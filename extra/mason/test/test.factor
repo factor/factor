@@ -101,8 +101,6 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
     user-init-errors get-global assoc-empty?
     [ f ] [ :user-init-errors t ] if ;
 
-SYMBOL: skip-mason-benchmarks
-
 : do-all ( -- )
     f parser-quiet? set-global
     f restartable-tests? set-global
@@ -114,15 +112,7 @@ SYMBOL: skip-mason-benchmarks
         [ generate-help ] benchmark html-help-time-file to-file
         [ do-tests ] benchmark test-time-file to-file
         [ do-help-lint ] benchmark help-lint-time-file to-file
-        ! Because of the way mason is written, it expects these files to exist.
-        ! So fake them.
-        skip-mason-benchmarks get [
-            { } benchmarks-file to-file
-            benchmark-error-messages-file touch-file
-            0 benchmark-time-file to-file
-        ] [
-            [ do-benchmarks ] benchmark benchmark-time-file to-file
-        ] if
+        [ do-benchmarks ] benchmark benchmark-time-file to-file
         do-compile-errors
     ] with-directory ;
 
