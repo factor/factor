@@ -123,17 +123,12 @@ IN: mason.report
             help-lint-errors-file
             error-dump
 
-            skip-mason-benchmarks get-global [
-                f f
-            ] [
-                "Benchmark errors"
-                benchmark-error-vocabs-file
-                benchmark-error-messages-file
-                error-dump
+            "Benchmark errors"
+            benchmark-error-vocabs-file
+            benchmark-error-messages-file
+            error-dump
 
-                benchmarks-file eval-file benchmarks-table
-            ] if
-
+            benchmarks-file eval-file benchmarks-table
         ] output>array sift
     ] with-report ;
 
@@ -143,7 +138,7 @@ IN: mason.report
         test-all-vocabs-file
         help-lint-vocabs-file
         compiler-errors-file
-        skip-mason-benchmarks get [ t ] [ benchmark-error-vocabs-file ] if
+        benchmark-error-vocabs-file
     } [ eval-file empty? ] all? ;
 
 : success ( -- status )

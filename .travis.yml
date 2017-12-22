@@ -50,7 +50,7 @@ script: >
   ( echo "=== Factor Configure Postgresql ===" ; ./factor -e='USING: db.postgresql namespaces memory ; T{ postgresql-db f "localhost" f f f f "postgres" "" } \ postgresql-db set-global save' ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ] ) &&
   ( echo "=== Factor Configure Imap ===" ; ./factor -e='USING: imap namespaces memory environment accessors ; T{ imap-settings { host "imap.gmail.com" }  } "FACTOR_IMAP_USER" os-env >>email "FACTOR_IMAP_PASSWORD" os-env >>password \ imap-settings set-global save' ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ] ) &&
   ( echo "=== Mkdir ===" ; mkdir -p mason/builds ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ] ) &&
-  ( echo "=== Factor tests ===" ; cd mason/builds && ../../factor -e='USING: namespaces tools.test mason.test ; f long-unit-tests-enabled? set-global t skip-mason-benchmarks set-global do-all' < /dev/null | awk 'NR<1000 || /^Loading resource|Unit Test/' ; ret=${PIPESTATUS[0]} ; echo "=== $ret ==="; [ $ret == 0 ]) &&
+  ( echo "=== Factor tests ===" ; cd mason/builds && ../../factor -e='USING: namespaces tools.test mason.test benchmark ; f long-unit-tests-enabled? set-global t benchmarks-disabled? set-global do-all' < /dev/null | awk 'NR<1000 || /^Loading resource|Unit Test/' ; ret=${PIPESTATUS[0]} ; echo "=== $ret ==="; [ $ret == 0 ]) &&
   ( echo "=== Factor report === " ; cd mason && ../factor -e='USING: mason.config mason.report namespaces ; "." builds-dir [ successful-report ] with-variable'  ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ]) &&
   ( echo "=== Dump report === " ;[[ "$TRAVIS_OS_NAME" != "osx" ]] && links -dump mason/report || cat mason/report  ; ret=$? ; echo "=== $ret ==="; [ $ret == 0 ]) &&
   [ ! -s mason/test-all-errors ]
