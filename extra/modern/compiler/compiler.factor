@@ -1,8 +1,9 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit constructors fry kernel lexer math
-modern namespaces sequences sets splitting strings ;
+combinators.short-circuit combinators.smart constructors fry
+kernel lexer math modern namespaces sequences sets splitting
+strings ;
 IN: modern.compiler
 
 <<
@@ -185,6 +186,10 @@ TUPLE: double-paren < matched ;
 CONSTRUCTOR: <double-paren> double-paren ( tokens tag payload -- obj ) ;
 
 
+TUPLE: double-quote < matched ;
+CONSTRUCTOR: <double-quote> double-quote ( tokens tag payload -- obj ) ;
+
+
 TUPLE: identifier < lexed name ;
 CONSTRUCTOR: <identifier> identifier ( tokens name -- obj ) ;
 
@@ -216,6 +221,9 @@ DEFER: literal>tuple
         { [ dup ?first ":" tail? ] [
             ! foo: 123
             [ ] [ ?first >string ] [ second literal>tuple ] tri <lower-colon>
+        ] }
+        { [ dup ?first "\"" tail? ] [
+            [ ] [ ?first >string ] [ second >string ] tri <double-quote>
         ] }
         { [ dup ?first "[" tail? ] [
             [ ] [ ?first "[" ?tail drop ] [ rest but-last ?first dup [ [ literal>tuple ] map ] when ] tri <single-bracket>
@@ -251,6 +259,35 @@ DEFER: literal>tuple
 : literals>tuples ( seq -- seq' )
     [ literal>tuple ] map ;
 
+: vocab>tuples ( path -- seq )
+    vocab>literals literals>tuples ;
+
+: string>tuples ( string -- seq )
+    string>literals literals>tuples ;
 
 : literals>vocabulary ( literals -- vocabulary )
     ;
+
+
+![[
+GENERIC: tuple>string ( obj -- string )
+
+M: sequence tuple>string
+    [ tuple>string ] map " " join ;
+
+M: upper-colon tuple>string
+    [
+        {
+            [ tag>> ": " ]
+            [ payload>> [ tuple>string ] map " " join ]
+            [ drop " ;" ]
+        } cleave
+    ] "" append-outputs-as ;
+
+M: identifier tuple>string name>> ;
+]]
+
+
+GENERIC: resolve-identifiers ( obj -- obj' )
+
+
