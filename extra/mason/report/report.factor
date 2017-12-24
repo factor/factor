@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators.smart debugger fry io.encodings.utf8
 io.files io.streams.string kernel literals locals mason.common
-mason.config mason.disk math math.parser namespaces sequences
+mason.config mason.disk mason.test math namespaces sequences
 xml.syntax xml.writer ;
 IN: mason.report
 
@@ -129,7 +129,7 @@ IN: mason.report
             error-dump
 
             benchmarks-file eval-file benchmarks-table
-        ] output>array
+        ] output>array sift
     ] with-report ;
 
 : build-clean? ( -- ? )

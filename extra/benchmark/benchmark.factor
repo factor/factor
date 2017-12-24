@@ -6,6 +6,8 @@ sequences tools.profiler.sampling tools.test tools.time
 vocabs.hierarchy vocabs.loader ;
 IN: benchmark
 
+SYMBOL: benchmarks-disabled?
+
 : run-timing-benchmark ( vocab -- time )
     5 swap '[ gc [ _ run ] benchmark ] replicate infimum ;
 
@@ -16,7 +18,12 @@ IN: benchmark
     "benchmark" disk-child-vocab-names [ find-vocab-root ] filter ;
 
 : find-benchmark-vocabs ( -- seq )
-    command-line get [ all-benchmark-vocabs ] when-empty ;
+    benchmarks-disabled? get [
+        "benchmarks-disabled? is true, not benchmarking anything!" print
+        { }
+    ] [
+        command-line get [ all-benchmark-vocabs ] when-empty
+    ] if ;
 
 <PRIVATE
 

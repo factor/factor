@@ -362,6 +362,7 @@ echo_build_info() {
     $ECHO NUM_CORES=$NUM_CORES
     $ECHO WORD=$WORD
     $ECHO DEBUG=$DEBUG
+    $ECHO CURRENT_BRANCH=$CURRENT_BRANCH
     $ECHO FACTOR_BINARY=$FACTOR_BINARY
     $ECHO FACTOR_LIBRARY=$FACTOR_LIBRARY
     $ECHO FACTOR_IMAGE=$FACTOR_IMAGE
@@ -436,6 +437,7 @@ find_build_info() {
     find_num_cores
     set_cc
     find_word_size
+    find_branch
     set_factor_binary
     set_factor_library
     set_factor_image
@@ -557,12 +559,21 @@ current_git_branch() {
     git rev-parse --abbrev-ref HEAD
 }
 
+find_branch() {
+    if [ -z ${TRAVIS_BRANCH} ]; then
+        CURRENT_BRANCH=$(current_git_branch)
+    else
+        CURRENT_BRANCH=${TRAVIS_BRANCH}
+    fi
+}
+
 checksum_url() {
-    branch=$(current_git_branch)
-    echo "http://downloads.factorcode.org/images/$branch/checksums.txt"
+    find_branch
+    echo "http://downloads.factorcode.org/images/$CURRENT_BRANCH/checksums.txt"
 }
 
 update_boot_images() {
+    find_branch
     $ECHO "Deleting old images..."
     $DELETE checksums.txt* > /dev/null 2>&1
     # delete boot images with one or two characters after the dot
@@ -587,8 +598,8 @@ update_boot_images() {
 }
 
 boot_image_url() {
-    branch=$(current_git_branch)
-    echo "http://downloads.factorcode.org/images/$branch/$BOOT_IMAGE"
+    find_branch
+    echo "http://downloads.factorcode.org/images/$CURRENT_BRANCH/$BOOT_IMAGE"
 }
 
 get_boot_image() {
@@ -737,3 +748,4 @@ case "$1" in
     full-report) find_build_info; check_installed_programs; check_libraries ;;
     *) usage ;;
 esac
+

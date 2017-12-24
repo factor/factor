@@ -1,9 +1,10 @@
+USING: accessors calendar classes concurrency.conditions
+concurrency.mailboxes concurrency.promises continuations
+destructors io io.backend.unix io.encodings.ascii io.sockets
+io.sockets.secure io.sockets.secure.debug io.streams.duplex
+io.timeouts kernel locals namespaces threads tools.test ;
+QUALIFIED-WITH: concurrency.messaging qm
 IN: io.sockets.secure.tests
-USING: accessors kernel namespaces io io.sockets
-io.sockets.secure io.encodings.ascii io.streams.duplex
-io.backend.unix classes words destructors threads tools.test
-concurrency.promises byte-arrays locals calendar io.timeouts
-io.sockets.secure.debug ;
 
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
 
@@ -19,13 +20,24 @@ io.sockets.secure.debug ;
                 ] curry with-stream
             ] with-disposal
         ] with-test-context
-    ] "SSL server test" spawn drop ;
+    ] "SSL server test" qm:spawn-linked drop
+    ! This is hideous.
+    ! If we fail with a timeout, the test is passing.
+    ! If we fail with something besides a timeout, rethrow it and fail the test.
+    [ qm:my-mailbox 200 milliseconds mailbox-get-timeout drop ]
+    [ dup timed-out-error? [ drop ] [ rethrow ] if ] recover ;
+
+: ?promise-test ( mailbox -- obj )
+    340 milliseconds ?promise-timeout ;
 
 : client-test ( -- string )
     <secure-config> [
-        "127.0.0.1" "port" get ?promise <inet4> f <secure> ascii <client> drop stream-contents
+        "127.0.0.1" "port" get ?promise-test <inet4> f <secure> ascii <client> drop
+        1 seconds
+        [ stream-contents ] with-timeout*
     ] with-secure-context ;
 
+! { } [ [ class-of name>> write "done" my-mailbox mailbox-put ] server-test ] unit-test
 { } [ [ class-of name>> write ] server-test ] unit-test
 
 { "secure" } [ client-test ] unit-test
@@ -55,7 +67,7 @@ io.sockets.secure.debug ;
 
 [
     <secure-config> [
-        "localhost" "port" get ?promise <inet> f <secure> ascii
+        "localhost" "port" get ?promise-test <inet> f <secure> ascii
         <client> drop dispose
     ] with-secure-context
 ] [ certificate-verify-error? ] must-fail-with
@@ -85,7 +97,7 @@ io.sockets.secure.debug ;
 { } [
     [
         [
-            "127.0.0.1" "port" get ?promise
+            "127.0.0.1" "port" get ?promise-test
             <inet4> ascii <client> drop &dispose 1 minutes sleep
         ] with-destructors
     ] "Silly client" spawn drop
@@ -126,7 +138,7 @@ io.sockets.secure.debug ;
     [
         1 seconds secure-socket-timeout [
             <secure-config> [
-                "127.0.0.1" "port" get ?promise <inet4> f <secure>
+                "127.0.0.1" "port" get ?promise-test <inet4> f <secure>
                 ascii <client> drop dispose
             ] with-secure-context
         ] with-variable
@@ -139,7 +151,7 @@ io.sockets.secure.debug ;
         [
             [
                 [
-                    "127.0.0.1" "port" get ?promise
+                    "127.0.0.1" "port" get ?promise-test
                     <inet4> f <secure> ascii <client> drop &dispose 1 minutes sleep
                 ] with-test-context
             ] with-destructors
