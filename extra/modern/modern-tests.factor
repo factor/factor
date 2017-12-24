@@ -183,6 +183,7 @@ IN: modern.tests
 } [ "<FOO: foo BAR: bar ;FOO>" string>literals >strings ] unit-test
 
 
+![[
 {
     {
         {
@@ -202,3 +203,14 @@ IN: modern.tests
         }
     }
 } [ "foo:: <FOO FOO>[ 0 ][ 1 ][ 2 ][ 3 ] <BAR BAR>" string>literals >strings ] unit-test
+]]
+
+{
+    {
+        { "foo::" { { "<FOO" { } "FOO>" } { "[" { "0" } "]" } } }
+        { "[" { "1" } "]" }
+        { "[" { "2" } "]" }
+        { "[" { "3" } "]" }
+        { "<BAR" { } "BAR>" }
+    }
+} [ "foo:: <FOO FOO> [ 0 ] [ 1 ] [ 2 ] [ 3 ] <BAR BAR>" string>literals >strings ] unit-test

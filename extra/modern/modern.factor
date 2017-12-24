@@ -207,6 +207,7 @@ ERROR: unexpected-terminator n string slice ;
     ! Also in stack effects ( T: int -- ) can be ended by -- and )
     dup ?last {
         { [ dup ";" sequence= ] [ drop unclip-last 3array ] }
+        { [ dup ";" tail? ] [ drop unclip-last 3array ] }
         { [ dup "--" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
         { [ dup "]" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
         { [ dup "}" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
