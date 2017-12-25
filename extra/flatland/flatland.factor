@@ -2,7 +2,7 @@
 USING: accessors arrays combinators combinators.short-circuit
 fry kernel locals math math.intervals math.vectors multi-methods
 sequences ;
-FROM: multi-methods => GENERIC: ;
+FROM: multi-methods => \GENERIC: ;
 IN: flatland
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

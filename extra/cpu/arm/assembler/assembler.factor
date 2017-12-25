@@ -56,7 +56,7 @@ SYMBOL: cond-code
 : >CC ( n -- )
     cond-code set ;
 
-: CC> ( -- n )
+: \CC> ( -- n )
     ! Default value is 0b1110 AL (= always)
     cond-code [ f ] change 0b1110 or ;
 
@@ -79,7 +79,7 @@ SYMBOL: cond-code
 
 <PRIVATE
 
-: (insn) ( n -- ) CC> 28 shift bitor , ;
+: (insn) ( n -- ) \CC> 28 shift bitor , ;
 
 : insn ( bitspec -- ) bitfield (insn) ; inline
 
@@ -102,12 +102,12 @@ PRIVATE>
 
 : S ( -- ) updates-cond-code on ;
 
-: S> ( -- ? ) updates-cond-code [ f ] change ;
+: \S> ( -- ? ) updates-cond-code [ f ] change ;
 
 <PRIVATE
 
 : sinsn ( bitspec -- )
-    bitfield S> [ 20 2^ bitor ] when (insn) ; inline
+    bitfield \S> [ 20 2^ bitor ] when (insn) ; inline
 
 GENERIC#: shift-imm/reg 2 ( shift-imm/Rs Rm shift -- n )
 

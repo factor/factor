@@ -67,8 +67,8 @@ node node-attributes define-=attrs
 
 >>
 
-ALIAS: -> add-edge
-ALIAS: -- add-edge
+ALIAS: \-> add-edge
+ALIAS: \-- add-edge
 ALIAS: ~-> add-path
 ALIAS: ~-- add-path
 
