@@ -336,6 +336,7 @@ M: upper-colon tuple>identifiers
         { "USING" [ drop f ] }
         { "IN" [ drop f ] }
         { "M" [ drop f ] }
+        { "FROM" [ drop f ] }
         { "INSTANCE" [ drop f ] }
         { "ARTICLE" [ drop f ] } ! TODO: Should be a word imo
         { "ABOUT" [ drop f ] } ! TODO: Should be a word imo
