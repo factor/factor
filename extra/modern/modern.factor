@@ -162,7 +162,7 @@ ERROR: unexpected-terminator n string slice ;
     {
         [
             [
-                { [ char: A char: Z between? ] [ ":-\\" member? ] } 1||
+                { [ char: A char: Z between? ] [ ":-\\#" member? ] } 1||
             ] all?
         ]
         [ [ char: A char: Z between? ] any? ] ! XXX: what?
@@ -292,7 +292,14 @@ DEFER: lex-factor-top*
 : lex-factor-nested* ( n/f string slice/f ch/f -- n'/f string literal )
     {
         ! Nested ``A: a B: b`` so rewind and let the parser get it top-level
-        { char: \: [ merge-slice-til-whitespace rewind-slice f ] }
+        { char: \: [
+            ! A: B: then interrupt the current parser
+            ! A: b: then keep going
+            merge-slice-til-whitespace
+            dup upper-colon?
+            [ rewind-slice f ]
+            [ read-colon ] if
+        ] }
         { char: < [
             ! FOO: a b <BAR: ;BAR>
             ! FOO: a b <BAR BAR>

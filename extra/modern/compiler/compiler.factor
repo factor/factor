@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit combinators.smart constructors fry
-kernel lexer math modern namespaces sequences sets splitting
-strings ;
+kernel lexer math math.parser modern namespaces sequences sets
+splitting strings ;
 IN: modern.compiler
 
 <<
@@ -32,38 +32,45 @@ LEFT-DECORATOR: recursive
 
 <<
 SYMBOL: arities
-arities [ H{ } clone ] initialize
+! Initialize with : foo ( -- ) .. ; already
+arities [ H{ } clone 2 "" pick set-at ] initialize
 >>
 <<
 : make-arity ( n string -- )
     arities get set-at ;
 >>
 <<
-SYNTAX: \ARITY: scan-token scan-token swap make-arity ;
+SYNTAX: \ARITY:
+    scan-token
+    scan-token string>number swap make-arity ;
 >>
 
-ARITY: \ALIAS: 2
-ARITY: \ARITY: 2
-ARITY: \BUILTIN: 1
-ARITY: \CONSTANT: 2
-ARITY: \DEFER: 1
-ARITY: \GENERIC#: 3
-ARITY: \GENERIC: 2
-ARITY: \HOOK: 3
-ARITY: \IN: 1
-ARITY: \INSTANCE: 2
-ARITY: \MAIN: 1
-ARITY: \MATH: 1
-ARITY: \MIXIN: 1
-ARITY: \PRIMITIVE: 2
-ARITY: \QUALIFIED-WITH: 2
-ARITY: \QUALIFIED: 1
-ARITY: \RENAME: 3
-ARITY: \SINGLETON: 1
-ARITY: \SLOT: 1
-ARITY: \SYMBOL: 1
-ARITY: \UNUSE: 1
-ARITY: \USE: 1
+ARITY: ALIAS 2
+ARITY: ARITY 2
+ARITY: BUILTIN 1
+ARITY: CONSTANT 2
+ARITY: DEFER 1
+ARITY: GENERIC# 3
+ARITY: GENERIC 2
+ARITY: HOOK 3
+ARITY: IN 1
+ARITY: INSTANCE 2
+ARITY: MAIN 1
+ARITY: MATH 1
+ARITY: MIXIN 1
+ARITY: PRIMITIVE 2
+ARITY: QUALIFIED-WITH 2
+ARITY: QUALIFIED 1
+ARITY: RENAME 3
+ARITY: SINGLETON 1
+ARITY: SLOT 1
+ARITY: SYMBOL 1
+ARITY: UNUSE 1
+ARITY: USE 1
+
+ARITY: MEMO 2
+ARITY: \: 2
+
 ! ARITY: \USING: 0
 
 : get-arity ( string -- n/f )
@@ -150,6 +157,9 @@ CONSTRUCTOR: <comment> comment ( tokens payload -- obj ) ;
 TUPLE: escaped-identifier < lexed name ;
 CONSTRUCTOR: <escaped-identifier> escaped-identifier ( tokens name -- obj ) ;
 
+TUPLE: escaped-object < lexed name payload ;
+CONSTRUCTOR: <escaped-object> escaped-object ( tokens name payload -- obj ) ;
+
 TUPLE: section < lexed tag payload ;
 CONSTRUCTOR: <section> section ( tokens tag payload -- obj ) ;
 
@@ -201,6 +211,11 @@ DEFER: literal>tuple
         ! Comment has to be first
         { [ dup ?first "!" head? ] [
             [ ] [ ?second >string ] bi <comment>
+        ] }
+
+        ! Must be before escaped-identifier so that ``\ foo`` works
+        { [ dup ?first "\\" tail? ] [
+            [ ] [ ?first >string ] [ ?second ] tri <escaped-object>
         ] }
 
         { [ dup ?first "\\" head? ] [
@@ -287,7 +302,41 @@ M: upper-colon tuple>string
 M: identifier tuple>string name>> ;
 ]]
 
+TUPLE: compilation-unit ;
 
-GENERIC: resolve-identifiers ( obj -- obj' )
+GENERIC: tuple>identifiers ( obj -- obj' )
 
+M: comment tuple>identifiers drop f ;
 
+M: section tuple>identifiers
+    payload>> [ tuple>identifiers ] map sift ;
+
+M: identifier tuple>identifiers drop f ;
+M: lower-colon tuple>identifiers drop f ;
+M: escaped-object tuple>identifiers drop f ;
+M: double-quote tuple>identifiers drop f ;
+M: single-bracket tuple>identifiers drop f ;
+M: single-brace tuple>identifiers drop f ;
+M: single-paren tuple>identifiers drop f ;
+
+ERROR: upper-colon-identifer-expected obj ;
+ERROR: unknown-upper-colon upper-colon string ;
+M: upper-colon tuple>identifiers
+    [ ] [ payload>> ] [ tag>> ] tri {
+        ! { "" [ ?first name>> ] }
+        ! { "TUPLE" [ ?first name>> ] }
+        ! make the default one ?first
+        { "USE" [ drop f ] }
+        { "USING" [ drop f ] }
+        { "IN" [ drop f ] }
+        { "M" [ drop f ] }
+        { "INSTANCE" [ drop f ] }
+        { "ROMAN-OP" [ ?first name>> "roman" prepend ] }
+        [ drop ?first name>> ]
+    } case nip ;
+
+M: sequence tuple>identifiers
+    [ tuple>identifiers ] map sift ;
+
+: vocab>identifiers ( vocab -- hashtable )
+    vocab>tuples tuple>identifiers ;
