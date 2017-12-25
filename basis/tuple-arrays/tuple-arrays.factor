@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.tuple classes.tuple.private
-combinators combinators.smart fry functors kernel macros math parser
+combinators combinators.smart fry functors2 kernel macros math parser
 sequences sequences.private ;
 FROM: inverse => undo ;
 IN: tuple-arrays
@@ -34,7 +34,7 @@ MACRO: write-tuple ( class -- quot )
 
 PRIVATE>
 
-FUNCTOR: tuple-array ( CLASS: [ check-final ] -- ) [[
+FUNCTOR: tuple-array ( CLASS: existing-class -- ) [[
 
 USING: accessors arrays classes.tuple.private kernel sequences
 sequences.private tuple-arrays.private ;
