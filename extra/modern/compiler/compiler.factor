@@ -320,10 +320,10 @@ M: double-brace tuple>identifiers drop f ;
 M: double-paren tuple>identifiers drop f ;
 
 M: section tuple>identifiers
-    payload>> [ tuple>identifiers ] map sift ;
+    payload>> [ tuple>identifiers ] map concat 1array ;
 
 M: named-section tuple>identifiers
-    payload>> [ tuple>identifiers ] map sift ;
+    payload>> [ tuple>identifiers ] map concat 1array ;
 
 ERROR: upper-colon-identifer-expected obj ;
 ERROR: unknown-upper-colon upper-colon string ;
@@ -337,18 +337,34 @@ M: upper-colon tuple>identifiers
         { "IN" [ drop f ] }
         { "M" [ drop f ] }
         { "FROM" [ drop f ] }
+        { "LIBRARY" [ drop f ] }
         { "INSTANCE" [ drop f ] }
         { "ARTICLE" [ drop f ] } ! TODO: Should be a word imo
         { "ABOUT" [ drop f ] } ! TODO: Should be a word imo
-        { "ROMAN-OP" [ ?first name>> "roman" prepend ] }
-        { "TYPEDEF" [ ?second name>> ] }
-        { "FUNCTION" [ ?second name>> ] }
-        { "GL-FUNCTION" [ ?second name>> ] }
-        [ drop ?first name>> ]
+        { "ROMAN-OP" [ ?first name>> "roman" prepend 1array ] }
+        { "TYPEDEF" [ ?second name>> 1array ] }
+        { "FUNCTION" [ ?second name>> 1array ] }
+        { "GL-FUNCTION" [ ?second name>> 1array ] }
+        { "TUPLE" [ ?first name>> [ ] [ "?" append ] bi 2array ] }
+        { "UNION" [ ?first name>> [ ] [ "?" append ] bi 2array ] }
+        { "ERROR" [ ?first name>> [ ] [ "?" append ] bi 2array ] }
+        { "BUILTIN" [ ?first name>> [ ] [ "?" append ] bi 2array ] }
+        { "SINGLETON" [ ?first name>> [ ] [ "?" append ] bi 2array ] }
+        { "SINGLETONS" [
+            [ name>> [ ] [ "?" append ] bi 2array ] map concat
+        ] }
+        { "MIXIN" [ ?first name>> [ ] [ "?" append ] bi 2array ] }
+        { "PREDICATE" [ ?first name>> [ ] [ "?" append ] bi 2array ] }
+        { "C-TYPE" [ ?first name>> [ ] [ "?" append ] bi 2array ] }
+        { "SLOT" [ ?first name>> ">>" append 1array ] }
+        [ drop ?first name>> 1array ]
     } case nip ;
 
 M: sequence tuple>identifiers
-    [ tuple>identifiers ] map sift ;
+    [ tuple>identifiers ] map sift concat ;
 
 : vocab>identifiers ( vocab -- hashtable )
     vocab>tuples tuple>identifiers ;
+
+: string>identifiers ( string -- identifiers )
+    string>tuples tuple>identifiers ;
