@@ -342,6 +342,8 @@ M: upper-colon tuple>identifiers
         { "ABOUT" [ drop f ] } ! TODO: Should be a word imo
         { "ROMAN-OP" [ ?first name>> "roman" prepend ] }
         { "TYPEDEF" [ ?second name>> ] }
+        { "FUNCTION" [ ?second name>> ] }
+        { "GL-FUNCTION" [ ?second name>> ] }
         [ drop ?first name>> ]
     } case nip ;
 
