@@ -411,7 +411,7 @@ PRIVATE>
 : set-fortran-abi ( library -- )
     library-fortran-abis get-global at fortran-abi set ;
 
-: fortran-invoke-impl ( return library function parameters -- quot )
+: (fortran-invoke-impl) ( return library function parameters -- quot )
     {
         [ 2nip [<fortran-result>] ]
         [ nip nip nip [fortran-args>c-args] ]
@@ -419,13 +419,13 @@ PRIVATE>
         [ 2nip [fortran-results>] ]
     } 4 ncleave 4 nappend ;
 
-:: (fortran-invoke) ( return library function parameters -- quot )
+:: fortran-invoke-impl ( return library function parameters -- quot )
     library library-fortran-abis get-global at dup bad-fortran-abi?
     [ '[ _ throw ] ]
-    [ drop return library function parameters fortran-invoke-impl ] if ;
+    [ drop return library function parameters (fortran-invoke-impl) ] if ;
 
 MACRO: fortran-invoke ( return library function parameters -- quot )
-    { [ 2drop nip set-fortran-abi ] [ (fortran-invoke) ] } 4 ncleave ;
+    { [ 2drop nip set-fortran-abi ] [ fortran-invoke-impl ] } 4 ncleave ;
 
 : parse-arglist ( parameters return -- types effect )
     [
