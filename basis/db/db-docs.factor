@@ -14,7 +14,7 @@ HELP: new-db-connection
 
 HELP: db-open
 { $values { "db" "a database configuration object" } { "db-connection" db-connection } }
-{ $description "Opens a database using the configuration data stored in a " { $snippet "database configuration object" } "tuple. The database object now references a database handle that must be cleaned up. Therefore, it is better to use the " { $link with-db } " combinator than calling this word directly." } ;
+{ $description "Opens a database using the configuration data stored in a " { $snippet "database configuration object" } " tuple. The database object now references a database handle that must be cleaned up. Therefore, it is better to use the " { $link with-db } " combinator than calling this word directly." } ;
 
 HELP: db-close
 { $values { "handle" alien } }
