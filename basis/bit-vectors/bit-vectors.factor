@@ -5,7 +5,7 @@ sequences.private growable bit-arrays prettyprint.custom
 parser accessors vectors.functor classes.parser ;
 IN: bit-vectors
 
-<< "bit-vector" create-class-in \ bit-array \ <bit-array> define-vector >>
+SPECIAL-VECTOR: bit-vector bit-array
 
 SYNTAX: \?V{ \ } [ >bit-vector ] parse-literal ;
 

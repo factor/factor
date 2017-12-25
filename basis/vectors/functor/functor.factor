@@ -4,31 +4,28 @@ USING: classes functors growable kernel math sequences
 sequences.private functors2 ;
 IN: vectors.functor
 
-FUNCTOR: special-vector ( T: existing-word -- ) [[
-USING: classes growable kernel math sequences sequences.private
-specialized-arrays ;
+SAME-FUNCTOR: special-vector ( vector: name underlying: existing-class -- ) [[
+    USING: classes growable kernel math sequences sequences.private
+    specialized-arrays ;
 
-SPECIALIZED-ARRAY: ${T}
+    TUPLE: ${vector} { underlying ${underlying} } { length array-capacity } ;
 
-TUPLE: ${T}-vector { underlying ${T}-array } { length array-capacity } ;
+    : >${vector} ( seq -- vector ) ${vector} new clone-like ; inline
 
-: >${T}-vector ( seq -- vector ) ${T}-vector new clone-like ; inline
+    : <${vector}> ( capacity -- vector ) <${underlying}> 0 ${vector} boa ; inline
 
-: <${T}-vector> ( capacity -- vector ) <${T}-array> 0 ${T}-vector boa ; inline
+    M: ${vector} like
+        drop dup ${vector} instance? [
+            dup ${underlying} instance? [ dup length ${vector} boa ] [ >${vector} ] if
+        ] unless ; inline
 
-M: ${T}-vector like
-    drop dup ${T}-vector instance? [
-        dup ${T}-array instance? [ dup length ${T}-vector boa ] [ >${T}-vector ] if
-    ] unless ; inline
+    M: ${vector} new-sequence drop [ <${underlying}> ] [ >fixnum ] bi ${vector} boa ; inline
 
-M: ${T}-vector new-sequence drop [ <${T}-array> ] [ >fixnum ] bi ${T}-vector boa ; inline
+    M: ${underlying} new-resizable drop <${vector}> ; inline
 
-M: ${T}-array new-resizable drop <${T}-vector> ; inline
+    M: ${vector} new-resizable drop <${vector}> ; inline
 
-M: ${T}-vector new-resizable drop <${T}-vector> ; inline
+    M: ${vector} equal? over ${vector} instance? [ sequence= ] [ 2drop f ] if ;
 
-M: ${T}-vector equal? over ${T}-vector instance? [ sequence= ] [ 2drop f ] if ;
-
-INSTANCE: ${T}-vector growable
-
+    INSTANCE: ${vector} growable
 ]]
