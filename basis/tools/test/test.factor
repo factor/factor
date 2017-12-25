@@ -241,7 +241,7 @@ SYNTAX: \UNIT-TEST:
 
 TUPLE: unit-test-failed-section quot ;
 CONSTRUCTOR: <unit-test-failed-section> unit-test-failed-section ( quot -- obj ) ;
-SYMBOL: UNIT-TEST-FAILED>
+SYMBOL: \UNIT-TEST-FAILED>
 SYNTAX: \<UNIT-TEST-FAILED
     \ UNIT-TEST-FAILED> parse-until <unit-test-failed-section> suffix! ;
 

@@ -74,7 +74,7 @@ C: <cocoa-protocol> cocoa-protocol
 SYNTAX: \COCOA-PROTOCOL:
     scan-token <cocoa-protocol> suffix! ;
 
-SYMBOL: ;CLASS>
+SYMBOL: \;CLASS>
 
 SYNTAX: \<CLASS:
     scan-token

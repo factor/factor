@@ -3,6 +3,23 @@
 USING: modern modern.slices multiline tools.test ;
 IN: modern.tests
 
+{ f } [ "" upper-colon? ] unit-test
+{ t } [ ":" upper-colon? ] unit-test
+{ t } [ "::" upper-colon? ] unit-test
+{ t } [ ":::" upper-colon? ] unit-test
+{ t } [ "FOO:" upper-colon? ] unit-test
+{ t } [ "FOO::" upper-colon? ] unit-test
+{ t } [ "FOO:::" upper-colon? ] unit-test
+
+{ f } [ "\\" upper-colon? ] unit-test
+{ f } [ "\\:" upper-colon? ] unit-test
+{ f } [ "\\::" upper-colon? ] unit-test
+{ f } [ "\\:::" upper-colon? ] unit-test
+{ f } [ "\\FOO:" upper-colon? ] unit-test
+{ f } [ "\\FOO::" upper-colon? ] unit-test
+{ f } [ "\\FOO:::" upper-colon? ] unit-test
+
+
 ! Comment
 {
     { { "!" "" } }

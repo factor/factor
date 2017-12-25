@@ -308,9 +308,6 @@ GENERIC: tuple>identifiers ( obj -- obj' )
 
 M: comment tuple>identifiers drop f ;
 
-M: section tuple>identifiers
-    payload>> [ tuple>identifiers ] map sift ;
-
 M: identifier tuple>identifiers drop f ;
 M: lower-colon tuple>identifiers drop f ;
 M: escaped-object tuple>identifiers drop f ;
@@ -318,6 +315,15 @@ M: double-quote tuple>identifiers drop f ;
 M: single-bracket tuple>identifiers drop f ;
 M: single-brace tuple>identifiers drop f ;
 M: single-paren tuple>identifiers drop f ;
+M: double-bracket tuple>identifiers drop f ;
+M: double-brace tuple>identifiers drop f ;
+M: double-paren tuple>identifiers drop f ;
+
+M: section tuple>identifiers
+    payload>> [ tuple>identifiers ] map sift ;
+
+M: named-section tuple>identifiers
+    payload>> [ tuple>identifiers ] map sift ;
 
 ERROR: upper-colon-identifer-expected obj ;
 ERROR: unknown-upper-colon upper-colon string ;
@@ -331,7 +337,10 @@ M: upper-colon tuple>identifiers
         { "IN" [ drop f ] }
         { "M" [ drop f ] }
         { "INSTANCE" [ drop f ] }
+        { "ARTICLE" [ drop f ] } ! TODO: Should be a word imo
+        { "ABOUT" [ drop f ] } ! TODO: Should be a word imo
         { "ROMAN-OP" [ ?first name>> "roman" prepend ] }
+        { "TYPEDEF" [ ?second name>> ] }
         [ drop ?first name>> ]
     } case nip ;
 

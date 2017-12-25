@@ -181,15 +181,21 @@ ERROR: unexpected-terminator n string slice ;
     } 1&& ;
 
 : upper-colon? ( string -- ? )
-    {
-        [ length 2 >= ]
-        [ ":" tail? ]
-        [ dup [ char: \: = ] find drop head strict-upper? ]
-    } 1&& ;
+    dup { [ length 0 > ] [ [ char: \: = ] all? ] } 1&& [
+        drop t
+    ] [
+        {
+            [ length 2 >= ]
+            [ "\\" head? not ] ! XXX: good?
+            [ ":" tail? ]
+            [ dup [ char: \: = ] find drop head strict-upper? ]
+        } 1&&
+    ] if ;
 
 : section-close? ( string -- ? )
     {
         [ length 2 >= ]
+        [ "\\" head? not ] ! XXX: good?
         [ ">" tail? ]
         [
             {
@@ -296,7 +302,8 @@ DEFER: lex-factor-top*
             ! A: B: then interrupt the current parser
             ! A: b: then keep going
             merge-slice-til-whitespace
-            dup upper-colon?
+            dup { [ upper-colon? ] [ ":" = ] } 1||
+            ! dup upper-colon?
             [ rewind-slice f ]
             [ read-colon ] if
         ] }

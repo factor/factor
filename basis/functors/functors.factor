@@ -139,7 +139,7 @@ SYNTAX: DEFINES-PRIVATE [ begin-private create-word-in end-private ] (INTERPOLAT
 
 SYNTAX: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ;
 
-DEFER: ;FUNCTOR> delimiter
+DEFER: \;FUNCTOR> delimiter
 
 <PRIVATE
 
