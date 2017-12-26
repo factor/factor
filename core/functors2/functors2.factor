@@ -89,9 +89,10 @@ ERROR: not-all-unique seq ;
         ] [
             [
                 [
-                    dup { [ word? ] [ string? ] } 1|| [
+                    ! dup { [ word? ] [ string? ] } 1|| [
+                    dup { [ word? ] } 1|| [
                         [ dup word? [ vocabulary>> ] [ drop current-vocab name>> ] if ] [ dup word? [ name>> ] when ] bi
-                        " => " glue "FROM: " " ;\n" surround drop ""
+                        " => " glue "FROM: " " ;\n" surround
                     ] [
                         drop ""
                     ] if
@@ -108,7 +109,8 @@ ERROR: not-all-unique seq ;
             '[
                 ! parse-stream forgets the previous vocab if same name
                 @ over '[
-                    _ _ drop string-lines parse-lines drop
+                    _ _ drop string-lines parse-lines
+                    call( -- ) ! call the top-level code returned from parse-lines
                 ] nip call ! generate-vocab use-vocab
             ]
         ] dip
