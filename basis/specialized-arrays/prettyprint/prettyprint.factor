@@ -11,5 +11,5 @@ IN: specialized-arrays.prettyprint
          [ pprint* ] tri@
      ] pprint-prefix ;
 
-M: specialized-array pprint*
+M: specialized-array-mixin pprint*
     [ pprint-object ] [ pprint-direct-array ] pprint-c-object ;

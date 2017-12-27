@@ -18,7 +18,10 @@ FROM: specialized-arrays.private => nth-c-ptr direct-like ;
 
 SPECIALIZED-ARRAY: ${T}
 
+<<
+! For >foo-vector to be defined in time
 SPECIAL-VECTOR: ${T}
+>>
 
 SYNTAX: ${T}-vector{ \ } [ >${T}-vector ] parse-literal ;
 
