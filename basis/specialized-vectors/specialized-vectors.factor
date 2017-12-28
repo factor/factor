@@ -8,7 +8,7 @@ IN: specialized-vectors
 
 MIXIN: specialized-vector
 
-FUNCTOR: specialized-vector ( T: existing-word -- ) [[
+FUNCTOR: specialized-vector ( type: existing-word -- ) [[
 
 USING: accessors alien alien.c-types alien.data classes growable
 kernel math parser prettyprint.custom sequences
@@ -16,39 +16,40 @@ sequences.private specialized-arrays specialized-arrays.private
 specialized-vectors vectors.functor ;
 FROM: specialized-arrays.private => nth-c-ptr direct-like ;
 
-SPECIALIZED-ARRAY: ${T}
+<<
+SPECIALIZED-ARRAY: ${type}
+>>
 
 <<
 ! For >foo-vector to be defined in time
-SPECIAL-VECTOR: ${T}
+VECTORIZED: ${type} ${type}-array <${type}-array>
 >>
 
-SYNTAX: ${T}-vector{ \ } [ >${T}-vector ] parse-literal ;
+SYNTAX: ${type}-vector{ \ } [ >${type}-vector ] parse-literal ;
 
-INSTANCE: ${T}-vector specialized-vector
-INSTANCE: ${T}-vector growable
+INSTANCE: ${type}-vector specialized-vector
 
-M: ${T}-vector contract 2drop ; inline
+M: ${type}-vector contract 2drop ; inline
 
-M: ${T}-vector element-size drop \ ${T} heap-size ; inline
+M: ${type}-vector element-size drop \ ${type} heap-size ; inline
 
-M: ${T}-vector pprint-delims drop \ ${T}-vector{ \ } ;
+M: ${type}-vector pprint-delims drop \ ${type}-vector{ \ } ;
 
-M: ${T}-vector >pprint-sequence ;
+M: ${type}-vector >pprint-sequence ;
 
-M: ${T}-vector pprint* pprint-object ;
+M: ${type}-vector pprint* pprint-object ;
 
-M: ${T}-vector >c-ptr underlying>> underlying>> ; inline
-M: ${T}-vector byte-length [ length ] [ element-size ] bi * ; inline
+M: ${type}-vector >c-ptr underlying>> underlying>> ; inline
+M: ${type}-vector byte-length [ length ] [ element-size ] bi * ; inline
 
-M: ${T}-vector direct-like drop <direct-${T}-array> ; inline
-M: ${T}-vector nth-c-ptr underlying>> nth-c-ptr ; inline
+M: ${type}-vector direct-like drop <direct-${type}-array> ; inline
+M: ${type}-vector nth-c-ptr underlying>> nth-c-ptr ; inline
 
-M: ${T}-array like
-    drop dup ${T}-array instance? [
-        dup ${T}-vector instance? [
-            [ >c-ptr ] [ length>> ] bi <direct-${T}-array>
-        ] [ \ ${T} >c-array ] if
+M: ${type}-array like
+    drop dup ${type}-array instance? [
+        dup ${type}-vector instance? [
+            [ >c-ptr ] [ length>> ] bi <direct-${type}-array>
+        ] [ \ ${type} >c-array ] if
     ] unless ; inline
 
 ]]

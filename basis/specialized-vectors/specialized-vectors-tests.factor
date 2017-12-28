@@ -1,10 +1,10 @@
 IN: specialized-vectors.tests
 USING: specialized-arrays specialized-vectors
 tools.test kernel sequences alien.c-types vectors.functor ;
-SPECIALIZED-ARRAY: float
+SPECIALIZED-ARRAYS: float double ;
 SPECIALIZED-VECTORS: float double ;
-SPECIAL-VECTOR: double
-SPECIAL-VECTOR: float
+VECTORIZED: double double-array <double-array>
+VECTORIZED: float float-array <float-array>
 
 { 3 } [ double-vector{ 1 2 } 3 suffix! length ] unit-test
 

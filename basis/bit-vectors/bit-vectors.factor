@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel kernel.private math sequences
-sequences.private growable bit-arrays prettyprint.custom
-parser accessors vectors.functor classes.parser ;
+USING: bit-arrays classes growable kernel math parser
+prettyprint.custom sequences sequences.private vectors.functor ;
 IN: bit-vectors
 
-SPECIAL-VECTOR: bit-vector bit-array
+VECTORIZED: bit bit-array <bit-array>
 
 SYNTAX: \?V{ \ } [ >bit-vector ] parse-literal ;
 

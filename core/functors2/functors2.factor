@@ -63,8 +63,12 @@ ERROR: not-all-unique seq ;
         ] [
             [
                 [
-                    [ dup word? [ vocabulary>> ] [ drop current-vocab name>> ] if ] [ dup word? [ name>> ] when ] bi
-                    " => " glue "FROM: " " ;\n" surround
+                    dup { [ word? ] } 1|| [
+                        [ dup word? [ vocabulary>> ] [ drop current-vocab name>> ] if ] [ dup word? [ name>> ] when ] bi
+                        " => " glue "FROM: " " ;\n" surround
+                    ] [
+                        drop ""
+                    ] if
                 ]
             ] replicate
         ] [ ] tri dup
@@ -75,7 +79,7 @@ ERROR: not-all-unique seq ;
         ! append the IN: and the FROM: quot generator and the functor code
         [
             append
-            '[ @ over '[ _ <string-reader> _ parse-stream drop ] generate-vocab use-vocab ]
+            '[ @ over '[ _ <string-reader> _ parse-stream call( -- ) ] generate-vocab use-vocab ]
         ] dip
     ] 3tri ;
 

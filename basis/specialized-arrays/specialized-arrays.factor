@@ -41,8 +41,8 @@ M: byte-array direct-like drop uchar <c-direct-array> ; inline
 
 PRIVATE>
 
-VARIABLES-FUNCTOR: specialized-array ( T: existing-word -- ) {
-    { "A" "${T}-array" }
+VARIABLES-FUNCTOR: specialized-array ( type: existing-word -- ) {
+    { "A" "${type}-array" }
     { "<A>" "<${A}>" }
     { "(A)" "(${A})" }
     { "<direct-A>" "<direct-${A}>" }
@@ -62,13 +62,13 @@ INSTANCE: ${A} specialized-array-mixin
 : ${<direct-A>} ( alien len -- specialized-array ) ${A} boa ; inline
 
 : ${<A>} ( n -- specialized-array )
-    [ \ ${T} <underlying> ] keep ${<direct-A>} ; inline
+    [ \ ${type} <underlying> ] keep ${<direct-A>} ; inline
 
 : ${(A)} ( n -- specialized-array )
-    [ \ ${T} (underlying) ] keep ${<direct-A>} ; inline
+    [ \ ${type} (underlying) ] keep ${<direct-A>} ; inline
 >>
 
-SYNTAX: ${A}{ \ } [ \ ${T} >c-array ] parse-literal ;
+SYNTAX: ${A}{ \ } [ \ ${type} >c-array ] parse-literal ;
 
 M: ${A} direct-like drop ${<direct-A>} ; inline
 
@@ -76,13 +76,13 @@ M: ${A} clone [ underlying>> clone ] [ length>> ] bi ${<direct-A>} ; inline
 
 M: ${A} length length>> ; inline
 
-M: ${A} nth-unsafe underlying>> \ ${T} alien-element ; inline
+M: ${A} nth-unsafe underlying>> \ ${type} alien-element ; inline
 
-M: ${A} nth-c-ptr underlying>> \ ${T} array-accessor drop swap <displaced-alien> ; inline
+M: ${A} nth-c-ptr underlying>> \ ${type} array-accessor drop swap <displaced-alien> ; inline
 
-M: ${A} set-nth-unsafe underlying>> \ ${T} set-alien-element ; inline
+M: ${A} set-nth-unsafe underlying>> \ ${type} set-alien-element ; inline
 
-M: ${A} like drop dup ${A} instance? [ \ ${T} >c-array ] unless ; inline
+M: ${A} like drop dup ${A} instance? [ \ ${type} >c-array ] unless ; inline
 
 M: ${A} new-sequence drop ${(A)} ; inline
 
@@ -90,24 +90,24 @@ M: ${A} equal? over ${A} instance? [ sequence= ] [ 2drop f ] if ;
 
 M: ${A} resize
     [
-        [ \ ${T} heap-size * ] [ underlying>> ] bi*
+        [ \ ${type} heap-size * ] [ underlying>> ] bi*
         resize-byte-array
     ] [ drop ] 2bi
     ${<direct-A>} ; inline
 
-M: ${A} element-size drop \ ${T} heap-size ; inline
+M: ${A} element-size drop \ ${type} heap-size ; inline
 
-M: ${A} underlying-type drop \ ${T} ;
+M: ${A} underlying-type drop \ ${type} ;
 
 M: ${A} pprint-delims drop \ ${A}{ \ } ;
 
 M: ${A} >pprint-sequence ;
 
-M: ${A} vs+ [ + \ ${T} c-type-clamp ] 2map ; inline
-M: ${A} vs- [ - \ ${T} c-type-clamp ] 2map ; inline
-M: ${A} vs* [ * \ ${T} c-type-clamp ] 2map ; inline
+M: ${A} vs+ [ + \ ${type} c-type-clamp ] 2map ; inline
+M: ${A} vs- [ - \ ${type} c-type-clamp ] 2map ; inline
+M: ${A} vs* [ * \ ${type} c-type-clamp ] 2map ; inline
 
-M: ${A} v*high [ * \ ${T} heap-size neg shift ] 2map ; inline
+M: ${A} v*high [ * \ ${type} heap-size neg shift ] 2map ; inline
 ]]
 
 <PRIVATE
