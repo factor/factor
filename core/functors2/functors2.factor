@@ -46,7 +46,7 @@ ERROR: not-all-unique seq ;
         _ hashcode number>string % ! narray for all the template parameters
     ] "" make ;
 
-: functor-same-vocab-name ( functor-word parameters -- string )
+: functor-inline-vocab-name ( functor-word parameters -- string )
     drop
     '[
         ! box-functor:functors:box:float:1827917291
@@ -83,7 +83,7 @@ ERROR: not-all-unique seq ;
         ] dip
     ] 3tri ;
 
-: prepend-input-vocabs-same ( word def effect -- word def effect )
+: prepend-input-vocabs-inline ( word def effect -- word def effect )
     [ 2drop ]
     [
         ! make FROM: vocab => word ; for each input argument
@@ -171,10 +171,10 @@ CONSTANT: scanner-table H{
         '[ @ @ ] define-syntax
     ] 3bi ; inline
 
-: (make-functor-same) ( word effect quot -- )
+: (make-functor-inline) ( word effect quot -- )
     swap
     make-in-drop-variables
-    prepend-input-vocabs-same
+    prepend-input-vocabs-inline
     ! word quot effect
     [
         [ functor-definer-word-name create-new-word-in ] 2dip
@@ -207,27 +207,23 @@ CONSTANT: scanner-table H{
         (make-functor-vocab)
     ] 4bi ; inline
 
-: make-variable-functor-same ( word effect bindings string -- )
+: make-variable-functor-inline ( word effect bindings string -- )
     [
         nip make-functor-word
     ] [
         [ interpolate-assoc ] dip ! do bindings in series
         '[ @ _ interpolate>string append ] ! append the interpolated string to the FROM:
-        (make-functor-same)
+        (make-functor-inline)
     ] 4bi ; inline
 
 : make-functor ( word effect string -- )
     { } swap make-variable-functor ;
 
-: make-same-functor ( word effect string -- )
-    { } swap make-variable-functor-same ;
-
-! FUNCTOR: foo, define-foo, and FOO: go into the vocabulary where the FUNCTOR: appears
-! SYNTAX: \FUNCTOR:
-    ! scan-new-word scan-effect scan-object make-functor ;
+: make-inline-functor ( word effect string -- )
+    { } swap make-variable-functor-inline ;
 
 ! SYNTAX: \VARIABLE-FUNCTOR:
     ! scan-new-word scan-effect scan-object scan-object make-variable-functor ;
 
 SYNTAX: \INLINE-FUNCTOR:
-    scan-new-word scan-effect scan-object make-same-functor ;
+    scan-new-word scan-effect scan-object make-inline-functor ;
