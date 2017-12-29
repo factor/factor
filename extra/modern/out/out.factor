@@ -21,7 +21,7 @@ CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;
 : write-whitespace ( last obj -- )
     swap
     [ swap slice-between ] [ slice-before ] if*
-    trim-before-newline io:write ;
+    trim-before-newline io::write ;
 
 GENERIC: write-literal* ( last obj -- last' )
 M: slice write-literal* [ write-whitespace ] [ write ] [ ] tri ;
