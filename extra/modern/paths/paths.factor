@@ -113,8 +113,7 @@ ERROR: not-a-source-path path ;
 : core-test-paths ( -- seq ) core-vocabs modern-tests-paths ;
 : basis-test-paths ( -- seq )
     basis-vocabs
-    modern-tests-paths
-    { "resource:basis/functors/functors-tests.factor" } diff ;
+    modern-tests-paths ;
 : extra-test-paths ( -- seq ) extra-vocabs modern-tests-paths ;
 
 
@@ -139,22 +138,11 @@ ERROR: not-a-source-path path ;
 : basis-syntax-paths ( -- seq ) basis-vocabs vocab-names>syntax reject-some-paths ;
 : extra-syntax-paths ( -- seq ) extra-vocabs vocab-names>syntax reject-some-paths ;
 
-CONSTANT: functor-vocabs {
-    "specialized-arrays"
-    "specialized-vectors"
-    "tuple-arrays"
-    "math.vectors.simd"
-    "math.vectors.simd.cords"
-    "vectors.functor"
-    "math.blas.matrices"
-    "math.blas.vectors"
-}
-
 : core-source-paths ( -- seq )
     core-vocabs modern-source-paths reject-some-paths ;
 : basis-source-paths ( -- seq )
-    basis-vocabs functor-vocabs diff
+    basis-vocabs
     modern-source-paths reject-some-paths ;
 : extra-source-paths ( -- seq )
-    extra-vocabs functor-vocabs diff
+    extra-vocabs
     modern-source-paths reject-some-paths ;
