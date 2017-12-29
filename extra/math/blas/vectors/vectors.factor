@@ -3,7 +3,7 @@ arrays ascii byte-arrays combinators combinators.short-circuit
 fry kernel math math.blas.ffi math.complex math.functions
 math.order sequences sequences.private functors words locals
 parser prettyprint.backend prettyprint.custom specialized-arrays
-functors2 ;
+functors2 strings ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: double
@@ -129,7 +129,7 @@ M: blas-vector-base virtual@
 : arg>double ( f -- f ) ; inline
 
 <<
-INLINE-FUNCTOR: blas-vector ( type: name t: name -- ) [[
+INLINE-FUNCTOR: blas-vector ( type: name t: string -- ) [[
     TUPLE: ${type}-blas-vector < blas-vector-base ;
 
     : <${type}-blas-vector> ( underlying length inc -- vector ) ${type}-blas-vector boa ; inline
@@ -172,9 +172,9 @@ INLINE-FUNCTOR: blas-vector ( type: name t: name -- ) [[
 
 
 <<
-INLINE-FUNCTOR: real-blas-vector ( type: name t: name -- ) [[
+INLINE-FUNCTOR: real-blas-vector ( type: name t: string -- ) [[
     <<
-    BLAS-VECTOR: ${type} ${t}
+    BLAS-VECTOR: ${type} "${t}"
     >>
 
     M: ${type}-blas-vector V.
@@ -191,9 +191,9 @@ INLINE-FUNCTOR: real-blas-vector ( type: name t: name -- ) [[
 
 
 <<
-INLINE-FUNCTOR: complex-blas-vector ( type: name c: name s: name -- ) [[
+INLINE-FUNCTOR: complex-blas-vector ( type: name c: string s: string -- ) [[
     <<
-    BLAS-VECTOR: ${type} ${c}
+    BLAS-VECTOR: ${type} "${c}"
     >>
 
     M: ${type}-blas-vector V.
@@ -208,10 +208,10 @@ INLINE-FUNCTOR: complex-blas-vector ( type: name c: name s: name -- ) [[
 ]]
 >>
 
-COMPLEX-BLAS-VECTOR: complex-float  C S
-COMPLEX-BLAS-VECTOR: complex-double Z D
-REAL-BLAS-VECTOR: float  S
-REAL-BLAS-VECTOR: double D
+COMPLEX-BLAS-VECTOR: complex-float  "C" "S"
+COMPLEX-BLAS-VECTOR: complex-double "Z" "D"
+REAL-BLAS-VECTOR: float  "S"
+REAL-BLAS-VECTOR: double "D"
 
 M: blas-vector-base >pprint-sequence ;
 M: blas-vector-base pprint* pprint-object ;
