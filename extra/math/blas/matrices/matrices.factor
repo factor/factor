@@ -247,21 +247,6 @@ M: blas-matrix-base equal?
 
 <<
 INLINE-FUNCTOR: blas-matrix ( type: name t: string u: string c: string -- ) [[
-    ! VECTOR      IS ${TYPE}-blas-vector
-    ! <VECTOR>    IS <${TYPE}-blas-vector>
-    ! XGEMV       IS ${T}GEMV
-    ! XGEMM       IS ${T}GEMM
-    ! XGERU       IS ${T}GER${U}
-    ! XGERC       IS ${T}GER${C}
-
-    ! MATRIX      DEFINES-CLASS ${TYPE}-blas-matrix
-    ! <MATRIX>    DEFINES <${TYPE}-blas-matrix>
-    ! >MATRIX     DEFINES >${TYPE}-blas-matrix
-
-    ! t           [ T >lower ]
-
-    ! XMATRIX{    DEFINES ${t}matrix{
-
     TUPLE: ${type}-blas-matrix < blas-matrix-base ;
     : <${type}-blas-matrix> ( underlying ld rows cols transpose -- matrix )
         ${type}-blas-matrix boa ; inline
@@ -293,16 +278,6 @@ INLINE-FUNCTOR: blas-matrix ( type: name t: string u: string c: string -- ) [[
 ]]
 >>
 
-
-! : define-real-blas-matrix ( TYPE T -- )
-    ! "" "" (define-blas-matrix) ;
-! : define-complex-blas-matrix ( TYPE T -- )
-    ! "U" "C" (define-blas-matrix) ;
-
-! float          "S" define-real-blas-matrix
-! double         "D" define-real-blas-matrix
-! complex-float  "C" define-complex-blas-matrix
-! complex-double "Z" define-complex-blas-matrix
 BLAS-MATRIX: float "S" "" ""
 BLAS-MATRIX: double "D" "" ""
 BLAS-MATRIX: complex-float "C" "U" "C"
