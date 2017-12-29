@@ -74,7 +74,7 @@ TUPLE: tuple2 d ;
 { { "a" "b" "c" } } [ { "b" "c" "a" } { <=> <=> } sort-by ] unit-test
 { { "b" "c" "a" } } [ { "b" "c" "a" } { } sort-by ] unit-test
 
-<< "length-test" [ length ] define-sorting >>
+<< SORTING: length-test [ length ] >>
 
 { { { 1 } { 1 2 3 } { 1 3 2 } { 3 2 1 } } }
 [

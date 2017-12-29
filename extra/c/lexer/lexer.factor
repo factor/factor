@@ -92,7 +92,7 @@ IN: c.lexer
 : take-c-identifier ( sequence-parser -- string/f )
     [ (take-c-identifier) ] with-sequence-parser ;
 
-<< "length" [ length ] define-sorting >>
+<< SORTING: length [ length ] >>
 
 : sort-tokens ( seq -- seq' )
     { length>=< <=> } sort-by ;
