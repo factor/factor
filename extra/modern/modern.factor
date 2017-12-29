@@ -1,11 +1,9 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators
-combinators.short-circuit continuations fry io.encodings.utf8
-io.files kernel locals make math math.order modern.paths
-modern.slices namespaces sequences sequences.deep sets
-sequences.extras shuffle splitting splitting.monotonic strings
-unicode ;
+USING: arrays assocs combinators combinators.short-circuit
+continuations io.encodings.utf8 io.files kernel make math
+math.order modern.paths modern.slices sequences sequences.extras
+sets splitting strings unicode vocabs.loader ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;
@@ -385,7 +383,7 @@ ERROR: compound-syntax-disallowed n seq obj ;
 
 : vocab>literals ( vocab -- sequence )
     ".private" ?tail drop
-    modern-source-path utf8 file-contents string>literals ;
+    vocab-source-path utf8 file-contents string>literals ;
 
 : path>literals ( path -- sequence )
     utf8 file-contents string>literals ;
