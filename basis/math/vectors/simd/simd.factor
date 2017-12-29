@@ -311,7 +311,7 @@ SYNTAX: ${type}{ \ } [ >${type} ] parse-literal ;
 
 M: ${type} new-underlying    drop \ ${type} boa ; inline
 M: ${type} simd-rep          drop ${type}-rep ; inline
-M: ${type} simd-element-type drop ${type}-rep rep-length ; inline
+M: ${type} simd-element-type drop $[ ${type}-rep rep-component-type ] ; inline
 M: ${type} simd-with         drop ${type}-with ; inline
 
 M: ${type} nth-unsafe
