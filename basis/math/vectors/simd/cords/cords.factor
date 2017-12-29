@@ -75,4 +75,3 @@ SIMD-128-CORD: longlong-2  longlong-4
 SIMD-128-CORD: ulonglong-2 ulonglong-4
 SIMD-128-CORD: float-4     float-8
 SIMD-128-CORD: double-2    double-4
-
