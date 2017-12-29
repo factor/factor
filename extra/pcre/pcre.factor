@@ -1,6 +1,5 @@
 ! Copyright (C) 2013, 2016 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
-
 USING: accessors alien alien.accessors alien.c-types alien.data
 alien.enums alien.strings arrays assocs combinators fry
 io.encodings.string io.encodings.utf8 kernel literals math
@@ -14,7 +13,7 @@ ERROR: malformed-regexp expr error ;
 ERROR: pcre-error value ;
 
 : version ( -- f )
-    pcre_version " -" splitting:split first string>number ;
+    pcre_version " -" splitting::split first string>number ;
 
 <PRIVATE
 
