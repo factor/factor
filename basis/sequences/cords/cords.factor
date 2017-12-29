@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences sorting binary-search fry math
 math.order arrays classes combinators kernel functors locals
-math.functions math.vectors ;
+math.functions math.vectors functors2 ;
 IN: sequences.cords
 
 MIXIN: cord
@@ -27,21 +27,18 @@ GENERIC: cord-append ( seq1 seq2 -- cord )
 M: object cord-append
     generic-cord boa ; inline
 
-<FUNCTOR: define-specialized-cord ( T C -- )
+SAME-FUNCTOR: specialized-cord ( type: name class: name -- ) [[
+    USING: kernel ;
 
-T-cord DEFINES-CLASS ${C}
+    TUPLE: ${class}
+        { head ${type} read-only } { tail ${type} read-only } ; final
+    INSTANCE: ${class} cord
 
-WHERE
+    M: ${type} cord-append
+        2dup [ ${type} instance? ] both?
+        [ ${class} boa ] [ generic-cord boa ] if ; inline
 
-TUPLE: T-cord
-    { head T read-only } { tail T read-only } ; final
-INSTANCE: T-cord cord
-
-M: T cord-append
-    2dup [ T instance? ] both?
-    [ T-cord boa ] [ generic-cord boa ] if ; inline
-
-;FUNCTOR>
+]]
 
 : cord-map ( cord quot -- cord' )
     [ [ head>> ] dip call ]

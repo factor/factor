@@ -328,7 +328,6 @@ DEFER: ${type}-boa
 
 <<
 \ ${type}-boa
-! [ $[ ${type}-rep rep-component-type c:c-type-class "coercer" word-prop [ ] or ] $[ ${type}-rep rep-length ] napply ] ${type}-rep rep-length {
 [ $[ ${type}-coercer ] $[ ${type}-rep rep-length ] napply ] ${type}-rep rep-length {
     { 2 [ [ ${type}-rep (simd-gather-2) ${type} boa ] ] }
     { 4 [ [ ${type}-rep (simd-gather-4) ${type} boa ] ] }

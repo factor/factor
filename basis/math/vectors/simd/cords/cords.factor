@@ -2,86 +2,67 @@ USING: accessors alien.c-types arrays byte-arrays
 cpu.architecture effects functors generalizations kernel lexer
 math math.vectors.simd math.vectors.simd.intrinsics parser
 prettyprint.custom quotations sequences sequences.cords words
-classes ;
+classes functors2 literals ;
 IN: math.vectors.simd.cords
 
 <<
-<PRIVATE
+SAME-FUNCTOR: simd-128-cord ( type/2: existing-word type: name -- ) [[
 
-<FUNCTOR: (define-simd-128-cord) ( A/2 A -- )
+    DEFER: ${type}
+    <<
+    SPECIALIZED-CORD: ${type/2} ${type}
+    >>
 
-A-rep    IS            ${A/2}-rep
->A/2     IS            >${A/2}
-A/2-boa  IS            ${A/2}-boa
-A/2-with IS            ${A/2}-with
-A/2-cast IS            ${A/2}-cast
+    <<
+    <c-type>
+        byte-array >>class
+        ${type} >>boxed-class
+        [
+            [      ${type/2}-rep alien-vector ${type/2} boa ]
+            [ 16 + ${type/2}-rep alien-vector ${type/2} boa ] 2bi cord-append
+        ] >>getter
+        [
+            [ [ head>> underlying>> ] 2dip      ${type/2}-rep set-alien-vector ]
+            [ [ tail>> underlying>> ] 2dip 16 + ${type/2}-rep set-alien-vector ] 3bi
+        ] >>setter
+        32 >>size
+        16 >>align
+        ${type/2}-rep >>rep
+    \ ${type} typedef
+    >>
 
->A     DEFINES       >${A}
-A-boa  DEFINES       ${A}-boa
-A-with DEFINES       ${A}-with
-A-cast DEFINES       ${A}-cast
-A{     DEFINES       ${A}{
+    : >${type} ( seq -- ${type} )
+        [ $[ ${type/2}-rep rep-length ] head-slice >${type/2} ]
+        [ $[ ${type/2}-rep rep-length ] tail-slice >${type/2} ] bi cord-append ;
 
-N       [ A-rep rep-length ]
-BOA-EFFECT [ N 2 * "n" <array> { "v" } <effect> ]
+    DEFER: ${type}-boa
+    \ ${type}-boa
+    { $[ ${type/2}-rep rep-length ] ndip ${type/2}-boa cord-append } { ${type/2}-boa } >quotation prefix >quotation
+    $[ $[ ${type/2}-rep rep-length ] 2 * "n" <array> { "v" } <effect> ] define-inline
 
-WHERE
+    : ${type}-with ( n -- v )
+        [ ${type/2}-with ] [ ${type/2}-with ] bi cord-append ; inline
 
-: >A ( seq -- A )
-    [ N head-slice >A/2 ]
-    [ N tail-slice >A/2 ] bi cord-append ;
+    : ${type}-cast ( v -- v' )
+        [ ${type/2}-cast ] cord-map ; inline
 
-\ A-boa
-{ N ndip A/2-boa cord-append } { A/2-boa } >quotation prefix >quotation
-BOA-EFFECT define-inline
+    M: ${type} new-sequence
+        2drop
+        $[ ${type/2}-rep rep-length ] ${type/2} new new-sequence
+        $[ ${type/2}-rep rep-length ] ${type/2} new new-sequence
+        \ ${type} boa ;
 
-: A-with ( n -- v )
-    [ A/2-with ] [ A/2-with ] bi cord-append ; inline
+    M: ${type} like
+        over \ ${type} instance? [ drop ] [ call-next-method ] if ;
 
-: A-cast ( v -- v' )
-    [ A/2-cast ] cord-map ; inline
+    M: ${type} >pprint-sequence ;
+    M: ${type} pprint* pprint-object ;
 
-M: A new-sequence
-    2drop
-    N A/2 new new-sequence
-    N A/2 new new-sequence
-    \ A boa ;
-
-M: A like
-    over \ A instance? [ drop ] [ call-next-method ] if ;
-
-M: A >pprint-sequence ;
-M: A pprint* pprint-object ;
-
-M: A pprint-delims drop \ A{ \ } ;
-SYNTAX: A{ \ } [ >A ] parse-literal ;
-
-<c-type>
-    byte-array >>class
-    A >>boxed-class
-    [
-        [      A-rep alien-vector A/2 boa ]
-        [ 16 + A-rep alien-vector A/2 boa ] 2bi cord-append
-    ] >>getter
-    [
-        [ [ head>> underlying>> ] 2dip      A-rep set-alien-vector ]
-        [ [ tail>> underlying>> ] 2dip 16 + A-rep set-alien-vector ] 3bi
-    ] >>setter
-    32 >>size
-    16 >>align
-    A-rep >>rep
-\ A typedef
-
-;FUNCTOR>
-
-: define-simd-128-cord ( A/2 T -- )
-    [ define-specialized-cord ]
-    [ create-word-in (define-simd-128-cord) ] 2bi ;
-
-SYNTAX: \SIMD-128-CORD:
-    scan-word scan-token define-simd-128-cord ;
-
-PRIVATE>
+    <<
+    SYNTAX: ${type}{ \ } [ >${type} ] parse-literal ;
+    >>
+    M: ${type} pprint-delims drop \ ${type}{ \ } ;
+]]
 >>
 
 SIMD-128-CORD: char-16     char-32
