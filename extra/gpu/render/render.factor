@@ -169,13 +169,13 @@ M: index-elements render-vertex-indexes-instanced
     [ ] tri*
     swap index-buffer [ swap glDrawElementsInstanced ] with-gpu-data-ptr ;
 
-M: specialized-array render-vertex-indexes
+M: specialized-array-mixin render-vertex-indexes
     GL_ELEMENT_ARRAY_BUFFER 0 glBindBuffer
     [ gl-primitive-mode ]
     [ [ length ] [ gl-array-element-type ] [ >c-ptr ] tri ] bi*
     glDrawElements ;
 
-M: specialized-array render-vertex-indexes-instanced
+M: specialized-array-mixin render-vertex-indexes-instanced
     GL_ELEMENT_ARRAY_BUFFER 0 glBindBuffer
     [ gl-primitive-mode ]
     [ [ length ] [ gl-array-element-type ] [ >c-ptr ] tri ]
@@ -258,7 +258,7 @@ DEFER: uniform-texture-accessors
     \ nip swap \ cleave [ ] 3sequence ;
 
 UNION: binary-data
-    c-ptr specialized-array struct simd-128 ;
+    c-ptr specialized-array-mixin struct simd-128 ;
 
 GENERIC: >uniform-bool-array ( sequence -- c-array )
 GENERIC: >uniform-int-array ( sequence -- c-array )

@@ -8,9 +8,10 @@ math.order math.ranges math.vectors math.vectors.conversion
 math.vectors.simd math.vectors.simd.cords method-chains models
 namespaces sequences sets specialized-vectors typed ui
 ui.gadgets ui.gadgets.worlds ui.gestures ui.pixel-formats
-vectors ;
+vectors specialized-arrays ;
 FROM: math.matrices => m.v ;
 FROM: models => change-model ;
+SPECIALIZED-ARRAY: ushort
 SPECIALIZED-VECTORS: ushort float-4 ;
 IN: gml.viewer
 
