@@ -2,7 +2,8 @@ USING: accessors alien alien.c-types alien.complex alien.data
 arrays ascii byte-arrays combinators combinators.short-circuit
 fry kernel math math.blas.ffi math.complex math.functions
 math.order sequences sequences.private functors words locals
-parser prettyprint.backend prettyprint.custom specialized-arrays ;
+parser prettyprint.backend prettyprint.custom specialized-arrays
+functors2 ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: double
@@ -128,121 +129,89 @@ M: blas-vector-base virtual@
 : arg>double ( f -- f ) ; inline
 
 <<
+INLINE-FUNCTOR: blas-vector ( type: name t: name -- ) [[
+    TUPLE: ${type}-blas-vector < blas-vector-base ;
 
-<FUNCTOR: (define-blas-vector) ( TYPE T -- )
+    : <${type}-blas-vector> ( underlying length inc -- vector ) ${type}-blas-vector boa ; inline
+    <<
+    : >${type}-blas-vector ( seq -- v )
+        [ ${type} >c-array underlying>> ] [ length ] bi 1 <${type}-blas-vector> ;
+    >>
+    <<
+    SYNTAX: ${t}vector{ \ } [ >${type}-blas-vector ] parse-literal ;
+    >>
 
-<DIRECT-ARRAY> IS <direct-${TYPE}-array>
-XCOPY          IS ${T}COPY
-XSWAP          IS ${T}SWAP
-IXAMAX         IS I${T}AMAX
+    M: ${type}-blas-vector clone
+        ${type} heap-size (prepare-copy)
+        [ ${t}COPY ] 3dip <${type}-blas-vector> ;
 
-VECTOR         DEFINES-CLASS ${TYPE}-blas-vector
-<VECTOR>       DEFINES <${TYPE}-blas-vector>
->VECTOR        DEFINES >${TYPE}-blas-vector
+    M: ${type}-blas-vector element-type
+        drop ${type} ;
+    M: ${type}-blas-vector Vswap
+        (prepare-swap) [ ${t}SWAP ] 2dip ;
+    M: ${type}-blas-vector Viamax
+        (prepare-nrm2) I${t}AMAX 1 - ;
 
-t              [ T >lower ]
+    M: ${type}-blas-vector (blas-vector-like)
+        drop <${type}-blas-vector> ;
 
-XVECTOR{       DEFINES ${t}vector{
+    M: ${type}-blas-vector (blas-direct-array)
+        [ underlying>> ]
+        [ [ length>> ] [ inc>> ] bi * ] bi
+        <direct-${type}-array> ;
 
-XAXPY          IS ${T}AXPY
-XSCAL          IS ${T}SCAL
+    M: ${type}-blas-vector n*V+V!
+        (prepare-axpy) [ ${t}AXPY ] dip ;
+    M: ${type}-blas-vector n*V!
+        (prepare-scal) [ ${t}SCAL ] dip ;
 
-WHERE
-
-TUPLE: VECTOR < blas-vector-base ;
-: <VECTOR> ( underlying length inc -- vector ) VECTOR boa ; inline
-
-: >VECTOR ( seq -- v )
-    [ TYPE >c-array underlying>> ] [ length ] bi 1 <VECTOR> ;
-
-M: VECTOR clone
-    TYPE heap-size (prepare-copy)
-    [ XCOPY ] 3dip <VECTOR> ;
-
-M: VECTOR element-type
-    drop TYPE ;
-M: VECTOR Vswap
-    (prepare-swap) [ XSWAP ] 2dip ;
-M: VECTOR Viamax
-    (prepare-nrm2) IXAMAX 1 - ;
-
-M: VECTOR (blas-vector-like)
-    drop <VECTOR> ;
-
-M: VECTOR (blas-direct-array)
-    [ underlying>> ]
-    [ [ length>> ] [ inc>> ] bi * ] bi
-    <DIRECT-ARRAY> ;
-
-M: VECTOR n*V+V!
-    (prepare-axpy) [ XAXPY ] dip ;
-M: VECTOR n*V!
-    (prepare-scal) [ XSCAL ] dip ;
-
-SYNTAX: XVECTOR{ \ } [ >VECTOR ] parse-literal ;
-
-M: VECTOR pprint-delims
-    drop \ XVECTOR{ \ } ;
-
-;FUNCTOR>
-
-
-<FUNCTOR: (define-real-blas-vector) ( TYPE T -- )
-
-VECTOR         IS ${TYPE}-blas-vector
-XDOT           IS ${T}DOT
-XNRM2          IS ${T}NRM2
-XASUM          IS ${T}ASUM
-
-WHERE
-
-M: VECTOR V.
-    (prepare-dot) XDOT ;
-M: VECTOR V.conj
-    (prepare-dot) XDOT ;
-M: VECTOR Vnorm
-    (prepare-nrm2) XNRM2 ;
-M: VECTOR Vasum
-    (prepare-nrm2) XASUM ;
-
-;FUNCTOR>
-
-
-<FUNCTOR: (define-complex-blas-vector) ( TYPE C S -- )
-
-VECTOR         IS ${TYPE}-blas-vector
-XDOTU          IS ${C}DOTU
-XDOTC          IS ${C}DOTC
-XXNRM2         IS ${S}${C}NRM2
-XXASUM         IS ${S}${C}ASUM
-
-WHERE
-
-M: VECTOR V.
-    (prepare-dot) XDOTU ;
-M: VECTOR V.conj
-    (prepare-dot) XDOTC ;
-M: VECTOR Vnorm
-    (prepare-nrm2) XXNRM2 ;
-M: VECTOR Vasum
-    (prepare-nrm2) XXASUM ;
-
-;FUNCTOR>
-
-
-: define-real-blas-vector ( TYPE T -- )
-    [ (define-blas-vector) ]
-    [ (define-real-blas-vector) ] 2bi ;
-: define-complex-blas-vector ( TYPE C S -- )
-    [ drop (define-blas-vector) ]
-    [ (define-complex-blas-vector) ] 3bi ;
-
-float  "S" define-real-blas-vector
-double "D" define-real-blas-vector
-complex-float  "C" "S" define-complex-blas-vector
-complex-double "Z" "D" define-complex-blas-vector
-
+    M: ${type}-blas-vector pprint-delims
+        drop \ ${t}vector{ \ } ;
+]]
 >>
+
+
+<<
+INLINE-FUNCTOR: real-blas-vector ( type: name t: name -- ) [[
+    <<
+    BLAS-VECTOR: ${type} ${t}
+    >>
+
+    M: ${type}-blas-vector V.
+        (prepare-dot) ${t}DOT ;
+    M: ${type}-blas-vector V.conj
+        (prepare-dot) ${t}DOT ;
+    M: ${type}-blas-vector Vnorm
+        (prepare-nrm2) ${t}NRM2 ;
+    M: ${type}-blas-vector Vasum
+        (prepare-nrm2) ${t}ASUM ;
+
+]]
+>>
+
+
+<<
+INLINE-FUNCTOR: complex-blas-vector ( type: name c: name s: name -- ) [[
+    <<
+    BLAS-VECTOR: ${type} ${c}
+    >>
+
+    M: ${type}-blas-vector V.
+        (prepare-dot) ${c}DOTU ;
+    M: ${type}-blas-vector V.conj
+        (prepare-dot) ${c}DOTC ;
+    M: ${type}-blas-vector Vnorm
+        (prepare-nrm2) ${s}${c}NRM2 ;
+    M: ${type}-blas-vector Vasum
+        (prepare-nrm2) ${s}${c}ASUM ;
+
+]]
+>>
+
+COMPLEX-BLAS-VECTOR: complex-float  C S
+COMPLEX-BLAS-VECTOR: complex-double Z D
+REAL-BLAS-VECTOR: float  S
+REAL-BLAS-VECTOR: double D
 
 M: blas-vector-base >pprint-sequence ;
 M: blas-vector-base pprint* pprint-object ;
