@@ -6,7 +6,7 @@ classes functors2 literals ;
 IN: math.vectors.simd.cords
 
 <<
-SAME-FUNCTOR: simd-128-cord ( type/2: existing-word type: name -- ) [[
+INLINE-FUNCTOR: simd-128-cord ( type/2: existing-word type: name -- ) [[
 
     DEFER: ${type}
     <<

@@ -9,7 +9,7 @@ IN: compiler.cfg.renaming.functor
     '[ [ _ ] dip changer-word [ ] 2sequence ] map [ ] join
     [ drop ] append ;
 
-SAME-FUNCTOR: renaming ( NAME: name DEF-QUOT: string USE-QUOT: string TEMP-QUOT: string -- ) [[
+INLINE-FUNCTOR: renaming ( NAME: name DEF-QUOT: string USE-QUOT: string TEMP-QUOT: string -- ) [[
 
 ! rename-insn-defs DEFINES ${NAME}-insn-defs
 ! rename-insn-uses DEFINES ${NAME}-insn-uses

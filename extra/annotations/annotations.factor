@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff, Doug Coleman. see BSD license
 USING: accessors combinators.short-circuit kernel lexer
 namespaces sequences tools.crossref words ;
-FROM: functors2 => new-word \SAME-FUNCTOR: ;
+FROM: functors2 => new-word \INLINE-FUNCTOR: ;
 IN: annotations
 
 <<
@@ -14,7 +14,7 @@ IN: annotations
     [ { [ word? ] [ vocabulary>> "annotations" = ] } 1&& not ]
     filter ;
 
-SAME-FUNCTOR: annotation ( NAME: new-word -- ) [[
+INLINE-FUNCTOR: annotation ( NAME: new-word -- ) [[
 
 USING: annotations kernel sequences tools.crossref ;
 

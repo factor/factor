@@ -264,7 +264,7 @@ M: simd-128 pprint* pprint-object ;
 
 ! SIMD concrete type functor
 
-SAME-FUNCTOR: simd-128-type ( type: name -- ) [[
+INLINE-FUNCTOR: simd-128-type ( type: name -- ) [[
 
 ! A      DEFINES-CLASS ${T}
 ! A-rep  IS            ${T}-rep

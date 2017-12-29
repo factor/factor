@@ -27,7 +27,7 @@ GENERIC: cord-append ( seq1 seq2 -- cord )
 M: object cord-append
     generic-cord boa ; inline
 
-SAME-FUNCTOR: specialized-cord ( type: name class: name -- ) [[
+INLINE-FUNCTOR: specialized-cord ( type: name class: name -- ) [[
     USING: kernel ;
 
     TUPLE: ${class}

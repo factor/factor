@@ -3,7 +3,7 @@
 USING: functors2 ;
 IN: alien.complex.functor
 
-SAME-FUNCTOR: complex-type ( N: existing-word T: name -- ) [[
+INLINE-FUNCTOR: complex-type ( N: existing-word T: name -- ) [[
     USING: alien alien.c-types classes.struct kernel quotations ;
     QUALIFIED: math
 

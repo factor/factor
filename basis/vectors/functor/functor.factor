@@ -7,7 +7,7 @@ IN: vectors.functor
 ! VECTORIZED: bit bit-array <bit-array> ! bit is not necessarily a word
 ! VECTORIZED: int int-array <int-array> ! int is a word already
 
-SAME-FUNCTOR: vectorized ( type: name underlying: existing-word constructor: existing-word -- ) [[
+INLINE-FUNCTOR: vectorized ( type: name underlying: existing-word constructor: existing-word -- ) [[
     USING: classes growable kernel math sequences sequences.private ;
 
     <<

@@ -3,7 +3,7 @@
 USING: functors2 quotations strings ;
 IN: sorting.functor
 
-SAME-FUNCTOR: sorting ( NAME: name QUOT: string -- ) [[
+INLINE-FUNCTOR: sorting ( NAME: name QUOT: string -- ) [[
     : ${NAME}<=> ( obj1 obj2 -- <=> ) ${QUOT} compare ;
     : ${NAME}>=< ( obj1 obj2 -- >=< ) ${NAME}<=> invert-comparison ;
 ]]

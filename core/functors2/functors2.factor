@@ -229,5 +229,5 @@ CONSTANT: scanner-table H{
 ! SYNTAX: \VARIABLE-FUNCTOR:
     ! scan-new-word scan-effect scan-object scan-object make-variable-functor ;
 
-SYNTAX: \SAME-FUNCTOR:
+SYNTAX: \INLINE-FUNCTOR:
     scan-new-word scan-effect scan-object make-same-functor ;

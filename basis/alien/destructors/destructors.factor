@@ -5,7 +5,7 @@ IN: alien.destructors
 
 TUPLE: alien-destructor alien ;
 
-SAME-FUNCTOR: destructor ( F: existing-word -- ) [[
+INLINE-FUNCTOR: destructor ( F: existing-word -- ) [[
 USING: accessors alien.destructors effects generalizations
 destructors kernel literals sequences ;
 
