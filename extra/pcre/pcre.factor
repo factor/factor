@@ -1,9 +1,10 @@
 ! Copyright (C) 2013, 2016 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors alien alien.accessors alien.c-types alien.data
-alien.enums alien.strings arrays assocs combinators fry
+alien.enums alien.strings arrays assocs combinators
 io.encodings.string io.encodings.utf8 kernel literals math
-math.bitwise math.parser pcre.ffi regexp sequences splitting strings ;
+math.bitwise math.parser pcre.ffi regexp sequences splitting
+strings ;
 IN: pcre
 
 ERROR: bad-option what ;
@@ -149,7 +150,7 @@ M: compiled-pcre findall
 M: string findall
     <compiled-pcre> findall ;
 
-M: regexp:regexp findall
+M: regexp::regexp findall
     raw>> findall ;
 
 : matches? ( subject obj -- ? )

@@ -1,10 +1,10 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-constructors continuations fry io io.encodings.utf8 io.files
+constructors continuations io io.encodings.utf8 io.files
 io.streams.string kernel modern modern.paths modern.slices
-multiline namespaces prettyprint sequences sequences.extras
-splitting strings ;
+prettyprint sequences sequences.extras splitting strings
+vocabs.loader ;
 IN: modern.out
 
 : token? ( obj -- ? )
@@ -53,7 +53,7 @@ DEFER: map-literals
     utf8 [ write-literal nl ] with-file-writer ; inline
 
 : write-modern-vocab ( seq vocab -- )
-    modern-source-path write-modern-path ; inline
+    vocab-source-path write-modern-path ; inline
 
 : rewrite-path ( path quot: ( obj -- obj' ) -- )
     ! dup print
@@ -77,7 +77,7 @@ DEFER: map-literals
     [ path>literals ] [ ] bi write-modern-path ;
 
 : rewrite-vocab-exact ( name -- )
-    modern-source-path rewrite-path-exact ;
+    vocab-source-path rewrite-path-exact ;
 
 : rewrite-paths ( paths -- )
     [ rewrite-path-exact ] each ;
@@ -85,7 +85,7 @@ DEFER: map-literals
 
 : strings-core-to-file ( -- )
     core-bootstrap-vocabs
-    [ ".private" ?tail drop modern-source-path utf8 file-contents ] map-zip
+    [ ".private" ?tail drop vocab-source-path utf8 file-contents ] map-zip
     [ "[========[" dup matching-delimiter-string surround ] assoc-map
     [
         first2 [ "VOCAB: " prepend ] dip " " glue
