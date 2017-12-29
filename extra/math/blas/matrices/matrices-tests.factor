@@ -4,76 +4,76 @@ IN: math.blas.matrices.tests
 
 ! clone
 
-{ smatrix{
+{ Smatrix{
     { 1.0 2.0 3.0 }
     { 4.0 5.0 6.0 }
     { 7.0 8.0 9.0 }
 } } [
-    smatrix{
+    Smatrix{
         { 1.0 2.0 3.0 }
         { 4.0 5.0 6.0 }
         { 7.0 8.0 9.0 }
     } clone
 ] unit-test
 { f } [
-    smatrix{
+    Smatrix{
         { 1.0 2.0 3.0 }
         { 4.0 5.0 6.0 }
         { 7.0 8.0 9.0 }
     } dup clone eq?
 ] unit-test
 
-{ dmatrix{
+{ Dmatrix{
     { 1.0 2.0 3.0 }
     { 4.0 5.0 6.0 }
     { 7.0 8.0 9.0 }
 } } [
-    dmatrix{
+    Dmatrix{
         { 1.0 2.0 3.0 }
         { 4.0 5.0 6.0 }
         { 7.0 8.0 9.0 }
     } clone
 ] unit-test
 { f } [
-    dmatrix{
+    Dmatrix{
         { 1.0 2.0 3.0 }
         { 4.0 5.0 6.0 }
         { 7.0 8.0 9.0 }
     } dup clone eq?
 ] unit-test
 
-{ cmatrix{
+{ Cmatrix{
     { C{ 1.0 1.0 } 2.0          3.0          }
     { 4.0          C{ 5.0 2.0 } 6.0          }
     { 7.0          8.0          C{ 9.0 3.0 } }
 } } [
-    cmatrix{
+    Cmatrix{
         { C{ 1.0 1.0 } 2.0          3.0          }
         { 4.0          C{ 5.0 2.0 } 6.0          }
         { 7.0          8.0          C{ 9.0 3.0 } }
     } clone
 ] unit-test
 { f } [
-    cmatrix{
+    Cmatrix{
         { C{ 1.0 1.0 } 2.0          3.0          }
         { 4.0          C{ 5.0 2.0 } 6.0          }
         { 7.0          8.0          C{ 9.0 3.0 } }
     } dup clone eq?
 ] unit-test
 
-{ zmatrix{
+{ Zmatrix{
     { C{ 1.0 1.0 } 2.0          3.0          }
     { 4.0          C{ 5.0 2.0 } 6.0          }
     { 7.0          8.0          C{ 9.0 3.0 } }
 } } [
-    zmatrix{
+    Zmatrix{
         { C{ 1.0 1.0 } 2.0          3.0          }
         { 4.0          C{ 5.0 2.0 } 6.0          }
         { 7.0          8.0          C{ 9.0 3.0 } }
     } clone
 ] unit-test
 { f } [
-    zmatrix{
+    Zmatrix{
         { C{ 1.0 1.0 } 2.0          3.0          }
         { 4.0          C{ 5.0 2.0 } 6.0          }
         { 7.0          8.0          C{ 9.0 3.0 } }
@@ -82,148 +82,148 @@ IN: math.blas.matrices.tests
 
 ! M.V
 
-{ svector{ 3.0 1.0 6.0 } } [
-    smatrix{
+{ Svector{ 3.0 1.0 6.0 } } [
+    Smatrix{
         {  0.0 1.0 0.0 1.0 }
         { -1.0 0.0 0.0 2.0 }
         {  0.0 0.0 1.0 3.0 }
     }
-    svector{ 1.0 2.0 3.0 1.0 }
+    Svector{ 1.0 2.0 3.0 1.0 }
     M.V
 ] unit-test
-{ svector{ -2.0 1.0 3.0 14.0 } } [
-    smatrix{
+{ Svector{ -2.0 1.0 3.0 14.0 } } [
+    Smatrix{
         {  0.0 1.0 0.0 1.0 }
         { -1.0 0.0 0.0 2.0 }
         {  0.0 0.0 1.0 3.0 }
     } Mtranspose
-    svector{ 1.0 2.0 3.0 }
+    Svector{ 1.0 2.0 3.0 }
     M.V
 ] unit-test
 
-{ dvector{ 3.0 1.0 6.0 } } [
-    dmatrix{
+{ Dvector{ 3.0 1.0 6.0 } } [
+    Dmatrix{
         {  0.0 1.0 0.0 1.0 }
         { -1.0 0.0 0.0 2.0 }
         {  0.0 0.0 1.0 3.0 }
     }
-    dvector{ 1.0 2.0 3.0 1.0 }
+    Dvector{ 1.0 2.0 3.0 1.0 }
     M.V
 ] unit-test
-{ dvector{ -2.0 1.0 3.0 14.0 } } [
-    dmatrix{
+{ Dvector{ -2.0 1.0 3.0 14.0 } } [
+    Dmatrix{
         {  0.0 1.0 0.0 1.0 }
         { -1.0 0.0 0.0 2.0 }
         {  0.0 0.0 1.0 3.0 }
     } Mtranspose
-    dvector{ 1.0 2.0 3.0 }
+    Dvector{ 1.0 2.0 3.0 }
     M.V
 ] unit-test
 
-{ cvector{ 3.0 C{ 1.0 2.0 } 6.0 } } [
-    cmatrix{
+{ Cvector{ 3.0 C{ 1.0 2.0 } 6.0 } } [
+    Cmatrix{
         {  0.0 1.0          0.0 1.0 }
         { -1.0 C{ 0.0 1.0 } 0.0 2.0 }
         {  0.0 0.0          1.0 3.0 }
     }
-    cvector{ 1.0 2.0 3.0 1.0 }
+    Cvector{ 1.0 2.0 3.0 1.0 }
     M.V
 ] unit-test
-{ cvector{ -2.0 C{ 1.0 2.0 } 3.0 14.0 } } [
-    cmatrix{
+{ Cvector{ -2.0 C{ 1.0 2.0 } 3.0 14.0 } } [
+    Cmatrix{
         {  0.0 1.0          0.0 1.0 }
         { -1.0 C{ 0.0 1.0 } 0.0 2.0 }
         {  0.0 0.0          1.0 3.0 }
     } Mtranspose
-    cvector{ 1.0 2.0 3.0 }
+    Cvector{ 1.0 2.0 3.0 }
     M.V
 ] unit-test
 
-{ zvector{ 3.0 C{ 1.0 2.0 } 6.0 } } [
-    zmatrix{
+{ Zvector{ 3.0 C{ 1.0 2.0 } 6.0 } } [
+    Zmatrix{
         {  0.0 1.0          0.0 1.0 }
         { -1.0 C{ 0.0 1.0 } 0.0 2.0 }
         {  0.0 0.0          1.0 3.0 }
     }
-    zvector{ 1.0 2.0 3.0 1.0 }
+    Zvector{ 1.0 2.0 3.0 1.0 }
     M.V
 ] unit-test
-{ zvector{ -2.0 C{ 1.0 2.0 } 3.0 14.0 } } [
-    zmatrix{
+{ Zvector{ -2.0 C{ 1.0 2.0 } 3.0 14.0 } } [
+    Zmatrix{
         {  0.0 1.0          0.0 1.0 }
         { -1.0 C{ 0.0 1.0 } 0.0 2.0 }
         {  0.0 0.0          1.0 3.0 }
     } Mtranspose
-    zvector{ 1.0 2.0 3.0 }
+    Zvector{ 1.0 2.0 3.0 }
     M.V
 ] unit-test
 
 ! V(*)
 
-{ smatrix{
+{ Smatrix{
     { 1.0 2.0 3.0  4.0 }
     { 2.0 4.0 6.0  8.0 }
     { 3.0 6.0 9.0 12.0 }
 } } [
-    svector{ 1.0 2.0 3.0 } svector{ 1.0 2.0 3.0 4.0 } V(*)
+    Svector{ 1.0 2.0 3.0 } Svector{ 1.0 2.0 3.0 4.0 } V(*)
 ] unit-test
 
-{ dmatrix{
+{ Dmatrix{
     { 1.0 2.0 3.0  4.0 }
     { 2.0 4.0 6.0  8.0 }
     { 3.0 6.0 9.0 12.0 }
 } } [
-    dvector{ 1.0 2.0 3.0 } dvector{ 1.0 2.0 3.0 4.0 } V(*)
+    Dvector{ 1.0 2.0 3.0 } Dvector{ 1.0 2.0 3.0 4.0 } V(*)
 ] unit-test
 
-{ cmatrix{
+{ Cmatrix{
     { 1.0          2.0          C{ 3.0 -3.0 } 4.0            }
     { 2.0          4.0          C{ 6.0 -6.0 } 8.0            }
     { C{ 3.0 3.0 } C{ 6.0 6.0 } 18.0          C{ 12.0 12.0 } }
 } } [
-    cvector{ 1.0 2.0 C{ 3.0 3.0 } } cvector{ 1.0 2.0 C{ 3.0 -3.0 } 4.0 } V(*)
+    Cvector{ 1.0 2.0 C{ 3.0 3.0 } } Cvector{ 1.0 2.0 C{ 3.0 -3.0 } 4.0 } V(*)
 ] unit-test
 
-{ zmatrix{
+{ Zmatrix{
     { 1.0          2.0          C{ 3.0 -3.0 } 4.0            }
     { 2.0          4.0          C{ 6.0 -6.0 } 8.0            }
     { C{ 3.0 3.0 } C{ 6.0 6.0 } 18.0          C{ 12.0 12.0 } }
 } } [
-    zvector{ 1.0 2.0 C{ 3.0 3.0 } } zvector{ 1.0 2.0 C{ 3.0 -3.0 } 4.0 } V(*)
+    Zvector{ 1.0 2.0 C{ 3.0 3.0 } } Zvector{ 1.0 2.0 C{ 3.0 -3.0 } 4.0 } V(*)
 ] unit-test
 
 ! M.
 
-{ smatrix{
+{ Smatrix{
     { 1.0 0.0  0.0 4.0  0.0 }
     { 0.0 0.0 -3.0 0.0  0.0 }
     { 0.0 4.0  0.0 0.0 10.0 }
     { 0.0 0.0  0.0 0.0  0.0 }
 } } [
-    smatrix{
+    Smatrix{
         { 1.0 0.0  0.0 }
         { 0.0 0.0 -1.0 }
         { 0.0 2.0  0.0 }
         { 0.0 0.0  0.0 }
-    } smatrix{
+    } Smatrix{
         { 1.0 0.0 0.0 4.0 0.0 }
         { 0.0 2.0 0.0 0.0 5.0 }
         { 0.0 0.0 3.0 0.0 0.0 }
     } M.
 ] unit-test
 
-{ smatrix{
+{ Smatrix{
     { 1.0  0.0  0.0 0.0 }
     { 0.0  0.0  4.0 0.0 }
     { 0.0 -3.0  0.0 0.0 }
     { 4.0  0.0  0.0 0.0 }
     { 0.0  0.0 10.0 0.0 }
 } } [
-    smatrix{
+    Smatrix{
         { 1.0 0.0 0.0 4.0 0.0 }
         { 0.0 2.0 0.0 0.0 5.0 }
         { 0.0 0.0 3.0 0.0 0.0 }
-    } Mtranspose smatrix{
+    } Mtranspose Smatrix{
         { 1.0 0.0  0.0 }
         { 0.0 0.0 -1.0 }
         { 0.0 2.0  0.0 }
@@ -231,36 +231,36 @@ IN: math.blas.matrices.tests
     } Mtranspose M.
 ] unit-test
 
-{ dmatrix{
+{ Dmatrix{
     { 1.0 0.0  0.0 4.0  0.0 }
     { 0.0 0.0 -3.0 0.0  0.0 }
     { 0.0 4.0  0.0 0.0 10.0 }
     { 0.0 0.0  0.0 0.0  0.0 }
 } } [
-    dmatrix{
+    Dmatrix{
         { 1.0 0.0  0.0 }
         { 0.0 0.0 -1.0 }
         { 0.0 2.0  0.0 }
         { 0.0 0.0  0.0 }
-    } dmatrix{
+    } Dmatrix{
         { 1.0 0.0 0.0 4.0 0.0 }
         { 0.0 2.0 0.0 0.0 5.0 }
         { 0.0 0.0 3.0 0.0 0.0 }
     } M.
 ] unit-test
 
-{ dmatrix{
+{ Dmatrix{
     { 1.0  0.0  0.0 0.0 }
     { 0.0  0.0  4.0 0.0 }
     { 0.0 -3.0  0.0 0.0 }
     { 4.0  0.0  0.0 0.0 }
     { 0.0  0.0 10.0 0.0 }
 } } [
-    dmatrix{
+    Dmatrix{
         { 1.0 0.0 0.0 4.0 0.0 }
         { 0.0 2.0 0.0 0.0 5.0 }
         { 0.0 0.0 3.0 0.0 0.0 }
-    } Mtranspose dmatrix{
+    } Mtranspose Dmatrix{
         { 1.0 0.0  0.0 }
         { 0.0 0.0 -1.0 }
         { 0.0 2.0  0.0 }
@@ -268,36 +268,36 @@ IN: math.blas.matrices.tests
     } Mtranspose M.
 ] unit-test
 
-{ cmatrix{
+{ Cmatrix{
     { 1.0 0.0            0.0 4.0  0.0 }
     { 0.0 0.0           -3.0 0.0  0.0 }
     { 0.0 C{ 4.0 -4.0 }  0.0 0.0 10.0 }
     { 0.0 0.0            0.0 0.0  0.0 }
 } } [
-    cmatrix{
+    Cmatrix{
         { 1.0 0.0  0.0 }
         { 0.0 0.0 -1.0 }
         { 0.0 2.0  0.0 }
         { 0.0 0.0  0.0 }
-    } cmatrix{
+    } Cmatrix{
         { 1.0 0.0           0.0 4.0 0.0 }
         { 0.0 C{ 2.0 -2.0 } 0.0 0.0 5.0 }
         { 0.0 0.0           3.0 0.0 0.0 }
     } M.
 ] unit-test
 
-{ cmatrix{
+{ Cmatrix{
     { 1.0  0.0  0.0          0.0 }
     { 0.0  0.0 C{ 4.0 -4.0 } 0.0 }
     { 0.0 -3.0  0.0          0.0 }
     { 4.0  0.0  0.0          0.0 }
     { 0.0  0.0 10.0          0.0 }
 } } [
-    cmatrix{
+    Cmatrix{
         { 1.0 0.0           0.0 4.0 0.0 }
         { 0.0 C{ 2.0 -2.0 } 0.0 0.0 5.0 }
         { 0.0 0.0           3.0 0.0 0.0 }
-    } Mtranspose cmatrix{
+    } Mtranspose Cmatrix{
         { 1.0 0.0  0.0 }
         { 0.0 0.0 -1.0 }
         { 0.0 2.0  0.0 }
@@ -305,36 +305,36 @@ IN: math.blas.matrices.tests
     } Mtranspose M.
 ] unit-test
 
-{ zmatrix{
+{ Zmatrix{
     { 1.0 0.0            0.0 4.0  0.0 }
     { 0.0 0.0           -3.0 0.0  0.0 }
     { 0.0 C{ 4.0 -4.0 }  0.0 0.0 10.0 }
     { 0.0 0.0            0.0 0.0  0.0 }
 } } [
-    zmatrix{
+    Zmatrix{
         { 1.0 0.0  0.0 }
         { 0.0 0.0 -1.0 }
         { 0.0 2.0  0.0 }
         { 0.0 0.0  0.0 }
-    } zmatrix{
+    } Zmatrix{
         { 1.0 0.0           0.0 4.0 0.0 }
         { 0.0 C{ 2.0 -2.0 } 0.0 0.0 5.0 }
         { 0.0 0.0           3.0 0.0 0.0 }
     } M.
 ] unit-test
 
-{ zmatrix{
+{ Zmatrix{
     { 1.0  0.0  0.0          0.0 }
     { 0.0  0.0 C{ 4.0 -4.0 } 0.0 }
     { 0.0 -3.0  0.0          0.0 }
     { 4.0  0.0  0.0          0.0 }
     { 0.0  0.0 10.0          0.0 }
 } } [
-    zmatrix{
+    Zmatrix{
         { 1.0 0.0           0.0 4.0 0.0 }
         { 0.0 C{ 2.0 -2.0 } 0.0 0.0 5.0 }
         { 0.0 0.0           3.0 0.0 0.0 }
-    } Mtranspose zmatrix{
+    } Mtranspose Zmatrix{
         { 1.0 0.0  0.0 }
         { 0.0 0.0 -1.0 }
         { 0.0 2.0  0.0 }
@@ -344,41 +344,41 @@ IN: math.blas.matrices.tests
 
 ! n*M
 
-{ smatrix{
+{ Smatrix{
     { 2.0 0.0 }
     { 0.0 2.0 }
 } } [
-    2.0 smatrix{
+    2.0 Smatrix{
         { 1.0 0.0 }
         { 0.0 1.0 }
     } n*M
 ] unit-test
 
-{ dmatrix{
+{ Dmatrix{
     { 2.0 0.0 }
     { 0.0 2.0 }
 } } [
-    2.0 dmatrix{
+    2.0 Dmatrix{
         { 1.0 0.0 }
         { 0.0 1.0 }
     } n*M
 ] unit-test
 
-{ cmatrix{
+{ Cmatrix{
     { C{ 2.0 1.0 } 0.0           }
     { 0.0          C{ -1.0 2.0 } }
 } } [
-    C{ 2.0 1.0 } cmatrix{
+    C{ 2.0 1.0 } Cmatrix{
         { 1.0 0.0          }
         { 0.0 C{ 0.0 1.0 } }
     } n*M
 ] unit-test
 
-{ zmatrix{
+{ Zmatrix{
     { C{ 2.0 1.0 } 0.0           }
     { 0.0          C{ -1.0 2.0 } }
 } } [
-    C{ 2.0 1.0 } zmatrix{
+    C{ 2.0 1.0 } Zmatrix{
         { 1.0 0.0          }
         { 0.0 C{ 0.0 1.0 } }
     } n*M
@@ -386,228 +386,228 @@ IN: math.blas.matrices.tests
 
 ! Mrows, Mcols
 
-{ svector{ 3.0 3.0 3.0 } } [
-    2 smatrix{
+{ Svector{ 3.0 3.0 3.0 } } [
+    2 Smatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mcols nth
 ] unit-test
-{ svector{ 3.0 2.0 3.0 4.0 } } [
-    2 smatrix{
+{ Svector{ 3.0 2.0 3.0 4.0 } } [
+    2 Smatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mrows nth
 ] unit-test
 { 3 } [
-    smatrix{
+    Smatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mrows length
 ] unit-test
 { 4 } [
-    smatrix{
+    Smatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mcols length
 ] unit-test
-{ svector{ 3.0 3.0 3.0 } } [
-    2 smatrix{
+{ Svector{ 3.0 3.0 3.0 } } [
+    2 Smatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mtranspose Mrows nth
 ] unit-test
-{ svector{ 3.0 2.0 3.0 4.0 } } [
-    2 smatrix{
+{ Svector{ 3.0 2.0 3.0 4.0 } } [
+    2 Smatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mtranspose Mcols nth
 ] unit-test
 { 3 } [
-    smatrix{
+    Smatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mtranspose Mcols length
 ] unit-test
 { 4 } [
-    smatrix{
+    Smatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mtranspose Mrows length
 ] unit-test
 
-{ dvector{ 3.0 3.0 3.0 } } [
-    2 dmatrix{
+{ Dvector{ 3.0 3.0 3.0 } } [
+    2 Dmatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mcols nth
 ] unit-test
-{ dvector{ 3.0 2.0 3.0 4.0 } } [
-    2 dmatrix{
+{ Dvector{ 3.0 2.0 3.0 4.0 } } [
+    2 Dmatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mrows nth
 ] unit-test
 { 3 } [
-    dmatrix{
+    Dmatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mrows length
 ] unit-test
 { 4 } [
-    dmatrix{
+    Dmatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mcols length
 ] unit-test
-{ dvector{ 3.0 3.0 3.0 } } [
-    2 dmatrix{
+{ Dvector{ 3.0 3.0 3.0 } } [
+    2 Dmatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mtranspose Mrows nth
 ] unit-test
-{ dvector{ 3.0 2.0 3.0 4.0 } } [
-    2 dmatrix{
+{ Dvector{ 3.0 2.0 3.0 4.0 } } [
+    2 Dmatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mtranspose Mcols nth
 ] unit-test
 { 3 } [
-    dmatrix{
+    Dmatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mtranspose Mcols length
 ] unit-test
 { 4 } [
-    dmatrix{
+    Dmatrix{
         { 1.0 2.0 3.0 4.0 }
         { 2.0 2.0 3.0 4.0 }
         { 3.0 2.0 3.0 4.0 }
     } Mtranspose Mrows length
 ] unit-test
 
-{ cvector{ C{ 3.0 1.0 } C{ 3.0 2.0 } C{ 3.0 3.0 } } } [
-    2 cmatrix{
+{ Cvector{ C{ 3.0 1.0 } C{ 3.0 2.0 } C{ 3.0 3.0 } } } [
+    2 Cmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mcols nth
 ] unit-test
-{ cvector{ C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } } } [
-    2 cmatrix{
+{ Cvector{ C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } } } [
+    2 Cmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mrows nth
 ] unit-test
 { 3 } [
-    cmatrix{
+    Cmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mrows length
 ] unit-test
 { 4 } [
-    cmatrix{
+    Cmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mcols length
 ] unit-test
-{ cvector{ C{ 3.0 1.0 } C{ 3.0 2.0 } C{ 3.0 3.0 } } } [
-    2 cmatrix{
+{ Cvector{ C{ 3.0 1.0 } C{ 3.0 2.0 } C{ 3.0 3.0 } } } [
+    2 Cmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mtranspose Mrows nth
 ] unit-test
-{ cvector{ C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } } } [
-    2 cmatrix{
+{ Cvector{ C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } } } [
+    2 Cmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mtranspose Mcols nth
 ] unit-test
 { 3 } [
-    cmatrix{
+    Cmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mtranspose Mcols length
 ] unit-test
 { 4 } [
-    cmatrix{
+    Cmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mtranspose Mrows length
 ] unit-test
 
-{ zvector{ C{ 3.0 1.0 } C{ 3.0 2.0 } C{ 3.0 3.0 } } } [
-    2 zmatrix{
+{ Zvector{ C{ 3.0 1.0 } C{ 3.0 2.0 } C{ 3.0 3.0 } } } [
+    2 Zmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mcols nth
 ] unit-test
-{ zvector{ C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } } } [
-    2 zmatrix{
+{ Zvector{ C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } } } [
+    2 Zmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mrows nth
 ] unit-test
 { 3 } [
-    zmatrix{
+    Zmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mrows length
 ] unit-test
 { 4 } [
-    zmatrix{
+    Zmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mcols length
 ] unit-test
-{ zvector{ C{ 3.0 1.0 } C{ 3.0 2.0 } C{ 3.0 3.0 } } } [
-    2 zmatrix{
+{ Zvector{ C{ 3.0 1.0 } C{ 3.0 2.0 } C{ 3.0 3.0 } } } [
+    2 Zmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mtranspose Mrows nth
 ] unit-test
-{ zvector{ C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } } } [
-    2 zmatrix{
+{ Zvector{ C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } } } [
+    2 Zmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mtranspose Mcols nth
 ] unit-test
 { 3 } [
-    zmatrix{
+    Zmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
     } Mtranspose Mcols length
 ] unit-test
 { 4 } [
-    zmatrix{
+    Zmatrix{
         { C{ 1.0 1.0 } C{ 2.0 1.0 } C{ 3.0 1.0 } C{ 4.0 1.0 } }
         { C{ 1.0 2.0 } C{ 2.0 2.0 } C{ 3.0 2.0 } C{ 4.0 2.0 } }
         { C{ 1.0 3.0 } C{ 2.0 3.0 } C{ 3.0 3.0 } C{ 4.0 3.0 } }
@@ -616,92 +616,92 @@ IN: math.blas.matrices.tests
 
 ! Msub
 
-{ smatrix{
+{ Smatrix{
     { 3.0 2.0 1.0 }
     { 0.0 1.0 0.0 }
 } } [
-    smatrix{
+    Smatrix{
         { 0.0 1.0 2.0 3.0 2.0 }
         { 1.0 0.0 3.0 2.0 1.0 }
         { 2.0 3.0 0.0 1.0 0.0 }
     } 1 2 2 3 Msub
 ] unit-test
 
-{ smatrix{
+{ Smatrix{
     { 3.0 0.0 }
     { 2.0 1.0 }
     { 1.0 0.0 }
 } } [
-    smatrix{
+    Smatrix{
         { 0.0 1.0 2.0 3.0 2.0 }
         { 1.0 0.0 3.0 2.0 1.0 }
         { 2.0 3.0 0.0 1.0 0.0 }
     } Mtranspose 2 1 3 2 Msub
 ] unit-test
 
-{ dmatrix{
+{ Dmatrix{
     { 3.0 2.0 1.0 }
     { 0.0 1.0 0.0 }
 } } [
-    dmatrix{
+    Dmatrix{
         { 0.0 1.0 2.0 3.0 2.0 }
         { 1.0 0.0 3.0 2.0 1.0 }
         { 2.0 3.0 0.0 1.0 0.0 }
     } 1 2 2 3 Msub
 ] unit-test
 
-{ dmatrix{
+{ Dmatrix{
     { 3.0 0.0 }
     { 2.0 1.0 }
     { 1.0 0.0 }
 } } [
-    dmatrix{
+    Dmatrix{
         { 0.0 1.0 2.0 3.0 2.0 }
         { 1.0 0.0 3.0 2.0 1.0 }
         { 2.0 3.0 0.0 1.0 0.0 }
     } Mtranspose 2 1 3 2 Msub
 ] unit-test
 
-{ cmatrix{
+{ Cmatrix{
     { C{ 3.0 3.0 } 2.0 1.0 }
     { 0.0          1.0 0.0 }
 } } [
-    cmatrix{
+    Cmatrix{
         { 0.0 1.0 2.0          3.0 2.0 }
         { 1.0 0.0 C{ 3.0 3.0 } 2.0 1.0 }
         { 2.0 3.0 0.0          1.0 0.0 }
     } 1 2 2 3 Msub
 ] unit-test
 
-{ cmatrix{
+{ Cmatrix{
     { C{ 3.0 3.0 } 0.0 }
     { 2.0          1.0 }
     { 1.0          0.0 }
 } } [
-    cmatrix{
+    Cmatrix{
         { 0.0 1.0 2.0          3.0 2.0 }
         { 1.0 0.0 C{ 3.0 3.0 } 2.0 1.0 }
         { 2.0 3.0 0.0          1.0 0.0 }
     } Mtranspose 2 1 3 2 Msub
 ] unit-test
 
-{ zmatrix{
+{ Zmatrix{
     { C{ 3.0 3.0 } 2.0 1.0 }
     { 0.0          1.0 0.0 }
 } } [
-    zmatrix{
+    Zmatrix{
         { 0.0 1.0 2.0          3.0 2.0 }
         { 1.0 0.0 C{ 3.0 3.0 } 2.0 1.0 }
         { 2.0 3.0 0.0          1.0 0.0 }
     } 1 2 2 3 Msub
 ] unit-test
 
-{ zmatrix{
+{ Zmatrix{
     { C{ 3.0 3.0 } 0.0 }
     { 2.0          1.0 }
     { 1.0          0.0 }
 } } [
-    zmatrix{
+    Zmatrix{
         { 0.0 1.0 2.0          3.0 2.0 }
         { 1.0 0.0 C{ 3.0 3.0 } 2.0 1.0 }
         { 2.0 3.0 0.0          1.0 0.0 }

@@ -96,10 +96,10 @@ ARTICLE: "math.blas.matrices" "BLAS interface matrix operations"
 }
 "Literal syntax:"
 { $subsections
-    postpone: \smatrix{
-    postpone: \dmatrix{
-    postpone: \cmatrix{
-    postpone: \zmatrix{
+    postpone: \Smatrix{
+    postpone: \Dmatrix{
+    postpone: \Cmatrix{
+    postpone: \Zmatrix{
 } ;
 
 
@@ -270,8 +270,8 @@ HELP: <empty-vector>
 { $values { "length" "The length of the new vector" } { "exemplar" blas-vector-base blas-matrix-base } { "vector" blas-vector-base } }
 { $description "Return a vector of zeros with the given " { $snippet "length" } " and the same element type as " { $snippet "v" } "." } ;
 
-HELP: \smatrix{
-{ $syntax "smatrix{
+HELP: \Smatrix{
+{ $syntax "Smatrix{
     { 1.0 0.0 0.0 1.0 }
     { 0.0 1.0 0.0 2.0 }
     { 0.0 0.0 1.0 3.0 }
@@ -279,8 +279,8 @@ HELP: \smatrix{
 }" }
 { $description "Construct a literal " { $link float-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
-HELP: \dmatrix{
-{ $syntax "dmatrix{
+HELP: \Dmatrix{
+{ $syntax "Dmatrix{
     { 1.0 0.0 0.0 1.0 }
     { 0.0 1.0 0.0 2.0 }
     { 0.0 0.0 1.0 3.0 }
@@ -288,8 +288,8 @@ HELP: \dmatrix{
 }" }
 { $description "Construct a literal " { $link double-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
-HELP: \cmatrix{
-{ $syntax "cmatrix{
+HELP: \Cmatrix{
+{ $syntax "Cmatrix{
     { 1.0 0.0           0.0 1.0           }
     { 0.0 C{ 0.0 1.0 }  0.0 2.0           }
     { 0.0 0.0          -1.0 3.0           }
@@ -297,8 +297,8 @@ HELP: \cmatrix{
 }" }
 { $description "Construct a literal " { $link complex-float-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
-HELP: \zmatrix{
-{ $syntax "zmatrix{
+HELP: \Zmatrix{
+{ $syntax "Zmatrix{
     { 1.0 0.0           0.0 1.0           }
     { 0.0 C{ 0.0 1.0 }  0.0 2.0           }
     { 0.0 0.0          -1.0 3.0           }
@@ -307,6 +307,6 @@ HELP: \zmatrix{
 { $description "Construct a literal " { $link complex-double-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
 {
-    postpone: \smatrix{ postpone: \dmatrix{
-    postpone: \cmatrix{ postpone: \zmatrix{
+    postpone: \Smatrix{ postpone: \Dmatrix{
+    postpone: \Cmatrix{ postpone: \Zmatrix{
 } related-words

@@ -5,7 +5,7 @@ math.blas.ffi math.blas.vectors math.blas.vectors.private
 math.complex math.functions math.order functors words
 sequences sequences.merged sequences.private shuffle
 parser prettyprint.backend prettyprint.custom ascii
-specialized-arrays ;
+specialized-arrays functors2 strings ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: double
@@ -246,70 +246,67 @@ M: blas-matrix-base equal?
     } 2&& ;
 
 <<
+INLINE-FUNCTOR: blas-matrix ( type: name t: string u: string c: string -- ) [[
+    ! VECTOR      IS ${TYPE}-blas-vector
+    ! <VECTOR>    IS <${TYPE}-blas-vector>
+    ! XGEMV       IS ${T}GEMV
+    ! XGEMM       IS ${T}GEMM
+    ! XGERU       IS ${T}GER${U}
+    ! XGERC       IS ${T}GER${C}
 
-<FUNCTOR: (define-blas-matrix) ( TYPE T U C -- )
+    ! MATRIX      DEFINES-CLASS ${TYPE}-blas-matrix
+    ! <MATRIX>    DEFINES <${TYPE}-blas-matrix>
+    ! >MATRIX     DEFINES >${TYPE}-blas-matrix
 
-VECTOR      IS ${TYPE}-blas-vector
-<VECTOR>    IS <${TYPE}-blas-vector>
-XGEMV       IS ${T}GEMV
-XGEMM       IS ${T}GEMM
-XGERU       IS ${T}GER${U}
-XGERC       IS ${T}GER${C}
+    ! t           [ T >lower ]
 
-MATRIX      DEFINES-CLASS ${TYPE}-blas-matrix
-<MATRIX>    DEFINES <${TYPE}-blas-matrix>
->MATRIX     DEFINES >${TYPE}-blas-matrix
+    ! XMATRIX{    DEFINES ${t}matrix{
 
-t           [ T >lower ]
+    TUPLE: ${type}-blas-matrix < blas-matrix-base ;
+    : <${type}-blas-matrix> ( underlying ld rows cols transpose -- matrix )
+        ${type}-blas-matrix boa ; inline
+    : >${type}-blas-matrix ( arrays -- matrix )
+        [ ${type} >c-array underlying>> ] (>matrix) <${type}-blas-matrix> ;
+    
+    SYNTAX: ${t}matrix{ \ } [ >${type}-blas-matrix ] parse-literal ;
 
-XMATRIX{    DEFINES ${t}matrix{
+    M: ${type}-blas-matrix element-type
+        drop ${type} ;
+    M: ${type}-blas-matrix (blas-matrix-like)
+        drop <${type}-blas-matrix> ;
+    M: ${type}-blas-vector (blas-matrix-like)
+        drop <${type}-blas-matrix> ;
+    M: ${type}-blas-matrix (blas-vector-like)
+        drop <${type}-blas-vector> ;
 
-WHERE
+    M: ${type}-blas-vector n*M.V+n*V!
+        (prepare-gemv) [ ${t}GEMV ] dip ;
+    M: ${type}-blas-matrix n*M.M+n*M!
+        (prepare-gemm) [ ${t}GEMM ] dip ;
+    M: ${type}-blas-matrix n*V(*)V+M!
+        (prepare-ger) [ ${t}GER${u} ] dip ;
+    M: ${type}-blas-matrix n*V(*)Vconj+M!
+        (prepare-ger) [ ${t}GER${c} ] dip ;
 
-TUPLE: MATRIX < blas-matrix-base ;
-: <MATRIX> ( underlying ld rows cols transpose -- matrix )
-    MATRIX boa ; inline
-
-M: MATRIX element-type
-    drop TYPE ;
-M: MATRIX (blas-matrix-like)
-    drop <MATRIX> ;
-M: VECTOR (blas-matrix-like)
-    drop <MATRIX> ;
-M: MATRIX (blas-vector-like)
-    drop <VECTOR> ;
-
-: >MATRIX ( arrays -- matrix )
-    [ TYPE >c-array underlying>> ] (>matrix) <MATRIX> ;
-
-M: VECTOR n*M.V+n*V!
-    (prepare-gemv) [ XGEMV ] dip ;
-M: MATRIX n*M.M+n*M!
-    (prepare-gemm) [ XGEMM ] dip ;
-M: MATRIX n*V(*)V+M!
-    (prepare-ger) [ XGERU ] dip ;
-M: MATRIX n*V(*)Vconj+M!
-    (prepare-ger) [ XGERC ] dip ;
-
-SYNTAX: XMATRIX{ \ } [ >MATRIX ] parse-literal ;
-
-M: MATRIX pprint-delims
-    drop \ XMATRIX{ \ } ;
-
-;FUNCTOR>
-
-
-: define-real-blas-matrix ( TYPE T -- )
-    "" "" (define-blas-matrix) ;
-: define-complex-blas-matrix ( TYPE T -- )
-    "U" "C" (define-blas-matrix) ;
-
-float          "S" define-real-blas-matrix
-double         "D" define-real-blas-matrix
-complex-float  "C" define-complex-blas-matrix
-complex-double "Z" define-complex-blas-matrix
-
+    M: ${type}-blas-matrix pprint-delims
+        drop \ ${t}matrix{ \ } ;
+]]
 >>
+
+
+! : define-real-blas-matrix ( TYPE T -- )
+    ! "" "" (define-blas-matrix) ;
+! : define-complex-blas-matrix ( TYPE T -- )
+    ! "U" "C" (define-blas-matrix) ;
+
+! float          "S" define-real-blas-matrix
+! double         "D" define-real-blas-matrix
+! complex-float  "C" define-complex-blas-matrix
+! complex-double "Z" define-complex-blas-matrix
+BLAS-MATRIX: float "S" "" ""
+BLAS-MATRIX: double "D" "" ""
+BLAS-MATRIX: complex-float "C" "U" "C"
+BLAS-MATRIX: complex-double "Z" "U" "C"
 
 M: blas-matrix-base >pprint-sequence Mrows ;
 M: blas-matrix-base pprint* pprint-object ;
