@@ -3,24 +3,24 @@
 USING: functors2 ;
 IN: alien.complex.functor
 
-INLINE-FUNCTOR: complex-type ( N: existing-word T: name -- ) [[
+INLINE-FUNCTOR: complex-type ( n: existing-word t: name -- ) [[
     USING: alien alien.c-types classes.struct kernel quotations ;
     QUALIFIED: math
 
     <<
-    STRUCT: ${T} { real ${N} } { imaginary ${N} } ;
+    STRUCT: ${t} { real ${n} } { imaginary ${n} } ;
 
-    : <${T}> ( z -- alien )
-        math:>rect ${T} <struct-boa> >c-ptr ;
+    : <${t}> ( z -- alien )
+        math:>rect ${t} <struct-boa> >c-ptr ;
 
-    : *${T} ( alien -- z )
-        ${T} memory>struct [ real>> ] [ imaginary>> ] bi math:rect> ; inline
+    : *${t} ( alien -- z )
+        ${t} memory>struct [ real>> ] [ imaginary>> ] bi math:rect> ; inline
 
     >>
 
-    \ ${T} lookup-c-type
-    [ <${T}> ] >>unboxer-quot
-    [ *${T} ] >>boxer-quot
+    \ ${t} lookup-c-type
+    [ <${t}> ] >>unboxer-quot
+    [ *${t} ] >>boxer-quot
     complex >>boxed-class
     drop
 

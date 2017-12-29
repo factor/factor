@@ -5,19 +5,18 @@ IN: alien.destructors
 
 TUPLE: alien-destructor alien ;
 
-INLINE-FUNCTOR: destructor ( F: existing-word -- ) [[
-USING: accessors alien.destructors effects generalizations
-destructors kernel literals sequences ;
+INLINE-FUNCTOR: destructor ( f: existing-word -- ) [[
+    USING: accessors alien.destructors effects generalizations
+    destructors kernel literals sequences ;
 
-TUPLE: ${F}-destructor < alien-destructor ;
+    TUPLE: ${f}-destructor < alien-destructor ;
 
-: <${F}-destructor> ( alien -- destructor )
-    ${F}-destructor boa ; inline
+    : <${f}-destructor> ( alien -- destructor )
+        ${f}-destructor boa ; inline
 
-: &${F} ( alien -- alien ) dup <${F}-destructor> &dispose drop ; inline
+    : &${f} ( alien -- alien ) dup <${f}-destructor> &dispose drop ; inline
 
-: |${F} ( alien -- alien ) dup <${F}-destructor> |dispose drop ; inline
+    : |${f} ( alien -- alien ) dup <${f}-destructor> |dispose drop ; inline
 
-M: ${F}-destructor dispose alien>> ${F} $[ \ ${F} stack-effect out>> length ] ndrop ;
-
+    M: ${f}-destructor dispose alien>> ${f} $[ \ ${f} stack-effect out>> length ] ndrop ;
 ]]

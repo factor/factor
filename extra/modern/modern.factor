@@ -210,6 +210,7 @@ ERROR: unexpected-terminator n string slice ;
     swap
     ! What ended the FOO: .. ; form?
     ! Remove the ; from the payload if present
+    ! XXX: probably can remove this, T: is dumb
     ! Also in stack effects ( T: int -- ) can be ended by -- and )
     dup ?last {
         { [ dup ";" sequence= ] [ drop unclip-last 3array ] }

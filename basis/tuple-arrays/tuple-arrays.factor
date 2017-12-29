@@ -34,32 +34,30 @@ MACRO: write-tuple ( class -- quot )
 
 PRIVATE>
 
-FUNCTOR: tuple-array ( CLASS: existing-class -- ) [[
+FUNCTOR: tuple-array ( class: existing-class -- ) [[
+    USING: accessors arrays classes.tuple.private kernel sequences
+    sequences.private tuple-arrays.private ;
 
-USING: accessors arrays classes.tuple.private kernel sequences
-sequences.private tuple-arrays.private ;
+    TUPLE: ${class}-array
+    { seq array read-only }
+    { n array-capacity read-only }
+    { length array-capacity read-only } ;
 
-TUPLE: ${CLASS}-array
-{ seq array read-only }
-{ n array-capacity read-only }
-{ length array-capacity read-only } ;
+    INSTANCE: ${class}-array sequence
 
-INSTANCE: ${CLASS}-array sequence
+    : <${class}-array> ( length -- tuple-array )
+        [ \ ${class} [ initial-values <repetition> concat ] [ tuple-arity ] bi ] keep
+        \ ${class}-array boa ; inline
 
-: <${CLASS}-array> ( length -- tuple-array )
-    [ \ ${CLASS} [ initial-values <repetition> concat ] [ tuple-arity ] bi ] keep
-    \ ${CLASS}-array boa ; inline
+    M: ${class}-array length length>> ; inline
 
-M: ${CLASS}-array length length>> ; inline
+    M: ${class}-array nth-unsafe tuple-slice \ ${class} read-tuple ; inline
 
-M: ${CLASS}-array nth-unsafe tuple-slice \ ${CLASS} read-tuple ; inline
+    M: ${class}-array set-nth-unsafe tuple-slice \ ${class} write-tuple ; inline
 
-M: ${CLASS}-array set-nth-unsafe tuple-slice \ ${CLASS} write-tuple ; inline
+    M: ${class}-array new-sequence drop <${class}-array> ; inline
 
-M: ${CLASS}-array new-sequence drop <${CLASS}-array> ; inline
+    : >${class}-array ( seq -- tuple-array ) 0 <${class}-array> clone-like ;
 
-: >${CLASS}-array ( seq -- tuple-array ) 0 <${CLASS}-array> clone-like ;
-
-M: ${CLASS}-array like drop dup ${CLASS}-array? [ >${CLASS}-array ] unless ; inline
-
+    M: ${class}-array like drop dup ${class}-array? [ >${class}-array ] unless ; inline
 ]]

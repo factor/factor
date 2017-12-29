@@ -14,20 +14,18 @@ IN: annotations
     [ { [ word? ] [ vocabulary>> "annotations" = ] } 1&& not ]
     filter ;
 
-INLINE-FUNCTOR: annotation ( NAME: new-word -- ) [[
+INLINE-FUNCTOR: annotation ( name: new-word -- ) [[
+    USING: annotations kernel sequences tools.crossref ;
 
-USING: annotations kernel sequences tools.crossref ;
+    : (${name}) ( str -- ) drop ; inline
 
-: (${NAME}) ( str -- ) drop ; inline
+    SYNTAX: !${name} (parse-annotation) \ (${name}) suffix! ;
 
-SYNTAX: !${NAME} (parse-annotation) \ (${NAME}) suffix! ;
+    : ${name}s ( -- usages )
+        \ (${name}) (non-annotation-usage) ;
 
-: ${NAME}s ( -- usages )
-    \ (${NAME}) (non-annotation-usage) ;
-
-: ${NAME}s. ( -- )
-    ${NAME}s sorted-definitions. ;
-
+    : ${name}s. ( -- )
+        ${name}s sorted-definitions. ;
 ]]
 
 SYNTAX: \ANNOTATIONS: ";" [ define-annotation ] each-token ;

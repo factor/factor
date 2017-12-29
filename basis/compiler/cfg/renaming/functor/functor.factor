@@ -9,79 +9,70 @@ IN: compiler.cfg.renaming.functor
     '[ [ _ ] dip changer-word [ ] 2sequence ] map [ ] join
     [ drop ] append ;
 
-INLINE-FUNCTOR: renaming ( NAME: name DEF-QUOT: string USE-QUOT: string TEMP-QUOT: string -- ) [[
+INLINE-FUNCTOR: renaming ( name: name def-quot: string use-quot: string temp-quot: string -- ) [[
+    GENERIC: ${name}-insn-defs ( insn -- )
+    GENERIC: ${name}-insn-uses ( insn -- )
+    GENERIC: ${name}-insn-temps ( insn -- )
 
-! rename-insn-defs DEFINES ${NAME}-insn-defs
-! rename-insn-uses DEFINES ${NAME}-insn-uses
-! rename-insn-temps DEFINES ${NAME}-insn-temps
+    M: insn ${name}-insn-defs drop ;
+    M: insn ${name}-insn-uses drop ;
+    M: insn ${name}-insn-temps drop ;
 
-! WHERE
+    ! Instructions with unusual operands
 
-GENERIC: ${NAME}-insn-defs ( insn -- )
-GENERIC: ${NAME}-insn-uses ( insn -- )
-GENERIC: ${NAME}-insn-temps ( insn -- )
+    ! Special ${name}-insn-defs methods
+    M: ##parallel-copy ${name}-insn-defs
+        [ [ first2 ${def-quot} dip 2array ] map ] change-values drop ;
 
-M: insn ${NAME}-insn-defs drop ;
-M: insn ${NAME}-insn-uses drop ;
-M: insn ${NAME}-insn-temps drop ;
+    M: ##phi ${name}-insn-defs ${def-quot} change-dst drop ;
 
-! Instructions with unusual operands
+    M: alien-call-insn ${name}-insn-defs
+        [ [ first3 ${def-quot} 2dip 3array ] map ] change-reg-outputs
+        drop ;
 
-! Special ${NAME}-insn-defs methods
-M: ##parallel-copy ${NAME}-insn-defs
-    [ [ first2 ${DEF-QUOT} dip 2array ] map ] change-values drop ;
+    M: ##callback-inputs ${name}-insn-defs
+        [ [ first3 ${def-quot} 2dip 3array ] map ] change-reg-outputs
+        [ [ first3 ${def-quot} 2dip 3array ] map ] change-stack-outputs
+        drop ;
 
-M: ##phi ${NAME}-insn-defs ${DEF-QUOT} change-dst drop ;
+    ! Special ${name}-insn-uses methods
+    M: ##parallel-copy ${name}-insn-uses
+        [ [ first2 ${use-quot} call 2array ] map ] change-values drop ;
 
-M: alien-call-insn ${NAME}-insn-defs
-    [ [ first3 ${DEF-QUOT} 2dip 3array ] map ] change-reg-outputs
-    drop ;
+    M: ##phi ${name}-insn-uses
+        [ ${use-quot} assoc-map ] change-inputs drop ;
 
-M: ##callback-inputs ${NAME}-insn-defs
-    [ [ first3 ${DEF-QUOT} 2dip 3array ] map ] change-reg-outputs
-    [ [ first3 ${DEF-QUOT} 2dip 3array ] map ] change-stack-outputs
-    drop ;
+    M: alien-call-insn ${name}-insn-uses
+        [ [ first3 ${use-quot} 2dip 3array ] map ] change-reg-inputs
+        [ [ first3 ${use-quot} 2dip 3array ] map ] change-stack-inputs
+        drop ;
 
-! Special ${NAME}-insn-uses methods
-M: ##parallel-copy ${NAME}-insn-uses
-    [ [ first2 ${USE-QUOT} call 2array ] map ] change-values drop ;
+    M: ##alien-indirect ${name}-insn-uses
+        ${use-quot} change-src call-next-method ;
 
-M: ##phi ${NAME}-insn-uses
-    [ ${USE-QUOT} assoc-map ] change-inputs drop ;
+    M: ##callback-outputs ${name}-insn-uses
+        [ [ first3 ${use-quot} 2dip 3array ] map ] change-reg-inputs
+        drop ;
 
-M: alien-call-insn ${NAME}-insn-uses
-    [ [ first3 ${USE-QUOT} 2dip 3array ] map ] change-reg-inputs
-    [ [ first3 ${USE-QUOT} 2dip 3array ] map ] change-stack-inputs
-    drop ;
+    <<
+    ! Generate methods for everything else
+    insn-classes get special-vreg-insns diff [ insn-def-slots empty? ] reject [
+        [ \ ${name}-insn-defs create-method-in ]
+        [ insn-def-slots [ name>> ] map ${def-quot} slot-change-quot ] bi
+        define
+    ] each
 
-M: ##alien-indirect ${NAME}-insn-uses
-    ${USE-QUOT} change-src call-next-method ;
+    insn-classes get special-vreg-insns diff [ insn-use-slots empty? ] reject [
+        [ \ ${name}-insn-uses create-method-in ]
+        [ insn-use-slots [ name>> ] map ${use-quot} slot-change-quot ] bi
+        define
+    ] each
 
-M: ##callback-outputs ${NAME}-insn-uses
-    [ [ first3 ${USE-QUOT} 2dip 3array ] map ] change-reg-inputs
-    drop ;
-
-<<
-! Generate methods for everything else
-insn-classes get special-vreg-insns diff [ insn-def-slots empty? ] reject [
-    [ \ ${NAME}-insn-defs create-method-in ]
-    [ insn-def-slots [ name>> ] map ${DEF-QUOT} slot-change-quot ] bi
-    define
-] each
-
-insn-classes get special-vreg-insns diff [ insn-use-slots empty? ] reject [
-    [ \ ${NAME}-insn-uses create-method-in ]
-    [ insn-use-slots [ name>> ] map ${USE-QUOT} slot-change-quot ] bi
-    define
-] each
-
-insn-classes get [ insn-temp-slots empty? ] reject [
-    [ \ ${NAME}-insn-temps create-method-in ]
-    [ insn-temp-slots [ name>> ] map ${TEMP-QUOT} slot-change-quot ] bi
-    define
-] each
->>
+    insn-classes get [ insn-temp-slots empty? ] reject [
+        [ \ ${name}-insn-temps create-method-in ]
+        [ insn-temp-slots [ name>> ] map ${temp-quot} slot-change-quot ] bi
+        define
+    ] each
+    >>
 
 ]]
-
-! SYNTAX: \RENAMING: scan-token scan-object scan-object scan-object define-renaming ;
