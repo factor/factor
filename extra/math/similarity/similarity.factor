@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: kernel math math.functions math.statistics math.vectors
-sequences sequences.extras ;
+sequences sequences.extras sets ;
 
 IN: math.similarity
 
