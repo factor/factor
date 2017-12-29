@@ -2,8 +2,8 @@ USING: alien alien.c-types alien.data arrays assocs command-line fry
 hashtables init io.encodings.utf8 kernel namespaces
 python.errors python.ffi python.objects sequences
 specialized-arrays strings vectors ;
-IN: python
 QUALIFIED: math
+IN: python
 
 ERROR: python-error type message traceback ;
 
@@ -64,9 +64,9 @@ DEFER: >py
 GENERIC: >py ( obj -- py-obj )
 M: string >py
     utf8>py-unicode check-new-ref ;
-M: math:fixnum >py
+M: math::fixnum >py
     PyLong_FromLong check-new-ref ;
-M: math:float >py
+M: math::float >py
     PyFloat_FromDouble check-new-ref ;
 M: array >py
     [ >py ] map array>py-tuple ;

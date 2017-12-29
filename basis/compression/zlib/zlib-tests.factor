@@ -8,4 +8,4 @@ IN: compression.zlib.tests
 
 { t } [ compress-me [ compress uncompress ] keep = ] unit-test
 
-[ ffi:Z_DATA_ERROR zlib-error-message ] [ string>> "data error" = ] must-fail-with
+[ ffi::Z_DATA_ERROR zlib-error-message ] [ string>> "data error" = ] must-fail-with

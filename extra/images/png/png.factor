@@ -5,7 +5,7 @@ compression.inflate fry grouping images images.loader io io.binary
 io.encodings.8-bit.latin1 io.encodings.ascii io.encodings.binary
 io.encodings.string io.streams.byte-array io.streams.throwing kernel
 locals math math.bitwise math.functions sequences sorting splitting ;
-QUALIFIED: bitstreams
+QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
 SINGLETON: png-image
@@ -195,10 +195,10 @@ ERROR: bad-filter n ;
         count 2 * count!
     ] when
 
-    bitstreams:<msb0-bit-reader> :> br
+    bs:<msb0-bit-reader> :> br
     height [
-        count [ depth br bitstreams:read ] B{ } replicate-as
-        8 br bitstreams:align
+        count [ depth br bs:read ] B{ } replicate-as
+        8 br bs:align
     ] replicate concat ;
 
 :: reverse-interlace-none ( bytes loading-png -- array )

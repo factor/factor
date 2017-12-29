@@ -108,7 +108,7 @@ PRIVATE>
 
 ! Help support
 
-: fuel-get-article ( name -- ) fuel.help:get-article fuel-eval-set-result ;
+: fuel-get-article ( name -- ) fuel.help::get-article fuel-eval-set-result ;
 
 : fuel-get-article-title ( name -- )
     articles get at [ article-title ] [ f ] if* fuel-eval-set-result ;
@@ -117,12 +117,12 @@ PRIVATE>
 
 : fuel-word-def ( name -- ) word-def fuel-eval-set-result ;
 
-: fuel-vocab-help ( name -- ) fuel.help:vocab-help fuel-eval-set-result ;
+: fuel-vocab-help ( name -- ) fuel.help::vocab-help fuel-eval-set-result ;
 
 : fuel-word-synopsis ( word -- ) word-synopsis fuel-eval-set-result ;
 
 : fuel-vocab-summary ( name -- )
-    fuel.help:vocab-summary fuel-eval-set-result ;
+    fuel.help::vocab-summary fuel-eval-set-result ;
 
 : fuel-index ( quot -- ) call( -- seq ) format-index fuel-eval-set-result ;
 

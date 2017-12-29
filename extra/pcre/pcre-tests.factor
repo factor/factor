@@ -2,7 +2,6 @@ USING: accessors arrays assocs continuations http.client kernel
 literals math math.parser math.ranges pcre pcre.ffi pcre.private
 random sequences system tools.test ;
 QUALIFIED: regexp
-QUALIFIED: splitting
 IN: pcre.tests
 
 { { "Bords" "words" "word" } } [
@@ -158,4 +157,4 @@ version 8.36 <= [
 ] unit-test
 
 ! Test that the regexp syntax works.
-{ t } [ "1234abcd" regexp:R/ ^\d+\w+$/ matches? ] unit-test
+{ t } [ "1234abcd" regexp::R/ ^\d+\w+$/ matches? ] unit-test

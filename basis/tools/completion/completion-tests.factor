@@ -1,5 +1,4 @@
 USING: assocs kernel sequences tools.test ;
-
 IN: tools.completion
 
 { f } [ "abc" "def" fuzzy ] unit-test
