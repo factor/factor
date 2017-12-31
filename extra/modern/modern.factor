@@ -158,12 +158,14 @@ ERROR: unexpected-terminator n string slice ;
 
 : (strict-upper?) ( string -- ? )
     {
+        ! All chars must...
         [
             [
-                { [ char: A char: Z between? ] [ ":-\\#" member? ] } 1||
+                { [ char: A char: Z between? ] [ "':-\\#" member? ] } 1||
             ] all?
         ]
-        [ [ char: A char: Z between? ] any? ] ! XXX: what?
+        ! At least one char must...
+        [ [ { [ char: A char: Z between? ] [ char: ' = ] } 1|| ] any? ]
     } 1&& ;
 
 : strict-upper? ( string -- ? )

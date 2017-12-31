@@ -11,6 +11,16 @@ IN: modern.tests
 { t } [ "FOO::" upper-colon? ] unit-test
 { t } [ "FOO:::" upper-colon? ] unit-test
 
+! 'FOO:
+{ f } [ "'" upper-colon? ] unit-test
+{ t } [ "':" upper-colon? ] unit-test
+{ t } [ "'::" upper-colon? ] unit-test
+{ t } [ "':::" upper-colon? ] unit-test
+{ t } [ "'FOO:" upper-colon? ] unit-test
+{ t } [ "'FOO::" upper-colon? ] unit-test
+{ t } [ "'FOO:::" upper-colon? ] unit-test
+
+! \FOO: is not an upper-colon form, it is deactivated by the \
 { f } [ "\\" upper-colon? ] unit-test
 { f } [ "\\:" upper-colon? ] unit-test
 { f } [ "\\::" upper-colon? ] unit-test
