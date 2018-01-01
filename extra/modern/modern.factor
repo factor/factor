@@ -219,6 +219,15 @@ ERROR: unexpected-terminator n string slice ;
         [ ">" tail? ]
     } 1&& ;
 
+: special-acute? ( string -- ? )
+    {
+        [ section-open? ]
+        [ html-self-close? ]
+        [ html-full-open? ]
+        [ html-half-open? ]
+        [ html-close? ]
+    } 1|| ;
+
 : upper-colon? ( string -- ? )
     dup { [ length 0 > ] [ [ char: \: = ] all? ] } 1&& [
         drop t
@@ -304,7 +313,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
         { [ dup html-close? ] [
             ! Do nothing
         ] }
-        ! [ B ]
+        [ [ slice-til-whitespace drop ] dip span-slices ]
     } cond ;
 
 ! Words like append! and suffix! are allowed for now.
