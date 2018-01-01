@@ -3,7 +3,8 @@
 USING: arrays assocs combinators combinators.short-circuit
 continuations io.encodings.utf8 io.files kernel make math
 math.order modern.paths modern.slices sequences sequences.extras
-sets splitting strings unicode vocabs.loader ;
+sequences.generalizations sets shuffle splitting strings unicode
+vocabs.loader ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;
@@ -171,13 +172,51 @@ ERROR: unexpected-terminator n string slice ;
 : strict-upper? ( string -- ? )
     { [ ":" sequence= ] [ (strict-upper?) ] } 1|| ;
 
-! <a <a: but not <a>
+! <A <A: but not <A>
 : section-open? ( string -- ? )
     {
         [ "<" head? ]
         [ length 2 >= ]
         [ rest strict-upper? ]
         [ ">" tail? not ]
+    } 1&& ;
+
+: html-self-close? ( string -- ? )
+    {
+        [ "<" head? ]
+        [ length 2 >= ]
+        [ rest strict-upper? not ]
+        [ [ blank? ] any? not ]
+        [ "/>" tail? ]
+    } 1&& ;
+
+: html-full-open? ( string -- ? )
+    {
+        [ "<" head? ]
+        [ length 2 >= ]
+        [ second char: / = not ]
+        [ rest strict-upper? not ]
+        [ [ blank? ] any? not ]
+        [ ">" tail? ]
+    } 1&& ;
+
+: html-half-open? ( string -- ? )
+    {
+        [ "<" head? ]
+        [ length 2 >= ]
+        [ second char: / = not ]
+        [ rest strict-upper? not ]
+        [ [ blank? ] any? not ]
+        [ ">" tail? not ]
+    } 1&& ;
+
+: html-close? ( string -- ? )
+    {
+        [ "</" head? ]
+        [ length 2 >= ]
+        [ rest strict-upper? not ]
+        [ [ blank? ] any? not ]
+        [ ">" tail? ]
     } 1&& ;
 
 : upper-colon? ( string -- ? )
@@ -233,7 +272,40 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
     } cond ;
 
 : read-acute ( n string slice -- n' string acute )
-    [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
+    {
+        { [ dup section-open? ] [
+            [
+                matching-section-delimiter 1array lex-until
+            ] keep swap unclip-last 3array
+        ] }
+        { [ dup html-self-close? ] [
+            ! do nothing special
+        ] }
+        { [ dup html-full-open? ] [
+            dup [
+                rest-slice
+                dup ">" tail? [ but-last-slice ] when
+                "</" ">" surround 1array lex-until unclip-last
+            ] dip -rot 3array
+        ] }
+        { [ dup html-half-open? ] [
+            ! n seq slice
+            [ { ">" "/>" } lex-until ] dip
+            ! n seq slice2 slice
+            over ">" sequence= [
+                "</" ">" surround array '[ _ lex-until ] dip unclip-last
+                -rot roll unclip-last [ 3array ] 2dip 3array
+            ] [
+                ! self-contained
+                swap unclip-last 3array
+            ] if
+        ] }
+
+        { [ dup html-close? ] [
+            ! Do nothing
+        ] }
+        ! [ B ]
+    } cond ;
 
 ! Words like append! and suffix! are allowed for now.
 : read-exclamation ( n string slice -- n' string obj )
@@ -316,6 +388,7 @@ DEFER: lex-factor-top*
 
             ! if we are in a FOO: and we hit a <BAR or <BAR:
             ! then end the FOO:
+            ! Don't rewind for a <foo/> or <foo></foo>
             [ slice-til-whitespace drop ] dip span-slices
             dup section-open? [ rewind-slice f ] when
         ] }
@@ -342,7 +415,7 @@ DEFER: lex-factor-top*
             ! if we are in a FOO: and we hit a <BAR or <BAR:
             ! then end the FOO:
             [ slice-til-whitespace drop ] dip span-slices
-            dup section-open? [ read-acute ] when
+            read-acute
         ] }
 
         { char: \s [ read-token-or-whitespace-top ] }
