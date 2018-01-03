@@ -33,7 +33,8 @@ cli-git-num-parallel [ cpus 2 * ] initialize
     ?file-info dup [ directory? ] when ;
 
 : git-current-branch* ( -- name )
-     { "git" "rev-parse" "--abbrev-ref" "HEAD" }
+     ! { "git" "rev-parse" "--abbrev-ref" "HEAD" }
+     { "git" "name-rev" "--name-only" "HEAD" }
      utf8 <process-reader> stream-contents
      [ blank? ] trim-tail ;
 
