@@ -319,6 +319,8 @@ IN: bootstrap.syntax
     "IDENTITY-MEMO:" [ (:) apply-inlined-effects define-identity-memoized ] define-core-syntax
     "IDENTITY-MEMO::" [ (::) apply-inlined-effects define-identity-memoized ] define-core-syntax
 
+    "'[" [ parse-quotation fry append! ] define-core-syntax
+
     "':" [
         (:) [ fry '[ @ call ] ] [ apply-inlined-effects ] bi* define-declared
     ] define-core-syntax

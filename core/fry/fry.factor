@@ -1,11 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel locals.backend math parser
+USING: accessors combinators kernel locals.backend math
 quotations sequences sets splitting words ;
 IN: fry
-
-! : _ ( -- * ) "Only valid inside a fry" throw ;
-! : @ ( -- * ) "Only valid inside a fry" throw ;
 
 ERROR: >r/r>-in-fry-error ;
 
@@ -144,5 +141,3 @@ M: callable fry ( quot -- quot' )
             [ quot>> >quotation shallow-fry ] bi append
         ] bi
     ] if-empty ;
-
-! SYNTAX: \'[ parse-quotation fry append! ;
