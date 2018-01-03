@@ -304,7 +304,7 @@ c::<c-type>
 <<
 : ${type}-coercer ( -- m ) ${type}-rep rep-component-type c::c-type-class "coercer" word-prop [ ] or ; inline
 >>
-: ${type}-with ( n -- v ) ${type}-coercer call( a -- b ) \ ${type}-rep (simd-with) \ ${type} boa ; inline
+: ${type}-with ( n -- v ) $[ ${type}-coercer ] call \ ${type}-rep (simd-with) \ ${type} boa ; inline
 : ${type}-cast ( v -- v' ) underlying>> \ ${type} boa ; inline
 : >${type} ( seq -- simd ) \ ${type} new clone-like ; inline
 SYNTAX: ${type}{ \ } [ >${type} ] parse-literal ;
@@ -322,7 +322,7 @@ M: ${type} set-nth-unsafe
 
 M: ${type} like drop dup \ ${type} instance? [ >${type} ] unless ; inline
 
-M: ${type} length drop ${type}-rep rep-length ; inline
+M: ${type} length drop $[ ${type}-rep rep-length ] ; inline
 
 DEFER: ${type}-boa
 
