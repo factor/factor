@@ -81,7 +81,7 @@ ARTICLE: "io.servers" "Threaded servers"
     insecure-addr
 }
 "Additionally, the " { $link local-address } " and "
-{ $subsections remote-address } " variables are set, as in " { $link with-client } "." ;
+{ $link remote-address } " variables are set, as in " { $link with-client } "." ;
 
 ABOUT: "io.servers"
 
