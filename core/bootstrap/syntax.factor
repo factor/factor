@@ -106,6 +106,7 @@ IN: bootstrap.syntax
         "BROADCAST:"
         "SLOT-PROTOCOL:"
         "HINTS:"
+        "':"
         "'["
         "@"
         "_"
