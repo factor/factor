@@ -66,7 +66,7 @@ M: cannot-send-synchronous-to-self summary
 : reply-synchronous ( message synchronous -- )
     [ <reply> ] keep sender>> send ;
 
-: handle-synchronous ( quot -- )
+: handle-synchronous ( quot: ( ... message -- ... reply ) -- )
     receive [
         data>> swap call
     ] keep reply-synchronous ; inline

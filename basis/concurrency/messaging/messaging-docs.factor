@@ -24,6 +24,12 @@ HELP: receive-if
 { $description "Return the first message from the current thread's mailbox that satisfies the predicate. To satisfy the predicate, " { $snippet "pred" } " is called with the item on the stack and the predicate should leave a boolean indicating whether it was satisfied or not. If nothing in the mailbox satisfies the predicate then the thread will block until something does." }
 { $see-also send receive } ;
 
+HELP: handle-synchronous
+{ $values { "quot" "a " { $link quotation } " with stack effect " { $snippet "( ... message -- ... reply )" } }
+}
+{ $description "Receive a message that was sent with " { $link send-synchronous } ", call " { $snippet "quot" } " to transform it into a response and use " { $link reply-synchronous } " to reply."
+} ;
+
 HELP: spawn-linked
 { $values { "quot" quotation }
           { "name" string }
@@ -52,13 +58,13 @@ ARTICLE: "concurrency-synchronous-sends" "Synchronous sends"
 "The " { $link send } " word sends a message asynchronously, and the sending thread continues immediately. It is also possible to send a message to a thread and block until a response is received:"
 { $subsections send-synchronous }
 "To reply to a synchronous message:"
-{ $subsections reply-synchronous }
+{ $subsections reply-synchronous handle-synchronous }
 "An example:"
 { $example
     "USING: concurrency.messaging threads ;"
     "IN: scratchpad"
     ": pong-server ( -- )"
-    "    receive [ \"pong\" ] dip reply-synchronous ;"
+    "    [ drop \"pong\" ] handle-synchronous ;"
     "[ pong-server t ] \"pong-server\" spawn-server"
     "\"ping\" swap send-synchronous ."
     "\"pong\""
