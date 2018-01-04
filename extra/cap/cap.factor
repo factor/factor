@@ -24,7 +24,7 @@ IN: cap
     [ glReadPixels ] keep ;
 
 : screenshot ( window -- bitmap )
-    [ <image> t >>2x? ] dip
+    [ <image> ] dip
     [ gl-screenshot >>bitmap ]
     [ dim>> [ gl-scale >fixnum ] map >>dim ] bi
     ubyte-components >>component-type
