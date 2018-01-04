@@ -14,13 +14,13 @@ ARTICLE: "concurrency.distributed.example" "Distributed Concurrency Example"
 "The code to run the server is:"
 { $code
   "USING: io.servers ;"
-  "9000 local-server <node-server> start-server drop"
+  "9000 local-server start-node"
 }
 "The code to start the thread is:"
 { $code
     "USING: concurrency.messaging threads ;"
     ": log-message ( -- ) receive . flush log-message ;"
-    "[ log-message ] \"logger\" spawn dup name>> register-remote-thread"
+    "[ log-message ] \"logger\" [ spawn ] keep register-remote-thread"
 }
 "This spawns a thread that waits for the messages and prints them. It registers "
 "the thread as remotely accessible with " { $link register-remote-thread } "."
