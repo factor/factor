@@ -6,6 +6,8 @@ models namespaces opengl opengl.gl sequences ui ui.gadgets
 ui.gadgets.worlds ;
 IN: cap
 
+<PRIVATE
+
 : screenshot-array ( world -- byte-array )
     dim>> [ first 4 * ] [ second ] bi
     [ gl-scale ] bi@ * >fixnum <byte-array> ;
@@ -23,10 +25,11 @@ IN: cap
     [ screenshot-array ] bi
     [ glReadPixels ] keep ;
 
+PRIVATE>
+
 : screenshot ( window -- bitmap )
     [ <image>
-        gl-scale-factor get-global
-        [ >integer 2 = [ >>2x? ] when* ] when*
+        gl-scale-factor get-global [ 2.0 = >>2x? ] when*
     ] dip
     [ gl-screenshot >>bitmap ]
     [ dim>> [ gl-scale >fixnum ] map >>dim ] bi
