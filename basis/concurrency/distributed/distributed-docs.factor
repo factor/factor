@@ -43,7 +43,9 @@ $nl
 "response to a distributed message. When an instance of " { $link thread } " "
 "is marshalled, it is converted into an instance of " { $link remote-thread }
 ". The receiver of this can use it as the target of a " { $link send }
-", " { $link send-synchronous } " or " { $link reply-synchronous } " call." ;
+", " { $link send-synchronous } " or " { $link reply-synchronous } " call."
+$nl
+"Note: " { $link send-synchronous } " can only work if " { $link local-node } " is assigned (use " { $link start-node } "), because there must be a server for the remote instance to send its reply to." ;
 
 ARTICLE: "concurrency.distributed" "Distributed message passing"
 "The " { $vocab-link "concurrency.distributed" } " implements transparent distributed message passing, inspired by Erlang and Termite." $nl
