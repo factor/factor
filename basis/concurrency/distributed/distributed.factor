@@ -52,7 +52,7 @@ M: thread (serialize) ( obj -- )
     id>> [ local-node get insecure>> ] dip <remote-thread> (serialize) ;
 
 : stop-node ( -- )
-    local-node get insecure>> f swap send-remote-message ;
+    f local-node get insecure>> send-remote-message ;
 
 [
     H{ } clone \ registered-remote-threads set-global
