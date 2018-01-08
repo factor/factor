@@ -1,4 +1,5 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs concurrency.messaging
 continuations destructors fry init io io.encodings.binary
