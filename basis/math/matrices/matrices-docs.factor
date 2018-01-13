@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2010, 2018 Slava Pestov, Joe Groff, Cat Stevens.
-USING: help.markup help.syntax kernel math sequences urls ;
+USING: help.markup help.syntax kernel math sequences prettyprint urls ;
 IN: math.matrices
 
 ABOUT: "math.matrices"
@@ -14,9 +14,11 @@ $nl
     <matrix>
     make-matrix
     zero-matrix
+    zero-square-matrix
     diagonal-matrix
     identity-matrix
     eye
+    simple-eye
     square-rows
     square-cols
     make-matrix-with-indices
@@ -107,17 +109,95 @@ $nl
     square-matrix?
 } ;
 
+! creators
+
+HELP: <matrix>
+{ $values { "m" integer } { "n" integer } { "element" object } { "matrix" sequence } }
+{ $description "Creates a matrix of size " { $snippet "m x n" } ", filled with " { $snippet "element" } "." }
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "3 2 10 <matrix> ."
+        "{ { 10 10 } { 10 10 } { 10 10 } }"
+    }
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "4 1 \"¢\" <matrix> ."
+        "{ { \"¢\" } { \"¢\" } { \"¢\" } { \"¢\" } }"
+    }
+} ;
+
+HELP: make-matrix
+{ $values { "m" integer } { "n" integer } { "quot" { $quotation ( ... -- elt ) } } }
+{ $description "Creates a matrix of size " { $snippet "m x n" } " using elements given by " { $snippet "quot" } "."  }
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "4 5 [ 5 ] make-matrix ."
+        "{ { 5 5 5 5 5 } { 5 5 5 5 5 } { 5 5 5 5 5 } { 5 5 5 5 5 } }"
+    }
+} ;
+
+{ <matrix> make-matrix } related-words
+
 HELP: zero-matrix
 { $values { "m" integer } { "n" integer } { "matrix" sequence } }
 { $description "Creates a matrix of size " { $snippet "m x n" } ", filled with zeroes." } ;
 
+HELP: zero-square-matrix
+{ $values { "m" integer } { "matrix" sequence } }
+{ $description "Creates a matrix of size " { $snippet "n x n" } ", filled with zeroes. Shorthand for " { $snippet "n n zero-matrix" } "." } ;
+
 HELP: diagonal-matrix
 { $values { "diagonal-seq" sequence } { "matrix" sequence } }
-{ $description "Creates a matrix with the specified diagonal values." } ;
+{ $description "Creates a matrix with the specified diagonal values." }
+{ $examples
+  { $example
+      "USING: math.matrices prettyprint ;"
+      "{ 1 2 3 } diagonal-matrix ."
+      "{ { 1 0 0 } { 0 2 0 } { 0 0 3 } }"
+  }
+} ;
 
 HELP: identity-matrix
 { $values { "n" integer } { "matrix" sequence } }
 { $description "Creates an " { $url URL" http://enwp.org/Identity_matrix" "identity matrix" } " of size " { $snippet "n x n" } ", where the diagonal values are all ones." } ;
+
+HELP: eye
+{ $values { "m" integer } { "n" integer } { "k" integer } { "z" object } { "matrix" sequence } }
+{ $description "Creates an " { $snippet "m x n" } " matrix with a diagonal of " { $snippet "z" } " offset by " { $snippet "k" } " from the main diagonal. A positive value of " { $snippet "k" } " gives a diagonal above the main diagonal, whereas a negative value of " { $snippet "k" } " gives a diagonal below the main diagonal." }
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "5 6 0 4 eye ."
+        "{
+    { 4 0 0 0 0 0 }
+    { 0 4 0 0 0 0 }
+    { 0 0 4 0 0 0 }
+    { 0 0 0 4 0 0 }
+    { 0 0 0 0 4 0 }
+}"
+    }
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "5 5 2 2 eye ."
+        "{
+    { 0 0 2 0 0 }
+    { 0 0 0 2 0 }
+    { 0 0 0 0 2 }
+    { 0 0 0 0 0 }
+    { 0 0 0 0 0 }
+}"
+    }
+} ;
+
+HELP: simple-eye
+{ $values { "m" integer } { "n" integer } { "k" integer } { "matrix" sequence } }
+{ $description "Creates an " { $snippet "m x n" } " matrix with a diagonal of ones offset by " { $snippet "k" } " from the main diagonal. Equivalent to " { $snippet "m n k 1 eye" } "." } ;
+
+{ zero-matrix diagonal-matrix identity-matrix eye simple-eye } related-words
+
+{ square-rows square-cols } related-words
 
 HELP: m.v
 { $values { "m" sequence } { "v" sequence } }
@@ -157,9 +237,9 @@ HELP: m-
 { $description "Subtracts the matrices element-wise." }
 { $examples
   { $example
-    "USING: math.matrices prettyprint ;"
-    "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m- ."
-    "{ { 2 7 } { 11 8 } }"
+      "USING: math.matrices prettyprint ;"
+      "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m- ."
+      "{ { 2 7 } { 11 8 } }"
   }
 } ;
 
@@ -167,7 +247,8 @@ HELP: kronecker
 { $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
 { $description "Calculates the " { $url URL" http://enwp.org/Kronecker_product" "Kronecker product" } " of two matrices." }
 { $examples
-    { $example "USING: math.matrices prettyprint ;"
+    { $example
+        "USING: math.matrices prettyprint ;"
         "{ { 1 2 } { 3 4 } } { { 0 5 } { 6 7 } } kronecker ."
         "{ { 0 5 0 10 } { 6 7 12 14 } { 0 15 0 20 } { 18 21 24 28 } }" }
 } ;
@@ -176,7 +257,8 @@ HELP: outer
 { $values { "u" sequence } { "v" sequence } { "m" sequence } }
 { $description "Computes the " { $url URL" http://  enwp.org/Outer_product" "outer product" } " of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples
-    { $example "USING: math.matrices prettyprint ;"
+    { $example
+        "USING: math.matrices prettyprint ;"
         "{ 5 6 7 } { 1 2 3 } outer ."
         "{ { 5 10 15 } { 6 12 18 } { 7 14 21 } }" }
 } ;

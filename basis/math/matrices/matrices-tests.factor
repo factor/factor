@@ -39,7 +39,7 @@ IN: math.matrices.tests
         { 0 0 1 }
     }
 } [
-    3 3 0 eye
+    3 3 0 simple-eye
 ] unit-test
 
 {
@@ -49,7 +49,7 @@ IN: math.matrices.tests
         { 0 0 0 }
     }
 } [
-    3 3 1 eye
+    3 3 1 simple-eye
 ] unit-test
 
 {
@@ -59,7 +59,7 @@ IN: math.matrices.tests
         { 0 1 0 }
     }
 } [
-    3 3 -1 eye
+    3 3 -1 simple-eye
 ] unit-test
 
 {
@@ -69,7 +69,7 @@ IN: math.matrices.tests
         { 0 0 1 0 }
     }
 } [
-    3 4 0 eye
+    3 4 0 simple-eye
 ] unit-test
 
 {
@@ -80,7 +80,7 @@ IN: math.matrices.tests
         { 0 0 0 }
     }
 } [
-    4 3 1 eye
+    4 3 1 simple-eye
 ] unit-test
 
 {
@@ -91,7 +91,7 @@ IN: math.matrices.tests
         { 0 0 1 }
     }
 } [
-    4 3 -1 eye
+    4 3 -1 simple-eye
 ] unit-test
 
 {
