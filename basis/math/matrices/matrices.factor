@@ -6,6 +6,8 @@ sequences.private fry math.statistics grouping
 combinators.short-circuit math.ranges combinators.smart ;
 IN: math.matrices
 
+ERROR: negative-power-matrix m n ;
+
 ! Matrices
 : make-matrix ( m n quot -- matrix )
     '[ _ _ replicate ] replicate ; inline
@@ -68,8 +70,10 @@ IN: math.matrices
         { 0.0 0.0 0.0 1.0 }
     } ;
 
+<PRIVATE ! never used outside this file
 : >scale-factors ( number/sequence -- x y z )
     dup number? [ dup dup ] [ first3 ] if ;
+PRIVATE>
 
 :: scale-matrix3 ( factors -- matrix )
     factors >scale-factors :> ( x y z )
@@ -107,7 +111,6 @@ IN: math.matrices
 
 :: skew-matrix4 ( theta -- matrix )
     theta tan :> zf
-
     {
         { 1.0 0.0 0.0 0.0 }
         { 0.0 1.0 0.0 0.0 }
@@ -158,20 +161,20 @@ IN: math.matrices
 : angle-between ( v u -- a )
     [ normalize ] bi@ h. acos ;
 
+<PRIVATE
 : (gram-schmidt) ( v seq -- newseq )
     [ dupd proj v- ] each ;
-
-: gram-schmidt ( seq -- orthogonal )
-    V{ } clone [ over (gram-schmidt) suffix! ] reduce ;
-
-: norm-gram-schmidt ( seq -- orthonormal )
-    gram-schmidt [ normalize ] map ;
-
-ERROR: negative-power-matrix m n ;
 
 : (m^n) ( m n -- n )
     make-bits over first length identity-matrix
     [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
+PRIVATE>
+
+: gram-schmidt ( seq -- orthogonal )
+    V{ } clone [ over (gram-schmidt) suffix! ] reduce ;
+
+: gram-schmidt-normal ( seq -- orthonormal )
+    gram-schmidt [ normalize ] map ; inline
 
 : m^n ( m n -- n )
     dup 0 >= [ (m^n) ] [ negative-power-matrix ] if ;
@@ -179,7 +182,7 @@ ERROR: negative-power-matrix m n ;
 : stitch ( m -- m' )
     [ ] [ [ append ] 2map ] map-reduce ;
 
-: kron ( m1 m2 -- m )
+: kronecker ( m1 m2 -- m )
     '[ [ _ n*m  ] map ] map stitch stitch ;
 
 : outer ( u v -- m )
@@ -197,10 +200,10 @@ ERROR: negative-power-matrix m n ;
 : cols ( seq matrix -- cols )
     '[ _ col ] map ; inline
 
-: set-index ( object pair matrix -- )
+: set-index ( n pair matrix -- )
     [ first2 swap ] dip nth set-nth ; inline
 
-: set-indices ( object sequence matrix -- )
+: set-indices ( n sequence matrix -- )
     '[ _ set-index ] with each ; inline
 
 : matrix-map ( matrix quot -- )

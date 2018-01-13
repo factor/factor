@@ -1,5 +1,85 @@
+! Copyright (C) 2005, 2010, 2018 Slava Pestov, Joe Groff, Cat Stevens.
 USING: help.markup help.syntax math sequences ;
 IN: math.matrices
+
+ABOUT: "math.matrices"
+
+ARTICLE: "math.matrices" "Working with matrix data"
+"The " { $vocab-link "math.matrices" } " vocabulary implements many ways of working with 2-dimensional sequences, known as matrices. Operations on numeric vectors are implemented in " { $vocab-link "math.vectors" } ", upon which this vocabulary relies."
+$nl
+"Instead of a separate matrix class to be instantiated, words in this vocabulary operate on 2-dimensional sequences."
+$nl
+"Creating simple matrices:"
+{ $subsections
+    <matrix>
+    make-matrix
+    zero-matrix
+    diagonal-matrix
+    identity-matrix
+    eye
+}
+
+"Special kinds of matrices:"
+{ $subsections
+    box-matrix
+    hankel-matrix
+    hilbert-matrix
+    toeplitz-matrix
+    vandermonde-matrix
+}
+
+"Domain-specific transformation matrices:"
+{ $subsections
+    frustum-matrix4
+    ortho-matrix4
+    rotation-matrix3
+    rotation-matrix4
+    scale-matrix3
+    scale-matrix4
+    skew-matrix4
+    translation-matrix4
+}
+
+"By-element mathematical operations of a matrix and a scalar:"
+{ $subsections mneg n+m m+n n-m m-n n*m m*n n/m m/n m^n }
+
+"By-element mathematical operations of two matricess:"
+{ $subsections m+ m- m* m/ m~ }
+
+"Dot product (multiplication) of vectors and matrices:"
+{ $subsections v.m m.v m. }
+
+"Transformations on matrices:"
+{ $subsections
+    cross
+    normal
+    proj
+    perp
+    angle-between
+    gram-schmidt
+    gram-schmidt-normal
+    stitch
+    kronecker
+    outer
+}
+
+"Accesing parts of a matrix:"
+{ $subsections
+  row
+  rows
+  col
+  cols
+}
+
+"Mutating matrices in place:"
+{ $subsections
+  set-index
+  set-indices
+  matrix-map
+}
+
+"Attributes of a matrix:"
+{ $subsections mmin mmax mnorm } ;
 
 HELP: zero-matrix
 { $values { "m" integer } { "n" integer } { "matrix" sequence } }
@@ -37,7 +117,7 @@ HELP: m.
 
 HELP: m+
 { $values { "m" sequence } }
-{ $description "Adds the matrices component-wise." }
+{ $description "Adds the matrices element-wise." }
 { $examples
   { $example
     "USING: math.matrices prettyprint ;"
@@ -48,7 +128,7 @@ HELP: m+
 
 HELP: m-
 { $values { "m" sequence } }
-{ $description "Subtracts the matrices component-wise." }
+{ $description "Subtracts the matrices element-wise." }
 { $examples
   { $example
     "USING: math.matrices prettyprint ;"
@@ -57,12 +137,12 @@ HELP: m-
   }
 } ;
 
-HELP: kron
+HELP: kronecker
 { $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
 { $description "Calculates the Kronecker product of two matrices." }
 { $examples
     { $example "USING: math.matrices prettyprint ;"
-        "{ { 1 2 } { 3 4 } } { { 0 5 } { 6 7 } } kron ."
+        "{ { 1 2 } { 3 4 } } { { 0 5 } { 6 7 } } kronecker ."
         "{ { 0 5 0 10 } { 6 7 12 14 } { 0 15 0 20 } { 18 21 24 28 } }" }
 } ;
 

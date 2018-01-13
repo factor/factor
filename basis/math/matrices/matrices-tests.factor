@@ -213,7 +213,7 @@ IN: math.matrices.tests
 {
     { { 0 5 0 10 } { 6 7 12 14 } { 0 15 0 20 } { 18 21 24 28 } }
 }
-[ { { 1 2 } { 3 4 } } { { 0 5 } { 6 7 } } kron ] unit-test
+[ { { 1 2 } { 3 4 } } { { 0 5 } { 6 7 } } kronecker ] unit-test
 
 {
     {
@@ -222,7 +222,7 @@ IN: math.matrices.tests
         { 1 1 -1 -1 }
         { 1 -1 -1 1 }
     }
-} [ { { 1 1 } { 1 -1 } } dup kron ] unit-test
+} [ { { 1 1 } { 1 -1 } } dup kronecker ] unit-test
 
 {
     {
@@ -235,7 +235,7 @@ IN: math.matrices.tests
         { 1 1 -1 -1 -1 -1 1 1 }
         { 1 -1 -1 1 -1 1 1 -1 }
     }
-} [ { { 1 1 } { 1 -1 } } dup dup kron kron ] unit-test
+} [ { { 1 1 } { 1 -1 } } dup dup kronecker kronecker ] unit-test
 
 {
     {
@@ -248,10 +248,10 @@ IN: math.matrices.tests
         { 1 1 -1 -1 -1 -1 1 1 }
         { 1 -1 -1 1 -1 1 1 -1 }
     }
-} [ { { 1 1 } { 1 -1 } } dup dup kron swap kron ] unit-test
+} [ { { 1 1 } { 1 -1 } } dup dup kronecker swap kronecker ] unit-test
 
 
-! kron is not generally commutative, make sure we have the right order
+! kronecker is not generally commutative, make sure we have the right order
 {
     {
         { 1 2 3 4 5 1 2 3 4 5 }
@@ -262,7 +262,7 @@ IN: math.matrices.tests
 }
 [
     { { 1 1 } { 1 -1 } }
-    { { 1 2 3 4 5 } { 6 7 8 9 10 } } kron
+    { { 1 2 3 4 5 } { 6 7 8 9 10 } } kronecker
 ] unit-test
 
 {
@@ -275,7 +275,7 @@ IN: math.matrices.tests
 }
 [
     { { 1 1 } { 1 -1 } }
-    { { 1 2 3 4 5 } { 6 7 8 9 10 } } swap kron
+    { { 1 2 3 4 5 } { 6 7 8 9 10 } } swap kronecker
 ] unit-test
 
 {
