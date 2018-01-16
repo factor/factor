@@ -1,7 +1,8 @@
 USING: accessors colors fonts fry help help.markup help.stylesheet
 help.syntax help.topics inspector io io.streams.string io.styles
-kernel math models namespaces prettyprint see sequences tools.test
-ui.gadgets ui.gadgets.debug ui.gadgets.panes ui.gadgets.panes.private ;
+kernel literals math models namespaces prettyprint see sequences
+tools.test ui.gadgets ui.gadgets.debug ui.gadgets.panes
+ui.gadgets.panes.private ;
 IN: ui.gadgets.panes.tests
 
 : #children ( -- n ) "pane" get children>> length ;
@@ -126,11 +127,11 @@ ARTICLE: "test-article-2" "This is a test article"
 { t } [ <test-pane> dup last-line>> child? ] unit-test
 
 ! smash-line
-{
+${
     ""
     T{ font
-       { name "sans-serif" }
-       { size 12 }
+       { name $[ default-sans-serif-font-name ] }
+       { size $[ default-font-size ] }
        { foreground
          T{ rgba
             { red 0.0 }
