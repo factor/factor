@@ -121,24 +121,24 @@ HELP: find-primary-key
 HELP: no-sql-type
 { $values
      { "type" "a SQL type" } }
-{ $description "Throws an error containing a SQL type that is unsupported or the result of a typo." } ;
+{ $description "Throws an error containing an SQL type that is unsupported or the result of a typo." } ;
 
 HELP: normalize-spec
 { $values
      { "spec" "a SQL spec" } }
-{ $description "Normalizes a SQL spec." } ;
+{ $description "Normalizes an SQL spec." } ;
 
 HELP: primary-key?
 { $values
      { "spec" "a SQL spec" }
      { "?" boolean } }
-{ $description "Returns true if a SQL spec is a primary key." } ;
+{ $description "Returns true if an SQL spec is a primary key." } ;
 
 HELP: relation?
 { $values
      { "spec" "a SQL spec" }
      { "?" boolean } }
-{ $description "Returns true if a SQL spec is a relation." } ;
+{ $description "Returns true if an SQL spec is a relation." } ;
 
 HELP: unknown-modifier
 { $values { "modifier" string } }

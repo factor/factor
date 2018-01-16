@@ -14,7 +14,7 @@ HELP: new-db-connection
 
 HELP: db-open
 { $values { "db" "a database configuration object" } { "db-connection" db-connection } }
-{ $description "Opens a database using the configuration data stored in a " { $snippet "database configuration object" } "tuple. The database object now references a database handle that must be cleaned up. Therefore, it is better to use the " { $link with-db } " combinator than calling this word directly." } ;
+{ $description "Opens a database using the configuration data stored in a " { $snippet "database configuration object" } " tuple. The database object now references a database handle that must be cleaned up. Therefore, it is better to use the " { $link with-db } " combinator than calling this word directly." } ;
 
 HELP: db-close
 { $values { "handle" alien } }
@@ -81,7 +81,7 @@ HELP: query-results
 { $values { "query" object }
     { "result-set" result-set }
 }
-{ $description "Returns a " { $link result-set } " object representing the results of a SQL query. See " { $link "db-result-sets" } "." } ;
+{ $description "Returns a " { $link result-set } " object representing the results of an SQL query. See " { $link "db-result-sets" } "." } ;
 
 HELP: #rows
 { $values { "result-set" result-set } { "n" integer } }
@@ -128,14 +128,14 @@ HELP: in-transaction?
 
 HELP: query-each
 { $values
-     { "statement" statement } { "quot" quotation } }
-{ $description "A combinator that calls a quotation on a sequence of SQL statements to their results query results." } ;
+     { "result-set" result-set } { "quot" quotation } }
+{ $description "Applies the quotation to each row of the " { $link result-set } " in order." } ;
 
 HELP: query-map
 { $values
-     { "statement" statement } { "quot" quotation }
+     { "result-set" result-set } { "quot" quotation }
      { "seq" sequence } }
-{ $description "A combinator that maps a sequence of SQL statements to their results query results." } ;
+{ $description "Applies the quotation to each row of the " { $link result-set } " in order." } ;
 
 HELP: rollback-transaction
 { $description "Rolls back a transaction; no data is committed to the database. User code should make use of the " { $link with-transaction } " combinator." } ;
@@ -143,13 +143,13 @@ HELP: rollback-transaction
 HELP: sql-command
 { $values
      { "sql" string } }
-{ $description "Executes a SQL string using the database in the " { $link db-connection } " symbol." } ;
+{ $description "Executes an SQL string using the database in the " { $link db-connection } " symbol." } ;
 
 HELP: sql-query
 { $values
      { "sql" string }
      { "rows" "an array of arrays of strings" } }
-{ $description "Runs a SQL query of raw text in the database in the " { $link db-connection } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
+{ $description "Runs an SQL query of raw text in the database in the " { $link db-connection } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
 
 { sql-command sql-query } related-words
 
@@ -217,7 +217,7 @@ $nl
 } ;
 
 ARTICLE: "db-result-sets" "Result sets"
-"Result sets are the encapsulated, database-specific results from a SQL query."
+"Result sets are the encapsulated, database-specific results from an SQL query."
 $nl
 "Two possible protocols for iterating over result sets exist:"
 { $subsections
@@ -266,7 +266,7 @@ ARTICLE: "db-protocol" "Low-level database protocol"
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "." $nl
-"Executing a SQL command:"
+"Executing an SQL command:"
 { $subsections sql-command }
 "Executing a query directly:"
 { $subsections sql-query }
