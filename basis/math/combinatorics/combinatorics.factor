@@ -3,8 +3,8 @@
 
 USING: accessors arrays assocs binary-search classes.tuple
 combinators fry hints kernel kernel.private locals math
-math.order math.ranges memoize namespaces sequences
-sequences.private sorting strings vectors ;
+math.order math.ranges namespaces sequences sequences.private
+sorting strings vectors ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -28,7 +28,7 @@ M: object nths-unsafe (nths-unsafe) ;
 
 PRIVATE>
 
-MEMO: factorial ( n -- n! )
+: factorial ( n -- n! )
     dup 1 > [ [1,b] product ] [ drop 1 ] if ;
 
 : nPk ( n k -- nPk )
