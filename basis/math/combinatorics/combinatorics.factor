@@ -3,8 +3,8 @@
 
 USING: accessors arrays assocs binary-search classes.tuple
 combinators fry hints kernel kernel.private locals math
-math.order math.ranges namespaces sequences sequences.private
-sorting strings vectors ;
+math.functions math.order math.ranges namespaces sequences
+sequences.private sorting strings vectors ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -251,10 +251,20 @@ PRIVATE>
 
 <PRIVATE
 
-: (selections) ( seq n -- selections )
-    [ dup [ 1sequence ] curry { } map-as dup ] [ 1 - ] bi* [
-        cartesian-product concat [ concat ] map
-    ] with times ;
+:: next-selection ( seq n -- )
+    1 seq length 1 - [
+        over 0 =
+    ] [
+        [ seq [ + n /mod ] change-nth-unsafe ] keep
+    ] do until 2drop ; inline
+
+:: (selections) ( seq n -- selections )
+    seq length :> len
+    n 0 <array> :> idx
+    len n ^ [
+        idx seq nths-unsafe
+        idx len next-selection
+    ] replicate ;
 
 PRIVATE>
 
