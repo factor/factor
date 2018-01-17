@@ -670,8 +670,8 @@ make_boot_image() {
     check_ret factor
 }
 
-install_deps_apt_get() {
-    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang gcc make screen tmux libssl-dev g++
+install_deps_apt() {
+    sudo apt install --yes libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang gcc make screen tmux libssl-dev g++
     check_ret sudo
 }
 
@@ -702,7 +702,7 @@ install_deps_macosx() {
 usage() {
     $ECHO "usage: $0 command [optional-target]"
     $ECHO "  install - git clone, compile, bootstrap"
-    $ECHO "  deps-apt-get - install required packages for Factor on Linux using apt-get"
+    $ECHO "  deps-apt - install required packages for Factor on Linux using apt"
     $ECHO "  deps-pacman - install required packages for Factor on Linux using pacman"
     $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
     $ECHO "  deps-macosx - install git on MacOSX using port"
@@ -733,7 +733,7 @@ set_delete
 
 case "$1" in
     install) install ;;
-    deps-apt-get) install_deps_apt_get ;;
+    deps-apt) install_deps_apt ;;
     deps-pacman) install_deps_pacman ;;
     deps-macosx) install_deps_macosx ;;
     deps-dnf) install_deps_dnf ;;

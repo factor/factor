@@ -466,6 +466,12 @@ listener-gadget "multi-touch" f {
     { up-action refresh-all }
 } define-command-map
 
+listener-gadget "touchbar" f {
+    { f refresh-all }
+    { f com-auto-use }
+    { f com-help }
+} define-command-map
+
 M: listener-gadget graft*
     [ call-next-method ] [ restart-listener ] bi ;
 

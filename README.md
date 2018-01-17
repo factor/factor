@@ -6,7 +6,7 @@ features](https://concatenative.org/wiki/view/Factor/Features/The%20language)
 including dynamic types, extensible syntax, macros, and garbage collection.
 On a practical side, Factor has a [full-featured
 library](https://docs.factorcode.org/content/article-vocab-index.html),
-supports many different platforms, and has been extensively documented. 
+supports many different platforms, and has been extensively documented.
 
 The implementation is [fully
 compiled](https://concatenative.org/wiki/view/Factor/Optimizing%20compiler)
@@ -31,10 +31,18 @@ To check out Factor:
 * `git clone git://factorcode.org/git/factor.git`
 * `cd factor`
 
-To build the latest complete Factor system from git:
+To build the latest complete Factor system from git, either use the
+build script:
 
 * Windows: `build.cmd`
 * Unix: `./build.sh update`
+
+or download the correct boot image for your system from
+http://downloads.factorcode.org/images/master/, put it in the factor
+directory and run:
+
+* Unix: `make` and then `./factor -i=boot.unix-x86.64.image`
+* Windows: `nmake /f Nmakefile x86-64` and then `factor.com -i=boot.windows-x86.64.image`
 
 Now you should have a complete Factor system ready to run.
 

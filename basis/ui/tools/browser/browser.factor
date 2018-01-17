@@ -225,6 +225,12 @@ browser-gadget "multi-touch" f {
     { right-action com-forward }
 } define-command-map
 
+browser-gadget "touchbar" f {
+    { f com-home }
+    { f browser-help }
+    { f glossary }
+} define-command-map
+
 browser-gadget "scrolling"
 "The browser's scroller can be scrolled from the keyboard."
 {

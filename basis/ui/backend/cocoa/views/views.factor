@@ -1,13 +1,14 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays assocs cocoa cocoa.application cocoa.classes
-cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.types
-cocoa.views combinators core-foundation.strings core-graphics
-core-graphics.types core-text io.encodings.utf8 kernel literals
-locals math math.rectangles namespaces opengl sequences threads
-ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.private ;
+arrays assocs classes cocoa cocoa.application cocoa.classes
+cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.touchbar
+cocoa.types cocoa.views combinators core-foundation.strings
+core-graphics core-graphics.types core-text io.encodings.utf8
+kernel literals locals math math.order math.parser
+math.rectangles namespaces opengl sequences splitting threads
+ui.commands ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.private words ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -160,6 +161,18 @@ CONSTANT: selector>action H{
     selector>action at
     [ swap world-focus parents-handle-gesture? t ] [ drop f f ] if* ;
 
+: touchbar-commands ( -- commands/f gadget )
+    world get [
+        children>> [
+            class-of "commands" word-prop
+            "touchbar" of dup [ commands>> ] when
+        ] map-find
+    ] [ f f ] if* ;
+
+: touchbar-invoke-command ( n -- )
+    [ touchbar-commands ] dip over
+    [ rot nth second invoke-command ] [ 3drop ] if ;
+
 <CLASS: FactorView < NSOpenGLView
     COCOA-PROTOCOL: NSTextInput
 
@@ -180,6 +193,30 @@ CONSTANT: selector>action H{
             ] [ drop ] if
 
         ] when
+    ] ;
+
+    ! TouchBar
+    METHOD: void touchBarCommand0 [ 0 touchbar-invoke-command ] ;
+    METHOD: void touchBarCommand1 [ 1 touchbar-invoke-command ] ;
+    METHOD: void touchBarCommand2 [ 2 touchbar-invoke-command ] ;
+    METHOD: void touchBarCommand3 [ 3 touchbar-invoke-command ] ;
+    METHOD: void touchBarCommand4 [ 4 touchbar-invoke-command ] ;
+    METHOD: void touchBarCommand5 [ 5 touchbar-invoke-command ] ;
+    METHOD: void touchBarCommand6 [ 6 touchbar-invoke-command ] ;
+    METHOD: void touchBarCommand7 [ 7 touchbar-invoke-command ] ;
+
+    METHOD: Class makeTouchBar [
+        touchbar-commands drop [
+            length 8 min <iota> [ number>string ] map
+        ] [ { } ] if* self make-touchbar
+    ] ;
+
+    METHOD: Class touchBar: Class touchbar makeItemForIdentifier: Class string [
+        touchbar-commands drop [
+            [ self string CF>string dup string>number ] dip nth
+            second name>> "com-" ?head drop over
+            "touchBarCommand" prepend make-NSTouchBar-button
+        ] [ f ] if*
     ] ;
 
     ! Rendering

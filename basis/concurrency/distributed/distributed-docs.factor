@@ -14,22 +14,22 @@ ARTICLE: "concurrency.distributed.example" "Distributed Concurrency Example"
 "The code to run the server is:"
 { $code
   "USING: io.servers ;"
-  "9000 local-server <node-server> start-server drop"
+  "9000 local-server start-node"
 }
 "The code to start the thread is:"
 { $code
     "USING: concurrency.messaging threads ;"
     ": log-message ( -- ) receive . flush log-message ;"
-    "[ log-message ] \"logger\" spawn dup name>> register-remote-thread"
+    "[ log-message ] \"logger\" [ spawn ] keep register-remote-thread"
 }
 "This spawns a thread that waits for the messages and prints them. It registers "
 "the thread as remotely accessible with " { $link register-remote-thread } "."
 $nl
-"The second Factor instance, the one associated with port 9001, can send "
+"The second Factor instance can send "
 "messages to the 'logger' thread by name:"
 { $code
-    "USING: io.sockets ; FROM: concurrency.messaging => send ;"
-    "\"hello\" \"127.0.0.1\" 9000 <inet4> \"logger\" <remote-thread> send"
+    "USING: io.servers concurrency.distributed ; FROM: concurrency.messaging => send ;"
+    "\"hello\" 9000 local-server \"logger\" <remote-thread> send"
 }
 "The " { $link send } " word is used to send messages to threads. If an "
 "instance of " { $link remote-thread } " is provided, then "
@@ -43,7 +43,9 @@ $nl
 "response to a distributed message. When an instance of " { $link thread } " "
 "is marshalled, it is converted into an instance of " { $link remote-thread }
 ". The receiver of this can use it as the target of a " { $link send }
-", " { $link send-synchronous } " or " { $link reply-synchronous } " call." ;
+", " { $link send-synchronous } " or " { $link reply-synchronous } " call."
+$nl
+"Note: " { $link send-synchronous } " can only work if " { $link local-node } " is assigned (use " { $link start-node } "), because there must be a server for the remote instance to send its reply to." ;
 
 ARTICLE: "concurrency.distributed" "Distributed message passing"
 "The " { $vocab-link "concurrency.distributed" } " implements transparent distributed message passing, inspired by Erlang and Termite." $nl

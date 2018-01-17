@@ -3,7 +3,7 @@
 
 USING: accessors arrays assocs binary-search classes.tuple
 combinators fry hints kernel kernel.private locals math
-math.order math.ranges memoize namespaces sequences
+math.functions math.order math.ranges namespaces sequences
 sequences.private sorting strings vectors ;
 IN: math.combinatorics
 
@@ -28,7 +28,7 @@ M: object nths-unsafe (nths-unsafe) ;
 
 PRIVATE>
 
-MEMO: factorial ( n -- n! )
+: factorial ( n -- n! )
     dup 1 > [ [1,b] product ] [ drop 1 ] if ;
 
 : nPk ( n k -- nPk )
@@ -251,10 +251,20 @@ PRIVATE>
 
 <PRIVATE
 
-: (selections) ( seq n -- selections )
-    [ dup [ 1sequence ] curry { } map-as dup ] [ 1 - ] bi* [
-        cartesian-product concat [ concat ] map
-    ] with times ;
+:: next-selection ( seq n -- )
+    1 seq length 1 - [
+        dup 0 >= [ over 0 = ] [ t ] if
+    ] [
+        [ seq [ + n /mod ] change-nth-unsafe ] keep 1 -
+    ] do until 2drop ; inline
+
+:: (selections) ( seq n -- selections )
+    seq length :> len
+    n 0 <array> :> idx
+    len n ^ [
+        idx seq nths-unsafe
+        idx len next-selection
+    ] replicate ;
 
 PRIVATE>
 
