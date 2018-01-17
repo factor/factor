@@ -255,7 +255,7 @@ PRIVATE>
     1 seq length 1 - [
         over 0 =
     ] [
-        [ seq [ + n /mod ] change-nth-unsafe ] keep
+        [ seq [ + n /mod ] change-nth-unsafe ] keep 1 -
     ] do until 2drop ; inline
 
 :: (selections) ( seq n -- selections )
