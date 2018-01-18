@@ -6,6 +6,11 @@ HELP: <gadget>
 { $values { "gadget" "a new " { $link gadget } } }
 { $description "Creates a new gadget." } ;
 
+HELP: children-on
+{ $values { "rect" rect } { "gadget" gadget } { "seq" "a sequence of gadgets" } }
+{ $contract "Outputs a sequence of gadgets which potentially intersect a rectangle in the co-ordinate system of the gadget." }
+{ $notes "This does not have to be an accurate intersection test, and simply returning " { $link children>> } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
+
 HELP: control-value
 { $values { "control" gadget } { "value" object } }
 { $description "Outputs the value of the control's model." } ;
@@ -18,6 +23,10 @@ HELP: notify
 { $values { "gadget" gadget } }
 { $description "Notifies the gadget that it has a graft message to handle." }
 { $see-also graft* ungraft* } ;
+
+HELP: notify-ui-thread
+{ $description "Notifies the UI thread that there is work to do." }
+{ $see-also ui-notify-flag } ;
 
 HELP: nth-gadget
 { $values { "n" "a non-negative integer" } { "gadget" gadget } { "child" gadget } }
@@ -36,11 +45,6 @@ HELP: relative-loc
 HELP: user-input*
 { $values { "str" string } { "gadget" gadget } { "?" boolean } }
 { $contract "Handle free-form textual input while the gadget has keyboard focus." } ;
-
-HELP: children-on
-{ $values { "rect" rect } { "gadget" gadget } { "seq" "a sequence of gadgets" } }
-{ $contract "Outputs a sequence of gadgets which potentially intersect a rectangle in the co-ordinate system of the gadget." }
-{ $notes "This does not have to be an accurate intersection test, and simply returning " { $link children>> } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
 
 HELP: pick-up
 { $values { "point" "a pair of integers" } { "gadget" gadget } { "child/f" { $maybe gadget } } }
@@ -70,7 +74,7 @@ HELP: relayout
 
 HELP: relayout-1
 { $values { "gadget" gadget } }
-{ $description "Relayout and redraw a gadget before the next iteration of the event loop. Unlike " { $link relayout } ", this does not propagate requests up to the parent, and so this word should only be used when the gadget's internal layout or appearance has changed, but the dimensions have not." } ;
+{ $description "Relayout and redraw a gadget before the next iteration of the event loop. Unlike " { $link relayout } ", this does not propagate requests up to the parent, and so this word should be used when the gadget's internal layout or appearance has changed, but the dimensions have not." } ;
 
 { relayout relayout-1 } related-words
 

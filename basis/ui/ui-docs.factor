@@ -6,14 +6,18 @@ vocabs.loader ;
 
 IN: ui
 
+HELP: open-window
+{ $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
+{ $description "Opens a native window containing " { $snippet "gadget" } " with the specified attributes. If a string is provided, it is used as the window title; otherwise, the window attributes are specified in a " { $link world-attributes } " tuple." } ;
+
+HELP: ui-running?
+{ $values { "?" boolean } }
+{ $description "Whether the UI is running or not." } ;
+
 HELP: ui-windows
 { $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." } ;
 
 { ui-windows open-window find-window world-attributes } related-words
-
-HELP: open-window
-{ $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
-{ $description "Opens a native window containing " { $snippet "gadget" } " with the specified attributes. If a string is provided, it is used as the window title; otherwise, the window attributes are specified in a " { $link world-attributes } " tuple." } ;
 
 HELP: close-window
 { $values { "gadget" gadget } }
