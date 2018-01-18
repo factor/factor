@@ -6,9 +6,25 @@ vocabs.loader ;
 
 IN: ui
 
+HELP: close-window
+{ $values { "gadget" gadget } }
+{ $description "Close the native window containing " { $snippet "gadget" } "." } ;
+
 HELP: open-window
 { $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
 { $description "Opens a native window containing " { $snippet "gadget" } " with the specified attributes. If a string is provided, it is used as the window title; otherwise, the window attributes are specified in a " { $link world-attributes } " tuple." } ;
+
+HELP: set-fullscreen
+{ $values { "gadget" gadget } { "?" boolean } }
+{ $description "Sets and unsets fullscreen mode for the gadget's world." } ;
+
+HELP: set-up-window
+{ $values { "world" world } }
+{ $description "Initializes the window that shows the world." } ;
+
+HELP: ui-thread
+{ $var-description "Holds a reference to the running UI thread. This variable is used to ensure that there can only be one UI thread running at the same time." }
+{ $see-also start-ui-thread } ;
 
 HELP: ui-running?
 { $values { "?" boolean } }
@@ -18,10 +34,6 @@ HELP: ui-windows
 { $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." } ;
 
 { ui-windows open-window find-window world-attributes } related-words
-
-HELP: close-window
-{ $values { "gadget" gadget } }
-{ $description "Close the native window containing " { $snippet "gadget" } "." } ;
 
 HELP: world-attributes
 { $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } { "window-controls" sequence } }
@@ -34,14 +46,6 @@ HELP: world-attributes
     { { $snippet "pixel-format-attributes" } " is a sequence of " { $link "ui.pixel-formats-attributes" } " that the window will request for its OpenGL pixel format." }
     { { $snippet "window-controls" } " is a sequence of " { $link "ui.gadgets.worlds-window-controls" } " that will be placed in the window." }
 } ;
-
-HELP: set-fullscreen
-{ $values { "gadget" gadget } { "?" boolean } }
-{ $description "Sets and unsets fullscreen mode for the gadget's world." } ;
-
-HELP: set-up-window
-{ $values { "world" world } }
-{ $description "Initializes the window that shows the world." } ;
 
 HELP: fullscreen?
 { $values { "gadget" gadget } { "?" boolean } }

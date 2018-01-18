@@ -150,12 +150,14 @@ PRIVATE>
 
 <PRIVATE
 
+SYMBOL: ui-thread
+
 : update-ui-loop ( -- )
     ! Note the logic: if update-ui fails, we open an error window and
     ! run one iteration of update-ui. If that also fails, well, the
     ! whole UI subsystem is broken so we throw the error to terminate
     ! the update-ui-loop.
-    [ ui-running? ]
+    [ { [ ui-running? ] [ ui-thread get-global self eq? ] } 0&& ]
     [
         ui-notify-flag get lower-flag
         [ update-ui ] [
@@ -166,7 +168,8 @@ PRIVATE>
     ] while ;
 
 : start-ui-thread ( -- )
-    [ update-ui-loop ] "UI update" spawn drop ;
+    [ self ui-thread set-global update-ui-loop ]
+    "UI update" spawn drop ;
 
 : start-ui ( quot -- )
     call( -- ) notify-ui-thread start-ui-thread ;
