@@ -327,7 +327,7 @@ M: x11-ui-backend (with-ui) ( quot -- )
                 event-loop
             ] with-xim
         ] with-x
-    ] ui-running ;
+    ] with-ui-running ;
 
 M: x11-ui-backend beep ( -- )
     dpy get 100 XBell drop ;

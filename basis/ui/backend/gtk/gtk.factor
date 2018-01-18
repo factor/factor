@@ -511,7 +511,7 @@ M: gtk-ui-backend (with-ui)
         [
             [ [ gtk_main ] with-timer ] with-event-loop
         ] with-destructors
-    ] ui-running ;
+    ] with-ui-running ;
 
 M: gtk-ui-backend stop-event-loop
     gtk_main_quit ;
