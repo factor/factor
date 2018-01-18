@@ -132,9 +132,11 @@ M: world ungraft*
     redraw-worlds
     send-queued-gestures ;
 
-: ui-running ( quot -- )
-    t \ ui-running set-global
-    [ f \ ui-running set-global ] [ ] cleanup ; inline
+SYMBOL: ui-running
+
+: with-ui-running ( quot -- )
+    t ui-running set-global
+    [ f ui-running set-global ] [ ] cleanup ; inline
 
 PRIVATE>
 
@@ -144,7 +146,7 @@ PRIVATE>
     find-last nip ; inline
 
 : ui-running? ( -- ? )
-    \ ui-running get-global ;
+    ui-running get-global ;
 
 <PRIVATE
 
@@ -205,7 +207,7 @@ M: object close-window
     find-world [ ungraft ] when* ;
 
 [
-    f \ ui-running set-global
+    f ui-running set-global
     <flag> ui-notify-flag set-global
 ] "ui" add-startup-hook
 

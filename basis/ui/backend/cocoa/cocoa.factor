@@ -223,7 +223,7 @@ M: cocoa-ui-backend (with-ui)
             init-thread-timer
             reset-thread-timer
             NSApp -> run
-        ] ui-running
+        ] with-ui-running
     ] with-cocoa ;
 
 cocoa-ui-backend ui-backend set-global
