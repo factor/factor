@@ -31,7 +31,7 @@ CONSTANT: initial-dt 5
         initial-behaviours >>behaviours
         initial-dt >>dt ;
 
-M:  boids-gadget ungraft*
+M: boids-gadget ungraft*
     t >>paused drop ;
 
 : vec>deg ( vec -- deg )
