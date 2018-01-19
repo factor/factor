@@ -1,10 +1,10 @@
 ! Copyright (C) 2015 Sankaranarayanan Viswanathan.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar combinators destructors
-formatting kernel make math math.vectors namespaces opengl
-opengl.textures sequences sets snake-game.game
-snake-game.sprites timers ui ui.gadgets ui.gadgets.worlds
-ui.gestures ui.render ;
+USING: accessors assocs calendar combinators
+combinators.short-circuit destructors formatting fry kernel math
+math.vectors namespaces opengl opengl.textures sequences sets
+snake-game.game snake-game.sprites timers ui ui.gadgets
+ui.gadgets.worlds ui.gestures ui.render ;
 
 IN: snake-game.ui
 
@@ -41,8 +41,7 @@ CONSTANT: snake-game-cell-size 20
 
 : draw-snake-head ( loc facing-dir -- )
     dup name>> rest "head-" prepend [
-        [ game-loc>screen-loc ] dip
-        {
+        [ game-loc>screen-loc ] dip {
             { :right [ { -20 -10 } ] }
             { :down  [ { -10 -20 } ] }
             { :up    [ { -10  0  } ] }
@@ -74,7 +73,7 @@ CONSTANT: snake-game-cell-size 20
     ! make sure to draw the head again
     first draw-snake-part ;
 
-: generate-status-message ( snake-game -- str )
+: game-status ( snake-game -- str )
     [ score>> ]
     [
         {
@@ -85,7 +84,7 @@ CONSTANT: snake-game-cell-size 20
     ] bi "Score: %d -- %s" sprintf ;
 
 : update-status ( gadget -- )
-    [ snake-game>> generate-status-message ] keep show-status ;
+    [ snake-game>> game-status ] keep show-status ;
 
 : do-updates ( gadget -- )
     [ snake-game>> do-game-step ]
@@ -96,7 +95,36 @@ CONSTANT: snake-game-cell-size 20
 : toggle-game-pause ( snake-gadget -- )
     snake-game>> [ not ] change-paused? drop ;
 
-: key-action ( key -- action )
+: load-game-textures ( snake-gadget -- textures )
+    dup textures>> [ ] [ snake-textures >>textures textures>> ] ?if ;
+
+M: snake-gadget graft*
+    [ '[ _ do-updates ] 200 milliseconds every ] keep timer<< ;
+
+M: snake-gadget ungraft*
+    [ stop-timer f ] change-timer
+    [ values dispose-each f ] change-textures
+    drop ;
+
+M: snake-gadget pref-dim*
+    drop snake-game-dim [ snake-game-cell-size * 20 + ] map ;
+
+M: snake-gadget draw-gadget*
+    [ load-game-textures game-textures ] keep '[
+        draw-background
+        { 10 10 } [
+            _ snake-game>>
+            [ food-loc>> [ draw-food ] when* ]
+            [
+                [ snake-loc>> ]
+                [ snake-dir>> opposite-dir ]
+                [ snake>> ]
+                tri draw-snake
+            ] bi
+        ] with-translation
+    ] with-variable ;
+
+: key-dir ( key -- dir )
     H{
         { "RIGHT"  :right }
         { "LEFT"   :left }
@@ -113,62 +141,19 @@ CONSTANT: snake-game-cell-size 20
 : new-game-key? ( key -- ? )
     HS{ "ENTER" "RET" "n" "N" } in? ;
 
-: ?handle-movement-key ( snake-game key -- )
-    key-action
-    [
-        2dup [ snake-dir>> opposite-dir ] dip =
-        [ 2drop ] [ >>next-turn-dir drop ] if
-    ] [ drop ] if* ;
-
-: handle-key ( snake-gadget key -- )
-    {
-        { [ dup quit-key? ] [ drop close-window ] }
-        { [ dup pause-key? ] [ drop toggle-game-pause ] }
-        { [ dup new-game-key? ] [ drop start-new-game ] }
-        [
-            [ snake-game>> ] dip over
-            game-in-progress? [ ?handle-movement-key ] [ 2drop ] if
-        ]
-    } cond ;
-
-: load-game-textures ( snake-gadget -- textures )
-    dup textures>> [ ] [
-        [
-            snake-head-textures %%
-            snake-body-textures %%
-            snake-tail-textures %%
-            food-texture %%
-            background-texture %%
-        ] H{ } make >>textures
-        textures>>
-    ] ?if ;
-
-M: snake-gadget graft*
-    [ [ do-updates ] curry 200 milliseconds every ] keep timer<< ;
-
-M: snake-gadget ungraft*
-    [ stop-timer f ] change-timer
-    [ values dispose-each f ] change-textures
-    drop ;
-
-M: snake-gadget pref-dim*
-    drop snake-game-dim [ snake-game-cell-size * 20 + ] map ;
-
-M: snake-gadget draw-gadget*
-    [ load-game-textures game-textures ] keep [
-        draw-background
-        { 10 10 } [
-            snake-game>>
-            [ food-loc>> [ draw-food ] when* ]
-            [
-                [ snake-loc>> ]
-                [ snake-dir>> opposite-dir ]
-                [ snake>> ]
-                tri draw-snake
-            ] bi
-        ] with-translation
-    ] curry with-variable ;
-
 M: snake-gadget handle-gesture
-    swap dup key-down?
-    [ sym>> handle-key ] [ 2drop ] if f ;
+    swap dup key-down? [
+        sym>> {
+            { [ dup quit-key? ] [ drop close-window ] }
+            { [ dup pause-key? ] [ drop toggle-game-pause ] }
+            { [ dup new-game-key? ] [ drop start-new-game ] }
+            [
+                key-dir [
+                    swap snake-game>> dup {
+                        [ game-in-progress? ]
+                        [ snake-dir>> opposite-dir pick = not ]
+                    } 1&& [ next-turn-dir<< ] [ 2drop ] if
+                ] [ drop ] if*
+            ]
+        } cond
+    ] [ 2drop ] if f ;
