@@ -24,7 +24,7 @@ IN: rosetta-code.bitmap-bezier
 
 ! turns a list of points into the list of lines between them
 : points-to-lines ( seq -- seq )
-    dup rest [ 2array ] 2map ;
+    dup rest zip ;
 
 : draw-lines ( {R,G,B} points image -- )
     [ [ first2 ] dip draw-line ] curry with each ;
