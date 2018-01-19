@@ -28,46 +28,37 @@ IN: snake-game.sprites
         swap [ image ] 2dip sw sh image-part
     ] cartesian-map f join ;
 
-: load-sprite-image ( filename -- image )
+: load-snake-image ( filename -- image )
     "vocab:snake-game/_resources/%s" sprintf load-image ;
 
-: make-texture ( image -- texture )
-    { 0 0 } <texture> ;
+: load-snake-texture ( file-name -- texture )
+    load-snake-image { 0 0 } <texture> ;
 
-: make-sprites ( filename cols rows -- seq )
-    [ load-sprite-image ] 2dip generate-sprite-sheet
-    [ make-texture ] map ;
+: load-sprite-textures ( filename cols rows -- seq )
+    [ load-snake-image ] 2dip generate-sprite-sheet
+    [ { 0 0 } <texture> ] map ;
 
 : snake-head-textures ( -- assoc )
-    "head.png" 1 4 make-sprites
     { "head-up" "head-right" "head-down" "head-left" }
-    [ swap 2array ] 2map ;
-
-:: assoc-with-value-like ( assoc key seq -- )
-    key assoc at :> value
-    seq [ [ value ] dip assoc set-at ] each ;
+    "head.png" 1 4 load-sprite-textures zip ;
 
 : snake-body-textures ( -- assoc )
-    "body.png" 3 2 make-sprites
-    { 1 2 3 4 5 6 }
-    [ swap 2array ] 2map
-    dup 1 { "body-right-up" "body-down-left" } assoc-with-value-like
-    dup 2 { "body-down-right" "body-left-up" } assoc-with-value-like
-    dup 3 { "body-right-right" "body-left-left" } assoc-with-value-like
-    dup 4 { "body-up-up" "body-down-down" } assoc-with-value-like    
-    dup 5 { "body-up-right" "body-left-down" } assoc-with-value-like
-    dup 6 { "body-right-down" "body-up-left" } assoc-with-value-like
-    dup [ { 1 2 3 4 5 6 } ] dip [ delete-at ] curry each ;
+    {
+        "body-right-up" "body-down-right" "body-right-right"
+        "body-up-up" "body-up-right" "body-right-down"
+    }
+    {
+        "body-down-left" "body-left-up" "body-left-left"
+        "body-down-down" "body-left-down" "body-up-left"
+    }
+    "body.png" 3 2 load-sprite-textures '[ _ zip ] bi@ append ;
 
 : snake-tail-textures ( -- assoc )
-    "tail.png" 2 2 make-sprites
     { "tail-down" "tail-left" "tail-up" "tail-right" }
-    [ swap 2array ] 2map ;
+    "tail.png" 2 2 load-sprite-textures zip ;
 
 : food-texture ( -- assoc )
-    "food" "food.png" load-sprite-image make-texture
-    2array 1array ;
+    "food" "food.png" load-snake-texture 2array 1array ;
 
 : background-texture ( -- assoc )
-    "background" "background.png" load-sprite-image make-texture
-    2array 1array ;
+    "background" "background.png" load-snake-texture 2array 1array ;

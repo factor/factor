@@ -1,13 +1,10 @@
 ! Copyright (C) 2015 Sankaranarayanan Viswanathan.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators destructors
-formatting kernel make math namespaces opengl opengl.textures
-sequences sets snake-game.constants snake-game.game
-snake-game.input snake-game.util snake-game.sprites timers
-ui ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
-
-FROM: snake-game.util => screen-loc ;
-FROM: snake-game.util => relative-loc ;
+formatting kernel make math math.vectors namespaces opengl
+opengl.textures sequences sets snake-game.game
+snake-game.sprites timers ui ui.gadgets ui.gadgets.worlds
+ui.gestures ui.render ;
 
 IN: snake-game.ui
 
@@ -20,8 +17,12 @@ TUPLE: snake-gadget < gadget
     <snake-game> >>snake-game drop ;
 
 : <snake-gadget> ( -- snake-gadget )
-    snake-gadget new
-    [ start-new-game ] keep ;
+    snake-gadget new [ start-new-game ] keep ;
+
+CONSTANT: snake-game-cell-size 20
+
+: game-loc>screen-loc ( loc -- loc )
+    [ snake-game-cell-size * ] map ;
 
 : lookup-texture ( key -- texture )
     game-textures get at ;
@@ -30,7 +31,7 @@ TUPLE: snake-gadget < gadget
     [ lookup-texture draw-texture ] with-translation ;
 
 : draw-sprite ( grid-loc key -- )
-    swap screen-loc draw-sprite* ;
+    swap game-loc>screen-loc draw-sprite* ;
 
 : draw-food ( loc -- )
     "food" draw-sprite ;
@@ -39,17 +40,15 @@ TUPLE: snake-gadget < gadget
     { 0 0 } "background" draw-sprite ;
 
 : draw-snake-head ( loc facing-dir -- )
-    dup name>> rest "head-" prepend
-    [
-        [ screen-loc ] dip
+    dup name>> rest "head-" prepend [
+        [ game-loc>screen-loc ] dip
         {
             { :right [ { -20 -10 } ] }
             { :down  [ { -10 -20 } ] }
             { :up    [ { -10  0  } ] }
             { :left  [ {  0  -10 } ] }
-        } case offset
-    ] dip
-    swap draw-sprite* ;
+        } case v+
+    ] dip swap draw-sprite* ;
 
 : draw-snake-body ( loc from-dir to-dir -- )
     [ name>> rest ] bi@ "body-%s-%s" sprintf draw-sprite ;
@@ -65,7 +64,7 @@ TUPLE: snake-gadget < gadget
     } case ;
 
 : next-snake-loc-from-dir ( loc from-dir snake-part -- new-loc new-from-dir )
-    nip dir>> [ relative-loc ] keep ;
+    nip dir>> [ move-loc ] keep ;
 
 : draw-snake ( loc from-dir snake -- )
     3dup [
@@ -76,16 +75,15 @@ TUPLE: snake-gadget < gadget
     first draw-snake-part ;
 
 : generate-status-message ( snake-game -- str )
-    [ score>> "Score: %d" sprintf ]
+    [ score>> ]
     [
         {
             { [ dup game-over?>> ] [ drop "Game Over" ] }
             { [ dup paused?>> ] [ drop "Game Paused" ] }
             [ drop "Game In Progress" ]
         } cond
-    ]
-    bi 2array " -- " join ;
-        
+    ] bi "Score: %d -- %s" sprintf ;
+
 : update-status ( gadget -- )
     [ snake-game>> generate-status-message ] keep show-status ;
 
@@ -97,6 +95,23 @@ TUPLE: snake-gadget < gadget
 
 : toggle-game-pause ( snake-gadget -- )
     snake-game>> [ not ] change-paused? drop ;
+
+: key-action ( key -- action )
+    H{
+        { "RIGHT"  :right }
+        { "LEFT"   :left }
+        { "UP"     :up }
+        { "DOWN"   :down }
+    } at ;
+
+: quit-key? ( key -- ? )
+    HS{ "ESC" "q" "Q" } in? ;
+
+: pause-key? ( key -- ? )
+    HS{ " " "SPACE" "p" "P" } in? ;
+
+: new-game-key? ( key -- ? )
+    HS{ "ENTER" "RET" "n" "N" } in? ;
 
 : ?handle-movement-key ( snake-game key -- )
     key-action
@@ -133,8 +148,8 @@ M: snake-gadget graft*
 
 M: snake-gadget ungraft*
     [ stop-timer f ] change-timer
-    dup textures>> values [ dispose ] each
-    f >>textures drop ;
+    [ values dispose-each f ] change-textures
+    drop ;
 
 M: snake-gadget pref-dim*
     drop snake-game-dim [ snake-game-cell-size * 20 + ] map ;
