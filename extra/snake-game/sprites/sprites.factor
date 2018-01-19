@@ -62,3 +62,12 @@ IN: snake-game.sprites
 
 : background-texture ( -- assoc )
     "background" "background.png" load-snake-texture 2array 1array ;
+
+: snake-textures ( -- assoc )
+    [
+        snake-head-textures %%
+        snake-body-textures %%
+        snake-tail-textures %%
+        food-texture %%
+        background-texture %%
+    ] H{ } make ;
