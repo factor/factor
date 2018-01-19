@@ -19,6 +19,9 @@ ERROR: negative-power-matrix m n ;
 : make-matrix ( m n quot: ( ... -- elt ) -- matrix )
     '[ _ _ replicate ] replicate ; inline
 
+: make-matrix-with-indices ( m n quot -- matrix )
+    [ [ <iota> ] bi@ ] dip '[ @ ] cartesian-map ; inline
+
 : <matrix> ( m n element -- matrix )
     '[ _ _ <array> ] replicate ; inline
 
@@ -149,38 +152,25 @@ PRIVATE>
 : n/m ( n m -- m ) [ n/v ] with map ;
 : m/n ( m n -- m ) [ v/n ] curry map ;
 
-: m+   ( m m -- m ) [ v+ ] 2map ;
-: m-   ( m m -- m ) [ v- ] 2map ;
-: m*   ( m m -- m ) [ v* ] 2map ;
-: m/   ( m m -- m ) [ v/ ] 2map ;
+: m+   ( m1 m2 -- m ) [ v+ ] 2map ;
+: m-   ( m1 m2 -- m ) [ v- ] 2map ;
+: m*   ( m1 m2 -- m ) [ v* ] 2map ;
+: m/   ( m1 m2 -- m ) [ v/ ] 2map ;
 
-: v.m ( v m -- v ) flip [ v. ] with map ;
-: m.v ( m v -- v ) [ v. ] curry map ;
+: v.m ( v m -- p ) flip [ v. ] with map ;
+: m.v ( m v -- p ) [ v. ] curry map ;
 : m.  ( m m -- m ) flip [ swap m.v ] curry map ;
+! should this be called m.m ?
 
-: m~  ( m m epsilon -- ? ) [ v~ ] curry 2all? ;
+: m~  ( m1 m2 epsilon -- ? ) [ v~ ] curry 2all? ;
 
 : mmin ( m -- n ) [ 1/0. ] dip [ [ min ] each ] each ;
 : mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
 : mnorm ( m -- n ) dup mmax abs m/n ;
 
-: cross ( vec1 vec2 -- vec3 )
-    [ [ { 1 2 0 } vshuffle ] [ { 2 0 1 } vshuffle ] bi* v* ]
-    [ [ { 2 0 1 } vshuffle ] [ { 1 2 0 } vshuffle ] bi* v* ] 2bi v- ; inline
-
-:: normal ( vec1 vec2 vec3 -- vec4 )
-    vec2 vec1 v- vec3 vec1 v- cross normalize ; inline
-
-: proj ( v u -- w )
-    [ [ v. ] [ norm-sq ] bi / ] keep n*v ;
-
-: perp ( v u -- w )
-    dupd proj v- ;
-
-: angle-between ( v u -- a )
-    [ normalize ] bi@ h. acos ;
 
 <PRIVATE
+
 : (gram-schmidt) ( v seq -- newseq )
     [ dupd proj v- ] each ;
 
@@ -192,7 +182,7 @@ PRIVATE>
 : gram-schmidt ( seq -- orthogonal )
     V{ } clone [ over (gram-schmidt) suffix! ] reduce ;
 
-: gram-schmidt-normal ( seq -- orthonormal )
+: gram-schmidt-normalize ( seq -- orthonormal )
     gram-schmidt [ normalize ] map ; inline
 
 : m^n ( m n -- n )
@@ -219,11 +209,11 @@ PRIVATE>
 : cols ( seq matrix -- cols )
     '[ _ col ] map ; inline
 
-: set-index ( n pair matrix -- )
+: matrix-set-nth ( n pair matrix -- )
     [ first2 swap ] dip nth set-nth ; inline
 
-: set-indices ( n sequence matrix -- )
-    '[ _ set-index ] with each ; inline
+: matrix-set-nths ( n sequence matrix -- )
+    '[ _ matrix-set-nth ] with each ; inline
 
 : matrix-map ( matrix quot -- )
     '[ _ map ] map ; inline
@@ -258,9 +248,6 @@ M: integer square-cols <iota> square-cols ;
 M: sequence square-cols
     [ length ] keep [ <array> ] with { } map-as ;
 
-: make-matrix-with-indices ( m n quot -- matrix )
-    [ [ <iota> ] bi@ ] dip '[ @ ] cartesian-map ; inline
-
 : null-matrix? ( matrix -- ? ) empty? ; inline
 
 : well-formed-matrix? ( matrix -- ? )
@@ -289,7 +276,7 @@ M: sequence square-cols
     dimension-range [ head-slice >array ] 2map concat ;
 
 : make-lower-matrix ( object m n -- matrix )
-    zero-matrix [ lower-matrix-indices ] [ set-indices ] [ ] tri ;
+    zero-matrix [ lower-matrix-indices ] [ matrix-set-nths ] [ ] tri ;
 
 : make-upper-matrix ( object m n -- matrix )
-    zero-matrix [ upper-matrix-indices ] [ set-indices ] [ ] tri ;
+    zero-matrix [ upper-matrix-indices ] [ matrix-set-nths ] [ ] tri ;

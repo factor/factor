@@ -4,7 +4,7 @@ IN: math.matrices
 
 ABOUT: "math.matrices"
 
-ARTICLE: "math.matrices" "Working with matrix data"
+ARTICLE: "math.matrices" "Matrix operations"
 "The " { $vocab-link "math.matrices" } " vocabulary implements many ways of working with 2-dimensional sequences, known as matrices. Operations on numeric vectors are implemented in " { $vocab-link "math.vectors" } ", upon which this vocabulary relies."
 $nl
 "Instead of a separate matrix " { $link tuple } " to be instantiated, words in this vocabulary operate on 2-dimensional sequences."
@@ -59,16 +59,12 @@ $nl
 
 "Transformations on matrices:"
 { $subsections
+    matrix-map
     cartesian-matrix-map
     cartesian-matrix-column-map
     column-map
-    cross
-    normal
-    proj
-    perp
-    angle-between
     gram-schmidt
-    gram-schmidt-normal
+    gram-schmidt-normalize
     stitch
     kronecker
     outer
@@ -93,9 +89,8 @@ $nl
 
 "Mutating matrices in place:"
 { $subsections
-  set-index
-  set-indices
-  matrix-map
+  matrix-set-nth
+  matrix-set-nths
 }
 
 "Attributes of a matrix:"
@@ -146,7 +141,7 @@ HELP: zero-matrix
 
 HELP: zero-square-matrix
 { $values { "m" integer } { "matrix" sequence } }
-{ $description "Creates a matrix of size " { $snippet "n x n" } ", filled with zeroes. Shorthand for " { $snippet "n n zero-matrix" } "." } ;
+{ $description "Creates a matrix of size " { $snippet "n x n" } ", filled with zeroes. Shorthand for " { $code "n n zero-matrix" } "." } ;
 
 HELP: diagonal-matrix
 { $values { "diagonal-seq" sequence } { "matrix" sequence } }
@@ -193,19 +188,30 @@ HELP: eye
 
 HELP: simple-eye
 { $values { "m" integer } { "n" integer } { "k" integer } { "matrix" sequence } }
-{ $description "Creates an " { $snippet "m x n" } " matrix with a diagonal of ones offset by " { $snippet "k" } " from the main diagonal. Equivalent to " { $snippet "m n k 1 eye" } "." } ;
+{ $description "Creates an " { $snippet "m x n" } " matrix with a diagonal of ones offset by " { $snippet "k" } " from the main diagonal. The following are equivalent for any " { $snippet "m n k" } ":" { $code "m n k 1 eye" } { $code "m n k simple-eye" } $nl "Specify a different diagonal value with " { $link eye } "." } ;
 
 { zero-matrix diagonal-matrix identity-matrix eye simple-eye } related-words
 
 { square-rows square-cols } related-words
 
 HELP: m.v
-{ $values { "m" sequence } { "v" sequence } }
+{ $values { "m" sequence } { "v" sequence } { "p" sequence } }
 { $description "Computes the dot product between a matrix and a vector." }
 { $examples
   { $example
     "USING: math.matrices prettyprint ;"
     "{ { 1 -1 2 } { 0 -3 1 } } { 2 1 0 } m.v ."
+    "{ 1 -3 }"
+  }
+} ;
+
+HELP: v.m
+{ $values { "m" sequence } { "v" sequence } { "p" sequence } }
+{ $description "Computes the dot product between a vector and a matrix." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ 2 1 0 } { { 1 -1 2 } { 0 -3 1 } } v.m ."
     "{ 1 -3 }"
   }
 } ;
@@ -221,8 +227,10 @@ HELP: m.
   }
 } ;
 
+{ m. v.m m.v } related-words
+
 HELP: m+
-{ $values { "m" sequence } }
+{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
 { $description "Adds the matrices element-wise." }
 { $examples
   { $example
@@ -233,7 +241,7 @@ HELP: m+
 } ;
 
 HELP: m-
-{ $values { "m" sequence } }
+{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
 { $description "Subtracts the matrices element-wise." }
 { $examples
   { $example
@@ -242,6 +250,45 @@ HELP: m-
       "{ { 2 7 } { 11 8 } }"
   }
 } ;
+
+HELP: m*
+{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
+{ $description "Multiplies the matrices element-wise." }
+{ $examples
+  { $example
+      "USING: math.matrices prettyprint ;"
+      "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m- ."
+      "{ { 15 18 } { 60 153 } }"
+  }
+} ;
+
+HELP: m/
+{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
+{ $description "Divides the matrices element-wise." }
+{ $examples
+  { $example
+      "USING: math.matrices prettyprint ;"
+      "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m- ."
+      "{ { 1+2/3 4+1/2 } { 3+3/4 1+8/9 } }"
+  }
+} ;
+
+HELP: m~
+{ $values { "m1" sequence } { "m2" sequence } { "epsilon" number } { boolean } }
+{ $description "Compares the matrices using the " { $snippet "epsilon" } "." }
+{ $examples
+  { $example
+      "USING: math.matrices prettyprint ;"
+      "{ { 5 9 } { 15 17 } } dup [ .01 + ] matrix-map .1 m~ ."
+      "t"
+  }
+} ;
+
+{ m+ m- m* m/ m~ } related-words
+
+{ n+m m+n n-m m-n n*m m*n n/m m/n } related-words
+
+{ mmin mmax mnorm mneg } related-words
 
 HELP: kronecker
 { $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
