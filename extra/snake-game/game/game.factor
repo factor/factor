@@ -1,9 +1,15 @@
 ! Copyright (C) 2015 Sankaranarayanan Viswanathan.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators kernel make math random
-sequences sets snake-game.constants snake-game.util sorting ;
+USING: accessors arrays assocs combinators fry kernel make math
+math.vectors random sequences sets sorting ;
 
 IN: snake-game.game
+
+SYMBOLS: :left :right :up :down ;
+
+SYMBOLS: :head :body :tail ;
+
+CONSTANT: snake-game-dim { 12 10 }
 
 TUPLE: snake-game
     snake snake-loc snake-dir food-loc
@@ -26,10 +32,33 @@ C: <snake-part> snake-part
 
 : <snake-game> ( -- snake-game )
     snake-game new
-    <snake> >>snake
-    { 5 4 } clone >>snake-loc
-    :right >>snake-dir
-    { 1 1 } clone >>food-loc ;
+        <snake> >>snake
+        { 5 4 } clone >>snake-loc
+        :right >>snake-dir
+        { 1 1 } clone >>food-loc ;
+
+: ?roll-over ( x max -- x )
+    {
+        { [ 2dup >= ] [ 2drop 0 ] }
+        { [ over neg? ] [ nip 1 - ] }
+        [ drop ]
+    } cond ;
+
+: move-loc ( loc dir -- loc )
+    H{
+        { :left  { -1  0 } }
+        { :right {  1  0 } }
+        { :up    {  0 -1 } }
+        { :down  {  0  1 } }
+    } at v+ snake-game-dim [ ?roll-over ] 2map ;
+
+: opposite-dir ( dir -- dir )
+    H{
+        { :left  :right }
+        { :right :left }
+        { :up    :down }
+        { :down  :up }
+    } at ;
 
 : game-loc>index ( loc -- n )
     first2 snake-game-dim first * + ;
@@ -37,22 +66,19 @@ C: <snake-part> snake-part
 : index>game-loc ( n -- loc )
     snake-game-dim first /mod swap 2array ;
 
-: snake-shape ( snake -- dirs )
-    [ dir>> ] map ;
-
 : grow-snake ( snake dir -- snake )
     opposite-dir :head <snake-part> prefix
     dup second :body >>type drop ;
 
 : move-snake ( snake dir -- snake )
-    dupd [ snake-shape but-last ] dip
+    [ dup but-last [ dir>> ] map ] dip
     opposite-dir prefix [ >>dir ] 2map ;
 
 : all-indices ( -- points )
-    snake-game-dim first2 * <iota> ;
+    snake-game-dim product <iota> ;
 
 : snake-occupied-locs ( snake head-loc -- points )
-    [ dir>> relative-loc ] accumulate nip ;
+    [ dir>> move-loc ] accumulate nip ;
 
 : snake-occupied-indices ( snake head-loc -- points )
     snake-occupied-locs [ game-loc>index ] map natural-sort ;
@@ -60,30 +86,23 @@ C: <snake-part> snake-part
 : snake-unoccupied-indices ( snake head-loc -- points )
     [ all-indices ] 2dip snake-occupied-indices without ;
 
-: snake-will-eat-food? ( snake-game dir -- ? )
-    [ [ food-loc>> ] [ snake-loc>> ] bi ] dip
-    relative-loc = ;
+: snake-will-eat-food? ( snake-game -- ? )
+    [ food-loc>> ] [ snake-loc>> ] [ snake-dir>> ] tri move-loc = ;
 
-: update-score ( snake-game -- )
-    [ 1 + ] change-score
-    drop ;
+: increase-score ( snake-game -- snake-game )
+    [ 1 + ] change-score ;
 
-: update-snake-shape ( snake-game dir growing? -- )
-    [ [ grow-snake ] curry change-snake ]
-    [ [ move-snake ] curry change-snake ]
-    if drop ;
+: update-snake-shape ( snake-game growing? -- snake-game )
+    [ dup snake-dir>> ] dip
+    '[ _ _ [ grow-snake ] [ move-snake ] if ] change-snake ;
 
-: update-snake-loc ( snake-game dir -- )
-    [ relative-loc ] curry change-snake-loc drop ;
+: update-snake-loc ( snake-game -- snake-game )
+    dup snake-dir>> '[ _ move-loc ] change-snake-loc ;
 
-: update-snake-dir ( snake-game dir -- )
-    >>snake-dir drop ;
-
-: generate-food ( snake-game -- )
-    [
-        [ snake>> ] [ snake-loc>> ] bi
-        snake-unoccupied-indices random index>game-loc
-    ] keep food-loc<< ;
+: generate-food ( snake-game -- snake-game )
+    dup [ snake>> ] [ snake-loc>> ] bi
+    snake-unoccupied-indices random index>game-loc
+    >>food-loc ;
 
 : game-in-progress? ( snake-game -- ? )
     [ game-over?>> ] [ paused?>> ] bi or not ;
@@ -94,28 +113,24 @@ C: <snake-part> snake-part
         f >>next-turn-dir
     ] when* drop ;
 
-: snake-will-eat-itself? ( snake-game dir -- ? )
-    [ [ snake>> ] [ snake-loc>> ] bi ] dip relative-loc
-    [ snake-occupied-locs rest ] keep
-    swap member? ;
+: snake-will-eat-itself? ( snake-game -- ? )
+    [ snake>> ] [ snake-loc>> ] [ snake-dir>> ] tri move-loc
+    [ snake-occupied-locs rest ] keep swap member? ;
 
 : game-over ( snake-game -- )
     t >>game-over? drop ;
 
-: update-snake ( snake-game dir -- )
-    2dup snake-will-eat-food?
-    {
-        [ [ drop update-score ] [ 2drop ] if ]
+: update-snake ( snake-game -- )
+    dup snake-will-eat-food? {
+        [ [ increase-score ] when ]
         [ update-snake-shape ]
         [ drop update-snake-loc ]
-        [ drop update-snake-dir ]
-        [ nip [ generate-food ] [ drop ] if ]
-    } 3cleave ;
+        [ [ generate-food ] when ]
+    } cleave drop ;
 
 : do-game-step ( snake-game -- )
     dup game-in-progress? [
         dup ?handle-pending-turn
-        dup snake-dir>>
-        2dup snake-will-eat-itself?
-        [ drop game-over ] [ update-snake ] if
+        dup snake-will-eat-itself?
+        [ game-over ] [ update-snake ] if
     ] [ drop ] if ;
