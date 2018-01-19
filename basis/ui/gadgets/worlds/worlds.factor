@@ -104,8 +104,7 @@ TUPLE: world-attributes
 ERROR: no-world-found ;
 
 : find-gl-context ( gadget -- )
-    find-world dup
-    [ set-gl-context ] [ no-world-found ] if ;
+    find-world [ set-gl-context ] [ no-world-found ] if* ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
@@ -216,14 +215,12 @@ ui-error-hook [ [ rethrow ] ] initialize
 
 : draw-world ( world -- )
     dup draw-world? [
-        dup world [
-            [
-                dup [ draw-world* ] with-gl-context
-                flush-layout-cache-hook get call( -- )
-            ] [
-                swap f >>active? <world-error> throw
-            ] recover
-        ] with-variable
+        [
+            dup [ draw-world* ] with-gl-context
+            flush-layout-cache-hook get call( -- )
+        ] [
+            swap f >>active? <world-error> throw
+        ] recover
     ] [ drop ] if ;
 
 world
