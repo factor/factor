@@ -3,11 +3,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays boids.simulation calendar classes
 colors.constants kernel literals locals math math.functions
-math.trig models opengl opengl.demo-support opengl.gl sequences
-threads ui ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.labeled
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
-ui.gadgets.tracks ui.render ui.tools.common ;
+math.trig models namespaces opengl opengl.demo-support opengl.gl
+sequences threads ui ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.frames ui.gadgets.grids
+ui.gadgets.labeled ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.sliders ui.gadgets.tracks ui.gadgets.worlds ui.render
+ui.tools.common ;
 QUALIFIED-WITH: models.range mr
 IN: boids
 
@@ -104,11 +105,11 @@ M: range-observer model-changed
         [ neg random-boids append ] if
     ] change-boids drop ;
 
-: pause-toggle ( boids-gadget -- )
+: com-pause ( boids-gadget -- )
     dup paused>> not [ >>paused ] keep
     [ drop ] [ start-boids-thread ] if ;
 
-: randomize-boids ( boids-gadget -- )
+: com-randomize ( boids-gadget -- )
     [ length random-boids ] change-boids drop ;
 
 :: simulation-panel ( boids-gadget -- gadget )
@@ -129,9 +130,9 @@ M: range-observer model-changed
     { 5 5 } <border> add-gadget
 
     <shelf> { 2 2 } >>gap
-    "pause" [ drop boids-gadget pause-toggle ]
+    "pause" [ drop boids-gadget com-pause ]
     <border-button> add-gadget
-    "randomize" [ drop boids-gadget randomize-boids ]
+    "randomize" [ drop boids-gadget com-randomize ]
     <border-button> add-gadget
 
     { 5 5 } <border> add-gadget
@@ -139,10 +140,8 @@ M: range-observer model-changed
     "simulation" COLOR: gray <framed-labeled-gadget> ;
 
 :: create-gadgets ( -- gadgets )
-    <shelf>
     <boids-gadget> :> boids-gadget
     boids-gadget [ start-boids-thread ] keep
-    add-gadget
 
     <pile> { 5 5 } >>gap 1.0 >>fill
 
@@ -152,8 +151,14 @@ M: range-observer model-changed
     boids-gadget behaviours>>
     [ behavior-panel add-gadget ] each
 
-    { 5 5 } <border> add-gadget ;
+    { 5 5 } <border> 2array ;
+
+boids-gadget "touchbar" f {
+    { f com-pause }
+    { f com-randomize }
+} define-command-map
 
 MAIN-WINDOW: boids { { title "Boids" } }
-    create-gadgets
-    >>gadgets ;
+    0 >>fill
+    horizontal >>orientation
+    create-gadgets >>gadgets ;
