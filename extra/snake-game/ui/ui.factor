@@ -95,14 +95,14 @@ CONSTANT: snake-game-cell-size 20
 : toggle-game-pause ( snake-gadget -- )
     snake-game>> [ not ] change-paused? drop ;
 
-: load-game-textures ( snake-gadget -- textures )
-    dup textures>> [ ] [ snake-textures >>textures textures>> ] ?if ;
-
 M: snake-gadget graft*
-    [ '[ _ do-updates ] 200 milliseconds every ] keep timer<< ;
+    dup '[ _ do-updates ] 200 milliseconds every >>timer
+    snake-textures >>textures
+    drop ;
 
 M: snake-gadget ungraft*
     [ stop-timer f ] change-timer
+    dup find-gl-context ! so texture disposing works properly
     [ values dispose-each f ] change-textures
     drop ;
 
@@ -110,7 +110,7 @@ M: snake-gadget pref-dim*
     drop snake-game-dim [ snake-game-cell-size * 20 + ] map ;
 
 M: snake-gadget draw-gadget*
-    [ load-game-textures game-textures ] keep '[
+    [ textures>> game-textures ] keep '[
         draw-background
         { 10 10 } [
             _ snake-game>>
