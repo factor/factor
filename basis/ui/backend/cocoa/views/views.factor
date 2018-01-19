@@ -162,7 +162,7 @@ CONSTANT: selector>action H{
     [ swap world-focus parents-handle-gesture? t ] [ drop f f ] if* ;
 
 : touchbar-commands ( -- commands/f gadget )
-    world get [
+    world get-global [
         children>> [
             class-of "commands" word-prop
             "touchbar" of dup [ commands>> ] when
