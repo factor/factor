@@ -12,7 +12,7 @@ IN: cap
     [ gl-scale ] bi@ * >fixnum <byte-array> ;
 
 : gl-screenshot ( gadget -- byte-array )
-    [ find-world handle>> select-gl-context ]
+    [ find-gl-context ]
     [
         [
             GL_BACK glReadBuffer
