@@ -110,7 +110,7 @@ M: range-observer model-changed
     [ drop ] [ start-boids-thread ] if ;
 
 : com-randomize ( boids-gadget -- )
-    [ length random-boids ] change-boids drop ;
+    [ length random-boids ] change-boids relayout-1 ;
 
 :: simulation-panel ( boids-gadget -- gadget )
     <pile> white-interior
