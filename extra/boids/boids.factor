@@ -105,11 +105,18 @@ M: range-observer model-changed
         [ neg random-boids append ] if
     ] change-boids drop ;
 
+<PRIVATE
+: find-boids-gadget ( gadget -- boids-gadget )
+    dup boids-gadget? [ children>> [ boids-gadget? ] find nip ] unless ;
+PRIVATE>
+
 : com-pause ( boids-gadget -- )
+    find-boids-gadget
     dup paused>> not [ >>paused ] keep
     [ drop ] [ start-boids-thread ] if ;
 
 : com-randomize ( boids-gadget -- )
+    find-boids-gadget
     [ length random-boids ] change-boids relayout-1 ;
 
 :: simulation-panel ( boids-gadget -- gadget )
@@ -139,9 +146,13 @@ M: range-observer model-changed
 
     "simulation" COLOR: gray <framed-labeled-gadget> ;
 
-:: create-gadgets ( -- gadgets )
+TUPLE: boids-frame < pack ;
+
+:: <boids-frame> ( -- boids-frame )
+    boids-frame new horizontal >>orientation
     <boids-gadget> :> boids-gadget
     boids-gadget [ start-boids-thread ] keep
+    add-gadget
 
     <pile> { 5 5 } >>gap 1.0 >>fill
 
@@ -151,14 +162,12 @@ M: range-observer model-changed
     boids-gadget behaviours>>
     [ behavior-panel add-gadget ] each
 
-    { 5 5 } <border> 2array ;
+    { 5 5 } <border> add-gadget ;
 
-boids-gadget "touchbar" f {
+boids-frame "touchbar" f {
     { f com-pause }
     { f com-randomize }
 } define-command-map
 
 MAIN-WINDOW: boids { { title "Boids" } }
-    0 >>fill
-    horizontal >>orientation
-    create-gadgets >>gadgets ;
+    <boids-frame> >>gadgets ;
