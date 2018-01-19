@@ -141,7 +141,7 @@ M: world apply-world-attributes
         [ window-controls>> >>window-controls ]
         [ initial-background-color >>background-color ]
         [ grab-input?>> >>grab-input? ]
-        [ gadgets>> dup sequence? [ [ f track-add ] each ] [ 1 track-add ] if ]
+        [ gadgets>> dup sequence? [ [ 1 track-add ] each ] [ 1 track-add ] if ]
         [ pref-dim>> >>pref-dim ]
         [ fill>> >>fill ]
         [ orientation>> >>orientation ]
