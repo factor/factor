@@ -54,7 +54,9 @@ TUPLE: world-attributes
     gadgets
     { pixel-format-attributes initial: $ default-world-pixel-format-attributes }
     { window-controls initial: $ default-world-window-controls }
-    pref-dim ;
+    pref-dim
+    { fill initial: 1 }
+    { orientation initial: $ vertical } ;
 
 : <world-attributes> ( -- world-attributes )
     world-attributes new ; inline
@@ -139,8 +141,10 @@ M: world apply-world-attributes
         [ window-controls>> >>window-controls ]
         [ initial-background-color >>background-color ]
         [ grab-input?>> >>grab-input? ]
-        [ gadgets>> dup sequence? [ [ 1 track-add ] each ] [ 1 track-add ] if ]
+        [ gadgets>> dup sequence? [ [ f track-add ] each ] [ f track-add ] if ]
         [ pref-dim>> >>pref-dim ]
+        [ fill>> >>fill ]
+        [ orientation>> >>orientation ]
     } cleave ;
 
 : <world> ( world-attributes -- world )
