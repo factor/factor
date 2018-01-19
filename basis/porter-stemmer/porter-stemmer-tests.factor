@@ -1,6 +1,6 @@
 IN: porter-stemmer.tests
-USING: arrays io kernel porter-stemmer sequences tools.test
-io.files io.encodings.utf8 ;
+USING: arrays assocs io kernel porter-stemmer sequences
+tools.test io.files io.encodings.utf8 ;
 
 { 0 } [ "xa" consonant-seq ] unit-test
 { 0 } [ "xxaa" consonant-seq ] unit-test
@@ -60,5 +60,5 @@ io.files io.encodings.utf8 ;
     "vocab:porter-stemmer/test/voc.txt" utf8 file-lines
     [ stem ] map
     "vocab:porter-stemmer/test/output.txt" utf8 file-lines
-    [ 2array ] 2map [ first2 = ] reject
+    zip [ = ] assoc-reject
 ] unit-test
