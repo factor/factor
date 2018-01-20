@@ -48,13 +48,13 @@ IN: windows.dropfiles
     TRUE DragAcceptFiles init-message-filter install-wm-handler ;
 
 : hwnd-reject-files ( hwnd -- )
-    f DragAcceptFiles ;
+    FALSE DragAcceptFiles ;
 
 : world-accept-files ( world -- )
     handle>> hWnd>> hwnd-accept-files ;
 
 : world-reject-files ( world -- )
-    handle>> hWnd>> hwnd-accept-files ;
+    handle>> hWnd>> hwnd-reject-files ;
 
 : accept-files ( -- )
     world get world-accept-files ;
