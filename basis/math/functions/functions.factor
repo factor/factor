@@ -214,7 +214,7 @@ CONSTANT: log10-2 0x1.34413509f79ffp-2
 : (bignum-log) ( n log-quot: ( x -- y ) log-2 -- log )
     [ dup ] dip '[
         dup representable-as-float?
-        [ >float @ ] [ frexp [ @ ] [ _ * ] bi* + ] if
+        [ >float @ ] [ frexp _ [ _ * ] bi* + ] if
     ] call ; inline
 
 PRIVATE>

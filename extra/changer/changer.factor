@@ -6,6 +6,6 @@ IN: changer
 MACRO: inline-changer ( name -- quot' )
     [ ">>" append ] [ ">>" prepend ] bi
     [ "accessors" lookup-word 1quotation ] bi@
-    '[ over [ [ @ ] dip call ] dip swap @ ] ;
+    '[ over [ _ dip call ] dip swap @ ] ;
 
 SYNTAX: change: scan-token '[ _ inline-changer ] append! ;

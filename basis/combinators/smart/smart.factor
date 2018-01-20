@@ -139,7 +139,7 @@ MACRO: map-reduce-outputs ( quot mapper reducer -- quot )
 
 MACRO: smart-reduce ( reduce-quots -- quot )
     unzip [ [ ] like ] bi@ dup length dup '[
-        [ @ ] dip [ @ _ cleave-curry _ spread* ] each
+        _ dip [ @ _ cleave-curry _ spread* ] each
     ] ;
 
 MACRO: smart-map-reduce ( map-reduce-quots -- quot )
@@ -151,7 +151,7 @@ MACRO: smart-map-reduce ( map-reduce-quots -- quot )
 
 MACRO: smart-2reduce ( 2reduce-quots -- quot )
     unzip [ [ ] like ] bi@ dup length dup '[
-        [ @ ] 2dip
+        _ 2dip
         [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ] 2each
     ] ;
 

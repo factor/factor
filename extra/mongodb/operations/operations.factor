@@ -84,7 +84,7 @@ PRIVATE>
 : (write-message) ( message quot -- )
     [ connection-buffer dup ] 2dip
     '[
-        [ _ [ write-header ] [ @ ] bi ] with-length-prefix
+        [ _ [ write-header ] _ bi ] with-length-prefix
     ] with-output-stream* write flush ; inline
 
 :: build-query-object ( query -- selector )
