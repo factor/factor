@@ -35,11 +35,9 @@ IN: windows.dropfiles
 : do-once ( guard-variable quot -- )
     dupd '[ t _ set-global @ ] [ get-global ] dip unless ; inline
 
-SYMBOL: init-message-filter-done?
-
 ! Ignore the errors: on WinXP the function is missing, and is not needed.
 : init-message-filter ( -- )
-    init-message-filter-done? [
+    \ init-message-filter [
         [ (init-message-filter) ] [ drop ] recover
     ] do-once ;
 
