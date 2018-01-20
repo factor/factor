@@ -33,7 +33,7 @@ $nl
 "By default, WM_DROPFILES doesn't work either, because the necessary window messages are filtered out from the queue, but it is possible to configure the filters and make it work, see " { $link init-message-filter } "." ;
 
 HELP: init-message-filter
-{ $description "Call " { $snippet "ChangeWindowMessageFilter" } " to allow the window messages necessary for file dropping pass through the filters. This will have a process-wide effect, and will only be called once (when " { $link init-message-filter-done? } " is " { $link POSTPONE: f } ")."
+{ $description "Call " { $snippet "ChangeWindowMessageFilter" } " to allow the window messages necessary for file dropping pass through the filters. This will have a process-wide effect, and will only be called once."
 $nl
 "The API function is only available since Windows Vista, and is not needed in earlier versions. On Windows XP the missing function will cause an exception on the first call, which will be suppressed, and no more calls will be made." }
 { $notes "It is generally preferrable to use " { $snippet "ChangeWindowMessageFilterEx" } ", because it has a per-window-handle effect, thus gives a more fine-grained security control. Unfortunately, the " { $snippet "Ex" } "-version is only available since Windows 7, and in any case the " { $link add-wm-handler } " has global effect for all Factor native windows, so it's not like we are exposing any additional code to potential exploitation." } ;
