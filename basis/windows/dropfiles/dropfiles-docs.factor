@@ -1,4 +1,4 @@
-! Copyright (C) 2017 Alexander Ilin.
+! Copyright (C) 2017-2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax kernel math
 ui.backend.windows ui.gestures windows.types ;
