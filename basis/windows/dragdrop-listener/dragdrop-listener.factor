@@ -4,9 +4,11 @@
 USING: accessors alien.accessors alien.data alien.strings
 classes.struct io.encodings.utf16n kernel make math namespaces
 prettyprint sequences specialized-arrays
-ui.gadgets.worlds ui.tools.listener windows.com
-windows.com.wrapper windows.dropfiles windows.kernel32
-windows.ole32 windows.shell32 windows.types ;
+specialized-arrays.instances.alien.c-types.ushort
+ui.backend.windows ui.gadgets.worlds ui.gestures
+ui.tools.listener windows.com windows.com.wrapper
+windows.dropfiles windows.kernel32 windows.ole32 windows.shell32
+windows.types ;
 SPECIALIZED-ARRAY: WCHAR
 IN: windows.dragdrop-listener
 
@@ -32,9 +34,9 @@ CONSTANT: E_OUTOFMEMORY -2147024882 ! 0x8007000e
 : filecount-from-data-object ( data-object -- n )
     \ filecount-from-hdrop swap handle-data-object ;
 
-TUPLE: listener-dragdrop hWnd last-drop-effect ;
+TUPLE: listener-dragdrop world last-drop-effect ;
 
-: <listener-dragdrop> ( hWnd -- object )
+: <listener-dragdrop> ( world -- object )
     DROPEFFECT_NONE listener-dragdrop boa ;
 
 <<
@@ -45,27 +47,24 @@ SYMBOL: +listener-dragdrop-wrapper+
 {
     { IDropTarget {
         [ ! HRESULT DragEnter ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
-            [
-                2drop filecount-from-data-object
-                1 = DROPEFFECT_COPY DROPEFFECT_NONE ?
-                dup
-            ] dip 0 set-alien-unsigned-4
-            >>last-drop-effect drop
+            DROPEFFECT_COPY swap 0 set-alien-unsigned-4 3drop
+            DROPEFFECT_COPY >>last-drop-effect drop
             S_OK
         ] [ ! HRESULT DragOver ( DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
-            [ 2drop last-drop-effect>> ] dip 0 set-alien-unsigned-4
+            [
+                2drop
+                [ world>> children>> first hand-gadget set-global ]
+                [ last-drop-effect>> ] bi
+            ] dip 0 set-alien-unsigned-4
             S_OK
         ] [ ! HRESULT DragLeave ( )
             drop S_OK
         ] [ ! HRESULT Drop ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
             [
                 2drop nip
-                filenames-from-data-object
-                dup length 1 = [
-                    first unparse [ "USE: parser " % % " run-file" % ] "" make
-                    eval-listener
-                    DROPEFFECT_COPY
-                ] [ drop DROPEFFECT_NONE ] if
+                filenames-from-data-object dropped-files set-global
+                key-modifiers <file-drop> hand-gadget get-global propagate-gesture
+                DROPEFFECT_COPY
             ] dip 0 set-alien-unsigned-4
             S_OK
         ]
@@ -74,8 +73,9 @@ SYMBOL: +listener-dragdrop-wrapper+
 >>
 
 : dragdrop-listener-window ( -- )
-    world get handle>> hWnd>> dup <listener-dragdrop>
+    world get dup <listener-dragdrop>
     +listener-dragdrop-wrapper+ get-global com-wrap [
+        [ handle>> hWnd>> ] dip
         2dup RegisterDragDrop dup E_OUTOFMEMORY =
         [ drop ole-initialize RegisterDragDrop ] [ 2nip ] if
         check-ole32-error
