@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2010 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors concurrency.conditions continuations deques
-dlists fry kernel locals sequences threads vocabs.loader ;
+destructors dlists fry kernel locals sequences threads
+vocabs.loader ;
 IN: concurrency.mailboxes
 
 TUPLE: mailbox { threads dlist } { data dlist } ;
@@ -64,8 +65,9 @@ M: mailbox mailbox-get-timeout block-if-empty data>> pop-back ;
     f swap mailbox-get-timeout? ; inline
 
 : wait-for-close-timeout ( mailbox timeout -- )
-    over disposed>>
-    [ 2drop ] [ 2dup wait-for-mailbox wait-for-close-timeout ] if ;
+    '[
+        _ 2dup wait-for-mailbox wait-for-close-timeout
+    ] unless-disposed ;
 
 : wait-for-close ( mailbox -- )
     f wait-for-close-timeout ;
