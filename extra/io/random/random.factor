@@ -9,7 +9,7 @@ IN: io.random
 <PRIVATE
 
 : each-numbered-line ( ... quot: ( ... line number -- ... ) -- ... )
-    [ 1 ] dip '[ swap [ @ ] [ 1 + ] bi ] each-line drop ; inline
+    [ 1 ] dip '[ swap _ [ 1 + ] bi ] each-line drop ; inline
 
 PRIVATE>
 
