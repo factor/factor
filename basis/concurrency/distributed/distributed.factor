@@ -16,14 +16,6 @@ IN: concurrency.distributed
 : thread-connections ( -- hash )
     \ thread-connections get-global ;
 
-: get-thd-conn ( thread -- connection/f )
-    thread-connections at ;
-
-: set-thd-conn ( thread connection/f -- )
-    [ swap thread-connections set-at ] [
-        thread-connections delete-at
-    ] if* ;
-
 PRIVATE>
 
 : register-remote-thread ( thread name -- )
@@ -60,10 +52,12 @@ TUPLE: connection remote stream local ;
 C: <connection> connection
 
 : connect ( remote-thread -- )
-    dup node>> dup binary <client> <connection> set-thd-conn ;
+    [ node>> dup binary <client> <connection> ]
+    [ thread-connections set-at ] bi ;
 
 : disconnect ( remote-thread -- )
-    dup get-thd-conn [ stream>> dispose ] when* f set-thd-conn ;
+    [ thread-connections at [ stream>> dispose ] when* ]
+    [ thread-connections delete-at ] bi ;
 
 : with-connection ( remote-thread quot -- )
     '[ connect @ ] over [ disconnect ] curry [ ] cleanup ; inline
@@ -75,7 +69,7 @@ C: <connection> connection
     stream>> [ serialize flush ] with-stream* ;
 
 M: remote-thread send ( message thread -- )
-    [ id>> 2array ] [ node>> ] [ get-thd-conn ] tri
+    [ id>> 2array ] [ node>> ] [ thread-connections at ] tri
     [ nip send-to-connection ] [ send-remote-message ] if* ;
 
 M: thread (serialize) ( obj -- )
