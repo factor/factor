@@ -56,8 +56,8 @@ C: <connection> connection
     [ thread-connections set-at ] bi ;
 
 : disconnect ( remote-thread -- )
-    [ thread-connections at [ stream>> dispose ] when* ]
-    [ thread-connections delete-at ] bi ;
+    thread-connections delete-at*
+    [ stream>> dispose ] [ drop ] if ;
 
 : with-connection ( remote-thread quot -- )
     '[ connect @ ] over [ disconnect ] curry [ ] cleanup ; inline
