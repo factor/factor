@@ -13,6 +13,17 @@ IN: concurrency.distributed
 : registered-remote-threads ( -- hash )
    \ registered-remote-threads get-global ;
 
+: thread-connections ( -- hash )
+    \ thread-connections get-global ;
+
+: get-thd-conn ( thread -- connection/f )
+    thread-connections at ;
+
+: set-thd-conn ( thread connection/f -- )
+    [ swap thread-connections set-at ] [
+        thread-connections delete-at
+    ] if* ;
+
 PRIVATE>
 
 : register-remote-thread ( thread name -- )
@@ -40,20 +51,19 @@ SYMBOL: local-node
 : start-node ( addrspec -- )
     <node-server> start-server local-node set-global ;
 
-TUPLE: remote-thread node id connection ;
+TUPLE: remote-thread node id ;
 
-: <remote-thread> ( node id -- remote-thread )
-    f remote-thread boa ;
+C: <remote-thread> remote-thread
 
 TUPLE: connection remote stream local ;
 
 C: <connection> connection
 
 : connect ( remote-thread -- )
-    dup node>> dup binary <client> <connection> >>connection drop ;
+    dup node>> dup binary <client> <connection> set-thd-conn ;
 
 : disconnect ( remote-thread -- )
-    dup connection>> [ stream>> dispose ] when* f >>connection drop ;
+    dup get-thd-conn [ stream>> dispose ] when* f set-thd-conn ;
 
 : with-connection ( remote-thread quot -- )
     '[ connect @ ] over [ disconnect ] curry [ ] cleanup ; inline
@@ -65,7 +75,7 @@ C: <connection> connection
     stream>> [ serialize flush ] with-stream* ;
 
 M: remote-thread send ( message thread -- )
-    [ id>> 2array ] [ node>> ] [ connection>> ] tri
+    [ id>> 2array ] [ node>> ] [ get-thd-conn ] tri
     [ nip send-to-connection ] [ send-remote-message ] if* ;
 
 M: thread (serialize) ( obj -- )
@@ -76,4 +86,5 @@ M: thread (serialize) ( obj -- )
 
 [
     H{ } clone \ registered-remote-threads set-global
+    H{ } clone \ thread-connections set-global
 ] "remote-thread-registry" add-startup-hook
