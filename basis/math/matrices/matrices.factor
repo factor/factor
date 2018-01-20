@@ -6,21 +6,14 @@ sequences.private fry math.statistics grouping
 combinators.short-circuit math.ranges combinators.smart ;
 IN: math.matrices
 
-DEFER: eye
-<PRIVATE
-: keep-order ( ..a x quot: ( ..a x -- ..b ) -- ..b x )
-    [ dup ] dip call ; inline
-
-PRIVATE>
-
 ERROR: negative-power-matrix m n ;
 
 ! Matrices
 : make-matrix ( m n quot: ( ... -- elt ) -- matrix )
     '[ _ _ replicate ] replicate ; inline
 
-: make-matrix-with-indices ( m n quot -- matrix )
-    [ [ <iota> ] bi@ ] dip '[ @ ] cartesian-map ; inline
+: make-matrix-with-indices ( ... m n quot: ( ... m' n' -- ... elt ) -- ... matrix )
+    [ [ <iota> ] bi@ ] dip cartesian-map ; inline
 
 : <matrix> ( m n element -- matrix )
     '[ _ _ <array> ] replicate ; inline
@@ -32,23 +25,20 @@ ERROR: negative-power-matrix m n ;
     dup 0 <matrix> ; inline
 
 : diagonal-matrix ( diagonal-seq -- matrix )
-    [ length zero-square-matrix ] keep-order
+    [ length zero-square-matrix ] keep swap
     [ '[ dup _ nth set-nth ] each-index ] keep ; inline
 
 : identity-matrix ( n -- matrix )
     1 <repetition> diagonal-matrix ; inline
 
+! if m = n and k = 0 then identity-matrix is (possibly) faster
+:: simple-eye ( m n k -- matrix )
+    m n = k 0 = and [ n identity-matrix ] [ 1 eye ] if ;
+
 : eye ( m n k z -- matrix )
     [ [ <iota> ] bi@ ] 2dip
     '[ _ neg + = _ 0 ? ]
     cartesian-map ;
-
-! if m = n and k = 0 then identity-matrix is (possibly) faster
-: simple-eye ( m n k -- matrix )
-    3dup 0 [ = ] 2bi@ and
-    [ swap 2nip identity-matrix ]
-    [ 1 eye ]
-    if ;
 
 : hilbert-matrix ( m n -- matrix )
     [ <iota> ] bi@ [ + 1 + recip ] cartesian-map ;
@@ -209,10 +199,10 @@ PRIVATE>
 : cols ( seq matrix -- cols )
     '[ _ col ] map ; inline
 
-: matrix-set-nth ( n pair matrix -- )
+: matrix-set-nth ( obj pair matrix -- )
     [ first2 swap ] dip nth set-nth ; inline
 
-: matrix-set-nths ( n sequence matrix -- )
+: matrix-set-nths ( obj sequence matrix -- )
     '[ _ matrix-set-nth ] with each ; inline
 
 : matrix-map ( matrix quot -- )
