@@ -83,13 +83,13 @@ METHOD: (expr.) { □ } pprint ;
 : op. ( expr -- )
     "(" write
     [ x>> (expr.) ]
-    [ bl class pprint bl ]
+    [ bl class-of pprint bl ]
     [ y>> (expr.) ]
     tri
     ")" write ;
 
 METHOD: (expr.) { ⋀ } op. ;
 METHOD: (expr.) { ⋁ } op. ;
-METHOD: (expr.) { ¬ } [ class pprint ] [ x>> (expr.) ] bi ;
+METHOD: (expr.) { ¬ } [ class-of pprint ] [ x>> (expr.) ] bi ;
 
 : expr. ( expr -- ) (expr.) nl ;
