@@ -1,0 +1,1 @@
+Simple boolean expression evaluator and simplifier
