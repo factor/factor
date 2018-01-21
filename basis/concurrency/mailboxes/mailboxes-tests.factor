@@ -42,7 +42,7 @@ IN: concurrency.mailboxes.tests
     mailbox-get
 ] unit-test
 
-{ { "foo" "bar" } } [
+{ V{ "foo" "bar" } } [
     <mailbox>
     "foo" over mailbox-put
     "bar" over mailbox-put
