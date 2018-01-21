@@ -31,14 +31,15 @@ ERROR: negative-power-matrix m n ;
 : identity-matrix ( n -- matrix )
     1 <repetition> diagonal-matrix ; inline
 
-! if m = n and k = 0 then identity-matrix is (possibly) faster
-:: simple-eye ( m n k -- matrix )
-    m n = k 0 = and [ n identity-matrix ] [ 1 eye ] if ;
-
 : eye ( m n k z -- matrix )
     [ [ <iota> ] bi@ ] 2dip
     '[ _ neg + = _ 0 ? ]
     cartesian-map ;
+
+! if m = n and k = 0 then identity-matrix is (possibly) faster
+:: simple-eye ( m n k -- matrix )
+    m n = k 0 = and [ n identity-matrix ] [ 1 eye ] if ;
+
 
 : hilbert-matrix ( m n -- matrix )
     [ <iota> ] bi@ [ + 1 + recip ] cartesian-map ;
