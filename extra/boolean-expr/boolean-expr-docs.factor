@@ -9,23 +9,21 @@ ARTICLE: "boolean-expr" "Boolean expressions"
 "The " { $vocab-link "boolean-expr" } " vocab demonstrates the use of Unicode symbols in source files and multi-method dispatch."
 ;
 
-HELP: cnf
+HELP: dnf
 { $values
     { "expr" □ }
-    { "cnf" array }
+    { "dnf" array }
 }
-{ $description "Convert the " { $snippet "expr" } " to Conjuctive Normal Form (CNF), i.e. an array of subexpressions, each not containing conjunctions. See " { $url "https://en.wikipedia.org/wiki/Conjunctive_normal_form" } "." }
+{ $description "Convert the " { $snippet "expr" } " to Disjunctive Normal Form (DNF), i.e. an array of subexpressions, each not containing disjunctions. See " { $url "https://en.wikipedia.org/wiki/Disjunctive_normal_form" } "." }
 { $examples
     { $example "USING: boolean-expr prettyprint ;"
-        "X Y Z ⋀ ⋀ cnf ."
+        "X Y Z ⋀ ⋀ dnf ."
         "{ { X Y Z } }"
     }
     { $example "USING: boolean-expr prettyprint ;"
-        "X Y Z ⋁ ⋁ cnf ."
+        "X Y Z ⋁ ⋁ dnf ."
         "{ { X } { Y } { Z } }"
     }
-}
-{ $notes "Actually, looking at the exapmles above, to me it seems more like the Disjunctive Normal Form (DNF). Maybe the implementation needs to be fixed."
 } ;
 
 HELP: expr.

@@ -50,26 +50,27 @@ METHOD: ¬ { □ } \ ¬ boa ;
 : ⊕ ( x y -- expr ) [ ⋁ ] [ ⋀ ¬ ] 2bi ⋀ ;
 : ≣ ( x y -- expr ) [ ⋀ ] [ [ ¬ ] bi@ ⋀ ] 2bi ⋁ ;
 
-GENERIC: (cnf) ( expr -- cnf )
+GENERIC: (dnf) ( expr -- dnf )
 
-METHOD: (cnf) { ⋀ } [ x>> (cnf) ] [ y>> (cnf) ] bi append ;
-METHOD: (cnf) { □ } 1array ;
+METHOD: (dnf) { ⋀ } [ x>> (dnf) ] [ y>> (dnf) ] bi append ;
+METHOD: (dnf) { □ } 1array ;
 
-GENERIC: cnf ( expr -- cnf )
+GENERIC: dnf ( expr -- dnf )
 
-METHOD: cnf { ⋁ } [ x>> cnf ] [ y>> cnf ] bi append ;
-METHOD: cnf { □ } (cnf) 1array ;
+METHOD: dnf { ⋁ } [ x>> dnf ] [ y>> dnf ] bi append ;
+METHOD: dnf { □ } (dnf) 1array ;
 
 GENERIC: satisfiable? ( expr -- ? )
 
 METHOD: satisfiable? { ⊤ } drop t ;
 METHOD: satisfiable? { ⊥ } drop f ;
 
+! See if there is a term along with its negation in the conjunction seq.
 : (satisfiable?) ( seq -- ? )
     [ \ ¬ instance? ] partition swap [ x>> ] map intersect empty? ;
 
 METHOD: satisfiable? { □ }
-    cnf [ (satisfiable?) ] any? ;
+    dnf [ (satisfiable?) ] any? ;
 
 GENERIC: (expr.) ( expr -- )
 
