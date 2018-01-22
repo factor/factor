@@ -67,7 +67,7 @@ METHOD: satisfiable? { ⊥ } drop f ;
 
 ! See if there is a term along with its negation in the conjunction seq.
 : (satisfiable?) ( seq -- ? )
-    [ \ ¬ instance? ] partition swap [ x>> ] map intersect empty? ;
+    [ ¬? ] partition swap [ x>> ] map intersect empty? ;
 
 METHOD: satisfiable? { □ }
     dnf [ (satisfiable?) ] any? ;
