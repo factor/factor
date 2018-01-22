@@ -5,9 +5,6 @@ io prettyprint ;
 FROM: multi-methods => GENERIC: METHOD: ;
 IN: boolean-expr
 
-! Demonstrates the use of Unicode symbols in source files, and
-! multi-method dispatch.
-
 TUPLE: ⋀ x y ;
 TUPLE: ⋁ x y ;
 TUPLE: ¬ x ;
