@@ -30,10 +30,10 @@ HELP: ui-running?
 { $values { "?" boolean } }
 { $description "Whether the UI is running or not." } ;
 
-HELP: ui-windows
+HELP: worlds
 { $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." } ;
 
-{ ui-windows open-window find-window world-attributes } related-words
+{ worlds open-window find-window world-attributes } related-words
 
 HELP: world-attributes
 { $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } { "window-controls" sequence } }
@@ -63,12 +63,12 @@ HELP: find-window
 
 HELP: register-window
 { $values { "world" world } { "handle" "a backend-specific handle" } }
-{ $description "Adds a window to the global " { $link ui-windows } " variable." }
+{ $description "Adds a window to the global " { $link worlds } " variable." }
 { $notes "This word should only be called by the UI backend. User code can open new windows with " { $link open-window } "." } ;
 
 HELP: unregister-window
 { $values { "handle" "a backend-specific handle" } }
-{ $description "Removes a window from the global " { $link ui-windows } " variable." }
+{ $description "Removes a window from the global " { $link worlds } " variable." }
 { $notes "This word should only be called only by the UI backend, and not user code." } ;
 
 HELP: (with-ui)
@@ -126,7 +126,7 @@ ARTICLE: "building-ui" "Building user interfaces"
     "ui-geometry"
     "ui-layouts"
     "gadgets"
-    "ui-windows"
+    "ui-worlds"
     "ui.gadgets.status-bar"
 }
 { $see-also "models" } ;
@@ -160,13 +160,13 @@ ARTICLE: "ui-geometry" "Gadget geometry"
     children-on
 } ;
 
-ARTICLE: "ui-windows" "Top-level windows"
+ARTICLE: "ui-worlds" "Top-level windows"
 "Opening a top-level window:"
 { $subsections open-window }
 "Finding top-level windows:"
 { $subsections find-window }
 "Top-level windows are stored in a global variable:"
-{ $subsections ui-windows }
+{ $subsections worlds }
 "When a gadget is displayed in a top-level window, or added to a parent which is already showing in a top-level window, a generic word is called allowing the gadget to perform initialization tasks:"
 { $subsections graft* }
 "When the gadget is removed from a parent shown in a top-level window, or when the top-level window is closed, a corresponding generic word is called to clean up:"

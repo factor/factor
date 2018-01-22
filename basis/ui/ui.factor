@@ -11,10 +11,10 @@ IN: ui
 
 <PRIVATE
 
-! Assoc mapping aliens to gadgets
-SYMBOL: ui-windows
+! Assoc mapping aliens to worlds
+SYMBOL: worlds
 
-: window ( handle -- world ) ui-windows get-global at ;
+: window ( handle -- world ) worlds get-global at ;
 
 : register-window ( world handle -- )
     ! Add the new window just below the topmost window. Why?
@@ -23,15 +23,15 @@ SYMBOL: ui-windows
     ! in the new window when it appears) Factor doesn't get
     ! confused and send workspace operations to the new window,
     ! etc.
-    swap 2array ui-windows get-global push
-    ui-windows get-global dup length 1 >
+    swap 2array worlds get-global push
+    worlds get-global dup length 1 >
     [ [ length 1 - dup 1 - ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
-    ui-windows [ [ first = ] with reject ] change-global ;
+    worlds [ [ first = ] with reject ] change-global ;
 
 : raised-window ( world -- )
-    ui-windows get-global
+    worlds get-global
     [ [ second eq? ] with find drop ] keep
     [ nth ] [ remove-nth! drop ] [ nip ] 2tri push ;
 
@@ -105,7 +105,7 @@ M: world ungraft*
     <dlist> \ graft-queue set-global
     100 <vector> \ layout-queue set-global
     <dlist> \ gesture-queue set-global
-    V{ } clone ui-windows set-global ;
+    V{ } clone worlds set-global ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
@@ -141,7 +141,7 @@ SYMBOL: ui-running
 PRIVATE>
 
 : find-windows ( quot: ( world -- ? ) -- seq )
-    [ ui-windows get-global values ] dip
+    [ worlds get-global values ] dip
     '[ dup children>> [ ] [ nip first ] if-empty @ ]
     filter ; inline
 
@@ -205,7 +205,7 @@ PRIVATE>
     find-world raise-window* ;
 
 : topmost-window ( -- world )
-    ui-windows get-global last second ;
+    worlds get-global last second ;
 
 HOOK: close-window ui-backend ( gadget -- )
 
