@@ -65,11 +65,8 @@ GENERIC: satisfiable? ( expr -- ? )
 METHOD: satisfiable? { ⊤ } drop t ;
 METHOD: satisfiable? { ⊥ } drop f ;
 
-: partition ( seq quot -- left right )
-    [ [ not ] compose filter ] [ filter ] 2bi ; inline
-
 : (satisfiable?) ( seq -- ? )
-    [ \ ¬ instance? ] partition [ x>> ] map intersect empty? ;
+    [ \ ¬ instance? ] partition swap [ x>> ] map intersect empty? ;
 
 METHOD: satisfiable? { □ }
     cnf [ (satisfiable?) ] any? ;
