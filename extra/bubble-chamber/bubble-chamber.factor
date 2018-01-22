@@ -1,8 +1,10 @@
-USING: accessors arrays calendar colors colors.gray
+USING: accessors arrays ascii calendar colors colors.gray
 combinators.short-circuit frame-buffer kernel locals math
 math.constants math.functions math.libm math.order math.points
 math.ranges math.vectors namespaces opengl processing.shapes
-random sequences threads ui ui.gadgets ui.gestures ;
+quotations random sequences splitting threads ui ui.gadgets
+ui.gadgets.borders ui.gadgets.buttons ui.gadgets.packs
+ui.gestures ;
 
 IN: bubble-chamber
 
@@ -498,3 +500,14 @@ bubble-chamber H{
      111 [ <axion>  add-particle ] times
     dup particles>> [ collide randomize-collision-theta ] each
     drop ;
+
+MAIN-WINDOW: run-bubble-chamber { { title "Bubble Chamber" } }
+    <pile> 1 >>fill { 2 2 } >>gap {
+        original small medium large hadron-chamber
+        quark-chamber muon-chamber ten-hadrons
+        original-big-bang original-big-bang-variant
+    } [
+        [ name>> "-" " " replace >title ]
+        [ 1quotation [ drop ] prepend ] bi
+        <border-button> add-gadget
+    ] each { 2 2 } <border> >>gadgets ;
