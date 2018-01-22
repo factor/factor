@@ -9,7 +9,7 @@ IN: demos
     dup '[ drop [ _ run ] \ run call-listener ] <border-button> ;
 
 : <demo-runner> ( -- gadget )
-    <pile> 1 >>fill { 2 2 } >>gap demo-vocabs [ <run-vocab-button> add-gadget ] each ;
+    <filled-pile> { 2 2 } >>gap demo-vocabs [ <run-vocab-button> add-gadget ] each ;
 
 MAIN-WINDOW: demos { { title "Demos" } }
     <demo-runner> { 2 2 } <border> <scroller> >>gadgets ;
