@@ -41,20 +41,18 @@ TUPLE: merge-state
     push-all-unsafe ; inline
 
 : l-next ( merge -- )
-    [ [ l-elt ] [ [ 1 + ] change-from1 drop ] bi ] [ accum>> ] bi
-    push-unsafe ; inline
+    [ l-elt ] [ [ 1 + ] change-from1 accum>> ] bi push-unsafe ; inline
 
 : r-next ( merge -- )
-    [ [ r-elt ] [ [ 1 + ] change-from2 drop ] bi ] [ accum>> ] bi
-    push-unsafe ; inline
+    [ r-elt ] [ [ 1 + ] change-from2 accum>> ] bi push-unsafe ; inline
 
-: decide ( merge quot: ( elt1 elt2 -- <=> ) -- ? )
+: decide? ( merge quot: ( elt1 elt2 -- <=> ) -- ? )
     [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
 
 : (merge) ( merge quot: ( elt1 elt2 -- <=> ) -- )
     over r-done? [ drop dump-l ] [
         over l-done? [ drop dump-r ] [
-            2dup decide
+            2dup decide?
             [ over r-next ] [ over l-next ] if
             (merge)
         ] if
