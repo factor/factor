@@ -17,12 +17,7 @@ ERROR: not-a-vocab-root string ;
 <PRIVATE
 
 : vocab-root? ( string -- ? )
-    trim-tail-separators
-    vocab-roots get member? ;
-
-: contains-dot? ( string -- ? ) ".." swap subseq? ;
-
-: contains-separator? ( string -- ? ) [ path-separator? ] any? ;
+    trim-tail-separators vocab-roots get member? ;
 
 : ensure-vocab-exists ( string -- string )
     dup loaded-vocab-names member? [ no-vocab ] unless ;
@@ -41,8 +36,7 @@ ERROR: not-a-vocab-root string ;
     [ ] [ replace-vocab-separators ] bi* append-path ;
 
 : vocab>path ( vocab -- path )
-    check-vocab
-    [ find-vocab-root ] keep vocab-root/vocab>path ;
+    check-vocab [ find-vocab-root ] keep vocab-root/vocab>path ;
 
 : vocab-root/vocab/file>path ( vocab-root vocab file -- path )
     [ vocab-root/vocab>path ] dip append-path ;
@@ -147,12 +141,9 @@ M: string add-using drop ;
 M: object add-using ( object -- )
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
 
-: 4bl ( -- )
-    "    " write ; inline
-
 : ($values.) ( array -- )
     [
-        4bl
+        "    " write
         [ bl ] [
             "{ " write
             dup array? [ first ] when
@@ -186,16 +177,13 @@ M: object add-using ( object -- )
     ] when* ;
 
 : class-description. ( word -- )
-    drop
-    "{ $class-description \"\" } ;" print ;
+    drop "{ $class-description \"\" } ;" print ;
 
 : symbol-description. ( word -- )
-    drop
-    "{ $var-description \"\" } ;" print ;
+    drop "{ $var-description \"\" } ;" print ;
 
 : $description. ( word -- )
-    drop
-    "{ $description \"\" } ;" print ;
+    drop "{ $description \"\" } ;" print ;
 
 : docs-body. ( word/symbol -- )
     {
