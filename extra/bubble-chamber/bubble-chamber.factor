@@ -313,13 +313,13 @@ M:: quark move ( QUARK -- )
     dup out-of-bounds? [ collide ] [ drop ] if ;
 
 TUPLE: bubble-chamber < frame-buffer
-  paused particles collision-theta size timer ;
+  particles collision-theta size timer ;
 
 M: bubble-chamber graft*
     [ timer>> start-timer yield ] [ call-next-method ] bi ;
 
 M: bubble-chamber ungraft*
-    [ timer>> stop-timer ] [ t >>paused call-next-method ] bi ;
+    [ timer>> stop-timer ] [ call-next-method ] bi ;
 
 ! : randomize-collision-theta ( bubble-chamber -- bubble-chamber )
 !     0  2 pi *  0.001  <range>  random >>collision-theta ;
