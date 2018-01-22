@@ -17,11 +17,11 @@ M: biassoc at* from>> at* ; inline
 
 M: biassoc value-at* to>> at* ; inline
 
-: once-at ( value key assoc -- )
+: set-at-once ( value key assoc -- )
     2dup key? [ 3drop ] [ set-at ] if ;
 
 M: biassoc set-at
-    [ from>> set-at ] [ swapd to>> once-at ] 3bi ;
+    [ from>> set-at ] [ swapd to>> set-at-once ] 3bi ;
 
 ERROR: no-biassoc-deletion ;
 
