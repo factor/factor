@@ -9,7 +9,7 @@ HELP: instruction-count
 }
 { $description "The word returns the CPU's Timestamp Counter: " { $url "http://en.wikipedia.org/wiki/Time_Stamp_Counter" } "." } ;
 
-ARTICLE: "cpu.x86.features" "cpu.x86.features"
+ARTICLE: "cpu.x86.features" "CPU x86 features"
 { $vocab-link "cpu.x86.features" }
 ;
 
