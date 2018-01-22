@@ -502,7 +502,7 @@ bubble-chamber H{
     drop ;
 
 MAIN-WINDOW: run-bubble-chamber { { title "Bubble Chamber" } }
-    <pile> 1 >>fill { 2 2 } >>gap {
+    <filled-pile> { 2 2 } >>gap {
         original small medium large hadron-chamber
         quark-chamber muon-chamber ten-hadrons
         original-big-bang original-big-bang-variant
