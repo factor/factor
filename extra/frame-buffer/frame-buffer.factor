@@ -41,28 +41,20 @@ GENERIC: update-frame-buffer ( frame-buffer -- )
 : update-last-dim ( frame-buffer -- ) dup dim>> >>last-dim drop ;
 
 M:: frame-buffer layout* ( FRAME-BUFFER -- )
-  {
-      {
-          [ FRAME-BUFFER last-dim>> f = ]
-          [
-              FRAME-BUFFER init-frame-buffer-pixels
-              FRAME-BUFFER update-last-dim
-          ]
-      }
-      {
-          [ FRAME-BUFFER [ dim>> ] [ last-dim>> ] bi = not ]
-          [
-              FRAME-BUFFER pixels>> :> OLD-PIXELS
-              FRAME-BUFFER last-dim>> first :> OLD-WIDTH
-              FRAME-BUFFER init-frame-buffer-pixels
-              FRAME-BUFFER update-last-dim
-              FRAME-BUFFER pixels>> :> NEW-PIXELS
-              FRAME-BUFFER last-dim>> first :> NEW-WIDTH
-              OLD-PIXELS OLD-WIDTH NEW-PIXELS NEW-WIDTH copy-pixels
-          ]
-      }
-      [ ]
-  } cond ;
+    FRAME-BUFFER last-dim>> [
+        FRAME-BUFFER dim>> = [
+            FRAME-BUFFER pixels>> :> OLD-PIXELS
+            FRAME-BUFFER last-dim>> first :> OLD-WIDTH
+            FRAME-BUFFER init-frame-buffer-pixels
+            FRAME-BUFFER update-last-dim
+            FRAME-BUFFER pixels>> :> NEW-PIXELS
+            FRAME-BUFFER last-dim>> first :> NEW-WIDTH
+            OLD-PIXELS OLD-WIDTH NEW-PIXELS NEW-WIDTH copy-pixels
+        ] unless
+    ] [
+        FRAME-BUFFER init-frame-buffer-pixels
+        FRAME-BUFFER update-last-dim
+    ] if* ;
 
 M:: frame-buffer draw-gadget* ( FRAME-BUFFER -- )
     FRAME-BUFFER dim>> { 0 1 } v* first2 glRasterPos2i
