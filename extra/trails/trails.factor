@@ -17,13 +17,13 @@ IN: trails
 
 : dot ( pos percent -- ) percent->radius draw-circle ;
 
-TUPLE: trails-gadget < gadget paused points timer ;
+TUPLE: trails-gadget < gadget points timer ;
 
 M: trails-gadget graft*
     [ timer>> start-timer yield ] [ call-next-method ] bi ;
 
 M: trails-gadget ungraft*
-    [ timer>> stop-timer ] [ t >>paused call-next-method ] bi ;
+    [ timer>> stop-timer ] [ call-next-method ] bi ;
 
 :: iterate-system ( GADGET -- )
     ! Add a valid point if the mouse is in the gadget
