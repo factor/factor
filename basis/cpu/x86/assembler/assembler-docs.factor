@@ -49,7 +49,7 @@ HELP: zero-extendable?
 { $values { "imm" integer } { "?" boolean } }
 { $description "All positive 32-bit numbers are zero extendable except for 0 which is the value used for relocations." } ;
 
-ARTICLE: "cpu.x86.assembler" "X86 assembler"
+ARTICLE: "cpu.x86.assembler" "CPU x86 assembler"
 "This vocab implements an assembler for x86 architectures."
 $nl
 "General instructions:"
