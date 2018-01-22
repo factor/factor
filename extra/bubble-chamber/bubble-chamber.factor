@@ -1,8 +1,8 @@
 USING: accessors arrays calendar colors colors.gray
 combinators.short-circuit frame-buffer kernel locals math
 math.constants math.functions math.libm math.order math.points
-math.ranges math.vectors namespaces processing.shapes random
-sequences threads ui ui.gadgets ui.gestures ;
+math.ranges math.vectors namespaces opengl processing.shapes
+random sequences threads ui ui.gadgets ui.gestures ;
 
 IN: bubble-chamber
 
@@ -24,6 +24,14 @@ IN: bubble-chamber
 
 : mouse-x ( -- x ) mouse first  ;
 : mouse-y ( -- y ) mouse second ;
+
+: draw ( point -- )
+    gl-scale-factor get-global [
+        stroke-color get fill-color set
+        >integer draw-circle
+    ] [
+        draw-point
+    ] if* ;
 
 GENERIC: collide ( particle -- )
 GENERIC: move    ( particle -- )
@@ -103,13 +111,13 @@ M: axion collide
 : axion-white ( dy -- dy ) dup 1 swap dy>alpha gray boa stroke-color set ;
 : axion-black ( dy -- dy ) dup 0 swap dy>alpha gray boa stroke-color set ;
 
-: axion-point- ( particle dy -- particle ) [ dup pos>> ] dip v-y draw-point ;
-: axion-point+ ( particle dy -- particle ) [ dup pos>> ] dip v+y draw-point ;
+: axion-point- ( particle dy -- particle ) [ dup pos>> ] dip v-y draw ;
+: axion-point+ ( particle dy -- particle ) [ dup pos>> ] dip v+y draw ;
 
 M: axion move
 
   T{ gray f 0.06 0.59 } stroke-color set
-  dup pos>> draw-point
+  dup pos>> draw
 
   1 4 [a,b] [ axion-white axion-point- ] each
   1 4 [a,b] [ axion-black axion-point+ ] each
@@ -155,8 +163,8 @@ M: hadron collide
 
 M: hadron move
 
-  T{ gray f 1 0.11 } stroke-color set  dup pos>> 1 v-y draw-point
-  T{ gray f 0 0.11 } stroke-color set  dup pos>> 1 v+y draw-point
+  T{ gray f 1 0.11 } stroke-color set  dup pos>> 1 v-y draw
+  T{ gray f 0 0.11 } stroke-color set  dup pos>> 1 v+y draw
 
   dup vel>> move-by
 
@@ -243,10 +251,10 @@ M:: muon move ( MUON -- )
     MUON
 
     dup myc>> >rgba-components drop 0.16 <rgba> stroke-color set
-    dup pos>> draw-point
+    dup pos>> draw
 
     dup mya>> >rgba-components drop 0.16 <rgba> stroke-color set
-    dup pos>> first2 [ WIDTH swap - ] dip 2array draw-point
+    dup pos>> first2 [ WIDTH swap - ] dip 2array draw
 
     dup
     [ speed>> ] [ theta>> [ sin ] [ cos ] bi 2array ] bi n*v
@@ -283,9 +291,9 @@ M:: quark move ( QUARK -- )
     QUARK
 
     dup myc>> >rgba-components drop 0.13 <rgba> stroke-color set
-    dup pos>> draw-point
+    dup pos>> draw
 
-    dup pos>> first2 [ WIDTH swap - ] dip 2array draw-point
+    dup pos>> first2 [ WIDTH swap - ] dip 2array draw
 
     [ ] [ vel>> ] bi move-by
 
