@@ -671,16 +671,16 @@ HELP: NAN:
 HELP: GENERIC:
 { $syntax "GENERIC: word ( stack -- effect )" }
 { $values { "word" "a new word to define" } }
-{ $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." } ;
+{ $description "Defines a new generic word in the current vocabulary. The word dispatches on the topmost stack element. Initially it contains no methods, and thus will throw a " { $link no-method } " error when called." } ;
 
 HELP: GENERIC#:
 { $syntax "GENERIC#: word n ( stack -- effect )" }
 { $values { "word" "a new word to define" } { "n" "the stack position to dispatch on" } }
-{ $description "Defines a new generic word which dispatches on the " { $snippet "n" } "th most element from the top of the stack in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
+{ $description "Defines a new generic word in the current vocabulary. The word dispatches on the " { $snippet "n" } "th element from the top of the stack. Initially it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "The following two definitions are equivalent:"
-    { $code "GENERIC: foo ( obj -- )" }
-    { $code "GENERIC#: foo 0 ( obj -- )" }
+    { $code "GENERIC: foo ( x y z obj -- )" }
+    { $code "GENERIC#: foo 0 ( x y z obj -- )" }
 } ;
 
 HELP: MATH:
