@@ -29,19 +29,19 @@ IN: fuel
 SYMBOL: :uses
 SYMBOL: :uses-suggestions
 
-: is-use-restart ( restart -- ? )
+: is-use-restart? ( restart -- ? )
     name>> [ "Use the " head? ] [ " vocabulary" tail? ] bi and ;
 
 : get-restart-vocab ( restart -- vocab/f )
     obj>> dup word? [ vocabulary>> ] [ drop f ] if ;
 
-: is-suggested-restart ( restart -- ? )
-    dup is-use-restart [
+: is-suggested-restart? ( restart -- ? )
+    dup is-use-restart? [
         get-restart-vocab :uses-suggestions get member?
     ] [ drop f ] if ;
 
 : try-suggested-restarts ( -- )
-    restarts get [ is-suggested-restart ] filter
+    restarts get [ is-suggested-restart? ] filter
     dup length 1 = [ first continue-restart ] [ drop ] if ;
 
 : set-use-hook ( -- )
