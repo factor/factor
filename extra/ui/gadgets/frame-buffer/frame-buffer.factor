@@ -2,7 +2,7 @@ USING: accessors alien.c-types alien.data combinators grouping
 kernel locals math math.vectors opengl opengl.gl sequences
 specialized-arrays ui.gadgets ui.render ;
 SPECIALIZED-ARRAY: uint
-IN: frame-buffer
+IN: ui.gadgets.frame-buffer
 
 TUPLE: frame-buffer < gadget pixels last-dim ;
 
