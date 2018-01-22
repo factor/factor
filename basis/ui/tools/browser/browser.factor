@@ -226,6 +226,8 @@ browser-gadget "multi-touch" f {
 } define-command-map
 
 browser-gadget "touchbar" f {
+    { f com-back }
+    { f com-forward }
     { f com-home }
     { f browser-help }
     { f glossary }
