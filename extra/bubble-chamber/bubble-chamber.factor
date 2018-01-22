@@ -1,10 +1,10 @@
 USING: accessors arrays ascii calendar colors colors.gray
-combinators.short-circuit frame-buffer kernel locals math
+combinators.short-circuit frame-buffer fry kernel locals math
 math.constants math.functions math.libm math.order math.points
 math.ranges math.vectors namespaces opengl processing.shapes
-quotations random sequences splitting threads ui ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.packs
-ui.gestures ;
+quotations random sequences splitting threads timers ui
+ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.packs ui.gestures ;
 
 IN: bubble-chamber
 
@@ -313,7 +313,13 @@ M:: quark move ( QUARK -- )
     dup out-of-bounds? [ collide ] [ drop ] if ;
 
 TUPLE: bubble-chamber < frame-buffer
-  paused particles collision-theta size ;
+  paused particles collision-theta size timer ;
+
+M: bubble-chamber graft*
+    [ timer>> start-timer yield ] [ call-next-method ] bi ;
+
+M: bubble-chamber ungraft*
+    [ timer>> stop-timer ] [ t >>paused call-next-method ] bi ;
 
 ! : randomize-collision-theta ( bubble-chamber -- bubble-chamber )
 !     0  2 pi *  0.001  <range>  random >>collision-theta ;
@@ -325,8 +331,6 @@ TUPLE: bubble-chamber < frame-buffer
 
 M: bubble-chamber pref-dim* ( gadget -- dim ) size>> ;
 
-M: bubble-chamber ungraft* ( bubble-chamber -- ) t >>paused drop ;
-
 : iterate-particle ( particle -- ) move ;
 
 M:: bubble-chamber update-frame-buffer ( BUBBLE-CHAMBER -- )
@@ -334,25 +338,15 @@ M:: bubble-chamber update-frame-buffer ( BUBBLE-CHAMBER -- )
 
 : iterate-system ( bubble-chamber -- ) drop ;
 
-:: start-bubble-chamber-thread ( GADGET -- )
-    GADGET f >>paused drop [
-        [
-            GADGET paused>>
-            [ f ]
-            [ GADGET iterate-system GADGET relayout-1 1 milliseconds sleep t ]
-            if
-        ] loop
-    ] in-thread ;
-
 : <bubble-chamber> ( -- bubble-chamber )
     bubble-chamber new
-    { 1000 1000 } >>size
-    randomize-collision-theta ;
+        { 1000 1000 } >>size
+        randomize-collision-theta
+        dup '[ _ dup iterate-system relayout-1 ]
+        f 10 milliseconds <timer> >>timer ;
 
 : bubble-chamber-window ( -- bubble-chamber )
-    <bubble-chamber>
-    dup start-bubble-chamber-thread
-    dup "Bubble Chamber" open-window ;
+    <bubble-chamber> dup "Bubble Chamber" open-window ;
 
 :: add-particle ( BUBBLE-CHAMBER PARTICLE -- bubble-chamber )
     PARTICLE BUBBLE-CHAMBER >>bubble-chamber drop
@@ -428,10 +422,8 @@ bubble-chamber H{
     drop ;
 
 : small ( -- )
-    bubble-chamber new
+    <bubble-chamber>
     { 200 200 } >>size
-    randomize-collision-theta
-    dup start-bubble-chamber-thread
     dup "Bubble Chamber" open-window
 
     42 [ <muon>   add-particle ] times
@@ -443,10 +435,8 @@ bubble-chamber H{
     drop ;
 
 : medium ( -- )
-    bubble-chamber new
+    <bubble-chamber>
     { 400 400 } >>size
-    randomize-collision-theta
-    dup start-bubble-chamber-thread
     dup "Bubble Chamber" open-window
 
     100 [ <muon>   add-particle ] times
@@ -458,10 +448,8 @@ bubble-chamber H{
     drop ;
 
 : large ( -- )
-    bubble-chamber new
+    <bubble-chamber>
     { 600 600 } >>size
-    randomize-collision-theta
-    dup start-bubble-chamber-thread
     dup "Bubble Chamber" open-window
 
     550 [ <muon>   add-particle ] times
@@ -481,7 +469,6 @@ bubble-chamber H{
 : original-big-bang ( -- )
     <bubble-chamber>
     { 1000 1000 } >>size
-    dup start-bubble-chamber-thread
     dup "Bubble Chamber" open-window
 
     1789 [ <muon>   add-particle ] times
