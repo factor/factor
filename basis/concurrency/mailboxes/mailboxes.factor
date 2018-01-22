@@ -47,10 +47,10 @@ M: mailbox mailbox-get-timeout block-if-empty data>> pop-back ;
 : mailbox-get ( mailbox -- obj )
     f mailbox-get-timeout ; inline
 
-: mailbox-get-all-timeout ( mailbox timeout -- array )
+: mailbox-get-all-timeout ( mailbox timeout -- seq )
     block-if-empty data>> [ ] collector [ slurp-deque ] dip ;
 
-: mailbox-get-all ( mailbox -- array )
+: mailbox-get-all ( mailbox -- seq )
     f mailbox-get-all-timeout ;
 
 : while-mailbox-empty ( mailbox quot -- )

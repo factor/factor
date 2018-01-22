@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel arrays calendar ;
+USING: help.markup help.syntax kernel calendar sequences ;
 IN: concurrency.mailboxes
 
 HELP: <mailbox>
@@ -29,15 +29,19 @@ HELP: block-if-empty
 { $values { "mailbox" mailbox }
     { "timeout" { $maybe duration } }
 }
-{ $description "Block the thread if the mailbox is empty." } ;
+{ $description "Block the thread for " { $snippet "timeout" } " if the mailbox is empty." } ;
 
 HELP: mailbox-get
 { $values { "mailbox" mailbox } { "obj" object } }
 { $description "Get the first item put into the mailbox. If it is empty, the thread blocks until an item is put into it. The thread then resumes, leaving the item on the stack." } ;
 
+HELP: mailbox-get-all-timeout
+{ $values { "mailbox" mailbox } { "timeout" { $maybe duration } } { "seq" sequence } }
+{ $description "Blocks the thread for " { $snippet "timeout" } " if the mailbox is empty, then removes all objects in the mailbox and returns a sequence containing the objects." } ;
+
 HELP: mailbox-get-all
-{ $values { "mailbox" mailbox } { "array" array } }
-{ $description "Blocks the thread if the mailbox is empty, otherwise removes all objects in the mailbox and returns an array containing the objects." } ;
+{ $values { "mailbox" mailbox } { "seq" sequence } }
+{ $description "Blocks the thread if the mailbox is empty, then removes all objects in the mailbox and returns a sequence containing the objects." } ;
 
 HELP: while-mailbox-empty
 { $values { "mailbox" mailbox }
@@ -69,7 +73,10 @@ ARTICLE: "concurrency.mailboxes" "Mailboxes"
     mailbox-get-timeout?
 }
 "Emptying out a mailbox:"
-{ $subsections mailbox-get-all }
+{ $subsections
+    mailbox-get-all
+    mailbox-get-all-timeout
+}
 "Adding an element:"
 { $subsections mailbox-put }
 "Testing if a mailbox is empty:"
