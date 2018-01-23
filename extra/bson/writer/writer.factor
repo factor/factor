@@ -13,8 +13,6 @@ IN: bson.writer
 CONSTANT: INT32-SIZE 4
 CONSTANT: INT64-SIZE 8
 
-PRIVATE>
-
 TYPED: get-output ( -- stream: byte-vector )
     output-stream get ; inline
 
@@ -31,8 +29,6 @@ TYPED: with-length ( quot -- bytes-written: integer start-index: integer )
 
 : with-length-prefix-excl ( quot: ( .. -- .. ) -- )
     [ 4 - ] (with-length-prefix) ; inline
-
-<PRIVATE
 
 : write-le ( x n -- )
     <iota> [ nth-byte write1 ] with each ; inline
