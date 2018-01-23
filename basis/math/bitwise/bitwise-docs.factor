@@ -470,10 +470,11 @@ $nl
     W-
     W*
 }
-"Converting a number to the nearest even/odd:"
+"Converting a number to the nearest even/odd/signed:"
 { $subsections
     >even
     >odd
+    >signed
 }
 "Bitfields:"
 { $subsections
