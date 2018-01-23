@@ -7,7 +7,7 @@ HELP: STRING:
 
 HELP: /*
 { $syntax "/* comment */" }
-{ $description "Provides C-like comments that can span multiple lines. One caveat is that " { $snippet "/*" } " and " { $snippet "*/" } " are still tokens and must not appear in the comment text itself." }
+{ $description "Provides C-like comments that can span multiple lines. One caveat is that " { $snippet "/*" } " and " { $snippet "*/" } " are still tokens and must not appear in the comment text itself. Another caveat is that, unlike in C, the whitespace space after the " { $snippet "/*" } " is mandatory." }
 { $examples
     { $example "USING: multiline ;"
            "/* I think that I shall never see"
