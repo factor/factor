@@ -3,8 +3,8 @@
 USING: accessors alien alien.data alien.libraries alien.strings
 continuations fry init io.encodings.utf16n kernel literals math
 namespaces sequences ui.backend.windows ui.gadgets.worlds
-ui.gestures windows.messages windows.shell32 windows.types
-windows.user32 ;
+ui.gestures windows.errors windows.messages windows.shell32
+windows.types windows.user32 ;
 IN: windows.dropfiles
 
 : filecount-from-hdrop ( hdrop -- n )
