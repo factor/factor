@@ -8,7 +8,11 @@ USING:
     tools.test ;
 IN: openssl.libcrypto.tests
 
-{ t } [ "factorcode.org:80" BIO_new_connect bio_st? ] unit-test
+{ t 1 } [
+    "factorcode.org:80" BIO_new_connect [
+        bio_st?
+    ] keep BIO_free
+] unit-test
 
 { 1 1 } [
     "factorcode.org:80" BIO_new_connect [
