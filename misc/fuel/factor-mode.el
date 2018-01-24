@@ -219,15 +219,13 @@ these lines in your .emacs:
     "FOREIGN-ATOMIC-TYPE:" "FOREIGN-ENUM-TYPE:" "FOREIGN-RECORD-TYPE:" "FUNCTION-ALIAS:"
     ";FUNCTOR>"
     "GIR:"
-    "GLSL-SHADER:" "GLSL-PROGRAM:"
     "initial:" "IMPLEMENT-STRUCTS:"
     "MATH:"
     "METHOD:"
-    "PRIVATE>" "PROTOCOL:" "PROVIDE:"
+    "PRIVATE>" "PROTOCOL:"
     "read-only"
     "STRING:" "SYNTAX:"
-    "UNIFORM-TUPLE:"
-    "VARIANT:" "VERTEX-FORMAT:"))
+    "VARIANT:"))
 
 (defconst factor-parsing-words-regex
   (format "\\(?:^\\| \\)%s" (regexp-opt factor-parsing-words 'symbols)))
@@ -297,7 +295,8 @@ these lines in your .emacs:
 (defconst factor-symbol-definition-regex
   (syntax-and-1-symbol
    '("&" "CONSTANT" "DESTRUCTOR" "EBNF" "FORGET" "FUNCTOR"
-     "GAME" "HELP" "LIBRARY" "MAIN" "MAIN-WINDOW" "SLOT" "STRING"
+     "GAME" "GLSL-PROGRAM" "GLSL-SHADER"
+     "HELP" "LIBRARY" "MAIN" "MAIN-WINDOW" "SLOT" "STRING"
      "SYMBOL" "VAR")))
 
 ;; [parsing-word] [symbol-word]* ;
@@ -309,9 +308,12 @@ these lines in your .emacs:
    (syntax-begin '("INTERSECTION" "SINGLETONS" "SPECIALIZED-ARRAYS"))
    ws+ symbols-to-semicolon))
 
+;; [parsing-word] [type-word]
 (defconst factor-type-definition-regex
   (syntax-and-1-symbol
-   '("COM-INTERFACE" "C-TYPE" "MIXIN" "SINGLETON" "SPECIALIZED-ARRAY"
+   '("COM-INTERFACE" "C-TYPE" "MIXIN"
+     "GLSL-SHADER-FILE"
+     "SINGLETON" "SPECIALIZED-ARRAY" "SPECIALIZED-VECTOR"
      "TUPLE-ARRAY")))
 
 (defconst factor-constructor-regex
@@ -342,7 +344,7 @@ these lines in your .emacs:
                 "CONSTANT:" "C-GLOBAL:" "C-TYPE:"
                 "DEFER:" "DESTRUCTOR:"
                 "FORGET:"
-                "GAME:" "GENERIC:" "GENERIC#:" "GLSL-PROGRAM:"
+                "GAME:" "GENERIC:" "GENERIC#:"
                 "HOOK:"
                 "IN:" "INSTANCE:"
                 "LIBRARY:"
@@ -477,8 +479,10 @@ these lines in your .emacs:
                      "PROTOCOL"
                      "STRUCT"
                      "TUPLE"
+                     "UNIFORM-TUPLE"
                      "UNION"
-                     "UNION-STRUCT"))
+                     "UNION-STRUCT"
+                     "VERTEX-FORMAT"))
        symbol
        symbol)
      (1 'factor-font-lock-parsing-word)
