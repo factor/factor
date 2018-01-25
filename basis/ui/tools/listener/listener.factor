@@ -56,6 +56,9 @@ M: word-completion (word-at-caret)
         '[ _ _ search-manifest ] [ drop f ] recover
     ] [ drop f ] if* ;
 
+M: vocab-word-completion (word-at-caret)
+    vocab-name>> lookup-word ;
+
 M: char-completion (word-at-caret) 2drop f ;
 
 M: path-completion (word-at-caret) 2drop f ;
