@@ -84,6 +84,9 @@ PRIVATE>
 : vocabs-matching ( str -- seq )
     all-disk-vocabs-recursive filter-vocabs name-completions ;
 
+: vocab-words-matching ( str vocab -- seq )
+    vocab-words name-completions ;
+
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;
 
@@ -114,8 +117,10 @@ PRIVATE>
 <PRIVATE
 
 : (complete-single-vocab?) ( str -- ? )
-    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
-    member? ; inline
+    {
+        "IN:" "USE:" "UNUSE:" "QUALIFIED:"
+        "QUALIFIED-WITH:" "FROM:" "EXCLUDE:"
+    } member? ; inline
 
 : complete-single-vocab? ( tokens -- ? )
     dup last empty? [
@@ -135,6 +140,13 @@ PRIVATE>
 
 : complete-vocab? ( tokens -- ? )
     { [ complete-single-vocab? ] [ complete-vocab-list? ] } 1|| ;
+
+: complete-vocab-words? ( tokens -- ? )
+    harvest chop-; {
+        [ length 3 >= ]
+        [ first { "FROM:" "EXCLUDE:" } member? ]
+        [ third "=>" = ]
+    } 1&& ;
 
 <PRIVATE
 
