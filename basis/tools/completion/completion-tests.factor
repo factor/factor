@@ -1,6 +1,4 @@
-USING: assocs kernel sequences tools.test ;
-
-IN: tools.completion
+USING: assocs kernel sequences tools.completion tools.test ;
 
 { f } [ "abc" "def" fuzzy ] unit-test
 { V{ 4 5 6 } } [ "set-nth" "nth" fuzzy ] unit-test
@@ -27,6 +25,12 @@ IN: tools.completion
 { t } [ { "USING:" "A" "B" "C" } complete-vocab? ] unit-test
 { f } [ { "USING:" "A" "B" "C" ";" } complete-vocab? ] unit-test
 { t } [ { "X" ";" "USING:" "A" "B" "C" } complete-vocab? ] unit-test
+
+{ f } [ { "FROM:" } complete-vocab-words? ] unit-test
+{ f } [ { "FROM:" "math" } complete-vocab-words? ] unit-test
+{ t } [ { "FROM:" "math" "=>" } complete-vocab-words? ] unit-test
+{ f } [ { "FROM:" "math" "=>" "+" ";" } complete-vocab-words? ] unit-test
+{ f } [ { "BOOM:" "math" "=>" "+" } complete-vocab-words? ] unit-test
 
 { f } [ { "CHAR:" } complete-char? ] unit-test
 { t } [ { "CHAR:" "" } complete-char? ] unit-test
