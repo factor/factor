@@ -32,6 +32,9 @@ M: readline-reader prompt.
 : prefixed-vocabs ( prefix -- vocabs )
     all-disk-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
 
+: prefixed-vocab-words ( prefix vocab-name -- words )
+    vocab-words [ name>> ] map! prefixed ;
+
 : prefixed-colors ( prefix -- colors )
     named-colors prefixed ;
 
@@ -44,6 +47,7 @@ M: readline-reader prompt.
             { [ dup complete-vocab? ] [ drop prefixed-vocabs ] }
             { [ dup complete-char? ] [ drop prefixed-chars ] }
             { [ dup complete-color? ] [ drop prefixed-colors ] }
+            { [ dup complete-vocab-words? ] [ harvest second prefixed-vocab-words ] }
             [ drop prefixed-words ]
         } cond dup completions tset
     ] if* ;
