@@ -27,6 +27,7 @@ factor_vm::factor_vm(THREADHANDLE thread)
       fep_help_was_shown(false),
       fep_disabled(false),
       full_output(false),
+      object_counter(0),
       last_nano_count(0),
       signal_callstack_seg(NULL),
       safepoint_fep_p(false),
