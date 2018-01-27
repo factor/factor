@@ -1,8 +1,16 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.struct gpu.buffers help.markup help.syntax
-images kernel math multiline quotations sequences strings words ;
+USING: classes classes.struct gpu.buffers gpu.shaders.private
+help.markup help.syntax images math sequences strings words ;
 IN: gpu.shaders
+
+HELP: <multi-vertex-array>
+{ $values
+    { "vertex-formats" "a list of " { $link buffer-ptr } "/" { $link vertex-format } " pairs" }
+    { "program-instance" program-instance }
+    { "vertex-array" vertex-array }
+}
+{ $description "Creates a new " { $link vertex-array } " to feed data to " { $snippet "program-instance" } " from the set of " { $link buffer } "s specified in " { $snippet "vertex-formats" } ". The first element of each pair in " { $snippet "vertex-formats" } " can be either a " { $link buffer-ptr } " or a " { $link buffer } "; in the latter case, vertex data in the associated format is read from the beginning of the buffer." } ;
 
 HELP: <program-instance>
 { $values
@@ -18,13 +26,13 @@ HELP: <shader-instance>
 }
 { $description "Compiles an instance of " { $snippet "shader" } " for the current graphics context. If an instance already exists for " { $snippet "shader" } " in the current context, it is reused." } ;
 
-HELP: <multi-vertex-array>
+HELP: <vertex-array-object>
 { $values
-    { "vertex-formats" "a list of " { $link buffer-ptr } "/" { $link vertex-format } " pairs" }
-    { "program-instance" program-instance }
-    { "vertex-array" vertex-array }
+  { "vertex-buffer" "a vertex buffer" }
+  { "program-instance" program-instance }
+  { "format" vertex-format }
 }
-{ $description "Creates a new " { $link vertex-array } " to feed data to " { $snippet "program-instance" } " from the set of " { $link buffer } "s specified in " { $snippet "vertex-formats" } ". The first element of each pair in " { $snippet "vertex-formats" } " can be either a " { $link buffer-ptr } " or a " { $link buffer } "; in the latter case, vertex data in the associated format is read from the beginning of the buffer." } ;
+{ $description "Creates a new vertex array object." } ;
 
 HELP: feedback-format:
 { $syntax "feedback-format: vertex-format" }
@@ -32,7 +40,7 @@ HELP: feedback-format:
 
 HELP: GLSL-PROGRAM:
 { $syntax "GLSL-PROGRAM: program-name shader shader ... [vertex-format vertex-format ...] [feedback-format: vertex-format] ;" }
-{ $description "Defines a new " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. If any " { $link vertex-format } "s are specified, their attributes will be pre-assigned attribute indexes at link time, to ensure that their indexes remain constant if the program is refreshed with " { $link refresh-program } ". A transform feedback vertex format may optionally be specified with " { $link POSTPONE: feedback-format: } "; if the program is used to collect transform feedback, the given vertex format will be used for the output." }
+{ $description "Defines a new shader " { $link program } " named " { $snippet "program-name" } ". When the program is instantiated with " { $link <program-instance> } ", it will link together instances of all of the specified " { $link shader } "s to create the program instance. If any " { $link vertex-format } "s are specified, their attributes will be pre-assigned attribute indexes at link time, to ensure that their indexes remain constant if the program is refreshed with " { $link refresh-program } ". A transform feedback vertex format may optionally be specified with " { $link POSTPONE: feedback-format: } "; if the program is used to collect transform feedback, the given vertex format will be used for the output." }
 { $notes "Transform feedback requires OpenGL 3.0 or one of the " { $snippet "GL_EXT_transform_feedback" } " or " { $snippet "GL_ARB_transform_feedback" } " extensions." } ;
 
 HELP: GLSL-SHADER-FILE:
