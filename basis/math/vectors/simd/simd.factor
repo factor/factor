@@ -328,12 +328,12 @@ DEFER: ${type}-boa
 
 <<
 \ ${type}-boa
-[ $[ ${type}-coercer ] $[ ${type}-rep rep-length ] napply ] ${type}-rep rep-length {
+[ $[ ${type}-coercer ] $[ ${type}-rep rep-length ] napply ] $[ ${type}-rep rep-length ] {
     { 2 [ [ ${type}-rep (simd-gather-2) ${type} boa ] ] }
     { 4 [ [ ${type}-rep (simd-gather-4) ${type} boa ] ] }
     [ \ ${type} new '[ _ _ nsequence ] ]
 } case compose
-${type}-rep rep-length "n" <array> { "v" } <effect> define-inline
+$[ $[ ${type}-rep rep-length ] "n" <array> { "v" } <effect> ] define-inline
 >>
 
 M: ${type} pprint-delims drop \ ${type}{ \ } ;
