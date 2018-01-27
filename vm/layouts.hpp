@@ -104,7 +104,7 @@ inline static fixnum untag_fixnum(cell tagged) {
 }
 
 inline static cell tag_fixnum(fixnum untagged) {
-  return (untagged << TAG_BITS) | FIXNUM_TYPE;
+  return ( (cell)untagged << TAG_BITS) | FIXNUM_TYPE;
 }
 
 #define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
