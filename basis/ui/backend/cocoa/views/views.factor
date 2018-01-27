@@ -221,7 +221,7 @@ M: send-touchbar-command send-queued-gesture
 
     METHOD: Class touchBar: Class touchbar makeItemForIdentifier: Class string [
         touchbar-commands drop [
-            [ self string CF>string dup string>number ] dip nth
+            [ self string CFString>string dup string>number ] dip nth
             second name>> "com-" ?head drop over
             "touchBarCommand" prepend make-NSTouchBar-button
         ] [ f ] if*

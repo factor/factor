@@ -86,7 +86,7 @@ M: word-completion row-color
         [ color: dark-gray ]
     } cond 2nip ;
 
-M: vocab-word-completion row-color 2drop COLOR: black ;
+M: vocab-word-completion row-color 2drop color: black ;
 
 M: vocab-completion row-color
     drop dup vocab? [

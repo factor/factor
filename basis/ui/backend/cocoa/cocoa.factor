@@ -76,10 +76,10 @@ M: pasteboard set-clipboard-contents
     ! after register-window.
     dup { 0 0 } = [
         drop
-        worlds get-global length 1 <= [ -> center ] [
+        worlds get-global length 1 <= [ send: center ] [
             worlds get-global last second window-loc>>
-            dupd first2 <CGPoint> -> \cascadeTopLeftFromPoint:
-            -> \setFrameTopLeftPoint:
+            dupd first2 <CGPoint> send: \cascadeTopLeftFromPoint:
+            send: \setFrameTopLeftPoint:
         ] if
     ] [ first2 <CGPoint> send: \setFrameTopLeftPoint: ] if ;
 
@@ -222,13 +222,9 @@ M: cocoa-ui-backend (with-ui)
             stop-io-thread
             init-thread-timer
             reset-thread-timer
-<<<<<<< HEAD
             NSApp send: run
-        ] ui-running
-=======
-            NSApp -> run
+            NSApp send: run
         ] with-ui-running
->>>>>>> origin/master
     ] with-cocoa ;
 
 cocoa-ui-backend ui-backend set-global
