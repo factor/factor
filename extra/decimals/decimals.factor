@@ -11,11 +11,14 @@ C: <decimal> decimal
 : >decimal< ( decimal -- mantissa exponent )
     [ mantissa>> ] [ exponent>> ] bi ; inline
 
-: string>decimal ( string -- decimal )
+: string>mantissa-exponent ( string -- mantissa exponent )
     "." split1
     [ [ char: 0 = ] trim-head [ "0" ] when-empty ]
     [ [ char: 0 = ] trim-tail [ "" ] when-empty ] bi*
-    [ append string>number ] [ nip length neg ] 2bi <decimal> ;
+    [ append string>number ] [ nip length neg ] 2bi ; inline
+
+: string>decimal ( string -- decimal )
+    string>mantissa-exponent <decimal> ;
 
 : parse-decimal ( -- decimal ) scan-token string>decimal ;
 
