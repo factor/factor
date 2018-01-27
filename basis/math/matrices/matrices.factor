@@ -237,7 +237,7 @@ M: sequence square-cols
     [ length ] keep [ <array> ] with { } map-as ;
 
 : make-matrix-with-indices ( m n quot -- matrix )
-    [ [ <iota> ] bi@ ] dip '[ @ ] cartesian-map ; inline
+    [ [ <iota> ] bi@ ] dip cartesian-map ; inline
 
 : null-matrix? ( matrix -- ? ) empty? ; inline
 

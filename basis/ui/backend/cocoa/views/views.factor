@@ -162,16 +162,24 @@ CONSTANT: selector>action H{
     [ swap world-focus parents-handle-gesture? t ] [ drop f f ] if* ;
 
 : touchbar-commands ( -- commands/f gadget )
-    world get [
+    world get-global [
         children>> [
             class-of "commands" word-prop
             "touchbar" of dup [ commands>> ] when
         ] map-find
     ] [ f f ] if* ;
 
+TUPLE: send-touchbar-command target command ;
+
+M: send-touchbar-command send-queued-gesture
+    [ target>> ] [ command>> ] bi invoke-command ;
+
 : touchbar-invoke-command ( n -- )
-    [ touchbar-commands ] dip over
-    [ rot nth second invoke-command ] [ 3drop ] if ;
+    [ touchbar-commands ] dip over [
+        rot nth second
+        send-touchbar-command queue-gesture notify-ui-thread
+        yield
+    ] [ 3drop ] if ;
 
 <CLASS: FactorView < NSOpenGLView
     COCOA-PROTOCOL: NSTextInput

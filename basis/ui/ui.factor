@@ -11,10 +11,10 @@ IN: ui
 
 <PRIVATE
 
-! Assoc mapping aliens to gadgets
-SYMBOL: ui-windows
+! Assoc mapping aliens to worlds
+SYMBOL: worlds
 
-: window ( handle -- world ) ui-windows get-global at ;
+: window ( handle -- world ) worlds get-global at ;
 
 : register-window ( world handle -- )
     ! Add the new window just below the topmost window. Why?
@@ -23,15 +23,15 @@ SYMBOL: ui-windows
     ! in the new window when it appears) Factor doesn't get
     ! confused and send workspace operations to the new window,
     ! etc.
-    swap 2array ui-windows get-global push
-    ui-windows get-global dup length 1 >
+    swap 2array worlds get-global push
+    worlds get-global dup length 1 >
     [ [ length 1 - dup 1 - ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
-    ui-windows [ [ first = ] with reject ] change-global ;
+    worlds [ [ first = ] with reject ] change-global ;
 
 : raised-window ( world -- )
-    ui-windows get-global
+    worlds get-global
     [ [ second eq? ] with find drop ] keep
     [ nth ] [ remove-nth! drop ] [ nip ] 2tri push ;
 
@@ -105,7 +105,7 @@ M: world ungraft*
     <dlist> \ graft-queue set-global
     100 <vector> \ layout-queue set-global
     <dlist> \ gesture-queue set-global
-    V{ } clone ui-windows set-global ;
+    V{ } clone worlds set-global ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
@@ -132,28 +132,35 @@ M: world ungraft*
     redraw-worlds
     send-queued-gestures ;
 
-: ui-running ( quot -- )
-    t \ ui-running set-global
-    [ f \ ui-running set-global ] [ ] cleanup ; inline
+SYMBOL: ui-running
+
+: with-ui-running ( quot -- )
+    t ui-running set-global
+    [ f ui-running set-global ] [ ] cleanup ; inline
 
 PRIVATE>
 
-: find-window ( quot: ( world -- ? ) -- world/f )
-    [ ui-windows get-global values ] dip
+: find-windows ( quot: ( world -- ? ) -- seq )
+    [ worlds get-global values ] dip
     '[ dup children>> [ ] [ nip first ] if-empty @ ]
-    find-last nip ; inline
+    filter ; inline
+
+: find-window ( quot: ( world -- ? ) -- world/f )
+    find-windows ?last ; inline
 
 : ui-running? ( -- ? )
-    \ ui-running get-global ;
+    ui-running get-global ;
 
 <PRIVATE
+
+SYMBOL: ui-thread
 
 : update-ui-loop ( -- )
     ! Note the logic: if update-ui fails, we open an error window and
     ! run one iteration of update-ui. If that also fails, well, the
     ! whole UI subsystem is broken so we throw the error to terminate
     ! the update-ui-loop.
-    [ ui-running? ]
+    [ { [ ui-running? ] [ ui-thread get-global self eq? ] } 0&& ]
     [
         ui-notify-flag get lower-flag
         [ update-ui ] [
@@ -164,7 +171,8 @@ PRIVATE>
     ] while ;
 
 : start-ui-thread ( -- )
-    [ update-ui-loop ] "UI update" spawn drop ;
+    [ self ui-thread set-global update-ui-loop ]
+    "UI update" spawn drop ;
 
 : start-ui ( quot -- )
     call( -- ) notify-ui-thread start-ui-thread ;
@@ -197,7 +205,7 @@ PRIVATE>
     find-world raise-window* ;
 
 : topmost-window ( -- world )
-    ui-windows get-global last second ;
+    worlds get-global last second ;
 
 HOOK: close-window ui-backend ( gadget -- )
 
@@ -205,7 +213,7 @@ M: object close-window
     find-world [ ungraft ] when* ;
 
 [
-    f \ ui-running set-global
+    f ui-running set-global
     <flag> ui-notify-flag set-global
 ] "ui" add-startup-hook
 

@@ -95,7 +95,7 @@ FUNCTION: c-string udev_list_entry_get_value (
 
 ! Helper to iterate over all entries of a list.
 : udev_list_entry_foreach ( ... first_entry quot: ( ... x -- ... ) -- ... )
-    [ [ dup ] ] dip '[ [ @ ] keep udev_list_entry_get_next ]
+    [ [ dup ] ] dip '[ _ keep udev_list_entry_get_next ]
     while drop ; inline
 
 ! Get all list entries _as_ a list

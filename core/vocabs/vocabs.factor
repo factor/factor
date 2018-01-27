@@ -45,7 +45,7 @@ GENERIC: lookup-vocab ( vocab-spec -- vocab )
 
 M: vocab lookup-vocab ;
 
-M: object lookup-vocab ( name -- vocab ) vocab-name dictionary get at ;
+M: object lookup-vocab vocab-name dictionary get at ;
 
 GENERIC: vocab-words-assoc ( vocab-spec -- assoc/f )
 

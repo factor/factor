@@ -78,6 +78,7 @@ M: gtk-clipboard set-clipboard-contents
 :: with-timer ( quot -- )
     <timer-funcs> &free
     GSource heap-size g_source_new &g_source_unref :> source
+    source G_PRIORITY_DEFAULT_IDLE g_source_set_priority
     source f g_source_attach drop
     [ quot call( -- ) ]
     [ source g_source_destroy ] [ ] cleanup ;
@@ -512,7 +513,7 @@ M: gtk-ui-backend (with-ui)
         [
             [ [ gtk_main ] with-timer ] with-event-loop
         ] with-destructors
-    ] ui-running ;
+    ] with-ui-running ;
 
 M: gtk-ui-backend stop-event-loop
     gtk_main_quit ;

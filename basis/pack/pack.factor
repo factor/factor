@@ -123,7 +123,7 @@ PRIVATE>
 MACRO: unpack ( str -- quot )
     expand-pack-format
     [ [ ch>packed-length ] { } map-as start/end ]
-    [ [ unpack-table at '[ @ ] ] { } map-as ] bi
+    [ [ unpack-table at ] { } map-as ] bi
     [ '[ [ _ _ ] dip <slice> @ ] ] 3map
     '[ [ _ cleave ] output>array ] ;
 

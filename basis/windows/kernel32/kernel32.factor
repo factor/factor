@@ -1861,7 +1861,7 @@ FUNCTION: DWORD SetFilePointerEx ( HANDLE hFile, LARGE_INTEGER lDistanceToMove, 
 ! FUNCTION: SetFileShortNameA
 ! FUNCTION: SetFileShortNameW
 FUNCTION: BOOL SetFileTime ( HANDLE hFile, FILETIME* lpCreationTime, FILETIME* lpLastAccessTime, FILETIME* lpLastWriteTime )
-! FUNCTION: SetFileValidData
+FUNCTION: BOOL SetFileValidData ( HANDLE hFile, LONGLONG ValidDataLength )
 ! FUNCTION: SetFirmwareEnvironmentVariableA
 ! FUNCTION: SetFirmwareEnvironmentVariableW
 ! FUNCTION: SetHandleContext

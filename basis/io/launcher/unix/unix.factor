@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data assocs combinators
-continuations environment io.backend io.backend.unix
+continuations environment fry io.backend io.backend.unix
 io.files.private io.files.unix io.launcher io.launcher.private
 io.pathnames io.ports kernel libc math namespaces sequences
 simple-tokenizer strings system unix unix.ffi unix.process ;
@@ -92,7 +92,7 @@ IN: io.launcher.unix
 M: unix (current-process) ( -- handle ) getpid ;
 
 M: unix (run-process) ( process -- pid )
-    [ spawn-process ] curry [ ] with-fork ;
+    '[ _ spawn-process ] [ ] with-fork ;
 
 M: unix (kill-process) ( process -- )
     [ handle>> SIGTERM ] [ group>> ] bi {
@@ -102,8 +102,7 @@ M: unix (kill-process) ( process -- )
     } case io-error ;
 
 : find-process ( handle -- process )
-    processes get swap [ nip swap handle>> = ] curry
-    assoc-find 2drop ;
+    processes get keys [ handle>> = ] with find nip ;
 
 TUPLE: signal n ;
 

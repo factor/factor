@@ -23,7 +23,7 @@ IN: tools.image-analyzer.utils
 
 : until-eof-reader ( reader-quot -- reader-quot' )
     '[
-        [ [ @ ] throw-on-eof ] [
+        [ _ throw-on-eof ] [
             dup stream-exhausted? [ drop f ] [ throw ] if
         ] recover
     ] ; inline

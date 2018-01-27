@@ -31,5 +31,5 @@ PRIVATE>
 : ?box ( box -- value/f ? )
     dup occupied>> [ box-unsafe> t ] [ drop f f ] if ; inline
 
-: if-box? ( box quot -- )
+: if-box? ( box quot: ( value -- ) -- )
     [ ?box ] dip [ drop ] if ; inline

@@ -1,13 +1,10 @@
 ! Copyright (C) 2015 Sankaranarayanan Viswanathan.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar combinators destructors
-formatting kernel make math namespaces opengl opengl.textures
-sequences sets snake-game.constants snake-game.game
-snake-game.input snake-game.util snake-game.sprites timers
-ui ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
-
-FROM: snake-game.util => screen-loc ;
-FROM: snake-game.util => relative-loc ;
+USING: accessors assocs calendar combinators
+combinators.short-circuit destructors formatting fry kernel math
+math.vectors namespaces opengl opengl.textures sequences sets
+snake-game.game snake-game.sprites timers ui ui.gadgets
+ui.gadgets.worlds ui.gestures ui.render ;
 
 IN: snake-game.ui
 
@@ -20,8 +17,12 @@ TUPLE: snake-gadget < gadget
     <snake-game> >>snake-game drop ;
 
 : <snake-gadget> ( -- snake-gadget )
-    snake-gadget new
-    [ start-new-game ] keep ;
+    snake-gadget new [ start-new-game ] keep ;
+
+CONSTANT: snake-game-cell-size 20
+
+: game-loc>screen-loc ( loc -- loc )
+    [ snake-game-cell-size * ] map ;
 
 : lookup-texture ( key -- texture )
     game-textures get at ;
@@ -30,7 +31,7 @@ TUPLE: snake-gadget < gadget
     [ lookup-texture draw-texture ] with-translation ;
 
 : draw-sprite ( grid-loc key -- )
-    swap screen-loc draw-sprite* ;
+    swap game-loc>screen-loc draw-sprite* ;
 
 : draw-food ( loc -- )
     "food" draw-sprite ;
@@ -39,17 +40,14 @@ TUPLE: snake-gadget < gadget
     { 0 0 } "background" draw-sprite ;
 
 : draw-snake-head ( loc facing-dir -- )
-    dup name>> rest "head-" prepend
-    [
-        [ screen-loc ] dip
-        {
+    dup name>> rest "head-" prepend [
+        [ game-loc>screen-loc ] dip {
             { :right [ { -20 -10 } ] }
             { :down  [ { -10 -20 } ] }
             { :up    [ { -10  0  } ] }
             { :left  [ {  0  -10 } ] }
-        } case offset
-    ] dip
-    swap draw-sprite* ;
+        } case v+
+    ] dip swap draw-sprite* ;
 
 : draw-snake-body ( loc from-dir to-dir -- )
     [ name>> rest ] bi@ "body-%s-%s" sprintf draw-sprite ;
@@ -65,7 +63,7 @@ TUPLE: snake-gadget < gadget
     } case ;
 
 : next-snake-loc-from-dir ( loc from-dir snake-part -- new-loc new-from-dir )
-    nip dir>> [ relative-loc ] keep ;
+    nip dir>> [ move-loc ] keep ;
 
 : draw-snake ( loc from-dir snake -- )
     3dup [
@@ -75,19 +73,18 @@ TUPLE: snake-gadget < gadget
     ! make sure to draw the head again
     first draw-snake-part ;
 
-: generate-status-message ( snake-game -- str )
-    [ score>> "Score: %d" sprintf ]
+: game-status ( snake-game -- str )
+    [ score>> ]
     [
         {
             { [ dup game-over?>> ] [ drop "Game Over" ] }
             { [ dup paused?>> ] [ drop "Game Paused" ] }
             [ drop "Game In Progress" ]
         } cond
-    ]
-    bi 2array " -- " join ;
-        
+    ] bi "Score: %d -- %s" sprintf ;
+
 : update-status ( gadget -- )
-    [ snake-game>> generate-status-message ] keep show-status ;
+    [ snake-game>> game-status ] keep show-status ;
 
 : do-updates ( gadget -- )
     [ snake-game>> do-game-step ]
@@ -98,52 +95,25 @@ TUPLE: snake-gadget < gadget
 : toggle-game-pause ( snake-gadget -- )
     snake-game>> [ not ] change-paused? drop ;
 
-: ?handle-movement-key ( snake-game key -- )
-    key-action
-    [
-        2dup [ snake-dir>> opposite-dir ] dip =
-        [ 2drop ] [ >>next-turn-dir drop ] if
-    ] [ drop ] if* ;
-
-: handle-key ( snake-gadget key -- )
-    {
-        { [ dup quit-key? ] [ drop close-window ] }
-        { [ dup pause-key? ] [ drop toggle-game-pause ] }
-        { [ dup new-game-key? ] [ drop start-new-game ] }
-        [
-            [ snake-game>> ] dip over
-            game-in-progress? [ ?handle-movement-key ] [ 2drop ] if
-        ]
-    } cond ;
-
-: load-game-textures ( snake-gadget -- textures )
-    dup textures>> [ ] [
-        [
-            snake-head-textures %%
-            snake-body-textures %%
-            snake-tail-textures %%
-            food-texture %%
-            background-texture %%
-        ] H{ } make >>textures
-        textures>>
-    ] ?if ;
-
 M: snake-gadget graft*
-    [ [ do-updates ] curry 200 milliseconds every ] keep timer<< ;
+    dup '[ _ do-updates ] 200 milliseconds every >>timer
+    snake-textures >>textures
+    drop ;
 
 M: snake-gadget ungraft*
     [ stop-timer f ] change-timer
-    dup textures>> values [ dispose ] each
-    f >>textures drop ;
+    dup find-gl-context ! so texture disposing works properly
+    [ values dispose-each f ] change-textures
+    drop ;
 
 M: snake-gadget pref-dim*
     drop snake-game-dim [ snake-game-cell-size * 20 + ] map ;
 
 M: snake-gadget draw-gadget*
-    [ load-game-textures game-textures ] keep [
+    [ textures>> game-textures ] keep '[
         draw-background
         { 10 10 } [
-            snake-game>>
+            _ snake-game>>
             [ food-loc>> [ draw-food ] when* ]
             [
                 [ snake-loc>> ]
@@ -152,8 +122,38 @@ M: snake-gadget draw-gadget*
                 tri draw-snake
             ] bi
         ] with-translation
-    ] curry with-variable ;
+    ] with-variable ;
+
+: key-dir ( key -- dir )
+    H{
+        { "RIGHT"  :right }
+        { "LEFT"   :left }
+        { "UP"     :up }
+        { "DOWN"   :down }
+    } at ;
+
+: quit-key? ( key -- ? )
+    HS{ "ESC" "q" "Q" } in? ;
+
+: pause-key? ( key -- ? )
+    HS{ " " "SPACE" "p" "P" } in? ;
+
+: new-game-key? ( key -- ? )
+    HS{ "ENTER" "RET" "n" "N" } in? ;
 
 M: snake-gadget handle-gesture
-    swap dup key-down?
-    [ sym>> handle-key ] [ 2drop ] if f ;
+    swap dup key-down? [
+        sym>> {
+            { [ dup quit-key? ] [ drop close-window ] }
+            { [ dup pause-key? ] [ drop toggle-game-pause ] }
+            { [ dup new-game-key? ] [ drop start-new-game ] }
+            [
+                key-dir [
+                    swap snake-game>> dup {
+                        [ game-in-progress? ]
+                        [ snake-dir>> opposite-dir pick = not ]
+                    } 1&& [ next-turn-dir<< ] [ 2drop ] if
+                ] [ drop ] if*
+            ]
+        } cond
+    ] [ 2drop ] if f ;

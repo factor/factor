@@ -300,7 +300,7 @@ CONSTANT: lookup-table-at-max 256
 \ at* [ at-quot ] 1 define-partial-eval
 
 : diff-quot ( seq -- quot: ( seq' -- seq'' ) )
-    [ tester ] keep '[ members [ @ ] reject _ set-like ] ;
+    [ tester ] keep '[ members _ reject _ set-like ] ;
 
 M\\ sets::set diff [ diff-quot ] 1 define-partial-eval
 

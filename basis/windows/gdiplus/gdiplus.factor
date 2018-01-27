@@ -248,7 +248,7 @@ ENUM: StringAlignment
     { StringAlignmentCenter    1 }
     { StringAlignmentFar       2 } ;
 
-ENUM:  StringDigitSubstitute
+ENUM: StringDigitSubstitute
     { StringDigitSubstituteUser          0 }
     { StringDigitSubstituteNone          1 }
     { StringDigitSubstituteNational      2 }

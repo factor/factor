@@ -28,9 +28,13 @@ SLOT: history
 TUPLE: word-completion manifest ;
 C: <word-completion> word-completion
 
+TUPLE: vocab-word-completion vocab-name ;
+C: <vocab-word-completion> vocab-word-completion
+
 SINGLETONS: vocab-completion color-completion char-completion
 path-completion history-completion ;
-UNION: definition-completion word-completion vocab-completion ;
+UNION: definition-completion word-completion
+vocab-word-completion vocab-completion ;
 UNION: listener-completion definition-completion
 color-completion char-completion path-completion history-completion ;
 
@@ -40,6 +44,7 @@ GENERIC: completion-quot ( interactor completion-mode -- quot )
     2nip '[ [ { } ] _ if-empty ] ; inline
 
 M: word-completion completion-quot [ words-matching ] (completion-quot) ;
+M: vocab-word-completion completion-quot nip vocab-name>> '[ _ vocab-words-matching ] ;
 M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
 M: color-completion completion-quot [ colors-matching ] (completion-quot) ;
 M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
@@ -54,6 +59,7 @@ M: history-completion completion-element drop one-line-elt ;
 GENERIC: completion-banner ( completion-mode -- string )
 
 M: word-completion completion-banner drop "Words" ;
+M: vocab-word-completion completion-banner drop "Words" ;
 M: vocab-completion completion-banner drop "Vocabularies" ;
 M: color-completion completion-banner drop "Colors" ;
 M: char-completion completion-banner drop "Unicode code point names" ;
@@ -80,6 +86,8 @@ M: word-completion row-color
         [ color: dark-gray ]
     } cond 2nip ;
 
+M: vocab-word-completion row-color 2drop COLOR: black ;
+
 M: vocab-completion row-color
     drop dup vocab? [
         name>> ".private" tail? color: dark-red color: black ?
@@ -98,6 +106,7 @@ M: color-completion row-color
         { [ dup complete-char? ] [ 2drop char-completion ] }
         { [ dup complete-color? ] [ 2drop color-completion ] }
         { [ dup complete-pathname? ] [ 2drop path-completion ] }
+        { [ dup complete-vocab-words? ] [ nip harvest second <vocab-word-completion> ] }
         [ drop <word-completion> ]
     } cond ;
 

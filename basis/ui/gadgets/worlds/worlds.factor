@@ -54,7 +54,9 @@ TUPLE: world-attributes
     gadgets
     { pixel-format-attributes initial: $ default-world-pixel-format-attributes }
     { window-controls initial: $ default-world-window-controls }
-    pref-dim ;
+    pref-dim
+    { fill initial: 1 }
+    { orientation initial: $ vertical } ;
 
 : <world-attributes> ( -- world-attributes )
     world-attributes new ; inline
@@ -102,8 +104,7 @@ TUPLE: world-attributes
 ERROR: no-world-found ;
 
 : find-gl-context ( gadget -- )
-    find-world dup
-    [ set-gl-context ] [ no-world-found ] if ;
+    find-world [ set-gl-context ] [ no-world-found ] if* ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
@@ -141,6 +142,8 @@ M: world apply-world-attributes
         [ grab-input?>> >>grab-input? ]
         [ gadgets>> dup sequence? [ [ 1 track-add ] each ] [ 1 track-add ] if ]
         [ pref-dim>> >>pref-dim ]
+        [ fill>> >>fill ]
+        [ orientation>> >>orientation ]
     } cleave ;
 
 : <world> ( world-attributes -- world )
@@ -212,14 +215,12 @@ ui-error-hook [ [ rethrow ] ] initialize
 
 : draw-world ( world -- )
     dup draw-world? [
-        dup world [
-            [
-                dup [ draw-world* ] with-gl-context
-                flush-layout-cache-hook get call( -- )
-            ] [
-                swap f >>active? <world-error> throw
-            ] recover
-        ] with-variable
+        [
+            dup [ draw-world* ] with-gl-context
+            flush-layout-cache-hook get call( -- )
+        ] [
+            swap f >>active? <world-error> throw
+        ] recover
     ] [ drop ] if ;
 
 world

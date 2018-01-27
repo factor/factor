@@ -70,7 +70,7 @@ M: ##horizontal-shl-vector-imm insn-available? rep>> %horizontal-shl-vector-imm-
 M: ##horizontal-shr-vector-imm insn-available? rep>> %horizontal-shr-vector-imm-reps member? ;
 
 : [vector-op-checked] ( #dup quot -- quot )
-    '[ _ ndup [ @ ] { } make dup [ insn-available? ] all? ] ;
+    '[ _ ndup _ { } make dup [ insn-available? ] all? ] ;
 
 GENERIC#: >vector-op-cond 2 ( quot #pick #dup -- quotpair )
 M:: callable >vector-op-cond ( quot #pick #dup -- quotpair )

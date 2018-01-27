@@ -3,4 +3,4 @@ IN: ui.event-loop
 
 HELP: event-loop?
 { $values { "?" boolean } }
-{ $description { $link t } " if there is active windows." } ;
+{ $description { $link t } " if there are active windows." } ;

@@ -1343,7 +1343,7 @@ HELP: sift
 { $values
      { "seq" sequence }
      { "newseq" sequence } }
- { $description "Outputs a new sequence with all instance of " { $link f } " removed." }
+ { $description "Outputs a new sequence with all instances of " { $link f } " removed." }
  { $examples
     { $example "USING: prettyprint sequences ;"
         "{ \"a\" 3 { } f } sift ."

@@ -9,6 +9,8 @@ math.functions.integer-logs splitting multiline ;
 FROM: math.parser.private => format-float ;
 IN: formatting
 
+ERROR: unknown-format-directive value ;
+
 <PRIVATE
 
 : compose-all ( seq -- quot )
@@ -91,8 +93,6 @@ IN: formatting
         [ [ ".0" ?tail drop ] [ drop ] if-zero ] bi
     ] [ format-decimal-simple ] if ;
 
-ERROR: unknown-printf-directive ;
-
 EBNF: parse-printf [=[
 
 zero      = "0"                  => [[ char: 0 ]]
@@ -126,7 +126,7 @@ fmt-E     = digits "E"           => [[ first '[ _ format-scientific >upper ] ]]
 fmt-f     = digits "f"           => [[ first '[ _ format-decimal ] ]]
 fmt-x     = "x"                  => [[ [ >integer >hex ] ]]
 fmt-X     = "X"                  => [[ [ >integer >hex >upper ] ]]
-unknown   = (.)*                 => [[ unknown-printf-directive ]]
+unknown   = (.)*                 => [[ "" like unknown-format-directive ]]
 
 strings_  = fmt-c|fmt-C|fmt-s|fmt-S|fmt-u
 strings   = pad width strings_   => [[ <reversed> compose-all ]]
@@ -235,7 +235,7 @@ fmt-X     = "X"                  => [[ [ >time ] ]]
 fmt-y     = "y"                  => [[ [ year>> 100 mod pad-00 ] ]]
 fmt-Y     = "Y"                  => [[ [ year>> number>string ] ]]
 fmt-Z     = "Z"                  => [[ [ "Not yet implemented" throw ] ]]
-unknown   = (.)*                 => [[ "Unknown directive" throw ]]
+unknown   = (.)*                 => [[ "" like unknown-format-directive ]]
 
 formats_  = fmt-%|fmt-a|fmt-A|fmt-b|fmt-B|fmt-c|fmt-d|fmt-H|fmt-I|
             fmt-j|fmt-m|fmt-M|fmt-p|fmt-S|fmt-U|fmt-w|fmt-W|fmt-x|

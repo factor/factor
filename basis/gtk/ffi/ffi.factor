@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.syntax combinators gobject-introspection
-gobject-introspection.standard-types kernel pango.ffi system
-vocabs ;
+gobject-introspection.standard-types kernel pango.ffi system vocabs ;
 IN: gtk.ffi
 
 <<

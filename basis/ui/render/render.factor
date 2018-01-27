@@ -104,9 +104,9 @@ M: gadget gadget-foreground dup interior>> pen-foreground ;
     ] with-translation ;
 
 : draw-border ( object -- )
-    dup boundary>> dup [
+    dup boundary>> [
         origin get [ draw-boundary ] with-translation
-    ] [ 2drop ] if ;
+    ] [ drop ] if* ;
 
 PRIVATE>
 

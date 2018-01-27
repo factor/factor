@@ -40,13 +40,8 @@ CONSTANT: mach-map {
 : ldconfig-matches? ( lib triple -- ? )
     { [ name-matches? ] [ arch-matches? ] } 2&& ;
 
-: ldconfig-find-soname ( lib -- seq )
-    load-ldconfig-cache [ ldconfig-matches? ] with filter
-    [ third ] map ;
-
 PRIVATE>
 
 M: linux find-library*
-    "lib" prepend ldconfig-find-soname [
-        { [ exists? ] [ file-info regular-file? ] } 1&&
-    ] find nip ;
+    "lib" prepend load-ldconfig-cache
+    [ ldconfig-matches? ] with find nip ?first ;
