@@ -1,7 +1,7 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
 USING: accessors arrays fry kernel math math.order math.vectors
-namespaces opengl.gl random sequences ui ui.gadgets
-ui.gadgets.canvas ui.render ;
+namespaces opengl.demo-support opengl.gl random sequences ui
+ui.gadgets ui.gadgets.canvas ui.render ;
 IN: maze
 
 CONSTANT: line-width 8
@@ -25,7 +25,7 @@ SYMBOL: visited
 : (draw-maze) ( cell -- )
     dup vertex
     glEnd
-    GL_POINTS glBegin dup vertex glEnd
+    GL_POINTS [ dup vertex ] do-state
     GL_LINE_STRIP glBegin
     dup vertex
     dup visit
@@ -42,9 +42,9 @@ SYMBOL: visited
     line-width 2 - glPointSize
     1.0 1.0 1.0 1.0 glColor4d
     dup '[ _ t <array> ] replicate visited set
-    GL_LINE_STRIP glBegin
-    { 0 0 } dup vertex (draw-maze)
-    glEnd ;
+    GL_LINE_STRIP [
+        { 0 0 } dup vertex (draw-maze)
+    ] do-state ;
 
 TUPLE: maze < canvas ;
 
