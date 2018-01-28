@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors
+USING: accessors arrays assocs byte-arrays byte-vectors
 classes.algebra.private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
 classes.predicate classes.singleton classes.tuple
@@ -8,12 +8,12 @@ classes.tuple.parser classes.union combinators compiler.units
 definitions delegate delegate.private effects effects.parser fry
 functors2 generic generic.hook generic.math generic.parser
 generic.standard hash-sets hashtables hashtables.identity hints
-interpolate io.pathnames kernel lexer locals.errors
+init interpolate io.pathnames kernel lexer locals.errors
 locals.parser locals.types macros math memoize multiline
 namespaces parser quotations sbufs sequences slots source-files
 splitting stack-checker strings strings.parser typed vectors
-vocabs.parser words words.alias words.constant words.symbol
-words.inlined ;
+vocabs.parser words words.alias words.constant words.inlined
+words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -156,6 +156,26 @@ IN: bootstrap.syntax
 
     "SYMBOLS:" [
         ";" [ create-word-in [ reset-generic ] [ define-symbol ] bi ] each-token
+    ] define-core-syntax
+
+    "INITIALIZED-SYMBOL:" [
+        scan-new-word [ define-symbol ]
+        [
+            name>> "initialize-" prepend create-word-in dup reset-generic
+            scan-object dupd [ initialize ] curry curry ( -- ) define-declared
+        ] bi
+    ] define-core-syntax
+
+    "STARTUP-HOOK:" [
+        scan-new-word scan-object
+        [ ( -- ) define-declared ]
+        [ swap startup-hooks get set-at ] 2bi
+    ] define-core-syntax
+
+    "SHUTDOWN-HOOK:" [
+        scan-new-word scan-object
+        [ ( -- ) define-declared ]
+        [ swap shutdown-hooks get set-at ] 2bi
     ] define-core-syntax
 
     "SINGLETONS:" [
