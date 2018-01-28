@@ -2,56 +2,55 @@
 USING: accessors arrays combinators combinators.short-circuit
 fry kernel locals math math.intervals math.vectors multi-methods
 sequences ;
-FROM: multi-methods => \GENERIC: ;
 IN: flatland
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! Two dimensional world protocol
 
-GENERIC: x ( obj -- x )
-GENERIC: y ( obj -- y )
+MULTI-GENERIC: x ( obj -- x )
+MULTI-GENERIC: y ( obj -- y )
 
-GENERIC: (x!) ( x obj -- )
-GENERIC: (y!) ( y obj -- )
+MULTI-GENERIC: (x!) ( x obj -- )
+MULTI-GENERIC: (y!) ( y obj -- )
 
 : x! ( obj x -- obj ) over (x!) ;
 : y! ( obj y -- obj ) over (y!) ;
 
-GENERIC: width  ( obj -- width  )
-GENERIC: height ( obj -- height )
+MULTI-GENERIC: width  ( obj -- width  )
+MULTI-GENERIC: height ( obj -- height )
 
-GENERIC: (width!)  ( width  obj -- )
-GENERIC: (height!) ( height obj -- )
+MULTI-GENERIC: (width!)  ( width  obj -- )
+MULTI-GENERIC: (height!) ( height obj -- )
 
 : width!  ( obj width  -- obj ) over (width!) ;
 : height! ( obj height -- obj ) over (width!) ;
 
 ! Predicates on relative placement
 
-GENERIC: to-the-left-of?  ( obj obj -- ? )
-GENERIC: to-the-right-of? ( obj obj -- ? )
+MULTI-GENERIC: to-the-left-of?  ( obj obj -- ? )
+MULTI-GENERIC: to-the-right-of? ( obj obj -- ? )
 
-GENERIC: below? ( obj obj -- ? )
-GENERIC: above? ( obj obj -- ? )
+MULTI-GENERIC: below? ( obj obj -- ? )
+MULTI-GENERIC: above? ( obj obj -- ? )
 
-GENERIC: in-between-horizontally? ( obj obj -- ? )
+MULTI-GENERIC: in-between-horizontally? ( obj obj -- ? )
 
-GENERIC: horizontal-interval ( obj -- interval )
+MULTI-GENERIC: horizontal-interval ( obj -- interval )
 
-GENERIC: move-to ( obj obj -- )
+MULTI-GENERIC: move-to ( obj obj -- )
 
-GENERIC: move-by ( obj delta -- )
+MULTI-GENERIC: move-by ( obj delta -- )
 
-GENERIC: move-left-by  ( obj obj -- )
-GENERIC: move-right-by ( obj obj -- )
+MULTI-GENERIC: move-left-by  ( obj obj -- )
+MULTI-GENERIC: move-right-by ( obj obj -- )
 
-GENERIC: left   ( obj -- left   )
-GENERIC: right  ( obj -- right  )
-GENERIC: bottom ( obj -- bottom )
-GENERIC: top    ( obj -- top    )
+MULTI-GENERIC: left   ( obj -- left   )
+MULTI-GENERIC: right  ( obj -- right  )
+MULTI-GENERIC: bottom ( obj -- bottom )
+MULTI-GENERIC: top    ( obj -- top    )
 
-GENERIC: distance ( a b -- c )
+MULTI-GENERIC: distance ( a b -- c )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -216,7 +215,7 @@ METHOD: above? { sequence rectangle } [ y ] [ top    ] bi* > ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-GENERIC: within? ( a b -- ? )
+MULTI-GENERIC: within? ( a b -- ? )
 
 METHOD: within? { pos rectangle }
   {

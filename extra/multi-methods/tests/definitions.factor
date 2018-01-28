@@ -19,11 +19,11 @@ DEFER: testing
 
     [ t ] [ { } \ fake multi-dispatch-quot callable? ] unit-test
 
-    [ t ] [ \ fake make-generic quotation? ] unit-test
+    [ t ] [ \ fake make-multi-generic quotation? ] unit-test
 
     [ ] [ \ fake update-generic ] unit-test
 
-    [ ] [ \ testing ( -- ) define-generic ] unit-test
+    [ ] [ \ testing ( -- ) define-multi-generic ] unit-test
 
     [ t ] [ \ testing generic? ] unit-test
 ] with-compilation-unit

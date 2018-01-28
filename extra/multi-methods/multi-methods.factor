@@ -140,14 +140,14 @@ PREDICATE: generic < word
 : methods ( word -- alist )
     "multi-methods" word-prop >alist ;
 
-: make-generic ( generic -- quot )
+: make-multi-generic ( generic -- quot )
     [
         [ methods prepare-methods % sort-methods ] keep
         multi-dispatch-quot %
     ] [ ] make ;
 
 : update-generic ( word -- )
-    dup make-generic define ;
+    dup make-multi-generic define ;
 
 ! Methods
 PREDICATE: method-body < word
@@ -215,7 +215,7 @@ M: no-method error.
     [ "multi-method-specializer" word-prop ]
     [ "multi-method-generic" word-prop ] bi prefix ;
 
-: define-generic ( word effect -- )
+: define-multi-generic ( word effect -- )
     over set-stack-effect
     dup "multi-methods" word-prop [ drop ] [
         [ H{ } clone "multi-methods" set-word-prop ]
@@ -224,31 +224,34 @@ M: no-method error.
     ] if ;
 
 ! Syntax
-SYNTAX: \GENERIC: scan-new-word scan-effect define-generic ;
+SYNTAX: \MULTI-GENERIC: scan-new-word scan-effect define-multi-generic ;
+
+SYNTAX: \MULTI-HOOK:
+    scan-new-word scan-object 2array scan-effect define-multi-generic ;
 
 : parse-method ( -- quot classes generic )
     parse-definition [ 2 tail ] [ second ] [ first ] tri ;
 
-: create-method-in ( specializer generic -- method )
+: create-multi-method-in ( specializer generic -- method )
     create-method dup save-location f set-last-word ;
 
-: scan-new-method ( -- method )
-    scan-word scan-object swap create-method-in ;
+: scan-new-multi-method ( -- method )
+    scan-word scan-object swap create-multi-method-in ;
 
-: (METHOD:) ( -- method def ) scan-new-method parse-definition ;
+: (METHOD:) ( -- method def ) scan-new-multi-method parse-definition ;
 
 SYNTAX: \METHOD: (METHOD:) define ;
 
 ! For compatibility
 SYNTAX: \M:
-    scan-word 1array scan-word create-method-in
+    scan-word 1array scan-word create-multi-method-in
     parse-definition
     define ;
 
 ! Definition protocol. We qualify core generics here
 QUALIFIED: syntax
 
-syntax::M: generic definer drop \ GENERIC: f ;
+syntax::M: generic definer drop \ MULTI-GENERIC: f ;
 
 syntax::M: generic definition drop f ;
 

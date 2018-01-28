@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes kernel sequences sets
 io prettyprint ;
-FROM: multi-methods => GENERIC: METHOD: ;
 IN: boolean-expr
 
 TUPLE: ⋀ x y ;
@@ -15,7 +14,7 @@ SINGLETONS: P Q R S T U V W X Y Z ;
 
 UNION: □ ⋀ ⋁ ¬ ⊤ ⊥ P Q R S T U V W X Y Z ;
 
-GENERIC: ⋀ ( x y -- expr )
+MULTI-GENERIC: ⋀ ( x y -- expr )
 
 METHOD: ⋀ { ⊤ □ } nip ;
 METHOD: ⋀ { □ ⊤ } drop ;
@@ -27,7 +26,7 @@ METHOD: ⋀ { □ ⋁ } [ x>> ⋀ ] [ y>> ⋀ ] 2bi ⋁ ;
 
 METHOD: ⋀ { □ □ } \ ⋀ boa ;
 
-GENERIC: ⋁ ( x y -- expr )
+MULTI-GENERIC: ⋁ ( x y -- expr )
 
 METHOD: ⋁ { ⊤ □ } drop ;
 METHOD: ⋁ { □ ⊤ } nip ;
@@ -36,7 +35,7 @@ METHOD: ⋁ { □ ⊥ } drop ;
 
 METHOD: ⋁ { □ □ } \ ⋁ boa ;
 
-GENERIC: ¬ ( x -- expr )
+MULTI-GENERIC: ¬ ( x -- expr )
 
 METHOD: ¬ { ⊤ } drop ⊥ ;
 METHOD: ¬ { ⊥ } drop ⊤ ;
@@ -50,17 +49,17 @@ METHOD: ¬ { □ } \ ¬ boa ;
 : ⊕ ( x y -- expr ) [ ⋁ ] [ ⋀ ¬ ] 2bi ⋀ ;
 : ≣ ( x y -- expr ) [ ⋀ ] [ [ ¬ ] bi@ ⋀ ] 2bi ⋁ ;
 
-GENERIC: (dnf) ( expr -- dnf )
+MULTI-GENERIC: (dnf) ( expr -- dnf )
 
 METHOD: (dnf) { ⋀ } [ x>> (dnf) ] [ y>> (dnf) ] bi append ;
 METHOD: (dnf) { □ } 1array ;
 
-GENERIC: dnf ( expr -- dnf )
+MULTI-GENERIC: dnf ( expr -- dnf )
 
 METHOD: dnf { ⋁ } [ x>> dnf ] [ y>> dnf ] bi append ;
 METHOD: dnf { □ } (dnf) 1array ;
 
-GENERIC: satisfiable? ( expr -- ? )
+MULTI-GENERIC: satisfiable? ( expr -- ? )
 
 METHOD: satisfiable? { ⊤ } drop t ;
 METHOD: satisfiable? { ⊥ } drop f ;
@@ -72,7 +71,7 @@ METHOD: satisfiable? { ⊥ } drop f ;
 METHOD: satisfiable? { □ }
     dnf [ (satisfiable?) ] any? ;
 
-GENERIC: (expr.) ( expr -- )
+MULTI-GENERIC: (expr.) ( expr -- )
 
 METHOD: (expr.) { □ } pprint ;
 
