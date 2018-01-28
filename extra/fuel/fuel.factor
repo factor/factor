@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.units continuations fuel.eval
+USING: accessors assocs compiler.units continuations fry fuel.eval
 fuel.help fuel.xref help.topics io.pathnames kernel namespaces parser
-parser.notes sequences tools.scaffold vocabs vocabs.files
+parser.notes sequences source-files tools.scaffold vocabs vocabs.files
 vocabs.hierarchy vocabs.loader vocabs.metadata vocabs.parser words ;
 IN: fuel
 
@@ -48,12 +48,6 @@ SYMBOL: :uses-suggestions
     [ manifest get auto-used>> clone :uses prefix fuel-eval-set-result ]
     print-use-hook set ;
 
-: get-uses ( lines -- )
-    [
-        parser-quiet? on
-        parse-fresh drop
-    ] curry with-compilation-unit ; inline
-
 PRIVATE>
 
 : fuel-use-suggested-vocabs ( ..a suggestions quot: ( ..a -- ..b ) -- ..b )
@@ -61,13 +55,20 @@ PRIVATE>
     [ try-suggested-restarts rethrow ] recover ; inline
 
 : fuel-run-file ( path -- )
-    [ set-use-hook run-file ] curry with-scope ; inline
+    '[ _ set-use-hook run-file ] with-scope ; inline
 
 : fuel-with-autouse ( ..a quot: ( ..a -- ..b ) -- ..b )
-    [ set-use-hook call ] curry with-scope ; inline
+    '[ _ set-use-hook call ] with-scope ; inline
 
-: fuel-get-uses ( lines -- )
-    [ get-uses ] curry fuel-with-autouse ;
+: fuel-get-uses ( name lines -- )
+    '[
+        [
+            _ [
+                parser-quiet? on
+                _ parse-fresh drop
+            ] with-source-file
+        ] with-compilation-unit
+    ] fuel-with-autouse ;
 
 ! Edit locations
 
