@@ -7,17 +7,17 @@ IN: cocoa.touchbar
 
 : make-touchbar ( seq self -- touchbar )
     [ NSTouchBar -> alloc -> init dup ] dip -> setDelegate: {
-        [ swap <CFStringArray> -> setDefaultItemIdentifiers: ]
-        [ swap <CFStringArray> -> setCustomizationAllowedItemIdentifiers: ]
+        [ swap <CFStringArray> { void { id SEL id } } ?-> setDefaultItemIdentifiers: ]
+        [ swap <CFStringArray> { void { id SEL id } } ?-> setCustomizationAllowedItemIdentifiers: ]
         [ nip ]
     } 2cleave ;
 
 :: make-NSTouchBar-button ( self identifier label-string action-string -- button )
     NSCustomTouchBarItem -> alloc
-        identifier <CFString> -> initWithIdentifier: :> item
+        identifier <CFString> { id { id SEL id } } ?-> initWithIdentifier: :> item
         NSButton
             label-string <CFString>
             self
-            action-string lookup-selector -> buttonWithTitle:target:action: :> button
+            action-string lookup-selector { id { id SEL id id SEL } } ?-> buttonWithTitle:target:action: :> button
         item button -> setView:
         item ;
