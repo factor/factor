@@ -184,7 +184,7 @@ M: send-touchbar-command send-queued-gesture
 <CLASS: FactorView < NSOpenGLView
     COCOA-PROTOCOL: NSTextInput
 
-    METHOD: void prepareOpenGL [
+    COCOA-METHOD: void prepareOpenGL [
 
         self selector: \setWantsBestResolutionOpenGLSurface:
         send: \respondsToSelector: c-bool> [
@@ -204,22 +204,22 @@ M: send-touchbar-command send-queued-gesture
     ] ;
 
     ! TouchBar
-    METHOD: void touchBarCommand0 [ 0 touchbar-invoke-command ] ;
-    METHOD: void touchBarCommand1 [ 1 touchbar-invoke-command ] ;
-    METHOD: void touchBarCommand2 [ 2 touchbar-invoke-command ] ;
-    METHOD: void touchBarCommand3 [ 3 touchbar-invoke-command ] ;
-    METHOD: void touchBarCommand4 [ 4 touchbar-invoke-command ] ;
-    METHOD: void touchBarCommand5 [ 5 touchbar-invoke-command ] ;
-    METHOD: void touchBarCommand6 [ 6 touchbar-invoke-command ] ;
-    METHOD: void touchBarCommand7 [ 7 touchbar-invoke-command ] ;
+    COCOA-METHOD: void touchBarCommand0 [ 0 touchbar-invoke-command ] ;
+    COCOA-METHOD: void touchBarCommand1 [ 1 touchbar-invoke-command ] ;
+    COCOA-METHOD: void touchBarCommand2 [ 2 touchbar-invoke-command ] ;
+    COCOA-METHOD: void touchBarCommand3 [ 3 touchbar-invoke-command ] ;
+    COCOA-METHOD: void touchBarCommand4 [ 4 touchbar-invoke-command ] ;
+    COCOA-METHOD: void touchBarCommand5 [ 5 touchbar-invoke-command ] ;
+    COCOA-METHOD: void touchBarCommand6 [ 6 touchbar-invoke-command ] ;
+    COCOA-METHOD: void touchBarCommand7 [ 7 touchbar-invoke-command ] ;
 
-    METHOD: Class makeTouchBar [
+    COCOA-METHOD: Class makeTouchBar [
         touchbar-commands drop [
             length 8 min <iota> [ number>string ] map
         ] [ { } ] if* self make-touchbar
     ] ;
 
-    METHOD: Class touchBar: Class touchbar makeItemForIdentifier: Class string [
+    COCOA-METHOD: Class touchBar: Class touchbar makeItemForIdentifier: Class string [
         touchbar-commands drop [
             [ self string CFString>string dup string>number ] dip nth
             second name>> "com-" ?head drop over
@@ -228,42 +228,42 @@ M: send-touchbar-command send-queued-gesture
     ] ;
 
     ! Rendering
-    METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ] ;
+    COCOA-METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ] ;
 
     ! Events
-    METHOD: char acceptsFirstMouse: id event [ 0 ] ;
+    COCOA-METHOD: char acceptsFirstMouse: id event [ 0 ] ;
 
-    METHOD: void mouseEntered: id event [ self event send-mouse-moved ] ;
+    COCOA-METHOD: void mouseEntered: id event [ self event send-mouse-moved ] ;
 
-    METHOD: void mouseExited: id event [ forget-rollover ] ;
+    COCOA-METHOD: void mouseExited: id event [ forget-rollover ] ;
 
-    METHOD: void mouseMoved: id event [ self event send-mouse-moved ] ;
+    COCOA-METHOD: void mouseMoved: id event [ self event send-mouse-moved ] ;
 
-    METHOD: void mouseDragged: id event [ self event send-mouse-moved ] ;
+    COCOA-METHOD: void mouseDragged: id event [ self event send-mouse-moved ] ;
 
-    METHOD: void rightMouseDragged: id event [ self event send-mouse-moved ] ;
+    COCOA-METHOD: void rightMouseDragged: id event [ self event send-mouse-moved ] ;
 
-    METHOD: void otherMouseDragged: id event [ self event send-mouse-moved ] ;
+    COCOA-METHOD: void otherMouseDragged: id event [ self event send-mouse-moved ] ;
 
-    METHOD: void mouseDown: id event [ self event send-button-down$ ] ;
+    COCOA-METHOD: void mouseDown: id event [ self event send-button-down$ ] ;
 
-    METHOD: void mouseUp: id event [ self event send-button-up$ ] ;
+    COCOA-METHOD: void mouseUp: id event [ self event send-button-up$ ] ;
 
-    METHOD: void rightMouseDown: id event [ self event send-button-down$ ] ;
+    COCOA-METHOD: void rightMouseDown: id event [ self event send-button-down$ ] ;
 
-    METHOD: void rightMouseUp: id event [ self event send-button-up$ ] ;
+    COCOA-METHOD: void rightMouseUp: id event [ self event send-button-up$ ] ;
 
-    METHOD: void otherMouseDown: id event [ self event send-button-down$ ] ;
+    COCOA-METHOD: void otherMouseDown: id event [ self event send-button-down$ ] ;
 
-    METHOD: void otherMouseUp: id event [ self event send-button-up$ ] ;
+    COCOA-METHOD: void otherMouseUp: id event [ self event send-button-up$ ] ;
 
-    METHOD: void scrollWheel: id event [ self event send-scroll$ ] ;
+    COCOA-METHOD: void scrollWheel: id event [ self event send-scroll$ ] ;
 
-    METHOD: void keyDown: id event [ self event send-key-down-event ] ;
+    COCOA-METHOD: void keyDown: id event [ self event send-key-down-event ] ;
 
-    METHOD: void keyUp: id event [ self event send-key-up-event ] ;
+    COCOA-METHOD: void keyUp: id event [ self event send-key-up-event ] ;
 
-    METHOD: char validateUserInterfaceItem: id event
+    COCOA-METHOD: char validateUserInterfaceItem: id event
     [
         self window [
             event send: action utf8 alien>string validate-action
@@ -271,32 +271,32 @@ M: send-touchbar-command send-queued-gesture
         ] [ 0 ] if*
     ] ;
 
-    METHOD: id undo: id event [ self event undo-action send-action$ f ] ;
+    COCOA-METHOD: id undo: id event [ self event undo-action send-action$ f ] ;
 
-    METHOD: id redo: id event [ self event redo-action send-action$ f ] ;
+    COCOA-METHOD: id redo: id event [ self event redo-action send-action$ f ] ;
 
-    METHOD: id cut: id event [ self event cut-action send-action$ f ] ;
+    COCOA-METHOD: id cut: id event [ self event cut-action send-action$ f ] ;
 
-    METHOD: id copy: id event [ self event copy-action send-action$ f ] ;
+    COCOA-METHOD: id copy: id event [ self event copy-action send-action$ f ] ;
 
-    METHOD: id paste: id event [ self event paste-action send-action$ f ] ;
+    COCOA-METHOD: id paste: id event [ self event paste-action send-action$ f ] ;
 
-    METHOD: id delete: id event [ self event delete-action send-action$ f ] ;
+    COCOA-METHOD: id delete: id event [ self event delete-action send-action$ f ] ;
 
-    METHOD: id selectAll: id event [ self event select-all-action send-action$ f ] ;
+    COCOA-METHOD: id selectAll: id event [ self event select-all-action send-action$ f ] ;
 
-    METHOD: id newDocument: id event [ self event new-action send-action$ f ] ;
+    COCOA-METHOD: id newDocument: id event [ self event new-action send-action$ f ] ;
 
-    METHOD: id openDocument: id event [ self event open-action send-action$ f ] ;
+    COCOA-METHOD: id openDocument: id event [ self event open-action send-action$ f ] ;
 
-    METHOD: id saveDocument: id event [ self event save-action send-action$ f ] ;
+    COCOA-METHOD: id saveDocument: id event [ self event save-action send-action$ f ] ;
 
-    METHOD: id saveDocumentAs: id event [ self event save-as-action send-action$ f ] ;
+    COCOA-METHOD: id saveDocumentAs: id event [ self event save-as-action send-action$ f ] ;
 
-    METHOD: id revertDocumentToSaved: id event [ self event revert-action send-action$ f ] ;
+    COCOA-METHOD: id revertDocumentToSaved: id event [ self event revert-action send-action$ f ] ;
 
     ! Multi-touch gestures
-    METHOD: void magnifyWithEvent: id event
+    COCOA-METHOD: void magnifyWithEvent: id event
     [
         self event
         dup send: deltaZ sgn {
@@ -306,7 +306,7 @@ M: send-touchbar-command send-queued-gesture
         } case
     ] ;
 
-    METHOD: void swipeWithEvent: id event
+    COCOA-METHOD: void swipeWithEvent: id event
     [
         self event
         dup send: deltaX sgn {
@@ -324,10 +324,10 @@ M: send-touchbar-command send-queued-gesture
         } case
     ] ;
 
-    METHOD: char acceptsFirstResponder [ 1 ] ;
+    COCOA-METHOD: char acceptsFirstResponder [ 1 ] ;
 
     ! Services
-    METHOD: id validRequestorForSendType: id sendType returnType: id returnType
+    COCOA-METHOD: id validRequestorForSendType: id sendType returnType: id returnType
     [
         ! We return either self or nil
         self window [
@@ -336,7 +336,7 @@ M: send-touchbar-command send-queued-gesture
         ] [ f ] if*
     ] ;
 
-    METHOD: char writeSelectionToPasteboard: id pboard types: id types
+    COCOA-METHOD: char writeSelectionToPasteboard: id pboard types: id types
     [
         NSStringPboardType types CFString>string-array member? [
             self window [
@@ -346,7 +346,7 @@ M: send-touchbar-command send-queued-gesture
         ] [ 0 ] if
     ] ;
 
-    METHOD: char readSelectionFromPasteboard: id pboard
+    COCOA-METHOD: char readSelectionFromPasteboard: id pboard
     [
         self window :> window
         window [
@@ -356,7 +356,7 @@ M: send-touchbar-command send-queued-gesture
     ] ;
 
     ! Text input
-    METHOD: void insertText: id text
+    COCOA-METHOD: void insertText: id text
     [
         self window :> window
         window [
@@ -364,28 +364,28 @@ M: send-touchbar-command send-queued-gesture
         ] when
     ] ;
 
-    METHOD: char hasMarkedText [ 0 ] ;
+    COCOA-METHOD: char hasMarkedText [ 0 ] ;
 
-    METHOD: NSRange markedRange [ 0 0 <NSRange> ] ;
+    COCOA-METHOD: NSRange markedRange [ 0 0 <NSRange> ] ;
 
-    METHOD: NSRange selectedRange [ 0 0 <NSRange> ] ;
+    COCOA-METHOD: NSRange selectedRange [ 0 0 <NSRange> ] ;
 
-    METHOD: void setMarkedText: id text selectedRange: NSRange range [ ] ;
+    COCOA-METHOD: void setMarkedText: id text selectedRange: NSRange range [ ] ;
 
-    METHOD: void unmarkText [ ] ;
+    COCOA-METHOD: void unmarkText [ ] ;
 
-    METHOD: id validAttributesForMarkedText [ NSArray send: array ] ;
+    COCOA-METHOD: id validAttributesForMarkedText [ NSArray send: array ] ;
 
-    METHOD: id attributedSubstringFromRange: NSRange range [ f ] ;
+    COCOA-METHOD: id attributedSubstringFromRange: NSRange range [ f ] ;
 
-    METHOD: NSUInteger characterIndexForPoint: NSPoint point [ 0 ] ;
+    COCOA-METHOD: NSUInteger characterIndexForPoint: NSPoint point [ 0 ] ;
 
-    METHOD: NSRect firstRectForCharacterRange: NSRange range [ 0 0 0 0 <CGRect> ] ;
+    COCOA-METHOD: NSRect firstRectForCharacterRange: NSRange range [ 0 0 0 0 <CGRect> ] ;
 
-    METHOD: NSInteger conversationIdentifier [ self alien-address ] ;
+    COCOA-METHOD: NSInteger conversationIdentifier [ self alien-address ] ;
 
     ! Initialization
-    METHOD: void updateFactorGadgetSize: id notification
+    COCOA-METHOD: void updateFactorGadgetSize: id notification
     [
         self window :> window
         window [
@@ -393,17 +393,17 @@ M: send-touchbar-command send-queued-gesture
         ] when
     ] ;
 
-    METHOD: void doCommandBySelector: SEL selector [ ] ;
+    COCOA-METHOD: void doCommandBySelector: SEL selector [ ] ;
 
-    METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
+    COCOA-METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
     [
         self frame pixelFormat super: \initWithFrame:pixelFormat:
         dup dup add-resize-observer
     ] ;
 
-    METHOD: char isOpaque [ 0 ] ;
+    COCOA-METHOD: char isOpaque [ 0 ] ;
 
-    METHOD: void dealloc
+    COCOA-METHOD: void dealloc
     [
         self remove-observer
         self super: dealloc
@@ -422,19 +422,19 @@ M: send-touchbar-command send-queued-gesture
 
 <CLASS: FactorWindowDelegate < NSObject
 
-    METHOD: void windowDidMove: id notification
+    COCOA-METHOD: void windowDidMove: id notification
     [
         notification send: object send: contentView window
         [ notification send: object save-position ] when*
     ] ;
 
-    METHOD: void windowDidBecomeKey: id notification
+    COCOA-METHOD: void windowDidBecomeKey: id notification
     [
         notification send: object send: contentView window
         [ focus-world ] when*
     ] ;
 
-    METHOD: void windowDidResignKey: id notification
+    COCOA-METHOD: void windowDidResignKey: id notification
     [
         forget-rollover
         notification send: object send: contentView :> view
@@ -445,15 +445,15 @@ M: send-touchbar-command send-queued-gesture
         ] when
     ] ;
 
-    METHOD: char windowShouldClose: id notification [ 1 ] ;
+    COCOA-METHOD: char windowShouldClose: id notification [ 1 ] ;
 
-    METHOD: void windowWillClose: id notification
+    COCOA-METHOD: void windowWillClose: id notification
     [
         notification send: object send: contentView
         [ window ungraft ] [ unregister-window ] bi
     ] ;
 
-    METHOD: void windowDidChangeBackingProperties: id notification
+    COCOA-METHOD: void windowDidChangeBackingProperties: id notification
     [
 
         notification send: object dup selector: backingScaleFactor

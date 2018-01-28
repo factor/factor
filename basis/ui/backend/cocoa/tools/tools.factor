@@ -23,29 +23,29 @@ IN: ui.backend.cocoa.tools
 ! Handle Open events from the Finder
 <CLASS: FactorWorkspaceApplicationDelegate < FactorApplicationDelegate
 
-    METHOD: void application: id app openFiles: id files [ files finder-run-files ] ;
+    COCOA-METHOD: void application: id app openFiles: id files [ files finder-run-files ] ;
 
-    METHOD: int applicationShouldHandleReopen: id app hasVisibleWindows: int flag [ flag 0 = [ show-listener ] when 1 ] ;
+    COCOA-METHOD: int applicationShouldHandleReopen: id app hasVisibleWindows: int flag [ flag 0 = [ show-listener ] when 1 ] ;
 
-    METHOD: id showFactorListener: id app [ show-listener f ] ;
+    COCOA-METHOD: id showFactorListener: id app [ show-listener f ] ;
 
-    METHOD: id showFactorBrowser: id app [ show-browser f ] ;
+    COCOA-METHOD: id showFactorBrowser: id app [ show-browser f ] ;
 
-    METHOD: id newFactorListener: id app [ listener-window f ] ;
+    COCOA-METHOD: id newFactorListener: id app [ listener-window f ] ;
 
-    METHOD: id newFactorBrowser: id app [ browser-window f ] ;
+    COCOA-METHOD: id newFactorBrowser: id app [ browser-window f ] ;
 
-    METHOD: id runFactorFile: id app [ menu-run-files f ] ;
+    COCOA-METHOD: id runFactorFile: id app [ menu-run-files f ] ;
 
-    METHOD: id saveFactorImage: id app [ save f ] ;
+    COCOA-METHOD: id saveFactorImage: id app [ save f ] ;
 
-    METHOD: id saveFactorImageAs: id app [ menu-save-image f ] ;
+    COCOA-METHOD: id saveFactorImageAs: id app [ menu-save-image f ] ;
 
-    METHOD: id switchLightTheme: id app [ light-mode f ] ;
+    COCOA-METHOD: id switchLightTheme: id app [ light-mode f ] ;
 
-    METHOD: id switchDarkTheme: id app [ dark-mode f ] ;
+    COCOA-METHOD: id switchDarkTheme: id app [ dark-mode f ] ;
 
-    METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ] ;
+    COCOA-METHOD: id refreshAll: id app [ [ refresh-all ] \ refresh-all call-listener f ] ;
 ;CLASS>
 
 : install-workspace-delegate ( -- )
@@ -59,10 +59,10 @@ IN: ui.backend.cocoa.tools
 
 <CLASS: FactorServiceProvider < NSObject
 
-    METHOD: void evalInListener: id pboard userData: id userData error: id error
+    COCOA-METHOD: void evalInListener: id pboard userData: id userData error: id error
     [ pboard error [ eval-listener f ] do-service ] ;
 
-    METHOD: void evalToString: id pboard userData: id userData error: id error
+    COCOA-METHOD: void evalToString: id pboard userData: id userData error: id error
     [
         pboard error
         [ [ (eval>string) ] with-interactive-vocabs ] do-service

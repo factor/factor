@@ -197,9 +197,9 @@ M: cocoa-ui-backend system-alert
 
 <CLASS: FactorApplicationDelegate < NSObject
 
-    METHOD: void applicationDidUpdate: id obj [ reset-thread-timer ] ;
+    COCOA-METHOD: void applicationDidUpdate: id obj [ reset-thread-timer ] ;
 
-    METHOD: char applicationShouldTerminateAfterLastWindowClosed: id app [
+    COCOA-METHOD: char applicationShouldTerminateAfterLastWindowClosed: id app [
         ui-stop-after-last-window? get 1 0 ?
     ] ;
 ;CLASS>

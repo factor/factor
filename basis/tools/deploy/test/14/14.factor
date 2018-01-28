@@ -7,7 +7,7 @@ FROM: alien.c-types => float ;
 IN: tools.deploy.test.14
 
 <CLASS: Bar < NSObject
-    METHOD: float bar: NSRect rect [
+    COCOA-METHOD: float bar: NSRect rect [
         rect origin>> [ x>> ] [ y>> ] bi +
         rect size>> [ w>> ] [ h>> ] bi +
         +

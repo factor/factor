@@ -4,7 +4,7 @@ namespaces tools.test ;
 IN: cocoa.tests
 
 <CLASS: Foo < NSObject
-    METHOD: void foo: NSRect rect [
+    COCOA-METHOD: void foo: NSRect rect [
         gc rect "x" set
     ] ;
 ;CLASS>
@@ -22,7 +22,7 @@ IN: cocoa.tests
 { 102.0 } [ "x" get CGRect-h ] unit-test
 
 <CLASS: Bar < NSObject
-    METHOD: NSRect bar [ test-foo "x" get ] ;
+    COCOA-METHOD: NSRect bar [ test-foo "x" get ] ;
 ;CLASS>
 
 { } [
@@ -40,9 +40,9 @@ IN: cocoa.tests
 
 ! Make sure that we can add methods
 <CLASS: Bar < NSObject
-    METHOD: NSRect bar [ test-foo "x" get ] ;
+    COCOA-METHOD: NSRect bar [ test-foo "x" get ] ;
 
-    METHOD: int babb: int x [ x sq ] ;
+    COCOA-METHOD: int babb: int x [ x sq ] ;
 ;CLASS>
 
 { 144 } [
