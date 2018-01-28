@@ -494,8 +494,11 @@ DEFER: <shader-instance>
 : link-program ( program -- program-instance )
     dup shaders>> [ <shader-instance> ] map (link-program) ;
 
+: word-directory ( word -- directory )
+    where first parent-directory ;
+
 : in-word's-path ( word kind filename -- word kind filename' )
-    [ over ] dip [ where first parent-directory ] dip append-path ;
+    pick word-directory prepend-path ;
 
 : become-shader-instance ( shader-instance new-shader-instance -- )
     handle>> [ swap delete-gl-shader ] curry change-handle drop ;
