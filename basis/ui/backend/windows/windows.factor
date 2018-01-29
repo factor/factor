@@ -706,13 +706,11 @@ M: windows-ui-backend set-title ( string world -- )
 
 M: windows-ui-backend (with-ui)
     [
-        [
-            init-clipboard
-            init-win32-ui
-            start-ui
-            event-loop
-        ] [ cleanup-win32-ui ] [ ] cleanup
-    ] with-ui-running ;
+        init-clipboard
+        init-win32-ui
+        start-ui
+        event-loop
+    ] [ cleanup-win32-ui ] [ ] cleanup ;
 
 M: windows-ui-backend beep ( -- )
     0 MessageBeep drop ;
