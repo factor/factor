@@ -224,7 +224,11 @@ M: object resize-window 2drop ;
     ui-running? [ call( -- ) ] [
         t ui-running set-global '[
             [ init-ui @ ] (with-ui)
-        ] [ f ui-running set-global ] [ ] cleanup
+        ] [
+            f ui-running set-global
+            ! Give running ui threads a chance to finish.
+            notify-ui-thread yield
+        ] [ ] cleanup
     ] if ;
 
 HOOK: beep ui-backend ( -- )
