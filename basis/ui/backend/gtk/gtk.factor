@@ -503,16 +503,14 @@ M:: gtk-ui-backend system-alert ( caption text -- )
     ] with-destructors ;
 
 M: gtk-ui-backend (with-ui)
+    f f gtk_init
+    f f gtk_gl_init
+    load-icon
+    init-clipboard
+    start-ui
     [
-        f f gtk_init
-        f f gtk_gl_init
-        load-icon
-        init-clipboard
-        start-ui
-        [
-            [ [ gtk_main ] with-timer ] with-event-loop
-        ] with-destructors
-    ] with-ui-running ;
+        [ [ gtk_main ] with-timer ] with-event-loop
+    ] with-destructors ;
 
 M: gtk-ui-backend stop-event-loop
     gtk_main_quit ;

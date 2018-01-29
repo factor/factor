@@ -215,15 +215,13 @@ cocoa-startup-hook [
 
 M: cocoa-ui-backend (with-ui)
     "UI" assert.app [
-        [
-            init-clipboard
-            cocoa-startup-hook get call( -- )
-            start-ui
-            stop-io-thread
-            init-thread-timer
-            reset-thread-timer
-            NSApp -> run
-        ] with-ui-running
+        init-clipboard
+        cocoa-startup-hook get call( -- )
+        start-ui
+        stop-io-thread
+        init-thread-timer
+        reset-thread-timer
+        NSApp -> run
     ] with-cocoa ;
 
 cocoa-ui-backend ui-backend set-global
