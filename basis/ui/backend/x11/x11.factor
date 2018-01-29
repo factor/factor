@@ -319,15 +319,13 @@ M: x11-handle flush-gl-context ( handle -- )
     dpy get swap window>> glXSwapBuffers ;
 
 M: x11-ui-backend (with-ui) ( quot -- )
-    [
-        f [
-            [
-                init-clipboard
-                start-ui
-                event-loop
-            ] with-xim
-        ] with-x
-    ] with-ui-running ;
+    f [
+        [
+            init-clipboard
+            start-ui
+            event-loop
+        ] with-xim
+    ] with-x ;
 
 M: x11-ui-backend beep ( -- )
     dpy get 100 XBell drop ;
