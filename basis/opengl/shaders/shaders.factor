@@ -54,8 +54,6 @@ IN: opengl.shaders
 : check-gl-shader ( shader -- shader )
     dup gl-shader-ok? [ dup gl-shader-info-log throw ] unless ;
 
-: delete-gl-shader ( shader -- ) glDeleteShader ; inline
-
 PREDICATE: gl-shader < integer (gl-shader?) ;
 PREDICATE: vertex-shader < gl-shader (vertex-shader?) ;
 PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
@@ -110,23 +108,18 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
     over uint <c-array>
     [ glGetAttachedShaders ] keep [ zero? ] reject ;
 
-: delete-gl-program-only ( program -- )
-    glDeleteProgram ; inline
-
-: detach-gl-program-shader ( program shader -- )
-    glDetachShader ; inline
-
 : delete-gl-program ( program -- )
     dup gl-program-shaders [
-        2dup detach-gl-program-shader delete-gl-shader
-    ] each delete-gl-program-only ;
+        2dup glDetachShader glDeleteShader
+    ] each glDeleteProgram ;
 
 : with-gl-program ( program quot -- )
     over glUseProgram [ 0 glUseProgram ] [ ] cleanup ; inline
 
 PREDICATE: gl-program < integer (gl-program?) ;
 
-: <simple-gl-program> ( vertex-shader-source fragment-shader-source -- program )
+: <simple-gl-program> ( vertex-shader-source fragment-shader-source
+                        -- program )
     [ <vertex-shader> check-gl-shader ]
     [ <fragment-shader> check-gl-shader ] bi*
     2array <gl-program> check-gl-program ;
