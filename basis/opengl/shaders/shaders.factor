@@ -62,15 +62,14 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 ! Programs
 
+: attach-shaders ( program shaders -- )
+    [ glAttachShader ] with each ;
+
 : (gl-program) ( shaders quot: ( gl-program -- ) -- program )
     glCreateProgram
     [
-        [ swap [ glAttachShader ] with each ]
-        [ swap call ] bi-curry bi*
+        rot dupd attach-shaders swap call
     ] [ glLinkProgram ] [ ] tri gl-error ; inline
-
-: <mrt-gl-program> ( shaders frag-data-locations -- program )
-    [ [ first2 swap glBindFragDataLocation ] with each ] curry (gl-program) ;
 
 : <gl-program> ( shaders -- program )
     [ drop ] (gl-program) ;
