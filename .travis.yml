@@ -1,4 +1,3 @@
-
 language: cpp
 compiler:
   - clang
@@ -45,4 +44,4 @@ before_install:
     ( cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) &&
     ( [[ "$TRAVIS_OS_NAME" != "osx" ]] && sudo ldconfig || true )
 script:
-  - ./build.sh net-bootstrap < /dev/null
+  - DEBUG=1 ./build.sh net-bootstrap < /dev/null
