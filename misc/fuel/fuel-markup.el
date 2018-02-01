@@ -145,7 +145,7 @@
     ($quotation . fuel-markup--quotation)
     ($references . fuel-markup--references)
     ($related . fuel-markup--related)
-    ($see . fuel-markup--see)
+    ($see . fuel-markup--word-info)
     ($see-also . fuel-markup--see-also)
     ($shuffle . fuel-markup--shuffle)
     ($side-effects . fuel-markup--side-effects)
@@ -155,7 +155,7 @@
     ($subheading . fuel-markup--subheading)
     ($subsection . fuel-markup--subsection)
     ($subsections . fuel-markup--subsections)
-    ($synopsis . fuel-markup--synopsis)
+    ($synopsis . fuel-markup--word-info)
     ($syntax . fuel-markup--syntax)
     ($table . fuel-markup--table)
     ($tag . fuel-markup--tag)
@@ -663,21 +663,19 @@ the 'words.' word emits."
 (defun fuel-markup--notes (e)
   (fuel-markup--elem-with-heading e "Notes"))
 
-(defun fuel-markup--word-info (e s)
+(defun fuel-markup--word-info (e)
+  "Uses the 'see' word to lookup info about a given word. Note
+that this function is called in contexts where it is impossible
+to guess the correct usings, so a static using list is used."
   (let* ((word (nth 1 e))
-         (cmd (and word `(:fuel* ((:quote ,(format "%s" word)) ,s) "fuel")))
+         (cmd `(:fuel* ((:quote ,(symbol-name word)) see)
+                       "fuel" ("kernel" "lexer" "see" "sequences")))
          (ret (and cmd (fuel-eval--send/wait cmd)))
          (res (and (not (fuel-eval--retort-error ret))
                    (fuel-eval--retort-output ret))))
     (if res
         (fuel-markup--code (list '$code res) nil)
       (fuel-markup--snippet (list '$snippet " " word)))))
-
-(defun fuel-markup--see (e)
-  (fuel-markup--word-info e 'see))
-
-(defun fuel-markup--synopsis (e)
-  (fuel-markup--word-info e 'synopsis))
 
 (defun fuel-markup--null (e))
 
