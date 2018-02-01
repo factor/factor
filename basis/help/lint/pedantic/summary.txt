@@ -1,0 +1,1 @@
+Pedantic help coverage checker
