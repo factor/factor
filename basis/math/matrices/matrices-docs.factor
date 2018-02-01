@@ -74,9 +74,9 @@ $nl
 
 "Covariance in matrices:"
 { $subsections
-    cov-matrix
-    cov-matrix-ddof
-    sample-cov-matrix
+    covariance-matrix
+    covariance-matrix-ddof
+    sample-covariance-matrix
 }
 
 "Accesing parts of a matrix:"
@@ -194,6 +194,122 @@ HELP: <simple-eye>
 
 { <square-rows> <square-cols> } related-words
 
+HELP: n+m
+{ $values { "n" object } { "m" sequence }  }
+{ $description { $snippet "n" } " is treated as a scalar and added to each element of the matrix " { $snippet "m" } ". " }
+{ $examples
+  { $example
+    "USING: kernel math.matrices prettyprint ;"
+    "3 <identity-matrix> 1 swap n+m ."
+    "{ { 2 1 1 } { 1 2 1 } { 1 1 2 } }"
+  }
+} ;
+
+{ n+m m+n n-m m-n n*m m*n n/m m/n } related-words
+
+HELP: m+
+{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
+{ $description "Adds two matrices element-wise." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ { 1 2 3 } { 3 2 1 } } { { 4 5 6 } { 6 5 4 } } m+ ."
+    "{ { 5 7 9 } { 9 7 5 } }"
+  }
+} ;
+
+HELP: m-
+{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
+{ $description "Subtracts two matrices element-wise." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ { 4 5 6 } { 6 5 4 } } { { 1 2 3 } { 3 2 1 } } m- ."
+    "{ { 3 3 3 } { 3 3 3 } }"
+  }
+} ;
+
+HELP: m*
+{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
+{ $description "Multiplies two matrices element-wise." }
+{ $examples
+  { $example
+      "USING: math.matrices prettyprint ;"
+      "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m* ."
+      "{ { 15 18 } { 60 153 } }"
+  }
+} ;
+
+HELP: m/
+{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
+{ $description "Divides two matrices element-wise." }
+{ $examples
+  { $example
+      "USING: math.matrices prettyprint ;"
+      "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m/ ."
+      "{ { 1+2/3 4+1/2 } { 3+3/4 1+8/9 } }"
+  }
+} ;
+
+HELP: m~
+{ $values { "m1" sequence } { "m2" sequence } { "epsilon" number } { "?" boolean } }
+{ $description "Compares the matrices using the " { $snippet "epsilon" } "." }
+{ $examples
+  { $example
+      "USING: kernel math math.matrices prettyprint ;"
+      "{ { 5 9 } { 15 17 } } dup [ .01 + ] matrix-map .1 m~ ."
+      "t"
+  }
+} ;
+
+{ m+ m- m* m/ m~ } related-words
+
+HELP: mneg
+{ $values { "m" sequence } { "m" object } }
+{ $description "Negate (invert the sign) of all elements in the matrix." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ { 5 9 } { 15 17 } } mneg ."
+    "{ { -5 -9 } { -15 -17 } }"
+  }
+} ;
+
+HELP: mmin
+{ $values { "m" sequence } { "n" object } }
+{ $description "Calculate the minimum value of all elements in the matrix." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ { 5 9 } { 15 17 } } mmin ."
+    "5"
+  }
+} ;
+
+HELP: mmax
+{ $values { "m" sequence } { "n" object } }
+{ $description "Calculate the maximum value of all elements in the matrix." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ { 5 9 } { 15 17 } } mmin ."
+    "17"
+  }
+} ;
+
+HELP: mnorm
+{ $values { "m" sequence } { "m'" object } }
+{ $description "Calculate the normal value of each element in the matrix. This makes the maximum value in the sequence " { $snippet "1/1" } ", and computes other elements as fractions of this maximum. The output is a matrix, containing each original element as a fraction of the maximum." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ { 5 9 } { 15 17 } } mnorm ."
+    "{ { 5/17 9/17 } { 15/17 1 } }"
+  }
+} ;
+
+{ mmin mmax mnorm mneg } related-words
+
 HELP: m.v
 { $values { "m" sequence } { "v" sequence } { "p" sequence } }
 { $description "Computes the dot product between a matrix and a vector." }
@@ -228,67 +344,6 @@ HELP: m.
 } ;
 
 { m. v.m m.v } related-words
-
-HELP: m+
-{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
-{ $description "Adds the matrices element-wise." }
-{ $examples
-  { $example
-    "USING: math.matrices prettyprint ;"
-    "{ { 1 2 } { 3 4 } } { { 5 6 } { 7 8 } } m+ ."
-    "{ { 6 8 } { 10 12 } }"
-  }
-} ;
-
-HELP: m-
-{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
-{ $description "Subtracts the matrices element-wise." }
-{ $examples
-  { $example
-      "USING: math.matrices prettyprint ;"
-      "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m- ."
-      "{ { 2 7 } { 11 8 } }"
-  }
-} ;
-
-HELP: m*
-{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
-{ $description "Multiplies the matrices element-wise." }
-{ $examples
-  { $example
-      "USING: math.matrices prettyprint ;"
-      "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m- ."
-      "{ { 2 7 } { 11 8 } }"
-  }
-} ;
-
-HELP: m/
-{ $values { "m1" sequence } { "m2" sequence } { "m" sequence } }
-{ $description "Divides the matrices element-wise." }
-{ $examples
-  { $example
-      "USING: math.matrices prettyprint ;"
-      "{ { 5 9 } { 15 17 } } { { 3 2 } { 4 9 } } m- ."
-      "{ { 2 7 } { 11 8 } }"
-  }
-} ;
-
-HELP: m~
-{ $values { "m1" sequence } { "m2" sequence } { "epsilon" number } { "?" boolean } }
-{ $description "Compares the matrices using the " { $snippet "epsilon" } "." }
-{ $examples
-  { $example
-      "USING: kernel math math.matrices prettyprint ;"
-      "{ { 5 9 } { 15 17 } } dup [ .01 + ] matrix-map .1 m~ ."
-      "t"
-  }
-} ;
-
-{ m+ m- m* m/ m~ } related-words
-
-{ n+m m+n n-m m-n n*m m*n n/m m/n } related-words
-
-{ mmin mmax mnorm mneg } related-words
 
 HELP: stitch
 { $values { "m" sequence } { "m'" sequence } }

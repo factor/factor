@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
+! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff, Cat Stevens.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays columns kernel locals math math.bits
 math.functions math.order math.vectors sequences
@@ -40,7 +40,7 @@ ERROR: negative-power-matrix m n ;
 :: <simple-eye> ( m n k -- matrix )
     m n = k 0 = and
     [ n <identity-matrix> ]
-    [ m n k 1 <eye> ] if ;
+    [ m n k 1 <eye> ] if ; inline
 
 DEFER: matrix-indices
 DEFER: matrix-set-nths
@@ -164,15 +164,14 @@ PRIVATE>
 
 : v.m ( v m -- p ) flip [ v. ] with map ;
 : m.v ( m v -- p ) [ v. ] curry map ;
-: m.  ( m m -- m ) flip [ swap m.v ] curry map ;
+: m. ( m m -- m ) flip [ swap m.v ] curry map ;
 ! should this be called m.m ?
 
 : m~  ( m1 m2 epsilon -- ? ) [ v~ ] curry 2all? ;
 
 : mmin ( m -- n ) [ 1/0. ] dip [ [ min ] each ] each ;
 : mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
-: mnorm ( m -- n ) dup mmax abs m/n ;
-
+: mnorm ( m -- m' ) dup mmax abs m/n ;
 
 <PRIVATE
 
@@ -201,7 +200,7 @@ PRIVATE>
     '[ [ _ n*m  ] map ] map stitch stitch ;
 
 : outer ( u v -- m )
-    [ n*v ] curry map ;
+    '[ _ n*v ] map ;
 
 : row ( n matrix -- col )
     nth ; inline
@@ -234,12 +233,12 @@ PRIVATE>
 : cartesian-matrix-column-map ( matrix quot -- matrix' )
     [ cols first2 ] prepose cartesian-matrix-map ; inline
 
-: cov-matrix-ddof ( matrix ddof -- cov )
+: covariance-matrix-ddof ( matrix ddof -- cov )
     '[ _ cov-ddof ] cartesian-matrix-column-map ; inline
 
-: cov-matrix ( matrix -- cov ) 0 cov-matrix-ddof ; inline
+: covariance-matrix ( matrix -- cov ) 0 covariance-matrix-ddof ; inline
 
-: sample-cov-matrix ( matrix -- cov ) 1 cov-matrix-ddof ; inline
+: sample-covariance-matrix ( matrix -- cov ) 1 covariance-matrix-ddof ; inline
 
 GENERIC: <square-rows> ( object -- matrix )
 M: integer <square-rows> <iota> <square-rows> ;
