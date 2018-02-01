@@ -21,7 +21,7 @@ IN: game.debug.tests
         { 0 0 0 } { 1 0 0 } COLOR: red   debug-line
         { 0 0 0 } { 0 1 0 } COLOR: green debug-line
         { 0 0 0 } { 0 0 1 } COLOR: blue  debug-line
-        { -1.2 0 0 } { 0 1 0 } 0 deg>rad rotation-matrix3 debug-axes
+        { -1.2 0 0 } { 0 1 0 } 0 deg>rad <rotation-matrix3> debug-axes
         { 3 5 -2 } { 3 2 1 } COLOR: white debug-box
         { 0 9 0 } 8 2 COLOR: blue debug-cylinder
     ] float-array{ } make

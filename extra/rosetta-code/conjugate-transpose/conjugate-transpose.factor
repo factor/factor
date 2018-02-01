@@ -38,4 +38,4 @@ IN: rosetta-code.conjugate-transpose
     dup conj-t [ m. ] [ swap m. ] 2bi = ;
 
 : unitary-matrix? ( matrix -- ? )
-    [ dup conj-t m. ] [ length identity-matrix ] bi = ;
+    [ dup conj-t m. ] [ length <identity-matrix> ] bi = ;

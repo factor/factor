@@ -38,14 +38,14 @@ GENERIC: wasd-fly-vertically? ( world -- ? )
 M: wasd-world wasd-fly-vertically? drop t ;
 
 : wasd-mv-matrix ( world -- matrix )
-    [ { 1.0 0.0 0.0 } swap pitch>> rotation-matrix4 ]
-    [ { 0.0 1.0 0.0 } swap yaw>>   rotation-matrix4 ]
-    [ location>> vneg translation-matrix4 ] tri m. m. ;
+    [ { 1.0 0.0 0.0 } swap pitch>> <rotation-matrix4> ]
+    [ { 0.0 1.0 0.0 } swap yaw>>   <rotation-matrix4> ]
+    [ location>> vneg <translation-matrix4> ] tri m. m. ;
 
 : wasd-mv-inv-matrix ( world -- matrix )
-    [ location>> translation-matrix4 ]
-    [ {  0.0 -1.0 0.0 } swap yaw>>   rotation-matrix4 ]
-    [ { -1.0  0.0 0.0 } swap pitch>> rotation-matrix4 ] tri m. m. ;
+    [ location>> <translation-matrix4> ]
+    [ {  0.0 -1.0 0.0 } swap yaw>>   <rotation-matrix4> ]
+    [ { -1.0  0.0 0.0 } swap pitch>> <rotation-matrix4> ] tri m. m. ;
 
 : wasd-p-matrix ( world -- matrix )
     p-matrix>> ;
@@ -63,7 +63,7 @@ CONSTANT: fov 0.7
     world wasd-far-plane :> far-plane
 
     world wasd-fov-vector near-plane v*n
-    near-plane far-plane frustum-matrix4 ;
+    near-plane far-plane <frustum-matrix4> ;
 
 :: wasd-pixel-ray ( world loc -- direction )
     loc world dim>> [ /f 0.5 - 2.0 * ] 2map

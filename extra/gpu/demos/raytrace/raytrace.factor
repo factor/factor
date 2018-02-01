@@ -48,7 +48,7 @@ TUPLE: raytrace-world < wasd-world
     dup dtheta>> [ + ] curry change-theta drop ;
 
 : sphere-center ( sphere -- center )
-    [ [ axis>> ] [ theta>> ] bi rotation-matrix4 ]
+    [ [ axis>> ] [ theta>> ] bi <rotation-matrix4> ]
     [ home>> ] bi m.v ;
 
 M: sphere audio-position sphere-center ; inline
