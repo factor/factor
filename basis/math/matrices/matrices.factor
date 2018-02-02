@@ -240,12 +240,12 @@ PRIVATE>
 
 : sample-covariance-matrix ( matrix -- cov ) 1 covariance-matrix-ddof ; inline
 
-GENERIC: <square-rows> ( object -- matrix )
+GENERIC: <square-rows> ( desc -- matrix )
 M: integer <square-rows> <iota> <square-rows> ;
 M: sequence <square-rows>
     [ length ] keep >array '[ _ clone ] { } replicate-as ;
 
-GENERIC: <square-cols> ( object -- matrix )
+GENERIC: <square-cols> ( desc -- matrix )
 M: integer <square-cols> <iota> <square-cols> ;
 M: sequence <square-cols>
     [ length ] keep [ <array> ] with { } map-as ;

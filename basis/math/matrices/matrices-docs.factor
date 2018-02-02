@@ -104,6 +104,11 @@ $nl
     square-matrix?
 } ;
 
+HELP: negative-power-matrix?
+! { $values { "m" integer } { "n" integer } }
+{ $description "Determines whether an object is in the class of " { $link negative-power-matrix } " objects." }
+;
+
 ! creators
 
 HELP: <matrix>
@@ -168,7 +173,7 @@ HELP: <identity-matrix>
 { $examples
   { $example
     "USING: math.matrices prettyprint ;"
-    "4 identity-matrix ."
+    "4 <identity-matrix> ."
     "{ { 1 0 0 0 } { 0 1 0 0 } { 0 0 1 0 } { 0 0 0 1 } }"
   }
 } ;
@@ -209,22 +214,48 @@ HELP: <simple-eye>
 
 { <square-rows> <square-cols> } related-words
 
+HELP: <square-cols>
+{ $values { "desc" "a descriptor" } { "matrix" sequence } }
+{ $description "Generate a square column matrix using the input descriptor. If the descriptor is a number, it is used to generate square columns within that range. If the descriptor is a sequence, one column is created to replicate each of its elements." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "3 <square-cols> ."
+    "{ { 0 0 0 } { 1 1 1 } { 2 2 2 } }"
+  }
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ 2 3 5 } <square-cols> ."
+    "{ { 2 2 2 } { 3 3 3 } { 5 5 5 } }"
+  }
+} ;
+
 HELP: <scale-matrix4>
 { $values { "factors" sequence } { "matrix" sequence } }
 { $description "Make a 4x4 " { $url URL" https://en.wikipedia.org/wiki/Scaling_(geometry)#Matrix_representation" "scaling matrix" } "." }
 { $examples
 
-}
-;
+} ;
 
 HELP: n+m
 { $values { "n" object } { "m" sequence }  }
-{ $description { $snippet "n" } " is treated as a scalar and added to each element of the matrix " { $snippet "m" } ". " }
+{ $description { $snippet "n" } " is treated as a scalar and added to each element of the matrix " { $snippet "m" } "." }
 { $examples
   { $example
     "USING: kernel math.matrices prettyprint ;"
     "3 <identity-matrix> 1 swap n+m ."
     "{ { 2 1 1 } { 1 2 1 } { 1 1 2 } }"
+  }
+} ;
+
+HELP: n*m
+{ $values { "n" object } { "m" sequence }  }
+{ $description { $snippet "n" } " is treated as a scalar. Each element in " { $snippet "m" } " is multiplied by " { $snippet "n" } "." }
+{ $examples
+  { $example
+    "USING: kernel math.matrices prettyprint ;"
+    "3 <identity-matrix> 3 swap n*m ."
+    "{ { 3 0 0 } { 0 3 0 } { 0 0 3 } }"
   }
 } ;
 
@@ -315,7 +346,7 @@ HELP: mmax
 { $examples
   { $example
     "USING: math.matrices prettyprint ;"
-    "{ { 5 9 } { 15 17 } } mmin ."
+    "{ { 5 9 } { 15 17 } } mmax ."
     "17"
   }
 } ;
@@ -408,3 +439,53 @@ HELP: outer
         "{ 5 6 7 } { 1 2 3 } outer ."
         "{ { 5 10 15 } { 6 12 18 } { 7 14 21 } }" }
 } ;
+
+{ kronecker outer } related-words
+
+HELP: col
+{ $values { "n" integer } { "matrix" sequence } }
+{ $description "Get the nth column of the matrix." }
+{ $notes "Like most Factor sequences, indexing is 0-based. The first column is given by " { $snippet "m 0 col" } "." }
+{ $examples
+  { $example
+    "USING: kernel math.matrices prettyprint ;"
+    "{ { 1 2 } { 3 4 } } 1 swap col ."
+    "{ 2 4 }"
+  }
+} ;
+
+HELP: cols
+{ $values { "seq" "a sequence of integers" } { "matrix" sequence } }
+{ $description "Get the columns from " { $snippet "matrix" } " listed by " { $snippet "seq" } "." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ 0 1 } { { 1 2 } { 3 4 } } cols ."
+    "{ { 1 3 } { 2 4 } }"
+  }
+} ;
+
+HELP: row
+{ $values { "n" integer } { "matrix" sequence } }
+{ $description "Get the nth row of the matrix." }
+{ $notes "Like most Factor sequences, indexing is 0-based. The first row is given by " { $snippet "m 0 row" } "." }
+{ $examples
+  { $example
+    "USING: kernel math.matrices prettyprint ;"
+    "{ { 1 2 } { 3 4 } } 1 swap row ."
+    "{ 3 4 }"
+  }
+} ;
+
+HELP: rows
+{ $values { "seq" "a sequence of integers" } { "matrix" sequence } }
+{ $description "Get the rows from " { $snippet "matrix" } " listed by " { $snippet "seq" } "." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "{ 0 1 } { { 1 2 } { 3 4 } } rows ."
+    "{ { 1 2 } { 3 4 } }"
+  }
+} ;
+
+{ col cols row rows } related-words
