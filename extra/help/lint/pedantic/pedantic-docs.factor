@@ -1,17 +1,20 @@
-USING: help help.lint.pedantic help.markup help.syntax kernel
-strings words vocabs ;
+USING: help help.lint.pedantic help.lint.pedantic.private help.markup help.syntax kernel
+sequences strings vocabs words ;
 IN: help.lint.pedantic
 
 ABOUT: "help.lint.pedantic"
 
 ARTICLE: "help.lint.pedantic" "Pedantic help coverage"
-"The " { $vocab-link "help.lint.pedantic" } " vocabulary implements a very picky documentation completeness checker. Intended to be used alongside " { $vocab-link "help.lint" } " in writing documenation, the pedantic linter requires all ordinary words to have documentation defining the "
-{ $link $example } ", "
-{ $link $description } ", and "
-{ $link $values }
-" sections (see " { $link "element-types" } ")."
+"pedant, " { $emphasis "n." } " one who pays more attention to formal rules and book learning than they merit."
 $nl
-"The following words are provided to aid in writing more complete documentation:"
+"The " { $vocab-link "help.lint.pedantic" } " vocabulary implements a very picky documentation completeness checker -- your very own documentation pedant."
+$nl
+"The pedantic linter requires most words to have documentation defining the "
+{ $links $values $description $error-description $class-description $examples } " sections (see " { $links "element-types" } ")."
+$nl
+"This vocabulary is intended to be used alongside and after " { $vocab-link "help.lint" } ", not as a replacement for it."
+$nl
+"These words are provided to aid in writing more complete documentation:"
 { $subsections
     word-pedant
     vocab-pedant
@@ -19,11 +22,17 @@ $nl
 } ;
 
 { word-pedant vocab-pedant prefix-pedant } related-words
+{ missing-sections empty-examples } related-words
 
-HELP: ordinary-word-missing-section
-{ $values { "missing-section" string } { "word-name" string } }
-{ $description "Throws an " { $link ordinary-word-missing-section } " error." }
-{ $error-description "Thrown when an ordinary word's documentation is missing one of the sections " { $links $values $description $example } "." } ;
+HELP: missing-sections
+{ $values { "missing-sections" sequence } { "word-name" word } }
+{ $description "Throws an " { $link missing-sections } " error." }
+{ $error-description "Thrown when a word's documentation is missing one or more sections required for it by " { $link should-define } "." } ;
+
+HELP: empty-examples
+{ $values { "word-name" word } }
+{ $description "Throws an " { $link empty-examples } " error." }
+{ $error-description "Thrown when a word's " { $link $examples } " section is missing or empty." } ;
 
 HELP: prefix-pedant
 { $values { "prefix" string } { "private?" boolean } }
@@ -31,7 +40,7 @@ HELP: prefix-pedant
 { $errors
     { $link empty-examples } " if a word has an empty " { $snippet "$examples" } " section
 "
-    { $link ordinary-word-missing-section } " if a word is missing a section entirely"
+    { $link missing-sections } " if a word is missing a section entirely"
 }
 { $examples
   { $example
@@ -47,7 +56,7 @@ HELP: word-pedant
 { $errors
     { $link empty-examples } " if a word has an empty " { $snippet "$examples" } " section
 "
-    { $link ordinary-word-missing-section } " if a word is missing a section entirely"
+    { $link missing-sections } " if a word is missing a section entirely"
 }
 { $examples
     { $example
@@ -63,7 +72,7 @@ HELP: vocab-pedant
 { $errors
     { $link empty-examples } " if a word has an empty " { $snippet "$examples" } " section
 "
-    { $link ordinary-word-missing-section } " if a word is missing a section entirely"
+    { $link missing-sections } " if a word is missing a section entirely"
 }
 { $examples
     { $example
