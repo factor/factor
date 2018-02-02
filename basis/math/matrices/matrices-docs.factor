@@ -137,7 +137,15 @@ HELP: <matrix-by>
 
 HELP: <zero-matrix>
 { $values { "m" integer } { "n" integer } { "matrix" sequence } }
-{ $description "Creates a matrix of size " { $snippet "m x n" } ", filled with zeroes." } ;
+{ $description "Creates a matrix of size " { $snippet "m x n" } ", filled with zeroes." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "2 3 <zero-matrix> ."
+    "{ { 0 0 0 } { 0 0 0 } }"
+  }
+}
+;
 
 HELP: <zero-square-matrix>
 { $values { "m" integer } { "matrix" sequence } }
@@ -156,7 +164,14 @@ HELP: <diagonal-matrix>
 
 HELP: <identity-matrix>
 { $values { "n" integer } { "matrix" sequence } }
-{ $description "Creates an " { $url URL" http://enwp.org/Identity_matrix" "identity matrix" } " of size " { $snippet "n x n" } ", where the diagonal values are all ones." } ;
+{ $description "Creates an " { $url URL" http://enwp.org/Identity_matrix" "identity matrix" } " of size " { $snippet "n x n" } ", where the diagonal values are all ones." }
+{ $examples
+  { $example
+    "USING: math.matrices prettyprint ;"
+    "4 identity-matrix ."
+    "{ { 1 0 0 0 } { 0 1 0 0 } { 0 0 1 0 } { 0 0 0 1 } }"
+  }
+} ;
 
 HELP: <eye>
 { $values { "m" integer } { "n" integer } { "k" integer } { "z" object } { "matrix" sequence } }
@@ -193,6 +208,14 @@ HELP: <simple-eye>
 { <zero-matrix> <diagonal-matrix> <identity-matrix> <eye> <simple-eye> } related-words
 
 { <square-rows> <square-cols> } related-words
+
+HELP: <scale-matrix4>
+{ $values { "factors" sequence } { "matrix" sequence } }
+{ $description "Make a 4x4 " { $url URL" https://en.wikipedia.org/wiki/Scaling_(geometry)#Matrix_representation" "scaling matrix" } "." }
+{ $examples
+
+}
+;
 
 HELP: n+m
 { $values { "n" object } { "m" sequence }  }
