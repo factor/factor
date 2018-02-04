@@ -8,8 +8,9 @@ HELP: inverse
 { $examples
   "A matrix multiplied by its inverse is the identity matrix."
   { $example
-    "USING: kernel math.matrices math.matrices.elimination prettyprint ;"
-    "{ { 3 4 } { 7 9 } } dup inverse m. 2 identity-matrix = ."
+    "USING: kernel math.matrices prettyprint ;"
+    "FROM: math.matrices.elimination => inverse ;"
+    "{ { 3 4 } { 7 9 } } dup inverse m. 2 <identity-matrix> = ."
     "t"
   }
 } ;

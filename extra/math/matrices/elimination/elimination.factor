@@ -93,7 +93,7 @@ SYMBOL: matrix
 
 : nullspace ( matrix -- seq )
     echelon reduced dup empty? [
-        dup first length identity-matrix [
+        dup first length <identity-matrix> [
             [
                 dup leading drop
                 [ basis-vector ] [ drop ] if*
@@ -109,5 +109,5 @@ SYMBOL: matrix
 
 : inverse ( matrix -- matrix ) ! Assumes an invertible matrix
     dup length
-    [ identity-matrix [ append ] 2map solution ] keep
+    [ <identity-matrix> [ append ] 2map solution ] keep
     [ tail ] curry map ;
