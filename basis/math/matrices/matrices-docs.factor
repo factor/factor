@@ -105,7 +105,7 @@ $nl
 } ;
 
 HELP: negative-power-matrix?
-! { $values { "m" integer } { "n" integer } }
+{ $values { "m" integer } { "n" integer } }
 { $description "Determines whether an object is in the class of " { $link negative-power-matrix } " objects." }
 ;
 
