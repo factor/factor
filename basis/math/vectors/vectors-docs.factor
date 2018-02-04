@@ -315,11 +315,11 @@ HELP: vclamp
 } ;
 
 HELP: v.
-{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "x" "a real number" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "x" real } }
 { $description "Computes the dot product of two vectors." } ;
 
 HELP: h.
-{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "x" "a real number" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "x" real } }
 { $description "Computes the Hermitian inner product of two vectors." } ;
 
 HELP: vs+

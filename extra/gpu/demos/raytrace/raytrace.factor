@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.tuple game.loop game.worlds
 generalizations gpu gpu.render gpu.shaders gpu.util gpu.util.wasd
-kernel literals math math.libm math.matrices math.order math.vectors
-method-chains sequences ui ui.gadgets ui.gadgets.worlds
-ui.pixel-formats audio.engine audio.loader locals ;
+kernel literals math math.libm math.matrices math.matrices.extras
+math.order math.vectors method-chains sequences ui ui.gadgets
+ui.gadgets.worlds ui.pixel-formats audio.engine audio.loader locals ;
 IN: gpu.demos.raytrace
 
 GLSL-SHADER-FILE: raytrace-vertex-shader vertex-shader "raytrace.v.glsl"
@@ -48,7 +48,7 @@ TUPLE: raytrace-world < wasd-world
     dup dtheta>> [ + ] curry change-theta drop ;
 
 : sphere-center ( sphere -- center )
-    [ [ axis>> ] [ theta>> ] bi rotation-matrix4 ]
+    [ [ axis>> ] [ theta>> ] bi <rotation-matrix4> ]
     [ home>> ] bi m.v ;
 
 M: sphere audio-position sphere-center ; inline

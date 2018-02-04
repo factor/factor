@@ -279,3 +279,19 @@ PRIVATE>
 
 : vclamp ( v min max -- w )
     rot vmin vmax ; inline
+
+: cross ( vec1 vec2 -- vec3 )
+    [ [ { 1 2 0 } vshuffle ] [ { 2 0 1 } vshuffle ] bi* v* ]
+    [ [ { 2 0 1 } vshuffle ] [ { 1 2 0 } vshuffle ] bi* v* ] 2bi v- ; inline
+
+:: normal ( vec1 vec2 vec3 -- vec4 )
+    vec2 vec1 v- vec3 vec1 v- cross normalize ; inline
+
+: proj ( v u -- w )
+    [ [ v. ] [ norm-sq ] bi / ] keep n*v ;
+
+: perp ( v u -- w )
+    dupd proj v- ;
+
+: angle-between ( v u -- a )
+    [ normalize ] bi@ h. acos ;

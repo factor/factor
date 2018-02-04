@@ -1,15 +1,15 @@
-USING: kernel locals math math.matrices math.order math.vectors
-prettyprint sequences ;
+USING: kernel locals math math.matrices math.matrices.extras
+math.order math.vectors prettyprint sequences ;
 IN: benchmark.3d-matrix-scalar
 
 :: p-matrix ( dim fov near far -- matrix )
     dim dup first2 min v/n fov v*n near v*n
-    near far frustum-matrix4 ;
+    near far <frustum-matrix4> ;
 
 :: mv-matrix ( pitch yaw location -- matrix )
-    { 1.0 0.0 0.0 } pitch rotation-matrix4
-    { 0.0 1.0 0.0 } yaw   rotation-matrix4
-    location vneg translation-matrix4 m. m. ;
+    { 1.0 0.0 0.0 } pitch <rotation-matrix4>
+    { 0.0 1.0 0.0 } yaw   <rotation-matrix4>
+    location vneg <translation-matrix4> m. m. ;
 
 :: 3d-matrix-scalar-benchmark ( -- )
     f :> result!
