@@ -251,6 +251,11 @@ PRIVATE>
 : $subsections ( children -- )
     [ $subsection* ] each ($blank-line) ;
 
+DEFER: related-words
+
+: $related-subsections ( children -- ) 
+    [ related-words ] [ $subsections ] bi ; 
+
 : $subsection ( element -- )
     check-first $subsection* ;
 
