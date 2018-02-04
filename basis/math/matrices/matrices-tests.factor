@@ -4,7 +4,7 @@ IN: math.matrices.tests
 {
     { { 0 } { 0 } { 0 } }
 } [
-    3 1 zero-matrix
+    3 1 <zero-matrix>
 ] unit-test
 
 {
@@ -12,7 +12,7 @@ IN: math.matrices.tests
        { 0 1 0 }
        { 0 0 1 } }
 } [
-    3 identity-matrix
+    3 <identity-matrix>
 ] unit-test
 
 {
@@ -20,7 +20,7 @@ IN: math.matrices.tests
        { 0 2 0 }
        { 0 0 3 } }
 } [
-    { 1 2 3 } diagonal-matrix
+    { 1 2 3 } <diagonal-matrix>
 ] unit-test
 
 {
@@ -29,7 +29,7 @@ IN: math.matrices.tests
       { 9 3 1 }
       { 25 5 1 } }
 } [
-    { 1 2 3 5 } 3 vandermonde-matrix
+    { 1 2 3 5 } 3 <vandermonde-matrix>
 ] unit-test
 
 {
@@ -39,7 +39,7 @@ IN: math.matrices.tests
         { 0 0 1 }
     }
 } [
-    3 3 0 eye
+    3 3 0 <simple-eye>
 ] unit-test
 
 {
@@ -49,7 +49,7 @@ IN: math.matrices.tests
         { 0 0 0 }
     }
 } [
-    3 3 1 eye
+    3 3 1 <simple-eye>
 ] unit-test
 
 {
@@ -59,7 +59,7 @@ IN: math.matrices.tests
         { 0 1 0 }
     }
 } [
-    3 3 -1 eye
+    3 3 -1 <simple-eye>
 ] unit-test
 
 {
@@ -69,7 +69,7 @@ IN: math.matrices.tests
         { 0 0 1 0 }
     }
 } [
-    3 4 0 eye
+    3 4 0 <simple-eye>
 ] unit-test
 
 {
@@ -80,7 +80,7 @@ IN: math.matrices.tests
         { 0 0 0 }
     }
 } [
-    4 3 1 eye
+    4 3 1 <simple-eye>
 ] unit-test
 
 {
@@ -91,7 +91,7 @@ IN: math.matrices.tests
         { 0 0 1 }
     }
 } [
-    4 3 -1 eye
+    4 3 -1 <simple-eye>
 ] unit-test
 
 {
@@ -99,21 +99,21 @@ IN: math.matrices.tests
       { 1/2 1/3 1/4 1/5 }
       { 1/3 1/4 1/5 1/6 }
     }
-} [ 3 4 hilbert-matrix ] unit-test
+} [ 3 4 <hilbert-matrix> ] unit-test
 
 {
     { { 1 2 3 4 }
       { 2 1 2 3 }
       { 3 2 1 2 }
       { 4 3 2 1 } }
-} [ 4 toeplitz-matrix ] unit-test
+} [ 4 <toeplitz-matrix> ] unit-test
 
 {
     { { 1 2 3 4 }
       { 2 3 4 0 }
       { 3 4 0 0 }
       { 4 0 0 0 } }
-} [ 4 hankel-matrix ] unit-test
+} [ 4 <hankel-matrix> ] unit-test
 
 {
     { { 1 0 4 }
@@ -199,21 +199,22 @@ IN: math.matrices.tests
     m.
 ] unit-test
 
-{ { 0 0 1 } } [ { 1 0 0 } { 0 1 0 } cross ] unit-test
-{ { 1 0 0 } } [ { 0 1 0 } { 0 0 1 } cross ] unit-test
-{ { 0 1 0 } } [ { 0 0 1 } { 1 0 0 } cross ] unit-test
-{ { 0.0 -0.707 0.707 } } [ { 1.0 0.0 0.0 } { 0.0 0.707 0.707 } cross ] unit-test
-{ { 0 -2 2 } } [ { -1 -1 -1 } { 1 -1 -1 } cross ] unit-test
-{ { 1 0 0 } } [ { 1 1 0 } { 1 0 0 } proj ] unit-test
-
-{ { { 4181 6765 } { 6765 10946 } } }
-[ { { 0 1 } { 1 1 } } 20 m^n ] unit-test
+{
+  {
+    { 4181 6765 }
+    { 6765 10946 }
+  }
+} [
+  {
+    { 0 1 } { 1 1 }
+  } 20 m^n
+] unit-test
 [ { { 0 1 } { 1 1 } } -20 m^n ] [ negative-power-matrix? ] must-fail-with
 
 {
     { { 0 5 0 10 } { 6 7 12 14 } { 0 15 0 20 } { 18 21 24 28 } }
 }
-[ { { 1 2 } { 3 4 } } { { 0 5 } { 6 7 } } kron ] unit-test
+[ { { 1 2 } { 3 4 } } { { 0 5 } { 6 7 } } kronecker ] unit-test
 
 {
     {
@@ -222,7 +223,7 @@ IN: math.matrices.tests
         { 1 1 -1 -1 }
         { 1 -1 -1 1 }
     }
-} [ { { 1 1 } { 1 -1 } } dup kron ] unit-test
+} [ { { 1 1 } { 1 -1 } } dup kronecker ] unit-test
 
 {
     {
@@ -235,7 +236,7 @@ IN: math.matrices.tests
         { 1 1 -1 -1 -1 -1 1 1 }
         { 1 -1 -1 1 -1 1 1 -1 }
     }
-} [ { { 1 1 } { 1 -1 } } dup dup kron kron ] unit-test
+} [ { { 1 1 } { 1 -1 } } dup dup kronecker kronecker ] unit-test
 
 {
     {
@@ -248,10 +249,10 @@ IN: math.matrices.tests
         { 1 1 -1 -1 -1 -1 1 1 }
         { 1 -1 -1 1 -1 1 1 -1 }
     }
-} [ { { 1 1 } { 1 -1 } } dup dup kron swap kron ] unit-test
+} [ { { 1 1 } { 1 -1 } } dup dup kronecker swap kronecker ] unit-test
 
 
-! kron is not generally commutative, make sure we have the right order
+! kronecker is not generally commutative, make sure we have the right order
 {
     {
         { 1 2 3 4 5 1 2 3 4 5 }
@@ -262,7 +263,7 @@ IN: math.matrices.tests
 }
 [
     { { 1 1 } { 1 -1 } }
-    { { 1 2 3 4 5 } { 6 7 8 9 10 } } kron
+    { { 1 2 3 4 5 } { 6 7 8 9 10 } } kronecker
 ] unit-test
 
 {
@@ -275,7 +276,7 @@ IN: math.matrices.tests
 }
 [
     { { 1 1 } { 1 -1 } }
-    { { 1 2 3 4 5 } { 6 7 8 9 10 } } swap kron
+    { { 1 2 3 4 5 } { 6 7 8 9 10 } } swap kronecker
 ] unit-test
 
 {
@@ -302,7 +303,7 @@ CONSTANT: test-points {
         { 24+4/7 6+87/140 28+5/7 }
     }
 } [
-    test-points sample-cov-matrix
+    test-points sample-covariance-matrix
 ] unit-test
 
 {
@@ -312,7 +313,7 @@ CONSTANT: test-points {
         { 23+59/147 6+15/49 27+17/49 }
     }
 } [
-    test-points cov-matrix
+    test-points covariance-matrix
 ] unit-test
 
 {
@@ -330,7 +331,7 @@ CONSTANT: test-points {
         { 5 5 }
     }
 } [
-    2 2 [ 5 ] make-matrix
+    2 2 [ 5 ] <matrix-by>
 ] unit-test
 
 {
@@ -339,7 +340,7 @@ CONSTANT: test-points {
         { 1 2 3 }
     }
 } [
-    2 3 [ + ] make-matrix-with-indices
+    2 3 [ + ] <matrix-by-indices>
 ] unit-test
 
 {
@@ -348,7 +349,7 @@ CONSTANT: test-points {
         { 0 1 }
     }
 } [
-    2 square-rows
+    2 <square-rows>
 ] unit-test
 
 {
@@ -357,7 +358,7 @@ CONSTANT: test-points {
         { 1 1 }
     }
 } [
-    2 square-cols
+    2 <square-cols>
 ] unit-test
 
 {
@@ -366,7 +367,7 @@ CONSTANT: test-points {
         { 5 6 }
     }
 } [
-    { 5 6 } square-rows
+    { 5 6 } <square-rows>
 ] unit-test
 
 {
@@ -375,7 +376,7 @@ CONSTANT: test-points {
         { 6 6 }
     }
 } [
-    { 5 6 } square-cols
+    { 5 6 } <square-cols>
 ] unit-test
 
 { t } [ { } square-matrix? ] unit-test

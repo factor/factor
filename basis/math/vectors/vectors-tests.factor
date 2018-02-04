@@ -35,7 +35,6 @@ SPECIALIZED-ARRAY: int
 
 { 1 } [ { C{ 0 1 } } dup h. ] unit-test
 
-
 { { 1 2 3 } } [
     { t t t } [ { 1 2 3 } ] [ { 4 5 6 } ] vif
 ] unit-test
@@ -52,3 +51,10 @@ SPECIALIZED-ARRAY: int
 { { 0 30 100 } } [
     { -10 30 120 } { 0 0 0 } { 100 100 100 } vclamp
 ] unit-test
+
+{ { 0 0 1 } } [ { 1 0 0 } { 0 1 0 } cross ] unit-test
+{ { 1 0 0 } } [ { 0 1 0 } { 0 0 1 } cross ] unit-test
+{ { 0 1 0 } } [ { 0 0 1 } { 1 0 0 } cross ] unit-test
+{ { 0.0 -0.707 0.707 } } [ { 1.0 0.0 0.0 } { 0.0 0.707 0.707 } cross ] unit-test
+{ { 0 -2 2 } } [ { -1 -1 -1 } { 1 -1 -1 } cross ] unit-test
+{ { 1 0 0 } } [ { 1 1 0 } { 1 0 0 } proj ] unit-test

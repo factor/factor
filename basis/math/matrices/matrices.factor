@@ -1,47 +1,76 @@
-! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
+! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff, Cat Stevens.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays columns kernel locals math math.bits
 math.functions math.order math.vectors sequences
-sequences.private fry math.statistics grouping
+sequences.private fry math.vectors.private math.statistics grouping
 combinators.short-circuit math.ranges combinators.smart ;
 IN: math.matrices
 
+ERROR: negative-power-matrix m n ;
+
 ! Matrices
-: make-matrix ( m n quot -- matrix )
+: <matrix-by> ( m n quot: ( ... -- elt ) -- matrix )
     '[ _ _ replicate ] replicate ; inline
+
+: <matrix-by-indices> ( ... m n quot: ( ... m' n' -- ... elt ) -- ... matrix )
+    [ [ <iota> ] bi@ ] dip cartesian-map ; inline
 
 : <matrix> ( m n element -- matrix )
     '[ _ _ <array> ] replicate ; inline
 
-: zero-matrix ( m n -- matrix )
+: <zero-matrix> ( m n -- matrix )
     0 <matrix> ; inline
 
-: diagonal-matrix ( diagonal-seq -- matrix )
-    dup length dup zero-matrix
+: <zero-square-matrix> ( n -- matrix )
+    dup 0 <matrix> ; inline
+
+: <diagonal-matrix> ( diagonal-seq -- matrix )
+    [ length <zero-square-matrix> ] keep swap
     [ '[ dup _ nth set-nth ] each-index ] keep ; inline
 
-: identity-matrix ( n -- matrix )
-    1 <repetition> diagonal-matrix ; inline
+: <identity-matrix> ( n -- matrix )
+    1 <repetition> <diagonal-matrix> ; inline
 
-: eye ( m n k -- matrix )
-    [ [ <iota> ] bi@ ] dip neg '[ _ + = 1 0 ? ] cartesian-map ;
+: <eye> ( m n k z -- matrix )
+    [ [ <iota> ] bi@ ] 2dip
+    '[ _ neg + = _ 0 ? ]
+    cartesian-map ;
 
-: hilbert-matrix ( m n -- matrix )
+! if m = n and k = 0 then <identity-matrix> is (possibly) faster
+:: <simple-eye> ( m n k -- matrix )
+    m n = k 0 = and
+    [ n <identity-matrix> ]
+    [ m n k 1 <eye> ] if ; inline
+
+DEFER: matrix-indices
+DEFER: matrix-set-nths
+
+: <lower-matrix> ( object m n -- matrix )
+    <zero-matrix> [ matrix-indices ] [ matrix-set-nths ] [ ] tri ;
+
+: <upper-matrix> ( object m n -- matrix )
+    <zero-matrix> [ matrix-indices ] [ matrix-set-nths ] [ ] tri ;
+
+: <cartesian-square-indices> ( n -- matrix )
+    <iota> dup cartesian-product ; inline
+
+! Special matrix constructors follow
+: <hilbert-matrix> ( m n -- matrix )
     [ <iota> ] bi@ [ + 1 + recip ] cartesian-map ;
 
-: toeplitz-matrix ( n -- matrix )
+: <toeplitz-matrix> ( n -- matrix )
     <iota> dup [ - abs 1 + ] cartesian-map ;
 
-: hankel-matrix ( n -- matrix )
+: <hankel-matrix> ( n -- matrix )
     [ <iota> dup ] keep '[ + abs 1 + dup _ > [ drop 0 ] when ] cartesian-map ;
 
-: box-matrix ( r -- matrix )
+: <box-matrix> ( r -- matrix )
     2 * 1 + dup '[ _ 1 <array> ] replicate ;
 
-: vandermonde-matrix ( u n -- matrix )
+: <vandermonde-matrix> ( u n -- matrix )
     <iota> [ v^n ] with map reverse flip ;
 
-:: rotation-matrix3 ( axis theta -- matrix )
+:: <rotation-matrix3> ( axis theta -- matrix )
     theta cos :> c
     theta sin :> s
     axis first3 :> ( x y z )
@@ -50,7 +79,7 @@ IN: math.matrices
     x z * 1.0 c - * y s * -   y z * 1.0 c - * x s * +   z sq 1.0 z sq - c * +   3array
     3array ;
 
-:: rotation-matrix4 ( axis theta -- matrix )
+:: <rotation-matrix4> ( axis theta -- matrix )
     theta cos :> c
     theta sin :> s
     axis first3 :> ( x y z )
@@ -59,7 +88,7 @@ IN: math.matrices
     x z * 1.0 c - * y s * -   y z * 1.0 c - * x s * +   z sq 1.0 z sq - c * +     0 4array
     { 0.0 0.0 0.0 1.0 } 4array ;
 
-:: translation-matrix4 ( offset -- matrix )
+:: <translation-matrix4> ( offset -- matrix )
     offset first3 :> ( x y z )
     {
         { 1.0 0.0 0.0 x   }
@@ -68,10 +97,12 @@ IN: math.matrices
         { 0.0 0.0 0.0 1.0 }
     } ;
 
+<PRIVATE
 : >scale-factors ( number/sequence -- x y z )
     dup number? [ dup dup ] [ first3 ] if ;
+PRIVATE>
 
-:: scale-matrix3 ( factors -- matrix )
+:: <scale-matrix3> ( factors -- matrix )
     factors >scale-factors :> ( x y z )
     {
         { x   0.0 0.0 }
@@ -79,7 +110,7 @@ IN: math.matrices
         { 0.0 0.0 z   }
     } ;
 
-:: scale-matrix4 ( factors -- matrix )
+:: <scale-matrix4> ( factors -- matrix )
     factors >scale-factors :> ( x y z )
     {
         { x   0.0 0.0 0.0 }
@@ -88,10 +119,10 @@ IN: math.matrices
         { 0.0 0.0 0.0 1.0 }
     } ;
 
-: ortho-matrix4 ( dim -- matrix )
-    [ recip ] map scale-matrix4 ;
+: <ortho-matrix4> ( dim -- matrix )
+    [ recip ] map <scale-matrix4> ;
 
-:: frustum-matrix4 ( xy-dim near far -- matrix )
+:: <frustum-matrix4> ( xy-dim near far -- matrix )
     xy-dim first2 :> ( x y )
     near x /f :> xf
     near y /f :> yf
@@ -105,9 +136,8 @@ IN: math.matrices
         { 0.0 0.0 -1.0 0.0 }
     } ;
 
-:: skew-matrix4 ( theta -- matrix )
+:: <skew-matrix4> ( theta -- matrix )
     theta tan :> zf
-
     {
         { 1.0 0.0 0.0 0.0 }
         { 0.0 1.0 0.0 0.0 }
@@ -127,51 +157,38 @@ IN: math.matrices
 : n/m ( n m -- m ) [ n/v ] with map ;
 : m/n ( m n -- m ) [ v/n ] curry map ;
 
-: m+   ( m m -- m ) [ v+ ] 2map ;
-: m-   ( m m -- m ) [ v- ] 2map ;
-: m*   ( m m -- m ) [ v* ] 2map ;
-: m/   ( m m -- m ) [ v/ ] 2map ;
+: m+   ( m1 m2 -- m ) [ v+ ] 2map ;
+: m-   ( m1 m2 -- m ) [ v- ] 2map ;
+: m*   ( m1 m2 -- m ) [ v* ] 2map ;
+: m/   ( m1 m2 -- m ) [ v/ ] 2map ;
 
-: v.m ( v m -- v ) flip [ v. ] with map ;
-: m.v ( m v -- v ) [ v. ] curry map ;
-: m.  ( m m -- m ) flip [ swap m.v ] curry map ;
+: v.m ( v m -- p ) flip [ v. ] with map ;
+: m.v ( m v -- p ) [ v. ] curry map ;
+: m. ( m m -- m ) flip [ swap m.v ] curry map ;
+! should this be called m.m ?
 
-: m~  ( m m epsilon -- ? ) [ v~ ] curry 2all? ;
+: m~  ( m1 m2 epsilon -- ? ) [ v~ ] curry 2all? ;
 
 : mmin ( m -- n ) [ 1/0. ] dip [ [ min ] each ] each ;
 : mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
-: mnorm ( m -- n ) dup mmax abs m/n ;
+: mnorm ( m -- m' ) dup mmax abs m/n ;
 
-: cross ( vec1 vec2 -- vec3 )
-    [ [ { 1 2 0 } vshuffle ] [ { 2 0 1 } vshuffle ] bi* v* ]
-    [ [ { 2 0 1 } vshuffle ] [ { 1 2 0 } vshuffle ] bi* v* ] 2bi v- ; inline
-
-:: normal ( vec1 vec2 vec3 -- vec4 )
-    vec2 vec1 v- vec3 vec1 v- cross normalize ; inline
-
-: proj ( v u -- w )
-    [ [ v. ] [ norm-sq ] bi / ] keep n*v ;
-
-: perp ( v u -- w )
-    dupd proj v- ;
-
-: angle-between ( v u -- a )
-    [ normalize ] bi@ h. acos ;
+<PRIVATE
 
 : (gram-schmidt) ( v seq -- newseq )
     [ dupd proj v- ] each ;
 
+: (m^n) ( m n -- n )
+    make-bits over first length <identity-matrix>
+    [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
+
+PRIVATE>
+
 : gram-schmidt ( seq -- orthogonal )
     V{ } clone [ over (gram-schmidt) suffix! ] reduce ;
 
-: norm-gram-schmidt ( seq -- orthonormal )
-    gram-schmidt [ normalize ] map ;
-
-ERROR: negative-power-matrix m n ;
-
-: (m^n) ( m n -- n )
-    make-bits over first length identity-matrix
-    [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
+: gram-schmidt-normalize ( seq -- orthonormal )
+    gram-schmidt [ normalize ] map ; inline
 
 : m^n ( m n -- n )
     dup 0 >= [ (m^n) ] [ negative-power-matrix ] if ;
@@ -179,11 +196,11 @@ ERROR: negative-power-matrix m n ;
 : stitch ( m -- m' )
     [ ] [ [ append ] 2map ] map-reduce ;
 
-: kron ( m1 m2 -- m )
+: kronecker ( m1 m2 -- m )
     '[ [ _ n*m  ] map ] map stitch stitch ;
 
 : outer ( u v -- m )
-    [ n*v ] curry map ;
+    '[ _ n*v ] map ;
 
 : row ( n matrix -- col )
     nth ; inline
@@ -197,11 +214,11 @@ ERROR: negative-power-matrix m n ;
 : cols ( seq matrix -- cols )
     '[ _ col ] map ; inline
 
-: set-index ( object pair matrix -- )
+: matrix-set-nth ( obj pair matrix -- )
     [ first2 swap ] dip nth set-nth ; inline
 
-: set-indices ( object sequence matrix -- )
-    '[ _ set-index ] with each ; inline
+: matrix-set-nths ( obj sequence matrix -- )
+    '[ _ matrix-set-nth ] with each ; inline
 
 : matrix-map ( matrix quot -- )
     '[ _ map ] map ; inline
@@ -209,35 +226,29 @@ ERROR: negative-power-matrix m n ;
 : column-map ( matrix quot -- seq )
     [ [ first length <iota> ] keep ] dip '[ _ col @ ] map ; inline
 
-: cartesian-square-indices ( n -- matrix )
-    <iota> dup cartesian-product ; inline
-
 : cartesian-matrix-map ( matrix quot -- matrix' )
-    [ [ first length cartesian-square-indices ] keep ] dip
+    [ [ first length <cartesian-square-indices> ] keep ] dip
     '[ _ @ ] matrix-map ; inline
 
 : cartesian-matrix-column-map ( matrix quot -- matrix' )
     [ cols first2 ] prepose cartesian-matrix-map ; inline
 
-: cov-matrix-ddof ( matrix ddof -- cov )
+: covariance-matrix-ddof ( matrix ddof -- cov )
     '[ _ cov-ddof ] cartesian-matrix-column-map ; inline
 
-: cov-matrix ( matrix -- cov ) 0 cov-matrix-ddof ; inline
+: covariance-matrix ( matrix -- cov ) 0 covariance-matrix-ddof ; inline
 
-: sample-cov-matrix ( matrix -- cov ) 1 cov-matrix-ddof ; inline
+: sample-covariance-matrix ( matrix -- cov ) 1 covariance-matrix-ddof ; inline
 
-GENERIC: square-rows ( object -- matrix )
-M: integer square-rows <iota> square-rows ;
-M: sequence square-rows
+GENERIC: <square-rows> ( desc -- matrix )
+M: integer <square-rows> <iota> <square-rows> ;
+M: sequence <square-rows>
     [ length ] keep >array '[ _ clone ] { } replicate-as ;
 
-GENERIC: square-cols ( object -- matrix )
-M: integer square-cols <iota> square-cols ;
-M: sequence square-cols
+GENERIC: <square-cols> ( desc -- matrix )
+M: integer <square-cols> <iota> <square-cols> ;
+M: sequence <square-cols>
     [ length ] keep [ <array> ] with { } map-as ;
-
-: make-matrix-with-indices ( m n quot -- matrix )
-    [ [ <iota> ] bi@ ] dip cartesian-map ; inline
 
 : null-matrix? ( matrix -- ? ) empty? ; inline
 
@@ -265,9 +276,3 @@ M: sequence square-cols
 
 : lower-matrix-indices ( matrix -- matrix' )
     dimension-range [ head-slice >array ] 2map concat ;
-
-: make-lower-matrix ( object m n -- matrix )
-    zero-matrix [ lower-matrix-indices ] [ set-indices ] [ ] tri ;
-
-: make-upper-matrix ( object m n -- matrix )
-    zero-matrix [ upper-matrix-indices ] [ set-indices ] [ ] tri ;

@@ -1,5 +1,6 @@
-USING: kernel locals math math.matrices.simd math.order math.vectors
-math.vectors.simd prettyprint sequences typed ;
+USING: kernel locals math math.matrices math.matrices.simd
+math.order math.vectors math.vectors.simd prettyprint sequences
+typed ;
 QUALIFIED-WITH: alien.c-types c
 IN: benchmark.3d-matrix-vector
 
@@ -8,12 +9,12 @@ IN: benchmark.3d-matrix-vector
 
 TYPED:: p-matrix ( dim: float-4 fov: float near: float far: float -- matrix: matrix4 )
     dim dup v2min v/ fov v*n near v*n
-    near far frustum-matrix4 ;
+    near far <frustum-matrix4> ;
 
 TYPED:: mv-matrix ( pitch: float yaw: float location: float-4 -- matrix: matrix4 )
-    float-4{ 1.0 0.0 0.0 0.0 } pitch rotation-matrix4
-    float-4{ 0.0 1.0 0.0 0.0 } yaw   rotation-matrix4
-    location vneg translation-matrix4 m4. m4. ;
+    float-4{ 1.0 0.0 0.0 0.0 } pitch <rotation-matrix4>
+    float-4{ 0.0 1.0 0.0 0.0 } yaw   <rotation-matrix4>
+    location vneg <translation-matrix4> m4. m4. ;
 
 :: 3d-matrix-vector-benchmark ( -- )
     f :> result!
