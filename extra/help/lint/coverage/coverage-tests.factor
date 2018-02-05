@@ -1,6 +1,6 @@
 USING: accessors fuel.help.private help.lint.coverage
 help.lint.coverage.private help.markup help.syntax kernel
-literals math math.matrices sorting tools.test vocabs ;
+literals math math.matrices sequences sorting tools.test vocabs ;
 IN: help.lint.coverage.tests
 
 <PRIVATE
