@@ -1,5 +1,6 @@
-USING: help.lint.coverage help.lint.coverage.private help.markup
-help.syntax kernel math.matrices sorting tools.test vocabs ;
+USING: accessors fuel.help.private help.lint.coverage
+help.lint.coverage.private help.markup help.syntax kernel
+literals math math.matrices sorting tools.test vocabs ;
 IN: help.lint.coverage.tests
 
 <PRIVATE
@@ -9,7 +10,7 @@ IN: help.lint.coverage.tests
 
 HELP: empty { $examples } ;
 HELP: nonexistent ;
-HELP: defined { $examples { $example "USING: x ;" "blah" "hahaha" } } ;
+HELP: defined { $examples { $example "USING: prettyprint ; ""1 ." "1" } } ;
 PRIVATE>
 
 { t } [ \ empty empty-examples? ] unit-test
@@ -33,4 +34,35 @@ PRIVATE>
 { { $values $description $examples } } [ \ keep word-defines-sections ] unit-test
 { { $values $contract $examples } } [ \ <word-help-coverage> word-defines-sections ] unit-test
 
-{ eye } [ "eye" loaded-vocab-names resolve-name-in ] unit-test
+{ eye } [ "eye" find-word ] unit-test
+
+{
+  V{ "[" { $[ "math" dup lookup-vocab ] } "] " { "zero?" zero? } ": " }
+} [
+  V{ } clone \ zero? (assemble-word-metadata)
+] unit-test
+{
+  V{ "empty " { "$examples" $examples } "; " }
+} [
+  V{ } clone word-help-coverage new t >>empty-examples? (assemble-empty-examples)
+] unit-test
+
+{
+  V{ "needs help " "sections: " { { "$description" $description } { "$examples" $examples } } }
+} [
+  V{ } clone word-help-coverage new { $description $examples } >>omitted-sections (assemble-omitted-sections)
+] unit-test
+{
+  V{ "needs help " "section: " { { "$description" $description } } }
+} [
+  V{ } clone word-help-coverage new { $description } >>omitted-sections (assemble-omitted-sections)
+] unit-test
+{
+  V{ "full help coverage" }
+} [
+  V{ } clone word-help-coverage new t >>100%-coverage? (assemble-full-coverage)
+] unit-test
+
+! make sure this doesn't throw an error (would signify an issue with ignored-words)
+! the contents of all-words is not important
+{ } [ all-words [ <word-help-coverage> ] map drop ] unit-test
