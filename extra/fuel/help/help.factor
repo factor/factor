@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators combinators.short-circuit
-fry help help.crossref help.markup help.markup.private help.topics
-help.vocabs io io.streams.string kernel make namespaces parser
-prettyprint see sequences splitting summary vocabs vocabs.hierarchy
-vocabs.metadata vocabs.parser words ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit help help.crossref help.markup
+help.markup.private help.topics help.vocabs io io.streams.string
+kernel make namespaces parser prettyprint see sequences
+splitting summary vocabs vocabs.hierarchy vocabs.metadata
+vocabs.parser words ;
 IN: fuel.help
 
 SYMBOLS: $doc-path $next-link $prev-link $fuel-nav-crumbs ;
@@ -35,7 +36,7 @@ SYMBOLS: $doc-path $next-link $prev-link $fuel-nav-crumbs ;
 <PRIVATE
 
 : find-word ( name -- word/f )
-    { [ search ] [ '[ name>> _ = ] all-words swap find nip ] } 1|| ;
+    { [ search ] [ words-named ?first ] } 1|| ;
 
 : definition-str ( word -- str )
     [ see ] with-string-writer ; inline
