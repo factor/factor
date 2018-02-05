@@ -1,6 +1,6 @@
-USING: accessors fuel.help.private help.lint.coverage
-help.lint.coverage.private help.markup help.syntax kernel
-literals math math.matrices sequences sorting tools.test vocabs ;
+USING: accessors help.lint.coverage help.lint.coverage.private
+help.markup help.syntax kernel literals math math.matrices
+sequences sorting tools.test vocabs ;
 IN: help.lint.coverage.tests
 
 <PRIVATE
@@ -10,7 +10,7 @@ IN: help.lint.coverage.tests
 
 HELP: empty { $examples } ;
 HELP: nonexistent ;
-HELP: defined { $examples { $example "USING: prettyprint ; ""1 ." "1" } } ;
+HELP: defined { $examples { $example "USING: prettyprint ; " "1 ." "1" } } ;
 PRIVATE>
 
 { t } [ \ empty empty-examples? ] unit-test
