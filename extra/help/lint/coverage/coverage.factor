@@ -1,9 +1,8 @@
-USING: accessors arrays classes classes.error combinators
-combinators.short-circuit continuations english eval formatting
-fry fuel.help.private generic help help.lint help.lint.checks help.markup io
-io.streams.string io.styles kernel math namespaces parser
-prettyprint sequences sequences.deep sets sorting splitting strings summary
-vocabs words ;
+USING: accessors arrays assocs classes classes.error combinators
+continuations english formatting fry generic help
+help.lint.checks help.markup io io.streams.string io.styles
+kernel math namespaces parser sequences sequences.deep sets
+sorting splitting strings summary vocabs vocabs.parser words ;
 FROM: namespaces => set ;
 IN: help.lint.coverage
 
@@ -107,6 +106,14 @@ M: word-help-coverage summary
 
 : missing-sections ( word -- missing )
     [ should-define ] [ word-defines-sections ] bi diff ;
+
+: find-word ( name -- word/f )
+    dup words-named dup length {
+        { 0 [ 2drop f ] }
+        { 1 [ first nip ] }
+        [ drop <ambiguous-use-error> throw-restarts ]
+    } case ;
+
 PRIVATE>
 
 GENERIC: <word-help-coverage> ( word -- coverage )
