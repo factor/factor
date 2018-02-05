@@ -195,14 +195,7 @@ HELP: $subsections
     { $markup-example { $subsections "sequences" nth each } }
 } ;
 
-HELP: $related-subsections 
-{ $values { "children" "a " { $link sequence } " of one or more " { $link topic } "s" } }
-{ $description "A version of " { $link $subsections } " which also calls " { $link related-words } " on " { $snippet "children" } ", relating its contents together." }
-{ $examples
-    { $markup-example { $related-subsections keep + } }
-} ; 
-
-{ $subsection $subsections $related-subsections $link $vocab-subsection } related-words
+{ $subsection $subsections $link } related-words
 
 HELP: $vocab-subsection
 { $values { "element" "a markup element of the form " { $snippet "{ title vocab }" } } }
