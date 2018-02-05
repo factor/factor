@@ -1,8 +1,9 @@
 USING: accessors arrays classes classes.error combinators
 combinators.short-circuit continuations english eval formatting
-fry generic help help.lint help.lint.checks help.markup io
-kernel math namespaces parser prettyprint sequences sets sorting
-splitting strings summary vocabs words ;
+fry fuel.help.private generic help help.lint help.lint.checks help.markup io
+io.streams.string io.styles kernel math namespaces parser
+prettyprint sequences sequences.deep sets sorting splitting strings summary
+vocabs words ;
 FROM: namespaces => set ;
 IN: help.lint.coverage
 
@@ -13,7 +14,7 @@ TUPLE: word-help-coverage
     { 100%-coverage? boolean initial: f } ;
 
 <PRIVATE
-! <<
+
 CONSTANT: ignored-words {
     $low-level-note
     $prettyprinting-note
@@ -24,31 +25,61 @@ CONSTANT: ignored-words {
     $complex-shuffle
     $nl
 }
-! >>
 
 DEFER: ?pluralize
 
-M: word-help-coverage summary
-    [ word-name>> [ vocabulary>> ] [ name>> ] bi "[%s] %s: " sprintf ] keep
-    dup 100%-coverage?>>
-    [ drop "full help coverage" append ]
+: write-object-seq ( object-seq -- )
     [
-        [ empty-examples?>> "defined empty { $examples }, " "" ? ]
-        [ omitted-sections>> dup [
-                length "section" ?pluralize
-            ] dip
-            [ name>> ] map ", " join
-        ] bi
-        "%sshould define help %s %s" sprintf append
-    ] if ; inline
+        dup array? [
+            dup ?first array?
+            [ dup length '[
+                    swap first2 write-object
+                    _ 1 - abs = not [ " " write ] when
+                ] each-index
+            ] [ first2 write-object ] if
+        ] [ write ] if
+    ] each ; inline
+
+: (assemble-word-metadata) ( vec word -- vec )
+    [
+        [ "[" ] dip vocabulary>> dup lookup-vocab 2array "] "
+            3array over push-all
+    ] [
+        [ name>> ] keep 2array ": "
+        2array over push-all
+    ] bi ; inline
+
+: (assemble-empty-examples) ( vec coverage -- vec )
+    empty-examples?>> [ "empty " \ $examples [ name>> ] keep 2array "; "
+        3array over push-all
+    ] when ;
+
+: (assemble-omitted-sections) ( vec coverage -- vec )
+    omitted-sections>> [
+        length "section" ?pluralize ": " append
+    ] [
+        [ [ name>> ] keep 2array ] map
+    ] bi
+    [ "needs help " ] 2dip
+    3array over push-all ;
+
+: (assemble-full-coverage) ( vec coverage -- vec )
+    drop "full help coverage" over push ;
+
+: (present-coverage) ( coverage-report -- )
+    [ V{ } clone ] dip
+    [ word-name>> (assemble-word-metadata) ] keep
+    dup 100%-coverage?>>
+    [ (assemble-full-coverage) ] [
+        [ (assemble-empty-examples) ]
+        [ (assemble-omitted-sections) ] bi
+    ] if "\n" over push write-object-seq ;
+
+M: word-help-coverage summary
+    [ (present-coverage) ] with-string-writer ; inline
 
 : sorted-loaded-child-vocabs ( prefix -- assoc )
     loaded-child-vocab-names natural-sort ; inline
-
-: resolve-name-in ( name namespaces -- word )
-    "syntax" swap remove " " join
-    "USING: " " ; \\ " surround
-    prepend eval( -- word ) ;
 
 : filter-private ( seq -- no-private )
     [ ".private" ?tail nip not ] filter ; inline
@@ -78,30 +109,14 @@ M: word-help-coverage summary
     [ should-define ] [ word-defines-sections ] bi diff ;
 PRIVATE>
 
-GENERIC: print-coverage ( coverage-seq -- )
-M: sequence print-coverage
-    [
-        [ print-coverage ] each
-    ] [
-        [ [ 100%-coverage?>> ] count ] [ length ] bi /f
-        100 *
-        "\n%3.1f%% of words have complete documentation\n"
-        printf
-    ] bi ;
-
-M: word-help-coverage print-coverage
-    summary print ;
-
 GENERIC: <word-help-coverage> ( word -- coverage )
 M: word <word-help-coverage>
-    dup
-    [ missing-sections ]
-    [ empty-examples? ] bi
+    dup [ missing-sections ] [ empty-examples? ] bi
     2dup 2array { { } f } =
     word-help-coverage boa ; inline
 
 M: string <word-help-coverage>
-    loaded-vocab-names resolve-name-in <word-help-coverage> ; inline
+    find-word <word-help-coverage> ; inline
 
 : <vocab-help-coverage> ( vocab-spec -- coverage )
     [ auto-use? off vocab-words natural-sort [ <word-help-coverage> ] map ] with-scope ;
@@ -111,5 +126,23 @@ M: string <word-help-coverage>
         auto-use? off group-articles vocab-articles set
         [ sorted-loaded-child-vocabs ] dip not
         [ filter-private ] when
-        [ <vocab-help-coverage> ] map
+        [ <vocab-help-coverage> ] map flatten
     ] with-scope ;
+
+GENERIC: help-coverage. ( coverage -- )
+M: sequence help-coverage.
+    [
+        [ help-coverage. ] each
+    ] [
+        [ [ 100%-coverage?>> ] count ] [ length ] bi /f
+        100 *
+        "\n%3.1f%% of words have complete documentation\n"
+        printf
+    ] bi ; recursive
+
+M: word-help-coverage help-coverage.
+    (present-coverage) ;
+
+: word-help-coverage. ( word-spec -- ) <word-help-coverage> help-coverage. ;
+: vocab-help-coverage. ( vocab-spec -- ) <vocab-help-coverage> help-coverage. ;
+: prefix-help-coverage. ( prefix-spec private? -- ) <prefix-help-coverage> help-coverage. ;
