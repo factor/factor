@@ -144,8 +144,8 @@
         (assoc name err))))
 
 (defsubst fuel-eval--error-restarts (err)
-  (cdr (assoc :restarts (or (fuel-eval--error-name-p err 'condition)
-                            (fuel-eval--error-name-p err 'lexer-error)))))
+  (alist-get :restarts (or (fuel-eval--error-name-p err 'condition)
+                           (fuel-eval--error-name-p err 'lexer-error))))
 
 (defsubst fuel-eval--error-file (err)
   (nth 1 (fuel-eval--error-name-p err 'source-file-error)))
