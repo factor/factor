@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry git io io.directories io.encodings.utf8 io.files.temp
-io.files.unique io.launcher kernel sequences tools.test ;
+USING: accessors fry git io io.directories io.encodings.utf8
+io.launcher io.streams.string kernel sequences tools.test ;
 IN: git.tests
 
 : run-process-stdout ( process -- string )
@@ -20,6 +20,12 @@ IN: git.tests
         { "git" "commit" "-m" "initial commit of empty file" } run-process drop
         @
     ] with-empty-test-git-repo ; inline
+
+{ "hello" } [
+    commit new "author" "hello\r\n"
+    [ parse-commit-field ] with-string-reader
+    author>>
+] unit-test
 
 { "refs/heads/master" } [
     [ git-head-ref ] with-empty-test-git-repo
