@@ -153,8 +153,8 @@ the generated files."
          (platforms (read-string "Vocab platforms (empty for all): "))
          (help (y-or-n-p "Scaffold help? "))
          (tests (y-or-n-p "Scaffold tests? "))
-         (cmd `(:fuel* ((,root ,name ,(fuel-scaffold--dev-name)
-                        (fuel-scaffold-vocab)) "fuel")))
+         (cmd `(:fuel* (,root ,name ,(fuel-scaffold--dev-name)
+                              fuel-scaffold-vocab) "fuel"))
          (ret (fuel-eval--send/wait cmd))
          (file (fuel-eval--retort-result ret)))
     (unless file
