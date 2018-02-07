@@ -466,7 +466,7 @@ the 'words.' word emits."
     (fuel-markup--insert-newline)))
 
 (defun fuel-markup--all-tags (e)
-  (let* ((cmd `(:fuel* (all-tags :get) "fuel" t))
+  (let* ((cmd `(:fuel* (all-tags) "fuel" t))
          (tags (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
     (fuel-markup--list
      (cons '$list (mapcar (lambda (tag) (list '$link tag tag 'tag)) tags)))))
@@ -484,7 +484,7 @@ the 'words.' word emits."
     (fuel-markup--insert-newline)))
 
 (defun fuel-markup--all-authors (e)
-  (let* ((cmd `(:fuel* (all-authors :get) "fuel" t))
+  (let* ((cmd `(:fuel* (all-authors) "fuel" t))
          (authors (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
     (fuel-markup--list
      (cons '$list (mapcar (lambda (a) (list '$link a a 'author)) authors)))))

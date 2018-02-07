@@ -50,11 +50,12 @@
   (fuel-mode--code-file "tests"))
 
 (defun fuel-scaffold--vocab-roots ()
-  (let ((cmd '(:fuel* (vocab-roots get :get) "fuel" ("namespaces" "vocabs.loader"))))
+  (let ((cmd '(:fuel* (vocab-roots get)
+                      "fuel" ("namespaces" "vocabs.loader"))))
     (nth 1 (fuel-eval--send/wait cmd))))
 
 (defun fuel-scaffold--dev-name ()
-  (or (let ((cmd '(:fuel* (developer-name get :get)
+  (or (let ((cmd '(:fuel* (developer-name get)
                           "fuel"
                           ("namespaces" "tools.scaffold"))))
         (fuel-eval--retort-result (fuel-eval--send/wait cmd)))
