@@ -328,7 +328,7 @@ With prefix, the current page is deleted from history."
   ("Show bookmarks..." "bb" fuel-help-display-bookmarks)
   ("Clean browsing history" "c" fuel-help-clean-history)
   --
-  ("Edit word at point" "\M-." fuel-edit-word-at-point)
+  ("Edit word or vocab at point" "\M-." fuel-edit-word-at-point)
   ("Edit help file" "e" fuel-help-edit)
   --
   ("Next page" "n" fuel-help-next)
