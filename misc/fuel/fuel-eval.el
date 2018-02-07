@@ -46,7 +46,6 @@
                    (:nrs 'fuel-eval-non-restartable)
                    (:in (or (factor-current-vocab) "fuel"))
                    (:usings `(:array ,@(factor-usings)))
-                   (:get 'fuel-eval-set-result)
                    (:end '\;)
                    (t `(:factor ,(symbol-name sexp))))))
         ((symbolp sexp) (symbol-name sexp))))
