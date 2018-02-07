@@ -28,6 +28,6 @@ IN: fuel.tests
         [ make-uses-restart is-suggested-restart? ] with-variable
 ] unit-test
 
-{ } [
+{ f } [
     { "kernel" } [ "\\ dup drop" eval( -- ) ] fuel-use-suggested-vocabs
 ] unit-test
