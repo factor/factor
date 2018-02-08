@@ -411,10 +411,10 @@ INSTANCE: odds immutable-sequence
     [ dup empty? ] swap until drop ; inline
 
 : arg-max ( seq -- n )
-    <enumerated> [ second-unsafe ] supremum-by first ;
+    [ supremum ] keep index ;
 
 : arg-min ( seq -- n )
-    <enumerated> [ second-unsafe ] infimum-by first ;
+    [ infimum ] keep index ;
 
 <PRIVATE
 
