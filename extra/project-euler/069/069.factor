@@ -1,7 +1,7 @@
 ! Copyright (c) 2009 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators fry kernel math math.primes math.primes.factors math.ranges
-    project-euler.common sequences ;
+USING: combinators fry kernel math math.primes math.primes.factors
+math.ranges project-euler.common sequences sequences.extras ;
 IN: project-euler.069
 
 ! http://projecteuler.net/index.php?section=problems&id=69
@@ -47,7 +47,7 @@ PRIVATE>
 
 : euler069 ( -- answer )
     2 1000000 [a,b] [ totient-ratio ] map
-    [ supremum ] keep index 2 + ;
+    arg-max 2 + ;
 
 ! [ euler069 ] 10 ave-time
 ! 25210 ms ave run time - 115.37 SD (10 trials)

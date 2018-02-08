@@ -1,8 +1,9 @@
 ! Copyright (c) 2010 Aaron Schaefer. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
-USING: arrays assocs combinators.short-circuit kernel math math.combinatorics
-    math.functions math.primes math.ranges project-euler.common sequences ;
+USING: arrays combinators.short-circuit kernel math math.combinatorics
+math.functions math.primes project-euler.common sequences
+sequences.extras ;
 FROM: project-euler.common => permutations? ;
 IN: project-euler.070
 
@@ -54,7 +55,7 @@ IN: project-euler.070
     first2 { [ drop 7 10^ < ] [ permutations? ] } 2&& ;
 
 : minimum-ratio ( seq -- n )
-    [ [ first2 / ] map [ infimum ] keep index ] keep nth first ;
+    [ [ first2 / ] map arg-min ] keep nth first ;
 
 PRIVATE>
 
