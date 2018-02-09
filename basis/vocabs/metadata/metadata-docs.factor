@@ -32,18 +32,18 @@ ARTICLE: "vocabs.metadata" "Vocabulary metadata"
 }
 "Getting and setting arbitrary vocabulary metadata:"
 { $subsections
-    vocab-file-contents
-    set-vocab-file-contents
+    vocab-file-lines
+    set-vocab-file-lines
 } ;
 
 ABOUT: "vocabs.metadata"
 
-HELP: vocab-file-contents
-{ $values { "vocab" "a vocabulary specifier" } { "name" string } { "seq" { $maybe "a sequence of lines" } } }
-{ $description "Outputs the contents of the file named " { $snippet "name" } " from the vocabulary's directory, or " { $link f } " if the file does not exist." } ;
+HELP: vocab-file-lines
+{ $values { "vocab" "a vocabulary specifier" } { "name" string } { "lines" { $maybe { $sequence "lines" } } } }
+{ $description "Outputs the lines of the file named " { $snippet "name" } " from the vocabulary's directory, or " { $link f } " if the file does not exist." } ;
 
-HELP: set-vocab-file-contents
-{ $values { "seq" "a sequence of lines" } { "vocab" "a vocabulary specifier" } { "name" string } }
+HELP: set-vocab-file-lines
+{ $values { "lines" { $sequence "lines" } } { "vocab" "a vocabulary specifier" } { "name" string } }
 { $description "Stores a sequence of lines to the file named " { $snippet "name" } " from the vocabulary's directory." } ;
 
 HELP: vocab-summary
