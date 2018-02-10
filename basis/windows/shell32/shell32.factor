@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.strings
 alien.syntax classes.struct io.backend kernel
-specialized-arrays
-specialized-arrays.instances.alien.c-types.ushort windows
+specialized-arrays windows
 windows.com windows.com.syntax windows.kernel32 windows.ole32
 windows.types ;
 IN: windows.shell32
