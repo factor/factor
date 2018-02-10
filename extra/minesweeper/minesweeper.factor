@@ -51,12 +51,12 @@ TUPLE: cell #adjacent mined? state ;
     ] with with with count ;
 
 :: each-cell ( ... cells quot: ( ... row col cell -- ... ) -- ... )
-    cells [| row |
-        [| cell col | row col cell quot call ] each-index
+    cells |[ row |
+        |[ cell col | row col cell quot call ] each-index
     ] each-index ; inline
 
 :: update-counts ( cells -- cells )
-    cells [| row col cell |
+    cells |[ row col cell |
         cells row col adjacent-mines cell #adjacent<<
     ] each-cell cells ;
 
@@ -122,7 +122,7 @@ TUPLE: grid-gadget < gadget cells timer textures start end ;
         mines place-mines update-counts >>cells
         H{ } clone >>textures
         dup '[ _ relayout-1 ] f 1 seconds <timer> >>timer
-        COLOR: gray <solid> >>interior ;
+        color: gray <solid> >>interior ;
 
 M: grid-gadget graft*
     [ timer>> start-timer ] [ call-next-method ] bi ;
@@ -200,7 +200,7 @@ M: grid-gadget pref-dim*
 
 :: draw-cells ( gadget -- )
     gadget cells>> game-over? :> game-over?
-    gadget cells>> [| row col cell |
+    gadget cells>> |[ row col cell |
         col row [ 32 * ] bi@ 58 + 2array [
             cell game-over? cell-image-path
             gadget cached-texture
