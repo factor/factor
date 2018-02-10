@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors.constants kernel
-specialized-arrays.instances.alien.c-types.float tools.test
+USING: accessors colors.constants kernel tools.test
 ui.gadgets.labels ui.pens.caching ui.pens.gradient ;
 IN: ui.pens.caching.tests
+
+SPECIALIZED-ARRAY: float
 
 ! compute-pen
 {
