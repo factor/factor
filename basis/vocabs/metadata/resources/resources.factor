@@ -33,10 +33,12 @@ ERROR: resource-missing pattern ;
     '[ _ match-pattern ] gather ;
 
 : vocab-resource-files ( vocab -- filenames )
-    [ vocab-resources ] [ vocab-dir-in-root ] bi
-    [
-        match-patterns [ expand-resource ] map concat
-    ] with-directory-files ;
+    dup vocab-resources [
+        swap vocab-dir-in-root
+        [
+            match-patterns [ expand-resource ] map concat
+        ] with-directory-files
+    ] [ drop f ] if* ;
 
 : copy-vocab-resources ( dir vocab -- )
     dup vocab-resource-files

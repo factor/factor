@@ -355,6 +355,8 @@ M: word ($instance) dup name>> a/an write bl ($link) ;
 
 M: string ($instance) write ;
 
+M: array ($instance) print-element ;
+
 M: f ($instance) ($link) ;
 
 : $instance ( element -- ) first ($instance) ;

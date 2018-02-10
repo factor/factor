@@ -148,11 +148,6 @@ CONSTRUCTOR: <tree> tree ( -- obj ) ;
 
 ERROR: unknown-commit-line line name ;
 
-ERROR: string-expected got expected ;
-
-: expect-string ( string expected -- )
-    2dup = [ 2drop ] [ string-expected ] if ;
-
 ERROR: eof-too-early ;
 ERROR: unknown-field field ;
 
@@ -175,12 +170,10 @@ ERROR: unexpected-text text ;
     } case ;
 
 : parse-commit ( bytes -- commit )
-    " " split1 [ "commit" expect-string ] [ string>number read ] bi*
+    " " split1 [ "commit" assert= ] [ string>number read ] bi*
     utf8 [
         commit new parse-commit-lines
     ] with-byte-reader ;
-
-
 
 : parse-tree-field ( obj parameter -- obj )
     [ "\r\n" read-until* ] dip {
@@ -504,8 +497,6 @@ ERROR: repeated-parent-hash hash ;
     H{ } clone parents [
         git-head-object [
             parents>> dup string? [ random ] unless [
-                ! [ parents get 2dup key? [ repeated-parent-hash ] when dupd set-at ] keep
-                ! dup "parent: " prepend print flush yield
                 dup git-unpacked-object-exists?
                 [ git-read-object ] [ git-object-from-pack ] if
             ] [ f ] if*

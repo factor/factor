@@ -11,20 +11,20 @@ CONSTANT: token-uri "https://www.googleapis.com/oauth2/v4/token"
 CONSTANT: redirect-uri "urn:ietf:wg:oauth:2.0:oob"
 CONSTANT: gmail-scope-ro "https://www.googleapis.com/auth/gmail.readonly"
 
-SYMBOL: access-token
+SYMBOLS: access-token google-oauth2 ;
 
 : configure-oauth2 ( client-id client-secret -- )
     [ auth-uri token-uri redirect-uri ] 2dip gmail-scope-ro { }
-    oauth2 boa oauth2 set ;
+    oauth2 boa google-oauth2 set ;
 
 : ensure-token ( -- )
     access-token [
         [
             dup access-expired? [
-                oauth2 get over refresh-flow update-tokens
+                google-oauth2 get over refresh-flow update-tokens
             ] when
         ] [
-            oauth2 get console-flow
+            google-oauth2 get console-flow
         ] if*
     ] change ;
 

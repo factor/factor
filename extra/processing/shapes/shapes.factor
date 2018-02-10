@@ -1,9 +1,7 @@
 USING: alien.c-types alien.data arrays colors.constants grouping
-kernel locals math math.vectors namespaces opengl opengl.gl
-opengl.glu sequences sequences.generalizations shuffle ;
+kernel locals math math.vectors namespaces opengl opengl.demo-support
+opengl.gl opengl.glu sequences sequences.generalizations shuffle ;
 IN: processing.shapes
-
-: do-state ( mode quot -- ) swap glBegin call glEnd ; inline
 
 SYMBOL: fill-color
 SYMBOL: stroke-color

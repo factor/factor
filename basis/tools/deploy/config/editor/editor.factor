@@ -10,12 +10,12 @@ IN: tools.deploy.config.editor
 
 : deploy-config ( vocab -- assoc )
     dup default-config swap
-    dup deploy-config-path vocab-file-contents
+    dup deploy-config-path vocab-file-lines
     parse-fresh [ first assoc-union ] unless-empty ;
 
 : set-deploy-config ( assoc vocab -- )
     [ [ unparse-use ] without-limits string-lines ] dip
-    dup deploy-config-path set-vocab-file-contents ;
+    dup deploy-config-path set-vocab-file-lines ;
 
 : set-deploy-flag ( value key vocab -- )
     [ deploy-config [ set-at ] keep ] keep set-deploy-config ;

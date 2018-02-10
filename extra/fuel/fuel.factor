@@ -1,13 +1,12 @@
 ! Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.units continuations fuel.eval
+USING: accessors assocs compiler.units continuations fry fuel.eval
 fuel.help fuel.xref help.topics io.pathnames kernel namespaces parser
-parser.notes sequences tools.scaffold vocabs vocabs.files
+parser.notes sequences source-files tools.scaffold vocabs vocabs.files
 vocabs.hierarchy vocabs.loader vocabs.metadata vocabs.parser words ;
 IN: fuel
 
 ! Evaluation
-
 : fuel-eval-restartable ( -- )
     t eval-res-flag set-global ; inline
 
@@ -16,9 +15,6 @@ IN: fuel
 
 : fuel-eval-in-context ( lines in usings -- )
     eval-in-context ;
-
-: fuel-eval-set-result ( obj -- )
-    clone eval-result set-global ; inline
 
 : fuel-retort ( -- ) f f "" send-retort ; inline
 
@@ -44,134 +40,147 @@ SYMBOL: :uses-suggestions
     restarts get [ is-suggested-restart? ] filter
     dup length 1 = [ first continue-restart ] [ drop ] if ;
 
-: set-use-hook ( -- )
-    [ manifest get auto-used>> clone :uses prefix fuel-eval-set-result ]
-    print-use-hook set ;
+SYMBOL: auto-uses
 
-: get-uses ( lines -- )
+: set-use-hook ( -- )
     [
-        parser-quiet? on
-        parse-fresh drop
-    ] curry with-compilation-unit ; inline
+        manifest get auto-used>> clone :uses prefix
+        clone auto-uses set-global
+    ] print-use-hook set ;
 
 PRIVATE>
 
-: fuel-use-suggested-vocabs ( ..a suggestions quot: ( ..a -- ..b ) -- ..b )
+: fuel-use-suggested-vocabs ( ..a suggestions quot: ( ..a -- ..b )
+                              -- ..b result )
+    f auto-uses set-global
     [ :uses-suggestions set ] dip
-    [ try-suggested-restarts rethrow ] recover ; inline
+    [ try-suggested-restarts rethrow ] recover
+    auto-uses get-global ; inline
 
-: fuel-run-file ( path -- )
-    [ set-use-hook run-file ] curry with-scope ; inline
+: fuel-run-file ( path -- result )
+    f auto-uses set-global
+    '[ set-use-hook _ run-file ] with-scope
+    auto-uses get-global ; inline
 
 : fuel-with-autouse ( ..a quot: ( ..a -- ..b ) -- ..b )
-    [ set-use-hook call ] curry with-scope ; inline
+    '[ set-use-hook _ call ] with-scope ; inline
 
-: fuel-get-uses ( lines -- )
-    [ get-uses ] curry fuel-with-autouse ;
+: fuel-get-uses ( name lines -- )
+    '[
+        [
+            _ [
+                parser-quiet? on
+                _ parse-fresh drop
+            ] with-source-file
+        ] with-compilation-unit
+    ] fuel-with-autouse ;
 
 ! Edit locations
+: fuel-get-word-location ( word -- result )
+    word-location ;
 
-: fuel-get-word-location ( word -- )
-    word-location fuel-eval-set-result ;
+: fuel-get-vocab-location ( vocab -- result )
+    vocab-location  ;
 
-: fuel-get-vocab-location ( vocab -- )
-    vocab-location fuel-eval-set-result ;
+: fuel-get-doc-location ( word -- result )
+    doc-location ;
 
-: fuel-get-doc-location ( word -- )
-    doc-location fuel-eval-set-result ;
+: fuel-get-article-location ( name -- result )
+    article-location ;
 
-: fuel-get-article-location ( name -- )
-    article-location fuel-eval-set-result ;
+: fuel-get-vocabs ( -- reuslt )
+    all-disk-vocab-names ;
 
-: fuel-get-vocabs ( -- )
-    all-disk-vocab-names fuel-eval-set-result ;
+: fuel-get-vocabs/prefix ( prefix -- result )
+    get-vocabs/prefix ;
 
-: fuel-get-vocabs/prefix ( prefix -- )
-    get-vocabs/prefix fuel-eval-set-result ;
-
-: fuel-get-words ( prefix names -- )
-    get-vocabs-words/prefix fuel-eval-set-result ;
+: fuel-get-words ( prefix names -- result )
+    get-vocabs-words/prefix ;
 
 ! Cross-references
 
-: fuel-callers-xref ( word -- ) callers-xref fuel-eval-set-result ;
+: fuel-callers-xref ( word -- result ) callers-xref ;
 
-: fuel-callees-xref ( word -- ) callees-xref fuel-eval-set-result ;
+: fuel-callees-xref ( word -- result ) callees-xref ;
 
-: fuel-apropos-xref ( str -- ) apropos-xref fuel-eval-set-result ;
+: fuel-apropos-xref ( str -- result ) apropos-xref ;
 
-: fuel-vocab-xref ( vocab -- ) vocab-xref fuel-eval-set-result ;
+: fuel-vocab-xref ( vocab -- result ) vocab-xref ;
 
-: fuel-vocab-uses-xref ( vocab -- ) vocab-uses-xref fuel-eval-set-result ;
+: fuel-vocab-uses-xref ( vocab -- result ) vocab-uses-xref ;
 
-: fuel-vocab-usage-xref ( vocab -- ) vocab-usage-xref fuel-eval-set-result ;
+: fuel-vocab-usage-xref ( vocab -- result ) vocab-usage-xref ;
 
 ! Help support
 
-: fuel-get-article ( name -- ) fuel.help::get-article fuel-eval-set-result ;
+: fuel-get-article ( name -- result )
+    fuel.help:get-article ;
 
-: fuel-get-article-title ( name -- )
-    articles get at [ article-title ] [ f ] if* fuel-eval-set-result ;
+: fuel-get-article-title ( name -- result )
+    articles get at [ article-title ] [ f ] if* ;
 
-: fuel-word-help ( name -- ) word-help fuel-eval-set-result ;
+: fuel-word-help ( name -- result ) word-help ;
 
-: fuel-word-def ( name -- ) word-def fuel-eval-set-result ;
+: fuel-word-def ( name -- result ) word-def ;
 
-: fuel-vocab-help ( name -- ) fuel.help::vocab-help fuel-eval-set-result ;
+: fuel-vocab-help ( name -- result ) fuel.help:vocab-help ;
 
-: fuel-word-synopsis ( word -- ) word-synopsis fuel-eval-set-result ;
+: fuel-word-synopsis ( word -- synopsis )
+    word-synopsis ;
 
-: fuel-vocab-summary ( name -- )
-    fuel.help::vocab-summary fuel-eval-set-result ;
+: fuel-vocab-summary ( name -- summary )
+    fuel.help:vocab-summary ;
 
-: fuel-index ( quot -- ) call( -- seq ) format-index fuel-eval-set-result ;
+: fuel-index ( quot -- result )
+    call( -- seq ) format-index ;
 
-: fuel-get-vocabs/tag ( tag -- )
-    get-vocabs/tag fuel-eval-set-result ;
+: fuel-get-vocabs/tag ( tag -- result )
+    get-vocabs/tag ;
 
-: fuel-get-vocabs/author ( author -- )
-    get-vocabs/author fuel-eval-set-result ;
+: fuel-get-vocabs/author ( author -- result )
+    get-vocabs/author ;
 
 ! Scaffold support
 
 : scaffold-name ( devname -- )
     [ developer-name set ] when* ;
 
-: fuel-scaffold-vocab ( root name devname -- )
+: fuel-scaffold-vocab ( root name devname -- result )
     [ scaffold-name dup [ scaffold-vocab ] dip ] with-scope
-    dup require vocab-source-path absolute-path fuel-eval-set-result ;
+    dup require vocab-source-path absolute-path ;
 
-: fuel-scaffold-help ( name devname -- )
+: fuel-scaffold-help ( name devname -- result )
     [ scaffold-name dup require dup scaffold-docs ] with-scope
-    vocab-docs-path absolute-path fuel-eval-set-result ;
+    vocab-docs-path absolute-path ;
 
-: fuel-scaffold-tests ( name devname -- )
+: fuel-scaffold-tests ( name devname -- result )
     [ scaffold-name dup require dup scaffold-tests ] with-scope
-    vocab-tests-file absolute-path fuel-eval-set-result ;
+    vocab-tests-file absolute-path ;
 
-: fuel-scaffold-authors ( name devname -- )
+: fuel-scaffold-authors ( name devname -- result )
     [ scaffold-name dup require dup scaffold-authors ] with-scope
-    [ vocab-authors-path ] keep swap vocab-append-path absolute-path fuel-eval-set-result ;
+    [ vocab-authors-path ] keep swap vocab-append-path absolute-path ;
 
-: fuel-scaffold-tags ( name tags -- )
+: fuel-scaffold-tags ( name tags -- result )
     [ scaffold-tags ]
     [
         drop [ vocab-tags-path ] keep swap
-        vocab-append-path absolute-path fuel-eval-set-result
+        vocab-append-path absolute-path
     ] 2bi ;
 
-: fuel-scaffold-summary ( name summary -- )
+: fuel-scaffold-summary ( name summary -- result )
     [ scaffold-summary ]
     [
         drop [ vocab-summary-path ] keep swap
-        vocab-append-path absolute-path fuel-eval-set-result
+        vocab-append-path absolute-path
     ] 2bi ;
 
-: fuel-scaffold-platforms ( name platforms -- )
+: fuel-scaffold-platforms ( name platforms -- result )
     [ scaffold-platforms ]
     [
         drop [ vocab-platforms-path ] keep swap
-        vocab-append-path absolute-path fuel-eval-set-result
+        vocab-append-path absolute-path
     ] 2bi ;
 
-: fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
+: fuel-scaffold-get-root ( name -- result )
+    find-vocab-root ;

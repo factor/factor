@@ -157,6 +157,7 @@ IN: sequences.extras.tests
 { { 1 3 5 } } [ 6 <iota> <odds> >array ] unit-test
 
 { 1 } [ { 1 7 3 7 6 3 7 } arg-max ] unit-test
+{ 2 } [ { 0 1 99 } arg-max ] unit-test
 { 0 } [ { 1 7 3 7 6 3 7 } arg-min ] unit-test
 { V{ 0 4 } } [ { 5 3 2 10 5 } [ 5 = ] arg-where ] unit-test
 { { 2 1 0 4 3 } } [ { 5 3 2 10 5 } arg-sort ] unit-test

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ui.gadgets.worlds ;
+USING: gpu.private help.markup help.syntax ui.gadgets.worlds ;
 IN: gpu
 
 HELP: finish-gpu
@@ -14,6 +14,9 @@ HELP: flush-gpu
 
 HELP: gpu-object
 { $class-description "Parent class of all GPU resources." } ;
+
+HELP: has-vertex-array-objects?
+{ $var-description "Whether the opengl version supports Vertex Array Objects or not." } ;
 
 HELP: init-gpu
 { $description "Initializes the current graphics context for use with the " { $snippet "gpu" } " library. This should be the first thing called in a world's " { $link begin-world } " method." } ;

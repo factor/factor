@@ -27,13 +27,6 @@
   "Options for FUEL's scaffolding."
   :group 'fuel)
 
-(defcustom fuel-scaffold-developer-name nil
-  "The name to be inserted as yours in scaffold templates."
-  :type '(choice string
-                 (const :tag "Factor's value for developer-name" nil))
-  :group 'fuel-scaffold)
-
-
 ;;; Auxiliary functions:
 
 (defun fuel-mode--code-file (kind &optional file)
@@ -50,15 +43,15 @@
   (fuel-mode--code-file "tests"))
 
 (defun fuel-scaffold--vocab-roots ()
-  (let ((cmd '(:fuel* (vocab-roots get :get) "fuel" ("namespaces" "vocabs.loader"))))
+  (let ((cmd '(:fuel* (vocab-roots get)
+                      "fuel" ("namespaces" "vocabs.loader"))))
     (nth 1 (fuel-eval--send/wait cmd))))
 
 (defun fuel-scaffold--dev-name ()
-  (or (let ((cmd '(:fuel* (developer-name get :get)
+  (or (let ((cmd '(:fuel* (developer-name get)
                           "fuel"
                           ("namespaces" "tools.scaffold"))))
         (fuel-eval--retort-result (fuel-eval--send/wait cmd)))
-      fuel-scaffold-developer-name
       user-full-name
       "Your name"))
 
@@ -148,8 +141,8 @@ IN: %s
 adds source and authors.txt files. Prompts the user for optional summary,
 tags, help, and test file creation.
 
-You can configure `fuel-scaffold-developer-name' for the name to
-be inserted in the generated files."
+You can configure `user-full-name' for the name to be inserted in
+the generated files."
   (interactive)
   (let* ((name (read-string "Vocab name: " name-hint))
          (root (completing-read "Vocab root: "
@@ -160,8 +153,8 @@ be inserted in the generated files."
          (platforms (read-string "Vocab platforms (empty for all): "))
          (help (y-or-n-p "Scaffold help? "))
          (tests (y-or-n-p "Scaffold tests? "))
-         (cmd `(:fuel* ((,root ,name ,(fuel-scaffold--dev-name)
-                        (fuel-scaffold-vocab)) "fuel")))
+         (cmd `(:fuel* (,root ,name ,(fuel-scaffold--dev-name)
+                              fuel-scaffold-vocab) "fuel"))
          (ret (fuel-eval--send/wait cmd))
          (file (fuel-eval--retort-result ret)))
     (unless file
@@ -186,7 +179,7 @@ be inserted in the generated files."
 scaffolded help for each word in the current vocabulary.
 
 With prefix argument, ask for the vocabulary name. You can
-configure `fuel-scaffold-developer-name' for the name to be
+configure `user-full-name' for the name to be
 inserted in the generated file."
   (interactive "P")
   (let* ((vocab (or (and (not arg) (factor-current-vocab))
@@ -204,8 +197,8 @@ inserted in the generated file."
 vocabulary.
 
 With prefix argument, ask for the vocabulary name. You can
-configure `fuel-scaffold-developer-name' for the name to be
-inserted in the generated file."
+configure `user-full-name' for the name to be inserted in the
+generated file."
   (interactive "P")
   (let* ((vocab (or (and (not arg) (factor-current-vocab))
                     (fuel-completion--read-vocab nil)))
@@ -221,7 +214,7 @@ inserted in the generated file."
 vocabulary.
 
 With prefix argument, ask for the vocabulary name. You can
-configure `fuel-scaffold-developer-name' for the name to be
+configure `user-full-name' for the name to be
 inserted in the generated file."
   (interactive "P")
   (let* ((vocab (or (and (not arg) (factor-current-vocab))

@@ -69,18 +69,6 @@ With prefix argument, refreshes cached vocabulary list."
     (fuel-edit--try-edit (fuel-eval--send/wait cmd))))
 
 ;;;###autoload
-(defun fuel-edit-word (&optional arg)
-  "Asks for a word to edit, with completion.
-With prefix, only words visible in the current vocabulary are
-offered."
-  (interactive "P")
-  (let* ((word (fuel-completion--read-word "Edit word: "
-                                           nil
-                                           fuel-edit--word-history
-                                           arg))
-         (cmd `(:fuel* ((:quote ,word) fuel-get-word-location))))
-    (fuel-edit--try-edit (fuel-eval--send/wait cmd))))
-
 (defun fuel-edit-word-at-point (&optional arg)
   "Opens a new window visiting the definition of the word at point.
 With prefix, asks for the word to edit."

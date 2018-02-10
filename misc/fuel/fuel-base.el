@@ -20,7 +20,6 @@
   (interactive)
   (message "FUEL %s" fuel-version))
 
-
 ;;; Customization:
 
 ;;;###autoload
@@ -28,9 +27,7 @@
   "Factor's Ultimate Emacs Library."
   :group 'languages)
 
-
-;;; Utilities:
-
+;;; Compatibility with Emacs 24.3
 (unless (fboundp 'setq-local)
   (defmacro setq-local (var val)
     (list 'set (list 'make-local-variable (list 'quote var)) val)))
@@ -41,6 +38,11 @@
     (list 'progn (list 'defvar var val docstring)
           (list 'make-variable-buffer-local (list 'quote var)))))
 
+(unless (fboundp 'alist-get)
+  (defun alist-get (key alist)
+    (cdr (assoc key alist))))
+
+;;; Utilities:
 (defun fuel-shorten-str (str len)
   (let ((sl (length str)))
     (if (<= sl len) str

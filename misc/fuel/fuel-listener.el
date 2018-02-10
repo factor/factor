@@ -274,8 +274,7 @@ the vocabulary name."
 (fuel-menu--defmenu listener fuel-listener-mode-map
   ("Complete symbol" ((kbd "TAB") (kbd "M-TAB"))
    fuel-completion--complete-symbol :enable (symbol-at-point))
-  ("Edit word definition" "\M-." fuel-edit-word-at-point
-   :enable (symbol-at-point))
+  ("Edit word or vocab at point" "\M-." fuel-edit-word-at-point)
   ("Edit vocabulary" "\C-c\C-v" fuel-edit-vocabulary)
   --
   ("Word help" "\C-c\C-w" fuel-help)
