@@ -4,11 +4,11 @@
 USING: accessors alien.accessors alien.data alien.strings
 classes.struct io.encodings.utf16n kernel make math namespaces
 prettyprint sequences specialized-arrays
-specialized-arrays.instances.alien.c-types.ushort
 ui.backend.windows ui.gadgets.worlds ui.gestures
 ui.tools.listener windows.com windows.com.wrapper
 windows.dropfiles windows.kernel32 windows.ole32 windows.shell32
 windows.types ;
+SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: WCHAR
 IN: windows.dragdrop-listener
 
