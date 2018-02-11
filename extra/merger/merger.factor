@@ -19,8 +19,7 @@ MAIN-WINDOW: merger-window {
                     [ swap set-control-value ] 2bi
                 ] [ drop ] if*
             ] <border-button> swap >>model swap
-            COLOR: black <labeled-gadget>
-            1 track-add
+            <labeled-gadget> 1 track-add
         ] 2each
     ] keep
     dup first2

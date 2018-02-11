@@ -101,9 +101,9 @@ M: inspector-table compute-column-widths
         swap >>model
         dup model>> <inspector-table> >>table
         dup model>> <summary-gadget> margins white-interior
-        "Object" object-color <labeled-gadget> f track-add
+        "Object" object-color <colored-labeled-gadget> f track-add
         dup table>> <scroller> margins white-interior
-        "Contents" contents-color <labeled-gadget> 1 track-add ;
+        "Contents" contents-color <colored-labeled-gadget> 1 track-add ;
 
 M: inspector-gadget focusable-child*
     table>> ;
