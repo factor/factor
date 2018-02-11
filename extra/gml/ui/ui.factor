@@ -27,7 +27,7 @@ M: stack-entry-renderer row-value
 
 : <stack-display> ( model -- gadget )
     <stack-table> <scroller> "Operand stack"
-    COLOR: dark-gray <labeled-gadget> ;
+    COLOR: dark-gray <colored-labeled-gadget> ;
 
 TUPLE: gml-editor < frame editor gml stack-model b-rep b-rep-model ;
 
@@ -99,7 +99,7 @@ CONSTANT: example-dir "vocab:gml/examples/"
         30 >>max-rows
         40 >>min-cols
         40 >>max-cols
-    <scroller> "Editor" COLOR: dark-gray <labeled-gadget> ;
+    <scroller> "Editor" COLOR: dark-gray <colored-labeled-gadget> ;
 
 : <gml-editor> ( -- gadget )
     2 3 gml-editor new-frame
