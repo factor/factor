@@ -29,9 +29,6 @@ TUPLE: cell #adjacent mined? state ;
 : cells-dim ( cells -- rows cols )
     [ length ] [ first length ] bi ;
 
-: unmined-cell ( cells -- cell )
-    f [ dup mined?>> ] [ drop dup random random ] do while nip ;
-
 : #mines ( cells -- n )
     [ [ mined?>> ] count ] map-sum ;
 
@@ -40,6 +37,9 @@ TUPLE: cell #adjacent mined? state ;
 
 : #mines-remaining ( cells -- n )
     [ #mines ] [ #flagged ] bi - ;
+
+: unmined-cell ( cells -- cell )
+    f [ dup mined?>> ] [ drop dup random random ] do while nip ;
 
 : place-mines ( cells n -- cells )
     [ dup unmined-cell t >>mined? drop ] times ;
@@ -81,7 +81,7 @@ DEFER: click-cell-at
     neighbors [
         first2 [ row + ] [ col + ] bi* :> ( row' col' )
         cells row' col' cell-at [
-            { [ mined?>> ] [ state>> +question+ = ] } 1|| [
+            { [ mined?>> ] [ state>> +flagged+ = ] } 1|| [
                 cells row' col' click-cell-at drop
             ] unless
         ] when*
@@ -229,7 +229,7 @@ M: grid-gadget draw-gadget*
         h 3 55 between?
         gadget pref-dim first 2/ w - abs 26 < and [
             gadget [ reset-cells ] change-cells
-            f >>start f >>end relayout-1
+            f >>start f >>end drop
         ] when
     ] [
         h 58 - w [ 32 /i ] bi@ :> ( row col )
@@ -238,10 +238,9 @@ M: grid-gadget draw-gadget*
             cells row col click-cell-at [
                 gadget start>> [ now gadget start<< ] unless
                 cells game-over? [ now gadget end<< ] when
-                gadget relayout-1
             ] when
         ] unless
-    ] if ;
+    ] if gadget relayout-1 ;
 
 :: on-mark ( gadget -- )
     gadget hand-rel first2 :> ( w h )
@@ -252,10 +251,9 @@ M: grid-gadget draw-gadget*
             cells row col mark-cell-at [
                 gadget start>> [ now gadget start<< ] unless
                 cells game-over? [ now gadget end<< ] when
-                gadget relayout-1
             ] when
         ] unless
-    ] when ;
+    ] when gadget relayout-1 ;
 
 : new-game ( gadget rows cols mines -- )
     [ make-cells ] dip place-mines update-counts >>cells
