@@ -229,7 +229,7 @@ M: grid-gadget draw-gadget*
         h 3 55 between?
         gadget pref-dim first 2/ w - abs 26 < and [
             gadget [ reset-cells ] change-cells
-            f >>start f >>end relayout-1
+            f >>start f >>end drop
         ] when
     ] [
         h 58 - w [ 32 /i ] bi@ :> ( row col )
@@ -238,10 +238,9 @@ M: grid-gadget draw-gadget*
             cells row col click-cell-at [
                 gadget start>> [ now gadget start<< ] unless
                 cells game-over? [ now gadget end<< ] when
-                gadget relayout-1
             ] when
         ] unless
-    ] if ;
+    ] if gadget relayout-1 ;
 
 :: on-mark ( gadget -- )
     gadget hand-rel first2 :> ( w h )
@@ -252,10 +251,9 @@ M: grid-gadget draw-gadget*
             cells row col mark-cell-at [
                 gadget start>> [ now gadget start<< ] unless
                 cells game-over? [ now gadget end<< ] when
-                gadget relayout-1
             ] when
         ] unless
-    ] when ;
+    ] when gadget relayout-1 ;
 
 : new-game ( gadget rows cols mines -- )
     [ make-cells ] dip place-mines update-counts >>cells
