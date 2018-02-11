@@ -29,9 +29,6 @@ TUPLE: cell #adjacent mined? state ;
 : cells-dim ( cells -- rows cols )
     [ length ] [ first length ] bi ;
 
-: unmined-cell ( cells -- cell )
-    f [ dup mined?>> ] [ drop dup random random ] do while nip ;
-
 : #mines ( cells -- n )
     [ [ mined?>> ] count ] map-sum ;
 
@@ -40,6 +37,9 @@ TUPLE: cell #adjacent mined? state ;
 
 : #mines-remaining ( cells -- n )
     [ #mines ] [ #flagged ] bi - ;
+
+: unmined-cell ( cells -- cell )
+    f [ dup mined?>> ] [ drop dup random random ] do while nip ;
 
 : place-mines ( cells n -- cells )
     [ dup unmined-cell t >>mined? drop ] times ;
@@ -81,7 +81,7 @@ DEFER: click-cell-at
     neighbors [
         first2 [ row + ] [ col + ] bi* :> ( row' col' )
         cells row' col' cell-at [
-            { [ mined?>> ] [ state>> +question+ = ] } 1|| [
+            { [ mined?>> ] [ state>> +flagged+ = ] } 1|| [
                 cells row' col' click-cell-at drop
             ] unless
         ] when*
