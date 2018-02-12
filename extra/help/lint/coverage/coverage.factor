@@ -1,9 +1,9 @@
 USING: accessors arrays classes classes.error combinators
 combinators.short-circuit continuations english eval formatting
-fry fuel.help.private generic help help.lint help.lint.checks help.markup io
+fry generic help help.lint help.lint.checks help.markup io
 io.streams.string io.styles kernel math namespaces parser
 prettyprint sequences sequences.deep sets sorting splitting strings summary
-vocabs words words.alias ;
+vocabs vocabs.parser words words.alias ;
 FROM: namespaces => set ;
 IN: help.lint.coverage
 
@@ -77,6 +77,13 @@ DEFER: ?pluralize
 
 M: word-help-coverage summary
     [ (present-coverage) ] with-string-writer ; inline
+
+: find-word ( name -- word/f )
+    dup words-named dup length {
+        { 0 [ 2drop f ] }
+        { 1 [ first nip ] }
+        [ drop <ambiguous-use-error> throw-restarts ]
+    } case ;
 
 : sorted-loaded-child-vocabs ( prefix -- assoc )
     loaded-child-vocab-names natural-sort ; inline
