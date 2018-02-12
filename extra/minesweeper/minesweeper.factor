@@ -284,7 +284,7 @@ TUPLE: minesweeper-gadget < track ;
     [ <toolbar> format-toolbar f track-add ]
     [ 1 track-add ] bi ;
 
-M: minesweeper-gadget focusable-child* children>> second ;
+M: minesweeper-gadget focusable-child* children>> ?second t or ;
 
 MAIN-WINDOW: run-minesweeper {
         { title "Minesweeper" }
