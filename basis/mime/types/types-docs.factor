@@ -13,7 +13,7 @@ HELP: mime-type
 { $values
     { "filename" "a filename" }
     { "mime-type" "a MIME type string" } }
-{ $description "Outputs the MIME type associtated with a path by parsing the path's file extension and looking it up in the table returned by " { $link mime-types } "." } ;
+{ $description "Outputs the MIME type associated with a path by parsing the path's file extension and looking it up in the table returned by " { $link mime-types } "." } ;
 
 HELP: mime-types
 { $values
