@@ -343,16 +343,17 @@ HELP: no-cond
 { $error-description "Thrown by " { $link cond } " if none of the test quotations yield a true value. Some uses of " { $link cond } " include a default case where the test quotation is " { $snippet "[ t ]" } "; such a " { $link cond } " form will never throw this error." } ;
 
 HELP: case
-{ $values { "obj" object } { "assoc" "a sequence of object/word, quotation pairs, with an optional quotation at the end" } }
+{ $values { "obj" object } { "assoc" "an assoc of object/quotation pairs, with an optional quotation at the end" } }
 { $description
-    "Compares " { $snippet "obj" } " against the first element of every pair, first evaluating the first element if it is a word. If some pair matches, removes " { $snippet "obj" } " from the stack and calls the second element of that pair, which must be a quotation."
+    "Compares " { $snippet "obj" } " against the first element of every " { $link pair } ", evaluating the first element if it is a " { $link callable } ". If a pair matches, " { $snippet "obj" } " is removed from the stack and the second element of that pair (which must be a " { $link quotation } ") is " { $link call } "ed."
     $nl
-    "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "assoc" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-cond } " error is raised."
+    "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "assoc" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-case } " error is raised."
     $nl
-    "The following two phrases are equivalent:"
+    "In general, the following two phrases are equivalent:"
     { $code "{ { X [ Y ] } { Z [ T ] } } case" }
     { $code "dup X = [ drop Y ] [ dup Z = [ drop T ] [ no-case ] if ] if" }
 }
+{ $errors { $link no-case } " if the input matched none of the options and there was no trailing quotation." }
 { $examples
     { $example
         "USING: combinators io kernel ;"
