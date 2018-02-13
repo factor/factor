@@ -66,7 +66,7 @@ HELP: user-groups
 HELP: with-effective-group
 { $values
      { "string/id/f" "a string, a group id, or f" } { "quot" quotation } }
-{ $description "Sets the effective group name and calls the quotation. Restores the effective group name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
+{ $description "Sets the effective group name and calls the quotation. Restors the effective group name on success or on error after the call. If the first parameter is " { $link f } ", the quotation is called as the current user." } ;
 
 HELP: with-group-cache
 { $values

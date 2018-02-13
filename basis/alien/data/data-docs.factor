@@ -154,7 +154,7 @@ ARTICLE: "c-pointers" "Passing pointers to C functions"
 ARTICLE: "c-boxes" "C value boxes"
 "Sometimes it is useful to create a byte array storing a single C value, like a struct with a single field. A pair of utility words exist to make this more convenient:"
 { $subsections <ref> deref }
-"These words can be used to in conjuction with, or instead of, " { $link with-out-parameters } " to handle \"out-parameters\". For example, if a function is declared in the following way:"
+"These words can be used to in conjunction with, or instead of, " { $link with-out-parameters } " to handle \"out-parameters\". For example, if a function is declared in the following way:"
 { $code
   "FUNCTION: int do_foo ( int* a )"
 }

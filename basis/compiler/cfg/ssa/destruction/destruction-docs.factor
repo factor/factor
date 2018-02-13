@@ -12,7 +12,7 @@ HELP: destruct-ssa
 { $description "Main entry point for the SSA destruction compiler pass." } ;
 
 ARTICLE: "compiler.cfg.ssa.destruction" "SSA Destruction"
-"SSA destruction compiler pass. It is preceeded by " { $vocab-link "compiler.cfg.save-contexts" } " and followed by " { $vocab-link "compiler.cfg.linear-scan" } "."
+"SSA destruction compiler pass. It is preceded by " { $vocab-link "compiler.cfg.save-contexts" } " and followed by " { $vocab-link "compiler.cfg.linear-scan" } "."
 $nl
 "Because of the design of the register allocator, this pass has three peculiar properties."
 { $list
