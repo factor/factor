@@ -197,9 +197,9 @@ $nl
 
 ARTICLE: "http.proxy-variables" "HTTP(S) proxy variables"
 { $heading "Proxy Variables" }
-"The http and https proxies can be configured per request, or with Factor's dynamic variables, or with the system's environnement variables (searched from left to right) :"
+"The http and https proxies can be configured per request, or with Factor's dynamic variables, or with the system's environment variables (searched from left to right) :"
 { $table
-{ "variable" "Factor dynamic" "environnement #1" "environnement #2" }
+{ "variable" "Factor dynamic" "environment #1" "environment #2" }
 { "HTTP" { $snippet "\"http.proxy\"" } "http_proxy" "HTTP_PROXY" }
 { "HTTPS" { $snippet "\"https.proxy\"" } "https_proxy" "HTTPS_PROXY" }
 { "no proxy" { $snippet "\"no_proxy\"" } "no_proxy" "NO_PROXY" }

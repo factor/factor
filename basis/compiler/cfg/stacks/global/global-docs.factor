@@ -18,7 +18,7 @@ HELP: pending
 { $class-description "A stack location is pending at a location if all paths from the entry block to the location write the location." } ;
 
 ARTICLE: "compiler.cfg.stacks.global" "Global stack analysis"
-"This vocab defines a bunch of dataflow analysises:"
+"This vocab defines a bunch of dataflow analyses:"
 { $subsections avail anticip dead live pending }
 "The info they gather is used by " { $link finalize-stack-shuffling } " for optimal insertion of " { $link ##peek } " and " { $link ##replace } " instructions." ;
 
