@@ -119,7 +119,7 @@ HELP: ⊥
 { $class-description "Logical contradiction. This statement is unconditionally false." } ;
 
 HELP: ⋀
-{ $class-description "Logical conjuction (AND)." } ;
+{ $class-description "Logical conjunction (AND)." } ;
 
 HELP: ⋁
 { $class-description "Logical disjunction (OR)." } ;

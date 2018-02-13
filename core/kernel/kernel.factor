@@ -77,7 +77,7 @@ DEFER: if
 
 : ? ( ? true false -- true/false )
     ! 'if' and '?' can be defined in terms of each other
-    ! because the JIT special-cases an 'if' preceeded by
+    ! because the JIT special-cases an 'if' preceded by
     ! two literal quotations.
     rot [ drop ] [ nip ] if ; inline
 
