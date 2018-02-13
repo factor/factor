@@ -528,7 +528,7 @@ HELP: find-index
           { "quot" { $quotation ( ... elt i -- ... ? ) } }
           { "i" { $maybe "the index of the first match" } }
           { "elt" { $maybe "the first matching element" } } }
-{ $description "A varient of " { $link find } " where the quotation takes both an element and its index." } ;
+{ $description "A variant of " { $link find } " where the quotation takes both an element and its index." } ;
 
 HELP: find-index-from
 { $values { "n" "a starting index" }
@@ -536,7 +536,7 @@ HELP: find-index-from
           { "quot" { $quotation ( ... elt i -- ... ? ) } }
           { "i" { $maybe "the index of the first match" } }
           { "elt" { $maybe "the first matching element" } } }
-{ $description "A varient of " { $link find-from } " where the quotation takes both an element and its index." } ;
+{ $description "A variant of " { $link find-from } " where the quotation takes both an element and its index." } ;
 
 HELP: map-find
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... result/f ) } } { "result" "the first non-false result of the quotation" } { "elt" { $maybe "the first matching element" } } }

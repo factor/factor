@@ -174,7 +174,7 @@ CONSTANT: jvm-summit-slides
         "Even if we inline complex arithmetic methods, still dispatching on components"
         "Solution: propagate slot info"
     }
-    { $slide "Constrant propagation"
+    { $slide "Constraint propagation"
         "Contrieved example:"
         { $code
             "x = •"
@@ -187,7 +187,7 @@ CONSTANT: jvm-summit-slides
         }
         { "We should be able to inline the call to " { $snippet "length" } " in the true branch" }
     }
-    { $slide "Constrant propagation"
+    { $slide "Constraint propagation"
         "We build a table:"
         { $code
             "b true => x is array"

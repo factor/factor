@@ -51,7 +51,7 @@ HELP: rel-decks-offset
 
 HELP: rel-literal
 { $values { "literal" "a literal" } { "class" "a relocation class" } }
-{ $description "Adds a refrence to a literal value to the current code offset." } ;
+{ $description "Adds a reference to a literal value to the current code offset." } ;
 
 HELP: rel-safepoint
 { $values { "class" "a relocation class" } }
