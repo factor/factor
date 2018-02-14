@@ -281,18 +281,15 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : create-db-triggers ( sql-specs -- )
     [ modifiers>> [ +foreign-id+ = ] deep-any? ] filter
     [
-        [ class>> db-table-name "db-table" set ]
+        [ "sql-spec" set ]
+        [ column-name>> "table-id" set ]
+        [ ] tri
+        modifiers>> [ [ +foreign-id+ = ] deep-any? ] filter
         [
-            [ "sql-spec" set ]
-            [ column-name>> "table-id" set ]
-            [ ] tri
-            modifiers>> [ [ +foreign-id+ = ] deep-any? ] filter
-            [
-                [ second db-table-name "foreign-table-name" set ]
-                [ third "foreign-table-id" set ] bi
-                create-sqlite-triggers
-            ] each
-        ] bi
+            [ second db-table-name "foreign-table-name" set ]
+            [ third "foreign-table-id" set ] bi
+            create-sqlite-triggers
+        ] each
     ] each ;
 
 : sqlite-create-table ( sql-specs class-name -- )
