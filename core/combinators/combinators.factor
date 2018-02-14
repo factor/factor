@@ -184,7 +184,7 @@ PRIVATE>
         { [ dup empty? ] [ 2drop ] }
         { [ dup [ length 4 <= ] [ [ word? ] any? ] bi or ] [ drop linear-case-quot ] }
         { [ dup contiguous-range? ] [ drop dispatch-case-quot ] }
-        { [ dup [ wrapper? ] any? not ] [ drop hash-case-quot ] }
+        { [ dup [ wrapper? ] none? ] [ drop hash-case-quot ] }
         { [ dup [ wrapper? ] all? ] [ drop [ [ wrapped>> ] dip ] assoc-map hash-case-quot ] }
         [ drop linear-case-quot ]
     } cond ;

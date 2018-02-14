@@ -256,7 +256,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
     " interpolate>string ;
 
 : can-be-null? ( -- ? )
-    "sql-spec" get modifiers>> [ +not-null+ = ] any? not ;
+    "sql-spec" get modifiers>> [ +not-null+ = ] none? ;
 
 : delete-cascade? ( -- ? )
     "sql-spec" get modifiers>> { +on-delete+ +cascade+ } swap subseq? ;

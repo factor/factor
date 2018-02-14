@@ -73,7 +73,7 @@ TUPLE: cell #adjacent mined? state ;
     { [ lost? ] [ won? ] } 1|| ;
 
 : new-game? ( cells -- ? )
-    [ [ state>> +clicked+ = ] any? ] any? not ;
+    [ [ state>> +clicked+ = ] any? ] none? ;
 
 DEFER: click-cell-at
 

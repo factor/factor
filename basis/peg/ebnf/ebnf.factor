@@ -425,7 +425,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
     elements>> filter-hidden dup length 1 = [
         first build-locals
     ] [
-        dup [ ebnf-var? ] any? not [
+        dup [ ebnf-var? ] none? [
             drop
         ] [
             [

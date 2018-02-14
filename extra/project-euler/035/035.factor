@@ -28,7 +28,7 @@ IN: project-euler.035
 
 : possible? ( seq -- ? )
     dup length 1 > [
-        [ even? ] any? not
+        [ even? ] none?
     ] [
         drop t
     ] if ;

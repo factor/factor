@@ -273,7 +273,7 @@ PRIVATE>
 ERROR: topological-sort-failed ;
 
 : largest-class ( seq -- n elt )
-    dup [ [ class< ] with any? not ] curry find-last
+    dup [ [ class< ] with none? ] curry find-last
     [ topological-sort-failed ] unless* ;
 
 : sort-classes ( seq -- newseq )
