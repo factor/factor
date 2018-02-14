@@ -39,7 +39,7 @@ PRIVATE>
 
 : forward-reference? ( word -- ? )
     dup old-definitions get [ in? ] with any? [
-        new-definitions get [ in? ] with any? not
+        new-definitions get [ in? ] with none?
     ] [ drop f ] if ;
 
 SYMBOL: compiler-impl

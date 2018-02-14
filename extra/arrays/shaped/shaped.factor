@@ -5,7 +5,7 @@ grouping kernel math math.functions math.order math.vectors
 parser prettyprint.custom sequences sequences.deep ;
 IN: arrays.shaped
 
-: flat? ( array -- ? ) [ sequence? ] any? not ; inline
+: flat? ( array -- ? ) [ sequence? ] none? ; inline
 
 GENERIC: array-replace ( object -- shape )
 

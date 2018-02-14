@@ -18,9 +18,9 @@ IN: math.primes.miller-rabin
         ] [
             r <iota> [
                 2^ s * a swap n ^mod n-1 =
-            ] any? not
+            ] none?
         ] if
-    ] any? not ;
+    ] none? ;
 
 PRIVATE>
 

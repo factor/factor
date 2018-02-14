@@ -45,7 +45,7 @@ TUPLE: code-file
 
 : include-file-name? ( name -- ? )
     {
-        [ path-components [ "." head? ] any? not ]
+        [ path-components [ "." head? ] none? ]
         [ link-info regular-file? ]
     } 1&& ;
 
