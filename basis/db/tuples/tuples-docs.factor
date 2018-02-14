@@ -1,4 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes help.markup help.syntax io.streams.string kernel
 quotations sequences strings math db.types db.tuples.private db ;
