@@ -33,10 +33,13 @@ GENERIC: eval-generator ( singleton -- object )
         '[ slot-name>> _ set-slot-named ] 2each
     ] keep ;
 
+: query-tuples-each ( exemplar-tuple statement quot: ( tuple -- ) -- )
+    [ [ out-params>> ] keep query-results ] dip '[
+        [ sql-row-typed swap resulting-tuple @ ] 2with query-each
+    ] with-disposal ; inline
+
 : query-tuples ( exemplar-tuple statement -- seq )
-    [ out-params>> ] keep query-results [
-        [ sql-row-typed swap resulting-tuple ] 2with query-map
-    ] with-disposal ;
+    [ ] collector [ query-tuples-each ] dip { } like ;
 
 : query-modify-tuple ( tuple statement -- )
     [ query-results [ sql-row-typed ] with-disposal ] keep
@@ -60,6 +63,10 @@ GENERIC: eval-generator ( singleton -- object )
     db-connection get insert-statements>>
     [ <insert-user-assigned-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
+
+: do-each-tuple ( exemplar-tuple statement quot: ( tuple -- ) -- tuples )
+    '[ [ bind-tuple ] [ _ query-tuples-each ] 2bi ] with-disposal
+    ; inline
 
 : do-select ( exemplar-tuple statement -- tuples )
     [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
@@ -155,3 +162,7 @@ ERROR: no-defined-persistent object ;
 : count-tuples ( query/tuple -- n )
     >query [ tuple>> ] [ <count-statement> ] bi do-count
     [ first string>number ] map dup length 1 = [ first ] when ;
+
+: each-tuple ( query/tuple quot: ( tuple -- ) -- )
+    [ >query [ tuple>> ] [ query>statement ] bi ] dip do-each-tuple
+    ; inline
