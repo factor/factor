@@ -154,5 +154,4 @@ ERROR: no-defined-persistent object ;
 
 : count-tuples ( query/tuple -- n )
     >query [ tuple>> ] [ <count-statement> ] bi do-count
-    dup length 1 =
-    [ first first string>number ] [ [ first string>number ] map ] if ;
+    [ first string>number ] map dup length 1 = [ first ] when ;
