@@ -97,12 +97,12 @@ HELP: user-assigned-id-spec?
 
 HELP: bind#
 { $values
-     { "spec" "a SQL spec" } { "obj" object } }
+     { "spec" "an SQL spec" } { "obj" object } }
 { $description "A generic word that lets a database construct a literal binding." } ;
 
 HELP: bind%
 { $values
-     { "spec" "a SQL spec" } }
+     { "spec" "an SQL spec" } }
 { $description "A generic word that lets a database output a binding." } ;
 
 HELP: db-assigned-id-spec?
@@ -120,23 +120,23 @@ HELP: find-primary-key
 
 HELP: no-sql-type
 { $values
-     { "type" "a SQL type" } }
+     { "type" "an SQL type" } }
 { $description "Throws an error containing an SQL type that is unsupported or the result of a typo." } ;
 
 HELP: normalize-spec
 { $values
-     { "spec" "a SQL spec" } }
+     { "spec" "an SQL spec" } }
 { $description "Normalizes an SQL spec." } ;
 
 HELP: primary-key?
 { $values
-     { "spec" "a SQL spec" }
+     { "spec" "an SQL spec" }
      { "?" boolean } }
 { $description "Returns true if an SQL spec is a primary key." } ;
 
 HELP: relation?
 { $values
-     { "spec" "a SQL spec" }
+     { "spec" "an SQL spec" }
      { "?" boolean } }
 { $description "Returns true if an SQL spec is a relation." } ;
 
