@@ -130,6 +130,12 @@ HELP: delete-tuples
 
 { insert-tuple update-tuple delete-tuples } related-words
 
+HELP: each-tuple
+{ $values
+     { "query/tuple" tuple }
+     { "quot" { $quotation ( tuple -- ) } } }
+{ $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". The " { $snippet "quot" } " is applied to each tuple from the database that matches the query constructed from the exemplar tuple." } ;
+
 HELP: select-tuple
 { $values
      { "query/tuple" tuple }
@@ -148,7 +154,7 @@ HELP: count-tuples
      { "n" integer } }
 { $description "Returns the number of items that would be returned if the query were a select query. Counting the tuples with this word is more efficient than calling " { $link length } " on the result of " { $link select-tuples } "." } ;
 
-{ select-tuple select-tuples count-tuples } related-words
+{ each-tuple select-tuple select-tuples count-tuples } related-words
 
 
 
@@ -183,6 +189,7 @@ ARTICLE: "db-tuples-words" "High-level tuple/database words"
 { $subsections delete-tuples }
 "Querying tuples:"
 { $subsections
+    each-tuple
     select-tuple
     select-tuples
     count-tuples
