@@ -122,13 +122,23 @@ HELP: update-tuple
      { "tuple" tuple } }
 { $description "Updates a tuple that has already been inserted into a database. The tuple must have a primary key that has been set by " { $link insert-tuple } " or that is user-defined." } ;
 
+HELP: update-tuples
+{ $values
+     { "query/tuple" tuple }
+     { "quot" { $quotation ( tuple -- tuple'/f ) } } }
+{ $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". The " { $snippet "quot" } " is applied to each tuple from the database that matches the query, and the changed tuple is stored back to the database. If the " { $snippet "quot" } " returns " { $link f } ", the tuple is dropped, and its data remains unmodified in the database."
+$nl
+"The word is equivalent to the following code:"
+{ $code "query/tuple select-tuples quot map sift [ update-tuple ] each" }
+"The difference is that " { $snippet "update-tuples" } " handles query results one by one, thus avoiding the overhead of allocating the intermediate array of tuples, which " { $link select-tuples } " would do. This is important when processing large amounts of data in limited memory." } ;
+
 HELP: delete-tuples
 { $values
      { "tuple" tuple } }
 { $description "Uses the " { $snippet "tuple" } " as an exemplar object and deletes any objects that have the same slots set. If a slot is not " { $link f } ", then it is used to generate an SQL statement that deletes tuples." }
 { $warning "This word will delete your data." } ;
 
-{ insert-tuple update-tuple delete-tuples } related-words
+{ insert-tuple update-tuple update-tuples delete-tuples } related-words
 
 HELP: each-tuple
 { $values
@@ -183,8 +193,11 @@ ARTICLE: "db-tuples-words" "High-level tuple/database words"
 { $subsections drop-table }
 "Inserting a tuple:"
 { $subsections insert-tuple }
-"Updating a tuple:"
-{ $subsections update-tuple }
+"Updating tuples:"
+{ $subsections
+    update-tuple
+    update-tuples
+}
 "Deleting tuples:"
 { $subsections delete-tuples }
 "Querying tuples:"
