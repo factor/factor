@@ -46,7 +46,7 @@ GENERIC: eval-generator ( singleton -- object )
 
 : with-disposals ( object quotation -- )
     over sequence? [
-        [ with-disposal ] curry each
+        over [ dispose-each ] curry [ ] cleanup
     ] [
         with-disposal
     ] if ; inline
