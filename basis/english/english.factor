@@ -185,7 +185,6 @@ PRIVATE>
         [ "s" append ]
     } cond match-case ;
 
-! using glue here means we don't mutate the input number, so it isn't coerced to int
 : count-of-things ( count word -- str )
     over 1 = [ pluralize ] unless [ number>string ] dip " " glue ;
 
@@ -228,7 +227,7 @@ PRIVATE>
     [ drop dup word? [
             [ name>> a/an " " append ] [ \ $link swap 2array ] bi 2array
         ] [
-            [ "\"" ?head drop a/an ] keep 1array \ $snippet prefix " " swap 3array 
+            [ "\"" ?head drop a/an ] keep 1array \ $snippet prefix " " swap 3array
         ] if
     ] "or" comma-list-by ;
 
