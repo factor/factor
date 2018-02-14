@@ -46,11 +46,10 @@ M: retryable execute-statement* ( statement type -- )
 : sql-props ( class -- columns table )
     [ db-columns ] [ db-table-name ] bi ;
 
-: query-make ( class quot -- statements )
+: query-make ( ..a class quot: ( ..a columns table -- ..b ) -- ..b statements )
     ! query, input, outputs, secondary queries
-    over db-table-name "table-name" set
     [ sql-props ] dip
-    [ 0 sql-counter rot with-variable ] curry
+    '[ 0 sql-counter [ dup "table-name" set @ ] with-variable ]
     { "" { } { } { } } nmake
     [ <simple-statement> maybe-make-retryable ] dip
     [ [ 1array ] dip append ] unless-empty ; inline
