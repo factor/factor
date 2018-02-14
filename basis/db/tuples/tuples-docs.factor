@@ -134,13 +134,13 @@ HELP: select-tuple
 { $values
      { "query/tuple" tuple }
      { "tuple/f" { $maybe tuple } } }
-{ $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a single tuple from the database if it matches the query constructed from the exemplar tuple." } ;
+{ $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a single tuple from the database if it matches the query constructed from the exemplar tuple." } ;
 
 HELP: select-tuples
 { $values
      { "query/tuple" tuple }
      { "tuples" "an array of tuples" } }
-{ $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns an array of multiple tuples from the database that match the query constructed from the exemplar tuple." } ;
+{ $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns an array of multiple tuples from the database that match the query constructed from the exemplar tuple." } ;
 
 HELP: count-tuples
 { $values
