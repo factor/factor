@@ -166,3 +166,6 @@ ERROR: no-defined-persistent object ;
 : each-tuple ( query/tuple quot: ( tuple -- ) -- )
     [ >query [ tuple>> ] [ query>statement ] bi ] dip do-each-tuple
     ; inline
+
+: update-tuples ( query/tuple quot: ( tuple -- tuple'/f ) -- )
+    '[ @ [ update-tuple ] when* ] each-tuple ; inline
