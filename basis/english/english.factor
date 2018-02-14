@@ -107,48 +107,6 @@ CONSTANT: plural-to-singular $[ singular-to-plural assoc-invert ]
 
 PRIVATE>
 
-: singular? ( word -- ? )
-    >lower {
-        { [ dup empty? ] [ drop f ] }
-        { [ dup singular-to-plural key? ] [ drop t ] }
-        { [ dup plural-to-singular key? ] [ drop f ] }
-        { [ dup "s" tail? ] [ drop f ] }
-        {
-            [
-                dup "ies" ?tail [
-                    last "aeiou" member? not
-                ] [ drop f ] if
-            ] [ drop f ]
-        }
-        { [ dup "es" tail? ] [ drop f ] }
-        [ drop t ]
-    } cond ;
-
-: plural? ( word -- ? )
-    >lower {
-        { [ dup empty? ] [ drop f ] }
-        { [ dup plural-to-singular key? ] [ drop t ] }
-        { [ dup dup plural-to-singular at = ] [ drop t ] } ! moose -> moose
-        { [ dup singular-to-plural key? ] [ drop f ] }
-        {
-            [
-                dup "y" ?tail [
-                    last "aeiou" member? not
-                ] [ drop f ] if
-            ] [ drop f ]
-        }
-        { [ dup "s" tail? ] [ drop t ] }
-        {
-            [
-                dup "ies" ?tail [
-                    last "aeiou" member? not
-                ] [ drop f ] if
-            ] [ drop t ]
-        }
-        { [ dup "es" tail? ] [ drop t ] }
-        [ drop f ]
-    } cond ;
-
 : singularize ( word -- singular )
     dup >lower {
         { [ dup empty? ] [ ] }
@@ -184,6 +142,35 @@ PRIVATE>
         }
         [ "s" append ]
     } cond match-case ;
+
+: singular? ( word -- ? )
+    [ singularize ] [ = ] bi ;
+
+: plural? ( word -- ? )
+    >lower {
+        { [ dup empty? ] [ drop f ] }
+        { [ dup plural-to-singular key? ] [ drop t ] }
+        { [ dup dup plural-to-singular at = ] [ drop t ] } ! moose -> moose
+        { [ dup singular-to-plural key? ] [ drop f ] }
+        {
+            [
+                dup "y" ?tail [
+                    last "aeiou" member? not
+                ] [ drop f ] if
+            ] [ drop f ]
+        }
+        { [ dup "s" tail? ] [ drop t ] }
+        {
+            [
+                dup "ies" ?tail [
+                    last "aeiou" member? not
+                ] [ drop f ] if
+            ] [ drop t ]
+        }
+        { [ dup "es" tail? ] [ drop t ] }
+        [ drop f ]
+    } cond ;
+
 
 : count-of-things ( count word -- str )
     over 1 = [ pluralize ] unless [ number>string ] dip " " glue ;

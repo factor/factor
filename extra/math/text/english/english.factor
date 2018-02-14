@@ -1,7 +1,7 @@
 ! Copyright (c) 2007, 2008, 2018 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.short-circuit grouping kernel
-math math.functions math.parser math.text.utils namespaces
+math math.functions math.parser math.order math.text.utils namespaces
 sequences splitting ;
 IN: math.text.english
 
@@ -114,15 +114,11 @@ M: complex number>text
     ] bi* 3append ;
 
 : ordinal-suffix ( n -- suffix )
-    dup ratio? [ >float ] unless   ! make rationals into floats for easy parsing
-    number>string "." split1 drop  ! drop the end
-    dup { "11" "12" "13" } [ ?tail nip ] with any? [ ! eleventh, not 11st
-        drop "th"
-    ] [
-      string>number 10 mod abs {
-          { 1 [ "st" ] }
-          { 2 [ "nd" ] }
-          { 3 [ "rd" ] }
-          [ drop "th" ]
-      } case
+    abs dup 100 mod 11 13 between? [ drop "th" ] [
+        10 mod {
+            { 1 [ "st" ] }
+            { 2 [ "nd" ] }
+            { 3 [ "rd" ] }
+            [ drop "th" ]
+        } case
     ] if ;
