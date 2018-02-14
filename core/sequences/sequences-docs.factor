@@ -546,6 +546,10 @@ HELP: any?
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
 { $description "Tests if the sequence contains an element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link f } "." } ;
 
+HELP: none?
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
+{ $description "Tests if the sequence does not contain any element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link t } "." } ;
+
 HELP: all?
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "?" boolean } }
 { $description "Tests if all elements in the sequence satisfy the predicate by checking each element in turn. Given an empty sequence, vacuously outputs " { $link t } "." } ;
