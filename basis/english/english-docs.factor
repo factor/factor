@@ -28,13 +28,13 @@ $nl
 { $subsections plural? pluralize ?pluralize count-of-things singular? singularize }
 
 "Toy grammatical words:"
-{ $subsections a/an ?plural-article a10n comma-list-by simple-comma-list }
+{ $subsections a/an ?plural-article a10n comma-list }
 
 "An example application:"
 { $subsections or-markup-example $or-markup-example } ;
 
 { pluralize ?pluralize plural? count-of-things singularize singular? } related-words
-{ a/an ?plural-article a10n comma-list-by simple-comma-list $or-markup-example or-markup-example } related-words
+{ a/an ?plural-article a10n comma-list $or-markup-example or-markup-example } related-words
 
 HELP: singularize
 { $values { "word" string } { "singular" string } }
@@ -172,36 +172,30 @@ HELP: ?plural-article
     }
 } ;
 
-HELP: comma-list-by
+HELP: comma-list
 { $values
     { "parts" sequence }
-    { "quot" { $quotation ( part index -- newpart ) } }
     { "conjunction" string }
     { "clause-seq" sequence }
 }
-{ $description "Generate a comma-separated list of things from the result of applying " { $snippet "quot" } " to each element in "  { $snippet "parts" } ", emplacing " { $snippet "conjunction" } " before the last " { $snippet "part" } " if there are two or more elements in " { $snippet "parts" } "." }
+{ $description "Generate a comma-separated list of things, emplacing " { $snippet "conjunction" } " before the last " { $snippet "part" } " if there are two or more elements in " { $snippet "parts" } "." }
 { $notes $keep-case }
-{ $examples { "See the examples in " { $link $or-markup-example } " and " { $link simple-comma-list } "." } } ;
-
-HELP: simple-comma-list
-{ $values { "parts" sequence } { "conjunction" string } { "parts'" sequence } }
-{ $description "Punctuate and conjunctionize the input words into a comma-separated list construction." }
 { $examples
     { $example
-        "USING: english io sequences splitting ;"
-        "{ \"a cat\" \"a peach\" \"an object\" } \"or\" simple-comma-list [ \"\" join ] map \"\" join print"
+        "USING: english io sequences ;"
+        "{ \"a cat\" \"a peach\" \"an object\" } \"or\" comma-list concat print"
         "a cat, a peach, or an object"
     }
 } ;
 
 HELP: or-markup-example
 { $values { "markup" "a sequence of markup elements" } { "classes" "a sequence of words" } }
-{ $description "Used to implement " { $link $or-markup-example } " and demonstrate " { $link comma-list-by } "." }
+{ $description "Used to implement " { $link $or-markup-example } " and demonstrate " { $link comma-list } "." }
 { $examples { "See the examples in " { $link $or-markup-example } "." } } ;
 
 HELP: $or-markup-example
 { $values { "classes" "a sequence of words" } }
-{ $description "An example to demonstrate a use-case for " { $link comma-list-by } ". Works like the " { $link $or } " and " { $link ($instance) } " words from " { $vocab-link "help.markup" } "." }
+{ $description "An example to demonstrate a use-case for " { $link comma-list } ". Works like the " { $link $or } " and " { $link ($instance) } " words from " { $vocab-link "help.markup" } "." }
 { $examples
     { $markup-example
         { $or-markup-example "cat" "octopus" "animal" object pair number array string sequence assoc "bird" } print-element
