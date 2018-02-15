@@ -1,5 +1,4 @@
 USING: calendar tools.cal.private tools.test ;
-IN: tools.cal.tests
 
 {
     "    October 2010    "

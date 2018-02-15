@@ -1,7 +1,6 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test z-algorithm ;
-IN: z-algorithm.tests
 
 { 0 } [ "qwerty" "" lcp ] unit-test
 { 0 } [ "qwerty" "asdf" lcp ] unit-test

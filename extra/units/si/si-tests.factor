@@ -1,6 +1,5 @@
 USING: kernel tools.test units.si inverse math.constants
 math.functions units.imperial ;
-IN: units.si.tests
 
 { t } [ 1 m 100 cm = ] unit-test
 

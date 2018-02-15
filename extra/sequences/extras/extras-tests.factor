@@ -1,7 +1,6 @@
 USING: accessors arrays ascii io io.streams.string kernel make
 math math.vectors random sequences sequences.extras strings
 tools.test vectors vocabs ;
-IN: sequences.extras.tests
 
 { V{ { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
 
