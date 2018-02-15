@@ -3,10 +3,6 @@ USING: arrays assocs help.markup help.syntax kernel math multiline
 sequences strings ;
 IN: english
 
-ABOUT: "english"
-
-ARTICLE: "english" "English natural language transformations"
-
 <PRIVATE
 : $0-plurality ( children -- )
     drop {
@@ -21,6 +17,10 @@ ARTICLE: "english" "English natural language transformations"
     drop
     "This word attempts to preserve the letter case style of the input." print-element ;
 PRIVATE>
+
+ABOUT: "english"
+
+ARTICLE: "english" "English natural language transformations"
 
 "The " { $vocab-link "english" } " vocabulary implements a few simple ways of interacting with text in the English language, for improving generated text."
 $nl
