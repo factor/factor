@@ -1,9 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays kernel grouping math sequences tools.test ;
-
-IN: math.hashcodes
+USING: arrays kernel grouping math math.hashcodes sequences
+tools.test ;
 
 { t } [
     12 dup >bignum 12.0 12 0 complex boa 4array

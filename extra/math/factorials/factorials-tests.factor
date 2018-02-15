@@ -1,5 +1,4 @@
-USING: kernel math.functions math.ranges sequences tools.test ;
-IN: math.factorials
+USING: kernel math.factorials math.functions math.ranges sequences tools.test ;
 
 { 1 } [ -1 factorial ] unit-test ! not necessarily correct
 { 1 } [ 0 factorial ] unit-test

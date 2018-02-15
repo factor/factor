@@ -1,7 +1,6 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar subrip-subtitles tools.test ;
-IN: subrip-subtitles.tests
 
 {
     {

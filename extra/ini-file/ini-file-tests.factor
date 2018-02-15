@@ -3,8 +3,6 @@
 
 USING: ini-file tools.test ;
 
-IN: ini-file.tests
-
 { H{ } } [ "" string>ini ] unit-test
 
 { H{ { "section" H{ } } } } [ "[section]" string>ini ] unit-test

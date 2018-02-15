@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.extras io.files kernel math sequences
 tools.test ;
-IN: combinators.extras.tests
 
 { "a b" }
 [ "a" "b" [ " " glue ] once ] unit-test

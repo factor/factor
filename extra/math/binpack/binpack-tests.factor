@@ -3,8 +3,6 @@
 
 USING: kernel tools.test sequences ;
 
-IN: math.binpack
-
 { { V{ } } } [ { } 1 binpack ] unit-test
 
 { { V{ 3 } V{ 2 1 } } } [ { 1 2 3 } 2 binpack ] unit-test

@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien destructors kernel math
 memory.piles tools.test ;
-IN: memory.piles.tests
 
 { 25 } [
     [

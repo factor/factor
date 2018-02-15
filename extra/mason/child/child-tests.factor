@@ -1,6 +1,5 @@
 USING: io io.pathnames kernel mason.child mason.config
 namespaces sequences system tools.test ;
-IN: mason.child.tests
 
 { t } [
     H{

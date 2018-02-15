@@ -1,5 +1,4 @@
-USING: tools.test ;
-IN: cuesheet
+USING: cuesheet tools.test ;
 
 {
     T{ cuesheet

@@ -1,5 +1,4 @@
 USING: kernel math.blas.vectors math.functions sequences tools.test ;
-IN: math.blas.vectors.tests
 
 ! clone
 

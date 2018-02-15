@@ -1,5 +1,4 @@
 USING: money parser tools.test eval ;
-IN: money.tests
 
 { -1/10 } [ DECIMAL: -.1 ] unit-test
 { -1/10 } [ DECIMAL: -0.1 ] unit-test

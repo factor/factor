@@ -1,4 +1,3 @@
-IN: benchmark.reverse-complement.tests
 USING: benchmark.reverse-complement checksums checksums.md5
 io.files io.files.temp kernel math.parser tools.test ;
 

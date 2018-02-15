@@ -1,6 +1,5 @@
 USING: arrays ctags.private io.backend kernel sequences
 tools.test ;
-IN: ctags.tests
 
 { t } [
   "if\t" "resource:extra/unix/unix.factor" normalize-path "\t91" 3append

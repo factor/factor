@@ -1,4 +1,3 @@
-IN: smalltalk.eval.tests
 USING: smalltalk.eval tools.test io.streams.string kernel ;
 
 { 3 } [ "1+2" eval-smalltalk ] unit-test

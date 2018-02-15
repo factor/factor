@@ -1,10 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays colors kernel locals math.functions math.ranges
-sequences tools.test ;
-
-IN: colors.cmyk
+USING: arrays colors colors.cmyk kernel locals math.functions
+math.ranges sequences tools.test ;
 
 { t } [
     0.0 1.0 0.1 <range> [| r |

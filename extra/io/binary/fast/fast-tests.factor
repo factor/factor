@@ -1,7 +1,6 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test io.binary.fast ;
-IN: io.binary.fast.tests
 
 { 0x0102 } [ B{ 01 02 } 2be> ] unit-test
 { 0x01020304 } [ B{ 01 02 03 04 } 4be> ] unit-test
