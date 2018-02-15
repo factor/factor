@@ -65,7 +65,7 @@ IN: project-euler.186
     ] if ;
 
 : <relation> ( n -- unionfind )
-    <disjoint-set> [ [ add-atom ] curry each ] keep ;
+    <iota> <disjoint-set> [ [ add-atom ] curry each ] keep ;
 
 : euler186 ( -- n )
     <generator> 0 1000000 <relation> (p186) ;
