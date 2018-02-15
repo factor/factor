@@ -1,6 +1,5 @@
 USING: arrays generic kernel math models namespaces sequences assocs
 tools.test models.mapping accessors make ;
-IN: models.mapping.tests
 
 ! Test mapping
 { } [

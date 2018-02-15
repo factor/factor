@@ -3,8 +3,6 @@
 
 USING: kernel uuid tools.test ;
 
-IN: uuid.tests
-
 { t } [ NAMESPACE_DNS  [ uuid-parse uuid-unparse ] keep = ] unit-test
 { t } [ NAMESPACE_URL  [ uuid-parse uuid-unparse ] keep = ] unit-test
 { t } [ NAMESPACE_OID  [ uuid-parse uuid-unparse ] keep = ] unit-test

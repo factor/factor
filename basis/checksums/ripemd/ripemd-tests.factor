@@ -1,7 +1,6 @@
 ! Copyright (C) 2017 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: checksums checksums.ripemd strings tools.test ;
-IN: checksums.ripemd.tests
 
 { B{
     0x9c 0x11 0x85 0xa5 0xc5

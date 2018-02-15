@@ -1,6 +1,5 @@
 USING: kernel ui.gadgets ui.gadgets.tracks tools.test
 math.rectangles accessors sequences namespaces ;
-IN: ui.gadgets.tracks.tests
 
 { { 100 100 } } [
     vertical <track>

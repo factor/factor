@@ -1,5 +1,4 @@
 USING: classes kernel layouts math sequences tools.test ;
-IN: growable.tests
 
 ! erg found this one
 { fixnum } [

@@ -3,7 +3,6 @@
 USING: accessors alien.c-types colors.constants kernel
 specialized-arrays tools.test ui.gadgets.labels
 ui.pens.caching ui.pens.gradient ;
-IN: ui.pens.caching.tests
 
 SPECIALIZED-ARRAY: float
 

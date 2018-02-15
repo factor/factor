@@ -1,4 +1,3 @@
-IN: ui.gadgets.glass.tests
 USING: tools.test ui.gadgets.glass ui.gadgets.worlds ui.gadgets
 math.rectangles namespaces accessors models sequences arrays ;
 

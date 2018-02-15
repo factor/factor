@@ -1,5 +1,4 @@
 USING: accessors tools.test ui.gadgets ui.gadgets.labels ;
-IN: ui.gadgets.labels.tests
 
 { { 119 14 } } [
     <gadget> { 100 14 } >>dim

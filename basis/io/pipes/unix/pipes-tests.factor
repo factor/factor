@@ -1,6 +1,5 @@
 USING: tools.test io.pipes io.pipes.unix io.encodings.utf8
 io.encodings io namespaces sequences ;
-IN: io.pipes.unix.tests
 
 [ { 0 0 } ] [ { "ls" "grep ." } run-pipeline ] unit-test
 
