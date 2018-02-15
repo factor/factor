@@ -1,4 +1,4 @@
-USING: kernel tools.test ;
+USING: kernel tools.test uu ;
 IN: uu.tests
 
 CONSTANT: plain
