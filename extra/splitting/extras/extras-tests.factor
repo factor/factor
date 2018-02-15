@@ -1,8 +1,6 @@
 
 USING: ascii kernel math sequences strings tools.test ;
 
-IN: splitting.extras
-
 { { } } [ { } { 0 } split* ] unit-test
 { { { 1 2 3 } } } [ { 1 2 3 } { 0 } split* ] unit-test
 { { { 0 } } } [ { 0 } { 0 } split* ] unit-test

@@ -1,7 +1,4 @@
-
 USING: tools.test txon ;
-
-IN: txon.tests
 
 { "ABC" } [ "ABC" >txon ] unit-test
 

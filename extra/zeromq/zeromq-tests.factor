@@ -1,7 +1,6 @@
 ! Copyright (C) 2011-2013 Eungju PARK, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: destructors sequences tools.test zeromq ;
-IN: zeromq.tests
 
 { t } [
     zmq-msg-size { 32 48 64 } member?

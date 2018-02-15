@@ -1,7 +1,5 @@
 USING: synth tools.test ;
 
-IN: synth.tests
-
 {
     {
         0.0
