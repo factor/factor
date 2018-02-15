@@ -44,11 +44,8 @@ IN: project-euler.186
 : <generator> ( -- lag )
     55 [1,b] [ (generator) ] map <circular> ;
 
-: advance ( lag -- )
-    [ [ 0 swap nth ] [ 31 swap nth ] bi + 1000000 rem ] keep circular-push ;
-
 : next ( lag -- n )
-    [ first ] [ advance ] bi ;
+    [ [ first dup ] [ 31 swap nth ] bi + 1000000 rem ] keep circular-push ;
 
 : 2unless? ( x y ?quot quot -- )
     [ 2keep rot [ 2drop ] ] dip if ; inline
