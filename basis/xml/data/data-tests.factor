@@ -1,4 +1,3 @@
-USING: assocs tools.test ;
-IN: xml.data
+USING: assocs tools.test xml.data ;
 
 { "bob" } [ "test" { { "name" "bob" } } { } <tag> "name" of ] unit-test

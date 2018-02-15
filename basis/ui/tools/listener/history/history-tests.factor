@@ -4,8 +4,6 @@
 USING: accessors documents io.styles kernel namespaces
 sequences tools.test ui.tools.listener.history ;
 
-IN: ui.tools.listener.history.tests
-
 { } [ <document> "d" set ] unit-test
 { } [ "d" get <history> "h" set ] unit-test
 

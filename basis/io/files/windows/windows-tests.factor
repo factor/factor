@@ -4,7 +4,6 @@ USING: combinators continuations io.backend io.directories io.files
 io.files.temp io.files.windows io.pathnames kernel kernel.private libc
 literals memory sequences splitting tools.test windows.kernel32
 io.files.unique destructors ;
-IN: io.files.windows.tests
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
 [ t ] [ "\\\\?\\c:\\foo" absolute-path? ] unit-test

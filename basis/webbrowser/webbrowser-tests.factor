@@ -1,5 +1,4 @@
-USING: io.pathnames tools.test urls ;
-IN: webbrowser
+USING: io.pathnames tools.test urls webbrowser ;
 
 { t } [ "http://reddit.com" url-string? ] unit-test
 { t } [ "https://reddit.com" url-string? ] unit-test

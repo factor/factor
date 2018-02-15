@@ -1,6 +1,5 @@
 USING: arrays kernel math math.primes math.primes.miller-rabin
 sequences tools.test ;
-IN: math.primes.tests
 
 { 1237 } [ 1234 next-prime ] unit-test
 { f t } [ 1234 prime? 1237 prime? ] unit-test

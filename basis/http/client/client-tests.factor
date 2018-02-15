@@ -1,4 +1,4 @@
-USING: accessors io.sockets.secure http.client http.client.private http
+USING: accessors http http.client http.client.private
 io.streams.string kernel namespaces sequences tools.test urls ;
 IN: http.client.tests
 

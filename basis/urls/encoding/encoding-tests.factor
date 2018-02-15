@@ -1,4 +1,3 @@
-IN: urls.encoding.tests
 USING: urls.encoding tools.test arrays kernel assocs present
 accessors linked-assocs ;
 

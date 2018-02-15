@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel linked-assocs math sequences
 tools.test ;
-IN: linked-assocs.tests
 
 { { 1 2 3 } } [
     <linked-hash> 1 "b" pick set-at

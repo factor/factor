@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lcs lcs.diff2html kernel tools.test strings sequences
 xml.writer ;
-IN: lcs.diff2html.tests
 
 { } [
     "hello" "heyo" [ [ 1string ] { } map-as ] bi@
