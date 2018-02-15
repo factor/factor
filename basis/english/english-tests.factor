@@ -87,29 +87,27 @@ IN: english
 { "the" } [ "geese" ?plural-article ] unit-test
 { "a" }   [ "sheep" ?plural-article ] unit-test
 
-{ { "" } }
-    [ { } "or" simple-comma-list ] unit-test
+{ { } } [ { } "or" comma-list ] unit-test
 
-{ { { "a" } } }
-    [ { "a" } "or" simple-comma-list ] unit-test
+{ { "a" } } [ { "a" } "or" comma-list ] unit-test
 
-{ { { "a" } { " or " "b" } } }
-    [ { "a" "b" } "or" simple-comma-list ] unit-test
+{ { "a" " or " "b" } }
+[ { "a" "b" } "or" comma-list ] unit-test
 
-{ { { "a" ", " } { "b" } { ", or " "c" } } }
-    [ { "a" "b" "c" } "or" simple-comma-list ] unit-test
+{ { "a" ", " "b" ", or " "c" } }
+[ { "a" "b" "c" } "or" comma-list ] unit-test
 
-{ { { "a" ", " } { "b" ", " } { "x" } { ", and " "c" } } }
-    [ { "a" "b" "x" "c" } "and" simple-comma-list ] unit-test
+{ { "a" ", " "b" ", " "x" ", and " "c" } }
+[ { "a" "b" "x" "c" } "and" comma-list ] unit-test
 
 { {
-    { "an " { $link object } ", " }
-    { "a " { $link pair } ", " }
-    { "a " { $link number } ", " }
-    { "an " { $link array } ", " }
-    { "a " { $link string } ", " }
-    { "a " { $link sequence } }
-    { ", or " "an " { $link assoc } }
+    { "an " { $link object } } ", "
+    { "a " { $link pair } } ", "
+    { "a " { $link number } } ", "
+    { "an " { $link array } } ", "
+    { "a " { $link string } } ", "
+    { "a " { $link sequence } } ", or "
+    { "an " { $link assoc } }
 } } [
     { object pair number array string sequence assoc }
     or-markup-example
@@ -121,6 +119,5 @@ IN: english
 } } [ { object } or-markup-example ] unit-test
 
 { {
-    { "an " { $link object } }
-    { " or " "a " { $link pair } }
+    { "an " { $link object } } " or " { "a " { $link pair } }
 } } [ { object pair } or-markup-example ] unit-test

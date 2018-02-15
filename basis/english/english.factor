@@ -168,32 +168,23 @@ PRIVATE>
 : ?plural-article ( word -- article )
     dup singular? [ a/an ] [ drop "the" ] if ;
 
-: comma-list-by ( parts quot conjunction  -- clause-seq )
-    ! using map-index for maximum flexibility
-    [ '[ _ call( x n -- x ) ] map-index
-        ! not using oxford comma for 2 objects: "a, or b"; instead it's "a or b"
-        dup length 2 > ", " " " ? " "
-    ] dip glue
-
-    over length {
-        { [ dup 0 = ] [ 3drop { "" } ] }
-        { [ dup 1 = ] [ 2drop ] }
-        [ drop [ unclip-last [
-                dup length 1 - '[ _ - zero? [ ", " suffix ] unless ] map-index
-            ] dip ] dip prefix suffix
-        ]
-    } cond ;
-
-: simple-comma-list ( parts conjunction -- parts' )
-    [ drop 1array ] swap comma-list-by ;
+: comma-list ( parts conjunction  -- clause-seq )
+    [
+        V{ } clone [
+            [ '[ ", " _ push ] ] [ '[ _ push ] ] bi interleave
+        ] keep { } like
+    ] dip over length dup 3 >= [
+        [ 3 > ", " " " ? " " surround ] [ 2 - pick set-nth ] bi
+    ] [ 2drop ] if ;
 
 : or-markup-example ( classes -- markup )
-    [ drop dup word? [
+    [
+        dup word? [
             [ name>> a/an " " append ] [ \ $link swap 2array ] bi 2array
         ] [
             [ "\"" ?head drop a/an ] keep 1array \ $snippet prefix " " swap 3array
         ] if
-    ] "or" comma-list-by ;
+    ] map "or" comma-list ;
 
 : $or-markup-example ( classes -- )
     or-markup-example print-element ;
