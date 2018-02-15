@@ -627,6 +627,5 @@ PRIVATE>
     [ dup length ] unless* tail-slice ; inline
 
 : join-with ( seq glue -- newseq )
-    V{ } clone [
-        [ '[ _ _ push ] ] [ '[ _ push ] ] bi interleave
-    ] keep { } like ;
+    [ dup length dup 1 - + 0 max ] dip <array>
+    [ '[ 2 * _ set-nth-unsafe ] each-index ] keep ;
