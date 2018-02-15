@@ -149,11 +149,11 @@ PRIVATE>
 : plural? ( word -- ? )
     [ singularize pluralize ] [ = ] bi ;
 
-: count-of-things ( count word -- str )
-    over 1 = [ pluralize ] unless [ number>string ] dip " " glue ;
-
 : ?pluralize ( count singular -- singular/plural )
     swap 1 = [ pluralize ] unless ;
+
+: count-of-things ( count word -- str )
+    dupd ?pluralize [ number>string ] dip " " glue ;
 
 : a10n ( word -- numeronym )
     dup length 3 > [
