@@ -119,5 +119,12 @@ IN: english
 } } [ { object } or-markup-example ] unit-test
 
 { {
-    { "an " { $link object } } " or " { "a " { $link pair } }
+    { "an " { $link object } } " or "
+    { "a " { $link pair } }
 } } [ { object pair } or-markup-example ] unit-test
+
+{ {
+    { "an " { $link object } } ", "
+    { "a " { $link pair } } ", or "
+    { "a " { $snippet "thing" } }
+} } [ { object pair "thing" } or-markup-example ] unit-test

@@ -180,10 +180,10 @@ PRIVATE>
 : or-markup-example ( classes -- markup )
     [
         dup word? [
-            [ name>> a/an " " append ] [ \ $link swap 2array ] bi 2array
+            [ name>> ] keep \ $link
         ] [
-            [ "\"" ?head drop a/an ] keep 1array \ $snippet prefix " " swap 3array
-        ] if
+            dup \ $snippet
+        ] if swap 2array [ a/an " " append ] dip 2array
     ] map "or" comma-list ;
 
 : $or-markup-example ( classes -- )
