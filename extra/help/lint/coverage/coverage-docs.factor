@@ -77,12 +77,11 @@ HELP: vocab-help-coverage.
 [english] ?pluralize: full help coverage
 [english] a/an: full help coverage
 [english] a10n: full help coverage
-[english] comma-list-by: full help coverage
+[english] comma-list: full help coverage
 [english] count-of-things: full help coverage
 [english] or-markup-example: full help coverage
 [english] plural?: full help coverage
 [english] pluralize: full help coverage
-[english] simple-comma-list: full help coverage
 [english] singular?: full help coverage
 [english] singularize: full help coverage
 
@@ -102,12 +101,11 @@ HELP: prefix-help-coverage.
 [english] ?pluralize: full help coverage
 [english] a/an: full help coverage
 [english] a10n: full help coverage
-[english] comma-list-by: full help coverage
+[english] comma-list: full help coverage
 [english] count-of-things: full help coverage
 [english] or-markup-example: full help coverage
 [english] plural?: full help coverage
 [english] pluralize: full help coverage
-[english] simple-comma-list: full help coverage
 [english] singular?: full help coverage
 [english] singularize: full help coverage
 [english.private] $0-plurality: needs help sections: $description $examples
@@ -116,7 +114,7 @@ HELP: prefix-help-coverage.
 [english.private] plural-to-singular: needs help sections: $description $examples
 [english.private] singular-to-plural: needs help sections: $description $examples
 
-72.2% of words have complete documentation"
+70.6% of words have complete documentation"
     }
 } ;
 
@@ -149,7 +147,7 @@ HELP: <prefix-help-coverage>
         { 100%-coverage? t }
     }
     T{ word-help-coverage
-        { word-name comma-list-by }
+        { word-name comma-list }
         { 100%-coverage? t }
     }
     T{ word-help-coverage
@@ -166,10 +164,6 @@ HELP: <prefix-help-coverage>
     }
     T{ word-help-coverage
         { word-name pluralize }
-        { 100%-coverage? t }
-    }
-    T{ word-help-coverage
-        { word-name simple-comma-list }
         { 100%-coverage? t }
     }
     T{ word-help-coverage
@@ -247,7 +241,7 @@ HELP: <vocab-help-coverage>
         { 100%-coverage? t }
     }
     T{ word-help-coverage
-        { word-name comma-list-by }
+        { word-name comma-list }
         { 100%-coverage? t }
     }
     T{ word-help-coverage
@@ -264,10 +258,6 @@ HELP: <vocab-help-coverage>
     }
     T{ word-help-coverage
         { word-name pluralize }
-        { 100%-coverage? t }
-    }
-    T{ word-help-coverage
-        { word-name simple-comma-list }
         { 100%-coverage? t }
     }
     T{ word-help-coverage
