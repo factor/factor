@@ -625,3 +625,8 @@ PRIVATE>
 : drop-while ( ... seq quot: ( ... elt -- ... ? ) -- tail-slice )
     [ '[ @ not ] find drop ] 2keep drop swap
     [ dup length ] unless* tail-slice ; inline
+
+: join-with ( seq glue -- newseq )
+    V{ } clone [
+        [ '[ _ _ push ] ] [ '[ _ push ] ] bi interleave
+    ] keep { } like ;

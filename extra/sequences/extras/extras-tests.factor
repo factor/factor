@@ -262,3 +262,7 @@ tools.test vectors vocabs ;
 { { 4 5 6 7 } } [ 8 <iota> [ 4 < ] drop-while >array ] unit-test
 { { 15 16 } } [ { 15 16 } [ 4 < ] drop-while >array ] unit-test
 { { } } [ 3 <iota> [ 4 < ] drop-while >array ] unit-test
+
+{ { } } [ { } ", " join-with ] unit-test
+{ { 1 } } [ { 1 } ", " join-with ] unit-test
+{ { 1 ", " 2 } } [ { 1 2 } ", " join-with ] unit-test
