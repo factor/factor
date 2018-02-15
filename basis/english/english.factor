@@ -1,8 +1,8 @@
 ! Copyright (C) 2015, 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays accessors assocs assocs.extras combinators fry formatting kernel
-literals locals math math.parser sequences splitting words unicode ;
-USE: help.markup
+USING: accessors arrays assocs assocs.extras combinators
+help.markup kernel literals locals math math.parser sequences
+sequences.extras splitting unicode words ;
 
 IN: english
 
@@ -169,11 +169,7 @@ PRIVATE>
     dup singular? [ a/an ] [ drop "the" ] if ;
 
 : comma-list ( parts conjunction  -- clause-seq )
-    [
-        V{ } clone [
-            [ '[ ", " _ push ] ] [ '[ _ push ] ] bi interleave
-        ] keep { } like
-    ] dip over length dup 3 >= [
+    [ ", " join-with ] dip over length dup 3 >= [
         [ 3 > ", " " " ? " " surround ] [ 2 - pick set-nth ] bi
     ] [ 2drop ] if ;
 
