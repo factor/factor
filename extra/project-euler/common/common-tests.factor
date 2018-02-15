@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test project-euler.common ;
-IN: project-euler.common.tests
 
 { 4 } [ -1000 number-length ] unit-test
 { 3 } [ -999 number-length ] unit-test
