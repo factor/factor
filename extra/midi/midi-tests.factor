@@ -1,6 +1,5 @@
 USING: io.encodings.binary io.streams.byte-array midi
 midi.private sequences tools.test ;
-IN: midi.tests
 
 ! variable-width numbers
 {

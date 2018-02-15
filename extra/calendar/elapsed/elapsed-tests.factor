@@ -3,8 +3,6 @@
 
 USING: calendar calendar.elapsed kernel tools.test ;
 
-IN: calendar.elapsed.tests
-
 [ -1 elapsed-time ] [ "negative seconds" = ] must-fail-with
 
 { "0s" } [ 0 elapsed-time ] unit-test

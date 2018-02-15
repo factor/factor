@@ -4,7 +4,6 @@ USING: byte-arrays io.encodings.8-bit.koi8-r
 io.encodings.8-bit.latin1 io.encodings.binary
 io.encodings.detect io.encodings.utf16 io.encodings.utf32
 io.encodings.utf8 namespaces tools.test ;
-IN: io.encodings.detect.tests
 
 ! UTF encodings with BOMs
 { utf16be } [ B{ 0xFE 0xFF 0x00 0x31 0x00 0x32 0x00 0x33 } detect-byte-array ] unit-test

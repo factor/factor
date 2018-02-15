@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors images.png images.testing io.directories
 io.encodings.binary io.files kernel sequences tools.test ;
-IN: images.png.tests
 
 ! Test files from PngSuite (http://www.libpng.org/pub/png/pngsuite.html)
 

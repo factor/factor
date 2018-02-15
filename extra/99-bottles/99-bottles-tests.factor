@@ -1,7 +1,6 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: 99-bottles io.streams.string tools.test ;
-IN: 99-bottles.tests
 
 {
 "99 bottles of beer on the wall, 99 bottles of beer.

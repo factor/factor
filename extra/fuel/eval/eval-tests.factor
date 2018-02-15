@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations fuel fuel.eval io.streams.string kernel math
 namespaces random.data sequences tools.test vocabs.parser ;
-IN: fuel.eval.tests
 
 ! pop-restarts
 { V{ "um" } } [

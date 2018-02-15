@@ -1,10 +1,5 @@
-USING:
-    html.parser html.parser.printer
-    io.streams.string
-    namespaces
-    strings
-    tools.test ;
-IN: html.parser.printer.tests
+USING: html.parser html.parser.printer io.streams.string
+namespaces strings tools.test ;
 
 {
     "          "

@@ -1,5 +1,4 @@
 USING: accessors calendar kernel oauth2 tools.test urls ;
-IN: oauth2.tests
 
 ! assoc>tokens
 {

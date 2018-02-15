@@ -1,7 +1,6 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays.shaped kernel math sequences tools.test ;
-IN: arrays.shaped.tests
 
 { t } [
     { 5 5 } increasing

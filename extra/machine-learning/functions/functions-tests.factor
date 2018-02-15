@@ -1,7 +1,6 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test machine-learning.functions ;
-IN: machine-learning.functions.tests
 
 { 0 } [ 0 relu ] unit-test
 { .5 .000001 } [ .5 relu ] unit-test~

@@ -1,7 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays morse strings tools.test ;
-IN: morse.tests
 
 { "?" } [ CHAR: \\ ch>morse ] unit-test
 { "..." } [ CHAR: s ch>morse ] unit-test

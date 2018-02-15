@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Jason W. Merrill.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test math.dual kernel accessors math math.functions
-    math.constants ;
-IN: math.dual.tests
+math.constants ;
 
 { 0.0 1.0 } [ 0 1 <dual> dsin unpack-dual ] unit-test
 { 1.0 0.0 } [ 0 1 <dual> dcos unpack-dual ] unit-test
