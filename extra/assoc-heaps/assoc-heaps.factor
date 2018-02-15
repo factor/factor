@@ -25,3 +25,5 @@ M: assoc-heap heap-pop heap>> heap-pop ;
 M: assoc-heap heap-peek heap>> heap-peek ;
 
 M: assoc-heap heap-empty? heap>> heap-empty? ;
+
+M: assoc-heap heap-size heap>> heap-size ;

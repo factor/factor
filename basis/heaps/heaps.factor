@@ -21,11 +21,6 @@ TUPLE: heap { data vector } ;
 : <heap> ( class -- heap )
     V{ } clone swap boa ; inline
 
-ERROR: not-a-heap object ;
-
-: check-heap ( heap -- heap )
-    dup heap? [ not-a-heap ] unless ; inline
-
 TUPLE: entry value key heap index ;
 
 : <entry> ( value key heap -- entry )
@@ -148,7 +143,6 @@ M: heap heap-pop
     [ data-first >entry< ] [ heap-pop* ] bi ;
 
 : slurp-heap ( ... heap quot: ( ... value key -- ... ) -- ... )
-    [ check-heap ] dip
     [ drop '[ _ heap-empty? ] ]
     [ '[ _ heap-pop @ ] until ] 2bi ; inline
 
