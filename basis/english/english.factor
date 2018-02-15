@@ -1,7 +1,8 @@
-! Copyright (C) 2015 John Benediktsson
+! Copyright (C) 2015, 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: assocs assocs.extras combinators formatting kernel literals
-locals math math.parser sequences splitting unicode ;
+USING: arrays accessors assocs assocs.extras combinators fry formatting kernel
+literals locals math math.parser sequences splitting words unicode ;
+USE: help.markup
 
 IN: english
 
@@ -14,6 +15,7 @@ CONSTANT: singular-to-plural H{
     ! us -> i
     { "alumnus" "alumni" }
     { "cactus" "cacti" }
+    { "octopus" "octopi" }
     { "focus" "foci" }
     { "fungus" "fungi" }
     { "nucleus" "nuclei" }
@@ -141,11 +143,57 @@ PRIVATE>
         [ "s" append ]
     } cond match-case ;
 
-: count-of-things ( count word -- str )
-    over 1 = [ pluralize ] unless "%d %s" sprintf ;
+: singular? ( word -- ? )
+    [ singularize ] [ = ] bi ;
 
-: a10n ( str -- str' )
+: plural? ( word -- ? )
+    [ singularize pluralize ] [ = ] bi ;
+
+: count-of-things ( count word -- str )
+    over 1 = [ pluralize ] unless [ number>string ] dip " " glue ;
+
+: ?pluralize ( count singular -- singular/plural )
+    swap 1 = [ pluralize ] unless ;
+
+: a10n ( word -- numeronym )
     dup length 3 > [
         [ 1 head ] [ length 2 - number>string ] [ 1 tail* ] tri
         3append
     ] when ;
+
+: a/an ( word -- article )
+    [ first ] [ length ] bi 1 = "afhilmnorsx" "aeiou" ?
+    member? "an" "a" ? ;
+
+: ?plural-article ( word -- article )
+    dup singular? [ a/an ] [ drop "the" ] if ;
+
+: comma-list-by ( parts quot conjunction  -- clause-seq )
+    ! using map-index for maximum flexibility
+    [ '[ _ call( x n -- x ) ] map-index
+        ! not using oxford comma for 2 objects: "a, or b"; instead it's "a or b"
+        dup length 2 > ", " " " ? " "
+    ] dip glue
+
+    over length {
+        { [ dup 0 = ] [ 3drop { "" } ] }
+        { [ dup 1 = ] [ 2drop ] }
+        [ drop [ unclip-last [
+                dup length 1 - '[ _ - zero? [ ", " suffix ] unless ] map-index
+            ] dip ] dip prefix suffix
+        ]
+    } cond ;
+
+: simple-comma-list ( parts conjunction -- parts' )
+    [ drop 1array ] swap comma-list-by ;
+
+: or-markup-example ( classes -- markup )
+    [ drop dup word? [
+            [ name>> a/an " " append ] [ \ $link swap 2array ] bi 2array
+        ] [
+            [ "\"" ?head drop a/an ] keep 1array \ $snippet prefix " " swap 3array
+        ] if
+    ] "or" comma-list-by ;
+
+: $or-markup-example ( classes -- )
+    or-markup-example print-element ;
