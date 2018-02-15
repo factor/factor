@@ -1,4 +1,4 @@
-USING: fry kernel sequences tools.test ;
+USING: fry kernel math.primes.erato.fast sequences tools.test ;
 
 {
 
