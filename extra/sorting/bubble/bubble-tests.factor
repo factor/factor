@@ -1,4 +1,4 @@
-USING: kernel tools.test ;
+USING: kernel sorting.bubble tools.test ;
 
 { { } } [ { } dup natural-bubble-sort! ] unit-test
 { { 1 } } [ { 1 } dup natural-bubble-sort! ] unit-test

@@ -1,4 +1,4 @@
-USING: kernel sequences tools.test ;
+USING: kernel sequences sorting.heap tools.test ;
 
 { { } } [ { } heapsort ] unit-test
 { { 1 } } [ { 1 } heapsort ] unit-test

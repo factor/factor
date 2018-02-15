@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays sequences tools.test ;
+USING: arrays sequences sequences.shifted tools.test ;
 
 { { 1 2 3 7 } } [ 4 <iota> -1 7 <shifted> >array ] unit-test
 { { 7 0 1 2 } } [ 4 <iota> 1 7 <shifted> >array ] unit-test
