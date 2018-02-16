@@ -382,25 +382,31 @@ PRIVATE>
 : 2map-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... newelt ) -- ... newseq )
     pick [ (2each-index) ] dip map-integers ; inline
 
-TUPLE: evens seq length ;
+TUPLE: evens { seq read-only } ;
 
-: <evens> ( seq -- evens )
-    dup length 1 + 2/ evens boa ; inline
+C: <evens> evens
 
-M: evens length length>> ; inline
+M: evens length seq>> length 1 + 2/ ; inline
 
 M: evens nth-unsafe [ 2 * ] [ seq>> nth-unsafe ] bi* ; inline
 
+M: evens like seq>> like ;
+
+M: evens new-sequence seq>> new-sequence ;
+
 INSTANCE: evens immutable-sequence
 
-TUPLE: odds seq length ;
+TUPLE: odds { seq read-only } ;
 
-: <odds> ( seq -- odds )
-    dup length 2/ odds boa ; inline
+C: <odds> odds
 
-M: odds length length>> ; inline
+M: odds length seq>> length 2/ ; inline
 
 M: odds nth-unsafe [ 2 * 1 + ] [ seq>> nth-unsafe ] bi* ; inline
+
+M: odds like seq>> like ;
+
+M: odds new-sequence seq>> new-sequence ;
 
 INSTANCE: odds immutable-sequence
 
