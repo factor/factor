@@ -266,3 +266,8 @@ tools.test vectors vocabs ;
 { { } } [ { } ", " join-with ] unit-test
 { { 1 } } [ { 1 } ", " join-with ] unit-test
 { { 1 ", " 2 } } [ { 1 2 } ", " join-with ] unit-test
+{ "" } [ "" CHAR: _ join-with ] unit-test
+{ "a" } [ "a" CHAR: _ join-with ] unit-test
+{ "a_b" } [ "ab" CHAR: _ join-with ] unit-test
+{ "a_b_c" } [ "abc" CHAR: _ join-with ] unit-test
+{ "a_b_c_d" } [ "abcd" CHAR: _ join-with ] unit-test
