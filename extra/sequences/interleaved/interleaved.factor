@@ -14,7 +14,7 @@ M: interleaved length seq>> length dup 1 - + 0 max ;
 
 M: interleaved nth-unsafe
     over even? [
-        [ 2 / ] [ seq>> ] bi* nth-unsafe
+        [ 2/ ] [ seq>> ] bi* nth-unsafe
     ] [
         nip elt>>
     ] if ;
