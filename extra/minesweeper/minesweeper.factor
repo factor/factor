@@ -182,7 +182,8 @@ M: grid-gadget pref-dim*
     gadget pref-dim first :> width
     width 2/ 26 - 3 2array [
         gadget cells>> [ won? ] [ lost? ] bi
-        gadget hand-click-rel [ second 58 >= ] [ f ] if*
+        hand-buttons get-global empty? not
+        gadget hand-click-rel [ second 58 >= ] [ f ] if* and
         smiley-image-path gadget draw-cached-texture
     ] with-translation ;
 
