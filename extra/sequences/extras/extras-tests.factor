@@ -150,10 +150,12 @@ tools.test vectors vocabs ;
 { { } } [ { } <evens> >array ] unit-test
 { { 0 2 } } [ 4 <iota> <evens> >array ] unit-test
 { { 0 2 4 } } [ 5 <iota> <evens> >array ] unit-test
+{ "bbddff" } [ "abcdef" <evens> [ 1 + ] map! seq>> ] unit-test
 
 { { } } [ { } <odds> >array ] unit-test
 { { 1 3 } } [ 5 <iota> <odds> >array ] unit-test
 { { 1 3 5 } } [ 6 <iota> <odds> >array ] unit-test
+{ "acceeg" } [ "abcdef" <odds> [ 1 + ] map! seq>> ] unit-test
 
 { 1 } [ { 1 7 3 7 6 3 7 } arg-max ] unit-test
 { 2 } [ { 0 1 99 } arg-max ] unit-test

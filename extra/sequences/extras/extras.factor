@@ -392,8 +392,6 @@ M: evens virtual@ [ 2 * ] [ seq>> ] bi* ; inline
 
 M: evens virtual-exemplar seq>> ; inline
 
-INSTANCE: evens immutable-sequence
-
 INSTANCE: evens virtual-sequence
 
 TUPLE: odds { seq read-only } ;
@@ -405,8 +403,6 @@ M: odds length seq>> length 2/ ; inline
 M: odds virtual@ [ 2 * 1 + ] [ seq>> ] bi* ; inline
 
 M: odds virtual-exemplar seq>> ; inline
-
-INSTANCE: odds immutable-sequence
 
 INSTANCE: odds virtual-sequence
 
