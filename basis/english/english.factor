@@ -169,7 +169,7 @@ PRIVATE>
     dup singular? [ a/an ] [ drop "the" ] if ;
 
 : comma-list ( parts conjunction  -- clause-seq )
-    [ ", " join-with ] dip over length dup 3 >= [
+    [ ", " interleaved ] dip over length dup 3 >= [
         [ 3 > ", " " " ? " " surround ] [ 2 - pick set-nth ] bi
     ] [ 2drop ] if ;
 
