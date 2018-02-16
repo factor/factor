@@ -265,11 +265,11 @@ tools.test vectors vocabs ;
 { { 15 16 } } [ { 15 16 } [ 4 < ] drop-while >array ] unit-test
 { { } } [ 3 <iota> [ 4 < ] drop-while >array ] unit-test
 
-{ { } } [ { } ", " join-with ] unit-test
-{ { 1 } } [ { 1 } ", " join-with ] unit-test
-{ { 1 ", " 2 } } [ { 1 2 } ", " join-with ] unit-test
-{ "" } [ "" CHAR: _ join-with ] unit-test
-{ "a" } [ "a" CHAR: _ join-with ] unit-test
-{ "a_b" } [ "ab" CHAR: _ join-with ] unit-test
-{ "a_b_c" } [ "abc" CHAR: _ join-with ] unit-test
-{ "a_b_c_d" } [ "abcd" CHAR: _ join-with ] unit-test
+{ { } } [ { } ", " interleaved ] unit-test
+{ { 1 } } [ { 1 } ", " interleaved ] unit-test
+{ { 1 ", " 2 } } [ { 1 2 } ", " interleaved ] unit-test
+{ "" } [ "" CHAR: _ interleaved ] unit-test
+{ "a" } [ "a" CHAR: _ interleaved ] unit-test
+{ "a_b" } [ "ab" CHAR: _ interleaved ] unit-test
+{ "a_b_c" } [ "abc" CHAR: _ interleaved ] unit-test
+{ "a_b_c_d" } [ "abcd" CHAR: _ interleaved ] unit-test
