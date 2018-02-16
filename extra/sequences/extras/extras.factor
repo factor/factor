@@ -632,11 +632,11 @@ PRIVATE>
     [ '[ @ not ] find drop ] 2keep drop swap
     [ dup length ] unless* tail-slice ; inline
 
-:: join-with-as ( seq glue exemplar -- newseq )
+:: interleaved-as ( seq glue exemplar -- newseq )
     seq length dup 1 - + 0 max exemplar new-sequence :> newseq
     seq [ 2 * newseq set-nth-unsafe ] each-index
     seq length 1 - [ 2 * 1 + glue swap newseq set-nth-unsafe ] each-integer
     newseq ;
 
-: join-with ( seq glue -- newseq )
-    over join-with-as ;
+: interleaved ( seq glue -- newseq )
+    over interleaved-as ;
