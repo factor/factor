@@ -182,8 +182,7 @@ M: grid-gadget pref-dim*
     gadget pref-dim first :> width
     width 2/ 26 - 3 2array [
         gadget cells>> [ won? ] [ lost? ] bi
-        hand-buttons get-global empty? not
-        gadget hand-click-rel second 58 >= and
+        gadget hand-click-rel [ second 58 >= ] [ f ] if*
         smiley-image-path gadget draw-cached-texture
     ] with-translation ;
 
@@ -284,7 +283,7 @@ TUPLE: minesweeper-gadget < track ;
     [ <toolbar> format-toolbar f track-add ]
     [ 1 track-add ] bi ;
 
-M: minesweeper-gadget focusable-child* children>> ?second t or ;
+M: minesweeper-gadget focusable-child* children>> second ;
 
 MAIN-WINDOW: run-minesweeper {
         { title "Minesweeper" }
