@@ -454,17 +454,24 @@ HELP: boa
 HELP: bad-superclass
 { $error-description "Thrown if an attempt is made to subclass a class that is not a tuple class, or a tuple class declared " { $link POSTPONE: final } "." } ;
 
+HELP: ?offset-of-slot
+{ $values { "name" string } { "tuple" tuple } { "n" { $maybe integer } } }
+{ $description "Returns the offset of a tuple slot accessed by " { $snippet "name" } ", or " { $link f } " if no slot with that name." } ;
+
 HELP: offset-of-slot
 { $values { "name" string } { "tuple" tuple } { "n" integer } }
-{ $description "Returns the offset of a tuple slot accessed by " { $snippet "name" } "." } ;
+{ $description "Returns the offset of a tuple slot accessed by " { $snippet "name" } "." }
+{ $errors "Throws a " { $link no-slot } " error if no slot with that name." } ;
 
 HELP: get-slot-named
 { $values { "name" string } { "tuple" tuple } { "value" object } }
-{ $description "Returns the " { $snippet "value" } " stored in a tuple slot accessed by " { $snippet "name" } "." } ;
+{ $description "Returns the " { $snippet "value" } " stored in a tuple slot accessed by " { $snippet "name" } "." }
+{ $errors "Throws a " { $link no-slot } " error if no slot with that name." } ;
 
 HELP: set-slot-named
 { $values { "value" object } { "name" string } { "tuple" tuple } }
-{ $description "Stores the " { $snippet "value" } " into a tuple slot accessed by " { $snippet "name" } "." } ;
+{ $description "Stores the " { $snippet "value" } " into a tuple slot accessed by " { $snippet "name" } "." }
+{ $errors "Throws a " { $link no-slot } " error if no slot with that name." } ;
 
 HELP: set-slots
 { $values { "assoc" assoc } { "tuple" tuple } }
