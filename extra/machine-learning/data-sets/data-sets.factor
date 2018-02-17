@@ -7,7 +7,7 @@ kernel math.parser sequences splitting ;
 IN: machine-learning.data-sets
 
 TUPLE: data-set data target target-names description
-feature-names ;
+    feature-names ;
 
 C: <data-set> data-set
 
@@ -17,17 +17,29 @@ C: <data-set> data-set
     "resource:extra/machine-learning/data-sets/" prepend
     utf8 file-contents ;
 
+: load-tabular-file ( name -- lines )
+    load-file [ blank? ] trim string-lines
+    [ [ blank? ] split-when harvest ] map harvest ;
+
 : numerify ( table -- data names )
     unclip [ [ [ string>number ] map ] map ] dip ;
 
 : load-table ( name -- data names )
-    load-file [ blank? ] trim string-lines
-    [ [ blank? ] split-when ] map numerify ;
+    load-tabular-file numerify ;
 
 : load-table-csv ( name -- data names )
     load-file string>csv numerify ;
 
 PRIVATE>
+
+: load-monks ( name -- data-set )
+    load-tabular-file
+    ! Omits the identifiers which are not so interesting.
+    [ but-last [ string>number ] map ] map
+    [ [ rest ] map ] [ [ first ] map ] bi
+    { "no" "yes" }
+    "monks.names" load-file
+    { "a1" "a2" "a3" "a4" "a5" "a6" } <data-set> ;
 
 : load-iris ( -- data-set )
     "iris.csv" load-table-csv

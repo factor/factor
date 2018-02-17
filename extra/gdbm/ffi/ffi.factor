@@ -42,6 +42,9 @@ FUNCTION: int gdbm_exists ( GDBM_FILE dbf, datum key )
 FUNCTION: int gdbm_setopt ( GDBM_FILE dbf, int option, int* value, int size )
 FUNCTION: int gdbm_fdesc ( GDBM_FILE dbf )
 
+! Removed in gdbm 1.14
 C-GLOBAL: int gdbm_errno
+! Added in gdbm 1.14
+FUNCTION: int *gdbm_errno_location ( )
 
 FUNCTION: c-string gdbm_strerror ( int errno )

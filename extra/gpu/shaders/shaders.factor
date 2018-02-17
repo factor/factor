@@ -456,7 +456,7 @@ TUPLE: compile-shader-error shader log ;
 TUPLE: link-program-error program log ;
 
 : throw-compile-shader-error ( shader instance -- * )
-    [ dup ] dip [ gl-shader-info-log ] [ delete-gl-shader ] bi
+    [ dup ] dip [ gl-shader-info-log ] [ glDeleteShader ] bi
     replace-log-line-numbers compile-shader-error boa throw ;
 
 : throw-link-program-error ( program instance -- * )
@@ -494,11 +494,14 @@ DEFER: <shader-instance>
 : link-program ( program -- program-instance )
     dup shaders>> [ <shader-instance> ] map (link-program) ;
 
+: word-directory ( word -- directory )
+    where first parent-directory ;
+
 : in-word's-path ( word kind filename -- word kind filename' )
-    [ over ] dip [ where first parent-directory ] dip append-path ;
+    pick word-directory prepend-path ;
 
 : become-shader-instance ( shader-instance new-shader-instance -- )
-    handle>> [ swap delete-gl-shader ] curry change-handle drop ;
+    handle>> [ swap glDeleteShader ] curry change-handle drop ;
 
 : refresh-shader-source ( shader -- )
     dup filename>>
@@ -506,7 +509,7 @@ DEFER: <shader-instance>
     [ drop ] if* ;
 
 : become-program-instance ( program-instance new-program-instance -- )
-    handle>> [ swap delete-gl-program-only ] curry change-handle drop ;
+    handle>> [ swap glDeleteProgram ] curry change-handle drop ;
 
 : reset-memos ( -- )
     \ uniform-index reset-memoized
@@ -622,11 +625,11 @@ SYNTAX: \GLSL-PROGRAM:
     define-constant ;
 
 M: shader-instance dispose
-    [ dup valid-handle? [ delete-gl-shader ] [ drop ] if f ] change-handle
+    [ dup valid-handle? [ glDeleteShader ] [ drop ] if f ] change-handle
     [ world>> ] [ shader>> instances>> ] [ ] tri ?delete-at ;
 
 M: program-instance dispose
-    [ dup valid-handle? [ delete-gl-program-only ] [ drop ] if f ] change-handle
+    [ dup valid-handle? [ glDeleteProgram ] [ drop ] if f ] change-handle
     [ world>> ] [ program>> instances>> ] [ ] tri ?delete-at
     reset-memos ;
 

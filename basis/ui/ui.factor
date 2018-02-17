@@ -134,10 +134,6 @@ M: world ungraft*
 
 SYMBOL: ui-running
 
-: with-ui-running ( quot -- )
-    t ui-running set-global
-    [ f ui-running set-global ] [ ] cleanup ; inline
-
 PRIVATE>
 
 : find-windows ( quot: ( world -- ? ) -- seq )
@@ -225,7 +221,15 @@ M: object resize-window 2drop ;
     [ find-world [ dup pref-dim resize-window ] when* ] bi ;
 
 : with-ui ( quot: ( -- ) -- )
-    ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;
+    ui-running? [ call( -- ) ] [
+        t ui-running set-global '[
+            [ init-ui @ ] (with-ui)
+        ] [
+            f ui-running set-global
+            ! Give running ui threads a chance to finish.
+            notify-ui-thread yield
+        ] [ ] cleanup
+    ] if ;
 
 HOOK: beep ui-backend ( -- )
 

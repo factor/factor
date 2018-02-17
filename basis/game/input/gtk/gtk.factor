@@ -13,7 +13,9 @@ LIBRARY: gdk
 FUNCTION: Display* gdk_x11_display_get_xdisplay ( GdkDisplay* display )
 
 : get-dpy ( -- dpy )
-    gdk_display_get_default gdk_x11_display_get_xdisplay ;
+    gdk_display_get_default [ gdk_x11_display_get_xdisplay ] [
+        "No default display." throw
+    ] if* ;
 
 M: gtk-game-input-backend (open-game-input)
     reset-mouse ;

@@ -145,7 +145,7 @@
     ($quotation . fuel-markup--quotation)
     ($references . fuel-markup--references)
     ($related . fuel-markup--related)
-    ($see . fuel-markup--see)
+    ($see . fuel-markup--word-info)
     ($see-also . fuel-markup--see-also)
     ($shuffle . fuel-markup--shuffle)
     ($side-effects . fuel-markup--side-effects)
@@ -155,7 +155,7 @@
     ($subheading . fuel-markup--subheading)
     ($subsection . fuel-markup--subsection)
     ($subsections . fuel-markup--subsections)
-    ($synopsis . fuel-markup--synopsis)
+    ($synopsis . fuel-markup--word-info)
     ($syntax . fuel-markup--syntax)
     ($table . fuel-markup--table)
     ($tag . fuel-markup--tag)
@@ -182,10 +182,10 @@
         ((stringp e) (fuel-markup--insert-string e))
         ((and (listp e) (symbolp (car e))
               (assoc (car e) fuel-markup--printers))
-         (funcall (cdr (assoc (car e) fuel-markup--printers)) e))
+         (funcall (alist-get (car e) fuel-markup--printers) e))
         ((and (symbolp e)
               (assoc e fuel-markup--printers))
-         (funcall (cdr (assoc e fuel-markup--printers)) e))
+         (funcall (alist-get e fuel-markup--printers) e))
         ((listp e) (mapc 'fuel-markup--print e))
         ((symbolp e) (fuel-markup--print (list '$link e)))
         (t (insert (format "\n%S\n" e)))))
@@ -466,7 +466,7 @@ the 'words.' word emits."
     (fuel-markup--insert-newline)))
 
 (defun fuel-markup--all-tags (e)
-  (let* ((cmd `(:fuel* (all-tags :get) "fuel" t))
+  (let* ((cmd `(:fuel* (all-tags) "fuel" t))
          (tags (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
     (fuel-markup--list
      (cons '$list (mapcar (lambda (tag) (list '$link tag tag 'tag)) tags)))))
@@ -484,7 +484,7 @@ the 'words.' word emits."
     (fuel-markup--insert-newline)))
 
 (defun fuel-markup--all-authors (e)
-  (let* ((cmd `(:fuel* (all-authors :get) "fuel" t))
+  (let* ((cmd `(:fuel* (all-authors) "fuel" t))
          (authors (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
     (fuel-markup--list
      (cons '$list (mapcar (lambda (a) (list '$link a a 'author)) authors)))))
@@ -663,21 +663,19 @@ the 'words.' word emits."
 (defun fuel-markup--notes (e)
   (fuel-markup--elem-with-heading e "Notes"))
 
-(defun fuel-markup--word-info (e s)
+(defun fuel-markup--word-info (e)
+  "Uses the 'see' word to lookup info about a given word. Note
+that this function is called in contexts where it is impossible
+to guess the correct usings, so a static using list is used."
   (let* ((word (nth 1 e))
-         (cmd (and word `(:fuel* ((:quote ,(format "%s" word)) ,s) "fuel")))
+         (cmd `(:fuel* ((:quote ,(symbol-name word)) see)
+                       "fuel" ("kernel" "lexer" "see" "sequences")))
          (ret (and cmd (fuel-eval--send/wait cmd)))
          (res (and (not (fuel-eval--retort-error ret))
                    (fuel-eval--retort-output ret))))
     (if res
         (fuel-markup--code (list '$code res) nil)
       (fuel-markup--snippet (list '$snippet " " word)))))
-
-(defun fuel-markup--see (e)
-  (fuel-markup--word-info e 'see))
-
-(defun fuel-markup--synopsis (e)
-  (fuel-markup--word-info e 'synopsis))
 
 (defun fuel-markup--null (e))
 

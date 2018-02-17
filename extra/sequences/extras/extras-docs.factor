@@ -230,6 +230,16 @@ HELP: start-all*
                "{ 0 2 }"
     } } ;
 
+HELP: arg-max
+{ $values { "seq" sequence } { "n" integer } }
+{ $description "Outputs the sequence with the largest item." } ;
+
+HELP: arg-min
+{ $values { "seq" sequence } { "n" integer } }
+{ $description "Outputs the sequence with the smallest item." } ;
+
+{ arg-max arg-min } related-words
+
 HELP: count-subseq
 { $values
     { "subseq" sequence } { "seq" sequence } { "n" integer } }

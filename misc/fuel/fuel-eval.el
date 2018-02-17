@@ -46,7 +46,6 @@
                    (:nrs 'fuel-eval-non-restartable)
                    (:in (or (factor-current-vocab) "fuel"))
                    (:usings `(:array ,@(factor-usings)))
-                   (:get 'fuel-eval-set-result)
                    (:end '\;)
                    (t `(:factor ,(symbol-name sexp))))))
         ((symbolp sexp) (symbol-name sexp))))
@@ -144,8 +143,8 @@
         (assoc name err))))
 
 (defsubst fuel-eval--error-restarts (err)
-  (cdr (assoc :restarts (or (fuel-eval--error-name-p err 'condition)
-                            (fuel-eval--error-name-p err 'lexer-error)))))
+  (alist-get :restarts (or (fuel-eval--error-name-p err 'condition)
+                           (fuel-eval--error-name-p err 'lexer-error))))
 
 (defsubst fuel-eval--error-file (err)
   (nth 1 (fuel-eval--error-name-p err 'source-file-error)))

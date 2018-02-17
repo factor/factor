@@ -8,7 +8,7 @@ sequences threads ui ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.labeled ui.gadgets.labels ui.gadgets.packs
 ui.gadgets.sliders ui.gadgets.tracks ui.gadgets.worlds ui.render
-ui.tools.common ;
+ui.tools.common combinators.smart.syntax ;
 QUALIFIED-WITH: models.range mr
 IN: boids
 

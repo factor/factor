@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.ranges
-    namespaces project-euler.common sequences ;
+USING: arrays kernel math math.ranges namespaces project-euler.common
+sequences sequences.extras ;
 IN: project-euler.039
 
 ! http://projecteuler.net/index.php?section=problems&id=39
@@ -56,7 +56,7 @@ PRIVATE>
 
 : euler039 ( -- answer )
     [
-        1000 count-perimeters p-count get [ supremum ] keep index
+        1000 count-perimeters p-count get arg-max
     ] with-scope ;
 
 ! [ euler039 ] 100 ave-time

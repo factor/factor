@@ -6,7 +6,6 @@ math math.order math.ranges namespaces pdf.canvas pdf.values
 pdf.wrap sequences sequences.extras sorting splitting ui.text
 xml.entities ;
 FROM: pdf.canvas => draw-text ;
-
 IN: pdf.layout
 
 ! TODO: inset, image
@@ -251,7 +250,7 @@ M: table-row pdf-render
     ] each widths >alist sort-keys values
 
     ! make last cell larger
-    dup sum 400 swap [-] [ + ] curry dupd sequences.extras:change-last
+    dup sum 400 swap [-] [ + ] curry dupd sequences.extras::change-last
 
     ! size down each column
     dup sum dup 400 > [ 400 swap / [ * ] curry map ] [ drop ] if ;

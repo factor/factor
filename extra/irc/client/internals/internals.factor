@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs arrays concurrency.mailboxes continuations destructors
-hashtables io irc.client.base irc.client.chats irc.messages kernel namespaces
-strings words.symbol irc.messages.base irc.client.participants fry threads
-combinators irc.messages.parser math sequences ;
+USING: accessors arrays assocs combinators concurrency.mailboxes
+continuations destructors fry hashtables io irc.client.base
+irc.client.chats irc.client.participants irc.messages
+irc.messages.base irc.messages.parser kernel math namespaces
+sequences strings threads words.symbol ;
 IN: irc.client.internals
 
 : do-connect ( server port quot: ( host port -- stream ) attempts -- stream/f )
@@ -75,7 +76,7 @@ GENERIC: process-message ( irc-message -- )
 M: object process-message drop ;
 M: ping   process-message trailing>> /PONG ;
 ! FIXME: it shouldn't be checking for the presence of chat here...
-M: irc.messages:join
+M: irc.messages::join
     process-message [ sender>> ] [ chat> ] bi
     [ join-participant ] [ drop ] if* ;
 M: part   process-message [ sender>> ] [ chat> ] bi [ part-participant ] [ drop ] if* ;

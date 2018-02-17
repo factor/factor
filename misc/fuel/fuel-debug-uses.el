@@ -109,7 +109,7 @@
   (let* ((lines (fuel-debug--file-lines file))
          (old-usings (fuel-debug--current-usings file))
          (cmd `(:fuel ((V{ ,@old-usings }
-                           [ V{ ,@lines } fuel-get-uses ]
+                           [ ,file V{ ,@lines } fuel-get-uses ]
                            fuel-use-suggested-vocabs)) t t)))
     (fuel-debug--uses-prepare file)
     (with-current-buffer (fuel-debug--uses-buffer)
