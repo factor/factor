@@ -24,6 +24,8 @@ INSTANCE: foo named-tuple
 { f } [ T{ foo } "y" of ] unit-test
 { f } [ T{ foo } "z" of ] unit-test
 
+{ f f } [ "not found" T{ foo f 1 2 3 } at* ] unit-test
+
 { 1 } [ T{ foo f 1 2 3 } "x" of ] unit-test
 { 2 } [ T{ foo f 1 2 3 } "y" of ] unit-test
 { 3 } [ T{ foo f 1 2 3 } "z" of ] unit-test
