@@ -21,3 +21,6 @@ SYMBOL: blah
 { f f } [ "fdaf" "b" get at* ] unit-test
 { 2 } [ "b" get assoc-size ] unit-test
 { { { 2 1 } { blah "bleah" } } } [ "b" get >alist ] unit-test
+{ V{ 1 2 } } [ 1 2 <pair> V{ } >sequence ] unit-test
+{ { 1 2 } } [ 1 2 <pair> >array ] unit-test
+

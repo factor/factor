@@ -38,4 +38,11 @@ M: pair delete-at
 M: pair >alist
     [ hash>> >alist ] [ [ key>> ] [ value>> ] bi 2array ] bi suffix ; inline
 
+: >sequence ( pair exemplar -- seq )
+    [ [ value>> ] [ key>> ] bi 2array ] dip like ;
+
+: >array ( pair -- array )
+    { } >sequence ;
+
 INSTANCE: pair assoc
+
