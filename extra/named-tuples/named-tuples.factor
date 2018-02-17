@@ -11,7 +11,8 @@ MIXIN: named-tuple
 
 M: named-tuple assoc-size tuple-size ;
 
-M: named-tuple at* get-slot-named t ;
+M: named-tuple at*
+    [ nip ] [ ?offset-of-slot ] 2bi [ slot t ] [ drop f f ] if* ;
 
 M: named-tuple set-at set-slot-named ;
 
