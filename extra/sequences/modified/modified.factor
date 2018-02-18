@@ -16,15 +16,13 @@ GENERIC: modified-set-nth ( elt n seq -- )
 M: modified set-nth modified-set-nth ;
 M: modified set-nth-unsafe modified-set-nth ;
 
-INSTANCE: modified sequence
+INSTANCE: modified virtual-sequence
 
 TUPLE: 1modified < modified seq ;
 
-M: modified length seq>> length ;
-M: modified set-length seq>> set-length ;
-
-M: 1modified like seq>> like ;
-M: 1modified new-sequence seq>> new-sequence ;
+M: 1modified length seq>> length ;
+M: 1modified set-length seq>> set-length ;
+M: 1modified virtual-exemplar seq>> ;
 
 TUPLE: scaled < 1modified c ;
 
@@ -33,12 +31,12 @@ C: <scaled> scaled
 : scale ( seq c -- new-seq )
     dupd <scaled> swap like ;
 
-M: scaled modified-nth ( n seq -- elt )
+M: scaled modified-nth
     [ seq>> nth ] [ c>> * ] bi ;
 
-M:: scaled modified-set-nth ( elt n seq -- )
+M: scaled modified-set-nth
     ! don't set c to 0!
-    elt seq c>> / n seq seq>> set-nth ;
+    [ nip c>> / ] [ seq>> set-nth ] 2bi ;
 
 TUPLE: offset < 1modified n ;
 
@@ -47,11 +45,11 @@ C: <offset> offset
 : seq-offset ( seq n -- new-seq )
     dupd <offset> swap like ;
 
-M: offset modified-nth ( n seq -- elt )
+M: offset modified-nth
     [ seq>> nth ] [ n>> + ] bi ;
 
-M:: offset modified-set-nth ( elt n seq -- )
-    elt seq n>> - n seq seq>> set-nth ;
+M: offset modified-set-nth
+    [ nip n>> - ] [ seq>> set-nth ] 2bi ;
 
 TUPLE: summed < modified seqs ;
 
@@ -59,15 +57,15 @@ C: <summed> summed
 
 M: summed length seqs>> longest length ;
 
-M: summed modified-nth ( n seq -- elt )
+M: summed modified-nth
     seqs>> [ ?nth [ + ] when* ] with 0 swap reduce ;
 
-M: summed modified-set-nth ( elt n seq -- ) immutable ;
+M: summed modified-set-nth immutable ;
 
-M: summed set-length ( n seq -- )
+M: summed set-length
     seqs>> [ set-length ] with each ;
 
-M: summed virtual-exemplar ( summed -- seq )
+M: summed virtual-exemplar
     seqs>> ?first ;
 
 : <2summed> ( seq seq -- summed-seq ) 2array <summed> ;
