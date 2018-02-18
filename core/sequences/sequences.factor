@@ -654,6 +654,9 @@ PRIVATE>
 : any? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     find drop >boolean ; inline
 
+: none? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
+    any? not ; inline
+
 : member? ( elt seq -- ? )
     [ = ] with any? ;
 

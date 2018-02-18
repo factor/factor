@@ -40,13 +40,11 @@ GENERIC: eval-generator ( singleton -- object )
 
 : query-modify-tuple ( tuple statement -- )
     [ query-results [ sql-row-typed ] with-disposal ] keep
-    out-params>> rot [
-        [ slot-name>> ] dip set-slot-named
-    ] curry 2each ;
+    out-params>> rot '[ slot-name>> _ set-slot-named ] 2each ;
 
 : with-disposals ( object quotation -- )
     over sequence? [
-        [ with-disposal ] curry each
+        over '[ _ dispose-each ] [ ] cleanup
     ] [
         with-disposal
     ] if ; inline
@@ -73,7 +71,8 @@ PRIVATE>
 
 ! High level
 ERROR: no-slots-named class seq ;
-: check-columns ( class columns -- )
+
+: check-columns ( columns class -- )
     [ nip ] [
         [ keys ]
         [ all-slots [ name>> ] map ] bi* diff
@@ -155,5 +154,4 @@ ERROR: no-defined-persistent object ;
 
 : count-tuples ( query/tuple -- n )
     >query [ tuple>> ] [ <count-statement> ] bi do-count
-    dup length 1 =
-    [ first first string>number ] [ [ first string>number ] map ] if ;
+    [ first string>number ] map dup length 1 = [ first ] when ;

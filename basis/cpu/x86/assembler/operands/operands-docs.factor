@@ -31,7 +31,7 @@ HELP: n-bit-version-of
 ARTICLE: "cpu.x86.assembler.operands" "CPU x86 registers and memory operands"
 "Indirect operand constructors for various addressing formats:"
 { $subsections [] [RIP+] [+] [++] [+*2+] [+*4+] [+*8+] }
-"Register correspondances:"
+"Register correspondences:"
 { $subsections
   8-bit-version-of
   16-bit-version-of

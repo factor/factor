@@ -193,7 +193,7 @@ HELP: subset?
 
 HELP: set=
 { $values { "set1" set } { "set2" set } { "?" boolean } }
-{ $description "Tests if both sets contain the same elements, disregrading order and duplicates." } ;
+{ $description "Tests if both sets contain the same elements, disregarding order and duplicates." } ;
 
 HELP: gather
 { $values

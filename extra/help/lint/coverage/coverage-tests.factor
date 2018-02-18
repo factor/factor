@@ -1,5 +1,5 @@
-USING: accessors help.lint.coverage help.lint.coverage.private
-help.markup help.syntax kernel literals math math.matrices
+USING: accessors help.lint.coverage help.lint.coverage.private 
+help.markup help.syntax kernel literals math math.matrices 
 sequences sorting tools.test vocabs ;
 IN: help.lint.coverage.tests
 
@@ -34,7 +34,7 @@ PRIVATE>
 { { $values $description $examples } } [ \ keep word-defines-sections ] unit-test
 { { $values $contract $examples } } [ \ <word-help-coverage> word-defines-sections ] unit-test
 
-{ eye } [ "eye" find-word ] unit-test
+{ empty } [ "empty" find-word ] unit-test
 
 {
   V{ "[" { $[ "math" dup lookup-vocab ] } "] " { "zero?" zero? } ": " }

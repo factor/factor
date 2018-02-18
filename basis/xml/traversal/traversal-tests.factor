@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml xml.traversal tools.test xml.data sequences arrays kernel ;
-IN: xml.traversal.tests
 
 { "bar" } [ "<foo>bar</foo>" string>xml children>string ] unit-test
 

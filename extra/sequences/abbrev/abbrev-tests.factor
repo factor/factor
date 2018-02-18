@@ -1,5 +1,4 @@
 USING: assocs sequences.abbrev tools.test ;
-IN: sequences.abbrev.tests
 
 { { "hello" "help" } } [
     "he" { "apple" "hello" "help" } abbrev at

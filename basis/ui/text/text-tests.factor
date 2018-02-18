@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test ui.text images fonts math arrays accessors kernel
 sequences ;
-IN: ui.text.tests
 
 { t } [ 0 sans-serif-font "aaa" offset>x zero? ] unit-test
 { t } [ 1 sans-serif-font "aaa" offset>x 0.0 > ] unit-test

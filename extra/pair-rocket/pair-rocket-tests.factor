@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel pair-rocket tools.test ;
-IN: pair-rocket.tests
 
 { { "a" 1 } } [ "a" => 1 ] unit-test
 { { { "a" } { 1 } } } [ { "a" } => { 1 } ] unit-test

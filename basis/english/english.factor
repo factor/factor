@@ -1,7 +1,8 @@
-! Copyright (C) 2015 John Benediktsson
+! Copyright (C) 2015, 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: assocs assocs.extras combinators formatting kernel literals
-locals math math.parser sequences splitting unicode ;
+USING: accessors arrays assocs assocs.extras combinators
+help.markup kernel literals locals math math.parser sequences
+sequences.extras splitting unicode words ;
 
 IN: english
 
@@ -14,6 +15,7 @@ CONSTANT: singular-to-plural H{
     ! us -> i
     { "alumnus" "alumni" }
     { "cactus" "cacti" }
+    { "octopus" "octopi" }
     { "focus" "foci" }
     { "fungus" "fungi" }
     { "nucleus" "nuclei" }
@@ -141,11 +143,44 @@ PRIVATE>
         [ "s" append ]
     } cond match-case ;
 
-: count-of-things ( count word -- str )
-    over 1 = [ pluralize ] unless "%d %s" sprintf ;
+: singular? ( word -- ? )
+    [ singularize ] [ = ] bi ;
 
-: a10n ( str -- str' )
+: plural? ( word -- ? )
+    [ singularize pluralize ] [ = ] bi ;
+
+: ?pluralize ( count singular -- singular/plural )
+    swap 1 = [ pluralize ] unless ;
+
+: count-of-things ( count word -- str )
+    dupd ?pluralize [ number>string ] dip " " glue ;
+
+: a10n ( word -- numeronym )
     dup length 3 > [
         [ 1 head ] [ length 2 - number>string ] [ 1 tail* ] tri
         3append
     ] when ;
+
+: a/an ( word -- article )
+    [ first ] [ length ] bi 1 = "afhilmnorsx" "aeiou" ?
+    member? "an" "a" ? ;
+
+: ?plural-article ( word -- article )
+    dup singular? [ a/an ] [ drop "the" ] if ;
+
+: comma-list ( parts conjunction  -- clause-seq )
+    [ ", " interleaved ] dip over length dup 3 >= [
+        [ 3 > ", " " " ? " " surround ] [ 2 - pick set-nth ] bi
+    ] [ 2drop ] if ;
+
+: or-markup-example ( classes -- markup )
+    [
+        dup word? [
+            [ name>> ] keep \ $link
+        ] [
+            dup \ $snippet
+        ] if swap 2array [ a/an " " append ] dip 2array
+    ] map "or" comma-list ;
+
+: $or-markup-example ( classes -- )
+    or-markup-example print-element ;

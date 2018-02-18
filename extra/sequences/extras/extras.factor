@@ -355,9 +355,6 @@ PRIVATE>
 : unsurround ( newseq seq2 seq3 -- seq1 )
    [ ?head drop ] [ ?tail drop ] bi* ;
 
-: none? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
-    any? not ; inline
-
 : one? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     [ find ] 2keep rot [
         [ 1 + ] 2dip find-from drop not
@@ -385,27 +382,29 @@ PRIVATE>
 : 2map-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... newelt ) -- ... newseq )
     pick [ (2each-index) ] dip map-integers ; inline
 
-TUPLE: evens seq length ;
+TUPLE: evens { seq read-only } ;
 
-: <evens> ( seq -- evens )
-    dup length 1 + 2/ evens boa ; inline
+C: <evens> evens
 
-M: evens length length>> ; inline
+M: evens length seq>> length 1 + 2/ ; inline
 
-M: evens nth-unsafe [ 2 * ] [ seq>> nth-unsafe ] bi* ; inline
+M: evens virtual@ [ 2 * ] [ seq>> ] bi* ; inline
 
-INSTANCE: evens immutable-sequence
+M: evens virtual-exemplar seq>> ; inline
 
-TUPLE: odds seq length ;
+INSTANCE: evens virtual-sequence
 
-: <odds> ( seq -- odds )
-    dup length 2/ odds boa ; inline
+TUPLE: odds { seq read-only } ;
 
-M: odds length length>> ; inline
+C: <odds> odds
 
-M: odds nth-unsafe [ 2 * 1 + ] [ seq>> nth-unsafe ] bi* ; inline
+M: odds length seq>> length 2/ ; inline
 
-INSTANCE: odds immutable-sequence
+M: odds virtual@ [ 2 * 1 + ] [ seq>> ] bi* ; inline
+
+M: odds virtual-exemplar seq>> ; inline
+
+INSTANCE: odds virtual-sequence
 
 : until-empty ( seq quot -- )
     [ dup empty? ] swap until drop ; inline
@@ -635,3 +634,12 @@ PRIVATE>
 : count-tail ( seq quot -- n )
     [ not ] compose [ find-last drop ] 2keep drop
     length swap [ - 1 - ] when* ; inline
+
+:: interleaved-as ( seq glue exemplar -- newseq )
+    seq length dup 1 - + 0 max exemplar new-sequence :> newseq
+    seq [ 2 * newseq set-nth-unsafe ] each-index
+    seq length 1 - [ 2 * 1 + glue swap newseq set-nth-unsafe ] each-integer
+    newseq ;
+
+: interleaved ( seq glue -- newseq )
+    over interleaved-as ;

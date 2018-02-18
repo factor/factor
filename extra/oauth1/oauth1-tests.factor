@@ -1,6 +1,5 @@
 USING: oauth1 oauth1.private tools.test accessors kernel assocs
 strings namespaces urls ;
-IN: oauth1.tests
 
 { "%26&b" } [ "&" "b" hmac-key ] unit-test
 { "%26&" } [ "&" f hmac-key ] unit-test

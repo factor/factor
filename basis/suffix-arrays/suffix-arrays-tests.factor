@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test suffix-arrays kernel namespaces sequences ;
-IN: suffix-arrays.tests
 
 ! built from [ all-words 10 head [ name>> ] map ]
 { } [

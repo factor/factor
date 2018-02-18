@@ -73,7 +73,7 @@ TUPLE: cell #adjacent mined? state ;
     { [ lost? ] [ won? ] } 1|| ;
 
 : new-game? ( cells -- ? )
-    [ [ state>> +clicked+ = ] any? ] any? not ;
+    [ [ state>> +clicked+ = ] any? ] none? ;
 
 DEFER: click-cell-at
 
@@ -81,7 +81,7 @@ DEFER: click-cell-at
     neighbors [
         first2 [ row + ] [ col + ] bi* :> ( row' col' )
         cells row' col' cell-at [
-            { [ mined?>> ] [ state>> +flagged+ = ] } 1|| [
+            mined?>> [
                 cells row' col' click-cell-at drop
             ] unless
         ] when*
@@ -167,34 +167,31 @@ M: grid-gadget pref-dim*
         [ "vocab:minesweeper/_resources/smiley.gif" ]
     } cond ;
 
-: cached-texture ( path gadget -- texture )
-    textures>> [ load-image { 0 0 } <texture> ] cache ;
+: draw-cached-texture ( path gadget -- )
+    textures>> [ load-image { 0 0 } <texture> ] cache
+    [ dim>> [ 2 /i ] map ] [ draw-scaled-texture ] bi ;
 
 :: draw-mines ( n gadget -- )
     n "%03d" sprintf [
         26 * 3 + 6 2array [
-            digit-image-path gadget cached-texture
-            { 26 46 } swap draw-scaled-texture
+            digit-image-path gadget draw-cached-texture
         ] with-translation
     ] each-index ;
 
 :: draw-smiley ( gadget -- )
     gadget pref-dim first :> width
     width 2/ 26 - 3 2array [
-        gadget cells>> won?
-        gadget cells>> lost?
+        gadget cells>> [ won? ] [ lost? ] bi
         hand-buttons get-global empty? not
-        gadget hand-click-rel second 58 >= and
-        smiley-image-path
-        gadget cached-texture { 52 52 } swap draw-scaled-texture
+        gadget hand-click-rel [ second 58 >= ] [ f ] if* and
+        smiley-image-path gadget draw-cached-texture
     ] with-translation ;
 
 :: draw-timer ( n gadget -- )
     gadget pref-dim first :> width
     n "%03d" sprintf [
         3 swap - 26 * width swap - 3 - 6 2array [
-            digit-image-path gadget cached-texture
-            { 26 46 } swap draw-scaled-texture
+            digit-image-path gadget draw-cached-texture
         ] with-translation
     ] each-index ;
 
@@ -203,8 +200,7 @@ M: grid-gadget pref-dim*
     gadget cells>> |[ row col cell |
         col row [ 32 * ] bi@ 58 + 2array [
             cell game-over? cell-image-path
-            gadget cached-texture
-            { 32 32 } swap draw-scaled-texture
+            gadget draw-cached-texture
         ] with-translation
     ] each-cell ;
 

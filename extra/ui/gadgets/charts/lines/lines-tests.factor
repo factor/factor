@@ -3,7 +3,6 @@
 USING: kernel math math.ratios sequences tools.test
 ui.gadgets.charts.lines ui.gadgets.charts.lines.private
 ui.gadgets.charts.utils ;
-IN: ui.gadgets.charts.lines.tests
 
 { -2/3 } [ { 1 3 } { -2 5 } calc-line-slope ] unit-test
 [ { 5 0 } { 5 5 } calc-line-slope ] [ division-by-zero? ] must-fail-with

@@ -1,5 +1,4 @@
-USING: tools.test ;
-IN: bencode
+USING: bencode tools.test ;
 
 { "i42e" } [ 42 >bencode ] unit-test
 { "i0e" } [ 0 >bencode ] unit-test

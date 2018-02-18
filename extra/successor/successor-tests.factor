@@ -3,8 +3,6 @@
 
 USING: successor tools.test ;
 
-IN: successor
-
 [ "" ] [ "" successor ] unit-test
 [ "abce" ] [ "abcd" successor ] unit-test
 [ "THX1139" ] [ "THX1138" successor ] unit-test

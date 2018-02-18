@@ -1,5 +1,4 @@
-USING: kernel strings tools.test ;
-IN: base85
+USING: base85 kernel strings tools.test ;
 
 { t } [ "Hello, world" dup >base85 base85> >string = ] unit-test
 

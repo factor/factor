@@ -1,5 +1,4 @@
 USING: gml.viewer math.vectors.simd.cords tools.test ;
-IN: gml.viewer.tests
 
 { {
     double-4{ 0 0 0 0 }

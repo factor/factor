@@ -27,6 +27,6 @@ HELP: track
 
 HELP: track-add
 { $values { "track" track } { "gadget" gadget } { "constraint" "a number between 0 and 1, or " { $link f } } }
-{ $description "Adds a new child to a track. If the constraint is " { $link f } ", the child always occupies its preferred size. Otherwise, the constrant is a fraction of the total size which is allocated for the child." } ;
+{ $description "Adds a new child to a track. If the constraint is " { $link f } ", the child always occupies its preferred size. Otherwise, the constraint is a fraction of the total size which is allocated for the child." } ;
 
 ABOUT: "ui-track-layout"

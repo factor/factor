@@ -71,7 +71,7 @@ SINGLETON: deprecation-observer
 
 M: deprecation-observer definitions-changed
     drop filter-word-defs
-    dup [ deprecated? ] any? not
+    dup [ deprecated? ] none?
     [ [ check-deprecations ] each ]
     [ drop initialize-deprecation-notes ] if ;
 

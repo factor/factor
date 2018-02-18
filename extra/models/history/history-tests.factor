@@ -1,6 +1,5 @@
 USING: arrays generic kernel math models namespaces sequences assocs
 tools.test models.history accessors ;
-IN: models.history.tests
 
 f <history> "history" set
 

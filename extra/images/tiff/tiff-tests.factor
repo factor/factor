@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: images.testing images.tiff sequences ;
-IN: images.tiff.tests
 
 {
     "vocab:images/testing/tiff/octagon.tiff"

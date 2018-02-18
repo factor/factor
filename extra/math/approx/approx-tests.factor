@@ -4,8 +4,6 @@
 USING: kernel math math.approx math.constants
 math.floating-point sequences tools.test ;
 
-IN: math.approx.tests
-
 { { 3 3 13/4 16/5 19/6 22/7 } }
 [
     pi double>ratio

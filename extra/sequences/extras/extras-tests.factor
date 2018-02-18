@@ -1,7 +1,6 @@
 USING: accessors arrays ascii io io.streams.string kernel make
 math math.vectors random sequences sequences.extras strings
 tools.test vectors vocabs ;
-IN: sequences.extras.tests
 
 { V{ { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
 
@@ -151,10 +150,12 @@ IN: sequences.extras.tests
 { { } } [ { } <evens> >array ] unit-test
 { { 0 2 } } [ 4 <iota> <evens> >array ] unit-test
 { { 0 2 4 } } [ 5 <iota> <evens> >array ] unit-test
+{ "bbddff" } [ "abcdef" <evens> [ 1 + ] map! seq>> ] unit-test
 
 { { } } [ { } <odds> >array ] unit-test
 { { 1 3 } } [ 5 <iota> <odds> >array ] unit-test
 { { 1 3 5 } } [ 6 <iota> <odds> >array ] unit-test
+{ "acceeg" } [ "abcdef" <odds> [ 1 + ] map! seq>> ] unit-test
 
 { 1 } [ { 1 7 3 7 6 3 7 } arg-max ] unit-test
 { 2 } [ { 0 1 99 } arg-max ] unit-test
@@ -263,3 +264,12 @@ IN: sequences.extras.tests
 { { 4 5 6 7 } } [ 8 <iota> [ 4 < ] drop-while >array ] unit-test
 { { 15 16 } } [ { 15 16 } [ 4 < ] drop-while >array ] unit-test
 { { } } [ 3 <iota> [ 4 < ] drop-while >array ] unit-test
+
+{ { } } [ { } ", " interleaved ] unit-test
+{ { 1 } } [ { 1 } ", " interleaved ] unit-test
+{ { 1 ", " 2 } } [ { 1 2 } ", " interleaved ] unit-test
+{ "" } [ "" CHAR: _ interleaved ] unit-test
+{ "a" } [ "a" CHAR: _ interleaved ] unit-test
+{ "a_b" } [ "ab" CHAR: _ interleaved ] unit-test
+{ "a_b_c" } [ "abc" CHAR: _ interleaved ] unit-test
+{ "a_b_c_d" } [ "abcd" CHAR: _ interleaved ] unit-test

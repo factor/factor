@@ -1,4 +1,3 @@
-IN: porter-stemmer.tests
 USING: arrays assocs io kernel porter-stemmer sequences
 tools.test io.files io.encodings.utf8 ;
 

@@ -46,7 +46,7 @@ HELP: basic-block
     }
   }
 }
-{ $notes "A basic-block is an " { $link identity-tuple } " becase it is used as a hash table key by the compiler." } ;
+{ $notes "A basic-block is an " { $link identity-tuple } " because it is used as a hash table key by the compiler." } ;
 
 HELP: <basic-block>
 { $values { "bb" basic-block } }

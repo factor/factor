@@ -3,8 +3,6 @@
 
 USING: kernel math.distances math.functions tools.test ;
 
-IN: math.distances.tests
-
 { 1 } [ "hello" "jello" hamming-distance ] unit-test
 
 { 0.0 } [ { 1 2 3 } dup cosine-distance ] unit-test

@@ -1,7 +1,6 @@
 USING: io.files.info io.encodings.utf8 io.files
 io.directories kernel io.pathnames accessors tools.test
 sequences io.files.temp ;
-IN: io.files.info.tests
 
 { "hi41" } [
     [

@@ -16,7 +16,7 @@ IN: math.primes.solovay-strassen
             a n jacobi n mod'
             a n 1 - 2 /i n ^mod = not
         ] if
-    ] any? not ;
+    ] none? ;
 
 PRIVATE>
 

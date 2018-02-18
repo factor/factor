@@ -11,6 +11,6 @@ ARTICLE: "editors.vim" "Vim support"
     { "If you want to start vim in an extra terminal, use something like this:" { $code "{ \"urxvt\" \"-e\" \"vim\" } vim-path set-global" } "Replace " { $snippet "urxvt" } " by your terminal of choice." }
 }
 $nl
-"You may also wish to install Vim support files to enable syntax hilighting and other features. These are in the " { $link resource-path } " in " { $snippet "misc/vim" } "."
+"You may also wish to install Vim support files to enable syntax highlighting and other features. These are in the " { $link resource-path } " in " { $snippet "misc/vim" } "."
 { $see-also "editor" }
 ;

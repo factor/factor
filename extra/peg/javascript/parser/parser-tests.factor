@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-USING: kernel tools.test peg peg.javascript.ast peg.javascript.parser
-       accessors sequences math peg.ebnf peg.ebnf.private ;
-IN: peg.javascript.parser.tests
+
+USING: kernel tools.test peg peg.javascript.ast
+peg.javascript.parser accessors sequences math peg.ebnf
+peg.ebnf.private ;
 
 {
   T{

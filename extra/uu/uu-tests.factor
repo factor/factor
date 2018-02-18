@@ -1,5 +1,5 @@
-USING: kernel tools.test ;
-IN: uu
+USING: kernel tools.test uu ;
+IN: uu.tests
 
 CONSTANT: plain
 "The smooth-scaled python crept over the sleeping dog"

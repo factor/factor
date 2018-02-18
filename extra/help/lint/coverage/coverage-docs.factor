@@ -72,12 +72,20 @@ HELP: vocab-help-coverage.
     { $example
         "USING: help.lint.coverage ;"
         "\"english\" vocab-help-coverage."
-"[english] a10n: needs help sections: $description $examples
-[english] count-of-things: needs help sections: $description $examples
-[english] pluralize: needs help sections: $description $examples
-[english] singularize: needs help sections: $description $examples
+"[english] $or-markup-example: full help coverage
+[english] ?plural-article: full help coverage
+[english] ?pluralize: full help coverage
+[english] a/an: full help coverage
+[english] a10n: full help coverage
+[english] comma-list: full help coverage
+[english] count-of-things: full help coverage
+[english] or-markup-example: full help coverage
+[english] plural?: full help coverage
+[english] pluralize: full help coverage
+[english] singular?: full help coverage
+[english] singularize: full help coverage
 
-0.0% of words have complete documentation"
+100.0% of words have complete documentation"
     }
 } ;
 
@@ -88,15 +96,25 @@ HELP: prefix-help-coverage.
     { $example
         "USING: help.lint.coverage ;"
         "\"english\" t prefix-help-coverage."
-"[english] a10n: needs help sections: $description $examples
-[english] count-of-things: needs help sections: $description $examples
-[english] pluralize: needs help sections: $description $examples
-[english] singularize: needs help sections: $description $examples
+"[english] $or-markup-example: full help coverage
+[english] ?plural-article: full help coverage
+[english] ?pluralize: full help coverage
+[english] a/an: full help coverage
+[english] a10n: full help coverage
+[english] comma-list: full help coverage
+[english] count-of-things: full help coverage
+[english] or-markup-example: full help coverage
+[english] plural?: full help coverage
+[english] pluralize: full help coverage
+[english] singular?: full help coverage
+[english] singularize: full help coverage
+[english.private] $0-plurality: needs help sections: $description $examples
+[english.private] $keep-case: needs help sections: $description $examples
 [english.private] match-case: needs help sections: $description $examples
 [english.private] plural-to-singular: needs help sections: $description $examples
 [english.private] singular-to-plural: needs help sections: $description $examples
 
-0.0% of words have complete documentation"
+70.6% of words have complete documentation"
     }
 } ;
 
@@ -106,22 +124,62 @@ HELP: <prefix-help-coverage>
 { $examples
     { $example
         "USING: help.lint.coverage prettyprint ;"
-        "\"english\" t <prefix-help-coverage> ."
+        "\"english\" t <prefix-help-coverage> ..."
 "{
     T{ word-help-coverage
+        { word-name $or-markup-example }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name ?plural-article }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name ?pluralize }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name a/an }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
         { word-name a10n }
-        { omitted-sections { $description $examples } }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name comma-list }
+        { 100%-coverage? t }
     }
     T{ word-help-coverage
         { word-name count-of-things }
-        { omitted-sections { $description $examples } }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name or-markup-example }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name plural? }
+        { 100%-coverage? t }
     }
     T{ word-help-coverage
         { word-name pluralize }
-        { omitted-sections { $description $examples } }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name singular? }
+        { 100%-coverage? t }
     }
     T{ word-help-coverage
         { word-name singularize }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name $0-plurality }
+        { omitted-sections { $description $examples } }
+    }
+    T{ word-help-coverage
+        { word-name $keep-case }
         { omitted-sections { $description $examples } }
     }
     T{ word-help-coverage
@@ -146,7 +204,7 @@ HELP: <word-help-coverage>
 { $examples
     { $example
         "USING: help.lint.coverage prettyprint ;"
-        "\\ <word-help-coverage> <word-help-coverage> ."
+        "\\ <word-help-coverage> <word-help-coverage> ..."
 "T{ word-help-coverage
     { word-name <word-help-coverage> }
     { 100%-coverage? t }
@@ -160,23 +218,55 @@ HELP: <vocab-help-coverage>
 { $examples
     { $example
         "USING: help.lint.coverage prettyprint ;"
-        "\"english\" <vocab-help-coverage> ."
+        "\"english\" <vocab-help-coverage> ..."
 "{
     T{ word-help-coverage
+        { word-name $or-markup-example }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name ?plural-article }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name ?pluralize }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name a/an }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
         { word-name a10n }
-        { omitted-sections { $description $examples } }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name comma-list }
+        { 100%-coverage? t }
     }
     T{ word-help-coverage
         { word-name count-of-things }
-        { omitted-sections { $description $examples } }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name or-markup-example }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name plural? }
+        { 100%-coverage? t }
     }
     T{ word-help-coverage
         { word-name pluralize }
-        { omitted-sections { $description $examples } }
+        { 100%-coverage? t }
+    }
+    T{ word-help-coverage
+        { word-name singular? }
+        { 100%-coverage? t }
     }
     T{ word-help-coverage
         { word-name singularize }
-        { omitted-sections { $description $examples } }
+        { 100%-coverage? t }
     }
 }"
     }

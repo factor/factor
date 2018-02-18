@@ -1,7 +1,6 @@
 ! Copyright (C) 2016 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test checksums checksums.crc16 ;
-IN: checksums.crc16.tests
 
 { B{ 0xb8 0x80 } } [
     B{ 0x01 0x04 0x02 0xFF 0xFF } crc16 checksum-bytes

@@ -31,7 +31,7 @@ M: prolog process
 : before-main? ( -- ? )
     xml-stack get {
         [ length 1 = ]
-        [ first second [ tag? ] any? not ]
+        [ first second [ tag? ] none? ]
     } 1&& ;
 
 M: directive process

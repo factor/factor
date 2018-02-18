@@ -1,9 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel tools.test sequences ;
-
-IN: math.binpack
+USING: kernel math.binpack sequences tools.test ;
 
 { { V{ } } } [ { } 1 binpack ] unit-test
 

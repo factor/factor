@@ -18,7 +18,7 @@ M: cycles length length>> ;
 
 M: cycles set-length length<< ;
 
-M: cycles virtual@ ( n seq -- n' seq' ) circular>> ;
+M: cycles virtual@ circular>> ;
 
 M: cycles virtual-exemplar circular>> ;
 
@@ -26,17 +26,19 @@ INSTANCE: cycles virtual-sequence
 
 TUPLE: repeats
 { seq sequence read-only }
-{ length integer read-only } ;
+{ times integer read-only } ;
 
-: <repeats> ( seq times -- repeats )
-    over length * repeats boa ;
+C: <repeats> repeats
+
+M: repeats length [ seq>> length ] [ times>> ] bi * ;
+
+M: repeats virtual@ [ times>> /i ] [ seq>> ] bi ;
+
+M: repeats virtual-exemplar seq>> ;
+
+INSTANCE: repeats immutable-sequence
+
+INSTANCE: repeats virtual-sequence
 
 : repeat ( seq times -- new-seq )
     dupd <repeats> swap like ;
-
-M: repeats length length>> ;
-
-M: repeats nth-unsafe
-    [ length>> / ] [ seq>> [ length * >integer ] keep nth ] bi ;
-
-INSTANCE: repeats immutable-sequence

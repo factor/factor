@@ -1,4 +1,3 @@
-IN: ui.gadgets.borders.tests
 USING: accessors kernel math.rectangles namespaces tools.test
 ui.gadgets ui.gadgets.borders ui.gadgets.borders.private
 ui.gadgets.editors ;

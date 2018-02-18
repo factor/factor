@@ -1,7 +1,5 @@
-IN: mason.common.tests
-USING: prettyprint mason.common mason.config
-namespaces calendar tools.test io.files
-io.files.temp io.encodings.utf8 sequences ;
+USING: prettyprint mason.common mason.config namespaces calendar
+tools.test io.files io.files.temp io.encodings.utf8 sequences ;
 
 { "00:01:02" } [ 62,000,000,000 nanos>time ] unit-test
 

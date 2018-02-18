@@ -1,8 +1,9 @@
-USING: accessors arrays assocs classes classes.error combinators
-continuations english formatting fry generic help
-help.lint.checks help.markup io io.streams.string io.styles
-kernel math namespaces parser sequences sequences.deep sets
-sorting splitting strings summary vocabs vocabs.parser words ;
+USING: accessors arrays classes classes.error combinators
+combinators.short-circuit continuations english eval formatting
+fry generic help help.lint help.lint.checks help.markup io
+io.streams.string io.styles kernel math namespaces parser
+prettyprint sequences sequences.deep sets sorting splitting strings summary
+vocabs vocabs.parser words words.alias ;
 FROM: namespaces => set ;
 IN: help.lint.coverage
 
@@ -77,6 +78,13 @@ DEFER: ?pluralize
 M: word-help-coverage summary
     [ (present-coverage) ] with-string-writer ; inline
 
+: find-word ( name -- word/f )
+    dup words-named dup length {
+        { 0 [ 2drop f ] }
+        { 1 [ first nip ] }
+        [ drop <ambiguous-use-error> throw-restarts ]
+    } case ;
+
 : sorted-loaded-child-vocabs ( prefix -- assoc )
     loaded-child-vocab-names natural-sort ; inline
 
@@ -88,11 +96,15 @@ M: word-help-coverage summary
 
 : should-define ( word -- spec )
     {
-        { [ dup predicate? ]    [ drop { } ] } ! predicate?s have generated docs
-        { [ dup error-class? ]  [ drop { $values $description $error-description } ] }
-        { [ dup class? ]        [ drop { $class-description } ] }
-        { [ dup generic? ]      [ drop { $values $contract $examples } ] }
-        { [ dup word? ]         [ drop { $values $description $examples } ] }
+        ! predicates have generated docs
+        { [ dup predicate? ]   [ drop { } ] }
+        ! aliases should describe why they exist but ideally $values should be
+        ! automatically inherited from the aliased word's docs
+        { [ dup alias? ]       [ drop { $values $description } ] }
+        { [ dup error-class? ] [ drop { $values $description $error-description } ] }
+        { [ dup class? ]       [ drop { $class-description } ] }
+        { [ dup generic? ]     [ drop { $values $contract $examples } ] }
+        { [ dup word? ]        [ drop { $values $description $examples } ] }
         [ drop no-cond ]
     } cond ;
 
@@ -106,14 +118,6 @@ M: word-help-coverage summary
 
 : missing-sections ( word -- missing )
     [ should-define ] [ word-defines-sections ] bi diff ;
-
-: find-word ( name -- word/f )
-    dup words-named dup length {
-        { 0 [ 2drop f ] }
-        { 1 [ first nip ] }
-        [ drop <ambiguous-use-error> throw-restarts ]
-    } case ;
-
 PRIVATE>
 
 GENERIC: <word-help-coverage> ( word -- coverage )
@@ -153,3 +157,4 @@ M: word-help-coverage help-coverage.
 : word-help-coverage. ( word-spec -- ) <word-help-coverage> help-coverage. ;
 : vocab-help-coverage. ( vocab-spec -- ) <vocab-help-coverage> help-coverage. ;
 : prefix-help-coverage. ( prefix-spec private? -- ) <prefix-help-coverage> help-coverage. ;
+

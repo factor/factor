@@ -34,7 +34,7 @@ HELP: secure-config
 
 HELP: <secure-config>
 { $values { "config" secure-config } }
-{ $description "Creates a new secure socket configration with default values." } ;
+{ $description "Creates a new secure socket configuration with default values." } ;
 
 ARTICLE: "ssl-key-file" "The key file and password"
 "The " { $snippet "key-file" } " and " { $snippet "password" } " slots of a " { $link secure-config } " can be set to a private key file in PEM format. These slots are required for secure servers, and also for clients when client-side authentication is used." ;

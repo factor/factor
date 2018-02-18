@@ -1,6 +1,5 @@
 USING: accessors kernel namespaces tools.test ui.gadgets
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.labels ;
-IN: ui.gadgets.frames.tests
 
 { } [ 3 3 <frame> { 1 1 } >>filled-cell layout ] unit-test
 

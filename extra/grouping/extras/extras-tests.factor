@@ -1,5 +1,5 @@
-USING: arrays kernel math math.functions sequences tools.test ;
-IN: grouping.extras
+USING: arrays grouping.extras kernel math math.functions
+sequences tools.test ;
 
 { { } } [ { 1 } [ 2array ] 2clump-map ] unit-test
 { { { 1 2 } } } [ { 1 2 } [ 2array ] 2clump-map ] unit-test

@@ -77,14 +77,12 @@ CONSTANT: doc-start { 0 0 }
 : (doc-range) ( from to line# document -- slice )
     [ start/end-on-line ] 2keep doc-line <slice> ;
 
-: text+loc ( lines loc -- loc )
-    over [
-        over length 1 = [
-            nip first2
-        ] [
-            first swap length 1 - + 0
-        ] if
-    ] dip last length + 2array ;
+:: text+loc ( lines loc -- loc )
+    lines length 1 = [
+        loc first2
+    ] [
+        loc first lines length 1 - + 0
+    ] if lines last length + 2array ;
 
 : prepend-first ( str seq -- )
     0 swap [ append ] change-nth ;

@@ -4,8 +4,6 @@
 USING: assocs hashtables.numbers kernel literals sequences
 tools.test ;
 
-IN: hashtables.numbers.tests
-
 { 1000 } [ 3/2 NH{ { 1.5 1000 } } at ] unit-test
 
 { 1001 } [

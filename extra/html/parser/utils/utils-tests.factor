@@ -1,8 +1,4 @@
-USING: assocs combinators continuations hashtables
-hashtables.private io kernel math
-namespaces prettyprint quotations sequences splitting
-strings tools.test html.parser.utils quoting ;
-IN: html.parser.utils.tests
+USING: html.parser.utils quoting tools.test ;
 
 { "'Rome'" } [ "Rome" single-quote ] unit-test
 { "\"Roma\"" } [ "Roma" double-quote ] unit-test

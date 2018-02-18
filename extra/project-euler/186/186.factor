@@ -44,31 +44,26 @@ IN: project-euler.186
 : <generator> ( -- lag )
     55 [1,b] [ (generator) ] map <circular> ;
 
-: advance ( lag -- )
-    [ { 0 31 } swap nths sum 1000000 rem ] keep circular-push ;
-
 : next ( lag -- n )
-    [ first ] [ advance ] bi ;
+    [ [ first dup ] [ 31 swap nth ] bi + 1000000 rem ] keep circular-push ;
 
-: 2unless? ( x y ?quot quot -- )
-    [ 2keep rot [ 2drop ] ] dip if ; inline
-
-: (p186) ( generator counter unionfind -- counter )
+: (euler186) ( generator counter unionfind -- counter )
     524287 over equiv-set-size 990000 < [
         pick [ next ] [ next ] bi
-        [ = ] [
-            pick equate
-            [ 1 + ] dip
-        ] 2unless? (p186)
+        2dup = [
+            2drop
+        ] [
+            pick equate [ 1 + ] dip
+        ] if (euler186)
     ] [
         drop nip
     ] if ;
 
 : <relation> ( n -- unionfind )
-    <disjoint-set> [ [ add-atom ] curry each ] keep ;
+    <iota> <disjoint-set> [ [ add-atom ] curry each ] keep ;
 
 : euler186 ( -- n )
-    <generator> 0 1000000 <relation> (p186) ;
+    <generator> 0 1000000 <relation> (euler186) ;
 
 ! [ euler186 ] 10 ave-time
 ! 18572 ms ave run time - 796.87 SD (10 trials)

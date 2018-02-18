@@ -1,6 +1,5 @@
 USING: accessors effects effects.parser eval kernel prettyprint
 sequences tools.test math ;
-IN: effects.tests
 
 { t } [ { "a" } { "a" } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test
 { f } [ { "a" } { } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test

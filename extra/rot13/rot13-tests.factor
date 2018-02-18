@@ -1,7 +1,5 @@
 
-USING: tools.test ;
-
-IN: rot13
+USING: rot13 tools.test ;
 
 { "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" } [
     "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm" rot13

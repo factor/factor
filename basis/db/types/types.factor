@@ -32,8 +32,7 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 SYMBOL: IGNORE
 
 : filter-ignores ( tuple specs -- specs' )
-    [ <mirror> [ nip IGNORE = ] assoc-filter keys ] dip
-    [ slot-name>> swap member? ] with reject ;
+    [ <mirror> ] dip [ slot-name>> of IGNORE = ] with reject ;
 
 ERROR: not-persistent class ;
 

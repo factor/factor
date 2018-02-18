@@ -1,4 +1,3 @@
-IN: xmode.rules.tests
 USING: xmode.rules tools.test ;
 
 { { 1 2 3 } } [ f { 1 2 3 } ?push-all ] unit-test

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-USING: kernel tools.test peg peg.javascript.ast peg.javascript.tokenizer accessors ;
-IN: peg.javascript.tokenizer.tests
+
+USING: kernel tools.test peg peg.javascript.ast
+peg.javascript.tokenizer accessors ;
 
 {
   V{

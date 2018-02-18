@@ -53,7 +53,7 @@ HELP: ##alien-indirect
 
 HELP: ##allot
 { $class-description
-  "An instruction for allocating memory in the nursery. Usually the instruction is preceeded by " { $link ##check-nursery-branch } " which checks that there is enough room in the nursery to allocate. It has the following slots:"
+  "An instruction for allocating memory in the nursery. Usually the instruction is preceded by " { $link ##check-nursery-branch } " which checks that there is enough room in the nursery to allocate. It has the following slots:"
   { $table
     { { $slot "dst" } { "Register to put the pointer to the memory in." } }
     { { $slot "size" } { "Number of bytes to allocate." } }

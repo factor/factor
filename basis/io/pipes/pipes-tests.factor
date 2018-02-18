@@ -1,9 +1,7 @@
-USING: io io.pipes io.streams.string io.encodings.utf8
-io.encodings.binary io.streams.duplex io.encodings io.timeouts
-namespaces continuations tools.test kernel calendar destructors
-accessors debugger math sequences threads
-concurrency.count-downs fry ;
-IN: io.pipes.tests
+USING: accessors calendar concurrency.count-downs continuations
+destructors fry io io.encodings io.encodings.binary
+io.encodings.utf8 io.pipes io.streams.duplex io.streams.string
+io.timeouts kernel math namespaces threads tools.test ;
 
 { "Hello" } [
     utf8 <pipe> [

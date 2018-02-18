@@ -1,7 +1,6 @@
 USING: timers timers.private calendar concurrency.count-downs
 concurrency.promises fry kernel math math.order sequences
 threads tools.test tools.time ;
-IN: timers.tests
 
 { } [
     1 <count-down>

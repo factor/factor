@@ -36,7 +36,7 @@ HELP: line-gadget
 
 HELP: pref-viewport-dim*
 { $values { "gadget" line-gadget } { "dim" array } }
-{ $description "Calculates the preferred viewport dimenstions of the line gadget." }
+{ $description "Calculates the preferred viewport dimensions of the line gadget." }
 { $see-also pref-viewport-dim } ;
 
 ARTICLE: "ui.gadgets.line-support" "Gadget line support"

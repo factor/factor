@@ -1,7 +1,6 @@
 USING: io.encodings.string io.encodings.8-bit
 io.encodings.8-bit.private tools.test strings arrays
 io.encodings.8-bit.latin1 io.encodings.8-bit.windows-1252 ;
-IN: io.encodings.8-bit.tests
 
 { B{ char: f char: o char: o } } [ "foo" latin1 encode ] unit-test
 [ { 256 } >string latin1 encode ] must-fail

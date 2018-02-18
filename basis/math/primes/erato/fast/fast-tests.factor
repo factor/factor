@@ -1,5 +1,4 @@
-USING: fry kernel sequences tools.test ;
-IN: math.primes.erato.fast
+USING: fry kernel math.primes.erato.fast sequences tools.test ;
 
 {
 

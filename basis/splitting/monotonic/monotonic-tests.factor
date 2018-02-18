@@ -1,5 +1,5 @@
-IN: splitting.monotonic
-USING: tools.test math arrays kernel sequences ;
+USING: tools.test math arrays kernel sequences
+splitting.monotonic ;
 
 { { } } [ { } [ < ] monotonic-split ] unit-test
 { { { 1 } } } [ { 1 } [ < ] monotonic-split ] unit-test

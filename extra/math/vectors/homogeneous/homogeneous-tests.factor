@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.vectors.homogeneous tools.test ;
-IN: math.vectors.homogeneous.tests
 
 { { 1.0 2.0 1.0 } } [ { 1.0 0.0 1.0 } { 0.0 2.0 1.0 } h+ ] unit-test
 { { 1.0 -2.0 1.0 } } [ { 1.0 0.0 1.0 } { 0.0 2.0 1.0 } h- ] unit-test
