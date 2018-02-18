@@ -1,4 +1,5 @@
-USING: arrays assocs math named-tuples sequences tools.test ;
+USING: arrays assocs classes.tuple kernel math named-tuples
+sequences tools.test ;
 IN: named-tuples.tests
 
 TUPLE: foo x y z ;
@@ -25,6 +26,10 @@ INSTANCE: foo named-tuple
 { f } [ T{ foo } "z" of ] unit-test
 
 { f f } [ "not found" T{ foo f 1 2 3 } at* ] unit-test
+
+{ T{ foo f "x" 2 3 } } [ T{ foo f 1 2 3 } "x" dup pick set-at ] unit-test
+
+[ 1 "not found" T{ foo f 1 2 3 } set-at ] [ no-slot? ] must-fail-with
 
 { 1 } [ T{ foo f 1 2 3 } "x" of ] unit-test
 { 2 } [ T{ foo f 1 2 3 } "y" of ] unit-test
