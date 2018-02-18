@@ -140,6 +140,9 @@ IN: bootstrap.syntax
         "'let["
         "FUNCTOR:"
         "VARIABLES-FUNCTOR:"
+        "INITIALIZED-SYMBOL:"
+        "STARTUP-HOOK:"
+        "SHUTDOWN-HOOK:"
     } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol
