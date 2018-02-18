@@ -1,4 +1,4 @@
-USING: arrays assocs named-tuples sequences tools.test ;
+USING: arrays assocs math named-tuples sequences tools.test ;
 IN: named-tuples.tests
 
 TUPLE: foo x y z ;
@@ -29,3 +29,7 @@ INSTANCE: foo named-tuple
 { 1 } [ T{ foo f 1 2 3 } "x" of ] unit-test
 { 2 } [ T{ foo f 1 2 3 } "y" of ] unit-test
 { 3 } [ T{ foo f 1 2 3 } "z" of ] unit-test
+
+{ 1 } [ 0 >bignum T{ foo f 1 2 3 } nth ] unit-test
+{ 2 } [ 1 >bignum T{ foo f 1 2 3 } nth ] unit-test
+{ 3 } [ 2 >bignum T{ foo f 1 2 3 } nth ] unit-test
