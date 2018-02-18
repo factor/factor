@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs classes classes.tuple
-classes.tuple.private kernel sequences sequences.private
+classes.tuple.private kernel math sequences sequences.private
 slots.private ;
 
 IN: named-tuples
@@ -24,9 +24,11 @@ INSTANCE: named-tuple assoc
 
 M: named-tuple length tuple-size ;
 
-M: named-tuple nth-unsafe array-nth ;
+M: named-tuple nth-unsafe
+    [ integer>fixnum ] dip array-nth ;
 
-M: named-tuple set-nth-unsafe set-array-nth ;
+M: named-tuple set-nth-unsafe
+    [ integer>fixnum ] dip set-array-nth ;
 
 M: named-tuple like class-of slots>tuple ;
 
