@@ -17,13 +17,13 @@ IN: shapefiles
 : read-box ( -- box )
     4 [ read-double ] replicate ;
 
-: read-int-array ( n -- parts )
+: read-ints ( n -- parts )
     [ read-int ] replicate ;
 
 : read-range ( -- range )
     read-double read-double 2array ;
 
-: read-double-array ( n -- array )
+: read-doubles ( n -- array )
     [ read-double ] replicate ;
 
 PRIVATE>
@@ -32,19 +32,19 @@ TUPLE: header file-code file-length version shape-type x-min
 y-min x-max y-max z-min z-max m-min m-max ;
 
 : read-header ( -- header )
-    4 read be> dup 9994 assert= ! file code
+    4 read be> dup 9994 assert=
     20 read drop ! unused
-    4 read be> ! file-length
-    read-int dup 1000 assert= ! version
-    read-int ! shape-type
-    read-double ! x-min
-    read-double ! y-min
-    read-double ! x-max
-    read-double ! y-max
-    read-double ! z-min
-    read-double ! z-max
-    read-double ! m-min
-    read-double ! m-max
+    4 read be>
+    read-int dup 1000 assert=
+    read-int
+    read-double
+    read-double
+    read-double
+    read-double
+    read-double
+    read-double
+    read-double
+    read-double
     header boa ;
 
 TUPLE: point x y ;
@@ -58,22 +58,19 @@ TUPLE: point x y ;
 TUPLE: multipoint box points ;
 
 : read-multipoint ( -- multipoint )
-    read-box read-int [ read-point ] replicate multipoint boa ;
+    read-box read-int read-points multipoint boa ;
 
 TUPLE: polyline box parts points ;
 
 : read-polyline ( -- polyline )
-    read-box read-int read-int
-    [ [ read-int ] replicate ]
-    [ [ read-point ] replicate ] bi*
-    polyline boa ;
+    read-box read-int read-int [ read-ints ] dip
+    read-points polyline boa ;
 
 TUPLE: polygon box parts points ;
 
 : read-polygon ( -- polygon )
-    read-box read-int read-int
-    [ read-int-array ] [ read-points ] bi*
-    polygon boa ;
+    read-box read-int read-int [ read-ints ] dip
+    read-points polygon boa ;
 
 TUPLE: point-m x y m ;
 
@@ -84,21 +81,21 @@ TUPLE: multipoint-m box points m-range m-array ;
 
 : read-multipoint-m ( -- multipoint-m )
     read-box read-int
-    [ read-points read-range ] [ read-double-array ] bi
+    [ read-points read-range ] [ read-doubles ] bi
     multipoint-m boa ;
 
 TUPLE: polyline-m box parts points m-range m-array ;
 
 : read-polyline-m ( -- polyline-m )
-    read-box read-int read-int [ read-int-array ] dip
-    [ read-points read-range ] [ read-double-array ] bi
+    read-box read-int read-int [ read-ints ] dip
+    [ read-points read-range ] [ read-doubles ] bi
     polyline-m boa ;
 
 TUPLE: polygon-m box parts points m-range m-array ;
 
 : read-polygon-m ( -- polyline-m )
-    read-box read-int read-int [ read-int-array ] dip
-    [ read-points read-range ] [ read-double-array ] bi
+    read-box read-int read-int [ read-ints ] dip
+    [ read-points read-range ] [ read-doubles ] bi
     polygon-m boa ;
 
 TUPLE: point-z x y z m ;
@@ -111,36 +108,36 @@ TUPLE: multipoint-z box points z-range z-array m-range m-array ;
 : read-multipoint-z ( -- multipoint-z )
     read-box read-int
     [ read-points read-range ]
-    [ read-double-array read-range ]
-    [ read-double-array ] tri multipoint-z boa ;
+    [ read-doubles read-range ]
+    [ read-doubles ] tri multipoint-z boa ;
 
 TUPLE: polyline-z box parts points z-range z-array m-range
 m-array ;
 
 : read-polyline-z ( -- polyline-z )
-    read-box read-int read-int [ read-int-array ] dip
+    read-box read-int read-int [ read-ints ] dip
     [ read-points read-range ]
-    [ read-double-array read-range ]
-    [ read-double-array ] tri polyline-z boa ;
+    [ read-doubles read-range ]
+    [ read-doubles ] tri polyline-z boa ;
 
 TUPLE: polygon-z box parts points z-range z-array m-range
 m-array ;
 
 : read-polygon-z ( -- polyline-z )
-    read-box read-int read-int [ read-int-array ] dip
+    read-box read-int read-int [ read-ints ] dip
     [ read-points read-range ]
-    [ read-double-array read-range ]
-    [ read-double-array ] tri polygon-z boa ;
+    [ read-doubles read-range ]
+    [ read-doubles ] tri polygon-z boa ;
 
 TUPLE: multipatch box parts points part-types z-range z-array
 m-range m-array ;
 
 : read-multipatch ( -- multipatch )
     read-box read-int read-int
-    [ [ read-int-array ] [ read-int-array ] bi ] dip
+    [ [ read-ints ] [ read-ints ] bi ] dip
     [ read-points read-range ]
-    [ read-double-array read-range ]
-    [ read-double-array ] tri multipatch boa ;
+    [ read-doubles read-range ]
+    [ read-doubles ] tri multipatch boa ;
 
 : read-shape ( -- shape )
     4 read le> {
