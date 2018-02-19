@@ -11,20 +11,20 @@ IN: shapefiles
 : read-int ( -- n )
     4 read le> ;
 
-: read-double ( -- n )
-    8 read le> bits>double ;
-
-: read-box ( -- box )
-    4 [ read-double ] replicate ;
-
 : read-ints ( n -- parts )
     [ read-int ] replicate ;
 
-: read-range ( -- range )
-    read-double read-double 2array ;
+: read-double ( -- n )
+    8 read le> bits>double ;
 
 : read-doubles ( n -- array )
     [ read-double ] replicate ;
+
+: read-box ( -- box )
+    4 read-doubles ;
+
+: read-range ( -- range )
+    2 read-doubles ;
 
 PRIVATE>
 
@@ -93,7 +93,7 @@ TUPLE: polyline-m box parts points m-range m-array ;
 
 TUPLE: polygon-m box parts points m-range m-array ;
 
-: read-polygon-m ( -- polyline-m )
+: read-polygon-m ( -- polygon-m )
     read-box read-int read-int [ read-ints ] dip
     [ read-points read-range ] [ read-doubles ] bi
     polygon-m boa ;
@@ -123,7 +123,7 @@ m-array ;
 TUPLE: polygon-z box parts points z-range z-array m-range
 m-array ;
 
-: read-polygon-z ( -- polyline-z )
+: read-polygon-z ( -- polygon-z )
     read-box read-int read-int [ read-ints ] dip
     [ read-points read-range ]
     [ read-doubles read-range ]
