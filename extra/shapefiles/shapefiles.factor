@@ -167,10 +167,10 @@ TUPLE: record number content-length shape ;
 : read-records ( -- records )
     [ read-record dup ] [ ] produce nip ;
 
-: read-shp ( -- header shapes )
+: read-shp ( -- header records )
     read-header read-records ;
 
-: file>shp ( path -- header shapes )
+: file>shp ( path -- header records )
     binary [ read-shp ] with-file-reader ;
 
 TUPLE: index offset content-length ;
