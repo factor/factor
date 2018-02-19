@@ -33,7 +33,7 @@ FUNCTION: void no_such_function ( )
     ${
         KERNEL-ERROR ERROR-UNDEFINED-SYMBOL
         "no_such_function" string>symbol
-        "no_such_library" load-library
+        "no_such_library" library-dll
     }
     =
 ] must-fail-with
