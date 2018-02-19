@@ -47,6 +47,8 @@ y-min x-max y-max z-min z-max m-min m-max ;
     read-double
     header boa ;
 
+SINGLETON: null-shape
+
 TUPLE: point x y ;
 
 : read-point ( -- point )
@@ -141,7 +143,7 @@ m-range m-array ;
 
 : read-shape ( -- shape )
     4 read le> {
-        { 0 [ null ] }
+        { 0 [ null-shape ] }
         { 1 [ read-point ] }
         { 3 [ read-polyline ] }
         { 5 [ read-polygon ] }
