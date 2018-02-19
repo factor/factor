@@ -116,5 +116,8 @@ ERROR: missing-type type ;
 : with-quot>py-cfunction ( alien quot -- )
     '[ <py-cfunction> @ ] with-callback ; inline
 
-[ "PyIsInitialized" "python2.7" library-dll dlsym? [ py-initialize ] when ] "python" add-startup-hook
-[ py-finalize ] "python" add-shutdown-hook
+: python-dll-loaded? ( -- ? )
+    "PyIsInitialized" "python2.7" library-dll dlsym? ;
+
+[ python-dll-loaded? [ py-initialize ] when ] "python" add-startup-hook
+[ python-dll-loaded? [ py-finalize ] when ] "python" add-shutdown-hook
