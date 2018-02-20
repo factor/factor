@@ -9,7 +9,7 @@ threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.private windows.dwmapi windows.errors windows.gdi32
 windows.kernel32 windows.messages windows.offscreen windows.opengl32
-windows.types windows.user32 ;
+windows.types windows.user32 assocs.extras ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -504,8 +504,6 @@ SYMBOL: nc-buttons
 
 SYMBOL: wm-handlers
 
-H{ } clone wm-handlers set-global
-
 : add-wm-handler ( quot: ( hWnd Msg wParam lParam -- LRESULT ) wm -- )
     dup array?
     [ [ execute( -- wm ) add-wm-handler ] with each ]
@@ -514,56 +512,52 @@ H{ } clone wm-handlers set-global
 : remove-wm-handler ( wm -- )
     wm-handlers get-global delete-at ;
 
-[ handle-wm-close 0                  ] WM_CLOSE add-wm-handler
-[ 4dup handle-wm-paint DefWindowProc ] WM_PAINT add-wm-handler
+wm-handlers [
+    H{
+        ${ WM_CLOSE [ handle-wm-close 0 ] }
+        ${ WM_PAINT [ 4dup handle-wm-paint DefWindowProc ] }
 
-[ handle-wm-size 0 ] WM_SIZE add-wm-handler
-[ handle-wm-move 0 ] WM_MOVE add-wm-handler
+        ${ WM_SIZE [ handle-wm-size 0 ] }
+        ${ WM_MOVE [ handle-wm-move 0 ] }
 
-[ 4dup handle-wm-keydown DefWindowProc ] { WM_KEYDOWN WM_SYSKEYDOWN } add-wm-handler
-[ 4dup handle-wm-char DefWindowProc    ] { WM_CHAR WM_SYSCHAR }       add-wm-handler
-[ 4dup handle-wm-keyup DefWindowProc   ] { WM_KEYUP WM_SYSKEYUP }     add-wm-handler
+        { ${ WM_CHAR WM_SYSCHAR } [ 4dup handle-wm-char DefWindowProc ] }
+        { ${ WM_KEYDOWN WM_SYSKEYDOWN } [ 4dup handle-wm-keydown DefWindowProc ] }
+        { ${ WM_KEYUP WM_SYSKEYUP } [ 4dup handle-wm-keyup DefWindowProc ] }
 
-[ handle-wm-syscommand   ] WM_SYSCOMMAND add-wm-handler
-[ handle-wm-set-focus 0  ] WM_SETFOCUS add-wm-handler
-[ handle-wm-kill-focus 0 ] WM_KILLFOCUS add-wm-handler
+        ${ WM_SYSCOMMAND [ handle-wm-syscommand ] }
+        ${ WM_SETFOCUS [ handle-wm-set-focus 0 ]  }
+        ${ WM_KILLFOCUS [ handle-wm-kill-focus 0 ] }
 
-[ handle-app-command 0 ] WM_APPCOMMAND add-wm-handler
+        ${ WM_APPCOMMAND [ handle-app-command 0 ] }
 
-[ handle-wm-buttondown 0 ] WM_LBUTTONDOWN add-wm-handler
-[ handle-wm-buttondown 0 ] WM_MBUTTONDOWN add-wm-handler
-[ handle-wm-buttondown 0 ] WM_RBUTTONDOWN add-wm-handler
-[ handle-wm-buttonup 0   ] WM_LBUTTONUP   add-wm-handler
-[ handle-wm-buttonup 0   ] WM_MBUTTONUP   add-wm-handler
-[ handle-wm-buttonup 0   ] WM_RBUTTONUP   add-wm-handler
-[ handle-wm-dwmcompositionchanged 0   ] WM_DWMCOMPOSITIONCHANGED add-wm-handler
+        { ${ WM_LBUTTONDOWN WM_MBUTTONDOWN WM_RBUTTONDOWN } [ handle-wm-buttondown 0 ] }
+        { ${ WM_LBUTTONUP WM_MBUTTONUP WM_RBUTTONUP } [ handle-wm-buttonup 0 ] }
+        ${ WM_DWMCOMPOSITIONCHANGED [ handle-wm-dwmcompositionchanged 0 ] }
 
-[ 4dup handle-wm-ncbutton DefWindowProc ]
-{ WM_NCLBUTTONDOWN WM_NCMBUTTONDOWN WM_NCRBUTTONDOWN
-WM_NCLBUTTONUP WM_NCMBUTTONUP WM_NCRBUTTONUP }
-add-wm-handler
+        {
+            ${
+                WM_NCLBUTTONDOWN WM_NCMBUTTONDOWN WM_NCRBUTTONDOWN
+                WM_NCLBUTTONUP WM_NCMBUTTONUP WM_NCRBUTTONUP
+            } [ 4dup handle-wm-ncbutton DefWindowProc ]
+        }
 
-[ nc-buttons get-global delete-all DefWindowProc ]
-{ WM_EXITSIZEMOVE WM_EXITMENULOOP } add-wm-handler
+        { ${ WM_EXITMENULOOP WM_EXITSIZEMOVE } [ nc-buttons get-global delete-all DefWindowProc ] }
 
-[ handle-wm-mousemove 0  ] WM_MOUSEMOVE  add-wm-handler
-[ handle-wm-mousewheel 0 ] WM_MOUSEWHEEL add-wm-handler
-[ handle-wm-cancelmode 0 ] WM_CANCELMODE add-wm-handler
-[ handle-wm-mouseleave 0 ] WM_MOUSELEAVE add-wm-handler
+        ${ WM_MOUSEMOVE [ handle-wm-mousemove 0 ] }
+        ${ WM_MOUSEWHEEL [ handle-wm-mousewheel 0 ] }
+        ${ WM_CANCELMODE [ handle-wm-cancelmode 0 ] }
+        ${ WM_MOUSELEAVE [ handle-wm-mouseleave 0 ] }
+    } expand-keys-set-at
+] initialize
 
 SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     c:uint { c:void* c:uint WPARAM LPARAM } stdcall [
-        pick
-
-        trace-messages? get-global
-        [ dup windows-message-name name>> print flush ] when
-
-        wm-handlers get-global at*
-        [ call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
-     ] alien-callback ;
+        pick wm-handlers get-global at*
+        [ flush call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
+    ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
