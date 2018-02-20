@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.strings alien.syntax
-classes.struct io.backend kernel windows windows.com
-windows.com.syntax windows.kernel32 windows.ole32 windows.types ;
+classes.struct io.backend kernel literals math windows
+windows.com windows.com.syntax windows.kernel32 windows.messages
+windows.ole32 windows.types ;
 IN: windows.shell32
 
 CONSTANT: CSIDL_DESKTOP 0x00
@@ -318,3 +319,63 @@ FUNCTION: BOOL DragQueryPoint ( HDROP hDrop, POINT* lppt )
 FUNCTION: void DragFinish ( HDROP hDrop )
 
 FUNCTION: BOOL IsUserAnAdmin ( )
+
+
+CONSTANT: NIM_ADD 0
+CONSTANT: NIM_MODIFY 1
+CONSTANT: NIM_DELETE 2
+CONSTANT: NIM_SETFOCUS 3
+CONSTANT: NIM_SETVERSION 4
+
+CONSTANT: NIF_MESSAGE 0x1
+CONSTANT: NIF_ICON 0x2
+CONSTANT: NIF_TIP 0x4
+CONSTANT: NIF_STATE 0x8
+CONSTANT: NIF_INFO 0x10
+CONSTANT: NIF_GUID 0x20
+CONSTANT: NIF_REALTIME 0x40
+CONSTANT: NIF_SHOWTIP 0x80
+
+CONSTANT: NIIF_NONE 0x0
+CONSTANT: NIIF_INFO 0x1
+CONSTANT: NIIF_WARNING 0x2
+CONSTANT: NIIF_ERROR 0x3
+CONSTANT: NIIF_USER 0x4
+CONSTANT: NIIF_ICON_MASK 0xF
+CONSTANT: NIIF_NOSOUND 0x10
+
+CONSTANT: NIS_HIDDEN 1
+CONSTANT: NIS_SHAREDICON 2
+
+CONSTANT: NOTIFYICON_VERSION 3
+CONSTANT: NOTIFYICON_VERSION_4 4
+
+! >= 0x0500
+CONSTANT: NIN_SELECT $[ WM_USER 0 + ]
+CONSTANT: NIN_KEYSELECT $[ WM_USER 1 + ]
+! >= 0x0501
+CONSTANT: NIN_BALLOONSHOW $[ WM_USER 2 + ]
+CONSTANT: NIN_BALLOONHIDE $[ WM_USER 3 + ]
+CONSTANT: NIN_BALLOONTIMEOUT $[ WM_USER 4 + ]
+CONSTANT: NIN_BALLOONUSERCLICK $[ WM_USER 5 + ]
+
+STRUCT: NOTIFYICONDATA
+    { cbSize DWORD }
+    { hWnd HWND }
+    { uID UINT }
+    { uFlags UINT }
+    { uCallbackMessage UINT }
+    { hIcon HICON }
+    { szTip TCHAR[64] }
+    { dwState DWORD }
+    { dwStateMask DWORD }
+    { szInfo TCHAR[256] }
+    { uTimeout UINT } ! { uVersion UINT } ! c-union here1
+    { szInfoTitle TCHAR[64] }
+    { dwInfoFlags DWORD }
+    { guidItem GUID }
+    { hBalloonIcon HICON } ;
+
+TYPEDEF: NOTIFYICONDATA* PNOTIFYICONDATA
+
+FUNCTION: BOOL Shell_NotifyIcon ( DWORD dwMessage, PNOTIFYICONDATA lpdata )
