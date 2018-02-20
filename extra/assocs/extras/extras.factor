@@ -104,7 +104,7 @@ PRIVATE>
 : expand-keys-push-as ( assoc exemplar -- hashtable' )
     [
         [ [ dup sequence? [ 1array ] unless ] dip ]
-        [ '[ 2array _ push ] curry each ]
+        [ '[ _ 2array _ push ] each ]
     ] dip assoc>object ;
 
 : expand-keys-push ( assoc -- hashtable' )
@@ -113,7 +113,7 @@ PRIVATE>
 : expand-values-set-at-as ( assoc exemplar -- hashtable' )
     [
         [ dup sequence? [ 1array ] unless swap ]
-        [ '[ _ set-at ] curry each ]
+        [ '[ _ _ set-at ] each ]
     ] dip assoc>object ;
 
 : expand-values-set-at ( assoc -- hashtable' )
@@ -122,7 +122,7 @@ PRIVATE>
 : expand-values-push-at-as ( assoc exemplar -- hashtable' )
     [
         [ dup sequence? [ 1array ] unless swap ]
-        [ '[ _ push-at ] curry each ]
+        [ '[ _ _ push-at ] each ]
     ] dip assoc>object ;
 
 : expand-values-push-at ( assoc -- assoc )
