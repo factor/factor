@@ -1,4 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.parser classes continuations
 db.tester db.tuples db.types kernel math math.intervals math.ranges
@@ -656,3 +657,42 @@ example "EXAMPLE"
 
 [ test-blob-select ] test-sqlite
 [ test-blob-select ] test-postgresql
+
+TUPLE: select-me id data ;
+
+select-me "select_me"
+{
+    { "id" "ID" +db-assigned-id+ }
+    { "data" "DATA" TEXT }
+} define-persistent
+
+: test-mapping ( -- )
+    select-me drop-table
+    select-me ensure-table
+    [ ] [ select-me new                insert-tuple ] unit-test
+    [ ] [ select-me new "test2" >>data insert-tuple ] unit-test
+
+    [
+        T{ select-me { id 1 } { data f } }
+        T{ select-me { id 2 } { data "test2" } }
+    ] [ select-me new select-tuples first2 ] unit-test
+
+    [ V{ f "test2" } ]
+    [
+        select-me new [ data>> ] collector [ each-tuple ] dip
+    ] unit-test
+
+    [ V{ "test" "test2" } ] [
+        select-me new NULL >>data [ "test" >>data ] update-tuples
+        select-me new [ data>> ] collector [ each-tuple ] dip
+    ] unit-test
+
+    [ V{ "test1" "test2" } ] [
+        select-me new [
+            dup data>> "test" = [ "test1" >>data ] [ drop f ] if
+        ] update-tuples
+        select-me new [ data>> ] collector [ each-tuple ] dip
+    ] unit-test ;
+
+[ test-mapping ] test-sqlite
+[ test-mapping ] test-postgresql
