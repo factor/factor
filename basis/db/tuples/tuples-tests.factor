@@ -294,8 +294,7 @@ TUPLE: serialize-me id data ;
         { "id" "ID" +db-assigned-id+ }
         { "data" "DATA" FACTOR-BLOB }
     } define-persistent
-    [ serialize-me drop-table ] ignore-errors
-    [ ] [ serialize-me create-table ] unit-test
+    [ ] [ serialize-me recreate-table ] unit-test
 
     [ ] [ T{ serialize-me f f H{ { 1 2 } } } insert-tuple ] unit-test
     [
@@ -328,8 +327,7 @@ TUPLE: exam id name score ;
         { "name" "NAME" TEXT }
         { "score" "SCORE" INTEGER }
     } define-persistent
-    [ exam drop-table ] ignore-errors
-    [ ] [ exam create-table ] unit-test
+    [ ] [ exam recreate-table ] unit-test
 
     [ ] [ T{ exam f f "Kyle" 100 } insert-tuple ] unit-test
     [ ] [ T{ exam f f "Stan" 80 } insert-tuple ] unit-test
@@ -462,8 +460,7 @@ TUPLE: bignum-test id m n o ;
         { "n" "N" UNSIGNED-BIG-INTEGER }
         { "o" "O" SIGNED-BIG-INTEGER }
     } define-persistent
-    [ bignum-test drop-table ] ignore-errors
-    [ ] [ bignum-test ensure-table ] unit-test
+    [ ] [ bignum-test recreate-table ] unit-test
     [ ] [ 63 2^ 1 - dup dup <bignum-test> insert-tuple ] unit-test ;
 
     ! sqlite only
@@ -667,8 +664,7 @@ select-me "select_me"
 } define-persistent
 
 : test-mapping ( -- )
-    [ select-me drop-table ] ignore-errors
-    select-me ensure-table
+    [ ] [ select-me recreate-table ] unit-test
     [ ] [ select-me new                insert-tuple ] unit-test
     [ ] [ select-me new "test2" >>data insert-tuple ] unit-test
 
