@@ -122,17 +122,10 @@ ERROR: no-defined-persistent object ;
     drop-sql-statement [ execute-statement ] with-disposals ;
 
 : recreate-table ( class -- )
-    ensure-defined-persistent
-    [
-        '[
-            [
-                _ drop-sql-statement [ execute-statement ] with-disposals
-            ] ignore-table-missing
-        ] ignore-function-missing
-    ] [ create-table ] bi ;
+    [ '[ [ _ drop-table ] ignore-table-missing ] ignore-function-missing ]
+    [ create-table ] bi ;
 
 : ensure-table ( class -- )
-    ensure-defined-persistent
     '[ [ _ create-table ] ignore-table-exists ] ignore-function-exists ;
 
 : ensure-tables ( classes -- ) [ ensure-table ] each ;
