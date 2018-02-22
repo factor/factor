@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.parser classes continuations
 db.tester db.tuples db.types kernel math math.intervals math.ranges
-namespaces random sequences strings tools.test urls ;
+namespaces random sequences sorting strings tools.test urls ;
 FROM: math.ranges => [a,b] ;
 IN: db.tuples.tests
 
@@ -678,16 +678,18 @@ select-me "select_me"
         select-me new [ data>> ] collector [ each-tuple ] dip
     ] unit-test
 
-    [ V{ "test" "test2" } ] [
+    [ { "test" "test2" } ] [
         select-me new NULL >>data [ "test" >>data ] update-tuples
         select-me new [ data>> ] collector [ each-tuple ] dip
+        natural-sort
     ] unit-test
 
-    [ V{ "test1" "test2" } ] [
+    [ { "test1" "test2" } ] [
         select-me new [
             dup data>> "test" = [ "test1" >>data ] [ drop f ] if
         ] update-tuples
         select-me new [ data>> ] collector [ each-tuple ] dip
+        natural-sort
     ] unit-test ;
 
 [ test-mapping ] test-sqlite
