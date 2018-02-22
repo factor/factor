@@ -667,7 +667,7 @@ select-me "select_me"
 } define-persistent
 
 : test-mapping ( -- )
-    select-me drop-table
+    [ select-me drop-table ] ignore-errors
     select-me ensure-table
     [ ] [ select-me new                insert-tuple ] unit-test
     [ ] [ select-me new "test2" >>data insert-tuple ] unit-test
