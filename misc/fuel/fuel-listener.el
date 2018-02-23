@@ -22,7 +22,6 @@
 
 (require 'comint)
 
-
 ;;; Customization:
 
 ;;;###autoload
@@ -49,12 +48,6 @@
 (defcustom fuel-listener-use-other-window t
   "Use a window other than the current buffer's when switching to
 the factor-listener buffer."
-  :type 'boolean
-  :group 'fuel-listener)
-
-(defcustom fuel-listener-window-allow-split t
-  "Allow window splitting when switching to the fuel listener
-buffer."
   :type 'boolean
   :group 'fuel-listener)
 
@@ -181,8 +174,7 @@ sessions."
 (defun run-factor (&optional arg)
   "Show the fuel-listener buffer, starting the process if needed."
   (interactive)
-  (let ((buf (process-buffer (fuel-listener--process t)))
-        (pop-up-windows fuel-listener-window-allow-split))
+  (let ((buf (process-buffer (fuel-listener--process t))))
     (if fuel-listener-use-other-window
         (pop-to-buffer buf)
       (switch-to-buffer buf))
@@ -259,7 +251,7 @@ the vocabulary name."
   (when (= (point) (comint-bol)) (beginning-of-line)))
 
 ;;;###autoload
-(define-derived-mode fuel-listener-mode comint-mode "Fuel Listener"
+(define-derived-mode fuel-listener-mode comint-mode "FUEL Listener"
   "Major mode for interacting with an inferior Factor listener process.
 \\{fuel-listener-mode-map}"
   (setq-local comint-prompt-regexp fuel-con--prompt-regex)
@@ -274,14 +266,20 @@ the vocabulary name."
 (fuel-menu--defmenu listener fuel-listener-mode-map
   ("Complete symbol" ((kbd "TAB") (kbd "M-TAB"))
    fuel-completion--complete-symbol :enable (symbol-at-point))
+  --
   ("Edit word or vocab at point" "\M-." fuel-edit-word-at-point)
   ("Edit vocabulary" "\C-c\C-v" fuel-edit-vocabulary)
   --
-  ("Word help" "\C-c\C-w" fuel-help)
-  ("Apropos" "\C-c\C-p" fuel-apropos)
-  (mode "Autodoc mode" "\C-c\C-a" fuel-autodoc-mode)
+  ("Help on word" "\C-c\C-w" fuel-help)
+  ("Apropos..." "\C-c\C-p" fuel-apropos)
   (mode "Show stack mode" "\C-c\C-s" fuel-stack-mode)
   --
+  (menu "Crossref"
+        ("Word callers" "\C-c\M-<"
+         fuel-show-callers :enable (symbol-at-point))
+        ("Word callees" "\C-c\M->"
+         fuel-show-callees :enable (symbol-at-point))
+        (mode "Autodoc mode" "\C-c\C-a" fuel-autodoc-mode))
   ("Run file" "\C-c\C-k" fuel-run-file)
   ("Refresh vocabs" "\C-c\C-r" fuel-refresh-all))
 
