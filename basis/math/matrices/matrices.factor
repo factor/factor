@@ -222,7 +222,7 @@ ERROR: negative-power-matrix m n ;
 : cov-matrix-ddof ( matrix ddof -- cov )
     '[ _ cov-ddof ] cartesian-matrix-column-map ; inline
 
-: cov-matrix ( matrix -- cov ) 0 cov-matrix-ddof ; inline
+: population-cov-matrix ( matrix -- cov ) 0 cov-matrix-ddof ; inline
 
 : sample-cov-matrix ( matrix -- cov ) 1 cov-matrix-ddof ; inline
 
