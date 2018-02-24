@@ -5,7 +5,7 @@ IN: minesweeper
 ARTICLE: "minesweeper" "Minesweeper"
 "The game starts with a grid of cells. Some cells contain a mine, others do not. If you click on a cell containing a mine, you " { $strong "lose" } " (it blows up!). If you click on all the cells (without clicking on any mines), you " { $strong "win" } "!"
 $nl
-"Three levels of difficulties are available:"
+"Three levels of difficulty are available:"
 $nl
 { $table
     { { $strong "Difficulty" } { $strong "Grid Size" } { $strong "Mines" } }
@@ -21,9 +21,10 @@ $nl
 "Clicking on a cell which doesn't have a mine reveals the number of neighboring cells that contain mines. Use this information (plus good guessing!) to avoid the mines."
 $nl
 "To open a cell, point at the cell with your mouse and click on it. The first cell you click to open is never a mine."
-$nl "Every cell has up to 8 neighbors: the cells adjacent above, below, left, right, and all 4 diagonals. The cells on the sides of the board (and its corners) have fewer neighbors."
 $nl
-"If you open a cell with no neighboring mines all of its neighbors will automatically open. This can sometimes be a large area."
+"Every cell has up to " { $snippet "8" } " neighbors: the cells adjacent above, below, left, right, and all " { $snippet "4" } " diagonals. The cells on the sides of the board (and its corners) have fewer neighbors."
+$nl
+"If you open a cell with " { $snippet "0" } " neighboring mines, all of its neighbors will automatically open. This can sometimes be a large area."
 $nl
 "To flag a cell you think is a mine, point and right-click (or hover with the mouse and press " { $snippet "SPACE" } "). Do this again to mark with a question mark symbol (useful if you are unsure about a cell). Do this again to return the cell to blank."
 $nl
