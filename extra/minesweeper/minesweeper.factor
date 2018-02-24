@@ -137,21 +137,20 @@ M: grid-gadget ungraft*
 M: grid-gadget pref-dim*
     cells>> cells-dim [ 32 * ] bi@ swap 58 + 2array ;
 
-:: cell-image-path ( cell game-over? -- image-path )
-    game-over? cell mined?>> and [
-        cell state>> +clicked+ = "mineclicked.gif" "mine.gif" ?
+:: cell-image-path ( cell won? lost? -- image-path )
+    won? lost? or cell mined?>> and [
+        cell state>> {
+            { +flagged+ [ "flagged.gif" ] }
+            { +clicked+ [ "mineclicked.gif" ] }
+            [ drop won? "flagged.gif" "mine.gif" ? ]
+        } case
     ] [
-        cell state>>
-        {
+        cell state>> {
             { +question+ [ "question.gif" ] }
-            { +flagged+ [ game-over? "misflagged.gif" "flagged.gif" ? ] }
+            { +flagged+ [ lost? "misflagged.gif" "flagged.gif" ? ] }
             { +clicked+ [
-                cell mined?>> [
-                    "mine.gif"
-                ] [
-                    cell #adjacent>> 0 or number>string
-                    "open" ".gif" surround
-                ] if ] }
+                cell #adjacent>> 0 or number>string
+                "open" ".gif" surround ] }
             { f [ "blank.gif" ] }
         } case
     ] if "vocab:minesweeper/_resources/" prepend ;
@@ -172,7 +171,7 @@ M: grid-gadget pref-dim*
     [ dim>> [ 2 /i ] map ] [ draw-scaled-texture ] bi ;
 
 :: draw-mines ( n gadget -- )
-    n "%03d" sprintf [
+    gadget cells>> won? 0 n ? "%03d" sprintf [
         26 * 3 + 6 2array [
             digit-image-path gadget draw-cached-texture
         ] with-translation
@@ -196,10 +195,10 @@ M: grid-gadget pref-dim*
     ] each-index ;
 
 :: draw-cells ( gadget -- )
-    gadget cells>> game-over? :> game-over?
+    gadget cells>> [ won? ] [ lost? ] bi :> ( won? lost? )
     gadget cells>> [| row col cell |
         col row [ 32 * ] bi@ 58 + 2array [
-            cell game-over? cell-image-path
+            cell won? lost? cell-image-path
             gadget draw-cached-texture
         ] with-translation
     ] each-cell ;
