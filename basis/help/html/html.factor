@@ -5,8 +5,8 @@ debugger fry help help.home help.topics help.vocabs html
 html.streams io.directories io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.pathnames kernel
 locals make math math.parser memoize namespaces sequences
-sequences.deep serialize sorting splitting tools.completion
-vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
+serialize sorting splitting tools.completion vocabs
+vocabs.hierarchy words xml.data xml.syntax xml.traversal
 xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
