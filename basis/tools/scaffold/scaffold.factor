@@ -1,4 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays calendar
 classes combinators combinators.short-circuit fry hashtables
@@ -272,7 +273,19 @@ PRIVATE>
 : scaffold-platforms ( vocab platforms -- )
     [ "platforms.txt" ] dip scaffold-metadata ;
 
+: vocab-root-index ( vocab-root -- i/f )
+    vocab-roots get index ;
+
+: check-shadowed ( vocab-root string -- )
+    [ vocab-root-index ] [ find-vocab-root dup vocab-root-index ] bi*
+    swapd 2dup and [
+        < [ drop ] [
+            "Vocab with this name already exists in " prepend throw
+        ] if
+    ] [ 3drop ] if ;
+
 : scaffold-vocab ( vocab-root string -- )
+    2dup check-shadowed
     {
         [ scaffold-directory ]
         [ scaffold-main ]

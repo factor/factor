@@ -1,4 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup io.streams.string kernel sequences
 tools.scaffold tools.scaffold.private tools.test unicode ;
@@ -38,3 +39,20 @@ IN: tools.scaffold.tests
 : test-maybe ( obj -- obj/f ) ;
 
 { } [ \ test-maybe (help.) ] unit-test
+
+[ "resource:work" "math" check-shadowed ]
+[
+    "Vocab with this name already exists in resource:core" =
+] must-fail-with
+
+[ "resource:core" "math" check-shadowed ]
+[
+    "Vocab with this name already exists in resource:core" =
+] must-fail-with
+
+[ "resource:extra" "sequences.extras" check-shadowed ]
+[
+    "Vocab with this name already exists in resource:extra" =
+] must-fail-with
+
+{ } [ "resource:core" "sequences.extras" check-shadowed ] unit-test
