@@ -127,7 +127,7 @@ M: pathname url-of
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
-    all-disk-vocabs-recursive no-roots remove-redundant-prefixes
+    all-disk-vocabs-recursive no-roots no-prefixes
     [ vocab-name "scratchpad" = ] reject ;
 
 : all-topics ( -- topics )

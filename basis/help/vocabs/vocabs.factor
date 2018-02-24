@@ -27,7 +27,7 @@ IN: help.vocabs
     $heading ;
 
 : $vocabs ( seq -- )
-    convert-prefixes [ vocab-row ] map vocab-headings prefix $table ;
+    [ vocab-row ] map vocab-headings prefix $table ;
 
 : $vocab-roots ( assoc -- )
     [
