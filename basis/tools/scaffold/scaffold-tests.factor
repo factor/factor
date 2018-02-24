@@ -38,3 +38,20 @@ IN: tools.scaffold.tests
 : test-maybe ( obj -- obj/f ) ;
 
 { } [ \ test-maybe (help.) ] unit-test
+
+[ "resource:work" "math" check-shadowed ]
+[
+    "Vocab with this name already exists in resource:core" =
+] must-fail-with
+
+[ "resource:core" "math" check-shadowed ]
+[
+    "Vocab with this name already exists in resource:core" =
+] must-fail-with
+
+[ "resource:extra" "sequences.extras" check-shadowed ]
+[
+    "Vocab with this name already exists in resource:extra" =
+] must-fail-with
+
+{ } [ "resource:core" "sequences.extras" check-shadowed ] unit-test
