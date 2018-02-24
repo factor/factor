@@ -173,7 +173,7 @@ M: grid-gadget pref-dim*
     [ dim>> [ 2 /i ] map ] [ draw-scaled-texture ] bi ;
 
 :: draw-hint ( gadget -- )
-    gadget hint?>> t eq? [
+    gadget hint?>> "xyzzy" sequence= [
         gadget hand-rel first2 :> ( w h )
         h 58 >= [
             h 58 - w [ 32 /i ] bi@ :> ( row col )
@@ -222,6 +222,11 @@ M: grid-gadget pref-dim*
         gadget end>> now or swap time- duration>seconds
     ] [ 0 ] if* ;
 
+M: grid-gadget handle-gesture
+    over { [ key-down? ] [ sym>> length 1 = ] } 1&& [
+        2dup [ sym>> first ] [ hint?>> ] bi* circular-push
+    ] when call-next-method ;
+
 M: grid-gadget draw-gadget*
     {
         [ draw-hint ]
@@ -265,23 +270,6 @@ M: grid-gadget draw-gadget*
         ] unless
     ] when gadget relayout-1 ;
 
-:: on-x ( gadget -- )
-    gadget hint?>> t eq? [
-        CHAR: x gadget hint?>> circular-push
-    ] unless ;
-
-:: on-y ( gadget -- )
-    gadget hint?>> t eq? [
-        CHAR: y gadget hint?>> circular-push
-        gadget hint?>> "xyzzy" sequence=
-        [ t gadget hint?<< ] when
-    ] unless ;
-
-:: on-z ( gadget -- )
-    gadget hint?>> t eq? [
-        CHAR: z gadget hint?>> circular-push
-    ] unless ;
-
 : new-game ( gadget rows cols mines -- )
     [ make-cells ] dip place-mines update-counts >>cells
     f >>start f >>end relayout-window ;
@@ -304,9 +292,6 @@ grid-gadget "gestures" [
         { T{ button-up { # 1 } } [ on-click ] }
         { T{ button-up { # 3 } } [ on-mark ] }
         { T{ key-down { sym " " } } [ on-mark ] }
-        { T{ key-down { sym "x" } } [ on-x ] }
-        { T{ key-down { sym "y" } } [ on-y ] }
-        { T{ key-down { sym "z" } } [ on-z ] }
         { motion [ relayout-1 ] }
     } assoc-union
 ] change-word-prop
