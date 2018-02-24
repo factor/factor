@@ -255,11 +255,11 @@ M: grid-gadget draw-gadget*
     [ make-cells ] dip place-mines update-counts >>cells
     f >>start f >>end relayout-window ;
 
-: com-easy ( gadget -- ) 7 7 10 new-game ;
+: com-easy ( gadget -- ) 8 8 10 new-game ;
 
-: com-medium ( gadget -- ) 15 15 40 new-game ;
+: com-medium ( gadget -- ) 16 16 40 new-game ;
 
-: com-hard ( gadget -- ) 15 30 99 new-game ;
+: com-hard ( gadget -- ) 16 30 99 new-game ;
 
 grid-gadget "toolbar" f {
     { T{ key-down { sym "1" } } com-easy }
@@ -280,7 +280,7 @@ TUPLE: minesweeper-gadget < track ;
 
 : <minesweeper-gadget> ( -- gadget )
     vertical minesweeper-gadget new-track
-    7 7 10 <grid-gadget>
+    8 8 10 <grid-gadget>
     [ <toolbar> format-toolbar f track-add ]
     [ 1 track-add ] bi ;
 
