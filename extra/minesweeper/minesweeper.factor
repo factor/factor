@@ -1,12 +1,13 @@
 ! Copyright (C) 2017 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs calendar colors.constants
-combinators combinators.short-circuit destructors formatting fry
-images.loader kernel locals math math.order math.parser
-namespaces opengl opengl.textures random sequences timers ui
-ui.commands ui.gadgets ui.gadgets.toolbar ui.gadgets.tracks
-ui.gadgets.worlds ui.gestures ui.pens.solid ui.render words ;
+USING: accessors arrays assocs calendar circular
+colors.constants combinators combinators.short-circuit
+destructors formatting fry images.loader kernel locals math
+math.order math.parser namespaces opengl opengl.textures random
+sequences timers ui ui.commands ui.gadgets ui.gadgets.toolbar
+ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.pens.solid
+ui.render words ;
 
 IN: minesweeper
 
@@ -114,7 +115,7 @@ DEFER: click-cell-at
         } case >>state drop t
     ] [ f ] if* ;
 
-TUPLE: grid-gadget < gadget cells timer textures start end ;
+TUPLE: grid-gadget < gadget cells timer textures start end hint? ;
 
 :: <grid-gadget> ( rows cols mines -- gadget )
     grid-gadget new
@@ -122,7 +123,8 @@ TUPLE: grid-gadget < gadget cells timer textures start end ;
         mines place-mines update-counts >>cells
         H{ } clone >>textures
         dup '[ _ relayout-1 ] f 1 seconds <timer> >>timer
-        COLOR: gray <solid> >>interior ;
+        COLOR: gray <solid> >>interior
+        "12345" <circular> >>hint? ;
 
 M: grid-gadget graft*
     [ timer>> start-timer ] [ call-next-method ] bi ;
@@ -170,6 +172,18 @@ M: grid-gadget pref-dim*
     textures>> [ load-image { 0 0 } <texture> ] cache
     [ dim>> [ 2 /i ] map ] [ draw-scaled-texture ] bi ;
 
+:: draw-hint ( gadget -- )
+    gadget hint?>> t eq? [
+        gadget hand-rel first2 :> ( w h )
+        h 58 >= [
+            h 58 - w [ 32 /i ] bi@ :> ( row col )
+            gadget cells>> row col cell-at [
+                mined?>> COLOR: black COLOR: white ? gl-color
+                { 0 0 } { 1 1 } gl-fill-rect
+            ] when*
+        ] when
+    ] when ;
+
 :: draw-mines ( n gadget -- )
     gadget cells>> won? 0 n ? "%03d" sprintf [
         26 * 3 + 6 2array [
@@ -210,6 +224,7 @@ M: grid-gadget pref-dim*
 
 M: grid-gadget draw-gadget*
     {
+        [ draw-hint ]
         [ cells>> #mines-remaining ]
         [ draw-mines ]
         [ draw-smiley ]
@@ -250,6 +265,23 @@ M: grid-gadget draw-gadget*
         ] unless
     ] when gadget relayout-1 ;
 
+:: on-x ( gadget -- )
+    gadget hint?>> t eq? [
+        CHAR: x gadget hint?>> circular-push
+    ] unless ;
+
+:: on-y ( gadget -- )
+    gadget hint?>> t eq? [
+        CHAR: y gadget hint?>> circular-push
+        gadget hint?>> "xyzzy" sequence=
+        [ t gadget hint?<< ] when
+    ] unless ;
+
+:: on-z ( gadget -- )
+    gadget hint?>> t eq? [
+        CHAR: z gadget hint?>> circular-push
+    ] unless ;
+
 : new-game ( gadget rows cols mines -- )
     [ make-cells ] dip place-mines update-counts >>cells
     f >>start f >>end relayout-window ;
@@ -272,6 +304,10 @@ grid-gadget "gestures" [
         { T{ button-up { # 1 } } [ on-click ] }
         { T{ button-up { # 3 } } [ on-mark ] }
         { T{ key-down { sym " " } } [ on-mark ] }
+        { T{ key-down { sym "x" } } [ on-x ] }
+        { T{ key-down { sym "y" } } [ on-y ] }
+        { T{ key-down { sym "z" } } [ on-z ] }
+        { motion [ relayout-1 ] }
     } assoc-union
 ] change-word-prop
 
