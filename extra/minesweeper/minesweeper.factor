@@ -7,7 +7,7 @@ destructors formatting fry images.loader kernel locals math
 math.order math.parser namespaces opengl opengl.textures random
 sequences timers ui ui.commands ui.gadgets ui.gadgets.toolbar
 ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.pens.solid
-ui.render words ;
+ui.render ui.tools.browser words ;
 
 IN: minesweeper
 
@@ -202,7 +202,7 @@ M: grid-gadget pref-dim*
 
 :: draw-timer ( n gadget -- )
     gadget pref-dim first :> width
-    n "%03d" sprintf [
+    n 999 min "%03d" sprintf [
         3 swap - 26 * width swap - 3 - 6 2array [
             digit-image-path gadget draw-cached-texture
         ] with-translation
@@ -280,10 +280,13 @@ M: grid-gadget draw-gadget*
 
 : com-hard ( gadget -- ) 16 30 99 new-game ;
 
+: com-help ( gadget -- ) drop "minesweeper" com-browse ;
+
 grid-gadget "toolbar" f {
     { T{ key-down { sym "1" } } com-easy }
     { T{ key-down { sym "2" } } com-medium }
     { T{ key-down { sym "3" } } com-hard }
+    { T{ key-down { sym "?" } } com-help }
 } define-command-map
 
 grid-gadget "gestures" [
