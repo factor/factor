@@ -16,9 +16,6 @@ IN: math.statistics
 : mean ( seq -- x )
     0 mean-ddof ; inline
 
-: unbiased-mean ( seq -- x )
-    1 mean-ddof ; inline
-
 : sum-of-squares ( seq -- x )
     [ sq ] map-sum ; inline
 
