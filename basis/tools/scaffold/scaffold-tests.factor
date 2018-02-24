@@ -1,4 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup io.streams.string kernel sequences
 tools.scaffold tools.scaffold.private tools.test unicode ;

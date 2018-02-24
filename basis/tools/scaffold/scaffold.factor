@@ -1,4 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays calendar
 classes combinators combinators.short-circuit fry hashtables
