@@ -1,9 +1,9 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences sorting tools.coverage
-tools.coverage.private tools.coverage.testvocab tools.coverage.testvocab.child
-tools.coverage.testvocab.private tools.test vocabs.loader ;
-IN: tools.coverage.tests
+tools.coverage.private tools.coverage.testvocab
+tools.coverage.testvocab.child tools.coverage.testvocab.private
+tools.test vocabs.loader ;
 
 { "foo.private" } [ "foo" private-vocab-name ] unit-test
 { "foo.private" } [ "foo.private" private-vocab-name ] unit-test

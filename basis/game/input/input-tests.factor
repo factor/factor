@@ -1,6 +1,5 @@
 USING: ui game.input tools.test kernel system threads calendar
 combinators.short-circuit ;
-IN: game.input.tests
 
 ! os { [ windows? ] [ macosx? ] } 1|| [
 ! This test only works if a mouse is present. Issue #1844

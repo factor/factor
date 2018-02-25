@@ -1,16 +1,12 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make sequences sequences.product tools.test ;
-IN: sequences.product.tests
-
 
 { { { 0 "a" } { 1 "a" } { 2 "a" } { 0 "b" } { 1 "b" } { 2 "b" } } }
 [ { { 0 1 2 } { "a" "b" } } <product-sequence> >array ] unit-test
 
-: x ( n s -- sss ) <repetition> concat ;
-
 { { "a" "aa" "aaa" "b" "bb" "bbb" } }
-[ { { 1 2 3 } { "a" "b" } } [ first2 x ] product-map ] unit-test
+[ { { 1 2 3 } { "a" "b" } } [ first2 <repetition> concat ] product-map ] unit-test
 
 {
     {

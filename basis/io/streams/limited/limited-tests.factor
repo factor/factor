@@ -1,10 +1,8 @@
-USING: accessors continuations destructors io io.encodings
-io.encodings.ascii io.encodings.binary
-io.encodings.string io.encodings.utf8 io.files io.pipes
-io.streams.byte-array io.streams.duplex io.streams.limited io.streams.string
-kernel namespaces strings tools.test system
-io.encodings.8-bit.latin1 ;
-IN: io.streams.limited.tests
+USING: destructors io io.encodings io.encodings.8-bit.latin1
+io.encodings.ascii io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files io.pipes io.streams.byte-array
+io.streams.duplex io.streams.limited io.streams.string kernel
+namespaces strings tools.test ;
 
 { } [
     "hello world\nhow are you today\nthis is a very long line indeed"
@@ -25,7 +23,6 @@ IN: io.streams.limited.tests
 
 { f } [ "decoded" get stream-readln ] unit-test
 
-
 { } [
     "abc\ndef\nghi"
     ascii encode binary <byte-reader> "data" set
@@ -37,7 +34,6 @@ IN: io.streams.limited.tests
 [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
 
 { "" f } [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
-
 
 { CHAR: a }
 [ "a" <string-reader> 1 <limited-stream> stream-read1 ] unit-test

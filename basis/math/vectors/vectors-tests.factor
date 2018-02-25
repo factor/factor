@@ -1,4 +1,3 @@
-IN: math.vectors.tests
 USING: math.vectors tools.test kernel specialized-arrays compiler
 kernel.private alien.c-types math.functions ;
 SPECIALIZED-ARRAY: int
@@ -35,7 +34,6 @@ SPECIALIZED-ARRAY: int
 
 { 1 } [ { C{ 0 1 } } dup h. ] unit-test
 
-
 { { 1 2 3 } } [
     { t t t } [ { 1 2 3 } ] [ { 4 5 6 } ] vif
 ] unit-test
@@ -48,7 +46,6 @@ SPECIALIZED-ARRAY: int
     { t f t } [ { 1 2 3 } ] [ { 4 5 6 } ] vif
 ] unit-test
 
-! vclamp
 { { 0 30 100 } } [
     { -10 30 120 } { 0 0 0 } { 100 100 100 } vclamp
 ] unit-test

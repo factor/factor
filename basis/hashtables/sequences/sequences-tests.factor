@@ -4,8 +4,6 @@
 USING: assocs hashtables.sequences kernel literals sequences
 tools.test ;
 
-IN: hashtables.sequences.tests
-
 { 1000 } [ 0 4 "asdf" <slice> SH{ { "asdf" 1000 } } at ] unit-test
 
 { 1001 } [

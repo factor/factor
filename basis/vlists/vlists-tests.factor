@@ -1,6 +1,5 @@
 USING: vlists kernel persistent.sequences arrays tools.test
 namespaces accessors sequences assocs ;
-IN: vlists.tests
 
 { { "hi" "there" } }
 [ VL{ } "hi" swap ppush "there" swap ppush >array ] unit-test

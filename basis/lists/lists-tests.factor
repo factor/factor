@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test lists math kernel ;
-IN: lists.tests
 
 { { 3 4 5 6 7 } } [
     { 1 2 3 4 5 } sequence>list [ 2 + ] lmap list>array

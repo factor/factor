@@ -1,6 +1,5 @@
-IN: search-deques.tests
-USING: search-deques tools.test namespaces
-kernel sequences words deques vocabs dlists ;
+USING: deques dlists kernel namespaces sequences tools.test
+vocabs ;
 
 <hashed-dlist> "h" set
 
