@@ -14,7 +14,7 @@ SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
 
-ERROR: vocab-must-not-exist string ;
+ERROR: vocab-must-not-exist name root ;
 
 <PRIVATE
 
@@ -31,7 +31,7 @@ ERROR: vocab-must-not-exist string ;
     [ check-root ] [ check-vocab-name ] bi* ;
 
 : check-vocab-exists ( string -- string )
-    dup vocab-exists? [ vocab-must-not-exist ] when ;
+    dup vocab-exists? [ dup find-vocab-root vocab-must-not-exist ] when ;
 
 : replace-vocab-separators ( vocab -- path )
     path-separator first CHAR: . associate substitute ; inline
@@ -132,8 +132,10 @@ ERROR: vocab-must-not-exist string ;
         { "exemplar" object }
         { "assoc" assoc }
         { "alist" "an array of key/value pairs" }
-        { "keys" sequence } { "values" sequence }
-        { "class" class } { "tuple" tuple }
+        { "keys" sequence }
+        { "values" sequence }
+        { "class" class }
+        { "tuple" tuple }
         { "url" url }
     } at* [ swap [ \ $maybe swap 2array ] when ] dip ;
 
