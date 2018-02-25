@@ -150,6 +150,7 @@ ARTICLE: "db.types" "Database types"
 { $subsections
     +db-assigned-id+
     +foreign-id+
+    +primary-key+
     +user-assigned-id+
     +random-id+
 }
