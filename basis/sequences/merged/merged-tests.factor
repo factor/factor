@@ -1,5 +1,4 @@
 USING: sequences sequences.merged tools.test ;
-IN: sequences.merged.tests
 
 { 0 { 1 2 } } [ 0 T{ merged f { { 1 2 } { 3 4 } } } virtual@ ] unit-test
 { 0 { 3 4 } } [ 1 T{ merged f { { 1 2 } { 3 4 } } } virtual@ ] unit-test

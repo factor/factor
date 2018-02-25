@@ -1,4 +1,3 @@
-IN: vocabs.refresh.tests
 USING: vocabs.refresh tools.test continuations namespaces ;
 
 { } [

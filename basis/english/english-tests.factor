@@ -1,6 +1,6 @@
-USING: accessors arrays assocs english.private help.markup kernel math
-math.parser sequences strings tools.test ;
-IN: english
+USING: arrays assocs english help.markup kernel math sequences
+strings tools.test ;
+FROM: english => a/an ;
 
 { "record" }  [ "records" singularize ] unit-test
 { "record" }  [ "record" singularize ] unit-test

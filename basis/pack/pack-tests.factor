@@ -1,6 +1,5 @@
 USING: alien.c-types io io.streams.string kernel make namespaces
 pack pack.private strings tools.test ;
-IN: pack.tests
 
 { B{ 1 0 2 0 0 3 0 0 0 4 0 0 0 0 0 0 0 5 } } [
     { 1 2 3 4 5 }
@@ -49,10 +48,7 @@ IN: pack.tests
 [ "iii" pack ] must-infer
 [ "iii" unpack ] must-infer
 
-: test-pack ( str -- ba )
-    "iii" pack ;
-
-[ test-pack ] must-infer
+[ "iii" pack ] must-infer
 
 { "c" } [ "1c" expand-pack-format ] unit-test
 { "cccc" } [ "4c" expand-pack-format ] unit-test
