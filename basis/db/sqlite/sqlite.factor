@@ -161,6 +161,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         { +user-assigned-id+ { f f f } }
         { +random-id+ { "integer" "integer" f } }
         { +foreign-id+ { "integer" "integer" "references" } }
+        { +primary-key+ { f f "primary key" } }
 
         { +on-update+ { f f "on update" } }
         { +on-delete+ { f f "on delete" } }
