@@ -20,12 +20,12 @@ IN: machine-learning.decision-trees
     [ [ entropy2 ] [ length ] bi * ] map-sum ; inline
 
 :: average-gain ( dataset idx -- gain )
-    dataset target>> :> target
-    dataset data>> :> data
-    data target zip :> data-target
-    data-target idx subsets-weighted-entropy :> weighted
+    dataset targets>> :> targets
+    dataset features>> :> features
+    features targets zip :> features-targets
+    features-targets idx subsets-weighted-entropy :> weighted
 
-    target entropy2 weighted data length / - ;
+    targets entropy2 weighted features length / - ;
 
 : highest-gain-index ( dataset -- idx )
     dup feature-names>> length <iota> [
