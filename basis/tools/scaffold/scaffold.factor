@@ -14,7 +14,7 @@ SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
 
-ERROR: vocab-must-not-exist name root ;
+ERROR: vocab-must-not-exist string ;
 
 <PRIVATE
 
@@ -31,7 +31,7 @@ ERROR: vocab-must-not-exist name root ;
     [ check-root ] [ check-vocab-name ] bi* ;
 
 : check-vocab-exists ( string -- string )
-    dup vocab-exists? [ dup find-vocab-root vocab-must-not-exist ] when ;
+    dup vocab-exists? [ vocab-must-not-exist ] when ;
 
 : replace-vocab-separators ( vocab -- path )
     path-separator first CHAR: . associate substitute ; inline
