@@ -95,7 +95,6 @@ SYNTAX: 8-BIT: scan-token scan-token scan-token load-encoding ;
 ! 8-BIT: mac-icelandic mac-icelandic ICELAND
 ! 8-BIT: mac-latin2 mac-latin2 LATIN2
 ! 8-BIT: mac-turkish mac-turkish TURKISH
-8-BIT: windows-874 windows-874 CP874
 8-BIT: windows-1250 windows-1250 CP1250
 8-BIT: windows-1251 windows-1251 CP1251
 8-BIT: windows-1252 windows-1252 CP1252
