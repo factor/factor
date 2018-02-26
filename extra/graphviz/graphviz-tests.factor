@@ -1,6 +1,6 @@
 USING: accessors arrays assocs continuations formatting graphviz
 graphviz.notation graphviz.render graphviz.render.private
-images.loader.private io.directories io.encodings.8-bit.latin1
+images.loader.private io.directories io.encodings.8-bit
 io.encodings.ascii io.encodings.utf8 io.files io.launcher kernel
 locals make math math.combinatorics math.parser namespaces
 sequences sequences.extras sets splitting system tools.test ;
