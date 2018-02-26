@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: graphviz help.markup help.syntax images.viewer
-io.encodings.8-bit.latin1 io.encodings.utf8 io.launcher kernel
+io.encodings.8-bit io.encodings.utf8 io.launcher kernel
 strings ;
 IN: graphviz.render
 

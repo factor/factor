@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
 alien.strings assocs byte-arrays classes.struct combinators
-combinators.short-circuit destructors fry io io.backend io.binary
-io.buffers io.encodings.8-bit.latin1 io.encodings.utf8 io.files
-io.pathnames io.ports io.sockets io.sockets.secure io.timeouts kernel
-libc locals math math.functions math.order math.parser memoize
-namespaces openssl openssl.libcrypto openssl.libssl random sequences
-sets splitting unicode ;
+combinators.short-circuit destructors fry io io.backend
+io.binary io.buffers io.encodings.8-bit io.encodings.utf8
+io.files io.pathnames io.ports io.sockets io.sockets.secure
+io.timeouts kernel libc locals math math.functions math.order
+math.parser memoize namespaces openssl openssl.libcrypto
+openssl.libssl random sequences sets splitting unicode ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )

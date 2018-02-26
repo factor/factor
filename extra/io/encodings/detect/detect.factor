@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators continuations fry io
-io.encodings io.encodings.8-bit.latin1 io.encodings.ascii
+io.encodings io.encodings.8-bit io.encodings.ascii
 io.encodings.binary io.encodings.iana io.encodings.string
 io.encodings.utf16 io.encodings.utf32 io.encodings.utf8
 io.files io.streams.string kernel literals math namespaces

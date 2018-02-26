@@ -1,6 +1,6 @@
 USING: alien alien.c-types alien.data arrays classes.struct
 compiler.units continuations destructors fry generic.single io
-io.backend io.directories io.encodings io.encodings.8-bit.latin1
+io.backend io.directories io.encodings io.encodings.8-bit
 io.encodings.ascii io.encodings.binary io.encodings.string
 io.encodings.utf16 io.encodings.utf8 io.files io.files.private
 io.pathnames kernel locals make math sequences

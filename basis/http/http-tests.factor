@@ -3,7 +3,7 @@ http.client.private tools.test multiline fry io.streams.string io.crlf
 io.encodings.utf8 io.encodings.8-bit io.encodings.binary io.encodings.string
 io.encodings.ascii kernel arrays splitting sequences assocs io.sockets db
 db.sqlite make continuations urls hashtables accessors namespaces xml.data
-io.encodings.8-bit.latin1 random combinators.short-circuit literals ;
+random combinators.short-circuit literals ;
 IN: http.tests
 
 { "text/plain" "UTF-8" } [ "text/plain" parse-content-type ] unit-test
