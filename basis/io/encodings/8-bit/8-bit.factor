@@ -22,14 +22,10 @@ TUPLE: 8-bit { biassoc biassoc read-only } ;
 M: 8-bit encode-char
     swap [ 8-bit-encode ] dip stream-write1 ;
 
-M: 8-bit encode-string
-    swap [ '[ _ 8-bit-encode ] B{ } map-as ] dip stream-write ;
-
 M: 8-bit decode-char
-    swap stream-read1 dup
+    swap stream-read1
     [ swap biassoc>> at [ replacement-char ] unless* ]
-    [ 2drop f ]
-    if ;
+    [ drop f ] if* ;
 
 MIXIN: 8-bit-encoding
 
