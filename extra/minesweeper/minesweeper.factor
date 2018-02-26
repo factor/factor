@@ -223,7 +223,9 @@ M: grid-gadget pref-dim*
     ] [ 0 ] if* ;
 
 M: grid-gadget handle-gesture
-    over { [ key-down? ] [ sym>> length 1 = ] } 1&& [
+    over {
+        [ key-down? ] [ sym>> length 1 = ] [ sym>> " " = not ]
+    } 1&& [
         2dup [ sym>> first ] [ hint?>> ] bi* circular-push
     ] when call-next-method ;
 
