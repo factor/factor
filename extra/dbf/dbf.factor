@@ -50,7 +50,7 @@ CONSTANT: dbf-encodings H{
     { 0x4D "cp936" }
     { 0x4E "cp949" }
     { 0x4F "cp950" }
-    { 0x50 "cp874" }
+    { 0x50 windows-874 }
     { 0x57 windows-1252 }
     { 0x58 windows-1252 }
     { 0x59 windows-1252 }
@@ -67,7 +67,7 @@ CONSTANT: dbf-encodings H{
     { 0x79 "cp949" }
     { 0x7a "cp936" }
     { 0x7b "cp932" }
-    { 0x7c "cp874" }
+    { 0x7c windows-874 }
     { 0x7d windows-1255 }
     { 0x7e windows-1256 }
     { 0x86 "cp737" }
