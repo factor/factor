@@ -19,11 +19,9 @@ HOOK: cert-path os ( -- path/f )
 
 M: object cert-path f ;
 
-M: macosx cert-path
-    home "config/mac_app.cer" append-path ;
+M: macosx cert-path "~/config/mac_app.cer" ;
 
-M: windows cert-path
-    home "config/FactorSPC.pfx" append-path ;
+M: windows cert-path "~/config/FactorSPC.pfx" ;
 >>
 
 HOOK: sign-factor-app os ( -- )
