@@ -126,9 +126,9 @@ ARTICLE: "rc-files" "Running code on startup"
 $nl
 "If you are unsure where the files should be located, evaluate the following code:"
 { $code
-    "USE: command-line"
-    "\".factor-rc\" rc-path print"
-    "\".factor-boot-rc\" rc-path print"
+    "USING: io io.pathnames ;"
+    "\"~/.factor-rc\" absolute-path print"
+    "\"~/.factor-boot-rc\" absolute-path print"
 }
 "Here is an example " { $snippet ".factor-boot-rc" } " which sets up your developer name:"
 { $code
