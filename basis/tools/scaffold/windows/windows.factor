@@ -4,4 +4,4 @@ USING: io.pathnames system tools.scaffold windows.shell32 ;
 IN: tools.scaffold.windows
 
 M: windows scaffold-emacs ( -- )
-    application-data ".emacs" append-path touch. ;
+    application-data ".emacs" append-path scaffold-file ;
