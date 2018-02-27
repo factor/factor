@@ -5,7 +5,7 @@ USING: accessors calendar combinators.short-circuit environment
 formatting io io.directories io.encodings.utf8 io.files
 io.files.info io.files.info.unix io.files.trash io.files.types
 io.pathnames kernel math math.parser sequences system unix.stat
-unix.users ;
+unix.users xdg ;
 
 IN: io.files.trash.unix
 
@@ -31,9 +31,7 @@ IN: io.files.trash.unix
     } 1&& [ "invalid trash path" throw ] unless ;
 
 : trash-home ( -- path )
-    "XDG_DATA_HOME" os-env
-    home ".local/share" append-path or
-    "Trash" append-path dup check-trash-path ;
+    xdg-data-home "Trash" append-path dup check-trash-path ;
 
 : trash-1 ( root -- path )
     ".Trash" append-path dup check-trash-path
