@@ -3,8 +3,8 @@ USING: html.templates html.templates.fhtml io.files io.pathnames ;
 IN: editors.vim.generate-syntax
 
 : generate-vim-syntax ( -- )
-    "misc/factor.vim.fgen" resource-path <fhtml>
-    "misc/vim/syntax/factor.vim" resource-path
+    "resource:misc/factor.vim.fgen" <fhtml>
+    "resource:misc/vim/syntax/factor.vim"
     template-convert ;
 
 MAIN: generate-vim-syntax
