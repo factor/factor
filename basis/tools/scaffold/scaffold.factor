@@ -348,22 +348,22 @@ ${example-indent}}
 : scaffold-examples ( word -- )
     2 swap scaffold-n-examples ;
 
-: touch. ( path -- )
+: scaffold-file ( path -- )
     [ touch-file ]
     [ "Click to edit: " write <pathname> . ] bi ;
 
 : scaffold-factor-boot-rc ( -- )
-    "~/.factor-boot-rc" touch. ;
+    "~/.factor-boot-rc" scaffold-file ;
 
 : scaffold-factor-rc ( -- )
-    "~/.factor-rc" touch. ;
+    "~/.factor-rc" scaffold-file ;
 
 : scaffold-mason-rc ( -- )
-    "~/.factor-mason-rc" touch. ;
+    "~/.factor-mason-rc" scaffold-file ;
 
 : scaffold-factor-roots ( -- )
-    "~/.factor-roots" touch. ;
+    "~/.factor-roots" scaffold-file ;
 
 HOOK: scaffold-emacs os ( -- )
 
-M: unix scaffold-emacs ( -- ) "~/.emacs" touch. ;
+M: unix scaffold-emacs ( -- ) "~/.emacs" scaffold-file ;
