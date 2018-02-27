@@ -29,7 +29,7 @@ IN: help.pdf
     [ topic>pdf ] map <pb> 1array join ;
 
 : write-pdf ( pdf name -- )
-    [ pdf>string ] dip home prepend-path utf8 set-file-contents ;
+    [ pdf>string ] dip utf8 set-file-contents ;
 
 PRIVATE>
 
@@ -41,19 +41,19 @@ PRIVATE>
     ] [ write-pdf ] bi* ;
 
 : cookbook-pdf ( -- )
-    "cookbook" "cookbook.pdf" article-pdf ;
+    "cookbook" "~/cookbook.pdf" article-pdf ;
 
 : first-program-pdf ( -- )
-    "first-program" "first-program.pdf" article-pdf ;
+    "first-program" "~/first-program.pdf" article-pdf ;
 
 : handbook-pdf ( -- )
-    "handbook-language-reference" "handbook.pdf" article-pdf ;
+    "handbook-language-reference" "~/handbook.pdf" article-pdf ;
 
 : system-pdf ( -- )
-    "handbook-system-reference" "system.pdf" article-pdf ;
+    "handbook-system-reference" "~/system.pdf" article-pdf ;
 
 : tools-pdf ( -- )
-    "handbook-tools-reference" "tools" article-pdf ;
+    "handbook-tools-reference" "~/tools.pdf" article-pdf ;
 
 : index-pdf ( -- )
     {
@@ -62,13 +62,13 @@ PRIVATE>
         "primitive-index"
         "error-index"
         "class-index"
-    } topics>pdf "index.pdf" write-pdf ;
+    } topics>pdf "~/index.pdf" write-pdf ;
 
 : furnace-pdf ( -- )
-    "furnace" "furnace.pdf" article-pdf ;
+    "furnace" "~/furnace.pdf" article-pdf ;
 
 : alien-pdf ( -- )
-    "alien" "alien.pdf" article-pdf ;
+    "alien" "~/alien.pdf" article-pdf ;
 
 : io-pdf ( -- )
-    "io" "io.pdf" article-pdf ;
+    "io" "~/io.pdf" article-pdf ;
