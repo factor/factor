@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays io.encodings.binary io.encodings.detect
-io.encodings.latin1 io.encodings.utf16 io.encodings.utf32
-io.encodings.utf8 namespaces tools.test ;
+USING: byte-arrays io.encodings.8-bit io.encodings.binary
+io.encodings.detect io.encodings.latin1 io.encodings.utf16
+io.encodings.utf32 io.encodings.utf8 namespaces tools.test ;
 
 ! UTF encodings with BOMs
 { utf16be } [ B{ 0xFE 0xFF 0x00 0x31 0x00 0x32 0x00 0x33 } detect-byte-array ] unit-test
@@ -34,7 +34,7 @@ unit-test
 { utf8 } [ B{ 0x31 0x32 0xC2 0xA0 0x33 } detect-byte-array ] unit-test
 { latin1 } [ B{ 0x31 0x32 0xA0 0x33 } detect-byte-array ] unit-test
 { koi8-r } [
-    koi8-r default-8bit-encoding [
+    koi8-r default-encoding [
         B{ 0x31 0x32 0xA0 0x33 } detect-byte-array
     ] with-variable
 ] unit-test
