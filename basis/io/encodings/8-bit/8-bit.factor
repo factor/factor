@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.singleton generic
+USING: accessors arrays assocs classes.singleton fry generic
 hashtables io io.encodings io.encodings.iana kernel lexer parser
 sequences simple-flat-file words ;
 IN: io.encodings.8-bit
@@ -22,6 +22,9 @@ TUPLE: 8-bit { from array read-only } { to hashtable read-only } ;
 M: 8-bit encode-char
     swap [ 8-bit-encode ] dip stream-write1 ;
 
+M: 8-bit encode-string
+    swap [ '[ _ 8-bit-encode ] B{ } map-as ] dip stream-write ;
+
 M: 8-bit decode-char
     swap stream-read1 [
         swap from>> ?nth [ replacement-char ] unless*
@@ -34,8 +37,8 @@ M: 8-bit decode-char
     [ create-encoding dup ]
     [ register-encoding ]
     [ encoding-file load-codetable-file <8-bit> ] tri*
-    [ [ \ <encoder> create-method ] dip [ nip <encoder> ] curry define ]
-    [ [ \ <decoder> create-method ] dip [ nip <decoder> ] curry define ] 2bi ;
+    [ [ \ <encoder> create-method ] dip '[ drop _ <encoder> ] define ]
+    [ [ \ <decoder> create-method ] dip '[ drop _ <decoder> ] define ] 2bi ;
 
 PRIVATE>
 
