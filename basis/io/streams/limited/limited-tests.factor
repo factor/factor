@@ -1,4 +1,4 @@
-USING: destructors io io.encodings io.encodings.8-bit
+USING: destructors io io.encodings io.encodings.latin1
 io.encodings.ascii io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.pipes io.streams.byte-array
 io.streams.duplex io.streams.limited io.streams.string kernel

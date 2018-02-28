@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays io.encodings.8-bit io.encodings.binary
-io.encodings.detect io.encodings.utf16 io.encodings.utf32
+USING: byte-arrays io.encodings.binary io.encodings.detect
+io.encodings.latin1 io.encodings.utf16 io.encodings.utf32
 io.encodings.utf8 namespaces tools.test ;
 
 ! UTF encodings with BOMs
