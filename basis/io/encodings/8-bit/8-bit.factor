@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs biassocs classes.singleton generic io
-io.encodings io.encodings.iana kernel lexer parser sequences
-simple-flat-file words ;
+USING: accessors arrays assocs classes.singleton generic
+hashtables io io.encodings io.encodings.iana kernel lexer parser
+sequences simple-flat-file words ;
 IN: io.encodings.8-bit
 
 <<
@@ -11,17 +11,20 @@ IN: io.encodings.8-bit
 : encoding-file ( file-name -- stream )
     "vocab:io/encodings/8-bit/" ".TXT" surround ;
 
-TUPLE: 8-bit { table biassoc read-only } ;
+TUPLE: 8-bit { from array read-only } { to hashtable read-only } ;
+
+: <8-bit> ( biassoc -- 8-bit )
+    [ from>> 256 <iota> [ of ] with map ] [ to>> ] bi 8-bit boa ;
 
 : 8-bit-encode ( char 8-bit -- byte )
-    table>> value-at [ encode-error ] unless* ; inline
+    to>> at [ encode-error ] unless* ; inline
 
 M: 8-bit encode-char
     swap [ 8-bit-encode ] dip stream-write1 ;
 
 M: 8-bit decode-char
     swap stream-read1 [
-        swap table>> at [ replacement-char ] unless*
+        swap from>> ?nth [ replacement-char ] unless*
     ] [ drop f ] if* ;
 
 : create-encoding ( name -- word )
@@ -30,7 +33,7 @@ M: 8-bit decode-char
 : load-encoding ( name iana-name file-name -- )
     [ create-encoding dup ]
     [ register-encoding ]
-    [ encoding-file load-codetable-file 8-bit boa ] tri*
+    [ encoding-file load-codetable-file <8-bit> ] tri*
     [ [ \ <encoder> create-method ] dip [ nip <encoder> ] curry define ]
     [ [ \ <decoder> create-method ] dip [ nip <decoder> ] curry define ] 2bi ;
 
