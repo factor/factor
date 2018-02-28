@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar combinators compiler.units continuations
 graphviz.dot images.viewer io.backend io.directories
-io.encodings.8-bit io.encodings.utf8 io.files
+io.encodings.latin1 io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.standard-paths
 kernel locals make namespaces sequences summary system threads
 unicode vocabs webbrowser words ;

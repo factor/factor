@@ -1,6 +1,6 @@
 USING: destructors http http.server http.server.requests http.client
 http.client.private tools.test multiline fry io.streams.string io.crlf
-io.encodings.utf8 io.encodings.8-bit io.encodings.binary io.encodings.string
+io.encodings.utf8 io.encodings.latin1 io.encodings.binary io.encodings.string
 io.encodings.ascii kernel arrays splitting sequences assocs io.sockets db
 db.sqlite make continuations urls hashtables accessors namespaces xml.data
 random combinators.short-circuit literals ;

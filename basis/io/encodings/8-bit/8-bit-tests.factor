@@ -11,3 +11,5 @@ io.encodings.8-bit.private strings tools.test ;
 
 { t } [ \ latin1 8-bit-encoding? ] unit-test
 { "bar" } [ "bar" \ latin1 decode ] unit-test
+
+{ { 0x221a 0x00b1 0x0040 } } [ B{ 0xfb 0xf1 0x40 } cp437 decode >array ] unit-test

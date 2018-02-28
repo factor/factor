@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.data alien.enums
 alien.strings assocs byte-arrays classes.struct combinators
 combinators.short-circuit destructors fry io io.backend
-io.binary io.buffers io.encodings.8-bit io.encodings.utf8
+io.binary io.buffers io.encodings.latin1 io.encodings.utf8
 io.files io.pathnames io.ports io.sockets io.sockets.secure
 io.timeouts kernel libc locals math math.functions math.order
 math.parser memoize namespaces openssl openssl.libcrypto

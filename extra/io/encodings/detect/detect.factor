@@ -1,15 +1,14 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators continuations fry io
-io.encodings io.encodings.8-bit io.encodings.ascii
-io.encodings.binary io.encodings.iana io.encodings.string
-io.encodings.utf16 io.encodings.utf32 io.encodings.utf8
-io.files io.streams.string kernel literals math namespaces
-sequences strings ;
+USING: byte-arrays combinators continuations fry io io.encodings
+io.encodings.ascii io.encodings.binary io.encodings.iana
+io.encodings.latin1 io.encodings.string io.encodings.utf16
+io.encodings.utf32 io.encodings.utf8 io.files kernel literals
+math namespaces sequences strings ;
 IN: io.encodings.detect
 
-SYMBOL: default-8bit-encoding
-default-8bit-encoding [ latin1 ] initialize
+SYMBOL: default-encoding
+default-encoding [ latin1 ] initialize
 
 <PRIVATE
 
@@ -41,7 +40,7 @@ PRIVATE>
         { [ 0 over member? ] [ drop binary ] }
         { [ dup empty? ] [ drop utf8 ] }
         { [ dup valid-utf8? ] [ drop utf8 ] }
-        [ drop default-8bit-encoding get ]
+        [ drop default-encoding get ]
     } cond ;
 
 : detect-stream ( stream -- sample encoding )

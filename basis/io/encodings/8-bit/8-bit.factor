@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs biassocs classes.mixin classes.singleton
-fry io io.encodings io.encodings.iana kernel lexer namespaces
-parser sequences simple-flat-file ;
+USING: accessors assocs biassocs classes.singleton generic io
+io.encodings io.encodings.iana kernel lexer parser sequences
+simple-flat-file words ;
 IN: io.encodings.8-bit
 
 <<
@@ -11,41 +11,28 @@ IN: io.encodings.8-bit
 : encoding-file ( file-name -- stream )
     "vocab:io/encodings/8-bit/" ".TXT" surround ;
 
-SYMBOL: 8-bit-encodings
-8-bit-encodings [ H{ } clone ] initialize
-
-TUPLE: 8-bit { biassoc biassoc read-only } ;
+TUPLE: 8-bit { table biassoc read-only } ;
 
 : 8-bit-encode ( char 8-bit -- byte )
-    biassoc>> value-at [ encode-error ] unless* ; inline
+    table>> value-at [ encode-error ] unless* ; inline
 
 M: 8-bit encode-char
     swap [ 8-bit-encode ] dip stream-write1 ;
 
 M: 8-bit decode-char
-    swap stream-read1
-    [ swap biassoc>> at [ replacement-char ] unless* ]
-    [ drop f ] if* ;
-
-MIXIN: 8-bit-encoding
-
-M: 8-bit-encoding <encoder>
-    8-bit-encodings get-global at <encoder> ;
-
-M: 8-bit-encoding <decoder>
-    8-bit-encodings get-global at <decoder> ;
+    swap stream-read1 [
+        swap table>> at [ replacement-char ] unless*
+    ] [ drop f ] if* ;
 
 : create-encoding ( name -- word )
-    create-word-in
-    [ define-singleton-class ]
-    [ 8-bit-encoding add-mixin-instance ]
-    [ ] tri ;
+    create-word-in dup define-singleton-class ;
 
 : load-encoding ( name iana-name file-name -- )
     [ create-encoding dup ]
     [ register-encoding ]
     [ encoding-file load-codetable-file 8-bit boa ] tri*
-    swap 8-bit-encodings get-global set-at ;
+    [ [ \ <encoder> create-method ] dip [ nip <encoder> ] curry define ]
+    [ [ \ <decoder> create-method ] dip [ nip <decoder> ] curry define ] 2bi ;
 
 PRIVATE>
 
@@ -75,7 +62,7 @@ SYNTAX: 8-BIT: scan-token scan-token scan-token load-encoding ;
 8-BIT: latin/greek ISO_8859-7:1987 8859-7
 8-BIT: latin/hebrew ISO_8859-8:1988 8859-8
 8-BIT: latin/thai TIS-620 8859-11
-8-BIT: latin1 ISO_8859-1:1987 8859-1
+! 8-BIT: latin1 ISO_8859-1:1987 8859-1
 8-BIT: latin2 ISO_8859-2:1987 8859-2
 8-BIT: latin3 ISO_8859-3:1988 8859-3
 8-BIT: latin4 ISO_8859-4:1988 8859-4
