@@ -228,7 +228,8 @@ ERROR: illegal-logical value ;
     } cond ;
 
 : parse-numeric ( byte-array -- n )
-    [ "\r\n\t *" member? ] trim "," "." replace string>number ;
+    [ "\r\n\t *" member? ] trim
+    H{ { CHAR: , CHAR: . } } substitute string>number ;
 
 : parse-double ( byte-array -- n )
     dup length 8 assert= le> bits>double ;
