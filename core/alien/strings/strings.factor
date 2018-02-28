@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays byte-arrays byte-vectors init io
-io.encodings io.encodings.ascii io.encodings.latin1
-io.encodings.utf16n io.encodings.utf8 io.streams.memory kernel
-kernel.private math namespaces sequences sequences.private
-strings strings.private system system.private ;
+io.encodings io.encodings.ascii io.encodings.utf16n
+io.encodings.utf8 io.streams.memory kernel kernel.private math
+namespaces sequences sequences.private strings strings.private
+system system.private ;
 IN: alien.strings
 
 GENERIC#: alien>string 1 ( c-ptr encoding -- string/f )
@@ -31,7 +31,7 @@ M: c-ptr string>alien drop ;
 <PRIVATE
 
 : fast-string? ( string encoding -- ? )
-    swap aux>> not [ { ascii latin1 utf8 } member-eq? ] [ drop f ] if ; inline
+    swap aux>> not [ { ascii utf8 } member-eq? ] [ drop f ] if ; inline
 
 : string>alien-fast ( string encoding -- byte-array )
     { string object } declare ! aux>> must be f
