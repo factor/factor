@@ -45,6 +45,7 @@ PRIVATE>
 SYNTAX: 8-BIT: scan-token scan-token scan-token load-encoding ;
 >>
 
+8-BIT: cp424 IBM424 CP424
 8-BIT: cp437 IBM437 CP437
 8-BIT: cp500 IBM500 CP500
 8-BIT: cp775 IBM775 CP775
