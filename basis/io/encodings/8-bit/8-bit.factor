@@ -63,7 +63,9 @@ SYNTAX: 8-BIT: scan-token scan-token scan-token load-encoding ;
 8-BIT: cp869 IBM869 CP869
 8-BIT: cp1026 IBM1026 CP1026
 8-BIT: ebcdic IBM037 CP037
+8-BIT: kz1048 KZ-1048 KZ1048
 8-BIT: koi8-r KOI8-R KOI8-R
+8-BIT: koi8-u KOI8-U KOI8-U
 8-BIT: latin/arabic ISO_8859-6:1987 8859-6
 8-BIT: latin/cyrillic ISO_8859-5:1988 8859-5
 8-BIT: latin/greek ISO_8859-7:1987 8859-7
