@@ -25,7 +25,7 @@ IN: checksums.multi.tests
         }
     }
 } [
-    "LICENSE.txt" binary [
+    "resource:LICENSE.txt" binary [
         input-stream get { md5 sha1 } <multi-checksum> checksum-stream
     ] with-file-reader
 ] unit-test
