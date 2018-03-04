@@ -1,5 +1,5 @@
 
-USING: checksums checksums.metrohash tools.test ;
+USING: byte-arrays checksums checksums.metrohash tools.test ;
 
 { 17099979927131455419 } [
     "abc" T{ metrohash-64 { seed 0 } } checksum-bytes
