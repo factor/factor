@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators environment gobject-introspection.common
-gobject-introspection.ffi gobject-introspection.loader
-gobject-introspection.types io io.files io.pathnames kernel lexer
-locals make namespaces parser sequences splitting summary vocabs
-vocabs.parser xdg xml ;
+USING: accessors combinators environment
+gobject-introspection.common gobject-introspection.ffi
+gobject-introspection.loader gobject-introspection.types io
+io.files io.pathnames kernel lexer locals make namespaces parser
+sequences splitting summary vocabs vocabs.parser xdg xml ;
 IN: gobject-introspection
 
 ERROR: gir-not-found name paths ;
