@@ -13,7 +13,8 @@ $nl
 $nl
 "The " { $link checksum-bytes } " and the " { $link checksum-stream } " methods encapsulate the above protocol, including instantiation and disposal of the " { $link multi-state } " tuple."
 { $examples
-    { $unchecked-example "USING: byte-arrays checksums checksums.md5 checksums.sha ;"
+    { $example "USING: byte-arrays checksums checksums.md5 "
+    " checksums.multi checksums.sha ;"
     "\"test\" >byte-array { md5 sha1 } <multi-checksum> checksum-bytes ."
     "{
     B{
@@ -25,9 +26,9 @@ $nl
     }
 }" }
     $nl
-    { $unchecked-example "USING: checksums checksums.common checksums.md5 checksums.sha"
-    "io io.encodings.binary namespaces ;"
-    "\"LICENSE.txt\" binary ["
+    { $example "USING: checksums checksums.common checksums.md5 "
+    "checksums.multi checksums.sha io io.encodings.binary namespaces ;"
+    "\"resource:LICENSE.txt\" binary ["
     "    input-stream get { md5 sha1 } <multi-checksum> checksum-stream"
     "] with-file-reader ."
     "{
