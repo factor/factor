@@ -659,7 +659,7 @@ M: windows-ui-backend do-events
     swap window-controls>> close-button swap member? not
     [ disable-close-button ] [ drop ] if ;
 
-M: windows-ui-backend (open-window) ( world -- )
+M: windows-ui-backend (open-window)
     [
         dup
         [ ] [ world>style ] [ world>ex-style ] tri create-window
@@ -670,11 +670,11 @@ M: windows-ui-backend (open-window) ( world -- )
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
 
-M: win-base select-gl-context ( handle -- )
+M: win-base select-gl-context
     [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f
     GdiFlush drop ;
 
-M: win-base flush-gl-context ( handle -- )
+M: win-base flush-gl-context
     hDC>> SwapBuffers win32-error=0/f ;
 
 ! Windows 32-bit bitmaps don't actually use the alpha byte of
@@ -688,10 +688,10 @@ M: win-base flush-gl-context ( handle -- )
 : (opaque-pixels) ( world -- pixels )
     [ handle>> bits>> ] [ dim>> ] bi bitmap>byte-array (make-opaque) ;
 
-M: windows-ui-backend raise-window* ( world -- )
+M: windows-ui-backend raise-window*
     handle>> [ hWnd>> SetFocus drop ] when* ;
 
-M: windows-ui-backend set-title ( string world -- )
+M: windows-ui-backend set-title
     handle>>
     dup title>> [ free ] when*
     swap utf16n malloc-string
@@ -706,7 +706,7 @@ M: windows-ui-backend (with-ui)
         event-loop
     ] [ cleanup-win32-ui ] [ ] cleanup ;
 
-M: windows-ui-backend beep ( -- )
+M: windows-ui-backend beep
     0 MessageBeep drop ;
 
 M: windows-ui-backend system-alert
@@ -727,11 +727,11 @@ M: windows-ui-backend system-alert
 : hwnd>RECT ( hwnd -- RECT )
     RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
 
-M: windows-ui-backend (grab-input) ( handle -- )
+M: windows-ui-backend (grab-input)
     0 ShowCursor drop
     hWnd>> client-area>RECT ClipCursor drop ;
 
-M: windows-ui-backend (ungrab-input) ( handle -- )
+M: windows-ui-backend (ungrab-input)
     drop
     f ClipCursor drop
     1 ShowCursor drop ;
@@ -769,17 +769,21 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
         [ drop SW_RESTORE ShowWindow win32-error=0/f ]
     } 2cleave ;
 
-M: windows-ui-backend (set-fullscreen) ( ? world -- )
+M: windows-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
-M: windows-ui-backend (fullscreen?) ( world -- ? )
+M: windows-ui-backend (fullscreen?)
     handle>> hWnd>>
     [ hwnd>RECT ] [ fullscreen-RECT ] bi
     [ get-RECT-dimensions 2array 2nip ] same? ;
 
-M: windows-ui-backend resize-window ( world dim -- )
-  [ handle>> hWnd>> dup hwnd>RECT get-RECT-top-left ]
-  [ first2 FALSE ] bi* MoveWindow win32-error=0/f ;
+M:: windows-ui-backend resize-window ( world dim -- )
+    world handle>> hWnd>>
+    world window-loc>> dim <RECT> dup
+    world world>style
+    world world>ex-style
+    adjust-RECT get-RECT-dimensions FALSE
+    MoveWindow win32-error=0/f ;
 
 M: windows-ui-backend ui-backend-available?
     t ;
