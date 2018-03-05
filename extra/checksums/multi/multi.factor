@@ -1,17 +1,17 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors checksums checksums.common destructors fry kernel
-sequences ;
+USING: accessors checksums checksums.common destructors fry
+kernel sequences ;
 IN: checksums.multi
 
 TUPLE: multi-checksum checksums ;
-INSTANCE: multi-checksum block-checksum
+
 C: <multi-checksum> multi-checksum
 
 TUPLE: multi-state < disposable states results ;
 
 M: multi-checksum initialize-checksum-state
-    checksums>> [ initialize-checksum-state ] V{ } map-as
+    checksums>> [ initialize-checksum-state ] map
     multi-state new-disposable swap >>states ;
 
 M: multi-state dispose*
@@ -22,5 +22,7 @@ M: multi-state add-checksum-bytes
 
 M: multi-state get-checksum
     dup results>> [
-        dup states>> [ get-checksum ] { } map-as [ >>results ] keep
+        dup states>> [ get-checksum ] map [ >>results ] keep
     ] unless* nip ;
+
+INSTANCE: multi-checksum block-checksum
