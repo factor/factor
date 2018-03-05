@@ -26,6 +26,8 @@ $nl
 $nl
 "If you open a cell with " { $snippet "0" } " neighboring mines, all of its neighbors will automatically open. This can sometimes be a large area."
 $nl
+"If you middle-click an opened cell, and the number of adjacent flags match the number of adjacent mines, it will open all of the neighbors. This can improve the speed at which you can complete the game. However, if you have not flagged the adjacent cells correctly, you can lose when this opens the mined cell that was not marked."
+$nl
 "To flag a cell you think is a mine, point and right-click (or hover with the mouse and press " { $snippet "SPACE" } "). Do this again to mark with a question mark symbol (useful if you are unsure about a cell). Do this again to return the cell to blank."
 $nl
 "If you flag a mine incorrectly, you will need to correct that mistake before you can win."
