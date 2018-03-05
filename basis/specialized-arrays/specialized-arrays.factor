@@ -66,11 +66,11 @@ M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
 M: A length length>> ; inline
 
-M: A nth-unsafe underlying>> \ T alien-element ; inline
+M: A nth-unsafe [ integer>fixnum ] dip underlying>> \ T alien-element ; inline
 
 M: A nth-c-ptr underlying>> \ T array-accessor drop swap <displaced-alien> ; inline
 
-M: A set-nth-unsafe underlying>> \ T set-alien-element ; inline
+M: A set-nth-unsafe [ integer>fixnum ] dip underlying>> \ T set-alien-element ; inline
 
 M: A like drop dup A instance? [ \ T >c-array ] unless ; inline
 
