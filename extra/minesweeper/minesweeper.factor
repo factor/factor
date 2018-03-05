@@ -88,10 +88,8 @@ DEFER: click-cell-at
     neighbors [
         first2 [ row + ] [ col + ] bi* :> ( row' col' )
         cells row' col' cell-at [
-            mined?>> [
-                cells row' col' click-cell-at drop
-            ] unless
-        ] when*
+            cells row' col' click-cell-at drop
+        ] when
     ] each ;
 
 :: click-cell-at ( cells row col -- ? )
@@ -125,12 +123,7 @@ DEFER: click-cell-at
     cells row col cell-at [
         state>> +clicked+ = [
             cells row col [ adjacent-flags ] [ adjacent-mines ] 3bi = [
-                neighbors [
-                    first2 [ row + ] [ col + ] bi* :> ( row' col' )
-                    cells row' col' cell-at [
-                        cells row' col' click-cell-at drop
-                    ] when
-                ] each
+                cells row col click-cells-around
             ] when
         ] when t
     ] [ f ] if* ;
