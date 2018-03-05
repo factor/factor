@@ -51,6 +51,12 @@ TUPLE: cell #adjacent mined? state ;
         [ mined?>> ] [ f ] if*
     ] with with with count ;
 
+: adjacent-flags ( cells row col -- #mines )
+    neighbors [
+        first2 [ + ] bi-curry@ bi* cell-at
+        [ state>> +flagged+ = ] [ f ] if*
+    ] with with with count ;
+
 :: each-cell ( ... cells quot: ( ... row col cell -- ... ) -- ... )
     cells [| row |
         [| cell col | row col cell quot call ] each-index
@@ -113,6 +119,20 @@ DEFER: click-cell-at
             { +question+ [ f ] }
             { f [ +flagged+ ] }
         } case >>state drop t
+    ] [ f ] if* ;
+
+:: open-cell-at ( cells row col -- ? )
+    cells row col cell-at [
+        state>> +clicked+ = [
+            cells row col [ adjacent-flags ] [ adjacent-mines ] 3bi = [
+                neighbors [
+                    first2 [ row + ] [ col + ] bi* :> ( row' col' )
+                    cells row' col' cell-at [
+                        cells row' col' click-cell-at drop
+                    ] when
+                ] each
+            ] when
+        ] when t
     ] [ f ] if* ;
 
 TUPLE: grid-gadget < gadget cells timer textures start end hint? ;
@@ -272,6 +292,19 @@ M: grid-gadget draw-gadget*
         ] unless
     ] when gadget relayout-1 ;
 
+:: on-open ( gadget -- )
+    gadget hand-rel first2 :> ( w h )
+    h 58 >= [
+        h 58 - w [ 32 /i ] bi@ :> ( row col )
+        gadget cells>> :> cells
+        cells game-over? [
+            cells row col open-cell-at [
+                gadget start>> [ now gadget start<< ] unless
+                cells game-over? [ now gadget end<< ] when
+            ] when
+        ] unless
+    ] when gadget relayout-1 ;
+
 : new-game ( gadget rows cols mines -- )
     [ make-cells ] dip place-mines update-counts >>cells
     f >>start f >>end relayout-window ;
@@ -296,6 +329,7 @@ grid-gadget "gestures" [
         { T{ button-down { # 1 } } [ relayout-1 ] }
         { T{ button-up { # 1 } } [ on-click ] }
         { T{ button-up { # 3 } } [ on-mark ] }
+        { T{ button-up { # 2 } } [ on-open ] }
         { T{ key-down { sym " " } } [ on-mark ] }
         { motion [ relayout-1 ] }
     } assoc-union
