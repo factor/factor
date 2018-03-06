@@ -6,7 +6,6 @@ sequences specialized-arrays ;
 SPECIALIZED-ARRAY: uint64_t
 SPECIALIZED-ARRAY: uint32_t
 SPECIALIZED-ARRAY: uint16_t
-SPECIALIZED-ARRAY: uint8_t
 
 IN: checksums.metrohash
 
