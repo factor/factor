@@ -35,6 +35,7 @@ M: string-reader dispose drop ;
 
 ! Writers
 M: sbuf stream-element-type drop +character+ ; inline
+M: sbuf stream-tell length ; inline
 
 : <string-writer> ( -- stream )
     512 <sbuf> ; inline

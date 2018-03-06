@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel random random.sfmt random.sfmt.private
 sequences tools.test ;
-IN: random.sfmt.tests
 
 ! Period certified by virtue of seed
 { } [ 5 <sfmt-19937> drop ] unit-test

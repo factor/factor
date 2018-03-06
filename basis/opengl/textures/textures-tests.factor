@@ -3,7 +3,6 @@
 USING: accessors combinators.smart.syntax images kernel literals
 namespaces opengl.gl opengl.textures opengl.textures.private
 sequences tools.test ;
-IN: opengl.textures.tests
 
 {
     {

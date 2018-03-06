@@ -4,8 +4,6 @@
 USING: hash-sets.sequences kernel literals sequences sets
 tools.test ;
 
-IN: hash-sets.sequences.tests
-
 { t } [ 0 4 "asdf" <slice> SHS{ "asdf" } in? ] unit-test
 
 { SHS{ "asdf" } } [

@@ -1,4 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes help.markup help.syntax io.streams.string kernel
 quotations sequences strings math db.types db.tuples.private db ;
@@ -122,25 +123,41 @@ HELP: update-tuple
      { "tuple" tuple } }
 { $description "Updates a tuple that has already been inserted into a database. The tuple must have a primary key that has been set by " { $link insert-tuple } " or that is user-defined." } ;
 
+HELP: update-tuples
+{ $values
+     { "query/tuple" tuple }
+     { "quot" { $quotation ( tuple -- tuple'/f ) } } }
+{ $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". The " { $snippet "quot" } " is applied to each tuple from the database that matches the query, and the changed tuple is stored back to the database. If the " { $snippet "quot" } " returns " { $link f } ", the tuple is dropped, and its data remains unmodified in the database."
+$nl
+"The word is equivalent to the following code:"
+{ $code "query/tuple select-tuples quot map sift [ update-tuple ] each" }
+"The difference is that " { $snippet "update-tuples" } " handles query results one by one, thus avoiding the overhead of allocating the intermediate array of tuples, which " { $link select-tuples } " would do. This is important when processing large amounts of data in limited memory." } ;
+
 HELP: delete-tuples
 { $values
      { "tuple" tuple } }
 { $description "Uses the " { $snippet "tuple" } " as an exemplar object and deletes any objects that have the same slots set. If a slot is not " { $link f } ", then it is used to generate an SQL statement that deletes tuples." }
 { $warning "This word will delete your data." } ;
 
-{ insert-tuple update-tuple delete-tuples } related-words
+{ insert-tuple update-tuple update-tuples delete-tuples } related-words
+
+HELP: each-tuple
+{ $values
+     { "query/tuple" tuple }
+     { "quot" { $quotation ( tuple -- ) } } }
+{ $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". The " { $snippet "quot" } " is applied to each tuple from the database that matches the query constructed from the exemplar tuple." } ;
 
 HELP: select-tuple
 { $values
      { "query/tuple" tuple }
      { "tuple/f" { $maybe tuple } } }
-{ $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a single tuple from the database if it matches the query constructed from the exemplar tuple." } ;
+{ $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a single tuple from the database if it matches the query constructed from the exemplar tuple." } ;
 
 HELP: select-tuples
 { $values
      { "query/tuple" tuple }
      { "tuples" "an array of tuples" } }
-{ $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns an array of multiple tuples from the database that match the query constructed from the exemplar tuple." } ;
+{ $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns an array of multiple tuples from the database that match the query constructed from the exemplar tuple." } ;
 
 HELP: count-tuples
 { $values
@@ -148,7 +165,7 @@ HELP: count-tuples
      { "n" integer } }
 { $description "Returns the number of items that would be returned if the query were a select query. Counting the tuples with this word is more efficient than calling " { $link length } " on the result of " { $link select-tuples } "." } ;
 
-{ select-tuple select-tuples count-tuples } related-words
+{ each-tuple select-tuple select-tuples count-tuples } related-words
 
 
 
@@ -177,12 +194,16 @@ ARTICLE: "db-tuples-words" "High-level tuple/database words"
 { $subsections drop-table }
 "Inserting a tuple:"
 { $subsections insert-tuple }
-"Updating a tuple:"
-{ $subsections update-tuple }
+"Updating tuples:"
+{ $subsections
+    update-tuple
+    update-tuples
+}
 "Deleting tuples:"
 { $subsections delete-tuples }
 "Querying tuples:"
 { $subsections
+    each-tuple
     select-tuple
     select-tuples
     count-tuples

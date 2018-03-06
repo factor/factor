@@ -1,13 +1,20 @@
 ! Copyright (C) 2018 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
-USING: kernel machine-learning.data-sets
-machine-learning.decision-trees math.extras sequences tools.test ;
+USING: formatting kernel machine-learning.data-sets
+machine-learning.decision-trees sequences tools.test ;
+IN: machine-learning.decision-trees.tests
 
-{ { 0.08 0.01 0.0 0.03 0.29 0.0 } } [
-    "monks-1.train" load-monks
-    6 <iota> [
-        average-gain 2 round-to-decimal
-    ] with map
+: monks-gains ( name -- seq )
+    load-monks 6 <iota> [ average-gain "%.3f" sprintf ] with map ;
+
+{
+    { "0.075" "0.006" "0.005" "0.026" "0.287" "0.001" }
+    { "0.004" "0.002" "0.001" "0.016" "0.017" "0.006" }
+    { "0.007" "0.294" "0.001" "0.003" "0.256" "0.007" }
+} [
+    "monks-1.train" monks-gains
+    "monks-2.train" monks-gains
+    "monks-3.train" monks-gains
 ] unit-test
 
 { 4 } [

@@ -132,7 +132,7 @@ unit-test
     int { int int int int } stdcall alien-indirect
     gc ;
 
-[ f ] [ "f-stdcall" load-library f = ] unit-test
+[ f ] [ "f-stdcall" library-dll f = ] unit-test
 [ stdcall ] [ "f-stdcall" lookup-library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
@@ -640,7 +640,7 @@ os windows? [
 
 [ ] [ assembly-test-1 ] unit-test
 
-[ f ] [ "f-fastcall" load-library f = ] unit-test
+[ f ] [ "f-fastcall" library-dll f = ] unit-test
 [ fastcall ] [ "f-fastcall" lookup-library abi>> ] unit-test
 
 : ffi_test_49 ( x -- int )

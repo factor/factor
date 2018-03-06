@@ -5,7 +5,7 @@ math.order simple-flat-file io io.binary byte-arrays locals combinators
 words classes.singleton fry classes.parser parser quotations ;
 IN: io.encodings.euc
 
-TUPLE: euc { table biassoc } ;
+TUPLE: euc { table biassoc read-only } ;
 
 <PRIVATE
 

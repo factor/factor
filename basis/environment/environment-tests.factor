@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces prettyprint system tools.test
-environment strings sequences ;
-IN: environment.tests
+USING: environment kernel namespaces prettyprint sequences
+strings system tools.test ;
 
 { } [ os-envs . ] unit-test
 

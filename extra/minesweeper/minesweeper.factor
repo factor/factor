@@ -1,12 +1,13 @@
 ! Copyright (C) 2017 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs calendar colors.constants
-combinators combinators.short-circuit destructors formatting fry
-images.loader kernel locals math math.order math.parser
-namespaces opengl opengl.textures random sequences timers ui
-ui.commands ui.gadgets ui.gadgets.toolbar ui.gadgets.tracks
-ui.gadgets.worlds ui.gestures ui.pens.solid ui.render words ;
+USING: accessors arrays assocs calendar circular
+colors.constants combinators combinators.short-circuit
+destructors formatting fry images.loader kernel locals math
+math.order math.parser namespaces opengl opengl.textures random
+sequences timers ui ui.commands ui.gadgets ui.gadgets.toolbar
+ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.pens.solid
+ui.render ui.tools.browser words ;
 
 IN: minesweeper
 
@@ -50,6 +51,12 @@ TUPLE: cell #adjacent mined? state ;
         [ mined?>> ] [ f ] if*
     ] with with with count ;
 
+: adjacent-flags ( cells row col -- #mines )
+    neighbors [
+        first2 [ + ] bi-curry@ bi* cell-at
+        [ state>> +flagged+ = ] [ f ] if*
+    ] with with with count ;
+
 :: each-cell ( ... cells quot: ( ... row col cell -- ... ) -- ... )
     cells |[ row |
         |[ cell col | row col cell quot call ] each-index
@@ -81,10 +88,8 @@ DEFER: click-cell-at
     neighbors [
         first2 [ row + ] [ col + ] bi* :> ( row' col' )
         cells row' col' cell-at [
-            mined?>> [
-                cells row' col' click-cell-at drop
-            ] unless
-        ] when*
+            cells row' col' click-cell-at drop
+        ] when
     ] each ;
 
 :: click-cell-at ( cells row col -- ? )
@@ -114,7 +119,16 @@ DEFER: click-cell-at
         } case >>state drop t
     ] [ f ] if* ;
 
-TUPLE: grid-gadget < gadget cells timer textures start end ;
+:: open-cell-at ( cells row col -- ? )
+    cells row col cell-at [
+        state>> +clicked+ = [
+            cells row col [ adjacent-flags ] [ adjacent-mines ] 3bi = [
+                cells row col click-cells-around
+            ] when
+        ] when t
+    ] [ f ] if* ;
+
+TUPLE: grid-gadget < gadget cells timer textures start end hint? ;
 
 :: <grid-gadget> ( rows cols mines -- gadget )
     grid-gadget new
@@ -122,7 +136,8 @@ TUPLE: grid-gadget < gadget cells timer textures start end ;
         mines place-mines update-counts >>cells
         H{ } clone >>textures
         dup '[ _ relayout-1 ] f 1 seconds <timer> >>timer
-        color: gray <solid> >>interior ;
+        color: gray <solid> >>interior
+        "12345" <circular> >>hint? ;
 
 M: grid-gadget graft*
     [ timer>> start-timer ] [ call-next-method ] bi ;
@@ -137,21 +152,20 @@ M: grid-gadget ungraft*
 M: grid-gadget pref-dim*
     cells>> cells-dim [ 32 * ] bi@ swap 58 + 2array ;
 
-:: cell-image-path ( cell game-over? -- image-path )
-    game-over? cell mined?>> and [
-        cell state>> +clicked+ = "mineclicked.gif" "mine.gif" ?
+:: cell-image-path ( cell won? lost? -- image-path )
+    won? lost? or cell mined?>> and [
+        cell state>> {
+            { +flagged+ [ "flagged.gif" ] }
+            { +clicked+ [ "mineclicked.gif" ] }
+            [ drop won? "flagged.gif" "mine.gif" ? ]
+        } case
     ] [
-        cell state>>
-        {
+        cell state>> {
             { +question+ [ "question.gif" ] }
-            { +flagged+ [ game-over? "misflagged.gif" "flagged.gif" ? ] }
+            { +flagged+ [ lost? "misflagged.gif" "flagged.gif" ? ] }
             { +clicked+ [
-                cell mined?>> [
-                    "mine.gif"
-                ] [
-                    cell #adjacent>> 0 or number>string
-                    "open" ".gif" surround
-                ] if ] }
+                cell #adjacent>> 0 or number>string
+                "open" ".gif" surround ] }
             { f [ "blank.gif" ] }
         } case
     ] if "vocab:minesweeper/_resources/" prepend ;
@@ -171,8 +185,20 @@ M: grid-gadget pref-dim*
     textures>> [ load-image { 0 0 } <texture> ] cache
     [ dim>> [ 2 /i ] map ] [ draw-scaled-texture ] bi ;
 
+:: draw-hint ( gadget -- )
+    gadget hint?>> "xyzzy" sequence= [
+        gadget hand-rel first2 :> ( w h )
+        h 58 >= [
+            h 58 - w [ 32 /i ] bi@ :> ( row col )
+            gadget cells>> row col cell-at [
+                mined?>> COLOR: black COLOR: white ? gl-color
+                { 0 0 } { 1 1 } gl-fill-rect
+            ] when*
+        ] when
+    ] when ;
+
 :: draw-mines ( n gadget -- )
-    n "%03d" sprintf [
+    gadget cells>> won? 0 n ? "%03d" sprintf [
         26 * 3 + 6 2array [
             digit-image-path gadget draw-cached-texture
         ] with-translation
@@ -189,17 +215,17 @@ M: grid-gadget pref-dim*
 
 :: draw-timer ( n gadget -- )
     gadget pref-dim first :> width
-    n "%03d" sprintf [
+    n 999 min "%03d" sprintf [
         3 swap - 26 * width swap - 3 - 6 2array [
             digit-image-path gadget draw-cached-texture
         ] with-translation
     ] each-index ;
 
 :: draw-cells ( gadget -- )
-    gadget cells>> game-over? :> game-over?
+    gadget cells>> [ won? ] [ lost? ] bi :> ( won? lost? )
     gadget cells>> |[ row col cell |
         col row [ 32 * ] bi@ 58 + 2array [
-            cell game-over? cell-image-path
+            cell won? lost? cell-image-path
             gadget draw-cached-texture
         ] with-translation
     ] each-cell ;
@@ -209,8 +235,16 @@ M: grid-gadget pref-dim*
         gadget end>> now or swap time- duration>seconds
     ] [ 0 ] if* ;
 
+M: grid-gadget handle-gesture
+    over {
+        [ key-down? ] [ sym>> length 1 = ] [ sym>> " " = not ]
+    } 1&& [
+        2dup [ sym>> first ] [ hint?>> ] bi* circular-push
+    ] when call-next-method ;
+
 M: grid-gadget draw-gadget*
     {
+        [ draw-hint ]
         [ cells>> #mines-remaining ]
         [ draw-mines ]
         [ draw-smiley ]
@@ -251,20 +285,36 @@ M: grid-gadget draw-gadget*
         ] unless
     ] when gadget relayout-1 ;
 
+:: on-open ( gadget -- )
+    gadget hand-rel first2 :> ( w h )
+    h 58 >= [
+        h 58 - w [ 32 /i ] bi@ :> ( row col )
+        gadget cells>> :> cells
+        cells game-over? [
+            cells row col open-cell-at [
+                gadget start>> [ now gadget start<< ] unless
+                cells game-over? [ now gadget end<< ] when
+            ] when
+        ] unless
+    ] when gadget relayout-1 ;
+
 : new-game ( gadget rows cols mines -- )
     [ make-cells ] dip place-mines update-counts >>cells
     f >>start f >>end relayout-window ;
 
-: com-easy ( gadget -- ) 7 7 10 new-game ;
+: com-easy ( gadget -- ) 8 8 10 new-game ;
 
-: com-medium ( gadget -- ) 15 15 40 new-game ;
+: com-medium ( gadget -- ) 16 16 40 new-game ;
 
-: com-hard ( gadget -- ) 15 30 99 new-game ;
+: com-hard ( gadget -- ) 16 30 99 new-game ;
+
+: com-help ( gadget -- ) drop "minesweeper" com-browse ;
 
 grid-gadget "toolbar" f {
     { T{ key-down { sym "1" } } com-easy }
     { T{ key-down { sym "2" } } com-medium }
     { T{ key-down { sym "3" } } com-hard }
+    { T{ key-down { sym "?" } } com-help }
 } define-command-map
 
 grid-gadget "gestures" [
@@ -272,7 +322,9 @@ grid-gadget "gestures" [
         { T{ button-down { # 1 } } [ relayout-1 ] }
         { T{ button-up { # 1 } } [ on-click ] }
         { T{ button-up { # 3 } } [ on-mark ] }
+        { T{ button-up { # 2 } } [ on-open ] }
         { T{ key-down { sym " " } } [ on-mark ] }
+        { motion [ relayout-1 ] }
     } assoc-union
 ] change-word-prop
 
@@ -280,7 +332,7 @@ TUPLE: minesweeper-gadget < track ;
 
 : <minesweeper-gadget> ( -- gadget )
     vertical minesweeper-gadget new-track
-    7 7 10 <grid-gadget>
+    8 8 10 <grid-gadget>
     [ <toolbar> format-toolbar f track-add ]
     [ 1 track-add ] bi ;
 

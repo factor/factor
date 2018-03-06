@@ -71,19 +71,6 @@ PRIVATE>
 
 : no-prefixes ( seq -- seq' ) [ vocab-prefix? ] reject ;
 
-: convert-prefixes ( seq -- seq' )
-    [ dup vocab-prefix? [ name>> <vocab-link> ] when ] map ;
-
-: remove-redundant-prefixes ( seq -- seq' )
-    ! Hack.
-    [ vocab-prefix? ] partition
-    [
-        [ vocab-name ] map fast-set
-        '[ name>> _ in? ] reject
-        convert-prefixes
-    ] keep
-    append ;
-
 : no-roots ( assoc -- seq ) values concat ;
 
 : filter-vocabs ( assoc -- seq )

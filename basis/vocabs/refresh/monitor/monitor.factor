@@ -62,7 +62,7 @@ TR: convert-separators "/\\" ".." ;
     bi spawn drop ;
 
 : init-vocab-monitor ( -- )
-    H{ } clone changed-vocabs set-global
+    HS{ } clone changed-vocabs set-global
     loaded-vocab-names [ changed-vocab ] each ;
 
 [

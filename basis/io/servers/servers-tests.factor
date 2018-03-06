@@ -1,7 +1,7 @@
-USING: accessors arrays concurrency.flags fry io io.encodings.ascii
-io.encodings.utf8 io.servers.private io.sockets kernel namespaces
-sequences sets threads tools.test ;
-IN: io.servers
+USING: accessors arrays concurrency.flags fry io
+io.encodings.ascii io.encodings.utf8 io.servers
+io.servers.private io.sockets kernel namespaces sequences sets
+threads tools.test ;
 
 { t } [ ascii <threaded-server> listen-on empty? ] unit-test
 
@@ -53,12 +53,9 @@ ipv6-supported? [
     ] unit-test
 ] unless
 
-
 ! Test that we can listen on several ports at once.
-TUPLE: my-threaded-server < threaded-server ;
-
 { } [
-    utf8 my-threaded-server new-threaded-server
+    utf8 <threaded-server>
         "127.0.0.1" 0 <inet4>
         "127.0.0.1" 0 <inet4>
         2array >>insecure

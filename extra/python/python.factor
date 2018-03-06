@@ -1,4 +1,5 @@
-USING: alien alien.c-types alien.data arrays assocs command-line fry
+USING: alien alien.c-types alien.data alien.libraries
+arrays assocs command-line fry
 hashtables init io.encodings.utf8 kernel namespaces
 python.errors python.ffi python.objects sequences
 specialized-arrays strings vectors ;
@@ -115,5 +116,8 @@ ERROR: missing-type type ;
 : with-quot>py-cfunction ( alien quot -- )
     '[ <py-cfunction> @ ] with-callback ; inline
 
-[ py-initialize ] "python" add-startup-hook
-[ py-finalize ] "python" add-shutdown-hook
+: python-dll-loaded? ( -- ? )
+    "Py_IsInitialized" "python" dlsym? ;
+
+[ python-dll-loaded? [ py-initialize ] when ] "python" add-startup-hook
+[ python-dll-loaded? [ py-finalize ] when ] "python" add-shutdown-hook

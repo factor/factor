@@ -3,7 +3,6 @@
 USING: destructors io io.encodings.binary io.encodings.utf8
 io.files io.streams.byte-array io.streams.string
 io.streams.throwing kernel namespaces tools.test ;
-IN: io.streams.throwing.tests
 
 { "asdf" }
 [

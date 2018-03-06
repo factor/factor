@@ -5,8 +5,8 @@ debugger fry help help.home help.topics help.vocabs html
 html.streams io.directories io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.pathnames kernel
 locals make math math.parser memoize namespaces sequences
-sequences.deep serialize sorting splitting tools.completion
-vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
+serialize sorting splitting tools.completion vocabs
+vocabs.hierarchy words xml.data xml.syntax xml.traversal
 xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
@@ -127,7 +127,7 @@ M: pathname url-of
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
-    all-disk-vocabs-recursive no-roots remove-redundant-prefixes
+    all-disk-vocabs-recursive filter-vocabs
     [ vocab-name "scratchpad" = ] reject ;
 
 : all-topics ( -- topics )

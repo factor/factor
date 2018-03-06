@@ -13,6 +13,10 @@ HELP: open-window
 { $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
 { $description "Opens a native window containing " { $snippet "gadget" } " with the specified attributes. If a string is provided, it is used as the window title; otherwise, the window attributes are specified in a " { $link world-attributes } " tuple." } ;
 
+HELP: resize-window
+{ $values { "world" world } { "dim" "a pair of integers: width and height" } }
+{ $description "Resize the native window so that its contents area (called the \"client area\" in Windows) has the specified dimensions." } ;
+
 HELP: set-fullscreen
 { $values { "gadget" gadget } { "?" boolean } }
 { $description "Sets and unsets fullscreen mode for the gadget's world." } ;

@@ -1,8 +1,8 @@
 USING: grouping tools.test kernel sequences arrays
 math accessors ;
-IN: grouping.tests
 
 [ { 1 2 3 } 0 group ] must-fail
+[ f 3 <groups> first ] [ bounds-error? ] must-fail-with
 
 { { "hell" "o wo" "rld" } } [ "hello world" 4 group ] unit-test
 

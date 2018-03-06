@@ -26,6 +26,11 @@ IN: help.vocabs
     [ "Children from " prepend ] [ "Children" ] if*
     $heading ;
 
+<PRIVATE
+: convert-prefixes ( seq -- seq' )
+    [ dup vocab-prefix? [ name>> <vocab-link> ] when ] map ;
+PRIVATE>
+
 : $vocabs ( seq -- )
     convert-prefixes [ vocab-row ] map vocab-headings prefix $table ;
 

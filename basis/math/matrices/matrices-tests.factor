@@ -312,7 +312,7 @@ CONSTANT: test-points {
         { 23+59/147 6+15/49 27+17/49 }
     }
 } [
-    test-points cov-matrix
+    test-points population-cov-matrix
 ] unit-test
 
 {

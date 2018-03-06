@@ -3,9 +3,8 @@
 USING: accessors alien.c-types alien.data arrays byte-arrays
 combinators compression.run-length fry grouping images
 images.loader images.normalization io io.binary
-io.encodings.8-bit.latin1 io.encodings.string kernel math
-math.bitwise sequences specialized-arrays summary
-io.streams.throwing ;
+io.encodings.latin1 io.encodings.string io.streams.throwing
+kernel math math.bitwise sequences specialized-arrays summary ;
 QUALIFIED-WITH: bitstreams b
 SPECIALIZED-ARRAYS: uint ushort ;
 IN: images.bitmap

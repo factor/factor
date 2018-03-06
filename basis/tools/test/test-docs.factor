@@ -1,8 +1,21 @@
 USING: help.markup help.syntax kernel quotations io ;
 IN: tools.test
 
-ARTICLE: "tools.test.write" "Writing unit tests"
-"Assert that a quotation outputs a specific set of values:"
+ARTICLE: "tools.test" "Unit testing"
+"A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
+$nl
+"For example, if you were developing a word for computing symbolic derivatives, your unit tests would apply the word to certain input functions, comparing the results against the correct values. While the passing of these tests would not guarantee the algorithm is correct, it would at least ensure that what used to work keeps working, in that as soon as something breaks due to a change in another part of your program, failing tests will let you know."
+$nl
+"Unit tests for a vocabulary are placed in test files in the same directory as the vocabulary source file (see " { $link "vocabs.loader" } "). Two possibilities are supported:"
+{ $list
+    { "Tests can be placed in a file named " { $snippet { $emphasis "vocab" } "-tests.factor" } "." }
+    { "Tests can be placed in files in the " { $snippet "tests" } " subdirectory." }
+}
+"The latter is used for vocabularies with more extensive test suites."
+$nl
+"If the test harness needs to define words, they should be placed in a vocabulary named " { $snippet { $emphasis "vocab" } ".tests" } " where " { $emphasis "vocab" } " is the vocab being tested."
+{ $heading "Writing unit tests" }
+"Several worlds exist for writing different kinds of unit tests. The most general one asserts that a quotation outputs a specific set of values:"
 { $subsections postpone: unit-test }
 "Assert that a quotation throws an error:"
 { $subsections
@@ -14,9 +27,14 @@ ARTICLE: "tools.test.write" "Writing unit tests"
     postpone: must-infer
     postpone: must-infer-as
 }
-"All of the above are used like ordinary words but are actually parsing words. This ensures that parse-time state, namely the line number, can be associated with the test in question, and reported in test failures." ;
-
-ARTICLE: "tools.test.run" "Running unit tests"
+"All of the above are used like ordinary words but are actually parsing words. This ensures that parse-time state, namely the line number, can be associated with the test in question, and reported in test failures."
+$nl
+"Some words help the test writer using temporary files:"
+{ $subsections
+  with-test-directory
+  with-test-file
+}
+{ $heading "Running unit tests" }
 "The following words run test harness files; any test failures are collected and printed at the end:"
 { $subsections
     test
@@ -32,30 +50,7 @@ $nl
     test-failures
 } ;
 
-ARTICLE: "tools.test" "Unit testing"
-"A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
-$nl
-"For example, if you were developing a word for computing symbolic derivatives, your unit tests would apply the word to certain input functions, comparing the results against the correct values. While the passing of these tests would not guarantee the algorithm is correct, it would at least ensure that what used to work keeps working, in that as soon as something breaks due to a change in another part of your program, failing tests will let you know."
-$nl
-"Unit tests for a vocabulary are placed in test files in the same directory as the vocabulary source file (see " { $link "vocabs.loader" } "). Two possibilities are supported:"
-{ $list
-    { "Tests can be placed in a file named " { $snippet { $emphasis "vocab" } "-tests.factor" } "." }
-    { "Tests can be placed in files in the " { $snippet "tests" } " subdirectory." }
-}
-"The latter is used for vocabularies with more extensive test suites."
-$nl
-"If the test harness needs to define words, they should be placed in a vocabulary named " { $snippet { $emphasis "vocab" } ".tests" } " where " { $emphasis "vocab" } " is the vocab being tested."
-{ $subsections
-    "tools.test.write"
-    "tools.test.run"
-} ;
 
-ABOUT: "tools.test"
-
-HELP: unit-test
-{ $syntax "{ output } [ input ] unit-test" }
-{ $values { "output" "a sequence of expected stack elements" } { "input" "a quotation run with an empty stack" } }
-{ $description "Runs a quotation with an empty stack, comparing the resulting stack with " { $snippet "output" } ". Elements are compared using " { $link = } ". Throws an error if the expected stack does not match the resulting stack." } ;
 
 HELP: must-fail
 { $syntax "[ quot ] must-fail" }
@@ -90,3 +85,14 @@ HELP: test-all
 
 HELP: :test-failures
 { $description "Prints all pending unit test failures." } ;
+
+HELP: unit-test
+{ $syntax "{ output } [ input ] unit-test" }
+{ $values { "output" "a sequence of expected stack elements" } { "input" "a quotation run with an empty stack" } }
+{ $description "Runs a quotation with an empty stack, comparing the resulting stack with " { $snippet "output" } ". Elements are compared using " { $link = } ". Throws an error if the expected stack does not match the resulting stack." } ;
+
+HELP: with-test-file
+{ $values { "quot" quotation } }
+{ $description "Creates an empty temporary file and applies the quotation to it. The file is deleted after the word returns." } ;
+
+ABOUT: "tools.test"

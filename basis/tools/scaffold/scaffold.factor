@@ -14,6 +14,8 @@ SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
 
+ERROR: vocab-must-not-exist string ;
+
 <PRIVATE
 
 : vocab-root? ( string -- ? )
@@ -27,6 +29,9 @@ ERROR: not-a-vocab-root string ;
 
 : check-vocab-root/vocab ( vocab-root string -- vocab-root string )
     [ check-root ] [ check-vocab-name ] bi* ;
+
+: check-vocab-exists ( string -- string )
+    dup vocab-exists? [ vocab-must-not-exist ] when ;
 
 : replace-vocab-separators ( vocab -- path )
     path-separator first char: . associate substitute ; inline
@@ -127,8 +132,10 @@ ERROR: not-a-vocab-root string ;
         { "exemplar" object }
         { "assoc" assoc }
         { "alist" "an array of key/value pairs" }
-        { "keys" sequence } { "values" sequence }
-        { "class" class } { "tuple" tuple }
+        { "keys" sequence }
+        { "values" sequence }
+        { "class" class }
+        { "tuple" tuple }
         { "url" url }
     } at* [ swap [ \ $maybe swap 2array ] when ] dip ;
 
@@ -273,7 +280,7 @@ PRIVATE>
     [ "platforms.txt" ] dip scaffold-metadata ;
 
 : scaffold-vocab ( vocab-root string -- )
-    {
+    check-vocab-exists {
         [ scaffold-directory ]
         [ scaffold-main ]
         [ nip require ]
@@ -341,25 +348,22 @@ ${example-indent}}
 : scaffold-examples ( word -- )
     2 swap scaffold-n-examples ;
 
-: touch. ( path -- )
+: scaffold-file ( path -- )
     [ touch-file ]
     [ "Click to edit: " write <pathname> . ] bi ;
 
-: scaffold-rc ( path -- )
-    [ home ] dip append-path touch. ;
-
 : scaffold-factor-boot-rc ( -- )
-    ".factor-boot-rc" scaffold-rc ;
+    "~/.factor-boot-rc" scaffold-file ;
 
 : scaffold-factor-rc ( -- )
-    ".factor-rc" scaffold-rc ;
+    "~/.factor-rc" scaffold-file ;
 
 : scaffold-mason-rc ( -- )
-    ".factor-mason-rc" scaffold-rc ;
+    "~/.factor-mason-rc" scaffold-file ;
 
 : scaffold-factor-roots ( -- )
-    ".factor-roots" scaffold-rc ;
+    "~/.factor-roots" scaffold-file ;
 
 HOOK: scaffold-emacs os ( -- )
 
-M: unix scaffold-emacs ( -- ) ".emacs" scaffold-rc ;
+M: unix scaffold-emacs ( -- ) "~/.emacs" scaffold-file ;

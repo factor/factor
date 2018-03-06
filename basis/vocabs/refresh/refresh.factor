@@ -20,23 +20,23 @@ IN: vocabs.refresh
 
 SYMBOL: changed-vocabs
 
-: changed-vocab ( vocab -- )
+: changed-vocab ( vocab-name -- )
     dup lookup-vocab changed-vocabs get and
-    [ dup changed-vocabs get set-at ] [ drop ] if ;
+    [ changed-vocabs get adjoin ] [ drop ] if ;
 
 : mark-unchanged-vocab  ( vocab-name -- )
-    changed-vocabs get delete-at ;
+    changed-vocabs get delete ;
 
 : mark-unchanged-vocabs  ( vocab-names -- )
     [ mark-unchanged-vocab ] each ;
 
-: changed-vocab-by-name? ( vocab -- ? )
-    changed-vocabs get [ key? ] [ drop t ] if* ;
+: changed-vocab? ( vocab-name -- ? )
+    changed-vocabs get [ in? ] [ drop t ] if* ;
 
 : (to-refresh) ( vocab-name loaded? path -- ? )
     [
         swap [
-            swap changed-vocab-by-name? [
+            swap changed-vocab? [
                 source-modified?
             ] [ drop f ] if
         ] [ 2drop t ] if
@@ -66,8 +66,7 @@ SYMBOL: changed-vocabs
     [
         [ [ lookup-vocab f >>source-loaded? drop ] each ]
         [ [ lookup-vocab f >>docs-loaded? drop ] each ] bi*
-    ]
-    [
+    ] [
         union
         [ mark-unchanged-vocabs ]
         [ require-all ] bi

@@ -36,14 +36,18 @@ C: <library> library
 : make-library ( path abi -- library )
     [ dup open-dll ] dip <library> ;
 
-: library-dll ( library -- dll )
+GENERIC: library-dll ( obj -- dll )
+
+M: f library-dll ;
+
+M: library library-dll
     dup [ dll>> ] when ;
 
-: load-library ( name -- dll )
+M: string library-dll ( library -- dll )
     lookup-library library-dll ;
 
 : dlsym? ( function library -- alien/f )
-    load-library dlsym ;
+    library-dll dlsym ;
 
 M: dll dispose dlclose ;
 
@@ -84,7 +88,7 @@ M: library dispose dll>> [ dispose ] when* ;
     lookup-library [ abi>> ] [ cdecl ] if* ;
 
 : address-of ( name library -- value )
-    2dup load-library dlsym-raw
+    2dup library-dll dlsym-raw
     [ 2nip ] [ no-such-symbol ] if* ;
 
 SYMBOL: deploy-libraries

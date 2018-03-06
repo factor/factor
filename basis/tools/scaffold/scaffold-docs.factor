@@ -101,22 +101,16 @@ HELP: scaffold-vocab
 { $description "Creates a directory in the given root for a new vocabulary and adds a main .factor file and an authors.txt file." } ;
 
 HELP: scaffold-emacs
-{ $description "Touches the .emacs file in your home directory and provides a clickable link to open it in an editor." } ;
+{ $description "Touches the " { $snippet ".emacs" } " file in your home directory and provides a clickable link to open it in an editor." } ;
 
 HELP: scaffold-factor-boot-rc
-{ $description "Touches the .factor-boot-rc file in your home directory and provides a clickable link to open it in an editor." } ;
+{ $description "Touches the " { $snippet ".factor-boot-rc" } " file in your home directory and provides a clickable link to open it in an editor." } ;
 
 HELP: scaffold-factor-rc
-{ $description "Touches the .factor-rc file in your home directory and provides a clickable link to open it in an editor." } ;
+{ $description "Touches the " { $snippet ".factor-rc" } " file in your home directory and provides a clickable link to open it in an editor." } ;
 
 HELP: scaffold-factor-roots
-{ $description "Touches the .factor-roots file in your home directory and provides a clickable link to open it in an editor." } ;
-
-HELP: scaffold-rc
-{ $values
-    { "path" "a pathname string" }
-}
-{ $description "Touches the given path in your home directory and provides a clickable link to open it in an editor." } ;
+{ $description "Touches the " { $snippet ".factor-roots" } " file in your home directory and provides a clickable link to open it in an editor." } ;
 
 HELP: using
 { $description "Stores the vocabularies that are pulled into the documentation file from looking up the stack effect types." } ;
@@ -137,7 +131,6 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
 "Types that are unrecognized by the scaffold generator will be of type " { $link null } ". The developer should change these to strings that describe the stack effect names instead." $nl
 "Scaffolding a configuration file:"
 { $subsections
-    scaffold-rc
     scaffold-factor-boot-rc
     scaffold-factor-rc
     scaffold-factor-roots

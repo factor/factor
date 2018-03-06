@@ -1,6 +1,5 @@
 USING: documents documents.private accessors sequences
 namespaces tools.test make arrays kernel fry ;
-IN: documents.tests
 
 ! Tests
 

@@ -75,12 +75,11 @@ M: ${A} direct-like drop ${<direct-A>} ; inline
 M: ${A} clone [ underlying>> clone ] [ length>> ] bi ${<direct-A>} ; inline
 
 M: ${A} length length>> ; inline
-
-M: ${A} nth-unsafe underlying>> \ ${type} alien-element ; inline
+M: ${A} nth-unsafe [ integer>fixnum ] dip underlying>> \ ${type} alien-element ; inline
 
 M: ${A} nth-c-ptr underlying>> \ ${type} array-accessor drop swap <displaced-alien> ; inline
 
-M: ${A} set-nth-unsafe underlying>> \ ${type} set-alien-element ; inline
+M: ${A} set-nth-unsafe [ integer>fixnum ] dip underlying>> \ ${type} set-alien-element ; inline
 
 M: ${A} like drop dup ${A} instance? [ \ ${type} >c-array ] unless ; inline
 
