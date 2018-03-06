@@ -14,11 +14,9 @@ TUPLE: chunking { seq read-only } { n read-only } ;
 
 INSTANCE: chunking sequence
 
-M: chunking nth group@ <slice> ; inline
-
 M: chunking nth-unsafe group@ <slice-unsafe> ; inline
 
-M: chunking set-nth group@ <slice> 0 swap copy ;
+M: chunking set-nth-unsafe group@ <slice-unsafe> 0 swap copy ;
 
 M: chunking like drop { } like ; inline
 
