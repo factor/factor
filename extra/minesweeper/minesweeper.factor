@@ -253,6 +253,19 @@ M: grid-gadget draw-gadget*
         [ draw-cells ]
     } cleave ;
 
+:: on-grid ( gadget quot: ( cells row col -- ? ) -- )
+    gadget hand-rel first2 :> ( w h )
+    h 58 >= [
+        h 58 - w [ 32 /i ] bi@ :> ( row col )
+        gadget cells>> :> cells
+        cells game-over? [
+            cells row col quot call [
+                gadget start>> [ now gadget start<< ] unless
+                cells game-over? [ now gadget end<< ] when
+            ] when
+        ] unless
+    ] when gadget relayout-1 ; inline
+
 :: on-click ( gadget -- )
     gadget hand-rel first2 :> ( w h )
     h 58 < [
@@ -261,42 +274,11 @@ M: grid-gadget draw-gadget*
             gadget [ reset-cells ] change-cells
             f >>start f >>end drop
         ] when
-    ] [
-        h 58 - w [ 32 /i ] bi@ :> ( row col )
-        gadget cells>> :> cells
-        cells game-over? [
-            cells row col click-cell-at [
-                gadget start>> [ now gadget start<< ] unless
-                cells game-over? [ now gadget end<< ] when
-            ] when
-        ] unless
-    ] if gadget relayout-1 ;
+    ] when gadget [ click-cell-at ] on-grid ;
 
-:: on-mark ( gadget -- )
-    gadget hand-rel first2 :> ( w h )
-    h 58 >= [
-        h 58 - w [ 32 /i ] bi@ :> ( row col )
-        gadget cells>> :> cells
-        cells game-over? [
-            cells row col mark-cell-at [
-                gadget start>> [ now gadget start<< ] unless
-                cells game-over? [ now gadget end<< ] when
-            ] when
-        ] unless
-    ] when gadget relayout-1 ;
+: on-mark ( gadget -- ) [ mark-cell-at ] on-grid ;
 
-:: on-open ( gadget -- )
-    gadget hand-rel first2 :> ( w h )
-    h 58 >= [
-        h 58 - w [ 32 /i ] bi@ :> ( row col )
-        gadget cells>> :> cells
-        cells game-over? [
-            cells row col open-cell-at [
-                gadget start>> [ now gadget start<< ] unless
-                cells game-over? [ now gadget end<< ] when
-            ] when
-        ] unless
-    ] when gadget relayout-1 ;
+: on-open ( gadget -- ) [ open-cell-at ] on-grid ;
 
 : new-game ( gadget rows cols mines -- )
     [ make-cells ] dip place-mines update-counts >>cells
