@@ -53,7 +53,7 @@ TUPLE: cell #adjacent mined? state ;
 : adjacent-mines ( cells row col -- #mines )
     [ mined?>> ] count-neighbors ;
 
-: adjacent-flags ( cells row col -- #mines )
+: adjacent-flags ( cells row col -- #flags )
     [ state>> +flagged+ = ] count-neighbors ;
 
 :: each-cell ( ... cells quot: ( ... row col cell -- ... ) -- ... )
