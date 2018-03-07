@@ -6,7 +6,7 @@ images.loader io io.binary io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string
 io.streams.byte-array io.streams.throwing kernel locals math
 math.bitwise math.functions sequences sorting ;
-QUALIFIED: bitstreams
+QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
 SINGLETON: png-image

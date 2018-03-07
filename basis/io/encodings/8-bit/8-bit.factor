@@ -43,6 +43,7 @@ M: 8-bit decode-char
 PRIVATE>
 
 SYNTAX: \8-BIT: scan-token scan-token scan-token load-encoding ;
+>>
 
 8-BIT: cp424 IBM424 CP424
 8-BIT: cp437 IBM437 CP437
@@ -95,4 +96,3 @@ SYNTAX: \8-BIT: scan-token scan-token scan-token load-encoding ;
 8-BIT: windows-1256 windows-1256 CP1256
 8-BIT: windows-1257 windows-1257 CP1257
 8-BIT: windows-1258 windows-1258 CP1258
->>>>>>> origin/master

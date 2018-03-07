@@ -149,20 +149,20 @@ STRUCT: dbf-field-header
     { index-field-flag uint8_t } ;
 
 : read-field-headers ( -- field-headers )
-    [ read1 dup { CHAR: \r CHAR: \n f } member? not ] [
+    [ read1 dup { char: \r char: \n f } member? not ] [
         dbf-field-header heap-size 1 - read swap prefix
         dbf-field-header memory>struct
     ] produce nip ;
 
 : check-field-header ( field-header -- field-header )
     dup type>> {
-        { CHAR: I [ dup length>> 4 assert= ] }
-        { CHAR: L [ dup length>> 1 assert= ] }
-        { CHAR: O [ dup length>> 8 assert= ] }
-        { CHAR: Y [ dup length>> 8 assert= ] }
-        { CHAR: D [ dup length>> 8 assert= ] }
-        { CHAR: T [ dup length>> 8 assert= ] }
-        { CHAR: M [ dup length>> 10 assert= ] }
+        { char: I [ dup length>> 4 assert= ] }
+        { char: L [ dup length>> 1 assert= ] }
+        { char: O [ dup length>> 8 assert= ] }
+        { char: Y [ dup length>> 8 assert= ] }
+        { char: D [ dup length>> 8 assert= ] }
+        { char: T [ dup length>> 8 assert= ] }
+        { char: M [ dup length>> 10 assert= ] }
         [ drop ]
     } case ;
 
@@ -176,7 +176,7 @@ TUPLE: record deleted? values ;
 : read-records ( field-headers -- records )
     [ read1 dup { 0x1a f } member? not ]
     [
-        CHAR: * = over [
+        char: * = over [
             [ length>> read ]
             [ type>> parse-field ] bi
         ] map record boa
@@ -229,7 +229,7 @@ ERROR: illegal-logical value ;
 
 : parse-numeric ( byte-array -- n )
     [ "\r\n\t *" member? ] trim
-    H{ { CHAR: , CHAR: . } } substitute string>number ;
+    H{ { char: , char: . } } substitute string>number ;
 
 : parse-double ( byte-array -- n )
     dup length 8 assert= le> bits>double ;
@@ -245,27 +245,27 @@ ERROR: unsupported-field-type type ;
 
 : parse-field ( byte-array type -- data )
     {
-        { CHAR: \0 [ ] }
-        { CHAR: 2  [ parse-short ] }
-        { CHAR: 4  [ parse-int ] }
-        { CHAR: 8  [ parse-double ] }
-        { CHAR: C  [ parse-string ] }
-        { CHAR: D  [ parse-date ] }
-        { CHAR: F  [ parse-float ] }
-        { CHAR: I  [ parse-int ] }
-        { CHAR: L  [ parse-logical ] }
-        { CHAR: N  [ parse-numeric ] }
-        { CHAR: O  [ parse-double ] }
-        { CHAR: V  [ parse-string ] }
-        { CHAR: Y  [ parse-currency ] }
-        { CHAR: @  [ parse-timestamp ] }
-        ! { CHAR: +  [ parse-autoincrement ] }
-        ! { CHAR: M  [ parse-memo ] }
-        ! { CHAR: T  [ parse-datetime ] }
-        ! { CHAR: B  [ parse-double? ] } ! (only on dbversion in [0x30, 0x31, 0x32])
-        ! { CHAR: G  [ parse-general ] }
-        ! { CHAR: P  [ parse-picture ] }
-        ! { CHAR: Q  [ parse-varbinary ] }
+        { char: \0 [ ] }
+        { char: 2  [ parse-short ] }
+        { char: 4  [ parse-int ] }
+        { char: 8  [ parse-double ] }
+        { char: C  [ parse-string ] }
+        { char: D  [ parse-date ] }
+        { char: F  [ parse-float ] }
+        { char: I  [ parse-int ] }
+        { char: L  [ parse-logical ] }
+        { char: N  [ parse-numeric ] }
+        { char: O  [ parse-double ] }
+        { char: V  [ parse-string ] }
+        { char: Y  [ parse-currency ] }
+        { char: @  [ parse-timestamp ] }
+        ! { char: +  [ parse-autoincrement ] }
+        ! { char: M  [ parse-memo ] }
+        ! { char: T  [ parse-datetime ] }
+        ! { char: B  [ parse-double? ] } ! (only on dbversion in [0x30, 0x31, 0x32])
+        ! { char: G  [ parse-general ] }
+        ! { char: P  [ parse-picture ] }
+        ! { char: Q  [ parse-varbinary ] }
         [ unsupported-field-type ]
     } case ;
 

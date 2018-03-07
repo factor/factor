@@ -191,7 +191,7 @@ M: grid-gadget pref-dim*
         h 58 >= [
             h 58 - w [ 32 /i ] bi@ :> ( row col )
             gadget cells>> row col cell-at [
-                mined?>> COLOR: black COLOR: white ? gl-color
+                mined?>> color: black color: white ? gl-color
                 { 0 0 } { 1 1 } gl-fill-rect
             ] when*
         ] when
