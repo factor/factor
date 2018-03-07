@@ -45,17 +45,16 @@ TUPLE: cell #adjacent mined? state ;
 : place-mines ( cells n -- cells )
     [ dup unmined-cell t >>mined? drop ] times ;
 
+:: count-neighbors ( cells row col quot: ( cell -- ? ) -- n )
+    cells neighbors [
+        first2 [ row + ] [ col + ] bi* cell-at quot [ f ] if*
+    ] with count ; inline
+
 : adjacent-mines ( cells row col -- #mines )
-    neighbors [
-        first2 [ + ] bi-curry@ bi* cell-at
-        [ mined?>> ] [ f ] if*
-    ] with with with count ;
+    [ mined?>> ] count-neighbors ;
 
 : adjacent-flags ( cells row col -- #mines )
-    neighbors [
-        first2 [ + ] bi-curry@ bi* cell-at
-        [ state>> +flagged+ = ] [ f ] if*
-    ] with with with count ;
+    [ state>> +flagged+ = ] count-neighbors ;
 
 :: each-cell ( ... cells quot: ( ... row col cell -- ... ) -- ... )
     cells [| row |
