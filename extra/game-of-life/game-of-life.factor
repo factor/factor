@@ -2,19 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs bit-arrays calendar circular
-colors.constants fry kernel locals math math.order namespaces
-opengl random sequences timers ui ui.commands ui.gadgets
-ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words
-;
+colors.constants combinators fry kernel locals math math.order
+math.ranges namespaces opengl random sequences timers ui
+ui.commands ui.gadgets ui.gadgets.toolbar ui.gadgets.tracks
+ui.gestures ui.render words ;
 
 IN: game-of-life
 
 : make-grid ( rows cols -- grid )
     '[ _ <bit-array> <circular> ] replicate <circular> ;
-
-: glider ( grid -- grid )
-    { { 2 1 } { 3 2 } { 1 3 } { 2 3 } { 3 3 } }
-    [ first2 pick nth t -rot set-nth ] each ;
 
 : grid-dim ( grid -- rows cols )
     [ length ] [ first length ] bi ;
@@ -50,11 +46,12 @@ CONSTANT: neighbors {
         ] each-index
     ] each-index ;
 
-TUPLE: grid-gadget < gadget grid timer ;
+TUPLE: grid-gadget < gadget grid size timer ;
 
 : <grid-gadget> ( grid -- gadget )
     grid-gadget new
         swap >>grid
+        20 >>size
         dup '[ _ [ grid>> next-step ] [ relayout-1 ] bi ]
         f 1/5 seconds <timer> >>timer ;
 
@@ -65,45 +62,80 @@ M: grid-gadget ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
 
 M: grid-gadget pref-dim*
-    grid>> grid-dim [ 20 * ] bi@ 2array ;
+    [ grid>> grid-dim ] [ size>> '[ _ * ] bi@ 2array ] bi ;
+
+:: update-grid ( gadget -- )
+    gadget dim>> first2 :> ( w h )
+    gadget size>> :> size
+    h w [ size /i ] bi@ :> ( new-rows new-cols )
+    gadget grid>> :> grid
+    grid grid-dim :> ( rows cols )
+    rows new-rows = not
+    cols new-cols = not or [
+        new-rows new-cols make-grid :> new-grid
+        rows new-rows min <iota> [| j |
+            cols new-cols min <iota> [| i |
+                i j grid nth nth
+                i j new-grid nth set-nth
+            ] each
+        ] each
+        new-grid gadget grid<<
+    ] when ;
 
 :: draw-cells ( gadget -- )
     COLOR: black gl-color
+    gadget size>> :> size
     gadget grid>> [| row j |
         row [| cell i |
             cell [
-                i j [ 20 * ] bi@ 2array { 20 20 } gl-fill-rect
+                i j [ size * ] bi@ 2array { size size } gl-fill-rect
             ] when
         ] each-index
     ] each-index ;
 
 :: draw-lines ( gadget -- )
-    gadget pref-dim first2 :> ( w h )
+    gadget size>> :> size
     gadget grid>> grid-dim :> ( rows cols )
     COLOR: gray gl-color
-    rows <iota> [| j |
-        j 20 * :> y
+    cols rows [ size * ] bi@ :> ( w h )
+    rows [0,b] [| j |
+        j size * :> y
         { 0 y } { w y } gl-line
-        cols <iota> [| i |
-            i 20 * :> x
+        cols [0,b] [| i |
+            i size * :> x
             { x 0 } { x h } gl-line
         ] each
     ] each ;
 
 M: grid-gadget draw-gadget*
-    [ draw-cells ] [ draw-lines ] bi ;
+    [ update-grid ] [ draw-cells ] [ draw-lines ] tri ;
 
 :: on-click ( gadget -- )
-    gadget hand-rel first2 [ 20 /i ] bi@ :> ( i j )
-    i j [ 0 19 between? ] bi@ and [
+    gadget size>> :> size
+    gadget grid>> grid-dim :> ( rows cols )
+    gadget hand-rel first2 [ size /i ] bi@ :> ( i j )
+    i 0 cols 1 - between?
+    j 0 rows 1 - between? and [
         i j gadget grid>> nth [ not ] change-nth
     ] when gadget relayout-1 ;
 
 :: on-drag ( gadget -- )
-    gadget hand-rel first2 [ 20 /i ] bi@ :> ( i j )
-    i j [ 0 19 between? ] bi@ and [
+    gadget size>> :> size
+    gadget grid>> grid-dim :> ( rows cols )
+    gadget hand-rel first2 [ size /i ] bi@ :> ( i j )
+    i 0 cols 1 - between?
+    j 0 rows 1 - between? and [
         t i j gadget grid>> nth set-nth
     ] when gadget relayout-1 ;
+
+: on-scroll ( gadget -- )
+    [
+        scroll-direction get second {
+            { [ dup 0 > ] [ 2 ] }
+            { [ dup 0 < ] [ -2 ] }
+            [ 0 ]
+        } cond nip + 4 30 clamp
+    ] change-size relayout-1 ;
 
 :: com-play ( gadget -- )
     gadget timer>> thread>> [
@@ -128,7 +160,9 @@ M: grid-gadget draw-gadget*
     gadget relayout-1 ;
 
 :: com-glider ( gadget -- )
-    gadget grid>> glider drop
+    gadget grid>> :> grid
+    { { 2 1 } { 3 2 } { 1 3 } { 2 3 } { 3 3 } }
+    [ first2 grid nth t -rot set-nth ] each
     gadget relayout-1 ;
 
 grid-gadget "toolbar" f {
@@ -142,8 +176,10 @@ grid-gadget "toolbar" f {
 
 grid-gadget "gestures" [
     {
+        { T{ key-down f { A+ } "F" } [ toggle-fullscreen ] }
         { T{ button-down { # 1 } } [ on-click ] }
         { T{ drag { # 1 } } [ on-drag ] }
+        { mouse-scroll [ on-scroll ] }
     } assoc-union
 ] change-word-prop
 
