@@ -170,8 +170,10 @@ SYMBOL: last-click
     gadget relayout-1 ;
 
 :: com-random ( gadget -- )
-    gadget grid>> [ [ drop { t f } random ] map! drop ] each
-    gadget relayout-1 ;
+    gadget grid>> [
+        [ length>> ] [ underlying>> length random-bytes ] bi
+        bit-array boa
+    ] map! drop gadget relayout-1 ;
 
 :: com-glider ( gadget -- )
     gadget grid>> :> grid
