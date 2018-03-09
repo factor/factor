@@ -1,33 +1,40 @@
 ! Copyright (C) 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs bit-arrays calendar circular
-colors.constants combinators fry kernel locals math math.order
-math.ranges namespaces opengl random sequences timers ui
-ui.commands ui.gadgets ui.gadgets.toolbar ui.gadgets.tracks
-ui.gestures ui.render words ;
+USING: accessors arrays assocs bit-arrays calendar
+colors.constants combinators combinators.short-circuit fry
+kernel kernel.private locals math math.order math.private
+math.ranges namespaces opengl random sequences sequences.private
+timers ui ui.commands ui.gadgets ui.gadgets.toolbar
+ui.gadgets.tracks ui.gestures ui.render words ;
 
 IN: game-of-life
 
 : make-grid ( rows cols -- grid )
-    '[ _ <bit-array> <circular> ] replicate <circular> ;
+    '[ _ <bit-array> ] replicate ;
 
 : grid-dim ( grid -- rows cols )
     [ length ] [ first length ] bi ;
 
-CONSTANT: neighbors {
-    { -1 -1 } { -1  0 } { -1  1 }
-    {  0 -1 }           {  0  1 }
-    {  1 -1 } {  1  0 } {  1  1 }
-}
-
 :: count-neighbors ( grid -- counts )
-    grid grid-dim :> ( rows cols )
+    grid grid-dim { fixnum fixnum } declare :> ( rows cols )
     rows <iota> [| j |
         cols <iota> [| i |
-            neighbors [
-                first2 [ i + ] [ j + ] bi* grid nth nth
-            ] count
+            { -1 0 1 } [
+                { -1 0 1 } [
+                    [ i fixnum+fast ] [ j fixnum+fast ] bi*
+                    { fixnum fixnum } declare :> ( col row )
+                    {
+                        [ col i = not ] [ row i = not ]
+                        [ col 0 >= ] [ col cols < ]
+                        [ row 0 >= ] [ row rows < ]
+                    } 0&& [
+                        col row grid
+                        { array } declare nth-unsafe
+                        { bit-array } declare nth-unsafe
+                    ] [ f ] if
+                ] with count
+            ] map-sum
         ] map
     ] map ;
 
@@ -35,11 +42,19 @@ CONSTANT: neighbors {
     grid count-neighbors :> neighbors
     grid [| row j |
         row [| cell i |
-            i j neighbors nth nth
+            i j neighbors
+            { array } declare nth-unsafe
+            { array } declare nth-unsafe
             cell [
-                2 3 between? i j grid nth set-nth
+                2 3 between? i j grid
+                { array } declare nth-unsafe
+                { bit-array } declare set-nth-unsafe
             ] [
-                3 = [ t i j grid nth set-nth ] when
+                3 = [
+                    t i j grid
+                    { array } declare nth-unsafe
+                    { bit-array } declare set-nth-unsafe
+                ] when
             ] if
         ] each-index
     ] each-index ;
