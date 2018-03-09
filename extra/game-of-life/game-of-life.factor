@@ -25,7 +25,7 @@ IN: game-of-life
                     [ i fixnum+fast ] [ j fixnum+fast ] bi*
                     { fixnum fixnum } declare :> ( col row )
                     {
-                        [ col i = not ] [ row i = not ]
+                        [ col i = row j = and not ]
                         [ col 0 >= ] [ col cols < ]
                         [ row 0 >= ] [ row rows < ]
                     } 0&& [
@@ -166,7 +166,7 @@ SYMBOL: last-click
     ] when ;
 
 :: com-clear ( gadget -- )
-    gadget grid>> [ seq>> clear-bits ] each
+    gadget grid>> [ clear-bits ] each
     gadget relayout-1 ;
 
 :: com-random ( gadget -- )
