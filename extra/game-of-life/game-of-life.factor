@@ -35,13 +35,11 @@ CONSTANT: neighbors {
     grid count-neighbors :> neighbors
     grid [| row j |
         row [| cell i |
-            i j neighbors nth nth :> n
+            i j neighbors nth nth
             cell [
-                n 2 3 between? i j grid nth set-nth
+                2 3 between? i j grid nth set-nth
             ] [
-                n 3 = [
-                    t i j grid nth set-nth
-                ] when
+                3 = [ t i j grid nth set-nth ] when
             ] if
         ] each-index
     ] each-index ;
@@ -54,9 +52,6 @@ TUPLE: grid-gadget < gadget grid size timer ;
         20 >>size
         dup '[ _ [ grid>> next-step ] [ relayout-1 ] bi ]
         f 1/5 seconds <timer> >>timer ;
-
-M: grid-gadget graft*
-    [ timer>> start-timer ] [ call-next-method ] bi ;
 
 M: grid-gadget ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
@@ -88,7 +83,8 @@ M: grid-gadget pref-dim*
     gadget grid>> [| row j |
         row [| cell i |
             cell [
-                i j [ size * ] bi@ 2array { size size } gl-fill-rect
+                i j [ size * ] bi@ 2array
+                { size size } gl-fill-rect
             ] when
         ] each-index
     ] each-index ;
@@ -110,13 +106,16 @@ M: grid-gadget pref-dim*
 M: grid-gadget draw-gadget*
     [ update-grid ] [ draw-cells ] [ draw-lines ] tri ;
 
+SYMBOL: last-click
+
 :: on-click ( gadget -- )
     gadget size>> :> size
     gadget grid>> grid-dim :> ( rows cols )
     gadget hand-rel first2 [ size /i ] bi@ :> ( i j )
     i 0 cols 1 - between?
     j 0 rows 1 - between? and [
-        i j gadget grid>> nth [ not ] change-nth
+        i j gadget grid>> nth
+        [ not dup last-click set ] change-nth
     ] when gadget relayout-1 ;
 
 :: on-drag ( gadget -- )
@@ -125,7 +124,7 @@ M: grid-gadget draw-gadget*
     gadget hand-rel first2 [ size /i ] bi@ :> ( i j )
     i 0 cols 1 - between?
     j 0 rows 1 - between? and [
-        t i j gadget grid>> nth set-nth
+        last-click get i j gadget grid>> nth set-nth
     ] when gadget relayout-1 ;
 
 : on-scroll ( gadget -- )
