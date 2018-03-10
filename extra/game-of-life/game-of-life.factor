@@ -16,23 +16,22 @@ IN: game-of-life
 : grid-dim ( grid -- rows cols )
     [ length ] [ first length ] bi ;
 
+:: wraparound ( x min max -- y )
+    x min < [ max ] [ x max > min x ? ] if ; inline
+
 :: count-neighbors ( grid -- counts )
     grid grid-dim { fixnum fixnum } declare :> ( rows cols )
     rows <iota> [| j |
         cols <iota> [| i |
             { -1 0 1 } [
                 { -1 0 1 } [
-                    [ i fixnum+fast ] [ j fixnum+fast ] bi*
-                    { fixnum fixnum } declare :> ( col row )
-                    {
-                        [ col i = row j = and not ]
-                        [ col 0 >= ] [ col cols < ]
-                        [ row 0 >= ] [ row rows < ]
-                    } 0&& [
-                        col row grid
+                    2dup [ zero? ] both? [ 2drop f ] [
+                        [ i fixnum+fast 0 cols 1 - wraparound ]
+                        [ j fixnum+fast 0 rows 1 - wraparound ] bi*
+                        { fixnum fixnum } declare grid
                         { array } declare nth-unsafe
                         { bit-array } declare nth-unsafe
-                    ] [ f ] if
+                    ] if
                 ] with count
             ] map-sum
         ] map
