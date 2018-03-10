@@ -17,7 +17,7 @@ IN: game-of-life
     [ length ] [ first length ] bi ;
 
 :: wraparound ( x min max -- y )
-    x min < [ max ] [ x max > min x ? ] if ; inline
+    x min fixnum< [ max ] [ x max fixnum> min x ? ] if ; inline
 
 :: count-neighbors ( grid -- counts )
     grid grid-dim { fixnum fixnum } declare :> ( rows cols )
@@ -25,7 +25,7 @@ IN: game-of-life
         cols <iota> [| i |
             { -1 0 1 } [
                 { -1 0 1 } [
-                    2dup [ zero? ] both? [ 2drop f ] [
+                    2dup [ 0 eq? ] both? [ 2drop f ] [
                         [ i fixnum+fast 0 cols 1 - wraparound ]
                         [ j fixnum+fast 0 rows 1 - wraparound ] bi*
                         { fixnum fixnum } declare grid
