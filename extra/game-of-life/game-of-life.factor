@@ -72,7 +72,7 @@ M: grid-gadget ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
 
 M: grid-gadget pref-dim*
-    [ grid>> grid-dim ] [ size>> '[ _ * ] bi@ 2array ] bi ;
+    [ grid>> grid-dim swap ] [ size>> '[ _ * ] bi@ 1 + 2array ] bi ;
 
 :: update-grid ( gadget -- )
     gadget dim>> first2 :> ( w h )
@@ -145,8 +145,8 @@ SYMBOL: last-click
 : on-scroll ( gadget -- )
     [
         scroll-direction get second {
-            { [ dup 0 > ] [ 2 ] }
-            { [ dup 0 < ] [ -2 ] }
+            { [ dup 0 > ] [ -2 ] }
+            { [ dup 0 < ] [ 2 ] }
             [ 0 ]
         } cond nip + 4 30 clamp
     ] change-size relayout-1 ;
