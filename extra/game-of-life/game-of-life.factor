@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs bit-arrays calendar
+USING: accessors arrays assocs bit-arrays byte-arrays calendar
 colors.constants combinators combinators.short-circuit fry
 kernel kernel.private locals math math.order math.private
 math.ranges namespaces opengl random sequences sequences.private
@@ -16,34 +16,41 @@ IN: game-of-life
 : grid-dim ( grid -- rows cols )
     [ length ] [ first length ] bi ;
 
+: random-grid! ( grid -- )
+    [
+        [ length>> ] [ underlying>> length random-bytes ] bi
+        bit-array boa
+    ] map! drop ;
+
 :: wraparound ( x min max -- y )
     x min fixnum< [ max ] [ x max fixnum> min x ? ] if ; inline
 
 :: count-neighbors ( grid -- counts )
     grid grid-dim { fixnum fixnum } declare :> ( rows cols )
-    rows <iota> [| j |
-        cols <iota> [| i |
-            { -1 0 1 } [
-                { -1 0 1 } [
-                    2dup [ 0 eq? ] both? [ 2drop f ] [
-                        [ i fixnum+fast 0 cols 1 - wraparound ]
-                        [ j fixnum+fast 0 rows 1 - wraparound ] bi*
-                        { fixnum fixnum } declare grid
-                        { array } declare nth-unsafe
-                        { bit-array } declare nth-unsafe
-                    ] if
-                ] with count
-            ] map-sum
-        ] map
-    ] map ;
+    rows [ cols <byte-array> ] replicate :> neighbors
+    grid { array } declare [| row j |
+        row { bit-array } declare [| cell i |
+            cell [
+                { -1 0 1 } [| y |
+                    y j fixnum+fast 0 rows 1 fixnum-fast wraparound
+                    neighbors nth-unsafe { byte-array } declare
+                    { -1 0 1 } [| x |
+                        x y [ 0 eq? ] both? [ drop ] [
+                            x i fixnum+fast 0 cols 1 fixnum-fast wraparound
+                            swap [ 1 fixnum+fast ] change-nth-unsafe
+                        ] if
+                    ] with each
+                ] each
+            ] when
+        ] each-index
+    ] each-index neighbors ;
 
 :: next-step ( grid -- )
-    grid count-neighbors :> neighbors
-    grid [| row j |
-        row [| cell i |
-            i j neighbors
-            { array } declare nth-unsafe
-            { array } declare nth-unsafe
+    grid count-neighbors { array } declare :> neighbors
+    grid { array } declare [| row j |
+        j neighbors nth-unsafe { byte-array } declare :> neighbor-row
+        row { bit-array } declare [| cell i |
+            i neighbor-row nth-unsafe
             cell [
                 2 3 between? i j grid
                 { array } declare nth-unsafe
@@ -94,8 +101,8 @@ M: grid-gadget pref-dim*
 :: draw-cells ( gadget -- )
     COLOR: black gl-color
     gadget size>> :> size
-    gadget grid>> [| row j |
-        row [| cell i |
+    gadget grid>> { array } declare [| row j |
+        row { bit-array } declare [| cell i |
             cell [
                 i j [ size * ] bi@ 2array
                 { size size } gl-fill-rect
@@ -169,10 +176,7 @@ SYMBOL: last-click
     gadget relayout-1 ;
 
 :: com-random ( gadget -- )
-    gadget grid>> [
-        [ length>> ] [ underlying>> length random-bytes ] bi
-        bit-array boa
-    ] map! drop gadget relayout-1 ;
+    gadget grid>> random-grid! gadget relayout-1 ;
 
 :: com-glider ( gadget -- )
     gadget grid>> :> grid
