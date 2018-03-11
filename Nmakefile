@@ -1,10 +1,32 @@
-!IF !DEFINED(VERSION)
-VERSION = version-missing
+VERSION = 0.98
+
+# Crazy hack to do shell commands
+# We do it in Nmakefile because that way we don't have to invoke build through build.cmd
+# and we can just do ``nmake /f Nmakefile x86-64-vista`` or similar
+# and we still get the git branch, id, etc
+
+!IF [git describe --all > git-describe.tmp] == 0
+GIT_DESCRIBE = \
+!INCLUDE <git-describe.tmp>
+!IF [rm git-describe.tmp] == 0
+!ENDIF
 !ENDIF
 
-!IF !DEFINED(GIT_LABEL)
-GIT_LABEL = git-label-missing
+!IF [git rev-parse HEAD > git-id.tmp] == 0
+GIT_ID = \
+!INCLUDE <git-id.tmp>
+!IF [rm git-id.tmp] == 0
 !ENDIF
+!ENDIF
+
+!IF [git rev-parse --abbrev-ref HEAD > git-branch.tmp] == 0
+GIT_BRANCH = \
+!INCLUDE <git-branch.tmp>
+!IF [rm git-branch.tmp] == 0
+!ENDIF
+!ENDIF
+
+GIT_LABEL = $(GIT_DESCRIBE)-$(GIT_ID)
 
 !IF DEFINED(PLATFORM)
 
