@@ -29,18 +29,22 @@ IN: game-of-life
     grid grid-dim { fixnum fixnum } declare :> ( rows cols )
     rows [ cols <byte-array> ] replicate :> neighbors
     grid { array } declare [| row j |
+        j 1 fixnum-fast 0 rows 1 fixnum-fast wraparound
+        j
+        j 1 fixnum+fast 0 rows 1 fixnum-fast wraparound
+        [ neighbors nth-unsafe { byte-array } declare ] tri@ :>
+        ( above same below )
+
         row { bit-array } declare [| cell i |
             cell [
-                { -1 0 1 } [| y |
-                    y j fixnum+fast 0 rows 1 fixnum-fast wraparound
-                    neighbors nth-unsafe { byte-array } declare
-                    { -1 0 1 } [| x |
-                        x y [ 0 eq? ] both? [ drop ] [
-                            x i fixnum+fast 0 cols 1 fixnum-fast wraparound
-                            swap [ 1 fixnum+fast ] change-nth-unsafe
-                        ] if
-                    ] with each
-                ] each
+                i 1 fixnum-fast 0 cols 1 fixnum-fast wraparound
+                i
+                i 1 fixnum+fast 0 cols 1 fixnum-fast wraparound
+
+                [ [ above [ 1 fixnum+fast ] change-nth-unsafe ] tri@ ]
+                [ nip [ same [ 1 fixnum+fast ] change-nth-unsafe ] bi@ ]
+                [ [ below [ 1 fixnum+fast ] change-nth-unsafe ] tri@ ]
+                3tri
             ] when
         ] each-index
     ] each-index neighbors ;
