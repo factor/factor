@@ -56,15 +56,9 @@ IN: game-of-life
         row { bit-array } declare [| cell i |
             i neighbor-row nth-unsafe
             cell [
-                2 3 between? i j grid
-                { array } declare nth-unsafe
-                { bit-array } declare set-nth-unsafe
+                2 3 between? i row set-nth-unsafe
             ] [
-                3 = [
-                    t i j grid
-                    { array } declare nth-unsafe
-                    { bit-array } declare set-nth-unsafe
-                ] when
+                3 = [ t i row set-nth-unsafe ] when
             ] if
         ] each-index
     ] each-index ;
