@@ -3,10 +3,10 @@
 
 USING: accessors arrays assocs bit-arrays byte-arrays calendar
 colors.constants combinators fry kernel kernel.private locals
-math math.order math.private math.ranges namespaces opengl
-random sequences sequences.private timers ui ui.commands
-ui.gadgets ui.gadgets.toolbar ui.gadgets.tracks ui.gestures
-ui.render words ;
+math math.order math.ranges namespaces opengl random sequences
+sequences.private timers ui ui.commands ui.gadgets
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words
+;
 
 IN: game-of-life
 
@@ -43,9 +43,9 @@ IN: game-of-life
                 i
                 i 1 + 0 max-cols wraparound
 
-                [ [ above [ 1 fixnum+fast ] change-nth-unsafe ] tri@ ]
-                [ nip [ same [ 1 fixnum+fast ] change-nth-unsafe ] bi@ ]
-                [ [ below [ 1 fixnum+fast ] change-nth-unsafe ] tri@ ]
+                [ [ above [ 1 + ] change-nth-unsafe ] tri@ ]
+                [ nip [ same [ 1 + ] change-nth-unsafe ] bi@ ]
+                [ [ below [ 1 + ] change-nth-unsafe ] tri@ ]
                 3tri
             ] when
         ] each-index
