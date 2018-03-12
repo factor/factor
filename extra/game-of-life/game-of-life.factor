@@ -23,23 +23,25 @@ IN: game-of-life
     ] map! drop ;
 
 :: wraparound ( x min max -- y )
-    x min fixnum< [ max ] [ x max fixnum> min x ? ] if ; inline
+    x min < [ max ] [ x max > min x ? ] if ; inline
 
 :: count-neighbors ( grid -- counts )
     grid grid-dim { fixnum fixnum } declare :> ( rows cols )
+    rows 1 - { fixnum } declare :> max-rows
+    cols 1 - { fixnum } declare :> max-cols
     rows [ cols <byte-array> ] replicate :> neighbors
     grid { array } declare [| row j |
-        j 1 fixnum-fast 0 rows 1 fixnum-fast wraparound
+        j 1 - 0 max-rows wraparound
         j
-        j 1 fixnum+fast 0 rows 1 fixnum-fast wraparound
+        j 1 + 0 max-rows wraparound
         [ neighbors nth-unsafe { byte-array } declare ] tri@ :>
         ( above same below )
 
         row { bit-array } declare [| cell i |
             cell [
-                i 1 fixnum-fast 0 cols 1 fixnum-fast wraparound
+                i 1 - 0 max-cols wraparound
                 i
-                i 1 fixnum+fast 0 cols 1 fixnum-fast wraparound
+                i 1 + 0 max-cols wraparound
 
                 [ [ above [ 1 fixnum+fast ] change-nth-unsafe ] tri@ ]
                 [ nip [ same [ 1 fixnum+fast ] change-nth-unsafe ] bi@ ]
@@ -156,18 +158,14 @@ SYMBOL: last-click
     ] change-size relayout-1 ;
 
 :: com-play ( gadget -- )
-    gadget timer>> thread>> [
-        gadget timer>> start-timer
-    ] unless ;
+    gadget timer>> restart-timer ;
 
 :: com-step ( gadget -- )
     gadget grid>> next-step
     gadget relayout-1 ;
 
 :: com-stop ( gadget -- )
-    gadget timer>> thread>> [
-        gadget timer>> stop-timer
-    ] when ;
+    gadget timer>> stop-timer ;
 
 :: com-clear ( gadget -- )
     gadget grid>> [ clear-bits ] each
