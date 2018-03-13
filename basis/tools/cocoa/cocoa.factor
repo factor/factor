@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays cocoa.messages cocoa.runtime combinators
-prettyprint combinators.smart ;
+USING: cocoa.messages cocoa.runtime combinators
+combinators.smart kernel prettyprint ;
 IN: tools.cocoa
 
 : method. ( method -- )
@@ -15,4 +15,4 @@ IN: tools.cocoa
     ] output>array . ;
 
 : methods. ( class -- )
-    [ method. ] each-method-in-class ;
+    [ nip method. ] each-method-in-class ;
