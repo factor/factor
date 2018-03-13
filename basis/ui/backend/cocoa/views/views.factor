@@ -189,11 +189,9 @@ M: send-touchbar-command send-queued-gesture
         self SEL: setWantsBestResolutionOpenGLSurface:
         -> respondsToSelector: c-bool> [
 
-            self SEL: setWantsBestResolutionOpenGLSurface: 1
-            void f "objc_msgSend" { id SEL char } f alien-invoke
+            self 1 { void { id SEL char } } ?-> setWantsBestResolutionOpenGLSurface:
 
-            self SEL: backingScaleFactor
-            double f "objc_msgSend" { id SEL } f alien-invoke
+            self { double { id SEL } } ?-> backingScaleFactor
 
             dup 1.0 > [
                 gl-scale-factor set-global t retina? set-global
