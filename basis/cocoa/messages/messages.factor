@@ -44,8 +44,11 @@ super-message-senders [ H{ } clone ] initialize
 
 TUPLE: selector-tuple name object ;
 
+: selector-name ( name -- name' )
+    CHAR: . over index [ 0 > [ "." split1 nip ] when ] when* ;
+
 MEMO: <selector> ( name -- sel )
-    "." split1 nip f selector-tuple boa ;
+    selector-name f selector-tuple boa ;
 
 : selector ( selector -- alien )
     dup object>> expired? [
