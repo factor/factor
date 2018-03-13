@@ -189,11 +189,9 @@ M: send-touchbar-command send-queued-gesture
         self SEL: setWantsBestResolutionOpenGLSurface:
         -> respondsToSelector: c-bool> [
 
-            self SEL: setWantsBestResolutionOpenGLSurface: 1
-            void f "objc_msgSend" { id SEL char } f alien-invoke
+            self 1 { void { id SEL char } } ?-> setWantsBestResolutionOpenGLSurface:
 
-            self SEL: backingScaleFactor
-            double f "objc_msgSend" { id SEL } f alien-invoke
+            self { double { id SEL } } ?-> backingScaleFactor
 
             dup 1.0 > [
                 gl-scale-factor set-global t retina? set-global
@@ -213,13 +211,13 @@ M: send-touchbar-command send-queued-gesture
     METHOD: void touchBarCommand6 [ 6 touchbar-invoke-command ] ;
     METHOD: void touchBarCommand7 [ 7 touchbar-invoke-command ] ;
 
-    METHOD: Class makeTouchBar [
+    METHOD: id makeTouchBar [
         touchbar-commands drop [
             length 8 min <iota> [ number>string ] map
         ] [ { } ] if* self make-touchbar
     ] ;
 
-    METHOD: Class touchBar: Class touchbar makeItemForIdentifier: Class string [
+    METHOD: id touchBar: id touchbar makeItemForIdentifier: id string [
         touchbar-commands drop [
             [ self string CF>string dup string>number ] dip nth
             second name>> "com-" ?head drop over
@@ -271,29 +269,29 @@ M: send-touchbar-command send-queued-gesture
         ] [ 0 ] if*
     ] ;
 
-    METHOD: id undo: id event [ self event undo-action send-action$ f ] ;
+    METHOD: void undo: id event [ self event undo-action send-action$ ] ;
 
-    METHOD: id redo: id event [ self event redo-action send-action$ f ] ;
+    METHOD: void redo: id event [ self event redo-action send-action$ ] ;
 
-    METHOD: id cut: id event [ self event cut-action send-action$ f ] ;
+    METHOD: void cut: id event [ self event cut-action send-action$ ] ;
 
-    METHOD: id copy: id event [ self event copy-action send-action$ f ] ;
+    METHOD: void copy: id event [ self event copy-action send-action$ ] ;
 
-    METHOD: id paste: id event [ self event paste-action send-action$ f ] ;
+    METHOD: void paste: id event [ self event paste-action send-action$ ] ;
 
-    METHOD: id delete: id event [ self event delete-action send-action$ f ] ;
+    METHOD: void delete: id event [ self event delete-action send-action$ ] ;
 
-    METHOD: id selectAll: id event [ self event select-all-action send-action$ f ] ;
+    METHOD: void selectAll: id event [ self event select-all-action send-action$ ] ;
 
-    METHOD: id newDocument: id event [ self event new-action send-action$ f ] ;
+    METHOD: void newDocument: id event [ self event new-action send-action$ ] ;
 
-    METHOD: id openDocument: id event [ self event open-action send-action$ f ] ;
+    METHOD: void openDocument: id event [ self event open-action send-action$ ] ;
 
-    METHOD: id saveDocument: id event [ self event save-action send-action$ f ] ;
+    METHOD: void saveDocument: id event [ self event save-action send-action$ ] ;
 
-    METHOD: id saveDocumentAs: id event [ self event save-as-action send-action$ f ] ;
+    METHOD: void saveDocumentAs: id event [ self event save-as-action send-action$ ] ;
 
-    METHOD: id revertDocumentToSaved: id event [ self event revert-action send-action$ f ] ;
+    METHOD: void revertDocumentToSaved: id event [ self event revert-action send-action$ ] ;
 
     ! Multi-touch gestures
     METHOD: void magnifyWithEvent: id event
