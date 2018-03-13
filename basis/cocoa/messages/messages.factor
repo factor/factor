@@ -4,8 +4,8 @@ USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
 combinators core-graphics.types fry generalizations
 io.encodings.utf8 kernel layouts libc locals macros make math
-memoize namespaces quotations sequences specialized-arrays
-stack-checker strings words ;
+memoize namespaces quotations sequences sets specialized-arrays
+splitting stack-checker strings words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
@@ -44,7 +44,8 @@ super-message-senders [ H{ } clone ] initialize
 
 TUPLE: selector-tuple name object ;
 
-MEMO: <selector> ( name -- sel ) f \ selector-tuple boa ;
+MEMO: <selector> ( name -- sel )
+    "." split1 nip f selector-tuple boa ;
 
 : selector ( selector -- alien )
     dup object>> expired? [
@@ -234,16 +235,28 @@ ERROR: no-objc-type name ;
 : method-name ( method -- name )
     method_getName sel_getName ;
 
-: register-objc-method ( method -- )
-    [ method-name ]
-    [ [ method-return-type ] [ method-arg-types ] bi 2array ] bi
-    [ nip cache-stubs ] [ swap objc-methods get set-at ] 2bi ;
+:: register-objc-method ( classname method -- )
+    method method-return-type
+    method method-arg-types 2array :> signature
+    method method-name :> name
+    classname "." name 3append :> fullname
+    signature cache-stubs
+    signature name objc-methods get set-at
+    signature fullname objc-methods get set-at ;
 
-: each-method-in-class ( class quot -- )
-    [ { uint } [ class_copyMethodList ] with-out-parameters ] dip
-    over 0 = [ 3drop ] [
+: method-collisions ( -- collisions )
+    objc-methods get >alist
+    [ first CHAR: . swap member? ] filter
+    [ first "." split1 nip ] collect-by
+    [ nip values members length 1 > ] assoc-filter ;
+
+: each-method-in-class ( class quot: ( class method -- ) -- )
+    [
+        [ class_getName ] keep
+        { uint } [ class_copyMethodList ] with-out-parameters
+    ] dip over 0 = [ 4drop ] [
         [ void* <c-direct-array> ] dip
-        [ each ] [ drop (free) ] 2bi
+        [ with each ] [ drop (free) ] 2bi
     ] if ; inline
 
 : register-objc-methods ( class -- )
