@@ -94,7 +94,7 @@ MACRO:: (?send) ( effect selector super? -- quot )
     selector dup ?lookup-method effect or super?
     [ make-prepare-send ] 2keep
     super-message-senders message-senders ? get at
-    [ 1quotation append ] [ effect selector sender-stub 1quotation append ] if* ;
+    1quotation append ;
 
 : ?send ( receiver args... selector effect -- return... ) f (?send) ; inline
 
