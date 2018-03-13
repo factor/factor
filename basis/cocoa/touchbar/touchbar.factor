@@ -12,6 +12,8 @@ IN: cocoa.touchbar
         [ nip ]
     } 2cleave ;
 
+{ id { id SEL id id SEL } } cache-stubs
+
 :: make-NSTouchBar-button ( self identifier label-string action-string -- button )
     NSCustomTouchBarItem -> alloc
         identifier <CFString> { id { id SEL id } } ?-> initWithIdentifier: :> item
