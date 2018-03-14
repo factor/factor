@@ -42,12 +42,12 @@ TUPLE: weight primary secondary tertiary ignorable? ;
 
 ducet get-global insert-helpers
 
-: base ( char -- base )
+:: base ( char -- base )
     {
-        { [ dup 0x3400 0x4DB5 between? ] [ drop 0xFB80 ] } ! Extension A
-        { [ dup 0x20000 0x2A6D6 between? ] [ drop 0xFB80 ] } ! Extension B
-        { [ dup 0x4E00 0x9FC3 between? ] [ drop 0xFB40 ] } ! CJK
-        [ drop 0xFBC0 ] ! Other
+        { [ char 0x03400 0x04DB5 between? ] [ 0xFB80 ] } ! Extension A
+        { [ char 0x20000 0x2A6D6 between? ] [ 0xFB80 ] } ! Extension B
+        { [ char 0x04E00 0x09FC3 between? ] [ 0xFB40 ] } ! CJK
+        [ 0xFBC0 ] ! Other
     } cond ;
 
 : AAAA ( char -- weight )
@@ -57,15 +57,20 @@ ducet get-global insert-helpers
     0x7FFF bitand 0x8000 bitor 0 0 f weight boa ;
 
 : illegal? ( char -- ? )
-    { [ "Noncharacter_Code_Point" property? ] [ category "Cs" = ] } 1|| ;
+    {
+        [ "Noncharacter_Code_Point" property? ]
+        [ category "Cs" = ]
+    } 1|| ;
 
 : derive-weight ( char -- weights )
-    first dup illegal?
-    [ drop { } ]
-    [ [ AAAA ] [ BBBB ] bi 2array ] if ;
+    first dup illegal? [
+        drop { }
+    ] [
+        [ AAAA ] [ BBBB ] bi 2array
+    ] if ;
 
 : building-last ( -- char )
-    building get empty? [ 0 ] [ building get last last ] if ;
+    building get [ 0 ] [ last last ] if-empty ;
 
 : blocked? ( char -- ? )
     combining-class dup { 0 f } member?
@@ -98,8 +103,8 @@ ducet get-global insert-helpers
     ] { } map-as concat ;
 
 : append-weights ( weights quot -- )
-    [ [ ignorable?>> ] reject ] dip
-    map [ zero? ] reject % 0 , ; inline
+    [ [ ignorable?>> ] reject ] dip map
+    [ zero? ] reject % 0 , ; inline
 
 : variable-weight ( weight -- )
     dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if , ;
@@ -117,8 +122,11 @@ ducet get-global insert-helpers
 PRIVATE>
 
 : completely-ignorable? ( weight -- ? )
-    [ primary>> ] [ secondary>> ] [ tertiary>> ] tri
-    [ zero? ] tri@ and and ;
+    {
+        [ primary>> zero? ]
+        [ secondary>> zero? ]
+        [ tertiary>> zero? ]
+    } 1&& ;
 
 : filter-ignorable ( weights -- weights' )
     f swap [
