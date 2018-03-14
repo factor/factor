@@ -22,26 +22,23 @@ IN: game-of-life
         bit-array boa
     ] map! drop ;
 
-:: wraparound ( x min max -- y )
-    x min < [ max ] [ x max > min x ? ] if ; inline
-
 :: count-neighbors ( grid -- counts )
     grid grid-dim { fixnum fixnum } declare :> ( rows cols )
     rows 1 - { fixnum } declare :> max-rows
     cols 1 - { fixnum } declare :> max-cols
     rows [ cols <byte-array> ] replicate :> neighbors
     grid { array } declare [| row j |
-        j 1 - 0 max-rows wraparound
+        j 0 eq? [ max-rows ] [ j 1 - ] if
         j
-        j 1 + 0 max-rows wraparound
+        j max-rows eq? [ 0 ] [ j 1 + ] if
         [ neighbors nth-unsafe { byte-array } declare ] tri@ :>
         ( above same below )
 
         row { bit-array } declare [| cell i |
             cell [
-                i 1 - 0 max-cols wraparound
+                i 0 eq? [ max-cols ] [ i 1 - ] if
                 i
-                i 1 + 0 max-cols wraparound
+                i max-cols eq? [ 0 ] [ i 1 + ] if
 
                 [ [ above [ 1 + ] change-nth-unsafe ] tri@ ]
                 [ nip [ same [ 1 + ] change-nth-unsafe ] bi@ ]
