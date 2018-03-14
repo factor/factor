@@ -173,8 +173,6 @@ M: stdin refill
 M: stdin cancel-operation
     [ size>> ] [ control>> ] bi [ cancel-operation ] bi@ ;
 
-M: stdin fd>> data>> handle-fd ; ! for handle-length
-
 : control-write-fd ( -- fd ) &: control_write uint deref ;
 
 : size-read-fd ( -- fd ) &: size_read uint deref ;
