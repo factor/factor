@@ -132,11 +132,19 @@ libfactor-ffi-test.dll: vm/ffi_test.obj
 factor.dll.lib: $(DLL_OBJS)
 	link $(LINK_FLAGS) /implib:factor.dll.lib /out:factor.dll /dll $(DLL_OBJS)
 
-factor.com: $(EXE_OBJS) $(DLL_OBJS)
+# If we ``link`` factor.com and then ``mt`` it in the same rule (for retina support)
+# then factor.com is still open and ``mt`` fails
+# sleep hack fixes it...
+factor.com :: $(EXE_OBJS) $(DLL_OBJS)
 	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:$(SUBSYSTEM_COM_FLAGS) $(EXE_OBJS) $(DLL_OBJS)
+factor.com ::
+	mt -manifest factor.exe.manifest -outputresource:factor.com;#1
 
-factor.exe: $(EXE_OBJS) $(DLL_OBJS)
+factor.exe :: $(EXE_OBJS) $(DLL_OBJS)
 	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:$(SUBSYSTEM_EXE_FLAGS) $(EXE_OBJS) $(DLL_OBJS)
+factor.exe ::
+	mt -manifest factor.exe.manifest -outputresource:factor.exe;#1
+
 
 all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
 
