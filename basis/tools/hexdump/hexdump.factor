@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors ascii byte-arrays byte-vectors combinators
-command-line destructors formatting fry io io.encodings
-io.encodings.binary io.files io.streams.string kernel literals
-locals math math.parser namespaces sequences sequences.private
-strings typed ;
+command-line destructors fry io io.encodings io.encodings.binary
+io.files io.streams.string kernel literals locals math
+math.parser namespaces sequences sequences.private strings typed
+;
 
 IN: tools.hexdump
 
@@ -63,12 +63,12 @@ TYPED: write-hex-line ( from: fixnum to: fixnum bytes: byte-array -- )
     len 16 /mod
     [ [ 16 * dup 16 + bytes write-hex-line ] each-integer ]
     [ [ len swap - len bytes write-hex-line ] unless-zero ] bi*
-    len "%08x\n" printf ;
+    len >hex 8 CHAR: 0 pad-head print ;
 
 : hexdump-stream ( stream -- )
     reset-line# 0 swap [
         all-bytes [ write-hex-line ] [ length + ] bi
-    ] 16 (each-stream-block) "%08x\n" printf ;
+    ] 16 (each-stream-block) >hex 8 CHAR: 0 pad-head print ;
 
 PRIVATE>
 
