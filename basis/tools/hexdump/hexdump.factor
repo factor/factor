@@ -11,10 +11,7 @@ IN: tools.hexdump
 
 <PRIVATE
 
-: write-header ( len -- )
-    dup "Length: %d, %xh\n" printf ;
-
-CONSTANT: line# "00000000h: "
+CONSTANT: line# "00000000  "
 
 : inc-line# ( -- )
     7 [ CHAR: 0 = over 0 > and ] [
@@ -28,7 +25,7 @@ CONSTANT: line# "00000000h: "
     ] do while drop ;
 
 : reset-line# ( -- )
-    7 [ CHAR: 0 swap line# set-nth ] each-integer ;
+    8 [ CHAR: 0 swap line# set-nth ] each-integer ;
 
 CONSTANT: hex-digits $[
     256 <iota> [ >hex 2 CHAR: 0 pad-head " " append ] map
@@ -49,7 +46,9 @@ CONSTANT: hex-digits $[
     ] unless-zero ; inline
 
 : write-ascii ( from to bytes stream -- )
-    '[ [ printable? ] keep CHAR: . ? _ stream-write1 ] each-byte ; inline
+    dup stream-bl '[
+        [ printable? ] keep CHAR: . ? _ stream-write1
+    ] each-byte ; inline
 
 TYPED: write-hex-line ( from: fixnum to: fixnum bytes: byte-array -- )
     line# write inc-line# output-stream get {
@@ -61,15 +60,15 @@ TYPED: write-hex-line ( from: fixnum to: fixnum bytes: byte-array -- )
 :: hexdump-bytes ( from to bytes -- )
     reset-line#
     to from - :> len
-    len write-header
     len 16 /mod
     [ [ 16 * dup 16 + bytes write-hex-line ] each-integer ]
-    [ [ len swap - len bytes write-hex-line ] unless-zero ] bi* ;
+    [ [ len swap - len bytes write-hex-line ] unless-zero ] bi*
+    len "%08x\n" printf ;
 
 : hexdump-stream ( stream -- )
-    reset-line#
-    [ stream-length write-header ]
-    [ [ all-bytes write-hex-line ] 16 (each-stream-block) ] bi ;
+    reset-line# 0 swap [
+        all-bytes [ write-hex-line ] [ length + ] bi
+    ] 16 (each-stream-block) "%08x\n" printf ;
 
 PRIVATE>
 
