@@ -360,18 +360,21 @@ ${example-indent}}
     [ touch-file ]
     [ "Click to edit: " write <pathname> . ] bi ;
 
+: scaffold-rc ( path -- )
+    [ home ] dip append-path scaffold-file ;
+
 : scaffold-factor-boot-rc ( -- )
-    "~/.factor-boot-rc" scaffold-file ;
+    ".factor-boot-rc" scaffold-rc ;
 
 : scaffold-factor-rc ( -- )
-    "~/.factor-rc" scaffold-file ;
+    ".factor-rc" scaffold-rc ;
 
 : scaffold-mason-rc ( -- )
-    "~/.factor-mason-rc" scaffold-file ;
+    ".factor-mason-rc" scaffold-rc ;
 
 : scaffold-factor-roots ( -- )
-    "~/.factor-roots" scaffold-file ;
+    ".factor-roots" scaffold-rc ;
 
 HOOK: scaffold-emacs os ( -- )
 
-M: unix scaffold-emacs ( -- ) "~/.emacs" scaffold-file ;
+M: unix scaffold-emacs ( -- ) ".emacs" scaffold-rc ;

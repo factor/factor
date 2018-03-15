@@ -33,7 +33,7 @@ M: linux find-visual-studio-code-invocation
     {
         [ "code" which ]
         [ "Code" which ]
-        [ "~/VSCode-linux-x64/Code" ]
+        [ home "VSCode-linux-x64/Code" append-path ]
         [ "/usr/share/code/code" ]
     } [ [ exists? ] ?1arg ] map-compose 0|| ;
 
