@@ -1,20 +1,22 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cocoa.messages compiler.units core-foundation.bundles
+USING: assocs cocoa.messages compiler.units core-foundation.bundles
 hashtables init io kernel lexer namespaces sequences vocabs ;
 IN: cocoa
 
 SYMBOL: sent-messages
 
-: (remember-send) ( selector variable -- )
-    [ dupd ?set-at ] change-global ;
+sent-messages [ H{ } clone ] initialize
 
 : remember-send ( selector -- )
-    sent-messages (remember-send) ;
+    dup sent-messages get set-at ;
 
 SYNTAX: \send: scan-token unescape-token dup remember-send suffix! \ send suffix! ;
 
-SYNTAX: \?send: scan-token unescape-token dup remember-send suffix! \ ?send suffix! ;
+SYNTAX: \?send:
+    dup last cache-stubs 
+    scan-token unescape-token dup remember-send
+    suffix! \ ?send suffix! ;
 
 SYNTAX: \selector:
     scan-token unescape-token
@@ -23,11 +25,14 @@ SYNTAX: \selector:
 
 SYMBOL: super-sent-messages
 
+super-sent-messages [ H{ } clone ] initialize
+
 : remember-super-send ( selector -- )
-    super-sent-messages (remember-send) ;
+    dup super-sent-messages get set-at ;
 
-SYNTAX: \super: scan-token unescape-token dup remember-super-send suffix! \ super-send suffix! ;
-
+SYNTAX: \super:
+    scan-token unescape-token dup remember-super-send
+    suffix! \ super-send suffix! ;
 SYMBOL: frameworks
 
 frameworks [ V{ } clone ] initialize

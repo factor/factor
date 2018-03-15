@@ -1,12 +1,12 @@
 ! Copyright (C) 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs bit-arrays calendar
-colors.constants combinators combinators.short-circuit fry
-kernel kernel.private locals math math.order math.private
-math.ranges namespaces opengl random sequences sequences.private
-timers ui ui.commands ui.gadgets ui.gadgets.toolbar
-ui.gadgets.tracks ui.gestures ui.render words ;
+USING: accessors arrays assocs bit-arrays byte-arrays calendar
+colors.constants combinators fry kernel kernel.private locals
+math math.order math.ranges namespaces opengl random sequences
+sequences.private timers ui ui.commands ui.gadgets
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words
+;
 
 IN: game-of-life
 
@@ -16,44 +16,48 @@ IN: game-of-life
 : grid-dim ( grid -- rows cols )
     [ length ] [ first length ] bi ;
 
-:: wraparound ( x min max -- y )
-    x min fixnum< [ max ] [ x max fixnum> min x ? ] if ; inline
+: random-grid! ( grid -- )
+    [
+        [ length>> ] [ underlying>> length random-bytes ] bi
+        bit-array boa
+    ] map! drop ;
 
 :: count-neighbors ( grid -- counts )
     grid grid-dim { fixnum fixnum } declare :> ( rows cols )
-    rows <iota> [| j |
-        cols <iota> [| i |
-            { -1 0 1 } [
-                { -1 0 1 } [
-                    2dup [ 0 eq? ] both? [ 2drop f ] [
-                        [ i fixnum+fast 0 cols 1 - wraparound ]
-                        [ j fixnum+fast 0 rows 1 - wraparound ] bi*
-                        { fixnum fixnum } declare grid
-                        { array } declare nth-unsafe
-                        { bit-array } declare nth-unsafe
-                    ] if
-                ] with count
-            ] map-sum
-        ] map
-    ] map ;
+    rows 1 - { fixnum } declare :> max-rows
+    cols 1 - { fixnum } declare :> max-cols
+    rows [ cols <byte-array> ] replicate :> neighbors
+    grid { array } declare [| row j |
+        j 0 eq? [ max-rows ] [ j 1 - ] if
+        j
+        j max-rows eq? [ 0 ] [ j 1 + ] if
+        [ neighbors nth-unsafe { byte-array } declare ] tri@ :>
+        ( above same below )
+
+        row { bit-array } declare [| cell i |
+            cell [
+                i 0 eq? [ max-cols ] [ i 1 - ] if
+                i
+                i max-cols eq? [ 0 ] [ i 1 + ] if
+
+                [ [ above [ 1 + ] change-nth-unsafe ] tri@ ]
+                [ nip [ same [ 1 + ] change-nth-unsafe ] bi@ ]
+                [ [ below [ 1 + ] change-nth-unsafe ] tri@ ]
+                3tri
+            ] when
+        ] each-index
+    ] each-index neighbors ;
 
 :: next-step ( grid -- )
-    grid count-neighbors :> neighbors
-    grid [| row j |
-        row [| cell i |
-            i j neighbors
-            { array } declare nth-unsafe
-            { array } declare nth-unsafe
+    grid count-neighbors { array } declare :> neighbors
+    grid { array } declare [| row j |
+        j neighbors nth-unsafe { byte-array } declare :> neighbor-row
+        row { bit-array } declare [| cell i |
+            i neighbor-row nth-unsafe
             cell [
-                2 3 between? i j grid
-                { array } declare nth-unsafe
-                { bit-array } declare set-nth-unsafe
+                2 3 between? i row set-nth-unsafe
             ] [
-                3 = [
-                    t i j grid
-                    { array } declare nth-unsafe
-                    { bit-array } declare set-nth-unsafe
-                ] when
+                3 = [ t i row set-nth-unsafe ] when
             ] if
         ] each-index
     ] each-index ;
@@ -94,8 +98,8 @@ M: grid-gadget pref-dim*
 :: draw-cells ( gadget -- )
     COLOR: black gl-color
     gadget size>> :> size
-    gadget grid>> [| row j |
-        row [| cell i |
+    gadget grid>> { array } declare [| row j |
+        row { bit-array } declare [| cell i |
             cell [
                 i j [ size * ] bi@ 2array
                 { size size } gl-fill-rect
@@ -151,28 +155,21 @@ SYMBOL: last-click
     ] change-size relayout-1 ;
 
 :: com-play ( gadget -- )
-    gadget timer>> thread>> [
-        gadget timer>> start-timer
-    ] unless ;
+    gadget timer>> restart-timer ;
 
 :: com-step ( gadget -- )
     gadget grid>> next-step
     gadget relayout-1 ;
 
 :: com-stop ( gadget -- )
-    gadget timer>> thread>> [
-        gadget timer>> stop-timer
-    ] when ;
+    gadget timer>> stop-timer ;
 
 :: com-clear ( gadget -- )
     gadget grid>> [ clear-bits ] each
     gadget relayout-1 ;
 
 :: com-random ( gadget -- )
-    gadget grid>> [
-        [ length>> ] [ underlying>> length random-bytes ] bi
-        bit-array boa
-    ] map! drop gadget relayout-1 ;
+    gadget grid>> random-grid! gadget relayout-1 ;
 
 :: com-glider ( gadget -- )
     gadget grid>> :> grid

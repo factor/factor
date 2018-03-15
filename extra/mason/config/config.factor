@@ -5,7 +5,10 @@ IN: mason.config
 
 ! (Optional) Location for build directories
 SYMBOL: builds-dir
-builds-dir [ "~/builds" ] initialize
+
+builds-dir get-global [
+    home "builds" append-path builds-dir set-global
+] unless
 
 ! Who sends build report e-mails.
 SYMBOL: builder-from
@@ -15,11 +18,13 @@ SYMBOL: builder-recipients
 
 ! (Optional) CPU architecture to build for.
 SYMBOL: target-cpu
-target-cpu [ cpu ] initialize
+
+target-cpu get-global [ cpu target-cpu set-global ] unless
 
 ! (Optional) OS to build for.
 SYMBOL: target-os
-target-os [ os ] initialize
+
+target-os get-global [ os target-os set-global ] unless
 
 ! (Optional) Architecture variant suffix.
 SYMBOL: target-variant
@@ -32,10 +37,12 @@ SYMBOL: builder-debug
 
 ! URL for counter notifications.
 SYMBOL: counter-url
+
 counter-url [ "http://builds.factorcode.org/counter" ] initialize
 
 ! URL for status notifications.
 SYMBOL: status-url
+
 status-url [ "http://builds.factorcode.org/status-update" ] initialize
 
 ! Password for status notifications.
@@ -56,6 +63,7 @@ SYMBOL: docs-directory
 
 ! URL to notify server about new docs
 SYMBOL: docs-update-url
+
 docs-update-url [ "http://builds.factorcode.org/docs-update" ] initialize
 
 ! Boolean. Do we upload package binaries?

@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays calendar
-classes combinators combinators.short-circuit fry hashtables
-help.markup interpolate io io.directories io.encodings.utf8
-io.files io.pathnames io.streams.string kernel math math.parser
-namespaces prettyprint quotations sequences sets sorting
-splitting strings system timers unicode urls vocabs
+classes classes.error combinators combinators.short-circuit fry
+hashtables help.markup interpolate io io.directories
+io.encodings.utf8 io.files io.pathnames io.streams.string kernel
+math math.parser namespaces prettyprint quotations sequences
+sets sorting splitting strings system timers unicode urls vocabs
 vocabs.loader vocabs.metadata words words.symbol ;
 IN: tools.scaffold
 
@@ -183,6 +183,13 @@ M: object add-using ( object -- )
         ] if
     ] when* ;
 
+: error-description. ( word -- )
+    [ $values. ] [
+        "{ $description \"Throws " write
+        name>> dup a/an write " \" { $link " write
+        write " } \" error.\" }" print
+    ] bi "{ $error-description \"\" } ;" print ;
+
 : class-description. ( word -- )
     drop "{ $class-description \"\" } ;" print ;
 
@@ -194,6 +201,7 @@ M: object add-using ( object -- )
 
 : docs-body. ( word/symbol -- )
     {
+        { [ dup error-class? ] [ error-description. ] }
         { [ dup class? ] [ class-description. ] }
         { [ dup symbol? ] [ symbol-description. ] }
         [ [ $values. ] [ $description. ] bi ]
@@ -352,18 +360,21 @@ ${example-indent}}
     [ touch-file ]
     [ "Click to edit: " write <pathname> . ] bi ;
 
+: scaffold-rc ( path -- )
+    [ home ] dip append-path scaffold-file ;
+
 : scaffold-factor-boot-rc ( -- )
-    "~/.factor-boot-rc" scaffold-file ;
+    ".factor-boot-rc" scaffold-rc ;
 
 : scaffold-factor-rc ( -- )
-    "~/.factor-rc" scaffold-file ;
+    ".factor-rc" scaffold-rc ;
 
 : scaffold-mason-rc ( -- )
-    "~/.factor-mason-rc" scaffold-file ;
+    ".factor-mason-rc" scaffold-rc ;
 
 : scaffold-factor-roots ( -- )
-    "~/.factor-roots" scaffold-file ;
+    ".factor-roots" scaffold-rc ;
 
 HOOK: scaffold-emacs os ( -- )
 
-M: unix scaffold-emacs ( -- ) "~/.emacs" scaffold-file ;
+M: unix scaffold-emacs ( -- ) ".emacs" scaffold-rc ;

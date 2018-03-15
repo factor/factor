@@ -12,6 +12,7 @@ IN: mason.release
     sign-factor-app
     archive-name {
         [ make-archive ]
+        [ sign-archive ]
         [ upload ]
         [ save-archive ]
         [ notify-release ]

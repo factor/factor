@@ -19,9 +19,11 @@ HOOK: cert-path os ( -- path/f )
 
 M: object cert-path f ;
 
-M: macosx cert-path "~/config/mac_app.cer" ;
+M: macosx cert-path
+    home "config/mac_app.cer" append-path ;
 
-M: windows cert-path "~/config/FactorSPC.pfx" ;
+M: windows cert-path
+    home "config/FactorSPC.pfx" append-path ;
 >>
 
 HOOK: sign-factor-app os ( -- )
@@ -47,3 +49,18 @@ M:: windows sign-factor-app ( -- )
             }
         ] dip make-factor-path suffix short-running-process
     ] each ;
+
+HOOK: sign-archive os ( path -- )
+
+M: object sign-archive drop ;
+
+! Sign the .dmg on macOS as well to avoid Gatekeeper marking
+! the xattrs as quarantined.
+! https://github.com/factor/factor/issues/1896
+M: macosx sign-archive ( path -- )
+    ${
+        "codesign" "--force" "--sign"
+        "Developer ID Application"
+        cert-path
+    } swap suffix
+    short-running-process ;

@@ -94,7 +94,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 : run-mason-rc ( -- )
     t "user-init" [
-        "~/.factor-mason-rc" try-user-init
+        ".factor-mason-rc" rc-path try-user-init
     ] with-variable ;
 
 : check-user-init-errors ( -- ? )

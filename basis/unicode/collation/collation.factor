@@ -52,12 +52,12 @@ ducet get-global insert-helpers
 ! Unicode TR10 - Computing Implicit Weights
 : base ( char -- base )
     {
-        { [ dup 0x3400 0x4DB5 between? ] [ drop 0xFB80 ] } ! Extension A
+        { [ dup 0x03400 0x04DB5 between? ] [ drop 0xFB80 ] } ! Extension A
         { [ dup 0x20000 0x2A6D6 between? ] [ drop 0xFB80 ] } ! Extension B
         { [ dup 0x2A700 0x2B734 between? ] [ drop 0xFB80 ] } ! Extension C
         { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
         { [ dup 0x2B820 0x2CEA1 between? ] [ drop 0xFB80 ] } ! Extension E
-        { [ dup 0x4E00 0x9FD5 between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x04E00 0x09FD5 between? ] [ drop 0xFB40 ] } ! CJK
         [ drop 0xFBC0 ] ! Other
     } cond ;
 
@@ -73,16 +73,26 @@ ducet get-global insert-helpers
 : BBBB ( char -- weight-levels )
     0x7FFF bitand 0x8000 bitor 0 0 <weight-levels> ; inline
 
+: illegal? ( char -- ? )
+    {
+        [ "Noncharacter_Code_Point" property? ]
+        [ category "Cs" = ]
+    } 1|| ;
+
 : derive-weight ( 1string -- weight-levels-pair )
     first
     dup tangut-block? [
-        [ tangut-AAAA ] [ tangut-BBBB ] bi
+        [ tangut-AAAA ] [ tangut-BBBB ] bi 2array
     ] [
-        [ AAAA ] [ BBBB ] bi
-    ] if 2array ;
+        first dup illegal? [
+            drop { }
+        ] [
+            [ AAAA ] [ BBBB ] bi 2array
+        ] if
+    ] if ;
 
 : building-last ( -- char )
-    building get empty? [ 0 ] [ building get last last ] if ;
+    building get [ 0 ] [ last last ] if-empty ;
 
 : blocked? ( char -- ? )
     combining-class dup { 0 f } member?
@@ -138,7 +148,11 @@ ducet get-global insert-helpers
 PRIVATE>
 
 : completely-ignorable? ( weight -- ? )
-    { [ primary>> zero? ] [ secondary>> zero? ] [ tertiary>> zero? ] } 1&& ;
+    {
+        [ primary>> zero? ]
+        [ secondary>> zero? ]
+        [ tertiary>> zero? ]
+    } 1&& ;
 
 : filter-ignorable ( weights -- weights' )
     f swap [

@@ -4,8 +4,8 @@ USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
 combinators core-graphics.types fry generalizations
 io.encodings.utf8 kernel layouts libc locals macros make math
-memoize namespaces quotations sequences specialized-arrays
-stack-checker strings words ;
+memoize namespaces quotations sequences sets specialized-arrays
+splitting stack-checker strings words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
@@ -44,7 +44,11 @@ super-message-senders [ H{ } clone ] initialize
 
 TUPLE: selector-tuple name object ;
 
-MEMO: <selector> ( name -- sel ) f \ selector-tuple boa ;
+: selector-name ( name -- name' )
+    CHAR: . over index [ 0 > [ "." split1 nip ] when ] when* ;
+
+MEMO: <selector> ( name -- sel )
+    selector-name f selector-tuple boa ;
 
 : selector ( selector -- alien )
     dup object>> expired? [
@@ -63,38 +67,24 @@ objc-methods [ H{ } clone ] initialize
 
 ERROR: no-objc-method name ;
 
-: ?lookup-method ( selector -- method/f )
+: ?lookup-method ( selector -- signature/f )
     objc-methods get at ;
 
-: lookup-method ( selector -- method )
+: lookup-method ( selector -- signature )
     dup ?lookup-method [ ] [ no-objc-method ] ?if ;
 
-: lookup-sender ( name -- method )
-    lookup-method message-senders get at ;
-
-MEMO: make-prepare-send ( selector method super? -- quot )
+MEMO: make-prepare-send ( selector signature super? -- quot )
     [
         [ \ <super> , ] when swap <selector> , \ selector ,
-    ] [ ] make
-    swap second length 2 - '[ _ _ ndip ] ;
+    ] [ ] make swap second length 2 - '[ _ _ ndip ] ;
 
-MACRO: (send) ( selector super? -- quot )
-    [ dup lookup-method ] dip
-    [ make-prepare-send ] 2keep
-    super-message-senders message-senders ? get at
-    1quotation append ;
+MACRO: (send) ( signature selector super? -- quot )
+    swapd [ make-prepare-send ] 2keep
+    super-message-senders message-senders ? get at suffix ;
 
-: send ( receiver args... selector -- return... ) f (send) ; inline
+: send ( receiver args... signature selector -- return... ) f (send) ; inline
 
-MACRO:: (?send) ( effect selector super? -- quot )
-    selector dup ?lookup-method effect or super?
-    [ make-prepare-send ] 2keep
-    super-message-senders message-senders ? get at
-    [ 1quotation append ] [ effect selector sender-stub 1quotation append ] if* ;
-
-: ?send ( receiver args... selector effect -- return... ) f (?send) ; inline
-
-: super-send ( receiver args... selector -- return... ) t (send) ; inline
+: super-send ( receiver args... signature selector -- return... ) t (send) ; inline
 
 ! Runtime introspection
 SYMBOL: class-init-hooks
@@ -231,19 +221,33 @@ ERROR: no-objc-type name ;
     [ utf8 alien>string parse-objc-type ] keep
     (free) ;
 
+: method-signature ( method -- signature )
+    [ method-return-type ] [ method-arg-types ] bi 2array ;
+
 : method-name ( method -- name )
     method_getName sel_getName ;
 
-: register-objc-method ( method -- )
-    [ method-name ]
-    [ [ method-return-type ] [ method-arg-types ] bi 2array ] bi
-    [ nip cache-stubs ] [ swap objc-methods get set-at ] 2bi ;
+:: register-objc-method ( classname method -- )
+    method method-signature :> signature
+    method method-name :> name
+    classname "." name 3append :> fullname
+    signature cache-stubs
+    signature name objc-methods get set-at
+    signature fullname objc-methods get set-at ;
 
-: each-method-in-class ( class quot -- )
-    [ { uint } [ class_copyMethodList ] with-out-parameters ] dip
-    over 0 = [ 3drop ] [
+: method-collisions ( -- collisions )
+    objc-methods get >alist
+    [ first CHAR: . swap member? ] filter
+    [ first "." split1 nip ] collect-by
+    [ nip values members length 1 > ] assoc-filter ;
+
+: each-method-in-class ( class quot: ( classname method -- ) -- )
+    [
+        [ class_getName ] keep
+        { uint } [ class_copyMethodList ] with-out-parameters
+    ] dip over 0 = [ 4drop ] [
         [ void* <c-direct-array> ] dip
-        [ each ] [ drop (free) ] 2bi
+        [ with each ] [ drop (free) ] 2bi
     ] if ; inline
 
 : register-objc-methods ( class -- )

@@ -189,11 +189,9 @@ M: send-touchbar-command send-queued-gesture
         self selector: \setWantsBestResolutionOpenGLSurface:
         send: \respondsToSelector: c-bool> [
 
-            self selector: \setWantsBestResolutionOpenGLSurface: 1
-            void f "objc_msgSend" { id SEL char } f alien-invoke
+            self 1 { void { id SEL char } } ?send: setWantsBestResolutionOpenGLSurface:
 
-            self selector: backingScaleFactor
-            double f "objc_msgSend" { id SEL } f alien-invoke
+            self { double { id SEL } } ?send: backingScaleFactor
 
             dup 1.0 > [
                 gl-scale-factor set-global t retina? set-global
@@ -213,13 +211,13 @@ M: send-touchbar-command send-queued-gesture
     COCOA-METHOD: void touchBarCommand6 [ 6 touchbar-invoke-command ] ;
     COCOA-METHOD: void touchBarCommand7 [ 7 touchbar-invoke-command ] ;
 
-    COCOA-METHOD: Class makeTouchBar [
+    COCOA-METHOD: id makeTouchBar [
         touchbar-commands drop [
             length 8 min <iota> [ number>string ] map
         ] [ { } ] if* self make-touchbar
     ] ;
 
-    COCOA-METHOD: Class touchBar: Class touchbar makeItemForIdentifier: Class string [
+    COCOA-METHOD: id touchBar: id touchbar makeItemForIdentifier: id string [
         touchbar-commands drop [
             [ self string CFString>string dup string>number ] dip nth
             second name>> "com-" ?head drop over

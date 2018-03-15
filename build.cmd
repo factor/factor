@@ -3,8 +3,8 @@ setlocal
 
 : Check which branch we are on, or just assume master if we are not in a git repository
 for /f %%z in ('git rev-parse --abbrev-ref HEAD') do set GIT_BRANCH=%%z
-if %GIT_BRANCH% =="" (
-    GIT_BRANCH = "master"
+if not defined GIT_BRANCH (
+    set GIT_BRANCH=master
 )
 
 if "%1"=="/?" (

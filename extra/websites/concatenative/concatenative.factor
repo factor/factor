@@ -31,7 +31,7 @@ webapps.mason.backend.watchdog
 websites.factorcode ;
 IN: websites.concatenative
 
-: website-db ( -- db ) "~/website.db" <sqlite-db> ;
+: website-db ( -- db ) home "website.db" append-path <sqlite-db> ;
 
 : init-factor-db ( -- )
     mason-db [ init-mason-db ] with-db
@@ -107,9 +107,9 @@ SYMBOLS: key-password key-file dh-file ;
         <pastebin> <factor-recaptcha> <login-config> <factor-boilerplate> website-db <alloy> "paste.factorcode.org" add-responder
         <planet> <login-config> <factor-boilerplate> website-db <alloy> "planet.factorcode.org" add-responder
         <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
-        "~/docs" <help-webapp> "docs.factorcode.org" add-responder
-        "~/cgi" <gitweb> "gitweb.factorcode.org" add-responder
-        "~/irclogs" <static> t >>allow-listings "irclogs.factorcode.org" add-responder
+        home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
+        home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
+        home "irclogs" append-path <static> t >>allow-listings "irclogs.factorcode.org" add-responder
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )
