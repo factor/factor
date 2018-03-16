@@ -108,7 +108,14 @@ TUPLE: CreateProcess-args
 : fill-dwCreateFlags ( process args -- process args )
     0
     pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
-    pick detached>> os windows? and [ DETACHED_PROCESS bitor ] when
+    pick group>> [
+        {
+            { +same-group+ [ ] }
+            { +new-session+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
+            { +new-group+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
+            [ drop ]
+        } case
+    ] when*
     pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
