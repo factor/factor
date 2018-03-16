@@ -6,7 +6,7 @@ make math.parser memoize namespaces sequences system tools.which ;
 IN: editors.visual-studio-code
 
 ! Command line arguments
-! https://code.visualstudio.com/docs/editor/codebasics#_additional-command-line-arguments
+! https://code.visualstudio.com/docs/editor/command-line
 
 SINGLETON: visual-studio-code
 visual-studio-code editor-class set-global
