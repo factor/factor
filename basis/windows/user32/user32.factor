@@ -748,6 +748,45 @@ ALIAS: SPIF_SENDCHANGE                 SPIF_SENDWININICHANGE
 TYPEDEF: HANDLE HRAWINPUT
 : GET_RAWINPUT_CODE_WPARAM ( wParam -- n ) 0xff bitand ; inline
 
+CONSTANT: LLMHF_INJECTED 1
+CONSTANT: LLMHF_LOWER_IL_INJECTED 2
+
+
+CONSTANT: WH_JOURNALRECORD 0    ! global
+CONSTANT: WH_JOURNALPLAYBACK 1  ! global
+CONSTANT: WH_KEYBOARD 2         ! thread/global
+CONSTANT: WH_GETMESSAGE 3       ! thread/global
+CONSTANT: WH_CALLWNDPROC 4      ! thread/global
+CONSTANT: WH_CBT 5              ! thread/global
+CONSTANT: WH_SYSMSGFILTER 6     ! global
+CONSTANT: WH_MOUSE 7            ! thread/global
+CONSTANT: WH_DEBUG 9            ! thread/global
+CONSTANT: WH_SHELL 10           ! thread/global
+CONSTANT: WH_FOREGROUNDIDLE 11  ! thread/global
+CONSTANT: WH_CALLWNDPROCRET 12  ! thread/global
+CONSTANT: WH_KEYBOARD_LL 13     ! global
+CONSTANT: WH_MOUSE_LL 14        ! global
+CONSTANT: WH_MSGFILTER -1       ! thread/global
+
+
+STRUCT: KBDLLHOOKSTRUCT
+    { vkCode DWORD }
+    { scanCode DWORD }
+    { flags DWORD }
+    { time DWORD }
+    { dwExtraInfo ULONG_PTR } ;
+TYPEDEF: KBDLLHOOKSTRUCT* PKBDLLHOOKSTRUCT
+TYPEDEF: KBDLLHOOKSTRUCT* LPKBDLLHOOKSTRUCT
+
+STRUCT: MSLLHOOKSTRUCT
+  { pt POINT }
+  { mouseData DWORD }
+  { flags DWORD }
+  { time DWORD }
+  { dwExtraInfo ULONG_PTR } ;
+TYPEDEF: MSLLHOOKSTRUCT* PMSLLHOOKSTRUCT
+TYPEDEF: MSLLHOOKSTRUCT* LPMSLLHOOKSTRUCT
+
 CONSTANT: RIM_INPUT        0
 CONSTANT: RIM_INPUTSINK    1
 
@@ -1013,6 +1052,70 @@ STRUCT: CHANGEFILTERSTRUCT
     { ExtStatus DWORD } ;
 TYPEDEF: CHANGEFILTERSTRUCT* PCHANGEFILTERSTRUCT
 
+CONSTANT: INPUT_MOUSE 0
+CONSTANT: INPUT_KEYBOARD 1
+CONSTANT: INPUT_HARDWARE 2
+
+CONSTANT: XBUTTON1 1
+CONSTANT: XBUTTON2 2
+
+CONSTANT: MOUSEEVENTF_ABSOLUTE 0x8000
+CONSTANT: MOUSEEVENTF_HWHEEL 0x01000
+CONSTANT: MOUSEEVENTF_MOVE 0x0001
+CONSTANT: MOUSEEVENTF_MOVE_NOCOALESCE 0x2000
+CONSTANT: MOUSEEVENTF_LEFTDOWN 0x0002
+CONSTANT: MOUSEEVENTF_LEFTUP 0x0004
+CONSTANT: MOUSEEVENTF_RIGHTDOWN 0x0008
+CONSTANT: MOUSEEVENTF_RIGHTUP 0x0010
+CONSTANT: MOUSEEVENTF_MIDDLEDOWN 0x0020
+CONSTANT: MOUSEEVENTF_MIDDLEUP 0x0040
+CONSTANT: MOUSEEVENTF_VIRTUALDESK 0x4000
+CONSTANT: MOUSEEVENTF_WHEEL 0x0800
+CONSTANT: MOUSEEVENTF_XDOWN 0x0080
+CONSTANT: MOUSEEVENTF_XUP 0x0100
+
+STRUCT: MOUSEINPUT
+    { dx LONG }
+    { dy LONG }
+    { mouseData DWORD }
+    { dwFlags DWORD }
+    { time DWORD }
+    { dwExtraInfo ULONG_PTR } ;
+TYPEDEF: MOUSEINPUT* PMOUSEINPUT
+
+CONSTANT: KEYEVENTF_EXTENDEDKEY 1
+CONSTANT: KEYEVENTF_KEYUP 2
+CONSTANT: KEYEVENTF_UNICODE 4
+CONSTANT: KEYEVENTF_SCANCODE 8
+
+
+STRUCT: KEYBDINPUT
+    { wVk WORD }
+    { wScan WORD }
+    { dwFlags DWORD }
+    { time DWORD }
+    { dwExtraInfo ULONG_PTR } ;
+TYPEDEF: KEYBDINPUT* PKEYBDINPUT
+
+STRUCT: HARDWAREINPUT
+    { uMsg DWORD }
+    { wParamL WORD }
+    { wParamH WORD } ;
+TYPEDEF: HARDWAREINPUT* PHARDWAREINPUT
+
+
+UNION-STRUCT: ANYINPUT
+    { mi MOUSEINPUT }
+    { ki KEYBDINPUT }
+    { hi HARDWAREINPUT } ;
+
+STRUCT: INPUT
+    { type DWORD }
+    { input ANYINPUT } ;
+TYPEDEF: INPUT* PINPUT
+TYPEDEF: INPUT* LPINPUT
+
+
 CONSTANT: LR_DEFAULTCOLOR 0x00
 CONSTANT: LR_MONOCHROME 0x01
 CONSTANT: LR_COLOR 0x02
@@ -1192,6 +1295,8 @@ CONSTANT: SM_MEDIACENTER 87
 CONSTANT: SM_CMETRICS 88
 CONSTANT: SM_REMOTESESSION 0X1000
 
+CONSTANT: DF_ALLOWOTHERACCOUNTHOOK 1
+
 LIBRARY: user32
 
 FUNCTION: HKL ActivateKeyboardLayout ( HKL hkl, UINT Flags )
@@ -1224,7 +1329,7 @@ FUNCTION: HDC BeginPaint ( HWND hwnd, LPPAINTSTRUCT lpPaint )
 ! FUNCTION: CallMsgFilter
 ! FUNCTION: CallMsgFilterA
 ! FUNCTION: CallMsgFilterW
-! FUNCTION: CallNextHookEx
+FUNCTION: LRESULT CallNextHookEx ( HHOOK hhk, int nCode, WPARAM wParam, LPARAM lParam )
 ! FUNCTION: CallWindowProcA
 ! FUNCTION: CallWindowProcW
 ! FUNCTION: CascadeChildWindows
@@ -1291,7 +1396,8 @@ ALIAS: CreateAcceleratorTable CreateAcceleratorTableW
 ! FUNCTION: CreateCaret
 ! FUNCTION: CreateCursor
 ! FUNCTION: CreateDesktopA
-! FUNCTION: CreateDesktopW
+FUNCTION: HDESK CreateDesktopW ( LPCTSTR lpszDesktop, LPCTSTR lpszDevice, DEVMODE* pDevmode, DWORD dwFlags, ACCESS_MASK dwDesiredAccess, LPSECURITY_ATTRIBUTES lpsa )
+ALIAS: CreateDesktop CreateDesktopW
 ! FUNCTION: CreateDialogIndirectParamA
 ! FUNCTION: CreateDialogIndirectParamAorW
 ! FUNCTION: CreateDialogIndirectParamW
@@ -1441,7 +1547,7 @@ FUNCTION: BOOL EndPaint ( HWND hWnd, PAINTSTRUCT* lpPaint )
 FUNCTION: UINT EnumClipboardFormats ( UINT format )
 ! FUNCTION: EnumDesktopsA
 ! FUNCTION: EnumDesktopsW
-! FUNCTION: EnumDesktopWindows
+FUNCTION: BOOL EnumDesktopWindows ( HDESK hDesktop, WNDENUMPROC lpFn, LPARAM lParam )
 ! FUNCTION: EnumDisplayDevicesA
 ! FUNCTION: EnumDisplayDevicesW
 ! FUNCTION: BOOL EnumDisplayMonitors ( HDC hdc, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData )
@@ -1455,7 +1561,7 @@ ALIAS: EnumDisplaySettings EnumDisplaySettingsW
 ! FUNCTION: EnumPropsExW
 ! FUNCTION: EnumPropsW
 ! FUNCTION: EnumThreadWindows
-! FUNCTION: EnumWindows
+FUNCTION: BOOL EnumWindows ( WNDENUMPROC lpEnumFunc, LPARAM lParam )
 ! FUNCTION: EnumWindowStationsA
 ! FUNCTION: EnumWindowStationsW
 ! FUNCTION: EqualRect
@@ -1463,8 +1569,11 @@ ALIAS: EnumDisplaySettings EnumDisplaySettingsW
 ! FUNCTION: ExitWindowsEx
 FUNCTION: int FillRect ( HDC hDC, RECT* lprc, HBRUSH hbr )
 FUNCTION: HWND FindWindowA ( c-string lpClassName, c-string lpWindowName )
+FUNCTION: HWND FindWindowW ( c-string lpClassName, c-string lpWindowName )
+ALIAS: FindWindow FindWindowW
 FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, c-string lpClassName, c-string lpWindowName )
-! FUNCTION: FindWindowExW
+FUNCTION: HWND FindWindowExW ( HWND hwndParent, HWND hwndChildAfter, c-string lpszClass, c-string lpszWindow )
+ALIAS: FindWindowEx FindWindowExW
 ! FUNCTION: FindWindowW
 ! FUNCTION: FlashWindow
 ! FUNCTION: FlashWindowEx
@@ -1509,16 +1618,17 @@ FUNCTION: DWORD GetClipboardSequenceNumber ( )
 ! FUNCTION: GetCursor
 ! FUNCTION: GetCursorFrameInfo
 ! FUNCTION: GetCursorInfo
-! FUNCTION: GetCursorPos
+FUNCTION: BOOL GetCursorPos ( LPPOINT lpPoint )
 FUNCTION: HDC GetDC ( HWND hWnd )
 FUNCTION: HDC GetDCEx ( HWND hWnd, HRGN hrgnClip, DWORD flags )
 FUNCTION: HWND GetDesktopWindow ( )
 ! FUNCTION: GetDialogBaseUnits
 ! FUNCTION: GetDlgCtrlID
-! FUNCTION: GetDlgItem
+FUNCTION: HWND GetDlgItem ( HWND hDlg, int nIDDlgItem )
 ! FUNCTION: GetDlgItemInt
 ! FUNCTION: GetDlgItemTextA
-! FUNCTION: GetDlgItemTextW
+FUNCTION: UINT GetDlgItemTextW ( HWND hDlg, int nIDDlgItem, LPTSTR lpString, int nMaxCount )
+ALIAS: GetDlgItemText GetDlgItemTextW
 FUNCTION: uint GetDoubleClickTime ( )
 FUNCTION: HWND GetFocus ( )
 FUNCTION: HWND GetForegroundWindow ( )
@@ -1529,7 +1639,7 @@ FUNCTION: HWND GetForegroundWindow ( )
 ! FUNCTION: GetInputState
 ! FUNCTION: GetInternalWindowPos
 ! FUNCTION: GetKBCodePage
-! FUNCTION: GetKeyboardLayout
+FUNCTION: HKL GetKeyboardLayout ( DWORD idThread )
 ! FUNCTION: GetKeyboardLayoutList
 ! FUNCTION: GetKeyboardLayoutNameA
 ! FUNCTION: GetKeyboardLayoutNameW
@@ -1560,7 +1670,7 @@ FUNCTION: SHORT GetKeyState ( int nVirtKey )
 FUNCTION: BOOL GetMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax )
 ALIAS: GetMessage GetMessageW
 
-! FUNCTION: GetMessageExtraInfo
+FUNCTION: LPARAM GetMessageExtraInfo ( )
 ! FUNCTION: GetMessagePos
 ! FUNCTION: GetMessageTime
 ! FUNCTION: GetMonitorInfoA
@@ -1601,7 +1711,7 @@ FUNCTION: HMENU GetSystemMenu ( HWND hWnd, BOOL bRevert )
 ! FUNCTION: GetTabbedTextExtentA
 ! FUNCTION: GetTabbedTextExtentW
 ! FUNCTION: GetTaskmanWindow
-! FUNCTION: GetThreadDesktop
+FUNCTION: HDESK GetThreadDesktop ( DWORD dwThreadId )
 ! FUNCTION: GetTitleBarInfo
 
 
@@ -1631,7 +1741,9 @@ ALIAS: GetWindowLongPtr GetWindowLongPtrW
 FUNCTION: BOOL GetWindowRect ( HWND hWnd, LPRECT lpRect )
 ! FUNCTION: GetWindowRgn
 ! FUNCTION: GetWindowRgnBox
-FUNCTION: int GetWindowTextA ( HWND hWnd, char* lpString, int nMaxCount )
+! FUNCTION: int GetWindowTextA ( HWND hWnd, char* lpString, int nMaxCount )
+FUNCTION: int GetWindowTextW ( HWND hWnd, LPTSTR lpString, int nMaxCount )
+ALIAS: GetWindowText GetWindowTextW
 ! FUNCTION: GetWindowTextLengthA
 ! FUNCTION: GetWindowTextLengthW
 ! FUNCTION: GetWindowTextW
@@ -1737,7 +1849,7 @@ ALIAS: MapVirtualKey MapVirtualKeyW
 FUNCTION: UINT MapVirtualKeyExW ( UINT uCode, UINT uMapType, HKL dwhkl )
 ALIAS: MapVirtualKeyEx MapVirtualKeyExW
 
-! FUNCTION: MapWindowPoints
+FUNCTION: int MapWindowPoints ( HWND hWndFrom, HWND hWndTo, LPPOINT lpPoints, UINT cPoints )
 ! FUNCTION: MB_GetString
 ! FUNCTION: MBToWCSEx
 ! FUNCTION: MenuItemFromPoint
@@ -1813,9 +1925,10 @@ FUNCTION: BOOL MoveWindow (
 ! FUNCTION: OffsetRect
 FUNCTION: BOOL OpenClipboard ( HWND hWndNewOwner )
 ! FUNCTION: OpenDesktopA
-! FUNCTION: OpenDesktopW
+FUNCTION: HDESK OpenDesktopW ( LPTSTR lpsazDesktop, DWORD dwFlags, BOOL fInherit, ACCESS_MASK dwDesiredAccess )
+ALIAS: OpenDesktop OpenDesktopW
 ! FUNCTION: OpenIcon
-! FUNCTION: OpenInputDesktop
+FUNCTION: HDESK OpenInputDesktop ( DWORD dwFlags, BOOL fInherit, ACCESS_MASK dwDesiredAccess )
 ! FUNCTION: OpenWindowStationA
 ! FUNCTION: OpenWindowStationW
 ! FUNCTION: PackDDElParam
@@ -1881,7 +1994,7 @@ FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC )
 ! FUNCTION: ReplyMessage
 ! FUNCTION: ResolveDesktopForWOW
 ! FUNCTION: ReuseDDElParam
-! FUNCTION: ScreenToClient
+FUNCTION: BOOL ScreenToClient ( HWND hWnd, LPPOINT lpPoint )
 ! FUNCTION: ScrollChildren
 ! FUNCTION: ScrollDC
 ! FUNCTION: ScrollWindow
@@ -1890,7 +2003,7 @@ FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC )
 ! FUNCTION: SendDlgItemMessageW
 ! FUNCTION: SendIMEMessageExA
 ! FUNCTION: SendIMEMessageExW
-! FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize )
+FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize )
 FUNCTION: LRESULT SendMessageW ( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 ALIAS: SendMessage SendMessageW
 ! FUNCTION: SendMessageCallbackA
@@ -1975,14 +2088,18 @@ FUNCTION: LONG_PTR SetWindowLongPtrW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong
 ALIAS: SetWindowLongPtr SetWindowLongPtrW
 
 : HWND_BOTTOM ( -- alien ) 1 <alien> ;
+: HWND_MESSAGE ( -- alien ) -3 <alien> ;
 : HWND_NOTOPMOST ( -- alien ) -2 <alien> ;
 CONSTANT: HWND_TOP f
 : HWND_TOPMOST ( -- alien ) -1 <alien> ;
+: HWND_DESKTOP ( -- alien ) 0 <alien> ;
+: HWND_BROADCAST ( -- alien ) 65535 <alien> ;
 
 ! FUNCTION: SetWindowRgn
 ! FUNCTION: SetWindowsHookA
 ! FUNCTION: SetWindowsHookExA
-! FUNCTION: SetWindowsHookExW
+FUNCTION: HHOOK SetWindowsHookExW ( int idHook, HOOKPROC lpfn, HINSTANCE hMod, DWORD dwThreadId )
+ALIAS: SetWindowsHookEx SetWindowsHookExW
 ! FUNCTION: SetWindowsHookW
 ! FUNCTION: SetWindowStationUser
 ! FUNCTION: SetWindowTextA
@@ -2028,7 +2145,7 @@ ALIAS: TranslateAccelerator TranslateAcceleratorW
 FUNCTION: BOOL TranslateMessage ( MSG* lpMsg )
 
 ! FUNCTION: UnhookWindowsHook
-! FUNCTION: UnhookWindowsHookEx
+FUNCTION: BOOL UnhookWindowsHookEx ( HHOOK hhk )
 ! FUNCTION: UnhookWinEvent
 ! FUNCTION: UnionRect
 ! FUNCTION: UnloadKeyboardLayout
@@ -2056,8 +2173,10 @@ FUNCTION: BOOL UpdateWindow ( HWND hWnd )
 ! FUNCTION: ValidateRgn
 ! FUNCTION: VkKeyScanA
 ! FUNCTION: VkKeyScanExA
-! FUNCTION: VkKeyScanExW
-! FUNCTION: VkKeyScanW
+FUNCTION: SHORT VkKeyScanExW ( TCHAR ch, HKL dwhkl )
+ALIAS: VkKeyScanEx VkKeyScanExW
+FUNCTION: SHORT VkKeyScanW ( TCHAR ch )
+ALIAS: VkKeyScan VkKeyScanW
 ! FUNCTION: VRipOutput
 ! FUNCTION: VTagOutput
 ! FUNCTION: WaitForInputIdle
