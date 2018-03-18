@@ -25,10 +25,14 @@ M: f editor-command
 HOOK: editor-detached? editor-class ( -- ? )
 M: object editor-detached? t ;
 
+HOOK: editor-is-child? editor-class ( -- ? )
+M: object editor-is-child? f ;
+
 : run-and-wait-for-editor ( command -- )
     <process>
         swap >>command
         editor-detached? >>detached
+        editor-is-child? [ +new-group+ >>group ] unless
     run-process
     300 milliseconds sleep
     dup status>> { 0 f } member?

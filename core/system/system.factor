@@ -80,5 +80,5 @@ PRIVATE>
 
 : exit ( n -- * )
     [ do-shutdown-hooks (exit) ] ignore-errors
-    [ "Unexpected error during shutdown!" print ] ignore-errors
+    [ "Unexpected error during shutdown!" print flush ] ignore-errors
     255 (exit) ;
