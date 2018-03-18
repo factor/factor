@@ -280,16 +280,19 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
         [ ]
     } cond ;
 
-: read-acute ( n string slice -- n' string acute )
+: read-acute-html ( n string slice -- n' string acute )
     {
+        ! <FOO <FOO:
         { [ dup section-open? ] [
             [
                 matching-section-delimiter 1array lex-until
             ] keep swap unclip-last 3array
         ] }
+        ! <foo/>
         { [ dup html-self-close? ] [
             ! do nothing special
         ] }
+        ! <foo>
         { [ dup html-full-open? ] [
             dup [
                 rest-slice
@@ -297,6 +300,7 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
                 "</" ">" surround 1array lex-until unclip-last
             ] dip -rot 3array
         ] }
+        ! <foo
         { [ dup html-half-open? ] [
             ! n seq slice
             [ { ">" "/>" } lex-until ] dip
@@ -309,12 +313,15 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
                 swap unclip-last 3array
             ] if
         ] }
-
+        ! </foo>
         { [ dup html-close? ] [
             ! Do nothing
         ] }
         [ [ slice-til-whitespace drop ] dip span-slices ]
     } cond ;
+
+: read-acute ( n string slice -- n' string acute )
+    [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
 
 ! Words like append! and suffix! are allowed for now.
 : read-exclamation ( n string slice -- n' string obj )
@@ -424,7 +431,8 @@ DEFER: lex-factor-top*
             ! if we are in a FOO: and we hit a <BAR or <BAR:
             ! then end the FOO:
             [ slice-til-whitespace drop ] dip span-slices
-            read-acute
+            ! read-acute-html
+            dup section-open? [ read-acute ] when
         ] }
 
         { char: \s [ read-token-or-whitespace-top ] }
