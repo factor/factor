@@ -84,7 +84,6 @@ $nl
     "USING: arrays locals infix ;"
     "let[ \"0123456789\" :> s infix[[ s[::2] ]] ] ."
     "\"02468\""
-}
-;
+} ;
 
 ABOUT: "infix"

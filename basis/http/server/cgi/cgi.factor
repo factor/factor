@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar fry http http.server io
 io.encodings io.encodings.binary io.launcher io.streams.duplex
-kernel make math.parser namespaces sequences urls urls.encoding
-;
+kernel make math.parser namespaces sequences urls urls.encoding ;
 IN: http.server.cgi
 
 : cgi-variables ( script-path -- assoc )

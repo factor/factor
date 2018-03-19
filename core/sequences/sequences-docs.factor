@@ -847,8 +847,7 @@ HELP: check-slice
 
 HELP: collapse-slice
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "slice" slice } { "m'" "a non-negative integer" } { "n'" "a non-negative integer" } { "seq" sequence } }
-{ $description "Prepares to take the slice of a slice by adjusting the start and end indices accordingly, and replacing the slice with its underlying sequence." }
-;
+{ $description "Prepares to take the slice of a slice by adjusting the start and end indices accordingly, and replacing the slice with its underlying sequence." } ;
 
 HELP: <slice>
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "slice" slice } }

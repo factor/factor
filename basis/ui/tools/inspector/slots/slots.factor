@@ -3,8 +3,7 @@
 USING: accessors eval kernel math.vectors parser prettyprint
 refs sequences ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
-ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.tools.common
-;
+ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.tools.common ;
 IN: ui.tools.inspector.slots
 
 TUPLE: slot-editor < track ref close-hook update-hook text ;

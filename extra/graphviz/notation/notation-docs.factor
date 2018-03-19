@@ -41,8 +41,7 @@ HELP: \--
         "    5 -- 6"
         "}"
     }
-}
-;
+} ;
 
 HELP: ->
 { $values
@@ -75,8 +74,7 @@ HELP: ->
         "    5 -> 6"
         "}"
     }
-}
-;
+} ;
 
 HELP: \--[
 { $values
@@ -102,8 +100,7 @@ HELP: \--[
     "    1 -- 2 [ color=\"red\" ];"
     "}"
   }
-}
-;
+} ;
 
 HELP: \->[
 { $values
@@ -129,8 +126,7 @@ HELP: \->[
     "    1 -> 2 [ color=\"red\" ];"
     "}"
   }
-}
-;
+} ;
 
 HELP: \add-edge[
 { $values
@@ -158,8 +154,7 @@ HELP: \add-edge[
   }
   $nl
   "This has the advantage over " { $link \ --[ } " and " { $link \ ->[ } " of reading nicely for both directed " { $emphasis "and" } " undirected " { $link graph } "s."
-}
-;
+} ;
 
 HELP: \add-node[
 { $values
@@ -184,8 +179,7 @@ HELP: \add-node[
     "    foo [ color=\"red\" ];"
     "}"
   }
-}
-;
+} ;
 
 HELP: \edge[
 { $values
@@ -209,8 +203,7 @@ HELP: \edge[
     "    edge[ color=\"red\" ]"
     "}"
   }
-}
-;
+} ;
 
 HELP: \graph[
 { $values
@@ -249,8 +242,7 @@ HELP: \graph[
     "    label=\"blah\""
     "}"
   }
-}
-;
+} ;
 
 HELP: \node[
 { $values
@@ -274,8 +266,7 @@ HELP: \node[
     "    node[ color=\"red\" ]"
     "}"
   }
-}
-;
+} ;
 
 HELP: ~--
 { $values
@@ -303,8 +294,7 @@ HELP: ~--
       "    1 -- 2 -- 3 -- 4"
       "}"
     }
-}
-;
+} ;
 
 HELP: ~->
 { $values
@@ -332,8 +322,7 @@ HELP: ~->
       "    1 -> 2 -> 3 -> 4"
       "}"
     }
-}
-;
+} ;
 
 ARTICLE: { "graphviz.notation" "=attrs" } "Notation for setting Graphviz attributes"
 "The " { $vocab-link "graphviz.notation" } " vocabulary provides words for setting Graphviz attributes in a way that looks similar to the DOT language (see " { $url "http://graphviz.org/content/dot-language" } ")."
@@ -400,8 +389,7 @@ $nl
     "not for edges!"
 }
 $nl
-"For the full list of attribute-setting words, consult the list of generic words for the " { $vocab-link "graphviz.notation" } " vocabulary."
-;
+"For the full list of attribute-setting words, consult the list of generic words for the " { $vocab-link "graphviz.notation" } " vocabulary." ;
 
 ARTICLE: { "graphviz.notation" "synonyms" } "Aliases that resemble DOT code"
 "The " { $vocab-link "graphviz.notation" } " vocabulary provides aliases for words defined in the " { $vocab-link "graphviz" } " and " { $vocab-link "graphviz.attributes" } " vocabularies. These will make Factor code read more like DOT code (see " { $url "http://graphviz.org/content/dot-language" } ")."
@@ -425,8 +413,7 @@ $nl
     \ \node[
     \ \edge[
     \ \graph[
-}
-;
+} ;
 
 ARTICLE: "graphviz.notation" "Graphviz notation"
 "The " { $vocab-link "graphviz.notation" } " vocabulary provides words for building " { $link graph } "s in a way that looks similar to the DOT language (see " { $url "http://graphviz.org/content/dot-language" } ")."
@@ -447,7 +434,6 @@ $nl
 { $subsections
     { "graphviz.notation" "=attrs" }
     { "graphviz.notation" "synonyms" }
-}
-;
+} ;
 
 ABOUT: "graphviz.notation"

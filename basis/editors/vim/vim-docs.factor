@@ -12,5 +12,4 @@ ARTICLE: "editors.vim" "Vim support"
 }
 $nl
 "You may also wish to install Vim support files to enable syntax highlighting and other features. These are in the " { $link resource-path } " in " { $snippet "misc/vim" } "."
-{ $see-also "editor" }
-;
+{ $see-also "editor" } ;

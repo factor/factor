@@ -5,8 +5,7 @@ IN: backtrack
 
 HELP: fail
 { $description "Signal that the current alternative is not acceptable. This will cause either backtracking to occur, or a failure to be signalled, as explained in the " { $link amb } " word description." }
-{ $see-also amb cut-amb }
-;
+{ $see-also amb cut-amb } ;
 
 HELP: amb
 { $values
@@ -14,13 +13,11 @@ HELP: amb
   { "elt" "one of the alternatives" }
 }
 { $description "The amb (ambiguous) word saves the state of the current computation (through the " { $vocab-link "continuations" } " vocabulary) and returns the first alternative. When " { $link fail } " is invoked, the saved state will be restored and the next alternative will be returned. When there are no more alternatives, " { $link fail } " will go up one level to the location of the previous " { $link amb } " call. If there are no more calls up the chain, an error will be signalled." }
-{ $see-also fail cut-amb }
-;
+{ $see-also fail cut-amb } ;
 
 HELP: cut-amb
 { $description "Reset the amb system. Calling this word resets the whole stack of " { $link amb } " calls and should not be done lightly." }
-{ $see-also amb fail }
-;
+{ $see-also amb fail } ;
 
 HELP: amb-execute
 { $values
@@ -41,8 +38,7 @@ HELP: amb-all
   { "quot" { $quotation ( -- ) } }
 }
 { $description "Execute all the alternatives in the quotation by calling " { $link fail } " repeatedly at the end." }
-{ $see-also bag-of fail }
-;
+{ $see-also bag-of fail } ;
 
 HELP: bag-of
 { $values

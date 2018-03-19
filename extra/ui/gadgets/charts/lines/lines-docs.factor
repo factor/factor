@@ -29,8 +29,7 @@ $nl
 $nl
 "Finally, the data needs to be scaled so that its coordinates are mapped to the screen coordinates (" { $link scale-chunks } "). This last step could probably be combined with flipping the " { $snippet "y" } " coordinate for extra performance."
 $nl
-"The resulting chunks are displayed with a call to " { $link draw-line } " each."
-;
+"The resulting chunks are displayed with a call to " { $link draw-line } " each." ;
 
 HELP: clip-data
 { $values

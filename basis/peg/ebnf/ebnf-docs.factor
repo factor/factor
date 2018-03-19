@@ -93,8 +93,7 @@ ARTICLE: "peg.ebnf.sequence" "EBNF Rule: Sequence"
        "\"abbba\" EBNF[[ rule=\"a\" (\"b\")* \"a\" ]] ."
        "V{ \"a\" V{ \"b\" \"b\" \"b\" } \"a\" }"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.grouping" "EBNF Rule: Group"
 "Any sequence of rules may be grouped using parentheses (" { $snippet "()" } "). "
@@ -115,8 +114,7 @@ $nl
        "\"ab  c\nd \" EBNF[[ rule={\"a\" \"b\" \"c\" \"d\"} ]] ."
        "V{ \"a\" \"b\" \"c\" \"d\" }"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.choice" "EBNF Rule: Choice"
 "Any rule element separated by a pipe character (|) is considered a " { $strong "choice" } ". Choices "
@@ -139,8 +137,7 @@ ARTICLE: "peg.ebnf.choice" "EBNF Rule: Choice"
        "Peg parsing error at character position 0.\nExpected 'a' or 'b' or 'c'\nGot 'd'"
     }
 }
-{ $notes "Due to parser caching, rules can't re-use parsers that have already failed earlier in the choice." }
-;
+{ $notes "Due to parser caching, rules can't re-use parsers that have already failed earlier in the choice." } ;
 
 ARTICLE: "peg.ebnf.ignore" "EBNF Rule: Ignore"
 "Any rule element followed by a tilde (~) will be matched, and its results "
@@ -151,8 +148,7 @@ ARTICLE: "peg.ebnf.ignore" "EBNF Rule: Ignore"
        "\"abc\" EBNF[[ rule=\"a\" \"b\"~ \"c\" ]] ."
        "V{ \"a\" \"c\" }"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.option" "EBNF Rule: Option"
 "Any rule element followed by a question mark (?) is considered optional. The "
@@ -169,8 +165,7 @@ ARTICLE: "peg.ebnf.option" "EBNF Rule: Option"
        "\"ac\" EBNF[[ rule=\"a\" \"b\"? \"c\" ]] ."
        "V{ \"a\" f \"c\" }"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.character-class" "EBNF Rule: Character Class"
 "Character class matching can be done using a range of characters defined in "
@@ -186,8 +181,7 @@ ARTICLE: "peg.ebnf.character-class" "EBNF Rule: Character Class"
        "\"123\" EBNF[[ rule=[0-9]+ ]] ."
        "V{ 49 50 51 }"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.one-or-more" "EBNF Rule: One or more"
 "Any rule element followed by a plus (+) matches one or more instances of the rule "
@@ -199,8 +193,7 @@ ARTICLE: "peg.ebnf.one-or-more" "EBNF Rule: One or more"
        "\"aab\" EBNF[[ rule=\"a\"+ \"b\" ]] ."
        "V{ V{ \"a\" \"a\" } \"b\" }"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.zero-or-more" "EBNF Rule: Zero or more"
 "Any rule element followed by an asterisk (*) matches zero or more instances of the rule "
@@ -217,8 +210,7 @@ ARTICLE: "peg.ebnf.zero-or-more" "EBNF Rule: Zero or more"
        "\"b\" EBNF[[ rule=\"a\"* \"b\" ]] ."
        "V{ V{ } \"b\" }"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.and" "EBNF Rule: And"
 "Any rule element prefixed by an ampersand (&) performs the Parsing Expression "
@@ -233,8 +225,7 @@ ARTICLE: "peg.ebnf.and" "EBNF Rule: And"
        "\"ab\" EBNF[[ rule=&(\"a\") \"a\" \"b\" ]] ."
        "V{ \"a\" \"b\" }"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.not" "EBNF Rule: Not"
 "Any rule element prefixed by an exclamation mark (!) performs the Parsing Expression "
@@ -249,8 +240,7 @@ ARTICLE: "peg.ebnf.not" "EBNF Rule: Not"
        "\"<abcd>\" EBNF[[ rule=\"<\" (!(\">\") .)* \">\" ]] ."
        "V{ \"<\" V{ 97 98 99 100 } \">\" }"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.action" "EBNF Action"
 "An action is a quotation that is run after a rule matches. The quotation "
@@ -275,8 +265,7 @@ ARTICLE: "peg.ebnf.action" "EBNF Action"
        "\"123\" EBNF[=[ rule=[0-9]+ => [[ string>number ]] ]=] ."
        "123"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.semantic-action" "EBNF Semantic Action"
 "Semantic actions allow providing a quotation that gets run on the AST of a "
@@ -295,8 +284,7 @@ ARTICLE: "peg.ebnf.semantic-action" "EBNF Semantic Action"
        "\"2\" EBNF[[ rule=[0-9] ?[ digit> odd? ]? ]] ."
        "Peg parsing error at character position 0.\nExpected \nGot '2'"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.variable" "EBNF Variable"
 "Variables names can be suffixed to a rule element using the colon character (:) "
@@ -308,8 +296,7 @@ ARTICLE: "peg.ebnf.variable" "EBNF Variable"
        "\"1+2\" EBNF[=[ rule=[0-9]:a \"+\" [0-9]:b => [[ a digit> b digit> + ]] ]=] ."
        "3"
     }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.foreign-rules" "EBNF Foreign Rules"
 "Rules can call out to other " { $vocab-link "peg.ebnf" } " defined parsers. The result of "
@@ -340,8 +327,7 @@ ARTICLE: "peg.ebnf.foreign-rules" "EBNF Foreign Rules"
        "abc = <foreign a-token> 'b' 'c'"
        "]=]"
    }
-}
-;
+} ;
 
 ARTICLE: "peg.ebnf.tokenizers" "EBNF Tokenizers"
 "It is possible to override the tokenizer in an EBNF defined parser. "
@@ -518,7 +504,6 @@ ARTICLE: "peg.ebnf" "EBNF"
 "those tokens, allowing you to ignore the whitespace issue. The tokenizer "
 "can be changed at various parts in the grammar as needed. The JavaScript grammar "
 "does this to define the optional semicolon rule for example."
-{ $subsections "peg.ebnf.tokenizers" }
-;
+{ $subsections "peg.ebnf.tokenizers" } ;
 
 ABOUT: "peg.ebnf"

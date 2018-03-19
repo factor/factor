@@ -6,7 +6,6 @@ IN: images.gif
 ARTICLE: "images.gif" "GIF Image Loader"
 { $vocab-link "images.gif" }
 $nl
-{ $notes "Currently multi-frame GIF images are not supported." }
-;
+{ $notes "Currently multi-frame GIF images are not supported." } ;
 
 ABOUT: "images.gif"

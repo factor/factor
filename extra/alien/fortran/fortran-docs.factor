@@ -43,15 +43,13 @@ HELP: \LIBRARY:
 
 HELP: add-fortran-library
 { $values { "name" string } { "soname" string } { "fortran-abi" symbol } }
-{ $description "Opens the shared library in the file specified by " { $snippet "soname" } " under the logical name " { $snippet "name" } " so that it may be used in subsequent " { $link postpone: \LIBRARY: } " and " { $link fortran-invoke } " calls. Functions and subroutines from the library will be defined using the specified " { $snippet "fortran-abi" } ", which must be one of the supported " { $link "alien.fortran-abis" } "." }
-;
+{ $description "Opens the shared library in the file specified by " { $snippet "soname" } " under the logical name " { $snippet "name" } " so that it may be used in subsequent " { $link postpone: \LIBRARY: } " and " { $link fortran-invoke } " calls. Functions and subroutines from the library will be defined using the specified " { $snippet "fortran-abi" } ", which must be one of the supported " { $link "alien.fortran-abis" } "." } ;
 
 HELP: fortran-invoke
 { $values
     { "return" string } { "library" string } { "procedure" string } { "parameters" sequence }
 }
-{ $description "Invokes the Fortran subroutine or function " { $snippet "procedure" } " in " { $snippet "library" } " with parameters specified by the " { $link "alien.fortran-types" } " specified in the " { $snippet "parameters" } " sequence. If the " { $snippet "return" } " value is " { $link f } ", no return value is expected, otherwise a return value of the specified Fortran type is expected. Input values are taken off the top of the datastack, and output values are left for the return value (if any) and any parameters specified as out parameters by prepending " { $snippet "\"!\"" } "." }
-;
+{ $description "Invokes the Fortran subroutine or function " { $snippet "procedure" } " in " { $snippet "library" } " with parameters specified by the " { $link "alien.fortran-types" } " specified in the " { $snippet "parameters" } " sequence. If the " { $snippet "return" } " value is " { $link f } ", no return value is expected, otherwise a return value of the specified Fortran type is expected. Input values are taken off the top of the datastack, and output values are left for the return value (if any) and any parameters specified as out parameters by prepending " { $snippet "\"!\"" } "." } ;
 
 ARTICLE: "alien.fortran" "Fortran FFI"
 "The " { $vocab-link "alien.fortran" } " vocabulary provides an interface to code in shared libraries written in Fortran."

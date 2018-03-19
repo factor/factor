@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs generic kernel kernel.private
 math math.order memory namespaces make sequences layouts system
-hashtables classes alien byte-arrays combinators words sets fry
-;
+hashtables classes alien byte-arrays combinators words sets fry ;
 IN: cpu.architecture
 
 ! Representations -- these are like low-level types

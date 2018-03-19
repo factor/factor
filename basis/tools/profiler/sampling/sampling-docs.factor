@@ -213,8 +213,7 @@ ARTICLE: "tools.profiler.sampling" "Sampling profiler"
 { $subsections most-recent-profile-data top-down* top-down-max-depth* cross-section* flat* }
 "For example, the following will profile a call to the foo word, and generate and display a top-down tree profile from the results:"
 { $code "[ foo ] profile
-top-down profile." }
-;
+top-down profile." } ;
 
 ABOUT: "tools.profiler.sampling"
 

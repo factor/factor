@@ -15,8 +15,7 @@ USING: math.blas.config namespaces ;
 intel-windows-abi blas-fortran-abi set-global
 t deploy-blas? set-global
 " }
-"To take effect, the " { $snippet "blas-library" } " and " { $snippet "blas-fortran-abi" } " variables must be set before any other " { $snippet "math.blas" } " vocabularies are loaded."
-;
+"To take effect, the " { $snippet "blas-library" } " and " { $snippet "blas-fortran-abi" } " variables must be set before any other " { $snippet "math.blas" } " vocabularies are loaded." ;
 
 HELP: blas-library
 { $var-description "The name of the shared library containing the BLAS interface to load. The value of this variable must be a valid shared library name that can be passed to " { $link add-fortran-library } ". To take effect, this variable must be set before any other " { $snippet "math.blas" } " vocabularies are loaded. See " { $link "math.blas.config" } " for details and examples." } ;

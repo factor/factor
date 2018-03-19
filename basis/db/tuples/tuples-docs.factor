@@ -177,8 +177,7 @@ ARTICLE: "db-tuples" "High-level tuple/database integration"
 "Useful words:"
 { $subsections "db-tuples-words" }
 "For porting " { $vocab-link "db.tuples" } " to other databases:"
-{ $subsections "db-tuples-protocol" }
-;
+{ $subsections "db-tuples-protocol" } ;
 
 ARTICLE: "db-tuples-words" "High-level tuple/database words"
 "Making tuples work with a database:"

@@ -272,8 +272,7 @@ HELP: interval-bitnot
 
 HELP: points>interval
 { $values { "seq" "a sequence of " { $snippet "{ point included? }" } " pairs" } { "interval" interval } { "nan?" "true if the computation produced NaNs" } }
-{ $description "Outputs the smallest interval containing all of the endpoints." }
-;
+{ $description "Outputs the smallest interval containing all of the endpoints." } ;
 
 HELP: interval-shift-safe
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }

@@ -240,7 +240,6 @@ ARTICLE: "opencl" "OpenCL"
   cl-wait
   cl-flush
   cl-finish
-}
-;
+} ;
 
 ABOUT: "opencl"

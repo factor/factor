@@ -62,7 +62,6 @@ ARTICLE: "sequences.n-based" "N-based sequences"
 { $subsections
     n-based-assoc
     <n-based-assoc>
-}
-;
+} ;
 
 ABOUT: "sequences.n-based"

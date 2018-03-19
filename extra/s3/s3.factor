@@ -19,8 +19,7 @@ USING:
     sorting
     strings
     xml
-    xml.traversal
-;
+    xml.traversal ;
 IN: s3
 
 SYMBOL: key-id

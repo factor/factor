@@ -43,7 +43,6 @@ ARTICLE: "z-algorithm" "Z algorithm"
 " vocabulary implements algorithm for finding all Z values for sequence "
 { $snippet "S" }
 " in linear time. In contrast to naive approach which takes "
-{ $snippet "Θ(n^2)" } " time."
-;
+{ $snippet "Θ(n^2)" } " time." ;
 
 ABOUT: "z-algorithm"

@@ -97,7 +97,6 @@ $nl
 $nl
 "Utility words for displaying images:"
 { $subsections
-image. image-window }
+image. image-window } ;
 
-;
 ABOUT: "images.viewer"

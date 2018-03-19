@@ -233,7 +233,6 @@ $nl
 { $subsections
     pop-tree-left pop-tree-right
     slurp-tree-left slurp-tree-right
-}
-;
+} ;
 
 ABOUT: "trees"

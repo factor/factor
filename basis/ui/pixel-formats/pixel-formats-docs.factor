@@ -62,8 +62,7 @@ M: picky-depth-buffered-world check-world-pixel-format
     [ double-buffered pixel-format-attribute 0 = [ \"Not double buffered!\" throw ] when ]
     [ color-bits pixel-format-attribute 24 < [ \"Not enough color bits!\" throw ] when ]
     [ depth-bits pixel-format-attribute 24 < [ \"Not enough depth bits!\" throw ] when ]
-    tri ;" } }
-;
+    tri ;" } } ;
 
 HELP: double-buffered
 { $description "Requests a double-buffered pixel format." } ;
@@ -166,8 +165,7 @@ HELP: <pixel-format>
 { $description "Requests a pixel format suitable for " { $snippet "world" } " with a set of " { $link "ui.pixel-formats-attributes" } ". If no pixel format can be found that satisfies the given attributes, an " { $link invalid-pixel-format-attributes } " error is thrown. Pixel format attributes not supported by the window system are ignored. The returned " { $snippet "pixel-format" } " must be released using the " { $link dispose } " word when it is no longer needed." }
 { $notes "Pixel formats don't normally need to be directly allocated by user code. If you need to control the pixel format requested by a window, subclass " { $snippet "world" } " and override the " { $link world-pixel-format-attributes } " and " { $link check-world-pixel-format } " words."
 $nl
-"The returned pixel format does not necessarily exactly match the requested attributes; the window system will try to find the format that best matches the given attributes. Use " { $link pixel-format-attribute } " to check the actual values of the attributes on the returned pixel format." }
-;
+"The returned pixel format does not necessarily exactly match the requested attributes; the window system will try to find the format that best matches the given attributes. Use " { $link pixel-format-attribute } " to check the actual values of the attributes on the returned pixel format." } ;
 
 HELP: pixel-format-attribute
 { $values { "pixel-format" pixel-format } { "attribute-name" "one of the " { $link "ui.pixel-formats-attributes" } } { "value" object } }
@@ -198,7 +196,6 @@ ARTICLE: "ui.pixel-formats" "Pixel formats"
 { $subsections
     world-pixel-format-attributes
     check-world-pixel-format
-}
-;
+} ;
 
 ABOUT: "ui.pixel-formats"

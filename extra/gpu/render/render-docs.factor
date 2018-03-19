@@ -304,7 +304,6 @@ ARTICLE: "gpu.render" "Rendering"
     render-set
 }
 { $link uniform-tuple } "s provide Factor types for containing and submitting shader uniform parameters:"
-{ $subsections postpone: \UNIFORM-TUPLE: }
-;
+{ $subsections postpone: \UNIFORM-TUPLE: } ;
 
 ABOUT: "gpu.render"

@@ -38,7 +38,6 @@ ARTICLE: "prettyprint.stylesheet" "Prettyprinter stylesheet"
     string-style
     vocab-style
     effect-style
-}
-;
+} ;
 
 ABOUT: "prettyprint.stylesheet"

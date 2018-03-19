@@ -68,8 +68,7 @@ $nl
     save-all-as-reference-images
 }
 "A reference image can be loaded by the path of the original image:"
-{ $subsections load-reference-image }
-;
+{ $subsections load-reference-image } ;
 
 ARTICLE: "images.testing" "Testing image encoders and decoders"
 "The " { $vocab-link "images.testing" } " vocab facilitates writing unit tests for image encoders and decoders by providing common functionality"
@@ -92,7 +91,6 @@ $nl
     ls
     with-matching-files
 }
-{ $notes "This vocabulary is only intended for implementors of image encoders and image decoders. If you are an end-user, you are in the wrong place :-)" }
-;
+{ $notes "This vocabulary is only intended for implementors of image encoders and image decoders. If you are an end-user, you are in the wrong place :-)" } ;
 
 ABOUT: "images.testing"

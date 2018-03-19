@@ -77,7 +77,6 @@ $nl
 "Compression has not yet been implemented."
 $nl
 "Implementation details:"
-{ $subsections "compression.lzw.differences" }
-;
+{ $subsections "compression.lzw.differences" } ;
 
 ABOUT: "compression.lzw"

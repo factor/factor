@@ -40,8 +40,7 @@ $nl
 " Valid or invalid content after the first document is ignored."
 " To verifiy that the whole input is one valid YAML document, use "
 { $link yaml-docs> } " and assert that the length of the output array is 1."
-}
-;
+} ;
 
 HELP: libyaml-emitter-error
 { $values
@@ -128,8 +127,7 @@ ARTICLE: "yaml-mapping" "Mapping between Factor and YAML types"
   { { $link set } " -> !!set -> " { $link hash-set } }
   { { $link sequence } " -> !!seq -> " { $link array } }
 }
-"Examples of type precedence which preserves type: " { $link byte-array } " over " { $link sequence } "."
-;
+"Examples of type precedence which preserves type: " { $link byte-array } " over " { $link sequence } "." ;
 
 ARTICLE: "yaml-errors" "YAML errors"
 { $heading "libYAML's errors" }
@@ -147,8 +145,7 @@ ARTICLE: "yaml-errors" "YAML errors"
   "Or many errors thrown by library words (eg unparseable numbers, converting unsupported objects to yaml, etc)"
 }
 { $heading "Bugs" }
-"The following error probably means that there is a bug in the implementation: " { $link yaml-unexpected-event }
-;
+"The following error probably means that there is a bug in the implementation: " { $link yaml-unexpected-event } ;
 
 ARTICLE: "yaml-keys" "Special mapping keys"
 "The following special keys have been implemented for !!map. By default, these keys will be taken into account when deserializing yaml documents. To keep the original document structure, configuration variables can be set. See " { $link "yaml-config" } "."
@@ -184,9 +181,8 @@ link with:
     H{ { \"link with\" { \"library1.dll\" \"library2.dll\" } } }
     H{ { \"link with\" { \"library1.dll\" \"library2.dll\" } } }
 }"
-}
+} ;
 
-;
 ARTICLE: "yaml" "YAML serialization"
 "The " { $vocab-link "yaml" } " vocabulary implements YAML serialization/deserialization. It uses LibYAML, a YAML parser and emitter written in C (" { $url "http://pyyaml.org/wiki/LibYAML" } ")."
 { $heading "Main conversion words" }
@@ -262,8 +258,7 @@ t emitter-unicode set
 { t 32 \"foobar\" { \"nested\" \"list\" } H{ { \"nested\" \"assoc\" } } } >yaml print"
     "--- !!seq\n- !!bool true\n- !!int 32\n- !!str foobar\n- !!seq\n  - !!str nested\n  - !!str list\n- !!map\n  !!str nested: !!str assoc\n...\n"
   }
-}
-;
+} ;
 
 
 { >yaml >yaml-docs } related-words

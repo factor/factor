@@ -67,7 +67,6 @@ $nl
 "This pairing is analogous to that of " { $link postpone: \call( } " with " { $link call-effect } "."
 $nl
 "Advanced features:"
-{ $subsections "eval-vocabs" eval>string }
-;
+{ $subsections "eval-vocabs" eval>string } ;
 
 ABOUT: "eval"

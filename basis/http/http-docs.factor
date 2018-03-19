@@ -248,7 +248,6 @@ t"
 { $subheading "Full example:" }
 "$ no_proxy=\"localhost,127.0.0.1,.private\" http_proxy=\"http://proxy.private:3128\" https_proxy=\"http://proxysec.private:3128\" ./factor"
 }
-}
-;
+} ;
 
 ABOUT: "http"

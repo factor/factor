@@ -66,8 +66,7 @@ $nl
     { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
 }
 { $heading "Stack effect conventions" }
-"Stack effect conventions are documented in " { $link "effects" } "."
-;
+"Stack effect conventions are documented in " { $link "effects" } "." ;
 
 ARTICLE: "tail-call-opt" "Tail-call optimization"
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $emphasis "tail-call optimization" } " and the Factor implementation guarantees that it will be performed."

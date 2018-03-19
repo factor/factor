@@ -10,8 +10,7 @@ USING:
     combinators
     kernel
     ogg
-    system
-;
+    system ;
 IN: ogg.vorbis
 
 <<

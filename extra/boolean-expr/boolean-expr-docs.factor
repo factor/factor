@@ -6,8 +6,7 @@ IN: boolean-expr
 ABOUT: "boolean-expr"
 
 ARTICLE: "boolean-expr" "Boolean expressions"
-"The " { $vocab-link "boolean-expr" } " vocab demonstrates the use of Unicode symbols in source files and multi-method dispatch."
-;
+"The " { $vocab-link "boolean-expr" } " vocab demonstrates the use of Unicode symbols in source files and multi-method dispatch." ;
 
 HELP: dnf
 { $values

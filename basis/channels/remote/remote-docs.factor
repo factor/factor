@@ -58,7 +58,6 @@ $nl
 $nl
 "Given the id from the snippet above, a remote node can put items in the channel (where 123456 is the id):"
 $nl
-{ $snippet "\"myhost.com\" 9001 <node> 123456 <remote-channel>\n\"hello\" over to" }
-;
+{ $snippet "\"myhost.com\" 9001 <node> 123456 <remote-channel>\n\"hello\" over to" } ;
 
 ABOUT: "channels.remote"

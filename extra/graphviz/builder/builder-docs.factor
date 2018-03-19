@@ -15,15 +15,13 @@ HELP: build-alien
 $nl
 "Throws " { $link improper-statement-error } " if any of the " { $link graph } "'s " { $slot "statements" } " is not an instance of:"
 { $list { $link subgraph } { $link node } { $link edge } { $link graph-attributes } { $link node-attributes } { $link edge-attributes } }
-}
-;
+} ;
 
 HELP: improper-statement-error
 { $values
     { "obj" object }
 }
-{ $error-description "Thrown if, in a call to " { $link build-alien } ", any of a " { $link graph } "'s " { $snippet "statements" } " is not an instance of:" { $list { $link subgraph } { $link node } { $link edge } { $link graph-attributes } { $link node-attributes } { $link edge-attributes } } }
-;
+{ $error-description "Thrown if, in a call to " { $link build-alien } ", any of a " { $link graph } "'s " { $snippet "statements" } " is not an instance of:" { $list { $link subgraph } { $link node } { $link edge } { $link graph-attributes } { $link node-attributes } { $link edge-attributes } } } ;
 
 HELP: non-graph-error
 { $values
@@ -39,7 +37,6 @@ $nl
 "The main word:"
 { $subsections build-alien }
 "Errors that might be thrown:"
-{ $subsections non-graph-error improper-statement-error }
-;
+{ $subsections non-graph-error improper-statement-error } ;
 
 ABOUT: "graphviz.builder"

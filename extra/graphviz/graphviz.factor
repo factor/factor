@@ -1,9 +1,7 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays grouping kernel namespaces present
-sequences strings
-graphviz.attributes
-;
+sequences strings graphviz.attributes ;
 IN: graphviz
 
 TUPLE: graph

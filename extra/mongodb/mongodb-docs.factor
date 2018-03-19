@@ -21,7 +21,7 @@ ARTICLE: "mongodb" "MongoDB factor integration"
   "\"db\" \"127.0.0.1\" 27017 <mdb>"
   "person new \"Alfred\" >>name 57 >>age"
   "'[ person ensure-table _ save-tuple person new 57 >>age select-tuple ] with-db"
-  "" }
-;
+  ""
+} ;
 
 ABOUT: "mongodb"

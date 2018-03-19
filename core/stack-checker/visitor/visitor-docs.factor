@@ -1,5 +1,4 @@
-USING: compiler.tree help.markup help.syntax kernel sequences vectors
-;
+USING: compiler.tree help.markup help.syntax kernel sequences vectors ;
 IN: stack-checker.visitor
 
 HELP: stack-visitor

@@ -46,7 +46,6 @@ ARTICLE: "multiline" "Multiline"
 "Multiline comments:"
 { $subsections POSTPONE: /* }
 "Writing new multiline parsing words:"
-{ $subsections parse-multiline-string }
-;
+{ $subsections parse-multiline-string } ;
 
 ABOUT: "multiline"

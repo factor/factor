@@ -22,8 +22,7 @@ USING:
     peg
     sequences
     urls
-    validators
-;
+    validators ;
 IN: webapps.fjsc
 
 TUPLE: fjsc < dispatcher ;

@@ -42,7 +42,6 @@ HELP: version>=
 ARTICLE: "semantic-versioning" "Semantic Versioning"
 { $vocab-link "semantic-versioning" }
 $nl
-{ "See " { $url "http://semver.org/" } " for a detailed description of semantic versioning." }
-;
+{ "See " { $url "http://semver.org/" } " for a detailed description of semantic versioning." } ;
 
 ABOUT: "semantic-versioning"

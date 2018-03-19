@@ -45,7 +45,6 @@ $nl
 "The " { $vocab-link "graphviz.attributes" } " vocabulary simply provides three different tuples to encapsulate Graphviz attributes:"
 { $subsections node-attributes edge-attributes graph-attributes }
 "Empty instances are created with the following constructors:"
-{ $subsections <node-attributes> <edge-attributes> <graph-attributes> }
-;
+{ $subsections <node-attributes> <edge-attributes> <graph-attributes> } ;
 
 ABOUT: "graphviz.attributes"

@@ -178,7 +178,6 @@ $nl
     "c-types.pointers"
     "c-types.ambiguity"
     "c-types.structs"
-}
-;
+} ;
 
 ABOUT: "c-types-specs"

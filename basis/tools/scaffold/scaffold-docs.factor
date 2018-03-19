@@ -142,7 +142,6 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
     scaffold-factor-rc
     scaffold-factor-roots
     scaffold-emacs
-}
-;
+} ;
 
 ABOUT: "tools.scaffold"

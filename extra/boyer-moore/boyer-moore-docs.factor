@@ -53,7 +53,6 @@ ARTICLE: "boyer-moore" "The Boyer-Moore algorithm"
 { $emphasis "for" } " respectively. Then searching runs in "
 { $snippet "O(n)" } " time in its worst case using additional "
 { $snippet "O(m)" } " space. The preprocessing phase runs in "
-{ $snippet "O(m)" } " time."
-;
+{ $snippet "O(m)" } " time." ;
 
 ABOUT: "boyer-moore"

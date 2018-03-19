@@ -141,7 +141,6 @@ $nl
 { $subsections first-key next-key }
 "The following combinators, however, provide more convenient way to do that:"
 { $subsections each-key each-value each-record }
-"The order in which records are accessed has nothing to do with the order in which records have been stored. Note that these words can only be used in read-only algorithms since delete operation re-arranges the hash table."
-;
+"The order in which records are accessed has nothing to do with the order in which records have been stored. Note that these words can only be used in read-only algorithms since delete operation re-arranges the hash table." ;
 
 ABOUT: "gdbm"

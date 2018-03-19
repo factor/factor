@@ -40,8 +40,7 @@ $nl
 $nl
 "Dropping a source file onto the Factor icon in the dock runs the source file in the listener."
 $nl
-"If you install " { $strong "Factor.app" } " in your " { $strong "Applications" } " folder, then other applications will be able to call Factor via the System Services feature. For example, you can select some text in " { $strong "TextEdit.app" } ", then invoke the " { $strong "TextEdit->Services->Factor->Evaluate Selection" } " menu item, which will replace the selected text with the result of evaluating it in Factor."
-;
+"If you install " { $strong "Factor.app" } " in your " { $strong "Applications" } " folder, then other applications will be able to call Factor via the System Services feature. For example, you can select some text in " { $strong "TextEdit.app" } ", then invoke the " { $strong "TextEdit->Services->Factor->Evaluate Selection" } " menu item, which will replace the selected text with the result of evaluating it in Factor." ;
 
 ARTICLE: "ui-windows" "Functionality specific to Windows"
 "Files can be dropped from other applications onto the listener window to push their names onto the stack:"

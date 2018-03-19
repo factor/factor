@@ -130,8 +130,7 @@ ARTICLE: "assocs-conversions" "Associative mapping conversions"
 "Creating an assoc from key/value sequences and their indices:"
 { $subsections zip-index zip-index-as }
 "Creating key/value sequences from an assoc:"
-{ $subsections unzip }
-;
+{ $subsections unzip } ;
 
 ARTICLE: "assocs-combinators" "Associative mapping combinators"
 "The following combinators can be used on any associative mapping."
@@ -411,8 +410,7 @@ HELP: delete-at*
 
 HELP: rename-at
 { $values { "newkey" object } { "key" object } { "assoc" assoc } }
-{ $description "Removes the values associated to " { $snippet "key" } " and re-adds it as " { $snippet "newkey" } ". Does nothing if the assoc does not contain " { $snippet "key" } "." }
-;
+{ $description "Removes the values associated to " { $snippet "key" } " and re-adds it as " { $snippet "newkey" } ". Does nothing if the assoc does not contain " { $snippet "key" } "." } ;
 
 HELP: keys
 { $values { "assoc" assoc } { "keys" "an array of keys" } }
@@ -440,8 +438,7 @@ HELP: assoc-union
 
 HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
-{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." }
-;
+{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } ;
 
 HELP: assoc-diff!
 { $values { "assoc1" assoc } { "assoc2" assoc } }

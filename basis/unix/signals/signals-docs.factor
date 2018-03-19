@@ -27,7 +27,6 @@ ARTICLE: "unix.signals" "Signal handlers"
 "The " { $vocab-link "unix.signals" } " vocabulary allows Factor applications to handle a limited subset of Unix signals."
 { $subsection "unix.signals:allowed-signals" }
 "Factor signal handlers are composable. Adding a signal handler does not replace signal handlers installed by other libraries. Individual signal handlers are added and removed independently with the following words:"
-{ $subsections add-signal-handler remove-signal-handler }
-;
+{ $subsections add-signal-handler remove-signal-handler } ;
 
 ABOUT: "unix.signals"

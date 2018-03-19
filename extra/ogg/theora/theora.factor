@@ -10,8 +10,7 @@ USING:
     combinators
     kernel
     ogg
-    system
-;
+    system ;
 IN: ogg.theora
 
 <<
@@ -53,8 +52,7 @@ STRUCT: th-img-plane
     { width int }
     { height int }
     { stride int }
-    { data uchar* }
-;
+    { data uchar* } ;
 
 TYPEDEF: th-img-plane[3] th-ycbcr-buffer
 
@@ -76,38 +74,33 @@ STRUCT: th-info
     { pixel-fmt th-pixelformat }
     { target-bitrate int }
     { quality int }
-    { keyframe-granule-shift int }
-;
+    { keyframe-granule-shift int } ;
 
 STRUCT: th-comment
     { user-comments c-string* }
     { comment-lengths int* }
     { comments int }
-    { vendor c-string }
-;
+    { vendor c-string } ;
 
 TYPEDEF: uchar[64] th-quant-base
 
 STRUCT: th-quant-ranges
     { nranges int }
     { sizes int* }
-    { base-matrices th-quant-base* }
-;
+    { base-matrices th-quant-base* } ;
 
 STRUCT: th-quant-info
     { dc-scale { short 64 } }
     { ac-scale { short 64 } }
     { loop-filter-limits { uchar 64 } }
-    { qi-ranges { th-quant-ranges 2 3 } }
-;
+    { qi-ranges { th-quant-ranges 2 3 } } ;
 
 CONSTANT: TH-NHUFFMANE-TABLES 80
 CONSTANT: TH-NDCT-TOKENS 32
 
 STRUCT: th-huff-code
     { pattern int }
-    { nbits int }
-;
+    { nbits int } ;
 
 LIBRARY: theoradec
 FUNCTION: c-string th_version_string ( )
@@ -165,8 +158,7 @@ TYPEDEF: void* th-stripe-decoded-func
 
 STRUCT: th-stripe-callback
     { ctx void* }
-    { stripe-decoded th-stripe-decoded-func }
-;
+    { stripe-decoded th-stripe-decoded-func } ;
 
 TYPEDEF: void* th-dec-ctx
 TYPEDEF: void* th-setup-info

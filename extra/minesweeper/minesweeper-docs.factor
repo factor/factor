@@ -34,7 +34,6 @@ $nl
 $nl
 "You do not have to flag all the mines to win, you only need to open all the cells that do not contain mines."
 $nl
-"Click the yellow smiley face (or the desired difficulty) to start a new game."
-;
+"Click the yellow smiley face (or the desired difficulty) to start a new game." ;
 
 ABOUT: "minesweeper"

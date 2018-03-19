@@ -6,8 +6,7 @@ TUPLE: line-context
 parent
 in-rule
 in-rule-set
-end
-;
+end ;
 
 : <line-context> ( ruleset parent -- line-context )
     over rule-set? [ "not a rule-set" throw ] unless

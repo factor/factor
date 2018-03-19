@@ -55,9 +55,7 @@ ARTICLE: "opengl-geometric-primitives" "OpenGL geometric primitives"
       { { $link GL_QUADS          }
         "quadruples of vertices interpreted as four-sided polygons" }
       { { $link GL_QUAD_STRIP     } "linked strip of quadrilaterals" }
-      { { $link GL_POLYGON        } "boundary of a simple, convex polygon" } }
-
-;
+      { { $link GL_POLYGON        } "boundary of a simple, convex polygon" } } ;
 
 HELP: glBegin
   { $values { "mode"

@@ -57,30 +57,26 @@ TYPEDEF: uchar yaml_char_t
 ! /** The version directive data. */
 STRUCT: yaml_version_directive_t
     { major int }
-    { minor int }
-;
+    { minor int } ;
 
 ! /** The tag directive data. */
 STRUCT: yaml_tag_directive_t
     { handle c-string }
-    { prefix c-string }
-;
+    { prefix c-string } ;
 
 ! /** The stream encoding. */
 ENUM: yaml_encoding_t
     YAML_ANY_ENCODING
     YAML_UTF8_ENCODING
     YAML_UTF16LE_ENCODING
-    YAML_UTF16BE_ENCODING
-;
+    YAML_UTF16BE_ENCODING ;
 
 ! /** Line break types. */
 ENUM: yaml_break_t
     YAML_ANY_BREAK
     YAML_CR_BREAK
     YAML_LN_BREAK
-    YAML_CRLN_BREAK
-;
+    YAML_CRLN_BREAK ;
 
 ! /** Many bad things could happen with the parser and emitter. */
 ENUM: yaml_error_type_t
@@ -94,15 +90,13 @@ ENUM: yaml_error_type_t
     YAML_COMPOSER_ERROR
 
     YAML_WRITER_ERROR
-    YAML_EMITTER_ERROR
-;
+    YAML_EMITTER_ERROR ;
 
 ! /** The pointer position. */
 STRUCT: yaml_mark_t
     { index size_t }
     { line size_t }
-    { column size_t }
-;
+    { column size_t } ;
 
 ! /** @} */
 
@@ -121,24 +115,21 @@ ENUM: yaml_scalar_style_t
     YAML_DOUBLE_QUOTED_SCALAR_STYLE
 
     YAML_LITERAL_SCALAR_STYLE
-    YAML_FOLDED_SCALAR_STYLE
-;
+    YAML_FOLDED_SCALAR_STYLE ;
 
 ! /** Sequence styles. */
 ENUM: yaml_sequence_style_t
     YAML_ANY_SEQUENCE_STYLE
 
     YAML_BLOCK_SEQUENCE_STYLE
-    YAML_FLOW_SEQUENCE_STYLE
-;
+    YAML_FLOW_SEQUENCE_STYLE ;
 
 ! /** Mapping styles. */
 ENUM: yaml_mapping_style_t
     YAML_ANY_MAPPING_STYLE
 
     YAML_BLOCK_MAPPING_STYLE
-    YAML_FLOW_MAPPING_STYLE
-;
+    YAML_FLOW_MAPPING_STYLE ;
 
 ! /** @} */
 
@@ -176,41 +167,34 @@ ENUM: yaml_token_type_t
     YAML_ALIAS_TOKEN
     YAML_ANCHOR_TOKEN
     YAML_TAG_TOKEN
-    YAML_SCALAR_TOKEN
-;
+    YAML_SCALAR_TOKEN ;
 
 ! /** The token structure. */
 ! /** The stream start (for @c YAML_STREAM_START_TOKEN). */
 STRUCT: stream_start_token_data
-    { encoding yaml_encoding_t }
-;
+    { encoding yaml_encoding_t } ;
 ! /** The alias (for @c YAML_ALIAS_TOKEN). */
 STRUCT: alias_token_data
-    { value c-string }
-;
+    { value c-string } ;
 ! /** The anchor (for @c YAML_ANCHOR_TOKEN). */
 STRUCT: anchor_token_data
-    { value c-string }
-;
+    { value c-string } ;
 
 ! /** The tag (for @c YAML_TAG_TOKEN). */
 STRUCT: tag_token_data
     { handle c-string }
-    { suffix c-string }
-;
+    { suffix c-string } ;
 
 ! /** The scalar value (for @c YAML_SCALAR_TOKEN). */
 STRUCT: scalar_token_data
     { value c-string }
     { length size_t }
-    { style yaml_scalar_style_t }
-;
+    { style yaml_scalar_style_t } ;
 
 ! /** The version directive (for @c YAML_VERSION_DIRECTIVE_TOKEN). */
 STRUCT: version_directive_token_data
     { major int }
-    { minor int }
-;
+    { minor int } ;
 
 UNION-STRUCT: token_data
   { stream_start stream_start_token_data }
@@ -218,8 +202,7 @@ UNION-STRUCT: token_data
   { anchor anchor_token_data }
   { tag tag_token_data }
   { scalar scalar_token_data }
-  { version_directive version_directive_token_data }
-;
+  { version_directive version_directive_token_data } ;
 STRUCT: yaml_token_t
 
     { type yaml_token_type_t }
@@ -227,8 +210,7 @@ STRUCT: yaml_token_t
     { data token_data }
 
     { start_mark yaml_mark_t }
-    { end_mark yaml_mark_t }
-;
+    { end_mark yaml_mark_t } ;
 
 ! /**
 !  * Free any memory allocated for a token object.
@@ -264,16 +246,14 @@ ENUM: yaml_event_type_t
     YAML_SEQUENCE_END_EVENT
 
     YAML_MAPPING_START_EVENT
-    YAML_MAPPING_END_EVENT
-;
+    YAML_MAPPING_END_EVENT ;
 
 ! /** The event structure. */
 
 ! /** The event data. */
 ! /** The stream parameters (for @c YAML_STREAM_START_EVENT). */
 STRUCT: stream_start_event_data
-    { encoding yaml_encoding_t }
-;
+    { encoding yaml_encoding_t } ;
 
 ! /** The document parameters (for @c YAML_DOCUMENT_START_EVENT). */
 !   /** The list of tag directives. */
@@ -284,18 +264,15 @@ STRUCT: stream_start_event_data
 STRUCT: document_start_event_data
     { version_directive yaml_version_directive_t* }
     { tag_directives tag_directives_document_start_event_data }
-    { implicit int }
-;
+    { implicit int } ;
 
 ! /** The document end parameters (for @c YAML_DOCUMENT_END_EVENT). */
 STRUCT: document_end_event_data
-    { implicit int }
-;
+    { implicit int } ;
 
 ! /** The alias parameters (for @c YAML_ALIAS_EVENT). */
 STRUCT: alias_event_data
-    { anchor c-string }
-;
+    { anchor c-string } ;
 
 ! /** The scalar parameters (for @c YAML_SCALAR_EVENT). */
 STRUCT: scalar_event_data
@@ -305,24 +282,21 @@ STRUCT: scalar_event_data
     { length size_t }
     { plain_implicit int }
     { quoted_implicit int }
-    { style yaml_scalar_style_t }
-;
+    { style yaml_scalar_style_t } ;
 
 ! /** The sequence parameters (for @c YAML_SEQUENCE_START_EVENT). */
 STRUCT: sequence_start_event_data
     { anchor c-string }
     { tag c-string }
     { implicit int }
-    { style yaml_sequence_style_t }
-;
+    { style yaml_sequence_style_t } ;
 
 ! /** The mapping parameters (for @c YAML_MAPPING_START_EVENT). */
 STRUCT: mapping_start_event_data
     { anchor c-string }
     { tag c-string }
     { implicit int }
-    { style yaml_mapping_style_t }
-;
+    { style yaml_mapping_style_t } ;
 
 UNION-STRUCT: event_data
   { stream_start stream_start_event_data }
@@ -331,8 +305,7 @@ UNION-STRUCT: event_data
   { alias alias_event_data }
   { scalar scalar_event_data }
   { sequence_start sequence_start_event_data }
-  { mapping_start mapping_start_event_data }
-;
+  { mapping_start mapping_start_event_data } ;
 
 STRUCT: yaml_event_t
 
@@ -341,8 +314,7 @@ STRUCT: yaml_event_t
     { data event_data }
 
     { start_mark yaml_mark_t }
-    { end_mark yaml_mark_t }
-;
+    { end_mark yaml_mark_t } ;
 
 ! /**
 !  * Create the STREAM-START event.
@@ -562,8 +534,7 @@ ENUM: yaml_node_type_t
 
     YAML_SCALAR_NODE
     YAML_SEQUENCE_NODE
-    YAML_MAPPING_NODE
-;
+    YAML_MAPPING_NODE ;
 
 ! /** The forward definition of a document node structure. */
 ! typedef struct yaml_node_s yaml_node_t;
@@ -574,8 +545,7 @@ TYPEDEF: int yaml_node_item_t
 ! /** An element of a mapping node. */
 STRUCT: yaml_node_pair_t
     { key int }
-    { value int }
-;
+    { value int } ;
 
 ! /** The node structure. */
         ! /** The scalar parameters (for @c YAML_SCALAR_NODE). */
@@ -623,9 +593,7 @@ STRUCT: yaml_node_t
     { data node_data }
 
     { start_mark yaml_mark_t }
-    { end_mark yaml_mark_t }
-
-;
+    { end_mark yaml_mark_t } ;
 
 ! /** The document structure. */
     ! /** The document nodes. */
@@ -653,9 +621,7 @@ STRUCT: yaml_document_t
     { end_implicit int }
 
     { start_mark yaml_mark_t }
-    { end_mark yaml_mark_t }
-
-;
+    { end_mark yaml_mark_t } ;
 
 ! /**
 !  * Create a YAML document.
@@ -845,8 +811,7 @@ STRUCT: yaml_simple_key_t
 
     { token_number size_t }
 
-    { mark yaml_mark_t }
-;
+    { mark yaml_mark_t } ;
 
 ! /**
 !  * The states of the parser.
@@ -875,8 +840,7 @@ ENUM: yaml_parser_state_t
     YAML_PARSE_FLOW_MAPPING_KEY_STATE
     YAML_PARSE_FLOW_MAPPING_VALUE_STATE
     YAML_PARSE_FLOW_MAPPING_EMPTY_VALUE_STATE
-    YAML_PARSE_END_STATE
-;
+    YAML_PARSE_END_STATE ;
 
 ! /**
 !  * This structure holds aliases data.
@@ -885,8 +849,7 @@ ENUM: yaml_parser_state_t
 STRUCT: yaml_alias_data_t
     { anchor c-string }
     { index int }
-    { mark yaml_mark_t }
-;
+    { mark yaml_mark_t } ;
 
 ! /**
 !  * The parser structure.
@@ -1032,8 +995,7 @@ STRUCT: yaml_parser_t
 
     { aliases yaml_parser_aliases }
 
-    { document yaml_document_t* }
-;
+    { document yaml_document_t* } ;
 
 ! /**
 !  * Initialize a parser.
@@ -1228,8 +1190,7 @@ ENUM: yaml_emitter_state_t
     YAML_EMIT_BLOCK_MAPPING_KEY_STATE
     YAML_EMIT_BLOCK_MAPPING_SIMPLE_VALUE_STATE
     YAML_EMIT_BLOCK_MAPPING_VALUE_STATE
-    YAML_EMIT_END_STATE
-;
+    YAML_EMIT_END_STATE ;
 
 ! /**
 !  * The emitter structure.
@@ -1390,9 +1351,7 @@ STRUCT: yaml_emitter_t
 
     { last_anchor_id int }
 
-    { document yaml_document_t* }
-
-;
+    { document yaml_document_t* } ;
 
 ! /**
 !  * Initialize an emitter.

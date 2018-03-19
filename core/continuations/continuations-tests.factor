@@ -1,6 +1,5 @@
 USING: accessors continuations debugger eval io kernel kernel.private
-math math.ratios memory namespaces sequences tools.test vectors words
-;
+math math.ratios memory namespaces sequences tools.test vectors words ;
 IN: continuations.tests
 
 : (callcc1-test) ( n obj -- n' obj )

@@ -10,8 +10,7 @@ USING:
     math
     math.bits
     sequences
-    tools.time
-;
+    tools.time ;
 IN: cpu.8080.test
 
 : step ( cpu -- )

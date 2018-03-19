@@ -653,8 +653,7 @@ HELP: \(
         "4"
     }
 }
-{ $see-also "effects" }
-;
+{ $see-also "effects" } ;
 
 HELP: \nan:
 { $syntax "nan: payload" }

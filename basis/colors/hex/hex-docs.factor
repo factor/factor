@@ -7,13 +7,11 @@ IN: colors.hex
 
 HELP: hex>rgba
 { $values { "hex" string } { "rgba" color } }
-{ $description "Converts a hexadecimal string value into a " { $link color } "." }
-;
+{ $description "Converts a hexadecimal string value into a " { $link color } "." } ;
 
 HELP: rgba>hex
 { $values { "rgba" color } { "hex" string } }
-{ $description "Converts a " { $link color } " into a hexadecimal string value." }
-;
+{ $description "Converts a " { $link color } " into a hexadecimal string value." } ;
 
 HELP: \hexcolor:
 { $syntax "hexcolor: value" }

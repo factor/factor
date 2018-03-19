@@ -8,7 +8,6 @@ HELP: env
 
 ARTICLE: "env" "Accessing the environment via the assoc protocol"
 "The " { $vocab-link "env" } " vocabulary defines a " { $link env } " word which implements the " { $link "assocs-protocol" } " over " { $link "environment" } "."
-{ $subsections env }
-;
+{ $subsections env } ;
 
 ABOUT: "env"

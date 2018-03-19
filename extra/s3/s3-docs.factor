@@ -11,8 +11,7 @@ HELP: buckets
     "Returns a list of " { $link bucket } " objects containing data on the buckets available on S3." }
 { $examples
   { $unchecked-example "USING: s3 ;" "buckets ." "{ }" }
-}
-;
+} ;
 
 HELP: create-bucket
 { $values
@@ -23,8 +22,7 @@ HELP: create-bucket
 }
 { $examples
   { $unchecked-example "USING: s3 ;" "\"testbucket\" create-bucket" "" }
-}
-;
+} ;
 
 HELP: delete-bucket
 { $values
@@ -35,8 +33,7 @@ HELP: delete-bucket
 }
 { $examples
   { $unchecked-example "USING: s3 ;" "\"testbucket\" delete-bucket" "" }
-}
-;
+} ;
 
 HELP: keys
 { $values
@@ -48,8 +45,7 @@ HELP: keys
 }
 { $examples
   { $unchecked-example "USING: s3 ;" "\"testbucket\" keys . " "{ }" }
-}
-;
+} ;
 
 HELP: get-object
 { $values
@@ -63,8 +59,7 @@ HELP: get-object
 }
 { $examples
   { $unchecked-example "USING: s3 ;" "\"testbucket\" \"mykey\" http-get " "" }
-}
-;
+} ;
 
 HELP: put-object
 { $values
@@ -85,8 +80,7 @@ HELP: put-object
 { $examples
   { $unchecked-example "USING: s3 ;" "\"hello\" binary encode \"text/plain\" \"testbucket\" \"hello.txt\" H{ { \"x-amz-acl\" \"public-read\" } } put-object" "" }
   { $unchecked-example "USING: s3 ;" "\"hello.txt\" <pathname> \"text/plain\" \"testbucket\" \"hello.txt\" H{ { \"x-amz-acl\" \"public-read\" } } put-object" "" }
-}
-;
+} ;
 
 HELP: delete-object
 { $values
@@ -98,8 +92,7 @@ HELP: delete-object
 }
 { $examples
   { $unchecked-example "USING: s3 ;" "\"testbucket\" \"mykey\" delete-object" "" }
-}
-;
+} ;
 
 ARTICLE: "s3" "Amazon S3"
 "The " { $vocab-link "s3" } " vocabulary provides a wrapper to the Amazon "
@@ -115,7 +108,6 @@ $nl
     get-object
     put-object
     delete-object
-}
-;
+} ;
 
 ABOUT: "s3"

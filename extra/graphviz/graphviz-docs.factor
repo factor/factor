@@ -36,8 +36,7 @@ $nl
       "<anon> <anon> [ id>> ] same? ."
       "f"
     }
-}
-;
+} ;
 
 HELP: <cluster>
 { $values

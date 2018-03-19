@@ -2256,8 +2256,7 @@ CONSTANT: PBT_POWERSETTINGCHANGE 0x8013
 STRUCT: POWERBROADCAST_SETTING
     { PowerSetting GUID  }
     { DataLength   DWORD }
-    { Data         UCHAR }
-;
+    { Data         UCHAR } ;
 
 : msgbox ( str -- )
     f swap "DebugMsg" MB_OK MessageBox drop ;

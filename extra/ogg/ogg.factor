@@ -1,16 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING:
-    alien
-    alien.c-types
-    alien.libraries
-    alien.syntax
-    classes.struct
-    combinators
-    kernel
-    system
-;
+USING: alien alien.c-types alien.libraries alien.syntax
+classes.struct combinators kernel system ;
 IN: ogg
 
 <<

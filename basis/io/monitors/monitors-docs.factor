@@ -86,8 +86,7 @@ $nl
 $nl
 "Inside a single " { $link with-monitors } " scope, only one monitor may be created for any given directory."
 $nl
-"Both directories and files may be monitored. Unlike Mac OS X and Windows, changes to the immediate directory being monitored (permissions, modification time, and so on) are reported."
-;
+"Both directories and files may be monitored. Unlike Mac OS X and Windows, changes to the immediate directory being monitored (permissions, modification time, and so on) are reported." ;
 
 ARTICLE: "io.monitors" "File system change monitors"
 "File system change monitors listen for changes to file names, attributes and contents under a specified directory. They can optionally be recursive, in which case subdirectories are also monitored."

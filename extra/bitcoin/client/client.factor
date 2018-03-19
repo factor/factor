@@ -23,8 +23,7 @@ USING:
     namespaces
     sequences
     strings
-    urls
-;
+    urls ;
 IN: bitcoin.client
 
 : bitcoin-server ( -- string )

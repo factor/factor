@@ -1,5 +1,4 @@
-USING: accessors combinators namespaces sequences system vocabs
-;
+USING: accessors combinators namespaces sequences system vocabs ;
 IN: bootstrap.io
 
 "bootstrap.compiler" require

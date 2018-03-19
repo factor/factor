@@ -403,7 +403,6 @@ $nl
 { $subsections
     { "graphviz.render" "layouts" }
     { "graphviz.render" "formats" }
-}
-;
+} ;
 
 ABOUT: "graphviz.render"

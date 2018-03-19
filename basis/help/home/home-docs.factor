@@ -10,7 +10,6 @@ ARTICLE: "help.home" "Factor documentation"
 { $table
   { "Words" "Articles" "Vocabs" }
   { { $recent recent-words } { $recent recent-articles } { $recent recent-vocabs } }
-}
-;
+} ;
 
 ABOUT: "help.home"

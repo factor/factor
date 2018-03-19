@@ -41,7 +41,6 @@ $nl
     uuid3
     uuid4
     uuid5
-}
-;
+} ;
 
 ABOUT: "uuid"

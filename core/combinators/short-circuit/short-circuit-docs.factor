@@ -68,7 +68,6 @@ ARTICLE: "combinators.short-circuit" "Short-circuit combinators"
 { $subsections
     n&&
     n||
-}
-;
+} ;
 
 ABOUT: "combinators.short-circuit"

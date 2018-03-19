@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.accessors arrays cocoa cocoa.application
-core-foundation.arrays core-foundation.strings kernel sequences
-;
+core-foundation.arrays core-foundation.strings kernel sequences ;
 IN: cocoa.pasteboard
 
 CONSTANT: NSStringPboardType "NSStringPboardType"

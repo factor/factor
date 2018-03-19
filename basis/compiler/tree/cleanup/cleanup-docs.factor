@@ -1,5 +1,4 @@
-USING: classes compiler.tree help.markup help.syntax kernel sequences
-;
+USING: classes compiler.tree help.markup help.syntax kernel sequences ;
 IN: compiler.tree.cleanup
 
 HELP: (cleanup-folding)

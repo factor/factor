@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors calendar calendar.english combinators
 command-line formatting grouping io kernel math.parser
-math.ranges namespaces sequences sequences.extras strings.tables
-;
+math.ranges namespaces sequences sequences.extras strings.tables ;
 IN: tools.cal
 
 <PRIVATE

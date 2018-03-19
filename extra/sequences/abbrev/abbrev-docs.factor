@@ -22,7 +22,6 @@ ARTICLE: "sequences.abbrev" "Examples of abbrev usage"
 { $code
     "{ \"hello\" \"help\" } abbrev"
     "{ \"hello\" \"help\" } unique-abbrev"
-}
-;
+} ;
 
 ABOUT: "sequences.abbrev"

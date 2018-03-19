@@ -260,8 +260,7 @@ ARTICLE: "db-protocol" "Low-level database protocol"
 "Performing a query:"
 { $subsections query-results }
 "Handling query results:"
-{ $subsections "db-result-sets" }
-;
+{ $subsections "db-result-sets" } ;
 ! { $subsection bind-tuple }
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"

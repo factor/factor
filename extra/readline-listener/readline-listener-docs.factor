@@ -11,7 +11,6 @@ ARTICLE: "readline-listener" "Readline listener"
 $nl
 "By default, the terminal listener does not provide any command history or completion. This vocabulary uses libreadline to provide a listener with history, word completion and more convenient editing facilities."
 $nl
-{ $code "\"readline-listener\" run" }
-;
+{ $code "\"readline-listener\" run" } ;
 
 ABOUT: "readline-listener"

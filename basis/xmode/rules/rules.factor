@@ -23,8 +23,7 @@ escape-rule
 highlight-digits?
 digit-re
 no-word-sep
-finalized?
-;
+finalized? ;
 
 : <rule-set> ( -- ruleset )
     rule-set new
@@ -67,8 +66,7 @@ end
 match-token
 body-token
 delegate
-chars
-;
+chars ;
 
 TUPLE: seq-rule < rule ;
 

@@ -19,8 +19,6 @@ ARTICLE: "editors.emacs" "Integration with Emacs"
 
 "Factor also comes with an environment, called FUEL, that turns Emacs into a rich, fully featured IDE for Factor, including debugging, a Factor listener, documentation browsing, stack effect inference, and more. To learn more, check out the " { $vocab-link "fuel" } " vocabulary."
 
-{ $see-also "editor" }
-
-;
+{ $see-also "editor" } ;
 
 ABOUT: "editors.emacs"

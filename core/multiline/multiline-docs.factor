@@ -8,7 +8,6 @@ HELP: parse-multiline-string
 
 ARTICLE: "multiline" "Multiline"
 "Writing new multiline parsing words:"
-{ $subsections parse-multiline-string }
-;
+{ $subsections parse-multiline-string } ;
 
 ABOUT: "multiline"

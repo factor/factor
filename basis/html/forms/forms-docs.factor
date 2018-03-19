@@ -1,5 +1,4 @@
-USING: assocs help.markup help.syntax kernel quotations strings
-;
+USING: assocs help.markup help.syntax kernel quotations strings ;
 IN: html.forms
 
 HELP: <form>

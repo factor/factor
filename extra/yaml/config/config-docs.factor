@@ -33,8 +33,7 @@ ARTICLE: "yaml-config" "YAML control variables"
 { $subsections
   "yaml-input"
   "yaml-output"
-}
-;
+} ;
 
 ARTICLE: "yaml-input" "YAML deserialization control"
 "The following variables control the YAML deserialization process:"

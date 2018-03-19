@@ -5,8 +5,7 @@ USING: accessors arrays assocs bit-arrays byte-arrays calendar
 colors.constants combinators fry kernel kernel.private locals
 math math.order math.ranges namespaces opengl random sequences
 sequences.private timers ui ui.commands ui.gadgets
-ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words
-;
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words ;
 
 IN: game-of-life
 
