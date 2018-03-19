@@ -45,7 +45,7 @@ super-message-senders [ H{ } clone ] initialize
 TUPLE: selector-tuple name object ;
 
 : selector-name ( name -- name' )
-    CHAR: . over index [ 0 > [ "." split1 nip ] when ] when* ;
+    char: . over index [ 0 > [ "." split1 nip ] when ] when* ;
 
 MEMO: <selector> ( name -- sel )
     selector-name f selector-tuple boa ;
@@ -237,7 +237,7 @@ ERROR: no-objc-type name ;
 
 : method-collisions ( -- collisions )
     objc-methods get >alist
-    [ first CHAR: . swap member? ] filter
+    [ first char: . swap member? ] filter
     [ first "." split1 nip ] collect-by
     [ nip values members length 1 > ] assoc-filter ;
 

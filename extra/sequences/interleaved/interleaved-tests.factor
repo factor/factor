@@ -1,7 +1,7 @@
 USING: sequences.interleaved strings tools.test ;
 
-{ "" } [ "" CHAR: _ <interleaved> >string ] unit-test
-{ "a" } [ "a" CHAR: _ <interleaved> >string ] unit-test
-{ "a_b" } [ "ab" CHAR: _ <interleaved> >string ] unit-test
-{ "a_b_c" } [ "abc" CHAR: _ <interleaved> >string ] unit-test
-{ "a_b_c_d" } [ "abcd" CHAR: _ <interleaved> >string ] unit-test
+{ "" } [ "" char: _ <interleaved> >string ] unit-test
+{ "a" } [ "a" char: _ <interleaved> >string ] unit-test
+{ "a_b" } [ "ab" char: _ <interleaved> >string ] unit-test
+{ "a_b_c" } [ "abc" char: _ <interleaved> >string ] unit-test
+{ "a_b_c_d" } [ "abcd" char: _ <interleaved> >string ] unit-test

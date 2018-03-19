@@ -268,8 +268,8 @@ tools.test vectors vocabs ;
 { { } } [ { } ", " interleaved ] unit-test
 { { 1 } } [ { 1 } ", " interleaved ] unit-test
 { { 1 ", " 2 } } [ { 1 2 } ", " interleaved ] unit-test
-{ "" } [ "" CHAR: _ interleaved ] unit-test
-{ "a" } [ "a" CHAR: _ interleaved ] unit-test
-{ "a_b" } [ "ab" CHAR: _ interleaved ] unit-test
-{ "a_b_c" } [ "abc" CHAR: _ interleaved ] unit-test
-{ "a_b_c_d" } [ "abcd" CHAR: _ interleaved ] unit-test
+{ "" } [ "" char: _ interleaved ] unit-test
+{ "a" } [ "a" char: _ interleaved ] unit-test
+{ "a_b" } [ "ab" char: _ interleaved ] unit-test
+{ "a_b_c" } [ "abc" char: _ interleaved ] unit-test
+{ "a_b_c_d" } [ "abcd" char: _ interleaved ] unit-test
