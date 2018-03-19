@@ -157,4 +157,3 @@ M: word-help-coverage help-coverage.
 : word-help-coverage. ( word-spec -- ) <word-help-coverage> help-coverage. ;
 : vocab-help-coverage. ( vocab-spec -- ) <vocab-help-coverage> help-coverage. ;
 : prefix-help-coverage. ( prefix-spec private? -- ) <prefix-help-coverage> help-coverage. ;
-

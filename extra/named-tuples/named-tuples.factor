@@ -33,4 +33,3 @@ M: named-tuple set-nth-unsafe
 M: named-tuple like class-of slots>tuple ;
 
 INSTANCE: named-tuple sequence
-

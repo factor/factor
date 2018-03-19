@@ -14,7 +14,7 @@ sent-messages [ H{ } clone ] initialize
 SYNTAX: \send: scan-token unescape-token dup remember-send suffix! \ send suffix! ;
 
 SYNTAX: \?send:
-    dup last cache-stubs 
+    dup last cache-stubs
     scan-token unescape-token dup remember-send
     suffix! \ ?send suffix! ;
 

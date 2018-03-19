@@ -4,7 +4,7 @@ IN: units.imperial
 ! TEMPERATURE
 
 : deg-F ( n -- Fahrenheit ) 32 - 5/9 * deg-C ;
-ALIAS: °F deg-F
+ALIAS: ï¿½F deg-F
 
 ! LENGTH
 

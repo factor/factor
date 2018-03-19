@@ -60,4 +60,3 @@ M:: frame-buffer draw-gadget* ( FRAME-BUFFER -- )
     FRAME-BUFFER update-frame-buffer
     glFlush
     FRAME-BUFFER read-pixels ;
-
