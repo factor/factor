@@ -32,7 +32,7 @@ CONSTANT: elevator-padding 4
 
 : elevator-length ( slider -- n )
     [ elevator>> dim>> ] [ orientation>> ] bi v.
-    elevator-padding 2 * - ;
+    elevator-padding 2 * [-] ;
 
 CONSTANT: min-thumb-dim 30
 
