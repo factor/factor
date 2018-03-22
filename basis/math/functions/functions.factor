@@ -196,8 +196,7 @@ M: real log >float log ; inline
 
 M: complex log >polar [ flog ] dip rect> ; inline
 
-: logn ( x n -- y )
-  [ log ] bi@ / ;
+: logn ( x n -- y ) [ log ] bi@ / ;
 
 <PRIVATE
 
