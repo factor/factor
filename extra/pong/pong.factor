@@ -16,7 +16,7 @@ CONSTANT: FONT $[
     monospace-font
         t >>bold?
         COLOR: red >>foreground
-        COLOR: white >>background
+        COLOR: gray95 >>background
     ]
 
 TUPLE: ball pos vel ;
@@ -33,7 +33,7 @@ DEFER: on-tick
 
 : <pong-gadget> ( -- gadget )
     pong-gadget new initial-state
-        COLOR: white <solid> >>interior
+        COLOR: gray95 <solid> >>interior
         dup '[ _ on-tick ] f 16 milliseconds <timer> >>timer ;
 
 M: pong-gadget pref-dim* drop { 400 400 } ;
@@ -42,7 +42,7 @@ M: pong-gadget ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
 
 M:: pong-gadget draw-gadget* ( PONG -- )
-    COLOR: dark-gray gl-color
+    COLOR: gray80 gl-color
     15 390 20 <range> [
         197 2array { 10 6 } gl-fill-rect
     ] each
@@ -64,7 +64,7 @@ M:: pong-gadget draw-gadget* ( PONG -- )
     ] [
         PONG timer>> thread>> [
             FONT 24 >>size
-            { "N     - New Game" "SPACE - Pause" }
+            { "    N - New Game" "SPACE - Pause" }
             [ text-width 390 swap - 2 / 100 2array ]
             [ '[ _ _ draw-text ] with-translation ] 2bi
         ] unless
