@@ -53,7 +53,7 @@
 #endif
 
 // Record compilation time
-#define FACTOR_COMPILE_TIME __TIMESTAMP__
+#define FACTOR_COMPILE_TIME __DATE__ " " __TIME__
 
 // Detect target CPU type
 #if defined(__arm__)
