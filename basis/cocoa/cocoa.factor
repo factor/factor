@@ -11,17 +11,18 @@ sent-messages [ H{ } clone ] initialize
 : remember-send ( selector -- )
     dup sent-messages get set-at ;
 
-SYNTAX: \send: scan-token unescape-token dup remember-send suffix! \ send suffix! ;
+SYNTAX: \send:
+    scan-token unescape-token dup remember-send
+    [ lookup-method suffix! ] [ suffix! ] bi \ send suffix! ;
 
 SYNTAX: \?send:
     dup last cache-stubs
     scan-token unescape-token dup remember-send
-    suffix! \ ?send suffix! ;
+    suffix! \ send suffix! ;
 
 SYNTAX: \selector:
-    scan-token unescape-token
-    [ remember-send ]
-    [ <selector> suffix! \ cocoa.messages::selector suffix! ] bi ;
+    scan-token unescape-token dup remember-send
+    <selector> suffix! \ cocoa.messages::selector suffix! ;
 
 SYMBOL: super-sent-messages
 
@@ -32,7 +33,7 @@ super-sent-messages [ H{ } clone ] initialize
 
 SYNTAX: \super:
     scan-token unescape-token dup remember-super-send
-    suffix! \ super-send suffix! ;
+    [ lookup-method suffix! ] [ suffix! ] bi \ super-send suffix! ;
 SYMBOL: frameworks
 
 frameworks [ V{ } clone ] initialize
