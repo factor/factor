@@ -26,14 +26,14 @@ IN: game-of-life
     rows 1 - { fixnum } declare :> max-rows
     cols 1 - { fixnum } declare :> max-cols
     rows [ cols <byte-array> ] replicate :> neighbors
-    grid { array } declare [| row j |
+    grid { array } declare |[ row j |
         j 0 eq? [ max-rows ] [ j 1 - ] if
         j
         j max-rows eq? [ 0 ] [ j 1 + ] if
         [ neighbors nth-unsafe { byte-array } declare ] tri@ :>
         ( above same below )
 
-        row { bit-array } declare [| cell i |
+        row { bit-array } declare |[ cell i |
             cell [
                 i 0 eq? [ max-cols ] [ i 1 - ] if
                 i
@@ -49,9 +49,9 @@ IN: game-of-life
 
 :: next-step ( grid -- )
     grid count-neighbors { array } declare :> neighbors
-    grid { array } declare [| row j |
+    grid { array } declare |[ row j |
         j neighbors nth-unsafe { byte-array } declare :> neighbor-row
-        row { bit-array } declare [| cell i |
+        row { bit-array } declare |[ cell i |
             i neighbor-row nth-unsafe
             cell [
                 2 3 between? i row set-nth-unsafe
@@ -85,8 +85,8 @@ M: grid-gadget pref-dim*
     rows new-rows = not
     cols new-cols = not or [
         new-rows new-cols make-grid :> new-grid
-        rows new-rows min <iota> [| j |
-            cols new-cols min <iota> [| i |
+        rows new-rows min <iota> |[ j |
+            cols new-cols min <iota> |[ i |
                 i j grid nth nth
                 i j new-grid nth set-nth
             ] each
@@ -95,10 +95,10 @@ M: grid-gadget pref-dim*
     ] when ;
 
 :: draw-cells ( gadget -- )
-    COLOR: black gl-color
+    color: black gl-color
     gadget size>> :> size
-    gadget grid>> { array } declare [| row j |
-        row { bit-array } declare [| cell i |
+    gadget grid>> { array } declare |[ row j |
+        row { bit-array } declare |[ cell i |
             cell [
                 i j [ size * ] bi@ 2array
                 { size size } gl-fill-rect
@@ -109,12 +109,12 @@ M: grid-gadget pref-dim*
 :: draw-lines ( gadget -- )
     gadget size>> :> size
     gadget grid>> grid-dim :> ( rows cols )
-    COLOR: gray gl-color
+    color: gray gl-color
     cols rows [ size * ] bi@ :> ( w h )
-    rows [0,b] [| j |
+    rows [0,b] |[ j |
         j size * :> y
         { 0 y } { w y } gl-line
-        cols [0,b] [| i |
+        cols [0,b] |[ i |
             i size * :> x
             { x 0 } { x h } gl-line
         ] each

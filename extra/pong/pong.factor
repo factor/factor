@@ -15,8 +15,8 @@ CONSTANT: PADDLE-DIM ${ PADDLE-SIZE 10 }
 CONSTANT: FONT $[
     monospace-font
         t >>bold?
-        COLOR: red >>foreground
-        COLOR: gray95 >>background
+        color: red >>foreground
+        color: gray95 >>background
     ]
 
 TUPLE: ball pos vel ;
@@ -33,7 +33,7 @@ DEFER: on-tick
 
 : <pong-gadget> ( -- gadget )
     pong-gadget new initial-state
-        COLOR: gray95 <solid> >>interior
+        color: gray95 <solid> >>interior
         dup '[ _ on-tick ] f 16 milliseconds <timer> >>timer ;
 
 M: pong-gadget pref-dim* drop { 400 400 } ;
@@ -42,12 +42,12 @@ M: pong-gadget ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
 
 M:: pong-gadget draw-gadget* ( PONG -- )
-    COLOR: gray80 gl-color
+    color: gray80 gl-color
     15 390 20 <range> [
         197 2array { 10 6 } gl-fill-rect
     ] each
 
-    COLOR: black gl-color
+    color: black gl-color
     { 0 0 } { 10 400 } gl-fill-rect
     { 390 0 } { 10 400 } gl-fill-rect
 
