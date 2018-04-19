@@ -23,7 +23,7 @@ SYNTAX: DECIMAL: parse-decimal suffix! ;
 
 : decimal>ratio ( decimal -- ratio ) >decimal< 10^ * ;
 
-: decimal>float ( decimal -- ratio ) decimal>ratio >float ;
+: decimal>float ( decimal -- float ) decimal>ratio >float ;
 
 : scale-mantissas ( D1 D2 -- m1 m2 exp )
     [ [ mantissa>> ] bi@ ]
