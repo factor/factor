@@ -165,13 +165,10 @@ static void* mach_exception_thread(void* arg) {
       char data[1024];
     } reply;
 
-    mach_msg_return_t retval;
-
     // Wait for a message on the exception port.
-    retval =
-        mach_msg(&msg.head, MACH_RCV_MSG | MACH_RCV_LARGE, 0, sizeof(msg),
-                 our_exception_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-    if (retval != MACH_MSG_SUCCESS) {
+    if (mach_msg(&msg.head, MACH_RCV_MSG | MACH_RCV_LARGE, 0, sizeof(msg),
+                 our_exception_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL) !=
+        MACH_MSG_SUCCESS) {
       abort();
     }
 
