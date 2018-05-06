@@ -11,7 +11,6 @@ ui.render ui.text ui.theme unicode ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
-    caret-color
     caret mark
     focused? blink blink-timer
     default-text ;
