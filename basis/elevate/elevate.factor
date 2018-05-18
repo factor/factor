@@ -2,29 +2,41 @@ USING: arrays command-line fry io.launcher kernel math namespaces
 sequences system unix.ffi ;
 IN: elevate
 
-: apple-script-elevate ( x x -- ) 2drop ;
+: apple-script-elevate ( command -- ) 2drop ;
 
-HOOK: elevate os ( win-console? posix-graphical? -- )
+GENERIC: glue-command ( prefix command -- glued )
 
-M: windows elevate 2drop ;
+M: array glue-command
+    swap prefix ;
 
-M: macosx elevate
-    [   ! graphical (through applescript)
-        t apple-script-elevate
+M: string glue-command
+    " " glue ;
+
+ERROR: elevated-failed path ;
+
+HOOK: elevated os ( command win-console? posix-graphical? -- process )
+
+M: windows elevated
+    2drop run-process ;
+
+M: macosx elevated
+    nip [ ! graphical (through applescript)
+        apple-script-elevate
     ] [
-        f linux os [ elevate ] with-variable
+        f f linux os [ elevated ] with-variable
     ] if ;
 
-M: linux elevate
-    getuid zero? [
-        2drop ! we are already root: do nothing
+M: linux elevated
+    nip getuid zero? [
+        drop ! we are already root: do nothing
     ] [
-        ! graphical on linuxes
-        nip [ { "gksudo" "kdesudo" } ] [ { } ] if
-        "sudo" suffix (command-line) '[ 1array _ append ] map
-        [
-            run-process drop
-        ] each
+        { "gksudo" "kdesudo" "sudo" } { "sudo" } ? ! graphical handled
+        swap '[ _ glue-command ] map
+        [ " " split [ first utf8 string>alien ] [ rest ] execvp ] map
+        [ -1 = ] all? elevated-failed
     ] if ;
 
-HOOK: lower os ( relaunch? -- )
+: elevate ( option? -- ) (command-line) elevated ;
+
+HOOK: lowered os ( relaunch? -- )
+
