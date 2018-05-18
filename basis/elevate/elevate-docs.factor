@@ -1,4 +1,4 @@
-USING: help.syntax help.markup ;
+USING: arrays help.markup help.syntax strings ;
 IN: elevate
 
 ABOUT: elevate
