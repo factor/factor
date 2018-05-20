@@ -1,11 +1,14 @@
 USING: accessors alien alien.c-types elevate io.launcher kernel
 locals math sequences splitting strings system windows.errors
-windows.shell32 ;
+windows.kernel32 windows.shell32 windows.user32 ;
 IN: elevate.windows
 
 <PRIVATE
 ! TODO
 M: windows already-root?
+    ! https://msdn.microsoft.com/en-us/library/windows/desktop/aa379296(v=vs.85).aspx
+    ! https://msdn.microsoft.com/en-us/library/windows/desktop/aa446671%28v=vs.85%29.aspx
+    ! https://msdn.microsoft.com/en-us/library/windows/desktop/ms683182(v=vs.85).aspx
     f ;
 
 M:: windows elevated ( command replace? win-console? posix-graphical? -- process )
@@ -15,11 +18,11 @@ M:: windows elevated ( command replace? win-console? posix-graphical? -- process
         ! hwnd lpOperation
         f "runas"
         command dup string? [ " " split ] when
-        ! lpFile lpParameters lpDirectory nShowCmd
-        [ first ] [ rest ] bi " " join f win-console? >c-bool
+        ! lpFile lpParameters lpDirectory (int)nShowCmd
+        [ first ] [ rest ] bi " " join f SW_SHOW
         ! call shell function
         ShellExecuteW alien-address :> retval retval 32 <= [ retval n>win32-error-check ] [ ] if
-        retval replace? [ exit ] [ ] if
+        replace? [ exit ] [ ] if
     ] if ;
 
 ! no-op (not possible to lower)
