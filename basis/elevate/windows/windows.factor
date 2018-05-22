@@ -18,9 +18,9 @@ M:: windows elevated ( command replace? win-console? posix-graphical? -- process
         ! hwnd lpOperation
         f "runas"
         command dup string? [ " " split ] when
-        ! lpFile lpParameters lpDirectory (int)nShowCmd
+        ! lpFile lpParameters lpDirectory (enum)nShowCmd
         [ first ] [ rest ] bi " " join f SW_SHOW
-        ! call shell function
+        ! call shell function with questionable return pointer handling (should use WaitForSingleObject but it hangs)
         ShellExecuteW alien-address :> retval retval 32 <= [ retval n>win32-error-check ] [ ] if
         replace? [ exit ] [ ] if
     ] if ;
