@@ -1,6 +1,7 @@
-USING: accessors help.lint.coverage help.lint.coverage.private 
-help.markup help.syntax kernel literals math math.matrices 
-sequences sorting tools.test vocabs ;
+USING: accessors english help.lint.coverage
+help.lint.coverage.private help.markup help.syntax kernel
+literals math math.matrices sequences sorting tools.test vocabs
+;
 IN: help.lint.coverage.tests
 
 <PRIVATE
@@ -48,7 +49,7 @@ PRIVATE>
 ] unit-test
 
 {
-  V{ "needs help " "sections: " { { "$description" $description } { "$examples" $examples } } }
+  V{ "needs help " "sections: " { { "$description" $description } " and " { "$examples" $examples } } }
 } [
   V{ } clone word-help-coverage new { $description $examples } >>omitted-sections (assemble-omitted-sections)
 ] unit-test
