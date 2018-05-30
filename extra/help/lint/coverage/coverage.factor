@@ -4,7 +4,9 @@ fry generic help help.lint help.lint.checks help.markup io
 io.streams.string io.styles kernel math namespaces parser
 prettyprint sequences sequences.deep sets sorting splitting strings summary
 vocabs vocabs.parser words words.alias ;
+
 FROM: namespaces => set ;
+
 IN: help.lint.coverage
 
 TUPLE: word-help-coverage
@@ -14,6 +16,10 @@ TUPLE: word-help-coverage
     { 100%-coverage? boolean initial: f } ;
 
 <PRIVATE
+ERROR: unloaded-vocab spec ;
+
+M: unloaded-vocab summary
+    drop "Not a loaded vocabulary" ;
 
 CONSTANT: ignored-words {
     $low-level-note
@@ -26,17 +32,15 @@ CONSTANT: ignored-words {
     $nl
 }
 
-DEFER: ?pluralize
+GENERIC: write-object* ( object -- )
+M: string write-object* write ;
+M: pair write-object* first2 write-object ;
 
 : write-object-seq ( object-seq -- )
-    [
-        dup array? [
-            dup ?first array?
-            [ dup length '[
-                    swap first2 write-object
-                    _ 1 - abs = not [ " " write ] when
-                ] each-index
-            ] [ first2 write-object ] if
+    [ dup array? [
+            dup ?first array? [
+                [ write-object* ] each
+            ] [ write-object* ] if
         ] [ write ] if
     ] each ; inline
 
@@ -58,7 +62,7 @@ DEFER: ?pluralize
     omitted-sections>> [
         length "section" ?pluralize ": " append
     ] [
-        [ [ name>> ] keep 2array ] map
+        [ [ name>> ] keep 2array ] map "and" comma-list
     ] bi
     [ "needs help " ] 2dip
     3array over push-all ;
@@ -89,15 +93,21 @@ M: word-help-coverage summary
     loaded-child-vocab-names natural-sort ; inline
 
 : filter-private ( seq -- no-private )
-    [ ".private" ?tail nip not ] filter ; inline
+    [ ".private" ?tail nip ] reject ; inline
 
-: ?pluralize ( n singular -- singular/plural )
-    count-of-things " " split1 nip ;
+: ?remove-$values ( word spec -- spec )
+    \ $values over member? [
+        swap "declared-effect" word-prop [
+            [ in>> ] [ out>> ] bi append [
+                \ $values swap remove
+            ] [ drop ] if-empty
+    ] when* ] [ nip ] if ;
 
 : should-define ( word -- spec )
-    {
+    dup {
         ! predicates have generated docs
         { [ dup predicate? ]   [ drop { } ] }
+        { [ dup primitive? ]   [ drop { $description } ] }
         ! aliases should describe why they exist but ideally $values should be
         ! automatically inherited from the aliased word's docs
         { [ dup alias? ]       [ drop { $values $description } ] }
@@ -105,8 +115,7 @@ M: word-help-coverage summary
         { [ dup class? ]       [ drop { $class-description } ] }
         { [ dup generic? ]     [ drop { $values $contract $examples } ] }
         { [ dup word? ]        [ drop { $values $description $examples } ] }
-        [ drop no-cond ]
-    } cond ;
+    } cond ?remove-$values ;
 
 : word-defines-sections ( word -- seq )
     word-help [ ignored-words member? not ] filter [ ?first ] map ;
@@ -118,6 +127,10 @@ M: word-help-coverage summary
 
 : missing-sections ( word -- missing )
     [ should-define ] [ word-defines-sections ] bi diff ;
+
+GENERIC: loaded-vocab? ( vocab-spec -- ? )
+M: string loaded-vocab? lookup-vocab >boolean ;
+M: vocab loaded-vocab? source-loaded?>> +done+ = ;
 PRIVATE>
 
 GENERIC: <word-help-coverage> ( word -- coverage )
@@ -130,15 +143,22 @@ M: string <word-help-coverage>
     find-word <word-help-coverage> ; inline
 
 : <vocab-help-coverage> ( vocab-spec -- coverage )
-    [ auto-use? off vocab-words natural-sort [ <word-help-coverage> ] map ] with-scope ;
+    dup loaded-vocab? [
+        [ auto-use? off vocab-words natural-sort [ <word-help-coverage> ] map ] with-scope
+    ] [
+        unloaded-vocab
+    ] if ;
 
 : <prefix-help-coverage> ( prefix private? -- coverage )
-    [
-        auto-use? off group-articles vocab-articles set
-        [ sorted-loaded-child-vocabs ] dip not
-        [ filter-private ] when
-        [ <vocab-help-coverage> ] map flatten
-    ] with-scope ;
+    over loaded-vocab? [
+            [ auto-use? off group-articles vocab-articles set
+            [ sorted-loaded-child-vocabs ] dip not
+            [ filter-private ] when
+            [ <vocab-help-coverage> ] map flatten
+        ] with-scope
+    ] [
+        drop unloaded-vocab
+    ] if ;
 
 GENERIC: help-coverage. ( coverage -- )
 M: sequence help-coverage.
@@ -157,4 +177,3 @@ M: word-help-coverage help-coverage.
 : word-help-coverage. ( word-spec -- ) <word-help-coverage> help-coverage. ;
 : vocab-help-coverage. ( vocab-spec -- ) <vocab-help-coverage> help-coverage. ;
 : prefix-help-coverage. ( prefix-spec private? -- ) <prefix-help-coverage> help-coverage. ;
-
