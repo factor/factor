@@ -52,6 +52,9 @@ ERROR: key-exists value key assoc ;
         drop set-at
     ] if ;
 
+: kv-with ( obj assoc quot -- assoc curried )
+    swapd [ [ -rot ] dip call ] 2curry ; inline
+
 <PRIVATE
 
 : (sequence>assoc) ( seq map-quot insert-quot assoc -- assoc )
