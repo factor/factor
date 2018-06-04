@@ -104,4 +104,10 @@ void factor_vm::primitive_set_innermost_stack_frame_quotation() {
   *(cell*)inner = quot->entry_point + offset;
 }
 
+// Allocates memory (allot_alien)
+void factor_vm::primitive_callstack_bounds() {
+  ctx->push(allot_alien(ctx->callstack_seg->start));
+  ctx->push(allot_alien(ctx->callstack_seg->end));
+}
+
 }

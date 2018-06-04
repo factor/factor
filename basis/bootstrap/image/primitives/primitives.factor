@@ -314,6 +314,10 @@ CONSTANT: all-primitives {
             }
             { "become" ( old new -- ) "become" { array array } { } f }
             {
+                "callstack-bounds" ( -- start end ) "callstack_bounds"
+                { } { alien alien } make-flushable
+            }
+            {
                 "check-datastack" ( array in# out# -- ? ) "check_datastack"
                 { array integer integer } { object } make-flushable
             }
