@@ -136,4 +136,4 @@ ERROR: sequence-expected obj ;
     1array find-files-by-extensions ;
 
 : find-files-larger-than ( path size -- seq )
-    '[ file-info size>> _ > ] find-files ;
+    '[ link-info size>> _ > ] find-files ;
