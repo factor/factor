@@ -30,10 +30,6 @@ ERROR: vocab-must-not-exist string ;
 : check-vocab-root/vocab ( vocab-root string -- vocab-root string )
     [ check-root ] [ check-vocab-name ] bi* ;
 
-: check-vocab-exists ( string -- string )
-    dup vocab-exists? [ vocab-must-not-exist ] when
-    dup root-cache get delete-at ;
-
 : replace-vocab-separators ( vocab -- path )
     path-separator first CHAR: . associate substitute ;
 
@@ -288,8 +284,12 @@ PRIVATE>
 : scaffold-platforms ( vocab platforms -- )
     [ "platforms.txt" ] dip scaffold-metadata ;
 
+: delete-from-root-cache ( string -- )
+    root-cache get delete-at ;
+
 : scaffold-vocab ( vocab-root string -- )
-    check-vocab-exists {
+    dup delete-from-root-cache
+    {
         [ scaffold-directory ]
         [ scaffold-main ]
         [ nip require ]
