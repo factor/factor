@@ -22,7 +22,7 @@ ERROR: vocab-must-not-exist string ;
     trim-tail-separators vocab-roots get member? ;
 
 : ensure-vocab-exists ( string -- string )
-    dup loaded-vocab-names member? [ no-vocab ] unless ;
+    dup lookup-vocab [ no-vocab ] unless ;
 
 : check-root ( string -- string )
     dup vocab-root? [ not-a-vocab-root ] unless ;
@@ -31,10 +31,11 @@ ERROR: vocab-must-not-exist string ;
     [ check-root ] [ check-vocab-name ] bi* ;
 
 : check-vocab-exists ( string -- string )
-    dup vocab-exists? [ vocab-must-not-exist ] when ;
+    dup vocab-exists? [ vocab-must-not-exist ] when
+    dup root-cache get delete-at ;
 
 : replace-vocab-separators ( vocab -- path )
-    path-separator first CHAR: . associate substitute ; inline
+    path-separator first CHAR: . associate substitute ;
 
 : vocab-root/vocab>path ( vocab-root vocab -- path )
     check-vocab-root/vocab
