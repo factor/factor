@@ -13,8 +13,8 @@ IN: xkcd
 
 : comic-image ( url -- image )
     http-get nip
-    R/ http:\\/\\/imgs\.xkcd\.com\\/comics\\/[^\.]+\.(png|jpg)/
-    first-match >string load-http-image ;
+    R/ \/\/imgs\.xkcd\.com\\/comics\\/[^\.]+\.(png|jpg)/
+    first-match >string "http:" prepend load-http-image ;
 
 : comic-image. ( url -- )
     comic-image image. ;
