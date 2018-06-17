@@ -90,7 +90,7 @@ M: sequence nth-unsafe nth ; inline
 M: sequence set-nth-unsafe set-nth ; inline
 
 : change-nth-unsafe ( i seq quot -- )
-    [ [ nth-unsafe ] dip call ] 3keep drop set-nth-unsafe ; inline
+    [ [ nth-unsafe ] dip call ] 2keepd set-nth-unsafe ; inline
 
 PRIVATE>
 
@@ -380,7 +380,7 @@ PRIVATE>
 : glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
 
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
-    [ [ nth ] dip call ] 3keep drop set-nth-unsafe ; inline
+    [ [ nth ] dip call ] 2keepd set-nth-unsafe ; inline
 
 : min-length ( seq1 seq2 -- n ) [ length ] bi@ min ; inline
 
@@ -1089,7 +1089,7 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
         [ keep swap ] curry [ [ first ] dip call ] 2keep
         [ curry 2dip pick over ] curry
     ] [
-        [ [ 2drop ] [ [ 2drop ] 2dip ] if ] compose
+        [ [ 2drop ] [ 2nipd ] if ] compose
     ] bi* compose 1 each-from drop ; inline
 
 PRIVATE>

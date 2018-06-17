@@ -72,7 +72,7 @@ IN: sequences.extras
     [ change-nth ] 2curry each ; inline
 
 : push-if-index ( ..a elt i quot: ( ..a elt i -- ..b ? ) accum -- ..b )
-    [ 2keep drop ] dip rot [ push ] [ 2drop ] if ; inline
+    [ keepd ] dip rot [ push ] [ 2drop ] if ; inline
 
 : push-if* ( ..a elt quot: ( ..a elt -- ..b obj/f ) accum -- ..b )
     [ call ] dip [ push ] [ drop ] if* ; inline
@@ -538,7 +538,7 @@ PRIVATE>
     } case ;
 
 : cut-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
-    [ find drop ] 2keep drop swap
+    [ find drop ] keepd swap
     [ cut ] [ f over like ] if* ; inline
 
 : nth* ( n seq -- elt )
@@ -621,11 +621,11 @@ PRIVATE>
     '[ swap _ dip swap ] assoc-map ; inline
 
 : take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
-    [ '[ @ not ] find drop ] 2keep drop swap
+    [ '[ @ not ] find drop ] keepd swap
     [ dup length ] unless* head-slice ; inline
 
 : drop-while ( ... seq quot: ( ... elt -- ... ? ) -- tail-slice )
-    [ '[ @ not ] find drop ] 2keep drop swap
+    [ '[ @ not ] find drop ] keepd swap
     [ dup length ] unless* tail-slice ; inline
 
 :: interleaved-as ( seq glue exemplar -- newseq )

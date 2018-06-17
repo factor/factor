@@ -37,7 +37,7 @@ ERROR: zlib-failed n string ;
         [ <byte-vector> dup underlying>> ] keep ulong <ref>
     ] keep [
         dup length compression.zlib.ffi:compress zlib-error
-    ] 2keep drop ulong deref >>length B{ } like ;
+    ] keepd ulong deref >>length B{ } like ;
 
 : (uncompress) ( length byte-array -- byte-array )
     [

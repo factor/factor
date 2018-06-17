@@ -101,13 +101,13 @@ PRIVATE>
 
 M: input-port stream-read-until
     2dup read-until-step dup [
-        [ 2drop ] 2dip
+        2nipd
     ] [
         over [
             drop
             BV{ } like [ read-until-loop ] keep B{ } like swap
         ] [
-            [ 2drop ] 2dip
+            2nipd
         ] if
     ] if ;
 

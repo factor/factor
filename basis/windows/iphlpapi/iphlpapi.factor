@@ -387,7 +387,7 @@ FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen )
 
 : get-fixed-info ( -- FIXED_INFO )
     FIXED_INFO <struct> dup byte-length ulong <ref>
-    [ GetNetworkParams n>win32-error-check ] 2keep drop ;
+    [ GetNetworkParams n>win32-error-check ] keepd ;
 
 : dns-server-ips ( -- sequence )
     get-fixed-info DnsServerList>> [

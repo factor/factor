@@ -184,8 +184,8 @@ TUPLE: vbo
     [
         {
             { "primitive-mode"     [ 3drop triangles-mode ] }
-            { "uniforms"           [ nip nip ] }
-            { "vertex-array"       [ drop drop ] }
+            { "uniforms"           [ 2nip ] }
+            { "vertex-array"       [ 2drop ] }
             { "indexes"            [ drop nip ] }
         } 3<render-set> render
     ] 3each ;

@@ -47,7 +47,7 @@ DEFER: quoted-field,
 : field ( delimiter stream field-seps quote-seps -- sep/f field )
     pick stream-read-until dup CHAR: \" = [
         drop [ drop quoted-field ] [ continue-field ] if-empty
-    ] [ [ 3drop ] 2dip swap ?trim ] if ;
+    ] [ 3nipd swap ?trim ] if ;
 
 : (stream-read-row) ( delimiter stream field-end quoted-field -- sep/f fields )
     [ [ dup '[ dup _ = ] ] keep ] 3dip

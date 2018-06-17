@@ -18,6 +18,8 @@ CONSTANT: manual-substitutions
         { over [ dup swap ] }
         { swapd [ [ swap ] dip ] }
         { 2nip [ nip nip ] }
+        { 3nip [ 2nip nip ] }
+        { 4nip [ 3nip nip ] }
         { 2drop [ drop drop ] }
         { 3drop [ drop drop drop ] }
         { pop* [ pop drop ] }
@@ -144,7 +146,7 @@ CONSTANT: trivial-defs
         [
             {
                 [ length 4 <= ]
-                [ first { drop 2drop 3drop nip 2nip } member? ]
+                [ first { drop 2drop 3drop nip 2nip 3nip 4nip } member? ]
                 [ rest-slice [ boolean? ] all? ]
             } 1&&
         ]

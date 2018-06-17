@@ -38,7 +38,7 @@ M: c-ptr string>alien drop ;
     drop [ length ] keep over [
         1 + (byte-array) [
             [
-                [ [ string-nth-fast ] 2keep drop ]
+                [ [ string-nth-fast ] keepd ]
                 [ set-nth-unsafe ] bi*
             ] 2curry each-integer
         ] keep

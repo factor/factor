@@ -388,7 +388,7 @@ M: windows home
     FindStreamInfoStandard
     WIN32_FIND_STREAM_DATA <struct>
     0
-    [ FindFirstStream ] 2keep drop
+    [ FindFirstStream ] keepd
     over -1 <alien> = [
         2drop throw-win32-error
     ] [
