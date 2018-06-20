@@ -41,7 +41,7 @@ ERROR: not-a-string obj ;
     [ integer>fixnum ]
     [ dup slice? [ [ seq>> ] [ from>> ] bi ] [ 0 ] if ]
     [
-        swap over stream-element-type +byte+ eq?
+        tuck stream-element-type +byte+ eq?
         [ check-byte-array sequence-copy-unsafe ]
         [ check-string sequence-copy-unsafe ] if
     ] tri* ; inline

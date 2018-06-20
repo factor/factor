@@ -60,7 +60,7 @@ M: heap heap-size ( heap -- n )
 
 : data-push ( entry data -- n )
     [ length [ >>index ] keep ]
-    [ [ set-nth ] 2keep drop ] bi ; inline
+    [ [ set-nth ] keepd ] bi ; inline
 
 GENERIC: heap-compare ( entry1 entry2 heap -- ? )
 

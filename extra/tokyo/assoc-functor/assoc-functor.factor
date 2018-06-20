@@ -39,7 +39,7 @@ M: TYPE assoc-size handle>> DBRNUM ;
     dup DBITERINIT drop 0 int <ref>
     [ 2dup DBITERNEXT dup ] [
         [ memory>object ] [ tcfree ] bi
-        [ pick ] dip swap push
+        reach push
     ] while 3drop ;
 
 M: TYPE >alist

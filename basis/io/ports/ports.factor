@@ -89,25 +89,25 @@ M: input-port stream-read-unsafe
 : read-until-loop ( seps port accum -- sep/f )
     2over read-until-step over [
         [ append! ] dip dup [
-            [ 3drop ] dip
+            3nip
         ] [
             drop read-until-loop
         ] if
     ] [
-        [ 4drop ] dip
+        4nip
     ] if ; inline recursive
 
 PRIVATE>
 
 M: input-port stream-read-until
     2dup read-until-step dup [
-        [ 2drop ] 2dip
+        2nipd
     ] [
         over [
             drop
             BV{ } like [ read-until-loop ] keep B{ } like swap
         ] [
-            [ 2drop ] 2dip
+            2nipd
         ] if
     ] if ;
 

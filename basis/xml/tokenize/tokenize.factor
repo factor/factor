@@ -87,7 +87,7 @@ HINTS: next* { spot } ;
     [ blank? not ] skip-until ;
 
 : next-matching ( pos ch str -- pos' )
-    [ over ] dip nth eq? [ 1 + ] [ drop 0 ] if ; inline
+    overd nth eq? [ 1 + ] [ drop 0 ] if ; inline
 
 : string-matcher ( str -- quot: ( pos char -- pos ? ) )
     dup length 1 - '[ _ next-matching dup _ > ] ; inline

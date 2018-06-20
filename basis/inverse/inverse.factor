@@ -259,7 +259,7 @@ DEFER: __
 
 : recover-fail ( try fail -- )
     [ drop call ] [
-        [ nip ] dip dup fail?
+        nipd dup fail?
         [ drop call ] [ nip throw ] if
     ] recover ; inline
 

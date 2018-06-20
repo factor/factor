@@ -13,5 +13,5 @@ M: object load-wav-file ( filename -- format data size frequency )
     f void* <ref>
     0 int <ref>
     0 int <ref>
-    [ 0 char <ref> alutLoadWAVFile ] 4 nkeep
+    [ 0 char <ref> alutLoadWAVFile ] 4keep
     { [ int deref ] [ void* deref ] [ int deref ] [ int deref ] } spread ;

@@ -42,7 +42,7 @@ STRUCT: EntryNew
     [ magic>> ] dip [ >byte-array ] bi@ check-magic ;
 
 : make-string ( string-table i -- str )
-    0 rot swapd [ index-from ] 2keep swapd subseq
+    0 spin [ index-from ] 2keep swapd subseq
     native-string-encoding decode ;
 
 : string-offset ( header-new -- n )

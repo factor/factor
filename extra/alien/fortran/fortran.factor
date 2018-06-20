@@ -414,7 +414,7 @@ PRIVATE>
 : ((fortran-invoke)) ( return library function parameters -- quot )
     {
         [ 2nip [<fortran-result>] ]
-        [ nip nip nip [fortran-args>c-args] ]
+        [ 3nip [fortran-args>c-args] ]
         [ [fortran-invoke] ]
         [ 2nip [fortran-results>] ]
     } 4 ncleave 4 nappend ;

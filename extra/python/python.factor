@@ -109,7 +109,7 @@ ERROR: missing-type type ;
 ! Callbacks
 : quot>py-callback ( quot: ( args kw -- ret ) -- alien )
     '[
-        [ nip ] dip
+        nipd
         [ [ py> ] [ { } ] if* ] bi@ @ >py
     ] PyCallback ; inline
 

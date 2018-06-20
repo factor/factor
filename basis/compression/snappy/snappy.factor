@@ -29,4 +29,4 @@ PRIVATE>
     [ snappy_uncompressed_length check-snappy ] keep
     size_t deref
     n>outs
-    [ snappy_uncompress check-snappy ] 2keep drop >byte-array ;
+    [ snappy_uncompress check-snappy ] keepd >byte-array ;

@@ -72,7 +72,7 @@ M: z-up >y-up-axis!
     [ "float_array" x/ xt string>numbers [ * ] with map ]
     [ nip "technique_common" x/ "accessor" x/ "stride" x@ string>number ] 2bi
     group
-    [ swap over length 2 > [ >y-up-axis! ] [ drop ] if ] with map ;
+    [ tuck length 2 > [ >y-up-axis! ] [ drop ] if ] with map ;
 
 : source>pair ( source-tag -- pair )
     [ "id" x@ ]

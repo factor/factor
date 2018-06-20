@@ -49,7 +49,7 @@ TUPLE: hash-set
         [ pick or [ probe ] dip (new-key@) ]
         if
     ] [
-        [ [ pick ] dip = ] 2dip rot
+        [ pickd = ] 2dip rot
         [ nip [ drop ] 3dip f ]
         [ [ probe ] dip (new-key@) ]
         if
@@ -125,7 +125,7 @@ M: hash-set ?adjoin
 
 M: hash-set members
     [ array>> 0 swap ] [ cardinality f <array> ] bi [
-        [ [ over ] dip set-nth-unsafe 1 + ] curry each-member
+        [ overd set-nth-unsafe 1 + ] curry each-member
     ] keep nip ;
 
 M: hash-set clone

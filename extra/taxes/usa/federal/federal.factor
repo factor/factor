@@ -42,7 +42,7 @@ M: federal adjust-allowances* ( salary w4 collector entity -- newsalary )
 
 M: federal withholding* ( salary w4 tax-table entity -- x )
     drop
-    [ federal-tax ] 3keep drop
+    [ federal-tax ] 2keepd
     [ fica-tax ] 2keep
     medicare-tax + + ;
 

@@ -27,4 +27,4 @@ PRIVATE>
 
 : weighted-cosine-similarity ( w a b -- n )
     [ weighted-v. ]
-    [ [ over ] dip [ weighted-norm ] 2bi@ * ] 3bi / ;
+    [ overd [ weighted-norm ] 2bi@ * ] 3bi / ;

@@ -85,8 +85,8 @@ M: ##gather-int-vector-2 rewrite rewrite-gather-vector-2 ;
 : rewrite-gather-vector-4 ( insn -- insn/f )
     dup { [ src1>> ] [ src2>> ] [ src3>> ] [ src4>> ] } cleave [ vreg>insn ] 4 napply
     {
-        { [ 4 ndup [ literal-insn? ] 4 napply and and and ] [ fold-gather-vector-4 ] }
-        [ 5 ndrop f ]
+        { [ 4dup [ literal-insn? ] 4 napply and and and ] [ fold-gather-vector-4 ] }
+        [ 5drop f ]
     } cond ;
 
 M: ##gather-vector-4 rewrite rewrite-gather-vector-4 ;

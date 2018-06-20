@@ -453,7 +453,7 @@ DEFER: eee'
 
 ! ensure that polymorphic checking works on recursive combinators
 : (recursive-reduce) ( identity i seq quot: ( prev elt -- next ) n -- result )
-    [ pick ] dip swap over < [
+    pickd tuck < [
         [ [ [ nth-unsafe ] dip call ] 3keep [ 1 + ] 2dip ] dip
         (recursive-reduce)
     ] [ 4drop ] if ; inline recursive

@@ -53,7 +53,7 @@ ERROR: key-exists value key assoc ;
     ] if ;
 
 : kv-with ( obj assoc quot -- assoc curried )
-    swapd [ [ -rot ] dip call ] 2curry ; inline
+    swapd [ -rotd call ] 2curry ; inline
 
 <PRIVATE
 
@@ -66,13 +66,13 @@ ERROR: key-exists value key assoc ;
 PRIVATE>
 
 : sequence>assoc! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- assoc )
-    4 nrot (sequence>assoc) ; inline
+    roll (sequence>assoc) ; inline
 
 : assoc>object ( assoc map-quot insert-quot exemplar -- object )
     clone [ swap curry compose assoc-each ] keep ; inline
 
 : assoc>object! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- object )
-    4 nrot assoc>object ; inline
+    roll assoc>object ; inline
 
 : sequence>assoc ( seq map-quot insert-quot exemplar -- assoc )
     clone (sequence>assoc) ; inline

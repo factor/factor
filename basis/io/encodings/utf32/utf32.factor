@@ -20,29 +20,25 @@ utf32 "UTF-32" register-encoding
 
 ! Decoding
 
-: char> ( stream encoding quot -- ch )
-    nip swap 4 swap stream-read dup length {
+: char> ( stream quot -- ch )
+    swap [ 4 ] dip stream-read dup length {
         { 0 [ 2drop f ] }
         { 4 [ swap call ] }
         [ 3drop replacement-char ]
     } case ; inline
 
-M: utf32be decode-char
-    [ be> ] char> ;
+M: utf32be decode-char drop [ be> ] char> ;
 
-M: utf32le decode-char
-    [ le> ] char> ;
+M: utf32le decode-char drop [ le> ] char> ;
 
 ! Encoding
 
-: >char ( char stream encoding quot -- )
-    nip 4 swap curry dip stream-write ; inline
+: >char ( char stream quot -- )
+    4 swap curry dip stream-write ; inline
 
-M: utf32be encode-char
-    [ >be ] >char ;
+M: utf32be encode-char drop [ >be ] >char ;
 
-M: utf32le encode-char
-    [ >le ] >char ;
+M: utf32le encode-char drop [ >le ] >char ;
 
 ! UTF-32
 
@@ -51,7 +47,9 @@ CONSTANT: bom-le B{ 0xff 0xfe 0 0 }
 CONSTANT: bom-be B{ 0 0 0xfe 0xff }
 
 : bom>le/be ( bom -- le/be )
-    dup bom-le sequence= [ drop utf32le ] [
+    dup bom-le sequence= [
+        drop utf32le
+    ] [
         bom-be sequence= [ utf32be ] [ missing-bom ] if
     ] if ;
 

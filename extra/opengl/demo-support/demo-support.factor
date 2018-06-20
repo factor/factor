@@ -46,7 +46,7 @@ M: demo-world pref-dim* ( gadget -- dim )
     [ near-plane ] [ far-plane ] [ fov-ratio ] tri [
         nip swap FOV / v*n
         first2 [ -+ ] bi@
-    ] 3keep drop ;
+    ] 2keepd ;
 
 M: demo-world resize-world
     GL_PROJECTION glMatrixMode
@@ -88,7 +88,7 @@ M: demo-world resize-world
         over first2 glVertex2d
         dup first pick second glVertex2d
         dup first2 glVertex2d
-        swap first swap second glVertex2d
+        [ first ] [ second ] bi* glVertex2d
     ] do-state ;
 
 demo-world H{

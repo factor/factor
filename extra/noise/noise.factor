@@ -58,7 +58,7 @@ ERROR: invalid-perlin-noise-table table ;
 ! XXX doesn't work when v is nan or |v| >= 2^31
 : floor-vector ( v -- v' )
     [ float-4 int-4 vconvert int-4 float-4 vconvert ]
-    [ [ v> -1.0 float-4-with vand ] curry keep v+ ] bi ; inline
+    [ [ v> -1.0 float-4-with vand ] keepd v+ ] bi ; inline
 
 : unit-cubed ( floats -- ints )
     float-4 int-4 vconvert 255 int-4-with vbitand ; inline

@@ -191,7 +191,7 @@ GENERIC#: check-combination-effect 1 ( combination effect -- )
 M: object check-combination-effect 2drop ;
 
 : define-generic ( word combination effect -- )
-    [ [ check-combination-effect ] keep swap set-stack-effect ]
+    [ [ check-combination-effect ] keep set-stack-effect ]
     [
         drop
         2dup [ "combination" word-prop ] dip = [ 2drop ] [

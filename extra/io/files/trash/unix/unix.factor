@@ -70,7 +70,7 @@ M: unix send-to-trash ( path -- )
         to-directory safe-file-name
     ] [
         "info" append-path [ make-user-directory ] keep
-        to-directory ".trashinfo" append [ over ] dip utf8 [
+        to-directory ".trashinfo" append overd utf8 [
             "[Trash Info]" write nl
             "Path=" write write nl
             "DeletionDate=" write
