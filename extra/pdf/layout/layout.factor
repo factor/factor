@@ -149,7 +149,7 @@ M: hr pdf-render
     [
         [ dup 0 > pick avail-lines 0 > and ] [
             over avail-width over min [ - ] keep [
-                [ over ] dip [ draw-line ] [ inc-x ] 2bi
+                overd [ draw-line ] [ inc-x ] 2bi
             ] unless-zero dup 0 > [ over line-break ] when
         ] while
     ] change-width nip dup width>> 0 > [ drop f ] unless ;

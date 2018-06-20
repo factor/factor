@@ -10,5 +10,5 @@ FUNCTION: void alutLoadWAVFile ( c-string fileName, ALenum* format, void** data,
 
 M: macosx load-wav-file ( path -- format data size frequency )
     0 int <ref> f void* <ref> 0 int <ref> 0 int <ref>
-    [ alutLoadWAVFile ] 4 nkeep
+    [ alutLoadWAVFile ] 4keep
     [ [ [ int deref ] dip void* deref ] dip int deref ] dip int deref ;

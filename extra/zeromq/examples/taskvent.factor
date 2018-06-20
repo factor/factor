@@ -30,7 +30,7 @@ IN: zeromq.examples.taskvent
             ! Random workload from 1 to 100msecs
             100 random 1 +
             dup [ + ] dip
-            [ pick ] dip "%d" sprintf >byte-array 0 zmq-send
+            pickd "%d" sprintf >byte-array 0 zmq-send
         ] times
         "Total expected cost: %d msec\n" printf
 

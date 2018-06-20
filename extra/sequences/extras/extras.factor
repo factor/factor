@@ -36,7 +36,7 @@ IN: sequences.extras
 : filter-all-subseqs-range ( ... seq range quot: ( ... subseq -- ... ) -- seq )
     [
         '[ <clumps> _ filter ] with map concat
-    ] 3keep 2drop map-like ; inline
+    ] keepdd map-like ; inline
 
 : filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ) -- seq )
     [ dup length [1,b] ] dip filter-all-subseqs-range ; inline
@@ -72,7 +72,7 @@ IN: sequences.extras
     [ change-nth ] 2curry each ; inline
 
 : push-if-index ( ..a elt i quot: ( ..a elt i -- ..b ? ) accum -- ..b )
-    [ 2keep drop ] dip rot [ push ] [ 2drop ] if ; inline
+    [ keepd ] dip rot [ push ] [ 2drop ] if ; inline
 
 : push-if* ( ..a elt quot: ( ..a elt -- ..b obj/f ) accum -- ..b )
     [ call ] dip [ push ] [ drop ] if* ; inline
@@ -236,7 +236,7 @@ PRIVATE>
     ] if ; inline
 
 : map-filter-as ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
-    [ pick ] dip swap length over
+    reach length over
     [ (selector-as) [ compose each ] dip ] 2curry dip like ; inline
 
 : map-filter ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) -- ... subseq )
@@ -281,7 +281,7 @@ PRIVATE>
 PRIVATE>
 
 : filter-map-as ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    [ pick ] dip swap length over
+    reach length over
     [ (filter-mapper-for) [ each ] dip ] 2curry dip like ; inline
 
 : filter-map ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) -- ... newseq )
@@ -538,7 +538,7 @@ PRIVATE>
     } case ;
 
 : cut-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
-    [ find drop ] 2keep drop swap
+    [ find drop ] keepd swap
     [ cut ] [ f over like ] if* ; inline
 
 : nth* ( n seq -- elt )
@@ -621,11 +621,11 @@ PRIVATE>
     '[ swap _ dip swap ] assoc-map ; inline
 
 : take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
-    [ '[ @ not ] find drop ] 2keep drop swap
+    [ '[ @ not ] find drop ] keepd swap
     [ dup length ] unless* head-slice ; inline
 
 : drop-while ( ... seq quot: ( ... elt -- ... ? ) -- tail-slice )
-    [ '[ @ not ] find drop ] 2keep drop swap
+    [ '[ @ not ] find drop ] keepd swap
     [ dup length ] unless* tail-slice ; inline
 
 :: interleaved-as ( seq glue exemplar -- newseq )

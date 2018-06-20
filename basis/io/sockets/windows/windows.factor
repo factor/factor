@@ -56,11 +56,11 @@ M: win32-socket dispose* ( stream -- )
 
 M: object (get-local-address) ( socket addrspec -- sockaddr )
     [ handle>> ] dip empty-sockaddr/size int <ref>
-    [ getsockname socket-error ] 2keep drop ;
+    [ getsockname socket-error ] keepd ;
 
 M: object (get-remote-address) ( socket addrspec -- sockaddr )
     [ handle>> ] dip empty-sockaddr/size int <ref>
-    [ getpeername socket-error ] 2keep drop ;
+    [ getpeername socket-error ] keepd ;
 
 : bind-socket ( win32-socket sockaddr len -- )
     [ handle>> ] 2dip bind socket-error ;

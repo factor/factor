@@ -116,6 +116,39 @@ DEFER: if
 
 : 4dip ( w x y z quot -- w x y z ) swap [ 3dip ] dip ; inline
 
+! Misfits
+: tuck ( x y -- y x y ) dup -rot ; inline
+
+: spin ( x y z -- z y x ) -rot swap ; inline
+
+: rotd ( w x y z -- x y w z ) [ rot ] dip ; inline
+
+: -rotd ( w x y z -- w z x y ) [ -rot ] dip ; inline
+
+: roll ( w x y z -- x y z w ) rotd swap ; inline
+
+: -roll ( w x y z -- z w x y ) swap -rotd ; inline
+
+: nipd ( x y z -- y z ) [ nip ] dip ; inline
+
+: overd ( x y z -- x y x z ) [ over ] dip ; inline
+
+: pickd ( w x y z -- w x y w z ) [ pick ] dip ; inline
+
+: 2nipd ( w x y z -- y z ) [ 2drop ] 2dip ; inline
+
+: 3nipd ( v w x y z -- y z ) [ 3drop ] 2dip ; inline
+
+: 3nip ( w x y z -- z ) 2nip nip ; inline
+
+: 4nip ( v w x y z -- z ) 2nip 2nip ; inline
+
+: 5nip ( u v w x y z -- z ) 3nip 2nip ; inline
+
+: 5drop ( v w x y z -- ) 4drop drop ; inline
+
+: reach ( w x y z -- w x y z w ) [ pick ] dip swap ; inline
+
 ! Keepers
 : keep ( ..a x quot: ( ..a x -- ..b ) -- ..b x )
     over [ call ] dip ; inline
@@ -128,6 +161,15 @@ DEFER: if
 
 : 4keep ( ..a w x y z quot: ( ..a w x y z -- ..b ) -- ..b w x y z )
     [ 4dup ] dip 4dip ; inline
+
+: keepd ( ..a x y quot: ( ..a x y -- ..b x ) -- ..b x )
+    2keep drop ; inline
+
+: keepdd ( ..a x y z quot: ( ..a x y z -- ..b x ) -- ..b x )
+    3keep 2drop ; inline
+
+: 2keepd ( ..a x y z quot: ( ..a x y z -- ..b x y ) -- ..b x y )
+    3keep drop ; inline
 
 ! Cleavers
 : bi ( x p q -- )

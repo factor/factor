@@ -56,7 +56,8 @@ PRIVATE>
 
 M: string equal?
     over string? [
-        2dup [ hashcode ] bi@ eq?
+        ! faster during bootstrap than ``[ hashcode ] bi@``
+        over hashcode over hashcode eq?
         [ sequence= ] [ 2drop f ] if
     ] [
         2drop f

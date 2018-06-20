@@ -118,11 +118,11 @@ SYMBOL: error-stream
     stream-exemplar new-sequence ; inline
 
 : resize-if-necessary ( wanted-n got-n seq -- seq' )
-    2over = [ [ 2drop ] dip ] [ resize nip ] if ; inline
+    2over = [ 2nip ] [ resize nip ] if ; inline
 
 : (read-into-new) ( n stream quot -- seq/f )
     [ dup ] 2dip
-    [ 2dup (new-sequence-for-stream) swap ] dip curry keep
+    [ 2dup (new-sequence-for-stream) swap ] dip keepd
     over 0 = [ 3drop f ] [ resize-if-necessary ] if ; inline
 
 : (read-into) ( buf stream quot -- buf-slice/f )
@@ -173,7 +173,7 @@ CONSTANT: each-block-size 65536
 
 : (each-stream-block-slice) ( ... stream quot: ( ... block-slice -- ... ) block-size -- ... )
     [ [ drop ] prepose swap ] dip
-    [ swap (new-sequence-for-stream) ] curry keep
+    [ swap (new-sequence-for-stream) ] keepd
     [ stream-read-partial-into ] 2curry each-morsel drop ; inline
 
 : each-stream-block-slice ( ... stream quot: ( ... block-slice -- ... ) -- ... )
@@ -194,7 +194,7 @@ CONSTANT: each-block-size 65536
 : (stream-contents-by-length) ( stream len -- seq )
     dup rot
     [ (new-sequence-for-stream) ]
-    [ [ stream-read-unsafe ] curry keep resize ] bi ; inline
+    [ [ stream-read-unsafe ] keepd resize ] bi ; inline
 
 : (stream-contents-by-block) ( stream -- seq )
     [ [ ] collector [ each-stream-block ] dip { } like ]
@@ -225,11 +225,11 @@ CONSTANT: each-block-size 65536
 <PRIVATE
 
 : read-loop ( buf stream n i -- count )
-     2dup = [ nip nip nip ] [
+     2dup = [ 3nip ] [
         pick stream-read1 [
             over [ pick set-nth-unsafe ] 2curry 3dip
             1 + read-loop
-        ] [ nip nip nip ] if*
+        ] [ 3nip ] if*
      ] if ; inline recursive
 
 : finalize-read-until ( seq sep/f -- seq/f sep/f )

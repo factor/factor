@@ -39,7 +39,7 @@ M: sodium-state get-checksum
     dup output>> [
         dup state>> [
             over output-size>> [ <byte-array> ] keep
-            [ crypto_generichash_final check0 ] 2keep drop
+            [ crypto_generichash_final check0 ] keepd
         ] [ B{ } clone ] if*
         [ >>output ] keep
     ] unless* nip ;

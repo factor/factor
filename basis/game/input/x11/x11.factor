@@ -90,7 +90,7 @@ M: x11-game-input-backend read-keyboard
     dpy get dup XDefaultRootWindow
     { int int int int int int int }
     [ XQueryPointer drop ] with-out-parameters
-    [ 4 ndrop ] 3dip ;
+    [ 4drop ] 3dip ;
 
 SYMBOL: mouse-reset?
 

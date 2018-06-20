@@ -19,19 +19,21 @@ ERROR: cl-error err ;
     dup f = [ cl-error ] [ drop ] if ; inline
 
 : info-data-size ( handle name info-quot -- size_t )
-    [ 0 f 0 size_t <ref> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
+    [ 0 f 0 size_t <ref> ] dip
+    [ call cl-success ] keepd size_t deref ; inline
 
 : info-data-bytes ( handle name info-quot size -- bytes )
-    swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
+    swap [ dup <byte-array> f ] dip [ call cl-success ] keepdd ; inline
 
 : info ( handle name info-quot lift-quot -- value )
     [ 3dup info-data-size info-data-bytes ] dip call ; inline
 
 : 2info-data-size ( handle1 handle2 name info-quot -- size_t )
-    [ 0 f 0 size_t <ref> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
+    [ 0 f 0 size_t <ref> ] dip
+    [ call cl-success ] keepd size_t deref ; inline
 
 : 2info-data-bytes ( handle1 handle2 name info-quot size -- bytes )
-    swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
+    swap [ dup <byte-array> f ] dip [ call cl-success ] keepdd ; inline
 
 : 2info ( handle1 handle2 name info_quot lift_quot -- value )
     [ 4dup 2info-data-size 2info-data-bytes ] dip call ; inline
@@ -463,7 +465,7 @@ PRIVATE>
 
 : <cl-buffer> ( buffer-access-mode size initial-data -- buffer )
     [ (current-cl-context) ] 3dip
-    swap over [
+    tuck [
         [ handle>> ]
         [ buffer-access-constant ]
         [ [ CL_MEM_COPY_HOST_PTR ] [ CL_MEM_ALLOC_HOST_PTR ] if ] tri* bitor

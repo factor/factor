@@ -132,7 +132,7 @@ IN: kernel.tests
 
 ! Regression
 : (loop) ( a b c d -- )
-    [ pick ] dip swap [ pick ] dip swap
+    pickd swap pickd swap
     < [ [ 1 + ] 3dip (loop) ] [ 4drop ] if ; inline recursive
 
 : loop ( obj -- )
@@ -201,3 +201,6 @@ IN: kernel.tests
 
 { 1 2 3 1 2 3 } [ 1 2 3 3dup ] unit-test
 { 1 2 3 4 1 2 3 4 } [ 1 2 3 4 4dup ] unit-test
+
+{ 2 3 4 1 } [ 1 2 3 4 roll ] unit-test
+{ 1 2 3 4 } [ 2 3 4 1 -roll ] unit-test

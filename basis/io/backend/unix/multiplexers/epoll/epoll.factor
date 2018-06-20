@@ -23,7 +23,7 @@ M: epoll-mx dispose* fd>> close-file ;
 : make-event ( fd events -- event )
     epoll-event <struct>
         swap >>events
-        swap over data>> fd<< ;
+        tuck data>> fd<< ;
 
 :: do-epoll-ctl ( fd mx what events -- )
     mx fd>> what fd fd events make-event epoll_ctl io-error ;

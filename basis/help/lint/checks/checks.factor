@@ -83,6 +83,7 @@ SYMBOL: vocab-articles
     ] map ;
 
 : contains-funky-elements? ( element -- ? )
+B
     {
         $shuffle
         $complex-shuffle

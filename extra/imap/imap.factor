@@ -27,7 +27,7 @@ CONSTANT: IMAP4_SSL_PORT 993
         ! Date, month, year.
         "-" read-token checked-number
         "-" read-token month-abbreviations index 1 +
-        read-sp checked-number -rot swap
+        read-sp checked-number spin
         ! Hour, minute second and gmt offset.
         read-hms " " expect readln parse-rfc822-gmt-offset <timestamp>
     ] with-string-reader  ;

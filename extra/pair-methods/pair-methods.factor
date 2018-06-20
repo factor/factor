@@ -33,7 +33,7 @@ ERROR: no-pair-method a b generic ;
     dup pair-generic-definition define ;
 
 : define-pair-generic ( word effect -- )
-    [ swap set-stack-effect ]
+    [ set-stack-effect ]
     [ drop H{ } clone "pair-generic-methods" set-word-prop ]
     [ drop make-pair-generic ] 2tri ;
 

@@ -37,7 +37,7 @@ ERROR: zlib-failed n string ;
         [ <byte-vector> dup underlying>> ] keep ulong <ref>
     ] keep [
         dup length compression.zlib.ffi:compress zlib-error
-    ] 2keep drop ulong deref >>length B{ } like ;
+    ] keepd ulong deref >>length B{ } like ;
 
 : (uncompress) ( length byte-array -- byte-array )
     [
@@ -53,15 +53,13 @@ ERROR: zlib-failed n string ;
 
 
 : zlib-inflate-init ( -- z_stream_s )
-    z_stream <struct> ZLIB_VERSION over byte-length [
-        inflateInit_ zlib-error
-    ] 3keep 2drop  ;
+    z_stream <struct>
+    dup ZLIB_VERSION over byte-length inflateInit_ zlib-error ;
 
 ! window can be 0, 15, 32, 47 (others?)
 : zlib-inflate-init2 ( window -- z_stream_s )
-    [ z_stream <struct> ] dip ZLIB_VERSION pick byte-length [
-        inflateInit2_ zlib-error
-    ] 4keep 3drop  ;
+    [ z_stream <struct> dup ] dip
+    ZLIB_VERSION pick byte-length inflateInit2_ zlib-error ;
 
 : zlib-inflate-end ( z_stream -- )
     inflateEnd zlib-error ;
@@ -73,6 +71,4 @@ ERROR: zlib-failed n string ;
     inflate zlib-error ;
 
 : zlib-inflate-get-header ( z_stream -- gz_header )
-    gz_header <struct> [
-        inflateGetHeader zlib-error
-    ] keep ;
+    gz_header <struct> [ inflateGetHeader zlib-error ] keep ;

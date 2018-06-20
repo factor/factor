@@ -359,7 +359,7 @@ M: float truncate
     dup -52 shift 0x7ff bitand 0x3ff -
     ! check for floats without fractional part (>= 2^52)
     dup 52 < [
-        [ drop ] 2dip
+        nipd
         dup 0 < [
             ! the float is between -1.0 and 1.0,
             ! the result could be +/-0.0, but we will

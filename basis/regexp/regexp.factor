@@ -60,7 +60,7 @@ PRIVATE>
 :: next-match ( i string regexp quot: ( i string regexp -- j ) reverse? -- start end ? )
     f f f
     i string reverse? search-range
-    [ [ 3drop ] dip string regexp quot reverse? (next-match) dup ] find 2drop ; inline
+    [ 3nip string regexp quot reverse? (next-match) dup ] find 2drop ; inline
 
 : do-next-match ( i string regexp -- start end ? )
     dup next-match>>
@@ -130,7 +130,7 @@ PRIVATE>
     ] [ 2drop f ] if ;
 
 : re-contains? ( string regexp -- ? )
-    prepare-match-iterator do-next-match [ 2drop ] dip >boolean ;
+    prepare-match-iterator do-next-match 2nip >boolean ;
 
 : re-split ( string regexp -- seq )
     [ <slice-unsafe> ] (re-split) ;

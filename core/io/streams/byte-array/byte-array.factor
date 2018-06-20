@@ -13,7 +13,7 @@ M: byte-vector stream-tell length ; inline
     512 <byte-vector> swap <encoder> ; inline
 
 : with-byte-writer ( encoding quot -- byte-array )
-    [ <byte-writer> ] dip [ with-output-stream* ] 2keep drop
+    [ <byte-writer> ] dip [ with-output-stream* ] keepd
     dup encoder? [ stream>> ] when >byte-array ; inline
 
 TUPLE: byte-reader { underlying byte-array read-only } { i array-capacity } ;

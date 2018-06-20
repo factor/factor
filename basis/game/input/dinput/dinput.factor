@@ -176,7 +176,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     <alien> DEV_BROADCAST_HDR memory>struct ;
 
 : handle-wm-devicechange ( hWnd uMsg wParam lParam -- )
-    [ 2drop ] 2dip swap {
+    2nipd swap {
         { [ dup DBT_DEVICEARRIVAL = ]         [ drop <DEV_BROADCAST_HDR> device-arrived ] }
         { [ dup DBT_DEVICEREMOVECOMPLETE = ]  [ drop <DEV_BROADCAST_HDR> device-removed ] }
         [ 2drop ]
