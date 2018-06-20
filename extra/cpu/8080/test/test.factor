@@ -54,7 +54,7 @@ IN: cpu.8080.test
     224 [
       32 [
         over 32 * over +  0x2400 + ! cpu h w addr
-        [ pick ] dip swap ram>> nth [
+        reach ram>> nth [
           [
             " 0 0 0" write
           ] [

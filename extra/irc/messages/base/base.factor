@@ -102,7 +102,7 @@ M: irc-message set-irc-command
     [ irc-message ] dip define-tuple-class ;
 
 : define-irc-parameter-slots ( class params -- )
-    { ":" } split1 [ over ] dip
+    { ":" } split1 overd
     [ ?define-irc-parameters ] [ ?define-irc-trailing ] 2bi* ;
 PRIVATE>
 

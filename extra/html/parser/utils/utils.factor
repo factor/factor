@@ -4,7 +4,7 @@ USING: kernel quoting sequences splitting ;
 IN: html.parser.utils
 
 : trim1 ( seq ch -- newseq )
-    [ [ ?head-slice drop ] [ ?tail-slice drop ] bi ] 2keep drop like ;
+    [ [ ?head-slice drop ] [ ?tail-slice drop ] bi ] keepd like ;
 
 : single-quote ( str -- newstr ) "'" dup surround ;
 

@@ -22,16 +22,13 @@ ERROR: vocab-must-not-exist string ;
     trim-tail-separators vocab-roots get member? ;
 
 : ensure-vocab-exists ( string -- string )
-    dup loaded-vocab-names member? [ no-vocab ] unless ;
+    dup lookup-vocab [ no-vocab ] unless ;
 
 : check-root ( string -- string )
     dup vocab-root? [ not-a-vocab-root ] unless ;
 
 : check-vocab-root/vocab ( vocab-root string -- vocab-root string )
     [ check-root ] [ check-vocab-name ] bi* ;
-
-: check-vocab-exists ( string -- string )
-    dup vocab-exists? [ vocab-must-not-exist ] when ;
 
 : replace-vocab-separators ( vocab -- path )
     path-separator first char: . associate substitute ; inline
@@ -287,8 +284,12 @@ PRIVATE>
 : scaffold-platforms ( vocab platforms -- )
     [ "platforms.txt" ] dip scaffold-metadata ;
 
+: delete-from-root-cache ( string -- )
+    root-cache get delete-at ;
+
 : scaffold-vocab ( vocab-root string -- )
-    check-vocab-exists {
+    dup delete-from-root-cache
+    {
         [ scaffold-directory ]
         [ scaffold-main ]
         [ nip require ]

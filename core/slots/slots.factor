@@ -212,7 +212,7 @@ M: anonymous-intersection initial-value*
         { [ pinned-alien bootstrap-word over class<= ] [ <bad-alien> t ] }
         { [ quotation bootstrap-word over class<= ] [ [ ] t ] }
         [ dup initial-value* ]
-    } cond [ drop ] 2dip ;
+    } cond nipd ;
 
 GENERIC: make-slot ( desc -- slot-spec )
 

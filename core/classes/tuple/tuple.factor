@@ -208,7 +208,7 @@ M: object final-class? drop f ;
     pick [
         [ [ swap nth dup ] dip instance? ] dip swap
         [ drop ] [ nip ] if
-    ] [ [ 3drop ] dip ] if ;
+    ] [ 3nip ] if ;
 
 : apply-slot-permutation ( old-values triples -- new-values )
     [ first3 update-slot ] with map ;

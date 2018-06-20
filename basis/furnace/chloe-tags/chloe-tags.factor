@@ -32,7 +32,7 @@ IN: furnace.chloe-tags
     [ [ "/" ?tail drop "/" ] dip present 3append ] when* ;
 
 : a-url ( href rest query value-name -- url )
-    dup [ [ 3drop ] dip value ] [
+    dup [ 3nip value ] [
         drop
         <url>
             swap parse-query-attr >>query

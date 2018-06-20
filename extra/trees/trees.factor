@@ -320,7 +320,7 @@ DEFER: delete-node
 
 : (prune-extremity) ( parent node -- new-extremity )
     dup node-link [
-        [ nip ] dip (prune-extremity)
+        nipd (prune-extremity)
     ] [
         [ delete-node swap set-node-link ] keep
     ] if* ;

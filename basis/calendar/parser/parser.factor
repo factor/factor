@@ -104,7 +104,7 @@ CONSTANT: rfc822-named-zones H{
     read1 char: \s assert=
     read-sp checked-number
     read-sp month-abbreviations index 1 + check-timestamp
-    read-sp checked-number -rot swap
+    read-sp checked-number spin
     read-hh:mm:ss
     " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
@@ -120,7 +120,7 @@ CONSTANT: rfc822-named-zones H{
     read1 char: \s assert=
     "-" read-token checked-number
     "-" read-token month-abbreviations index 1 + check-timestamp
-    read-sp checked-number -rot swap
+    read-sp checked-number spin
     read-hh:mm:ss
     " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 

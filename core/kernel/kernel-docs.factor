@@ -40,6 +40,9 @@ HELP: 2over $shuffle ;
 HELP: pick  $shuffle ;
 HELP: swap  $shuffle ;
 
+HELP: roll  $complex-shuffle ;
+HELP: -roll $complex-shuffle ;
+HELP: tuck  $complex-shuffle ;
 HELP: rot   $complex-shuffle ;
 HELP: -rot  $complex-shuffle ;
 HELP: dupd  $complex-shuffle ;

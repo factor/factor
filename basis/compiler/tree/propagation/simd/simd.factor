@@ -124,7 +124,7 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 
 : inline-unless-intrinsic ( word -- )
     dup '[
-        _ swap over "intrinsic" word-prop
+        _ tuck "intrinsic" word-prop
         "always-inline-simd-intrinsics" get not swap and
         ! word node intrinsic
         [ try-intrinsic [ drop f ] [ def>> ] if ]

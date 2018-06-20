@@ -1,25 +1,9 @@
 ! Copyright (C) 2009 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING:
-    accessors
-    assocs
-    base64
-    calendar
-    calendar.format
-    checksums.hmac
-    checksums.sha
-    combinators
-    http
-    http.client
-    kernel
-    make
-    math.order
-    namespaces
-    sequences
-    sorting
-    strings
-    xml
-    xml.traversal ;
+USING: accessors assocs base64 calendar calendar.format
+calendar.parser checksums.hmac checksums.sha combinators http
+http.client kernel make math.order namespaces sequences
+sequences.extras sorting sorting.slots strings xml xml.traversal ;
 IN: s3
 
 SYMBOL: key-id
@@ -27,7 +11,7 @@ SYMBOL: secret-key
 
 <PRIVATE
 
-TUPLE: s3-request path mime-type date method headers  bucket data ;
+TUPLE: s3-request path mime-type date method headers bucket data ;
 
 : hashtable>headers ( hashtable -- seq )
     [
@@ -99,6 +83,9 @@ PRIVATE>
 : buckets ( -- seq )
     f "/" H{ } clone s3-get nip >string string>xml (buckets) ;
 
+: sorted-buckets ( -- seq )
+    buckets { { date>> rfc3339>timestamp <=> } } sort-by ;
+
 <PRIVATE
 : bucket-url ( bucket -- string )
     [ "http://" % % ".s3.amazonaws.com/" % ] "" make ;
@@ -121,10 +108,7 @@ PRIVATE>
     nip >string string>xml (keys) ;
 
 : get-object ( bucket key -- response data )
-    s3-request new
-        swap "/" prepend >>path
-        swap >>bucket
-    s3-url http-get ;
+    "/" prepend H{ } clone s3-get ;
 
 : create-bucket ( bucket -- )
     "" swap "/" H{ } clone "PUT" <s3-request>
@@ -150,3 +134,7 @@ PRIVATE>
 : delete-object ( bucket key -- )
     "/" prepend H{ } clone "DELETE" <s3-request>
     dup s3-url <delete-request> sign-http-request http-request 2drop ;
+
+: bucket>alist ( bucket -- alist )
+    dup keys
+    [ name>> get-object nip ] with map-zip ;

@@ -4,7 +4,7 @@ IN: multi-methods.tests
 
 DEFER: fake
 \ fake H{ } clone "multi-methods" set-word-prop
-<< ( -- ) \ fake set-stack-effect >>
+<< \ fake ( -- ) set-stack-effect >>
 
 DEFER: testing
 [

@@ -210,7 +210,7 @@ CONSTANT: smpte-framerate H{
     binary <byte-reader> <peek-stream> [
         f [
             peek1 [ read-event-header ] [ f f ] if dup
-        ] [ read-event ] produce 2nip nip
+        ] [ read-event ] produce 3nip
     ] with-input-stream ;
 
 : <midi-header> ( bytes -- header )

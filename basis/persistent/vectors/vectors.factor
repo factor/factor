@@ -95,7 +95,7 @@ M: persistent-vector ppush ( val pvec -- pvec' )
 
 : node-change-nth ( i node quot -- node' )
     [ clone ] dip [
-        [ clone ] dip [ change-nth ] 2keep drop
+        [ clone ] dip [ change-nth ] keepd
     ] curry change-children ; inline
 
 : (new-nth) ( val i node -- node' )

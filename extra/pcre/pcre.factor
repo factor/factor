@@ -90,7 +90,7 @@ ERROR: pcre-error value ;
     0 { c-string } [ pcre_study ] with-out-parameters drop ;
 
 : exec ( pcre extra subject ofs opts -- count match-data )
-    [ dup length ] 2dip 30 int <c-array> 30 [ pcre_exec ] 2keep drop ;
+    [ dup length ] 2dip 30 int <c-array> 30 [ pcre_exec ] keepd ;
 
 TUPLE: matcher pcre extra subject ofs exec-opts ;
 

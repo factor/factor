@@ -269,7 +269,7 @@ ALIAS: std sample-std
 <PRIVATE
 : r-sum-diffs ( x-mean y-mean x-seq y-seq -- (r) )
     ! finds sigma((xi-mean(x))(yi-mean(y))
-    0 [ [ [ pick ] dip swap - ] bi@ * + ] 2reduce 2nip ;
+    0 [ [ reach - ] bi@ * + ] 2reduce 2nip ;
 
 : (r) ( x-mean y-mean x-seq y-seq x-std y-std -- r )
     * recip [ [ r-sum-diffs ] keep length 1 - / ] dip * ;
@@ -281,7 +281,7 @@ PRIVATE>
 : pearson-r ( xy-pairs -- r ) r-stats (r) ;
 
 : least-squares ( xy-pairs -- alpha beta )
-    r-stats [ 2dup ] 4 ndip
+    r-stats [ 2dup ] 4dip
     ! stack is x-mean y-mean x-mean y-mean x-seq y-seq x-std y-std
     [ (r) ] 2keep ! stack is mean(x) mean(y) r sx sy
     swap / * ! stack is mean(x) mean(y) beta

@@ -111,16 +111,17 @@ M: word parent-word drop f ;
     [ changed-effects get add-to-unit ]
     [ dup primitive? [ drop ] [ changed-definition ] if ] bi ;
 
-: set-stack-effect ( effect word -- )
-    2dup "declared-effect" word-prop = [ 2drop ] [
-        [ nip changed-effect ]
-        [ nip subwords [ changed-effect ] each ]
-        [ swap "declared-effect" set-word-prop ]
+: set-stack-effect ( word effect -- )
+    2dup [ "declared-effect" word-prop ] dip =
+    [ 2drop ] [
+        [ drop changed-effect ]
+        [ drop subwords [ changed-effect ] each ]
+        [ "declared-effect" set-word-prop ]
         2tri
     ] if ;
 
 : define-declared ( word def effect -- )
-    [ nip swap set-stack-effect ] [ drop define ] 3bi ;
+    [ nip set-stack-effect ] [ drop define ] 3bi ;
 
 : make-deprecated ( word -- )
     t "deprecated" set-word-prop ;
@@ -200,7 +201,7 @@ M: word reset-word
     ] tri ;
 
 : <word> ( name vocab -- word )
-    2dup [ hashcode ] bi@ hash-combine >fixnum (word) dup new-word ;
+    over hashcode over hashcode hash-combine >fixnum (word) dup new-word ;
 
 : <uninterned-word> ( name -- word )
     f \ <uninterned-word> counter >fixnum (word)

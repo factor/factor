@@ -113,7 +113,7 @@ ALIAS: y second
 : calc-point-y ( slope y point -- xy ) over [ calc-x ] dip 2array ;
 
 : xyy>chunk ( x y1 y2 -- chunk )
-    [ over ] dip 2array [ 2array ] dip 2array ;
+    overd 2array [ 2array ] dip 2array ;
 
 :: 2-point-chunk ( left right ymin ymax -- chunk )
     left last :> left-point

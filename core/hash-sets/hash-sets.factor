@@ -49,7 +49,7 @@ TUPLE: hash-set
         [ pick or [ probe ] dip (new-key@) ]
         if
     ] [
-        [ [ pick ] dip = ] 2dip rot
+        [ pickd = ] 2dip rot
         [ nip [ drop ] 3dip f ]
         [ [ probe ] dip (new-key@) ]
         if

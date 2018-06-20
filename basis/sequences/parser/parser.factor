@@ -62,7 +62,7 @@ TUPLE: sequence-parser sequence n ;
 : <safe-slice> ( from to seq -- slice/f )
     3dup {
         [ 2drop 0 < ]
-        [ [ drop ] 2dip length > ]
+        [ nipd length > ]
         [ drop > ]
     } 3|| [ 3drop f ] [ <slice-unsafe> ] if ; inline
 

@@ -33,4 +33,4 @@ PRIVATE>
     while drop swap and ; inline
 
 : reduce-permutation-bits ( ... bit-count bits identity quot: ( ... prev elt -- ... next ) -- ... result )
-    [ -rot ] dip each-permutation-bits ; inline
+    -rotd each-permutation-bits ; inline

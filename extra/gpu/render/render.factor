@@ -554,7 +554,7 @@ SYNTAX: \UNIFORM-TUPLE:
 
 : bind-output-attachments ( program-instance framebuffer attachments -- )
     dup first sequence?
-    [ bind-named-output-attachments ] [ [ drop ] 2dip bind-unnamed-output-attachments ] if ;
+    [ bind-named-output-attachments ] [ nipd bind-unnamed-output-attachments ] if ;
 
 GENERIC: bind-transform-feedback-output ( output -- )
 

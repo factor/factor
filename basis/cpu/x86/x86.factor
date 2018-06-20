@@ -409,7 +409,7 @@ M: x86 %convert-integer ( dst src c-type -- )
             { c::int    [ 32 %alien-signed-getter ] }
             { c::uint   [ 32 [ 2drop ] %alien-integer-getter ] }
         } case
-    ] [ [ drop ] 2dip %copy ] ?if ;
+    ] [ nipd %copy ] ?if ;
 
 M: x86 %load-memory ( dst base displacement scale offset rep c-type -- )
     (%memory) (%load-memory) ;

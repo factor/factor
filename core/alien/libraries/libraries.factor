@@ -65,7 +65,7 @@ M: library dispose dll>> [ dispose ] when* ;
 : add-library ( name path abi -- )
     3dup add-library? [
         [ 2drop remove-library ]
-        [ [ nip ] dip make-library ]
+        [ nipd make-library ]
         [ 2drop libraries get set-at ] 3tri
     ] [ 3drop ] if ;
 

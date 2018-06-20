@@ -94,7 +94,7 @@ sharpness-stack [ V{ t } ] initialize
     [ face-ccw ] keep [ vertex-pos ] bi@ v- ;
 
 : normal ( v0 v1 v2 -- v )
-    [ drop v- ] [ [ drop ] 2dip v- ] 3bi cross ;
+    [ drop v- ] [ nipd v- ] 3bi cross ;
 
 ERROR: all-points-colinear ;
 

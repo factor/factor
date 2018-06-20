@@ -37,7 +37,7 @@ M: assoc assoc-like drop ; inline
         3drop f
     ] [
         3dup nth-unsafe at*
-        [ [ 3drop ] dip ] [ drop [ 1 - ] dip (assoc-stack) ] if
+        [ 3nip ] [ drop [ 1 - ] dip (assoc-stack) ] if
     ] if ; inline recursive
 
 : search-alist ( key alist -- pair/f i/f )
@@ -156,7 +156,7 @@ M: assoc values [ nip ] { } assoc>map ;
     over [ set-at ] with-assoc assoc-each ;
 
 : assoc-union-as ( assoc1 assoc2 exemplar -- union )
-    [ [ [ assoc-size ] bi@ + ] dip new-assoc ] 3keep drop
+    [ [ [ assoc-size ] bi@ + ] dip new-assoc ] 2keepd
     [ assoc-union! ] bi@ ;
 
 : assoc-union ( assoc1 assoc2 -- union )

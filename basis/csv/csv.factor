@@ -17,7 +17,7 @@ MEMO: field-delimiters ( delimiter -- field-seps quote-seps )
 DEFER: quoted-field,
 
 : maybe-escaped-quote ( delimeter stream quoted? -- delimiter stream sep/f )
-    2over stream-read1 swap over =
+    2over stream-read1 tuck =
     [ nip ] [
         {
             { char: \"    [ [ char: \" , ] when quoted-field, ] }
@@ -42,12 +42,12 @@ DEFER: quoted-field,
 
 : continue-field ( delimiter stream field-seps seq -- sep/f field )
     swap rot stream-read-until [ "\"" glue ] dip
-    swap ?trim [ drop ] 2dip ; inline
+    swap ?trim nipd ; inline
 
 : field ( delimiter stream field-seps quote-seps -- sep/f field )
     pick stream-read-until dup char: \" = [
         drop [ drop quoted-field ] [ continue-field ] if-empty
-    ] [ [ 3drop ] 2dip swap ?trim ] if ;
+    ] [ 3nipd swap ?trim ] if ;
 
 : (stream-read-row) ( delimiter stream field-end quoted-field -- sep/f fields )
     [ [ dup '[ dup _ = ] ] keep ] 3dip
@@ -61,7 +61,7 @@ DEFER: quoted-field,
 PRIVATE>
 
 : stream-read-row ( stream -- row )
-    delimiter get swap over field-delimiters
+    delimiter get tuck field-delimiters
     (stream-read-row) nip ; inline
 
 : read-row ( -- row )

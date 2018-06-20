@@ -120,7 +120,7 @@ MACRO: (ncollect) ( n -- quot )
     [ { } swap dupn ] keep nproduce-as ; inline
 
 MACRO: nmap-reduce ( map-quot reduce-quot n -- quot )
-    -rot dupd compose [ over ] dip over '[
+    -rot dupd compose overd over '[
         [ [ first ] _ napply @ 1 ] _ nkeep
         _ _ (neach) (each-integer)
     ] ;

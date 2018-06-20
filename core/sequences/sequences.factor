@@ -90,7 +90,7 @@ M: sequence nth-unsafe nth ; inline
 M: sequence set-nth-unsafe set-nth ; inline
 
 : change-nth-unsafe ( i seq quot -- )
-    [ [ nth-unsafe ] dip call ] 3keep drop set-nth-unsafe ; inline
+    [ [ nth-unsafe ] dip call ] 2keepd set-nth-unsafe ; inline
 
 PRIVATE>
 
@@ -380,7 +380,7 @@ PRIVATE>
 : glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
 
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
-    [ [ nth ] dip call ] 3keep drop set-nth-unsafe ; inline
+    [ [ nth ] dip call ] 2keepd set-nth-unsafe ; inline
 
 : min-length ( seq1 seq2 -- n ) [ length ] bi@ min ; inline
 
@@ -447,7 +447,7 @@ PRIVATE>
     if ; inline
 
 : (accumulate) ( seq identity quot -- identity seq quot )
-    swapd [ curry keep ] curry ; inline
+    swapd [ keepd ] curry ; inline
 
 : (accumulate*) ( seq identity quot -- identity seq quot )
     swapd [ dup ] compose ; inline
@@ -464,7 +464,7 @@ PRIVATE>
     swapd each ; inline
 
 : map-integers ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
-    [ over ] dip [ [ collect ] keep ] new-like ; inline
+    overd [ [ collect ] keep ] new-like ; inline
 
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
     [ (each) ] dip map-integers ; inline
@@ -506,7 +506,7 @@ PRIVATE>
     [ (2each) ] dip -rot (each-integer) ; inline
 
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
-    [ -rot ] dip 2each ; inline
+    -rotd 2each ; inline
 
 : 2map-as ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) exemplar -- ... newseq )
     [ (2each) ] dip map-integers ; inline
@@ -524,7 +524,7 @@ PRIVATE>
     [ (3each) ] dip map-integers ; inline
 
 : 3map ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... newelt ) -- ... newseq )
-    [ pick ] dip swap 3map-as ; inline
+    pickd swap 3map-as ; inline
 
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ (find-integer) ] (find-from) ; inline
@@ -798,7 +798,7 @@ PRIVATE>
     2over = [
         4drop
     ] [
-        [ [ pick [ dup dup ] dip + swap ] dip move-unsafe 1 - ] keep
+        [ [ [ ] [ nip + ] [ 2nip ] 3tri ] dip move-unsafe 1 - ] keep
         move-forward
     ] if ;
 
@@ -813,7 +813,7 @@ PRIVATE>
     pick 0 = [
         3drop
     ] [
-        pick over length + over
+        [ ] [ nip length + ] [ 2nip ] 3tri
         [ pick 0 > [ [ length ] keep ] dip (open-slice) ] 2dip
         set-length
     ] if ;
@@ -1094,7 +1094,7 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
         [ keep swap ] curry [ [ first ] dip call ] 2keep
         [ curry 2dip pick over ] curry
     ] [
-        [ [ 2drop ] [ [ 2drop ] 2dip ] if ] compose
+        [ [ 2drop ] [ 2nipd ] if ] compose
     ] bi* compose 1 each-from drop ; inline
 
 PRIVATE>

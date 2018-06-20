@@ -66,7 +66,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 : (gl-program) ( shaders quot: ( gl-program -- ) -- program )
     glCreateProgram
     [
-        rot dupd attach-shaders swap call
+        dup roll attach-shaders swap call
     ] [ glLinkProgram ] [ ] tri gl-error ; inline
 
 : <gl-program> ( shaders -- program )

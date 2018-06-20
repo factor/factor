@@ -60,23 +60,34 @@ IN: stack-checker.known-words
     } cond ;
 
 {
-    { drop  ( x       --                 ) }
-    { 2drop ( x y     --                 ) }
-    { 3drop ( x y z   --                 ) }
-    { 4drop ( w x y z --                 ) }
-    { dup   ( x       -- x x             ) }
-    { 2dup  ( x y     -- x y x y         ) }
-    { 3dup  ( x y z   -- x y z x y z     ) }
-    { 4dup  ( w x y z -- w x y z w x y z ) }
-    { rot   ( x y z   -- y z x           ) }
-    { -rot  ( x y z   -- z x y           ) }
-    { dupd  ( x y     -- x x y           ) }
-    { swapd ( x y z   -- y x z           ) }
-    { nip   ( x y     -- y               ) }
-    { 2nip  ( x y z   -- z               ) }
-    { over  ( x y     -- x y x           ) }
-    { pick  ( x y z   -- x y z x         ) }
-    { swap  ( x y     -- y x             ) }
+    { drop  ( x         --                 ) }
+    { 2drop ( x y       --                 ) }
+    { 3drop ( x y z     --                 ) }
+    { 4drop ( w x y z   --                 ) }
+    { dup   ( x         -- x x             ) }
+    { 2dup  ( x y       -- x y x y         ) }
+    { 3dup  ( x y z     -- x y z x y z     ) }
+    { 4dup  ( w x y z   -- w x y z w x y z ) }
+    { rot   ( x y z     -- y z x           ) }
+    { -rot  ( x y z     -- z x y           ) }
+    { roll  ( w x y z   -- x y z w         ) }
+    { -roll ( w x y z   -- z w x y         ) }
+    { reach ( w x y z   -- w x y z w       ) }
+    { dupd  ( x y       -- x x y           ) }
+    { swapd ( x y z     -- y x z           ) }
+    { nip   ( x y       -- y               ) }
+    { 2nip  ( x y z     -- z               ) }
+    { 3nip  ( w x y z   -- z               ) }
+    { 4nip  ( v w x y z -- z               ) }
+    { nipd  ( x y z     -- y z             ) }
+    { 2nipd ( w x y z   -- y z             ) }
+    { 3nipd ( v w x y z -- y z             ) }
+    { over  ( x y       -- x y x           ) }
+    { overd ( x y z     -- x y x z         ) }
+    { pick  ( x y z     -- x y z x         ) }
+    { pickd ( w x y z   -- w x y w z       ) }
+    { swap  ( x y       -- y x             ) }
+    { tuck  ( x y       -- y x y           ) }
 } [ "shuffle" set-word-prop ] assoc-each
 
 : check-declaration ( declaration -- declaration )

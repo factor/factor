@@ -51,7 +51,7 @@ ARTICLE: "power-functions" "Powers and logarithms"
 "Exponential and natural logarithm:"
 { $subsections e^ cis log }
 "Other logarithms:"
-{ $subsections log1+ log10 }
+{ $subsections log1+ log10 logn }
 "Raising a number to a power:"
 { $subsections ^ e^ 10^ }
 "Logistics functions:"

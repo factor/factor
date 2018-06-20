@@ -73,7 +73,7 @@ TUPLE: hashtable
         [ pick or [ probe ] dip (new-key@) ]
         if
     ] [
-        [ [ pick ] dip = ] 2dip rot
+        [ pickd = ] 2dip rot
         [ nip [ drop ] 3dip f ]
         [ [ probe ] dip (new-key@) ]
         if
@@ -154,7 +154,7 @@ M: hashtable set-at
 
 : collect-pairs ( hash quot: ( key value -- elt ) -- seq )
     [ [ array>> 0 swap ] [ assoc-size f <array> ] bi ] dip swap [
-        [ [ over ] dip set-nth-unsafe 1 + ] curry compose each-pair drop
+        [ overd set-nth-unsafe 1 + ] curry compose each-pair drop
     ] keep ; inline
 
 PRIVATE>

@@ -9,7 +9,6 @@ IN: heaps
 GENERIC: heap-push* ( value key heap -- entry )
 GENERIC: heap-peek ( heap -- value key )
 GENERIC: heap-pop* ( heap -- )
-GENERIC: heap-pop ( heap -- value key )
 GENERIC: heap-delete ( entry heap -- )
 GENERIC: heap-empty? ( heap -- ? )
 GENERIC: heap-size ( heap -- n )
@@ -53,18 +52,15 @@ M: heap heap-size ( heap -- n )
 : up ( n -- m )
     { fixnum } declare 1 fixnum-fast 2/ ; inline
 
-: data-nth ( n heap -- entry )
-    data>> nth-unsafe { entry } declare ; inline
+: data-nth ( n data -- entry )
+    nth-unsafe { entry } declare ; inline
 
-: data-first ( heap -- entry )
-    data>> first ; inline
+: data-set-nth ( entry n data -- )
+    [ [ >>index ] keep ] dip set-nth-unsafe ; inline
 
-: data-set-nth ( entry n heap -- )
-    [ [ >>index ] keep ] dip data>> set-nth-unsafe ; inline
-
-: data-push ( entry heap -- n )
-    [ heap-size [ >>index ] keep ]
-    [ data>> [ set-nth ] 2keep drop ] bi ; inline
+: data-push ( entry data -- n )
+    [ length [ >>index ] keep ]
+    [ [ set-nth ] keepd ] bi ; inline
 
 GENERIC: heap-compare ( entry1 entry2 heap -- ? )
 
@@ -74,38 +70,36 @@ M: min-heap heap-compare
 M: max-heap heap-compare
     drop { entry entry } declare [ key>> ] bi@ before? ; inline
 
-: data-compare ( m n heap -- ? )
-    [ '[ _ data-nth ] bi@ ] [ heap-compare ] bi ; inline
-
 PRIVATE>
 
 : >entry< ( entry -- value key )
     [ value>> ] [ key>> ] bi ; inline
 
 M: heap heap-peek ( heap -- value key )
-    data-first >entry< ;
+    data>> first >entry< ;
 
 <PRIVATE
 
 :: sift-down ( heap from to -- )
-    to heap data-nth :> tmp
+    heap data>>      :> data
+    to data data-nth :> tmp
 
     to t [ over from > and ] [
         dup up
-        dup heap data-nth
+        dup data data-nth
         dup tmp heap heap-compare [
-            rot heap data-set-nth t
+            rot data data-set-nth t
         ] [
             2drop f
         ] if
     ] while
 
-    tmp swap heap data-set-nth ; inline
+    tmp swap data data-set-nth ; inline
 
 PRIVATE>
 
 M: heap heap-push*
-    [ <entry> dup ] [ data-push ] [ 0 rot sift-down ] tri ;
+    [ <entry> dup ] [ data>> data-push ] [ 0 rot sift-down ] tri ;
 
 : heap-push ( value key heap -- )
     heap-push* drop ;
@@ -116,18 +110,21 @@ M: heap heap-push*
 <PRIVATE
 
 :: sift-up ( heap n -- )
-    heap heap-size  :> end
-    n heap data-nth :> tmp
+    heap data>>     :> data
+    data length     :> end
+    n data data-nth :> tmp
 
     n dup left [ dup end < ] [
         dup 1 fixnum+fast
-        dup end < [ 2dup heap data-compare ] [ f ] if
+        dup end < [
+            2dup [ data data-nth ] bi@ heap heap-compare
+        ] [ f ] if
         [ nip ] [ drop ] if
-        [ heap data-nth swap heap data-set-nth ]
+        [ data data-nth swap data data-set-nth ]
         [ dup left ] bi
     ] while drop
 
-    tmp over heap data-set-nth
+    tmp over data data-set-nth
     heap n rot sift-down ; inline
 
 PRIVATE>
@@ -139,8 +136,8 @@ M: heap heap-pop*
         pop* drop
     ] if ; inline
 
-M: heap heap-pop
-    [ data-first >entry< ] [ heap-pop* ] bi ;
+: heap-pop ( heap -- value key )
+    [ heap-peek ] [ heap-pop* ] bi ;
 
 : slurp-heap ( ... heap quot: ( ... value key -- ... ) -- ... )
     [ drop '[ _ heap-empty? ] ]
@@ -169,7 +166,7 @@ M: heap heap-delete
         nip data>> pop*
     ] [
         [ nip data>> pop ]
-        [ data-set-nth ]
+        [ data>> data-set-nth ]
         [ swap sift-up ] 2tri
     ] if ;
 

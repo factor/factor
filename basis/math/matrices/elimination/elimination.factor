@@ -28,7 +28,7 @@ SYMBOL: matrix
     0 swap nth-row [ zero? not ] skip ;
 
 : clear-scale ( col# pivot-row i-row -- n )
-    [ over ] dip nth dup zero? [
+    overd nth dup zero? [
         3drop 0
     ] [
         [ nth dup zero? ] dip swap [

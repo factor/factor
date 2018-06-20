@@ -36,10 +36,8 @@ MACRO: ordinary-op ( word -- o )
 MACRO: duals>nweave ( n -- quot )
    dup dup dup
    '[
-       [ [ epsilon-part>> ] _ napply ]
-       _ nkeep
-       [ ordinary-part>> ] _ napply
-       _ nweave
+       [ [ epsilon-part>> ] _ napply ] _ nkeep
+       [ ordinary-part>> ] _ napply _ nweave
     ] ;
 
 MACRO: chain-rule ( word -- e )
@@ -49,18 +47,19 @@ MACRO: chain-rule ( word -- e )
     tri
     '[ [ @ _ @ ] sum-outputs ] ;
 
-: set-dual-help ( word dword -- )
-    [ swap
-        [ stack-effect [ in>> ] [ out>> ] bi append
+: set-dual-help ( dword word -- )
+    [
+        [
+            stack-effect [ in>> ] [ out>> ] bi append
             [ dual ] { } map>assoc { $values } prepend
-        ]
-        [ [ { $description } % "Version of " ,
-                   { $link } swap suffix ,
-                   " extended to work on dual numbers." , ]
-            { } make
-        ]
-        bi* 2array
-    ] keep set-word-help ;
+        ] [
+            [
+                { $description } % "Version of " ,
+                { $link } swap suffix ,
+                " extended to work on dual numbers." ,
+            ] { } make
+        ] bi* 2array
+    ] keepd set-word-help ;
 
 PRIVATE>
 
@@ -72,12 +71,12 @@ MACRO: dual-op ( word -- quot )
     '[ _ @ @ <dual> ] ;
 
 : define-dual ( word -- )
-    dup name>> "d" prepend "math.dual" create-word
-    [ [ stack-effect ] dip set-stack-effect ]
+    [ name>> "d" prepend "math.dual" create-word ] keep
+    [ stack-effect set-stack-effect ]
     [ set-dual-help ]
-    [ swap '[ _ dual-op ] define ]
+    [ '[ _ dual-op ] define ]
     2tri ;
 
 ! Specialize math functions to operate on dual numbers.
 [ all-words [ "derivative" word-prop ] filter
-    [ define-dual ] each ] with-compilation-unit
+[ define-dual ] each ] with-compilation-unit

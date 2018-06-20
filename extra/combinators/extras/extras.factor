@@ -22,6 +22,24 @@ MACRO: cond-case ( assoc -- quot )
 MACRO: cleave-array ( quots -- quot )
     [ '[ _ cleave ] ] [ length '[ _ narray ] ] bi compose ;
 
+: 3bi* ( u v w x y z p q -- )
+    [ 3dip ] dip call ; inline
+
+: 3bi@ ( u v w x y z quot -- )
+    dup 3bi* ; inline
+
+: 4bi ( w x y z p q -- )
+    [ 4keep ] dip call ; inline
+
+: 4bi* ( s t u v w x y z p q -- )
+    [ 4dip ] dip call ; inline
+
+: 4bi@ ( s t u v w x y z quot -- )
+    dup 4bi* ; inline
+
+: 4tri ( w x y z p q r -- )
+    [ [ 4keep ] dip 4keep ] dip call ; inline
+
 : plox ( ... x/f quot: ( ... x -- ... ) -- ... )
     dupd when ; inline
 
@@ -64,10 +82,10 @@ MACRO:: n-falsify ( n -- quot )
 
 ! try the quot, keep the original arg if quot is true
 : ?1arg ( obj quot: ( obj -- ? ) -- obj/f )
-    [ ?1res ] 2keep drop '[ _ ] [ f ] if ; inline
+    [ ?1res ] keepd '[ _ ] [ f ] if ; inline
 
 : ?2arg ( obj1 obj2 quot: ( obj1 obj2 -- ? ) -- obj1/f obj2/f )
-    [ ?2res ] 3keep drop '[ _ _ ] [ f f ] if ; inline
+    [ ?2res ] 2keepd '[ _ _ ] [ f f ] if ; inline
 
 <<
 : alist>quot* ( default assoc -- quot )

@@ -1949,8 +1949,8 @@ tri* 134 1 63 x-insn ;
 : CLRLDI.   ( ra rs  n -- ) 0 swap RLDICL. ;
 : CLRRDI    ( ra rs  n -- ) 0 swap 63 swap - RLDICR ;
 : CLRRDI.   ( ra rs  n -- ) 0 swap 63 swap - RLDICR. ;
-: CLRLSLDI  ( ra rs  b n -- ) swap over - RLDIC ;
-: CLRLSLDI. ( ra rs  b n -- ) swap over - RLDIC. ;
+: CLRLSLDI  ( ra rs  b n -- ) tuck - RLDIC ;
+: CLRLSLDI. ( ra rs  b n -- ) tuck - RLDIC. ;
 
 ! E.7.2 Operations on Words
 : EXTLWI    ( ra rs  n b -- ) swap 0 1 - RLWINM ;

@@ -290,7 +290,7 @@ TUPLE: single-texture < disposable image dim loc texture-coords texture display-
 : tex-sub-image ( image -- )
     [ GL_TEXTURE_2D 0 0 0 ] dip
     [ dim>> first2 ]
-    [ image-format [ drop ] 2dip ]
+    [ image-format nipd ]
     [ bitmap>> ] tri
     glTexSubImage2D ;
 

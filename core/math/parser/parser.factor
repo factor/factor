@@ -309,7 +309,7 @@ DEFER: @neg-digit
             { [ dup "bB" member-eq? ] [ 2drop  2 ->radix require-next-digit ] }
             { [ dup "oO" member-eq? ] [ 2drop  8 ->radix require-next-digit ] }
             { [ dup "xX" member-eq? ] [ 2drop 16 ->radix require-next-digit ] }
-            [ [ drop ] 2dip swap call ]
+            [ nipd swap call ]
         } cond
     ] 2curry next-digit ; inline
 

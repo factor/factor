@@ -108,11 +108,11 @@ HELP: prefix-help-coverage.
 [english] pluralize: full help coverage
 [english] singular?: full help coverage
 [english] singularize: full help coverage
-[english.private] $0-plurality: needs help sections: $description $examples
-[english.private] $keep-case: needs help sections: $description $examples
-[english.private] match-case: needs help sections: $description $examples
-[english.private] plural-to-singular: needs help sections: $description $examples
-[english.private] singular-to-plural: needs help sections: $description $examples
+[english.private] $0-plurality: needs help sections: $description and $examples
+[english.private] $keep-case: needs help sections: $description and $examples
+[english.private] match-case: needs help sections: $description and $examples
+[english.private] plural-to-singular: needs help sections: $description and $examples
+[english.private] singular-to-plural: needs help sections: $description and $examples
 
 70.6% of words have complete documentation"
     }

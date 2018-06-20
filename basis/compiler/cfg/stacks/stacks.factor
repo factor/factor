@@ -21,7 +21,7 @@ IN: compiler.cfg.stacks
     } apply-passes ;
 
 : create-locs ( loc-class seq -- locs )
-    [ swap new swap >>n ] with map <reversed> ;
+    [ [ new ] dip >>n ] with map <reversed> ;
 
 : stack-locs ( loc-class n -- locs )
     <iota> create-locs ;

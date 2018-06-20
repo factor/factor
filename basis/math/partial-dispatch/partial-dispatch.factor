@@ -143,7 +143,7 @@ SYMBOL: fast-math-ops
 
 : math-method* ( word left right -- quot )
     3dup math-op
-    [ [ 3drop ] dip 1quotation ] [ drop math-method ] if ;
+    [ 3nip 1quotation ] [ drop math-method ] if ;
 
 : math-both-known? ( word left right -- ? )
     3dup math-op

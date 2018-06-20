@@ -22,7 +22,7 @@ TUPLE: effect
     f f effect boa ; inline
 
 : <variable-effect> ( in-var in out-var out -- effect )
-    swap [ rot ] dip [ ?terminated ] 2dip effect boa ;
+    swap rotd [ ?terminated ] 2dip effect boa ;
 
 : effect-height ( effect -- n )
     [ out>> length ] [ in>> length ] bi - ; inline

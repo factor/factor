@@ -53,9 +53,9 @@ M: c-reader stream-read1
 : read-until-loop ( handle seps accum -- accum ch )
     pick fgetc dup [
         pick dupd member-eq?
-        [ [ 2drop ] 2dip ] [ suffix! read-until-loop ] if
+        [ 2nipd ] [ suffix! read-until-loop ] if
     ] [
-        [ 2drop ] 2dip
+        2nipd
     ] if ; inline recursive
 
 M: c-reader stream-read-until

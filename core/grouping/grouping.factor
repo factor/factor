@@ -61,7 +61,7 @@ M: clumps group@
 <PRIVATE
 
 : map-like ( seq n quot -- seq )
-    2keep drop '[ _ like ] map ; inline
+    keepd '[ _ like ] map ; inline
 
 PRIVATE>
 

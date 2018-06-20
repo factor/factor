@@ -145,7 +145,7 @@ IN: compiler.cfg.stacks.local.tests
 : my-new-key4 ( a i j -- i/j )
     2over
     slot
-    swap over
+    tuck
     ! a i el j el
     [
         ! a i el j

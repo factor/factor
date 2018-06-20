@@ -145,6 +145,6 @@ FUNCTION: int strerror_r ( int errno, char* buf, size_t buflen )
 
 M: macosx strerror ( errno -- str )
     [
-        1024 [ malloc &free ] keep [ strerror_r ] 2keep drop nip
+        1024 [ malloc &free ] keep [ strerror_r ] keepd nip
         alien>native-string
     ] with-destructors ;

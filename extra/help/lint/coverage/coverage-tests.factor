@@ -48,7 +48,7 @@ PRIVATE>
 ] unit-test
 
 {
-  V{ "needs help " "sections: " { { "$description" $description } { "$examples" $examples } } }
+  V{ "needs help " "sections: " { { "$description" $description } " and " { "$examples" $examples } } }
 } [
   V{ } clone word-help-coverage new { $description $examples } >>omitted-sections (assemble-omitted-sections)
 ] unit-test

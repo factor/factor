@@ -37,7 +37,7 @@ SYMBOL: error-stack
 
 : merge-errors ( -- )
     error-stack get dup length 1 >  [
-        dup pop over pop swap (merge-errors) swap push
+        [ pop ] [ pop swap (merge-errors) ] [ ] tri push
     ] [
         drop
     ] if ;
@@ -144,7 +144,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     [ [ setup-growth ] 2keep ] 2dip
     [ dup eval-rule ] dip swap
         dup pick stop-growth? [
-        5 ndrop
+        5drop
     ] [
         over update-m
         (grow-lr)
@@ -347,7 +347,7 @@ TUPLE: satisfy-parser quot ;
     swap [
         drop f
     ] [
-        unclip-slice rot dupd call [
+        unclip-slice dup roll call [
             <parse-result>
         ] [
             2drop f

@@ -134,7 +134,7 @@ PRIVATE>
     '[ _ [ _ log-error @ ] recover ] ;
 
 : add-error-logging ( word level -- )
-    [ [ input-logging-quot ] 2keep drop error-logging-quot ]
+    [ [ input-logging-quot ] keepd error-logging-quot ]
     (define-logging) ;
 
 SYNTAX: \LOG:

@@ -101,13 +101,13 @@ M: utf16le encode-char ( char stream encoding -- )
     drop char>utf16le ;
 
 : ascii-char>utf16-byte-array ( off n byte-array string -- )
-    [ over ] dip string-nth-fast -rot
+    overd string-nth-fast -rot
     [ 2 fixnum*fast rot fixnum+fast ] dip
     set-nth-unsafe ; inline
 
 : ascii-string>utf16-byte-array ( off string -- byte-array )
     [ length >fixnum [ <iota> ] [ 2 fixnum*fast <byte-array> ] bi ] keep
-    [ [ ascii-char>utf16-byte-array ] 2curry with each ] 2keep drop ; inline
+    [ [ ascii-char>utf16-byte-array ] 2curry with each ] keepd ; inline
 
 : ascii-string>utf16le ( string stream -- )
     [ 0 swap ascii-string>utf16-byte-array ] dip stream-write ; inline

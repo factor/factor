@@ -135,7 +135,7 @@ PRIVATE>
 M: struct-class boa>object
     swap pad-struct-slots
     [ <struct> ] [ struct-slots ] bi
-    [ [ (writer-quot) call( value struct -- ) ] with 2each ] curry keep ;
+    [ [ (writer-quot) call( value struct -- ) ] with 2each ] keepd ;
 
 M: struct-class initial-value* <struct> t ; inline
 
@@ -262,7 +262,7 @@ M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inlin
         [
             [ initial>> ]
             [ (writer-quot) ] bi
-            over [ swapd [ call( value struct -- ) ] curry keep ] [ 2drop ] if
+            over [ swapd [ call( value struct -- ) ] keepd ] [ 2drop ] if
         ] each
     ] [ drop f ] if ;
 
