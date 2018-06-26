@@ -568,6 +568,37 @@ big-endian off
         ds-reg 2 bootstrap-cells SUB
         ds-reg [] temp0 MOV
     ] }
+    { 3nip [
+        temp0 ds-reg [] MOV
+        ds-reg 3 bootstrap-cells SUB
+        ds-reg [] temp0 MOV
+    ] }
+    { 4nip [
+        temp0 ds-reg [] MOV
+        ds-reg 4 bootstrap-cells SUB
+        ds-reg [] temp0 MOV
+    ] }
+    { nipd [
+        temp0 ds-reg [] MOV
+        temp1 ds-reg -1 bootstrap-cells [+] MOV
+        ds-reg bootstrap-cell SUB
+        ds-reg -1 bootstrap-cells [+] temp1 MOV
+        ds-reg [] temp0 MOV
+    ] }
+    { 2nipd [
+        temp0 ds-reg [] MOV
+        temp1 ds-reg -1 bootstrap-cells [+] MOV
+        ds-reg 2 bootstrap-cells SUB
+        ds-reg -1 bootstrap-cells [+] temp1 MOV
+        ds-reg [] temp0 MOV
+    ] }
+    { 3nipd [
+        temp0 ds-reg [] MOV
+        temp1 ds-reg -1 bootstrap-cells [+] MOV
+        ds-reg 3 bootstrap-cells SUB
+        ds-reg -1 bootstrap-cells [+] temp1 MOV
+        ds-reg [] temp0 MOV
+    ] }
 
     ! ### Swaps
     { -rot [

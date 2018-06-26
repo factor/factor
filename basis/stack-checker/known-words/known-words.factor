@@ -84,6 +84,8 @@ IN: stack-checker.known-words
     { 2nipd ( w x y z   -- y z             ) }
     { 3nipd ( v w x y z -- y z             ) }
     { over  ( x y       -- x y x           ) }
+    { pick  ( x y z     -- x y z x         ) }
+    { swap  ( x y       -- y x             ) }
     { overd ( x y z     -- x y x z         ) }
     { pick  ( x y z     -- x y z x         ) }
     { pickd ( w x y z   -- w x y w z       ) }

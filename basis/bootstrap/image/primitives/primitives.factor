@@ -273,6 +273,11 @@ CONSTANT: all-primitives {
             { "swapd" ( x y z -- y x z ) f f f f }
             { "nip" ( x y -- y ) f f f f }
             { "2nip" ( x y z -- z ) f f f f }
+            { "3nip" ( w x y z -- z ) f f f f }
+            { "4nip" ( v w x y z -- z ) f f f f }
+            { "nipd" ( x y z -- y z ) f f f f }
+            { "2nipd" ( w x y z -- y z ) f f f f }
+            { "3nipd" ( v w x y z -- y z ) f f f f }
             { "over" ( x y -- x y x ) f f f f }
             { "pick" ( x y z -- x y z x ) f f f f }
             { "swap" ( x y -- y x ) f f f f }
