@@ -734,8 +734,7 @@ usage() {
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  report - print the build variables"
-    $ECHO "  check-boot-image-exists - check that there is a boot image for current branch"
-    $ECHO "  get-boot-image - get the boot image for the current branch of for master"
+    $ECHO "  update-boot-image - get the boot image for the current branch of for master"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
@@ -769,7 +768,6 @@ case "$1" in
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
     report) find_build_info ;;
     full-report) find_build_info; check_installed_programs; check_libraries ;;
-    check-boot-image-exists) find_build_info; check_installed_programs; check_boot_image_exists;;
     update-boot-image) find_build_info; check_installed_programs; update_boot_image;;
     *) usage ;;
 esac
