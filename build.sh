@@ -91,11 +91,13 @@ set_downloader() {
     test_program_installed wget
     if [[ $? -ne 0 ]] ; then
         DOWNLOADER=wget
+        DOWNLOADER_NAME=wget
         return
     fi
     test_program_installed curl
     if [[ $? -ne 0 ]] ; then
         DOWNLOADER="curl -f -O"
+        DOWNLOADER_NAME=curl
         return
     fi
     $ECHO "error: wget or curl required"
@@ -437,7 +439,7 @@ find_build_info() {
     find_num_cores
     set_cc
     find_word_size
-    find_branch
+    set_current_branch
     set_factor_binary
     set_factor_library
     set_factor_image
@@ -556,7 +558,38 @@ current_git_branch() {
     git rev-parse --abbrev-ref HEAD
 }
 
-find_branch() {
+check_url() {
+    if [[ $DOWNLOADER_NAME == 'wget' ]]; then
+        if [[ `wget -S --spider $1 2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then
+            return 0
+        else
+            return 1
+        fi
+    elif [[ $DOWNLOADER_NAME == 'curl' ]]; then
+        code=`curl -sL -w "%{http_code}\\n" "$1" -o /dev/null`
+        if [[ $code -eq 200 ]]; then return 0; else return 1; fi
+    else
+        $ECHO "error: wget or curl required in check_url"
+        exit_script 12
+    fi
+}
+
+# If we are on a branch, first try to get a boot image for that branch.
+# Otherwise, just use `master`
+set_boot_image_vars() {
+    set_current_branch
+    url="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
+    check_url $url
+    if [[ $? -eq 0 ]]; then
+        CHECKSUM_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
+        BOOT_IMAGE_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
+    else
+        CHECKSUM_URL="http://downloads.factorcode.org/images/master/checksums.txt"
+        BOOT_IMAGE_URL="http://downloads.factorcode.org/images/master/${BOOT_IMAGE}"
+    fi
+}
+
+set_current_branch() {
     if [ -z ${TRAVIS_BRANCH} ]; then
         CURRENT_BRANCH=$(current_git_branch)
     else
@@ -564,20 +597,15 @@ find_branch() {
     fi
 }
 
-checksum_url() {
-    find_branch
-    echo "http://downloads.factorcode.org/images/$CURRENT_BRANCH/checksums.txt"
-}
-
-update_boot_images() {
-    find_branch
+update_boot_image() {
+    set_boot_image_vars
     $ECHO "Deleting old images..."
     $DELETE checksums.txt* > /dev/null 2>&1
     # delete boot images with one or two characters after the dot
     $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
-        get_url $(checksum_url)
+        get_url $CHECKSUM_URL
         factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`
         set_md5sum
         disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`
@@ -587,21 +615,16 @@ update_boot_images() {
             $ECHO "Your disk boot image matches the one on factorcode.org."
         else
             $DELETE $BOOT_IMAGE > /dev/null 2>&1
-            get_boot_image;
+            get_boot_image
         fi
     else
         get_boot_image
     fi
 }
 
-boot_image_url() {
-    find_branch
-    echo "http://downloads.factorcode.org/images/$CURRENT_BRANCH/$BOOT_IMAGE"
-}
-
 get_boot_image() {
     $ECHO "Downloading boot image $BOOT_IMAGE."
-    get_url $(boot_image_url)
+    get_url "${BOOT_IMAGE_URL}"
 }
 
 get_url() {
@@ -635,6 +658,7 @@ install() {
     git_clone
     cd_factor
     make_factor
+    set_boot_image_vars
     get_boot_image
     bootstrap
 }
@@ -647,7 +671,7 @@ update() {
 }
 
 download_and_bootstrap() {
-    update_boot_images
+    update_boot_image
     bootstrap
 }
 
@@ -710,6 +734,8 @@ usage() {
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  report - print the build variables"
+    $ECHO "  check-boot-image-exists - check that there is a boot image for current branch"
+    $ECHO "  get-boot-image - get the boot image for the current branch of for master"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
@@ -743,6 +769,8 @@ case "$1" in
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
     report) find_build_info ;;
     full-report) find_build_info; check_installed_programs; check_libraries ;;
+    check-boot-image-exists) find_build_info; check_installed_programs; check_boot_image_exists;;
+    update-boot-image) find_build_info; check_installed_programs; update_boot_image;;
     *) usage ;;
 esac
 
