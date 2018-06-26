@@ -118,7 +118,7 @@ M: postgresql-result-null summary ( obj -- str )
 
 : pq-get-string ( handle row column -- obj )
     3dup PQgetvalue utf8 alien>string
-    dup empty? [ [ pq-get-is-null f ] dip ? ] [ [ 3drop ] dip ] if ;
+    dup empty? [ [ pq-get-is-null f ] dip ? ] [ 3nip ] if ;
 
 : pq-get-number ( handle row column -- obj )
     pq-get-string dup [ string>number ] when ;
@@ -135,7 +135,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
 : pq-get-blob ( handle row column -- obj/f )
     [ PQgetvalue ] 3keep 3dup PQgetlength
     dup 0 > [
-        [ 3drop ] dip
+        3nip
         [
             memory>byte-array >string
             { uint }

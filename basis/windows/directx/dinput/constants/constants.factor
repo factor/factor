@@ -71,7 +71,7 @@ M: array array-base-type first ;
 >>
 
 MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
-    [ DIDATAFORMAT heap-size DIOBJECTDATAFORMAT heap-size ] 4 ndip
+    [ DIDATAFORMAT heap-size DIOBJECTDATAFORMAT heap-size ] 4dip
     [ nip length ] [ make-DIOBJECTDATAFORMAT-array-quot ] 2bi
     '[ _ _ _ _ _ @ DIDATAFORMAT <struct-boa> ] ;
 

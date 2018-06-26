@@ -768,6 +768,7 @@ case "$1" in
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
     report) find_build_info ;;
     full-report) find_build_info; check_installed_programs; check_libraries ;;
+    check-boot-image-exists) find_build_info; check_installed_programs; check_boot_image_exists;;
     update-boot-image) find_build_info; check_installed_programs; update_boot_image;;
     *) usage ;;
 esac

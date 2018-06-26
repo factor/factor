@@ -45,7 +45,7 @@ PRIVATE>
         { [ effect-closer? ] [ stack-effect-omits-dashes ] }
         { [ row-variable? ] [ parse-effect-var t ] }
         [
-            [ drop ] 2dip standalone-type?
+            nipd standalone-type?
             [ parse-standalone-type ] [ parse-effect-value ] if , t
         ]
     } cond ;

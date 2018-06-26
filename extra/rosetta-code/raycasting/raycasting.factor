@@ -111,7 +111,7 @@ IN: rosetta-code.raycasting
 : lincomb ( a b x -- w )
     3dup [ last ] tri@
     [ - ] curry bi@
-    [ drop ] 2dip
+    nipd
     neg 2dup + [ / ] curry bi@
     [ [ v*n ] curry ] bi@ bi*  v+ ;
 

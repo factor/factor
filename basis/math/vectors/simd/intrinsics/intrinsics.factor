@@ -268,16 +268,16 @@ PRIVATE>
 : (simd-vunpack-tail)      ( a   rep -- c )
     [ byte>rep-array ] [ widen-vector-rep [ rep-length ] [ '[ _ >rep-array ] ] bi ] bi
     [ tail-slice ] dip call( a' -- c' ) underlying>> ;
-: (simd-with)              (   n rep -- v )
+: (simd-with)              ( n rep -- v )
     [ rep-length swap '[ _ ] ] [ <rep-array> ] bi replicate-as
     underlying>> ;
 : (simd-gather-2)          ( m n rep -- v ) <rep-array> [ 2 set-firstn-unsafe ] keep underlying>> ;
 : (simd-gather-4)          ( m n o p rep -- v ) <rep-array> [ 4 set-firstn-unsafe ] keep underlying>> ;
 : (simd-select)            ( a n rep -- x ) swapd byte>rep-array nth-unsafe ;
 
-: alien-vector     (       c-ptr n rep -- value )
+: alien-vector     ( c-ptr n rep -- value )
     [ swap <displaced-alien> ] dip rep-size memory>byte-array ;
-: set-alien-vector ( value c-ptr n rep --       )
+: set-alien-vector ( value c-ptr n rep -- )
     [ swap <displaced-alien> swap ] dip rep-size memcpy ;
 
 "compiler.cfg.intrinsics.simd" require

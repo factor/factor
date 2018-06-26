@@ -147,7 +147,7 @@ M: register displacement, drop ;
 : 1-operand ( operand reg,rex.w,opcode -- )
     ! The 'reg' is not really a register, but a value for the
     ! 'reg' field of the mod-r/m byte.
-    first3 [ [ over ] dip prefix-1 ] dip opcode, swap addressing ;
+    first3 [ overd prefix-1 ] dip opcode, swap addressing ;
 
 : immediate-operand-size-bit ( dst imm reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
     over integer? [ first3 0b1 opcode-or 3array ] when ;

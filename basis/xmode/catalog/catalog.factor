@@ -117,7 +117,7 @@ DEFER: finalize-rule-set
     [ file-name ] dip
     modes
     [ nip [ 2dup ] dip suitable-mode? ] assoc-find
-    2drop [ 2drop ] dip ;
+    2drop 2nip ;
 
 : find-mode ( file-name first-line -- mode )
     ?find-mode "text" or ; inline

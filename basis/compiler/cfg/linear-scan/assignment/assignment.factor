@@ -102,7 +102,7 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
     } cleave ;
 
 : change-insn-gc-roots ( gc-map-insn quot: ( x -- x ) -- )
-    [ gc-map>> ] dip [ swap gc-roots>> swap map! drop ]
+    [ gc-map>> ] dip [ [ gc-roots>> ] dip map! drop ]
     [ '[ [ _ bi@ ] assoc-map ] change-derived-roots drop ] 2bi ; inline
 
 : spill-required? ( live-interval root-leaders n -- ? )

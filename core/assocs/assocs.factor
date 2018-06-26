@@ -37,7 +37,7 @@ M: assoc assoc-like drop ; inline
         3drop f
     ] [
         3dup nth-unsafe at*
-        [ [ 3drop ] dip ] [ drop [ 1 - ] dip (assoc-stack) ] if
+        [ 3nip ] [ drop [ 1 - ] dip (assoc-stack) ] if
     ] if ; inline recursive
 
 : search-alist ( key alist -- pair/f i/f )

@@ -39,7 +39,7 @@ M: ripemd-160 initialize-checksum-state drop <ripemd-160-state> ;
 : F ( x y z -- out ) bitxor bitxor ;  inline
 : G ( x y z -- out ) pick bitnot swap [ bitand ] 2bi@ bitor ; inline
 : H ( x y z -- out ) [ bitnot bitor ] [ bitxor ] bi* ; inline
-: I ( x y z -- out ) swap over bitnot [ bitand ] 2bi@ bitor ; inline
+: I ( x y z -- out ) tuck bitnot [ bitand ] 2bi@ bitor ; inline
 : J ( x y z -- out ) bitnot bitor bitxor ; inline
 
 CONSTANT: T11 0x00000000

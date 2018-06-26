@@ -71,6 +71,9 @@ IN: stack-checker.known-words
     { 4dup  ( w x y z   -- w x y z w x y z ) }
     { rot   ( x y z     -- y z x           ) }
     { -rot  ( x y z     -- z x y           ) }
+    { roll  ( w x y z   -- x y z w         ) }
+    { -roll ( w x y z   -- z w x y         ) }
+    { reach ( w x y z   -- w x y z w       ) }
     { dupd  ( x y       -- x x y           ) }
     { swapd ( x y z     -- y x z           ) }
     { nip   ( x y       -- y               ) }
@@ -83,6 +86,11 @@ IN: stack-checker.known-words
     { over  ( x y       -- x y x           ) }
     { pick  ( x y z     -- x y z x         ) }
     { swap  ( x y       -- y x             ) }
+    { overd ( x y z     -- x y x z         ) }
+    { pick  ( x y z     -- x y z x         ) }
+    { pickd ( w x y z   -- w x y w z       ) }
+    { swap  ( x y       -- y x             ) }
+    { tuck  ( x y       -- y x y           ) }
 } [ "shuffle" set-word-prop ] assoc-each
 
 : check-declaration ( declaration -- declaration )

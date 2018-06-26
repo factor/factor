@@ -41,7 +41,7 @@ PRIVATE>
 ! -------------------
 
 : fib-upto* ( n -- seq )
-    0 1 [ pick over >= ] [ [ nip ] 2keep + dup ] produce [ 3drop ] dip
+    0 1 [ pick over >= ] [ [ nip ] 2keep + dup ] produce 3nip
     but-last-slice { 0 1 } prepend ;
 
 : euler002a ( -- answer )

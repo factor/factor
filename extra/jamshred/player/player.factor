@@ -25,7 +25,7 @@ CONSTANT: max-speed 30.0
     f f 0 default-speed player boa ;
 
 : turn-player ( player x-radians y-radians -- )
-    [ over ] dip left-pivot up-pivot ;
+    overd left-pivot up-pivot ;
 
 : roll-player ( player z-radians -- )
     forward-pivot ;

@@ -98,7 +98,7 @@ M: gtk-game-input-backend read-keyboard
     get-dpy dup XDefaultRootWindow
     { int int int int int int int }
     [ XQueryPointer drop ] with-out-parameters
-    [ 4 ndrop ] 3dip ;
+    [ 4drop ] 3dip ;
 
 M: gtk-game-input-backend read-mouse
     query-pointer

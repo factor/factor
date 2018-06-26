@@ -37,7 +37,7 @@ ERROR: unknown-format-directive value ;
         [ 10^ * round-to-even >integer number>string ]
         [ 1 + CHAR: 0 pad-head ]
         [ cut* ] tri [ "." glue ] unless-empty
-    ] curry keep neg? [ CHAR: - prefix ] when ;
+    ] keepd neg? [ CHAR: - prefix ] when ;
 
 : format-scientific-mantissa ( x log10x digits -- string rounded-up? )
     [ swap - 10^ * round-to-even >integer number>string ] keep
@@ -55,7 +55,7 @@ ERROR: unknown-format-directive value ;
         [ abs dup integer-log10 ] dip
         [ format-scientific-mantissa ]
         [ drop nip format-scientific-exponent ] 3bi append
-    ] curry keep neg? [ CHAR: - prefix ] when ;
+    ] keepd neg? [ CHAR: - prefix ] when ;
 
 : format-float-fast ( x digits string -- string )
     [ "" -1 ] 2dip "C" format-float ;

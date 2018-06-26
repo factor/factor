@@ -101,7 +101,7 @@ M: utf16le encode-char ( char stream encoding -- )
     drop char>utf16le ;
 
 : ascii-char>utf16-byte-array ( off n byte-array string -- )
-    [ over ] dip string-nth-fast -rot
+    overd string-nth-fast -rot
     [ 2 fixnum*fast rot fixnum+fast ] dip
     set-nth-unsafe ; inline
 

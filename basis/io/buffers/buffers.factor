@@ -56,7 +56,7 @@ TYPED: buffer-read-into ( dst n: fixnum buffer: buffer -- count )
         pick c-ptr? [
             memcpy
         ] [
-            -rot swap
+            spin
             [ swap alien-unsigned-1 ]
             [ set-nth-unsafe ] bi-curry*
             [ bi ] 2curry each-integer

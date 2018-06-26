@@ -245,50 +245,43 @@ GENERIC: prev-float ( m -- n )
 : align ( m w -- n )
     1 - [ + ] keep bitnot bitand ; inline
 
-<PRIVATE
-
-: iterate-prep ( n quot -- i n quot ) [ 0 ] 2dip ; inline
-
-: if-iterate? ( i n true false -- ) [ 2over < ] 2dip if ; inline
-
-: iterate-step ( i n quot -- i n quot )
-    ! Apply quot to i, keep i and quot, hide n.
-    [ nip call ] 3keep ; inline
-
-: iterate-rot ( ? i n quot -- i n quot ? )
-    [ rot ] dip swap ; inline
-
-: iterate-next ( i n quot -- i' n quot ) [ 1 + ] 2dip ; inline
-
-PRIVATE>
-
 : (each-integer) ( ... i n quot: ( ... i -- ... ) -- ... )
-    [ iterate-step iterate-next (each-integer) ]
-    [ 3drop ] if-iterate? ; inline recursive
+    2over < [
+        [ nip call ] 3keep
+        [ 1 + ] 2dip (each-integer)
+    ] [
+        3drop
+    ] if ; inline recursive
 
 : (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
-    [
-        iterate-step iterate-rot
-        [ 2drop ] [ iterate-next (find-integer) ] if
-    ] [ 3drop f ] if-iterate? ; inline recursive
+    2over < [
+        [ nip call ] 3keep roll
+        [ 2drop ]
+        [ [ 1 + ] 2dip (find-integer) ] if
+    ] [
+        3drop f
+    ] if ; inline recursive
 
 : (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
-    [
-        iterate-step iterate-rot
-        [ iterate-next (all-integers?) ] [ 3drop f ] if
-    ] [ 3drop t ] if-iterate? ; inline recursive
+    2over < [
+        [ nip call ] 3keep roll
+        [ [ 1 + ] 2dip (all-integers?) ]
+        [ 3drop f ] if
+    ] [
+        3drop t
+    ] if ; inline recursive
 
 : each-integer ( ... n quot: ( ... i -- ... ) -- ... )
-    iterate-prep (each-integer) ; inline
+    [ 0 ] 2dip (each-integer) ; inline
 
 : times ( ... n quot: ( ... -- ... ) -- ... )
     [ drop ] prepose each-integer ; inline
 
 : find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
-    iterate-prep (find-integer) ; inline
+    [ 0 ] 2dip (find-integer) ; inline
 
 : all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
-    iterate-prep (all-integers?) ; inline
+    [ 0 ] 2dip (all-integers?) ; inline
 
 : find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
     over 0 < [

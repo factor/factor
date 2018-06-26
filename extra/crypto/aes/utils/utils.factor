@@ -40,18 +40,16 @@ IN: crypto.aes.utils
 : first-diag ( c0 c1 c2 c3 -- a0 a1 a2 a3 )
     { [ gb3 ] [ gb2 ] [ gb1 ] [ gb0 ] } spread ;
 
-: (4rot) ( c0 c1 c2 c3 -- c1 c2 c3 c0 ) 4 nrot ; inline
-: second-diag ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) (4rot) first-diag ;
-: third-diag  ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) (4rot) second-diag ;
-: fourth-diag ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) (4rot) third-diag ;
+: second-diag ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) roll first-diag ;
+: third-diag  ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) roll second-diag ;
+: fourth-diag ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) roll third-diag ;
 
 ! given 4 columns, output the first reverse diagonal, i.e.
 !  C[0,0] C[3,1] C[2,2] C[1,3]
-:: (-rev) ( c0 c1 c2 c3 -- c0 c3 c2 c1 ) c0 c3 c2 c1 ; inline
-: -first-diag  ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) (-rev) first-diag ;
-: -second-diag ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) (-rev) (4rot) first-diag ;
-: -third-diag  ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) (-rev) (4rot) second-diag ;
-: -fourth-diag ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) (-rev) (4rot) third-diag ;
+: -first-diag  ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) spin first-diag ;
+: -second-diag ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) spin roll first-diag ;
+: -third-diag  ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) spin roll second-diag ;
+: -fourth-diag ( c0 c1 c2 c3 -- a0 a1 a2 a3 ) spin roll third-diag ;
 
 :: set-first4-unsafe ( seq a0 a1 a2 a3 -- )
     a0 0 seq set-nth-unsafe

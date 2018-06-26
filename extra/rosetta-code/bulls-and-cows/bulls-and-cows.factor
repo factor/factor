@@ -37,8 +37,8 @@ TUPLE: cow ;
 TUPLE: bull ;
 : <bull> ( -- bull ) bull new ;
 
-: inc-bulls ( score -- score ) dup bulls>> 1 + >>bulls ;
-: inc-cows ( score -- score ) dup cows>> 1 + >>cows ;
+: inc-bulls ( score -- score ) [ 1 + ] change-bulls ;
+: inc-cows ( score -- score ) [ 1 + ] change-cows ;
 
 : random-nums ( -- seq ) 9 [1,b] 4 sample ;
 
@@ -66,23 +66,26 @@ TUPLE: bull ;
 : sum-score ( n g -- score ? )
     '[ _ cow-or-bull ] map sift add-to-score dup check-win ;
 
-: print-sum ( score -- str )
-    dup bulls>> number>string "Bulls: " swap append swap cows>> number>string
-    " Cows: " swap 3append "\n" append ;
+: score-to-answer ( score -- str )
+    [ bulls>> number>string "Bulls: " prepend ]
+    [ cows>> number>string " Cows: " prepend ] bi "\n" glue ;
 
-: (validate-readln) ( str -- ? ) dup length 4 = not swap [ letter? ] all? or ;
+: (validate-readln) ( str -- ? )
+    [ length 4 = not ]
+    [ [ letter? ] all? ] bi or ;
 
 : validate-readln ( -- str )
     readln dup (validate-readln)
-    [ "Invalid input.\nPlease enter a valid 4 digit number: "
-      write flush drop validate-readln ]
-    when ;
+    [
+        "Invalid input.\nPlease enter a valid 4 digit number: "
+        write flush drop validate-readln
+    ] when ;
 
-: win ( -- ) "\nYou've won! Good job. You're so smart." print flush ;
+: win ( -- ) "You've won! Good job. You're so smart." print flush ;
 
 : main-loop ( x -- )
     "Enter a 4 digit number: " write flush validate-readln num>hash swap
-    [ sum-score swap print-sum print flush ] keep swap not
+    [ sum-score swap score-to-answer print flush ] keep swap not
     [ main-loop ] [ drop win ] if ;
 
 : bulls-and-cows-main ( -- ) new-number drop narr>nhash main-loop ;

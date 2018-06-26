@@ -42,7 +42,7 @@ DEFER: assoc>tuple
 
 : write-field? ( tuple key value -- ? )
    pick mdb-persistent? [
-      { [ [ 2drop ] dip not ]
+      { [ 2nip not ]
         [ drop transient-slot? ] } 3|| not ] [ 3drop t ] if ; inline
 
 TUPLE: cond-value value quot ;

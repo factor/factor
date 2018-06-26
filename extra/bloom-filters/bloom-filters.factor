@@ -127,7 +127,7 @@ PRIVATE>
 
 : relevant-indices ( object bloom-filter -- n quot: ( elt -- n ) )
     [ double-hashcodes ] [ #hashes-and-length ] bi*
-    [ -rot ] dip '[ _ _ combine-hashcodes _ mod ] ; inline
+    -rotd '[ _ _ combine-hashcodes _ mod ] ; inline
 
 PRIVATE>
 

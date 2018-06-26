@@ -36,7 +36,7 @@ IN: sequences.extras
 : filter-all-subseqs-range ( ... seq range quot: ( ... subseq -- ... ) -- seq )
     [
         '[ <clumps> _ filter ] with map concat
-    ] 3keep 2drop map-like ; inline
+    ] keepdd map-like ; inline
 
 : filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ) -- seq )
     [ dup length [1,b] ] dip filter-all-subseqs-range ; inline
@@ -236,7 +236,7 @@ PRIVATE>
     ] if ; inline
 
 : map-filter-as ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) exemplar -- ... subseq )
-    [ pick ] dip swap length over
+    reach length over
     [ (selector-as) [ compose each ] dip ] 2curry dip like ; inline
 
 : map-filter ( ... seq map-quot: ( ... elt -- ... newelt ) filter-quot: ( ... newelt -- ... ? ) -- ... subseq )
@@ -281,7 +281,7 @@ PRIVATE>
 PRIVATE>
 
 : filter-map-as ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    [ pick ] dip swap length over
+    reach length over
     [ (filter-mapper-for) [ each ] dip ] 2curry dip like ; inline
 
 : filter-map ( ... seq filter-quot: ( ... elt -- ... ? ) map-quot: ( ... elt -- ... newelt ) -- ... newseq )

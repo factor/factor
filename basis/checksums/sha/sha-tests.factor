@@ -84,7 +84,7 @@ CONSTANT: bytes-b B{ 1 2 3 4 5 6 7 8 }
 ERROR: checksums-differ algorithm seq incremental-checksum one-go-checksum ;
 : compare-checksum-calculations ( algorithm seq -- ? )
     2dup [ incremental-checksum ] [ one-go-checksum ] 2bi 2dup = [
-        2drop 2drop t
+        4drop t
     ] [
         checksums-differ
     ] if ;

@@ -95,7 +95,7 @@ os macosx? "openal.alut.macosx" "openal.alut.other" ? require
 
 : create-buffer-from-wav ( filename -- buffer )
     gen-buffer dup rot load-wav-file
-    [ alBufferData ] 4 nkeep alutUnloadWAV ;
+    [ alBufferData ] 4keep alutUnloadWAV ;
 
 : check-error ( -- )
     alGetError dup ALUT_ERROR_NO_ERROR = [

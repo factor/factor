@@ -113,7 +113,7 @@ TUPLE: vbo
         <texture-2d>
     ]
     [
-        0 swap [ allocate-texture-image ] 3keep 2drop
+        0 swap [ allocate-texture-image ] keepdd
     ] bi ;
 
 : <model-buffers> ( models -- buffers )

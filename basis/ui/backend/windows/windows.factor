@@ -458,7 +458,7 @@ SYMBOL: nc-buttons
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
     mouse-captured get [ release-capture ] when
     pick message>button drop dup nc-buttons get member? [
-        nc-buttons get remove! drop 4drop
+        nc-buttons get remove! 5drop
     ] [
         drop prepare-mouse send-button-up
     ] if ;

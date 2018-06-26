@@ -238,7 +238,7 @@ SYMBOL: default-secure-context
     ] [ nip (ssl-error) ] if-zero ;
 
 : check-ssl-error ( ssl ret exra-cases/f -- event/f )
-    [ swap over SSL_get_error ] dip
+    [ tuck SSL_get_error ] dip
     {
         { SSL_ERROR_NONE [ drop f ] }
         { SSL_ERROR_WANT_READ [ drop +input+ ] }

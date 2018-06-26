@@ -574,7 +574,7 @@ MACRO: -nin- ( n -- quot )
 !
 
 : -with- ( invariant begin end quot -- begin end quot' )
-    [ rot ] dip '[ [ _ ] dip @ ] ; inline
+    rotd '[ [ _ ] dip @ ] ; inline
 
 : -2with- ( invariant invariant begin end quot -- begin end quot' )
     -with- -with- ; inline

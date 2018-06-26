@@ -21,7 +21,7 @@ TUPLE: factor-expr        expr ;
         suffix swap prefix >>commands
         over second >>stdin
         over 5 swap nth >>stdout
-        swap 6 swap nth >>background ;
+        6 rot nth >>background ;
 
 : ast>single-quoted-expr ( ast -- obj )
     second >string single-quoted-expr boa ;

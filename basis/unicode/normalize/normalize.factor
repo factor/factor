@@ -137,7 +137,7 @@ DEFER: compose-iter
 
 : try-noncombining ( state char -- state )
     [ drop ] [ [ char>> ] dip combine-chars ] 2bi
-    [ >>char to f >>last-class compose-iter ] when* ; inline
+    [ >>char to f >>last-class compose-iter ] when* ; inline recursive
 
 : compose-iter ( state -- state )
     dup current [
