@@ -1,6 +1,10 @@
 USING: help.markup help.syntax strings ;
-
 IN: cocoa.apple-script
+
+HELP: quote-apple-script 
+{ $values { "str" string } }
+{ $description { "Escape special characters in a string to make it suitable as a literal string in AppleScript code." }
+{ $notes "Because this word is a port from Barney Gale's Elevate.py ("{ $vocab-link elevate }"), the only characters escaped are keys in " { $link apple-script-charmap } "; other special characters are unchanged." } ;
 
 HELP: run-apple-script
 { $values { "str" string } }
