@@ -1,36 +1,14 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences arrays namespaces splitting
-vocabs.loader destructors assocs debugger continuations
-combinators combinators.short-circuit vocabs.refresh
-tools.time math present vectors hashtables
-io
-io.sockets
-io.sockets.secure
-io.encodings
-io.encodings.iana
-io.encodings.utf8
-io.encodings.ascii
-io.encodings.binary
-io.streams.limited
-io.streams.string
-io.streams.throwing
-io.servers
-io.timeouts
-io.crlf
-fry logging logging.insomniac calendar urls
-unicode
-http
-http.server.requests
-http.server.responses
-http.server.remapping
-html.templates
-html.streams
-html
-mime.types
-math.order
-xml.writer
-vocabs ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit continuations debugger destructors fry
+hashtables html html.streams html.templates http
+http.server.remapping http.server.requests http.server.responses
+io io.crlf io.encodings io.encodings.ascii io.encodings.iana
+io.encodings.utf8 io.servers io.sockets io.sockets.secure
+io.streams.limited kernel logging logging.insomniac math
+mime.types namespaces present sequences splitting tools.time
+urls vectors vocabs vocabs.refresh xml.writer ;
 IN: http.server
 
 GENERIC: write-response ( response -- )
@@ -187,7 +165,7 @@ SYMBOL: params
     [
         local-address get
         [ secure? "https" "http" ? >>protocol ]
-        [ port>> remap-port '[ _ or ] change-port ]
+        [ port>> remap-port >>port ]
         bi
     ] change-url drop ;
 
