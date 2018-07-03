@@ -27,6 +27,8 @@ HOOK: lowered  os ( -- )
 
 : elevate ( win-console? posix-graphical? -- ) [ (command-line) t ] 2dip elevated drop ;
 
+os unix? [ "elevate.unix" require ] when
+
 {
     { [ os windows? ] [ "elevate.windows" require ] }
     { [ os linux? ] [ "elevate.linux" require ] }
