@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: cocoa cocoa.application cocoa.classes kernel parser
-multiline words ;
+USING: assocs cocoa cocoa.application cocoa.classes kernel
+multiline parser sequences strings words ;
 IN: cocoa.apple-script
 
 <PRIVATE
@@ -15,10 +15,8 @@ CONSTANT: apple-script-charmap H{
 PRIVATE>
 
 : quote-apple-script ( str -- str' )
-    [
-      1string [ apple-script-charmap at ] [ ] bi or
-    ] { } map-as
-    "" join "\"" dup surround ;
+    [ 1string apple-script-charmap ?at drop ] { } map-as
+    "" concat-as "\"" dup surround ;
 
 : run-apple-script ( str -- )
     [ NSAppleScript -> alloc ] dip
