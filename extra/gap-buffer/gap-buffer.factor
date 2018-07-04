@@ -4,7 +4,7 @@
 ! gap buffer -- largely influenced by Strandh and Villeneuve's Flexichain
 ! for a good introduction see:
 ! https://common-lisp.net/project/flexichain/download/StrandhVilleneuveMoore.pdf
-USING: accessors arrays circular kernel math math.functions
+USING: accessors arrays circular fry kernel math math.functions
 math.order multiline sequences sequences.private ;
 IN: gap-buffer
 
