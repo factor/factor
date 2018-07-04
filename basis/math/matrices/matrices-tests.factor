@@ -383,3 +383,12 @@ CONSTANT: test-points {
 { t } [ { { 1 2 } { 3 4 } } square-matrix? ] unit-test
 { f } [ { { 1 } { 2 3 } } square-matrix? ] unit-test
 { f } [ { { 1 2 } } square-matrix? ] unit-test
+
+{ 9 }
+[ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-1norm ] unit-test
+
+{ 8 }
+[ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-infinity-norm ] unit-test
+
+{ 2.0 }
+[ { { 1 1 } { 1 1 } } frobenius-norm ] unit-test

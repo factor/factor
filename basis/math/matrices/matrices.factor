@@ -141,6 +141,9 @@ IN: math.matrices
 : mmin ( m -- n ) [ 1/0. ] dip [ [ min ] each ] each ;
 : mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
 : mnorm ( m -- n ) dup mmax abs m/n ;
+: m-infinity-norm ( m -- n ) [ [ abs ] map-sum ] map supremum ;
+: m-1norm ( m -- n ) flip m-infinity-norm ;
+: frobenius-norm ( m -- n ) [ [ sq ] map-sum ] map-sum sqrt ;
 
 : cross ( vec1 vec2 -- vec3 )
     [ [ { 1 2 0 } vshuffle ] [ { 2 0 1 } vshuffle ] bi* v* ]
