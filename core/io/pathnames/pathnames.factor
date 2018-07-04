@@ -111,6 +111,9 @@ PRIVATE>
 : prepend-path ( path1 path2 -- path )
     swap append-path ; inline
 
+: 3append-path ( path chunk1 chunk2 -- path' )
+    [ append-path ] dip append-path ; inline
+
 : file-name ( path -- string )
     dup root-directory? [
         trim-tail-separators
