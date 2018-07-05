@@ -487,7 +487,7 @@ ERROR: compound-syntax-disallowed n seq obj ;
 
 : failed-lexing ( assoc -- assoc' ) [ nip array? ] assoc-reject ;
 
-: lex-core ( -- assoc ) core-bootstrap-vocabs lex-vocabs ;
+: lex-core ( -- assoc ) core-vocabs lex-vocabs ;
 : lex-basis ( -- assoc ) basis-vocabs lex-vocabs ;
 : lex-extra ( -- assoc ) extra-vocabs lex-vocabs ;
 : lex-roots ( -- assoc ) lex-core lex-basis lex-extra 3append ;
