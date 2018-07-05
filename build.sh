@@ -590,10 +590,10 @@ set_boot_image_vars() {
 }
 
 set_current_branch() {
-    if [ -z ${TRAVIS_BRANCH} ]; then
-        CURRENT_BRANCH=$(current_git_branch)
+    if [ -n "${CI_BRANCH}" ]; then
+        CURRENT_BRANCH="${CI_BRANCH}"
     else
-        CURRENT_BRANCH=${TRAVIS_BRANCH}
+        CURRENT_BRANCH=$(current_git_branch)
     fi
 }
 

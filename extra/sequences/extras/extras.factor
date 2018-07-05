@@ -628,6 +628,13 @@ PRIVATE>
     [ '[ @ not ] find drop ] keepd swap
     [ dup length ] unless* tail-slice ; inline
 
+: count-head ( seq quot -- n )
+    [ not ] compose find drop ; inline
+
+: count-tail ( seq quot -- n )
+    [ not ] compose [ find-last drop ] 2keep drop
+    length swap [ - 1 - ] when* ; inline
+
 :: interleaved-as ( seq glue exemplar -- newseq )
     seq length dup 1 - + 0 max exemplar new-sequence :> newseq
     seq [ 2 * newseq set-nth-unsafe ] each-index
