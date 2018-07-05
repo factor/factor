@@ -11,9 +11,8 @@ ERROR: not-a-source-path path ;
     "" disk-vocabs-in-root/prefix
     no-prefixes [ name>> ] map ;
 
-: core-vocabs ( -- seq ) "resource:core" vocabs-from ;
-: less-core-test-vocabs ( seq -- seq' )
-    {
+CONSTANT: core-broken-vocabs
+   {
         "vocabs.loader.test.a"
         "vocabs.loader.test.b"
         "vocabs.loader.test.c"
@@ -30,10 +29,10 @@ ERROR: not-a-source-path path ;
         "vocabs.loader.test.n"
         "vocabs.loader.test.o"
         "vocabs.loader.test.p"
-    } diff ;
+    }
 
-: core-bootstrap-vocabs ( -- seq )
-    core-vocabs less-core-test-vocabs ;
+: core-vocabs ( -- seq )
+    "resource:core" vocabs-from core-broken-vocabs diff ;
 
 : basis-vocabs ( -- seq ) "resource:basis" vocabs-from ;
 : extra-vocabs ( -- seq ) "resource:extra" vocabs-from ;
