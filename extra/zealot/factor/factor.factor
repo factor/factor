@@ -4,9 +4,9 @@ USING: accessors arrays bootstrap.image calendar cli.git
 combinators concurrency.combinators formatting fry http.client
 io io.directories io.launcher io.pathnames kernel math.parser
 memory modern.paths namespaces parser.notes prettyprint
-sequences sequences.extras system system-info threads tools.test
-tools.test.private vocabs vocabs.hierarchy
-vocabs.hierarchy.private vocabs.loader zealot ;
+sequences sequences.extras sets splitting system system-info
+threads tools.test tools.test.private vocabs vocabs.hierarchy
+vocabs.hierarchy.private vocabs.loader vocabs.metadata zealot ;
 IN: zealot.factor
 
 : download-boot-checksums ( path branch -- )
@@ -168,3 +168,29 @@ M: windows factor-path "./factor.com" ;
         [ "ZEALOT LOADING ROOTS" print flush drop zealot-load-commands ]
         [ "ZEALOT TESTING ROOTS" print flush drop zealot-test-commands ]
     } 2cleave ;
+
+: vocab-path>vocab ( path -- vocab )
+    [ parent-directory ] map
+    [ "/" split1 nip ] map
+    [ path-separator split harvest "." join ] map ;
+
+: changed-factor-vocabs ( old-rev new-rev -- vocabs )
+    [
+        default-vocab-roots
+        [ ":" split1 nip ] map
+        [ "/" append ] map
+    ] 2dip git-diff-name-only*
+    [ ".factor" tail? ] filter
+    [ swap [ head? ] with any? ] with filter
+    [ parent-directory ] map
+    [ "/" split1 nip ] map
+    [ path-separator split harvest "." join ] map members ;
+
+: changed-factor-vocabs-from-master ( -- vocabs )
+    "master" "origin/master" changed-factor-vocabs ;
+
+: reject-unloadable-vocabs ( vocabs -- vocabs' )
+    [ don't-load? ] reject ;
+
+: ci-vocabs-to-test ( -- vocabs )
+    changed-factor-vocabs-from-master reject-unloadable-vocabs ;
