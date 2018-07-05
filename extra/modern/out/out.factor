@@ -1,10 +1,10 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-constructors continuations io io.encodings.utf8 io.files
+constructors continuations fry io io.encodings.utf8 io.files
 io.streams.string kernel modern modern.paths modern.slices
-prettyprint sequences sequences.extras splitting strings
-vocabs.loader ;
+multiline prettyprint sequences sequences.extras splitting
+strings vocabs.loader ;
 IN: modern.out
 
 : token? ( obj -- ? )
@@ -14,14 +14,14 @@ TUPLE: renamed slice string ;
 CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;
 
 : trim-before-newline ( seq -- seq' )
-    dup [ char: \s = not ] find
-    { char: \r char: \n } member?
+    dup [ CHAR: \s = not ] find
+    { CHAR: \r CHAR: \n } member?
     [ tail-slice ] [ drop ] if ;
 
 : write-whitespace ( last obj -- )
     swap
     [ swap slice-between ] [ slice-before ] if*
-    trim-before-newline io::write ;
+    trim-before-newline io:write ;
 
 GENERIC: write-literal* ( last obj -- last' )
 M: slice write-literal* [ write-whitespace ] [ write ] [ ] tri ;
@@ -84,7 +84,7 @@ DEFER: map-literals
 ]]
 
 : strings-core-to-file ( -- )
-    core-bootstrap-vocabs
+    core-vocabs
     [ ".private" ?tail drop vocab-source-path utf8 file-contents ] map-zip
     [ "[========[" dup matching-delimiter-string surround ] assoc-map
     [
@@ -95,7 +95,7 @@ DEFER: map-literals
     "\n;VOCAB-ROOT>" surround "resource:core-strings.factor" utf8 set-file-contents ;
 
 : parsed-core-to-file ( -- )
-    core-bootstrap-vocabs
+    core-vocabs
     [ vocab>literals ] map-zip
     [
         first2 [ "<VOCAB: " prepend ] dip
