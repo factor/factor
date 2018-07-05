@@ -9,13 +9,15 @@ SYMBOL: vocab-roots
 
 SYMBOL: add-vocab-root-hook
 
+CONSTANT: default-vocab-roots {
+    "resource:core"
+    "resource:basis"
+    "resource:extra"
+    "resource:work"
+}
+
 [
-    V{
-        "resource:core"
-        "resource:basis"
-        "resource:extra"
-        "resource:work"
-    } clone vocab-roots set-global
+    default-vocab-roots V{ } like vocab-roots set-global
 
     [ drop ] add-vocab-root-hook set-global
 ] "vocabs.loader" add-startup-hook
