@@ -40,6 +40,13 @@ before_install:
     wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz &&
     ( cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) &&
     ( [[ "$TRAVIS_OS_NAME" != "osx" ]] && sudo ldconfig || true )
+  - git remote set-branches --add origin master
+  - git fetch # so we can see which vocabs changed versus origin/master...
 script:
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH"
+  - export CI_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
+  - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
-  - ./factor -run=zealot.cli-changed-vocabs | while read line ; do ./factor -e="USING: kernel tools.test vocabs.hierarchy ; \"$line\" [ load ] [ test ] bi" ; done
+  - "./factor -e='USING: memory vocabs.hierarchy ; \"zealot\" load save'"
+  - ./factor -run=zealot.cli-changed-vocabs
+  - ./factor -run=zealot.cli-test-changed-vocabs

@@ -1,11 +1,12 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays bootstrap.image calendar cli.git
-combinators concurrency.combinators formatting fry http.client
-io io.directories io.launcher io.pathnames kernel math.parser
-memory modern.paths namespaces parser.notes prettyprint
-sequences sequences.extras sets splitting system system-info
-threads tools.test tools.test.private vocabs vocabs.hierarchy
+USING: accessors arrays bootstrap.image bootstrap.image.upload
+calendar cli.git combinators concurrency.combinators environment
+formatting fry http.client io io.directories io.launcher
+io.pathnames kernel math.parser memory modern.paths namespaces
+parser.notes prettyprint sequences sequences.extras sets
+splitting system system-info threads tools.test
+tools.test.private vocabs vocabs.hierarchy
 vocabs.hierarchy.private vocabs.loader vocabs.metadata zealot ;
 IN: zealot.factor
 
@@ -187,7 +188,7 @@ M: windows factor-path "./factor.com" ;
     [ path-separator split harvest "." join ] map members ;
 
 : changed-factor-vocabs-from-master ( -- vocabs )
-    "master" "origin/master" changed-factor-vocabs ;
+    "HEAD" "origin/master" changed-factor-vocabs ;
 
 : reject-unloadable-vocabs ( vocabs -- vocabs' )
     [ don't-load? ] reject ;
