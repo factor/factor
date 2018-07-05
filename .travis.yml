@@ -50,3 +50,4 @@ script:
   - "./factor -e='USING: memory vocabs.hierarchy ; \"zealot\" load save'"
   - ./factor -run=zealot.cli-changed-vocabs
   - ./factor -run=zealot.cli-test-changed-vocabs
+  - "./factor -e='USING: modern.paths tools.test sequences ; core-vocabs [ test ] each'"
