@@ -42,3 +42,4 @@ before_install:
     ( [[ "$TRAVIS_OS_NAME" != "osx" ]] && sudo ldconfig || true )
 script:
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
+  - ./factor -run=zealot.cli-changed-vocabs | while read line ; do ./factor -e="USING: kernel tools.test vocabs.hierarchy ; \"$line\" [ load ] [ test ] bi" ; done
