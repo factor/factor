@@ -38,7 +38,7 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-diff-name-only* ( from to -- lines )
     [ { "git" "diff" "--name-only" } ] 2dip 2array append git-command>lines ;
 : git-diff-name-only ( path from to -- lines )
-    [ git-diff-name-only* ] with-directory ;
+    '[ _ _ git-diff-name-only* ] with-directory ;
 
 : git-repository? ( directory -- ? )
     ".git" append-path current-directory get prepend-path
