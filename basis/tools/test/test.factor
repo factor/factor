@@ -212,6 +212,8 @@ M: test-failure error. ( error -- )
 
 : test-main ( -- )
     command-line get [ [ load ] [ test ] bi ] each
-    test-failures get empty? [ 0 ] [ 1 ] if exit ;
+    test-failures get empty?
+    [ [ "==== FAILING TESTS" print :test-failures ] unless ]
+    [ 0 1 ? exit ] bi ;
 
 MAIN: test-main
