@@ -22,10 +22,12 @@ IN: kernel.tests
     }
 } [ 1 2 10 <iota> [ 3array ] 2with map ] unit-test
 
+
 ! Don't leak extra roots if error is thrown
 { } [ 1000 [ [ 3 throw ] ignore-errors ] times ] unit-test
 
-{ } [ 1000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test
+[ -1 f <array> ] must-fail
+{ } [ 1000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test ! Travis CI fails
 
 ! Make sure we report the correct error on stack underflow
 [ clear drop ] [
