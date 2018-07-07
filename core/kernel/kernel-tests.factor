@@ -27,7 +27,8 @@ IN: kernel.tests
 { } [ 1000 [ [ 3 throw ] ignore-errors ] times ] unit-test
 
 [ -1 f <array> ] must-fail
-{ } [ 1000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test ! Travis CI fails
+{ } [ 10 [ [ -1 f <array> ] ignore-errors ] times ] unit-test
+! { } [ 1000 [ [ -1 f <array> ] ignore-errors ] times ] unit-test ! Travis CI fails
 
 ! Make sure we report the correct error on stack underflow
 [ clear drop ] [
