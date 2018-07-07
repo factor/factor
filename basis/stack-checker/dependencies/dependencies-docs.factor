@@ -11,7 +11,7 @@ HELP: +definition+
 { $description "Word that indicates that the dependency is a definition dependency. It is a dependency among two words in which one word depends on the definition of the another. For example, if two words are defined as " { $snippet ": o ( -- ) i ;" } " and " { $snippet ": i ( -- ) ; inline" } ", then 'o' has a definition dependency to 'i' because 'i' is inline. If the definition of 'i' changes 'o' must be recompiled." } ;
 
 HELP: add-depends-on-class
-{ $values { "obj" classoid } }
+{ $values { "classoid" classoid } }
 { $description "Adds a " { $link +conditional+ } " dependency from the word to the classes mentioned in the classoid." } ;
 
 HELP: conditional-dependencies

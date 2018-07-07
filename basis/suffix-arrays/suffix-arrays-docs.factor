@@ -7,7 +7,7 @@ IN: suffix-arrays
 HELP: >suffix-array
 { $values
      { "seq" sequence }
-     { "array" array } }
+     { "suffix-array" array } }
 { $description "Creates a suffix array from the input sequence. Suffix arrays are arrays of slices." } ;
 
 HELP: SA{

@@ -6,6 +6,7 @@ HELP: (gl-program)
 { $values
   { "shaders" sequence }
   { "quot" quotation }
+  { "program" "a new " { $link gl-program } }
 } { $description
     "Creates a gl program and attaches the shaders to it. Then applies the quotation to the program and finally links it."
   }

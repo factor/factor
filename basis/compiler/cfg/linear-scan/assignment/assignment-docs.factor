@@ -72,7 +72,7 @@ HELP: vreg>reg
 { $see-also lookup-spill-slot pending-interval-assoc } ;
 
 HELP: vregs>regs
-{ $values { "assoc" "an " { $link assoc } " (set) of virtual registers" } { "assoc" assoc } }
+{ $values { "assoc" "an " { $link assoc } " (set) of virtual registers" } { "assoc'" assoc } }
 { $description "Creates a mapping of virtual registers to registers." } ;
 
 HELP: vreg>spill-slot

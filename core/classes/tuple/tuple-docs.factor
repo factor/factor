@@ -455,7 +455,7 @@ HELP: bad-superclass
 { $error-description "Thrown if an attempt is made to subclass a class that is not a tuple class, or a tuple class declared " { $link POSTPONE: final } "." } ;
 
 HELP: ?offset-of-slot
-{ $values { "name" string } { "tuple" tuple } { "n" { $maybe integer } } }
+{ $values { "name" string } { "tuple" tuple } { "n/f" { $maybe integer } } }
 { $description "Returns the offset of a tuple slot accessed by " { $snippet "name" } ", or " { $link f } " if no slot with that name." } ;
 
 HELP: offset-of-slot

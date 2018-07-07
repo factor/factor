@@ -522,7 +522,7 @@ HOOK: fused-unboxing? cpu ( -- ? )
 HOOK: immediate-arithmetic? cpu ( n -- ? )
 HOOK: immediate-bitwise? cpu ( n -- ? )
 HOOK: immediate-comparand? cpu ( n -- ? )
-HOOK: immediate-store? cpu ( obj -- ? )
+HOOK: immediate-store? cpu ( n -- ? )
 
 M: object immediate-comparand? ( n -- ? )
     {

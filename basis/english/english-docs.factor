@@ -110,7 +110,7 @@ HELP: count-of-things
 } ;
 
 HELP: ?pluralize
-{ $values { "count" number } { "singular" string } { "singluar/plural" string } }
+{ $values { "count" number } { "singular" string } { "singular/plural" string } }
 { $description "A simpler variant of " { $link count-of-things } " which omits its input value from the output. As with " { $link count-of-things } ", " { $snippet "word" } " is expected to be in singular form." }
 { $notes { $list $keep-case $0-plurality } }
 { $examples
@@ -189,7 +189,7 @@ HELP: comma-list
 } ;
 
 HELP: or-markup-example
-{ $values { "markup" "a sequence of markup elements" } { "classes" "a sequence of words" } }
+{ $values { "classes" "a sequence of words" } { "markup" "a sequence of markup elements" } }
 { $description "Used to implement " { $link $or-markup-example } " and demonstrate " { $link comma-list } "." }
 { $examples { "See the examples in " { $link $or-markup-example } "." } } ;
 

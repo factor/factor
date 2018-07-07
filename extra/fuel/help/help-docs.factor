@@ -6,7 +6,7 @@ HELP: article-parents
 { $description "All the parent articles for the article and ensures that the ancestor always is 'handbook'." } ;
 
 HELP:  get-article
-{ $values { "name" string } { "str" string } }
+{ $values { "name" string } { "element" string } }
 { $description "If an article and a vocab share name, we render the vocab instead." } ;
 
 HELP: find-word

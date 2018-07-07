@@ -39,7 +39,7 @@ ARTICLE: "vocabs.metadata" "Vocabulary metadata"
 ABOUT: "vocabs.metadata"
 
 HELP: vocab-file-lines
-{ $values { "vocab" "a vocabulary specifier" } { "name" string } { "lines" { $maybe { $sequence "lines" } } } }
+{ $values { "vocab" "a vocabulary specifier" } { "name" string } { "lines/f" { $maybe { $sequence "lines" } } } }
 { $description "Outputs the lines of the file named " { $snippet "name" } " from the vocabulary's directory, or " { $link f } " if the file does not exist." } ;
 
 HELP: set-vocab-file-lines
