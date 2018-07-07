@@ -48,6 +48,6 @@ script:
   - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
   - "./factor -e='USING: memory vocabs.hierarchy ; \"zealot\" load save'"
-  - ./factor -run=zealot.cli-changed-vocabs
-  - ./factor -run=zealot.cli-test-changed-vocabs
+  - './factor -run=tools.test `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'
+#  - ./factor -run=zealot.cli-changed-vocabs
 #  - "./factor -e='USING: modern.paths tools.test sequences ; core-vocabs [ test ] each'"
