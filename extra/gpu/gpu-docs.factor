@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: gpu.private help.markup help.syntax ui.gadgets.worlds ;
+USING: gpu.private help.markup help.syntax ui.gadgets.worlds
+gpu.textures gpu.state gpu.framebuffers gpu.shaders gpu.render ;
 IN: gpu
 
 HELP: finish-gpu
