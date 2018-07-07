@@ -1,12 +1,12 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays bootstrap.image bootstrap.image.upload
-calendar cli.git combinators concurrency.combinators environment
-formatting fry http.client io io.directories io.launcher
-io.pathnames kernel math.parser memory modern.paths namespaces
-parser.notes prettyprint sequences sequences.extras sets
-splitting system system-info threads tools.test
-tools.test.private vocabs vocabs.hierarchy
+USING: accessors arrays assocs bootstrap.image
+bootstrap.image.upload calendar cli.git combinators
+concurrency.combinators environment formatting fry http.client
+io io.directories io.launcher io.pathnames kernel math.parser
+memory modern.paths namespaces parser.notes prettyprint
+sequences sequences.extras sets splitting system system-info
+threads tools.test tools.test.private vocabs vocabs.hierarchy
 vocabs.hierarchy.private vocabs.loader vocabs.metadata zealot ;
 IN: zealot.factor
 
@@ -170,6 +170,10 @@ M: windows factor-path "./factor.com" ;
         [ "ZEALOT TESTING ROOTS" print flush drop zealot-test-commands ]
     } 2cleave ;
 
+: factor-clean-branch ( -- str )
+    os cpu [ name>> ] bi@ { { CHAR: . CHAR: - } } substitute
+    "-" glue "origin/clean-" prepend ;
+
 : vocab-path>vocab ( path -- vocab )
     [ parent-directory ] map
     [ "/" split1 nip ] map
@@ -190,8 +194,21 @@ M: windows factor-path "./factor.com" ;
 : changed-factor-vocabs-from-master ( -- vocabs )
     "HEAD" "origin/master" changed-factor-vocabs ;
 
+: changed-factor-vocabs-from-clean ( -- vocabs )
+    "HEAD" factor-clean-branch changed-factor-vocabs ;
+
+: testing-a-branch? ( -- ? )
+    "CI_BRANCH" os-env "master" or
+    "master" = not ;
+
 : reject-unloadable-vocabs ( vocabs -- vocabs' )
     [ don't-load? ] reject ;
 
+! Test changes from a CI_BRANCH against origin/master
+! Test master against last clean build, e.g. origin/clean-linux-x86-64
 : ci-vocabs-to-test ( -- vocabs )
-    changed-factor-vocabs-from-master reject-unloadable-vocabs ;
+    testing-a-branch? [
+        changed-factor-vocabs-from-master
+    ] [
+        changed-factor-vocabs-from-clean
+    ] if reject-unloadable-vocabs ;
