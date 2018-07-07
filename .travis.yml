@@ -65,5 +65,4 @@ script:
   - './factor -run=zealot.cli-changed-vocabs'
   - './factor -run=tools.test `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'
   - './factor -run=help.lint `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'
-#  - ./factor -run=zealot.cli-changed-vocabs
-#  - "./factor -e='USING: modern.paths tools.test sequences ; core-vocabs [ test ] each'"
+  - "./factor -e='USING: modern.paths tools.test sequences ; core-vocabs [ test ] each'"
