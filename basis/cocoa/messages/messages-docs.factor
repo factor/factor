@@ -8,7 +8,7 @@ HELP: send
 { $notes "This word uses a special fast code path if " { $snippet "selector" } " is a literal and the word containing the call to " { $link send } " is compiled." } ;
 
 HELP: super-send
-{ $values { "receiver" alien } { "args..." "method arguments" } { "selector" string } { "signature" "signature" } { "return..." "value returned by method, if any" } }
+{ $values { "receiver" alien } { "args..." "method arguments" } { "signature" "signature" } { "selector" string } { "return..." "value returned by method, if any" } }
 { $description "Sends an Objective C message named by " { $snippet "selector" } " to the super class of " { $snippet "receiver" } ". Otherwise behaves identically to " { $link send } "." } ;
 
 HELP: objc-class
