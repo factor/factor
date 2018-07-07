@@ -41,6 +41,12 @@ before_install:
     ( cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) &&
     ( [[ "$TRAVIS_OS_NAME" != "osx" ]] && sudo ldconfig || true )
   - git remote set-branches --add origin master
+  - git remote set-branches --add origin clean-windows-x86-64
+  - git remote set-branches --add origin clean-windows-x86-32
+  - git remote set-branches --add origin clean-linux-x86-64
+  - git remote set-branches --add origin clean-linux-x86-32
+  - git remote set-branches --add origin clean-macosx-x86-64
+  - git remote set-branches --add origin clean-macosx-x86-32
   - git fetch # so we can see which vocabs changed versus origin/master...
 script:
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH"
