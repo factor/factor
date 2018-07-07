@@ -57,6 +57,12 @@ $nl
 
 HELP: y-at
 { $description "Given two points on a straight line and an " { $snippet "x" } " coordinate, calculate the " { $snippet "y" } " coordinate at " { $snippet "x" } " on that line." }
+{ $values
+    { "x" object }
+    { "point1" object }
+    { "point2" object }
+    { "y" object }
+}
 { $examples
     { $example
         "USING: ui.gadgets.charts.lines.private prettyprint ;"
@@ -77,6 +83,12 @@ HELP: y-at
 
 HELP: calc-x
 { $description "Given the " { $snippet "slope" } " of a line and a random " { $snippet "point" } " belonging to that line, calculate the " { $snippet "x" } " coordinate corresponding to the given " { $snippet "y" } "." }
+{ $values
+    { "slope" object }
+    { "y" object }
+    { "point" object }
+    { "x" object }
+}
 { $examples
     { $example
         "USING: ui.gadgets.charts.lines.private prettyprint ;"
@@ -92,6 +104,12 @@ HELP: calc-x
 
 HELP: calc-y
 { $description "Given the " { $snippet "slope" } " of a line and a random " { $snippet "point" } " belonging to that line, calculate the " { $snippet "y" } " coordinate corresponding to the given " { $snippet "x" } "." }
+{ $values
+    { "slope" object }
+    { "x" object }
+    { "point" object }
+    { "y" object }
+}
 { $examples
     { $example
         "USING: ui.gadgets.charts.lines.private prettyprint ;"
@@ -107,6 +125,11 @@ HELP: calc-y
 
 HELP: calc-line-slope
 { $description "Given the two points belonging to a straight line, calculate the " { $snippet "slope" } " of the line, assuming the line equation is " { $snippet "y(x) = slope * x + b" } "."
+{ $values
+    { "point1" object }
+    { "point2" object }
+    { "slope" object }
+}
 $nl
 "The formula for the calculation is " { $snippet "slope = (y1-y2) / (x1-x2)" } ", therefore it'll throw a division by zero error if both points have the same " { $snippet "x" } " coordinate." }
 { $examples

@@ -75,6 +75,7 @@ init-relocation [ RAX RBX 3 -14 RCX RDX %write-barrier ] B{ } make disassemble
 
 HELP: %alien-invoke
 { $values
+  { "varargs?" boolean }
   { "reg-inputs" sequence }
   { "stack-inputs" sequence }
   { "reg-outputs" sequence }
@@ -292,12 +293,18 @@ HELP: %store-memory-imm
 HELP: %test-imm-branch
 { $values
   { "label" "branch destination" }
+  { "cc" "comparison symbol" }
   { "src1" "register" }
   { "src2" "immediate" }
-  { "cc" "comparison symbol" }
 } { $description "Emits a TEST instruction with a register and an immediate, followed by a branch." } ;
 
 HELP: %unbox
+{ $values
+  { "dst" "destination register" }
+  { "src" "source register" }
+  { "func" "function?" }
+  { "rep" representation }
+}
 { $description "Call a function to convert a tagged pointer into a value that can be passed to a C function, or returned from a callback." } ;
 
 HELP: %vector>scalar

@@ -32,13 +32,13 @@ HELP: TYPED::
 { $example
 "USING: kernel math math.libm prettyprint typed ;
 IN: scratchpad
-
+<<
 TYPED:: quadratic-roots ( a: float b: float c: float -- q1: float q2: float )
     b neg
     b sq 4.0 a * c * - fsqrt
     [ + ] [ - ] 2bi
     [ 2.0 a * / ] bi@ ;
-
+>>
 1 0 -9/4 quadratic-roots [ . ] bi@"
 "1.5
 -1.5" } } ;

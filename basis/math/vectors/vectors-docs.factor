@@ -304,7 +304,7 @@ HELP: vmin
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmin ." "{ -7 2 3 }" } } ;
 
 HELP: vclamp
-{ $values { "v" "a sequence of real numbers" } { "min" "a sequence of real numbers" } { "max" "a sequence of real numbers" } }
+{ $values { "v" "a sequence of real numbers" } { "min" "a sequence of real numbers" } { "max" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
 { $description "Creates a sequence where each element is clamped to the minimum and maximum elements of the " { $snippet "min" } " and " { $snippet "max" } " sequences." }
 { $examples
   { $example

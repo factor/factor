@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax assocs help.markup help.syntax strings words
-;
+USING: alien alien.syntax assocs help.markup help.syntax kernel
+strings ;
 IN: alien.libraries
 
 HELP: add-library
@@ -73,7 +73,7 @@ HELP: library
 } ;
 
 HELP: library-dll
-{ $values { "name" string } { "dll" "a DLL handle" } }
+{ $values { "obj" object } { "dll" "a DLL handle" } }
 { $description "Looks up a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } "." } ;
 
 HELP: remove-library

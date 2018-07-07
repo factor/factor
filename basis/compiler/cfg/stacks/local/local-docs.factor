@@ -51,7 +51,7 @@ HELP: height-state
 { $see-also inc-stack reset-incs } ;
 
 HELP: height-state>insns
-{ $values { "state" sequence } { "insns" sequence } }
+{ $values { "height-state" height-state } { "insns" sequence } }
 { $description "Converts a " { $link height-state } " tuple to 0-2 stack height change instructions." }
 { $examples
   "In this example the datastacks height is increased by 4 and the retainstacks decreased by 2."
@@ -67,7 +67,7 @@ HELP: inc-stack
 { $description "Increases or decreases the data or retain stack depending on if loc is a " { $link ds-loc } " or " { $link rs-loc } " instance. An " { $link ##inc } " instruction will later be inserted." } ;
 
 HELP: local-loc>global
-{ $values { "loc" loc } { "bb" basic-block } { "loc'" loc } }
+{ $values { "loc" loc } { "height-state" height-state } { "loc'" loc } }
 { $description "Translates a stack location relative to a block to an absolute one. The word does the opposite to " { $link global-loc>local } "." } ;
 
 HELP: loc>vreg
@@ -76,10 +76,11 @@ HELP: loc>vreg
 
 HELP: local-kill-set
 { $values
-  { "ds-height" integer }
+  { "ds-begin" integer }
   { "ds-inc" integer }
-  { "rs-height" integer }
+  { "rs-begin" integer }
   { "rs-inc" integer }
+  { "set" hash-set }
 }
 { $description "The set of stack locations that was killed. Locations on a stack are deemed killed if that stacks height is decremented." }
 { $see-also compute-local-kill-set } ;

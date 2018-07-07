@@ -1210,12 +1210,12 @@ HELP: supremum
 { min max supremum infimum } related-words
 
 HELP: shortest
-{ $values { "seq" sequence } { "elt" object } }
-{ $description "Outputs the shortest element of " { $snippet "seq" } "." } ;
+{ $values { "seqs" sequence } { "elt" object } }
+{ $description "Outputs the shortest sequence from " { $snippet "seqs" } "." } ;
 
 HELP: longest
-{ $values { "seq" sequence } { "elt" object } }
-{ $description "Outputs the longest element of " { $snippet "seq" } "." } ;
+{ $values { "seqs" sequence } { "elt" object } }
+{ $description "Outputs the longest sequence from " { $snippet "seqs" } "." } ;
 
 { shortest longest } related-words
 

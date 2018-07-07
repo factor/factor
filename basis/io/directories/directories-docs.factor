@@ -20,7 +20,7 @@ $nl
   "This variable should never be set directly; instead, use " { $link set-current-directory } " or " { $link with-directory } ". This preserves the invariant that the value of this variable is an absolute path." } ;
 
 HELP: make-parent-directories
-{ $values { "path" "a pathname string" } }
+{ $values { "filename" "a pathname string" } }
 { $description "Creates all parent directories of the path which do not yet exist." }
 { $errors "Throws an error if the directories could not be created." } ;
 

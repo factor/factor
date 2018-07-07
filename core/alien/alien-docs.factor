@@ -95,7 +95,7 @@ HELP: c-ptr
 { $class-description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects all can be used as values of " { $link pointer } " C types." } ;
 
 HELP: alien-invoke
-{ $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } { "return..." "the return value of the function, if not " { $link void } } }
+{ $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } { "varargs?" boolean } { "return..." "the return value of the function, if not " { $link void } } }
 { $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected." }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
 { $errors "Throws an " { $link callsite-not-compiled } " if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler." } ;
