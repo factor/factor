@@ -1,7 +1,7 @@
-USING: accessors english help.lint.coverage
+USING: accessors english eval help.lint.coverage
 help.lint.coverage.private help.markup help.syntax kernel
-literals math math.matrices sequences sorting tools.test vocabs
-;
+literals math math.matrices multiline sequences sorting
+tools.test vocabs ;
 IN: help.lint.coverage.tests
 
 <PRIVATE
@@ -67,3 +67,33 @@ PRIVATE>
 ! make sure this doesn't throw an error (would signify an issue with ignored-words)
 ! the contents of all-words is not important
 { } [ all-words [ <word-help-coverage> ] map drop ] unit-test
+
+
+! Lint system is written weirdly, there's no way to invoke it and get the output
+! Instead, it writes to lint-failures.
+{ }
+[
+    [[
+        USING: assocs math kernel namespaces help.syntax help.lint help.lint.private ;
+        IN: help.lint.tests
+        <<
+        : add-stuff ( x y -- z ) + ;
+
+        HELP: add-stuff ;
+        >>
+        H{ } clone lint-failures [ \ add-stuff check-word lint-failures get ] with-variable
+        assoc-empty? [ "help-lint is broken" throw ] when
+    ]] eval( -- )
+] unit-test
+
+
+! clean up broken words
+[[
+  USING: definitions ;
+  IN: help.lint.coverage.tests.private
+<<
+\ empty forget
+\ nonexistent forget
+\ defined forget
+>>
+]] eval( -- )
