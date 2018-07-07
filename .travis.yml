@@ -11,6 +11,14 @@ group: deprecated-2017Q4
 services:
   - postgresql
   - redis-server
+branches:
+  except:
+  - clean-windows-x86-64
+  - clean-windows-x86-32
+  - clean-linux-x86-64
+  - clean-linux-x86-32
+  - clean-macosx-x86-64
+  - clean-macosx-x86-32
 addons:
   apt:
     packages:
