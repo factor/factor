@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fuel.help fuel.help.private help help.topics sequences
 tools.test ;
+USE: io.servers ! required for a test to pass
 
 {
     {
