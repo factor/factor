@@ -8,7 +8,7 @@ io.files.types io.pathnames io.ports io.streams.c io.streams.null
 io.timeouts kernel libc literals locals math math.bitwise namespaces
 sequences specialized-arrays system threads tr vectors windows
 windows.errors windows.handles windows.kernel32 windows.shell32
-windows.time windows.types windows.winsock ;
+windows.time windows.types windows.winsock splitting ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
@@ -326,10 +326,13 @@ M: windows root-directory? ( path -- ? )
         [ drop f ]
     } cond ;
 
-: prepend-prefix ( string -- string' )
+: prepend-unicode-prefix ( string -- string' )
     dup unicode-prefix head? [
         unicode-prefix prepend
     ] unless ;
+
+: remove-unicode-prefix ( string -- string' )
+    unicode-prefix ?head drop ;
 
 TR: normalize-separators "/" "\\" ;
 
@@ -340,13 +343,20 @@ TR: normalize-separators "/" "\\" ;
 
 PRIVATE>
 
+M: windows canonicalize-path
+    remove-unicode-prefix canonicalize-path* ;
+
+M: object root-path remove-unicode-prefix root-path* ;
+
+M: object relative-path remove-unicode-prefix relative-path* ;
+
 M: windows normalize-path ( string -- string' )
     dup unc-path? [
         normalize-separators
     ] [
         absolute-path
         normalize-separators
-        prepend-prefix
+        prepend-unicode-prefix
     ] if ;
 
 <PRIVATE

@@ -1,6 +1,6 @@
 USING: io.backend io.directories io.files.private io.files.temp
-io.files.unique io.pathnames kernel locals math namespaces
-system tools.test ;
+io.files.unique io.pathnames kernel locals math multiline
+namespaces sequences system tools.test ;
 
 { "passwd" } [ "/etc/passwd" file-name ] unit-test
 { "awk" } [ "/usr/libexec/awk/" file-name ] unit-test
@@ -81,3 +81,80 @@ H{
 
 { t } [ "~" home [ "foo" append-path ] bi@ [ normalize-path ] same? ] unit-test
 { t } [ os windows? "~\\~/" "~/~/" ? "~" "~" append-path [ path-components ] same? ] unit-test
+
+! Absolute paths
+os windows? [
+    { "c:/" } [ "c:/" canonicalize-path ] unit-test
+    { "c:/" } [ "c:/." canonicalize-path ] unit-test
+    { "c:/" } [ "c:/.." canonicalize-path ] unit-test
+    { "c:/" } [ "c:/Users/.." canonicalize-path ] unit-test
+    { "c:/" } [ "c:/Users/../" canonicalize-path ] unit-test
+    { "c:/" } [ "c:/Users/../." canonicalize-path ] unit-test
+    { "c:/" } [ "c:/Users/.././" canonicalize-path ] unit-test
+    { "c:/" } [ "c:/Users/.././././././" canonicalize-path ] unit-test
+    { "c:/" } [ "c:/Users/../././/////./././/././././//././././././." canonicalize-path ] unit-test
+    { "c:/" } [ "c:/Users/../../../..////.././././././/../" canonicalize-path ] unit-test
+    { "c:/Users" } [ "c:/Users/../../../Users" canonicalize-path ] unit-test
+
+    { "c:/Users" } [ "c:/Users" canonicalize-path ] unit-test
+    { "c:/Users" } [ "c:/Users/." canonicalize-path ] unit-test
+    { "c:/Users\\foo\\bar" } [ "c:/Users/foo/bar" canonicalize-path ] unit-test
+] [
+    { "/" } [ "/" canonicalize-path ] unit-test
+    { "/" } [ "/." canonicalize-path ] unit-test
+    { "/" } [ "/.." canonicalize-path ] unit-test
+    { "/" } [ "/Users/.." canonicalize-path ] unit-test
+    { "/" } [ "/Users/../" canonicalize-path ] unit-test
+    { "/" } [ "/Users/../." canonicalize-path ] unit-test
+    { "/" } [ "/Users/.././" canonicalize-path ] unit-test
+    { "/" } [ "/Users/.././././././" canonicalize-path ] unit-test
+    { "/" } [ "/Users/../././/////./././/././././//././././././." canonicalize-path ] unit-test
+    { "/" } [ "/Users/../../../..////.././././././/../" canonicalize-path ] unit-test
+    { "/Users" } [ "/Users/../../../Users" canonicalize-path ] unit-test
+
+    { "/Users" } [ "/Users" canonicalize-path ] unit-test
+    { "/Users" } [ "/Users/." canonicalize-path ] unit-test
+    { "/Users/foo/bar" } [ "/Users/foo/bar" canonicalize-path ] unit-test
+] if
+
+
+! Relative paths
+{ "." } [ f canonicalize-path ] unit-test
+{ "." } [ "" canonicalize-path ] unit-test
+{ "." } [ "." canonicalize-path ] unit-test
+{ "." } [ "./" canonicalize-path ] unit-test
+{ "." } [ "./." canonicalize-path ] unit-test
+{ ".." } [ ".." canonicalize-path ] unit-test
+{ ".." } [ "../" canonicalize-path ] unit-test
+{ ".." } [ "../." canonicalize-path ] unit-test
+{ ".." } [ ".././././././//." canonicalize-path ] unit-test
+
+{ t } [ "../.." canonicalize-path { "../.." "..\\.." } member? ] unit-test
+{ t } [ "../../" canonicalize-path { "../.." "..\\.." } member? ] unit-test
+{ t } [ "../.././././/./././" canonicalize-path { "../.." "..\\.." } member? ] unit-test
+
+
+! Root paths
+os windows? [
+    { "d:\\" } [ "d:\\" root-path ] unit-test
+    { "d:\\" } [ "d:\\\\\\\\//////" root-path ] unit-test
+    { "c:\\" } [ "c:\\Users\\merlen" root-path ] unit-test
+    { "c:\\" } [ "c:\\\\\\//Users//\\//merlen//" root-path ] unit-test
+    { "d:\\" } [ "d:\\././././././/../../../" root-path ] unit-test
+    { "d:\\" } [ "d:\\merlen\\dog" root-path ] unit-test
+
+    { "d:\\" } [ "\\\\?\\d:\\" root-path ] unit-test
+    { "d:\\" } [ "\\\\?\\d:\\\\\\\\//////" root-path ] unit-test
+    { "c:\\" } [ "\\\\?\\c:\\Users\\merlen" root-path ] unit-test
+    { "c:\\" } [ "\\\\?\\c:\\\\\\//Users//\\//merlen//" root-path ] unit-test
+    { "d:\\" } [ "\\\\?\\d:\\././././././/../../../" root-path ] unit-test
+    { "d:\\" } [ "\\\\?\\d:\\merlen\\dog" root-path ] unit-test
+] [
+    { "/" } [ "/" root-path ] unit-test
+    { "/" } [ "//" root-path ] unit-test
+    { "/" } [ "/Users" root-path ] unit-test
+    { "/" } [ "//Users" root-path ] unit-test
+    { "/" } [ "/Users/foo/bar////././." root-path ] unit-test
+    { "/" } [ "/Users/foo/bar////.//../../../../../../////./." root-path ] unit-test
+    { "/" } [ "/Users/////" root-path ] unit-test
+] if
