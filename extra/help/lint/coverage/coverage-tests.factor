@@ -71,31 +71,38 @@ PRIVATE>
 
 ! Lint system is written weirdly, there's no way to invoke it and get the output
 ! Instead, it writes to lint-failures.
-{ }
+{ t }
 [
     [[
         USING: assocs definitions math kernel namespaces help.syntax
-        help.lint help.lint.private ;
+        help.lint help.lint.private continuations compiler.units ;
         IN: help.lint.tests
         <<
         : add-stuff ( x y -- z ) + ;
 
         HELP: add-stuff ;
         >>
-        H{ } clone lint-failures [ \ add-stuff check-word lint-failures get ] with-variable
-        assoc-empty? [ "help-lint is broken" throw ] when
-        << \ add-stuff forget >>
-    ]] eval( -- )
+        [
+            H{ } clone lint-failures [
+                \ add-stuff check-word lint-failures get
+                assoc-empty? [ "help-lint is broken" throw ] when
+            ] with-variable t
+        ] [
+            [ \ add-stuff forget ] with-compilation-unit
+        ] [
+            f
+        ] cleanup
+    ]] eval( -- ? )
 ] unit-test
 
 
 ! clean up broken words
 [[
-  USING: definitions ;
+  USING: definitions compiler.units ;
   IN: help.lint.coverage.tests.private
-<<
-\ empty forget
-\ nonexistent forget
-\ defined forget
->>
+[
+    \ empty forget
+    \ nonexistent forget
+    \ defined forget
+] with-compilation-unit
 ]] eval( -- )
