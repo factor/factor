@@ -44,6 +44,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start redis; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start postgresql; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm get stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
   - >
     wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz &&
     ( cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) &&
