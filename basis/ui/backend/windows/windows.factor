@@ -578,7 +578,7 @@ M: windows-ui-backend do-events
         0 >>cbWndExtra
         f GetModuleHandle >>hInstance
         f GetModuleHandle "APPICON" native-string>alien LoadIcon >>hIcon
-        f IDC_ARROW LoadCursor >>hCursor
+        f IDC_ARROW MAKEINTRESOURCE LoadCursor >>hCursor
 
         class-name-ptr >>lpszClassName
         RegisterClassEx win32-error=0/f
