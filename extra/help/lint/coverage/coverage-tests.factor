@@ -74,7 +74,8 @@ PRIVATE>
 { }
 [
     [[
-        USING: assocs math kernel namespaces help.syntax help.lint help.lint.private ;
+        USING: assocs definitions math kernel namespaces help.syntax
+        help.lint help.lint.private ;
         IN: help.lint.tests
         <<
         : add-stuff ( x y -- z ) + ;
@@ -83,6 +84,7 @@ PRIVATE>
         >>
         H{ } clone lint-failures [ \ add-stuff check-word lint-failures get ] with-variable
         assoc-empty? [ "help-lint is broken" throw ] when
+        << \ add-stuff forget >>
     ]] eval( -- )
 ] unit-test
 
