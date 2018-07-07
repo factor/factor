@@ -123,7 +123,9 @@ HELP: circular-clump
 { $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements, wrapping around the end of the sequence, and collects the clumps into a new array." }
 { $notes "For an empty sequence, the result is an empty sequence." }
 { $examples
-    { $example "USING: grouping prettyprint ;" "{ 3 1 3 3 7 } 2 circular-clump ." "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } { 7 3 } }" }
+    { $example "USING: grouping prettyprint ;"
+    "{ 3 1 3 3 7 } 2 circular-clump ."
+    "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } { 7 3 } }" }
 } ;
 
 HELP: <clumps>
