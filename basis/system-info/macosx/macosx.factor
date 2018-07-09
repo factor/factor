@@ -1,12 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: alien alien.c-types alien.data alien.strings alien.syntax
-arrays assocs byte-arrays combinators core-foundation io.binary
-io.encodings.utf8 libc kernel math namespaces sequences
-specialized-arrays system system-info unix ;
+USING: alien.c-types alien.data alien.strings alien.syntax
+arrays assocs byte-arrays core-foundation io.binary
+io.encodings.utf8 kernel libc sequences specialized-arrays
+splitting system system-info ;
 SPECIALIZED-ARRAY: int
-
 IN: system-info.macosx
 
 <PRIVATE
