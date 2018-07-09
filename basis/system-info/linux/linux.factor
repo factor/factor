@@ -26,3 +26,4 @@ M: linux cpus parse-proc-cpuinfo sort-cpus cpu-counts 2drop ;
 : hyperthreads ( -- n ) parse-proc-cpuinfo sort-cpus cpu-counts 2nip ;
 M: linux cpu-mhz parse-proc-cpuinfo first cpu-mhz>> 1,000,000 * ;
 M: linux physical-mem parse-proc-meminfo mem-total>> ;
+M: linux computer-name nodename ;

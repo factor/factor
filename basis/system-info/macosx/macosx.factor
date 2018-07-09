@@ -101,3 +101,5 @@ M: macosx cpu-mhz ( -- n ) { 6 15 } sysctl-query-uint ;
 : tb-frequency ( -- n ) { 6 23 } sysctl-query-uint ;
 M: macosx physical-mem ( -- n ) { 6 24 } sysctl-query-ulonglong ;
 : available-cpus ( -- n ) { 6 25 } sysctl-query-uint ;
+
+M: macosx computer-name { 1 10 } sysctl-query-string "." split1 drop ;
