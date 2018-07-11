@@ -66,6 +66,8 @@ CONSTANT: registry-value-max-length 16384
 : grow-buffer ( byte-array -- byte-array' )
     length 2 * <byte-array> ;
 
+PRIVATE>
+
 :: reg-query-value-ex ( key subkey ptr1 ptr2 buffer -- buffer )
     buffer length uint <ref> :> pdword
     key subkey ptr1 ptr2 buffer pdword [ RegQueryValueEx ] 2keep
@@ -183,8 +185,6 @@ TUPLE: registry-enum-key ;
 
 : set-reg-sz ( hkey value lpdata cbdata -- )
     [ REG_SZ ] 2dip set-reg-key ;
-
-PRIVATE>
 
 : windows-performance-data ( -- byte-array )
     HKEY_PERFORMANCE_DATA "Global" f f
