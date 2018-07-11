@@ -68,16 +68,16 @@ CONSTANT: registry-value-max-length 16384
 
 PRIVATE>
 
-:: reg-query-value-ex ( key subkey ptr1 ptr2 buffer -- buffer )
+:: reg-query-value-ex ( key value-name ptr1 lpType buffer -- buffer )
     buffer length uint <ref> :> pdword
-    key subkey ptr1 ptr2 buffer pdword [ RegQueryValueEx ] 2keep
+    key value-name ptr1 lpType buffer pdword [ RegQueryValueEx ] 2keep
     rot :> ret
     ret ERROR_SUCCESS = [
         uint deref head
     ] [
         ret ERROR_MORE_DATA = [
             2drop
-            key subkey ptr1 ptr2 buffer
+            key value-name ptr1 lpType buffer
             grow-buffer reg-query-value-ex
         ] [
             ret n>win32-error-string throw
