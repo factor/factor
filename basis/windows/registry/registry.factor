@@ -1,4 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays
 classes.struct continuations io.encodings.string

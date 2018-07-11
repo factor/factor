@@ -1,4 +1,5 @@
 ! Copyright (C) 2010 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays io.encodings.string io.encodings.utf16n
 kernel sequences tools.test windows.advapi32 windows.kernel32
