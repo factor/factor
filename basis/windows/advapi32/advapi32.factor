@@ -1317,7 +1317,14 @@ FUNCTION: LONG RegDeleteKeyExW (
 ALIAS: RegDeleteKeyEx RegDeleteKeyExW
 
 ! : RegDeleteValueA ;
-! : RegDeleteValueW ;
+
+FUNCTION: LONG RegDeleteValueW (
+        HKEY    hKey,
+        LPCWSTR lpValueName
+    )
+
+ALIAS: RegDeleteValue RegDeleteValueW
+
 ! : RegDisablePredefinedCache ;
 ! : RegEnumKeyA ;
 ! : RegEnumKeyExA ;
