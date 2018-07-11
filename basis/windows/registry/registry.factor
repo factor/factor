@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types byte-arrays kernel locals sequences
-windows.advapi32 windows.errors math windows
-windows.kernel32 windows.time accessors alien.data
-windows.types classes.struct continuations ;
+USING: accessors alien.c-types alien.data byte-arrays
+classes.struct continuations io.encodings.string
+io.encodings.utf16n kernel literals locals math sequences sets
+splitting windows windows.advapi32 windows.errors
+windows.kernel32 windows.time windows.types ;
 IN: windows.registry
 
 ERROR: open-key-failed key subkey mode error-string ;
@@ -192,3 +193,24 @@ TUPLE: registry-enum-key ;
 
 : read-registry ( key subkey -- registry-info )
     KEY_READ [ reg-query-info-key ] with-open-registry-key ;
+
+:: change-registry-value ( key subkey value-name quot: ( value -- value' ) -- )
+    0 DWORD <ref> :> type
+    key subkey KEY_QUERY_VALUE KEY_SET_VALUE bitor [
+        dup :> hkey value-name f type MAX_PATH <byte-array>
+        reg-query-value-ex
+        type DWORD deref ${ REG_SZ REG_EXPAND_SZ REG_MULTI_SZ } in?
+        dup :> string-type? [
+            utf16n decode type DWORD deref REG_MULTI_SZ = [
+                "\0" split 2
+            ] [ 1 ] if head*
+        ] when
+        quot call( x -- x' )
+        string-type? [
+            type DWORD deref REG_MULTI_SZ = [
+                "\0" join 2
+            ] [ 1 ] if [ CHAR: \0 suffix ] times utf16n encode
+        ] when
+        [ hkey value-name type DWORD deref ] dip dup length
+        set-reg-key
+    ] with-open-registry-key ;
