@@ -85,6 +85,13 @@ PRIVATE>
         ] if
     ] if ;
 
+: delete-value ( key value-name -- )
+    RegDeleteValue dup ERROR_SUCCESS = [
+        drop
+    ] [
+        n>win32-error-string throw
+    ] if ;
+
 TUPLE: registry-info
 key
 class-name
