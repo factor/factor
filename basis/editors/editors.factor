@@ -1,11 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar continuations debugger
-definitions fry io io.launcher io.pathnames kernel namespaces
+definitions io io.launcher io.pathnames kernel namespaces
 prettyprint sequences source-files.errors splitting strings
-threads tools.crossref ui ui.gadgets ui.gadgets.borders
-ui.gadgets.buttons ui.gadgets.packs ui.gadgets.scrollers
-ui.tools.listener vocabs vocabs.files vocabs.hierarchy
+threads tools.crossref vocabs vocabs.files vocabs.hierarchy
 vocabs.loader vocabs.metadata words ;
 IN: editors
 
@@ -128,13 +126,3 @@ M: word edit-tests vocabulary>> edit-tests ;
 
 : edit-summary ( vocab -- )
     dup vocab-summary-path vocab-append-path 1 edit-location ;
-
-: <reload-editor-button> ( editor -- button )
-    dup '[ drop [ _ reload ] \ run call-listener ] <border-button> ;
-
-: <editor-reloader> ( -- gadget )
-    <filled-pile> { 2 2 } >>gap available-editors
-    [ <reload-editor-button> add-gadget ] each ;
-
-MAIN-WINDOW: editor-window { { title "Editors" } }
-    <editor-reloader> { 2 2 } <border> <scroller> >>gadgets ;
