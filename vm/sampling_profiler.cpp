@@ -73,6 +73,9 @@ void factor_vm::record_sample(bool prolog_p) {
 
   bool skip_p = prolog_p;
   auto recorder = [&](cell frame_top, cell size, code_block* owner, cell addr) {
+    (void)frame_top;
+    (void)size;
+    (void)addr;
     if (skip_p)
       skip_p = false;
     else {

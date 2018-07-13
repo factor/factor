@@ -194,6 +194,8 @@ typedef enum _EXCEPTION_DISPOSITION {
 
 LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                   void* dispatch) {
+  (void)frame;
+  (void)dispatch;
   switch (e->ExceptionCode) {
     case EXCEPTION_ACCESS_VIOLATION:
       set_memory_protection_error(e->ExceptionInformation[1], c->EIP);
@@ -242,7 +244,7 @@ VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
 // On Unix SIGINT (ctrl-c) automatically interrupts blocking io system
 // calls. It doesn't on Windows, so we need to manually send some
 // cancellation requests to unblock the thread.
-VOID CALLBACK dummy_cb (ULONG_PTR dwParam) { }
+VOID CALLBACK dummy_cb(ULONG_PTR dwParam) { (void)dwParam; }
 
 // CancelSynchronousIo is not in Windows XP
 #if _WIN32_WINNT >= 0x0600
@@ -261,7 +263,7 @@ static void wake_up_thread(HANDLE thread) {
   }
 }
 #else
-static void wake_up_thread(HANDLE thread) {}
+static void wake_up_thread(HANDLE thread) { (void)thread; }
 #endif
 
 static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {

@@ -62,6 +62,7 @@ void factor_vm::print_alien(ostream& out, alien* alien, cell nesting) {
 }
 
 void factor_vm::print_byte_array(ostream& out, byte_array* array, cell nesting) {
+  (void)nesting;
   cell length = array->capacity;
   cell i;
   bool trimmed;

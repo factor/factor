@@ -263,7 +263,7 @@ void free_list_allocator<Block>::sweep(Iterator& iter) {
 }
 
 template <typename Block> void free_list_allocator<Block>::sweep() {
-  auto null_sweep = [](Block* free_block, cell size) { };
+  auto null_sweep = [](Block* free_block, cell size) { (void)free_block; (void)size; };
   sweep(null_sweep);
 }
 
