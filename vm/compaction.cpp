@@ -109,6 +109,8 @@ void factor_vm::collect_compact_impl() {
     // Slide everything in tenured space up, and update data and code heap
     // pointers inside objects.
     auto compact_object_func = [&](object* old_addr, object* new_addr, cell size) {
+      (void)old_addr;
+      (void)size;
       forwarder.visit_slots(new_addr);
       forwarder.visit_object_code_block(new_addr);
       tenured->starts.record_object_start_offset(new_addr);
@@ -120,6 +122,7 @@ void factor_vm::collect_compact_impl() {
     auto compact_code_func = [&](code_block* old_addr,
                                  code_block* new_addr,
                                  cell size) {
+      (void)size;
       forwarder.visit_code_block_objects(new_addr);
       cell old_entry_point = old_addr->entry_point();
       forwarder.visit_instruction_operands(new_addr, old_entry_point);
@@ -136,6 +139,7 @@ void factor_vm::collect_compact_impl() {
   // the code heap. Since the code heap has now been compacted, those
   // pointers are invalid and we need to update them.
   auto callback_updater = [&](code_block* stub, cell size) {
+    (void)size;
     callbacks->update(stub);
   };
   callbacks->allocator->iterate(callback_updater, no_fixup());

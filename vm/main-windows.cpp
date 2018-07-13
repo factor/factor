@@ -16,6 +16,10 @@ VM_C_API int wmain(int argc, wchar_t** argv) {
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int nCmdShow) {
+  (void)hInstance;
+  (void)hPrevInstance;
+  (void)lpCmdLine;
+  (void)nCmdShow;
   int argc;
   wchar_t** argv = CommandLineToArgvW(GetCommandLine(), &argc);
   wmain(argc, argv);

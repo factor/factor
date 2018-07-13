@@ -177,6 +177,7 @@ void factor_vm::fixup_heaps(cell data_offset, cell code_offset) {
   visitor.visit_all_roots();
 
   auto start_object_updater = [&](object *obj, cell size) {
+    (void)size;
     data->tenured->starts.record_object_start_offset(obj);
     visitor.visit_slots(obj);
     switch (obj->type()) {
@@ -201,6 +202,7 @@ void factor_vm::fixup_heaps(cell data_offset, cell code_offset) {
   data->tenured->iterate(start_object_updater, fixup);
 
   auto updater = [&](code_block* compiled, cell size) {
+    (void)size;
     visitor.visit_code_block_objects(compiled);
     cell rel_base = compiled->entry_point() - fixup.code_offset;
     visitor.visit_instruction_operands(compiled, rel_base);
