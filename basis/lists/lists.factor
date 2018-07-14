@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash, Daniel Ehrenberg, Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit kernel locals math
-sequences ;
+parser sequences ;
 IN: lists
 
 ! List Protocol
@@ -102,3 +102,7 @@ INSTANCE: +nil+ list
 GENERIC: >list ( object -- list )
 
 M: list >list ;
+
+M: sequence >list sequence>list ;
+
+SYNTAX: L{ \ } [ sequence>list ] parse-literal ;
