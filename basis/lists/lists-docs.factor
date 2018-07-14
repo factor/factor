@@ -28,6 +28,7 @@ ARTICLE: "lists-protocol" "The list protocol"
 ARTICLE: "lists-strict" "Constructing strict lists"
 "Strict lists are simply cons cells where the car and cdr have already been evaluated. These are the lists of Lisp. To construct a strict list, the following words are provided:"
 { $subsections
+    \ L{
     cons
     swons
     sequence>list
@@ -61,6 +62,15 @@ ARTICLE: "lists-manipulation" "Manipulating lists"
     lappend
     lcut
 } ;
+
+HELP: L{
+{ $syntax "L{ val1 val2... }" }
+{ $values { "val1" object } { "val2" object } }
+{ $example
+    "USING: lists prettyprint ; L{ 1 2 3 } ."
+    "L{ 1 2 3 }"
+}
+{ $description "Constructs a list literal from a sequence." } ;
 
 HELP: cons
 { $values { "car" "the head of the list cell" } { "cdr" "the tail of the list cell" } { "cons-state" list } }
