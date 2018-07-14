@@ -3,8 +3,8 @@
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
 classes.tuple combinators continuations effects generic
-hash-sets hashtables io.pathnames io.styles kernel make math
-math.order math.parser namespaces prettyprint.config
+hash-sets hashtables io.pathnames io.styles kernel lists make
+math math.order math.parser namespaces prettyprint.config
 prettyprint.custom prettyprint.sections prettyprint.stylesheet
 quotations sbufs sequences strings vectors words ;
 QUALIFIED: sets
@@ -213,6 +213,7 @@ M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
 M: byte-vector pprint-delims drop \ BV{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
+M: list pprint-delims drop \ L{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
 M: tuple pprint-delims drop \ T{ \ } ;
 M: wrapper pprint-delims drop \ W{ \ } ;
@@ -227,6 +228,7 @@ M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
 M: byte-vector >pprint-sequence ;
 M: callable >pprint-sequence ;
+M: list >pprint-sequence list>array ;
 M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
@@ -268,6 +270,7 @@ M: byte-vector pprint* pprint-object ;
     nesting-limit [ dup [ 1 + ] [ f ] if* ] change
     [ nesting-limit set ] curry [ ] cleanup ; inline
 
+M: list pprint* pprint-object ;
 M: hashtable pprint*
     [ pprint-object ] with-extra-nesting-level ;
 M: curried pprint* pprint-object ;
