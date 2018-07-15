@@ -32,6 +32,7 @@ addons:
       - cmake
       - libaio-dev
       - libsnappy-dev
+      - clang-6.0
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
@@ -61,6 +62,7 @@ before_install:
   - git remote set-branches --add origin clean-macosx-x86-64
   - git remote set-branches --add origin clean-macosx-x86-32
   - git fetch # so we can see which vocabs changed versus origin/master...
+  - clang --version
 script:
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH"
   - export CI_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
