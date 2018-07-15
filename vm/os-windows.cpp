@@ -12,13 +12,13 @@ bool set_memory_locked(cell base, cell size, bool locked) {
 }
 
 void factor_vm::init_ffi() {
-  hFactorDll = GetModuleHandle(NULL);
+  hFactorDll = GetModuleHandle(nullptr);
   if (!hFactorDll)
     fatal_error("GetModuleHandle() failed", 0);
 }
 
 void factor_vm::ffi_dlopen(dll* dll) {
-  dll->handle = LoadLibraryEx((WCHAR*)alien_offset(dll->path), NULL, 0);
+  dll->handle = LoadLibraryEx((WCHAR*)alien_offset(dll->path), nullptr, 0);
 }
 
 cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
@@ -32,13 +32,13 @@ cell factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
 
 void factor_vm::ffi_dlclose(dll* dll) {
   FreeLibrary((HMODULE) dll->handle);
-  dll->handle = NULL;
+  dll->handle = nullptr;
 }
 
 BOOL factor_vm::windows_stat(vm_char* path) {
   BY_HANDLE_FILE_INFORMATION bhfi;
-  HANDLE h = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
-                         OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  HANDLE h = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr,
+                         OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 
   if (h == INVALID_HANDLE_VALUE) {
     // FindFirstFile is the only call that can stat c:\pagefile.sys
@@ -61,7 +61,7 @@ const vm_char* factor_vm::default_image_path() {
   vm_char* ptr;
   vm_char temp_path[MAX_UNICODE_PATH];
 
-  if (!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+  if (!GetModuleFileName(nullptr, full_path, MAX_UNICODE_PATH))
     fatal_error("GetModuleFileName() failed", 0);
 
   if ((ptr = wcsrchr(full_path, '.')))
@@ -79,7 +79,7 @@ const vm_char* factor_vm::default_image_path() {
 // You must free() this yourself.
 const vm_char* factor_vm::vm_executable_path() {
   vm_char full_path[MAX_UNICODE_PATH];
-  if (!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+  if (!GetModuleFileName(nullptr, full_path, MAX_UNICODE_PATH))
     fatal_error("GetModuleFileName() failed", 0);
   return safe_strdup(full_path);
 }
@@ -95,7 +95,7 @@ segment::segment(cell size_, bool executable_p) {
   char* mem;
   cell alloc_size = getpagesize() * 2 + size;
   if ((mem = (char*)VirtualAlloc(
-           NULL, alloc_size, MEM_COMMIT,
+           nullptr, alloc_size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
       0) {
     fatal_error("Out of memory in VirtualAlloc", alloc_size);
@@ -141,7 +141,7 @@ bool move_file(const vm_char* path1, const vm_char* path2) {
 void factor_vm::init_signals() {}
 
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
-  return (void*)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) start_routine,
+  return (void*)CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE) start_routine,
                              args, 0, 0);
 }
 
@@ -254,7 +254,7 @@ static void wake_up_thread(HANDLE thread) {
     // CancelSynchronousIo() didn't find anything to cancel, let's try
     // with QueueUserAPC() instead.
     if (err == ERROR_NOT_FOUND) {
-      if (!QueueUserAPC(&dummy_cb, thread, NULL)) {
+      if (!QueueUserAPC(&dummy_cb, thread, nullptr)) {
         fatal_error("QueueUserAPC() failed", GetLastError());
       }
     } else {
@@ -307,7 +307,7 @@ static DWORD WINAPI ctrl_break_thread_proc(LPVOID parent_vm) {
     } else if (!ctrl_break_handled) {
       /* Check if the VM thread has the same Id as the thread Id of the
          currently active window. Note that thread Id is not a handle. */
-      DWORD fg_thd_id = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+      DWORD fg_thd_id = GetWindowThreadProcessId(GetForegroundWindow(), nullptr);
       if ((fg_thd_id == vm->thread_id) && !vm->fep_p) {
         vm->enqueue_fep();
         ctrl_break_handled = true;
@@ -320,22 +320,22 @@ static DWORD WINAPI ctrl_break_thread_proc(LPVOID parent_vm) {
 
 void factor_vm::primitive_disable_ctrl_break() {
   stop_on_ctrl_break = false;
-  if (ctrl_break_thread != NULL) {
+  if (ctrl_break_thread != nullptr) {
     DWORD wait_result = WaitForSingleObject(ctrl_break_thread,
                                             2 * ctrl_break_sleep);
     if (wait_result != WAIT_OBJECT_0)
       TerminateThread(ctrl_break_thread, 0);
     CloseHandle(ctrl_break_thread);
-    ctrl_break_thread = NULL;
+    ctrl_break_thread = nullptr;
   }
 }
 
 void factor_vm::primitive_enable_ctrl_break() {
   stop_on_ctrl_break = true;
-  if (ctrl_break_thread == NULL) {
+  if (ctrl_break_thread == nullptr) {
     DisableProcessWindowsGhosting();
-    ctrl_break_thread = CreateThread(NULL, 0, factor::ctrl_break_thread_proc,
-                                     static_cast<LPVOID>(this), 0, NULL);
+    ctrl_break_thread = CreateThread(nullptr, 0, factor::ctrl_break_thread_proc,
+                                     static_cast<LPVOID>(this), 0, nullptr);
     SetThreadPriority(ctrl_break_thread, THREAD_PRIORITY_ABOVE_NORMAL);
   }
 }
@@ -397,8 +397,8 @@ static DWORD WINAPI sampler_thread_entry(LPVOID parent_vm) {
 }
 
 void factor_vm::start_sampling_profiler_timer() {
-  sampler_thread = CreateThread(NULL, 0, &sampler_thread_entry,
-                                static_cast<LPVOID>(this), 0, NULL);
+  sampler_thread = CreateThread(nullptr, 0, &sampler_thread_entry,
+                                static_cast<LPVOID>(this), 0, nullptr);
 }
 
 void factor_vm::end_sampling_profiler_timer() {
@@ -408,7 +408,7 @@ void factor_vm::end_sampling_profiler_timer() {
   if (wait_result != WAIT_OBJECT_0)
     TerminateThread(sampler_thread, 0);
   CloseHandle(sampler_thread);
-  sampler_thread = NULL;
+  sampler_thread = nullptr;
 }
 
 void abort() { ::abort(); }

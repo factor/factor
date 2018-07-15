@@ -1,13 +1,13 @@
-#ifndef __FACTOR_MASTER_H__
-#define __FACTOR_MASTER_H__
+#ifndef FACTOR_MASTER_H
+#define FACTOR_MASTER_H
 
-#ifndef _THREAD_SAFE
-#define _THREAD_SAFE
-#endif
+//#ifndef _THREAD_SAFE
+//#define _THREAD_SAFE
+//#endif
 
-#ifndef _REENTRANT
-#define _REENTRANT
-#endif
+//#ifndef _REENTRANT
+//#define _REENTRANT
+//#endif
 
 #include <errno.h>
 
@@ -139,4 +139,4 @@ namespace factor { struct factor_vm; }
 #include "mvm.hpp"
 #include "factor.hpp"
 
-#endif // __FACTOR_MASTER_H__
+#endif // FACTOR_MASTER_H

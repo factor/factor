@@ -16,10 +16,10 @@ char* factor_vm::pinned_alien_offset(cell obj) {
         return (char*)ptr->address;
     }
     case F_TYPE:
-      return NULL;
+      return nullptr;
     default:
       type_error(ALIEN_TYPE, obj);
-      return NULL; // can't happen
+      return nullptr; // can't happen
   }
 }
 
@@ -118,12 +118,12 @@ void factor_vm::primitive_dlsym() {
   if (to_boolean(library.value())) {
     dll* d = untag_check<dll>(library.value());
 
-    if (d->handle == NULL)
+    if (d->handle == nullptr)
       ctx->replace(false_object);
     else
       ctx->replace(allot_alien(ffi_dlsym(d, sym)));
   } else
-    ctx->replace(allot_alien(ffi_dlsym(NULL, sym)));
+    ctx->replace(allot_alien(ffi_dlsym(nullptr, sym)));
 }
 
 // look up a symbol in a native library
@@ -138,25 +138,25 @@ void factor_vm::primitive_dlsym_raw() {
   if (to_boolean(library.value())) {
     dll* d = untag_check<dll>(library.value());
 
-    if (d->handle == NULL)
+    if (d->handle == nullptr)
       ctx->replace(false_object);
     else
       ctx->replace(allot_alien(ffi_dlsym_raw(d, sym)));
   } else
-    ctx->replace(allot_alien(ffi_dlsym_raw(NULL, sym)));
+    ctx->replace(allot_alien(ffi_dlsym_raw(nullptr, sym)));
 }
 
 // close a native library handle
 void factor_vm::primitive_dlclose() {
   dll* d = untag_check<dll>(ctx->pop());
-  if (d->handle != NULL)
+  if (d->handle != nullptr)
     ffi_dlclose(d);
 }
 
 void factor_vm::primitive_dll_validp() {
   cell library = ctx->peek();
   if (to_boolean(library))
-    ctx->replace(tag_boolean(untag_check<dll>(library)->handle != NULL));
+    ctx->replace(tag_boolean(untag_check<dll>(library)->handle != nullptr));
   else
     ctx->replace(special_objects[OBJ_CANONICAL_TRUE]);
 }
@@ -169,10 +169,10 @@ char* factor_vm::alien_offset(cell obj) {
     case ALIEN_TYPE:
       return (char*)untag<alien>(obj)->address;
     case F_TYPE:
-      return NULL;
+      return nullptr;
     default:
       type_error(ALIEN_TYPE, obj);
-      return NULL; // can't happen
+      return nullptr; // can't happen
   }
 }
 

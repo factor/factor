@@ -50,8 +50,10 @@ inline static THREADHANDLE thread_id() { return pthread_self(); }
 uint64_t nano_count();
 void sleep_nanos(uint64_t nsec);
 
+void* stdin_loop(void* arg);
+
 void check_ENOMEM(const char* msg);
 
-static inline void breakpoint() { __builtin_trap(); }
+__attribute__((noreturn)) static inline void breakpoint() { __builtin_trap(); }
 
 }

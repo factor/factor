@@ -155,7 +155,7 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell size) {
       // Allocate a block this big
       free_heap_block* large_block = find_free_block(large_block_size);
       if (!large_block)
-        return NULL;
+        return nullptr;
 
       large_block = split_free_block(large_block, large_block_size);
 
@@ -192,7 +192,7 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell size) {
       return block;
     }
 
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -206,7 +206,7 @@ Block* free_list_allocator<Block>::allot(cell size) {
     block = split_free_block(block, size);
     return (Block*)block;
   }
-  return NULL;
+  return nullptr;
 }
 
 template <typename Block>
@@ -299,7 +299,7 @@ template <typename Iterator, typename Fixup>
 void free_list_allocator<Block>::iterate(Iterator& iter, Fixup fixup) {
   cell scan = this->start;
   while (scan != this->end) {
-    Block* block = (Block*)scan;
+    Block* block = reinterpret_cast<Block*>(scan);
     cell size = fixup.size(block);
     if (!block->free_p())
       iter(block, size);

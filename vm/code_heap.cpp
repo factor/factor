@@ -20,9 +20,9 @@ code_heap::code_heap(cell size) {
 
 code_heap::~code_heap() {
   delete allocator;
-  allocator = NULL;
+  allocator = nullptr;
   delete seg;
-  seg = NULL;
+  seg = nullptr;
 }
 
 void code_heap::write_barrier(code_block* compiled) {

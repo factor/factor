@@ -374,7 +374,7 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_object_code_block(object* obj) {
   switch (obj->type()) {
     case WORD_TYPE: {
-      word* w = (word*)obj;
+      word* w = static_cast<word*>(obj);
       if (w->entry_point)
         w->entry_point = fixup.fixup_code(w->code())->entry_point();
       break;

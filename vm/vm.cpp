@@ -3,33 +3,33 @@
 namespace factor {
 
 factor_vm::factor_vm(THREADHANDLE thread)
-    : ctx(NULL),
+    : ctx(nullptr),
       nursery(0, 0),
       faulting_p(false),
       thread(thread),
 #if defined(WINDOWS)
       thread_id(GetCurrentThreadId()),
-      ctrl_break_thread(NULL),
+      ctrl_break_thread(nullptr),
 #endif
       callback_id(0),
-      c_to_factor_func(NULL),
+      c_to_factor_func(nullptr),
       sampling_profiler_p(false),
       signal_pipe_input(0),
       signal_pipe_output(0),
       current_sample(0, 0, 0, 0, 0),
       gc_off(false),
-      data(NULL), code(NULL), callbacks(NULL),
-      current_gc(NULL),
+      data(nullptr), code(nullptr), callbacks(nullptr),
+      current_gc(nullptr),
       current_gc_p(false),
       current_jit_count(0),
-      gc_events(NULL),
+      gc_events(nullptr),
       fep_p(false),
       fep_help_was_shown(false),
       fep_disabled(false),
       full_output(false),
       object_counter(0),
       last_nano_count(0),
-      signal_callstack_seg(NULL),
+      signal_callstack_seg(nullptr),
       safepoint_fep_p(false),
       stop_on_ctrl_break(false) {
   primitive_reset_dispatch_stats();
@@ -54,7 +54,7 @@ factor_vm::~factor_vm() {
     delete code;
   if (signal_callstack_seg) {
     delete signal_callstack_seg;
-    signal_callstack_seg = NULL;
+    signal_callstack_seg = nullptr;
   }
   FACTOR_FOR_EACH(function_descriptors) {
     delete[] * iter;

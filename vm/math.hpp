@@ -40,18 +40,18 @@ inline double factor_vm::untag_float_check(cell tagged) {
 }
 
 inline fixnum factor_vm::float_to_fixnum(cell tagged) {
-  return (fixnum)untag_float(tagged);
+  return static_cast<fixnum>(untag_float(tagged));
 }
 
 inline double factor_vm::fixnum_to_float(cell tagged) {
-  return (double)untag_fixnum(tagged);
+  return static_cast<double>(untag_fixnum(tagged));
 }
 
 inline cell factor_vm::unbox_array_size() {
   cell obj = ctx->pop();
   fixnum n = to_fixnum_strict(obj);
-  if (n >= 0 && n < (fixnum)array_size_max) {
-    return n;
+  if (n >= 0 && n < static_cast<fixnum>(array_size_max)) {
+    return static_cast<cell>(n);
   }
   general_error(ERROR_ARRAY_SIZE, obj, tag_fixnum(array_size_max));
   return 0; // can't happen

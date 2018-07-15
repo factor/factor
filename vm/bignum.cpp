@@ -776,7 +776,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
     }
   }
 
-  if (quotient != NULL) {
+  if (quotient != nullptr) {
     bignum *q_ = allot_bignum(length_n - length_d, q_negative_p);
     data_root<bignum> q(q_, this);
 
@@ -793,7 +793,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
                                        shift);
       bignum_destructive_normalization(denominator.untagged(), v, shift);
       bignum_divide_unsigned_normalized(u.untagged(), v, q.untagged());
-      if (remainder != NULL)
+      if (remainder != nullptr)
         bignum_destructive_unnormalization(u.untagged(), shift);
     }
 
@@ -806,7 +806,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
         (BIGNUM_REF(u.untagged(), (length_n - 1))) = 0;
         bignum_divide_unsigned_normalized(u.untagged(),
                                           denominator.untagged(),
-                                          NULL);
+                                          nullptr);
       } else {
         bignum* v = allot_bignum(length_d, 0);
         bignum_destructive_normalization(numerator.untagged(),
@@ -815,14 +815,14 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
         bignum_destructive_normalization(denominator.untagged(),
                                          v,
                                          shift);
-        bignum_divide_unsigned_normalized(u.untagged(), v, NULL);
-        if (remainder != NULL)
+        bignum_divide_unsigned_normalized(u.untagged(), v, nullptr);
+        if (remainder != nullptr)
           bignum_destructive_unnormalization(u.untagged(), shift);
       }
   }
 
   u.set_untagged(bignum_trim(u.untagged()));
-  if (remainder != NULL)
+  if (remainder != nullptr)
     *remainder = u.untagged();
 }
 
@@ -836,7 +836,7 @@ void factor_vm::bignum_divide_unsigned_normalized(bignum* u, bignum* v,
   bignum_digit_type* u_scan_start = (u_scan - v_length);
   bignum_digit_type* v_start = (BIGNUM_START_PTR(v));
   bignum_digit_type* v_end = (v_start + v_length);
-  bignum_digit_type* q_scan = NULL;
+  bignum_digit_type* q_scan = nullptr;
   bignum_digit_type v1 = (v_end[-1]);
   bignum_digit_type v2 = (v_end[-2]);
   bignum_digit_type ph; // high half of double-digit product
@@ -1422,7 +1422,7 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
 
   data_root<bignum> arg1(arg1_, this);
 
-  bignum* result = NULL;
+  bignum* result = nullptr;
   bignum_digit_type* scan1;
   bignum_digit_type* scanr;
   bignum_digit_type* end;

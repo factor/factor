@@ -21,9 +21,9 @@ callback_heap::callback_heap(cell size, factor_vm* parent) {
 
 callback_heap::~callback_heap() {
   delete allocator;
-  allocator = NULL;
+  allocator = nullptr;
   delete seg;
-  seg = NULL;
+  seg = nullptr;
 }
 
 instruction_operand callback_heap::callback_operand(code_block* stub,
