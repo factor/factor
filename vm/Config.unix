@@ -12,7 +12,7 @@ PLAF_DLL_OBJS = vm/os-unix.o
 PLAF_EXE_OBJS += vm/main-unix.o
 PLAF_MASTER_HEADERS += vm/os-unix.hpp
 
-FFI_TEST_CFLAGS = -fPIC -stdlib=libc++
+FFI_TEST_CFLAGS = -fPIC
 
 # LINKER = gcc -shared -o
 # LINK_WITH_ENGINE = '-Wl,-rpath,$$ORIGIN' -lfactor

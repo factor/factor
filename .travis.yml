@@ -21,6 +21,7 @@ branches:
   - clean-macosx-x86-32
 addons:
   apt:
+    update: true
     packages:
       - links
       - libblas-dev
@@ -31,7 +32,6 @@ addons:
       - cmake
       - libaio-dev
       - libsnappy-dev
-      - libc++-dev
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
