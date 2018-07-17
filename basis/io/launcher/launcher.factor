@@ -236,6 +236,9 @@ PRIVATE>
 : with-process-reader ( desc encoding quot -- )
     with-process-reader* check-success ; inline
 
+: process-lines ( desc -- lines )
+    utf8 <process-reader> stream-lines ;
+
 <PRIVATE
 
 : (process-writer) ( desc encoding -- stream process )

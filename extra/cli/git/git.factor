@@ -12,9 +12,6 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-command>string ( quot -- string )
     utf8 <process-reader> stream-contents [ blank? ] trim-tail ;
 
-: git-command>lines ( quot -- string )
-    utf8 <process-reader> stream-lines ;
-
 : git-clone-as ( uri path -- process ) [ { "git" "clone" } ] 2dip 2array append run-process ;
 : git-clone ( uri -- process ) [ { "git" "clone" } ] dip suffix run-process ;
 : git-pull* ( -- process ) { "git" "pull" } run-process ;
@@ -36,7 +33,7 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : git-rev-parse* ( branch -- string ) [ { "git" "rev-parse" } ] dip suffix git-command>string ;
 : git-rev-parse ( path branch -- string ) '[ _ git-rev-parse* ] with-directory ;
 : git-diff-name-only* ( from to -- lines )
-    [ { "git" "diff" "--name-only" } ] 2dip 2array append git-command>lines ;
+    [ { "git" "diff" "--name-only" } ] 2dip 2array append process-lines ;
 : git-diff-name-only ( path from to -- lines )
     '[ _ _ git-diff-name-only* ] with-directory ;
 
