@@ -117,7 +117,7 @@ $nl
 ABOUT: "slots"
 
 HELP: bad-initial-value
-{ $error-description "Thrown by " { $link POSTPONE: TUPLE: } " if a slot has an impossible initial value. "
+{ $error-description "Thrown by " { $link POSTPONE: TUPLE: } " if a slot has an impossible initial value."
   { $examples
     { $unchecked-example
       "TUPLE: a { b integer initial: \"invalid\" } ;"
