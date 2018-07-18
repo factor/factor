@@ -91,7 +91,7 @@ HELP: ndrop
 HELP: nrot
 { $values { "n" integer } }
 { $description "A generalization of " { $link rot } " that works for any "
-"number of items on the stack. "
+"number of items on the stack."
 }
 { $examples
   { $example "USING: arrays generalizations kernel prettyprint ;" "1 2 3 4 4 nrot 4array ." "{ 2 3 4 1 }" }
@@ -105,7 +105,7 @@ HELP: nrot
 HELP: -nrot
 { $values { "n" integer } }
 { $description "A generalization of " { $link -rot } " that works for any "
-"number of items on the stack. "
+"number of items on the stack."
 }
 { $examples
   { $example "USING: arrays generalizations kernel prettyprint ;" "1 2 3 4 4 -nrot 4array ." "{ 4 1 2 3 }" }

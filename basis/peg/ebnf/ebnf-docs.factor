@@ -346,7 +346,7 @@ ARTICLE: "peg.ebnf.foreign-rules" "EBNF Foreign Rules"
 ARTICLE: "peg.ebnf.tokenizers" "EBNF Tokenizers"
 "It is possible to override the tokenizer in an EBNF defined parser. "
 "Usually the input sequence to be parsed is an array of characters or a string. "
-"Terminals in a rule match successive characters in the array or string. "
+"Terminals in a rule match successive characters in the array or string."
 { $examples
     { $code
         "USING: multiline ;"
@@ -392,7 +392,7 @@ ARTICLE: "peg.ebnf.tokenizers" "EBNF Tokenizers"
 "instead of the string \"++--\". With the new tokenizer \"....\" sequences "
 "in the grammar are matched for equality against the token, rather than a "
 "string comparison against successive items in the sequence. This can be used "
-"to match an AST from a tokenizer. "
+"to match an AST from a tokenizer."
 $nl
 "In this example I split the tokenizer into a separate parser and use "
 "'foreign' to call it from the main one. This allows testing of the "
@@ -463,7 +463,7 @@ $nl
 "This tokenizer strips out whitespace and newlines. Some rules in the grammar "
 "require checking for a newline. In particular the automatic semicolon insertion "
 "rule (managed by the 'Sc' rule here). If there is a newline, the semicolon can "
-"be optional in places. "
+"be optional in places."
 { $examples
     { $code
       "\"do\" Stmt:s \"while\" \"(\" Expr:c \")\" Sc    => [[ s c ast-do-while boa ]]"
@@ -477,7 +477,7 @@ $nl
 ARTICLE: "peg.ebnf" "EBNF"
 "The " { $vocab-link "peg.ebnf" } " vocabulary provides a DSL that allows writing PEG parsers that look like "
 "EBNF syntax. It provides three parsing words described below. These words all "
-"accept the same EBNF syntax. The difference is in how they are used. "
+"accept the same EBNF syntax. The difference is in how they are used."
 { $subsections
     POSTPONE: EBNF:
     POSTPONE: EBNF[[

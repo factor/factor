@@ -30,7 +30,7 @@ HELP: new-user
 
 HELP: update-user
 { $values { "user" user } { "provider" "an authentication provider" } }
-{ $contract "Stores a user back to an authentication provider after being changed. This is a no-op with in-memory providers; providers which use an external store will save the user in this word. " } ;
+{ $contract "Stores a user back to an authentication provider after being changed. This is a no-op with in-memory providers; providers which use an external store will save the user in this word." } ;
 
 ARTICLE: "furnace.auth.providers.protocol" "Authentication provider protocol"
 "The " { $vocab-link "furnace.auth.providers" } " vocabulary implements a protocol for persistence and authentication of users."
