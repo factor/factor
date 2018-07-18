@@ -193,7 +193,7 @@ HELP: flow
 { $class-description "A " { $link block } " section printed on its own line if it can fit entirely on one line." } ;
 
 HELP: <flow
-{ $description "Begins a " { $link flow } " section. " } ;
+{ $description "Begins a " { $link flow } " section." } ;
 
 HELP: colon
 { $class-description "A " { $link block } " section. When printed as a " { $link long-section } ", indents every line except the first." }

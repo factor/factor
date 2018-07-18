@@ -14,7 +14,7 @@ HELP: #alien-invoke
 { $see-also alien-invoke } ;
 
 HELP: #alien-callback
-{ $class-description "SSA tree node that constructs an alien callback. It is not a subclass of " { $link #alien-node } ". " } ;
+{ $class-description "SSA tree node that constructs an alien callback. It is not a subclass of " { $link #alien-node } "." } ;
 
 HELP: #call
 { $class-description "SSA tree node that calls a word. It has the following slots:"

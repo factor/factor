@@ -299,7 +299,7 @@ $nl
     }
 }
 $nl
-"The messages marked for deletion are actually deleted only when " { $link close } " is called. This should be the last command you issue. "
+"The messages marked for deletion are actually deleted only when " { $link close } " is called. This should be the last command you issue."
 { $subsections close }
 { $examples
     { $code
