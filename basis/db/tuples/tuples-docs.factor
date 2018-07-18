@@ -232,7 +232,7 @@ ARTICLE: "db-tuples-tutorial" "Tuple database tutorial"
 "Let's make a tuple and store it in a database. To follow along, click on each code example and run it in the listener. If you forget to run an example, just start at the top and run them all again in order." $nl
 "We're going to store books in this tutorial."
 { $code "TUPLE: book id title author date-published edition cover-price condition ;" }
-"The title, author, and publisher should be strings; the date-published a timestamp; the edition an integer; the cover-price a float. These are the Factor types for which we will need to look up the corresponding " { $link "db.types" } ". " $nl
+"The title, author, and publisher should be strings; the date-published a timestamp; the edition an integer; the cover-price a float. These are the Factor types for which we will need to look up the corresponding " { $link "db.types" } "." $nl
 "To actually bind the tuple slots to the database types, we'll use " { $link define-persistent } "."
 { $code
 "USING: db.tuples db.types ;

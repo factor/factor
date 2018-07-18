@@ -7,7 +7,7 @@ IN: match
 HELP: match
 { $values { "value1" object } { "value2" object } { "bindings" assoc }
 }
-{ $description "Pattern match " { $snippet "value1" } " against " { $snippet "value2" } ". These values can be any Factor value, including sequences and tuples. The values can contain pattern variables, which are symbols that begin with '?'. The result is a hashtable of the bindings, mapping the pattern variables from one sequence to the equivalent value in the other sequence. The " { $link _ } " symbol can be used to ignore the value at that point in the pattern for the match. " }
+{ $description "Pattern match " { $snippet "value1" } " against " { $snippet "value2" } ". These values can be any Factor value, including sequences and tuples. The values can contain pattern variables, which are symbols that begin with '?'. The result is a hashtable of the bindings, mapping the pattern variables from one sequence to the equivalent value in the other sequence. The " { $link _ } " symbol can be used to ignore the value at that point in the pattern for the match." }
 { $examples
     { $unchecked-example "USE: match" "MATCH-VARS: ?a ?b ;\n{ ?a { 2 ?b } 5 } { 1 { 2 3 } _ } match ." "H{ { ?a 1 } { ?b 3 } }" }
 }

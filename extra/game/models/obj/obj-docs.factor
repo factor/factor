@@ -18,7 +18,7 @@ HELP: cm
 
 HELP: md
 { $values { "material-dictionary" assoc } }
-{ $description "Convenience word for accessing the material dictionary while parsing primitives. " } ;
+{ $description "Convenience word for accessing the material dictionary while parsing primitives." } ;
 
 HELP: strings>numbers
 { $values { "strings" sequence } { "numbers" sequence } }
