@@ -28,6 +28,9 @@ IN: escape-strings
 : escape-strings ( strs -- str )
     [ escape-string ] map concat escape-string ;
 
+: tag-payload ( str tag -- str' )
+    [ escape-string ] dip prepend ;
+
 : escape-simplest ( str -- str' )
     dup { CHAR: ' CHAR: " CHAR: \r CHAR: \n CHAR: \s } counts {
         { [ dup { CHAR: ' CHAR: \r CHAR: \n CHAR: \s } values-of sum 0 = ] [ drop "'" prepend ] }
