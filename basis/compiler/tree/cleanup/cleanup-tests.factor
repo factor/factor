@@ -225,7 +225,7 @@ M: float detect-float ;
     { shift fixnum-shift } inlined?
 ] unit-test
 
-cell-bits 32 = [
+32bit? [
     [ t ] [
         [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
         \ shift inlined?
