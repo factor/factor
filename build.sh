@@ -132,23 +132,6 @@ semver_into() {
     fi
 }
 
-# issue 1440
-gcc_version_ok() {
-    GCC_VERSION=`gcc -dumpversion`
-    local GCC_MAJOR local GCC_MINOR local GCC_PATCH local GCC_SPECIAL
-    semver_into $GCC_VERSION GCC_MAJOR GCC_MINOR GCC_PATCH GCC_SPECIAL
-
-    if [[ $GCC_MAJOR -lt 4
-        || ( $GCC_MAJOR -eq 4 && $GCC_MINOR -lt 7 )
-        || ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 7 && $GCC_PATCH -lt 3 )
-        || ( $GCC_MAJOR -eq 4 && $GCC_MINOR -eq 8 && $GCC_PATCH -eq 0 )
-        ]] ; then
-        echo "gcc version required >= 4.7.3, != 4.8.0, >= 4.8.1, got $GCC_VERSION"
-        return 1
-    fi
-    return 0
-}
-
 clang_version_ok() {
     CLANG_VERSION=`clang --version | head -n1`
     CLANG_VERSION_RE='^[a-zA-Z0-9 ]* version (.*)$' # 3.3-5
@@ -177,7 +160,7 @@ set_cc() {
     fi
 
     test_programs_installed gcc g++
-    if [[ $? -ne 0 ]] && gcc_version_ok ; then
+    if [[ $? -ne 0 ]] ; then
         [ -z "$CC" ] && CC=gcc
         [ -z "$CXX" ] && CXX=g++
         return
