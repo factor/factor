@@ -10,7 +10,6 @@ struct quotation_jit : public jit {
         elements(false_object, vm),
         compiling(compiling),
         relocate(relocate) {}
-  ;
 
   cell nth(cell index);
   void init_quotation(cell quot);
