@@ -161,7 +161,7 @@ struct test_struct_16 {
 
 FACTOR_EXPORT struct test_struct_16 ffi_test_43(float x, int a);
 
-FACTOR_EXPORT struct test_struct_14 ffi_test_44();
+FACTOR_EXPORT struct test_struct_14 ffi_test_44(void);
 
 /* C99 features */
 #ifndef _MSC_VER
@@ -211,7 +211,7 @@ struct bool_and_ptr {
     void* ptr;
 };
 
-FACTOR_EXPORT struct bool_and_ptr ffi_test_61();
+FACTOR_EXPORT struct bool_and_ptr ffi_test_61(void);
 
 #endif
 
@@ -220,14 +220,14 @@ struct uint_pair {
 	unsigned int b;
 };
 
-FACTOR_EXPORT struct uint_pair ffi_test_62();
+FACTOR_EXPORT struct uint_pair ffi_test_62(void);
 
 struct ulonglong_pair {
 	unsigned long long a;
 	unsigned long long b;
 };
 
-FACTOR_EXPORT struct ulonglong_pair ffi_test_63();
+FACTOR_EXPORT struct ulonglong_pair ffi_test_63(void);
 
 FACTOR_EXPORT int ffi_test_64(int n, ...);
 FACTOR_EXPORT double ffi_test_65(int n, ...);

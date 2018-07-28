@@ -84,7 +84,10 @@ FACTOR_STDCALL(struct bar) ffi_test_19(long x, long y, long z) {
 }
 
 void ffi_test_20(double x1, double x2, double x3, double y1, double y2,
-                 double y3, double z1, double z2, double z3) {}
+                 double y3, double z1, double z2, double z3) {
+  (void) x1, (void) x2, (void) x3, (void) y1, (void) y2,
+  (void) y3, (void) z1, (void) z2, (void) z3;
+}
 
 long long ffi_test_21(long x, long y) { return (long long) x * (long long) y; }
 
@@ -309,7 +312,7 @@ unsigned long long ffi_test_60(unsigned long long x) {
 /* C99 features */
 #ifndef _MSC_VER
 
-struct bool_and_ptr ffi_test_61() {
+struct bool_and_ptr ffi_test_61(void) {
   struct bool_and_ptr bap;
   bap.b = true;
   bap.ptr = NULL;
@@ -318,14 +321,14 @@ struct bool_and_ptr ffi_test_61() {
 
 #endif
 
-struct uint_pair ffi_test_62() {
+struct uint_pair ffi_test_62(void) {
   struct uint_pair uip;
   uip.a = 0xabcdefab;
   uip.b = 0x12345678;
   return uip;
 }
 
-struct ulonglong_pair ffi_test_63() {
+struct ulonglong_pair ffi_test_63(void) {
   struct ulonglong_pair ullp;
   ullp.a = 0xabcdefabcdefabcd;
   ullp.b = 0x1234567891234567;
@@ -360,6 +363,8 @@ void* bug1021_test_1(void* x, int y) {
 }
 
 int bug1021_test_2(int x, char *y, void *z) {
+  (void) x;
+  (void) z;
   return y[0];
 }
 
