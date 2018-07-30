@@ -61,7 +61,7 @@ M: trit >trit ;
     } case ;
 
 : t= ( trit1 trit2 -- trit )
-    {
+    >trit {
         { t [ >trit ] }
         { m [ drop m ] }
         { f [ tnot ] }
