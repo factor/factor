@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.data alien.strings
-alien.syntax classes.struct destructors io.files.trash kernel
-libc literals math sequences system windows.types ;
+alien.syntax classes.struct destructors io.files.trash
+io.pathnames kernel libc literals math sequences system
+windows.types ;
 
 IN: io.files.trash.windows
 
@@ -51,7 +52,7 @@ PRIVATE>
 
 M: windows send-to-trash ( path -- )
     [
-        native-string>alien B{ 0 0 } append
+        absolute-path native-string>alien B{ 0 0 } append
         malloc-byte-array &free
 
         SHFILEOPSTRUCTW <struct>
