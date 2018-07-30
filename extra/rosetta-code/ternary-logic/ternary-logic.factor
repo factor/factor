@@ -43,12 +43,12 @@ M: trit >trit ;
     >trit {
         { t [ >trit ] }
         { m [ >trit { { t [ m ] } { m [ m ] } { f [ f ] } } case ] }
-        { f [ >trit drop f ] }
+        { f [ drop f ] }
     } case ;
 
 : tor ( trit1 trit2 -- trit )
     >trit {
-        { t [ >trit drop t ] }
+        { t [ drop t ] }
         { m [ >trit { { t [ t ] } { m [ m ] } { f [ m ] } } case ] }
         { f [ >trit ] }
     } case ;
@@ -56,13 +56,13 @@ M: trit >trit ;
 : txor ( trit1 trit2 -- trit )
     >trit {
         { t [ tnot ] }
-        { m [ >trit drop m ] }
+        { m [ drop m ] }
         { f [ >trit ] }
     } case ;
 
 : t= ( trit1 trit2 -- trit )
     {
         { t [ >trit ] }
-        { m [ >trit drop m ] }
+        { m [ drop m ] }
         { f [ tnot ] }
     } case ;
