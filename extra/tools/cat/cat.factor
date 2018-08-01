@@ -1,14 +1,14 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors command-line formatting fry io io.encodings
+USING: command-line formatting fry io io.encodings
 io.encodings.binary io.files kernel namespaces sequences ;
 
 IN: tools.cat
 
 : cat-stream ( -- )
-    input-stream get dup decoder? [ stream>> ] when
-    output-stream get dup encoder? [ stream>> ] when
+    input-stream get binary re-decode
+    output-stream get binary re-encode
     '[ _ stream-write ] each-stream-block ;
 
 : cat-file ( path -- )
