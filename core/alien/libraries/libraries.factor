@@ -1,8 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings assocs compiler.errors
-io.backend kernel namespaces destructors sequences strings
-system io.pathnames fry combinators vocabs ;
+destructors kernel namespaces sequences strings system ;
 IN: alien.libraries
 
 PRIMITIVE: dll-valid? ( dll -- ? )

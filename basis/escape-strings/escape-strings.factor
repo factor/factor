@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math math.order math.statistics
-sequences sequences.extras sets ;
+USING: assocs assocs.extras combinators kernel math math.order
+math.statistics sequences sequences.extras sets ;
 IN: escape-strings
 
 : find-escapes ( str -- set )
@@ -26,16 +26,14 @@ IN: escape-strings
     dup find-escapes lowest-missing escape-string* ;
 
 : escape-strings ( strs -- str )
-    dup [ find-escapes ] map
-    [
-        [ lowest-missing ] map
-        [ escape-string* ] 2map concat
-    ] [
-        [ ] [ union ] map-reduce
-    ] bi
-    dup cardinality 0 = [
-        drop 1
-    ] [
-        members minmax nip 2 +
-    ] if
-    escape-string* ;
+    [ escape-string ] map concat escape-string ;
+
+: tag-payload ( str tag -- str' )
+    [ escape-string ] dip prepend ;
+
+: escape-simplest ( str -- str' )
+    dup { char: \' char: \" char: \r char: \n char: \s } counts {
+        { [ dup { char: \' char: \r char: \n char: \s } values-of sum 0 = ] [ drop "'" prepend ] }
+        { [ dup char: \" of not ] [ drop "\"" "\"" surround ] }
+        [ drop escape-string ]
+    } cond ;

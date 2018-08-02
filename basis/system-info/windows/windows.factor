@@ -96,7 +96,7 @@ M: windows total-virtual-mem ( -- n )
 M: windows available-virtual-mem ( -- n )
     memory-status ullAvailVirtual>> ;
 
-: computer-name ( -- string )
+M: windows computer-name ( -- string )
     MAX_COMPUTERNAME_LENGTH 1 +
     [ <byte-array> dup ] keep uint <ref>
     GetComputerName win32-error=0/f alien>native-string ;

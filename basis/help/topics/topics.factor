@@ -42,7 +42,7 @@ GENERIC: valid-article? ( topic -- ? )
 GENERIC: article-title ( topic -- string )
 GENERIC: article-name ( topic -- string )
 GENERIC: article-content ( topic -- content )
-GENERIC: article-parent ( topic -- parent )
+GENERIC: article-parent ( topic -- parent/f )
 GENERIC: set-article-parent ( parent topic -- )
 
 M: object article-name article-title ;

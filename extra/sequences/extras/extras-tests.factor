@@ -273,3 +273,11 @@ tools.test vectors vocabs ;
 { "a_b" } [ "ab" char: _ interleaved ] unit-test
 { "a_b_c" } [ "abc" char: _ interleaved ] unit-test
 { "a_b_c_d" } [ "abcd" char: _ interleaved ] unit-test
+
+{ 0 } [ { 1 2 3 4 } [ 5 > ] count-head ] unit-test
+{ 2 } [ { 1 2 3 4 } [ 3 < ] count-head ] unit-test
+{ 4 } [ { 1 2 3 4 } [ 5 < ] count-head ] unit-test
+
+{ 0 } [ { 1 2 3 4 } [ 5 > ] count-tail ] unit-test
+{ 2 } [ { 1 2 3 4 } [ 2 > ] count-tail ] unit-test
+{ 4 } [ { 1 2 3 4 } [ 5 < ] count-tail ] unit-test

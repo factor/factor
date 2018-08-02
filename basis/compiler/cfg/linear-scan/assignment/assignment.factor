@@ -33,7 +33,7 @@ SYMBOL: pending-interval-assoc
 : remove-pending ( live-interval -- )
     vreg>> pending-interval-assoc get delete-at ;
 
-: vreg>spill-slot ( vreg -- slot )
+: vreg>spill-slot ( vreg -- spill-slot )
     dup rep-of lookup-spill-slot ;
 
 : vreg>reg ( vreg -- reg/spill-slot )

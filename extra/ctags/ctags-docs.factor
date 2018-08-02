@@ -20,7 +20,7 @@ HELP: write-ctags
 } ;
 
 HELP: ctags
-{ $values { "alist" "ctags" } }
+{ $values { "ctags" "alist" } }
 { $description "Make a sequence of ctags from " { $link all-words } ", sorted by word name." } ;
 
 ABOUT: "ctags"

@@ -4,10 +4,10 @@ USING: accessors arrays assocs classes classes.struct
 classes.tuple combinators combinators.short-circuit
 combinators.smart continuations debugger definitions effects
 eval formatting fry grouping help help.markup help.topics io
-io.streams.string kernel macros math namespaces parser.notes
-prettyprint sequences sequences.deep sets splitting strings
-summary tools.destructors unicode vocabs vocabs.loader words
-words.constant words.symbol ;
+io.streams.string kernel macros math math.statistics namespaces
+parser.notes prettyprint sequences sequences.deep sets splitting
+strings summary tools.destructors unicode vocabs vocabs.loader
+words words.constant words.symbol ;
 IN: help.lint.checks
 
 ERROR: simple-lint-error message ;
@@ -26,6 +26,7 @@ SYMBOL: vocab-articles
             "line" ! core-text
             "layout" ! ui.text.pango
             "script-string" ! windows.uniscribe
+            "linux-monitor" ! github issue #2014, race condition in disposing of child monitors
         } member?
     ] reject ;
 
@@ -50,9 +51,13 @@ SYMBOL: vocab-articles
             ] keep
             last assert=
         ] vocabs-quot get call( quot -- )
-    ] leaks members no-ui-disposables length [
-        "%d disposable(s) leaked in example" sprintf simple-lint-error
-    ] unless-zero ;
+    ] leaks members no-ui-disposables
+    dup length 0 > [
+       dup [ class-of ] histogram-by
+       [ "Leaked resources: " write ... ] with-string-writer simple-lint-error
+    ] [
+        drop
+    ] if ;
 
 : check-examples ( element -- )
     \ $example swap elements [ check-example ] each ;
@@ -99,7 +104,7 @@ SYMBOL: vocab-articles
         [ parsing-word? ]
         [ "declared-effect" word-prop not ]
         [ constant? ]
-        [ "word-help" word-prop not ]
+        [ "help" word-prop not ]
     } 1|| ;
 
 : skip-check-values? ( word element -- ? )

@@ -46,6 +46,8 @@ M: interactor manifest>>
 
 GENERIC: (word-at-caret) ( token completion-mode -- obj )
 
+M: object (word-at-caret) 2drop f ;
+
 M: vocab-completion (word-at-caret)
     drop
     [ dup vocab-exists? [ >vocab-link ] [ drop f ] if ]
@@ -58,12 +60,6 @@ M: word-completion (word-at-caret)
 
 M: vocab-word-completion (word-at-caret)
     vocab-name>> lookup-word ;
-
-M: char-completion (word-at-caret) 2drop f ;
-
-M: path-completion (word-at-caret) 2drop f ;
-
-M: color-completion (word-at-caret) 2drop f ;
 
 : word-at-caret ( token interactor -- obj )
     completion-mode (word-at-caret) ;

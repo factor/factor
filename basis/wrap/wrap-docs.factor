@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup strings math kernel ;
+USING: arrays help.markup help.syntax kernel math strings ;
 IN: wrap
 
 ABOUT: "wrap"
@@ -19,5 +19,5 @@ HELP: element
 } ;
 
 HELP: wrap
-{ $values { "elements" { $sequence element } } { "width" real } }
+{ $values { "elements" { $sequence element } } { "width" real } { "array" array } }
 { $description "Break the " { $snippet "elements" } " into lines such that the total width of each line tries to be less than " { $snippet "width" } " while attempting to minimize the raggedness represented by the amount of space at the end of each line. Returns an array of lines." } ;

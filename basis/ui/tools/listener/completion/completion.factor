@@ -193,6 +193,6 @@ completion-popup H{
     [ [ nip ] [ gesture>operation ] 2bi ] [ drop f ] if ;
 
 M: completion-popup handle-gesture ( gesture completion -- ? )
-    2dup completion-gesture dup [
+    2dup completion-gesture [
         [ nip hide-glass ] [ invoke-command ] 2bi* f
-    ] [ 2drop call-next-method ] if ;
+    ] [ drop call-next-method ] if* ;

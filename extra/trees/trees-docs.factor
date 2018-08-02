@@ -177,14 +177,14 @@ HELP: first-key
 HELP: pop-tree-left
 { $values
     { "tree" tree }
-    { "pair/f" { $maybe pair } }
+    { "node/f" { $maybe pair } }
 }
 { $description "Removes and returns a key-value mapping associated with the lowest key in this map, or " { $link f } " if the map is empty." } ;
 
 HELP: pop-tree-right
 { $values
     { "tree" tree }
-    { "pair/f" { $maybe pair } }
+    { "node/f" { $maybe pair } }
 }
 { $description "Removes and returns a key-value mapping associated with the highest key in this map, or " { $link f } " if the map is empty." } ;
 

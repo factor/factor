@@ -1813,16 +1813,14 @@ FUNCTION: HACCEL LoadAcceleratorsW ( HINSTANCE hInstance, LPCTSTR lpTableName )
 ! FUNCTION: LoadCursorFromFileW
 
 
-! FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName )
-FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, ushort lpCursorName )
+FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName )
 ALIAS: LoadCursor LoadCursorW
 
-! FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, LPCTSTR lpIconName )
-FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, LPCTSTR lpIconName )
+FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, LPCWSTR lpIconName )
 ALIAS: LoadIcon LoadIconW
 
 ! FUNCTION: LoadImageA
-FUNCTION: HANDLE LoadImageW ( HINSTANCE hinst, LPCTSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad )
+FUNCTION: HANDLE LoadImageW ( HINSTANCE hinst, LPCWSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad )
 ALIAS: LoadImage LoadImageW
 ! FUNCTION: LoadKeyboardLayoutA
 ! FUNCTION: LoadKeyboardLayoutEx

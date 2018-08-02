@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar calendar.english combinators io
-io.streams.string kernel macros math math.order math.parser
-math.parser.private present quotations sequences typed words ;
+USING: accessors arrays calendar calendar.english combinators
+fry io io.streams.string kernel macros math math.order
+math.parser math.parser.private present quotations sequences
+typed words ;
 IN: calendar.format
 
 MACRO: formatted ( spec -- quot )
@@ -15,6 +16,9 @@ MACRO: formatted ( spec -- quot )
     ] map [ cleave ] curry ;
 
 : pad-00 ( n -- str ) number>string 2 char: 0 pad-head ;
+
+: formatted>string ( spec -- string )
+    '[ _ formatted ] with-string-writer ; inline
 
 : pad-0000 ( n -- str ) number>string 4 char: 0 pad-head ;
 

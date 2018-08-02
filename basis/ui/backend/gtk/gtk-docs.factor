@@ -12,14 +12,14 @@ HELP: icon-data
 
 HELP: key-sym
 { $values
-  { "event" GdkEventKey }
-  { "sym/f" { $maybe string } }
+  { "keyval" GdkEventKey }
+  { "string/f" { $maybe string } }
   { "action?" boolean }
 } { $description "Gets the key symbol and action indicator from a " { $link GdkEventKey } " struct. If 'action?' is " { $link t } ", then the key is one of the special keys in " { $link codes } "." } ;
 
 HELP: on-configure
 { $values
-  { "win" alien }
+  { "window" alien }
   { "event" alien }
   { "user-data" alien }
   { "?" boolean }

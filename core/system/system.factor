@@ -1,7 +1,7 @@
 ! Copyright (c) 2007, 2010 slava pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations init io kernel kernel.private make
-math math.parser namespaces sequences ;
+USING: accessors assocs continuations init io kernel
+kernel.private make math.parser namespaces sequences splitting ;
 IN: system
 
 PRIMITIVE: (exit) ( n -- * )
@@ -27,10 +27,10 @@ UNION: unix macosx linux ;
 : vm-git-label ( -- string ) \ vm-git-label get-global ;
 
 : vm-git-ref ( -- string )
-    vm-git-label char: - over last-index head ;
+    vm-git-label "-" split1-last drop ;
 
 : vm-git-id ( -- string )
-    vm-git-label char: - over last-index 1 + tail ;
+    vm-git-label "-" split1-last nip ;
 
 : vm-compiler ( -- string ) \ vm-compiler get-global ;
 

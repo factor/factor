@@ -16,6 +16,7 @@ HOOK: available-page-file os ( -- n )
 HOOK: total-virtual-mem os ( -- n )
 HOOK: available-virtual-mem os ( -- n )
 HOOK: available-virtual-extended-mem os ( -- n )
+HOOK: computer-name os ( -- string )
 
 : write-unit ( x n str -- )
     [ 2^ /f number>string write bl ] [ write ] bi* ;

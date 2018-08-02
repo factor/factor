@@ -77,7 +77,7 @@ HELP: odbc-number-of-columns
 HELP: odbc-describe-column
 { $values
     { "statement" "an ODBC statement handle" }
-    { "n" "a column number starting from one" }
+    { "columnNumber" "a column number starting from one" }
     { "column" "a column object" }
 }
 { $description
@@ -88,7 +88,7 @@ HELP: odbc-describe-column
 HELP: odbc-get-field
 { $values
     { "statement" "an ODBC statement handle" }
-    { "column" "a column number starting from one or a <column> object" }
+    { "column!" "a column number starting from one or a <column> object" }
     { "field" "a <field> object" }
 }
 { $description

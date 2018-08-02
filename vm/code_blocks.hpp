@@ -62,7 +62,7 @@ struct code_block {
     header = (header & 0xFFFFFF) | (frame_size << 20);
   }
 
-  template <typename Fixup> cell size(Fixup fixup) const { return size(); }
+  template <typename Fixup> cell size(Fixup fixup) const { (void)fixup; return size(); }
 
   cell entry_point() const { return (cell)(this + 1); }
 

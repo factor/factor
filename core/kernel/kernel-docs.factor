@@ -794,7 +794,7 @@ HELP: curried
 { curry curried compose prepose composed } related-words
 
 HELP: 2curry
-{ $values { "obj1" object } { "obj2" object } { "quot" callable } { "curry" curried } }
+{ $values { "obj1" object } { "obj2" object } { "quot" callable } { "curried" curried } }
 { $description "Outputs a " { $link callable } " which pushes " { $snippet "obj1" } " and " { $snippet "obj2" } " and then calls " { $snippet "quot" } "." }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
@@ -802,12 +802,12 @@ HELP: 2curry
 } ;
 
 HELP: 3curry
-{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quot" callable } { "curry" curried } }
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quot" callable } { "curried" curried } }
 { $description "Outputs a " { $link callable } " which pushes " { $snippet "obj1" } ", " { $snippet "obj2" } " and " { $snippet "obj3" } ", and then calls " { $snippet "quot" } "." }
 { $notes "This operation is efficient and does not copy the quotation." } ;
 
 HELP: with
-{ $values { "param" object } { "obj" object } { "quot" { $quotation ( param elt -- ... ) } } { "curry" curried } }
+{ $values { "param" object } { "obj" object } { "quot" { $quotation ( param elt -- ... ) } } { "curried" curried } }
 { $description "Partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
     { $code "[ A ] with B" }
@@ -825,7 +825,7 @@ HELP: 2with
   { "param2" object }
   { "obj" object }
   { "quot" { $quotation ( param1 param2 elt -- ... ) } }
-  { "curry" curried }
+  { "curried" curried }
 }
 { $description "Partial application on the left of two parameters." } ;
 
@@ -842,7 +842,7 @@ HELP: compose
 } ;
 
 HELP: prepose
-{ $values { "quot1" callable } { "quot2" callable } { "compose" composed } }
+{ $values { "quot1" callable } { "quot2" callable } { "composed" composed } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot2" } " followed by " { $snippet "quot1" } "." }
 { $notes "See " { $link compose } " for details." } ;
 

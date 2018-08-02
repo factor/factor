@@ -38,6 +38,10 @@ void context::fill_stack_seg(cell top_ptr, segment* seg, cell pattern) {
   cell clear_start = top_ptr + sizeof(cell);
   cell clear_size = seg->end - clear_start;
   memset_cell((void*)clear_start, pattern, clear_size);
+#else
+  (void)top_ptr;
+  (void)seg;
+  (void)pattern;
 #endif
 }
 

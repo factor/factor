@@ -132,7 +132,7 @@ IN: modern.tests
 [ "char: [" string>literals >strings ] must-fail
 [ "char: {" string>literals >strings ] must-fail
 [ "char: \"" string>literals >strings ] must-fail
-{ { { "char:" { "\\\\" } } } } [ "char: \\\\" string>literals >strings ] unit-test
+! { { { "char:" { "\\\\" } } } } [ "char: \\\\" string>literals >strings ] unit-test
 
 [ "char: \\" string>literals >strings ] must-fail ! char: \ should be legal eventually
 

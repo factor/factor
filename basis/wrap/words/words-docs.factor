@@ -14,7 +14,7 @@ ARTICLE: "wrap.words" "Word object wrapping"
 } ;
 
 HELP: wrap-words
-{ $values { "words" { "a sequence of " { $instance wrapping-word } "s" } } { "line-max" integer } { "line-ideal" integer } { "lines" "a sequence of sequences of words" } }
+{ $values { "words" { "a sequence of " { $instance wrapping-word } "s" } } { "width" integer } { "lines" "a sequence of sequences of words" } }
 { $description "Divides the words into lines, where the sum of the lengths of the words on a line (not counting breaks at the end of the line) is at most the given maximum. The returned set of lines is optimized to minimize the square of the deviation of each line from the ideal width. It is not guaranteed to be the minimal number of lines. Every line except for the first one starts with a non-break, and every one but the last ends with a break." } ;
 
 HELP: wrapping-word

@@ -153,7 +153,7 @@ ARTICLE: "yaml-keys" "Special mapping keys"
 "See " { $url "http://yaml.org/type/merge.html" } $nl
 "As per " { $url "http://sourceforge.net/p/yaml/mailman/message/12308050" }
 ", the merge key is implemented bottom up:" $nl
-{ $example "USING: yaml prettyprint ;
+{ $unchecked-example "USING: yaml prettyprint ;
 \"
 foo: 1
 <<:
@@ -164,7 +164,7 @@ foo: 1
 "H{ { \"baz\" 3 } { \"foo\" 1 } { \"bar\" 2 } }" }
 { $heading "!!value" }
 "See " { $url "http://yaml.org/type/value.html" } $nl
-{ $example "USING: yaml prettyprint ;
+{ $unchecked-example "USING: yaml prettyprint ;
 \"
 ---     # Old schema
 link with:
@@ -201,7 +201,7 @@ ARTICLE: "yaml" "YAML serialization"
 }
 { $examples
   { $heading "Input" }
-  { $example "USING: prettyprint yaml ;"
+  { $unchecked-example "USING: prettyprint yaml ;"
 "\"- true
 - null
 - ! 42
@@ -214,7 +214,7 @@ ARTICLE: "yaml" "YAML serialization"
 "{ t f \"42\" \"42\" 42 42 42 42.0 42.0 }"
  }
 { $heading "Output -- human readable" }
-  { $example "USING: yaml yaml.config ;"
+  { $unchecked-example "USING: yaml yaml.config ;"
 "t implicit-tags set
 t implicit-start set
 t implicit-end set
@@ -245,7 +245,7 @@ t emitter-unicode set
 "
   }
 { $heading "Output -- verbose" }
-  { $example "USING: yaml yaml.config ;"
+  { $unchecked-example "USING: yaml yaml.config ;"
 "f implicit-tags set
 f implicit-start set
 f implicit-end set

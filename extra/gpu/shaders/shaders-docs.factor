@@ -31,6 +31,7 @@ HELP: <vertex-array-object>
   { "vertex-buffer" "a vertex buffer" }
   { "program-instance" program-instance }
   { "format" vertex-format }
+  { "vertex-array" vertex-array }
 }
 { $description "Creates a new vertex array object." } ;
 

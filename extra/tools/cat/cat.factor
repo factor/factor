@@ -1,16 +1,15 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: command-line formatting kernel io io.encodings.binary
-io.files namespaces sequences strings ;
+USING: command-line formatting fry io io.encodings
+io.encodings.binary io.files kernel namespaces sequences ;
 
 IN: tools.cat
 
-: cat-lines ( -- )
-    [ print flush ] each-line ;
-
 : cat-stream ( -- )
-    [ >string write flush ] each-block ;
+    input-stream get binary re-decode
+    output-stream get binary re-encode
+    '[ _ stream-write ] each-stream-block ;
 
 : cat-file ( path -- )
     dup exists? [
@@ -18,9 +17,9 @@ IN: tools.cat
     ] [ "%s: not found\n" printf flush ] if ;
 
 : cat-files ( paths -- )
-    [ dup "-" = [ drop cat-lines ] [ cat-file ] if ] each ;
+    [ dup "-" = [ drop cat-stream ] [ cat-file ] if ] each ;
 
 : run-cat ( -- )
-    command-line get [ cat-lines ] [ cat-files ] if-empty ;
+    command-line get [ cat-stream ] [ cat-files ] if-empty ;
 
 MAIN: run-cat

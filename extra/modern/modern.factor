@@ -348,7 +348,7 @@ DEFER: lex-factor-top*
     over "\\" head? [
         drop
         ! \ foo
-        dup "\\" sequence= [ (read-backslash) ] [ merge-slice-til-whitespace ] if
+        dup [ char: \\ = ] all? [ (read-backslash) ] [ merge-slice-til-whitespace ] if
     ] [
         ! foo\ or foo\bar (?)
         over "\\" tail? [ drop (read-backslash) ] [ lex-factor-top* ] if
@@ -488,7 +488,7 @@ ERROR: compound-syntax-disallowed n seq obj ;
 
 : failed-lexing ( assoc -- assoc' ) [ nip array? ] assoc-reject ;
 
-: lex-core ( -- assoc ) core-bootstrap-vocabs lex-vocabs ;
+: lex-core ( -- assoc ) core-vocabs lex-vocabs ;
 : lex-basis ( -- assoc ) basis-vocabs lex-vocabs ;
 : lex-extra ( -- assoc ) extra-vocabs lex-vocabs ;
 : lex-roots ( -- assoc ) lex-core lex-basis lex-extra 3append ;

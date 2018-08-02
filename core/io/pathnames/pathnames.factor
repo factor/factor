@@ -166,6 +166,53 @@ M: string absolute-path
 M: object normalize-path ( path -- path' )
     absolute-path ;
 
+: root-path* ( path -- path' )
+    dup absolute-path? [
+        dup [ path-separator? ] find
+        drop 1 + head
+    ] when ;
+
+HOOK: root-path os ( path -- path' )
+
+M: object root-path root-path* ;
+
+: relative-path* ( path -- relative-path )
+    dup absolute-path? [
+        dup [ path-separator? ] find
+        drop 1 + tail
+    ] when ;
+
+HOOK: relative-path os ( path -- path' )
+
+M: object relative-path relative-path* ;
+
+: canonicalize-path* ( path -- path' )
+    [
+        relative-path
+        [ path-separator? ] split-when
+        [ { "." "" } member? ] reject
+        V{ } clone [
+            dup ".." = [
+                over empty?
+                [ over push ]
+                [ over ?last ".." = [ over push ] [ drop dup pop* ] if ] if
+            ] [
+                over push
+            ] if
+        ] reduce
+    ] keep dup absolute-path? [
+        [
+            [ ".." = ] trim-head
+            path-separator join
+        ] dip root-path prepend-path
+    ] [
+        drop path-separator join [ "." ] when-empty
+    ] if ;
+
+HOOK: canonicalize-path io-backend ( path -- path' )
+
+M: object canonicalize-path canonicalize-path* ;
+
 TUPLE: pathname string ;
 
 C: <pathname> pathname

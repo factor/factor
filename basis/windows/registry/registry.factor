@@ -1,9 +1,11 @@
 ! Copyright (C) 2010 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types byte-arrays kernel locals sequences
-windows.advapi32 windows.errors math windows
-windows.kernel32 windows.time accessors alien.data
-windows.types classes.struct continuations ;
+USING: accessors alien.c-types alien.data byte-arrays
+classes.struct continuations io.encodings.string
+io.encodings.utf16n kernel literals locals math sequences sets
+splitting windows windows.advapi32 windows.errors
+windows.kernel32 windows.time windows.types ;
 IN: windows.registry
 
 ERROR: open-key-failed key subkey mode error-string ;
@@ -66,20 +68,29 @@ CONSTANT: registry-value-max-length 16384
 : grow-buffer ( byte-array -- byte-array' )
     length 2 * <byte-array> ;
 
-:: reg-query-value-ex ( key subkey ptr1 ptr2 buffer -- buffer )
+PRIVATE>
+
+:: reg-query-value-ex ( key value-name ptr1 lpType buffer -- buffer )
     buffer length uint <ref> :> pdword
-    key subkey ptr1 ptr2 buffer pdword [ RegQueryValueEx ] 2keep
+    key value-name ptr1 lpType buffer pdword [ RegQueryValueEx ] 2keep
     rot :> ret
     ret ERROR_SUCCESS = [
         uint deref head
     ] [
         ret ERROR_MORE_DATA = [
             2drop
-            key subkey ptr1 ptr2 buffer
+            key value-name ptr1 lpType buffer
             grow-buffer reg-query-value-ex
         ] [
             ret n>win32-error-string throw
         ] if
+    ] if ;
+
+: delete-value ( key value-name -- )
+    RegDeleteValue dup ERROR_SUCCESS = [
+        drop
+    ] [
+        n>win32-error-string throw
     ] if ;
 
 TUPLE: registry-info
@@ -184,11 +195,30 @@ TUPLE: registry-enum-key ;
 : set-reg-sz ( hkey value lpdata cbdata -- )
     [ REG_SZ ] 2dip set-reg-key ;
 
-PRIVATE>
-
 : windows-performance-data ( -- byte-array )
     HKEY_PERFORMANCE_DATA "Global" f f
     21 2^ <byte-array> reg-query-value-ex ;
 
 : read-registry ( key subkey -- registry-info )
     KEY_READ [ reg-query-info-key ] with-open-registry-key ;
+
+:: change-registry-value ( key subkey value-name quot: ( value -- value' ) -- )
+    0 DWORD <ref> :> type
+    key subkey KEY_QUERY_VALUE KEY_SET_VALUE bitor [
+        dup :> hkey value-name f type MAX_PATH <byte-array>
+        reg-query-value-ex
+        type DWORD deref ${ REG_SZ REG_EXPAND_SZ REG_MULTI_SZ } in?
+        dup :> string-type? [
+            utf16n decode type DWORD deref REG_MULTI_SZ = [
+                "\0" split 2
+            ] [ 1 ] if head*
+        ] when
+        quot call( x -- x' )
+        string-type? [
+            type DWORD deref REG_MULTI_SZ = [
+                "\0" join 2
+            ] [ 1 ] if [ CHAR: \0 suffix ] times utf16n encode
+        ] when
+        [ hkey value-name type DWORD deref ] dip dup length
+        set-reg-key
+    ] with-open-registry-key ;

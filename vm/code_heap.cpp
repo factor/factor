@@ -71,6 +71,8 @@ void code_heap::sweep() {
 
 void code_heap::verify_all_blocks_set() {
   auto all_blocks_set_verifier = [&](code_block* block, cell size) {
+    (void)block;
+    (void)size;
     FACTOR_ASSERT(all_blocks.find((cell)block) != all_blocks.end());
   };
   allocator->iterate(all_blocks_set_verifier, no_fixup());
@@ -102,6 +104,7 @@ cell code_heap::frame_predecessor(cell frame_top) {
 void code_heap::initialize_all_blocks_set() {
   all_blocks.clear();
   auto all_blocks_set_inserter = [&](code_block* block, cell size) {
+    (void)size;
     all_blocks.insert((cell)block);
   };
   allocator->iterate(all_blocks_set_inserter, no_fixup());
@@ -115,6 +118,7 @@ void code_heap::initialize_all_blocks_set() {
 // If generic words were redefined, inline caches need to be reset.
 void factor_vm::update_code_heap_words(bool reset_inline_caches) {
   auto word_updater = [&](code_block* block, cell size) {
+    (void)size;
     update_word_references(block, reset_inline_caches);
   };
   each_code_block(word_updater);
@@ -182,6 +186,7 @@ void factor_vm::primitive_code_room() {
 
 void factor_vm::primitive_strip_stack_traces() {
   auto stack_trace_stripper = [](code_block* block, cell size) {
+    (void)size;
     block->owner = false_object;
   };
   each_code_block(stack_trace_stripper);
@@ -191,6 +196,7 @@ void factor_vm::primitive_strip_stack_traces() {
 void factor_vm::primitive_code_blocks() {
   std::vector<cell> objects;
   auto code_block_accumulator = [&](code_block* block, cell size) {
+    (void)size;
     objects.push_back(block->owner);
     objects.push_back(block->parameters);
     objects.push_back(block->relocation);

@@ -72,7 +72,7 @@ HELP: library
 } ;
 
 HELP: library-dll
-{ $values { "name" string } { "dll" "a DLL handle" } }
+{ $values { "obj" object } { "dll" "a DLL handle" } }
 { $description "Looks up a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } "." } ;
 
 HELP: remove-library

@@ -1,9 +1,9 @@
 ! Copyright (C) 2016 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors alien.data command-line formatting io
-io.encodings io.encodings.binary io.files kernel math
-math.bitwise math.vectors math.vectors.simd namespaces sequences
+USING: alien.data command-line formatting io io.encodings
+io.encodings.binary io.files kernel math math.bitwise
+math.vectors math.vectors.simd namespaces sequences
 specialized-arrays ;
 
 SPECIALIZED-ARRAY: uchar-16
@@ -27,7 +27,7 @@ IN: tools.wc
     ] each-block-slice ; inline
 
 : wc-stdin ( -- n )
-    input-stream get dup decoder? [ stream>> ] when
+    input-stream get binary re-decode
     [ count-lines ] with-input-stream* ;
 
 PRIVATE>
