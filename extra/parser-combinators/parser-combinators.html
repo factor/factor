@@ -42,8 +42,8 @@ general parsers work and the 'list of sucesses' that are returned as a
 result.</p>
 <pre class="code">
   (1) : char-a ( inp -- result )
-        0 over string-nth CHAR: a = [
-          1 swap string-tail CHAR: a cons unit delay lunit
+        0 over string-nth char: a = [
+          1 swap string-tail char: a cons unit delay lunit
         ] [
           drop lnil
         ] ifte ;
