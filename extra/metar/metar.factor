@@ -277,16 +277,16 @@ CONSTANT: sky H{
     unclip [ string>number ] [ char: A = ] bi*
     [ 100 /f "%.2f Hg" sprintf ] [ "%s hPa" sprintf ] if ;
 
-CONSTANT: re-timestamp R[[ \d{6}Z]]
-CONSTANT: re-station R[[ \w{4}]]
-CONSTANT: re-temperature R[[ [M]?\d{2}\\/([M]?\d{2})?]]
-CONSTANT: re-wind R[[ (VRB|\d{3})\d{2,3}(G\d{2,3})?KT]]
-CONSTANT: re-wind-variable R[[ \d{3}V\d{3}]]
-CONSTANT: re-visibility R[[ [MP]?\d+(\\/\d+)?SM]]
-CONSTANT: re-rvr R[[ R\d{2}[RLC]?\\/\d{4}(V\d{4})?FT]]
-CONSTANT: re-weather R[[ [+-]?(VC)?(\w{2}|\w{4})]]
-CONSTANT: re-sky-condition R[[ (\w{2,3}\d{3}(\w+)?|\w{3}|CAVOK)]]
-CONSTANT: re-altimeter R[[ [AQ]\d{4}]]
+CONSTANT: re-timestamp R[[\d{6}Z]]
+CONSTANT: re-station R[[\w{4}]]
+CONSTANT: re-temperature R[[[M]?\d{2}\\/([M]?\d{2})?]]
+CONSTANT: re-wind R[[(VRB|\d{3})\d{2,3}(G\d{2,3})?KT]]
+CONSTANT: re-wind-variable R[[\d{3}V\d{3}]]
+CONSTANT: re-visibility R[[[MP]?\d+(\\/\d+)?SM]]
+CONSTANT: re-rvr R[[R\d{2}[RLC]?\\/\d{4}(V\d{4})?FT]]
+CONSTANT: re-weather R[[[+-]?(VC)?(\w{2}|\w{4})]]
+CONSTANT: re-sky-condition R[[(\w{2,3}\d{3}(\w+)?|\w{3}|CAVOK)]]
+CONSTANT: re-altimeter R[[[AQ]\d{4}]]
 
 : find-one ( seq quot: ( elt -- ? ) -- seq elt/f )
     dupd find drop [ tail unclip ] [ f ] if* ; inline
@@ -462,7 +462,7 @@ CONSTANT: high-clouds H{
 : parse-lightning ( str -- str' )
     "LTG" ?head drop 2 group [ lightning at ] map " " join ;
 
-CONSTANT: re-recent-weather R[[ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+]]
+CONSTANT: re-recent-weather R[[((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+]]
 
 : parse-began/ended ( str -- str' )
     unclip swap
@@ -512,27 +512,27 @@ CONSTANT: re-recent-weather R[[ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+]]
 : parse-remark ( str -- str' )
     {
         { [ dup glossary key? ] [ glossary at ] }
-        { [ dup R[[ 1\d{4}]] matches? ] [ parse-6hr-max-temp ] }
-        { [ dup R[[ 2\d{4}]] matches? ] [ parse-6hr-min-temp ] }
-        { [ dup R[[ 4\d{8}]] matches? ] [ parse-24hr-temp ] }
-        { [ dup R[[ 4\\/\d{3}]] matches? ] [ parse-snow-depth ] }
-        { [ dup R[[ 5\d{4}]] matches? ] [ parse-1hr-pressure ] }
-        { [ dup R[[ 6[\d\\/]{4}]] matches? ] [ parse-6hr-precipitation ] }
-        { [ dup R[[ 7\d{4}]] matches? ] [ parse-24hr-precipitation ] }
-        { [ dup R[[ 8\\/\d{3}]] matches? ] [ parse-cloud-cover ] }
-        { [ dup R[[ 931\d{3}]] matches? ] [ parse-6hr-snowfall ] }
-        { [ dup R[[ 933\d{3}]] matches? ] [ parse-water-equivalent-snow ] }
-        { [ dup R[[ 98\d{3}]] matches? ] [ parse-duration-of-sunshine ] }
-        { [ dup R[[ T\d{4,8}]] matches? ] [ parse-1hr-temp ] }
-        { [ dup R[[ \d{3}\d{2,3}\\/\d{2,4}]] matches? ] [ parse-peak-wind ] }
-        { [ dup R[[ P\d{4}]] matches? ] [ parse-1hr-precipitation ] }
-        { [ dup R[[ SLP\d{3}]] matches? ] [ parse-sea-level-pressure ] }
-        { [ dup R[[ LTG\w+]] matches? ] [ parse-lightning ] }
-        { [ dup R[[ PROB\d+]] matches? ] [ parse-probability ] }
-        { [ dup R[[ \d{3}V\d{3}]] matches? ] [ parse-varying ] }
-        { [ dup R[[ [^-]+(-[^-]+)+]] matches? ] [ parse-from-to ] }
-        { [ dup R[[ [^\\/]+(\\/[^\\/]+)+]] matches? ] [ ] }
-        { [ dup R[[ \d+.\d+]] matches? ] [ ] }
+        { [ dup R[[1\d{4}]] matches? ] [ parse-6hr-max-temp ] }
+        { [ dup R[[2\d{4}]] matches? ] [ parse-6hr-min-temp ] }
+        { [ dup R[[4\d{8}]] matches? ] [ parse-24hr-temp ] }
+        { [ dup R[[4\\/\d{3}]] matches? ] [ parse-snow-depth ] }
+        { [ dup R[[5\d{4}]] matches? ] [ parse-1hr-pressure ] }
+        { [ dup R[[6[\d\\/]{4}]] matches? ] [ parse-6hr-precipitation ] }
+        { [ dup R[[7\d{4}]] matches? ] [ parse-24hr-precipitation ] }
+        { [ dup R[[8\\/\d{3}]] matches? ] [ parse-cloud-cover ] }
+        { [ dup R[[931\d{3}]] matches? ] [ parse-6hr-snowfall ] }
+        { [ dup R[[933\d{3}]] matches? ] [ parse-water-equivalent-snow ] }
+        { [ dup R[[98\d{3}]] matches? ] [ parse-duration-of-sunshine ] }
+        { [ dup R[[T\d{4,8}]] matches? ] [ parse-1hr-temp ] }
+        { [ dup R[[\d{3}\d{2,3}\\/\d{2,4}]] matches? ] [ parse-peak-wind ] }
+        { [ dup R[[P\d{4}]] matches? ] [ parse-1hr-precipitation ] }
+        { [ dup R[[SLP\d{3}]] matches? ] [ parse-sea-level-pressure ] }
+        { [ dup R[[LTG\w+]] matches? ] [ parse-lightning ] }
+        { [ dup R[[PROB\d+]] matches? ] [ parse-probability ] }
+        { [ dup R[[\d{3}V\d{3}]] matches? ] [ parse-varying ] }
+        { [ dup R[[[^-]+(-[^-]+)+]] matches? ] [ parse-from-to ] }
+        { [ dup R[[[^\\/]+(\\/[^\\/]+)+]] matches? ] [ ] }
+        { [ dup R[[\d+.\d+]] matches? ] [ ] }
         { [ dup re-recent-weather matches? ] [ parse-recent-weather ] }
         { [ dup re-weather matches? ] [ parse-weather ] }
         { [ dup re-sky-condition matches? ] [ parse-sky-condition ] }
@@ -596,12 +596,12 @@ M: string metar.
     [ parse-altitude ] [ parse-wind ] bi* prepend
     "wind shear " prepend ;
 
-CONSTANT: re-from-timestamp R[[ FM\d{6}]]
+CONSTANT: re-from-timestamp R[[FM\d{6}]]
 
 : parse-from-timestamp ( str -- str' )
     "FM" ?head drop parse-timestamp ;
 
-CONSTANT: re-valid-timestamp R[[ \d{4}\/\d{4}]]
+CONSTANT: re-valid-timestamp R[[\d{4}\/\d{4}]]
 
 : parse-valid-timestamp ( str -- str' )
     "/" split1 [ "00" append parse-timestamp ] bi@ " to " glue ;

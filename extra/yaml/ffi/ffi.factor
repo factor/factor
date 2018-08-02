@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! adapted from "yaml.h" libYAML 0.1.4
 ! http://pyyaml.org/wiki/LibYAML
-USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax classes.struct combinators literals system
-alien.libraries.finder ;
+USING: accessors alien alien.c-types alien.destructors
+alien.libraries alien.libraries.finder alien.syntax
+classes.struct destructors effects generalizations kernel
+literals sequences ;
 IN: yaml.ffi
 
 <<

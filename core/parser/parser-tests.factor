@@ -625,9 +625,9 @@ EXCLUDE: qualified.tests.bar => x ;
 
 [
     [ "vocabs.loader.test.l" use-vocab ] must-fail
-    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test
-    [ ] [ "vocabs.loader.test.l" unuse-vocab ] unit-test
-    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test
+    { f } [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test
+    { } [ "vocabs.loader.test.l" unuse-vocab ] unit-test
+    { f } [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test
 ] with-file-vocabs
 
 ! Test cases for #183

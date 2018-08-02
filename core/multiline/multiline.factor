@@ -29,18 +29,21 @@ PRIVATE>
 : parse-multiline-string ( end-text -- str )
     lexer get 1 (parse-multiline-string) ;
 
-! SYNTAX: \[[ "]]" parse-multiline-string suffix! ;
-! SYNTAX: \[=[ "]=]" parse-multiline-string suffix! ;
-! SYNTAX: \[==[ "]==]" parse-multiline-string suffix! ;
-! SYNTAX: \[===[ "]===]" parse-multiline-string suffix! ;
-! SYNTAX: \[====[ "]====]" parse-multiline-string suffix! ;
-! SYNTAX: \[=====[ "]=====]" parse-multiline-string suffix! ;
-! SYNTAX: \[======[ "]======]" parse-multiline-string suffix! ;
+: parse-multiline-string0 ( end-text -- str )
+    lexer get 0 (parse-multiline-string) ;
 
-! SYNTAX: \![[ "]]" parse-multiline-string drop ;
-! SYNTAX: \![=[ "]=]" parse-multiline-string drop ;
-! SYNTAX: \![==[ "]==]" parse-multiline-string drop ;
-! SYNTAX: \![===[ "]===]" parse-multiline-string drop ;
-! SYNTAX: \![====[ "]====]" parse-multiline-string drop ;
-! SYNTAX: \![=====[ "]=====]" parse-multiline-string drop ;
-! SYNTAX: \![======[ "]======]" parse-multiline-string drop ;
+! SYNTAX: \[[ "]]" parse-multiline-string0 suffix! ;
+! SYNTAX: \[=[ "]=]" parse-multiline-string0 suffix! ;
+! SYNTAX: \[==[ "]==]" parse-multiline-string0 suffix! ;
+! SYNTAX: \[===[ "]===]" parse-multiline-string0 suffix! ;
+! SYNTAX: \[====[ "]====]" parse-multiline-string0 suffix! ;
+! SYNTAX: \[=====[ "]=====]" parse-multiline-string0 suffix! ;
+! SYNTAX: \[======[ "]======]" parse-multiline-string0 suffix! ;
+
+! SYNTAX: \![[ "]]" parse-multiline-string0 drop ;
+! SYNTAX: \![=[ "]=]" parse-multiline-string0 drop ;
+! SYNTAX: \![==[ "]==]" parse-multiline-string0 drop ;
+! SYNTAX: \![===[ "]===]" parse-multiline-string0 drop ;
+! SYNTAX: \![====[ "]====]" parse-multiline-string0 drop ;
+! SYNTAX: \![=====[ "]=====]" parse-multiline-string0 drop ;
+! SYNTAX: \![======[ "]======]" parse-multiline-string0 drop ;

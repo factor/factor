@@ -549,11 +549,11 @@ SYNTAX: \EBNF:
     ebnf>quot nip
     suffix! \ call suffix! reset-tokenizer ;
 
-SYNTAX: \EBNF[[ "]]" parse-multiline-string define-inline-ebnf ;
-SYNTAX: \EBNF[=[ "]=]" parse-multiline-string define-inline-ebnf ;
-SYNTAX: \EBNF[==[ "]==]" parse-multiline-string define-inline-ebnf ;
-SYNTAX: \EBNF[===[ "]===]" parse-multiline-string define-inline-ebnf ;
-SYNTAX: \EBNF[====[ "]====]" parse-multiline-string define-inline-ebnf ;
+SYNTAX: \EBNF[[ "]]" parse-multiline-string0 define-inline-ebnf ;
+SYNTAX: \EBNF[=[ "]=]" parse-multiline-string0 define-inline-ebnf ;
+SYNTAX: \EBNF[==[ "]==]" parse-multiline-string0 define-inline-ebnf ;
+SYNTAX: \EBNF[===[ "]===]" parse-multiline-string0 define-inline-ebnf ;
+SYNTAX: \EBNF[====[ "]====]" parse-multiline-string0 define-inline-ebnf ;
 
 SYNTAX: \EBNF-PARSER:
     reset-tokenizer

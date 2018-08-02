@@ -218,7 +218,7 @@ PRIVATE>
 PRIVATE>
 
 : parse-optioned-regexp ( accum string -- accum )
-    parse-multiline-string lexer get
+    parse-multiline-string0 lexer get
     parse-noblank-token <optioned-regexp> compile-next-match
     suffix! ;
 

@@ -374,21 +374,21 @@ IN: bootstrap.syntax
 
     { "_" "@" } define-fry-specifiers
 
-    "[[" [ "]]" parse-multiline-string suffix! ] define-core-syntax
-    "[=[" [ "]=]" parse-multiline-string suffix! ] define-core-syntax
-    "[==[" [ "]==]" parse-multiline-string suffix! ] define-core-syntax
-    "[===[" [ "]===]" parse-multiline-string suffix! ] define-core-syntax
-    "[====[" [ "]====]" parse-multiline-string suffix! ] define-core-syntax
-    "[=====[" [ "]=====]" parse-multiline-string suffix! ] define-core-syntax
-    "[======[" [ "]======]" parse-multiline-string suffix! ] define-core-syntax
+    "[[" [ "]]" parse-multiline-string0 suffix! ] define-core-syntax
+    "[=[" [ "]=]" parse-multiline-string0 suffix! ] define-core-syntax
+    "[==[" [ "]==]" parse-multiline-string0 suffix! ] define-core-syntax
+    "[===[" [ "]===]" parse-multiline-string0 suffix! ] define-core-syntax
+    "[====[" [ "]====]" parse-multiline-string0 suffix! ] define-core-syntax
+    "[=====[" [ "]=====]" parse-multiline-string0 suffix! ] define-core-syntax
+    "[======[" [ "]======]" parse-multiline-string0 suffix! ] define-core-syntax
 
-    "![[" [ "]]" parse-multiline-string drop ] define-core-syntax
-    "![=[" [ "]=]" parse-multiline-string drop ] define-core-syntax
-    "![==[" [ "]==]" parse-multiline-string drop ] define-core-syntax
-    "![===[" [ "]===]" parse-multiline-string drop ] define-core-syntax
-    "![====[" [ "]====]" parse-multiline-string drop ] define-core-syntax
-    "![=====[" [ "]=====]" parse-multiline-string drop ] define-core-syntax
-    "![======[" [ "]======]" parse-multiline-string drop ] define-core-syntax
+    "![[" [ "]]" parse-multiline-string0 drop ] define-core-syntax
+    "![=[" [ "]=]" parse-multiline-string0 drop ] define-core-syntax
+    "![==[" [ "]==]" parse-multiline-string0 drop ] define-core-syntax
+    "![===[" [ "]===]" parse-multiline-string0 drop ] define-core-syntax
+    "![====[" [ "]====]" parse-multiline-string0 drop ] define-core-syntax
+    "![=====[" [ "]=====]" parse-multiline-string0 drop ] define-core-syntax
+    "![======[" [ "]======]" parse-multiline-string0 drop ] define-core-syntax
 
     "I[[" [ "]]" define-interpolate-syntax ] define-core-syntax
     "I[=[" [ "]=]" define-interpolate-syntax ] define-core-syntax

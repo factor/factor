@@ -22,7 +22,7 @@ MEMO: x ( a b c d e -- f g h i j )
 
 MEMO: see-test ( a -- b ) reverse ;
 
-{ "USING: memoize sequences ;\nIN: memoize.tests\nMEMO: see-test ( a -- b ) reverse ;\n" }
+{ "USING: sequences ;\nIN: memoize.tests\nMEMO: see-test ( a -- b ) reverse ;\n" }
 [ [ \ see-test see ] with-string-writer ]
 unit-test
 

@@ -191,4 +191,12 @@ PRIVATE>
 ! Literal syntax
 SYNTAX: \url" parse-string >url suffix! ;
 
+: parse-url-container ( accum string -- accum )
+    parse-multiline-string0 >url suffix! ;
+
+SYNTAX: \url[[ "]]" parse-url-container ;
+SYNTAX: \url[=[ "]=]" parse-url-container ;
+SYNTAX: \url[==[ "]==]" parse-url-container ;
+SYNTAX: \url[===[ "]===]" parse-url-container ;
+
 { "urls" "prettyprint" } "urls.prettyprint" require-when

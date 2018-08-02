@@ -194,7 +194,7 @@ CONSTANT: new-definition "USING: math ;\nIN: locals.tests\n: a-word-with-locals 
     new-definition =
 ] unit-test
 
-CONSTANT: method-definition "USING: locals locals.tests sequences ;\nM:: sequence method-with-locals ( a -- y ) a reverse ;\n"
+CONSTANT: method-definition "USING: locals.tests sequences ;\nM:: sequence method-with-locals ( a -- y ) a reverse ;\n"
 
 GENERIC: method-with-locals ( x -- y )
 

@@ -7,7 +7,7 @@ MACRO: see-test ( a b -- quot ) + ;
 
 { t } [ \ see-test macro? ] unit-test
 
-{ "USING: macros math ;\nIN: macros.tests\nMACRO: see-test ( a b -- quot ) + ;\n" }
+{ "USING: math ;\nIN: macros.tests\nMACRO: see-test ( a b -- quot ) + ;\n" }
 [ [ \ see-test see ] with-string-writer ]
 unit-test
 

@@ -112,10 +112,10 @@ TUPLE: yo-momma ;
 
 ! Test forget
 [
-    [ t ] [ \ yo-momma class? ] unit-test
-    [ ] [ \ yo-momma forget ] unit-test
-    [ ] [ \ <yo-momma> forget ] unit-test
-    [ f ] [ \ yo-momma update-map get values member-eq? ] unit-test
+    { t } [ \ yo-momma class? ] unit-test
+    { } [ \ yo-momma forget ] unit-test
+    { } [ \ <yo-momma> forget ] unit-test
+    { f } [ \ yo-momma update-map get values member-eq? ] unit-test
 ] with-compilation-unit
 
 TUPLE: loc-recording ;
@@ -133,9 +133,9 @@ M: forget-robustness forget-robustness-generic ;
 M: integer forget-robustness-generic ;
 
 [
-    [ ] [ M\\ forget-robustness-generic forget ] unit-test
-    [ ] [ M\\ forget-robustness forget ] unit-test
-    [ ] [ M\\ forget-robustness forget-robustness-generic forget ] unit-test
+    { } [ \ forget-robustness-generic forget ] unit-test
+    { } [ \ forget-robustness forget ] unit-test
+    { } [ M\\ forget-robustness forget-robustness-generic forget ] unit-test
 ] with-compilation-unit
 
 ! rapido found this one
@@ -223,10 +223,10 @@ C: <laptop> laptop
 { t } [ "laptop" get tuple? ] unit-test
 
 : test-laptop-slot-values ( -- )
-    [ laptop ] [ "laptop" get class-of ] unit-test
-    [ "Pentium" ] [ "laptop" get cpu>> ] unit-test
-    [ 128 ] [ "laptop" get ram>> ] unit-test
-    [ t ] [ "laptop" get battery>> 3 hours = ] unit-test ;
+    { laptop } [ "laptop" get class-of ] unit-test
+    { "Pentium" } [ "laptop" get cpu>> ] unit-test
+    { 128 } [ "laptop" get ram>> ] unit-test
+    { t } [ "laptop" get battery>> 3 hours = ] unit-test ;
 
 test-laptop-slot-values
 

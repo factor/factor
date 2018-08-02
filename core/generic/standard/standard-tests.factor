@@ -3,9 +3,11 @@ byte-arrays classes.tuple classes.union compiler.crossref
 compiler.units definitions eval generic generic.single
 generic.standard io.streams.string kernel make math
 math.constants math.functions namespaces parser quotations
-sequences specialized-vectors strings tools.test words ;
+sequences specialized-arrays specialized-vectors strings
+tools.test words ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-VECTOR: c:double
+SPECIALIZED-ARRAY: c:double
 IN: generic.standard.tests
 
 GENERIC: class-of ( x -- y )
@@ -398,7 +400,7 @@ GENERIC: forget-test ( a -- b )
 
 M: integer forget-test 3 + ;
 
-{ } [ "IN: generic.standard.tests USE: math FORGET: M\\ integer forget-test" eval( -- ) ] unit-test
+{ } [ "IN: generic.standard.tests USE: math FORGET: M\\\\ integer forget-test" eval( -- ) ] unit-test
 
 { { } } [
     \ + all-dependencies-of keys [ method? ] filter
@@ -427,12 +429,12 @@ M: integer foozul ;
 M: slice foozul ;
 
 { } [ reversed \ foozul method-for-class M\\ reversed foozul assert= ] unit-test
-{ } [ { 1 2 3 } <reversed> \ foozul method-for-object M\ reversed foozul assert= ] unit-test
-{ } [ { 1 2 3 } <reversed> \ foozul effective-method M\ reversed foozul assert= drop ] unit-test
+{ } [ { 1 2 3 } <reversed> \ foozul method-for-object M\\ reversed foozul assert= ] unit-test
+{ } [ { 1 2 3 } <reversed> \ foozul effective-method M\\ reversed foozul assert= drop ] unit-test
 
-{ } [ fixnum \ foozul method-for-class M\ integer foozul assert= ] unit-test
-{ } [ 13 \ foozul method-for-object M\ integer foozul assert= ] unit-test
-{ } [ 13 \ foozul effective-method M\ integer foozul assert= drop ] unit-test
+{ } [ fixnum \ foozul method-for-class M\\ integer foozul assert= ] unit-test
+{ } [ 13 \ foozul method-for-object M\\ integer foozul assert= ] unit-test
+{ } [ 13 \ foozul effective-method M\\ integer foozul assert= drop ] unit-test
 
 ! Ensure dynamic and static dispatch match in ambiguous cases
 UNION: amb-union-1a integer float ;
