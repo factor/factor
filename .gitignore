@@ -23,8 +23,9 @@
 .*.swp
 .DS_Store
 .gdb_history
+/factor
+Factor.app/Contents/MacOS/factor
 Factor.app/Contents/_CodeSignature
-Factor/factor
 a.out
 checksums.txt
 factor.com
