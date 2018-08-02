@@ -137,10 +137,10 @@ M: insn visit-insn 2drop ;
     [ update-live-out/in ] keep predecessors>> { } ? ;
 
 : init-liveness ( -- )
-    H{ } clone live-ins namespaces::set
-    H{ } clone edge-live-ins namespaces::set
-    H{ } clone live-outs namespaces::set
-    H{ } clone base-pointers namespaces::set ;
+    H{ } clone live-ins namespaces:set
+    H{ } clone edge-live-ins namespaces:set
+    H{ } clone live-outs namespaces:set
+    H{ } clone base-pointers namespaces:set ;
 
 : compute-live-sets ( cfg -- )
     init-liveness

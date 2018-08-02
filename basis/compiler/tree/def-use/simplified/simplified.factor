@@ -18,8 +18,8 @@ SYMBOLS: visited accum ;
 
 : with-simplified-def-use ( quot -- real-usages )
     [
-        HS{ } clone visited namespaces::set
-        HS{ } clone accum namespaces::set
+        HS{ } clone visited namespaces:set
+        HS{ } clone accum namespaces:set
         call
         accum get members
     ] with-scope ; inline

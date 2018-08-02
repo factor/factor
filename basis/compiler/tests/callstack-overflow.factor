@@ -22,7 +22,7 @@ IN: compiler.tests.callstack-overflow
 : overflow/w-primitive ( -- )
     reset-dispatch-stats overflow/w-primitive post ;
 
-: get-context ( -- ctx ) context vm::context memory>struct ;
+: get-context ( -- ctx ) context vm:context memory>struct ;
 
 : remaining-stack ( -- n )
     get-context [ callstack-top>> ] [ callstack-seg>> start>> ] bi - ;

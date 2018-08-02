@@ -57,13 +57,12 @@ M: dataflow-analysis join-sets 2drop assoc-refine ;
 M: dataflow-analysis ignore-block? drop kill-block?>> ;
 
 INLINE-FUNCTOR: dataflow-analysis ( name: name -- ) [[
-    USING: assocs namespaces ;
-
-    SINGLETON: ${name}
-    SYMBOL: ${name}-ins
-    : ${name}-in ( bb -- set ) ${name}-ins get at ;
-    SYMBOL: ${name}-outs
-    : ${name}-out ( bb -- set ) ${name}-outs get at ;
+USING: assocs namespaces ;
+SINGLETON: ${name}
+SYMBOL: ${name}-ins
+: ${name}-in ( bb -- set ) ${name}-ins get at ;
+SYMBOL: ${name}-outs
+: ${name}-out ( bb -- set ) ${name}-outs get at ;
 ]]
 
 ! ! ! Forward dataflow analysis
@@ -76,16 +75,17 @@ M: forward-analysis successors   drop successors>> ;
 M: forward-analysis predecessors drop predecessors>> ;
 
 INLINE-FUNCTOR: forward-analysis ( name: name -- ) [[
-    USING: assocs kernel namespaces ;
-    QUALIFIED: namespaces
+USING: assocs kernel namespaces ;
+QUALIFIED: namespaces
 
-    DATAFLOW-ANALYSIS: ${name}
+DATAFLOW-ANALYSIS: ${name}
 
-    INSTANCE: ${name} forward-analysis
+INSTANCE: ${name} forward-analysis
 
-    : compute-${name}-sets ( cfg -- )
-        \ ${name} run-dataflow-analysis
-        [ ${name}-ins namespaces::set ] [ ${name}-outs namespaces::set ] bi* ;
+: compute-${name}-sets ( cfg -- )
+    \ ${name} run-dataflow-analysis
+    [ ${name}-ins namespaces:set ] [ ${name}-outs namespaces:set ] bi* ;
+
 ]]
 
 ! ! ! Backward dataflow analysis
@@ -98,14 +98,15 @@ M: backward-analysis successors   drop predecessors>> ;
 M: backward-analysis predecessors drop successors>> ;
 
 INLINE-FUNCTOR: backward-analysis ( name: name -- ) [[
-    USING: assocs kernel namespaces ;
-    QUALIFIED: namespaces
+USING: assocs kernel namespaces ;
+QUALIFIED: namespaces
 
-    DATAFLOW-ANALYSIS: ${name}
+DATAFLOW-ANALYSIS: ${name}
 
-    INSTANCE: ${name} backward-analysis
+INSTANCE: ${name} backward-analysis
 
-    : compute-${name}-sets ( cfg -- )
-        \ ${name} run-dataflow-analysis
-        [ ${name}-outs namespaces::set ] [ ${name}-ins namespaces::set ] bi* ;
+: compute-${name}-sets ( cfg -- )
+    \ ${name} run-dataflow-analysis
+    [ ${name}-outs namespaces:set ] [ ${name}-ins namespaces:set ] bi* ;
+
 ]]

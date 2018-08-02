@@ -467,8 +467,8 @@ ERROR: bug-in-fixnum* x y a b ;
 [ t ] [ pi double <ref> [ { byte-array } declare double deref ] compile-call pi = ] unit-test
 
 ! Silly
-[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-call ] keep c::float deref pi - -0.001 0.001 between? ] unit-test
-[ t ] [ pi c::float <ref> [ { byte-array } declare c::float deref ] compile-call pi - -0.001 0.001 between? ] unit-test
+[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-call ] keep c:float deref pi - -0.001 0.001 between? ] unit-test
+[ t ] [ pi c:float <ref> [ { byte-array } declare c:float deref ] compile-call pi - -0.001 0.001 between? ] unit-test
 
 [ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-call ] keep double deref pi = ] unit-test
 

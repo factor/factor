@@ -73,7 +73,7 @@ M: gif-lzw increment-code-size [ 1 + 12 min ] change-code-size ;
     [ maybe-increment-code-size 2drop ] 2bi ;
 
 : lzw-read ( lzw -- lzw n )
-    [ ] [ code-size>> ] [ input>> ] tri bs::read ;
+    [ ] [ code-size>> ] [ input>> ] tri bs:read ;
 
 : end-of-information? ( lzw code -- ? ) swap end-of-information-code>> = ;
 : clear-code? ( lzw code -- ? ) swap clear-code>> = ;
@@ -121,7 +121,7 @@ DEFER: lzw-uncompress-char
     [ lzw-uncompress-char ] [ output>> ] bi ;
 
 : tiff-lzw-uncompress ( seq -- byte-array )
-    bs::<msb0-bit-reader> 9 tiff-lzw lzw-uncompress ;
+    bs:<msb0-bit-reader> 9 tiff-lzw lzw-uncompress ;
 
 : gif-lzw-uncompress ( seq code-size -- byte-array )
-    [ bs::<lsb0-bit-reader> ] dip gif-lzw lzw-uncompress ;
+    [ bs:<lsb0-bit-reader> ] dip gif-lzw lzw-uncompress ;

@@ -179,7 +179,7 @@ M: nesting-observer definitions-changed
 
 : add-nesting-observer ( -- )
     new-words get nesting-observer boa
-    [ nesting-observer namespaces::set ] [ add-definition-observer ] bi ;
+    [ nesting-observer namespaces:set ] [ add-definition-observer ] bi ;
 
 : remove-nesting-observer ( -- )
     nesting-observer get remove-definition-observer ;

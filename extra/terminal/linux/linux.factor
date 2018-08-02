@@ -1,8 +1,10 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
+
 USING: accessors arrays classes.struct io.streams.c kernel
 math system terminal unix unix.ffi ;
 QUALIFIED-WITH: alien.c-types c
+
 IN: terminal.linux
 
 <PRIVATE
@@ -10,10 +12,10 @@ IN: terminal.linux
 CONSTANT: TIOCGWINSZ 0x5413
 
 STRUCT: winsize
-{ ws_row c::short }
-{ ws_col c::short }
-{ ws_xpixel c::short }
-{ ws_ypixel c::short } ;
+{ ws_row c:short }
+{ ws_col c:short }
+{ ws_xpixel c:short }
+{ ws_ypixel c:short } ;
 
 PRIVATE>
 

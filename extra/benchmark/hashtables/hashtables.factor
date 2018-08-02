@@ -31,7 +31,7 @@ MEMO: strings ( -- str )
     ] map drop
 
     keys [
-        hash [ 1 + ] assocs::change-at
+        hash [ 1 + ] assocs:change-at
     ] each ;
 
 : string-mix ( hash -- )

@@ -540,13 +540,13 @@ HELP: \QUALIFIED:
   { $code
   "USE: fish"
   "QUALIFIED: go"
-  "go::fishing"
+  "go:fishing"
   }
 }
 { $examples { $example
     "USING: prettyprint ;"
     "QUALIFIED: math"
-    "1 2 math::+ ."
+    "1 2 math:+ ."
     "3"
 } } ;
 
@@ -556,7 +556,7 @@ HELP: \QUALIFIED-WITH:
 { $examples { $example
     "USING: prettyprint ;"
     "QUALIFIED-WITH: math m"
-    "1 2 m::+ ."
+    "1 2 m:+ ."
     "3"
 } } ;
 

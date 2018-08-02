@@ -1,8 +1,11 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
+
 USING: accessors alien.c-types classes.struct io.streams.c
 kernel math memoize scratchpad system terminal unix unix.ffi ;
+
 QUALIFIED-WITH: alien.c-types c
+
 IN: terminal.macosx
 
 <PRIVATE
@@ -23,10 +26,10 @@ CONSTANT: IOC_IN   0x80000000 ! copy parameters in
 : _IOCW ( group num len -- n ) [ IOC_IN ] 3dip _IOC ;
 
 STRUCT: winsize
-{ ws_row c::short }
-{ ws_col c::short }
-{ ws_xpixel c::short }
-{ ws_ypixel c::short } ;
+{ ws_row c:short }
+{ ws_col c:short }
+{ ws_xpixel c:short }
+{ ws_ypixel c:short } ;
 
 MEMO: TIOCGWINSZ ( -- x ) char: t 104 winsize heap-size _IOCR ;
 

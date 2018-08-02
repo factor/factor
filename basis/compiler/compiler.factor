@@ -25,9 +25,9 @@ SYMBOL: compiled
 
 : start-compilation ( word -- )
     dup name>> compiler-message
-    H{ } clone dependencies namespaces::set
-    H{ } clone generic-dependencies namespaces::set
-    HS{ } clone conditional-dependencies namespaces::set
+    H{ } clone dependencies namespaces:set
+    H{ } clone generic-dependencies namespaces:set
+    HS{ } clone conditional-dependencies namespaces:set
     clear-compiler-error ;
 
 GENERIC: no-compile? ( word -- ? )

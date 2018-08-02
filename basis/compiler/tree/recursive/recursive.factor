@@ -35,8 +35,8 @@ GENERIC: node-call-graph ( tail? node -- )
 
 : build-call-graph ( nodes -- labels calls )
     [
-        V{ } clone children namespaces::set
-        V{ } clone calls namespaces::set
+        V{ } clone children namespaces:set
+        V{ } clone calls namespaces:set
         [ t ] dip (build-call-graph)
         children get
         calls get
@@ -111,8 +111,8 @@ SYMBOL: changed?
     [ changed? get [ while-changing ] [ drop ] if ] bi ; inline recursive
 
 : detect-loops ( call-graph -- )
-    HS{ } clone not-loops namespaces::set
-    V{ } clone recursive-nesting namespaces::set
+    HS{ } clone not-loops namespaces:set
+    V{ } clone recursive-nesting namespaces:set
     [ visit-back-edges ]
     [ '[ _ detect-cross-frame-calls ] while-changing ]
     bi ;
@@ -130,7 +130,7 @@ SYMBOL: call-graph
 
 : analyze-recursive ( nodes -- nodes )
     dup build-call-graph drop
-    [ call-graph namespaces::set ]
+    [ call-graph namespaces:set ]
     [ detect-loops ]
     [ mark-loops ]
     tri ;

@@ -175,5 +175,5 @@ GENERIC: binary-zero? ( value -- ? )
 M: object binary-zero? drop f ; inline
 M: f binary-zero? drop t ; inline
 M: integer binary-zero? zero? ; inline
-M: math::float binary-zero? double>bits zero? ; inline
+M: math:float binary-zero? double>bits zero? ; inline
 M: complex binary-zero? >rect [ binary-zero? ] both? ; inline

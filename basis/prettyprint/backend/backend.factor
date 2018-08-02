@@ -231,7 +231,7 @@ M: callable >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
-M: hash-set >pprint-sequence sets::members ;
+M: hash-set >pprint-sequence sets:members ;
 M: anonymous-union >pprint-sequence members>> ;
 M: anonymous-intersection >pprint-sequence participants>> ;
 M: anonymous-complement >pprint-sequence class>> 1array ;

@@ -96,5 +96,5 @@ TUPLE: tuple2 d ;
 
 { { { "apples" 1 } { "bananas" 2 } { "cherries" 3 } } } [
     H{ { "apples" 1 } { "bananas" 2 } { "cherries" 3 } }
-    { { sequences::length <=> } } sort-keys-by
+    { { sequences:length <=> } } sort-keys-by
 ] unit-test

@@ -29,11 +29,11 @@ SYMBOL: blank-line
     and [ nl ] when ;
 
 : ($blank-line) ( -- )
-    nl nl blank-line last-element namespaces::set ;
+    nl nl blank-line last-element namespaces:set ;
 
 : ($span) ( quot -- )
     last-block? [ nl ] when
-    span last-element namespaces::set
+    span last-element namespaces:set
     call ; inline
 
 GENERIC: print-element ( element -- )
@@ -60,9 +60,9 @@ M: f print-element drop ;
 
 : ($block) ( quot -- )
     ?nl
-    span last-element namespaces::set
+    span last-element namespaces:set
     call
-    block last-element namespaces::set ; inline
+    block last-element namespaces:set ; inline
 
 ! Some spans
 
@@ -86,7 +86,7 @@ ALIAS: $slot $snippet
 
 : $nl ( children -- )
     drop nl last-element get [ nl ] when
-    blank-line last-element namespaces::set ;
+    blank-line last-element namespaces:set ;
 
 ! Some blocks
 : ($heading) ( children quot -- )

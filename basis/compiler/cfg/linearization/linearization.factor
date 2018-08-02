@@ -47,7 +47,7 @@ SYMBOLS: loop-heads visited ;
     [ visited? ] reject ;
 
 : (linearization-order) ( cfg -- bbs )
-    HS{ } clone visited namespaces::set
+    HS{ } clone visited namespaces:set
     entry>> <dlist> [ push-back ] keep
     [ dup '[ process-block _ push-all-back ] slurp-deque ] { } make ;
 

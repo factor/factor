@@ -93,12 +93,12 @@ M: user-saver dispose
     <user-saver> &dispose drop ;
 
 : init-user ( user -- )
-    [ [ logged-in-user namespaces::set ] [ save-user-after ] bi ] when* ;
+    [ [ logged-in-user namespaces:set ] [ save-user-after ] bi ] when* ;
 
 \ init-user DEBUG add-input-logging
 
 M: realm call-responder* ( path responder -- response )
-    dup realm namespaces::set
+    dup realm namespaces:set
     logged-in? [
         dup init-realm
         dup logged-in-username
@@ -147,7 +147,7 @@ TUPLE: protected < filter-responder description capabilities ;
     ] if ;
 
 M: protected call-responder* ( path responder -- response )
-    dup protected namespaces::set
+    dup protected namespaces:set
     dup capabilities>> have-capabilities?
     [ call-next-method ] [
         [ drop ] [ [ description>> ] [ capabilities>> ] bi ] bi*

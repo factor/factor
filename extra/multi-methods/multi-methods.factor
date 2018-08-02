@@ -251,35 +251,35 @@ SYNTAX: \M:
 ! Definition protocol. We qualify core generics here
 QUALIFIED: syntax
 
-syntax::M: generic definer drop \ MULTI-GENERIC: f ;
+syntax:M: generic definer drop \ MULTI-GENERIC: f ;
 
-syntax::M: generic definition drop f ;
+syntax:M: generic definition drop f ;
 
 PREDICATE: method-spec < array
     unclip generic? [ [ class? ] all? ] dip and ;
 
-syntax::M: method-spec where
+syntax:M: method-spec where
     dup unclip method [ ] [ first ] ?if where ;
 
-syntax::M: method-spec set-where
+syntax:M: method-spec set-where
     unclip method set-where ;
 
-syntax::M: method-spec definer
+syntax:M: method-spec definer
     unclip method definer ;
 
-syntax::M: method-spec definition
+syntax:M: method-spec definition
     unclip method definition ;
 
-syntax::M: method-spec synopsis*
+syntax:M: method-spec synopsis*
     unclip method synopsis* ;
 
-syntax::M: method-spec forget*
+syntax:M: method-spec forget*
     unclip method forget* ;
 
-syntax::M: method-body definer
+syntax:M: method-body definer
     drop \ METHOD: \ ; ;
 
-syntax::M: method-body synopsis*
+syntax:M: method-body synopsis*
     dup definer.
     [ "multi-method-generic" word-prop pprint-word ]
     [ "multi-method-specializer" word-prop pprint* ] bi ;

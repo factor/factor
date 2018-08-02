@@ -25,6 +25,7 @@ stack-checker.transforms
 stack-checker.dependencies
 stack-checker.recursive-state
 stack-checker.row-polymorphism ;
+QUALIFIED-WITH: generic.single.private gsp
 IN: stack-checker.known-words
 
 : infer-special ( word -- )

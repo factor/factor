@@ -54,7 +54,7 @@ M: closer process
     <tag> add-child ;
 
 : init-xml-stack ( -- )
-    V{ } clone xml-stack namespaces::set
+    V{ } clone xml-stack namespaces:set
     f push-xml ;
 
 : default-prolog ( -- prolog )
@@ -125,7 +125,7 @@ TUPLE: pull-xml scope ;
     scope>> [
         text-now? get [ parse-text f ] [
             get-char [ make-tag t ] [ f f ] if
-        ] if text-now? namespaces::set
+        ] if text-now? namespaces:set
     ] with-variables ;
 
 <PRIVATE
@@ -157,7 +157,7 @@ PRIVATE>
 
 : read-seq ( stream quot n -- seq )
     rot [
-        depth namespaces::set
+        depth namespaces:set
         init-xml init-xml-stack
         call
         [ process ] xml-loop
@@ -200,7 +200,7 @@ PRIVATE>
 
 : read-dtd ( stream -- dtd )
     [
-        H{ } clone extra-entities namespaces::set
+        H{ } clone extra-entities namespaces:set
         take-internal-subset
     ] with-state ;
 

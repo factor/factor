@@ -115,21 +115,21 @@ MACRO: size-case-type ( cases -- quot )
 
 GENERIC: (fortran-type>c-type) ( type -- c-type )
 
-M: f (fortran-type>c-type) drop c::void ;
+M: f (fortran-type>c-type) drop c:void ;
 
 M: integer-type (fortran-type>c-type)
     {
-        { f [ c::int      ] }
-        { 1 [ c::char     ] }
-        { 2 [ c::short    ] }
-        { 4 [ c::int      ] }
-        { 8 [ c::longlong ] }
+        { f [ c:int      ] }
+        { 1 [ c:char     ] }
+        { 2 [ c:short    ] }
+        { 4 [ c:int      ] }
+        { 8 [ c:longlong ] }
     } size-case-type ;
 M: real-type (fortran-type>c-type)
     {
-        { f [ c::float  ] }
-        { 4 [ c::float  ] }
-        { 8 [ c::double ] }
+        { f [ c:float  ] }
+        { 4 [ c:float  ] }
+        { 8 [ c:double ] }
     } size-case-type ;
 M: real-complex-type (fortran-type>c-type)
     {
@@ -139,7 +139,7 @@ M: real-complex-type (fortran-type>c-type)
     } size-case-type ;
 
 M: double-precision-type (fortran-type>c-type)
-    c::double simple-type ;
+    c:double simple-type ;
 M: double-complex-type (fortran-type>c-type)
     complex-double simple-type ;
 M: misc-type (fortran-type>c-type)
@@ -155,7 +155,7 @@ M: misc-type (fortran-type>c-type)
     dup single-char? [ f >>dims ] when ;
 
 M: character-type (fortran-type>c-type)
-    fix-character-type c::char simple-type ;
+    fix-character-type c:char simple-type ;
 
 : dimension>number ( string -- number )
     dup "*" = [ drop 0 ] [ string>number ] if ;
@@ -181,7 +181,7 @@ M: character-type (fortran-type>c-type)
 GENERIC: added-c-args ( type -- args )
 
 M: fortran-type added-c-args drop { } ;
-M: character-type added-c-args fix-character-type single-char? [ { } ] [ { c::long } ] if ;
+M: character-type added-c-args fix-character-type single-char? [ { } ] [ { c:long } ] if ;
 
 GENERIC: returns-by-value? ( type -- ? )
 
@@ -194,10 +194,10 @@ M: complex-type returns-by-value?
 
 GENERIC: (fortran-ret-type>c-type) ( type -- c-type )
 
-M: f (fortran-ret-type>c-type) drop c::void ;
+M: f (fortran-ret-type>c-type) drop c:void ;
 M: fortran-type (fortran-ret-type>c-type) (fortran-type>c-type) ;
 M: real-type (fortran-ret-type>c-type)
-    drop real-functions-return-double? [ c::double ] [ c::float ] if ;
+    drop real-functions-return-double? [ c:double ] [ c:float ] if ;
 
 GENERIC: (fortran-arg>c-args) ( type -- main-quot added-quot )
 
@@ -207,11 +207,11 @@ GENERIC: (fortran-arg>c-args) ( type -- main-quot added-quot )
 M: integer-type (fortran-arg>c-args)
     [
         size>> {
-            { f [ [ c::int <ref>     ] [ drop ] ] }
-            { 1 [ [ c::char <ref>    ] [ drop ] ] }
-            { 2 [ [ c::short <ref>   ] [ drop ] ] }
-            { 4 [ [ c::int <ref>     ] [ drop ] ] }
-            { 8 [ [ c::longlong <ref> ] [ drop ] ] }
+            { f [ [ c:int <ref>     ] [ drop ] ] }
+            { 1 [ [ c:char <ref>    ] [ drop ] ] }
+            { 2 [ [ c:short <ref>   ] [ drop ] ] }
+            { 4 [ [ c:int <ref>     ] [ drop ] ] }
+            { 8 [ [ c:longlong <ref> ] [ drop ] ] }
             [ invalid-fortran-type ]
         } case
     ] args?dims ;
@@ -222,9 +222,9 @@ M: logical-type (fortran-arg>c-args)
 M: real-type (fortran-arg>c-args)
     [
         size>> {
-            { f [ [ c::float <ref> ] [ drop ] ] }
-            { 4 [ [ c::float <ref> ] [ drop ] ] }
-            { 8 [ [ c::double <ref> ] [ drop ] ] }
+            { f [ [ c:float <ref> ] [ drop ] ] }
+            { 4 [ [ c:float <ref> ] [ drop ] ] }
+            { 8 [ [ c:double <ref> ] [ drop ] ] }
             [ invalid-fortran-type ]
         } case
     ] args?dims ;
@@ -240,14 +240,14 @@ M: real-complex-type (fortran-arg>c-args)
     ] args?dims ;
 
 M: double-precision-type (fortran-arg>c-args)
-    [ drop [ c::double <ref> ] [ drop ] ] args?dims ;
+    [ drop [ c:double <ref> ] [ drop ] ] args?dims ;
 
 M: double-complex-type (fortran-arg>c-args)
     [ drop [ <complex-double> ] [ drop ] ] args?dims ;
 
 M: character-type (fortran-arg>c-args)
     fix-character-type single-char?
-    [ [ first c::char <ref> ] [ drop ] ]
+    [ [ first c:char <ref> ] [ drop ] ]
     [ [ ascii string>alien ] [ length ] ] if ;
 
 M: misc-type (fortran-arg>c-args)
@@ -261,11 +261,11 @@ GENERIC: (fortran-result>) ( type -- quots )
 M: integer-type (fortran-result>)
     [
         size>> {
-            { f [ { [ c::int deref      ] } ] }
-            { 1 [ { [ c::char deref     ] } ] }
-            { 2 [ { [ c::short deref    ] } ] }
-            { 4 [ { [ c::int deref      ] } ] }
-            { 8 [ { [ c::longlong deref ] } ] }
+            { f [ { [ c:int deref      ] } ] }
+            { 1 [ { [ c:char deref     ] } ] }
+            { 2 [ { [ c:short deref    ] } ] }
+            { 4 [ { [ c:int deref      ] } ] }
+            { 8 [ { [ c:longlong deref ] } ] }
             [ invalid-fortran-type ]
         } case
     ] result?dims ;
@@ -275,9 +275,9 @@ M: logical-type (fortran-result>)
 
 M: real-type (fortran-result>)
     [ size>> {
-        { f [ { [ c::float deref ] } ] }
-        { 4 [ { [ c::float deref ] } ] }
-        { 8 [ { [ c::double deref ] } ] }
+        { f [ { [ c:float deref ] } ] }
+        { 4 [ { [ c:float deref ] } ] }
+        { 8 [ { [ c:double deref ] } ] }
         [ invalid-fortran-type ]
     } case ] result?dims ;
 
@@ -290,14 +290,14 @@ M: real-complex-type (fortran-result>)
     } case ] result?dims ;
 
 M: double-precision-type (fortran-result>)
-    [ drop { [ c::double deref ] } ] result?dims ;
+    [ drop { [ c:double deref ] } ] result?dims ;
 
 M: double-complex-type (fortran-result>)
     [ drop { [ *complex-double ] } ] result?dims ;
 
 M: character-type (fortran-result>)
     fix-character-type single-char?
-    [ { [ c::char deref 1string ] } ]
+    [ { [ c:char deref 1string ] } ]
     [ { [ ] [ ascii alien>nstring ] } ] if ;
 
 M: misc-type (fortran-result>)
@@ -396,7 +396,7 @@ PRIVATE>
 : fortran-ret-type>c-type ( fortran-type -- c-type added-args )
     parse-fortran-type dup returns-by-value?
     [ (fortran-ret-type>c-type) { } ] [
-        c::void swap
+        c:void swap
         [ added-c-args ] [ (fortran-type>c-type) <pointer> ] bi prefix
     ] if ;
 
@@ -437,7 +437,7 @@ MACRO: fortran-invoke ( return library function parameters -- quot )
 
 :: define-fortran-function ( return library function parameters -- )
     function create-function
-    return library function parameters return [ c::void ] unless* parse-arglist
+    return library function parameters return [ c:void ] unless* parse-arglist
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
 SYNTAX: \SUBROUTINE:

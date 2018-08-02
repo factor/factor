@@ -116,20 +116,20 @@ ERROR: no-cuda-library name ;
     [ cleave-curry ] [ spread* ] bi ; inline
 
 : pointer-argument-type? ( c-type -- ? )
-    { [ c::void* = ] [ CUdeviceptr = ] [ c::pointer? ] } 1|| ;
+    { [ c:void* = ] [ CUdeviceptr = ] [ c:pointer? ] } 1|| ;
 
 : abi-pointer-type ( abi -- type )
     {
-        { cuda32 [ c::uint ] }
+        { cuda32 [ c:uint ] }
         { cuda64 [ CUulonglong ] }
     } case ;
 
 : >argument-type ( c-type abi -- c-type' )
     swap {
         { [ dup pointer-argument-type? ] [ drop abi-pointer-type ] }
-        { [ dup c::double    = ] [ 2drop CUdouble ] }
-        { [ dup c::longlong  = ] [ 2drop CUlonglong ] }
-        { [ dup c::ulonglong = ] [ 2drop CUulonglong ] }
+        { [ dup c:double    = ] [ 2drop CUdouble ] }
+        { [ dup c:longlong  = ] [ 2drop CUlonglong ] }
+        { [ dup c:ulonglong = ] [ 2drop CUulonglong ] }
         [ nip ]
     } cond ;
 
@@ -170,7 +170,7 @@ MACRO: cuda-invoke ( module-name function-name arguments -- quot )
     ] ;
 
 : cuda-global* ( module-name symbol-name -- device-ptr size )
-    [ { CUdeviceptr { c::uint initial: 0 } } ] 2dip
+    [ { CUdeviceptr { c:uint initial: 0 } } ] 2dip
     [ cached-module ] dip
     '[ _ _ cuModuleGetGlobal cuda-error ] with-out-parameters ; inline
 
@@ -180,7 +180,7 @@ MACRO: cuda-invoke ( module-name function-name arguments -- quot )
 :: define-cuda-function ( word module-name function-name types names -- )
     word
     [ module-name function-name types cuda-invoke ]
-    names "grid" suffix c::void function-effect
+    names "grid" suffix c:void function-effect
     define-inline ;
 
 : define-cuda-global ( word module-name symbol-name -- )

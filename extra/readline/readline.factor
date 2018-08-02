@@ -7,18 +7,18 @@ IN: readline
 
 : readline ( prompt -- str )
     [
-        readline.ffi::readline [
+        readline.ffi:readline [
             |free utf8 alien>string [
-                [ readline.ffi::add_history ] unless-empty
+                [ readline.ffi:add_history ] unless-empty
             ] keep
         ] [ f ] if*
     ] with-destructors ;
 
 : current-line ( -- str )
-    readline.ffi::rl_line_buffer ;
+    readline.ffi:rl_line_buffer ;
 
 : completion-line ( -- str )
-    current-line readline.ffi::rl_point head ;
+    current-line readline.ffi:rl_point head ;
 
 : has-readline? ( -- ? )
     "readline" dup library-dll dlsym-raw >boolean ;
@@ -27,7 +27,7 @@ IN: readline
     [
        '[
             [ @ [ utf8 malloc-string ] [ f ] if* ]
-            readline.ffi::rl_compentry_func_t
+            readline.ffi:rl_compentry_func_t
         ] ( -- alien ) define-temp
     ] with-compilation-unit execute( -- alien )
-    readline.ffi::set-rl_completion_entry_function ;
+    readline.ffi:set-rl_completion_entry_function ;

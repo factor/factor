@@ -39,8 +39,8 @@ M: vreg-insn (collect-vreg-reps)
 M: insn (collect-vreg-reps) drop ;
 
 : collect-vreg-reps ( cfg -- )
-    H{ } clone vreg-reps namespaces::set
-    HS{ } clone tagged-vregs namespaces::set
+    H{ } clone vreg-reps namespaces:set
+    HS{ } clone tagged-vregs namespaces:set
     [ [ (collect-vreg-reps) ] each-non-phi ] each-basic-block ;
 
 SYMBOL: possibilities
@@ -52,7 +52,7 @@ SYMBOL: possibilities
 
 : compute-possibilities ( cfg -- )
     collect-vreg-reps
-    vreg-reps get [ possible-reps ] assoc-map possibilities namespaces::set ;
+    vreg-reps get [ possible-reps ] assoc-map possibilities namespaces:set ;
 
 ! For every vreg, compute the cost of keeping it in every possible
 ! representation.
@@ -60,7 +60,7 @@ SYMBOL: possibilities
 SYMBOL: costs
 
 : init-costs ( -- )
-    possibilities get [ [ 0 ] H{ } map>assoc ] assoc-map costs namespaces::set ;
+    possibilities get [ [ 0 ] H{ } map>assoc ] assoc-map costs namespaces:set ;
 
 : increase-cost ( rep scc factor -- )
     [ costs get at 2dup key? ] dip
@@ -122,7 +122,7 @@ M: vreg-insn compute-insn-costs
 : compute-costs ( cfg -- )
     init-costs
     [
-        [ basic-block namespaces::set ]
+        [ basic-block namespaces:set ]
         [ [ compute-insn-costs ] each-non-phi ] bi
     ] each-basic-block ;
 
@@ -134,4 +134,4 @@ M: vreg-insn compute-insn-costs
     compute-costs costs get minimize-costs
     [ components get [ disjoint-set-members ] keep ] dip
     '[ dup _ representative _ at ] H{ } map>assoc
-    representations namespaces::set ;
+    representations namespaces:set ;

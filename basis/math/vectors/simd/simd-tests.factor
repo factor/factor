@@ -9,7 +9,7 @@ quotations math.constants compiler.units splitting math.matrices
 math.vectors.simd.cords alien.data ;
 FROM: math.vectors.simd.intrinsics => alien-vector set-alien-vector ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAY: c::float
+SPECIALIZED-ARRAY: c:float
 IN: math.vectors.simd.tests
 
 ! Test type propagation
@@ -723,10 +723,10 @@ STRUCT: simd-struct
 [ 5.0 float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-2 ] unit-test
 
 : callback-1 ( -- c )
-    c::int { c::int c::int c::int c::int c::int } cdecl [ + + + + ] alien-callback ;
+    c:int { c:int c:int c:int c:int c:int } cdecl [ + + + + ] alien-callback ;
 
 : indirect-1 ( x x x x x c -- y )
-    c::int { c::int c::int c::int c::int c::int } cdecl alien-indirect ; inline
+    c:int { c:int c:int c:int c:int c:int } cdecl alien-indirect ; inline
 
 : simd-spill-test-3 ( a b d c -- v )
     { float float-4 float-4 float } declare
@@ -740,9 +740,9 @@ STRUCT: simd-struct
 ! aligned right
 
 : simd-stack-test ( -- b c )
-    { c::int float-4 } [
-        [ 123 swap 0 c::int c::set-alien-value ]
-        [ float-4{ 1 2 3 4 } swap 0 float-4 c::set-alien-value ] bi*
+    { c:int float-4 } [
+        [ 123 swap 0 c:int c:set-alien-value ]
+        [ float-4{ 1 2 3 4 } swap 0 float-4 c:set-alien-value ] bi*
     ] with-out-parameters ;
 
 { 123 float-4{ 1 2 3 4 } } [ simd-stack-test ] unit-test
@@ -752,8 +752,8 @@ STRUCT: simd-struct
 : (simd-stack-spill-test) ( -- n ) 17 ;
 
 : simd-stack-spill-test ( x -- b c )
-    { c::int } [
-        123 swap 0 c::int c::set-alien-value
+    { c:int } [
+        123 swap 0 c:int c:set-alien-value
         >float (simd-stack-spill-test) float-4-with swap cos v*n
     ] with-out-parameters ;
 

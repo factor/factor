@@ -47,7 +47,7 @@ V{ } 6 test-bb
 
 { t } [
     2 get 3 get 2array merge-set
-    4 get 6 get 2array sets::set=
+    4 get 6 get 2array sets:set=
 ] unit-test
 
 V{ } 0 test-bb

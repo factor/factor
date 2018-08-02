@@ -67,7 +67,7 @@ QUALIFIED: opencl
 
 ! word>gc-maps
 { f } [
-    \ effects::<effect> word>gc-maps empty?
+    \ effects:<effect> word>gc-maps empty?
 ] unit-test
 
 cpu x86.64? [
@@ -83,7 +83,7 @@ cpu x86.64? [
         }
     ] if
     [
-        \ effects::<effect> word>gc-maps first
+        \ effects:<effect> word>gc-maps first
     ] unit-test
 ] when
 
@@ -126,23 +126,23 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 ] unit-test
 
 { t } [
-    \ opencl::cl-queue-kernel
+    \ opencl:cl-queue-kernel
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test
 
 { t } [
-    \ crypto.aes.utils::bytes>words
+    \ crypto.aes.utils:bytes>words
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test
 
 { t } [
-    \ cpu.x86.features.private::(sse-version)
+    \ cpu.x86.features.private:(sse-version)
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test
 
 ! #1436
 { t } [
-    \ gtk-samples.opengl::opengl-main
+    \ gtk-samples.opengl:opengl-main
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test
 

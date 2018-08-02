@@ -34,7 +34,7 @@ SYMBOL: current-context
     swapd '[ @ @ -rot call-object-full @ ] ;
 
 : make-factor-words ( module name prefix? -- call-word obj-word )
-    [ [ "::" glue ] [ "::$" glue ] 2bi ] [ nip dup "$" prepend ] if
+    [ [ ":" glue ] [ ":$" glue ] 2bi ] [ nip dup "$" prepend ] if
     [ create-word-in ] bi@ ;
 
 : import-getattr ( module name -- alien )

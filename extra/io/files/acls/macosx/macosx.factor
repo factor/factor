@@ -105,7 +105,7 @@ ERROR: add-permission-failed permission-set permission ;
    [ [ new-acl &free-acl ] dip call ] with-destructors ; inline
 
 : acls. ( path -- )
-    [ acl>text io::write ] acl-each ;
+    [ acl>text io:write ] acl-each ;
 
 : acl-entry>owner-name ( acl-entry -- string )
     [

@@ -125,13 +125,13 @@ SYMBOL: ac-counter
     ] [ vreg kill-computed-set-slot ] if ;
 
 : init-alias-analysis ( -- )
-    H{ } clone vregs>acs namespaces::set
-    H{ } clone acs>vregs namespaces::set
-    H{ } clone live-slots namespaces::set
-    H{ } clone copies namespaces::set
-    H{ } clone recent-stores namespaces::set
-    HS{ } clone dead-stores namespaces::set
-    0 ac-counter namespaces::set ;
+    H{ } clone vregs>acs namespaces:set
+    H{ } clone acs>vregs namespaces:set
+    H{ } clone live-slots namespaces:set
+    H{ } clone copies namespaces:set
+    H{ } clone recent-stores namespaces:set
+    HS{ } clone dead-stores namespaces:set
+    0 ac-counter namespaces:set ;
 
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
@@ -255,7 +255,7 @@ M: insn eliminate-dead-stores drop t ;
     copies get clear-assoc
     dead-stores get clear-set
 
-    next-ac heap-ac namespaces::set
+    next-ac heap-ac namespaces:set
     ##vm-field set-new-ac
     ##alien-global set-new-ac ;
 

@@ -366,12 +366,12 @@ M: x86.64 has-small-reg? 2drop t ;
 
 M: x86 %convert-integer ( dst src c-type -- )
     {
-        { c::char   [ 8 %sign-extend ] }
-        { c::uchar  [ 8 %zero-extend ] }
-        { c::short  [ 16 %sign-extend ] }
-        { c::ushort [ 16 %zero-extend ] }
-        { c::int    [ 32 %sign-extend ] }
-        { c::uint   [ 32 [ 2drop ] (%convert-integer) ] }
+        { c:char   [ 8 %sign-extend ] }
+        { c:uchar  [ 8 %zero-extend ] }
+        { c:short  [ 16 %sign-extend ] }
+        { c:ushort [ 16 %zero-extend ] }
+        { c:int    [ 32 %sign-extend ] }
+        { c:uint   [ 32 [ 2drop ] (%convert-integer) ] }
     } case ;
 
 :: %alien-integer-getter ( dst exclude address bits quot -- )
@@ -402,12 +402,12 @@ M: x86 %convert-integer ( dst src c-type -- )
 : (%load-memory) ( dst exclude address rep c-type -- )
     [
         {
-            { c::char   [ 8 %alien-signed-getter ] }
-            { c::uchar  [ 8 %alien-unsigned-getter ] }
-            { c::short  [ 16 %alien-signed-getter ] }
-            { c::ushort [ 16 %alien-unsigned-getter ] }
-            { c::int    [ 32 %alien-signed-getter ] }
-            { c::uint   [ 32 [ 2drop ] %alien-integer-getter ] }
+            { c:char   [ 8 %alien-signed-getter ] }
+            { c:uchar  [ 8 %alien-unsigned-getter ] }
+            { c:short  [ 16 %alien-signed-getter ] }
+            { c:ushort [ 16 %alien-unsigned-getter ] }
+            { c:int    [ 32 %alien-signed-getter ] }
+            { c:uint   [ 32 [ 2drop ] %alien-integer-getter ] }
         } case
     ] [ nipd %copy ] ?if ;
 
@@ -420,12 +420,12 @@ M: x86 %load-memory-imm ( dst base offset rep c-type -- )
 : (%store-memory) ( src exclude address rep c-type -- )
     [
         {
-            { c::char   [ 8 %alien-integer-setter ] }
-            { c::uchar  [ 8 %alien-integer-setter ] }
-            { c::short  [ 16 %alien-integer-setter ] }
-            { c::ushort [ 16 %alien-integer-setter ] }
-            { c::int    [ 32 %alien-integer-setter ] }
-            { c::uint   [ 32 %alien-integer-setter ] }
+            { c:char   [ 8 %alien-integer-setter ] }
+            { c:uchar  [ 8 %alien-integer-setter ] }
+            { c:short  [ 16 %alien-integer-setter ] }
+            { c:ushort [ 16 %alien-integer-setter ] }
+            { c:int    [ 32 %alien-integer-setter ] }
+            { c:uint   [ 32 %alien-integer-setter ] }
         } case
     ] [ [ nip swap ] dip %copy ] ?if ;
 

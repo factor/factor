@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit kernel locals namespaces sbufs
 sequences splitting unicode.categories unicode.data ;
+QUALIFIED: ascii
 IN: unicode.case
 
 SYMBOL: locale ! Just casing locale, or overall?

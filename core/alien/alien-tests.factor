@@ -84,7 +84,7 @@ f initialize-test set-global
 
 { 7575 } [ initialize-test [ 7575 ] initialize-alien ] unit-test
 
-{ { BAD-ALIEN } } [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } sets::members ] unit-test
+{ { BAD-ALIEN } } [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } sets:members ] unit-test
 
 ! Generate callbacks until the whole callback-heap is full, then free
 ! them. Do it ten times in a row for good measure.

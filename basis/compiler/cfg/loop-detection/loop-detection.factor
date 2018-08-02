@@ -55,13 +55,13 @@ SYMBOL: loop-nesting
 : compute-loop-nesting ( -- )
     loops get H{ } clone [
         [ values ] dip '[ blocks>> members [ _ inc-at ] each ] each
-    ] keep loop-nesting namespaces::set ;
+    ] keep loop-nesting namespaces:set ;
 
 : detect-loops ( cfg -- cfg' )
-    H{ } clone loops namespaces::set
-    HS{ } clone visited namespaces::set
-    HS{ } clone active namespaces::set
-    H{ } clone loop-nesting namespaces::set
+    H{ } clone loops namespaces:set
+    HS{ } clone visited namespaces:set
+    HS{ } clone active namespaces:set
+    H{ } clone loop-nesting namespaces:set
     [ needs-predecessors ]
     [ entry>> find-loop-headers process-loop-headers compute-loop-nesting ]
     [ ] tri ;

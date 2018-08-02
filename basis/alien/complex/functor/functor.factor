@@ -11,10 +11,10 @@ INLINE-FUNCTOR: complex-type ( n: existing-word t: name -- ) [[
     STRUCT: ${t} { real ${n} } { imaginary ${n} } ;
 
     : <${t}> ( z -- alien )
-        math::>rect ${t} <struct-boa> >c-ptr ;
+        math:>rect ${t} <struct-boa> >c-ptr ;
 
     : *${t} ( alien -- z )
-        ${t} memory>struct [ real>> ] [ imaginary>> ] bi math::rect> ; inline
+        ${t} memory>struct [ real>> ] [ imaginary>> ] bi math:rect> ; inline
 
     >>
 

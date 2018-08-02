@@ -123,9 +123,9 @@ M: linux-monitor dispose* ( monitor -- )
     [ inotify-read-loop ] curry ignore-errors ;
 
 M: linux init-monitors
-    H{ } clone watches namespaces::set
+    H{ } clone watches namespaces:set
     <inotify> [
-        [ inotify namespaces::set ]
+        [ inotify namespaces:set ]
         [
             [ inotify-read-thread ] curry
             "Linux monitor thread" spawn drop

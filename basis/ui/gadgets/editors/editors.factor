@@ -395,7 +395,7 @@ editor "editing" f {
 
 : com-paste ( editor -- ) clipboard get paste-clipboard ;
 
-: paste-selection ( editor -- ) ui.clipboards::selection get paste-clipboard ;
+: paste-selection ( editor -- ) ui.clipboards:selection get paste-clipboard ;
 
 : com-cut ( editor -- ) clipboard get editor-cut ;
 

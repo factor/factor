@@ -137,7 +137,7 @@ STRUCT: struct-test-bar
 [ struct-test-foo struct-definer-word ] unit-test
 
 UNION-STRUCT: struct-test-float-and-bits
-    { f c::float }
+    { f c:float }
     { bits uint } ;
 
 { 1.0 } [ struct-test-float-and-bits <struct> 1.0 float>bits >>bits f>> ] unit-test
@@ -229,7 +229,7 @@ UNION-STRUCT: struct-test-float-and-bits
     T{ struct-slot-spec
         { name "f" }
         { offset 0 }
-        { type c::float }
+        { type c:float }
         { class float }
         { initial 0.0 }
     }
@@ -478,11 +478,11 @@ STRUCT: silly-array-field-test { x int*[3] } ;
 
 ! Packed structs
 PACKED-STRUCT: packed-struct-test
-    { d c::int }
-    { e c::short }
-    { f c::int }
-    { g c::char }
-    { h c::int } ;
+    { d c:int }
+    { e c:short }
+    { f c:int }
+    { g c:char }
+    { h c:int } ;
 
 { 15 } [ packed-struct-test heap-size ] unit-test
 
@@ -495,9 +495,9 @@ PACKED-STRUCT: packed-struct-test
 { postpone: \PACKED-STRUCT: }
 [ packed-struct-test struct-definer-word ] unit-test
 
-STRUCT: struct-1 { a c::int } ;
-PACKED-STRUCT: struct-1-packed { a c::int } ;
-UNION-STRUCT: struct-1-union { a c::int } ;
+STRUCT: struct-1 { a c:int } ;
+PACKED-STRUCT: struct-1-packed { a c:int } ;
+UNION-STRUCT: struct-1-union { a c:int } ;
 
 { "USING: alien.c-types classes.struct ;
 IN: classes.struct.tests

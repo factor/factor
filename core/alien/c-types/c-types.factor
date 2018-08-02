@@ -290,8 +290,8 @@ M: pointer lookup-c-type
     \ uchar typedef
 
     <c-type>
-        math::float >>class
-        math::float >>boxed-class
+        math:float >>class
+        math:float >>boxed-class
         [ alien-float ] >>getter
         [ set-alien-float ] >>setter
         4 >>size
@@ -304,8 +304,8 @@ M: pointer lookup-c-type
     \ float typedef
 
     <c-type>
-        math::float >>class
-        math::float >>boxed-class
+        math:float >>class
+        math:float >>boxed-class
         [ alien-double ] >>getter
         [ set-alien-double ] >>setter
         8 >>size

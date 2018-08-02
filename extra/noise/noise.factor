@@ -4,7 +4,7 @@ math.libm math.matrices.simd math.vectors math.vectors.conversion math.vectors.s
 memoize random random.mersenne-twister sequences sequences.private specialized-arrays
 typed ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAYS: c::float c::uchar float-4 uchar-16 ;
+SPECIALIZED-ARRAYS: c:float c:uchar float-4 uchar-16 ;
 IN: noise
 
 : with-seed ( seed quot -- )
@@ -123,8 +123,8 @@ MEMO: perlin-noise-map-coords ( dim -- coords )
     first2 <iota> |[ x y | x <iota> [ y 0.0 0.0 float-4-boa ] float-4-array{ } map-as ] with map concat ;
 
 TYPED:: perlin-noise-map ( table: byte-array transform: matrix4 coords: float-4-array -- map: float-array )
-    coords |[ coord | table transform coord m4.v perlin-noise ] data-map( float-4 -- c::float )
-    c::float cast-array ;
+    coords |[ coord | table transform coord m4.v perlin-noise ] data-map( float-4 -- c:float )
+    c:float cast-array ;
 
 : perlin-noise-image ( table transform dim -- image )
     [ perlin-noise-map-coords perlin-noise-map ] [ 5/7. 0.5 float-map>image ] bi ;

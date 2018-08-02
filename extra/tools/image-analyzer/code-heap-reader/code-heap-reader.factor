@@ -1,6 +1,7 @@
 USING: accessors alien.c-types classes.struct io kernel math
 math.bitwise tools.image-analyzer.gc-info tools.image-analyzer.vm ;
 IN: tools.image-analyzer.code-heap-reader
+QUALIFIED: layouts
 
 : free? ( code-block -- ? )
     header>> 1 mask? ;

@@ -327,8 +327,8 @@ SYMBOL: next
 : group-flow ( seq -- newseq )
     [
         dup length <iota> [
-            2dup 1 - swap ?nth prev namespaces::set
-            2dup 1 + swap ?nth next namespaces::set
+            2dup 1 - swap ?nth prev namespaces:set
+            2dup 1 + swap ?nth next namespaces:set
             swap nth dup split-before dup , split-after
         ] with each
     ] { } make { t } split harvest ;
@@ -359,10 +359,10 @@ M: block long-section ( block -- )
 
 : make-pprint ( obj quot manifest? -- block manifest/f )
     [
-        0 position namespaces::set
-        HS{ } clone pprinter-use namespaces::set
-        V{ } clone recursion-check namespaces::set
-        V{ } clone pprinter-stack namespaces::set
+        0 position namespaces:set
+        HS{ } clone pprinter-use namespaces:set
+        V{ } clone recursion-check namespaces:set
+        V{ } clone pprinter-stack namespaces:set
 
         [ over <object call pprinter-block ] dip
         [ pprinter-manifest ] [ f ] if

@@ -55,7 +55,7 @@ M: fake-cpu gc-root-offset ;
     uint-array{ 100 } underlying>> %
 
     ! GC info footer - 12 bytes
-    S{ vm::gc-info
+    S{ vm:gc-info
        { gc-root-count 4 }
        { derived-root-count 3 }
        { return-address-count 1 }

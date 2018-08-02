@@ -110,7 +110,7 @@ SYMBOLS: defs insns ;
                 _ set-def-of
             ] with each
         ] simple-analysis
-    ] keep defs namespaces::set ;
+    ] keep defs namespaces:set ;
 
 : compute-insns ( cfg -- )
     H{ } clone [
@@ -119,4 +119,4 @@ SYMBOLS: defs insns ;
                 dup _ set-def-of
             ] each
         ] simple-analysis
-    ] keep insns namespaces::set ;
+    ] keep insns namespaces:set ;

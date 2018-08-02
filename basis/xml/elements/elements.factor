@@ -121,8 +121,8 @@ DEFER: make-tag ! Is this unavoidable?
 
 : take-internal-subset ( -- dtd )
     [
-        H{ } clone pe-table namespaces::set
-        t in-dtd? namespaces::set
+        H{ } clone pe-table namespaces:set
+        t in-dtd? namespaces:set
         dtd-loop
         pe-table get
     ] { } make swap extra-entities get swap <dtd> ;

@@ -20,11 +20,11 @@ IN: io.sockets.secure.tests
                 ] curry with-stream
             ] with-disposal
         ] with-test-context
-    ] "SSL server test" qm::spawn-linked drop
+    ] "SSL server test" qm:spawn-linked drop
     ! This is hideous.
     ! If we fail with a timeout, the test is passing.
     ! If we fail with something besides a timeout, rethrow it and fail the test.
-    [ qm::my-mailbox 200 milliseconds mailbox-get-timeout drop ]
+    [ qm:my-mailbox 200 milliseconds mailbox-get-timeout drop ]
     [ dup timed-out-error? [ drop ] [ rethrow ] if ] recover ;
 
 : ?promise-test ( mailbox -- obj )

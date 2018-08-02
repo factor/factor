@@ -52,7 +52,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] with-variables
-    \ foo [ global >n get namespaces.private::ndrop ] compile-call
+    \ foo [ global >n get namespaces.private:ndrop ] compile-call
 ] unit-test
 
 : blech ( x -- ) drop ;
@@ -66,7 +66,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] with-variables
-    \ foo [ global [ get ] swap >n call namespaces.private::ndrop ] compile-call
+    \ foo [ global [ get ] swap >n call namespaces.private:ndrop ] compile-call
 ] unit-test
 
 [ 3 ]

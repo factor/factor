@@ -282,17 +282,17 @@ M: f (verify-feedback-format)
 
 : component-type>c-type ( component-type -- c-type )
     {
-        { ubyte-components [ c::uchar ] }
-        { ushort-components [ c::ushort ] }
-        { uint-components [ c::uint ] }
+        { ubyte-components [ c:uchar ] }
+        { ushort-components [ c:ushort ] }
+        { uint-components [ c:uint ] }
         { half-components [ half ] }
-        { float-components [ c::float ] }
-        { byte-integer-components [ c::char ] }
-        { ubyte-integer-components [ c::uchar ] }
-        { short-integer-components [ c::short ] }
-        { ushort-integer-components [ c::ushort ] }
-        { int-integer-components [ c::int ] }
-        { uint-integer-components [ c::uint ] }
+        { float-components [ c:float ] }
+        { byte-integer-components [ c:char ] }
+        { ubyte-integer-components [ c:uchar ] }
+        { short-integer-components [ c:short ] }
+        { ushort-integer-components [ c:ushort ] }
+        { int-integer-components [ c:int ] }
+        { uint-integer-components [ c:uint ] }
     } case ;
 
 : c-array-dim ( type dim -- type' )

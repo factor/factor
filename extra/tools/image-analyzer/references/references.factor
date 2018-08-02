@@ -30,17 +30,17 @@ GENERIC: pointers ( heap heap-node struct -- seq )
 : filter-data-pointers ( seq -- seq' )
     [ 15 mask 1 <= ] reject ;
 
-M: vm::array pointers ( heap heap-node struct -- seq )
+M: vm:array pointers ( heap heap-node struct -- seq )
     drop nip payload>> filter-data-pointers ;
 
-M: vm::code-block pointers ( heap heap-node struct -- seq )
+M: vm:code-block pointers ( heap heap-node struct -- seq )
     [ relocation-pointers ] [ slots{ owner parameters relocation } ] bi
     append ;
 
-M: vm::quotation pointers ( heap heap-node struct -- seq )
+M: vm:quotation pointers ( heap heap-node struct -- seq )
     2nip [ array>> ] [ entry_point>> 4 cell * - ] bi 2array ;
 
-M: vm::word pointers ( heap heap-node struct -- seq )
+M: vm:word pointers ( heap heap-node struct -- seq )
     2nip [
         slots{ def name pic_def pic_tail_def props subprimitive vocabulary }
         filter-data-pointers

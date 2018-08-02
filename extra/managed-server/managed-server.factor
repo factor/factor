@@ -77,7 +77,7 @@ PRIVATE>
     [ username server clients>> delete-at ] when-logged-in ;
 
 : handle-managed-client ( -- )
-    handle-login <managed-client> managed-client namespaces::set
+    handle-login <managed-client> managed-client namespaces:set
     maybe-login-client [
         handle-client-join
         [ handle-managed-client* client quit?>> not ] loop
@@ -92,7 +92,7 @@ PRIVATE>
 PRIVATE>
 
 M: managed-server handle-client*
-    managed-server namespaces::set
+    managed-server namespaces:set
     [ handle-managed-client ]
     [ cleanup-client ]
     [ ] cleanup ;

@@ -131,7 +131,7 @@ PRIVATE>
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
-        new-lines from to document [ (set-doc-range) ] models::change-model
+        new-lines from to document [ (set-doc-range) ] models:change-model
         new-to document update-locs
     ] unless ;
 

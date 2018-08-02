@@ -5,7 +5,7 @@ jamshred.oint jamshred.sound jamshred.tunnel kernel locals math
 math.constants math.order math.ranges math.vectors math.matrices
 sequences shuffle specialized-arrays strings system ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAY: c::float
+SPECIALIZED-ARRAY: c:float
 IN: jamshred.player
 
 TUPLE: player < oint

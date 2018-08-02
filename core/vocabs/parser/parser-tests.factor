@@ -18,11 +18,11 @@ must-fail-with
     [ ] [ "vocabs.parser.tests" dup add-qualified ] unit-test
 
     [ aaa ] [ "uutt" search ] unit-test
-    [ aaa ] [ "vocabs.parser.tests::aaa" search ] unit-test
+    [ aaa ] [ "vocabs.parser.tests:aaa" search ] unit-test
 
     [ ] [ [ "bbb" "vocabs.parser.tests" create-word drop ] with-compilation-unit ] unit-test
 
-    [ "bbb" ] [ "vocabs.parser.tests::bbb" search name>> ] unit-test
+    [ "bbb" ] [ "vocabs.parser.tests:bbb" search name>> ] unit-test
 
     [ ] [ [ \ aaa forget ] with-compilation-unit ] unit-test
 
@@ -30,7 +30,7 @@ must-fail-with
 
     [ f ] [ "uutt" search ] unit-test
 
-    [ f ] [ "vocabs.parser.tests::aaa" search ] unit-test
+    [ f ] [ "vocabs.parser.tests:aaa" search ] unit-test
 
     [ ] [ "vocabs.parser.tests.foo" set-current-vocab ] unit-test
 

@@ -62,7 +62,7 @@ ERROR: unsupported-number-type type ;
         { kCFNumberSInt64Type [ SInt64 (CFNumber>number) ] }
         { kCFNumberFloat64Type [ double (CFNumber>number) ] }
         { kCFNumberCharType [ char (CFNumber>number) ] }
-        { kCFNumberShortType [ c::short (CFNumber>number) ] }
+        { kCFNumberShortType [ c:short (CFNumber>number) ] }
         { kCFNumberIntType [ int (CFNumber>number) ] }
         { kCFNumberLongType [ long (CFNumber>number) ] }
         { kCFNumberLongLongType [ longlong (CFNumber>number) ] }

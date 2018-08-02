@@ -4,8 +4,8 @@ locals math math.matrices math.parser math.vectors opengl
 opengl.capabilities opengl.gl opengl.demo-support sequences
 splitting vectors words specialized-arrays alien.data ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAY: c::float
-SPECIALIZED-ARRAY: c::uint
+SPECIALIZED-ARRAY: c:float
+SPECIALIZED-ARRAY: c:uint
 IN: bunny.model
 
 : numbers ( str -- seq )
@@ -67,11 +67,11 @@ TUPLE: bunny-buffers array element-array nv ni ;
     {
         [
             [ first concat ] [ second concat ] bi
-            append c::float >c-array underlying>>
+            append c:float >c-array underlying>>
             GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
         ]
         [
-            third concat c::uint >c-array underlying>>
+            third concat c:uint >c-array underlying>>
             GL_ELEMENT_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
         ]
         [ first length 3 * ]
@@ -89,7 +89,7 @@ M: bunny-buffers bunny-geom
         { GL_VERTEX_ARRAY GL_NORMAL_ARRAY } [
             GL_FLOAT 0 0 buffer-offset glNormalPointer
             [
-                nv>> c::float heap-size * buffer-offset
+                nv>> c:float heap-size * buffer-offset
                 [ 3 GL_FLOAT 0 ] dip glVertexPointer
             ] [
                 ni>>

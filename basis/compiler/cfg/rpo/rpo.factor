@@ -33,7 +33,7 @@ IN: compiler.cfg.rpo
 
 : optimize-basic-block ( bb quot -- )
     over kill-block?>> [ 2drop ] [
-        over basic-block namespaces::set
+        over basic-block namespaces:set
         change-instructions drop
     ] if ; inline
 
@@ -42,7 +42,7 @@ IN: compiler.cfg.rpo
 
 : analyze-basic-block ( bb quot -- )
     over kill-block?>> [ 2drop ] [
-        [ dup basic-block namespaces::set instructions>> ] dip call
+        [ dup basic-block namespaces:set instructions>> ] dip call
     ] if ; inline
 
 : simple-analysis ( ... cfg quot: ( ... insns -- ... ) -- ... )

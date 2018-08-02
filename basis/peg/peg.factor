@@ -111,9 +111,9 @@ TUPLE: peg-head rule-id involved-set eval-set ;
 
 : process-rule-result ( p result -- result )
     [
-        nip [ ast>> ] [ remaining>> ] bi input-from pos namespaces::set
+        nip [ ast>> ] [ remaining>> ] bi input-from pos namespaces:set
     ] [
-        pos namespaces::set fail
+        pos namespaces:set fail
     ] if* ;
 
 : eval-rule ( rule -- ast )
@@ -138,7 +138,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     pos>> <= or ;
 
 : setup-growth ( h p -- )
-    pos namespaces::set dup involved-set>> clone >>eval-set drop ;
+    pos namespaces:set dup involved-set>> clone >>eval-set drop ;
 
 : (grow-lr) ( h p r: ( -- result ) m -- )
     [ [ setup-growth ] 2keep ] 2dip
@@ -154,7 +154,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     [ [ heads set-at ] 2keep ] 2dip
     pick over [ (grow-lr) ] 2dip
     swap heads delete-at
-    dup pos>> pos namespaces::set ans>>
+    dup pos>> pos namespaces:set ans>>
     ; inline
 
 :: (setup-lr) ( l s -- )
@@ -208,9 +208,9 @@ TUPLE: peg-head rule-id involved-set eval-set ;
 
 :: apply-non-memo-rule ( r p -- ast )
     fail r rule-id f lrstack get left-recursion boa :> lr
-    lr lrstack namespaces::set lr p memo-entry boa dup p r rule-id set-memo :> m
+    lr lrstack namespaces:set lr p memo-entry boa dup p r rule-id set-memo :> m
     r eval-rule :> ans
-    lrstack get next>> lrstack namespaces::set
+    lrstack get next>> lrstack namespaces:set
     pos get m pos<<
     lr head>> [
         m ans>> left-recursion? [
@@ -223,7 +223,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     ] if ; inline
 
 : apply-memo-rule ( r m -- ast )
-    [ ans>> ] [ pos>> ] bi pos namespaces::set
+    [ ans>> ] [ pos>> ] bi pos namespaces:set
     dup left-recursion? [
         [ setup-lr ] keep seed>>
     ] [
@@ -500,7 +500,7 @@ TUPLE: sp-parser parser ;
 
 M: sp-parser (compile)
     parser>> compile-parser-quot '[
-        input-slice [ blank? ] trim-head-slice input-from pos namespaces::set @
+        input-slice [ blank? ] trim-head-slice input-from pos namespaces:set @
     ] ;
 
 TUPLE: delay-parser quot ;

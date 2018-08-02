@@ -11,7 +11,7 @@ SYMBOL: insomniac-recipients
 
 : email-subject ( service -- string )
     [
-        "Log analysis for " % % " on " % io.sockets::host-name %
+        "Log analysis for " % % " on " % io.sockets:host-name %
     ] "" make ;
 
 :: (email-log-report) ( service word-names -- )

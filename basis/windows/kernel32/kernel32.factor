@@ -5,7 +5,7 @@ math multiline classes.struct alien.data arrays literals ;
 QUALIFIED-WITH: alien.c-types c
 IN: windows.kernel32
 
-: lo-word ( wparam -- lo ) c::short <ref> c::short deref ; inline
+: lo-word ( wparam -- lo ) c:short <ref> c:short deref ; inline
 : hi-word ( wparam -- hi ) -16 shift lo-word ; inline
 : >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ; inline
 

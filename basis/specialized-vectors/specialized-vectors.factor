@@ -3,52 +3,55 @@
 USING: alien.parser arrays functors2 growable kernel lexer make
 math.parser sequences vocabs.loader ;
 FROM: sequences.private => nth-unsafe ;
+QUALIFIED: vectors.functor
 IN: specialized-vectors
 
 MIXIN: specialized-vector
 
 FUNCTOR: specialized-vector ( type: existing-word -- ) [[
-    USING: accessors alien alien.c-types alien.data classes growable
-    kernel math parser prettyprint.custom sequences
-    sequences.private specialized-arrays specialized-arrays.private
-    specialized-vectors vectors.functor ;
-    FROM: specialized-arrays.private => nth-c-ptr direct-like ;
 
-    <<
-    SPECIALIZED-ARRAY: ${type}
-    >>
+USING: accessors alien alien.c-types alien.data classes growable
+kernel math parser prettyprint.custom sequences
+sequences.private specialized-arrays specialized-arrays.private
+specialized-vectors vectors.functor ;
+FROM: specialized-arrays.private => nth-c-ptr direct-like ;
 
-    <<
-    ! For >foo-vector to be defined in time
-    VECTORIZED: ${type} ${type}-array <${type}-array>
-    >>
+<<
+SPECIALIZED-ARRAY: ${type}
+>>
 
-    SYNTAX: ${type}-vector{ \ } [ >${type}-vector ] parse-literal ;
+<<
+! For >foo-vector to be defined in time
+VECTORIZED: ${type} ${type}-array <${type}-array>
+>>
 
-    INSTANCE: ${type}-vector specialized-vector
+SYNTAX: ${type}-vector{ \ } [ >${type}-vector ] parse-literal ;
 
-    M: ${type}-vector contract 2drop ; inline
+INSTANCE: ${type}-vector specialized-vector
 
-    M: ${type}-vector element-size drop \ ${type} heap-size ; inline
+M: ${type}-vector contract 2drop ; inline
 
-    M: ${type}-vector pprint-delims drop \ ${type}-vector{ \ } ;
+M: ${type}-vector element-size drop \ ${type} heap-size ; inline
 
-    M: ${type}-vector >pprint-sequence ;
+M: ${type}-vector pprint-delims drop \ ${type}-vector{ \ } ;
 
-    M: ${type}-vector pprint* pprint-object ;
+M: ${type}-vector >pprint-sequence ;
 
-    M: ${type}-vector >c-ptr underlying>> underlying>> ; inline
-    M: ${type}-vector byte-length [ length ] [ element-size ] bi * ; inline
+M: ${type}-vector pprint* pprint-object ;
 
-    M: ${type}-vector direct-like drop <direct-${type}-array> ; inline
-    M: ${type}-vector nth-c-ptr underlying>> nth-c-ptr ; inline
+M: ${type}-vector >c-ptr underlying>> underlying>> ; inline
+M: ${type}-vector byte-length [ length ] [ element-size ] bi * ; inline
 
-    M: ${type}-array like
-        drop dup ${type}-array instance? [
-            dup ${type}-vector instance? [
-                [ >c-ptr ] [ length>> ] bi <direct-${type}-array>
-            ] [ \ ${type} >c-array ] if
-        ] unless ; inline
+M: ${type}-vector direct-like drop <direct-${type}-array> ; inline
+M: ${type}-vector nth-c-ptr underlying>> nth-c-ptr ; inline
+
+M: ${type}-array like
+    drop dup ${type}-array instance? [
+        dup ${type}-vector instance? [
+            [ >c-ptr ] [ length>> ] bi <direct-${type}-array>
+        ] [ \ ${type} >c-array ] if
+    ] unless ; inline
+
 ]]
 
 <PRIVATE

@@ -24,12 +24,12 @@ SYMBOL: class-or-cache
 SYMBOL: next-method-quot-cache
 
 : init-caches ( -- )
-    H{ } clone class<=-cache namespaces::set
-    H{ } clone class-not-cache namespaces::set
-    H{ } clone classes-intersect-cache namespaces::set
-    H{ } clone class-and-cache namespaces::set
-    H{ } clone class-or-cache namespaces::set
-    H{ } clone next-method-quot-cache namespaces::set ;
+    H{ } clone class<=-cache namespaces:set
+    H{ } clone class-not-cache namespaces:set
+    H{ } clone classes-intersect-cache namespaces:set
+    H{ } clone class-and-cache namespaces:set
+    H{ } clone class-or-cache namespaces:set
+    H{ } clone next-method-quot-cache namespaces:set ;
 
 : reset-caches ( -- )
     class<=-cache get clear-assoc

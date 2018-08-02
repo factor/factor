@@ -9,7 +9,7 @@ IN: compression.zlib
 ERROR: zlib-failed n string ;
 
 : zlib-error-message ( n -- * )
-    dup compression.zlib.ffi::Z_ERRNO = [
+    dup compression.zlib.ffi:Z_ERRNO = [
         drop errno "native libc error"
     ] [
         dup
@@ -23,8 +23,8 @@ ERROR: zlib-failed n string ;
 
 : zlib-error ( n -- )
     dup {
-        { compression.zlib.ffi::Z_OK [ drop ] }
-        { compression.zlib.ffi::Z_STREAM_END [ drop ] }
+        { compression.zlib.ffi:Z_OK [ drop ] }
+        { compression.zlib.ffi:Z_STREAM_END [ drop ] }
         [ dup zlib-error-message zlib-failed ]
     } case ;
 
@@ -36,14 +36,14 @@ ERROR: zlib-failed n string ;
         compressed-size
         [ <byte-vector> dup underlying>> ] keep ulong <ref>
     ] keep [
-        dup length compression.zlib.ffi::compress zlib-error
+        dup length compression.zlib.ffi:compress zlib-error
     ] keepd ulong deref >>length B{ } like ;
 
 : (uncompress) ( length byte-array -- byte-array )
     [
         [ drop [ malloc &free ] [ ulong <ref> ] bi ]
         [ nip dup length ] 2bi
-        [ compression.zlib.ffi::uncompress zlib-error ] 4keep
+        [ compression.zlib.ffi:uncompress zlib-error ] 4keep
         2drop ulong deref memory>byte-array
     ] with-destructors ;
 

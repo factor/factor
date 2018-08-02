@@ -18,7 +18,7 @@ GENERIC: group-struct ( obj -- group/f )
     gr_mem>> utf8 alien>strings ;
 
 : (group-struct) ( id -- group-struct id group-struct byte-array length void* )
-    [ unix.ffi::group <struct> ] dip over 4096
+    [ unix.ffi:group <struct> ] dip over 4096
     [ <byte-array> ] keep f void* <ref> ;
 
 : check-group-struct ( group-struct ptr -- group-struct/f )
@@ -26,12 +26,12 @@ GENERIC: group-struct ( obj -- group/f )
 
 M: integer group-struct ( id -- group/f )
     (group-struct)
-    [ [ unix.ffi::getgrgid_r ] unix-system-call drop ] keep
+    [ [ unix.ffi:getgrgid_r ] unix-system-call drop ] keep
     check-group-struct ;
 
 M: string group-struct ( string -- group/f )
     (group-struct)
-    [ [ unix.ffi::getgrnam_r ] unix-system-call drop ] keep
+    [ [ unix.ffi:getgrnam_r ] unix-system-call drop ] keep
     check-group-struct ;
 
 : group-struct>group ( group-struct -- group )
@@ -64,12 +64,12 @@ ERROR: no-group string ;
 <PRIVATE
 
 : >groups ( byte-array n -- groups )
-    [ 4 grouping::group ] dip head-slice [ uint deref group-name ] map ;
+    [ 4 grouping:group ] dip head-slice [ uint deref group-name ] map ;
 
 : (user-groups) ( string -- seq )
     dup user-passwd [
         gid>> 64 [ 4 * <byte-array> ] keep
-        int <ref> [ [ unix.ffi::getgrouplist ] unix-system-call drop ] 2keep
+        int <ref> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
         int deref >groups
     ] [
         drop { }
@@ -86,7 +86,7 @@ M: integer user-groups ( id -- seq )
     user-name (user-groups) ;
 
 : all-groups ( -- seq )
-    [ unix.ffi::getgrent dup ] [ group-struct>group ] produce nip
+    [ unix.ffi:getgrent dup ] [ group-struct>group ] produce nip
     endgrent ;
 
 : all-group-names ( -- seq )
@@ -98,11 +98,11 @@ M: integer user-groups ( id -- seq )
 : with-group-cache ( quot -- )
     [ <group-cache> group-cache ] dip with-variable ; inline
 
-: real-group-id ( -- id ) unix.ffi::getgid ; inline
+: real-group-id ( -- id ) unix.ffi:getgid ; inline
 
 : real-group-name ( -- string ) real-group-id group-name ; inline
 
-: effective-group-id ( -- string ) unix.ffi::getegid ; inline
+: effective-group-id ( -- string ) unix.ffi:getegid ; inline
 
 : effective-group-name ( -- string )
     effective-group-id group-name ; inline
@@ -130,10 +130,10 @@ GENERIC: set-effective-group ( obj -- )
 <PRIVATE
 
 : (set-real-group) ( id -- )
-    [ unix.ffi::setgid ] unix-system-call drop ; inline
+    [ unix.ffi:setgid ] unix-system-call drop ; inline
 
 : (set-effective-group) ( id -- )
-    [ unix.ffi::setegid ] unix-system-call drop ; inline
+    [ unix.ffi:setegid ] unix-system-call drop ; inline
 
 PRIVATE>
 

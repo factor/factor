@@ -18,8 +18,8 @@ SYMBOL: live-values
 : look-at-inputs ( node -- ) in-d>> look-at-values ;
 
 : init-dead-code ( -- )
-    <hashed-dlist> work-list namespaces::set
-    H{ { +bottom+ f } } clone live-values namespaces::set ;
+    <hashed-dlist> work-list namespaces:set
+    H{ { +bottom+ f } } clone live-values namespaces:set ;
 
 GENERIC: mark-live-values* ( node -- )
 

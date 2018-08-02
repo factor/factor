@@ -93,7 +93,7 @@ M: f >insecure ;
 
 : log-connection ( remote local -- )
     [ accepted-connection ]
-    [ [ remote-address namespaces::set ] [ local-address namespaces::set ] bi* ]
+    [ [ remote-address namespaces:set ] [ local-address namespaces:set ] bi* ]
     2bi ;
 
 M: threaded-server handle-client* handler>> call( -- ) ;

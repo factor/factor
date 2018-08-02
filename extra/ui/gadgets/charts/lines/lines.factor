@@ -8,7 +8,7 @@ ui.gadgets.charts ui.gadgets.charts.utils ui.render ;
 QUALIFIED-WITH: alien.c-types c
 IN: ui.gadgets.charts.lines
 
-SPECIALIZED-ARRAY: c::float
+SPECIALIZED-ARRAY: c:float
 
 ! Data must be a sequence of { x y } coordinates sorted by
 ! non-descending x vaues.

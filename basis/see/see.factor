@@ -20,8 +20,8 @@ GENERIC: see* ( defspec -- )
 : synopsis ( defspec -- str )
     [
         string-limit? off
-        0 margin namespaces::set
-        1 line-limit namespaces::set
+        0 margin namespaces:set
+        1 line-limit namespaces:set
         [ synopsis* ] with-in
     ] with-string-writer ;
 
@@ -46,7 +46,7 @@ M: word print-stack-effect? drop t ;
 <PRIVATE
 
 : seeing-word ( word -- )
-    vocabulary>> dup [ lookup-vocab ] when pprinter-in namespaces::set ;
+    vocabulary>> dup [ lookup-vocab ] when pprinter-in namespaces:set ;
 
 : word-synopsis ( word -- )
     {
@@ -92,8 +92,8 @@ M: pathname synopsis* pprint* ;
 
 M: alias summary
     [
-        0 margin namespaces::set
-        1 line-limit namespaces::set
+        0 margin namespaces:set
+        1 line-limit namespaces:set
         [
             {
                 [ seeing-word ]
@@ -128,8 +128,8 @@ M: word declarations.
 
 M: object see*
     [
-        12 nesting-limit namespaces::set
-        100 length-limit namespaces::set
+        12 nesting-limit namespaces:set
+        100 length-limit namespaces:set
         <colon dup synopsis*
         <block dup definition pprint-elements block>
         dup definer nip [ pprint-word ] when* declarations.

@@ -6,7 +6,7 @@ splitting xml xml.data xml.traversal math.order namespaces
 combinators images gpu.shaders io make game.models game.models.util
 io.encodings.ascii game.models.loader specialized-arrays ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAYS: c::float c::uint ;
+SPECIALIZED-ARRAYS: c:float c:uint ;
 IN: game.models.collada
 
 SINGLETON: collada-models
@@ -147,8 +147,8 @@ VERTEX-FORMAT: collada-vertex-format
     ]
     [
         soa>aos
-        [ flatten c::float >c-array ]
-        [ flatten c::uint >c-array ]
+        [ flatten c:float >c-array ]
+        [ flatten c:uint >c-array ]
         bi* collada-vertex-format f model boa
     ] bi ;
 

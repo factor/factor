@@ -156,8 +156,8 @@ M: with-options nfa-node ( node -- start end )
 
 : construct-nfa ( ast -- nfa-table )
     [
-        0 state namespaces::set
-        <transition-table> nfa-table namespaces::set
+        0 state namespaces:set
+        <transition-table> nfa-table namespaces:set
         nfa-node
         nfa-table get
             swap 1array fast-set >>final-states

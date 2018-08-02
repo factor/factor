@@ -35,4 +35,4 @@ C-TYPE: rlimit
 C-TYPE: rusage
 C-TYPE: sockaddr
 
-"unix.types." os name>> sequences::append require
+"unix.types." os name>> sequences:append require

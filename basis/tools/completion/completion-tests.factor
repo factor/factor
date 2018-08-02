@@ -1,4 +1,5 @@
-USING: assocs kernel sequences tools.completion tools.test ;
+USING: assocs kernel sequences tools.test ;
+IN: tools.completion
 
 { f } [ "abc" "def" fuzzy ] unit-test
 { V{ 4 5 6 } } [ "set-nth" "nth" fuzzy ] unit-test

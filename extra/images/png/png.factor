@@ -196,10 +196,10 @@ ERROR: bad-filter n ;
         count 2 * count!
     ] when
 
-    bs::<msb0-bit-reader> :> br
+    bs:<msb0-bit-reader> :> br
     height [
-        count [ depth br bs::read ] B{ } replicate-as
-        8 br bs::align
+        count [ depth br bs:read ] B{ } replicate-as
+        8 br bs:align
     ] replicate concat ;
 
 :: reverse-interlace-none ( bytes loading-png -- array )

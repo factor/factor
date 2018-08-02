@@ -203,7 +203,7 @@ M: yaml-alias (deref-aliases) anchor>> of ;
 M: sequence (deref-aliases)
     [ (deref-aliases) ] with map! ;
 
-M: sets::set (deref-aliases)
+M: sets:set (deref-aliases)
     [ members (deref-aliases) ] [ clear-set ] [ swap union! ] tri ;
 
 : assoc-map! ( assoc quot -- assoc' )
@@ -332,7 +332,7 @@ M: string (replace-aliases) nip ;
 M: sequence (replace-aliases)
     [ ?replace-aliases ] with map ;
 
-M: sets::set (replace-aliases)
+M: sets:set (replace-aliases)
     [ members (replace-aliases) ] keep set-like ;
 
 M: assoc (replace-aliases)
@@ -361,7 +361,7 @@ M: string (replace-anchors) nip ;
 M: sequence (replace-anchors)
     [ ?replace-anchors ] with map ;
 
-M: sets::set (replace-anchors)
+M: sets:set (replace-anchors)
     [ members ?replace-anchors ] keep set-like ;
 
 M: assoc (replace-anchors)
@@ -469,7 +469,7 @@ M: assoc emit-value ( emitter event anchor assoc -- )
     [ nip emit-assoc-body ]
     [ 2drop emit-assoc-end ] 4tri ;
 
-M: sets::set emit-value ( emitter event anchor set -- )
+M: sets:set emit-value ( emitter event anchor set -- )
     [ drop YAML_SET_TAG f emit-assoc-start ]
     [ nip emit-set-body ]
     [ 2drop emit-assoc-end ] 4tri ;

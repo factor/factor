@@ -114,7 +114,7 @@ PRIVATE>
 ! Help support
 
 : fuel-get-article ( name -- result )
-    fuel.help::get-article ;
+    fuel.help:get-article ;
 
 : fuel-get-article-title ( name -- result )
     articles get at [ article-title ] [ f ] if* ;
@@ -123,13 +123,13 @@ PRIVATE>
 
 : fuel-word-def ( name -- result ) word-def ;
 
-: fuel-vocab-help ( name -- result ) fuel.help::vocab-help ;
+: fuel-vocab-help ( name -- result ) fuel.help:vocab-help ;
 
 : fuel-word-synopsis ( word -- synopsis )
     word-synopsis ;
 
 : fuel-vocab-summary ( name -- summary )
-    fuel.help::vocab-summary ;
+    fuel.help:vocab-summary ;
 
 : fuel-index ( quot -- result )
     call( -- seq ) format-index ;

@@ -18,7 +18,7 @@ M: hook-combination picker
 M: hook-combination dispatch# drop 0 ;
 
 M: hook-combination mega-cache-quot
-    1quotation picker [ gsp::lookup-method (execute) ] surround ;
+    1quotation picker [ gsp:lookup-method (execute) ] surround ;
 
 M: hook-generic definer drop \ HOOK: f ;
 

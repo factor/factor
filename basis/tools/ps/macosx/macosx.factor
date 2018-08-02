@@ -1,10 +1,13 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
+
 USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs byte-arrays classes.struct continuations fry grouping
 kernel libc literals math sequences splitting strings system
 system-info.macosx tools.ps unix unix.time unix.types ;
+
 QUALIFIED-WITH: alien.c-types c
+
 IN: tools.ps.macosx
 
 <PRIVATE
@@ -36,7 +39,7 @@ STRUCT: _pcred
 STRUCT: _ucred
     { cr_ref int32_t }
     { cr_uid uid_t }
-    { cr_ngroups c::short }
+    { cr_ngroups c:short }
     { cr_groups gid_t[16] } ;
 
 STRUCT: vmspace
@@ -106,15 +109,15 @@ STRUCT: kinfo_proc
     { e_vm vmspace }
     { e_ppid pid_t }
     { e_pgid pid_t }
-    { e_joc c::short }
+    { e_joc c:short }
     { e_tdev dev_t }
     { e_tpgid pid_t }
     { e_tsess void* }
     { e_mesg char[8] }
     { e_xsize segsz_t }
-    { e_xrssize c::short }
-    { e_xccount c::short }
-    { e_xswrss c::short }
+    { e_xrssize c:short }
+    { e_xccount c:short }
+    { e_xswrss c:short }
     { e_flag int32_t }
     { e_login char[12] }
     { e_spare int32_t[4] } ;

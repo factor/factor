@@ -57,7 +57,7 @@ CONSTANT: attrib-table H{
 : arb-make-pixel-format ( world attributes -- pf )
     [ handle>> hDC>> ] dip
     perm-attribs attrib-table pixel-format-attributes>int-array
-    f 1 { c::int c::int }
+    f 1 { c:int c:int }
     [ wglChoosePixelFormatARB win32-error=0/f ] with-out-parameters drop ;
 
 CONSTANT: pfd-flag-map H{
@@ -84,7 +84,7 @@ CONSTANT: pfd-flag-map H{
 : >pfd ( attributes -- pfd )
     [ PIXELFORMATDESCRIPTOR <struct> ] dip
     {
-        [ drop PIXELFORMATDESCRIPTOR c::heap-size >>nSize ]
+        [ drop PIXELFORMATDESCRIPTOR c:heap-size >>nSize ]
         [ drop 1 >>nVersion ]
         [ >pfd-flags >>dwFlags ]
         [ drop PFD_TYPE_RGBA >>iPixelType ]
@@ -434,7 +434,7 @@ SYMBOL: nc-buttons
         drop
     ] [
         [ SetCapture drop ] keep
-        mouse-captured namespaces::set
+        mouse-captured namespaces:set
     ] if ;
 
 : release-capture ( -- )
@@ -466,7 +466,7 @@ SYMBOL: nc-buttons
 : make-TRACKMOUSEEVENT ( hWnd -- alien )
     TRACKMOUSEEVENT <struct>
         swap >>hwndTrack
-        TRACKMOUSEEVENT c::heap-size >>cbSize ;
+        TRACKMOUSEEVENT c:heap-size >>cbSize ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
     2nip
@@ -554,10 +554,15 @@ SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
-    c::uint { c::void* c::uint WPARAM LPARAM } stdcall [
-        pick wm-handlers get-global at*
-        [ flush call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
-    ] alien-callback ;
+    c:uint { c:void* c:uint WPARAM LPARAM } stdcall [
+        pick
+
+        trace-messages? get-global
+        [ dup windows-message-name name>> print flush ] when
+
+        wm-handlers get-global at*
+        [ call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
+     ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
@@ -571,7 +576,7 @@ M: windows-ui-backend do-events
 :: register-window-class ( class-name-ptr -- )
     WNDCLASSEX <struct> f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
-        WNDCLASSEX c::heap-size >>cbSize
+        WNDCLASSEX c:heap-size >>cbSize
         flags{ CS_HREDRAW CS_VREDRAW CS_OWNDC } >>style
         ui-wndproc >>lpfnWndProc
         0 >>cbClsExtra
@@ -715,7 +720,7 @@ M: windows-ui-backend system-alert
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
     MONITORINFOEX <struct>
-        MONITORINFOEX c::heap-size >>cbSize
+        MONITORINFOEX c:heap-size >>cbSize
     [ GetMonitorInfo win32-error=0/f ] keep rcMonitor>> ;
 
 : client-area>RECT ( hwnd -- RECT )

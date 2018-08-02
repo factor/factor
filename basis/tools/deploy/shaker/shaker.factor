@@ -311,11 +311,11 @@ IN: tools.deploy.shaker
     [
         "inspector-hook" "inspector" lookup-word ,
         {
-            source-files::source-files
-            continuations::error
-            continuations::error-continuation
-            continuations::error-thread
-            continuations::restarts
+            source-files:source-files
+            continuations:error
+            continuations:error-continuation
+            continuations:error-thread
+            continuations:restarts
         } %
 
         "disposables" "destructors" lookup-word ,
@@ -345,30 +345,30 @@ IN: tools.deploy.shaker
             {
                 gensym
                 name>char-hook
-                classes.private::next-method-quot-cache
-                classes.private::class-and-cache
-                classes.private::class-not-cache
-                classes.private::class-or-cache
-                classes.private::class<=-cache
-                classes.private::classes-intersect-cache
-                classes.private::implementors-map
-                classes.private::update-map
+                classes.private:next-method-quot-cache
+                classes.private:class-and-cache
+                classes.private:class-not-cache
+                classes.private:class-or-cache
+                classes.private:class<=-cache
+                classes.private:classes-intersect-cache
+                classes.private:implementors-map
+                classes.private:update-map
                 main-vocab-hook
-                compiler.crossref::compiled-crossref
-                compiler.crossref::generic-call-site-crossref
+                compiler.crossref:compiled-crossref
+                compiler.crossref:generic-call-site-crossref
                 compiler-impl
-                compiler.errors::compiler-errors
+                compiler.errors:compiler-errors
                 print-use-hook
                 root-cache
                 require-when-vocabs
                 require-when-table
-                source-files.errors::error-types
-                source-files.errors::error-observers
-                vocabs::dictionary
-                vocabs::require-hook
-                vocabs::vocab-observers
-                vocabs.loader::add-vocab-root-hook
-                vocabs.parser::manifest
+                source-files.errors:error-types
+                source-files.errors:error-observers
+                vocabs:dictionary
+                vocabs:require-hook
+                vocabs:vocab-observers
+                vocabs.loader:add-vocab-root-hook
+                vocabs.parser:manifest
                 word
                 parser-quiet?
             } %
@@ -387,7 +387,7 @@ IN: tools.deploy.shaker
         ] when
 
         strip-debugger? [
-            \ compiler.errors::compiler-errors ,
+            \ compiler.errors:compiler-errors ,
         ] when
     ] { } make ;
 
@@ -395,7 +395,7 @@ IN: tools.deploy.shaker
     [
 
         {
-            init::startup-hooks
+            init:startup-hooks
             input-stream
             output-stream
             error-stream
@@ -634,7 +634,7 @@ SYMBOL: deploy-vocab
                     "ui.debugger" require
                 ] when
             ] unless
-            [ deploy-vocab namespaces::set ] [ require ] [
+            [ deploy-vocab namespaces:set ] [ require ] [
                 vocab-main [
                     "Vocabulary has no MAIN: word." print flush 1 exit
                 ] unless

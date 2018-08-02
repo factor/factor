@@ -98,8 +98,8 @@ M: node compute-modular-candidates*
     drop ;
 
 : compute-modular-candidates ( nodes -- )
-    HS{ } clone modular-values namespaces::set
-    HS{ } clone fixnum-values namespaces::set
+    HS{ } clone modular-values namespaces:set
+    HS{ } clone fixnum-values namespaces:set
     [ compute-modular-candidates* ] each-node ;
 
 GENERIC: only-reads-low-order? ( node -- ? )

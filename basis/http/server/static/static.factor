@@ -184,7 +184,7 @@ M: file-responder call-responder* ( path responder -- response )
     [ drop <400> ] [ "/" join serve-object ] if ;
 
 : add-index ( name responder -- )
-    index-names>> sets::adjoin ;
+    index-names>> sets:adjoin ;
 
 : serve-fhtml ( path -- response )
     <fhtml> <html-content> ;

@@ -7,7 +7,7 @@ io.binary kernel locals math math.bitwise math.constants
 math.functions math.order math.ranges namespaces sequences
 sequences.private sets summary system typed vocabs ;
 QUALIFIED-WITH: alien.c-types c
-QUALIFIED: sets
+QUALIFIED-WITH: sets sets
 IN: random
 
 SYMBOL: system-random-generator
@@ -22,13 +22,13 @@ M: object random-bytes*
     [ integer>fixnum-strict [ (byte-array) ] keep ] dip
     [ over 4 >= ] [
         [ 4 - ] dip
-        [ random-32* 2over c::int c::set-alien-value ] keep
+        [ random-32* 2over c:int c:set-alien-value ] keep
     ] while over zero? [ 2drop ] [
-        random-32* c::int <ref> swap head 0 pick copy-unsafe
+        random-32* c:int <ref> swap head 0 pick copy-unsafe
     ] if ;
 
 M: object random-32*
-    4 swap random-bytes* c::uint deref ;
+    4 swap random-bytes* c:uint deref ;
 
 ERROR: no-random-number-generator ;
 
@@ -105,7 +105,7 @@ M: hashtable random
         [ array-nth ] [ [ 1 + ] dip array-nth ] 2bi 2array
     ] if-zero ;
 
-M: sets::set random members random ;
+M: sets:set random members random ;
 
 M: hash-set random
     dup cardinality [ drop f ] [

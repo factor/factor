@@ -21,10 +21,10 @@ load-help? off
     [
         ! Rehash hashtables first, since bootstrap.image creates
         ! them using the host image's hashing algorithms.
-        [ identity-hashtable? ] instances [ hashtables::rehash ] each
-        [ wrapped-hashtable? ] instances [ hashtables::rehash ] each
-        [ hashtable? ] instances [ hashtables::rehash ] each
-        [ hash-set? ] instances [ hash-sets::rehash ] each
+        [ identity-hashtable? ] instances [ hashtables:rehash ] each
+        [ wrapped-hashtable? ] instances [ hashtables:rehash ] each
+        [ hashtable? ] instances [ hashtables:rehash ] each
+        [ hash-set? ] instances [ hash-sets:rehash ] each
         boot
     ] %
 
@@ -66,4 +66,4 @@ load-help? off
     ] %
 ] [ ] make
 OBJ-STARTUP-QUOT
-bootstrap.image.private::special-objects get set-at
+bootstrap.image.private:special-objects get set-at

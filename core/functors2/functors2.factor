@@ -12,7 +12,7 @@ IN: functors2
 ERROR: not-all-unique seq ;
 
 : ensure-unique ( seq -- seq )
-    dup sets::all-unique? [ not-all-unique ] unless ; inline
+    dup sets:all-unique? [ not-all-unique ] unless ; inline
 
 : effect-in>drop-variables ( effect -- quot )
     in>> ensure-unique

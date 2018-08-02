@@ -125,12 +125,12 @@ M: c-type box
     {
         { "from_float" [ drop ] }
         { "from_double" [ drop ] }
-        { "from_signed_1" [ drop c::char ^^convert-integer ] }
-        { "from_unsigned_1" [ drop c::uchar ^^convert-integer ] }
-        { "from_signed_2" [ drop c::short ^^convert-integer ] }
-        { "from_unsigned_2" [ drop c::ushort ^^convert-integer ] }
-        { "from_signed_4" [ drop c::int ^^convert-integer ] }
-        { "from_unsigned_4" [ drop c::uint ^^convert-integer ] }
+        { "from_signed_1" [ drop c:char ^^convert-integer ] }
+        { "from_unsigned_1" [ drop c:uchar ^^convert-integer ] }
+        { "from_signed_2" [ drop c:short ^^convert-integer ] }
+        { "from_unsigned_2" [ drop c:ushort ^^convert-integer ] }
+        { "from_signed_4" [ drop c:int ^^convert-integer ] }
+        { "from_unsigned_4" [ drop c:uint ^^convert-integer ] }
         { "allot_alien" [ drop ^^box-alien ] }
         [ swap <gc-map> ^^box ]
     } case ;

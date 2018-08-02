@@ -51,10 +51,10 @@ M: unix tell-handle ( handle -- n )
 
 M: unix seek-handle ( n seek-type handle -- )
     swap {
-        { io::seek-absolute [ SEEK_SET ] }
-        { io::seek-relative [ SEEK_CUR ] }
-        { io::seek-end [ SEEK_END ] }
-        [ io::bad-seek-type ]
+        { io:seek-absolute [ SEEK_SET ] }
+        { io:seek-relative [ SEEK_CUR ] }
+        { io:seek-end [ SEEK_END ] }
+        [ io:bad-seek-type ]
     } case
     [ fd>> swap ] dip [ lseek ] unix-system-call drop ;
 
@@ -147,8 +147,8 @@ M: stdin dispose*
     ] with-destructors ;
 
 : wait-for-stdin ( stdin -- size )
-    [ control>> char: X over io::stream-write1 io::stream-flush ]
-    [ size>> ssize_t heap-size swap io::stream-read ssize_t deref ]
+    [ control>> char: X over io:stream-write1 io:stream-flush ]
+    [ size>> ssize_t heap-size swap io:stream-read ssize_t deref ]
     bi ;
 
 :: refill-stdin ( buffer stdin size -- )
@@ -194,7 +194,7 @@ dispatch-signal-hook [ [ drop ] ] initialize
 
 : signal-pipe-loop ( port -- )
     '[
-        int heap-size _ io::stream-read
+        int heap-size _ io:stream-read
         dup [ int deref dispatch-signal-hook get call( x -- ) ] when*
     ] loop ;
 

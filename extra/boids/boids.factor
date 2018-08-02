@@ -80,17 +80,17 @@ M: range-observer model-changed
     2 3 <frame> white-interior { 2 4 } >>gap { 0 0 } >>filled-cell
 
     "weight" <label> { 0 0 } grid-add
-    behavior weight>> 100 * >fixnum 0 0 200 1 mr::<range>
+    behavior weight>> 100 * >fixnum 0 0 200 1 mr:<range>
     dup [ 100.0 / behavior weight<< ] connect
     horizontal <slider> { 1 0 } grid-add
 
     "radius" <label> { 0 1 } grid-add
-    behavior radius>> 0 0 100 1 mr::<range>
+    behavior radius>> 0 0 100 1 mr:<range>
     dup [ behavior radius<< ] connect
     horizontal <slider> { 1 1 } grid-add
 
     "angle" <label> { 0 2 } grid-add
-    behavior angle-cos>> acos rad>deg >fixnum 0 0 180 1 mr::<range>
+    behavior angle-cos>> acos rad>deg >fixnum 0 0 180 1 mr:<range>
     dup [ deg>rad cos behavior angle-cos<< ] connect
     horizontal <slider> { 1 2 } grid-add
 
@@ -125,12 +125,12 @@ PRIVATE>
     2 2 <frame> { 2 4 } >>gap { 0 0 } >>filled-cell
 
     "population" <label> { 0 0 } grid-add
-    initial-population 0 0 200 10 mr::<range>
+    initial-population 0 0 200 10 mr:<range>
     dup [ boids-gadget set-population ] connect
     horizontal <slider> { 1 0 } grid-add
 
     "speed" <label> { 0 1 } grid-add
-    boids-gadget dt>> 0 1 10 1 mr::<range>
+    boids-gadget dt>> 0 1 10 1 mr:<range>
     dup [ boids-gadget dt<< ] connect
     horizontal <slider> { 1 1 } grid-add
 

@@ -686,36 +686,36 @@ M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
 
 M:: ppc.32 %convert-integer ( dst src c-type -- )
     c-type {
-        { c::char   [ dst src 24 CLRLWI dst dst EXTSB ] }
-        { c::uchar  [ dst src 24 CLRLWI ] }
-        { c::short  [ dst src 16 CLRLWI dst dst EXTSH ] }
-        { c::ushort [ dst src 16 CLRLWI ] }
-        { c::int    [ ] }
-        { c::uint   [ ] }
+        { c:char   [ dst src 24 CLRLWI dst dst EXTSB ] }
+        { c:uchar  [ dst src 24 CLRLWI ] }
+        { c:short  [ dst src 16 CLRLWI dst dst EXTSH ] }
+        { c:ushort [ dst src 16 CLRLWI ] }
+        { c:int    [ ] }
+        { c:uint   [ ] }
     } case ;
 
 M:: ppc.64 %convert-integer ( dst src c-type -- )
     c-type {
-        { c::char      [ dst src 56 CLRLDI dst dst EXTSB ] }
-        { c::uchar     [ dst src 56 CLRLDI ] }
-        { c::short     [ dst src 48 CLRLDI dst dst EXTSH ] }
-        { c::ushort    [ dst src 48 CLRLDI ] }
-        { c::int       [ dst src 32 CLRLDI dst dst EXTSW ] }
-        { c::uint      [ dst src 32 CLRLDI ] }
-        { c::longlong  [ ] }
-        { c::ulonglong [ ] }
+        { c:char      [ dst src 56 CLRLDI dst dst EXTSB ] }
+        { c:uchar     [ dst src 56 CLRLDI ] }
+        { c:short     [ dst src 48 CLRLDI dst dst EXTSH ] }
+        { c:ushort    [ dst src 48 CLRLDI ] }
+        { c:int       [ dst src 32 CLRLDI dst dst EXTSW ] }
+        { c:uint      [ dst src 32 CLRLDI ] }
+        { c:longlong  [ ] }
+        { c:ulonglong [ ] }
     } case ;
 
 M: ppc.32 %load-memory-imm ( dst base offset rep c-type -- )
     [
         pick %trap-null
         {
-            { c::char   [ [ dup ] 2dip LBZ dup EXTSB ] }
-            { c::uchar  [ LBZ ] }
-            { c::short  [ LHA ] }
-            { c::ushort [ LHZ ] }
-            { c::int    [ LWZ ] }
-            { c::uint   [ LWZ ] }
+            { c:char   [ [ dup ] 2dip LBZ dup EXTSB ] }
+            { c:uchar  [ LBZ ] }
+            { c:short  [ LHA ] }
+            { c:ushort [ LHZ ] }
+            { c:int    [ LWZ ] }
+            { c:uint   [ LWZ ] }
         } case
     ] [
         {
@@ -729,14 +729,14 @@ M: ppc.64 %load-memory-imm ( dst base offset rep c-type -- )
     [
         pick %trap-null
         {
-            { c::char      [ [ dup ] 2dip LBZ dup EXTSB ] }
-            { c::uchar     [ LBZ ] }
-            { c::short     [ LHA ] }
-            { c::ushort    [ LHZ ] }
-            { c::int       [ LWZ ] }
-            { c::uint      [ LWZ ] }
-            { c::longlong  [ [ scratch-reg ] dip LI scratch-reg LDX ] }
-            { c::ulonglong [ [ scratch-reg ] dip LI scratch-reg LDX ] }
+            { c:char      [ [ dup ] 2dip LBZ dup EXTSB ] }
+            { c:uchar     [ LBZ ] }
+            { c:short     [ LHA ] }
+            { c:ushort    [ LHZ ] }
+            { c:int       [ LWZ ] }
+            { c:uint      [ LWZ ] }
+            { c:longlong  [ [ scratch-reg ] dip LI scratch-reg LDX ] }
+            { c:ulonglong [ [ scratch-reg ] dip LI scratch-reg LDX ] }
         } case
     ] [
         {
@@ -752,12 +752,12 @@ M: ppc.32 %load-memory ( dst base displacement scale offset rep c-type -- )
     [
         pick %trap-null
         {
-            { c::char   [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
-            { c::uchar  [ LBZX ] }
-            { c::short  [ LHAX ] }
-            { c::ushort [ LHZX ] }
-            { c::int    [ LWZX ] }
-            { c::uint   [ LWZX ] }
+            { c:char   [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
+            { c:uchar  [ LBZX ] }
+            { c:short  [ LHAX ] }
+            { c:ushort [ LHZX ] }
+            { c:int    [ LWZX ] }
+            { c:uint   [ LWZX ] }
         } case
     ] [
         {
@@ -772,14 +772,14 @@ M: ppc.64 %load-memory ( dst base displacement scale offset rep c-type -- )
     [
         pick %trap-null
         {
-            { c::char      [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
-            { c::uchar     [ LBZX ] }
-            { c::short     [ LHAX ] }
-            { c::ushort    [ LHZX ] }
-            { c::int       [ LWZX ] }
-            { c::uint      [ LWZX ] }
-            { c::longlong  [ LDX  ] }
-            { c::ulonglong [ LDX  ] }
+            { c:char      [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
+            { c:uchar     [ LBZX ] }
+            { c:short     [ LHAX ] }
+            { c:ushort    [ LHZX ] }
+            { c:int       [ LWZX ] }
+            { c:uint      [ LWZX ] }
+            { c:longlong  [ LDX  ] }
+            { c:ulonglong [ LDX  ] }
         } case
     ] [
         {
@@ -793,12 +793,12 @@ M: ppc.64 %load-memory ( dst base displacement scale offset rep c-type -- )
 M: ppc.32 %store-memory-imm ( src base offset rep c-type -- )
     [
         {
-            { c::char   [ STB ] }
-            { c::uchar  [ STB ] }
-            { c::short  [ STH ] }
-            { c::ushort [ STH ] }
-            { c::int    [ STW ] }
-            { c::uint   [ STW ] }
+            { c:char   [ STB ] }
+            { c:uchar  [ STB ] }
+            { c:short  [ STH ] }
+            { c:ushort [ STH ] }
+            { c:int    [ STW ] }
+            { c:uint   [ STW ] }
         } case
     ] [
         {
@@ -811,14 +811,14 @@ M: ppc.32 %store-memory-imm ( src base offset rep c-type -- )
 M: ppc.64 %store-memory-imm ( src base offset rep c-type -- )
     [
         {
-            { c::char      [ STB ] }
-            { c::uchar     [ STB ] }
-            { c::short     [ STH ] }
-            { c::ushort    [ STH ] }
-            { c::int       [ STW ] }
-            { c::uint      [ STW ] }
-            { c::longlong  [ [ scratch-reg ] dip LI scratch-reg STDX ] }
-            { c::ulonglong [ [ scratch-reg ] dip LI scratch-reg STDX ] }
+            { c:char      [ STB ] }
+            { c:uchar     [ STB ] }
+            { c:short     [ STH ] }
+            { c:ushort    [ STH ] }
+            { c:int       [ STW ] }
+            { c:uint      [ STW ] }
+            { c:longlong  [ [ scratch-reg ] dip LI scratch-reg STDX ] }
+            { c:ulonglong [ [ scratch-reg ] dip LI scratch-reg STDX ] }
         } case
     ] [
         {
@@ -832,12 +832,12 @@ M: ppc.32 %store-memory ( src base displacement scale offset rep c-type -- )
     [ [ 0 assert= ] bi@ ] 2dip
     [
         {
-            { c::char   [ STBX ] }
-            { c::uchar  [ STBX ] }
-            { c::short  [ STHX ] }
-            { c::ushort [ STHX ] }
-            { c::int    [ STWX ] }
-            { c::uint   [ STWX ] }
+            { c:char   [ STBX ] }
+            { c:uchar  [ STBX ] }
+            { c:short  [ STHX ] }
+            { c:ushort [ STHX ] }
+            { c:int    [ STWX ] }
+            { c:uint   [ STWX ] }
         } case
     ] [
         {
@@ -851,14 +851,14 @@ M: ppc.64 %store-memory ( src base displacement scale offset rep c-type -- )
     [ [ 0 assert= ] bi@ ] 2dip
     [
         {
-            { c::char      [ STBX ] }
-            { c::uchar     [ STBX ] }
-            { c::short     [ STHX ] }
-            { c::ushort    [ STHX ] }
-            { c::int       [ STWX ] }
-            { c::uint      [ STWX ] }
-            { c::longlong  [ STDX ] }
-            { c::ulonglong [ STDX ] }
+            { c:char      [ STBX ] }
+            { c:uchar     [ STBX ] }
+            { c:short     [ STHX ] }
+            { c:ushort    [ STHX ] }
+            { c:int       [ STWX ] }
+            { c:uint      [ STWX ] }
+            { c:longlong  [ STDX ] }
+            { c:ulonglong [ STDX ] }
         } case
     ] [
         {

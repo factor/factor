@@ -25,7 +25,7 @@ SYMBOL: terms
 
 : with-terms ( quot -- hash )
     [
-        H{ } clone terms namespaces::set call terms get canonicalize
+        H{ } clone terms namespaces:set call terms get canonicalize
     ] with-scope ; inline
 
 ! Printing elements

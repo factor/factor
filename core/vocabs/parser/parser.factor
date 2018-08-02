@@ -65,7 +65,7 @@ ERROR: no-word-in-vocab word vocab ;
     [ nip words>> ] [ extract-words ] 2bi assoc-diff ;
 
 : qualified-words ( prefix vocab -- assoc )
-    words>> swap [ swap [ swap "::" glue ] dip ] curry assoc-map ;
+    words>> swap [ swap [ swap ":" glue ] dip ] curry assoc-map ;
 
 : (lookup) ( name assoc -- word/f )
     at* [ dup forward-reference? [ drop f ] when ] when ;
@@ -186,7 +186,7 @@ TUPLE: ambiguous-use-error name words ;
     [ words>> (lookup) ] with map sift ;
 
 : (vocab-search-qualified) ( name assocs -- words )
-    [ "::" split1 swap ] dip [ name>> = ] with filter (vocab-search) ;
+    [ ":" split1 swap ] dip [ name>> = ] with filter (vocab-search) ;
 
 : (vocab-search-full) ( name assocs -- words )
     [ (vocab-search-qualified) ] [ (vocab-search) ] 2bi append ;

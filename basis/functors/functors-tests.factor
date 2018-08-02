@@ -159,15 +159,15 @@ T-class DEFINES-CLASS ${T}
 WHERE
 
 STRUCT: T-class
-    { NAME c::longlong }
+    { NAME c:longlong }
     { x { TYPE 4 } }
-    { y { c::short N } }
+    { y { c:short N } }
     { z TYPE initial: 5 }
-    { float { c::float 2 } } ;
+    { float { c:float 2 } } ;
 
 ;FUNCTOR>
 
-"a-struct" "nemo" c::char 2 define-a-struct
+"a-struct" "nemo" c:char 2 define-a-struct
 
 >>
 
@@ -178,35 +178,35 @@ STRUCT: T-class
             { offset 0 }
             { class integer }
             { initial 0 }
-            { type c::longlong }
+            { type c:longlong }
         }
         T{ struct-slot-spec
             { name "x" }
             { offset 8 }
             { class object }
             { initial f }
-            { type { c::char 4 } }
+            { type { c:char 4 } }
         }
         T{ struct-slot-spec
             { name "y" }
             { offset 12 }
             { class object }
             { initial f }
-            { type { c::short 2 } }
+            { type { c:short 2 } }
         }
         T{ struct-slot-spec
             { name "z" }
             { offset 16 }
             { class fixnum }
             { initial 5 }
-            { type c::char }
+            { type c:char }
         }
         T{ struct-slot-spec
             { name "float" }
             { offset 20 }
             { class object }
             { initial f }
-            { type { c::float 2 } }
+            { type { c:float 2 } }
         }
     }
 ] [ a-struct struct-slots ] unit-test

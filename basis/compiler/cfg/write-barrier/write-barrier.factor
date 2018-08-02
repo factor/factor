@@ -54,9 +54,9 @@ M: ##copy eliminate-write-barrier
 M: insn eliminate-write-barrier drop t ;
 
 : write-barriers-step ( insns -- insns' )
-    HS{ } clone fresh-allocations namespaces::set
-    HS{ } clone mutated-objects namespaces::set
-    H{ } clone copies namespaces::set
+    HS{ } clone fresh-allocations namespaces:set
+    HS{ } clone mutated-objects namespaces:set
+    H{ } clone copies namespaces:set
     [ eliminate-write-barrier ] filter! ;
 
 : eliminate-write-barriers ( cfg -- )

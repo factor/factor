@@ -7,9 +7,9 @@ sequences.unrolled sequences.unrolled.private specialized-arrays
 vocabs ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS:
-    c::char c::short c::int c::longlong
-    c::uchar c::ushort c::uint c::ulonglong
-    c::float c::double ;
+    c:char c:short c:int c:longlong
+    c:uchar c:ushort c:uint c:ulonglong
+    c:float c:double ;
 IN: math.vectors.simd.intrinsics
 
 ! Word props are added later
@@ -47,44 +47,44 @@ IN: math.vectors.simd.intrinsics
 
 : byte>rep-array ( byte-array rep -- array )
     {
-        { char-16-rep      [ 16 c::char <c-direct-array>      ] }
-        { uchar-16-rep     [ 16 c::uchar <c-direct-array>     ] }
-        { short-8-rep      [  8 c::short <c-direct-array>     ] }
-        { ushort-8-rep     [  8 c::ushort <c-direct-array>    ] }
-        { int-4-rep        [  4 c::int <c-direct-array>       ] }
-        { uint-4-rep       [  4 c::uint <c-direct-array>      ] }
-        { longlong-2-rep   [  2 c::longlong <c-direct-array>  ] }
-        { ulonglong-2-rep  [  2 c::ulonglong <c-direct-array> ] }
-        { float-4-rep      [  4 c::float <c-direct-array>     ] }
-        { double-2-rep     [  2 c::double <c-direct-array>    ] }
+        { char-16-rep      [ 16 c:char <c-direct-array>      ] }
+        { uchar-16-rep     [ 16 c:uchar <c-direct-array>     ] }
+        { short-8-rep      [  8 c:short <c-direct-array>     ] }
+        { ushort-8-rep     [  8 c:ushort <c-direct-array>    ] }
+        { int-4-rep        [  4 c:int <c-direct-array>       ] }
+        { uint-4-rep       [  4 c:uint <c-direct-array>      ] }
+        { longlong-2-rep   [  2 c:longlong <c-direct-array>  ] }
+        { ulonglong-2-rep  [  2 c:ulonglong <c-direct-array> ] }
+        { float-4-rep      [  4 c:float <c-direct-array>     ] }
+        { double-2-rep     [  2 c:double <c-direct-array>    ] }
     } case ; inline
 
 : >rep-array ( seq rep -- array )
     {
-        { char-16-rep      [ c::char >c-array      ] }
-        { uchar-16-rep     [ c::uchar >c-array     ] }
-        { short-8-rep      [ c::short >c-array     ] }
-        { ushort-8-rep     [ c::ushort >c-array    ] }
-        { int-4-rep        [ c::int >c-array       ] }
-        { uint-4-rep       [ c::uint >c-array      ] }
-        { longlong-2-rep   [ c::longlong >c-array  ] }
-        { ulonglong-2-rep  [ c::ulonglong >c-array ] }
-        { float-4-rep      [ c::float >c-array     ] }
-        { double-2-rep     [ c::double >c-array    ] }
+        { char-16-rep      [ c:char >c-array      ] }
+        { uchar-16-rep     [ c:uchar >c-array     ] }
+        { short-8-rep      [ c:short >c-array     ] }
+        { ushort-8-rep     [ c:ushort >c-array    ] }
+        { int-4-rep        [ c:int >c-array       ] }
+        { uint-4-rep       [ c:uint >c-array      ] }
+        { longlong-2-rep   [ c:longlong >c-array  ] }
+        { ulonglong-2-rep  [ c:ulonglong >c-array ] }
+        { float-4-rep      [ c:float >c-array     ] }
+        { double-2-rep     [ c:double >c-array    ] }
     } case ; inline
 
 : <rep-array> ( rep -- array )
     {
-        { char-16-rep      [ 16 c::char (c-array)      ] }
-        { uchar-16-rep     [ 16 c::uchar (c-array)     ] }
-        { short-8-rep      [  8 c::short (c-array)     ] }
-        { ushort-8-rep     [  8 c::ushort (c-array)    ] }
-        { int-4-rep        [  4 c::int (c-array)       ] }
-        { uint-4-rep       [  4 c::uint (c-array)      ] }
-        { longlong-2-rep   [  2 c::longlong (c-array)  ] }
-        { ulonglong-2-rep  [  2 c::ulonglong (c-array) ] }
-        { float-4-rep      [  4 c::float (c-array)     ] }
-        { double-2-rep     [  2 c::double (c-array)    ] }
+        { char-16-rep      [ 16 c:char (c-array)      ] }
+        { uchar-16-rep     [ 16 c:uchar (c-array)     ] }
+        { short-8-rep      [  8 c:short (c-array)     ] }
+        { ushort-8-rep     [  8 c:ushort (c-array)    ] }
+        { int-4-rep        [  4 c:int (c-array)       ] }
+        { uint-4-rep       [  4 c:uint (c-array)      ] }
+        { longlong-2-rep   [  2 c:longlong (c-array)  ] }
+        { ulonglong-2-rep  [  2 c:ulonglong (c-array) ] }
+        { float-4-rep      [  4 c:float (c-array)     ] }
+        { double-2-rep     [  2 c:double (c-array)    ] }
     } case ; inline
 
 : rep-tf-values ( rep -- t f )
@@ -158,14 +158,14 @@ PRIVATE>
     ] unrolled-each-unsafe
     c' underlying>> ;
 : (simd-vs+)               ( a b rep -- c )
-    dup rep-component-type '[ + _ c::c-type-clamp ] components-2map ;
+    dup rep-component-type '[ + _ c:c-type-clamp ] components-2map ;
 : (simd-vs-)               ( a b rep -- c )
-    dup rep-component-type '[ - _ c::c-type-clamp ] components-2map ;
+    dup rep-component-type '[ - _ c:c-type-clamp ] components-2map ;
 : (simd-vs*)               ( a b rep -- c )
-    dup rep-component-type '[ * _ c::c-type-clamp ] components-2map ;
+    dup rep-component-type '[ * _ c:c-type-clamp ] components-2map ;
 : (simd-v*)                ( a b rep -- c ) [ * ] components-2map ;
 : (simd-v*high)            ( a b rep -- c )
-    dup rep-component-type c::heap-size -8 * '[ * _ shift ] components-2map ;
+    dup rep-component-type c:heap-size -8 * '[ * _ shift ] components-2map ;
 :: (simd-v*hs+)            ( a b rep -- c )
     rep { char-16-rep uchar-16-rep } member-eq?
     [ uchar-16-rep char-16-rep ]
@@ -177,7 +177,7 @@ PRIVATE>
     a' b' rep rep-length 2 /i [
         [ [ first  ] bi@ * ]
         [ [ second ] bi@ * ] 2bi +
-        wide-type c::c-type-clamp
+        wide-type c:c-type-clamp
     ] wide-rep <rep-array> unrolled-2map-as-unsafe underlying>> ;
 : (simd-v/)                ( a b rep -- c ) [ native/ ] components-2map ;
 : (simd-vavg)              ( a b rep -- c )
@@ -257,11 +257,11 @@ PRIVATE>
 : (simd-vpack-signed)      ( a b rep -- c )
     [ [ 2byte>rep-array cord-append ] [ rep-length 2 * ] bi ]
     [ narrow-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
-    '[ _ c::c-type-clamp ] swap unrolled-map-as-unsafe underlying>> ;
+    '[ _ c:c-type-clamp ] swap unrolled-map-as-unsafe underlying>> ;
 : (simd-vpack-unsigned)    ( a b rep -- c )
     [ [ 2byte>rep-array cord-append ] [ rep-length 2 * ] bi ]
     [ narrow-vector-rep >uint-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
-    '[ _ c::c-type-clamp ] swap unrolled-map-as-unsafe underlying>> ;
+    '[ _ c:c-type-clamp ] swap unrolled-map-as-unsafe underlying>> ;
 : (simd-vunpack-head)      ( a   rep -- c )
     [ byte>rep-array ] [ widen-vector-rep [ rep-length ] [ '[ _ >rep-array ] ] bi ] bi
     [ head-slice ] dip call( a' -- c' ) underlying>> ;

@@ -6,7 +6,7 @@ help.syntax images kernel math sequences
 specialized-arrays strings ;
 QUALIFIED-WITH: alien.c-types c
 QUALIFIED-WITH: math m
-SPECIALIZED-ARRAY: c::float
+SPECIALIZED-ARRAY: c:float
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: ulong
@@ -52,7 +52,7 @@ $nl
 "Uniform parameters are passed from Factor to the shader program through the uniform tuple as follows:"
 { $list
 { { $link int-uniform } "s and " { $link uint-uniform } "s take their values from Factor " { $link integer } "s." }
-{ { $link float-uniform } "s take their values from Factor " { $link m::float } "s." }
+{ { $link float-uniform } "s take their values from Factor " { $link m:float } "s." }
 { { $link bool-uniform } "s take their values from Factor " { $link boolean } "s." }
 { { $link texture-uniform } "s take their values from " { $link texture } " objects." }
 { "Vector uniforms take their values from Factor " { $link sequence } "s of the corresponding component type."
@@ -72,7 +72,7 @@ $nl
 "Rectangular matrix type names are column x row."
 }
 { "Uniform slots can also be defined as other " { $snippet "uniform-tuple" } " types to bind uniform structures. The uniform structure will take its value from the slots of a tuple of the given type." }
-{ "Array uniforms are passed either as Factor sequences of the corresponding type specified above, or as " { $link alien } "s or " { $vocab-link "specialized-arrays" } " that reference pre-packed binary arrays of " { $link c::int } "s or " { $link c::float } "s." }
+{ "Array uniforms are passed either as Factor sequences of the corresponding type specified above, or as " { $link alien } "s or " { $vocab-link "specialized-arrays" } " that reference pre-packed binary arrays of " { $link c:int } "s or " { $link c:float } "s." }
 }
 $nl
 "A value of a uniform tuple type is a standard Factor tuple. Uniform tuples are constructed with " { $link new } " or " { $link boa } ", and values are placed inside them using standard slot accessors."
@@ -294,7 +294,7 @@ HELP: vertex-indexes
 { "An " { $link index-elements } " value submits vertex array elements in an order specified by an array of indexes." }
 { "A " { $link multi-index-range } " value submits multiple sequential slices of a vertex array." }
 { "A " { $link multi-index-elements } " value submits multiple separate lists of indexed vertex array elements." }
-{ "Specialized arrays of " { $link c::uchar } ", " { $link c::ushort } ", or " { $link c::uint } " elements may also be used directly as arrays of indexes." }
+{ "Specialized arrays of " { $link c:uchar } ", " { $link c:ushort } ", or " { $link c:uint } " elements may also be used directly as arrays of indexes." }
 } } ;
 
 ARTICLE: "gpu.render" "Rendering"

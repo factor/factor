@@ -2,8 +2,8 @@ USING: compiler.units compiler.test kernel kernel.private memory
 math math.private tools.test math.floats.private math.order fry
 specialized-arrays sequences math.functions layouts literals ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAY: c::float
-SPECIALIZED-ARRAY: c::double
+SPECIALIZED-ARRAY: c:float
+SPECIALIZED-ARRAY: c:double
 IN: compiler.tests.float
 
 [ 3.0 1 2 3 ] [ 1.0 2.0 [ float+ 1 2 3 ] compile-call ] unit-test

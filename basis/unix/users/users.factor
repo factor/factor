@@ -32,13 +32,13 @@ M: unix passwd>new-passwd ( passwd -- seq )
 
 : with-pwent ( quot -- )
     setpwent
-    [ unix.ffi::endpwent ] [ ] cleanup ; inline
+    [ unix.ffi:endpwent ] [ ] cleanup ; inline
 
 PRIVATE>
 
 : all-users ( -- seq )
     [
-        [ unix.ffi::getpwent dup ] [ passwd>new-passwd ] produce nip
+        [ unix.ffi:getpwent dup ] [ passwd>new-passwd ] produce nip
     ] with-pwent ;
 
 : all-user-names ( -- seq )
@@ -56,10 +56,10 @@ GENERIC: user-passwd ( obj -- passwd/f )
 
 M: integer user-passwd ( id -- passwd/f )
     user-cache get
-    [ at ] [ unix.ffi::getpwuid [ passwd>new-passwd ] [ f ] if* ] if* ;
+    [ at ] [ unix.ffi:getpwuid [ passwd>new-passwd ] [ f ] if* ] if* ;
 
 M: string user-passwd ( string -- passwd/f )
-    unix.ffi::getpwnam dup [ passwd>new-passwd ] when ;
+    unix.ffi:getpwnam dup [ passwd>new-passwd ] when ;
 
 : user-name ( id -- string )
     dup user-passwd
@@ -74,13 +74,13 @@ ERROR: no-user string ;
     dup user-passwd [ nip uid>> ] [ no-user ] if* ;
 
 : real-user-id ( -- id )
-    unix.ffi::getuid ; inline
+    unix.ffi:getuid ; inline
 
 : real-user-name ( -- string )
     real-user-id user-name ; inline
 
 : effective-user-id ( -- id )
-    unix.ffi::geteuid ; inline
+    unix.ffi:geteuid ; inline
 
 : effective-user-name ( -- string )
     effective-user-id user-name ; inline
@@ -110,10 +110,10 @@ GENERIC: set-effective-user ( string/id -- )
 <PRIVATE
 
 : (set-real-user) ( id -- )
-    [ unix.ffi::setuid ] unix-system-call drop ; inline
+    [ unix.ffi:setuid ] unix-system-call drop ; inline
 
 : (set-effective-user) ( id -- )
-    [ unix.ffi::seteuid ] unix-system-call drop ; inline
+    [ unix.ffi:seteuid ] unix-system-call drop ; inline
 
 PRIVATE>
 

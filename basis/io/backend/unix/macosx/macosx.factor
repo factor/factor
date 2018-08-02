@@ -17,4 +17,4 @@ M: macosx init-io ( -- )
 macosx set-io-backend
 
 [ start-signal-pipe-thread ]
-"io.backend.unix::signal-pipe-thread" add-startup-hook
+"io.backend.unix:signal-pipe-thread" add-startup-hook

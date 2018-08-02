@@ -13,14 +13,14 @@ ERROR: bad-zlib-data ;
 ERROR: bad-zlib-header ;
 
 :: check-zlib-header ( data -- )
-    16 data bs::peek 2 >le be> 31 mod    ! checksum
+    16 data bs:peek 2 >le be> 31 mod    ! checksum
     0 assert=
-    4 data bs::read 8 assert=            ! compression method: deflate
-    4 data bs::read                      ! log2(max length)-8, 32K max
+    4 data bs:read 8 assert=            ! compression method: deflate
+    4 data bs:read                      ! log2(max length)-8, 32K max
     7 <= [ bad-zlib-header ] unless
-    5 data bs::seek                      ! drop check bits
-    1 data bs::read 0 assert=            ! dictionary - not allowed in png
-    2 data bs::seek                      ! compression level; ignore
+    5 data bs:seek                      ! drop check bits
+    1 data bs:read 0 assert=            ! dictionary - not allowed in png
+    2 data bs:seek                      ! compression level; ignore
     ;
 
 CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
@@ -31,19 +31,19 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     seq>> rest-slice [ natural-sort ] map ; inline
 
 :: decode-huffman-tables ( bitstream -- tables )
-    5 bitstream bs::read 257 +
-    5 bitstream bs::read 1 +
-    4 bitstream bs::read 4 + clen-shuffle swap head
+    5 bitstream bs:read 257 +
+    5 bitstream bs:read 1 +
+    4 bitstream bs:read 4 + clen-shuffle swap head
 
-    dup length [ 3 bitstream bs::read ] replicate
+    dup length [ 3 bitstream bs:read ] replicate
     get-table
     bitstream swap <huffman-decoder>
     [ 2dup + ] dip swap :> k!
     '[
         _ read1-huff2 {
-            { [ dup 16 = ] [ 2 bitstream bs::read 3 + 2array ] }
-            { [ dup 17 = ] [ 3 bitstream bs::read 3 + 2array ] }
-            { [ dup 18 = ] [ 7 bitstream bs::read 11 + 2array ] }
+            { [ dup 16 = ] [ 2 bitstream bs:read 3 + 2array ] }
+            { [ dup 17 = ] [ 3 bitstream bs:read 3 + 2array ] }
+            { [ dup 18 = ] [ 7 bitstream bs:read 11 + 2array ] }
             [ ]
         } cond
         dup array? [ dup second ] [ 1 ] if
@@ -105,7 +105,7 @@ CONSTANT: dist-table
                 dup 264 > [
                     dup 261 - 4 /i
                     dup 5 > [ bad-zlib-data ] when
-                    bitstream bs::read 2array
+                    bitstream bs:read 2array
                 ] when
             ] unless
 
@@ -114,7 +114,7 @@ CONSTANT: dist-table
             dup 3 > [
                 dup 2 - 2 /i dup 13 >
                 [ bad-zlib-data ] when
-                bitstream bs::read 2array
+                bitstream bs:read 2array
             ] when 2array
         ] when dup 256 = not
     ] [ ] produce nip
@@ -131,9 +131,9 @@ CONSTANT: dist-table
     ] map ;
 
 :: inflate-raw ( bitstream -- bytes )
-    8 bitstream bs::align
-    16 bitstream bs::read :> len
-    16 bitstream bs::read :> nlen
+    8 bitstream bs:align
+    16 bitstream bs:read :> len
+    16 bitstream bs:read :> nlen
 
     ! len + ~len = -1
     len nlen + 16 >signed -1 assert=
@@ -141,7 +141,7 @@ CONSTANT: dist-table
     bitstream byte-pos>>
     bitstream byte-pos>> len +
     bitstream bytes>> <slice>
-    len 8 * bitstream bs::seek ;
+    len 8 * bitstream bs:seek ;
 
 : inflate-dynamic ( bitstream -- array )
     dup decode-huffman-tables inflate-huffman ;
@@ -150,9 +150,9 @@ CONSTANT: dist-table
     static-huffman-tables inflate-huffman ;
 
 :: inflate-loop ( bitstream -- array )
-    [ 1 bitstream bs::read 0 = ] [
+    [ 1 bitstream bs:read 0 = ] [
         bitstream
-        2 bitstream bs::read
+        2 bitstream bs:read
         {
             { 0 [ inflate-raw ] }
             { 1 [ inflate-static ] }
@@ -164,6 +164,6 @@ CONSTANT: dist-table
 PRIVATE>
 
 : zlib-inflate ( bytes -- bytes )
-    bs::<lsb0-bit-reader>
+    bs:<lsb0-bit-reader>
     [ check-zlib-header ] [ inflate-loop ] bi
     inflate-lz77 ;

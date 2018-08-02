@@ -63,13 +63,13 @@ TUPLE: huffman-decoder
         dup [ tdesc>> ] [ bits/level>> 2^ ] bi reverse-table >>rtable ; inline
 
 : read1-huff ( huffman-decoder -- elt )
-    16 over [ bs>> bs::peek ] [ rtable>> nth ] bi
-    [ size>> swap bs>> bs::seek ] [ value>> ] bi ; inline
+    16 over [ bs>> bs:peek ] [ rtable>> nth ] bi
+    [ size>> swap bs>> bs:seek ] [ value>> ] bi ; inline
 
 : reverse-bits ( value bits -- value' )
     [ integer>bit-array ] dip
     f pad-tail reverse bit-array>integer ; inline
 
 : read1-huff2 ( huffman-decoder -- elt )
-    16 over [ bs>> bs::peek 16 reverse-bits ] [ rtable>> nth ] bi
-    [ size>> swap bs>> bs::seek ] [ value>> ] bi ; inline
+    16 over [ bs>> bs:peek 16 reverse-bits ] [ rtable>> nth ] bi
+    [ size>> swap bs>> bs:seek ] [ value>> ] bi ; inline

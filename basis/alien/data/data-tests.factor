@@ -4,28 +4,28 @@ specialized-arrays.private system tools.test vocabs ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.data.tests
 
-{ -1 } [ -1 c::char <ref> c::char deref ] unit-test
-{ -1 } [ -1 c::short <ref> c::short deref ] unit-test
-{ -1 } [ -1 c::int <ref> c::int deref ] unit-test
+{ -1 } [ -1 c:char <ref> c:char deref ] unit-test
+{ -1 } [ -1 c:short <ref> c:short deref ] unit-test
+{ -1 } [ -1 c:int <ref> c:int deref ] unit-test
 
 ! I don't care if this throws an error or works, but at least
 ! it should be consistent between platforms
-{ -1 } [ -1.0 c::int <ref> c::int deref ] unit-test
-{ -1 } [ -1.0 c::long <ref> c::long deref ] unit-test
-{ -1 } [ -1.0 c::longlong <ref> c::longlong deref ] unit-test
-{ 1 } [ 1.0 c::uint <ref> c::uint deref ] unit-test
-{ 1 } [ 1.0 c::ulong <ref> c::ulong deref ] unit-test
-{ 1 } [ 1.0 c::ulonglong <ref> c::ulonglong deref ] unit-test
+{ -1 } [ -1.0 c:int <ref> c:int deref ] unit-test
+{ -1 } [ -1.0 c:long <ref> c:long deref ] unit-test
+{ -1 } [ -1.0 c:longlong <ref> c:longlong deref ] unit-test
+{ 1 } [ 1.0 c:uint <ref> c:uint deref ] unit-test
+{ 1 } [ 1.0 c:ulong <ref> c:ulong deref ] unit-test
+{ 1 } [ 1.0 c:ulonglong <ref> c:ulonglong deref ] unit-test
 
 [
-    0 B{ 1 2 3 4 } <displaced-alien> c::void* <ref>
+    0 B{ 1 2 3 4 } <displaced-alien> c:void* <ref>
 ] must-fail
 
 os windows? cpu x86.64? and [
-    [ -2147467259 ] [ 2147500037 c::long <ref> c::long deref ] unit-test
+    [ -2147467259 ] [ 2147500037 c:long <ref> c:long deref ] unit-test
 ] when
 
-STRUCT: foo { a c::int } { b c::void* } { c c::bool } ;
+STRUCT: foo { a c:int } { b c:void* } { c c:bool } ;
 
 SPECIALIZED-ARRAY: foo
 

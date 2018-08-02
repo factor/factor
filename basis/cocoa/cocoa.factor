@@ -21,8 +21,9 @@ SYNTAX: \?send:
     suffix! \ send suffix! ;
 
 SYNTAX: \selector:
-    scan-token unescape-token dup remember-send
-    <selector> suffix! \ cocoa.messages::selector suffix! ;
+    scan-token unescape-token
+    [ remember-send ]
+    [ <selector> suffix! \ cocoa.messages:selector suffix! ] bi ;
 
 SYMBOL: super-sent-messages
 

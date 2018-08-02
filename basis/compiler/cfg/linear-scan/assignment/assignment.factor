@@ -99,7 +99,7 @@ RENAMING: assign "[ vreg>reg ]" "[ vreg>reg ]" "[ vreg>reg ]"
 
 : begin-block ( bb -- )
     {
-        [ basic-block set ]
+        [ basic-block namespaces:set ]
         [ block-from unhandled-intervals get activate-new-intervals ]
         [ compute-edge-live-in ]
         [ compute-live-in ]
@@ -110,7 +110,7 @@ RENAMING: assign "[ vreg>reg ]" "[ vreg>reg ]" "[ vreg>reg ]"
     [ '[ [ _ bi@ ] assoc-map ] change-derived-roots drop ] 2bi ; inline
 
 : spill-required? ( live-interval root-leaders n -- ? )
-    [ [ vreg>> ] dip sets::in? ] [ swap covers? ] bi-curry* bi or ;
+    [ [ vreg>> ] dip sets:in? ] [ swap covers? ] bi-curry* bi or ;
 
 : spill-intervals ( root-leaders n -- live-intervals )
     [ pending-interval-heap get heap-members ] 2dip
@@ -160,12 +160,12 @@ RENAMING: assign "[ vreg>reg ]" "[ vreg>reg ]" "[ vreg>reg ]"
     [ [ live-interval-start ] map ] keep zip >min-heap ;
 
 : init-assignment ( live-intervals -- )
-    live-intervals>min-heap unhandled-intervals set
-    <min-heap> pending-interval-heap set
-    H{ } clone pending-interval-assoc set
-    H{ } clone machine-live-ins set
-    H{ } clone machine-edge-live-ins set
-    H{ } clone machine-live-outs set ;
+    live-intervals>min-heap unhandled-intervals namespaces:set
+    <min-heap> pending-interval-heap namespaces:set
+    H{ } clone pending-interval-assoc namespaces:set
+    H{ } clone machine-live-ins namespaces:set
+    H{ } clone machine-edge-live-ins namespaces:set
+    H{ } clone machine-live-outs namespaces:set ;
 
 : assign-registers ( cfg live-intervals -- )
     init-assignment

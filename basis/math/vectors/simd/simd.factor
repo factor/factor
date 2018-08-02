@@ -30,10 +30,10 @@ PRIVATE>
 ! Helper for boolean vector literals
 
 : vector-true-value ( class -- value )
-    { c::float c::double } member? [ -1 bits>double ] [ -1 ] if ; foldable
+    { c:float c:double } member? [ -1 bits>double ] [ -1 ] if ; foldable
 
 : vector-false-value ( type -- value )
-    { c::float c::double } member? [ 0.0 ] [ 0 ] if ; foldable
+    { c:float c:double } member? [ 0.0 ] [ 0 ] if ; foldable
 
 : boolean>element ( bool/elt type -- elt )
     swap {
@@ -276,7 +276,7 @@ INLINE-FUNCTOR: simd-128-type ( type: name -- ) [[
 
 ! ELT     [ A-rep rep-component-type ]
 ! N       [ A-rep rep-length ]
-! COERCER [ A-rep rep-component-type c::c-type-class "coercer" word-prop [ ] or ]
+! COERCER [ A-rep rep-component-type c:c-type-class "coercer" word-prop [ ] or ]
 
 ! BOA-EFFECT [ A-rep rep-length "n" <array> { "v" } <effect> ]
 
@@ -287,7 +287,7 @@ TUPLE: ${type} < simd-128 ; final
 >>
 
 <<
-c::<c-type>
+c:<c-type>
     byte-array >>class
     ${type} >>boxed-class
     { ${type}-rep alien-vector ${type} boa } >quotation >>getter
@@ -298,11 +298,11 @@ c::<c-type>
     16 >>size
     16 >>align
     ${type}-rep >>rep
-\ ${type} c::typedef
+\ ${type} c:typedef
 >>
 
 <<
-: ${type}-coercer ( -- m ) ${type}-rep rep-component-type c::c-type-class "coercer" word-prop [ ] or ; inline
+: ${type}-coercer ( -- m ) ${type}-rep rep-component-type c:c-type-class "coercer" word-prop [ ] or ; inline
 >>
 : ${type}-with ( n -- v ) $[ ${type}-coercer ] call \ ${type}-rep (simd-with) \ ${type} boa ; inline
 : ${type}-cast ( v -- v' ) underlying>> \ ${type} boa ; inline
@@ -318,7 +318,7 @@ M: ${type} nth-unsafe
     swap \ ${type}-rep [ (simd-select) ] [ call-next-method ] vx->x-op ; inline
 M: ${type} set-nth-unsafe
     [ ${type} boolean>element ] 2dip
-    underlying>> $[ ${type}-rep rep-component-type ] c::set-alien-element ; inline
+    underlying>> $[ ${type}-rep rep-component-type ] c:set-alien-element ; inline
 
 M: ${type} like drop dup \ ${type} instance? [ >${type} ] unless ; inline
 

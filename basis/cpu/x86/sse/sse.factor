@@ -8,8 +8,8 @@ QUALIFIED-WITH: alien.c-types c
 IN: cpu.x86.sse
 
 ! Scalar floating point with SSE2
-M: x86 %load-float c::float <ref> float-rep %load-vector ;
-M: x86 %load-double c::double <ref> double-rep %load-vector ;
+M: x86 %load-float c:float <ref> float-rep %load-vector ;
+M: x86 %load-double c:double <ref> double-rep %load-vector ;
 
 M: float-rep copy-register* drop MOVAPS ;
 M: double-rep copy-register* drop MOVAPS ;

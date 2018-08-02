@@ -6,7 +6,7 @@ arrays sequences.deep accessors alien.c-types alien.data
 game.models game.models.util gpu.shaders images game.models.loader
 prettyprint specialized-arrays make ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAYS: c::float c::uint ;
+SPECIALIZED-ARRAYS: c:float c:uint ;
 IN: game.models.obj
 
 SINGLETON: obj-models
@@ -122,8 +122,8 @@ VERTEX-FORMAT: obj-vertex-format
 
 : push-current-model ( -- )
     current-model get [
-        [ dseq>> flatten c::float >c-array ]
-        [ iseq>> flatten c::uint >c-array ]
+        [ dseq>> flatten c:float >c-array ]
+        [ iseq>> flatten c:uint >c-array ]
         bi obj-vertex-format current-material get model boa models get push
         V{ } V{ } H{ } <indexed-seq> current-model set
     ] unless-empty ;

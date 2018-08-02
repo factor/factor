@@ -72,8 +72,8 @@ SYMBOLS: locs>vregs local-peek-set replaces ;
 : begin-local-analysis ( basic-block -- )
     height-state [ clone ] change
     height-state get [ reset-incs ] keep >>height drop
-    HS{ } clone local-peek-set namespaces::set
-    H{ } clone replaces namespaces::set ;
+    HS{ } clone local-peek-set namespaces:set
+    H{ } clone replaces namespaces:set ;
 
 : remove-redundant-replaces ( replaces -- replaces' )
     [ [ loc>vreg ] dip = ] assoc-reject ;

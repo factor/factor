@@ -140,8 +140,8 @@ ERROR: unknown-chloe-tag tag ;
 
 : with-compiler ( quot -- quot' )
     [
-        SBUF" " string-buffer namespaces::set
-        V{ } clone tag-stack namespaces::set
+        SBUF" " string-buffer namespaces:set
+        V{ } clone tag-stack namespaces:set
         call
         reset-buffer
     ] [ ] make ; inline
@@ -152,7 +152,7 @@ ERROR: unknown-chloe-tag tag ;
 : compile-quot ( quot -- )
     reset-buffer
     [
-        SBUF" " string-buffer namespaces::set
+        SBUF" " string-buffer namespaces:set
         call
         reset-buffer
     ] [ ] make , ; inline

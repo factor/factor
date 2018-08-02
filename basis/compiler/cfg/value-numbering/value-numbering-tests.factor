@@ -2887,14 +2887,14 @@ cpu x86? [
         T{ ##peek f 1 d: 0 }
         T{ ##tagged>integer f 2 1 }
         T{ ##add-imm f 3 2 10 }
-        T{ ##load-memory-imm f 4 2 10 int-rep c::uchar }
+        T{ ##load-memory-imm f 4 2 10 int-rep c:uchar }
     }
 } [
     V{
         T{ ##peek f 1 d: 0 }
         T{ ##tagged>integer f 2 1 }
         T{ ##add-imm f 3 2 10 }
-        T{ ##load-memory-imm f 4 3 0 int-rep c::uchar }
+        T{ ##load-memory-imm f 4 3 0 int-rep c:uchar }
     } value-numbering-step
 ] unit-test
 
@@ -2905,7 +2905,7 @@ cpu x86? [
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add-imm f 4 3 10 }
-        T{ ##store-memory-imm f 2 3 10 int-rep c::uchar }
+        T{ ##store-memory-imm f 2 3 10 int-rep c:uchar }
     }
 } [
     V{
@@ -2914,7 +2914,7 @@ cpu x86? [
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add-imm f 4 3 10 }
-        T{ ##store-memory-imm f 2 4 0 int-rep c::uchar }
+        T{ ##store-memory-imm f 2 4 0 int-rep c:uchar }
     } value-numbering-step
 ] unit-test
 
@@ -2926,7 +2926,7 @@ cpu x86? [
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add f 4 2 3 }
-        T{ ##load-memory f 5 2 3 0 0 int-rep c::uchar }
+        T{ ##load-memory f 5 2 3 0 0 int-rep c:uchar }
     }
 } [
     V{
@@ -2935,7 +2935,7 @@ cpu x86? [
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add f 4 2 3 }
-        T{ ##load-memory-imm f 5 4 0 int-rep c::uchar }
+        T{ ##load-memory-imm f 5 4 0 int-rep c:uchar }
     } value-numbering-step
 ] unit-test
 
@@ -2946,7 +2946,7 @@ cpu x86? [
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add f 4 2 3 }
-        T{ ##store-memory f 5 2 3 0 0 int-rep c::uchar }
+        T{ ##store-memory f 5 2 3 0 0 int-rep c:uchar }
     }
 } [
     V{
@@ -2955,7 +2955,7 @@ cpu x86? [
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add f 4 2 3 }
-        T{ ##store-memory-imm f 5 4 0 int-rep c::uchar }
+        T{ ##store-memory-imm f 5 4 0 int-rep c:uchar }
     } value-numbering-step
 ] unit-test
 
@@ -2968,7 +2968,7 @@ cpu x86?
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add-imm f 4 2 31337 }
-        T{ ##load-memory f 5 2 3 0 31337 int-rep c::uchar }
+        T{ ##load-memory f 5 2 3 0 31337 int-rep c:uchar }
     }
 ]
 [
@@ -2978,7 +2978,7 @@ cpu x86?
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add-imm f 4 2 31337 }
-        T{ ##load-memory f 5 4 3 0 0 int-rep c::uchar }
+        T{ ##load-memory f 5 4 3 0 0 int-rep c:uchar }
     }
 ] ?
 [
@@ -2988,7 +2988,7 @@ cpu x86?
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add-imm f 4 2 31337 }
-        T{ ##load-memory f 5 4 3 0 0 int-rep c::uchar }
+        T{ ##load-memory f 5 4 3 0 0 int-rep c:uchar }
     } value-numbering-step
 ] unit-test
 
@@ -3001,7 +3001,7 @@ cpu x86?
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add-imm f 4 3 31337 }
-        T{ ##load-memory f 5 2 3 0 31338 int-rep c::uchar }
+        T{ ##load-memory f 5 2 3 0 31338 int-rep c:uchar }
     }
 ]
 [
@@ -3011,7 +3011,7 @@ cpu x86?
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add-imm f 4 3 31337 }
-        T{ ##load-memory f 5 2 4 0 1 int-rep c::uchar }
+        T{ ##load-memory f 5 2 4 0 1 int-rep c:uchar }
     }
 ] ?
 [
@@ -3021,7 +3021,7 @@ cpu x86?
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add-imm f 4 3 31337 }
-        T{ ##load-memory f 5 2 4 0 1 int-rep c::uchar }
+        T{ ##load-memory f 5 2 4 0 1 int-rep c:uchar }
     } value-numbering-step
 ] unit-test
 
@@ -3034,7 +3034,7 @@ cpu x86?
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##add-imm f 4 3 10 }
-        T{ ##load-memory f 5 2 4 1 1 int-rep c::uchar }
+        T{ ##load-memory f 5 2 4 1 1 int-rep c:uchar }
     } dup value-numbering-step assert=
 ] unit-test
 
@@ -3047,7 +3047,7 @@ ${
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##shl-imm f 4 3 2 }
-        T{ ##load-memory f 5 2 3 2 0 int-rep c::uchar }
+        T{ ##load-memory f 5 2 3 2 0 int-rep c:uchar }
     }
     V{
         T{ ##peek f 0 d: 0 }
@@ -3055,7 +3055,7 @@ ${
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##shl-imm f 4 3 2 }
-        T{ ##load-memory f 5 2 4 0 0 int-rep c::uchar }
+        T{ ##load-memory f 5 2 4 0 0 int-rep c:uchar }
     } ?
 } [
     V{
@@ -3064,7 +3064,7 @@ ${
         T{ ##tagged>integer f 2 0 }
         T{ ##tagged>integer f 3 1 }
         T{ ##shl-imm f 4 3 2 }
-        T{ ##load-memory f 5 2 4 0 0 int-rep c::uchar }
+        T{ ##load-memory f 5 2 4 0 0 int-rep c:uchar }
     } value-numbering-step
 ] unit-test
 
@@ -3077,7 +3077,7 @@ cpu x86? [
             T{ ##tagged>integer f 2 0 }
             T{ ##tagged>integer f 3 1 }
             T{ ##shl-imm f 4 3 2 }
-            T{ ##load-memory f 5 2 4 1 0 int-rep c::uchar }
+            T{ ##load-memory f 5 2 4 1 0 int-rep c:uchar }
         } dup value-numbering-step assert=
     ] unit-test
 
@@ -3089,7 +3089,7 @@ cpu x86? [
             T{ ##tagged>integer f 2 0 }
             T{ ##tagged>integer f 3 1 }
             T{ ##shl-imm f 4 3 4 }
-            T{ ##load-memory f 5 2 4 0 0 int-rep c::uchar }
+            T{ ##load-memory f 5 2 4 0 0 int-rep c:uchar }
         } dup value-numbering-step assert=
     ] unit-test
 ] when

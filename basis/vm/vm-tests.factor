@@ -4,7 +4,7 @@ QUALIFIED: vm
 IN: vm.tests
 
 : get-ctx ( -- ctx )
-    context vm::context memory>struct ;
+    context vm:context memory>struct ;
 
 { t } [
     get-ctx [ callstack-bottom>> ] [ callstack-top>> ] bi - 0 >

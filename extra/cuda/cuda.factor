@@ -16,7 +16,7 @@ ERROR: cuda-error-state code ;
     dup CUDA_SUCCESS = [ drop ] [ cuda-error-state ] if ;
 
 : cuda-version ( -- n )
-    { c::int } [ cuDriverGetVersion cuda-error ] with-out-parameters ;
+    { c:int } [ cuDriverGetVersion cuda-error ] with-out-parameters ;
 
 : init-cuda ( -- )
     0 cuInit cuda-error ; inline

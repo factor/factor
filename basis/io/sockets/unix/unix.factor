@@ -94,7 +94,7 @@ M: object (server)
 
 : do-accept ( server addrspec -- fd sockaddr )
     [ handle>> handle-fd ] [ empty-sockaddr/size int <ref> ] bi*
-    [ unix.ffi::accept ] keepd ; inline
+    [ unix.ffi:accept ] keepd ; inline
 
 M: object (accept)
     2dup do-accept over 0 >= [

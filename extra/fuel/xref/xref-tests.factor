@@ -20,7 +20,7 @@ IN: fuel.xref.tests
     3 1array drop ;
 
 { 2 } [
-    \ random-word tools.crossref::uses format-xrefs group-xrefs
+    \ random-word tools.crossref:uses format-xrefs group-xrefs
     members length
 ] unit-test
 

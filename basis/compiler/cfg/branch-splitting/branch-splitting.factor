@@ -85,8 +85,8 @@ SYMBOL: visited
     [ worklist get push-front ] [ drop ] if ;
 
 : init-worklist ( cfg -- )
-    <dlist> worklist namespaces::set
-    HS{ } clone visited namespaces::set
+    <dlist> worklist namespaces:set
+    HS{ } clone visited namespaces:set
     entry>> add-to-worklist ;
 
 : split-branches ( cfg -- )

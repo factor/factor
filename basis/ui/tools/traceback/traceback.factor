@@ -28,7 +28,7 @@ M: stack-entry-renderer row-value drop object>> ;
         40 >>min-cols
         40 >>max-cols
         monospace-font >>font
-        [ i::inspector ] >>action
+        [ i:inspector ] >>action
         t >>single-click? ;
 
 : <stack-display> ( model quot title color -- gadget )
@@ -68,13 +68,13 @@ TUPLE: traceback-gadget < tool ;
     add-toolbar ;
 
 : variables ( traceback -- )
-    model>> [ dup [ name>> vars-in-scope ] when ] <arrow> i::inspect-model ;
+    model>> [ dup [ name>> vars-in-scope ] when ] <arrow> i:inspect-model ;
 
 : traceback-window ( continuation -- )
     <model> <traceback-gadget> "Traceback" open-status-window ;
 
 : inspect-continuation ( traceback -- )
-    control-value i::inspector ;
+    control-value i:inspector ;
 
 traceback-gadget "toolbar" f {
     { T{ key-down f f "v" } variables }

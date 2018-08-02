@@ -19,13 +19,13 @@ IN: python.syntax.tests
 [ "hello.doc" ] [ "/some/path/hello.doc" >py basename py> ] py-test
 
 [ { "hello" ".doc" } ] [
-    "hello.doc" >py splitext 2array [ py> ] s::map
+    "hello.doc" >py splitext 2array [ py> ] s:map
 ] py-test
 
 [ ] [ 0 >py sleep ] py-test
 
 ! Module variables are bound as zero-arg functions
-{ t } [ $path py> s::sequence? ] py-test
+{ t } [ $path py> s:sequence? ] py-test
 
 { t } [ $path len int py> 5 > ] py-test
 
@@ -63,7 +63,7 @@ IN: python.syntax.tests
 { t } [
     6 <py-tuple>
     [ getrefcount py> 1 - ]
-    [ always-destructors get [ alien>> = ] with s::count ] bi =
+    [ always-destructors get [ alien>> = ] with s:count ] bi =
 ] py-test
 
 { t } [
@@ -78,7 +78,7 @@ IN: python.syntax.tests
 ] py-test
 
 [ { "hello" "=" "there" } ] [
-    "hello=there" >py "=" >py partition 3array [ py> ] s::map
+    "hello=there" >py "=" >py partition 3array [ py> ] s:map
 ] py-test
 
 ! Introspection
@@ -107,11 +107,11 @@ PY-METHODS: code =>
         ArgumentParser dup
         "--foo" >py H{ { "help" "badger" } } >py add_argument
         format_help py>
-    ] with-destructors [ blank? ] s::trim " " split "badger" swap in?
+    ] with-destructors [ blank? ] s:trim " " split "badger" swap in?
 ] py-test
 
 { t } [
-    [ 987 >py basename ] [ traceback>> ] recover s::length 0 >
+    [ 987 >py basename ] [ traceback>> ] recover s:length 0 >
 ] py-test
 
 ! Test if exceptions leak references. If so, the test will leak a few
@@ -134,7 +134,7 @@ PY-METHODS: code =>
 PY-QUALIFIED-FROM: types => UnicodeType ( -- ) ;
 
 { "unicode" } [
-    types::$UnicodeType $__name__ py>
+    types:$UnicodeType $__name__ py>
 ] py-test
 
 ! Make callbacks
@@ -144,23 +144,23 @@ PY-QUALIFIED-FROM: __builtin__ =>
     reduce ( func seq -- seq' ) ;
 
 { V{ 1 2 3 } } [
-    __builtin__::$None { 1 2 3 } >py __builtin__::map py>
+    __builtin__:$None { 1 2 3 } >py __builtin__:map py>
 ] py-test
 
 : double-fun ( -- alien )
-    [ drop s::first 2 * ] quot>py-callback ;
+    [ drop s:first 2 * ] quot>py-callback ;
 
 { V{ 2 4 16 2 4 68 } } [
     double-fun [
-        { 1 2 8 1 2 34 } >py __builtin__::map py>
+        { 1 2 8 1 2 34 } >py __builtin__:map py>
     ] with-quot>py-cfunction
 ] py-test
 
 : reduce-func ( -- alien )
-    [ drop s::first2 + ] quot>py-callback ;
+    [ drop s:first2 + ] quot>py-callback ;
 
 { 48 } [
     reduce-func [
-        { 1 2 8 1 2 34 } >py __builtin__::reduce py>
+        { 1 2 8 1 2 34 } >py __builtin__:reduce py>
     ] with-quot>py-cfunction
 ] py-test

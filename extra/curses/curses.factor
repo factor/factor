@@ -1,10 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien.c-types alien.data alien.strings
 classes.struct combinators continuations destructors fry
 io.encodings.utf8 kernel libc locals math memoize multiline
 namespaces sequences unix.ffi ;
+
 QUALIFIED-WITH: curses.ffi ffi
+
 IN: curses
 
 SYMBOL: current-window
@@ -135,36 +138,36 @@ CONSTANT: KEY_MAX       0o777  ! Maximum key value is 0633
 CONSTANT: KEY_F0        0o410  ! Function keys.  Space for 64
 : KEY_F ( n -- code ) KEY_F0 + ; inline ! Value of function key n
 
-: BUTTON1_RELEASED       ( -- mask ) 1 ffi::NCURSES_BUTTON_RELEASED ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON1_PRESSED        ( -- mask ) 1 ffi::NCURSES_BUTTON_PRESSED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON1_CLICKED        ( -- mask ) 1 ffi::NCURSES_BUTTON_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON1_DOUBLE_CLICKED ( -- mask ) 1 ffi::NCURSES_DOUBLE_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON1_TRIPLE_CLICKED ( -- mask ) 1 ffi::NCURSES_TRIPLE_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON2_RELEASED       ( -- mask ) 2 ffi::NCURSES_BUTTON_RELEASED ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON2_PRESSED        ( -- mask ) 2 ffi::NCURSES_BUTTON_PRESSED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON2_CLICKED        ( -- mask ) 2 ffi::NCURSES_BUTTON_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON2_DOUBLE_CLICKED ( -- mask ) 2 ffi::NCURSES_DOUBLE_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON2_TRIPLE_CLICKED ( -- mask ) 2 ffi::NCURSES_TRIPLE_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON3_RELEASED       ( -- mask ) 3 ffi::NCURSES_BUTTON_RELEASED ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON3_PRESSED        ( -- mask ) 3 ffi::NCURSES_BUTTON_PRESSED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON3_CLICKED        ( -- mask ) 3 ffi::NCURSES_BUTTON_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON3_DOUBLE_CLICKED ( -- mask ) 3 ffi::NCURSES_DOUBLE_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON3_TRIPLE_CLICKED ( -- mask ) 3 ffi::NCURSES_TRIPLE_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON4_RELEASED       ( -- mask ) 4 ffi::NCURSES_BUTTON_RELEASED ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON4_PRESSED        ( -- mask ) 4 ffi::NCURSES_BUTTON_PRESSED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON4_CLICKED        ( -- mask ) 4 ffi::NCURSES_BUTTON_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON4_DOUBLE_CLICKED ( -- mask ) 4 ffi::NCURSES_DOUBLE_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON4_TRIPLE_CLICKED ( -- mask ) 4 ffi::NCURSES_TRIPLE_CLICKED  ffi::NCURSES_MOUSE_MASK ; inline
+: BUTTON1_RELEASED       ( -- mask ) 1 ffi:NCURSES_BUTTON_RELEASED ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON1_PRESSED        ( -- mask ) 1 ffi:NCURSES_BUTTON_PRESSED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON1_CLICKED        ( -- mask ) 1 ffi:NCURSES_BUTTON_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON1_DOUBLE_CLICKED ( -- mask ) 1 ffi:NCURSES_DOUBLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON1_TRIPLE_CLICKED ( -- mask ) 1 ffi:NCURSES_TRIPLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON2_RELEASED       ( -- mask ) 2 ffi:NCURSES_BUTTON_RELEASED ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON2_PRESSED        ( -- mask ) 2 ffi:NCURSES_BUTTON_PRESSED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON2_CLICKED        ( -- mask ) 2 ffi:NCURSES_BUTTON_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON2_DOUBLE_CLICKED ( -- mask ) 2 ffi:NCURSES_DOUBLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON2_TRIPLE_CLICKED ( -- mask ) 2 ffi:NCURSES_TRIPLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON3_RELEASED       ( -- mask ) 3 ffi:NCURSES_BUTTON_RELEASED ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON3_PRESSED        ( -- mask ) 3 ffi:NCURSES_BUTTON_PRESSED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON3_CLICKED        ( -- mask ) 3 ffi:NCURSES_BUTTON_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON3_DOUBLE_CLICKED ( -- mask ) 3 ffi:NCURSES_DOUBLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON3_TRIPLE_CLICKED ( -- mask ) 3 ffi:NCURSES_TRIPLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON4_RELEASED       ( -- mask ) 4 ffi:NCURSES_BUTTON_RELEASED ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON4_PRESSED        ( -- mask ) 4 ffi:NCURSES_BUTTON_PRESSED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON4_CLICKED        ( -- mask ) 4 ffi:NCURSES_BUTTON_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON4_DOUBLE_CLICKED ( -- mask ) 4 ffi:NCURSES_DOUBLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON4_TRIPLE_CLICKED ( -- mask ) 4 ffi:NCURSES_TRIPLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
 
-: BUTTON1_RESERVED_EVENT ( -- mask ) 1 ffi::NCURSES_RESERVED_EVENT ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON2_RESERVED_EVENT ( -- mask ) 2 ffi::NCURSES_RESERVED_EVENT ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON3_RESERVED_EVENT ( -- mask ) 3 ffi::NCURSES_RESERVED_EVENT ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON4_RESERVED_EVENT ( -- mask ) 4 ffi::NCURSES_RESERVED_EVENT ffi::NCURSES_MOUSE_MASK ; inline
+: BUTTON1_RESERVED_EVENT ( -- mask ) 1 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON2_RESERVED_EVENT ( -- mask ) 2 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON3_RESERVED_EVENT ( -- mask ) 3 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON4_RESERVED_EVENT ( -- mask ) 4 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
 
-: BUTTON_CTRL            ( -- mask ) 5 0o01 ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON_SHIFT           ( -- mask ) 5 0o02 ffi::NCURSES_MOUSE_MASK ; inline
-: BUTTON_ALT             ( -- mask ) 5 0o04 ffi::NCURSES_MOUSE_MASK ; inline
-: REPORT_MOUSE_POSITION  ( -- mask ) 5 0o10 ffi::NCURSES_MOUSE_MASK ; inline
+: BUTTON_CTRL            ( -- mask ) 5 0o01 ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON_SHIFT           ( -- mask ) 5 0o02 ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON_ALT             ( -- mask ) 5 0o04 ffi:NCURSES_MOUSE_MASK ; inline
+: REPORT_MOUSE_POSITION  ( -- mask ) 5 0o10 ffi:NCURSES_MOUSE_MASK ; inline
 
 : ALL_MOUSE_EVENTS ( -- mask ) REPORT_MOUSE_POSITION 1 - ; inline
 
@@ -173,11 +176,11 @@ ERROR: unsupported-curses-terminal ;
 
 <PRIVATE
 
-: >BOOLEAN ( ? -- TRUE/FALSE ) ffi::TRUE ffi::FALSE ? ; inline
+: >BOOLEAN ( ? -- TRUE/FALSE ) ffi:TRUE ffi:FALSE ? ; inline
 
 : curses-pointer-error ( ptr/f -- ptr )
     [ curses-failed ] unless* ; inline
-: curses-error ( n -- ) ffi::ERR = [ curses-failed ] when ;
+: curses-error ( n -- ) ffi:ERR = [ curses-failed ] when ;
 
 PRIVATE>
 
@@ -208,7 +211,7 @@ TUPLE: curses-window < disposable
     curses-window new-disposable ;
 
 M: curses-window dispose* ( window -- )
-    ptr>> ffi::delwin curses-error ;
+    ptr>> ffi:delwin curses-error ;
 
 <PRIVATE
 
@@ -216,34 +219,34 @@ M: curses-window dispose* ( window -- )
     { [ lines>> ] [ columns>> ] [ y>> ] [ x>> ] } cleave ;
 
 : set-cbreak/raw ( cbreak raw -- )
-    [ drop ffi::raw ] [
-        [ ffi::cbreak ] [ ffi::nocbreak ] if
+    [ drop ffi:raw ] [
+        [ ffi:cbreak ] [ ffi:nocbreak ] if
     ] if curses-error ;
 
 : apply-window-options ( window -- )
     {
-        [ [ ptr>> ] [ scrollok>> >BOOLEAN ] bi ffi::scrollok curses-error ]
-        [ [ ptr>> ] [ leaveok>> >BOOLEAN ] bi ffi::leaveok curses-error ]
-        [ [ ptr>> ] [ keypad>> >BOOLEAN ] bi ffi::keypad curses-error ]
+        [ [ ptr>> ] [ scrollok>> >BOOLEAN ] bi ffi:scrollok curses-error ]
+        [ [ ptr>> ] [ leaveok>> >BOOLEAN ] bi ffi:leaveok curses-error ]
+        [ [ ptr>> ] [ keypad>> >BOOLEAN ] bi ffi:keypad curses-error ]
     } cleave ;
 
 : apply-global-options ( window -- )
     [ [ cbreak>> ] [ raw>> ] bi set-cbreak/raw ]
-    [ echo>> [ ffi::echo ] [ ffi::noecho ] if curses-error ]
+    [ echo>> [ ffi:echo ] [ ffi:noecho ] if curses-error ]
     bi ;
 
 SYMBOL: n-registered-colors
 
 MEMO: register-color ( fg bg -- n )
-    [ n-registered-colors get dup ] 2dip ffi::init_pair curses-error
+    [ n-registered-colors get dup ] 2dip ffi:init_pair curses-error
     n-registered-colors inc ;
 
 : init-colors ( -- )
-    ffi::has_colors [
+    ffi:has_colors [
         1 n-registered-colors set
         \ register-color reset-memoized
-        ffi::start_color curses-error
-        ffi::stdscr 0 f ffi::wcolor_set curses-error
+        ffi:start_color curses-error
+        ffi:stdscr 0 f ffi:wcolor_set curses-error
     ] when ;
 
 PRIVATE>
@@ -251,7 +254,7 @@ PRIVATE>
 : setup-window ( window -- window )
     [
         dup [ window-params ] keep
-        parent-window>> [ ptr>> ffi::derwin ] [ ffi::newwin ] if*
+        parent-window>> [ ptr>> ffi:derwin ] [ ffi:newwin ] if*
         curses-pointer-error >>ptr &dispose
     ] [ apply-window-options ] bi ;
 
@@ -262,54 +265,54 @@ PRIVATE>
     curses-ok? [ unsupported-curses-terminal ] unless
     [
         '[
-            ffi::initscr curses-pointer-error
+            ffi:initscr curses-pointer-error
             >>ptr
             {
                 [ apply-global-options ]
                 [ apply-window-options ]
-                [ ptr>> ffi::wclear curses-error ]
-                [ ptr>> ffi::wrefresh curses-error ]
+                [ ptr>> ffi:wclear curses-error ]
+                [ ptr>> ffi:wrefresh curses-error ]
                 [ ]
             } cleave
             init-colors
 
             _ with-window
-        ] [ ffi::endwin curses-error ] [ ] cleanup
+        ] [ ffi:endwin curses-error ] [ ] cleanup
     ] with-destructors ; inline
 
 <PRIVATE
 
 : (wcrefresh) ( window-ptr -- )
-    ffi::wrefresh curses-error ; inline
+    ffi:wrefresh curses-error ; inline
 
 : (wcwrite) ( string window-ptr -- )
-    swap ffi::waddstr curses-error ; inline
+    swap ffi:waddstr curses-error ; inline
 
 :: (wcread) ( n encoding window-ptr -- string )
     [
         n 1 + malloc &free :> str
-        window-ptr str n ffi::wgetnstr curses-error
+        window-ptr str n ffi:wgetnstr curses-error
         str encoding alien>string
     ] with-destructors ; inline
 
 : (wcmove) ( y x window-ptr -- )
-    -rot ffi::wmove curses-error ; inline
+    -rot ffi:wmove curses-error ; inline
 
 : (winsert-blank-line) ( y window-ptr -- )
     [ 0 swap (wcmove) ]
-    [ ffi::winsertln curses-error ] bi ; inline
+    [ ffi:winsertln curses-error ] bi ; inline
 
 : (waddch) ( ch window-ptr -- )
-    swap ffi::waddch curses-error ; inline
+    swap ffi:waddch curses-error ; inline
 
 : (wgetch) ( window -- key )
-    ffi::wgetch [ curses-error ] keep ; inline
+    ffi:wgetch [ curses-error ] keep ; inline
 
 : (wattroff) ( attribute window-ptr -- )
-    swap ffi::wattroff curses-error ; inline
+    swap ffi:wattroff curses-error ; inline
 
 : (wattron) ( attribute window-ptr -- )
-    swap ffi::wattron curses-error ; inline
+    swap ffi:wattron curses-error ; inline
 
 PRIVATE>
 
@@ -319,7 +322,7 @@ PRIVATE>
 : wgetch ( window -- key ) ptr>> (wgetch) ;
 : getch ( -- key ) current-window get wgetch ;
 
-: wgetch-err ( window -- key ) ptr>> ffi::wgetch ;
+: wgetch-err ( window -- key ) ptr>> ffi:wgetch ;
 : getch-err ( -- key ) current-window get wgetch-err ;
 
 : waddch ( ch window -- ) ptr>> (waddch) ;
@@ -348,7 +351,7 @@ PRIVATE>
     [ encoding>> ] [ ptr>> ] bi (wcread) ;
 : cread ( n -- string ) current-window get wcread ;
 
-: werase ( window -- ) ptr>> ffi::werase curses-error ;
+: werase ( window -- ) ptr>> ffi:werase curses-error ;
 : erase ( -- ) current-window get werase ;
 
 : wcmove ( y x window -- )
@@ -356,7 +359,7 @@ PRIVATE>
 : cmove ( y x -- ) current-window get wcmove ;
 
 : wdelete-line ( y window -- )
-    ptr>> [ 0 swap (wcmove) ] [ ffi::wdeleteln curses-error ] bi ;
+    ptr>> [ 0 swap (wcmove) ] [ ffi:wdeleteln curses-error ] bi ;
 : delete-line ( y -- ) current-window get wdelete-line ;
 
 : winsert-blank-line ( y window -- )
@@ -379,13 +382,13 @@ PRIVATE>
 : all-attroff ( -- ) current-window get wall-attroff ;
 
 : wccolor ( foreground background window -- )
-    [ register-color ] dip ptr>> swap f ffi::wcolor_set curses-error ;
+    [ register-color ] dip ptr>> swap f ffi:wcolor_set curses-error ;
 
 : ccolor ( foreground background -- )
     current-window get wccolor ;
 
 : wccbox ( window -- )
-    ptr>> 0 0 ffi::box curses-error ;
+    ptr>> 0 0 ffi:box curses-error ;
 : cbox ( -- )
     current-window get wccbox ;
 
@@ -404,7 +407,7 @@ TUPLE: mouse-event
 <PRIVATE
 
 : substate-n ( bstate n -- substate )
-    [ 1 + ffi::NCURSES_BUTTON_RELEASED ffi::NCURSES_MOUSE_MASK 1 - bitand ] keep
+    [ 1 + ffi:NCURSES_BUTTON_RELEASED ffi:NCURSES_MOUSE_MASK 1 - bitand ] keep
     1 - -6 * shift ; inline
 
 : button-n? ( bstate n -- ? ) substate-n 0 = not ; inline
@@ -444,13 +447,13 @@ PRIVATE>
 
 : getmouse ( -- mouse-event/f )
     [
-        ffi::MEVENT malloc-struct &free
-        dup ffi::getmouse
-        ffi::ERR = [ drop f ] [ <mouse-event> ] if
+        ffi:MEVENT malloc-struct &free
+        dup ffi:getmouse
+        ffi:ERR = [ drop f ] [ <mouse-event> ] if
     ] with-destructors ;
 
 : mousemask ( mask -- newmask oldmask )
-    0 ulong <ref> [ ffi::mousemask ] keep ulong deref ;
+    0 ulong <ref> [ ffi:mousemask ] keep ulong deref ;
 
 : wget-yx ( window -- y x )
     ptr>> [ _cury>> ] [ _curx>> ] bi ;

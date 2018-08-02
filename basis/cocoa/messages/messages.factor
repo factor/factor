@@ -111,17 +111,17 @@ class-init-hooks [ H{ } clone ] initialize
 SYMBOL: objc>alien-types
 
 H{
-    { "c" c::char }
-    { "i" c::int }
-    { "s" c::short }
-    { "C" c::uchar }
-    { "I" c::uint }
-    { "S" c::ushort }
-    { "f" c::float }
-    { "d" c::double }
-    { "B" c::bool }
-    { "v" c::void }
-    { "*" c::void* }
+    { "c" c:char }
+    { "i" c:int }
+    { "s" c:short }
+    { "C" c:uchar }
+    { "I" c:uint }
+    { "S" c:ushort }
+    { "f" c:float }
+    { "d" c:double }
+    { "B" c:bool }
+    { "v" c:void }
+    { "*" c:void* }
     { "?" unknown_type }
     { "@" id }
     { "#" Class }
@@ -129,10 +129,10 @@ H{
 }
 cell {
     { 4 [ H{
-        { "l" c::long }
-        { "q" c::longlong }
-        { "L" c::ulong }
-        { "Q" c::ulonglong }
+        { "l" c:long }
+        { "q" c:longlong }
+        { "L" c:ulong }
+        { "Q" c:ulonglong }
     } ] }
     { 8 [ H{
         { "l" long32 }

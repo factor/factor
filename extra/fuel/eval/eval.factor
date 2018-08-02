@@ -59,6 +59,6 @@ t eval-res-flag set-global
             ! words.
             { "fuel" "syntax" "debugger" } prepend
         ] if-empty
-        <manifest> manifest namespaces::set
+        <manifest> manifest namespaces:set
         [ eval-usings eval-in eval ] with-string-writer
     ] with-scope end-eval ;

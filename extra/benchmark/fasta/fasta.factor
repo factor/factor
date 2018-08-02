@@ -3,7 +3,7 @@ USING: assocs benchmark.reverse-complement byte-arrays fry io
 io.encodings.ascii io.files locals kernel math sequences
 sequences.private specialized-arrays strings typed alien.data ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAY: c::double
+SPECIALIZED-ARRAY: c:double
 IN: benchmark.fasta
 
 CONSTANT: IM 139968
@@ -47,7 +47,7 @@ CONSTANT: homo-sapiens
 
 TYPED: make-cumulative ( freq -- chars: byte-array floats: double-array )
     [ keys >byte-array ]
-    [ values c::double >c-array 0.0 [ + ] accumulate* ] bi ;
+    [ values c:double >c-array 0.0 [ + ] accumulate* ] bi ;
 
 :: select-random ( seed chars floats -- seed elt )
     seed next-fasta-random floats [ <= ] with find drop chars nth-unsafe ; inline

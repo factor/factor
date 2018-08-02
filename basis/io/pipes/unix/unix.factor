@@ -6,7 +6,7 @@ QUALIFIED: io.pipes
 SPECIALIZED-ARRAY: int
 IN: io.pipes.unix
 
-M: unix io.pipes::(pipe) ( -- pair )
+M: unix io.pipes:(pipe) ( -- pair )
     2 int <c-array>
     [ pipe io-error ]
-    [ first2 [ <fd> init-fd ] bi@ io.pipes::pipe boa ] bi ;
+    [ first2 [ <fd> init-fd ] bi@ io.pipes:pipe boa ] bi ;

@@ -74,8 +74,8 @@ GENERIC: check-stack-flow* ( node -- )
     [ check-stack-flow* terminated? get not ] all? drop ;
 
 : init-stack-flow ( -- )
-    V{ } clone datastack namespaces::set
-    V{ } clone retainstack namespaces::set ;
+    V{ } clone datastack namespaces:set
+    V{ } clone retainstack namespaces:set ;
 
 : check-stack-flow ( nodes -- )
     [
@@ -149,7 +149,7 @@ SYMBOL: branch-out
 : check-branch ( nodes -- stack )
     [
         datastack [ clone ] change
-        V{ } clone retainstack namespaces::set
+        V{ } clone retainstack namespaces:set
         (check-stack-flow)
         terminated? get [ assert-retainstack-empty ] unless
         terminated? get f datastack get ?
@@ -157,7 +157,7 @@ SYMBOL: branch-out
 
 M: #branch check-stack-flow*
     [ check-in-d ]
-    [ children>> [ check-branch ] map branch-out namespaces::set ]
+    [ children>> [ check-branch ] map branch-out namespaces:set ]
     bi ;
 
 : check-phi-in ( #phi -- )
@@ -174,7 +174,7 @@ M: #branch check-stack-flow*
 
 : set-phi-datastack ( #phi -- )
     phi-in-d>> first length
-    branch-out get [ ] find nip swap head* >vector datastack namespaces::set ;
+    branch-out get [ ] find nip swap head* >vector datastack namespaces:set ;
 
 M: #phi check-stack-flow*
     branch-out get [ ] any? [

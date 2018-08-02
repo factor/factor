@@ -333,9 +333,9 @@ M: space-invaders update-video
 
 : sync-frame ( micros -- micros )
     ! Sleep until the time for the next frame arrives.
-    16,667 + system::nano-count - dup 0 >
-    [ 1,000 * threads::sleep ] [ drop threads::yield ] if
-    system::nano-count ;
+    16,667 + system:nano-count - dup 0 >
+    [ 1,000 * threads:sleep ] [ drop threads:yield ] if
+    system:nano-count ;
 
 : invaders-process ( micros gadget -- )
     ! Run a space invaders gadget inside a
@@ -354,8 +354,8 @@ M: space-invaders update-video
 M: invaders-gadget graft*
     dup cpu>> init-sounds
     f >>quit?
-    [ system::nano-count swap invaders-process ] curry
-    "Space invaders" threads::spawn drop ;
+    [ system:nano-count swap invaders-process ] curry
+    "Space invaders" threads:spawn drop ;
 
 M: invaders-gadget ungraft*
     t swap quit?<< ;

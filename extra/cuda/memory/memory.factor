@@ -12,7 +12,7 @@ IN: cuda.memory
     '[ _ cuMemAlloc cuda-error ] with-out-parameters ; inline
 
 : cuda-malloc-type ( n type -- ptr )
-    c::heap-size * cuda-malloc ; inline
+    c:heap-size * cuda-malloc ; inline
 
 : cuda-free ( ptr -- )
     cuMemFree cuda-error ; inline

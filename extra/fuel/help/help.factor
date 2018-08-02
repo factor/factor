@@ -66,7 +66,7 @@ SYMBOLS: $doc-path $next-link $prev-link $fuel-nav-crumbs ;
                 [ next-article [ \ $next-link next/prev-link , ] when* ] bi
             ]
             [ parent-topics [ \ $doc-path prefix , ] unless-empty ]
-            [ help::word-help % ]
+            [ help:word-help % ]
             [ related-words [ \ $related swap 2array , ] unless-empty ]
             [ get-global [ \ $value swap unparse-short 2array , ] when* ]
             [ \ $definition swap definition-str 2array , ]
@@ -111,7 +111,7 @@ SYMBOL: describe-words
             [ vocab-tags [ \ $tags prefix , ] when* ]
             [ summary [ { $heading "Summary" } swap 2array , ] when* ]
             [ drop \ $nl , ]
-            [ vocabs::vocab-help [ lookup-article content>> % ] when* ]
+            [ vocabs:vocab-help [ lookup-article content>> % ] when* ]
             [ name>> vocab-describe-words , ]
             [ name>> vocab-children-help % ]
         } cleave

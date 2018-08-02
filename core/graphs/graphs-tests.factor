@@ -6,7 +6,7 @@ H{ } "g" set
 
 { } [ "v" dup get "g" get add-vertex ] unit-test
 
-{ { "v" } } [ 1 "g" get at sets::members ] unit-test
+{ { "v" } } [ 1 "g" get at sets:members ] unit-test
 
 H{
     { 1 HS{ 1 2 } }
@@ -15,5 +15,5 @@ H{
 } "g" set
 
 { { 2 3 4 5 } } [
-    2 [ "g" get at sets::members ] closure sets::members natural-sort
+    2 [ "g" get at sets:members ] closure sets:members natural-sort
 ] unit-test

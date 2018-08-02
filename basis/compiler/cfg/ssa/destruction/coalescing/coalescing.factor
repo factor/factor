@@ -42,8 +42,8 @@ ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
     defs get [ [ dup dup value-of ] dip <vreg-info> 1array ] assoc-map ;
 
 : init-coalescing ( insns -- )
-    initial-leaders leader-map namespaces::set
-    initial-class-elements class-element-map namespaces::set ;
+    initial-leaders leader-map namespaces:set
+    initial-class-elements class-element-map namespaces:set ;
 
 GENERIC: coalesce-now ( insn -- )
 

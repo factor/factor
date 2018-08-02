@@ -12,7 +12,7 @@ specialized-arrays strings ui.gadgets.worlds variants
 vocabs.parser words math.vectors.simd ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAYS: c::float c::int c::uchar c::ushort c::uint c::void* ;
+SPECIALIZED-ARRAYS: c:float c:int c:uchar c:ushort c:uint c:void* ;
 IN: gpu.render
 
 VARIANT: uniform-type
@@ -290,13 +290,13 @@ GENERIC: bind-uniform-vec4  ( index sequence -- )
 M: object >uniform-bool-array [ >c-bool ] int-array{ } map-as ; inline
 M: binary-data >uniform-bool-array ; inline
 
-M: object >uniform-int-array c::int >c-array ; inline
+M: object >uniform-int-array c:int >c-array ; inline
 M: binary-data >uniform-int-array ; inline
 
-M: object >uniform-uint-array c::uint >c-array ; inline
+M: object >uniform-uint-array c:uint >c-array ; inline
 M: binary-data >uniform-uint-array ; inline
 
-M: object >uniform-float-array c::float >c-array ; inline
+M: object >uniform-float-array c:float >c-array ; inline
 M: binary-data >uniform-float-array ; inline
 
 M: object >uniform-bvec-array '[ _ head-slice [ >c-bool ] int-array{ } map-as ] map concat ; inline
@@ -313,7 +313,7 @@ M: binary-data >uniform-vec-array drop ; inline
 
 M:: object >uniform-matrix ( sequence cols rows -- c-array )
      sequence flip cols head-slice
-     [ rows head-slice c::float >c-array ] { } map-as concat ; inline
+     [ rows head-slice c:float >c-array ] { } map-as concat ; inline
 M: binary-data >uniform-matrix 2drop ; inline
 
 M: object >uniform-matrix-array
@@ -546,7 +546,7 @@ SYNTAX: \UNIFORM-TUPLE:
     [ gl-attachment ] with map
     dup length 1 =
     [ first glDrawBuffer ]
-    [ [ length ] [ c::int >c-array ] bi glDrawBuffers ] if ;
+    [ [ length ] [ c:int >c-array ] bi glDrawBuffers ] if ;
 
 : bind-named-output-attachments ( program-instance framebuffer attachments -- )
     rot '[ first _ swap output-index ] sort-with values
