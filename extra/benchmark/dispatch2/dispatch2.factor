@@ -9,7 +9,7 @@ IN: benchmark.dispatch2
         10 >bignum <iota> ,
         { 1 2 3 } ,
         "hello world" ,
-        SBUF" sbuf world" ,
+        sbuf"sbuf world" ,
         V{ "a" "b" "c" } ,
         double-array{ 1.0 2.0 3.0 } ,
         "hello world" 4 tail-slice ,

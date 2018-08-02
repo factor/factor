@@ -4,7 +4,7 @@ USING: assocs bootstrap.image checksums checksums.md5
 http.client io.files kernel math.parser splitting urls ;
 IN: bootstrap.image.download
 
-CONSTANT: url URL" http://downloads.factorcode.org/images/master/"
+CONSTANT: url url"http://downloads.factorcode.org/images/master/"
 
 : download-checksums ( -- alist )
     url "checksums.txt" >url derive-url http-get nip

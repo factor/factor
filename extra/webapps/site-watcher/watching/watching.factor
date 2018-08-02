@@ -5,7 +5,7 @@ furnace.redirection html.forms site-watcher site-watcher.db
 validators webapps.site-watcher.common urls ;
 IN: webapps.site-watcher.watching
 
-CONSTANT: site-list-url URL" $site-watcher-app/watch-list"
+CONSTANT: site-list-url url"$site-watcher-app/watch-list"
 
 : <watch-list-action> ( -- action )
     <page-action>

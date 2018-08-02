@@ -2,7 +2,7 @@ USING: sequences xml kernel arrays xml.traversal io.files tools.test ;
 IN: xml.tests
 
 : assemble-data ( tag -- 3array )
-    { "URL" "snippet" "title" }
+    { "url""snippet" "title" }
     [ tag-named children>string ] with map ;
 
 : parse-result ( xml -- seq )

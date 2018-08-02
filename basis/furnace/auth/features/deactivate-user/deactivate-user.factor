@@ -15,7 +15,7 @@ IN: furnace.auth.features.deactivate-user
                 1 >>deleted
                 t >>changed?
             drop
-            URL" $realm" end-aside
+            url"$realm" end-aside
         ] >>submit ;
 
 : allow-deactivation ( realm -- realm )

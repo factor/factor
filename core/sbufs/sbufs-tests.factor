@@ -11,17 +11,17 @@ sequences.private strings tools.test ;
     "buf" get >string
 ] unit-test
 
-{ char: h } [ 0 SBUF" hello world" nth ] unit-test
+{ char: h } [ 0 sbuf"hello world" nth ] unit-test
 { char: H } [
-    char: H 0 SBUF" hello world" [ set-nth ] keep first
+    char: H 0 sbuf"hello world" [ set-nth ] keep first
 ] unit-test
 
-{ SBUF" x" } [ 1 <sbuf> char: x >bignum suffix! ] unit-test
+{ sbuf"x" } [ 1 <sbuf> char: x >bignum suffix! ] unit-test
 
-{ fixnum } [ 1 >bignum SBUF" " new-sequence length class-of ] unit-test
+{ fixnum } [ 1 >bignum sbuf"" new-sequence length class-of ] unit-test
 
-{ fixnum } [ 1 >bignum <iota> [ ] SBUF" " map-as length class-of ] unit-test
+{ fixnum } [ 1 >bignum <iota> [ ] sbuf"" map-as length class-of ] unit-test
 
-[ 1.5 SBUF" " new-sequence ] must-fail
+[ 1.5 sbuf"" new-sequence ] must-fail
 
-[ char: A 0.5 0.5 SBUF" a" set-nth-unsafe ] must-fail
+[ char: A 0.5 0.5 sbuf"a" set-nth-unsafe ] must-fail

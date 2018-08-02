@@ -11,16 +11,16 @@ urls ;
             { allows V{ } }
             { disallows
                 V{
-                    URL" /cgi-bin/"
-                    URL" /scripts/"
-                    URL" /ChipList2/scripts/"
-                    URL" /ChipList2/styles/"
-                    URL" /ads/"
-                    URL" /ChipList2/ads/"
-                    URL" /advertisements/"
-                    URL" /ChipList2/advertisements/"
-                    URL" /graphics/"
-                    URL" /ChipList2/graphics/"
+                    url"/cgi-bin/"
+                    url"/scripts/"
+                    url"/ChipList2/scripts/"
+                    url"/ChipList2/styles/"
+                    url"/ads/"
+                    url"/ChipList2/ads/"
+                    url"/advertisements/"
+                    url"/ChipList2/advertisements/"
+                    url"/graphics/"
+                    url"/ChipList2/graphics/"
                 }
             }
             { visit-time
@@ -36,163 +36,163 @@ urls ;
         T{ rules
             { user-agents V{ "UbiCrawler" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "DOC" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "Zao" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "sitecheck.internetseer.com" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "Zealbot" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "MSIECrawler" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "SiteSnagger" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "WebStripper" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "WebCopier" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "Fetch" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "Offline Explorer" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "Teleport" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "TeleportPro" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "WebZIP" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "linko" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "HTTrack" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "Microsoft.URL.Control" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "Xenu" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "larbin" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "libwww" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "ZyBORG" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "Download Ninja" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "wget" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "grub-client" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "k2spider" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "NPBot" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
             { user-agents V{ "WebReaper" } }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
         T{ rules
@@ -327,7 +327,7 @@ urls ;
                 }
             }
             { allows V{ } }
-            { disallows V{ URL" /" } }
+            { disallows V{ url"/" } }
             { unknowns H{ } }
         }
     }

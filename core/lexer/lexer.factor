@@ -83,9 +83,24 @@ M: lexer skip-blank
 
 GENERIC: skip-word ( lexer -- )
 
+: find-container-delimiter ( i str -- n/f )
+    2dup [ "[" member? ] find-from [
+        [ swap subseq [ char: = = ] all? ] keep and
+    ] [
+        3drop f
+    ] if ;
+
 M: lexer skip-word
     [
-        2dup nth char: \" eq? [ drop 1 + ] [ f skip ] if
+        2dup [ " \"[" member? ] find-from
+        {
+            { char: \" [ 2nip 1 + ] }
+            { char: \[  [
+                1 + over find-container-delimiter
+                dup [ 2nip 1 + ] [ drop f skip ] if
+            ] }
+            [ 2drop f skip ]
+        } case
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )

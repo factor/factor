@@ -114,7 +114,7 @@ SYMBOL: error-stream
     stream-element-type +byte+ = B{ } "" ? ; inline
 
 : stream-exemplar-growable ( stream -- exemplar )
-    stream-element-type +byte+ = BV{ } SBUF" " ? ; inline
+    stream-element-type +byte+ = BV{ } sbuf"" ? ; inline
 
 : (new-sequence-for-stream) ( n stream -- seq )
     stream-exemplar new-sequence ; inline

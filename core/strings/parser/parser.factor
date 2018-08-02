@@ -156,7 +156,7 @@ PRIVATE>
 
 : parse-string ( -- str )
     [
-        SBUF" " clone [
+        sbuf"" clone [
             lexer get (parse-string)
         ] keep unescape-string
     ] rewind-lexer-on-error ;

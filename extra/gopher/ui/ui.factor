@@ -40,7 +40,7 @@ M: gopher-gadget model-changed
 
 : <url-field> ( gopher-gadget -- field )
     '[ >url _ show-gopher ] <action-field>
-        "Gopher URL" >>default-text
+        "Gopher url">>default-text
         white-interior ;
 
 : <gopher-pane> ( gopher-gadget -- gadget )

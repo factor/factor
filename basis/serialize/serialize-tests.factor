@@ -52,7 +52,7 @@ CONSTANT: objects
         "test"
         { 1 2 "three" }
         V{ 1 2 "three" }
-        SBUF" hello world"
+        sbuf"hello world"
         "hello \u012345 unicode"
         \ dup
         [ \ dup dup ]

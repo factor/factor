@@ -59,7 +59,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
     ascii file-contents words histogram ;
 
 MEMO: default-dictionary ( -- counts )
-    URL" http://norvig.com/big.txt" "big.txt" temp-file
+    url"http://norvig.com/big.txt" "big.txt" temp-file
     [ ?download-to ] [ load-dictionary ] bi ;
 
 : (correct) ( word dictionary -- word/f )

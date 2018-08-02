@@ -65,7 +65,7 @@ HELP: new-resizable
 { $contract "Outputs a resizable mutable sequence with an initial capacity of " { $snippet "len" } " elements and zero length, which can hold the elements of " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "300 V{ } new-resizable ." "V{ }" }
-    { $example "USING: prettyprint sequences ;" "300 SBUF\" \" new-resizable ." "SBUF\" \"" }
+    { $example "USING: prettyprint sequences ;" "300 sbuf\"\" new-resizable ." "sbuf\"\"" }
 } ;
 
 HELP: like
@@ -749,8 +749,8 @@ HELP: join-as
 { $examples
     "Join a list of strings as a string buffer:"
     { $example "USING: sequences prettyprint ;"
-        "{ \"a\" \"b\" \"c\" } \"1\" SBUF\" \"join-as ."
-        "SBUF\" a1b1c\""
+        "{ \"a\" \"b\" \"c\" } \"1\" sbuf\"\"join-as ."
+        "sbuf\"a1b1c\""
     }
 }
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." } ;
@@ -904,8 +904,8 @@ HELP: append-as
         "B{ 1 2 3 4 }"
     }
     { $example "USING: prettyprint sequences strings ;"
-        "\"go\" \"ing\" SBUF\" \" append-as ."
-        "SBUF\" going\""
+        "\"go\" \"ing\" sbuf\"\" append-as ."
+        "sbuf\"going\""
     }
 } ;
 
@@ -935,8 +935,8 @@ HELP: prepend-as
         "B{ 1 2 3 4 }"
     }
     { $example "USING: prettyprint sequences strings ;"
-        "\"ing\" \"go\" SBUF\" \" prepend-as ."
-        "SBUF\" going\""
+        "\"ing\" \"go\" sbuf\"\" prepend-as ."
+        "sbuf\"going\""
     }
 } ;
 
@@ -959,8 +959,8 @@ HELP: 3append-as
 { $errors "Throws an error if " { $snippet "seq1" } ", " { $snippet "seq2" } ", or " { $snippet "seq3" } " contain elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;"
-        "\"a\" \"b\" \"c\" SBUF\" \" 3append-as ."
-        "SBUF\" abc\""
+        "\"a\" \"b\" \"c\" sbuf\"\" 3append-as ."
+        "sbuf\"abc\""
     }
 } ;
 

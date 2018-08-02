@@ -58,18 +58,18 @@ unit-test
 { { "hello" "hi" } } [ "hello\r\nhi" string-lines ] unit-test
 { { "hello" "" "" } } [ "hello\n\n\n" string-lines ] unit-test
 
-{ { } } [ SBUF" " string-lines ] unit-test
-{ { "" } } [ SBUF" \n" string-lines ] unit-test
-{ { "" } } [ SBUF" \r" string-lines ] unit-test
-{ { "" } } [ SBUF" \r\n" string-lines ] unit-test
-{ { "hello" } } [ SBUF" hello" string-lines ] unit-test
-{ { "hello" } } [ SBUF" hello\n" string-lines ] unit-test
-{ { "hello" } } [ SBUF" hello\r" string-lines ] unit-test
-{ { "hello" } } [ SBUF" hello\r\n" string-lines ] unit-test
-{ { "hello" "hi" } } [ SBUF" hello\nhi" string-lines ] unit-test
-{ { "hello" "hi" } } [ SBUF" hello\rhi" string-lines ] unit-test
-{ { "hello" "hi" } } [ SBUF" hello\r\nhi" string-lines ] unit-test
-{ { "hello" "" "" } } [ SBUF" hello\n\n\n" string-lines ] unit-test
+{ { } } [ sbuf"" string-lines ] unit-test
+{ { "" } } [ sbuf"\n" string-lines ] unit-test
+{ { "" } } [ sbuf"\r" string-lines ] unit-test
+{ { "" } } [ sbuf"\r\n" string-lines ] unit-test
+{ { "hello" } } [ sbuf"hello" string-lines ] unit-test
+{ { "hello" } } [ sbuf"hello\n" string-lines ] unit-test
+{ { "hello" } } [ sbuf"hello\r" string-lines ] unit-test
+{ { "hello" } } [ sbuf"hello\r\n" string-lines ] unit-test
+{ { "hello" "hi" } } [ sbuf"hello\nhi" string-lines ] unit-test
+{ { "hello" "hi" } } [ sbuf"hello\rhi" string-lines ] unit-test
+{ { "hello" "hi" } } [ sbuf"hello\r\nhi" string-lines ] unit-test
+{ { "hello" "" "" } } [ sbuf"hello\n\n\n" string-lines ] unit-test
 
 { { "hey" "world" "what's" "happening" } }
 [ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test

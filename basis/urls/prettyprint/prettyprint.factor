@@ -5,5 +5,5 @@ prettyprint.backend urls ;
 IN: urls.prettyprint
 
 M: url pprint*
-    \ URL" record-vocab
-    dup present "URL\" " "\"" pprint-string ;
+    \ url" record-vocab
+    dup present "url\"" "\"" pprint-string ;

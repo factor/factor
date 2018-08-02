@@ -160,7 +160,7 @@ M: circle big-mix-test drop "circle" ;
 { "complex" } [ -1 sqrt big-mix-test ] unit-test
 { "sequence" } [ B{ 1 2 3 } big-mix-test ] unit-test
 { "sequence" } [ ?{ t f t } big-mix-test ] unit-test
-{ "sequence" } [ SBUF" hello world" big-mix-test ] unit-test
+{ "sequence" } [ sbuf"hello world" big-mix-test ] unit-test
 { "sequence" } [ V{ "a" "b" } big-mix-test ] unit-test
 { "sequence" } [ BV{ 1 2 } big-mix-test ] unit-test
 { "sequence" } [ ?V{ t t f f } big-mix-test ] unit-test

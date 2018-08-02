@@ -17,7 +17,7 @@ M: sbuf set-nth-unsafe
 M: sbuf new-sequence
     drop [ 0 <string> ] [ integer>fixnum ] bi sbuf boa ; inline
 
-: >sbuf ( seq -- sbuf ) SBUF" " clone-like ; inline
+: >sbuf ( seq -- sbuf ) sbuf"" clone-like ; inline
 
 M: sbuf contract 2drop ; inline
 

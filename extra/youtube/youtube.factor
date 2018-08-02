@@ -42,7 +42,7 @@ CONSTANT: encodings H{
     { 102 T{ encoding f "webm" "720p" "VP8" "3D" f "Vorbis" 192 } }
 }
 
-CONSTANT: video-info-url URL" http://www.youtube.com/get_video_info"
+CONSTANT: video-info-url url"http://www.youtube.com/get_video_info"
 
 : get-video-info ( video-id -- video-info )
     video-info-url clone

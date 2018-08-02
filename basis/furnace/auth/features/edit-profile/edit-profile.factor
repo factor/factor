@@ -52,7 +52,7 @@ IN: furnace.auth.features.edit-profile
 
             drop
 
-            URL" $realm" end-aside
+            url"$realm" end-aside
         ] >>submit
 
     <protected>

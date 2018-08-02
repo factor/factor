@@ -37,7 +37,7 @@ version "VERSIONS" {
     { "git-id" "GIT_ID" TEXT }
     { "timestamp" "TIMESTAMP" TIMESTAMP }
     { "source-path" "SOURCE_PATH" TEXT }
-    { "announcement-url" "ANNOUNCEMENT_URL" TEXT }
+    { "announcement-url" "ANNOUNCEMENT_url"TEXT }
 } define-persistent
 
 : update-version ( version git-id announcement-url -- )

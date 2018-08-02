@@ -6,7 +6,7 @@ IN: webapps.mason.utils.tests
 {
     "http://builds.factorcode.org/report?os=the-os&cpu=the-cpu"
 } [
-    URL" /" url set
+    url"/" url set
     builder new "the-os" >>os "the-cpu" >>cpu report-url
     present
 ] unit-test

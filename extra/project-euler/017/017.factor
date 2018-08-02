@@ -24,7 +24,7 @@ IN: project-euler.017
 ! --------
 
 : euler017 ( -- answer )
-    1000 [1,b] SBUF" " clone [ number>text append! ] reduce [ Letter? ] count ;
+    1000 [1,b] sbuf"" clone [ number>text append! ] reduce [ Letter? ] count ;
 
 ! [ euler017 ] 100 ave-time
 ! 15 ms ave run time - 1.71 SD (100 trials)

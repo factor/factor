@@ -261,7 +261,7 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <list-changes-feed-action> ( -- action )
     <feed-action>
-        [ URL" $wiki/changes" ] >>url
+        [ url"$wiki/changes" ] >>url
         [ "All changes" ] >>title
         [ list-changes ] >>entries ;
 
@@ -273,7 +273,7 @@ M: revision feed-entry-url id>> revision-url ;
         [
             "title" value <article> delete-tuples
             f <revision> "title" value >>title delete-tuples
-            URL" $wiki" <redirect>
+            url"$wiki" <redirect>
         ] >>submit
 
      <protected>
@@ -347,7 +347,7 @@ M: revision feed-entry-url id>> revision-url ;
     "Footer" latest-revision [ "footer" [ from-object ] nest-form ] when* ;
 
 : init-relative-link-prefix ( -- )
-    URL" $wiki/view/" adjust-url present relative-link-prefix set ;
+    url"$wiki/view/" adjust-url present relative-link-prefix set ;
 
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher

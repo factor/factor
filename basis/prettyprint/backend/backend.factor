@@ -132,10 +132,10 @@ M: string pprint*
     dup "\"" "\"" pprint-string ;
 
 M: sbuf pprint*
-    dup "SBUF\" " "\"" pprint-string ;
+    dup "sbuf\"" "\"" pprint-string ;
 
 M: pathname pprint*
-    dup string>> "P\" " "\"" pprint-string ;
+    dup string>> "path\"" "\"" pprint-string ;
 
 ! Sequences
 : nesting-limit? ( -- ? )

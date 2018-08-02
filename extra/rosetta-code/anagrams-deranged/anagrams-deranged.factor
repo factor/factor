@@ -42,7 +42,7 @@ IN: rosettacode.anagrams-deranged
     deranged-anagrams [ first length ] sort-with last ;
 
 : default-word-list ( -- path )
-    URL" http://puzzlers.org/pub/wordlists/unixdict.txt"
+    url"http://puzzlers.org/pub/wordlists/unixdict.txt"
     "unixdict.txt" temp-file [ ?download-to ] keep ;
 
 : longest-deranged-anagrams ( -- anagrams )

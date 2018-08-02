@@ -48,7 +48,7 @@ HELP: rpc-fault
 { $see-also <rpc-fault> rpc-method rpc-response } ;
 
 HELP: post-rpc
-{ $values { "rpc" "an XML-RPC input tuple" } { "url" "a URL" }
+{ $values { "rpc" "an XML-RPC input tuple" } { "url" "a url"}
     { "rpc'" "an XML-RPC output tuple" } }
 { $description "posts an XML-RPC document to the specified URL, receives the response and parses it as XML-RPC, returning the tuple" } ;
 

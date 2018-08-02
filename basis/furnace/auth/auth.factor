@@ -62,7 +62,7 @@ GENERIC: login-required* ( description capabilities realm -- response )
 
 GENERIC: user-registered ( user realm -- response )
 
-M: object user-registered 2drop URL" $realm" <redirect> ;
+M: object user-registered 2drop url"$realm" <redirect> ;
 
 GENERIC: init-realm ( realm -- )
 

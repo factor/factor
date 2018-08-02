@@ -37,6 +37,6 @@ unit-test
 
 { f } [ <request> request [ referrer ] with-variable ] unit-test
 
-{ t } [ URL" http://foo" dup url [ same-host? ] with-variable ] unit-test
+{ t } [ url"http://foo" dup url [ same-host? ] with-variable ] unit-test
 
-{ f } [ f URL" http://foo" url [ same-host? ] with-variable ] unit-test
+{ f } [ f url"http://foo" url [ same-host? ] with-variable ] unit-test

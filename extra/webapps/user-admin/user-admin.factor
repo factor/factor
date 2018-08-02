@@ -77,7 +77,7 @@ TUPLE: user-admin < dispatcher ;
 
             insert-tuple
 
-            URL" $user-admin" <redirect>
+            url"$user-admin" <redirect>
         ] >>submit ;
 
 : validate-username ( -- )
@@ -131,7 +131,7 @@ TUPLE: user-admin < dispatcher ;
 
             update-tuple
 
-            URL" $user-admin" <redirect>
+            url"$user-admin" <redirect>
         ] >>submit ;
 
 : <delete-user-action> ( -- action )
@@ -139,7 +139,7 @@ TUPLE: user-admin < dispatcher ;
         [
             validate-username
             "username" value <user> delete-tuples
-            URL" $user-admin" <redirect>
+            url"$user-admin" <redirect>
         ] >>submit ;
 
 SYMBOL: can-administer-users?

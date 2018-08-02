@@ -13,7 +13,7 @@ SYMBOL: lost-password-from
     url get host>> host-name or ;
 
 : new-password-url ( user -- url )
-    URL" recover-3" clone
+    url"recover-3" clone
         swap
         [ username>> "username" set-query-param ]
         [ ticket>> "ticket" set-query-param ]
@@ -63,7 +63,7 @@ SYMBOL: lost-password-from
                 send-password-email
             ] when*
 
-            URL" $realm/recover-2" <redirect>
+            url"$realm/recover-2" <redirect>
         ] >>submit ;
 
 : <recover-action-2> ( -- action )
@@ -99,7 +99,7 @@ SYMBOL: lost-password-from
                 "new-password" value >>encoded-password
                 users update-user
 
-                URL" $realm/recover-4" <redirect>
+                url"$realm/recover-4" <redirect>
             ] [
                 <403>
             ] if*

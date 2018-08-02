@@ -5,7 +5,7 @@ strings namespaces urls ;
 { "%26&" } [ "&" f hmac-key ] unit-test
 
 { "B&http%3A%2F%2Ftwitter.com%2F&a%3Db" } [
-    URL" http://twitter.com"
+    url"http://twitter.com"
     "B"
     { { "a" "b" } }
     signature-base-string
@@ -14,7 +14,7 @@ strings namespaces urls ;
 { "0EieqbHx0FJ/RtFskmRj9/TDpqo=" } [
     "ABC" "DEF" <token> consumer-token set
 
-    URL" http://twitter.com"
+    url"http://twitter.com"
     <request-token-params>
         12345 >>timestamp
         54321 >>nonce

@@ -66,7 +66,7 @@ IN: http.client.tests
 ] unit-test
 
 { "www.google.com:8080" } [
-    URL" http://foo:bar@www.google.com:8080/foo?bar=baz#quux" authority-uri
+    url"http://foo:bar@www.google.com:8080/foo?bar=baz#quux" authority-uri
 ] unit-test
 
 { "/index.html?bar=baz" } [
@@ -147,7 +147,7 @@ CONSTANT: classic-proxy-settings H{
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ url"http://proxy.private:3128" } [
     classic-proxy-settings [
        "27.0.0.1" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
@@ -165,7 +165,7 @@ CONSTANT: classic-proxy-settings H{
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ url"http://proxy.private:3128" } [
     classic-proxy-settings [
        "a.subprivate" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
@@ -183,41 +183,41 @@ CONSTANT: classic-proxy-settings H{
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ url"http://proxy.private:3128" } [
     classic-proxy-settings [
        "bara.subprivate" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ url"http://proxy.private:3128" } [
     classic-proxy-settings [
        "google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
 ] unit-test
 
-{ URL" http://localhost:3128" } [
+{ url"http://localhost:3128" } [
     { { "http.proxy" "localhost:3128" } } [
        "google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
 ] unit-test
 
-{ URL" http://localhost:3128" } [
+{ url"http://localhost:3128" } [
     "google.com" "GET" <client-request>
-    URL" localhost:3128" >>proxy-url ?default-proxy proxy-url>>
+    url"localhost:3128" >>proxy-url ?default-proxy proxy-url>>
 ] unit-test
 
-{ URL" http://localhost:3128" } [
+{ url"http://localhost:3128" } [
     "google.com" "GET" <client-request>
     "localhost:3128" >>proxy-url ?default-proxy proxy-url>>
 ] unit-test
 
-{ URL" http://proxysec.private:3128" } [
+{ url"http://proxysec.private:3128" } [
     classic-proxy-settings [
        "https://google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ url"http://proxy.private:3128" } [
     classic-proxy-settings [
        "allprivate.google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables

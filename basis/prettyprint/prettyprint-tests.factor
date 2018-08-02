@@ -47,7 +47,7 @@ unit-test
 { "f" } [ f unparse ] unit-test
 { "t" } [ t unparse ] unit-test
 
-{ "SBUF\" hello world\"" } [ SBUF" hello world" unparse ] unit-test
+{ "sbuf\"hello world\"" } [ sbuf"hello world" unparse ] unit-test
 
 { "W{ \\ + }" } [ [ W{ \ + } ] first unparse ] unit-test
 

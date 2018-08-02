@@ -46,11 +46,11 @@ ARTICLE: "concurrency.semaphores.examples" "Semaphore examples"
 fry http.client kernel urls ;
 
 {
-    URL\" http://www.apple.com\"
-    URL\" http://www.google.com\"
-    URL\" http://www.ibm.com\"
-    URL\" http://www.hp.com\"
-    URL\" http://www.oracle.com\"
+    url\"http://www.apple.com\"
+    url\"http://www.google.com\"
+    url\"http://www.ibm.com\"
+    url\"http://www.hp.com\"
+    url\"http://www.oracle.com\"
 }
 2 <semaphore> '[
     _ [ http-get nip ] with-semaphore

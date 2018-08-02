@@ -13,8 +13,8 @@ SYMBOL: bootstrap-time
 : strip-encodings ( -- )
     os unix? [
         [
-            P" resource:core/io/encodings/utf16/utf16.factor"
-            P" resource:core/io/encodings/utf16n/utf16n.factor" [ forget ] bi@
+            path"resource:core/io/encodings/utf16/utf16.factor"
+            path"resource:core/io/encodings/utf16n/utf16n.factor" [ forget ] bi@
             "io.encodings.utf16"
             "io.encodings.utf16n" [ loaded-child-vocab-names [ forget-vocab ] each ] bi@
         ] with-compilation-unit

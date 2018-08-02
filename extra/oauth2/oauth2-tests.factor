@@ -15,7 +15,7 @@ USING: accessors calendar kernel oauth2 tools.test urls ;
 
 ! oauth2>auth-uri
 {
-    URL" https://github.com/login/oauth/authorize?client_id=1234&scope=user&redirect_uri=test-pest&state=abcd&response_type=code&access_type=offline"
+    url"https://github.com/login/oauth/authorize?client_id=1234&scope=user&redirect_uri=test-pest&state=abcd&response_type=code&access_type=offline"
 } [
     "https://github.com/login/oauth/authorize"
     "https://github.com/login/oauth/access_token"

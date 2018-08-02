@@ -152,8 +152,8 @@ IN: sequences.tests
 { t } [ "xxfoo" 2 head-slice "xxbar" 2 head-slice = ] unit-test
 { t } [ "xxfoo" 2 head-slice "xxbar" 2 head-slice [ hashcode ] same? ] unit-test
 
-{ t } [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* = ] unit-test
-{ t } [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* [ hashcode ] same? ] unit-test
+{ t } [ "xxfoo" 2 head-slice sbuf"barxx" 2 tail-slice* = ] unit-test
+{ t } [ "xxfoo" 2 head-slice sbuf"barxx" 2 tail-slice* [ hashcode ] same? ] unit-test
 
 { t } [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
 { t } [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
@@ -210,8 +210,8 @@ unit-test
 { 5 } [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
 { 5 } [ 1 >bignum "\u000001\u000005\u000007" nth-unsafe ] unit-test
 
-{ SBUF" before&after" } [
-    "&" 6 11 SBUF" before and after" replace-slice
+{ sbuf"before&after" } [
+    "&" 6 11 sbuf"before and after" replace-slice
 ] unit-test
 
 { 3 "a" } [ { "a" "b" "c" "a" "d" } [ "a" = ] find-last ] unit-test
@@ -240,11 +240,11 @@ unit-test
 ! Pathological case
 { "ihbye" } [ "hi" <reversed> "bye" append ] unit-test
 
-{ t } [ "hi" <reversed> SBUF" hi" <reversed> = ] unit-test
+{ t } [ "hi" <reversed> sbuf"hi" <reversed> = ] unit-test
 
-{ t } [ "hi" <reversed> SBUF" hi" <reversed> = ] unit-test
+{ t } [ "hi" <reversed> sbuf"hi" <reversed> = ] unit-test
 
-{ t } [ "hi" <reversed> SBUF" hi" <reversed> [ hashcode ] same? ] unit-test
+{ t } [ "hi" <reversed> sbuf"hi" <reversed> [ hashcode ] same? ] unit-test
 
 [ -10 "hi" "bye" copy ] must-fail
 [ 10 "hi" "bye" copy ] must-fail
@@ -254,14 +254,14 @@ unit-test
 ] unit-test
 
 ! erg's random tester found this one
-{ SBUF" 12341234" } [
+{ sbuf"12341234" } [
     9 <sbuf> dup "1234" swap push-all dup dup swap push-all
 ] unit-test
 
 { f } [ f V{ } like f V{ } like eq? ] unit-test
 
 { V{ f f f } } [ 3 V{ } new-sequence ] unit-test
-{ SBUF" \0\0\0" } [ 3 SBUF" " new-sequence ] unit-test
+{ sbuf"\0\0\0" } [ 3 sbuf"" new-sequence ] unit-test
 
 { 0 } [ f length ] unit-test
 [ f first ] must-fail

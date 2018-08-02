@@ -259,5 +259,5 @@ MACRO: strftime ( format-string -- quot )
             '[ over @ swap push-all ]
         ] if
     ] map '[
-        SBUF" " clone [ _ cleave drop ] keep "" like
+        sbuf"" clone [ _ cleave drop ] keep "" like
     ] ;

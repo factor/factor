@@ -63,7 +63,7 @@ TUPLE: maxlicense max-count current-count times ;
 
 MEMO: mlijobs ( -- lines )
     "mlijobs.txt" temp-file dup exists? [
-        URL" http://rosettacode.org/resources/mlijobs.txt"
+        url"http://rosettacode.org/resources/mlijobs.txt"
         over download-to
     ] unless ascii file-lines ;
 

@@ -296,8 +296,8 @@ CONSTANT: google-slides
         "Libraries can define new parsing words"
     }
     { $slide "The parser"
-        { "Example: URLs define a " { $link postpone: \URL" } " word" }
-        { $code "URL\" http://paste.factorcode.org/paste?id=81\"" }
+        { "Example: URLs define a " { $link postpone: \url"} " word" }
+        { $code "url\"http://paste.factorcode.org/paste?id=81\"" }
     }
     { $slide "Example: memoization"
         { "Memoization with " { $link postpone: \MEMO: } }

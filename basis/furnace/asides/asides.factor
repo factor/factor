@@ -19,7 +19,7 @@ session method url post-data ;
 aside "ASIDES" {
     { "session" "SESSION" BIG-INTEGER +not-null+ }
     { "method" "METHOD" { VARCHAR 10 } }
-    { "url" "URL" URL }
+    { "url" "url"URL }
     { "post-data" "POST_DATA" FACTOR-BLOB }
 } define-persistent
 

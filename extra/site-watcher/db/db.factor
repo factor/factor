@@ -33,7 +33,7 @@ TUPLE: site site-id url up? changed? last-up error last-error ;
 
 site "SITE" {
     { "site-id" "SITE_ID" INTEGER +db-assigned-id+ }
-    { "url" "URL" VARCHAR }
+    { "url" "url"VARCHAR }
     { "up?" "UP" BOOLEAN }
     { "changed?" "CHANGED" BOOLEAN }
     { "last-up" "LAST_UP" TIMESTAMP }

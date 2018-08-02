@@ -7,4 +7,4 @@ USING: io.pathnames tools.test urls webbrowser ;
 { f } [ 123 url-string? ] unit-test
 
 { } [ "" absolute-path open-item ] unit-test
-{ } [ URL" http://www.google.com" open-item ] unit-test
+{ } [ url"http://www.google.com" open-item ] unit-test

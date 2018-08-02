@@ -19,7 +19,7 @@ HELP: >url
     { $example
         "USING: accessors prettyprint urls ;"
         "\"http://www.apple.com\" >url ."
-        "URL\" http://www.apple.com/\""
+        "url\"http://www.apple.com/\""
     }
     "We can examine the URL object:"
     { $example
@@ -35,13 +35,13 @@ HELP: >url
     }
 } ;
 
-HELP: URL"
-{ $syntax "URL\" url...\"" }
+HELP: \url"
+{ $syntax "url\"url...\"" }
 { $description "URL literal syntax." }
 { $examples
     { $example
         "USING: accessors prettyprint urls ;"
-        "URL\" http://factorcode.org:80\" port>> ."
+        "url\"http://factorcode.org:80\" port>> ."
         "80"
     }
 } ;
@@ -52,15 +52,15 @@ HELP: derive-url
 { $examples
     { $example
         "USING: prettyprint urls ;"
-        "URL\" http://factorcode.org\""
-        "URL\" binaries.fhtml\" derive-url ."
-        "URL\" http://factorcode.org/binaries.fhtml\""
+        "url\"http://factorcode.org\""
+        "url\"binaries.fhtml\" derive-url ."
+        "url\"http://factorcode.org/binaries.fhtml\""
     }
     { $example
         "USING: prettyprint urls ;"
-        "URL\" http://www.truecasey.com/drinks/kombucha\""
-        "URL\" master-cleanser\" derive-url ."
-        "URL\" http://www.truecasey.com/drinks/master-cleanser\""
+        "url\"http://www.truecasey.com/drinks/kombucha\""
+        "url\"master-cleanser\" derive-url ."
+        "url\"http://www.truecasey.com/drinks/master-cleanser\""
     }
 } ;
 
@@ -70,7 +70,7 @@ HELP: ensure-port
 { $examples
     { $example
         "USING: accessors prettyprint urls ;"
-        "URL\" https://concatenative.org\" ensure-port port>> ."
+        "url\"https://concatenative.org\" ensure-port port>> ."
         "443"
     }
 } ;
@@ -95,7 +95,7 @@ HELP: query-param
 { $examples
     { $example
         "USING: io urls ;"
-        "URL\" http://food.com/calories?item=French+Fries\""
+        "url\"http://food.com/calories?item=French+Fries\""
         "\"item\" query-param print"
         "French Fries"
     }
@@ -109,7 +109,7 @@ HELP: set-query-param
 { $examples
     { $code
         "USING: kernel http.client urls ;
-URL\" http://search.yahooapis.com/WebSearchService/V1/webSearch\" clone
+url\"http://search.yahooapis.com/WebSearchService/V1/webSearch\" clone
     \"concatenative programming (NSFW)\" \"query\" set-query-param
     \"1\" \"adult_ok\" set-query-param
 http-get"
@@ -124,9 +124,9 @@ HELP: relative-url
 { $examples
     { $example
         "USING: prettyprint urls ;"
-        "URL\" http://factorcode.org/binaries.fhtml\""
+        "url\"http://factorcode.org/binaries.fhtml\""
         "relative-url ."
-        "URL\" /binaries.fhtml\""
+        "url\"/binaries.fhtml\""
     }
 } ;
 
@@ -153,12 +153,12 @@ HELP: url-addr
 { $examples
     { $example
         "USING: prettyprint urls ;"
-        "URL\" ftp://ftp.cdrom.com\" url-addr ."
+        "url\"ftp://ftp.cdrom.com\" url-addr ."
         "T{ inet { host \"ftp.cdrom.com\" } { port 21 } }"
     }
     { $example
         "USING: io.sockets.secure prettyprint urls ;"
-        "URL\" https://google.com/\" url-addr ."
+        "url\"https://google.com/\" url-addr ."
         "T{ secure\n    { addrspec T{ inet { host \"google.com\" } { port 443 } } }\n    { hostname \"google.com\" }\n}"
     }
 } ;
@@ -189,7 +189,7 @@ $nl
 "URLs can be converted back to strings using the " { $link present } " word."
 $nl
 "URL literal syntax:"
-{ $subsections postpone: \URL" }
+{ $subsections postpone: \url"}
 "Manipulating URLs:"
 { $subsections
     derive-url

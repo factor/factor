@@ -18,7 +18,7 @@ IN: rosetta-code.ordered-words
 ! this page.
 
 MEMO: word-list ( -- seq )
-    URL" http://puzzlers.org/pub/wordlists/unixdict.txt"
+    url"http://puzzlers.org/pub/wordlists/unixdict.txt"
     "unixdict.txt" temp-file
     [ ?download-to ] [ utf8 file-lines ] bi ;
 

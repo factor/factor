@@ -112,7 +112,7 @@ M: pathname >url string>> >url ;
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
 
-! URL" //foo.com" takes on the protocol of the url it's derived from
+! url"//foo.com" takes on the protocol of the url it's derived from
 : unparse-protocol ( url -- )
     dup protocol>> [
         % "://" % unparse-host-part
@@ -189,6 +189,6 @@ PRIVATE>
     clone dup protocol>> '[ _ protocol-port or ] change-port ;
 
 ! Literal syntax
-SYNTAX: \URL" lexer get skip-blank parse-string >url suffix! ;
+SYNTAX: \url" parse-string >url suffix! ;
 
 { "urls" "prettyprint" } "urls.prettyprint" require-when

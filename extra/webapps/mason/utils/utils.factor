@@ -46,15 +46,15 @@ IN: webapps.mason.utils
     adjust-url ;
 
 : package-url ( builder -- url )
-    [ URL" http://builds.factorcode.org/package" clone ] dip
+    [ url"http://builds.factorcode.org/package" clone ] dip
     platform-url ;
 
 : report-url ( builder -- url )
-    [ URL" http://builds.factorcode.org/report" clone ] dip
+    [ url"http://builds.factorcode.org/report" clone ] dip
     platform-url ;
 
 : release-url ( builder -- url )
-    [ URL" http://builds.factorcode.org/release" clone ] dip
+    [ url"http://builds.factorcode.org/release" clone ] dip
     platform-url ;
 
 : validate-secret ( -- )

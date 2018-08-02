@@ -61,6 +61,6 @@ build-engineer? define-capability
         "dashboard" add-responder
 
     <action>
-        [ URL" $mason-app/dashboard" <redirect> ] >>display
+        [ url"$mason-app/dashboard" <redirect> ] >>display
         "" add-responder
     ;

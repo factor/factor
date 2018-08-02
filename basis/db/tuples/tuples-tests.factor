@@ -104,7 +104,7 @@ SYMBOL: person4
             T{ duration f 0 0 0 12 34 56 }
             f
             H{ { 1 2 } { 3 4 } { 5 "lol" } }
-            URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"
+            url"http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"
         }
     ] [ T{ person f 4 } select-tuple ] unit-test
 
@@ -123,7 +123,7 @@ SYMBOL: person4
     "2008-11-22 00:00:00" ymdhms>timestamp
     "12:34:56" hms>duration
     f H{ { 1 2 } { 3 4 } { 5 "lol" } }
-    URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" ;
+    url"http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" ;
 
 : db-assigned-person-schema ( -- )
     person "PERSON"

@@ -23,7 +23,7 @@ TUPLE: calculator < dispatcher ;
             { "y" [ v-number ] }
         } validate-params
 
-        URL" $calculator" clone "x" value "y" value + "z" set-query-param
+        url"$calculator" clone "x" value "y" value + "z" set-query-param
         <redirect>
     ] >>submit ;
 

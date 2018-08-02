@@ -180,7 +180,7 @@ ARTICLE: "syntax-strings" "Character and string syntax"
 "Strings are documented in " { $link "strings" } "." ;
 
 ARTICLE: "syntax-sbufs" "String buffer syntax"
-{ $subsections postpone: \SBUF" }
+{ $subsections postpone: \sbuf"}
 "String buffers are documented in " { $link "sbufs" } "." ;
 
 ARTICLE: "syntax-arrays" "Array syntax"
@@ -218,7 +218,7 @@ ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
-{ $subsections postpone: \P" }
+{ $subsections postpone: \path" }
 "Pathnames are documented in " { $link "io.pathnames" } "." ;
 
 ARTICLE: "syntax-effects" "Stack effect syntax"
@@ -620,14 +620,14 @@ HELP: \"
     { $example "USE: io" "\"\\u{greek-capital-letter-sigma}\" print" "\u{greek-capital-letter-sigma}" }
 } ;
 
-HELP: \SBUF"
-{ $syntax "SBUF\" string... \"" }
+HELP: \sbuf"
+{ $syntax "sbuf\"string... \"" }
 { $values { "string" "literal and escaped characters" } }
 { $description "Reads from the input string until the next occurrence of " { $link postpone: \" } ", converts the string to a string buffer, and appends it to the parse tree." }
-{ $examples { $example "USING: io strings ;" "SBUF\" Hello world\" >string print" "Hello world" } } ;
+{ $examples { $example "USING: io strings ;" "sbuf\"Hello world\" >string print" "Hello world" } } ;
 
-HELP: \P"
-{ $syntax "P\" pathname\"" }
+HELP: \path"
+{ $syntax "path\"pathname\"" }
 { $values { "pathname" "a pathname string" } }
 { $description "Reads from the input string until the next occurrence of " { $link postpone: \" } ", creates a new " { $link pathname } ", and appends it to the parse tree. Pathnames presented in the UI are clickable, which opens them in a text editor configured with " { $link "editor" } "." }
 { $examples { $example "USING: accessors io io.files ;" "P\" foo.txt\" string>> print" "foo.txt" } } ;

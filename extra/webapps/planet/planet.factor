@@ -36,8 +36,8 @@ blog "BLOGS"
 {
     { "id" "ID" INTEGER +db-assigned-id+ }
     { "name" "NAME" { VARCHAR 256 } +not-null+ }
-    { "www-url" "WWWURL" URL +not-null+ }
-    { "feed-url" "FEEDURL" URL +not-null+ }
+    { "www-url" "WWWurl"URL +not-null+ }
+    { "feed-url" "FEEDurl"URL +not-null+ }
 } define-persistent
 
 TUPLE: posting < entry id ;
@@ -80,7 +80,7 @@ posting "POSTINGS"
 : <planet-feed-action> ( -- action )
     <feed-action>
         [ "Planet Factor" ] >>title
-        [ URL" $planet" ] >>url
+        [ url"$planet" ] >>url
         [ postings ] >>entries ;
 
 :: <posting> ( entry name -- entry' )
@@ -112,7 +112,7 @@ posting "POSTINGS"
     <action>
         [
             update-cached-postings
-            URL" $planet/admin" <redirect>
+            url"$planet/admin" <redirect>
         ] >>submit ;
 
 : <delete-blog-action> ( -- action )
@@ -121,7 +121,7 @@ posting "POSTINGS"
 
         [
             "id" value <blog> delete-tuples
-            URL" $planet/admin" <redirect>
+            url"$planet/admin" <redirect>
         ] >>submit ;
 
 : validate-blog ( -- )
@@ -146,7 +146,7 @@ posting "POSTINGS"
             [ deposit-blog-slots ]
             [ insert-tuple ]
             bi
-            URL" $planet/admin" <redirect>
+            url"$planet/admin" <redirect>
         ] >>submit ;
 
 : <edit-blog-action> ( -- action )

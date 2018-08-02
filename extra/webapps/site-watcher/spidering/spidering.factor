@@ -5,7 +5,7 @@ furnace.redirection html.forms validators webapps.site-watcher.common
 site-watcher.db site-watcher.spider kernel urls sequences ;
 IN: webapps.site-watcher.spidering
 
-CONSTANT: site-list-url URL" $site-watcher-app/spider-list"
+CONSTANT: site-list-url url"$site-watcher-app/spider-list"
 
 : <spider-list-action> ( -- action )
     <page-action>

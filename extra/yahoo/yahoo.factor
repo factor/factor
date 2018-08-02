@@ -18,7 +18,7 @@ format similar-ok language country site subscription license ;
         first3 <result>
     ] map ;
 
-CONSTANT: yahoo-url URL" http://search.yahooapis.com/WebSearchService/V1/webSearch"
+CONSTANT: yahoo-url url"http://search.yahooapis.com/WebSearchService/V1/webSearch"
 
 :: param ( search url name quot -- search url )
     search url search quot call

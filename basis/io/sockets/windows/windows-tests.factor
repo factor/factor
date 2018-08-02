@@ -3,7 +3,7 @@ kernel sequences tools.test urls windows.winsock ;
 IN: io.sockets.windows.tests
 
 : google-socket ( -- socket )
-    URL" http://www.google.com" url-addr resolve-host first
+    url"http://www.google.com" url-addr resolve-host first
     SOCK_STREAM open-socket ;
 
 { } [

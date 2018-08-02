@@ -26,7 +26,7 @@ visit-time request-rate crawl-delay unknowns ;
 <PRIVATE
 
 : >robots.txt-url ( url -- url' )
-    >url URL" robots.txt" derive-url ;
+    >url url"robots.txt" derive-url ;
 
 : get-robots.txt ( url -- robots.txt )
     >robots.txt-url http-get nip ;

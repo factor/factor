@@ -10,7 +10,7 @@ IN: google.search
 <PRIVATE
 
 : search-url ( query -- url )
-    URL" http://ajax.googleapis.com/ajax/services/search/web" clone
+    url"http://ajax.googleapis.com/ajax/services/search/web" clone
         "1.0" "v" set-query-param
         swap "q" set-query-param
         "8" "rsz" set-query-param

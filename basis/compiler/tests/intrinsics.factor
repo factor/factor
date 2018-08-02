@@ -402,7 +402,7 @@ ERROR: bug-in-fixnum* x y a b ;
     { 1 2 3 } 2 [ vector boa ] compile-call
 ] unit-test
 
-[ SBUF" hello" ] [
+[ sbuf"hello" ] [
     "hello world" 5 [ sbuf boa ] compile-call
 ] unit-test
 

@@ -153,7 +153,7 @@ content-type: text/html; charset=UTF-8
 ]]
 >>
 array[ read-response-test-1' ] [
-    URL" http://localhost/" url set
+    url"http://localhost/" url set
     read-response-test-1 lf>crlf
     [ read-response ] with-string-reader
     [ write-response ] with-string-writer
@@ -248,7 +248,7 @@ USING: locals ;
         "vocab:http/test" <static> >>default
     "nested" add-responder
     <action>
-        [ URL" redirect-loop" <temporary-redirect> ] >>display
+        [ url"redirect-loop" <temporary-redirect> ] >>display
     "redirect-loop" add-responder [
 
     [ t ] [
@@ -338,7 +338,7 @@ SYMBOL: a
         [ a get-global "a" set-value ] >>init
         [ [ "<!DOCTYPE html><html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
         [ { { "a" [ v-integer ] } } validate-params ] >>validate
-        [ "a" value a set-global URL" " <redirect> ] >>submit
+        [ "a" value a set-global url"" <redirect> ] >>submit
     <conversations>
     <sessions>
     >>default

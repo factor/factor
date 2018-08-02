@@ -79,7 +79,7 @@ todo "TODO"
         ] >>submit ;
 
 : todo-list-url ( -- url )
-    URL" $todo-list/list" ;
+    url"$todo-list/list" ;
 
 : <delete-action> ( -- action )
     <action>
@@ -98,7 +98,7 @@ todo "TODO"
 : <todo-list> ( -- responder )
     todo-list new-dispatcher
         <list-action>   "list"       add-responder
-        URL" /list" <redirect-responder> "" add-responder
+        url"/list" <redirect-responder> "" add-responder
         <view-action>   "view"   add-responder
         <new-action>    "new"    add-responder
         <edit-action>   "edit"   add-responder

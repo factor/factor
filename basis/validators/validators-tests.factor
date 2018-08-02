@@ -34,7 +34,7 @@ namespaces assocs ;
 [ "http://www.factorcode.org" v-url ] unit-test
 
 [ "http:/www.factorcode.org" v-url ]
-[ "invalid URL" = ] must-fail-with
+[ "invalid url"= ] must-fail-with
 
 [ "" v-one-line ] must-fail
 { "hello world" } [ "hello world" v-one-line ] unit-test

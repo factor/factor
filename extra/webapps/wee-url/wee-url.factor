@@ -13,7 +13,7 @@ TUPLE: short-url short url ;
 
 short-url "SHORT_URLS" {
     { "short" "SHORT" TEXT +user-assigned-id+ }
-    { "url" "URL" TEXT +not-null+ }
+    { "url" "url"TEXT +not-null+ }
 } define-persistent
 
 : random-url ( -- string )

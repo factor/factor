@@ -15,7 +15,7 @@ M: counter-app init-session* drop 0 count sset ;
     <action>
         swap '[
             count _ schange
-            URL" $counter-app" <redirect>
+            url"$counter-app" <redirect>
         ] >>submit ;
 
 : <display-action> ( -- action )

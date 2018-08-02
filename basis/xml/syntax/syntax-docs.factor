@@ -77,7 +77,7 @@ XML-DOC[[ <doc><-></doc> ]] pprint-xml"
 let[
     3 :> number
     f :> false
-    URL\" http://factorcode.org/\" :> url
+    url\"http://factorcode.org/\" :> url
     \"hello\" :> string
     \\ drop :> word
     XML-DOC[[

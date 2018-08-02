@@ -86,7 +86,7 @@ unit-test
 ] unit-test
 
 [ 1 ] [
-    SBUF" " [ 1 slot 1 [ slot ] keep ] compile-call nip
+    sbuf"" [ 1 slot 1 [ slot ] keep ] compile-call nip
 ] unit-test
 
 ! Test slow shuffles

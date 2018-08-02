@@ -195,7 +195,7 @@ ARTICLE: "http.client.post-data" "HTTP client post data"
 "When passing a stream, you must ensure the stream is closed afterwards. The best way is to use " { $link with-disposal } " or " { $link "destructors" } ". For example,"
 { $code
   "\"my-large-post-request.txt\" ascii <file-reader>"
-  "[ URL\" http://www.my-company.com/web-service\" http-post ] with-disposal"
+  "[ url\"http://www.my-company.com/web-service\" http-post ] with-disposal"
 }
 "An internal word used to convert objects to " { $link post-data } " instances:"
 { $subsections >post-data } ;

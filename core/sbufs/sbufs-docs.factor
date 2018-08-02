@@ -18,7 +18,7 @@ $nl
     <sbuf>
 }
 "If you don't care about initial capacity, a more elegant way to create a new string buffer is to write:"
-{ $code "SBUF\" \" clone" } ;
+{ $code "sbuf\"\" clone" } ;
 
 ABOUT: "sbufs"
 

@@ -243,7 +243,7 @@ t"
 { $example "USE: namespaces \"http://localhost:3128\" \"http.proxy\" [ ] with-variable" "" }
 
 { $subheading "Manually making the request:" }
-{ $example "USING: http http.client urls ; URL\" http://localhost:3128\" <request> proxy-url<<" "" }
+{ $example "USING: http http.client urls ; url\"http://localhost:3128\" <request> proxy-url<<" "" }
 
 { $subheading "Full example:" }
 "$ no_proxy=\"localhost,127.0.0.1,.private\" http_proxy=\"http://proxy.private:3128\" https_proxy=\"http://proxysec.private:3128\" ./factor"

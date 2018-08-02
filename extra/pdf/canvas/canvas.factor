@@ -23,7 +23,7 @@ foreground background page-color inset line-height metrics ;
         54 54 54 54 <margin> >>margin
         612 >>col-width
         sans-serif-font 12 >>size >>font
-        SBUF" " >>stream
+        sbuf"" >>stream
         0 >>line-height
         { 0 0 } >>inset
     dup font>> font-metrics >>metrics ;

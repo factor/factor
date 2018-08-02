@@ -40,7 +40,7 @@ ERROR: bad-location str ;
     ] [ drop f ] if ;
 
 : stations-data ( -- seq )
-    URL" http://tgftp.nws.noaa.gov/data/nsd_cccc.txt"
+    url"http://tgftp.nws.noaa.gov/data/nsd_cccc.txt"
     http-get nip char: \; [ string>csv ] with-delimiter ;
 
 PRIVATE>

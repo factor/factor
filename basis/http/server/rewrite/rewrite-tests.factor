@@ -33,16 +33,16 @@ H{ } clone params set
 "rewrite" set
 
 { { { } "DEFAULT!" } } [
-    URL" http://blogs.vegan.net" url set
+    url"http://blogs.vegan.net" url set
     { } "rewrite" get call-responder
 ] unit-test
 
 { { { } "DEFAULT!" } } [
-    URL" http://www.blogs.vegan.net" url set
+    url"http://www.blogs.vegan.net" url set
     { } "rewrite" get call-responder
 ] unit-test
 
 { { { } "erg" } } [
-    URL" http://erg.blogs.vegan.net" url set
+    url"http://erg.blogs.vegan.net" url set
     { } "rewrite" get call-responder
 ] unit-test

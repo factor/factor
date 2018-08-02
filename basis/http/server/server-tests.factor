@@ -50,8 +50,8 @@ io.streams.string kernel math peg sequences tools.test urls ;
 {
     T{ request
         { method "GET" }
-        { url URL" /" }
-        { proxy-url URL" " }
+        { url url"/" }
+        { proxy-url url"" }
         { version "1.0" }
         { header H{ } }
         { cookies V{ } }
@@ -68,8 +68,8 @@ io.streams.string kernel math peg sequences tools.test urls ;
 {
     T{ request
         { method "GET" }
-        { url URL" /" }
-        { proxy-url URL" " }
+        { url url"/" }
+        { proxy-url url"" }
         { version "1.0" }
         { header H{ } }
         { cookies V{ } }

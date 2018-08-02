@@ -69,7 +69,7 @@ SYMBOLS: factor-recaptcha-public-key factor-recaptcha-private-key ;
 
 : <concatenative-website> ( -- responder )
     concatenative-website new-dispatcher
-        URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
+        url"/wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
 SYMBOLS: key-password key-file dh-file ;
 
@@ -95,7 +95,7 @@ SYMBOLS: key-password key-file dh-file ;
 : <gitweb> ( path -- responder )
     <dispatcher>
         swap <static> enable-cgi >>default
-        URL" /gitweb.cgi" <redirect-responder> "" add-responder ;
+        url"/gitweb.cgi" <redirect-responder> "" add-responder ;
 
 : init-production ( -- )
     common-configuration

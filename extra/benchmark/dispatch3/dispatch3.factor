@@ -25,7 +25,7 @@ M: object g drop "object" ;
         10 >bignum ,
         { 1 2 3 } ,
         "hello world" ,
-        SBUF" sbuf world" ,
+        sbuf"sbuf world" ,
         V{ "a" "b" "c" } ,
         double-array{ 1.0 2.0 3.0 } ,
         "hello world" 4 tail-slice ,

@@ -184,7 +184,7 @@ SYMBOL: redirects
 
 : (check-proxy) ( proxy -- ? )
     {
-        { [ dup URL" " = ] [ drop f ] }
+        { [ dup url"" = ] [ drop f ] }
         { [ dup host>> ] [ drop t ] }
         [ invalid-proxy ]
     } cond ;

@@ -34,7 +34,7 @@ IN: project-euler.040
     ] if ;
 
 : concat-upto ( n -- str )
-    SBUF" " clone 1 -rot (concat-upto) ;
+    sbuf"" clone 1 -rot (concat-upto) ;
 
 : nth-integer ( n str -- m )
     [ 1 - ] dip nth digit> ;
