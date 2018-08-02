@@ -14,7 +14,7 @@ ERROR: malformed-regexp expr error ;
 ERROR: pcre-error value ;
 
 : version ( -- f )
-    pcre_version " -" splitting::split first string>number ;
+    pcre_version " -" splitting:split first string>number ;
 
 <PRIVATE
 
@@ -150,7 +150,7 @@ M: compiled-pcre findall
 M: string findall
     <compiled-pcre> findall ;
 
-M: regexp::regexp findall
+M: regexp:regexp findall
     raw>> findall ;
 
 : matches? ( subject obj -- ? )
