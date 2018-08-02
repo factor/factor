@@ -183,7 +183,7 @@ ERROR: bad-filter n ;
     bit-depth :> depth!
     #components width * :> count!
 
-    #components bit-depth * width * 8 math::align 8 /i :> stride
+    #components bit-depth * width * 8 math:align 8 /i :> stride
 
     height [
         stride 1 + byte-reader stream-read

@@ -76,7 +76,7 @@ GENERIC: process-message ( irc-message -- )
 M: object process-message drop ;
 M: ping   process-message trailing>> /PONG ;
 ! FIXME: it shouldn't be checking for the presence of chat here...
-M: irc.messages::join
+M: irc.messages:join
     process-message [ sender>> ] [ chat> ] bi
     [ join-participant ] [ drop ] if* ;
 M: part   process-message [ sender>> ] [ chat> ] bi [ part-participant ] [ drop ] if* ;

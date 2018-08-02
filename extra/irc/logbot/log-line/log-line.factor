@@ -23,7 +23,7 @@ M: privmsg >log-line
 : prefix% ( string -- )
     " [" % % "]" % ;
 
-M: irc.messages::join >log-line
+M: irc.messages:join >log-line
     [
         [ "* " % sender>> % ]
         [ prefix>> prefix% " has joined the channel." % ] bi

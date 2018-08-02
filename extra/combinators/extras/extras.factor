@@ -22,24 +22,6 @@ MACRO: cond-case ( assoc -- quot )
 MACRO: cleave-array ( quots -- quot )
     [ '[ _ cleave ] ] [ length '[ _ narray ] ] bi compose ;
 
-: 3bi* ( u v w x y z p q -- )
-    [ 3dip ] dip call ; inline
-
-: 3bi@ ( u v w x y z quot -- )
-    dup 3bi* ; inline
-
-: 4bi ( w x y z p q -- )
-    [ 4keep ] dip call ; inline
-
-: 4bi* ( s t u v w x y z p q -- )
-    [ 4dip ] dip call ; inline
-
-: 4bi@ ( s t u v w x y z quot -- )
-    dup 4bi* ; inline
-
-: 4tri ( w x y z p q r -- )
-    [ [ 4keep ] dip 4keep ] dip call ; inline
-
 : plox ( ... x/f quot: ( ... x -- ... ) -- ... )
     dupd when ; inline
 

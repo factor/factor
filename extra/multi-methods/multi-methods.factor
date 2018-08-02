@@ -215,7 +215,7 @@ M: no-method error.
     [ "multi-method-specializer" word-prop ]
     [ "multi-method-generic" word-prop ] bi prefix ;
 
-: define-generic ( word effect -- )
+: define-multi-generic ( word effect -- )
     [ set-stack-effect ] keepd
     dup "multi-methods" word-prop [ drop ] [
         [ H{ } clone "multi-methods" set-word-prop ]

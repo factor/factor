@@ -3,7 +3,7 @@
 USING: accessors alien.c-types grouping kernel locals math
 math.order math.ranges math.vectors math.vectors.homogeneous
 sequences specialized-arrays ;
-SPECIALIZED-ARRAY: alien.c-types::float
+SPECIALIZED-ARRAY: alien.c-types:float
 IN: nurbs
 
 TUPLE: nurbs-curve

@@ -32,8 +32,8 @@ IN: escape-strings
     [ escape-string ] dip prepend ;
 
 : escape-simplest ( str -- str' )
-    dup { char: \' char: \" char: \r char: \n char: \s } counts {
-        { [ dup { char: \' char: \r char: \n char: \s } values-of sum 0 = ] [ drop "'" prepend ] }
+    dup { char: ' char: \" char: \r char: \n char: \s } counts {
+        { [ dup { char: ' char: \r char: \n char: \s } values-of sum 0 = ] [ drop "'" prepend ] }
         { [ dup char: \" of not ] [ drop "\"" "\"" surround ] }
         [ drop escape-string ]
     } cond ;

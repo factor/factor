@@ -18,7 +18,7 @@ SYMBOL: current-irc-client
     \ current-irc-client swap with-variable ; inline
 
 UNION: to-target privmsg notice ;
-UNION: to-channel irc.messages::join part topic kick rpl-channel-modes
+UNION: to-channel irc.messages:join part topic kick rpl-channel-modes
                   topic rpl-names rpl-names-end ;
 UNION: to-one-chat to-target to-channel mode ;
 UNION: to-many-chats nick quit ;
