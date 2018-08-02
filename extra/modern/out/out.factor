@@ -1,6 +1,10 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit ;
+USING: accessors arrays assocs combinators.short-circuit
+constructors continuations io io.encodings.utf8 io.files
+io.streams.string kernel modern modern.paths modern.slices
+prettyprint sequences sequences.extras splitting strings
+vocabs.loader ;
 IN: modern.out
 
 : token? ( obj -- ? )
@@ -17,7 +21,7 @@ CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;
 : write-whitespace ( last obj -- )
     swap
     [ swap slice-between ] [ slice-before ] if*
-    trim-before-newline io::write ;
+    trim-before-newline io:write ;
 
 GENERIC: write-literal* ( last obj -- last' )
 M: slice write-literal* [ write-whitespace ] [ write ] [ ] tri ;
