@@ -50,7 +50,7 @@ DEFER: map-literals
     [ write-literal ] with-string-writer ; inline
 
 : write-modern-path ( seq path -- )
-    utf8 [ write-literal nl ] with-file-writer ; inline
+    utf8 [ write-literal ] with-file-writer ; inline
 
 : write-modern-vocab ( seq vocab -- )
     vocab-source-path write-modern-path ; inline
