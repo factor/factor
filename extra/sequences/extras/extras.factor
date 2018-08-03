@@ -173,9 +173,10 @@ PRIVATE>
 ERROR: slices-don't-touch slice1 slice2 ;
 
 : merge-slices ( slice1 slice2 -- slice/* )
-    slice-order-by-from
     2dup ordered-slices-touch? [
-        [ from>> ] [ [ to>> ] [ seq>> ] bi ] bi* <slice>
+        [ [ from>> ] bi@ min ]
+        [ [ to>> ] bi@ max ]
+        [ drop seq>> ] 2tri <slice>
     ] [
         slices-don't-touch
     ] if ;
