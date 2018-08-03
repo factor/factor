@@ -358,10 +358,16 @@ DEFER: lex-factor-top*
 ! Advance the index and read again!
 
 : read-token-or-whitespace-top ( n string slice -- n' string slice/f )
-    dup length 0 = [ [ 1 + ] 2dip drop lex-factor-top ] when ;
+    dup length 0 = [
+        ! [ 1 + ] 2dip drop lex-factor-top
+        merge-slice-til-non-whitespace
+    ] when ;
 
 : read-token-or-whitespace-nested ( n string slice -- n' string slice/f )
-    dup length 0 = [ [ 1 + ] 2dip drop lex-factor-nested ] when ;
+    dup length 0 = [
+        ! [ 1 + ] 2dip drop lex-factor-nested
+        merge-slice-til-non-whitespace
+    ] when ;
 
 : lex-factor-fallthrough ( n/f string slice/f ch/f -- n'/f string literal )
     {

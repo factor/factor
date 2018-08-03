@@ -82,6 +82,16 @@ ERROR: unexpected-end n string ;
         f string f f
     ] if ; inline
 
+:: slice-til-non-whitespace ( n string -- n' string slice/f ch/f )
+    n [
+        n string [ "\s\r\n" member? not ] find-from :> ( n' ch )
+        n' string
+        n n' string ?<slice>
+        ch
+    ] [
+        f string f f
+    ] if ; inline
+
 :: (slice-until) ( n string quot -- n' string slice/f ch/f )
     n string quot find-from :> ( n' ch )
     n' string
@@ -133,6 +143,11 @@ ERROR: unexpected-end n string ;
 : merge-slice-til-whitespace ( n string slice --  n' string slice' )
     pick [
         [ slice-til-whitespace drop ] dip merge-slices
+    ] when ;
+
+: merge-slice-til-non-whitespace ( n string slice --  n' string slice' )
+    pick [
+        [ slice-til-non-whitespace drop ] dip merge-slices
     ] when ;
 
 : merge-slice-til-eol ( n string slice --  n' string slice' )
