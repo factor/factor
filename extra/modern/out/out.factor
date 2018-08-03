@@ -27,20 +27,18 @@ GENERIC: write-literal* ( last obj -- last' )
 M: slice write-literal* [ write-whitespace ] [ write ] [ ] tri ;
 M: array write-literal* [ write-literal* ] each ;
 M: renamed write-literal* [ slice>> write-whitespace ] [ string>> write ] [ slice>> ] tri ; ! for refactoring
-
-
+M: string write-literal* write ;
 
 DEFER: map-literals
 : (map-literals) ( obj quot: ( obj -- obj' ) -- seq )
     over [ array? ] any? [
-        [ call drop ] [ map-literals ] 2bi
+        [ call ] [ map-literals ] bi
     ] [
         over array? [ map-literals ] [ call ] if
     ] if ; inline recursive
 
 : map-literals ( obj quot: ( obj -- obj' ) -- seq )
     '[ _ (map-literals) ] map ; inline recursive
-
 
 
 ! Start with no slice as ``last``
@@ -106,3 +104,15 @@ DEFER: map-literals
 
     { "<VOCAB-ROOT:" "factorcode-core" "https://factorcode.org/git/factor.git" "core/" }
     { ";VOCAB-ROOT>" } surround "resource:core-parsed.factor" utf8 [ ... ] with-file-writer ;
+
+![[
+: rewrite-core-paths-with-semis ( -- )
+    core-source-paths first [
+        dup { [ array? ] [ ?first upper-colon? ] } 1&& [
+            dup ?first >strings .
+            dup length 2 = [
+                first2 1 cut* { " " ";" } swap 3append 2array
+            ] when
+        ] when
+    ] rewrite-path ;
+]]
