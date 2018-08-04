@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes classes.struct
 classes.tuple combinators combinators.short-circuit
 combinators.smart continuations debugger definitions effects
-eval formatting fry grouping help help.markup help.topics io
+eval factor formatting grouping help help.markup help.topics io
 io.streams.string kernel macros math math.statistics namespaces
 parser.notes prettyprint sequences sequences.deep sets splitting
 strings summary tools.destructors unicode vocabs vocabs.loader
@@ -41,10 +41,14 @@ SYMBOL: vocab-articles
         ] [ nip print-error ] recover
     ] with-string-writer ;
 
+GENERIC: example>strings ( seq -- strings )
+M: factor example>strings text>> string-lines [ [ blank? ] trim-head ] map ;
+M: array example>strings dup length 1 = [ first example>strings ] when ;
+
 : check-example ( element -- )
     [
         '[
-            _ rest [
+            _ rest example>strings [
                 but-last "\n" join
                 eval-with-stack
                 "\n" ?tail drop

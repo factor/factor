@@ -8,9 +8,9 @@ HELP: >roman
 { $description "Converts a number to its lower-case Roman Numeral equivalent." }
 { $notes "The range for this word is 1-3999, inclusive." }
 { $examples
-    { $example "USING: io roman ;"
-               "56 >roman print"
-               "lvi"
+    { $example factor[[USING: io roman ;
+                       56 >roman print
+                       lvi]]
     }
 } ;
 
