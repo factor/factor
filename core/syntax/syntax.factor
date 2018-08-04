@@ -11,9 +11,9 @@ generic.standard hash-sets hashtables hashtables.identity hints
 init interpolate io.pathnames kernel lexer locals.errors
 locals.parser locals.types macros math memoize multiline
 namespaces parser quotations sbufs sequences slots source-files
-splitting stack-checker strings strings.parser typed vectors
-vocabs.parser words words.alias words.constant words.inlined
-words.symbol ;
+splitting stack-checker strings strings.parser system typed
+vectors vocabs.parser vocabs.platforms words words.alias
+words.constant words.inlined words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -52,7 +52,7 @@ IN: bootstrap.syntax
     dup [ define-fry-specifier ] curry each ;
 
 [
-    { "]" "}" ";" ">>" } [ define-delimiter ] each
+    { "]" "}" ";" ">>" "UNIX>" "MACOS>" "LINUX>" "WINDOWS>" } [ define-delimiter ] each
 
     "PRIMITIVE:" [
         current-vocab name>>
@@ -68,6 +68,27 @@ IN: bootstrap.syntax
     "<PRIVATE" [ begin-private ] define-core-syntax
 
     "PRIVATE>" [ end-private ] define-core-syntax
+
+    "<UNIX" [
+        "UNIX>" parse-multiline-string
+        os unix? [ ".unix" parse-platform-section ] [ drop ] if
+    ] define-core-syntax
+
+    "<MACOS" [
+        "MACOS>" parse-multiline-string
+        os macosx? [ ".macos" parse-platform-section ] [ drop ] if
+    ] define-core-syntax
+
+    "<LINUX" [
+        "LINUX>" parse-multiline-string
+        os linux? [ ".linux" parse-platform-section ] [ drop ] if
+    ] define-core-syntax
+
+    "<WINDOWS" [
+        "WINDOWS>" parse-multiline-string
+        os windows? [ ".windows" parse-platform-section ] [ drop ] if
+    ] define-core-syntax
+
 
     "USE:" [ scan-token use-vocab ] define-core-syntax
 
