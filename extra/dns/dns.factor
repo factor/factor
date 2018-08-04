@@ -408,10 +408,13 @@ M: TXT rdata>byte-array
 
 HOOK: initial-dns-servers os ( -- sequence )
 
-{
-    { [ os windows? ] [ "dns.windows" ] }
-    { [ os unix? ] [ "dns.unix" ] }
-} cond require
+<WINDOWS
+    USE: dns.windows
+WINDOWS>
+
+<UNIX
+    USE: dns.unix
+UNIX>
 
 : with-dns-servers ( servers quot -- )
     [ dns-servers ] dip with-variable ; inline
