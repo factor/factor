@@ -178,7 +178,7 @@ $nl
 "This code starts with a string on the stack, removes non-alphabetical characters, and converts the result to lower case, leaving a new string on the stack. We put this code in a new word, and add the new word to " { $snippet "palindrome.factor" } ":"
 { $code ": normalize ( string -- string' ) [ Letter? ] filter >lower ;" }
 $nl
-"You will need to add " { $vocab-link "unicode.case" } " and " { $vocab-link "unicode.categories" } " to the vocabulary search path, so that " { $link >lower } " and " { $link Letter? } " can be used in the source file."
+"You will need to add " { $vocab-link "unicode" } " to the vocabulary search path, so that " { $link >lower } " and " { $link Letter? } " can be used in the source file."
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( string -- ? ) normalize dup reverse = ;" }
