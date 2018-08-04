@@ -153,7 +153,7 @@ ERROR: unexpected-terminator n string slice ;
 : read-lowercase-colon ( n string slice -- n' string lowercase-colon )
     dup [ char: \: = ] count-tail
     '[
-        _ [ lex-factor ] replicate ensure-no-false dup [ token-expected ] unless
+        _ [ slice-til-non-whitespace drop [ lex-factor ] dip swap 2array ] replicate ensure-no-false dup [ token-expected ] unless
         dup terminator? [ unexpected-terminator ] when
     ] dip swap 2array ;
 
@@ -347,8 +347,9 @@ DEFER: lex-factor-top*
     [ "\"!:[{(<>\s\r\n" slice-til-either ] dip swap [ span-slices ] dip
     over "\\" head? [
         drop
+        ! \\  ! done, \ turns parsing off, \\ is complete token
         ! \ foo
-        dup [ char: \\ = ] all? [ (read-backslash) ] [ merge-slice-til-whitespace ] if
+        dup "\\" sequence= [ (read-backslash) ] [ merge-slice-til-whitespace ] if
     ] [
         ! foo\ or foo\bar (?)
         over "\\" tail? [ drop (read-backslash) ] [ lex-factor-top* ] if
