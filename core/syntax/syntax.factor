@@ -132,6 +132,7 @@ IN: bootstrap.syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
     "M\\\\" [ scan-object scan-object lookup-method <wrapper> suffix! ] define-core-syntax
     "inline" [ last-word make-inline ] define-core-syntax
+    "private" [ last-word make-private ] define-core-syntax
     "recursive" [ last-word make-recursive ] define-core-syntax
     "foldable" [ last-word make-foldable ] define-core-syntax
     "flushable" [ last-word make-flushable ] define-core-syntax

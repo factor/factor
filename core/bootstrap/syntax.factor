@@ -73,6 +73,7 @@ IN: bootstrap.syntax
         "flushable"
         "foldable"
         "inline"
+        "private"
         "recursive"
         "t"
         "{"

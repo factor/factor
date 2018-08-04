@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions hashtables kernel
 kernel.private math math.order namespaces quotations sequences
-slots.private strings vocabs ;
+slots.private splitting strings vocabs ;
 IN: words
 
 BUILTIN: word
@@ -152,6 +152,9 @@ M: word make-inline
 
 : define-inline ( word def effect -- )
     [ define-declared ] [ 2drop make-inline ] 3bi ;
+
+: make-private ( word -- )
+    [ ".private" ?tail drop ".private" append ] change-vocabulary drop ;
 
 : make-recursive ( word -- )
     t "recursive" set-word-prop ;
