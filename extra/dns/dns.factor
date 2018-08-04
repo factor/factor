@@ -409,11 +409,16 @@ M: TXT rdata>byte-array
 HOOK: initial-dns-servers os ( -- sequence )
 
 <WINDOWS
-    USE: dns.windows
+USING: windows.iphlpapi ;
+
+M: windows initial-dns-servers dns-server-ips ;
 WINDOWS>
 
 <UNIX
-    USE: dns.unix
+USING: resolv-conf ;
+
+M: unix initial-dns-servers
+    default-resolv.conf nameserver>> ;
 UNIX>
 
 : with-dns-servers ( servers quot -- )
