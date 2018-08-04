@@ -180,7 +180,7 @@ ARTICLE: "syntax-strings" "Character and string syntax"
 "Strings are documented in " { $link "strings" } "." ;
 
 ARTICLE: "syntax-sbufs" "String buffer syntax"
-{ $subsections postpone: \sbuf"}
+{ $subsections postpone: \sbuf" }
 "String buffers are documented in " { $link "sbufs" } "." ;
 
 ARTICLE: "syntax-arrays" "Array syntax"

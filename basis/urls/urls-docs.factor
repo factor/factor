@@ -189,7 +189,7 @@ $nl
 "URLs can be converted back to strings using the " { $link present } " word."
 $nl
 "URL literal syntax:"
-{ $subsections postpone: \url"}
+{ $subsections postpone: \url" }
 "Manipulating URLs:"
 { $subsections
     derive-url

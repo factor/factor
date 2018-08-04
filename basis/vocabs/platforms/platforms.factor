@@ -19,18 +19,18 @@ IN: vocabs.platforms
         curry
     ] dip with-vocabulary drop ; inline
 
-SYNTAX: <UNIX
+SYNTAX: \<UNIX
     "UNIX>" parse-multiline-string
     os unix? [ ".unix" parse-platform-section ] [ drop ] if ;
 
-SYNTAX: <MACOSX
+SYNTAX: \<MACOSX
     "MACOSX>" parse-multiline-string
     os macosx? [ ".macosx" parse-platform-section ] [ drop ] if ;
 
-SYNTAX: <LINUX
+SYNTAX: \<LINUX
     "LINUX>" parse-multiline-string
     os linux? [ ".linux" parse-platform-section ] [ drop ] if ;
 
-SYNTAX: <WINDOWS
+SYNTAX: \<WINDOWS
     "WINDOWS>" parse-multiline-string
     os windows? [ ".windows" parse-platform-section ] [ drop ] if ;
