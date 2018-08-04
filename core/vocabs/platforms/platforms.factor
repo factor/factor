@@ -17,4 +17,7 @@ IN: vocabs.platforms
     [
         [ [ string-lines parse-lines ] curry with-nested-compilation-unit ]
         curry
-    ] dip with-vocabulary drop ; inline
+    ] dip
+    ! XXX: call( -- ) -> drop for definitions only
+    ! or make call( -- ) smart-infer the quot
+    with-vocabulary call( -- ) ; inline
