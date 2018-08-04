@@ -132,7 +132,7 @@ $nl
 { $unchecked-example "\"A man, a plan, a canal: Panama.\" palindrome? ." "f" }
 $nl
 "We would like it to output " { $link t } " there. We can encode this requirement with a unit test that we add to " { $snippet "palindrome-tests.factor" } ":"
-{ $code "[ t ] [ \"A man, a plan, a canal: Panama.\" palindrome? ] unit-test" }
+{ $code "{ t } [ \"A man, a plan, a canal: Panama.\" palindrome? ] unit-test" }
 $nl
 "If you now run unit tests, you will see a unit test failure:"
 { $code "\"palindrome\" test" }
