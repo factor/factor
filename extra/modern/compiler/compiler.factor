@@ -45,30 +45,35 @@ SYNTAX: \ARITY:
     scan-token string>number swap make-arity ;
 >>
 
-ARITY: ALIAS 2
-ARITY: ARITY 2
-ARITY: BUILTIN 1
-ARITY: CONSTANT 2
-ARITY: DEFER 1
-ARITY: GENERIC# 3
-ARITY: GENERIC 2
-ARITY: HOOK 3
-ARITY: IN 1
-ARITY: INSTANCE 2
-ARITY: MAIN 1
-ARITY: MATH 1
-ARITY: MIXIN 1
-ARITY: PRIMITIVE 2
-ARITY: QUALIFIED-WITH 2
-ARITY: QUALIFIED 1
-ARITY: RENAME 3
-ARITY: SINGLETON 1
-ARITY: SLOT 1
-ARITY: SYMBOL 1
-ARITY: UNUSE 1
-ARITY: USE 1
+ARITY: \ABOUT: 1
+ARITY: \ALIAS: 2
+ARITY: \ARITY: 2
+ARITY: \B: 1
+ARITY: \BUILTIN: 1
+ARITY: \CONSTANT: 2
+ARITY: \DEFER: 1
+ARITY: \FORGET: 1
+ARITY: \GENERIC#: 3
+ARITY: \GENERIC: 2
+ARITY: \LEFT-DECORATOR: 1
+ARITY: \HOOK: 3
+ARITY: \IN: 1
+ARITY: \INSTANCE: 2
+ARITY: \MAIN: 1
+ARITY: \MATH: 1
+ARITY: \MIXIN: 1
+ARITY: \PRIMITIVE: 2
+ARITY: \QUALIFIED-WITH: 2
+ARITY: \QUALIFIED: 1
+ARITY: \RENAME: 3
+ARITY: \SINGLETON: 1
+ARITY: \SLOT: 1
+ARITY: \SOLUTION: 1
+ARITY: \SYMBOL: 1
+ARITY: \UNUSE: 1
+ARITY: \USE: 1
 
-ARITY: MEMO 2
+ARITY: \MEMO: 2
 ARITY: \: 2
 
 ! ARITY: \USING: 0
@@ -368,3 +373,30 @@ M: sequence tuple>identifiers
 
 : string>identifiers ( string -- identifiers )
     string>tuples tuple>identifiers ;
+
+
+![[
+GENERIC: fixup-arity ( obj -- seq )
+
+ERROR: closing-tag-required obj ;
+M: uppercase-colon-literal fixup-arity
+    dup tag>> janky-arities ?at [
+        '[ _ swap [ any-comment? not ] cut-nth-match swap ] change-payload
+        swap 2array
+        dup first f >>closing-tag drop
+        dup first [ ] [ underlying>> ] [ payload>> last-underlying-slice ] tri force-merge-slices >>underlying drop
+        ! dup first " ;" >>closing-tag drop
+    ] [
+        drop
+        ! dup closing-tag>> [ B closing-tag-required ] unless
+        ! dup closing-tag>> [ " ;" >>closing-tag ] unless
+    ] if ;
+
+M: less-than-literal fixup-arity
+    [ [ fixup-arity ] map ] change-payload ;
+
+M: object fixup-arity ;
+
+: postprocess-modern ( seq -- seq' )
+    collapse-decorators [ fixup-arity ] map flatten ;
+]]
