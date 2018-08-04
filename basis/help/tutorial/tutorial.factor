@@ -132,7 +132,7 @@ $nl
 { $unchecked-example "\"A man, a plan, a canal: Panama.\" palindrome? ." "f" }
 $nl
 "We would like it to output " { $link t } " there. We can encode this requirement with a unit test that we add to " { $snippet "palindrome-tests.factor" } ":"
-{ $code "[ t ] [ \"A man, a plan, a canal: Panama.\" palindrome? ] unit-test" }
+{ $code "{ t } [ \"A man, a plan, a canal: Panama.\" palindrome? ] unit-test" }
 $nl
 "If you now run unit tests, you will see a unit test failure:"
 { $code "\"palindrome\" test" }
@@ -178,7 +178,7 @@ $nl
 "This code starts with a string on the stack, removes non-alphabetical characters, and converts the result to lower case, leaving a new string on the stack. We put this code in a new word, and add the new word to " { $snippet "palindrome.factor" } ":"
 { $code ": normalize ( string -- string' ) [ Letter? ] filter >lower ;" }
 $nl
-"You will need to add " { $vocab-link "unicode.case" } " and " { $vocab-link "unicode.categories" } " to the vocabulary search path, so that " { $link >lower } " and " { $link Letter? } " can be used in the source file."
+"You will need to add " { $vocab-link "unicode" } " to the vocabulary search path, so that " { $link >lower } " and " { $link Letter? } " can be used in the source file."
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( string -- ? ) normalize dup reverse = ;" }
