@@ -127,6 +127,14 @@ IN: bootstrap.syntax
         "[=====["
         "[======["
 
+        "factor[["
+        "factor[=["
+        "factor[==["
+        "factor[===["
+        "factor[====["
+        "factor[=====["
+        "factor[======["
+
         "![["
         "![=["
         "![==["

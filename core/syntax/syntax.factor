@@ -5,8 +5,8 @@ classes.algebra.private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
 classes.predicate classes.singleton classes.tuple
 classes.tuple.parser classes.union combinators compiler.units
-definitions delegate delegate.private effects effects.parser fry
-functors2 generic generic.hook generic.math generic.parser
+definitions delegate delegate.private effects effects.parser factor
+fry functors2 generic generic.hook generic.math generic.parser
 generic.standard hash-sets hashtables hashtables.identity hints
 init interpolate io.pathnames kernel lexer locals.errors
 locals.parser locals.types macros math memoize multiline
@@ -395,6 +395,14 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     { "_" "@" } define-fry-specifiers
+
+    "factor[[" [ "]]" parse-multiline-string0 <factor> suffix! ] define-core-syntax
+    "factor[=[" [ "]=]" parse-multiline-string0 <factor> suffix! ] define-core-syntax
+    "factor[==[" [ "]==]" parse-multiline-string0 <factor> suffix! ] define-core-syntax
+    "factor[===[" [ "]===]" parse-multiline-string0 <factor> suffix! ] define-core-syntax
+    "factor[====[" [ "]====]" parse-multiline-string0 <factor> suffix! ] define-core-syntax
+    "factor[=====[" [ "]=====]" parse-multiline-string0 <factor> suffix! ] define-core-syntax
+    "factor[======[" [ "]======]" parse-multiline-string0 <factor> suffix! ] define-core-syntax
 
     "[[" [ "]]" parse-multiline-string0 suffix! ] define-core-syntax
     "[=[" [ "]=]" parse-multiline-string0 suffix! ] define-core-syntax
