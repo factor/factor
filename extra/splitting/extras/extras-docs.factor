@@ -20,3 +20,7 @@ HELP: split-find
 { $description "Splits a sequence into slices using the provided quotation to find split points." } ;
 
 { split-when-harvest split-when-slice-harvest } related-words
+
+HELP: split-lengths
+{ $values { "seq" sequence } { "lengths" sequence } { "pieces" "a new array" } }
+{ $description "Splits a sequence into slices of the given lengths." } ;
