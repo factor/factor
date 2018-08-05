@@ -40,8 +40,7 @@ TUPLE: b-rep < identity-tuple faces edges vertices ;
 : <b-rep> ( -- b-rep )
     V{ } clone V{ } clone V{ } clone b-rep boa ;
 
-SYMBOL: sharpness-stack
-sharpness-stack [ V{ t } ] initialize
+INITIALIZED-SYMBOL: sharpness-stack [ V{ t } ]
 
 : set-sharpness ( sharp? -- ) >boolean sharpness-stack get set-last ;
 : get-sharpness ( -- sharp? ) sharpness-stack get last ;

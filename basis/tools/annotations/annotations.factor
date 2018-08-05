@@ -111,9 +111,7 @@ PRIVATE>
 : watch-vars ( word vars -- )
     dupd '[ [ _ _ ] dip (watch-vars) ] annotate ;
 
-SYMBOL: word-timing
-
-word-timing [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: word-timing [ H{ } clone ]
 
 : reset-word-timing ( -- )
     word-timing get clear-assoc ;

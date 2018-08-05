@@ -6,9 +6,7 @@ IN: unix.signals
 
 <PRIVATE
 
-SYMBOL: signal-handlers
-
-signal-handlers [ H{ } ] initialize
+INITIALIZED-SYMBOL: signal-handlers [ H{ } ]
 
 : dispatch-signal ( sig -- )
     signal-handlers get-global at [ in-thread ] each ;

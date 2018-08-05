@@ -5,8 +5,7 @@ IN: gobject-introspection.common
 
 SYMBOL: current-namespace-name
 
-SYMBOL: implement-structs
-implement-structs [ V{ } ] initialize
+INITIALIZED-SYMBOL: implement-structs [ V{ } ]
 
 : implement-struct? ( c-type -- ? )
     implement-structs get-global member? ;

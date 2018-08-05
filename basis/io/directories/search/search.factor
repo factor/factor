@@ -6,11 +6,10 @@ kernel kernel.private locals math namespaces sequences sorting
 strings system unicode vocabs ;
 IN: io.directories.search
 
-SYMBOL: traversal-method
 
 SYMBOLS: +depth-first+ +breadth-first+ ;
 
-traversal-method [ +depth-first+ ] initialize
+INITIALIZED-SYMBOL: traversal-method [ +depth-first+ ]
 
 <PRIVATE
 

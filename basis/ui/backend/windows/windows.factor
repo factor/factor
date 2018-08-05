@@ -502,17 +502,7 @@ SYMBOL: nc-buttons
 : handle-wm-dwmcompositionchanged ( hWnd uMsg wParam lParam -- )
     3drop [ window ] keep ?make-glass ;
 
-SYMBOL: wm-handlers
-
-: add-wm-handler ( quot: ( hWnd Msg wParam lParam -- LRESULT ) wm -- )
-    dup array?
-    [ [ execute( -- wm ) add-wm-handler ] with each ]
-    [ wm-handlers get-global set-at ] if ;
-
-: remove-wm-handler ( wm -- )
-    wm-handlers get-global delete-at ;
-
-wm-handlers [
+INITIALIZED-SYMBOL: wm-handlers [
     H{
         ${ WM_CLOSE [ handle-wm-close 0 ] }
         ${ WM_PAINT [ 4dup handle-wm-paint DefWindowProc ] }
@@ -548,7 +538,15 @@ wm-handlers [
         ${ WM_CANCELMODE [ handle-wm-cancelmode 0 ] }
         ${ WM_MOUSELEAVE [ handle-wm-mouseleave 0 ] }
     } expand-keys-set-at
-] initialize
+]
+
+: add-wm-handler ( quot: ( hWnd Msg wParam lParam -- LRESULT ) wm -- )
+    dup array?
+    [ [ execute( -- wm ) add-wm-handler ] with each ]
+    [ wm-handlers get-global set-at ] if ;
+
+: remove-wm-handler ( wm -- )
+    wm-handlers get-global delete-at ;
 
 SYMBOL: trace-messages?
 

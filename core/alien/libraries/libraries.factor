@@ -18,9 +18,7 @@ PRIMITIVE: (dlsym-raw) ( name dll -- alien )
 
 HOOK: dlerror os ( -- message/f )
 
-SYMBOL: libraries
-
-libraries [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: libraries [ H{ } clone ]
 
 TUPLE: library { path string } dll dlerror { abi abi initial: cdecl } ;
 
@@ -90,9 +88,7 @@ M: library dispose dll>> [ dispose ] when* ;
     2dup library-dll dlsym-raw
     [ 2nip ] [ no-such-symbol ] if* ;
 
-SYMBOL: deploy-libraries
-
-deploy-libraries [ V{ } clone ] initialize
+INITIALIZED-SYMBOL: deploy-libraries [ V{ } clone ]
 
 : deploy-library ( name -- )
     dup libraries get key?

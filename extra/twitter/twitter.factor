@@ -6,9 +6,9 @@ io.sockets.secure fry oauth1 urls ;
 IN: twitter
 
 ! Configuration
-SYMBOLS: twitter-source twitter-consumer-token twitter-access-token ;
+INITIALIZED-SYMBOL: twitter-source [ "factor" ]
 
-twitter-source [ "factor" ] initialize
+SYMBOLS: twitter-consumer-token twitter-access-token ;
 
 <PRIVATE
 

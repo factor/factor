@@ -8,11 +8,9 @@ IN: gml.macros
 
 TUPLE: macro macro-id timestamp log ;
 
-SYMBOL: next-macro-id
-next-macro-id [ 0 ] initialize
+INITIALIZED-SYMBOL: next-macro-id [ 0 ]
 
-SYMBOL: macros
-macros [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: macros [ H{ } clone ]
 
 SYMBOL: current-macro
 

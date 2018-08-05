@@ -6,8 +6,7 @@ io.pathnames kernel math namespaces sequences splitting
 system-info unicode ;
 IN: cli.git
 
-SYMBOL: cli-git-num-parallel
-cli-git-num-parallel [ cpus 2 * ] initialize
+INITIALIZED-SYMBOL: cli-git-num-parallel [ cpus 2 * ]
 
 : git-command>string ( quot -- string )
     utf8 <process-reader> stream-contents [ blank? ] trim-tail ;

@@ -52,7 +52,11 @@ IN: bootstrap.syntax
     dup [ define-fry-specifier ] curry each ;
 
 [
-    { "]" "}" ";" ">>" "UNIX>" "MACOS>" "LINUX>" "WINDOWS>" } [ define-delimiter ] each
+    {
+        "]" "}" ";" ">>"
+        "UNIX>" "MACOS>" "LINUX>" "WINDOWS>"
+        "FACTOR>"
+    } [ define-delimiter ] each
 
     "PRIMITIVE:" [
         current-vocab name>>
@@ -89,6 +93,9 @@ IN: bootstrap.syntax
         os windows? [ ".windows" parse-platform-section ] [ drop ] if
     ] define-core-syntax
 
+    "<FACTOR" [
+        "FACTOR>" parse-multiline-string "" parse-platform-section
+    ] define-core-syntax
 
     "USE:" [ scan-token use-vocab ] define-core-syntax
 
@@ -172,20 +179,26 @@ IN: bootstrap.syntax
         (parse-tuple-definition) 2drop check-builtin
     ] define-core-syntax
 
-    "SYMBOL:" [
-        scan-new-word define-symbol
+    "INITIALIZED-SYMBOL:" [
+        scan-new-word [ define-symbol ] keep scan-object '[ _ _ initialize ] append!
     ] define-core-syntax
 
-    "SYMBOLS:" [
-        ";" [ create-word-in [ reset-generic ] [ define-symbol ] bi ] each-token
-    ] define-core-syntax
-
+![[
     "INITIALIZED-SYMBOL:" [
         scan-new-word [ define-symbol ]
         [
             name>> "initialize-" prepend create-word-in dup reset-generic
             scan-object dupd [ initialize ] curry curry ( -- ) define-declared
         ] bi
+    ] define-core-syntax
+]]
+
+    "SYMBOL:" [
+        scan-new-word define-symbol
+    ] define-core-syntax
+
+    "SYMBOLS:" [
+        ";" [ create-word-in [ reset-generic ] [ define-symbol ] bi ] each-token
     ] define-core-syntax
 
     "STARTUP-HOOK:" [

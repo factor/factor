@@ -4,9 +4,7 @@ USING: assocs cocoa.messages compiler.units core-foundation.bundles
 hashtables init io kernel lexer namespaces sequences vocabs ;
 IN: cocoa
 
-SYMBOL: sent-messages
-
-sent-messages [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: sent-messages [ H{ } clone ]
 
 : remember-send ( selector -- )
     dup sent-messages get set-at ;
@@ -25,9 +23,7 @@ SYNTAX: \selector:
     [ remember-send ]
     [ <selector> suffix! \ cocoa.messages:selector suffix! ] bi ;
 
-SYMBOL: super-sent-messages
-
-super-sent-messages [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: super-sent-messages [ H{ } clone ]
 
 : remember-super-send ( selector -- )
     dup super-sent-messages get set-at ;
@@ -35,9 +31,8 @@ super-sent-messages [ H{ } clone ] initialize
 SYNTAX: \super:
     scan-token unescape-token dup remember-super-send
     [ lookup-method suffix! ] [ suffix! ] bi \ super-send suffix! ;
-SYMBOL: frameworks
 
-frameworks [ V{ } clone ] initialize
+INITIALIZED-SYMBOL: frameworks [ V{ } clone ]
 
 [ frameworks get [ load-framework ] each ] "cocoa" add-startup-hook
 

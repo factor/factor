@@ -6,9 +6,7 @@ namespaces parser sequences source-files.errors system
 tools.errors vocabs vocabs.hierarchy ;
 IN: help.lint
 
-SYMBOL: lint-failures
-
-lint-failures [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: lint-failures [ H{ } clone ]
 
 TUPLE: help-lint-error < source-file-error ;
 

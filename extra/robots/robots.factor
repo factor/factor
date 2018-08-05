@@ -9,8 +9,7 @@ IN: robots
 ! visit-time is GMT, request-rate is pages/second
 ! crawl-rate is seconds
 
-SYMBOL: robot-identities
-robot-identities [ { "FactorSpider" } ] initialize
+INITIALIZED-SYMBOL: robot-identities [ { "FactorSpider" } ]
 
 TUPLE: robots site sitemap rules rules-quot ;
 

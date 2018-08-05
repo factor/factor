@@ -14,8 +14,7 @@ VARIANT: cuda-abi
 SYMBOL: cuda-modules
 SYMBOL: cuda-functions
 
-SYMBOL: cuda-libraries
-cuda-libraries [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: cuda-libraries [ H{ } clone ]
 
 SYMBOL: current-cuda-library
 

@@ -8,9 +8,7 @@ words ;
 IN: tools.deprecation
 
 SYMBOL: +deprecation-note+
-SYMBOL: deprecation-notes
-
-deprecation-notes [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: deprecation-notes [ H{ } clone ]
 
 TUPLE: deprecation-note < source-file-error ;
 

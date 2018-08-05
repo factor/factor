@@ -4,13 +4,9 @@ USING: assocs combinators compiler.units fry grouping kernel
 namespaces sequences sets stack-checker.dependencies words ;
 IN: compiler.crossref
 
-SYMBOL: compiled-crossref
+INITIALIZED-SYMBOL: compiled-crossref [ H{ } clone ]
 
-compiled-crossref [ H{ } clone ] initialize
-
-SYMBOL: generic-call-site-crossref
-
-generic-call-site-crossref [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: generic-call-site-crossref [ H{ } clone ]
 
 : all-dependencies-of ( word -- assoc )
     compiled-crossref get at ;

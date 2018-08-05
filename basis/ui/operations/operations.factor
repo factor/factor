@@ -30,9 +30,7 @@ M: operation command-word command>> command-word ;
 : operation-gesture ( operation -- gesture )
     command>> +keyboard+ word-prop ;
 
-SYMBOL: operations
-
-operations [ <linked-hash> ] initialize
+INITIALIZED-SYMBOL: operations [ <linked-hash> ]
 
 : object-operations ( obj -- operations )
     operations get values

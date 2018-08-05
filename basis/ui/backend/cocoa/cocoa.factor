@@ -207,11 +207,9 @@ M: cocoa-ui-backend system-alert
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
 
-SYMBOL: cocoa-startup-hook
-
-cocoa-startup-hook [
+INITIALIZED-SYMBOL: cocoa-startup-hook [
     [ "MiniFactor.nib" load-nib install-app-delegate ]
-] initialize
+]
 
 M: cocoa-ui-backend (with-ui)
     "UI" assert.app [

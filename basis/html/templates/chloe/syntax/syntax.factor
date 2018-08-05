@@ -7,9 +7,7 @@ multiline xml xml.data xml.writer xml.syntax html.components
 html.templates ;
 IN: html.templates.chloe.syntax
 
-SYMBOL: tags
-
-tags [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: tags [ H{ } clone ]
 
 : define-chloe-tag ( name quot -- ) swap tags get set-at ;
 

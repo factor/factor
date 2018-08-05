@@ -7,8 +7,7 @@ io.encodings.utf32 io.encodings.utf8 io.files kernel literals
 math namespaces sequences strings ;
 IN: io.encodings.detect
 
-SYMBOL: default-encoding
-default-encoding [ latin1 ] initialize
+INITIALIZED-SYMBOL: default-encoding [ latin1 ]
 
 <PRIVATE
 

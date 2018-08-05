@@ -33,11 +33,9 @@ ERROR: bad-escape char ;
         { char: \) char: \) }
     } ?at [ bad-escape ] unless ;
 
-SYMBOL: name>char-hook
-
-name>char-hook [
+INITIALIZED-SYMBOL: name>char-hook [
     [ "Unicode support not available" throw ]
-] initialize
+]
 
 : hex-escape ( str -- ch str' )
     2 cut-slice [ hex> ] dip ;

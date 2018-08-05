@@ -179,9 +179,7 @@ CONSTANT: default-icon-path "resource:misc/icons/Factor_128x128.png"
         default-icon-path binary file-contents
     ] [ drop f ] recover ;
 
-SYMBOL: icon-data
-
-icon-data [ default-icon-data ] initialize
+INITIALIZED-SYMBOL: icon-data [ default-icon-data ]
 
 : vocab-icon-data ( vocab-name -- byte-array )
     dup vocab-dir { "icon.png" "icon.ico" } [

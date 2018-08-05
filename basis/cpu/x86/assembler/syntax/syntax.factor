@@ -4,9 +4,7 @@ USING: kernel words words.symbol sequences lexer parser fry
 namespaces combinators assocs math ;
 IN: cpu.x86.assembler.syntax
 
-SYMBOL: registers
-
-registers [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: registers [ H{ } clone ]
 
 : define-register ( name num size -- word )
     [ create-word-in ] 2dip {

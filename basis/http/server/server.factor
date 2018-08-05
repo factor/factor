@@ -197,9 +197,7 @@ LOG: httpd-benchmark DEBUG
 
 TUPLE: http-server < threaded-server ;
 
-SYMBOL: request-limit
-
-request-limit [ 64 1024 * ] initialize
+INITIALIZED-SYMBOL: request-limit [ 64 1024 * ]
 
 LOG: httpd-bad-request NOTICE
 

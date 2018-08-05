@@ -5,9 +5,7 @@ help.stylesheet io io.styles kernel literals namespaces parser
 random sequences ui.theme ;
 IN: help.tips
 
-SYMBOL: tips
-
-tips [ V{ } clone ] initialize
+INITIALIZED-SYMBOL: tips [ V{ } clone ]
 
 TUPLE: tip < identity-tuple content loc ;
 

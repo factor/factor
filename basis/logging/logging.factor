@@ -10,9 +10,7 @@ IN: logging
 
 SYMBOLS: DEBUG NOTICE WARNING ERROR CRITICAL ;
 
-SYMBOL: log-level
-
-log-level [ DEBUG ] initialize
+INITIALIZED-SYMBOL: log-level [ DEBUG ]
 
 : log-levels ( -- assoc )
     H{

@@ -7,8 +7,7 @@ splitting strings ;
 IN: modern.compiler
 
 <<
-SYMBOL: left-decorators
-left-decorators [ HS{ } clone ] initialize
+INITIALIZED-SYMBOL: left-decorators [ HS{ } clone ]
 >>
 <<
 : make-left-decorator ( string -- )
@@ -31,9 +30,8 @@ LEFT-DECORATOR: recursive
     left-decorators get in? ;
 
 <<
-SYMBOL: arities
 ! Initialize with : foo ( -- ) .. ; already
-arities [ H{ } clone 2 "" pick set-at ] initialize
+INITIALIZED-SYMBOL: arities [ H{ } clone 2 "" pick set-at ]
 >>
 <<
 : make-arity ( n string -- )
@@ -82,8 +80,7 @@ ARITY: \: 2
     arities get at ;
 
 <<
-SYMBOL: variable-arities
-variable-arities [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: variable-arities [ H{ } clone ]
 >>
 <<
 : make-variable-arity ( n string -- )

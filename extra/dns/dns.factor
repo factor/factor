@@ -35,7 +35,7 @@ ENUM: dns-opcode QUERY IQUERY STATUS ;
 ENUM: dns-rcode NO-ERROR FORMAT-ERROR SERVER-FAILURE
 NAME-ERROR NOT-IMPLEMENTED REFUSED ;
 
-SYMBOL: dns-servers
+INITIALIZED-SYMBOL: dns-servers [ initial-dns-servers >vector ]
 
 : add-dns-server ( string -- )
     dns-servers get push ;
@@ -424,4 +424,3 @@ UNIX>
 : with-dns-servers ( servers quot -- )
     [ dns-servers ] dip with-variable ; inline
 
-dns-servers [ initial-dns-servers >vector ] initialize

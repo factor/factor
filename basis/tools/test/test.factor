@@ -18,9 +18,7 @@ SYMBOL: +test-failure+
 
 M: test-failure error-type drop +test-failure+ ;
 
-SYMBOL: test-failures
-
-test-failures [ V{ } clone ] initialize
+INITIALIZED-SYMBOL: test-failures [ V{ } clone ]
 
 T{ error-type-holder
    { type +test-failure+ }
@@ -44,8 +42,7 @@ t restartable-tests? set-global
         swap >>error
         error-continuation get >>continuation ;
 
-SYMBOL: long-unit-tests-enabled?
-long-unit-tests-enabled? [ t ] initialize
+INITIALIZED-SYMBOL: long-unit-tests-enabled? [ t ]
 
 <PRIVATE
 

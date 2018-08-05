@@ -36,9 +36,7 @@ TUPLE: error-type-holder type word plural icon quot forget-quot { fatal? initial
 
 GENERIC: error-type ( error -- type )
 
-SYMBOL: error-types
-
-error-types [ V{ } clone ] initialize
+INITIALIZED-SYMBOL: error-types [ V{ } clone ]
 
 : define-error-type ( error-type -- )
     dup type>> error-types get set-at ;

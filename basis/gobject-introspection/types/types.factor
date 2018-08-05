@@ -5,11 +5,9 @@ gobject-introspection.common gobject-introspection.repository kernel
 locals namespaces parser sequences sets ;
 IN: gobject-introspection.types
 
-SYMBOL: type-infos
-type-infos [ H{ } ] initialize
+INITIALIZED-SYMBOL: type-infos [ H{ } ]
 
-SYMBOL: standard-types
-standard-types [ V{ } ] initialize
+INITIALIZED-SYMBOL: standard-types [ V{ } ]
 
 TUPLE: type-info c-type ;
 

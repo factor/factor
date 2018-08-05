@@ -124,9 +124,7 @@ TUPLE: alien-callback-params < alien-node-params
 
 GENERIC: wrap-callback-quot ( params quot -- quot' )
 
-SYMBOL: wait-for-callback-hook
-
-wait-for-callback-hook [ [ drop ] ] initialize
+INITIALIZED-SYMBOL: wait-for-callback-hook [ [ drop ] ]
 
 M: callable wrap-callback-quot
     swap [ callback-parameter-quot ] [ callback-return-quot ] bi surround

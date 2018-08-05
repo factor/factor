@@ -7,9 +7,9 @@ IN: marvel
 
 ! http://developer.marvel.com/docs
 ! Register for an api key.
-SYMBOLS: marvel-base-url marvel-public-key marvel-private-key ;
+SYMBOLS: marvel-public-key marvel-private-key ;
 
-marvel-base-url [ "http://gateway.marvel.com/v1/public/" ] initialize
+INITIALIZED-SYMBOL: marvel-base-url [ "http://gateway.marvel.com/v1/public/" ]
 
 : calculate-hash ( ts -- hash )
     number>string

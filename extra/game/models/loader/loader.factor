@@ -10,8 +10,7 @@ ERROR: unknown-models-extension extension ;
 
 <PRIVATE
 
-SYMBOL: types
-types [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: types [ H{ } clone ]
 
 : models-class ( path -- class )
     file-extension >lower types get ?at

@@ -24,8 +24,7 @@ handler
 server-stopped
 secure-context ;
 
-SYMBOL: running-servers
-running-servers [ HS{ } clone ] initialize
+INITIALIZED-SYMBOL: running-servers [ HS{ } clone ]
 
 ERROR: server-not-running threaded-server ;
 

@@ -6,10 +6,8 @@ IN: alien.handles
 
 <PRIVATE
 
-SYMBOLS: alien-handle-counter alien-handles ;
-
-alien-handle-counter [ 0 ] initialize
-alien-handles [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: alien-handle-counter [ 0 ]
+INITIALIZED-SYMBOL: alien-handles [ H{ } clone ]
 
 : biggest-handle ( -- n )
     -1 32 bits ; inline

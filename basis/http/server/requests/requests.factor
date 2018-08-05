@@ -30,9 +30,7 @@ ERROR: bad-request-line < request-error parse-error ;
 : read-request-header ( request -- request )
     read-header >>header ;
 
-SYMBOL: upload-limit
-
-upload-limit [ 200,000,000 ] initialize
+INITIALIZED-SYMBOL: upload-limit [ 200,000,000 ]
 
 : parse-multipart-form-data ( string -- separator )
     ";" split1 nip

@@ -5,18 +5,14 @@ source-files.errors summary ;
 IN: compiler.errors
 
 SYMBOL: +compiler-error+
-SYMBOL: compiler-errors
-
-compiler-errors [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: compiler-errors [ H{ } clone ]
 
 TUPLE: compiler-error < source-file-error ;
 
 M: compiler-error error-type drop +compiler-error+ ;
 
 SYMBOL: +linkage-error+
-SYMBOL: linkage-errors
-
-linkage-errors [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: linkage-errors [ H{ } clone ]
 
 TUPLE: linkage-error < source-file-error ;
 

@@ -12,9 +12,7 @@ PRIMITIVE: (get-samples) ( -- samples/f )
 PRIMITIVE: profiling ( n -- )
 PRIVATE>
 
-SYMBOL: samples-per-second
-
-samples-per-second [ 1,000 ] initialize
+INITIALIZED-SYMBOL: samples-per-second [ 1,000 ]
 
 <PRIVATE
 SYMBOL: raw-profile-data

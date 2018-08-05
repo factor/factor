@@ -25,9 +25,9 @@ DEFER: fortran-ret-type>c-type
 DEFER: fortran-arg-type>c-type
 DEFER: fortran-name>symbol-name
 
-SYMBOL: library-fortran-abis
+INITIALIZED-SYMBOL: library-fortran-abis [ H{ } clone ]
+
 SYMBOL: fortran-abi
-library-fortran-abis [ H{ } clone ] initialize
 
 <PRIVATE
 

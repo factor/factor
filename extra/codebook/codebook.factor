@@ -198,11 +198,9 @@ TUPLE: code-file
 : write-dest-file ( xml name ext -- )
     append utf8 [ write-xml ] with-file-writer ;
 
-SYMBOL: kindlegen-path
-kindlegen-path [ "kindlegen" ] initialize
+INITIALIZED-SYMBOL: kindlegen-path [ "kindlegen" ]
 
-SYMBOL: codebook-output-path
-codebook-output-path [ "resource:codebooks" ] initialize
+INITIALIZED-SYMBOL: codebook-output-path [ "resource:codebooks" ]
 
 : kindlegen ( path -- )
     [ kindlegen-path get "-unicode" ] dip 3array try-process ;

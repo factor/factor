@@ -4,11 +4,8 @@ USING: assocs continuations continuations.private kernel
 kernel.private namespaces ;
 IN: init
 
-SYMBOL: startup-hooks
-SYMBOL: shutdown-hooks
-
-startup-hooks [ V{ } clone ] initialize
-shutdown-hooks [ V{ } clone ] initialize
+INITIALIZED-SYMBOL: startup-hooks [ V{ } clone ]
+INITIALIZED-SYMBOL: shutdown-hooks [ V{ } clone ]
 
 : do-hooks ( symbol -- )
     get [ nip call( -- ) ] assoc-each ;

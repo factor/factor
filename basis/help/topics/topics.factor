@@ -30,13 +30,9 @@ M: link summary
     ] "" make ;
 
 ! Help articles
-SYMBOL: articles
+INITIALIZED-SYMBOL: articles [ H{ } clone ]
 
-articles [ H{ } clone ] initialize
-
-SYMBOL: article-xref
-
-article-xref [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: article-xref [ H{ } clone ]
 
 GENERIC: valid-article? ( topic -- ? )
 GENERIC: article-title ( topic -- string )

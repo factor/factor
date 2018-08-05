@@ -9,11 +9,9 @@ SINGLETONS: big-endian little-endian ;
 : compute-native-endianness ( -- class )
     1 int <ref> char deref 0 = big-endian little-endian ? ; foldable
 
-SYMBOL: native-endianness
-native-endianness [ compute-native-endianness ] initialize
+INITIALIZED-SYMBOL: native-endianness [ compute-native-endianness ]
 
-SYMBOL: endianness
-endianness [ native-endianness get-global ] initialize
+INITIALIZED-SYMBOL: endianness [ native-endianness get-global ]
 
 HOOK: >native-endian native-endianness ( obj n -- bytes )
 

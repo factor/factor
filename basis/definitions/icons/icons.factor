@@ -12,9 +12,7 @@ GENERIC: definition-icon ( definition -- path )
 
 <<
 
-SYMBOL: icons
-
-icons [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: icons [ H{ } clone ]
 
 : define-icon ( class name -- )
     [ swap icons get set-at ]

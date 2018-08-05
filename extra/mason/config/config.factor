@@ -36,14 +36,10 @@ SYMBOL: boot-flags
 SYMBOL: builder-debug
 
 ! URL for counter notifications.
-SYMBOL: counter-url
-
-counter-url [ "http://builds.factorcode.org/counter" ] initialize
+INITIALIZED-SYMBOL: counter-url [ "http://builds.factorcode.org/counter" ]
 
 ! URL for status notifications.
-SYMBOL: status-url
-
-status-url [ "http://builds.factorcode.org/status-update" ] initialize
+INITIALIZED-SYMBOL: status-url [ "http://builds.factorcode.org/status-update" ]
 
 ! Password for status notifications.
 SYMBOL: status-secret
@@ -62,9 +58,7 @@ SYMBOL: docs-username
 SYMBOL: docs-directory
 
 ! URL to notify server about new docs
-SYMBOL: docs-update-url
-
-docs-update-url [ "http://builds.factorcode.org/docs-update" ] initialize
+INITIALIZED-SYMBOL: docs-update-url [ "http://builds.factorcode.org/docs-update" ]
 
 ! Boolean. Do we upload package binaries?
 SYMBOL: upload-package?
@@ -106,8 +100,6 @@ SYMBOL: upload-timeout
 1 hours upload-timeout set-global
 
 ! Optional: override ssh and scp command names
-SYMBOL: scp-command
-scp-command [ "scp" ] initialize
+INITIALIZED-SYMBOL: scp-command [ "scp" ]
 
-SYMBOL: ssh-command
-ssh-command [ "ssh" ] initialize
+INITIALIZED-SYMBOL: ssh-command [ "ssh" ]

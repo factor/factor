@@ -26,8 +26,7 @@ CONSTANT: default-vocab-roots {
     trim-tail-separators dup vocab-roots get ?adjoin
     [ add-vocab-root-hook get-global call( root -- ) ] [ drop ] if ;
 
-SYMBOL: root-cache
-root-cache [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: root-cache [ H{ } clone ]
 
 ERROR: not-found-in-roots path ;
 
@@ -71,16 +70,13 @@ PRIVATE>
 SYMBOL: load-help?
 
 ! Defined by vocabs.metadata
-SYMBOL: check-vocab-hook
-check-vocab-hook [ [ drop ] ] initialize
+INITIALIZED-SYMBOL: check-vocab-hook [ [ drop ] ]
 
 <PRIVATE
 
-SYMBOL: require-when-vocabs
-require-when-vocabs [ HS{ } clone ] initialize
+INITIALIZED-SYMBOL: require-when-vocabs [ HS{ } clone ]
 
-SYMBOL: require-when-table
-require-when-table [ V{ } clone ] initialize
+INITIALIZED-SYMBOL: require-when-table [ V{ } clone ]
 
 : load-conditional-requires ( vocab -- )
     vocab-name require-when-vocabs get in? [

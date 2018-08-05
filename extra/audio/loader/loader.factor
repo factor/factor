@@ -6,8 +6,7 @@ IN: audio.loader
 
 ERROR: unknown-audio-extension extension ;
 
-SYMBOL: audio-types
-audio-types [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: audio-types [ H{ } clone ]
 
 : register-audio-extension ( extension quot -- )
     swap audio-types get set-at ;

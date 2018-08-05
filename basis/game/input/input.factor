@@ -2,9 +2,9 @@ USING: arrays accessors continuations kernel math system
 sequences namespaces init vocabs combinators ;
 IN: game.input
 
-SYMBOLS: game-input-backend game-input-opened ;
+SYMBOL: game-input-backend
 
-game-input-opened [ 0 ] initialize
+INITIALIZED-SYMBOL: game-input-opened [ 0 ]
 
 HOOK: (open-game-input)  game-input-backend ( -- )
 HOOK: (close-game-input) game-input-backend ( -- )

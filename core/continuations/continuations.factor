@@ -117,14 +117,16 @@ PRIVATE>
 
 GENERIC: error-in-thread ( error thread -- * )
 
-SYMBOL: thread-error-hook ! ( error thread -- * )
+DEFER: rethrow
+
+INITIALIZED-SYMBOL: thread-error-hook [ [ die drop rethrow ] ] ! ( error thread -- * )
 
 M: object error-in-thread
     thread-error-hook get-global call( error thread -- * ) ;
 
 : in-callback? ( -- ? ) CONTEXT-OBJ-IN-CALLBACK-P context-object ;
 
-SYMBOL: callback-error-hook ! ( error -- * )
+INITIALIZED-SYMBOL: callback-error-hook [ [ die rethrow ] ] ! ( error -- * )
 
 : rethrow ( error -- * )
     dup save-error
@@ -134,10 +136,6 @@ SYMBOL: callback-error-hook ! ( error -- * )
         [ OBJ-CURRENT-THREAD special-object error-in-thread ]
         if
     ] [ pop continue-with ] if-empty ;
-
-thread-error-hook [ [ die drop rethrow ] ] initialize
-
-callback-error-hook [ [ die rethrow ] ] initialize
 
 : recover ( ..a try: ( ..a -- ..b ) recovery: ( ..a error -- ..b ) -- ..b )
     [

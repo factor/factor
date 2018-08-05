@@ -8,9 +8,7 @@ IN: gml.runtime
 
 TUPLE: gml-name < identity-tuple { string read-only } ;
 
-SYMBOL: gml-names
-
-gml-names [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: gml-names [ H{ } clone ]
 
 : >gml-name ( string -- name ) gml-names get-global [ \ gml-name boa ] cache ;
 
@@ -172,9 +170,7 @@ MACRO: gml-primitive (
 )
     swap '[ _ inputs @ _ outputs ] ;
 
-SYMBOL: global-dictionary
-
-global-dictionary [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: global-dictionary [ H{ } clone ]
 
 : add-primitive ( word name -- )
     >gml-name global-dictionary get-global set-at ;

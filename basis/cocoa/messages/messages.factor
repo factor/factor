@@ -24,11 +24,8 @@ SPECIALIZED-ARRAY: void*
     over first large-struct? [ "_stret" append ] when
     make-sender dup infer define-declared ;
 
-SYMBOL: message-senders
-SYMBOL: super-message-senders
-
-message-senders [ H{ } clone ] initialize
-super-message-senders [ H{ } clone ] initialize
+INITIALIZED-SYMBOL: message-senders [ H{ } clone ]
+INITIALIZED-SYMBOL: super-message-senders [ H{ } clone ]
 
 :: cache-stub ( signature function assoc -- )
     signature assoc [ function sender-stub ] cache drop ;
