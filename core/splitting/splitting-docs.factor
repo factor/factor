@@ -15,6 +15,8 @@ ARTICLE: "sequences-split" "Splitting sequences"
     split1-last
     split1-last-slice
     split
+    split-indices
+    split-slice
     split-when
     split-when-slice
 }
