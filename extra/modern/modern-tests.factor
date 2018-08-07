@@ -241,3 +241,12 @@ IN: modern.tests
         { "<BAR" { } "BAR>" }
     }
 } [ "foo:: <FOO FOO> [ 0 ] [ 1 ] [ 2 ] [ 3 ] <BAR BAR>" string>literals >strings ] unit-test
+
+
+{ t } [ "![[ ]]" [ rewrite-string-exact ] keep sequence= ] unit-test
+{ t } [ "![=[ ]=]" [ rewrite-string-exact ] keep sequence= ] unit-test
+{ t } [ "![==[ ]==]" [ rewrite-string-exact ] keep sequence= ] unit-test
+
+{ t } [ "foo[[ ]]" [ rewrite-string-exact ] keep sequence= ] unit-test
+{ t } [ "foo[=[ ]=]" [ rewrite-string-exact ] keep sequence= ] unit-test
+{ t } [ "foo[==[ ]==]" [ rewrite-string-exact ] keep sequence= ] unit-test

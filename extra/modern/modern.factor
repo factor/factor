@@ -131,7 +131,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
 
 : take-comment ( n string slice -- n' string comment )
     2over ?nth char: \[ = [
-        [ 1 + ] 2dip 2over ?nth read-double-matched-bracket
+        [ 1 + ] 2dip 1 modify-to 2over ?nth read-double-matched-bracket
     ] [
         [ slice-til-eol drop ] dip swap 2array
     ] if ;
