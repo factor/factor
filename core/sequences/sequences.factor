@@ -1055,6 +1055,18 @@ PRIVATE>
 : trim-tail ( ... seq quot: ( ... elt -- ... ? ) -- ... newseq )
     (trim-tail) head ; inline
 
+: cut-head ( ... seq quot: ( ... elt -- ... ? ) -- ... head tail )
+    (trim-head) cut ; inline
+
+: cut-head-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... head-slice tail-slice )
+    (trim-head) cut-slice ; inline
+
+: cut-tail ( ... seq quot: ( ... elt -- ... ? ) -- ... head tail )
+    (trim-tail) cut ; inline
+
+: cut-tail-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... head-slice tail-slice )
+    (trim-tail) cut-slice ; inline
+
 : trim-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... slice )
     [ trim-head-slice ] [ trim-tail-slice ] bi ; inline
 
