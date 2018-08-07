@@ -24,9 +24,9 @@ CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;
     trim-before-newline io:write ;
 
 GENERIC: write-literal* ( last obj -- last' )
-M: slice write-literal* [ write-whitespace ] [ write ] [ ] tri ;
+M: slice write-literal* write ; ! [ write-whitespace ] [ write ] [ ] tri ;
 M: array write-literal* [ write-literal* ] each ;
-M: renamed write-literal* [ slice>> write-whitespace ] [ string>> write ] [ slice>> ] tri ; ! for refactoring
+! M: renamed write-literal* [ slice>> write-whitespace ] [ string>> write ] [ slice>> ] tri ; ! for refactoring
 M: string write-literal* write ;
 
 DEFER: map-literals

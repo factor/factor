@@ -334,7 +334,7 @@ ERROR: no-backslash-payload n string slice ;
         ! \ foo, M\ foo
         dup [ char: \\ = ] count-tail
         '[
-            _ [ skip-blank-from slice-til-whitespace drop ] replicate
+            _ [ slice-til-not-whitespace drop [ slice-til-whitespace drop ] dip swap 2array ] replicate
             ensure-no-false
             dup [ no-backslash-payload ] unless
         ] dip swap 2array
