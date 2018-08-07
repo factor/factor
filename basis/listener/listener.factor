@@ -1,10 +1,10 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors colors.constants combinators.short-circuit
-compiler.units continuations debugger fry io io.styles kernel lexer
-locals math math.parser namespaces parser parser.notes prettyprint
-sequences sets source-files.errors system vocabs vocabs.loader
-vocabs.parser ;
+USING: accessors colors colors.constants
+combinators.short-circuit compiler.units continuations debugger
+io io.styles kernel lexer math math.parser namespaces parser
+parser.notes prettyprint sequences sets source-files.errors
+strings system vocabs vocabs.loader vocabs.parser ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -118,7 +118,8 @@ t error-summary? set-global
 
 : datastack. ( datastack -- )
     display-stacks? get [
-        [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
+        ! [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
+        [ nl "data-stack" over length char: \: <string> append title. trimmed-stack. ] unless-empty
     ] [ drop ] if ;
 
 :: listener-step ( datastack -- datastack' )
