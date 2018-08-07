@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays byte-arrays kernel layouts math namespaces
-quotations strings words ;
+USING: alien arrays assocs byte-arrays kernel layouts math
+namespaces quotations strings words ;
 
 16 data-alignment set
 
@@ -29,6 +29,6 @@ H{
     { dll 13 }
 } type-numbers set
 
-14 num-types set
+type-numbers get assoc-size num-types set
 
 2 header-bits set
