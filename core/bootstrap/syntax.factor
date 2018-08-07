@@ -1,7 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words words.symbol sequences vocabs kernel
-compiler.units ;
+USING: compiler.units kernel sequences vocabs words ;
 IN: bootstrap.syntax
 
 [
@@ -158,6 +157,4 @@ IN: bootstrap.syntax
         "STARTUP-HOOK:"
         "SHUTDOWN-HOOK:"
     } [ "syntax" create-word drop ] each
-
-    "t" "syntax" lookup-word define-symbol
 ] with-compilation-unit
