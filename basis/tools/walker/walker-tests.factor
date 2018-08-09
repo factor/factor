@@ -116,7 +116,7 @@ IN: tools.walker.tests
 
 : breakpoint-test ( -- x ) break 1 2 + ;
 
-\ breakpoint-test don't-step-into
+\ breakpoint-test do-not-step-into
 
 { f } [ \ breakpoint-test word-optimized? ] unit-test
 
@@ -128,7 +128,7 @@ TUPLE: method-breakpoint-tuple ;
 
 M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
 
-\ method-breakpoint-test don't-step-into
+\ method-breakpoint-test do-not-step-into
 
 { { 3 } }
 [ [ T{ method-breakpoint-tuple } method-breakpoint-test ] test-walker ] unit-test
@@ -136,13 +136,13 @@ M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
 : case-breakpoint-test ( -- x )
     5 { [ break 1 + ] } case ;
 
-\ case-breakpoint-test don't-step-into
+\ case-breakpoint-test do-not-step-into
 
 { { 6 } } [ [ case-breakpoint-test ] test-walker ] unit-test
 
 : call(-breakpoint-test ( -- x )
     [ break 1 ] call( -- x ) 2 + ;
 
-\ call(-breakpoint-test don't-step-into
+\ call(-breakpoint-test do-not-step-into
 
 { { 3 } } [ [ call(-breakpoint-test ] test-walker ] unit-test

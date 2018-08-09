@@ -48,11 +48,11 @@ USING: kernel sequences tools.test gap-buffer strings math ;
 
 ! test changing buffer contents
 { "factory" }
-[ "factor" <gb> char: y 6 pick insert* >string ] unit-test
+[ "factor" <gb> ch'y 6 pick insert* >string ] unit-test
 
 ! test inserting multiple elements in different places. buffer should grow
 { "refractory" }
-[ "factor" <gb> char: y 6 pick insert* "re" 0 pick insert* char: r 3 pick insert* >string ] unit-test
+[ "factor" <gb> ch'y 6 pick insert* "re" 0 pick insert* ch'r 3 pick insert* >string ] unit-test
 
 ! test deleting elements. buffer should shrink
 { "for" }
@@ -60,19 +60,19 @@ USING: kernel sequences tools.test gap-buffer strings math ;
 
 ! more testing of nth and set-nth
 { "raptor" }
-[ "factor" <gb> char: p 2 pick set-nth 5 over nth 0 pick set-nth >string ] unit-test
+[ "factor" <gb> ch'p 2 pick set-nth 5 over nth 0 pick set-nth >string ] unit-test
 
 ! test stack/queue operations
 { "slaughter" }
-[ "laughter" <gb> char: s over push-start >string ] unit-test
+[ "laughter" <gb> ch's over push-start >string ] unit-test
 
 { "pantonio" }
 [ "pant" <gb> "onio" over push-end >string ] unit-test
 
-{ char: f "actor" }
+{ ch'f "actor" }
 [ "factor" <gb> dup pop-start swap >string ] unit-test
 
-{ char: s "pant" }
+{ ch's "pant" }
 [ "pants" <gb> dup pop-end swap >string ] unit-test
 
 { "end this is the " }

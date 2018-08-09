@@ -217,7 +217,7 @@ TUPLE: registry-enum-key ;
         string-type? [
             type DWORD deref REG_MULTI_SZ = [
                 "\0" join 2
-            ] [ 1 ] if [ char: \0 suffix ] times utf16n encode
+            ] [ 1 ] if [ ch'\0 suffix ] times utf16n encode
         ] when
         [ hkey value-name type DWORD deref ] dip dup length
         set-reg-key

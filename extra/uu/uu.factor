@@ -17,7 +17,7 @@ ERROR: bad-length seq ;
     0 :> char!
     0 :> bits!
     seq check-length [
-        dup length char: \s + ,
+        dup length ch'\s + ,
 
         [ dup empty? bits zero? and ] [
 
@@ -30,7 +30,7 @@ ERROR: bad-length seq ;
 
             [ bits 6 >= ] [
                 bits 6 -
-                [ char swap neg shift 0x3f bitand char: \s + , ]
+                [ char swap neg shift 0x3f bitand ch'\s + , ]
                 [ bits! ] bi
             ] while
 
@@ -40,13 +40,13 @@ ERROR: bad-length seq ;
 ERROR: illegal-character ch ;
 
 : check-illegal-character ( ch -- ch )
-    dup char: \s dup 64 + between? [ illegal-character ] unless ;
+    dup ch'\s dup 64 + between? [ illegal-character ] unless ;
 
 :: ascii>binary ( seq -- seq' )
     0 :> char!
     0 :> bits!
 
-    seq unclip-slice char: \s - :> len!
+    seq unclip-slice ch'\s - :> len!
 
     [
         [ dup empty? not len 0 > and ] [
@@ -55,7 +55,7 @@ ERROR: illegal-character ch ;
                 drop 0
             ] [
                 check-illegal-character
-                char: \s -
+                ch'\s -
             ] if
 
             char 6 shift bitor char!

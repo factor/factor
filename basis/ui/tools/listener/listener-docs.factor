@@ -89,7 +89,7 @@ TIP: "When you mouse over certain objects, a black border will appear. Left-clic
 
 TIP: "The status bar displays stack effects of recognized words as they are being typed in." ;
 
-TIP: "Press " { $command interactor "completion" code-completion-popup } " to complete word, vocabulary and Unicode character names. The latter two features become available if the cursor is after a " { $link postpone: \USE: } ", " { $link postpone: \USING: } " or " { $link postpone: \char: } "." ;
+TIP: "Press " { $command interactor "completion" code-completion-popup } " to complete word, vocabulary and Unicode character names. The latter two features become available if the cursor is after a " { $link postpone: \USE: } ", " { $link postpone: \USING: } " or " { $snippet "ch'" } "." ;
 
 TIP: "If a word's vocabulary is loaded, but not in the search path, you can use restarts to add the vocabulary to the search path. Auto-use mode (" { $command listener-gadget "toolbar" com-auto-use } ") invokes restarts automatically if there is only one restart." ;
 

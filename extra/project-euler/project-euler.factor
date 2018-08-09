@@ -36,7 +36,7 @@ IN: project-euler
     print readln string>number ;
 
 : number>euler ( n -- str )
-    number>string 3 char: 0 pad-head ;
+    number>string 3 ch'0 pad-head ;
 
 : solution-path ( n -- str/f )
     number>euler "project-euler." prepend

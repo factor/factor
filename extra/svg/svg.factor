@@ -13,7 +13,7 @@ XML-NS: sodipodi-name http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd
 XML-NS: inkscape-name http://www.inkscape.org/namespaces/inkscape
 
 : svg-string>number ( string -- number )
-    H{ { char: E char: e } } substitute "e" split1
+    H{ { ch'E ch'e } } substitute "e" split1
     [ string>number ] [ [ string>number 10^ ] [ 1 ] if* ] bi* *
     >float ;
 

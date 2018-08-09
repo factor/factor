@@ -305,7 +305,7 @@ TUPLE: exam id name score ;
 
 : random-exam ( -- exam )
         f
-        6 [ char: a char: z [a,b] random ] replicate >string
+        6 [ ch'a ch'z [a,b] random ] replicate >string
         100 random
     exam boa ;
 

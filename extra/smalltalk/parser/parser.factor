@@ -20,7 +20,7 @@ WhitespaceCharacter = [ \t\n\r]
 DecimalDigit = [0-9]
 Letter = [A-Za-z]
 
-CommentCharacter = [^"] | '""' => [[ char: \" ]]
+CommentCharacter = [^"] | '""' => [[ ch'\" ]]
 Comment = '"' (CommentCharacter)*:s '"' => [[ s >string ast-comment boa ]]
 
 OptionalWhiteSpace = (WhitespaceCharacter | Comment)*
@@ -48,7 +48,7 @@ BinarySelectorChar =   "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+"
                      | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"
 BinaryMessageSelector = BinarySelectorChar+ => [[ concat ]]
 
-OptionalMinus = ("-" => [[ char: - ]])?
+OptionalMinus = ("-" => [[ ch'- ]])?
 IntegerLiteral = (OptionalMinus:m UnsignedIntegerLiteral:i) => [[ i m [ neg ] when ]]
 UnsignedIntegerLiteral =   Radix:r "r" BaseNIntegerLiteral:b => [[ b >string r base> ]]
                          | DecimalIntegerLiteral => [[ check-number ]]
@@ -57,13 +57,13 @@ Radix = DecimalIntegerLiteral => [[ check-number ]]
 BaseNIntegerLiteral = LetterOrDigit+
 FloatingPointLiteral = (OptionalMinus
                         DecimalIntegerLiteral
-                        ("." => [[ char: . ]] DecimalIntegerLiteral Exponent? | Exponent))
+                        ("." => [[ ch'. ]] DecimalIntegerLiteral Exponent? | Exponent))
                         => [[ flatten check-number ]]
-Exponent = "e" => [[ char: e ]] (OptionalMinus DecimalIntegerLiteral)?
+Exponent = "e" => [[ ch'e ]] (OptionalMinus DecimalIntegerLiteral)?
 
 CharacterLiteral = "$" Character:c => [[ c ]]
 
-StringLiteral = "'" (StringLiteralCharacter | "''" => [[ char: ' ]])*:s "'"
+StringLiteral = "'" (StringLiteralCharacter | "''" => [[ ch'\' ]])*:s "'"
                 => [[ s >string ]]
 StringLiteralCharacter = [^']
 

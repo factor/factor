@@ -169,14 +169,14 @@ M: interactor stream-read1
     dup interactor-read {
         { [ dup not ] [ 2drop f ] }
         { [ dup empty? ] [ drop stream-read1 ] }
-        { [ dup first empty? ] [ 2drop char: \n ] }
+        { [ dup first empty? ] [ 2drop ch'\n ] }
         [ nip first first ]
     } cond ;
 
 M: interactor stream-read-until ( seps stream -- seq sep/f )
     swap '[
         _ interactor-read [
-            "\n" join char: \n suffix
+            "\n" join ch'\n suffix
             [ _ member? ] dupd find
             [ [ head ] when* ] dip dup not
         ] [ f f f ] if*

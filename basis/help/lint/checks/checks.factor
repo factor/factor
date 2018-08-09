@@ -101,7 +101,7 @@ M: array example>strings dup length 1 = [ first example>strings ] when ;
         $error-description
     } swap '[ _ elements empty? not ] any? ;
 
-: don't-check-word? ( word -- ? )
+: do-not-check-word? ( word -- ? )
     {
         [ macro? ]
         [ symbol? ]
@@ -112,7 +112,7 @@ M: array example>strings dup length 1 = [ first example>strings ] when ;
     } 1|| ;
 
 : skip-check-values? ( word element -- ? )
-    [ don't-check-word? ] [ contains-funky-elements? ] bi* or ;
+    [ do-not-check-word? ] [ contains-funky-elements? ] bi* or ;
 
 : check-values ( word element -- )
     2dup skip-check-values? [ 2drop ] [

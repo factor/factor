@@ -57,7 +57,7 @@ CONSTANT: ABBREVIATIONS {
     $[
         ABBREVIATIONS "|" join "(" ")\\.\x01" surround
         "i" <optioned-regexp>
-    ] [ char: . over index head ] re-replace-with
+    ] [ ch'. over index head ] re-replace-with
 
     ! Split on EOS marker
     "\x01" split trimmed ;
@@ -94,7 +94,7 @@ CONSTANT: add-syllable {
 
 : syllables ( str -- n )
     dup length 1 = [ drop 1 ] [
-        >lower char: . swap remove
+        >lower ch'. swap remove
         [ R/ [aeiouy]+/ count-matches ]
         [ sub-syllable [ matches? ] with count - ]
         [ add-syllable [ matches? ] with count + ] tri

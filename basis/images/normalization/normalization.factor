@@ -11,12 +11,12 @@ IN: images.normalization
 
 <PRIVATE
 
-CONSTANT: don't-care 127
+CONSTANT: do-not-care 127
 CONSTANT: fill-value 255
 
 : permutation ( src dst -- seq )
-    swap '[ _ index [ don't-care ] unless* ] { } map-as
-    4 don't-care pad-tail ;
+    swap '[ _ index [ do-not-care ] unless* ] { } map-as
+    4 do-not-care pad-tail ;
 
 : pad4 ( seq -- newseq ) 4 fill-value pad-tail ;
 

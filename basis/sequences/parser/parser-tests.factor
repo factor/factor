@@ -12,7 +12,7 @@ USING: tools.test sequences.parser unicode kernel accessors ;
 { "foo" ";bar" }
 [
     "foo;bar" [
-        [ char: \; take-until-object ] [ take-rest ] bi
+        [ ch'\; take-until-object ] [ take-rest ] bi
     ] parse-sequence
 ] unit-test
 

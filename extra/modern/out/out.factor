@@ -14,8 +14,8 @@ TUPLE: renamed slice string ;
 CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;
 
 : trim-before-newline ( seq -- seq' )
-    dup [ char: \s = not ] find
-    { char: \r char: \n } member?
+    dup [ ch'\s = not ] find
+    { ch'\r ch'\n } member?
     [ tail-slice ] [ drop ] if ;
 
 : write-whitespace ( last obj -- )

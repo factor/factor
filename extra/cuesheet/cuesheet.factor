@@ -55,10 +55,10 @@ ERROR: unknown-syntax syntax ;
 <PRIVATE
 
 : trim-comments ( str -- str' )
-    dup [ char: \; = ] find drop [ head ] when* ;
+    dup [ ch'\; = ] find drop [ head ] when* ;
 
 : trim-quotes ( str -- str' )
-    [ char: \" = ] trim ;
+    [ ch'\" = ] trim ;
 
 : last-track ( cuesheet -- cuesheet track )
     dup files>> last tracks>> last ;

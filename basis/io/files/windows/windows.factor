@@ -320,7 +320,7 @@ M: windows root-directory? ( path -- ? )
         { [ dup empty? ] [ drop f ] }
         { [ dup [ path-separator? ] all? ] [ drop t ] }
         { [ dup trim-tail-separators { [ length 2 = ]
-          [ second char: \: = ] } 1&& ] [ drop t ] }
+          [ second ch'\: = ] } 1&& ] [ drop t ] }
         { [ dup unicode-prefix head? ]
           [ trim-tail-separators length unicode-prefix length 2 + = ] }
         [ drop f ]

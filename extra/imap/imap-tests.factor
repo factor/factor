@@ -7,7 +7,7 @@ FROM: pcre => findall ;
 IN: imap.tests
 
 : random-ascii ( n -- str )
-    [ char: a char: z [a,b] random ] "" replicate-as ;
+    [ ch'a ch'z [a,b] random ] "" replicate-as ;
 
 : make-mail ( from -- mail )
     now timestamp>rfc822 swap 10000 random

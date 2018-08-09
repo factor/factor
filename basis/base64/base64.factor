@@ -23,13 +23,13 @@ CONSTANT: alphabet
     alphabet nth ; inline
 
 : base64>ch ( ch -- ch )
-    $[ alphabet alphabet-inverse 0 char: = pick set-nth ] nth
+    $[ alphabet alphabet-inverse 0 ch'= pick set-nth ] nth
     [ malformed-base64 ] unless* ; inline
 
 : (write-lines) ( column byte-array -- column' )
     output-stream get dup '[
         _ stream-write1 1 + dup 76 = [
-            drop B{ char: \r char: \n } _ stream-write 0
+            drop B{ ch'\r ch'\n } _ stream-write 0
         ] when
     ] each ; inline
 
@@ -43,7 +43,7 @@ CONSTANT: alphabet
 
 : encode-pad ( seq n -- byte-array )
     [ 3 0 pad-tail encode3 ] [ 1 + ] bi* head-slice
-    4 char: = pad-tail ; inline
+    4 ch'= pad-tail ; inline
 
 : (encode-base64) ( stream column -- )
     3 pick stream-read dup length {
@@ -77,14 +77,14 @@ PRIVATE>
 
 : decode4 ( seq -- )
     [ 0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ]
-    [ [ char: = = ] count ] bi
+    [ [ ch'= = ] count ] bi
     [ write ] [ head-slice* write ] if-zero ; inline
 
 : (decode-base64) ( stream -- )
     4 "\n\r" pick read-ignoring dup length {
         { 0 [ 2drop ] }
         { 4 [ decode4 (decode-base64) ] }
-        [ drop 4 char: = pad-tail decode4 (decode-base64) ]
+        [ drop 4 ch'= pad-tail decode4 (decode-base64) ]
     } case ;
 
 PRIVATE>

@@ -15,19 +15,19 @@ IN: help.html
 : escape-char ( ch -- )
     dup ascii? [
         dup H{
-            { char: \" "__quo__" }
-            { char: * "__star__" }
-            { char: \: "__colon__" }
-            { char: < "__lt__" }
-            { char: > "__gt__" }
-            { char: ? "__que__" }
-            { char: \\ "__back__" }
-            { char: | "__pipe__" }
-            { char: / "__slash__" }
-            { char: , "__comma__" }
-            { char: @ "__at__" }
-            { char: # "__hash__" }
-            { char: % "__percent__" }
+            { ch'\" "__quo__" }
+            { ch'* "__star__" }
+            { ch'\: "__colon__" }
+            { ch'< "__lt__" }
+            { ch'> "__gt__" }
+            { ch'? "__que__" }
+            { ch'\\ "__back__" }
+            { ch'| "__pipe__" }
+            { ch'/ "__slash__" }
+            { ch', "__comma__" }
+            { ch'@ "__at__" }
+            { ch'# "__hash__" }
+            { ch'% "__percent__" }
         } at [ % ] [ , ] ?if
     ] [ number>string "__" "__" surround % ] if ;
 
@@ -87,7 +87,7 @@ M: pathname url-of
      ]] ;
 
 : bijective-base26 ( n -- name )
-    [ dup 0 > ] [ 1 - 26 /mod char: a + ] "" produce-as nip reverse! ;
+    [ dup 0 > ] [ 1 - 26 /mod ch'a + ] "" produce-as nip reverse! ;
 
 : css-class ( style classes -- name )
     dup '[ drop _ assoc-size 1 + bijective-base26 ] cache ;

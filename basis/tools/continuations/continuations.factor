@@ -123,7 +123,7 @@ PRIVATE>
 } [ "step-into" set-word-prop ] assoc-each
 
 ! Never step into these words
-: don't-step-into ( word -- )
+: do-not-step-into ( word -- )
     dup '[ _ execute break ] "step-into" set-word-prop ;
 
 {
@@ -131,7 +131,7 @@ PRIVATE>
     continue continue-with
     stop suspend (spawn)
     set-context start-context
-} [ don't-step-into ] each
+} [ do-not-step-into ] each
 
 \ break [ break ] "step-into" set-word-prop
 

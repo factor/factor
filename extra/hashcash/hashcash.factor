@@ -25,7 +25,7 @@ IN: hashcash
 ! Random salt is formed by ascii characters
 ! between 33 and 126
 : available-chars ( -- seq )
-    33 126 [a,b] [ char: \: = ] reject ;
+    33 126 [a,b] [ ch'\: = ] reject ;
 
 PRIVATE>
 
@@ -54,14 +54,14 @@ M: hashcash string>>
     >hex >>suffix ;
 
 : get-bits ( bytes -- str )
-    [ >bin 8 char: 0 pad-head ] { } map-as concat ;
+    [ >bin 8 ch'0 pad-head ] { } map-as concat ;
 
 : checksummed-bits ( tuple -- relevant-bits )
     dup string>> sha1-checksum
     swap bits>> 8 / ceiling head get-bits ;
 
 : all-char-zero? ( seq -- ? )
-    [ char: 0 = ] all? ; inline
+    [ ch'0 = ] all? ; inline
 
 : valid-guess? ( checksum tuple -- ? )
     bits>> head all-char-zero? ;

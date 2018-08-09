@@ -26,9 +26,9 @@ IN: regexp.minimize.tests
 {
     T{ transition-table
         { transitions H{
-            { 0 H{ { char: a 1 } { char: b 1 } } }
-            { 1 H{ { char: a 2 } { char: b 2 } } }
-            { 2 H{ { char: c 3 } } }
+            { 0 H{ { ch'a 1 } { ch'b 1 } } }
+            { 1 H{ { ch'a 2 } { ch'b 2 } } }
+            { 2 H{ { ch'c 3 } } }
             { 3 H{ } }
         } }
         { start-state 0 }
@@ -37,12 +37,12 @@ IN: regexp.minimize.tests
 } [
     T{ transition-table
         { transitions H{
-            { 0 H{ { char: a 1 } { char: b 4 } } }
-            { 1 H{ { char: a 2 } { char: b 5 } } }
-            { 2 H{ { char: c 3 } } }
+            { 0 H{ { ch'a 1 } { ch'b 4 } } }
+            { 1 H{ { ch'a 2 } { ch'b 5 } } }
+            { 2 H{ { ch'c 3 } } }
             { 3 H{ } }
-            { 4 H{ { char: a 2 } { char: b 5 } } }
-            { 5 H{ { char: c 6 } } }
+            { 4 H{ { ch'a 2 } { ch'b 5 } } }
+            { 5 H{ { ch'c 6 } } }
             { 6 H{ } }
         } }
         { start-state 0 }

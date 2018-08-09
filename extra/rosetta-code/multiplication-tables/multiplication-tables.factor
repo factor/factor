@@ -11,16 +11,16 @@ IN: rosetta-code.multiplication-tables
 ! Only print the top half triangle of products.
 
 : print-row ( n -- )
-    [ number>string 2 char: space pad-head write " |" write ]
+    [ number>string 2 ch'space pad-head write " |" write ]
     [ 1 - [ "    " write ] times ]
     [
         dup 12 [a,b]
-        [ * number>string 4 char: space pad-head write ] with each
+        [ * number>string 4 ch'space pad-head write ] with each
     ] tri nl ;
 
 : print-table ( -- )
     "    " write
-    1 12 [a,b] [ number>string 4 char: space pad-head write ] each nl
+    1 12 [a,b] [ number>string 4 ch'space pad-head write ] each nl
     "   +" write
     12 [ "----" write ] times nl
     1 12 [a,b] [ print-row ] each ;

@@ -28,7 +28,7 @@ PRIVATE>
 <PRIVATE
 
 : make-indent ( indent -- indent' )
-    dup string? [ char: \s <string> ] unless ; inline
+    dup string? [ ch'\s <string> ] unless ; inline
 
 PRIVATE>
 

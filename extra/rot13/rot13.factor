@@ -7,8 +7,8 @@ IN: rot13
 
 : rot-letter ( ch -- ch )
     {
-        { [ dup letter? ] [ char: a rotate ] }
-        { [ dup LETTER? ] [ char: A rotate ] }
+        { [ dup letter? ] [ ch'a rotate ] }
+        { [ dup LETTER? ] [ ch'A rotate ] }
         [ ]
     } cond ;
 

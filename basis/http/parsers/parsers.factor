@@ -97,7 +97,7 @@ PEG: parse-response-line ( string -- triple )
     [ " \t" member? ] satisfy repeat1 ;
 
 : qdtext-parser ( -- parser )
-    { [ char: \" = ] [ control? ] } except-these ;
+    { [ ch'\" = ] [ control? ] } except-these ;
 
 : quoted-char-parser ( -- parser )
     "\\" token hide any-char 2seq ;

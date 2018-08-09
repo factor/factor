@@ -47,4 +47,4 @@ IN: io.encodings.euc.tests
 
 { t } [ phrase-euc-kr 3 head* euc-kr decode phrase-unicode 2 head* = ] unit-test
 
-{ t } [ phrase-euc-kr 2 head* euc-kr decode phrase-unicode 2 head* char: replacement-character suffix = ] unit-test
+{ t } [ phrase-euc-kr 2 head* euc-kr decode phrase-unicode 2 head* ch'replacement-character suffix = ] unit-test

@@ -23,15 +23,15 @@ UNION: dtd-acceptable
 : take-entity-def ( var -- entity-name entity-def )
     [
         take-word pass-blank get-char {
-            { char: ' [ parse-quote ] }
-            { char: \" [ parse-quote ] }
+            { ch'\' [ parse-quote ] }
+            { ch'\" [ parse-quote ] }
             [ drop take-external-id close ]
         } case
    ] dip '[ swap _ [ ?set-at ] change ] 2keep ;
 
 : take-entity-decl ( -- entity-decl )
     pass-blank get-char {
-        { char: % [ next pass-blank pe-table take-entity-def t ] }
+        { ch'% [ next pass-blank pe-table take-entity-def t ] }
         [ drop extra-entities take-entity-def f ]
     } case close <entity-decl> ;
 

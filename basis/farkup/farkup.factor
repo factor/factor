@@ -63,11 +63,11 @@ DEFER: (parse-paragraph)
 
 : delimiter-class ( delimiter -- class )
     H{
-        { char: * strong }
-        { char: _ emphasis }
-        { char: ^ superscript }
-        { char: ~ subscript }
-        { char: % inline-code }
+        { ch'* strong }
+        { ch'_ emphasis }
+        { ch'^ superscript }
+        { ch'~ subscript }
+        { ch'% inline-code }
     } at ;
 
 : or-simple-title ( ... url title/f quot: ( ... title -- ... title' ) -- ... url title' )
@@ -82,9 +82,9 @@ DEFER: (parse-paragraph)
     ] dip [ (parse-paragraph) cons ] [ 1list ] if* ;
 
 : parse-big-link ( before after -- link rest )
-    dup ?first char: \[ =
+    dup ?first ch'\[ =
     [ parse-link ]
-    [ [ char: \[ suffix ] [ (parse-paragraph) ] bi* ]
+    [ [ ch'\[ suffix ] [ (parse-paragraph) ] bi* ]
     if ;
 
 : escape ( before after -- before' after' )
@@ -94,8 +94,8 @@ DEFER: (parse-paragraph)
     [ nil ] [
         [ "*_^~%[\\" member? ] find-cut [
             {
-                { char: \[ [ parse-big-link ] }
-                { char: \\ [ escape ] }
+                { ch'\[ [ parse-big-link ] }
+                { ch'\\ [ escape ] }
                 [ dup delimiter-class parse-delimiter ]
             } case cons
         ] [ drop "" like 1list ] if*
@@ -124,10 +124,10 @@ DEFER: (parse-paragraph)
     V{ } clone (take-until) ;
 
 : count= ( string -- n )
-    dup <reversed> [ [ char: = = not ] find drop 0 or ] bi@ min ;
+    dup <reversed> [ [ ch'= = not ] find drop 0 or ] bi@ min ;
 
 : trim= ( string -- string' )
-    [ char: = = ] trim ;
+    [ ch'= = ] trim ;
 
 : make-heading ( string class -- heading )
     [ trim= parse-paragraph ] dip boa ; inline
@@ -149,14 +149,14 @@ DEFER: (parse-paragraph)
 : coalesce ( rows -- rows' )
     V{ } clone [
         '[
-            _ dup ?last ?last char: \\ =
+            _ dup ?last ?last ch'\\ =
             [ [ pop "|" rot 3append ] keep ] when
             push
         ] each
     ] keep ;
 
 : parse-table ( state -- state' table )
-    char: | take-lines [
+    ch'| take-lines [
         "|" split
         trim-row
         coalesce
@@ -175,13 +175,13 @@ DEFER: (parse-paragraph)
     ] dip boa ; inline
 
 : parse-ul ( state -- state' ul )
-    char: - unordered-list parse-list ;
+    ch'- unordered-list parse-list ;
 
 : parse-ol ( state -- state' ul )
-    char: # ordered-list parse-list ;
+    ch'# ordered-list parse-list ;
 
 : parse-code ( state -- state' item )
-    dup 1 look char: \[ =
+    dup 1 look ch'\[ =
     [ unclip-slice make-paragraph ] [
         dup "{" take-until [
             [ nip rest ] dip
@@ -192,12 +192,12 @@ DEFER: (parse-paragraph)
 
 : parse-item ( state -- state' item )
     dup 0 look {
-        { char: = [ parse-heading ] }
-        { char: | [ parse-table ] }
-        { char: _ [ parse-line ] }
-        { char: - [ parse-ul ] }
-        { char: # [ parse-ol ] }
-        { char: \[ [ parse-code ] }
+        { ch'= [ parse-heading ] }
+        { ch'| [ parse-table ] }
+        { ch'_ [ parse-line ] }
+        { ch'- [ parse-ul ] }
+        { ch'# [ parse-ol ] }
+        { ch'\[ [ parse-code ] }
         { f [ rest-slice f ] }
         [ drop unclip-slice make-paragraph ]
     } case ;
@@ -212,7 +212,7 @@ CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
         { [ dup empty? ] [ drop invalid-url ] }
         { [ dup [ 127 > ] any? ] [ drop invalid-url ] }
         { [ dup first "/\\" member? ] [ drop invalid-url ] }
-        { [ char: \: over member? ] [ dup absolute-url? [ drop invalid-url ] unless ] }
+        { [ ch'\: over member? ] [ dup absolute-url? [ drop invalid-url ] unless ] }
         [ relative-link-prefix get prepend "" like url-encode ]
     } cond ;
 

@@ -8,7 +8,7 @@ IN: db.tester
 
 : postgresql-test-db-name ( -- string )
     cpu name>> "-" "factor-test" 3append
-    H{ { char: - char: _ } { char: . char: _ } } substitute ;
+    H{ { ch'- ch'_ } { ch'. ch'_ } } substitute ;
 
 : postgresql-test-db ( -- postgresql-db )
     \ postgresql-db get-global clone postgresql-test-db-name >>database ;

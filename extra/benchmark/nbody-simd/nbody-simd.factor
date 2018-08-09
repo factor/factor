@@ -85,11 +85,11 @@ SPECIALIZED-ARRAY: body
 : inertia ( body -- e )
     [ mass>> ] [ velocity>> norm-sq ] bi * 0.5 * ; inline
 
-: newton's-law ( other-body body -- e )
+: newtons-law ( other-body body -- e )
     [ [ mass>> ] bi@ * ] [ [ location>> ] bi@ distance ] 2bi / ; inline
 
 : energy ( system -- x )
-    [ 0.0 ] dip [ newton's-law - ] [ inertia + ] each-pair ; inline
+    [ 0.0 ] dip [ newtons-law - ] [ inertia + ] each-pair ; inline
 
 : nbody ( n -- )
     >fixnum

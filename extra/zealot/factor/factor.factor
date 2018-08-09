@@ -170,7 +170,7 @@ M: windows factor-path "./factor.com" ;
     } 2cleave ;
 
 : factor-clean-branch ( -- str )
-    os cpu [ name>> ] bi@ { { char: . char: - } } substitute
+    os cpu [ name>> ] bi@ { { ch'. ch'- } } substitute
     "-" glue "origin/clean-" prepend ;
 
 : vocab-path>vocab ( path -- vocab )
@@ -201,7 +201,7 @@ M: windows factor-path "./factor.com" ;
     "master" = not ;
 
 : reject-unloadable-vocabs ( vocabs -- vocabs' )
-    [ don't-load? ] reject ;
+    [ do-not-load? ] reject ;
 
 ! Test changes from a CI_BRANCH against origin/master
 ! Test master against last clean build, e.g. origin/clean-linux-x86-64

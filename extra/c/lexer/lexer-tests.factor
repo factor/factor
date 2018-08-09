@@ -51,32 +51,32 @@ IN: c.lexer.tests
 { f }
 [
     "\"abc\" asdf" <sequence-parser>
-    [ char: \\ char: \" take-quoted-string drop ] [ "asdf" take-sequence ] bi
+    [ ch'\\ ch'\" take-quoted-string drop ] [ "asdf" take-sequence ] bi
 ] unit-test
 
 { "abc\\\"def" }
 [
     "\"abc\\\"def\" asdf" <sequence-parser>
-    char: \\ char: \" take-quoted-string
+    ch'\\ ch'\" take-quoted-string
 ] unit-test
 
 { "asdf" }
 [
     "\"abc\" asdf" <sequence-parser>
-    [ char: \\ char: \" take-quoted-string drop ]
+    [ ch'\\ ch'\" take-quoted-string drop ]
     [ skip-whitespace "asdf" take-sequence ] bi
 ] unit-test
 
 { f }
 [
     "\"abc asdf" <sequence-parser>
-    char: \\ char: \" take-quoted-string
+    ch'\\ ch'\" take-quoted-string
 ] unit-test
 
 { "\"abc" }
 [
     "\"abc asdf" <sequence-parser>
-    [ char: \\ char: \" take-quoted-string drop ]
+    [ ch'\\ ch'\" take-quoted-string drop ]
     [ "\"abc" take-sequence ] bi
 ] unit-test
 
@@ -87,7 +87,7 @@ IN: c.lexer.tests
 [ "" <sequence-parser> take-token ] unit-test
 
 { "abcd e \\\"f g" }
-[ "\"abcd e \\\"f g\"" <sequence-parser> char: \\ char: \" take-token* ] unit-test
+[ "\"abcd e \\\"f g\"" <sequence-parser> ch'\\ ch'\" take-token* ] unit-test
 
 { "123" }
 [ "123jjj" <sequence-parser> take-c-integer ] unit-test

@@ -613,7 +613,7 @@ HELP: member?
     "Is a letter in a string:"
     { $example
         "USING: sequences prettyprint ;"
-        "char: a \"abc\" member? ."
+        "ch'a \"abc\" member? ."
         "t"
     } $nl
     "Is a number in a sequence:"
@@ -799,12 +799,12 @@ HELP: padding
 HELP: pad-head
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
-{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 char: - pad-head print ] each" "---ab\n-quux" } } ;
+{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 ch'- pad-head print ] each" "---ab\n-quux" } } ;
 
 HELP: pad-tail
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the right with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
-{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 char: - pad-tail print ] each" "ab---\nquux-" } } ;
+{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 ch'- pad-tail print ] each" "ab---\nquux-" } } ;
 
 HELP: sequence=
 { $values { "seq1" sequence } { "seq2" sequence } { "?" boolean } }

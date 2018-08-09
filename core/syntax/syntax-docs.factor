@@ -594,16 +594,16 @@ HELP: \IN:
 { $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist. After the vocabulary has been created, it can be listed in " { $link postpone: \USE: } " and " { $link postpone: \USING: } " declarations." } ;
 
 HELP: \char:
-{ $syntax "char: token" }
+{ $syntax "ch'token" }
 { $values { "token" "a literal character, escape code, or Unicode code point name" } }
 { $description "Adds a Unicode code point to the parse tree." }
 { $examples
     { $code
-        "char: x"
-        "char: \\u000032"
-        "char: \\u{exclamation-mark}"
-        "char: exclamation-mark"
-        "char: ugaritic-letter-samka"
+        "ch'x"
+        "ch'\\u000032"
+        "ch'\\u{exclamation-mark}"
+        "ch'exclamation-mark"
+        "ch'ugaritic-letter-samka"
     }
 } ;
 

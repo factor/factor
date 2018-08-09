@@ -108,14 +108,14 @@ GENERIC#: lambda-generic-1 1 ( a b -- c )
 M:: integer lambda-generic-1 ( a b -- c ) a b * ;
 
 M:: string lambda-generic-1 ( a b -- c )
-    a b char: x <string> lambda-generic ;
+    a b ch'x <string> lambda-generic ;
 
 M:: integer lambda-generic ( a b -- c ) a b lambda-generic-1 ;
 
 GENERIC#: lambda-generic-2 1 ( a b -- c )
 
 M:: integer lambda-generic-2 ( a b -- c )
-    a char: x <string> b lambda-generic ;
+    a ch'x <string> b lambda-generic ;
 
 M:: string lambda-generic-2 ( a b -- c ) a b append ;
 

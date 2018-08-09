@@ -13,8 +13,8 @@ C: <decimal> decimal
 
 : string>mantissa-exponent ( string -- mantissa exponent )
     "." split1
-    [ [ char: 0 = ] trim-head [ "0" ] when-empty ]
-    [ [ char: 0 = ] trim-tail [ "" ] when-empty ] bi*
+    [ [ ch'0 = ] trim-head [ "0" ] when-empty ]
+    [ [ ch'0 = ] trim-tail [ "" ] when-empty ] bi*
     [ append string>number ] [ nip length neg ] 2bi ; inline
 
 : string>decimal ( string -- decimal )

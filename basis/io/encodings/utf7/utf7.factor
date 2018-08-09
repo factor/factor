@@ -13,20 +13,20 @@ TUPLE: utf7codec dialect buffer ;
 : utf7 ( -- utf7codec )
     {
         { { } { } }
-        { { char: + } { char: - } }
+        { { ch'+ } { ch'- } }
     } V{ } utf7codec boa ;
 
 : utf7imap4 ( -- utf7codec )
     {
-        { { char: / } { char: , } }
-        { { char: & } { char: - } }
+        { { ch'/ } { ch', } }
+        { { ch'& } { ch'- } }
     } V{ } utf7codec boa ;
 
 : >raw-base64 ( bytes -- bytes' )
-    >string utf16be encode >base64 [ char: = = ] trim-tail ;
+    >string utf16be encode >base64 [ ch'= = ] trim-tail ;
 
 : raw-base64> ( str -- str' )
-    dup length 4 / ceiling 4 * char: = pad-tail base64> utf16be decode ;
+    dup length 4 / ceiling 4 * ch'= pad-tail base64> utf16be decode ;
 
 : encode-chunk ( repl-pair surround-pair chunk ascii? -- bytes )
     [ swap [ first ] [ concat ] bi replace nip ]

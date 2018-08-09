@@ -333,7 +333,7 @@ M: x86.32 has-small-reg?
 
 M: x86.64 has-small-reg? 2drop t ;
 
-: small-reg-that-isn't ( exclude -- reg' )
+: small-reg-that-is-not ( exclude -- reg' )
     [ have-byte-regs ] dip
     [ native-version-of ] map
     '[ _ member-eq? not ] find nip ;
@@ -347,7 +347,7 @@ M: x86.64 has-small-reg? 2drop t ;
     ! small register that is not in exclude, and call quot, saving and
     ! restoring the small register.
     dst size has-small-reg? [ dst quot call ] [
-        exclude small-reg-that-isn't
+        exclude small-reg-that-is-not
         [ quot call ] with-save/restore
     ] if ; inline
 

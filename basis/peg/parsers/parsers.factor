@@ -74,9 +74,9 @@ PRIVATE>
 
 : string-parser ( -- parser )
     [
-        [ char: \" = ] satisfy hide ,
-        [ char: \" = not ] satisfy repeat0 ,
-        [ char: \" = ] satisfy hide ,
+        [ ch'\" = ] satisfy hide ,
+        [ ch'\" = not ] satisfy repeat0 ,
+        [ ch'\" = ] satisfy hide ,
     ] seq* [ first >string ] action ;
 
 : (range-pattern) ( pattern -- string )
@@ -84,7 +84,7 @@ PRIVATE>
     ! all characters within that range.
     [
         any-char ,
-        [ char: - = ] satisfy hide ,
+        [ ch'- = ] satisfy hide ,
         any-char ,
     ] seq* [
         first2 [a,b] >string
@@ -100,7 +100,7 @@ PRIVATE>
     ! characters separated with a dash (-) represents the
     ! range of characters from the first to the second,
     ! inclusive.
-    dup first char: ^ = [
+    dup first ch'^ = [
         rest (range-pattern) [ member? not ] curry satisfy
     ] [
         (range-pattern) [ member? ] curry satisfy

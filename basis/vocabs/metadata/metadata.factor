@@ -76,13 +76,13 @@ ERROR: bad-platform name ;
 : supported-platform? ( platforms -- ? )
     [ t ] [ [ os swap class<= ] any? ] if-empty ;
 
-: don't-load? ( vocab -- ? )
+: do-not-load? ( vocab -- ? )
     {
         [ vocab-tags "not loaded" swap member? ]
         [ vocab-platforms supported-platform? not ]
     } 1|| ;
 
-: don't-test? ( vocab -- ? )
+: do-not-test? ( vocab -- ? )
     vocab-tags "not tested" swap member? ;
 
 TUPLE: unsupported-platform vocab requires ;

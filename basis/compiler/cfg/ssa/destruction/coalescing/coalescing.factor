@@ -23,12 +23,12 @@ SYMBOL: class-element-map
 : vregs-interfere? ( vreg1 vreg2 -- merged/f ? )
     class-element-map get '[ _ at ] bi@ sets-interfere? ;
 
-ERROR: vregs-shouldn't-interfere vreg1 vreg2 ;
+ERROR: vregs-should-not-interfere vreg1 vreg2 ;
 
 : try-eliminate-copy ( follower leader must? -- )
     -rot leaders 2dup = [ 3drop ] [
         2dup vregs-interfere? [
-            drop rot [ vregs-shouldn't-interfere ] [ 2drop ] if
+            drop rot [ vregs-should-not-interfere ] [ 2drop ] if
         ] [ -rot coalesce-vregs drop ] if
     ] if ;
 

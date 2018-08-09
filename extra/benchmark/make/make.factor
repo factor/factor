@@ -6,7 +6,7 @@ USING: kernel make math sequences ;
 IN: benchmark.make
 
 : make-strings ( n -- seq )
-    [ [ char: a , ] times ] "" make ;
+    [ [ ch'a , ] times ] "" make ;
 
 : make-arrays ( n -- seq )
     [ <iota> % ] { } make ;

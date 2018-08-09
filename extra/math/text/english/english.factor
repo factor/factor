@@ -104,7 +104,7 @@ M: float number>text
         [ string>number number>text ]
         [ [ "negative " prepend ] when ] bi*
     ] [
-        [ char: 0 - small-numbers ] { } map-as " " join
+        [ ch'0 - small-numbers ] { } map-as " " join
     ] bi* " point " glue ;
 
 M: complex number>text

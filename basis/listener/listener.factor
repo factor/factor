@@ -119,7 +119,7 @@ t error-summary? set-global
 : datastack. ( datastack -- )
     display-stacks? get [
         ! [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
-        [ nl "data-stack" over length char: \: <string> append title. trimmed-stack. ] unless-empty
+        [ nl "data-stack" over length ch'\: <string> append title. trimmed-stack. ] unless-empty
     ] [ drop ] if ;
 
 :: listener-step ( datastack -- datastack' )

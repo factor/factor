@@ -65,8 +65,8 @@ SYMBOL: ns-stack
     } 2&& [ f <name> ] [ 2drop f ] if ;
 
 : prefixed-name ( str -- name/f )
-    char: \: over index [
-        char: \: 2over 1 + swap index-from
+    ch'\: over index [
+        ch'\: 2over 1 + swap index-from
         [ 2drop f ]
         [ [ head ] [ 1 + tail ] 2bi maybe-name ]
         if

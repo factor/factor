@@ -33,12 +33,12 @@ IN: compiler.tree.propagation.known-words
 : fits-in-fixnum? ( interval -- ? )
     fixnum-interval interval-subset? ;
 
-: won't-overflow? ( class interval -- ? )
+: will-not-overflow? ( class interval -- ? )
     [ fixnum class<= ] [ fits-in-fixnum? ] bi* and ;
 
 : may-overflow ( class interval -- class' interval' )
     over null-class? [
-        2dup won't-overflow?
+        2dup will-not-overflow?
         [ [ integer math-class-max ] dip ] unless
     ] unless ;
 

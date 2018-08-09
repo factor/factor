@@ -44,8 +44,8 @@ LOG: what NOTICE
 
 TUPLE: oh\no { and/again initial: "meh" } ;
 
-! As are quotes
-: don't-do-that ( x -- y ) ;
+! Don't use single-quotes like this.
+! : don't-do-that ( x -- y ) ;
 
 ! Double quotes aren't right yet.
 ! : do-"that" ( x -- y ) ;
@@ -55,9 +55,9 @@ C-TYPE: cairo_snurface_t
 
 ! ! CHAR
 : stuff-with-chars ( -- K \n )
-    char: K
-    char: \n
-    char: \"        ! <- \" should be highlighted
+    ch'K
+    ch'\n
+    ch'\"        ! <- \" should be highlighted
     drop ;
 
 ! ! MAIN
@@ -96,7 +96,7 @@ FUNCTION: int futimes ( int id,
 FUNCTION: int booyah ( int x )
 FUNCTION-ALIAS: test int bah ( int* ah, int[] eh )
 
-hexcolor: ffffff color: green nan: 1234 char: m alien: 93
+hexcolor: ffffff color: green nan: 1234 ch'm alien: 93
 2drop 2drop drop
 
 PRIMITIVE: one ( a -- b )

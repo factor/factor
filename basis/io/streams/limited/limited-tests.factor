@@ -11,7 +11,7 @@ namespaces strings tools.test ;
 
 { } [ "data" get 24 <limited-stream> "limited" set ] unit-test
 
-{ char: h } [ "limited" get stream-read1 ] unit-test
+{ ch'h } [ "limited" get stream-read1 ] unit-test
 
 { } [ "limited" get ascii <decoder> "decoded" set ] unit-test
 
@@ -30,13 +30,13 @@ namespaces strings tools.test ;
 
 { } [ "data" get 4 <limited-stream> "limited" set ] unit-test
 
-{ "abc" char: \n }
+{ "abc" ch'\n }
 [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
 
 { "" f } [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
 
 
-{ char: a }
+{ ch'a }
 [ "a" <string-reader> 1 <limited-stream> stream-read1 ] unit-test
 
 { "abc" }

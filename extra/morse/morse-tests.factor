@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays morse strings tools.test ;
 
-{ "?" } [ char: \\ ch>morse ] unit-test
-{ "..." } [ char: s ch>morse ] unit-test
-{ char: s } [ "..." morse>ch ] unit-test
-{ char: \s } [ "..--..--.." morse>ch ] unit-test
+{ "?" } [ ch'\\ ch>morse ] unit-test
+{ "..." } [ ch's ch>morse ] unit-test
+{ ch's } [ "..." morse>ch ] unit-test
+{ ch'\s } [ "..--..--.." morse>ch ] unit-test
 { "-- --- .-. ... . / -.-. --- -.. ." } [ "morse code" >morse ] unit-test
 { "morse code" } [ "-- --- .-. ... . / -.-. --- -.. ." morse> ] unit-test
 { "hello, world!" } [ "Hello, World!" >morse morse> ] unit-test

@@ -18,7 +18,7 @@ SYMBOLS: $doc-path $next-link $prev-link $fuel-nav-crumbs ;
 
 : vocab-own-crumbs ( vocab-name -- crumbs )
     "." split unclip [
-        [ char: . suffix ] dip append
+        [ ch'. suffix ] dip append
     ] accumulate swap suffix
     [ dup "." split last \ vocab 3array ] map ;
 

@@ -97,7 +97,7 @@ M: did-not-fail summary drop "Did not fail" ;
 
 : experiment-title ( word -- string )
     "(" ?head drop ")" ?tail drop
-    H{ { char: - char: \s } } substitute >title ;
+    H{ { ch'- ch'\s } } substitute >title ;
 
 MACRO: <experiment> ( word -- quot )
     [ stack-effect in>> length dup ]
@@ -309,7 +309,7 @@ M: test-failure error. ( error -- )
     loaded-child-vocab-names test-vocabs ;
 
 : test-all ( -- )
-    loaded-vocab-names [ don't-test? ] reject test-vocabs ;
+    loaded-vocab-names [ do-not-test? ] reject test-vocabs ;
 
 : test-main ( -- )
     command-line get [ [ load ] [ test ] bi ] each

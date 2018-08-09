@@ -23,10 +23,10 @@ IN: benchmark.dispatch2
         1 [ + ] curry ,
     ] { } make ;
 
-: don't-flush-me ( obj -- ) drop ;
+: do-not-flush-me ( obj -- ) drop ;
 
 : dispatch2-benchmark ( -- )
     1000000 sequences
-    [ [ first don't-flush-me ] each ] curry times ;
+    [ [ first do-not-flush-me ] each ] curry times ;
 
 MAIN: dispatch2-benchmark

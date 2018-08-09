@@ -421,8 +421,8 @@ DEFER: foo
 
 [ ": foo ;" eval( -- ) ] [ error>> error>> no-current-vocab-error? ] must-fail-with
 
-{ 92 } [ "char: \\" eval( -- n ) ] unit-test
-{ 92 } [ "char: \\\\" eval( -- n ) ] unit-test
+{ 92 } [ "ch'\\" eval( -- n ) ] unit-test
+{ 92 } [ "ch'\\\\" eval( -- n ) ] unit-test
 
 { } [
     {
@@ -488,7 +488,7 @@ DEFER: blahy
 [ "IN: parser.tests USE: kernel TUPLE: blahy < tuple ; : blahy ( -- ) ; TUPLE: blahy < tuple ; : blahy ( -- ) ;" eval( -- ) ]
 [ error>> error>> def>> \ blahy eq? ] must-fail-with
 
-[ "char: \\u9999999999999" eval( -- n ) ] must-fail
+[ "ch'\\u9999999999999" eval( -- n ) ] must-fail
 
 SYMBOLS: a b c ;
 

@@ -325,7 +325,7 @@ CONSTANT: exclude-keys-wm-char
     {
         {
             [ dup LETTER? ]
-            [ shift? caps-lock? xor [ char: a + char: A - ] unless 1string f ]
+            [ shift? caps-lock? xor [ ch'a + ch'A - ] unless 1string f ]
         }
         { [ dup digit? ] [ 1string f ] }
         [ wm-keydown-codes at t ]

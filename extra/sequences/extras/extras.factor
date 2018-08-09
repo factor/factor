@@ -170,7 +170,7 @@ PRIVATE>
 : slices-touch? ( slice1 slice2 -- ? )
     unordered-slices-touch? ;
 
-ERROR: slices-don't-touch slice1 slice2 ;
+ERROR: slices-do-not-touch slice1 slice2 ;
 
 : merge-slices ( slice1 slice2 -- slice/* )
     2dup ordered-slices-touch? [
@@ -178,7 +178,7 @@ ERROR: slices-don't-touch slice1 slice2 ;
         [ [ to>> ] bi@ max ]
         [ drop seq>> ] 2tri <slice>
     ] [
-        slices-don't-touch
+        slices-do-not-touch
     ] if ;
 
 : rotate ( seq n -- seq' )

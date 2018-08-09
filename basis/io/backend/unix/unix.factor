@@ -147,7 +147,7 @@ M: stdin dispose*
     ] with-destructors ;
 
 : wait-for-stdin ( stdin -- size )
-    [ control>> char: X over io:stream-write1 io:stream-flush ]
+    [ control>> ch'X over io:stream-write1 io:stream-flush ]
     [ size>> ssize_t heap-size swap io:stream-read ssize_t deref ]
     bi ;
 

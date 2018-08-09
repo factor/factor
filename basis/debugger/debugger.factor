@@ -370,7 +370,7 @@ M: bad-effect summary
 M: invalid-row-variable summary
     drop "Stack effect row variables can only occur as the first input or output" ;
 
-M: row-variable-can't-have-type summary
+M: row-variable-cannot-have-type summary
     drop "Stack effect row variables cannot have a declared type" ;
 
 M: bad-escape error.

@@ -5,16 +5,16 @@ io.encodings.binary io.files io.streams.byte-array
 io.streams.memory io.streams.peek io.streams.string kernel make
 namespaces sequences strings tools.test ;
 
-{ char: a }
+{ ch'a }
 [ "abc" <string-reader> <peek-stream> stream-read1 ] unit-test
 
-{ char: a }
+{ ch'a }
 [ "abc" <string-reader> <peek-stream> stream-peek1 ] unit-test
 
 { f }
 [ "" <string-reader> <peek-stream> stream-peek1 ] unit-test
 
-{ char: a }
+{ ch'a }
 [ "abc" <string-reader> <peek-stream> stream-peek1 ] unit-test
 
 { "ab" 99 }
@@ -23,7 +23,7 @@ namespaces sequences strings tools.test ;
 { "ab" f }
 [ "ab" <string-reader> <peek-stream> "c" swap stream-read-until ] unit-test
 
-{ char: a }
+{ ch'a }
 [
     "abc" <string-reader> <peek-stream>
     [ stream-peek1 drop ]

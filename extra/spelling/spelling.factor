@@ -25,7 +25,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
 
 : inserts ( word -- edits )
     [ length [0,b] ] keep '[
-        char: ? over _ insert-nth ALPHABET swap [
+        ch'? over _ insert-nth ALPHABET swap [
             swapd clone [ set-nth-unsafe ] keep
         ] curry with { } map-as
     ] map concat ;

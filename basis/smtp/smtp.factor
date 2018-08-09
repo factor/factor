@@ -94,7 +94,7 @@ ERROR: bad-email-address email ;
 LOG: smtp-response DEBUG
 
 : multiline? ( response -- ? )
-    3 swap ?nth char: - = ;
+    3 swap ?nth ch'- = ;
 
 : (receive-response) ( -- )
     read-crlf

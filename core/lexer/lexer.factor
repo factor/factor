@@ -51,11 +51,11 @@ ERROR: not-a-lexer object ;
 ERROR: unexpected want got ;
 
 : forbid-tab ( c -- c )
-    [ char: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
+    [ ch'\t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
 : skip ( i seq ? -- n )
     over length [
-        [ swap forbid-tab char: \s eq? xor ] curry find-from drop
+        [ swap forbid-tab ch'\s eq? xor ] curry find-from drop
     ] dip or ; inline
 
 : change-lexer-column ( ..a lexer quot: ( ..a col line -- ..b newcol ) -- ..b )
@@ -86,7 +86,7 @@ GENERIC: skip-word ( lexer -- )
 
 : find-container-delimiter ( i str -- n/f )
     2dup [ "[" member? ] find-from [
-        [ swap subseq [ char: = = ] all? ] keep and
+        [ swap subseq [ ch'= = ] all? ] keep and
     ] [
         3drop f
     ] if ;
@@ -95,8 +95,8 @@ M: lexer skip-word
     [
         2dup [ " \"[" member? ] find-from
         {
-            { char: \" [ 2nip 1 + ] }
-            { char: \[  [
+            { ch'\" [ 2nip 1 + ] }
+            { ch'\[  [
                 1 + over find-container-delimiter
                 dup [ 2nip 1 + ] [ drop f skip ] if
             ] }
@@ -149,9 +149,9 @@ PREDICATE: unexpected-eof < unexpected got>> not ;
 
 : throw-unexpected-eof ( word -- * ) f unexpected ;
 
-: strict-single-quote? ( string -- ? )
+: (strict-single-quote?) ( string -- ? )
     "'" split1
-    [ drop t ]
+    [ "'" head? not ]
     [
         [ length 0 > ]
         [
@@ -160,11 +160,15 @@ PREDICATE: unexpected-eof < unexpected got>> not ;
         ] bi and
     ] bi* and ;
 
+: strict-single-quote? ( string -- ? )
+    dup (strict-single-quote?)
+    [ "'[" sequence= not ] [ drop f ] if ;
+
 : strict-lower-colon? ( string -- ? )
-    [ char: \: = ] cut-tail
+    [ ch'\: = ] cut-tail
     [
         [ length 0 > ] [
-            [ [ char: a char: z between? ] [ "-" member? ] bi or ] all?
+            [ [ ch'a ch'z between? ] [ "-" member? ] bi or ] all?
         ] bi and ]
     [ length 0 > ] bi* and ;
 
@@ -172,14 +176,14 @@ PREDICATE: unexpected-eof < unexpected got>> not ;
     ! All chars must...
     [
         [
-            [ char: A char: Z between? ] [ "':-\\#" member? ] bi or
+            [ ch'A ch'Z between? ] [ "':-\\#" member? ] bi or
         ] all?
     ]
     ! At least one char must...
-    [ [ [ char: A char: Z between? ] [ char: ' = ] bi or ] any? ] bi and ;
+    [ [ [ ch'A ch'Z between? ] [ ch'\' = ] bi or ] any? ] bi and ;
 
 : strict-upper-colon? ( string -- ? )
-    [ [ char: \: = ] all? ]
+    [ [ ch'\: = ] all? ]
     [ (strict-upper-colon?) ] bi or ;
 
 : scan-token ( -- str )
@@ -218,14 +222,14 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
     [ line>> number>string ": " append ]
     [ line-text>> ]
     [ column>> ] tri
-    pick length + char: \s <string>
+    pick length + ch'\s <string>
     [ write ] [ print ] [ write "^" print ] tri* ;
 
 : (parsing-word-lexer-dump) ( error parsing-word -- )
     [
         line>> number>string
         over line>> number>string length
-        char: \s pad-head
+        ch'\s pad-head
         ": " append write
     ] [ line-text>> print ] bi
     simple-lexer-dump ;

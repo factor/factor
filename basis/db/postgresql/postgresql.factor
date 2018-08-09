@@ -117,7 +117,7 @@ M: postgresql-db-connection <prepared-statement> ( sql in out -- statement )
     <simple-statement> dup prepare-statement ;
 
 : bind-name% ( -- )
-    char: $ 0,
+    ch'$ 0,
     sql-counter [ inc ] [ get 0# ] bi ;
 
 M: postgresql-db-connection bind% ( spec -- )

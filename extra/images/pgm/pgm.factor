@@ -12,7 +12,7 @@ SINGLETON: pgm-image
 : read-token ( -- token )
     [ read1 dup blank?
       [ t ]
-      [ dup char: # =
+      [ dup ch'# =
         [ "\n" read-until 2drop t ]
         [ f ] if
       ] if

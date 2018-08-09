@@ -42,12 +42,12 @@ IN: compiler.tests.intrinsics
 ! Write barrier hits on the wrong value were causing segfaults
 [ -3 ] [ -3 1 2 [ 2array [ 3 set-slot ] keep ] compile-call second ] unit-test
 
-[ char: a ] [ 0 "abc" [ string-nth ] compile-call ] unit-test
-[ char: a ] [ 0 [ "abc" string-nth ] compile-call ] unit-test
-[ char: a ] [ [ 0 "abc" string-nth ] compile-call ] unit-test
-[ char: b ] [ 1 "abc" [ string-nth ] compile-call ] unit-test
-[ char: b ] [ 1 [ "abc" string-nth ] compile-call ] unit-test
-[ char: b ] [ [ 1 "abc" string-nth ] compile-call ] unit-test
+[ ch'a ] [ 0 "abc" [ string-nth ] compile-call ] unit-test
+[ ch'a ] [ 0 [ "abc" string-nth ] compile-call ] unit-test
+[ ch'a ] [ [ 0 "abc" string-nth ] compile-call ] unit-test
+[ ch'b ] [ 1 "abc" [ string-nth ] compile-call ] unit-test
+[ ch'b ] [ 1 [ "abc" string-nth ] compile-call ] unit-test
+[ ch'b ] [ [ 1 "abc" string-nth ] compile-call ] unit-test
 
 [ 0x123456 ] [ 0 "\u123456bc" [ string-nth ] compile-call ] unit-test
 [ 0x123456 ] [ 0 [ "\u123456bc" string-nth ] compile-call ] unit-test

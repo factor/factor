@@ -28,8 +28,8 @@ SYMBOL: locale ! Just casing locale, or overall?
     [ [ { } ] [
         [
             dup first
-            { [ mark-above? ] [ char: combining-ogonek = ] } 1||
-            [ char: combining-dot-above prefix ] when
+            { [ mark-above? ] [ ch'combining-ogonek = ] } 1||
+            [ ch'combining-dot-above prefix ] when
         ] map
     ] if-empty ] with-rest ; inline
 
@@ -46,24 +46,24 @@ SYMBOL: locale ! Just casing locale, or overall?
 
 : fix-sigma-end ( string -- string )
     [ "" ] [
-        dup last char: greek-small-letter-sigma =
-        [ but-last char: greek-small-letter-final-sigma suffix ] when
+        dup last ch'greek-small-letter-sigma =
+        [ but-last ch'greek-small-letter-final-sigma suffix ] when
     ] if-empty ; inline
 
 ! this duplicate unicode to prevent dependencies
 CATEGORY-NOT: (uncased) Lu Ll Lt Lm Mn Me ;
 
 : sigma-map ( string -- string )
-    { char: greek-capital-letter-sigma } split [ [
-        [ { char: greek-small-letter-sigma } ] [
+    { ch'greek-capital-letter-sigma } split [ [
+        [ { ch'greek-small-letter-sigma } ] [
             dup first (uncased)?
-            char: greek-small-letter-final-sigma
-            char: greek-small-letter-sigma ? prefix
+            ch'greek-small-letter-final-sigma
+            ch'greek-small-letter-sigma ? prefix
         ] if-empty
     ] map ] with-rest concat fix-sigma-end ; inline
 
 : final-sigma ( string -- string )
-    char: greek-capital-letter-sigma
+    ch'greek-capital-letter-sigma
     over member? [ sigma-map ] when
     "" like ; inline
 

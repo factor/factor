@@ -147,7 +147,7 @@ ERROR: not-absolute-path ;
     unicode-prefix ?head drop
     dup {
         [ length 2 >= ]
-        [ second char: \: = ]
+        [ second ch'\: = ]
         [ first Letter? ]
     } 1&& [ 2 head "\\" append ] [ not-absolute-path ] if ;
 

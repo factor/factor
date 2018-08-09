@@ -104,7 +104,7 @@ DEFER: simd-construct-op
     [ obj swap quot (vvx->v-op) ]
     [ drop obj fallback-quot call ] if-both-vectors-match ; inline
 
-: vv'->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
+: vvT->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
     [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors ; inline
 
 : vv->x-op ( a b rep quot: ( (a) (b) rep -- obj ) fallback-quot -- obj )
@@ -215,7 +215,7 @@ M: simd-128 vshuffle-elements
 M: simd-128 vshuffle2-elements
     over simd-rep [ (simd-vshuffle2-elements) ] [ call-next-method ] vvx->v-op ; inline
 M: simd-128 vshuffle-bytes
-    dup simd-rep [ (simd-vshuffle-bytes) ] [ call-next-method ] vv'->v-op ; inline
+    dup simd-rep [ (simd-vshuffle-bytes) ] [ call-next-method ] vvT->v-op ; inline
 M: simd-128 (vmerge-head)
     dup simd-rep [ (simd-vmerge-head) ] [ call-next-method ] vv->v-op ; inline
 M: simd-128 (vmerge-tail)

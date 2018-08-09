@@ -13,13 +13,13 @@ IN: txon
     "\\`" "`" replace ;
 
 : `? ( ch1 ch2 -- ? )
-    [ char: \\ = not ] [ char: ` = ] bi* and ;
+    [ ch'\\ = not ] [ ch'` = ] bi* and ;
 
 : (find-`) ( string -- n/f )
     2 clump [ first2 `? ] find drop [ 1 + ] [ f ] if* ;
 
 : find-` ( string -- n/f )
-    dup ?first char: ` = [ drop 0 ] [ (find-`) ] if ;
+    dup ?first ch'` = [ drop 0 ] [ (find-`) ] if ;
 
 : parse-name ( string -- remain name )
     ":`" split1 swap decode-value ;
@@ -32,7 +32,7 @@ DEFER: name/values
 
 : parse-value ( string -- remain value )
     dup find-` [
-        dup 1 - pick ?nth char: \: =
+        dup 1 - pick ?nth ch'\: =
         [ drop name/values ] [ cut swap (parse-value) ] if
         [ rest [ blank? ] trim-head ] dip
     ] [ f swap ] if* ;
@@ -45,7 +45,7 @@ DEFER: name/values
     ":`" over subseq? [ (name=value) ] [ f swap ] if ;
 
 : name/values ( string -- remain terms )
-    [ dup { [ empty? not ] [ first char: ` = not ] } 1&& ]
+    [ dup { [ empty? not ] [ first ch'` = not ] } 1&& ]
     [ name=value ] produce assoc-combine ;
 
 : parse-txon ( string -- objects )

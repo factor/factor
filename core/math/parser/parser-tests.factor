@@ -434,12 +434,12 @@ unit-test
 { t } [ most-negative-fixnum number>string string>number fixnum? ] unit-test
 
 ! large/small numbers/exponents correctly cancel out
-{ 1.0 } [ "1" 3000 [ char: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
-{ 1.0 } [ "0x1" 1000 [ char: 0 ] "" replicate-as append "p-4000" append string>number ] unit-test
-{ 1.0 } [ "0." 3000 [ char: 0 ] "" replicate-as append "1e3001" append string>number ] unit-test
-{ 1.0 } [ "0x0." 1000 [ char: 0 ] "" replicate-as append "1p4004" append string>number ] unit-test
-{ 1.0 } [ "1" 3000 [ char: 0 ] "" replicate-as append "." append
-              3000 [ char: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+{ 1.0 } [ "1" 3000 [ ch'0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+{ 1.0 } [ "0x1" 1000 [ ch'0 ] "" replicate-as append "p-4000" append string>number ] unit-test
+{ 1.0 } [ "0." 3000 [ ch'0 ] "" replicate-as append "1e3001" append string>number ] unit-test
+{ 1.0 } [ "0x0." 1000 [ ch'0 ] "" replicate-as append "1p4004" append string>number ] unit-test
+{ 1.0 } [ "1" 3000 [ ch'0 ] "" replicate-as append "." append
+              3000 [ ch'0 ] "" replicate-as append "e-3000" append string>number ] unit-test
 
 ! We correctly parse the biggest/smallest float correctly
 ! (ie the 1/0. or 0/0. short-circuit optimization doesn't apply)
@@ -459,9 +459,9 @@ unit-test
 { 1.79769313486231571e+308 } [ "1.797693134862315807e+308" string>number ] unit-test
 
 ! works with ratios
-{ 0.25 } [ "1/4" 3000 [ char: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+{ 0.25 } [ "1/4" 3000 [ ch'0 ] "" replicate-as append "e-3000" append string>number ] unit-test
 ! XXX: disable for right now, see #1362 or #1408
-! { 1.25 } [ "1+1/4" 3000 [ char: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
+! { 1.25 } [ "1+1/4" 3000 [ ch'0 ] "" replicate-as append "e-3000" append string>number ] unit-test
 
 ! #1356 #1231
 { 1/0. } [ "1e100000" string>number ] unit-test
@@ -499,5 +499,5 @@ unit-test
     "1.55E+05"
     "1.550e+05"
 } [
-    trouble char: e 0 rot set-nth trouble drop
+    trouble ch'e 0 rot set-nth trouble drop
 ] unit-test

@@ -10,16 +10,16 @@ PRIVATE>
 
 : digit> ( ch -- n )
     {
-        { [ dup char: 9 <= ] [ char: 0 -      dup  0 < [ drop 255 ] when ] }
-        { [ dup char: a <  ] [ char: A 10 - - dup 10 < [ drop 255 ] when ] }
-                             [ char: a 10 - - dup 10 < [ drop 255 ] when ]
+        { [ dup ch'9 <= ] [ ch'0 -      dup  0 < [ drop 255 ] when ] }
+        { [ dup ch'a <  ] [ ch'A 10 - - dup 10 < [ drop 255 ] when ] }
+                             [ ch'a 10 - - dup 10 < [ drop 255 ] when ]
     } cond ; inline
 
 : string>digits ( str -- digits )
     [ digit> ] B{ } map-as ; inline
 
 : >digit ( n -- ch )
-    dup 10 < [ char: 0 + ] [ 10 - char: a + ] if ; inline
+    dup 10 < [ ch'0 + ] [ 10 - ch'a + ] if ; inline
 
 ERROR: invalid-radix radix ;
 
@@ -201,7 +201,7 @@ DEFER: @neg-digit
 
 : @exponent-digit-or-punc ( float-parse i number-parse n char -- float-parse n/f )
     {
-        { char: , [ [ @exponent-digit ] require-next-digit ] }
+        { ch', [ [ @exponent-digit ] require-next-digit ] }
         [ @exponent-digit ]
     } case ; inline
 
@@ -211,8 +211,8 @@ DEFER: @neg-digit
 
 : @exponent-first-char ( float-parse i number-parse n char -- float-parse n/f )
     {
-        { char: - [ [ @exponent-digit ] require-next-digit ?neg ] }
-        { char: + [ [ @exponent-digit ] require-next-digit ] }
+        { ch'- [ [ @exponent-digit ] require-next-digit ?neg ] }
+        { ch'+ [ [ @exponent-digit ] require-next-digit ] }
         [ @exponent-digit ]
     } case ; inline
 
@@ -233,7 +233,7 @@ DEFER: @neg-digit
 
 : @mantissa-digit-or-punc ( float-parse i number-parse n char -- float-parse n/f )
     {
-        { char: , [ [ @mantissa-digit ] require-next-digit ] }
+        { ch', [ [ @mantissa-digit ] require-next-digit ] }
         [ @mantissa-digit ]
     } case ; inline
 
@@ -253,8 +253,8 @@ DEFER: @neg-digit
 
 : @denom-digit-or-punc ( i number-parse n char -- n/f )
     {
-        { char: , [ [ @denom-digit ] require-next-digit ] }
-        { char: . [ ->mantissa ] }
+        { ch', [ [ @denom-digit ] require-next-digit ] }
+        { ch'. [ ->mantissa ] }
         [ [ @denom-digit ] or-exponent ]
     } case ; inline
 
@@ -264,7 +264,7 @@ DEFER: @neg-digit
 
 : @denom-first-digit ( i number-parse n char -- n/f )
     {
-        { char: . [ ->mantissa ] }
+        { ch'. [ ->mantissa ] }
         [ @denom-digit ]
     } case ; inline
 
@@ -274,8 +274,8 @@ DEFER: @neg-digit
 
 : @num-digit-or-punc ( i number-parse n char -- n/f )
     {
-        { char: , [ [ @num-digit ] require-next-digit ] }
-        { char: / [ ->denominator ] }
+        { ch', [ [ @num-digit ] require-next-digit ] }
+        { ch'/ [ ->denominator ] }
         [ @num-digit ]
     } case ; inline
 
@@ -289,10 +289,10 @@ DEFER: @neg-digit
 
 : @pos-digit-or-punc ( i number-parse n char -- n/f )
     {
-        { char: , [ [ @pos-digit ] require-next-digit ] }
-        { char: + [ ->numerator ] }
-        { char: / [ ->denominator ] }
-        { char: . [ ->mantissa ] }
+        { ch', [ [ @pos-digit ] require-next-digit ] }
+        { ch'+ [ ->numerator ] }
+        { ch'/ [ ->denominator ] }
+        { ch'. [ ->mantissa ] }
         [ [ @pos-digit ] or-exponent ]
     } case ; inline
 
@@ -315,17 +315,17 @@ DEFER: @neg-digit
 
 : @pos-first-digit ( i number-parse n char -- n/f )
     {
-        { char: . [ ->required-mantissa ] }
-        { char: 0 [ [ @pos-digit ] [ @pos-digit-or-punc ] with-radix-char ] }
+        { ch'. [ ->required-mantissa ] }
+        { ch'0 [ [ @pos-digit ] [ @pos-digit-or-punc ] with-radix-char ] }
         [ @pos-digit ]
     } case ; inline
 
 : @neg-digit-or-punc ( i number-parse n char -- n/f )
     {
-        { char: , [ [ @neg-digit ] require-next-digit ] }
-        { char: - [ ->numerator ] }
-        { char: / [ ->denominator ] }
-        { char: . [ ->mantissa ] }
+        { ch', [ [ @neg-digit ] require-next-digit ] }
+        { ch'- [ ->numerator ] }
+        { ch'/ [ ->denominator ] }
+        { ch'. [ ->mantissa ] }
         [ [ @neg-digit ] or-exponent ]
     } case ; inline
 
@@ -335,34 +335,34 @@ DEFER: @neg-digit
 
 : @neg-first-digit ( i number-parse n char -- n/f )
     {
-        { char: . [ ->required-mantissa ] }
-        { char: 0 [ [ @neg-digit ] [ @neg-digit-or-punc ] with-radix-char ] }
+        { ch'. [ ->required-mantissa ] }
+        { ch'0 [ [ @neg-digit ] [ @neg-digit-or-punc ] with-radix-char ] }
         [ @neg-digit ]
     } case ; inline
 
 : @first-char ( i number-parse n char -- n/f )
     {
-        { char: - [ [ @neg-first-digit ] require-next-digit ?neg ] }
-        { char: + [ [ @pos-first-digit ] require-next-digit ] }
+        { ch'- [ [ @neg-first-digit ] require-next-digit ?neg ] }
+        { ch'+ [ [ @pos-first-digit ] require-next-digit ] }
         [ @pos-first-digit ]
     } case ; inline
 
 : @neg-first-digit-no-radix ( i number-parse n char -- n/f )
     {
-        { char: . [ ->required-mantissa ] }
+        { ch'. [ ->required-mantissa ] }
         [ @neg-digit ]
     } case ; inline
 
 : @pos-first-digit-no-radix ( i number-parse n char -- n/f )
     {
-        { char: . [ ->required-mantissa ] }
+        { ch'. [ ->required-mantissa ] }
         [ @pos-digit ]
     } case ; inline
 
 : @first-char-no-radix ( i number-parse n char -- n/f )
     {
-        { char: - [ [ @neg-first-digit-no-radix ] require-next-digit ?neg ] }
-        { char: + [ [ @pos-first-digit-no-radix ] require-next-digit ] }
+        { ch'- [ [ @neg-first-digit-no-radix ] require-next-digit ?neg ] }
+        { ch'+ [ [ @pos-first-digit-no-radix ] require-next-digit ] }
         [ @pos-first-digit-no-radix ]
     } case ; inline
 
@@ -403,7 +403,7 @@ CONSTANT: ONES B{
     ] dip [ push ] keep [ push ] keep ; inline
 
 : (one-digit) ( num accum -- num' accum )
-    [ 10 /mod char: 0 + ] dip [ push ] keep ; inline
+    [ 10 /mod ch'0 + ] dip [ push ] keep ; inline
 
 : (bignum>dec) ( num accum -- num' accum )
     [ over most-positive-fixnum > ]
@@ -476,21 +476,21 @@ M: integer >base
     {
         { [ over 0 = ] [ 2drop "0" ] }
         { [ over 0 > ] [ positive>base ] }
-        [ [ neg ] dip positive>base char: - prefix ]
+        [ [ neg ] dip positive>base ch'- prefix ]
     } cond ;
 
 M: ratio >base
     [ fraction>parts [ /mod ] keep ] [ [ >base ] curry tri@ ] bi*
     "/" glue over first-unsafe {
-        { char: 0 [ nip ] }
-        { char: - [ append ] }
+        { ch'0 [ nip ] }
+        { ch'- [ append ] }
         [ drop "+" glue ]
     } case ;
 
 <PRIVATE
 
 : (fix-float) ( str-no-exponent -- newstr )
-    char: . over member? [ ".0" append ] unless ; inline
+    ch'. over member? [ ".0" append ] unless ; inline
 
 : fix-float ( str exponent-char -- newstr )
     over index [
@@ -510,7 +510,7 @@ M: ratio >base
     -0.0 double>bits bitand zero? "" "-" ? ;
 
 : bin-float-value ( str size -- str' )
-    char: 0 pad-head [ char: 0 = ] trim-tail
+    ch'0 pad-head [ ch'0 = ] trim-tail
     [ "0" ] when-empty "1." prepend ;
 
 : float>hex-value ( mantissa -- str )
@@ -547,7 +547,7 @@ M: ratio >base
         [ format-string ] 4dip [ format-string ] bi@ (format-float)
         >string
     ] [
-        "C" = [ [ "G" = ] [ "E" = ] bi or char: E char: e ? fix-float ]
+        "C" = [ [ "G" = ] [ "E" = ] bi or ch'E ch'e ? fix-float ]
         [ drop ] if
     ] 2bi ; inline
 
@@ -583,7 +583,7 @@ M: float >base
     ] keep ;
 
 : bytes>hex-string ( bytes -- hex-string )
-    dup length 2 * char: 0 <string> [
+    dup length 2 * ch'0 <string> [
         [
             [ 16 /mod [ >digit ] bi@ ]
             [ 2 * dup 1 + ]

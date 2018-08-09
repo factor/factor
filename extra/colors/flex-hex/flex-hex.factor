@@ -9,19 +9,19 @@ IN: colors.flex-hex
 <PRIVATE
 
 : hex-only ( str -- str' )
-    [ dup hex-digit? [ drop char: 0 ] unless ] map ;
+    [ dup hex-digit? [ drop ch'0 ] unless ] map ;
 
 : pad-length ( str -- n )
     length dup 3 mod [ 3 swap - + ] unless-zero ;
 
 : three-groups ( str -- array )
-    dup pad-length [ char: 0 pad-tail ] [ 3 / group ] bi ;
+    dup pad-length [ ch'0 pad-tail ] [ 3 / group ] bi ;
 
 : hex-rgb ( array -- array' )
     [
         8 short tail*
         2 short head
-        2 char: 0 pad-head
+        2 ch'0 pad-head
     ] map ;
 
 PRIVATE>

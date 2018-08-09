@@ -27,7 +27,7 @@ M: macosx find-visual-studio-code-invocation
         f
     ] if* ;
 
-ERROR: can't-find-visual-studio-code ;
+ERROR: cannot-find-visual-studio-code ;
 
 M: linux find-visual-studio-code-invocation
     {
@@ -45,7 +45,7 @@ M: windows find-visual-studio-code-invocation
 M: visual-studio-code editor-command ( file line -- command )
     [
         visual-studio-code-invocation
-        [ , ] [ can't-find-visual-studio-code ] if*
+        [ , ] [ cannot-find-visual-studio-code ] if*
         "-g" , "-r" ,
         number>string ":" glue ,
     ] { } make ;

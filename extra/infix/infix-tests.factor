@@ -34,8 +34,8 @@ IN: infix.tests
 
 { -1 } [ let[ 1 :> a infix[[ -a ]] ] ] unit-test
 
-{ char: f } [ let[ "foo" :> s infix[[ s[0] ]] ] ] unit-test
-{ char: r } [ let[ "bar" :> s infix[[ s[-1] ]] ] ] unit-test
+{ ch'f } [ let[ "foo" :> s infix[[ s[0] ]] ] ] unit-test
+{ ch'r } [ let[ "bar" :> s infix[[ s[-1] ]] ] ] unit-test
 { "foo" } [ let[ "foobar" :> s infix[[ s[0:3] ]] ] ] unit-test
 { "foo" } [ let[ "foobar" :> s infix[[ s[:3] ]] ] ] unit-test
 { "bar" } [ let[ "foobar" :> s infix[[ s[-3:] ]] ] ] unit-test

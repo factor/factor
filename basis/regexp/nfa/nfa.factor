@@ -116,10 +116,10 @@ M: not-class modify-class
     class>> modify-class <not-class> ;
 
 MEMO: unix-dot ( -- class )
-    char: \n <not-class> ;
+    ch'\n <not-class> ;
 
 MEMO: nonl-dot ( -- class )
-    { char: \n char: \r } <or-class> <not-class> ;
+    { ch'\n ch'\r } <or-class> <not-class> ;
 
 M: dot modify-class
     drop dotall option? [ t ] [

@@ -497,7 +497,7 @@ DEFER: <shader-instance>
 : word-directory ( word -- directory )
     where first parent-directory ;
 
-: in-word's-path ( word kind filename -- word kind filename' )
+: in-words-path ( word kind filename -- word kind filename' )
     pick word-directory prepend-path ;
 
 : become-shader-instance ( shader-instance new-shader-instance -- )
@@ -605,7 +605,7 @@ SYNTAX: \GLSL-SHADER-FILE:
     scan-new dup
     dup old-instances [
         scan-word execute( -- kind )
-        scan-object in-word's-path
+        scan-object in-words-path
         0
         over ascii file-contents
     ] dip

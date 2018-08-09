@@ -55,14 +55,14 @@ SINGLETONS: +left+ +middle+ +right+ ;
 
 GENERIC: align-string ( str n alignment -- str' )
 
-M: +left+ align-string  drop char: space pad-tail ;
-M: +right+ align-string drop char: space pad-head ;
+M: +left+ align-string  drop ch'space pad-tail ;
+M: +right+ align-string drop ch'space pad-head ;
 
 M: +middle+ align-string
     drop
     over length - 2 /
-    [ floor char: space <string> ]
-    [ ceiling char: space <string> ] bi surround ;
+    [ floor ch'space <string> ]
+    [ ceiling ch'space <string> ] bi surround ;
 
 : align-columns ( columns alignment -- columns' )
     [ dup column-widths ] dip '[

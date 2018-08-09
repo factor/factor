@@ -12,10 +12,10 @@ IN: successor
     '[ _ > dup _ ] keep ? ;
 
 : next-digit ( ch -- ? ch' )
-    1 + char: 9 char: 0 carry ;
+    1 + ch'9 ch'0 carry ;
 
 : next-letter ( ch -- ? ch' )
-    [ ch>lower 1 + char: z char: a carry ] [ LETTER? ] bi
+    [ ch>lower 1 + ch'z ch'a carry ] [ LETTER? ] bi
     [ ch>upper ] when ;
 
 : next-char ( ch -- ? ch' )

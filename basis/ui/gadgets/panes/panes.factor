@@ -337,7 +337,7 @@ M: paragraph stream-write
 M: pack stream-write1 gadget-write1 ;
 
 M: paragraph stream-write1
-    over char: \s =
+    over ch'\s =
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
 : empty-output? ( string style -- ? )

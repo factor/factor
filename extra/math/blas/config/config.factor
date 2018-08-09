@@ -2,7 +2,9 @@ USING: alien.fortran combinators kernel math namespaces
 sequences system system-info ;
 IN: math.blas.config
 
-INITIALIZED-SYMBOL: blas-library [
+SYMBOL: blas-library
+
+blas-library [
     {
         { [ os macosx?  ] [ "libblas.dylib" ] }
         { [ os windows? ] [ "blas.dll"      ] }
@@ -10,7 +12,9 @@ INITIALIZED-SYMBOL: blas-library [
     } cond
 ] initialize
 
-INITIALIZED-SYMBOL: blas-fortran-abi [
+SYMBOL: blas-fortran-abi
+
+blas-fortran-abi [
     {
         { [ os macosx? cpu x86.32? and ] [ intel-unix-abi ] }
         { [ os macosx? cpu x86.64? and ]
@@ -29,6 +33,6 @@ ou will need to install a third-party BLAS library and configure Factor. See `\"
         { [ os linux?                   ] [ gfortran-abi   ] }
         [ f2c-abi ]
     } cond
-]
+] initialize
 
 INITIALIZED-SYMBOL: deploy-blas? [ os macosx? not ]

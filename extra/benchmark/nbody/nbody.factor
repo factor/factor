@@ -86,11 +86,11 @@ TUPLE: nbody-system { bodies array read-only } ;
 : inertia ( body -- e )
     [ mass>> ] [ velocity>> norm-sq ] bi * 0.5 * ;
 
-: newton's-law ( other-body body -- e )
+: newtons-law ( other-body body -- e )
     [ [ mass>> ] bi@ * ] [ [ location>> ] bi@ distance ] 2bi / ;
 
 : energy ( system -- x )
-    [ 0.0 ] dip bodies>> [ newton's-law - ] [ inertia + ] each-pair ; inline
+    [ 0.0 ] dip bodies>> [ newtons-law - ] [ inertia + ] each-pair ; inline
 
 : nbody ( n -- )
     <nbody-system>
@@ -99,7 +99,7 @@ TUPLE: nbody-system { bodies array read-only } ;
 HINTS: update-position body float ;
 HINTS: update-velocity body body float ;
 HINTS: inertia body ;
-HINTS: newton's-law body body ;
+HINTS: newtons-law body body ;
 HINTS: nbody fixnum ;
 
 : nbody-benchmark ( -- ) 1000000 nbody ;

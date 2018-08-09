@@ -17,12 +17,12 @@ TUPLE: vocab-manifest vocabs libraries ;
 : copy-resources ( manifest name dir -- )
     append-path swap vocabs>> [ copy-vocab-resources ] with each ;
 
-ERROR: can't-deploy-library-file library ;
+ERROR: cannot-deploy-library-file library ;
 
 : copy-library ( dir library -- )
     dup find-library-file
     [ tuck file-name append-path copy-file ]
-    [ can't-deploy-library-file ] ?if ;
+    [ cannot-deploy-library-file ] ?if ;
 
 : copy-libraries ( manifest name dir -- )
     append-path swap libraries>> [ copy-library ] with each ;

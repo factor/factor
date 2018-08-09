@@ -52,7 +52,7 @@ unit-test
 ] unit-test
 
 {
-    char: 1
+    ch'1
 } [
      "Hello world\r\n1234" <string-reader>
      dup stream-readln drop

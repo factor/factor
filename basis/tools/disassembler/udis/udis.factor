@@ -63,8 +63,8 @@ SINGLETON: udis-disassembler
     dup [ second length ] [ max ] map-reduce
     '[
         [
-            [ first >hex cell 2 * char: 0 pad-head % ": " % ]
-            [ second _ char: \s pad-tail % "  " % ]
+            [ first >hex cell 2 * ch'0 pad-head % ": " % ]
+            [ second _ ch'\s pad-tail % "  " % ]
             [ third resolve-call % ]
             tri
         ] "" make

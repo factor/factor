@@ -71,7 +71,7 @@ FROM: english => a/an ;
 { "i18n" }    [ "internationalization" a10n ] unit-test
 { "f28n" }    [ "floccinauccinihilipilification" a10n ] unit-test
 { "p43s" }    [ "pneumonoultramicroscopicsilicovolcanoconiosis" a10n ] unit-test
-{ "a10000c" } [ 10000 char: b <string> "a" "c" surround a10n ] unit-test
+{ "a10000c" } [ 10000 ch'b <string> "a" "c" surround a10n ] unit-test
 
 { "an" } [ "object" a/an ] unit-test
 { "an" } [ "elephant" a/an ] unit-test

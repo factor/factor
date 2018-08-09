@@ -29,14 +29,14 @@ SPECIALIZED-ARRAY: int
 ] unit-test
 
 {
-    "This" char: \s
+    "This" ch'\s
 } [
     "vocab:io/test/read-until-test.txt" ascii
     [ " " read-until ] with-file-reader
 ] unit-test
 
 {
-    "This" char: \s
+    "This" ch'\s
 } [
     "vocab:io/test/read-until-test.txt" binary
     [ " " read-until [ ascii decode ] dip ] with-file-reader
@@ -50,8 +50,8 @@ SPECIALIZED-ARRAY: int
 
     {
         {
-            { "It seems " char: J }
-            { "obs has lost h" char: i }
+            { "It seems " ch'J }
+            { "obs has lost h" ch'i }
             { "s grasp on reality again.\n" f }
         }
     } [

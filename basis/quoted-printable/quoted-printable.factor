@@ -15,16 +15,16 @@ IN: quoted-printable
 
 : printable? ( ch -- ? )
     {
-        [ char: \s char: < between? ]
-        [ char: > char: ~ between? ]
-        [ char: \t = ]
+        [ ch'\s ch'< between? ]
+        [ ch'> ch'~ between? ]
+        [ ch'\t = ]
     } 1|| ;
 
 : char>quoted ( ch -- str )
     dup printable? [ 1string ] [
         assure-small >hex >upper
-        2 char: 0 pad-head
-        char: = prefix
+        2 ch'0 pad-head
+        ch'= prefix
     ] if ;
 
 : take-some ( seqs -- seqs seq )
@@ -46,8 +46,8 @@ PRIVATE>
 <PRIVATE
 
 : read-char ( byte -- ch )
-    dup char: = = [
-       drop read1 dup char: \n =
+    dup ch'= = [
+       drop read1 dup ch'\n =
        [ drop read1 read-char ]
        [ read1 2array hex> ] if
     ] when ;

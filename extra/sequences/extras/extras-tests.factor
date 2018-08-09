@@ -16,11 +16,11 @@ tools.test vectors vocabs ;
 { "foo" } [ "foo" "foobar" longest-subseq ] unit-test
 { "foo" } [ "foobar" "foo" longest-subseq ] unit-test
 
-{ "" "" } [ "" "" char: ? pad-longest ] unit-test
-{ "abc" "def" } [ "abc" "def" char: ? pad-longest ] unit-test
-{ "   " "abc" } [ "" "abc" char: \s pad-longest ] unit-test
-{ "abc" "   " } [ "abc" "" char: \s pad-longest ] unit-test
-{ "abc..." "foobar" } [ "abc" "foobar" char: . pad-longest ] unit-test
+{ "" "" } [ "" "" ch'? pad-longest ] unit-test
+{ "abc" "def" } [ "abc" "def" ch'? pad-longest ] unit-test
+{ "   " "abc" } [ "" "abc" ch'\s pad-longest ] unit-test
+{ "abc" "   " } [ "abc" "" ch'\s pad-longest ] unit-test
+{ "abc..." "foobar" } [ "abc" "foobar" ch'. pad-longest ] unit-test
 
 {
     {
@@ -34,7 +34,7 @@ tools.test vectors vocabs ;
         "--ABC--"
     }
 } [
-    "ABC" 8 <iota> [ char: - pad-center ] with map
+    "ABC" 8 <iota> [ ch'- pad-center ] with map
 ] unit-test
 
 { { 0 1 0 1 } } [
@@ -268,11 +268,11 @@ tools.test vectors vocabs ;
 { { } } [ { } ", " interleaved ] unit-test
 { { 1 } } [ { 1 } ", " interleaved ] unit-test
 { { 1 ", " 2 } } [ { 1 2 } ", " interleaved ] unit-test
-{ "" } [ "" char: _ interleaved ] unit-test
-{ "a" } [ "a" char: _ interleaved ] unit-test
-{ "a_b" } [ "ab" char: _ interleaved ] unit-test
-{ "a_b_c" } [ "abc" char: _ interleaved ] unit-test
-{ "a_b_c_d" } [ "abcd" char: _ interleaved ] unit-test
+{ "" } [ "" ch'_ interleaved ] unit-test
+{ "a" } [ "a" ch'_ interleaved ] unit-test
+{ "a_b" } [ "ab" ch'_ interleaved ] unit-test
+{ "a_b_c" } [ "abc" ch'_ interleaved ] unit-test
+{ "a_b_c_d" } [ "abcd" ch'_ interleaved ] unit-test
 
 { 0 } [ { 1 2 3 4 } [ 5 > ] count-head ] unit-test
 { 2 } [ { 1 2 3 4 } [ 3 < ] count-head ] unit-test

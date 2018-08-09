@@ -106,7 +106,7 @@ M: decoder stream-element-type
 
 : fix-cr ( decoder c -- c' )
     over cr>> [
-        over cr- dup char: \n eq? [ drop (read1) ] [ nip ] if
+        over cr- dup ch'\n eq? [ drop (read1) ] [ nip ] if
     ] [ nip ] if ; inline
 
 M: decoder stream-read1 ( decoder -- ch )
@@ -152,8 +152,8 @@ M: decoder stream-contents*
 : handle-readln ( stream str ch -- str )
     {
         { f [ line-ends/eof ] }
-        { char: \r [ line-ends\r ] }
-        { char: \n [ line-ends\n ] }
+        { ch'\r [ line-ends\r ] }
+        { ch'\n [ line-ends\n ] }
     } case ; inline
 
 M: decoder stream-read-until
@@ -161,13 +161,13 @@ M: decoder stream-read-until
         dup cr- 2dup
         >decoder< decode-until
         over [
-            dup char: \n = [
+            dup ch'\n = [
                 2drop stream-read-until
             ] [
                 2nipd
             ] if
         ] [
-            first-unsafe char: \n = [ [ rest ] dip ] when
+            first-unsafe ch'\n = [ [ rest ] dip ] when
             2nipd
         ] if-empty
     ] [

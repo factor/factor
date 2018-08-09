@@ -81,7 +81,7 @@ ERROR: register-already-used live-interval ;
 : deactivate ( n live-interval -- keep? )
     nip add-inactive f ;
 
-: don't-change ( n live-interval -- keep? ) 2drop t ;
+: do-not-change ( n live-interval -- keep? ) 2drop t ;
 
 ! Moving intervals between active and inactive sets
 : process-intervals ( n symbol quots -- )
@@ -96,14 +96,14 @@ ERROR: register-already-used live-interval ;
     active-intervals {
         { [ 2dup finished? ] [ finish ] }
         { [ 2dup covers? not ] [ deactivate ] }
-        [ don't-change ]
+        [ do-not-change ]
     } process-intervals ;
 
 : activate-intervals ( n -- )
     inactive-intervals {
         { [ 2dup finished? ] [ finish ] }
         { [ 2dup covers? ] [ activate ] }
-        [ don't-change ]
+        [ do-not-change ]
     } process-intervals ;
 
 : add-unhandled ( live-interval -- )

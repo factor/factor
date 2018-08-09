@@ -15,7 +15,7 @@ CONSTANT: knucleotide-in "vocab:benchmark/knucleotide/knucleotide-input.txt"
 : read-input ( -- input )
     discard-lines
     ">" read-until drop
-    char: \n swap remove >upper ;
+    ch'\n swap remove >upper ;
 
 : handle-table ( inputs n -- )
     clump

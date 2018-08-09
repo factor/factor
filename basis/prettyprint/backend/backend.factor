@@ -97,21 +97,21 @@ M: f pprint* drop \ f pprint-word ;
 ! Strings
 : ch>ascii-escape ( ch -- ch' ? )
     H{
-        { char: \a char: a  }
-        { char: \b char: b  }
-        { char: \e char: e  }
-        { char: \f char: f  }
-        { char: \n char: n  }
-        { char: \r char: r  }
-        { char: \t char: t  }
-        { char: \v char: v  }
-        { char: \0 char: 0  }
-        { char: \\ char: \\ }
-        { char: \" char: \" }
+        { ch'\a ch'a  }
+        { ch'\b ch'b  }
+        { ch'\e ch'e  }
+        { ch'\f ch'f  }
+        { ch'\n ch'n  }
+        { ch'\r ch'r  }
+        { ch'\t ch't  }
+        { ch'\v ch'v  }
+        { ch'\0 ch'0  }
+        { ch'\\ ch'\\ }
+        { ch'\" ch'\" }
     } ?at ; inline
 
 : unparse-ch ( ch -- )
-    ch>ascii-escape [ char: \\ , , ] [
+    ch>ascii-escape [ ch'\\ , , ] [
         dup 32 < [ dup 16 < "\\x0" "\\x" ? % >hex % ] [ , ] if
     ] if ;
 

@@ -509,14 +509,14 @@ M: timestamp december clone 12 >>month ;
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
 
-: o'clock ( timestamp n -- new-timestamp )
+: o-clock ( timestamp n -- new-timestamp )
     [ midnight ] dip >>hour ;
 
 : am ( timestamp n -- new-timestamp )
-    0 12 [a,b] check-interval o'clock ;
+    0 12 [a,b] check-interval o-clock ;
 
 : pm ( timestamp n -- new-timestamp )
-    0 12 [a,b] check-interval 12 + o'clock ;
+    0 12 [a,b] check-interval 12 + o-clock ;
 
 GENERIC: beginning-of-year ( object -- new-timestamp )
 M: timestamp beginning-of-year beginning-of-month 1 >>month ;

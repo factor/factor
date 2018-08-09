@@ -6,17 +6,17 @@ IN: xml.entities
 
 CONSTANT: entities-out
     H{
-        { char: < "&lt;"   }
-        { char: > "&gt;"   }
-        { char: & "&amp;"  }
+        { ch'< "&lt;"   }
+        { ch'> "&gt;"   }
+        { ch'& "&amp;"  }
     }
 
 CONSTANT: quoted-entities-out
     H{
-        { char: & "&amp;"  }
-        { char: ' "&apos;" }
-        { char: \" "&quot;" }
-        { char: < "&lt;"   }
+        { ch'& "&amp;"  }
+        { ch'\' "&apos;" }
+        { ch'\" "&quot;" }
+        { ch'< "&lt;"   }
     }
 
 : escape-string-by ( str table -- escaped )
@@ -31,11 +31,11 @@ CONSTANT: quoted-entities-out
 
 CONSTANT: entities
     H{
-        { "lt"    char: <  }
-        { "gt"    char: >  }
-        { "amp"   char: &  }
-        { "apos"  char: '  }
-        { "quot"  char: \"  }
+        { "lt"    ch'<  }
+        { "gt"    ch'>  }
+        { "amp"   ch'&  }
+        { "apos"  ch'\'  }
+        { "quot"  ch'\"  }
     }
 
 : with-entities ( entities quot -- )

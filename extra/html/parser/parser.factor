@@ -20,7 +20,7 @@ SYMBOL: tagstack
 
 : closing-tag? ( string -- ? )
     [ f ]
-    [ { [ first char: / = ] [ last char: / = ] } 1|| ] if-empty ;
+    [ { [ first ch'/ = ] [ last ch'/ = ] } 1|| ] if-empty ;
 
 : <tag> ( name attributes closing? -- tag )
     tag new
@@ -40,18 +40,18 @@ SYMBOL: tagstack
     '[ [ current _ = ] take-until ] [ advance drop ] bi ;
 
 : read-single-quote ( sequence-parser -- string )
-    char: ' (read-quote) ;
+    ch'\' (read-quote) ;
 
 : read-double-quote ( sequence-parser -- string )
-    char: \" (read-quote) ;
+    ch'\" (read-quote) ;
 
 : read-quote ( sequence-parser -- string )
-    dup get+increment char: ' =
+    dup get+increment ch'\' =
     [ read-single-quote ] [ read-double-quote ] if ;
 
 : read-key ( sequence-parser -- string )
     skip-whitespace
-    [ current { [ char: = = ] [ blank? ] } 1|| ] take-until ;
+    [ current { [ ch'= = ] [ blank? ] } 1|| ] take-until ;
 
 : read-token ( sequence-parser -- string )
     [ current blank? ] take-until ;
@@ -70,17 +70,17 @@ SYMBOL: tagstack
     [ advance drop ] bi ;
 
 : read-bang ( sequence-parser -- )
-    advance dup { [ current char: - = ] [ peek-next char: - = ] } 1&&
+    advance dup { [ current ch'- = ] [ peek-next ch'- = ] } 1&&
     [ advance advance read-comment ] [ read-dtd ] if ;
 
 : read-tag ( sequence-parser -- string )
     [
         [ current "><" member? ] take-until
-        [ char: / = ] trim-tail
-    ] [ dup current char: < = [ advance ] unless drop ] bi ;
+        [ ch'/ = ] trim-tail
+    ] [ dup current ch'< = [ advance ] unless drop ] bi ;
 
 : read-until-< ( sequence-parser -- string )
-    [ current char: < = ] take-until ;
+    [ current ch'< = ] take-until ;
 
 : parse-text ( sequence-parser -- )
     read-until-< [ text new-tag push-tag ] unless-empty ;
@@ -108,7 +108,7 @@ SYMBOL: tagstack
 
 : read-< ( sequence-parser -- string/f )
     advance dup current [
-        char: \! = [ read-bang f ] [ read-tag ] if
+        ch'\! = [ read-bang f ] [ read-tag ] if
     ] [
         drop f
     ] if* ;

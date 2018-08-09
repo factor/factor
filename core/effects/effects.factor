@@ -64,7 +64,7 @@ M: pair effect>string
     ] if ;
 
 : stack-picture ( seq -- string )
-    [ [ effect>string % char: \s , ] each ] "" make ;
+    [ [ effect>string % ch'\s , ] each ] "" make ;
 
 : var-picture ( var -- string )
     [ ".." " " surround ]

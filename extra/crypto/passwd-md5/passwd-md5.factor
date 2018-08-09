@@ -23,7 +23,7 @@ PRIVATE>
     [ 16 / ceiling swap <repetition> concat ] keep
     head-slice append
     password [ length make-bits ] [ first ] bi
-    '[ char: \0 _ ? ] "" map-as append
+    '[ ch'\0 _ ? ] "" map-as append
     md5 checksum-bytes :> final!
 
     1000 <iota> [

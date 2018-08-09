@@ -5,7 +5,7 @@ IN: porter-stemmer
     2dup nth dup "aeiou" member? [
         3drop f
     ] [
-        char: y = [
+        ch'y = [
             over zero?
             [ 2drop t ] [ [ 1 - ] dip consonant? not ] if
         ] [
@@ -67,7 +67,7 @@ IN: porter-stemmer
     pick consonant-seq 0 > [ nip ] [ drop ] if append ;
 
 : step1a ( str -- newstr )
-    dup last char: s = [
+    dup last ch's = [
         {
             { [ "sses" ?tail ] [ "ss" append ] }
             { [ "ies" ?tail ] [ "i" append ] }
@@ -199,13 +199,13 @@ IN: porter-stemmer
     [ 1 = [ but-last-slice cvc? not ] [ drop f ] if ] if ;
 
 : remove-e ( str -- newstr )
-    dup last char: e = [
+    dup last ch'e = [
         dup remove-e? [ but-last-slice ] when
     ] when ;
 
 : ll->l ( str -- newstr )
     {
-        { [ dup last char: l = not ] [ ] }
+        { [ dup last ch'l = not ] [ ] }
         { [ dup length 1 - over double-consonant? not ] [ ] }
         { [ dup consonant-seq 1 > ] [ but-last-slice ] }
         [ ]

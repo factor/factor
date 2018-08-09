@@ -203,8 +203,8 @@ DEFER: (d)
     [ v- ] 2map ;
 
 ! Laplacian
-: m.m' ( matrix -- matrix' ) dup flip m. ;
-: m'.m ( matrix -- matrix' ) dup flip swap m. ;
+: m.mT ( matrix -- matrix' ) dup flip m. ;
+: mT.m ( matrix -- matrix' ) dup flip swap m. ;
 
 : empty-matrix? ( matrix -- ? )
     [ t ] [ first empty? ] if-empty ;
@@ -221,7 +221,7 @@ DEFER: (d)
     ] if ;
 
 : laplacian-matrix ( basis1 basis2 basis3 -- matrix )
-    dupd d-matrix m.m' [ d-matrix m'.m ] dip ?m+ ;
+    dupd d-matrix m.mT [ d-matrix mT.m ] dip ?m+ ;
 
 : laplacian-betti ( basis1 basis2 basis3 -- n )
     laplacian-matrix null/rank drop ;

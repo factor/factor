@@ -227,10 +227,10 @@ TYPED:: kill-ev ( edge: b-edge -- )
     edge [ v' >>vertex drop ] each-vertex-edge
 
     edge face-cw :> edgep
-    edge' face-cw :> edge'p
+    edge' face-cw :> edgep'
 
     edge next-edge>> edgep next-edge<<
-    edge' next-edge>> edge'p next-edge<<
+    edge' next-edge>> edgep' next-edge<<
 
     v b-rep delete-vertex
     edge b-rep delete-edge

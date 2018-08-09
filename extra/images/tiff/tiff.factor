@@ -230,8 +230,8 @@ ERROR: bad-jpeg-proc n ;
 ERROR: bad-tiff-magic bytes ;
 : tiff-endianness ( byte-array -- ? )
     {
-        { B{ char: M char: M } [ big-endian ] }
-        { B{ char: I char: I } [ little-endian ] }
+        { B{ ch'M ch'M } [ big-endian ] }
+        { B{ ch'I ch'I } [ little-endian ] }
         [ bad-tiff-magic ]
     } case ;
 

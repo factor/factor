@@ -33,12 +33,12 @@ HELP: eliminatable-copy?
 
 HELP: try-eliminate-copy
 { $values { "follower" "vreg" } { "leader" "vreg" } { "must?" boolean } }
-{ $description "Tries to eliminate a vreg copy from 'leader' to 'follower'. If 'must?' is " { $link t } " then a " { $link vregs-shouldn't-interfere } " error is thrown if the vregs interfere." }
+{ $description "Tries to eliminate a vreg copy from 'leader' to 'follower'. If 'must?' is " { $link t } " then a " { $link vregs-should-not-interfere } " error is thrown if the vregs interfere." }
 { $see-also try-eliminate-copies vregs-interfere? } ;
 
 HELP: try-eliminate-copies
 { $values { "pairs" "a sequence of vreg pairs" } { "must?" boolean } }
-{ $description "Tries to eliminate the vreg copies in the " { $link sequence } " 'pairs'. If 'must?' is " { $link t } " then a " { $link vregs-shouldn't-interfere } " error is thrown if any of the vregs interfere." }
+{ $description "Tries to eliminate the vreg copies in the " { $link sequence } " 'pairs'. If 'must?' is " { $link t } " then a " { $link vregs-should-not-interfere } " error is thrown if any of the vregs interfere." }
 { $see-also try-eliminate-copy } ;
 
 ARTICLE: "compiler.cfg.ssa.destruction.coalescing" "Vreg Coalescing"

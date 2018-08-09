@@ -42,7 +42,7 @@ INITIALIZED-SYMBOL: super-message-senders [ H{ } clone ]
 TUPLE: selector-tuple name object ;
 
 : selector-name ( name -- name' )
-    char: . over index [ 0 > [ "." split1 nip ] when ] when* ;
+    ch'. over index [ 0 > [ "." split1 nip ] when ] when* ;
 
 MEMO: <selector> ( name -- sel )
     selector-name f selector-tuple boa ;
@@ -184,7 +184,7 @@ cell {
 assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
-    [ char: = ] 2keep index-from swap subseq
+    [ ch'= ] 2keep index-from swap subseq
     objc>struct-types get at* [ drop void* ] unless ;
 
 ERROR: no-objc-type name ;
@@ -196,9 +196,9 @@ ERROR: no-objc-type name ;
 : (parse-objc-type) ( i string -- ctype )
     [ [ 1 + ] dip ] [ nth ] 2bi {
         { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
-        { [ dup char: ^ = ] [ 3drop void* ] }
-        { [ dup char: \{ = ] [ drop objc-struct-type ] }
-        { [ dup char: \[ = ] [ 3drop void* ] }
+        { [ dup ch'^ = ] [ 3drop void* ] }
+        { [ dup ch'\{ = ] [ drop objc-struct-type ] }
+        { [ dup ch'\[ = ] [ 3drop void* ] }
         [ 2nip decode-type ]
     } cond ;
 
@@ -234,7 +234,7 @@ ERROR: no-objc-type name ;
 
 : method-collisions ( -- collisions )
     objc-methods get >alist
-    [ first char: . swap member? ] filter
+    [ first ch'. swap member? ] filter
     [ first "." split1 nip ] collect-by
     [ nip values members length 1 > ] assoc-filter ;
 

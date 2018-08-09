@@ -55,16 +55,16 @@ ERROR: unknown-cpuinfo-line string ;
 
 : line>processor-info ( processor-info string -- processor-info )
     ":" split first2 swap
-    [ char: \t = ] trim-tail [ [ char: \s = ] trim ] bi@
+    [ ch'\t = ] trim-tail [ [ ch'\s = ] trim ] bi@
     {
         { "address sizes" [
-            "," split [ [ char: \s = ] trim " " split first string>number ] map
+            "," split [ [ ch'\s = ] trim " " split first string>number ] map
             >>address-sizes
         ] }
         { "apicid" [ string>number >>apicid ] }
         { "bogomips" [ string>number >>bogomips ] }
         { "cache size" [
-            " " split first [ char: \s = ] trim
+            " " split first [ ch'\s = ] trim
             string>number 1024 * >>cache-size
         ] }
         { "cache_alignment" [ string>number >>cache-alignment ] }
@@ -208,7 +208,7 @@ TUPLE: proc-cpu-stat name user nice system idle iowait irq softirq steal guest g
 : line>cpu ( string -- cpu )
     " " split
     unclip-slice
-    [ [ [ char: \s = ] trim string>number ] map ] dip prefix
+    [ [ [ ch'\s = ] trim string>number ] map ] dip prefix
     [ proc-cpu-stat boa ] input<sequence ;
 
 : parse-proc-stat ( -- obj )

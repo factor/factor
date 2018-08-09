@@ -29,7 +29,7 @@ IN: unicode.collation.tests
     ";" split1 [
         " " split [ hex> ] map
     ] [
-        "#" split1 nip char: \[ tail-from-last
+        "#" split1 nip ch'\[ tail-from-last
         "]" split1 drop
         "|" split 4 head
         [ " " split harvest [ hex> ] map ] map

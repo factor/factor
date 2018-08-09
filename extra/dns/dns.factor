@@ -35,6 +35,8 @@ ENUM: dns-opcode QUERY IQUERY STATUS ;
 ENUM: dns-rcode NO-ERROR FORMAT-ERROR SERVER-FAILURE
 NAME-ERROR NOT-IMPLEMENTED REFUSED ;
 
+HOOK: initial-dns-servers os ( -- sequence )
+
 INITIALIZED-SYMBOL: dns-servers [ initial-dns-servers >vector ]
 
 : add-dns-server ( string -- )
@@ -406,20 +408,22 @@ M: TXT rdata>byte-array
         ! dns-A-query message>a-names [ <ipv4> ] map
     ! ] if ;
 
-HOOK: initial-dns-servers os ( -- sequence )
-
 <WINDOWS
 USING: windows.iphlpapi ;
 
 M: windows initial-dns-servers dns-server-ips ;
 WINDOWS>
 
-<UNIX
+<LINUX
 USING: resolv-conf ;
 
 M: unix initial-dns-servers
     default-resolv.conf nameserver>> ;
-UNIX>
+LINUX>
+
+<MACOS
+M: macosx initial-dns-servers { "8.8.8.8" } ;
+MACOS>
 
 : with-dns-servers ( servers quot -- )
     [ dns-servers ] dip with-variable ; inline

@@ -24,7 +24,7 @@ HINTS: assure-good-char { spot fixnum } ;
 
 : record ( spot char -- spot )
     over char>> [
-        char: \n eq?
+        ch'\n eq?
         [ [ 1 + ] change-line -1 ] [ dup column>> 1 + ] if
         >>column
     ] [ drop ] if ;
@@ -34,9 +34,9 @@ HINTS: record { spot fixnum } ;
 :: (next) ( spot -- spot char )
     spot next>> :> old-next
     spot stream>> stream-read1 :> new-next
-    old-next char: \r eq? [
-        spot char: \n >>char
-        new-next char: \n eq?
+    old-next ch'\r eq? [
+        spot ch'\n >>char
+        new-next ch'\n eq?
         [ spot stream>> stream-read1 >>next ]
         [ new-next >>next ] if
     ] [ spot old-next >>char new-next >>next ] if
@@ -134,11 +134,11 @@ HINTS: next* { spot } ;
     {
         { [ char not ] [ ] }
         { [ char quot call ] [ spot next* ] }
-        { [ char char: & eq? ] [
+        { [ char ch'& eq? ] [
             accum parse-entity
             quot accum spot (parse-char)
         ] }
-        { [ char char: % eq? [ in-dtd? get ] [ f ] if ] [
+        { [ char ch'% eq? [ in-dtd? get ] [ f ] if ] [
             accum parse-pe
             quot accum spot (parse-char)
         ] }
@@ -162,23 +162,23 @@ HINTS: next* { spot } ;
     |[ char |
         pos char assure-no-double-bracket pos!
         no-text [
-            char blank? char char: < eq? or [
+            char blank? char ch'< eq? or [
                 char 1string t pre/post-content
             ] unless
         ] when
-        char char: < eq?
+        char ch'< eq?
     ] parse-char ;
 
 : close ( -- )
     pass-blank ">" expect ;
 
 : normalize-quote ( str -- str )
-    [ dup "\t\r\n" member? [ drop char: \s ] when ] map! ;
+    [ dup "\t\r\n" member? [ drop ch'\s ] when ] map! ;
 
 : (parse-quote) ( <-disallowed? ch -- string )
     swap '[
         dup _ eq? [ drop t ]
-        [ char: < eq? _ and [ attr-w/< ] [ f ] if ] if
+        [ ch'< eq? _ and [ attr-w/< ] [ f ] if ] if
     ] parse-char normalize-quote get-char
     [ unclosed-quote ] unless ; inline
 

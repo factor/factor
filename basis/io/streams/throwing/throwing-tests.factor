@@ -51,7 +51,7 @@ io.streams.throwing kernel namespaces tools.test ;
     ] with-byte-reader
 ] [ stream-exhausted? ] must-fail-with
 
-{ "asd" char: f } [
+{ "asd" ch'f } [
     "asdf" [ [ "f" read-until ] throw-on-eof ] with-string-reader
 ] unit-test
 

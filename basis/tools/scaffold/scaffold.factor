@@ -31,7 +31,7 @@ ERROR: vocab-must-not-exist string ;
     [ check-root ] [ check-vocab-name ] bi* ;
 
 : replace-vocab-separators ( vocab -- path )
-    path-separator first char: . associate substitute ; inline
+    path-separator first ch'. associate substitute ; inline
 
 : vocab-root/vocab>path ( vocab-root vocab -- path )
     check-vocab-root/vocab
@@ -104,7 +104,7 @@ ERROR: vocab-must-not-exist string ;
 
 : lookup-type ( string -- object/string ? )
     "/f" ?tail swap
-    "new" ?head drop [ { [ char: ' = ] [ digit? ] } 1|| ] trim-tail
+    "new" ?head drop [ { [ ch'\' = ] [ digit? ] } 1|| ] trim-tail
     H{
         { "object" object }
         { "obj" object }
@@ -331,7 +331,7 @@ SYMBOL: nested-examples
 
 : example-using ( using -- )
     " " join "example-using" [
-        nested-examples get 4 0 ? char: \s <string> "example-indent" [
+        nested-examples get 4 0 ? ch'\s <string> "example-indent" [
             "${example-indent}\"Example:\"
 ${example-indent}{ $example \"USING: ${example-using} ;\"
 ${example-indent}    \"\"

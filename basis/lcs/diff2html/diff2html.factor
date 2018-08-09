@@ -7,7 +7,7 @@ IN: lcs.diff2html
 GENERIC: diff-line ( obj -- xml )
 
 : item-string ( item -- string )
-    item>> [ char: no-break-space 1string ] when-empty ;
+    item>> [ ch'no-break-space 1string ] when-empty ;
 
 M: retain diff-line
     item-string
