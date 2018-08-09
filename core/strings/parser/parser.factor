@@ -31,6 +31,7 @@ ERROR: bad-escape char ;
         { char: \] char: \] }
         { char: \} char: \} }
         { char: \) char: \) }
+        { char: \' char: \' }
     } ?at [ bad-escape ] unless ;
 
 INITIALIZED-SYMBOL: name>char-hook [

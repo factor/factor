@@ -151,8 +151,14 @@ PREDICATE: unexpected-eof < unexpected got>> not ;
 
 : strict-single-quote? ( string -- ? )
     "'" split1
-    [ [ char: ' swap member? not ] [ drop t ] bi and ]
-    [ [ length 0 > ] [ "'" tail? not ] bi and ] bi* and ;
+    [ drop t ]
+    [
+        [ length 0 > ]
+        [
+            ! ch'\'
+            [ "\\'" tail? ] [ "'" tail? not ] bi or
+        ] bi and
+    ] bi* and ;
 
 : strict-lower-colon? ( string -- ? )
     [ char: \: = ] cut-tail
