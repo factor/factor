@@ -60,8 +60,24 @@ ERROR: number-expected ;
         dup string>number [ ] [ no-word ] ?if
     ] ?if ;
 
+DEFER: scan-object
+: parse-lower-colon2 ( obj -- obj' )
+    [ char: \: = ] cut-tail length [ scan-object ] replicate 2array
+    handle-lower-colon ;
+
+: parse-single-quote ( obj -- obj' )
+    "'" split1 2array handle-single-quote ;
+
+: string>new-parser ( string -- string/obj ? )
+    {
+        ! { [ dup strict-lower-colon? ] [ parse-lower-colon2 t ] }
+        { [ dup strict-single-quote? ] [ parse-single-quote t ] }
+        [ f ]
+    } cond ;
+
 : ?scan-datum ( -- word/number/f )
-    ?scan-token dup [ parse-datum ] when ;
+    ?scan-token
+    string>new-parser [ ] [ dup [ parse-datum ] when ] if ;
 
 : scan-datum ( -- word/number )
     ?scan-datum [ \ word throw-unexpected-eof ] unless* ;
@@ -127,19 +143,9 @@ ERROR: classoid-expected object ;
         [ pick push drop t ]
     } cond ;
 
-: parse-lower-colon2 ( accum obj -- accum )
-    [ char: \: = ] cut-tail length [ scan-object ] replicate 2array
-    handle-lower-colon suffix! ;
-
-: parse-single-quote ( accum obj -- accum )
-    "'" split1 2array handle-single-quote suffix! ;
-
 : parse-until-step ( accum end -- accum ? )
-    ?scan-token {
-        ! { [ dup strict-lower-colon? ] [ nip parse-lower-colon2 t ] }
-        ! { [ dup strict-single-quote? ] [ nip parse-single-quote t ] }
-        [ (parse-until-step) ]
-    } cond ;
+    ?scan-token string>new-parser
+    [ nip suffix! t ] [ (parse-until-step) ] if ;
 
 : (parse-until) ( accum end -- accum )
     [ parse-until-step ] keep swap [ (parse-until) ] [ drop ] if ;
