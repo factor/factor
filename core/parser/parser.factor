@@ -3,8 +3,8 @@
 USING: accessors arrays classes combinators compiler.units
 continuations definitions effects io io.encodings.utf8 io.files
 kernel lexer math.parser namespaces parser.notes quotations
-sequences sets slots source-files vectors vocabs vocabs.parser
-words words.symbol ;
+sequences sets slots source-files splitting syntax.modern
+vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 : location ( -- loc )
@@ -117,13 +117,28 @@ ERROR: classoid-expected object ;
     scan-object \ f or
     dup classoid? [ classoid-expected ] unless ;
 
-: parse-until-step ( accum end -- accum ? )
-    ?scan-datum {
+: (parse-until-step) ( accum end token -- accum ? )
+    dup [ parse-datum ] when
+    {
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop throw-unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
         { [ dup parsing-word? ] [ nip execute-parsing t ] }
         [ pick push drop t ]
+    } cond ;
+
+: parse-lower-colon2 ( accum obj -- accum )
+    [ char: \: = ] cut-tail length [ scan-object ] replicate 2array
+    handle-lower-colon suffix! ;
+
+: parse-single-quote ( accum obj -- accum )
+    "'" split1 2array handle-single-quote suffix! ;
+
+: parse-until-step ( accum end -- accum ? )
+    ?scan-token {
+        ! { [ dup strict-lower-colon? ] [ nip parse-lower-colon2 t ] }
+        ! { [ dup strict-single-quote? ] [ nip parse-single-quote t ] }
+        [ (parse-until-step) ]
     } cond ;
 
 : (parse-until) ( accum end -- accum )

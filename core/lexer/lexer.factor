@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators continuations io kernel
-kernel.private math math.parser namespaces sequences
+kernel.private math math.order math.parser namespaces sequences
 sequences.private source-files.errors splitting strings vectors ;
 IN: lexer
+
 
 TUPLE: lexer
 { text array }
@@ -147,6 +148,33 @@ DEFER: parse-token
 PREDICATE: unexpected-eof < unexpected got>> not ;
 
 : throw-unexpected-eof ( word -- * ) f unexpected ;
+
+: strict-single-quote? ( string -- ? )
+    "'" split1
+    [ [ char: ' swap member? not ] [ drop t ] bi and ]
+    [ [ length 0 > ] [ "'" tail? not ] bi and ] bi* and ;
+
+: strict-lower-colon? ( string -- ? )
+    [ char: \: = ] cut-tail
+    [
+        [ length 0 > ] [
+            [ [ char: a char: z between? ] [ "-" member? ] bi or ] all?
+        ] bi and ]
+    [ length 0 > ] bi* and ;
+
+: (strict-upper-colon?) ( string -- ? )
+    ! All chars must...
+    [
+        [
+            [ char: A char: Z between? ] [ "':-\\#" member? ] bi or
+        ] all?
+    ]
+    ! At least one char must...
+    [ [ [ char: A char: Z between? ] [ char: ' = ] bi or ] any? ] bi and ;
+
+: strict-upper-colon? ( string -- ? )
+    [ [ char: \: = ] all? ]
+    [ (strict-upper-colon?) ] bi or ;
 
 : scan-token ( -- str )
     ?scan-token [ "token" throw-unexpected-eof ] unless* ;
