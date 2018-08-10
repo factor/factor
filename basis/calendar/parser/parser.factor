@@ -94,7 +94,7 @@ CONSTANT: rfc822-named-zones H{
         ]
     } cond ;
 
-: read-hh:mm:ss ( -- hh mm ss )
+: read-hh-mm-ss ( -- hh mm ss )
     ":" read-token checked-number
     ":" read-token checked-number
     read-sp checked-number ;
@@ -105,7 +105,7 @@ CONSTANT: rfc822-named-zones H{
     read-sp checked-number
     read-sp month-abbreviations index 1 + check-timestamp
     read-sp checked-number spin
-    read-hh:mm:ss
+    read-hh-mm-ss
     " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
 : rfc822>timestamp ( str -- timestamp )
@@ -121,7 +121,7 @@ CONSTANT: rfc822-named-zones H{
     "-" read-token checked-number
     "-" read-token month-abbreviations index 1 + check-timestamp
     read-sp checked-number spin
-    read-hh:mm:ss
+    read-hh-mm-ss
     " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
 : cookie-string>timestamp-1 ( str -- timestamp )
@@ -131,7 +131,7 @@ CONSTANT: rfc822-named-zones H{
     read-sp check-day-name
     read-sp month-abbreviations index 1 + check-timestamp
     read-sp checked-number
-    read-hh:mm:ss
+    read-hh-mm-ss
     [ read-sp checked-number ] 5 ndip
     " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
 
