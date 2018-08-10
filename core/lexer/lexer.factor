@@ -134,8 +134,14 @@ DEFER: parse-token
         nip
     ] if ;
 
+! TODO: combinations of prefix: \$#_:
+! suffix: \_:
+
 : unescape-token ( string -- string' )
     dup length 1 = [ "\\" ?head drop ] unless ;
+
+: unhashtag-token ( string -- string' )
+    dup length 1 = [ "#" ?head [ drop f ] when ] unless ;
 
 : unescape-tokens ( seq -- seq' )
     [ unescape-token ] map ;
@@ -143,7 +149,7 @@ DEFER: parse-token
 : parse-token ( lexer -- str/f )
     dup parse-raw [ skip-comments ] [ drop f ] if* ;
 
-: ?scan-token ( -- str/f ) lexer get parse-token unescape-token ;
+: ?scan-token ( -- str/f ) lexer get parse-token unescape-token unhashtag-token ;
 
 PREDICATE: unexpected-eof < unexpected got>> not ;
 
