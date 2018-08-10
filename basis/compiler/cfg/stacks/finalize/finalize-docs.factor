@@ -25,7 +25,7 @@ HELP: finalize-stack-shuffling
 
 HELP: visit-edge
 { $values { "from" basic-block } { "to" basic-block } }
-{ $description "If required, insert a block containing " { $link ##peek } " and " { $link ##replace } " instructions on the edge between the 'from' and 'to' block. If no such instructions are needed, then no block is inserted." } ;
+{ $description "If required, insert a block containing " { $link peek## } " and " { $link replace## } " instructions on the edge between the 'from' and 'to' block. If no such instructions are needed, then no block is inserted." } ;
 
 ARTICLE: "compiler.cfg.stacks.finalize" "Stack finalization"
 "This pass inserts peeks and replaces." ;

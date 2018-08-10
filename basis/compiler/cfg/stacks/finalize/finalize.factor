@@ -24,14 +24,14 @@ ERROR: bad-peek dst loc ;
 
 : insert-peeks ( from to -- )
     [ inserting-peeks ] keep
-    [ dup n>> 0 < [ bad-peek ] [ ##peek, ] if ] each-insertion ;
+    [ dup n>> 0 < [ bad-peek ] [ peek##, ] if ] each-insertion ;
 
 : insert-replaces ( from to -- )
     [ inserting-replaces ] keep
-    [ dup n>> 0 < [ 2drop ] [ ##replace, ] if ] each-insertion ;
+    [ dup n>> 0 < [ 2drop ] [ replace##, ] if ] each-insertion ;
 
 : visit-edge ( from to -- )
-    2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ##branch, ] V{ } make
+    2dup [ [ insert-replaces ] [ insert-peeks ] 2bi branch##, ] V{ } make
     dup length 1 > [
         insert-basic-block
     ] [ 3drop ] if ;

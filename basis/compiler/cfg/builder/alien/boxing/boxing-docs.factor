@@ -9,15 +9,15 @@ HELP: box
   { "c-type" c-type }
   { "dst" "box" }
 }
-{ $description "Emits a " { $link ##box-alien } " instruction which boxes an alien value contained in the given register." }
+{ $description "Emits a " { $link box-alien## } " instruction which boxes an alien value contained in the given register." }
 { $examples
   { $unchecked-example
     "USING: compiler.cfg.builder.alien.boxing make prettyprint ;"
     "{ 71 } { int-rep } void* base-type [ box ] { } make nip ."
-    "{ T{ ##box-alien { dst 105 } { src 71 } { temp 104 } } }"
+    "{ T{ box-alien## { dst 105 } { src 71 } { temp 104 } } }"
   }
 }
-{ $see-also ##box-alien } ;
+{ $see-also box-alien## } ;
 
 HELP: box-return
 { $values
@@ -31,10 +31,10 @@ HELP: box-return
   { $unchecked-example
     "USING: compiler.cfg.builder.alien.boxing kernel make prettyprint ;"
     "[ { 10 } { tagged-rep } int base-type box-return drop ] { } make ."
-    "{ T{ ##convert-integer { dst 118 } { src 10 } { c-type int } } }"
+    "{ T{ convert-integer## { dst 118 } { src 10 } { c-type int } } }"
   }
 }
-{ $see-also ##box-alien } ;
+{ $see-also box-alien## } ;
 
 HELP: flatten-c-type
 { $values { "c-type" abstract-c-type } { "pairs" sequence } }

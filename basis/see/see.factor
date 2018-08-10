@@ -65,7 +65,7 @@ M: standard-generic synopsis*
         [ definer. ]
         [ seeing-word ]
         [ pprint-word ]
-        [ dispatch# pprint* ]
+        [ dispatch-number pprint* ]
         [ stack-effect. ]
     } cleave ;
 

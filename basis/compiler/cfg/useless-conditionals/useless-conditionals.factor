@@ -9,12 +9,12 @@ IN: compiler.cfg.useless-conditionals
     {
         [
             instructions>> last {
-                [ ##compare-branch? ]
-                [ ##compare-imm-branch? ]
-                [ ##compare-integer-branch? ]
-                [ ##compare-integer-imm-branch? ]
-                [ ##compare-float-ordered-branch? ]
-                [ ##compare-float-unordered-branch? ]
+                [ compare-branch##? ]
+                [ compare-imm-branch##? ]
+                [ compare-integer-branch##? ]
+                [ compare-integer-imm-branch##? ]
+                [ compare-float-ordered-branch##? ]
+                [ compare-float-unordered-branch##? ]
             } 1||
         ]
         [ successors>> first2 [ skip-empty-blocks ] bi@ eq? ]
@@ -22,7 +22,7 @@ IN: compiler.cfg.useless-conditionals
 
 : delete-conditional ( bb -- )
     [ first skip-empty-blocks 1vector ] change-successors
-    instructions>> [ pop* ] [ [ ##branch new-insn ] dip push ] bi ;
+    instructions>> [ pop* ] [ [ branch## new-insn ] dip push ] bi ;
 
 : delete-useless-conditionals ( cfg -- )
     [

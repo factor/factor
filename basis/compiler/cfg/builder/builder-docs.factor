@@ -20,8 +20,8 @@ T{ basic-block
                 { id 1903166 }
                 { instructions
                     V{
-                        T{ ##call { word dummy } }
-                        T{ ##branch }
+                        T{ call## { word dummy } }
+                        T{ branch## }
                     }
                 }
                 { successors
@@ -36,7 +36,7 @@ T{ basic-block
 
 CONSTANT: ex-make-input-map [[
 USING: compiler.cfg.builder prettyprint ;
-T{ #shuffle { in-d { 37 81 92 } } } make-input-map .
+T{ shuffle# { in-d { 37 81 92 } } } make-input-map .
 { { 37 d: 2 } { 81 d: 1 } { 92 d: 0 } }
 ]]
 >>
@@ -50,7 +50,7 @@ HELP: procedures
 { $see-also build-cfg } ;
 
 HELP: make-input-map
-{ $values { "#shuffle" #shuffle } { "assoc" assoc } }
+{ $values { "shuffle#" shuffle# } { "assoc" assoc } }
 { $description "Creates an " { $link assoc } " that maps input values to the shuffle operation to stack locations." }
 { $examples { $unchecked-example $[ ex-make-input-map ] } } ;
 
@@ -82,9 +82,9 @@ HELP: emit-node
 $nl
 "The following classes emit-node methods does not change the current block:"
   { $list
-    { $link #alien-assembly }
-    { $link #alien-callback }
-    { $link #alien-indirect }
+    { $link alien-assembly# }
+    { $link alien-callback# }
+    { $link alien-indirect# }
   }
 } ;
 
@@ -101,21 +101,21 @@ HELP: end-word
   { "block" "current " { $link basic-block } }
   { "block'" basic-block }
 }
-{ $description "Ends the word by adding a basic block containing a " { $link ##return } " instructions to the " { $link cfg } "." } ;
+{ $description "Ends the word by adding a basic block containing a " { $link return## } " instructions to the " { $link cfg } "." } ;
 
 HELP: height-changes
-{ $values { "#shuffle" #shuffle } { "height-changes" pair } }
-{ $description "Returns a two-tuple which represents how much the " { $link #shuffle } " node increases or decreases the data and retainstacks." }
+{ $values { "shuffle#" shuffle# } { "height-changes" pair } }
+{ $description "Returns a two-tuple which represents how much the " { $link shuffle# } " node increases or decreases the data and retainstacks." }
 { $examples
   { $example
     "USING: compiler.cfg.builder compiler.tree prettyprint ;"
-    "T{ #shuffle { in-d { 37 81 92 } } { out-d { 20 } } } height-changes ."
+    "T{ shuffle# { in-d { 37 81 92 } } { out-d { 20 } } } height-changes ."
     "{ -2 0 }"
   }
 } ;
 
 HELP: out-vregs/stack
-{ $values { "#shuffle" #shuffle } { "pair" sequence } }
+{ $values { "shuffle#" shuffle# } { "pair" sequence } }
 { $description "Returns a sequence of what vregs are on which stack locations after the shuffle instruction." } ;
 
 HELP: trivial-branch?
@@ -128,7 +128,7 @@ HELP: trivial-branch?
 { $examples
   { $example
     "USING: compiler.cfg.builder compiler.tree prettyprint ;"
-    "{ T{ #push { literal 25 } } } trivial-branch? . ."
+    "{ T{ push# { literal 25 } } } trivial-branch? . ."
     "t\n25"
   }
 } ;
@@ -156,26 +156,26 @@ $nl
 { $subsections
     with-cfg-builder
 }
-"Emitters for " { $link #call } ":"
+"Emitters for " { $link call# } ":"
 { $subsections
   emit-call
   emit-loop-call
 }
-"Emitters for " { $link #dispatch } " and " { $link #if } ":"
+"Emitters for " { $link dispatch# } " and " { $link if# } ":"
 { $subsections
   emit-actual-if
   emit-branch
   emit-if
   emit-trivial-if
 }
-"Emitters for " { $link #recursive } ":"
+"Emitters for " { $link recursive# } ":"
 {
     $subsections
     emit-loop
     emit-recursive
     end-branch
 }
-"Helpers for " { $link #shuffle } ":"
+"Helpers for " { $link shuffle# } ":"
 {
     $subsections
     height-changes

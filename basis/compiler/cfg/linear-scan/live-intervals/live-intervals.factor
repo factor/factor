@@ -88,15 +88,15 @@ M: insn compute-live-intervals* drop ;
 
 UNION: hairy-clobber-insn
     alien-call-insn
-    ##callback-inputs
-    ##callback-outputs
-    ##unbox-long-long ;
+    callback-inputs##
+    callback-outputs##
+    unbox-long-long## ;
 
 UNION: clobber-insn
     hairy-clobber-insn
-    ##unbox
-    ##box
-    ##box-long-long ;
+    unbox##
+    box##
+    box-long-long## ;
 
 M: vreg-insn compute-live-intervals* ( insn -- )
     dup insn#>>

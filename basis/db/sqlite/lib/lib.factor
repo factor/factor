@@ -126,7 +126,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
 : sqlite-reset ( handle -- ) sqlite3_reset sqlite-check-result ;
 : sqlite-clear-bindings ( handle -- )
     sqlite3_clear_bindings sqlite-check-result ;
-: sqlite-#columns ( query -- int ) sqlite3_column_count ;
+: sqlite-num-columns ( query -- int ) sqlite3_column_count ;
 : sqlite-column ( handle index -- string ) sqlite3_column_text ;
 : sqlite-column-name ( handle index -- string ) sqlite3_column_name ;
 : sqlite-column-type ( handle index -- string ) sqlite3_column_type ;
@@ -181,7 +181,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     } case ;
 
 : sqlite-row ( handle -- seq )
-    dup sqlite-#columns [ sqlite-column ] with { } map-integers ;
+    dup sqlite-num-columns [ sqlite-column ] with { } map-integers ;
 
 : sqlite-step-has-more-rows? ( prepared -- ? )
     {

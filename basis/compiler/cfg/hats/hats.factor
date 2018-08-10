@@ -11,7 +11,7 @@ IN: compiler.cfg.hats
 <PRIVATE
 
 : hat-name ( insn -- word )
-    name>> "##" ?head drop "^^" prepend create-word-in ;
+    name>> "##" ?tail drop "^^" prepend create-word-in ;
 
 : hat-quot ( insn -- quot )
     [
@@ -35,7 +35,7 @@ IN: compiler.cfg.hats
 PRIVATE>
 
 insn-classes get [
-    dup [ insn-def-slots length 1 = ] [ name>> "##" head? ] bi and
+    dup [ insn-def-slots length 1 = ] [ name>> "##" tail? ] bi and
     [ define-hat ] [ drop ] if
 ] each
 

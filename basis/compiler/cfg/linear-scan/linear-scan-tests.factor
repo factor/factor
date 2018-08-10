@@ -32,9 +32,9 @@ check-numbering? on
     ! A value is defined and never used; make sure it has the right
     ! live range
     {
-        T{ ##load-integer f 1 0 }
-        T{ ##replace-imm f d: 0 "hi" }
-        T{ ##branch }
+        T{ load-integer## f 1 0 }
+        T{ replace-imm## f d: 0 "hi" }
+        T{ branch## }
     } insns>cfg
     [ cfg set ] [ number-instructions ] [ compute-live-intervals ] tri
     drop ;

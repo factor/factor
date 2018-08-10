@@ -15,7 +15,7 @@ PREDICATE: hook-generic < generic
 M: hook-combination picker
     combination get var>> [ get ] curry ;
 
-M: hook-combination dispatch# drop 0 ;
+M: hook-combination dispatch-number drop 0 ;
 
 M: hook-combination mega-cache-quot
     1quotation picker [ gsp:lookup-method (execute) ] surround ;

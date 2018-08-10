@@ -72,7 +72,7 @@ midi.private sequences tools.test ;
         { header
             T{ midi-header
                 { format 0 }
-                { #chunks 1 }
+                { n-chunks 1 }
                 { division 96 }
             }
         }
@@ -263,7 +263,7 @@ midi.private sequences tools.test ;
         { header
             T{ midi-header
                 { format 1 }
-                { #chunks 4 }
+                { n-chunks 4 }
                 { division 96 }
             }
         }

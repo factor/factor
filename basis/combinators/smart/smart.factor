@@ -24,7 +24,7 @@ IDENTITY-MEMO: inputs/outputs ( quot -- in out )
 \ inputs/outputs [
     peek-d
     infer-known [
-        [ pop-d 1array #drop, ]
+        [ pop-d 1array drop#, ]
         [ [ in>> ] [ out>> ] bi [ length apply-object ] bi@ ] bi*
     ] [
         \ inputs/outputs dup required-stack-effect apply-word/effect

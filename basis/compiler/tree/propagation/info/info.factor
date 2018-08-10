@@ -323,13 +323,13 @@ SYMBOL: value-infos
 : node-output-infos ( node -- seq )
     dup out-d>> [ node-value-info ] with map ;
 
-: first-literal ( #call -- obj )
+: first-literal ( call# -- obj )
     dup in-d>> first node-value-info literal>> ;
 
-: last-literal ( #call -- obj )
+: last-literal ( call# -- obj )
     dup out-d>> last node-value-info literal>> ;
 
-: immutable-tuple-boa? ( #call -- ? )
+: immutable-tuple-boa? ( call# -- ? )
     dup word>> \ <tuple-boa> eq? [
         dup in-d>> last node-value-info
         literal>> first immutable-tuple-class?

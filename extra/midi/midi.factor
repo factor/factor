@@ -20,7 +20,7 @@ TUPLE: midi-chunk type bytes ;
 
 C: <midi-chunk> midi-chunk
 
-TUPLE: midi-header format #chunks division ;
+TUPLE: midi-header format n-chunks division ;
 
 TUPLE: midi-track events ;
 
@@ -230,7 +230,7 @@ CONSTANT: smpte-framerate H{
     read-chunk dup midi-header? t assert= ;
 
 : read-chunks ( header -- chunks )
-    #chunks>> [ read-chunk ] replicate ;
+    n-chunks>> [ read-chunk ] replicate ;
 
 PRIVATE>
 
@@ -384,7 +384,7 @@ GENERIC: write-chunk ( chunk -- )
 M: midi-header write-chunk
     $[ "MThd" >byte-array ] write
     $[ 6 4 >be ] write
-    [ format>> ] [ #chunks>> ] [ division>> ] tri
+    [ format>> ] [ n-chunks>> ] [ division>> ] tri
     [ 2 >be write ] tri@ ;
 
 M: midi-track write-chunk

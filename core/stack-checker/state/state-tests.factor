@@ -23,8 +23,8 @@ IN: stack-checker.state.tests
         known-values get 24 of value>> 33 =
     ] with-infer nip
     V{
-        T{ #push { literal 33 } { out-d { 24 } } }
-        T{ #return { in-d V{ 24 } } }
+        T{ push# { literal 33 } { out-d { 24 } } }
+        T{ return# { in-d V{ 24 } } }
     } node-seqs-eq?
 ] unit-test
 
@@ -33,6 +33,6 @@ IN: stack-checker.state.tests
     V{ } clone stack-visitor set
     V{ [ call ] } literals set commit-literals
     stack-visitor get
-    V{ T{ #push { literal [ call ] } { out-d { 1 } } } }
+    V{ T{ push# { literal [ call ] } { out-d { 1 } } } }
     node-seqs-eq?
 ] unit-test

@@ -18,7 +18,7 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 {
     {
-        T{ ##reload { dst 1 } { rep int-rep } { src T{ spill-slot f 0 } } }
+        T{ reload## { dst 1 } { rep int-rep } { src T{ spill-slot f 0 } } }
     }
 } [
     [
@@ -30,7 +30,7 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 {
     {
-        T{ ##spill { src 1 } { rep int-rep } { dst T{ spill-slot f 0 } } }
+        T{ spill## { src 1 } { rep int-rep } { dst T{ spill-slot f 0 } } }
     }
 } [
     [
@@ -42,7 +42,7 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 {
     {
-        T{ ##copy { src 1 } { dst 2 } { rep int-rep } }
+        T{ copy## { src 1 } { dst 2 } { rep int-rep } }
     }
 } [
     [
@@ -54,8 +54,8 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 {
     {
-        T{ ##copy { src 1 } { dst 2 } { rep int-rep } }
-        T{ ##branch }
+        T{ copy## { src 1 } { dst 2 } { rep int-rep } }
+        T{ branch## }
     }
 } [
     { { T{ location f 1 int-rep int-regs } T{ location f 2 int-rep int-regs } } }
@@ -64,9 +64,9 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 {
     {
-        T{ ##spill { src 0 } { rep int-rep } { dst T{ spill-slot f 0 } } }
-        T{ ##reload { dst 0 } { rep tagged-rep } { src T{ spill-slot f 1 } } }
-        T{ ##branch }
+        T{ spill## { src 0 } { rep int-rep } { dst T{ spill-slot f 0 } } }
+        T{ reload## { dst 0 } { rep tagged-rep } { src T{ spill-slot f 1 } } }
+        T{ branch## }
     }
 } [
     {
@@ -78,9 +78,9 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 {
     {
-        T{ ##spill { src 0 } { rep int-rep } { dst T{ spill-slot f 1 } } }
-        T{ ##reload { dst 0 } { rep tagged-rep } { src T{ spill-slot f 0 } } }
-        T{ ##branch }
+        T{ spill## { src 0 } { rep int-rep } { dst T{ spill-slot f 1 } } }
+        T{ reload## { dst 0 } { rep tagged-rep } { src T{ spill-slot f 0 } } }
+        T{ branch## }
     }
 } [
     {
@@ -92,9 +92,9 @@ IN: compiler.cfg.linear-scan.resolve.tests
 
 {
     {
-        T{ ##spill { src 0 } { rep int-rep } { dst T{ spill-slot f 1 } } }
-        T{ ##reload { dst 0 } { rep tagged-rep } { src T{ spill-slot f 0 } } }
-        T{ ##branch }
+        T{ spill## { src 0 } { rep int-rep } { dst T{ spill-slot f 1 } } }
+        T{ reload## { dst 0 } { rep tagged-rep } { src T{ spill-slot f 0 } } }
+        T{ branch## }
     }
 } [
     {
@@ -114,16 +114,16 @@ init-resolve
     }
     mapping-instructions {
         {
-            T{ ##spill { src 0 } { rep int-rep } { dst T{ spill-slot f 8 } } }
-            T{ ##copy { dst 0 } { src 1 } { rep int-rep } }
-            T{ ##reload { dst 1 } { rep int-rep } { src T{ spill-slot f 8 } } }
-            T{ ##branch }
+            T{ spill## { src 0 } { rep int-rep } { dst T{ spill-slot f 8 } } }
+            T{ copy## { dst 0 } { src 1 } { rep int-rep } }
+            T{ reload## { dst 1 } { rep int-rep } { src T{ spill-slot f 8 } } }
+            T{ branch## }
         }
         {
-            T{ ##spill { src 1 } { rep int-rep } { dst T{ spill-slot f 8 } } }
-            T{ ##copy { dst 1 } { src 0 } { rep int-rep } }
-            T{ ##reload { dst 0 } { rep int-rep } { src T{ spill-slot f 8 } } }
-            T{ ##branch }
+            T{ spill## { src 1 } { rep int-rep } { dst T{ spill-slot f 8 } } }
+            T{ copy## { dst 1 } { src 0 } { rep int-rep } }
+            T{ reload## { dst 0 } { rep int-rep } { src T{ spill-slot f 8 } } }
+            T{ branch## }
         }
     } member?
 ] unit-test

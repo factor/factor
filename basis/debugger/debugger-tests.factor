@@ -35,7 +35,7 @@ IN: debugger.tests
        }
        { asset { "Unit Test" [ ] [ dup ] } }
        { path "resource:basis/game/input/input-tests.factor" }
-       { line# 6 }
+       { line-number 6 }
        { continuation $[ current-continuation ] }
     } error.
 ] unit-test

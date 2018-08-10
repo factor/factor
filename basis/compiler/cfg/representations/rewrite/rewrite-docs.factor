@@ -11,4 +11,4 @@ HELP: conversions-for-block
 
 HELP: insert-conversions
 { $values { "cfg" cfg } }
-{ $description "The last step in " { $vocab-link "compiler.cfg.representations" } ". Here instructions such as " { $link ##shl-imm } " and " { $link ##shr-imm } " are inserted to convert between tagged and untagged value types." } ;
+{ $description "The last step in " { $vocab-link "compiler.cfg.representations" } ". Here instructions such as " { $link shl-imm## } " and " { $link shr-imm## } " are inserted to convert between tagged and untagged value types." } ;

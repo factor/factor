@@ -48,18 +48,18 @@ IN: compiler.cfg.ssa.destruction.coalescing.tests
     H{ { 65 65 } { 99 99 } { 62 62 } { 303 303 } }
 } [
     {
-        T{ ##load-vector
+        T{ load-vector##
            { dst 62 }
            { val B{ 0 0 0 0 0 0 0 64 0 0 0 0 0 0 52 64 } }
            { rep double-2-rep }
         }
-        T{ ##add-vector
+        T{ add-vector##
            { dst 65 }
            { src1 62 }
            { src2 63 }
            { rep double-2-rep }
         }
-        T{ ##allot
+        T{ allot##
            { dst 99 }
            { size 24 }
            { temp 303 }
@@ -71,7 +71,7 @@ IN: compiler.cfg.ssa.destruction.coalescing.tests
 {
     H{ { 118 118 } }
 } [
-    { T{ ##phi { dst 118 } { inputs H{ { 4 120 } { 2 119 } } } } }
+    { T{ phi## { dst 118 } { inputs H{ { 4 120 } { 2 119 } } } } }
     [ insns>cfg compute-defs ] [ init-coalescing ] bi
     leader-map get
 ] unit-test
@@ -84,13 +84,13 @@ IN: compiler.cfg.ssa.destruction.coalescing.tests
 ! coalesce-later
 { V{ { 2 1 } } } [
     [
-        T{ ##copy { src 1 } { dst 2 } { rep int-rep } } coalesce-later
+        T{ copy## { src 1 } { dst 2 } { rep int-rep } } coalesce-later
     ] V{ } make
 ] unit-test
 
 { V{ { 3 4 } { 7 8 } } } [
     [
-        T{ ##parallel-copy { values V{ { 3 4 } { 7 8 } } } } coalesce-later
+        T{ parallel-copy## { values V{ { 3 4 } { 7 8 } } } } coalesce-later
     ] V{ } make
 ] unit-test
 
@@ -105,7 +105,7 @@ IN: compiler.cfg.ssa.destruction.coalescing.tests
 { t } [
     10 [
         { 2286 2287 2288 } unique leader-map set
-        2286 make-phi-inputs ##phi new-insn
+        2286 make-phi-inputs phi## new-insn
         coalesce-now
         2286 leader
     ] replicate all-equal?

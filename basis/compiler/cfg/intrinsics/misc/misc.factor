@@ -24,7 +24,7 @@ IN: compiler.cfg.intrinsics.misc
 : emit-set-special-object ( block node -- block' )
     dup node-input-infos second literal>> [
         ds-drop
-        [ ds-pop ] dip vm-special-object-offset ##set-vm-field,
+        [ ds-pop ] dip vm-special-object-offset set-vm-field##,
     ] [ emit-primitive ] ?if ;
 
 : context-object-offset ( n -- n )
@@ -50,4 +50,4 @@ IN: compiler.cfg.intrinsics.misc
     [ 2drop emit-primitive ] if ;
 
 : emit-cleanup-allot ( block node -- block' )
-    drop [ drop ##no-tco, ] emit-trivial-block ;
+    drop [ drop no-tco##, ] emit-trivial-block ;

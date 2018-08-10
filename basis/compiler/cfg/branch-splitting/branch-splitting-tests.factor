@@ -17,31 +17,31 @@ IN: compiler.cfg.branch-splitting.tests
 : test-branch-splitting ( -- )
     0 get block>cfg check-branch-splitting ;
 
-V{ T{ ##branch } } 0 test-bb
+V{ T{ branch## } } 0 test-bb
 
-V{ T{ ##branch } } 1 test-bb
+V{ T{ branch## } } 1 test-bb
 
-V{ T{ ##branch } } 2 test-bb
+V{ T{ branch## } } 2 test-bb
 
-V{ T{ ##branch } } 3 test-bb
+V{ T{ branch## } } 3 test-bb
 
-V{ T{ ##branch } } 4 test-bb
+V{ T{ branch## } } 4 test-bb
 
 test-diamond
 
 { } [ test-branch-splitting ] unit-test
 
-V{ T{ ##branch } } 0 test-bb
+V{ T{ branch## } } 0 test-bb
 
-V{ T{ ##branch } } 1 test-bb
+V{ T{ branch## } } 1 test-bb
 
-V{ T{ ##branch } } 2 test-bb
+V{ T{ branch## } } 2 test-bb
 
-V{ T{ ##branch } } 3 test-bb
+V{ T{ branch## } } 3 test-bb
 
-V{ T{ ##branch } } 4 test-bb
+V{ T{ branch## } } 4 test-bb
 
-V{ T{ ##branch } } 5 test-bb
+V{ T{ branch## } } 5 test-bb
 
 0 { 1 2 } edges
 
@@ -51,15 +51,15 @@ V{ T{ ##branch } } 5 test-bb
 
 { } [ test-branch-splitting ] unit-test
 
-V{ T{ ##branch } } 0 test-bb
+V{ T{ branch## } } 0 test-bb
 
-V{ T{ ##branch } } 1 test-bb
+V{ T{ branch## } } 1 test-bb
 
-V{ T{ ##branch } } 2 test-bb
+V{ T{ branch## } } 2 test-bb
 
-V{ T{ ##branch } } 3 test-bb
+V{ T{ branch## } } 3 test-bb
 
-V{ T{ ##branch } } 4 test-bb
+V{ T{ branch## } } 4 test-bb
 
 0 { 1 2 } edges
 
@@ -69,11 +69,11 @@ V{ T{ ##branch } } 4 test-bb
 
 { } [ test-branch-splitting ] unit-test
 
-V{ T{ ##branch } } 0 test-bb
+V{ T{ branch## } } 0 test-bb
 
-V{ T{ ##branch } } 1 test-bb
+V{ T{ branch## } } 1 test-bb
 
-V{ T{ ##branch } } 2 test-bb
+V{ T{ branch## } } 2 test-bb
 
 0 { 1 2 } edges
 

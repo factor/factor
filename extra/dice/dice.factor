@@ -4,16 +4,16 @@ USING: fry kernel lexer macros math math.parser namespaces
 random random.private sequences splitting ;
 IN: dice
 
-: (random-roll) ( #dice #sides obj -- n )
+: (random-roll) ( n-dice n-sides obj -- n )
     [ 0 ] 3dip '[ _ _ (random-integer) + 1 + ] times ;
 
-: random-roll ( #dice #sides -- n )
+: random-roll ( n-dice n-sides -- n )
     random-generator get (random-roll) ;
 
-: random-rolls ( length #dice #sides -- seq )
+: random-rolls ( length n-dice n-sides -- seq )
     random-generator get '[ _ _ _ (random-roll) ] replicate ;
 
-: parse-roll ( string -- #dice #sides #added )
+: parse-roll ( string -- n-dice n-sides n-added )
     "d" split1 "+" split1 [ string>number ] tri@ ;
 
 : roll ( string -- n )

@@ -104,8 +104,8 @@ CONSTANT: add-syllable {
 : split-words ( str -- words )
     R/ \b([a-z][a-z\-']*)\b/i all-matching-subseqs ;
 
-TUPLE: text-analysis #paragraphs #sentences #chars #words
-#syllables #complex-words #unique-words #difficult-words ;
+TUPLE: text-analysis n-paragraphs n-sentences n-chars n-words
+n-syllables n-complex-words n-unique-words n-difficult-words ;
 
 : <text-analysis> ( str -- text-analysis )
     {
@@ -129,22 +129,22 @@ TUPLE: text-analysis #paragraphs #sentences #chars #words
     } cleave text-analysis boa ;
 
 : syllables-per-word ( text-analysis -- n )
-    [ #syllables>> ] [ #words>> ] bi / ;
+    [ n-syllables>> ] [ n-words>> ] bi / ;
 
 : words-per-sentence ( text-analysis -- n )
-    [ #words>> ] [ #sentences>> ] bi / ;
+    [ n-words>> ] [ n-sentences>> ] bi / ;
 
 : chars-per-word ( text-analysis -- n )
-    [ #chars>> ] [ #words>> ] bi / ;
+    [ n-chars>> ] [ n-words>> ] bi / ;
 
 : sentences-per-word ( text-analysis -- n )
-    [ #sentences>> ] [ #words>> ] bi / ;
+    [ n-sentences>> ] [ n-words>> ] bi / ;
 
 : percent-complex-words ( text-analysis -- n )
-    [ #complex-words>> ] [ #words>> ] bi / 100 * ;
+    [ n-complex-words>> ] [ n-words>> ] bi / 100 * ;
 
 : percent-difficult-words ( text-analysis -- n )
-    [ #difficult-words>> ] [ #words>> ] bi / 100 * ;
+    [ n-difficult-words>> ] [ n-words>> ] bi / 100 * ;
 
 : flesch-kincaid ( text-analysis -- n )
     [ words-per-sentence 0.39 * ]
@@ -163,7 +163,7 @@ TUPLE: text-analysis #paragraphs #sentences #chars #words
     [ sentences-per-word 29.6 * ] bi - 15.8 - ;
 
 : smog ( text-analysis -- n )
-    [ #complex-words>> ] [ #sentences>> 30 swap / ] bi *
+    [ n-complex-words>> ] [ n-sentences>> 30 swap / ] bi *
     sqrt 1.0430 * 3.1291 + ;
 
 : automated-readability ( text-analysis -- n )
@@ -200,10 +200,10 @@ PRIVATE>
 
 : analyze-text. ( str -- )
     <text-analysis> {
-        [ #paragraphs>> ]
-        [ #sentences>> ]
-        [ #words>> ]
-        [ #chars>> ]
+        [ n-paragraphs>> ]
+        [ n-sentences>> ]
+        [ n-words>> ]
+        [ n-chars>> ]
         [ words-per-sentence ]
         [ syllables-per-word ]
         [ flesch ]

@@ -13,13 +13,13 @@ IN: stack-checker.known-words.tests
         V{ } clone stack-visitor set
         \ swap "shuffle" word-prop infer-shuffle
     ] with-infer nip V{
-        T{ #introduce { out-d { 1 2 } } }
-        T{ #shuffle
+        T{ introduce# { out-d { 1 2 } } }
+        T{ shuffle#
            { mapping { { 3 2 } { 4 1 } } }
            { in-d V{ 1 2 } }
            { out-d V{ 3 4 } }
         }
-        T{ #return { in-d V{ 3 4 } } }
+        T{ return# { in-d V{ 3 4 } } }
     } node-seqs-eq?
 ] unit-test
 
@@ -35,13 +35,13 @@ IN: stack-checker.known-words.tests
            { recursion T{ recursive-state } }
         } infer-call*
     ] with-infer nip V{
-        T{ #shuffle
+        T{ shuffle#
            { mapping { } }
            { in-d { 1234 } }
            { out-d { } }
         }
-        T{ #introduce { out-d { 1 } } }
-        T{ #call { word foo } { in-d V{ 1 } } { out-d { } } }
-        T{ #return { in-d V{ } } }
+        T{ introduce# { out-d { 1 } } }
+        T{ call# { word foo } { in-d V{ 1 } } { out-d { } } }
+        T{ return# { in-d V{ } } }
     } node-seqs-eq?
 ] unit-test

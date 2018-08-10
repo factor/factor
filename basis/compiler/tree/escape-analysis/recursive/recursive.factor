@@ -25,12 +25,12 @@ IN: compiler.tree.escape-analysis.recursive
 : node-output-allocations ( node -- allocations )
     out-d>> [ allocation ] map ;
 
-: recursive-stacks ( #enter-recursive -- stacks )
+: recursive-stacks ( enter-recursive# -- stacks )
     recursive-phi-in
     escaping-values get '[ [ _ disjoint-set-member? ] all? ] filter
     flip ;
 
-: analyze-recursive-phi ( #enter-recursive -- )
+: analyze-recursive-phi ( enter-recursive# -- )
     [ ] [ recursive-stacks ] [ out-d>> ] tri
     [ [ merge-values ] 2each ]
     [
@@ -40,7 +40,7 @@ IN: compiler.tree.escape-analysis.recursive
         2bi
     ] 2bi ;
 
-M: #recursive escape-analysis* ( #recursive -- )
+M: recursive# escape-analysis* ( recursive# -- )
     [ label>> return>> in-d>> introduce-values ]
     [
         [
@@ -52,17 +52,17 @@ M: #recursive escape-analysis* ( #recursive -- )
         ] until-fixed-point
     ] bi ;
 
-M: #enter-recursive escape-analysis* ( #enter-recursive -- )
-    ! Handled by #recursive
+M: enter-recursive# escape-analysis* ( enter-recursive# -- )
+    ! Handled by recursive#
     drop ;
 
-M: #call-recursive escape-analysis* ( #call-label -- )
+M: call-recursive# escape-analysis* ( call-label# -- )
     [ ] [ label>> return>> ] [ node-output-allocations ] tri
     [ [ node-input-allocations ] dip check-fixed-point ]
     [ drop swap [ in-d>> ] [ out-d>> ] bi* copy-values ]
     3bi ;
 
-M: #return-recursive escape-analysis* ( #return-recursive -- )
+M: return-recursive# escape-analysis* ( return-recursive# -- )
     [ call-next-method ]
     [
         [ in-d>> ] [ label>> calls>> ] bi

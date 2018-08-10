@@ -17,12 +17,12 @@ SYMBOL: introduction-stack
 : pop-introductions ( n -- values )
     introduction-stack [ swap cut* swap ] change ;
 
-M: #introduce normalize*
+M: introduce# normalize*
     out-d>> [ length pop-introductions ] keep add-renamings f ;
 
 SYMBOL: remaining-introductions
 
-M: #branch normalize*
+M: branch# normalize*
     [
         [
             [
@@ -44,7 +44,7 @@ M: #branch normalize*
         ] if
     ] 3map ;
 
-M: #phi normalize*
+M: phi# normalize*
     remaining-introductions get swap dup terminated>>
     '[ _ eliminate-phi-introductions ] change-phi-in-d ;
 
@@ -53,32 +53,32 @@ M: #phi normalize*
         [ normalize* ] map-flat
     ] with-variable ;
 
-M: #recursive normalize*
+M: recursive# normalize*
     [ [ child>> first ] [ in-d>> ] bi >>in-d drop ]
     [ dup label>> introductions>> make-values '[ _ (normalize) ] change-child ]
     bi ;
 
-M: #enter-recursive normalize*
+M: enter-recursive# normalize*
     [ introduction-stack get prepend ] change-out-d
     dup [ label>> ] keep >>enter-recursive drop
     dup [ label>> ] [ out-d>> ] bi >>enter-out drop ;
 
-: unchanged-underneath ( #call-recursive -- n )
+: unchanged-underneath ( call-recursive# -- n )
     [ out-d>> length ] [ label>> return>> in-d>> length ] bi - ;
 
-: call<return ( #call-recursive n -- nodes )
+: call<return ( call-recursive# n -- nodes )
     neg dup make-values [
         [ pop-introductions '[ _ prepend ] change-in-d ]
         [ '[ _ prepend ] change-out-d ]
         bi*
     ] [ introduction-stack [ prepend ] change ] bi ;
 
-: call>return ( #call-recursive n -- #call-recursive )
+: call>return ( call-recursive# n -- call-recursive# )
     [ [ [ in-d>> ] [ out-d>> ] bi ] [ '[ _ head ] ] bi* bi@ add-renamings ]
     [ '[ _ tail ] [ change-in-d ] [ change-out-d ] bi ]
     2bi ;
 
-M: #call-recursive normalize*
+M: call-recursive# normalize*
     dup unchanged-underneath {
         { [ dup 0 < ] [ call<return ] }
         { [ dup 0 = ] [ drop ] }
@@ -92,9 +92,9 @@ M: node normalize* ;
         dup count-introductions make-values
         H{ } clone rename-map set
         [ (normalize) ] [ nip ] 2bi
-        [ <#introduce> prefix ] unless-empty
+        [ <introduce#> prefix ] unless-empty
         rename-node-values
     ] with-scope ;
 
-M: #alien-callback normalize*
+M: alien-callback# normalize*
     [ normalize ] change-child ;

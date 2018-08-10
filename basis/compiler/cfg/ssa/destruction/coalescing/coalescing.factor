@@ -12,7 +12,7 @@ IN: compiler.cfg.ssa.destruction.coalescing
 SYMBOL: class-element-map
 
 : value-of ( vreg -- value )
-    dup insn-of dup ##tagged>integer? [ nip src>> ] [ drop ] if ;
+    dup insn-of dup tagged>integer##? [ nip src>> ] [ drop ] if ;
 
 : coalesce-elements ( merged follower leader -- )
     class-element-map get [ delete-at ] [ set-at ] bi-curry bi* ;
@@ -49,10 +49,10 @@ GENERIC: coalesce-now ( insn -- )
 
 M: insn coalesce-now drop ;
 
-M: ##tagged>integer coalesce-now
+M: tagged>integer## coalesce-now
     [ dst>> ] [ src>> ] bi t try-eliminate-copy ;
 
-M: ##phi coalesce-now
+M: phi## coalesce-now
     [ dst>> ] [ inputs>> values ] bi zip-scalar
     natural-sort t try-eliminate-copies ;
 
@@ -65,10 +65,10 @@ M: alien-call-insn coalesce-later drop ;
 M: vreg-insn coalesce-later
     [ defs-vregs ] [ uses-vregs ] bi zip ?first [ , ] when* ;
 
-M: ##copy coalesce-later
+M: copy## coalesce-later
     [ dst>> ] [ src>> ] bi 2array , ;
 
-M: ##parallel-copy coalesce-later
+M: parallel-copy## coalesce-later
     values>> % ;
 
 : eliminatable-copy? ( vreg1 vreg2 -- ? )

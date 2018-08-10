@@ -72,7 +72,7 @@ $nl
 { $list
   "With SSA, it is not sufficient to have a single live-in set per block. There is also an edge-live-in set per edge, consisting of phi inputs from each predecessor."
   "Liveness analysis annotates call sites with GC maps indicating the spill slots in the stack frame that contain tagged pointers, and thus have to be visited if a GC occurs inside the call."
-  { "GC maps can contain derived pointers. A derived pointer is a pointer into the middle of a data heap object. Each derived pointer has a base pointer, to keep it up to date when objects are moved by the garbage collector. This extends live intervals and inserts new " { $link ##phi } " instructions." }
+  { "GC maps can contain derived pointers. A derived pointer is a pointer into the middle of a data heap object. Each derived pointer has a base pointer, to keep it up to date when objects are moved by the garbage collector. This extends live intervals and inserts new " { $link phi## } " instructions." }
 }
 $nl
 "Querying liveness data:"

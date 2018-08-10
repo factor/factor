@@ -58,21 +58,21 @@ PRIVATE>
 M: alien-call-insn defs-vreg-reps
     reg-outputs>> [ second ] map ;
 
-M: ##callback-inputs defs-vreg-reps
+M: callback-inputs## defs-vreg-reps
     [ reg-outputs>> ] [ stack-outputs>> ] bi append [ second ] map ;
 
-M: ##callback-outputs defs-vreg-reps drop { } ;
+M: callback-outputs## defs-vreg-reps drop { } ;
 
 M: alien-call-insn uses-vreg-reps
     [ reg-inputs>> ] [ stack-inputs>> ] bi append [ second ] map ;
 
-M: ##alien-indirect uses-vreg-reps
+M: alien-indirect## uses-vreg-reps
     call-next-method int-rep prefix ;
 
-M: ##callback-inputs uses-vreg-reps
+M: callback-inputs## uses-vreg-reps
     drop { } ;
 
-M: ##callback-outputs uses-vreg-reps
+M: callback-outputs## uses-vreg-reps
     reg-inputs>> [ second ] map ;
 
 [

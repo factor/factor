@@ -59,10 +59,10 @@ M: postgresql-statement bind-tuple ( tuple statement -- )
     ] 2bi
     >>bind-params drop ;
 
-M: postgresql-result-set #rows ( result-set -- n )
+M: postgresql-result-set num-rows ( result-set -- n )
     handle>> PQntuples ;
 
-M: postgresql-result-set #columns ( result-set -- n )
+M: postgresql-result-set num-columns ( result-set -- n )
     handle>> PQnfields ;
 
 : result-handle-n ( result-set -- handle n )

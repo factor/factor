@@ -22,7 +22,7 @@ SYMBOL: literals
 
 : (push-literal) ( obj -- )
     dup <literal> make-known
-    [ nip (meta-d) get push ] [ #push, ] 2bi ;
+    [ nip (meta-d) get push ] [ push#, ] 2bi ;
 
 : commit-literals ( -- )
     literals get [ [ (push-literal) ] each ] [ delete-all ] bi ;

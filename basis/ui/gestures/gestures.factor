@@ -76,9 +76,9 @@ M: user-input-tuple send-queued-gesture
     '[ _ \ user-input-tuple queue-gesture ] unless-empty ;
 
 ! Gesture objects
-TUPLE: drag # ;             C: <drag> drag
-TUPLE: button-up mods # ;   C: <button-up> button-up
-TUPLE: button-down mods # ; C: <button-down> button-down
+TUPLE: drag n ;             C: <drag> drag
+TUPLE: button-up mods n ;   C: <button-up> button-up
+TUPLE: button-down mods n ; C: <button-down> button-down
 TUPLE: file-drop mods ;     C: <file-drop> file-drop
 
 SYMBOL: dropped-files
@@ -295,14 +295,14 @@ SYMBOL: drag-timer
 : send-button-down ( gesture loc world -- )
     move-hand
     start-drag-timer
-    dup #>>
+    dup n>>
     dup update-click# hand-buttons get-global push
     update-clicked
     button-gesture ;
 
 : send-button-up ( gesture loc world -- )
     move-hand
-    dup #>> hand-buttons get-global remove! drop
+    dup n>> hand-buttons get-global remove! drop
     stop-drag-timer
     button-gesture ;
 
@@ -350,14 +350,14 @@ M: button-up gesture>string
     [
         dup mods>> modifiers>string %
         "Click Button" %
-        #>> [ " " % # ] when*
+        n>> [ " " % # ] when*
     ] "" make ;
 
 M: button-down gesture>string
     [
         dup mods>> modifiers>string %
         "Press Button" %
-        #>> [ " " % # ] when*
+        n>> [ " " % # ] when*
     ] "" make ;
 
 M: file-drop gesture>string drop "Drop files" ;

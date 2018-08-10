@@ -6,7 +6,7 @@ IN: compiler.cfg.ssa.construction.tests
 
 ! insert-phi-later
 {
-    { V{ T{ ##phi { dst 789 } { inputs H{ } } } } }
+    { V{ T{ phi## { dst 789 } { inputs H{ } } } } }
 } [
     H{ } clone inserting-phis set
     789 { } 0 insns>block insert-phi-later
@@ -24,8 +24,8 @@ IN: compiler.cfg.ssa.construction.tests
 ! live-phi?
 { f t } [
     HS{ 68 } live-phis set
-    T{ ##phi } live-phi?
-    T{ ##phi { dst 68 } }  live-phi?
+    T{ phi## } live-phi?
+    T{ phi## { dst 68 } }  live-phi?
 ] unit-test
 
 
@@ -39,31 +39,31 @@ IN: compiler.cfg.ssa.construction.tests
     construct-ssa ;
 
 : clean-up-phis ( insns -- insns' )
-    [ dup ##phi? [ [ [ [ number>> ] dip ] assoc-map ] change-inputs ] when ] map ;
+    [ dup phi##? [ [ [ [ number>> ] dip ] assoc-map ] change-inputs ] when ] map ;
 
 ! Test 1
 reset-counters
 
 V{
-    T{ ##load-integer f 1 100 }
-    T{ ##add-imm f 2 1 50 }
-    T{ ##add-imm f 2 2 10 }
-    T{ ##branch }
+    T{ load-integer## f 1 100 }
+    T{ add-imm## f 2 1 50 }
+    T{ add-imm## f 2 2 10 }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##load-integer f 3 3 }
-    T{ ##branch }
+    T{ load-integer## f 3 3 }
+    T{ branch## }
 } 1 test-bb
 
 V{
-    T{ ##load-integer f 3 4 }
-    T{ ##branch }
+    T{ load-integer## f 3 4 }
+    T{ branch## }
 } 2 test-bb
 
 V{
-    T{ ##replace f 3 d: 0 }
-    T{ ##return }
+    T{ replace## f 3 d: 0 }
+    T{ return## }
 } 3 test-bb
 
 0 { 1 2 } edges
@@ -74,32 +74,32 @@ V{
 
 {
     V{
-        T{ ##load-integer f 1 100 }
-        T{ ##add-imm f 2 1 50 }
-        T{ ##add-imm f 3 2 10 }
-        T{ ##branch }
+        T{ load-integer## f 1 100 }
+        T{ add-imm## f 2 1 50 }
+        T{ add-imm## f 3 2 10 }
+        T{ branch## }
     }
 } [ 0 get instructions>> ] unit-test
 
 {
     V{
-        T{ ##load-integer f 4 3 }
-        T{ ##branch }
+        T{ load-integer## f 4 3 }
+        T{ branch## }
     }
 } [ 1 get instructions>> ] unit-test
 
 {
     V{
-        T{ ##load-integer f 5 4 }
-        T{ ##branch }
+        T{ load-integer## f 5 4 }
+        T{ branch## }
     }
 } [ 2 get instructions>> ] unit-test
 
 {
     V{
-        T{ ##phi f 6 H{ { 1 4 } { 2 5 } } }
-        T{ ##replace f 6 d: 0 }
-        T{ ##return }
+        T{ phi## f 6 H{ { 1 4 } { 2 5 } } }
+        T{ replace## f 6 d: 0 }
+        T{ return## }
     }
 } [
     3 get instructions>>
@@ -111,9 +111,9 @@ reset-counters
 
 V{ } 0 test-bb
 V{ } 1 test-bb
-V{ T{ ##peek f 0 d: 0 } } 2 test-bb
-V{ T{ ##peek f 0 d: 0 } } 3 test-bb
-V{ T{ ##replace f 0 d: 0 } } 4 test-bb
+V{ T{ peek## f 0 d: 0 } } 2 test-bb
+V{ T{ peek## f 0 d: 0 } } 3 test-bb
+V{ T{ replace## f 0 d: 0 } } 4 test-bb
 V{ } 5 test-bb
 V{ } 6 test-bb
 
@@ -128,8 +128,8 @@ V{ } 6 test-bb
 
 {
     V{
-        T{ ##phi f 3 H{ { 2 1 } { 3 2 } } }
-        T{ ##replace f 3 d: 0 }
+        T{ phi## f 3 H{ { 2 1 } { 3 2 } } }
+        T{ replace## f 3 d: 0 }
     }
 } [
     4 get instructions>>
@@ -140,25 +140,25 @@ V{ } 6 test-bb
 reset-counters
 
 V{
-    T{ ##branch }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##load-integer f 3 3 }
-    T{ ##branch }
+    T{ load-integer## f 3 3 }
+    T{ branch## }
 } 1 test-bb
 
 V{
-    T{ ##load-integer f 3 4 }
-    T{ ##branch }
+    T{ load-integer## f 3 4 }
+    T{ branch## }
 } 2 test-bb
 
 V{
-    T{ ##branch }
+    T{ branch## }
 } 3 test-bb
 
 V{
-    T{ ##return }
+    T{ return## }
 } 4 test-bb
 
 0 { 1 2 3 } edges
@@ -168,43 +168,43 @@ V{
 
 { } [ test-ssa ] unit-test
 
-{ V{ } } [ 4 get instructions>> [ ##phi? ] filter ] unit-test
+{ V{ } } [ 4 get instructions>> [ phi##? ] filter ] unit-test
 
 ! Test 4
 reset-counters
 
 V{
-    T{ ##branch }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##branch }
+    T{ branch## }
 } 1 test-bb
 
 V{
-    T{ ##load-integer f 0 4 }
-    T{ ##branch }
+    T{ load-integer## f 0 4 }
+    T{ branch## }
 } 2 test-bb
 
 V{
-    T{ ##load-integer f 0 4 }
-    T{ ##branch }
+    T{ load-integer## f 0 4 }
+    T{ branch## }
 } 3 test-bb
 
 V{
-    T{ ##branch }
+    T{ branch## }
 } 4 test-bb
 
 V{
-    T{ ##branch }
+    T{ branch## }
 } 5 test-bb
 
 V{
-    T{ ##branch }
+    T{ branch## }
 } 6 test-bb
 
 V{
-    T{ ##return }
+    T{ return## }
 } 7 test-bb
 
 0 { 1 6 } edges
@@ -217,6 +217,6 @@ V{
 
 { } [ test-ssa ] unit-test
 
-{ V{ } } [ 5 get instructions>> [ ##phi? ] filter ] unit-test
+{ V{ } } [ 5 get instructions>> [ phi##? ] filter ] unit-test
 
-{ V{ } } [ 7 get instructions>> [ ##phi? ] filter ] unit-test
+{ V{ } } [ 7 get instructions>> [ phi##? ] filter ] unit-test

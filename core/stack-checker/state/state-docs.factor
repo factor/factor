@@ -24,7 +24,7 @@ HELP: current-effect
 } ;
 
 HELP: commit-literals
-{ $description "Outputs all remaining literals to the current " { $link stack-visitor } " as " { $link #push } " instructions. They are also pushed onto the compile-time data stack." }
+{ $description "Outputs all remaining literals to the current " { $link stack-visitor } " as " { $link push# } " instructions. They are also pushed onto the compile-time data stack." }
 { $see-also meta-d literals } ;
 
 HELP: input-count

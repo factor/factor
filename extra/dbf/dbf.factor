@@ -110,7 +110,7 @@ STRUCT: dbf-file-header
     { year uint8_t }
     { month uint8_t }
     { day uint8_t }
-    { #records uint32_t }
+    { n-records uint32_t }
     { header-length uint16_t }
     { record-length uint16_t }
     { reserved1 uint16_t }
@@ -139,7 +139,7 @@ STRUCT: dbf-field-header
     { type uint8_t }
     { address uint32_t }
     { length uint8_t }
-    { #decimals uint8_t }
+    { n-decimals uint8_t }
     { reserved1 uint16_t }
     { workarea-id uint8_t }
     { reserved2 uint8_t }

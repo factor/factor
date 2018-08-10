@@ -82,5 +82,5 @@ IN: compiler.tree.propagation.recursive.tests
     }
 } [
     \ integer-loop build-tree optimize-tree
-    [ #if? ] filter second children>> first first recursive-phi-infos
+    [ if#? ] filter second children>> first first recursive-phi-infos
 ] unit-test

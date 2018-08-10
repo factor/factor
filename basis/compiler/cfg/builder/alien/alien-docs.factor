@@ -8,12 +8,12 @@ IN: compiler.cfg.builder.alien
 CONSTANT: ex-caller-return [[
 USING: compiler.cfg.builder.alien make prettyprint ;
 [
-    T{ ##alien-invoke { reg-outputs { { 1 int-rep RAX } } } } ,
+    T{ alien-invoke## { reg-outputs { { 1 int-rep RAX } } } } ,
     T{ alien-invoke-params { return pointer: void } } caller-return
 ] { } make .
 {
-    T{ ##alien-invoke { reg-outputs { { 1 int-rep RAX } } } }
-    T{ ##box-alien { dst 116 } { src 1 } { temp 115 } }
+    T{ alien-invoke## { reg-outputs { { 1 int-rep RAX } } } }
+    T{ box-alien## { dst 116 } { src 1 } { temp 115 } }
 }
 ]]
 >>
@@ -45,7 +45,7 @@ HELP: emit-callback-body
 
 HELP: emit-callback-return
 { $values { "block" basic-block } { "params" alien-node-params } }
-{ $description "Emits a " { $link ##callback-outputs } " instruction for the " { $link #alien-callback } " if needed." } ;
+{ $description "Emits a " { $link callback-outputs## } " instruction for the " { $link alien-callback# } " if needed." } ;
 
 HELP: unbox-parameters
 { $values { "parameters" sequence } { "vregs" sequence } { "reps" sequence } }

@@ -34,9 +34,9 @@ t verbose-tests? set-global
 SYMBOL: restartable-tests?
 t restartable-tests? set-global
 
-: <test-failure> ( error experiment path line# -- test-failure )
+: <test-failure> ( error experiment path line-number -- test-failure )
     test-failure new
-        swap >>line#
+        swap >>line-number
         swap >>path
         swap >>asset
         swap >>error
@@ -46,7 +46,7 @@ INITIALIZED-SYMBOL: long-unit-tests-enabled? [ t ]
 
 <PRIVATE
 
-: notify-test-failed ( error experiment path line# -- )
+: notify-test-failed ( error experiment path line-number -- )
     "--> test failed!" print
     <test-failure> test-failures get push
     notify-error-observers ;
@@ -104,13 +104,13 @@ MACRO: <experiment> ( word -- quot )
     [ name>> experiment-title ] bi
     '[ _ ndup _ narray _ prefix ] ;
 
-TUPLE: must-fail-test-passed error test path line# ;
-CONSTRUCTOR: <must-fail-test-passed> must-fail-test-passed ( error test path line# -- obj ) ;
+TUPLE: must-fail-test-passed error test path line-number ;
+CONSTRUCTOR: <must-fail-test-passed> must-fail-test-passed ( error test path line-number -- obj ) ;
 
-TUPLE: must-fail-with-test-passed error test fail path line# ;
-CONSTRUCTOR: <must-fail-with-test-passed> must-fail-with-test-passed ( error test fail path line# -- obj ) ;
+TUPLE: must-fail-with-test-passed error test fail path line-number ;
+CONSTRUCTOR: <must-fail-with-test-passed> must-fail-with-test-passed ( error test fail path line-number -- obj ) ;
 
-TUPLE: new-unit-test-failed error test expected path line# ;
+TUPLE: new-unit-test-failed error test expected path line-number ;
 
 TUPLE: new-experiment test expected ;
 
@@ -155,13 +155,13 @@ M: must-fail-with-experiment experiment. ( experiment -- )
     [ test>> verbose-tests? get [ pprint ] [ pprint-short ] if bl ]
     [ fail>> verbose-tests? get [ pprint ] [ pprint-short ] if ] bi nl flush ;
 
-:: experiment ( word: ( -- error/f failed? tested? ) line# -- )
+:: experiment ( word: ( -- error/f failed? tested? ) line-number -- )
     word <experiment> :> e
     e experiment.
     word execute [
         [
             current-test-file get [
-                e current-test-file get line# notify-test-failed
+                e current-test-file get line-number notify-test-failed
             ] [ rethrow ] if
         ] [ drop ] if
     ] [ 2drop "Warning: test skipped!" print ] if ; inline
@@ -271,7 +271,7 @@ SYNTAX: \MUST-FAIL-WITH:
         [ error>> ]
         [ new-unit-test-failed>experiment ]
         [ path>> ]
-        [ line#>> ]
+        [ line-number>> ]
     } cleave notify-test-failed ;
 
 SYNTAX: \UNIT-TEST:

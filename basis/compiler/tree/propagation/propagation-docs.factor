@@ -5,7 +5,7 @@ IN: compiler.tree.propagation
 CONSTANT: propagate-ex [[
 USING: compiler.tree.builder compiler.tree.propagation math prettyprint ;
 [ 3 + ] build-tree propagate third .
-T{ #call
+T{ call#
     { word + }
     { in-d V{ 9450187 9450186 } }
     { out-d { 9450188 } }

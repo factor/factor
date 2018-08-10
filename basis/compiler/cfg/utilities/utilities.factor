@@ -24,7 +24,7 @@ IN: compiler.cfg.utilities
 : empty-block? ( bb -- ? )
     instructions>> {
         [ length 1 = ]
-        [ first ##branch? ]
+        [ first branch##? ]
     } 1&& ;
 
 : (skip-empty-blocks) ( visited bb -- visited bb' )
@@ -55,7 +55,7 @@ IN: compiler.cfg.utilities
     from to bb update-successors ;
 
 : has-phis? ( bb -- ? )
-    instructions>> first ##phi? ;
+    instructions>> first phi##? ;
 
 : cfg-has-phis? ( cfg -- ? )
     post-order [ has-phis? ] any? ;
@@ -63,19 +63,19 @@ IN: compiler.cfg.utilities
 : if-has-phis ( ..a bb quot: ( ..a bb -- ..b ) -- ..b )
     [ dup has-phis? ] dip [ drop ] if ; inline
 
-: each-phi ( ... bb quot: ( ... ##phi -- ... ) -- ... )
+: each-phi ( ... bb quot: ( ... phi## -- ... ) -- ... )
     [ instructions>> ] dip
-    '[ dup ##phi? [ @ t ] [ drop f ] if ] all? drop ; inline
+    '[ dup phi##? [ @ t ] [ drop f ] if ] all? drop ; inline
 
 : each-non-phi ( ... bb quot: ( ... insn -- ... ) -- ... )
     [ instructions>> ] dip
-    '[ dup ##phi? [ drop ] _ if ] each ; inline
+    '[ dup phi##? [ drop ] _ if ] each ; inline
 
 : predecessor ( bb -- pred )
     predecessors>> first ; inline
 
 : <copy> ( dst src -- insn )
-    any-rep ##copy new-insn ;
+    any-rep copy## new-insn ;
 
 : connect-bbs ( from to -- )
     [ [ successors>> ] dip suffix! drop ]

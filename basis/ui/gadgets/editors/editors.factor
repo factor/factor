@@ -110,7 +110,7 @@ M: editor ungraft*
 :: point>loc ( point editor -- loc )
     point second editor y>line {
         { [ dup 0 < ] [ drop { 0 0 } ] }
-        { [ dup editor model>> last-line# > ] [ drop editor model>> doc-end ] }
+        { [ dup editor model>> last-line-number > ] [ drop editor model>> doc-end ] }
         |[ n |
             n
             point first
@@ -484,7 +484,7 @@ editor "caret-motion" f {
 editor "selection" f {
     { T{ button-down f { S+ } 1 } extend-selection }
     { T{ button-up f { S+ } 1 } com-copy-selection }
-    { T{ drag { # 1 } } drag-selection }
+    { T{ drag { n 1 } } drag-selection }
     { gain-focus focus-editor }
     { lose-focus unfocus-editor }
     { delete-action remove-selection }
@@ -559,7 +559,7 @@ PRIVATE>
     tri ;
 
 : last-line? ( document line -- ? )
-    [ last-line# ] dip = ;
+    [ last-line-number ] dip = ;
 
 : prev-line-and-this ( document line -- start end )
     swap [ drop 1 - 0 2array ] [ line-end ] 2bi ;
@@ -581,7 +581,7 @@ PRIVATE>
     dup gadget-selection?
     [ [ join-lines ] change-selection ] [
         [ model>> ] [ editor-caret first ] bi {
-            { [ over last-line# 0 = ] [ 2drop ] }
+            { [ over last-line-number 0 = ] [ 2drop ] }
             { [ 2dup last-line? ] [ join-with-prev ] }
             [ join-with-next ]
         } cond

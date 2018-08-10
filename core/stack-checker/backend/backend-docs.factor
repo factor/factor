@@ -15,7 +15,7 @@ HELP: consume-d
 } ;
 
 HELP: end-infer
-{ $description "Called to end the infer context. It outputs a " { $link #return } " node to the " { $link stack-visitor } " containing the remaining items on the data stack." } ;
+{ $description "Called to end the infer context. It outputs a " { $link return# } " node to the " { $link stack-visitor } " containing the remaining items on the data stack." } ;
 
 HELP: ensure-d
 { $values { "n" integer } { "values" sequence } }
@@ -36,7 +36,7 @@ HELP: infer-quot-here
 
 HELP: introduce-values
 { $values { "values" sequence } }
-{ $description "Emits an " { $link #introduce } " node to the current " { $link stack-visitor } " which pushes the given values onto the data stack." } ;
+{ $description "Emits an " { $link introduce# } " node to the current " { $link stack-visitor } " which pushes the given values onto the data stack." } ;
 
 HELP: pop-d
 { $values { "obj" "object" } }

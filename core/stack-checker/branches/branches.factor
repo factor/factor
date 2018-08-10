@@ -83,7 +83,7 @@ SYMBOLS: combinator quotations ;
 
 : compute-phi-function ( seq -- )
     [ quotation active-variable sift quotations set ]
-    [ [ datastack-phi ] [ terminated-phi ] bi #phi, ]
+    [ [ datastack-phi ] [ terminated-phi ] bi phi#, ]
     [ terminate-branches ]
     tri ;
 
@@ -135,7 +135,7 @@ M: callable infer-branch
 
 : (infer-if) ( branches -- )
     infer-branches
-    [ first2 #if, ] dip compute-phi-function ;
+    [ first2 if#, ] dip compute-phi-function ;
 
 GENERIC: curried/composed? ( known -- ? )
 M: object curried/composed? drop f ;
@@ -161,11 +161,11 @@ M: declared-effect curried/composed? known>> curried/composed? ;
             [ rot [ drop call ] [ nip call ] if ]
             infer-quot-here
         ] [
-            [ #drop, ] [ [ literal ] map (infer-if) ] bi
+            [ drop#, ] [ [ literal ] map (infer-if) ] bi
         ] if
     ] if ;
 
 : infer-dispatch ( -- )
     \ dispatch combinator set
     pop-literal infer-branches
-    [ #dispatch, ] dip compute-phi-function ;
+    [ dispatch#, ] dip compute-phi-function ;

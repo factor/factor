@@ -1122,12 +1122,12 @@ M: f derp drop t ;
 
 [ 1 shift-test0 ] [ no-method? ] must-fail-with
 
-! Test for the #1370 bug
+! Test for the 1370# bug
 STRUCT: bar { s bar* } ;
 
 { t } [
     [ bar <struct> [ s>> ] follow ] build-tree optimize-tree
-    [ #recursive? ] find nip
-    child>> [ { [ #call? ] [ word>> \ alien-cell = ] } 1&& ] find nip
+    [ recursive#? ] find nip
+    child>> [ { [ call#? ] [ word>> \ alien-cell = ] } 1&& ] find nip
     >boolean
 ] unit-test

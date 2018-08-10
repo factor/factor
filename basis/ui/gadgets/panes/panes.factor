@@ -433,7 +433,7 @@ pane H{
     { T{ button-down f { S+ } 1 } [ select-to-caret ] }
     { T{ button-up f { S+ } 1 } [ end-selection ] }
     { T{ button-up } [ end-selection ] }
-    { T{ drag { # 1 } } [ extend-selection ] }
+    { T{ drag { n 1 } } [ extend-selection ] }
     { copy-action [ com-copy ] }
     { T{ button-down f f 3 } [ pane-menu ] }
 } set-gestures

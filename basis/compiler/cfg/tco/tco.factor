@@ -12,37 +12,37 @@ IN: compiler.cfg.tco
     skip-empty-blocks
     instructions>> {
         [ length 3 = ]
-        [ first ##safepoint? ]
-        [ second ##epilogue? ]
-        [ third ##return? ]
+        [ first safepoint##? ]
+        [ second epilogue##? ]
+        [ third return##? ]
     } 1&& ;
 
 : tail-call? ( bb -- ? )
     {
-        [ instructions>> { [ length 2 >= ] [ last ##branch? ] } 1&& ]
+        [ instructions>> { [ length 2 >= ] [ last branch##? ] } 1&& ]
         [ successors>> first return? ]
     } 1&& ;
 
 : word-tail-call? ( bb -- ? )
-    instructions>> penultimate ##call? ;
+    instructions>> penultimate call##? ;
 
 : convert-tail-call ( ..a bb quot: ( ..a insn -- ..a tail-insn ) -- ..b )
     '[
         instructions>>
         [ pop* ] [ pop ] [ ] tri
-        [ [ ##safepoint new-insn ] dip push ]
-        [ [ ##epilogue new-insn ] dip push ]
+        [ [ safepoint## new-insn ] dip push ]
+        [ [ epilogue## new-insn ] dip push ]
         [ _ dip push ] tri
     ]
     [ successors>> delete-all ]
     bi ; inline
 
 : convert-word-tail-call ( bb -- )
-    [ word>> ##jump new-insn ] convert-tail-call ;
+    [ word>> jump## new-insn ] convert-tail-call ;
 
 : loop-tail-call? ( bb -- ? )
     instructions>> penultimate
-    { [ ##call? ] [ word>> cfg get label>> eq? ] } 1&& ;
+    { [ call##? ] [ word>> cfg get label>> eq? ] } 1&& ;
 
 : convert-loop-tail-call ( bb -- )
     ! If a word calls itself, this becomes a loop in the CFG.
@@ -50,8 +50,8 @@ IN: compiler.cfg.tco
         instructions>> {
             [ pop* ]
             [ pop* ]
-            [ [ ##safepoint new-insn ] dip push ]
-            [ [ ##branch new-insn ] dip push ]
+            [ [ safepoint## new-insn ] dip push ]
+            [ [ branch## new-insn ] dip push ]
         } cleave
     ]
     [ successors>> delete-all ]

@@ -50,7 +50,7 @@ SYMBOL: enter-out
 
 : emit-enter-recursive ( label -- )
     enter-out get >>enter-out
-    enter-in get enter-out get #enter-recursive,
+    enter-in get enter-out get enter-recursive#,
     enter-out get >vector (meta-d) set ;
 
 : entry-stack-height ( label -- stack )
@@ -68,7 +68,7 @@ SYMBOL: enter-out
 
 : end-recursive-word ( word label -- )
     [ check-return ]
-    [ meta-d dup copy-values dup (meta-d) set #return-recursive, ]
+    [ meta-d dup copy-values dup (meta-d) set return-recursive#, ]
     bi ;
 
 : recursive-word-inputs ( label -- n )
@@ -94,7 +94,7 @@ SYMBOL: enter-out
 
 : inline-recursive-word ( word -- )
     (inline-recursive-word)
-    [ [ consume-d ] [ output-d ] [ ] tri* #recursive, ] dip
+    [ [ consume-d ] [ output-d ] [ ] tri* recursive#, ] dip
     [ terminate ] when ;
 
 : check-call-height ( label -- )
@@ -134,7 +134,7 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
 : call-recursive-inline-word ( word label -- )
     over recursive? [
         [ required-stack-effect adjust-stack-effect ] dip
-        [ check-call ] [ '[ _ #call-recursive, ] consume/produce ] bi
+        [ check-call ] [ '[ _ call-recursive#, ] consume/produce ] bi
     ] [
         drop undeclared-recursion-error inference-error
     ] if ;

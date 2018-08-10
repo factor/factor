@@ -21,25 +21,25 @@ INLINE-FUNCTOR: renaming ( name: name def-quot: string use-quot: string temp-quo
     ! Instructions with unusual operands
 
     ! Special ${name}-insn-defs methods
-    M: ##parallel-copy ${name}-insn-defs
+    M: parallel-copy## ${name}-insn-defs
         [ [ first2 ${def-quot} dip 2array ] map ] change-values drop ;
 
-    M: ##phi ${name}-insn-defs ${def-quot} change-dst drop ;
+    M: phi## ${name}-insn-defs ${def-quot} change-dst drop ;
 
     M: alien-call-insn ${name}-insn-defs
         [ [ first3 ${def-quot} 2dip 3array ] map ] change-reg-outputs
         drop ;
 
-    M: ##callback-inputs ${name}-insn-defs
+    M: callback-inputs## ${name}-insn-defs
         [ [ first3 ${def-quot} 2dip 3array ] map ] change-reg-outputs
         [ [ first3 ${def-quot} 2dip 3array ] map ] change-stack-outputs
         drop ;
 
     ! Special ${name}-insn-uses methods
-    M: ##parallel-copy ${name}-insn-uses
+    M: parallel-copy## ${name}-insn-uses
         [ [ first2 ${use-quot} call 2array ] map ] change-values drop ;
 
-    M: ##phi ${name}-insn-uses
+    M: phi## ${name}-insn-uses
         [ ${use-quot} assoc-map ] change-inputs drop ;
 
     M: alien-call-insn ${name}-insn-uses
@@ -47,10 +47,10 @@ INLINE-FUNCTOR: renaming ( name: name def-quot: string use-quot: string temp-quo
         [ [ first3 ${use-quot} 2dip 3array ] map ] change-stack-inputs
         drop ;
 
-    M: ##alien-indirect ${name}-insn-uses
+    M: alien-indirect## ${name}-insn-uses
         ${use-quot} change-src call-next-method ;
 
-    M: ##callback-outputs ${name}-insn-uses
+    M: callback-outputs## ${name}-insn-uses
         [ [ first3 ${use-quot} 2dip 3array ] map ] change-reg-inputs
         drop ;
 

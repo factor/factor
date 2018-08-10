@@ -37,6 +37,6 @@ IN: compiler.tree.propagation.slots.tests
     }
 } [
     { 7 f } [ <literal-info> ] map setup-value-infos
-    { 0 1 } { 2 } \ <array> <#call> dup word>>
+    { 0 1 } { 2 } \ <array> <call#> dup word>>
     propagate-sequence-constructor first
 ] unit-test

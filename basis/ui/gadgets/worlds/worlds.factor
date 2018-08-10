@@ -238,12 +238,12 @@ H{
     { T{ button-up f { M+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
 } assoc-union set-gestures
 
-PREDICATE: specific-button-up < button-up #>> ;
-PREDICATE: specific-button-down < button-down #>> ;
-PREDICATE: specific-drag < drag #>> ;
+PREDICATE: specific-button-up < button-up n>> ;
+PREDICATE: specific-button-down < button-down n>> ;
+PREDICATE: specific-drag < drag n>> ;
 
 : generalize-gesture ( gesture -- )
-    clone f >># button-gesture ;
+    clone f >>n button-gesture ;
 
 M: world handle-gesture ( gesture gadget -- ? )
     2dup call-next-method [

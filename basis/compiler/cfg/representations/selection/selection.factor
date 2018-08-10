@@ -23,7 +23,7 @@ SYMBOL: vreg-reps
 
 GENERIC: (collect-vreg-reps) ( insn -- )
 
-M: ##load-reference (collect-vreg-reps)
+M: load-reference## (collect-vreg-reps)
     [ dst>> ] [ obj>> ] bi {
         { [ dup float? ] [ drop { float-rep double-rep } ] }
         { [ dup byte-array? ] [ drop vector-reps ] }
@@ -73,44 +73,44 @@ SYMBOL: costs
     ] each ; inline
 
 UNION: inert-tag-untag-insn
-    ##add
-    ##sub
-    ##and
-    ##or
-    ##xor
-    ##min
-    ##max ;
+    add##
+    sub##
+    and##
+    or##
+    xor##
+    min##
+    max## ;
 
 UNION: inert-arithmetic-tag-untag-insn
-    ##add-imm
-    ##sub-imm ;
+    add-imm##
+    sub-imm## ;
 
 UNION: inert-bitwise-tag-untag-insn
-    ##and-imm
-    ##or-imm
-    ##xor-imm ;
+    and-imm##
+    or-imm##
+    xor-imm## ;
 
 UNION: peephole-optimizable
-    ##load-integer
-    ##load-reference
-    ##neg
-    ##not
+    load-integer##
+    load-reference##
+    neg##
+    not##
     inert-tag-untag-insn
     inert-arithmetic-tag-untag-insn
     inert-bitwise-tag-untag-insn
-    ##mul-imm
-    ##shl-imm
-    ##shr-imm
-    ##sar-imm
-    ##compare-integer-imm
-    ##compare-integer
-    ##compare-integer-imm-branch
-    ##compare-integer-branch
-    ##test-imm
-    ##test
-    ##test-imm-branch
-    ##test-branch
-    ##bit-count ;
+    mul-imm##
+    shl-imm##
+    shr-imm##
+    sar-imm##
+    compare-integer-imm##
+    compare-integer##
+    compare-integer-imm-branch##
+    compare-integer-branch##
+    test-imm##
+    test##
+    test-imm-branch##
+    test-branch##
+    bit-count## ;
 
 GENERIC: compute-insn-costs ( insn -- )
 

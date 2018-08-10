@@ -21,15 +21,15 @@ IN: compiler.tests.low-level-ir
     } cleave ;
 
 : compile-test-bb ( insns -- result )
-    V{ T{ ##prologue } T{ ##branch } } [ clone ] map 0 test-bb
+    V{ T{ prologue## } T{ branch## } } [ clone ] map 0 test-bb
     V{
-        T{ ##inc f d: 1 }
-        T{ ##replace f 0 d: 0 }
-        T{ ##branch }
+        T{ inc## f d: 1 }
+        T{ replace## f 0 d: 0 }
+        T{ branch## }
     } [ clone ] map append 1 test-bb
     V{
-        T{ ##epilogue }
-        T{ ##return }
+        T{ epilogue## }
+        T{ return## }
     } [ clone ] map 2 test-bb
     0 1 edge
     1 2 edge
@@ -39,7 +39,7 @@ IN: compiler.tests.low-level-ir
 ! loading constants
 [ "hello" ] [
     V{
-        T{ ##load-reference f 0 "hello" }
+        T{ load-reference## f 0 "hello" }
     } compile-test-bb
 ] unit-test
 
@@ -47,83 +47,83 @@ IN: compiler.tests.low-level-ir
 ! one of the sources
 [ t ] [
     V{
-        T{ ##load-tagged f 1 $[ 2 cell log2 shift array type-number - ] }
-        T{ ##load-reference f 0 { t f t } }
-        T{ ##slot f 0 0 1 0 0 }
+        T{ load-tagged## f 1 $[ 2 cell log2 shift array type-number - ] }
+        T{ load-reference## f 0 { t f t } }
+        T{ slot## f 0 0 1 0 0 }
     } compile-test-bb
 ] unit-test
 
 [ t ] [
     V{
-        T{ ##load-reference f 0 { t f t } }
-        T{ ##slot-imm f 0 0 2 $[ array type-number ] }
+        T{ load-reference## f 0 { t f t } }
+        T{ slot-imm## f 0 0 2 $[ array type-number ] }
     } compile-test-bb
 ] unit-test
 
 [ t ] [
     V{
-        T{ ##load-tagged f 1 $[ 2 cell log2 shift array type-number - ] }
-        T{ ##load-reference f 0 { t f t } }
-        T{ ##set-slot f 0 0 1 0 0 }
+        T{ load-tagged## f 1 $[ 2 cell log2 shift array type-number - ] }
+        T{ load-reference## f 0 { t f t } }
+        T{ set-slot## f 0 0 1 0 0 }
     } compile-test-bb
     dup first eq?
 ] unit-test
 
 [ t ] [
     V{
-        T{ ##load-reference f 0 { t f t } }
-        T{ ##set-slot-imm f 0 0 2 $[ array type-number ] }
+        T{ load-reference## f 0 { t f t } }
+        T{ set-slot-imm## f 0 0 2 $[ array type-number ] }
     } compile-test-bb
     dup first eq?
 ] unit-test
 
 [ $[ tag-bits get ] ] [
     V{
-        T{ ##load-tagged f 0 $[ tag-bits get ] }
-        T{ ##shl f 0 0 0 }
+        T{ load-tagged## f 0 $[ tag-bits get ] }
+        T{ shl## f 0 0 0 }
     } compile-test-bb
 ] unit-test
 
 [ $[ tag-bits get ] ] [
     V{
-        T{ ##load-tagged f 0 $[ tag-bits get ] }
-        T{ ##shl-imm f 0 0 $[ tag-bits get ] }
+        T{ load-tagged## f 0 $[ tag-bits get ] }
+        T{ shl-imm## f 0 0 $[ tag-bits get ] }
     } compile-test-bb
 ] unit-test
 
 [ 31 ] [
     V{
-        T{ ##load-reference f 1 B{ 31 67 52 } }
-        T{ ##unbox-any-c-ptr f 2 1 }
-        T{ ##load-memory-imm f 3 2 0 int-rep uchar }
-        T{ ##shl-imm f 0 3 $[ tag-bits get ] }
+        T{ load-reference## f 1 B{ 31 67 52 } }
+        T{ unbox-any-c-ptr## f 2 1 }
+        T{ load-memory-imm## f 3 2 0 int-rep uchar }
+        T{ shl-imm## f 0 3 $[ tag-bits get ] }
     } compile-test-bb
 ] unit-test
 
 [ 1 ] [
     V{
-        T{ ##load-tagged f 0 $[ 2 tag-fixnum ] }
-        T{ ##add-imm f 0 0 $[ -1 tag-fixnum ] }
+        T{ load-tagged## f 0 $[ 2 tag-fixnum ] }
+        T{ add-imm## f 0 0 $[ -1 tag-fixnum ] }
     } compile-test-bb
 ] unit-test
 
 [ -1 ] [
     V{
-        T{ ##load-tagged f 1 $[ -1 tag-fixnum ] }
-        T{ ##convert-integer f 0 1 char }
+        T{ load-tagged## f 1 $[ -1 tag-fixnum ] }
+        T{ convert-integer## f 0 1 char }
     } compile-test-bb
 ] unit-test
 
 [ -1 ] [
     V{
-        T{ ##load-tagged f 1 $[ -1 9 2^ bitxor tag-fixnum ] }
-        T{ ##convert-integer f 0 1 char }
+        T{ load-tagged## f 1 $[ -1 9 2^ bitxor tag-fixnum ] }
+        T{ convert-integer## f 0 1 char }
     } compile-test-bb
 ] unit-test
 
 [ $[ 255 tag-bits get neg shift ] ] [
     V{
-        T{ ##load-tagged f 1 $[ -1 9 2^ bitxor tag-fixnum ] }
-        T{ ##convert-integer f 0 1 uchar }
+        T{ load-tagged## f 1 $[ -1 9 2^ bitxor tag-fixnum ] }
+        T{ convert-integer## f 0 1 uchar }
     } compile-test-bb
 ] unit-test

@@ -19,14 +19,14 @@ IN: compiler.cfg.value-numbering.comparisons
     } case ;
 
 : fold-compare-integer-imm? ( insn -- ? )
-    src1>> vreg>insn ##load-integer? ;
+    src1>> vreg>insn load-integer##? ;
 
 : evaluate-compare-integer-imm ( insn -- ? )
     [ src1>> vreg>integer ] [ src2>> ] [ cc>> ] tri
     [ <=> ] dip evaluate-cc ;
 
 : fold-test-imm? ( insn -- ? )
-    src1>> vreg>insn ##load-integer? ;
+    src1>> vreg>insn load-integer##? ;
 
 : evaluate-test-imm ( insn -- ? )
     [ src1>> vreg>integer ] [ src2>> ] [ cc>> ] tri
@@ -54,16 +54,16 @@ IN: compiler.cfg.value-numbering.comparisons
     } cleave ; inline
 
 UNION: scalar-compare-insn
-    ##compare
-    ##compare-imm
-    ##compare-integer
-    ##compare-integer-imm
-    ##test
-    ##test-imm
-    ##compare-float-unordered
-    ##compare-float-ordered ;
+    compare##
+    compare-imm##
+    compare-integer##
+    compare-integer-imm##
+    test##
+    test-imm##
+    compare-float-unordered##
+    compare-float-ordered## ;
 
-UNION: general-compare-insn scalar-compare-insn ##test-vector ;
+UNION: general-compare-insn scalar-compare-insn test-vector## ;
 
 : rewrite-boolean-comparison? ( insn -- ? )
     {
@@ -74,29 +74,29 @@ UNION: general-compare-insn scalar-compare-insn ##test-vector ;
 
 : rewrite-boolean-comparison ( insn -- insn )
     src1>> vreg>insn {
-        { [ dup ##compare? ] [ >compare< ##compare-branch new-insn ] }
-        { [ dup ##compare-imm? ] [ >compare< ##compare-imm-branch new-insn ] }
-        { [ dup ##compare-integer? ] [ >compare< ##compare-integer-branch new-insn ] }
-        { [ dup ##compare-integer-imm? ] [ >compare< ##compare-integer-imm-branch new-insn ] }
-        { [ dup ##test? ] [ >compare< ##test-branch new-insn ] }
-        { [ dup ##test-imm? ] [ >compare< ##test-imm-branch new-insn ] }
-        { [ dup ##compare-float-unordered? ] [ >compare< ##compare-float-unordered-branch new-insn ] }
-        { [ dup ##compare-float-ordered? ] [ >compare< ##compare-float-ordered-branch new-insn ] }
-        { [ dup ##test-vector? ] [ >test-vector< ##test-vector-branch new-insn ] }
+        { [ dup compare##? ] [ >compare< compare-branch## new-insn ] }
+        { [ dup compare-imm##? ] [ >compare< compare-imm-branch## new-insn ] }
+        { [ dup compare-integer##? ] [ >compare< compare-integer-branch## new-insn ] }
+        { [ dup compare-integer-imm##? ] [ >compare< compare-integer-imm-branch## new-insn ] }
+        { [ dup test##? ] [ >compare< test-branch## new-insn ] }
+        { [ dup test-imm##? ] [ >compare< test-imm-branch## new-insn ] }
+        { [ dup compare-float-unordered##? ] [ >compare< compare-float-unordered-branch## new-insn ] }
+        { [ dup compare-float-ordered##? ] [ >compare< compare-float-ordered-branch## new-insn ] }
+        { [ dup test-vector##? ] [ >test-vector< test-vector-branch## new-insn ] }
     } cond ;
 
 : fold-branch ( ? -- insn )
     0 1 ?
     basic-block get [ nth 1vector ] change-successors drop
-    ##branch new-insn ;
+    branch## new-insn ;
 
 : fold-compare-imm-branch ( insn -- insn/f )
     evaluate-compare-imm fold-branch ;
 
 : >test-branch ( insn -- insn' )
-    [ src1>> ] [ src1>> ] [ cc>> ] tri ##test-branch new-insn ;
+    [ src1>> ] [ src1>> ] [ cc>> ] tri test-branch## new-insn ;
 
-M: ##compare-imm-branch rewrite
+M: compare-imm-branch## rewrite
     {
         { [ dup rewrite-boolean-comparison? ] [ rewrite-boolean-comparison ] }
         { [ dup fold-compare-imm? ] [ fold-compare-imm-branch ] }
@@ -106,7 +106,7 @@ M: ##compare-imm-branch rewrite
 : fold-compare-integer-imm-branch ( insn -- insn/f )
     evaluate-compare-integer-imm fold-branch ;
 
-M: ##compare-integer-imm-branch rewrite
+M: compare-integer-imm-branch## rewrite
     {
         { [ dup fold-compare-integer-imm? ] [ fold-compare-integer-imm-branch ] }
         { [ dup rewrite-into-test? ] [ >test-branch ] }
@@ -116,7 +116,7 @@ M: ##compare-integer-imm-branch rewrite
 : fold-test-imm-branch ( insn -- insn/f )
     evaluate-test-imm fold-branch ;
 
-M: ##test-imm-branch rewrite
+M: test-imm-branch## rewrite
     {
         { [ dup fold-test-imm? ] [ fold-test-imm-branch ] }
         [ drop f ]
@@ -131,12 +131,12 @@ M: ##test-imm-branch rewrite
 : >compare-imm-branch ( insn swap? -- insn' )
     (>compare-imm-branch)
     [ vreg>literal ] dip
-    ##compare-imm-branch new-insn ; inline
+    compare-imm-branch## new-insn ; inline
 
 : >compare-integer-imm-branch ( insn swap? -- insn' )
     (>compare-imm-branch)
     [ vreg>integer ] dip
-    ##compare-integer-imm-branch new-insn ; inline
+    compare-integer-imm-branch## new-insn ; inline
 
 : evaluate-self-compare ( insn -- ? )
     cc>> { cc= cc<= cc>= } member-eq? ;
@@ -144,7 +144,7 @@ M: ##test-imm-branch rewrite
 : rewrite-self-compare-branch ( insn -- insn' )
     evaluate-self-compare fold-branch ;
 
-M: ##compare-branch rewrite
+M: compare-branch## rewrite
     {
         { [ dup src1>> vreg-immediate-comparand? ] [ t >compare-imm-branch ] }
         { [ dup src2>> vreg-immediate-comparand? ] [ f >compare-imm-branch ] }
@@ -152,7 +152,7 @@ M: ##compare-branch rewrite
         [ drop f ]
     } cond ;
 
-M: ##compare-integer-branch rewrite
+M: compare-integer-branch## rewrite
     {
         { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-integer-imm-branch ] }
         { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-integer-imm-branch ] }
@@ -167,20 +167,20 @@ M: ##compare-integer-branch rewrite
 : >compare-imm ( insn swap? -- insn' )
     (>compare-imm)
     [ vreg>literal ] dip
-    next-vreg ##compare-imm new-insn ; inline
+    next-vreg compare-imm## new-insn ; inline
 
 : >compare-integer-imm ( insn swap? -- insn' )
     (>compare-imm)
     [ vreg>integer ] dip
-    next-vreg ##compare-integer-imm new-insn ; inline
+    next-vreg compare-integer-imm## new-insn ; inline
 
 : >boolean-insn ( insn ? -- insn' )
-    [ dst>> ] dip ##load-reference new-insn ;
+    [ dst>> ] dip load-reference## new-insn ;
 
 : rewrite-self-compare ( insn -- insn' )
     dup evaluate-self-compare >boolean-insn ;
 
-M: ##compare rewrite
+M: compare## rewrite
     {
         { [ dup src1>> vreg-immediate-comparand? ] [ t >compare-imm ] }
         { [ dup src2>> vreg-immediate-comparand? ] [ f >compare-imm ] }
@@ -188,7 +188,7 @@ M: ##compare rewrite
         [ drop f ]
     } cond ;
 
-M: ##compare-integer rewrite
+M: compare-integer## rewrite
     {
         { [ dup src1>> vreg-immediate-arithmetic? ] [ t >compare-integer-imm ] }
         { [ dup src2>> vreg-immediate-arithmetic? ] [ f >compare-integer-imm ] }
@@ -205,21 +205,21 @@ M: ##compare-integer rewrite
 
 : rewrite-redundant-comparison ( insn -- insn' )
     [ cc>> ] [ dst>> ] [ src1>> vreg>insn ] tri {
-        { [ dup ##compare? ] [ >compare< next-vreg ##compare new-insn ] }
-        { [ dup ##compare-imm? ] [ >compare< next-vreg ##compare-imm new-insn ] }
-        { [ dup ##compare-integer? ] [ >compare< next-vreg ##compare-integer new-insn ] }
-        { [ dup ##compare-integer-imm? ] [ >compare< next-vreg ##compare-integer-imm new-insn ] }
-        { [ dup ##test? ] [ >compare< next-vreg ##test new-insn ] }
-        { [ dup ##test-imm? ] [ >compare< next-vreg ##test-imm new-insn ] }
-        { [ dup ##compare-float-unordered? ] [ >compare< next-vreg ##compare-float-unordered new-insn ] }
-        { [ dup ##compare-float-ordered? ] [ >compare< next-vreg ##compare-float-ordered new-insn ] }
+        { [ dup compare##? ] [ >compare< next-vreg compare## new-insn ] }
+        { [ dup compare-imm##? ] [ >compare< next-vreg compare-imm## new-insn ] }
+        { [ dup compare-integer##? ] [ >compare< next-vreg compare-integer## new-insn ] }
+        { [ dup compare-integer-imm##? ] [ >compare< next-vreg compare-integer-imm## new-insn ] }
+        { [ dup test##? ] [ >compare< next-vreg test## new-insn ] }
+        { [ dup test-imm##? ] [ >compare< next-vreg test-imm## new-insn ] }
+        { [ dup compare-float-unordered##? ] [ >compare< next-vreg compare-float-unordered## new-insn ] }
+        { [ dup compare-float-ordered##? ] [ >compare< next-vreg compare-float-ordered## new-insn ] }
     } cond
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 
 : fold-compare-imm ( insn -- insn' )
     dup evaluate-compare-imm >boolean-insn ;
 
-M: ##compare-imm rewrite
+M: compare-imm## rewrite
     {
         { [ dup rewrite-redundant-comparison? ] [ rewrite-redundant-comparison ] }
         { [ dup fold-compare-imm? ] [ fold-compare-imm ] }
@@ -231,9 +231,9 @@ M: ##compare-imm rewrite
 
 : >test ( insn -- insn' )
     { [ dst>> ] [ src1>> ] [ src1>> ] [ cc>> ] [ temp>> ] } cleave
-    ##test new-insn ;
+    test## new-insn ;
 
-M: ##compare-integer-imm rewrite
+M: compare-integer-imm## rewrite
     {
         { [ dup fold-compare-integer-imm? ] [ fold-compare-integer-imm ] }
         { [ dup rewrite-into-test? ] [ >test ] }
@@ -247,41 +247,41 @@ M: ##compare-integer-imm rewrite
     dup (simplify-test) drop [ >>src1 ] [ >>src2 ] bi* ; inline
 
 : simplify-test-imm ( insn -- insn )
-    [ dst>> ] [ (simplify-test) ] [ temp>> ] tri ##test-imm new-insn ; inline
+    [ dst>> ] [ (simplify-test) ] [ temp>> ] tri test-imm## new-insn ; inline
 
 : simplify-test-imm-branch ( insn -- insn )
-    (simplify-test) ##test-imm-branch new-insn ; inline
+    (simplify-test) test-imm-branch## new-insn ; inline
 
 : >test-imm ( insn ? -- insn' )
     (>compare-imm) [ vreg>integer ] dip next-vreg
-    ##test-imm new-insn ; inline
+    test-imm## new-insn ; inline
 
 : >test-imm-branch ( insn ? -- insn' )
     (>compare-imm-branch) [ vreg>integer ] dip
-    ##test-imm-branch new-insn ; inline
+    test-imm-branch## new-insn ; inline
 
-M: ##test rewrite
+M: test## rewrite
     {
         { [ dup src1>> vreg-immediate-comparand? ] [ t >test-imm ] }
         { [ dup src2>> vreg-immediate-comparand? ] [ f >test-imm ] }
         { [ dup diagonal? ] [
             {
-                { [ dup src1>> vreg>insn ##and? ] [ simplify-test ] }
-                { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm ] }
+                { [ dup src1>> vreg>insn and##? ] [ simplify-test ] }
+                { [ dup src1>> vreg>insn and-imm##? ] [ simplify-test-imm ] }
                 [ drop f ]
             } cond
         ] }
         [ drop f ]
     } cond ;
 
-M: ##test-branch rewrite
+M: test-branch## rewrite
     {
         { [ dup src1>> vreg-immediate-comparand? ] [ t >test-imm-branch ] }
         { [ dup src2>> vreg-immediate-comparand? ] [ f >test-imm-branch ] }
         { [ dup diagonal? ] [
             {
-                { [ dup src1>> vreg>insn ##and? ] [ simplify-test ] }
-                { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm-branch ] }
+                { [ dup src1>> vreg>insn and##? ] [ simplify-test ] }
+                { [ dup src1>> vreg>insn and-imm##? ] [ simplify-test-imm-branch ] }
                 [ drop f ]
             } cond
         ] }
@@ -291,7 +291,7 @@ M: ##test-branch rewrite
 : fold-test-imm ( insn -- insn' )
     dup evaluate-test-imm >boolean-insn ;
 
-M: ##test-imm rewrite
+M: test-imm## rewrite
     {
         { [ dup fold-test-imm? ] [ fold-test-imm ] }
         [ drop f ]

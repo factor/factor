@@ -15,7 +15,7 @@ IN: stack-checker.transforms
 
 :: apply-literal-values-transform ( quot values stack rstate -- )
     rstate recursive-state [ stack quot call-transformer ] with-variable
-    values [ length shorten-d ] [ #drop, ] bi
+    values [ length shorten-d ] [ drop#, ] bi
     rstate infer-quot ;
 
 : literal-values? ( values -- ? ) [ literal-value? ] all? ;

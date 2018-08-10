@@ -83,11 +83,11 @@ HELP: query-results
 }
 { $description "Returns a " { $link result-set } " object representing the results of an SQL query. See " { $link "db-result-sets" } "." } ;
 
-HELP: #rows
+HELP: num-rows
 { $values { "result-set" result-set } { "n" integer } }
 { $description "Returns the number of rows in a result set." } ;
 
-HELP: #columns
+HELP: num-columns
 { $values { "result-set" result-set } { "n" integer } }
 { $description "Returns the number of columns in a result set." } ;
 
@@ -199,8 +199,8 @@ ARTICLE: "db-random-access-result-set" "Random access result sets"
 $nl
 "Databases which work in this way must provide methods for the following traversal words:"
 { $subsections
-    #rows
-    #columns
+    num-rows
+    num-columns
     row-column
     row-column-typed
 } ;
@@ -226,8 +226,8 @@ $nl
 }
 "Query the number of rows or columns:"
 { $subsections
-    #rows
-    #columns
+    num-rows
+    num-columns
 }
 "Traversing a result set:"
 { $subsections

@@ -8,7 +8,7 @@ IN: cpu.x86.tests
 
 { } [
     [ { float } declare fsqrt ]
-    [ ##sqrt? ] contains-insn?
+    [ sqrt##? ] contains-insn?
     sse2?
     assert=
 ] unit-test

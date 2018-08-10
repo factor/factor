@@ -65,29 +65,29 @@ SYMBOL: fixnum-values
 
 GENERIC: compute-modular-candidates* ( node -- )
 
-M: #push compute-modular-candidates*
+M: push# compute-modular-candidates*
     [ out-d>> first ] [ literal>> ] bi
     real? [ [ modular-value ] [ fixnum-value ] bi ] [ drop ] if ;
 
 : small-shift? ( interval -- ? )
     0 cell-bits tag-bits get - 1 - [a,b] interval-subset? ;
 
-: modular-word? ( #call -- ? )
+: modular-word? ( call# -- ? )
     dup word>> { shift fixnum-shift bignum-shift } member-eq?
     [ node-input-infos second interval>> small-shift? ]
     [ word>> "modular-arithmetic" word-prop ]
     if ;
 
-: output-candidate ( #call -- )
+: output-candidate ( call# -- )
     out-d>> first [ modular-value ] [ fixnum-value ] bi ;
 
-: low-order-word? ( #call -- ? )
+: low-order-word? ( call# -- ? )
     word>> "low-order" word-prop ;
 
-: input-candidiate ( #call -- )
+: input-candidiate ( call# -- )
     in-d>> first modular-value ;
 
-M: #call compute-modular-candidates*
+M: call# compute-modular-candidates*
     {
         { [ dup modular-word? ] [ output-candidate ] }
         { [ dup low-order-word? ] [ input-candidiate ] }
@@ -104,10 +104,10 @@ M: node compute-modular-candidates*
 
 GENERIC: only-reads-low-order? ( node -- ? )
 
-: output-modular? ( #call -- ? )
+: output-modular? ( call# -- ? )
     out-d>> first modular-value? ;
 
-M: #call only-reads-low-order?
+M: call# only-reads-low-order?
     {
         [ low-order-word? ]
         [ { [ modular-word? ] [ output-modular? ] } 1&& ]
@@ -131,21 +131,21 @@ SYMBOL: changed?
 
 GENERIC: optimize-modular-arithmetic* ( node -- nodes )
 
-M: #push optimize-modular-arithmetic*
+M: push# optimize-modular-arithmetic*
     dup [ out-d>> first modular-value? ] [ literal>> real? ] bi and
     [ [ >fixnum ] change-literal ] when ;
 
-: redundant->fixnum? ( #call -- ? )
+: redundant->fixnum? ( call# -- ? )
     in-d>> first actually-defined-by
     [ value>> { [ modular-value? ] [ fixnum-value? ] } 1&& ] all? ;
 
-: optimize->fixnum ( #call -- nodes )
+: optimize->fixnum ( call# -- nodes )
     dup redundant->fixnum? [ drop f ] when ;
 
-: should-be->fixnum? ( #call -- ? )
+: should-be->fixnum? ( call# -- ? )
     out-d>> first modular-value? ;
 
-: optimize->integer ( #call -- nodes )
+: optimize->integer ( call# -- nodes )
     dup should-be->fixnum? [ \ >fixnum >>word ] when ;
 
 MEMO: fixnum-coercion ( flags -- nodes )
@@ -154,11 +154,11 @@ MEMO: fixnum-coercion ( flags -- nodes )
     [ [ ] [ >fixnum ] ? ] map shallow-spread>quot
     '[ _ call ] splice-quot ;
 
-: modular-value-info ( #call -- alist )
+: modular-value-info ( call# -- alist )
     [ in-d>> ] [ out-d>> ] bi append
     fixnum <class-info> '[ _ ] { } map>assoc ;
 
-: optimize-modular-op ( #call -- nodes )
+: optimize-modular-op ( call# -- nodes )
     dup out-d>> first modular-value? [
         [ in-d>> ] [ word>> integer-op-input-classes ] [ ] tri
         [
@@ -170,22 +170,22 @@ MEMO: fixnum-coercion ( flags -- nodes )
         ] [ [ modular-variant ] change-word ] bi* suffix
     ] when ;
 
-: optimize-low-order-op ( #call -- nodes )
+: optimize-low-order-op ( call# -- nodes )
     dup in-d>> first actually-defined-by [ value>> fixnum-value? ] all? [
         [ ] [ in-d>> first ] [ info>> ] tri
         [ drop fixnum <class-info> ] change-at
     ] when ;
 
-: like->fixnum? ( #call -- ? )
+: like->fixnum? ( call# -- ? )
     word>> {
         >fixnum bignum>fixnum float>fixnum
         integer>fixnum integer>fixnum-strict
     } member-eq? ;
 
-: like->integer? ( #call -- ? )
+: like->integer? ( call# -- ? )
     word>> { >integer >bignum fixnum>bignum } member-eq? ;
 
-M: #call optimize-modular-arithmetic*
+M: call# optimize-modular-arithmetic*
     {
         { [ dup like->fixnum? ] [ optimize->fixnum ] }
         { [ dup like->integer? ] [ optimize->integer ] }

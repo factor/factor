@@ -8,18 +8,18 @@ IN: compiler.cfg.gc-checks.tests
 
 ! insert-gc-check?
 { t f } [
-    V{ T{ ##inc } T{ ##allot } } 0 insns>block insert-gc-check?
-    V{ T{ ##call } } 0 insns>block insert-gc-check?
+    V{ T{ inc## } T{ allot## } } 0 insns>block insert-gc-check?
+    V{ T{ call## } } 0 insns>block insert-gc-check?
 ] unit-test
 
 ! allocation-size
 { t } [
-    V{ T{ ##box-alien f 0 1 } } allocation-size
+    V{ T{ box-alien## f 0 1 } } allocation-size
     123 <alien> size =
 ] unit-test
 
 { t } [
-    V{ T{ ##box-alien } T{ ##replace } } allocation-size
+    V{ T{ box-alien## } T{ replace## } } allocation-size
     5 cells data-alignment get align =
 ] unit-test
 
@@ -27,10 +27,10 @@ IN: compiler.cfg.gc-checks.tests
 {
     {
         V{
-            T{ ##inc }
-            T{ ##peek }
-            T{ ##alien-invoke }
-            T{ ##check-nursery-branch
+            T{ inc## }
+            T{ peek## }
+            T{ alien-invoke## }
+            T{ check-nursery-branch##
                { size 64 }
                { cc cc<= }
                { temp1 1 }
@@ -38,26 +38,26 @@ IN: compiler.cfg.gc-checks.tests
             }
         }
         V{
-            T{ ##allot
+            T{ allot##
                { dst 1 }
                { size 64 }
                { class-of byte-array }
             }
-            T{ ##add }
-            T{ ##branch }
+            T{ add## }
+            T{ branch## }
         }
     }
 } [
     {
-        V{ T{ ##inc } T{ ##peek } T{ ##alien-invoke } }
+        V{ T{ inc## } T{ peek## } T{ alien-invoke## } }
         V{
-            T{ ##allot
+            T{ allot##
                { dst 1 }
                { size 64 }
                { class-of byte-array }
             }
-            T{ ##add }
-            T{ ##branch }
+            T{ add## }
+            T{ branch## }
         }
     } [ add-gc-checks ] keep
 ] cfg-unit-test
@@ -65,66 +65,66 @@ IN: compiler.cfg.gc-checks.tests
 ! gc-check-offsets
 { { } } [
     V{
-        T{ ##inc }
-        T{ ##peek }
-        T{ ##add }
-        T{ ##branch }
+        T{ inc## }
+        T{ peek## }
+        T{ add## }
+        T{ branch## }
     } gc-check-offsets
 ] unit-test
 
 { { } } [
     V{
-        T{ ##inc }
-        T{ ##peek }
-        T{ ##alien-invoke }
-        T{ ##add }
-        T{ ##branch }
+        T{ inc## }
+        T{ peek## }
+        T{ alien-invoke## }
+        T{ add## }
+        T{ branch## }
     } gc-check-offsets
 ] unit-test
 
 { { 0 } } [
     V{
-        T{ ##inc }
-        T{ ##peek }
-        T{ ##allot }
-        T{ ##alien-invoke }
-        T{ ##add }
-        T{ ##branch }
+        T{ inc## }
+        T{ peek## }
+        T{ allot## }
+        T{ alien-invoke## }
+        T{ add## }
+        T{ branch## }
     } gc-check-offsets
 ] unit-test
 
 { { 0 } } [
     V{
-        T{ ##inc }
-        T{ ##peek }
-        T{ ##allot }
-        T{ ##allot }
-        T{ ##add }
-        T{ ##branch }
+        T{ inc## }
+        T{ peek## }
+        T{ allot## }
+        T{ allot## }
+        T{ add## }
+        T{ branch## }
     } gc-check-offsets
 ] unit-test
 
 { { 0 4 } } [
     V{
-        T{ ##inc }
-        T{ ##peek }
-        T{ ##allot }
-        T{ ##alien-invoke }
-        T{ ##allot }
-        T{ ##add }
-        T{ ##sub }
-        T{ ##branch }
+        T{ inc## }
+        T{ peek## }
+        T{ allot## }
+        T{ alien-invoke## }
+        T{ allot## }
+        T{ add## }
+        T{ sub## }
+        T{ branch## }
     } gc-check-offsets
 ] unit-test
 
 { { 3 } } [
     V{
-        T{ ##inc }
-        T{ ##peek }
-        T{ ##alien-invoke }
-        T{ ##allot }
-        T{ ##add }
-        T{ ##branch }
+        T{ inc## }
+        T{ peek## }
+        T{ alien-invoke## }
+        T{ allot## }
+        T{ add## }
+        T{ branch## }
     } gc-check-offsets
 ] unit-test
 
@@ -143,12 +143,12 @@ IN: compiler.cfg.gc-checks.tests
     0 get block>cfg cfg set ;
 
 V{
-    T{ ##inc f 3 }
-    T{ ##replace f 0 d: 1 }
+    T{ inc## f 3 }
+    T{ replace## f 0 d: 1 }
 } 0 test-bb
 
 V{
-    T{ ##box-alien f 0 1 }
+    T{ box-alien## f 0 1 }
 } 1 test-bb
 
 0 1 edge
@@ -161,14 +161,14 @@ V{
     instructions>>
     {
         [ length 1 = ]
-        [ first ##check-nursery-branch? ]
+        [ first check-nursery-branch##? ]
     } 1&& ;
 
 : gc-call? ( bb -- ? )
     instructions>>
     V{
-        T{ ##call-gc f T{ gc-map } }
-        T{ ##branch }
+        T{ call-gc## f T{ gc-map } }
+        T{ branch## }
     } = ;
 
 { t } [ <gc-call> gc-call? ] unit-test
@@ -176,33 +176,33 @@ V{
 reset-vreg-counter
 
 V{
-    T{ ##prologue }
-    T{ ##branch }
+    T{ prologue## }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##peek f 2 d: 0 }
-    T{ ##inc { loc d: 3 } }
-    T{ ##branch }
+    T{ peek## f 2 d: 0 }
+    T{ inc## { loc d: 3 } }
+    T{ branch## }
 } 1 test-bb
 
 V{
-    T{ ##allot f 1 64 byte-array }
-    T{ ##branch }
+    T{ allot## f 1 64 byte-array }
+    T{ branch## }
 } 2 test-bb
 
 V{
-    T{ ##branch }
+    T{ branch## }
 } 3 test-bb
 
 V{
-    T{ ##replace f 2 d: 1 }
-    T{ ##branch }
+    T{ replace## f 2 d: 1 }
+    T{ branch## }
 } 4 test-bb
 
 V{
-    T{ ##epilogue }
-    T{ ##return }
+    T{ epilogue## }
+    T{ return## }
 } 5 test-bb
 
 0 1 edge
@@ -231,33 +231,33 @@ H{
 
 {
     V{
-        T{ ##call-gc f T{ gc-map } }
-        T{ ##branch }
+        T{ call-gc## f T{ gc-map } }
+        T{ branch## }
     }
 } [ 2 get predecessors>> second instructions>> ] unit-test
 
 ! Don't forget to invalidate RPO after inserting basic blocks!
 { 8 } [ cfg get reverse-post-order length ] unit-test
 
-! Do the right thing with ##phi instructions
+! Do the right thing with phi## instructions
 V{
-    T{ ##branch }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##load-reference f 1 "hi" }
-    T{ ##branch }
+    T{ load-reference## f 1 "hi" }
+    T{ branch## }
 } 1 test-bb
 
 V{
-    T{ ##load-reference f 2 "bye" }
-    T{ ##branch }
+    T{ load-reference## f 2 "bye" }
+    T{ branch## }
 } 2 test-bb
 
 V{
-    T{ ##phi f 3 H{ { 1 1 } { 2 2 } } }
-    T{ ##allot f 1 64 byte-array }
-    T{ ##branch }
+    T{ phi## f 3 H{ { 1 1 } { 2 2 } } }
+    T{ allot## f 1 64 byte-array }
+    T{ branch## }
 } 3 test-bb
 
 0 { 1 2 } edges
@@ -274,23 +274,23 @@ H{
 
 { } [ cfg get insert-gc-checks ] unit-test
 { } [ 1 get successors>> first successors>> first 3 set ] unit-test
-{ t } [ 2 get successors>> first instructions>> first ##phi? ] unit-test
+{ t } [ 2 get successors>> first instructions>> first phi##? ] unit-test
 { 2 } [ 3 get instructions>> length ] unit-test
 
 ! GC check in a block that is its own successor
 V{
-    T{ ##prologue }
-    T{ ##branch }
+    T{ prologue## }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##allot f 1 64 byte-array }
-    T{ ##branch }
+    T{ allot## f 1 64 byte-array }
+    T{ branch## }
 } 1 test-bb
 
 V{
-    T{ ##epilogue }
-    T{ ##return }
+    T{ epilogue## }
+    T{ return## }
 } 2 test-bb
 
 0 1 edge
@@ -322,19 +322,19 @@ V{
 
 ! call then allot
 V{
-    T{ ##prologue }
-    T{ ##branch }
+    T{ prologue## }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
-    T{ ##allot f 1 64 byte-array }
-    T{ ##branch }
+    T{ alien-invoke## f "malloc" f f f f f T{ gc-map } }
+    T{ allot## f 1 64 byte-array }
+    T{ branch## }
 } 1 test-bb
 
 V{
-    T{ ##epilogue }
-    T{ ##return }
+    T{ epilogue## }
+    T{ return## }
 } 2 test-bb
 
 0 1 edge
@@ -349,28 +349,28 @@ V{
 ! The GC check should come after the alien-invoke
 {
     V{
-        T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
-        T{ ##check-nursery-branch f 64 cc<= 3 4 }
+        T{ alien-invoke## f "malloc" f f f f f T{ gc-map } }
+        T{ check-nursery-branch## f 64 cc<= 3 4 }
     }
 } [ 0 get successors>> first instructions>> ] unit-test
 
 ! call then allot then call then allot
 V{
-    T{ ##prologue }
-    T{ ##branch }
+    T{ prologue## }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
-    T{ ##allot f 1 64 byte-array }
-    T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
-    T{ ##allot f 2 64 byte-array }
-    T{ ##branch }
+    T{ alien-invoke## f "malloc" f f f f f T{ gc-map } }
+    T{ allot## f 1 64 byte-array }
+    T{ alien-invoke## f "malloc" f f f f f T{ gc-map } }
+    T{ allot## f 2 64 byte-array }
+    T{ branch## }
 } 1 test-bb
 
 V{
-    T{ ##epilogue }
-    T{ ##return }
+    T{ epilogue## }
+    T{ return## }
 } 2 test-bb
 
 0 1 edge
@@ -384,8 +384,8 @@ V{
 
 {
     V{
-        T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
-        T{ ##check-nursery-branch f 64 cc<= 3 4 }
+        T{ alien-invoke## f "malloc" f f f f f T{ gc-map } }
+        T{ check-nursery-branch## f 64 cc<= 3 4 }
     }
 } [
     0 get
@@ -395,9 +395,9 @@ V{
 
 {
     V{
-        T{ ##allot f 1 64 byte-array }
-        T{ ##alien-invoke f "malloc" f f f f f T{ gc-map } }
-        T{ ##check-nursery-branch f 64 cc<= 5 6 }
+        T{ allot## f 1 64 byte-array }
+        T{ alien-invoke## f "malloc" f f f f f T{ gc-map } }
+        T{ check-nursery-branch## f 64 cc<= 5 6 }
     }
 } [
     0 get
@@ -408,8 +408,8 @@ V{
 
 {
     V{
-        T{ ##allot f 2 64 byte-array }
-        T{ ##branch }
+        T{ allot## f 2 64 byte-array }
+        T{ branch## }
     }
 } [
     0 get

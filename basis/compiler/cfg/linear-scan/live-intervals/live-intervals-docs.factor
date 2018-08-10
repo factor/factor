@@ -56,7 +56,7 @@ HELP: from
 
 HELP: hairy-clobber-insn
 { $class-description "Instructions that clobber registers. They receive inputs and produce outputs in spill slots." }
-{ $notes "The " { $link ##call-gc } " instruction is not included in the class even though it clobbers registers because it is handled specially." } ;
+{ $notes "The " { $link call-gc## } " instruction is not included in the class even though it clobbers registers because it is handled specially." } ;
 
 HELP: insn>sync-point
 { $values { "insn" insn } { "sync-point/f" { $maybe sync-point } } }

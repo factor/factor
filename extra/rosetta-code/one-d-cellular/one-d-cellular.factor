@@ -29,7 +29,7 @@ IN: rosetta-code.one-d-cellular
     [ [ 2 ] [ 1 ] if ]
     [ [ 1 ] [ 0 ] if ] if ;
 
-:: neighbours ( index world -- # )
+:: neighbours ( index world -- n )
     index [ 1 - ] [ 1 + ] bi [ world ?nth ] bi@ bool-sum ;
 
 : count-neighbours ( world -- neighbours )

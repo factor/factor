@@ -30,26 +30,26 @@ total-births total-deaths ;
     dup [ harvest>> ] [ yield>> ] bi / >>acres
     dup [ harvest>> ] [ stores>> ] bi - >>eaten ;
 
-: #acres-available ( game -- n )
+: n-acres-available ( game -- n )
     [ stores>> ] [ cost>> ] bi /i ;
 
-: #acres-per-person ( game -- n )
+: n-acres-per-person ( game -- n )
     [ acres>> ] [ population>> ] bi / ;
 
-: #harvested ( game -- n )
+: n-harvested ( game -- n )
     [ planted>> ] [ yield>> ] bi * ;
 
-: #eaten ( game -- n )
+: n-eaten ( game -- n )
     dup rat-factor>> odd?
     [ [ stores>> ] [ rat-factor>> ] bi / ] [ drop 0 ] if ;
 
-: #stored ( game -- n )
+: n-stored ( game -- n )
     [ harvest>> ] [ eaten>> ] bi - ;
 
-: #percent-died ( game -- n )
+: n-percent-died ( game -- n )
     [ total-deaths>> 100 * ] [ total-births>> ] [ year>> ] tri / / ;
 
-: #births ( game -- n )
+: n-births ( game -- n )
     {
         [ acres>> 20 * ]
         [ stores>> + ]
@@ -57,7 +57,7 @@ total-births total-deaths ;
         [ population>> / ]
     } cleave 100 /i 1 + ;
 
-: #starved ( game -- n )
+: n-starved ( game -- n )
     [ population>> ] [ feed>> 20 /i ] bi [-] ;
 
 : leave-fink ( -- )
@@ -86,7 +86,7 @@ total-births total-deaths ;
     "JEFFERSON COMBINED COULD NOT HAVE DONE BETTER!" print ;
 
 : leave ( game -- )
-    dup [ #percent-died ] [ #acres-per-person ] bi
+    dup [ n-percent-died ] [ n-acres-per-person ] bi
     {
         { [ 2dup [ 33 > ] [ 7 < ] bi* or ] [ leave-fink ] }
         { [ 2dup [ 10 > ] [ 9 < ] bi* or ] [ leave-nero ] }
@@ -133,7 +133,7 @@ total-births total-deaths ;
 
 : buy-acres ( game -- game )
     "HOW MANY ACRES DO YOU WISH TO BUY? " input
-    over #acres-available dupd > "stores" and check-error
+    over n-acres-available dupd > "stores" and check-error
     [ drop buy-acres ] [ adjust-acres ] if ;
 
 : sell-acres ( game -- game )
@@ -183,18 +183,18 @@ total-births total-deaths ;
     100 random 15 < >>plague ;
 
 : update-stores ( game -- game )
-    dup #harvested >>harvest
-    dup #eaten >>eaten
-    dup #stored '[ _ + ] change-stores ;
+    dup n-harvested >>harvest
+    dup n-eaten >>eaten
+    dup n-stored '[ _ + ] change-stores ;
 
 : update-births ( game -- game )
-    dup #births
+    dup n-births
     [ >>births ]
     [ '[ _ + ] change-total-births ]
     [ '[ _ + ] change-population ] tri ;
 
 : update-deaths ( game -- game )
-    dup #starved
+    dup n-starved
     [ >>deaths ]
     [ '[ _ + ] change-total-deaths ]
     [ '[ _ - ] change-population ] tri ;
@@ -230,12 +230,12 @@ total-births total-deaths ;
     "SUCCESSFULLY FOR A TEN-YEAR TERM OF OFFICE" print nl ;
 
 : finish ( game -- )
-    dup #percent-died
+    dup n-percent-died
     "IN YOUR 10-YEAR TERM OF OFFICE, %d PERCENT OF THE\n" printf
     "POPULATION STARVED PER YEAR ON AVERAGE, I.E., A TOTAL OF" print
     dup total-deaths>> "%d PEOPLE DIED!!\n" printf
     "YOU STARTED WITH 10 ACRES PER PERSON AND ENDED WITH" print
-    dup #acres-per-person "%d ACRES PER PERSON\n" printf
+    dup n-acres-per-person "%d ACRES PER PERSON\n" printf
     nl leave nl "SO LONG FOR NOW." print ;
 
 PRIVATE>

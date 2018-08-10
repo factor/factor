@@ -17,7 +17,7 @@ HELP: class-tag
 HELP: immediate-slot-offset?
 { $values { "object" object } { "?" boolean } }
 { $description
-  { $link t } " if the object is a " { $link fixnum } " that is small enough to fit into a machine register. It is used to determine whether immediate versions of the instructions " { $link ##set-slot } " and " { $link ##set-slot-imm } " can be emitted." }
+  { $link t } " if the object is a " { $link fixnum } " that is small enough to fit into a machine register. It is used to determine whether immediate versions of the instructions " { $link set-slot## } " and " { $link set-slot-imm## } " can be emitted." }
 { $examples
   { $example
     "USING: compiler.cfg.intrinsics.slots compiler.tree.propagation.info prettyprint ;"
@@ -28,7 +28,7 @@ HELP: immediate-slot-offset?
 
 HELP: node>set-slot-data
 { $values
-  { "#call" #call }
+  { "call#" call# }
   { "write-barrier?" "whether a write barrier is needed, it always is unless the item to set is an " { $link immediate } }
   { "tag" { $maybe number } }
   { "literal" "a literal" }
@@ -41,7 +41,7 @@ HELP: value-tag
 HELP: emit-set-slot
 { $values
   { "block" basic-block }
-  { "#call" #call }
+  { "call#" call# }
   { "block'" basic-block }
 }
 { $description "Emits intrinsic code for a " { $link set-slot } " call." } ;

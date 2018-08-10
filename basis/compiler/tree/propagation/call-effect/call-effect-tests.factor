@@ -64,7 +64,7 @@ IN: compiler.tree.propagation.call-effect.tests
 {
     [ drop f T{ inline-cache } call-effect-ic ]
 } [
-    T{ #call
+    T{ call#
        { word call-effect }
        { in-d V{ 165186755 165186756 165186754 } }
        { out-d { 165186757 } }

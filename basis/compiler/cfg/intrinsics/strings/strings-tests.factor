@@ -5,9 +5,9 @@ IN: compiler.cfg.intrinsics.strings.tests
 
 {
     V{
-        T{ ##tagged>integer { dst 4 } { src 3 } }
-        T{ ##add { dst 5 } { src1 4 } { src2 2 } }
-        T{ ##store-memory-imm
+        T{ tagged>integer## { dst 4 } { src 3 } }
+        T{ add## { dst 5 } { src1 4 } { src2 2 } }
+        T{ store-memory-imm##
            { src 1 }
            { base 5 }
            { offset "varies" }

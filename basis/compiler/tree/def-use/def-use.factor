@@ -49,24 +49,24 @@ ERROR: multiple-defs-error ;
 
 GENERIC: node-uses-values ( node -- values )
 
-M: #introduce node-uses-values drop f ;
-M: #push node-uses-values drop f ;
-M: #phi node-uses-values phi-in-d>> concat remove-bottom sets:members ;
-M: #declare node-uses-values drop f ;
-M: #terminate node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
-M: #shuffle node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
-M: #alien-callback node-uses-values drop f ;
+M: introduce# node-uses-values drop f ;
+M: push# node-uses-values drop f ;
+M: phi# node-uses-values phi-in-d>> concat remove-bottom sets:members ;
+M: declare# node-uses-values drop f ;
+M: terminate# node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
+M: shuffle# node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
+M: alien-callback# node-uses-values drop f ;
 M: node node-uses-values in-d>> ;
 
 GENERIC: node-defs-values ( node -- values )
 
-M: #shuffle node-defs-values [ out-d>> ] [ out-r>> ] bi append ;
-M: #branch node-defs-values drop f ;
-M: #declare node-defs-values drop f ;
-M: #return node-defs-values drop f ;
-M: #recursive node-defs-values drop f ;
-M: #terminate node-defs-values drop f ;
-M: #alien-callback node-defs-values drop f ;
+M: shuffle# node-defs-values [ out-d>> ] [ out-r>> ] bi append ;
+M: branch# node-defs-values drop f ;
+M: declare# node-defs-values drop f ;
+M: return# node-defs-values drop f ;
+M: recursive# node-defs-values drop f ;
+M: terminate# node-defs-values drop f ;
+M: alien-callback# node-defs-values drop f ;
 M: node node-defs-values out-d>> ;
 
 : node-def-use ( node -- )

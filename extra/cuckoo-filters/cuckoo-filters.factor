@@ -19,12 +19,12 @@ CONSTANT: max-load-factor 0.96
 ! The number of fingerprint to store in each bucket
 CONSTANT: bucket-size 4
 
-: #buckets ( capacity -- #buckets )
+: buckets# ( capacity -- buckets# )
     [ bucket-size /i next-power-of-2 ] keep
     over / bucket-size / max-load-factor > [ 2 * ] when ;
 
 : <cuckoo-buckets> ( capacity -- buckets )
-    #buckets [ bucket-size f <array> ] replicate ;
+    buckets# [ bucket-size f <array> ] replicate ;
 
 : hash-index ( hash -- fingerprint index )
     4 over <displaced-alien> [ uint deref ] bi@ ;

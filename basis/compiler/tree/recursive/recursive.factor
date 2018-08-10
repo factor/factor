@@ -6,7 +6,7 @@ IN: compiler.tree.recursive
 
 TUPLE: call-site tail? node label ;
 
-: recursive-phi-in ( #enter-recursive -- seq )
+: recursive-phi-in ( enter-recursive# -- seq )
     [ label>> calls>> [ node>> in-d>> ] map ] [ in-d>> ] bi suffix ;
 
 <PRIVATE
@@ -19,9 +19,9 @@ TUPLE: call-graph-node tail? label children calls ;
 : tail-calls ( tail? node -- seq )
     [
         {
-            [ #phi? ]
-            [ #return? ]
-            [ #return-recursive? ]
+            [ phi#? ]
+            [ return#? ]
+            [ return-recursive#? ]
         } 1||
     ] map (tail-calls) ;
 
@@ -42,25 +42,25 @@ GENERIC: node-call-graph ( tail? node -- )
         calls get
     ] with-scope ;
 
-M: #return-recursive node-call-graph
+M: return-recursive# node-call-graph
     nip dup label>> return<< ;
 
-M: #call-recursive node-call-graph
+M: call-recursive# node-call-graph
     [ dup label>> call-site boa ] keep
     [ drop calls get push ]
     [ label>> calls>> push ] 2bi ;
 
-M: #recursive node-call-graph
+M: recursive# node-call-graph
     [ label>> V{ } clone >>calls drop ]
     [
         [ label>> ] [ child>> build-call-graph ] bi
         call-graph-node boa children get push
     ] bi ;
 
-M: #branch node-call-graph
+M: branch# node-call-graph
     children>> [ (build-call-graph) ] with each ;
 
-M: #alien-callback node-call-graph
+M: alien-callback# node-call-graph
     child>> (build-call-graph) ;
 
 M: node node-call-graph 2drop ;

@@ -264,18 +264,18 @@ CONSTRUCTOR: <idx> idx ( version table triples packfile-sha1 idx-sha1 -- obj ) ;
         } case
     ] with-file-reader ;
 
-SYMBOL: #bits
+SYMBOL: num-bits
 
 : read-type-length ( -- pair )
-    0 #bits [
+    0 num-bits [
         read1*
         [ -4 shift 3 bits ] [ 4 bits ] [ ] tri
         0x80 mask? [
-            #bits [ 4 + ] change
+            num-bits [ 4 + ] change
             [
                 read1* [
-                    7 bits #bits get shift bitor
-                    #bits [ 7 + ] change
+                    7 bits num-bits get shift bitor
+                    num-bits [ 7 + ] change
                 ] [ 0x80 mask? ] bi
             ] loop
         ] when 2array

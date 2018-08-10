@@ -18,26 +18,26 @@ SYMBOL: rename-map
 
 GENERIC: rename-node-values* ( node -- node )
 
-M: #introduce rename-node-values* ;
+M: introduce# rename-node-values* ;
 
-M: #shuffle rename-node-values*
+M: shuffle# rename-node-values*
     [ rename-values ] change-in-d
     [ rename-values ] change-in-r
     [ [ rename-value ] assoc-map ] change-mapping ;
 
-M: #push rename-node-values* ;
+M: push# rename-node-values* ;
 
-M: #terminate rename-node-values*
+M: terminate# rename-node-values*
     [ rename-values ] change-in-d
     [ rename-values ] change-in-r ;
 
-M: #phi rename-node-values*
+M: phi# rename-node-values*
     [ [ rename-values ] map ] change-phi-in-d ;
 
-M: #declare rename-node-values*
+M: declare# rename-node-values*
     [ [ [ rename-value ] dip ] assoc-map ] change-declaration ;
 
-M: #alien-callback rename-node-values* ;
+M: alien-callback# rename-node-values* ;
 
 M: node rename-node-values*
     [ rename-values ] change-in-d ;

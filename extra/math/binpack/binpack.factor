@@ -18,16 +18,16 @@ TUPLE: bin items total ;
 : add-to-bin ( item weight bin -- )
     [ + ] change-total items>> push ;
 
-:: (binpack) ( alist #bins -- bins )
+:: (binpack) ( alist n-bins -- bins )
     alist sort-values <reversed> :> items
-    #bins [ <bin> ] replicate :> bins
+    n-bins [ <bin> ] replicate :> bins
     items [ bins smallest-bin add-to-bin ] assoc-each
     bins [ items>> ] map ;
 
 PRIVATE>
 
-: binpack ( items #bins -- bins )
+: binpack ( items n-bins -- bins )
     [ dup zip ] dip (binpack) ;
 
-: map-binpack ( items quot: ( item -- weight ) #bins -- bins )
+: map-binpack ( items quot: ( item -- weight ) n-bins -- bins )
     [ dupd map zip ] dip (binpack) ; inline

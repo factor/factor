@@ -132,7 +132,7 @@ M: quotation add-quot-to-history add-to-history ;
 : last2 ( seq -- penultimate ultimate )
     2 tail* first2 ;
 
-: top-two ( #call -- effect value )
+: top-two ( call# -- effect value )
     in-d>> last2 [ value-info ] bi@
     literal>> swap ;
 
@@ -177,7 +177,7 @@ ERROR: uninferable ;
 : value>quot ( value-info -- quot: ( code effect -- ) )
     (value>quot) '[ drop @ ] ;
 
-: call-inlining ( #call -- quot/f )
+: call-inlining ( call# -- quot/f )
     top-two dup infer-value [
         pick effect<=
         [ nip value>quot ]
@@ -186,7 +186,7 @@ ERROR: uninferable ;
 
 \ call-effect [ call-inlining ] "custom-inlining" set-word-prop
 
-: execute-inlining ( #call -- quot/f )
+: execute-inlining ( call# -- quot/f )
     top-two >literal< [
         2dup swap execute-effect-unsafe?
         [ nip '[ 2drop _ execute ] ]

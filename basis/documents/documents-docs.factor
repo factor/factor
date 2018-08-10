@@ -70,9 +70,9 @@ HELP: validate-loc
 { $description "Ensures that the line and column numbers in " { $snippet "loc" } " are valid, clamping them to the permitted range if they are not." } ;
 
 HELP: line-end
-{ $values { "line#" "a non-negative integer" } { "document" document } { "loc" "a pair of integers" } }
-{ $description "Outputs the location where " { $snippet "line#" } " ends." }
-{ $errors "Throws an error if " { $snippet "line#" } " is out of bounds." } ;
+{ $values { "line-number" "a non-negative integer" } { "document" document } { "loc" "a pair of integers" } }
+{ $description "Outputs the location where " { $snippet "line-number" } " ends." }
+{ $errors "Throws an error if " { $snippet "line-number" } " is out of bounds." } ;
 
 HELP: doc-end
 { $values { "document" document } { "loc" "a pair of integers" } }

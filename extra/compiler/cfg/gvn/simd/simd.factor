@@ -27,7 +27,7 @@ IN: compiler.cfg.gvn.simd
         [ [ dst>> ] [ src>> ] bi* ]
         [ [ shuffle>> ] bi@ nths ]
         [ drop rep>> ]
-        2tri ##shuffle-vector-imm new-insn
+        2tri shuffle-vector-imm## new-insn
     ] [ 2drop f ] if ;
 
 : (fold-shuffle-vector-imm) ( shuffle bytes -- bytes' )
@@ -35,13 +35,13 @@ IN: compiler.cfg.gvn.simd
 
 : fold-shuffle-vector-imm ( outer inner -- insn' )
     [ [ dst>> ] [ shuffle>> ] bi ] [ obj>> ] bi*
-    (fold-shuffle-vector-imm) ##load-reference new-insn ;
+    (fold-shuffle-vector-imm) load-reference## new-insn ;
 
-M: ##shuffle-vector-imm rewrite
+M: shuffle-vector-imm## rewrite
     dup src>> vreg>insn {
         { [ over useless-shuffle-vector-imm? ] [ drop [ dst>> ] [ src>> ] bi <copy> ] }
-        { [ dup [ ##shuffle-vector-imm? ] with-available-uses? ] [ compose-shuffle-vector-imm ] }
-        { [ dup ##load-reference? ] [ fold-shuffle-vector-imm ] }
+        { [ dup [ shuffle-vector-imm##? ] with-available-uses? ] [ compose-shuffle-vector-imm ] }
+        { [ dup load-reference##? ] [ fold-shuffle-vector-imm ] }
         [ 2drop f ]
     } cond ;
 
@@ -54,22 +54,22 @@ M: ##shuffle-vector-imm rewrite
 
 : (fold-scalar>vector) ( insn bytes -- insn' )
     [ [ dst>> ] [ rep>> rep-length ] bi ] dip <repetition> concat
-    ##load-reference new-insn ;
+    load-reference## new-insn ;
 
 : fold-scalar>vector ( outer inner -- insn' )
     over rep>> scalar-value (fold-scalar>vector) ;
 
-M: ##scalar>vector rewrite
+M: scalar>vector## rewrite
     dup src>> vreg>insn {
         { [ dup literal-insn? ] [ fold-scalar>vector ] }
-        { [ dup [ ##vector>scalar? ] with-available-uses? ] [ [ dst>> ] [ src>> ] bi* <copy> ] }
+        { [ dup [ vector>scalar##? ] with-available-uses? ] [ [ dst>> ] [ src>> ] bi* <copy> ] }
         [ 2drop f ]
     } cond ;
 
 :: fold-gather-vector-2 ( insn src1 src2 -- insn )
     insn dst>>
     src1 src2 [ insn rep>> scalar-value ] bi@ append
-    ##load-reference new-insn ;
+    load-reference## new-insn ;
 
 : rewrite-gather-vector-2 ( insn -- insn/f )
     dup [ src1>> vreg>insn ] [ src2>> vreg>insn ] bi {
@@ -77,9 +77,9 @@ M: ##scalar>vector rewrite
         [ 3drop f ]
     } cond ;
 
-M: ##gather-vector-2 rewrite rewrite-gather-vector-2 ;
+M: gather-vector-2## rewrite rewrite-gather-vector-2 ;
 
-M: ##gather-int-vector-2 rewrite rewrite-gather-vector-2 ;
+M: gather-int-vector-2## rewrite rewrite-gather-vector-2 ;
 
 :: fold-gather-vector-4 ( insn src1 src2 src3 src4 -- insn )
     insn dst>>
@@ -87,7 +87,7 @@ M: ##gather-int-vector-2 rewrite rewrite-gather-vector-2 ;
         src1 src2 src3 src4
         [ insn rep>> scalar-value % ] 4 napply
     ] B{ } make
-    ##load-reference new-insn ;
+    load-reference## new-insn ;
 
 : rewrite-gather-vector-4 ( insn -- insn/f )
     dup { [ src1>> ] [ src2>> ] [ src3>> ] [ src4>> ] } cleave [ vreg>insn ] 4 napply
@@ -96,43 +96,43 @@ M: ##gather-int-vector-2 rewrite rewrite-gather-vector-2 ;
         [ 5drop f ]
     } cond ;
 
-M: ##gather-vector-4 rewrite rewrite-gather-vector-4 ;
+M: gather-vector-4## rewrite rewrite-gather-vector-4 ;
 
-M: ##gather-int-vector-4 rewrite rewrite-gather-vector-4 ;
+M: gather-int-vector-4## rewrite rewrite-gather-vector-4 ;
 
 : fold-shuffle-vector ( insn src1 src2 -- insn )
     [ dst>> ] [ obj>> ] [ obj>> ] tri*
-    swap nths ##load-reference new-insn ;
+    swap nths load-reference## new-insn ;
 
-M: ##shuffle-vector rewrite
+M: shuffle-vector## rewrite
     dup [ src>> vreg>insn ] [ shuffle>> vreg>insn ] bi
     {
-        { [ 2dup [ ##load-reference? ] both? ] [ fold-shuffle-vector ] }
+        { [ 2dup [ load-reference##? ] both? ] [ fold-shuffle-vector ] }
         [ 3drop f ]
     } cond ;
 
-M: ##xor-vector rewrite
+M: xor-vector## rewrite
     dup diagonal?
-    [ [ dst>> ] [ rep>> ] bi ##zero-vector new-insn ] [ drop f ] if ;
+    [ [ dst>> ] [ rep>> ] bi zero-vector## new-insn ] [ drop f ] if ;
 
 : vector-not? ( insn -- ? )
     {
-        [ [ ##not-vector? ] with-available-uses? ]
+        [ [ not-vector##? ] with-available-uses? ]
         [ {
-            [ [ ##xor-vector? ] with-available-uses? ]
-            [ [ src1>> ] [ src2>> ] bi [ vreg>insn ##fill-vector? ] either? ]
+            [ [ xor-vector##? ] with-available-uses? ]
+            [ [ src1>> ] [ src2>> ] bi [ vreg>insn fill-vector##? ] either? ]
         } 1&& ]
     } 1|| ;
 
 GENERIC: vector-not-src ( insn -- vreg )
 
-M: ##not-vector vector-not-src
+M: not-vector## vector-not-src
     src>> ;
 
-M: ##xor-vector vector-not-src
-    dup src1>> vreg>insn ##fill-vector? [ src2>> ] [ src1>> ] if ;
+M: xor-vector## vector-not-src
+    dup src1>> vreg>insn fill-vector##? [ src2>> ] [ src1>> ] if ;
 
-M: ##and-vector rewrite
+M: and-vector## rewrite
     {
         { [ dup src1>> vreg>insn vector-not? ] [
             {
@@ -140,7 +140,7 @@ M: ##and-vector rewrite
                 [ src1>> vreg>insn vector-not-src ]
                 [ src2>> ]
                 [ rep>> ]
-            } cleave ##andn-vector new-insn
+            } cleave andn-vector## new-insn
         ] }
         { [ dup src2>> vreg>insn vector-not? ] [
             {
@@ -148,17 +148,17 @@ M: ##and-vector rewrite
                 [ src2>> vreg>insn vector-not-src ]
                 [ src1>> ]
                 [ rep>> ]
-            } cleave ##andn-vector new-insn
+            } cleave andn-vector## new-insn
         ] }
         [ drop f ]
     } cond ;
 
-M: ##andn-vector rewrite
+M: andn-vector## rewrite
     dup src1>> vreg>insn vector-not? [
         {
             [ dst>> ]
             [ src1>> vreg>insn vector-not-src ]
             [ src2>> ]
             [ rep>> ]
-        } cleave ##and-vector new-insn
+        } cleave and-vector## new-insn
     ] [ drop f ] if ;

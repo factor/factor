@@ -13,7 +13,7 @@ IN: stack-checker.backend
 : introduce-values ( values -- )
     [ [ input-parameter swap set-known ] each ]
     [ length input-count +@ ]
-    [ #introduce, ]
+    [ introduce#, ]
     tri ;
 
 : update-inner-d ( new -- )
@@ -68,7 +68,7 @@ IN: stack-checker.backend
 
 : pop-literal ( -- obj )
     literals get [
-        pop-d [ 1array #drop, ] [ literal value>> ] bi
+        pop-d [ 1array drop#, ] [ literal value>> ] bi
     ] [ pop ] if-empty ;
 
 : literals-available? ( n -- literals ? )
@@ -86,7 +86,7 @@ M: wrapper apply-object
 M: object apply-object push-literal ;
 
 : terminate ( -- )
-    terminated? on meta-d clone meta-r clone #terminate, ;
+    terminated? on meta-d clone meta-r clone terminate#, ;
 
 : check->r ( -- )
     meta-r empty? [ too-many->r ] unless ;
@@ -124,10 +124,10 @@ M: object apply-object push-literal ;
     ] if ;
 
 : infer->r ( n -- )
-    consume-d dup copy-values [ nip output-r ] [ #>r, ] 2bi ;
+    consume-d dup copy-values [ nip output-r ] [ >r#, ] 2bi ;
 
 : infer-r> ( n -- )
-    consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi ;
+    consume-r dup copy-values [ nip output-d ] [ r>#, ] 2bi ;
 
 : consume/produce ( ..a effect quot: ( ..a inputs outputs -- ..b ) -- ..b )
     '[ [ in>> length consume-d ] [ out>> length produce-d ] bi @ ]
@@ -135,10 +135,10 @@ M: object apply-object push-literal ;
     bi ; inline
 
 : apply-word/effect ( word effect -- )
-    swap '[ _ #call, ] consume/produce ;
+    swap '[ _ call#, ] consume/produce ;
 
 : end-infer ( -- )
-    meta-d clone #return, ;
+    meta-d clone return#, ;
 
 : required-stack-effect ( word -- effect )
     dup stack-effect [ ] [ missing-effect ] ?if ;

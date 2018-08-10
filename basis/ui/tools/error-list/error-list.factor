@@ -81,7 +81,7 @@ M: error-renderer row-columns
     drop [
         {
             [ error-type error-icon ]
-            [ line#>> [ number>string ] [ "" ] if* ]
+            [ line-number>> [ number>string ] [ "" ] if* ]
             [ asset>> [ unparse-short ] [ "" ] if* ]
             [ error>> safe-summary ]
         } cleave
@@ -99,7 +99,7 @@ M: error-renderer column-titles
 M: error-renderer column-alignment drop { 0 1 0 0 } ;
 
 : sort-errors ( seq -- seq' )
-    [ [ [ line#>> 0 or ] [ asset>> unparse-short ] bi 2array ] keep ] { } map>assoc
+    [ [ [ line-number>> 0 or ] [ asset>> unparse-short ] bi 2array ] keep ] { } map>assoc
     sort-keys values ;
 
 : file-matches? ( error pathname/f -- ? )

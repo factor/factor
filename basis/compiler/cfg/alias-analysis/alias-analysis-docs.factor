@@ -3,7 +3,7 @@ IN: compiler.cfg.alias-analysis
 
 HELP: useless-compare?
 { $values
-  { "insn" "a " { $link ##compare } " instruction" }
+  { "insn" "a " { $link compare## } " instruction" }
   { "?" boolean }
 }
 { $description "Checks if the comparison instruction is required." } ;

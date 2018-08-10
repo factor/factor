@@ -58,70 +58,70 @@ IN: compiler.cfg.stacks.padding.tests
     V{ } combine-states
 ] unit-test
 
-! visit-insn ##inc
+! visit-insn inc##
 
 ! We assume that overinitialized locations are always dead.
 {
     { { 0 { } } { 0 { } } }
 } [
-    { { 3 { 0 } } { 0 { } } } T{ ##inc { loc d: -3 } } visit-insn
+    { { 3 { 0 } } { 0 { } } } T{ inc## { loc d: -3 } } visit-insn
 ] unit-test
 
 {
     { { 3 { 0 1 2 } } { 0 { } } }
 } [
-    { { 0 { } } { 0 { } } } T{ ##inc { loc d: 3 } } visit-insn
+    { { 0 { } } { 0 { } } } T{ inc## { loc d: 3 } } visit-insn
 ] unit-test
 
-! visit-insn ##call
+! visit-insn call##
 {
     { { 0 { } } { 0 { } } }
 } [
-    initial-state T{ ##call } visit-insn
+    initial-state T{ call## } visit-insn
 ] unit-test
 
-! if any of the stack locations are uninitialized when ##call is
-! visisted then something is wrong. ##call might gc and the
+! if any of the stack locations are uninitialized when call## is
+! visisted then something is wrong. call## might gc and the
 ! uninitialized locations would cause a crash.
 [
-    { { 3 { 0 1 2 } } { 0 { } } } T{ ##call } visit-insn
+    { { 3 { 0 1 2 } } { 0 { } } } T{ call## } visit-insn
 ] [ vacant-when-calling? ] must-fail-with
 
-! visit-insn ##call-gc
+! visit-insn call-gc##
 
-! ##call-gc ofcourse fills all uninitialized locations. ##peek still
-! shouldn't look at them, but if we gc again we don't need to exept ##them.
+! call-gc## ofcourse fills all uninitialized locations. peek## still
+! shouldn't look at them, but if we gc again we don't need to exept them##.
 {
     { { 4 { } } { 0 { } } }
 } [
-    { { 4 { 0 1 2 3 } } { 0 { } } } T{ ##call-gc } visit-insn
+    { { 4 { 0 1 2 3 } } { 0 { } } } T{ call-gc## } visit-insn
 ] unit-test
 
-! visit-insn ##peek
+! visit-insn peek##
 {
     { { 3 { 0 } } { 0 { } } }
 } [
-    { { 3 { 0 } } { 0 { } } } T{ ##peek { dst 1 } { loc d: 1 } } visit-insn
+    { { 3 { 0 } } { 0 { } } } T{ peek## { dst 1 } { loc d: 1 } } visit-insn
 ] unit-test
 
-! After a ##peek that can cause a stack underflow, it is certain that
+! After a peek## that can cause a stack underflow, it is certain that
 ! all stack locations are initialized.
 {
     { { 0 { } } { 2 { } } }
     { { 2 { } } { 0 { } } }
 } [
-    { { 0 { } } { 2 { 0 1 } } } T{ ##peek { dst 1 } { loc r: 2 } } visit-insn
-    { { 2 { 0 1 } } { 0 { } } } T{ ##peek { dst 1 } { loc d: 2 } } visit-insn
+    { { 0 { } } { 2 { 0 1 } } } T{ peek## { dst 1 } { loc r: 2 } } visit-insn
+    { { 2 { 0 1 } } { 0 { } } } T{ peek## { dst 1 } { loc d: 2 } } visit-insn
 ] unit-test
 
-! If the ##peek can't cause a stack underflow, then we don't have the
+! If the peek## can't cause a stack underflow, then we don't have the
 ! same guarantees.
 [
-    { { 3 { 0 1 2 } } { 0 { } } } T{ ##peek { dst 1 } { loc d: 0 } } visit-insn
+    { { 3 { 0 1 2 } } { 0 { } } } T{ peek## { dst 1 } { loc d: 0 } } visit-insn
 ] [ vacant-peek? ] must-fail-with
 
 : following-stack-state ( insns -- state )
-    T{ ##branch } suffix insns>cfg trace-stack-state
+    T{ branch## } suffix insns>cfg trace-stack-state
     >alist [ first ] sort-with last second ;
 
 ! trace-stack-state
@@ -142,9 +142,9 @@ IN: compiler.cfg.stacks.padding.tests
     }
 } [
     {
-        T{ ##inc f d: 2 }
-        T{ ##peek f f d: 2 }
-        T{ ##inc f d: 0 }
+        T{ inc## f d: 2 }
+        T{ peek## f f d: 2 }
+        T{ inc## f d: 0 }
     } insns>cfg trace-stack-state
 ] unit-test
 
@@ -155,7 +155,7 @@ IN: compiler.cfg.stacks.padding.tests
         { 2 { { 0 { } } { 0 { } } } }
     }
 } [
-    V{ T{ ##safepoint } T{ ##prologue } T{ ##branch } }
+    V{ T{ safepoint## } T{ prologue## } T{ branch## } }
     insns>cfg trace-stack-state
 ] unit-test
 
@@ -168,21 +168,21 @@ IN: compiler.cfg.stacks.padding.tests
     }
 } [
     V{
-        T{ ##inc f d: 3 }
-        T{ ##peek { loc d: 3 } }
-        T{ ##branch }
+        T{ inc## f d: 3 }
+        T{ peek## { loc d: 3 } }
+        T{ branch## }
     }
     insns>cfg trace-stack-state
 ] unit-test
 
 : cfg1 ( -- cfg )
     V{
-        T{ ##inc f d: 1 }
-        T{ ##replace { src 10 } { loc d: 0 } }
+        T{ inc## f d: 1 }
+        T{ replace## { src 10 } { loc d: 0 } }
     } 0 insns>block
     V{
-        T{ ##peek { dst 37 } { loc d: 0 } }
-        T{ ##inc f d: -1 }
+        T{ peek## { dst 37 } { loc d: 0 } }
+        T{ inc## f d: -1 }
     } 1 insns>block
     1vector >>successors block>cfg ;
 
@@ -199,45 +199,45 @@ IN: compiler.cfg.stacks.padding.tests
 ! non-datastack instructions mostly omitted.
 : bug1021-cfg ( -- cfg )
     {
-        { 0 V{ T{ ##safepoint } T{ ##prologue } T{ ##branch } } }
+        { 0 V{ T{ safepoint## } T{ prologue## } T{ branch## } } }
         {
             1 V{
-                T{ ##inc f d: 2 }
-                T{ ##replace { src 0 } { loc d: 1 } }
-                T{ ##replace { src 0 } { loc d: 0 } }
+                T{ inc## f d: 2 }
+                T{ replace## { src 0 } { loc d: 1 } }
+                T{ replace## { src 0 } { loc d: 0 } }
             }
         }
         {
             2 V{
-                T{ ##call { word <array> } }
+                T{ call## { word <array> } }
             }
         }
         {
             3 V{
-                T{ ##peek { dst 0 } { loc d: 0 } }
-                T{ ##peek { dst 0 } { loc d: 1 } }
-                T{ ##inc f d: 2 }
-                T{ ##replace { src 0 } { loc d: 2 } }
-                T{ ##replace { src 0 } { loc d: 3 } }
-                T{ ##replace { src 0 } { loc d: 1 } }
+                T{ peek## { dst 0 } { loc d: 0 } }
+                T{ peek## { dst 0 } { loc d: 1 } }
+                T{ inc## f d: 2 }
+                T{ replace## { src 0 } { loc d: 2 } }
+                T{ replace## { src 0 } { loc d: 3 } }
+                T{ replace## { src 0 } { loc d: 1 } }
             }
         }
         {
             8 V{
-                T{ ##peek { dst 0 } { loc d: 2 } }
-                T{ ##peek { dst 0 } { loc d: 1 } }
-                T{ ##inc f d: 3 }
-                T{ ##replace { src 0 } { loc d: 0 } }
-                T{ ##replace { src 0 } { loc d: 1 } }
-                T{ ##replace { src 0 } { loc d: 2 } }
-                T{ ##replace { src 0 } { loc d: 3 } }
+                T{ peek## { dst 0 } { loc d: 2 } }
+                T{ peek## { dst 0 } { loc d: 1 } }
+                T{ inc## f d: 3 }
+                T{ replace## { src 0 } { loc d: 0 } }
+                T{ replace## { src 0 } { loc d: 1 } }
+                T{ replace## { src 0 } { loc d: 2 } }
+                T{ replace## { src 0 } { loc d: 3 } }
             }
         }
         {
             10 V{
-                T{ ##inc f d: -3 }
-                T{ ##peek { dst 0 } { loc d: 0 } }
-                T{ ##alien-invoke { gc-map T{ gc-map } } }
+                T{ inc## f d: -3 }
+                T{ peek## { dst 0 } { loc d: 0 } }
+                T{ alien-invoke## { gc-map T{ gc-map } } }
             }
         }
     } [ over insns>block ] assoc-map dup
@@ -281,24 +281,24 @@ IN: compiler.cfg.stacks.padding.tests
         { 0 V{ } }
         {
             1 V{
-                T{ ##inc f d: 3 }
-                T{ ##replace { src 0 } { loc d: 2 } }
-                T{ ##replace { src 0 } { loc d: 0 } }
-                T{ ##replace { src 0 } { loc d: 1 } }
+                T{ inc## f d: 3 }
+                T{ replace## { src 0 } { loc d: 2 } }
+                T{ replace## { src 0 } { loc d: 0 } }
+                T{ replace## { src 0 } { loc d: 1 } }
             }
         }
         {
             2 V{
-                T{ ##call { word <array> } }
+                T{ call## { word <array> } }
             }
         }
         {
             3 V{
-                T{ ##peek { dst 0 } { loc d: 1 } }
-                T{ ##peek { dst 0 } { loc d: 0 } }
-                T{ ##inc f d: 1 }
-                T{ ##inc f r: 1 }
-                T{ ##replace { src 0 } { loc r: 0 } }
+                T{ peek## { dst 0 } { loc d: 1 } }
+                T{ peek## { dst 0 } { loc d: 0 } }
+                T{ inc## f d: 1 }
+                T{ inc## f r: 1 }
+                T{ replace## { src 0 } { loc r: 0 } }
             }
         }
         {
@@ -306,31 +306,31 @@ IN: compiler.cfg.stacks.padding.tests
         }
         {
             5 V{
-                T{ ##inc f d: -2 }
-                T{ ##inc f r: 5 }
-                T{ ##replace { src 0 } { loc r: 3 } }
-                T{ ##replace { src 0 } { loc d: 0 } }
-                T{ ##replace { src 0 } { loc r: 4 } }
-                T{ ##replace { src 0 } { loc r: 2 } }
-                T{ ##replace { src 0 } { loc r: 1 } }
-                T{ ##replace { src 0 } { loc r: 0 } }
+                T{ inc## f d: -2 }
+                T{ inc## f r: 5 }
+                T{ replace## { src 0 } { loc r: 3 } }
+                T{ replace## { src 0 } { loc d: 0 } }
+                T{ replace## { src 0 } { loc r: 4 } }
+                T{ replace## { src 0 } { loc r: 2 } }
+                T{ replace## { src 0 } { loc r: 1 } }
+                T{ replace## { src 0 } { loc r: 0 } }
             }
         }
         {
             6 V{
-                T{ ##call { word f } }
+                T{ call## { word f } }
             }
         }
         {
             7 V{
-                T{ ##peek { dst 0 } { loc d: 0 } }
-                T{ ##peek { dst 0 } { loc r: 3 } }
-                T{ ##peek { dst 0 } { loc r: 2 } }
-                T{ ##peek { dst 0 } { loc r: 1 } }
-                T{ ##peek { dst 0 } { loc r: 0 } }
-                T{ ##peek { dst 0 } { loc r: 4 } }
-                T{ ##inc f d: 2 }
-                T{ ##inc f r: -5 }
+                T{ peek## { dst 0 } { loc d: 0 } }
+                T{ peek## { dst 0 } { loc r: 3 } }
+                T{ peek## { dst 0 } { loc r: 2 } }
+                T{ peek## { dst 0 } { loc r: 1 } }
+                T{ peek## { dst 0 } { loc r: 0 } }
+                T{ peek## { dst 0 } { loc r: 4 } }
+                T{ inc## f d: 2 }
+                T{ inc## f r: -5 }
             }
         }
         { 8 V{ } }
@@ -338,16 +338,16 @@ IN: compiler.cfg.stacks.padding.tests
         { 10 V{ } }
         {
             11 V{
-                T{ ##call-gc }
+                T{ call-gc## }
             }
         }
         {
             12 V{
-                T{ ##peek { dst 0 } { loc r: 0 } }
-                T{ ##inc f d: -3 }
-                T{ ##inc f d: 1 }
-                T{ ##inc f r: -1 }
-                T{ ##replace { src 0 } { loc d: 0 } }
+                T{ peek## { dst 0 } { loc r: 0 } }
+                T{ inc## f d: -3 }
+                T{ inc## f d: 1 }
+                T{ inc## f r: -1 }
+                T{ replace## { src 0 } { loc d: 0 } }
             }
         }
         {
@@ -416,87 +416,87 @@ IN: compiler.cfg.stacks.padding.tests
         { 0 V{ } }
         {
             1 V{
-                T{ ##peek { loc d: 0 } }
-                T{ ##peek { loc d: 1 } }
-                T{ ##inc { loc d: -1 } }
+                T{ peek## { loc d: 0 } }
+                T{ peek## { loc d: 1 } }
+                T{ inc## { loc d: -1 } }
             }
         }
         {
             2 V{
-                T{ ##inc { loc d: -1 } }
-                T{ ##replace { loc d: 1 } }
-                T{ ##replace { loc d: 0 } }
-                T{ ##inc { loc d: 1 } }
-                T{ ##replace { loc d: 0 } }
+                T{ inc## { loc d: -1 } }
+                T{ replace## { loc d: 1 } }
+                T{ replace## { loc d: 0 } }
+                T{ inc## { loc d: 1 } }
+                T{ replace## { loc d: 0 } }
             }
         }
-        { 3 V{ T{ ##call } } }
+        { 3 V{ T{ call## } } }
         { 4 V{ } }
-        { 5 V{ T{ ##call } } }
-        { 6 V{ T{ ##peek { loc d: 0 } } } }
+        { 5 V{ T{ call## } } }
+        { 6 V{ T{ peek## { loc d: 0 } } } }
         { 7 V{ } }
         {
             8 V{
-                T{ ##replace { loc d: 2 } }
-                T{ ##replace { loc d: 1 } }
-                T{ ##replace { loc d: 0 } }
+                T{ replace## { loc d: 2 } }
+                T{ replace## { loc d: 1 } }
+                T{ replace## { loc d: 0 } }
             }
         }
-        { 9 V{ T{ ##call } } }
+        { 9 V{ T{ call## } } }
         {
             10 V{
-                T{ ##inc { loc d: 1 } }
-                T{ ##replace { loc d: 0 } }
+                T{ inc## { loc d: 1 } }
+                T{ replace## { loc d: 0 } }
             }
         }
-        { 11 V{ T{ ##call } } }
+        { 11 V{ T{ call## } } }
         { 12 V{ } }
-        { 13 V{ T{ ##call } } }
-        { 14 V{ T{ ##peek { loc d: 0 } } } }
+        { 13 V{ T{ call## } } }
+        { 14 V{ T{ peek## { loc d: 0 } } } }
         { 15 V{ } }
         {
             16 V{
-                T{ ##inc { loc d: 1 } }
-                T{ ##replace { loc d: 0 } }
+                T{ inc## { loc d: 1 } }
+                T{ replace## { loc d: 0 } }
             }
         }
-        { 17 V{ T{ ##call } } }
+        { 17 V{ T{ call## } } }
         {
             18 V{
-                T{ ##peek { loc d: 2 } }
-                T{ ##peek { loc d: 1 } }
-                T{ ##peek { loc d: 0 } }
-                T{ ##inc { loc d: 1 } }
+                T{ peek## { loc d: 2 } }
+                T{ peek## { loc d: 1 } }
+                T{ peek## { loc d: 0 } }
+                T{ inc## { loc d: 1 } }
             }
         }
         { 19 V{ } }
         { 20 V{ } }
         {
             21 V{
-                T{ ##inc { loc d: -3 } }
-                T{ ##replace { loc d: 0 } }
+                T{ inc## { loc d: -3 } }
+                T{ replace## { loc d: 0 } }
             }
         }
-        { 22 V{ T{ ##call } } }
+        { 22 V{ T{ call## } } }
         { 23 V{ } }
-        { 24 V{ T{ ##call } } }
+        { 24 V{ T{ call## } } }
         {
             25 V{
-                T{ ##peek { loc d: 0 } }
-                T{ ##inc { loc d: 3 } }
+                T{ peek## { loc d: 0 } }
+                T{ inc## { loc d: 3 } }
             }
         }
         { 26 V{ } }
         { 27 V{ } }
         { 28 V{ } }
         { 29 V{ } }
-        { 30 V{ T{ ##call-gc } } }
+        { 30 V{ T{ call-gc## } } }
         { 31 V{ } }
         {
             32 V{
-                T{ ##inc { loc d: -4 } }
-                T{ ##inc { loc d: 1 } }
-                T{ ##replace { loc d: 0 } }
+                T{ inc## { loc d: -4 } }
+                T{ inc## { loc d: 1 } }
+                T{ replace## { loc d: 0 } }
             }
         }
         { 33 V{ } }
@@ -589,18 +589,18 @@ IN: compiler.cfg.stacks.padding.tests
 
 {
     { { 1 { 0 } } { 0 { } } }
-} [ V{ T{ ##inc f d: 1 } } following-stack-state ] unit-test
+} [ V{ T{ inc## f d: 1 } } following-stack-state ] unit-test
 
 {
     { { 0 { } } { 1 { 0 } } }
-} [ V{ T{ ##inc f r: 1 } } following-stack-state ] unit-test
+} [ V{ T{ inc## f r: 1 } } following-stack-state ] unit-test
 
 ! Here the peek refers to a parameter of the word.
 {
     { { 0 { } } { 0 { } } }
 } [
     V{
-        T{ ##peek { loc d: 25 } }
+        T{ peek## { loc d: 25 } }
     } following-stack-state
 ] unit-test
 
@@ -608,9 +608,9 @@ IN: compiler.cfg.stacks.padding.tests
     { { 0 { } } { 0 { } } }
 } [
     V{
-        T{ ##replace { src 10 } { loc d: 0 } }
-        T{ ##replace { src 10 } { loc d: 1 } }
-        T{ ##replace { src 10 } { loc d: 2 } }
+        T{ replace## { src 10 } { loc d: 0 } }
+        T{ replace## { src 10 } { loc d: 1 } }
+        T{ replace## { src 10 } { loc d: 2 } }
     } following-stack-state
 ] unit-test
 
@@ -618,9 +618,9 @@ IN: compiler.cfg.stacks.padding.tests
     { { 1 { } } { 0 { } } }
 } [
     V{
-        T{ ##replace { src 10 } { loc d: 0 } }
-        T{ ##inc f d: 1 }
-        T{ ##replace { src 10 } { loc d: 0 } }
+        T{ replace## { src 10 } { loc d: 0 } }
+        T{ inc## f d: 1 }
+        T{ replace## { src 10 } { loc d: 0 } }
     } following-stack-state
 ] unit-test
 
@@ -628,10 +628,10 @@ IN: compiler.cfg.stacks.padding.tests
     { { 0 { } } { 0 { } } }
 } [
     V{
-        T{ ##replace { src 10 } { loc d: 0 } }
-        T{ ##inc f d: 1 }
-        T{ ##replace { src 10 } { loc d: 0 } }
-        T{ ##inc f d: -1 }
+        T{ replace## { src 10 } { loc d: 0 } }
+        T{ inc## f d: 1 }
+        T{ replace## { src 10 } { loc d: 0 } }
+        T{ inc## f d: -1 }
     } following-stack-state
 ] unit-test
 
@@ -639,42 +639,42 @@ IN: compiler.cfg.stacks.padding.tests
     { { 0 { } } { 0 { } } }
 } [
     V{
-        T{ ##inc f d: 1 }
-        T{ ##replace { src 10 } { loc d: 0 } }
-        T{ ##inc f d: -1 }
+        T{ inc## f d: 1 }
+        T{ replace## { src 10 } { loc d: 0 } }
+        T{ inc## f d: -1 }
     } following-stack-state
 ] unit-test
 
-! ##call clears the overinitialized slots.
+! call## clears the overinitialized slots.
 {
     { { -1 { } } { 0 { } } }
 } [
     V{
-        T{ ##replace { src 10 } { loc d: 0 } }
-        T{ ##inc f d: -1 }
-        T{ ##call }
+        T{ replace## { src 10 } { loc d: 0 } }
+        T{ inc## f d: -1 }
+        T{ call## }
     } following-stack-state
 ] unit-test
 
 ! Should not be ok because the value wasn't initialized when gc ran.
 [
     V{
-        T{ ##inc f d: 1 }
-        T{ ##alien-invoke { gc-map T{ gc-map } } }
-        T{ ##peek { loc d: 0 } }
+        T{ inc## f d: 1 }
+        T{ alien-invoke## { gc-map T{ gc-map } } }
+        T{ peek## { loc d: 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with
 
 [
     V{
-        T{ ##inc f d: 1 }
-        T{ ##peek { loc d: 0 } }
+        T{ inc## f d: 1 }
+        T{ peek## { loc d: 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with
 
 [
     V{
-        T{ ##inc f r: 1 }
-        T{ ##peek { loc r: 0 } }
+        T{ inc## f r: 1 }
+        T{ peek## { loc r: 0 } }
     } following-stack-state
 ] [ vacant-peek? ] must-fail-with

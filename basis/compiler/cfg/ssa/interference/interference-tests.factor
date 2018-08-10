@@ -15,7 +15,7 @@ IN: compiler.cfg.ssa.interference.tests
     compute-live-ranges ;
 
 : <test-vreg-info> ( vreg -- info )
-    [ ] [ insn-of dup ##tagged>integer? [ src>> ] [ dst>> ] if ] [ def-of ] tri
+    [ ] [ insn-of dup tagged>integer##? [ src>> ] [ dst>> ] if ] [ def-of ] tri
     <vreg-info> ;
 
 : test-vregs-intersect? ( vreg1 vreg2 -- ? )
@@ -30,20 +30,20 @@ IN: compiler.cfg.ssa.interference.tests
     [ [ <test-vreg-info> ] map ] bi@ sets-interfere? ;
 
 V{
-    T{ ##peek f 0 d: 0 }
-    T{ ##peek f 2 d: 0 }
-    T{ ##copy f 1 0 }
-    T{ ##copy f 3 2 }
-    T{ ##branch }
+    T{ peek## f 0 d: 0 }
+    T{ peek## f 2 d: 0 }
+    T{ copy## f 1 0 }
+    T{ copy## f 3 2 }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##peek f 4 d: 0 }
-    T{ ##peek f 5 d: 0 }
-    T{ ##replace f 3 d: 0 }
-    T{ ##peek f 6 d: 0 }
-    T{ ##replace f 5 d: 0 }
-    T{ ##return }
+    T{ peek## f 4 d: 0 }
+    T{ peek## f 5 d: 0 }
+    T{ replace## f 3 d: 0 }
+    T{ peek## f 6 d: 0 }
+    T{ replace## f 5 d: 0 }
+    T{ return## }
 } 1 test-bb
 
 0 1 edge
@@ -66,28 +66,28 @@ V{
 { f } [ 6 3 test-vregs-intersect? ] unit-test
 
 V{
-    T{ ##prologue }
-    T{ ##branch }
+    T{ prologue## }
+    T{ branch## }
 } 0 test-bb
 
 
 V{
-    T{ ##inc f d: -3 }
-    T{ ##peek f 12 d: -2 }
-    T{ ##peek f 23 d: -1 }
-    T{ ##sar-imm f 13 23 4 }
-    T{ ##peek f 24 d: -3 }
-    T{ ##sar-imm f 14 24 4 }
-    T{ ##mul f 15 13 13 }
-    T{ ##mul f 16 15 15 }
-    T{ ##tagged>integer f 17 12 }
-    T{ ##store-memory f 16 17 14 0 7 int-rep uchar }
-    T{ ##branch }
+    T{ inc## f d: -3 }
+    T{ peek## f 12 d: -2 }
+    T{ peek## f 23 d: -1 }
+    T{ sar-imm## f 13 23 4 }
+    T{ peek## f 24 d: -3 }
+    T{ sar-imm## f 14 24 4 }
+    T{ mul## f 15 13 13 }
+    T{ mul## f 16 15 15 }
+    T{ tagged>integer## f 17 12 }
+    T{ store-memory## f 16 17 14 0 7 int-rep uchar }
+    T{ branch## }
 } 1 test-bb
 
 V{
-    T{ ##epilogue }
-    T{ ##return }
+    T{ epilogue## }
+    T{ return## }
 } 2 test-bb
 
 0 1 edge
@@ -98,60 +98,60 @@ V{
 { t } [ { 15 } { 23 13 } test-sets-interfere? nip ] unit-test
 
 V{
-    T{ ##prologue f }
-    T{ ##branch f }
+    T{ prologue## f }
+    T{ branch## f }
 } 0 test-bb
 
 V{
-    T{ ##inc f d: 2 }
-    T{ ##peek f 32 d: 2 }
-    T{ ##load-reference f 33 ##check-nursery-branch }
-    T{ ##load-integer f 34 11 }
-    T{ ##tagged>integer f 35 32 }
-    T{ ##and-imm f 36 35 15 }
-    T{ ##compare-integer-imm-branch f 36 7 cc= }
+    T{ inc## f d: 2 }
+    T{ peek## f 32 d: 2 }
+    T{ load-reference## f 33 check-nursery-branch## }
+    T{ load-integer## f 34 11 }
+    T{ tagged>integer## f 35 32 }
+    T{ and-imm## f 36 35 15 }
+    T{ compare-integer-imm-branch## f 36 7 cc= }
 } 1 test-bb
 
 V{
-    T{ ##slot-imm f 48 32 1 7 }
-    T{ ##slot-imm f 50 48 1 2 }
-    T{ ##sar-imm f 65 50 4 }
-    T{ ##compare-integer-branch f 34 65 cc<= }
+    T{ slot-imm## f 48 32 1 7 }
+    T{ slot-imm## f 50 48 1 2 }
+    T{ sar-imm## f 65 50 4 }
+    T{ compare-integer-branch## f 34 65 cc<= }
 } 2 test-bb
 
 V{
-    T{ ##inc f d: -2 }
-    T{ ##slot-imm f 57 48 11 2 }
-    T{ ##compare f 58 33 57 cc= 20 }
-    T{ ##replace f 58 d: 0 }
-    T{ ##branch f }
+    T{ inc## f d: -2 }
+    T{ slot-imm## f 57 48 11 2 }
+    T{ compare## f 58 33 57 cc= 20 }
+    T{ replace## f 58 d: 0 }
+    T{ branch## f }
 } 3 test-bb
 
 V{
-    T{ ##epilogue f }
-    T{ ##return f }
+    T{ epilogue## f }
+    T{ return## f }
 } 4 test-bb
 
 V{
-    T{ ##inc f d: -2 }
-    T{ ##replace-imm f f d: 0 }
-    T{ ##branch f }
+    T{ inc## f d: -2 }
+    T{ replace-imm## f f d: 0 }
+    T{ branch## f }
 } 5 test-bb
 
 V{
-    T{ ##epilogue f }
-    T{ ##return f }
+    T{ epilogue## f }
+    T{ return## f }
 } 6 test-bb
 
 V{
-    T{ ##inc f d: -2 }
-    T{ ##replace-imm f f d: 0 }
-    T{ ##branch f }
+    T{ inc## f d: -2 }
+    T{ replace-imm## f f d: 0 }
+    T{ branch## f }
 } 7 test-bb
 
 V{
-    T{ ##epilogue f }
-    T{ ##return f }
+    T{ epilogue## f }
+    T{ return## f }
 } 8 test-bb
 
 0 1 edge
@@ -170,105 +170,105 @@ TUPLE: gfg { x bab } ;
 : bah ( -- x ) f ;
 
 V{
-    T{ ##prologue }
-    T{ ##branch }
+    T{ prologue## }
+    T{ branch## }
 } 0 test-bb
 
 V{
-    T{ ##check-nursery-branch f 16 cc<= 75 76 }
+    T{ check-nursery-branch## f 16 cc<= 75 76 }
 } 1 test-bb
 
 V{
-    T{ ##save-context f 77 78 }
-    T{ ##call-gc f T{ gc-map } }
-    T{ ##branch }
+    T{ save-context## f 77 78 }
+    T{ call-gc## f T{ gc-map } }
+    T{ branch## }
 } 2 test-bb
 
 V{
-    T{ ##inc f d: 1 }
-    T{ ##load-reference f 37 T{ bab } }
-    T{ ##load-reference f 38 { gfg 1 1 tuple 57438726 gfg 7785907 } }
-    T{ ##allot f 40 12 tuple 4 }
-    T{ ##set-slot-imm f 38 40 1 7 }
-    T{ ##set-slot-imm f 37 40 2 7 }
-    T{ ##replace f 40 d: 0 }
-    T{ ##branch }
+    T{ inc## f d: 1 }
+    T{ load-reference## f 37 T{ bab } }
+    T{ load-reference## f 38 { gfg 1 1 tuple 57438726 gfg 7785907 } }
+    T{ allot## f 40 12 tuple 4 }
+    T{ set-slot-imm## f 38 40 1 7 }
+    T{ set-slot-imm## f 37 40 2 7 }
+    T{ replace## f 40 d: 0 }
+    T{ branch## }
 } 3 test-bb
 
 V{
-    T{ ##call f bah }
-    T{ ##branch }
+    T{ call## f bah }
+    T{ branch## }
 } 4 test-bb
 
 V{
-    T{ ##inc f r: 1 }
-    T{ ##inc f d: 1 }
-    T{ ##peek f 43 d: 1 }
-    T{ ##peek f 44 d: 2 }
-    T{ ##tagged>integer f 45 43 }
-    T{ ##and-imm f 46 45 15 }
-    T{ ##compare-integer-imm-branch f 46 7 cc= }
+    T{ inc## f r: 1 }
+    T{ inc## f d: 1 }
+    T{ peek## f 43 d: 1 }
+    T{ peek## f 44 d: 2 }
+    T{ tagged>integer## f 45 43 }
+    T{ and-imm## f 46 45 15 }
+    T{ compare-integer-imm-branch## f 46 7 cc= }
 } 5 test-bb
 
 V{
-    T{ ##inc f d: 1 }
-    T{ ##slot-imm f 58 43 1 7 }
-    T{ ##slot-imm f 60 58 7 2 }
-    T{ ##compare-imm-branch f 60 bab cc= }
+    T{ inc## f d: 1 }
+    T{ slot-imm## f 58 43 1 7 }
+    T{ slot-imm## f 60 58 7 2 }
+    T{ compare-imm-branch## f 60 bab cc= }
 } 6 test-bb
 
 V{
-    T{ ##branch }
+    T{ branch## }
 } 7 test-bb
 
 V{
-    T{ ##inc f r: -1 }
-    T{ ##inc f d: -1 }
-    T{ ##set-slot-imm f 43 44 2 7 }
-    T{ ##write-barrier-imm f 44 2 7 34 35 }
-    T{ ##branch }
+    T{ inc## f r: -1 }
+    T{ inc## f d: -1 }
+    T{ set-slot-imm## f 43 44 2 7 }
+    T{ write-barrier-imm## f 44 2 7 34 35 }
+    T{ branch## }
 } 8 test-bb
 
 V{
-    T{ ##epilogue }
-    T{ ##return }
+    T{ epilogue## }
+    T{ return## }
 } 9 test-bb
 
 V{
-    T{ ##inc f d: 1 }
-    T{ ##replace f 44 r: 0 }
-    T{ ##replace-imm f bab d: 0 }
-    T{ ##branch }
+    T{ inc## f d: 1 }
+    T{ replace## f 44 r: 0 }
+    T{ replace-imm## f bab d: 0 }
+    T{ branch## }
 } 10 test-bb
 
 V{
-    T{ ##call f bad-slot-value }
-    T{ ##branch }
+    T{ call## f bad-slot-value }
+    T{ branch## }
 } 11 test-bb
 
 V{
-    T{ ##no-tco }
+    T{ no-tco## }
 } 12 test-bb
 
 V{
-    T{ ##inc f d: -1 }
-    T{ ##branch }
+    T{ inc## f d: -1 }
+    T{ branch## }
 } 13 test-bb
 
 V{
-    T{ ##inc f d: 1 }
-    T{ ##replace f 44 r: 0 }
-    T{ ##replace-imm f bab d: 0 }
-    T{ ##branch }
+    T{ inc## f d: 1 }
+    T{ replace## f 44 r: 0 }
+    T{ replace-imm## f bab d: 0 }
+    T{ branch## }
 } 14 test-bb
 
 V{
-    T{ ##call f bad-slot-value }
-    T{ ##branch }
+    T{ call## f bad-slot-value }
+    T{ branch## }
 } 15 test-bb
 
 V{
-    T{ ##no-tco }
+    T{ no-tco## }
 } 16 test-bb
 
 0 1 edge
@@ -306,39 +306,39 @@ V{
 ] unit-test
 
 V{
-    T{ ##prologue f }
-    T{ ##branch f }
+    T{ prologue## f }
+    T{ branch## f }
 } 0 test-bb
 
 V{
 
-    T{ ##inc f d: 1 }
-    T{ ##peek f 31 d: 1 }
-    T{ ##sar-imm f 16 31 4 }
-    T{ ##load-integer f 17 0 }
-    T{ ##copy f 33 17 int-rep }
-    T{ ##branch f }
+    T{ inc## f d: 1 }
+    T{ peek## f 31 d: 1 }
+    T{ sar-imm## f 16 31 4 }
+    T{ load-integer## f 17 0 }
+    T{ copy## f 33 17 int-rep }
+    T{ branch## f }
 } 1 test-bb
 
 V{
-    T{ ##phi f 21 H{ { 1 33 } { 3 32 } } }
-    T{ ##compare-integer-branch f 21 16 cc< }
+    T{ phi## f 21 H{ { 1 33 } { 3 32 } } }
+    T{ compare-integer-branch## f 21 16 cc< }
 } 2 test-bb
 
 V{
-    T{ ##add-imm f 27 21 1 }
-    T{ ##copy f 32 27 int-rep }
-    T{ ##branch f }
+    T{ add-imm## f 27 21 1 }
+    T{ copy## f 32 27 int-rep }
+    T{ branch## f }
 } 3 test-bb
 
 V{
-    T{ ##inc f d: -2 }
-    T{ ##branch f }
+    T{ inc## f d: -2 }
+    T{ branch## f }
 } 4 test-bb
 
 V{
-    T{ ##epilogue f }
-    T{ ##return f }
+    T{ epilogue## f }
+    T{ return## f }
 } 5 test-bb
 
 0 1 edge

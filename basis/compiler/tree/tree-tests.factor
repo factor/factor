@@ -5,6 +5,6 @@ IN: compiler.tree.tests
     "label"
     "a-child"
 } [
-    "label" f "a-child" <#recursive>
+    "label" f "a-child" <recursive#>
     [ label>> ] [ child>> ] bi
 ] unit-test

@@ -8,7 +8,7 @@ HELP: counter-class
 { $description "The smallest class to use for a counter that iterates the given interval." } ;
 
 HELP: recursive-phi-infos
-{ $values { "node" #recursive } { "infos" sequence } }
+{ $values { "node" recursive# } { "infos" sequence } }
 { $description "The sequence of " { $link value-info-state } " that is the input to the recursive block." } ;
 
 ARTICLE: "compiler.tree.propagation.recursive" "Propagation for inline recursive combinators"

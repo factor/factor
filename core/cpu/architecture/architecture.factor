@@ -7,7 +7,7 @@ IN: cpu.architecture
 
 ! Representations -- these are like low-level types
 
-! Unknown representation; this is used for ##copy instructions which
+! Unknown representation; this is used for copy## instructions which
 ! get eliminated later
 SINGLETON: any-rep
 

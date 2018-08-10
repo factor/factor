@@ -20,7 +20,7 @@ ERROR: broadcast-words-must-have-no-outputs group ;
 GENERIC: group-words ( group -- words )
 
 M: standard-generic group-words
-    dup "combination" word-prop #>> 2array 1array ;
+    dup "combination" word-prop n>> 2array 1array ;
 
 : slot-words, ( slot-spec -- )
     [ name>> reader-word 0 2array , ]

@@ -44,7 +44,7 @@ TODO:
 ]]
 
 TUPLE: bloom-filter
-{ #hashes fixnum read-only }
+{ n-hashes fixnum read-only }
 { bits bit-array read-only }
 { capacity fixnum read-only }
 { count fixnum } ;
@@ -60,10 +60,10 @@ ERROR: invalid-capacity capacity ;
     ceiling >integer ;
 
 ! 100 hashes ought to be enough for anybody.
-: #hashes-range ( -- range )
+: n-hashes-range ( -- range )
     100 [1,b] ;
 
-! { #hashes #bits }
+! { n-hashes n-bits }
 : identity-configuration ( -- 2seq )
     0 max-array-capacity 2array ;
 
@@ -84,7 +84,7 @@ ERROR: invalid-capacity capacity ;
 ! tradeoff to support it, and I haven't done my own, but we'll
 ! go with it anyway.
 : size-bloom-filter ( error-rate number-objects -- number-hashes number-bits )
-    [ #hashes-range identity-configuration ] 2dip '[
+    [ n-hashes-range identity-configuration ] 2dip '[
         dup _ _ bits-to-satisfy-error-rate
         2array smaller-second
     ] reduce check-hashes first2 ;
@@ -122,11 +122,11 @@ PRIVATE>
 : increment-count ( bloom-filter -- )
     [ 1 + ] change-count drop ; inline
 
-: #hashes-and-length ( bloom-filter -- #hashes length )
-    [ #hashes>> ] [ bits>> length ] bi ; inline
+: n-hashes-and-length ( bloom-filter -- n-hashes length )
+    [ n-hashes>> ] [ bits>> length ] bi ; inline
 
 : relevant-indices ( object bloom-filter -- n quot: ( elt -- n ) )
-    [ double-hashcodes ] [ #hashes-and-length ] bi*
+    [ double-hashcodes ] [ n-hashes-and-length ] bi*
     -rotd '[ _ _ combine-hashcodes _ mod ] ; inline
 
 PRIVATE>

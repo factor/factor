@@ -16,15 +16,15 @@ GENERIC: count-unboxed-allocations* ( m node -- n )
 : (count-unboxed-allocations) ( m node -- n )
     out-d>> first escaping-allocation? [ 1 + ] unless ;
 
-M: #call count-unboxed-allocations*
+M: call# count-unboxed-allocations*
     dup immutable-tuple-boa?
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
-M: #push count-unboxed-allocations*
+M: push# count-unboxed-allocations*
     dup literal>> class-of immutable-tuple-class?
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
-M: #introduce count-unboxed-allocations*
+M: introduce# count-unboxed-allocations*
     out-d>> [ escaping-allocation? [ 1 + ] unless ] each ;
 
 M: node count-unboxed-allocations* drop ;

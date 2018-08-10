@@ -7,7 +7,7 @@ IN: compiler.cfg.intrinsics.fixnum.tests
 
 {
     V{
-        T{ ##compare-integer
+        T{ compare-integer##
            { dst 4 }
            { src1 1 }
            { src2 2 }
@@ -21,7 +21,7 @@ IN: compiler.cfg.intrinsics.fixnum.tests
 
 {
     V{
-        T{ ##compare-integer-imm-branch
+        T{ compare-integer-imm-branch##
            { src1 1 }
            { src2 0 }
            { cc cc> }
@@ -37,13 +37,13 @@ IN: compiler.cfg.intrinsics.fixnum.tests
 
 {
     V{
-        T{ ##copy
+        T{ copy##
            { dst 1 }
            { src 321 }
            { rep any-rep }
         }
-        T{ ##inc { loc d: -1 } }
-        T{ ##branch }
+        T{ inc## { loc d: -1 } }
+        T{ branch## }
     }
     77
 } [
@@ -52,7 +52,7 @@ IN: compiler.cfg.intrinsics.fixnum.tests
 ] cfg-unit-test
 
 {
-    V{ T{ ##call { word 2drop } } T{ ##branch } }
+    V{ T{ call## { word 2drop } } T{ branch## } }
     107
 } [
     \ 2drop V{ } 107 insns>block emit-overflow-case

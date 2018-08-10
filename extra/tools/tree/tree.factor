@@ -6,8 +6,8 @@ io.directories io.files.info io.pathnames kernel locals math
 namespaces sequences sorting ;
 IN: tools.tree
 
-SYMBOL: #files
-SYMBOL: #directories
+SYMBOL: n-files
+SYMBOL: n-directories
 
 : indent ( indents -- )
     unclip-last-slice
@@ -18,7 +18,7 @@ SYMBOL: #directories
     indent name>> write ;
 
 : write-file ( entry indents -- )
-    write-name #files [ 1 + ] change-global ;
+    write-name n-files [ 1 + ] change-global ;
 
 DEFER: write-tree
 
@@ -26,7 +26,7 @@ DEFER: write-tree
     [ write-name ] [
         [ [ name>> ] dip write-tree ]
         [ 3drop " [error opening dir]" write ] recover
-    ] 2bi #directories [ 1 + ] change-global ;
+    ] 2bi n-directories [ 1 + ] change-global ;
 
 : write-entry ( entry indents -- )
     nl over directory? [ write-dir ] [ write-file ] if ;
@@ -45,9 +45,9 @@ DEFER: write-tree
     ] with-directory-entries ;
 
 : tree ( path -- )
-    0 #directories set-global 0 #files set-global
+    0 n-directories set-global 0 n-files set-global
     [ write ] [ V{ } clone write-tree ] bi nl
-    #directories get-global #files get-global
+    n-directories get-global n-files get-global
     "\n%d directories, %d files\n" printf ;
 
 : run-tree ( -- )

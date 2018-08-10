@@ -39,19 +39,19 @@ TUPLE: document < model locs undos redos inside-undo? ;
 
 : doc-line ( n document -- string ) value>> nth ;
 
-: line-end ( line# document -- loc )
+: line-end ( line-number document -- loc )
     [ drop ] [ doc-line length ] 2bi 2array ;
 
 : doc-lines ( from to document -- slice )
     [ 1 + ] [ value>> ] bi* <slice> ;
 
-: start-on-line ( from line# document -- n1 )
+: start-on-line ( from line-number document -- n1 )
     drop over first =
     [ second ] [ drop 0 ] if ;
 
-:: end-on-line ( to line# document -- n2 )
-    to first line# =
-    [ to second ] [ line# document doc-line length ] if ;
+:: end-on-line ( to line-number document -- n2 )
+    to first line-number =
+    [ to second ] [ line-number document doc-line length ] if ;
 
 : each-line ( ... from to quot: ( ... line -- ... ) -- ... )
     2over = [ 3drop ] [
@@ -61,20 +61,20 @@ TUPLE: document < model locs undos redos inside-undo? ;
 : map-lines ( ... from to quot: ( ... line -- ... result ) -- ... results )
     collector [ each-line ] dip ; inline
 
-: start/end-on-line ( from to line# document -- n1 n2 )
+: start/end-on-line ( from to line-number document -- n1 n2 )
     [ start-on-line ] [ end-on-line ] bi-curry bi-curry bi* ;
 
-: last-line# ( document -- line )
+: last-line-number ( document -- line )
     value>> length 1 - ;
 
 CONSTANT: doc-start { 0 0 }
 
 : doc-end ( document -- loc )
-    [ last-line# ] keep line-end ;
+    [ last-line-number ] keep line-end ;
 
 <PRIVATE
 
-: (doc-range) ( from to line# document -- slice )
+: (doc-range) ( from to line-number document -- slice )
     [ start/end-on-line ] 2keep doc-line <slice> ;
 
 :: text+loc ( lines loc -- loc )
@@ -142,7 +142,7 @@ PRIVATE>
     [ "" ] 3dip set-doc-range ;
 
 : validate-line ( line document -- line )
-    last-line# min 0 max ;
+    last-line-number min 0 max ;
 
 : validate-col ( col line document -- col )
     doc-line length min 0 max ;

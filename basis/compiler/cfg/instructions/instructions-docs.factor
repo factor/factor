@@ -6,7 +6,7 @@ compiler.codegen.gc-maps compiler.tree cpu.architecture help.markup
 help.syntax kernel layouts math sequences slots.private system vm ;
 IN: compiler.cfg.instructions
 
-HELP: ##alien-invoke
+HELP: alien-invoke##
 { $class-description
   "An instruction for calling a function in a dynamically linked library. It has the following slots:"
   { $table
@@ -39,9 +39,9 @@ HELP: ##alien-invoke
   }
   "Which function arguments that goes in " { $slot "reg-inputs" } " and which goes in " { $slot "stack-inputs" } " depend on the calling convention. In " { $link cdecl } " on " { $link x86.32 } ", all arguments goes in " { $slot "stack-inputs" } ", in " { $link x86.64 } " on " { $link unix } ", the first six arguments are passed in registers and then stack parameters are used for the remainder."
 }
-{ $see-also #alien-invoke %alien-invoke } ;
+{ $see-also alien-invoke# %alien-invoke } ;
 
-HELP: ##alien-indirect
+HELP: alien-indirect##
 { $class-description
   "An instruction representing an indirect alien call. The first item on the datastack is a pointer to the function to call and the parameters follows. It has the following slots:"
   { $table
@@ -51,9 +51,9 @@ HELP: ##alien-indirect
 }
 { $see-also alien-indirect %alien-indirect } ;
 
-HELP: ##allot
+HELP: allot##
 { $class-description
-  "An instruction for allocating memory in the nursery. Usually the instruction is preceded by " { $link ##check-nursery-branch } " which checks that there is enough room in the nursery to allocate. It has the following slots:"
+  "An instruction for allocating memory in the nursery. Usually the instruction is preceded by " { $link check-nursery-branch## } " which checks that there is enough room in the nursery to allocate. It has the following slots:"
   { $table
     { { $slot "dst" } { "Register to put the pointer to the memory in." } }
     { { $slot "size" } { "Number of bytes to allocate." } }
@@ -62,21 +62,21 @@ HELP: ##allot
   }
 } ;
 
-HELP: ##bit-count
+HELP: bit-count##
 { $class-description "Specialized instruction for counting the number of lit bits in an integer." }
 { $see-also %bit-count } ;
 
-HELP: ##box
+HELP: box##
 { $class-description
   "This instruction boxes a value into a tagged pointer."
 } { $see-also %box } ;
 
-HELP: ##box-alien
+HELP: box-alien##
 { $class-description
   "An instruction for boxing an alien value."
 } ;
 
-HELP: ##call
+HELP: call##
 { $class-description
   "An instruction for calling a Factor word."
   { $table
@@ -84,7 +84,7 @@ HELP: ##call
   }
 } ;
 
-HELP: ##check-nursery-branch
+HELP: check-nursery-branch##
 { $class-description
   "Instruction that inserts a conditional branch to a " { $link basic-block } " that garbage collects the nursery. The " { $vocab-link "compiler.cfg.gc-checks" } " vocab goes through each block in the " { $link cfg } " and checks if it allocates memory. If it does, then this instruction is inserted in the cfg before that block and checks if there is enough available space in the nursery. If it isn't, then a basic block containing code for garbage collecting the nursery is executed."
   $nl
@@ -98,7 +98,7 @@ HELP: ##check-nursery-branch
 }
 { $see-also %check-nursery-branch } ;
 
-HELP: ##compare-float-ordered-branch
+HELP: compare-float-ordered-branch##
 { $class-description
   "It has the following slots:"
   { $table
@@ -106,54 +106,54 @@ HELP: ##compare-float-ordered-branch
   }
 } ;
 
-HELP: ##compare-imm
+HELP: compare-imm##
 { $class-description "Instruction used to implement trivial ifs and not ifs." }
 { $see-also emit-trivial-if emit-trivial-not-if } ;
 
-HELP: ##compare-imm-branch
+HELP: compare-imm-branch##
 { $class-description "The instruction used to implement branching for the " { $link if } " word." } ;
 
-HELP: ##compare-integer
+HELP: compare-integer##
 { $class-description "This instruction is emitted for " { $link fixnum } " comparisons." }
 { $see-also emit-fixnum-comparison } ;
 
-HELP: ##copy
+HELP: copy##
 { $class-description "Instruction that copies a value from one register to another of the same type. For example, you can copy between two gprs or two simd registers but not across. It has the following slots:"
   { $table
     { { $slot "rep" } { "Value representation. Both the source and destination register must have the same representation." } }
   }
 } ;
 
-HELP: ##dispatch
+HELP: dispatch##
 { $class-description "Special instruction for implementing " { $link case } " blocks." } ;
 
-HELP: ##fixnum-add
+HELP: fixnum-add##
 { $class-description "Instruction for adding two fixnums together." }
 { $see-also emit-fixnum+ } ;
 
-HELP: ##inc
+HELP: inc##
 { $class-description
   "An instruction that increases or decreases a stacks height by n. For example, " { $link 2drop } " decreases the datastacks height by two and pushing an item increases it by one."
 } ;
 
-HELP: ##jump
+HELP: jump##
 { $class-description
   "An uncondiation jump instruction. It has the following slots:"
   { $table
     { { $slot "word" } { "Word whose address the instruction is jumping to." } }
   }
-  "Note that the optimizer is sometimes able to optimize away a " { $link ##call } " and " { $link ##return } " pair into one ##jump instruction."
+  "Note that the optimizer is sometimes able to optimize away a " { $link call## } " and " { $link return## } " pair into one jump## instruction."
 } ;
 
-HELP: ##load-double
+HELP: load-double##
 { $class-description "Loads a " { $link float } " into a SIMD register." }
 { $see-also %load-double } ;
 
-HELP: ##load-memory-imm
+HELP: load-memory-imm##
 { $class-description "Instruction for loading data from memory into a register. Either a General Purpose or an SSE register." }
 { $see-also %load-memory-imm } ;
 
-HELP: ##load-reference
+HELP: load-reference##
 { $class-description
   "An instruction for loading a pointer to an object into a register. It has the following slots:"
   { $table
@@ -162,16 +162,16 @@ HELP: ##load-reference
   }
 } ;
 
-HELP: ##load-tagged
+HELP: load-tagged##
 { $class-description "Loads a tagged value into a register." } ;
 
-HELP: ##load-vector
+HELP: load-vector##
 { $class-description
   "Loads a " { $link byte-array } " into an SSE register."
 }
 { $see-also %load-vector } ;
 
-HELP: ##local-allot
+HELP: local-allot##
 { $class-description
   "An instruction for allocating memory in the words own stack frame. It's mostly used for receiving data from alien calls. It has the following slots:"
   { $table
@@ -180,29 +180,29 @@ HELP: ##local-allot
     { { $slot "offset" } { } }
   }
 }
-{ $see-also ##allot } ;
+{ $see-also allot## } ;
 
-HELP: ##mul-vector
+HELP: mul-vector##
 { $class-description
   "SIMD instruction." } ;
 
-HELP: ##no-tco
+HELP: no-tco##
 { $class-description "A dummy instruction that simply inhibits TCO." } ;
 
-HELP: ##parallel-copy
-{ $class-description "An instruction for performing multiple copies. It allows for optimizations or (or prunings) if more than one source or destination vreg is the same. They are transformed into " { $link ##copy } " instructions in " { $link destruct-ssa } ". It has the following slots:"
+HELP: parallel-copy##
+{ $class-description "An instruction for performing multiple copies. It allows for optimizations or (or prunings) if more than one source or destination vreg is the same. They are transformed into " { $link copy## } " instructions in " { $link destruct-ssa } ". It has the following slots:"
   { $table
     { { $slot "values" } { "An assoc mapping source vregs to destinations." } }
   }
 } ;
 
-HELP: ##peek
+HELP: peek##
 { $class-description
   "Copies a value from a stack location to a machine register."
 }
-{ $see-also ##replace } ;
+{ $see-also replace## } ;
 
-HELP: ##phi
+HELP: phi##
 { $class-description
   "A special kind of instruction used to mark control flow. It is inserted by the " { $vocab-link "compiler.cfg.ssa.construction" } " vocab. It has the following slots:"
   { $table
@@ -211,34 +211,34 @@ HELP: ##phi
   }
 } ;
 
-HELP: ##prologue
+HELP: prologue##
 { $class-description
   "An instruction for generating the prologue for a cfg. All it does is decrementing the stack register a number of cells to give the generated code some stack space to work with." }
-  { $see-also ##epilogue } ;
+  { $see-also epilogue## } ;
 
-HELP: ##reload
+HELP: reload##
 { $class-description "Instruction that copies a value from a " { $link spill-slot } " to a register." } ;
 
-HELP: ##replace
+HELP: replace##
 { $class-description "Copies a value from a machine register to a stack location." }
-{ $see-also ##peek ##replace-imm } ;
+{ $see-also peek## replace-imm## } ;
 
-HELP: ##replace-imm
-{ $class-description "An instruction that replaces an item on the data or register stack with an " { $link immediate } " value. The " { $link value-numbering } " compiler optimization pass can sometimes rewrite " { $link ##replace } " instructions to ##replace-imm's." }
-{ $see-also ##replace } ;
+HELP: replace-imm##
+{ $class-description "An instruction that replaces an item on the data or register stack with an " { $link immediate } " value. The " { $link value-numbering } " compiler optimization pass can sometimes rewrite " { $link replace## } " instructions to replace-imm##'s." }
+{ $see-also replace## } ;
 
 
-HELP: ##return
+HELP: return##
 { $class-description "Instruction that returns from a procedure call." } ;
 
-HELP: ##safepoint
+HELP: safepoint##
 { $class-description "Instruction that inserts a safe point in the generated code." } ;
 
-HELP: ##save-context
-{ $class-description "The ##save-context instructions saves the state of the data, retain and callstacks in the threads " { $link context } " struct." }
+HELP: save-context##
+{ $class-description "The save-context## instructions saves the state of the data, retain and callstacks in the threads " { $link context } " struct." }
 { $see-also %save-context } ;
 
-HELP: ##set-slot
+HELP: set-slot##
 { $class-description
   "An instruction for the non-primitive, non-immediate variant of " { $link set-slot } ". It has the following slots:"
   { $table
@@ -249,7 +249,7 @@ HELP: ##set-slot
   }
 } ;
 
-HELP: ##set-slot-imm
+HELP: set-slot-imm##
 { $class-description
   "An instruction for what? It has the following slots:"
   { $table
@@ -259,14 +259,14 @@ HELP: ##set-slot-imm
     { { $slot "tag" } { "Type tag for obj." } }
   }
 }
-{ $see-also ##set-slot %set-slot-imm } ;
+{ $see-also set-slot## %set-slot-imm } ;
 
-{ ##set-slot-imm ##set-slot } related-words
+{ set-slot-imm## set-slot## } related-words
 
-HELP: ##single>double-float
+HELP: single>double-float##
 { $class-description "Converts a single precision value (32-bit usually) stored in a SIMD register to a double precision one (64-bit usually)." } ;
 
-HELP: ##shuffle-vector-imm
+HELP: shuffle-vector-imm##
 { $class-description "Shuffles the vector in a SSE register according to the given shuffle pattern. It is used to extract a given element of the vector."
   { $table
     { { $slot "dst" } { "Destination register to shuffle the vector to." } }
@@ -276,7 +276,7 @@ HELP: ##shuffle-vector-imm
 }
 { $see-also %shuffle-vector-imm } ;
 
-HELP: ##slot-imm
+HELP: slot-imm##
 { $class-description
   "Instruction for reading a slot with a given index from an object."
   { $table
@@ -287,15 +287,15 @@ HELP: ##slot-imm
   }
 } { $see-also %slot-imm } ;
 
-HELP: ##spill
+HELP: spill##
 { $class-description "Instruction that copies a value from a register to a " { $link spill-slot } "."
   { $table
     { { $slot "rep" } { "Register representation which is necessary when spilling SIMD registers." } }
   }
-} { $see-also ##reload } ;
+} { $see-also reload## } ;
 
-HELP: ##store-memory-imm
-{ $class-description "Instruction that copies an 8 byte value from a XMM register to a memory location addressed by a normal register. This instruction is often turned into a cheaper " { $link ##store-memory } " instruction in the " { $link value-numbering } " pass."
+HELP: store-memory-imm##
+{ $class-description "Instruction that copies an 8 byte value from a XMM register to a memory location addressed by a normal register. This instruction is often turned into a cheaper " { $link store-memory## } " instruction in the " { $link value-numbering } " pass."
   { $table
     { { $slot "base" } { "Vreg that contains the base address." } }
     {
@@ -308,11 +308,11 @@ HELP: ##store-memory-imm
 }
 { $see-also %store-memory-imm } ;
 
-HELP: ##test-branch
+HELP: test-branch##
 { $class-description "Instruction inserted by the " { $vocab-link "compiler.cfg.value-numbering" } " compiler pass." }
-{ $see-also ##compare-integer-imm-branch } ;
+{ $see-also compare-integer-imm-branch## } ;
 
-HELP: ##unbox-any-c-ptr
+HELP: unbox-any-c-ptr##
 { $class-description "Instruction that unboxes a pointer in a register so that it can be fed to a C FFI function. For example, if 'src' points to a " { $link byte-array } ", then in 'dst' will be put a pointer to the first byte of that byte array."
   { $table
     { { $slot "dst" } { "Destination register." } }
@@ -321,12 +321,12 @@ HELP: ##unbox-any-c-ptr
 }
 { $see-also %unbox-any-c-ptr } ;
 
-HELP: ##unbox-long-long
+HELP: unbox-long-long##
 { $class-description "Instruction that unboxes a 64-bit integer to two 32-bit registers. Only used on 32 bit architectures." } ;
 
-HELP: ##vector>scalar
+HELP: vector>scalar##
 { $class-description
-  "This instruction is very similar to " { $link ##copy } "."
+  "This instruction is very similar to " { $link copy## } "."
   { $table
     { { $slot "dst" } { "destination vreg" } }
     { { $slot "src" } { "source vreg" } }
@@ -336,7 +336,7 @@ HELP: ##vector>scalar
 { $notes "The two vregs must not necessarily share the same representation." }
 { $see-also %vector>scalar } ;
 
-HELP: ##vm-field
+HELP: vm-field##
 { $class-description "Instruction for loading a pointer to a vm field."
   { $table
     { { $slot "dst" } { "Register to load the field into." } }
@@ -345,9 +345,9 @@ HELP: ##vm-field
 }
 { $see-also %vm-field } ;
 
-HELP: ##write-barrier
+HELP: write-barrier##
 { $class-description
-  "An instruction for inserting a write barrier. This instruction is almost always inserted after a " { $link ##set-slot } " instruction. If the container object is in an older generation than the item inserted, this instruction guarantees that the item will not be garbage collected. It has the following slots:"
+  "An instruction for inserting a write barrier. This instruction is almost always inserted after a " { $link set-slot## } " instruction. If the container object is in an older generation than the item inserted, this instruction guarantees that the item will not be garbage collected. It has the following slots:"
   { $table
     { { $slot "src" } { "Object to which the writer barrier refers." } }
     { { $slot "slot" } { "Slot index of the object." } }
@@ -412,51 +412,51 @@ HELP: gc-map
 ARTICLE: "compiler.cfg.instructions" "Basic block instructions"
 "The " { $vocab-link "compiler.cfg.instructions" } " vocab contains all instruction classes used for generating CFG:s (Call Flow Graphs)."
 $nl
-"All instructions are tuples prefixed with '##' and inheriting from the base class " { $link insn } ". Most instructions are coupled with a generic word in " { $vocab-link "cpu.architecture" } " which emits machine code for it. For example, " { $link %copy } " emits code for " { $link ##copy } " instructions."
+"All instructions are tuples prefixed with '##' and inheriting from the base class " { $link insn } ". Most instructions are coupled with a generic word in " { $vocab-link "cpu.architecture" } " which emits machine code for it. For example, " { $link %copy } " emits code for " { $link copy## } " instructions."
 $nl
 "Instruction classes for moving values around:"
 { $subsections
-  ##copy
-  ##parallel-copy
-  ##peek
-  ##reload
-  ##replace
-  ##replace-imm
-  ##spill
+  copy##
+  parallel-copy##
+  peek##
+  reload##
+  replace##
+  replace-imm##
+  spill##
 }
 "Control flow:"
 { $subsections
-  ##branch
-  ##call
-  ##jump
-  ##no-tco
-  ##phi
-  ##return
+  branch##
+  call##
+  jump##
+  no-tco##
+  phi##
+  return##
 }
 "Alien calls and FFI:"
 { $subsections
-  ##alien-assembly
-  ##alien-indirect
-  ##alien-invoke
-  ##box
-  ##box-alien
-  ##box-displaced-alien
-  ##box-long-long
-  ##callback-inputs
-  ##callback-outputs
-  ##unbox
-  ##unbox-alien
-  ##unbox-any-c-ptr
-  ##unbox-long-long
+  alien-assembly##
+  alien-indirect##
+  alien-invoke##
+  box##
+  box-alien##
+  box-displaced-alien##
+  box-long-long##
+  callback-inputs##
+  callback-outputs##
+  unbox##
+  unbox-alien##
+  unbox-any-c-ptr##
+  unbox-long-long##
   alien-call-insn
 }
 "Allocation and garbage collection:"
 { $subsections
-  ##allot
-  ##call-gc
-  ##check-nursery-branch
-  ##local-allot
-  ##save-context
+  allot##
+  call-gc##
+  check-nursery-branch##
+  local-allot##
+  save-context##
   allocation-insn
   gc-map
   gc-map-insn
@@ -464,84 +464,84 @@ $nl
 }
 "Comparison instructions:"
 { $subsections
-  ##compare
-  ##compare-imm
-  ##compare-imm-branch
-  ##compare-integer
-  ##compare-integer-branch
-  ##compare-integer-imm-branch
-  ##test
-  ##test-branch
-  ##test-imm
-  ##test-imm-branch
+  compare##
+  compare-imm##
+  compare-imm-branch##
+  compare-integer##
+  compare-integer-branch##
+  compare-integer-imm-branch##
+  test##
+  test-branch##
+  test-imm##
+  test-imm-branch##
 }
 "Constant loading:"
 { $subsections
-  ##load-integer
-  ##load-reference
-  ##load-tagged
+  load-integer##
+  load-reference##
+  load-tagged##
 }
 "Floating point SIMD instructions:"
 { $subsections
-  ##add-float
-  ##div-float
-  ##mul-float
-  ##sub-float
+  add-float##
+  div-float##
+  mul-float##
+  sub-float##
 }
  "Integer arithmetic and bit operations:"
 { $subsections
-  ##add
-  ##add-imm
-  ##and
-  ##and-imm
-  ##fixnum-add
-  ##fixnum-sub
-  ##mul
-  ##mul-imm
-  ##neg
-  ##not
-  ##or
-  ##or-imm
-  ##sar
-  ##sar-imm
-  ##shl
-  ##shl-imm
-  ##shr
-  ##shr-imm
-  ##sub
-  ##sub-imm
-  ##xor
-  ##xor-imm
+  add##
+  add-imm##
+  and##
+  and-imm##
+  fixnum-add##
+  fixnum-sub##
+  mul##
+  mul-imm##
+  neg##
+  not##
+  or##
+  or-imm##
+  sar##
+  sar-imm##
+  shl##
+  shl-imm##
+  shr##
+  shr-imm##
+  sub##
+  sub-imm##
+  xor##
+  xor-imm##
 }
 "Slot access:"
 { $subsections
-  ##slot
-  ##slot-imm
-  ##set-slot
-  ##set-slot-imm
-  ##write-barrier
+  slot##
+  slot-imm##
+  set-slot##
+  set-slot-imm##
+  write-barrier##
 }
 "SIMD instructions"
 { $subsections
-  ##add-vector
-  ##add-sub-vector
-  ##bit-count
-  ##compare-float-ordered-branch
-  ##div-vector
-  ##horizontal-add-vector
-  ##horizontal-sub-vector
-  ##load-double
-  ##load-vector
-  ##mul-vector
-  ##shuffle-vector-imm
-  ##single>double-float
-  ##store-memory-imm
-  ##sub-vector
-  ##vector>scalar
+  add-vector##
+  add-sub-vector##
+  bit-count##
+  compare-float-ordered-branch##
+  div-vector##
+  horizontal-add-vector##
+  horizontal-sub-vector##
+  load-double##
+  load-vector##
+  mul-vector##
+  shuffle-vector-imm##
+  single>double-float##
+  store-memory-imm##
+  sub-vector##
+  vector>scalar##
 }
 "Stack height manipulation:"
 { $subsections
-  ##inc
+  inc##
 } ;
 
 ABOUT: "compiler.cfg.instructions"

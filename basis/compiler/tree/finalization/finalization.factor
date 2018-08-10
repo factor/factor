@@ -17,9 +17,9 @@ GENERIC: finalize* ( node -- nodes )
 : splice-predicate ( word -- nodes )
     [ +definition+ depends-on ] [ def>> splice-final ] bi ;
 
-M: #copy finalize* drop f ;
+M: copy# finalize* drop f ;
 
-M: #shuffle finalize*
+M: shuffle# finalize*
     dup {
         [ [ in-d>> length ] [ out-d>> length ] bi = ]
         [ [ in-r>> length ] [ out-r>> length ] bi = ]
@@ -30,7 +30,7 @@ M: #shuffle finalize*
 MEMO: cached-expansion ( word -- nodes )
     def>> splice-final ;
 
-GENERIC: finalize-word ( #call word -- nodes )
+GENERIC: finalize-word ( call# word -- nodes )
 
 M: predicate finalize-word
     "predicating" word-prop {
@@ -45,7 +45,7 @@ M: math-partial finalize-word
 
 M: word finalize-word drop ;
 
-M: #call finalize*
+M: call# finalize*
     dup word>> finalize-word ;
 
 M: node finalize* ;

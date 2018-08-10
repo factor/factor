@@ -13,21 +13,21 @@ FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.tree.cleanup.tests
 
-{ t } [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
+{ t } [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ if#? ] contains-node? ] unit-test
 
-{ f } [ [ f [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
+{ f } [ [ f [ 1 ] [ 2 ] if ] cleaned-up-tree [ if#? ] contains-node? ] unit-test
 
-{ f } [ [ { array } declare [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
+{ f } [ [ { array } declare [ 1 ] [ 2 ] if ] cleaned-up-tree [ if#? ] contains-node? ] unit-test
 
-{ t } [ [ { sequence } declare [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
+{ t } [ [ { sequence } declare [ 1 ] [ 2 ] if ] cleaned-up-tree [ if#? ] contains-node? ] unit-test
 
 : recursive-test ( a -- b ) dup [ not recursive-test ] when ; inline recursive
 
-{ t } [ [ recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
+{ t } [ [ recursive-test ] cleaned-up-tree [ recursive#? ] contains-node? ] unit-test
 
-{ f } [ [ f recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
+{ f } [ [ f recursive-test ] cleaned-up-tree [ recursive#? ] contains-node? ] unit-test
 
-{ t } [ [ t recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
+{ t } [ [ t recursive-test ] cleaned-up-tree [ recursive#? ] contains-node? ] unit-test
 
 { f } [
     [ { integer } declare >fixnum ]
@@ -467,7 +467,7 @@ M: float detect-float ;
 
 { t } [
     [ { array-capacity } declare 1 fixnum+ ] cleaned-up-tree
-    [ { [ #call? ] [ node-input-infos second literal>> 1 = ] } 1&& ] any?
+    [ { [ call#? ] [ node-input-infos second literal>> 1 = ] } 1&& ] any?
 ] unit-test
 
 { } [
@@ -539,7 +539,7 @@ MIXIN: foo-mix
 
 ! cleanup-folding?
 : call-node-foldable2 ( -- node )
-    T{ #call
+    T{ call#
        { word foo-mix? }
        { in-d V{ 8815401 } }
        { out-d { 8815405 } }
@@ -582,7 +582,7 @@ MIXIN: foo-mix
 
 ! cleanup-folding
 : call-node-foldable ( -- node )
-    T{ #call
+    T{ call#
        { word set-slot }
        { in-d V{ 1 2 } }
        { out-d V{ 3 } }

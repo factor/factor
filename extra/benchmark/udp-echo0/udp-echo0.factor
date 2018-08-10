@@ -9,7 +9,7 @@ IN: benchmark.udp-echo0
 : send/recv ( packet server client -- )
     [ 2dup addr>> ] [ send ] bi* receive drop assert= ;
 
-: udp-echo ( #times #bytes -- )
+: udp-echo ( n-times n-bytes -- )
     '[
         _ <iota> [ _ >be ] map
         "127.0.0.1" 0 <inet4> <datagram> &dispose

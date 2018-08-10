@@ -7,7 +7,7 @@ compiler.tree.propagation.branches grouping kernel sequences
 stack-checker.branches ;
 IN: compiler.tree.escape-analysis.branches
 
-M: #branch escape-analysis*
+M: branch# escape-analysis*
     [ in-d>> add-escaping-values ]
     [ live-children sift [ (escape-analysis) ] each ]
     bi ;
@@ -31,5 +31,5 @@ M: #branch escape-analysis*
     [ [ (merge-allocations) ] dip record-allocations ]
     2bi ;
 
-M: #phi escape-analysis*
+M: phi# escape-analysis*
     [ phi-in-d>> flip ] [ out-d>> ] bi merge-allocations ;

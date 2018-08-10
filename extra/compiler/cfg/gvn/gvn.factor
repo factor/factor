@@ -26,7 +26,7 @@ GENERIC: simplify ( insn -- insn' )
 
 M: insn simplify dup rewrite [ simplify ] [ dup >avail-insn-uses ] ?if ;
 M: array simplify [ simplify ] map ;
-M: ##copy simplify ;
+M: copy## simplify ;
 
 ! ! ! Global value numbering
 
@@ -37,9 +37,9 @@ M: array value-number [ value-number ] each ;
 : record-defs ( insn -- ) defs-vregs [ dup set-vn ] each ;
 
 M: alien-call-insn value-number record-defs ;
-M: ##callback-inputs value-number record-defs ;
+M: callback-inputs## value-number record-defs ;
 
-M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
+M: copy## value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
 
 : redundant-instruction ( insn vn -- )
     swap dst>> set-vn ;
@@ -54,7 +54,7 @@ M: ##copy value-number [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
     dup >expr dup exprs>vns get at
     [ redundant-instruction ] [ useful-instruction ] ?if ;
 
-M: ##phi value-number
+M: phi## value-number
     dup inputs>> values [ vreg>vn ] map sift
     dup all-equal? [
         [ drop ] [ first redundant-instruction ] if-empty
@@ -88,8 +88,8 @@ M: array gcse [ gcse ] map ;
     dup defs-vregs [ make-available ] each ;
 
 M: alien-call-insn gcse defs-available ;
-M: ##callback-inputs gcse defs-available ;
-M: ##copy gcse defs-available ;
+M: callback-inputs## gcse defs-available ;
+M: copy## gcse defs-available ;
 
 : ?eliminate ( insn vn -- insn' )
     dup available? [
@@ -100,7 +100,7 @@ M: ##copy gcse defs-available ;
     dup >expr exprs>vns get at >avail-vreg
     [ ?eliminate ] [ defs-available ] if* ;
 
-M: ##phi gcse
+M: phi## gcse
     dup inputs>> values [ vreg>vn ] map sift
     dup all-equal? [
         [ first ?eliminate ] unless-empty

@@ -12,7 +12,7 @@ SYMBOL: copies
 
 : resolve ( vreg -- vreg ) copies get ?at drop ;
 
-: record-copy ( ##copy -- )
+: record-copy ( copy## -- )
     [ src>> resolve ] [ dst>> ] bi copies get set-at ; inline
 
 ! Map vregs -> alias classes
@@ -30,8 +30,8 @@ SYMBOL: heap-ac
     acs>vregs get [ drop V{ } clone ] cache ;
 
 : vreg>ac ( vreg -- ac )
-    ! Only vregs produced by ##allot, ##peek and ##slot can
-    ! ever be used as valid inputs to ##slot and ##set-slot,
+    ! Only vregs produced by allot##, peek## and slot## can
+    ! ever be used as valid inputs to slot## and set-slot##,
     ! so we assert this fact by not giving alias classes to
     ! other vregs.
     vregs>acs get [ heap-ac get [ ac>vregs push ] keep ] cache ;
@@ -58,7 +58,7 @@ SYMBOL: live-slots
 ! Maps vreg -> slot# -> insn# of last store or f
 SYMBOL: recent-stores
 
-! A set of insn#s of dead stores
+! A set of insns# of dead stores
 SYMBOL: dead-stores
 
 : dead-store ( insn# -- ) dead-stores get adjoin ;
@@ -136,21 +136,21 @@ SYMBOL: ac-counter
 GENERIC: insn-slot# ( insn -- slot#/f )
 GENERIC: insn-object ( insn -- vreg )
 
-M: ##slot insn-slot# drop f ;
-M: ##slot-imm insn-slot# slot>> ;
-M: ##set-slot insn-slot# drop f ;
-M: ##set-slot-imm insn-slot# slot>> ;
-M: ##alien-global insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
-M: ##vm-field insn-slot# offset>> ;
-M: ##set-vm-field insn-slot# offset>> ;
+M: slot## insn-slot# drop f ;
+M: slot-imm## insn-slot# slot>> ;
+M: set-slot## insn-slot# drop f ;
+M: set-slot-imm## insn-slot# slot>> ;
+M: alien-global## insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
+M: vm-field## insn-slot# offset>> ;
+M: set-vm-field## insn-slot# offset>> ;
 
-M: ##slot insn-object obj>> resolve ;
-M: ##slot-imm insn-object obj>> resolve ;
-M: ##set-slot insn-object obj>> resolve ;
-M: ##set-slot-imm insn-object obj>> resolve ;
-M: ##alien-global insn-object drop ##alien-global ;
-M: ##vm-field insn-object drop ##vm-field ;
-M: ##set-vm-field insn-object drop ##vm-field ;
+M: slot## insn-object obj>> resolve ;
+M: slot-imm## insn-object obj>> resolve ;
+M: set-slot## insn-object obj>> resolve ;
+M: set-slot-imm## insn-object obj>> resolve ;
+M: alien-global## insn-object drop alien-global## ;
+M: vm-field## insn-object drop vm-field## ;
+M: set-vm-field## insn-object drop vm-field## ;
 
 GENERIC: analyze-aliases ( insn -- insn' )
 
@@ -175,7 +175,7 @@ M: allocation-insn analyze-aliases
     ! object.
     dup dst>> set-new-ac ;
 
-M: ##box-displaced-alien analyze-aliases
+M: box-displaced-alien## analyze-aliases
     [ call-next-method ]
     [ base>> heap-ac get merge-acs ] bi ;
 
@@ -206,7 +206,7 @@ M:: write-insn analyze-aliases ( insn -- insn )
 
     insn ;
 
-M: ##copy analyze-aliases
+M: copy## analyze-aliases
     ! The output vreg gets the same alias class as the input
     ! vreg, since they both contain the same value.
     dup record-copy ;
@@ -217,10 +217,10 @@ M: ##copy analyze-aliases
         [ [ src1>> ] [ src2>> ] bi [ resolve vreg>ac ] same? not ]
     } 1&& ; inline
 
-M: ##compare analyze-aliases
+M: compare## analyze-aliases
     call-next-method
     dup useless-compare? [
-        dst>> f ##load-reference new-insn
+        dst>> f load-reference## new-insn
         analyze-aliases
     ] when ;
 
@@ -242,7 +242,7 @@ M: alien-call-insn analyze-aliases
 
 GENERIC: eliminate-dead-stores ( insn -- ? )
 
-M: ##set-slot-imm eliminate-dead-stores
+M: set-slot-imm## eliminate-dead-stores
     insn#>> dead-stores get in? not ;
 
 M: insn eliminate-dead-stores drop t ;
@@ -256,8 +256,8 @@ M: insn eliminate-dead-stores drop t ;
     dead-stores get clear-set
 
     next-ac heap-ac namespaces:set
-    ##vm-field set-new-ac
-    ##alien-global set-new-ac ;
+    vm-field## set-new-ac
+    alien-global## set-new-ac ;
 
 : alias-analysis-step ( insns -- insns' )
     reset-alias-analysis

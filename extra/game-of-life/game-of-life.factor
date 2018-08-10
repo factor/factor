@@ -188,8 +188,8 @@ grid-gadget "toolbar" f {
 grid-gadget "gestures" [
     {
         { T{ key-down f { A+ } "F" } [ toggle-fullscreen ] }
-        { T{ button-down { # 1 } } [ on-click ] }
-        { T{ drag { # 1 } } [ on-drag ] }
+        { T{ button-down { n 1 } } [ on-click ] }
+        { T{ drag { n 1 } } [ on-drag ] }
         { mouse-scroll [ on-scroll ] }
     } assoc-union
 ] change-word-prop

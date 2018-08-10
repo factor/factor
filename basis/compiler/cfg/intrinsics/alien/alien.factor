@@ -21,11 +21,11 @@ IN: compiler.cfg.intrinsics.alien
         ] binary-op
     ] [ emit-primitive ] if ;
 
-:: inline-accessor ( block #call quot test -- block' )
-    #call node-input-infos :> infos
+:: inline-accessor ( block call# quot test -- block' )
+    call# node-input-infos :> infos
     infos test call
     [ infos quot call block ]
-    [ block #call emit-primitive ] if ; inline
+    [ block call# emit-primitive ] if ; inline
 
 : inline-load-memory? ( infos -- ? )
     [ first class>> c-ptr class<= ]
@@ -60,7 +60,7 @@ IN: compiler.cfg.intrinsics.alien
 
 :: (emit-store-memory) ( block node rep c-type prepare-quot test-quot -- block' )
     block node
-    [ prepare-quot call rep c-type ##store-memory-imm, ]
+    [ prepare-quot call rep c-type store-memory-imm##, ]
     [ test-quot call inline-store-memory? ]
     inline-accessor ; inline
 

@@ -14,35 +14,35 @@ M: insn rewrite drop f ;
 ! Utilities
 GENERIC: insn>integer ( insn -- n )
 
-M: ##load-integer insn>integer val>> ;
+M: load-integer## insn>integer val>> ;
 
 : vreg>integer ( vreg -- n ) vreg>insn insn>integer ; inline
 
 : vreg-immediate-arithmetic? ( vreg -- ? )
     vreg>insn {
-        [ ##load-integer? ]
+        [ load-integer##? ]
         [ val>> immediate-arithmetic? ]
     } 1&& ;
 
 : vreg-immediate-bitwise? ( vreg -- ? )
     vreg>insn {
-        [ ##load-integer? ]
+        [ load-integer##? ]
         [ val>> immediate-bitwise? ]
     } 1&& ;
 
-UNION: literal-insn ##load-integer ##load-reference ;
+UNION: literal-insn load-integer## load-reference## ;
 
 GENERIC: insn>literal ( insn -- n )
 
-M: ##load-integer insn>literal val>> >fixnum ;
+M: load-integer## insn>literal val>> >fixnum ;
 
-M: ##load-reference insn>literal obj>> ;
+M: load-reference## insn>literal obj>> ;
 
 : vreg>literal ( vreg -- n ) vreg>insn insn>literal ; inline
 
 : vreg-immediate-comparand? ( vreg -- ? )
     vreg>insn {
-        { [ dup ##load-integer? ] [ val>> tag-fixnum immediate-comparand? ] }
-        { [ dup ##load-reference? ] [ obj>> immediate-comparand? ] }
+        { [ dup load-integer##? ] [ val>> tag-fixnum immediate-comparand? ] }
+        { [ dup load-reference##? ] [ obj>> immediate-comparand? ] }
         [ drop f ]
     } cond ;

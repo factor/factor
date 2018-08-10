@@ -29,15 +29,15 @@ IN: compiler.tree.propagation.simple.tests
     indexize >hashtable 1array value-infos set
     H{ { 0 0 } { 1 1 } { 2 2 } } copies set ;
 
-: #call-fixnum* ( -- node )
-    T{ #call { word fixnum* } { in-d V{ 0 1 } } { out-d { 3 } } } ;
+: call-fixnum#* ( -- node )
+    T{ call# { word fixnum* } { in-d V{ 0 1 } } { out-d { 3 } } } ;
 
 : call-outputs-quot-of-word ( inputs outputs word -- value-infos )
-    <#call> dup word>> call-outputs-quot ;
+    <call#> dup word>> call-outputs-quot ;
 
 { } [
     fixnum-value-infos setup-value-infos
-    #call-fixnum* dup word>> word>input-infos propagate-input-infos
+    call-fixnum#* dup word>> word>input-infos propagate-input-infos
 ] unit-test
 
 {
@@ -126,7 +126,7 @@ cpu x86.64? [
     }
 } [
     { 2 3 "hello" } [ <literal-info> ] map setup-value-infos
-    { 0 1 } { 2 } \ + <#call> dup word>> (fold-call)
+    { 0 1 } { 2 } \ + <call#> dup word>> (fold-call)
 ] unit-test
 
 {
@@ -138,16 +138,16 @@ cpu x86.64? [
     }
 } [
     { 2 "hello" } [ <literal-info> ] map setup-value-infos { 0 1 } { 2 } \ +
-    <#call> dup word>> (fold-call)
+    <call#> dup word>> (fold-call)
 ] unit-test
 
 ! foldable-call?
 { t f f t } [
     { 2 3 "hello" } [ <literal-info> ] map setup-value-infos
-    { 0 1 } { 2 } \ + <#call> dup word>> foldable-call?
-    { 0 2 } { 2 } \ + <#call> dup word>> foldable-call?
+    { 0 1 } { 2 } \ + <call#> dup word>> foldable-call?
+    { 0 2 } { 2 } \ + <call#> dup word>> foldable-call?
     number <class-info> 1array setup-value-infos
-    { 0 } { 1 } \ >fixnum <#call> dup word>> foldable-call?
+    { 0 } { 1 } \ >fixnum <call#> dup word>> foldable-call?
     "mamma mia" <literal-info> 1array setup-value-infos
-    { 0 } { 1 } \ >fixnum <#call> dup word>> foldable-call?
+    { 0 } { 1 } \ >fixnum <call#> dup word>> foldable-call?
 ] unit-test

@@ -49,16 +49,16 @@ CONSTANT: initial-state { { 0 { } } { 0 { } } }
 
 GENERIC: visit-insn ( state insn -- state' )
 
-M: ##inc visit-insn ( state insn -- state' )
+M: inc## visit-insn ( state insn -- state' )
     [ shift-stack ] apply-stack-op ;
 
-M: ##replace-imm visit-insn live-location ;
-M: ##replace visit-insn live-location ;
+M: replace-imm## visit-insn live-location ;
+M: replace## visit-insn live-location ;
 
-M: ##call visit-insn ( state insn -- state' )
+M: call## visit-insn ( state insn -- state' )
     drop dup ensure-no-vacant ;
 
-M: ##call-gc visit-insn ( state insn -- state' )
+M: call-gc## visit-insn ( state insn -- state' )
     drop all-live ;
 
 M: gc-map-insn visit-insn ( state insn -- state' )
@@ -70,7 +70,7 @@ ERROR: vacant-peek insn ;
     2dup loc>> >loc< swap [ 0 1 ? swap nth ] dip classify-read
     dup 2 = [ drop vacant-peek ] [ 2nip 1 = ] if ;
 
-M: ##peek visit-insn ( state insn -- state )
+M: peek## visit-insn ( state insn -- state )
     dup loc>> n>> 0 >= t assert=
     dupd underflowable-peek? [ all-live ] when ;
 

@@ -68,32 +68,32 @@ IN: project-euler.255
 : next-multiple ( a multiple -- next )
     [ [ 1 - ] dip /i 1 + ] keep * ;
 
-DEFER: iteration#
+DEFER: n-iteration
 ! Gives the number of iterations when xk+1 has the same value for all a<=i<=n
-:: (iteration#) ( i xi a b -- # )
+:: (n-iteration) ( i xi a b -- n )
     a xi xk+1 dup xi =
     [ drop i b a - 1 + * ]
-    [ i 1 + swap a b iteration# ] if ;
+    [ i 1 + swap a b n-iteration ] if ;
 
 ! Gives the number of iterations in the general case by breaking into intervals
 ! in which xk+1 is the same.
-:: iteration# ( i xi a b -- # )
+:: n-iteration ( i xi a b -- n )
     a
     a xi next-multiple
     [ dup b < ]
     [
         ! set up the values for the next iteration
         [ nip [ 1 + ] [ xi + ] bi ] 2keep
-        ! set up the arguments for (iteration#)
-        [ i xi ] 2dip (iteration#)
+        ! set up the arguments for (n-iteration)
+        [ i xi ] 2dip (n-iteration)
     ] produce-sum
     ! deal with the last numbers
-    [ drop b [ i xi ] 2dip (iteration#) ] dip
+    [ drop b [ i xi ] 2dip (n-iteration) ] dip
     + ;
 
 : (euler255) ( a b -- answer )
     [ 10^ ] bi@ 1 -
-    [ [ drop x0 1 swap ] 2keep iteration# ] 2keep
+    [ [ drop x0 1 swap ] 2keep n-iteration ] 2keep
     swap - 1 + /f ;
 
 PRIVATE>

@@ -10,17 +10,17 @@ TUPLE: element contents black white ;
 C: <element> element
 
 :: wrap ( elements width -- array )
-    elements length integer>fixnum-strict :> #elements
+    elements length integer>fixnum-strict :> n-elements
     elements [ black>> ] { } map-as :> black
     elements [ white>> ] { } map-as :> white
 
-    #elements 1 + f <array> :> minima
-    #elements 1 + 0 <array> :> breaks
+    n-elements 1 + f <array> :> minima
+    n-elements 1 + 0 <array> :> breaks
 
     0 0 minima set-nth-unsafe
 
     minima |[ base i |
-        0 i 1 + [ dup #elements <= ] |[ j |
+        0 i 1 + [ dup n-elements <= ] |[ j |
             j 1 - black nth-unsafe + dup :> w
             j 1 - white nth-unsafe +
 
@@ -28,10 +28,10 @@ C: <element> element
                 j 1 - i = [
                     0 j minima set-nth-unsafe
                     i j breaks set-nth-unsafe
-                ] when #elements
+                ] when n-elements
             ] [
                 base
-                j #elements = [ width w - sq + ] unless :> cost
+                j n-elements = [ width w - sq + ] unless :> cost
                 j minima nth-unsafe [ cost >= ] [ t ] if* [
                     cost j minima set-nth-unsafe
                     i j breaks set-nth-unsafe
@@ -40,7 +40,7 @@ C: <element> element
         ] while 2drop
     ] each-index
 
-    #elements [ dup 0 > ] [
+    n-elements [ dup 0 > ] [
         [ breaks nth dup ] keep elements <slice>
         [ contents>> ] map
     ] produce nip reverse ;

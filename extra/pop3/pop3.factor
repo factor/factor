@@ -8,7 +8,7 @@ strings ;
 IN: pop3
 
 TUPLE: pop3-account
-# host port timeout user pwd stream capa count list
+n host port timeout user pwd stream capa count list
 uidls messages ;
 
 : <pop3-account> ( -- pop3-account )
@@ -18,7 +18,7 @@ uidls messages ;
 
 : account ( -- pop3-account ) pop3-account get ;
 
-TUPLE: message # uidl headers from to subject size ;
+TUPLE: message n uidl headers from to subject size ;
 
 <PRIVATE
 
@@ -126,7 +126,7 @@ PRIVATE>
 : list ( -- assoc )
     (list) account list>> split-map ;
 
-: uidl ( message# -- uidl )
+: uidl ( n-message -- uidl )
     [ stream ] dip '[
         "UIDL " _ number>string append command-and-uidl
     ] with-stream* ;
@@ -134,7 +134,7 @@ PRIVATE>
 : uidls ( -- assoc )
     (uidls) account uidls>> split-map ;
 
-: top ( message# #lines -- seq )
+: top ( n-message n-lines -- seq )
     <raw-source> raw-source set
     [ stream ] 2dip '[
         "TOP " _ number>string append " "
@@ -165,13 +165,13 @@ PRIVATE>
         ]
     } cleave raw headers>> associate-split ;
 
-: retrieve ( message# -- seq )
+: retrieve ( n-message -- seq )
     [ stream ] dip '[
         "RETR " _ number>string append command
         readlns dup raw content<<
     ] with-stream* ;
 
-: delete ( message# -- )
+: delete ( n-message -- )
     [ stream ] dip '[
         "DELE " _ number>string append command
     ] with-stream* ;
@@ -184,7 +184,7 @@ PRIVATE>
         1 account count>> [a,b] [
             {
                 [ 0 top drop ]
-                [ <message> swap >># ]
+                [ <message> swap >>n ]
                 [ uidls at >>uidl ]
                 [ list at >>size ]
             } cleave

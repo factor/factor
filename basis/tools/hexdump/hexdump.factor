@@ -10,11 +10,11 @@ IN: tools.hexdump
 
 <PRIVATE
 
-CONSTANT: line# "00000000  "
+CONSTANT: line-number "00000000  "
 
-: inc-line# ( -- )
+: inc-line-number ( -- )
     7 [ ch'0 = over 0 > and ] [
-        1 - dup line# [
+        1 - dup line-number [
             {
                 { ch'9 [ ch'a ] }
                 { ch'f [ ch'0 ] }
@@ -23,8 +23,8 @@ CONSTANT: line# "00000000  "
         ] change-nth-unsafe
     ] do while drop ;
 
-: reset-line# ( -- )
-    8 [ ch'0 swap line# set-nth ] each-integer ;
+: reset-line-number ( -- )
+    8 [ ch'0 swap line-number set-nth ] each-integer ;
 
 CONSTANT: hex-digits $[
     256 <iota> [ >hex 2 ch'0 pad-head " " append ] map
@@ -50,14 +50,14 @@ CONSTANT: hex-digits $[
     ] each-byte ; inline
 
 TYPED: write-hex-line ( from: fixnum to: fixnum bytes: byte-array -- )
-    line# write inc-line# output-stream get {
+    line-number write inc-line-number output-stream get {
         [ write-bytes ]
         [ write-space ]
         [ write-ascii ]
     } 4cleave nl ;
 
 :: hexdump-bytes ( from to bytes -- )
-    reset-line#
+    reset-line-number
     to from - :> len
     len 16 /mod
     [ [ 16 * dup 16 + bytes write-hex-line ] each-integer ]
@@ -65,7 +65,7 @@ TYPED: write-hex-line ( from: fixnum to: fixnum bytes: byte-array -- )
     len >hex 8 ch'0 pad-head print ;
 
 : hexdump-stream ( stream -- )
-    reset-line# 0 swap [
+    reset-line-number 0 swap [
         all-bytes [ write-hex-line ] [ length + ] bi
     ] 16 (each-stream-block) >hex 8 ch'0 pad-head print ;
 

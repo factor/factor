@@ -11,7 +11,7 @@ IN: compiler.tree.def-use.tests
     [ 1 2 3 ] build-tree compute-def-use drop
     def-use get {
         [ assoc-size 3 = ]
-        [ values [ uses>> [ #return? ] all? ] all? ]
+        [ values [ uses>> [ return#? ] all? ] all? ]
     } 1&&
 ] unit-test
 

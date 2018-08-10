@@ -63,13 +63,13 @@ SYMBOL: temp-locations
     ] if ;
 
 : memory->register ( from to -- )
-    swap [ reg>> ] [ [ rep>> ] [ reg>> ] bi ] bi* ##reload, ;
+    swap [ reg>> ] [ [ rep>> ] [ reg>> ] bi ] bi* reload##, ;
 
 : register->memory ( from to -- )
-    [ [ reg>> ] [ rep>> ] bi ] [ reg>> ] bi* ##spill, ;
+    [ [ reg>> ] [ rep>> ] bi ] [ reg>> ] bi* spill##, ;
 
 : register->register ( from to -- )
-    swap [ reg>> ] [ [ reg>> ] [ rep>> ] bi ] bi* ##copy, ;
+    swap [ reg>> ] [ [ reg>> ] [ rep>> ] bi ] bi* copy##, ;
 
 : >insn ( from to -- )
     {
@@ -81,7 +81,7 @@ SYMBOL: temp-locations
 : mapping-instructions ( alist -- insns )
     [ swap ] H{ } assoc-map-as [
         [ temp-location ] [ swap >insn ] parallel-mapping
-        ##branch,
+        branch##,
     ] { } make ;
 
 : perform-mappings ( bb to mappings -- )

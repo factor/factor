@@ -52,7 +52,7 @@ IN: rosetta-code.dice7
 
 ! Count the number of rolls for each side of the dice,
 ! inserting zeros for die rolls that never occur.
-: count-outcomes ( #sides rolls -- counts )
+: count-outcomes ( n-sides rolls -- counts )
     histogram
     swap [1,b] [ over [ 0 or ] change-at ] each
     sort-keys values ;
@@ -69,17 +69,17 @@ IN: rosetta-code.dice7
 ! Verify distribution uniformity/naive. Error is the acceptable
 ! deviation from the ideal number of items in each bucket,
 ! expressed as a fraction of the total count.
-:: test-distribution ( #sides #trials quot error -- )
-    #sides #trials quot replicate count-outcomes :> outcomes
+:: test-distribution ( n-sides n-trials quot error -- )
+    n-sides n-trials quot replicate count-outcomes :> outcomes
     outcomes .
     outcomes error fair-counts?
     "Random enough" "Not random enough" ? . ; inline
 
 CONSTANT: trial-counts { 1 10 100 1000 10000 100000 1000000 }
-CONSTANT: #sides 7
+CONSTANT: n-sides 7
 CONSTANT: error-delta 0.02
 
 : verify-all ( -- )
-    #sides trial-counts [
+    n-sides trial-counts [
         [ dice7 ] error-delta test-distribution
     ] with each ;

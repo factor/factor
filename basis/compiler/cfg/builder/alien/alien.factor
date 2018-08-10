@@ -93,30 +93,30 @@ IN: compiler.cfg.builder.alien
         [ stack-params get [ caller-stack-cleanup ] keep ]
     } cleave ;
 
-M: #alien-invoke emit-node ( block node -- block' )
+M: alien-invoke# emit-node ( block node -- block' )
     params>>
     [
         [ params>alien-insn-params ]
         [ caller-linkage ] bi
-        <gc-map> ##alien-invoke,
+        <gc-map> alien-invoke##,
     ]
     [ caller-return ] bi ;
 
-M: #alien-indirect emit-node ( block node -- block' )
+M: alien-indirect# emit-node ( block node -- block' )
     params>>
     [
         [ ds-pop ^^unbox-any-c-ptr ] dip
         params>alien-insn-params
-        <gc-map> ##alien-indirect,
+        <gc-map> alien-indirect##,
     ]
     [ caller-return ] bi ;
 
-M: #alien-assembly emit-node ( block node -- block' )
+M: alien-assembly# emit-node ( block node -- block' )
     params>>
     [
         [ params>alien-insn-params ]
         [ quot>> ] bi
-        ##alien-assembly,
+        alien-assembly##,
     ]
     [ caller-return ] bi ;
 
@@ -149,10 +149,10 @@ M: #alien-assembly emit-node ( block node -- block' )
     ] if-void ;
 
 : emit-callback-body ( block nodes -- block' )
-    dup last #return? t assert= but-last emit-nodes ;
+    dup last return#? t assert= but-last emit-nodes ;
 
 : emit-callback-inputs ( params -- )
-    [ callee-parameters ##callback-inputs, ] keep box-parameters ;
+    [ callee-parameters callback-inputs##, ] keep box-parameters ;
 
 : callback-stack-cleanup ( params -- )
     [ xt>> ]
@@ -160,12 +160,12 @@ M: #alien-assembly emit-node ( block node -- block' )
     "stack-cleanup" set-word-prop ;
 
 : emit-callback-return ( block params -- )
-    swap [ callee-return ##callback-outputs, ] [ drop ] if ;
+    swap [ callee-return callback-outputs##, ] [ drop ] if ;
 
 : emit-callback-outputs ( block params -- )
     [ emit-callback-return ] keep callback-stack-cleanup ;
 
-M: #alien-callback emit-node ( block node -- block' )
+M: alien-callback# emit-node ( block node -- block' )
     dup params>> xt>> dup
     [
         t cfg get frame-pointer?<<

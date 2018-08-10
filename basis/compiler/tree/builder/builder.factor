@@ -43,7 +43,7 @@ PRIVATE>
         in-d word/quot build-tree-with unclip-last in-d>> :> in-d'
         {
             { [ dup not ] [ ] }
-            { [ dup ends-with-terminate? ] [ out-d [ f swap <#push> ] map append ] }
-            [ in-d' out-d [ [ length ] bi@ assert= ] [ <#copy> suffix ] 2bi ]
+            { [ dup ends-with-terminate? ] [ out-d [ f swap <push#> ] map append ] }
+            [ in-d' out-d [ [ length ] bi@ assert= ] [ <copy#> suffix ] 2bi ]
         } cond
     ] [ inference-error? ] ignore-error/f ;

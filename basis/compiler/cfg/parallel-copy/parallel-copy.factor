@@ -52,7 +52,7 @@ PRIVATE>
     ] with-scope ; inline
 
 : parallel-copy ( mapping -- insns )
-    [ next-vreg '[ drop _ ] [ any-rep ##copy, ] parallel-mapping ] { } make ;
+    [ next-vreg '[ drop _ ] [ any-rep copy##, ] parallel-mapping ] { } make ;
 
 <PRIVATE
 
@@ -67,5 +67,5 @@ PRIVATE>
 : parallel-copy-rep ( mapping -- insns )
     [
         H{ } clone temp-vregs set
-        [ rep-of temp-vreg ] [ dup rep-of ##copy, ] parallel-mapping
+        [ rep-of temp-vreg ] [ dup rep-of copy##, ] parallel-mapping
     ] { } make ;

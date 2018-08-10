@@ -78,9 +78,9 @@ RENAMING: convert "[ converted-value ]" "[ converted-value ]" "[ ]"
 
 GENERIC: conversions-for-insn ( insn -- )
 
-M: ##phi conversions-for-insn , ;
+M: phi## conversions-for-insn , ;
 
-M: ##copy conversions-for-insn , ;
+M: copy## conversions-for-insn , ;
 
 M: insn conversions-for-insn , ;
 

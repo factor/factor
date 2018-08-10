@@ -20,7 +20,7 @@ SYMBOL: pending-interval-heap
 SYMBOL: pending-interval-assoc
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill, ;
+    [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri spill##, ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
@@ -77,7 +77,7 @@ SYMBOL: machine-live-outs
     [ > ] with heap-pop-while [ expire-interval ] each ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload, ;
+    [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri reload##, ;
 
 : handle-reload ( live-interval -- )
     dup reload-from>> [ insert-reload ] [ drop ] if ;
@@ -126,19 +126,19 @@ RENAMING: assign "[ vreg>reg ]" "[ vreg>reg ]" "[ vreg>reg ]"
 : spill/reloads ( n intervals -- spill/reloads )
     [ spill/reload ] with map ;
 
-: spill/reloads-for-call-gc ( ##call-gc -- spill-seq )
+: spill/reloads-for-call-gc ( call-gc## -- spill-seq )
     [ gc-map>> gc-roots>> ] [ insn#>> ] bi
     [ spill-intervals ] keep swap spill/reloads ;
 
-: emit-##call-gc ( insn -- )
+: emit-call-gc## ( insn -- )
     dup spill/reloads-for-call-gc
-    dup [ first3 ##spill, ] each
+    dup [ first3 spill##, ] each
     swap ,
-    [ first3 ##reload, ] each ;
+    [ first3 reload##, ] each ;
 
 : emit-gc-map-insn ( gc-map-insn -- )
     [ [ leader ] change-insn-gc-roots ]
-    [ dup ##call-gc? [ emit-##call-gc ] [ , ] if ]
+    [ dup call-gc##? [ emit-call-gc## ] [ , ] if ]
     [ [ vreg>spill-slot ] change-insn-gc-roots ] tri ;
 
 : emit-insn ( insn -- )

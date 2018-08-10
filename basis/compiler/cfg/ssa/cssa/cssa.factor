@@ -31,7 +31,7 @@ SYMBOLS: edge-copies phi-copies ;
     ] each ;
 
 : insert-edge-copies ( from to copies -- )
-    [ ##parallel-copy, ##branch, ] { } make insert-basic-block ;
+    [ parallel-copy##, branch##, ] { } make insert-basic-block ;
 
 : insert-all-edge-copies ( bb -- )
     [ edge-copies get ] dip '[
@@ -39,10 +39,10 @@ SYMBOLS: edge-copies phi-copies ;
     ] assoc-each ;
 
 : phi-copy-insn ( copies -- insn )
-    f \ ##parallel-copy boa ;
+    f \ parallel-copy## boa ;
 
 : end-of-phis ( insns -- i )
-    [ [ ##phi? not ] find drop ] [ length ] bi or ;
+    [ [ phi##? not ] find drop ] [ length ] bi or ;
 
 : insert-phi-copies ( bb -- )
     [

@@ -6,7 +6,7 @@ kernel namespaces sequences ;
 IN: compiler.cfg.representations.coalescing
 
 ! Find all strongly connected components in the graph where the
-! edges are ##phi or ##copy vreg uses
+! edges are phi## or copy## vreg uses
 SYMBOL: components
 
 : init-components ( cfg components -- )
@@ -18,10 +18,10 @@ SYMBOL: components
 
 GENERIC#: visit-insn 1 ( insn disjoint-set -- )
 
-M: ##copy visit-insn
+M: copy## visit-insn
     [ [ dst>> ] [ src>> ] bi ] dip equate ;
 
-M: ##phi visit-insn
+M: phi## visit-insn
     [ [ inputs>> values ] [ dst>> ] bi ] dip equate-all-with ;
 
 M: insn visit-insn 2drop ;

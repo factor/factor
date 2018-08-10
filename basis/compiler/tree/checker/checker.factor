@@ -23,7 +23,7 @@ ERROR: check-use-error value message ;
 
 GENERIC: check-node* ( node -- )
 
-M: #shuffle check-node*
+M: shuffle# check-node*
     [ [ mapping>> values ] [ [ in-d>> ] [ in-r>> ] bi append ] bi subset? [ "Bad mapping inputs" throw ] unless ]
     [ [ mapping>> keys ] [ [ out-d>> ] [ out-r>> ] bi append ] bi set= [ "Bad mapping outputs" throw ] unless ]
     bi ;
@@ -31,23 +31,23 @@ M: #shuffle check-node*
 : check-lengths ( seq -- )
     [ length ] map all-equal? [ "Bad lengths" throw ] unless ;
 
-M: #copy check-node* inputs/outputs 2array check-lengths ;
+M: copy# check-node* inputs/outputs 2array check-lengths ;
 
-M: #return-recursive check-node* inputs/outputs 2array check-lengths ;
+M: return-recursive# check-node* inputs/outputs 2array check-lengths ;
 
-M: #phi check-node*
+M: phi# check-node*
     [ [ phi-in-d>> <flipped> ] [ out-d>> ] bi 2array check-lengths ]
     [ phi-in-d>> check-lengths ]
     bi ;
 
-M: #enter-recursive check-node*
+M: enter-recursive# check-node*
     [ [ label>> enter-out>> ] [ out-d>> ] bi assert= ]
     [ [ in-d>> ] [ out-d>> ] bi 2array check-lengths ]
     [ recursive-phi-in check-lengths ]
     tri ;
 
-M: #push check-node*
-    out-d>> length 1 = [ "Bad #push" throw ] unless ;
+M: push# check-node*
+    out-d>> length 1 = [ "Bad push#" throw ] unless ;
 
 M: node check-node* drop ;
 
@@ -102,13 +102,13 @@ GENERIC: check-stack-flow* ( node -- )
 : check-out-r ( node -- )
     out-r>> retainstack check-outputs ;
 
-M: #introduce check-stack-flow* check-out-d ;
+M: introduce# check-stack-flow* check-out-d ;
 
-M: #push check-stack-flow* check-out-d ;
+M: push# check-stack-flow* check-out-d ;
 
-M: #call check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
+M: call# check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
 
-M: #shuffle check-stack-flow*
+M: shuffle# check-stack-flow*
     { [ check-in-d ] [ check-in-r ] [ check-out-d ] [ check-out-r ] } cleave ;
 
 : assert-datastack-empty ( -- )
@@ -117,29 +117,29 @@ M: #shuffle check-stack-flow*
 : assert-retainstack-empty ( -- )
     retainstack get empty? [ "Retain stack not empty" throw ] unless ;
 
-M: #return check-stack-flow*
+M: return# check-stack-flow*
     check-in-d
     assert-datastack-empty
     terminated? get [ assert-retainstack-empty ] unless ;
 
-M: #enter-recursive check-stack-flow*
+M: enter-recursive# check-stack-flow*
     check-out-d ;
 
-M: #return-recursive check-stack-flow*
+M: return-recursive# check-stack-flow*
     [ check-in-d ] [ check-out-d ] bi ;
 
-M: #call-recursive check-stack-flow*
+M: call-recursive# check-stack-flow*
     [ check-in-d ] [ check-out-d ] bi ;
 
-: check-terminate-in-d ( #terminate -- )
+: check-terminate-in-d ( terminate# -- )
     in-d>> datastack get over length tail* sequence=
     [ "Bad terminate data stack" throw ] unless ;
 
-: check-terminate-in-r ( #terminate -- )
+: check-terminate-in-r ( terminate# -- )
     in-r>> retainstack get over length tail* sequence=
     [ "Bad terminate retain stack" throw ] unless ;
 
-M: #terminate check-stack-flow*
+M: terminate# check-stack-flow*
     terminated? on
     [ check-terminate-in-d ]
     [ check-terminate-in-r ] bi ;
@@ -155,12 +155,12 @@ SYMBOL: branch-out
         terminated? get f datastack get ?
     ] with-scope ;
 
-M: #branch check-stack-flow*
+M: branch# check-stack-flow*
     [ check-in-d ]
     [ children>> [ check-branch ] map branch-out namespaces:set ]
     bi ;
 
-: check-phi-in ( #phi -- )
+: check-phi-in ( phi# -- )
     phi-in-d>> branch-out get [
         dup [
             over length tail* sequence= [
@@ -172,25 +172,25 @@ M: #branch check-stack-flow*
         ] if
     ] 2each ;
 
-: set-phi-datastack ( #phi -- )
+: set-phi-datastack ( phi# -- )
     phi-in-d>> first length
     branch-out get [ ] find nip swap head* >vector datastack namespaces:set ;
 
-M: #phi check-stack-flow*
+M: phi# check-stack-flow*
     branch-out get [ ] any? [
         [ check-phi-in ] [ set-phi-datastack ] [ check-out-d ] tri
     ] [ drop terminated? on ] if ;
 
-M: #recursive check-stack-flow*
+M: recursive# check-stack-flow*
     [ check-in-d ] [ child>> (check-stack-flow) ] bi ;
 
-M: #copy check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
+M: copy# check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
 
-M: #alien-node check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
+M: alien-node# check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
 
-M: #alien-callback check-stack-flow* child>> check-stack-flow ;
+M: alien-callback# check-stack-flow* child>> check-stack-flow ;
 
-M: #declare check-stack-flow* drop ;
+M: declare# check-stack-flow* drop ;
 
 : check-nodes ( nodes -- )
     compute-def-use

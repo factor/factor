@@ -89,20 +89,20 @@ MACRO: pack-params ( outs -- quot )
     fry [ call ] compose ;
 
 :: [data-map] ( ins outs param-quot -- quot )
-    ins length :> #ins
-    outs length :> #outs
-    #ins #outs + :> #params
+    ins length :> n-ins
+    outs length :> n-outs
+    n-ins n-outs + :> n-params
 
     [
         param-quot %
         [
             [
                 [ ins , \ unpack-params , \ @ , ] [ ] make ,
-                #outs , \ ndip , outs , \ pack-params ,
+                n-outs , \ ndip , outs , \ pack-params ,
             ] [ ] make ,
-            #params , \ neach ,
-        ] [ ] make , #outs , \ nkeep ,
-        [ orig>> ] , #outs , \ napply ,
+            n-params , \ neach ,
+        ] [ ] make , n-outs , \ nkeep ,
+        [ orig>> ] , n-outs , \ napply ,
     ] [ ] make fry \ call suffix ;
 
 MACRO: data-map ( ins outs -- quot )

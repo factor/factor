@@ -9,7 +9,7 @@ IN: compiler.cfg.predecessors
 : update-predecessors ( bb -- )
     dup successors>> [ predecessors>> push ] with each ;
 
-: update-phi ( bb ##phi -- )
+: update-phi ( bb phi## -- )
     [
         swap predecessors>>
         '[ drop _ member-eq? ] assoc-filter

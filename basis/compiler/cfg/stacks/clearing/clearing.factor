@@ -5,10 +5,10 @@ IN: compiler.cfg.stacks.clearing
 
 : state>clears ( state -- clears )
     [ second ] map { ds-loc rs-loc } [ swap create-locs ] 2map concat
-    [ f ##clear boa ] map ;
+    [ f clear## boa ] map ;
 
 : dangerous-insn? ( state insn -- ? )
-    [ { [ nip ##peek? ] [ underflowable-peek? ] } 2&& ]
+    [ { [ nip peek##? ] [ underflowable-peek? ] } 2&& ]
     [ gc-map-insn? ] bi or ;
 
 : clearing-insns ( assoc insn -- insns' )

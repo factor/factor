@@ -5,7 +5,7 @@ IN: compiler.cfg.stacks
 
 HELP: ds-push
 { $values { "vreg" "a virtual register" } }
-{ $description "Used when translating the " { $link #push } " SSA node to CFG form. The node pushes a literal value onto the data stack." } ;
+{ $description "Used when translating the " { $link push# } " SSA node to CFG form. The node pushes a literal value onto the data stack." } ;
 
 HELP: begin-stack-analysis
 { $description "Initializes a set of variables related to global stack analysis of Factor words." }

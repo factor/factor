@@ -9,7 +9,7 @@ HELP: fixnum*overflow
 
 HELP: emit-fixnum-comparison
 { $values { "cc" "comparison symbol" } }
-{ $description "Emits a " { $link ##compare-integer } " instruction to the make sequence." } ;
+{ $description "Emits a " { $link compare-integer## } " instruction to the make sequence." } ;
 
 HELP: emit-fixnum-overflow-op
 { $values
@@ -25,7 +25,7 @@ HELP: emit-fixnum-shift-general
   { "block" basic-block }
   { "block'" basic-block }
 }
-{ $description "Emits intrinsic code for shifting a " { $link fixnum } ". For positive shifts, " { $link ##shl } " is used, for negative shifts it is more complicated." } ;
+{ $description "Emits intrinsic code for shifting a " { $link fixnum } ". For positive shifts, " { $link shl## } " is used, for negative shifts it is more complicated." } ;
 
 ARTICLE: "compiler.cfg.intrinsics.fixnum" "Generating instructions for fixnum arithmetic"
 "Combinators:"

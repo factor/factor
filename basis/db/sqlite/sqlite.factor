@@ -101,8 +101,8 @@ ERROR: sqlite-last-id-fail ;
 M: sqlite-db-connection insert-tuple-set-key ( tuple statement -- )
     execute-statement last-insert-id swap set-primary-key ;
 
-M: sqlite-result-set #columns ( result-set -- n )
-    handle>> sqlite-#columns ;
+M: sqlite-result-set num-columns ( result-set -- n )
+    handle>> sqlite-num-columns ;
 
 M: sqlite-result-set row-column ( result-set n -- obj )
     [ handle>> ] [ sqlite-column ] bi* ;

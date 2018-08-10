@@ -20,6 +20,6 @@ HELP: pending
 ARTICLE: "compiler.cfg.stacks.global" "Global stack analysis"
 "This vocab defines a bunch of dataflow analyses:"
 { $subsections avail anticip dead live pending }
-"The info they gather is used by " { $link finalize-stack-shuffling } " for optimal insertion of " { $link ##peek } " and " { $link ##replace } " instructions." ;
+"The info they gather is used by " { $link finalize-stack-shuffling } " for optimal insertion of " { $link peek## } " and " { $link replace## } " instructions." ;
 
 ABOUT: "compiler.cfg.stacks.global"

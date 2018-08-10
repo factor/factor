@@ -5,17 +5,17 @@ tools.test ui.gadgets ui.gadgets.debug ui.gadgets.panes
 ui.gadgets.panes.private ;
 IN: ui.gadgets.panes.tests
 
-: #children ( -- n ) "pane" get children>> length ;
+: n-children ( -- n ) "pane" get children>> length ;
 
 { } [ <pane> "pane" set ] unit-test
 
-{ } [ #children "num-children" set ] unit-test
+{ } [ n-children "num-children" set ] unit-test
 
 { } [
     "pane" get <pane-stream> [ 100 [ . ] each-integer ] with-output-stream*
 ] unit-test
 
-{ t } [ #children "num-children" get = ] unit-test
+{ t } [ n-children "num-children" get = ] unit-test
 
 : test-gadget-text ( quot -- ? )
     '[ _ call( -- ) ]

@@ -42,7 +42,7 @@ HELP: try-eliminate-copies
 { $see-also try-eliminate-copy } ;
 
 ARTICLE: "compiler.cfg.ssa.destruction.coalescing" "Vreg Coalescing"
-"This compiler pass eliminates redundant vreg copies. Coalescing occurs in two steps. First all redundant copies in all " { $link ##tagged>integer } " and " { $link ##phi } " instructions are handled. Then those in other instructions like " { $link vreg-insn } ", " { $link ##copy } " and " { $link ##parallel-copy } "."
+"This compiler pass eliminates redundant vreg copies. Coalescing occurs in two steps. First all redundant copies in all " { $link tagged>integer## } " and " { $link phi## } " instructions are handled. Then those in other instructions like " { $link vreg-insn } ", " { $link copy## } " and " { $link parallel-copy## } "."
 $nl
 "Main entry point:"
 { $subsections coalesce-cfg }

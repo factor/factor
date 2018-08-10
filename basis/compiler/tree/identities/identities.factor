@@ -59,15 +59,15 @@ SYMBOL: X
 
 GENERIC: apply-identities* ( node -- node )
 
-: simplify-to-constant ( #call constant -- nodes )
-    [ [ in-d>> <#drop> ] [ out-d>> first ] bi ] dip swap <#push>
+: simplify-to-constant ( call# constant -- nodes )
+    [ [ in-d>> <drop#> ] [ out-d>> first ] bi ] dip swap <push#>
     2array ;
 
-: select-input ( node n -- #shuffle )
+: select-input ( node n -- shuffle# )
     [ [ in-d>> ] [ out-d>> ] bi ] dip
-    pick nth over first associate <#data-shuffle> ;
+    pick nth over first associate <data-shuffle#> ;
 
-M: #call apply-identities*
+M: call# apply-identities*
     dup word>> "identities" word-prop [
         over node-input-infos find-identity [
             {

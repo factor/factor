@@ -70,9 +70,9 @@ HELP: consolidate
 
 HELP: delete
 { $values
-    { "message#" fixnum }
+    { "n-message" fixnum }
 }
-{ $description "This marks message number message# for deletion from the server. This is the way to get rid of a problem causing message. It is not actually deleted until the " { $link close } " word is issued. If you lose the connection to the mail server before calling the " { $link close } " word, the server should not delete any messages. Example: 3 delete" } ;
+{ $description "This marks message number n-message for deletion from the server. This is the way to get rid of a problem causing message. It is not actually deleted until the " { $link close } " word is issued. If you lose the connection to the mail server before calling the " { $link close } " word, the server should not delete any messages. Example: 3 delete" } ;
 
 HELP: headers
 { $values
@@ -91,7 +91,7 @@ HELP: list
 HELP: pop3-account
 { $class-description "A POP3 account on a POP3 server. It has the following slots:"
     { $table
-        { { $slot "#" } "The ephemeral ordinal number of the message." }
+        { { $slot "n" } "The ephemeral ordinal number of the message." }
         { { $slot "host" } "The name or IP address of the remote host to which a POP3 connection is required." }
         { { $slot "port" } "The POP3 server port (defaults to 110)." }
         { { $slot "timeout" } "Maximum time in minutes to wait for a response from the POP3 server (defaults to 1 minutes)." }
@@ -111,7 +111,7 @@ HELP: pop3-account
 HELP: message
 { $class-description "An e-mail message having the following slots:"
     { $table
-        { { $slot "#" } "The ephemeral ordinal number of the message." }
+        { { $slot "n" } "The ephemeral ordinal number of the message." }
         { { $slot "uidl" } "The POP3 UIDL (Unique IDentification Listing) of the message." }
         { { $slot "headers" } "The From:, Subject:, and To: headers of the message." }
         { { $slot "from" } "The sender of the message. An e-mail address." }
@@ -126,10 +126,10 @@ HELP: close
 
 HELP: retrieve
 { $values
-    { "message#" fixnum }
+    { "n-message" fixnum }
     { "seq" sequence }
 }
-{ $description "Sends message number message# to you. You should prepare for some base64 decoding. You probably want to do this with a mailer." } ;
+{ $description "Sends message number n-message to you. You should prepare for some base64 decoding. You probably want to do this with a mailer." } ;
 
 HELP: reset
 { $description "Resets the status of the remote POP3 server. This includes resetting the status of all messages to not be deleted." } ;
@@ -143,17 +143,17 @@ HELP: count
 
 HELP: top
 { $values
-    { "message#" fixnum } { "#lines" fixnum }
+    { "n-message" fixnum } { "n-lines" fixnum }
     { "seq" sequence }
 }
-{ $description "Lists the header for message# and the first #lines of the message text. For example, 1 0 top would list just the headers for message 1, where as 1 5 top would list the headers and first 5 lines of the message text." } ;
+{ $description "Lists the header for n-message and the first n-lines of the message text. For example, 1 0 top would list just the headers for message 1, where as 1 5 top would list the headers and first 5 lines of the message text." } ;
 
 HELP: uidl
 { $values
-    { "message#" fixnum }
+    { "n-message" fixnum }
     { "uidl" string }
 }
-{ $description "Gets the POP3 UIDL (Unique IDentification Listing) of the given message#." } ;
+{ $description "Gets the POP3 UIDL (Unique IDentification Listing) of the given n-message." } ;
 
 HELP: uidls
 { $values
@@ -260,7 +260,7 @@ $nl
     "consolidate ."
 "{
         T{ message
-            { # 1 }
+            { n 1 }
             { uidl \"000000d547ac2fc2\" }
             { from \"from.first@mail.com\" }
             { to \"username@host.com\" }
@@ -268,7 +268,7 @@ $nl
             { size \"1006\" }
         }
         T{ message
-            { # 2 }
+            { n 2 }
             { uidl \"000000d647ac2fc2\" }
             { from \"from.second@mail.com\" }
             { to \"username@host.com\" }

@@ -9,13 +9,13 @@ IN: command-line
 SYMBOL: user-init-errors
 SYMBOL: +user-init-error+
 
-TUPLE: user-init-error error path line# asset ;
+TUPLE: user-init-error error path line-number asset ;
 
 : <user-init-error> ( error -- error' )
     [ ] [ error-file ] [ error-line ] tri
     f user-init-error boa ; inline
 M: user-init-error error-file path>> ;
-M: user-init-error error-line line#>> ;
+M: user-init-error error-line line-number>> ;
 M: user-init-error error-type drop +user-init-error+ ;
 
 SYMBOL: script

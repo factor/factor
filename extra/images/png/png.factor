@@ -178,17 +178,17 @@ ERROR: bad-filter n ;
     pixel col irow set-nth ;
 
 :: read-scanlines ( byte-reader loading-png width height -- array )
-    loading-png png-components-per-pixel :> #components
+    loading-png png-components-per-pixel :> n-components
     loading-png bit-depth>> :> bit-depth
     bit-depth :> depth!
-    #components width * :> count!
+    n-components width * :> count!
 
-    #components bit-depth * width * 8 math:align 8 /i :> stride
+    n-components bit-depth * width * 8 math:align 8 /i :> stride
 
     height [
         stride 1 + byte-reader stream-read
     ] replicate
-    #components bit-depth 16 = [ 2 * ] when reverse-png-filter
+    n-components bit-depth 16 = [ 2 * ] when reverse-png-filter
 
     ! Only read up to 8 bits at a time
     bit-depth 16 = [
@@ -241,11 +241,11 @@ ERROR: bad-filter n ;
     loading-png height>> :> height
     loading-png width>> :> width
     loading-png bit-depth>> :> bit-depth
-    loading-png png-components-per-pixel :> #bytes!
+    loading-png png-components-per-pixel :> n-bytes!
     width height * f <array> width <groups> :> image
 
     bit-depth 16 = [
-        #bytes 2 * #bytes!
+        n-bytes 2 * n-bytes!
     ] when
 
     0 :> row!
@@ -255,7 +255,7 @@ ERROR: bad-filter n ;
     [ pass 7 < ] [
       ba loading-png pass read-adam7-subimage
 
-      #bytes <groups>
+      n-bytes <groups>
 
       pass starting-row nth row!
       pass starting-col nth col!

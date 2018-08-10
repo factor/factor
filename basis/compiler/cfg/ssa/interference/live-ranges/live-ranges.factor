@@ -22,10 +22,10 @@ SYMBOLS: local-def-indices local-kill-indices ;
 
 GENERIC: record-insn ( n insn -- )
 
-M: ##phi record-insn
+M: phi## record-insn
     record-defs ;
 
-M: ##parallel-copy record-insn
+M: parallel-copy## record-insn
     [ 2 * ] dip
     [ record-defs ]
     [ uses-vregs [ local-kill-indices get set-at ] with each ]

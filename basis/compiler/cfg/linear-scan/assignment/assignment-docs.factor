@@ -12,7 +12,7 @@ HELP: add-pending
 
 HELP: assign-registers-in-block
 { $values { "bb" basic-block } }
-{ $description "Assigns registers to vregs and also inserts " { $link ##reload } " and " { $link ##spill } " instructions." } ;
+{ $description "Assigns registers to vregs and also inserts " { $link reload## } " and " { $link spill## } " instructions." } ;
 
 HELP: assign-registers
 { $values { "cfg" cfg } { "live-intervals" sequence } }
@@ -31,22 +31,22 @@ HELP: compute-live-in
 { $description "Computes the live in registers for a basic block." }
 { $see-also machine-live-ins } ;
 
-HELP: emit-##call-gc
-{ $values { "insn" ##call-gc } }
-{ $description "Emits a " { $link ##call-gc } " instruction and the " { $link ##reload } " and " { $link ##spill } " instructions it requires. ##call-gc aren't counted as sync points, so the instruction requires special handling." } ;
+HELP: emit-call-gc##
+{ $values { "insn" call-gc## } }
+{ $description "Emits a " { $link call-gc## } " instruction and the " { $link reload## } " and " { $link spill## } " instructions it requires. call-gc## aren't counted as sync points, so the instruction requires special handling." } ;
 
 HELP: expire-old-intervals
 { $values { "n" integer } { "pending-heap" min-heap } }
-{ $description "Expires all intervals older than the cutoff point. First they are removed from the 'pending-heap' and " { $link pending-interval-assoc } ". Then " { $link ##spill } " instructions are inserted for each interval that was removed." } ;
+{ $description "Expires all intervals older than the cutoff point. First they are removed from the 'pending-heap' and " { $link pending-interval-assoc } ". Then " { $link spill## } " instructions are inserted for each interval that was removed." } ;
 
 HELP: insert-reload
 { $values { "live-interval" live-interval-state } }
-{ $description "Inserts a " { $link ##reload } " instruction for a live interval." }
+{ $description "Inserts a " { $link reload## } " instruction for a live interval." }
 { $see-also handle-reload insert-spill } ;
 
 HELP: insert-spill
 { $values { "live-interval" live-interval-state } }
-{ $description "Inserts a " { $link ##spill } " instruction for a live interval." }
+{ $description "Inserts a " { $link spill## } " instruction for a live interval." }
 { $see-also insert-reload } ;
 
 HELP: machine-edge-live-ins
@@ -82,12 +82,12 @@ HELP: vreg>spill-slot
 ARTICLE: "compiler.cfg.linear-scan.assignment" "Assigning registers to live intervals"
 "The " { $vocab-link "compiler.cfg.linear-scan.assignment" } " assigns registers to live intervals. Before this compiler pass, all values in the " { $link cfg } " were represented as simple integers called \"virtual registers\" or vregs. In this pass, using the live interval data computed in the register allocation pass (" { $vocab-link "compiler.cfg.linear-scan.allocation" } "), those vregs are translated into physical registers."
 $nl
-"Since there is an infinite number of vregs but the number of physical registers is limited, some values must be spilled. So this pass also handles spilling decisions and inserts " { $link ##spill } " and " { $link ##reload } " instructions where needed."
+"Since there is an infinite number of vregs but the number of physical registers is limited, some values must be spilled. So this pass also handles spilling decisions and inserts " { $link spill## } " and " { $link reload## } " instructions where needed."
 $nl
 "GC maps:"
 { $subsections
   change-insn-gc-roots
-  emit-##call-gc
+  emit-call-gc##
 }
 "Pending intervals:"
 { $subsections

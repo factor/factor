@@ -20,7 +20,7 @@ HELP: slot-access
 { $var-description "We track slot access to connect constructor inputs with accessor outputs." } ;
 
 HELP: value-classes
-{ $var-description "A map from values to classes. Only for " { $link #introduce } " outputs." } ;
+{ $var-description "A map from values to classes. Only for " { $link introduce# } " outputs." } ;
 
 ARTICLE: "compiler.tree.escape-analysis.allocations" "Tracking memory allocations"
 "Tracks memory allocations and unboxes those which can be determined never escapes." ;

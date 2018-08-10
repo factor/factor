@@ -39,15 +39,15 @@ M: db-connection dispose ( db-connection -- )
 TUPLE: result-set sql in-params out-params handle n max ;
 
 GENERIC: query-results ( query -- result-set )
-GENERIC: #rows ( result-set -- n )
-GENERIC: #columns ( result-set -- n )
+GENERIC: num-rows ( result-set -- n )
+GENERIC: num-columns ( result-set -- n )
 GENERIC#: row-column 1 ( result-set column -- obj )
 GENERIC#: row-column-typed 1 ( result-set column -- sql )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
 : init-result-set ( result-set -- )
-    dup #rows >>max
+    dup num-rows >>max
     0 >>n drop ;
 
 : new-result-set ( query handle class -- result-set )
@@ -100,10 +100,10 @@ M: object execute-statement* ( statement type -- )
     t >>bound? drop ;
 
 : sql-row ( result-set -- seq )
-    dup #columns [ row-column ] with { } map-integers ;
+    dup num-columns [ row-column ] with { } map-integers ;
 
 : sql-row-typed ( result-set -- seq )
-    dup #columns [ row-column-typed ] with { } map-integers ;
+    dup num-columns [ row-column-typed ] with { } map-integers ;
 
 : query-each ( result-set quot: ( row -- ) -- )
     over more-rows? [

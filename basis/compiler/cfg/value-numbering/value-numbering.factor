@@ -41,7 +41,7 @@ M: foldable-insn process-instruction
     [ process-instruction ]
     [ dup defs-vregs length 1 = [ check-redundancy ] when ] ?if ;
 
-M: ##copy process-instruction
+M: copy## process-instruction
     dup [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
 
 M: array process-instruction

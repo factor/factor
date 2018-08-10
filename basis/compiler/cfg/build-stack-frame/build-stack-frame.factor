@@ -9,7 +9,7 @@ SYMBOLS: param-area-size allot-area-size allot-area-align ;
 
 GENERIC: compute-stack-frame* ( insn -- ? )
 
-M:: ##local-allot compute-stack-frame* ( insn -- ? )
+M:: local-allot## compute-stack-frame* ( insn -- ? )
     insn size>> :> s
     insn align>> :> a
     allot-area-align [ a max ] change
@@ -21,21 +21,21 @@ M: alien-call-insn compute-stack-frame*
 : vm-frame-required ( -- ? )
     vm-stack-space param-area-size [ max ] change t ;
 
-M: ##call-gc compute-stack-frame* drop vm-frame-required ;
-M: ##box compute-stack-frame* drop vm-frame-required ;
-M: ##unbox compute-stack-frame* drop vm-frame-required ;
-M: ##box-long-long compute-stack-frame* drop vm-frame-required ;
-M: ##callback-inputs compute-stack-frame* drop vm-frame-required ;
-M: ##callback-outputs compute-stack-frame* drop vm-frame-required ;
+M: call-gc## compute-stack-frame* drop vm-frame-required ;
+M: box## compute-stack-frame* drop vm-frame-required ;
+M: unbox## compute-stack-frame* drop vm-frame-required ;
+M: box-long-long## compute-stack-frame* drop vm-frame-required ;
+M: callback-inputs## compute-stack-frame* drop vm-frame-required ;
+M: callback-outputs## compute-stack-frame* drop vm-frame-required ;
 
-M: ##call compute-stack-frame* drop t ;
-M: ##spill compute-stack-frame* drop t ;
-M: ##reload compute-stack-frame* drop t ;
+M: call## compute-stack-frame* drop t ;
+M: spill## compute-stack-frame* drop t ;
+M: reload## compute-stack-frame* drop t ;
 
-M: ##float>integer compute-stack-frame*
+M: float>integer## compute-stack-frame*
     drop integer-float-needs-stack-frame? ;
 
-M: ##integer>float compute-stack-frame*
+M: integer>float## compute-stack-frame*
     drop integer-float-needs-stack-frame? ;
 
 M: insn compute-stack-frame* drop f ;

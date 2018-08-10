@@ -5,7 +5,7 @@ make math math.intervals sequences slots.private tools.test ;
 IN: compiler.cfg.intrinsics.slots.tests
 
 : call-node-1 ( -- node )
-    T{ #call
+    T{ call#
        { word set-slot }
        { in-d V{ 9133848 9133849 9133850 } }
        { out-d { } }
@@ -37,7 +37,7 @@ IN: compiler.cfg.intrinsics.slots.tests
     } ;
 
 : call-node-2 ( -- node )
-    T{ #call
+    T{ call#
        { word set-slot }
        { in-d V{ 1 2 3 } }
        { out-d { } }
@@ -69,7 +69,7 @@ IN: compiler.cfg.intrinsics.slots.tests
     } ;
 
 : call-node-3 ( -- node )
-    T{ #call
+    T{ call#
        { word set-slot }
        { in-d V{ 1 2 3 } }
        { out-d { } }
@@ -109,7 +109,7 @@ IN: compiler.cfg.intrinsics.slots.tests
 
 ! emit-set-slot
 {
-    V{ T{ ##call { word set-slot } } T{ ##branch } }
+    V{ T{ call## { word set-slot } } T{ branch## } }
 } [
     <basic-block> dup set-basic-block
     call-node-1 [ emit-set-slot ] V{ } make drop
@@ -118,14 +118,14 @@ IN: compiler.cfg.intrinsics.slots.tests
 
 {
     V{
-        T{ ##set-slot
+        T{ set-slot##
            { src 1 }
            { obj 2 }
            { slot 3 }
            { scale $[ cell log2 ] }
            { tag 2 }
         }
-        T{ ##write-barrier
+        T{ write-barrier##
            { src 2 }
            { slot 3 }
            { scale $[ cell log2 ] }
@@ -140,8 +140,8 @@ IN: compiler.cfg.intrinsics.slots.tests
 
 {
     V{
-        T{ ##set-slot-imm { src 1 } { obj 2 } { slot 9 } { tag 2 } }
-        T{ ##write-barrier-imm
+        T{ set-slot-imm## { src 1 } { obj 2 } { slot 9 } { tag 2 } }
+        T{ write-barrier-imm##
            { src 2 }
            { slot 9 }
            { tag 2 }

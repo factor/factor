@@ -9,10 +9,10 @@ compiler.tree.propagation.slots continuations fry kernel make
 sequences sets stack-checker.dependencies words ;
 IN: compiler.tree.propagation.simple
 
-M: #introduce propagate-before
+M: introduce# propagate-before
     out-d>> [ object-info swap set-value-info ] each ;
 
-M: #push propagate-before
+M: push# propagate-before
     [ literal>> <literal-info> ] [ out-d>> first ] bi
     set-value-info ;
 
@@ -22,7 +22,7 @@ M: #push propagate-before
 : set-value-infos ( infos values -- )
     [ set-value-info ] 2each ;
 
-M: #declare propagate-before
+M: declare# propagate-before
     ! We need to force the caller word to recompile when the
     ! classes mentioned in the declaration are redefined, since
     ! now we're making assumptions about their definitions.
@@ -37,11 +37,11 @@ M: #declare propagate-before
     [ [ class-not is-instance-of ] dip f--> ]
     3bi 2array ;
 
-: custom-constraints ( #call quot -- )
+: custom-constraints ( call# quot -- )
     [ [ in-d>> ] [ out-d>> ] bi append ] dip
     with-datastack first assume ;
 
-: compute-constraints ( #call word -- )
+: compute-constraints ( call# word -- )
     dup "constraints" word-prop [ nip custom-constraints ] [
         dup predicate? [
             [ [ in-d>> first ] [ out-d>> first ] bi ]
@@ -50,39 +50,39 @@ M: #declare propagate-before
         ] [ 2drop ] if
     ] if* ;
 
-ERROR: invalid-outputs #call infos ;
+ERROR: invalid-outputs call# infos ;
 
-: check-outputs ( #call infos -- infos )
+: check-outputs ( call# infos -- infos )
     over out-d>> over [ length ] bi@ =
     [ nip ] [ invalid-outputs ] if ;
 
-: call-outputs-quot ( #call word -- infos )
+: call-outputs-quot ( call# word -- infos )
     dupd
     [ in-d>> [ value-info ] map ]
     [ "outputs" word-prop ] bi*
     with-datastack check-outputs ;
 
-: literal-inputs? ( #call -- ? )
+: literal-inputs? ( call# -- ? )
     in-d>> [ value-info literal?>> ] all? ;
 
-: input-classes-match? ( #call word -- ? )
+: input-classes-match? ( call# word -- ? )
     [ in-d>> ] [ "input-classes" word-prop ] bi*
     [ [ value-info literal>> ] dip instance? ] 2all? ;
 
-: foldable-call? ( #call word -- ? )
+: foldable-call? ( call# word -- ? )
     {
         [ nip foldable? ]
         [ drop literal-inputs? ]
         [ input-classes-match? ]
     } 2&& ;
 
-: (fold-call) ( #call word -- info )
+: (fold-call) ( call# word -- info )
     [ [ out-d>> ] [ in-d>> [ value-info literal>> ] map ] bi ] [ '[ _ execute ] ] bi*
     '[ _ _ with-datastack [ <literal-info> ] map nip ]
     [ drop length [ object-info ] replicate ]
     recover ;
 
-: fold-call ( #call word -- )
+: fold-call ( call# word -- )
     [ (fold-call) ] [ drop out-d>> ] 2bi set-value-infos ;
 
 : predicate-output-infos/literal ( info class -- info )
@@ -101,17 +101,17 @@ ERROR: invalid-outputs #call infos ;
     [ predicate-output-infos/class ]
     if ;
 
-: propagate-predicate ( #call word -- infos )
+: propagate-predicate ( call# word -- infos )
     [ in-d>> first value-info ]
     [ "predicating" word-prop ] bi*
     [ nip +conditional+ depends-on ]
     [ predicate-output-infos 1array ] 2bi ;
 
-: default-output-value-infos ( #call word -- infos )
+: default-output-value-infos ( call# word -- infos )
     "default-output-classes" word-prop
     [ class-infos ] [ out-d>> length object-info <repetition> ] ?if ;
 
-: output-value-infos ( #call word -- infos )
+: output-value-infos ( call# word -- infos )
     {
         { [ dup \ <tuple-boa> eq? ] [ drop propagate-<tuple-boa> ] }
         { [ dup sequence-constructor? ] [ propagate-sequence-constructor ] }
@@ -120,7 +120,7 @@ ERROR: invalid-outputs #call infos ;
         [ default-output-value-infos ]
     } cond ;
 
-M: #call propagate-before
+M: call# propagate-before
     dup word>> {
         { [ 2dup foldable-call? ] [ fold-call ] }
         { [ 2dup do-inlining ] [
@@ -133,21 +133,21 @@ M: #call propagate-before
         ]
     } cond ;
 
-M: #call annotate-node
+M: call# annotate-node
     dup [ in-d>> ] [ out-d>> ] bi append (annotate-node) ;
 
 : propagate-input-infos ( node infos/f -- )
     swap in-d>> refine-value-infos ;
 
-M: #call propagate-after
+M: call# propagate-after
     dup word>> word>input-infos propagate-input-infos ;
 
 : propagate-alien-invoke ( node -- )
     [ out-d>> ] [ params>> return>> ] bi
     [ drop ] [ c-type-class <class-info> swap first set-value-info ] if-void ;
 
-M: #alien-node propagate-before propagate-alien-invoke ;
+M: alien-node# propagate-before propagate-alien-invoke ;
 
-M: #alien-callback propagate-around child>> (propagate) ;
+M: alien-callback# propagate-around child>> (propagate) ;
 
-M: #return annotate-node dup in-d>> (annotate-node) ;
+M: return# annotate-node dup in-d>> (annotate-node) ;

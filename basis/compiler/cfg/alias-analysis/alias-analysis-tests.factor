@@ -12,168 +12,168 @@ IN: compiler.cfg.alias-analysis.tests
 ! Redundant load elimination
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##copy f 2 1 any-rep }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ copy## f 2 1 any-rep }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 ! Store-load forwarding
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##copy f 2 1 any-rep }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ copy## f 2 1 any-rep }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 ! Dead store elimination
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##set-slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ set-slot-imm## f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##set-slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ set-slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##set-slot-imm f 3 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ set-slot-imm## f 3 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##set-slot-imm f 2 0 1 0 }
-        T{ ##set-slot-imm f 3 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ set-slot-imm## f 2 0 1 0 }
+        T{ set-slot-imm## f 3 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 ! Redundant store elimination
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ set-slot-imm## f 1 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##copy f 2 1 any-rep }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ copy## f 2 1 any-rep }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##copy f 2 1 any-rep }
-        T{ ##set-slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ copy## f 2 1 any-rep }
+        T{ set-slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 ! Not a redundant load
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##set-slot-imm f 0 1 1 0 }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ set-slot-imm## f 0 1 1 0 }
+        T{ slot-imm## f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##set-slot-imm f 0 1 1 0 }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ set-slot-imm## f 0 1 1 0 }
+        T{ slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 ! Not a redundant store
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##set-slot-imm f 2 1 1 0 }
-        T{ ##slot-imm f 4 0 1 0 }
-        T{ ##set-slot-imm f 3 1 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ set-slot-imm## f 2 1 1 0 }
+        T{ slot-imm## f 4 0 1 0 }
+        T{ set-slot-imm## f 3 1 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##set-slot-imm f 2 1 1 0 }
-        T{ ##slot-imm f 4 0 1 0 }
-        T{ ##set-slot-imm f 3 1 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ set-slot-imm## f 2 1 1 0 }
+        T{ slot-imm## f 4 0 1 0 }
+        T{ set-slot-imm## f 3 1 1 0 }
     } test-alias-analysis
 ] unit-test
 
 ! There's a redundant load, but not a redundant store
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##slot-imm f 4 0 1 0 }
-        T{ ##set-slot-imm f 2 0 1 0 }
-        T{ ##slot f 5 0 3 0 0 }
-        T{ ##set-slot-imm f 3 0 1 0 }
-        T{ ##copy f 6 3 any-rep }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ slot-imm## f 4 0 1 0 }
+        T{ set-slot-imm## f 2 0 1 0 }
+        T{ slot## f 5 0 3 0 0 }
+        T{ set-slot-imm## f 3 0 1 0 }
+        T{ copy## f 6 3 any-rep }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##slot-imm f 4 0 1 0 }
-        T{ ##set-slot-imm f 2 0 1 0 }
-        T{ ##slot f 5 0 3 0 0 }
-        T{ ##set-slot-imm f 3 0 1 0 }
-        T{ ##slot-imm f 6 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ slot-imm## f 4 0 1 0 }
+        T{ set-slot-imm## f 2 0 1 0 }
+        T{ slot## f 5 0 3 0 0 }
+        T{ set-slot-imm## f 3 0 1 0 }
+        T{ slot-imm## f 6 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
@@ -182,45 +182,45 @@ IN: compiler.cfg.alias-analysis.tests
 ! Redundant load elimination
 {
     V{
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##allot f 4 16 array }
-        T{ ##set-slot-imm f 3 4 1 0 }
-        T{ ##set-slot-imm f 2 1 1 0 }
-        T{ ##copy f 5 3 any-rep }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ allot## f 4 16 array }
+        T{ set-slot-imm## f 3 4 1 0 }
+        T{ set-slot-imm## f 2 1 1 0 }
+        T{ copy## f 5 3 any-rep }
     }
 } [
     V{
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##allot f 4 16 array }
-        T{ ##set-slot-imm f 3 4 1 0 }
-        T{ ##set-slot-imm f 2 1 1 0 }
-        T{ ##slot-imm f 5 4 1 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ allot## f 4 16 array }
+        T{ set-slot-imm## f 3 4 1 0 }
+        T{ set-slot-imm## f 2 1 1 0 }
+        T{ slot-imm## f 5 4 1 0 }
     } test-alias-analysis
 ] unit-test
 
 ! Redundant store elimination
 {
     V{
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##allot f 4 16 array }
-        T{ ##slot-imm f 5 1 1 0 }
-        T{ ##set-slot-imm f 3 4 1 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ allot## f 4 16 array }
+        T{ slot-imm## f 5 1 1 0 }
+        T{ set-slot-imm## f 3 4 1 0 }
     }
 } [
     V{
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##allot f 4 16 array }
-        T{ ##set-slot-imm f 1 4 1 0 }
-        T{ ##slot-imm f 5 1 1 0 }
-        T{ ##set-slot-imm f 3 4 1 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ allot## f 4 16 array }
+        T{ set-slot-imm## f 1 4 1 0 }
+        T{ slot-imm## f 5 1 1 0 }
+        T{ set-slot-imm## f 3 4 1 0 }
     } test-alias-analysis
 ] unit-test
 
@@ -228,63 +228,63 @@ IN: compiler.cfg.alias-analysis.tests
 ! can now alias the new ac
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##allot f 4 16 array }
-        T{ ##set-slot-imm f 0 4 1 0 }
-        T{ ##set-slot-imm f 4 2 1 0 }
-        T{ ##slot-imm f 5 3 1 0 }
-        T{ ##set-slot-imm f 1 5 1 0 }
-        T{ ##slot-imm f 6 4 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ allot## f 4 16 array }
+        T{ set-slot-imm## f 0 4 1 0 }
+        T{ set-slot-imm## f 4 2 1 0 }
+        T{ slot-imm## f 5 3 1 0 }
+        T{ set-slot-imm## f 1 5 1 0 }
+        T{ slot-imm## f 6 4 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##peek f 3 d: 3 }
-        T{ ##allot f 4 16 array }
-        T{ ##set-slot-imm f 0 4 1 0 }
-        T{ ##set-slot-imm f 4 2 1 0 }
-        T{ ##slot-imm f 5 3 1 0 }
-        T{ ##set-slot-imm f 1 5 1 0 }
-        T{ ##slot-imm f 6 4 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ peek## f 3 d: 3 }
+        T{ allot## f 4 16 array }
+        T{ set-slot-imm## f 0 4 1 0 }
+        T{ set-slot-imm## f 4 2 1 0 }
+        T{ slot-imm## f 5 3 1 0 }
+        T{ set-slot-imm## f 1 5 1 0 }
+        T{ slot-imm## f 6 4 1 0 }
     } test-alias-analysis
 ] unit-test
 
 ! Compares between objects which cannot alias are eliminated
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##allot f 1 16 array }
-        T{ ##load-reference f 2 f }
+        T{ peek## f 0 d: 0 }
+        T{ allot## f 1 16 array }
+        T{ load-reference## f 2 f }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##allot f 1 16 array }
-        T{ ##compare f 2 0 1 cc= }
+        T{ peek## f 0 d: 0 }
+        T{ allot## f 1 16 array }
+        T{ compare## f 2 0 1 cc= }
     } test-alias-analysis
 ] unit-test
 
-! Make sure that input to ##box-displaced-alien becomes heap-ac
+! Make sure that input to box-displaced-alien## becomes heap-ac
 {
     V{
-        T{ ##allot f 1 16 byte-array }
-        T{ ##load-reference f 2 10 }
-        T{ ##box-displaced-alien f 3 2 1 4 byte-array }
-        T{ ##slot-imm f 5 3 1 $[ alien type-number ] }
-        T{ ##compare f 6 5 1 cc= }
+        T{ allot## f 1 16 byte-array }
+        T{ load-reference## f 2 10 }
+        T{ box-displaced-alien## f 3 2 1 4 byte-array }
+        T{ slot-imm## f 5 3 1 $[ alien type-number ] }
+        T{ compare## f 6 5 1 cc= }
     }
 } [
     V{
-        T{ ##allot f 1 16 byte-array }
-        T{ ##load-reference f 2 10 }
-        T{ ##box-displaced-alien f 3 2 1 4 byte-array }
-        T{ ##slot-imm f 5 3 1 $[ alien type-number ] }
-        T{ ##compare f 6 5 1 cc= }
+        T{ allot## f 1 16 byte-array }
+        T{ load-reference## f 2 10 }
+        T{ box-displaced-alien## f 3 2 1 4 byte-array }
+        T{ slot-imm## f 5 3 1 $[ alien type-number ] }
+        T{ compare## f 6 5 1 cc= }
     } test-alias-analysis
 ] unit-test
 
@@ -292,71 +292,71 @@ IN: compiler.cfg.alias-analysis.tests
 ! instructions which can call back into Factor code
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ slot-imm## f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ slot-imm## f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##set-slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ set-slot-imm## f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##set-slot-imm f 2 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ set-slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 {
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ set-slot-imm## f 1 0 1 0 }
     }
 } [
     V{
-        T{ ##peek f 0 d: 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ peek## f 0 d: 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ set-slot-imm## f 1 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
@@ -364,70 +364,70 @@ IN: compiler.cfg.alias-analysis.tests
 ! instruction
 {
     V{
-        T{ ##allot f 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##copy f 2 1 any-rep }
+        T{ allot## f 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ copy## f 2 1 any-rep }
     }
 } [
     V{
-        T{ ##allot f 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ allot## f 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 {
     V{
-        T{ ##allot f 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##copy f 2 1 any-rep }
+        T{ allot## f 0 }
+        T{ peek## f 1 d: 1 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ copy## f 2 1 any-rep }
     }
 } [
     V{
-        T{ ##allot f 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##slot-imm f 2 0 1 0 }
+        T{ allot## f 0 }
+        T{ peek## f 1 d: 1 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 {
     V{
-        T{ ##allot f 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##set-slot-imm f 2 0 1 0 }
+        T{ allot## f 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ set-slot-imm## f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##allot f 0 }
-        T{ ##peek f 1 d: 1 }
-        T{ ##peek f 2 d: 2 }
-        T{ ##set-slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##set-slot-imm f 2 0 1 0 }
+        T{ allot## f 0 }
+        T{ peek## f 1 d: 1 }
+        T{ peek## f 2 d: 2 }
+        T{ set-slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ set-slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
 {
     V{
-        T{ ##allot f 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
+        T{ allot## f 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
     }
 } [
     V{
-        T{ ##allot f 0 }
-        T{ ##slot-imm f 1 0 1 0 }
-        T{ ##alien-invoke f { } { } { } { } 0 0 "free" }
-        T{ ##set-slot-imm f 1 0 1 0 }
+        T{ allot## f 0 }
+        T{ slot-imm## f 1 0 1 0 }
+        T{ alien-invoke## f { } { } { } { } 0 0 "free" }
+        T{ set-slot-imm## f 1 0 1 0 }
     } test-alias-analysis
 ] unit-test
 
@@ -435,14 +435,14 @@ IN: compiler.cfg.alias-analysis.tests
 ! handled properly
 {
     V{
-        T{ ##allot f 0 }
-        T{ ##alien-indirect f f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
-        T{ ##set-slot-imm f 2 0 1 0 }
+        T{ allot## f 0 }
+        T{ alien-indirect## f f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
+        T{ set-slot-imm## f 2 0 1 0 }
     }
 } [
     V{
-        T{ ##allot f 0 }
-        T{ ##alien-indirect f f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
-        T{ ##set-slot-imm f 2 0 1 0 }
+        T{ allot## f 0 }
+        T{ alien-indirect## f f { } { } { { 2 double-rep 0 } } { } 0 0 "free" }
+        T{ set-slot-imm## f 2 0 1 0 }
     } test-alias-analysis
 ] unit-test

@@ -16,9 +16,9 @@ SYMBOL: temp
 
 {
     {
-        T{ ##copy f 4 2 any-rep }
-        T{ ##copy f 2 1 any-rep }
-        T{ ##copy f 1 4 any-rep }
+        T{ copy## f 4 2 any-rep }
+        T{ copy## f 2 1 any-rep }
+        T{ copy## f 1 4 any-rep }
     }
 } [
     H{
@@ -29,8 +29,8 @@ SYMBOL: temp
 
 {
     {
-        T{ ##copy f 1 2 any-rep }
-        T{ ##copy f 3 4 any-rep }
+        T{ copy## f 1 2 any-rep }
+        T{ copy## f 3 4 any-rep }
     }
 } [
     H{
@@ -41,8 +41,8 @@ SYMBOL: temp
 
 {
     {
-        T{ ##copy f 1 3 any-rep }
-        T{ ##copy f 2 1 any-rep }
+        T{ copy## f 1 3 any-rep }
+        T{ copy## f 2 1 any-rep }
     }
 } [
     H{
@@ -53,10 +53,10 @@ SYMBOL: temp
 
 {
     {
-        T{ ##copy f 4 3 any-rep }
-        T{ ##copy f 3 2 any-rep }
-        T{ ##copy f 2 1 any-rep }
-        T{ ##copy f 1 4 any-rep }
+        T{ copy## f 4 3 any-rep }
+        T{ copy## f 3 2 any-rep }
+        T{ copy## f 2 1 any-rep }
+        T{ copy## f 1 4 any-rep }
     }
 } [
     {

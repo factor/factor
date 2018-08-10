@@ -15,17 +15,17 @@ GENERIC: cleanup-insn ( insn -- )
 : useful-copy? ( insn -- ? )
     [ dst>> ] [ src>> ] bi leaders = not ; inline
 
-M: ##copy cleanup-insn
+M: copy## cleanup-insn
     dup useful-copy? [ , ] [ drop ] if ;
 
-M: ##parallel-copy cleanup-insn
+M: parallel-copy## cleanup-insn
     values>> [ leaders ] assoc-map [ first2 = ] reject
     parallel-copy-rep % ;
 
-M: ##tagged>integer cleanup-insn
+M: tagged>integer## cleanup-insn
     dup useful-copy? [ , ] [ drop ] if ;
 
-M: ##phi cleanup-insn drop ;
+M: phi## cleanup-insn drop ;
 
 M: insn cleanup-insn , ;
 

@@ -29,12 +29,12 @@ IN: compiler.cfg.builder.alien.tests
 
 {
     V{
-        T{ ##load-reference { dst 1 } { obj t } }
-        T{ ##load-integer { dst 2 } { val 3 } }
-        T{ ##copy { dst 4 } { src 1 } { rep any-rep } }
-        T{ ##copy { dst 3 } { src 2 } { rep any-rep } }
-        T{ ##inc { loc d: 2 } }
-        T{ ##branch }
+        T{ load-reference## { dst 1 } { obj t } }
+        T{ load-integer## { dst 2 } { val 3 } }
+        T{ copy## { dst 4 } { src 1 } { rep any-rep } }
+        T{ copy## { dst 3 } { src 2 } { rep any-rep } }
+        T{ inc## { loc d: 2 } }
+        T{ branch## }
     }
 } [
     <basic-block> dup set-basic-block
@@ -115,8 +115,8 @@ cpu x86.32?
     { 2 4 }
     { { int-rep f f } { int-rep f f } }
     V{
-        T{ ##unbox-any-c-ptr { dst 2 } { src 1 } }
-        T{ ##unbox
+        T{ unbox-any-c-ptr## { dst 2 } { src 1 } }
+        T{ unbox##
            { dst 4 }
            { src 3 }
            { unboxer "to_fixnum" }
@@ -127,7 +127,7 @@ cpu x86.32?
 {
     { 2 3 }
     { { int-rep f f } { int-rep f f } }
-    V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
+    V{ T{ unbox-any-c-ptr## { dst 2 } { src 1 } } }
 } ? [
     [ { c-string int } unbox-parameters ] V{ } make
 ] cfg-unit-test

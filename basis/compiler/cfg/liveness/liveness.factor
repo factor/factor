@@ -42,30 +42,30 @@ DEFER: lookup-base-pointer
 
 GENERIC: lookup-base-pointer* ( vreg insn -- vreg/f )
 
-M: ##tagged>integer lookup-base-pointer* nip src>> ;
+M: tagged>integer## lookup-base-pointer* nip src>> ;
 
-M: ##unbox-any-c-ptr lookup-base-pointer*
+M: unbox-any-c-ptr## lookup-base-pointer*
     ! If the input to unbox-any-c-ptr was an alien and not a
     ! byte array, then the derived pointer will be outside of
     ! the data heap. The GC has to handle this case and ignore
     ! it.
     nip src>> ;
 
-M: ##copy lookup-base-pointer* nip src>> lookup-base-pointer ;
+M: copy## lookup-base-pointer* nip src>> lookup-base-pointer ;
 
-M: ##add-imm lookup-base-pointer* nip src1>> lookup-base-pointer ;
+M: add-imm## lookup-base-pointer* nip src1>> lookup-base-pointer ;
 
-M: ##sub-imm lookup-base-pointer* nip src1>> lookup-base-pointer ;
+M: sub-imm## lookup-base-pointer* nip src1>> lookup-base-pointer ;
 
-M: ##parallel-copy lookup-base-pointer* values>> value-at ;
+M: parallel-copy## lookup-base-pointer* values>> value-at ;
 
-M: ##add lookup-base-pointer*
+M: add## lookup-base-pointer*
     ! If both operands have a base pointer, then the user better
     ! not be doing memory reads and writes on the object, since
     ! we don't give it a base pointer in that case at all.
     nip [ src1>> ] [ src2>> ] bi [ lookup-base-pointer ] bi@ xor ;
 
-M: ##sub lookup-base-pointer*
+M: sub## lookup-base-pointer*
     nip src1>> lookup-base-pointer ;
 
 M: vreg-insn lookup-base-pointer* 2drop f ;
@@ -101,7 +101,7 @@ M: vreg-insn lookup-base-pointer* 2drop f ;
 M: gc-map-insn visit-insn ( live-set insn -- )
     [ kill-defs ] [ gc-map>> fill-gc-map ] [ gen-uses ] 2tri ;
 
-M: ##phi visit-insn kill-defs ;
+M: phi## visit-insn kill-defs ;
 
 M: insn visit-insn 2drop ;
 

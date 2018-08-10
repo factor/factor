@@ -57,7 +57,7 @@ SYMBOL: current-source-file
 : wrap-source-file-error ( error -- * )
     current-source-file get rollback-source-file
     source-file-error new
-        f >>line#
+        f >>line-number
         current-source-file get path>> >>path
         swap >>error rethrow ;
 

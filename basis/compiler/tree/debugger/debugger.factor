@@ -55,13 +55,13 @@ TUPLE: shuffle-node { effect effect } ;
 
 M: shuffle-node pprint* effect>> effect>string text ;
 
-: (shuffle-effect) ( in out #shuffle -- effect )
+: (shuffle-effect) ( in out shuffle# -- effect )
     mapping>> '[ _ at ] map [ >array ] bi@ <effect> ;
 
-: shuffle-effect ( #shuffle -- effect )
+: shuffle-effect ( shuffle# -- effect )
     [ in-d>> ] [ out-d>> ] [ ] tri (shuffle-effect) ;
 
-: #>r? ( #shuffle -- ? )
+: >r#? ( shuffle# -- ? )
     {
         [ in-d>> length 1 = ]
         [ out-r>> length 1 = ]
@@ -69,7 +69,7 @@ M: shuffle-node pprint* effect>> effect>string text ;
         [ out-d>> empty? ]
     } 1&& ;
 
-: #r>? ( #shuffle -- ? )
+: r>#? ( shuffle# -- ? )
     {
         [ in-d>> empty? ]
         [ out-r>> empty? ]
@@ -79,10 +79,10 @@ M: shuffle-node pprint* effect>> effect>string text ;
 
 SYMBOLS: >R R> ;
 
-M: #shuffle node>quot
+M: shuffle# node>quot
     {
-        { [ dup #>r? ] [ drop \ >R , ] }
-        { [ dup #r>? ] [ drop \ R> , ] }
+        { [ dup >r#? ] [ drop \ >R , ] }
+        { [ dup r>#? ] [ drop \ R> , ] }
         {
             [ dup [ in-r>> empty? ] [ out-r>> empty? ] bi and ]
             [
@@ -93,35 +93,35 @@ M: #shuffle node>quot
         [ drop "COMPLEX SHUFFLE" , ]
     } cond ;
 
-M: #push node>quot literal>> literalize , ;
+M: push# node>quot literal>> literalize , ;
 
-M: #call node>quot word>> , ;
+M: call# node>quot word>> , ;
 
-M: #call-recursive node>quot label>> id>> , ;
+M: call-recursive# node>quot label>> id>> , ;
 
 DEFER: nodes>quot
 
 DEFER: label
 
-M: #recursive node>quot
+M: recursive# node>quot
     [ label>> id>> literalize , ]
     [ child>> nodes>quot , \ label , ]
     bi ;
 
-M: #if node>quot
+M: if# node>quot
     children>> [ nodes>quot ] map % \ if , ;
 
-M: #dispatch node>quot
+M: dispatch# node>quot
     children>> [ nodes>quot ] map , \ dispatch , ;
 
-M: #alien-invoke node>quot params>> , #alien-invoke , ;
+M: alien-invoke# node>quot params>> , alien-invoke# , ;
 
-M: #alien-indirect node>quot params>> , #alien-indirect , ;
+M: alien-indirect# node>quot params>> , alien-indirect# , ;
 
-M: #alien-assembly node>quot params>> , #alien-assembly , ;
+M: alien-assembly# node>quot params>> , alien-assembly# , ;
 
-M: #alien-callback node>quot
-    [ params>> , ] [ child>> nodes>quot , ] bi #alien-callback , ;
+M: alien-callback# node>quot
+    [ params>> , ] [ child>> nodes>quot , ] bi alien-callback# , ;
 
 M: node node>quot drop ;
 
@@ -153,7 +153,7 @@ SYMBOL: node-count
 
         0 swap [
             [ 1 + ] dip
-            dup #call? [
+            dup call#? [
                 word>> {
                     { [ dup "intrinsic" word-prop ] [ intrinsics-called ] }
                     { [ dup generic? ] [ generics-called ] }
@@ -202,5 +202,5 @@ SYMBOL: node-count
 
 : inlined? ( quot seq/word -- ? )
     dup word? [ 1array ] when swap
-    [ cleaned-up-tree [ dup #call? [ word>> , ] [ drop ] if ] each-node ] V{ } make
+    [ cleaned-up-tree [ dup call#? [ word>> , ] [ drop ] if ] each-node ] V{ } make
     intersect empty? ;

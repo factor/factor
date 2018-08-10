@@ -19,9 +19,9 @@ HELP: build-sub-tree
     $[
         {
             "V{"
-            "    T{ #push { literal 4 } { out-d { 1 } } }"
-            "    T{ #call { word * } { in-d V{ \"x\" 1 } } { out-d { 2 } } }"
-            "    T{ #copy { in-d V{ 2 } } { out-d { \"y\" } } }"
+            "    T{ push# { literal 4 } { out-d { 1 } } }"
+            "    T{ call# { word * } { in-d V{ \"x\" 1 } } { out-d { 2 } } }"
+            "    T{ copy# { in-d V{ 2 } } { out-d { \"y\" } } }"
             "}"
         } "\n" join
     ]

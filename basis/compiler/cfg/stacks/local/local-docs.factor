@@ -58,13 +58,13 @@ HELP: height-state>insns
   { $example
     "USING: compiler.cfg.stacks.local prettyprint ;"
     "T{ height-state f 0 0 4 -2 } height-state>insns ."
-    "{ T{ ##inc { loc d: 4 } } T{ ##inc { loc r: -2 } } }"
+    "{ T{ inc## { loc d: 4 } } T{ inc## { loc r: -2 } } }"
   }
 } ;
 
 HELP: inc-stack
 { $values { "loc" loc } }
-{ $description "Increases or decreases the data or retain stack depending on if loc is a " { $link ds-loc } " or " { $link rs-loc } " instance. An " { $link ##inc } " instruction will later be inserted." } ;
+{ $description "Increases or decreases the data or retain stack depending on if loc is a " { $link ds-loc } " or " { $link rs-loc } " instance. An " { $link inc## } " instruction will later be inserted." } ;
 
 HELP: local-loc>global
 { $values { "loc" loc } { "height-state" height-state } { "loc'" loc } }
@@ -108,9 +108,9 @@ ARTICLE: "compiler.cfg.stacks.local" "Local stack analysis"
   { { $slot "replaces" } " all stack locations that the block writes" }
   { { $slot "kills" } " all stack locations which become unavailable after the block ends because of the stack height being decremented. For example, if the block contains " { $link drop } ", then d: 0 will be contained in kills because that stack location will not be live anymore." }
 }
-"This is done while constructing the CFG. These sets are then used by the " { $link end-stack-analysis } " word to emit optimal sequences of " { $link ##peek } " and " { $link ##replace } " instructions to the cfg."
+"This is done while constructing the CFG. These sets are then used by the " { $link end-stack-analysis } " word to emit optimal sequences of " { $link peek## } " and " { $link replace## } " instructions to the cfg."
 $nl
-"For example, the code [ dup dup dup ] will only execute ##peek once, instead of three time which a 'non-lazy' method would."
+"For example, the code [ dup dup dup ] will only execute peek## once, instead of three time which a 'non-lazy' method would."
 $nl
 "Words for reading the stack state:"
 { $subsections

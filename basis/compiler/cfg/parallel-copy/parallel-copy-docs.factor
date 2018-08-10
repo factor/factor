@@ -9,16 +9,16 @@ HELP: process-to-do
 
 HELP: parallel-copy
 { $values { "mapping" { $link assoc } " of { dst src } virtual register pairs" } { "insns" array } }
-{ $description "Creates " { $link ##copy } " instructions." } ;
+{ $description "Creates " { $link copy## } " instructions." } ;
 
 HELP: parallel-copy-rep
 { $values { "mapping" { $link assoc } " of { dst src } virtual register pairs" } { "insns" array } }
-{ $description "Creates " { $link ##copy } " instructions. Representation selection must have been run previously." } ;
+{ $description "Creates " { $link copy## } " instructions. Representation selection must have been run previously." } ;
 
 ARTICLE: "compiler.cfg.parallel-copy" "Parallel copy"
 "Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency http://hal.archives-ouvertes.fr/docs/00/34/99/25/PDF/OutSSA-RR.pdf, Algorithm 1"
 $nl
-"Generating " { $link ##copy } " instructions:"
+"Generating " { $link copy## } " instructions:"
 { $subsections parallel-copy parallel-copy-rep } ;
 
 ABOUT: "compiler.cfg.parallel-copy"

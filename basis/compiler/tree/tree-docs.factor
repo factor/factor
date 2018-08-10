@@ -6,17 +6,17 @@ IN: compiler.tree
 HELP: node
 { $class-description "Base class for all SSA tree nodes. The node is an " { $link identity-tuple } " which means that two different node instances with the same attributes are not equal." } ;
 
-HELP: #alien-node
+HELP: alien-node#
 { $class-description "Base class for alien nodes. Its " { $snippet "params" } " slot holds an instance of the " { $link alien-node-params } " class." } ;
 
-HELP: #alien-invoke
+HELP: alien-invoke#
 { $class-description "SSA tree node that calls a function in a dynamically linked library." }
 { $see-also alien-invoke } ;
 
-HELP: #alien-callback
-{ $class-description "SSA tree node that constructs an alien callback. It is not a subclass of " { $link #alien-node } ". " } ;
+HELP: alien-callback#
+{ $class-description "SSA tree node that constructs an alien callback. It is not a subclass of " { $link alien-node# } ". " } ;
 
-HELP: #call
+HELP: call#
 { $class-description "SSA tree node that calls a word. It has the following slots:"
   { $table
     { { $slot "word" } { "The " { $link word } " to call." } }
@@ -28,22 +28,22 @@ HELP: #call
   }
 } ;
 
-HELP: #call-recursive
-{ $class-description "In a " { $link #recursive } " block of the SSA tree, this node represents a call back to the beginning of the block." }
-{ $see-also #recursive } ;
+HELP: call-recursive#
+{ $class-description "In a " { $link recursive# } " block of the SSA tree, this node represents a call back to the beginning of the block." }
+{ $see-also recursive# } ;
 
-HELP: #declare
+HELP: declare#
 { $class-description "SSA tree node emitted when " { $link declare } " declarations are encountered. It has the following slots:"
   { $table
     { { $slot "declaration" } { { $link assoc } " that maps values to the types they are declared as." } }
   }
 } ;
 
-HELP: #enter-recursive
-{ $class-description "This node works is placed first in the 'child' " { $link sequence } " for " { $link #recursive } " nodes and works like a header for it." }
-{ $see-also #recursive #return-recursive } ;
+HELP: enter-recursive#
+{ $class-description "This node works is placed first in the 'child' " { $link sequence } " for " { $link recursive# } " nodes and works like a header for it." }
+{ $see-also recursive# return-recursive# } ;
 
-HELP: #if
+HELP: if#
 { $class-description "SSA tree node that implements conditional branching. It has the following slots:"
   { $table
     { { $slot "children" }
@@ -52,17 +52,17 @@ HELP: #if
   }
 } ;
 
-HELP: #introduce
+HELP: introduce#
 { $class-description "SSA tree node that puts an input value from the \"outside\" on the stack. It is used to \"introduce\" data stack parameter whenever they are needed. It has the following slots:"
   { $table
     { { $slot "out-d" } { "Array of values of the parameters being introduced." } }
   }
 } ;
 
-HELP: #phi
-{ $class-description "#phi is a SSA tree node type that unifies two branches in an " { $link #if } "." } ;
+HELP: phi#
+{ $class-description "phi# is a SSA tree node type that unifies two branches in an " { $link if# } "." } ;
 
-HELP: #push
+HELP: push#
 { $class-description "SSA tree node that puts a literal value on the stack. It has the following slots:"
   { $table
     { { $slot "out-d" } { "A one item array containing the " { $link <value> } " of the literal being pushed." } }
@@ -70,7 +70,7 @@ HELP: #push
 }
 { $notes "A " { $link quotation } " is also a literal." } ;
 
-HELP: #recursive
+HELP: recursive#
 { $class-description "Instruction which encodes a loop. It has the following slots:"
   { $table
     { { $slot "child" } { "A sequence of nodes representing the body of the loop." } }
@@ -79,7 +79,7 @@ HELP: #recursive
 }
 { $see-also inline-recursive-word } ;
 
-HELP: #shuffle
+HELP: shuffle#
 { $class-description "SSA tree node that represents a stack shuffling operation such as " { $link swap } ". It has the following slots:"
   { $table
     { { $slot "mapping" } { "An " { $link assoc } " that shows how the shuffle output values (the keys) correspond to their inputs (the values)." } }
@@ -93,31 +93,31 @@ HELP: node,
 ARTICLE: "compiler.tree" "High-level optimizer operating on lexical tree SSA IR"
 "Node types:"
 { $subsections
-  #call
-  #declare
-  #shuffle
+  call#
+  declare#
+  shuffle#
 }
 "Nodes for control flow:"
 { $subsections
-  #call-recursive
-  #enter-recursive
-  #recursive
-  #return-recursive
-  #terminate
+  call-recursive#
+  enter-recursive#
+  recursive#
+  return-recursive#
+  terminate#
 }
 "Nodes for alien ffi:"
 { $subsections
-  #alien-node
-  #alien-invoke
-  #alien-indirect
-  #alien-assembly
-  #alien-callback
+  alien-node#
+  alien-invoke#
+  alien-indirect#
+  alien-assembly#
+  alien-callback#
 }
 "Nodes for branching:"
 { $subsections
-  #dispatch
-  #if
-  #phi
+  dispatch#
+  if#
+  phi#
 } ;
 
 ABOUT: "compiler.tree"

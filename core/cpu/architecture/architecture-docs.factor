@@ -86,7 +86,7 @@ HELP: %alien-invoke
   { "dll" { $maybe dll } }
   { "gc-map" gc-map }
 }
-{ $description "Machine code emitter for the " { $link ##alien-invoke } " instruction." } ;
+{ $description "Machine code emitter for the " { $link alien-invoke## } " instruction." } ;
 
 
 HELP: %allot
@@ -128,7 +128,7 @@ HELP: %box-alien
 }
 { $description "Emits machine code for boxing an alien value. If the alien is not a NULL pointer, then five " { $link cells } " will be allocated in the nursery space to wrap the object. See vm/layouts.hpp for details." }
 { $examples { $unchecked-example $[ ex-%box-alien ] } }
-{ $see-also ##box-alien %allot } ;
+{ $see-also box-alien## %allot } ;
 
 HELP: %call
 { $values { "word" word } }
@@ -160,7 +160,7 @@ HELP: %copy
 
 HELP: %dispatch
 { $values { "src" "a register symbol" } { "temp" "a register symbol" } }
-{ $description "Code emitter for the " { $link ##dispatch } " instruction." } ;
+{ $description "Code emitter for the " { $link dispatch## } " instruction." } ;
 
 HELP: %horizontal-add-vector
 { $values
@@ -184,12 +184,12 @@ HELP: %load-double
   { "reg" "destination register symbol" }
   { "val" float }
 } { $description "Loads a literal floating point value into a register. On x86, this corresponds to the " { $link MOVSD } " instruction." }
-{ $see-also ##load-double } ;
+{ $see-also load-double## } ;
 
 HELP: %load-immediate
 { $values { "reg" "a register symbol" } { "val" "a value" } }
 { $description "Emits code for loading an immediate value into a register. On " { $link x86 } ", if val is 0, then an " { $link XOR } " instruction is emitted instead of " { $link MOV } " because the former is shorter." }
-{ $see-also ##load-tagged } ;
+{ $see-also load-tagged## } ;
 
 HELP: %load-memory-imm
 { $values
@@ -216,7 +216,7 @@ HELP: %local-allot
   { "offset" "where to allocate the data, relative to the stack register" }
 }
 { $description "Emits machine code for stack \"allocating\" a chunk of memory. No memory is really allocated and instead a pointer to it is just put in the destination register." }
-{ $see-also ##local-allot } ;
+{ $see-also local-allot## } ;
 
 HELP: %replace-imm
 { $values
@@ -248,7 +248,7 @@ HELP: %set-slot
   { "slot" "register containing the slot index" }
   { "scale" fixnum }
   { "tag" "type tag for the builtin" }
-} { $description "Emits machine code for " { $link ##set-slot } " instructions." }
+} { $description "Emits machine code for " { $link set-slot## } " instructions." }
 { $examples
   { $unchecked-example
     "USING: cpu.architecture prettyprint ;"
@@ -263,7 +263,7 @@ HELP: %shl-imm
   { "src1" "register" }
   { "src2" integer }
 } { $description "Bitshifts the value in a register left by a constant." }
-{ $see-also ##shl-imm } ;
+{ $see-also shl-imm## } ;
 
 HELP: %spill
 { $values
@@ -281,7 +281,7 @@ HELP: %store-memory-imm
   { "rep" "representation" }
   { "c-type" "a c type or " { $link f } }
 }
-{ $description "Emits machine code for " { $link ##store-memory-imm } " instructions." }
+{ $description "Emits machine code for " { $link store-memory-imm## } " instructions." }
 { $examples
   { $unchecked-example
     "USING: cpu.architecture prettyprint ;"
@@ -324,7 +324,7 @@ HELP: %write-barrier
   { "temp1" "a register symbol" }
   { "temp2" "a register symbol" }
 }
-{ $description "Generates code for the " { $link ##write-barrier } " instruction." }
+{ $description "Generates code for the " { $link write-barrier## } " instruction." }
 { $examples { $unchecked-example $[ ex-%write-barrier ] } } ;
 
 HELP: complex-addressing?

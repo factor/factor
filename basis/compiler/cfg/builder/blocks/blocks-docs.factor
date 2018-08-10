@@ -5,10 +5,10 @@ IN: compiler.cfg.builder.blocks
 <<
 CONSTANT: ex-emit-trivial-block [[
 USING: compiler.cfg.builder.blocks make prettyprint ;
-begin-stack-analysis <basic-block> dup set-basic-block [ gensym ##call, drop ] emit-trivial-block predecessors>> first .
+begin-stack-analysis <basic-block> dup set-basic-block [ gensym call##, drop ] emit-trivial-block predecessors>> first .
 T{ basic-block
     { instructions
-        V{ T{ ##call { word ( gensym ) } } T{ ##branch } }
+        V{ T{ call## { word ( gensym ) } } T{ branch## } }
     }
     { successors
         V{
@@ -18,7 +18,7 @@ T{ basic-block
     { predecessors
         V{
             T{ basic-block
-                { instructions V{ T{ ##branch } } }
+                { instructions V{ T{ branch## } } }
                 { successors V{ ~circularity~ } }
             }
         }
@@ -39,8 +39,8 @@ HELP: begin-branch
 { $description "Used to begin emitting a branch." } ;
 
 HELP: call-height
-{ $values { "#call" #call } { "n" number } }
-{ $description "Calculates how many items a " { $link #call } " will add or remove from the data stack." }
+{ $values { "call#" call# } { "n" number } }
+{ $description "Calculates how many items a " { $link call# } " will add or remove from the data stack." }
 { $examples
   { $example
     "USING: compiler.cfg.builder.blocks compiler.tree.builder prettyprint sequences ;"

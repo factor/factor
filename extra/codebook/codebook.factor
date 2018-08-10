@@ -80,22 +80,22 @@ TUPLE: code-file
 
 ! We wrap every line in <tt> because Kindle tends to forget the font when
 ! moving back pages
-: htmlize-tokens ( tokens line# -- html-tokens )
+: htmlize-tokens ( tokens line-number -- html-tokens )
     swap [
         [ str>> zwnj ] [ id>> ] bi codebook-style case
     ] map XML-CHUNK[[ <tt><font size="-2" color="#666666"><-></font> <-></tt> ]]
     "\n" 2array ;
 
-: line#>string ( i line#len -- i-string )
+: line-number>string ( i line-number-len -- i-string )
     [ number>string ] [ ch'\s pad-head ] bi* ;
 
 :: code>html ( dir file -- page )
     file name>> :> name
     "Generating HTML for " write name write "..." print flush
     dir [ file [ name>> ] [ encoding>> ] bi file-lines ] with-directory :> lines
-    lines length 1 + number>string length :> line#len
+    lines length 1 + number>string length :> line-number-len
     file mode>> load-mode :> rules
-    f lines |[ l i | l rules tokenize-line i 1 + line#len line#>string htmlize-tokens ]
+    f lines |[ l i | l rules tokenize-line i 1 + line-number-len line-number>string htmlize-tokens ]
     map-index concat nip :> html-lines
     XML-DOC[[ <!DOCTYPE html> <html>
         <head>

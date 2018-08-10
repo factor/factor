@@ -4,16 +4,16 @@ USING: compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
 cpu.architecture kernel sequences ;
 IN: compiler.cfg.save-contexts
 
-UNION: context-modifier ##phi ##inc ##callback-inputs ;
+UNION: context-modifier phi## inc## callback-inputs## ;
 
 : save-context-offset ( insns -- n )
     [ context-modifier? not ] find drop ;
 
 UNION: needs-save-context-insn
-    ##alien-invoke
-    ##alien-indirect
-    ##box-long-long
-    ##box ;
+    alien-invoke##
+    alien-indirect##
+    box-long-long##
+    box## ;
 
 : insns-needs-save-context? ( insns -- ? )
     [ needs-save-context-insn? ] any? ;
@@ -23,7 +23,7 @@ UNION: needs-save-context-insn
         [
             int-rep next-vreg-rep
             int-rep next-vreg-rep
-            ##save-context new-insn
+            save-context## new-insn
         ] dip
         [ save-context-offset ] keep
         insert-nth

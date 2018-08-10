@@ -3,7 +3,7 @@ quotations sequences ;
 IN: stack-checker.alien
 
 HELP: alien-node-params
-{ $class-description "Base class for the parameter slot of " { $link #alien-node } " nodes. It has the following slots:"
+{ $class-description "Base class for the parameter slot of " { $link alien-node# } " nodes. It has the following slots:"
   { $table
     { { $slot "return" } { "a " { $link c-type-name } " which indicates the type of the functions return value." } }
     { { $slot "parameters" } { "a " { $link sequence } " of " { $link c-type-name } " giving the types of the functions parameters." } }
@@ -14,7 +14,7 @@ HELP: alien-node-params
 
 HELP: alien-callback-params
 { $class-description "Class that holds the parameter types and return value type of an alien callback call." }
-{ $see-also #alien-callback } ;
+{ $see-also alien-callback# } ;
 
 HELP: param-prep-quot
 { $values { "params" alien-node-params } { "quot" quotation } }

@@ -7,14 +7,14 @@ kernel locals math math.order math.parser namespaces
 prettyprint sequences ;
 IN: cuda.devices
 
-: #cuda-devices ( -- n )
+: n-cuda-devices ( -- n )
     { int } [ cuDeviceGetCount cuda-error ] with-out-parameters ;
 
 : n>cuda-device ( n -- device )
     [ { CUdevice } ] dip '[ _ cuDeviceGet cuda-error ] with-out-parameters ;
 
 : enumerate-cuda-devices ( -- devices )
-    #cuda-devices <iota> [ n>cuda-device ] map ;
+    n-cuda-devices <iota> [ n>cuda-device ] map ;
 
 : with-each-cuda-device ( quot -- )
     [ enumerate-cuda-devices ] dip '[ 0 _ with-cuda-context ] each ; inline
@@ -68,7 +68,7 @@ IN: cuda.devices
 : cuda. ( -- )
     init-cuda
     "CUDA Version: " write cuda-version number>string print nl
-    #cuda-devices <iota> [ nl ] [ cuda-device. ] interleave ;
+    n-cuda-devices <iota> [ nl ] [ cuda-device. ] interleave ;
 
 : up/i ( x y -- z )
     [ 1 - + ] keep /i ; inline

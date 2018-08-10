@@ -28,7 +28,7 @@ TUPLE: height-state ds-begin rs-begin ds-inc rs-inc ;
 
 : height-state>insns ( height-state -- insns )
     [ ds-inc>> ds-loc ] [ rs-inc>> rs-loc ] bi [ new swap >>n ] 2bi@ 2array
-    [ n>> 0 = ] reject [ ##inc new swap >>loc ] map ;
+    [ n>> 0 = ] reject [ inc## new swap >>loc ] map ;
 
 : reset-incs ( height-state -- )
     dup ds-inc>> '[ _ + ] change-ds-begin

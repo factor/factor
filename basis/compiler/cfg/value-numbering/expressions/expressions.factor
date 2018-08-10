@@ -48,7 +48,7 @@ GENERIC: >expr ( insn -- expr )
 
 insn-classes get
 [ foldable-insn class<= ] filter
-{ ##copy ##load-integer ##load-reference } diff
+{ copy## load-integer## load-reference## } diff
 [
     dup "insn-slots" word-prop input-values
     define->expr-method
@@ -76,8 +76,8 @@ M: reference-expr hashcode*
 
 M: insn >expr drop input-expr-counter counter neg ;
 
-M: ##copy >expr "Fail" throw ;
+M: copy## >expr "Fail" throw ;
 
-M: ##load-integer >expr val>> <integer-expr> ;
+M: load-integer## >expr val>> <integer-expr> ;
 
-M: ##load-reference >expr obj>> <reference-expr> ;
+M: load-reference## >expr obj>> <reference-expr> ;

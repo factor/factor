@@ -4,10 +4,10 @@ regexp sequences strings unicode ;
 IN: html.parser.printer
 
 SYMBOL: indentation "  " indentation set-global
-SYMBOL: #indentations
+SYMBOL: n-indentations
 
 : indent ( -- )
-    #indentations get indentation get '[ _ write ] times ;
+    n-indentations get indentation get '[ _ write ] times ;
 
 TUPLE: html-printer ;
 TUPLE: text-printer < html-printer ;
@@ -37,7 +37,7 @@ ERROR: unknown-tag-error tag ;
     } cond ;
 
 : print-tags ( vector -- )
-    0 #indentations [ [ print-tag ] each ] with-variable ;
+    0 n-indentations [ [ print-tag ] each ] with-variable ;
 
 : html-text. ( vector -- )
     T{ text-printer } html-printer [ print-tags ] with-variable ;
@@ -59,7 +59,7 @@ M: text-printer print-opening-tag
         { "ol" [ nl indent ] }
         { "ul" [ nl indent ] }
         { "li" [ " * " write ] }
-        { "blockquote" [ #indentations inc indent ] }
+        { "blockquote" [ n-indentations inc indent ] }
         { "pre" [ preformatted? on ] }
         { "script" [ script? on ] }
         { "style" [ style? on ] }
@@ -68,7 +68,7 @@ M: text-printer print-opening-tag
 
 M: text-printer print-closing-tag
     name>> {
-        [ "blockquote" = [ #indentations dec ] when ]
+        [ "blockquote" = [ n-indentations dec ] when ]
         [
             { "p" "blockquote" "h1" "h2" "h3" "h4" "h5" }
             member? [ nl indent nl indent ] when
@@ -120,11 +120,11 @@ M: html-prettyprinter print-opening-tag
     name>>
     [ indent "<" write write ">\n" write ]
     ! These tags usually don't have any closing tag associated with them.
-    [ { "br" "img" } member? [ #indentations inc ] unless ] bi ;
+    [ { "br" "img" } member? [ n-indentations inc ] unless ] bi ;
 
 M: html-prettyprinter print-closing-tag
     ! These tags usually don't have any closing tag associated with them.
-    [ { "br" "img" } member? [ #indentations dec ] unless ]
+    [ { "br" "img" } member? [ n-indentations dec ] unless ]
     [ indent "</" write name>> write ">\n" write ] bi ;
 
 M: html-prettyprinter print-text-tag

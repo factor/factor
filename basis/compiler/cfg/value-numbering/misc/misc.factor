@@ -5,9 +5,9 @@ compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.rewrite cpu.architecture kernel ;
 IN: compiler.cfg.value-numbering.misc
 
-M: ##replace rewrite
+M: replace## rewrite
     [ loc>> ] [ src>> vreg>insn ] bi
     dup literal-insn? [
         insn>literal dup immediate-store?
-        [ swap ##replace-imm new-insn ] [ 2drop f ] if
+        [ swap replace-imm## new-insn ] [ 2drop f ] if
     ] [ 2drop f ] if ;

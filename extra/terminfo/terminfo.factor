@@ -26,8 +26,8 @@ ERROR: bad-magic ;
 : check-magic ( n -- )
     MAGIC = [ bad-magic ] unless ;
 
-TUPLE: terminfo-header names-bytes boolean-bytes #numbers
-#strings string-bytes ;
+TUPLE: terminfo-header names-bytes boolean-bytes n-numbers
+n-strings string-bytes ;
 
 C: <terminfo-header> terminfo-header
 
@@ -49,13 +49,13 @@ C: <terminfo-header> terminfo-header
     [ read1 drop ] when ;
 
 : read-numbers ( header -- numbers )
-    [ align-even-bytes ] [ #numbers>> read-shorts ] bi ;
+    [ align-even-bytes ] [ n-numbers>> read-shorts ] bi ;
 
 : string-offset ( from seq -- str )
     0 2over index-from swap subseq >string ;
 
 : read-strings ( header -- strings )
-    [ #strings>> read-shorts ] [ string-bytes>> read ] bi
+    [ n-strings>> read-shorts ] [ string-bytes>> read ] bi
     '[ [ _ string-offset ] [ f ] if* ] map ;
 
 TUPLE: terminfo names booleans numbers strings ;

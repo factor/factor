@@ -19,7 +19,7 @@ IN: stack-checker.known-words
     [ in>> length consume-d ] keep ! inputs shuffle
     [ drop ] [ shuffle dup copy-values dup output-d ] 2bi ! inputs outputs copies
     [ nip f f ] [ swap zip ] 2bi ! in-d out-d in-r out-r mapping
-    #shuffle, ;
+    shuffle#, ;
 
 : infer-shuffle-word ( word -- )
     "shuffle" word-prop infer-shuffle ;
@@ -82,7 +82,7 @@ IN: stack-checker.known-words
 : infer-declare ( -- )
     pop-literal check-declaration
     [ length ensure-d ] keep zip
-    #declare, ;
+    declare#, ;
 
 \ declare [ infer-declare ] "special" set-word-prop
 
@@ -98,7 +98,7 @@ GENERIC: infer-call* ( value known -- )
 \ (call) [ infer-call ] "special" set-word-prop
 
 M: literal-tuple infer-call*
-    [ 1array #drop, ] [ infer-literal-quot ] bi* ;
+    [ 1array drop#, ] [ infer-literal-quot ] bi* ;
 
 M: curried-effect infer-call*
     swap push-d
@@ -144,7 +144,7 @@ M: object infer-call* \ call bad-macro-input ;
 
 :: infer-builder ( quot word -- )
     2 consume-d dup first2 quot call make-known
-    [ push-d ] [ 1array ] bi word #call, ; inline
+    [ push-d ] [ 1array ] bi word call#, ; inline
 
 : infer-curry ( -- ) [ <curried-effect> ] \ curry infer-builder ;
 
@@ -191,7 +191,7 @@ M: object infer-call* \ call bad-macro-input ;
 : infer-load-locals ( -- )
     pop-literal
     consume-d dup copy-values dup output-r
-    [ [ f f ] dip ] [ swap zip ] 2bi #shuffle, ;
+    [ [ f f ] dip ] [ swap zip ] 2bi shuffle#, ;
 
 \ load-locals [ infer-load-locals ] "special" set-word-prop
 
@@ -210,12 +210,12 @@ M: object infer-call* \ call bad-macro-input ;
     out-r output-r
     f out-d in-r out-r
     out-r in-r zip out-d first in-r first 2array suffix
-    #shuffle, ;
+    shuffle#, ;
 
 \ get-local [ infer-get-local ] "special" set-word-prop
 
 : infer-drop-locals ( -- )
-    f f pop-literal consume-r f f #shuffle, ;
+    f f pop-literal consume-r f f shuffle#, ;
 
 \ drop-locals [ infer-drop-locals ] "special" set-word-prop
 

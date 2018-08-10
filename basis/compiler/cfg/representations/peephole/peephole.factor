@@ -29,17 +29,17 @@ M: vreg-insn conversions-for-insn
 M: vreg-insn optimize-insn
     [ emit-use-conversion ] [ finish ] [ emit-def-conversion ] tri ;
 
-M: ##load-integer optimize-insn
+M: load-integer## optimize-insn
     {
         {
             [ dup dst>> rep-of tagged-rep? ]
-            [ [ dst>> ] [ val>> tag-fixnum ] bi ##load-tagged, here ]
+            [ [ dst>> ] [ val>> tag-fixnum ] bi load-tagged##, here ]
         }
         [ call-next-method ]
     } cond ;
 
 ! When a constant float is unboxed, we replace the
-! ##load-reference with a ##load-float or ##load-double if the
+! load-reference## with a load-float## or load-double## if the
 ! architecture supports it
 : convert-to-load-float? ( insn -- ? )
     {
@@ -74,42 +74,42 @@ M: ##load-integer optimize-insn
         [ obj>> B{ 255 255 255 255  255 255 255 255  255 255 255 255  255 255 255 255 } = ]
     } 1&& ;
 
-M: ##load-reference optimize-insn
+M: load-reference## optimize-insn
     {
         {
             [ dup convert-to-load-float? ]
-            [ [ dst>> ] [ obj>> ] bi ##load-float, here ]
+            [ [ dst>> ] [ obj>> ] bi load-float##, here ]
         }
         {
             [ dup convert-to-load-double? ]
-            [ [ dst>> ] [ obj>> ] bi ##load-double, here ]
+            [ [ dst>> ] [ obj>> ] bi load-double##, here ]
         }
         {
             [ dup convert-to-zero-vector? ]
-            [ dst>> dup rep-of ##zero-vector, here ]
+            [ dst>> dup rep-of zero-vector##, here ]
         }
         {
             [ dup convert-to-fill-vector? ]
-            [ dst>> dup rep-of ##fill-vector, here ]
+            [ dst>> dup rep-of fill-vector##, here ]
         }
         {
             [ dup convert-to-load-vector? ]
-            [ [ dst>> ] [ obj>> ] [ dst>> rep-of ] tri ##load-vector, here ]
+            [ [ dst>> ] [ obj>> ] [ dst>> rep-of ] tri load-vector##, here ]
         }
         [ call-next-method ]
     } cond ;
 
 ! Optimize this:
-! ##sar-imm temp src tag-bits
-! ##shl-imm dst temp X
+! sar-imm## temp src tag-bits
+! shl-imm## dst temp X
 ! Into either
-! ##shl-imm by X - tag-bits, or
-! ##sar-imm by tag-bits - X.
+! shl-imm## by X - tag-bits, or
+! sar-imm## by tag-bits - X.
 : combine-shl-imm-input ( insn -- )
     [ dst>> ] [ src1>> ] [ src2>> ] tri tag-bits get {
-        { [ 2dup < ] [ swap - ##sar-imm, here ] }
-        { [ 2dup > ] [ - ##shl-imm, here ] }
-        [ 2drop int-rep ##copy, here ]
+        { [ 2dup < ] [ swap - sar-imm##, here ] }
+        { [ 2dup > ] [ - shl-imm##, here ] }
+        [ 2drop int-rep copy##, here ]
     } cond ;
 
 : dst-tagged? ( insn -- ? ) dst>> rep-of tagged-rep? ;
@@ -122,7 +122,7 @@ M: ##load-reference optimize-insn
 
 : >tagged-shift ( insn -- ) [ tag-bits get + ] change-src2 finish ; inline
 
-M: ##shl-imm optimize-insn
+M: shl-imm## optimize-insn
     {
         {
             [ dup { [ dst-tagged? ] [ src1-tagged? ] } 1&& ]
@@ -140,12 +140,12 @@ M: ##shl-imm optimize-insn
     } cond ;
 
 ! Optimize this:
-! ##sar-imm temp src tag-bits
-! ##sar-imm dst temp X
+! sar-imm## temp src tag-bits
+! sar-imm## dst temp X
 ! Into
-! ##sar-imm by X + tag-bits
+! sar-imm## by X + tag-bits
 ! assuming X + tag-bits is a valid shift count.
-M: ##sar-imm optimize-insn
+M: sar-imm## optimize-insn
     {
         {
             [ dup { [ src1-tagged? ] [ src2-tagged-shift-count? ] } 1&& ]
@@ -158,7 +158,7 @@ M: ##sar-imm optimize-insn
 ! we have
 ! tag(untag(a) X untag(b)) = a X b
 !
-! so if all inputs and outputs of ##X or ##X-imm are tagged,
+! so if all inputs and outputs of X## or X-imm## are tagged,
 ! don't have to insert any conversions
 M: inert-tag-untag-insn optimize-insn
     {
@@ -191,7 +191,7 @@ M: inert-bitwise-tag-untag-insn optimize-insn
         [ call-next-method ]
     } cond ;
 
-M: ##mul-imm optimize-insn
+M: mul-imm## optimize-insn
     {
         { [ dup { [ dst-tagged? ] [ src1-tagged? ] } 1&& ] [ unchanged ] }
         { [ dup { [ dst-tagged? ] [ src2-tagged-arithmetic? ] } 1&& ] [ >tagged-imm ] }
@@ -199,49 +199,49 @@ M: ##mul-imm optimize-insn
     } cond ;
 
 ! Similar optimization for comparison operators
-M: ##compare-integer-imm optimize-insn
+M: compare-integer-imm## optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged-arithmetic? ] } 1&& ] [ >tagged-imm ] }
         [ call-next-method ]
     } cond ;
 
-M: ##test-imm optimize-insn
+M: test-imm## optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged-bitwise? ] } 1&& ] [ >tagged-imm ] }
         [ call-next-method ]
     } cond ;
 
-M: ##compare-integer-imm-branch optimize-insn
+M: compare-integer-imm-branch## optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged-arithmetic? ] } 1&& ] [ >tagged-imm ] }
         [ call-next-method ]
     } cond ;
 
-M: ##test-imm-branch optimize-insn
+M: test-imm-branch## optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged-bitwise? ] } 1&& ] [ >tagged-imm ] }
         [ call-next-method ]
     } cond ;
 
-M: ##compare-integer optimize-insn
+M: compare-integer## optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged? ] } 1&& ] [ unchanged ] }
         [ call-next-method ]
     } cond ;
 
-M: ##test optimize-insn
+M: test## optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged? ] } 1&& ] [ unchanged ] }
         [ call-next-method ]
     } cond ;
 
-M: ##compare-integer-branch optimize-insn
+M: compare-integer-branch## optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged? ] } 1&& ] [ unchanged ] }
         [ call-next-method ]
     } cond ;
 
-M: ##test-branch optimize-insn
+M: test-branch## optimize-insn
     {
         { [ dup { [ src1-tagged? ] [ src2-tagged? ] } 1&& ] [ unchanged ] }
         [ call-next-method ]
@@ -254,9 +254,9 @@ M: ##test-branch optimize-insn
     [ dst>> ] [ src>> ] bi [ rep-of tagged-rep? ] both? ;
 
 : combine-neg-tag ( insn -- )
-    [ dst>> ] [ src>> ] bi tag-bits get 2^ neg ##mul-imm, here ;
+    [ dst>> ] [ src>> ] bi tag-bits get 2^ neg mul-imm##, here ;
 
-M: ##neg optimize-insn
+M: neg## optimize-insn
     {
         { [ dup inert-tag/untag-unary? ] [ unchanged ] }
         {
@@ -270,10 +270,10 @@ M: ##neg optimize-insn
 ! tag(not(untag(x))) = not(x) xor tag-mask
 :: emit-tagged-not ( insn -- )
     tagged-rep next-vreg-rep :> temp
-    temp insn src>> ##not,
-    insn dst>> temp tag-mask get ##xor-imm, here ;
+    temp insn src>> not##,
+    insn dst>> temp tag-mask get xor-imm##, here ;
 
-M: ##not optimize-insn
+M: not## optimize-insn
     {
         {
             [ dup inert-tag/untag-unary? ]
@@ -282,5 +282,5 @@ M: ##not optimize-insn
         [ call-next-method ]
     } cond ;
 
-M: ##bit-count optimize-insn
+M: bit-count## optimize-insn
     [ no-use-conversion ] [ finish ] [ emit-def-conversion ] tri ;

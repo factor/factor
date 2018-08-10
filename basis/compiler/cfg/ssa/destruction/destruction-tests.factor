@@ -17,23 +17,23 @@ IN: compiler.cfg.ssa.destruction.tests
 
 ! cleanup-insn
 {
-    V{ T{ ##copy { dst 100 } { src 46 } } }
+    V{ T{ copy## { dst 100 } { src 46 } } }
 } [
     setup-leader/reps-scenario
-    T{ ##copy { src 46 } { dst 100 } } [ cleanup-insn ] V{ } make
+    T{ copy## { src 46 } { dst 100 } } [ cleanup-insn ] V{ } make
 ] unit-test
 
-! I think the difference is because ##parallel-copy may encode a swap
+! I think the difference is because parallel-copy## may encode a swap
 ! between two vregs.
 {
-    V{ T{ ##copy { dst 47 } { src 45 } { rep double-2-rep } } }
+    V{ T{ copy## { dst 47 } { src 45 } { rep double-2-rep } } }
 } [
     setup-leader/reps-scenario
-    T{ ##parallel-copy { values V{ { 100 46 } } } } [ cleanup-insn ] V{ } make
+    T{ parallel-copy## { values V{ { 100 46 } } } } [ cleanup-insn ] V{ } make
 ] unit-test
 
 { V{ } } [
-    T{ ##parallel-copy { values V{ } } }
+    T{ parallel-copy## { values V{ } } }
     [ cleanup-insn ] V{ } make
 ] unit-test
 
@@ -42,7 +42,7 @@ IN: compiler.cfg.ssa.destruction.tests
     H{ { 36 23 } { 23 23 } } leader-map set
     H{ { 36 int-rep } { 37 tagged-rep } } representations set
     V{
-        T{ ##alien-invoke
+        T{ alien-invoke##
            { reg-inputs V{ { 56 int-rep RDI } } }
            { stack-inputs V{ } }
            { reg-outputs { { 36 int-rep RAX } } }
@@ -54,8 +54,8 @@ IN: compiler.cfg.ssa.destruction.tests
            { gc-map T{ gc-map } }
            { insn# 14 }
         }
-        T{ ##call-gc { gc-map T{ gc-map } } }
-        T{ ##box-alien
+        T{ call-gc## { gc-map T{ gc-map } } }
+        T{ box-alien##
            { dst 37 }
            { src 36 }
            { temp 11 }

@@ -20,21 +20,21 @@ SLOT: out-d
     dup end-basic-block (begin-basic-block) ;
 
 : emit-trivial-block ( block quot: ( ..a block' -- ..b ) -- block' )
-    ##branch, swap begin-basic-block
+    branch##, swap begin-basic-block
     [ swap call ] keep
-    ##branch, begin-basic-block ; inline
+    branch##, begin-basic-block ; inline
 
-: call-height ( #call -- n )
+: call-height ( call# -- n )
     [ out-d>> length ] [ in-d>> length ] bi - ;
 
 : emit-call-block ( word height block -- )
     t swap kill-block?<<
-    <ds-loc> inc-stack ##call, ;
+    <ds-loc> inc-stack call##, ;
 
 : emit-trivial-call ( block word height -- block' )
     rot [ emit-call-block ] emit-trivial-block ;
 
-: emit-primitive ( block #call -- block' )
+: emit-primitive ( block call# -- block' )
     [ word>> ] [ call-height ] bi emit-trivial-call ;
 
 : begin-branch ( block -- block' )
@@ -42,7 +42,7 @@ SLOT: out-d
 
 : end-branch ( block/f -- pair/f )
     dup [
-        ##branch,
+        branch##,
         end-local-analysis
         height-state get clone 2array
     ] when* ;

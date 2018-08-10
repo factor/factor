@@ -30,13 +30,13 @@ IN: compiler.cfg.build-stack-frame.tests
 ] unit-test
 
 { t } [
-    { T{ ##call-gc } } insns>cfg dup build-stack-frame
+    { T{ call-gc## } } insns>cfg dup build-stack-frame
     stack-frame>> stack-frame?
 ] unit-test
 
 { 0 } [
     {
-        T{ ##call-gc }
-        T{ ##local-allot { dst 1 } { size 32 } { align 8 } }
+        T{ call-gc## }
+        T{ local-allot## { dst 1 } { size 32 } { align 8 } }
     } insns>cfg dup build-stack-frame cfg>insns last offset>>
 ] unit-test

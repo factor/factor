@@ -22,7 +22,7 @@ TUPLE: vorbis-stream < disposable
     { block vorbis-block }
     { comment vorbis-comment }
     { temp-state ogg-stream-state }
-    { #vorbis-headers integer initial: 0 } ;
+    { vorbis-headers integer initial: 0 } ;
 
 CONSTANT: stream-buffer-size 4096
 
@@ -93,11 +93,11 @@ ERROR: no-vorbis-in-ogg ;
     [ info>> ] [ comment>> ] [ packet>> ] tri vorbis_synthesis_headerin 0 >= ; inline
 
 : is-initial-vorbis-packet? ( vorbis-stream -- ? )
-    dup #vorbis-headers>> zero? [ vorbis-header? ] [ drop f ] if ; inline
+    dup vorbis-headers>> zero? [ vorbis-header? ] [ drop f ] if ; inline
 
 : save-initial-vorbis-header ( state vorbis-stream -- )
     [ stream-state>> swap dup byte-length memcpy ]
-    [ 1 >>#vorbis-headers drop ] bi ; inline
+    [ 1 >>vorbis-headers drop ] bi ; inline
 
 : drop-initial-other-header ( state vorbis-stream -- )
     swap ogg_stream_clear 2drop ; inline
@@ -117,7 +117,7 @@ ERROR: no-vorbis-in-ogg ;
     [ dup buffer-data-from-stream [ parse-initial-headers ] [ drop ] if ] if ;
 
 : have-required-vorbis-headers? ( vorbis-stream -- ? )
-    #vorbis-headers>> 1 2 between? not ; inline
+    vorbis-headers>> 1 2 between? not ; inline
 
 : ?vorbis-error ( code -- )
     [ vorbis-error ] unless-zero ; inline
@@ -136,7 +136,7 @@ ERROR: no-vorbis-in-ogg ;
     dup have-required-vorbis-headers? not [
         dup get-remaining-vorbis-header-packet [
             [ decode-remaining-vorbis-header-packet ]
-            [ [ 1 + ] change-#vorbis-headers drop ]
+            [ [ 1 + ] change-vorbis-headers drop ]
             [ parse-remaining-vorbis-headers ] tri
         ] [ drop ] if
     ] [ drop ] if ;
@@ -153,7 +153,7 @@ ERROR: no-vorbis-in-ogg ;
     [ [ dsp-state>> ] [ block>> ] bi vorbis_block_init drop ] bi ;
 
 : initialize-decoder ( vorbis-stream -- )
-    dup #vorbis-headers>> zero?
+    dup vorbis-headers>> zero?
     [ no-vorbis-in-ogg ]
     [ init-vorbis-codec ] if ;
 
@@ -168,13 +168,13 @@ ERROR: no-vorbis-in-ogg ;
     buffer length -1 shift :> buffer-length
     offset -1 shift :> sample-offset
     buffer buffer-length c:short <c-direct-array> sample-offset short-vector boa :> short-buffer
-    vorbis-stream info>> channels>> :> #channels
-    buffer-length sample-offset - #channels /i :> max-len
+    vorbis-stream info>> channels>> :> n-channels
+    buffer-length sample-offset - n-channels /i :> max-len
     len max-len min :> len'
-    pcm #channels void* <c-direct-array> :> channel*s
+    pcm n-channels void* <c-direct-array> :> channel*s
 
     len' <iota> |[ sample |
-        #channels <iota> |[ channel |
+        n-channels <iota> |[ channel |
             channel channel*s nth len c:float <c-direct-array>
             sample swap nth
             float>short-sample short-buffer push

@@ -23,7 +23,7 @@ SYMBOL: copies
 
 GENERIC: compute-copy-equiv* ( node -- )
 
-M: #renaming compute-copy-equiv* inputs/outputs are-copies-of ;
+M: renaming# compute-copy-equiv* inputs/outputs are-copies-of ;
 
 : compute-phi-equiv ( inputs outputs -- )
     [
@@ -32,7 +32,7 @@ M: #renaming compute-copy-equiv* inputs/outputs are-copies-of ;
         [ first swap is-copy-of ] [ 2drop ] if
     ] 2each ;
 
-M: #phi compute-copy-equiv*
+M: phi# compute-copy-equiv*
     [ phi-in-d>> flip ] [ out-d>> ] bi compute-phi-equiv ;
 
 M: node compute-copy-equiv* drop ;

@@ -25,12 +25,12 @@ IN: compiler.cfg.intrinsics.fixnum
     ] binary-op ;
 
 : emit-fixnum-shift-general ( block -- block' )
-    ds-peek 0 cc> ##compare-integer-imm-branch, dup
+    ds-peek 0 cc> compare-integer-imm-branch##, dup
     [ [ emit-fixnum-left-shift ] with-branch ]
     [ [ emit-fixnum-right-shift ] with-branch ] bi 2array
     emit-conditional ;
 
-: emit-fixnum-shift-fast ( block #call -- block' )
+: emit-fixnum-shift-fast ( block call# -- block' )
     node-input-infos second interval>> {
         { [ dup 0 [a,inf] interval-subset? ] [ drop emit-fixnum-left-shift ] }
         { [ dup 0 [-inf,a] interval-subset? ] [ drop emit-fixnum-right-shift ] }

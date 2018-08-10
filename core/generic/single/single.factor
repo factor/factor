@@ -25,9 +25,9 @@ PREDICATE: single-generic < generic
 
 M: single-generic make-inline cannot-be-inline ;
 
-GENERIC: dispatch# ( word -- n )
+GENERIC: dispatch-number ( word -- n )
 
-M: generic dispatch# "combination" word-prop dispatch# ;
+M: generic dispatch-number "combination" word-prop dispatch-number ;
 
 SYMBOL: assumed
 SYMBOL: default

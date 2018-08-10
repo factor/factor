@@ -21,7 +21,7 @@ IN: compiler.cfg.builder.blocks.tests
 
 ! emit-call-block
 {
-    V{ T{ ##call { word 2drop } } }
+    V{ T{ call## { word 2drop } } }
     T{ height-state f 0 0 -2 0 }
 } [
     \ 2drop -2 <basic-block> [ emit-call-block ] V{ } make
@@ -30,16 +30,16 @@ IN: compiler.cfg.builder.blocks.tests
 
 ! emit-trivial-block
 {
-    V{ T{ ##no-tco } T{ ##branch } }
+    V{ T{ no-tco## } T{ branch## } }
 } [
     <basic-block> dup set-basic-block
-    [ drop ##no-tco, ] emit-trivial-block
+    [ drop no-tco##, ] emit-trivial-block
     predecessors>> first instructions>>
 ] cfg-unit-test
 
 ! end-basic-block
 { } [
-    <basic-block> dup set-basic-block ##branch, end-basic-block
+    <basic-block> dup set-basic-block branch##, end-basic-block
 ] unit-test
 
 {

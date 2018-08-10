@@ -15,7 +15,7 @@ IN: compiler.tree.recursive.tests
     swap [
         [
             dup {
-                [ #recursive? ]
+                [ recursive#? ]
                 [ label>> loop?>> ]
             } 1&& [ label>> word>> , ] [ drop ] if
         ] each-node
@@ -25,7 +25,7 @@ IN: compiler.tree.recursive.tests
     swap [
         [
             dup {
-                [ #recursive? ]
+                [ recursive#? ]
                 [ label>> loop?>> not ]
             } 1&& [ label>> word>> , ] [ drop ] if
         ] each-node
@@ -73,7 +73,7 @@ IN: compiler.tree.recursive.tests
 { f } [
     [ [ [ ] map ] map ] build-tree analyze-recursive
     [
-        dup #recursive? [ label>> loop?>> not ] [ drop f ] if
+        dup recursive#? [ label>> loop?>> not ] [ drop f ] if
     ] contains-node?
 ] unit-test
 

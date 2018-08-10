@@ -16,6 +16,6 @@ HELP: join-blocks
 { $description "A compiler pass when optimizing the cfg." } ;
 
 ARTICLE: "compiler.cfg.block-joining" "Block Joining"
-"Joining blocks that are not calls and are connected by a single CFG edge. This pass does not update " { $link ##phi } " nodes and should therefore only run before stack analysis or after ##phi node elimination." ;
+"Joining blocks that are not calls and are connected by a single CFG edge. This pass does not update " { $link phi## } " nodes and should therefore only run before stack analysis or after phi## node elimination." ;
 
 ABOUT: "compiler.cfg.block-joining"

@@ -10,18 +10,18 @@ CONSTANT: test-size0 $[ 23 2^ 1 - ]
 
 MEMO: test-bytes ( n -- byte-array ) <iota> >byte-array ;
 
-TUPLE: tcp-echo < threaded-server #times #bytes ;
+TUPLE: tcp-echo < threaded-server n-times n-bytes ;
 
-: <tcp-echo> ( #times #bytes -- obj )
+: <tcp-echo> ( n-times n-bytes -- obj )
     binary \ tcp-echo new-threaded-server
-        swap >>#bytes
-        swap >>#times
+        swap >>n-bytes
+        swap >>n-times
         <any-port-local-inet4> >>insecure ;
 
-ERROR: incorrect-#bytes ;
+ERROR: incorrect-n-bytes ;
 
 : check-bytes ( bytes n -- bytes )
-    over length = [ incorrect-#bytes ] unless ;
+    over length = [ incorrect-n-bytes ] unless ;
 
 : read-n ( n -- bytes )
     [ read ] [ check-bytes ] bi ;
@@ -32,21 +32,21 @@ ERROR: incorrect-#bytes ;
     [ write flush ] [ length read-n drop ] bi ;
 
 M: tcp-echo handle-client*
-    [ #times>> ] [ #bytes>> ] bi
+    [ n-times>> ] [ n-bytes>> ] bi
     '[ _ [ _ test-bytes write-read ] times ] call ;
 
 : server>address ( server -- port )
     servers>> first addr>> port>> local-server ;
 
-: tcp-echo-banner ( #times #bytes -- )
+: tcp-echo-banner ( n-times n-bytes -- )
     "Network testing: times: %d, length: %d\n" printf ;
 
-:: tcp-echo-benchmark ( #times #bytes -- )
-    #times #bytes [ tcp-echo-banner ] 2keep
+:: tcp-echo-benchmark ( n-times n-bytes -- )
+    n-times n-bytes [ tcp-echo-banner ] 2keep
     <tcp-echo> [
         \ threaded-server get server>address binary [
-            #times [ #bytes read-write ] times
-            contents empty? [ incorrect-#bytes ] unless
+            n-times [ n-bytes read-write ] times
+            contents empty? [ incorrect-n-bytes ] unless
         ] with-client
     ] with-threaded-server ;
 

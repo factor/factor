@@ -55,7 +55,7 @@ HELP: spill-at-sync-point?
   { "live-interval" live-interval-state }
   { "?" boolean }
 }
-{ $description "Whether the given live interval must be spilled at the sync point. If the instruction for the given sync point is a " { $link hairy-clobber-insn } ", such as a (" { $link ##call-gc } " instruction) then the interval is always spilled." } ;
+{ $description "Whether the given live interval must be spilled at the sync point. If the instruction for the given sync point is a " { $link hairy-clobber-insn } ", such as a (" { $link call-gc## } " instruction) then the interval is always spilled." } ;
 
 ARTICLE: "compiler.cfg.linear-scan.allocation" "Allocating registers for live intervals"
 "This vocab implements the step in the linear scan algorithm in which virtual registers are allocated physical registers. It also takes decisions on when to spill registers."

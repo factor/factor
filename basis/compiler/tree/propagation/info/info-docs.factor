@@ -17,7 +17,7 @@ HELP: literal-class
 
 HELP: node-input-infos
 { $values { "node" node } { "seq" sequence } }
-{ $description "Lists the value infos for the input variables of an SSA tree node. For " { $link #call } " nodes, the inputs represents the values on the stack when the word is called." } ;
+{ $description "Lists the value infos for the input variables of an SSA tree node. For " { $link call# } " nodes, the inputs represents the values on the stack when the word is called." } ;
 
 HELP: node-output-infos
 { $values { "node" node } { "seq" sequence } }

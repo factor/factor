@@ -105,7 +105,7 @@ IN: compiler.tree.propagation.transforms
 ] each
 
 ! Speeds up 2^
-: 2^? ( #call -- ? )
+: 2^? ( call# -- ? )
     in-d>> first value-info literal>> 1 eq? ;
 
 : shift-2^ ( -- quot )
@@ -119,7 +119,7 @@ IN: compiler.tree.propagation.transforms
     ] ;
 
 ! Speeds up 2/
-: 2/? ( #call -- ? )
+: 2/? ( call# -- ? )
     in-d>> second value-info literal>> -1 eq? ;
 
 : shift-2/ ( -- quot )
@@ -314,7 +314,7 @@ M\\ sets:set intersect [ intersect-quot ] 1 define-partial-eval
 
 M\\ sets:set intersects? [ intersects?-quot ] 1 define-partial-eval
 
-: bit-quot ( #call -- quot/f )
+: bit-quot ( call# -- quot/f )
     in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?
     [ [ integer>fixnum ] dip fixnum-bit? ] f ? ;
 
@@ -327,7 +327,7 @@ M\\ sets:set intersects? [ intersects?-quot ] 1 define-partial-eval
     [ \ push def>> ] [ f ] if
 ] "custom-inlining" set-word-prop
 
-: custom-inline-fixnum ( #call method -- y )
+: custom-inline-fixnum ( call# method -- y )
     [ in-d>> first value-info class>> fixnum \ f class-or class<= ] dip
     '[ [ dup [ _ no-method ] unless ] ] [ f ] if ;
 

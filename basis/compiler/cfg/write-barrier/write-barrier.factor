@@ -21,16 +21,16 @@ GENERIC: eliminate-write-barrier ( insn -- ? )
 : fresh-allocation ( vreg -- )
     fresh-allocations get adjoin ;
 
-M: ##allot eliminate-write-barrier
+M: allot## eliminate-write-barrier
     dst>> fresh-allocation t ;
 
 : mutated-object ( vreg -- )
     resolve-copy mutated-objects get adjoin ;
 
-M: ##set-slot eliminate-write-barrier
+M: set-slot## eliminate-write-barrier
     obj>> mutated-object t ;
 
-M: ##set-slot-imm eliminate-write-barrier
+M: set-slot-imm## eliminate-write-barrier
     obj>> mutated-object t ;
 
 : needs-write-barrier? ( insn -- ? )
@@ -39,16 +39,16 @@ M: ##set-slot-imm eliminate-write-barrier
         [ mutated-objects get in? ]
     } 1&& ;
 
-M: ##write-barrier eliminate-write-barrier
+M: write-barrier## eliminate-write-barrier
     src>> needs-write-barrier? ;
 
-M: ##write-barrier-imm eliminate-write-barrier
+M: write-barrier-imm## eliminate-write-barrier
     src>> needs-write-barrier? ;
 
 M: gc-map-insn eliminate-write-barrier
     fresh-allocations get clear-set ;
 
-M: ##copy eliminate-write-barrier
+M: copy## eliminate-write-barrier
     [ src>> resolve-copy ] [ dst>> ] bi copies get set-at t ;
 
 M: insn eliminate-write-barrier drop t ;

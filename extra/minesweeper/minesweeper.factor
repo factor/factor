@@ -19,7 +19,7 @@ CONSTANT: neighbors {
 
 SYMBOLS: +flagged+ +question+ +clicked+ ;
 
-TUPLE: cell #adjacent mined? state ;
+TUPLE: cell n-adjacent mined? state ;
 
 : make-cells ( rows cols -- cells )
     '[ _ [ cell new ] replicate ] replicate ;
@@ -30,14 +30,14 @@ TUPLE: cell #adjacent mined? state ;
 : cells-dim ( cells -- rows cols )
     [ length ] [ first length ] bi ;
 
-: #mines ( cells -- n )
+: n-mines ( cells -- n )
     [ [ mined?>> ] count ] map-sum ;
 
-: #flagged ( cells -- n )
+: n-flagged ( cells -- n )
     [ [ state>> +flagged+ = ] count ] map-sum ;
 
-: #mines-remaining ( cells -- n )
-    [ #mines ] [ #flagged ] bi - ;
+: n-mines-remaining ( cells -- n )
+    [ n-mines ] [ n-flagged ] bi - ;
 
 : unmined-cell ( cells -- cell )
     f [ dup mined?>> ] [ drop dup random random ] do while nip ;
@@ -50,10 +50,10 @@ TUPLE: cell #adjacent mined? state ;
         first2 [ row + ] [ col + ] bi* cell-at quot [ f ] if*
     ] with count ; inline
 
-: adjacent-mines ( cells row col -- #mines )
+: adjacent-mines ( cells row col -- n-mines )
     [ mined?>> ] count-neighbors ;
 
-: adjacent-flags ( cells row col -- #flags )
+: adjacent-flags ( cells row col -- n-flags )
     [ state>> +flagged+ = ] count-neighbors ;
 
 :: each-cell ( ... cells quot: ( ... row col cell -- ... ) -- ... )
@@ -63,11 +63,11 @@ TUPLE: cell #adjacent mined? state ;
 
 :: update-counts ( cells -- cells )
     cells |[ row col cell |
-        cells row col adjacent-mines cell #adjacent<<
+        cells row col adjacent-mines cell n-adjacent<<
     ] each-cell cells ;
 
 : reset-cells ( cells -- cells )
-    [ cells-dim make-cells ] [ #mines place-mines ] bi update-counts ;
+    [ cells-dim make-cells ] [ n-mines place-mines ] bi update-counts ;
 
 : won? ( cells -- ? )
     [ [ { [ state>> +clicked+ = ] [ mined?>> ] } 1|| ] all? ] all? ;
@@ -102,7 +102,7 @@ DEFER: click-cell-at
         ] when
         dup state>> { +clicked+ +flagged+ } member? [ drop f ] [
             +clicked+ >>state
-            { [ mined?>> not ] [ #adjacent>> 0 = ] } 1&& [
+            { [ mined?>> not ] [ n-adjacent>> 0 = ] } 1&& [
                 cells row col click-cells-around
             ] when t
         ] if
@@ -163,7 +163,7 @@ M: grid-gadget pref-dim*
             { +question+ [ "question.gif" ] }
             { +flagged+ [ lost? "misflagged.gif" "flagged.gif" ? ] }
             { +clicked+ [
-                cell #adjacent>> 0 or number>string
+                cell n-adjacent>> 0 or number>string
                 "open" ".gif" surround ] }
             { f [ "blank.gif" ] }
         } case
@@ -244,7 +244,7 @@ M: grid-gadget handle-gesture
 M: grid-gadget draw-gadget*
     {
         [ draw-hint ]
-        [ cells>> #mines-remaining ]
+        [ cells>> n-mines-remaining ]
         [ draw-mines ]
         [ draw-smiley ]
         [ elapsed-time ]
@@ -300,10 +300,10 @@ grid-gadget "toolbar" f {
 
 grid-gadget "gestures" [
     {
-        { T{ button-down { # 1 } } [ relayout-1 ] }
-        { T{ button-up { # 1 } } [ on-click ] }
-        { T{ button-up { # 3 } } [ on-mark ] }
-        { T{ button-up { # 2 } } [ on-open ] }
+        { T{ button-down { n 1 } } [ relayout-1 ] }
+        { T{ button-up { n 1 } } [ on-click ] }
+        { T{ button-up { n 3 } } [ on-mark ] }
+        { T{ button-up { n 2 } } [ on-open ] }
         { T{ key-down { sym " " } } [ on-mark ] }
         { motion [ relayout-1 ] }
     } assoc-union

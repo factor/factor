@@ -8,7 +8,7 @@ IN: compiler.cfg.value-numbering.slots
 
 : simplify-slot-addressing? ( insn -- ? )
     complex-addressing?
-    [ slot>> vreg>insn ##add-imm? ] [ drop f ] if ;
+    [ slot>> vreg>insn add-imm##? ] [ drop f ] if ;
 
 : simplify-slot-addressing ( insn -- insn/f )
     dup simplify-slot-addressing? [
@@ -18,6 +18,6 @@ IN: compiler.cfg.value-numbering.slots
         bi
     ] [ drop f ] if ;
 
-M: ##slot rewrite simplify-slot-addressing ;
-M: ##set-slot rewrite simplify-slot-addressing ;
-M: ##write-barrier rewrite simplify-slot-addressing ;
+M: slot## rewrite simplify-slot-addressing ;
+M: set-slot## rewrite simplify-slot-addressing ;
+M: write-barrier## rewrite simplify-slot-addressing ;

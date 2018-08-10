@@ -116,7 +116,7 @@ M: page-elt prev-elt
     [ 2drop { 0 0 } ] [ lines>> neg +line ] if ;
 
 M: page-elt next-elt
-    3dup [ first ] [ last-line# ] [ lines>> ] tri* - >
+    3dup [ first ] [ last-line-number ] [ lines>> ] tri* - >
     [ drop nip doc-end ] [ nip lines>> +line ] if ;
 
 CONSTANT: line-elt T{ page-elt f 1 }

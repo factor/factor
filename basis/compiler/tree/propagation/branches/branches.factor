@@ -10,18 +10,18 @@ IN: compiler.tree.propagation.branches
 
 GENERIC: child-constraints ( node -- seq )
 
-M: #if child-constraints
+M: if# child-constraints
     in-d>> first [ =t ] [ =f ] bi 2array ;
 
-M: #dispatch child-constraints
+M: dispatch# child-constraints
     children>> length f <repetition> ;
 
 ! There is an important invariant here, either no flags are set
 ! in live-branches, exactly one is set, or all are set.
 
-GENERIC: live-branches ( #branch -- indices )
+GENERIC: live-branches ( branch# -- indices )
 
-M: #if live-branches
+M: if# live-branches
     in-d>> first value-info class>> {
         { [ dup null-class? ] [ { f f } ] }
         { [ dup true-class? ] [ { t f } ] }
@@ -29,7 +29,7 @@ M: #if live-branches
         [ { t t } ]
     } cond nip ;
 
-M: #dispatch live-branches
+M: dispatch# live-branches
     [ children>> ] [ in-d>> first value-info ] bi {
         { [ dup class>> null-class? ] [ drop length f <array> ] }
         { [ dup literal>> integer? not ] [ drop length t <array> ] }
@@ -37,7 +37,7 @@ M: #dispatch live-branches
         [ literal>> swap length f <array> [ [ t ] 2dip set-nth ] keep ]
     } cond ;
 
-: live-children ( #branch -- children )
+: live-children ( branch# -- children )
     [ children>> ] [ live-branches>> ] bi select-children ;
 
 SYMBOL: infer-children-data
@@ -74,7 +74,7 @@ DEFER: collect-variables
         ] map
     ] 2map ;
 
-: annotate-phi-inputs ( #phi -- )
+: annotate-phi-inputs ( phi# -- )
     dup phi-in-d>> compute-phi-input-infos >>phi-info-d drop ;
 
 : merge-value-infos ( infos outputs -- )
@@ -90,7 +90,7 @@ SYMBOL: condition-value
         value-infos
     } [ dup get ] H{ } map>assoc ;
 
-M: #phi propagate-before ( #phi -- )
+M: phi# propagate-before ( phi# -- )
     [ annotate-phi-inputs ]
     [ [ phi-info-d>> flip ] [ out-d>> ] bi merge-value-infos ]
     bi ;
@@ -173,7 +173,7 @@ M: #phi propagate-before ( #phi -- )
         [ 3drop f ]
     } case assume ;
 
-M: #phi propagate-after ( #phi -- )
+M: phi# propagate-after ( phi# -- )
     condition-value get [
         [ out-d>> ]
         [ phi-in-d>> flip ]
@@ -184,12 +184,12 @@ M: #phi propagate-after ( #phi -- )
         ] 3each
     ] [ drop ] if ;
 
-M: #branch propagate-around
+M: branch# propagate-around
     dup live-branches >>live-branches
     [ infer-children ] [ annotate-node ] bi ;
 
-M: #if propagate-around
+M: if# propagate-around
     [ in-d>> first condition-value set ] [ call-next-method ] bi ;
 
-M: #dispatch propagate-around
+M: dispatch# propagate-around
     condition-value off call-next-method ;

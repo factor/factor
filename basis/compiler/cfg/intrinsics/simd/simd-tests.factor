@@ -9,7 +9,7 @@ namespaces sequences system tools.test words ;
 IN: compiler.cfg.intrinsics.simd.tests
 
 :: test-node ( rep -- node )
-    T{ #call
+    T{ call#
         { in-d  { 1 2 3 4 } }
         { out-d { 5 } }
         { info H{
@@ -23,7 +23,7 @@ IN: compiler.cfg.intrinsics.simd.tests
 
 :: test-node-literal ( lit rep -- node )
     lit class-of :> lit-class
-    T{ #call
+    T{ call#
         { in-d  { 1 2 3 4 } }
         { out-d { 5 } }
         { info H{
@@ -36,7 +36,7 @@ IN: compiler.cfg.intrinsics.simd.tests
     } ;
 
 : test-node-nonliteral-rep ( -- node )
-    T{ #call
+    T{ call#
         { in-d  { 1 2 3 4 } }
         { out-d { 5 } }
         { info H{
@@ -114,31 +114,31 @@ M: simple-ops-cpu %gather-vector-4-reps { int-4-rep uint-4-rep float-4-rep } ;
 M: simple-ops-cpu %alien-vector-reps all-reps ;
 
 ! v+
-{ { ##add-vector } }
+{ { add-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-v+ ] test-emit ]
 unit-test
 
 ! v-
-{ { ##sub-vector } }
+{ { sub-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-v- ] test-emit ]
 unit-test
 
 ! vneg
-{ { ##load-reference ##sub-vector } }
+{ { load-reference## sub-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vneg ] test-emit ]
 unit-test
 
-{ { ##zero-vector ##sub-vector } }
+{ { zero-vector## sub-vector## } }
 [ simple-ops-cpu int-4-rep [ emit-simd-vneg ] test-emit ]
 unit-test
 
 ! v*
-{ { ##mul-vector } }
+{ { mul-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-v* ] test-emit ]
 unit-test
 
 ! v/
-{ { ##div-vector } }
+{ { div-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-v/ ] test-emit ]
 unit-test
 
@@ -146,15 +146,15 @@ TUPLE: addsub-cpu < simple-ops-cpu ;
 M: addsub-cpu %add-sub-vector-reps { int-4-rep float-4-rep } ;
 
 ! v+-
-{ { ##add-sub-vector } }
+{ { add-sub-vector## } }
 [ addsub-cpu float-4-rep [ emit-simd-v+- ] test-emit ]
 unit-test
 
-{ { ##load-reference ##xor-vector ##add-vector } }
+{ { load-reference## xor-vector## add-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-v+- ] test-emit ]
 unit-test
 
-{ { ##load-reference ##xor-vector ##sub-vector ##add-vector } }
+{ { load-reference## xor-vector## sub-vector## add-vector## } }
 [ simple-ops-cpu int-4-rep [ emit-simd-v+- ] test-emit ]
 unit-test
 
@@ -164,41 +164,41 @@ M: saturating-cpu %saturated-sub-vector-reps { int-4-rep } ;
 M: saturating-cpu %saturated-mul-vector-reps { int-4-rep } ;
 
 ! vs+
-{ { ##add-vector } }
+{ { add-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vs+ ] test-emit ]
 unit-test
 
-{ { ##add-vector } }
+{ { add-vector## } }
 [ saturating-cpu float-4-rep [ emit-simd-vs+ ] test-emit ]
 unit-test
 
-{ { ##saturated-add-vector } }
+{ { saturated-add-vector## } }
 [ saturating-cpu int-4-rep [ emit-simd-vs+ ] test-emit ]
 unit-test
 
 ! vs-
-{ { ##sub-vector } }
+{ { sub-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vs- ] test-emit ]
 unit-test
 
-{ { ##sub-vector } }
+{ { sub-vector## } }
 [ saturating-cpu float-4-rep [ emit-simd-vs- ] test-emit ]
 unit-test
 
-{ { ##saturated-sub-vector } }
+{ { saturated-sub-vector## } }
 [ saturating-cpu int-4-rep [ emit-simd-vs- ] test-emit ]
 unit-test
 
 ! vs*
-{ { ##mul-vector } }
+{ { mul-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vs* ] test-emit ]
 unit-test
 
-{ { ##mul-vector } }
+{ { mul-vector## } }
 [ saturating-cpu float-4-rep [ emit-simd-vs* ] test-emit ]
 unit-test
 
-{ { ##saturated-mul-vector } }
+{ { saturated-mul-vector## } }
 [ saturating-cpu int-4-rep [ emit-simd-vs* ] test-emit ]
 unit-test
 
@@ -213,20 +213,20 @@ M: compare-cpu %compare-vector-reps drop signed-reps ;
 M: compare-cpu %compare-vector-ccs nip f 2array 1array f ;
 
 ! vmin
-{ { ##min-vector } }
+{ { min-vector## } }
 [ minmax-cpu float-4-rep [ emit-simd-vmin ] test-emit ]
 unit-test
 
-{ { ##compare-vector ##and-vector ##andn-vector ##or-vector } }
+{ { compare-vector## and-vector## andn-vector## or-vector## } }
 [ compare-cpu float-4-rep [ emit-simd-vmin ] test-emit ]
 unit-test
 
 ! vmax
-{ { ##max-vector } }
+{ { max-vector## } }
 [ minmax-cpu float-4-rep [ emit-simd-vmax ] test-emit ]
 unit-test
 
-{ { ##compare-vector ##and-vector ##andn-vector ##or-vector } }
+{ { compare-vector## and-vector## andn-vector## or-vector## } }
 [ compare-cpu float-4-rep [ emit-simd-vmax ] test-emit ]
 unit-test
 
@@ -239,49 +239,49 @@ M: horizontal-cpu %unpack-vector-head-reps signed-reps ;
 M: horizontal-cpu %unpack-vector-tail-reps signed-reps ;
 
 ! v.
-{ { ##dot-vector } }
+{ { dot-vector## } }
 [ dot-cpu float-4-rep [ emit-simd-v. ] test-emit ]
 unit-test
 
-{ { ##mul-vector ##horizontal-add-vector ##horizontal-add-vector ##vector>scalar } }
+{ { mul-vector## horizontal-add-vector## horizontal-add-vector## vector>scalar## } }
 [ horizontal-cpu float-4-rep [ emit-simd-v. ] test-emit ]
 unit-test
 
 { {
-    ##mul-vector
-    ##merge-vector-head ##merge-vector-tail ##add-vector
-    ##merge-vector-head ##merge-vector-tail ##add-vector
-    ##vector>scalar
+    mul-vector##
+    merge-vector-head## merge-vector-tail## add-vector##
+    merge-vector-head## merge-vector-tail## add-vector##
+    vector>scalar##
 } }
 [ simple-ops-cpu float-4-rep [ emit-simd-v. ] test-emit ]
 unit-test
 
 ! vsqrt
-{ { ##sqrt-vector } }
+{ { sqrt-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vsqrt ] test-emit ]
 unit-test
 
 ! sum
-{ { ##horizontal-add-vector ##vector>scalar } }
+{ { horizontal-add-vector## vector>scalar## } }
 [ horizontal-cpu double-2-rep [ emit-simd-sum ] test-emit ]
 unit-test
 
-{ { ##horizontal-add-vector ##horizontal-add-vector ##vector>scalar } }
+{ { horizontal-add-vector## horizontal-add-vector## vector>scalar## } }
 [ horizontal-cpu float-4-rep [ emit-simd-sum ] test-emit ]
 unit-test
 
 { {
-    ##unpack-vector-head ##unpack-vector-tail ##add-vector
-    ##horizontal-add-vector ##horizontal-add-vector
-    ##vector>scalar
+    unpack-vector-head## unpack-vector-tail## add-vector##
+    horizontal-add-vector## horizontal-add-vector##
+    vector>scalar##
 } }
 [ horizontal-cpu short-8-rep [ emit-simd-sum ] test-emit ]
 unit-test
 
 { {
-    ##unpack-vector-head ##unpack-vector-tail ##add-vector
-    ##horizontal-add-vector ##horizontal-add-vector ##horizontal-add-vector
-    ##vector>scalar
+    unpack-vector-head## unpack-vector-tail## add-vector##
+    horizontal-add-vector## horizontal-add-vector## horizontal-add-vector##
+    vector>scalar##
 } }
 [ horizontal-cpu char-16-rep [ emit-simd-sum ] test-emit ]
 unit-test
@@ -294,35 +294,35 @@ M: abs-cpu %abs-vector-reps signed-reps ;
 [ simple-ops-cpu uint-4-rep [ emit-simd-vabs ] test-emit ]
 unit-test
 
-{ { ##abs-vector } }
+{ { abs-vector## } }
 [ abs-cpu float-4-rep [ emit-simd-vabs ] test-emit ]
 unit-test
 
-{ { ##load-reference ##andn-vector } }
+{ { load-reference## andn-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vabs ] test-emit ]
 unit-test
 
-{ { ##zero-vector ##sub-vector ##compare-vector ##and-vector ##andn-vector ##or-vector } }
+{ { zero-vector## sub-vector## compare-vector## and-vector## andn-vector## or-vector## } }
 [ compare-cpu int-4-rep [ emit-simd-vabs ] test-emit ]
 unit-test
 
 ! vand
-{ { ##and-vector } }
+{ { and-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vand ] test-emit ]
 unit-test
 
 ! vandn
-{ { ##andn-vector } }
+{ { andn-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vandn ] test-emit ]
 unit-test
 
 ! vor
-{ { ##or-vector } }
+{ { or-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vor ] test-emit ]
 unit-test
 
 ! vxor
-{ { ##xor-vector } }
+{ { xor-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vxor ] test-emit ]
 unit-test
 
@@ -330,11 +330,11 @@ TUPLE: not-cpu < simple-ops-cpu ;
 M: not-cpu %not-vector-reps signed-reps ;
 
 ! vnot
-{ { ##not-vector } }
+{ { not-vector## } }
 [ not-cpu float-4-rep [ emit-simd-vnot ] test-emit ]
 unit-test
 
-{ { ##fill-vector ##xor-vector } }
+{ { fill-vector## xor-vector## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vnot ] test-emit ]
 unit-test
 
@@ -351,30 +351,30 @@ M: horizontal-shift-cpu %horizontal-shl-vector-imm-reps signed-reps ;
 M: horizontal-shift-cpu %horizontal-shr-vector-imm-reps signed-reps ;
 
 ! vlshift
-{ { ##shl-vector-imm } }
+{ { shl-vector-imm## } }
 [ shift-imm-cpu 2 int-4-rep [ emit-simd-vlshift ] test-emit-literal ]
 unit-test
 
-{ { ##shl-vector } }
+{ { shl-vector## } }
 [ shift-cpu int-4-rep [ emit-simd-vlshift ] test-emit ]
 unit-test
 
 ! vrshift
-{ { ##shr-vector-imm } }
+{ { shr-vector-imm## } }
 [ shift-imm-cpu 2 int-4-rep [ emit-simd-vrshift ] test-emit-literal ]
 unit-test
 
-{ { ##shr-vector } }
+{ { shr-vector## } }
 [ shift-cpu int-4-rep [ emit-simd-vrshift ] test-emit ]
 unit-test
 
 ! hlshift
-{ { ##horizontal-shl-vector-imm } }
+{ { horizontal-shl-vector-imm## } }
 [ horizontal-shift-cpu 2 int-4-rep [ emit-simd-hlshift ] test-emit-literal ]
 unit-test
 
 ! hrshift
-{ { ##horizontal-shr-vector-imm } }
+{ { horizontal-shr-vector-imm## } }
 [ horizontal-shift-cpu 2 int-4-rep [ emit-simd-hrshift ] test-emit-literal ]
 unit-test
 
@@ -385,44 +385,44 @@ TUPLE: shuffle-cpu < simple-ops-cpu ;
 M: shuffle-cpu %shuffle-vector-reps signed-reps ;
 
 ! vshuffle-elements
-{ { ##load-reference ##shuffle-vector } }
+{ { load-reference## shuffle-vector## } }
 [ shuffle-cpu { 0 1 2 3 } int-4-rep [ emit-simd-vshuffle-elements ] test-emit-literal ]
 unit-test
 
-{ { ##shuffle-vector-imm } }
+{ { shuffle-vector-imm## } }
 [ shuffle-imm-cpu { 0 1 2 3 } int-4-rep [ emit-simd-vshuffle-elements ] test-emit-literal ]
 unit-test
 
 ! vshuffle-bytes
-{ { ##shuffle-vector } }
+{ { shuffle-vector## } }
 [ shuffle-cpu int-4-rep [ emit-simd-vshuffle-bytes ] test-emit ]
 unit-test
 
 ! vmerge-head
-{ { ##merge-vector-head } }
+{ { merge-vector-head## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vmerge-head ] test-emit ]
 unit-test
 
 ! vmerge-tail
-{ { ##merge-vector-tail } }
+{ { merge-vector-tail## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-vmerge-tail ] test-emit ]
 unit-test
 
 ! v<= etc.
-{ { ##compare-vector } }
+{ { compare-vector## } }
 [ compare-cpu int-4-rep [ emit-simd-v<= ] test-emit ]
 unit-test
 
-{ { ##min-vector ##compare-vector } }
+{ { min-vector## compare-vector## } }
 [ minmax-cpu int-4-rep [ emit-simd-v<= ] test-emit ]
 unit-test
 
-{ { ##load-reference ##xor-vector ##xor-vector ##compare-vector } }
+{ { load-reference## xor-vector## xor-vector## compare-vector## } }
 [ compare-cpu uint-4-rep [ emit-simd-v<= ] test-emit ]
 unit-test
 
 ! vany? etc.
-{ { ##test-vector } }
+{ { test-vector## } }
 [ simple-ops-cpu int-4-rep [ emit-simd-vany? ] test-emit ]
 unit-test
 
@@ -435,7 +435,7 @@ M: convert-cpu %float>integer-vector-reps { float-4-rep } ;
 [ convert-cpu float-4-rep [ emit-simd-v>float ] test-emit ]
 unit-test
 
-{ { ##integer>float-vector } }
+{ { integer>float-vector## } }
 [ convert-cpu int-4-rep [ emit-simd-v>float ] test-emit ]
 unit-test
 
@@ -444,17 +444,17 @@ unit-test
 [ convert-cpu int-4-rep [ emit-simd-v>integer ] test-emit ]
 unit-test
 
-{ { ##float>integer-vector } }
+{ { float>integer-vector## } }
 [ convert-cpu float-4-rep [ emit-simd-v>integer ] test-emit ]
 unit-test
 
 ! vpack-signed
-{ { ##signed-pack-vector } }
+{ { signed-pack-vector## } }
 [ simple-ops-cpu int-4-rep [ emit-simd-vpack-signed ] test-emit ]
 unit-test
 
 ! vpack-unsigned
-{ { ##unsigned-pack-vector } }
+{ { unsigned-pack-vector## } }
 [ simple-ops-cpu int-4-rep [ emit-simd-vpack-unsigned ] test-emit ]
 unit-test
 
@@ -464,71 +464,71 @@ TUPLE: unpack-cpu < unpack-head-cpu ;
 M: unpack-cpu %unpack-vector-tail-reps all-reps ;
 
 ! vunpack-head
-{ { ##unpack-vector-head } }
+{ { unpack-vector-head## } }
 [ unpack-head-cpu int-4-rep [ emit-simd-vunpack-head ] test-emit ]
 unit-test
 
-{ { ##zero-vector ##merge-vector-head } }
+{ { zero-vector## merge-vector-head## } }
 [ simple-ops-cpu uint-4-rep [ emit-simd-vunpack-head ] test-emit ]
 unit-test
 
-{ { ##merge-vector-head ##shr-vector-imm } }
+{ { merge-vector-head## shr-vector-imm## } }
 [ shift-imm-cpu int-4-rep [ emit-simd-vunpack-head ] test-emit ]
 unit-test
 
-{ { ##zero-vector ##compare-vector ##merge-vector-head } }
+{ { zero-vector## compare-vector## merge-vector-head## } }
 [ compare-cpu int-4-rep [ emit-simd-vunpack-head ] test-emit ]
 unit-test
 
 ! vunpack-tail
-{ { ##unpack-vector-tail } }
+{ { unpack-vector-tail## } }
 [ unpack-cpu int-4-rep [ emit-simd-vunpack-tail ] test-emit ]
 unit-test
 
-{ { ##tail>head-vector ##unpack-vector-head } }
+{ { tail>head-vector## unpack-vector-head## } }
 [ unpack-head-cpu int-4-rep [ emit-simd-vunpack-tail ] test-emit ]
 unit-test
 
-{ { ##zero-vector ##merge-vector-tail } }
+{ { zero-vector## merge-vector-tail## } }
 [ simple-ops-cpu uint-4-rep [ emit-simd-vunpack-tail ] test-emit ]
 unit-test
 
-{ { ##merge-vector-tail ##shr-vector-imm } }
+{ { merge-vector-tail## shr-vector-imm## } }
 [ shift-imm-cpu int-4-rep [ emit-simd-vunpack-tail ] test-emit ]
 unit-test
 
-{ { ##zero-vector ##compare-vector ##merge-vector-tail } }
+{ { zero-vector## compare-vector## merge-vector-tail## } }
 [ compare-cpu int-4-rep [ emit-simd-vunpack-tail ] test-emit ]
 unit-test
 
 ! with
-{ { ##scalar>vector ##shuffle-vector-imm } }
+{ { scalar>vector## shuffle-vector-imm## } }
 [ shuffle-imm-cpu float-4-rep [ emit-simd-with ] test-emit ]
 unit-test
 
 ! gather-2
-{ { ##gather-vector-2 } }
+{ { gather-vector-2## } }
 [ simple-ops-cpu double-2-rep [ emit-simd-gather-2 ] test-emit ]
 unit-test
 
 ! gather-4
-{ { ##gather-vector-4 } }
+{ { gather-vector-4## } }
 [ simple-ops-cpu float-4-rep [ emit-simd-gather-4 ] test-emit ]
 unit-test
 
 ! select
-{ { ##shuffle-vector-imm ##vector>scalar } }
+{ { shuffle-vector-imm## vector>scalar## } }
 [ shuffle-imm-cpu 1 float-4-rep [ emit-simd-select ] test-emit-literal ]
 unit-test
 
 ! ^load-neg-zero-vector
 {
     V{
-        T{ ##load-reference
+        T{ load-reference##
            { dst 1 }
            { obj B{ 0 0 0 128 0 0 0 128 0 0 0 128 0 0 0 128 } }
         }
-        T{ ##load-reference
+        T{ load-reference##
            { dst 2 }
            { obj B{ 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 128 } }
         }
@@ -542,33 +542,33 @@ unit-test
 ! ^load-add-sub-vector
 {
     V{
-        T{ ##load-reference
+        T{ load-reference##
            { dst 1 }
            { obj B{ 0 0 0 128 0 0 0 0 0 0 0 128 0 0 0 0 } }
         }
-        T{ ##load-reference
+        T{ load-reference##
            { dst 2 }
            { obj B{ 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 0 } }
         }
-        T{ ##load-reference
+        T{ load-reference##
            { dst 3 }
            { obj
              B{ 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 }
            }
         }
-        T{ ##load-reference
+        T{ load-reference##
            { dst 4 }
            { obj
              B{ 255 255 0 0 255 255 0 0 255 255 0 0 255 255 0 0 }
            }
         }
-        T{ ##load-reference
+        T{ load-reference##
            { dst 5 }
            { obj
              B{ 255 255 255 255 0 0 0 0 255 255 255 255 0 0 0 0 }
            }
         }
-        T{ ##load-reference
+        T{ load-reference##
            { dst 6 }
            { obj
              B{ 255 255 255 255 255 255 255 255 0 0 0 0 0 0 0 0 }
@@ -591,11 +591,11 @@ unit-test
 ! ^load-half-vector
 {
     V{
-        T{ ##load-reference
+        T{ load-reference##
            { dst 1 }
            { obj B{ 0 0 0 63 0 0 0 63 0 0 0 63 0 0 0 63 } }
         }
-        T{ ##load-reference
+        T{ load-reference##
            { dst 2 }
            { obj B{ 0 0 0 0 0 0 224 63 0 0 0 0 0 0 224 63 } }
         }

@@ -18,7 +18,7 @@ HELP: next-vreg-rep
 
 HELP: rep-of
 { $values { "vreg" number } { "rep" representation } }
-{ $description "Gets the representation for a virtual register. This word cannot be called before representation selection has run; use any-rep for " { $link ##copy } " instructions and so on." }
+{ $description "Gets the representation for a virtual register. This word cannot be called before representation selection has run; use any-rep for " { $link copy## } " instructions and so on." }
 { $notes
   { $list
     { "Throws " { $link bad-vreg } " if the representation for the vreg isn't known." }

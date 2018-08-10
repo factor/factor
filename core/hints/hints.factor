@@ -42,7 +42,7 @@ M: object specializer-declaration class-of ;
     [ drop ] [ specializer-cases ] 2bi alist>quot ;
 
 : method-declaration ( method -- quot )
-    [ "method-generic" word-prop dispatch# object <array> ]
+    [ "method-generic" word-prop dispatch-number object <array> ]
     [ "method-class" word-prop ]
     bi prefix [ declare ] curry [ ] like ;
 

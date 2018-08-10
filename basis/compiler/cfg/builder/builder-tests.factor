@@ -169,73 +169,73 @@ IN: compiler.cfg.builder.tests
     { pinned-c-ptr class fixnum } \ set-alien-cell '[ _ declare _ execute ] unit-test-builder
 ] each
 
-{ t } [ [ swap ] [ ##replace? ] contains-insn? ] unit-test
+{ t } [ [ swap ] [ replace##? ] contains-insn? ] unit-test
 
-{ f } [ [ swap swap ] [ ##replace? ] contains-insn? ] unit-test
+{ f } [ [ swap swap ] [ replace##? ] contains-insn? ] unit-test
 
 { t } [
     [ { fixnum byte-array fixnum } declare set-alien-unsigned-1 ]
-    [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
+    [ [ store-memory##? ] [ store-memory-imm##? ] bi or ] contains-insn?
 ] unit-test
 
 { t } [
     [ { fixnum byte-array fixnum } declare [ dup * dup * ] 2dip set-alien-unsigned-1 ]
-    [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
+    [ [ store-memory##? ] [ store-memory-imm##? ] bi or ] contains-insn?
 ] unit-test
 
 { f } [
     [ { byte-array fixnum } declare set-alien-unsigned-1 ]
-    [ [ ##store-memory? ] [ ##store-memory-imm? ] bi or ] contains-insn?
+    [ [ store-memory##? ] [ store-memory-imm##? ] bi or ] contains-insn?
 ] unit-test
 
 { t t } [
     [ { byte-array fixnum } declare alien-cell ]
-    [ [ [ ##load-memory? ] [ ##load-memory-imm? ] bi or ] contains-insn? ]
-    [ [ ##box-alien? ] contains-insn? ]
+    [ [ [ load-memory##? ] [ load-memory-imm##? ] bi or ] contains-insn? ]
+    [ [ box-alien##? ] contains-insn? ]
     bi
 ] unit-test
 
 { f } [
     [ { byte-array integer } declare alien-cell ]
-    [ [ ##load-memory? ] [ ##load-memory-imm? ] bi or ] contains-insn?
+    [ [ load-memory##? ] [ load-memory-imm##? ] bi or ] contains-insn?
 ] unit-test
 
 { f } [
-    [ 1000 [ ] times ] [ ##peek? ] contains-insn?
+    [ 1000 [ ] times ] [ peek##? ] contains-insn?
 ] unit-test
 
 { f t } [
     [ { fixnum alien } declare <displaced-alien> 0 alien-cell ]
-    [ [ ##unbox-any-c-ptr? ] contains-insn? ]
-    [ [ ##unbox-alien? ] contains-insn? ] bi
+    [ [ unbox-any-c-ptr##? ] contains-insn? ]
+    [ [ unbox-alien##? ] contains-insn? ] bi
 ] unit-test
 
 \ alien-float "intrinsic" word-prop [
     [ f t ] [
         [ { byte-array fixnum } declare alien-cell 4 alien-float ]
-        [ [ ##box-alien? ] contains-insn? ]
-        [ [ ##allot? ] contains-insn? ] bi
+        [ [ box-alien##? ] contains-insn? ]
+        [ [ allot##? ] contains-insn? ] bi
     ] unit-test
 
     [ f t ] [
         [ { byte-array fixnum } declare alien-cell { alien } declare 4 alien-float ]
-        [ [ ##box-alien? ] contains-insn? ]
-        [ [ ##allot? ] contains-insn? ] bi
+        [ [ box-alien##? ] contains-insn? ]
+        [ [ allot##? ] contains-insn? ] bi
     ] unit-test
 
-    [ 1 ] [ [ dup float+ ] [ ##load-memory-imm? ] count-insns ] unit-test
+    [ 1 ] [ [ dup float+ ] [ load-memory-imm##? ] count-insns ] unit-test
 ] when
 
 ! Regression. Make sure everything is inlined correctly
-{ f } [ M\\ hashtable set-at [ { [ ##call? ] [ word>> \ set-slot eq? ] } 1&& ] contains-insn? ] unit-test
+{ f } [ M\\ hashtable set-at [ { [ call##? ] [ word>> \ set-slot eq? ] } 1&& ] contains-insn? ] unit-test
 
 ! Regression. Make sure branch splitting works.
-{ 2 } [ [ 1 2 ? ] [ ##return? ] count-insns ] unit-test
+{ 2 } [ [ 1 2 ? ] [ return##? ] count-insns ] unit-test
 
 ! Make sure fast union predicates don't have conditionals.
 { f } [
     [ tag 1 swap fixnum-shift-fast ]
-    [ ##compare-integer-imm-branch? ] contains-insn?
+    [ compare-integer-imm-branch##? ] contains-insn?
 ] unit-test
 
 ! begin-cfg
@@ -253,7 +253,7 @@ SYMBOL: foo
 
 ! emit-branch
 { 77 } [
-    { T{ #call { word + } } }
+    { T{ call# { word + } } }
     V{ } 77 insns>block
     emit-branch
     first predecessors>>
@@ -264,7 +264,7 @@ SYMBOL: foo
 
 ! emit-call
 {
-    V{ T{ ##call { word print } } T{ ##branch } }
+    V{ T{ call## { word print } } T{ branch## } }
 } [
     <basic-block> dup set-basic-block \ print 4 emit-call
     predecessors>> first instructions>>
@@ -272,13 +272,13 @@ SYMBOL: foo
 
 ! emit-if
 { V{ 3 2 } } [
-    <basic-block> dup set-basic-block ##branch,
-    T{ #if
+    <basic-block> dup set-basic-block branch##,
+    T{ if#
        { in-d { 9 } }
        { children
          {
-             { T{ #push { literal 3 } { out-d { 6 } } } }
-             { T{ #push { literal 2 } { out-d { 7 } } } }
+             { T{ push# { literal 3 } { out-d { 6 } } } }
+             { T{ push# { literal 2 } { out-d { 7 } } } }
          }
        }
        { live-branches { t t } }
@@ -295,21 +295,21 @@ SYMBOL: foo
 
 ! emit-node
 
-! ! #call
+! ! call#
 {
     V{
-        T{ ##load-integer { dst 3 } { val 0 } }
-        T{ ##add { dst 4 } { src1 3 } { src2 2 } }
-        T{ ##load-memory-imm
+        T{ load-integer## { dst 3 } { val 0 } }
+        T{ add## { dst 4 } { src1 3 } { src2 2 } }
+        T{ load-memory-imm##
            { dst 5 }
            { base 4 }
            { offset 0 }
            { rep int-rep }
         }
-        T{ ##box-alien { dst 7 } { src 5 } { temp 6 } }
+        T{ box-alien## { dst 7 } { src 5 } { temp 6 } }
     }
 } [
-    f T{ #call
+    f T{ call#
        { word alien-cell }
        { in-d V{ 10 20 } }
        { out-d { 30 } }
@@ -317,7 +317,7 @@ SYMBOL: foo
 ] cfg-unit-test
 
 : call-node-1 ( -- node )
-    T{ #call
+    T{ call#
        { word set-slot }
        { in-d V{ 1 2 3 } }
        { out-d { } }
@@ -349,7 +349,7 @@ SYMBOL: foo
     } ;
 
 {
-    V{ T{ ##call { word set-slot } } T{ ##branch } }
+    V{ T{ call## { word set-slot } } T{ branch## } }
 } [
     [
          <basic-block> dup set-basic-block call-node-1 emit-node
@@ -357,21 +357,21 @@ SYMBOL: foo
     predecessors>> first instructions>>
 ] cfg-unit-test
 
-! ! #push
+! ! push#
 {
-    { T{ ##load-integer { dst 78 } { val 0 } } }
+    { T{ load-integer## { dst 78 } { val 0 } } }
 } [
     77 vreg-counter set-global
-    [ f T{ #push { literal 0 } { out-d { 8537399 } } } emit-node drop ] { } make
+    [ f T{ push# { literal 0 } { out-d { 8537399 } } } emit-node drop ] { } make
 ] cfg-unit-test
 
-! ! #shuffle
+! ! shuffle#
 {
     T{ height-state f 0 0 1 0 }
     H{ { d: -1 4 } { d: 0 4 } }
 } [
     4 d: 0 replace-loc
-    f T{ #shuffle
+    f T{ shuffle#
        { mapping { { 2 4 } { 3 4 } } }
        { in-d V{ 4 } }
        { out-d V{ 2 3 } }
@@ -380,19 +380,19 @@ SYMBOL: foo
     replaces get
 ] cfg-unit-test
 
-! ! #terminate
+! ! terminate#
 
 { f } [
     <basic-block> dup set-basic-block
-    T{ #terminate { in-d { } } { in-r { } } } emit-node
+    T{ terminate# { in-d { } } { in-r { } } } emit-node
 ] cfg-unit-test
 
 ! end-word
 {
     V{
-        T{ ##safepoint }
-        T{ ##epilogue }
-        T{ ##return }
+        T{ safepoint## }
+        T{ epilogue## }
+        T{ return## }
     }
 } [
     <basic-block> dup set-basic-block end-word instructions>>
@@ -400,28 +400,28 @@ SYMBOL: foo
 
 ! height-changes
 { { -2 0 } } [
-    T{ #shuffle { in-d { 37 81 92 } } { out-d { 20 } } } height-changes
+    T{ shuffle# { in-d { 37 81 92 } } { out-d { 20 } } } height-changes
 ] unit-test
 
 ! make-input-map
 {
     { { 37 d: 2 } { 81 d: 1 } { 92 d: 0 } }
 } [
-    T{ #shuffle { in-d { 37 81 92 } } } make-input-map
+    T{ shuffle# { in-d { 37 81 92 } } } make-input-map
 ] unit-test
 
 ! store-shuffle
 {
     H{ { d: 2 1 } }
 } [
-    f T{ #shuffle { in-d { 7 3 0 } } { out-d { 55 } } { mapping { { 55 3 } } } }
+    f T{ shuffle# { in-d { 7 3 0 } } { out-d { 55 } } { mapping { { 55 3 } } } }
     emit-node drop replaces get
 ] cfg-unit-test
 
 {
     H{ { d: -1 1 } { d: 0 1 } }
 } [
-    f T{ #shuffle
+    f T{ shuffle#
        { in-d { 7 } }
        { out-d { 55 77 } }
        { mapping { { 55 7 } { 77 7 } } }

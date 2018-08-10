@@ -314,7 +314,7 @@ cell 4 = [
 ! Regression from Slava's value numbering changes
 [ 1 ] [ 31337 [ dup fixnum<= [ 1 ] [ 2 ] if ] compile-call ] unit-test
 
-! Bug with ##return node construction
+! Bug with return## node construction
 : return-recursive-bug ( nodes -- ? )
     { fixnum } declare <iota> [
         dup 3 bitand 1 = [ drop t ] [
@@ -450,7 +450,7 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
     [ 2.0 4 [ 2.0 fpow ] times 1.0 float+ ] compile-call
 ] unit-test
 
-! ##box-displaced-alien is a def-is-use instruction
+! box-displaced-alien## is a def-is-use instruction
 [ alien: 3e9 ] [
     [
         f

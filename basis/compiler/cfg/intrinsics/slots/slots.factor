@@ -44,22 +44,22 @@ IN: compiler.cfg.intrinsics.slots
 
     2inputs :> ( src obj )
 
-    src obj slot tag ##set-slot-imm,
+    src obj slot tag set-slot-imm##,
 
     write-barrier?
-    [ obj slot tag next-vreg next-vreg ##write-barrier-imm, ] when ;
+    [ obj slot tag next-vreg next-vreg write-barrier-imm##, ] when ;
 
 :: (emit-set-slot) ( write-barrier? tag -- )
     3inputs :> ( src obj slot )
 
     slot tag slot-indexing :> ( slot scale tag )
 
-    src obj slot scale tag ##set-slot,
+    src obj slot scale tag set-slot##,
 
     write-barrier?
-    [ obj slot scale tag next-vreg next-vreg ##write-barrier, ] when ;
+    [ obj slot scale tag next-vreg next-vreg write-barrier##, ] when ;
 
-: node>set-slot-data ( #call -- write-barrier? tag literal )
+: node>set-slot-data ( call# -- write-barrier? tag literal )
     node-input-infos first3
     [ class>> immediate class<= not ] [ value-tag ] [ literal>> ] tri* ;
 
@@ -68,7 +68,7 @@ IN: compiler.cfg.intrinsics.slots
         (emit-set-slot-imm)
     ] [ drop (emit-set-slot) ] if ;
 
-: emit-set-slot ( block #call -- block' )
+: emit-set-slot ( block call# -- block' )
     dup node>set-slot-data over [
         emit-intrinsic-set-slot drop
     ] [ 3drop emit-primitive ] if ;

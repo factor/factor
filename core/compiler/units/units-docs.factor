@@ -67,7 +67,7 @@ HELP: redefine-error
 { $error-description "Indicates that a single source file contains two definitions for the same artifact, one of which shadows the other. This is an error since it indicates a likely mistake, such as two words accidentally named the same by the developer; the error is restartable." } ;
 
 HELP: remember-definition
-{ $values { "definition" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
+{ $values { "definition" "a definition specifier" } { "loc" "a " { $snippet "{ path line-number }" } " pair" } }
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
 HELP: with-compilation-unit

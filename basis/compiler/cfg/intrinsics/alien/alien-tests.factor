@@ -7,8 +7,8 @@ IN: compiler.cfg.intrinsics.alien.tests
 
 ! emit-<displaced-alien>
 
-: call-<displaced-alien> ( -- #call )
-    T{ #call
+: call-<displaced-alien> ( -- call# )
+    T{ call#
        { word <displaced-alien> }
        { in-d V{ 8583268 8583269 } }
        { out-d { 8583267 } }
@@ -41,8 +41,8 @@ IN: compiler.cfg.intrinsics.alien.tests
 
 {
     V{
-        T{ ##call { word <displaced-alien> } }
-        T{ ##branch }
+        T{ call## { word <displaced-alien> } }
+        T{ branch## }
     }
 } [
     <basic-block> dup set-basic-block
@@ -53,19 +53,19 @@ IN: compiler.cfg.intrinsics.alien.tests
 ! emit-alien-cell
 {
     V{
-        T{ ##load-integer { dst 3 } { val 0 } }
-        T{ ##add { dst 4 } { src1 3 } { src2 2 } }
-        T{ ##load-memory-imm
+        T{ load-integer## { dst 3 } { val 0 } }
+        T{ add## { dst 4 } { src1 3 } { src2 2 } }
+        T{ load-memory-imm##
            { dst 5 }
            { base 4 }
            { offset 0 }
            { rep int-rep }
         }
-        T{ ##box-alien { dst 7 } { src 5 } { temp 6 } }
+        T{ box-alien## { dst 7 } { src 5 } { temp 6 } }
     }
 } [
     <basic-block>
-    T{ #call
+    T{ call#
        { word alien-cell }
        { in-d V{ 10 20 } }
        { out-d { 30 } }

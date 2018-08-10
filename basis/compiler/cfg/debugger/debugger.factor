@@ -41,7 +41,7 @@ M: word test-builder
 
 GENERIC: insn. ( insn -- )
 
-M: ##phi insn.
+M: phi## insn.
     clone [ [ [ number>> ] dip ] assoc-map ] change-inputs
     call-next-method ;
 

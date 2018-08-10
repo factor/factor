@@ -26,7 +26,7 @@ IN: compiler.cfg.linear-scan.assignment.tests
 ! activate-new-intervals
 {
     {
-        T{ ##reload
+        T{ reload##
            { dst RBX }
            { rep tagged-rep }
            { src T{ spill-slot } }
@@ -52,40 +52,40 @@ IN: compiler.cfg.linear-scan.assignment.tests
 
 ! assign-insn-defs
 {
-    T{ ##peek { dst RAX } { loc T{ ds-loc } } { insn# 0 } }
+    T{ peek## { dst RAX } { loc T{ ds-loc } } { insn# 0 } }
 } [
     H{ { 37 RAX } } pending-interval-assoc set
     { { 37 int-rep 37 f } } setup-vreg-spills
-    T{ ##peek f 37 d: 0 0 } [ assign-insn-defs ] keep
+    T{ peek## f 37 d: 0 0 } [ assign-insn-defs ] keep
 ] unit-test
 
 ! assign-all-registers
 {
-    T{ ##replace-imm f 20 d: 0 f }
-    T{ ##replace f RAX d: 0 f }
+    T{ replace-imm## f 20 d: 0 f }
+    T{ replace## f RAX d: 0 f }
 } [
-    ! It doesn't do anything because ##replace-imm isn't a vreg-insn.
-    T{ ##replace-imm { src 20 } { loc d: 0 } } [ assign-all-registers ] keep
+    ! It doesn't do anything because replace-imm## isn't a vreg-insn.
+    T{ replace-imm## { src 20 } { loc d: 0 } } [ assign-all-registers ] keep
 
     ! This one does something.
     H{ { 37 RAX } } pending-interval-assoc set
     H{ { 37 37 } } leader-map set
-    T{ ##replace { src 37 } { loc d: 0 } } clone
+    T{ replace## { src 37 } { loc d: 0 } } clone
     [ assign-all-registers ] keep
 ] unit-test
 
 ! assign-registers
 { } [
-    V{ T{ ##inc { loc d: 3 } { insn# 7 } } } 0 insns>block block>cfg { }
+    V{ T{ inc## { loc d: 3 } { insn# 7 } } } 0 insns>block block>cfg { }
     assign-registers
 ] unit-test
 
 ! assign-registers-in-block
 {
-    V{ T{ ##inc { loc T{ ds-loc { n 3 } } } { insn# 7 } } }
+    V{ T{ inc## { loc T{ ds-loc { n 3 } } } { insn# 7 } } }
 } [
     { } init-assignment
-    V{ T{ ##inc { loc d: 3 } { insn# 7 } } } 0 insns>block
+    V{ T{ inc## { loc d: 3 } { insn# 7 } } } 0 insns>block
     [ assign-registers-in-block ] keep instructions>>
 ] unit-test
 
@@ -99,7 +99,7 @@ IN: compiler.cfg.linear-scan.assignment.tests
 
 ! insert-reload
 {
-    { T{ ##reload { dst RAX } { rep int-rep } { src T{ spill-slot } } } }
+    { T{ reload## { dst RAX } { rep int-rep } { src T{ spill-slot } } } }
 } [
     [
         T{ live-interval-state
@@ -111,13 +111,13 @@ IN: compiler.cfg.linear-scan.assignment.tests
 ] unit-test
 
 ! insert-spill
-{ { T{ ##spill { src RAX } } } } [
+{ { T{ spill## { src RAX } } } } [
     [
         T{ live-interval-state { vreg 1234 } { reg RAX } } insert-spill
     ] { } make
 ] unit-test
 
-{ V{ T{ ##spill { src RAX } { rep int-rep } } } } [
+{ V{ T{ spill## { src RAX } { rep int-rep } } } } [
     [
         1234 <live-interval>
         RAX >>reg int-rep >>spill-rep
@@ -130,9 +130,9 @@ IN: compiler.cfg.linear-scan.assignment.tests
 ! The interval should be spilled around the gc instruction at 128. And
 ! it's spill representation should be int-rep because on instruction
 ! 102 it was converted from a tagged-rep to an int-rep.
-: test-call-gc ( -- ##call-gc )
+: test-call-gc ( -- call-gc## )
     T{ gc-map { gc-roots { 149 109 110 } } { derived-roots V{ } } } 128
-    ##call-gc boa ;
+    call-gc## boa ;
 
 : test-interval ( -- live-interval )
     T{ live-interval-state

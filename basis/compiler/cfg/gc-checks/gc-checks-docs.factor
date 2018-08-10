@@ -29,7 +29,7 @@ HELP: blocks-with-gc
 
 HELP: gc-check-offsets
 { $values { "insns" sequence } { "seq" sequence } }
-{ $description "A basic block is divided into sections by " { $link ##call } " and " { $link ##phi } " instructions. For every section with at least one allocation, record the offset of its first instruction in a sequence." } ;
+{ $description "A basic block is divided into sections by " { $link call## } " and " { $link phi## } " instructions. For every section with at least one allocation, record the offset of its first instruction in a sequence." } ;
 
 HELP: insert-gc-check?
 { $values { "bb" basic-block } { "?" boolean } }

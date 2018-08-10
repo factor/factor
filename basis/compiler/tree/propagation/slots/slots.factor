@@ -9,7 +9,7 @@ IN: compiler.tree.propagation.slots
 : sequence-constructor? ( word -- ? )
     { <array> <byte-array> (byte-array) <string> } member-eq? ;
 
-: propagate-sequence-constructor ( #call word -- infos )
+: propagate-sequence-constructor ( call# word -- infos )
     [ in-d>> first value-info ]
     [ "default-output-classes" word-prop first ] bi*
     <sequence-info> 1array ;
@@ -32,7 +32,7 @@ IN: compiler.tree.propagation.slots
     [ read-only-slots ] keep 2dup fold-<tuple-boa>?
     [ [ rest-slice ] dip fold-<tuple-boa> ] [ <tuple-info> ] if ;
 
-: propagate-<tuple-boa> ( #call -- infos )
+: propagate-<tuple-boa> ( call# -- infos )
     in-d>> unclip-last
     value-info literal>> first (propagate-<tuple-boa>) 1array ;
 

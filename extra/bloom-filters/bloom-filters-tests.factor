@@ -12,7 +12,7 @@ IN: bloom-filters.tests
 ! Test bloom-filter creation
 { 47965 } [ 7 0.01 5000 bits-to-satisfy-error-rate ] unit-test
 { 7 47965 } [ 0.01 5000 size-bloom-filter ] unit-test
-{ 7 } [ 0.01 5000 <bloom-filter> #hashes>> ] unit-test
+{ 7 } [ 0.01 5000 <bloom-filter> n-hashes>> ] unit-test
 { 47965 } [ 0.01 5000 <bloom-filter> bits>> length ] unit-test
 { 5000 } [ 0.01 5000 <bloom-filter> capacity>> ] unit-test
 { 0 } [ 0.01 5000 <bloom-filter> count>> ] unit-test

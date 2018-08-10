@@ -10,7 +10,7 @@ IN: compiler.cfg.gvn.slots
 
 : simplify-slot-addressing? ( insn -- ? )
     complex-addressing? [
-        slot>> vreg>insn [ ##add-imm? ] with-available-uses?
+        slot>> vreg>insn [ add-imm##? ] with-available-uses?
     ] [ drop f ] if ;
 
 : simplify-slot-addressing ( insn -- insn/f )
@@ -21,6 +21,6 @@ IN: compiler.cfg.gvn.slots
         bi
     ] [ drop f ] if ;
 
-M: ##slot rewrite simplify-slot-addressing ;
-M: ##set-slot rewrite simplify-slot-addressing ;
-M: ##write-barrier rewrite simplify-slot-addressing ;
+M: slot## rewrite simplify-slot-addressing ;
+M: set-slot## rewrite simplify-slot-addressing ;
+M: write-barrier## rewrite simplify-slot-addressing ;

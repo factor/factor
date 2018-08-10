@@ -112,7 +112,7 @@ ERROR: unknown-cpuinfo-line string ;
     [ [ physical-id>> ] bi@ = ] monotonic-split
     [ [ [ core-id>> ] bi@ = ] monotonic-split ] map ;
 
-: cpu-counts ( seq -- #cpus #cores #hyperthread )
+: cpu-counts ( seq -- n-cpus n-cores n-hyperthread )
     [ length ]
     [ [ length ] map-sum ]
     [ [ [ length ] map-sum ] map-sum ] tri ;

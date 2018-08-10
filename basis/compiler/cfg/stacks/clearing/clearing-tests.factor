@@ -6,13 +6,13 @@ IN: compiler.cfg.stacks.clearing.tests
 ! clear-uninitialized
 {
     V{
-        T{ ##inc { loc d: 2 } { insn# 0 } }
-        T{ ##clear { loc T{ ds-loc { n 1 } } } }
-        T{ ##clear { loc T{ ds-loc } } }
-        T{ ##peek { loc d: 2 } { insn# 1 } }
+        T{ inc## { loc d: 2 } { insn# 0 } }
+        T{ clear## { loc T{ ds-loc { n 1 } } } }
+        T{ clear## { loc T{ ds-loc } } }
+        T{ peek## { loc d: 2 } { insn# 1 } }
     }
 } [
-    { T{ ##inc f d: 2 } T{ ##peek f f d: 2 } } insns>cfg
+    { T{ inc## f d: 2 } T{ peek## f f d: 2 } } insns>cfg
     dup clear-uninitialized cfg>insns
 ] unit-test
 
@@ -20,10 +20,10 @@ IN: compiler.cfg.stacks.clearing.tests
 {
     t f t t
 } [
-    { { 0 { } } { 0 { } } } T{ ##peek { loc d: 0 } } dangerous-insn?
-    { { 1 { } } { 0 { } } } T{ ##peek { loc d: 0 } } dangerous-insn?
-    { { 2 { 0 1 } } { 0 { } } } T{ ##peek { loc d: 2 } } dangerous-insn?
-    { { 0 { } } { 3 { } } } T{ ##call-gc } dangerous-insn?
+    { { 0 { } } { 0 { } } } T{ peek## { loc d: 0 } } dangerous-insn?
+    { { 1 { } } { 0 { } } } T{ peek## { loc d: 0 } } dangerous-insn?
+    { { 2 { 0 1 } } { 0 { } } } T{ peek## { loc d: 2 } } dangerous-insn?
+    { { 0 { } } { 3 { } } } T{ call-gc## } dangerous-insn?
 ] unit-test
 
 ! state>clears
@@ -35,8 +35,8 @@ IN: compiler.cfg.stacks.clearing.tests
 
 {
     {
-        T{ ##clear { loc T{ ds-loc { n 1 } } } }
-        T{ ##clear { loc T{ ds-loc } } }
+        T{ clear## { loc T{ ds-loc { n 1 } } } }
+        T{ clear## { loc T{ ds-loc } } }
     }
 } [
     { { 2 { 0 1 } } { 0 { } } } state>clears
@@ -48,8 +48,8 @@ IN: compiler.cfg.stacks.clearing.tests
 
 {
     {
-        T{ ##clear { loc T{ ds-loc } } }
-        T{ ##clear { loc T{ rs-loc } } }
+        T{ clear## { loc T{ ds-loc } } }
+        T{ clear## { loc T{ rs-loc } } }
     }
 } [
     { { 1 { 0 } } { 1 { 0 } } } state>clears

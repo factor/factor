@@ -18,11 +18,11 @@ PRIVATE>
 
 :: random-lines ( n -- lines )
     V{ } clone :> accum
-    |[ line line# |
-        line# n <= [
+    |[ line line-number |
+        line-number n <= [
             line accum push
         ] [
-            line# random :> r
+            line-number random :> r
             r n < [ line r accum set-nth-unsafe ] when
         ] if
     ] each-numbered-line accum ;

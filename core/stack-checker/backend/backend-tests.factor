@@ -78,7 +78,7 @@ SYMBOL: sam-sum
     0 \ <value> set-global [
         V{ } clone stack-visitor set pop-d
     ] with-infer 2nip
-    V{ T{ #introduce { out-d { 1 } } } T{ #return { in-d V{ } } } }
+    V{ T{ introduce# { out-d { 1 } } } T{ return# { in-d V{ } } } }
     node-seqs-eq?
 ] unit-test
 
@@ -105,8 +105,8 @@ SYMBOL: sam-sum
         [ foo ] <literal> infer-literal-quot
     ] with-infer nip
     V{
-        T{ #introduce { out-d { 1 } } }
-        T{ #call { word foo } { in-d V{ 1 } } { out-d { } } }
-        T{ #return { in-d V{ } } }
+        T{ introduce# { out-d { 1 } } }
+        T{ call# { word foo } { in-d V{ 1 } } { out-d { } } }
+        T{ return# { in-d V{ } } }
     } node-seqs-eq?
 ] unit-test

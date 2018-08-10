@@ -22,7 +22,7 @@ TUPLE: spider
     nonmatching
     quiet?
     currently-spidering
-    { #threads integer initial: 1 }
+    { n-threads integer initial: 1 }
     semaphore
     follow-robots?
     robots ;

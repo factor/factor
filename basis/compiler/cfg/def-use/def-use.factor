@@ -17,43 +17,43 @@ M: insn temp-vregs drop { } ;
 M: insn uses-vregs drop { } ;
 
 CONSTANT: special-vreg-insns {
-    ##parallel-copy
-    ##phi
-    ##alien-invoke
-    ##alien-indirect
-    ##alien-assembly
-    ##callback-inputs
-    ##callback-outputs
+    parallel-copy##
+    phi##
+    alien-invoke##
+    alien-indirect##
+    alien-assembly##
+    callback-inputs##
+    callback-outputs##
 }
 
 ! Special defs-vregs methods
-M: ##parallel-copy defs-vregs values>> [ first ] map ;
+M: parallel-copy## defs-vregs values>> [ first ] map ;
 
-M: ##phi defs-vregs dst>> 1array ;
+M: phi## defs-vregs dst>> 1array ;
 
 M: alien-call-insn defs-vregs
     reg-outputs>> [ first ] map ;
 
-M: ##callback-inputs defs-vregs
+M: callback-inputs## defs-vregs
     [ reg-outputs>> ] [ stack-outputs>> ] bi append [ first ] map ;
 
-M: ##callback-outputs defs-vregs drop { } ;
+M: callback-outputs## defs-vregs drop { } ;
 
 ! Special uses-vregs methods
-M: ##parallel-copy uses-vregs values>> [ second ] map ;
+M: parallel-copy## uses-vregs values>> [ second ] map ;
 
-M: ##phi uses-vregs inputs>> values ;
+M: phi## uses-vregs inputs>> values ;
 
 M: alien-call-insn uses-vregs
     [ reg-inputs>> ] [ stack-inputs>> ] bi append [ first ] map ;
 
-M: ##alien-indirect uses-vregs
+M: alien-indirect## uses-vregs
     [ call-next-method ] [ src>> ] bi prefix ;
 
-M: ##callback-inputs uses-vregs
+M: callback-inputs## uses-vregs
     drop { } ;
 
-M: ##callback-outputs uses-vregs
+M: callback-outputs## uses-vregs
     reg-inputs>> [ first ] map ;
 
 ! Generate defs-vregs, uses-vregs and temp-vregs for everything

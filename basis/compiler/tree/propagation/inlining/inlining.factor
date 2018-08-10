@@ -8,29 +8,29 @@ generic.math generic.single generic.standard kernel locals math
 math.partial-dispatch namespaces quotations sequences words ;
 IN: compiler.tree.propagation.inlining
 
-: splicing-call ( #call word -- nodes )
-    [ [ in-d>> ] [ out-d>> ] bi ] dip <#call> 1array ;
+: splicing-call ( call# word -- nodes )
+    [ [ in-d>> ] [ out-d>> ] bi ] dip <call#> 1array ;
 
-: open-code-#call ( #call word/quot -- nodes/f )
+: open-code-call# ( call# word/quot -- nodes/f )
     [ [ in-d>> ] [ out-d>> ] bi ] dip build-sub-tree ;
 
-: splicing-body ( #call quot/word -- nodes/f )
-    open-code-#call dup [ analyze-recursive normalize ] when ;
+: splicing-body ( call# quot/word -- nodes/f )
+    open-code-call# dup [ analyze-recursive normalize ] when ;
 
 ! Dispatch elimination
-: undo-inlining ( #call -- ? )
+: undo-inlining ( call# -- ? )
     f >>method f >>body f >>class drop f ;
 
-: propagate-body ( #call -- ? )
+: propagate-body ( call# -- ? )
     body>> (propagate) t ;
 
-GENERIC: splicing-nodes ( #call word/quot -- nodes/f )
+GENERIC: splicing-nodes ( call# word/quot -- nodes/f )
 
 M: word splicing-nodes splicing-call ;
 
 M: callable splicing-nodes splicing-body ;
 
-: eliminate-dispatch ( #call class/f word/quot/f -- ? )
+: eliminate-dispatch ( call# class/f word/quot/f -- ? )
     dup [
         [ >>class ] dip
         over method>> over = [ drop propagate-body ] [
@@ -40,16 +40,16 @@ M: callable splicing-nodes splicing-body ;
         ] if
     ] [ 2drop undo-inlining ] if ;
 
-: inlining-standard-method ( #call word -- class/f method/f )
+: inlining-standard-method ( call# word -- class/f method/f )
     dup "methods" word-prop assoc-empty? [ 2drop f f ] [
-        2dup [ in-d>> length ] [ dispatch# ] bi* <= [ 2drop f f ] [
-            [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
+        2dup [ in-d>> length ] [ dispatch-number ] bi* <= [ 2drop f f ] [
+            [ in-d>> <reversed> ] [ [ dispatch-number ] keep ] bi*
             [ swap nth value-info class>> dup ] dip
             method-for-class
         ] if
     ] if ;
 
-: inline-standard-method ( #call word -- ? )
+: inline-standard-method ( call# word -- ? )
     dupd inlining-standard-method eliminate-dispatch ;
 
 : normalize-math-class ( class -- class' )
@@ -62,14 +62,14 @@ M: callable splicing-nodes splicing-body ;
         object
     } [ class<= ] with find nip ;
 
-: inlining-math-method ( #call word -- class/f quot/f )
+: inlining-math-method ( call# word -- class/f quot/f )
     swap in-d>>
     first2 [ value-info class>> normalize-math-class ] bi@
     3dup math-both-known?
     [ math-method* ] [ 3drop f ] if
     number swap ;
 
-: inline-math-method ( #call word -- ? )
+: inline-math-method ( call# word -- ? )
     dupd inlining-math-method eliminate-dispatch ;
 
 ! Method body inlining
@@ -79,12 +79,12 @@ SYMBOL: history
 
 : add-to-history ( obj -- ) history [ swap suffix ] change ;
 
-:: inline-word ( #call word -- ? )
+:: inline-word ( call# word -- ? )
     word already-inlined? [ f ] [
-        #call word splicing-body [
+        call# word splicing-body [
             word add-to-history
-            #call body<<
-            #call propagate-body
+            call# body<<
+            call# propagate-body
         ] [ f ] if*
     ] if ;
 
@@ -97,12 +97,12 @@ SYMBOL: history
 : custom-inlining? ( word -- quot/f )
     "custom-inlining" word-prop ;
 
-: inline-custom ( #call word -- ? )
+: inline-custom ( call# word -- ? )
     [ dup ] [ custom-inlining? ] bi*
-    call( #call -- word/quot/f )
+    call( call# -- word/quot/f )
     object swap eliminate-dispatch ;
 
-: (do-inlining) ( #call word -- ? )
+: (do-inlining) ( call# word -- ? )
     {
         { [ dup never-inline-word? ] [ 2drop f ] }
         { [ dup always-inline-word? ] [ inline-word ] }
@@ -112,7 +112,7 @@ SYMBOL: history
         [ 2drop f ]
     } cond ;
 
-: do-inlining ( #call word -- ? )
+: do-inlining ( call# word -- ? )
     [
         dup custom-inlining? [ 2dup inline-custom ] [ f ] if
         [ 2drop t ] [ (do-inlining) ] if

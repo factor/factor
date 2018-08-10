@@ -99,7 +99,7 @@ class-name
 sub-keys
 longest-subkey
 longest-class-string
-#values
+n-values
 max-value
 max-value-data
 security-descriptor
@@ -132,7 +132,7 @@ TUPLE: registry-enum-key ;
     0 DWORD <ref> dup :> sub-keys
     0 DWORD <ref> dup :> longest-subkey
     0 DWORD <ref> dup :> longest-class-string
-    0 DWORD <ref> dup :> #values
+    0 DWORD <ref> dup :> n-values
     0 DWORD <ref> dup :> max-value
     0 DWORD <ref> dup :> max-value-data
     0 DWORD <ref> dup :> security-descriptor
@@ -144,7 +144,7 @@ TUPLE: registry-enum-key ;
         sub-keys uint deref
         longest-subkey uint deref
         longest-class-string uint deref
-        #values uint deref
+        n-values uint deref
         max-value uint deref
         max-value-data uint deref
         security-descriptor uint deref

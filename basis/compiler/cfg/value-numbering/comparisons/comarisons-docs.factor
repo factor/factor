@@ -2,8 +2,8 @@ USING: compiler.cfg.instructions help.markup help.syntax kernel ;
 IN: compiler.cfg.value-numbering.comparisons
 
 HELP: >test-branch
-{ $values { "insn" insn } { "insn'" ##test-branch } }
-{ $description "Converts a " { $link ##compare-integer-imm-branch } " instruction into a " { $link ##test-branch } " instruction." } ;
+{ $values { "insn" insn } { "insn'" test-branch## } }
+{ $description "Converts a " { $link compare-integer-imm-branch## } " instruction into a " { $link test-branch## } " instruction." } ;
 
 HELP: rewrite-into-test?
 { $values { "insn" insn } { "?" boolean } }

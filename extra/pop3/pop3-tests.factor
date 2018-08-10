@@ -29,7 +29,7 @@ FROM: pop3 => count delete ;
 {
     {
         T{ message
-            { # 1 }
+            { n 1 }
             { uidl "000000d547ac2fc2" }
             { from "from.first@mail.com" }
             { to "username@host.com" }
@@ -37,7 +37,7 @@ FROM: pop3 => count delete ;
             { size "1006" }
         }
         T{ message
-            { # 2 }
+            { n 2 }
             { uidl "000000d647ac2fc2" }
             { from "from.second@mail.com" }
             { to "username@host.com" }

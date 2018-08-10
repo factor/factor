@@ -102,10 +102,10 @@ HELP: outdated-generics
 { $see-also remake-generic remake-generics } ;
 
 HELP: set-where
-{ $values { "loc" "a " { $snippet "{ path line# }" } " pair" } { "defspec" "a definition specifier" } }
+{ $values { "loc" "a " { $snippet "{ path line-number }" } " pair" } { "defspec" "a definition specifier" } }
 { $description "Sets the definition's location." }
 { $notes "This word is used by the parser." } ;
 
 HELP: where
-{ $values { "defspec" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
+{ $values { "defspec" "a definition specifier" } { "loc" "a " { $snippet "{ path line-number }" } " pair" } }
 { $description "Outputs the location of a definition. If the location is not known, will output " { $link f } "." } ;

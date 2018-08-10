@@ -17,7 +17,7 @@ IN: compiler.tree.normalization.tests
 : foo ( ..a quot: ( ..a -- ..b ) -- ..b ) call ; inline recursive
 
 : recursive-inputs ( nodes -- n )
-    [ #recursive? ] find nip child>> first in-d>> length ;
+    [ recursive#? ] find nip child>> first in-d>> length ;
 
 { 1 3 } [
     [ [ swap ] foo ] build-tree

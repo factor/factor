@@ -5,4 +5,4 @@ IN: compiler.cfg.intrinsics.simd
 HELP: emit-simd-v+
 { $values { "node" node } }
 { $description "Emits instructions for SIMD vector addition." }
-{ $see-also ##add-vector v+ } ;
+{ $see-also add-vector## v+ } ;

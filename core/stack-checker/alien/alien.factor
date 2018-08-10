@@ -75,7 +75,7 @@ TUPLE: alien-callback-params < alien-node-params
     ! Quotation which coerces parameters to required types
     dup param-prep-quot infer-quot-here
     ! Consume inputs and outputs and add node to IR
-    dup dup inputs/outputs #alien-invoke,
+    dup dup inputs/outputs alien-invoke#,
     ! Quotation which coerces return value to required type
     infer-return ;
 
@@ -88,7 +88,7 @@ TUPLE: alien-callback-params < alien-node-params
     ! Coerce parameters to required types
     dup param-prep-quot '[ _ [ >c-ptr ] bi* ] infer-quot-here
     ! Consume inputs and outputs and add node to IR
-    dup dup inputs/outputs #alien-indirect,
+    dup dup inputs/outputs alien-indirect#,
     ! Quotation which coerces return value to required type
     infer-return ;
 
@@ -102,7 +102,7 @@ TUPLE: alien-callback-params < alien-node-params
     ! Quotation which coerces parameters to required types
     dup param-prep-quot infer-quot-here
     ! Consume inputs and outputs and add node to IR
-    dup dup inputs/outputs #alien-assembly,
+    dup dup inputs/outputs alien-assembly#,
     ! Quotation which coerces return value to required type
     infer-return ;
 
@@ -154,4 +154,4 @@ M: callable wrap-callback-quot
         dup
         dup
     ] dip wrap-callback-quot infer-callback-quot
-    #alien-callback, ;
+    alien-callback#, ;

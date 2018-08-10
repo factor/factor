@@ -7,11 +7,11 @@ IN: bitstreams
 
 TUPLE: widthed
 { bits integer read-only }
-{ #bits integer read-only } ;
+{ n-bits integer read-only } ;
 
-ERROR: invalid-widthed bits #bits ;
+ERROR: invalid-widthed bits n-bits ;
 
-: check-widthed ( bits #bits -- bits #bits )
+: check-widthed ( bits n-bits -- bits n-bits )
     2dup {
         [ nip 0 < ]
         [ { [ nip 0 = ] [ drop 0 = not ] } 2&& ]
@@ -22,7 +22,7 @@ ERROR: invalid-widthed bits #bits ;
         ]
     } 2|| [ invalid-widthed ] when ;
 
-: <widthed> ( bits #bits -- widthed )
+: <widthed> ( bits n-bits -- widthed )
     check-widthed
     widthed boa ;
 
@@ -88,20 +88,20 @@ GENERIC: poke ( value n bitstream -- )
 ERROR: not-enough-widthed-bits widthed n ;
 
 : check-widthed-bits ( widthed n -- widthed n )
-    2dup { [ nip 0 < ] [ [ #bits>> ] dip < ] } 2||
+    2dup { [ nip 0 < ] [ [ n-bits>> ] dip < ] } 2||
     [ not-enough-widthed-bits ] when ;
 
 : widthed-bits ( widthed n -- bits )
     check-widthed-bits
-    [ [ bits>> ] [ #bits>> ] bi ] dip
+    [ [ bits>> ] [ n-bits>> ] bi ] dip
     [ - neg shift ] keep <widthed> ;
 
 : split-widthed ( widthed n -- widthed1 widthed2 )
-    2dup [ #bits>> ] dip < [
+    2dup [ n-bits>> ] dip < [
         drop zero-widthed
     ] [
         [ widthed-bits ]
-        [ [ [ bits>> ] [ #bits>> ] bi ] dip - [ bits ] keep <widthed> ] 2bi
+        [ [ [ bits>> ] [ n-bits>> ] bi ] dip - [ bits ] keep <widthed> ] 2bi
     ] if ;
 
 : widthed>bytes ( widthed -- bytes widthed )
@@ -110,20 +110,20 @@ ERROR: not-enough-widthed-bits widthed n ;
 
 :: |widthed ( widthed1 widthed2 -- widthed3 )
     widthed1 bits>> :> bits1
-    widthed1 #bits>> :> #bits1
+    widthed1 n-bits>> :> n-bits1
     widthed2 bits>> :> bits2
-    widthed2 #bits>> :> #bits2
-    bits1 #bits2 shift bits2 bitor
-    #bits1 #bits2 + <widthed> ;
+    widthed2 n-bits>> :> n-bits2
+    bits1 n-bits2 shift bits2 bitor
+    n-bits1 n-bits2 + <widthed> ;
 
 PRIVATE>
 
 M:: lsb0-bit-writer poke ( value n bs -- )
     value n <widthed> :> widthed
     widthed
-    bs widthed>> #bits>> 8 swap - split-widthed :> ( byte remainder )
+    bs widthed>> n-bits>> 8 swap - split-widthed :> ( byte remainder )
     byte bs widthed>> |widthed :> new-byte
-    new-byte #bits>> 8 = [
+    new-byte n-bits>> 8 = [
         new-byte bits>> bs bytes>> push
         zero-widthed bs widthed<<
         remainder widthed>bytes
@@ -139,7 +139,7 @@ M:: lsb0-bit-writer poke ( value n bs -- )
 
 ERROR: not-enough-bits n bit-reader ;
 
-: #bits>#bytes ( #bits -- #bytes )
+: n-bits>n-bytes ( n-bits -- n-bytes )
     8 /mod 0 = [ 1 + ] unless ; inline
 
 :: subseq>bits-le ( bignum n bs -- bits )
@@ -151,9 +151,9 @@ ERROR: not-enough-bits n bit-reader ;
     neg shift n bits ;
 
 :: adjust-bits ( n bs -- )
-    n 8 /mod :> ( #bytes #bits )
-    bs [ #bytes + ] change-byte-pos
-    bit-pos>> #bits + dup 8 >= [
+    n 8 /mod :> ( n-bytes n-bits )
+    bs [ n-bytes + ] change-byte-pos
+    bit-pos>> n-bits + dup 8 >= [
         8 - bs bit-pos<<
         bs [ 1 + ] change-byte-pos drop
     ] [
@@ -162,7 +162,7 @@ ERROR: not-enough-bits n bit-reader ;
 
 :: (peek) ( n bs endian> subseq-endian -- bits )
     n bs enough-bits? [ n bs not-enough-bits ] unless
-    bs [ byte-pos>> ] [ bit-pos>> n + ] bi #bits>#bytes dupd +
+    bs [ byte-pos>> ] [ bit-pos>> n + ] bi n-bits>n-bytes dupd +
     bs bytes>> subseq endian> execute( seq -- x )
     n bs subseq-endian execute( bignum n bs -- bits ) ;
 
@@ -173,7 +173,7 @@ M: msb0-bit-reader peek ( n bs -- bits )
     \ be> \ subseq>bits-be (peek) ;
 
 :: bit-writer-bytes ( writer -- bytes )
-    writer widthed>> #bits>> :> n
+    writer widthed>> n-bits>> :> n
     n 0 = [
         writer widthed>> bits>> 8 n - shift
         writer bytes>> push

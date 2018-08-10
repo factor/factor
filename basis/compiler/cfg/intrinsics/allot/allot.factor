@@ -7,13 +7,13 @@ compiler.constants compiler.tree.propagation.info cpu.architecture fry
 kernel layouts locals math math.order namespaces sequences ;
 IN: compiler.cfg.intrinsics.allot
 
-: ##set-slots, ( regs obj class -- )
-    '[ _ swap 1 + _ type-number ##set-slot-imm, ] each-index ;
+: set-slots##, ( regs obj class -- )
+    '[ _ swap 1 + _ type-number set-slot-imm##, ] each-index ;
 
 : emit-simple-allot ( node -- )
     [ in-d>> length ] [ node-output-infos first class>> ] bi
     [ drop ds-loc load-vregs ] [ [ 1 + cells ] dip ^^allot ] [ nip ] 2tri
-    [ ##set-slots, ] [ [ drop ] [ ds-push ] [ drop ] tri* ] 3bi ;
+    [ set-slots##, ] [ [ drop ] [ ds-push ] [ drop ] tri* ] 3bi ;
 
 : tuple-slot-regs ( layout -- vregs )
     [ second ds-loc load-vregs ] [ ^^load-literal ] bi prefix ;
@@ -21,20 +21,20 @@ IN: compiler.cfg.intrinsics.allot
 : ^^allot-tuple ( n -- dst )
     2 + cells tuple ^^allot ;
 
-: emit-<tuple-boa> ( block #call -- block' )
+: emit-<tuple-boa> ( block call# -- block' )
     dup node-input-infos last literal>>
     dup array? [
         nip
         ds-drop
         [ tuple-slot-regs ] [ second ^^allot-tuple ] bi
-        [ tuple ##set-slots, ] [ ds-push drop ] 2bi
+        [ tuple set-slots##, ] [ ds-push drop ] 2bi
     ] [ drop emit-primitive ] if ;
 
 : store-length ( len reg class -- )
-    [ [ ^^load-literal ] dip 1 ] dip type-number ##set-slot-imm, ;
+    [ [ ^^load-literal ] dip 1 ] dip type-number set-slot-imm##, ;
 
 :: store-initial-element ( len reg elt class -- )
-    len [ [ elt reg ] dip 2 + class type-number ##set-slot-imm, ] each-integer ;
+    len [ [ elt reg ] dip 2 + class type-number set-slot-imm##, ] each-integer ;
 
 : expand-<array>? ( obj -- ? )
     dup integer? [ 0 8 between? ] [ drop f ] if ;
@@ -76,12 +76,12 @@ IN: compiler.cfg.intrinsics.allot
     0 ^^load-literal :> elt
     reg ^^tagged>integer :> reg
     len cell align cell /i <iota> [
-        [ elt reg ] dip cells byte-array-offset + int-rep f ##store-memory-imm,
+        [ elt reg ] dip cells byte-array-offset + int-rep f store-memory-imm##,
     ] each ;
 
-:: emit-<byte-array> ( block #call -- block' )
-    #call node-input-infos first literal>> dup expand-<byte-array>? [
+:: emit-<byte-array> ( block call# -- block' )
+    call# node-input-infos first literal>> dup expand-<byte-array>? [
         :> len
         len emit-allot-byte-array :> reg
         len reg zero-byte-array block
-    ] [ drop block #call emit-primitive ] if ;
+    ] [ drop block call# emit-primitive ] if ;

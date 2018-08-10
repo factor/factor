@@ -36,11 +36,11 @@ M: vreg-insn compute-insn-defs
 
 SYMBOL: inserting-phis
 
-: <##phi> ( vreg bb -- ##phi )
-    predecessors>> over '[ _ ] H{ } map>assoc ##phi new-insn ;
+: <phi##> ( vreg bb -- phi## )
+    predecessors>> over '[ _ ] H{ } map>assoc phi## new-insn ;
 
 : insert-phi-later ( vreg bb -- )
-    [ <##phi> ] keep inserting-phis get push-at ;
+    [ <phi##> ] keep inserting-phis get push-at ;
 
 : compute-phis-for ( vreg bbs -- )
     members merge-set [ insert-phi-later ] with each ;
@@ -130,7 +130,7 @@ M: vreg-insn rename-insn
 ! Live phis
 SYMBOL: live-phis
 
-: live-phi? ( ##phi -- ? )
+: live-phi? ( phi## -- ? )
     dst>> live-phis get in? ;
 
 : compute-live-phis ( -- )

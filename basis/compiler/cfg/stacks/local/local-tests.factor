@@ -69,8 +69,8 @@ IN: compiler.cfg.stacks.local.tests
 ! stack-changes
 {
     {
-        T{ ##copy { dst 1 } { src 25 } { rep any-rep } }
-        T{ ##copy { dst 2 } { src 26 } { rep any-rep } }
+        T{ copy## { dst 1 } { src 25 } { rep any-rep } }
+        T{ copy## { dst 2 } { src 26 } { rep any-rep } }
     }
 } [
     { { d: 0 25 } { r: 0 26 } } replaces>copy-insns
@@ -88,7 +88,7 @@ IN: compiler.cfg.stacks.local.tests
 ! emit-insns
 {
     V{
-        T{ ##copy { dst 1 } { src 3 } { rep any-rep } }
+        T{ copy## { dst 1 } { src 3 } { rep any-rep } }
         "eh"
     }
 } [
@@ -131,7 +131,7 @@ IN: compiler.cfg.stacks.local.tests
 ] cfg-unit-test
 
 {
-    { T{ ##inc { loc d: 4 } } T{ ##inc { loc r: -2 } } }
+    { T{ inc## { loc d: 4 } } T{ inc## { loc r: -2 } } }
 } [
     0 0 4 -2 height-state boa height-state>insns
 ] unit-test
