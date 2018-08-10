@@ -4,18 +4,18 @@ namespaces prettyprint sequences tools.memory tools.test ;
 QUALIFIED: sets
 IN: alien.tests
 
-{ t } [ -1 <alien> alien-address 0 > ] unit-test
+UNIT-TEST: [ -1 <alien> alien-address 0 > ] { t }
 
-{ t } [ 0 <alien> 0 <alien> = ] unit-test
-{ f } [ 0 <alien> 1024 <alien> = ] unit-test
-{ f } [ "hello" 1024 <alien> = ] unit-test
-{ f } [ 0 <alien> ] unit-test
-{ f } [ 0 f <displaced-alien> ] unit-test
+UNIT-TEST: [ 0 <alien> 0 <alien> = ] { t }
+UNIT-TEST: [ 0 <alien> 1024 <alien> = ] { f }
+UNIT-TEST: [ "hello" 1024 <alien> = ] { f }
+UNIT-TEST: [ 0 <alien> ] { f }
+UNIT-TEST: [ 0 f <displaced-alien> ] { f }
 
 ! Testing the various bignum accessor
 10 <byte-array> "dump" set
 
-[ "dump" get alien-address ] must-fail
+MUST-FAIL: [ "dump" get alien-address ]
 
 { 123 } [
     123 "dump" get 0 set-alien-signed-1
