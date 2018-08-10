@@ -6,7 +6,7 @@ IN: classes.predicate
 ARTICLE: "predicates" "Predicate classes"
 "Predicate classes allow fine-grained control over method dispatch."
 { $subsections
-    postpone: \PREDICATE:
+    \ \PREDICATE:
     define-predicate-class
 }
 "The set of predicate classes is a class:"
@@ -19,11 +19,11 @@ ABOUT: "predicates"
 
 HELP: define-predicate-class
 { $values { "class" class } { "superclass" class } { "definition" { $quotation ( superclass -- ? ) } } }
-{ $description "Defines a predicate class. This is the run time equivalent of " { $link postpone: \PREDICATE: } "." }
+{ $description "Defines a predicate class. This is the run time equivalent of " { $link \ \PREDICATE: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
 
-{ predicate-class define-predicate-class postpone: \PREDICATE: } related-words
+{ predicate-class define-predicate-class \ \PREDICATE: } related-words
 
 HELP: predicate-class
-{ $class-description "The class of predicate class words, defined by " { $link postpone: \PREDICATE: } " and documented in " { $link "predicates" } "." } ;
+{ $class-description "The class of predicate class words, defined by " { $link \ \PREDICATE: } " and documented in " { $link "predicates" } "." } ;

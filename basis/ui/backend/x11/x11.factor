@@ -331,11 +331,11 @@ M: x11-ui-backend beep ( -- )
     dpy get 100 XBell drop ;
 
 <PRIVATE
-: escape-' ( string -- string' )
+: escape-single-quote ( string -- string' )
     [ dup ch'\' = [ drop "'\\''" ] [ 1string ] if ] { } map-as concat ;
 
 : xmessage ( string -- )
-    escape-' "/usr/bin/env xmessage '" "'" surround system drop ;
+    escape-single-quote "/usr/bin/env xmessage '" "'" surround system drop ;
 PRIVATE>
 
 M: x11-ui-backend system-alert

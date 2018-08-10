@@ -139,7 +139,7 @@ ARTICLE: "math.floats.bitwise" "Bitwise operations on floats"
 }
 "Comparing two floating point numbers for bitwise equality:"
 { $subsections fp-bitwise= }
-{ $see-also postpone: \nan: } ;
+{ $see-also \ \nan: } ;
 
 ARTICLE: "floats" "Floats"
 { $subsections float }

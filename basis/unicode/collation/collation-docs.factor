@@ -24,7 +24,7 @@ HELP: sort-strings
 { $description "This word takes a sequence of strings and sorts them according to the Unicode Collation Algorithm with the default collation order described in the DUCET. It uses code point order as a tie-breaker." } ;
 
 HELP: collation-key/nfd
-{ $values { "string" string } { "key" byte-array } }
+{ $values { "string" string } { "key" byte-array } { "nfd" object } }
 { $description "This takes a string and gives a representation of the collation key, which can be compared with " { $link <=> } ". The representation is according to the DUCET." } ;
 
 HELP: string<=>

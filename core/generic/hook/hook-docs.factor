@@ -4,7 +4,7 @@ IN: generic.hook
 
 HELP: hook-combination
 { $class-description
-    "Performs hook method combination . See " { $link postpone: \HOOK: } "."
+    "Performs hook method combination . See " { $link \ \HOOK: } "."
 } ;
 
 { standard-combination hook-combination } related-words

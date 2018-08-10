@@ -9,12 +9,12 @@ HELP: \|[
 
 HELP: \let[
 { $syntax "let[ code :> var code :> var code... ]" }
-{ $description "Establishes a new scope for lexical variable bindings. Variables bound with " { $link postpone: \:> } " within the body of the " { $snippet "let[" } " will be lexically scoped to the body of the " { $snippet "let[" } " form." }
+{ $description "Establishes a new scope for lexical variable bindings. Variables bound with " { $link \ \:> } " within the body of the " { $snippet "let[" } " will be lexically scoped to the body of the " { $snippet "let[" } " form." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
 HELP: :>
 { $syntax ":> var" ":> var!" ":> ( var-1 var-2 ... )" }
-{ $description "Binds one or more new lexical variables. In the " { $snippet ":> var" } " form, the value on the top of the datastack is bound to a new lexical variable named " { $snippet "var" } " and is scoped to the enclosing quotation, " { $link postpone: \let[ } " form, or " { $link postpone: \:: } " definition."
+{ $description "Binds one or more new lexical variables. In the " { $snippet ":> var" } " form, the value on the top of the datastack is bound to a new lexical variable named " { $snippet "var" } " and is scoped to the enclosing quotation, " { $link \ \let[ } " form, or " { $link \ \:: } " definition."
 $nl
 "The " { $snippet ":> ( var-1 ... )" } " form binds multiple variables to the top values of the datastack in right to left order, with the last variable bound to the top of the datastack. These two snippets have the same effect:"
 { $code ":> c :> b :> a" }
@@ -22,20 +22,20 @@ $nl
 $nl
 "If any " { $snippet "var" } " name is followed by an exclamation point (" { $snippet "!" } "), that new variable is mutable. See " { $link "locals-mutable" } " for more information." }
 { $notes
-    "This syntax can only be used inside a lexical scope established by a " { $link postpone: \:: } " definition, " { $link postpone: \let[ } " form, or " { $link postpone: \|[ } " quotation. Normal quotations have their own lexical scope only if they are inside an outer scope. Definition forms such as " { $link postpone: \: } " do not establish a lexical scope by themselves unless documented otherwise, nor is there a lexical scope available at the top level of source files or in the listener. " { $link postpone: \let[ } " can be used to create a lexical scope where one is not otherwise available." }
+    "This syntax can only be used inside a lexical scope established by a " { $link \ \:: } " definition, " { $link \ \let[ } " form, or " { $link \ \|[ } " quotation. Normal quotations have their own lexical scope only if they are inside an outer scope. Definition forms such as " { $link \ \: } " do not establish a lexical scope by themselves unless documented otherwise, nor is there a lexical scope available at the top level of source files or in the listener. " { $link \ \let[ } " can be used to create a lexical scope where one is not otherwise available." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
-{ postpone: \let[ postpone: \:> } related-words
+{ \ \let[ \ \:> } related-words
 
 HELP: ::
 { $syntax ":: word ( vars... -- outputs... ) body... ;" }
 { $description "Defines a word with named inputs. The word binds its input values to lexical variables from left to right, then executes the body with those bindings in scope."
 $nl
 "If any " { $snippet "var" } " name is followed by an exclamation point (" { $snippet "!" } "), the corresponding new variable is made mutable. See " { $link "locals-mutable" } " for more information." }
-{ $notes "The names of the " { $snippet "outputs" } " do not affect the word's behavior. However, the compiler verifies that the stack effect accurately represents the number of outputs as with " { $link postpone: \: } " definitions." }
+{ $notes "The names of the " { $snippet "outputs" } " do not affect the word's behavior. However, the compiler verifies that the stack effect accurately represents the number of outputs as with " { $link \ \: } " definitions." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
-{ postpone: \: postpone: \:: } related-words
+{ \ \: \ \:: } related-words
 
 HELP: \MACRO::
 { $syntax "MACRO:: word ( vars... -- outputs... ) body... ;" }
@@ -45,7 +45,7 @@ $nl
 { $notes "The expansion of a macro cannot reference lexical variables bound in the outer scope. There are also limitations on passing arguments involving lexical variables into macros. See " { $link "locals-limitations" } " for details." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
-{ postpone: \MACRO: postpone: \MACRO:: } related-words
+{ \ \MACRO: \ \MACRO:: } related-words
 
 HELP: \MEMO::
 { $syntax "MEMO:: word ( vars... -- outputs... ) body... ;" }
@@ -54,21 +54,21 @@ $nl
 "If any " { $snippet "var" } " name is followed by an exclamation point (" { $snippet "!" } "), the corresponding new variable is made mutable. See " { $link "locals-mutable" } " for more information." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
-{ postpone: \MEMO: postpone: \MEMO:: } related-words
+{ \ \MEMO: \ \MEMO:: } related-words
 
 HELP: \M::
 { $syntax "M:: class generic ( vars... -- outputs... ) body... ;" }
 { $description "Defines a new method on " { $snippet "generic" } " for " { $snippet "class" } " with named inputs. The method binds its input values to lexical variables from left to right, then executes the body with those bindings in scope."
 $nl
 "If any " { $snippet "var" } " name is followed by an exclamation point (" { $snippet "!" } "), the corresponding new variable is made mutable. See " { $link "locals-mutable" } " for more information." }
-{ $notes "The names of the " { $snippet "outputs" } " do not affect the word's behavior. However, the compiler verifies that the stack effect accurately represents the number of outputs as with " { $link postpone: \M: } " definitions." }
+{ $notes "The names of the " { $snippet "outputs" } " do not affect the word's behavior. However, the compiler verifies that the stack effect accurately represents the number of outputs as with " { $link \ \M: } " definitions." }
 { $examples "See " { $link "locals-examples" } "." } ;
 
-{ postpone: \M: postpone: \M:: } related-words
+{ \ \M: \ \M:: } related-words
 
 ARTICLE: "locals-examples" "Examples of lexical variables"
 { $heading "Definitions with lexical variables" }
-"The following example demonstrates lexical variable bindings in word definitions. The " { $snippet "quadratic-roots" } " word is defined with " { $link postpone: \:: } ", so it takes its inputs from the top three elements of the datastack and binds them to the variables " { $snippet "a" } ", " { $snippet "b" } ", and " { $snippet "c" } ". In the body, the " { $snippet "disc" } " variable is bound using " { $link postpone: \:> } " and then used in the following line of code."
+"The following example demonstrates lexical variable bindings in word definitions. The " { $snippet "quadratic-roots" } " word is defined with " { $link \ \:: } ", so it takes its inputs from the top three elements of the datastack and binds them to the variables " { $snippet "a" } ", " { $snippet "b" } ", and " { $snippet "c" } ". In the body, the " { $snippet "disc" } " variable is bound using " { $link \ \:> } " and then used in the following line of code."
 { $example "USING: locals math math.functions kernel ;
 IN: scratchpad
 :: quadratic-roots ( a b c -- x y )
@@ -77,7 +77,7 @@ IN: scratchpad
 1.0 1.0 -6.0 quadratic-roots"
 "\n--- Data stack:\n2.0\n-3.0"
 }
-"If you wanted to perform the quadratic formula interactively from the listener, you could use " { $link postpone: \let[ } " to provide a scope for the variables:"
+"If you wanted to perform the quadratic formula interactively from the listener, you could use " { $link \ \let[ } " to provide a scope for the variables:"
 { $example "USING: locals math math.functions kernel ;
 IN: scratchpad
 let[ 1.0 :> a 1.0 :> b -6.0 :> c
@@ -90,7 +90,7 @@ let[ 1.0 :> a 1.0 :> b -6.0 :> c
 $nl
 
 { $heading "Quotations with lexical variables, and closures" }
-"These next two examples demonstrate lexical variable bindings in quotations defined with " { $link postpone: \|[ } ". In this example, the values " { $snippet "5" } " and " { $snippet "3" } " are put on the datastack. When the quotation is called, it takes those values as inputs and binds them respectively to " { $snippet "m" } " and " { $snippet "n" } " before executing the quotation:"
+"These next two examples demonstrate lexical variable bindings in quotations defined with " { $link \ \|[ } ". In this example, the values " { $snippet "5" } " and " { $snippet "3" } " are put on the datastack. When the quotation is called, it takes those values as inputs and binds them respectively to " { $snippet "m" } " and " { $snippet "n" } " before executing the quotation:"
 { $example
     "USING: kernel locals math ;"
     "IN: scratchpad"
@@ -201,7 +201,7 @@ $nl
 "One exception to the above rule is that array instances containing free lexical variables (that is, immutable lexical variables not referenced in a closure) do retain identity. This allows macros such as " { $link cond } " to expand at compile time even when their arguments reference variables." ;
 
 ARTICLE: "locals-mutable" "Mutable lexical variables"
-"When a lexical variable is bound using " { $link postpone: \:> } ", " { $link postpone: \:: } ", or " { $link postpone: \|[ } ", the variable may be made mutable by suffixing its name with an exclamation point (" { $snippet "!" } "). A mutable variable's value is read by giving its name without the exclamation point as usual. To write to the variable, use its name with the " { $snippet "!" } " suffix."
+"When a lexical variable is bound using " { $link \ \:> } ", " { $link \ \:: } ", or " { $link \ \|[ } ", the variable may be made mutable by suffixing its name with an exclamation point (" { $snippet "!" } "). A mutable variable's value is read by giving its name without the exclamation point as usual. To write to the variable, use its name with the " { $snippet "!" } " suffix."
 $nl
 "Mutable bindings are implemented in a manner similar to that taken by the ML language. Each mutable binding is actually an immutable binding of a mutable cell. Reading the binding automatically unboxes the value from the cell, and writing to the binding stores into it."
 $nl
@@ -218,7 +218,7 @@ $nl
 "Conceptually, " { $link curry } " is defined so that the following two code snippets are equivalent:"
 { $code "3 [ - ] curry" }
 { $code "[ 3 - ]" }
-"When quotations take named parameters using " { $link postpone: \|[ } ", " { $link curry } " fills in the variable bindings from right to left. The following two snippets are equivalent:"
+"When quotations take named parameters using " { $link \ \|[ } ", " { $link curry } " fills in the variable bindings from right to left. The following two snippets are equivalent:"
 { $code "3 |[ a b | a b - ] curry" }
 { $code "|[ a | a 3 - ]" }
 "Because of this, the behavior of " { $snippet "fry" } " changes when applied to such a quotation to ensure that fry conceptually behaves the same as with normal quotations, placing the fried values “underneath” the variable bindings. Thus, the following snippets are no longer equivalent:"
@@ -227,7 +227,7 @@ $nl
 "Instead, the first line above expands into something like the following:"
 { $code "[ [ swap |[ a | a - ] ] curry call ]" }
 $nl
-"The precise behavior is as follows. When frying a " { $link postpone: \|[ } " quotation, a stack shuffle (" { $link mnswap } ") is prepended so that the " { $snippet "m" } " curried values, which start off at the top of the stack, are transposed with the quotation's " { $snippet "n" } " named input bindings." ;
+"The precise behavior is as follows. When frying a " { $link \ \|[ } " quotation, a stack shuffle (" { $link mnswap } ") is prepended so that the " { $snippet "m" } " curried values, which start off at the top of the stack, are transposed with the quotation's " { $snippet "n" } " named input bindings." ;
 
 ARTICLE: "locals-limitations" "Limitations of lexical variables"
 "There are two main limitations of the current implementation, and both concern macros."
@@ -276,18 +276,18 @@ ARTICLE: "locals" "Lexical variables"
 }
 "Word definitions where the inputs are bound to lexical variables:"
 { $subsections
-    postpone: \::
-    postpone: \M::
-    postpone: \MEMO::
-    postpone: \MACRO::
+    \ \::
+    \ \M::
+    \ \MEMO::
+    \ \MACRO::
 }
 "Lexical scoping and binding forms:"
 { $subsections
-    postpone: \let[
-    postpone: \:>
+    \ \let[
+    \ \:>
 }
 "Quotation literals where the inputs are bound to lexical variables:"
-{ $subsections postpone: \|[ }
+{ $subsections \ \|[ }
 "Additional topics:"
 { $subsections
     "locals-literals"

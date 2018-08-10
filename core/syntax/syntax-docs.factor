@@ -11,7 +11,7 @@ ARTICLE: "parser-algorithm" "Parser algorithm"
 $nl
 "The parser iterates through the input text, checking each character in turn. Here is the parser algorithm in more detail -- some of the concepts therein will be defined shortly:"
 { $list
-    { "If the current character is a double-quote (\"), the " { $link postpone: \" } " parsing word is executed, causing a string to be read." }
+    { "If the current character is a double-quote (\"), the " { $link \ \" } " parsing word is executed, causing a string to be read." }
     {
         "Otherwise, the next token is taken from the input. The parser searches for a word named by the token in the currently used set of vocabularies. If the word is found, one of the following two actions is taken:"
         { $list
@@ -28,8 +28,8 @@ $nl
 ARTICLE: "syntax-immediate" "Parse time evaluation"
 "Code can be evaluated at parse time. This is a rarely-used feature; one use-case is " { $link "loading-libs" } ", where you want to execute some code before the words in a source file are compiled."
 { $subsections
-    postpone: <<
-    postpone: >>
+    \ <<
+    \ >>
 } ;
 
 ARTICLE: "syntax-integers" "Integer syntax"
@@ -99,7 +99,7 @@ ARTICLE: "syntax-floats" "Float syntax"
 { "Not-a-number" { $snippet "0/0." } }
 }
 "A Not-a-number literal with an arbitrary payload can also be input:"
-{ $subsections postpone: \nan: }
+{ $subsections \ \nan: }
 "Hexadecimal, octal and binary float literals are also supported. These consist of a hexadecimal, octal or binary literal with a decimal point and a mandatory base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
     "8.0 0x1.0p3 = ."
@@ -131,7 +131,7 @@ ARTICLE: "syntax-complex-numbers" "Complex number syntax"
     "C{ 1/2 1/3 }   ! the complex number 1/2+1/3i"
     "C{ 0 1 }       ! the imaginary unit"
 }
-{ $subsections postpone: \C{ }
+{ $subsections \ \C{ }
 "More information on complex numbers can be found in " { $link "complex-numbers" } "." ;
 
 ARTICLE: "syntax-numbers" "Number syntax"
@@ -146,10 +146,10 @@ ARTICLE: "syntax-numbers" "Number syntax"
 ARTICLE: "syntax-words" "Word syntax"
 "A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
 { $subsections
-    postpone: \\
-    postpone: \postpone:
+    \ \\
+    \ \\
 }
-"The implementation of the " { $link postpone: \\ } " word is discussed in detail in " { $link "reading-ahead" } ". Words are documented in " { $link "words" } "." ;
+"The implementation of the " { $link \ \\ } " word is discussed in detail in " { $link "reading-ahead" } ". Words are documented in " { $link "words" } "." ;
 
 ARTICLE: "escape" "Character escape codes"
 { $table
@@ -173,57 +173,57 @@ ARTICLE: "escape" "Character escape codes"
 ARTICLE: "syntax-strings" "Character and string syntax"
 "Factor has no distinct character type. Integers representing Unicode code points can be read by specifying a literal character, or an escaped representation thereof."
 { $subsections
-    postpone: \char:
-    postpone: \"
+    \ \char:
+    \ \"
     "escape"
 }
 "Strings are documented in " { $link "strings" } "." ;
 
 ARTICLE: "syntax-sbufs" "String buffer syntax"
-{ $subsections postpone: \sbuf" }
+{ $subsections \ \sbuf" }
 "String buffers are documented in " { $link "sbufs" } "." ;
 
 ARTICLE: "syntax-arrays" "Array syntax"
 { $subsections
-    postpone: \{
-    postpone: \}
+    \ \{
+    \ \}
 }
 "Arrays are documented in " { $link "arrays" } "." ;
 
 ARTICLE: "syntax-vectors" "Vector syntax"
-{ $subsections postpone: \V{ }
+{ $subsections \ \V{ }
 "Vectors are documented in " { $link "vectors" } "." ;
 
 ARTICLE: "syntax-hashtables" "Hashtable syntax"
-{ $subsections postpone: \H{ }
+{ $subsections \ \H{ }
 "Hashtables are documented in " { $link "hashtables" } "." ;
 
 ARTICLE: "syntax-hash-sets" "Hash set syntax"
-{ $subsections postpone: \HS{ }
+{ $subsections \ \HS{ }
 "Hashtables are documented in " { $link "hash-sets" } "." ;
 
 ARTICLE: "syntax-tuples" "Tuple syntax"
-{ $subsections postpone: \T{ }
+{ $subsections \ \T{ }
 "Tuples are documented in " { $link "tuples" } "." ;
 
 ARTICLE: "syntax-quots" "Quotation syntax"
 { $subsections
-    postpone: \[
-    postpone: \]
+    \ \[
+    \ \]
 }
 "Quotations are documented in " { $link "quotations" } "." ;
 
 ARTICLE: "syntax-byte-arrays" "Byte array syntax"
-{ $subsections postpone: \B{ }
+{ $subsections \ \B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
-{ $subsections postpone: \path" }
+{ $subsections \ \path" }
 "Pathnames are documented in " { $link "io.pathnames" } "." ;
 
 ARTICLE: "syntax-effects" "Stack effect syntax"
 "Note that this is " { $emphasis "not" } " syntax to declare stack effects of words. This pushes an " { $link effect } " instance on the stack for reflection, for use with words such as " { $link define-declared } ", " { $link call-effect } " and " { $link execute-effect } "."
-{ $subsections postpone: \( }
+{ $subsections \ \( }
 { $see-also "effects" "inference" "tools.inference" } ;
 
 ARTICLE: "syntax-literals" "Literals"
@@ -287,7 +287,7 @@ HELP: inline
 HELP: recursive
 { $syntax ": foo ... ; recursive" }
 { $description "Declares the most recently defined word as a recursive word." }
-{ $notes "This declaration is only required for " { $link postpone: inline } " words which call themselves. See " { $link "inference-recursive-combinators" } "." } ;
+{ $notes "This declaration is only required for " { $link \ inline } " words which call themselves. See " { $link "inference-recursive-combinators" } "." } ;
 
 HELP: foldable
 { $syntax ": foo ... ; foldable" }
@@ -329,7 +329,7 @@ HELP: \[
 { $description "Marks the beginning of a literal quotation." }
 { $examples { $code "[ 1 2 3 ]" } } ;
 
-{ postpone: \[ postpone: \] } related-words
+{ \ \[ \ \] } related-words
 
 HELP: \]
 { $syntax "]" }
@@ -343,24 +343,24 @@ HELP: \}
 $nl
 "Parsing words can use this word as a generic end delimiter." } ;
 
-{ postpone: \{ postpone: \V{ postpone: \H{ postpone: \HS{ postpone: \C{ postpone: \T{ postpone: \W{ postpone: \} } related-words
+{ \ \{ \ \V{ \ \H{ \ \HS{ \ \C{ \ \T{ \ \W{ \ \} } related-words
 
 HELP: \{
 { $syntax "{ elements... }" }
 { $values { "elements" "a list of objects" } }
-{ $description "Marks the beginning of a literal array. Literal arrays are terminated by " { $link postpone: \} } "." }
+{ $description "Marks the beginning of a literal array. Literal arrays are terminated by " { $link \ \} } "." }
 { $examples { $code "{ 1 2 3 }" } } ;
 
 HELP: \V{
 { $syntax "V{ elements... }" }
 { $values { "elements" "a list of objects" } }
-{ $description "Marks the beginning of a literal vector. Literal vectors are terminated by " { $link postpone: \} } "." }
+{ $description "Marks the beginning of a literal vector. Literal vectors are terminated by " { $link \ \} } "." }
 { $examples { $code "V{ 1 2 3 }" } } ;
 
 HELP: \B{
 { $syntax "B{ elements... }" }
 { $values { "elements" "a list of integers" } }
-{ $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link postpone: \} } "." }
+{ $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link \ \} } "." }
 { $examples { $code "B{ 1 2 3 }" } } ;
 
 HELP: \intersection{
@@ -371,19 +371,19 @@ HELP: \intersection{
 HELP: \H{
 { $syntax "H{ { key value }... }" }
 { $values { "key" object } { "value" object } }
-{ $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs. Literal hashtables are terminated by " { $link postpone: \} } "." }
+{ $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs. Literal hashtables are terminated by " { $link \ \} } "." }
 { $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
 HELP: \HS{
 { $syntax "HS{ members ... }" }
 { $values { "members" "a list of objects" } }
-{ $description "Marks the beginning of a literal hash set, given as a list of its members. Literal hashtables are terminated by " { $link postpone: \} } "." }
+{ $description "Marks the beginning of a literal hash set, given as a list of its members. Literal hashtables are terminated by " { $link \ \} } "." }
 { $examples { $code "HS{ 3 \"foo\" }" } } ;
 
 HELP: \C{
 { $syntax "C{ real-part imaginary-part }" }
 { $values { "real-part" "a real number" } { "imaginary-part" "a real number" } }
-{ $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link postpone: \} } "." } ;
+{ $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link \ \} } "." } ;
 
 HELP: \T{
 { $syntax "T{ class }" "T{ class f slot-values... }" "T{ class { slot-name slot-value } ... }" }
@@ -393,7 +393,7 @@ $nl
 "Three literal syntax forms are recognized:"
 { $list
     { "empty tuple form: if no slot values are specified, then the literal tuple will have all slots set to their initial values (see " { $link "slot-initial-values" } ")." }
-    { "BOA-form: if the first element of " { $snippet "slots" } " is " { $snippet "f" } ", then the remaining elements are slot values corresponding to slots in the order in which they are defined in the " { $link postpone: \TUPLE: } " form." }
+    { "BOA-form: if the first element of " { $snippet "slots" } " is " { $snippet "f" } ", then the remaining elements are slot values corresponding to slots in the order in which they are defined in the " { $link \ \TUPLE: } " form." }
     { "assoc-form: otherwise, " { $snippet "slots" } " is interpreted as a sequence of " { $snippet "{ slot-name value }" } " pairs. The " { $snippet "slot-name" } " should not be quoted." }
 }
 "BOA form is more concise, whereas assoc form is more readable for larger tuples with many slots, or if only a few slots are to be specified."
@@ -416,13 +416,13 @@ $nl
 HELP: \W{
 { $syntax "W{ object }" }
 { $values { "object" object } }
-{ $description "Marks the beginning of a literal wrapper. Literal wrappers are terminated by " { $link postpone: \} } "." } ;
+{ $description "Marks the beginning of a literal wrapper. Literal wrappers are terminated by " { $link \ \} } "." } ;
 
-HELP: \postpone:
-{ $syntax "postpone: word" }
+HELP: \\
+{ $syntax "\ word" }
 { $values { "word" word } }
 { $description "Reads the next word from the input string and appends the word to the parse tree, even if it is a parsing word." }
-{ $examples "For an ordinary word " { $snippet "foo" } ", " { $snippet "foo" } " and " { $snippet "postpone: foo" } " are equivalent; however, if " { $snippet "foo" } " is a parsing word, the former will execute it at parse time, while the latter will execute it at runtime." }
+{ $examples "For an ordinary word " { $snippet "foo" } ", " { $snippet "foo" } " and " { $snippet "\ foo" } " are equivalent; however, if " { $snippet "foo" } " is a parsing word, the former will execute it at parse time, while the latter will execute it at runtime." }
 { $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
 
 HELP: \:
@@ -431,7 +431,7 @@ HELP: \:
 { $description "Defines a word with the given stack effect in the current vocabulary." }
 { $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )\n    \"Greetings, \" write print ;\n: friend ( -- )\n    ask-name greet ;" } } ;
 
-{ postpone: \: postpone: \; define } related-words
+{ \ \: \ \; define } related-words
 
 HELP: ;
 { $syntax ";" }
@@ -447,7 +447,7 @@ HELP: \SYMBOL:
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
 { $examples { $example "USE: prettyprint" "IN: scratchpad" "SYMBOL: foo\nfoo ." "foo" } } ;
 
-{ define-symbol postpone: \SYMBOL: postpone: \SYMBOLS: } related-words
+{ define-symbol \ \SYMBOL: \ \SYMBOLS: } related-words
 
 HELP: \SYMBOLS:
 { $syntax "SYMBOLS: words... ;" }
@@ -485,7 +485,7 @@ HELP: \ALIAS:
     }
 } ;
 
-{ define-alias postpone: \ALIAS: } related-words
+{ define-alias \ \ALIAS: } related-words
 
 HELP: \CONSTANT:
 { $syntax "CONSTANT: word value" }
@@ -493,9 +493,9 @@ HELP: \CONSTANT:
 { $description "Creates a word which pushes a value on the stack." }
 { $examples { $code "CONSTANT: magic 1" "CONSTANT: science 0xff0f" } } ;
 
-{ define-constant postpone: \CONSTANT: } related-words
+{ define-constant \ \CONSTANT: } related-words
 
-HELP: \\
+HELP: \postpone:
 { $syntax "\\ word" }
 { $values { "word" word } }
 { $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
@@ -552,7 +552,7 @@ HELP: \QUALIFIED:
 
 HELP: \QUALIFIED-WITH:
 { $syntax "QUALIFIED-WITH: vocab word-prefix" }
-{ $description "Like " { $link postpone: \QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
+{ $description "Like " { $link \ \QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
 { $examples { $example
     "USING: prettyprint ;"
     "QUALIFIED-WITH: math m"
@@ -567,7 +567,7 @@ HELP: \FROM:
 { $examples
   "Both the " { $vocab-link "vocabs.parser" } " and " { $vocab-link "binary-search" } " vocabularies define a word named " { $snippet "search" } ". The following will throw an " { $link ambiguous-use-error } ":"
   { $code "USING: vocabs.parser binary-search ;" "... search ..." }
-  "Because " { $link postpone: \FROM: } " takes precedence over a " { $link postpone: \USING: } ", the ambiguity can be resolved explicitly. Suppose you wanted the " { $vocab-link "binary-search" } " vocabulary's " { $snippet "search" } " word:"
+  "Because " { $link \ \FROM: } " takes precedence over a " { $link \ \USING: } ", the ambiguity can be resolved explicitly. Suppose you wanted the " { $vocab-link "binary-search" } " vocabulary's " { $snippet "search" } " word:"
   { $code "USING: vocabs.parser binary-search ;" "FROM: binary-search => search ;" "... search ..." }
  } ;
 
@@ -591,7 +591,7 @@ HELP: \RENAME:
 HELP: \IN:
 { $syntax "IN: vocabulary" }
 { $values { "vocabulary" "a new vocabulary name" } }
-{ $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist. After the vocabulary has been created, it can be listed in " { $link postpone: \USE: } " and " { $link postpone: \USING: } " declarations." } ;
+{ $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist. After the vocabulary has been created, it can be listed in " { $link \ \USE: } " and " { $link \ \USING: } " declarations." } ;
 
 HELP: \char:
 { $syntax "ch'token" }
@@ -623,19 +623,19 @@ HELP: \"
 HELP: \sbuf"
 { $syntax "sbuf\"string... \"" }
 { $values { "string" "literal and escaped characters" } }
-{ $description "Reads from the input string until the next occurrence of " { $link postpone: \" } ", converts the string to a string buffer, and appends it to the parse tree." }
+{ $description "Reads from the input string until the next occurrence of " { $link \ \" } ", converts the string to a string buffer, and appends it to the parse tree." }
 { $examples { $example "USING: io strings ;" "sbuf\"Hello world\" >string print" "Hello world" } } ;
 
 HELP: \path"
 { $syntax "path\"pathname\"" }
 { $values { "pathname" "a pathname string" } }
-{ $description "Reads from the input string until the next occurrence of " { $link postpone: \" } ", creates a new " { $link pathname } ", and appends it to the parse tree. Pathnames presented in the UI are clickable, which opens them in a text editor configured with " { $link "editor" } "." }
-{ $examples { $example "USING: accessors io io.files ;" "P\" foo.txt\" string>> print" "foo.txt" } } ;
+{ $description "Reads from the input string until the next occurrence of " { $link \ \" } ", creates a new " { $link pathname } ", and appends it to the parse tree. Pathnames presented in the UI are clickable, which opens them in a text editor configured with " { $link "editor" } "." }
+{ $examples { $example "USING: accessors io io.files ;" "path\"foo.txt\" string>> print" "foo.txt" } } ;
 
 HELP: \(
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "Literal stack effect syntax. Also used by syntax words (such as " { $link postpone: \: } "), typically declaring the stack effect of the word definition which follows." }
+{ $description "Literal stack effect syntax. Also used by syntax words (such as " { $link \ \: } "), typically declaring the stack effect of the word definition which follows." }
 { $notes "Useful for meta-programming with " { $link define-declared } "." }
 { $examples
     { $example
@@ -690,7 +690,7 @@ HELP: \MATH:
 HELP: \HOOK:
 { $syntax "HOOK: word variable ( stack -- effect )" }
 { $values { "word" "a new word to define" } { "variable" word } }
-{ $description "Defines a new hook word in the current vocabulary. Hook words are generic words which dispatch on the value of a variable, so methods are defined with " { $link postpone: \M: } ". Hook words differ from other generic words in that the dispatch value is removed from the stack before the chosen method is called." }
+{ $description "Defines a new hook word in the current vocabulary. Hook words are generic words which dispatch on the value of a variable, so methods are defined with " { $link \ \M: } ". Hook words differ from other generic words in that the dispatch value is removed from the stack before the chosen method is called." }
 { $examples
     { $example
         "USING: io namespaces ;"
@@ -728,7 +728,7 @@ HELP: \INTERSECTION:
 HELP: \MIXIN:
 { $syntax "MIXIN: class" }
 { $values { "class" "a new class word to define" } }
-{ $description "Defines a mixin class. A mixin is similar to a union class, except it has no members initially, and new members can be added with the " { $link postpone: \INSTANCE: } " word." }
+{ $description "Defines a mixin class. A mixin is similar to a union class, except it has no members initially, and new members can be added with the " { $link \ \INSTANCE: } " word." }
 { $examples "The " { $link sequence } " and " { $link assoc } " mixin classes." } ;
 
 HELP: \INSTANCE:
@@ -866,7 +866,7 @@ HELP: PRIVATE>
 { $syntax "<PRIVATE ... PRIVATE>" }
 { $description "Ends a block of private word definitions." } ;
 
-{ postpone: \<PRIVATE postpone: \PRIVATE> } related-words
+{ \ \<PRIVATE \ \PRIVATE> } related-words
 
 HELP: <<
 { $syntax "<< ... >>" }
@@ -885,9 +885,9 @@ HELP: call-next-method
     "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
 } ;
 
-{ postpone: call-next-method (call-next-method) next-method } related-words
+{ \ call-next-method (call-next-method) next-method } related-words
 
-{ postpone: << postpone: >> } related-words
+{ \ << \ >> } related-words
 
 HELP: \call(
 { $syntax "call( stack -- effect )" }
@@ -912,4 +912,4 @@ HELP: \execute(
   }
 } ;
 
-{ postpone: \call( postpone: \execute( } related-words
+{ \ \call( \ \execute( } related-words

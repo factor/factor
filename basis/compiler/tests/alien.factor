@@ -861,10 +861,10 @@ TUPLE: some-tuple x ;
 ] unit-test
 
 ! GC maps regression
-: anton's-regression ( -- )
+: antons-regression ( -- )
     f (free) f (free) ;
 
-[ ] [ anton's-regression ] unit-test
+[ ] [ antons-regression ] unit-test
 
 
 STRUCT: bool-and-ptr

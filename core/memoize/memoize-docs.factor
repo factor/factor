@@ -9,7 +9,7 @@ $nl
 "Memoization is useful in situations where the set of possible inputs is small, but the results are expensive to compute and should be cached. Memoized words should not have any side effects."
 $nl
 "Defining a memoized word at parse time:"
-{ $subsections postpone: \MEMO: }
+{ $subsections \ \MEMO: }
 "Defining a memoized word at run time:"
 { $subsections define-memoized }
 "Clearing memoized results:"
@@ -26,4 +26,4 @@ HELP: \MEMO:
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
 { $description "Defines the given word at parse time as one which memoizes its output given a particular input. The stack effect is mandatory." } ;
 
-{ define-memoized postpone: \MEMO: } related-words
+{ define-memoized \ \MEMO: } related-words

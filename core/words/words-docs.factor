@@ -7,7 +7,7 @@ ARTICLE: "interned-words" "Looking up and creating words"
 $nl
 "Words whose names are known at parse time -- that is, most words making up your program -- can be referenced in source code by stating their name. However, the parser itself, and sometimes code you write, will need to look up words dynamically."
 $nl
-"Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link postpone: \IN: } " parsing word (see " { $link "word-search" } ")."
+"Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link \ \IN: } " parsing word (see " { $link "word-search" } ")."
 { $subsections
     create-word
     create-word-in
@@ -30,8 +30,8 @@ ARTICLE: "colon-definition" "Colon definitions"
 $nl
 "Defining words at parse time:"
 { $subsections
-    postpone: \:
-    postpone: \;
+    \ \:
+    \ \;
 }
 "Defining words at run time:"
 { $subsections
@@ -54,7 +54,7 @@ ARTICLE: "deferred" "Deferred words and mutual recursion"
 "Words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. This is done to simplify the implementation, facilitate better parse time checking and remove some odd corner cases; it also encourages better coding style."
 $nl
 "Sometimes this restriction gets in the way, for example when defining mutually-recursive words; one way to get around this limitation is to make a forward definition."
-{ $subsections postpone: \DEFER: }
+{ $subsections \ \DEFER: }
 "The class of deferred word definitions:"
 { $subsections
     deferred
@@ -69,16 +69,16 @@ $nl
 } ;
 
 ARTICLE: "declarations" "Compiler declarations"
-"Compiler declarations are parsing words that set a word property in the most recently defined word. They appear after the final " { $link postpone: \; } " of a word definition:"
+"Compiler declarations are parsing words that set a word property in the most recently defined word. They appear after the final " { $link \ \; } " of a word definition:"
 { $code ": cubed ( x -- y ) dup dup * * ; foldable" }
 "Compiler declarations assert that the word follows a certain contract, enabling certain optimizations that are not valid in general."
 { $subsections
-    postpone: inline
-    postpone: foldable
-    postpone: flushable
-    postpone: recursive
+    \ inline
+    \ foldable
+    \ flushable
+    \ recursive
 }
-"It is entirely up to the programmer to ensure that the word satisfies the contract of a declaration. Furthermore, if a generic word is declared " { $link postpone: foldable } " or " { $link postpone: flushable } ", all methods must satisfy the contract. Unspecified behavior may result if a word does not follow the contract of one of its declarations."
+"It is entirely up to the programmer to ensure that the word satisfies the contract of a declaration. Furthermore, if a generic word is declared " { $link \ foldable } " or " { $link \ flushable } ", all methods must satisfy the contract. Unspecified behavior may result if a word does not follow the contract of one of its declarations."
 { $see-also "effects" } ;
 
 ARTICLE: "word-props" "Word properties"
@@ -257,15 +257,15 @@ HELP: changed-effect
 { $see-also changed-effects } ;
 
 HELP: deferred
-{ $class-description "The class of deferred words created by " { $link postpone: \DEFER: } "." } ;
+{ $class-description "The class of deferred words created by " { $link \ \DEFER: } "." } ;
 
-{ deferred postpone: \DEFER: } related-words
+{ deferred \ \DEFER: } related-words
 
 HELP: undefined
 { $error-description "This error is thrown in two cases, and the debugger's summary message reflects the cause:"
     { $list
         { "A word was executed before being compiled. For example, this can happen if a macro is defined in the same compilation unit where it was used. See " { $link "compilation-units" } " for a discussion." }
-        { "A word defined with " { $link postpone: \DEFER: } " was executed. Since this syntax is usually used for mutually-recursive word definitions, executing a deferred word usually indicates a programmer mistake." }
+        { "A word defined with " { $link \ \DEFER: } " was executed. Since this syntax is usually used for mutually-recursive word definitions, executing a deferred word usually indicates a programmer mistake." }
     }
 } ;
 
@@ -297,7 +297,7 @@ HELP: word-code
 
 HELP: define
 { $values { "word" word } { "def" quotation } }
-{ $description "Defines the word to call a quotation when executed. This is the run time equivalent of " { $link postpone: \: } "." }
+{ $description "Defines the word to call a quotation when executed. This is the run time equivalent of " { $link \ \: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;
 
@@ -373,7 +373,7 @@ HELP: constructor-word
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $examples { $example "USING: compiler.units prettyprint words ;" "[ \"salmon\" \"scratchpad\" constructor-word ] with-compilation-unit ." "<salmon>" } } ;
 
-{ postpone: \FORGET: forget forget* forget-vocab } related-words
+{ \ \FORGET: forget forget* forget-vocab } related-words
 
 HELP: target-word
 { $values { "word" word } { "target" word } }
@@ -385,7 +385,7 @@ HELP: bootstrap-word
 
 HELP: parsing-word?
 { $values { "object" object } { "?" boolean } }
-{ $description "Tests if an object is a parsing word declared by " { $link postpone: \SYNTAX: } "." }
+{ $description "Tests if an object is a parsing word declared by " { $link \ \SYNTAX: } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
 HELP: define-declared
@@ -406,17 +406,17 @@ HELP: define-temp
 
 HELP: delimiter?
 { $values { "obj" object } { "?" boolean } }
-{ $description "Tests if an object is a delimiter word declared by " { $link postpone: delimiter } "." }
+{ $description "Tests if an object is a delimiter word declared by " { $link \ delimiter } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
 HELP: deprecated?
 { $values { "obj" object } { "?" boolean } }
-{ $description "Tests if an object is " { $link postpone: deprecated } "." }
+{ $description "Tests if an object is " { $link \ deprecated } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
 HELP: inline?
 { $values { "obj" object } { "?" boolean } }
-{ $description "Tests if an object is " { $link postpone: inline } "." }
+{ $description "Tests if an object is " { $link \ inline } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
 HELP: subwords
@@ -426,33 +426,33 @@ HELP: subwords
   { $example
     "USING: math.functions prettyprint words ;"
     "\\ sin subwords ."
-    "{ M\\ object sin M\\ complex sin M\\ real sin M\\ float sin }"
+    "{ M\\\\ object sin M\\\\ complex sin M\\\\ real sin M\\\\ float sin }"
   }
 }
 { $notes "Outputs " { $link f } " if the word isn't generic." } ;
 
 HELP: make-deprecated
 { $values { "word" word } }
-{ $description "Declares a word as " { $link postpone: deprecated } "." }
+{ $description "Declares a word as " { $link \ deprecated } "." }
 { $side-effects "word" } ;
 
 HELP: make-flushable
 { $values { "word" word } }
-{ $description "Declares a word as " { $link postpone: flushable } "." }
+{ $description "Declares a word as " { $link \ flushable } "." }
 { $side-effects "word" } ;
 
 HELP: make-foldable
 { $values { "word" word } }
-{ $description "Declares a word as " { $link postpone: foldable } "." }
+{ $description "Declares a word as " { $link \ foldable } "." }
 { $side-effects "word" } ;
 
 HELP: make-inline
 { $values { "word" word } }
-{ $description "Declares a word as " { $link postpone: inline } "." }
+{ $description "Declares a word as " { $link \ inline } "." }
 { $side-effects "word" } ;
 
 HELP: define-inline
 { $values { "word" word } { "def" quotation } { "effect" effect } }
-{ $description "Defines a word and makes it " { $link postpone: inline } "." }
+{ $description "Defines a word and makes it " { $link \ inline } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "word" } ;

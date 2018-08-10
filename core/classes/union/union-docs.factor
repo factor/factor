@@ -5,7 +5,7 @@ IN: classes.union
 ARTICLE: "unions" "Union classes"
 "An object is an instance of a union class if it is an instance of one of its members."
 { $subsections
-    postpone: \UNION:
+    \ \UNION:
     define-union-class
 }
 "Union classes can be introspected:"
@@ -27,12 +27,12 @@ HELP: (define-union-class)
 
 HELP: define-union-class
 { $values { "class" class } { "members" "a sequence of classes" } }
-{ $description "Defines a union class with specified members. This is the run time equivalent of " { $link postpone: \UNION: } "." }
+{ $description "Defines a union class with specified members. This is the run time equivalent of " { $link \ \UNION: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class"
 } ;
 
-{ union-class define-union-class postpone: \UNION: } related-words
+{ union-class define-union-class \ \UNION: } related-words
 
 HELP: union-class
 { $class-description "The class of union classes." } ;

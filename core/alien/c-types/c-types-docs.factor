@@ -65,7 +65,7 @@ HELP: longlong
 HELP: ulonglong
 { $description "This C type represents an eight-byte unsigned integer type. Input values will be converted to " { $link math:integer } "s and truncated to 64 bits; output values will be returned as " { $link math:integer } "s." } ;
 HELP: void
-{ $description "This symbol is not a valid C type, but it can be used as the return type for a " { $link postpone: \FUNCTION: } " or " { $link postpone: \CALLBACK: } " definition or for an " { $link alien-invoke } " or " { $link alien-callback } " call." } ;
+{ $description "This symbol is not a valid C type, but it can be used as the return type for a " { $link \ \FUNCTION: } " or " { $link \ \CALLBACK: } " definition or for an " { $link alien-invoke } " or " { $link alien-callback } " call." } ;
 HELP: void*
 { $description "This C type represents a generic pointer to C memory. See " { $link pointer } " for information on pointer C types." } ;
 HELP: c-string
@@ -84,7 +84,7 @@ HELP: pointer
 $nl
 "Pointer output values are represented in Factor as " { $link alien } "s. If the pointed-to type is a struct, the alien will automatically be wrapped in a struct object if it is not null."
 $nl
-"In " { $link postpone: \TYPEDEF: } ", " { $link postpone: \FUNCTION: } ", " { $link postpone: \CALLBACK: } ", and " { $link postpone: \STRUCT: } " definitions, pointer types can be created by suffixing " { $snippet "*" } " to a C type name. Outside of FFI definitions, a pointer C type can be created using the " { $link postpone: \pointer: } " syntax word:"
+"In " { $link \ \TYPEDEF: } ", " { $link \ \FUNCTION: } ", " { $link \ \CALLBACK: } ", and " { $link \ \STRUCT: } " definitions, pointer types can be created by suffixing " { $snippet "*" } " to a C type name. Outside of FFI definitions, a pointer C type can be created using the " { $link \ \pointer: } " syntax word:"
 { $unchecked-example "FUNCTION: int* foo ( char* bar ) ;" }
 { $unchecked-example ": foo ( bar -- int* )
     pointer: int f \"foo\" { pointer: char } f alien-invoke ;" } } ;
@@ -148,7 +148,7 @@ ARTICLE: "c-types.ambiguity" "Word name clashes with C types"
   "FUNCTION: float magic_number ( ) ;"
   "magic_number 3.0 + ."
 }
-"The correct solution is to use one of " { $link postpone: \FROM: } ", " { $link postpone: \QUALIFIED: } " or " { $link postpone: \QUALIFIED-WITH: } " to disambiguate word lookup:"
+"The correct solution is to use one of " { $link \ \FROM: } ", " { $link \ \QUALIFIED: } " or " { $link \ \QUALIFIED-WITH: } " to disambiguate word lookup:"
 { $code
   "USING: alien.syntax math prettyprint ;"
   "QUALIFIED-WITH: alien.c-types c"
@@ -165,10 +165,10 @@ ARTICLE: "c-types-specs" "C type specifiers"
 $nl
 "Defining new C types:"
 { $subsections
-    postpone: \STRUCT:
-    postpone: \UNION-STRUCT:
-    postpone: \CALLBACK:
-    postpone: \TYPEDEF:
+    \ \STRUCT:
+    \ \UNION-STRUCT:
+    \ \CALLBACK:
+    \ \TYPEDEF:
 }
 "Getting the c-type of a class:"
 { $subsections lookup-c-type }

@@ -5,53 +5,53 @@ IN: vocabs.parser
 ARTICLE: "word-search-errors" "Word lookup errors"
 "If the parser cannot not find a word in the current vocabulary search path, it attempts to look for the word in all loaded vocabularies."
 $nl
-"If " { $link auto-use? } " mode is off, a restartable error is thrown with a restart for each vocabulary in question, together with a restart which defers the word in the current vocabulary, as if " { $link postpone: \DEFER: } " was used."
+"If " { $link auto-use? } " mode is off, a restartable error is thrown with a restart for each vocabulary in question, together with a restart which defers the word in the current vocabulary, as if " { $link \ \DEFER: } " was used."
 $nl
 "If " { $link auto-use? } " mode is on and only one vocabulary has a word with this name, the vocabulary is added to the search path and parsing continues."
 $nl
-"If any restarts were invoked, or if " { $link auto-use? } " is on, the parser will print the correct " { $link postpone: \USING: } " after parsing completes. This form can be copy and pasted back into the source file."
+"If any restarts were invoked, or if " { $link auto-use? } " is on, the parser will print the correct " { $link \ \USING: } " after parsing completes. This form can be copy and pasted back into the source file."
 { $subsections auto-use? } ;
 
 ARTICLE: "word-search-syntax" "Syntax to control word lookup"
 "Parsing words which make all words in a vocabulary available:"
 { $subsections
-    postpone: \USE:
-    postpone: \USING:
-    postpone: \QUALIFIED:
-    postpone: \QUALIFIED-WITH:
+    \ \USE:
+    \ \USING:
+    \ \QUALIFIED:
+    \ \QUALIFIED-WITH:
 }
 "Parsing words which make a subset of all words in a vocabulary available:"
 { $subsections
-    postpone: \FROM:
-    postpone: \EXCLUDE:
-    postpone: \RENAME:
+    \ \FROM:
+    \ \EXCLUDE:
+    \ \RENAME:
 }
 "Removing vocabularies from the search path:"
-{ $subsections postpone: \UNUSE: }
-"In the listener, the " { $vocab-link "scratchpad" } " is the default vocabulary for new word definitions. In source files, there is no default vocabulary. Defining words before declaring a vocabulary with " { $link postpone: \IN: } " results in an error."
-{ $subsections postpone: \IN: } ;
+{ $subsections \ \UNUSE: }
+"In the listener, the " { $vocab-link "scratchpad" } " is the default vocabulary for new word definitions. In source files, there is no default vocabulary. Defining words before declaring a vocabulary with " { $link \ \IN: } " results in an error."
+{ $subsections \ \IN: } ;
 
 ARTICLE: "word-search-semantics" "Resolution of ambiguous word names"
-"There is a distinction between parsing words which perform “open” imports versus “closed” imports. An open import introduces all words from a vocabulary as identifiers, except possibly a finite set of exclusions. The " { $link postpone: \USE: } ", " { $link postpone: \USING: } " and " { $link postpone: \EXCLUDE: } " words perform open imports. A closed import only adds a fixed set of identifiers. The " { $link postpone: \FROM: } ", " { $link postpone: \RENAME: } ", " { $link postpone: \QUALIFIED: } " and " { $link postpone: \QUALIFIED-WITH: } " words perform closed imports. Note that the latter two are considered as closed imports, due to the fact that all identifiers they introduce are unambiguously qualified with a prefix. The " { $link postpone: \IN: } " parsing word also performs a closed import of the newly-created vocabulary."
+"There is a distinction between parsing words which perform “open” imports versus “closed” imports. An open import introduces all words from a vocabulary as identifiers, except possibly a finite set of exclusions. The " { $link \ \USE: } ", " { $link \ \USING: } " and " { $link \ \EXCLUDE: } " words perform open imports. A closed import only adds a fixed set of identifiers. The " { $link \ \FROM: } ", " { $link \ \RENAME: } ", " { $link \ \QUALIFIED: } " and " { $link \ \QUALIFIED-WITH: } " words perform closed imports. Note that the latter two are considered as closed imports, due to the fact that all identifiers they introduce are unambiguously qualified with a prefix. The " { $link \ \IN: } " parsing word also performs a closed import of the newly-created vocabulary."
 $nl
 "When the parser encounters a reference to a word, it first searches the closed imports, in order. Closed imports are searched from the most recent to least recent. If the word could not be found this way, it searches open imports. Unlike closed imports, with open imports, the order does not matter -- instead, if more than one vocabulary defines a word with this name, an error is thrown."
 { $subsections ambiguous-use-error }
-"To resolve the error, add a closed import, using " { $link postpone: \FROM: } ", " { $link postpone: \QUALIFIED: } " or " { $link postpone: \QUALIFIED-WITH: } ". The closed import will then take precedence over the open imports, and the ambiguity will be resolved."
+"To resolve the error, add a closed import, using " { $link \ \FROM: } ", " { $link \ \QUALIFIED: } " or " { $link \ \QUALIFIED-WITH: } ". The closed import will then take precedence over the open imports, and the ambiguity will be resolved."
 $nl
 "The rationale for this behavior is as follows. Open imports are named such because they are open to future extension; if a future version of a vocabulary that you use adds new words, those new words will now be in scope in your source file, too. To avoid problems, any references to the new word have to be resolved since the parser cannot safely determine which vocabulary was meant. This problem can be avoided entirely by using only closed imports, but this leads to additional verbosity."
 $nl
 "In practice, a small set of guidelines helps avoid name clashes:"
 { $list
   "Keep vocabularies small"
-  { "Hide internal words using " { $link postpone: \<PRIVATE } }
-  { "Make good use of " { $link postpone: \FROM: } ", " { $link postpone: \QUALIFIED: } " or " { $link postpone: \QUALIFIED-WITH: } }
+  { "Hide internal words using " { $link \ \<PRIVATE } }
+  { "Make good use of " { $link \ \FROM: } ", " { $link \ \QUALIFIED: } " or " { $link \ \QUALIFIED-WITH: } }
 } ;
 
 ARTICLE: "word-search-private" "Private words"
 "Words which only serve as implementation detail should be defined in a private code block. Words in a private code blocks get defined in a vocabulary whose name is the name of the current vocabulary suffixed with " { $snippet ".private" } ". Privacy is not enforced by the system; private words can be called from other vocabularies, and from the listener. However, this should be avoided where possible."
 { $subsections
-    postpone: \<PRIVATE
-    postpone: \PRIVATE>
+    \ \<PRIVATE
+    \ \PRIVATE>
 } ;
 
 ARTICLE: "word-search" "Parse-time word lookup"
@@ -79,7 +79,7 @@ $nl
     add-words-from
     add-words-excluding
 }
-"Words used to implement " { $link postpone: \IN: } ":"
+"Words used to implement " { $link \ \IN: } ":"
 { $subsections
     current-vocab
     set-current-vocab
@@ -113,10 +113,10 @@ HELP: <no-word-error>
 HELP: set-current-vocab
 { $values { "name" string } }
 { $description "Sets the current vocabulary where new words will be defined, creating the vocabulary first if it does not exist." }
-{ $notes "This word is used to implement " { $link postpone: \IN: } "." } ;
+{ $notes "This word is used to implement " { $link \ \IN: } "." } ;
 
 HELP: no-current-vocab
-{ $error-description "Thrown when a new word is defined in a source file that does not have an " { $link postpone: \IN: } " form." } ;
+{ $error-description "Thrown when a new word is defined in a source file that does not have an " { $link \ \IN: } " form." } ;
 
 HELP: current-vocab
 { $values { "vocab" vocab } }
@@ -125,41 +125,41 @@ HELP: current-vocab
 
 HELP: begin-private
 { $description "Begins a block of private word definitions. Private word definitions are placed in the current vocabulary name, suffixed with " { $snippet ".private" } "." }
-{ $notes "This word is used to implement " { $link postpone: \<PRIVATE } "." } ;
+{ $notes "This word is used to implement " { $link \ \<PRIVATE } "." } ;
 
 HELP: end-private
 { $description "Ends a block of private word definitions." }
-{ $notes "This word is used to implement " { $link postpone: \PRIVATE> } "." } ;
+{ $notes "This word is used to implement " { $link \ \PRIVATE> } "." } ;
 
 HELP: use-vocab
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Adds a vocabulary to the current manifest." }
-{ $notes "This word is used to implement " { $link postpone: \USE: } "." } ;
+{ $notes "This word is used to implement " { $link \ \USE: } "." } ;
 
 HELP: unuse-vocab
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Removes a vocabulary from the current manifest." }
-{ $notes "This word is used to implement " { $link postpone: \UNUSE: } "." } ;
+{ $notes "This word is used to implement " { $link \ \UNUSE: } "." } ;
 
 HELP: add-qualified
 { $values { "vocab" "a vocabulary specifier" } { "prefix" string } }
 { $description "Adds the vocabulary's words, prefixed with the given string, to the current manifest." }
-{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. See the example in " { $link postpone: \QUALIFIED: } " for further explanation." } ;
+{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. See the example in " { $link \ \QUALIFIED: } " for further explanation." } ;
 
 HELP: add-words-from
 { $values { "vocab" "a vocabulary specifier" } { "words" { $sequence "word names" } } }
 { $description "Adds " { $snippet "words" } " from " { $snippet "vocab" } " to the current manifest." }
-{ $notes "This word is used to implement " { $link postpone: \FROM: } "." } ;
+{ $notes "This word is used to implement " { $link \ \FROM: } "." } ;
 
 HELP: add-words-excluding
 { $values { "vocab" "a vocabulary specifier" } { "words" { $sequence "word names" } } }
 { $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } " to the manifest." }
-{ $notes "This word is used to implement " { $link postpone: \EXCLUDE: } "." } ;
+{ $notes "This word is used to implement " { $link \ \EXCLUDE: } "." } ;
 
 HELP: add-renamed-word
 { $values { "word" string } { "vocab" "a vocabulary specifier" } { "new-name" string } }
 { $description "Imports " { $snippet "word" } " from " { $snippet "vocab" } ", but renamed to " { $snippet "new-name" } "." }
-{ $notes "This word is used to implement " { $link postpone: \RENAME: } "." } ;
+{ $notes "This word is used to implement " { $link \ \RENAME: } "." } ;
 
 HELP: use-words
 { $values { "assoc" assoc } }
@@ -170,7 +170,7 @@ HELP: unuse-words
 { $description "Removes an assoc mapping word names to words from the current manifest." } ;
 
 HELP: ambiguous-use-error
-{ $error-description "Thrown when a word name referenced in source file is available in more than one vocabulary in the manifest. Such cases must be explicitly disambiguated using " { $link postpone: \FROM: } ", " { $link postpone: \EXCLUDE: } ", " { $link postpone: \QUALIFIED: } ", or " { $link postpone: \QUALIFIED-WITH: } "." } ;
+{ $error-description "Thrown when a word name referenced in source file is available in more than one vocabulary in the manifest. Such cases must be explicitly disambiguated using " { $link \ \FROM: } ", " { $link \ \EXCLUDE: } ", " { $link \ \QUALIFIED: } ", or " { $link \ \QUALIFIED-WITH: } "." } ;
 
 HELP: search-manifest
 { $values { "name" string } { "manifest" manifest } { "word/f" { $maybe word } } }

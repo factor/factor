@@ -274,7 +274,7 @@ PRIVATE>
 : tri-curry@ ( x y z q -- p' q' r' ) currier tri@ ; inline
 
 ! Booleans
-UNION: boolean postpone: t postpone: f ;
+UNION: boolean t postpone: f ;
 
 : >boolean ( obj -- ? ) [ t ] [ f ] if ; inline
 

@@ -197,9 +197,9 @@ SYMBOL: not-a-tuple-class
 [ not-a-tuple-class boa ] must-fail
 [ not-a-tuple-class new ] must-fail
 
-TUPLE: erg's-reshape-problem a b c d ;
+TUPLE: ergs-reshape-problem a b c d ;
 
-C: <erg's-reshape-problem> erg's-reshape-problem
+C: <ergs-reshape-problem> ergs-reshape-problem
 
 ! Inheritance
 TUPLE: computer cpu ram ;
@@ -422,15 +422,15 @@ TUPLE: constructor-update-2 < constructor-update-1 yyy zzz ;
 ! Redefinition problem
 TUPLE: redefinition-problem ;
 
-UNION: redefinition-problem' redefinition-problem integer ;
+UNION: redefinition-problem-union redefinition-problem integer ;
 
-{ t } [ 3 redefinition-problem'? ] unit-test
+{ t } [ 3 redefinition-problem-union? ] unit-test
 
 TUPLE: redefinition-problem-2 ;
 
 "IN: classes.tuple.tests TUPLE: redefinition-problem < redefinition-problem-2 ;" eval( -- )
 
-{ t } [ 3 redefinition-problem'? ] unit-test
+{ t } [ 3 redefinition-problem-union? ] unit-test
 
 ! Hardcore unit tests
 
@@ -603,12 +603,12 @@ must-fail-with
 
 
 { } [
-    "IN: classes.tuple.tests TUPLE: forget-subclass-test ; TUPLE: forget-subclass-test' < forget-subclass-test ;"
+    "IN: classes.tuple.tests TUPLE: forget-subclass-test ; TUPLE: forget-subclass-test2 < forget-subclass-test ;"
     <string-reader> "forget-subclass-test" parse-stream
     drop
 ] unit-test
 
-{ } [ "forget-subclass-test'" "classes.tuple.tests" lookup-word new "bad-object" set ] unit-test
+{ } [ "forget-subclass-test2" "classes.tuple.tests" lookup-word new "bad-object" set ] unit-test
 
 { } [
     "IN: classes.tuple.tests TUPLE: forget-subclass-test a ;"

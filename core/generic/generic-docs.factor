@@ -22,7 +22,7 @@ $nl
 { $subsections order } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"
-"In most cases, generic words and methods are defined at parse time with " { $link postpone: \GENERIC: } " (or some other parsing word) and " { $link postpone: \M: } "."
+"In most cases, generic words and methods are defined at parse time with " { $link \ \GENERIC: } " (or some other parsing word) and " { $link \ \M: } "."
 $nl
 "Sometimes, generic words need to be inspected or defined at run time; words for performing these tasks are found in the " { $vocab-link "generic" } " vocabulary."
 $nl
@@ -49,7 +49,7 @@ $nl
 "Low-level method constructor:"
 { $subsections <method> }
 "Methods may be pushed on the stack with a literal syntax:"
-{ $subsections postpone: \M\\ }
+{ $subsections \ \M\\ }
 { $see-also "see" } ;
 
 ARTICLE: "method-combination" "Custom method combination"
@@ -60,10 +60,10 @@ ARTICLE: "method-combination" "Custom method combination"
 }
 "A table of built-in method combination defining words, and the method combinations themselves:"
 { $table
-    { { $link postpone: \GENERIC: } { $link standard-combination } }
-    { { $link postpone: \GENERIC#: } { $link standard-combination } }
-    { { $link postpone: \HOOK: } { $link hook-combination } }
-    { { $link postpone: \MATH: } { $link math-combination } }
+    { { $link \ \GENERIC: } { $link standard-combination } }
+    { { $link \ \GENERIC#: } { $link standard-combination } }
+    { { $link \ \HOOK: } { $link hook-combination } }
+    { { $link \ \MATH: } { $link math-combination } }
 }
 "Developing a custom method combination requires that a parsing word calling " { $link define-generic } " be defined; additionally, it is a good idea to implement the " { $link "definition-protocol" } " on the class of words having this method combination, to properly support developer tools."
 $nl
@@ -74,12 +74,12 @@ ARTICLE: "call-next-method" "Calling less-specific methods"
 "If a generic word is called with an object and multiple methods specialize on classes that this object is an instance of, usually the most specific method is called (" { $link "method-order" } ")."
 $nl
 "Less-specific methods can be called directly:"
-{ $subsections postpone: call-next-method }
+{ $subsections \ call-next-method }
 "A lower-level word which the above expands into:"
 { $subsections (call-next-method) }
 "To look up the next applicable method reflectively:"
 { $subsections next-method }
-"Errors thrown by improper calls to " { $link postpone: call-next-method } ":"
+"Errors thrown by improper calls to " { $link \ call-next-method } ":"
 { $subsections
     inconsistent-next-method
     no-next-method
@@ -91,15 +91,15 @@ $nl
 "A generic word behaves roughly like a long series of class predicate conditionals in a " { $link cond } " form, however methods can be defined in independent source files, reducing coupling and increasing extensibility. The method combination determines which object the generic word will " { $emphasis "dispatch" } " on; this could be the top of the stack, or some other value."
 $nl
 "Generic words which dispatch on the object at the top of the stack:"
-{ $subsections postpone: \GENERIC: }
+{ $subsections \ \GENERIC: }
 "A method combination which dispatches on a specified stack position:"
-{ $subsections postpone: \GENERIC#: }
+{ $subsections \ \GENERIC#: }
 "A method combination which dispatches on the value of a variable at the time the generic word is called:"
-{ $subsections postpone: \HOOK: }
+{ $subsections \ \HOOK: }
 "A method combination which dispatches on a pair of stack values, which must be numbers, and upgrades both to the same type of number:"
-{ $subsections postpone: \MATH: }
+{ $subsections \ \MATH: }
 "Method definition:"
-{ $subsections postpone: \M: }
+{ $subsections \ \M: }
 "Generic words must declare their stack effect in order to compile. See " { $link "effects" } "."
 { $subsections
     "method-order"
@@ -114,7 +114,7 @@ ABOUT: "generic"
 HELP: generic
 { $class-description "The class of generic words, documented in " { $link "generic" } "." } ;
 
-{ generic define-generic define-simple-generic postpone: \GENERIC: postpone: \GENERIC#: postpone: \MATH: postpone: \HOOK: } related-words
+{ generic define-generic define-simple-generic \ \GENERIC: \ \GENERIC#: \ \MATH: \ \HOOK: } related-words
 
 HELP: make-generic
 { $values { "word" generic } }
@@ -143,7 +143,7 @@ HELP: ?lookup-method
 { $values { "class" class } { "generic" generic } { "method/f" { $maybe method } } }
 { $description "Looks up a method definition." } ;
 
-{ lookup-method ?lookup-method create-method postpone: \M: } related-words
+{ lookup-method ?lookup-method create-method \ \M: } related-words
 
 HELP: <method>
 { $values { "class" class } { "generic" generic } { "method" "a new method definition" } }
@@ -156,7 +156,7 @@ HELP: order
 HELP: check-method
 { $values { "class" class } { "generic" generic } }
 { $description "Asserts that " { $snippet "class" } " is a class word and " { $snippet "generic" } " is a generic word, throwing a " { $link check-method } " error if the assertion fails." }
-{ $error-description "Thrown if " { $link postpone: \M: } " or " { $link create-method } " is given an invalid class or generic word." } ;
+{ $error-description "Thrown if " { $link \ \M: } " or " { $link create-method } " is given an invalid class or generic word." } ;
 
 HELP: with-methods
 { $values { "class" class } { "generic" generic } { "quot" { $quotation ( methods -- ) } } }
@@ -165,16 +165,16 @@ $low-level-note ;
 
 HELP: create-method
 { $values { "class" class } { "generic" generic } { "method" method } }
-{ $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link postpone: \M: } "." }
+{ $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link \ \M: } "." }
 { $notes "To define a method, pass the output value to " { $link define } "." } ;
 
 { sort-classes order } related-words
 
 HELP: (call-next-method)
 { $values { "method" method } }
-{ $description "Low-level word implementing " { $link postpone: call-next-method } "." }
+{ $description "Low-level word implementing " { $link \ call-next-method } "." }
 { $notes
-    "The " { $link postpone: call-next-method } " word parses into this word. The following are equivalent:"
+    "The " { $link \ call-next-method } " word parses into this word. The following are equivalent:"
     { $code
         "M: class generic call-next-method ;"
         "M: class generic M\\\\ class generic (call-next-method) ;"
@@ -182,7 +182,7 @@ HELP: (call-next-method)
 } ;
 
 HELP: no-next-method
-{ $error-description "Thrown by " { $link postpone: call-next-method } " if the current method is already the least specific method." }
+{ $error-description "Thrown by " { $link \ call-next-method } " if the current method is already the least specific method." }
 { $examples
     "The following code throws this error:"
     { $code
@@ -194,5 +194,5 @@ HELP: no-next-method
         ""
         "123 error-test"
     }
-    "This results in the method on " { $link integer } " being called, which then calls the method on " { $link number } ". The latter then calls " { $link postpone: call-next-method } ", however there is no method less specific than the method on " { $link number } " and so an error is thrown."
+    "This results in the method on " { $link integer } " being called, which then calls the method on " { $link number } ". The latter then calls " { $link \ call-next-method } ", however there is no method less specific than the method on " { $link number } " and so an error is thrown."
 } ;

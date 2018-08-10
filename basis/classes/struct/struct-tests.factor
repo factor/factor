@@ -325,11 +325,11 @@ STRUCT: clone-test-struct { x int } { y char[3] } ;
     ] with-destructors
 ] unit-test
 
-STRUCT: struct-that's-a-word { x int } ;
+STRUCT: struct-that-is-a-word { x int } ;
 
-: struct-that's-a-word ( -- ) "OOPS" throw ;
+: struct-that-is-a-word ( -- ) "OOPS" throw ;
 
-{ -77 } [ S{ struct-that's-a-word { x -77 } } clone x>> ] unit-test
+{ -77 } [ S{ struct-that-is-a-word { x -77 } } clone x>> ] unit-test
 
 ! Interactive parsing of struct slot definitions
 [

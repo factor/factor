@@ -469,28 +469,28 @@ M:: integer lambda-method-forget-test ( a -- b ) a ;
 { 3 } [ let[ \ + :> a 1 2 [ \ a execute ] ] call ] unit-test
 
 ! erg found this problem
-:: erg's-:>-bug ( n ? -- n ) ? [ n :> n n ] [ n :> b b ] if ;
+:: ergs-locals-bug ( n ? -- n ) ? [ n :> n n ] [ n :> b b ] if ;
 
-{ 3 } [ 3 f erg's-:>-bug ] unit-test
+{ 3 } [ 3 f ergs-locals-bug ] unit-test
 
-{ 3 } [ 3 t erg's-:>-bug ] unit-test
+{ 3 } [ 3 t ergs-locals-bug ] unit-test
 
-:: erg's-:>-bug-2 ( n ? -- n ) ? n '[ _ :> n n ] [ n :> b b ] if ;
+:: ergs-locals-bug2 ( n ? -- n ) ? n '[ _ :> n n ] [ n :> b b ] if ;
 
-{ 3 } [ 3 f erg's-:>-bug-2 ] unit-test
+{ 3 } [ 3 f ergs-locals-bug2 ] unit-test
 
-{ 3 } [ 3 t erg's-:>-bug-2 ] unit-test
+{ 3 } [ 3 t ergs-locals-bug2 ] unit-test
 
 ! dharmatech found this problem
-GENERIC: ed's-bug ( a -- b )
+GENERIC: eds-bug ( a -- b )
 
-M: string ed's-bug reverse ;
-M: integer ed's-bug neg ;
+M: string eds-bug reverse ;
+M: integer eds-bug neg ;
 
-:: ed's-test-case ( a -- b )
-   { [ a ed's-bug ] } && ;
+:: eds-test-case ( a -- b )
+   { [ a eds-bug ] } && ;
 
-{ t } [ \ ed's-test-case word-optimized? ] unit-test
+{ t } [ \ eds-test-case word-optimized? ] unit-test
 
 ! multiple bind
 { 3 1 2 } [ let[ 1 2 3 :> ( a b c ) c a b ] ] unit-test

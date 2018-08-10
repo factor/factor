@@ -5,7 +5,7 @@ IN: classes.intersection
 
 ARTICLE: "intersections" "Intersection classes"
 "An object is an instance of an intersection class if it is an instance of all of its participants."
-{ $subsections postpone: \INTERSECTION: }
+{ $subsections \ \INTERSECTION: }
 { $subsections define-intersection-class }
 "Intersection classes can be introspected:"
 { $subsections class-participants }
@@ -20,11 +20,11 @@ ABOUT: "intersections"
 
 HELP: define-intersection-class
 { $values { "class" class } { "participants" "a sequence of classes" } }
-{ $description "Defines a intersection class with specified participants. This is the run time equivalent of " { $link postpone: \INTERSECTION: } "." }
+{ $description "Defines a intersection class with specified participants. This is the run time equivalent of " { $link \ \INTERSECTION: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
 
-{ intersection-class define-intersection-class postpone: \INTERSECTION: } related-words
+{ intersection-class define-intersection-class \ \INTERSECTION: } related-words
 
 HELP: intersection-class
 { $class-description "The class of intersection classes." } ;

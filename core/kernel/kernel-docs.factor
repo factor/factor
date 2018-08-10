@@ -166,7 +166,7 @@ HELP: ?
 { $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;
 
 HELP: boolean
-{ $class-description "A union of the " { $link postpone: t } " and " { $link postpone: f } " classes." } ;
+{ $class-description "A union of the " { $link \ t } " and " { $link \ f } " classes." } ;
 
 HELP: >boolean
 { $values { "obj" "a generalized boolean" } { "?" boolean } }
@@ -229,12 +229,12 @@ HELP: same?
 
 HELP: execute
 { $values { "word" word } }
-{ $description "Executes a word. Words which " { $link execute } " an input parameter must be declared " { $link postpone: inline } " so that a caller which passes in a literal word can have a static stack effect." }
+{ $description "Executes a word. Words which " { $link execute } " an input parameter must be declared " { $link \ inline } " so that a caller which passes in a literal word can have a static stack effect." }
 { $examples
     { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ; inline\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
 
-{ execute postpone: \execute( } related-words
+{ execute \ \execute( } related-words
 
 HELP: (execute)
 { $values { "word" word } }
@@ -243,13 +243,13 @@ HELP: (execute)
 
 HELP: call
 { $values { "callable" callable } }
-{ $description "Calls a quotation. Words which " { $link call } " an input parameter must be declared " { $link postpone: inline } " so that a caller which passes in a literal quotation can have a static stack effect." }
+{ $description "Calls a quotation. Words which " { $link call } " an input parameter must be declared " { $link \ inline } " so that a caller which passes in a literal quotation can have a static stack effect." }
 { $examples
     "The following two lines are equivalent:"
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
 } ;
 
-{ call postpone: \call( } related-words
+{ call \ \call( } related-words
 
 HELP: keep
 { $values { "x" object } { "quot" { $quotation ( ..a x -- ..b ) } } }

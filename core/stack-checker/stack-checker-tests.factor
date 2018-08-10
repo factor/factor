@@ -322,9 +322,9 @@ ERROR: custom-error ;
 
 [ [ [ f dup ] [ ] while ] infer ] must-fail
 
-: erg's-inference-bug ( -- ) f dup [ erg's-inference-bug ] when ; inline recursive
-[ [ erg's-inference-bug ] infer ] must-fail
-FORGET: erg's-inference-bug
+: ergs-inference-bug ( -- ) f dup [ ergs-inference-bug ] when ; inline recursive
+[ [ ergs-inference-bug ] infer ] must-fail
+FORGET: ergs-inference-bug
 
 : bad-recursion-3 ( -- ) dup [ [ bad-recursion-3 ] dip ] when ; inline recursive
 [ [ bad-recursion-3 ] infer ] must-fail

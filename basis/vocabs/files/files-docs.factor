@@ -23,9 +23,9 @@ HELP: vocab-files
     $[
         {
             "{"
-            "    \"resource:basis/alien/libraries/libraries.factor\""
-            "    \"resource:basis/alien/libraries/libraries-docs.factor\""
-            "    \"resource:basis/alien/libraries/libraries-tests.factor\""
+            "    \"resource:core/alien/libraries/libraries.factor\""
+            "    \"resource:core/alien/libraries/libraries-docs.factor\""
+            "    \"resource:core/alien/libraries/libraries-tests.factor\""
             "}"
         } "\n" join
     ]

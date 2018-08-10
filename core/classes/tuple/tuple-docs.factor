@@ -25,7 +25,7 @@ $nl
 "This feature is mostly intended as an optimization for low-level code designed to avoid integer overflow, or where floating point precision is sufficient. Most code needs to work transparently with large integers, and thus should avoid the coercion behavior by using " { $link integer } " and " { $link real } " in place of " { $link fixnum } " and " { $link float } "." ;
 
 ARTICLE: "tuple-declarations" "Tuple slot declarations"
-"The slot specifier syntax of the " { $link postpone: \TUPLE: } " parsing word understands the following slot attributes:"
+"The slot specifier syntax of the " { $link \ \TUPLE: } " parsing word understands the following slot attributes:"
 { $list
     "class declaration: values must satisfy the class predicate"
     { "whether a slot is read only or not (" { $link read-only } ")" }
@@ -91,7 +91,7 @@ ARTICLE: "tuple-constructors" "Tuple constructors"
     boa
 }
 "A shortcut for defining BOA constructors:"
-{ $subsections postpone: \C: }
+{ $subsections \ \C: }
 "By convention, construction logic is encapsulated in a word named after the tuple class surrounded in angle brackets; for example, the constructor word for a " { $snippet "point" } " class might be named " { $snippet "<point>" } "."
 $nl
 "Constructors play a part in enforcing the invariant that slot values must always match slot declarations. The " { $link new } " word fills in the tuple with initial values, and " { $link boa } " ensures that the values on the stack match the corresponding slot declarations. See " { $link "tuple-declarations" } "."
@@ -183,7 +183,7 @@ $nl
 ARTICLE: "tuple-subclassing" "Tuple subclassing"
 "Tuple subclassing can be used to express natural relationships between classes at the language level. For example, every car " { $emphasis "is a" } " vehicle, so if the " { $snippet "car" } " class subclasses the " { $snippet "vehicle" } " class, it can " { $emphasis "inherit" } " the slots and methods of " { $snippet "vehicle" } "."
 $nl
-"To define one tuple class as a subclass of another, use the optional superclass parameter to " { $link postpone: \TUPLE: } ":"
+"To define one tuple class as a subclass of another, use the optional superclass parameter to " { $link \ \TUPLE: } ":"
 { $code
     "TUPLE: subclass < superclass ... ;"
 }
@@ -192,11 +192,11 @@ $nl
     "tuple-inheritance-anti-example"
 }
 "Declaring a tuple class final prohibits other classes from subclassing it:"
-{ $subsections postpone: final }
+{ $subsections \ final }
 { $see-also "call-next-method" "parameterized-constructors" "unions" "mixins" "maybes" } ;
 
 ARTICLE: "tuple-introspection" "Tuple introspection"
-"In addition to the slot reader and writer words which " { $link postpone: \TUPLE: } " defines for every tuple class, it is possible to construct and take apart entire tuples in a generic way."
+"In addition to the slot reader and writer words which " { $link \ \TUPLE: } " defines for every tuple class, it is possible to construct and take apart entire tuples in a generic way."
 { $subsections
     >tuple
     tuple>array
@@ -279,7 +279,7 @@ ARTICLE: "tuple-examples" "Tuple examples"
 "An example using subclassing can be found in " { $link "tuple-inheritance-example" } "." ;
 
 ARTICLE: "tuple-redefinition" "Tuple redefinition"
-"In the following, the " { $emphasis "direct slots" } " of a tuple class refers to the slot names specified in the " { $link postpone: \TUPLE: } " form defining the tuple class, and the " { $emphasis "effective slots" } " refers to the concatenation of the direct slots together with slots defined on superclasses."
+"In the following, the " { $emphasis "direct slots" } " of a tuple class refers to the slot names specified in the " { $link \ \TUPLE: } " form defining the tuple class, and the " { $emphasis "effective slots" } " refers to the concatenation of the direct slots together with slots defined on superclasses."
 $nl
 "When the " { $emphasis "effective slots" } " of a tuple class change, all instances of the class, including subclasses, are updated."
 $nl
@@ -304,7 +304,7 @@ ARTICLE: "protocol-slots" "Protocol slots"
 "A " { $emphasis "protocol slot" } " is one which is assumed to exist by the implementation of a class, without being defined on the class itself. The burden is on subclasses (or mixin instances) to provide this slot."
 $nl
 "Protocol slots are defined using a parsing word:"
-{ $subsections postpone: \SLOT: }
+{ $subsections \ \SLOT: }
 "Protocol slots are used where the implementation of a superclass needs to assume that each subclass defines certain slots, however the slots of each subclass are potentially declared with different class specializers, thus preventing the slots from being defined in the superclass."
 $nl
 "For example, the " { $link growable } " mixin provides an implementation of the sequence protocol which wraps an underlying sequence, resizing it as necessary when elements are added beyond the length of the sequence. It assumes that the concrete mixin instances define two slots, " { $snippet "length" } " and " { $snippet "underlying" } ". These slots are defined as protocol slots: " { $snippet "SLOT: length" } " and " { $snippet "SLOT: underlying" } ". "
@@ -331,7 +331,7 @@ ARTICLE: "tuples" "Tuples"
 "Tuples are user-defined classes composed of named slots. They are the central data type of Factor's object system."
 { $subsections "tuple-examples" }
 "A parsing word defines tuple classes:"
-{ $subsections postpone: \TUPLE: }
+{ $subsections \ \TUPLE: }
 "For each tuple class, several words are defined, the class word, a class predicate, and accessor words for each slot."
 $nl
 "The class word is used for defining methods on the tuple class; it has the same name as the tuple class. The predicate is named " { $snippet { $emphasis "name" } "?" } ". Initially, no specific words are defined for constructing new instances of the tuple. Constructors must be defined explicitly, and tuple slots are accessed via automatically-generated accessor words."
@@ -358,7 +358,7 @@ HELP: tuple=
 { $description "Checks if two tuples have equal slot values. This is the default behavior of " { $link = } " on tuples, unless the tuple class subclasses " { $link identity-tuple } " or implements a method on " { $link equal? } ". In cases where equality has been redefined, this word can be used to get the default semantics if needed." } ;
 
 HELP: tuple
-{ $class-description "The class of tuples. This class is further partitioned into disjoint subclasses; each tuple shape defined by " { $link postpone: \TUPLE: } " is a new class."
+{ $class-description "The class of tuples. This class is further partitioned into disjoint subclasses; each tuple shape defined by " { $link \ \TUPLE: } " is a new class."
 $nl
 "Tuple classes have additional word properties:"
 { $list
@@ -393,15 +393,15 @@ $low-level-note ;
 HELP: check-tuple
 { $values { "class" class } }
 { $description "Throws a " { $link check-tuple } " error if " { $snippet "word" } " is not a tuple class word." }
-{ $error-description "Thrown if " { $link postpone: \C: } " is called with a word which does not name a tuple class." } ;
+{ $error-description "Thrown if " { $link \ \C: } " is called with a word which does not name a tuple class." } ;
 
 HELP: define-tuple-class
 { $values { "class" word } { "superclass" class } { "slots" "a sequence of strings" } }
-{ $description "Defines a tuple class inheriting from " { $snippet "superclass" } " with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link postpone: \TUPLE: } "." }
+{ $description "Defines a tuple class inheriting from " { $snippet "superclass" } " with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link \ \TUPLE: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
 
-{ tuple-class define-tuple-class postpone: \TUPLE: } related-words
+{ tuple-class define-tuple-class \ \TUPLE: } related-words
 
 HELP: >tuple
 { $values { "seq" sequence } { "tuple" tuple } }
@@ -452,7 +452,7 @@ HELP: boa
 { $errors "Throws an error if the slot values do not match class declarations on slots (see " { $link "tuple-declarations" } ")." } ;
 
 HELP: bad-superclass
-{ $error-description "Thrown if an attempt is made to subclass a class that is not a tuple class, or a tuple class declared " { $link postpone: final } "." } ;
+{ $error-description "Thrown if an attempt is made to subclass a class that is not a tuple class, or a tuple class declared " { $link \ final } "." } ;
 
 HELP: ?offset-of-slot
 { $values { "name" string } { "tuple" tuple } { "n/f" { $maybe integer } } }

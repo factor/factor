@@ -7,7 +7,7 @@ USING: compiler.cfg.instructions.syntax prettyprint splitting ;
 "use: src/int-rep temp: temp/int-rep" " " split parse-insn-slot-specs .
 ]]
 
-CONSTANT: parse-insn-slot-specs-result [[ {
+CONSTANT: parse-insn-slot-specs-result [[{
     T{ insn-slot-spec
         { type use }
         { name "src" }

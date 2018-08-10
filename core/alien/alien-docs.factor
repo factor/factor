@@ -149,7 +149,7 @@ HELP: alien-assembly
 ARTICLE: "alien-expiry" "Alien expiry"
 "When an image is loaded, any alien objects which persisted from the previous session are marked as having expired. This is because the C pointers they contain are almost certainly no longer valid."
 $nl
-"For this reason, the " { $link postpone: \alien: } " word should not be used in source files, since loading the source file then saving the image will result in the literal becoming expired. Use " { $link <alien> } " instead, and ensure the word calling " { $link <alien> } " is not declared " { $link postpone: flushable } "."
+"For this reason, the " { $link \ \alien: } " word should not be used in source files, since loading the source file then saving the image will result in the literal becoming expired. Use " { $link <alien> } " instead, and ensure the word calling " { $link <alien> } " is not declared " { $link \ flushable } "."
 { $subsections expired? } ;
 
 ARTICLE: "aliens" "Alien addresses"
@@ -205,9 +205,9 @@ ARTICLE: "reading-writing-memory" "Reading and writing memory directly"
 ARTICLE: "alien-invoke" "Calling C from Factor"
 "The easiest way to call into a C library is to define bindings using a pair of parsing words:"
 { $subsections
-    postpone: \LIBRARY:
-    postpone: \FUNCTION:
-    postpone: \FUNCTION-ALIAS:
+    \ \LIBRARY:
+    \ \FUNCTION:
+    \ \FUNCTION-ALIAS:
 }
 "The above parsing words create word definitions which call a lower-level word; you can use it directly, too:"
 { $subsections alien-invoke }
@@ -219,7 +219,7 @@ ARTICLE: "alien-callback" "Calling Factor from C"
 "Callbacks can be defined and passed to C code as function pointers; the C code can then invoke the callback and run Factor code:"
 { $subsections
     alien-callback
-    postpone: \CALLBACK:
+    \ \CALLBACK:
 }
 "There are some caveats concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "."
 { $see-also "byte-arrays-gc" } ;
@@ -227,8 +227,8 @@ ARTICLE: "alien-callback" "Calling Factor from C"
 ARTICLE: "alien-globals" "Accessing C global variables"
 "The " { $vocab-link "alien.syntax" } " vocabulary defines two parsing words for accessing the value of a global variable, and get the address of a global variable, respectively."
 { $subsections
-    postpone: \C-GLOBAL:
-    postpone: \&:
+    \ \C-GLOBAL:
+    \ \&:
 } ;
 
 ARTICLE: "alien-assembly" "Calling arbitrary assembly code"

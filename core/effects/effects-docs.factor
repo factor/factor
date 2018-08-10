@@ -3,7 +3,7 @@ sequences strings words ;
 IN: effects
 
 ARTICLE: "effects" "Stack effect declarations"
-"Word definition words such as " { $link postpone: \: } " and " { $link postpone: \GENERIC: } " have a " { $emphasis "stack effect declaration" } " as part of their syntax. A stack effect declaration takes the following form:"
+"Word definition words such as " { $link \ \: } " and " { $link \ \GENERIC: } " have a " { $emphasis "stack effect declaration" } " as part of their syntax. A stack effect declaration takes the following form:"
 { $code "( input1 input2 ... -- output1 ... )" }
 "Stack elements in a stack effect are ordered so that the top of the stack is on the right side. Here is an example:"
 { $synopsis + }
@@ -13,7 +13,7 @@ ARTICLE: "effects" "Stack effect declarations"
 { $synopsis while }
 { $synopsis if* }
 { $synopsis each }
-"For words that are not " { $link postpone: inline } ", only the number of inputs and outputs carries semantic meaning, and effect variables are ignored. However, nested quotation declarations are enforced for inline words. Nested quotation declarations are optional for non-recursive inline combinators and only provide better error messages. However, quotation inputs to " { $link postpone: recursive } " combinators must have an effect declared. See " { $link "inference-recursive-combinators" } "."
+"For words that are not " { $link \ inline } ", only the number of inputs and outputs carries semantic meaning, and effect variables are ignored. However, nested quotation declarations are enforced for inline words. Nested quotation declarations are optional for non-recursive inline combinators and only provide better error messages. However, quotation inputs to " { $link \ recursive } " combinators must have an effect declared. See " { $link "inference-recursive-combinators" } "."
 $nl
 "In concatenative code, input and output names are for documentation purposes only and certain conventions have been established to make them more descriptive. For code written with " { $link "locals" } ", stack values are bound to local variables named by the stack effect's input parameters."
 $nl
@@ -100,7 +100,7 @@ f { \"a\" \"b\" } f { \"c\" } <variable-effect> ." "( a b -- c )" }
 { <effect> <terminated-effect> <variable-effect> } related-words
 
 ARTICLE: "effects-variables" "Stack effect row variables"
-"The stack effect of many " { $link postpone: inline } " combinators can have variable stack effects, depending on the effect of the quotation they call. For example, the quotation parameter to " { $link each } " receives an element from the input sequence each time it is called, but it can also manipulate values on the stack below the element as long as it leaves the same number of elements on the stack. (This is how " { $link reduce } " is implemented in terms of " { $snippet "each" } ".) The stack effect of an " { $snippet "each" } " expression thus depends on the stack effect of its input quotation:"
+"The stack effect of many " { $link \ inline } " combinators can have variable stack effects, depending on the effect of the quotation they call. For example, the quotation parameter to " { $link each } " receives an element from the input sequence each time it is called, but it can also manipulate values on the stack below the element as long as it leaves the same number of elements on the stack. (This is how " { $link reduce } " is implemented in terms of " { $snippet "each" } ".) The stack effect of an " { $snippet "each" } " expression thus depends on the stack effect of its input quotation:"
 { $example
  "USING: io sequences stack-checker ;
 [ [ write ] each ] infer."
@@ -113,7 +113,7 @@ ARTICLE: "effects-variables" "Stack effect row variables"
 { $synopsis each }
 "Using the same variable name in both the inputs and outputs (in the above case of " { $snippet "each" } ", " { $snippet "..." } ") indicates that the number of additional inputs and outputs must be the same. Using different variable names indicates that they can be independent. In combinators with multiple quotation inputs, the number of inputs or outputs represented by a particular " { $snippet ".." } " name must match among all of the quotations. For example, the branches of " { $link if* } " can take a different number of inputs from outputs, as long as they both have the same stack height. The true branch receives the test value as an added input. This is declared as follows:"
 { $synopsis if* }
-"Stack effect variables can only occur as the first input or first output of a stack effect; names starting in " { $snippet ".." } " cause a syntax error if they occur elsewhere in the effect. For words that are not " { $link postpone: inline } ", effect variables are currently ignored by the stack checker." ;
+"Stack effect variables can only occur as the first input or first output of a stack effect; names starting in " { $snippet ".." } " cause a syntax error if they occur elsewhere in the effect. For words that are not " { $link \ inline } ", effect variables are currently ignored by the stack checker." ;
 
 ABOUT: "effects"
 
@@ -144,4 +144,4 @@ HELP: effect>string
 
 HELP: stack-effect
 { $values { "word" word } { "effect/f" { $maybe effect } } }
-{ $description "Outputs the stack effect of a word; either a stack effect declared with " { $link postpone: \( } ", or an inferred stack effect (see " { $link "inference" } ")." } ;
+{ $description "Outputs the stack effect of a word; either a stack effect declared with " { $link \ \( } ", or an inferred stack effect (see " { $link "inference" } ")." } ;

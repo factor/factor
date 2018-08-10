@@ -37,7 +37,7 @@ ARTICLE: "vocabs.icons" "Vocabulary icons"
 "The icon file will be embedded in the vocab's image file." ;
 
 ARTICLE: "vocabs.loader" "Vocabulary loader"
-"The " { $link postpone: \USE: } " and " { $link postpone: \USING: } " words load vocabularies using the vocabulary loader. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."
+"The " { $link \ \USE: } " and " { $link \ \USING: } " words load vocabularies using the vocabulary loader. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."
 $nl
 "The vocabulary loader searches for vocabularies in a set of directories known as vocabulary roots."
 { $subsections "vocabs.roots" }
@@ -64,7 +64,7 @@ $nl
 $nl
 "Application vocabularies can define a main entry point, giving the user a convenient way to run the application:"
 { $subsections
-    postpone: \MAIN:
+    \ \MAIN:
     run
     runnable-vocab
 }
@@ -78,7 +78,7 @@ HELP: load-vocab
 
 HELP: vocab-main
 { $values { "vocab-spec" "a vocabulary specifier" } { "main" word } }
-{ $description "Outputs the main entry point for a vocabulary. The entry point can be executed with " { $link run } " and set with " { $link postpone: \MAIN: } "." } ;
+{ $description "Outputs the main entry point for a vocabulary. The entry point can be executed with " { $link run } " and set with " { $link \ \MAIN: } "." } ;
 
 HELP: vocab-roots
 { $var-description "A sequence of pathname strings to search for vocabularies." } ;
@@ -99,7 +99,7 @@ HELP: find-vocab-root
 HELP: no-vocab
 { $values { "name" "a vocabulary name" } }
 { $description "A " { $link no-vocab } " error tuple. Call " { $link no-vocab } " to throw it." }
-{ $error-description "Thrown when a " { $link postpone: \USE: } " or " { $link postpone: \USING: } " form refers to a non-existent vocabulary." } ;
+{ $error-description "Thrown when a " { $link \ \USE: } " or " { $link \ \USING: } " form refers to a non-existent vocabulary." } ;
 
 HELP: load-help?
 { $var-description "If set to a true value, documentation will be automatically loaded when vocabularies are loaded. This variable is usually on, except when Factor has been bootstrapped without the help system." } ;
@@ -125,7 +125,7 @@ HELP: require-when
 
 HELP: run
 { $values { "vocab" "a vocabulary specifier" } }
-{ $description "Runs a vocabulary's main entry point. The main entry point is set with the " { $link postpone: \MAIN: } " parsing word." } ;
+{ $description "Runs a vocabulary's main entry point. The main entry point is set with the " { $link \ \MAIN: } " parsing word." } ;
 
 HELP: vocab-source-path
 { $values { "vocab" "a vocabulary specifier" } { "path/f" { $maybe "a pathname string" } } }

@@ -307,14 +307,14 @@ INTERSECTION: intersection-see-test sequence number ;
 
 { "postpone: \[" } [ \ [ unparse ] unit-test
 
-TUPLE: started-out-hustlin' ;
+TUPLE: started-out-hustlin ;
 
-GENERIC: ended-up-ballin' ( a -- b )
+GENERIC: ended-up-ballin ( a -- b )
 
-M: started-out-hustlin' ended-up-ballin' ; inline
+M: started-out-hustlin ended-up-ballin ; inline
 
-{ "USING: prettyprint.tests ;\nM: started-out-hustlin' ended-up-ballin' ; inline\n" } [
-    [ M\\ started-out-hustlin' ended-up-ballin' see ] with-string-writer
+{ "USING: prettyprint.tests ;\nM: started-out-hustlin ended-up-ballin ; inline\n" } [
+    [ M\\ started-out-hustlin ended-up-ballin see ] with-string-writer
 ] unit-test
 
 TUPLE: tuple-with-declared-slot { x integer } ;
@@ -466,7 +466,7 @@ TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
     with-string-writer
 ] unit-test
 
-: margin-test ( number-of-'a's -- str )
+: margin-test ( number-of-a-s -- str )
     [
         [ ch'a <string> text "b" text ] with-pprint
     ] with-string-writer ;
