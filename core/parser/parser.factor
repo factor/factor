@@ -71,7 +71,18 @@ DEFER: scan-object
 : string>new-parser ( string -- string/obj ? )
     {
         ! { [ dup strict-lower-colon? ] [ parse-lower-colon2 t ] }
+        ! { [ dup strict-upper-colon? ] [ parse-upper-colon t ] }
+        ! { [ dup strict-section? ] [ parse-section t ] }
+        ! { [ dup strict-named-section? ] [ parse-named-section t ] }
         { [ dup strict-single-quote? ] [ parse-single-quote t ] }
+        ! { [ dup strict-double-quote? ] [ parse-double-quote t ] }
+        ! { [ dup strict-bracket-container? ] [ parse-bracket-container t ] }
+        ! { [ dup strict-brace-container? ] [ parse-brace-container t ] }
+        ! { [ dup strict-paren-container? ] [ parse-paren-container t ] }
+
+        ! { [ dup strict-bracket? ] [ parse-bracket t ] }
+        ! { [ dup strict-brace? ] [ parse-brace t ] }
+        ! { [ dup strict-paren? ] [ parse-paren t ] }
         [ f ]
     } cond ;
 
@@ -144,8 +155,12 @@ ERROR: classoid-expected object ;
     } cond ;
 
 : parse-until-step ( accum end -- accum ? )
-    ?scan-token string>new-parser
-    [ nip suffix! t ] [ (parse-until-step) ] if ;
+    ?scan-token
+    unhashtag-token
+    [
+        string>new-parser
+        [ nip suffix! t ] [ (parse-until-step) ] if
+    ] dip [ over pop* ] [ ] if ;
 
 : (parse-until) ( accum end -- accum )
     [ parse-until-step ] keep swap [ (parse-until) ] [ drop ] if ;

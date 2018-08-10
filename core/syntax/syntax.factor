@@ -128,11 +128,8 @@ IN: bootstrap.syntax
     "f" [ f suffix! ] define-core-syntax
 
     "char:" [
-        lexer get parse-raw [ "token" throw-unexpected-eof ] unless* {
-            { [ dup length 1 = ] [ first ] }
-            { [ "\\" ?head ] [ next-escape >string "" assert= ] }
-            [ name>char-hook get call( name -- char ) ]
-        } cond suffix!
+        lexer get parse-raw [ "token" throw-unexpected-eof ] unless*
+        lookup-char suffix!
     ] define-core-syntax
 
     "\"" [ parse-string suffix! ] define-core-syntax
@@ -182,16 +179,6 @@ IN: bootstrap.syntax
     "INITIALIZED-SYMBOL:" [
         scan-new-word [ define-symbol ] keep scan-object '[ _ _ initialize ] append!
     ] define-core-syntax
-
-![[
-    "INITIALIZED-SYMBOL:" [
-        scan-new-word [ define-symbol ]
-        [
-            name>> "initialize-" prepend create-word-in dup reset-generic
-            scan-object dupd [ initialize ] curry curry ( -- ) define-declared
-        ] bi
-    ] define-core-syntax
-]]
 
     "SYMBOL:" [
         scan-new-word define-symbol

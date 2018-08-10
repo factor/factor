@@ -7,18 +7,6 @@ IN: modern.slices
 : >strings ( seq -- str )
     [ dup slice? [ >string ] when ] deep-map ;
 
-: matching-delimiter ( ch -- ch' )
-    H{
-        { ch'\( ch'\) }
-        { ch'\[ ch'\] }
-        { ch'\{ ch'\} }
-        { ch'< ch'> }
-        { ch'\: ch'\; }
-    } ?at drop ;
-
-: matching-delimiter-string ( string -- string' )
-    [ matching-delimiter ] map ;
-
 : matching-section-delimiter ( string -- string' )
     dup ":" tail? [
         rest but-last ";" ">" surround

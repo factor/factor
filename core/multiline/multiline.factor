@@ -31,19 +31,3 @@ PRIVATE>
 
 : parse-multiline-string0 ( end-text -- str )
     lexer get 0 (parse-multiline-string) ;
-
-! SYNTAX: \[[ "]]" parse-multiline-string0 suffix! ;
-! SYNTAX: \[=[ "]=]" parse-multiline-string0 suffix! ;
-! SYNTAX: \[==[ "]==]" parse-multiline-string0 suffix! ;
-! SYNTAX: \[===[ "]===]" parse-multiline-string0 suffix! ;
-! SYNTAX: \[====[ "]====]" parse-multiline-string0 suffix! ;
-! SYNTAX: \[=====[ "]=====]" parse-multiline-string0 suffix! ;
-! SYNTAX: \[======[ "]======]" parse-multiline-string0 suffix! ;
-
-! SYNTAX: \![[ "]]" parse-multiline-string0 drop ;
-! SYNTAX: \![=[ "]=]" parse-multiline-string0 drop ;
-! SYNTAX: \![==[ "]==]" parse-multiline-string0 drop ;
-! SYNTAX: \![===[ "]===]" parse-multiline-string0 drop ;
-! SYNTAX: \![====[ "]====]" parse-multiline-string0 drop ;
-! SYNTAX: \![=====[ "]=====]" parse-multiline-string0 drop ;
-! SYNTAX: \![======[ "]======]" parse-multiline-string0 drop ;

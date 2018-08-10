@@ -84,8 +84,8 @@ M: lexer skip-blank
 
 GENERIC: skip-word ( lexer -- )
 
-: find-container-delimiter ( i str -- n/f )
-    2dup [ "[" member? ] find-from [
+: find-container-delimiter ( i str delim-str -- n/f )
+    [ 2dup ] dip '[ _ member? ] find-from [
         [ swap subseq [ ch'= = ] all? ] keep and
     ] [
         3drop f
@@ -93,11 +93,19 @@ GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word
     [
-        2dup [ " \"[" member? ] find-from
+        2dup [ " \"[{(" member? ] find-from
         {
             { ch'\" [ 2nip 1 + ] }
-            { ch'\[  [
-                1 + over find-container-delimiter
+            { ch'\[ [
+                1 + over "[" find-container-delimiter
+                dup [ 2nip 1 + ] [ drop f skip ] if
+            ] }
+            { ch'\{ [
+                1 + over "{" find-container-delimiter
+                dup [ 2nip 1 + ] [ drop f skip ] if
+            ] }
+            { ch'\( [
+                1 + over "(" find-container-delimiter
                 dup [ 2nip 1 + ] [ drop f skip ] if
             ] }
             [ 2drop f skip ]
@@ -140,8 +148,8 @@ DEFER: parse-token
 : unescape-token ( string -- string' )
     dup length 1 = [ "\\" ?head drop ] unless ;
 
-: unhashtag-token ( string -- string' )
-    dup length 1 = [ "#" ?head [ drop f ] when ] unless ;
+: unhashtag-token ( string -- string' ? )
+    dup length 1 = [ f ] [ "#" ?head >boolean ] if ;
 
 : unescape-tokens ( seq -- seq' )
     [ unescape-token ] map ;
@@ -149,48 +157,11 @@ DEFER: parse-token
 : parse-token ( lexer -- str/f )
     dup parse-raw [ skip-comments ] [ drop f ] if* ;
 
-: ?scan-token ( -- str/f ) lexer get parse-token unescape-token unhashtag-token ;
+: ?scan-token ( -- str/f ) lexer get parse-token unescape-token ;
 
 PREDICATE: unexpected-eof < unexpected got>> not ;
 
 : throw-unexpected-eof ( word -- * ) f unexpected ;
-
-: (strict-single-quote?) ( string -- ? )
-    "'" split1
-    [ "'" head? not ]
-    [
-        [ length 0 > ]
-        [
-            ! ch'\'
-            [ "\\'" tail? ] [ "'" tail? not ] bi or
-        ] bi and
-    ] bi* and ;
-
-: strict-single-quote? ( string -- ? )
-    dup (strict-single-quote?)
-    [ "'[" sequence= not ] [ drop f ] if ;
-
-: strict-lower-colon? ( string -- ? )
-    [ ch'\: = ] cut-tail
-    [
-        [ length 0 > ] [
-            [ [ ch'a ch'z between? ] [ "-" member? ] bi or ] all?
-        ] bi and ]
-    [ length 0 > ] bi* and ;
-
-: (strict-upper-colon?) ( string -- ? )
-    ! All chars must...
-    [
-        [
-            [ ch'A ch'Z between? ] [ "':-\\#" member? ] bi or
-        ] all?
-    ]
-    ! At least one char must...
-    [ [ [ ch'A ch'Z between? ] [ ch'\' = ] bi or ] any? ] bi and ;
-
-: strict-upper-colon? ( string -- ? )
-    [ [ ch'\: = ] all? ]
-    [ (strict-upper-colon?) ] bi or ;
 
 : scan-token ( -- str )
     ?scan-token [ "token" throw-unexpected-eof ] unless* ;

@@ -531,3 +531,5 @@ PRIVATE>
 
 : get-retainstack ( -- array )
     context retainstack-for ; inline
+
+: no-op ( obj -- obj ) ;

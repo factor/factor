@@ -159,3 +159,10 @@ PRIVATE>
             lexer get (parse-string)
         ] keep unescape-string
     ] rewind-lexer-on-error ;
+
+: lookup-char ( char -- obj )
+    {
+        { [ dup length 1 = ] [ first ] }
+        { [ "\\" ?head ] [ next-escape >string "" assert= ] }
+        [ name>char-hook get ( name -- char ) call-effect ]
+    } cond ;
