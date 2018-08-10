@@ -104,6 +104,12 @@ MACRO: <experiment> ( word -- quot )
     [ name>> experiment-title ] bi
     '[ _ ndup _ narray _ prefix ] ;
 
+TUPLE: must-fail-test-passed error test path line# ;
+CONSTRUCTOR: <must-fail-test-passed> must-fail-test-passed ( error test path line# -- obj ) ;
+
+TUPLE: must-fail-with-test-passed error test fail path line# ;
+CONSTRUCTOR: <must-fail-with-test-passed> must-fail-with-test-passed ( error test fail path line# -- obj ) ;
+
 TUPLE: new-unit-test-failed error test expected path line# ;
 
 TUPLE: new-experiment test expected ;
@@ -111,6 +117,19 @@ TUPLE: new-experiment test expected ;
 : <new-experiment> ( test expected -- new-experiment )
     new-experiment new
         swap >>expected
+        swap >>test ; inline
+
+TUPLE: must-fail-experiment test ;
+
+: <must-fail-experiment> ( test -- must-fail-experiment )
+    must-fail-experiment new
+        swap >>test ; inline
+
+TUPLE: must-fail-with-experiment test fail ;
+
+: <must-fail-with-experiment> ( test fail -- must-fail-with-experiment )
+    must-fail-with-experiment new
+        swap >>fail
         swap >>test ; inline
 
 : new-unit-test-failed>experiment ( new-unit-test-failed -- new-experiment )
@@ -122,10 +141,19 @@ M: array experiment. ( seq -- )
     [ first write ": " write ]
     [ rest verbose-tests? get [ . ] [ short. ] if flush ] bi ;
 
-M: new-experiment experiment. ( seq -- )
+M: new-experiment experiment. ( experiment -- )
     "UNIT-TEST: " write
     [ test>> verbose-tests? get [ pprint ] [ pprint-short ] if flush bl ]
     [ expected>> verbose-tests? get [ pprint ] [ pprint-short ] if nl flush ] bi ;
+
+M: must-fail-experiment experiment. ( experiment -- )
+    "MUST-FAIL: " write
+    test>> verbose-tests? get [ pprint ] [ pprint-short ] if nl flush ;
+
+M: must-fail-with-experiment experiment. ( experiment -- )
+    "MUST-FAIL-WITH: " write
+    [ test>> verbose-tests? get [ pprint ] [ pprint-short ] if bl ]
+    [ fail>> verbose-tests? get [ pprint ] [ pprint-short ] if ] bi nl flush ;
 
 :: experiment ( word: ( -- error/f failed? tested? ) line# -- )
     word <experiment> :> e
@@ -210,6 +238,33 @@ TEST: must-infer-as
 TEST: must-infer
 TEST: must-fail-with
 TEST: must-fail
+
+SYNTAX: \MUST-FAIL:
+    scan-object dup dup
+    current-test-file get
+    lexer get line>>
+    '[
+        _ <must-fail-experiment> experiment.
+        [ { } _ with-datastack drop "must fail but didn't" _ _ _ <must-fail-test-passed> throw ]
+        [ dup must-fail-test-passed? [ rethrow ] [ drop ] if ] recover
+    ] append! ;
+
+SYNTAX: \MUST-FAIL-WITH:
+    scan-object scan-object over 2over
+    current-test-file get
+    lexer get line>>
+    pick
+    '[
+        _ _ <must-fail-with-experiment> experiment.
+        [ { } _ with-datastack drop "must fail with but didn't" _ _ _ _ <must-fail-with-test-passed> throw ]
+        [
+            dup must-fail-with-test-passed? [
+                rethrow
+            ] [
+                dup _ call( error -- ? ) [ drop ] [ rethrow ] if
+            ] if
+        ] recover
+    ] append! ;
 
 : notify-new-test-failed ( new-unit-test-failed -- )
     {
