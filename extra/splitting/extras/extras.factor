@@ -1,4 +1,4 @@
-USING: hints kernel math sequences strings ;
+USING: hints kernel math sequences splitting strings ;
 
 IN: splitting.extras
 
@@ -62,3 +62,6 @@ PRIVATE>
 
 { split* split*-slice split-harvest }
 [ { string string } set-specializer ] each
+
+: split-lengths ( seq lengths -- pieces )
+    0 swap [ + dup ] map nip split-indices ;
