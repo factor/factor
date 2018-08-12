@@ -85,8 +85,7 @@ M: byte-vector hexdump. all-bytes underlying>> hexdump-bytes ;
 
 : hexdump-main ( -- )
     command-line get [
-        input-stream get dup decoder? [ stream>> ] when
-        hexdump-stream
+        input-stream get binary re-decode hexdump-stream
     ] [
         [ hexdump-file ] each
     ] if-empty ;
