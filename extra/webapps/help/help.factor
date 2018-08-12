@@ -37,10 +37,10 @@ TUPLE: help-webapp < dispatcher ;
 
 :: <help-webapp> ( help-dir -- webapp )
     help-webapp new-dispatcher
-        <main-action> "" add-responder
-        help-dir <search-action> "search" add-responder
-        help-dir <static> "content" add-responder
-        "resource:basis/definitions/icons/" <static> "icons" add-responder ;
+        <main-action> <secure-only> "" add-responder
+        help-dir <search-action> <secure-only> "search" add-responder
+        help-dir <static> <secure-only> "content" add-responder
+        "resource:basis/definitions/icons/" <static> <secure-only> "icons" add-responder ;
 
 : run-help-webapp ( -- )
     "docs" cache-file <help-webapp>
