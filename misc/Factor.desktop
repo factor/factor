@@ -1,0 +1,14 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Factor IDE
+Comment=Factor Programming Environment (Development Mode)
+Icon=/path/to/factor-folder/misc/icons/Factor_512x512@2x.png
+Exec="/path/to/factor-folder/factor"
+Path=/path/to/factor-folder/
+Terminal=false
+Categories=Development;IDE;
+Keywords=Programming;
+StartupWMClass=Listener
+
