@@ -1,0 +1,26 @@
+<!-- https://askubuntu.com/a/289959/455520 -->
+<!-- https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+
+<policyconfig>
+
+  <vendor>The Factor Programming Language</vendor>
+  <vendor_url>https://factorcode.org</vendor_url>
+
+  <action id="org.freedesktop.policykit.pkexec.elevate.factor">
+    <description>Run this Factor program as administrator</description>
+    <message>A Factor program requests adminstrative privileges</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <!-- going to paste in the program name -->
+    <annotate key="org.freedesktop.policykit.exec.path">%s</annotate>
+    <annotate key="org.freedesktop.policykit.exec.allow_gui">TRUE</annotate>
+  </action>
+
+</policyconfig>
