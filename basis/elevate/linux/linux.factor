@@ -4,12 +4,15 @@ sequences system ui ;
 IN: elevate.linux
 
 <PRIVATE
+CONSTANT: auth-methods { "kdesudo" "pkexec" "gksudo" "sudo" }
+
+! rewrite this to handle PKExec properly
 M:: linux elevated ( command replace? win-console? posix-graphical? -- process )
     already-root? [
         <process> command >>command 1array ! we are already root: just give a process
     ] [
         posix-graphical? ui-running? or "DISPLAY" os-env and [
-            command { "gksudo" "kdesudo" "pkexec" "sudo" } [
+            command auth-methods [
                 prepend-command
             ] with map :> command-list
 
