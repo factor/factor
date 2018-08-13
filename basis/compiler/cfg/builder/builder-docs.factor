@@ -78,7 +78,7 @@ HELP: emit-loop-call
 
 HELP: emit-node
 { $values { "block" basic-block } { "node" node } { "block'" basic-block } }
-{ $description "Emits CFG instructions for the given SSA node. The word can add one or more basic blocks to the " { $link cfg } ". The next block to operate on is pushed onto the stack. "
+{ $description "Emits CFG instructions for the given SSA node. The word can add one or more basic blocks to the " { $link cfg } ". The next block to operate on is pushed onto the stack."
 $nl
 "The following classes emit-node methods does not change the current block:"
   { $list
