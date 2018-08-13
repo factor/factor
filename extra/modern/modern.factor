@@ -3,8 +3,8 @@
 USING: arrays assocs combinators combinators.short-circuit
 continuations io.encodings.utf8 io.files kernel make math
 math.order modern.paths modern.slices sequences sequences.extras
-sequences.generalizations sets shuffle splitting strings unicode
-vocabs.loader ;
+sequences.generalizations sets shuffle splitting strings
+syntax.modern unicode vocabs.loader ;
 IN: modern
 
 ERROR: string-expected-got-eof n string ;
