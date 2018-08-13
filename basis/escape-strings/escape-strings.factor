@@ -1,6 +1,6 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs assocs.extras combinators kernel math math.order
+USING: assocs assocs.extras combinators fry kernel math math.order
 math.statistics sequences sequences.extras sets ;
 IN: escape-strings
 
@@ -32,8 +32,8 @@ IN: escape-strings
     [ escape-string ] dip prepend ;
 
 : escape-simplest ( str -- str' )
-    dup { CHAR: ' CHAR: " CHAR: \r CHAR: \n CHAR: \s } counts {
-        { [ dup { CHAR: ' CHAR: \r CHAR: \n CHAR: \s } values-of sum 0 = ] [ drop "'" prepend ] }
+    dup { CHAR: ' CHAR: " CHAR: \r CHAR: \n CHAR: \s } [ '[ _ = ] count ] with map {
+        { [ { CHAR: ' CHAR: \r CHAR: \n CHAR: \s } sum 0 = ] [ drop "'" prepend ] }
         { [ dup CHAR: " of not ] [ drop "\"" "\"" surround ] }
         [ drop escape-string ]
     } cond ;
