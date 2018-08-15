@@ -20,8 +20,8 @@ TUPLE: recaptcha-app < dispatcher recaptcha ;
 : <test-recaptcha> ( responder -- recaptcha )
     <recaptcha>
         "concatenative.org" >>domain
-        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
-        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key ;
+        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>site-key
+        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>secret-key ;
 
 : <recaptcha-app> ( -- obj )
     \ recaptcha-app new-dispatcher

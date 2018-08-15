@@ -1,5 +1,5 @@
 <?xml version='1.0' ?>
 <!DOCTYPE html>
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
-<html><body><t:form t:action=""><t:recaptcha/></t:form></body></html>
+<html><body><t:form t:action=""><t:recaptcha/><input type="SUBMIT" value="Done" /></t:form></body></html>
 </t:chloe>
