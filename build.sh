@@ -27,7 +27,7 @@ test_program_installed() {
 
 # return 1 on found
 test_programs_installed() {
-    installed=0;
+    local installed=0;
     $ECHO -n "Checking for all($*)..."
     for i in "$@" ;
     do
@@ -54,7 +54,7 @@ exit_script() {
 }
 
 ensure_program_installed() {
-    installed=0;
+    local installed=0;
     $ECHO -n "Checking for any($*)..."
     for i in "$@" ;
     do
@@ -243,7 +243,7 @@ check_factor_exists() {
 find_os() {
     if [[ -n $OS ]] ; then return; fi
     $ECHO "Finding OS..."
-    uname_s=$(uname -s)
+    local uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
         CYGWIN_NT-5.2-WOW64) OS=windows;;
@@ -550,7 +550,7 @@ check_url() {
             return 1
         fi
     elif [[ $DOWNLOADER_NAME == 'curl' ]]; then
-        code=$(curl -sL -w "%{http_code}\\n" "$1" -o /dev/null)
+        local code=$(curl -sL -w "%{http_code}\\n" "$1" -o /dev/null)
         if [[ $code -eq 200 ]]; then return 0; else return 1; fi
     else
         $ECHO "error: wget or curl required in check_url"
@@ -562,10 +562,10 @@ check_url() {
 # Otherwise, just use `master`
 set_boot_image_vars() {
     set_current_branch
-    url="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
+    local url="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
     check_url $url
     if [[ $? -eq 0 ]]; then
-        CHECKSUM_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
+        CHECKSUM_URL="$url"
         BOOT_IMAGE_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
     else
         CHECKSUM_URL="http://downloads.factorcode.org/images/master/checksums.txt"
