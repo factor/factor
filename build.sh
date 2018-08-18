@@ -681,7 +681,7 @@ install_deps_apt() {
 }
 
 install_deps_pacman() {
-    sudo pacman --noconfirm -S gcc clang make rlwrap git wget pango glibc gtk2 gtk3 gtkglext gtk-engines gdk-pixbuf2 libx11 screen tmux
+    sudo pacman --noconfirm -Syu gcc clang make rlwrap git wget pango glibc gtk2 gtk3 gtkglext gtk-engines gdk-pixbuf2 libx11 screen tmux
     check_ret sudo
 }
 
