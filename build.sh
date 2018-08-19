@@ -590,9 +590,9 @@ update_boot_image() {
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url $CHECKSUM_URL
-        factorcode_md5=$(cat checksums.txt | grep $BOOT_IMAGE | cut -f2 -d' ')
+        local factorcode_md5=$(cat checksums.txt | grep $BOOT_IMAGE | cut -f2 -d' ')
         set_md5sum
-        disk_md5=$($MD5SUM $BOOT_IMAGE | cut -f1 -d' ')
+        local disk_md5=$($MD5SUM $BOOT_IMAGE | cut -f1 -d' ')
         $ECHO "Factorcode md5: $factorcode_md5";
         $ECHO "Disk md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
