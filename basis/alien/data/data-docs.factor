@@ -74,7 +74,7 @@ $nl
 "If no initial value is specified, the contents of the allocated memory are undefined." }
 { $warning "Reading or writing a scoped allocation buffer outside of the given quotation will cause memory corruption." }
 { $examples
-    { $unchecked-example
+    { $example
         "USING: accessors alien.c-types alien.data
 classes.struct kernel math math.functions
 prettyprint ;
