@@ -12,8 +12,7 @@ SYMBOL: current-temp-directory
     current-temp-directory get ;
 
 : temp-file ( name -- path )
-    temp-directory
-    [ make-directories ] [ prepend-path ] bi ;
+    temp-directory prepend-path ;
 
 : with-temp-directory ( quot -- )
     [ temp-directory ] dip with-directory ; inline
