@@ -1,7 +1,9 @@
 USING: assocs classes help.markup help.syntax kernel
 quotations strings words words.symbol furnace.auth.providers.db
 checksums.sha furnace.auth.basic furnace.auth.features.deactivate-user
-furnace.auth.providers furnace.auth.providers.null math byte-arrays http ;
+furnace.auth.features.edit-profile furnace.auth.features.registration
+furnace.auth.features.recover-password furnace.auth.providers furnace.auth.login
+furnace.auth.providers.assoc furnace.auth.providers.null math byte-arrays http ;
 IN: furnace.auth
 
 HELP: <protected>
