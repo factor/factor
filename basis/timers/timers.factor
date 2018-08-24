@@ -94,11 +94,10 @@ PRIVATE>
     ] if ;
 
 : restart-timer ( timer -- )
-    t >>restart?
     dup quotation-running?>> [
-        drop
+        t >>restart? drop
     ] [
-        dup thread>> [ nip interrupt ] [ start-timer ] if*
+        dup thread>> [ interrupt ] when* start-timer
     ] if ;
 
 <PRIVATE
