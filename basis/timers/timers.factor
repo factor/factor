@@ -88,10 +88,8 @@ PRIVATE>
 
 : stop-timer ( timer -- )
     dup quotation-running?>> [
-        f >>thread drop
-    ] [
-        [ [ interrupt ] when* f ] change-thread drop
-    ] if ;
+        dup thread>> [ interrupt ] when*
+    ] unless f >>thread drop ;
 
 : restart-timer ( timer -- )
     dup quotation-running?>> [
