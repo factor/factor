@@ -15,9 +15,11 @@ GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
 SCRIPT_ARGS="$*"
 
+REQUIRE_CLANG_VERSION=3.1
+
 # return 1 on found
 test_program_installed() {
-    if ! [[ -n `type -p $1` ]] ; then
+    if ! [[ -n $(type -p $1) ]] ; then
         return 0;
     fi
     return 1;
@@ -25,9 +27,9 @@ test_program_installed() {
 
 # return 1 on found
 test_programs_installed() {
-    installed=0;
+    local installed=0;
     $ECHO -n "Checking for all($*)..."
-    for i in $* ;
+    for i in "$@" ;
     do
         test_program_installed $i
         if [[ $? -eq 1 ]]; then
@@ -52,9 +54,9 @@ exit_script() {
 }
 
 ensure_program_installed() {
-    installed=0;
+    local installed=0;
     $ECHO -n "Checking for any($*)..."
-    for i in $* ;
+    for i in "$@" ;
     do
         test_program_installed $i
         if [[ $? -eq 1 ]]; then
@@ -133,16 +135,16 @@ semver_into() {
 }
 
 clang_version_ok() {
-    CLANG_VERSION=`clang --version | head -n1`
+    CLANG_VERSION=$(clang --version | head -n1)
     CLANG_VERSION_RE='^[a-zA-Z0-9 ]* version (.*)$' # 3.3-5
     if [[ $CLANG_VERSION =~ $CLANG_VERSION_RE ]] ; then
         export "CLANG_VERSION=${BASH_REMATCH[1]}"
-        local CLANG_MAJOR local CLANG_MINOR local CLANG_PATCH local CLANG_SPECIAL
+        local CLANG_MAJOR CLANG_MINOR CLANG_PATCH CLANG_SPECIAL
         semver_into "$CLANG_VERSION" CLANG_MAJOR CLANG_MINOR CLANG_PATCH CLANG_SPECIAL
         if [[ $CLANG_MAJOR -lt 3
             || ( $CLANG_MAJOR -eq 3 && $CLANG_MINOR -le 1 )
             ]] ; then
-            echo "clang version required >= 3.1, got $CLANG_VERSION"
+            echo "clang version required >= $REQUIRE_CLANG_VERSION, got $CLANG_VERSION"
             return 1
         fi
     else
@@ -241,7 +243,7 @@ check_factor_exists() {
 find_os() {
     if [[ -n $OS ]] ; then return; fi
     $ECHO "Finding OS..."
-    uname_s=`uname -s`
+    local uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
         CYGWIN_NT-5.2-WOW64) OS=windows;;
@@ -258,7 +260,7 @@ find_os() {
 find_architecture() {
     if [[ -n $ARCH ]] ; then return; fi
     $ECHO "Finding ARCH..."
-    uname_m=`uname -m`
+    uname_m=$(uname -m)
     check_ret uname
     case $uname_m in
        i386) ARCH=x86;;
@@ -275,7 +277,7 @@ find_architecture() {
 find_num_cores() {
     $ECHO "Finding num cores..."
     NUM_CORES=7ZZ
-    uname_s=`uname -s`
+    uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
         CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS;;
@@ -283,20 +285,19 @@ find_num_cores() {
     esac
 }
 
-write_test_program() {
+echo_test_program() {
     #! Must be 'echo'
-    echo "#include <stdio.h>" > $C_WORD.c
-    echo "int main(){printf(\"%ld\", (long)(8*sizeof(void*))); return 0; }" >> $C_WORD.c
+    echo -e "int main(){ return (long)(8*sizeof(void*)); }"
 }
 
 c_find_word_size() {
     $ECHO "Finding WORD..."
-    C_WORD=factor-word-size
-    write_test_program
-    $CC -o $C_WORD $C_WORD.c
-    WORD=$(./$C_WORD)
-    check_ret $C_WORD
-    $DELETE -f $C_WORD*
+    C_WORD="factor-word-size"
+    echo_test_program | $CC -o $C_WORD -xc -
+    check_ret $CC
+    ./$C_WORD
+    WORD=$?
+    $DELETE -f $C_WORD
 }
 
 intel_macosx_word_size() {
@@ -403,9 +404,9 @@ set_build_info() {
 parse_build_info() {
     ensure_program_installed cut
     $ECHO "Parsing make target from command line: $1"
-    OS=`echo $1 | cut -d '-' -f 1`
-    ARCH=`echo $1 | cut -d '-' -f 2`
-    WORD=`echo $1 | cut -d '-' -f 3`
+    OS=$(echo $1 | cut -d '-' -f 1)
+    ARCH=$(echo $1 | cut -d '-' -f 2)
+    WORD=$(echo $1 | cut -d '-' -f 3)
 
     if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
     if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
@@ -433,7 +434,7 @@ find_build_info() {
 }
 
 invoke_git() {
-    git $*
+    git "$@"
     check_ret git
 }
 
@@ -443,13 +444,13 @@ git_clone() {
 }
 
 update_script_name() {
-    $ECHO `dirname $0`/_update.sh
+    $ECHO "$(dirname $0)/_update.sh"
 }
 
 update_script() {
-    update_script=`update_script_name`
-    bash_path=`which bash`
-    branch=$(current_git_branch)
+    local -r update_script=$(update_script_name)
+    local -r bash_path=$(which bash)
+    local -r branch=$(current_git_branch)
     $ECHO "#!$bash_path" >"$update_script"
     $ECHO "git pull \"$GIT_URL\" ${branch}" >>"$update_script"
     $ECHO "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
@@ -461,16 +462,16 @@ update_script() {
 }
 
 update_script_changed() {
-    invoke_git diff --stat `invoke_git merge-base HEAD FETCH_HEAD` FETCH_HEAD | grep 'build\.sh' >/dev/null
+    invoke_git diff --stat "$(invoke_git merge-base HEAD FETCH_HEAD)" FETCH_HEAD | grep 'build\.sh' >/dev/null
 }
 
 git_fetch_factorcode() {
     $ECHO "Fetching the git repository from factorcode.org..."
     branch=$(current_git_branch)
 
-    rm -f `update_script_name`
-    invoke_git fetch --all
-    invoke_git fetch --tags
+    rm -f "$(update_script_name)"
+    invoke_git fetch "$GIT_URL" --all
+    invoke_git fetch "$GIT_URL" --tags
 
     if update_script_changed; then
         $ECHO "Updating and restarting the build.sh script..."
@@ -482,7 +483,7 @@ git_fetch_factorcode() {
 }
 
 cd_factor() {
-    cd factor
+    cd "factor"
     check_ret cd
 }
 
@@ -522,7 +523,7 @@ check_makefile_exists() {
 
 invoke_make() {
     check_makefile_exists
-    $MAKE $MAKE_OPTS $*
+    $MAKE $MAKE_OPTS "$@"
     check_ret $MAKE
 }
 
@@ -546,13 +547,13 @@ current_git_branch() {
 
 check_url() {
     if [[ $DOWNLOADER_NAME == 'wget' ]]; then
-        if [[ `wget -S --spider $1 2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then
+        if [[ $(wget -S --spider $1 2>&1 | grep 'HTTP/1.1 200 OK') ]]; then
             return 0
         else
             return 1
         fi
     elif [[ $DOWNLOADER_NAME == 'curl' ]]; then
-        code=`curl -sL -w "%{http_code}\\n" "$1" -o /dev/null`
+        local code=$(curl -sL -w "%{http_code}\\n" "$1" -o /dev/null)
         if [[ $code -eq 200 ]]; then return 0; else return 1; fi
     else
         $ECHO "error: wget or curl required in check_url"
@@ -564,10 +565,10 @@ check_url() {
 # Otherwise, just use `master`
 set_boot_image_vars() {
     set_current_branch
-    url="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
+    local url="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
     check_url $url
     if [[ $? -eq 0 ]]; then
-        CHECKSUM_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
+        CHECKSUM_URL="$url"
         BOOT_IMAGE_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
     else
         CHECKSUM_URL="http://downloads.factorcode.org/images/master/checksums.txt"
@@ -592,9 +593,9 @@ update_boot_image() {
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url $CHECKSUM_URL
-        factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`
+        local factorcode_md5=$(cat checksums.txt | grep $BOOT_IMAGE | cut -f2 -d' ')
         set_md5sum
-        disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`
+        local disk_md5=$($MD5SUM $BOOT_IMAGE | cut -f1 -d' ')
         $ECHO "Factorcode md5: $factorcode_md5";
         $ECHO "Disk md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
@@ -668,12 +669,12 @@ net_bootstrap_no_pull() {
 }
 
 refresh_image() {
-    ./$FACTOR_BINARY -script -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save 0 exit"
+    ./$FACTOR_BINARY -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save 0 exit"
     check_ret factor
 }
 
 make_boot_image() {
-    ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
+    ./$FACTOR_BINARY -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
     check_ret factor
 }
 
@@ -683,7 +684,7 @@ install_deps_apt() {
 }
 
 install_deps_pacman() {
-    sudo pacman --noconfirm -S gcc clang make rlwrap git wget pango glibc gtk2 gtk3 gtkglext gtk-engines gdk-pixbuf2 libx11 screen tmux
+    sudo pacman --noconfirm -Syu gcc clang make rlwrap git wget pango glibc gtk2 gtk3 gtkglext gtk-engines gdk-pixbuf2 libx11 screen tmux
     check_ret sudo
 }
 

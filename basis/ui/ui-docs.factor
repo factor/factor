@@ -259,7 +259,7 @@ $nl
     clear-gadget
 }
 "The children of a gadget are available via the "
-{ $snippet "children" } " slot. "
+{ $snippet "children" } " slot."
 $nl
 "Working with gadget children:"
 { $subsections

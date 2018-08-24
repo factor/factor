@@ -72,7 +72,7 @@ $nl
 
 HELP: free-callback
 { $values { "alien" alien } }
-{ $description "Releases the callback heap memory allocated for an alien callback. " }
+{ $description "Releases the callback heap memory allocated for an alien callback." }
 { $warning "If the callback is invoked (either from C or Factor) after it has been freed, then Factor may crash." } ;
 
 HELP: with-callback

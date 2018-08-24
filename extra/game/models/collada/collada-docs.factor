@@ -46,7 +46,7 @@ HELP: mesh>sources
 
 HELP: mesh>vertices
 { $values { "mesh-tag" tag } { "pair" pair } }
-{ $description "Convert the mesh tag's vertices element to a pair for further lookup in " { $link collect-sources } ". " } ;
+{ $description "Convert the mesh tag's vertices element to a pair for further lookup in " { $link collect-sources } "." } ;
 
 HELP: collect-sources
 { $values { "sources" hashtable } { "vertices" pair } { "inputs" tag sequence } { "seq" sequence } }

@@ -48,7 +48,7 @@ HELP: reset-lzw-uncompress
 { $values
     { "lzw" lzw }
 }
-{ $description "Reset the LZW uncompressor state (either at initialization time or immediately after receiving a Clear Code). " } ;
+{ $description "Reset the LZW uncompressor state (either at initialization time or immediately after receiving a Clear Code)." } ;
 
 ARTICLE: "compression.lzw.differences" "LZW differences between TIFF and GIF"
 { $vocab-link "compression.lzw" }
