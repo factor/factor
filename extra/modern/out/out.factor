@@ -4,7 +4,7 @@ USING: accessors arrays assocs combinators.short-circuit
 constructors continuations io io.encodings.utf8 io.files
 io.streams.string kernel modern modern.paths modern.slices
 prettyprint sequences sequences.extras splitting strings
-vocabs.loader ;
+syntax.modern vocabs.loader ;
 IN: modern.out
 
 : token? ( obj -- ? )
