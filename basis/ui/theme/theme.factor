@@ -262,7 +262,7 @@ M: dark-theme vocab-border-color COLOR: solarized-base01 ;
 
 M: dark-theme field-border-color COLOR: solarized-base01 ;
 
-M: dark-theme editor-caret-color COLOR: red ;
+M: dark-theme editor-caret-color COLOR: DeepPink2 ;
 M: dark-theme selection-color COLOR: solarized-base01 ;
 M: dark-theme panel-background-color T{ rgba f 0.7843 0.7686 0.7176 1.0 } ;
 M: dark-theme focus-border-color COLOR: solarized-base01 ;
