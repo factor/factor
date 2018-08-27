@@ -1,7 +1,9 @@
 USING: assocs classes help.markup help.syntax kernel
 quotations strings words words.symbol furnace.auth.providers.db
-checksums.sha furnace.auth.providers math byte-arrays
-http ;
+checksums.sha furnace.auth.basic furnace.auth.features.deactivate-user
+furnace.auth.features.edit-profile furnace.auth.features.registration
+furnace.auth.features.recover-password furnace.auth.providers furnace.auth.login
+furnace.auth.providers.assoc furnace.auth.providers.null math byte-arrays http ;
 IN: furnace.auth
 
 HELP: <protected>
@@ -193,8 +195,6 @@ $nl
 { $subsections "furnace.auth.users" }
 "Authentication realms can be adorned with additional functionality."
 { $subsections "furnace.auth.features" }
-"An administration tool."
-{ $subsections "webapps.user-admin" }
 "A concrete example."
 { $subsections "furnace.auth.example" } ;
 
