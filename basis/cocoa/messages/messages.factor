@@ -126,6 +126,7 @@ H{
     { "@" id }
     { "#" Class }
     { ":" SEL }
+    { "(" c:void* }
 }
 cell {
     { 4 [ H{
