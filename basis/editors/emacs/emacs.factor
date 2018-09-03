@@ -23,9 +23,7 @@ M: windows find-emacsclient
 M: emacsclient editor-command ( file line -- command )
     [
         emacsclient-path get [ find-emacsclient ] unless* ,
-        emacsclient-args get %
-        "-a=emacs" ,
-        "--no-wait" ,
+        emacsclient-args get [ { "-a=emacs" "--no-wait" } ] unless* %
         number>string "+" prepend ,
         ,
     ] { } make ;
