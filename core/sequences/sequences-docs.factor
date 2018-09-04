@@ -1044,7 +1044,7 @@ HELP: head
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 short head ."
+        "{ 1 2 } 5 shorted head ."
         "{ 1 2 }"
     }
 }
@@ -1060,7 +1060,7 @@ HELP: tail
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 short tail ."
+        "{ 1 2 } 5 shorted tail ."
         "{ }"
     }
 }
@@ -1086,7 +1086,7 @@ HELP: head*
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 short head* ."
+        "{ 1 2 } 5 shorted head* ."
         "{ }"
     }
 }
@@ -1102,7 +1102,7 @@ HELP: tail*
     }
     "When a sequence may not have enough elements:"
     { $example "USING: sequences prettyprint ;"
-        "{ 1 2 } 5 short tail* ."
+        "{ 1 2 } 5 shorted tail* ."
         "{ 1 2 }"
     }
 }
@@ -1578,12 +1578,12 @@ HELP: sequence-hashcode-step
      { "newhash" integer } }
 { $description "An implementation word that computes a running hashcode of a sequence using some bit-twiddling. The resulting hashcode is always a fixnum." } ;
 
-HELP: short
+HELP: shorted
 { $values
      { "seq" sequence } { "n" integer } { "n'" integer } }
 { $description "Returns the input sequence and its length or " { $snippet "n" } ", whichever is less." }
 { $examples { $example "USING: sequences kernel prettyprint ;"
-    "\"abcd\" 3 short [ . ] bi@"
+    "\"abcd\" 3 shorted [ . ] bi@"
     "\"abcd\"\n3"
 } } ;
 

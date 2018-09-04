@@ -37,7 +37,7 @@ IN: mason.report
     ] with-file-writer ; inline
 
 : file-tail ( file encoding lines -- seq )
-    [ file-lines ] dip short tail* "\n" join ;
+    [ file-lines ] dip shorted tail* "\n" join ;
 
 :: failed-report ( error file what -- status )
     [

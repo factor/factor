@@ -39,7 +39,7 @@ M: incremental dim-changed drop ;
     dup children>> length 200,000 > [
         ! We let the length oscillate between 100k-200k, so we don't
         ! have to relayout the container every time a gadget is added.
-        [ 100,000 short cut* ] change-children relayout yield
+        [ 100,000 shorted cut* ] change-children relayout yield
 
         ! Then we ungraft the scrolled of gadgets. Yield every 10k
         ! gadget so to not overflow the ungraft queue.

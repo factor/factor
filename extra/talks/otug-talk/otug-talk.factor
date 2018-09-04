@@ -176,7 +176,7 @@ CONSTANT: otug-slides
             { { $link tail } { $link tail-slice } }
         }
         { "Modifier: " { $link from-end } }
-        { "Modifier: " { $link short } }
+        { "Modifier: " { $link shorted } }
         "4*2*2=16 operations, 6 words!"
     }
     { $slide "Modifiers"
@@ -187,8 +187,8 @@ CONSTANT: otug-slides
             "\"Hello, Joe\" 3 from-end tail ."
         }
         { $code
-            "\"Hello world\" 5 short head ."
-            "\"Hi\" 5 short tail ."
+            "\"Hello world\" 5 shorted head ."
+            "\"Hi\" 5 shorted tail ."
         }
     }
     { $slide "Modifiers"

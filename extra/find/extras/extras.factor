@@ -1,11 +1,9 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators combinators.extras
-combinators.smart fry generalizations kernel literals locals
-macros make math math.private modern.slices multiline namespaces
-quotations sequences sequences.deep sequences.extras
-sequences.generalizations sequences.private shuffle
-stack-checker.transforms strings unicode words ;
+USING: accessors arrays combinators.extras generalizations
+kernel literals make math modern.slices namespaces sequences
+sequences.extras sequences.generalizations strings syntax.modern
+unicode ;
 IN: find.extras
 
 SYMBOL: delimiter-stack
@@ -44,7 +42,7 @@ ERROR: invalid-slice seq from to ;
     [ [ drop ] [ + ] 2bi [ rot <slice> ] keep swap ] 3bi ; inline
 
 : head-from? ( seq n subseq -- ? )
-    over [ [ short tail-slice ] dip head? ] [ 3drop f ] if ; inline
+    over [ [ shorted tail-slice ] dip head? ] [ 3drop f ] if ; inline
 
 : head-from ( seq n subseq -- seq n/f subseq/f )
     3dup head-from? [ length length-slice ] [ drop f ] if ;

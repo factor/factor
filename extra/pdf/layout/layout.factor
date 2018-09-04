@@ -101,7 +101,7 @@ M: p pdf-render
     [
         over ?line-break
         over [ font>> ] [ avail-width ] bi visual-wrap
-        over avail-lines short cut
+        over avail-lines shorted cut
         [ draw-text ] [ "" concat-as ] bi*
     ] change-string dup string>> empty? [ drop f ] when ;
 
@@ -129,7 +129,7 @@ M: text pdf-render
             [ { } ] [ over [ font>> ] [ width ] bi visual-wrap ]
             if-empty
         ] dip [ prefix ] when*
-        over avail-lines short cut
+        over avail-lines shorted cut
         [ draw-text ] [ "" concat-as ] bi*
     ] change-string dup string>> empty? [ drop f ] when ;
 

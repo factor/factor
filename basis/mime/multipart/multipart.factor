@@ -41,7 +41,7 @@ C: <mime-variable> mime-variable
     [ t >>end-of-stream? ] if* ;
 
 : split-bytes ( bytes separator -- leftover-bytes safe-to-dump )
-    dupd [ length ] bi@ 1 - - short cut-slice swap ;
+    dupd [ length ] bi@ 1 - - shorted cut-slice swap ;
 
 : dump-until-separator ( multipart -- multipart )
     dup
@@ -49,7 +49,7 @@ C: <mime-variable> mime-variable
     [ nip ] [ subseq-start ] 2bi [
         cut-slice
         [ mime-write ]
-        [ over current-separator>> length short tail-slice >>bytes ] bi*
+        [ over current-separator>> length shorted tail-slice >>bytes ] bi*
     ] [
         drop
         dup [ bytes>> ] [ current-separator>> ] bi split-bytes mime-write

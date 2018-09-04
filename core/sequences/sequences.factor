@@ -244,7 +244,7 @@ M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
 M: slice length [ to>> ] [ from>> ] bi - ; inline
 
-: short ( seq n -- seq n' ) over length min ; inline
+: shorted ( seq n -- seq n' ) over length min ; inline
 
 : head-slice ( seq n -- slice ) (head) <slice> ; inline
 
@@ -278,8 +278,8 @@ INSTANCE: repetition immutable-sequence
 
 ERROR: integer-length-expected obj ;
 
-! The check-length call forces partial dispatch
-: check-length ( n -- n )
+! The ensure-integer call forces partial dispatch
+: ensure-integer ( n -- n )
     dup integer? [ integer-length-expected ] unless ; inline
 
 TUPLE: copy-state
@@ -300,7 +300,7 @@ C: <copy> copy-state
     ] if ; inline recursive
 
 : subseq>copy ( from to seq -- n copy )
-    [ over - check-length swap ] dip
+    [ over - ensure-integer swap ] dip
     3dup nip new-sequence 0 swap <copy> ; inline
 
 : bounds-check-head ( n seq -- n seq )
@@ -311,7 +311,7 @@ C: <copy> copy-state
     [ swap length + ] dip lengthen ; inline
 
 : copy-unsafe ( src i dst -- )
-    [ [ length check-length 0 ] keep ] 2dip <copy> (copy) drop ; inline
+    [ [ length ensure-integer 0 ] keep ] 2dip <copy> (copy) drop ; inline
 
 : subseq-unsafe-as ( from to seq exemplar -- subseq )
     [ subseq>copy (copy) ] dip like ;
@@ -388,14 +388,15 @@ PRIVATE>
 
 <PRIVATE
 
-: setup-each ( seq -- n quot )
-    [ length check-length ] keep [ nth-unsafe ] curry ; inline
+: length-curry ( seq -- n quot )
+    [ length ensure-integer ]
+    [ [ nth-unsafe ] curry ] bi ; inline
 
 : (each) ( seq quot -- n quot' )
-    [ setup-each ] dip compose ; inline
+    [ length-curry ] dip compose ; inline
 
 : (each-index) ( seq quot -- n quot' )
-    [ setup-each [ keep ] curry ] dip compose ; inline
+    [ length-curry [ keep ] curry ] dip compose ; inline
 
 : (collect) ( quot into -- quot' )
     [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
@@ -409,21 +410,22 @@ PRIVATE>
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
     [ nth-unsafe ] bi-curry@ bi ; inline
 
-: setup-2each ( seq1 seq2 -- n quot )
-    [ min-length check-length ] 2keep [ 2nth-unsafe ] 2curry ; inline
+: length-2curry ( seq1 seq2 -- n quot )
+    [ min-length ensure-integer ]
+    [ [ 2nth-unsafe ] 2curry ] 2bi ; inline
 
 : (2each) ( seq1 seq2 quot -- n quot' )
-    [ setup-2each ] dip compose ; inline
+    [ length-2curry ] dip compose ; inline
 
 : 3nth-unsafe ( n seq1 seq2 seq3 -- elt1 elt2 elt3 )
     [ nth-unsafe ] tri-curry@ tri ; inline
 
-: setup-3each ( seq1 seq2 seq3 -- n quot )
-    [ [ length ] tri@ min min check-length ]
+: length-3curry ( seq1 seq2 seq3 -- n quot )
+    [ [ length ] tri@ min min ensure-integer ]
     [ [ 3nth-unsafe ] 3curry ] 3bi ; inline
 
 : (3each) ( seq1 seq2 seq3 quot -- n quot' )
-    [ setup-3each ] dip compose ; inline
+    [ length-3curry ] dip compose ; inline
 
 : finish-find ( i seq -- i elt )
     over [ dupd nth-unsafe ] [ drop f ] if ; inline

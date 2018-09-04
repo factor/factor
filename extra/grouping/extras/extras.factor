@@ -5,21 +5,21 @@ sequences.generalizations sequences.private vectors ;
 IN: grouping.extras
 
 : 2clump-map-as ( seq quot: ( elt1 elt2 -- newelt ) exemplar -- seq' )
-    [ dup 1 short tail-slice ] 2dip 2map-as ; inline
+    [ dup 1 shorted tail-slice ] 2dip 2map-as ; inline
 
 : 2clump-map ( seq quot: ( elt1 elt2 -- newelt ) -- seq' )
     { } 2clump-map-as ; inline
 
 : 3clump-map-as ( seq quot: ( elt1 elt2 elt3 -- newelt ) exemplar -- seq' )
     [
-        dup [ 1 short tail-slice ] [ 2 short tail-slice ] bi
+        dup [ 1 shorted tail-slice ] [ 2 shorted tail-slice ] bi
     ] 2dip 3map-as ; inline
 
 : 3clump-map ( seq quot: ( elt1 elt2 elt3 -- newelt ) -- seq' )
     { } 3clump-map-as ; inline
 
 MACRO: nclump-map-as ( seq quot exemplar n -- result )
-    [ nip [1,b) [ [ short tail-slice ] curry ] map swap ] 2keep
+    [ nip [1,b) [ [ shorted tail-slice ] curry ] map swap ] 2keep
     '[ _ dup _ cleave _ _ _ nmap-as ] ;
 
 : nclump-map ( seq quot n -- result )

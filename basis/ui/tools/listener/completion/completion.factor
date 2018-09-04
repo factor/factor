@@ -117,7 +117,7 @@ TUPLE: completion-popup < track interactor table completion-mode ;
 
 : <completion-model> ( editor element quot -- model )
     [ <element-model> 1/3 seconds <delay> ] dip
-    '[ @ keys 1000 short head ] <arrow> ;
+    '[ @ keys 1000 shorted head ] <arrow> ;
 
 M: completion-popup focusable-child* table>> ;
 

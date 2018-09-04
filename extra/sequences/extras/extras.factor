@@ -367,7 +367,7 @@ PRIVATE>
 <PRIVATE
 
 : (2each-index) ( seq1 seq2 quot -- n quot' )
-    [ setup-2each [ keep ] curry ] dip compose ; inline
+    [ length-2curry [ keep ] curry ] dip compose ; inline
 
 PRIVATE>
 

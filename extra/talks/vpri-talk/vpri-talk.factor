@@ -265,7 +265,7 @@ CONSTANT: vpri-slides
         { $vocab-link "smtp-example" }
         { $code
             "{ \"chicken\" \"beef\" \"pork\" \"turkey\" }"
-            "[ 5 short head ] map ."
+            "[ 5 shorted head ] map ."
         }
         "To rattle people's cages"
     }
