@@ -1,7 +1,14 @@
-USING: assocs classes help.markup help.syntax kernel
-quotations strings words words.symbol furnace.auth.providers.db
-checksums.sha furnace.auth.providers math byte-arrays
-http ;
+USING: byte-arrays checksums.sha furnace.auth.providers
+furnace.auth.providers.db help.markup help.syntax http kernel
+math strings vocabs words.symbol ;
+"furnace.auth.basic" require
+"furnace.auth.features.deactivate-user" require
+"furnace.auth.features.edit-profile" require
+"furnace.auth.features.recover-password" require
+"furnace.auth.features.registration" require
+"furnace.auth.login" require
+"furnace.auth.providers.assoc" require
+"furnace.auth.providers.null" require
 IN: furnace.auth
 
 HELP: <protected>
@@ -193,8 +200,6 @@ $nl
 { $subsections "furnace.auth.users" }
 "Authentication realms can be adorned with additional functionality."
 { $subsections "furnace.auth.features" }
-"An administration tool."
-{ $subsections "webapps.user-admin" }
 "A concrete example."
 { $subsections "furnace.auth.example" } ;
 
