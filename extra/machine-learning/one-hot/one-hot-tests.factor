@@ -12,8 +12,17 @@ CONSTANT: test-data {
     { "well" "sick" "tired" }
 }
 
+! encode { hot sunny light neutral slowly well }
 { { 1 0 0 0 0 1 1 0 0 0 1 0 1 1 0 0 } }
-[ { 0 3 0 2 1 0 } test-data one-hot ] unit-test
+[ test-data { 0 3 0 2 1 0 } one-hot ] unit-test
 
 { { 0 1 0 0 1 0 0 1 0 1 0 1 0 0 1 0 } }
-[ { 1 2 1 1 0 1 } test-data one-hot ] unit-test
+[ test-data { 1 2 1 1 0 1 } one-hot ] unit-test
+
+! need an index for each category, e.g. 6 indices
+[ test-data { 1 2 } one-hot ]
+[ one-hot-length-mismatch? ] must-fail-with
+
+! last category is not within { well sick tired }
+[ test-data { 1 2 1 1 0 10 } one-hot ]
+[ one-hot-input-out-of-bounds? ] must-fail-with
