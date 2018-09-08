@@ -470,7 +470,7 @@ git_fetch_factorcode() {
     branch=$(current_git_branch)
 
     rm -f "$(update_script_name)"
-    invoke_git fetch "$GIT_URL" --all
+    invoke_git fetch "$GIT_URL"
     invoke_git fetch "$GIT_URL" --tags
 
     if update_script_changed; then
