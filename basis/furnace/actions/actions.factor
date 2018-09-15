@@ -19,7 +19,7 @@ IN: furnace.actions
 
 SYMBOL: rest
 
-TUPLE: action rest init authorize display validate submit ;
+TUPLE: action rest init authorize display validate submit update replace ;
 
 : new-action ( class -- action )
     new [ ] >>init [ ] >>validate [ ] >>authorize ; inline
@@ -83,6 +83,26 @@ CONSTANT: revalidate-url-key "__u"
         ] [ drop <400> ] if
     ] with-exit-continuation ;
 
+: handle-put ( action -- response )
+    '[
+        _ dup submit>> [
+            [ validate>> call( -- ) ]
+            [ authorize>> call( -- ) ]
+            [ replace>> call( -- response ) ]
+            tri
+        ] [ drop <400> ] if
+    ] with-exit-continuation ;
+
+: handle-patch ( action -- response )
+    '[
+        _ dup submit>> [
+            [ validate>> call( -- ) ]
+            [ authorize>> call( -- ) ]
+            [ update>> call( -- response ) ]
+            tri
+        ] [ drop <400> ] if
+    ] with-exit-continuation ;
+
 : handle-rest ( path action -- )
     rest>> [ [ "/" join ] dip set-param ] [ drop ] if* ;
 
@@ -93,9 +113,11 @@ CONSTANT: revalidate-url-key "__u"
 M: action call-responder* ( path action -- response )
     [ init-action ] keep
     request get method>> {
-        { "GET" [ handle-get ] }
-        { "HEAD" [ handle-get ] }
-        { "POST" [ handle-post ] }
+        { "GET"   [ handle-get ] }
+        { "HEAD"  [ handle-get ] }
+        { "POST"  [ handle-post ] }
+        { "PUT"   [ handle-put ] }
+        { "PATCH" [ handle-patch ] }
         [ 2drop <405> ]
     } case ;
 

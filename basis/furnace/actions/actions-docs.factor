@@ -99,6 +99,8 @@ ARTICLE: "furnace.actions.config" "Furnace action configuration"
     { { $slot "display" } { "A quotation called after the " { $slot "init" } " quotation in a GET request. This quotation must return an HTTP " { $link response } "." } }
     { { $slot "validate" } { "A quotation called at the beginning of a POST request to validate POST parameters." } }
     { { $slot "submit" } { "A quotation called after the " { $slot "validate" } " quotation in a POST request. This quotation must return an HTTP " { $link response } "." } }
+    { { $slot "replace" } { "A quotation called after the " { $slot "validate" } " quotation in a PUT request. This quotation must return an HTTP " { $link response } "." } }
+    { { $slot "update" } { "A quotation called after the " { $slot "validate" } " quotation in a PATCH request. This quotation must return an HTTP " { $link response } "." } }
 }
 "At least one of the " { $slot "display" } " and " { $slot "submit" } " slots must be set, otherwise the action will be useless." ;
 
