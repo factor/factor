@@ -72,6 +72,9 @@ CONSTANT: doc-start { 0 0 }
 : doc-end ( document -- loc )
     [ last-line# ] keep line-end ;
 
+: doc-empty? ( document -- ? )
+    doc-end doc-start = ;
+
 <PRIVATE
 
 : (doc-range) ( from to line# document -- slice )
