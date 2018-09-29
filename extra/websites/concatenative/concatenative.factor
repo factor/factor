@@ -59,13 +59,13 @@ TUPLE: concatenative-website < dispatcher ;
         allow-edit-profile
         allow-deactivation ;
 
-SYMBOLS: factor-recaptcha-public-key factor-recaptcha-private-key ;
+SYMBOLS: factor-recaptcha-site-key factor-recaptcha-secret-key ;
 
 : <factor-recaptcha> ( responder -- responder' )
     <recaptcha>
         "concatenative.org" >>domain
-        factor-recaptcha-public-key get >>public-key
-        factor-recaptcha-private-key get >>private-key ;
+        factor-recaptcha-site-key get >>site-key
+        factor-recaptcha-secret-key get >>secret-key ;
 
 : <concatenative-website> ( -- responder )
     concatenative-website new-dispatcher

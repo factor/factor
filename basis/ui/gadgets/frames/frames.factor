@@ -4,7 +4,7 @@ USING: accessors fry kernel math math.order sequences ui.gadgets
 ui.gadgets.grids ui.gadgets.grids.private ;
 IN: ui.gadgets.frames
 
-TUPLE: frame < grid filled-cell ;
+TUPLE: frame < grid { filled-cell initial: { 0 0 } } ;
 
 <PRIVATE
 

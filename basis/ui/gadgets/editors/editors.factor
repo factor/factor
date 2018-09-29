@@ -11,7 +11,6 @@ ui.render ui.text ui.theme unicode ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
-    caret-color
     caret mark
     focused? blink blink-timer
     default-text ;
@@ -25,7 +24,6 @@ TUPLE: editor < line-gadget
     <loc> >>mark ; inline
 
 : editor-theme ( editor -- editor )
-    color: red >>caret-color
     monospace-font >>font ; inline
 
 PRIVATE>
@@ -158,11 +156,9 @@ M: editor ungraft*
 
 : draw-caret ( editor -- )
     dup draw-caret? [
-        [ caret-color>> gl-color ]
-        [
-            [ caret-loc ] [ caret-dim ] bi
-            over v+ gl-line
-        ] bi
+        [ editor-caret-color gl-color ] dip
+        [ caret-loc ] [ caret-dim ] bi
+        over v+ gl-line
     ] [ drop ] if ;
 
 : selection-start/end ( editor -- start end )
