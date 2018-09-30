@@ -140,9 +140,9 @@ M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
 
 { { 6 } } [ [ case-breakpoint-test ] test-walker ] unit-test
 
-: call(-breakpoint-test ( -- x )
+: call-paren-breakpoint-test ( -- x )
     [ break 1 ] call( -- x ) 2 + ;
 
-\ call(-breakpoint-test do-not-step-into
+\ call-paren-breakpoint-test do-not-step-into
 
-{ { 3 } } [ [ call(-breakpoint-test ] test-walker ] unit-test
+{ { 3 } } [ [ call-paren-breakpoint-test ] test-walker ] unit-test
