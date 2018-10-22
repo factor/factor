@@ -7,7 +7,7 @@ IN: etc-hosts
 HOOK: hosts-path os ( -- path )
 
 M: windows hosts-path
-    "SystemRoot" os-env "/System32/drivers/etc/hosts" append-path ;
+    "SystemRoot" os-env "System32/drivers/etc/hosts" append-path ;
 
 M: unix hosts-path "/etc/hosts" ;
 
