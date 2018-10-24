@@ -4,16 +4,17 @@ USING: accessors arrays assocs byte-arrays byte-vectors
 classes.algebra.private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
 classes.predicate classes.singleton classes.tuple
-classes.tuple.parser classes.union combinators compiler.units
-definitions delegate delegate.private effects effects.parser factor
-fry functors2 generic generic.hook generic.math generic.parser
-generic.standard hash-sets hashtables hashtables.identity hints
-init interpolate io.pathnames kernel lexer locals.errors
-locals.parser locals.types macros math memoize multiline
-namespaces parser quotations sbufs sequences slots source-files
-splitting stack-checker strings strings.parser system typed
-vectors vocabs.parser vocabs.platforms words words.alias
-words.constant words.inlined words.symbol ;
+classes.tuple.parser classes.union combinators combinators.smart
+compiler.units definitions delegate delegate.private effects
+effects.parser factor fry functors2 generic generic.hook
+generic.math generic.parser generic.standard hash-sets
+hashtables hashtables.identity hints init interpolate
+io.pathnames kernel lexer locals.errors locals.parser
+locals.types macros math memoize multiline namespaces parser
+quotations sbufs sequences slots source-files splitting
+stack-checker strings strings.parser system typed vectors
+vocabs.parser vocabs.platforms words words.alias words.constant
+words.inlined words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -447,4 +448,29 @@ IN: bootstrap.syntax
     "VARIABLES-FUNCTOR:" [
         scan-new-word scan-effect scan-object scan-object make-variable-functor
     ] define-core-syntax
+
+    ":::" [
+        (:::) apply-inlined-effects define-declared
+    ] define-core-syntax
+
+    {
+        "}}" "]]"
+    } [ define-delimiter ] each
+
+    "q[[" [
+        \ ]] parse-until >quotation <fryable> suffix!
+    ] define-core-syntax
+
+
+    "q{{" [
+        \ }} parse-until >quotation [ output>array ] curry
+        <fryable> suffix! \ call suffix!
+    ] define-core-syntax
+
+    "{{" [
+        \ }}
+        [ >quotation [ output>array ] curry [ call ] curry ]
+        [ parse-until ] dip call append!
+    ] define-core-syntax
+
 ] with-compilation-unit

@@ -12,7 +12,7 @@ IN: locals.rewrite.sugar
 
 GENERIC: rewrite-sugar* ( obj -- )
 
-: (rewrite-sugar) ( form -- form' )
+: rewrite-sugar ( form -- form' )
     [ rewrite-sugar* ] [ ] make ;
 
 GENERIC: quotation-rewrite ( form -- form' )
@@ -28,6 +28,8 @@ M: lambda quotation-rewrite
 M: callable rewrite-sugar* quotation-rewrite , ;
 
 M: lambda rewrite-sugar* quotation-rewrite , ;
+
+M: fryable rewrite-sugar* , ;
 
 GENERIC: rewrite-literal? ( obj -- ? )
 

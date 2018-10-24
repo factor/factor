@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry fry.private generalizations kernel
-locals.types sequences ;
+locals.types macros.expander sequences ;
 IN: locals.fry
 
 ! Support for mixing locals with fry
@@ -17,5 +17,9 @@ M: lambda fry
 M: let fry
     clone [ fry ] change-body ;
 
+M: fryable condomize? drop t ;
+M: fryable call quot>> call ;
+
 INSTANCE: lambda fried
 INSTANCE: let    fried
+INSTANCE: fryable fried

@@ -1,8 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel locals.backend math
-quotations sequences sets splitting words ;
+math.parser quotations sequences sequences.private sets
+splitting words ;
 IN: fry
+
+TUPLE: fryable quot ;
+C: <fryable> fryable
 
 ERROR: >r/r>-in-fry-error ;
 
@@ -115,7 +119,7 @@ TUPLE: dredge-fry-state
 : push-subquot ( tail elt state -- )
     [ fry swap >quotation count-inputs [ndip] ] dip prequot>> push-all ; inline
 
-: (dredge-fry-subquot) ( n state i elt -- )
+: dredge-fry-subquot ( n state i elt -- )
     rot {
         [ nip in-quot-slices ] ! head tail i elt state
         [ [ 2drop swap ] dip push-head-slice ]
@@ -123,21 +127,36 @@ TUPLE: dredge-fry-state
         [ [ 1 + ] [ drop ] [ ] tri* dredge-fry ]
     } 3cleave ; inline recursive
 
-: (dredge-fry-simple) ( n state -- )
+: dredge-fry-simple ( n state -- )
     [ in-quot>> swap tail-slice ] [ quot>> ] bi push-all ; inline recursive
 
 : dredge-fry ( n dredge-fry -- )
     2dup in-quot>> [ fried? ] find-from
-    [ (dredge-fry-subquot) ]
-    [ drop (dredge-fry-simple) ] if* ; inline recursive
+    [ dredge-fry-subquot ]
+    [ drop dredge-fry-simple ] if* ; inline recursive
 
 PRIVATE>
 
 M: callable fry ( quot -- quot' )
-    [ [ [ ] ] ] [
+    [
+        [ [ ] ]
+    ] [
         0 swap <dredge-fry>
         [ dredge-fry ] [
             [ prequot>> >quotation ]
             [ quot>> >quotation shallow-fry ] bi append
         ] bi
     ] if-empty ;
+
+: number-underscores ( quot -- quot' )
+    0 swap [
+        dup \ _ eq? [
+            drop [ 1 + ] keep
+            number>string "_" append
+        ] [
+
+        ] if
+    ] map nip ;
+
+: fry-to-locals ( quot -- quot' )
+    check-fry mark-composes ;
