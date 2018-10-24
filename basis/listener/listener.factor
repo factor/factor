@@ -129,7 +129,9 @@ t error-summary? set-global
     input-stream get prompt prompt.
 
     [
-        read-quot [
+        read-quot
+        [
+            ! [ rewrite-closures ] prepose
             '[ [ datastack _ with-datastack ] with-ctrl-break ]
             [ call-error-hook datastack ]
             recover

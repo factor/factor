@@ -164,5 +164,12 @@ IN: bootstrap.syntax
         "VARIABLES-FUNCTOR:"
         "STARTUP-HOOK:"
         "SHUTDOWN-HOOK:"
+
+        "]]"
+        "}}"
+        ":::"
+        "q[["
+        "{{"
+        "q{{"
     } [ "syntax" create-word drop ] each
 ] with-compilation-unit

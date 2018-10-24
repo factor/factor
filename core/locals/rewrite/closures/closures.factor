@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals.rewrite.point-free
+USING: accessors fry kernel locals.rewrite.point-free
 locals.rewrite.sugar locals.types macros.expander make
 quotations sequences sets words ;
 IN: locals.rewrite.closures
@@ -24,6 +24,8 @@ M: def defs-vars* local>> unquote suffix ;
 
 M: quotation defs-vars* [ defs-vars* ] each ;
 
+M: fryable defs-vars* quot>> defs-vars* ;
+
 M: object defs-vars* drop ;
 
 GENERIC: uses-vars* ( seq form -- seq' )
@@ -40,6 +42,8 @@ M: object uses-vars* drop ;
 
 M: quotation uses-vars* [ uses-vars* ] each ;
 
+M: fryable uses-vars* quot>> uses-vars* ;
+
 : free-vars ( form -- seq )
     [ uses-vars ] [ defs-vars ] bi diff ;
 
@@ -51,5 +55,7 @@ M: callable rewrite-closures*
     [ var-defs prepend (rewrite-closures) point-free , ]
     [ length \ curry <repetition> % ]
     tri ;
+
+M: fryable rewrite-closures* quot>> fry rewrite-closures* \ call , ;
 
 M: object rewrite-closures* , ;

@@ -29,6 +29,8 @@ M: callable rewrite-sugar* quotation-rewrite , ;
 
 M: lambda rewrite-sugar* quotation-rewrite , ;
 
+M: fryable rewrite-sugar* , ;
+
 GENERIC: rewrite-literal? ( obj -- ? )
 
 M: special rewrite-literal? drop t ;

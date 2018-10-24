@@ -98,3 +98,21 @@ M: lambda-parser parse-quotation ( -- quotation )
             parse-locals-method-definition drop
         ] with-method-definition
     ] with-definition ;
+
+: (:::) ( -- word def effect )
+    [
+        scan-new-word scan-effect
+        { } H{ } [ \ ; parse-until >quotation ] with-lambda-scope
+        <lambda> rewrite-closures
+        dup length 1 = [ "rewritten closures length not 1" throw ] unless first
+    ] with-definition swap ;
+
+
+: (M:::) ( -- word def )
+    [
+        scan-new-method
+        [
+            [ parse-definition ]
+            parse-locals-method-definition drop
+        ] with-method-definition
+    ] with-definition ;
