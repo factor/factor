@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel locals.backend math
-math.parser quotations sequences sequences.private sets
-splitting words ;
+USING: accessors assocs combinators kernel locals.backend
+locals.parser locals.types math math.parser quotations sequences
+sequences.extras sequences.private sets splitting words ;
 IN: fry
 
 TUPLE: fryable quot ;
@@ -158,5 +158,32 @@ M: callable fry ( quot -- quot' )
         ] if
     ] map nip ;
 
+![[
 : fry-to-locals ( quot -- quot' )
     check-fry mark-composes ;
+
+!    [ dup fryable? [ fry-to-lambda ] when ] map
+
+: fry-quotation ( quot -- quot' )
+    ;
+
+: fry-array ( array -- lambda )
+    ;
+
+: fry-anything ( obj -- obj' )
+    dup fryable? [
+        quot>> {
+            { [ dup quotation? [ fry-quotation ] }
+            { [ dup array? ] [ fry-array ] }
+        } cond
+    ] when ;
+
+: fry-to-lambda ( quot -- lambda )
+    [
+        [ fry-specifier? ] count
+        <iota> [ number>string "_" append ] map [ make-locals ] with-compilation-unit
+        drop dup
+    ] keep ! { _ 1 2 3 _ }
+    [ [ \ _ eq? ] find-all keys ] keep
+    set-nths* 1quotation <lambda> [ call ] curry ;
+    ]]

@@ -476,6 +476,12 @@ PRIVATE>
 : set-nths-unsafe ( value indices seq -- )
     swapd '[ _ swap _ set-nth-unsafe ] each ; inline
 
+: set-nths* ( values indices seq -- seq )
+    -rot [ pick set-nth ] 2each ; inline
+
+: set-nths-unsafe* ( values indices seq -- seq )
+    -rot [ pick set-nth-unsafe ] 2each ; inline
+
 : flatten1 ( obj -- seq )
     [
         [

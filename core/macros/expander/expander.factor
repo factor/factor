@@ -91,3 +91,6 @@ M: callable expand-macros*
 
 M: callable expand-macros ( quot -- quot' )
     [ begin [ expand-macros* ] each end ] [ ] make ;
+
+M: array expand-macros ( quot -- quot' )
+    [ begin [ expand-macros* ] each end ] [ ] make ;

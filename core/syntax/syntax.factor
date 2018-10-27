@@ -463,14 +463,14 @@ IN: bootstrap.syntax
 
 
     "q{{" [
-        \ }} parse-until >quotation [ output>array ] curry
-        <fryable> suffix! \ call suffix!
+        ! \ }} parse-until >quotation [ output>array ] curry
+        ! <fryable> suffix!
+        \ }} parse-until >array <fryable> suffix!
     ] define-core-syntax
 
     "{{" [
-        \ }}
-        [ >quotation [ output>array ] curry [ call ] curry ]
-        [ parse-until ] dip call append!
+        \ }} parse-until
+        >quotation [ output>array ] curry append!
     ] define-core-syntax
 
 ] with-compilation-unit

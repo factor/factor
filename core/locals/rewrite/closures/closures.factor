@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry kernel locals.rewrite.point-free
+USING: accessors arrays fry kernel locals.rewrite.point-free
 locals.rewrite.sugar locals.types macros.expander make
 quotations sequences sets words ;
 IN: locals.rewrite.closures
@@ -56,6 +56,16 @@ M: callable rewrite-closures*
     [ length \ curry <repetition> % ]
     tri ;
 
-M: fryable rewrite-closures* quot>> fry rewrite-closures* \ call , ;
+![[
+! M: fryable rewrite-closures* quot>> fry rewrite-closures* \ call , ;
+M: fryable rewrite-closures*
+    B
+    quot>> [
+        dup array? [ fry-to-lambda ] when
+    ] map
+    fry rewrite-closures* ;
+    ! dup array? [ fry-to-lambda ] [ fry ] if rewrite-closures* ;
+! M: fryable rewrite-closures* quot>> fry % \ call , ;
+]]
 
 M: object rewrite-closures* , ;

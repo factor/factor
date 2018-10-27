@@ -15,3 +15,11 @@ M: let expand-macros* expand-macros literal ;
 M: lambda condomize? drop t ;
 
 M: lambda condomize [ call ] curry ;
+
+M: fryable expand-macros clone [ expand-macros ] change-quot ;
+
+M: fryable expand-macros* expand-macros literal ;
+
+M: fryable condomize? drop t ;
+
+M: fryable condomize [ call ] curry ;

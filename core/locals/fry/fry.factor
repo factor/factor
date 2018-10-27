@@ -17,9 +17,5 @@ M: lambda fry
 M: let fry
     clone [ fry ] change-body ;
 
-M: fryable condomize? drop t ;
-M: fryable call quot>> call ;
-
 INSTANCE: lambda fried
 INSTANCE: let    fried
-INSTANCE: fryable fried
