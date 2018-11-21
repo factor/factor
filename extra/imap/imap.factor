@@ -1,8 +1,10 @@
-USING: accessors arrays assocs calendar calendar.english calendar.format
-calendar.parser formatting fry grouping io io.crlf io.encodings.ascii
-io.encodings.binary io.encodings.string io.encodings.utf7 io.encodings.utf8
-io.sockets io.sockets.secure io.streams.duplex io.streams.string kernel math
-math.parser sequences splitting strings ;
+USING: accessors arrays assocs calendar calendar.english
+calendar.format calendar.parser formatting fry grouping io
+io.crlf io.encodings.ascii io.encodings.binary
+io.encodings.string io.encodings.utf7 io.encodings.utf8
+io.sockets io.sockets.secure io.streams.duplex io.streams.string
+kernel math math.parser multiline pcre sequences
+sequences.extras strings ;
 QUALIFIED: pcre
 IN: imap
 
@@ -46,9 +48,9 @@ CONSTANT: IMAP4_SSL_PORT 993
 : read-response-chunk ( stop-expr -- item ? )
     read-?crlf ascii decode swap dupd pcre:findall
     [
-        dup "^.*{(\\d+)}$" pcre:findall
+        dup [[ ^.*{(\d+)}$]] pcre:findall
         [
-            dup "^\\* (\\d+) [A-Z-]+ (.*)$" pcre:findall
+            dup [[ ^\* (\d+) [A-Z-]+ (.*)$]] pcre:findall
             [ ] [ nip first third second ] if-empty
         ]
         [
@@ -61,7 +63,7 @@ CONSTANT: IMAP4_SSL_PORT 993
 
 : read-response ( tag -- lines )
     "^%s (BAD|NO|OK) (.*)$" sprintf
-    '[ _ read-response-chunk [ suffix ] dip ] { } swap loop
+    '[ _ read-response-chunk ] loop>array*
     unclip-last first2 [ check-status ] keep suffix ;
 
 : write-command ( command literal tag -- )
@@ -80,24 +82,24 @@ CONSTANT: IMAP4_SSL_PORT 993
     first " " split 2 tail ;
 
 : parse-list-folders ( str -- folder )
-    "\\* LIST \\(([^\\)]+)\\) \"([^\"]+)\" \"([^\"]+)\"" pcre:findall
+    [[ \* LIST \(([^\)]+)\) "([^"]+)" "?([^"]+)"?]] pcre:findall
     first rest values [ utf7imap4 decode ] map ;
 
 : parse-select-folder ( seq -- count )
-    [ "\\* (\\d+) EXISTS" pcre:findall ] map harvest
+    [ [[ \* (\d+) EXISTS]] pcre:findall ] map harvest
     [ f ] [ first first last last string>number ] if-empty ;
 
 ! Returns uid if the server supports the UIDPLUS extension.
 : parse-append-mail ( seq -- uid/f )
-    [ "\\[APPENDUID (\\d+) \\d+\\]" pcre:findall ] map harvest
+    [ [=[ \[APPENDUID (\d+) \d+\]]=] pcre:findall ] map harvest
     [ f ] [ first first last last string>number ] if-empty ;
 
 : parse-status ( seq -- assoc )
-    first "\\* STATUS \"[^\"]+\" \\(([^\\)]+)\\)" pcre:findall first last last
+    first [[ \* STATUS "[^"]+" \(([^\)]+)\)]] pcre:findall first last last
     " " split 2 group [ string>number ] assoc-map ;
 
 : parse-store-mail-line ( str -- pair/f )
-    "\\(FLAGS \\(([^\\)]+)\\) UID (\\d+)\\)" pcre:findall [ f ] [
+    [[ \(FLAGS \(([^\)]+)\) UID (\d+)\)]] pcre:findall [ f ] [
         first rest values first2 [ " " split ] dip string>number swap 2array
     ] if-empty ;
 
@@ -123,6 +125,8 @@ PRIVATE>
 : list-folders ( directory -- folders )
     "LIST \"%s\" *" sprintf "" command-response
     but-last [ parse-list-folders ] map ;
+
+: list-all-folders ( -- folders ) "" list-folders ;
 
 : select-folder ( mailbox -- count )
     >utf7imap4 "SELECT \"%s\"" sprintf "" command-response
@@ -168,7 +172,8 @@ PRIVATE>
     ] dip utf8 encode command-response parse-append-mail ;
 
 : store-mail ( uids command flags -- mail-flags )
-    [ comma-list ] 2dip "UID STORE %s %s %s" sprintf "" command-response
+    [ comma-list ] 2dip "UID STORE %s %s %s" sprintf
+    "" command-response
     parse-store-mail ;
 
 ! High level API
