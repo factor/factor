@@ -40,6 +40,7 @@ M: linux find-visual-studio-code-invocation
 M: windows find-visual-studio-code-invocation
     {
         [ { "Microsoft VS Code" } "code.exe" find-in-applications ]
+        [ "code.cmd" ]
     } 0|| ;
 
 M: visual-studio-code editor-command ( file line -- command )
