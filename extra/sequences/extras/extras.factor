@@ -445,11 +445,17 @@ PRIVATE>
 : last? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? ) [ last ] dip call ; inline
 : nth? ( ... n seq quot: ( ... elt -- ... ? ) -- ... ? ) [ nth ] dip call ; inline
 
-: loop>sequence ( quot exemplar -- seq )
+: loop>sequence ( quot: ( -- obj/f ) exemplar -- seq )
    [ '[ [ @ [ [ , ] when* ] keep ] loop ] ] dip make ; inline
 
-: loop>array ( quot -- seq )
+: loop>array ( quot: ( -- obj/f ) -- seq )
    { } loop>sequence ; inline
+
+: loop>sequence* ( quot: ( -- obj ? ) exemplar -- seq )
+    [ '[ [ @ [ [ , ] when* ] [ ] bi* ] loop ] ] dip make ; inline
+
+: loop>array* ( quot: ( -- obj ? ) -- seq )
+   { } loop>sequence* ; inline
 
 <PRIVATE
 

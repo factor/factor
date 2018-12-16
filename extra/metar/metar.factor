@@ -141,7 +141,11 @@ MEMO: glossary ( -- assoc )
 : parse-timestamp ( str -- str' )
     [ now [ year>> ] [ month>> ] bi ] dip
     2 cut 2 cut 2 cut drop [ string>number ] tri@
-    0 instant <timestamp> timestamp>rfc822 ;
+    over 24 = [
+        [ drop 0 ] dip 0 instant <timestamp> 1 days time+
+    ] [
+        0 instant <timestamp>
+    ] if timestamp>rfc822 ;
 
 CONSTANT: compass-directions H{
     { 0.0 "N" }
