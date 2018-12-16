@@ -1,14 +1,6 @@
 USING: byte-arrays checksums.sha furnace.auth.providers
 furnace.auth.providers.db help.markup help.syntax http kernel
 math strings vocabs words.symbol ;
-"furnace.auth.basic" require
-"furnace.auth.features.deactivate-user" require
-"furnace.auth.features.edit-profile" require
-"furnace.auth.features.recover-password" require
-"furnace.auth.features.registration" require
-"furnace.auth.login" require
-"furnace.auth.providers.assoc" require
-"furnace.auth.providers.null" require
 IN: furnace.auth
 
 HELP: <protected>
