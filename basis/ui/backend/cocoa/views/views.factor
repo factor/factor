@@ -198,7 +198,7 @@ M: send-touchbar-command send-queued-gesture
                 cached-lines get-global clear-assoc
             ] [ drop ] if
 
-            self -> update
+            self send: update
         ] when
     ] ;
 

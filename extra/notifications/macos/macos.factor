@@ -7,13 +7,13 @@ IMPORT: NSUserNotification
 IMPORT: NSUserNotificationCenter
 
 :: make-notification ( title text -- notification )
-    NSUserNotification -> alloc -> init -> autorelease
-    [ title <NSString> -> setTitle: ] keep
-    [ text <NSString> -> setInformativeText: ] keep ;
+    NSUserNotification send: alloc send: init send: autorelease
+    [ title <NSString> send: \setTitle: ] keep
+    [ text <NSString> send: \setInformativeText: ] keep ;
 
 : send-notification ( title text -- )
     make-notification
     [
-        NSUserNotificationCenter -> defaultUserNotificationCenter
+        NSUserNotificationCenter send: defaultUserNotificationCenter
     ] dip
-    -> deliverNotification: ;
+    send: \deliverNotification: ;
