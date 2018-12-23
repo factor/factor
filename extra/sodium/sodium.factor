@@ -11,6 +11,16 @@ ERROR: buffer-too-small ;
 ! Call this before any other function, may be called multiple times.
 : sodium-init ( -- ) sodium_init 0 < [ sodium-init-fail ] when ;
 
+<PRIVATE
+
+: cipher-buf ( message-length n -- byte-array )
+    crypto_secretbox_macbytes + <byte-array> ;
+
+: message-buf ( cipher-length n -- byte-array )
+    crypto_secretbox_macbytes - <byte-array> ;
+
+PRIVATE>
+
 : random-bytes ( byte-array -- byte-array' )
     dup dup length randombytes_buf ;
 
@@ -29,12 +39,6 @@ ERROR: buffer-too-small ;
 
 : crypto-generichash ( out-bytes in-bytes key-bytes/f -- out-bytes' )
     [ dup ] 2dip [ dup length ] tri@ crypto_generichash check0 ;
-
-: cipher-buf ( msg-length -- byte-array )
-    crypto_secretbox_macbytes + <byte-array> ;
-
-: message-buf ( msg-length -- byte-array )
-    crypto_secretbox_macbytes - <byte-array> ;
 
 : check-length ( byte-array min-length -- byte-array )
     [ dup length ] dip < [ buffer-too-small ] when ;
