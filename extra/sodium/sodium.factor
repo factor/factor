@@ -14,10 +14,17 @@ ERROR: buffer-too-small ;
 <PRIVATE
 
 : cipher-buf ( message-length n -- byte-array )
-    crypto_secretbox_macbytes + <byte-array> ;
+    + <byte-array> ;
 
 : message-buf ( cipher-length n -- byte-array )
-    crypto_secretbox_macbytes - <byte-array> ;
+    - <byte-array> ;
+
+: secretbox-cipher-buf ( message-length -- byte-array )
+    crypto_secretbox_macbytes cipher-buf ;
+
+: secretbox-message-buf ( cipher-length -- byte-array )
+    crypto_secretbox_macbytes message-buf ;
+
 
 PRIVATE>
 
@@ -44,7 +51,7 @@ PRIVATE>
     [ dup length ] dip < [ buffer-too-small ] when ;
 
 : crypto-secretbox-easy ( msg-bytes nonce-bytes key-bytes -- cipher-bytes )
-    [ dup length [ cipher-buf swap dupd ] keep ]
+    [ dup length [ secretbox-cipher-buf swap dupd ] keep ]
     [ crypto_secretbox_noncebytes check-length ]
     [ crypto_secretbox_keybytes check-length ] tri*
     crypto_secretbox_easy check0 ;
@@ -52,7 +59,7 @@ PRIVATE>
 : crypto-secretbox-open-easy ( cipher-bytes nonce-bytes key-bytes -- msg-bytes/f )
     [
         crypto_secretbox_macbytes check-length
-        dup length [ message-buf swap dupd ] keep
+        dup length [ secretbox-message-buf swap dupd ] keep
     ]
     [ crypto_secretbox_noncebytes check-length ]
     [ crypto_secretbox_keybytes check-length ] tri*
