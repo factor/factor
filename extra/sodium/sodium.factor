@@ -25,6 +25,11 @@ ERROR: buffer-too-small ;
 : secretbox-message-buf ( cipher-length -- byte-array )
     crypto_secretbox_macbytes message-buf ;
 
+: box-cipher-buf ( message-length -- byte-array )
+    crypto_box_macbytes cipher-buf ;
+
+: box-message-buf ( cipher-length -- byte-array )
+    crypto_box_macbytes message-buf ;
 
 PRIVATE>
 
@@ -64,5 +69,23 @@ PRIVATE>
     [ crypto_secretbox_noncebytes check-length ]
     [ crypto_secretbox_keybytes check-length ] tri*
     crypto_secretbox_open_easy 0 = [ drop f ] unless ;
+
+: crypto-box-keypair ( -- public-key secret-key )
+    crypto_box_publickeybytes <byte-array>
+    crypto_box_secretkeybytes <byte-array>
+    2dup crypto_box_keypair check0 ;
+
+: crypto-box-nonce ( -- nonce-bytes )
+    crypto_box_noncebytes n-random-bytes ;
+
+: crypto-box-easy ( message nonce public-key private-key -- cipher-bytes )
+    [
+        dup length [ box-cipher-buf dup rot ] keep
+    ] 3dip crypto_box_easy check0 ;
+
+: crypto-box-open-easy ( cipher-bytes nonce public-key private-key -- message )
+    [
+        dup length [ box-message-buf dup rot ] keep
+    ] 3dip crypto_box_open_easy check0 ;
 
 [ sodium-init ] "sodium" add-startup-hook
