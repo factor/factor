@@ -80,7 +80,7 @@ FUNCTION: int crypto_generichash_final (
 FUNCTION: size_t crypto_secretbox_keybytes ( )
 FUNCTION: size_t crypto_secretbox_noncebytes ( )
 FUNCTION: size_t crypto_secretbox_macbytes ( )
-FUNCTION: char *crypto_secretbox_primitive ( )
+FUNCTION: char* crypto_secretbox_primitive ( )
 FUNCTION: int crypto_secretbox_easy (
     uchar* c, uchar* m, ulonglong mlen,
     uchar* n, uchar* k )
@@ -91,7 +91,7 @@ FUNCTION: int crypto_secretbox_detached (
     uchar* c, uchar* mac, uchar* m, ulonglong mlen,
     uchar* n, uchar* k )
 FUNCTION: int crypto_secretbox_open_detached (
-    uchar *m, uchar* c, uchar* mac, ulonglong clen,
+    uchar* m, uchar* c, uchar* mac, ulonglong clen,
     uchar* n, uchar* k )
 FUNCTION: void crypto_secretbox_keygen (
-    uchar k[crypto_secretbox_KEYBYTES] )
+    uchar k[crypto_secretbox_keybytes] )
