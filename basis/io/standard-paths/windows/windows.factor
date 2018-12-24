@@ -10,6 +10,7 @@ IN: io.standard-paths.windows
         program-files
         program-files-x86
         "ProgramW6432" os-env
+        "LOCALAPPDATA" os-env "Programs" append-path
     ] output>array harvest members ; inline
 
 : find-in-program-files ( base-directory quot -- path )
