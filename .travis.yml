@@ -33,6 +33,9 @@ addons:
       - libsnappy-dev
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
+  # rvm requires a gpg key import
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions gnupg > /dev/null || brew install gnupg; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions cmake > /dev/null || brew install cmake; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions libmagic > /dev/null || brew install libmagic; fi
