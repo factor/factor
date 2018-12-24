@@ -690,6 +690,12 @@ select-me "select_me"
         ] update-tuples
         select-me new [ data>> ] collector [ each-tuple ] dip
         natural-sort
+    ] unit-test
+
+    [ { "test2" } ] [
+        select-me new [ data>> "test1" = ] reject-tuples
+        select-me new [ data>> ] collector [ each-tuple ] dip
+        natural-sort
     ] unit-test ;
 
 [ test-mapping ] test-sqlite
