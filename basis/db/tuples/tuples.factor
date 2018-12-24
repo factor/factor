@@ -163,3 +163,6 @@ ERROR: no-defined-persistent object ;
 
 : update-tuples ( query/tuple quot: ( tuple -- tuple'/f ) -- )
     '[ @ [ update-tuple ] when* ] each-tuple ; inline
+
+: reject-tuples ( query/tuple quot: ( tuple -- ? ) -- )
+    '[ dup @ [ delete-tuples ] [ drop ] if ] each-tuple ; inline
