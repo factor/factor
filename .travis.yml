@@ -32,11 +32,6 @@ addons:
       - libaio-dev
       - libsnappy-dev
 before_install:
-  # rvm requires a gpg key import
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions gnupg > /dev/null || brew install gnupg; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
-
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions cmake > /dev/null || brew install cmake; fi
@@ -50,8 +45,8 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start postgresql; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.gnupg/; fi  # https://github.com/rvm/rvm/issues/3110
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -#LO https://rvm.io/mpapis.asc; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then gpg --import mpapis.asc; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://get.rvm.io | bash -s stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
   - >
     wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz &&
