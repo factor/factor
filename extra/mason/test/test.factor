@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs benchmark bootstrap.stage2 command-line
-compiler.errors continuations debugger fry generic help.html
-help.lint io io.directories io.encodings.utf8 io.files io.styles
-kernel locals mason.common namespaces parser.notes sequences
-sets sorting source-files.errors system tools.errors tools.test
-tools.time vocabs vocabs.hierarchy.private vocabs.loader
-vocabs.refresh words ;
+USING: accessors assocs benchmark bootstrap.stage2 calendar
+command-line compiler.errors continuations debugger fry generic
+help.html help.lint io io.directories io.encodings.utf8 io.files
+io.styles kernel locals mason.common memory namespaces
+parser.notes sequences sets sorting source-files.errors system
+threads tools.errors tools.test tools.time vocabs
+vocabs.hierarchy.private vocabs.loader vocabs.refresh words ;
 IN: mason.test
 
 : vocab-heading. ( vocab -- )
@@ -63,7 +63,10 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
     do-step ;
 
 : do-help-lint ( -- )
-    help-lint-all lint-failures get values
+    help-lint-all
+    ! Give the cleanup a chance to run before looking at the errors.
+    gc 2 seconds sleep
+    lint-failures get values
     help-lint-vocabs-file
     help-lint-errors-file
     do-step ;
