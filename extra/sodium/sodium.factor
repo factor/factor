@@ -11,6 +11,28 @@ ERROR: buffer-too-small ;
 ! Call this before any other function, may be called multiple times.
 : sodium-init ( -- ) sodium_init 0 < [ sodium-init-fail ] when ;
 
+<PRIVATE
+
+: cipher-buf ( message-length n -- byte-array )
+    + <byte-array> ;
+
+: message-buf ( cipher-length n -- byte-array )
+    - <byte-array> ;
+
+: secretbox-cipher-buf ( message-length -- byte-array )
+    crypto_secretbox_macbytes cipher-buf ;
+
+: secretbox-message-buf ( cipher-length -- byte-array )
+    crypto_secretbox_macbytes message-buf ;
+
+: box-cipher-buf ( message-length -- byte-array )
+    crypto_box_macbytes cipher-buf ;
+
+: box-message-buf ( cipher-length -- byte-array )
+    crypto_box_macbytes message-buf ;
+
+PRIVATE>
+
 : random-bytes ( byte-array -- byte-array' )
     dup dup length randombytes_buf ;
 
@@ -30,17 +52,11 @@ ERROR: buffer-too-small ;
 : crypto-generichash ( out-bytes in-bytes key-bytes/f -- out-bytes' )
     [ dup ] 2dip [ dup length ] tri@ crypto_generichash check0 ;
 
-: cipher-buf ( msg-length -- byte-array )
-    crypto_secretbox_macbytes + <byte-array> ;
-
-: message-buf ( msg-length -- byte-array )
-    crypto_secretbox_macbytes - <byte-array> ;
-
 : check-length ( byte-array min-length -- byte-array )
     [ dup length ] dip < [ buffer-too-small ] when ;
 
 : crypto-secretbox-easy ( msg-bytes nonce-bytes key-bytes -- cipher-bytes )
-    [ dup length [ cipher-buf swap dupd ] keep ]
+    [ dup length [ secretbox-cipher-buf swap dupd ] keep ]
     [ crypto_secretbox_noncebytes check-length ]
     [ crypto_secretbox_keybytes check-length ] tri*
     crypto_secretbox_easy check0 ;
@@ -48,10 +64,28 @@ ERROR: buffer-too-small ;
 : crypto-secretbox-open-easy ( cipher-bytes nonce-bytes key-bytes -- msg-bytes/f )
     [
         crypto_secretbox_macbytes check-length
-        dup length [ message-buf swap dupd ] keep
+        dup length [ secretbox-message-buf swap dupd ] keep
     ]
     [ crypto_secretbox_noncebytes check-length ]
     [ crypto_secretbox_keybytes check-length ] tri*
     crypto_secretbox_open_easy 0 = [ drop f ] unless ;
+
+: crypto-box-keypair ( -- public-key secret-key )
+    crypto_box_publickeybytes <byte-array>
+    crypto_box_secretkeybytes <byte-array>
+    2dup crypto_box_keypair check0 ;
+
+: crypto-box-nonce ( -- nonce-bytes )
+    crypto_box_noncebytes n-random-bytes ;
+
+: crypto-box-easy ( message nonce public-key private-key -- cipher-bytes )
+    [
+        dup length [ box-cipher-buf dup rot ] keep
+    ] 3dip crypto_box_easy check0 ;
+
+: crypto-box-open-easy ( cipher-bytes nonce public-key private-key -- message )
+    [
+        dup length [ box-message-buf dup rot ] keep
+    ] 3dip crypto_box_open_easy check0 ;
 
 [ sodium-init ] "sodium" add-startup-hook

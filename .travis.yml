@@ -45,8 +45,8 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start postgresql; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.gnupg/; fi  # https://github.com/rvm/rvm/issues/3110
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -#LO https://rvm.io/mpapis.asc; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then gpg --import mpapis.asc; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://get.rvm.io | bash -s stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
   - >
     wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz &&
