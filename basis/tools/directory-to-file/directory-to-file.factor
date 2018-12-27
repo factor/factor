@@ -9,8 +9,8 @@ IN: tools.directory-to-file
 : file-is-binary? ( path -- ? )
     binary file-contents [ 127 <= ] all? ;
 
-: directory-to-string ( path -- string )
-    normalize-path
+:: directory-to-string ( path -- string )
+    path normalize-path
     [ path-separator = ] trim-tail "/" append
     [ recursive-directory-files [ file-info directory? ] reject ] keep
     dup '[
@@ -26,8 +26,10 @@ IN: tools.directory-to-file
     ] with-directory
     [
         first2
-        [ escape-string "FILE: " prepend ] dip " " glue
-    ] map "\n\n" join ;
+        [ escape-simplest "FILE:: " prepend ] dip " " glue
+    ] map "\n\n" join
+    "<DIRECTORY: " path escape-simplest "\n\n" 3append
+    "\n\nDIRECTORY>" surround ;
 
 : directory-to-file ( path -- )
     [ directory-to-string ] keep ".modern" append
