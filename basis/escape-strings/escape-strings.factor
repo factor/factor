@@ -33,7 +33,7 @@ IN: escape-strings
 
 : escape-simplest ( str -- str' )
     dup { CHAR: ' CHAR: " CHAR: \r CHAR: \n CHAR: \s } counts {
-        { [ dup { CHAR: ' CHAR: \r CHAR: \n CHAR: \s } values-of sum 0 = ] [ drop "'" prepend ] }
+        ! { [ dup { CHAR: ' CHAR: \r CHAR: \n CHAR: \s } values-of sum 0 = ] [ drop "'" prepend ] }
         { [ dup CHAR: " of not ] [ drop "\"" "\"" surround ] }
         [ drop escape-string ]
     } cond ;
