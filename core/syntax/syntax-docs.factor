@@ -600,7 +600,9 @@ HELP: CHAR:
 { $examples
     { $code
         "CHAR: x"
+        "CHAR: \\x32"
         "CHAR: \\u000032"
+        "CHAR: \\u{32}"
         "CHAR: \\u{exclamation-mark}"
         "CHAR: exclamation-mark"
         "CHAR: ugaritic-letter-samka"
