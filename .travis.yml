@@ -33,6 +33,7 @@ addons:
       - libaio-dev
       - libsnappy-dev
 before_install:
+  - uname -s
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions cmake > /dev/null || brew install cmake; fi
