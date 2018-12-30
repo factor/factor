@@ -84,7 +84,7 @@ ducet get-global insert-helpers
     dup tangut-block? [
         [ tangut-AAAA ] [ tangut-BBBB ] bi 2array
     ] [
-        first dup illegal? [
+        dup illegal? [
             drop { }
         ] [
             [ AAAA ] [ BBBB ] bi 2array
