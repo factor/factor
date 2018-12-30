@@ -4,8 +4,6 @@ USING: kernel sequences tools.test zoneinfo ;
 
 { t } [ "PST8PDT" find-zone-rules and >boolean ] unit-test
 
-{ 13 } [ zoneinfo-paths length ] unit-test
-
 {
     T{ raw-zone
        { name "EST" }
