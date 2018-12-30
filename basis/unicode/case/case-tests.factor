@@ -3,7 +3,7 @@
 USING: unicode tools.test namespaces strings unicode.case
 unicode.case.private ;
 
-{ "Hello How Are You? I'm Good" } [ "hEllo how ARE yOU? I'm good" >title ] unit-test
+{ "Hello How Are You? I’m Good" } [ "hEllo how ARE yOU? I’m good" >title ] unit-test
 { "FUSS" } [ "Fu\u0000DF" >upper ] unit-test
 { "\u0003C3a\u0003C2 \u0003C3\u0003C2 \u0003C3a\u0003C2" } [ "\u0003A3A\u0003A3 \u0003A3\u0003A3 \u0003A3A\u0003A3" >lower ] unit-test
 { t } [ "hello how are you?" lower? ] unit-test
