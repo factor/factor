@@ -4,7 +4,7 @@ namespaces strings tools.test ;
 {
     "          "
 } [
-    5 #indentations [ [ indent ] with-string-writer ] with-variable
+    5 n-indentations [ [ indent ] with-string-writer ] with-variable
 ] unit-test
 
 {
