@@ -75,15 +75,15 @@ M: string make-slot-descriptions
         dup printable? [ 1string ] [
             dup 0xff <= [
                 H{
-                    { CHAR: \a "\\a" }
-                    { CHAR: \b "\\b" }
-                    { CHAR: \e "\\e" }
-                    { CHAR: \f "\\f" }
-                    { CHAR: \n "\\n" }
-                    { CHAR: \r "\\r" }
-                    { CHAR: \t "\\t" }
-                    { CHAR: \v "\\v" }
-                    { CHAR: \0 "\\0" }
+                    { char: \a "\\a" }
+                    { char: \b "\\b" }
+                    { char: \e "\\e" }
+                    { char: \f "\\f" }
+                    { char: \n "\\n" }
+                    { char: \r "\\r" }
+                    { char: \t "\\t" }
+                    { char: \v "\\v" }
+                    { char: \0 "\\0" }
                 } ?at [ "\\x%02x" sprintf ] unless
             ] [
                 "\\u{%x}" sprintf

@@ -25,7 +25,7 @@ PRIVATE>
     hmac-bytes totp-value ;
 
 : digits ( n digits -- string )
-    [ number>string ] dip [ CHAR: 0 pad-head ] keep tail* ;
+    [ number>string ] dip [ char: 0 pad-head ] keep tail* ;
 
 : totp ( key -- string )
     now timestamp>count swap totp-hash get totp* totp-digits get digits ;
