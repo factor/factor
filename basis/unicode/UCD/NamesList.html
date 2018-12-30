@@ -28,7 +28,7 @@
     <tbody>
       <tr>
         <td valign="top" width="144">Revision</td>
-        <td valign="top">10.0.0</td>
+        <td valign="top">11.0.0</td>
       </tr>
       <tr>
         <td valign="top" width="144">Authors</td>
@@ -36,19 +36,19 @@
       </tr>
       <tr>
         <td valign="top" width="144">Date</td>
-        <td valign="top">2017-06-14</td>
+        <td valign="top">2018-05-31</td>
       </tr>
       <tr>
         <td valign="top" width="144">This Version</td>
         <td valign="top">
-		<a href="http://www.unicode.org/Public/10.0.0/ucd/NamesList.html">
-		http://www.unicode.org/Public/10.0.0/ucd/NamesList.html</a></td>
+		<a href="http://www.unicode.org/Public/11.0.0/ucd/NamesList.html">
+		http://www.unicode.org/Public/11.0.0/ucd/NamesList.html</a></td>
       </tr>
       <tr>
         <td valign="top" width="144">Previous Version</td>
         <td valign="top">
-		<a href="http://www.unicode.org/Public/9.0.0/ucd/NamesList.html">
-		http://www.unicode.org/Public/9.0.0/ucd/NamesList.html</a></td>
+		<a href="http://www.unicode.org/Public/10.0.0/ucd/NamesList.html">
+		http://www.unicode.org/Public/10.0.0/ucd/NamesList.html</a></td>
       </tr>
       <tr>
         <td valign="top" width="144">Latest Version</td>
@@ -86,7 +86,9 @@ released form of the NamesList.txt file.</p>
 5.0. The syntax for marginal sidebar comments is utilized extensively in
 draft versions of the NamesList.txt file. The support for UTF-8 encoded files and the syntax for the UTF-8 charset 
 declaration in a comment at the head of the file were introduced after Unicode 
-6.1.0 was published, as was the syntax for the specification of variation sequences and alternate glyphs and their respective summaries.</p>
+6.1.0 was published, as was the syntax for the specification of variation sequences and alternate glyphs and their respective summaries. The repertoire restriction
+in comments and aliases in the names list format was loosened from the prior
+limitation to U+0020..U+00FF, to include the wider range U+0020..U+02FF, as of Unicode 11.0.</p>
 
 <p>The same input file can be used for the preparation of drafts and final editions for ISO/IEC 
   10646. Earlier versions of that standard used a different style, referred to below as ISO-style. That style necessitated the presence of some 
@@ -207,7 +209,11 @@ CHAR_ENTRY:   NAME_LINE | RESERVED_LINE
 <p>If the first line of a file is a file comment, it may contain a UTF-8 
     charset declaration (see below). Alternatively, or in addition, a BOM may be 
     present at the very beginning of the file, forcing the encoding to be 
-    interpreted as UTF-16 (little-endian only) or UTF-8.</p>
+    interpreted as UTF-16 (little-endian only) or UTF-8. When
+    declared as UTF-8, the names list format will support use of characters in
+    the range U+0020..U+02FF in LINE and LABEL elements. Otherwise,
+    the supported repertoire is limited to Latin-1, and attempted use of characters outside
+    the Latin-1 range will result in data corruption.</p>
 <p>Several of these elements, while part of the formal definition of the 
   file format, do not occur in final published versions of 
    NamesList.txt in the UCD.</p>
@@ -425,8 +431,6 @@ is machine generated and will always explicitly provide any summary subheaders.<
 	<li>Reserved entries are optional, and will normally be supplied automatically. They are 
 		required whenever followed by ALIAS_LINE, COMMENT_LINE, NOTICE_LINE or CROSS_REF.
 	</li>
-	<li>The French version of the names list uses French rules, which allow 
-		apostrophe and accented letters in character names. </li>
 <li>An empty alternative glyph summary subheader expression will result in default header &quot;Selected Alternative Glyphs&quot;</li>
 <li>An empty standard variation subheader expression will result in the default header &quot;Standardized Variation Sequences&quot;</li>
 <li> A VARSEL_LIST may only contain code points for standard variation selectors (including script specific ones)</li>
@@ -449,8 +453,8 @@ COMMENT:	&quot;(&quot; LABEL &quot;)&quot;
 		<strong>| LCNAME &quot;-&quot; CHAR</strong>
 
 <strong>LCTAG</strong>:		&lt;sequence of lowercase ASCII letters&gt;
-<strong>STRING</strong>:	  	&lt;sequence of ASCII or Latin-1 characters, except controls&gt; 
-<strong>LABEL</strong>:	  	&lt;sequence of ASCII or Latin-1 characters, except controls, &quot;(&quot; or &quot;)&quot;&gt; 
+<strong>STRING</strong>:	  	&lt;sequence of characters in the range U+0020..U+02FF, except controls&gt; 
+<strong>LABEL</strong>:	  	&lt;sequence of characters in the range U+0020..U+02FF, except controls, &quot;(&quot; or &quot;)&quot;&gt; 
 <strong>VARSEL</strong>:		<strong>CHAR
 		| ALT ( &quot;1&quot;|&quot;2&quot;|&quot;3&quot;|&quot;4&quot;|&quot;5&quot;|&quot;6&quot;|&quot;7&quot;|&quot;8&quot;|&quot;9&quot; )</strong>
 <strong>VARSEL_LIST</strong>:	<strong>&quot;{&quot; CHAR_LIST &quot;}&quot;</strong>
@@ -473,6 +477,8 @@ COMMENT:	&quot;(&quot; LABEL &quot;)&quot;
 <ul>
        <li>Multiple or leading spaces, multiple or leading hyphens, as well as 
        word-initial digits in NAMEs or LCNAMEs are illegal.</li>
+	<li>The French version of the names list uses French rules, which allow 
+		apostrophe and accented letters in character names.</li>
        <li>When names containing code points are lowercased to make them LCNAMEs, 
          the code point values remain uppercase. Such code points by convention 
          follow a hyphen and are the last element in the name.</li>
@@ -498,9 +504,12 @@ COMMENT:	&quot;(&quot; LABEL &quot;)&quot;
        FILE_COMMENT containing the declaration &quot;UTF-8&quot; or any casemap variation 
        thereof. Otherwise the file is encoded in Latin-1 (older versions). Beyond 
        detecting the charset declaration (typically: &quot;; charset=utf-8&quot;) the 
-       remainder of that comment is ignored. Even when the file is encoded as 
+       remainder of that comment is ignored. 
+       If the file is not encoded as 
        UTF-8, the character repertoire for running text (anything
-       other than CHAR) is effectively restricted to the repertoire of Latin-1.</li>
+       other than CHAR) is effectively restricted to the repertoire of Latin-1.
+       Otherwise, characters in the range U+0020..U+02FF
+       	are allowed in LINE or LABEL elements.</li>
        <li>The code chart layout program
        (<a href="http://www.unicode.org/unibook/">Unibook</a>)
        can accept files in several other formats. These include little-endian UTF-16,
@@ -516,6 +525,13 @@ COMMENT:	&quot;(&quot; LABEL &quot;)&quot;
        <li>The final LF in the file must be present.</li>
 </ul>
   <h2><a name="Modifications" href="#Modifications">Modifications</a></h2>
+  <p><b>Version 11.0.0</b></p>
+        <ul>
+        <li>Reissued for Unicode 11.0.0.</li>
+        <li>Loosened the limitation on repertoire allowed in LINE and LABEL
+        	elements to include characters outside Latin-1, in the range
+        	U+0100..U+02FF.</li>
+        </ul>
   <p><b>Version 10.0.0</b></p>
         <ul>
         <li>Reissued for Unicode 10.0.0.</li>

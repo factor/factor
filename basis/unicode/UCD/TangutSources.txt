@@ -1,5 +1,5 @@
-# TangutSources-10.0.0.txt
-# Date: 2017-04-13, 01:00:00 GMT [MS, KW]
+# TangutSources-11.0.0.txt
+# Date: 2017-12-06, 01:00:00 GMT [MS, KW]
 # © 2017 Unicode®, Inc.
 # Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
 # For terms of use, see http://www.unicode.org/terms_of_use.html
@@ -10,8 +10,8 @@
 # This file is a normative contributory data file in the
 # Unicode Character Database.
 #
-#	Data values match those for ISO/IEC 10646:2016
-#	Original Date: Wed Oct 21 11:25:48 2015
+#	Data values match those for ISO/IEC 10646:2017 + Amd 1
+#	Original Date: 2017-06-05
 #
 #	Format information:
 #
@@ -47,6 +47,8 @@
 #	      In 西夏語の研 究 (Seikago no kenkyū) [A Study of the Hsi-Hsia Language] (1964-1966) vol.2. Tokyo, 1966.
 # S1968 = Sofronov M. V. (М. В. Софронов), Грамматика тангутского языка (Grammatika tangutskogo jazyka)
 #	      [Grammar of the Tangut Language]. Moscow, 1968.
+# UTN42 = Andrew West and Viacheslave Zaytsev, Tangut Character Additions and Glyph Corrections,
+#         Unicode Technical Note #42. 2017-10-17.
 #
 #	For more information, see Section 18.10, Tangut, of the
 #	core specification.
@@ -90,7 +92,7 @@ U+17011	kRSTUnicode	1.9
 U+17012	kTGT_MergedSrc	L2008-0068
 U+17012	kRSTUnicode	1.9
 U+17013	kTGT_MergedSrc	L2008-0147
-U+17013	kRSTUnicode	1.9
+U+17013	kRSTUnicode	1.10
 U+17014	kTGT_MergedSrc	L2008-0089
 U+17014	kRSTUnicode	1.10
 U+17015	kTGT_MergedSrc	L2008-0035
@@ -1828,7 +1830,7 @@ U+17376	kRSTUnicode	47.9
 U+17377	kTGT_MergedSrc	L2008-0760
 U+17377	kRSTUnicode	47.9
 U+17378	kTGT_MergedSrc	L2008-0486
-U+17378	kRSTUnicode	47.10
+U+17378	kRSTUnicode	47.9
 U+17379	kTGT_MergedSrc	L2008-0219
 U+17379	kRSTUnicode	47.10
 U+1737A	kTGT_MergedSrc	L2008-0752
@@ -3672,7 +3674,7 @@ U+17710	kRSTUnicode	106.13
 U+17711	kTGT_MergedSrc	L2008-4166
 U+17711	kRSTUnicode	106.13
 U+17712	kTGT_MergedSrc	L2008-4201
-U+17712	kRSTUnicode	106.13
+U+17712	kRSTUnicode	106.14
 U+17713	kTGT_MergedSrc	L2008-4184
 U+17713	kRSTUnicode	106.13
 U+17714	kTGT_MergedSrc	L2008-4395
@@ -6816,7 +6818,7 @@ U+17D34	kRSTUnicode	206.11
 U+17D35	kTGT_MergedSrc	L2008-0124
 U+17D35	kRSTUnicode	206.12
 U+17D36	kTGT_MergedSrc	N1966-018-083
-U+17D36	kRSTUnicode	206.12
+U+17D36	kRSTUnicode	206.13
 U+17D37	kTGT_MergedSrc	L2008-0004
 U+17D37	kRSTUnicode	206.13
 U+17D38	kTGT_MergedSrc	L2008-0054
@@ -10564,7 +10566,7 @@ U+18486	kRSTUnicode	458.12
 U+18487	kTGT_MergedSrc	L2008-1526
 U+18487	kRSTUnicode	458.13
 U+18488	kTGT_MergedSrc	L2008-1510
-U+18488	kRSTUnicode	458.13
+U+18488	kRSTUnicode	325.13
 U+18489	kTGT_MergedSrc	L2008-1345
 U+18489	kRSTUnicode	458.14
 U+1848A	kTGT_MergedSrc	L2008-1094
@@ -12301,5 +12303,15 @@ U+187EB	kTGT_MergedSrc	L2008-5205
 U+187EB	kRSTUnicode	755.19
 U+187EC	kTGT_MergedSrc	L2008-5203
 U+187EC	kRSTUnicode	755.20
+U+187ED	kTGT_MergedSrc	L2012-6075
+U+187ED	kRSTUnicode	195.14
+U+187EE	kTGT_MergedSrc	L2012-6076
+U+187EE	kRSTUnicode	308.14
+U+187EF	kTGT_MergedSrc	L2012-6077
+U+187EF	kRSTUnicode	415.13
+U+187F0	kTGT_MergedSrc	UTN42-004
+U+187F0	kRSTUnicode	308.17
+U+187F1	kTGT_MergedSrc	UTN42-005
+U+187F1	kRSTUnicode	415.11
 
 # EOF

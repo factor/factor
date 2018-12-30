@@ -1,5 +1,5 @@
-# NushuSources-10.0.0.txt
-# Date: 2017-02-14, 00:00:00 GMT [KW]
+# NushuSources-11.0.0.txt
+# Date: 2017-12-06, 01:00:00 GMT [KW]
 # © 2017 Unicode®, Inc.
 # For terms of use, see http://www.unicode.org/terms_of_use.html
 #
