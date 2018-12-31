@@ -472,14 +472,38 @@ IN: bootstrap.syntax
 
 
     "q{{" [
-        ! \ }} parse-until >quotation [ output>array ] curry
-        ! <fryable> suffix!
-        \ }} parse-until >array <fryable> suffix!
+        \ }} parse-until
+        >quotation [ output>array ] curry
+        <fryable> suffix!
+        \ call suffix!
     ] define-core-syntax
 
     "{{" [
         \ }} parse-until
         >quotation [ output>array ] curry append!
+    ] define-core-syntax
+
+    "H{{" [
+        \ }} parse-until
+        >quotation [ H{ } output>assoc ] curry append!
+    ] define-core-syntax
+
+    "'[[" [
+        \ ]] parse-until
+        >quotation [ [ ] output>sequence ] curry
+        <fryable> suffix!
+    ] define-core-syntax
+
+    "'{{" [
+        \ }} parse-until
+        >quotation [ { } output>sequence ] curry
+        <fryable> suffix!
+    ] define-core-syntax
+
+    "'H{{" [
+        \ }} parse-until
+        >quotation [ H{ } output>assoc ] curry
+        <fryable> suffix!
     ] define-core-syntax
 
 ] with-compilation-unit

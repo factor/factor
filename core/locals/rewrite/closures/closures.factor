@@ -56,8 +56,14 @@ M: callable rewrite-closures*
     [ length \ curry <repetition> % ]
     tri ;
 
+! almost good
+M: fryable rewrite-closures* quot>> fry rewrite-closures* \ call , ;
+
+! M: fryable rewrite-closures* B quot>> fry (rewrite-closures) % ;
+
+! M: fryable rewrite-closures* B quot>> fry rewrite-closures* ;
+
 ![[
-! M: fryable rewrite-closures* quot>> fry rewrite-closures* \ call , ;
 M: fryable rewrite-closures*
     B
     quot>> [

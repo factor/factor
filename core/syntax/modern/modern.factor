@@ -144,7 +144,7 @@ ERROR: no-paren-container-word payload word ;
 
 : strict-single-quote? ( string -- ? )
     dup (strict-single-quote?)
-    [ "'[" sequence= not ] [ drop f ] if ;
+    [ { "'[" "'[[" "'{{" "'H{{" } member? not ] [ drop f ] if ;
 
 : strict-double-quote? ( string -- ? ) ?last char: \" = ;
 
@@ -180,5 +180,4 @@ ERROR: no-paren-container-word payload word ;
 \ lookup-char "ch" set-container-word
 \ no-op "data-stack" set-lower-colon-word
 ! USE: urls \ >url "url" set-container-word
-
 

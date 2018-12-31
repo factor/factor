@@ -169,7 +169,13 @@ IN: bootstrap.syntax
         "}}"
         ":::"
         "q[["
-        "{{"
+        "'{{"
+        "q[["
         "q{{"
+        "{{"
+        "'{{"
+        "H{{"
+        "'H{{"
+        "'[["
     } [ "syntax" create-word drop ] each
 ] with-compilation-unit

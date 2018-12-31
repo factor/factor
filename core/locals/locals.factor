@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel lexer locals.errors locals.parser locals.types
-macros memoize namespaces sequences vocabs vocabs.loader words ;
+! USING: fry kernel lexer locals.errors locals.parser locals.types
+! macros memoize namespaces sequences vocabs vocabs.loader words ;
 IN: locals
 
 ! SYNTAX: :>

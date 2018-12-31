@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators kernel locals.backend
-locals.parser locals.types math math.parser quotations sequences
-sequences.extras sequences.private sets splitting words ;
+USING: accessors combinators kernel locals.backend math
+math.parser quotations sequences sets splitting words ;
 IN: fry
 
 TUPLE: fryable quot ;
