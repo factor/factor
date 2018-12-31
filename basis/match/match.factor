@@ -6,7 +6,7 @@ USING: assocs classes classes.tuple combinators kernel lexer
 macros make namespaces parser quotations sequences summary words ;
 IN: match
 
-SYMBOL: _
+SYMBOL: __
 
 : define-match-var ( name -- )
     create-word-in
@@ -29,7 +29,7 @@ PREDICATE: match-var < word "match-var" word-prop ;
         { [ dup match-var? ] [ set-match-var ] }
         { [ over match-var? ] [ swap set-match-var ] }
         { [ 2dup = ] [ 2drop t ] }
-        { [ 2dup [ _ eq? ] either? ] [ 2drop t ] }
+        { [ 2dup [ __ eq? ] either? ] [ 2drop t ] }
         { [ 2dup [ sequence? ] both? ] [
             2dup [ length ] same? [
                 [ (match) ] 2all?

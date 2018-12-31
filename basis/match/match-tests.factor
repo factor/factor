@@ -39,7 +39,7 @@ MATCH-VARS: ?a ?b ;
     {
         { { 1 2 } [ t ] }
         { { 1 3 } [ t ] }
-        { _       [ f ] }
+        { __      [ f ] }
     } match-cond
 ] unit-test
 
@@ -89,7 +89,7 @@ C: <foo> foo
 ] unit-test
 
 { { 2 1 } } [
-    { "a" 1 2 "b" } { _ ?a ?b _ } { ?b ?a } match-replace
+    { "a" 1 2 "b" } { __ ?a ?b __ } { ?b ?a } match-replace
 ] unit-test
 
 TUPLE: match-replace-test a b ;
