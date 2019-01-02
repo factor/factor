@@ -20,10 +20,8 @@ HELP: bytes>ulid
     { "byte-array" byte-array }
     { "ulid" string }
 }
-{ $description "Convert a binary ULID to its string representation using the Crockford's base32 " { $link encoding } ". The " { $snippet "byte-array" } " must be exactly 16 bytes long, the resulting " { $snippet "ulid" } " string is always 26 characters long."
-$nl
-"The following errors may be thrown during the conversion:"
-{ $subsections bytes>ulid-bad-length } } ;
+{ $description "Convert a binary ULID to its string representation using the Crockford's base32 " { $link encoding } ". The " { $snippet "byte-array" } " must be exactly 16 bytes long, the resulting " { $snippet "ulid" } " string is always 26 characters long." }
+{ $errors { $subsections bytes>ulid-bad-length } } ;
 
 HELP: bytes>ulid-bad-length
 { $values
@@ -45,9 +43,8 @@ HELP: ulid
 }
 { $description "Generate a new 128-bit ULID using and return its string representation in the Crockford's base32 " { $link encoding } ". The current system time is encoded in the high 48 bits as the Unix time in milliseconds, the low 80 bits are random."
 $nl
-"At the time of this writing the Factor implementation is not able to produce multiple ULIDs within less than one millisecond of each other, but a provision is made to make sure that if that ever happens in the future, the subsequent ULIDs inside of a millisecond will be an increment of the previous ones to guarentee the sorting order of the identifiers, as per the specification."
-$nl
-"In case an overflow happens during such incrementing, the " { $link ulid-overflow } " error will be thrown." } ;
+"At the time of this writing the Factor implementation is not able to produce multiple ULIDs within less than one millisecond of each other, but a provision is made to make sure that if that ever happens in the future, the subsequent ULIDs inside of a millisecond will be an increment of the previous ones to guarentee the sorting order of the identifiers, as per the specification." }
+{ $errors "In case an overflow happens during such incrementing, the " { $link ulid-overflow } " error will be thrown." } ;
 
 HELP: ulid-overflow
 { $description "Throws an " { $link ulid-overflow } " error." }
@@ -58,7 +55,8 @@ HELP: ulid>bytes
     { "ulid" string }
     { "byte-array" byte-array }
 }
-{ $description "Convert a string " { $snippet "ulid" } " into its binary representation. Some errors may be thrown in the process:" { $subsections ulid>bytes-bad-length ulid>bytes-bad-character ulid>bytes-overflow } } ;
+{ $description "Convert a string " { $snippet "ulid" } " into its binary representation." }
+{ $errors { $subsections ulid>bytes-bad-length ulid>bytes-bad-character ulid>bytes-overflow } } ;
 
 HELP: ulid>bytes-bad-character
 { $values
