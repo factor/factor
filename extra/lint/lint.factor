@@ -3,8 +3,8 @@
 USING: accessors arrays assocs classes classes.tuple.private
 combinators.short-circuit continuations fry io kernel
 kernel.private locals.backend make math math.private namespaces
-prettyprint quotations sequences sequences.deep slots.private
-splitting stack-checker vocabs words words.alias ;
+prettyprint quotations sequences sequences.deep shuffle
+slots.private splitting stack-checker vocabs words words.alias ;
 IN: lint
 
 <PRIVATE
@@ -17,6 +17,7 @@ CONSTANT: manual-substitutions
         { rot [ swapd swap ] }
         { over [ dup swap ] }
         { swapd [ [ swap ] dip ] }
+        { 2swap [ -roll -roll ] }
         { 2nip [ nip nip ] }
         { 3nip [ 2nip nip ] }
         { 4nip [ 3nip nip ] }
