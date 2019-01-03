@@ -1,6 +1,7 @@
-USING: accessors arrays db db.sqlite db.tuples db.types io.directories
-io.files.temp kernel layouts literals math.parser namespaces sequences
-sorting splitting tools.test ;
+USING: accessors arrays db db.errors db.sqlite db.tuples
+db.types io.directories io.files.temp kernel layouts literals
+math.parser namespaces sequences sorting splitting tools.test ;
+
 IN: db.sqlite.tests
 
 : normalize ( str -- str' )
@@ -247,3 +248,9 @@ watch "WATCH" {
         num-test3 new select-tuple
     ] with-db num>>
 ] unit-test
+
+[
+    TUPLE: no-table name ;
+    no-table "NO_TABLE" { { "name" "NAME" VARCHAR } } define-persistent
+    test.db [ no-table new select-tuple ] with-db
+] [ sql-table-missing? ] must-fail-with

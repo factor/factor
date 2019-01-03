@@ -331,7 +331,9 @@ M: sqlite-db-connection compound ( string seq -- new-string )
     } case ;
 
 M: sqlite-db-connection parse-db-error
-    dup n>> {
-        { 1 [ string>> parse-sqlite-sql-error ] }
-        [ drop ]
-    } case ;
+    dup sqlite-error? [
+        dup n>> {
+            { 1 [ string>> parse-sqlite-sql-error ] }
+            [ drop ]
+        } case
+    ] when ;
