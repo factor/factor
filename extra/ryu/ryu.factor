@@ -208,7 +208,7 @@ PRIVATE>
                 ] if
             ] when
         ] [ ! e2 < 0
-            e2 neg DOUBLE_LOG10_5_NUMERATOR * DOUBLE_LOG10_5_DENOMINATOR /i 1 - 0 max :> q
+            e2 neg DOUBLE_LOG10_5_NUMERATOR * DOUBLE_LOG10_5_DENOMINATOR /i 1 [-] :> q
             q e2 + e10!
             e2 neg q - :> i
             i double-pow-5-bits DOUBLE_POW5_BITCOUNT - :> k
@@ -221,7 +221,7 @@ PRIVATE>
                 ] [ 1 - ] if ! vp!
             ] [
                 q 63 < [
-                    q 1 - 2^ 1 - mv bitand zero? vrIsTrailingZeros!
+                    q 1 - on-bits mv bitand zero? vrIsTrailingZeros!
                 ] when
             ] if
         ] if
