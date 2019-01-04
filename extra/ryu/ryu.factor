@@ -132,9 +132,9 @@ CONSTANT: offset 1023 ! (1 << (exponentBits - 1)) - 1
 PRIVATE>
 
 :: print-float ( value -- string )
-    value >float unpack-bits [
-        [ 5drop ] dip
-    ] [| e2 m2 acceptBounds ieeeExponent<=1 sign |
+    value >float unpack-bits
+    :> ( e2 m2 acceptBounds ieeeExponent<=1 sign output )
+    output [
         m2 4 * :> mv
         mantissaBits 2^ m2 = not ieeeExponent<=1 or 1 0 ? :> mmShift
         f f 0 0 0 :> ( vmIsTrailingZeros! vrIsTrailingZeros! e10! vr! vm! )
@@ -177,6 +177,6 @@ PRIVATE>
         [ decimal-length e10 + 1 - sign ] keep ! exp sign vp
         acceptBounds vmIsTrailingZeros vrIsTrailingZeros vr vm
         prepare-output produce-output
-    ] if* ;
+    ] unless* ;
 
 ALIAS: d2s print-float
