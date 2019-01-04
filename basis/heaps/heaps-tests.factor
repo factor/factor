@@ -79,3 +79,31 @@ IN: heaps.tests
 11 [
     [ t ] swap [ 2^ delete-test sequence= ] curry unit-test
 ] each-integer
+
+[| |
+ <min-heap> :> heap
+ t 1 heap heap-push* :> entry
+ heap heap-pop 2drop
+ t 2 heap heap-push
+ entry heap heap-delete ] [ bad-heap-delete? ] must-fail-with
+
+[| |
+ <min-heap> :> heap
+ t 1 heap heap-push* :> entry
+ t 2 heap heap-push
+ heap heap-pop 2drop
+ entry heap heap-delete ] [ bad-heap-delete? ] must-fail-with
+
+[| |
+ <min-heap> :> heap
+ t 1 heap heap-push* :> entry
+ t 2 heap heap-push
+ entry heap heap-delete
+ entry heap heap-delete ] [ bad-heap-delete? ] must-fail-with
+
+[| |
+ <min-heap> :> heap
+ t 0 heap heap-push
+ t 1 heap heap-push* :> entry
+ entry heap heap-delete
+ entry heap heap-delete ] [ bad-heap-delete? ] must-fail-with
