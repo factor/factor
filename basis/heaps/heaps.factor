@@ -131,9 +131,9 @@ PRIVATE>
 
 M: heap heap-pop*
     dup data>> dup length 1 > [
-        [ pop ] [ set-first ] bi 0 sift-up
+        [ first f >>index drop ] [ pop ] [ set-first ] tri 0 sift-up
     ] [
-        pop* drop
+        pop f >>index 2drop
     ] if ; inline
 
 : heap-pop ( heap -- value key )
@@ -156,12 +156,13 @@ M: bad-heap-delete summary
 
 : entry>index ( entry heap -- n )
     over heap>> eq? [ bad-heap-delete ] unless
-    index>> { fixnum } declare ; inline
+    index>> dup [ bad-heap-delete ] unless
+    { fixnum } declare ; inline
 
 PRIVATE>
 
 M: heap heap-delete
-    [ entry>index ] keep
+    [ entry>index ] [ f rot index<< ] 2bi
     2dup heap-size 1 - = [
         nip data>> pop*
     ] [
