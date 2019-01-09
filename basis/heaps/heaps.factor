@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Ryan Murphy, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry kernel kernel.private locals
-math math.order math.private sequences sequences.private summary
-vectors ;
+USING: accessors arrays assocs combinators fry kernel
+kernel.private locals math math.order math.private sequences
+sequences.private summary vectors ;
 IN: heaps
 
 GENERIC: heap-push* ( value key heap -- entry )
@@ -133,11 +133,14 @@ M: heap heap-push*
     tmp over data data-set-nth
     heap n rot sift-down ; inline
 
+: (heap-pop*) ( heap data -- )
+    [ first f >>index drop ] [ pop ] [ set-first ] tri 0 sift-up ; inline
+
 PRIVATE>
 
 M: heap heap-pop*
     dup data>> dup length 1 > [
-        [ first f >>index drop ] [ pop ] [ set-first ] tri 0 sift-up
+        (heap-pop*)
     ] [
         pop f >>index 2drop
     ] if ; inline
@@ -167,15 +170,22 @@ M: bad-heap-delete summary
 
 PRIVATE>
 
+: ((heap-delete)) ( n heap -- )
+    2dup [ dup up ] dip heapdata-compare
+    [ swap sift-up ] [ 0 rot sift-down ] if ;
+
+: (heap-delete) ( n heap -- )
+    [ nip data>> pop ]
+    [ data>> data-set-nth ]
+    [ ((heap-delete)) ] 2tri ;
+
 M: heap heap-delete
     [ entry>index ] [ f rot index<< ] 2bi
-    2dup heap-size 1 - = [
-        nip data>> pop*
-    ] [
-        [ nip data>> pop ]
-        [ data>> data-set-nth ]
-        [ swap sift-up ] 2tri
-    ] if ;
+    {
+        { [ 2dup heap-size 1 - = ] [ nip data>> pop* ] }
+        { [ over zero? ] [ nip dup data>> (heap-pop*) ] }
+        [ (heap-delete) ]
+    } cond ;
 
 : >min-heap ( assoc -- min-heap )
     dup assoc-size <vector> min-heap boa
