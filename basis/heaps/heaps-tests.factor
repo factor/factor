@@ -27,8 +27,24 @@ IN: heaps.tests
 { 0 } [ <max-heap> heap-size ] unit-test
 { 1 } [ <max-heap> t 1 pick heap-push heap-size ] unit-test
 
+DEFER: (assert-heap-invariant)
+
+: ((assert-heap-invariant)) ( parent child heap heap-size -- )
+    pick over < [
+        [ [ heapdata-compare f assert= ] 2keep ] dip
+        (assert-heap-invariant)
+    ] [ 4drop ] if ;
+
+: (assert-heap-invariant) ( n heap heap-size -- )
+    [ dup left dup 1 + ] 2dip
+    [ ((assert-heap-invariant)) ] 2curry bi-curry@ bi ;
+
+: assert-heap-invariant ( heap -- )
+    dup heap-empty? [ drop ]
+    [ 0 swap dup heap-size (assert-heap-invariant) ] if ;
+
 : heap-sort ( alist heap -- keys )
-    [ heap-push-all ] keep heap-pop-all ;
+    [ heap-push-all ] keep dup assert-heap-invariant heap-pop-all ;
 
 : random-alist ( n -- alist )
     <iota> [
@@ -57,6 +73,7 @@ IN: heaps.tests
 : test-entry-indices ( n -- ? )
     random-alist
     <min-heap> [ heap-push-all ] keep
+    dup assert-heap-invariant
     data>> dup length <iota> swap [ index>> ] map sequence= ;
 
 14 [
@@ -72,6 +89,7 @@ IN: heaps.tests
         <min-heap> [ heap-push-all ] keep
         dup data>> clone swap
     ] keep 3 /i [ 2dup [ delete-random ] dip heap-delete ] times
+    dup assert-heap-invariant
     data>>
     [ [ key>> ] map ] bi@
     [ natural-sort ] bi@ ;
