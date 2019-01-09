@@ -70,6 +70,12 @@ M: min-heap heap-compare
 M: max-heap heap-compare
     drop { entry entry } declare [ key>> ] bi@ before? ; inline
 
+: (heapdata-compare) ( m n data heap -- ? )
+    [ '[ _ data-nth ] bi@ ] [ heap-compare ] bi* ; inline
+
+: heapdata-compare ( m n heap -- ? )
+    [ data>> ] keep (heapdata-compare) ; inline
+
 PRIVATE>
 
 : >entry< ( entry -- value key )
@@ -117,7 +123,7 @@ M: heap heap-push*
     n dup left [ dup end < ] [
         dup 1 fixnum+fast
         dup end < [
-            2dup [ data data-nth ] bi@ heap heap-compare
+            2dup data heap (heapdata-compare)
         ] [ f ] if
         [ nip ] [ drop ] if
         [ data data-nth swap data data-set-nth ]
