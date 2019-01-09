@@ -80,9 +80,6 @@ DEFER: (assert-heap-invariant)
     [ t ] swap [ 2^ test-entry-indices ] curry unit-test
 ] each-integer
 
-: sort-entries ( entries -- entries' )
-    [ key>> ] sort-with ;
-
 : delete-test ( n -- obj1 obj2 )
     [
         random-alist
