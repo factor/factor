@@ -6,6 +6,9 @@ kernel.private locals math math.order math.private sequences
 sequences.private summary vectors ;
 IN: heaps
 
+! names and optimizations copied from pypy's heapq.py,
+! refer to it from in depth explanations of the optimizations.
+
 GENERIC: heap-push* ( value key heap -- entry )
 GENERIC: heap-peek ( heap -- value key )
 GENERIC: heap-pop* ( heap -- )
@@ -86,6 +89,7 @@ M: heap heap-peek ( heap -- value key )
 
 <PRIVATE
 
+! called bubble-up in the litterature... but we keep pypy's name.
 :: sift-down ( heap from to -- )
     heap data>>      :> data
     to data data-nth :> tmp
@@ -115,6 +119,11 @@ M: heap heap-push*
 
 <PRIVATE
 
+! called bubble-down in the litterature... but we keep pypy's name.
+! A quote from pypy's implementation:
+! > We *could* break out of the loop as soon as we find a pos where newitem <=
+! > both its children, but turns out that's not a good idea [...]
+! Indeed the code is 33% slower if we remove this optmization.
 :: sift-up ( heap n -- )
     heap data>>     :> data
     data length     :> end
