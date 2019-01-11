@@ -29,6 +29,9 @@ IN: heaps.tests
 
 DEFER: (assert-heap-invariant)
 
+: heapdata-compare ( m n heap -- ? )
+    [ data>> [ nth ] curry bi@ ] keep heap-compare ; inline
+
 : ((assert-heap-invariant)) ( parent child heap heap-size -- )
     pick over < [
         [ [ heapdata-compare f assert= ] 2keep ] dip
