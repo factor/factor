@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.backend io.monitors
-core-foundation.fsevents continuations kernel sequences
-namespaces arrays system locals accessors destructors fry ;
+USING: accessors arrays core-foundation.fsevents destructors fry
+io.backend io.monitors kernel locals sequences system ;
 IN: io.monitors.macosx
 
 TUPLE: macosx-monitor < monitor handle ;
