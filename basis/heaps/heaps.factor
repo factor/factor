@@ -6,9 +6,6 @@ kernel.private locals math math.order math.private sequences
 sequences.private summary vectors ;
 IN: heaps
 
-! names and optimizations copied from pypy's heapq.py,
-! refer to it from in depth explanations of the optimizations.
-
 GENERIC: heap-push* ( value key heap -- entry )
 GENERIC: heap-peek ( heap -- value key )
 GENERIC: heap-pop* ( heap -- )
@@ -73,12 +70,6 @@ M: min-heap heap-compare
 M: max-heap heap-compare
     drop { entry entry } declare [ key>> ] bi@ before? ; inline
 
-: (heapdata-compare) ( m n data heap -- ? )
-    [ '[ _ data-nth ] bi@ ] [ heap-compare ] bi* ; inline
-
-: heapdata-compare ( m n heap -- ? )
-    [ data>> ] keep (heapdata-compare) ; inline
-
 PRIVATE>
 
 : >entry< ( entry -- value key )
@@ -89,7 +80,10 @@ M: heap heap-peek ( heap -- value key )
 
 <PRIVATE
 
-! called bubble-up in the litterature... but we keep pypy's name.
+! names and optimizations inspired by cpython/Lib/heapq.py,
+! refer to it from in depth explanations of the optimizations.
+
+! called bubble-up in the literature... but we keep cpython's name.
 :: sift-down ( heap from to -- )
     heap data>>      :> data
     to data data-nth :> tmp
@@ -119,8 +113,8 @@ M: heap heap-push*
 
 <PRIVATE
 
-! called bubble-down in the litterature... but we keep pypy's name.
-! A quote from pypy's implementation:
+! called bubble-down in the literature... but we keep cpython's name.
+! A quote from cpython's implementation:
 ! > We *could* break out of the loop as soon as we find a pos where newitem <=
 ! > both its children, but turns out that's not a good idea [...]
 ! Indeed the code is 33% slower if we remove this optmization.
@@ -132,7 +126,7 @@ M: heap heap-push*
     n dup left [ dup end < ] [
         dup 1 fixnum+fast
         dup end < [
-            2dup data heap (heapdata-compare)
+            2dup [ data data-nth ] bi@ heap heap-compare
         ] [ f ] if
         [ nip ] [ drop ] if
         [ data data-nth swap data data-set-nth ]
@@ -142,17 +136,11 @@ M: heap heap-push*
     tmp over data data-set-nth
     heap n rot sift-down ; inline
 
-: (heap-pop*) ( heap data -- )
-    [ first f >>index drop ] [ pop ] [ set-first ] tri 0 sift-up ; inline
-
 PRIVATE>
 
 M: heap heap-pop*
-    dup data>> dup length 1 > [
-        (heap-pop*)
-    ] [
-        pop f >>index 2drop
-    ] if ; inline
+    dup data>> f over first index<< [ pop ] keep
+    [ 2drop ] [ set-first 0 sift-up ] if-empty ;
 
 : heap-pop ( heap -- value key )
     [ heap-peek ] [ heap-pop* ] bi ;
@@ -179,22 +167,16 @@ M: bad-heap-delete summary
 
 PRIVATE>
 
-: ((heap-delete)) ( n heap -- )
-    2dup [ dup up ] dip heapdata-compare
-    [ swap sift-up ] [ 0 rot sift-down ] if ;
-
-: (heap-delete) ( n heap -- )
-    [ nip data>> pop ]
-    [ data>> data-set-nth ]
-    [ ((heap-delete)) ] 2tri ;
-
-M: heap heap-delete
-    [ entry>index ] [ f rot index<< ] 2bi
-    {
-        { [ 2dup heap-size 1 - = ] [ nip data>> pop* ] }
-        { [ over zero? ] [ nip dup data>> (heap-pop*) ] }
-        [ (heap-delete) ]
-    } cond ;
+M:: heap heap-delete ( entry heap -- )
+    entry heap entry>index :> n
+    heap data>>            :> data
+    data pop               :> nth-entry
+    f entry index<<
+    n data length = [
+        nth-entry n data data-set-nth
+        n 0 = [ t ] [ nth-entry n up data data-nth heap heap-compare ] if
+        [ heap n sift-up ] [ heap 0 n sift-down ] if
+    ] unless ;
 
 : >min-heap ( assoc -- min-heap )
     dup assoc-size <vector> min-heap boa
