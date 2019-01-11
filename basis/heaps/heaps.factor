@@ -117,7 +117,7 @@ M: heap heap-push*
 ! A quote from cpython's implementation:
 ! > We *could* break out of the loop as soon as we find a pos where newitem <=
 ! > both its children, but turns out that's not a good idea [...]
-! Indeed the code is 33% slower if we remove this optmization.
+! Indeed the code is 33% slower if we remove this optimization.
 :: sift-up ( heap n -- )
     heap data>>     :> data
     data length     :> end
