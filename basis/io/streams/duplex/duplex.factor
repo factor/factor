@@ -19,7 +19,7 @@ INSTANCE: duplex-stream output-stream
 : >duplex-stream< ( stream -- in out ) [ in>> ] [ out>> ] bi ; inline
 
 M: duplex-stream stream-element-type
-    [ in>> ] [ out>> ] bi
+    >duplex-stream<
     [ stream-element-type ] bi@
     2dup eq? [ drop ] [ "Cannot determine element type" throw ] if ;
 
