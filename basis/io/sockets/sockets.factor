@@ -218,7 +218,7 @@ M: inet6 present
 
 M: inet6 protocol drop 0 ;
 
-ERROR: addrinfo-error n string ;
+ERROR: addrinfo-error n string host ;
 
 <PRIVATE
 
@@ -398,10 +398,10 @@ M: inet present
 
 C: <inet> inet
 
-M: string resolve-host
-    f prepare-addrinfo f void* <ref> [
+M:: string resolve-host ( host -- seq )
+    host f prepare-addrinfo f void* <ref> [
         getaddrinfo [
-            dup addrinfo-error-string addrinfo-error
+            dup addrinfo-error-string host addrinfo-error
         ] unless-zero
     ] keep void* deref addrinfo memory>struct
     [ parse-addrinfo-list ] keep freeaddrinfo ;
