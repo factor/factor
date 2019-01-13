@@ -64,8 +64,6 @@ TUPLE: entry title url description date ;
     [ "item" tags-named [ rss2.0-entry ] map set-entries ]
     tri ;
 
-ERROR: invalid-atom-link ;
-
 : atom-link ( tag -- url/f )
     {
         [ "link" "alternate" "rel" tag-named-with-attr ]
