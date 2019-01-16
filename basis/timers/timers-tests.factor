@@ -37,11 +37,12 @@ threads tools.test tools.time ;
     4 seconds sleep
 ] unit-test
 
-{ { 0 } } [
+{ { 0 } { 1 } } [
     { 0 }
     dup '[ 3 seconds sleep 1 _ set-first ] 1 seconds later
     2 seconds sleep stop-timer
-    1/2 seconds sleep
+    1/2 seconds sleep [ clone ] keep
+    2 seconds sleep clone
 ] unit-test
 
 { { 0 } } [
