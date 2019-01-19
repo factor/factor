@@ -1,21 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences sorting math math.order
-calendar timers logging concurrency.combinators namespaces
-db.types db.tuples db fry locals hashtables
-syndication urls xml.writer validators
-html.forms
-html.components
-http.server
-http.server.dispatchers
-http.server.static
-furnace
-furnace.actions
-furnace.redirection
-furnace.boilerplate
-furnace.auth.login
-furnace.auth
-furnace.syndication ;
+USING: accessors calendar concurrency.combinators db db.tuples
+db.types fry furnace.actions furnace.auth furnace.boilerplate
+furnace.redirection furnace.syndication html.components
+html.forms http.server.dispatchers http.server.static kernel
+locals logging sequences sorting syndication timers urls
+validators ;
 IN: webapps.planet
 
 TUPLE: planet < dispatcher ;
