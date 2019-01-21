@@ -77,3 +77,10 @@ SYMBOL: mime-test-server
     [
     ] with-test-server
 ] unit-test
+
+[
+    "--\r\n\r\n" <string-reader> [
+        "\r\n\r\n" <multipart>
+        "\r\n\r\n" parse-multipart
+    ] with-input-stream
+] [ mime-decoding-ran-out-of-bytes? ] must-fail-with
