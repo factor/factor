@@ -40,20 +40,19 @@ C: <mime-variable> mime-variable
     [ '[ _ B{ } append-as ] change-bytes ]
     [ t >>end-of-stream? ] if* ;
 
-: split-bytes ( bytes separator -- leftover-bytes safe-to-dump )
-    dupd [ length ] bi@ 1 - - short cut-slice swap ;
-
+ERROR: mime-decoding-ran-out-of-bytes ;
 : dump-until-separator ( multipart -- multipart )
-    dup
-    [ current-separator>> ] [ bytes>> ] bi
-    [ nip ] [ subseq-start ] 2bi [
+    [ ] [ current-separator>> ] [ bytes>> ] tri
+    dup [ mime-decoding-ran-out-of-bytes ] unless
+    2dup subseq-start [
         cut-slice
         [ mime-write ]
-        [ over current-separator>> length short tail-slice >>bytes ] bi*
+        [ swap length tail-slice >>bytes ] bi*
     ] [
-        drop
-        dup [ bytes>> ] [ current-separator>> ] bi split-bytes mime-write
-        >>bytes fill-bytes dup end-of-stream?>> [ dump-until-separator ] unless
+        tuck [ length ] bi@ - 1 - cut-slice
+        [ mime-write ]
+        [ >>bytes ] bi* fill-bytes
+        dup end-of-stream?>> [ dump-until-separator ] unless
     ] if* ;
 
 : dump-string ( multipart separator -- multipart string )
