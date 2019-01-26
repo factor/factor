@@ -1,35 +1,43 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: base64 command-line escape-strings fry io.backend
-io.directories io.directories.search io.encodings.binary
-io.encodings.utf8 io.files io.files.info io.pathnames kernel
-locals math namespaces sequences sequences.extras splitting ;
+USING: base85 combinators command-line escape-strings fry
+io.backend io.directories io.directories.search
+io.encodings.binary io.encodings.utf8 io.files io.files.info
+io.pathnames kernel locals math namespaces sequences
+sequences.extras splitting ;
 IN: tools.directory-to-file
 
-: file-is-binary? ( path -- ? )
-    binary file-contents [ 127 <= ] all? ;
+: file-is-text? ( path -- ? )
+    binary file-contents [ 127 < ] all? ;
+
+: directory-repr ( path -- obj )
+    escape-simplest
+    "DIRECTORY: " prepend ;
+
+: file-repr ( path string -- obj )
+    [ escape-simplest "FILE:: " prepend ] dip " " glue ;
 
 :: directory-to-string ( path -- string )
     path normalize-path
     [ path-separator = ] trim-tail "/" append
-    [ recursive-directory-files [ file-info directory? ] reject ] keep
+    [ recursive-directory-files ] keep
     dup '[
         [ _  ?head drop ] map
-    [
-        dup file-is-binary? [
-            utf8 file-contents escape-string
-        ] [
-            binary file-contents >base64 "" like escape-string
-            "base64" prepend
-        ] if
-        ] map-zip
+        [
+            {
+                { [ dup file-info directory? ] [ directory-repr ] }
+                { [ dup file-is-text? ] [ dup utf8 file-contents escape-string file-repr ] }
+                [
+                    dup binary file-contents >base85
+                    "" like escape-string
+                    "base85" prepend file-repr
+                ]
+            } cond
+        ] map
     ] with-directory
-    [
-        first2
-        [ escape-simplest "FILE:: " prepend ] dip " " glue
-    ] map "\n\n" join
+    "\n\n" join
     "<DIRECTORY: " path escape-simplest "\n\n" 3append
-    "\n\nDIRECTORY>" surround ;
+    "\n\n;DIRECTORY>" surround ;
 
 : directory-to-file ( path -- )
     [ directory-to-string ] keep ".modern" append
