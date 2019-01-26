@@ -30,7 +30,7 @@ CONSTANT: alphabet
         [
             drop
             [ 4 0 pad-tail encode4 ]
-            [ length neg 4 rem head-slice* write-lines ] bi
+            [ length 4 swap - head-slice* write-lines ] bi
             (encode-base85)
         ]
     } case ;
@@ -55,7 +55,7 @@ PRIVATE>
         [
             drop
             [ 5 CHAR: ~ pad-tail decode5 ]
-            [ length neg 5 rem head-slice* write ] bi
+            [ length 5 swap - head-slice* write ] bi
             (decode-base85)
         ]
     } case ;
