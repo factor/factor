@@ -1,11 +1,11 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators continuations
-destructors fry io io.backend.unix io.binary io.directories
-io.encodings.binary io.encodings.latin1 io.encodings.string
-io.encodings.utf8 io.files io.sockets kernel math math.parser
-namespaces pack random sequences sequences.extras splitting
-strings ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit continuations destructors fry io
+io.binary io.directories io.encodings.binary io.encodings.latin1
+io.encodings.string io.encodings.utf8 io.files io.files.info
+io.sockets kernel math math.parser namespaces pack prettyprint
+random sequences sequences.extras splitting strings ;
 IN: protocols.tftp
 
 CONSTANT: TFTP-RRQ 1 ! Read request (RRQ)
@@ -48,15 +48,20 @@ SYMBOL: tftp-servers
 tftp-servers [ H{ } clone ] initialize
 TUPLE: read-file path encoding block ;
 
-: send-file-block ( bytes block -- )
-    TFTP-DATA swap 2array "SS" pack B{ } prepend-as
+: send-client ( bytes -- )
     tftp-client get tftp-server get send ;
+
+: send-error ( message -- )
+    [ TFTP-ERROR 1 ] dip 3array "SSa" pack-be send-client ;
+
+: send-file-block ( bytes block -- )
+    TFTP-DATA swap 2array "SS" pack-be B{ } prepend-as
+    send-client ;
 
 : read-file-block ( path n -- bytes )
     binary swap
     '[ _ 512 * seek-absolute seek-input 512 read ] with-file-reader ;
 
-ERROR: unknown-client client ;
 : handle-send-file-next ( block -- )
     drop
     tftp-client get clients get ?at [
@@ -64,14 +69,18 @@ ERROR: unknown-client client ;
         [ [ 1 + ] change-block block>> ] bi
         send-file-block
     ] [
-        unknown-client
+        drop
     ] if ;
 
 : handle-send-file ( bytes -- )
     "\0" split harvest first2 [ utf8 decode ] bi@
-    "netascii" sequence= utf8 binary ? 0 read-file boa
-    tftp-client get clients get set-at
-    0 handle-send-file-next ;
+    over { [ exists? ] [ file-info directory? not ] } 1&& [
+        "netascii" sequence= utf8 binary ? 0 read-file boa
+        tftp-client get clients get set-at
+        0 handle-send-file-next
+    ] [
+        2drop "File not found" send-error
+    ] if ;
 
 : read-tftp-command ( -- )
     tftp-server get receive tftp-client [
@@ -90,7 +99,7 @@ ERROR: unknown-client client ;
                 tftp-server get dup addr>> port>> tftp-servers get-global set-at
                 [
                     [ read-tftp-command t ]
-                    [ dup io-timeout? [ drop ] [ rethrow ] if f ] recover
+                    [ [ . flush ] with-global f ] recover
                 ] loop
             ] with-variable
         ] with-variable
