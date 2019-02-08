@@ -1,33 +1,45 @@
 #include "master.hpp"
 
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
 namespace factor {
 char *vm_saved_path;
 
-/* 
-   FreeBSD needs proc mounted for this function to work.
-   "mount -t procfs proc /proc"
-*/
 
-const char* vm_executable_path(){
-  ssize_t bufsiz = 4096;
-  while (true) {
-    char* buf = new char [bufsiz + 1];
-    ssize_t size = readlink("/proc/curproc/file", buf, bufsiz);
-    if (size < 0) {
-      fatal_error("Cannot read /proc/curproc/file", errno);
-    }
-    else {
-      if (size < bufsiz) {
-        buf[size] = '\0';
-	const char* ret = safe_strdup(buf);
-	delete[] buf;
-	return ret;
-      }	else {
-	delete[] buf;
-	bufsiz *= 2;
-      }
-    }
+
+/* From SBCL */
+const char *vm_executable_path()
+{
+  char path[PATH_MAX + 1];
+
+  if (getosreldate() >= 600024)
+  {
+    /* KERN_PROC_PATHNAME is available */
+    size_t len = PATH_MAX + 1;
+    int mib[4];
+
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_PROC;
+    mib[2] = KERN_PROC_PATHNAME;
+    mib[3] = -1;
+    if (sysctl(mib, 4, &path, &len, NULL, 0) != 0)
+      return NULL;
   }
+  else
+  {
+    int size;
+    size = readlink("/proc/curproc/file", path, sizeof(path) - 1);
+    if (size < 0)
+      return NULL;
+    path[size] = '\0';
+  }
+
+  if(strcmp(path, "unknown") == 0)
+    return NULL;
+
+  return safe_strdup(path);
 }
+
 
 }
