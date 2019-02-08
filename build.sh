@@ -173,7 +173,13 @@ set_cc() {
 }
 
 set_make() {
-    MAKE='make'
+    case $OS in
+        freebsd) MAKE=gmake ;;
+        *) MAKE=make ;;
+    esac
+    if [[ $MAKE = 'gmake' ]] ; then
+        ensure_program_installed gmake
+    fi
 }
 
 check_installed_programs() {
@@ -255,6 +261,7 @@ find_os() {
         *Darwin*) OS=macosx;;
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
+        FreeBSD) OS=freebsd;;
     esac
 }
 
@@ -277,12 +284,13 @@ find_architecture() {
 
 find_num_cores() {
     $ECHO "Finding num cores..."
-    NUM_CORES=7ZZ
+    NUM_CORES=1
     uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
         CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS;;
         *darwin* | *Darwin* | *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN);;
+        freebsd) NUM_CORES=$(sysctl -n hw.ncpu);;
     esac
 }
 
@@ -691,6 +699,10 @@ install_deps_dnf() {
     check_ret sudo
 }
 
+install_deps_pkg() {
+    sudo pkg install --yes git gcc rlwrap ripgrep curl gmake
+}
+
 
 install_deps_macosx() {
     test_program_installed git
@@ -711,6 +723,7 @@ usage() {
     $ECHO "  deps-apt - install required packages for Factor on Linux using apt"
     $ECHO "  deps-pacman - install required packages for Factor on Linux using pacman"
     $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
+    $ECHO "  deps-pkg - install required packages for Factor on FreeBSD using pkg"
     $ECHO "  deps-macosx - install git on MacOSX using port"
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
@@ -744,6 +757,7 @@ case "$1" in
     deps-pacman) install_deps_pacman ;;
     deps-macosx) install_deps_macosx ;;
     deps-dnf) install_deps_dnf ;;
+    deps-pkg) install_deps_pkg ;;
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; download_and_bootstrap ;;
