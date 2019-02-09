@@ -1,1 +1,1 @@
-macosx
+macosx freebsd

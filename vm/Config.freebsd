@@ -1,0 +1,4 @@
+include vm/Config.unix
+PLAF_DLL_OBJS += vm/os-genunix.o vm/os-freebsd.o vm/mvm-unix.o
+PLAF_MASTER_HEADERS += vm/os-genunix.hpp vm/os-freebsd.hpp
+LIBS = -lm $(X11_UI_LIBS) -pthread -lc -Wl,--export-dynamic -lthr

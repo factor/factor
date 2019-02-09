@@ -10,7 +10,6 @@
 #include <signal.h>
 #include <pthread.h>
 #include <sched.h>
-
 #include "atomic-gcc.hpp"
 
 namespace factor {
