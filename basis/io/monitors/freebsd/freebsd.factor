@@ -1,7 +1,7 @@
 USING: kernel io.backend io.monitors io.monitors.recursive
 io.files io.pathnames io.buffers io.ports io.timeouts
 io.backend.unix io.encodings.utf8 assocs namespaces make
-sequences locals system destructors accessors o;
+sequences locals system destructors accessors ;
 IN: io.monitors.freebsd
 
 TUPLE: freebsd-monitor < monitor handle ;
