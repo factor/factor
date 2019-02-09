@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache combinators images.loader kernel
-memoize namespaces opengl.textures system ui.gadgets.worlds
-vocabs ;
+memoize namespaces opengl.textures sequences system
+ui.gadgets.worlds vocabs ;
 IN: ui.images
 
 TUPLE: image-name path ;
@@ -34,5 +34,9 @@ PRIVATE>
 {
     { [ os macosx? ] [ "images.loader.cocoa" require ] }
     { [ os windows?  ] [ "images.loader.gdiplus" require ] }
+    { [ os { freebsd } member? ] [
+        "images.png" require
+        "images.tiff" require
+    ] }
     [ "images.loader.gtk" require ]
 } cond
