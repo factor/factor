@@ -700,7 +700,7 @@ install_deps_dnf() {
 }
 
 install_deps_pkg() {
-    sudo pkg install --yes git gcc rlwrap ripgrep curl gmake
+    sudo pkg install --yes git gcc rlwrap ripgrep curl gmake x11-toolkits/gtk30 x11-toolkits/gtkglext pango cairo
 }
 
 
@@ -762,6 +762,7 @@ case "$1" in
     quick-update) update; refresh_image ;;
     update) update; download_and_bootstrap ;;
     latest) update; download_and_bootstrap ;;
+    compile) find_build_info; make_factor ;;
     bootstrap) get_config_info; bootstrap ;;
     net-bootstrap) net_bootstrap_no_pull ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
