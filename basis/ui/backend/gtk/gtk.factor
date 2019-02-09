@@ -515,7 +515,7 @@ M: gtk-ui-backend (with-ui)
 M: gtk-ui-backend stop-event-loop
     gtk_main_quit ;
 
-os linux? [
+os { linux freebsd } member? [
     gtk-ui-backend ui-backend set-global
 ] when
 
