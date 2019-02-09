@@ -175,6 +175,7 @@ set_cc() {
 set_make() {
     case $OS in
         freebsd) MAKE=gmake ;;
+        dragonflybsd) MAKE=gmake ;;
         *) MAKE=make ;;
     esac
     if [[ $MAKE = 'gmake' ]] ; then
@@ -262,6 +263,7 @@ find_os() {
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
         FreeBSD) OS=freebsd;;
+        DragonFly) OS=dragonflybsd;;
     esac
 }
 
@@ -290,7 +292,7 @@ find_num_cores() {
     case $uname_s in
         CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS;;
         *darwin* | *Darwin* | *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN);;
-        freebsd) NUM_CORES=$(sysctl -n hw.ncpu);;
+        freebsd | dragonflybsd) NUM_CORES=$(sysctl -n hw.ncpu);;
     esac
 }
 
