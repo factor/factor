@@ -17,10 +17,13 @@ STRUCT: addrinfo
     { next addrinfo* } ;
 
 STRUCT: dirent
-    { d_fileno u_int32_t }
-    { d_reclen u_int16_t }
-    { d_type u_int8_t }
-    { d_namlen u_int8_t }
+    { d_fileno ino_t }
+    { d_off off_t }
+    { d_reclen __uint16_t }
+    { d_type uint8_t }
+    { d_pad0 uint8_t }
+    { d_namlen u_int16_t }
+    { d_pad1 uint16_t }
     { d_name char[256] } ;
 
 CONSTANT: SOL_SOCKET 0xffff
