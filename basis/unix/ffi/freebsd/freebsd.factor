@@ -22,8 +22,8 @@ STRUCT: dirent
     { d_reclen __uint16_t }
     { d_type uint8_t }
     { d_pad0 uint8_t }
-    { d_namlen u_int16_t }
-    { d_pad1 uint16_t }
+    { d_namlen __uint16_t }
+    { d_pad1 __uint16_t }
     { d_name char[256] } ;
 
 CONSTANT: SOL_SOCKET 0xffff
