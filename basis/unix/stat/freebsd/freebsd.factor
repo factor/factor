@@ -5,10 +5,6 @@ IN: unix.stat
 ! FreeBSD 12
 
 ! stat64 structure
-
-STRUCT: fbsd-timespec
-    { tv_sec __int32_t }
-    { tv_nsec long } ;
     
 STRUCT: stat
     { st_dev dev_t }
