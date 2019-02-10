@@ -1,10 +1,17 @@
 USING: alien.c-types alien.syntax classes.struct unix.types unix.ffi.bsd ;
 IN: unix.ffi
 
+CONSTANT: AF_INET 2
+ALIAS: PF_INET AF_INET
 CONSTANT: AF_INET6 28
 ALIAS: PF_INET6 AF_INET6
 
 CONSTANT: FD_SETSIZE 1024
+
+STRUCT: sockaddr
+    { sa_len uchar }
+    { sa_family __uint8_t }
+    { sa_data char[14] } ;
 
 STRUCT: addrinfo
     { flags int }
