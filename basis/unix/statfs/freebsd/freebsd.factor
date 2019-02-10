@@ -8,22 +8,22 @@ CONSTANT: MNAMELEN        1024            ! size of on/from name bufs
 CONSTANT: STAFS_VERSION 0x20140518
 
 STRUCT: statfs
-    { f_version uint32_t }
-    { f_type uint32_t }
-    { f_flags uint64_t }
-    { f_bsize uint64_t }
-    { f_iosize uint64_t }
-    { f_blocks uint64_t }
-    { f_bfree uint64_t }
-    { f_bavail int64_t }
-    { f_files uint64_t }
-    { f_ffree int64_t }
-    { f_syncwrites uint64_t }
-    { f_asyncwrites uint64_t }
-    { f_syncreads uint64_t }
-    { f_asyncreads uint64_t }
-    { f_spare uint64_t[10] }
-    { f_namemax uint32_t }
+    { f_version __uint32_t }
+    { f_type __uint32_t }
+    { f_flags __uint64_t }
+    { f_bsize __uint64_t }
+    { f_iosize __uint64_t }
+    { f_blocks __uint64_t }
+    { f_bfree __uint64_t }
+    { f_bavail __int64_t }
+    { f_files __uint64_t }
+    { f_ffree __int64_t }
+    { f_syncwrites __uint64_t }
+    { f_asyncwrites __uint64_t }
+    { f_syncreads __uint64_t }
+    { f_asyncreads __uint64_t }
+    { f_spare __uint64_t[10] }
+    { f_namemax __uint32_t }
     { f_owner uid_t }
     { f_fsid fsid_t }
     { f_charspare char[80] }

@@ -2,13 +2,13 @@ USING: alien.c-types alien.syntax classes.struct unix.types unix.time ;
 IN: unix.kqueue
 
 STRUCT: kevent
-    { ident  ulong }
+    { ident  __uint64_t }
     { filter short }
     { flags  ushort }
     { fflags uint }
-    { data __uint64_t }
+    { data __int64_t }
     { udata  void* } 
-    { ext[4] __uint64_t } ;
+    { ext __uint64_t[4] } ;
 
 FUNCTION-ALIAS: kevent-func int kevent ( int kq, kevent* changelist, int nchanges, kevent* eventlist, int nevents, timespec* timeout )
 
