@@ -6,15 +6,19 @@ IN: unix.stat
 
 ! stat64 structure
 
+STRUCT: fbsd-timespec
+    { tv_sec __int32_t }
+    { tv_nsec long } ;
+    
 STRUCT: stat
     { st_dev dev_t }
     { st_ino ino_t }
     { st_nlink nlink_t }
     { st_mode mode_t }
-    { st_pading0 __int16_t }
+    { st_padding0 __int16_t }
     { st_uid uid_t }
     { st_gid gid_t }
-    { st_pading1 __int32_t }
+    { st_padding1 __int32_t }
     { st_rdev dev_t }
     { st_atimespec timespec }
     { st_mtimespec timespec }

@@ -8,5 +8,5 @@ CONSTANT: MNT_LAZY    3   ! push data not written by filesystem syncer
 CONSTANT: MNT_SUSPEND 4   ! suspend file system after sync
 
 
-FUNCTION-ALIAS: getfsstat int getfsstat ( statfs* buf, long bufsize, int flags ) 
-FUNCTION-ALIAS: getmntinfo int getmntinfo ( statfs **mntbufp, int flags ) 
+FUNCTION:  int getfsstat ( statfs* buf, long bufsize, int flags ) 
+FUNCTION:  int getmntinfo ( statfs **mntbufp, int flags ) 
