@@ -80,6 +80,10 @@ M: heap heap-peek ( heap -- value key )
 
 <PRIVATE
 
+! names and optimizations inspired by cpython/Lib/heapq.py,
+! refer to it from in depth explanations of the optimizations.
+
+! called bubble-up in the literature... but we keep cpython's name.
 :: sift-down ( heap from to -- )
     heap data>>      :> data
     to data data-nth :> tmp
@@ -109,6 +113,11 @@ M: heap heap-push*
 
 <PRIVATE
 
+! called bubble-down in the literature... but we keep cpython's name.
+! A quote from cpython's implementation:
+! > We *could* break out of the loop as soon as we find a pos where newitem <=
+! > both its children, but turns out that's not a good idea [...]
+! Indeed the code is 33% slower if we remove this optimization.
 :: sift-up ( heap n -- )
     heap data>>     :> data
     data length     :> end
@@ -130,11 +139,8 @@ M: heap heap-push*
 PRIVATE>
 
 M: heap heap-pop*
-    dup data>> dup length 1 > [
-        [ pop ] [ set-first ] bi 0 sift-up
-    ] [
-        pop* drop
-    ] if ; inline
+    dup data>> f over first index<< [ pop ] keep
+    [ 2drop ] [ set-first 0 sift-up ] if-empty ;
 
 : heap-pop ( heap -- value key )
     [ heap-peek ] [ heap-pop* ] bi ;
@@ -156,19 +162,21 @@ M: bad-heap-delete summary
 
 : entry>index ( entry heap -- n )
     over heap>> eq? [ bad-heap-delete ] unless
-    index>> { fixnum } declare ; inline
+    index>> dup [ bad-heap-delete ] unless
+    { fixnum } declare ; inline
 
 PRIVATE>
 
-M: heap heap-delete
-    [ entry>index ] keep
-    2dup heap-size 1 - = [
-        nip data>> pop*
-    ] [
-        [ nip data>> pop ]
-        [ data>> data-set-nth ]
-        [ swap sift-up ] 2tri
-    ] if ;
+M:: heap heap-delete ( entry heap -- )
+    entry heap entry>index :> n
+    heap data>>            :> data
+    data pop               :> nth-entry
+    f entry index<<
+    n data length = [
+        nth-entry n data data-set-nth
+        n 0 = [ t ] [ nth-entry n up data data-nth heap heap-compare ] if
+        [ heap n sift-up ] [ heap 0 n sift-down ] if
+    ] unless ;
 
 : >min-heap ( assoc -- min-heap )
     dup assoc-size <vector> min-heap boa

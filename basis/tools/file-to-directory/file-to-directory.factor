@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: base64 command-line fry io.directories
+USING: base85 combinators command-line fry io.directories
 io.encodings.binary io.encodings.utf8 io.files io.pathnames
 kernel modern modern.out namespaces sequences splitting strings ;
 IN: tools.file-to-directory
@@ -12,15 +12,20 @@ ERROR: expected-modern-path got ;
     [ ".modern" ?tail drop dup make-directories ]
     [ path>literals ] bi
     '[
-        _ [
-            second first2 [ third >string ] dip
-
-            [ third ] [
-                first "base64" head?
-                [ [ >string ] [ base64> ] bi* swap binary ]
-                [ [ >string ] bi@ swap utf8 ] if
-            ] bi
-            [ dup parent-directory make-directories ] dip set-file-contents
+        _ first second rest [
+            dup first "DIRECTORY:" head?
+            [ second first second >string make-directories ]
+            [
+                second first2
+                [ second >string ] [
+                    first3 nip swap "base85" head? [
+                        base85> binary
+                    ] [
+                        utf8
+                    ] if
+                ] bi* swapd
+                [ dup parent-directory make-directories ] dip set-file-contents
+            ] if
         ] each
     ] with-directory ;
 

@@ -601,6 +601,7 @@ HELP: \char:
     { $code
         "ch'x"
         "ch'\\u000032"
+        "ch'\\u{32}"
         "ch'\\u{exclamation-mark}"
         "ch'exclamation-mark"
         "ch'ugaritic-letter-samka"

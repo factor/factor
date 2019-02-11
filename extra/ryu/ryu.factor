@@ -1,7 +1,8 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: formatting kernel locals math math.bitwise math.functions
-math.order ryu.data sequences shuffle strings vectors ;
+USING: combinators.smart kernel locals math math.bitwise
+math.functions math.order math.parser ryu.data sequences
+sequences.private ;
 
 IN: ryu
 
@@ -17,10 +18,9 @@ IN: ryu
     [                     mul-shift ] 3tri ;
 
 :: pow-5-factor ( x -- y )
-    x :> value!
-    f 0 [ 2dup x <= swap not and ] [
-        value 5 /mod zero? [ value! 1 + ] [ nipd swap ] if
-    ] while nip ; inline
+    x f 0 [ 2dup x > or ] [
+        [ 5 /mod ] 2dip rot zero? [ 1 + ] [ nip dupd ] if
+    ] until 2nip ; inline
 
 : multiple-of-power-of-5 ( p value -- ? )
     pow-5-factor <= ;
@@ -80,34 +80,32 @@ CONSTANT: offset 1023 ! (1 << (exponentBits - 1)) - 1
         ] if-zero
     ] if [ e2 m2 dup even? ieeeExponent 1 <= sign ] dip ; inline
 
-:: prepare-output ( vp! vplength acceptBounds vmIsTrailingZeros! vrIsTrailingZeros! vr! vm! -- vplength' output )
+:: prepare-output ( vp! acceptBounds vmIsTrailingZeros! vrIsTrailingZeros! vr! vm! -- output )
     ! vr is converted into the output
-    0 vplength
-    ! the if has this stack-effect: ( lastRemovedDigit vplength -- lastRemovedDigit' vplength' output )
+    0
+    ! the if has this stack-effect: ( lastRemovedDigit -- lastRemovedDigit' output )
     vmIsTrailingZeros vrIsTrailingZeros or [
         ! rare
         [ vp 10 /i vm 10 /i 2dup > ] [
             vm! vp!
             vmIsTrailingZeros [ vm 10 divisor? vmIsTrailingZeros! ] when
-            vrIsTrailingZeros [ over zero? vrIsTrailingZeros! ] when
-            vr 10 /mod -roll vr! nip ! lastRemovedDigit!
-            1 - ! vplength!
+            vrIsTrailingZeros [ dup zero? vrIsTrailingZeros! ] when
+            vr 10 /mod swap vr! nip ! lastRemovedDigit!
         ] while 2drop
         vmIsTrailingZeros [
             [ vm dup 10 /i dup 10 * swapd = ] [
                 vm!
-                vrIsTrailingZeros [ over zero? vrIsTrailingZeros! ] when
-                vr 10 /mod -roll vr! nip ! lastRemovedDigit!
+                vrIsTrailingZeros [ dup zero? vrIsTrailingZeros! ] when
+                vr 10 /mod swap vr! nip ! lastRemovedDigit!
                 vp 10 /i vp!
-                1 - ! vplength!
             ] while drop ! Drop (vm 10 /i) result from the while condition.
         ] when
         vrIsTrailingZeros [
-            over 5 = [
-                vr even? [ 4 -rot nip ] when ! 4 lastRemovedDigit!
+            dup 5 = [
+                vr even? [ drop 4 ] when ! 4 lastRemovedDigit!
             ] when
         ] when
-        vr pick 5 >= [ 1 + ] [
+        vr over 5 >= [ 1 + ] [
             dup vm = [
                 acceptBounds vmIsTrailingZeros and not [ 1 + ] when
             ] when
@@ -116,76 +114,27 @@ CONSTANT: offset 1023 ! (1 << (exponentBits - 1)) - 1
         ! common
         [ vp 10 /i vm 10 /i 2dup > ] [
             vm! vp!
-            vr 10 /mod -roll vr! nip ! lastRemovedDigit!
-            1 - ! vplength!
+            vr 10 /mod swap vr! nip ! lastRemovedDigit!
         ] while 2drop
         vr dup vm = [ 1 + ] [
-            pick 5 >= [ 1 + ] when
+            over 5 >= [ 1 + ] when
         ] if
-    ] if nipd ; inline
+    ] if nip ; inline
 
-: write-char ( index seq char -- index+1 seq' )
-    -rot [ tuck ] dip [ set-nth 1 + ] keep ; inline
-
-: write-exp ( exp index result -- result' )
-    CHAR: e write-char
-    pick neg? [
-        CHAR: - write-char [ neg ] 2dip
-    ] when
-    pick dup 100 >= [
-        100 /i CHAR: 0 + write-char
-        [ 100 mod 2 * ] 2dip
-        pick DIGIT_TABLE nth write-char
-        [ 1 + DIGIT_TABLE nth ] 2dip [ set-nth ] keep
-    ] [
-        10 >= [
-            [ 2 * ] 2dip
-            pick DIGIT_TABLE nth write-char
-            [ 1 + DIGIT_TABLE nth ] 2dip [ set-nth ] keep
-        ] [
-            [ CHAR: 0 + ] 2dip [ set-nth ] keep
-        ] if
-    ] if ; inline
-
-:: produce-output ( exp sign olength output2! -- string )
-    25 <vector> 0 :> ( result i! )
-    0 sign [ CHAR: - swap result set-nth 1 ] when :> index!
-    [ output2 10000 >= ] [
-        output2 dup 10000 /i dup output2! 10000 * - :> c
-        index olength + i - 1 - :> res-index
-        c 100 mod 2 *
-        dup DIGIT_TABLE nth res-index result set-nth
-        1 + DIGIT_TABLE nth res-index 1 + result set-nth
-        c 100 /i 2 *
-        dup DIGIT_TABLE nth res-index 2 - result set-nth
-        1 + DIGIT_TABLE nth res-index 1 - result set-nth
-        i 4 + i!
-    ] while
-    output2 100 >= [
-        output2 dup 100 /i dup output2! 100 * - 2 * :> c
-        index olength + i - :> res-index
-        c DIGIT_TABLE nth res-index 1 - result set-nth
-        c 1 + DIGIT_TABLE nth res-index result set-nth
-        i 2 + i!
-    ] when
-    output2 10 >= [
-        output2 2 * :> c
-        index olength + i - :> res-index
-        c 1 + DIGIT_TABLE nth res-index result set-nth
-        c DIGIT_TABLE nth index result set-nth
-    ] [ CHAR: 0 output2 + index result set-nth ] if
-    index 1 + index!
-    olength 1 > [
-        CHAR: . index result set-nth
-        index olength + index!
-    ] when exp index result write-exp >string ; inline
+:: produce-output ( exp sign output -- string )
+    [
+        sign "-" f ?
+        output number>string 1 cut-slice dup empty? f "." ? swap
+        "e"
+        exp number>string
+    ] "" append-outputs-as ; inline
 
 PRIVATE>
 
 :: print-float ( value -- string )
-    value >float unpack-bits [
-        [ 5drop ] dip
-    ] [| e2 m2 acceptBounds ieeeExponent<=1 sign |
+    value >float unpack-bits
+    :> ( e2 m2 acceptBounds ieeeExponent<=1 sign output )
+    output [
         m2 4 * :> mv
         mantissaBits 2^ m2 = not ieeeExponent<=1 or 1 0 ? :> mmShift
         f f 0 0 0 :> ( vmIsTrailingZeros! vrIsTrailingZeros! e10! vr! vm! )
@@ -195,7 +144,7 @@ PRIVATE>
             q e10!
             q double-pow-5-bits DOUBLE_POW5_INV_BITCOUNT + 1 - :> k
             q k + e2 - :> i
-            mmShift m2 q DOUBLE_POW5_INV_SPLIT nth i mul-shift-all vr! swap vm! ! vp on stack
+            mmShift m2 q DOUBLE_POW5_INV_SPLIT nth-unsafe i mul-shift-all vr! swap vm! ! vp on stack
             q 21 <= [
                 mv 5 divisor? [
                     q mv multiple-of-power-of-5 vrIsTrailingZeros!
@@ -208,12 +157,12 @@ PRIVATE>
                 ] if
             ] when
         ] [ ! e2 < 0
-            e2 neg DOUBLE_LOG10_5_NUMERATOR * DOUBLE_LOG10_5_DENOMINATOR /i 1 - 0 max :> q
+            e2 neg DOUBLE_LOG10_5_NUMERATOR * DOUBLE_LOG10_5_DENOMINATOR /i 1 [-] :> q
             q e2 + e10!
             e2 neg q - :> i
             i double-pow-5-bits DOUBLE_POW5_BITCOUNT - :> k
             q k - :> j
-            mmShift m2 i DOUBLE_POW5_SPLIT nth j mul-shift-all vr! swap vm! ! vp on stack
+            mmShift m2 i DOUBLE_POW5_SPLIT nth-unsafe j mul-shift-all vr! swap vm! ! vp on stack
             q 1 <= [
                 mv 1 bitand bitnot q >= vrIsTrailingZeros!
                 acceptBounds [
@@ -221,14 +170,13 @@ PRIVATE>
                 ] [ 1 - ] if ! vp!
             ] [
                 q 63 < [
-                    q 1 - 2^ 1 - mv bitand zero? vrIsTrailingZeros!
+                    q 1 - on-bits mv bitand zero? vrIsTrailingZeros!
                 ] when
             ] if
         ] if
-        dup decimal-length ! vp vplength
-        dup e10 + 1 - sign 2swap ! exp and sign for produce-output
+        [ decimal-length e10 + 1 - sign ] keep ! exp sign vp
         acceptBounds vmIsTrailingZeros vrIsTrailingZeros vr vm
         prepare-output produce-output
-    ] if* ;
+    ] unless* ;
 
 ALIAS: d2s print-float

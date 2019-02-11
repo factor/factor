@@ -27,10 +27,19 @@
     #endif
   #else
     #include "os-genunix.hpp"
-    #if defined(__linux__)
+    #if defined(__FreeBSD__)
+	#define FACTOR_OS_STRING "freebsd"
+	#include "os-freebsd.hpp"
+        #if defined(FACTOR_X86)
+	    #include "os-freebsd-x86.32.hpp"
+        #elif defined(FACTOR_AMD64)
+	    #include "os-freebsd-x86.64.hpp"
+        #else
+            #error "Unsupported FreeBSD flavor"
+        #endif
+    #elif defined(__linux__)
       #define FACTOR_OS_STRING "linux"
       #include "os-linux.hpp"
-
       #if defined(FACTOR_X86)
         #include "os-linux-x86.32.hpp"
       #elif defined(FACTOR_PPC64)
@@ -44,8 +53,6 @@
       #else
         #error "Unsupported Linux flavor"
       #endif
-    #else
-      #error "Unsupported OS"
     #endif
   #endif
 #endif

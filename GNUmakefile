@@ -139,6 +139,8 @@ help:
 	@echo "linux-ppc-32"
 	@echo "linux-ppc-64"
 	@echo "linux-arm"
+	@echo "freebsd-x86-32"
+	@echo "freebsd-x86-64"
 	@echo "macosx-x86-32"
 	@echo "macosx-x86-64"
 	@echo "macosx-x86-fat"
@@ -152,6 +154,12 @@ help:
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
 ALL = factor factor-ffi-test factor-lib
+
+freebsd-x86-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
+
+freebsd-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
 
 macosx-x86-32:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32

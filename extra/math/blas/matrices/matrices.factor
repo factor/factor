@@ -241,6 +241,7 @@ M: blas-matrix-rowcol-sequence nth-unsafe
 
 M: blas-matrix-base equal?
     {
+        [ and ]
         [ [ Mwidth ] bi@ = ]
         [ [ Mcols ] bi@ [ = ] 2all? ]
     } 2&& ;

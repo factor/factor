@@ -10,18 +10,15 @@ TUPLE: delay < model model timeout timer ;
 
 : <delay> ( model timeout -- delay )
     f delay new-model
+        dup '[ _ update-delay-model ] pick f <timer> >>timer
         swap >>timeout
         over >>model
     [ add-dependency ] keep ;
 
-: stop-delay ( delay -- )
-    timer>> [ stop-timer ] when* ;
+M: delay model-changed
+    ! BUG: timer can't be "restart-timer" inside of its quotation?
+    ! nip timer>> restart-timer ;
+    nip timer>> [ stop-timer ] [ start-timer ] bi ;
 
-: start-delay ( delay -- )
-    [ '[ _ f >>timer update-delay-model ] ]
-    [ timeout>> later ]
-    [ timer<< ] tri ;
-
-M: delay model-changed nip dup stop-delay start-delay ;
 
 M: delay model-activated update-delay-model ;

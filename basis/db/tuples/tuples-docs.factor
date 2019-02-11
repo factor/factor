@@ -139,7 +139,18 @@ HELP: delete-tuples
 { $description "Uses the " { $snippet "tuple" } " as an exemplar object and deletes any objects that have the same slots set. If a slot is not " { $link f } ", then it is used to generate an SQL statement that deletes tuples." }
 { $warning "This word will delete your data." } ;
 
-{ insert-tuple update-tuple update-tuples delete-tuples } related-words
+HELP: reject-tuples
+{ $values
+     { "query/tuple" tuple }
+     { "quot" { $quotation ( tuple -- ? ) } } }
+{ $description "An SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". The " { $snippet "quot" } " is applied to each tuple from the database that matches the query, and if it returns a true value, the row is deleted from the database."
+$nl
+"The word is equivalent to the following code:"
+{ $code "query/tuple select-tuples quot filter [ delete-tuples ] each" }
+"The difference is that " { $snippet "reject-tuples" } " handles query results one by one, thus avoiding the overhead of allocating the intermediate array of tuples, which " { $link select-tuples } " would do. This is important when processing large amounts of data in limited memory." }
+{ $warning "This word will delete your data." } ;
+
+{ insert-tuple update-tuple update-tuples delete-tuples reject-tuples } related-words
 
 HELP: each-tuple
 { $values
@@ -199,7 +210,10 @@ ARTICLE: "db-tuples-words" "High-level tuple/database words"
     update-tuples
 }
 "Deleting tuples:"
-{ $subsections delete-tuples }
+{ $subsections
+    delete-tuples
+    reject-tuples
+}
 "Querying tuples:"
 { $subsections
     each-tuple

@@ -24,9 +24,9 @@ total-births total-deaths ;
         3 >>yield
         f >>plague
         0 >>cost
-    dup births>> >>total-births
-    dup deaths>> >>total-deaths
     dup births>> '[ _ + ] change-population
+    dup population>> >>total-births
+    dup deaths>> >>total-deaths
     dup [ harvest>> ] [ yield>> ] bi / >>acres
     dup [ harvest>> ] [ stores>> ] bi - >>eaten ;
 
@@ -47,7 +47,7 @@ total-births total-deaths ;
     [ harvest>> ] [ eaten>> ] bi - ;
 
 : n-percent-died ( game -- n )
-    [ total-deaths>> 100 * ] [ total-births>> ] [ year>> ] tri / / ;
+    [ total-deaths>> ] [ total-births>> ] bi / 100 * ;
 
 : n-births ( game -- n )
     {
@@ -63,7 +63,7 @@ total-births total-deaths ;
 : leave-fink ( -- )
     "DUE TO THIS EXTREME MISMANAGEMENT YOU HAVE NOT ONLY" print
     "BEEN IMPEACHED AND THROWN OUT OF OFFICE BUT YOU HAVE" print
-    "ALSO BEEN DECLARED 'NATIONAL FINK' !!" print ;
+    "ALSO BEEN DECLARED 'NATIONAL FINK'!!!!" print ;
 
 : leave-starved ( game -- game )
     dup deaths>> "YOU STARVED %d PEOPLE IN ONE YEAR!!!\n" printf

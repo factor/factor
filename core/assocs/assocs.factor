@@ -131,6 +131,9 @@ M: assoc values [ nip ] { } assoc>map ;
 : delete-at* ( key assoc -- old ? )
     [ at* ] 2keep delete-at ;
 
+: ?delete-at ( key assoc -- old ? )
+    [ ?at ] 2keep delete-at ;
+
 : rename-at ( newkey key assoc -- )
     [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
 
