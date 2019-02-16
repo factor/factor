@@ -14,7 +14,7 @@ GENERIC: rewrite-closures* ( obj -- )
     [ [ rewrite-closures* ] each ] [ ] make ;
 
 : rewrite-closures ( form -- form' )
-    expand-macros (rewrite-sugar) (rewrite-closures) point-free ;
+    expand-macros rewrite-sugar (rewrite-closures) point-free ;
 
 GENERIC: defs-vars* ( seq form -- seq' )
 
