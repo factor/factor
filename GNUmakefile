@@ -1,6 +1,7 @@
 ifdef CONFIG
 	VERSION = 0.99
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
+	REPRODUCIBLE ?= 0
 
 	BUNDLE = Factor.app
 
@@ -10,6 +11,7 @@ ifdef CONFIG
 		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
+		-DFACTOR_REPRODUCIBLE="$(REPRODUCIBLE)" \
 		$(SITE_CFLAGS)
 
 	CXXFLAGS += -std=c++11
