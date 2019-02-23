@@ -22,7 +22,7 @@ ifdef CONFIG
 	endif
 
 	ifneq ($(REPRODUCIBLE), 0)
-		CFLAGS += -DFACTOR_REPRODUCIBLE -Wno-builtin-macro-redefined
+		CFLAGS += -DFACTOR_REPRODUCIBLE
 	endif
 
 	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
