@@ -748,7 +748,7 @@ MAKE_TARGET=unknown
 if [[ -n "$2" ]] ; then
     parse_build_info $2
 fi
-$ECHO "args $#"
+
 if [ "$#" -gt 3 ]; then
 	usage
     $ECHO "error: too many arguments"
