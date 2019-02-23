@@ -1,4 +1,4 @@
-ifndef DEBUG
+ifneq ($(DEBUG), 0)
 	SITE_CFLAGS += -fomit-frame-pointer
 endif
 

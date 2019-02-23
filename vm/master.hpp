@@ -52,8 +52,7 @@
 #define FACTOR_COMPILER_VERSION "unknown"
 #endif
 
-#if (FACTOR_REPRODUCIBLE == 1)
-  #pragma message "REPRODUCIBLE"
+#if defined(FACTOR_REPRODUCIBLE)
   #define FACTOR_COMPILE_TIME "[reproducible]"
 #else
   // Record compilation time
