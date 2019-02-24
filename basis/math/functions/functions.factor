@@ -434,7 +434,11 @@ M: float round-to-odd [ (round-to-odd?) ] (float-round) ;
     [ recip 2pi * 0 swap complex boa e^ ]
     [ <iota> [ ^ * ] 2with map ] tri ;
 
+! expit
 : sigmoid ( x -- y ) neg e^ 1 + recip ; inline
+
+: logit ( x -- y ) [ ] [ 1 swap - ] bi /f log ; inline
+
 
 GENERIC: signum ( x -- y )
 
