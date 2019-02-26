@@ -51,30 +51,21 @@ HOOK: line-metrics font-renderer ( font string -- metrics )
 
 HOOK: string>image font-renderer ( font string -- image loc )
 
-<PRIVATE
+GENERIC: draw-text ( font text -- )
 
-: string-empty? ( obj -- ? )
-    dup selection? [ string>> ] when empty? ;
-
-: draw-string ( font string -- )
-    dup string-empty? [ 2drop ] [
+M: string draw-text
+    [ drop ] [
         world get world-text-handle
         [ string>image <texture> ] 2cache
         draw-texture
-    ] if ;
+    ] if-empty ;
 
-PRIVATE>
-
-GENERIC: draw-text ( font text -- )
-
-M: string draw-text draw-string ;
-
-M: selection draw-text draw-string ;
+M: selection draw-text string>> draw-text ;
 
 M: array draw-text
     [
         [
-            [ draw-string ]
+            [ draw-text ]
             [ [ 0.0 ] 2dip string-height 0.0 glTranslated ] 2bi
         ] with each
     ] do-matrix ;
