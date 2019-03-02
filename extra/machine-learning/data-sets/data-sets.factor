@@ -1,9 +1,12 @@
-! Copyright (C) 2012 John Benediktsson
+! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs csv io.encodings.utf8 io.files
-kernel math.parser sequences splitting ;
-
+USING: accessors arrays ascii assocs byte-arrays combinators
+combinators.short-circuit concurrency.combinators csv grouping
+http.client images images.viewer io io.directories
+io.encodings.binary io.encodings.utf8 io.files io.launcher
+io.pathnames kernel math math.parser namespaces sequences
+splitting ui.gadgets.panes ;
 IN: machine-learning.data-sets
 
 TUPLE: data-set
@@ -61,3 +64,55 @@ PRIVATE>
         "linnerud_physiological.csv" load-table
         [ >>targets ] [ >>target-names ] bi*
         "linnerud.rst" load-file >>description ;
+
+: download-to-directory ( url directory -- )
+    dup make-directories
+    [
+        dup { [ download-name exists? ] [ file-stem exists? ] } 1|| [
+            drop
+        ] [
+            download
+        ] if
+    ] with-directory ;
+
+: gzip-decompress-file ( path -- )
+    { "gzip" "-d" } swap suffix run-process drop ;
+
+: mnist-data>array ( bytes -- seq )
+    16 tail-slice 28 28 * <groups> [
+        >byte-array <image>
+            swap >>bitmap
+            { 28 28 } >>dim
+            L >>component-order
+            ubyte-components >>component-type
+    ] map ;
+
+: mnist-labels>array ( bytes -- seq )
+    8 tail-slice >array ;
+
+: image-grid. ( image-seq -- )
+    [
+        [
+            <image-gadget> output-stream get write-gadget
+        ] each
+        output-stream get stream-nl
+    ] each ;
+
+: load-mnist ( -- data-set )
+    "resource:datasets" dup make-directories [
+        {
+            "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz"
+            "http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz"
+            "http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz"
+            "http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz"
+        }
+        [ [ "resource:datasets/" download-to-directory ] parallel-each ]
+        [ [ dup file-stem exists? [ drop ] [ file-name gzip-decompress-file ] if ] each ]
+        [ [ file-stem binary file-contents ] map ] tri
+        first4 {
+            [ mnist-data>array ]
+            [ mnist-labels>array ]
+            [ mnist-data>array ]
+            [ mnist-labels>array ]
+        } spread 4array
+    ] with-directory ;
