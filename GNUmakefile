@@ -1,8 +1,9 @@
 ifdef CONFIG
 	VERSION = 0.99
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
-
 	BUNDLE = Factor.app
+	DEBUG ?= 0
+	REPRODUCIBLE ?= 0
 
 	include $(CONFIG)
 
@@ -14,10 +15,14 @@ ifdef CONFIG
 
 	CXXFLAGS += -std=c++11
 
-	ifdef DEBUG
+	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
 		CFLAGS += -O3
+	endif
+
+	ifneq ($(REPRODUCIBLE), 0)
+		CFLAGS += -DFACTOR_REPRODUCIBLE
 	endif
 
 	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
@@ -150,6 +155,7 @@ help:
 	@echo "Additional modifiers:"
 	@echo ""
 	@echo "DEBUG=1  compile VM with debugging information"
+	@echo "REPRODUCIBLE=1  compile VM without timestamp"
 	@echo "SITE_CFLAGS=...  additional optimization flags"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 

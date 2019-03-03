@@ -52,8 +52,12 @@
 #define FACTOR_COMPILER_VERSION "unknown"
 #endif
 
-// Record compilation time
-#define FACTOR_COMPILE_TIME __DATE__ " " __TIME__
+#if defined(FACTOR_REPRODUCIBLE)
+  #define FACTOR_COMPILE_TIME "[reproducible]"
+#else
+  // Record compilation time
+  #define FACTOR_COMPILE_TIME  __DATE__ " " __TIME__
+#endif
 
 // Detect target CPU type
 #if defined(__arm__)

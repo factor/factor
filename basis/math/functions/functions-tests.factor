@@ -268,6 +268,7 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { t } [ 3 15 roots [ 15 ^ 3 .01 ~ ] all? ] unit-test
 
 { .5 } [ 0 sigmoid ] unit-test
+{ t } [ 0 [ sigmoid logit ] keep .000001 ~ ] unit-test
 
 { 1 } [ 12 signum ] unit-test
 { -1 } [ -5.0 signum ] unit-test

@@ -357,6 +357,7 @@ echo_build_info() {
     $ECHO NUM_CORES=$NUM_CORES
     $ECHO WORD=$WORD
     $ECHO DEBUG=$DEBUG
+    $ECHO REPRODUCIBLE=$REPRODUCIBLE
     $ECHO CURRENT_BRANCH=$CURRENT_BRANCH
     $ECHO FACTOR_BINARY=$FACTOR_BINARY
     $ECHO FACTOR_LIBRARY=$FACTOR_LIBRARY
@@ -734,7 +735,7 @@ usage() {
     $ECHO "  bootstrap - bootstrap with existing boot image"
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
-    $ECHO "  report - print the build variables"
+    $ECHO "  report|info - print the build variables"
     $ECHO "  update-boot-image - get the boot image for the current branch of for master"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
@@ -751,6 +752,13 @@ if [[ -n "$2" ]] ; then
     parse_build_info $2
 fi
 
+if [ "$#" -gt 3 ]; then
+	usage
+    $ECHO "error: too many arguments"
+    exit 1
+fi
+
+
 set_copy
 set_delete
 
@@ -763,13 +771,12 @@ case "$1" in
     deps-pkg) install_deps_pkg ;;
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
-    update) update; download_and_bootstrap ;;
-    latest) update; download_and_bootstrap ;;
+    update|latest) update; download_and_bootstrap ;;
     compile) find_build_info; make_factor ;;
     bootstrap) get_config_info; bootstrap ;;
     net-bootstrap) net_bootstrap_no_pull ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
-    report) find_build_info ;;
+    report|info) find_build_info ;;
     full-report) find_build_info; check_installed_programs; check_libraries ;;
     update-boot-image) find_build_info; check_installed_programs; update_boot_image;;
     *) usage ;;
