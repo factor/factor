@@ -686,7 +686,7 @@ make_boot_image() {
 }
 
 install_deps_apt() {
-    sudo apt install --yes libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang gcc make screen tmux libssl-dev g++
+    sudo apt install --yes libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang make screen tmux libssl-dev
     check_ret sudo
 }
 
