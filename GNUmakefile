@@ -5,6 +5,14 @@ ifdef CONFIG
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
 
+	# gmake's default CXX is g++, we prefer c++
+	SHELL_CXX = $(shell printenv CXX)
+	ifeq ($(SHELL_CXX),)
+		CXX=c++
+	else
+		CXX=$(SHELL_CXX)
+	endif
+
 	include $(CONFIG)
 
 	CFLAGS = -Wall \
