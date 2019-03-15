@@ -8,7 +8,7 @@ struct aging_space : bump_allocator {
 
   object* allot(cell size) {
     if (here + size > end)
-      return NULL;
+      return nullptr;
 
     object* obj = bump_allocator::allot(size);
     starts.record_object_start_offset(obj);

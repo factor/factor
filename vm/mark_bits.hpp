@@ -26,9 +26,9 @@ struct mark_bits {
 
   ~mark_bits() {
     delete[] marked;
-    marked = NULL;
+    marked = nullptr;
     delete[] forwarding;
-    forwarding = NULL;
+    forwarding = nullptr;
   }
 
   cell block_line(cell address) {

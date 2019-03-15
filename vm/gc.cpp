@@ -31,13 +31,13 @@ gc_state::gc_state(gc_op op, factor_vm* parent) : op(op) {
     event = new gc_event(op, parent);
     start_time = nano_count();
   } else
-    event = NULL;
+    event = nullptr;
 }
 
 gc_state::~gc_state() {
   if (event) {
     delete event;
-    event = NULL;
+    event = nullptr;
   }
 }
 
@@ -139,7 +139,7 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   if (ctx)
     ctx->callstack_seg->set_border_locked(true);
   delete current_gc;
-  current_gc = NULL;
+  current_gc = nullptr;
 
   // Check the invariant again, just in case.
   FACTOR_ASSERT(!data->high_fragmentation_p());
@@ -168,7 +168,7 @@ void factor_vm::primitive_disable_gc_events() {
     growable_array result(this);
 
     std::vector<gc_event>* gc_events = this->gc_events;
-    this->gc_events = NULL;
+    this->gc_events = nullptr;
 
     FACTOR_FOR_EACH(*gc_events) {
       gc_event event = *iter;

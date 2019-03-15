@@ -13,8 +13,8 @@ bool factor_arg(const vm_char* str, const vm_char* arg, cell* value) {
 
 vm_parameters::vm_parameters() {
   embedded_image = false;
-  image_path = NULL;
-  executable_path = NULL;
+  image_path = nullptr;
+  executable_path = nullptr;
 
   datastack_size = 32 * sizeof(cell);
   retainstack_size = 32 * sizeof(cell);
@@ -36,7 +36,7 @@ vm_parameters::vm_parameters() {
   signals = true;
 
 #ifdef WINDOWS
-  console = GetConsoleWindow() != NULL;
+  console = GetConsoleWindow() != nullptr;
 #else
   console = true;
 #endif
@@ -231,7 +231,7 @@ char *threadsafe_strerror(int errnum) {
 void factor_vm::load_image(vm_parameters* p) {
 
   FILE* file = OPEN_READ(p->image_path);
-  if (file == NULL) {
+  if (file == nullptr) {
     std::cout << "Cannot open image file: " << p->image_path << std::endl;
     char *msg = threadsafe_strerror(errno);
     std::cout << "strerror:2: " << msg << std::endl;
@@ -289,7 +289,7 @@ bool factor_vm::save_image(const vm_char* saving_filename,
         (save_special_p(i) ? special_objects[i] : false_object);
 
   FILE* file = OPEN_WRITE(saving_filename);
-  if (file == NULL)
+  if (file == nullptr)
     return false;
   if (safe_fwrite(&h, sizeof(image_header), 1, file) != 1)
     return false;

@@ -277,8 +277,8 @@ void factor_vm::primitive_load_locals() {
   memcpy((cell*)(ctx->retainstack + sizeof(cell)),
          (cell*)(ctx->datastack - sizeof(cell) * (count - 1)),
          sizeof(cell) * count);
-  ctx->datastack -= sizeof(cell) * count;
-  ctx->retainstack += sizeof(cell) * count;
+  ctx->datastack -= sizeof(cell) * (cell)count;
+  ctx->retainstack += sizeof(cell) * (cell)count;
 }
 
 }

@@ -23,6 +23,7 @@ THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
 
 static void* null_dll;
 
+
 void sleep_nanos(uint64_t nsec) {
   timespec ts;
   timespec ts_rem;
@@ -39,7 +40,7 @@ void sleep_nanos(uint64_t nsec) {
     fatal_error("nanosleep failed", 0);
 }
 
-void factor_vm::init_ffi() { null_dll = dlopen(NULL, RTLD_LAZY); }
+void factor_vm::init_ffi() { null_dll = dlopen(nullptr, RTLD_LAZY); }
 
 void factor_vm::ffi_dlopen(dll* dll) {
   dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY | RTLD_GLOBAL);
@@ -56,7 +57,7 @@ cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
 void factor_vm::ffi_dlclose(dll* dll) {
   if (dlclose(dll->handle))
     general_error(ERROR_FFI, false_object, false_object);
-  dll->handle = NULL;
+  dll->handle = nullptr;
 }
 
 void factor_vm::primitive_existsp() {
@@ -86,7 +87,7 @@ segment::segment(cell size_, bool executable_p) {
     prot = PROT_READ | PROT_WRITE;
 
   cell alloc_size = 2 * pagesize + size;
-  char* array = (char*)mmap(NULL, alloc_size, prot,
+  char* array = (char*)mmap(nullptr, alloc_size, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
 
   if (array == (char*)-1)
@@ -110,13 +111,13 @@ void factor_vm::start_sampling_profiler_timer() {
   memset((void*)&timer, 0, sizeof(struct itimerval));
   timer.it_value.tv_usec = 1000000 / samples_per_second;
   timer.it_interval.tv_usec = 1000000 / samples_per_second;
-  setitimer(ITIMER_REAL, &timer, NULL);
+  setitimer(ITIMER_REAL, &timer, nullptr);
 }
 
 void factor_vm::end_sampling_profiler_timer() {
   struct itimerval timer;
   memset((void*)&timer, 0, sizeof(struct itimerval));
-  setitimer(ITIMER_REAL, &timer, NULL);
+  setitimer(ITIMER_REAL, &timer, nullptr);
 }
 
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
@@ -176,7 +177,7 @@ void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   factor_vm* vm = current_vm_p();
   bool foreign_thread = false;
-  if (vm == NULL) {
+  if (vm == nullptr) {
     foreign_thread = true;
     vm = thread_vms.begin()->second;
   }
@@ -255,43 +256,43 @@ void factor_vm::unix_init_signals() {
   signal_callstack.ss_size = signal_callstack_seg->size;
   signal_callstack.ss_flags = 0;
 
-  if (sigaltstack(&signal_callstack, (stack_t*)NULL) < 0)
+  if (sigaltstack(&signal_callstack, nullptr) < 0)
     fatal_error("sigaltstack() failed", 0);
 
   {
     struct sigaction memory_sigaction;
     init_sigaction_with_handler(&memory_sigaction, memory_signal_handler);
-    sigaction_safe(SIGBUS, &memory_sigaction, NULL);
-    sigaction_safe(SIGSEGV, &memory_sigaction, NULL);
-    sigaction_safe(SIGTRAP, &memory_sigaction, NULL);
+    sigaction_safe(SIGBUS, &memory_sigaction, nullptr);
+    sigaction_safe(SIGSEGV, &memory_sigaction, nullptr);
+    sigaction_safe(SIGTRAP, &memory_sigaction, nullptr);
   }
 
   {
     struct sigaction fpe_sigaction;
     init_sigaction_with_handler(&fpe_sigaction, fpe_signal_handler);
-    sigaction_safe(SIGFPE, &fpe_sigaction, NULL);
+    sigaction_safe(SIGFPE, &fpe_sigaction, nullptr);
   }
 
   {
     struct sigaction synchronous_sigaction;
     init_sigaction_with_handler(&synchronous_sigaction,
                                 synchronous_signal_handler);
-    sigaction_safe(SIGILL, &synchronous_sigaction, NULL);
-    sigaction_safe(SIGABRT, &synchronous_sigaction, NULL);
+    sigaction_safe(SIGILL, &synchronous_sigaction, nullptr);
+    sigaction_safe(SIGABRT, &synchronous_sigaction, nullptr);
   }
 
   {
     struct sigaction enqueue_sigaction;
     init_sigaction_with_handler(&enqueue_sigaction, enqueue_signal_handler);
-    sigaction_safe(SIGWINCH, &enqueue_sigaction, NULL);
-    sigaction_safe(SIGUSR1, &enqueue_sigaction, NULL);
-    sigaction_safe(SIGCONT, &enqueue_sigaction, NULL);
-    sigaction_safe(SIGURG, &enqueue_sigaction, NULL);
-    sigaction_safe(SIGIO, &enqueue_sigaction, NULL);
-    sigaction_safe(SIGPROF, &enqueue_sigaction, NULL);
-    sigaction_safe(SIGVTALRM, &enqueue_sigaction, NULL);
+    sigaction_safe(SIGWINCH, &enqueue_sigaction, nullptr);
+    sigaction_safe(SIGUSR1, &enqueue_sigaction, nullptr);
+    sigaction_safe(SIGCONT, &enqueue_sigaction, nullptr);
+    sigaction_safe(SIGURG, &enqueue_sigaction, nullptr);
+    sigaction_safe(SIGIO, &enqueue_sigaction, nullptr);
+    sigaction_safe(SIGPROF, &enqueue_sigaction, nullptr);
+    sigaction_safe(SIGVTALRM, &enqueue_sigaction, nullptr);
 #ifdef SIGINFO
-    sigaction_safe(SIGINFO, &enqueue_sigaction, NULL);
+    sigaction_safe(SIGINFO, &enqueue_sigaction, nullptr);
 #endif
   }
 
@@ -300,7 +301,7 @@ void factor_vm::unix_init_signals() {
   {
     struct sigaction sample_sigaction;
     init_sigaction_with_handler(&sample_sigaction, sample_signal_handler);
-    sigaction_safe(SIGALRM, &sample_sigaction, NULL);
+    sigaction_safe(SIGALRM, &sample_sigaction, nullptr);
   }
 
   // We don't use SA_IGN here because then the ignore action is inherited
@@ -309,9 +310,9 @@ void factor_vm::unix_init_signals() {
   {
     struct sigaction ignore_sigaction;
     init_sigaction_with_handler(&ignore_sigaction, ignore_signal_handler);
-    sigaction_safe(SIGPIPE, &ignore_sigaction, NULL);
+    sigaction_safe(SIGPIPE, &ignore_sigaction, nullptr);
     // We send SIGUSR2 to the stdin_loop thread to interrupt it on FEP
-    sigaction_safe(SIGUSR2, &ignore_sigaction, NULL);
+    sigaction_safe(SIGUSR2, &ignore_sigaction, nullptr);
   }
 }
 
@@ -359,7 +360,7 @@ void safe_write(int fd, void* data, ssize_t size) {
 
 void safe_write_nonblock(int fd, void* data, ssize_t size) {
   if (!check_write(fd, data, size) && errno != EAGAIN)
-    fatal_error("error writing fd", errno);
+    fatal_error("error writing fd", static_cast<cell>(errno));
 }
 
 bool safe_read(int fd, void* data, ssize_t size) {
@@ -376,6 +377,7 @@ bool safe_read(int fd, void* data, ssize_t size) {
 }
 
 void* stdin_loop(void* arg) {
+  (void) arg;
   unsigned char buf[4096];
   bool loop_running = true;
 
@@ -385,7 +387,7 @@ void* stdin_loop(void* arg) {
   sigdelset(&mask, SIGTTIN);
   sigdelset(&mask, SIGTERM);
   sigdelset(&mask, SIGQUIT);
-  pthread_sigmask(SIG_SETMASK, &mask, NULL);
+  pthread_sigmask(SIG_SETMASK, &mask, nullptr);
 
   int unused;
   pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &unused);
@@ -424,7 +426,7 @@ void* stdin_loop(void* arg) {
   safe_close(stdin_write);
   safe_close(control_read);
 
-  return NULL;
+  return nullptr;
 }
 
 void open_console() {
@@ -432,9 +434,9 @@ void open_console() {
   safe_pipe(&control_read, &control_write);
   safe_pipe(&size_read, &size_write);
   safe_pipe(&stdin_read, &stdin_write);
-  stdin_thread = start_thread(stdin_loop, NULL);
+  stdin_thread = start_thread(stdin_loop, nullptr);
   stdin_thread_initialized_p = true;
-  pthread_mutex_init(&stdin_mutex, NULL);
+  pthread_mutex_init(&stdin_mutex, nullptr);
 }
 
 // This method is used to kill the stdin_loop before exiting from factor.
@@ -443,7 +445,7 @@ void open_console() {
 void close_console() {
   if (stdin_thread_initialized_p) {
     pthread_cancel(stdin_thread);
-    pthread_join(stdin_thread, 0);
+    pthread_join(stdin_thread, nullptr);
   }
 }
 
@@ -471,7 +473,7 @@ void ignore_ctrl_c() {
 void handle_ctrl_c() {
   struct sigaction fep_sigaction;
   init_sigaction_with_handler(&fep_sigaction, fep_signal_handler);
-  sigaction_safe(SIGINT, &fep_sigaction, NULL);
+  sigaction_safe(SIGINT, &fep_sigaction, nullptr);
 }
 
 void factor_vm::primitive_disable_ctrl_break() {
@@ -482,7 +484,7 @@ void factor_vm::primitive_enable_ctrl_break() {
   stop_on_ctrl_break = true;
 }
 
-void abort() {
+__attribute__((noreturn)) void abort() {
   sig_t ret;
   do {
     ret = signal(SIGABRT, SIG_DFL);

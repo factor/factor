@@ -53,7 +53,7 @@ FILE* factor_vm::safe_fopen(char* filename, const char* mode) {
   FILE* file;
   for (;;) {
     file = fopen(filename, mode);
-    if (file == NULL)
+    if (file == nullptr)
       io_error_if_not_EINTR();
     else
       break;

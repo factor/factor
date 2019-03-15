@@ -15,13 +15,13 @@ ifdef CONFIG
 
 	include $(CONFIG)
 
-	CFLAGS = -Wall \
+	CFLAGS = -Wall -Weverything -Wno-c++98-compat-pedantic -Wno-padded \
 		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
 		$(SITE_CFLAGS)
 
-	CXXFLAGS += -std=c++11
+	CXXFLAGS += -std=c++14
 
 	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG

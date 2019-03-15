@@ -19,7 +19,7 @@ static const unsigned char call_opcode = 0xe8;
 static const unsigned char jmp_opcode = 0xe9;
 
 inline static unsigned char call_site_opcode(cell return_address) {
-  return *(unsigned char*)(return_address - 5);
+  return *reinterpret_cast<unsigned char*>(return_address - 5);
 }
 
 inline static void check_call_site(cell return_address) {

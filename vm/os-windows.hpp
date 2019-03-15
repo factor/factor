@@ -79,7 +79,7 @@ inline static THREADHANDLE thread_id() {
   HANDLE threadHandle = OpenThread(
       THREAD_GET_CONTEXT | THREAD_SET_CONTEXT | THREAD_SUSPEND_RESUME, FALSE,
       id);
-  FACTOR_ASSERT(threadHandle != NULL);
+  FACTOR_ASSERT(threadHandle != nullptr);
   return threadHandle;
 }
 
