@@ -16,9 +16,6 @@ TUPLE: delay < model model timeout timer ;
     [ add-dependency ] keep ;
 
 M: delay model-changed
-    ! BUG: timer can't be "restart-timer" inside of its quotation?
-    ! nip timer>> restart-timer ;
-    nip timer>> [ stop-timer ] [ start-timer ] bi ;
-
+    nip timer>> restart-timer ;
 
 M: delay model-activated update-delay-model ;
