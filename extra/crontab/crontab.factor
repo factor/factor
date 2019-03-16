@@ -101,4 +101,4 @@ CONSTANT: aliases H{
     now 0 >>second [ next-time-after ] keep ;
 
 : parse-crontab ( -- entries )
-    lines [ [ f ] [ parse-cronentry ] if-empty ] map harvest ;
+    lines harvest [ parse-cronentry ] map ;
