@@ -1,4 +1,4 @@
-USING: calendar crontab kernel tools.test ;
+USING: calendar crontab kernel math.order tools.test ;
 
 {
     T{ timestamp
@@ -19,4 +19,8 @@ USING: calendar crontab kernel tools.test ;
         { minute 6 }
         { gmt-offset T{ duration { hour -8 } } }
     } [ next-time-after ] keep
+] unit-test
+
+{ +lt+ } [
+    now "*/1 * * * *" parse-cronentry next-time <=>
 ] unit-test
