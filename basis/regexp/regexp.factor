@@ -197,11 +197,27 @@ PRIVATE>
 
 <PRIVATE
 
-: take-until ( lexer -- string )
-    dup skip-blank [
+:: (take-until) ( col line end -- col' line )
+    "\\" end suffix :> tokens
+    col line [
+        [ [ tokens member? ] find-from ] keep swap [
+            CHAR: \ = [ [ 2 + ] dip t ] [ [ 1 + ] dip f ] if
+        ] [
+            "Unterminated regexp" throw
+        ] if*
+    ] loop ;
+
+:: take-until ( lexer -- string )
+    lexer skip-blank
+    lexer [
         dupd [
-            [ [ "\\/" member? ] find-from ] keep swap [
-                CHAR: \ = [ [ 2 + ] dip t ] [ f ] if
+            [ [ "[(\\/" member? ] find-from ] keep swap [
+                {
+                    { CHAR: [ [ CHAR: ] (take-until) t ] }
+                    { CHAR: ( [ CHAR: ) (take-until) t ] }
+                    { CHAR: \ [ [ 2 + ] dip t ] }
+                    { CHAR: / [ f ] }
+                } case
             ] [
                 "Unterminated regexp" throw
             ] if*
