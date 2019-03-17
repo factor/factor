@@ -55,6 +55,10 @@ CONSTANT: aliases H{
 
 :: next-time-after ( cronentry timestamp -- )
 
+    timestamp second>> 0 > [
+        timestamp 0 >>second 1 minutes (time+) 2drop
+    ] when
+
     timestamp month>> :> month
     cronentry months>> [ month >= ] find nip [
         dup month = [ drop f ] [ timestamp month<< t ] if
@@ -98,7 +102,7 @@ CONSTANT: aliases H{
     ] unless-zero ;
 
 : next-time ( cronentry -- timestamp )
-    now 0 >>second [ next-time-after ] keep ;
+    now [ next-time-after ] keep ;
 
 : parse-crontab ( -- entries )
     lines harvest [ parse-cronentry ] map ;
