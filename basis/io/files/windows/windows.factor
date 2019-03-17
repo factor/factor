@@ -346,9 +346,9 @@ PRIVATE>
 M: windows canonicalize-path
     remove-unicode-prefix canonicalize-path* ;
 
-M: object root-path remove-unicode-prefix root-path* ;
+M: windows root-path remove-unicode-prefix root-path* ;
 
-M: object relative-path remove-unicode-prefix relative-path* ;
+M: windows relative-path remove-unicode-prefix relative-path* ;
 
 M: windows normalize-path ( string -- string' )
     dup unc-path? [
