@@ -92,10 +92,10 @@ MACRO: nspread* ( m n -- quot )
     [ drop [ ] ] [
         [ * 0 ] [ drop neg ] 2bi
         <range> rest >array dup length <iota> <reversed>
-        [
-            '[ [ [ _ ndip ] curry ] _ ndip ]
-        ] 2map dup rest-slice [ [ compose ] compose ] map! drop
-        [ ] concat-as [ call ] compose
+        [ '[ [ [ _ ndip ] curry ] _ ndip ] ] 2map
+        [ [ ] concat-as ]
+        [ length 1 - [ compose ] <array> concat append ] bi
+        [ call ] compose
     ] if-zero ;
 
 MACRO: cleave* ( n -- quot )
