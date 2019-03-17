@@ -179,7 +179,7 @@ M: ipv6 empty-sockaddr drop sockaddr-in6 <struct> ;
     sockaddr-in6 <struct>
         AF_INET6 >>family
         swap
-        port>> htons >>port ; inline
+        port>> 0 or htons >>port ; inline
 
 M: ipv6 make-sockaddr ( inet -- sockaddr )
     [ make-sockaddr-in6-part ]
@@ -201,7 +201,7 @@ M: ipv6 present
     [ host>> ] [ scope-id>> ] bi
     [ number>string "%" glue ] unless-zero ;
 
-TUPLE: inet6 < ipv6 { port integer read-only } ;
+TUPLE: inet6 < ipv6 { port maybe{ integer } read-only } ;
 
 : <inet6> ( host port -- inet6 )
     [ dup check-ipv6 0 ] dip inet6 boa ;
