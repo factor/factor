@@ -25,11 +25,25 @@ COM-INTERFACE: IDataObject IUnknown {0000010E-0000-0000-C000-000000000046}
     HRESULT DUnadvise ( DWORD pdwConnection )
     HRESULT EnumDAdvise ( IEnumSTATDATA** ppenumAdvise ) ;
 
+COM-INTERFACE: IDropSource IUnknown {00000121-0000-0000-C000-000000000046}
+    HRESULT GiveFeedback ( DWORD dwEffect )
+    HRESULT QueryContinueDrag ( BOOL  fEscapePressed, DWORD grfKeyState ) ;
+
 COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
     HRESULT DragEnter ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
     HRESULT DragOver ( DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
     HRESULT DragLeave ( )
     HRESULT Drop ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect ) ;
+
+TYPEDEF: IDataObject* LPDATAOBJECT
+TYPEDEF: IDropSource* LPDROPSOURCE
+
+FUNCTION: HRESULT DoDragDrop (
+    LPDATAOBJECT pDataObj,
+    LPDROPSOURCE pDropSource,
+    DWORD        dwOKEffects,
+    LPDWORD     pdwEffect
+)
 
 COM-INTERFACE: ISequentialStream IUnknown {0C733A30-2A1C-11CE-ADE5-00AA0044773D}
     HRESULT Read ( void* pv, ULONG cb, ULONG* pcbRead )
