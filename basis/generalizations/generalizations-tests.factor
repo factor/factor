@@ -99,6 +99,12 @@ IN: generalizations.tests
 { { 1 2 } { 3 4 } { 5 6 } }
 [ 1 2 3 4 5 6 [ 2array ] 2 3 mnapply ] unit-test
 
+{ 1 4 9 16 }
+[ 1 1 2 2 3 3 4 4 [ * ] 2 4 mnapply ] unit-test
+
+{ 1 8 27 64 125 }
+[ 1 1 1 2 2 2 3 3 3 4 4 4 5 5 5 [ * * ] 3 5 mnapply ] unit-test
+
 { { 1 2 3 } { 4 5 6 } }
 [ 1 2 3 4 5 6 [ 3array ] 3 2 mnapply ] unit-test
 
