@@ -107,7 +107,7 @@ M: ipv4 empty-sockaddr drop sockaddr-in <struct> ;
     sockaddr-in <struct>
         AF_INET >>family
         swap
-        port>> htons >>port ; inline
+        port>> 0 or htons >>port ; inline
 
 M: ipv4 make-sockaddr ( inet -- sockaddr )
     [ make-sockaddr-part ]
@@ -122,7 +122,7 @@ M: ipv4 make-sockaddr-outgoing ( inet -- sockaddr )
 M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
     [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
 
-TUPLE: inet4 < ipv4 { port integer read-only } ;
+TUPLE: inet4 < ipv4 { port maybe{ integer } read-only } ;
 
 : <inet4> ( host port -- inet4 )
     over check-ipv4 inet4 boa ;
