@@ -31,6 +31,8 @@ addons:
       - cmake
       - libaio-dev
       - libsnappy-dev
+      - libgtk2.0-dev
+      - gtk2-engines-pixbuf
 before_install:
   - uname -s
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
