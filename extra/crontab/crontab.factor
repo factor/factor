@@ -55,7 +55,9 @@ CONSTANT: aliases H{
 
 :: next-time-after ( cronentry timestamp -- )
 
-    timestamp 0 >>second 1 minutes (time+) 2drop
+    timestamp second>> 0 > [
+        timestamp 0 >>second 1 minutes (time+) 2drop
+    ] when
 
     timestamp month>> :> month
     cronentry months>> [ month >= ] find nip [
