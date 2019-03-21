@@ -3,7 +3,8 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit interval-maps kernel locals
 math.parser memoize multiline peg.ebnf regexp.ast regexp.classes
-sequences sets splitting strings unicode unicode.data unicode.script ;
+sequences sets splitting strings unicode unicode.data
+unicode.script ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )
@@ -70,13 +71,14 @@ MEMO: simple-category-table ( -- table )
 
 : lookup-escape ( char -- ast )
     {
-        { CHAR: t [ CHAR: \t ] }
+        { CHAR: a [ CHAR: \a ] }
+        { CHAR: e [ CHAR: \e ] }
+        { CHAR: f [ CHAR: \f ] }
         { CHAR: n [ CHAR: \n ] }
         { CHAR: r [ CHAR: \r ] }
-        { CHAR: f [ 0xc ] }
-        { CHAR: a [ 0x7 ] }
-        { CHAR: e [ 0x1b ] }
-        { CHAR: \\ [ CHAR: \\ ] }
+        { CHAR: t [ CHAR: \t ] }
+        { CHAR: v [ CHAR: \v ] }
+        { CHAR: 0 [ CHAR: \0 ] }
 
         { CHAR: w [ c-identifier-class <primitive-class> ] }
         { CHAR: W [ c-identifier-class <primitive-class> <not-class> ] }
