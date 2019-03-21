@@ -49,6 +49,9 @@ IN: regexp.tests
 { t } [ "a" ".+" <regexp> matches? ] unit-test
 { t } [ "ab" ".+" <regexp> matches? ] unit-test
 
+{ t } [ "\0" "[\\0]" <regexp> matches? ] unit-test
+{ f } [ "0" "[\\0]" <regexp> matches? ] unit-test
+
 { t } [ " " "[\\s]" <regexp> matches? ] unit-test
 { f } [ "a" "[\\s]" <regexp> matches? ] unit-test
 { f } [ " " "[\\S]" <regexp> matches? ] unit-test
@@ -334,6 +337,10 @@ unit-test
 { "1.2.3.4." } [ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ "." re-replace ] unit-test
 { "XhXXlXlXoX XwXoXrXlXdX" } [ "hello world" R/ e*/ "X" re-replace ] unit-test
 { "-- title --" } [ "== title ==" R/ =/ "-" re-replace ] unit-test
+
+{ "abc" } [ "a/   \\bc" "/.*\\" <regexp> "" re-replace ] unit-test
+{ "ac" } [ "a/   \\bc" R/ \/.*\\./ "" re-replace ] unit-test
+{ "abc" } [ "a/   \\bc" R/ \/.*\\/ "" re-replace ] unit-test
 
 { "" } [ "ab" "a(?!b)" <regexp> first-match >string ] unit-test
 { "a" } [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test

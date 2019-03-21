@@ -7,7 +7,7 @@ IN: regexp.prettyprint
 M: regexp pprint*
     [
         [
-            [ raw>> "\\/" "\\\\/" replace "R/ " % % "/" % ]
+            [ raw>> "/" "\\/" replace "R/ " % % "/" % ]
             [ options>> options>string % ] bi
         ] "" make
     ] keep present-text ;
