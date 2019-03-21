@@ -7,7 +7,7 @@ math namespaces prettyprint sequences specialized-arrays
 ui.backend.windows ui.gadgets.worlds ui.gestures
 ui.tools.listener windows.com windows.com.wrapper
 windows.dropfiles windows.kernel32 windows.ole32 windows.shell32
-windows.types ;
+windows.types windows.user32 ;
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: WCHAR
 IN: windows.dragdrop-listener
