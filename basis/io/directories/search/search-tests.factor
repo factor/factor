@@ -1,7 +1,7 @@
-USING: combinators fry io.directories io.directories.hierarchy
-io.directories.search io.files.unique io.pathnames kernel math
-namespaces sequences sorting splitting splitting.monotonic
-strings tools.test ;
+USING: combinators fry grouping io.directories
+io.directories.hierarchy io.directories.search io.files.unique
+io.pathnames kernel math namespaces sequences sorting splitting
+splitting.monotonic strings tools.test ;
 
 { t } [
     [
@@ -106,8 +106,8 @@ strings tools.test ;
 
             ! preserve file traversal order, but sort
             ! alphabetically for cross-platform testing
-            [ [ length ] bi@ < ] monotonic-split
-            [ natural-sort ] map natural-sort concat
+            dup length 3 / group natural-sort
+            [ natural-sort ] map concat
         ] with-variable
 
         +breadth-first+ traversal-method [
