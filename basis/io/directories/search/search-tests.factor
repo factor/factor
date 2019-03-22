@@ -47,9 +47,42 @@ strings tools.test ;
     [ drop f ] find-up-to-root
 ] unit-test
 
-{
-    t
-} [
+[
+    {
+        "/a"
+        "/a/a"
+        "/a/a/a"
+        "/a/b"
+        "/a/b/a"
+        "/b"
+        "/b/a"
+        "/b/a/a"
+        "/b/b"
+        "/b/b/a"
+        "/c"
+        "/c/a"
+        "/c/a/a"
+        "/c/b"
+        "/c/b/a"
+    }
+    {
+        "/a"
+        "/b"
+        "/c"
+        "/a/a"
+        "/a/b"
+        "/b/a"
+        "/b/b"
+        "/c/a"
+        "/c/b"
+        "/a/a/a"
+        "/a/b/a"
+        "/b/a/a"
+        "/b/b/a"
+        "/c/a/a"
+        "/c/b/a"
+    }
+] [
     [
         "a" make-directory
         "a/a" make-directory
@@ -87,5 +120,4 @@ strings tools.test ;
             [ natural-sort ] map concat
         ] with-variable
     ] with-test-directory
-    [ natural-sort ] bi@ sequence=
 ] unit-test
