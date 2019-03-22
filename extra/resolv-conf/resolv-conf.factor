@@ -68,6 +68,7 @@ ERROR: unsupported-resolv.conf-option string ;
         { [ "rotate" ?head ] [ drop t >>rotate? ] }
         { [ "no-check-names" ?head ] [ drop t >>no-check-names? ] }
         { [ "inet6" ?head ] [ drop t >>inet6? ] }
+        { [ "edns0" ?head ] [ drop t >>edns0? ] }
         [ unsupported-resolv.conf-option ]
     } cond drop ;
 
@@ -86,12 +87,17 @@ ERROR: unsupported-resolv.conf-line string ;
 
 PRIVATE>
 
-: parse-resolve.conf ( path -- resolv.conf )
+: lines>resolv.conf ( lines -- resolv.conf )
     [ <resolv.conf> ] dip
-    utf8 file-lines
     [ [ blank? ] trim ] map harvest
     [ "#" head? ] reject
     [ parse-resolv.conf-line ] each ;
 
+: string>resolv.conf ( string -- resolv.conf )
+    string-lines lines>resolv.conf ;
+
+: path>resolv.conf ( path -- resolv.conf )
+    utf8 file-lines lines>resolv.conf ;
+
 : default-resolv.conf ( -- resolv.conf )
-    "/etc/resolv.conf" parse-resolve.conf ;
+    "/etc/resolv.conf" path>resolv.conf ;
