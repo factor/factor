@@ -1,15 +1,10 @@
 ! Copyright (C) 2008, 2009 Joe Groff, Slava Pestov.
 ! Copyright (C) 2017-2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.data
-alien.strings classes.struct io.encodings.utf16n kernel make
-math namespaces prettyprint sequences specialized-arrays
-ui.backend.windows ui.gadgets.worlds ui.gestures
-ui.tools.listener windows.com windows.com.wrapper
-windows.dropfiles windows.kernel32 windows.ole32 windows.shell32
-windows.types windows.user32 ;
-SPECIALIZED-ARRAY: ushort
-SPECIALIZED-ARRAY: WCHAR
+USING: accessors alien.accessors classes.struct kernel
+namespaces sequences ui.backend.windows ui.gadgets.worlds
+ui.gestures windows.com windows.com.wrapper windows.dropfiles
+windows.kernel32 windows.ole32 windows.user32 ;
 IN: windows.dragdrop-listener
 
 CONSTANT: E_OUTOFMEMORY -2147024882 ! 0x8007000e
