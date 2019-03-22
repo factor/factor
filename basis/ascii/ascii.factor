@@ -24,7 +24,7 @@ IN: ascii
         [ [ 1 ] when-zero cut-slice swap ]
         [ f 0 rot [ length ] keep <slice> ] if*
     ] produce nip ;
-: capitalize ( str -- str' ) unclip [ >lower ] [ ch>upper ] bi* prefix ;
+: capitalize ( str -- str' ) >lower 0 over [ ch>upper ] change-nth ;
 : >title ( str -- title ) >words [ capitalize ] map concat ;
 
 HINTS: >lower string ;
