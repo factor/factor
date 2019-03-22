@@ -13,9 +13,11 @@ ifdef CONFIG
 		CXX=$(SHELL_CXX)
 	endif
 
+	XCODE_PATH ?= /Applications/Xcode.app
+
 	include $(CONFIG)
 
-	CFLAGS = -Wall \
+	CFLAGS += -Wall \
 		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
