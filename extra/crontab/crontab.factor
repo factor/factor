@@ -68,15 +68,16 @@ CONSTANT: aliases H{
 
     timestamp day>> :> day
     cronentry days>> [ day >= ] find nip
-    dup day = [ drop ] [
-        [ cronentry days>> first timestamp 1 +month drop ] unless*
-        timestamp 0 >>hour 0 >>minute day<< drop t
-    ] if
+    [ day - ] [
+        timestamp days-in-month cronentry days>> first -
+    ] if*
 
     timestamp day-of-week :> weekday
     cronentry days-of-week>> [ weekday >= ] find nip [
         cronentry days-of-week>> first 7 +
-    ] unless* weekday - [
+    ] unless* weekday - 
+
+    min [
         timestamp 0 >>hour 0 >>minute swap +day 2drop t
     ] unless-zero
 
