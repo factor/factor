@@ -270,6 +270,20 @@ STRUCT: TIME_ZONE_INFORMATION
     { DaylightDate SYSTEMTIME }
     { DaylightBias LONG } ;
 
+STRUCT: DYNAMIC_TIME_ZONE_INFORMATION
+    { Bias LONG }
+    { StandardName WCHAR[32] }
+    { StandardDate SYSTEMTIME }
+    { StandardBias LONG }
+    { DaylightName WCHAR[32] }
+    { DaylightDate SYSTEMTIME }
+    { DaylightBias LONG }
+    { TimeZoneKeyName WCHAR[128] }
+    { DynamicDaylightTimeDisabled BOOLEAN } ;
+
+TYPEDEF: DYNAMIC_TIME_ZONE_INFORMATION* PDYNAMIC_TIME_ZONE_INFORMATION
+
+
 STRUCT: FILETIME
     { dwLowDateTime DWORD }
     { dwHighDateTime DWORD } ;
@@ -1366,6 +1380,9 @@ ALIAS: GetDiskFreeSpaceEx GetDiskFreeSpaceExW
 ! FUNCTION: GetDriveTypeA
 FUNCTION: UINT GetDriveTypeW ( LPCTSTR lpRootPathName )
 ALIAS: GetDriveType GetDriveTypeW
+
+FUNCTION: DWORD GetDynamicTimeZoneInformation ( PDYNAMIC_TIME_ZONE_INFORMATION pTimeZoneInformation )
+
 FUNCTION: void* GetEnvironmentStringsW ( )
 ! FUNCTION: GetEnvironmentStringsA
 ALIAS: GetEnvironmentStrings GetEnvironmentStringsW
