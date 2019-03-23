@@ -56,25 +56,20 @@ CONSTANT: aliases H{
 <PRIVATE
 
 :: (next-time-after) ( cronentry timestamp -- )
+
     timestamp month>> :> month
-    cronentry months>> [ month >= ] find nip [
-        dup month = [ drop f ] [
-            timestamp 1 >>day 0 >>hour 0 >>minute month<< t
-        ] if
-    ] [
-        timestamp 1 >>day 0 >>hour 0 >>minute
-        cronentry months>> first >>month 1 +year
-    ] if* [ cronentry timestamp (next-time-after) ] when
+    cronentry months>> [ month >= ] find nip
+    dup month = [ drop f ] [
+        [ cronentry months>> first timestamp 1 +year drop ] unless*
+        timestamp 1 >>day 0 >>hour 0 >>minute month<< t
+    ] if [ cronentry timestamp (next-time-after) ] when
 
     timestamp day>> :> day
-    cronentry days>> [ day >= ] find nip [
-        dup day = [ drop f ] [
-            timestamp 0 >>hour 0 >>minute day<< t
-        ] if
-    ] [
-        timestamp 0 >>hour 0 >>minute
-        cronentry days>> first >>day 1 +month
-    ] if* [ cronentry timestamp (next-time-after) ] when
+    cronentry days>> [ day >= ] find nip
+    dup day = [ drop f ] [
+        [ cronentry days>> first timestamp 1 +month drop ] unless*
+        timestamp 0 >>hour 0 >>minute day<< t
+    ] if [ cronentry timestamp (next-time-after) ] when
 
     timestamp day-of-week :> weekday
     cronentry days-of-week>> [ weekday >= ] find nip [
@@ -85,21 +80,18 @@ CONSTANT: aliases H{
     ] unless-zero
 
     timestamp hour>> :> hour
-    cronentry hours>> [ hour >= ] find nip [
-        dup hour = [ drop f ] [
-            timestamp 0 >>minute hour<< t
-        ] if
-    ] [
-        timestamp 0 >>minute
-        cronentry hours>> first >>hour 1 +day
-    ] if* [ cronentry timestamp (next-time-after) ] when
+    cronentry hours>> [ hour >= ] find nip
+    dup hour = [ drop f ] [
+        [ cronentry hours>> first timestamp 1 +day drop ] unless*
+        timestamp 0 >>minute hour<< t
+    ] if [ cronentry timestamp (next-time-after) ] when
 
     timestamp minute>> :> minute
-    cronentry minutes>> [ minute >= ] find nip [
-        dup minute = [ drop f ] [ timestamp minute<< t ] if
-    ] [
-        timestamp cronentry minutes>> first >>minute 1 +hour
-    ] if* [ cronentry timestamp (next-time-after) ] when ;
+    cronentry minutes>> [ minute >= ] find nip
+    dup minute = [ drop f ] [
+        [ cronentry minutes>> first timestamp 1 +hour drop ] unless*
+        timestamp minute<< t
+    ] if [ cronentry timestamp (next-time-after) ] when ;
 
 PRIVATE>
 
