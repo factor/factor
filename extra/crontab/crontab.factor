@@ -66,18 +66,23 @@ CONSTANT: aliases H{
         timestamp 1 >>day 0 >>hour 0 >>minute month<< drop t
     ] if
 
-    timestamp day>> :> day
-    cronentry days>> [ day >= ] find nip
-    [ day - ] [
-        timestamp days-in-month cronentry days>> first -
-    ] if*
-
     timestamp day-of-week :> weekday
     cronentry days-of-week>> [ weekday >= ] find nip [
         cronentry days-of-week>> first 7 +
-    ] unless* weekday - 
+    ] unless* weekday - :> days-to-weekday
 
-    min [
+    timestamp day>> :> day
+    cronentry days>> [ day >= ] find nip [
+        cronentry days>> first timestamp days-in-month +
+    ] unless* day - :> days-to-day
+
+    cronentry days-of-week>> T{ range f 0 7 1 } =
+    cronentry days>> T{ range f 1 31 1 } = 2array
+    {
+        { { f t } [ days-to-weekday ] }
+        { { t f } [ days-to-day ] }
+        [ drop days-to-weekday days-to-day min ]
+    } case [
         timestamp 0 >>hour 0 >>minute swap +day 2drop t
     ] unless-zero
 
