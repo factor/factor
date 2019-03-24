@@ -129,3 +129,14 @@ CONSTANT: start-timestamp T{ timestamp
         "Sun, 21 Apr 2019 00:00:00 -0700"
     }
 } [ "@weekly" next-few-times ] unit-test
+
+! At 00:00 on day-of-month 29 in February.
+{
+    {
+        "Sat, 29 Feb 2020 00:00:00 -0700"
+        "Thu, 29 Feb 2024 00:00:00 -0700"
+        "Tue, 29 Feb 2028 00:00:00 -0700"
+        "Sun, 29 Feb 2032 00:00:00 -0700"
+        "Fri, 29 Feb 2036 00:00:00 -0700"
+    }
+} [ "0 0 29 2 *" next-few-times ] unit-test
