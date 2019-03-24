@@ -126,7 +126,7 @@ ARTICLE: "prettyprint-literal" "Literal prettyprinting protocol"
 "However, we can define three methods easily enough:"
 { $code
     "M: rect pprint-delims drop \\ RECT[ \\ ] ;"
-    "M: rect >pprint-sequence dup rect-w \\ * rot rect-h 3array ;"
+    "M: rect >pprint-sequence dup w>> \\ * rot h>> 3array ;"
     "M: rect pprint* pprint-object ;"
 }
 "Now, it will be printed in a custom way:"
