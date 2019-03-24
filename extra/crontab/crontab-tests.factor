@@ -7,6 +7,9 @@ IN: crontab.tests
     now "*/1 * * * *" parse-cronentry next-time <=>
 ] unit-test
 
+[ "0 0 30 2 *" parse-cronentry ] [ invalid-cronentry? ] must-fail-with
+[ "0 0 31 4 *" parse-cronentry ] [ invalid-cronentry? ] must-fail-with
+
 CONSTANT: start-timestamp T{ timestamp
     { year 2019 }
     { month 3 }
