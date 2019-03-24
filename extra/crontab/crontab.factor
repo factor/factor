@@ -2,10 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs calendar calendar.english
-calendar.private combinators io kernel literals locals math
-math.order math.parser math.ranges sequences splitting ;
+calendar.private combinators combinators.short-circuit io kernel
+literals locals math math.order math.parser math.ranges
+sequences splitting ;
 
 IN: crontab
+
+ERROR: invalid-cronentry value ;
 
 :: parse-value ( value quot: ( value -- value' ) seq -- value )
     value {
@@ -42,6 +45,20 @@ CONSTANT: aliases H{
     { "@hourly"   "0 * * * *" }
 }
 
+: check-cronentry ( cronentry -- cronentry )
+    dup {
+        [ days-of-week>> [ 0 6 between? ] all? ]
+        [ months>> [ 1 12 between? ] all? ]
+        [
+            [ days>> 1 ] [ months>> ] bi
+            dup { 2 } sequence= [ drop 29 ] [
+                [ day-counts nth ] map supremum
+            ] if [ between? ] 2curry all?
+        ]
+        [ minutes>> [ 0 59 between? ] all? ]
+        [ hours>> [ 0 23 between? ] all? ]
+    } 1&& [ invalid-cronentry ] unless ;
+
 : parse-cronentry ( entry -- cronentry )
     " " split1 [ aliases ?at drop ] dip " " glue
     " " split1 " " split1 " " split1 " " split1 " " split1 {
@@ -51,7 +68,7 @@ CONSTANT: aliases H{
         [ [ parse-month ] T{ range f 1 12 1 } parse-value ]
         [ [ parse-day ] T{ range f 0 7 1 } parse-value ]
         [ ]
-    } spread cronentry boa ;
+    } spread cronentry boa check-cronentry ;
 
 <PRIVATE
 
