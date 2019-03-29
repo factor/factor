@@ -7,8 +7,6 @@ ui.gestures windows.com windows.com.wrapper windows.dropfiles
 windows.kernel32 windows.ole32 windows.user32 ;
 IN: windows.dragdrop-listener
 
-CONSTANT: E_OUTOFMEMORY -2147024882 ! 0x8007000e
-
 : handle-data-object ( handler:  ( hdrop -- x ) data-object -- filenames )
     FORMATETC <struct>
         CF_HDROP         >>cfFormat
