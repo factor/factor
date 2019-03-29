@@ -257,4 +257,4 @@ ARTICLE: "c-out-params" "Output parameters in C"
 { $code
   "1234 { c-string } [ do_frob ] with-out-parameters"
 }
-"which would put the functions return value and error string on the stack." ;
+"which would put the function's return value and error string on the stack." ;
