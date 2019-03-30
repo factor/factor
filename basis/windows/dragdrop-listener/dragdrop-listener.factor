@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Joe Groff, Slava Pestov.
 ! Copyright (C) 2017-2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors classes.struct kernel
+USING: accessors alien.accessors classes.struct io kernel math
 namespaces sequences ui.backend.windows ui.gadgets.worlds
 ui.gestures windows.com windows.com.wrapper windows.dropfiles
 windows.kernel32 windows.ole32 windows.user32 ;
@@ -38,6 +38,23 @@ SYMBOL: +listener-dragdrop-wrapper+
 
 <<
 {
+    { IDropSource {
+        [ ! HRESULT GiveFeedback ( DWORD dwEffect )
+            [ "GiveFeedback" print flush ] with-global
+            2drop DRAGDROP_S_USEDEFAULTCURSORS
+        ] [ ! HRESULT QueryContinueDrag ( BOOL fEscapePressed, DWORD grfKeyState )
+            [ "QueryContinueDrag" print flush ] with-global
+            over [
+                3drop DRAGDROP_S_CANCEL
+            ] [
+                2nip MK_LBUTTON MK_RBUTTON bitor bitand 0 > [
+                    DRAGDROP_S_DROP
+                ] [
+                    S_OK
+                ] if
+            ] if
+        ]
+    } }
     { IDropTarget {
         [ ! HRESULT DragEnter ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
             DROPEFFECT_COPY swap 0 set-alien-unsigned-4 3drop
