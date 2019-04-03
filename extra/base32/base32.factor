@@ -1,15 +1,16 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: ascii assocs kernel literals math sequences ;
+USING: ascii assocs byte-arrays kernel literals math sequences ;
 
 IN: base32
 
 <PRIVATE
 
 <<
-CONSTANT: ALPHABET "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+CONSTANT: ALPHABET $[ "0123456789ABCDEFGHJKMNPQRSTVWXYZ" >byte-array ]
 >>
+CONSTANT: INVERSE $[ 256 [ ALPHABET index 0xff or ] B{ } map-integers ]
 CONSTANT: CHECKSUM $[ ALPHABET "*~$=U" append ]
 
 : normalize-base32 ( seq -- seq' )
@@ -20,7 +21,7 @@ CONSTANT: CHECKSUM $[ ALPHABET "*~$=U" append ]
     } substitute ;
 
 : parse-base32 ( seq -- base32 )
-    0 swap [ [ 32 * ] [ ALPHABET index + ] bi* ] each ;
+    0 swap [ [ 32 * ] [ INVERSE nth + ] bi* ] each ;
 
 PRIVATE>
 
