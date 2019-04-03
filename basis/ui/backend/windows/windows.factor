@@ -264,6 +264,10 @@ CONSTANT: wm-keydown-codes
         { 123 "F12" }
     }
 
+SYMBOLS: +down-key-code+  +printable-key-down-assoc+ ;
+V{ } clone +printable-key-down-assoc+ namespaces:set-global
+
+
 : key-state-down? ( key -- ? )
     GetKeyState 16 bit? ;
 
@@ -321,11 +325,31 @@ CONSTANT: exclude-keys-wm-char
 : send-key-up ( sym action? hWnd -- )
     [ [ <key-up> ] ] dip send-key-gesture ;
 
+
+: key-modifiers-without-shift ( -- seq )
+    [
+        ctrl? [ C+ , ] when
+        alt? [ A+ , ] when
+    ] { } make [ empty? not ] keep f ? ;
+
+: keystroke>gesture-without-shift ( n -- mods sym )
+    wm-keydown-codes at* [ key-modifiers-without-shift swap ] [ drop f f ] if ;
+
+: send-key-gesture-without-shift ( sym action? quot hWnd -- )
+    [ [ key-modifiers-without-shift ] 3dip call ] dip
+    window propagate-key-gesture ; inline
+
+: send-key-down-without-shift ( sym action? hWnd -- )
+    [ [ <key-down> ] ] dip send-key-gesture-without-shift ;
+
+: send-key-up-without-shift ( sym action? hWnd -- )
+    [ [ <key-up> ] ] dip send-key-gesture-without-shift ;
+
 : key-sym ( wParam -- string/f action? )
     {
         {
             [ dup LETTER? ]
-            [ shift? caps-lock? xor [ CHAR: a + CHAR: A - ] unless 1string f ]
+            [ shift? [ CHAR: a + CHAR: A - ] unless 1string f ]
         }
         { [ dup digit? ] [ 1string f ] }
         [ wm-keydown-codes at t ]
@@ -333,19 +357,43 @@ CONSTANT: exclude-keys-wm-char
 
 :: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-keydown? [
-        wParam key-sym over [
-            dup ctrl? alt? xor or [
-                hWnd send-key-down
-            ] [ 2drop ] if
-        ] [ 2drop ] if
+        wParam +down-key-code+ namespaces:set-global
+        wParam key-sym [
+            [ f hWnd send-key-down ] when*
+        ] [
+            dup [
+                ctrl? [
+                    :> wParam-str
+                    wParam-str f hWnd send-key-down
+                    +printable-key-down-assoc+ get :> pkd
+                    wParam pkd key? [
+                        wParam wParam-str 2array pkd push
+                    ] unless
+                ] [ drop ] if
+            ] [ drop ] if
+        ] if
     ] unless ;
 
 :: handle-wm-char ( hWnd uMsg wParam lParam -- )
+    wParam 1string :> wParam-str!
     wParam exclude-key-wm-char? [
-        ctrl? alt? xor [
-            wParam 1string
-            [ f hWnd send-key-down ]
-            [ hWnd window user-input ] bi
+        {
+            { [ wParam LETTER? shift? not and ]
+              [ wParam-str >lower wParam-str! ] }
+            { [ wParam letter? shift? and ]
+              [ wParam-str >upper wParam-str! ] }
+            [ ]
+        } cond
+        ctrl? not [
+            wParam-str t hWnd send-key-down-without-shift
+            +printable-key-down-assoc+ get :> pkd
+            +down-key-code+ get :> key-code
+            key-code pkd key? [
+                key-code wParam-str 2array pkd push
+            ] unless
+        ] when
+        ctrl? alt? or [
+            wParam 1string hWnd window user-input
         ] unless
     ] unless ;
 
@@ -353,7 +401,14 @@ CONSTANT: exclude-keys-wm-char
     wParam exclude-key-wm-keydown? [
         wParam key-sym over [
             hWnd send-key-up
-        ] [ 2drop ] if
+        ] [
+            2drop
+            +printable-key-down-assoc+ get :> pkd
+            wParam pkd at [
+                t hWnd send-key-up-without-shift
+                wParam pkd delete-at
+            ] when*
+        ] if
     ] unless ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
