@@ -10,6 +10,7 @@ ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.private windows.dwmapi windows.errors windows.gdi32
 windows.kernel32 windows.messages windows.offscreen windows.opengl32
 windows.types windows.user32 assocs.extras ;
+
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -267,7 +268,6 @@ CONSTANT: wm-keydown-codes
 SYMBOLS: +down-key-code+  +printable-key-down-assoc+ ;
 V{ } clone +printable-key-down-assoc+ namespaces:set-global
 
-
 : key-state-down? ( key -- ? )
     GetKeyState 16 bit? ;
 
@@ -366,9 +366,11 @@ CONSTANT: exclude-keys-wm-char
                     :> wParam-str
                     wParam-str f hWnd send-key-down
                     +printable-key-down-assoc+ get :> pkd
-                    wParam pkd key? [
+                    wParam pkd key? not
+                    wParam VK_PROCESSKEY < and
+                    pkd length 256 < and [
                         wParam wParam-str 2array pkd push
-                    ] unless
+                    ] when
                 ] [ drop ] if
             ] [ drop ] if
         ] if
@@ -384,32 +386,34 @@ CONSTANT: exclude-keys-wm-char
               [ wParam-str >upper wParam-str! ] }
             [ ]
         } cond
-        ctrl? not [
-            wParam-str t hWnd send-key-down-without-shift
+       ctrl? [
+            wParam-str f hWnd send-key-down-without-shift
             +printable-key-down-assoc+ get :> pkd
             +down-key-code+ get :> key-code
-            key-code pkd key? [
+            key-code pkd key? not
+            key-code VK_PROCESSKEY < and
+            pkd length 256 < and [
                 key-code wParam-str 2array pkd push
-            ] unless
-        ] when
+            ] when
+        ] unless
         ctrl? alt? or [
             wParam 1string hWnd window user-input
         ] unless
     ] unless ;
 
 :: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
+    +printable-key-down-assoc+ get :> pkd
     wParam exclude-key-wm-keydown? [
         wParam key-sym over [
             hWnd send-key-up
         ] [
             2drop
-            +printable-key-down-assoc+ get :> pkd
             wParam pkd at [
-                t hWnd send-key-up-without-shift
-                wParam pkd delete-at
+                f hWnd send-key-up-without-shift
             ] when*
-        ] if
-    ] unless ;
+         ] if
+    ] unless
+    wParam pkd delete-at ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
     ? hwnd window active?<<
