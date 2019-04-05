@@ -10,7 +10,6 @@ ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.private windows.dwmapi windows.errors windows.gdi32
 windows.kernel32 windows.messages windows.offscreen windows.opengl32
 windows.types windows.user32 assocs.extras ;
-
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -265,8 +264,8 @@ CONSTANT: wm-keydown-codes
         { 123 "F12" }
     }
 
-SYMBOLS: +down-key-code+  +printable-key-down-assoc+ ;
-V{ } clone +printable-key-down-assoc+ namespaces:set-global
+SYMBOLS: +down-key-code+ +printable-key-down-assoc+ ;
+V{ } clone +printable-key-down-assoc+ namespaces:set
 
 : key-state-down? ( key -- ? )
     GetKeyState 16 bit? ;
@@ -325,26 +324,6 @@ CONSTANT: exclude-keys-wm-char
 : send-key-up ( sym action? hWnd -- )
     [ [ <key-up> ] ] dip send-key-gesture ;
 
-
-: key-modifiers-without-shift ( -- seq )
-    [
-        ctrl? [ C+ , ] when
-        alt? [ A+ , ] when
-    ] { } make [ empty? not ] keep f ? ;
-
-: keystroke>gesture-without-shift ( n -- mods sym )
-    wm-keydown-codes at* [ key-modifiers-without-shift swap ] [ drop f f ] if ;
-
-: send-key-gesture-without-shift ( sym action? quot hWnd -- )
-    [ [ key-modifiers-without-shift ] 3dip call ] dip
-    window propagate-key-gesture ; inline
-
-: send-key-down-without-shift ( sym action? hWnd -- )
-    [ [ <key-down> ] ] dip send-key-gesture-without-shift ;
-
-: send-key-up-without-shift ( sym action? hWnd -- )
-    [ [ <key-up> ] ] dip send-key-gesture-without-shift ;
-
 : key-sym ( wParam -- string/f action? )
     {
         {
@@ -356,10 +335,10 @@ CONSTANT: exclude-keys-wm-char
     } cond ;
 
 :: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
+    wParam +down-key-code+ namespaces:set
     wParam exclude-key-wm-keydown? [
-        wParam +down-key-code+ namespaces:set-global
         wParam key-sym [
-            [ f hWnd send-key-down ] when*
+            [ t hWnd send-key-down ] when*
         ] [
             dup [
                 ctrl? [
@@ -387,7 +366,7 @@ CONSTANT: exclude-keys-wm-char
             [ ]
         } cond
        ctrl? [
-            wParam-str f hWnd send-key-down-without-shift
+            wParam-str f hWnd send-key-down
             +printable-key-down-assoc+ get :> pkd
             +down-key-code+ get :> key-code
             key-code pkd key? not
@@ -409,7 +388,7 @@ CONSTANT: exclude-keys-wm-char
         ] [
             2drop
             wParam pkd at [
-                f hWnd send-key-up-without-shift
+                f hWnd send-key-up
             ] when*
          ] if
     ] unless
