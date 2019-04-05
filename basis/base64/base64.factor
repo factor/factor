@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators fry io io.binary io.encodings.binary
-io.streams.byte-array kernel literals math namespaces sbufs
-sequences ;
+USING: arrays assocs byte-arrays combinators fry io io.binary
+io.encodings.binary io.streams.byte-array kernel literals math
+namespaces sbufs sequences ;
 IN: base64
 
 ERROR: malformed-base64 ;
@@ -10,8 +10,10 @@ ERROR: malformed-base64 ;
 <PRIVATE
 
 <<
-CONSTANT: alphabet
+CONSTANT: alphabet $[
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    >byte-array
+]
 
 : alphabet-inverse ( alphabet -- seq )
     dup supremum 1 + f <array> [
@@ -100,3 +102,21 @@ PRIVATE>
 
 : >base64-lines ( seq -- base64 )
     binary [ binary [ encode-base64-lines ] with-byte-reader ] with-byte-writer ;
+
+: >urlsafe-base64 ( seq -- base64 )
+    >base64 H{
+        { CHAR: + CHAR: - }
+        { CHAR: / CHAR: _ }
+    } substitute ;
+
+: urlsafe-base64> ( base64 -- seq )
+    H{
+        { CHAR: - CHAR: + }
+        { CHAR: _ CHAR: / }
+    } substitute base64> ;
+
+: >urlsafe-base64-lines ( seq -- base64 )
+    >base64-lines H{
+        { CHAR: + CHAR: - }
+        { CHAR: / CHAR: _ }
+    } substitute ;

@@ -39,3 +39,9 @@ sequences splitting strings tools.test ;
     "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2UifQ.ipevRNuRP6HflG8cFKnmUPtypruRC4fb1DWtoLL62SY"
     "." split [ base64> ] map
 ] unit-test
+
+{ "01a+b/cd" } [ "\xd3V\xbeo\xf7\x1d" >base64 "" like ] unit-test
+{ "\xd3V\xbeo\xf7\x1d" } [ "01a+b/cd" base64> "" like ] unit-test
+
+{ "01a-b_cd" } [ "\xd3V\xbeo\xf7\x1d" >urlsafe-base64 "" like ] unit-test
+{ "\xd3V\xbeo\xf7\x1d" } [ "01a-b_cd" urlsafe-base64> "" like ] unit-test
