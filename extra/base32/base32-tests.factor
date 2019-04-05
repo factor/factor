@@ -1,7 +1,9 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: base32 sequences tools.test ;
+USING: base32 byte-arrays kernel sequences tools.test ;
+
+{ t } [ 256 <iota> >byte-array dup >base32 base32> = ] unit-test
 
 { B{ } } [ f >base32 ] unit-test
 { B{ } } [ B{ } >base32 ] unit-test
