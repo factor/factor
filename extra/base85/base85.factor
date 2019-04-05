@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: base64.private combinators io io.binary
+USING: base64.private byte-arrays combinators io io.binary
 io.encodings.binary io.streams.byte-array kernel literals math
 namespaces sequences ;
 IN: base85
@@ -10,9 +10,12 @@ ERROR: malformed-base85 ;
 <PRIVATE
 
 <<
-CONSTANT: alphabet
+CONSTANT: alphabet $[
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~"
+    >byte-array
+]
 >>
+
 : ch>base85 ( ch -- ch )
     alphabet nth ; inline
 
