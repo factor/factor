@@ -1,5 +1,7 @@
-USING: base64 io.encodings.ascii io.encodings.string kernel
-sequences splitting strings tools.test ;
+USING: base64 byte-arrays io.encodings.ascii io.encodings.string
+kernel sequences splitting strings tools.test ;
+
+{ t } [ 256 <iota> >byte-array dup >base64 base64> = ] unit-test
 
 { "abcdefghijklmnopqrstuvwxyz" } [ "abcdefghijklmnopqrstuvwxyz" ascii encode >base64 base64> ascii decode
 ] unit-test
