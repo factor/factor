@@ -59,7 +59,48 @@ CONSTANT: codes
         { $ XK_Super_R f }
         { $ XK_Hyper_L f }
         { $ XK_Hyper_R f }
+
+        { $ XK_KP_Home "HOME" }
+        { $ XK_KP_Left "LEFT" }
+        { $ XK_KP_Up "UP" }
+        { $ XK_KP_Right "RIGHT" }
+        { $ XK_KP_Down "DOWN" }
+        { $ XK_KP_Page_Up "PAGE_UP" }
+        { $ XK_KP_Page_Down "PAGE_DOWN" }
+        { $ XK_KP_End "END" }
+        { $ XK_KP_Begin "BEGIN" }
+        { $ XK_KP_Insert "INSERT" }
+        { $ XK_KP_Delete "DELETE" }
     }
+
+CONSTANT: exclude-keys-keydown/up
+    H{
+        { $ XK_Shift_L f }
+        { $ XK_Shift_R f }
+        { $ XK_Control_L f }
+        { $ XK_Control_R f }
+        { $ XK_Caps_Lock f }
+        { $ XK_Shift_Lock f }
+        { $ XK_Super_L f }
+        { $ XK_Super_R f }
+        { $ XK_Alt_L f }
+        { $ XK_Alt_R f }
+    }
+
+CONSTANT: shift-ignore-keys
+    H{
+        { $ XK_KP_Home "HOME" }
+        { $ XK_KP_Left "LEFT" }
+        { $ XK_KP_Up "UP" }
+        { $ XK_KP_Right "RIGHT" }
+        { $ XK_KP_Down "DOWN" }
+        { $ XK_KP_Page_Up "PAGE_UP" }
+        { $ XK_KP_Page_Down "PAGE_DOWN" }
+        { $ XK_KP_End "END" }
+        { $ XK_KP_Begin "BEGIN" }
+        { $ XK_KP_Insert "INSERT" }
+        { $ XK_KP_Delete "DELETE" }
+    }    
 
 : code>sym ( code -- name/code/f action? )
     dup codes at* [ nip dup t and ] when ;
