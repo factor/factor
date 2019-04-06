@@ -171,19 +171,23 @@ CONSTANT: events-mask
     event win [ key-event>gesture ] [ window ] bi*
     over :> gesture
     gesture sym>> length 1 = [
-        gesture sym>> first LETTER?
-        S+ event event-modifiers member? not and [
-            gesture [ >lower ] change-sym drop
-        ] when
+        { { [ gesture sym>> first LETTER?
+              S+ event event-modifiers member? not and ] 
+            [ gesture [ >lower ] change-sym drop ] }
+          { [ gesture sym>> first letter?
+              S+ event event-modifiers member? and ]
+            [ gesture [ >upper ] change-sym drop ] }
+          [ ]
+        } cond
     ] when
     event keyval>> shift-ignore-keys key? [
         gesture [ S+ swap remove ] change-mods drop
     ] when
     over sym>> "\0" =
     event keyval>> exclude-keys-keydown/up key? or [
-        2drop f
+        2drop t
     ] [
-        propagate-key-gesture f
+        propagate-key-gesture t
     ] if ;
  
 : on-focus-in ( win event user-data -- ? )
