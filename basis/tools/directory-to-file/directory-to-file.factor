@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: base85 combinators command-line escape-strings fry
+USING: base91 combinators command-line escape-strings fry
 io.backend io.directories io.directories.search
 io.encodings.binary io.encodings.utf8 io.files io.files.info
 io.pathnames kernel locals math namespaces sequences
@@ -28,9 +28,9 @@ IN: tools.directory-to-file
                 { [ dup file-info directory? ] [ directory-repr ] }
                 { [ dup file-is-text? ] [ dup utf8 file-contents escape-string file-repr ] }
                 [
-                    dup binary file-contents >base85
+                    dup binary file-contents >base91
                     "" like escape-string
-                    "base85" prepend file-repr
+                    "base91" prepend file-repr
                 ]
             } cond
         ] map
