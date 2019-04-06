@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: base85 combinators command-line fry io.directories
+USING: base91 combinators command-line fry io.directories
 io.encodings.binary io.encodings.utf8 io.files io.pathnames
 kernel modern modern.out namespaces sequences splitting strings ;
 IN: tools.file-to-directory
@@ -18,8 +18,8 @@ ERROR: expected-modern-path got ;
             [
                 second first2
                 [ second >string ] [
-                    first3 nip swap "base85" head? [
-                        base85> binary
+                    first3 nip swap "base91" head? [
+                        base91> binary
                     ] [
                         utf8
                     ] if
