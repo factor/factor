@@ -4,7 +4,9 @@ USING: accessors arrays classes combinators compiler.units
 continuations definitions effects io io.encodings.utf8 io.files
 kernel lexer math.parser namespaces parser.notes quotations
 sequences sets slots source-files splitting syntax.modern
-vectors vocabs vocabs.parser words words.symbol ;
+vectors vocabs vocabs.parser words words.symbol
+sequences sets slots source-files vectors vocabs vocabs.parser
+words words.symbol ;
 IN: parser
 
 : location ( -- loc )
@@ -217,7 +219,7 @@ INITIALIZED-SYMBOL: print-use-hook [ [ ] ]
 : filter-moved ( set1 set2 -- seq )
     swap diff members [
         {
-            { [ dup where dup [ first ] when current-source-file get path>> = not ] [ f ] }
+            { [ dup where ?first current-source-file get path>> = not ] [ f ] }
             { [ dup reader-method? ] [ f ] }
             { [ dup writer-method? ] [ f ] }
             [ t ]

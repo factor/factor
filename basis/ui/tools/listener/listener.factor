@@ -149,7 +149,7 @@ M: word (print-input)
     [ interactor-yield ] [ interactor-finish ] bi ;
 
 M: interactor stream-readln
-    interactor-read dup [ first ] when ;
+    interactor-read ?first ;
 
 : (call-listener) ( quot command listener -- )
     input>> dup interactor-busy? [ 3drop ] [

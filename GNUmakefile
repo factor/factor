@@ -5,9 +5,20 @@ ifdef CONFIG
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
 
+	# gmake's default CXX is g++, we prefer c++
+	SHELL_CXX = $(shell printenv CXX)
+	ifeq ($(SHELL_CXX),)
+		CXX=c++
+	else
+		CXX=$(SHELL_CXX)
+	endif
+
+	XCODE_PATH ?= /Applications/Xcode.app
+	MACOSX_SDK ?= MacOSX10.13.sdk
+
 	include $(CONFIG)
 
-	CFLAGS = -Wall \
+	CFLAGS += -Wall \
 		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \

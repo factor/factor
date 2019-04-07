@@ -1,2 +1,6 @@
 include vm/Config.macosx
 include vm/Config.x86.32
+
+# The last SDK to support x86 is 10.13
+CFLAGS += --sysroot=$(XCODE_PATH)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/$(MACOSX_SDK)
+CXXFLAGS += --sysroot=$(XCODE_PATH)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/$(MACOSX_SDK)

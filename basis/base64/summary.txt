@@ -1,1 +1,1 @@
-Base64 encoding/decoding
+Base64 encoding/decoding (RFC 3548)

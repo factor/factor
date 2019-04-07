@@ -25,7 +25,5 @@ HOOK: normalize-path io-backend ( path -- path' )
     io-backend set-global init-io init-stdio
     "io.files" startup-hooks get at call( -- ) ;
 
-! Note that we have 'alien' in our using list so that the alien
-! init hook runs before this one.
 [ init-io embedded? [ init-stdio ] unless ]
 "io.backend" add-startup-hook

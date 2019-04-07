@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs hashtables kernel kernel.private
-make math math.order math.private quotations sequences
-sequences.private sets sorting words ;
+USING: accessors arrays assocs byte-arrays hashtables kernel
+kernel.private make math math.order math.private quotations
+sequences sequences.private sets sorting words ;
 IN: combinators
 
 ! Most of these combinators have compile-time expansions in
@@ -197,6 +197,8 @@ PRIVATE>
 M: sequence hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: array hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
+M: byte-array hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
