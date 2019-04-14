@@ -10,3 +10,9 @@ IN: sodium.tests
     [ [ first ] [ second ] bi* crypto-box-easy ] 3keep swap
     [ first ] [ second ] bi* crypto-box-open-easy utf8 decode =
 ] unit-test
+
+{ t } [
+    "Signature verification test" utf8 encode
+    crypto-sign-keypair [ over ] dip crypto-sign
+    -rot crypto-sign-verify
+] unit-test
