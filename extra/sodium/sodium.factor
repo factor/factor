@@ -75,6 +75,18 @@ PRIVATE>
     crypto_box_secretkeybytes <byte-array>
     2dup crypto_box_keypair check0 ;
 
+: crypto-sign-keypair ( -- public-key secret-key )
+    crypto_sign_publickeybytes <byte-array>
+    crypto_sign_secretkeybytes <byte-array>
+    2dup crypto_sign_keypair check0 ;
+
+: crypto-sign ( message secret-key -- signature )
+    [ crypto_sign_bytes <byte-array> dup f ] 2dip
+    [ dup length ] dip crypto_sign_detached check0 ;
+
+: crypto-sign-verify ( signature message public-key -- ? )
+    [ dup length ] dip crypto_sign_verify_detached 0 = ;
+
 : crypto-box-nonce ( -- nonce-bytes )
     crypto_box_noncebytes n-random-bytes ;
 
