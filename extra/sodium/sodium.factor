@@ -46,7 +46,7 @@ PRIVATE>
     [ utf8 encode dup length ] 2dip crypto_pwhash_str check0
     utf8 decode ;
 
-: crypto-pwhash-str-verify ( str password -- bool )
+: crypto-pwhash-str-verify ( str password -- ? )
     [ utf8 encode ] bi@ dup length crypto_pwhash_str_verify 0 = ;
 
 : crypto-generichash ( out-bytes in-bytes key-bytes/f -- out-bytes' )
