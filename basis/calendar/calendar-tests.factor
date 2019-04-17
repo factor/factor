@@ -194,3 +194,9 @@ IN: calendar
 
 ! pm
 [ now 30 pm ] [ not-in-interval? ] must-fail-with
+
+{ 1 } [ 2018 12 31 <date> week-number ] unit-test
+
+{ 16 } [ 2019 4 17 <date> week-number ] unit-test
+
+{ 53 } [ 2021 1 1 <date> week-number ] unit-test
