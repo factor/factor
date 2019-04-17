@@ -401,6 +401,22 @@ HELP: day-of-year
     }
 } ;
 
+HELP: week-number
+{ $values { "timestamp" timestamp } { "[1,53]" integer } }
+{ $description "Calculates the ISO 8601 week number from 1 to 53 (leap years). See " { $snippet "https://en.wikipedia.org/wiki/ISO_week_date" } }
+{ $examples
+    "Last day of 2018 is already in the first week of 2019."
+    { $example "USING: calendar prettyprint ;"
+               "2018 12 31 <date> week-number ."
+               "1"
+    }
+    "2020 is a leap year with 53 weeks, and January 1st, 2021 is still in week 53 of 2020."
+    { $example "USING: calendar prettyprint ;"
+               "2021 1 1 <date> week-number ."
+               "53"
+    }
+} ;
+
 HELP: sunday
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
 { $description "Returns the Sunday from the current week, which starts on a Sunday." } ;
@@ -573,6 +589,7 @@ ARTICLE: "calendar-facts" "Calendar facts"
     days-in-month
     day-of-year
     day-of-week
+    week-number
 }
 "Calculating a Julian day number:"
 { $subsections julian-day-number }
