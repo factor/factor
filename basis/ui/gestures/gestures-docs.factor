@@ -428,7 +428,14 @@ ARTICLE: "filedrop-gestures" "File drop gestures"
 HELP: file-drop
 { $class-description "File drop gesture. The " { $slot "mods" } " slot contains the keyboard modifiers active at the time of the drop (see " { $link "keyboard-gestures" } "). The " { $link dropped-files } " global variable contains an array of full paths of the files that were dropped."
 $nl
-"The " { $link hand-loc } " global variable contains the drop location. If the user dropped files onto the non-client area of a window (the caption or the border), the gesture will not be triggered, but the contents of the " { $link dropped-files } " will be updated." } ;
+"The " { $link hand-loc } " global variable contains the drop location. If the user dropped files onto the non-client area of a window (the caption or the border), the gesture will not be triggered, but the contents of the " { $link dropped-files } " will be updated." }
+{ $examples
+"A typical gesture handler looks like this:
+" { $snippet "your-gadget-class H{
+    { T{ file-drop } [
+        dropped-files get-global [ nip ] curry models:change-model
+    ] }
+} set-gestures" } } ;
 
 HELP: dropped-files
 { $var-description "The global variable holds an array of full paths of the files that were dropped by the last " { $link file-drop } " gesture." } ;
