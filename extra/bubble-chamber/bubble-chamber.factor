@@ -316,7 +316,7 @@ TUPLE: bubble-chamber < frame-buffer
   particles collision-theta size timer ;
 
 M: bubble-chamber graft*
-    [ timer>> start-timer yield ] [ call-next-method ] bi ;
+    [ timer>> start-timer ] [ call-next-method ] bi ;
 
 M: bubble-chamber ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
