@@ -28,7 +28,7 @@ TUPLE: time-display < label timer ;
         f 1 seconds <timer> >>timer ;
 
 M: time-display graft*
-    [ timer>> start-timer yield ] [ call-next-method ] bi ;
+    [ timer>> start-timer ] [ call-next-method ] bi ;
 
 M: time-display ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;

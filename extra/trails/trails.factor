@@ -20,7 +20,7 @@ IN: trails
 TUPLE: trails-gadget < gadget points timer ;
 
 M: trails-gadget graft*
-    [ timer>> start-timer yield ] [ call-next-method ] bi ;
+    [ timer>> start-timer ] [ call-next-method ] bi ;
 
 M: trails-gadget ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
