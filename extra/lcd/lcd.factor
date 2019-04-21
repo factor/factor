@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.format fonts fry grouping
-kernel math sequences timers threads ui ui.gadgets
-ui.gadgets.labels ;
+kernel math sequences timers ui ui.gadgets ui.gadgets.labels ;
 IN: lcd
 
 : lcd-digit ( digit row -- str )
