@@ -68,7 +68,7 @@ GENERIC: model-changed ( model observer -- )
 : with-locked-model ( model quot -- )
     [ '[ _ t >>locked? @ ] ]
     [ drop '[ f _ locked?<< ] ]
-    2bi [ ] cleanup ; inline
+    2bi finally ; inline
 
 GENERIC: update-model ( model -- )
 

@@ -28,7 +28,7 @@ DESTRUCTOR: destroy-context
 DESTRUCTOR: clean-up-context
 
 : (with-cuda-context) ( context quot -- )
-    swap '[ _ clean-up-context ] [ ] cleanup ; inline
+    swap '[ _ clean-up-context ] finally ; inline
 
 : with-cuda-context ( device flags quot -- )
     [ set-up-cuda-context create-context ] dip (with-cuda-context) ; inline

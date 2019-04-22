@@ -277,7 +277,7 @@ PRIVATE>
             init-colors
 
             _ with-window
-        ] [ ffi:endwin curses-error ] [ ] cleanup
+        ] [ ffi:endwin curses-error ] finally
     ] with-destructors ; inline
 
 <PRIVATE

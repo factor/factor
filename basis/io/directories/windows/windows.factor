@@ -84,4 +84,4 @@ M: windows (directory-entries) ( path -- seq )
             produce nip
             over name>> "." = [ nip ] [ swap prefix ] if
         ]
-    ] [ drop '[ _ FindClose win32-error=0/f ] ] 2bi [ ] cleanup ;
+    ] [ drop '[ _ FindClose win32-error=0/f ] ] 2bi finally ;

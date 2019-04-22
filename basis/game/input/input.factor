@@ -59,7 +59,7 @@ ERROR: game-input-not-open ;
     ] unless ;
 
 : with-game-input ( quot -- )
-    open-game-input [ close-game-input ] [ ] cleanup ; inline
+    open-game-input [ close-game-input ] finally ; inline
 
 TUPLE: controller handle ;
 TUPLE: controller-state x y z rx ry rz slider pov buttons ;

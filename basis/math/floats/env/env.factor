@@ -134,14 +134,14 @@ PRIVATE>
 :: with-denormal-mode ( mode quot -- )
     denormal-mode :> orig
     mode set-denormal-mode
-    quot [ orig set-denormal-mode ] [ ] cleanup ; inline
+    quot [ orig set-denormal-mode ] finally ; inline
 
 : rounding-mode ( -- mode ) fp-env-register (get-rounding-mode) ;
 
 :: with-rounding-mode ( mode quot -- )
     rounding-mode :> orig
     mode set-rounding-mode
-    quot [ orig set-rounding-mode ] [ ] cleanup ; inline
+    quot [ orig set-rounding-mode ] finally ; inline
 
 : fp-traps ( -- exceptions )
     (fp-env-registers) [ (get-fp-traps) ] [ union ] map-reduce >array ; inline
@@ -150,7 +150,7 @@ PRIVATE>
     clear-fp-exception-flags
     fp-traps :> orig
     exceptions set-fp-traps
-    quot [ orig set-fp-traps ] [ ] cleanup ; inline
+    quot [ orig set-fp-traps ] finally ; inline
 
 : without-fp-traps ( quot -- )
     { } swap with-fp-traps ; inline

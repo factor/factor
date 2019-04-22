@@ -279,4 +279,4 @@ C: <field> field
             dup odbc-get-all-rows
             swap odbc-free-statement
         ] keep
-    ] [ odbc-disconnect ] [ ] cleanup ;
+    ] [ odbc-disconnect ] finally ;

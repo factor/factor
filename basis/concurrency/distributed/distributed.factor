@@ -60,7 +60,7 @@ C: <connection> connection
     [ stream>> dispose ] [ drop ] if ;
 
 : with-connection ( remote-thread quot -- )
-    '[ connect @ ] over [ disconnect ] curry [ ] cleanup ; inline
+    '[ connect @ ] over [ disconnect ] curry finally ; inline
 
 : send-remote-message ( message node -- )
     binary [ serialize ] with-client ;

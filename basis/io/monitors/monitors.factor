@@ -16,7 +16,7 @@ M: object dispose-monitors ;
 : with-monitors ( quot -- )
     [
         init-monitors
-        [ dispose-monitors ] [ ] cleanup
+        [ dispose-monitors ] finally
     ] with-scope ; inline
 
 TUPLE: monitor < disposable path queue timeout ;
