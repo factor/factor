@@ -25,7 +25,7 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
     ! quot: ( token-handle -- token-handle )
     [ open-process-token ] dip
     [ keep ] curry
-    [ CloseHandle drop ] [ ] cleanup ; inline
+    [ CloseHandle drop ] finally ; inline
 
 : lookup-privilege ( string -- luid )
     [ f ] dip LUID <struct>
@@ -52,4 +52,4 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 : with-privileges ( seq quot -- )
     [ '[ _ [ t set-privilege ] each @ ] ]
     [ drop '[ _ [ f set-privilege ] each ] ]
-    2bi [ ] cleanup ; inline
+    2bi finally ; inline

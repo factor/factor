@@ -10,4 +10,4 @@ M: wrapped-hashtable >pprint-sequence >alist ;
 
 M: wrapped-hashtable pprint*
     nesting-limit inc
-    [ pprint-object ] [ nesting-limit dec ] [ ] cleanup ;
+    [ pprint-object ] [ nesting-limit dec ] finally ;

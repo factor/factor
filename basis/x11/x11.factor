@@ -31,6 +31,6 @@ SYMBOL: root
 : close-x ( -- ) dpy get XCloseDisplay drop ;
 
 : with-x ( display-string quot -- )
-    [ init-x ] dip [ close-x ] [ ] cleanup ; inline
+    [ init-x ] dip [ close-x ] finally ; inline
 
 { "x11" "io.backend.unix" } "x11.io.unix" require-when

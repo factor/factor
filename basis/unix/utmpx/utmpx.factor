@@ -38,7 +38,7 @@ M: unix new-utmpx-record
     utmpx-record new ;
 
 : with-utmpx ( quot -- )
-    setutxent [ endutxent ] [ ] cleanup ; inline
+    setutxent [ endutxent ] finally ; inline
 
 : all-utmpx ( -- seq )
     [

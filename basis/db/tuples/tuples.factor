@@ -48,7 +48,7 @@ GENERIC: eval-generator ( singleton -- object )
 
 : with-disposals ( object quotation -- )
     over sequence? [
-        over '[ _ dispose-each ] [ ] cleanup
+        over '[ _ dispose-each ] finally
     ] [
         with-disposal
     ] if ; inline
