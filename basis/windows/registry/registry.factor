@@ -55,13 +55,13 @@ CONSTANT: registry-value-max-length 16384
     key subkey mode open-key :> hkey
     [ hkey quot call ]
     [ hkey close-key ]
-    [ ] cleanup ; inline
+    finally ; inline
 
 :: with-create-registry-key ( key subkey quot -- )
     key subkey create-key :> hkey
     [ hkey quot call ]
     [ hkey close-key ]
-    [ ] cleanup ; inline
+    finally ; inline
 
 <PRIVATE
 

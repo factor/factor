@@ -27,7 +27,7 @@ HOOK: set-os-envs-pointer os ( malloc -- )
 
 : with-os-env ( value key quot -- )
     over [ [ [ set-os-env ] 2curry ] [ compose ] bi* ] dip
-    [ os-env ] keep [ set-os-env ] 2curry [ ] cleanup ; inline
+    [ os-env ] keep [ set-os-env ] 2curry finally ; inline
 
 {
     { [ os unix? ] [ "environment.unix" require ] }

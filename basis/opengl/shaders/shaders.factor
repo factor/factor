@@ -114,7 +114,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
     ] each glDeleteProgram ;
 
 : with-gl-program ( program quot -- )
-    over glUseProgram [ 0 glUseProgram ] [ ] cleanup ; inline
+    over glUseProgram [ 0 glUseProgram ] finally ; inline
 
 PREDICATE: gl-program < integer (gl-program?) ;
 

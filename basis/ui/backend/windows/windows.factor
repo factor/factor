@@ -704,7 +704,7 @@ M: windows-ui-backend (with-ui)
         init-win32-ui
         start-ui
         event-loop
-    ] [ cleanup-win32-ui ] [ ] cleanup ;
+    ] [ cleanup-win32-ui ] finally ;
 
 M: windows-ui-backend beep
     0 MessageBeep drop ;

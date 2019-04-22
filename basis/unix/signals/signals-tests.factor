@@ -23,7 +23,7 @@ test-sigusr1-handler SIGUSR1 add-signal-handler
         swap -
     ] unit-test
 
-] [ test-sigusr1-handler SIGUSR1 remove-signal-handler ] [ ] cleanup
+] [ test-sigusr1-handler SIGUSR1 remove-signal-handler ] finally
 
 { 0 } [
     sigusr1-count get-global

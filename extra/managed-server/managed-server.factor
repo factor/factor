@@ -95,7 +95,7 @@ M: managed-server handle-client*
     managed-server namespaces:set
     [ handle-managed-client ]
     [ cleanup-client ]
-    [ ] cleanup ;
+    finally ;
 
 : new-managed-server ( port name encoding class -- server )
     new-threaded-server

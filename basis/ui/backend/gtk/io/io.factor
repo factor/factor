@@ -48,4 +48,4 @@ CONSTANT: poll-fd-events
     [
         source g_source_destroy
         start-io-thread
-    ] [ ] cleanup ;
+    ] finally ;

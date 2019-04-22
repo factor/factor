@@ -111,6 +111,6 @@ ERROR: null-com-release ;
     [ IUnknown::Release drop ] [ null-com-release ] if* ; inline
 
 : with-com-interface ( interface quot -- )
-    over [ com-release ] curry [ ] cleanup ; inline
+    over [ com-release ] curry finally ; inline
 
 DESTRUCTOR: com-release

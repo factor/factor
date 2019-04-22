@@ -115,14 +115,14 @@ GENERIC: set-effective-group ( obj -- )
 
 : (with-real-group) ( string/id quot -- )
     '[ _ set-real-group @ ]
-    real-group-id '[ _ set-real-group ] [ ] cleanup ; inline
+    real-group-id '[ _ set-real-group ] finally ; inline
 
 : with-real-group ( string/id/f quot -- )
     over [ (with-real-group) ] [ nip call ] if ; inline
 
 : (with-effective-group) ( string/id quot -- )
     '[ _ set-effective-group @ ]
-    effective-group-id '[ _ set-effective-group ] [ ] cleanup ; inline
+    effective-group-id '[ _ set-effective-group ] finally ; inline
 
 : with-effective-group ( string/id/f quot -- )
     over [ (with-effective-group) ] [ nip call ] if ; inline
