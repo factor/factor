@@ -1644,7 +1644,7 @@ FUNCTION: HKL GetKeyboardLayout ( DWORD idThread )
 ! FUNCTION: GetKeyboardLayoutNameA
 ! FUNCTION: GetKeyboardLayoutNameW
 ! FUNCTION: GetKeyboardState
-! FUNCTION: GetKeyboardType
+FUNCTION: int GetKeyboardType ( int nTypeFlag )
 ! FUNCTION: GetKeyNameTextA
 ! FUNCTION: GetKeyNameTextW
 FUNCTION: SHORT GetKeyState ( int nVirtKey )
