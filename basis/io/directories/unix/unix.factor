@@ -42,7 +42,7 @@ M: unix copy-file ( from to -- )
 : with-unix-directory ( path quot -- )
     dupd '[ _ _
         [ opendir dup [ throw-errno ] unless ] dip
-        dupd curry swap '[ _ closedir io-error ] [ ] cleanup
+        dupd curry swap '[ _ closedir io-error ] finally
     ] with-directory ; inline
 
 : dirent-type>file-type ( type -- file-type )

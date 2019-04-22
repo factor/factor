@@ -48,7 +48,7 @@ IN: mason.build
         ] bi
         notify-finish
         finish-build
-    ] [ cleanup-build ] [ ] cleanup
+    ] [ cleanup-build ] finally
     notify-idle ;
 
 MAIN: do-build

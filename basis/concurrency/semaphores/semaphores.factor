@@ -32,7 +32,7 @@ M: negative-count-semaphore summary
 
 :: with-semaphore-timeout ( semaphore timeout quot -- )
     semaphore timeout acquire-timeout
-    quot [ semaphore release ] [ ] cleanup ; inline
+    quot [ semaphore release ] finally ; inline
 
 : with-semaphore ( semaphore quot -- )
-    swap dup acquire '[ _ release ] [ ] cleanup ; inline
+    swap dup acquire '[ _ release ] finally ; inline

@@ -266,7 +266,7 @@ M: byte-vector pprint* pprint-object ;
 
 : with-extra-nesting-level ( quot -- )
     nesting-limit [ dup [ 1 + ] [ f ] if* ] change
-    [ nesting-limit set ] curry [ ] cleanup ; inline
+    [ nesting-limit set ] curry finally ; inline
 
 M: hashtable pprint*
     [ pprint-object ] with-extra-nesting-level ;

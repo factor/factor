@@ -198,7 +198,7 @@ PRIVATE>
         [
             remove-nesting-observer
             finish-compilation-unit
-        ] [ ] cleanup
+        ] finally
     ] with-variables ; inline
 
 : with-compilation-unit ( quot -- )

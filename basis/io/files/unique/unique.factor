@@ -50,11 +50,11 @@ PRIVATE>
 
 :: cleanup-unique-file ( ..a prefix suffix quot: ( ..a path -- ..b ) -- ..b )
     prefix suffix unique-file :> path
-    [ path quot call ] [ path delete-file ] [ ] cleanup ; inline
+    [ path quot call ] [ path delete-file ] finally ; inline
 
 :: cleanup-unique-files ( ..a prefix suffixes quot: ( ..a paths -- ..b ) -- ..b )
     prefix suffixes unique-files :> paths
-    [ paths quot call ] [ paths [ delete-file ] each ] [ ] cleanup ; inline
+    [ paths quot call ] [ paths [ delete-file ] each ] finally ; inline
 
 : unique-directory ( -- path )
     [
@@ -70,7 +70,7 @@ PRIVATE>
 :: cleanup-unique-directory ( quot -- )
     unique-directory :> path
     [ path quot with-directory ]
-    [ path delete-tree ] [ ] cleanup ; inline
+    [ path delete-tree ] finally ; inline
 
 {
     { [ os unix? ] [ "io.files.unique.unix" ] }

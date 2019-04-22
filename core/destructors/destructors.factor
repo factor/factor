@@ -59,7 +59,7 @@ M: disposable dispose
     [ last rethrow ] unless-empty ;
 
 : with-disposal ( object quot -- )
-    over [ dispose ] curry [ ] cleanup ; inline
+    over [ dispose ] curry finally ; inline
 
 <PRIVATE
 

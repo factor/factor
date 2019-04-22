@@ -93,14 +93,14 @@ SYMBOL: iteration
     ] with-variable ;
 
 : watch-gvn ( path quot -- )
-    annotate-gvn [ test-gvn ] [ reset-gvn ] [ ] cleanup ;
+    annotate-gvn [ test-gvn ] [ reset-gvn ] finally ;
 
 : watch-gvn-cfg ( path cfg -- )
     annotate-gvn [
         { value-numbering } passes [
             0 iteration [ watch-cfg ] with-variable
         ] with-variable
-    ] [ reset-gvn ] [ ] cleanup ;
+    ] [ reset-gvn ] finally ;
 
 : watch-gvn-bb ( path insns -- )
     0 test-bb 0 get block>cfg watch-gvn-cfg ;
