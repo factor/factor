@@ -264,40 +264,7 @@ CONSTANT: wm-keydown-codes
         { 123 "F12" }
     }
 
-CONSTANT: US-OEM&NUMPAD-keydown-codes
-   H{
-       { 186 { ";" ":" } }  ! OEM_1
-       { 187 { "=" "+" } }  ! OEM_PLUS
-       { 188 { "," "<" } }  ! OEM_COMMA        
-       { 189 { "-" "_" } }  ! OEM_MINUS
-       { 190 { "." ">" } }  ! OEM_PERIOD
-       { 191 { "/" "?" } }  ! OEM_2
-       { 192 { "`" "~" } }  ! OEM_3
-       { 219 { "[" "{" } }  ! OEM_4
-       { 220 { "\\" "|" } } ! OEM_5
-       { 221 { "]" "}" } }  ! OEM_6
-       { 222 { "'" "\"" } } ! OEM_7
-       { 96  { "0" "0" } }  ! NUMPAD0
-       { 97  { "1" "1" } }  ! NUMPAD1
-       { 98  { "2" "2" } }  ! NUMPAD2
-       { 99  { "3" "3" } }  ! NUMPAD3
-       { 100 { "4" "4" } }  ! NUMPAD4
-       { 101 { "5" "5" } }  ! NUMPAD5
-       { 102 { "6" "6" } }  ! NUMPAD6
-       { 103 { "7" "7" } }  ! NUMPAD7
-       { 104 { "8" "8" } }  ! NUMPAD8
-       { 105 { "9" "9" } }  ! NUMPAD9
-       { 106 { "*" "*" } }  ! MULTIPLY
-       { 107 { "+" "+" } }  ! ADD
-       { 109 { "-" "-" } }  ! SUBTRUCT
-       { 110 { "." "." } }  ! DECIMAL
-       { 111 { "/" "/" } }  ! DIVIDE
-   }
-
-SYMBOL: +OEM&NUMPAD-keydown-codes+
-
-SYMBOL: +printable-key-down+
-V{ } clone +printable-key-down+ namespaces:set-global
+SYMBOL: +oem&numpad-keydown-codes+
 
 : key-state-down? ( key -- ? )
     GetKeyState 16 bit? ;
@@ -336,7 +303,7 @@ CONSTANT: exclude-keys-wm-char
         { 13 "RET" }
         { 27 "ESC" }
     }
-    
+
 : exclude-key-wm-keydown? ( n -- ? )
     exclude-keys-wm-keydown key? ;
 
@@ -368,30 +335,19 @@ CONSTANT: exclude-keys-wm-char
 
 :: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-keydown? [
-        wParam key-sym [               ! other than alphabets and digit
-            [ t hWnd send-key-down ] [ ! F keys, RET, TAB, etc. 
-                ctrl? [                ! NUMPAD keys, !, @, $, etc.
-                    wParam
-                    +OEM&NUMPAD-keydown-codes+ get-global [
-                        US-OEM&NUMPAD-keydown-codes
-                    ] unless*
-                    at* [
-                        shift? [ second ] [ first ] if
-                        f hWnd send-key-down                        
-                    ] [ drop ] if
+        wParam key-sym [
+            [ t hWnd send-key-down ] [
+                ctrl? [
+                    +oem&numpad-keydown-codes+ get-global [
+                        wParam swap at* [
+                            shift? [ second ] [ first ] if
+                            f hWnd send-key-down                        
+                        ] [ drop ] if
+                    ] when*
                 ] when
             ] if*
-        ] [                            ! alphabets or digits
-            ctrl? [
-                :> wParam-str
-                wParam-str f hWnd send-key-down
-                +printable-key-down+ get-global :> pkd
-                lParam 16 shift 0xff bitand :> key-code
-                key-code pkd key? not
-                pkd length 256 < and [
-                    key-code wParam-str 2array pkd push
-                ] when
-            ] [ drop ] if
+        ] [
+            ctrl? [ f hWnd send-key-down ] [ drop ] if
         ] if
     ] unless ;
 
@@ -407,12 +363,6 @@ CONSTANT: exclude-keys-wm-char
         } cond
        ctrl? [
             wParam-str f hWnd send-key-down
-            +printable-key-down+ get-global :> pkd
-            lParam 16 shift 0xff bitand :> key-code
-            key-code pkd key? not
-            pkd length 256 < and [
-                 key-code wParam-str 2array pkd push
-            ] when
        ] unless
        ctrl? alt? or [
            wParam 1string hWnd window user-input
@@ -420,35 +370,20 @@ CONSTANT: exclude-keys-wm-char
     ] unless ;
 
 :: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
-    +printable-key-down+ get-global :> pkd
-    lParam 16 shift 0xff bitand :> key-code
-    key-code exclude-key-wm-keydown? [
-        wParam key-sym [             ! other than alphabets and digit
-            [ t hWnd send-key-up ] [ ! F keys, RET, TAB, etc.
-                ctrl? [              ! NUMPAD keys, !, @, $, etc.
-                    wParam
-                    +OEM&NUMPAD-keydown-codes+ get-global [
-                        US-OEM&NUMPAD-keydown-codes
-                    ] unless*
-                    at* [
+    wParam exclude-key-wm-keydown? [
+        wParam key-sym [
+            [ t hWnd send-key-up ] [
+                +oem&numpad-keydown-codes+ get-global [
+                    wParam swap at* [
                         shift? [ second ] [ first ] if
                         f hWnd send-key-up
                     ] [ drop ] if
-                ] [
-                    key-code pkd at [
-                        f hWnd send-key-up
-                    ] when*
-                ] if
+                ] when*
             ] if*
-        ] [                           ! alphabets or digits
-            drop
-            key-code pkd at [
-                f hWnd send-key-up
-            ] when*
-         ] if
-    ] unless
-    key-code pkd delete-at
-    ;
+        ] [
+            f hWnd send-key-down
+        ] if
+    ] unless ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
     ? hwnd window active?<<
