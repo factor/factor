@@ -303,7 +303,7 @@ CONSTANT: exclude-keys-wm-char
         { 13 "RET" }
         { 27 "ESC" }
     }
-
+    
 : exclude-key-wm-keydown? ( n -- ? )
     exclude-keys-wm-keydown key? ;
 
@@ -329,21 +329,119 @@ CONSTANT: exclude-keys-wm-char
             [ dup LETTER? ]
             [ shift? [ CHAR: a + CHAR: A - ] unless 1string f ]
         }
-        { [ dup digit? ] [ 1string f ] }
+!        {
+!            [ dup digit? ]
+!            [ shift? [ drop f t ] [ 1string f ] if ]
+!        }
         [ wm-keydown-codes at t ]
     } cond ;
+
+: numpad-keydown-codes ( -- codes )
+    H{            
+        { 96  "0" }  ! NUMPAD0
+        { 97  "1" }  ! NUMPAD1
+        { 98  "2" }  ! NUMPAD2
+        { 99  "3" }  ! NUMPAD3
+        { 100 "4" }  ! NUMPAD4
+        { 101 "5" }  ! NUMPAD5
+        { 102 "6" }  ! NUMPAD6
+        { 103 "7" }  ! NUMPAD7
+        { 104 "8" }  ! NUMPAD8
+        { 105 "9" }  ! NUMPAD9
+        { 106 "*" }  ! MULTIPLY
+        { 107 "+" }  ! ADD
+        { 109 "-" }  ! SUBTRUCT
+        { 110 "." }  ! DECIMAL
+        { 111 "/" }  ! DIVIDE
+    } ;
+
+: 101-US-keydown-codes ( -- codes )
+    H{
+        {  49 { "1" "!" } }  ! 1 
+        {  50 { "2" "@" } }  ! 2
+        {  51 { "3" "#" } }  ! 3
+        {  52 { "4" "$" } }  ! 4
+        {  53 { "5" "%" } }  ! 5
+        {  54 { "6" "^" } }  ! 6
+        {  55 { "7" "&" } }  ! 7
+        {  56 { "8" "*" } }  ! 8
+        {  57 { "9" "(" } }  ! 9
+        {  48 { "0" ")" } }  ! 0
+        { 186 { ";" ":" } }  ! OEM_1
+        { 187 { "=" "+" } }  ! OEM_PLUS
+        { 188 { "," "<" } }  ! OEM_COMMA        
+        { 189 { "-" "_" } }  ! OEM_MINUS
+        { 190 { "." ">" } }  ! OEM_PERIOD
+        { 191 { "/" "?" } }  ! OEM_2
+        { 192 { "`" "~" } }  ! OEM_3
+        { 219 { "[" "{" } }  ! OEM_4
+        { 220 { "\\" "|" } } ! OEM_5
+        { 221 { "]" "}" } }  ! OEM_6
+        { 222 { "'" "\"" } } ! OEM_7
+    } ;
+
+: 106-keydown-codes ( -- codes )
+    H{
+        {  49 { "1" "!" } }  ! 1 
+        {  50 { "2" "\"" } } ! 2
+        {  51 { "3" "#" } }  ! 3
+        {  52 { "4" "$" } }  ! 4
+        {  53 { "5" "%" } }  ! 5
+        {  54 { "6" "&" } }  ! 6
+        {  55 { "7" "'" } }  ! 7
+        {  56 { "8" "(" } }  ! 8
+        {  57 { "9" ")" } }  ! 9
+        {  48 { "0" "0" } }  ! 0        
+        { 186 { ":" "*" } }  ! OEM_1
+        { 187 { ";" "+" } }  ! OEM_PLUS
+        { 188 { "," "<" } }  ! OEM_COMMA        
+        { 189 { "-" "=" } }  ! OEM_MINUS
+        { 190 { "." ">" } }  ! OEM_PERIOD
+        { 191 { "/" "?" } }  ! OEM_2
+        { 192 { "@" "`" } }  ! OEM_3
+        { 219 { "[" "{" } }  ! OEM_4
+        { 220 { "\\" "|" } } ! OEM_5
+        { 221 { "]" "}" } }  ! OEM_6
+        { 222 { "^" "~" } }  ! OEM_7
+        { 226 { "\\" "_" } } ! OEM_102
+    } ;
+
+: diff-keydown-codes ( -- codes )
+    0 GetKeyboardType {
+        { 0x01 [ 101-US-keydown-codes ] } ! IBM PC/XT 83
+        { 0x02 [ 101-US-keydown-codes ] } ! Olivetti ICO 102
+        { 0x03 [ 101-US-keydown-codes ] } ! IBM PC/AT 84
+        { 0x04 [ 101-US-keydown-codes ] } ! IBM enhanced 101 or 102
+        { 0x05 [ 101-US-keydown-codes ] } ! Nokia 1050
+        { 0x06 [ 101-US-keydown-codes ] } ! Nokia 9140
+        { 0x07 [                          ! Japanese
+              1 GetKeyboardType {
+                  { 0x00 [ 101-US-keydown-codes ] } ! PC/AT 101 Enhanced 
+                  { 0x01 [ 101-US-keydown-codes ] } ! AX compatible
+                  { 0x02 [ 106-keydown-codes ] }    ! IBM PC/AT 106
+                  { 0x03 [ 101-US-keydown-codes ] } ! IBM 5576-002/003
+                  { 0x04 [ 101-US-keydown-codes ] } ! IBM 5576-001
+                  { 0x11 [ 101-US-keydown-codes ] } ! AX
+                  [ drop 101-US-keydown-codes ]     ! others
+              } case
+          ] }
+        [ drop 101-US-keydown-codes ]     ! others
+    } case ;
+    
 
 :: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-keydown? [
         wParam key-sym [
             [ t hWnd send-key-down ] [
                 ctrl? [
-                    +oem&numpad-keydown-codes+ get-global [
-                        wParam swap at* [
-                            shift? [ second ] [ first ] if
-                            f hWnd send-key-down                        
-                        ] [ drop ] if
-                    ] when*
+                    wParam diff-keydown-codes at [
+                        shift? [ second ] [ first ] if
+                        f hWnd send-key-down                        
+                    ] [
+                        wParam numpad-keydown-codes at [
+                            f hWnd send-key-down
+                        ] when*
+                    ] if*
                 ] when
             ] if*
         ] [
@@ -373,15 +471,19 @@ CONSTANT: exclude-keys-wm-char
     wParam exclude-key-wm-keydown? [
         wParam key-sym [
             [ t hWnd send-key-up ] [
-                +oem&numpad-keydown-codes+ get-global [
-                    wParam swap at* [
+                diff-keydown-codes [
+                    wParam swap at [
                         shift? [ second ] [ first ] if
                         f hWnd send-key-up
-                    ] [ drop ] if
+                    ] [
+                        wParam numpad-keydown-codes at [
+                            f hWnd send-key-down
+                        ] when*
+                    ] if*
                 ] when*
             ] if*
         ] [
-            f hWnd send-key-down
+            f hWnd send-key-up
         ] if
     ] unless ;
 
