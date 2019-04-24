@@ -323,13 +323,10 @@ CONSTANT: exclude-keys-wm-char
 
 : key-sym ( wParam -- string/f action? )
     {
-        {
-            [ dup LETTER? ]
-            [ shift? caps-lock? xor [ CHAR: a + CHAR: A - ] unless 1string f ]
-        }
-        { [ dup digit? ] [ 1string f ] }
-        [ wm-keydown-codes at t ]
-    } cond ;
+        { [ dup LETTER? ] [ CHAR: a + CHAR: A - 1string ] }
+        { [ dup digit? ] [ 1string ] }
+        [ wm-keydown-codes at ]
+    } cond t ;
 
 :: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-keydown? [
@@ -344,8 +341,7 @@ CONSTANT: exclude-keys-wm-char
     wParam exclude-key-wm-char? [
         ctrl? alt? xor [
             wParam 1string
-            [ f hWnd send-key-down ]
-            [ hWnd window user-input ] bi
+            hWnd window user-input
         ] unless
     ] unless ;
 

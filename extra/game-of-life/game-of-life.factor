@@ -188,7 +188,7 @@ grid-gadget "toolbar" f {
 
 grid-gadget "gestures" [
     {
-        { T{ key-down f { A+ } "F" } [ toggle-fullscreen ] }
+        { T{ key-down f { S+ A+ } "f" } [ toggle-fullscreen ] }
         { T{ button-down { # 1 } } [ on-click ] }
         { T{ drag { # 1 } } [ on-drag ] }
         { mouse-scroll [ on-scroll ] }

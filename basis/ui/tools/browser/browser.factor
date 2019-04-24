@@ -195,7 +195,7 @@ M: browser-gadget focusable-child* search-field>> ;
 browser-gadget "toolbar" f {
     { T{ key-down f { A+ } "LEFT" } com-back }
     { T{ key-down f { A+ } "RIGHT" } com-forward }
-    { T{ key-down f { A+ } "H" } com-home }
+    { T{ key-down f { S+ A+ } "h" } com-home }
     { T{ key-down f f "F1" } browser-help }
     { T{ key-down f { A+ } "F1" } glossary }
 } define-command-map
@@ -217,7 +217,7 @@ browser-gadget "navigation" "Commands for navigating in the article hierarchy" {
     { T{ key-down f { A+ } "p" } com-prev }
     { T{ key-down f { A+ } "n" } com-next }
     { T{ key-down f { A+ } "k" } com-show-outgoing-links }
-    { T{ key-down f { A+ } "K" } com-show-incoming-links }
+    { T{ key-down f { S+ A+ } "k" } com-show-incoming-links }
 } define-command-map
 
 browser-gadget "multi-touch" f {

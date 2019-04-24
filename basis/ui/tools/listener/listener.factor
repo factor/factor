@@ -452,7 +452,7 @@ listener-gadget "toolbar" f {
     { f restart-listener }
     { T{ key-down f { A+ } "u" } com-auto-use }
     { T{ key-down f { A+ } "k" } clear-output }
-    { T{ key-down f { A+ } "K" } clear-stack }
+    { T{ key-down f { S+ A+ } "k" } clear-stack }
     { T{ key-down f { C+ } "d" } com-end }
     { T{ key-down f f "F1" } com-help }
 } define-command-map
