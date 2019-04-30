@@ -183,11 +183,11 @@ CONSTANT: CF_LOCALE           16
 CONSTANT: CF_DIBV5            17
 CONSTANT: CF_MAX              18
 
-CONSTANT: CF_OWNERDISPLAY     0x0080
-CONSTANT: CF_DSPTEXT          0x0081
-CONSTANT: CF_DSPBITMAP        0x0082
-CONSTANT: CF_DSPMETAFILEPICT  0x0083
-CONSTANT: CF_DSPENHMETAFILE   0x008E
+CONSTANT: CF_OWNERDISPLAY 0x0080
+CONSTANT: CF_DSPTEXT 0x0081
+CONSTANT: CF_DSPBITMAP 0x0082
+CONSTANT: CF_DSPMETAFILEPICT 0x0083
+CONSTANT: CF_DSPENHMETAFILE 0x008E
 
 ! "Private" formats don't get GlobalFree()'d
 CONSTANT: CF_PRIVATEFIRST 0x200
@@ -1643,7 +1643,7 @@ FUNCTION: HKL GetKeyboardLayout ( DWORD idThread )
 ! FUNCTION: GetKeyboardLayoutList
 ! FUNCTION: GetKeyboardLayoutNameA
 ! FUNCTION: GetKeyboardLayoutNameW
-! FUNCTION: GetKeyboardState
+FUNCTION: BOOL GetKeyboardState ( BYTE *lpKeyState )
 FUNCTION: int GetKeyboardType ( int nTypeFlag )
 ! FUNCTION: GetKeyNameTextA
 ! FUNCTION: GetKeyNameTextW
@@ -2129,7 +2129,7 @@ ALIAS: SystemParametersInfo SystemParametersInfoW
 ! FUNCTION: TileWindows
 ! FUNCTION: ToAscii
 ! FUNCTION: ToAsciiEx
-! FUNCTION: ToUnicode
+FUNCTION: int ToUnicode ( UINT wVirtKey, UINT wScanCode, BYTE *lpKeyState, LPWSTR pwszBuff, int cchBuff, UINT wFlags )
 ! FUNCTION: ToUnicodeEx
 FUNCTION: BOOL TrackMouseEvent ( LPTRACKMOUSEEVENT lpEventTrack )
 ! FUNCTION: TrackPopupMenu

@@ -9,7 +9,7 @@ threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.private windows.dwmapi windows.errors windows.gdi32
 windows.kernel32 windows.messages windows.offscreen windows.opengl32
-windows.types windows.user32 assocs.extras ;
+windows.types windows.user32 assocs.extras byte-arrays ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -264,8 +264,6 @@ CONSTANT: wm-keydown-codes
         { 123 "F12" }
     }
 
-SYMBOL: +oem&numpad-keydown-codes+
-
 : key-state-down? ( key -- ? )
     GetKeyState 16 bit? ;
 
@@ -303,7 +301,7 @@ CONSTANT: exclude-keys-wm-char
         { 13 "RET" }
         { 27 "ESC" }
     }
-    
+
 : exclude-key-wm-keydown? ( n -- ? )
     exclude-keys-wm-keydown key? ;
 
@@ -323,169 +321,41 @@ CONSTANT: exclude-keys-wm-char
 : send-key-up ( sym action? hWnd -- )
     [ [ <key-up> ] ] dip send-key-gesture ;
 
-: key-sym ( wParam -- string/f action? )
-    {
-        {
-            [ dup LETTER? ]
-            [ shift? [ CHAR: a + CHAR: A - ] unless 1string f ]
-        }
-!        {
-!            [ dup digit? ]
-!            [ shift? [ drop f t ] [ 1string f ] if ]
-!        }
-        [ wm-keydown-codes at t ]
-    } cond ;
+: key-sym ( wParam -- string/f )
+    wm-keydown-codes at ; inline
 
-: numpad-keydown-codes ( -- codes )
-    H{            
-        { 96  "0" }  ! NUMPAD0
-        { 97  "1" }  ! NUMPAD1
-        { 98  "2" }  ! NUMPAD2
-        { 99  "3" }  ! NUMPAD3
-        { 100 "4" }  ! NUMPAD4
-        { 101 "5" }  ! NUMPAD5
-        { 102 "6" }  ! NUMPAD6
-        { 103 "7" }  ! NUMPAD7
-        { 104 "8" }  ! NUMPAD8
-        { 105 "9" }  ! NUMPAD9
-        { 106 "*" }  ! MULTIPLY
-        { 107 "+" }  ! ADD
-        { 109 "-" }  ! SUBTRUCT
-        { 110 "." }  ! DECIMAL
-        { 111 "/" }  ! DIVIDE
-    } ;
-
-: 101-US-keydown-codes ( -- codes )
-    H{
-        {  49 { "1" "!" } }  ! 1 
-        {  50 { "2" "@" } }  ! 2
-        {  51 { "3" "#" } }  ! 3
-        {  52 { "4" "$" } }  ! 4
-        {  53 { "5" "%" } }  ! 5
-        {  54 { "6" "^" } }  ! 6
-        {  55 { "7" "&" } }  ! 7
-        {  56 { "8" "*" } }  ! 8
-        {  57 { "9" "(" } }  ! 9
-        {  48 { "0" ")" } }  ! 0
-        { 186 { ";" ":" } }  ! OEM_1
-        { 187 { "=" "+" } }  ! OEM_PLUS
-        { 188 { "," "<" } }  ! OEM_COMMA        
-        { 189 { "-" "_" } }  ! OEM_MINUS
-        { 190 { "." ">" } }  ! OEM_PERIOD
-        { 191 { "/" "?" } }  ! OEM_2
-        { 192 { "`" "~" } }  ! OEM_3
-        { 219 { "[" "{" } }  ! OEM_4
-        { 220 { "\\" "|" } } ! OEM_5
-        { 221 { "]" "}" } }  ! OEM_6
-        { 222 { "'" "\"" } } ! OEM_7
-    } ;
-
-: 106-keydown-codes ( -- codes )
-    H{
-        {  49 { "1" "!" } }  ! 1 
-        {  50 { "2" "\"" } } ! 2
-        {  51 { "3" "#" } }  ! 3
-        {  52 { "4" "$" } }  ! 4
-        {  53 { "5" "%" } }  ! 5
-        {  54 { "6" "&" } }  ! 6
-        {  55 { "7" "'" } }  ! 7
-        {  56 { "8" "(" } }  ! 8
-        {  57 { "9" ")" } }  ! 9
-        {  48 { "0" "0" } }  ! 0        
-        { 186 { ":" "*" } }  ! OEM_1
-        { 187 { ";" "+" } }  ! OEM_PLUS
-        { 188 { "," "<" } }  ! OEM_COMMA        
-        { 189 { "-" "=" } }  ! OEM_MINUS
-        { 190 { "." ">" } }  ! OEM_PERIOD
-        { 191 { "/" "?" } }  ! OEM_2
-        { 192 { "@" "`" } }  ! OEM_3
-        { 219 { "[" "{" } }  ! OEM_4
-        { 220 { "\\" "|" } } ! OEM_5
-        { 221 { "]" "}" } }  ! OEM_6
-        { 222 { "^" "~" } }  ! OEM_7
-        { 226 { "\\" "_" } } ! OEM_102
-    } ;
-
-: diff-keydown-codes ( -- codes )
-    0 GetKeyboardType {
-        { 0x01 [ 101-US-keydown-codes ] } ! IBM PC/XT 83
-        { 0x02 [ 101-US-keydown-codes ] } ! Olivetti ICO 102
-        { 0x03 [ 101-US-keydown-codes ] } ! IBM PC/AT 84
-        { 0x04 [ 101-US-keydown-codes ] } ! IBM enhanced 101 or 102
-        { 0x05 [ 101-US-keydown-codes ] } ! Nokia 1050
-        { 0x06 [ 101-US-keydown-codes ] } ! Nokia 9140
-        { 0x07 [                          ! Japanese
-              1 GetKeyboardType {
-                  { 0x00 [ 101-US-keydown-codes ] } ! PC/AT 101 Enhanced 
-                  { 0x01 [ 101-US-keydown-codes ] } ! AX compatible
-                  { 0x02 [ 106-keydown-codes ] }    ! IBM PC/AT 106
-                  { 0x03 [ 101-US-keydown-codes ] } ! IBM 5576-002/003
-                  { 0x04 [ 101-US-keydown-codes ] } ! IBM 5576-001
-                  { 0x11 [ 101-US-keydown-codes ] } ! AX
-                  [ drop 101-US-keydown-codes ]     ! others
-              } case
-          ] }
-        [ drop 101-US-keydown-codes ]     ! others
-    } case ;
-    
-
-:: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
+:: (handle-wm-keydown/up) ( hWnd uMsg wParam lParam send-key-down/up -- )
     wParam exclude-key-wm-keydown? [
         wParam key-sym [
-            [ t hWnd send-key-down ] [
-                ctrl? [
-                    wParam diff-keydown-codes at [
-                        shift? [ second ] [ first ] if
-                        f hWnd send-key-down                        
-                    ] [
-                        wParam numpad-keydown-codes at [
-                            f hWnd send-key-down
-                        ] when*
-                    ] if*
-                ] when
-            ] if*
+            t hWnd send-key-down/up execute( sym action? hWnd -- )
         ] [
-            ctrl? [ f hWnd send-key-down ] [ drop ] if
-        ] if
-    ] unless ;
+            256 <byte-array> :> keyboard-state
+            4 <byte-array> :> chars
+            lParam -16 shift 0xff bitand :> scan-code
+            keyboard-state GetKeyboardState win32-error<>0
+            VK_CONTROL VK_CAPITAL [ 0 swap keyboard-state set-nth ] bi@
+            wParam scan-code keyboard-state chars 2 0 ToUnicode dup win32-error=0/f
+            1 <=  [
+                1 chars nth 8 shift 0 chars nth bitor                        
+            ] [
+                3 chars nth 8 shift 2 chars nth bitor ! dead-key
+            ] if
+            1string f hWnd send-key-down/up execute( sym action? hWnd -- )
+        ] if*
+    ] unless ; inline
+
+: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
+    \ send-key-down (handle-wm-keydown/up) ;
 
 :: handle-wm-char ( hWnd uMsg wParam lParam -- )
-    wParam 1string :> wParam-str!
     wParam exclude-key-wm-char? [
-        {
-            { [ wParam LETTER? shift? not and ]
-              [ wParam-str >lower wParam-str! ] }
-            { [ wParam letter? shift? and ]
-              [ wParam-str >upper wParam-str! ] }
-            [ ]
-        } cond
-       ctrl? [
-            wParam-str f hWnd send-key-down
-       ] unless
-       ctrl? alt? or [
+       ctrl? alt? xor [ ! enable AltGr combination inputs
            wParam 1string hWnd window user-input
        ] unless
     ] unless ;
 
-:: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
-    wParam exclude-key-wm-keydown? [
-        wParam key-sym [
-            [ t hWnd send-key-up ] [
-                diff-keydown-codes [
-                    wParam swap at [
-                        shift? [ second ] [ first ] if
-                        f hWnd send-key-up
-                    ] [
-                        wParam numpad-keydown-codes at [
-                            f hWnd send-key-down
-                        ] when*
-                    ] if*
-                ] when*
-            ] if*
-        ] [
-            f hWnd send-key-up
-        ] if
-    ] unless ;
+: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
+    \ send-key-up (handle-wm-keydown/up) ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
     ? hwnd window active?<<
