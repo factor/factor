@@ -332,7 +332,7 @@ CONSTANT: exclude-keys-wm-char
             256 <byte-array> :> keyboard-state
             4 <byte-array> :> chars
             lParam -16 shift 0xff bitand :> scan-code
-            keyboard-state GetKeyboardState win32-error<>0
+            keyboard-state GetKeyboardState win32-error=0/f
             VK_CONTROL VK_CAPITAL [ 0 swap keyboard-state set-nth ] bi@
             wParam scan-code keyboard-state chars 2 0 ToUnicode dup win32-error=0/f
             1 <=  [
