@@ -185,10 +185,11 @@ CONSTANT: events-mask
     ] when
     over sym>> "\0" =
     event keyval>> exclude-keys-keydown/up key? or [
-        2drop t
+        2drop
     ] [
-        propagate-key-gesture t
-    ] if ;
+        propagate-key-gesture
+    ] if
+    t ;
  
 : on-focus-in ( win event user-data -- ? )
     2drop window focus-world t ;
