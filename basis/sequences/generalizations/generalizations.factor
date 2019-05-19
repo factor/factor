@@ -1,11 +1,13 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private math
-combinators macros math.order math.ranges quotations fry effects
-memoize.private generalizations ;
+USING: combinators fry generalizations kernel macros math
+math.order memoize.private sequences sequences.private ;
 IN: sequences.generalizations
 
-MACRO: nsequence ( n seq -- quot )
+MACRO: (nsequence) ( n -- quot )
+    <iota> reverse [ '[ [ _ swap set-nth-unsafe ] keep ] ] map concat ;
+
+MACRO: nsequence ( n exemplar -- quot )
     [ [nsequence] ] keep '[ @ _ like ] ;
 
 MACRO: narray ( n -- quot )
