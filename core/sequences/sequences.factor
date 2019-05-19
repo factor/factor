@@ -283,9 +283,9 @@ ERROR: integer-length-expected obj ;
     dup integer? [ integer-length-expected ] unless ; inline
 
 TUPLE: copy-state
-    { src-i read-only }
+    { src-i integer read-only }
     { src read-only }
-    { dst-i read-only }
+    { dst-i integer read-only }
     { dst read-only } ;
 
 C: <copy> copy-state
