@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: base64.private byte-arrays combinators io io.binary
-io.encodings.binary io.streams.byte-array kernel literals math
-namespaces sequences ;
+io.encodings.binary io.streams.byte-array kernel kernel.private
+literals math namespaces sequences ;
 IN: base85
 
 ERROR: malformed-base85 ;
@@ -21,7 +21,7 @@ CONSTANT: alphabet $[
 
 : base85>ch ( ch -- ch )
     $[ alphabet alphabet-inverse ] nth
-    [ malformed-base85 ] unless* ; inline
+    [ malformed-base85 ] unless* { fixnum } declare ; inline
 
 : encode4 ( seq -- seq' )
     be> 5 [ 85 /mod ch>base85 ] B{ } replicate-as reverse! nip ; inline
