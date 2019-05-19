@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays combinators fry io io.binary
-io.encodings.binary io.streams.byte-array kernel literals math
-namespaces sbufs sequences ;
+io.encodings.binary io.streams.byte-array kernel kernel.private
+literals math namespaces sbufs sequences ;
 IN: base64
 
 ERROR: malformed-base64 ;
@@ -26,7 +26,7 @@ CONSTANT: alphabet $[
 
 : base64>ch ( ch -- ch )
     $[ alphabet alphabet-inverse 0 CHAR: = pick set-nth ] nth
-    [ malformed-base64 ] unless* ; inline
+    [ malformed-base64 ] unless* { fixnum } declare ; inline
 
 : (write-lines) ( column byte-array -- column' )
     output-stream get dup '[
