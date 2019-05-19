@@ -1,8 +1,8 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: base64.private byte-arrays combinators fry io io.binary
-io.encodings.binary io.streams.byte-array kernel literals math
-namespaces sequences ;
+io.encodings.binary io.streams.byte-array kernel kernel.private
+literals math namespaces sequences ;
 IN: base32
 
 ERROR: malformed-base32 ;
@@ -22,7 +22,7 @@ CONSTANT: alphabet $[ "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567" >byte-array ]
 
 : base32>ch ( ch -- ch )
     $[ alphabet alphabet-inverse 0 CHAR: = pick set-nth ] nth
-    [ malformed-base32 ] unless* ; inline
+    [ malformed-base32 ] unless* { fixnum } declare ; inline
 
 : encode5 ( seq -- byte-array )
     be> { -35 -30 -25 -20 -15 -10 -5 0 } '[

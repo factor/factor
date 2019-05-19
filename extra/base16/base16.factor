@@ -1,8 +1,8 @@
 ! Copyright (C) 2019 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: base64.private byte-arrays combinators io
-io.encodings.binary io.streams.byte-array kernel literals locals
-math namespaces sequences ;
+io.encodings.binary io.streams.byte-array kernel kernel.private
+literals locals math namespaces sequences ;
 IN: base16
 
 ERROR: malformed-base16 ;
@@ -20,7 +20,7 @@ CONSTANT: alphabet $[ "0123456789ABCDEF" >byte-array ]
 
 : base16>ch ( ch -- ch )
     $[ alphabet alphabet-inverse ] nth
-    [ malformed-base16 ] unless* ; inline
+    [ malformed-base16 ] unless* { fixnum } declare ; inline
 
 :: (encode-base16) ( stream -- )
     stream stream-read1 [
