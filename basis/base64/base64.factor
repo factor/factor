@@ -122,7 +122,7 @@ PRIVATE>
 
 PRIVATE>
 
-: >base64 ( base64 -- seq )
+: >base64 ( seq -- base64 )
     binary [
         ensure-encode-length
         binary [ encode-base64 ] with-byte-reader
