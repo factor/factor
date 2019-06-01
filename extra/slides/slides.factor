@@ -27,7 +27,7 @@ CONSTANT: stylesheet
         }
         { code-style
             H{
-                { page-color T{ rgba f 0.9 0.9 0.9 1 } }
+                { page-color T{ rgba f 0.4 0.4 0.4 0.3 } }
             }
         }
         { snippet-style
