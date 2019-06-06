@@ -131,7 +131,7 @@ PRIVATE>
     [ callbacks get delete-values ] [ free-callback ] bi ;
 
 : with-callback ( alien quot -- )
-    over [ unregister-and-free-callback ] curry [ ] cleanup ; inline
+    over [ unregister-and-free-callback ] curry finally ; inline
 
 : initialize-alien ( symbol quot -- )
     swap dup get-global dup recompute-value?

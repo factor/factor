@@ -33,7 +33,7 @@ SYMBOL: handle-ctrl-break
     ! Always call disable-ctrl-break, no matter what handle-ctrl-break
     ! says: it might've been changed just now by the user in the Listener.
     ! It's a no-op if it's not enabled.
-    [ disable-ctrl-break ] [ ] cleanup ; inline
+    [ disable-ctrl-break ] finally ; inline
 
 : parse-lines-interactive ( lines -- quot/f )
     [ [ parse-lines ] with-ctrl-break ] with-compilation-unit ;

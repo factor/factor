@@ -82,7 +82,7 @@ PRIVATE>
         graph dot-file ?encoding write-dot
         dot-file format layout try-graphviz-command
     ]
-    [ dot-file ?delete-file ] [ ] cleanup ;
+    [ dot-file ?delete-file ] finally ;
 
 : graphviz* ( graph path format -- )
     default-layout get-global graphviz ;

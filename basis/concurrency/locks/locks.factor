@@ -27,7 +27,7 @@ TUPLE: lock threads owner reentrant? ;
 
 :: do-lock ( lock timeout quot acquire release -- )
     lock timeout acquire call
-    quot lock release curry [ ] cleanup ; inline
+    quot lock release curry finally ; inline
 
 : (with-lock) ( lock timeout quot -- )
     [ acquire-lock ] [ release-lock ] do-lock ; inline

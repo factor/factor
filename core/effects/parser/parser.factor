@@ -77,7 +77,7 @@ ERROR: cannot-nest-definitions word ;
     manifest get current-vocab>> t or in-definition delete ;
 
 : with-definition ( quot -- )
-    [ set-in-definition ] prepose [ unset-in-definition ] [ ] cleanup ; inline
+    [ set-in-definition ] prepose [ unset-in-definition ] finally ; inline
 
 : (:) ( -- word def effect )
     [

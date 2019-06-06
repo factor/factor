@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: base64.private byte-arrays kernel literals locals math
-sequences ;
+USING: base64.private byte-arrays kernel kernel.private
+literals locals math sequences ;
 IN: base91
 
 ERROR: malformed-base91 ;
@@ -20,7 +20,7 @@ CONSTANT: alphabet $[
 
 : base91>ch ( ch -- ch )
     $[ alphabet alphabet-inverse ] nth
-    [ malformed-base91 ] unless* ; inline
+    [ malformed-base91 ] unless* { fixnum } declare ; inline
 
 PRIVATE>
 

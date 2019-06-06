@@ -632,7 +632,7 @@ HELP: member-eq?
 
 HELP: remove
 { $values { "elt" object } { "seq" sequence } { "newseq" "a new sequence" } }
-{ $description "Outputs a new sequence containing all elements of the input sequence except for given element." }
+{ $description "Outputs a new sequence containing all elements of the input sequence except for the given element." }
 { $notes "This word uses equality comparison (" { $link = } ")." } ;
 
 HELP: remove-eq

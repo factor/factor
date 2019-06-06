@@ -210,7 +210,7 @@ PRIVATE>
     '[
         [ _ threaded-server _ with-variable ]
         [ _ stop-server ]
-        [ ] cleanup
+        finally
     ] call ; inline
 
 <PRIVATE

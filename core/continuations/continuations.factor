@@ -160,6 +160,9 @@ INITIALIZED-SYMBOL: callback-error-hook [ [ die rethrow ] ] ! ( error -- * )
 : cleanup ( try cleanup-always cleanup-error -- )
     [ compose [ dip rethrow ] curry recover ] [ drop ] 2bi call ; inline
 
+: finally ( try cleanup-always -- )
+    [ ] cleanup ; inline
+
 ERROR: attempt-all-error ;
 
 : attempt-all ( ... seq quot: ( ... elt -- ... obj ) -- ... obj )

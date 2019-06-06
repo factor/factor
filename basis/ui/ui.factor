@@ -228,7 +228,7 @@ M: object resize-window 2drop ;
             f ui-running set-global
             ! Give running ui threads a chance to finish.
             notify-ui-thread yield
-        ] [ ] cleanup
+        ] finally
     ] if ;
 
 HOOK: beep ui-backend ( -- )

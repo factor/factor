@@ -174,7 +174,7 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 
 :: with-gl-buffer ( binding id quot -- )
     binding id glBindBuffer
-    quot [ binding 0 glBindBuffer ] [ ] cleanup ; inline
+    quot [ binding 0 glBindBuffer ] finally ; inline
 
 : with-array-element-buffers ( array-buffer element-buffer quot -- )
     [ GL_ELEMENT_ARRAY_BUFFER ] 2dip '[
@@ -189,7 +189,7 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 
 :: with-vertex-array ( id quot -- )
     id glBindVertexArray
-    quot [ 0 glBindVertexArray ] [ ] cleanup ; inline
+    quot [ 0 glBindVertexArray ] finally ; inline
 
 : <gl-buffer> ( target data hint -- id )
     pick gen-gl-buffer [

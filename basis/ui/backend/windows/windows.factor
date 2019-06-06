@@ -9,7 +9,7 @@ threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.private windows.dwmapi windows.errors windows.gdi32
 windows.kernel32 windows.messages windows.offscreen windows.opengl32
-windows.types windows.user32 assocs.extras ;
+windows.types windows.user32 assocs.extras byte-arrays ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -321,40 +321,41 @@ CONSTANT: exclude-keys-wm-char
 : send-key-up ( sym action? hWnd -- )
     [ [ <key-up> ] ] dip send-key-gesture ;
 
-: key-sym ( wParam -- string/f action? )
-    {
-        {
-            [ dup LETTER? ]
-            [ shift? caps-lock? xor [ ch'a + ch'A - ] unless 1string f ]
-        }
-        { [ dup digit? ] [ 1string f ] }
-        [ wm-keydown-codes at t ]
-    } cond ;
+: key-sym ( wParam -- string/f )
+    wm-keydown-codes at ; inline
 
-:: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
+:: (handle-wm-keydown/up) ( hWnd uMsg wParam lParam send-key-down/up -- )
     wParam exclude-key-wm-keydown? [
-        wParam key-sym over [
-            dup ctrl? alt? xor or [
-                hWnd send-key-down
-            ] [ 2drop ] if
-        ] [ 2drop ] if
-    ] unless ;
+        wParam key-sym [
+            t hWnd send-key-down/up execute( sym action? hWnd -- )
+        ] [
+            256 <byte-array> :> keyboard-state
+            4 <byte-array> :> chars
+            lParam -16 shift 0xff bitand :> scan-code
+            keyboard-state GetKeyboardState win32-error=0/f
+            VK_CONTROL VK_CAPITAL [ 0 swap keyboard-state set-nth ] bi@
+            wParam scan-code keyboard-state chars 2 0 ToUnicode dup win32-error=0/f
+            1 <=  [
+                1 chars nth 8 shift 0 chars nth bitor
+            ] [
+                3 chars nth 8 shift 2 chars nth bitor ! dead-key
+            ] if
+            1string f hWnd send-key-down/up execute( sym action? hWnd -- )
+        ] if*
+    ] unless ; inline
+
+: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
+    \ send-key-down (handle-wm-keydown/up) ;
 
 :: handle-wm-char ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-char? [
-        ctrl? alt? xor [
-            wParam 1string
-            [ f hWnd send-key-down ]
-            [ hWnd window user-input ] bi
-        ] unless
+       ctrl? alt? xor [ ! enable AltGr combination inputs
+           wParam 1string hWnd window user-input
+       ] unless
     ] unless ;
 
-:: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
-    wParam exclude-key-wm-keydown? [
-        wParam key-sym over [
-            hWnd send-key-up
-        ] [ 2drop ] if
-    ] unless ;
+: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
+    \ send-key-up (handle-wm-keydown/up) ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
     ? hwnd window active?<<
@@ -707,7 +708,7 @@ M: windows-ui-backend (with-ui)
         init-win32-ui
         start-ui
         event-loop
-    ] [ cleanup-win32-ui ] [ ] cleanup ;
+    ] [ cleanup-win32-ui ] finally ;
 
 M: windows-ui-backend beep
     0 MessageBeep drop ;

@@ -126,7 +126,7 @@ PRIVATE>
                 _
                 [ coverage-on test-vocab coverage-off ]
                 [ coverage ] bi
-            ] [ _ remove-coverage ] [ ] cleanup
+            ] [ _ remove-coverage ] finally
         ] call
     ] bi ;
 

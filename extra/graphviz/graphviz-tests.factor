@@ -232,7 +232,7 @@ SYMBOLS: supported-layouts supported-formats ;
 :: with-global-value ( value variable quot -- )
     variable get-global "orig" [
         [ value variable set-global quot call ]
-        [ "orig" get variable set-global ] [ ] cleanup
+        [ "orig" get variable set-global ] finally
     ] with-variable ; inline
 
 : preview-format-test ( format -- pass? )

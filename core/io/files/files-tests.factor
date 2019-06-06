@@ -274,7 +274,7 @@ CONSTANT: pt-array-1
     [
         "resource:core" normalize-path
         [ cwd = ] [ cd ] [ cwd = ] tri
-    ] cwd '[ _ dup cd cwd = ] [ ] cleanup
+    ] cwd '[ _ dup cd cwd = ] finally
 ] unit-test
 
 { t } [

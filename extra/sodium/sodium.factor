@@ -46,7 +46,7 @@ PRIVATE>
     [ utf8 encode dup length ] 2dip crypto_pwhash_str check0
     utf8 decode ;
 
-: crypto-pwhash-str-verify ( str password -- bool )
+: crypto-pwhash-str-verify ( str password -- ? )
     [ utf8 encode ] bi@ dup length crypto_pwhash_str_verify 0 = ;
 
 : crypto-generichash ( out-bytes in-bytes key-bytes/f -- out-bytes' )
@@ -74,6 +74,18 @@ PRIVATE>
     crypto_box_publickeybytes <byte-array>
     crypto_box_secretkeybytes <byte-array>
     2dup crypto_box_keypair check0 ;
+
+: crypto-sign-keypair ( -- public-key secret-key )
+    crypto_sign_publickeybytes <byte-array>
+    crypto_sign_secretkeybytes <byte-array>
+    2dup crypto_sign_keypair check0 ;
+
+: crypto-sign ( message secret-key -- signature )
+    [ crypto_sign_bytes <byte-array> dup f ] 2dip
+    [ dup length ] dip crypto_sign_detached check0 ;
+
+: crypto-sign-verify ( signature message public-key -- ? )
+    [ dup length ] dip crypto_sign_verify_detached 0 = ;
 
 : crypto-box-nonce ( -- nonce-bytes )
     crypto_box_noncebytes n-random-bytes ;

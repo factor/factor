@@ -2,7 +2,7 @@ USING: accessors arrays ascii calendar colors colors.gray
 combinators.short-circuit fry kernel locals math math.constants
 math.functions math.libm math.order math.points math.ranges
 math.vectors namespaces opengl processing.shapes quotations
-random sequences splitting threads timers ui ui.gadgets
+random sequences splitting timers ui ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.frame-buffer
 ui.gadgets.packs ui.gestures ;
 
@@ -316,7 +316,7 @@ TUPLE: bubble-chamber < frame-buffer
   particles collision-theta size timer ;
 
 M: bubble-chamber graft*
-    [ timer>> start-timer yield ] [ call-next-method ] bi ;
+    [ timer>> start-timer ] [ call-next-method ] bi ;
 
 M: bubble-chamber ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;

@@ -135,5 +135,7 @@ anything related to Factor or language design in general.
 
 * [Factor homepage](https://factorcode.org)
 * [Concatenative languages wiki](https://concatenative.org)
+* [Mailing list](factor-talk@lists.sourceforge.net)
+* Search for "factorcode" on [Gitter](https://gitter.im/)
 
 Have fun!

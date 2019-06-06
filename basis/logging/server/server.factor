@@ -33,7 +33,7 @@ SYMBOL: log-files
     [ close-log-streams path \ log-root set-global quot call ]
     \ log-root get-global
     [ \ log-root set-global close-log-streams ] curry
-    [ ] cleanup ; inline
+    finally ; inline
 
 : timestamp-header. ( -- )
     "[" write now (timestamp>rfc3339) "] " write ;

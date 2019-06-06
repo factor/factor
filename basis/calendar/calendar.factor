@@ -538,6 +538,16 @@ M: integer end-of-year 12 31 <date> ;
 : unix-time>timestamp ( seconds -- timestamp )
     [ unix-1970 ] dip +second ; inline
 
+: (week-number) ( timestamp -- [0,53] )
+    [ day-of-year ] [ day-of-week [ 7 ] when-zero ] bi - 10 + 7 /i ;
+
+: week-number ( timestamp -- [1,53] )
+    dup (week-number) {
+        {  0 [ year>> 1 - end-of-year (week-number) ] }
+        { 53 [ year>> 1 + <year> (week-number) 1 = 1 53 ? ] }
+        [ nip ]
+    } case ;
+
 {
     { [ os unix? ] [ "calendar.unix" ] }
     { [ os windows? ] [ "calendar.windows" ] }

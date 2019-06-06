@@ -169,11 +169,15 @@ HELP: throw
 { $values { "error" object } }
 { $description "Saves the current continuation in the " { $link error-continuation } " global variable and throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." } ;
 
-{ cleanup recover } related-words
+{ cleanup recover finally } related-words
 
 HELP: cleanup
 { $values { "try" { $quotation ( ..a -- ..a ) } } { "cleanup-always" { $quotation ( ..a -- ..b ) } } { "cleanup-error" { $quotation ( ..b -- ..b ) } } }
 { $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
+
+HELP: finally
+{ $values { "try" { $quotation ( ..a -- ..a ) } } { "cleanup-always" { $quotation ( ..a -- ..b ) } } }
+{ $description "Same as " { $link cleanup } ", but with empty " { $snippet "cleanup-error" } " quotation. Useful when some cleanup code needs to be run after the " { $snippet "try" } " quotation whether an error was thrown or not, but when nothing specific needs to be done about any errors." } ;
 
 HELP: recover
 { $values { "try" { $quotation ( ..a -- ..b ) } } { "recovery" { $quotation ( ..a error -- ..b ) } } }

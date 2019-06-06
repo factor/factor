@@ -39,7 +39,7 @@ DESTRUCTOR: unmap-resource
 DESTRUCTOR: free-resource
 
 : with-mapped-resource ( ..a resource quot: ( ..a device-ptr size -- ..b ) -- ..b )
-    over [ map-resource ] 2dip '[ _ unmap-resource ] [ ] cleanup ; inline
+    over [ map-resource ] 2dip '[ _ unmap-resource ] finally ; inline
 
 TUPLE: cuda-buffer
     { buffer buffer }
