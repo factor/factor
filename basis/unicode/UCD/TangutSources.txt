@@ -1,6 +1,6 @@
-# TangutSources-11.0.0.txt
-# Date: 2017-12-06, 01:00:00 GMT [MS, KW]
-# © 2017 Unicode®, Inc.
+# TangutSources-12.1.0.txt
+# Date: 2019-03-08, 23:59:00 GMT [MS, KW]
+# © 2019 Unicode®, Inc.
 # Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
 # For terms of use, see http://www.unicode.org/terms_of_use.html
 #
@@ -10,8 +10,8 @@
 # This file is a normative contributory data file in the
 # Unicode Character Database.
 #
-#	Data values match those for ISO/IEC 10646:2017 + Amd 1
-#	Original Date: 2017-06-05
+#	Data values match those for ISO/IEC 10646:2017 + Amd 1 + Amd 2
+#	Original Date: 2017-11-21
 #
 #	Format information:
 #
@@ -47,7 +47,7 @@
 #	      In 西夏語の研 究 (Seikago no kenkyū) [A Study of the Hsi-Hsia Language] (1964-1966) vol.2. Tokyo, 1966.
 # S1968 = Sofronov M. V. (М. В. Софронов), Грамматика тангутского языка (Grammatika tangutskogo jazyka)
 #	      [Grammar of the Tangut Language]. Moscow, 1968.
-# UTN42 = Andrew West and Viacheslave Zaytsev, Tangut Character Additions and Glyph Corrections,
+# UTN42 = Andrew West and Viacheslav Zaytsev, Tangut Character Additions and Glyph Corrections,
 #         Unicode Technical Note #42. 2017-10-17.
 #
 #	For more information, see Section 18.10, Tangut, of the
@@ -12313,5 +12313,17 @@ U+187F0	kTGT_MergedSrc	UTN42-004
 U+187F0	kRSTUnicode	308.17
 U+187F1	kTGT_MergedSrc	UTN42-005
 U+187F1	kRSTUnicode	415.11
+U+187F2	kTGT_MergedSrc	UTN42-006
+U+187F2	kRSTUnicode	42.15
+U+187F3	kTGT_MergedSrc	UTN42-007
+U+187F3	kRSTUnicode	185.12
+U+187F4	kTGT_MergedSrc	UTN42-008
+U+187F4	kRSTUnicode	73.11
+U+187F5	kTGT_MergedSrc	UTN42-009
+U+187F5	kRSTUnicode	383.18
+U+187F6	kTGT_MergedSrc	UTN42-010
+U+187F6	kRSTUnicode	79.14
+U+187F7	kTGT_MergedSrc	UTN42-011
+U+187F7	kRSTUnicode	79.19
 
 # EOF

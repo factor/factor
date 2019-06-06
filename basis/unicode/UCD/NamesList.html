@@ -28,7 +28,7 @@
     <tbody>
       <tr>
         <td valign="top" width="144">Revision</td>
-        <td valign="top">11.0.0</td>
+        <td valign="top">12.1.0</td>
       </tr>
       <tr>
         <td valign="top" width="144">Authors</td>
@@ -36,19 +36,19 @@
       </tr>
       <tr>
         <td valign="top" width="144">Date</td>
-        <td valign="top">2018-05-31</td>
+        <td valign="top">2019-03-08</td>
       </tr>
       <tr>
         <td valign="top" width="144">This Version</td>
         <td valign="top">
-		<a href="http://www.unicode.org/Public/11.0.0/ucd/NamesList.html">
-		http://www.unicode.org/Public/11.0.0/ucd/NamesList.html</a></td>
+		<a href="http://www.unicode.org/Public/12.1.0/ucd/NamesList.html">
+		http://www.unicode.org/Public/12.1.0/ucd/NamesList.html</a></td>
       </tr>
       <tr>
         <td valign="top" width="144">Previous Version</td>
         <td valign="top">
-		<a href="http://www.unicode.org/Public/10.0.0/ucd/NamesList.html">
-		http://www.unicode.org/Public/10.0.0/ucd/NamesList.html</a></td>
+		<a href="http://www.unicode.org/Public/12.0.0/ucd/NamesList.html">
+		http://www.unicode.org/Public/12.0.0/ucd/NamesList.html</a></td>
       </tr>
       <tr>
         <td valign="top" width="144">Latest Version</td>
@@ -313,7 +313,7 @@ is machine generated and will always explicitly provide any summary subheaders.<
 			// and is used for ideographs)
 
 <strong>VARIATION_LINE:	TAB &quot;~&quot; SP CHAR VARSEL SP LABEL LF   
-		| TAB &quot;~&quot; SP CHAR VARSEL SP LABEL &quot;(&quot; LCNAME &quot;)&quot;LF</strong>      
+		| TAB &quot;~&quot; SP CHAR VARSEL SP LABEL &quot;(&quot; LCTAG &quot;)&quot;LF</strong>      
 			// output standardized variation sequence or simply the char code in case of alternate
 			// glyphs, followed by the alternate glyph or variation glyph and the label and context
 
@@ -334,7 +334,7 @@ is machine generated and will always explicitly provide any summary subheaders.<
 			// decomposition 
 
 <strong>COMPAT_MAPPING:	TAB &quot;#&quot; SP EXPAND_LINE       
-		| TAB &quot;#&quot; SP &quot;&lt;&quot; LCTAG &quot;&gt;&quot; SP EXPAND_LINE</strong>    
+		| TAB &quot;#&quot; SP &quot;&lt;&quot; TAG &quot;&gt;&quot; SP EXPAND_LINE</strong>    
 			// Replace '#' by APPROX, output line as mapping;
 			// check for balanced &lt; &gt;
 
@@ -449,9 +449,10 @@ COMMENT:	&quot;(&quot; LABEL &quot;)&quot;
 		| &quot;*&quot;</strong>
 
 <strong>NAME</strong>:	  	&lt;sequence of uppercase ASCII letters, digits, space and hyphen&gt; 
-<strong>LCNAME</strong>:		&lt;sequence of lowercase ASCII letters, digits space and hyphen&gt;
+<strong>LCNAME</strong>:		&lt;sequence of lowercase ASCII letters, digits, space and hyphen&gt;
 		<strong>| LCNAME &quot;-&quot; CHAR</strong>
 
+<strong>TAG</strong>:		&lt;sequence of ASCII letters&gt;
 <strong>LCTAG</strong>:		&lt;sequence of lowercase ASCII letters&gt;
 <strong>STRING</strong>:	  	&lt;sequence of characters in the range U+0020..U+02FF, except controls&gt; 
 <strong>LABEL</strong>:	  	&lt;sequence of characters in the range U+0020..U+02FF, except controls, &quot;(&quot; or &quot;)&quot;&gt; 
@@ -509,7 +510,7 @@ COMMENT:	&quot;(&quot; LABEL &quot;)&quot;
        UTF-8, the character repertoire for running text (anything
        other than CHAR) is effectively restricted to the repertoire of Latin-1.
        Otherwise, characters in the range U+0020..U+02FF
-       	are allowed in LINE or LABEL elements.</li>
+       	are allowed in STRING or LABEL elements, and elements derived from them.</li>
        <li>The code chart layout program
        (<a href="http://www.unicode.org/unibook/">Unibook</a>)
        can accept files in several other formats. These include little-endian UTF-16,
@@ -525,7 +526,21 @@ COMMENT:	&quot;(&quot; LABEL &quot;)&quot;
        <li>The final LF in the file must be present.</li>
 </ul>
   <h2><a name="Modifications" href="#Modifications">Modifications</a></h2>
-  <p><b>Version 11.0.0</b></p>
+
+    <p><b>Version 12.1.0</b></p>
+        <ul>
+        <li>Reissued for Unicode 12.1.0.</li>
+    	</ul>
+    <p><b>Version 12.0.0</b></p>
+        <ul>
+        <li>Reissued for Unicode 12.0.0.</li>
+        <li>Added definition of TAG (allowing uppercase letters), distinct from LCTAG.</li>
+        <li>Corrected definition of VARIATION_LINE to use LCTAG instead of LCNAME.</li>
+        <li>Corrected definition of COMPAT_MAPPING to use TAG instead of LCTAG.</li>
+        <li>Corrected the documentation regarding which elements allow use of characters
+        	in the range U+0020..U+02FF.</li>
+        </ul>
+    <p><b>Version 11.0.0</b></p>
         <ul>
         <li>Reissued for Unicode 11.0.0.</li>
         <li>Loosened the limitation on repertoire allowed in LINE and LABEL
