@@ -85,11 +85,14 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 ! the entire image a rectangle of the given color with varying
 ! transparency.
 :: color-to-alpha ( image color -- image' )
-    color >rgba-components drop [ 255 * >integer ] tri@
-    3byte-array uint32_t deref 24 bits :> rgb
-    image bitmap>> uint32_t cast-array [
-        0xff bitand 24 shift rgb bitor
-    ] map! drop image RGBA >>component-order ;
+    color >rgba-components :> alpha
+    [ 255 * >integer ] tri@ 3byte-array uint32_t deref 24 bits :> rgb
+    image bitmap>> uint32_t cast-array
+        alpha 1 <
+        [ [ 0xff bitand alpha * >integer 24 shift rgb bitor ] map! ]
+        [ [ 0xff bitand                  24 shift rgb bitor ] map! ]
+        if drop
+    image RGBA >>component-order ;
 
 :: render-image ( dc ssa script-string -- image )
     script-string size>> :> size
