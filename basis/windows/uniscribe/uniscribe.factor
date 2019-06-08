@@ -1,11 +1,13 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays assocs cache
-classes.struct colors colors.constants combinators destructors
-fonts images init io.encodings.string io.encodings.utf16n kernel
-literals locals math namespaces sequences windows.errors
+USING: accessors alien.c-types alien.data arrays assocs
+byte-arrays cache classes.struct colors colors.constants
+combinators destructors fonts images init io.encodings.string
+io.encodings.utf16n kernel literals locals math math.bitwise
+namespaces sequences specialized-arrays windows.errors
 windows.fonts windows.gdi32 windows.offscreen windows.ole32
 windows.types windows.usp10 ;
+SPECIALIZED-ARRAY: uint32_t
 IN: windows.uniscribe
 
 TUPLE: script-string < disposable font string metrics ssa size image ;
@@ -83,9 +85,11 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 ! the entire image a rectangle of the given color with varying
 ! transparency.
 :: color-to-alpha ( image color -- image' )
-    image color >rgba-components drop [ 255 * >integer ] tri@ 3array [
-        swap first suffix -rot image set-pixel-at
-    ] curry each-pixel image RGBA >>component-order ;
+    color >rgba-components drop [ 255 * >integer ] tri@
+    3byte-array uint32_t deref 24 bits :> rgb
+    image bitmap>> uint32_t cast-array [
+        0xff bitand 24 shift rgb bitor
+    ] map! drop image RGBA >>component-order ;
 
 :: render-image ( dc ssa script-string -- image )
     script-string size>> :> size
