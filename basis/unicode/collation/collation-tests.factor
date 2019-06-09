@@ -47,12 +47,12 @@ IN: unicode.collation.tests
     [ first2 dupd calculate-collation 3array ] map
     [ first3 sequence= nip ] reject ;
 
-{ 208026 { } }
-[ parse-collation-test-weights [ length ] [ find-bad-collations ] bi ] unit-test
+{ { } }
+[ parse-collation-test-weights find-bad-collations ] unit-test
 
-{ 208025 { } } [
+{ { } } [
     parse-collation-test-shifted
-    2 clump [ length ] keep
+    2 clump
     [ string<=> { +lt+ +eq+ } member? ] assoc-reject
 ] unit-test
 

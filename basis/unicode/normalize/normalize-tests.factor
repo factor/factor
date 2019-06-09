@@ -45,8 +45,8 @@ IN: unicode.normalize.tests
         ] with all?
     ] assoc-all? ;
 
-{ 18746 { } } [
-    parse-normalization-tests [ length ] keep [
+{ { } } [
+    parse-normalization-tests [
         {
             [ { { 2 { 1 2 3 } } { 4 { 4 5 } } } [ nfc ] check-normalization-test? ]
             [ { { 3 { 1 2 3 } } { 5 { 4 5 } } } [ nfd ] check-normalization-test? ]
