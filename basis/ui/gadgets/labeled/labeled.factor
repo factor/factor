@@ -11,16 +11,10 @@ TUPLE: labeled-gadget < track content ;
 
 M: labeled-gadget focusable-child* content>> ;
 
-! gradients don't work as backgrounds on windows, see #152 and #1397
-: title-bar-interior ( -- interior )
-    os windows?
-    [ toolbar-background <solid> ]
-    [ title-bar-gradient <gradient> ]
-    if ;
-
 : <title-bar> ( title -- title-bar )
     >label [ t >>bold? ] change-font
-    { 0 4 } <border> title-bar-interior >>interior ;
+    { 0 4 } <border>
+    title-bar-gradient <gradient> >>interior ;
 
 PRIVATE>
 

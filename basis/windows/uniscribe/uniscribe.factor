@@ -1,10 +1,13 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays assocs cache
-classes.struct combinators destructors fonts init io.encodings.string
-io.encodings.utf16n kernel literals locals math namespaces sequences
-windows.errors windows.fonts windows.gdi32 windows.offscreen
-windows.ole32 windows.types windows.usp10 ;
+USING: accessors alien.c-types alien.data arrays assocs
+byte-arrays cache classes.struct colors colors.constants
+combinators destructors fonts images init io.encodings.string
+io.encodings.utf16n kernel literals locals math math.bitwise
+namespaces sequences specialized-arrays windows.errors
+windows.fonts windows.gdi32 windows.offscreen windows.ole32
+windows.types windows.usp10 ;
+SPECIALIZED-ARRAY: uint32_t
 IN: windows.uniscribe
 
 TUPLE: script-string < disposable font string metrics ssa size image ;
@@ -48,8 +51,17 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
     [ check-ole32-error ] [ |ScriptStringFree void* deref ] bi* ;
 
 : set-dc-colors ( dc font -- )
-    [ background>> color>RGB SetBkColor drop ]
-    [ foreground>> color>RGB SetTextColor drop ] 2bi ;
+    dup background>> >rgba alpha>> 1 number= [
+        ! No transparency needed, set colors from the font.
+        [ background>> color>RGB SetBkColor drop ]
+        [ foreground>> color>RGB SetTextColor drop ] 2bi
+    ] [
+        ! Draw white text on black background. The resulting grayscale
+        ! image will be used as transparency mask for the actual color.
+        drop
+        [ COLOR: black color>RGB SetBkColor drop ]
+        [ COLOR: white color>RGB SetTextColor drop ] bi
+    ] if ;
 
 : selection-start/end ( script-string -- iMinSel iMaxSel )
     string>> dup selection? [ [ start>> ] [ end>> ] bi ] [ drop 0 0 ] if ;
@@ -67,10 +79,27 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
     FALSE ! fDisabled
     ScriptStringOut check-ole32-error ;
 
+! The image is a grayscale rendering of a text string. We want the text to
+! have the given color. Move the blue channel of the image (any color
+! channel will do, since it's grayscale) into its alpha channel, and make
+! the entire image a rectangle of the given color with varying
+! transparency.
+:: color-to-alpha ( image color -- image' )
+    color >rgba-components :> alpha
+    [ 255 * >integer ] tri@ 3byte-array uint32_t deref 24 bits :> rgb
+    image bitmap>> uint32_t cast-array
+        alpha 1 <
+        [ [ 0xff bitand alpha * >integer 24 shift rgb bitor ] map! ]
+        [ [ 0xff bitand                  24 shift rgb bitor ] map! ]
+        if drop
+    image RGBA >>component-order ;
+
 :: render-image ( dc ssa script-string -- image )
     script-string size>> :> size
     size dc
-    [ ssa size script-string draw-script-string ] make-bitmap-image ;
+    [ ssa size script-string draw-script-string ] make-bitmap-image
+    script-string font>> [ foreground>> ] [ background>> ] bi
+    >rgba alpha>> 1 number= [ drop ] [ color-to-alpha ] if ;
 
 : set-dc-font ( dc font -- )
     cache-font SelectObject win32-error=0/f ;

@@ -27,7 +27,7 @@ CONSTANT: stylesheet
         }
         { code-style
             H{
-                { page-color T{ rgba f 0.9 0.9 0.9 1 } }
+                { page-color T{ rgba f 0.4 0.4 0.4 0.3 } }
             }
         }
         { snippet-style
@@ -55,35 +55,23 @@ CONSTANT: stylesheet
         } format
     ] ($block) ;
 
-: divider-interior ( -- interior )
-    os windows? [
-        T{ rgba f 0.25 0.25 0.25 1.0 } <solid>
-    ] [ {
-            T{ rgba f 0.25 0.25 0.25 1.0 }
-            T{ rgba f 1.0 1.0 1.0 0.0 }
-        } <gradient>
-    ] if ;
-
 : $divider ( -- )
     [
         <gadget>
-            divider-interior >>interior
+            {
+                T{ rgba f 0.25 0.25 0.25 1.0 }
+                T{ rgba f 1.0 1.0 1.0 0.0 }
+            } <gradient> >>interior
             array[ default-font-size 67 * default-font-size 5/6 * ] >>dim
             { 1 0 } >>orientation
         gadget.
     ] ($block) ;
 
-: page-interior ( -- interior )
-    os windows? [
-        T{ rgba f 0.8 0.8 1.0 1.0 } <solid>
-    ] [ {
-            T{ rgba f 0.8 0.8 1.0 1.0 }
-            T{ rgba f 0.8 1.0 1.0 1.0 }
-        } <gradient>
-    ] if ;
-
 : page-theme ( gadget -- gadget )
-    page-interior >>interior ;
+    {
+        T{ rgba f 0.8 0.8 1.0 1.0 }
+        T{ rgba f 0.8 1.0 1.0 1.0 }
+    } <gradient> >>interior ;
 
 : <page> ( list -- gadget )
     [
