@@ -195,7 +195,7 @@ The word's body is put in a new method for the generic."
     (let ((code (fuel-refactor--word-def word)))
       (unless code (error "Word's definition not found"))
       (factor-beginning-of-symbol)
-      (kill-word 1)
+      (kill-sexp 1)
       (let ((start (point)))
         (insert code)
         (save-excursion (font-lock-fontify-region start (point)))
