@@ -19,7 +19,7 @@ SYMBOL: player
 : show-player-circle ( -- )
     player get
     25.0 RED draw-circle-v ;
-    
+
 : setup-game-vars ( -- )
     get-screen-width 2 /
     get-screen-height 2 /
@@ -27,12 +27,13 @@ SYMBOL: player
 
 ! Make this cleaner
 : change-player-position ( -- )
-    {
-        { [ KEY_RIGHT enum>number is-key-down ] [ player get x>> 2.0 + player get x<<   ] }
-        { [ KEY_LEFT enum>number is-key-down ] [ player get x>> -2.0 + player get x<<   ] }
-        { [ KEY_DOWN enum>number is-key-down ] [ player get y>> 2.0 + player get y<<   ] }
-        { [ KEY_UP   enum>number is-key-down ] [ player get y>> -2.0 +  player get y<<   ] }
-        [  ] } cond ;
+    player get {
+        { [ KEY_RIGHT enum>number is-key-down ] [ [  2.0 + ] change-x ] }
+        { [ KEY_LEFT  enum>number is-key-down ] [ [ -2.0 + ] change-x ] }
+        { [ KEY_DOWN  enum>number is-key-down ] [ [  2.0 + ] change-y ] }
+        { [ KEY_UP    enum>number is-key-down ] [ [ -2.0 + ] change-y ] }
+        [ ]
+    } cond drop ;
 
 : render-loop ( -- )
     begin-drawing
@@ -41,11 +42,10 @@ SYMBOL: player
 
 : main ( -- )
     make-window clear-window setup-game-vars
-    [ change-player-position
-      render-loop
-      window-should-close not ] loop
-    close-window
-        ;
-    
+    [
+        change-player-position
+        render-loop
+        window-should-close not
+    ] loop close-window ;
+
 MAIN: main
-   
