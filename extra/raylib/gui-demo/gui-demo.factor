@@ -42,3 +42,4 @@ IN: raylib.gui-demo
       window-should-close not ] loop
     close-window ;
 
+MAIN: main
