@@ -6,6 +6,6 @@ IN: unicode.script
 
 <<
 "script-table" create-word-in
-"vocab:unicode/script/Scripts.txt" load-interval-file
+"vocab:unicode/UCD/Scripts.txt" load-interval-file
 define-constant
 >>
