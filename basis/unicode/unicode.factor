@@ -1,11 +1,9 @@
-
 USING: accessors arrays assocs combinators.short-circuit fry
 hints interval-maps kernel math math.order sequences sorting
 strings unicode.breaks.private unicode.case.private
 unicode.categories unicode.collation unicode.collation.private
 unicode.data unicode.data.private unicode.normalize.private
 unicode.script ;
-
 IN: unicode
 
 CATEGORY: blank Zs Zl Zp | "\r\n\t" member? ;
@@ -164,15 +162,17 @@ HINTS: string-append string string ;
 : nfkc ( string -- nfkc )
     [ (nfkd) combine ] with-string ;
 
-: collation-key ( string -- key )
-    nfd string>graphemes graphemes>weights
-    filter-ignorable weights>bytes ;
+: collation-key/nfd ( string -- key nfd )
+    nfd [
+        string>graphemes graphemes>weights
+        filter-ignorable weights>bytes
+    ] keep ;
 
 <PRIVATE
 
 : insensitive= ( str1 str2 levels-removed -- ? )
     [
-        [ collation-key ] dip
+        [ collation-key/nfd drop ] dip
         [ [ 0 = not ] trim-tail but-last ] times
     ] curry same? ;
 
@@ -190,11 +190,18 @@ PRIVATE>
 : quaternary= ( str1 str2 -- ? )
     0 insensitive= ;
 
-: w/collation-key ( str -- {str,key} )
-    [ collation-key ] keep 2array ;
-
 : sort-strings ( strings -- sorted )
-    [ w/collation-key ] map natural-sort values ;
+    [ collation-key/nfd 2array ] map natural-sort values ;
 
 : string<=> ( str1 str2 -- <=> )
-    [ w/collation-key ] compare ;
+    [ collation-key/nfd 2array ] compare ;
+
+CONSTANT: unicode-supported {
+    "collation"
+}
+
+CONSTANT: unicode-unsupported {
+    "bidi"
+}
+
+CONSTANT: unicode-version "10.0"
