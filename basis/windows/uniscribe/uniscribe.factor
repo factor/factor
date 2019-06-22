@@ -12,31 +12,42 @@ IN: windows.uniscribe
 
 TUPLE: script-string < disposable font string metrics ssa size image ;
 
-: line-offset>x ( n script-string -- x )
-    2dup string>> length = [
-        ssa>> ! ssa
-        swap 1 - ! icp
-        TRUE ! fTrailing
-    ] [
-        ssa>>
-        swap ! icp
-        FALSE ! fTrailing
-    ] if
-    { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters ;
-
-: x>line-offset ( x script-string -- n trailing )
-    ssa>> ! ssa
-    swap ! iX
-    { int int } [ ScriptStringXtoCP check-ole32-error ] with-out-parameters ;
-
 <PRIVATE
 
 CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 
+:: line-offset>x ( n script-string -- x )
+    n script-string
+    2dup string>> length = [
+        ssa>> ! ssa
+        ! swap 1 - ! icp
+        swap 0 swap script-string string>> subseq
+        utf16n encode length 2 / >integer 1 - ! icp
+        TRUE ! fTrailing
+    ] [
+        ssa>>
+        ! swap ! icp
+        swap 0 swap script-string string>> subseq
+        utf16n encode length 2 / >integer ! icp
+        FALSE ! fTrailing
+    ] if
+    { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters ;
+
+:: x>line-offset ( x script-string -- n trailing )
+    x script-string
+    ssa>> ! ssa
+    swap ! iX
+    { int int } [ ScriptStringXtoCP check-ole32-error ] with-out-parameters
+    swap 2 * 0 swap script-string string>> utf16n encode subseq
+    utf16n decode length
+    swap ;
+
 : make-ssa ( dc script-string -- ssa )
     dup selection? [ string>> ] when
-    [ utf16n encode ] ! pString
-    [ length ] bi ! cString
+    !    [ utf16n encode ] ! pString
+    !    [ length ] bi ! cString
+    utf16n encode ! pString
+    dup length 2 / >integer ! cString
     dup 1.5 * 16 + >integer ! cGlyphs -- MSDN says this is "recommended size"
     -1 ! iCharset -- Unicode
     ssa-dwFlags
