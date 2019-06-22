@@ -1,10 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors alien core-graphics.types core-text
-core-text.fonts kernel hashtables namespaces sequences ui.text
-ui.text.private destructors combinators core-foundation
-core-foundation.strings math math.vectors init colors
-colors.constants cache arrays images ;
+USING: accessors cache core-graphics.types core-text
+core-text.fonts io.encodings.string io.encodings.utf16n kernel
+locals math math.vectors namespaces sequences ui.text
+ui.text.private ;
 IN: ui.text.core-text
 
 SINGLETON: core-text-renderer
@@ -45,14 +44,19 @@ M: core-text-renderer flush-layout-cache
 M: core-text-renderer string>image ( font string -- image loc )
     cached-line [ line>image ] [ loc>> scale-dim ] bi ;
 
-M: core-text-renderer x>offset ( x font string -- n )
+M:: core-text-renderer x>offset ( x font string -- n )
+    x font string
     [ 2drop 0 ] [
         cached-line line>>
         swap scale 0 <CGPoint> CTLineGetStringIndexForPosition
-    ] if-empty ;
+    ] if-empty
+    2 * 0 swap string utf16n encode subseq
+    utf16n decode length ;
 
-M: core-text-renderer offset>x ( n font string -- x )
-    cached-line line>> swap f
+M:: core-text-renderer offset>x ( n font string -- x )
+    font string cached-line line>> 
+    0 n string subseq utf16n encode length 2 / >integer
+    f
     CTLineGetOffsetForStringIndex unscale ;
 
 M: core-text-renderer font-metrics ( font -- metrics )
