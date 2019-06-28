@@ -281,3 +281,5 @@ tools.test vectors vocabs ;
 { 0 } [ { 1 2 3 4 } [ 5 > ] count-tail ] unit-test
 { 2 } [ { 1 2 3 4 } [ 2 > ] count-tail ] unit-test
 { 4 } [ { 1 2 3 4 } [ 5 < ] count-tail ] unit-test
+
+{ SBUF" aco" SBUF" ftr"  } [ SBUF" factor" dup [ even? ] extract! ] unit-test
