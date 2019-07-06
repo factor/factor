@@ -11,9 +11,9 @@ sequences.private sets sorting sorting.extras ;
 
 IN: math.extras
 
-<PRIVATE
-
 DEFER: stirling
+
+<PRIVATE
 
 : (stirling) ( n k -- x )
     [ [ 1 - ] bi@ stirling ]
