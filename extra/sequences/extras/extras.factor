@@ -649,3 +649,7 @@ PRIVATE>
 
 : interleaved ( seq glue -- newseq )
     over interleaved-as ;
+
+: extract! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
+    [ dup ] compose over [ length ] keep new-resizable
+    [ [ push-if ] 2curry reject! ] keep swap like ; inline
