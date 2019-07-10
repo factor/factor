@@ -4,6 +4,9 @@
 USING: arrays kernel math math.extras math.ranges sequences
 tools.test ;
 
+{ 7 } [ 4 2 stirling ] unit-test
+{ 90 } [ 6 3 stirling ] unit-test
+
 { { 1 -1/2 1/6 0 -1/30 0 1/42 0 -1/30 0 } }
 [ 10 <iota> [ bernoulli ] map ] unit-test
 
