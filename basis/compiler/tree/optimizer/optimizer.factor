@@ -7,6 +7,7 @@ compiler.tree.propagation
 compiler.tree.cleanup
 compiler.tree.escape-analysis
 compiler.tree.escape-analysis.check
+compiler.tree.locals
 compiler.tree.tuple-unboxing
 compiler.tree.identities
 compiler.tree.def-use
@@ -28,6 +29,7 @@ SYMBOL: check-optimizer?
         analyze-recursive
         normalize
         propagate
+        track-local-infos? [ optimize-locals ] when
         cleanup-tree
         dup run-escape-analysis? [
             escape-analysis
