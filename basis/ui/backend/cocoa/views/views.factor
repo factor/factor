@@ -8,7 +8,11 @@ core-graphics core-graphics.types core-text io.encodings.utf8
 kernel literals locals math math.order math.parser
 math.rectangles namespaces opengl sequences splitting threads
 ui.commands ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.private words ;
+ui.gestures ui.private words sorting math.vectors
+ui.baseline-alignment ui.gadgets.line-support
+ui.gadgets.editors ui.backend.cocoa.input-methods
+ui.backend.cocoa.input-methods.editors io.encodings.utf16n
+io.encodings.string classes.struct ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -181,8 +185,84 @@ M: send-touchbar-command send-queued-gesture
         yield
     ] [ 3drop ] if ;
 
+CONSTANT: NSNotFound 9223372036854775807 inline
+
+IMPORT: NSAttributedString
+
+<PRIVATE
+
+:: >codepoint-index ( str utf16-index -- codepoint-index )
+    0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
+
+:: >utf16-index ( str codepoint-index -- utf16-index )
+    0 codepoint-index str subseq utf16n encode length 2 / >integer ;
+
+:: earlier-caret/mark ( editor -- loc )
+    editor editor-caret :> caret
+    editor editor-mark :> mark
+    caret first mark first = [
+        caret second mark second < [ caret ] [ mark ] if
+    ] [
+        caret first mark first < [ caret ] [ mark ] if
+    ] if ;
+
+:: make-preedit-underlines ( gadget text range -- underlines )
+    f gadget preedit-selection-mode?<<
+    { } clone :> underlines!
+    text -> length :> text-length
+    0 0 <NSRange> :> effective-range
+    text -> string CF>string :> str
+    str utf16n encode :> byte-16n
+    0 :> cp-loc!    
+    "NSMarkedClauseSegment" <NSString> :> segment-attr
+    [ effective-range [ location>> ] [ length>> ] bi + text-length < ] [
+        text
+        segment-attr
+        effective-range [ location>> ] [ length>> ] bi +
+        effective-range >c-ptr
+        -> attribute:atIndex:effectiveRange: drop
+        1 :> thickness!
+        range location>> effective-range location>> = [
+            2 thickness!
+            t gadget preedit-selection-mode?<<
+        ] when
+        underlines
+        effective-range [ location>> ] [ length>> ] bi over +
+        [ str swap >codepoint-index ] bi@ swap - :> len
+        cp-loc cp-loc len + dup cp-loc!
+        2array thickness 2array
+        suffix underlines! 
+    ] while 
+    underlines length 1 = [
+        underlines first first 2 2array 1array  ! thickness: 2
+    ] [ underlines ] if ;
+
+:: update-marked-text ( gadget str range -- )
+    gadget preedit? [
+        gadget remove-preedit-text
+    ] when
+    gadget earlier-caret/mark dup
+    gadget preedit-start<<
+    0 str length 2array v+ gadget preedit-end<<
+    str gadget temp-im-input drop
+    gadget preedit-start>>
+    0 str range location>> >codepoint-index
+    2array v+
+    dup gadget preedit-selected-start<<
+    0
+    range location>> dup range length>> + [ 2 * ] bi@
+    str utf16n encode subseq utf16n decode length
+    2array v+
+    dup gadget preedit-selected-end<<
+    dup gadget set-caret gadget set-mark                    
+    gadget preedit-start>> gadget preedit-end>> = [
+        gadget remove-preedit-info 
+    ] when ;
+
+PRIVATE>
+
 <CLASS: FactorView < NSOpenGLView
-    COCOA-PROTOCOL: NSTextInput
+    COCOA-PROTOCOL: NSTextInputClient
 
     METHOD: void prepareOpenGL [
 
@@ -355,34 +435,147 @@ M: send-touchbar-command send-queued-gesture
     ] ;
 
     ! Text input
-    METHOD: void insertText: id text
-    [
-        self window :> window
-        window [
-            text CF>string window user-input
-        ] when
-    ] ;
+    METHOD: void insertText: id text replacementRange: NSRange replacementRange [
+            self window :> window
+            window [
+                "" clone :> str!
+                text NSString -> class -> isKindOfClass: 0 = not [
+                    text CF>string str!               
+                ] [
+                    text -> string CF>string str!               
+                ] if
+                window world-focus :> gadget
+                gadget support-input-methods? [
+                    gadget preedit? [
+                        gadget [ remove-preedit-text ] [ remove-preedit-info ] bi
+                    ] when
+                    str gadget user-input* drop                    
+                    f gadget preedit-selection-mode?<<
+                ] [ 
+                    str window user-input
+                ] if
+            ] when
+        ] ;
+    
+    METHOD: char hasMarkedText [
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget preedit? [ 1 ] [ 0 ] if
+            ] [ 0 ] if
+        ] ;
 
-    METHOD: char hasMarkedText [ 0 ] ;
+    METHOD: NSRange markedRange [ 
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget preedit? [
+                    gadget [ preedit-start>> second ] [ preedit-end>> second ] bi >= [ 
+                        NSNotFound 0 
+                    ] [
+                        gadget preedit-start>> first gadget editor-line :> str
+                        str gadget preedit-start>> second >utf16-index dup  ! location
+                        str gadget preedit-end>> second >utf16-index swap - ! length
+                    ] if
+                ] [  NSNotFound 0 ] if
+            ] [ NSNotFound 0 ] if
+            <NSRange>
+        ] ;
 
-    METHOD: NSRange markedRange [ 0 0 <NSRange> ] ;
+    METHOD: NSRange selectedRange [
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget support-input-methods? [
+                    gadget preedit? [
+                        gadget preedit-start>> first gadget editor-line :> str
+                        str
+                        gadget
+                        [ preedit-selected-start>> second ]
+                        [ preedit-start>> second ] bi - >utf16-index              ! location
+                        str gadget preedit-selected-end>> second >utf16-index
+                        str gadget preedit-selected-start>> second >utf16-index - ! length
+                    ] [ gadget earlier-caret/mark second 0 ] if
+                ] [ 0 0 ] if
+            ] [ 0 0 ] if 
+            <NSRange>
+        ] ;
+    
+    METHOD: void setMarkedText: id text selectedRange: NSRange selectedRange
+                                     replacementRange: NSRange replacementRange [           
+            self window :> window
+            { } clone :> underlines!
+            window [
+                window world-focus :> gadget
+                "" clone :> str!
+                text NSString -> class -> isKindOfClass: 0 = not [
+                    text CF>string str!               
+                ] [
+                    text -> string CF>string str!               
+                    gadget support-input-methods? [
+                        gadget text selectedRange make-preedit-underlines underlines!
+                    ] when
+                ] if
+                gadget support-input-methods? [
+                    gadget str selectedRange update-marked-text                   
+                    underlines gadget preedit-underlines<<
+                ] when
+            ] when            
+        ] ;
+             
+    METHOD: void unmarkText [ 
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget support-input-methods? [
+                    gadget preedit? [
+                        gadget {
+                            [ preedit-start>> second ]
+                            [ preedit-end>> second ]
+                            [ preedit-start>> first ] [ editor-line ]
+                        } cleave subseq
+                        gadget [ remove-preedit-text ] [ remove-preedit-info ] bi
+                        gadget user-input* drop
+                    ] when
+                    f gadget preedit-selection-mode?<<
+                ] when
+            ] when
+        ] ;
+    
+    METHOD: id validAttributesForMarkedText [             
+            NSArray "NSMarkedClauseSegment" <NSString> -> arrayWithObject:
+        ] ;
 
-    METHOD: NSRange selectedRange [ 0 0 <NSRange> ] ;
-
-    METHOD: void setMarkedText: id text selectedRange: NSRange range [ ] ;
-
-    METHOD: void unmarkText [ ] ;
-
-    METHOD: id validAttributesForMarkedText [ NSArray -> array ] ;
-
-    METHOD: id attributedSubstringFromRange: NSRange range [ f ] ;
-
+    METHOD: id attributedSubstringForProposedRange: NSRange range
+                                       actualRange: id actualRange [ f ] ;
+    
     METHOD: NSUInteger characterIndexForPoint: NSPoint point [ 0 ] ;
 
-    METHOD: NSRect firstRectForCharacterRange: NSRange range [ 0 0 0 0 <CGRect> ] ;
-
-    METHOD: NSInteger conversationIdentifier [ self alien-address ] ;
-
+    METHOD: NSRect firstRectForCharacterRange: NSRange aRange
+                                  actualRange: id actualRange [
+            aRange :> range!
+            actualRange [
+                 actualRange NSRange memory>struct range!
+             ] when
+            
+            self window :> window
+            window [
+                window world-focus preedit? [
+                    window world-focus :> gadget
+                    gadget editor-caret first gadget editor-line :> str                    
+                    str range location>> >codepoint-index :> start-pos
+                    gadget screen-loc                    
+                    gadget editor-caret first start-pos 2array gadget loc>x dup :> xl
+                    gadget caret-loc second gadget caret-dim second + 
+                    [ >fixnum ] bi@ 2array v+ { 1 -1 } v*
+                    window handle>> window>> dup -> frame -> contentRectForFrameRect:
+                    CGRect-top-left 2array v+
+                    first2 0 gadget line-height >fixnum
+                ] [ 0 0 0 0 ] if
+            ] [ 0 0 0 0 ] if    
+            <CGRect>
+        ] ;
+        
     ! Initialization
     METHOD: void updateFactorGadgetSize: id notification
     [
