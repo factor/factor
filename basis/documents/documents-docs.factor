@@ -59,6 +59,12 @@ HELP: set-doc-range
 { $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." }
 { $side-effects "document" } ;
 
+HELP: set-doc-range*
+{ $values { "string" string } { "from" "a pair of integers" } { "to" "a pair of integers" } { "document" document } }
+{ $description "Replaces all text between two line/column number pairs with " { $snippet "string" } ". The string may use either " { $snippet "\\n" } ", " { $snippet "\\r\\n" } " or " { $snippet "\\r" } " line separators.\n\nThis word differs from " { $link set-doc-range } " in that it does not include changes in the Undo and Redo actions." }
+{ $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." }
+{ $side-effects "document" } ;
+
 HELP: remove-doc-range
 { $values { "from" "a pair of integers" } { "to" "a pair of integers" } { "document" document } }
 { $description "Removes all text between two line/column number pairs." }
