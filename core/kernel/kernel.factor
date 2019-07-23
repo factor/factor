@@ -123,7 +123,7 @@ DEFER: if
 
 : rotd ( w x y z -- x y w z ) [ rot ] dip ; inline
 
-: -rotd ( w x y z -- w z x y ) [ -rot ] dip ; inline
+: -rotd ( w x y z -- y w x z ) [ -rot ] dip ; inline
 
 : roll ( w x y z -- x y z w ) rotd swap ; inline
 
