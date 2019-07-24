@@ -449,8 +449,7 @@ M: f ($instance) ($link) ;
     "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description ;
 
 : $complex-shuffle ( element -- )
-    drop
-    "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description
+    $shuffle
     { "The data flow represented by this shuffle word can be more clearly expressed using " { $link "locals" } "." } $deprecated ;
 
 : $low-level-note ( children -- )
