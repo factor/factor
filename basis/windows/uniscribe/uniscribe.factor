@@ -150,5 +150,5 @@ SYMBOL: cached-script-strings
         ] with-memory-dc
     ] unless image>> ;
 
-[ <cache-assoc> &dispose cached-script-strings set-global ]
+[ <cache-assoc> cached-script-strings set-global ]
 "windows.uniscribe" add-startup-hook
