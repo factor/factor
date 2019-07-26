@@ -193,7 +193,7 @@ IMPORT: NSAttributedString
 
 :: >codepoint-index ( str utf16-index -- codepoint-index )
     0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
-
+    
 :: >utf16-index ( str codepoint-index -- utf16-index )
     0 codepoint-index str subseq utf16n encode length 2 / >integer ;
 
@@ -237,24 +237,42 @@ IMPORT: NSAttributedString
         underlines first first 2 2array 1array  ! thickness: 2
     ] [ underlines ] if ;
 
-:: update-marked-text ( gadget str range -- )
+:: update-marked-text ( gadget str selectedRange replacementRange -- )
+    replacementRange location>>  NSNotFound = not     ! [ 
+    replacementRange length>> NSNotFound = not and [  ! erase this line
+        gadget editor-caret first
+        dup gadget editor-line
+        [ 
+            replacementRange length>> ! location>>
+            >codepoint-index
+            2array gadget set-caret
+        ] [
+            replacementRange length>> 1 + ! [ location>> ] [ length>> ] bi +
+            >codepoint-index
+            2array gadget set-mark
+        ] 2bi
+        gadget earlier-caret/mark dup
+        gadget preedit-start<<
+        0 1 2array v+ gadget preedit-end<<
+    ] when
+
     gadget preedit? [
         gadget remove-preedit-text
     ] when
+    
     gadget earlier-caret/mark dup
     gadget preedit-start<<
     0 str length 2array v+ gadget preedit-end<<
     str gadget temp-im-input drop
     gadget preedit-start>>
-    0 str range location>> >codepoint-index
-    2array v+
+    0 str selectedRange location>> >codepoint-index 2array v+
     dup gadget preedit-selected-start<<
     0
-    range location>> dup range length>> + [ 2 * ] bi@
-    str utf16n encode subseq utf16n decode length
+    selectedRange [ location>> ] [ length>> ] bi + selectedRange location>>
+    [ str swap >codepoint-index ] bi@ -
     2array v+
     dup gadget preedit-selected-end<<
-    dup gadget set-caret gadget set-mark                    
+    dup gadget set-caret gadget set-mark          
     gadget preedit-start>> gadget preedit-end>> = [
         gadget remove-preedit-info 
     ] when ;
@@ -445,23 +463,39 @@ PRIVATE>
                     text -> string CF>string str!               
                 ] if
                 window world-focus :> gadget
-                gadget support-input-methods? [
-                    gadget preedit? [
-                        gadget [ remove-preedit-text ] [ remove-preedit-info ] bi
-                    ] when
-                    str gadget user-input* drop                    
-                    f gadget preedit-selection-mode?<<
-                ] [ 
-                    str window user-input
-                ] if
+                gadget [
+                    gadget support-input-methods? [                        
+                        replacementRange location>> NSNotFound = [                        
+                            gadget editor-caret first
+                            dup gadget editor-line
+                            [ 
+                                replacementRange location>> >codepoint-index
+                                2array gadget set-caret
+                            ] [
+                                replacementRange [ location>> ] [ length>> ] bi + 
+                                >codepoint-index
+                                2array gadget set-mark
+                            ] 2bi                        
+                        ] unless
+                        gadget preedit? [
+                            gadget [ remove-preedit-text ] [ remove-preedit-info ] bi
+                        ] when
+                        str gadget user-input* drop                    
+                        f gadget preedit-selection-mode?<<
+                    ] [ 
+                        str window user-input
+                    ] if
+                ] when
             ] when
         ] ;
-    
+
     METHOD: char hasMarkedText [
             self window :> window
             window [
                 window world-focus :> gadget
-                gadget preedit? [ 1 ] [ 0 ] if
+                gadget [
+                    gadget preedit? [ 1 ] [ 0 ] if
+                ] [ 0 ] if
             ] [ 0 ] if
         ] ;
 
@@ -469,14 +503,18 @@ PRIVATE>
             self window :> window
             window [
                 window world-focus :> gadget
-                gadget preedit? [
-                    gadget [ preedit-start>> second ] [ preedit-end>> second ] bi >= [ 
-                        NSNotFound 0 
-                    ] [
-                        gadget preedit-start>> first gadget editor-line :> str
-                        str gadget preedit-start>> second >utf16-index dup  ! location
-                        str gadget preedit-end>> second >utf16-index swap - ! length
-                    ] if
+                gadget [
+                    gadget preedit? [
+                        gadget [ preedit-start>> second ] [ preedit-end>> second ] bi >= [ 
+                            NSNotFound 0 
+                        ] [
+                            gadget preedit-start>> first gadget editor-line :> str
+                            gadget
+                            [ preedit-start>> second ]                 ! location
+                            [ preedit-end>> second ]
+                            bi [ str swap >utf16-index ] bi@ over -    ! length
+                        ] if
+                    ] [  NSNotFound 0 ] if
                 ] [  NSNotFound 0 ] if
             ] [ NSNotFound 0 ] if
             <NSRange>
@@ -486,39 +524,48 @@ PRIVATE>
             self window :> window
             window [
                 window world-focus :> gadget
-                gadget support-input-methods? [
-                    gadget preedit? [
-                        gadget preedit-start>> first gadget editor-line :> str
-                        str
-                        gadget
-                        [ preedit-selected-start>> second ]
-                        [ preedit-start>> second ] bi - >utf16-index              ! location
-                        str gadget preedit-selected-end>> second >utf16-index
-                        str gadget preedit-selected-start>> second >utf16-index - ! length
-                    ] [ gadget earlier-caret/mark second 0 ] if
+                gadget [
+                    gadget support-input-methods? [
+                        gadget editor-caret first gadget editor-line :> str
+                        gadget preedit? [
+                            str
+                            gadget
+                            [ preedit-selected-start>> second ]
+                            [ preedit-start>> second ] 
+                            bi - >utf16-index                        ! location
+                            gadget
+                            [ preedit-selected-end>> second ]
+                            [ preedit-selected-start>> second ]
+                            bi [ str swap >utf16-index ] bi@ -       ! length
+                        ] [                            
+                            str gadget editor-caret second >utf16-index 0
+                        ] if
+                    ] [ 0 0 ] if
                 ] [ 0 0 ] if
             ] [ 0 0 ] if 
             <NSRange>
         ] ;
-    
+   
     METHOD: void setMarkedText: id text selectedRange: NSRange selectedRange
                                      replacementRange: NSRange replacementRange [           
             self window :> window
-            { } clone :> underlines!
             window [
                 window world-focus :> gadget
-                "" clone :> str!
-                text NSString -> class -> isKindOfClass: 0 = not [
-                    text CF>string str!               
-                ] [
-                    text -> string CF>string str!               
+                gadget [
+                    { } clone :> underlines!
+                    "" clone :> str!
+                    text NSString -> class -> isKindOfClass: 0 = not [
+                        text CF>string str!               
+                    ] [
+                        text -> string CF>string str!               
+                        gadget support-input-methods? [
+                            gadget text selectedRange make-preedit-underlines underlines!
+                        ] when
+                    ] if
                     gadget support-input-methods? [
-                        gadget text selectedRange make-preedit-underlines underlines!
+                        gadget str selectedRange replacementRange update-marked-text
+                        underlines gadget preedit-underlines<<
                     ] when
-                ] if
-                gadget support-input-methods? [
-                    gadget str selectedRange update-marked-text                   
-                    underlines gadget preedit-underlines<<
                 ] when
             ] when            
         ] ;
@@ -527,17 +574,19 @@ PRIVATE>
             self window :> window
             window [
                 window world-focus :> gadget
-                gadget support-input-methods? [
-                    gadget preedit? [
-                        gadget {
-                            [ preedit-start>> second ]
-                            [ preedit-end>> second ]
-                            [ preedit-start>> first ] [ editor-line ]
-                        } cleave subseq
-                        gadget [ remove-preedit-text ] [ remove-preedit-info ] bi
-                        gadget user-input* drop
+                gadget [
+                    gadget support-input-methods? [
+                        gadget preedit? [
+                            gadget {
+                                [ preedit-start>> second ]
+                                [ preedit-end>> second ]
+                                [ preedit-start>> first ] [ editor-line ]
+                            } cleave subseq
+                            gadget [ remove-preedit-text ] [ remove-preedit-info ] bi
+                            gadget user-input* drop
+                        ] when
+                        f gadget preedit-selection-mode?<<
                     ] when
-                    f gadget preedit-selection-mode?<<
                 ] when
             ] when
         ] ;
@@ -546,36 +595,34 @@ PRIVATE>
             NSArray "NSMarkedClauseSegment" <NSString> -> arrayWithObject:
         ] ;
 
-    METHOD: id attributedSubstringForProposedRange: NSRange range
+    METHOD: id attributedSubstringForProposedRange: NSRange aRange
                                        actualRange: id actualRange [ f ] ;
     
     METHOD: NSUInteger characterIndexForPoint: NSPoint point [ 0 ] ;
 
     METHOD: NSRect firstRectForCharacterRange: NSRange aRange
-                                  actualRange: id actualRange [
-            aRange :> range!
-            actualRange [
-                 actualRange NSRange memory>struct range!
-             ] when
-            
+                                  actualRange: NSRange actualRange [
             self window :> window
             window [
-                window world-focus preedit? [
-                    window world-focus :> gadget
-                    gadget editor-caret first gadget editor-line :> str                    
-                    str range location>> >codepoint-index :> start-pos
-                    gadget screen-loc                    
-                    gadget editor-caret first start-pos 2array gadget loc>x dup :> xl
-                    gadget caret-loc second gadget caret-dim second + 
-                    [ >fixnum ] bi@ 2array v+ { 1 -1 } v*
-                    window handle>> window>> dup -> frame -> contentRectForFrameRect:
-                    CGRect-top-left 2array v+
-                    first2 0 gadget line-height >fixnum
+                window world-focus :> gadget
+                gadget [
+                    gadget support-input-methods? [
+                        gadget editor-caret first gadget editor-line :> str                
+                        str aRange location>> >codepoint-index :> start-pos
+                        gadget editor-caret first start-pos 2array gadget loc>x
+                        gadget caret-loc second gadget caret-dim second + 
+                        2array                     ! character pos
+                        gadget screen-loc v+       ! + gadget pos 
+                        { 1 -1 } v*
+                        window handle>> window>> dup -> frame -> contentRectForFrameRect:
+                        CGRect-top-left 2array v+  ! + window pos
+                        first2 [ >fixnum ] bi@ 0 gadget line-height >fixnum
+                    ] [ 0 0 0 0 ] if
                 ] [ 0 0 0 0 ] if
-            ] [ 0 0 0 0 ] if    
+            ] [ 0 0 0 0 ] if
             <CGRect>
         ] ;
-        
+
     ! Initialization
     METHOD: void updateFactorGadgetSize: id notification
     [
