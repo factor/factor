@@ -5,7 +5,8 @@ assocs cache colors combinators core-foundation
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
 fonts init kernel locals make math math.functions math.order
-math.vectors memoize namespaces sequences strings ;
+math.vectors memoize namespaces sequences strings
+io.encodings.utf16n io.encodings.string ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
@@ -62,7 +63,7 @@ render-loc render-dim ;
     {
         [ >>width ]
         [ >>ascent ]
-        [ >>descent ]
+        [ dup 0 < [ -1 * ] when >>descent ]
         [ >>leading ]
     } spread ; inline
 
@@ -88,7 +89,9 @@ render-loc render-dim ;
     bi-curry* bi ;
 
 : selection-rect ( dim line selection -- rect )
-    [ start>> ] [ end>> ] bi
+    [let [ start>> ] [ end>> ] [ string>> ] tri :> ( start end string )
+     start end [ 0 swap string subseq utf16n encode length 2 / >integer ] bi@
+    ]
     [ f CTLineGetOffsetForStringIndex round ] bi-curry@ bi
     [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;
 
