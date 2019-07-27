@@ -63,7 +63,7 @@ render-loc render-dim ;
     {
         [ >>width ]
         [ >>ascent ]
-        [ dup 0 < [ -1 * ] when >>descent ]
+        [ >>descent ]
         [ >>leading ]
     } spread ; inline
 
