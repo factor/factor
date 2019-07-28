@@ -32,14 +32,7 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
 
 "vocab:unicode/UCA/allkeys.txt" parse-ducet ducet set-global
 
-! Fix up table for long contractions
-: help-one ( assoc key -- )
-    ! Need to be more general? Not for DUCET, apparently
-    2 head 2dup swap key? [ 2drop ] [
-        [ [ 1string of ] with { } map-as concat ]
-        [ swap set-at ] 2bi
-    ] if ;
-
+! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
 : fixup-ducet ( -- )
     {
         {
@@ -195,7 +188,8 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
         }
     } ducet get-global '[ swap >string _ set-at ] assoc-each ;
 
-! Add a few missing ducet values
+! Add a few missing ducet values for Tibetan
+! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
 fixup-ducet
 
 : tangut-block? ( char -- ? )
@@ -248,6 +242,7 @@ fixup-ducet
 : building-last ( -- char )
     building get [ 0 ] [ last last ] if-empty ;
 
+! https://www.unicode.org/reports/tr10/tr10-41.html#Collation_Graphemes
 : blocked? ( char -- ? )
     combining-class dup { 0 f } member?
     [ drop building-last non-starter? ]
