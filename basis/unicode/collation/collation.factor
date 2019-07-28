@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit combinators.smart kernel locals make
+combinators.short-circuit combinators.smart fry kernel locals make
 math math.order math.parser namespaces sequences
 simple-flat-file splitting strings unicode.data ;
 IN: unicode.collation
@@ -40,10 +40,164 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
         [ swap set-at ] 2bi
     ] if ;
 
-: insert-helpers ( assoc -- )
-    dup keys [ length 3 >= ] filter [ help-one ] with each ;
+: fixup-ducet ( -- )
+    {
+        {
+            { 0x0FB2 0x0F71 } ! CE(0FB2) CE(0F71)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F71 } ! CE(0FB3) CE(0F71)
+            {
+                T{ weight-levels
+                    { primary 12720 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
 
-ducet get-global insert-helpers
+        ! FIXME: WRONG WEIGHTS
+        {
+            { 0x0FB2 0x0F71 0x0F72 } ! CE(0FB2) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB2 0x0F73        } ! CE(0FB2) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB2 0x0F71 0x0F74 } ! CE(0FB2) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB2 0x0F75        } ! CE(0FB2) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F71 0x0F72 } ! CE(0FB3) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F73        } ! CE(0FB3) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F71 0x0F74 } ! CE(0FB3) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F75        } ! CE(0FB3) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+    } ducet get-global '[ swap >string _ set-at ] assoc-each ;
+
+! Add a few missing ducet values
+fixup-ducet
 
 : tangut-block? ( char -- ? )
     ! Tangut Block, Tangut Components Block
@@ -73,22 +227,12 @@ ducet get-global insert-helpers
 : BBBB ( char -- weight-levels )
     0x7FFF bitand 0x8000 bitor 0 0 <weight-levels> ; inline
 
-: illegal? ( char -- ? )
-    {
-        [ "Noncharacter_Code_Point" property? ]
-        [ category "Cs" = ]
-    } 1|| ;
-
 : derive-weight ( 1string -- weight-levels-pair )
     first
     dup tangut-block? [
         [ tangut-AAAA ] [ tangut-BBBB ] bi 2array
     ] [
-        dup illegal? [
-            drop { }
-        ] [
-            [ AAAA ] [ BBBB ] bi 2array
-        ] if
+        [ AAAA ] [ BBBB ] bi 2array
     ] if ;
 
 : building-last ( -- char )
