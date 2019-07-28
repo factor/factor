@@ -61,7 +61,7 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
             { 0x0FB3 0x0F71 } ! CE(0FB3) CE(0F71)
             {
                 T{ weight-levels
-                    { primary 12720 }
+                    { primary 12722 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
@@ -73,7 +73,6 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
             }
         }
 
-        ! FIXME: WRONG WEIGHTS
         {
             { 0x0FB2 0x0F71 0x0F72 } ! CE(0FB2) CE(0F71 0F72)
             {
@@ -83,7 +82,7 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
                     { tertiary 2 }
                 }
                 T{ weight-levels
-                    { primary 12741 }
+                    { primary 12743 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
@@ -98,7 +97,7 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
                     { tertiary 2 }
                 }
                 T{ weight-levels
-                    { primary 12741 }
+                    { primary 12743 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
@@ -113,7 +112,7 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
                     { tertiary 2 }
                 }
                 T{ weight-levels
-                    { primary 12741 }
+                    { primary 12747 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
@@ -128,7 +127,7 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
                     { tertiary 2 }
                 }
                 T{ weight-levels
-                    { primary 12741 }
+                    { primary 12747 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
@@ -138,12 +137,12 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
             { 0x0FB3 0x0F71 0x0F72 } ! CE(0FB3) CE(0F71 0F72)
             {
                 T{ weight-levels
-                    { primary 12719 }
+                    { primary 12722 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
                 T{ weight-levels
-                    { primary 12741 }
+                    { primary 12743 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
@@ -153,12 +152,12 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
             { 0x0FB3 0x0F73        } ! CE(0FB3) CE(0F71 0F72)
             {
                 T{ weight-levels
-                    { primary 12719 }
+                    { primary 12722 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
                 T{ weight-levels
-                    { primary 12741 }
+                    { primary 12743 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
@@ -168,12 +167,12 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
             { 0x0FB3 0x0F71 0x0F74 } ! CE(0FB3) CE(0F71 0F74)
             {
                 T{ weight-levels
-                    { primary 12719 }
+                    { primary 12722 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
                 T{ weight-levels
-                    { primary 12741 }
+                    { primary 12747 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
@@ -183,12 +182,12 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
             { 0x0FB3 0x0F75        } ! CE(0FB3) CE(0F71 0F74)
             {
                 T{ weight-levels
-                    { primary 12719 }
+                    { primary 12722 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
                 T{ weight-levels
-                    { primary 12741 }
+                    { primary 12747 }
                     { secondary 32 }
                     { tertiary 2 }
                 }
