@@ -72,128 +72,6 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
                 }
             }
         }
-
-        ! FIXME: WRONG WEIGHTS
-        {
-            { 0x0FB2 0x0F71 0x0F72 } ! CE(0FB2) CE(0F71 0F72)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB2 0x0F73        } ! CE(0FB2) CE(0F71 0F72)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB2 0x0F71 0x0F74 } ! CE(0FB2) CE(0F71 0F74)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB2 0x0F75        } ! CE(0FB2) CE(0F71 0F74)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB3 0x0F71 0x0F72 } ! CE(0FB3) CE(0F71 0F72)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB3 0x0F73        } ! CE(0FB3) CE(0F71 0F72)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB3 0x0F71 0x0F74 } ! CE(0FB3) CE(0F71 0F74)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB3 0x0F75        } ! CE(0FB3) CE(0F71 0F74)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
     } ducet get-global '[ swap >string _ set-at ] assoc-each ;
 
 ! Add a few missing ducet values
@@ -202,6 +80,9 @@ fixup-ducet
 : tangut-block? ( char -- ? )
     ! Tangut Block, Tangut Components Block
     { [ 0x17000 0x187FF between? ] [ 0x18800 0x18AFF between? ] } 1|| ; inline
+
+: nushu-block? ( char -- ? )
+    0x1b170 0x1B2FB between? ; inline
 
 ! https://wiki.computercraft.cc/Module:Unicode_data
 ! Unicode TR10 - Computing Implicit Weights
@@ -213,7 +94,7 @@ fixup-ducet
         { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
         { [ dup 0x2B820 0x2CEA1 between? ] [ drop 0xFB80 ] } ! Extension E
         { [ dup 0x2CEB0 0x2EBE0 between? ] [ drop 0xFB80 ] } ! Extension F
-        { [ dup 0x04E00 0x09FD5 between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x04E00 0x09FEF between? ] [ drop 0xFB40 ] } ! CJK
         [ drop 0xFBC0 ] ! Other
     } cond ;
 
@@ -223,6 +104,12 @@ fixup-ducet
 : tangut-BBBB ( char -- weight-levels )
     0x17000 - 0x8000 bitor 0 0 <weight-levels> ; inline
 
+: nushu-AAAA ( char -- weight-levels )
+    drop 0xfb01 0x0020 0x0002 <weight-levels> ; inline
+
+: nushu-BBBB ( char -- weight-levels )
+    0x1B170 - 0x8000 bitor 0 0 <weight-levels> ; inline
+
 : AAAA ( char -- weight-levels )
     [ base ] [ -15 shift ] bi + 0x0020 0x0002 <weight-levels> ; inline
 
@@ -231,11 +118,11 @@ fixup-ducet
 
 : derive-weight ( 1string -- weight-levels-pair )
     first
-    dup tangut-block? [
-        [ tangut-AAAA ] [ tangut-BBBB ] bi 2array
-    ] [
-        [ AAAA ] [ BBBB ] bi 2array
-    ] if ;
+    {
+        { [ dup tangut-block? ] [ [ tangut-AAAA ] [ tangut-BBBB ] bi 2array ] }
+        { [ dup nushu-block? ] [ [ nushu-AAAA ] [ nushu-BBBB ] bi 2array ] }
+        [ [ AAAA ] [ BBBB ] bi 2array ]
+    } cond ;
 
 : building-last ( -- char )
     building get [ 0 ] [ last last ] if-empty ;
