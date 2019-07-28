@@ -53,7 +53,7 @@ CONSTANT: categories {
 MEMO: categories-map ( -- hashtable )
     categories H{ } zip-index-as ;
 
-CONSTANT: num-chars 0x2FA1E
+CONSTANT: NUM-CHARS 0x2FA1E
 
 PRIVATE>
 
@@ -76,7 +76,7 @@ PRIVATE>
 
 ! Loading data from UnicodeData.txt
 
-: load-data ( -- data )
+: load-unicode-data ( -- data )
     "vocab:unicode/UCD/UnicodeData.txt" load-data-file ;
 
 : (process-data) ( index data -- newdata )
@@ -146,7 +146,7 @@ PRIVATE>
     ] assoc-each table ;
 
 :: process-category ( data -- category-listing )
-    num-chars <byte-array> :> table
+    NUM-CHARS <byte-array> :> table
     2 data (process-data) [| char cat |
         cat categories-map at char table ?set-nth
     ] assoc-each table fill-ranges ;
@@ -194,7 +194,7 @@ C: <code-point> code-point
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make ;
 
-load-data {
+load-unicode-data {
     [ process-names name-map swap assoc-union! drop ]
     [ 13 swap process-data simple-lower swap assoc-union! drop ]
     [ 12 swap process-data simple-upper swap assoc-union! drop ]
