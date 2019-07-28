@@ -1,6 +1,6 @@
-USING: arrays assocs fry grouping io io.encodings.utf8 io.files
-io.streams.null kernel math math.order math.parser multiline
-random sequences splitting strings tools.test unicode words ;
+USING: arrays assocs fry grouping io.encodings.utf8 io.files
+kernel math math.order math.parser sequences splitting
+strings tools.test unicode ;
 IN: unicode.collation.tests
 
 : test-equality ( str1 str2 -- ? ? ? ? )
@@ -16,11 +16,13 @@ IN: unicode.collation.tests
 { { "good bye" "goodbye" "hello" "HELLO" } }
 [ { "HELLO" "goodbye" "good bye" "hello" } sort-strings ] unit-test
 
-: parse-collation-test-shifted ( -- lines )
+: collation-test-lines ( -- lines )
     "vocab:unicode/UCA/CollationTest/CollationTest_SHIFTED.txt" utf8 file-lines
-    [ "#@" split first ] map harvest
-    [ ";" split first ] map
-    [ " " split [ hex> ] "" map-as ] map ;
+    [ "#" head? ] reject harvest ;
+
+: parse-collation-test-shifted ( -- lines )
+    collation-test-lines
+    [ ";" split first " " split [ hex> ] "" map-as ] map ;
 
 : tail-from-last ( string char -- string' )
     '[ _ = ] dupd find-last drop 1 + tail ; inline
@@ -36,16 +38,14 @@ IN: unicode.collation.tests
     ] bi* 2array ;
 
 : parse-collation-test-weights ( -- weights )
-    "vocab:unicode/UCA/CollationTest/CollationTest_SHIFTED.txt" utf8 file-lines
-    [ "#" head? ] reject harvest
+    collation-test-lines
     [ line>test-weights ] map ;
 
 : calculate-collation ( chars collation -- collation-calculated collation-answer )
     [ >string collation-key/nfd drop ] [ { 0 } join ] bi* ;
 
 : find-bad-collations ( pairs -- seq )
-    [ first2 dupd calculate-collation 3array ] map
-    [ first3 sequence= nip ] reject ;
+    [ first2 calculate-collation sequence= ] reject ;
 
 { { } }
 [ parse-collation-test-weights find-bad-collations ] unit-test
@@ -69,7 +69,7 @@ IN: unicode.collation.tests
 [ { 4018 820 3953 3968 } >string collation-key/nfd drop ] unit-test
 
 { { 12748 12741 0 32 74 32 0 2 2 2 0 65535 65535 65535 } }
-[ { 4018 820 3968 3953 } >string collation-key/nfd drop ] unit-test
+[ { 0x0FB2 0x0334 0x0F80 0x0F71 } >string collation-key/nfd drop ] unit-test
 
 { { 12748 12741 0 32 74 32 0 2 2 2 0 65535 65535 65535 } }
 [ { 4018 820 3969 } >string collation-key/nfd drop ] unit-test
