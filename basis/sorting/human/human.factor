@@ -32,7 +32,7 @@ TUPLE: alphanum obj ;
 
 : <alphanum-insensitive> ( obj -- alphanum )
     alphanum new
-        swap dup string? [ w/collation-key ] when >>obj ; inline
+        swap dup string? [ collation-key/nfd drop ] when >>obj ; inline
 
 M: alphanum <=>
     [ obj>> ] bi@
