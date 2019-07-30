@@ -15,6 +15,8 @@ ui.backend.cocoa.input-methods.editors io.encodings.utf16n
 io.encodings.string classes.struct ;
 IN: ui.backend.cocoa.views
 
+SLOT: window
+
 : send-mouse-moved ( view event -- )
     [ mouse-location ] [ drop window ] 2bi
     [ move-hand fire-motion yield ] [ drop ] if* ;
