@@ -1,7 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache kernel math math.vectors sequences
-fonts namespaces ui.text ui.text.private windows.uniscribe ;
+USING: accessors cache kernel math math.vectors namespaces
+sequences ui.text ui.text.private windows.uniscribe
+windows.uniscribe.private ;
 IN: ui.text.uniscribe
 
 SINGLETON: uniscribe-renderer
