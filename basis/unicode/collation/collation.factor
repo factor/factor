@@ -33,7 +33,15 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
 "vocab:unicode/UCA/allkeys.txt" parse-ducet ducet set-global
 
 ! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
-: fixup-ducet ( -- )
+! WF5 - Well-formedness 5 condition:
+! https://www.unicode.org/reports/tr10/tr10-41.html#WF5
+!    { "0CC6" "0CC2" "0CD5" } ! 0CD5 is not a non-starter, don't add 2-gram "0CC6" "0CC2"to ducet
+!    { "0DD9" "0DCF" "0DCA" } ! already in allkeys.txt file
+!    { "0FB2" "0F71" "0F80" } ! added below
+!    { "0FB3" "0F71" "0F80" } ! added below
+! This breaks the unicode tests that ship in CollationTest_SHIFTED.txt
+! but it's supposedly more correct.
+: fixup-ducet-for-tibetan ( -- )
     {
         {
             { 0x0FB2 0x0F71 } ! CE(0FB2) CE(0F71)
@@ -188,9 +196,11 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
         }
     } ducet get-global '[ swap >string _ set-at ] assoc-each ;
 
-! Add a few missing ducet values for Tibetan
+! These values actually break the collation unit tests in CollationTest_SHIFTED.txt
+! So we disable those tests in favor of supposedly better collation for Tibetan.
 ! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
-fixup-ducet
+
+fixup-ducet-for-tibetan
 
 : tangut-block? ( char -- ? )
     ! Tangut Block, Tangut Components Block
