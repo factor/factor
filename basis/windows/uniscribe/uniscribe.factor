@@ -16,36 +16,37 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
 
 CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 
+:: >codepoint-index ( str utf16-index -- codepoint-index )
+    0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
+    
+:: >utf16-index ( str codepoint-index -- utf16-index )
+    0 codepoint-index str subseq utf16n encode length 2 / >integer ;
+
+PRIVATE>
+
 :: line-offset>x ( n script-string -- x )
-    n script-string
-    2dup string>> length = [
-        ssa>> ! ssa
-        ! swap 1 - ! icp
-        swap 0 swap script-string string>> subseq
-        utf16n encode length 2 / >integer 1 - ! icp
+    script-string string>> n >utf16-index :> n-utf16
+    script-string ssa>> ! ssa
+    n script-string string>> length = [
+        n-utf16 1 - ! icp
         TRUE ! fTrailing
     ] [
-        ssa>>
-        ! swap ! icp
-        swap 0 swap script-string string>> subseq
-        utf16n encode length 2 / >integer ! icp
+        n-utf16 ! icp
         FALSE ! fTrailing
     ] if
     { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters ;
 
 :: x>line-offset ( x script-string -- n trailing )
-    x script-string
-    ssa>> ! ssa
-    swap ! iX
+    script-string ssa>> ! ssa
+    x ! iX
     { int int } [ ScriptStringXtoCP check-ole32-error ] with-out-parameters
-    swap 2 * 0 swap script-string string>> utf16n encode subseq
-    utf16n decode length
+    swap dup 0 < [ script-string string>> swap >codepoint-index ] unless
     swap ;
+
+<PRIVATE
 
 : make-ssa ( dc script-string -- ssa )
     dup selection? [ string>> ] when
-    !    [ utf16n encode ] ! pString
-    !    [ length ] bi ! cString
     utf16n encode ! pString
     dup length 2 / >integer ! cString
     dup 1.5 * 16 + >integer ! cGlyphs -- MSDN says this is "recommended size"
@@ -84,7 +85,14 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
         ETO_OPAQUE ! uOptions
     ]
     [ [ { 0 0 } ] dip <RECT> ]
-    [ selection-start/end ] tri*
+    [
+        [let :> str str selection-start/end
+         [
+             str string>> dup selection? [ string>> ] when
+             swap >utf16-index
+         ] bi@
+        ]
+    ] tri*
     ! iMinSel
     ! iMaxSel
     FALSE ! fDisabled
@@ -161,5 +169,5 @@ SYMBOL: cached-script-strings
         ] with-memory-dc
     ] unless image>> ;
 
-[ <cache-assoc> cached-script-strings set-global ]
+[ <cache-assoc> &dispose cached-script-strings set-global ]
 "windows.uniscribe" add-startup-hook
