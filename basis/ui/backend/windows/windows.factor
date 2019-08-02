@@ -361,7 +361,7 @@ SYMBOL: upper-surrogate-wm-char
                 { [ dup under-surrogate? ] [
                       drop
                       upper-surrogate-wm-char get-global [
-                          1string wParam 1string 2array "" join
+                          wParam "" 2sequence
                           utf16n encode utf16n decode hWnd window user-input
                       ] when* ]
                 }
