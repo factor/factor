@@ -217,6 +217,10 @@ PRIVATE>
 : string<=> ( str1 str2 -- <=> )
     [ collation-key/nfd 2array ] compare ;
 
+: upper-surrogate? ( ch -- ? ) 0xD800 0xDBFF between? ; inline
+
+: under-surrogate? ( ch -- ? ) 0xDC00 0xDFFF between? ; inline
+
 CONSTANT: unicode-supported {
     "collation"
 }
