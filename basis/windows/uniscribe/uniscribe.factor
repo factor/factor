@@ -18,7 +18,7 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 
 :: >codepoint-index ( str utf16-index -- codepoint-index )
     0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
-    
+
 :: >utf16-index ( str codepoint-index -- utf16-index )
     0 codepoint-index str subseq utf16n encode length 2 / >integer ;
 
@@ -169,5 +169,5 @@ SYMBOL: cached-script-strings
         ] with-memory-dc
     ] unless image>> ;
 
-[ <cache-assoc> &dispose cached-script-strings set-global ]
+[ <cache-assoc> cached-script-strings set-global ]
 "windows.uniscribe" add-startup-hook
