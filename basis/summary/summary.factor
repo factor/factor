@@ -33,7 +33,7 @@ M: sequence summary
     dup length "elements" container-summary ;
 
 M: string summary
-    dup length "characters" container-summary ;
+    dup length "code points" container-summary ;
 
 ! Override sequence => integer instance
 M: f summary object-summary ;
