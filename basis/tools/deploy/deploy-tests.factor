@@ -34,7 +34,7 @@ delete-staging-images
 { } [ "sudoku" shake-and-bake 800000 small-enough? ] long-unit-test
 
 ! [ ] [ "hello-ui" shake-and-bake 1605000 small-enough? ] long-unit-test
-{ } [ "hello-ui" shake-and-bake 2242000 small-enough? ] long-unit-test
+{ } [ "hello-ui" shake-and-bake 2762000 small-enough? ] long-unit-test
 
 { "math-threads-compiler-io-ui" } [
     "hello-ui" deploy-config config>profile
