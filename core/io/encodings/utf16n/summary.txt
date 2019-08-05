@@ -1,1 +1,0 @@
-UTF16 encoding with native byte order

@@ -1,9 +1,8 @@
 ! Copyright (C) 2006, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators io io.binary
-io.encodings kernel math math.private namespaces sbufs
-sequences sequences.private splitting strings strings.private
-vectors ;
+USING: accessors alien.accessors byte-arrays io io.binary
+io.encodings kernel math math.private sequences
+sequences.private strings strings.private ;
 IN: io.encodings.utf16
 
 SINGLETON: utf16be
@@ -161,4 +160,8 @@ M: utf16 <decoder> ( stream utf16 -- decoder )
 M: utf16 <encoder> ( stream utf16 -- encoder )
     drop bom-le over stream-write utf16le <encoder> ;
 
+: le? ( -- ? ) B{ 1 0 0 0 } 0 alien-unsigned-4 1 = ; foldable
+
 PRIVATE>
+
+: utf16n ( -- value ) le? utf16le utf16be ? ;
