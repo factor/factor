@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays
 classes.struct continuations io.encodings.string
-io.encodings.utf16n kernel literals locals math sequences sets
+io.encodings.utf16 kernel literals locals math sequences sets
 splitting windows windows.advapi32 windows.errors
 windows.kernel32 windows.time windows.types ;
 IN: windows.registry

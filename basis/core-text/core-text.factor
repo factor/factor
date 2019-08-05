@@ -4,9 +4,9 @@ USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs cache colors combinators core-foundation
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
-fonts init kernel locals make math math.functions math.order
-math.vectors memoize namespaces sequences strings
-io.encodings.utf16n io.encodings.string ;
+fonts init io.encodings.string io.encodings.utf16 kernel locals
+make math math.functions math.order math.vectors memoize
+namespaces sequences strings ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
