@@ -11,7 +11,7 @@ ui.commands ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.private words sorting math.vectors
 ui.baseline-alignment ui.gadgets.line-support
 ui.gadgets.editors ui.backend.cocoa.input-methods
-ui.backend.cocoa.input-methods.editors io.encodings.utf16n
+ui.backend.cocoa.input-methods.editors io.encodings.utf16
 io.encodings.string classes.struct ;
 IN: ui.backend.cocoa.views
 
@@ -195,7 +195,7 @@ IMPORT: NSAttributedString
 
 :: >codepoint-index ( str utf16-index -- codepoint-index )
     0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
-    
+
 :: >utf16-index ( str codepoint-index -- utf16-index )
     0 codepoint-index str subseq utf16n encode length 2 / >integer ;
 

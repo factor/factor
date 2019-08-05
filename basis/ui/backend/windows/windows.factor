@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data alien.strings arrays ascii assocs
 calendar classes classes.struct colors combinators continuations fry
-io io.crlf io.encodings.utf16n kernel libc literals locals make math
+io io.crlf io.encodings.utf16 kernel libc literals locals make math
 math.bitwise namespaces sequences sets specialized-arrays strings
 threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
