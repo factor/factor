@@ -160,8 +160,7 @@ M: utf16 <decoder> ( stream utf16 -- decoder )
 M: utf16 <encoder> ( stream utf16 -- encoder )
     drop bom-le over stream-write utf16le <encoder> ;
 
-: le? ( -- ? ) B{ 1 0 0 0 } 0 alien-unsigned-4 1 = ; foldable
-
 PRIVATE>
 
-: utf16n ( -- value ) le? utf16le utf16be ? ;
+: utf16n ( -- value )
+    B{ 1 0 0 0 } 0 alien-unsigned-4 1 = utf16le utf16be ? ; foldable
