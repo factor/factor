@@ -14,7 +14,6 @@ M: unix-random dispose reader>> dispose ;
 
 M: unix-random random-bytes* ( n tuple -- byte-array )
     reader>> stream-read ;
-
 HINTS: M\ unix-random random-bytes* { fixnum unix-random } ;
 
 [

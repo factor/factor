@@ -9,7 +9,6 @@ ARTICLE: "io.encodings.utf16" "UTF-16 encoding"
     utf16
     utf16le
     utf16be
-    utf16n
 } ;
 
 ABOUT: "io.encodings.utf16"
@@ -26,8 +25,4 @@ HELP: utf16
 { $class-description "The encoding descriptor for UTF-16, that is, UTF-16 with a byte order mark. This is the most useful for general input and output in UTF-16. Streams can be made which read or write wth this encoding." }
 { $see-also "encodings-introduction" } ;
 
-HELP: utf16n
-{ $description "The encoding descriptor for UTF-16 without a byte order mark in native endian order. This is useful mostly for FFI calls which take input of strings of the type " { $snippet "wchar_t*" } "." }
-{ $see-also "encodings-introduction" } ;
-
-{ utf16 utf16le utf16be utf16n } related-words
+{ utf16 utf16le utf16be } related-words
