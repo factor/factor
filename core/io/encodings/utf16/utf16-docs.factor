@@ -27,6 +27,7 @@ HELP: utf16
 { $see-also "encodings-introduction" } ;
 
 HELP: utf16n
+{ $values { "value" { $or utf16le utf16be } } }
 { $description "The encoding descriptor for UTF-16 without a byte order mark in native endian order. This is useful mostly for FFI calls which take input of strings of the type " { $snippet "wchar_t*" } "." }
 { $see-also "encodings-introduction" } ;
 
