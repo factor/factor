@@ -1426,8 +1426,9 @@ FUNCTION: DWORD GetLastError ( )
 ! FUNCTION: GetLocaleInfoW
 ! FUNCTION: GetLocalTime
 FUNCTION: DWORD GetLogicalDrives ( )
-! FUNCTION: GetLogicalDriveStringsA
-! FUNCTION: GetLogicalDriveStringsW
+FUNCTION: DWORD GetLogicalDriveStringsA ( DWORD dwBufferLength, LPWSTR lpBuffer )
+FUNCTION: DWORD GetLogicalDriveStringsW ( DWORD dwBufferLength, LPSTR lpBuffer )
+ALIAS: GetLogicalDriveStrings GetLogicalDriveStringsW
 ! FUNCTION: GetLongPathNameA
 ! FUNCTION: GetLongPathNameW
 ! FUNCTION: GetMailslotInfo
