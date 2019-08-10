@@ -15,8 +15,6 @@ ui.backend.cocoa.input-methods.editors io.encodings.utf16n
 io.encodings.string classes.struct ;
 IN: ui.backend.cocoa.views
 
-SLOT: window
-
 : send-mouse-moved ( view event -- )
     [ mouse-location ] [ drop window ] 2bi
     [ move-hand fire-motion yield ] [ drop ] if* ;
@@ -364,10 +362,16 @@ PRIVATE>
 
     METHOD: char validateUserInterfaceItem: id event
     [
-        self window [
-            event -> action utf8 alien>string validate-action
-            [ >c-bool ] [ drop self event SUPER-> validateUserInterfaceItem: ] if
-        ] [ 0 ] if*
+        self window :> window
+        window [
+            window world-focus :> gadget
+            gadget [
+                gadget preedit? not [
+                    window event -> action utf8 alien>string validate-action
+                    [ >c-bool ] [ drop self event SUPER-> validateUserInterfaceItem: ] if
+                ] [ 0 ] if
+            ] [ 0 ] if
+        ] [ 0 ] if
     ] ;
 
     METHOD: void undo: id event [ self event undo-action send-action$ ] ;
@@ -481,9 +485,11 @@ PRIVATE>
                         ] unless
                         gadget preedit? [
                             gadget [ remove-preedit-text ] [ remove-preedit-info ] bi
-                        ] when
-                        str gadget user-input* drop                    
-                        f gadget preedit-selection-mode?<<
+                            str gadget user-input* drop
+                            f gadget preedit-selection-mode?<<
+                        ] [
+                            str window user-input                           
+                        ] if
                     ] [ 
                         str window user-input
                     ] if
@@ -625,6 +631,8 @@ PRIVATE>
             <CGRect>
         ] ;
 
+    METHOD: void doCommandBySelector: SEL selector [ ] ;
+    
     ! Initialization
     METHOD: void updateFactorGadgetSize: id notification
     [
@@ -633,8 +641,6 @@ PRIVATE>
             self view-dim window dim<< yield
         ] when
     ] ;
-
-    METHOD: void doCommandBySelector: SEL selector [ ] ;
 
     METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
     [

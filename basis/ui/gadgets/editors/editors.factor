@@ -22,7 +22,7 @@ TUPLE: editor < line-gadget
     preedit-underlines ;
 
 M: editor preedit? preedit-start>> [ t ] [ f ] if ;
-
+ 
 <PRIVATE
 
 : <loc> ( -- loc ) { 0 0 } <model> ;

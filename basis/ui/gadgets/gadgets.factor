@@ -401,6 +401,10 @@ M: f request-focus-on 2drop ;
 : focus-path ( gadget -- seq )
     [ focus>> ] follow ;
 
+GENERIC: preedit? ( gadget -- ? )
+
+M: gadget preedit? drop f ;
+
 USE: vocabs.loader
 
 { "ui.gadgets" "prettyprint" } "ui.gadgets.prettyprint" require-when
