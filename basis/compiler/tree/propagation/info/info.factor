@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays classes
 classes.algebra classes.singleton classes.tuple
+classes.intersection classes.union
 classes.tuple.private combinators combinators.short-circuit
 compiler.tree.propagation.copy compiler.utilities kernel layouts math
 math.intervals namespaces sequences sequences.private strings
@@ -103,12 +104,31 @@ UNION: fixed-length array byte-array string ;
         [ drop 1/0. ]
     } case ;
 
-: class-interval ( class -- i )
+! : maybe-declared-interval ( classoid -- int )
+!     dup word?
+!     [ "declared-interval" word-prop full-interval or ]
+!     [ drop full-interval ] if ;
+
+GENERIC: declared-class-interval ( classoid -- int/f )
+M: object declared-class-interval drop full-interval ;
+M: class declared-class-interval "declared-interval" word-prop full-interval or ;
+M: union-class declared-class-interval
+    class-members [ empty-interval ]
+    [
+        [ declared-class-interval ] [ interval-union ] map-reduce
+    ] if-empty ;
+M: intersection-class declared-class-interval
+    class-participants [ full-interval ]
+    [
+        [ declared-class-interval ] [ interval-intersect ] map-reduce
+    ] if-empty ;
+
+: class-interval ( classoid -- i )
     {
         { fixnum [ fixnum-interval ] }
         { array-capacity [ array-capacity-interval ] }
         { integer-array-capacity [ array-capacity-interval ] }
-        [ drop full-interval ]
+        [ declared-class-interval ]
     } case ;
 
 : fix-capacity-class ( class -- class' )

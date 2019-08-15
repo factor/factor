@@ -1,0 +1,1 @@
+Predicate classes with numeric interval checking

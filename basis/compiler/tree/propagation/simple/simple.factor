@@ -22,6 +22,7 @@ M: #push propagate-before
 : set-value-infos ( infos values -- )
     [ set-value-info ] 2each ;
 
+
 M: #declare propagate-before
     ! We need to force the caller word to recompile when the
     ! classes mentioned in the declaration are redefined, since
