@@ -104,22 +104,7 @@ M: +cbor-nil+ write-cbor drop 0xf6 write1 ;
 
 M: +cbor-undefined+ write-cbor drop 0xf7 write1 ;
 
-M: integer write-cbor
-    dup 0 >= [
-        {
-            { [ dup 24 < ] [ write1 ] }
-            { [ dup 0xff <= ] [ 24 write1 write1 ] }
-            { [ dup 0xffff <= ] [ 25 write1 2 >be write ] }
-            { [ dup 0xffffffff <= ] [ 26 write1 4 >be write ] }
-            { [ dup 0xffffffffffffffff <= ] [ 27 write1 8 >be write ] }
-        } cond
-    ] [
-        drop
-    ] if ;
-
-M: float write-cbor 0xfb write1 double>bits 8 >be write ;
-
-: write-length ( n type -- )
+: write-integer ( n type -- )
     5 shift {
         { [ over 24 < ] [ bitor write1 ] }
         { [ over 0xff <= ] [ 24 bitor write1 write1 ] }
@@ -128,27 +113,26 @@ M: float write-cbor 0xfb write1 double>bits 8 >be write ;
         { [ over 0xffffffffffffffff <= ] [ 27 bitor write1 8 >be write ] }
     } cond ;
 
-M: byte-array write-cbor dup length 2 write-length write ;
+M: integer write-cbor
+    dup 0 >= [ 0 write-integer ] [ neg 1 - 1 write-integer ] if ;
 
-M: string write-cbor dup length 3 write-length utf8 encode write ;
+M: float write-cbor 0xfb write1 double>bits 8 >be write ;
+
+M: byte-array write-cbor dup length 2 write-integer write ;
+
+M: string write-cbor dup length 3 write-integer utf8 encode write ;
 
 M: sequence write-cbor
-    dup length 4 write-length [ write-cbor ] each ;
+    dup length 4 write-integer [ write-cbor ] each ;
 
 M: assoc write-cbor
-    dup length 5 write-length [ [ write-cbor ] bi@ ] assoc-each ;
-
-: write-byte ( n type -- )
-    5 shift {
-        { [ over 24 < ] [ bitor write1 ] }
-        { [ over 0xff <= ] [ 24 bitor write1 write1 ] }
-    } cond ;
+    dup length 5 write-integer [ [ write-cbor ] bi@ ] assoc-each ;
 
 M: cbor-tagged write-cbor
-    dup tag>> 6 write-byte item>> write-cbor ;
+    dup tag>> 6 write-integer item>> write-cbor ;
 
 M: cbor-simple write-cbor
-    value>> 7 write-byte ;
+    value>> 7 write-integer ;
 
 PRIVATE>
 
