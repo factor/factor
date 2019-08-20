@@ -111,6 +111,11 @@ M: +cbor-undefined+ write-cbor drop 0xf7 write1 ;
         { [ over 0xffff <= ] [ 25 bitor write1 2 >be write ] }
         { [ over 0xffffffff <= ] [ 26 bitor write1 4 >be write ] }
         { [ over 0xffffffffffffffff <= ] [ 27 bitor write1 8 >be write ] }
+        [
+            -5 shift 2 + 0xc0 bitor write1
+            dup bit-length 8 /mod zero? [ 1 + ] unless
+            >be write-cbor
+        ]
     } cond ;
 
 M: integer write-cbor
