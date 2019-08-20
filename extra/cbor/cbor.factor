@@ -1,10 +1,11 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs byte-arrays combinators io
-io.binary io.encodings.binary io.encodings.string
-io.encodings.utf8 io.streams.byte-array io.streams.string kernel
-math math.bitwise math.floats.half sequences strings ;
+USING: accessors arrays assocs base64 byte-arrays calendar
+calendar.format calendar.parser combinators io io.binary
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.streams.byte-array io.streams.string kernel math math.bitwise
+math.floats.half present sequences strings urls ;
 
 IN: cbor
 
@@ -61,7 +62,15 @@ TUPLE: cbor-simple value ;
     ] if ;
 
 : read-tagged ( info -- tagged )
-    read-unsigned read-cbor cbor-tagged boa ;
+    read-unsigned read-cbor swap {
+        { 0 [ rfc3339>timestamp ] }
+        { 1 [ unix-time>timestamp ] }
+        { 2 [ be> ] }
+        { 3 [ be> neg 1 - ] }
+        { 32 [ >url ] }
+        { 33 [ base64> ] }
+        [ swap cbor-tagged boa ]
+    } case ;
 
 : read-float ( info -- float )
     dup 20 < [ cbor-simple boa ] [
@@ -132,6 +141,12 @@ M: sequence write-cbor
 
 M: assoc write-cbor
     dup length 5 write-integer [ [ write-cbor ] bi@ ] assoc-each ;
+
+M: timestamp write-cbor
+    0 6 write-integer timestamp>rfc3339 write-cbor ;
+
+M: url write-cbor
+    32 6 write-integer present write-cbor ;
 
 M: cbor-tagged write-cbor
     dup tag>> 6 write-integer item>> write-cbor ;
