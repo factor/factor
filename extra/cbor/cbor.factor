@@ -56,17 +56,23 @@ SINGLETON: +cbor-indefinite+
         [ read-cbor read-cbor 2array ] replicate
     ] if ;
 
+: read-tagged ( info -- tagged )
+    read-unsigned read-cbor 2array ;
+
 : read-float ( info -- float )
-    {
-        { 20 [ f ] }
-        { 21 [ t ] }
-        { 22 [ +cbor-nil+ ] }
-        { 23 [ +cbor-undefined+ ] }
-        { 25 [ 2 read be> bits>half ] }
-        { 26 [ 4 read be> bits>float ] }
-        { 27 [ 8 read be> bits>double ] }
-        { 31 [ +cbor-break+ ] }
-    } case ;
+    dup 20 < [ "simple" swap 2array ] [
+        {
+            { 20 [ f ] }
+            { 21 [ t ] }
+            { 22 [ +cbor-nil+ ] }
+            { 23 [ +cbor-undefined+ ] }
+            { 24 [ read1 "simple" swap 2array ] }
+            { 25 [ 2 read be> bits>half ] }
+            { 26 [ 4 read be> bits>float ] }
+            { 27 [ 8 read be> bits>double ] }
+            { 31 [ +cbor-break+ ] }
+        } case
+    ] if ;
 
 PRIVATE>
 
@@ -78,7 +84,7 @@ PRIVATE>
         { 3 [ read-textstring ] }
         { 4 [ read-array ] }
         { 5 [ read-map ] }
-        { 6 [ "optional semantic tagging not supported" throw ] }
+        { 6 [ read-tagged ] }
         { 7 [ read-float ] }
     } case ;
 
