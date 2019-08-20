@@ -35,7 +35,7 @@ SINGLETON: +cbor-indefinite+
     read-unsigned dup +cbor-indefinite+ = [
         drop [ read-cbor dup +cbor-break+ = not ] [ ] produce nip concat
     ] [
-        read
+        read [ B{ } ] unless*
     ] if ;
 
 : read-textstring ( info -- string )
