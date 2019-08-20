@@ -1,10 +1,10 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs byte-arrays combinators io io.binary
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.streams.byte-array io.streams.string kernel math
-math.bitwise math.floats.half sequences strings ;
+USING: accessors arrays assocs byte-arrays combinators io
+io.binary io.encodings.binary io.encodings.string
+io.encodings.utf8 io.streams.byte-array io.streams.string kernel
+math math.bitwise math.floats.half sequences strings ;
 
 IN: cbor
 
@@ -17,6 +17,10 @@ SINGLETON: +cbor-undefined+
 SINGLETON: +cbor-break+
 
 SINGLETON: +cbor-indefinite+
+
+TUPLE: cbor-tagged tag item ;
+
+TUPLE: cbor-simple value ;
 
 <PRIVATE
 
@@ -57,16 +61,16 @@ SINGLETON: +cbor-indefinite+
     ] if ;
 
 : read-tagged ( info -- tagged )
-    read-unsigned read-cbor 2array ;
+    read-unsigned read-cbor cbor-tagged boa ;
 
 : read-float ( info -- float )
-    dup 20 < [ "simple" swap 2array ] [
+    dup 20 < [ cbor-simple boa ] [
         {
             { 20 [ f ] }
             { 21 [ t ] }
             { 22 [ +cbor-nil+ ] }
             { 23 [ +cbor-undefined+ ] }
-            { 24 [ read1 "simple" swap 2array ] }
+            { 24 [ read1 cbor-simple boa ] }
             { 25 [ 2 read be> bits>half ] }
             { 26 [ 4 read be> bits>float ] }
             { 27 [ 8 read be> bits>double ] }
@@ -115,24 +119,36 @@ M: integer write-cbor
 
 M: float write-cbor 0xfb write1 double>bits 8 >be write ;
 
-: write-length ( type n -- )
-    [ 5 shift ] dip {
-        { [ dup 24 < ] [ bitor write1 ] }
-        { [ dup 0xff <= ] [ 24 bitor write1 write1 ] }
-        { [ dup 0xffff <= ] [ 25 bitor write1 2 >be write ] }
-        { [ dup 0xffffffff <= ] [ 26 bitor write1 4 >be write ] }
-        { [ dup 0xffffffffffffffff <= ] [ 27 bitor write1 8 >be write ] }
+: write-length ( n type -- )
+    5 shift {
+        { [ over 24 < ] [ bitor write1 ] }
+        { [ over 0xff <= ] [ 24 bitor write1 write1 ] }
+        { [ over 0xffff <= ] [ 25 bitor write1 2 >be write ] }
+        { [ over 0xffffffff <= ] [ 26 bitor write1 4 >be write ] }
+        { [ over 0xffffffffffffffff <= ] [ 27 bitor write1 8 >be write ] }
     } cond ;
 
-M: byte-array write-cbor 2 over length write-length write ;
+M: byte-array write-cbor dup length 2 write-length write ;
 
-M: string write-cbor 3 over length write-length utf8 encode write ;
+M: string write-cbor dup length 3 write-length utf8 encode write ;
 
 M: sequence write-cbor
-    4 over length write-length [ write-cbor ] each ;
+    dup length 4 write-length [ write-cbor ] each ;
 
 M: assoc write-cbor
-    5 over length write-length [ [ write-cbor ] bi@ ] assoc-each ;
+    dup length 5 write-length [ [ write-cbor ] bi@ ] assoc-each ;
+
+: write-byte ( n type -- )
+    5 shift {
+        { [ over 24 < ] [ bitor write1 ] }
+        { [ over 0xff <= ] [ 24 bitor write1 write1 ] }
+    } cond ;
+
+M: cbor-tagged write-cbor
+    dup tag>> 6 write-byte item>> write-cbor ;
+
+M: cbor-simple write-cbor
+    value>> 7 write-byte ;
 
 PRIVATE>
 
