@@ -53,15 +53,15 @@ tools.test ;
 { t } [ B{ 0xf5 } cbor> ] unit-test
 { +cbor-nil+ } [ B{ 0xf6 } cbor> ] unit-test
 { +cbor-undefined+ } [ B{ 0xf7 } cbor> ] unit-test
-! simple(16) 0xf0
-! simple(24) 0xf818
-! simple(255) 0xf8ff
-! 0("2013-03-21T20:04:00Z") 0xc074323031332d30332d32315432303a30343a30305a
-! 1(1363896240) 0xc11a514b67b0
-! 1(1363896240.5) 0xc1fb41d452d9ec200000
-! 23(h'01020304') 0xd74401020304
-! 24(h'6449455446') 0xd818456449455446
-! 32("http://www.example.com") 0xd82076687474703a2f2f7777772e6578616d706c652e636f6d
+{ { "simple" 16 } } [ B{ 0xf0 } cbor> ] unit-test
+{ { "simple" 24 } } [ B{ 0xf8 0x18 } cbor> ] unit-test
+{ { "simple" 255 } } [ B{ 0xf8 0xff } cbor> ] unit-test
+{ { 0 "2013-03-21T20:04:00Z" } } [ "c074323031332d30332d32315432303a30343a30305a" hex-string>bytes cbor> ] unit-test
+{ { 1 1363896240 } } [ "c11a514b67b0" hex-string>bytes cbor> ] unit-test
+{ { 1 1363896240.5 } } [ "c1fb41d452d9ec200000" hex-string>bytes cbor> ] unit-test
+{ { 23 B{ 0x01 0x02 0x03 0x04 } } } [ "d74401020304" hex-string>bytes cbor> ] unit-test
+{ { 24 B{ 0x64 0x49 0x45 0x54 0x46 } } } [ "d818456449455446" hex-string>bytes cbor> ] unit-test
+{ { 32 "http://www.example.com" } } [ "d82076687474703a2f2f7777772e6578616d706c652e636f6d" hex-string>bytes cbor> ] unit-test
 { B{ } } [ B{ 0x40 } cbor> ] unit-test
 { B{ 1 2 3 4 } } [ B{ 0x44 0x01 0x02 0x03 0x04 } cbor> ] unit-test
 { "" } [ B{ 0x60 } cbor> ] unit-test
