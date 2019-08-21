@@ -45,7 +45,7 @@ delete-staging-images
 { } [ "maze" shake-and-bake 2800000 small-enough? ] long-unit-test
 
 ! [ ] [ "tetris" shake-and-bake 1734000 small-enough? ] long-unit-test
-{ } [ "tetris" shake-and-bake 2462008 small-enough? ] long-unit-test
+{ } [ "tetris" shake-and-bake 2850000 small-enough? ] long-unit-test
 
 ! [ ] [ "spheres" shake-and-bake 1557000 small-enough? ] long-unit-test
 { } [ "spheres" shake-and-bake 2184500 small-enough? ] long-unit-test
