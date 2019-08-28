@@ -384,6 +384,9 @@ SYMBOL: incomparable
 : interval-nonnegative? ( i -- ? )
     from>> first 0 >= ;
 
+: interval-negative? ( interval -- ? )
+    to>> first 0 < ;
+
 : interval-bitand ( i1 i2 -- i3 )
     ! Inaccurate.
     [
@@ -400,7 +403,53 @@ SYMBOL: incomparable
         } cond
     ] do-empty-interval ;
 
+<PRIVATE
+! Return the weight of the MSB.  For signed numbers, this does not mean the sign
+! bit.
+: bit-weight  ( n -- m )
+    dup [ -1/0. = ] [ 1/0. = ] bi or
+    [ drop 1/0. ]
+    [ dup 0 > [ 1 + ] [ neg ] if next-power-of-2 ] if ;
+
+: bounds ( interval -- lower upper )
+    {
+        { full-interval [ -1/0. 1/0. ] }
+        [ interval>points [ first ] bi@ ]
+    } case ;
+
+: max-lower-bound ( i1 i2 -- n )
+    [ from>> first ] bi@ max ;
+
+: max-upper-bound ( i1 i2 -- n )
+    [ to>> first ] bi@ max ;
+
+: interval-bit-weight ( i1 -- n )
+    bounds [ bit-weight ] bi@ max ;
+PRIVATE>
+
+! Basic Property of bitor: bits can never be taken away.  For both signed and
+! unsigned integers this means that the number can only grow towards positive
+! infinity.  Also, the significant bit range can never be larger than either of
+! the operands.
+! In case both intervals are positive:
+! lower(i1 bitor i2) = max(lower(i1),lower(i2))
+! upper(i1 bitor i2) = 2 ^ max(bit-length(upper(i1)), bit-length(upper(i2))) - 1
+! In case both intervals are negative:
+! lower(i1 bitor i2) = max(lower(i1),lower(i2))
+! upper(i1 bitor i2) = -1
+! In case one is negative and the other positive, simply assume the whole
+! bit-range.  This case is not accurate though.
 : interval-bitor ( i1 i2 -- i3 )
+    [
+        { { [ 2dup [ interval-nonnegative? ] both? ]
+            [ [ max-lower-bound ] [ max-upper-bound ] 2bi bit-weight 1 - [a,b] ] }
+          { [ 2dup [ interval-negative? ] both? ]
+            [ max-lower-bound -1 [a,b] ] }
+          [ interval-union interval-bit-weight [ neg ] [ 1 - ] bi [a,b] ]
+        } cond
+    ] do-empty-interval ;
+
+: interval-bitxor ( i1 i2 -- i3 )
     ! Inaccurate.
     [
         2dup [ interval-nonnegative? ] both?
@@ -409,10 +458,6 @@ SYMBOL: incomparable
             4array supremum 0 swap >integer next-power-of-2 [a,b]
         ] [ 2drop [-inf,inf] ] if
     ] do-empty-interval ;
-
-: interval-bitxor ( i1 i2 -- i3 )
-    ! Inaccurate.
-    interval-bitor ;
 
 GENERIC: interval-log2 ( i1 -- i2 )
 M: empty-interval interval-log2 ;

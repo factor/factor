@@ -1,7 +1,9 @@
-USING: math.intervals kernel sequences words math math.order
-arrays prettyprint tools.test random vocabs combinators
-accessors math.constants fry ;
+USING: accessors combinators fry kernel literals math math.intervals
+math.intervals.private math.order math.statistics random sequences
+sequences.deep tools.test vocabs ;
 IN: math.intervals.tests
+
+FROM: math.ranges => <range> ;
 
 { empty-interval } [ 2 2 (a,b) ] unit-test
 
@@ -385,7 +387,7 @@ commutative-ops [
     ] unit-test
 ] each
 
-! Test singleton behavior
+! test singleton behavior
 { f } [ full-interval interval-nonnegative? ] unit-test
 
 { t } [ empty-interval interval-nonnegative? ] unit-test
@@ -397,3 +399,39 @@ commutative-ops [
 { f } [ -1/0. 1/0. [ empty-interval interval-contains? ] bi@ or ] unit-test
 
 { t } [ -1/0. 1/0. [ full-interval interval-contains? ] bi@ and ] unit-test
+
+! Interval bitor
+
+{ 1/0. } [ 1/0. bit-weight ] unit-test
+{ 1/0. } [ -1/0. bit-weight ] unit-test
+
+{ t } [
+    16 <iota> dup [ bitor ] cartesian-map flatten
+    [ 0 15 [a,b] interval-contains? ] all?
+] unit-test
+
+: cartesian-bounds ( range range quot -- min max )
+    cartesian-map flatten minmax ; inline
+
+{ 0 15 } [ 16 <iota> dup [ bitor ] cartesian-bounds ] unit-test
+{ 0 15 } [ 16 <iota> dup [ bitxor ] cartesian-bounds ] unit-test
+
+{ -8 7 } [ -8 7 1 <range> dup [ bitor ] cartesian-bounds ] unit-test
+{ -8 7 } [ -8 7 1 <range> dup [ bitxor ] cartesian-bounds ] unit-test
+
+{ 6 15 } [ 5 15 1 <range> 6 15 1 <range> [ bitor ] cartesian-bounds ] unit-test
+
+{ -12 -1 } [ -16 -12 1 <range> -12 -2 1 <range> [ bitor ] cartesian-bounds ] unit-test
+
+{ -16 15 } [ -16 4 1 <range> -1 15 1 <range> [ bitor ] cartesian-bounds ] unit-test
+
+{ $[ 0 255 [a,b] ] } [ 0 255 [a,b] dup interval-bitor ] unit-test
+{ $[ 0 511 [a,b] ] } [ 0 256 [a,b] dup interval-bitor ] unit-test
+
+{ $[ -128 127 [a,b] ] } [ -128 127 [a,b] dup interval-bitor ] unit-test
+{ $[ -256 255 [a,b] ] } [ -128 128 [a,b] dup interval-bitor ] unit-test
+
+{ full-interval } [ full-interval -128 127 [a,b] interval-bitor ] unit-test
+{ $[ 0 [a,inf] ] } [ 0 [a,inf] dup interval-bitor ] unit-test
+{ full-interval } [ 0 [-inf,a] dup interval-bitor ] unit-test
+{ $[ 4 [a,inf] ] } [ 4 [a,inf] 3 [a,inf] interval-bitor ] unit-test
