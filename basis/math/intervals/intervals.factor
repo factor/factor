@@ -417,6 +417,9 @@ SYMBOL: incomparable
         [ interval>points [ first ] bi@ ]
     } case ;
 
+: min-lower-bound ( i1 i2 -- n )
+    [ from>> first ] bi@ min ;
+
 : max-lower-bound ( i1 i2 -- n )
     [ from>> first ] bi@ max ;
 
@@ -449,14 +452,18 @@ PRIVATE>
         } cond
     ] do-empty-interval ;
 
+! Basic Property of bitxor: can always produce 0,  can never increase
+! significant range
+! If both operands are known to be negative, the sign bit(s) will be zero,
+! always resulting in a positive number
 : interval-bitxor ( i1 i2 -- i3 )
-    ! Inaccurate.
     [
-        2dup [ interval-nonnegative? ] both?
-        [
-            [ interval>points [ first ] bi@ ] bi@
-            4array supremum 0 swap >integer next-power-of-2 [a,b]
-        ] [ 2drop [-inf,inf] ] if
+        { { [ 2dup [ interval-nonnegative? ] both? ]
+            [ max-upper-bound bit-weight 1 - 0 swap [a,b] ] }
+          { [ 2dup [ interval-negative? ] both? ]
+            [ min-lower-bound bit-weight 1 - 0 swap [a,b] ] }
+          [ interval-union interval-bit-weight [ neg ] [ 1 - ] bi [a,b] ]
+        } cond
     ] do-empty-interval ;
 
 GENERIC: interval-log2 ( i1 -- i2 )
