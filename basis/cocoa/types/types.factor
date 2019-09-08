@@ -1,8 +1,10 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct cocoa.runtime
-core-graphics.types ;
+core-graphics.types kernel literals layouts ;
 IN: cocoa.types
+
+CONSTANT: NSNotFound $[ 32bit? 0x7fffffff 0x7fffffffffffffff ? ]
 
 TYPEDEF: long NSInteger
 TYPEDEF: ulong NSUInteger

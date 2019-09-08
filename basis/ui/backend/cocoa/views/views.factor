@@ -187,8 +187,6 @@ M: send-touchbar-command send-queued-gesture
         yield
     ] [ 3drop ] if ;
 
-CONSTANT: NSNotFound 9223372036854775807 inline
-
 IMPORT: NSAttributedString
 
 <PRIVATE
