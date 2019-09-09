@@ -5,11 +5,16 @@ USING: accessors kernel sequences arrays math math.order
 combinators combinators.short-circuit generic layouts memoize ;
 IN: math.intervals
 
-SYMBOL: empty-interval
-
+SINGLETON: empty-interval
 SINGLETON: full-interval
+UNION: special-interval empty-interval full-interval ;
 
 TUPLE: interval { from read-only } { to read-only } ;
+
+M: empty-interval from>> drop { 1/0. f } ;
+M: empty-interval to>> drop { -1/0. f } ;
+M: full-interval from>> drop { -1/0. t } ;
+M: full-interval to>> drop { 1/0. t } ;
 
 : closed-point? ( from to -- ? )
     2dup [ first ] bi@ number=
@@ -122,10 +127,10 @@ MEMO: array-capacity-interval ( -- interval )
 
 : do-empty-interval ( i1 i2 quot -- i3 )
     {
-        { [ pick empty-interval eq? ] [ 2drop ] }
-        { [ over empty-interval eq? ] [ drop nip ] }
-        { [ pick full-interval eq? ] [ 2drop ] }
-        { [ over full-interval eq? ] [ drop nip ] }
+        { [ pick empty-interval? ] [ 2drop ] }
+        { [ over empty-interval? ] [ drop nip ] }
+        { [ pick full-interval? ] [ 2drop ] }
+        { [ over full-interval? ] [ drop nip ] }
         [ call ]
     } cond ; inline
 
@@ -137,10 +142,10 @@ MEMO: array-capacity-interval ( -- interval )
 
 : interval-intersect ( i1 i2 -- i3 )
     {
-        { [ over empty-interval eq? ] [ drop ] }
-        { [ dup empty-interval eq? ] [ nip ] }
-        { [ over full-interval eq? ] [ nip ] }
-        { [ dup full-interval eq? ] [ drop ] }
+        { [ over empty-interval? ] [ drop ] }
+        { [ dup empty-interval? ] [ nip ] }
+        { [ over full-interval? ] [ nip ] }
+        { [ dup full-interval? ] [ drop ] }
         [
             [ interval>points ] bi@
             [ [ swap endpoint< ] most ]
@@ -150,29 +155,28 @@ MEMO: array-capacity-interval ( -- interval )
     } cond ;
 
 : intervals-intersect? ( i1 i2 -- ? )
-    interval-intersect empty-interval eq? not ;
+    interval-intersect empty-interval? not ;
 
 : interval-union ( i1 i2 -- i3 )
     {
-        { [ over empty-interval eq? ] [ nip ] }
-        { [ dup empty-interval eq? ] [ drop ] }
-        { [ over full-interval eq? ] [ drop ] }
-        { [ dup full-interval eq? ] [ nip ] }
+        { [ over empty-interval? ] [ nip ] }
+        { [ dup empty-interval? ] [ drop ] }
+        { [ over full-interval? ] [ drop ] }
+        { [ dup full-interval? ] [ nip ] }
         [ [ interval>points 2array ] bi@ append points>interval nan-not-ok ]
     } cond ;
 
 : interval-subset? ( i1 i2 -- ? )
     dupd interval-intersect = ;
 
-: interval-contains? ( x int -- ? )
-    dup empty-interval eq? [ 2drop f ] [
-        dup full-interval eq? [ 2drop t ] [
-            {
-                [ from>> first2 [ >= ] [ > ] if ]
-                [ to>>   first2 [ <= ] [ < ] if ]
-            } 2&&
-        ] if
-    ] if ;
+GENERIC: interval-contains? ( x int -- ? )
+M: empty-interval interval-contains? 2drop f ;
+M: full-interval interval-contains? 2drop t ;
+M: interval interval-contains?
+    {
+        [ from>> first2 [ >= ] [ > ] if ]
+        [ to>>   first2 [ <= ] [ < ] if ]
+    } 2&& ;
 
 : interval-zero? ( int -- ? )
     0 swap interval-contains? ;
@@ -192,25 +196,19 @@ MEMO: array-capacity-interval ( -- interval )
 
 : interval-sq ( i1 -- i2 ) dup interval* ;
 
-: special-interval? ( interval -- ? )
-    { empty-interval full-interval } member-eq? ;
+GENERIC: interval-singleton? ( int -- ? )
+M: special-interval interval-singleton? drop f ;
+M: interval interval-singleton?
+    interval>points
+    2dup [ second ] both?
+    [ [ first ] bi@ number= ]
+    [ 2drop f ] if ;
 
-: interval-singleton? ( int -- ? )
-    dup special-interval? [
-        drop f
-    ] [
-        interval>points
-        2dup [ second ] both?
-        [ [ first ] bi@ number= ]
-        [ 2drop f ] if
-    ] if ;
-
-: interval-length ( int -- n )
-    {
-        { [ dup empty-interval eq? ] [ drop 0 ] }
-        { [ dup full-interval eq? ] [ drop 1/0. ] }
-        [ interval>points [ first ] bi@ swap - ]
-    } cond ;
+GENERIC: interval-length ( int -- n )
+M: empty-interval interval-length drop 0 ;
+M: full-interval interval-length drop 1/0. ;
+M: interval interval-length
+    interval>points [ first ] bi@ swap - ;
 
 : interval-closure ( i1 -- i2 )
     dup [ interval>points [ first ] bi@ [a,b] ] when ;
@@ -240,21 +238,21 @@ MEMO: array-capacity-interval ( -- interval )
 
 : interval-max ( i1 i2 -- i3 )
     {
-        { [ over empty-interval eq? ] [ drop ] }
-        { [ dup empty-interval eq? ] [ nip ] }
-        { [ 2dup [ full-interval eq? ] both? ] [ drop ] }
-        { [ over full-interval eq? ] [ nip from>> first [a,inf] ] }
-        { [ dup full-interval eq? ] [ drop from>> first [a,inf] ] }
+        { [ over empty-interval? ] [ drop ] }
+        { [ dup empty-interval? ] [ nip ] }
+        { [ 2dup [ full-interval? ] both? ] [ drop ] }
+        { [ over full-interval? ] [ nip from>> first [a,inf] ] }
+        { [ dup full-interval? ] [ drop from>> first [a,inf] ] }
         [ [ interval-closure ] bi@ [ max ] interval-op nan-not-ok ]
     } cond ;
 
 : interval-min ( i1 i2 -- i3 )
     {
-        { [ over empty-interval eq? ] [ drop ] }
-        { [ dup empty-interval eq? ] [ nip ] }
-        { [ 2dup [ full-interval eq? ] both? ] [ drop ] }
-        { [ over full-interval eq? ] [ nip to>> first [-inf,a] ] }
-        { [ dup full-interval eq? ] [ drop to>> first [-inf,a] ] }
+        { [ over empty-interval? ] [ drop ] }
+        { [ dup empty-interval? ] [ nip ] }
+        { [ 2dup [ full-interval? ] both? ] [ drop ] }
+        { [ over full-interval? ] [ nip to>> first [-inf,a] ] }
+        { [ dup full-interval? ] [ drop to>> first [-inf,a] ] }
         [ [ interval-closure ] bi@ [ min ] interval-op nan-not-ok ]
     } cond ;
 
@@ -296,8 +294,8 @@ MEMO: array-capacity-interval ( -- interval )
 
 : interval-abs ( i1 -- i2 )
     {
-        { [ dup empty-interval eq? ] [ ] }
-        { [ dup full-interval eq? ] [ drop [0,inf] ] }
+        { [ dup empty-interval? ] [ ] }
+        { [ dup full-interval? ] [ drop [0,inf] ] }
         { [ 0 over interval-contains? ] [ (interval-abs) { 0 t } suffix points>interval nan-not-ok ] }
         [ (interval-abs) points>interval nan-not-ok ]
     } cond ;
@@ -331,7 +329,7 @@ SYMBOL: incomparable
 : interval< ( i1 i2 -- ? )
     {
         { [ 2dup [ special-interval? ] either? ] [ incomparable ] }
-        { [ 2dup interval-intersect empty-interval eq? ] [ (interval<) ] }
+        { [ 2dup interval-intersect empty-interval? ] [ (interval<) ] }
         { [ 2dup left-endpoint-< ] [ f ] }
         { [ 2dup right-endpoint-< ] [ f ] }
         [ incomparable ]
@@ -346,7 +344,7 @@ SYMBOL: incomparable
 : interval<= ( i1 i2 -- ? )
     {
         { [ 2dup [ special-interval? ] either? ] [ incomparable ] }
-        { [ 2dup interval-intersect empty-interval eq? ] [ (interval<) ] }
+        { [ 2dup interval-intersect empty-interval? ] [ (interval<) ] }
         { [ 2dup right-endpoint-<= ] [ t ] }
         [ incomparable ]
     } cond 2nip ;
@@ -359,9 +357,9 @@ SYMBOL: incomparable
 
 : interval-mod ( i1 i2 -- i3 )
     {
-        { [ over empty-interval eq? ] [ swap ] }
-        { [ dup empty-interval eq? ] [ ] }
-        { [ dup full-interval eq? ] [ ] }
+        { [ over empty-interval? ] [ swap ] }
+        { [ dup empty-interval? ] [ ] }
+        { [ dup full-interval? ] [ ] }
         [ interval-abs to>> first [ neg ] keep (a,b) ]
     } cond
     swap 0 [a,a] interval>= t eq? [ [0,inf] interval-intersect ] when ;
@@ -370,9 +368,9 @@ SYMBOL: incomparable
 
 : interval-rem ( i1 i2 -- i3 )
     {
-        { [ over empty-interval eq? ] [ drop ] }
-        { [ dup empty-interval eq? ] [ nip ] }
-        { [ dup full-interval eq? ] [ 2drop [0,inf] ] }
+        { [ over empty-interval? ] [ drop ] }
+        { [ dup empty-interval? ] [ nip ] }
+        { [ dup full-interval? ] [ 2drop [0,inf] ] }
         [ nip (rem-range) ]
     } cond ;
 
@@ -416,17 +414,14 @@ SYMBOL: incomparable
     ! Inaccurate.
     interval-bitor ;
 
-: interval-log2 ( i1 -- i2 )
-    {
-        { empty-interval [ empty-interval ] }
-        { full-interval [ [0,inf] ] }
-        [
-            to>> first 1 max dup most-positive-fixnum >
-            [ drop full-interval interval-log2 ]
-            [ 1 + >integer log2 0 swap [a,b] ]
-            if
-        ]
-    } case ;
+GENERIC: interval-log2 ( i1 -- i2 )
+M: empty-interval interval-log2 ;
+M: full-interval interval-log2 drop [0,inf] ;
+M: interval interval-log2
+    to>> first 1 max dup most-positive-fixnum >
+    [ drop full-interval interval-log2 ]
+    [ 1 + >integer log2 0 swap [a,b] ]
+    if ;
 
 : assume< ( i1 i2 -- i3 )
     dup special-interval? [ drop ] [

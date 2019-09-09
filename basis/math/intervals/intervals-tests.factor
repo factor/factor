@@ -384,3 +384,16 @@ commutative-ops [
         ] all?
     ] unit-test
 ] each
+
+! Test singleton behavior
+{ f } [ full-interval interval-nonnegative? ] unit-test
+
+{ t } [ empty-interval interval-nonnegative? ] unit-test
+
+{ t } [ full-interval interval-zero? ] unit-test
+
+{ f } [ empty-interval interval-zero? ] unit-test
+
+{ f } [ -1/0. 1/0. [ empty-interval interval-contains? ] bi@ or ] unit-test
+
+{ t } [ -1/0. 1/0. [ full-interval interval-contains? ] bi@ and ] unit-test

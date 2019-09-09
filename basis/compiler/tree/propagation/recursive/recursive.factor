@@ -27,7 +27,7 @@ IN: compiler.tree.propagation.recursive
     interval class counter-class :> class
     {
         { [ interval initial-interval interval-subset? ] [ initial-interval ] }
-        { [ interval empty-interval eq? ] [ initial-interval ] }
+        { [ interval empty-interval? ] [ initial-interval ] }
         {
             [ interval initial-interval interval>= t eq? ]
             [ class max-value [a,a] initial-interval interval-union ]
