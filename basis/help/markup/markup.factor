@@ -491,7 +491,7 @@ M: array elements*
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
 : collect-elements ( element seq -- elements )
-    swap '[ _ elements [ rest ] map concat ] gather ;
+    swap '[ [ _ elements* ] each ] { } make [ rest ] map concat ;
 
 : <$link> ( topic -- element )
     1array \ $link prefix ;
