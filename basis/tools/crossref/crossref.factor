@@ -47,9 +47,8 @@ M: callable uses ( quot -- seq )
 M: word uses def>> uses ;
 
 M: link uses
-    article-content
-    [ { $subsection $subsections $link $see-also } collect-elements [ >link ] map ]
-    [ { $vocab-link } collect-elements [ >vocab-link ] map ]
+    [ { $subsection $subsections $link $see-also } article-links [ >link ] map ]
+    [ { $vocab-link } article-links [ >vocab-link ] map ]
     bi append ;
 
 M: pathname uses
