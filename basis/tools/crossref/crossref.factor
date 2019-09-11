@@ -47,11 +47,13 @@ M: callable uses ( quot -- seq )
 M: word uses def>> uses ;
 
 M: link uses
-    [ { $subsection $subsections $link $see-also } article-links [ >link ] map ]
-    [ { $vocab-link } article-links [ >vocab-link ] map ]
+    article-content
+    [ { $subsection $subsections $link $see-also } collect-elements [ >link ] map ]
+    [ { $vocab-link } collect-elements [ >vocab-link ] map ]
     bi append ;
 
-M: pathname uses string>> path>source-file top-level-form>> [ uses ] [ { } ] if* ;
+M: pathname uses
+    string>> path>source-file top-level-form>> [ uses ] [ { } ] if* ;
 
 ! To make UI browser happy
 M: object uses drop f ;
@@ -140,7 +142,7 @@ M: f smart-usage drop \ f smart-usage ;
 SINGLETON: invalidate-crossref
 
 M: invalidate-crossref definitions-changed
-    2drop crossref global delete-at ;
+    2drop f crossref set-global ;
 
 [ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
 
