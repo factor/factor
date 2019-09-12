@@ -11,7 +11,7 @@ HELP: smtp-config
         { { $slot "server" } { "An " { $link <inet> } " of the SMTP server." } }
         { { $slot "tls?" } { "Secure socket after connecting to server, server must support " { $snippet "STARTTLS" } } }
         { { $slot "read-timeout" } { "Length of time after which we give up waiting for a response." } }
-        { { $slot "auth" } { "Either " { $link no-auth } " or an instance of " { $link plain-auth } } }
+        { { $slot "auth" } { "Either " { $link no-auth } " or an instance of " { $link plain-auth } " or " { $link login-auth } } }
     }
 } ;
 
@@ -25,11 +25,21 @@ HELP: no-auth
 { $class-description "If the " { $snippet "auth" } " slot is set to this value, no authentication will be performed." } ;
 
 HELP: plain-auth
-{ $class-description "If the " { $snippet "auth" } " slot is set to this value, plain authentication will be performed, with the username and password stored in the " { $slot "username" } " and " { $slot "password" } " slots of the tuple sent to the server as plain-text." } ;
+{ $class-description "If the " { $snippet "auth" } " slot is set to this value, plain authentication will be performed, with the username and password stored in the " { $slot "username" } " and " { $slot "password" } " slots of the tuple sent to the server as plain-text." }
+{ $notes "This authentication method is no longer supported by Outlook mail servers." } ;
 
 HELP: <plain-auth>
 { $values { "username" string } { "password" string } { "plain-auth" plain-auth } }
 { $description "Creates a new " { $link plain-auth } " instance." } ;
+
+HELP: login-auth
+{ $class-description "If the " { $snippet "auth" } " slot is set to this value, LOGIN authentication will be performed, with the username and password stored in the " { $slot "username" } " and " { $slot "password" } " slots of the tuple sent to the server as plain-text." } ;
+
+HELP: <login-auth>
+{ $values { "username" string } { "password" string } { "login-auth" login-auth } }
+{ $description "Creates a new " { $link login-auth } " instance." } ;
+
+{ no-auth plain-auth login-auth } related-words
 
 HELP: with-smtp-config
 { $values { "quot" quotation } }
@@ -84,7 +94,7 @@ HELP: send-email
 
 ARTICLE: "smtp-gmail" "Setting up SMTP with gmail"
 "If you plan to send all email from the same address, then setting the config variable in the global namespace is the best option. The code example below does this approach and is meant to go in your " { $link ".factor-boot-rc" } "." $nl
-"First, we set the login and password to a " { $link <plain-auth> } " tuple with our login. Next, we set the gmail server address with an " { $link <inet> } " object. Finally, we tell the SMTP library to use a secure connection."
+"First, we set the login and password to a " { $link <login-auth> } " tuple with our login. Next, we set the gmail server address with an " { $link <inet> } " object. Finally, we tell the SMTP library to use a secure connection."
 { $notes
     "Observed on 2016-03-02: Gmail has restrictions for what they consider \"less secure apps\" (these include the factor smtp client)."
     { $list
@@ -99,7 +109,7 @@ ARTICLE: "smtp-gmail" "Setting up SMTP with gmail"
     "default-smtp-config
     \"smtp.gmail.com\" 587 <inet> >>server
     t >>tls?
-    \"my.gmail.address@gmail.com\" \"qwertyuiasdfghjk\" <plain-auth> >>auth
+    \"my.gmail.address@gmail.com\" \"qwertyuiasdfghjk\" <login-auth> >>auth
     \\ smtp-config set-global"
 }
 } ;
@@ -117,6 +127,7 @@ $nl
 { $subsections
     no-auth
     plain-auth
+    login-auth
 }
 "Constructing an e-mail:"
 { $subsections
