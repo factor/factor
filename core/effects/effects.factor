@@ -61,20 +61,23 @@ M: pair effect>string
         nip effect>string ":" prepend
     ] if ;
 
-: stack-picture ( seq -- string )
-    [ [ effect>string % CHAR: \s , ] each ] "" make ;
+<PRIVATE
 
-: var-picture ( var -- string )
-    [ ".." " " surround ]
-    [ "" ] if* ;
+: stack-picture% ( seq -- )
+    [ effect>string % CHAR: \s , ] each ;
+
+: var-picture% ( var -- )
+    [ ".." % % CHAR: \s , ] when* ;
+
+PRIVATE>
 
 M: effect effect>string ( effect -- string )
     [
         "( " %
-        dup in-var>> var-picture %
-        dup in>> stack-picture % "-- " %
-        dup out-var>> var-picture %
-        dup out>> stack-picture %
+        dup in-var>> var-picture%
+        dup in>> stack-picture% "-- " %
+        dup out-var>> var-picture%
+        dup out>> stack-picture%
         dup terminated?>> [ "* " % ] when
         drop
         ")" %
@@ -102,7 +105,13 @@ M: word stack-effect
 M: deferred stack-effect call-next-method ( -- * ) or ;
 
 M: effect clone
-    [ in>> clone ] [ out>> clone ] bi <effect> ;
+    {
+        [ in>> clone ]
+        [ out>> clone ]
+        [ terminated?>> ]
+        [ in-var>> ]
+        [ out-var>> ]
+    } cleave effect boa ;
 
 : stack-height ( word -- n )
     stack-effect effect-height ; inline
