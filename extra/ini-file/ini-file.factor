@@ -19,7 +19,7 @@ IN: ini-file
         { CHAR: t   CHAR: \t }
         { CHAR: v   CHAR: \v }
         { CHAR: '   CHAR: ' }
-        { CHAR: \"   CHAR: \" }
+        { CHAR: \"  CHAR: \" }
         { CHAR: \\  CHAR: \\ }
         { CHAR: ?   CHAR: ? }
         { CHAR: ;   CHAR: ; }
@@ -43,14 +43,14 @@ USE: xml.entities
 : escape-string ( str -- str' )
     H{
         { CHAR: \a   "\\a"  }
-        { 0x08    "\\b"  }
-        { 0x0c    "\\f"  }
+        { CHAR: \b   "\\b"  }
+        { CHAR: \f   "\\f"  }
         { CHAR: \n   "\\n"  }
         { CHAR: \r   "\\r"  }
         { CHAR: \t   "\\t"  }
-        { 0x0b    "\\v"  }
+        { CHAR: \b   "\\v"  }
         { CHAR: '    "\\'"  }
-        { CHAR: \"    "\\\"" }
+        { CHAR: \"   "\\\"" }
         { CHAR: \\   "\\\\" }
         { CHAR: ?    "\\?"  }
         { CHAR: ;    "\\;"  }
@@ -60,14 +60,7 @@ USE: xml.entities
     } escape-string-by ;
 
 : space? ( ch -- ? )
-    {
-        [ CHAR: \s = ]
-        [ CHAR: \t = ]
-        [ CHAR: \n = ]
-        [ CHAR: \r = ]
-        [ 0x0c = ] ! \f
-        [ 0x0b = ] ! \v
-    } 1|| ;
+    "\s\t\n\r\f\v" member-eq? ;
 
 : unspace ( str -- str' )
     [ space? ] trim ;
@@ -92,7 +85,7 @@ SYMBOL: option
     } 1&& ;
 
 : line-continues? ( line -- ? )
-    { [ empty? not ] [ last CHAR: \ = ] } 1&& ;
+    ?last CHAR: \ = ;
 
 : section, ( -- )
     section get [ , ] when* ;
@@ -130,9 +123,9 @@ PRIVATE>
 
 : write-ini ( assoc -- )
     [
-        dup string?
-        [ [ escape-string ] bi@ "%s=%s\n" printf ]
-        [
+        dup string? [
+            [ escape-string ] bi@ "%s=%s\n" printf
+        ] [
             [ escape-string "[%s]\n" printf ] dip
             [ [ escape-string ] bi@ "%s=%s\n" printf ]
             assoc-each nl
