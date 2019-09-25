@@ -94,7 +94,7 @@ M: hex-digit-class class-member? ( obj class -- ? )
 : java-blank? ( ch -- ? )
     {
         CHAR: \s CHAR: \t CHAR: \n
-        0xb 0x7 CHAR: \r
+        CHAR: \v CHAR: \a CHAR: \r
     } member? ;
 
 M: java-blank-class class-member? ( obj class -- ? )
