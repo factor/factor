@@ -57,7 +57,7 @@ TUPLE: entry key value ;
     "0b" token hide bindigit digits 2seq [ first bin> ] action ;
 
 : integer-parser ( -- parser )
-    hex oct bin dec 4choice [ ] action ;
+    hex oct bin dec 4choice ;
 
 : float ( -- parser )
     [
@@ -68,7 +68,7 @@ TUPLE: entry key value ;
         "e" token "E" token 2choice
         sign optional
         decdigit digits optional 3seq optional ,
-    ] seq* ;
+    ] seq* [ unclip-last append "" concat-as string>number ] action ;
 
 : +inf ( -- parser )
     "+" token optional "inf" token 2seq [ drop 1/0. ] action ;
@@ -81,8 +81,7 @@ TUPLE: entry key value ;
     [ drop NAN: 8000000000000 ] action ;
 
 : float-parser ( -- parser )
-    float +inf -inf nan 4choice
-    [ unclip-last append "" concat-as string>number ] action ;
+    float +inf -inf nan 4choice ;
 
 : escaped ( -- parser )
     "\\" token hide [ "btnfr\"\\" member-eq? ] satisfy 2seq
@@ -141,12 +140,11 @@ TUPLE: entry key value ;
     ] seq* [ "" concat-as ] action ;
 
 : timezone-parser ( -- parser )
-    [
-        "Z" token ,
-        "-" token
-        decdigit 2 exactly-n ":" token
-        decdigit 2 exactly-n 4seq [ "" concat-as ] action ,
-    ] choice* ;
+    "Z" token
+    "-" token
+    decdigit 2 exactly-n ":" token
+    decdigit 2 exactly-n 4seq [ "" concat-as ] action
+    2choice ;
 
 : datetime-parser ( -- parser )
     [
