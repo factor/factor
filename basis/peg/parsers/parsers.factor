@@ -91,8 +91,7 @@ PRIVATE>
         any-char ,
     ] seq* [
         first2 [a,b] >string
-    ] action
-    replace ;
+    ] action replace ;
 
 : range-pattern ( pattern -- parser )
     ! 'pattern' is a set of characters describing the
@@ -103,8 +102,8 @@ PRIVATE>
     ! characters separated with a dash (-) represents the
     ! range of characters from the first to the second,
     ! inclusive.
-    dup first CHAR: ^ = [
-        rest (range-pattern) [ member? not ] curry satisfy
+    "^" ?head [
+        (range-pattern) '[ _ member? not ] satisfy
     ] [
-        (range-pattern) [ member? ] curry satisfy
+        (range-pattern) '[ _ member? ] satisfy
     ] if ;
