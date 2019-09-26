@@ -1,7 +1,10 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel make math math.parser math.ranges peg
-peg.private peg.search sequences strings unicode vectors ;
+
+USING: accessors kernel literals make math math.parser
+math.ranges peg peg.private peg.search sequences strings unicode
+vectors ;
+
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
@@ -31,9 +34,9 @@ M: just-parser (compile) ( parser -- quot )
 : list-of-many ( items separator -- parser )
     hide t (list-of) ;
 
-: epsilon ( -- parser ) V{ } token ;
+CONSTANT: epsilon $[ V{ } token ]
 
-: any-char ( -- parser ) [ drop t ] satisfy ;
+CONSTANT: any-char $[ [ drop t ] satisfy ]
 
 <PRIVATE
 
