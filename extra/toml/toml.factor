@@ -13,6 +13,8 @@ ERROR: unknown-value value ;
 
 <PRIVATE
 
+! FIXME: key = 1234abcd # should error!
+
 TUPLE: table name array? entries ;
 
 TUPLE: entry key value ;
@@ -167,7 +169,7 @@ DEFER: value-parser
         "[" token hide ,
         whitespace hide ,
         value-parser
-        whitespace hide "," token whitespace hide 3seq list-of ,
+        whitespace "," token whitespace pack list-of ,
         whitespace hide ,
         "]" token hide ,
     ] seq* [ first { } like ] action ;
@@ -179,7 +181,7 @@ DEFER: key-value-parser
         "{" token hide ,
         whitespace hide ,
         key-value-parser
-        whitespace hide "," token whitespace hide 3seq list-of ,
+        whitespace "," token whitespace pack list-of ,
         whitespace hide ,
         "}" token hide ,
     ] seq* [ first >hashtable ] action ;
@@ -194,8 +196,8 @@ DEFER: key-value-parser
             float-parser ,
             integer-parser ,
             string-parser ,
-            [ array-parser ] box ,
-            [ inline-table-parser ] box ,
+            array-parser ,
+            inline-table-parser ,
         ] choice*
     ] delay ;
 
@@ -210,7 +212,7 @@ DEFER: key-value-parser
 
 : comment-parser ( -- parser )
     [
-        space ,
+        space hide ,
         "#" token ,
         [ CHAR: \n = not ] satisfy repeat0 ,
     ] seq* [ drop f ] action ;
@@ -237,7 +239,7 @@ DEFER: key-value-parser
         begin token hide ,
         space hide ,
         name-parser
-        space hide "." token space hide 3seq list-of
+        space "." token space pack list-of
         [ { } like ] action ,
         space hide ,
         end token hide ,
