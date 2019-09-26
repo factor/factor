@@ -1,10 +1,9 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: accessors kernel literals make math math.parser
-math.ranges peg peg.private peg.search sequences strings unicode
+USING: accessors fry kernel literals make math math.parser
+math.ranges peg peg.private sequences splitting strings unicode
 vectors ;
-
+FROM: peg.search => replace ;
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
