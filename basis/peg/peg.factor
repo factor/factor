@@ -1,9 +1,12 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.units effects.parser fry
 generalizations kernel locals make math math.order namespaces
-quotations sequences sets splitting unicode vectors words ;
+quotations sequences sets splitting unicode vectors
+vocabs.loader words ;
+
 IN: peg
 
 TUPLE: parse-result remaining ast ;
@@ -36,7 +39,7 @@ SYMBOL: error-stack
     } cond ;
 
 : merge-errors ( -- )
-    error-stack get dup length 1 >  [
+    error-stack get dup length 1 > [
         [ pop ] [ pop swap (merge-errors) ] [ ] tri push
     ] [
         drop
@@ -134,8 +137,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     swap >>ans pos get >>pos drop ;
 
 : stop-growth? ( ast m -- ? )
-    [ failed? pos get ] dip
-    pos>> <= or ;
+    [ failed? pos get ] dip pos>> <= or ;
 
 : setup-growth ( h p -- )
     pos namespaces:set dup involved-set>> clone >>eval-set drop ;
@@ -324,9 +326,7 @@ SYMBOL: delayed
     ! Wrap a parser tuple around the peg object.
     ! Look for an existing parser tuple for that
     ! peg object.
-    peg-cache [
-        f next-id parser boa
-    ] cache ;
+    peg-cache [ f next-id parser boa ] cache ;
 
 TUPLE: token-parser symbol ;
 
@@ -343,11 +343,9 @@ M: token-parser (compile) ( peg -- quot )
 
 TUPLE: satisfy-parser quot ;
 
-: parse-satisfy ( input quot -- result )
-    swap [
-        drop f
-    ] [
-        unclip-slice dup roll call [
+:: parse-satisfy ( input quot -- result/f )
+    input [ f ] [
+        unclip-slice dup quot call [
             <parse-result>
         ] [
             2drop f
@@ -359,29 +357,24 @@ M: satisfy-parser (compile)
 
 TUPLE: range-parser min max ;
 
-: parse-range ( input min max -- result )
-    pick empty? [
-        3drop f
-    ] [
-        [ dup first ] 2dip between? [
+:: parse-range ( input min max -- result/f )
+    input [ f ] [
+        dup first min max between? [
             unclip-slice <parse-result>
         ] [
             drop f
         ] if
-    ] if ;
+    ] if-empty ;
 
 M: range-parser (compile)
     [ min>> ] [ max>> ] bi '[ input-slice _ _ parse-range ] ;
 
 TUPLE: seq-parser parsers ;
 
-: ignore? ( ast -- bool )
-    ignore = ;
-
 : calc-seq-result ( prev-result current-result -- next-result )
     [
         [ remaining>> swap remaining<< ] 2keep
-        ast>> dup ignore? [
+        ast>> dup ignore = [
             drop
         ] [
             swap [ ast>> push ] keep
@@ -391,11 +384,7 @@ TUPLE: seq-parser parsers ;
     ] if* ;
 
 : parse-seq-element ( result quot -- result )
-    over [
-        call calc-seq-result
-    ] [
-        2drop f
-    ] if ; inline
+    '[ @ calc-seq-result ] [ f ] if* ; inline
 
 M: seq-parser (compile)
     [
@@ -435,11 +424,7 @@ M: repeat0-parser (compile)
 TUPLE: repeat1-parser parser ;
 
 : repeat1-empty-check ( result -- result )
-    [
-        dup ast>> empty? [ drop f ] when
-    ] [
-        f
-    ] if* ;
+    [ dup ast>> empty? [ drop f ] when ] [ f ] if* ;
 
 M: repeat1-parser (compile)
     parser>> compile-parser-quot '[
@@ -450,19 +435,15 @@ M: repeat1-parser (compile)
 TUPLE: optional-parser parser ;
 
 : check-optional ( result -- result )
-      [ input-slice f <parse-result> ] unless* ;
+    [ input-slice f <parse-result> ] unless* ;
 
 M: optional-parser (compile)
-      parser>> compile-parser-quot '[ @ check-optional ] ;
+    parser>> compile-parser-quot '[ @ check-optional ] ;
 
 TUPLE: semantic-parser parser quot ;
 
 : check-semantic ( result quot -- result )
-    over [
-        over ast>> swap call [ drop f ] unless
-    ] [
-        drop
-    ] if ; inline
+    dupd '[ dup ast>> @ [ drop f ] unless ] when ; inline
 
 M: semantic-parser (compile)
     [ parser>> compile-parser-quot ] [ quot>> ] bi
@@ -487,14 +468,11 @@ M: ensure-not-parser (compile)
 TUPLE: action-parser parser quot ;
 
 : check-action ( result quot -- result )
-    over [
-        over ast>> swap call( ast -- ast ) >>ast
-    ] [
-        drop
-    ] if ;
+    dupd '[ [ _ call( ast -- ast ) ] change-ast ] when ;
 
 M: action-parser (compile)
-    [ parser>> compile-parser-quot ] [ quot>> ] bi '[ @ _ check-action ] ;
+    [ parser>> compile-parser-quot ] [ quot>> ] bi
+    '[ @ _ check-action ] ;
 
 TUPLE: sp-parser parser ;
 
@@ -613,15 +591,12 @@ SYNTAX: PEG:
         [
             [
                 def call compile :> compiled-def
-                [
+                word [
                     dup compiled-def compiled-parse
                     [ ast>> ] [ word parse-failed ] ?if
-                ]
-                word swap effect define-declared
+                ] effect define-declared
             ] with-compilation-unit
         ] append!
     ] ;
-
-USE: vocabs.loader
 
 { "debugger" "peg" } "peg.debugger" require-when
