@@ -13,5 +13,6 @@ M: parse-error error.
     ] tri ;
 
 M: parse-failed error.
-    "The " write dup word>> pprint " word could not parse the following input:" print nl
+    "The " write dup word>> pprint
+    " word could not parse the following input:" print nl
     input>> . ;
