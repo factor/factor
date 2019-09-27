@@ -265,15 +265,14 @@ GENERIC: (compile) ( peg -- quot )
 : execute-parser ( word -- result )
     pos get apply-rule process-parser-result ;
 
-: preset-parser-word ( parser -- parser word )
-    gensym [ >>compiled ] keep ;
+: preset-parser-word ( parser -- word parser )
+    gensym swap over >>compiled ;
 
-: define-parser-word ( parser word -- )
+: define-parser-word ( word parser -- )
     ! Return the body of the word that is the compiled version
     ! of the parser.
-
-    2dup swap peg>> (compile) ( -- result ) define-declared
-    swap id>> "peg-id" set-word-prop ;
+    [ peg>> (compile) ( -- result ) define-declared ]
+    [ id>> "peg-id" set-word-prop ] 2bi ;
 
 : compile-parser ( parser -- word )
     ! Look to see if the given parser has been compiled.
@@ -285,7 +284,7 @@ GENERIC: (compile) ( peg -- quot )
     dup compiled>> [
         nip
     ] [
-        preset-parser-word [ define-parser-word ] keep
+        preset-parser-word dupd define-parser-word
     ] if* ;
 
 : compile-parser-quot ( parser -- quot )

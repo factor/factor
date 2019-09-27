@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces assocs accessors words sequences classes.tuple ;
+USING: accessors assocs classes.tuple kernel namespaces words ;
 IN: smalltalk.classes
 
 INITIALIZED-SYMBOL: classes [ H{ } clone ]

@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: peg peg.ebnf smalltalk.ast sequences sequences.deep strings
-math.parser multiline kernel arrays byte-arrays math assocs accessors ;
+USING: accessors arrays assocs byte-arrays kernel math
+math.parser multiline peg.ebnf sequences sequences.deep
+smalltalk.ast strings ;
 IN: smalltalk.parser
 
 ! :mode=text:noTabs=true:
@@ -131,7 +132,7 @@ BinaryMessage = OptionalWhiteSpace
                 OptionalWhiteSpace
                 (UnaryMessageSend | Operand):rhs
                 => [[ selector { rhs } ast-message boa ]]
-                                   
+
 KeywordMessageSegment = Keyword:k OptionalWhiteSpace (BinaryMessageSend | UnaryMessageSend | Operand):arg => [[ { k arg } ]]
 KeywordMessage = OptionalWhiteSpace
                  KeywordMessageSegment:h
