@@ -4,15 +4,14 @@
 ! Tested with OpenSSL 0.9.8a_0 on Mac OS X 10.4.9 PowerPC
 !
 ! export LD_LIBRARY_PATH=/opt/local/lib
-
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax classes.struct combinators system ;
+alien.libraries.finder alien.syntax classes.struct combinators system ;
 
 IN: openssl.libcrypto
 
 << "libcrypto" {
     { [ os windows? ] [ "libcrypto-37.dll" ] }
-    { [ os macosx? ] [ "libcrypto.dylib" ] }
+    { [ os macosx? ] [ { "libcrypto.46.dylib" "libcrypto.44.dylib" } find-library-from-list ] }
     { [ os unix? ] [ "libcrypto.so" ] }
 } cond cdecl add-library >>
 
