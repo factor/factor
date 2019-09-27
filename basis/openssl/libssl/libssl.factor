@@ -9,7 +9,7 @@ IN: openssl.libssl
 
 << "libssl" {
     { [ os windows? ] [ "libssl-38.dll" ] }
-    { [ os macosx? ] [ "libssl.dylib" ] }
+    { [ os macosx? ] [ "libssl.46.dylib" ] }
     { [ os unix? ] [ "libssl.so" ] }
 } cond cdecl add-library >>
 
