@@ -2,14 +2,14 @@
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.parser alien.syntax classes.struct combinators kernel literals
-namespaces openssl.libcrypto system ;
+alien.libraries.finder alien.parser alien.syntax classes.struct
+combinators kernel literals namespaces openssl.libcrypto system ;
 
 IN: openssl.libssl
 
 << "libssl" {
     { [ os windows? ] [ "libssl-38.dll" ] }
-    { [ os macosx? ] [ "libssl.dylib" ] }
+    { [ os macosx? ] [ { "libssl.44.dylib" "libssl.42.dylib" } find-library-from-list ] }
     { [ os unix? ] [ "libssl.so" ] }
 } cond cdecl add-library >>
 
