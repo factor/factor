@@ -5,7 +5,7 @@ classes.struct combinators destructors destructors.private fry
 io.backend io.backend.unix.multiplexers io.buffers io.files
 io.ports io.timeouts kernel kernel.private libc locals make math
 namespaces sequences summary system threads unix unix.ffi
-unix.stat unix.types ;
+unix.signals unix.stat unix.types ;
 QUALIFIED: io
 IN: io.backend.unix
 
@@ -184,10 +184,6 @@ M: stdin cancel-operation
         control-write-fd <fd> <output-port> >>control
         size-read-fd <fd> init-fd <input-port> >>size
         data-read-fd <fd> >>data ;
-
-SYMBOL: dispatch-signal-hook
-
-dispatch-signal-hook [ [ drop ] ] initialize
 
 : signal-pipe-fd ( -- n )
     OBJ-SIGNAL-PIPE special-object ; inline
