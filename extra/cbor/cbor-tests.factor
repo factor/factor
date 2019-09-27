@@ -34,13 +34,13 @@ math.parser math.ranges tools.test urls ;
     { -4.0 "f9c400" }
     { -4.1 "fbc010666666666666" }
     { 1/0. "f97c00" }
-    { NAN: 8000000000000 "f97e00" }
+    { nan: 8000000000000 "f97e00" }
     { -1/0. "f9fc00" }
     { 1/0. "fa7f800000" }
-    { NAN: 8000000000000 "fa7fc00000" }
+    { nan: 8000000000000 "fa7fc00000" }
     { -1/0. "faff800000" }
     { 1/0. "fb7ff0000000000000" }
-    { NAN: 8000000000000 "fb7ff8000000000000" }
+    { nan: 8000000000000 "fb7ff8000000000000" }
     { -1/0. "fbfff0000000000000" }
     { f "f4" }
     { t "f5" }
@@ -63,7 +63,7 @@ math.parser math.ranges tools.test urls ;
     }
     { T{ cbor-tagged f 23 B{ 1 2 3 4 } } "d74401020304" }
     { T{ cbor-tagged f 24 B{ 0x64 0x49 0x45 0x54 0x46 } } "d818456449455446" }
-    { URL" http://www.example.com" "d82076687474703a2f2f7777772e6578616d706c652e636f6d" }
+    { url"http://www.example.com" "d82076687474703a2f2f7777772e6578616d706c652e636f6d" }
     { B{ } "40" }
     { B{ 1 2 3 4 } "4401020304" }
     { B{ 0xaa 0xbb 0xcc 0xdd 0xee 0xff 0x99 } "5F44aabbccdd43eeff99ff" }
@@ -94,7 +94,7 @@ math.parser math.ranges tools.test urls ;
     { { { "a" 1 } { "b" { 2 3 } } } "bf61610161629f0203ffff" }
     { { "a" { { "b" "c" } } } "826161bf61626163ff" }
     { { { "Fun" t } { "Amt" -2 } } "bf6346756ef563416d7421ff" }
-} [| value hex-string |
+} |[ value hex-string |
 
     hex-string hex-string>bytes :> bytes
 

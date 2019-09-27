@@ -16,7 +16,7 @@ IN: alien.libraries.finder.freebsd
     rest parse-ldconfig-lines ;
 
 : name-matches? ( lib double -- ? )
-    first swap ?head [ ?first CHAR: . = ] [ drop f ] if ;
+    first swap ?head [ ?first ch'. = ] [ drop f ] if ;
 
 PRIVATE>
 

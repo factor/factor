@@ -32,28 +32,28 @@ TUPLE: entry key value ;
 
 : hexdigit ( -- parser )
     [
-        CHAR: 0 CHAR: 9 range ,
-        CHAR: a CHAR: f range ,
-        CHAR: A CHAR: F range ,
+        ch'0 ch'9 range ,
+        ch'a ch'f range ,
+        ch'A ch'F range ,
     ] choice* ;
 
 : hex ( -- parser )
     "0x" token hide hexdigit digits 2seq [ first hex> ] action ;
 
 : decdigit ( -- parser )
-    CHAR: 0 CHAR: 9 range ;
+    ch'0 ch'9 range ;
 
 : dec ( -- parser )
     decdigit digits [ dec> ] action ;
 
 : octdigit ( -- parser )
-    CHAR: 0 CHAR: 7 range ;
+    ch'0 ch'7 range ;
 
 : oct ( -- parser )
     "0o" token hide octdigit digits 2seq [ first oct> ] action ;
 
 : bindigit ( -- parser )
-    CHAR: 0 CHAR: 1 range ;
+    ch'0 ch'1 range ;
 
 : bin ( -- parser )
     "0b" token hide bindigit digits 2seq [ first bin> ] action ;
@@ -80,7 +80,7 @@ TUPLE: entry key value ;
 
 : nan ( -- parser )
     sign optional "nan" token 2seq
-    [ drop NAN: 8000000000000 ] action ;
+    [ drop nan: 8000000000000 ] action ;
 
 : float-parser ( -- parser )
     float +inf -inf nan 4choice ;
@@ -106,11 +106,11 @@ TUPLE: entry key value ;
     basic-string literal-string 2choice [ "" like ] action ;
 
 : multi-basic-string ( -- parser )
-    escaped unicode [ CHAR: \" = not ] satisfy 3choice repeat0
+    escaped unicode [ ch'\" = not ] satisfy 3choice repeat0
     "\"\"\"" dup surrounded-by ;
 
 : multi-literal-string ( -- parser )
-    [ CHAR: ' = not ] satisfy repeat0
+    [ ch'\' = not ] satisfy repeat0
     "'''" dup surrounded-by ;
 
 : multi-string ( -- parser )
@@ -203,9 +203,9 @@ DEFER: key-value-parser
 
 : name-parser ( -- parser )
     [
-        CHAR: A CHAR: Z range ,
-        CHAR: a CHAR: z range ,
-        CHAR: 0 CHAR: 9 range ,
+        ch'A ch'Z range ,
+        ch'a ch'z range ,
+        ch'0 ch'9 range ,
         "_" token [ first ] action ,
         "-" token [ first ] action ,
     ] choice* repeat1 [ "" like ] action single-string 2choice ;
@@ -214,7 +214,7 @@ DEFER: key-value-parser
     [
         space hide ,
         "#" token ,
-        [ CHAR: \n = not ] satisfy repeat0 ,
+        [ ch'\n = not ] satisfy repeat0 ,
     ] seq* [ drop f ] action ;
 
 : key-parser ( -- parser )

@@ -21,7 +21,7 @@ CONSTANT: alphabet $[ "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567" >byte-array ]
     alphabet nth ; inline
 
 : base32>ch ( ch -- ch )
-    $[ alphabet alphabet-inverse 0 CHAR: = pick set-nth ] nth
+    $[ alphabet alphabet-inverse 0 ch'= pick set-nth ] nth
     [ malformed-base32 ] unless* { fixnum } declare ; inline
 
 : encode5 ( seq -- byte-array )
@@ -31,7 +31,7 @@ CONSTANT: alphabet $[ "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567" >byte-array ]
 
 : encode-pad ( seq n -- byte-array )
     [ 5 0 pad-tail encode5 ] [ B{ 0 2 4 5 7 } nth ] bi* head-slice
-    8 CHAR: = pad-tail ; inline
+    8 ch'= pad-tail ; inline
 
 : (encode-base32) ( stream column -- )
     5 pick stream-read dup length {
@@ -52,14 +52,14 @@ PRIVATE>
 
 : decode8 ( seq -- )
     [ 0 [ base32>ch swap 5 shift bitor ] reduce 5 >be ]
-    [ [ CHAR: = = ] count ] bi
+    [ [ ch'= = ] count ] bi
     [ write ] [ B{ 0 4 0 3 2 0 1 } nth head-slice write ] if-zero ; inline
 
 : (decode-base32) ( stream -- )
     8 "\n\r" pick read-ignoring dup length {
         { 0 [ 2drop ] }
         { 8 [ decode8 (decode-base32) ] }
-        [ drop 8 CHAR: = pad-tail decode8 (decode-base32) ]
+        [ drop 8 ch'= pad-tail decode8 (decode-base32) ]
     } case ;
 
 PRIVATE>
