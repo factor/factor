@@ -1,9 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs combinators fry io.pathnames
-io.sockets io.sockets.secure kernel lexer linked-assocs make
-math.parser namespaces peg.ebnf present sequences splitting
-strings strings.parser urls.encoding vocabs.loader multiline ;
+
+USING: accessors arrays ascii assocs combinators fry
+io.pathnames io.sockets io.sockets.secure kernel lexer
+linked-assocs make math.parser multiline namespaces peg.ebnf
+present sequences splitting strings strings.parser urls.encoding
+vocabs.loader ;
+
 IN: urls
 
 TUPLE: url protocol username password host port path query anchor ;
@@ -101,7 +104,7 @@ M: pathname >url string>> >url ;
     ] [ 2drop ] if ;
 
 : url-port ( url -- port/f )
-    [ port>> ] [ port>> ] [ protocol>> protocol-port ] tri =
+    [ port>> ] [ protocol>> protocol-port ] bi over =
     [ drop f ] when ;
 
 : unparse-host-part ( url -- )

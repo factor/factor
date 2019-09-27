@@ -60,14 +60,7 @@ USE: xml.entities
     } escape-string-by ;
 
 : space? ( ch -- ? )
-    {
-        [ ch'\s = ]
-        [ ch'\t = ]
-        [ ch'\n = ]
-        [ ch'\r = ]
-        [ 0x0c = ] ! \f
-        [ 0x0b = ] ! \v
-    } 1|| ;
+    "\s\t\n\r\f\v" member-eq? ;
 
 : unspace ( str -- str' )
     [ space? ] trim ;
@@ -92,7 +85,7 @@ SYMBOL: option
     } 1&& ;
 
 : line-continues? ( line -- ? )
-    { [ empty? not ] [ last ch'\\ = ] } 1&& ;
+    ?last ch'\\ = ;
 
 : section, ( -- )
     section get [ , ] when* ;
@@ -130,9 +123,9 @@ PRIVATE>
 
 : write-ini ( assoc -- )
     [
-        dup string?
-        [ [ escape-string ] bi@ "%s=%s\n" printf ]
-        [
+        dup string? [
+            [ escape-string ] bi@ "%s=%s\n" printf
+        ] [
             [ escape-string "[%s]\n" printf ] dip
             [ [ escape-string ] bi@ "%s=%s\n" printf ]
             assoc-each nl

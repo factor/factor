@@ -51,7 +51,8 @@ M: link uses
     [ { $vocab-link } article-links [ >vocab-link ] map ]
     bi append ;
 
-M: pathname uses string>> path>source-file top-level-form>> [ uses ] [ { } ] if* ;
+M: pathname uses
+    string>> path>source-file top-level-form>> [ uses ] [ { } ] if* ;
 
 ! To make UI browser happy
 M: object uses drop f ;
@@ -140,7 +141,7 @@ M: f smart-usage drop \ f smart-usage ;
 SINGLETON: invalidate-crossref
 
 M: invalidate-crossref definitions-changed
-    2drop crossref global delete-at ;
+    2drop f crossref set-global ;
 
 [ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
 

@@ -55,6 +55,10 @@ GENERIC: user-input* ( str gadget -- ? )
 
 M: gadget user-input* 2drop t ;
 
+GENERIC: temp-im-input ( str gadget -- ? )
+
+M: gadget temp-im-input 2drop t ;
+
 GENERIC: children-on ( rect gadget -- seq )
 
 M: gadget children-on nip children>> ;
@@ -396,6 +400,10 @@ M: f request-focus-on 2drop ;
 
 : focus-path ( gadget -- seq )
     [ focus>> ] follow ;
+
+GENERIC: preedit? ( gadget -- ? )
+
+M: gadget preedit? drop f ;
 
 USE: vocabs.loader
 

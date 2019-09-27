@@ -8,8 +8,14 @@ core-graphics core-graphics.types core-text io.encodings.utf8
 kernel literals locals math math.order math.parser
 math.rectangles namespaces opengl sequences splitting threads
 ui.commands ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.private words ;
+ui.gestures ui.private words sorting math.vectors
+ui.baseline-alignment ui.gadgets.line-support
+ui.gadgets.editors ui.backend.cocoa.input-methods
+ui.backend.cocoa.input-methods.editors io.encodings.utf16n
+io.encodings.string classes.struct ;
 IN: ui.backend.cocoa.views
+
+SLOT: window
 
 : send-mouse-moved ( view event -- )
     [ mouse-location ] [ drop window ] 2bi
@@ -181,8 +187,100 @@ M: send-touchbar-command send-queued-gesture
         yield
     ] [ 3drop ] if ;
 
+IMPORT: NSAttributedString
+
+<PRIVATE
+
+:: >codepoint-index ( str utf16-index -- codepoint-index )
+    0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
+    
+:: >utf16-index ( str codepoint-index -- utf16-index )
+    0 codepoint-index str subseq utf16n encode length 2 / >integer ;
+
+:: earlier-caret/mark ( editor -- loc )
+    editor editor-caret :> caret
+    editor editor-mark :> mark
+    caret first mark first = [
+        caret second mark second < [ caret ] [ mark ] if
+    ] [
+        caret first mark first < [ caret ] [ mark ] if
+    ] if ;
+
+:: make-preedit-underlines ( gadget text range -- underlines )
+    f gadget preedit-selection-mode?<<
+    { } clone :> underlines!
+    text send: length :> text-length
+    0 0 <NSRange> :> effective-range
+    text send: string CFString>string :> str
+    str utf16n encode :> byte-16n
+    0 :> cp-loc!    
+    "NSMarkedClauseSegment" <NSString> :> segment-attr
+    [ effective-range [ location>> ] [ length>> ] bi + text-length < ] [
+        text
+        segment-attr
+        effective-range [ location>> ] [ length>> ] bi +
+        effective-range >c-ptr
+        send: attribute:atIndex:effectiveRange: drop
+        1 :> thickness!
+        range location>> effective-range location>> = [
+            2 thickness!
+            t gadget preedit-selection-mode?<<
+        ] when
+        underlines
+        effective-range [ location>> ] [ length>> ] bi over +
+        [ str swap >codepoint-index ] bi@ swap - :> len
+        cp-loc cp-loc len + dup cp-loc!
+        2array thickness 2array
+        suffix underlines! 
+    ] while 
+    underlines length 1 = [
+        underlines first first 2 2array 1array  ! thickness: 2
+    ] [ underlines ] if ;
+
+:: update-marked-text ( gadget str selectedRange replacementRange -- )
+    replacementRange location>>  NSNotFound = not     ! [ 
+    replacementRange length>> NSNotFound = not and [  ! erase this line
+        gadget editor-caret first
+        dup gadget editor-line
+        [ 
+            replacementRange length>> ! location>>
+            >codepoint-index
+            2array gadget set-caret
+        ] [
+            replacementRange length>> 1 + ! [ location>> ] [ length>> ] bi +
+            >codepoint-index
+            2array gadget set-mark
+        ] 2bi
+        gadget earlier-caret/mark dup
+        gadget preedit-start<<
+        0 1 2array v+ gadget preedit-end<<
+    ] when
+
+    gadget preedit? [
+        gadget remove-preedit-text
+    ] when
+    
+    gadget earlier-caret/mark dup
+    gadget preedit-start<<
+    0 str length 2array v+ gadget preedit-end<<
+    str gadget temp-im-input drop
+    gadget preedit-start>>
+    0 str selectedRange location>> >codepoint-index 2array v+
+    dup gadget preedit-selected-start<<
+    0
+    selectedRange [ location>> ] [ length>> ] bi + selectedRange location>>
+    [ str swap >codepoint-index ] bi@ -
+    2array v+
+    dup gadget preedit-selected-end<<
+    dup gadget set-caret gadget set-mark          
+    gadget preedit-start>> gadget preedit-end>> = [
+        gadget remove-preedit-info 
+    ] when ;
+
+PRIVATE>
+
 <CLASS: FactorView < NSOpenGLView
-    COCOA-PROTOCOL: NSTextInput
+    COCOA-PROTOCOL: NSTextInputClient
 
     COCOA-METHOD: void prepareOpenGL [
 
@@ -264,10 +362,16 @@ M: send-touchbar-command send-queued-gesture
 
     COCOA-METHOD: char validateUserInterfaceItem: id event
     [
-        self window [
-            event send: action utf8 alien>string validate-action
-            [ >c-bool ] [ drop self event super: \validateUserInterfaceItem: ] if
-        ] [ 0 ] if*
+        self window :> window
+        window [
+            window world-focus :> gadget
+            gadget [
+                gadget preedit? not [
+                    window event send: action utf8 alien>string validate-action
+                    [ >c-bool ] [ drop self event super: \validateUserInterfaceItem: ] if
+                ] [ 0 ] if
+            ] [ 0 ] if
+        ] [ 0 ] if
     ] ;
 
     COCOA-METHOD: id undo: id event [ self event undo-action send-action$ f ] ;
@@ -354,35 +458,180 @@ M: send-touchbar-command send-queued-gesture
         ] [ 0 ] if
     ] ;
 
-    ! Text input
-    COCOA-METHOD: void insertText: id text
-    [
-        self window :> window
-        window [
-            text CFString>string window user-input
-        ] when
-    ] ;
+    COCOA-METHOD: void insertText: id text replacementRange: NSRange replacementRange [
+            self window :> window
+            window [
+                "" clone :> str!
+                text NSString send: class send: isKindOfClass: 0 = not [
+                    text CFString>string str!               
+                ] [
+                    text send: string CFString>string str!               
+                ] if
+                window world-focus :> gadget
+                gadget [
+                    gadget support-input-methods? [                        
+                        replacementRange location>> NSNotFound = [                        
+                            gadget editor-caret first
+                            dup gadget editor-line
+                            [ 
+                                replacementRange location>> >codepoint-index
+                                2array gadget set-caret
+                            ] [
+                                replacementRange [ location>> ] [ length>> ] bi + 
+                                >codepoint-index
+                                2array gadget set-mark
+                            ] 2bi                        
+                        ] unless
+                        gadget preedit? [
+                            gadget [ remove-preedit-text ] [ remove-preedit-info ] bi
+                            str gadget user-input* drop
+                            f gadget preedit-selection-mode?<<
+                        ] [
+                            str window user-input                           
+                        ] if
+                    ] [ 
+                        str window user-input
+                    ] if
+                ] when
+            ] when
+        ] ;
 
-    COCOA-METHOD: char hasMarkedText [ 0 ] ;
+    COCOA-METHOD: char hasMarkedText [
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget [
+                    gadget preedit? [ 1 ] [ 0 ] if
+                ] [ 0 ] if
+            ] [ 0 ] if
+        ] ;
 
-    COCOA-METHOD: NSRange markedRange [ 0 0 <NSRange> ] ;
+    COCOA-METHOD: NSRange markedRange [ 
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget [
+                    gadget preedit? [
+                        gadget [ preedit-start>> second ] [ preedit-end>> second ] bi >= [ 
+                            NSNotFound 0 
+                        ] [
+                            gadget preedit-start>> first gadget editor-line :> str
+                            gadget
+                            [ preedit-start>> second ]                 ! location
+                            [ preedit-end>> second ]
+                            bi [ str swap >utf16-index ] bi@ over -    ! length
+                        ] if
+                    ] [  NSNotFound 0 ] if
+                ] [  NSNotFound 0 ] if
+            ] [ NSNotFound 0 ] if
+            <NSRange>
+        ] ;
 
-    COCOA-METHOD: NSRange selectedRange [ 0 0 <NSRange> ] ;
+    COCOA-METHOD: NSRange selectedRange [
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget [
+                    gadget support-input-methods? [
+                        gadget editor-caret first gadget editor-line :> str
+                        gadget preedit? [
+                            str
+                            gadget
+                            [ preedit-selected-start>> second ]
+                            [ preedit-start>> second ] 
+                            bi - >utf16-index                        ! location
+                            gadget
+                            [ preedit-selected-end>> second ]
+                            [ preedit-selected-start>> second ]
+                            bi [ str swap >utf16-index ] bi@ -       ! length
+                        ] [                            
+                            str gadget editor-caret second >utf16-index 0
+                        ] if
+                    ] [ 0 0 ] if
+                ] [ 0 0 ] if
+            ] [ 0 0 ] if 
+            <NSRange>
+        ] ;
+   
+    COCOA-METHOD: void setMarkedText: id text selectedRange: NSRange selectedRange
+                                     replacementRange: NSRange replacementRange [           
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget [
+                    { } clone :> underlines!
+                    "" clone :> str!
+                    text NSString send: class send: isKindOfClass: 0 = not [
+                        text CFString>string str!               
+                    ] [
+                        text send: string CFString>string str!               
+                        gadget support-input-methods? [
+                            gadget text selectedRange make-preedit-underlines underlines!
+                        ] when
+                    ] if
+                    gadget support-input-methods? [
+                        gadget str selectedRange replacementRange update-marked-text
+                        underlines gadget preedit-underlines<<
+                    ] when
+                ] when
+            ] when            
+        ] ;
+             
+    COCOA-METHOD: void unmarkText [ 
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget [
+                    gadget support-input-methods? [
+                        gadget preedit? [
+                            gadget {
+                                [ preedit-start>> second ]
+                                [ preedit-end>> second ]
+                                [ preedit-start>> first ] [ editor-line ]
+                            } cleave subseq
+                            gadget [ remove-preedit-text ] [ remove-preedit-info ] bi
+                            gadget user-input* drop
+                        ] when
+                        f gadget preedit-selection-mode?<<
+                    ] when
+                ] when
+            ] when
+        ] ;
+    
+    COCOA-METHOD: id validAttributesForMarkedText [             
+            NSArray "NSMarkedClauseSegment" <NSString> send: arrayWithObject:
+        ] ;
 
-    COCOA-METHOD: void setMarkedText: id text selectedRange: NSRange range [ ] ;
-
-    COCOA-METHOD: void unmarkText [ ] ;
-
-    COCOA-METHOD: id validAttributesForMarkedText [ NSArray send: array ] ;
-
-    COCOA-METHOD: id attributedSubstringFromRange: NSRange range [ f ] ;
-
+    COCOA-METHOD: id attributedSubstringForProposedRange: NSRange aRange
+                                       actualRange: id actualRange [ f ] ;
+    
     COCOA-METHOD: NSUInteger characterIndexForPoint: NSPoint point [ 0 ] ;
 
-    COCOA-METHOD: NSRect firstRectForCharacterRange: NSRange range [ 0 0 0 0 <CGRect> ] ;
+    COCOA-METHOD: NSRect firstRectForCharacterRange: NSRange aRange
+                                  actualRange: NSRange actualRange [
+            self window :> window
+            window [
+                window world-focus :> gadget
+                gadget [
+                    gadget support-input-methods? [
+                        gadget editor-caret first gadget editor-line :> str                
+                        str aRange location>> >codepoint-index :> start-pos
+                        gadget editor-caret first start-pos 2array gadget loc>x
+                        gadget caret-loc second gadget caret-dim second + 
+                        2array                     ! character pos
+                        gadget screen-loc v+       ! + gadget pos 
+                        { 1 -1 } v*
+                        window handle>> window>> dup send: frame send: contentRectForFrameRect:
+                        CGRect-top-left 2array v+  ! + window pos
+                        first2 [ >fixnum ] bi@ 0 gadget line-height >fixnum
+                    ] [ 0 0 0 0 ] if
+                ] [ 0 0 0 0 ] if
+            ] [ 0 0 0 0 ] if
+            <CGRect>
+        ] ;
 
-    COCOA-METHOD: NSInteger conversationIdentifier [ self alien-address ] ;
-
+    COCOA-METHOD: void doCommandBySelector: SEL selector [ ] ;
+    
     ! Initialization
     COCOA-METHOD: void updateFactorGadgetSize: id notification
     [
@@ -392,7 +641,6 @@ M: send-touchbar-command send-queued-gesture
         ] when
     ] ;
 
-    COCOA-METHOD: void doCommandBySelector: SEL selector [ ] ;
 
     COCOA-METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
     [

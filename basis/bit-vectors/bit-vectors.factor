@@ -9,6 +9,5 @@ VECTORIZED: bit bit-array <bit-array>
 SYNTAX: \?V{ \ } [ >bit-vector ] parse-literal ;
 
 M: bit-vector contract 2drop ;
-M: bit-vector >pprint-sequence ;
-M: bit-vector pprint-delims drop \ ?V{ \ } ;
-M: bit-vector pprint* pprint-object ;
+
+{ "bit-vectors" "prettyprint" } "bit-vectors.prettyprint" require-when

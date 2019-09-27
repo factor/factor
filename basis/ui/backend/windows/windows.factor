@@ -9,7 +9,9 @@ threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
 ui.private windows.dwmapi windows.errors windows.gdi32
 windows.kernel32 windows.messages windows.offscreen windows.opengl32
-windows.types windows.user32 assocs.extras byte-arrays ;
+windows.types windows.user32 assocs.extras byte-arrays
+io.encodings.string ;
+FROM: unicode => upper-surrogate? under-surrogate? ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -347,11 +349,26 @@ CONSTANT: exclude-keys-wm-char
 : handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     \ send-key-down (handle-wm-keydown/up) ;
 
+SYMBOL: upper-surrogate-wm-char
+
 :: handle-wm-char ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-char? [
-       ctrl? alt? xor [ ! enable AltGr combination inputs
-           wParam 1string hWnd window user-input
-       ] unless
+        ctrl? alt? xor [ ! enable AltGr combination inputs
+            wParam {
+                { [ dup upper-surrogate? ] [
+                      upper-surrogate-wm-char set-global ]
+                }
+                { [ dup under-surrogate? ] [
+                      drop
+                      upper-surrogate-wm-char get-global [
+                          wParam "" 2sequence
+                          utf16n encode utf16n decode hWnd window user-input
+                      ] when* ]
+                }
+                [ 1string hWnd window user-input
+                  f upper-surrogate-wm-char set-global ]
+            } cond
+        ] unless
     ] unless ;
 
 : handle-wm-keyup ( hWnd uMsg wParam lParam -- )

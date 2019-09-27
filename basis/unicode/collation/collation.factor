@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit combinators.smart kernel locals make
+combinators.short-circuit combinators.smart fry kernel locals make
 math math.order math.parser namespaces sequences
 simple-flat-file splitting strings unicode.data ;
 IN: unicode.collation
@@ -32,23 +32,184 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
 
 "vocab:unicode/UCA/allkeys.txt" parse-ducet ducet set-global
 
-! Fix up table for long contractions
-: help-one ( assoc key -- )
-    ! Need to be more general? Not for DUCET, apparently
-    2 head 2dup swap key? [ 2drop ] [
-        [ [ 1string of ] with { } map-as concat ]
-        [ swap set-at ] 2bi
-    ] if ;
+! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
+! WF5 - Well-formedness 5 condition:
+! https://www.unicode.org/reports/tr10/tr10-41.html#WF5
+!    { "0CC6" "0CC2" "0CD5" } ! 0CD5 is not a non-starter, don't add 2-gram "0CC6" "0CC2"to ducet
+!    { "0DD9" "0DCF" "0DCA" } ! already in allkeys.txt file
+!    { "0FB2" "0F71" "0F80" } ! added below
+!    { "0FB3" "0F71" "0F80" } ! added below
+! This breaks the unicode tests that ship in CollationTest_SHIFTED.txt
+! but it's supposedly more correct.
+: fixup-ducet-for-tibetan ( -- )
+    {
+        {
+            { 0x0FB2 0x0F71 } ! CE(0FB2) CE(0F71)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F71 } ! CE(0FB3) CE(0F71)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12741 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
 
-: insert-helpers ( assoc -- )
-    dup keys [ length 3 >= ] filter [ help-one ] with each ;
+        {
+            { 0x0FB2 0x0F71 0x0F72 } ! CE(0FB2) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12743 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB2 0x0F73        } ! CE(0FB2) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12743 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB2 0x0F71 0x0F74 } ! CE(0FB2) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12747 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB2 0x0F75        } ! CE(0FB2) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12719 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12747 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F71 0x0F72 } ! CE(0FB3) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12743 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F73        } ! CE(0FB3) CE(0F71 0F72)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12743 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F71 0x0F74 } ! CE(0FB3) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12747 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+        {
+            { 0x0FB3 0x0F75        } ! CE(0FB3) CE(0F71 0F74)
+            {
+                T{ weight-levels
+                    { primary 12722 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+                T{ weight-levels
+                    { primary 12747 }
+                    { secondary 32 }
+                    { tertiary 2 }
+                }
+            }
+        }
+    } ducet get-global '[ swap >string _ set-at ] assoc-each ;
 
-ducet get-global insert-helpers
+! These values actually break the collation unit tests in CollationTest_SHIFTED.txt
+! So we disable those tests in favor of supposedly better collation for Tibetan.
+! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
+
+fixup-ducet-for-tibetan
 
 : tangut-block? ( char -- ? )
     ! Tangut Block, Tangut Components Block
     { [ 0x17000 0x187FF between? ] [ 0x18800 0x18AFF between? ] } 1|| ; inline
 
+: nushu-block? ( char -- ? )
+    0x1b170 0x1B2FB between? ; inline
+
+! https://wiki.computercraft.cc/Module:Unicode_data
 ! Unicode TR10 - Computing Implicit Weights
 : base ( char -- base )
     {
@@ -57,7 +218,8 @@ ducet get-global insert-helpers
         { [ dup 0x2A700 0x2B734 between? ] [ drop 0xFB80 ] } ! Extension C
         { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
         { [ dup 0x2B820 0x2CEA1 between? ] [ drop 0xFB80 ] } ! Extension E
-        { [ dup 0x04E00 0x09FD5 between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x2CEB0 0x2EBE0 between? ] [ drop 0xFB80 ] } ! Extension F
+        { [ dup 0x04E00 0x09FEF between? ] [ drop 0xFB40 ] } ! CJK
         [ drop 0xFBC0 ] ! Other
     } cond ;
 
@@ -67,33 +229,30 @@ ducet get-global insert-helpers
 : tangut-BBBB ( char -- weight-levels )
     0x17000 - 0x8000 bitor 0 0 <weight-levels> ; inline
 
+: nushu-AAAA ( char -- weight-levels )
+    drop 0xfb01 0x0020 0x0002 <weight-levels> ; inline
+
+: nushu-BBBB ( char -- weight-levels )
+    0x1B170 - 0x8000 bitor 0 0 <weight-levels> ; inline
+
 : AAAA ( char -- weight-levels )
     [ base ] [ -15 shift ] bi + 0x0020 0x0002 <weight-levels> ; inline
 
 : BBBB ( char -- weight-levels )
     0x7FFF bitand 0x8000 bitor 0 0 <weight-levels> ; inline
 
-: illegal? ( char -- ? )
-    {
-        [ "Noncharacter_Code_Point" property? ]
-        [ category "Cs" = ]
-    } 1|| ;
-
 : derive-weight ( 1string -- weight-levels-pair )
     first
-    dup tangut-block? [
-        [ tangut-AAAA ] [ tangut-BBBB ] bi 2array
-    ] [
-        dup illegal? [
-            drop { }
-        ] [
-            [ AAAA ] [ BBBB ] bi 2array
-        ] if
-    ] if ;
+    {
+        { [ dup tangut-block? ] [ [ tangut-AAAA ] [ tangut-BBBB ] bi 2array ] }
+        { [ dup nushu-block? ] [ [ nushu-AAAA ] [ nushu-BBBB ] bi 2array ] }
+        [ [ AAAA ] [ BBBB ] bi 2array ]
+    } cond ;
 
 : building-last ( -- char )
     building get [ 0 ] [ last last ] if-empty ;
 
+! https://www.unicode.org/reports/tr10/tr10-41.html#Collation_Graphemes
 : blocked? ( char -- ? )
     combining-class dup { 0 f } member?
     [ drop building-last non-starter? ]

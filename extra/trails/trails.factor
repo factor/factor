@@ -11,11 +11,10 @@ IN: trails
     ! Return the mouse location relative to the current gadget
     hand-loc get hand-gadget get screen-loc v- ;
 
-: point-list ( n -- seq ) { 0 0 } <array> <circular> ;
-
 : percent->radius ( percent -- radius ) neg 1 + 25 * 5 max ;
 
-: dot ( pos percent -- ) percent->radius draw-circle ;
+: dot ( pos percent -- )
+    '[ _ percent->radius draw-circle ] when* ;
 
 TUPLE: trails-gadget < gadget points timer ;
 
@@ -28,7 +27,7 @@ M: trails-gadget ungraft*
 :: iterate-system ( GADGET -- )
     ! Add a valid point if the mouse is in the gadget
     ! Otherwise, add an "invisible" point
-    hand-gadget get GADGET = [ mouse ] [ { -10 -10 } ] if
+    hand-gadget get GADGET = [ mouse ] [ f ] if
     GADGET points>> circular-push ;
 
 M: trails-gadget pref-dim* drop { 500 500 } ;
@@ -44,7 +43,7 @@ M:: trails-gadget draw-gadget* ( GADGET -- )
 
 : <trails-gadget> ( -- trails-gadget )
     trails-gadget new
-        300 point-list >>points
+        300 f <array> <circular> >>points
         t >>clipped?
         dup '[ _ dup iterate-system relayout-1 ]
         f 10 milliseconds <timer> >>timer ;

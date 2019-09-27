@@ -83,7 +83,7 @@ UNION: fixed-length array byte-array string ;
 : empty-set? ( info -- ? )
     {
         [ class>> null-class? ]
-        [ [ interval>> empty-interval eq? ] [ class>> real class<= ] bi and ]
+        [ [ interval>> empty-interval? ] [ class>> real class<= ] bi and ]
     } 1|| ;
 
 ! Hardcoding classes is kind of a hack.

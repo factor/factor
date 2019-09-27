@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-effects kernel make math math.parser multiline namespaces parser
-peg peg.parsers quotations sequences sequences.deep splitting
-stack-checker strings strings.parser summary unicode
-vocabs.parser words fry ;
+effects fry kernel make math math.parser multiline namespaces
+parser peg peg.parsers quotations sequences sequences.deep
+splitting stack-checker strings strings.parser summary unicode
+vocabs.parser words ;
 FROM: vocabs.parser => search ;
 FROM: peg.search => replace ;
 IN: peg.ebnf
@@ -209,8 +209,8 @@ DEFER: choice-parser
     ! Parse a group of choices, with a suffix indicating
     ! the type of group (repeat0, repeat1, etc) and
     ! an quot that is the action that produces the AST.
-    2dup
     [
+        2dup
         "(" [ choice-parser sp ] delay ")" syntax-pack
         swap 2seq
         [ first ] rot compose action ,
@@ -278,8 +278,10 @@ DEFER: choice-parser
             repeat0-parser sp ,
             repeat1-parser sp ,
             optional-parser sp ,
-        ] choice*
-        [ dup    , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
+        ] choice* [
+            dup , ":" syntax , "a-zA-Z" range-pattern repeat1
+            [ >string ] action ,
+        ] seq* [ first2 <ebnf-var> ] action ,
         ,
     ] choice* ;
 

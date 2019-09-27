@@ -461,8 +461,7 @@ M: f ($instance) ($link) ;
     "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description ;
 
 : $complex-shuffle ( element -- )
-    drop
-    "Shuffle word. Rearranges the top of the datastack as indicated in the stack effect pattern." $description
+    $shuffle
     { "The data flow represented by this shuffle word can be more clearly expressed using " { $link "locals" } "." } $deprecated ;
 
 : $low-level-note ( children -- )
@@ -504,7 +503,7 @@ M: array elements*
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
 : collect-elements ( element seq -- elements )
-    swap '[ _ elements [ rest ] map concat ] gather ;
+    swap '[ [ _ elements* ] each ] { } make [ rest ] map concat ;
 
 : <$link> ( topic -- element )
     1array \ $link prefix ;

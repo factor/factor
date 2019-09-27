@@ -1,7 +1,9 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel make math math.parser math.ranges peg
-peg.private peg.search sequences strings unicode vectors ;
+USING: accessors fry kernel literals make math math.parser
+math.ranges peg peg.private sequences splitting strings unicode
+vectors ;
+FROM: peg.search => replace ;
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
@@ -31,9 +33,9 @@ M: just-parser (compile) ( parser -- quot )
 : list-of-many ( items separator -- parser )
     hide t (list-of) ;
 
-: epsilon ( -- parser ) V{ } token ;
+CONSTANT: epsilon $[ V{ } token ]
 
-: any-char ( -- parser ) [ drop t ] satisfy ;
+CONSTANT: any-char $[ [ drop t ] satisfy ]
 
 <PRIVATE
 
@@ -88,8 +90,7 @@ PRIVATE>
         any-char ,
     ] seq* [
         first2 [a,b] >string
-    ] action
-    replace ;
+    ] action replace ;
 
 : range-pattern ( pattern -- parser )
     ! 'pattern' is a set of characters describing the
@@ -100,8 +101,8 @@ PRIVATE>
     ! characters separated with a dash (-) represents the
     ! range of characters from the first to the second,
     ! inclusive.
-    dup first ch'^ = [
-        rest (range-pattern) [ member? not ] curry satisfy
+    "^" ?head [
+        (range-pattern) '[ _ member? not ] satisfy
     ] [
-        (range-pattern) [ member? ] curry satisfy
+        (range-pattern) '[ _ member? ] satisfy
     ] if ;

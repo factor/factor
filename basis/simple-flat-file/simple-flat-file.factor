@@ -30,7 +30,7 @@ IN: simple-flat-file
     utf8 file-lines process-codetable-lines >biassoc ;
 
 : split-; ( line -- array )
-    ";" split [ [ blank? ] trim ] map! ;
+    ";" split [ [ blank? ] trim ] map! ; inline
 
 : load-data-file ( filename -- data )
     utf8 file-lines drop-comments [ split-; ] map! ;

@@ -12,31 +12,43 @@ IN: windows.uniscribe
 
 TUPLE: script-string < disposable font string metrics ssa size image ;
 
-: line-offset>x ( n script-string -- x )
-    2dup string>> length = [
-        ssa>> ! ssa
-        swap 1 - ! icp
-        TRUE ! fTrailing
-    ] [
-        ssa>>
-        swap ! icp
-        FALSE ! fTrailing
-    ] if
-    { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters ;
-
-: x>line-offset ( x script-string -- n trailing )
-    ssa>> ! ssa
-    swap ! iX
-    { int int } [ ScriptStringXtoCP check-ole32-error ] with-out-parameters ;
-
 <PRIVATE
 
 CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 
+:: >codepoint-index ( str utf16-index -- codepoint-index )
+    0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
+
+:: >utf16-index ( str codepoint-index -- utf16-index )
+    0 codepoint-index str subseq utf16n encode length 2 / >integer ;
+
+PRIVATE>
+
+:: line-offset>x ( n script-string -- x )
+    script-string string>> n >utf16-index :> n-utf16
+    script-string ssa>> ! ssa
+    n script-string string>> length = [
+        n-utf16 1 - ! icp
+        TRUE ! fTrailing
+    ] [
+        n-utf16 ! icp
+        FALSE ! fTrailing
+    ] if
+    { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters ;
+
+:: x>line-offset ( x script-string -- n trailing )
+    script-string ssa>> ! ssa
+    x ! iX
+    { int int } [ ScriptStringXtoCP check-ole32-error ] with-out-parameters
+    swap dup 0 < [ script-string string>> swap >codepoint-index ] unless
+    swap ;
+
+<PRIVATE
+
 : make-ssa ( dc script-string -- ssa )
     dup selection? [ string>> ] when
-    [ utf16n encode ] ! pString
-    [ length ] bi ! cString
+    utf16n encode ! pString
+    dup length 2 / >integer ! cString
     dup 1.5 * 16 + >integer ! cGlyphs -- MSDN says this is "recommended size"
     -1 ! iCharset -- Unicode
     ssa-dwFlags
@@ -73,7 +85,14 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
         ETO_OPAQUE ! uOptions
     ]
     [ [ { 0 0 } ] dip <RECT> ]
-    [ selection-start/end ] tri*
+    [
+        [let :> str str selection-start/end
+         [
+             str string>> dup selection? [ string>> ] when
+             swap >utf16-index
+         ] bi@
+        ]
+    ] tri*
     ! iMinSel
     ! iMaxSel
     FALSE ! fDisabled
@@ -150,5 +169,5 @@ SYMBOL: cached-script-strings
         ] with-memory-dc
     ] unless image>> ;
 
-[ <cache-assoc> &dispose cached-script-strings set-global ]
+[ <cache-assoc> cached-script-strings set-global ]
 "windows.uniscribe" add-startup-hook
