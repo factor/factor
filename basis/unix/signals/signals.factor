@@ -1,6 +1,7 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math namespaces sequences threads ;
+USING: accessors assocs io kernel math namespaces sequences
+system threads ;
 IN: unix.signals
 
 CONSTANT: signal-names
@@ -20,6 +21,9 @@ GENERIC: signal-name ( obj -- str/f )
 M: signal signal-name n>> signal-name ;
 
 M: integer signal-name ( n -- str/f ) 1 - signal-names ?nth ;
+
+: signal-name. ( n -- )
+    signal-name [ " (" ")" surround write ] when* ;
 
 SYMBOL: dispatch-signal-hook
 
