@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bit-arrays classes growable kernel math parser
-prettyprint.custom sequences sequences.private vectors.functor ;
+prettyprint.custom sequences sequences.private vectors.functor
+vocabs.loader ;
 IN: bit-vectors
 
 VECTORIZED: bit bit-array <bit-array>
