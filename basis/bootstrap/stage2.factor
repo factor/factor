@@ -82,7 +82,6 @@ CONSTANT: default-components
         "stage2: deployment mode" print
     ] [
         "debugger" require
-        os unix? [ "debugger.unix" require ] when
         "listener" require
     ] if
 
