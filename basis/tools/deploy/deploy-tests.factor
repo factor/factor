@@ -59,7 +59,7 @@ delete-staging-images
 ! { } [ "bunny" shake-and-bake 2559640 small-enough? ] long-unit-test
 { } [ "bunny" shake-and-bake 2700000 small-enough? ] long-unit-test
 
-{ } [ "gpu.demos.bunny" shake-and-bake 3650000 small-enough? ] long-unit-test
+{ } [ "gpu.demos.bunny" shake-and-bake 3660000 small-enough? ] long-unit-test
 
 os macosx? [
     [ ] [ "webkit-demo" shake-and-bake 600000 small-enough? ] long-unit-test
