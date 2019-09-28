@@ -5,6 +5,7 @@ continuations environment fry io.backend io.backend.unix
 io.files.private io.files.unix io.launcher io.launcher.private
 io.pathnames io.ports kernel libc math namespaces sequences
 simple-tokenizer strings system unix unix.ffi unix.process ;
+QUALIFIED-WITH: unix.signals sig
 IN: io.launcher.unix
 
 : get-arguments ( process -- seq )
@@ -104,10 +105,8 @@ M: unix (kill-process) ( process -- )
 : find-process ( handle -- process )
     processes get keys [ handle>> = ] with find nip ;
 
-TUPLE: signal n ;
-
 : code>status ( code -- obj )
-    dup WIFSIGNALED [ WTERMSIG signal boa ] [ WEXITSTATUS ] if ;
+    dup WIFSIGNALED [ WTERMSIG sig:signal boa ] [ WEXITSTATUS ] if ;
 
 M: unix (wait-for-processes) ( -- ? )
     { int } [ -1 swap WNOHANG waitpid ] with-out-parameters
