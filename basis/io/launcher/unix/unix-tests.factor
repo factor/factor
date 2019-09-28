@@ -1,11 +1,9 @@
-USING: accessors calendar concurrency.promises continuations
-debugger.unix destructors io io.backend.unix io.directories
-io.encodings.ascii io.encodings.binary io.encodings.utf8
-io.files io.launcher io.launcher.unix io.streams.duplex
-io.timeouts kernel libc locals math namespaces sequences threads
-tools.test unix.process ;
+USING: accessors calendar concurrency.promises destructors io
+io.backend.unix io.directories io.encodings.ascii
+io.encodings.binary io.encodings.utf8 io.files io.launcher
+io.streams.duplex io.timeouts kernel libc locals math namespaces
+sequences threads tools.test unix.process unix.signals ;
 IN: io.launcher.unix.tests
-
 
 [
     { } [ { "touch" "launcher-test-1" } try-process ] unit-test

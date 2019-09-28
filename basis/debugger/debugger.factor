@@ -391,3 +391,5 @@ M: callsite-not-compiled summary
     drop "Caller not compiled with the optimizing compiler" ;
 
 { "threads" "debugger" } "debugger.threads" require-when
+
+os unix? [ "debugger.unix" require ] when
