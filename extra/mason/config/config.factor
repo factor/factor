@@ -38,12 +38,12 @@ SYMBOL: builder-debug
 ! URL for counter notifications.
 SYMBOL: counter-url
 
-counter-url [ "http://builds.factorcode.org/counter" ] initialize
+counter-url [ "https://builds.factorcode.org/counter" ] initialize
 
 ! URL for status notifications.
 SYMBOL: status-url
 
-status-url [ "http://builds.factorcode.org/status-update" ] initialize
+status-url [ "https://builds.factorcode.org/status-update" ] initialize
 
 ! Password for status notifications.
 SYMBOL: status-secret
@@ -64,7 +64,7 @@ SYMBOL: docs-directory
 ! URL to notify server about new docs
 SYMBOL: docs-update-url
 
-docs-update-url [ "http://builds.factorcode.org/docs-update" ] initialize
+docs-update-url [ "https://builds.factorcode.org/docs-update" ] initialize
 
 ! Boolean. Do we upload package binaries?
 SYMBOL: upload-package?
