@@ -9,29 +9,29 @@ ERROR: bad-escape char ;
 
 : escape ( escape -- ch )
     H{
-        { ch'a  ch'\a }
-        { ch'b  ch'\b }
-        { ch'e  ch'\e }
-        { ch'f  ch'\f }
-        { ch'n  ch'\n }
-        { ch'r  ch'\r }
-        { ch't  ch'\t }
-        { ch's  ch'\s }
-        { ch'v  ch'\v }
-        { ch'\s ch'\s }
-        { ch'0  ch'\0 }
-        { ch'\! ch'\! }
-        { ch'\\ ch'\\ }
-        { ch'\" ch'\" }
-        { ch'\: ch'\: }
-        { ch'\[ ch'\[ }
-        { ch'\{ ch'\{ }
-        { ch'\( ch'\( }
-        { ch'\; ch'\; }
-        { ch'\] ch'\] }
-        { ch'\} ch'\} }
-        { ch'\) ch'\) }
-        { ch'\' ch'\' }
+        { char: a  char: \a }
+        { char: b  char: \b }
+        { char: e  char: \e }
+        { char: f  char: \f }
+        { char: n  char: \n }
+        { char: r  char: \r }
+        { char: t  char: \t }
+        { char: s  char: \s }
+        { char: v  char: \v }
+        { char: \s char: \s }
+        { char: 0  char: \0 }
+        { char: \! char: \! }
+        { char: \\ char: \\ }
+        { char: \" char: \" }
+        { char: \: char: \: }
+        { char: \[ char: \[ }
+        { char: \{ char: \{ }
+        { char: \( char: \( }
+        { char: \; char: \; }
+        { char: \] char: \] }
+        { char: \} char: \} }
+        { char: \) char: \) }
+        { char: \' char: \' }
     } ?at [ bad-escape ] unless ;
 
 INITIALIZED-SYMBOL: name>char-hook [
@@ -43,7 +43,7 @@ INITIALIZED-SYMBOL: name>char-hook [
 
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
-        ch'\} over index cut-slice [
+        char: \} over index cut-slice [
             dup hex> [
                 nip
             ] [
@@ -56,8 +56,8 @@ INITIALIZED-SYMBOL: name>char-hook [
 
 : next-escape ( str -- ch str' )
     unclip-slice {
-        { ch'u [ unicode-escape ] }
-        { ch'x [ hex-escape ] }
+        { char: u [ unicode-escape ] }
+        { char: x [ hex-escape ] }
         [ escape swap ]
     } case ;
 
@@ -68,7 +68,7 @@ INITIALIZED-SYMBOL: name>char-hook [
     [
         cut-slice [ append! ] dip
         rest-slice next-escape [ suffix! ] dip
-        ch'\\ over index (unescape-string)
+        char: \\ over index (unescape-string)
     ] [
         append!
     ] if* ;
@@ -76,7 +76,7 @@ INITIALIZED-SYMBOL: name>char-hook [
 PRIVATE>
 
 : unescape-string ( str -- str' )
-    ch'\\ over index [
+    char: \\ over index [
         [ [ length <sbuf> ] keep ] dip (unescape-string)
     ] when* "" like ;
 
@@ -121,7 +121,7 @@ DEFER: (parse-string)
 : parse-found-token ( accum lexer i elt -- )
     { sbuf lexer fixnum fixnum } declare
     [ over lexer-subseq pick push-all ] dip
-    ch'\\ = [
+    char: \\ = [
         dup dup [ next-char ] bi@
         [ [ pick push ] bi@ ]
         [ drop 2dup next-line% ] if*
@@ -137,7 +137,7 @@ DEFER: (parse-string)
             parse-found-token
         ] [
             drop 2dup next-line%
-            ch'\n pick push
+            char: \n pick push
             (parse-string)
         ] if*
     ] [

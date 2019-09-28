@@ -20,4 +20,4 @@ ERROR: invalid-length x ;
 
 : make-progress-bar ( percent length -- string )
     [ check-percent ] [ check-length ] bi*
-    ch'= ch'- (make-progress-bar) ;
+    char: = char: - (make-progress-bar) ;

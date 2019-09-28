@@ -57,17 +57,17 @@ TUPLE: CreateProcess-args
 
 : fix-trailing-backslashes ( str -- str' )
     0 count-trailing-backslashes
-    2 * ch'\\ <repetition> append ;
+    2 * char: \\ <repetition> append ;
 
 ! Find groups of \, groups of \ followed by ", or naked "
 : escape-double-quote ( str -- newstr )
     [
-        { [ drop ch'\\ = ] [ nip "\\\"" member? ] } 2&&
+        { [ drop char: \\ = ] [ nip "\\\"" member? ] } 2&&
     ] monotonic-split [
-        dup last ch'\" = [
+        dup last char: \" = [
             dup length 1 > [
                 ! String of backslashes + double-quote
-                length 1 - 2 * ch'\\ <repetition> "\\\"" append
+                length 1 - 2 * char: \\ <repetition> "\\\"" append
             ] [
                 ! Single double-quote
                 drop "\\\""
@@ -81,7 +81,7 @@ TUPLE: CreateProcess-args
 ! See http://msdn.microsoft.com/en-us/library/ms647232.aspx
 : escape-argument ( str -- newstr )
     escape-double-quote
-    ch'\s over member? [
+    char: \s over member? [
         fix-trailing-backslashes "\"" dup surround
     ] when ;
 

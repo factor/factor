@@ -151,7 +151,7 @@ ERROR: zone-not-found name ;
 : on>value ( n -- n' )
     ! "3", "Thu>=8" always >=, "lastFri"
     {
-        { [ dup 3 swap ?nth ch'> = ] [
+        { [ dup 3 swap ?nth char: > = ] [
             3 cut 2 tail [ day-abbreviation3-predicate ] [ string>number ] bi* 2array
         ] }
         { [ dup "last" head? ] [ 4 tail day-abbreviation3-index ] }

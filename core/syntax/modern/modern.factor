@@ -6,11 +6,11 @@ IN: syntax.modern
 
 : matching-delimiter ( ch -- ch' )
     H{
-        { ch'\( ch'\) }
-        { ch'\[ ch'\] }
-        { ch'\{ ch'\} }
-        { ch'< ch'> }
-        { ch'\: ch'\; }
+        { char: \( char: \) }
+        { char: \[ char: \] }
+        { char: \{ char: \} }
+        { char: < char: > }
+        { char: \: char: \; }
     } ?at drop ;
 
 : matching-delimiter-string ( string -- string' )
@@ -94,12 +94,12 @@ ERROR: no-paren-container-word payload word ;
     [ no-paren-container-word ] if ;
 
 
-: lower-char? ( str -- ? ) [ ch'a ch'z between? ] [ ch'- = ] bi or ;
-: upper-char? ( str -- ? ) [ ch'A ch'Z between? ] [ ch'- = ] bi or ;
+: lower-char? ( str -- ? ) [ char: a char: z between? ] [ char: - = ] bi or ;
+: upper-char? ( str -- ? ) [ char: A char: Z between? ] [ char: - = ] bi or ;
 
 
 : strict-lower-colon? ( string -- ? )
-    [ ch'\: = ] cut-tail
+    [ char: \: = ] cut-tail
     [
         [ length 0 > ] [ [ lower-char? ] all? ] bi and
     ] [ length 0 > ] bi* and ;
@@ -111,14 +111,14 @@ ERROR: no-paren-container-word payload word ;
     ! All chars must...
     [
         [
-            [ ch'A ch'Z between? ] [ "':-\\#" member? ] bi or
+            [ char: A char: Z between? ] [ "':-\\#" member? ] bi or
         ] all?
     ]
     ! At least one char must...
-    [ [ [ ch'A ch'Z between? ] [ ch'\' = ] bi or ] any? ] bi and ;
+    [ [ [ char: A char: Z between? ] [ char: \' = ] bi or ] any? ] bi and ;
 
 : strict-upper-colon? ( string -- ? )
-    [ [ ch'\: = ] all? ]
+    [ [ char: \: = ] all? ]
     [ (strict-upper-colon?) ] bi or ;
 
 
@@ -137,7 +137,7 @@ ERROR: no-paren-container-word payload word ;
     [
         [ length 0 > ]
         [
-            ! ch'\'
+            ! char: \'
             [ "\\'" tail? ] [ "'" tail? not ] bi or
         ] bi and
     ] bi* and ;
@@ -146,12 +146,12 @@ ERROR: no-paren-container-word payload word ;
     dup (strict-single-quote?)
     [ "'[" sequence= not ] [ drop f ] if ;
 
-: strict-double-quote? ( string -- ? ) ?last ch'\" = ;
+: strict-double-quote? ( string -- ? ) ?last char: \" = ;
 
 : strict-container? ( string open-str -- ? )
     [ split1 ] [ split1 ] bi
     [ ]
-    [ [ ch'= = ] all? ]
+    [ [ char: = = ] all? ]
     [ "" = ] tri* and and ;
 
 : strict-bracket-container? ( string -- ? ) "[" strict-container? ;

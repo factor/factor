@@ -81,7 +81,7 @@ HELP: collapse
 { $see-also compact }
 { $examples
     "Collapse multiple spaces in a string down to a single space"
-    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ ch'\\s = ] \" \" collapse ." "\" Hello, crazy world \"" } } ;
+    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ char: \\s = ] \" \" collapse ." "\" Hello, crazy world \"" } } ;
 
 HELP: compact
 { $values
@@ -93,7 +93,7 @@ HELP: compact
 { $see-also collapse }
 { $examples
     "Collapse multiple spaces in a string down to a single space"
-    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ ch'\\s = ] \" \" compact ." "\"Hello, crazy world\"" } } ;
+    { $example "USING: kernel prettyprint sequences.extras ;" "\"   Hello,    crazy    world   \" [ char: \\s = ] \" \" compact ." "\"Hello, crazy world\"" } } ;
 
 HELP: <evens>
 { $values { "seq" sequence } { "evens" evens } }

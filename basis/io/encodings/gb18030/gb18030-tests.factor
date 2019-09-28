@@ -8,15 +8,15 @@ USING: io.encodings.gb18030 io.encodings.string strings tools.test arrays ;
 [ B{ 0xB7 0xB8 } >string gb18030 encode ] unit-test
 { { 0xB7 0xB8 } }
 [ B{ 0xA1 0xA4 0x81 0x30 0x86 0x30 } gb18030 decode >array ] unit-test
-{ { 0xB7 ch'replacement-character } }
+{ { 0xB7 char: replacement-character } }
 [ B{ 0xA1 0xA4 0x81 0x30 0x86 } gb18030 decode >array ] unit-test
-{ { 0xB7 ch'replacement-character } }
+{ { 0xB7 char: replacement-character } }
 [ B{ 0xA1 0xA4 0x81 0x30 } gb18030 decode >array ] unit-test
-{ { 0xB7 ch'replacement-character } }
+{ { 0xB7 char: replacement-character } }
 [ B{ 0xA1 0xA4 0x81 } gb18030 decode >array ] unit-test
 { { 0xB7 } }
 [ B{ 0xA1 0xA4 } gb18030 decode >array ] unit-test
-{ { ch'replacement-character } }
+{ { char: replacement-character } }
 [ B{ 0xA1 } >string gb18030 decode >array ] unit-test
 { { 0x44D7 0x464B } }
 [ B{ 0x82 0x33 0xA3 0x39 0x82 0x33 0xC9 0x31 }

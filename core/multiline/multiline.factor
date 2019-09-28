@@ -11,7 +11,7 @@ IN: multiline
         end text i subseq-start-from |[ j |
             i j text subseq % j end length +
         ] [
-            text i shorted tail % ch'\n ,
+            text i shorted tail % char: \n ,
             lexer next-line
             0 end lexer (scan-multiline-string)
         ] if*

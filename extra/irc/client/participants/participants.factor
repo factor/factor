@@ -37,13 +37,13 @@ M: irc-channel-chat has-participant? participants>> key? ;
 
 : apply-mode ( ? participant mode -- )
     {
-        { ch'o [ operator<< ] }
-        { ch'v [ voice<< ] }
+        { char: o [ operator<< ] }
+        { char: v [ voice<< ] }
         [ 3drop ]
     } case ;
 
 : apply-modes ( mode-line participant -- )
-    [ unclip ch'+ = ] dip
+    [ unclip char: + = ] dip
     '[ [ _ _ ] dip apply-mode ] each ;
 
 : change-participant-mode ( mode channel nick -- )

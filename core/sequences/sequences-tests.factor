@@ -51,20 +51,20 @@ IN: sequences.tests
 { 2 3 } [ [ 1 2 3 ] [ 2 > ] find ] unit-test
 { f f } [ [ 1 2 3 ] [ 10 > ] find ] unit-test
 
-{ 1 ch'e }
+{ 1 char: e }
 [ "hello world" "aeiou" [ member? ] curry find ] unit-test
 
-{ 4 ch'o }
+{ 4 char: o }
 [ 3 "hello world" "aeiou" [ member? ] curry find-from ] unit-test
 
 { f f } [ "abcd" [ 10 > nip ] find-index ] unit-test
-{ f f } [ "abcd" [ drop ch'e = ] find-index ] unit-test
-{ 3 ch'd } [ "abcdefg" [ 3 = nip ] find-index ] unit-test
-{ 3 ch'd } [ "abcdefg" [ drop ch'd = ] find-index ] unit-test
+{ f f } [ "abcd" [ drop char: e = ] find-index ] unit-test
+{ 3 char: d } [ "abcdefg" [ 3 = nip ] find-index ] unit-test
+{ 3 char: d } [ "abcdefg" [ drop char: d = ] find-index ] unit-test
 
-{ 0 ch'a } [ 0 "abcdef" [ drop ch'a >= ] find-index-from ] unit-test
-{ 1 ch'b } [ 0 "abcdef" [ drop ch'a > ] find-index-from ] unit-test
-{ 2 ch'c } [ 1 "abcdef" [ drop ch'b > ] find-index-from ] unit-test
+{ 0 char: a } [ 0 "abcdef" [ drop char: a >= ] find-index-from ] unit-test
+{ 1 char: b } [ 0 "abcdef" [ drop char: a > ] find-index-from ] unit-test
+{ 2 char: c } [ 1 "abcdef" [ drop char: b > ] find-index-from ] unit-test
 
 { f } [ 3 [ ]     member? ] unit-test
 { f } [ 3 [ 1 2 ] member? ] unit-test
@@ -74,11 +74,11 @@ IN: sequences.tests
 { t }
 [ [ "hello" "world" ] [ second ] keep member-eq? ] unit-test
 
-{ 4 } [ ch'x "tuvwxyz" >vector index ] unit-test
+{ 4 } [ char: x "tuvwxyz" >vector index ] unit-test
 
-{ f } [ ch'x 5 "tuvwxyz" >vector index-from ] unit-test
+{ f } [ char: x 5 "tuvwxyz" >vector index-from ] unit-test
 
-{ f } [ ch'a 0 "tuvwxyz" >vector index-from ] unit-test
+{ f } [ char: a 0 "tuvwxyz" >vector index-from ] unit-test
 
 { f } [ [ "Hello" { } 0.75 ] [ string? ] all? ] unit-test
 { t } [ [ ] [ ] all? ] unit-test
@@ -163,7 +163,7 @@ IN: sequences.tests
 { { 1 3 2 4 } } [ { 1 2 3 4 } clone 1 2 pick exchange ] unit-test
 
 { { "" "a" "aa" "aaa" } }
-[ 4 [ ch'a <string> ] { } map-integers ]
+[ 4 [ char: a <string> ] { } map-integers ]
 unit-test
 
 { V{ 1 3 5 7 9 } } [ 10 <iota> >vector [ even? ] reject! ] unit-test
@@ -279,14 +279,14 @@ unit-test
 { 9 } [ 10 <iota> ?last ] unit-test
 
 [ -1/0. 0 remove-nth! ] must-fail
-{ "" } [ "" [ ch'\s = ] trim ] unit-test
-{ "" } [ "" [ ch'\s = ] trim-head ] unit-test
-{ "" } [ "" [ ch'\s = ] trim-tail ] unit-test
-{ "" } [ "  " [ ch'\s = ] trim-head ] unit-test
-{ "" } [ "  " [ ch'\s = ] trim-tail ] unit-test
-{ "asdf" } [ " asdf " [ ch'\s = ] trim ] unit-test
-{ "asdf " } [ " asdf " [ ch'\s = ] trim-head ] unit-test
-{ " asdf" } [ " asdf " [ ch'\s = ] trim-tail ] unit-test
+{ "" } [ "" [ char: \s = ] trim ] unit-test
+{ "" } [ "" [ char: \s = ] trim-head ] unit-test
+{ "" } [ "" [ char: \s = ] trim-tail ] unit-test
+{ "" } [ "  " [ char: \s = ] trim-head ] unit-test
+{ "" } [ "  " [ char: \s = ] trim-tail ] unit-test
+{ "asdf" } [ " asdf " [ char: \s = ] trim ] unit-test
+{ "asdf " } [ " asdf " [ char: \s = ] trim-head ] unit-test
+{ " asdf" } [ " asdf " [ char: \s = ] trim-tail ] unit-test
 
 { 328350 } [ 100 <iota> [ sq ] map-sum ] unit-test
 

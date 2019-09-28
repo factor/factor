@@ -112,11 +112,11 @@ C: <ebnf> ebnf
     ! between the quotes.
     [
         [
-            [ ch'\\ = ] satisfy
+            [ char: \\ = ] satisfy
             [ "\"\\" member? ] satisfy 2seq ,
-            [ ch'\" = not ] satisfy ,
+            [ char: \" = not ] satisfy ,
         ] choice* repeat1 "\"" "\"" surrounded-by ,
-        [ ch'\' = not ] satisfy repeat1 "'" "'" surrounded-by ,
+        [ char: \' = not ] satisfy repeat1 "'" "'" surrounded-by ,
     ] choice* [ "" flatten-as unescape-string ] action ;
 
 : non-terminal-parser ( -- parser )
@@ -140,7 +140,7 @@ C: <ebnf> ebnf
     [
         {
             [ blank? ]
-            [ ch'> = ]
+            [ char: > = ]
         } 1|| not
     ] satisfy repeat1 [ >string ] action ;
 
@@ -155,13 +155,13 @@ C: <ebnf> ebnf
 
 : any-character-parser ( -- parser )
     ! A parser to match the symbol for any character match.
-    [ ch'. = ] satisfy [ drop <ebnf-any-character> ] action ;
+    [ char: . = ] satisfy [ drop <ebnf-any-character> ] action ;
 
 : range-parser-parser ( -- parser )
     ! Match the syntax for declaring character ranges
     [
         [ "[" syntax , "[" token ensure-not , ] seq* hide ,
-        [ ch'\] = not ] satisfy repeat1 ,
+        [ char: \] = not ] satisfy repeat1 ,
         "]" syntax ,
     ] seq* [ first >string unescape-string <ebnf-range> ] action ;
 

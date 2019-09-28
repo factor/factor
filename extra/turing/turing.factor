@@ -63,7 +63,7 @@ SYMBOL: tape
     ! Print current turing machine state.
     state get .
     tape get .
-    2 position get 2 * + ch'\s <string> write "^" print ;
+    2 position get 2 * + char: \s <string> write "^" print ;
 
 : n ( -- )
     ! Do one step and print new state.

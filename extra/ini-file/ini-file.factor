@@ -11,25 +11,25 @@ IN: ini-file
 
 : escape ( ch -- ch' )
     H{
-        { ch'a   ch'\a }
-        { ch'b   ch'\b }
-        { ch'f   ch'\f }
-        { ch'n   ch'\n }
-        { ch'r   ch'\r }
-        { ch't   ch'\t }
-        { ch'v   ch'\v }
-        { ch'\'   ch'\' }
-        { ch'\"   ch'\" }
-        { ch'\\  ch'\\ }
-        { ch'?   ch'? }
-        { ch'\;   ch'\; }
-        { ch'\[   ch'\[ }
-        { ch'\]   ch'\] }
-        { ch'=   ch'= }
+        { char: a   char: \a }
+        { char: b   char: \b }
+        { char: f   char: \f }
+        { char: n   char: \n }
+        { char: r   char: \r }
+        { char: t   char: \t }
+        { char: v   char: \v }
+        { char: \'   char: \' }
+        { char: \"   char: \" }
+        { char: \\  char: \\ }
+        { char: ?   char: ? }
+        { char: \;   char: \; }
+        { char: \[   char: \[ }
+        { char: \]   char: \] }
+        { char: =   char: = }
     } ?at [ bad-escape ] unless ;
 
 : (unescape-string) ( str -- )
-    ch'\\ over index [
+    char: \\ over index [
         cut-slice [ % ] dip rest-slice
         dup empty? [ "Missing escape code" throw ] when
         unclip-slice escape , (unescape-string)
@@ -42,21 +42,21 @@ USE: xml.entities
 
 : escape-string ( str -- str' )
     H{
-        { ch'\a   "\\a"  }
+        { char: \a   "\\a"  }
         { 0x08    "\\b"  }
         { 0x0c    "\\f"  }
-        { ch'\n   "\\n"  }
-        { ch'\r   "\\r"  }
-        { ch'\t   "\\t"  }
+        { char: \n   "\\n"  }
+        { char: \r   "\\r"  }
+        { char: \t   "\\t"  }
         { 0x0b    "\\v"  }
-        { ch'\'    "\\'"  }
-        { ch'\"    "\\\"" }
-        { ch'\\   "\\\\" }
-        { ch'?    "\\?"  }
-        { ch'\;    "\\;"  }
-        { ch'\[    "\\["  }
-        { ch'\]    "\\]"  }
-        { ch'=    "\\="  }
+        { char: \'    "\\'"  }
+        { char: \"    "\\\"" }
+        { char: \\   "\\\\" }
+        { char: ?    "\\?"  }
+        { char: \;    "\\;"  }
+        { char: \[    "\\["  }
+        { char: \]    "\\]"  }
+        { char: =    "\\="  }
     } escape-string-by ;
 
 : space? ( ch -- ? )
@@ -80,12 +80,12 @@ SYMBOL: option
 : section? ( line -- index/f )
     {
         [ length 1 > ]
-        [ first ch'\[ = ]
-        [ ch'\] swap last-index ]
+        [ first char: \[ = ]
+        [ char: \] swap last-index ]
     } 1&& ;
 
 : line-continues? ( line -- ? )
-    ?last ch'\\ = ;
+    ?last char: \\ = ;
 
 : section, ( -- )
     section get [ , ] when* ;

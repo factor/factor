@@ -32,9 +32,9 @@ IN: math.floating-point
 : double. ( double -- )
     double>bits
     [ (double-sign) .b ]
-    [ (double-exponent-bits) >bin 11 ch'0 pad-head bl print ]
+    [ (double-exponent-bits) >bin 11 char: 0 pad-head bl print ]
     [
-        (double-mantissa-bits) >bin 52 ch'0 pad-head
+        (double-mantissa-bits) >bin 52 char: 0 pad-head
         11 [ bl ] times print
     ] tri ;
 

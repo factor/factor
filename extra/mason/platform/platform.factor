@@ -5,7 +5,7 @@ namespaces sequences ;
 IN: mason.platform
 
 : (platform) ( os cpu -- string )
-    H{ { ch'. ch'- } } substitute "-" glue ;
+    H{ { char: . char: - } } substitute "-" glue ;
 
 : platform ( -- string )
     target-os get name>> target-cpu get name>> (platform)

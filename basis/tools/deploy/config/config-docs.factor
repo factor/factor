@@ -82,9 +82,9 @@ $nl
 "Off by default. Programs wishing to use the UI must be deployed with this flag on." } ;
 
 HELP: deploy-unicode?
-{ $description "Deploy flag. If set, full Unicode " { $snippet "ch'" } " syntax is included."
+{ $description "Deploy flag. If set, full Unicode " { $snippet "char: " } " syntax is included."
 $nl
-"Off by default. If your program needs to use " { $snippet "ch'" } " with named characters, enable this flag." } ;
+"Off by default. If your program needs to use " { $snippet "char: " } " with named characters, enable this flag." } ;
 
 HELP: deploy-console?
 { $description "Deploy flag. If set, the deployed executable will be configured as a console application. On Windows, this means the application will be deployed in the console subsystem and will be attached to a console window. On Mac OS X, this means the application will be deployed as a Unix executable instead of a Mac application bundle. On other Unix platforms, the flag has no effect."

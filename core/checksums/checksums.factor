@@ -18,7 +18,7 @@ M: checksum checksum-stream
     [ stream-contents ] dip checksum-bytes ;
 
 M: checksum checksum-lines
-    [ B{ ch'\n } join ] dip checksum-bytes ;
+    [ B{ char: \n } join ] dip checksum-bytes ;
 
 : checksum-file ( path checksum -- value )
     [ binary <file-reader> ] dip checksum-stream ;
@@ -45,7 +45,7 @@ GENERIC: get-checksum ( checksum-state -- value )
     [ [ add-checksum-bytes ] each-block ] with-input-stream ;
 
 : add-checksum-lines ( checksum-state lines -- checksum-state )
-    [ B{ ch'\n } add-checksum-bytes ]
+    [ B{ char: \n } add-checksum-bytes ]
     [ add-checksum-bytes ] interleave ;
 
 : add-checksum-file ( checksum-state path -- checksum-state )

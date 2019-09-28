@@ -26,8 +26,8 @@ IN: rosetta-code.balanced-brackets
     t :> ok!
     str [
         {
-            { ch'\[ [ 1 ] }
-            { ch'\] [ -1 ] }
+            { char: \[ [ 1 ] }
+            { char: \] [ -1 ] }
             [ drop 0 ]
         } case counter + counter!
         counter 0 < [ f ok! ] when

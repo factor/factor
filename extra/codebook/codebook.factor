@@ -62,7 +62,7 @@ TUPLE: code-file
     {
         { [ dup alpha? ] [ 1string ] }
         { [ dup digit? ] [ 1string ] }
-        [ >hex 6 ch'0 pad-head "_" "_" surround ]
+        [ >hex 6 char: 0 pad-head "_" "_" surround ]
     } cond ;
 
 : file-html-name ( name -- name )
@@ -76,7 +76,7 @@ TUPLE: code-file
 
 ! insert zero-width non-joiner between all characters so words can wrap anywhere
 : zwnj ( string -- s|t|r|i|n|g )
-    [ ch'\u00200c "" 2sequence ] { } map-as concat ;
+    [ char: \u00200c "" 2sequence ] { } map-as concat ;
 
 ! We wrap every line in <tt> because Kindle tends to forget the font when
 ! moving back pages
@@ -87,7 +87,7 @@ TUPLE: code-file
     "\n" 2array ;
 
 : line-number>string ( i line-number-len -- i-string )
-    [ number>string ] [ ch'\s pad-head ] bi* ;
+    [ number>string ] [ char: \s pad-head ] bi* ;
 
 :: code>html ( dir file -- page )
     file name>> :> name

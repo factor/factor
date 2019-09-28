@@ -84,8 +84,8 @@ M: div pdf-width
 
 : convert-string ( str -- str' )
     {
-        { ch'“    "\""   }
-        { ch'”    "\""   }
+        { char: “    "\""   }
+        { char: ”    "\""   }
     } escape-string-by [ 256 < ] filter ;
 
 PRIVATE>

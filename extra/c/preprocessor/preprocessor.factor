@@ -73,8 +73,8 @@ ERROR: header-file-missing path ;
 
 : handle-include ( preprocessor-state sequence-parser -- )
     skip-whitespace/comments advance dup previous {
-        { ch'< [ ch'> take-until-object read-standard-include ] }
-        { ch'\" [ ch'\" take-until-object read-local-include ] }
+        { char: < [ char: > take-until-object read-standard-include ] }
+        { char: \" [ char: \" take-until-object read-local-include ] }
         [ bad-include-line ]
     } case ;
 
@@ -85,7 +85,7 @@ ERROR: header-file-missing path ;
 
 : take-define-identifier ( sequence-parser -- string )
     skip-whitespace/comments
-    [ current { [ blank? ] [ ch'\( = ] } 1|| ] take-until ;
+    [ current { [ blank? ] [ char: \( = ] } 1|| ] take-until ;
 
 :: handle-define ( preprocessor-state sequence-parser -- )
     sequence-parser take-define-identifier :> ident
@@ -165,7 +165,7 @@ ERROR: header-file-missing path ;
     ] if ;
 
 : preprocess-line ( preprocessor-state sequence-parser -- )
-    skip-whitespace/comments dup current ch'# =
+    skip-whitespace/comments dup current char: # =
     [ parse-directive-line ]
     [ swap processing-disabled?>> [ drop ] [ write-full nl ] if ] if ;
 

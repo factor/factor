@@ -30,11 +30,11 @@ PRIVATE>
 
 : read-response ( -- response )
     readln unclip {
-        { ch'\: [ string>number ] }
-        { ch'+ [ handle-response ] }
-        { ch'$ [ string>number read-bulk ] }
-        { ch'* [ string>number read-multi-bulk ] }
-        { ch'- [ handle-error ] }
+        { char: \: [ string>number ] }
+        { char: + [ handle-response ] }
+        { char: $ [ string>number read-bulk ] }
+        { char: * [ string>number read-multi-bulk ] }
+        { char: - [ handle-error ] }
     } case ;
 
 : check-response ( -- )

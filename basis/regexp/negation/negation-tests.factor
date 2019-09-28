@@ -7,7 +7,7 @@ IN: regexp.negation.tests
     ! R/ |[^a]|.+/
     T{ transition-table
         { transitions H{
-            { 0 H{ { ch'a 1 } { T{ not-class f ch'a } -1 } } }
+            { 0 H{ { char: a 1 } { T{ not-class f char: a } -1 } } }
             { 1 H{ { t -1 } } }
             { -1 H{ { t -1 } } }
         } }
@@ -18,7 +18,7 @@ IN: regexp.negation.tests
     ! R/ a/
     T{ transition-table
         { transitions H{
-            { 0 H{ { ch'a 1 } } }
+            { 0 H{ { char: a 1 } } }
             { 1 H{ } }
         } }
         { start-state 0 }

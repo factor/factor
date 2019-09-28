@@ -12,7 +12,7 @@ INITIALIZED-SYMBOL: default-encoding [ latin1 ]
 <PRIVATE
 
 : prolog-tag ( bytes -- string )
-    ch'> over index [ 1 + head-slice ] when* >string ;
+    char: > over index [ 1 + head-slice ] when* >string ;
 
 : prolog-encoding ( string -- iana-encoding )
     '[

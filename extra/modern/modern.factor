@@ -57,7 +57,7 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
     } 2cleave :> ( openstr2 openstr1 closestr2 )
     |[ n string tag! ch |
         ch {
-            { ch'= [
+            { char: = [
                 tag 1 cut-slice* drop tag! ! tag of (=( is ( here, fix it
                 n string openstr1 slice-til-separator-inclusive [ -1 modify-from ] dip :> ( n' string' opening ch )
                 ch open-ch = [ tag openstr2 n string ch long-opening-mismatch ] unless
@@ -77,9 +77,9 @@ MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string se
         } case
      ] ;
 
-: read-double-matched-paren ( n string tag ch -- n' string seq ) ch'\( read-double-matched ;
-: read-double-matched-bracket ( n string tag ch -- n' string seq ) ch'\[ read-double-matched ;
-: read-double-matched-brace ( n string tag ch -- n' string seq ) ch'\{ read-double-matched ;
+: read-double-matched-paren ( n string tag ch -- n' string seq ) char: \( read-double-matched ;
+: read-double-matched-bracket ( n string tag ch -- n' string seq ) char: \[ read-double-matched ;
+: read-double-matched-brace ( n string tag ch -- n' string seq ) char: \{ read-double-matched ;
 
 DEFER: lex-factor-top
 DEFER: lex-factor
@@ -145,15 +145,15 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         } cond
     ] ;
 
-: read-bracket ( n string slice -- n' string slice' ) ch'\[ read-matched ;
-: read-brace ( n string slice -- n' string slice' ) ch'\{ read-matched ;
-: read-paren ( n string slice -- n' string slice' ) ch'\( read-matched ;
+: read-bracket ( n string slice -- n' string slice' ) char: \[ read-matched ;
+: read-brace ( n string slice -- n' string slice' ) char: \{ read-matched ;
+: read-paren ( n string slice -- n' string slice' ) char: \( read-matched ;
 : read-string-payload ( n string -- n' string )
     over [
-        { ch'\\ ch'\" } slice-til-separator-inclusive {
+        { char: \\ char: \" } slice-til-separator-inclusive {
             { f [ drop ] }
-            { ch'\" [ drop ] }
-            { ch'\\ [ drop next-char-from drop read-string-payload ] }
+            { char: \" [ drop ] }
+            { char: \\ [ drop next-char-from drop read-string-payload ] }
         } case
     ] [
         string-expected-got-eof
@@ -168,7 +168,7 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
     tag -rot 3array ;
 
 : take-comment ( n string slice -- n' string comment )
-    2over ?nth ch'\[ = [
+    2over ?nth char: \[ = [
         [ 1 + ] 2dip 1 modify-to 2over ?nth read-double-matched-bracket
     ] [
         [ slice-til-eol drop ] dip swap 2array
@@ -189,7 +189,7 @@ ERROR: expected-length-tokens n string length seq ;
 ERROR: token-expected n string obj ;
 ERROR: unexpected-terminator n string slice ;
 : read-lowercase-colon ( n string slice -- n' string lowercase-colon )
-    dup [ ch'\: = ] count-tail
+    dup [ char: \: = ] count-tail
     '[
         _ [ slice-til-non-whitespace drop [ lex-factor ] dip swap 2array ] replicate ensure-no-false dup [ token-expected ] unless
         dup terminator? [ unexpected-terminator ] when
@@ -200,11 +200,11 @@ ERROR: unexpected-terminator n string slice ;
         ! All chars must...
         [
             [
-                { [ ch'A ch'Z between? ] [ "':-\\#" member? ] } 1||
+                { [ char: A char: Z between? ] [ "':-\\#" member? ] } 1||
             ] all?
         ]
         ! At least one char must...
-        [ [ { [ ch'A ch'Z between? ] [ ch'\' = ] } 1|| ] any? ]
+        [ [ { [ char: A char: Z between? ] [ char: \' = ] } 1|| ] any? ]
     } 1&& ;
 
 : strict-upper? ( string -- ? )
@@ -232,7 +232,7 @@ ERROR: unexpected-terminator n string slice ;
     {
         [ "<" head? ]
         [ length 2 >= ]
-        [ second ch'/ = not ]
+        [ second char: / = not ]
         [ rest strict-upper? not ]
         [ [ blank? ] any? not ]
         [ ">" tail? ]
@@ -242,7 +242,7 @@ ERROR: unexpected-terminator n string slice ;
     {
         [ "<" head? ]
         [ length 2 >= ]
-        [ second ch'/ = not ]
+        [ second char: / = not ]
         [ rest strict-upper? not ]
         [ [ blank? ] any? not ]
         [ ">" tail? not ]
@@ -267,14 +267,14 @@ ERROR: unexpected-terminator n string slice ;
     } 1|| ;
 
 : upper-colon? ( string -- ? )
-    dup { [ length 0 > ] [ [ ch'\: = ] all? ] } 1&& [
+    dup { [ length 0 > ] [ [ char: \: = ] all? ] } 1&& [
         drop t
     ] [
         {
             [ length 2 >= ]
             [ "\\" head? not ] ! XXX: good?
             [ ":" tail? ]
-            [ dup [ ch'\: = ] find drop head strict-upper? ]
+            [ dup [ char: \: = ] find drop head strict-upper? ]
         } 1&&
     ] if ;
 
@@ -370,7 +370,7 @@ ERROR: no-backslash-payload n string slice ;
 : (read-backslash) ( n string slice -- n' string obj )
     merge-slice-til-whitespace dup "\\" tail? [
         ! \ foo, M\ foo
-        dup [ ch'\\ = ] count-tail
+        dup [ char: \\ = ] count-tail
         '[
             _ [ slice-til-not-whitespace drop [ slice-til-whitespace drop ] dip swap 2array ] replicate
             ensure-no-false
@@ -410,17 +410,17 @@ DEFER: lex-factor-top*
 
 : lex-factor-fallthrough ( n/f string slice/f ch/f -- n'/f string literal )
     {
-        { ch'\\ [ read-backslash ] }
-        { ch'\[ [ read-bracket ] }
-        { ch'\{ [ read-brace ] }
-        { ch'\( [ read-paren ] }
-        { ch'\] [ ] }
-        { ch'\} [ ] }
-        { ch'\) [ ] }
-        { ch'\" [ read-string ] }
-        { ch'\! [ read-exclamation ] }
-        { ch'> [
-            [ [ ch'> = not ] slice-until ] dip merge-slices
+        { char: \\ [ read-backslash ] }
+        { char: \[ [ read-bracket ] }
+        { char: \{ [ read-brace ] }
+        { char: \( [ read-paren ] }
+        { char: \] [ ] }
+        { char: \} [ ] }
+        { char: \) [ ] }
+        { char: \" [ read-string ] }
+        { char: \! [ read-exclamation ] }
+        { char: > [
+            [ [ char: > = not ] slice-until ] dip merge-slices
             dup section-close? [
                 [ slice-til-whitespace drop ] dip ?span-slices
             ] unless
@@ -432,7 +432,7 @@ DEFER: lex-factor-top*
 : lex-factor-nested* ( n/f string slice/f ch/f -- n'/f string literal )
     {
         ! Nested ``A: a B: b`` so rewind and let the parser get it top-level
-        { ch'\: [
+        { char: \: [
             ! A: B: then interrupt the current parser
             ! A: b: then keep going
             merge-slice-til-whitespace
@@ -441,7 +441,7 @@ DEFER: lex-factor-top*
             [ rewind-slice f ]
             [ read-colon ] if
         ] }
-        { ch'< [
+        { char: < [
             ! FOO: a b <BAR: ;BAR>
             ! FOO: a b <BAR BAR>
             ! FOO: a b <asdf>
@@ -453,9 +453,9 @@ DEFER: lex-factor-top*
             [ slice-til-whitespace drop ] dip span-slices
             dup section-open? [ rewind-slice f ] when
         ] }
-        { ch'\s [ read-token-or-whitespace-nested ] }
-        { ch'\r [ read-token-or-whitespace-nested ] }
-        { ch'\n [ read-token-or-whitespace-nested ] }
+        { char: \s [ read-token-or-whitespace-nested ] }
+        { char: \r [ read-token-or-whitespace-nested ] }
+        { char: \n [ read-token-or-whitespace-nested ] }
         [ lex-factor-fallthrough ]
     } case ;
 
@@ -466,8 +466,8 @@ DEFER: lex-factor-top*
 
 : lex-factor-top* ( n/f string slice/f ch/f -- n'/f string literal )
     {
-        { ch'\: [ merge-slice-til-whitespace read-colon ] }
-        { ch'< [
+        { char: \: [ merge-slice-til-whitespace read-colon ] }
+        { char: < [
             ! FOO: a b <BAR: ;BAR>
             ! FOO: a b <BAR BAR>
             ! FOO: a b <asdf>
@@ -480,9 +480,9 @@ DEFER: lex-factor-top*
             dup section-open? [ read-acute ] when
         ] }
 
-        { ch'\s [ read-token-or-whitespace-top ] }
-        { ch'\r [ read-token-or-whitespace-top ] }
-        { ch'\n [ read-token-or-whitespace-top ] }
+        { char: \s [ read-token-or-whitespace-top ] }
+        { char: \r [ read-token-or-whitespace-top ] }
+        { char: \n [ read-token-or-whitespace-top ] }
         [ lex-factor-fallthrough ]
     } case ;
 

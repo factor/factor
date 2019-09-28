@@ -468,7 +468,7 @@ TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
 
 : margin-test ( number-of-a-s -- str )
     [
-        [ ch'a <string> text "b" text ] with-pprint
+        [ char: a <string> text "b" text ] with-pprint
     ] with-string-writer ;
 
 {

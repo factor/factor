@@ -23,7 +23,7 @@ M: assoc >bencode
 DEFER: read-bencode
 
 : read-integer ( -- obj )
-    "e" read-until ch'e assert= string>number ;
+    "e" read-until char: e assert= string>number ;
 
 : read-list ( -- obj )
     [ read-bencode dup ] [ ] produce nip ;
@@ -34,15 +34,15 @@ DEFER: read-bencode
     ] [ ] produce nip >hashtable ;
 
 : read-string ( prefix -- obj )
-    ":" read-until ch'\: assert= swap prefix
+    ":" read-until char: \: assert= swap prefix
     string>number read ascii decode ;
 
 : read-bencode ( -- obj )
     read1 {
-        { ch'i [ read-integer ] }
-        { ch'l [ read-list ] }
-        { ch'd [ read-dictionary ] }
-        { ch'e [ f ] }
+        { char: i [ read-integer ] }
+        { char: l [ read-list ] }
+        { char: d [ read-dictionary ] }
+        { char: e [ f ] }
         [ read-string ]
     } case ;
 

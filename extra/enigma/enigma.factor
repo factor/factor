@@ -36,10 +36,10 @@ TUPLE: enigma cogs prev-cogs reflector ;
     enigma cogs>> :> cogs
     enigma reflector>> :> reflector
     text >lower [
-        ch'a mod dup special? [
+        char: a mod dup special? [
             ln 1 + ln!
             cogs [ nth ] each reflector nth
-            cogs reverse [ index ] each ch'a +
+            cogs reverse [ index ] each char: a +
             cogs length <iota> [ 6 * 1 + ln mod zero? ] filter
             cogs [ unclip prefix ] change-nths
         ] unless

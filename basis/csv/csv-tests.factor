@@ -61,7 +61,7 @@ IN: csv.tests
 
 "allows setting of delimiting character"
 [ { { "foo" "bah" "baz" } } ]
-[ "foo\tbah\tbaz\n" ch'\t [ string>csv ] with-delimiter ] named-unit-test
+[ "foo\tbah\tbaz\n" char: \t [ string>csv ] with-delimiter ] named-unit-test
 
 "Quoted field followed immediately by newline"
 [ { { "foo" "bar" }

@@ -9,7 +9,7 @@ IN: colors.constants
 : parse-color ( line -- name color )
     first4
     [ [ string>number 255 /f ] tri@ 1.0 <rgba> ] dip
-    [ blank? ] trim-head H{ { ch'\s ch'- } } substitute swap ;
+    [ blank? ] trim-head H{ { char: \s char: - } } substitute swap ;
 
 : parse-colors ( lines -- assoc )
     [ "!" head? ] reject

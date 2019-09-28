@@ -90,7 +90,7 @@ os unix? [ [ 10 ] [ PCRE_CONFIG_NEWLINE pcre-config ] unit-test ] when
 ] unit-test
 
 : long-string ( -- x )
-    10000 [ ch'a ch'z [a,b] random ] "" replicate-as ;
+    10000 [ char: a char: z [a,b] random ] "" replicate-as ;
 
 ! Performance
 { 0 } [ long-string ".{0,15}foobar.{0,10}" findall length ] unit-test

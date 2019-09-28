@@ -65,7 +65,7 @@ frequency pass-number ;
     } cleave ;
 
 : parse-mtab ( -- array )
-    ch'\s [ "/etc/mtab" utf8 file>csv ] with-delimiter
+    char: \s [ "/etc/mtab" utf8 file>csv ] with-delimiter
     [ mtab-csv>mtab-entry ] map ;
 
 : mtab-entry>file-system-info ( mtab-entry -- file-system-info/f )

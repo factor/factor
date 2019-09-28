@@ -16,7 +16,7 @@ IN: find.extras.tests
     "lol"
     3
     T{ slice f 0 3 "lol" }
-} [ "lol" 0 [ ch'a ch'z between? ] take-empty-from ] unit-test
+} [ "lol" 0 [ char: a char: z between? ] take-empty-from ] unit-test
 
 {
     "lol"
@@ -28,7 +28,7 @@ IN: find.extras.tests
 { "[=[" 3 T{ slice f 0 3 "[=[" } } [
     "[=[" 0 {
         [
-            { [ "[" head-from ] [ [ ch'= = ] take-empty-from ] [ "[" head-from ] } find-quots
+            { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
         ]
     } find-quots slices-combine
@@ -37,7 +37,7 @@ IN: find.extras.tests
 { "[=" 0 f } [
     "[=" 0 {
         [
-            { [ "[" head-from ] [ [ ch'= = ] take-empty-from ] [ "[" head-from ] } find-quots
+            { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
         ]
     } find-quots slices-combine
@@ -46,7 +46,7 @@ IN: find.extras.tests
 { "[" 0 f } [
     "[" 0 {
         [
-            { [ "[" head-from ] [ [ ch'= = ] take-empty-from ] [ "[" head-from ] } find-quots
+            { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
         ]
     } find-quots slices-combine
@@ -55,7 +55,7 @@ IN: find.extras.tests
 { "" 0 f } [
     "" 0 {
         [
-            { [ "[" head-from ] [ [ ch'= = ] take-empty-from ] [ "[" head-from ] } find-quots
+            { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
         ]
     } find-quots slices-combine
@@ -65,7 +65,7 @@ IN: find.extras.tests
 { f 0 f } [
     f 0 {
         [
-            { [ "[" head-from ] [ [ ch'= = ] take-empty-from ] [ "[" head-from ] } find-quots
+            { [ "[" head-from ] [ [ char: = = ] take-empty-from ] [ "[" head-from ] } find-quots
             dup [ slices-combine ] when
         ]
     } find-quots slices-combine

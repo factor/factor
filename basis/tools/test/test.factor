@@ -97,7 +97,7 @@ M: did-not-fail summary drop "Did not fail" ;
 
 : experiment-title ( word -- string )
     "(" ?head drop ")" ?tail drop
-    H{ { ch'- ch'\s } } substitute >title ;
+    H{ { char: - char: \s } } substitute >title ;
 
 MACRO: <experiment> ( word -- quot )
     [ stack-effect in>> length dup ]

@@ -6,26 +6,26 @@ IN: ftp.client.listing-parser
 
 : ch>file-type ( ch -- type )
     {
-        { ch'b [ +block-device+ ] }
-        { ch'c [ +character-device+ ] }
-        { ch'd [ +directory+ ] }
-        { ch'l [ +symbolic-link+ ] }
-        { ch's [ +socket+ ] }
-        { ch'p [ +fifo+ ] }
-        { ch'- [ +regular-file+ ] }
+        { char: b [ +block-device+ ] }
+        { char: c [ +character-device+ ] }
+        { char: d [ +directory+ ] }
+        { char: l [ +symbolic-link+ ] }
+        { char: s [ +socket+ ] }
+        { char: p [ +fifo+ ] }
+        { char: - [ +regular-file+ ] }
         [ drop +unknown+ ]
     } case ;
 
 : file-type>ch ( type -- string )
     {
-        { +block-device+ [ ch'b ] }
-        { +character-device+ [ ch'c ] }
-        { +directory+ [ ch'd ] }
-        { +symbolic-link+ [ ch'l ] }
-        { +socket+ [ ch's ] }
-        { +fifo+ [ ch'p ] }
-        { +regular-file+ [ ch'- ] }
-        [ drop ch'- ]
+        { +block-device+ [ char: b ] }
+        { +character-device+ [ char: c ] }
+        { +directory+ [ char: d ] }
+        { +symbolic-link+ [ char: l ] }
+        { +socket+ [ char: s ] }
+        { +fifo+ [ char: p ] }
+        { +regular-file+ [ char: - ] }
+        [ drop char: - ]
     } case ;
 
 : parse-permissions ( remote-file str -- remote-file )

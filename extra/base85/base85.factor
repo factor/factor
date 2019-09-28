@@ -57,7 +57,7 @@ PRIVATE>
         { 5 [ decode5 write (decode-base85) ] }
         [
             drop
-            [ 5 ch'~ pad-tail decode5 ]
+            [ 5 char: ~ pad-tail decode5 ]
             [ length 5 swap - head-slice* write ] bi
             (decode-base85)
         ]

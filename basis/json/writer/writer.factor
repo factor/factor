@@ -59,20 +59,20 @@ M: json-null stream-json-print
 PRIVATE>
 
 M: string stream-json-print
-    ch'\" over stream-write1 swap [
+    char: \" over stream-write1 swap [
         {
-            { ch'\"  [ "\\\"" over stream-write ] }
-            { ch'\\ [ "\\\\" over stream-write ] }
-            { ch'/  [
+            { char: \"  [ "\\\"" over stream-write ] }
+            { char: \\ [ "\\\\" over stream-write ] }
+            { char: /  [
                 json-escape-slashes? get
                 [ "\\/" over stream-write ]
-                [ ch'/ over stream-write1 ] if
+                [ char: / over stream-write1 ] if
             ] }
-            { ch'\b [ "\\b" over stream-write ] }
-            { ch'\f [ "\\f" over stream-write ] }
-            { ch'\n [ "\\n" over stream-write ] }
-            { ch'\r [ "\\r" over stream-write ] }
-            { ch'\t [ "\\t" over stream-write ] }
+            { char: \b [ "\\b" over stream-write ] }
+            { char: \f [ "\\f" over stream-write ] }
+            { char: \n [ "\\n" over stream-write ] }
+            { char: \r [ "\\r" over stream-write ] }
+            { char: \t [ "\\t" over stream-write ] }
             { 0x2028   [ "\\u2028" over stream-write ] }
             { 0x2029   [ "\\u2029" over stream-write ] }
             [
@@ -87,7 +87,7 @@ M: string stream-json-print
                 ] if
             ]
         } case
-    ] each ch'\" swap stream-write1 ;
+    ] each char: \" swap stream-write1 ;
 
 M: integer stream-json-print
     [ number>string ] [ stream-write ] bi* ;
@@ -111,10 +111,10 @@ M: real stream-json-print
     [ >float number>string ] [ stream-write ] bi* ;
 
 M: sequence stream-json-print
-    ch'\[ over stream-write1 swap
-    over '[ ch', _ stream-write1 ]
+    char: \[ over stream-write1 swap
+    over '[ char: , _ stream-write1 ]
     pick '[ _ stream-json-print ] interleave
-    ch'\] swap stream-write1 ;
+    char: \] swap stream-write1 ;
 
 <PRIVATE
 
@@ -130,8 +130,8 @@ M: float json-coerce float>json ;
 M: real json-coerce >float number>string ;
 
 :: json-print-assoc ( obj stream -- )
-    ch'\{ stream stream-write1 obj >alist
-    [ ch', stream stream-write1 ]
+    char: \{ stream stream-write1 obj >alist
+    [ char: , stream stream-write1 ]
     json-friendly-keys? get
     json-coerce-keys? get '[
         first2 [
@@ -140,11 +140,11 @@ M: real json-coerce >float number>string ;
             [ _ [ json-coerce ] when ] if
             stream stream-json-print
         ] [
-            ch'\: stream stream-write1
+            char: \: stream stream-write1
             stream stream-json-print
         ] bi*
     ] interleave
-    ch'\} stream stream-write1 ;
+    char: \} stream stream-write1 ;
 
 PRIVATE>
 

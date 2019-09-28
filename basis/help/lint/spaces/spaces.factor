@@ -17,7 +17,7 @@ IN: help.lint.spaces
         dup utf8 file-lines [ 1 + 2array ] map-index
         [
             first [
-                { [ ch'space = ] [ ch'\" = ] } 1||
+                { [ char: space = ] [ char: \" = ] } 1||
             ] trim-head
             "  " swap subseq?
         ] filter

@@ -43,7 +43,7 @@ M: maybe vocabulary-name
     line-limit get dup [ pprinter get line-count>> <= ] when ;
 
 : do-indent ( -- )
-    pprinter get indent>> [ ch'\s <string> write ] unless-zero ;
+    pprinter get indent>> [ char: \s <string> write ] unless-zero ;
 
 : fresh-line ( n -- )
     pprinter get 2dup last-newline>> = [

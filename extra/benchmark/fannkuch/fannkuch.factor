@@ -16,7 +16,7 @@ IN: benchmark.fannkuch
     ] count ; inline
 
 : write-permutation ( perm -- )
-    [ ch'0 + write1 ] each nl ; inline
+    [ char: 0 + write1 ] each nl ; inline
 
 : fannkuch-step ( counter max-flips perm -- counter max-flips )
     pick 30 < [ [ 1 + ] [ ] [ dup write-permutation ] tri* ] when

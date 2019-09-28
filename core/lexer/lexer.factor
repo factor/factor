@@ -51,11 +51,11 @@ ERROR: not-a-lexer object ;
 ERROR: unexpected want got ;
 
 : forbid-tab ( c -- c )
-    [ ch'\t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
+    [ char: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
 : skip ( i seq ? -- n )
     over length [
-        [ swap forbid-tab ch'\s eq? xor ] curry find-from drop
+        [ swap forbid-tab char: \s eq? xor ] curry find-from drop
     ] dip or ; inline
 
 : change-lexer-column ( ..a lexer quot: ( ..a col line -- ..b newcol ) -- ..b )
@@ -86,7 +86,7 @@ GENERIC: skip-word ( lexer -- )
 
 : find-container-delimiter ( i str delim-str -- n/f )
     [ 2dup ] dip '[ _ member? ] find-from [
-        [ swap subseq [ ch'= = ] all? ] keep and
+        [ swap subseq [ char: = = ] all? ] keep and
     ] [
         3drop f
     ] if ;
@@ -95,16 +95,16 @@ M: lexer skip-word
     [
         2dup [ " \"[{(" member? ] find-from
         {
-            { ch'\" [ 2nip 1 + ] }
-            { ch'\[ [
+            { char: \" [ 2nip 1 + ] }
+            { char: \[ [
                 1 + over "[" find-container-delimiter
                 dup [ 2nip 1 + ] [ drop f skip ] if
             ] }
-            { ch'\{ [
+            { char: \{ [
                 1 + over "{" find-container-delimiter
                 dup [ 2nip 1 + ] [ drop f skip ] if
             ] }
-            { ch'\( [
+            { char: \( [
                 1 + over "(" find-container-delimiter
                 dup [ 2nip 1 + ] [ drop f skip ] if
             ] }
@@ -199,14 +199,14 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
     [ line>> number>string ": " append ]
     [ line-text>> ]
     [ column>> ] tri
-    pick length + ch'\s <string>
+    pick length + char: \s <string>
     [ write ] [ print ] [ write "^" print ] tri* ;
 
 : (parsing-word-lexer-dump) ( error parsing-word -- )
     [
         line>> number>string
         over line>> number>string length
-        ch'\s pad-head
+        char: \s pad-head
         ": " append write
     ] [ line-text>> print ] bi
     simple-lexer-dump ;

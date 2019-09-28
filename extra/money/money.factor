@@ -5,7 +5,7 @@ namespaces sequences splitting ;
 IN: money
 
 SYMBOL: currency-token
-ch'$ currency-token set-global
+char: $ currency-token set-global
 
 : dollars/cents ( dollars -- dollars cents )
     100 * 100 /mod round >integer ;
@@ -13,7 +13,7 @@ ch'$ currency-token set-global
 : format-money ( dollars cents -- string )
     [ number>string ] bi@
     [ <reversed> 3 group "," join <reversed> ]
-    [ 2 ch'0 pad-head ] bi* "." glue ;
+    [ 2 char: 0 pad-head ] bi* "." glue ;
 
 : money>string ( number -- string )
     dollars/cents format-money currency-token get prefix ;

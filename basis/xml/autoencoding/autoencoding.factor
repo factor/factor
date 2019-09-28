@@ -52,8 +52,8 @@ IN: xml.autoencoding
     ! What if first letter of processing instruction is non-ASCII?
     get-next {
         { 0 [ next next start-utf16le ] }
-        { ch'? [ go-utf8 instruct dup instruct-encoding ] }
-        { ch'\! [ go-utf8 direct ] }
+        { char: ? [ go-utf8 instruct dup instruct-encoding ] }
+        { char: \! [ go-utf8 direct ] }
         [ check start<name ]
     } case ;
 
@@ -75,7 +75,7 @@ IN: xml.autoencoding
 
 : start-document ( -- tag )
     get-char {
-        { ch'< [ start< ] }
+        { char: < [ start< ] }
         { 0 [ start-utf16be ] }
         { 0xEF [ skip-utf8-bom ] }
         { 0xFF [ skip-utf16le-bom ] }

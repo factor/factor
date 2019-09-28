@@ -14,8 +14,8 @@ IN: compiler.cfg.linear-scan.debugger
     allocate-registers drop ;
 
 : picture ( uses -- str )
-    dup last 1 + ch'space <string>
-    [ '[ ch'* swap _ set-nth ] each ] keep ;
+    dup last 1 + char: space <string>
+    [ '[ char: * swap _ set-nth ] each ] keep ;
 
 : interval-picture ( interval -- str )
     [ uses>> picture ]

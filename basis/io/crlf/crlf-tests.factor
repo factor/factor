@@ -15,9 +15,9 @@ USING: io.crlf tools.test io.streams.string io ;
 { "foo\r\nbar" } [ "foo\nbar" lf>crlf ] unit-test
 
 { f } [ "" [ read1-ignoring-crlf ] with-string-reader ] unit-test
-{ ch'a } [ "a" [ read1-ignoring-crlf ] with-string-reader ] unit-test
-{ ch'b } [ "\nb" [ read1-ignoring-crlf ] with-string-reader ] unit-test
-{ ch'c } [ "\r\nc" [ read1-ignoring-crlf ] with-string-reader ] unit-test
+{ char: a } [ "a" [ read1-ignoring-crlf ] with-string-reader ] unit-test
+{ char: b } [ "\nb" [ read1-ignoring-crlf ] with-string-reader ] unit-test
+{ char: c } [ "\r\nc" [ read1-ignoring-crlf ] with-string-reader ] unit-test
 
 { f } [ "" [ 5 read-ignoring-crlf ] with-string-reader ] unit-test
 { "a" } [ "a" [ 5 read-ignoring-crlf ] with-string-reader ] unit-test

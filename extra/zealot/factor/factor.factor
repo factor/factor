@@ -170,7 +170,7 @@ M: windows factor-path "./factor.com" ;
     } 2cleave ;
 
 : factor-clean-branch ( -- str )
-    os cpu [ name>> ] bi@ { { ch'. ch'- } } substitute
+    os cpu [ name>> ] bi@ { { char: . char: - } } substitute
     "-" glue "origin/clean-" prepend ;
 
 : vocab-path>vocab ( path -- vocab )

@@ -76,9 +76,9 @@ PRIVATE>
 
 : string-parser ( -- parser )
     [
-        [ ch'\" = ] satisfy hide ,
-        [ ch'\" = not ] satisfy repeat0 ,
-        [ ch'\" = ] satisfy hide ,
+        [ char: \" = ] satisfy hide ,
+        [ char: \" = not ] satisfy repeat0 ,
+        [ char: \" = ] satisfy hide ,
     ] seq* [ first >string ] action ;
 
 : (range-pattern) ( pattern -- string )
@@ -86,7 +86,7 @@ PRIVATE>
     ! all characters within that range.
     [
         any-char ,
-        [ ch'- = ] satisfy hide ,
+        [ char: - = ] satisfy hide ,
         any-char ,
     ] seq* [
         first2 [a,b] >string

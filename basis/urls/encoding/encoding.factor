@@ -36,7 +36,7 @@ IN: urls.encoding
 
 : push-utf8 ( ch -- )
     1string utf8 encode
-    [ ch'% , >hex >upper 2 ch'0 pad-head % ] each ;
+    [ char: % , >hex >upper 2 char: 0 pad-head % ] each ;
 
 : (url-encode) ( str quot: ( ch -- ? ) -- encoded )
     '[ [ dup @ [ , ] [ push-utf8 ] if ] each ] "" make ; inline
@@ -62,7 +62,7 @@ PRIVATE>
     2dup length >= [
         2drop
     ] [
-        2dup nth dup ch'% = [
+        2dup nth dup char: % = [
             drop 2dup url-decode-hex [ 3 + ] dip
         ] [
             , [ 1 + ] dip

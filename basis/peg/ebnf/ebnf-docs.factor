@@ -342,7 +342,7 @@ ARTICLE: "peg.ebnf.tokenizers" "EBNF Tokenizers"
     }
 }
 "This parser when run with the string \"++--\" or the array "
-"{ ch'+ ch'+ ch'- ch'- } will succeed with an AST of { \"++\" \"--\" }. "
+"{ char: + char: + char: - char: - } will succeed with an AST of { \"++\" \"--\" }. "
 "If you want to add whitespace handling to the grammar you need to put it "
 "between the terminals:"
 { $examples

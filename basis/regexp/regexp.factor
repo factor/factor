@@ -202,7 +202,7 @@ PRIVATE>
     dup skip-blank [
         dupd [
             [ [ "\\/" member? ] find-from ] keep swap [
-                ch'\ = [ [ 2 + ] dip t ] [ f ] if
+                char: \ = [ [ 2 + ] dip t ] [ f ] if
             ] [
                 "Unterminated regexp" throw
             ] if*

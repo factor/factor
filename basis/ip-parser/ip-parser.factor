@@ -62,7 +62,7 @@ ERROR: more-than-8-components ;
     dup hex> [ ] [ bad-ipv6-component ] ?if ;
 
 : split-ipv6 ( string -- seq )
-    ":" split ch'. over last member? [ unclip-last ] [ f ] if
+    ":" split char: . over last member? [ unclip-last ] [ f ] if
     [ [ ipv6-component ] map ]
     [ [ parse-ipv4 append ] unless-empty ] bi* ;
 

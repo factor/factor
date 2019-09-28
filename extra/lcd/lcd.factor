@@ -5,7 +5,7 @@ kernel math sequences timers ui ui.gadgets ui.gadgets.labels ;
 IN: lcd
 
 : lcd-digit ( digit row -- str )
-    [ dup ch'\: = [ drop 10 ] [ ch'0 - ] if ] dip {
+    [ dup char: \: = [ drop 10 ] [ char: 0 - ] if ] dip {
         "  _       _  _       _   _   _   _   _      "
         " | |  |   _| _| |_| |_  |_    | |_| |_|  *  "
         " |_|  |  |_  _|   |  _| |_|   | |_|   |  *  "

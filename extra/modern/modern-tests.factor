@@ -128,14 +128,14 @@ IN: modern.tests
     { { "foo\\bar{" { "1" } "}" } }
 } [ "foo\\bar{ 1 }" string>literals >strings ] unit-test
 
-{ { { "char:" { "\\{" } } } } [ "ch'\\{" string>literals >strings ] unit-test
-[ "ch'{" string>literals >strings ] must-fail
-[ "ch'[" string>literals >strings ] must-fail
-[ "ch'{" string>literals >strings ] must-fail
-[ "ch'\"" string>literals >strings ] must-fail
-! { { { "char:" { "\\\\" } } } } [ "ch'\\\\" string>literals >strings ] unit-test
+{ { { "char:" { "\\{" } } } } [ "char: \\{" string>literals >strings ] unit-test
+[ "char: {" string>literals >strings ] must-fail
+[ "char: [" string>literals >strings ] must-fail
+[ "char: {" string>literals >strings ] must-fail
+[ "char: \"" string>literals >strings ] must-fail
+! { { { "char:" { "\\\\" } } } } [ "char: \\\\" string>literals >strings ] unit-test
 
-[ "ch'\\" string>literals >strings ] must-fail ! ch'\ should be legal eventually
+[ "char: \\" string>literals >strings ] must-fail ! char: \ should be legal eventually
 
 { { { "\\" { "(" } } } } [ "\\ (" string>literals >strings ] unit-test
 

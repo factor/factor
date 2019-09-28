@@ -3,7 +3,7 @@ io.streams.null kernel kernel.private make math math.order
 memory namespaces prettyprint sbufs sequences strings
 strings.private tools.test vectors ;
 
-{ ch'b } [ 1 >bignum "abc" nth ] unit-test
+{ char: b } [ 1 >bignum "abc" nth ] unit-test
 
 { } [ 10 [ [ -1000000 <sbuf> ] ignore-errors ] times ] unit-test
 
@@ -23,7 +23,7 @@ strings.private tools.test vectors ;
 
 { "Beginning" } [ "Beginning and end" 9 head ] unit-test
 
-{ f } [ ch'I "team" member? ] unit-test
+{ f } [ char: I "team" member? ] unit-test
 { t } [ "ea" "team" subseq? ] unit-test
 { f } [ "actore" "Factor" subseq? ] unit-test
 
@@ -39,12 +39,12 @@ strings.private tools.test vectors ;
 { "Replacing+spaces+with+plus" }
 [
     "Replacing spaces with plus"
-    [ dup ch'\s = [ drop ch'+ ] when ] map
+    [ dup char: \s = [ drop char: + ] when ] map
 ]
 unit-test
 
-{ "05" } [ "5" 2 ch'0 pad-head ] unit-test
-{ "666" } [ "666" 2 ch'0 pad-head ] unit-test
+{ "05" } [ "5" 2 char: 0 pad-head ] unit-test
+{ "666" } [ "666" 2 char: 0 pad-head ] unit-test
 
 [ 1 "" nth ] must-fail
 [ -6 "hello" nth ] must-fail
@@ -75,17 +75,17 @@ unit-test
 
 {
     {
-        ch'h
+        char: h
         0x1234
-        ch'l
+        char: l
         0x4321
-        ch'o
+        char: o
         0x654321
-        ch'w
-        ch'o
-        ch'r
-        ch'l
-        ch'd
+        char: w
+        char: o
+        char: r
+        char: l
+        char: d
     }
 } [
     "s" get >array
@@ -100,7 +100,7 @@ unit-test
 ! Make sure aux vector is not shared
 { "\udeadbe" } [
     "\udeadbe" clone
-    ch'\u123456 over clone set-first
+    char: \u123456 over clone set-first
 ] unit-test
 
 ! Regressions
@@ -123,7 +123,7 @@ unit-test
 { t } [
     10000 [
         drop
-        300 100 ch'\u123456
+        300 100 char: \u123456
         [ <string> clone resize-string first ] keep =
     ] all-integers?
 ] unit-test

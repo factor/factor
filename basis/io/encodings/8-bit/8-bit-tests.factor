@@ -1,10 +1,10 @@
 USING: arrays io.encodings.8-bit io.encodings.string strings
 tools.test ;
 
-{ B{ ch'f ch'o ch'o } } [ "foo" latin2 encode ] unit-test
+{ B{ char: f char: o char: o } } [ "foo" latin2 encode ] unit-test
 [ { 256 } >string latin2 encode ] must-fail
 { "bar" } [ "bar" latin2 decode ] unit-test
-{ { ch'b 233 ch'r } } [ B{ ch'b 233 ch'r } latin2 decode >array ] unit-test
+{ { char: b 233 char: r } } [ B{ char: b 233 char: r } latin2 decode >array ] unit-test
 
 { { 0xfffd 0x20AC } } [ B{ 0x81 0x80 } windows-1252 decode >array ] unit-test
 

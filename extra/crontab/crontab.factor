@@ -12,13 +12,13 @@ ERROR: invalid-cronentry value ;
 
 :: parse-value ( value quot: ( value -- value' ) seq -- value )
     value {
-        { [ ch', over member? ] [
+        { [ char: , over member? ] [
             "," split [ quot seq parse-value ] map concat ] }
         { [ dup "*" = ] [ drop seq ] }
-        { [ ch'/ over member? ] [
+        { [ char: / over member? ] [
             "/" split1 [ quot seq parse-value 0 over length 1 - ] dip
             string>number <range> swap nths ] }
-        { [ ch'- over member? ] [
+        { [ char: - over member? ] [
             "-" split1 quot bi@ [a,b] ] }
         [ quot call 1array ]
     } cond ; inline recursive

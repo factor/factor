@@ -387,7 +387,7 @@ M: bmp-image stream>image* ( stream bmp-image -- bitmap )
     ] bi ;
 
 : output-bmp ( image -- )
-    B{ ch'B ch'M } write
+    B{ char: B char: M } write
     [
         bitmap>> length 14 + 40 + write4
         0 write4

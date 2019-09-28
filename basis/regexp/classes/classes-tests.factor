@@ -8,10 +8,10 @@ IN: regexp.classes.tests
 { f } [ { 1 2 } <and-class> ] unit-test
 { T{ or-class f { 1 2 } } } [ { 1 2 } <or-class> ] unit-test
 { 3 } [ { 1 2 } <and-class> 3 2array <or-class> ] unit-test
-{ ch'A } [ ch'A LETTER-class <primitive-class> 2array <and-class> ] unit-test
-{ ch'A } [ LETTER-class <primitive-class> ch'A 2array <and-class> ] unit-test
-{ T{ primitive-class { class LETTER-class } } } [ ch'A LETTER-class <primitive-class> 2array <or-class> ] unit-test
-{ T{ primitive-class { class LETTER-class } } } [ LETTER-class <primitive-class> ch'A 2array <or-class> ] unit-test
+{ char: A } [ char: A LETTER-class <primitive-class> 2array <and-class> ] unit-test
+{ char: A } [ LETTER-class <primitive-class> char: A 2array <and-class> ] unit-test
+{ T{ primitive-class { class LETTER-class } } } [ char: A LETTER-class <primitive-class> 2array <or-class> ] unit-test
+{ T{ primitive-class { class LETTER-class } } } [ LETTER-class <primitive-class> char: A 2array <or-class> ] unit-test
 { t } [ { t 1 } <or-class> ] unit-test
 { t } [ { 1 t } <or-class> ] unit-test
 { f } [ { f 1 } <and-class> ] unit-test

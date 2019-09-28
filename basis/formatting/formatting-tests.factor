@@ -62,21 +62,21 @@ IN: formatting.tests
 { "1.00000e-1000" } [ -1000 10^ "%.5e" sprintf ] unit-test
 { t } [
     1000 10^ "%.5f" sprintf
-    "1" ".00000" 1000 ch'0 <string> glue =
+    "1" ".00000" 1000 char: 0 <string> glue =
 ] unit-test
 { t } [
     -1000 10^ "%.1004f" sprintf
-    "0." "10000" 999 ch'0 <string> glue =
+    "0." "10000" 999 char: 0 <string> glue =
 ] unit-test
 { "-1.00000e+1000" } [ 1000 10^ neg "%.5e" sprintf ] unit-test
 { "-1.00000e-1000" } [ -1000 10^ neg "%.5e" sprintf ] unit-test
 { t } [
     1000 10^ neg "%.5f" sprintf
-    "-1" ".00000" 1000 ch'0 <string> glue =
+    "-1" ".00000" 1000 char: 0 <string> glue =
 ] unit-test
 { t } [
     -1000 10^ neg "%.1004f" sprintf
-    "-0." "10000" 999 ch'0 <string> glue =
+    "-0." "10000" 999 char: 0 <string> glue =
 ] unit-test
 { "9007199254740991.0" } [ 53 2^ 1 - "%.1f" sprintf ] unit-test
 { "9007199254740992.0" } [ 53 2^ "%.1f" sprintf ] unit-test
@@ -121,7 +121,7 @@ IN: formatting.tests
 { "2008-09-10" } [ 2008 9 10 "%04d-%02d-%02d" sprintf ] unit-test
 { "Hello, World!" } [ "Hello, World!" "%s" sprintf ] unit-test
 { "printf test" } [ "printf test" sprintf ] unit-test
-{ "char a = 'a'" } [ ch'a "char %c = 'a'" sprintf ] unit-test
+{ "char a = 'a'" } [ char: a "char %c = 'a'" sprintf ] unit-test
 { "00" } [ 0x0 "%02x" sprintf ] unit-test
 { "ff" } [ 0xff "%02x" sprintf ] unit-test
 { "0 message(s)" } [ 0 "message" "%d %s(s)" sprintf ] unit-test

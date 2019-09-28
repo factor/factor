@@ -211,7 +211,7 @@ DEFER: (profile.)
 
 :: times. ( node -- )
     node {
-        [ depth>> number>string 4 ch'\s pad-head write bl ]
+        [ depth>> number>string 4 char: \s pad-head write bl ]
         [ total-time>> duration. bl ]
         [ [ gc-time>> ] [ total-time>> ] bi percentage. bl ]
         [ [ jit-time>> ] [ total-time>> ] bi percentage. bl ]

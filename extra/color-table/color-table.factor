@@ -11,7 +11,7 @@ SINGLETON: color-renderer
 
 <PRIVATE
 
-CONSTANT: full-block-string $[ 10 ch'full-block <string> ]
+CONSTANT: full-block-string $[ 10 char: full-block <string> ]
 
 PRIVATE>
 

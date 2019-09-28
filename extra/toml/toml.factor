@@ -32,28 +32,28 @@ TUPLE: entry key value ;
 
 : hexdigit ( -- parser )
     [
-        ch'0 ch'9 range ,
-        ch'a ch'f range ,
-        ch'A ch'F range ,
+        char: 0 char: 9 range ,
+        char: a char: f range ,
+        char: A char: F range ,
     ] choice* ;
 
 : hex ( -- parser )
     "0x" token hide hexdigit digits 2seq [ first hex> ] action ;
 
 : decdigit ( -- parser )
-    ch'0 ch'9 range ;
+    char: 0 char: 9 range ;
 
 : dec ( -- parser )
     decdigit digits [ dec> ] action ;
 
 : octdigit ( -- parser )
-    ch'0 ch'7 range ;
+    char: 0 char: 7 range ;
 
 : oct ( -- parser )
     "0o" token hide octdigit digits 2seq [ first oct> ] action ;
 
 : bindigit ( -- parser )
-    ch'0 ch'1 range ;
+    char: 0 char: 1 range ;
 
 : bin ( -- parser )
     "0b" token hide bindigit digits 2seq [ first bin> ] action ;
@@ -106,11 +106,11 @@ TUPLE: entry key value ;
     basic-string literal-string 2choice [ "" like ] action ;
 
 : multi-basic-string ( -- parser )
-    escaped unicode [ ch'\" = not ] satisfy 3choice repeat0
+    escaped unicode [ char: \" = not ] satisfy 3choice repeat0
     "\"\"\"" dup surrounded-by ;
 
 : multi-literal-string ( -- parser )
-    [ ch'\' = not ] satisfy repeat0
+    [ char: \' = not ] satisfy repeat0
     "'''" dup surrounded-by ;
 
 : multi-string ( -- parser )
@@ -203,9 +203,9 @@ DEFER: key-value-parser
 
 : name-parser ( -- parser )
     [
-        ch'A ch'Z range ,
-        ch'a ch'z range ,
-        ch'0 ch'9 range ,
+        char: A char: Z range ,
+        char: a char: z range ,
+        char: 0 char: 9 range ,
         "_" token [ first ] action ,
         "-" token [ first ] action ,
     ] choice* repeat1 [ "" like ] action single-string 2choice ;
@@ -214,7 +214,7 @@ DEFER: key-value-parser
     [
         space hide ,
         "#" token ,
-        [ ch'\n = not ] satisfy repeat0 ,
+        [ char: \n = not ] satisfy repeat0 ,
     ] seq* [ drop f ] action ;
 
 : key-parser ( -- parser )

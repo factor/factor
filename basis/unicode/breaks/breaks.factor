@@ -66,8 +66,8 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 
 : control-class ( ch -- class )
     {
-        { [ dup ch'\r = ]  [ drop CR ] }
-        { [ dup ch'\n = ] [ drop LF ] }
+        { [ dup char: \r = ]  [ drop CR ] }
+        { [ dup char: \n = ] [ drop LF ] }
         { [ dup 0x200C = ] [ drop Extend ] }
         { [ dup 0x200D = ] [ drop ZWJ ] }
         { [ dup "Other_Grapheme_Extend" property? ] [ drop Extend ] }

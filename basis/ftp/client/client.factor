@@ -11,7 +11,7 @@ IN: ftp.client
     3 head string>number ;
 
 : ftp-response-code ( string -- n/f )
-    dup fourth ch'- = [ drop f ] [ (ftp-response-code) ] if ;
+    dup fourth char: - = [ drop f ] [ (ftp-response-code) ] if ;
 
 : read-response-loop ( ftp-response -- ftp-response )
     readln
@@ -22,7 +22,7 @@ IN: ftp.client
     <ftp-response> readln
     [ (ftp-response-code) >>n ]
     [ add-response-line ]
-    [ fourth ch'- = ] tri
+    [ fourth char: - = ] tri
     [ read-response-loop ] when ;
 
 ERROR: ftp-error got expected ;

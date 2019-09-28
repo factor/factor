@@ -9,7 +9,7 @@ IN: io.crlf
 
 :: stream-read-crlf ( stream -- seq )
     "\r" stream stream-read-until [
-        ch'\r assert= stream stream-read1 ch'\n assert=
+        char: \r assert= stream stream-read1 char: \n assert=
     ] [ f like ] if* ;
 
 : read-crlf ( -- seq )
@@ -17,14 +17,14 @@ IN: io.crlf
 
 :: stream-read-?crlf ( stream -- seq )
     "\r\n" stream stream-read-until [
-        ch'\r = [ stream stream-read1 ch'\n assert= ] when
+        char: \r = [ stream stream-read1 char: \n assert= ] when
     ] [ f like ] if* ;
 
 : read-?crlf ( -- seq )
     input-stream get stream-read-?crlf ;
 
 : crlf>lf ( str -- str' )
-    ch'\r swap remove ;
+    char: \r swap remove ;
 
 : lf>crlf ( str -- str' )
     "\n" split "\r\n" join ;

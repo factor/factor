@@ -206,14 +206,14 @@ ERROR: bad-suit-symbol ch ;
 
 : symbol>suit ( ch -- ch' )
     ch>upper H{
-        { ch'♠ ch'S }
-        { ch'♦ ch'D }
-        { ch'♥ ch'H }
-        { ch'♣ ch'C }
-        { ch'S ch'S }
-        { ch'D ch'D }
-        { ch'H ch'H }
-        { ch'C ch'C }
+        { char: ♠ char: S }
+        { char: ♦ char: D }
+        { char: ♥ char: H }
+        { char: ♣ char: C }
+        { char: S char: S }
+        { char: D char: D }
+        { char: H char: H }
+        { char: C char: C }
     } ?at [ bad-suit-symbol ] unless ;
 
 : card> ( string -- card )

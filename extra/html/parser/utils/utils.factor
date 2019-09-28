@@ -11,7 +11,7 @@ IN: html.parser.utils
 : double-quote ( str -- newstr ) "\"" dup surround ;
 
 : quote ( str -- newstr )
-    ch'\' over member?
+    char: \' over member?
     [ double-quote ] [ single-quote ] if ;
 
 : ?quote ( str -- newstr ) dup quoted? [ quote ] unless ;

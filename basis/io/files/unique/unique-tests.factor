@@ -6,7 +6,7 @@ namespaces sequences strings tools.test ;
 { 123 } [
     [
         "core" ".test" [
-            [ [ 123 ch'a <string> ] dip ascii set-file-contents ]
+            [ [ 123 char: a <string> ] dip ascii set-file-contents ]
             [ file-info size>> ] bi
         ] cleanup-unique-file
     ] with-temp-directory

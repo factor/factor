@@ -156,11 +156,11 @@ IN: peg.ebnf.tests
   "ab" EBNF[=[ foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]] ]=]
 ] unit-test
 
-{ ch'A } [
+{ char: A } [
   "A" EBNF[=[ foo=[A-Z] ]=]
 ] unit-test
 
-{ ch'Z } [
+{ char: Z } [
   "Z" EBNF[=[ foo=[A-Z] ]=]
 ] unit-test
 
@@ -168,7 +168,7 @@ IN: peg.ebnf.tests
   "0" EBNF[=[ foo=[A-Z] ]=]
 ] must-fail
 
-{ ch'0 } [
+{ char: 0 } [
   "0" EBNF[=[ foo=[^A-Z] ]=]
 ] unit-test
 
@@ -498,7 +498,7 @@ foo=<foreign any-char> 'd'
   "ac" parser3
 ] unit-test
 
-{ V{ ch'a "d" } } [
+{ V{ char: a "d" } } [
   "ad" parser4
 ] unit-test
 
@@ -517,7 +517,7 @@ foo=<foreign any-char> 'd'
 ] unit-test
 
 ! Tokenizer tests
-{ V{ "a" ch'b } } [
+{ V{ "a" char: b } } [
   "ab" EBNF[=[ tokenizer=default foo="a" . ]=]
 ] unit-test
 
@@ -541,7 +541,7 @@ Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | "
 Tok                = Spaces (Number | Special )
 ]=]
 
-{ V{ ch'1 T{ ast-number f 23 } ";" ch'x } } [
+{ V{ char: 1 T{ ast-number f 23 } ";" char: x } } [
   "123;x" EBNF[=[ bar = .
                 tokenizer = <foreign a-tokenizer Tok>  foo=.
                 tokenizer=default baz=.
@@ -549,7 +549,7 @@ Tok                = Spaces (Number | Special )
           ]=]
 ] unit-test
 
-{ V{ ch'5 "+" ch'2 } } [
+{ V{ char: 5 "+" char: 2 } } [
   "5+2" EBNF[=[
           space=(" " | "\n")
           number=[0-9]
@@ -560,7 +560,7 @@ Tok                = Spaces (Number | Special )
         ]=]
 ] unit-test
 
-{ V{ ch'5 "+" ch'2 } } [
+{ V{ char: 5 "+" char: 2 } } [
   "5 + 2" EBNF[=[
           space=(" " | "\n")
           number=[0-9]

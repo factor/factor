@@ -14,7 +14,7 @@ GENERIC: pprint-json* ( obj -- )
 : write-spaces ( -- )
     indent-level get 0 > [
         indent-level get nspaces *
-        ch'\s
+        char: \s
         <string> write
     ] when ;
 

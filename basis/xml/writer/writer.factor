@@ -48,7 +48,7 @@ PRIVATE>
 <PRIVATE
 
 : write-quoted ( string -- )
-    ch'\" write1 write ch'\" write1 ;
+    char: \" write1 write char: \" write1 ;
 
 : print-attrs ( assoc -- )
     [
@@ -70,7 +70,7 @@ M: string write-xml
     ] when write ;
 
 : write-tag ( tag -- )
-    ?indent ch'< write1
+    ?indent char: < write1
     dup print-name attrs>> print-attrs ;
 
 : write-start-tag ( tag -- )
@@ -84,7 +84,7 @@ M: contained-tag write-xml
     [ write-xml ] each unindent ;
 
 : write-end-tag ( tag -- )
-    ?indent "</" write print-name ch'> write1 ;
+    ?indent "</" write print-name char: > write1 ;
 
 M: open-tag write-xml
     xml-pprint? get [
@@ -148,7 +148,7 @@ M: doctype-decl write-xml
     ">" write ;
 
 M: directive write-xml
-    "<!" write text>> write ch'> write1 nl ;
+    "<!" write text>> write char: > write1 nl ;
 
 M: instruction write-xml
     "<?" write text>> write "?>" write ;

@@ -220,7 +220,7 @@ total-births total-deaths ;
     check-starvation ;
 
 : spaces ( n -- )
-    ch'\s <string> write ;
+    char: \s <string> write ;
 
 : welcome ( -- )
     32 spaces "HAMURABI" print

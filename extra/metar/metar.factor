@@ -29,19 +29,19 @@ ERROR: bad-location str ;
     dup R{{ \d+-\d+(-\d+(\.\d+)?)?[WE]}} matches? [
         unclip-last
         [ parse-location ]
-        [ ch'W = [ neg ] when ] bi*
+        [ char: W = [ neg ] when ] bi*
     ] [ drop f ] if ;
 
 : string>latitude ( str -- lat/f )
     dup R{{ \d+-\d+(-\d+(\.\d+)?)?[NS]}} matches? [
         unclip-last
         [ parse-location ]
-        [ ch'S = [ neg ] when ] bi*
+        [ char: S = [ neg ] when ] bi*
     ] [ drop f ] if ;
 
 : stations-data ( -- seq )
     url"http://tgftp.nws.noaa.gov/data/nsd_cccc.txt"
-    http-get nip ch'\; [ string>csv ] with-delimiter ;
+    http-get nip char: \; [ string>csv ] with-delimiter ;
 
 PRIVATE>
 
@@ -201,11 +201,11 @@ CONSTANT: compass-directions H{
 
 : parse-visibility ( str -- str' )
     dup first {
-        { ch'M [ rest "less than " ] }
-        { ch'P [ rest "more than " ] }
+        { char: M [ rest "less than " ] }
+        { char: P [ rest "more than " ] }
         [ drop "" ]
     } case swap "SM" ?tail drop
-    ch'/ over index [ 1 > [ 1 cut "+" glue ] when ] when*
+    char: / over index [ 1 > [ 1 cut "+" glue ] when ] when*
     string>number "%s%s statute miles" sprintf ;
 
 : parse-rvr ( str -- str' )
@@ -220,8 +220,8 @@ CONSTANT: compass-directions H{
 : (parse-weather) ( str -- str' )
     dup "+FC" = [ drop "tornadoes or waterspouts" ] [
         dup first {
-            { ch'+ [ rest "heavy " ] }
-            { ch'- [ rest "light " ] }
+            { char: + [ rest "heavy " ] }
+            { char: - [ rest "light " ] }
             [ drop f ]
         } case [
             2 group dup [ weather key? ] all?
@@ -278,7 +278,7 @@ CONSTANT: sky H{
     ] bi@ ;
 
 : parse-altimeter ( str -- str' )
-    unclip [ string>number ] [ ch'A = ] bi*
+    unclip [ string>number ] [ char: A = ] bi*
     [ 100 /f "%.2f Hg" sprintf ] [ "%s hPa" sprintf ] if ;
 
 CONSTANT: re-timestamp R[[\d{6}Z]]
@@ -424,14 +424,14 @@ CONSTANT: high-clouds H{
 }
 
 : parse-cloud-cover ( str -- str' )
-    "8/" ?head drop first3 [ ch'0 - ] tri@
+    "8/" ?head drop first3 [ char: 0 - ] tri@
     [ [ f ] [ low-clouds at "low clouds are %s" sprintf ] if-zero ]
     [ [ f ] [ mid-clouds at "middle clouds are %s" sprintf ] if-zero ]
     [ [ f ] [ high-clouds at "high clouds are %s" sprintf ] if-zero ]
     tri* 3array " " join ;
 
 : parse-inches ( str -- str' )
-    dup [ ch'/ = ] all? [ drop "unknown" ] [
+    dup [ char: / = ] all? [ drop "unknown" ] [
         string>number
         [ "trace" ] [ 100 /f "%.2f inches" sprintf ] if-zero
     ] if ;
@@ -470,7 +470,7 @@ CONSTANT: re-recent-weather R[[((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+]]
 
 : parse-began/ended ( str -- str' )
     unclip swap
-    [ ch'B = "began" "ended" ? ]
+    [ char: B = "began" "ended" ? ]
     [ parse-recent-time ] bi* "%s at %s" sprintf ;
 
 : split-recent-weather ( str -- seq )

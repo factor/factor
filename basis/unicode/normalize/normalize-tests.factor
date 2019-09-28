@@ -33,7 +33,7 @@ IN: unicode.normalize.tests
     2 <groups> [ first2 [ first ] dip 2array ] map
     values [
         [
-            "#@" split first [ ch'\s = ] trim-tail ";" split harvest
+            "#@" split first [ char: \s = ] trim-tail ";" split harvest
             [ " " split [ hex> ] "" map-as ] map
         ] map
     ] map concat ;

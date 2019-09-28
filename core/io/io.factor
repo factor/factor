@@ -101,7 +101,7 @@ SYMBOL: error-stream
 
 : print ( str -- ) output-stream get stream-print ; inline
 
-: stream-bl ( stream -- ) ch'\s swap stream-write1 ; inline
+: stream-bl ( stream -- ) char: \s swap stream-write1 ; inline
 
 : bl ( -- ) output-stream get stream-bl ;
 
@@ -253,7 +253,7 @@ M: input-stream stream-length drop f ; inline
 
 M: output-stream stream-write [ stream-write1 ] curry each ; inline
 M: output-stream stream-flush drop ; inline
-M: output-stream stream-nl ch'\n swap stream-write1 ; inline
+M: output-stream stream-nl char: \n swap stream-write1 ; inline
 M: output-stream stream-seekable? drop f ; inline
 M: output-stream stream-length drop f ; inline
 

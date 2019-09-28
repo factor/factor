@@ -15,11 +15,11 @@ IN: ulid.tests
 ] must-fail-with
 
 [ "aBCDEFGH1JK1MN0PQRSTUVWXYZ" ulid>bytes ] [
-    [ ulid>bytes-bad-character? ] keep ch>> ch'a = and
+    [ ulid>bytes-bad-character? ] keep ch>> char: a = and
 ] must-fail-with
 
 [ "ABCDEFGH1JK1MN0PQRSTUVWXYZ" ulid>bytes ] [
-    [ ulid>bytes-bad-character? ] keep ch>> ch'U = and
+    [ ulid>bytes-bad-character? ] keep ch>> char: U = and
 ] must-fail-with
 
 [ "ABCDEFGH1JK1MN0PQRST0VWXYZ" ulid>bytes ]

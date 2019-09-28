@@ -346,7 +346,7 @@ GENERIC: write-ptx-operand ( operand -- )
 
 M: string write-ptx-operand write ;
 M: integer write-ptx-operand number>string write ;
-M: float write-ptx-operand "0d" write double>bits >hex 16 ch'0 pad-head write ;
+M: float write-ptx-operand "0d" write double>bits >hex 16 char: 0 pad-head write ;
 M: ptx-negation write-ptx-operand "!" write var>> write ;
 M: ptx-vector write-ptx-operand
     "{" write

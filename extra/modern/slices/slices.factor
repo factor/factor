@@ -154,15 +154,15 @@ ERROR: unexpected-end n string ;
     over [ (?nth) ] [ 2drop f ] if ;
 
 :: merge-slice-til-eol-slash' ( n string slice -- n' string slice/f ch/f )
-    n string merge-slice-til-eol-slash'' :> ( n' string' slice' ch' )
-    ch' ch'\\ = [
+    n string merge-slice-til-eol-slash'' :> ( n' string' slice' char'  )
+    char' char: \\ = [
         n' 1 + string' (?nth) "\r\n" member? [
             n' 2 + string' slice slice' span-slices merge-slice-til-eol-slash'
         ] [
             "omg" throw
         ] if
     ] [
-        n' string' slice slice' span-slices ch'
+        n' string' slice slice' span-slices char'
     ] if ;
 
 ! Supports \ at eol (with no space after it)
@@ -215,9 +215,9 @@ ERROR: subseq-expected-but-got-eof n string expected ;
     [ [ from>> ] [ to>> ] [ seq>> ] tri ] dip
     swap [ + ] dip <slice> ;
 
-! { ch'\] [ read-closing ] }
-! { ch'\} [ read-closing ] }
-! { ch'\) [ read-closing ] }
+! { char: \] [ read-closing ] }
+! { char: \} [ read-closing ] }
+! { char: \) [ read-closing ] }
 : read-closing ( n string tok -- n string tok )
     dup length 1 = [
         -1 modify-to [ 1 - ] 2dip

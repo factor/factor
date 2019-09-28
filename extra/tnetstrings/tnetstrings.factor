@@ -43,13 +43,13 @@ DEFER: parse-tnetstring
 
 : parse-tnetstring ( data -- remain value )
     parse-payload {
-        { ch'# [ string>number ] }
-        { ch'\" [ ] }
-        { ch'\} [ parse-dict ] }
-        { ch'\] [ parse-list ] }
-        { ch'\! [ parse-bool ] }
-        { ch'~ [ parse-null ] }
-        { ch', [ ] }
+        { char: # [ string>number ] }
+        { char: \" [ ] }
+        { char: \} [ parse-dict ] }
+        { char: \] [ parse-list ] }
+        { char: \! [ parse-bool ] }
+        { char: ~ [ parse-null ] }
+        { char: , [ ] }
         [ "Invalid payload type: %c" sprintf throw ]
     } case ;
 

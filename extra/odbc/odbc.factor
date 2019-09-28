@@ -143,7 +143,7 @@ FUNCTION: SQLRETURN SQLGetDiagRec (
 <PRIVATE
 
 : alien-space-str ( len -- alien )
-    ch'space <string> ascii string>alien ;
+    char: space <string> ascii string>alien ;
 
 PRIVATE>
 

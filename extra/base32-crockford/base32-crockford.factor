@@ -16,10 +16,10 @@ CONSTANT: INVERSE $[ 256 [ ALPHABET index 0xff or ] B{ } map-integers ]
 CONSTANT: CHECKSUM $[ ALPHABET "*~$=U" append ]
 
 : normalize-base32 ( base32 -- base32' )
-    ch'- swap remove >upper H{
-        { ch'I ch'1 }
-        { ch'L ch'1 }
-        { ch'O ch'0 }
+    char: - swap remove >upper H{
+        { char: I char: 1 }
+        { char: L char: 1 }
+        { char: O char: 0 }
     } substitute ;
 
 : parse-base32 ( base32 -- n )

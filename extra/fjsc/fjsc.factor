@@ -32,8 +32,8 @@ TUPLE: ast-hashtable elements ;
     [
         {
             [ blank? not ]
-            [ ch'\" = not ]
-            [ ch'\; = not ]
+            [ char: \" = not ]
+            [ char: \; = not ]
             [ LETTER? not ]
             [ letter? not ]
             [ identifier-middle? not ]
@@ -59,8 +59,8 @@ DEFER: expression-parser
     [
         {
             [ blank? not ]
-            [ ch'\) = not ]
-            [ ch'- = not ]
+            [ char: \) = not ]
+            [ char: - = not ]
         } 1&&
     ] satisfy repeat1 [ >string ] action ;
 
@@ -115,7 +115,7 @@ DEFER: expression-parser
     [
         "!" token hide ,
         [
-            dup ch'\n = swap ch'\r = or not
+            dup char: \n = swap char: \r = or not
         ] satisfy repeat0 ,
     ] seq* [ drop ast-comment boa ] action ;
 

@@ -13,12 +13,12 @@ IN: text-to-pdf
     H{
         { 0x08    "\\b"  }
         { 0x0c    "\\f"  }
-        { ch'\n   "\\n"  }
-        { ch'\r   "\\r"  }
-        { ch'\t   "\\t"  }
-        { ch'\\   "\\\\" }
-        { ch'\(    "\\("  }
-        { ch'\)    "\\)"  }
+        { char: \n   "\\n"  }
+        { char: \r   "\\r"  }
+        { char: \t   "\\t"  }
+        { char: \\   "\\\\" }
+        { char: \(    "\\("  }
+        { char: \)    "\\)"  }
     } escape-string-by "(" ")" surround ;
 
 : pdf-object ( str n -- str' )

@@ -14,10 +14,10 @@ IN: tools.cal
     42 "  " pad-tail ;
 
 : month-header ( timestamp -- str )
-    "%B %Y" strftime 20 ch'\s pad-center ;
+    "%B %Y" strftime 20 char: \s pad-center ;
 
 : year-header ( timestamp -- str )
-    "%Y" strftime 64 ch'\s pad-center ;
+    "%Y" strftime 64 char: \s pad-center ;
 
 : month-rows ( timestamp -- rows )
     days 7 group day-abbreviations2 prefix format-table ;
@@ -30,7 +30,7 @@ PRIVATE>
 : year. ( timestamp -- )
     dup year-header print nl 12 [1,b] [
         >>month [ month-rows ] [ month-name ] bi
-        20 ch'\s pad-center prefix
+        20 char: \s pad-center prefix
     ] with map 3 group
     [ first3 [ "%s  %s  %s\n" printf ] 3each ] each ;
 

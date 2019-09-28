@@ -15,8 +15,8 @@ M: string-reader stream-read1 sequence-read1 ;
 M: string-reader stream-read-until sequence-read-until ;
 M: string-reader stream-readln
     dup >sequence-stream< bounds-check? [
-        "\r\n" over sequence-read-until ch'\r eq? [
-            over >sequence-stream< dupd ?nth ch'\n eq?
+        "\r\n" over sequence-read-until char: \r eq? [
+            over >sequence-stream< dupd ?nth char: \n eq?
             [ 1 + pick i<< ] [ drop ] if
         ] when nip "" or
     ] [ drop f ] if ;

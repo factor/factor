@@ -15,8 +15,8 @@ IN: ctags
 
 : ctag ( word path lineno -- str )
     [
-        [ present % ch'\t , ]
-        [ normalize-path % ch'\t , ]
+        [ present % char: \t , ]
+        [ normalize-path % char: \t , ]
         [ number>string % ] tri*
     ] "" make ;
 

@@ -9,22 +9,22 @@ IN: tools.files
 
 : dir-or-size ( file-info -- str )
     dup directory? [
-        drop "<DIR>" 20 ch'\s pad-tail
+        drop "<DIR>" 20 char: \s pad-tail
     ] [
-        size>> number>string 20 ch'\s pad-head
+        size>> number>string 20 char: \s pad-head
     ] if ;
 
 : listing-time ( timestamp -- string )
     [ hour>> ] [ minute>> ] bi
-    [ number>string 2 ch'0 pad-head ] bi@ ":" glue ;
+    [ number>string 2 char: 0 pad-head ] bi@ ":" glue ;
 
 : listing-date ( timestamp -- string )
     [ month>> month-abbreviation ]
-    [ day>> number>string 2 ch'\s pad-head ]
+    [ day>> number>string 2 char: \s pad-head ]
     [
         dup year>> dup now year>> =
         [ drop listing-time ] [ nip number>string ] if
-        5 ch'\s pad-head
+        5 char: \s pad-head
     ] tri 3array " " join ;
 
 : read>string ( ? -- string ) "r" "-" ? ; inline

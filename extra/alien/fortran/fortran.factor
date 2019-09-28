@@ -34,7 +34,7 @@ SYMBOL: fortran-abi
 : lowercase-name-with-underscore ( name -- name' )
     >lower "_" append ;
 : lowercase-name-with-extra-underscore ( name -- name' )
-    >lower ch'_ over member?
+    >lower char: _ over member?
     [ "__" append ] [ "_" append ] if ;
 
 HOOK: fortran-c-abi fortran-abi ( -- abi )
@@ -346,7 +346,7 @@ M: character-type (<fortran-result>)
         [ (fortran-result>) ]
     } cond ;
 
-: letters ( -- seq ) ch'a ch'z [a,b] ;
+: letters ( -- seq ) char: a char: z [a,b] ;
 
 : (shuffle-map) ( return parameters -- ret par )
     [

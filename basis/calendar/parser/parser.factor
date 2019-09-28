@@ -28,16 +28,16 @@ ERROR: invalid-timestamp-format ;
 : read-sp ( -- token ) " " read-token ;
 
 : signed-gmt-offset ( dt ch -- dt' )
-    { { ch'+ [ 1 ] } { ch'- [ -1 ] } } case time* ;
+    { { char: + [ 1 ] } { char: - [ -1 ] } } case time* ;
 
 : read-rfc3339-gmt-offset ( ch -- dt )
     {
         { f [ instant ] }
-        { ch'Z [ instant ] }
+        { char: Z [ instant ] }
         [
             [
                 read-00 hours
-                read1 { { ch'\: [ read-00 ] } { f [ 0 ] } } case minutes
+                read1 { { char: \: [ read-00 ] } { f [ 0 ] } } case minutes
                 time+
             ] dip signed-gmt-offset
         ]
@@ -58,7 +58,7 @@ ERROR: invalid-timestamp-format ;
     read-ymd
     "Tt \t" expect
     read-hms
-    read1 { { ch'. [ read-rfc3339-seconds ] } [ ] } case
+    read1 { { char: . [ read-rfc3339-seconds ] } [ ] } case
     read-rfc3339-gmt-offset
     <timestamp> ;
 
@@ -66,7 +66,7 @@ ERROR: invalid-timestamp-format ;
     [ (rfc3339>timestamp) ] with-string-reader ;
 
 : parse-rfc822-military-offset ( string -- dt )
-    first ch'A - {
+    first char: A - {
         -1 -2 -3 -4 -5 -6 -7 -8 -9 f -10 -11 -12
         1 2 3 4 5 6 7 8 9 10 11 12 0
     } nth hours ;
@@ -101,7 +101,7 @@ CONSTANT: rfc822-named-zones H{
 
 : (rfc822>timestamp) ( -- timestamp )
     "," read-token day-abbreviations3 member? check-timestamp drop
-    read1 ch'\s assert=
+    read1 char: \s assert=
     read-sp checked-number
     read-sp month-abbreviations index 1 + check-timestamp
     read-sp checked-number spin
@@ -117,7 +117,7 @@ CONSTANT: rfc822-named-zones H{
 
 : (cookie-string>timestamp-1) ( -- timestamp )
     "," read-token check-day-name
-    read1 ch'\s assert=
+    read1 char: \s assert=
     "-" read-token checked-number
     "-" read-token month-abbreviations index 1 + check-timestamp
     read-sp checked-number spin

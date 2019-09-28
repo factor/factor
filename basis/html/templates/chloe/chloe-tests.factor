@@ -10,7 +10,7 @@ IN: html.templates.chloe.tests
 
 : run-template ( quot -- string )
     with-string-writer [ "\r\n\t" member? ] reject
-    [ ch'\s = ] trim ; inline
+    [ char: \s = ] trim ; inline
 
 : test-template ( name -- template )
     "vocab:html/templates/chloe/test/"

@@ -11,7 +11,7 @@ IN: cgi
 
 : query-string ( string -- assoc )
     query>assoc [ nip ] assoc-filter [
-        [ [ ch'\s = ] trim ]
+        [ [ char: \s = ] trim ]
         [ dup string? [ 1array ] when ] bi*
     ] assoc-map ;
 

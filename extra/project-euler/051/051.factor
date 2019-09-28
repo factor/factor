@@ -41,7 +41,7 @@ SYMBOL: large-families
     H{ } clone [ '[ swap _ push-at ] each-index ] keep ;
 
 : *-if-index ( char combination index -- char )
-    member? [ drop ch'* ] when ;
+    member? [ drop char: * ] when ;
 : replace-positions-with-* ( str positions -- str )
     [ *-if-index ] curry map-index ;
 : all-positions-combinations ( seq -- combinations )
@@ -68,7 +68,7 @@ SYMBOL: large-families
     large-families get members ;
 
 : fill-*-with-ones ( str -- str )
-    [ dup ch'* = [ drop ch'1 ] when ] map ;
+    [ dup char: * = [ drop char: 1 ] when ] map ;
 
 ! recursively test all primes by length until we find an answer
 : (euler051) ( i -- answer )

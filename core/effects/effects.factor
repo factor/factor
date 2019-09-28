@@ -64,10 +64,10 @@ M: pair effect>string
     ] if ;
 
 : stack-picture% ( seq -- )
-    [ effect>string % ch'\s , ] each ;
+    [ effect>string % char: \s , ] each ;
 
 : var-picture% ( var -- )
-    [ ".." % % ch'\s , ] when* ;
+    [ ".." % % char: \s , ] when* ;
 
 M: effect effect>string ( effect -- string )
     [

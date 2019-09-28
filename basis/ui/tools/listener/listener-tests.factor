@@ -154,7 +154,7 @@ CONSTANT: text "Hello world.\nThis is a test."
 
 { } [ "interactor" get evaluate-input ] unit-test
 
-{ ch'H } [ "promise" get 2 seconds ?promise-timeout ] unit-test
+{ char: H } [ "promise" get 2 seconds ?promise-timeout ] unit-test
 
 { } [ <listener-gadget> [ ] with-grafted-gadget ] unit-test
 

@@ -10,11 +10,11 @@ IN: html.entities
 <PRIVATE
 
 CONSTANT: html-escapes {
-    { ch'& "&amp;" }
-    { ch'< "&lt;" }
-    { ch'> "&gt;" }
-    { ch'\" "&quot;" }
-    { ch'\' "&#39;" }
+    { char: & "&amp;" }
+    { char: < "&lt;" }
+    { char: > "&gt;" }
+    { char: \" "&quot;" }
+    { char: \' "&#39;" }
 }
 
 : next-escape ( seq -- i elt )

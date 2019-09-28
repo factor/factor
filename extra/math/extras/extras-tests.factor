@@ -97,7 +97,7 @@ tools.test ;
 { f } [ { 1 1 2 2 } majority ] unit-test
 { 2 } [ { 1 1 2 2 2 } majority ] unit-test
 { 3 } [ { 1 2 3 1 2 3 1 2 3 3 } majority ] unit-test
-{ ch'C } [ "AAACCBBCCCBCC" majority ] unit-test
+{ char: C } [ "AAACCBBCCCBCC" majority ] unit-test
 
 { 0.0 } [ 0 2 round-to-decimal ] unit-test
 { 1.0 } [ 1 2 round-to-decimal ] unit-test

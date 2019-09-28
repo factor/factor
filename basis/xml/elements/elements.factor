@@ -8,7 +8,7 @@ IN: xml.elements
 
 : take-interpolated ( quot -- interpolated )
     interpolating? get [
-        drop get-char ch'> eq?
+        drop get-char char: > eq?
         [ next f ]
         [ "->" take-string [ blank? ] trim ]
         if <interpolated>
@@ -19,7 +19,7 @@ IN: xml.elements
 
 : start-tag ( -- name ? )
     ! Outputs the name and whether this is a closing tag
-    get-char ch'/ eq? dup [ next ] when
+    get-char char: / eq? dup [ next ] when
     parse-name swap ;
 
 : assure-no-duplicates ( attrs-alist -- attrs-alist )
@@ -29,7 +29,7 @@ IN: xml.elements
 
 : parse-attr ( -- array )
     parse-name pass-blank "=" expect pass-blank
-    get-char ch'< eq?
+    get-char char: < eq?
     [ "<-" expect interpolate-quote ]
     [ t parse-quote* ] if 2array ;
 
@@ -40,7 +40,7 @@ IN: xml.elements
     dup length 1 > [ assure-no-duplicates ] when ;
 
 : end-tag ( name attrs-alist -- tag )
-    tag-ns pass-blank get-char ch'/ eq?
+    tag-ns pass-blank get-char char: / eq?
     [ pop-ns <contained> next ">" expect ]
     [ depth inc <opener> close ] if ;
 
@@ -109,9 +109,9 @@ DEFER: make-tag ! Is this unavoidable?
 
 : dtd-loop ( -- )
     pass-blank get-char {
-        { ch'\] [ next ] }
-        { ch'% [ expand-pe ] }
-        { ch'< [
+        { char: \] [ next ] }
+        { char: % [ expand-pe ] }
+        { char: < [
             next make-tag dup dtd-acceptable?
             [ bad-doctype ] unless , dtd-loop
         ] }
@@ -132,7 +132,7 @@ DEFER: make-tag ! Is this unavoidable?
     [ take-external-id ] [ f ] if ;
 
 : take-internal ( -- dtd/f )
-    get-char ch'\[ eq?
+    get-char char: \[ eq?
     [ next take-internal-subset ] [ f ] if ;
 
 : take-doctype-decl ( -- doctype-decl )
@@ -151,8 +151,8 @@ DEFER: make-tag ! Is this unavoidable?
 
 : direct ( -- object )
     get-char {
-        { ch'- [ take-comment ] }
-        { ch'\[ [ take-cdata ] }
+        { char: - [ take-comment ] }
+        { char: \[ [ take-cdata ] }
         [ drop take-directive ]
     } case ;
 
@@ -166,8 +166,8 @@ DEFER: make-tag ! Is this unavoidable?
 
 : make-tag ( -- tag )
     get-char {
-        { ch'\! [ next direct ] }
-        { ch'? [ next instruct ] }
-        { ch'- [ next interpolate-tag ] }
+        { char: \! [ next direct ] }
+        { char: ? [ next instruct ] }
+        { char: - [ next interpolate-tag ] }
         [ drop normal-tag ]
     } case ;

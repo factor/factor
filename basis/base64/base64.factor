@@ -26,7 +26,7 @@ CONSTANT: alphabet $[
     alphabet nth ; inline
 
 : base64>ch ( ch -- ch )
-    $[ alphabet alphabet-inverse 0 ch'= pick set-nth ] nth
+    $[ alphabet alphabet-inverse 0 char: = pick set-nth ] nth
     [ malformed-base64 ] unless* { fixnum } declare ; inline
 
 : encode3 ( x y z -- a b c d )
@@ -41,7 +41,7 @@ CONSTANT: alphabet $[
         [
             stream stream-write1 1 + dup 76 = [
                 drop 0
-                B{ ch'\r ch'\n } stream stream-write
+                B{ char: \r char: \n } stream stream-write
             ] when
         ] each
     ] [
@@ -61,8 +61,8 @@ CONSTANT: alphabet $[
         input stream-read1
         [ [ 0 or ] bi@ encode3 ] 2keep [ 0 1 ? ] bi@ + {
             { 0 [ ] }
-            { 1 [ drop ch'= ] }
-            { 2 [ 2drop ch'= ch'= ] }
+            { 1 [ drop char: = ] }
+            { 2 [ 2drop char: = char: = ] }
         } case data (4sequence) output stream-write-lines
     ] while 2drop ; inline
 
@@ -95,12 +95,12 @@ PRIVATE>
 
 :: (decode-base64) ( input output -- )
     3 <byte-array> :> data
-    [ B{ ch'\n ch'\r } input read1-ignoring dup ] [
-        B{ ch'\n ch'\r } input read1-ignoring ch'= or
-        B{ ch'\n ch'\r } input read1-ignoring ch'= or
-        B{ ch'\n ch'\r } input read1-ignoring ch'= or
+    [ B{ char: \n char: \r } input read1-ignoring dup ] [
+        B{ char: \n char: \r } input read1-ignoring char: = or
+        B{ char: \n char: \r } input read1-ignoring char: = or
+        B{ char: \n char: \r } input read1-ignoring char: = or
         [ decode4 data (3sequence) ] 3keep
-        [ ch'= eq? 1 0 ? ] tri@ + +
+        [ char: = eq? 1 0 ? ] tri@ + +
         [ head-slice* ] unless-zero
         output stream-write
     ] while drop ;
@@ -142,18 +142,18 @@ PRIVATE>
 
 : >urlsafe-base64 ( seq -- base64 )
     >base64 H{
-        { ch'+ ch'- }
-        { ch'/ ch'_ }
+        { char: + char: - }
+        { char: / char: _ }
     } substitute ;
 
 : urlsafe-base64> ( base64 -- seq )
     H{
-        { ch'- ch'+ }
-        { ch'_ ch'/ }
+        { char: - char: + }
+        { char: _ char: / }
     } substitute base64> ;
 
 : >urlsafe-base64-lines ( seq -- base64 )
     >base64-lines H{
-        { ch'+ ch'- }
-        { ch'/ ch'_ }
+        { char: + char: - }
+        { char: / char: _ }
     } substitute ;

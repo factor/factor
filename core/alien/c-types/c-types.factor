@@ -503,7 +503,7 @@ M: double-2-rep rep-component-type drop double ;
 GENERIC: pointer-string ( pointer -- string/f )
 M: object pointer-string drop f ;
 M: word pointer-string name>> ;
-M: pointer pointer-string to>> pointer-string [ ch'* suffix ] [ f ] if* ;
+M: pointer pointer-string to>> pointer-string [ char: * suffix ] [ f ] if* ;
 
 GENERIC: c-type-string ( c-type -- string )
 

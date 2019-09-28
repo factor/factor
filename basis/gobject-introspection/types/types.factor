@@ -68,7 +68,7 @@ PREDICATE: fixed-size-array-type < c-array-type fixed-size>> >boolean ;
 
 : qualified-type-name ( data-type -- name )
     [ name>> ] keep {
-        [ name>> ch'. swap member? ]
+        [ name>> char: . swap member? ]
         [ none-type? ]
         [ standard-type? ]
     } 1|| [ qualified-name ] unless ;

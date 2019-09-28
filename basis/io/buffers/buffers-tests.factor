@@ -44,7 +44,7 @@ io.buffers kernel libc namespaces sequences strings tools.test ;
     dup buffer-read-all >string swap dispose
 ] unit-test
 
-{ ch'e } [
+{ char: e } [
     "hello" string>buffer
     1 over buffer-consume [ buffer-pop ] keep dispose
 ] unit-test
@@ -58,11 +58,11 @@ io.buffers kernel libc namespaces sequences strings tools.test ;
 "b" get dispose
 
 "hello world" string>buffer "b" set
-{ "hello" ch'\s } [ " " "b" get buffer-read-until [ >string ] dip ] unit-test
+{ "hello" char: \s } [ " " "b" get buffer-read-until [ >string ] dip ] unit-test
 "b" get dispose
 
 "hello world" string>buffer "b" set
-{ "hello worl" ch'd } [ "d" "b" get buffer-read-until [ >string ] dip ] unit-test
+{ "hello worl" char: d } [ "d" "b" get buffer-read-until [ >string ] dip ] unit-test
 "b" get dispose
 
 "hello world" string>buffer "b" set

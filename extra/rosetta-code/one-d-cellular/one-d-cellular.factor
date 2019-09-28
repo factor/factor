@@ -42,7 +42,7 @@ IN: rosetta-code.one-d-cellular
     dup count-neighbours [ life-law ] ?{ } 2map-as ;
 
 : print-cellular ( world -- )
-    [ ch'# ch'_ ? ] "" map-as print ;
+    [ char: # char: _ ? ] "" map-as print ;
 
 : main-cellular ( -- )
     ?{ f t t t f t t f t f t f t f t f f t f f }

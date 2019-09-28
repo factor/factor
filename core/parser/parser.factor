@@ -64,7 +64,7 @@ ERROR: number-expected ;
 
 DEFER: scan-object
 : parse-lower-colon2 ( obj -- obj' )
-    [ ch'\: = ] cut-tail length [ scan-object ] replicate 2array
+    [ char: \: = ] cut-tail length [ scan-object ] replicate 2array
     handle-lower-colon ;
 
 : parse-single-quote ( obj -- obj' )

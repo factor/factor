@@ -8,8 +8,8 @@ IN: escape-strings
     [ HS{ } clone 0 0 ] dip
     [
         {
-            { ch'\] [ 1 + dup 2 = [ drop over adjoin 0 1 ] when ] }
-            { ch'= [ dup 1 = [ [ 1 + ] dip ] when ] }
+            { char: \] [ 1 + dup 2 = [ drop over adjoin 0 1 ] when ] }
+            { char: = [ dup 1 = [ [ 1 + ] dip ] when ] }
             [ 3drop 0 0 ]
         } case
     ] each 0 > [ over adjoin ] [ drop ] if ;
@@ -19,7 +19,7 @@ IN: escape-strings
     [ nip ] [ drop length ] if ;
 
 : escape-string* ( str n -- str' )
-    ch'= <repetition>
+    char: = <repetition>
     [ "[" dup surround ] [ "]" dup surround ] bi surround ;
 
 : escape-string ( str -- str' )
@@ -32,8 +32,8 @@ IN: escape-strings
     [ escape-string ] dip prepend ;
 
 : escape-simplest ( str -- str' )
-    dup { ch'\' ch'\" ch'\r ch'\n ch'\s } counts {
-        ! { [ dup { ch'\' ch'\r ch'\n ch'\s } values-of sum 0 = ] [ drop "'" prepend ] }
-        { [ dup ch'\" of not ] [ drop "\"" "\"" surround ] }
+    dup { char: \' char: \" char: \r char: \n char: \s } counts {
+        ! { [ dup { char: \' char: \r char: \n char: \s } values-of sum 0 = ] [ drop "'" prepend ] }
+        { [ dup char: \" of not ] [ drop "\"" "\"" surround ] }
         [ drop escape-string ]
     } cond ;
