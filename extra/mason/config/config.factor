@@ -36,10 +36,10 @@ SYMBOL: boot-flags
 SYMBOL: builder-debug
 
 ! URL for counter notifications.
-INITIALIZED-SYMBOL: counter-url [ "http://builds.factorcode.org/counter" ]
+INITIALIZED-SYMBOL: counter-url [ "https://builds.factorcode.org/counter" ]
 
 ! URL for status notifications.
-INITIALIZED-SYMBOL: status-url [ "http://builds.factorcode.org/status-update" ]
+INITIALIZED-SYMBOL: status-url [ "https://builds.factorcode.org/status-update" ]
 
 ! Password for status notifications.
 SYMBOL: status-secret
@@ -58,7 +58,7 @@ SYMBOL: docs-username
 SYMBOL: docs-directory
 
 ! URL to notify server about new docs
-INITIALIZED-SYMBOL: docs-update-url [ "http://builds.factorcode.org/docs-update" ]
+INITIALIZED-SYMBOL: docs-update-url [ "https://builds.factorcode.org/docs-update" ]
 
 ! Boolean. Do we upload package binaries?
 SYMBOL: upload-package?
