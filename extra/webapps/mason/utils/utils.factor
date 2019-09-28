@@ -38,7 +38,7 @@ IN: webapps.mason.utils
     2array sift [ [XML <li><-></li> XML] ] map [XML <ul><-></ul> XML] ;
 
 : download-url ( string -- string' )
-    "http://downloads.factorcode.org/" prepend ;
+    "https://downloads.factorcode.org/" prepend ;
 
 : platform-url ( url builder -- url )
     [ os>> "os" set-query-param ]
@@ -46,15 +46,15 @@ IN: webapps.mason.utils
     adjust-url ;
 
 : package-url ( builder -- url )
-    [ URL" http://builds.factorcode.org/package" clone ] dip
+    [ URL" https://builds.factorcode.org/package" clone ] dip
     platform-url ;
 
 : report-url ( builder -- url )
-    [ URL" http://builds.factorcode.org/report" clone ] dip
+    [ URL" https://builds.factorcode.org/report" clone ] dip
     platform-url ;
 
 : release-url ( builder -- url )
-    [ URL" http://builds.factorcode.org/release" clone ] dip
+    [ URL" https://builds.factorcode.org/release" clone ] dip
     platform-url ;
 
 : validate-secret ( -- )
