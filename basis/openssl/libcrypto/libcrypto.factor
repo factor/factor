@@ -11,7 +11,7 @@ IN: openssl.libcrypto
 
 << "libcrypto" {
     { [ os windows? ] [ "libcrypto-37.dll" ] }
-    { [ os macosx? ] [ { "libcrypto.46.dylib" "libcrypto.44.dylib" } find-library-from-list ] }
+    { [ os macosx? ] [ { "libcrypto.46.dylib" "libcrypto.44.dylib" "libcrypto.dylib" } find-library-from-list ] }
     { [ os unix? ] [ "libcrypto.so" ] }
 } cond cdecl add-library >>
 
