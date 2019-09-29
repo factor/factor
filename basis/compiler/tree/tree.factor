@@ -4,6 +4,8 @@ USING: accessors arrays assocs kernel namespaces sequences
 stack-checker.visitor vectors ;
 IN: compiler.tree
 
+SYMBOL: word-being-compiled
+
 TUPLE: node < identity-tuple ;
 
 TUPLE: #introduce < node out-d ;

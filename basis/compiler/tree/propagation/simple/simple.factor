@@ -1,12 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes classes.algebra
-classes.algebra.private classes.maybe classes.tuple.private
-combinators combinators.short-circuit compiler.tree
+classes.tuple.private combinators combinators.short-circuit compiler.tree
 compiler.tree.propagation.constraints compiler.tree.propagation.info
 compiler.tree.propagation.inlining compiler.tree.propagation.nodes
-compiler.tree.propagation.slots continuations fry kernel make
-sequences sets stack-checker.dependencies words ;
+compiler.tree.propagation.output-infos compiler.tree.propagation.slots
+continuations fry kernel sequences stack-checker.dependencies words ;
 IN: compiler.tree.propagation.simple
 
 M: #introduce propagate-before
@@ -49,12 +48,6 @@ M: #declare propagate-before
             swap predicate-constraints assume
         ] [ 2drop ] if
     ] if* ;
-
-ERROR: invalid-outputs #call infos ;
-
-: check-outputs ( #call infos -- infos )
-    over out-d>> over [ length ] bi@ =
-    [ nip ] [ invalid-outputs ] if ;
 
 : call-outputs-quot ( #call word -- infos )
     dupd
@@ -111,12 +104,22 @@ ERROR: invalid-outputs #call infos ;
     "default-output-classes" word-prop
     [ class-infos ] [ out-d>> length object-info <repetition> ] ?if ;
 
+
+! Force literal? to f to prevent non-specified inlining.  Class/Interval info is
+! still propagated.
+: copy-output-infos ( #call word -- infos )
+    2dup check-copied-output-infos
+    [ nip "output-infos" word-prop clone [ f >>literal? ] map ]
+    [ default-output-value-infos ] if
+    ;
+
 : output-value-infos ( #call word -- infos )
     {
         { [ dup \ <tuple-boa> eq? ] [ drop propagate-<tuple-boa> ] }
         { [ dup sequence-constructor? ] [ propagate-sequence-constructor ] }
         { [ dup predicate? ] [ propagate-predicate ] }
         { [ dup "outputs" word-prop ] [ call-outputs-quot ] }
+        { [ dup "output-infos" word-prop ] [ copy-output-infos ] }
         [ default-output-value-infos ]
     } cond ;
 

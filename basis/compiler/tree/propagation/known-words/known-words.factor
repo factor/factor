@@ -1,15 +1,15 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors alien.data.private arrays
-assocs byte-arrays byte-vectors classes classes.algebra classes.tuple
+USING: accessors alien alien.accessors alien.data.private arrays assocs
+byte-arrays byte-vectors classes classes.algebra classes.tuple
 classes.tuple.private combinators compiler.tree.comparisons
 compiler.tree.propagation.constraints compiler.tree.propagation.info
-compiler.tree.propagation.simple compiler.tree.propagation.slots fry
-generic.math hashtables kernel kernel.private layouts locals math
-math.floats.private math.functions math.integers.private
-math.intervals math.libm math.parser math.partial-dispatch
-math.private namespaces sbufs sequences slots.private splitting
-stack-checker.dependencies strings strings.private vectors words ;
+compiler.tree.propagation.simple compiler.tree.propagation.slots continuations
+continuations.private fry generic.math hashtables kernel kernel.private layouts
+locals math math.floats.private math.functions math.integers.private
+math.intervals math.libm math.parser math.partial-dispatch math.private
+namespaces sbufs sequences slots.private splitting stack-checker.dependencies
+strings strings.private vectors words ;
 FROM: alien.c-types => (signed-interval) (unsigned-interval) ;
 IN: compiler.tree.propagation.known-words
 
@@ -391,3 +391,9 @@ generic-comparison-ops [
 \ tag [
     drop fixnum 0 num-types get [a,b) <class/interval-info>
 ] "outputs" set-word-prop
+
+
+! If info from `current-continuation` and the dummies is used, `ifcc` breaks
+\ current-continuation [ object-info ] "outputs" set-word-prop
+\ dummy-1 [ object-info ] "outputs" set-word-prop
+\ dummy-2 [ drop object-info ] "outputs" set-word-prop

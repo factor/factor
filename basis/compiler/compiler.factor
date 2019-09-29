@@ -4,7 +4,10 @@ USING: accessors assocs classes classes.algebra combinators
 combinators.short-circuit compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.finalization
 compiler.cfg.optimizer compiler.codegen compiler.crossref
-compiler.errors compiler.tree.builder compiler.tree.optimizer
+compiler.errors
+compiler.tree
+compiler.tree.propagation.output-infos
+compiler.tree.builder compiler.tree.optimizer
 compiler.units compiler.utilities continuations definitions fry
 generic generic.single io kernel macros make namespaces
 sequences sets stack-checker.dependencies stack-checker.errors
@@ -28,6 +31,7 @@ SYMBOL: compiled
     H{ } clone dependencies namespaces:set
     H{ } clone generic-dependencies namespaces:set
     HS{ } clone conditional-dependencies namespaces:set
+    dup word-being-compiled namespaces:set
     clear-compiler-error ;
 
 GENERIC: no-compile? ( word -- ? )
@@ -111,7 +115,9 @@ M: word combinator? inline? ;
     ! If the word contains breakpoints, don't optimize it, since
     ! the walker does not support this.
     dup optimize? [
-        [ [ build-tree ] [ deoptimize ] recover optimize-tree ] keep
+        [ [ build-tree ] [ deoptimize ] recover optimize-tree
+          [ update-output-infos ] keep
+        ] keep
         contains-breakpoints? [ nip deoptimize* ] [ drop ] if
     ] [ deoptimize* ] if ;
 

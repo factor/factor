@@ -182,6 +182,7 @@ IN: tools.deploy.shaker
                 "no-compile"
                 "owner-generic"
                 "outputs"
+                "output-infos"
                 "participants"
                 "predicate"
                 "predicate-definition"
