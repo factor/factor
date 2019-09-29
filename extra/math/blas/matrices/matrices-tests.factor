@@ -707,11 +707,11 @@ sequences tools.test ;
     } Mtranspose 2 1 3 2 Msub
 ] unit-test
 
-! Bugfix: blas-matrix-base did not handle `f smatrix{ } equal?`
+! Bugfix: blas-matrix-base did not handle `f Smatrix{ } equal?`
 { f } [
-    f smatrix{
-        svector{ 1.0 2.0 3.0 4.0 }
-        svector{ 2.0 2.0 3.0 4.0 }
-        svector{ 3.0 2.0 3.0 4.0 }
+    f Smatrix{
+        Svector{ 1.0 2.0 3.0 4.0 }
+        Svector{ 2.0 2.0 3.0 4.0 }
+        Svector{ 3.0 2.0 3.0 4.0 }
     } equal?
 ] unit-test
