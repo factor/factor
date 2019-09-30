@@ -85,7 +85,8 @@ M: memoized reset-word
     bi ;
 
 : memoize-quot ( quot effect -- memo-quot )
-    [ H{ } clone ] 2dip make-memoizer ;
+    dup in>> length zero? [ f 1array ] [ H{ } clone ] if
+    -rot make-memoizer ;
 
 : reset-memoized ( word -- )
     "memoize" word-prop dup sequence?
