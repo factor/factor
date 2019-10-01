@@ -71,8 +71,8 @@ PRIVATE>
         ! Draw white text on black background. The resulting grayscale
         ! image will be used as transparency mask for the actual color.
         drop
-        [ COLOR: black color>RGB SetBkColor drop ]
-        [ COLOR: white color>RGB SetTextColor drop ] bi
+        [ color: black color>RGB SetBkColor drop ]
+        [ color: white color>RGB SetTextColor drop ] bi
     ] if ;
 
 : selection-start/end ( script-string -- iMinSel iMaxSel )
@@ -86,7 +86,7 @@ PRIVATE>
     ]
     [ [ { 0 0 } ] dip <RECT> ]
     [
-        [let :> str str selection-start/end
+        let[ :> str str selection-start/end
          [
              str string>> dup selection? [ string>> ] when
              swap >utf16-index
