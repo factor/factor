@@ -188,7 +188,7 @@ M: writer-monad fail   "Fail" throw ;
 
 : run-writer ( writer -- value log ) [ value>> ] [ log>> ] bi ;
 
-M: writer >>= '[ [ _ run-writer ] dip '[ @ run-writer ] dip append <writer> ] ;
+M: writer >>= '[ [ _ run-writer ] dip '[ @ run-writer ] dip prepend <writer> ] ;
 
 : pass ( writer -- writer' ) run-writer [ first2 ] dip swap call( x -- y ) <writer> ;
 : listen ( writer -- writer' ) run-writer [ 2array ] keep <writer> ;
