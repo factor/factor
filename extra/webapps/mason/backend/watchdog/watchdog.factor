@@ -12,7 +12,7 @@ IN: webapps.mason.backend.watchdog
             <body>
                 <p>Machines which are not sending heartbeats:</p>
                 <ul><-></ul>
-                <a href="http://builds.factorcode.org/dashboard">Dashboard</a>
+                <a href="https://builds.factorcode.org/dashboard">Dashboard</a>
             </body>
         </html>
     XML> xml>string

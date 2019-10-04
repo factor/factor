@@ -1,11 +1,5 @@
-USING:
-    byte-arrays
-    kernel
-    openssl.libcrypto
-    sequences
-    splitting
-    strings
-    tools.test ;
+USING: byte-arrays kernel openssl.libcrypto sequences splitting
+strings tools.test ;
 IN: openssl.libcrypto.tests
 
 { t 1 } [
@@ -20,7 +14,7 @@ IN: openssl.libcrypto.tests
     ] keep BIO_free
 ] unit-test
 
-{ "HTTP/1.1 200 Document follows" 1 } [
+{ "HTTP/1.1 301 Moved Permanently" 1 } [
     "factorcode.org:80" BIO_new_connect [
         [ BIO_C_DO_STATE_MACHINE 0 f BIO_ctrl drop ]
         [

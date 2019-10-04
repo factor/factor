@@ -389,7 +389,6 @@ commutative-ops [
 
 ! Interval bitor
 
-
 { 1/0. } [ 1/0. bit-weight ] unit-test
 { 1/0. } [ -1/0. bit-weight ] unit-test
 
@@ -443,3 +442,17 @@ ${ 0 [a,inf] } [ 0 [a,inf] dup interval-bitxor ] unit-test
 ${ 0 [a,inf] } [ -1 [-inf,a] dup interval-bitxor ] unit-test
 ${ 0 [a,inf] } [ 4 [a,inf] 3 [a,inf] interval-bitxor ] unit-test
 { full-interval } [ 4 [a,inf] -3 [a,inf] interval-bitxor ] unit-test
+
+! Test singleton behavior
+{ f } [ full-interval interval-nonnegative? ] unit-test
+
+{ t } [ empty-interval interval-nonnegative? ] unit-test
+
+{ t } [ full-interval interval-zero? ] unit-test
+
+{ f } [ empty-interval interval-zero? ] unit-test
+
+{ f } [ -1/0. 1/0. [ empty-interval interval-contains? ] bi@ or ] unit-test
+
+{ t } [ -1/0. 1/0. [ full-interval interval-contains? ] bi@ and ] unit-test
+

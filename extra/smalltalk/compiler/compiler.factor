@@ -4,8 +4,7 @@ USING: accessors arrays assocs combinators continuations fry
 generic kernel locals locals.types math quotations sequences
 sequences.generalizations sets smalltalk.ast smalltalk.classes
 smalltalk.compiler.assignment smalltalk.compiler.lexenv
-smalltalk.compiler.return smalltalk.selectors splitting vocabs
-words ;
+smalltalk.compiler.return smalltalk.selectors splitting words ;
 IN: smalltalk.compiler
 
 GENERIC: compile-ast ( lexenv ast -- quot )
@@ -69,10 +68,7 @@ M: ast-return compile-ast
     [ [ arguments>> ] [ temporaries>> ] bi append ]
     [ body>> [ assigned-locals ] map concat fast-set ] bi
     '[
-        dup dup _ in?
-        [ <local-reader> ]
-        [ <local> ]
-        if
+        dup dup _ in? [ <local-reader> ] [ <local> ] if
     ] H{ } map>assoc
     dup
     [ nip local-reader? ] assoc-filter
