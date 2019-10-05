@@ -1,11 +1,16 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel locals.backend math parser
-quotations sequences sets splitting words ;
+USING: accessors combinators kernel locals.backend math
+namespaces parser quotations sequences sets splitting words ;
 IN: fry
 
-: _ ( -- * ) "Only valid inside a fry" throw ;
-: @ ( -- * ) "Only valid inside a fry" throw ;
+ERROR: not-in-a-fry ;
+
+SYMBOL: in-fry?
+
+SYNTAX: _ in-fry? get [ \ _ suffix! ] [ not-in-a-fry ] if ;
+
+SYNTAX: @ in-fry? get [ \ @ suffix! ] [ not-in-a-fry ] if ;
 
 ERROR: >r/r>-in-fry-error ;
 
@@ -17,7 +22,7 @@ GENERIC: fry ( quot -- quot' )
     dup { load-local load-locals get-local drop-locals } intersect
     [ >r/r>-in-fry-error ] unless-empty ;
 
-PREDICATE: fry-specifier < word { _ @ } member-eq? ;
+PREDICATE: fry-specifier < word { POSTPONE: _ POSTPONE: @ } member-eq? ;
 
 GENERIC: count-inputs ( quot -- n )
 
@@ -89,11 +94,11 @@ INSTANCE: fried-callable fried
     [ >quotation 1quotation prefix ] if-empty ;
 
 : mark-composes ( quot -- quot' )
-    [ dup \ @ = [ drop [ _ @ ] ] [ 1quotation ] if ] map concat ; inline
+    [ dup \ @ = [ drop [ POSTPONE: _ POSTPONE: @ ] ] [ 1quotation ] if ] map concat ; inline
 
 : shallow-fry ( quot -- quot' )
     check-fry mark-composes
-    { _ } split convert-curries
+    { POSTPONE: _ } split convert-curries
     [ [ [ ] ] [ [ ] (make-curry) but-last ] if-zero ]
     [ shallow-spread>quot swap [ [ ] (make-curry) compose ] unless-zero ] if-empty ;
 
@@ -145,4 +150,4 @@ M: callable fry ( quot -- quot' )
         ] bi
     ] if-empty ;
 
-SYNTAX: '[ parse-quotation fry append! ;
+SYNTAX: '[ t in-fry? [ parse-quotation ] with-variable fry append! ;
