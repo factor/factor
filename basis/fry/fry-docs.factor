@@ -19,7 +19,7 @@ HELP: fry
 
 HELP: '[
 { $syntax "'[ code... ]" }
-{ $description "Literal fried quotation. Expands into code which takes values from the stack and substitutes them in place of the fry specifiers " { $link _ } " and " { $link @ } "." }
+{ $description "Literal fried quotation. Expands into code which takes values from the stack and substitutes them in place of the fry specifiers " { $link POSTPONE: _ } " and " { $link POSTPONE: @ } "." }
 { $examples "See " { $link "fry.examples" } "." } ;
 
 HELP: >r/r>-in-fry-error
@@ -30,26 +30,26 @@ ARTICLE: "fry.examples" "Examples of fried quotations"
 $nl
 "If a quotation does not contain any fry specifiers, then " { $link POSTPONE: '[ } " behaves just like " { $link POSTPONE: [ } ":"
 { $code "{ 10 20 30 } '[ . ] each" }
-"Occurrences of " { $link _ } " on the left map directly to " { $link curry } ". That is, the following three lines are equivalent:"
+"Occurrences of " { $link POSTPONE: _ } " on the left map directly to " { $link curry } ". That is, the following three lines are equivalent:"
 { $code
     "{ 10 20 30 } 5 '[ _ + ] map"
     "{ 10 20 30 } 5 [ + ] curry map"
     "{ 10 20 30 } [ 5 + ] map"
 }
-"Occurrences of " { $link _ } " in the middle of a quotation map to more complex quotation composition patterns. The following three lines are equivalent:"
+"Occurrences of " { $link POSTPONE: _ } " in the middle of a quotation map to more complex quotation composition patterns. The following three lines are equivalent:"
 { $code
     "{ 10 20 30 } 5 '[ 3 _ / ] map"
     "{ 10 20 30 } 5 [ 3 ] swap [ / ] curry compose map"
     "{ 10 20 30 } [ 3 5 / ] map"
 }
-"Occurrences of " { $link @ } " are simply syntax sugar for " { $snippet "_ call" } ". The following four lines are equivalent:"
+"Occurrences of " { $link POSTPONE: @ } " are simply syntax sugar for " { $snippet "_ call" } ". The following four lines are equivalent:"
 { $code
     "{ 10 20 30 } [ sq ] '[ @ . ] each"
     "{ 10 20 30 } [ sq ] [ call . ] curry each"
     "{ 10 20 30 } [ sq ] [ . ] compose each"
     "{ 10 20 30 } [ sq . ] each"
 }
-"The " { $link _ } " and " { $link @ } " specifiers may be freely mixed, and the result is considerably more concise and readable than the version using " { $link curry } " and " { $link compose } " directly:"
+"The " { $link POSTPONE: _ } " and " { $link POSTPONE: @ } " specifiers may be freely mixed, and the result is considerably more concise and readable than the version using " { $link curry } " and " { $link compose } " directly:"
 { $code
     "{ 8 13 14 27 } [ even? ] 5 '[ @ dup _ ? ] map"
     "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry compose compose map"
@@ -83,15 +83,15 @@ $nl
 { $subsections POSTPONE: '[ }
 "There are two types of fry specifiers; the first can hold a value, and the second “splices” a quotation, as if it were inserted without surrounding brackets:"
 { $subsections
-    _
-    @
+    POSTPONE: _
+    POSTPONE: @
 }
 "The holes are filled in with the top of stack going in the rightmost hole, the second item on the stack going in the second hole from the right, and so on."
 { $subsections
     "fry.examples"
     "fry.philosophy"
 }
-"Fry is implemented as a parsing word which reads a quotation and scans for occurrences of " { $link _ } " and " { $link @ } "; these words are not actually executed, and doing so raises an error (this can happen if they're accidentally used outside of a fry)."
+"Fry is implemented as a parsing word which reads a quotation and scans for occurrences of " { $link POSTPONE: _ } " and " { $link POSTPONE: @ } "; these words are not actually executed, and doing so raises an error (this can happen if they're accidentally used outside of a fry)."
 $nl
 "Fried quotations can also be constructed without using a parsing word; this is useful when meta-programming:"
 { $subsections fry }
