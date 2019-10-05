@@ -85,7 +85,8 @@ MACRO: unpack-params ( ins -- quot )
     [ c-type-count nip '[ _ firstn-unsafe ] ] map '[ _ spread ] ;
 
 MACRO: pack-params ( outs -- quot )
-    [ ] [ c-type-count nip dup [ [ ndip _ ] dip set-firstn ] 3curry ] reduce
+    [ ] [ c-type-count nip dup
+    [ [ ndip POSTPONE: _ ] dip set-firstn ] 3curry ] reduce
     fry [ call ] compose ;
 
 :: [data-map] ( ins outs param-quot -- quot )
