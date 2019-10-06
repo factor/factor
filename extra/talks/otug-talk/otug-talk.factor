@@ -59,7 +59,7 @@ CONSTANT: otug-slides
     }
     { $slide "Constructing quotations"
         { $code ": remove-comments* ( lines string -- lines' )" "    '[ _ head? ] reject ;" "" ": remove-comments ( lines -- lines' )" "    \"#\" remove-comments* ;" }
-        { { $link POSTPONE: @ } " inserts a quotation" }
+        { { $link @ } " inserts a quotation" }
         { $code ": replicate ( n quot -- seq )" "    '[ drop @ ] map ;" }
         { $code "10 [ 1 10 [a,b] random ] replicate ." }
     }
