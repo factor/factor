@@ -14,7 +14,7 @@ GENERIC: fry ( quot -- quot' )
     dup { load-local load-locals get-local drop-locals } intersect
     [ >r/r>-in-fry-error ] unless-empty ;
 
-PREDICATE: fry-specifier < word { _ @ } member-eq? ;
+PREDICATE: fry-specifier < word { POSTPONE: _ POSTPONE: @ } member-eq? ;
 
 GENERIC: count-inputs ( quot -- n )
 
@@ -86,11 +86,11 @@ INSTANCE: fried-callable fried
     [ >quotation 1quotation prefix ] if-empty ;
 
 : mark-composes ( quot -- quot' )
-    [ dup \ @ = [ drop [ _ @ ] ] [ 1quotation ] if ] map concat ; inline
+    [ dup \ @ = [ drop [ POSTPONE: _ POSTPONE: @ ] ] [ 1quotation ] if ] map concat ; inline
 
 : shallow-fry ( quot -- quot' )
     check-fry mark-composes
-    { _ } split convert-curries
+    { POSTPONE: _ } split convert-curries
     [ [ [ ] ] [ [ ] (make-curry) but-last ] if-zero ]
     [ shallow-spread>quot swap [ [ ] (make-curry) compose ] unless-zero ] if-empty ;
 

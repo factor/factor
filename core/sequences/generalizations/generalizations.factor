@@ -131,10 +131,10 @@ MACRO: nmap-reduce ( map-quot reduce-quot n -- quot )
     (neach) all-integers? ; inline
 
 MACRO: finish-nfind ( n -- quot )
-    [ 1 + ] keep dup dup dup '[
+    [ 1 + ] keep dup dup dup f <array> >quotation '[
         _ npick
         [ [ dup ] _ ndip _ nnth-unsafe ]
-        [ _ ndrop _ [ f ] times ]
+        [ _ ndrop @ ]
         if
     ] ;
 

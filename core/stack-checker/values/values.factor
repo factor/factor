@@ -122,7 +122,7 @@ M: f (literal) current-word get bad-macro-input ;
 GENERIC: known>callable ( known -- quot )
 
 : ?@ ( x -- y )
-    dup callable? [ drop _ ] unless ;
+    dup callable? [ drop \ _ ] unless ;
 
 M: object known>callable drop \ _ ;
 

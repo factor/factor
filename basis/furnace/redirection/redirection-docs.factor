@@ -50,7 +50,7 @@ $nl
 } ;
 
 ARTICLE: "furnace.redirection" "Furnace redirection support"
-"The " { $vocab-link "furnace.redirection" } " vocabulary builds additional functionality on top of " { $vocab-link "http.server.redirection" } ", and integrates with various Furnace features such as " { $link "furnace.asides" } " and " { $link "furnace.conversations" } "."
+"The " { $vocab-link "furnace.redirection" } " vocabulary builds additional functionality on top of " { $vocab-link "http.server.redirection" } ", and integrates with various Furnace features such as " { $vocab-link "furnace.asides" } " and " { $vocab-link "furnace.conversations" } "."
 $nl
 "A redirection response which takes asides and conversations into account:"
 { $subsections <redirect> }

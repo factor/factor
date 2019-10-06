@@ -72,5 +72,5 @@ script:
   - "./factor -e='USING: memory vocabs.hierarchy ; \"zealot\" load save'"
   - './factor -run=zealot.cli-changed-vocabs'
   - './factor -run=tools.test `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'
-  - './factor -run=help.lint `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'
+  - './factor -run=zealot.help-lint `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'
   - "./factor -e='USING: modern.paths tools.test sequences system kernel math random ; core-vocabs os macosx? [ dup length 3 /i sample ] when [ test ] each'"
