@@ -7,8 +7,8 @@ sequences.generalizations sets shuffle splitting strings
 syntax.modern unicode vocabs.loader ;
 IN: modern
 
-ERROR: string-expected-got-eof n string ;
-ERROR: long-opening-mismatch tag open n string ch ;
+ERROR: string-expected-got-eof string n ;
+ERROR: long-opening-mismatch tag open string n ch ;
 
 TUPLE: lexed tokens ;
 
@@ -49,43 +49,43 @@ TUPLE: token < lexed name ;
 CONSTRUCTOR: <token> token ( name -- obj ) ;
 
 ! (( )) [[ ]] {{ }}
-MACRO:: read-double-matched ( open-ch -- quot: ( n string tag ch -- n' string seq ) )
+MACRO:: read-double-matched ( open-ch -- quot: ( string n tag ch -- string n' seq ) )
     open-ch dup matching-delimiter {
         [ drop 2 swap <string> ]
         [ drop 1string ]
         [ nip 2 swap <string> ]
     } 2cleave :> ( openstr2 openstr1 closestr2 )
-    |[ n string tag! ch |
+    |[ string n tag! ch |
         ch {
             { char: = [
                 tag 1 cut-slice* drop tag! ! tag of (=( is ( here, fix it
-                n string openstr1 slice-til-separator-inclusive [ -1 modify-from ] dip :> ( n' string' opening ch )
-                ch open-ch = [ tag openstr2 n string ch long-opening-mismatch ] unless
+                string n openstr1 slice-til-separator-inclusive [ -1 modify-from ] dip :> ( string' n' opening ch )
+                ch open-ch = [ tag openstr2 string n ch long-opening-mismatch ] unless
                 opening matching-delimiter-string :> needle
 
-                n' string' needle slice-til-string :> ( n'' string'' payload closing )
-                n'' string
+                string' n' needle slice-til-string :> ( string'' n'' payload closing )
+                string n''
                 tag opening payload closing 4array
             ] }
             { open-ch [
                 tag 1 cut-slice* swap tag! 1 modify-to :> opening
-                n 1 + string closestr2 slice-til-string :> ( n' string' payload closing )
-                n' string
+                string n 1 + closestr2 slice-til-string :> ( string' n' payload closing )
+                string n'
                 tag opening payload closing 4array
             ] }
-            [ [ tag openstr2 n string ] dip long-opening-mismatch ]
+            [ [ tag openstr2 string n ] dip long-opening-mismatch ]
         } case
      ] ;
 
-: read-double-matched-paren ( n string tag ch -- n' string seq ) char: \( read-double-matched ;
-: read-double-matched-bracket ( n string tag ch -- n' string seq ) char: \[ read-double-matched ;
-: read-double-matched-brace ( n string tag ch -- n' string seq ) char: \{ read-double-matched ;
+: read-double-matched-bracket ( string n tag ch -- string n' seq ) char: \[ read-double-matched ;
+! : read-double-matched-paren ( string n tag ch -- string n' seq ) char: \( read-double-matched ;
+! : read-double-matched-brace ( string n tag ch -- string n' seq ) char: \{ read-double-matched ;
 
 DEFER: lex-factor-top
 DEFER: lex-factor
-ERROR: lex-expected-but-got-eof n string expected ;
+ERROR: lex-expected-but-got-eof string n expected ;
 ! For implementing [ { (
-: lex-until ( n string tag-sequence -- n' string payload )
+: lex-until ( string n tag-sequence -- string n' payload )
     3dup '[
         [
             lex-factor-top dup f like [ , ] when* [
@@ -104,7 +104,7 @@ ERROR: lex-expected-but-got-eof n string expected ;
 DEFER: section-close?
 DEFER: upper-colon?
 DEFER: lex-factor-nested
-: lex-colon-until ( n string tag-sequence -- n' string payload )
+: lex-colon-until ( string n tag-sequence -- string n' payload )
     '[
         [
             lex-factor-nested dup f like [ , ] when* [
@@ -129,27 +129,28 @@ DEFER: lex-factor-nested
     dup [ { [ "--" sequence= ] } 1&& ] split-when
     dup length 1 > [ nip ] [ drop ] if ;
 
-MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
+MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     ch dup matching-delimiter {
         [ drop "=" swap prefix ]
         [ nip 1string ]
     } 2cleave :> ( openstreq closestr1 )  ! [= ]
-    |[ n string tag |
-        n string tag
+    |[ string n tag |
+        string n tag
         2over nth-check-eof {
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
             { [ dup blank? ] [
                 drop dup '[ _ matching-delimiter-string closestr1 2array members lex-until ] dip
-                swap unclip-last 3array ] } ! ( foo )
+                swap unclip-last 3array
+            ] } ! ( foo )
             [ drop [ slice-til-whitespace drop ] dip span-slices ]  ! (foo)
         } cond
     ] ;
 
-: read-bracket ( n string slice -- n' string slice' ) char: \[ read-matched ;
-: read-brace ( n string slice -- n' string slice' ) char: \{ read-matched ;
-: read-paren ( n string slice -- n' string slice' ) char: \( read-matched ;
-: read-string-payload ( n string -- n' string )
-    over [
+: read-bracket ( string n slice -- string n' slice' ) char: \[ read-matched ;
+: read-brace ( string n slice -- string n' slice' ) char: \{ read-matched ;
+: read-paren ( string n slice -- string n' slice' ) char: \( read-matched ;
+: read-string-payload ( string n -- string n' )
+    dup [
         { char: \\ char: \" } slice-til-separator-inclusive {
             { f [ drop ] }
             { char: \" [ drop ] }
@@ -159,17 +160,18 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         string-expected-got-eof
     ] if ;
 
-:: read-string ( n string tag -- n' string seq )
-    n string read-string-payload drop :> n'
-    n' string
-    n' [ n string string-expected-got-eof ] unless
+:: read-string ( string n tag -- string n' seq )
+    string n read-string-payload nip :> n'
+    string
+    n'
+    n' [ string n string-expected-got-eof ] unless
     n n' 1 - string <slice>
     n' 1 - n' string <slice>
     tag -rot 3array ;
 
-: take-comment ( n string slice -- n' string comment )
-    2over ?nth char: \[ = [
-        [ 1 + ] 2dip 1 modify-to 2over ?nth read-double-matched-bracket
+: take-comment ( string n slice -- string n' comment )
+    2over ?nth-of char: \[ = [
+        [ 1 + ] dip 1 modify-to 2over ?nth-of read-double-matched-bracket
     ] [
         [ slice-til-eol drop ] dip swap 2array
     ] if ;
@@ -182,16 +184,18 @@ MACRO:: read-matched ( ch -- quot: ( n string tag -- n' string slice' ) )
         [ ")" sequence= ]
     } 1|| ;
 
-ERROR: expected-length-tokens n string length seq ;
-: ensure-no-false ( n string seq -- n string seq )
-    dup [ length 0 > ] all? [ [ length ] keep expected-length-tokens ] unless ;
+ERROR: expected-length-tokens string n length seq ;
+: ensure-no-false ( string n seq -- string n seq )
+    dup [ length 0 > ] all?
+    [ [ length ] keep expected-length-tokens ] unless ;
 
-ERROR: token-expected n string obj ;
-ERROR: unexpected-terminator n string slice ;
-: read-lowercase-colon ( n string slice -- n' string lowercase-colon )
+ERROR: token-expected string n obj ;
+ERROR: unexpected-terminator string n slice ;
+: read-lowercase-colon ( string n slice -- string n' lowercase-colon )
     dup [ char: \: = ] count-tail
     '[
-        _ [ slice-til-non-whitespace drop [ lex-factor ] dip swap 2array ] replicate ensure-no-false dup [ token-expected ] unless
+        _ [ slice-til-not-whitespace drop [ lex-factor ] dip swap 2array ] replicate
+        ensure-no-false dup [ token-expected ] unless
         dup terminator? [ unexpected-terminator ] when
     ] dip swap 2array ;
 
@@ -291,7 +295,7 @@ ERROR: unexpected-terminator n string slice ;
         ]
     } 1&& ;
 
-: read-til-semicolon ( n string slice -- n' string semi )
+: read-til-semicolon ( string n slice -- string n' semi )
     dup '[ but-last ";" append ";" 2array { "--" ")" } append lex-colon-until ] dip
     swap
     ! What ended the FOO: .. ; form?
@@ -310,15 +314,14 @@ ERROR: unexpected-terminator n string slice ;
         [ drop 2array ]
     } cond ;
 
-ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
-: read-colon ( n string slice -- n' string colon )
+: read-colon ( string n slice -- string n' colon )
     {
         { [ dup strict-upper? ] [ read-til-semicolon ] }
         { [ dup ":" tail? ] [ dup ":" head? [ read-lowercase-colon ] unless ] } ! :foo: vs foo:
         [ ]
     } cond ;
 
-: read-acute-html ( n string slice -- n' string acute )
+: read-acute-html ( string n slice -- string n' acute )
     {
         ! <FOO <FOO:
         { [ dup section-open? ] [
@@ -358,16 +361,16 @@ ERROR: colon-word-must-be-all-uppercase-or-lowercase n string word ;
         [ [ slice-til-whitespace drop ] dip span-slices ]
     } cond ;
 
-: read-acute ( n string slice -- n' string acute )
+: read-acute ( string n slice -- string n' acute )
     [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
 
 ! Words like append! and suffix! are allowed for now.
-: read-exclamation ( n string slice -- n' string obj )
+: read-exclamation ( string n slice -- string n' obj )
     dup { [ "!" sequence= ] [ "#!" sequence= ] } 1||
     [ take-comment ] [ merge-slice-til-whitespace ] if ;
 
-ERROR: no-backslash-payload n string slice ;
-: (read-backslash) ( n string slice -- n' string obj )
+ERROR: no-backslash-payload string n slice ;
+: (read-backslash) ( string n slice -- string n' obj )
     merge-slice-til-whitespace dup "\\" tail? [
         ! \ foo, M\ foo
         dup [ char: \\ = ] count-tail
@@ -379,7 +382,7 @@ ERROR: no-backslash-payload n string slice ;
     ] when ;
 
 DEFER: lex-factor-top*
-: read-backslash ( n string slice -- n' string obj )
+: read-backslash ( string n slice -- string n' obj )
     ! foo\ so far, could be foo\bar{
     ! remove the \ and continue til delimiter/eof
     [ "\"!:[{(<>\s\r\n" slice-til-either ] dip swap [ span-slices ] dip
@@ -396,19 +399,19 @@ DEFER: lex-factor-top*
 ! If the slice is 0 width, we stopped on whitespace.
 ! Advance the index and read again!
 
-: read-token-or-whitespace-top ( n string slice -- n' string slice/f )
+: read-token-or-whitespace-top ( string n slice -- string n' slice/f )
     dup length 0 = [
         ! [ 1 + ] 2dip drop lex-factor-top
-        merge-slice-til-non-whitespace
+        merge-slice-til-not-whitespace
     ] when ;
 
-: read-token-or-whitespace-nested ( n string slice -- n' string slice/f )
+: read-token-or-whitespace-nested ( string n slice -- string n' slice/f )
     dup length 0 = [
         ! [ 1 + ] 2dip drop lex-factor-nested
-        merge-slice-til-non-whitespace
+        merge-slice-til-not-whitespace
     ] when ;
 
-: lex-factor-fallthrough ( n/f string slice/f ch/f -- n'/f string literal )
+: lex-factor-fallthrough ( string n/f slice/f ch/f -- string n'/f literal )
     {
         { char: \\ [ read-backslash ] }
         { char: \[ [ read-bracket ] }
@@ -486,21 +489,21 @@ DEFER: lex-factor-top*
         [ lex-factor-fallthrough ]
     } case ;
 
-: lex-factor-top ( n/f string -- n'/f string literal )
+: lex-factor-top ( string/f n/f -- string/f n'/f literal )
     ! skip-whitespace
     "\"\\!:[{(]})<>\s\r\n" slice-til-either
     lex-factor-top* ; inline
 
-ERROR: compound-syntax-disallowed n seq obj ;
-: check-for-compound-syntax ( n/f seq obj -- n/f seq obj )
+ERROR: compound-syntax-disallowed seq n obj ;
+: check-for-compound-syntax ( seq n/f obj -- seq n/f obj )
     dup length 1 > [ compound-syntax-disallowed ] when ;
 
-: check-compound-loop ( n/f string -- n/f string ? )
-    [ ] [ peek-from ] [ previous-from ] 2tri
+: check-compound-loop ( string/f n/f -- string/f n/f ? )
+    [ ] [ ?nth-of ] [ ?1- ?nth-of ] 2tri
     [ blank? ] bi@ or not ! no blanks between tokens
-    pick and ; ! and a valid index
+    over and ; ! and a valid index
 
-: lex-factor ( n/f string/f -- n'/f string literal/f )
+: lex-factor ( string/f n/f -- string n'/f literal/f )
     [
         ! Compound syntax loop
         [
@@ -514,8 +517,8 @@ ERROR: compound-syntax-disallowed n seq obj ;
     ?first f like ;
 
 : string>literals ( string -- sequence )
-    [ 0 ] dip [
-        [ lex-factor [ , ] when* over ] loop
+    [
+        0 [ lex-factor [ , ] when* dup ] loop
     ] { } make 2nip ;
 
 : vocab>literals ( vocab -- sequence )

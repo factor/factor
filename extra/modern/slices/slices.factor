@@ -1,8 +1,18 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel locals math sequences
-sequences.deep sequences.extras strings unicode ;
+sequences.deep sequences.extras strings unicode sequences.private ;
 IN: modern.slices
+
+: ?1- ( n/f -- n'/f ) dup [ 1 - ] when ;
+: ?1+ ( n/f -- n'/f ) dup [ 1 + ] when ;
+
+: ?nth-of ( seq n/f -- elt/f )
+    dup [
+        2dup swap bounds-check? [ swap nth-unsafe ] [ 2drop f ] if
+    ] [
+        nip
+    ] if ; inline
 
 : >strings ( seq -- str )
     [ dup slice? [ >string ] when ] deep-map ;
@@ -14,197 +24,110 @@ IN: modern.slices
         rest ">" append
     ] if ;
 
-ERROR: unexpected-end n string ;
-: nth-check-eof ( n string -- nth )
-    2dup ?nth [ 2nip ] [ unexpected-end ] if* ;
-
-: peek-from ( n/f string -- ch )
-    over [ ?nth ] [ 2drop f ] if ;
-
-: previous-from ( n/f string -- ch )
-    over [ [ 1 - ] dip ?nth ] [ 2drop f ] if ;
+ERROR: unexpected-end string n ;
+: nth-check-eof ( string n -- nth )
+    2dup ?nth-of [ 2nip ] [ unexpected-end ] if* ;
 
 ! Allow eof
-: next-char-from ( n/f string -- n'/f string ch/f )
-    over [
-        2dup ?nth [ [ 1 + ] 2dip ] [ f ] if*
+: next-char-from ( string n/f -- string n'/f ch/f )
+    dup [
+        2dup ?nth-of dup [ [ 1 + ] dip ] when
     ] [
-        [ 2drop f ] [ nip ] 2bi f
+        f
     ] if ;
 
-: prev-char-from-slice-end ( slice -- ch/f )
-    [ to>> 2 - ] [ seq>> ] bi ?nth ;
-
-: prev-char-from-slice ( slice -- ch/f )
-    [ from>> 1 - ] [ seq>> ] bi ?nth ;
-
-: next-char-from-slice ( slice -- ch/f )
-    [ to>> ] [ seq>> ] bi ?nth ;
-
-: char-before-slice ( slice -- ch/f )
-    [ from>> 1 - ] [ seq>> ] bi ?nth ;
-
-: char-after-slice ( slice -- ch/f )
-    [ to>> ] [ seq>> ] bi ?nth ;
+: find-from' ( ... seq n quot: ( ... elt -- ... ? ) -- ... i elt )
+    swapd find-from ; inline
 
 : find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt ? )
     [ find-from ] 2keep drop
     pick [ drop t ] [ length -rot nip f ] if ; inline
 
-: skip-blank-from ( n string -- n' string )
-    over [
-        [ [ blank? not ] find-from* 2drop ] keep
-    ] when ; inline
+: find-from*' ( ... seq n quot: ( ... elt -- ... ? ) -- ... i elt ? )
+    swapd find-from* ; inline
 
-: skip-til-eol-from ( n string -- n' string )
-    [ [ "\r\n" member? ] find-from* 2drop ] keep ; inline
-
-! Don't include the whitespace in the slice
-:: slice-til-whitespace ( n string -- n' string slice/f ch/f )
-    n [
-        n string [ "\s\r\n" member? ] find-from :> ( n' ch )
-        n' string
-        n n' string ?<slice>
-        ch
-    ] [
-        f string f f
-    ] if ; inline
-
-:: slice-til-non-whitespace ( n string -- n' string slice/f ch/f )
-    n [
-        n string [ "\s\r\n" member? not ] find-from :> ( n' ch )
-        n' string
-        n n' string ?<slice>
-        ch
-    ] [
-        f string f f
-    ] if ; inline
-
-:: (slice-until) ( n string quot -- n' string slice/f ch/f )
-    n string quot find-from :> ( n' ch )
-    n' string
+:: (slice-until) ( string n quot -- string n' slice/f ch/f )
+    string n quot find-from' :> ( n' ch )
+    string n'
     n n' string ?<slice>
     ch ; inline
 
-: slice-until ( n string quot -- n' string slice/f )
+: slice-until ( string n quot -- string n' slice/f )
     (slice-until) drop ; inline
 
-:: slice-til-not-whitespace ( n string -- n' string slice/f ch/f )
+! Don't include the whitespace in the slice
+:: slice-til-quot ( string n quot -- string n'/f slice/f ch/f )
     n [
-        n string [ "\s\r\n" member? not ] find-from :> ( n' ch )
-        n' string
+        ! BUG: (slice-until) is broken here?!
+        string n quot find-from' :> ( n' ch )
+        string n'
         n n' string ?<slice>
         ch
     ] [
-        n string f f
+        string f f f
     ] if ; inline
 
-: skip-whitespace ( n/f string -- n'/f string )
+: slice-til-whitespace ( string n -- string n' slice/f ch/f )
+    [ "\s\r\n" member? ] slice-til-quot ; inline
+
+: slice-til-not-whitespace ( string n -- string n' slice/f ch/f )
+    [ "\s\r\n" member? not ] slice-til-quot ; inline
+
+: skip-whitespace ( string n/f -- string n'/f )
     slice-til-not-whitespace 2drop ;
 
 : empty-slice-end ( seq -- slice )
     [ length dup ] [ ] bi <slice> ; inline
 
-: empty-slice-from ( n seq -- slice )
-    dupd <slice> ; inline
-
-:: slice-til-eol ( n string -- n' string slice/f ch/f )
+:: slice-til-eol ( string n -- string n' slice/f ch/f )
     n [
-        n string '[ "\r\n" member? ] find-from :> ( n' ch )
-        n' string
+        string n '[ "\r\n" member? ] find-from' :> ( n' ch )
+        string n'
         n n' string ?<slice>
         ch
     ] [
-        n string string empty-slice-end f
+        string n
+        string empty-slice-end
+        f
     ] if ; inline
 
-:: merge-slice-til-eol-slash'' ( n string -- n' string slice/f ch/f )
-    n [
-        n string '[ "\r\n\\" member? ] find-from :> ( n' ch )
-        n' string
-        n n' string ?<slice>
-        ch
-    ] [
-        n string string empty-slice-end f
-    ] if ; inline
-
-: merge-slice-til-whitespace ( n string slice --  n' string slice' )
-    pick [
+: merge-slice-til-whitespace ( string n slice --  string n' slice' )
+    over [
         [ slice-til-whitespace drop ] dip merge-slices
     ] when ;
 
-: merge-slice-til-non-whitespace ( n string slice --  n' string slice' )
-    pick [
-        [ slice-til-non-whitespace drop ] dip merge-slices
+: merge-slice-til-not-whitespace ( string n slice --  string n' slice' )
+    over [
+        [ slice-til-not-whitespace drop ] dip merge-slices
     ] when ;
 
-: merge-slice-til-eol ( n string slice --  n' string slice' )
-    [ slice-til-eol drop ] dip merge-slices ;
-
-: slice-between ( slice1 slice2 -- slice )
-    ! ensure-same-underlying
-    slice-order-by-from
-    [ to>> ]
-    [ [ from>> 2dup < [ swap ] unless ] [ seq>> ] bi ] bi* <slice> ;
-
-: slice-before ( slice -- slice' )
-    [ drop 0 ] [ from>> ] [ seq>> ] tri <slice> ;
-
-: (?nth) ( n/f string/f -- obj/f )
-    over [ (?nth) ] [ 2drop f ] if ;
-
-:: merge-slice-til-eol-slash' ( n string slice -- n' string slice/f ch/f )
-    n string merge-slice-til-eol-slash'' :> ( n' string' slice' char'  )
-    char' char: \\ = [
-        n' 1 + string' (?nth) "\r\n" member? [
-            n' 2 + string' slice slice' span-slices merge-slice-til-eol-slash'
-        ] [
-            "omg" throw
-        ] if
-    ] [
-        n' string' slice slice' span-slices char'
-    ] if ;
-
-! Supports \ at eol (with no space after it)
-: slice-til-eol-slash ( n string -- n' string slice/f ch/f )
-    2dup empty-slice-from merge-slice-til-eol-slash' ;
-
-:: slice-til-separator-inclusive ( n string tokens -- n' string slice/f ch/f )
-    n string '[ tokens member? ] find-from [ dup [ 1 + ] when ] dip  :> ( n' ch )
-    n' string
+:: slice-til-separator-inclusive ( string n tokens -- string n' slice/f ch/f )
+    string n '[ tokens member? ] find-from' [ ?1+ ] dip  :> ( n' ch )
+    string
+    n'
     n n' string ?<slice>
     ch ; inline
 
-: slice-til-separator-exclusive ( n string tokens -- n' string slice/f ch/f )
-    slice-til-separator-inclusive dup [
-        [ [ 1 - ] change-to ] dip
-    ] when ;
-
 ! Takes at least one character if not whitespace
-:: slice-til-either ( n string tokens -- n'/f string slice/f ch/f )
+:: slice-til-either ( string n tokens -- string n'/f slice/f ch/f )
     n [
-        n string '[ tokens member? ] find-from
-        dup "\s\r\n" member? [
-            :> ( n' ch )
-            n' string
-            n n' string ?<slice>
-            ch
-        ] [
-            [ dup [ 1 + ] when ] dip :> ( n' ch )
-            n' string
-            n n' string ?<slice>
-            ch
-        ] if
+        string n '[ tokens member? ] find-from'
+        dup "\s\r\n" member? [ [ ?1+ ] dip ] unless :> ( n' ch )
+        string
+        n'
+        n n' string ?<slice>
+        ch
     ] [
-        f string f f
+        string f f f
     ] if ; inline
 
-ERROR: subseq-expected-but-got-eof n string expected ;
+ERROR: subseq-expected-but-got-eof string n expected ;
 
-:: slice-til-string ( n string search --  n' string payload end-string )
+:: slice-til-string ( string n search --  string n'/f payload end-string )
     search string n subseq-start-from :> n'
-    n' [ n string search subseq-expected-but-got-eof ] unless
-    n' search length +  string
+    n' [ string n search subseq-expected-but-got-eof ] unless
+    string
+    search length n' +
     n n' string ?<slice>
     n' dup search length + string ?<slice> ;
 
@@ -215,17 +138,9 @@ ERROR: subseq-expected-but-got-eof n string expected ;
     [ [ from>> ] [ to>> ] [ seq>> ] tri ] dip
     swap [ + ] dip <slice> ;
 
-! { char: \] [ read-closing ] }
-! { char: \} [ read-closing ] }
-! { char: \) [ read-closing ] }
-: read-closing ( n string tok -- n string tok )
-    dup length 1 = [
-        -1 modify-to [ 1 - ] 2dip
-    ] unless ;
-
-: rewind-slice ( n string slice -- n' string )
-    pick [
-        length swap [ - ] dip
+: rewind-slice ( string n slice -- string n' )
+    over [
+        length -
     ] [
-        [ nip ] dip [ [ length ] bi@ - ] 2keep drop
+        nip [ [ length ] bi@ - ] keepd swap
     ] if ; inline
