@@ -213,7 +213,7 @@ M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
 M: byte-vector pprint-delims drop \ BV{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
-M: list pprint-delims drop \ L{ \ } ;
+M: cons-state pprint-delims drop \ L{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
 M: tuple pprint-delims drop \ T{ \ } ;
 M: wrapper pprint-delims drop \ W{ \ } ;
@@ -228,7 +228,6 @@ M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
 M: byte-vector >pprint-sequence ;
 M: callable >pprint-sequence ;
-M: list >pprint-sequence list>array ;
 M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
@@ -266,16 +265,15 @@ M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
 M: byte-vector pprint* pprint-object ;
 
-M: list pprint*
+M: cons-state pprint*
     [
         <flow
         dup pprint-delims [
             pprint-word
             dup pprint-narrow? <inset
-            dup nil? [ drop ] [
-                [ car pprint* ]
-                [ cdr nil? [ "~more~" text ] unless ] bi
-            ] if block>
+            [ car pprint* ]
+            [ cdr nil? [ "~more~" text ] unless ] bi
+            block>
         ] dip pprint-word block>
     ] check-recursion ;
 
