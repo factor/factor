@@ -27,20 +27,10 @@ IN: modern.slices.tests
     "foo:" 3 slice-til-whitespace
 ] unit-test
 
-{
-    "foo "
-    f
-    T{ slice f 0 4 "foo " }
-    f
-} [
+{ "foo " f T{ slice f 0 4 "foo " } f } [
     "foo " 0 [ blank? ] slice-until-include
 ] unit-test
 
-{
-    "foo "
-    3
-    T{ slice f 0 3 "foo " }
-    32
-} [
+{ "foo " 3 T{ slice f 0 3 "foo " } 32 } [
     "foo " 0 [ blank? ] slice-until-exclude
 ] unit-test

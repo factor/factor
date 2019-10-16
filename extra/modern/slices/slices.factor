@@ -4,6 +4,8 @@ USING: accessors assocs fry kernel locals math sequences
 sequences.deep sequences.extras strings unicode sequences.private ;
 IN: modern.slices
 
+ERROR: unexpected-eof string n expected ;
+
 : ?1- ( n/f -- n'/f ) dup [ 1 - ] when ;
 : ?1+ ( n/f -- n'/f ) dup [ 1 + ] when ;
 
@@ -33,9 +35,8 @@ IN: modern.slices
 : slice-before ( slice -- slice' )
     [ drop 0 ] [ from>> ] [ seq>> ] tri <slice> ;
 
-ERROR: unexpected-end string n ;
 : nth-check-eof ( string n -- nth )
-    2dup ?nth-of [ 2nip ] [ unexpected-end ] if* ;
+    2dup ?nth-of [ 2nip ] [ f unexpected-eof ] if* ;
 
 ! Allow eof
 : next-char-from ( string n/f -- string n'/f ch/f )

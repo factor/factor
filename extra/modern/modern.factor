@@ -7,13 +7,8 @@ sequences.generalizations sets shuffle splitting strings
 syntax.modern unicode vocabs.loader ;
 IN: modern
 
-ERROR: unexpected-eof string n ;
 ERROR: long-opening-mismatch tag open string n ch ;
-ERROR: lex-expected-but-got-eof string n expected ;
-ERROR: expected-length-tokens string n length seq ;
-ERROR: token-expected string n obj ;
-ERROR: unexpected-terminator string n slice ;
-ERROR: no-backslash-payload string n slice ;
+ERROR: unexpected-terminator string n slice ; ! ] } ) ;
 ERROR: compound-syntax-disallowed seq n obj ;
 
 ! (( )) [[ ]] {{ }}
@@ -62,7 +57,7 @@ DEFER: lex-factor
                     drop t ! loop again?
                 ] if
             ] [
-                _ _ _ lex-expected-but-got-eof
+                _ _ _ unexpected-eof
             ] if*
         ] loop
     ] { } make ;
@@ -123,14 +118,14 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
             { char: \\ [ drop next-char-from drop read-string-payload ] }
         } case
     ] [
-        unexpected-eof
+        f unexpected-eof
     ] if ;
 
 :: read-string ( string n tag -- string n' seq )
     string n read-string-payload nip :> n'
     string
     n'
-    n' [ string n unexpected-eof ] unless
+    n' [ string n f unexpected-eof ] unless
     n n' 1 - string <slice>
     n' 1 - n' string <slice>
     tag -rot 3array ;
@@ -150,19 +145,18 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         [ ")" sequence= ]
     } 1|| ;
 
-: ensure-no-false ( string n seq -- string n seq )
-    dup [ length 0 > ] all?
-    [ [ length ] keep expected-length-tokens ] unless ;
+: ensure-tokens ( string n seq -- string n seq )
+    dup [ terminator? ] any? [ unexpected-terminator ] when ;
 
 : read-lowercase-colon ( string n slice -- string n' lowercase-colon )
     dup [ char: \: = ] count-tail
     '[
         _ [
             slice-til-not-whitespace drop ! XXX: whitespace here
-            [ dup [ unexpected-eof ] unless ] dip
+            [ dup [ f unexpected-eof ] unless ] dip
             [ lex-factor ] dip swap 2array
         ] replicate
-        dup terminator? [ unexpected-terminator ] when
+        ensure-tokens
     ] dip swap 2array ;
 
 : (strict-upper?) ( string -- ? )
@@ -340,9 +334,12 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         ! \ foo, M\ foo
         dup [ char: \\ = ] count-tail
         '[
-            _ [ slice-til-not-whitespace drop [ slice-til-whitespace drop ] dip swap 2array ] replicate
-            ensure-no-false
-            dup [ no-backslash-payload ] unless
+            _ [
+                slice-til-not-whitespace drop
+                [ slice-til-whitespace drop ] dip
+                swap 2array
+            ] replicate
+            ensure-tokens
         ] dip swap 2array
     ] when ;
 
