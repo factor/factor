@@ -256,7 +256,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     } 1&& ;
 
 : read-til-semicolon ( string n slice -- string n' semi )
-    dup '[ but-last ";" append ";" 2array { "--" ")" } append lex-colon-until ] dip
+    [ but-last ";" append ";" "--" ")" 4array lex-colon-until ] keep
     swap
     ! What ended the FOO: .. ; form?
     ! Remove the ; from the payload if present
