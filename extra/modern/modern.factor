@@ -9,52 +9,19 @@ IN: modern
 
 ERROR: string-expected-got-eof string n ;
 ERROR: long-opening-mismatch tag open string n ch ;
-
-TUPLE: lexed tokens ;
-
-TUPLE: bracket < lexed tag payload ;
-CONSTRUCTOR: <bracket> bracket ( tag payload -- obj ) ;
-
-TUPLE: dbracket < lexed tag payload ;
-CONSTRUCTOR: <dbracket> dbracket ( tag payload -- obj ) ;
-
-TUPLE: brace < lexed tag payload ;
-CONSTRUCTOR: <brace> brace ( tag payload -- obj ) ;
-
-TUPLE: dbrace < lexed tag payload ;
-CONSTRUCTOR: <dbrace> dbrace ( tag payload -- obj ) ;
-
-TUPLE: lcolon < lexed tag payload ;
-CONSTRUCTOR: <lcolon> lcolon ( tag payload -- obj ) ;
-
-TUPLE: ucolon < lexed name effect body ;
-CONSTRUCTOR: <ucolon> ucolon ( name effect body -- obj ) ;
-
-TUPLE: dquote < lexed tag payload ;
-CONSTRUCTOR: <dquote> dquote ( tag payload -- obj ) ;
-
-TUPLE: section < lexed payload ;
-CONSTRUCTOR: <section> section ( payload -- obj ) ;
-
-TUPLE: named-section < lexed name payload ;
-CONSTRUCTOR: <named-section> named-section ( name payload -- obj ) ;
-
-TUPLE: backslash < lexed object ;
-CONSTRUCTOR: <backslash> backslash ( object -- obj ) ;
-
-TUPLE: hashtag < lexed object ;
-CONSTRUCTOR: <hashtag> hashtag ( object -- obj ) ;
-
-TUPLE: token < lexed name ;
-CONSTRUCTOR: <token> token ( name -- obj ) ;
+ERROR: lex-expected-but-got-eof string n expected ;
+ERROR: expected-length-tokens string n length seq ;
+ERROR: token-expected string n obj ;
+ERROR: unexpected-terminator string n slice ;
+ERROR: no-backslash-payload string n slice ;
+ERROR: compound-syntax-disallowed seq n obj ;
 
 ! (( )) [[ ]] {{ }}
 MACRO:: read-double-matched ( open-ch -- quot: ( string n tag ch -- string n' seq ) )
-    open-ch dup matching-delimiter {
-        [ drop 2 swap <string> ]
-        [ drop 1string ]
-        [ nip 2 swap <string> ]
-    } 2cleave :> ( openstr2 openstr1 closestr2 )
+    2 open-ch <string>
+    open-ch 1string
+    2 open-ch matching-delimiter <string>
+    :> ( openstr2 openstr1 closestr2 ) ! "[[" "[" "]]"
     |[ string n tag! ch |
         ch {
             { char: = [
@@ -83,7 +50,6 @@ MACRO:: read-double-matched ( open-ch -- quot: ( string n tag ch -- string n' se
 
 DEFER: lex-factor-top
 DEFER: lex-factor
-ERROR: lex-expected-but-got-eof string n expected ;
 ! For implementing [ { (
 : lex-until ( string n tag-sequence -- string n' payload )
     3dup '[
@@ -184,13 +150,10 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         [ ")" sequence= ]
     } 1|| ;
 
-ERROR: expected-length-tokens string n length seq ;
 : ensure-no-false ( string n seq -- string n seq )
     dup [ length 0 > ] all?
     [ [ length ] keep expected-length-tokens ] unless ;
 
-ERROR: token-expected string n obj ;
-ERROR: unexpected-terminator string n slice ;
 : read-lowercase-colon ( string n slice -- string n' lowercase-colon )
     dup [ char: \: = ] count-tail
     '[
@@ -369,7 +332,6 @@ ERROR: unexpected-terminator string n slice ;
     dup { [ "!" sequence= ] [ "#!" sequence= ] } 1||
     [ take-comment ] [ merge-slice-til-whitespace ] if ;
 
-ERROR: no-backslash-payload string n slice ;
 : (read-backslash) ( string n slice -- string n' obj )
     merge-slice-til-whitespace dup "\\" tail? [
         ! \ foo, M\ foo
@@ -494,7 +456,6 @@ DEFER: lex-factor-top*
     "\"\\!:[{(]})<>\s\r\n" slice-til-either
     lex-factor-top* ; inline
 
-ERROR: compound-syntax-disallowed seq n obj ;
 : check-for-compound-syntax ( seq n/f obj -- seq n/f obj )
     dup length 1 > [ compound-syntax-disallowed ] when ;
 
@@ -527,6 +488,8 @@ ERROR: compound-syntax-disallowed seq n obj ;
 
 : path>literals ( path -- sequence )
     utf8 file-contents string>literals ;
+
+
 
 : lex-paths ( vocabs -- assoc )
     [ [ path>literals ] [ nip ] recover ] map-zip ;
