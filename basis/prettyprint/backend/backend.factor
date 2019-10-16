@@ -266,11 +266,23 @@ M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
 M: byte-vector pprint* pprint-object ;
 
+M: list pprint*
+    [
+        <flow
+        dup pprint-delims [
+            pprint-word
+            dup pprint-narrow? <inset
+            dup nil? [ drop ] [
+                [ car pprint* ]
+                [ cdr nil? [ "~more~" text ] unless ] bi
+            ] if block>
+        ] dip pprint-word block>
+    ] check-recursion ;
+
 : with-extra-nesting-level ( quot -- )
     nesting-limit [ dup [ 1 + ] [ f ] if* ] change
     [ nesting-limit set ] curry finally ; inline
 
-M: list pprint* pprint-object ;
 M: hashtable pprint*
     [ pprint-object ] with-extra-nesting-level ;
 M: curried pprint* pprint-object ;
