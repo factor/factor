@@ -7,7 +7,7 @@ sequences.generalizations sets shuffle splitting strings
 syntax.modern unicode vocabs.loader ;
 IN: modern
 
-ERROR: string-expected-got-eof string n ;
+ERROR: unexpected-eof string n ;
 ERROR: long-opening-mismatch tag open string n ch ;
 ERROR: lex-expected-but-got-eof string n expected ;
 ERROR: expected-length-tokens string n length seq ;
@@ -123,14 +123,14 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
             { char: \\ [ drop next-char-from drop read-string-payload ] }
         } case
     ] [
-        string-expected-got-eof
+        unexpected-eof
     ] if ;
 
 :: read-string ( string n tag -- string n' seq )
     string n read-string-payload nip :> n'
     string
     n'
-    n' [ string n string-expected-got-eof ] unless
+    n' [ string n unexpected-eof ] unless
     n n' 1 - string <slice>
     n' 1 - n' string <slice>
     tag -rot 3array ;
@@ -157,8 +157,11 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
 : read-lowercase-colon ( string n slice -- string n' lowercase-colon )
     dup [ char: \: = ] count-tail
     '[
-        _ [ slice-til-not-whitespace drop [ lex-factor ] dip swap 2array ] replicate
-        ensure-no-false dup [ token-expected ] unless
+        _ [
+            slice-til-not-whitespace drop ! XXX: whitespace here
+            [ dup [ unexpected-eof ] unless ] dip
+            [ lex-factor ] dip swap 2array
+        ] replicate
         dup terminator? [ unexpected-terminator ] when
     ] dip swap 2array ;
 

@@ -52,17 +52,25 @@ ERROR: unexpected-end string n ;
     swapd find-from* ; inline
 
 : slice-until-exclude ( string n quot -- string n' slice/f ch/f )
-    [ drop ]
-    [ find-from' ] 3bi ! ( string n n' ch )
-    [ drop nip ]
-    [ [ rot ?<slice> ] dip ] 4bi ; inline
+    over [
+        [ drop ]
+        [ find-from' ] 3bi ! ( string n n' ch )
+        [ drop nip ]
+        [ [ rot ?<slice> ] dip ] 4bi
+    ] [
+        drop f f
+    ] if ; inline
 
 : slice-until-include ( string n tokens -- string n' slice/f ch/f )
-    '[ _ member? ]
-    [ drop ]
-    [ find-from' [ ?1+ ] dip ] 3bi ! ( string n n' ch )
-    [ drop nip ]
-    [ [ rot ?<slice> ] dip ] 4bi ; inline
+    over [
+        '[ _ member? ]
+        [ drop ]
+        [ find-from' [ ?1+ ] dip ] 3bi ! ( string n n' ch )
+        [ drop nip ]
+        [ [ rot ?<slice> ] dip ] 4bi
+    ] [
+        drop f f
+    ] if ; inline
 
 : slice-til-whitespace ( string n -- string n' slice/f ch/f )
     [ "\s\r\n" member? ] slice-until-exclude ; inline
