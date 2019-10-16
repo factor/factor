@@ -59,7 +59,7 @@ MACRO:: read-double-matched ( open-ch -- quot: ( string n tag ch -- string n' se
         ch {
             { char: = [
                 tag 1 cut-slice* drop tag! ! tag of (=( is ( here, fix it
-                string n openstr1 slice-til-separator-inclusive [ -1 modify-from ] dip :> ( string' n' opening ch )
+                string n openstr1 slice-until-include [ -1 modify-from ] dip :> ( string' n' opening ch )
                 ch open-ch = [ tag openstr2 string n ch long-opening-mismatch ] unless
                 opening matching-delimiter-string :> needle
 
@@ -133,7 +133,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     ch dup matching-delimiter {
         [ drop "=" swap prefix ]
         [ nip 1string ]
-    } 2cleave :> ( openstreq closestr1 )  ! [= ]
+    } 2cleave :> ( openstreq closestr1 ) ! [= ]
     |[ string n tag |
         string n tag
         2over nth-check-eof {
@@ -142,7 +142,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
                 drop dup '[ _ matching-delimiter-string closestr1 2array members lex-until ] dip
                 swap unclip-last 3array
             ] } ! ( foo )
-            [ drop [ slice-til-whitespace drop ] dip span-slices ]  ! (foo)
+            [ drop [ slice-til-whitespace drop ] dip span-slices ] ! (foo)
         } cond
     ] ;
 
@@ -151,7 +151,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
 : read-paren ( string n slice -- string n' slice' ) char: \( read-matched ;
 : read-string-payload ( string n -- string n' )
     dup [
-        { char: \\ char: \" } slice-til-separator-inclusive {
+        { char: \\ char: \" } slice-until-include {
             { f [ drop ] }
             { char: \" [ drop ] }
             { char: \\ [ drop next-char-from drop read-string-payload ] }
@@ -423,7 +423,7 @@ DEFER: lex-factor-top*
         { char: \" [ read-string ] }
         { char: \! [ read-exclamation ] }
         { char: > [
-            [ [ char: > = not ] slice-until ] dip merge-slices
+            [ [ char: > = not ] slice-until-exclude drop ] dip merge-slices
             dup section-close? [
                 [ slice-til-whitespace drop ] dip ?span-slices
             ] unless

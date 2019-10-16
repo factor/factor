@@ -24,17 +24,22 @@ IN: modern.slices
         rest ">" append
     ] if ;
 
+: slice-between ( slice1 slice2 -- slice )
+    ! ensure-same-underlying
+    slice-order-by-from
+    [ to>> ]
+    [ [ from>> 2dup < [ swap ] unless ] [ seq>> ] bi ] bi* <slice> ;
+
+: slice-before ( slice -- slice' )
+    [ drop 0 ] [ from>> ] [ seq>> ] tri <slice> ;
+
 ERROR: unexpected-end string n ;
 : nth-check-eof ( string n -- nth )
     2dup ?nth-of [ 2nip ] [ unexpected-end ] if* ;
 
 ! Allow eof
 : next-char-from ( string n/f -- string n'/f ch/f )
-    dup [
-        2dup ?nth-of dup [ [ 1 + ] dip ] when
-    ] [
-        f
-    ] if ;
+    dup [ 2dup ?nth-of dup [ [ 1 + ] dip ] when ] [ f ] if ;
 
 : find-from' ( ... seq n quot: ( ... elt -- ... ? ) -- ... i elt )
     swapd find-from ; inline
@@ -46,72 +51,46 @@ ERROR: unexpected-end string n ;
 : find-from*' ( ... seq n quot: ( ... elt -- ... ? ) -- ... i elt ? )
     swapd find-from* ; inline
 
-:: (slice-until) ( string n quot -- string n' slice/f ch/f )
-    string n quot find-from' :> ( n' ch )
-    string n'
-    n n' string ?<slice>
-    ch ; inline
+: slice-until-exclude ( string n quot -- string n' slice/f ch/f )
+    [ drop ]
+    [ find-from' ] 3bi ! ( string n n' ch )
+    [ drop nip ]
+    [ [ rot ?<slice> ] dip ] 4bi ; inline
 
-: slice-until ( string n quot -- string n' slice/f )
-    (slice-until) drop ; inline
-
-! Don't include the whitespace in the slice
-:: slice-til-quot ( string n quot -- string n'/f slice/f ch/f )
-    n [
-        ! BUG: (slice-until) is broken here?!
-        string n quot find-from' :> ( n' ch )
-        string n'
-        n n' string ?<slice>
-        ch
-    ] [
-        string f f f
-    ] if ; inline
+: slice-until-include ( string n tokens -- string n' slice/f ch/f )
+    '[ _ member? ]
+    [ drop ]
+    [ find-from' [ ?1+ ] dip ] 3bi ! ( string n n' ch )
+    [ drop nip ]
+    [ [ rot ?<slice> ] dip ] 4bi ; inline
 
 : slice-til-whitespace ( string n -- string n' slice/f ch/f )
-    [ "\s\r\n" member? ] slice-til-quot ; inline
+    [ "\s\r\n" member? ] slice-until-exclude ; inline
 
 : slice-til-not-whitespace ( string n -- string n' slice/f ch/f )
-    [ "\s\r\n" member? not ] slice-til-quot ; inline
+    [ "\s\r\n" member? not ] slice-until-exclude ; inline
 
 : skip-whitespace ( string n/f -- string n'/f )
     slice-til-not-whitespace 2drop ;
 
-: empty-slice-end ( seq -- slice )
-    [ length dup ] [ ] bi <slice> ; inline
+: slice-til-eol ( string n -- string n' slice/f ch/f )
+    [ "\r\n" member? ] slice-until-exclude ; inline
 
-:: slice-til-eol ( string n -- string n' slice/f ch/f )
-    n [
-        string n '[ "\r\n" member? ] find-from' :> ( n' ch )
-        string n'
-        n n' string ?<slice>
-        ch
-    ] [
-        string n
-        string empty-slice-end
-        f
-    ] if ; inline
-
-: merge-slice-til-whitespace ( string n slice --  string n' slice' )
+: merge-slice-til-whitespace ( string n slice -- string n' slice' )
     over [
         [ slice-til-whitespace drop ] dip merge-slices
     ] when ;
 
-: merge-slice-til-not-whitespace ( string n slice --  string n' slice' )
+: merge-slice-til-not-whitespace ( string n slice -- string n' slice' )
     over [
         [ slice-til-not-whitespace drop ] dip merge-slices
     ] when ;
 
-:: slice-til-separator-inclusive ( string n tokens -- string n' slice/f ch/f )
-    string n '[ tokens member? ] find-from' [ ?1+ ] dip  :> ( n' ch )
-    string
-    n'
-    n n' string ?<slice>
-    ch ; inline
 
 ! Takes at least one character if not whitespace
 :: slice-til-either ( string n tokens -- string n'/f slice/f ch/f )
     n [
-        string n '[ tokens member? ] find-from'
+        string n [ tokens member? ] find-from'
         dup "\s\r\n" member? [ [ ?1+ ] dip ] unless :> ( n' ch )
         string
         n'
@@ -123,7 +102,7 @@ ERROR: unexpected-end string n ;
 
 ERROR: subseq-expected-but-got-eof string n expected ;
 
-:: slice-til-string ( string n search --  string n'/f payload end-string )
+:: slice-til-string ( string n search -- string n'/f payload end-string )
     search string n subseq-start-from :> n'
     n' [ string n search subseq-expected-but-got-eof ] unless
     string
