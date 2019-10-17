@@ -15,9 +15,9 @@ M: ws nth-unsafe string>> nth-unsafe ;
 M: ws length string>> length ;
 
 ! Weird experiment
-! M: ws pprint*
+M: ws pprint*
     ! drop ;
-!    string>> dup "\"" "\"" pprint-string ;
+    string>> dup "\"" "\"" pprint-string ;
 
 TUPLE: lexed tokens ;
 

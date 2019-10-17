@@ -329,14 +329,21 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     dup { [ "!" sequence= ] [ "#!" sequence= ] } 1||
     [ take-comment ] [ merge-slice-til-whitespace ] if ;
 
+! \ foo    ! push the word, don't call it
+! \\ foo bar  ! push two words
+! \        ! error, expects another token
+! \\       ! error, expects two tokens
+! \ \abc{  ! push the abc{ word
+! \ abc{ } ! push the ``abc{ }`` form for running later
 : (read-backslash) ( string n slice -- string n' obj )
     merge-slice-til-whitespace dup "\\" tail? [
         ! \ foo, M\ foo
         dup [ char: \\ = ] count-tail
         '[
             _ [
-                slice-til-not-whitespace drop <ws>
-                [ slice-til-whitespace drop ] dip
+                slice-til-not-whitespace drop
+                [ <ws> ] [ "escaped string" unexpected-eof ] if*
+                [ lex-factor ] dip
                 swap 2array
             ] replicate
             ensure-tokens
@@ -419,9 +426,7 @@ DEFER: lex-factor-top*
     } case ;
 
 : lex-factor-nested ( n/f string -- n'/f string literal )
-    ! skip-whitespace
-    "\"\\!:[{(]})<>\s\r\n" slice-til-either
-    lex-factor-nested* ; inline
+    "\"\\!:[{(]})<>\s\r\n" slice-til-either lex-factor-nested* ; inline
 
 : lex-factor-top* ( n/f string slice/f ch/f -- n'/f string literal )
     {
@@ -447,9 +452,7 @@ DEFER: lex-factor-top*
     } case ;
 
 : lex-factor-top ( string/f n/f -- string/f n'/f literal )
-    ! skip-whitespace
-    "\"\\!:[{(]})<>\s\r\n" slice-til-either
-    lex-factor-top* ; inline
+    "\"\\!:[{(]})<>\s\r\n" slice-til-either lex-factor-top* ; inline
 
 : check-for-compound-syntax ( seq n/f obj -- seq n/f obj )
     dup length 1 > [ compound-syntax-disallowed ] when ;
