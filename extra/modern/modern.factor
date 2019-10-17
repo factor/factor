@@ -445,6 +445,7 @@ DEFER: lex-factor-top*
             dup section-open? [ read-acute ] when
         ] }
 
+        ! Two cases: zero width slice if we found whitespace, otherwise token
         { char: \s [ read-token-or-whitespace-top ] }
         { char: \r [ read-token-or-whitespace-top ] }
         { char: \n [ read-token-or-whitespace-top ] }

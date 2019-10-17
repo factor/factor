@@ -97,7 +97,8 @@ ERROR: unexpected-eof string n expected ;
     ] when ;
 
 
-! Takes at least one character if not whitespace
+! Whitespace is either found immediately, returning a zero-width slice
+! OR we find it at the end of a token
 :: slice-til-either ( string n tokens -- string n'/f slice/f ch/f )
     n [
         string n [ tokens member? ] find-from'
