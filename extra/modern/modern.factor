@@ -1,10 +1,10 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.short-circuit
-constructors continuations io.encodings.utf8 io.files kernel make math
-math.order modern.paths modern.slices sequences sequences.extras
-sequences.generalizations sets shuffle splitting strings
-syntax.modern unicode vocabs.loader ;
+constructors continuations io.encodings.utf8 io.files kernel
+make math math.order modern.lexer modern.paths modern.slices
+sequences sequences.extras sequences.generalizations sets
+shuffle splitting strings syntax.modern unicode vocabs.loader ;
 IN: modern
 
 ERROR: long-opening-mismatch tag open string n ch ;
@@ -134,7 +134,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     2over ?nth-of char: \[ = [
         [ 1 + ] dip 1 modify-to 2over ?nth-of read-double-matched-bracket
     ] [
-        [ slice-til-eol drop <ws> ] dip swap 2array
+        [ slice-til-eol drop ] dip swap 2array
     ] if ;
 
 : terminator? ( slice -- ? )
@@ -364,13 +364,13 @@ DEFER: lex-factor-top*
 : read-token-or-whitespace-top ( string n slice -- string n' slice/f )
     dup length 0 = [
         ! [ 1 + ] 2dip drop lex-factor-top
-        merge-slice-til-not-whitespace
+        merge-slice-til-not-whitespace <ws>
     ] when ;
 
 : read-token-or-whitespace-nested ( string n slice -- string n' slice/f )
     dup length 0 = [
         ! [ 1 + ] 2dip drop lex-factor-nested
-        merge-slice-til-not-whitespace
+        merge-slice-til-not-whitespace <ws>
     ] when ;
 
 : lex-factor-fallthrough ( string n/f slice/f ch/f -- string n'/f literal )

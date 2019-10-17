@@ -17,6 +17,7 @@ ERROR: unexpected-eof string n expected ;
     ] if ; inline
 
 : >strings ( seq -- str )
+    ! [ slice? ] deep-filter
     [ dup slice? [ >string ] when ] deep-map ;
 
 : matching-section-delimiter ( string -- string' )
