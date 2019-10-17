@@ -1,7 +1,19 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: constructors ;
+USING: accessors ascii constructors kernel prettyprint.custom
+sequences ;
 IN: modern.lexer
+
+ERROR: ws-expected string ;
+
+TUPLE: ws string ;
+CONSTRUCTOR: <ws> ws ( string -- ws )
+    dup string>> [ blank? not ] any? [ ws-expected ] when ;
+
+! Weird experiment
+M: ws pprint*
+    drop ;
+    ! string>> dup "\"" "\"" pprint-string ;
 
 TUPLE: lexed tokens ;
 

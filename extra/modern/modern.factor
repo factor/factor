@@ -134,7 +134,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     2over ?nth-of char: \[ = [
         [ 1 + ] dip 1 modify-to 2over ?nth-of read-double-matched-bracket
     ] [
-        [ slice-til-eol drop ] dip swap 2array
+        [ slice-til-eol drop <ws> ] dip swap 2array
     ] if ;
 
 : terminator? ( slice -- ? )
@@ -152,7 +152,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     dup [ char: \: = ] count-tail
     '[
         _ [
-            slice-til-not-whitespace drop ! XXX: whitespace here
+            slice-til-not-whitespace drop <ws> ! XXX: whitespace here
             [ dup [ f unexpected-eof ] unless ] dip
             [ lex-factor ] dip swap 2array
         ] replicate
@@ -335,7 +335,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         dup [ char: \\ = ] count-tail
         '[
             _ [
-                slice-til-not-whitespace drop
+                slice-til-not-whitespace drop <ws>
                 [ slice-til-whitespace drop ] dip
                 swap 2array
             ] replicate
