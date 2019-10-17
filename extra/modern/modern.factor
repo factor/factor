@@ -358,18 +358,10 @@ DEFER: lex-factor-top*
         over "\\" tail? [ drop (read-backslash) ] [ lex-factor-top* ] if
     ] if ;
 
-! If the slice is 0 width, we stopped on whitespace.
-! Advance the index and read again!
-
-: read-token-or-whitespace-top ( string n slice -- string n' slice/f )
+! If the slice is 0 width, we stopped on whitespace before any token.
+! Return it to the main loop as a ws form.
+: read-token-or-whitespace ( string n slice -- string n' slice/f )
     dup length 0 = [
-        ! [ 1 + ] 2dip drop lex-factor-top
-        merge-slice-til-not-whitespace <ws>
-    ] when ;
-
-: read-token-or-whitespace-nested ( string n slice -- string n' slice/f )
-    dup length 0 = [
-        ! [ 1 + ] 2dip drop lex-factor-nested
         merge-slice-til-not-whitespace <ws>
     ] when ;
 
@@ -418,9 +410,11 @@ DEFER: lex-factor-top*
             [ slice-til-whitespace drop ] dip span-slices
             dup section-open? [ rewind-slice f ] when
         ] }
-        { char: \s [ read-token-or-whitespace-nested ] }
-        { char: \r [ read-token-or-whitespace-nested ] }
-        { char: \n [ read-token-or-whitespace-nested ] }
+
+        ! Two cases: zero width slice if we found whitespace token, otherwise text token
+        { char: \s [ read-token-or-whitespace ] }
+        { char: \r [ read-token-or-whitespace ] }
+        { char: \n [ read-token-or-whitespace ] }
         [ lex-factor-fallthrough ]
     } case ;
 
@@ -445,10 +439,10 @@ DEFER: lex-factor-top*
             dup section-open? [ read-acute ] when
         ] }
 
-        ! Two cases: zero width slice if we found whitespace, otherwise token
-        { char: \s [ read-token-or-whitespace-top ] }
-        { char: \r [ read-token-or-whitespace-top ] }
-        { char: \n [ read-token-or-whitespace-top ] }
+        ! Two cases: zero width slice if we found whitespace token, otherwise text token
+        { char: \s [ read-token-or-whitespace ] }
+        { char: \r [ read-token-or-whitespace ] }
+        { char: \n [ read-token-or-whitespace ] }
         [ lex-factor-fallthrough ]
     } case ;
 
