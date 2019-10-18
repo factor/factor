@@ -9,7 +9,8 @@ locals macros make math math.order parser quotations sequences
 slots slots.private specialized-arrays vectors words summary
 namespaces assocs vocabs.parser math.functions
 classes.struct.bit-accessors bit-arrays
-stack-checker.dependencies ;
+stack-checker.dependencies system layouts ;
+FROM: delegate.private => group-words slot-group-words ;
 QUALIFIED: math
 IN: classes.struct
 
@@ -38,19 +39,27 @@ SLOT: fields
 : struct-slots ( struct-class -- slots )
     "c-type" word-prop fields>> ;
 
+M: struct-class group-words
+    struct-slots slot-group-words ;
+
 ! struct allocation
 
 M: struct >c-ptr
     2 slot { c-ptr } declare ; inline
 
 M: struct equal?
-    {
-        [ [ class ] bi@ = ]
-        [ [ >c-ptr ] [ binary-object ] bi* memory= ]
-    } 2&& ; inline
+    over struct? [
+        2dup [ class ] bi@ = [
+            2dup [ >c-ptr ] both?
+            [ [ >c-ptr ] [ binary-object ] bi* memory= ]
+            [ [ >c-ptr not ] both? ]
+            if
+        ] [ 2drop f ] if
+    ] [ 2drop f ] if ; inline
 
 M: struct hashcode*
-    binary-object <direct-uchar-array> hashcode* ; inline
+    binary-object over
+    [ <direct-uchar-array> hashcode* ] [ 3drop 0 ] if ; inline
 
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
@@ -101,8 +110,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 GENERIC: (reader-quot) ( slot -- quot )
 
 M: struct-slot-spec (reader-quot)
-    [ type>> c-type-getter-boxer ]
-    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+    [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ alien-value ] ;
 
 M: struct-bit-slot-spec (reader-quot)
     [ [ offset>> ] [ bits>> ] bi bit-reader ]
@@ -113,12 +121,10 @@ M: struct-bit-slot-spec (reader-quot)
 GENERIC: (writer-quot) ( slot -- quot )
 
 M: struct-slot-spec (writer-quot)
-    [ type>> c-setter ]
-    [ offset>> [ >c-ptr ] swap suffix ] bi prepend ;
+    [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ set-alien-value ] ;
 
 M: struct-bit-slot-spec (writer-quot)
-    [ offset>> ] [ bits>> ] bi bit-writer
-    [ >c-ptr ] prepose ;
+    [ offset>> ] [ bits>> ] bi bit-writer [ >c-ptr ] prepose ;
 
 : (boxer-quot) ( class -- quot )
     '[ _ memory>struct ] ;
@@ -166,30 +172,14 @@ INSTANCE: struct-c-type value-type
 
 M: struct-c-type c-type ;
 
-M: struct-c-type c-type-stack-align? drop f ;
+M: struct-c-type base-type ;
 
-: if-value-struct ( ctype true false -- )
-    [ dup value-struct? ] 2dip '[ drop void* @ ] if ; inline
-
-M: struct-c-type unbox-parameter
-    [ %unbox-large-struct ] [ unbox-parameter ] if-value-struct ;
-
-M: struct-c-type box-parameter
-    [ %box-large-struct ] [ box-parameter ] if-value-struct ;
-
-: if-small-struct ( c-type true false -- ? )
-    [ dup return-struct-in-registers? ] 2dip '[ f swap @ ] if ; inline
-
-M: struct-c-type unbox-return
-    [ %unbox-small-struct ] [ %unbox-large-struct ] if-small-struct ;
-
-M: struct-c-type box-return
-    [ %box-small-struct ] [ %box-large-struct ] if-small-struct ;
-
-M: struct-c-type stack-size
-    [ heap-size ] [ stack-size ] if-value-struct ;
-
-M: struct-c-type c-struct? drop t ;
+: large-struct? ( type -- ? )
+    {
+        { [ dup void? ] [ drop f ] }
+        { [ dup base-type struct-c-type? not ] [ drop f ] }
+        [ return-struct-in-registers? not ]
+    } cond ;
 
 <PRIVATE
 : struct-slot-values-quot ( class -- quot )
@@ -228,10 +218,10 @@ GENERIC: compute-slot-offset ( offset class -- offset' )
 
 M: struct-slot-spec compute-slot-offset
     [ type>> over c-type-align-at 8 * align ] keep
-    [ [ 8 /i ] dip (>>offset) ] [ type>> heap-size 8 * + ] 2bi ;
+    [ [ 8 /i ] dip offset<< ] [ type>> heap-size 8 * + ] 2bi ;
 
 M: struct-bit-slot-spec compute-slot-offset
-    [ (>>offset) ] [ bits>> + ] 2bi ;
+    [ offset<< ] [ bits>> + ] 2bi ;
 
 : compute-struct-offsets ( slots -- size )
     0 [ compute-slot-offset ] reduce 8 align 8 /i ;
@@ -246,17 +236,11 @@ M: struct-bit-slot-spec compute-slot-offset
 PRIVATE>
 
 M: struct byte-length class "struct-size" word-prop ; foldable
+M: struct binary-zero? binary-object <direct-uchar-array> [ 0 = ] all? ; inline
 
 ! class definition
 
 <PRIVATE
-GENERIC: binary-zero? ( value -- ? )
-
-M: object binary-zero? drop f ;
-M: f binary-zero? drop t ;
-M: number binary-zero? 0 = ;
-M: struct binary-zero? >c-ptr [ 0 = ] all? ;
-
 : struct-needs-prototype? ( class -- ? )
     struct-slots [ initial>> binary-zero? ] all? not ;
 
@@ -355,10 +339,9 @@ PRIVATE>
     scan scan-c-type \ } parse-until <struct-slot-spec> ;
 
 : parse-struct-slots ( slots -- slots' more? )
-    scan {
+    scan-token {
         { ";" [ f ] }
         { "{" [ parse-struct-slot suffix! t ] }
-        { f [ unexpected-eof ] }
         [ invalid-struct-slot ]
     } case ;
 
@@ -404,4 +387,4 @@ FUNCTOR-SYNTAX: STRUCT:
 
 USING: vocabs vocabs.loader ;
 
-"prettyprint" "classes.struct.prettyprint" require-when
+{ "classes.struct" "prettyprint" } "classes.struct.prettyprint" require-when

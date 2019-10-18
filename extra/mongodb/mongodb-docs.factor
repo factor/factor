@@ -9,7 +9,7 @@ ARTICLE: "mongodb" "MongoDB factor integration"
   "USING: mongodb.driver ;"
   "\"db\" \"127.0.0.1\" 27017 <mdb>"
   "[ \"mycollection\" [ H{ { \"name\" \"Alfred\" } { \"age\" 57 } } save ] "
-  "                 [ ageIdx [ \"age\" asc ] key-spec <index-spec> ensure-index ]"
+  "                 [ \"ageIdx\" [ \"age\" asc ] key-spec <index-spec> ensure-index ]"
   "                 [ H{ { \"age\" H{ { \"$gt\" 50 } } } } <query> find-one ] tri ] with-db "
   "" }
 { $heading "Highlevel tuple integration" }
@@ -20,7 +20,7 @@ ARTICLE: "mongodb" "MongoDB factor integration"
   "person \"persons\" { } { $[ \"ageIdx\" [ \"age\" asc ] key-spec <tuple-index> ] } define-persistent "
   "\"db\" \"127.0.0.1\" 27017 <mdb>"
   "person new \"Alfred\" >>name 57 >>age"
-  "'[ _ save-tuple person new 57 >>age select-tuple ] with-db"
+  "'[ person ensure-table _ save-tuple person new 57 >>age select-tuple ] with-db"
   "" }
 ;
 

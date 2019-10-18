@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors math.intervals
-system calendar alarms fry
+system calendar fry
 random db db.tuples db.types
 http.server.filters ;
 IN: furnace.cache
@@ -22,7 +22,7 @@ server-state f
 
 : expire-state ( class -- )
     new
-        -1/0. system-micros [a,b] >>expires
+        -1/0. gmt timestamp>micros [a,b] >>expires
     delete-tuples ;
 
 TUPLE: server-state-manager < filter-responder timeout ;

@@ -181,7 +181,7 @@ M: abstract-span-rule handle-rule-start
     add-remaining-token
     [ rule-match-token* next-token, ] keep
     ! ... end subst ...
-    dup context get (>>in-rule)
+    dup context get in-rule<<
     delegate>> push-context ;
 
 M: span-rule handle-rule-end
@@ -191,12 +191,12 @@ M: mark-following-rule handle-rule-start
     ?end-rule
     mark-token add-remaining-token
     [ rule-match-token* next-token, ] keep
-    f context get (>>end)
-    context get (>>in-rule) ;
+    f context get end<<
+    context get in-rule<< ;
 
 M: mark-following-rule handle-rule-end
     nip rule-match-token* prev-token,
-    f context get (>>in-rule) ;
+    f context get in-rule<< ;
 
 M: mark-previous-rule handle-rule-start
     ?end-rule

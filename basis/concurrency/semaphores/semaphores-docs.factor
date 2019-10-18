@@ -2,7 +2,7 @@ IN: concurrency.semaphores
 USING: help.markup help.syntax kernel quotations calendar ;
 
 HELP: semaphore
-{ $class-description "The class of counting semaphores." } ;
+{ $class-description "The class of counting semaphores. New instances can be created by calling " { $link <semaphore> } "." } ;
 
 HELP: <semaphore>
 { $values { "n" "a non-negative integer" } { "semaphore" semaphore } }
@@ -29,19 +29,39 @@ HELP: with-semaphore
 { $values { "semaphore" semaphore } { "quot" quotation } }
 { $description "Calls the quotation with the semaphore held." } ;
 
-ARTICLE: "concurrency.semaphores" "Counting semaphores"
-"Counting semaphores are used to ensure that no more than a fixed number of threads are executing in a critical section at a time; as such, they generalize " { $vocab-link "concurrency.locks" } ", since locks can be thought of as semaphores with an initial count of 1."
-$nl
+ARTICLE: "concurrency.semaphores.examples" "Semaphore examples"
 "A use-case would be a batch processing server which runs a large number of jobs which perform calculations but then need to fire off expensive external processes or perform heavy network I/O. While for most of the time, the threads can all run in parallel, it might be desired that the expensive operation is not run by more than 10 threads at once, to avoid thrashing swap space or saturating the network. This can be accomplished with a counting semaphore:"
 { $code
     "SYMBOL: expensive-section"
-    "10 <semaphore> expensive-section set-global"
-    "requests ["
+    "requests"
+    "10 <semaphore> '["
     "    ..."
-    "    expensive-section [ do-expensive-stuff ] with-semaphore"
+    "    _ [ do-expensive-stuff ] with-semaphore"
     "    ..."
     "] parallel-map"
 }
+"Here is a concrete example which fetches content from 5 different web sites, making no more than 3 requests at a time:"
+{ $code
+    """USING: concurrency.combinators concurrency.semaphores
+fry http.client kernel urls ;
+
+{
+    URL" http://www.apple.com"
+    URL" http://www.google.com"
+    URL" http://www.ibm.com"
+    URL" http://www.hp.com"
+    URL" http://www.oracle.com"
+}
+2 <semaphore> '[
+    _ [
+        http-get nip
+    ] with-semaphore
+] parallel-map"""
+} ;
+
+ARTICLE: "concurrency.semaphores" "Counting semaphores"
+"Counting semaphores are used to ensure that no more than a fixed number of threads are executing in a critical section at a time; as such, they generalize " { $vocab-link "concurrency.locks" } ", since locks can be thought of as semaphores with an initial count of 1."
+{ $subsections "concurrency.semaphores.examples" }
 "Creating semaphores:"
 { $subsections
     semaphore

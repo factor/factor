@@ -79,7 +79,7 @@ TUPLE: eol-span-rule < rule ;
 : init-span ( rule -- )
     dup delegate>> [ drop ] [
         dup body-token>> standard-rule-set
-        swap (>>delegate)
+        swap delegate<<
     ] if ;
 
 : init-eol-span ( rule -- )
@@ -114,7 +114,7 @@ M: regexp text-hash-char drop f ;
 : add-escape-rule ( string ruleset -- )
     over [
         [ <escape-rule> ] dip
-        2dup (>>escape-rule)
+        2dup escape-rule<<
         add-rule
     ] [
         2drop

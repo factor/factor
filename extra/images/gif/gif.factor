@@ -1,11 +1,9 @@
 ! Copyrigt (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compression.lzw
+USING: accessors arrays combinators compression.lzw
 constructors destructors grouping images images.loader io
-io.binary io.buffers io.encodings.binary io.encodings.string
-io.encodings.utf8 io.files io.files.info io.ports
-io.streams.limited kernel make math math.bitwise math.functions
-multiline namespaces prettyprint sequences ;
+io.binary io.buffers io.encodings.string io.encodings.utf8
+io.ports kernel make math math.bitwise namespaces sequences ;
 IN: images.gif
 
 SINGLETON: gif-image

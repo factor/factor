@@ -126,5 +126,5 @@ GAME: raytrace-game {
         { use-game-input? t }
         { use-audio-engine? t }
         { pref-dim { 1024 768 } }
-        { tick-interval-micros $[ 60 fps ] }
+        { tick-interval-nanos $[ 60 fps ] }
     } ;

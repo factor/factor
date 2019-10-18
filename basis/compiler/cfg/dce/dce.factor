@@ -1,6 +1,6 @@
-! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel namespaces sequences
+USING: accessors arrays assocs kernel namespaces sequences
 compiler.cfg.instructions compiler.cfg.def-use
 compiler.cfg.rpo compiler.cfg.predecessors hash-sets sets ;
 FROM: namespaces => set ;
@@ -28,11 +28,11 @@ SYMBOL: allocations
 
 GENERIC: build-liveness-graph ( insn -- )
 
-: add-edges ( insn register -- )
-    [ uses-vregs ] dip liveness-graph get [ union ] change-at ;
+: add-edges ( uses def -- )
+    liveness-graph get [ union ] change-at ;
 
 : setter-liveness-graph ( insn vreg -- )
-    dup allocation? [ add-edges ] [ 2drop ] if ;
+    dup allocation? [ [ uses-vregs ] dip add-edges ] [ 2drop ] if ;
 
 M: ##set-slot build-liveness-graph
     dup obj>> setter-liveness-graph ;
@@ -49,8 +49,10 @@ M: ##write-barrier-imm build-liveness-graph
 M: ##allot build-liveness-graph
     [ dst>> allocations get adjoin ] [ call-next-method ] bi ;
 
-M: insn build-liveness-graph
-    dup defs-vreg dup [ add-edges ] [ 2drop ] if ;
+M: vreg-insn build-liveness-graph
+    [ uses-vregs ] [ defs-vregs ] bi [ add-edges ] with each ;
+
+M: insn build-liveness-graph drop ;
 
 GENERIC: compute-live-vregs ( insn -- )
 
@@ -81,14 +83,11 @@ M: ##write-barrier compute-live-vregs
 M: ##write-barrier-imm compute-live-vregs
     dup src>> setter-live-vregs ;
 
-M: ##fixnum-add compute-live-vregs record-live ;
+M: flushable-insn compute-live-vregs drop ;
 
-M: ##fixnum-sub compute-live-vregs record-live ;
+M: vreg-insn compute-live-vregs record-live ;
 
-M: ##fixnum-mul compute-live-vregs record-live ;
-
-M: insn compute-live-vregs
-    dup defs-vreg [ drop ] [ record-live ] if ;
+M: insn compute-live-vregs drop ;
 
 GENERIC: live-insn? ( insn -- ? )
 
@@ -100,13 +99,22 @@ M: ##write-barrier live-insn? src>> live-vreg? ;
 
 M: ##write-barrier-imm live-insn? src>> live-vreg? ;
 
-M: ##fixnum-add live-insn? drop t ;
+: filter-alien-outputs ( outputs -- live-outputs dead-outputs )
+    [ first live-vreg? ] partition
+    [ first3 2array nip ] map ;
 
-M: ##fixnum-sub live-insn? drop t ;
+M: alien-call-insn live-insn?
+    dup reg-outputs>> filter-alien-outputs [ >>reg-outputs ] [ >>dead-outputs ] bi*
+    drop t ;
 
-M: ##fixnum-mul live-insn? drop t ;
+M: ##callback-inputs live-insn?
+    [ filter-alien-outputs drop ] change-reg-outputs
+    [ filter-alien-outputs drop ] change-stack-outputs
+    drop t ;
 
-M: insn live-insn? defs-vreg [ live-vreg? ] [ t ] if* ;
+M: flushable-insn live-insn? defs-vregs [ live-vreg? ] any? ;
+
+M: insn live-insn? drop t ;
 
 : eliminate-dead-code ( cfg -- cfg' )
     ! Even though we don't use predecessors directly, we depend
@@ -116,7 +124,7 @@ M: insn live-insn? defs-vreg [ live-vreg? ] [ t ] if* ;
 
     init-dead-code
     dup
-    [ [ instructions>> [ build-liveness-graph ] each ] each-basic-block ]
-    [ [ instructions>> [ compute-live-vregs ] each ] each-basic-block ]
-    [ [ instructions>> [ live-insn? ] filter! drop ] each-basic-block ]
+    [ [ [ build-liveness-graph ] each ] simple-analysis ]
+    [ [ [ compute-live-vregs ] each ] simple-analysis ]
+    [ [ [ live-insn? ] filter! ] simple-optimization ]
     tri ;

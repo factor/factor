@@ -1,8 +1,3 @@
-<?xml version='1.0' ?>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
 <h2>Stable release: <t:link t:name="stable-release" /></h2>
@@ -18,5 +13,7 @@
 <table id="mytable" cellspacing="0" summary="Development releases">
 	<t:xml t:name="package-grid" />
 </table>
+
+<p>Stable and development releases are built and uploaded by the <a href="http://concatenative.org/wiki/view/Factor/Build farm">build farm</a>. Follow <a href="http://twitter.com/FactorBuilds">@FactorBuilds</a> on Twitter to receive notifications. If you're curious, take a look at the <t:a t:href="$mason-app/dashboard">build farm dashboard</t:a>.</p>
 
 </t:chloe>

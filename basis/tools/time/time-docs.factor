@@ -10,13 +10,13 @@ ARTICLE: "timing" "Timing code and collecting statistics"
 "A lower-level word puts timings on the stack, intead of printing:"
 { $subsections benchmark }
 "You can also read the system clock directly; see " { $link "system" } "."
-{ $see-also "profiling" "calendar" } ;
+{ $see-also "profiling" "tools.annotations" "calendar" } ;
 
 ABOUT: "timing"
 
 HELP: benchmark
 { $values { "quot" quotation }
-          { "runtime" "the runtime in microseconds" } }
+          { "runtime" "the runtime in nanoseconds" } }
       { $description "Runs a quotation, measuring the total wall clock time." }
 { $notes "A nicer word for interactive use is " { $link time } "." } ;
 
@@ -24,7 +24,7 @@ HELP: time
 { $values { "quot" quotation } }
 { $description "Runs a quotation, gathering statistics about method dispatch and garbage collection, and then prints the total run time." } ;
 
-{ benchmark system-micros time } related-words
+{ benchmark time } related-words
 
 HELP: collect-gc-events
 { $values { "quot" quotation } { "gc-events" "a sequence of " { $link gc-event } " instances" } }

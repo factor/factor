@@ -1,14 +1,18 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions io kernel math
-namespaces parser prettyprint sequences strings words
-editors io.files io.sockets io.streams.byte-array io.binary
-math.parser io.encodings.ascii io.encodings.binary
-io.encodings.utf8 io.files.private io.pathnames ;
+USING: arrays editors io io.binary io.encodings.ascii
+io.encodings.binary io.encodings.utf8 io.files io.files.private
+io.pathnames io.sockets io.streams.byte-array kernel locals
+math.parser namespaces prettyprint sequences ;
 IN: editors.jedit
 
-: jedit-server-info ( -- port auth )
-    home ".jedit/server" append-path ascii [
+: jedit-server-file ( -- server-files )
+    home ".jedit/server" append-path
+    home "Library/jEdit/server" append-path 2array
+    [ exists? ] find nip ;
+
+: jedit-server-info ( server-file -- port auth )
+    ascii [
         readln drop
         readln string>number
         readln string>number
@@ -24,11 +28,12 @@ IN: editors.jedit
         "null});\n" write
     ] with-byte-writer ;
 
-: send-jedit-request ( request -- )
-    jedit-server-info "localhost" rot <inet> binary [
-        4 >be write
-        dup length 2 >be write
-        write
+:: send-jedit-request ( request -- )
+    jedit-server-file jedit-server-info :> ( port auth )
+    "localhost" port <inet> binary [
+        auth 4 >be write
+        request length 2 >be write
+        request write
     ] with-client ;
 
 : jedit-location ( file line -- )

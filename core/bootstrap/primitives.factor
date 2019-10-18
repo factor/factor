@@ -22,9 +22,6 @@ architecture get {
     { "unix-x86.32" "x86/32/unix" }
     { "winnt-x86.64" "x86/64/winnt" }
     { "unix-x86.64" "x86/64/unix" }
-    { "linux-ppc" "ppc/linux" }
-    { "macosx-ppc" "ppc/macosx" }
-    { "arm" "arm" }
 } ?at [ "Bad architecture: " prepend throw ] unless
 "vocab:cpu/" "/bootstrap.factor" surround parse-file
 
@@ -343,6 +340,8 @@ tuple
     { "tag" "kernel.private" (( object -- n )) }
     { "(execute)" "kernel.private" (( word -- )) }
     { "(call)" "kernel.private" (( quot -- )) }
+    { "fpu-state" "kernel.private" (( -- )) }
+    { "set-fpu-state" "kernel.private" (( -- )) }
     { "unwind-native-frames" "kernel.private" (( -- )) }
     { "set-callstack" "kernel.private" (( callstack -- * )) }
     { "lazy-jit-compile" "kernel.private" (( -- )) }
@@ -370,6 +369,7 @@ tuple
     { "fixnum<=" "math.private" (( x y -- z )) }
     { "fixnum>" "math.private" (( x y -- ? )) }
     { "fixnum>=" "math.private" (( x y -- ? )) }
+    { "string-nth-fast" "strings.private" (( n string -- ch )) }
     { "(set-context)" "threads.private" (( obj context -- obj' )) }
     { "(set-context-and-delete)" "threads.private" (( obj context -- * )) }
     { "(start-context)" "threads.private" (( obj quot -- obj' )) }
@@ -423,10 +423,10 @@ tuple
     { "dll-valid?" "alien.libraries" "primitive_dll_validp" (( dll -- ? )) }
     { "current-callback" "alien.private" "primitive_current_callback" (( -- n )) }
     { "<array>" "arrays" "primitive_array" (( n elt -- array )) }
-    { "resize-array" "arrays" "primitive_resize_array" (( n array -- newarray )) }
+    { "resize-array" "arrays" "primitive_resize_array" (( n array -- new-array )) }
     { "(byte-array)" "byte-arrays" "primitive_uninitialized_byte_array" (( n -- byte-array )) }
     { "<byte-array>" "byte-arrays" "primitive_byte_array" (( n -- byte-array )) }
-    { "resize-byte-array" "byte-arrays" "primitive_resize_byte_array" (( n byte-array -- newbyte-array )) }
+    { "resize-byte-array" "byte-arrays" "primitive_resize_byte_array" (( n byte-array -- new-byte-array )) }
     { "<tuple-boa>" "classes.tuple.private" "primitive_tuple_boa" (( slots... layout -- tuple )) }
     { "<tuple>" "classes.tuple.private" "primitive_tuple" (( layout -- tuple )) }
     { "modify-code-heap" "compiler.units" "primitive_modify_code_heap" (( alist update-existing? reset-pics? -- )) }
@@ -451,6 +451,7 @@ tuple
     { "retainstack" "kernel" "primitive_retainstack" (( -- array )) }
     { "(identity-hashcode)" "kernel.private" "primitive_identity_hashcode" (( obj -- code )) }
     { "become" "kernel.private" "primitive_become" (( old new -- )) }
+    { "callstack-bounds" "kernel.private" "primitive_callstack_bounds" (( -- start end )) }
     { "check-datastack" "kernel.private" "primitive_check_datastack" (( array in# out# -- ? )) }
     { "compute-identity-hashcode" "kernel.private" "primitive_compute_identity_hashcode" (( obj -- )) }
     { "context-object" "kernel.private" "primitive_context_object" (( n -- obj )) }
@@ -499,7 +500,6 @@ tuple
     { "float*" "math.private" "primitive_float_multiply" (( x y -- z )) }
     { "float+" "math.private" "primitive_float_add" (( x y -- z )) }
     { "float-" "math.private" "primitive_float_subtract" (( x y -- z )) }
-    { "float-mod" "math.private" "primitive_float_mod" (( x y -- z )) }
     { "float-u<" "math.private" "primitive_float_less" (( x y -- ? )) }
     { "float-u<=" "math.private" "primitive_float_lesseq" (( x y -- ? )) }
     { "float-u>" "math.private" "primitive_float_greater" (( x y -- ? )) }
@@ -532,11 +532,8 @@ tuple
     { "<string>" "strings" "primitive_string" (( n ch -- string )) }
     { "resize-string" "strings" "primitive_resize_string" (( n str -- newstr )) }
     { "set-string-nth-fast" "strings.private" "primitive_set_string_nth_fast" (( ch n string -- )) }
-    { "set-string-nth-slow" "strings.private" "primitive_set_string_nth_slow" (( ch n string -- )) }
-    { "string-nth" "strings.private" "primitive_string_nth" (( n string -- ch )) }
     { "(exit)" "system" "primitive_exit" (( n -- * )) }
     { "nano-count" "system" "primitive_nano_count" (( -- ns )) }
-    { "system-micros" "system" "primitive_system_micros" (( -- us )) }
     { "(sleep)" "threads.private" "primitive_sleep" (( nanos -- )) }
     { "callstack-for" "threads.private" "primitive_callstack_for" (( context -- array )) }
     { "context-object-for" "threads.private" "primitive_context_object_for" (( n context -- obj )) }

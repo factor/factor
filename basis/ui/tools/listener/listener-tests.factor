@@ -16,7 +16,7 @@ IN: ui.tools.listener.tests
     [ ] [ <promise> "promise" set ] unit-test
 
     [
-        self "interactor" get (>>thread)
+        self "interactor" get thread<<
         "interactor" get stream-read-quot "promise" get fulfill
     ] "Interactor test" spawn drop
 
@@ -40,7 +40,7 @@ IN: ui.tools.listener.tests
     [ ] [ <promise> "promise" set ] unit-test
 
     [
-        self "interactor" get (>>thread)
+        self "interactor" get thread<<
         "interactor" get stream-readln "promise" get fulfill
     ] "Interactor test" spawn drop
 

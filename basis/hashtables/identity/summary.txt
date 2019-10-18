@@ -1,0 +1,1 @@
+Hashtables keyed by object identity (eq?) rather than by logical value (=)

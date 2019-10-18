@@ -209,7 +209,7 @@ load-data {
 } cleave
 
 : postprocess-class ( -- )
-    combine-map [ [ second ] map ] map concat
+    combine-map [ values ] map concat
     [ combining-class not ] filter
     [ 0 swap class-map set-at ] each ;
 

@@ -96,4 +96,4 @@ SYNTAX: GUID: scan string>guid suffix! ;
 
 USE: vocabs.loader
 
-"prettyprint" "windows.com.prettyprint" require-when
+{ "windows.com" "prettyprint" } "windows.com.prettyprint" require-when

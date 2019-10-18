@@ -88,7 +88,9 @@ M: sse-env (set-denormal-mode) ( register mode -- register' )
         } case
     ] curry change-mxcsr ; inline
 
-CONSTANT: x87-exception-bits HEX: 3f
+SINGLETON: +fp-x87-stack-fault+
+
+CONSTANT: x87-exception-bits HEX: 7f
 CONSTANT: x87-exception>bit
     H{
         { +fp-invalid-operation+ HEX: 01 }
@@ -96,6 +98,7 @@ CONSTANT: x87-exception>bit
         { +fp-underflow+         HEX: 10 }
         { +fp-zero-divide+       HEX: 04 }
         { +fp-inexact+           HEX: 20 }
+        { +fp-x87-stack-fault+   HEX: 40 }
     }
 
 CONSTANT: x87-rounding-mode-bits HEX: 0c00

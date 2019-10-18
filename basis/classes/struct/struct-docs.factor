@@ -35,7 +35,8 @@ HELP: STRUCT:
 { "Struct classes cannot have a superclass defined." }
 { "The slots of a struct must all have a type declared. The type must be a C type." } 
 { { $link read-only } " slots on structs are not enforced, though they may be declared." }
-} } ;
+}
+"Additionally, structs may use bit fields. A slot specifier may use the syntax " { $snippet "bits: n" } " to specify that the bit width of the slot is " { $snippet "n" } ". Bit width may be specified on signed or unsigned integer slots. The layout of bit fields is not guaranteed to match that of any particular C compiler." } ;
 
 HELP: S{
 { $syntax "S{ class slots... }" }

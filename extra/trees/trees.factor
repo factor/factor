@@ -2,21 +2,26 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic math sequences arrays io namespaces
 prettyprint.private kernel.private assocs random combinators
-parser math.order accessors deques make prettyprint.custom 
-shuffle ;
+parser math.order accessors deques make prettyprint.custom ;
 IN: trees
 
 TUPLE: tree root count ;
+
+<PRIVATE
 
 : new-tree ( class -- tree )
     new
         f >>root
         0 >>count ; inline
 
+PRIVATE>
+
 : <tree> ( -- tree )
     tree new-tree ;
 
 INSTANCE: tree assoc
+
+<PRIVATE
 
 TUPLE: node key value left right ;
 
@@ -50,7 +55,7 @@ CONSTANT: right 1
     go-left? xor [ left>> ] [ right>> ] if ;
 
 : set-node-link@ ( left parent ? -- ) 
-    go-left? xor [ (>>left) ] [ (>>right) ] if ;
+    go-left? xor [ left<< ] [ right<< ] if ;
 
 : node-link ( node -- child ) f node-link@  ;
 
@@ -61,7 +66,7 @@ CONSTANT: right 1
 : set-node+link ( child node -- ) t set-node-link@ ;
 
 : with-side ( side quot -- )
-    [ swap current-side set call ] with-scope ; inline
+    [ current-side ] dip with-variable ; inline
 
 : with-other-side ( quot -- )
     current-side get neg swap with-side ; inline
@@ -137,9 +142,9 @@ DEFER: delete-node
 
 : (prune-extremity) ( parent node -- new-extremity )
     dup node-link [
-        rot drop (prune-extremity)
+        [ nip ] dip (prune-extremity)
     ] [
-        tuck delete-node swap set-node-link
+        [ delete-node ] [ set-node-link ] bi
     ] if* ;
 
 : prune-extremity ( node -- new-extremity )
@@ -183,8 +188,14 @@ DEFER: delete-node
     2dup key>> key-side dup 0 eq? [
         drop nip delete-node
     ] [
-        [ tuck node-link delete-bst-node over set-node-link ] with-side
+        [
+            [ node-link delete-bst-node ]
+            [ set-node-link ]
+            [ ] tri
+        ] with-side
     ] if ;
+
+PRIVATE>
 
 M: tree delete-at
     [ delete-bst-node ] change-root drop ;

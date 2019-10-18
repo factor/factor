@@ -4,7 +4,8 @@ USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
 continuations classes byte-arrays namespaces splitting grouping
 dlists alien alien.c-types assocs io.encodings.binary summary
-accessors destructors combinators fry specialized-arrays ;
+accessors destructors combinators fry specialized-arrays
+locals ;
 SPECIALIZED-ARRAY: uchar
 IN: io.ports
 
@@ -15,7 +16,7 @@ TUPLE: port < disposable handle timeout ;
 
 M: port timeout timeout>> ;
 
-M: port set-timeout (>>timeout) ;
+M: port set-timeout timeout<< ;
 
 : <port> ( handle class -- port )
     new-disposable swap >>handle ; inline
@@ -45,11 +46,17 @@ M: input-port stream-read1
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
 : read-step ( count port -- byte-array/f )
-    dup wait-to-read [ 2drop f ] [ buffer>> buffer-read ] if ;
+    {
+        { [ over 0 = ] [ 2drop f ] }
+        { [ dup wait-to-read ] [ 2drop f ] }
+        [ buffer>> buffer-read ]
+    } cond ;
+
+: prepare-read ( count stream -- count stream )
+    dup check-disposed [ 0 max >fixnum ] dip ; inline
 
 M: input-port stream-read-partial ( max stream -- byte-array/f )
-    dup check-disposed
-    [ 0 max >integer ] dip read-step ;
+    prepare-read read-step ;
 
 : read-loop ( count port accum -- )
     pick over length - dup 0 > [
@@ -63,8 +70,7 @@ M: input-port stream-read-partial ( max stream -- byte-array/f )
     ] if ;
 
 M: input-port stream-read
-    dup check-disposed
-    [ 0 max >fixnum ] dip
+    prepare-read
     2dup read-step dup [
         pick over length > [
             pick <byte-vector>
@@ -105,7 +111,8 @@ TUPLE: output-port < buffered-port ;
     [ nip ] [ buffer>> buffer-capacity <= ] 2bi
     [ drop ] [ stream-flush ] if ; inline
 
-M: output-port stream-element-type stream>> stream-element-type ; inline
+M: output-port stream-element-type
+    stream>> stream-element-type ; inline
 
 M: output-port stream-write1
     dup check-disposed
@@ -114,7 +121,7 @@ M: output-port stream-write1
 
 : write-in-groups ( byte-array port -- )
     [ binary-object <direct-uchar-array> ] dip
-    [ buffer>> size>> <groups> ] [ '[ _ stream-write ] ] bi
+    [ buffer>> size>> <sliced-groups> ] [ '[ _ stream-write ] ] bi
     each ;
 
 M: output-port stream-write
@@ -128,20 +135,40 @@ M: output-port stream-write
 
 HOOK: (wait-to-write) io-backend ( port -- )
 
+: port-flush ( port -- )
+    dup buffer>> buffer-empty?
+    [ drop ] [ dup (wait-to-write) port-flush ] if ;
+
+M: output-port stream-flush ( port -- )
+    [ check-disposed ] [ port-flush ] bi ;
+
 HOOK: tell-handle os ( handle -- n )
+
 HOOK: seek-handle os ( n seek-type handle -- )
 
-M: buffered-port stream-tell ( stream -- n )
+M: input-port stream-tell ( stream -- n )
     [ check-disposed ]
-    [ handle>> tell-handle ]
-    [ [ buffer>> size>> - 0 max ] [ buffer>> pos>> ] bi + ] tri ;
+    [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi - ] bi ;
+
+M: output-port stream-tell ( stream -- n )
+    [ check-disposed ]
+    [ [ handle>> tell-handle ] [ buffer>> buffer-length ] bi + ] bi ;
+
+:: do-seek-relative ( n seek-type stream -- n seek-type stream )
+    ! seek-relative needs special handling here, because of the
+    ! buffer.
+    seek-type seek-relative eq?
+    [ n stream stream-tell + seek-absolute ] [ n seek-type ] if
+    stream ;
 
 M: input-port stream-seek ( n seek-type stream -- )
+    do-seek-relative
     [ check-disposed ]
     [ buffer>> 0 swap buffer-reset ]
     [ handle>> seek-handle ] tri ;
 
 M: output-port stream-seek ( n seek-type stream -- )
+    do-seek-relative
     [ check-disposed ]
     [ stream-flush ]
     [ handle>> seek-handle ] tri ;
@@ -149,13 +176,6 @@ M: output-port stream-seek ( n seek-type stream -- )
 GENERIC: shutdown ( handle -- )
 
 M: object shutdown drop ;
-
-: port-flush ( port -- )
-    dup buffer>> buffer-empty?
-    [ drop ] [ dup (wait-to-write) port-flush ] if ;
-
-M: output-port stream-flush ( port -- )
-    [ check-disposed ] [ port-flush ] bi ;
 
 M: output-port dispose*
     [
@@ -198,5 +218,3 @@ io.encodings.private ;
 HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii } ;
 
 HINTS: decoder-readln { input-port utf8 } { input-port ascii } ;
-
-HINTS: encoder-write { object output-port utf8 } { object output-port ascii } ;

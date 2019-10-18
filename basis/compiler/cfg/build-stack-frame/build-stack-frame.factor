@@ -1,73 +1,74 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces accessors math.order assocs kernel sequences
-combinators make classes words cpu.architecture layouts
+USING: namespaces accessors math math.order assocs kernel
+sequences combinators classes words system fry locals
+cpu.architecture layouts compiler.cfg compiler.cfg.rpo
 compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stack-frame ;
 IN: compiler.cfg.build-stack-frame
 
-SYMBOL: frame-required?
+SYMBOLS: param-area-size allot-area-size allot-area-align
+frame-required? ;
+
+: frame-required ( -- ) frame-required? on ;
 
 GENERIC: compute-stack-frame* ( insn -- )
 
-: request-stack-frame ( stack-frame -- )
-    frame-required? on
-    stack-frame [ max-stack-frame ] change ;
+M:: ##local-allot compute-stack-frame* ( insn -- )
+    frame-required
+    insn size>> :> s
+    insn align>> :> a
+    allot-area-align [ a max ] change
+    allot-area-size [ a align [ insn offset<< ] [ s + ] bi ] change ;
 
-UNION: stack-frame-insn
-    ##alien-invoke
-    ##alien-indirect
-    ##alien-assembly
-    ##alien-callback ;
+M: alien-call-insn compute-stack-frame*
+    frame-required
+    stack-size>> param-area-size [ max ] change ;
 
-M: stack-frame-insn compute-stack-frame*
-    stack-frame>> request-stack-frame ;
+: vm-frame-required ( -- )
+    frame-required
+    vm-stack-space param-area-size [ max ] change ;
 
-M: ##call compute-stack-frame* drop frame-required? on ;
+M: ##call-gc compute-stack-frame* drop vm-frame-required ;
+M: ##box compute-stack-frame* drop vm-frame-required ;
+M: ##unbox compute-stack-frame* drop vm-frame-required ;
+M: ##box-long-long compute-stack-frame* drop vm-frame-required ;
+M: ##callback-inputs compute-stack-frame* drop vm-frame-required ;
+M: ##callback-outputs compute-stack-frame* drop vm-frame-required ;
 
-M: ##gc compute-stack-frame*
-    frame-required? on
-    stack-frame new
-        swap tagged-values>> length cells >>gc-root-size
-        t >>calls-vm?
-    request-stack-frame ;
+M: ##call compute-stack-frame* drop frame-required ;
+M: ##spill compute-stack-frame* drop frame-required ;
+M: ##reload compute-stack-frame* drop frame-required ;
 
-M: _spill-area-size compute-stack-frame*
-    n>> stack-frame get (>>spill-area-size) ;
+M: ##float>integer compute-stack-frame*
+    drop integer-float-needs-stack-frame? [ frame-required ] when ;
 
-M: insn compute-stack-frame*
-    class frame-required? word-prop [
-        frame-required? on
-    ] when ;
+M: ##integer>float compute-stack-frame*
+    drop integer-float-needs-stack-frame? [ frame-required ] when ;
 
-\ _spill t frame-required? set-word-prop
-\ ##unary-float-function t frame-required? set-word-prop
-\ ##binary-float-function t frame-required? set-word-prop
+M: insn compute-stack-frame* drop ;
 
-: compute-stack-frame ( insns -- )
-    frame-required? off
-    stack-frame new stack-frame set
-    [ compute-stack-frame* ] each
-    stack-frame get dup stack-frame-size >>total-size drop ;
+: finalize-stack-frame ( stack-frame -- )
+    dup [ params>> ] [ allot-area-align>> ] bi align >>allot-area-base
+    dup [ [ allot-area-base>> ] [ allot-area-size>> ] bi + ] [ spill-area-align>> ] bi align >>spill-area-base
+    dup stack-frame-size >>total-size drop ;
 
-GENERIC: insert-pro/epilogues* ( insn -- )
+: <stack-frame> ( cfg -- stack-frame )
+    [ stack-frame new ] dip
+    [ spill-area-size>> >>spill-area-size ]
+    [ spill-area-align>> >>spill-area-align ] bi
+    allot-area-size get >>allot-area-size
+    allot-area-align get >>allot-area-align
+    param-area-size get >>params
+    dup finalize-stack-frame ;
 
-M: ##prologue insert-pro/epilogues*
-    drop frame-required? get [ stack-frame get _prologue ] when ;
+: compute-stack-frame ( cfg -- stack-frame/f )
+    [ [ instructions>> [ compute-stack-frame* ] each ] each-basic-block ]
+    [ frame-required? get [ <stack-frame> ] [ drop f ] if ]
+    bi ;
 
-M: ##epilogue insert-pro/epilogues*
-    drop frame-required? get [ stack-frame get _epilogue ] when ;
-
-M: insn insert-pro/epilogues* , ;
-
-: insert-pro/epilogues ( insns -- insns )
-    [ [ insert-pro/epilogues* ] each ] { } make ;
-
-: build-stack-frame ( mr -- mr )
-    [
-        [
-            [ compute-stack-frame ]
-            [ insert-pro/epilogues ]
-            bi
-        ] change-instructions
-    ] with-scope ;
+: build-stack-frame ( cfg -- cfg )
+    0 param-area-size set
+    0 allot-area-size set
+    cell allot-area-align set
+    dup compute-stack-frame >>stack-frame ;

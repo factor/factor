@@ -8,11 +8,11 @@
 !
 USING: namespaces sequences kernel math io math.functions
 io.binary strings classes words sbufs classes.tuple arrays
-vectors byte-arrays quotations hashtables assocs help.syntax
-help.markup splitting io.streams.byte-array io.encodings.string
-io.encodings.utf8 io.encodings.binary combinators accessors
-locals prettyprint compiler.units sequences.private
-classes.tuple.private vocabs.loader ;
+vectors byte-arrays quotations hashtables hashtables.identity
+assocs help.syntax help.markup splitting io.streams.byte-array
+io.encodings.string io.encodings.utf8 io.encodings.binary
+combinators accessors locals prettyprint compiler.units
+sequences.private classes.tuple.private vocabs.loader ;
 IN: serialize
 
 GENERIC: (serialize) ( obj -- )
@@ -22,22 +22,14 @@ GENERIC: (serialize) ( obj -- )
 ! Variable holding a assoc of objects already serialized
 SYMBOL: serialized
 
-TUPLE: id obj ;
-
-C: <id> id
-
-M: id hashcode* nip obj>> identity-hashcode ;
-
-M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
-
 : add-object ( obj -- )
     #! Add an object to the sequence of already serialized
     #! objects.
-    serialized get [ assoc-size swap <id> ] keep set-at ;
+    serialized get [ assoc-size swap ] keep set-at ;
 
 : object-id ( obj -- id )
     #! Return the id of an already serialized object 
-    <id> serialized get at ;
+    serialized get at ;
 
 ! Numbers are serialized as follows:
 ! 0 => B{ 0 }
@@ -289,7 +281,7 @@ PRIVATE>
     [ (deserialize) ] with-variable ;
 
 : serialize ( obj -- )
-    H{ } clone serialized [ (serialize) ] with-variable ;
+    IH{ } clone serialized [ (serialize) ] with-variable ;
 
 : bytes>object ( bytes -- obj )
     binary [ deserialize ] with-byte-reader ;

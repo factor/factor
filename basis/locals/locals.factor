@@ -26,5 +26,5 @@ SYNTAX: MEMO:: (::) define-memoized ;
     "locals.fry"
 } [ require ] each
 
-"prettyprint" "locals.definitions" require-when
-"prettyprint" "locals.prettyprint" require-when
+{ "locals" "prettyprint" } "locals.definitions" require-when
+{ "locals" "prettyprint" } "locals.prettyprint" require-when

@@ -5,7 +5,7 @@ compiler.tree.cleanup compiler.tree.escape-analysis
 compiler.tree.tuple-unboxing compiler.tree.checker
 compiler.tree.def-use kernel accessors sequences math
 math.private sorting math.order binary-search sequences.private
-slots.private ;
+slots.private alien alien.c-types ;
 IN: compiler.tree.tuple-unboxing.tests
 
 : test-unboxing ( quot -- )
@@ -35,6 +35,7 @@ TUPLE: empty-tuple ;
     [ 1 cons boa over [ "A" throw ] when car>> ]
     [ [ <=> ] sort ]
     [ [ <=> ] with search ]
+    [ cons boa car>> void { } cdecl [ ] alien-callback ]
 } [ [ ] swap [ test-unboxing ] curry unit-test ] each
 
 ! A more complicated example

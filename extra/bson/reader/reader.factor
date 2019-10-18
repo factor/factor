@@ -1,51 +1,25 @@
-USING: accessors assocs bson.constants calendar fry io io.binary
-io.encodings io.encodings.utf8 kernel math math.bitwise namespaces
-sequences serialize locals ;
+! Copyright (C) 2010 Sascha Matzke.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors assocs bson.constants calendar combinators
+combinators.short-circuit io io.binary kernel math locals
+io.encodings.utf8 io.encodings
+namespaces sequences serialize strings vectors byte-arrays ;
 
-FROM: kernel.private => declare ;
-FROM: io.encodings.private => (read-until) ;
+FROM: io.encodings.binary => binary ;
+FROM: io.streams.byte-array => with-byte-reader ;
+FROM: typed => TYPED: ;
 
 IN: bson.reader
 
+SYMBOL: state
+
+DEFER: stream>assoc
+
+ERROR: unknown-bson-type type msg ;
+
 <PRIVATE
 
-TUPLE: element { type integer } name ;
-TUPLE: state
-    { size initial: -1 } exemplar
-    result scope element ;
-
-: <state> ( exemplar -- state )
-    [ state new ] dip
-    [ clone >>exemplar ] keep
-    clone [ >>result ] [ V{ } clone [ push ] keep >>scope ] bi
-    V{ } clone [ T_Object "" element boa swap push ] keep >>element ; 
-
-PREDICATE: bson-not-eoo < integer T_EOO > ;
-PREDICATE: bson-eoo     < integer T_EOO = ;
-
-PREDICATE: bson-string  < integer T_String = ;
-PREDICATE: bson-object  < integer T_Object = ;
-PREDICATE: bson-oid     < integer T_OID = ;
-PREDICATE: bson-array   < integer T_Array = ;
-PREDICATE: bson-integer < integer T_Integer = ;
-PREDICATE: bson-double  < integer T_Double = ;
-PREDICATE: bson-date    < integer T_Date = ;
-PREDICATE: bson-binary  < integer T_Binary = ;
-PREDICATE: bson-boolean < integer T_Boolean = ;
-PREDICATE: bson-regexp  < integer T_Regexp = ;
-PREDICATE: bson-null    < integer T_NULL = ;
-PREDICATE: bson-ref     < integer T_DBRef = ;
-PREDICATE: bson-binary-bytes < integer T_Binary_Bytes = ;
-PREDICATE: bson-binary-function < integer T_Binary_Function = ;
-PREDICATE: bson-binary-uuid < integer T_Binary_UUID = ;
-PREDICATE: bson-binary-custom < integer T_Binary_Custom = ;
-
-GENERIC: element-read ( type -- cont? )
-GENERIC: element-data-read ( type -- object )
-GENERIC: element-binary-read ( length type -- object )
-
-: get-state ( -- state )
-    state get ; inline
+DEFER: read-elements
 
 : read-int32 ( -- int32 )
     4 read signed-le> ; inline
@@ -63,123 +37,81 @@ GENERIC: element-binary-read ( length type -- object )
     read-byte-raw first ; inline
 
 : read-cstring ( -- string )
-    "\0" read-until drop "" like ; inline
+    input-stream get utf8 <decoder>
+    "\0" swap stream-read-until drop ; inline
 
 : read-sized-string ( length -- string )
-    read 1 head-slice* "" like ; inline
+    read binary [ read-cstring ] with-byte-reader ; inline
 
-: read-element-type ( -- type )
-    read-byte ; inline
+: read-timestamp ( -- timestamp )
+    8 read [ 4 head signed-le> ] [ 4 tail signed-le> ] bi <mongo-timestamp> ;
 
-: push-element ( type name -- )
-    element boa get-state element>> push ; inline
+: object-result ( quot -- object )
+    [
+        state get clone
+        [ clear-assoc ] [ ] [ ] tri state
+    ] dip with-variable ; inline
 
-: pop-element ( -- element )
-    get-state element>> pop ; inline
+: bson-object-data-read ( -- )
+    read-int32 drop read-elements ; inline recursive
 
-: peek-scope ( -- ht )
-    get-state scope>> last ; inline
+: bson-binary-read ( -- binary )
+   read-int32 read-byte 
+   {
+        { T_Binary_Default [ read ] }
+        { T_Binary_Bytes_Deprecated [ drop read-int32 read ] }
+        { T_Binary_Custom [ read bytes>object ] }
+        { T_Binary_Function [ read-sized-string ] }
+        { T_Binary_MD5 [ read >string ] }
+        { T_Binary_UUID [ read >string ] }
+        [ "unknown binary sub-type" unknown-bson-type ]
+   } case ; inline
+
+TYPED: bson-regexp-read ( -- mdbregexp: mdbregexp )
+   mdbregexp new
+   read-cstring >>regexp read-cstring >>options ; inline
+
+TYPED: bson-oid-read ( -- oid: oid )
+    read-longlong read-int32 oid boa ; inline
+
+: check-object ( assoc -- object )
+    dup dbref-assoc? [ assoc>dbref ] when ; inline
+
+TYPED: element-data-read ( type: integer -- object )
+    {
+        { T_OID         [ bson-oid-read ] }
+        { T_String      [ read-int32 read-sized-string ] }
+        { T_Integer     [ read-int32 ] }
+        { T_Integer64   [ read-longlong ] }
+        { T_Binary      [ bson-binary-read ] }
+        { T_Object      [ [ bson-object-data-read ] object-result check-object ] }
+        { T_Array       [ [ bson-object-data-read ] object-result values ] }
+        { T_Double      [ read-double ] }
+        { T_Boolean     [ read-byte 1 = ] }
+        { T_Date        [ read-longlong millis>timestamp ] }
+        { T_Regexp      [ bson-regexp-read ] }
+        { T_Timestamp   [ read-timestamp ] }
+        { T_Code        [ read-int32 read-sized-string ] }
+        { T_ScopedCode  [ read-int32 drop read-cstring H{ } clone stream>assoc <mongo-scoped-code> ] }
+        { T_NULL        [ f ] }
+        [ "type unknown" unknown-bson-type ]
+    } case ; inline recursive
+
+TYPED: (read-object) ( type: integer name: string -- )
+    [ element-data-read ] dip state get set-at ; inline recursive
+
+TYPED: (element-read) ( type: integer -- cont?: boolean )
+    dup T_EOO > 
+    [ read-cstring (read-object) t ]
+    [ drop f ] if ; inline recursive
 
 : read-elements ( -- )
-    read-element-type
-    element-read 
+    read-byte (element-read)
     [ read-elements ] when ; inline recursive
-
-GENERIC: fix-result ( assoc type -- result )
-
-M: bson-object fix-result ( assoc type -- result )
-    drop ;
-
-M: bson-array fix-result ( assoc type -- result )
-    drop values ;
-
-GENERIC: end-element ( type -- )
-
-M: bson-object end-element ( type -- )
-    drop ;
-
-M: bson-array end-element ( type -- )
-    drop ;
-
-M: object end-element ( type -- )
-    pop-element 2drop ;
-
-M:: bson-eoo element-read ( type -- cont? )
-    pop-element :> element
-    get-state scope>>
-    [ pop element type>> fix-result ] [ empty? ] bi
-    [ [ get-state ] dip >>result drop f ]
-    [ element name>> peek-scope set-at t ] if ;
-
-M:: bson-not-eoo element-read ( type -- cont? )
-    peek-scope :> scope
-    type read-cstring [ push-element ] 2keep
-    [ [ element-data-read ] [ end-element ] bi ]
-    [ scope set-at t ] bi* ;
-
-: [scope-changer] ( state -- state quot )
-    dup exemplar>> '[ [ [ _ clone ] dip push ] keep ] ; inline
-
-: (object-data-read) ( type -- object )
-    drop
-    read-int32 drop
-    get-state
-    [scope-changer] change-scope
-    scope>> last ; inline
-    
-M: bson-object element-data-read ( type -- object )
-    (object-data-read) ;
-
-M: bson-string element-data-read ( type -- object )
-    drop
-    read-int32 read-sized-string ;
-
-M: bson-array element-data-read ( type -- object )
-    (object-data-read) ;
-    
-M: bson-integer element-data-read ( type -- object )
-    drop
-    read-int32 ;
-
-M: bson-double element-data-read ( type -- double )
-    drop
-    read-double ;
-
-M: bson-boolean element-data-read ( type -- boolean )
-   drop
-   read-byte 1 = ;
-
-M: bson-date element-data-read ( type -- timestamp )
-   drop
-   read-longlong millis>timestamp ;
-
-M: bson-binary element-data-read ( type -- binary )
-   drop
-   read-int32 read-byte element-binary-read ;
-
-M: bson-regexp element-data-read ( type -- mdbregexp )
-   drop mdbregexp new
-   read-cstring >>regexp read-cstring >>options ;
- 
-M: bson-null element-data-read ( type -- bf  )
-    drop f ;
-
-M: bson-oid element-data-read ( type -- oid )
-    drop
-    read-longlong
-    read-int32 oid boa ;
-
-M: bson-binary-bytes element-binary-read ( size type -- bytes )
-    drop read ;
-
-M: bson-binary-custom element-binary-read ( size type -- quot )
-    drop read bytes>object ;
 
 PRIVATE>
 
-USE: tools.continuations
-
 : stream>assoc ( exemplar -- assoc )
-    <state> dup state
-    [ read-int32 >>size read-elements ] with-variable 
-    result>> ; 
+    clone [
+        state [ bson-object-data-read ] with-variable
+    ] keep ;

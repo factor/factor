@@ -4,7 +4,9 @@ sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
-compiler.test definitions generic.single shuffle math.order ;
+compiler.test definitions generic.single shuffle math.order
+compiler.cfg.debugger classes.struct alien.syntax alien.data
+alien.c-types ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
@@ -194,25 +196,6 @@ M: number detect-number ;
 [ 4 [ + ] ] [ 2 2 [ [ + ] [ call ] keep ] compile-call ] unit-test
 
 ! Regression
-USE: sorting
-USE: binary-search
-USE: binary-search.private
-
-: old-binsearch ( elt quot: ( ..a -- ..b ) seq -- elt quot i )
-    dup length 1 <= [
-        from>>
-    ] [
-        [ midpoint swap call ] 3keep [ rot ] dip swap dup zero?
-        [ drop dup from>> swap midpoint@ + ]
-        [ drop dup midpoint@ head-slice old-binsearch ] if
-    ] if ; inline recursive
-
-[ 10 ] [
-    10 20 iota <flat-slice>
-    [ [ - ] swap old-binsearch ] compile-call 2nip
-] unit-test
-
-! Regression
 : empty-compound ( -- ) ;
 
 : node-successor-f-bug ( x -- * )
@@ -308,6 +291,9 @@ PREDICATE: list < improper-list
     T{ cons f 1 T{ cons f 2 T{ cons f 3 f } } }
     [ list instance? ] compile-call
 ] unit-test
+
+! <tuple> type function bustage
+[ T{ cons } 7 ] [ cons tuple-layout [ [ <tuple> ] [ length ] bi ] compile-call ] unit-test
 
 ! Regression
 : interval-inference-bug ( obj -- obj x )
@@ -459,3 +445,19 @@ TUPLE: grid-mesh-tuple { length read-only } { step read-only } ;
     ] keep ;
 
 [ { 0.5 } ] [ grid-mesh-test-case ] unit-test
+
+[ { 1 } "bar" ] [ { 1 } [ [ [ [ "foo" throw ] [ "bar" throw ] recover ] attempt-all f ] [ ] recover ] compile-call ] unit-test
+
+GENERIC: bad-push-test-case ( a -- b )
+M: object bad-push-test-case "foo" throw ; inline
+[ { 1 } "bar" ] [ { 1 } [ [ [ [ bad-push-test-case ] [ "bar" throw ] recover ] attempt-all f ] [ ] recover ] compile-call ] unit-test
+
+STRUCT: BitmapData { Scan0 void* } ;
+
+[ ALIEN: 123 ] [
+    [
+        { BitmapData }
+        [ BitmapData memory>struct ALIEN: 123 >>Scan0 drop ]
+        with-out-parameters Scan0>>
+    ] compile-call
+] unit-test

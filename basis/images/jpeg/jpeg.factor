@@ -1,15 +1,15 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays combinators
-grouping compression.huffman images fry
-images.processing io io.binary io.encodings.binary io.files
-io.streams.byte-array kernel locals math math.bitwise
-math.constants math.functions math.matrices math.order
-math.ranges math.vectors memoize multiline namespaces
-sequences sequences.deep images.loader io.streams.limited ;
-IN: images.jpeg
-
+compression.huffman fry grouping images images.loader
+images.processing io io.binary io.encodings.binary
+io.streams.byte-array io.streams.limited io.streams.throwing
+kernel locals math math.bitwise math.blas.matrices
+math.blas.vectors math.constants math.functions math.matrices
+math.order math.vectors memoize namespaces sequences
+sequences.deep ;
 QUALIFIED-WITH: bitstreams bs
+IN: images.jpeg
 
 SINGLETON: jpeg-image
 
@@ -80,7 +80,7 @@ TUPLE: jpeg-color-info
 : jpeg> ( -- jpeg-image ) jpeg-image get ;
 
 : apply-diff ( dc color -- dc' )
-    [ diff>> + dup ] [ (>>diff) ] bi ;
+    [ diff>> + dup ] [ diff<< ] bi ;
 
 : fetch-tables ( component -- )
     [ [ jpeg> quant-tables>> nth ] change-quant-table drop ]
@@ -98,7 +98,7 @@ TUPLE: jpeg-color-info
         read1 8 assert=
         2 read be>
         2 read be>
-        swap 2array jpeg> (>>dim)
+        swap 2array jpeg> dim<<
         read1
         [
             read1 read4/4 read1 <jpeg-color-info>
@@ -120,18 +120,18 @@ TUPLE: jpeg-color-info
     ] with-byte-reader ;
 
 : decode-huff-table ( chunk -- )
-    data>> [ binary <byte-reader> ] [ length ] bi
-    stream-throws limit
-    [   
-        [ input-stream get [ count>> ] [ limit>> ] bi < ]
+    data>> [ binary <byte-reader> ] [ length ] bi limit-stream [
         [
-            read4/4 swap 2 * +
-            16 read
-            dup [ ] [ + ] map-reduce read
-            binary [ [ read [ B{ } ] unless* ] { } map-as ] with-byte-reader
-            swap jpeg> huff-tables>> set-nth
-        ] while
-    ] with-input-stream* ;
+            [ input-stream get stream>> [ count>> ] [ limit>> ] bi < ]
+            [
+                read4/4 swap 2 * +
+                16 read
+                dup [ ] [ + ] map-reduce read
+                binary [ [ read [ B{ } ] unless* ] { } map-as ] with-byte-reader
+                swap jpeg> huff-tables>> set-nth
+            ] while
+        ] with-input-stream*
+    ] stream-throw-on-eof ;
 
 : decode-scan ( chunk -- )
     data>>
@@ -141,7 +141,7 @@ TUPLE: jpeg-color-info
         [   drop
             read1 jpeg> color-info>> nth clone
             read1 16 /mod [ >>dc-huff-table ] [ >>ac-huff-table ] bi*
-        ] map jpeg> (>>components)
+        ] map jpeg> components<<
         read1 0 assert=
         read1 63 assert=
         read1 16 /mod [ 0 assert= ] bi@
@@ -218,9 +218,6 @@ MEMO: dct-matrix ( -- m ) 64 iota [ 8 /mod dct-vect flatten ] map ;
 : reverse-zigzag ( b -- b' ) zig-zag swap [ nth ] curry map ;
 
 : idct-factor ( b -- b' ) dct-matrix v.m ;
-
-USE: math.blas.vectors
-USE: math.blas.matrices
 
 MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
 : V.M ( x A -- x.A ) Mtranspose swap M.V ;
@@ -346,7 +343,7 @@ SINGLETONS: YUV420 YUV444 Y MAGIC! ;
 
 : baseline-decompress ( -- )
     jpeg> bitstream>> cleanup-bitstream { 255 255 255 255 } append
-    >byte-array bs:<msb0-bit-reader> jpeg> (>>bitstream)
+    >byte-array bs:<msb0-bit-reader> jpeg> bitstream<<
     jpeg> 
     [ bitstream>> ] 
     [ [ [ <huffman-decoder> ] with map ] change-huff-tables drop ] bi
@@ -369,7 +366,7 @@ ERROR: not-a-jpeg-image ;
     [
         parse-marker { SOI } = [ not-a-jpeg-image ] unless
         parse-headers
-        unlimited-input contents <loading-jpeg>
+        contents <loading-jpeg>
     ] with-input-stream ;
 
 PRIVATE>

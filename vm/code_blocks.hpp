@@ -43,9 +43,20 @@ struct code_block
 		return size;
 	}
 
+	template<typename Fixup> cell size(Fixup fixup) const
+	{
+		return size();
+	}
+
 	void *entry_point() const
 	{
 		return (void *)(this + 1);
+	}
+
+	/* GC info is stored at the end of the block */
+	gc_info *block_gc_info() const
+	{
+		return (gc_info *)((u8 *)this + size() - sizeof(gc_info));
 	}
 
 	void flush_icache()

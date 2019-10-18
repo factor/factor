@@ -25,26 +25,8 @@ struct full_policy {
 	}
 };
 
-struct code_workhorse {
-	factor_vm *parent;
-	code_heap *code;
-
-	explicit code_workhorse(factor_vm *parent_) : parent(parent_), code(parent->code) {}
-
-	code_block *operator()(code_block *compiled)
-	{
-		if(!code->marked_p(compiled))
-		{
-			code->set_marked_p(compiled);
-			parent->mark_stack.push_back((cell)compiled + 1);
-		}
-
-		return compiled;
-	}
-};
-
 struct full_collector : collector<tenured_space,full_policy> {
-	code_block_visitor<code_workhorse> code_visitor;
+	code_block_visitor<gc_workhorse<tenured_space,full_policy> > code_visitor;
 
 	explicit full_collector(factor_vm *parent_);
 	void trace_code_block(code_block *compiled);

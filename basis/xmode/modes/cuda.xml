@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Extension of cplusplus.xml to add CUDA specific syntax. -->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+        <PROPERTY NAME="lineComment" VALUE="//" />
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+
+        <!-- Auto indent -->
+        <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+        <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+        <PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+        <PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+        <PROPERTY NAME="indentNextLine"
+            VALUE="(?!^\s*(#|//)).*(\b(if|while|for)\s*\(.*\)|\b(else|do)\b)[^{;]*$" />
+        <PROPERTY NAME="unindentThisLine"
+            VALUE="^\s*((case\b.*|[\p{Alpha}_][\p{Alnum}_]*)\s*:(?!:)).*$" />
+        <PROPERTY NAME="electricKeys" VALUE=":" />
+    </PROPS>
+
+    <RULES
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <EOL_SPAN TYPE="KEYWORD2" AT_WHITESPACE_END="TRUE" DELEGATE="CPP">#</EOL_SPAN>
+
+        <IMPORT DELEGATE="LEX"/>
+        <IMPORT DELEGATE="CORE"/>
+    </RULES>
+
+    <!-- Core C++ language -->
+    <RULES SET="LEX"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+        <IMPORT DELEGATE="c::LEX"/>
+        <IMPORT DELEGATE="c++::LEX"/>
+
+        <SEQ TYPE="OPERATOR">&lt;&lt;&lt;</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;&gt;&gt;</SEQ>
+    </RULES>
+
+    <!-- Extra CUDA keywords -->
+    <RULES SET="CORE"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+        <IMPORT DELEGATE="c::CORE"/>
+        <IMPORT DELEGATE="c++::CORE"/>
+
+        <KEYWORDS>
+            <KEYWORD1>__device__</KEYWORD1>
+            <KEYWORD2>__host__</KEYWORD2>
+            <KEYWORD2>__global__</KEYWORD2>
+            <KEYWORD2>__local__</KEYWORD2>
+            <KEYWORD2>__constant__</KEYWORD2>
+            <KEYWORD2>__shared__</KEYWORD2>
+            <KEYWORD1>__inline__</KEYWORD1>
+            <KEYWORD1>__restrict__</KEYWORD1>
+            <KEYWORD4>blockIdx</KEYWORD4>
+            <KEYWORD4>threadIdx</KEYWORD4>
+            <KEYWORD4>gridDim</KEYWORD4>
+            <KEYWORD4>blockDim</KEYWORD4>
+            <KEYWORD3>char1</KEYWORD3>
+            <KEYWORD3>char2</KEYWORD3>
+            <KEYWORD3>char3</KEYWORD3>
+            <KEYWORD3>char4</KEYWORD3>
+            <KEYWORD3>uchar1</KEYWORD3>
+            <KEYWORD3>uchar2</KEYWORD3>
+            <KEYWORD3>uchar3</KEYWORD3>
+            <KEYWORD3>uchar4</KEYWORD3>
+            <KEYWORD3>short1</KEYWORD3>
+            <KEYWORD3>short2</KEYWORD3>
+            <KEYWORD3>short3</KEYWORD3>
+            <KEYWORD3>short4</KEYWORD3>
+            <KEYWORD3>ushort1</KEYWORD3>
+            <KEYWORD3>ushort2</KEYWORD3>
+            <KEYWORD3>ushort3</KEYWORD3>
+            <KEYWORD3>ushort4</KEYWORD3>
+            <KEYWORD3>int1</KEYWORD3>
+            <KEYWORD3>int2</KEYWORD3>
+            <KEYWORD3>int3</KEYWORD3>
+            <KEYWORD3>int4</KEYWORD3>
+            <KEYWORD3>uint1</KEYWORD3>
+            <KEYWORD3>uint2</KEYWORD3>
+            <KEYWORD3>uint3</KEYWORD3>
+            <KEYWORD3>uint4</KEYWORD3>
+            <KEYWORD3>long1</KEYWORD3>
+            <KEYWORD3>long2</KEYWORD3>
+            <KEYWORD3>long3</KEYWORD3>
+            <KEYWORD3>long4</KEYWORD3>
+            <KEYWORD3>ulong1</KEYWORD3>
+            <KEYWORD3>ulong2</KEYWORD3>
+            <KEYWORD3>ulong3</KEYWORD3>
+            <KEYWORD3>ulong4</KEYWORD3>
+            <KEYWORD3>longlong1</KEYWORD3>
+            <KEYWORD3>longlong2</KEYWORD3>
+            <KEYWORD3>longlong3</KEYWORD3>
+            <KEYWORD3>longlong4</KEYWORD3>
+            <KEYWORD3>ulonglong1</KEYWORD3>
+            <KEYWORD3>ulonglong2</KEYWORD3>
+            <KEYWORD3>ulonglong3</KEYWORD3>
+            <KEYWORD3>ulonglong4</KEYWORD3>
+            <KEYWORD3>float1</KEYWORD3>
+            <KEYWORD3>float2</KEYWORD3>
+            <KEYWORD3>float3</KEYWORD3>
+            <KEYWORD3>float4</KEYWORD3>
+            <KEYWORD3>double1</KEYWORD3>
+            <KEYWORD3>double2</KEYWORD3>
+            <KEYWORD3>double3</KEYWORD3>
+            <KEYWORD3>double4</KEYWORD3>
+            <KEYWORD3>dim1</KEYWORD3>
+            <KEYWORD3>dim2</KEYWORD3>
+            <KEYWORD3>dim3</KEYWORD3>
+            <KEYWORD3>dim4</KEYWORD3>
+            <KEYWORD3>texture</KEYWORD3>
+        </KEYWORDS>
+    </RULES>
+
+    <!-- Preprocessor specific rules -->
+    <RULES SET="CPP"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+        <EOL_SPAN_REGEXP HASH_CHAR="include" TYPE="MARKUP" DELEGATE="c::INCLUDE">include\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="define" TYPE="MARKUP" DELEGATE="DEFINE">define\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="endif" TYPE="MARKUP" DELEGATE="c::LEX">endif\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="elif" TYPE="MARKUP" DELEGATE="c::CONDITION">elif\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="if" TYPE="MARKUP" DELEGATE="c::CONDITION">if\b</EOL_SPAN_REGEXP>
+
+        <IMPORT DELEGATE="LEX"/>
+
+        <!-- Directives -->
+        <KEYWORDS>
+            <MARKUP>ifdef</MARKUP>
+            <MARKUP>ifndef</MARKUP>
+            <MARKUP>else</MARKUP>
+            <MARKUP>error</MARKUP>
+            <MARKUP>line</MARKUP>
+            <MARKUP>pragma</MARKUP>
+            <MARKUP>undef</MARKUP>
+            <MARKUP>warning</MARKUP>
+        </KEYWORDS>
+    </RULES>
+
+    <!-- After #define directive -->
+    <!-- Almost same as the normal code,
+        except two additional operators # and ##. -->
+    <RULES SET="DEFINE"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <SEQ TYPE="OPERATOR">#</SEQ>
+        <IMPORT DELEGATE="LEX"/>
+        <IMPORT DELEGATE="CORE"/>
+    </RULES>
+
+</MODE>
+

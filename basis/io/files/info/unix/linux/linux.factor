@@ -51,8 +51,8 @@ frequency pass-number ;
         [ second >>mount-point ]
         [ third >>type ]
         [ fourth <string-reader> csv first >>options ]
-        [ 4 swap nth >>frequency ]
-        [ 5 swap nth >>pass-number ]
+        [ 4 swap ?nth [ 0 ] unless* >>frequency ]
+        [ 5 swap ?nth [ 0 ] unless* >>pass-number ]
     } cleave ;
 
 : parse-mtab ( -- array )

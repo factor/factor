@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.order kernel sequences sbufs vectors growable io
-continuations namespaces io.encodings combinators strings ;
+USING: accessors byte-arrays math math.order kernel sequences
+sbufs vectors growable io continuations namespaces io.encodings
+combinators strings ;
 IN: io.encodings.utf8
 
 ! Decoding UTF-8
@@ -18,14 +19,24 @@ SINGLETON: utf8
     [ swap 6 shift swap BIN: 111111 bitand bitor ]
     [ 2drop replacement-char ] if ; inline
 
+: minimum-code-point ( char minimum -- char )
+    over > [ drop replacement-char ] when ; inline
+
+: maximum-code-point ( char maximum -- char )
+    over < [ drop replacement-char ] when ; inline
+
 : double ( stream byte -- stream char )
-    BIN: 11111 bitand append-nums ; inline
+    BIN: 11111 bitand append-nums
+    HEX: 80 minimum-code-point ; inline
 
 : triple ( stream byte -- stream char )
-    BIN: 1111 bitand append-nums append-nums ; inline
+    BIN: 1111 bitand append-nums append-nums
+    HEX: 800 minimum-code-point ; inline
 
 : quadruple ( stream byte -- stream char )
-    BIN: 111 bitand append-nums append-nums append-nums ; inline
+    BIN: 111 bitand append-nums append-nums append-nums
+    HEX: 10000 minimum-code-point
+    HEX: 10FFFF maximum-code-point ; inline
 
 : begin-utf8 ( stream byte -- stream char )
     {
@@ -45,10 +56,10 @@ M: utf8 decode-char
 ! Encoding UTF-8
 
 : encoded ( stream char -- )
-    BIN: 111111 bitand BIN: 10000000 bitor swap stream-write1 ;
+    BIN: 111111 bitand BIN: 10000000 bitor swap stream-write1 ; inline
 
-: char>utf8 ( stream char -- )
-    {
+: char>utf8 ( char stream -- )
+    swap {
         { [ dup -7 shift zero? ] [ swap stream-write1 ] }
         { [ dup -11 shift zero? ] [
             2dup -6 shift BIN: 11000000 bitor swap stream-write1
@@ -65,10 +76,16 @@ M: utf8 decode-char
             2dup -6 shift encoded
             encoded
         ]
-    } cond ;
+    } cond ; inline
 
 M: utf8 encode-char
-    drop swap char>utf8 ;
+    drop char>utf8 ;
+
+M: utf8 encode-string
+    drop
+    over aux>>
+    [ [ char>utf8 ] curry each ]
+    [ [ >byte-array ] dip stream-write ] if ;
 
 PRIVATE>
 

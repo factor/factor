@@ -48,7 +48,7 @@ COM-INTERFACE: ID3DX11FFT IUnknown {b3f7a938-4c93-4310-a675-b30d6de50553}
     HRESULT ForwardTransform ( ID3D11UnorderedAccessView* pInputBuffer, ID3D11UnorderedAccessView** ppOutputBuffer )
     HRESULT InverseTransform ( ID3D11UnorderedAccessView* pInputBuffer, ID3D11UnorderedAccessView** ppOutputBuffer ) ;
 
-C-ENUM: D3DX11_FFT_DATA_TYPE
+ENUM: D3DX11_FFT_DATA_TYPE
     D3DX11_FFT_DATA_TYPE_REAL
     D3DX11_FFT_DATA_TYPE_COMPLEX ;
 

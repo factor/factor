@@ -39,23 +39,9 @@ IN: generalizations.tests
 
 [ { "xyc" "xyd" } ] [ "x" "y" { "c" "d" } [ 3append ] 2 nwith map ] unit-test
 
-[ 1 2 3 4 ] [ { 1 2 3 4 } 4 firstn ] unit-test
-[ { 1 2 3 4 } ] [ 1 2 3 4 { f f f f } [ 4 set-firstn ] keep ] unit-test
-[ 1 2 3 4 { f f f } [ 4 set-firstn ] keep ] must-fail
-[ ] [ { } 0 firstn ] unit-test
-[ "a" ] [ { "a" } 1 firstn ] unit-test
-
-[ [ 1 2 ] ] [ 1 2 2 [ ] nsequence ] unit-test
-
 [ 4 5 1 2 3 ] [ 1 2 3 4 5 2 3 mnswap ] unit-test
 
 [ 1 2 3 4 5 6 ] [ 1 2 3 4 5 6 2 4 mnswap 4 2 mnswap ] unit-test
-
-[ { 1 2 3 4 } ] [ { 1 } { 2 } { 3 } { 4 } 4 nappend ] unit-test
-[ V{ 1 2 3 4 } ] [ { 1 } { 2 } { 3 } { 4 } 4 V{ } nappend-as ] unit-test
-
-[ 4 nappend ] must-infer
-[ 4 { } nappend-as ] must-infer
 
 [ 17 ] [ 3 1 3 3 7 5 nsum ] unit-test
 { 4 1 } [ 4 nsum ] must-infer-as

@@ -176,11 +176,6 @@ M: cube-map-face     texture-data-gl-target
     texture [ texture-gl-target ] [ handle>> ] bi glBindTexture
     texture ; inline
 
-: get-texture-float ( target level enum -- value )
-    0 <float> [ glGetTexLevelParameterfv ] keep *float ; inline
-: get-texture-int ( target level enum -- value )
-    0 <int> [ glGetTexLevelParameteriv ] keep *int ; inline
-
 : ?product ( x -- y )
     dup number? [ product ] unless ; inline
 

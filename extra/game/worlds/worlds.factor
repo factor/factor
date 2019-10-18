@@ -1,13 +1,14 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors combinators fry game.input game.loop generic kernel math
-parser sequences ui ui.gadgets ui.gadgets.worlds ui.gestures threads
-words audio.engine destructors ;
+USING: accessors audio.engine combinators concurrency.promises
+destructors fry game.input game.loop generic kernel math parser
+sequences threads ui ui.gadgets ui.gadgets.worlds ui.gestures
+words words.constant ;
 IN: game.worlds
 
 TUPLE: game-world < world
     game-loop
     audio-engine
-    { tick-interval-micros fixnum }
+    { tick-interval-nanos integer }
     { use-game-input? boolean }
     { use-audio-engine? boolean }
     { audio-engine-device initial: f }
@@ -44,17 +45,17 @@ PRIVATE>
 M: game-world begin-world
     dup use-game-input?>> [ open-game-input ] when
     dup use-audio-engine?>> [ dup open-game-audio-engine >>audio-engine ] when
-    dup [ tick-interval-micros>> ] [ ] bi <game-loop>
+    dup [ tick-interval-nanos>> ] [ ] bi <game-loop>
     [ >>game-loop begin-game-world ] keep start-loop ;
 
 M: game-world end-world
-    [ [ stop-loop ] when* f ] change-game-loop
+    dup game-loop>> [ stop-loop ] when*
     [ end-game-world ]
     [ audio-engine>> [ dispose ] when* ]
     [ use-game-input?>> [ close-game-input ] when ] tri ;
 
 TUPLE: game-attributes < world-attributes
-    { tick-interval-micros fixnum }
+    { tick-interval-nanos integer }
     { use-game-input? boolean initial: f }
     { use-audio-engine? boolean initial: f }
     { audio-engine-device initial: f }
@@ -62,7 +63,7 @@ TUPLE: game-attributes < world-attributes
 
 M: game-world apply-world-attributes
     {
-        [ tick-interval-micros>> >>tick-interval-micros ]
+        [ tick-interval-nanos>> >>tick-interval-nanos ]
         [ use-game-input?>> >>use-game-input? ]
         [ use-audio-engine?>> >>use-audio-engine? ]
         [ audio-engine-device>> >>audio-engine-device ]
@@ -70,8 +71,18 @@ M: game-world apply-world-attributes
         [ call-next-method ]
     } cleave ;
 
+: start-game ( attributes -- game-world )
+    f swap open-window* ;
+
+: wait-game ( attributes -- game-world )
+    f swap open-window* dup promise>> ?promise drop ;
+
+: define-attributes-word ( word tuple -- )
+    [ name>> "-attributes" append create-in ] dip define-constant ;
+
 SYNTAX: GAME:
     CREATE
     game-attributes parse-main-window-attributes
+    2dup define-attributes-word
     parse-definition
     define-main-window ;

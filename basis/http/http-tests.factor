@@ -14,6 +14,15 @@ IN: http.tests
 
 [ "application/octet-stream" f ] [ "application/octet-stream" parse-content-type ] unit-test
 
+[ "localhost" f ] [ "localhost" parse-host ] unit-test
+[ "localhost" 8888 ] [ "localhost:8888" parse-host ] unit-test
+
+[ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } } unparse-host ] unit-test
+[ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } { port 80 } } unparse-host ] unit-test
+[ "localhost" ] [ T{ url { protocol "https" } { host "localhost" } { port 443 } } unparse-host ] unit-test
+[ "localhost:8080" ] [ T{ url { protocol "http" } { host "localhost" } { port 8080 } } unparse-host ] unit-test
+[ "localhost:8443" ] [ T{ url { protocol "https" } { host "localhost" } { port 8443 } } unparse-host ] unit-test
+
 : lf>crlf ( string -- string' ) "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
@@ -80,14 +89,31 @@ Host: www.sex.com
     ] with-string-reader
 ] unit-test
 
+STRING: read-request-test-2'
+HEAD  /bar   HTTP/1.1
+Host: www.sex.com:101
+
+;
+
+[
+    T{ request
+        { url T{ url { host "www.sex.com" } { port 101 } { path "/bar" } } }
+        { method "HEAD" }
+        { version "1.1" }
+        { header H{ { "host" "www.sex.com:101" } } }
+        { cookies V{ } }
+        { redirects 10 }
+    }
+] [
+    read-request-test-2' lf>crlf [
+        read-request
+    ] with-string-reader
+] unit-test
+
 STRING: read-request-test-3
 GET nested HTTP/1.0
 
 ;
-
-[ read-request-test-3 lf>crlf [ read-request ] with-string-reader ]
-[ "Bad request: URL" = ]
-must-fail-with
 
 STRING: read-request-test-4
 GET /blah HTTP/1.0

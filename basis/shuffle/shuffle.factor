@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators effects.parser generalizations
-hashtables kernel locals locals.backend macros make math
-parser sequences ;
+USING: accessors assocs combinators effects.parser
+generalizations sequences.generalizations hashtables kernel
+locals locals.backend macros make math parser sequences ;
 IN: shuffle
 
 <PRIVATE

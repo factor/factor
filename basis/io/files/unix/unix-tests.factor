@@ -94,7 +94,7 @@ prepare-test-file
     test-file now
     [ set-file-access-time ] 2keep
     [ file-info accessed>> ]
-    [ [ [ truncate >integer ] change-second ] bi@ ] bi* =
+    [ [ [ truncate >integer ] change-second >gmt ] bi@ ] bi* =
 ] unit-test
 
 [ t ]
@@ -102,7 +102,7 @@ prepare-test-file
     test-file now
     [ set-file-modified-time ] 2keep
     [ file-info modified>> ]
-    [ [ [ truncate >integer ] change-second ] bi@ ] bi* =
+    [ [ [ truncate >integer ] change-second >gmt ] bi@ ] bi* =
 ] unit-test
 
 [ t ]
@@ -110,7 +110,7 @@ prepare-test-file
     test-file now [ dup 2array set-file-times ] 2keep
     [ file-info [ modified>> ] [ accessed>> ] bi ] dip
     3array
-    [ [ truncate >integer ] change-second ] map all-equal?
+    [ [ truncate >integer ] change-second >gmt ] map all-equal?
 ] unit-test
 
 [ ] [ test-file f now 2array set-file-times ] unit-test

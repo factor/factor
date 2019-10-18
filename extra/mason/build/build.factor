@@ -1,9 +1,10 @@
-! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel calendar io.directories io.encodings.utf8
-io.files io.launcher namespaces prettyprint combinators mason.child
-mason.cleanup mason.common mason.help mason.release mason.report
-mason.email mason.notify ;
+io.files io.launcher io.pathnames namespaces prettyprint
+combinators mason.child mason.cleanup mason.common mason.config
+mason.docs mason.release mason.report mason.email mason.git
+mason.notify mason.platform mason.updates ;
 QUALIFIED: continuations
 IN: mason.build
 
@@ -11,12 +12,18 @@ IN: mason.build
     now datestamp stamp set
     build-dir make-directory ;
 
-: enter-build-dir  ( -- ) build-dir set-current-directory ;
+: enter-build-dir  ( -- )
+    build-dir set-current-directory ;
 
-: clone-builds-factor ( -- )
-    "git" "clone" builds/factor 3array short-running-process ;
+: clone-source ( -- )
+    "git" "clone" builds-dir get "factor" append-path 3array
+    short-running-process ;
 
-: begin-build ( -- )
+: copy-image ( -- )
+    builds-dir get boot-image-name append-path
+    [ "." copy-file-into ] [ "factor" copy-file-into ] bi ;
+
+: save-git-id ( -- )
     "factor" [ git-id ] with-directory {
         [ "git-id" to-file ]
         [ "factor/git-id" to-file ]
@@ -24,15 +31,24 @@ IN: mason.build
         [ notify-begin-build ]
     } cleave ;
 
+: begin-build ( -- )
+    clone-source
+    copy-image
+    save-git-id ;
+
 : build ( -- )
     create-build-dir
     enter-build-dir
-    clone-builds-factor
     [
         begin-build
         build-child
-        [ notify-report ]
-        [ status-clean eq? [ upload-help release ] when ] bi
-    ] [ cleanup ] [ ] continuations:cleanup ;
+        [ notify-report ] [
+            status-clean eq?
+            [ notify-upload upload-docs release ] when
+        ] bi
+        notify-finish
+        finish-build
+    ] [ cleanup ] [ ] continuations:cleanup
+    notify-idle ;
 
 MAIN: build

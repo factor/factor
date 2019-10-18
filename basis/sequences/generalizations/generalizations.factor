@@ -4,12 +4,47 @@ combinators macros math.order math.ranges quotations fry effects
 memoize.private generalizations ;
 IN: sequences.generalizations
 
+MACRO: nsequence ( n seq -- )
+    [ [nsequence] ] keep
+    '[ @ _ like ] ;
+
+MACRO: narray ( n -- )
+    '[ _ { } nsequence ] ;
+
+MACRO: firstn-unsafe ( n -- )
+    [firstn] ;
+
+MACRO: firstn ( n -- )
+    dup zero? [ drop [ drop ] ] [
+        [ 1 - swap bounds-check 2drop ]
+        [ firstn-unsafe ]
+        bi-curry '[ _ _ bi ]
+    ] if ;
+
+MACRO: set-firstn-unsafe ( n -- )
+    [ 1 + ]
+    [ iota [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
+    '[ _ -nrot _ spread drop ] ;
+
+MACRO: set-firstn ( n -- )
+    dup zero? [ drop [ drop ] ] [
+        [ 1 - swap bounds-check 2drop ]
+        [ set-firstn-unsafe ]
+        bi-curry '[ _ _ bi ]
+    ] if ;
+
+: nappend-as ( n exemplar -- seq )
+    [ narray concat ] dip like ; inline
+
+: nappend ( n -- seq ) narray concat ; inline
+
 MACRO: nmin-length ( n -- )
     dup 1 - [ min ] n*quot
     '[ [ length ] _ napply @ ] ;
 
 : nnth-unsafe ( n seq... n -- )
     [ nth-unsafe ] swap [ apply-curry ] [ cleave* ] bi ; inline
+
 MACRO: nset-nth-unsafe ( n -- )
     [ [ drop ] ]
     [ '[ [ set-nth-unsafe ] _ [ apply-curry ] [ cleave-curry ] [ spread* ] tri ] ]

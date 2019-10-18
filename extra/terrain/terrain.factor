@@ -120,7 +120,7 @@ terrain-world H{
     read-keyboard keys>> :> keys
 
     key-left-shift keys nth
-    VELOCITY-MODIFIER-FAST VELOCITY-MODIFIER-NORMAL ? player (>>velocity-modifier)
+    VELOCITY-MODIFIER-FAST VELOCITY-MODIFIER-NORMAL ? player velocity-modifier<<
 
     {
         [ key-1 keys nth 1  f ? ]
@@ -128,7 +128,7 @@ terrain-world H{
         [ key-3 keys nth 3  f ? ]
         [ key-4 keys nth 4  f ? ]
         [ key-5 keys nth 10000 f ? ]
-    } 0|| player (>>reverse-time)
+    } 0|| player reverse-time<<
 
     key-w keys nth [ player walk-forward ] when 
     key-s keys nth [ player walk-backward ] when 
@@ -203,7 +203,7 @@ TYPED:: collide ( world: terrain-world player: player -- )
     world history>> :> history
     history length 0 > [
         history length reverse-time 1 - - 1 max history set-length
-        history pop world (>>player)
+        history pop world player<<
     ] when ;
 
 : tick-player-forward ( world player -- )
@@ -229,9 +229,9 @@ M: terrain-world tick-game-world
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri ;
 
 : sky-gradient ( world -- t )
-    game-loop>> tick-number>> SKY-PERIOD mod SKY-PERIOD /f ;
+    game-loop>> tick#>> SKY-PERIOD mod SKY-PERIOD /f ;
 : sky-theta ( world -- theta )
-    game-loop>> tick-number>> SKY-SPEED * ;
+    game-loop>> tick#>> SKY-SPEED * ;
 
 M: terrain-world begin-game-world
     "2.0" { "GL_ARB_vertex_buffer_object" "GL_ARB_shader_objects" }
@@ -298,5 +298,5 @@ GAME: terrain-game {
         { use-game-input? t }
         { grab-input? t }
         { pref-dim { 1024 768 } }
-        { tick-interval-micros $[ 60 fps ] }
+        { tick-interval-nanos $[ 60 fps ] }
     } ;

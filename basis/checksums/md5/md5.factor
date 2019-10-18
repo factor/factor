@@ -29,7 +29,7 @@ M: md5 initialize-checksum-state drop <md5-state> ;
 
 : update-md5 ( md5 -- )
     [ state>> ] [ old-state>> v-w+ dup clone ] [ ] tri
-    [ (>>old-state) ] [ (>>state) ] bi ;
+    [ old-state<< ] [ state<< ] bi ;
 
 CONSTANT: T
     $[
@@ -182,10 +182,10 @@ HINTS: (process-md5-block-I) { uint-array md5-state } ;
         ] each
     ] unless ;
 
-: byte-array>uint-array-le ( byte-array -- uint-array )
-    byte-array>le byte-array>uint-array ;
+: uint-array-cast-le ( byte-array -- uint-array )
+    byte-array>le uint-array-cast ;
 
-HINTS: byte-array>uint-array-le byte-array ;
+HINTS: uint-array-cast-le byte-array ;
 
 : uint-array>byte-array-le ( uint-array -- byte-array )
     underlying>> byte-array>le ;
@@ -194,7 +194,7 @@ HINTS: uint-array>byte-array-le uint-array ;
 
 M: md5-state checksum-block ( block state -- )
     [
-        [ byte-array>uint-array-le ] [ state>> ] bi* {
+        [ uint-array-cast-le ] [ state>> ] bi* {
             [ (process-md5-block-F) ]
             [ (process-md5-block-G) ]
             [ (process-md5-block-H) ]

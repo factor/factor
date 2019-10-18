@@ -14,6 +14,9 @@ SYMBOL: io-thread-running?
     [ [ io-thread-running? get-global ] [ io-thread ] while ]
     "I/O wait" spawn drop ;
 
+: stop-io-thread ( -- )
+    f io-thread-running? set-global ;
+
 [
     t io-thread-running? set-global
     start-io-thread

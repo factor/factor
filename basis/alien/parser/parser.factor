@@ -12,27 +12,35 @@ SYMBOL: current-library
 : parse-c-type-name ( name -- word )
     dup search [ ] [ no-word ] ?if ;
 
-: parse-array-type ( name -- dims c-type )
+DEFER: (parse-c-type)
+
+ERROR: bad-array-type ;
+
+: parse-array-type ( name -- c-type )
     "[" split unclip
-    [ [ "]" ?tail drop parse-word ] map ] dip ;
+    [ [ "]" ?tail [ bad-array-type ] unless parse-word ] map ]
+    [ (parse-c-type) ]
+    bi* prefix ;
 
 : (parse-c-type) ( string -- type )
     {
-        { [ dup "void" =         ] [ drop void ] }
-        { [ CHAR: ] over member? ] [ parse-array-type parse-c-type-name prefix ] }
-        { [ "*" ?tail            ] [ (parse-c-type) <pointer> ] }
-        { [ dup search           ] [ parse-c-type-name ] }
+        { [ "*" ?tail ] [ (parse-c-type) <pointer> ] }
+        { [ CHAR: ] over member? ] [ parse-array-type ] }
+        { [ dup search ] [ parse-c-type-name ] }
         [ dup search [ ] [ no-word ] ?if ]
     } cond ;
 
+: c-array? ( c-type -- ? )
+    { [ array? ] [ first { [ c-type-word? ] [ pointer? ] } 1|| ] } 1&& ;
+
 : valid-c-type? ( c-type -- ? )
-    { [ array? ] [ c-type-word? ] [ pointer? ] [ void? ] } 1|| ;
+    { [ c-array? ] [ c-type-word? ] [ pointer? ] [ void? ] } 1|| ;
 
 : parse-c-type ( string -- type )
     (parse-c-type) dup valid-c-type? [ no-c-type ] unless ;
 
 : scan-c-type ( -- c-type )
-    scan {
+    scan-token {
         { [ dup "{" = ] [ drop \ } parse-until >array ] }
         { [ dup "pointer:" = ] [ drop scan-c-type <pointer> ] }
         [ parse-c-type ]
@@ -75,19 +83,32 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     "*" ?head
     [ [ <pointer> ] dip parse-pointers ] when ;
 
+: next-enum-member ( members name value -- members value' )
+    [ 2array suffix! ] [ 1 + ] bi ;
+
+: parse-enum-name ( -- name )
+    scan (CREATE-C-TYPE) dup save-location ;
+
+: parse-enum-base-type ( -- base-type token )
+    scan dup "<" =
+    [ drop scan-object scan ]
+    [ [ int ] dip ] if ;
+
+: parse-enum-member ( members name value -- members value' )
+    over "{" =
+    [ 2drop scan create-in scan-object next-enum-member "}" expect ]
+    [ [ create-in ] dip next-enum-member ] if ;
+
+: parse-enum-members ( members counter token -- members )
+    dup ";" = not
+    [ swap parse-enum-member scan parse-enum-members ] [ 2drop ] if ;
+
 PRIVATE>
 
-: define-enum-member ( word-string value -- next-value )
-     [ create-in ] dip [ define-constant ] keep 1 + ;
-
-: parse-enum-member ( word-string value -- next-value )
-     over "{" =
-     [ 2drop scan scan-object define-enum-member "}" expect ]
-     [ define-enum-member ] if ;
-
-: parse-enum-members ( counter -- )
-     scan dup ";" = not
-     [ swap parse-enum-member parse-enum-members ] [ 2drop ] if ;
+: parse-enum ( -- name base-type members )
+    parse-enum-name
+    parse-enum-base-type
+    [ V{ } clone 0 ] dip parse-enum-members ;
 
 : scan-function-name ( -- return function )
     scan-c-type scan parse-pointers ;
@@ -155,8 +176,8 @@ PREDICATE: alien-callback-type-word < typedef-word
     "callback-effect" word-prop ;
 
 : global-quot ( type word -- quot )
-    name>> current-library get '[ _ _ address-of 0 ]
-    swap c-type-getter-boxer append ;
+    swap [ name>> current-library get ] dip
+    '[ _ _ address-of 0 _ alien-value ] ;
 
 : define-global ( type word -- )
     [ nip ] [ global-quot ] 2bi (( -- value )) define-declared ;

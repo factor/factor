@@ -19,10 +19,10 @@ STRUCT: context
 : context-field-offset ( field -- offset ) context offset-of ; inline
 
 STRUCT: zone
-{ start cell }
 { here cell }
-{ size cell }
-{ end cell } ;
+{ start cell }
+{ end cell }
+{ size cell } ;
 
 STRUCT: vm
 { ctx context* }
@@ -34,13 +34,12 @@ STRUCT: vm
 
 : vm-field-offset ( field -- offset ) vm offset-of ; inline
 
-C-ENUM: f
-collect-nursery-op
-collect-aging-op
-collect-to-tenured-op
-collect-full-op
-collect-compact-op
-collect-growing-heap-op ;
+CONSTANT: collect-nursery-op 0
+CONSTANT: collect-aging-op 1
+CONSTANT: collect-to-tenured-op 2
+CONSTANT: collect-full-op 3
+CONSTANT: collect-compact-op 4
+CONSTANT: collect-growing-heap-op 5
 
 STRUCT: copying-sizes
 { size cell }

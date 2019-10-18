@@ -1,11 +1,8 @@
 ! Copyright (C) 2008 Matthew Willis.
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays sequences alien alien.c-types alien.destructors
-alien.syntax math math.functions math.vectors destructors combinators
-colors fonts accessors assocs namespaces kernel pango pango.fonts
-glib unicode.data images cache init
-math.rectangles fry memoize io.encodings.utf8 classes.struct ;
+USING: alien.c-types alien.destructors alien.syntax glib pango
+pango.fonts ;
 IN: pango.layouts
 
 LIBRARY: pango

@@ -67,7 +67,7 @@ PRIVATE>
     username clients key? [
         handle-already-logged-in
     ] [
-        t client (>>logged-in?)
+        t client logged-in?<<
         client username clients set-at
     ] if ;
 

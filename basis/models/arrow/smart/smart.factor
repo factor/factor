@@ -1,7 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: models.arrow models.product stack-checker accessors fry
-generalizations combinators.smart macros kernel ;
+generalizations sequences.generalizations combinators.smart
+macros kernel ;
 IN: models.arrow.smart
 
 MACRO: <smart-arrow> ( quot -- quot' )

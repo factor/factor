@@ -1,9 +1,10 @@
-USING: alien alien.c-types arrays assocs combinators continuations
-destructors io io.backend io.ports io.timeouts io.backend.windows
-io.files.windows io.files.windows.nt io.files io.pathnames io.buffers
-io.streams.c io.streams.null libc kernel math namespaces sequences
-threads windows windows.errors windows.kernel32 strings splitting
-ascii system accessors locals classes.struct combinators.short-circuit ;
+USING: accessors alien alien.c-types alien.data alien.syntax
+arrays assocs classes.struct combinators
+combinators.short-circuit destructors io io.backend
+io.backend.windows io.buffers io.files.windows io.ports
+io.streams.c io.streams.null io.timeouts kernel libc locals
+math namespaces sequences system threads vocabs.loader
+windows.errors windows.handles windows.kernel32 ;
 IN: io.backend.windows.nt
 
 ! Global variable with assoc mapping overlapped to threads
@@ -31,8 +32,8 @@ SYMBOL: master-completion-port
 : <master-completion-port> ( -- handle )
     INVALID_HANDLE_VALUE f <completion-port> ;
 
-M: winnt add-completion ( win32-handle -- )
-    handle>> master-completion-port get-global <completion-port> drop ;
+M: winnt add-completion ( win32-handle -- win32-handle )
+    dup handle>> master-completion-port get-global <completion-port> drop ;
 
 : eof? ( error -- ? )
     { [ ERROR_HANDLE_EOF = ] [ ERROR_BROKEN_PIPE = ] } 1|| ;
@@ -51,16 +52,12 @@ M: winnt add-completion ( win32-handle -- )
     ] with-timeout ;
 
 :: wait-for-overlapped ( nanos -- bytes-transferred overlapped error? )
-    master-completion-port get-global
-    0 <int> :> bytes
-    f <void*> :> key
-    f <void*> :> overlapped
     nanos [ 1,000,000 /i ] [ INFINITE ] if* :> timeout
-    bytes key overlapped timeout GetQueuedCompletionStatus zero? :> error?
-
-    bytes *int
-    overlapped *void* dup [ OVERLAPPED memory>struct ] when
-    error? ;
+    master-completion-port get-global
+    { int void* pointer: OVERLAPPED }
+    [ timeout GetQueuedCompletionStatus zero? ] with-out-parameters
+    :> ( error? bytes key overlapped )
+    bytes overlapped error? ;
 
 : resume-callback ( result overlapped -- )
     >c-ptr pending-overlapped get-global delete-at* drop resume-with ;
@@ -73,7 +70,7 @@ M: winnt add-completion ( win32-handle -- )
     ] [ resume-callback t ] if ;
 
 M: win32-handle cancel-operation
-    [ check-disposed ] [ handle>> CancelIo drop ] bi ;
+    [ handle>> CancelIo win32-error=0/f ] unless-disposed ;
 
 M: winnt io-multiplex ( nanos -- )
     handle-overlapped [ 0 io-multiplex ] when ;
@@ -90,7 +87,7 @@ ERROR: invalid-file-size n ;
 ERROR: seek-before-start n ;
 
 : set-seek-ptr ( n handle -- )
-    [ dup 0 < [ seek-before-start ] when ] dip (>>ptr) ;
+    [ dup 0 < [ seek-before-start ] when ] dip ptr<< ;
 
 M: winnt tell-handle ( handle -- n ) ptr>> ;
 
@@ -147,4 +144,5 @@ M: winnt init-stdio
     [ init-c-stdio ]
     [ null-reader null-writer null-writer set-stdio ] if ;
 
+"io.files.windows.nt" require
 winnt set-io-backend

@@ -43,6 +43,9 @@ SYMBOL: literals
     meta-d length "x" <array>
     terminated? get <terminated-effect> ;
 
+: check-effect ( required-effect -- )
+    [ current-effect ] dip 2dup effect<= [ 2drop ] [ effect-error ] if ;
+
 : init-inference ( -- )
     terminated? off
     V{ } clone \ meta-d set

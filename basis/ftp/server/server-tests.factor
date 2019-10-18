@@ -25,7 +25,7 @@ IN: ftp.server.tests
                 "ftp" >>protocol
                 "localhost" >>host
                 create-test-file >>path
-                _ call
+                @
         ]
         [ stop-server ] tri
     ] with-unique-directory drop ; inline

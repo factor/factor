@@ -1,6 +1,6 @@
 USING: accessors effects eval kernel layouts math namespaces
-quotations tools.test typed words words.symbol
-compiler.tree.debugger prettyprint definitions compiler.units ;
+quotations tools.test typed words words.symbol combinators.short-circuit
+compiler.tree.debugger prettyprint definitions compiler.units sequences ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
@@ -24,14 +24,17 @@ TYPED: dee ( x: tweedle-dee -- y )
 TYPED: dum ( x: tweedle-dum -- y )
     drop \ tweedle-dum ;
 
-[ \ tweedle-dum new dee ] [ input-mismatch-error? ] must-fail-with
-[ \ tweedle-dee new dum ] [ input-mismatch-error? ] must-fail-with
+[ \ tweedle-dum new dee ]
+[ { [ input-mismatch-error? ] [ expected-type>> tweedle-dee = ] [ value>> tweedle-dum? ] } 1&& ] must-fail-with
 
+[ \ tweedle-dee new dum ]
+[ { [ input-mismatch-error? ] [ expected-type>> tweedle-dum = ] [ value>> tweedle-dee? ] } 1&& ] must-fail-with
 
 TYPED: dumdum ( x -- y: tweedle-dum )
     drop \ tweedle-dee new ;
 
-[ f dumdum ] [ output-mismatch-error? ] must-fail-with
+[ f dumdum ]
+[ { [ output-mismatch-error? ] [ expected-type>> tweedle-dum = ] [ value>> tweedle-dee? ] } 1&& ] must-fail-with
 
 TYPED:: f+locals ( a: float b: float -- c: float )
     a b + ;

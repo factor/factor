@@ -1,7 +1,7 @@
 ! (c)Joe Groff bsd license
 USING: accessors arrays compiler.test continuations generalizations
 kernel kernel.private locals math.vectors.conversion math.vectors.simd
-sequences stack-checker tools.test ;
+sequences stack-checker tools.test sequences.generalizations ;
 FROM: alien.c-types => char uchar short ushort int uint longlong ulonglong float double ;
 IN: math.vectors.conversion.tests
 

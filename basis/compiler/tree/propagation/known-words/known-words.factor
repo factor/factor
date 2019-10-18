@@ -7,7 +7,7 @@ layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private
 slots.private definitions strings.private vectors hashtables
-generic quotations alien
+generic quotations alien alien.data alien.data.private
 stack-checker.dependencies
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -220,14 +220,6 @@ generic-comparison-ops [
     2bi and maybe-or-never
 ] "outputs" set-word-prop
 
-\ both-fixnums? [
-    [ class>> ] bi@ {
-        { [ 2dup [ fixnum classes-intersect? not ] either? ] [ f <literal-info> ] }
-        { [ 2dup [ fixnum class<= ] both? ] [ t <literal-info> ] }
-        [ object-info ]
-    } cond 2nip
-] "outputs" set-word-prop
-
 {
     { >fixnum fixnum }
     { bignum>fixnum fixnum }
@@ -254,8 +246,8 @@ generic-comparison-ops [
     ] "outputs" set-word-prop
 ] each
 
-\ string-nth [
-    2drop fixnum 0 23 2^ [a,b] <class/interval-info>
+\ string-nth-fast [
+    2drop fixnum 0 255 [a,b] <class/interval-info>
 ] "outputs" set-word-prop
 
 {
@@ -280,6 +272,11 @@ generic-comparison-ops [
     2drop alien \ f class-or <class-info>
 ] "outputs" set-word-prop
 
+\ <displaced-alien> [
+    [ interval>> 0 swap interval-contains? ] dip
+    class>> alien class-or alien ? <class-info>
+] "outputs" set-word-prop
+
 { <tuple> <tuple-boa> } [
     [
         literal>> dup array? [ first ] [ drop tuple ] if <class-info>
@@ -291,14 +288,12 @@ generic-comparison-ops [
     literal>> dup tuple-class? [ drop tuple ] unless <class-info>
 ] "outputs" set-word-prop
 
-! the output of clone has the same type as the input
+! the output of (clone) has the same type as the input
 : cloned-value-info ( value-info -- value-info' )
     clone f >>literal f >>literal?
     [ [ dup [ cloned-value-info ] when ] map ] change-slots ;
 
-{ clone (clone) } [
-    [ cloned-value-info ] "outputs" set-word-prop
-] each
+\ (clone) [ cloned-value-info ] "outputs" set-word-prop
 
 \ slot [
     dup literal?>>
@@ -324,10 +319,9 @@ generic-comparison-ops [
     ] [ 2drop object-info ] if
 ] "outputs" set-word-prop
 
-{ facos fasin fatan fatan2 fcos fsin ftan fcosh fsinh ftanh fexp
-flog fpow fsqrt facosh fasinh fatanh } [
-    { float } "default-output-classes" set-word-prop
-] each
+! Unlike the other words in math.libm, fsqrt is not inline
+! since it has an intrinsic, so we need to give it outputs here.
+\ fsqrt { float } "default-output-classes" set-word-prop
 
 ! Find a less repetitive way of doing this
 \ float-min { float float } "input-classes" set-word-prop
@@ -341,3 +335,5 @@ flog fpow fsqrt facosh fasinh fatanh } [
 
 \ fixnum-max { fixnum fixnum } "input-classes" set-word-prop
 \ fixnum-max [ interval-max ] [ fixnum-valued ] binary-op
+
+\ (local-allot) { alien } "default-output-classes" set-word-prop

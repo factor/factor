@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
@@ -11,7 +11,7 @@ IN: urls.encoding
         [ letter? ]
         [ LETTER? ]
         [ digit? ]
-        [ "/_-.:" member? ]
+        [ "-._~/:" member? ]
     } 1|| ; foldable
 
 ! see http://tools.ietf.org/html/rfc3986#section-2.2
@@ -120,7 +120,7 @@ PRIVATE>
 : assoc>query ( assoc -- str )
     [
         assoc-strings [
-            [ url-encode ] dip
-            [ [ url-encode "=" glue , ] with each ] [ , ] if*
+            [ url-encode-full ] dip
+            [ [ url-encode-full "=" glue , ] with each ] [ , ] if*
         ] assoc-each
     ] { } make "&" join ;

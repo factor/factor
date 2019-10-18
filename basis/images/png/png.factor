@@ -4,7 +4,7 @@ USING: accessors arrays checksums checksums.crc32 combinators
 compression.inflate fry grouping images images.loader io
 io.binary io.encodings.ascii io.encodings.string kernel locals
 math math.bitwise math.ranges sequences sorting assocs
-math.functions math.order byte-arrays ;
+math.functions math.order byte-arrays io.streams.throwing ;
 QUALIFIED-WITH: bitstreams bs
 IN: images.png
 
@@ -290,14 +290,6 @@ ERROR: invalid-color-type/bit-depth loading-png ;
 : validate-truecolor-alpha ( loading-png -- loading-png )
     { 8 16 } validate-bit-depth ;
 
-: pad-bitmap ( image -- image )
-    dup dim>> second 4 divisor? [
-        dup [ bytes-per-pixel ]
-        [ dim>> first * ]
-        [ dim>> first 4 mod ] tri
-        '[ _ group [ _ 0 <array> append ] map B{ } concat-as ] change-bitmap
-    ] unless ;
-
 : loading-png>bitmap ( loading-png -- bytes component-order )
     dup color-type>> {
         { greyscale [
@@ -323,14 +315,16 @@ ERROR: invalid-color-type/bit-depth loading-png ;
         [ loading-png>bitmap [ >>bitmap ] [ >>component-order ] bi* ]
         [ [ width>> ] [ height>> ] bi 2array >>dim ]
         [ png-component >>component-type ]
-    } cleave pad-bitmap ;
+    } cleave ;
 
 : load-png ( stream -- loading-png )
     [
-        <loading-png>
-        read-png-header
-        read-png-chunks
-        parse-ihdr-chunk
+        [
+            <loading-png>
+            read-png-header
+            read-png-chunks
+            parse-ihdr-chunk
+        ] throw-on-eof
     ] with-input-stream ;
 
 M: png-image stream>image

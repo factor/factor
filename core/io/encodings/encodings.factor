@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Daniel Ehrenberg.
+! Copyright (C) 2008, 2010 Daniel Ehrenberg, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces growable
 strings io classes continuations destructors combinators
@@ -11,6 +11,10 @@ IN: io.encodings
 GENERIC: decode-char ( stream encoding -- char/f )
 
 GENERIC: encode-char ( char stream encoding -- )
+
+GENERIC: encode-string ( string stream encoding -- )
+
+M: object encode-string [ encode-char ] 2curry each ; inline
 
 GENERIC: <decoder> ( stream encoding -- newstream )
 
@@ -134,13 +138,8 @@ M: encoder stream-element-type
 M: encoder stream-write1
     >encoder< encode-char ;
 
-GENERIC# encoder-write 2 ( string stream encoding -- )
-
-M: string encoder-write
-    [ encode-char ] 2curry each ;
-
 M: encoder stream-write
-    >encoder< encoder-write ;
+    >encoder< encode-string ;
 
 M: encoder dispose stream>> dispose ;
 

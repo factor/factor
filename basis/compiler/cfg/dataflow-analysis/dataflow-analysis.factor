@@ -18,27 +18,21 @@ MIXIN: dataflow-analysis
 : <dfa-worklist> ( cfg dfa -- queue )
     block-order <hashed-dlist> [ push-all-front ] keep ;
 
-GENERIC# compute-in-set 2 ( bb out-sets dfa -- set )
-
-M: kill-block compute-in-set 3drop f ;
-
-M:: basic-block compute-in-set ( bb out-sets dfa -- set )
+:: compute-in-set ( bb out-sets dfa -- set )
     ! Only consider initialized sets.
-    bb dfa predecessors
-    [ out-sets key? ] filter
-    [ out-sets at ] map
-    bb dfa join-sets ;
+    bb kill-block?>> [ f ] [
+        bb dfa predecessors
+        [ out-sets key? ] filter
+        [ out-sets at ] map
+        bb dfa join-sets
+    ] if ;
 
 :: update-in-set ( bb in-sets out-sets dfa -- ? )
     bb out-sets dfa compute-in-set
     bb in-sets maybe-set-at ; inline
 
-GENERIC# compute-out-set 2 ( bb out-sets dfa -- set )
-
-M: kill-block compute-out-set 3drop f ;
-
-M:: basic-block compute-out-set ( bb in-sets dfa -- set )
-    bb in-sets at bb dfa transfer-set ;
+:: compute-out-set ( bb in-sets dfa -- set )
+    bb kill-block?>> [ f ] [ bb in-sets at bb dfa transfer-set ] if ;
 
 :: update-out-set ( bb in-sets out-sets dfa -- ? )
     bb in-sets dfa compute-out-set

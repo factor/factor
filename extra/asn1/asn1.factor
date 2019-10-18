@@ -72,7 +72,7 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
 : (set-tag) ( -- )
     elements get id>> 31 bitand
-    dup elements get (>>tag)
+    dup elements get tag<<
     31 < [
         [ "unsupported tag encoding: #{" % 
           get-id # "}" %
@@ -81,22 +81,22 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
 : set-tagclass ( -- )
     get-id -6 shift tag-classes nth
-    elements get (>>tagclass) ;
+    elements get tagclass<< ;
 
 : set-encoding ( -- )
     get-id HEX: 20 bitand
     zero? "primitive" "constructed" ?
-    elements get (>>encoding) ;
+    elements get encoding<< ;
 
 : set-content-length ( -- )
     read1
     dup 127 <= [ 
         127 bitand read be>
-    ] unless elements get (>>contentlength) ;
+    ] unless elements get contentlength<< ;
 
 : set-newobj ( -- )
     elements get contentlength>> read
-    elements get (>>newobj) ;
+    elements get newobj<< ;
 
 : set-objtype ( syntax -- )
     builtin-syntax 2array [
@@ -104,7 +104,7 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
         elements get encoding>> swap at
         elements get tag>>
         swap at [ 
-            elements get (>>objtype)
+            elements get objtype<<
         ] when*
     ] each ;
 
@@ -130,7 +130,7 @@ SYMBOL: end
     } case ;
 
 : set-id ( -- boolean )
-    read1 dup elements get (>>id) ;
+    read1 dup elements get id<< ;
 
 : read-ber ( syntax -- object )
     element new
@@ -199,7 +199,7 @@ TUPLE: tag value ;
     ] with-scope ; inline
 
 : set-tag ( value -- )
-    tagnum get (>>value) ;
+    tagnum get value<< ;
 
 M: string >ber ( str -- byte-array )
     tagnum get value>> 1array "C" pack-native swap dup

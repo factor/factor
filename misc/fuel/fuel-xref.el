@@ -1,6 +1,6 @@
 ;;; fuel-xref.el -- showing cross-reference info
 
-;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -20,6 +20,7 @@
 (require 'fuel-syntax)
 (require 'fuel-popup)
 (require 'fuel-font-lock)
+(require 'fuel-menu)
 (require 'fuel-base)
 
 (require 'button)
@@ -275,7 +276,8 @@ With prefix argument, ask for the vocab."
   (set-syntax-table fuel-syntax--syntax-table)
   (setq mode-name "FUEL Xref")
   (setq major-mode 'fuel-xref-mode)
-  (font-lock-add-keywords nil '(("(in \\(.+\\))" 1 'fuel-font-lock-xref-vocab)))
+  (font-lock-add-keywords nil
+                          '(("(in \\(.+\\))" 1 'fuel-font-lock-xref-vocab)))
   (setq buffer-read-only t))
 
 

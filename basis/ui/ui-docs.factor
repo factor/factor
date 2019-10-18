@@ -73,10 +73,10 @@ HELP: raise-window
 { $description "Makes the native window containing the given gadget the front-most window." } ;
 
 HELP: with-ui
-{ $values { "quot" quotation } }
-{ $description "Calls the quotation, starting the UI first if necessary." }
-{ $notes "This combinator should be used in the " { $link POSTPONE: MAIN: } " word of a vocabulary, in order for the vocabulary to work when run from the UI listener (" { $snippet "\"my-app\" run" } " and the command line (" { $snippet "./factor -run=my-app" } ")." }
-{ $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this combinator." } ;
+{ $values { "quot" { $quotation "( -- )" } } }
+{ $description "Calls the quotation, starting the UI first if necessary. If the UI is started, this word does not return." }
+{ $notes "This word should be used in the " { $link POSTPONE: MAIN: } " word of an application that uses the UI in order for the vocabulary to work when run from either the UI listener (" { $snippet "\"my-app\" run" } " and the command line (" { $snippet "./factor -run=my-app" } ")." }
+{ $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this word." } ;
 
 HELP: beep
 { $description "Plays the system beep sound." } ;

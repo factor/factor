@@ -1,0 +1,1 @@
+Heuristic auto-detection of text encodings and binary files

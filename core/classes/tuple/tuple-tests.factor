@@ -273,7 +273,13 @@ test-server-slot-values
 ! Dynamically changing inheritance hierarchy
 TUPLE: electronic-device ;
 
+: computer?' ( a -- b ) computer? ;
+
+[ t ] [ laptop new computer?' ] unit-test
+
 [ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram ; C: <computer> computer C: <laptop> laptop C: <server> server" eval( -- ) ] unit-test
+
+[ t ] [ laptop new computer?' ] unit-test
 
 [ f ] [ electronic-device laptop class<= ] unit-test
 [ t ] [ server electronic-device class<= ] unit-test
@@ -588,7 +594,7 @@ T{ reshape-test f "hi" } "tuple" set
 
 [ ] [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval( -- ) ] unit-test
 
-[ f ] [ \ reshape-test \ (>>x) method ] unit-test
+[ f ] [ \ reshape-test \ x<< method ] unit-test
 
 [ "tuple" get 5 >>x ] must-fail
 

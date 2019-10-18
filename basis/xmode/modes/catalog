@@ -91,7 +91,10 @@
 				FILE_NAME_GLOB="*.{cfm,dbm,cfc}" />
 
 <MODE NAME="c++"		FILE="cplusplus.xml"
-				FILE_NAME_GLOB="*.{cc,cpp,hh,hpp,cxx}" />
+				FILE_NAME_GLOB="*.{cc,cpp,hh,hpp,cxx,inl,mm}" />
+
+<MODE NAME="cuda"		FILE="cuda.xml"
+				FILE_NAME_GLOB="*.{cu,gpu,cuh}" />
 
 <MODE NAME="c#"			FILE="csharp.xml"
 				FILE_NAME_GLOB="*.cs" />

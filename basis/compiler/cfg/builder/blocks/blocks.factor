@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays fry kernel make math namespaces sequences
 compiler.cfg compiler.cfg.instructions compiler.cfg.stacks
@@ -31,6 +31,9 @@ IN: compiler.cfg.builder.blocks
     call
     ##branch begin-basic-block ; inline
 
+: make-kill-block ( -- )
+    basic-block get t >>kill-block? drop ;
+
 : call-height ( #call -- n )
     [ out-d>> length ] [ in-d>> length ] bi - ;
 
@@ -38,6 +41,7 @@ IN: compiler.cfg.builder.blocks
     [
         [ word>> ##call ]
         [ call-height adjust-d ] bi
+        make-kill-block
     ] emit-trivial-block ;
 
 : begin-branch ( -- ) clone-current-height (begin-basic-block) ;
@@ -56,19 +60,13 @@ IN: compiler.cfg.builder.blocks
 : set-successors ( branches -- )
     ! Set the successor of each branch's final basic block to the
     ! current block.
-    basic-block get dup [
-        '[ [ [ _ ] dip first successors>> push ] when* ] each
-    ] [ 2drop ] if ;
-
-: merge-heights ( branches -- )
-    ! If all elements are f, that means every branch ended with a backward
-    ! jump so the height is irrelevant since this block is unreachable.
-    [ ] find nip [ second current-height set ] [ end-basic-block ] if* ;
+    [ [ [ basic-block get ] dip first successors>> push ] when* ] each ;
 
 : emit-conditional ( branches -- )
-    ! branchies is a sequence of pairs as above
+    ! branches is a sequence of pairs as above
     end-basic-block
-    [ merge-heights begin-basic-block ]
-    [ set-successors ]
-    bi ;
-
+    dup [ ] find nip dup [
+        second current-height set
+        begin-basic-block
+        set-successors
+    ] [ 2drop ] if ;

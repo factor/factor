@@ -23,18 +23,10 @@ typedef wchar_t vm_char;
 	#define FTELL ftell
 	#define FSEEK fseek
 	#define SNPRINTF _snprintf
-	#define SNWPRINTF _snwprintf
 #else
 	#define FTELL ftello64
 	#define FSEEK fseeko64
 	#define SNPRINTF snprintf
-	#define SNWPRINTF snwprintf
-#endif
-
-#ifdef WIN64
-	#define CELL_HEX_FORMAT "%Ix"
-#else
-	#define CELL_HEX_FORMAT "%lx"
 #endif
 
 #define OPEN_READ(path) _wfopen((path),L"rb")
@@ -45,7 +37,6 @@ typedef wchar_t vm_char;
 
 inline static void early_init() {}
 
-u64 system_micros();
 u64 nano_count();
 void sleep_nanos(u64 nsec);
 long getpagesize();

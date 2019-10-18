@@ -79,7 +79,7 @@ TUPLE: depends-on-class-predicate class1 class2 result ;
 M: depends-on-class-predicate satisfied?
     {
         [ [ class1>> classoid? ] [ class2>> classoid? ] bi and ]
-        [ [ [ class1>> ] [ class2>> ] bi compare-classes ] [ result>> ] bi eq? ]
+        [ [ [ class1>> ] [ class2>> ] bi evaluate-class-predicate ] [ result>> ] bi eq? ]
     } 1&& ;
 
 TUPLE: depends-on-instance-predicate object class result ;

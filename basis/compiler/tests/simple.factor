@@ -1,7 +1,7 @@
 USING: compiler.test compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings alien
 arrays memory vocabs parser eval quotations compiler.errors
-definitions ;
+definitions generic.single ;
 IN: compiler.tests.simple
 
 ! Test empty word
@@ -249,3 +249,6 @@ M: quotation bad-effect-test call ; inline
 
 ! Don't want compiler error to stick around
 [ ] [ [ M\ quotation bad-effect-test forget ] with-compilation-unit ] unit-test
+
+! Make sure time bombs literalize
+[ [ \ + call ] compile-call ] [ no-method? ] must-fail-with

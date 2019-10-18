@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions effects fry generic generic.single
-generic.standard hashtables io.binary io.streams.string kernel
-kernel.private math math.integers.private math.parser
-namespaces parser sbufs sequences splitting splitting.private strings
-vectors words ;
+generic.standard hashtables io.binary io.encodings
+io.streams.string kernel kernel.private math
+math.integers.private math.parser namespaces parser sbufs
+sequences splitting splitting.private strings vectors words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
@@ -131,3 +131,5 @@ M\ hashtable at* { { fixnum object } { word object } } "specializer" set-word-pr
 M\ hashtable set-at { { object fixnum object } { object word object } } "specializer" set-word-prop
 
 \ bignum/f { { bignum bignum } { bignum fixnum } { fixnum bignum } { fixnum fixnum } } "specializer" set-word-prop
+
+\ encode-string { string object object } "specializer" set-word-prop

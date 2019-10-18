@@ -8,7 +8,7 @@ HELP: duration
 { $description "A duration is a period of time years, months, days, hours, minutes, and seconds.  All duration slots can store " { $link real } " numbers. Compare two durations with the " { $link <=> } " word." } ;
 
 HELP: timestamp
-{ $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two duarionts with the " { $link <=> } " word." } ;
+{ $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two durations with the " { $link <=> } " word." } ;
 
 { timestamp duration } related-words
 

@@ -1,7 +1,8 @@
 USING: accessors alien.c-types arrays byte-arrays
 cpu.architecture effects functors generalizations kernel lexer
 math math.vectors.simd math.vectors.simd.intrinsics parser
-prettyprint.custom quotations sequences sequences.cords words ;
+prettyprint.custom quotations sequences sequences.cords words
+classes ;
 IN: math.vectors.simd.cords
 
 <<
@@ -27,18 +28,27 @@ BOA-EFFECT [ N 2 * "n" <array> { "v" } <effect> ]
 WHERE
 
 : >A ( seq -- A )
-    [ N head >A/2 ]
-    [ N tail >A/2 ] bi cord-append ;
+    [ N head-slice >A/2 ]
+    [ N tail-slice >A/2 ] bi cord-append ;
 
 \ A-boa
 { N ndip A/2-boa cord-append } { A/2-boa } >quotation prefix >quotation
 BOA-EFFECT define-inline
 
 : A-with ( n -- v )
-    [ A/2-with ] [ A/2-with ] bi cord-append ;
+    [ A/2-with ] [ A/2-with ] bi cord-append ; inline
 
 : A-cast ( v -- v' )
-    [ A/2-cast ] cord-map ;
+    [ A/2-cast ] cord-map ; inline
+
+M: A new-sequence
+    2drop
+    N A/2 new new-sequence
+    N A/2 new new-sequence
+    \ A boa ;
+
+M: A like
+    over \ A instance? [ drop ] [ call-next-method ] if ;
 
 M: A >pprint-sequence ;
 M: A pprint* pprint-object ;

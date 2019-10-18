@@ -19,6 +19,6 @@ lexenv set
 [ [ \ tuple ] ] [ "Object" lexenv get lookup-reader ] unit-test
 
 [ [ fake-local ] ] [ "jumble" lexenv get lookup-writer ] unit-test
-[ [ fake-self (>>y) ] ] [ "y" lexenv get lookup-writer ] unit-test
+[ [ fake-self y<< ] ] [ "y" lexenv get lookup-writer ] unit-test
 
 [ "blahblah" lexenv get lookup-writer ] must-fail

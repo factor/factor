@@ -104,8 +104,23 @@ TUPLE: tuple-dispatch-engine echelons ;
     #! is always there
     H{ { 0 f } } clone [ [ push-echelon ] curry assoc-each ] keep ;
 
+: copy-superclass-methods ( engine superclass assoc -- )
+    at* [ [ methods>> ] bi@ assoc-union! drop ] [ 2drop ] if ;
+
+: copy-superclasses-methods ( class engine assoc -- )
+    [ superclasses ] 2dip
+    [ swapd copy-superclass-methods ] 2curry each ;
+
+: convert-tuple-inheritance ( assoc -- assoc' )
+    #! A method on a superclass A might have a higher precedence
+    #! than a method on a subclass B, if the methods are
+    #! defined on incomparable classes that happen to contain
+    #! A and B, respectively. Copy A's methods into B's set so
+    #! that they can be sorted and selected properly.
+    dup dup [ copy-superclasses-methods ] curry assoc-each ;
+
 : <tuple-dispatch-engine> ( methods -- engine )
-    echelon-sort
+    convert-tuple-inheritance echelon-sort
     [ dupd <echelon-dispatch-engine> ] assoc-map
     \ tuple-dispatch-engine boa ;
 

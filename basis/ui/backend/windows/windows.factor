@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! Portions copyright (C) 2007, 2009 Slava Pestov.
+! Portions copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings arrays assocs ui
 ui.private ui.gadgets ui.gadgets.private ui.backend
@@ -59,16 +59,16 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     drop f ;
 
 : arb-make-pixel-format ( world attributes -- pf )
-    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 0 <int> 0 <int>
-    [ wglChoosePixelFormatARB win32-error=0/f ] 2keep drop *int ;
+    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 { int int }
+    [ wglChoosePixelFormatARB win32-error=0/f ] with-out-parameters drop ;
 
 : arb-pixel-format-attribute ( pixel-format attribute -- value )
     >WGL_ARB
     [ drop f ] [
         [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
-        first <int> 0 <int>
+        first <int> { int }
         [ wglGetPixelFormatAttribivARB win32-error=0/f ]
-        keep *int
+        with-out-parameters
     ] if-empty ;
 
 CONSTANT: pfd-flag-map H{
@@ -248,7 +248,7 @@ CONSTANT: window-control>ex-style
         { minimize-button 0 }
         { maximize-button 0 }
         { resize-handles $ WS_EX_WINDOWEDGE }
-        { small-title-bar $ WS_EX_TOOLWINDOW }
+        { small-title-bar $[ WS_EX_TOOLWINDOW WS_EX_TOPMOST bitor ] }
         { normal-title-bar $ WS_EX_APPWINDOW }
     }
 
@@ -285,12 +285,12 @@ CONSTANT: window-control>ex-style
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    dup { 0 0 } = [ 2drop ] [ swap window [ (>>dim) ] [ drop ] if* ] if ;
+    dup { 0 0 } = [ 2drop ] [ swap window [ dim<< ] [ drop ] if* ] if ;
 
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    swap window [ (>>window-loc) ] [ drop ] if* ;
+    swap window [ window-loc<< ] [ drop ] if* ;
 
 CONSTANT: wm-keydown-codes
     H{
@@ -415,7 +415,7 @@ CONSTANT: exclude-keys-wm-char
     ] unless ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
-    ? hwnd window (>>active?)
+    ? hwnd window active?<<
     hwnd uMsg wParam lParam DefWindowProc ;
 
 : handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
@@ -475,7 +475,8 @@ SYMBOL: nc-buttons
     message>button nc-buttons get
     swap [ push ] [ remove! drop ] if ;
 
-: mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
+: mouse-scroll ( wParam -- array )
+    >lo-hi [ -80 /f ] map ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap message>button
@@ -534,7 +535,7 @@ SYMBOL: nc-buttons
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    wParam mouse-wheel hand-loc get hWnd window send-wheel ;
+    wParam mouse-scroll hand-loc get hWnd window send-scroll ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
@@ -567,6 +568,9 @@ H{ } clone wm-handlers set-global
     dup array?
     [ [ execute( -- wm ) add-wm-handler ] with each ]
     [ wm-handlers get-global set-at ] if ;
+
+: remove-wm-handler ( wm -- )
+    wm-handlers get-global delete-at ;
 
 [ handle-wm-close 0                  ] WM_CLOSE add-wm-handler
 [ 4dup handle-wm-paint DefWindowProc ] WM_PAINT add-wm-handler
@@ -611,8 +615,12 @@ SYMBOL: trace-messages?
 : ui-wndproc ( -- object )
     uint { void* uint long long } stdcall [
         pick
-        trace-messages? get-global [ dup windows-message-name name>> print flush ] when
-        wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
+
+        trace-messages? get-global
+        [ dup windows-message-name name>> print flush ] when
+
+        wm-handlers get-global at*
+        [ call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
      ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
@@ -796,7 +804,7 @@ M: windows-ui-backend system-alert
 : client-area>RECT ( hwnd -- RECT )
     RECT <struct>
     [ GetClientRect win32-error=0/f ]
-    [ >c-ptr byte-array>POINT-array [ ClientToScreen drop ] with each ]
+    [ >c-ptr POINT-array-cast [ ClientToScreen drop ] with each ]
     [ nip ] 2tri ;
 
 : hwnd>RECT ( hwnd -- RECT )
@@ -811,7 +819,7 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
     f ClipCursor drop
     1 ShowCursor drop ;
 
-CONSTANT: fullscreen-flags { WS_CAPTION WS_BORDER WS_THICKFRAME }
+CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
 
 : enter-fullscreen ( world -- )
     handle>> hWnd>>
@@ -831,24 +839,25 @@ CONSTANT: fullscreen-flags { WS_CAPTION WS_BORDER WS_THICKFRAME }
     } cleave ;
 
 : exit-fullscreen ( world -- )
-    dup handle>> hWnd>>
+    [ handle>> hWnd>> ] [ world>style ] bi
     {
-        [ GWL_STYLE rot world>style SetWindowLong win32-error=0/f ]
+        [ [ GWL_STYLE ] dip SetWindowLong win32-error=0/f ]
         [
+            drop
             f
             over hwnd>RECT get-RECT-dimensions
             flags{ SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED }
             SetWindowPos win32-error=0/f
         ]
-        [ SW_RESTORE ShowWindow win32-error=0/f ]
-    } cleave ;
+        [ drop SW_RESTORE ShowWindow win32-error=0/f ]
+    } 2cleave ;
 
 M: windows-ui-backend (set-fullscreen) ( ? world -- )
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: windows-ui-backend (fullscreen?) ( world -- ? )
-    [ handle>> hWnd>> hwnd>RECT ]
-    [ handle>> hWnd>> fullscreen-RECT ] bi
+    handle>> hWnd>>
+    [ hwnd>RECT ] [ fullscreen-RECT ] bi
     [ get-RECT-dimensions 2array 2nip ] bi@ = ;
 
 windows-ui-backend ui-backend set-global

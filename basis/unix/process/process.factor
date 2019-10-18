@@ -95,6 +95,3 @@ CONSTANT: WNOWAIT    HEX: 1000000
 
 FUNCTION: pid_t wait ( int* status ) ;
 FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
-
-: wait-for-pid ( pid -- status )
-    0 <int> [ 0 waitpid drop ] keep *int WEXITSTATUS ;

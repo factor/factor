@@ -15,15 +15,21 @@ TUPLE: anonymous-union { members read-only } ;
     [ null eq? not ] filter set-members
     dup length 1 = [ first ] [ anonymous-union boa ] if ;
 
+M: anonymous-union rank-class drop 6 ;
+
 TUPLE: anonymous-intersection { participants read-only } ;
 
 : <anonymous-intersection> ( participants -- class )
     set-members dup length 1 =
     [ first ] [ anonymous-intersection boa ] if ;
 
+M: anonymous-intersection rank-class drop 4 ;
+
 TUPLE: anonymous-complement { class read-only } ;
 
 C: <anonymous-complement> anonymous-complement
+
+M: anonymous-complement rank-class drop 3 ;
 
 DEFER: (class<=)
 
@@ -40,6 +46,9 @@ GENERIC: (flatten-class) ( class -- )
 GENERIC: normalize-class ( class -- class' )
 
 M: object normalize-class ;
+
+: symmetric-class-op ( first second cache quot -- result )
+    [ 2dup [ rank-class ] bi@ > [ swap ] when ] 2dip 2cache ; inline
 
 PRIVATE>
 
@@ -67,15 +76,27 @@ M: anonymous-complement classoid? class>> classoid? ;
     class-not-cache get [ (class-not) ] cache ;
 
 : classes-intersect? ( first second -- ? )
-    classes-intersect-cache get [
-        normalize-class (classes-intersect?)
-    ] 2cache ;
+    [ normalize-class ] bi@
+    classes-intersect-cache get [ (classes-intersect?) ] symmetric-class-op ;
 
 : class-and ( first second -- class )
-    class-and-cache get [ (class-and) ] 2cache ;
+    class-and-cache get [ (class-and) ] symmetric-class-op ;
 
 : class-or ( first second -- class )
-    class-or-cache get [ (class-or) ] 2cache ;
+    class-or-cache get [ (class-or) ] symmetric-class-op ;
+
+SYMBOL: +incomparable+
+
+: compare-classes ( first second -- <=> )
+    [ swap class<= ] [ class<= ] 2bi
+    [ +eq+ +lt+ ] [ +gt+ +incomparable+ ] if ? ;
+
+: evaluate-class-predicate ( class1 class2 -- ? )
+    {
+        { [ 2dup class<= ] [ t ] }
+        { [ 2dup classes-intersect? not ] [ f ] }
+        [ +incomparable+ ]
+    } cond 2nip ;
 
 <PRIVATE
 
@@ -93,6 +114,9 @@ M: anonymous-complement classoid? class>> classoid? ;
 
 : left-anonymous-intersection<= ( first second -- ? )
     [ participants>> ] dip [ class<= ] curry any? ;
+
+PREDICATE: nontrivial-anonymous-intersection < anonymous-intersection
+    participants>> empty? not ;
 
 : right-anonymous-intersection<= ( first second -- ? )
     participants>> [ class<= ] with all? ;
@@ -140,7 +164,7 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ over empty-union? ] [ 2drop t ] }
                 { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
                 { [ over anonymous-union? ] [ left-anonymous-union<= ] }
-                { [ over anonymous-intersection? ] [ left-anonymous-intersection<= ] }
+                { [ over nontrivial-anonymous-intersection? ] [ left-anonymous-intersection<= ] }
                 { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
                 { [ dup members ] [ right-union<= ] }
                 { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
@@ -167,20 +191,22 @@ M: anonymous-complement (classes-intersect?)
     participants>> swap suffix <anonymous-intersection> ;
 
 : (class-and) ( first second -- class )
-    {
-        { [ 2dup class<= ] [ drop ] }
-        { [ 2dup swap class<= ] [ nip ] }
-        { [ 2dup classes-intersect? not ] [ 2drop null ] }
-        [
-            [ normalize-class ] bi@ {
-                { [ dup anonymous-union? ] [ anonymous-union-and ] }
-                { [ dup anonymous-intersection? ] [ anonymous-intersection-and ] }
-                { [ over anonymous-union? ] [ swap anonymous-union-and ] }
-                { [ over anonymous-intersection? ] [ swap anonymous-intersection-and ] }
-                [ 2array <anonymous-intersection> ]
-            } cond
-        ]
-    } cond ;
+    2dup compare-classes {
+        { +lt+ [ drop ] }
+        { +gt+ [ nip ] }
+        { +eq+ [ nip ] }
+        { +incomparable+ [
+            2dup classes-intersect? [
+                [ normalize-class ] bi@ {
+                    { [ dup anonymous-union? ] [ anonymous-union-and ] }
+                    { [ dup anonymous-intersection? ] [ anonymous-intersection-and ] }
+                    { [ over anonymous-union? ] [ swap anonymous-union-and ] }
+                    { [ over anonymous-intersection? ] [ swap anonymous-intersection-and ] }
+                    [ 2array <anonymous-intersection> ]
+                } cond
+            ] [ 2drop null ] if
+        ] }
+    } case ;
 
 : anonymous-union-or ( first second -- class )
     members>> swap suffix <anonymous-union> ;
@@ -196,13 +222,18 @@ M: anonymous-complement (classes-intersect?)
     2dup class>> swap class<= [ 2drop object ] [ ((class-or)) ] if ;
 
 : (class-or) ( first second -- class )
-    {
-        { [ 2dup class<= ] [ nip ] }
-        { [ 2dup swap class<= ] [ drop ] }
-        { [ dup anonymous-complement? ] [ anonymous-complement-or ] }
-        { [ over anonymous-complement? ] [ swap anonymous-complement-or ] }
-        [ ((class-or)) ]
-    } cond ;
+    2dup compare-classes {
+        { +lt+ [ nip ] }
+        { +gt+ [ drop ] }
+        { +eq+ [ nip ] }
+        { +incomparable+ [
+            {
+                { [ dup anonymous-complement? ] [ anonymous-complement-or ] }
+                { [ over anonymous-complement? ] [ swap anonymous-complement-or ] }
+                [ ((class-or)) ]
+            } cond
+        ] }
+    } case ;
 
 : (class-not) ( class -- complement )
     {
@@ -237,12 +268,3 @@ ERROR: topological-sort-failed ;
 
 : flatten-class ( class -- assoc )
     [ (flatten-class) ] H{ } make-assoc ;
-
-SYMBOL: +incomparable+
-
-: compare-classes ( class1 class2 -- ? )
-    {
-        { [ 2dup class<= ] [ t ] }
-        { [ 2dup classes-intersect? not ] [ f ] }
-        [ +incomparable+ ]
-    } cond 2nip ;

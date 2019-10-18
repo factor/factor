@@ -33,4 +33,4 @@ V{
 5 6 edge
 
 cfg new 1 get >>entry 0 set
-[ ] [ 0 get [ compute-defs ] [ compute-uses ] bi ] unit-test
+[ ] [ 0 get compute-defs ] unit-test

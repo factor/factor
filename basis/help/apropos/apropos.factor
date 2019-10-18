@@ -28,11 +28,11 @@ M: more-completions article-name
     seq>> length max-completions - number>string " more results" append ;
 
 M: more-completions article-content
-    seq>> sort-values keys \ $completions prefix ;
+    seq>> [ second >lower ] sort-with keys \ $completions prefix ;
 
-: (apropos) ( str candidates title -- element )
+: (apropos) ( completions title -- element )
     [
-        [ completions ] dip '[
+        '[
             _ 1array \ $heading prefix ,
             [ max-completions short head keys \ $completions prefix , ]
             [ dup length max-completions > [ more-completions boa <$link> , ] [ drop ] if ]
@@ -40,22 +40,16 @@ M: more-completions article-content
         ] unless-empty
     ] { } make ;
 
-: word-candidates ( words -- candidates )
-    [ dup name>> >lower ] { } map>assoc ;
-
-: vocab-candidates ( -- candidates )
-    all-vocabs-recursive no-roots no-prefixes
-    [ dup vocab-name >lower ] { } map>assoc ;
-
-: help-candidates ( seq -- candidates )
-    [ [ >link ] [ article-title >lower ] bi ] { } map>assoc
-    sort-values ;
+: articles-matching ( str -- seq )
+    articles get
+    [ [ >link ] [ title>> ] bi* ] { } assoc-map-as
+    completions ;
 
 : $apropos ( str -- )
     first
-    [ all-words word-candidates "Words" (apropos) ]
-    [ vocab-candidates "Vocabularies" (apropos) ]
-    [ articles get keys help-candidates "Help articles" (apropos) ]
+    [ words-matching "Words" (apropos) ]
+    [ vocabs-matching "Vocabularies" (apropos) ]
+    [ articles-matching "Help articles" (apropos) ]
     tri 3array print-element ;
 
 TUPLE: apropos search ;

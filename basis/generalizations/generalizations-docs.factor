@@ -2,58 +2,9 @@ USING: help.syntax help.markup kernel sequences quotations
 math arrays combinators ;
 IN: generalizations
 
-HELP: nsequence
-{ $values { "n" integer } { "seq" "an exemplar" } }
-{ $description "A generalization of " { $link 2sequence } ", "
-{ $link 3sequence } ", and " { $link 4sequence } " "
-"that constructs a sequence from the top " { $snippet "n" } " elements of the stack."
-}
-{ $examples
-    { $example "USING: generalizations prettyprint ;" "CHAR: f CHAR: i CHAR: s CHAR: h 4 \"\" nsequence ." "\"fish\"" }
-} ;
-
-HELP: narray
-{ $values { "n" integer } }
-{ $description "A generalization of " { $link 1array } ", "
-{ $link 2array } ", " { $link 3array } " and " { $link 4array } " "
-"that constructs an array from the top " { $snippet "n" } " elements of the stack."
-}
-{ $examples
-    "Some core words expressed in terms of " { $link narray } ":"
-    { $table
-        { { $link 1array } { $snippet "1 narray" } }
-        { { $link 2array } { $snippet "2 narray" } }
-        { { $link 3array } { $snippet "3 narray" } }
-        { { $link 4array } { $snippet "4 narray" } }
-    }
-} ;
-
-{ nsequence narray } related-words
-
 HELP: nsum
 { $values { "n" integer } }
 { $description "Adds the top " { $snippet "n" } " stack values." } ;
-
-HELP: firstn
-{ $values { "n" integer } }
-{ $description "A generalization of " { $link first } ", "
-{ $link first2 } ", " { $link first3 } " and " { $link first4 } " "
-"that pushes the first " { $snippet "n" } " elements of a sequence on the stack."
-}
-{ $examples
-    "Some core words expressed in terms of " { $link firstn } ":"
-    { $table
-        { { $link first } { $snippet "1 firstn" } }
-        { { $link first2 } { $snippet "2 firstn" } }
-        { { $link first3 } { $snippet "3 firstn" } }
-        { { $link first4 } { $snippet "4 firstn" } }
-    }
-} ;
-
-HELP: set-firstn
-{ $values { "n" integer } }
-{ $description "A generalization of " { $link set-first } " "
-"that sets the first " { $snippet "n" } " elements of a sequence from the top " { $snippet "n" } " elements of the stack." } ;
 
 HELP: npick
 { $values { "n" integer } }
@@ -63,7 +14,13 @@ HELP: npick
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USING: kernel prettyprint generalizations ;" "1 2 3 4 4 npick 5 narray ." "{ 1 2 3 4 1 }" }
+  { $example
+      "USING: kernel generalizations prettyprint"
+      "sequences.generalizations ;"
+      ""
+      "1 2 3 4 4 npick 5 narray ."
+      "{ 1 2 3 4 1 }"
+  }
   "Some core words expressed in terms of " { $link npick } ":"
     { $table
         { { $link dup } { $snippet "1 npick" } }
@@ -80,7 +37,13 @@ HELP: ndup
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 4 ndup 8 narray ." "{ 1 2 3 4 1 2 3 4 }" }
+  { $example
+      "USING: prettyprint generalizations kernel"
+      "sequences.generalizations ;"
+      ""
+      "1 2 3 4 4 ndup 8 narray ."
+      "{ 1 2 3 4 1 2 3 4 }"
+  }
   "Some core words expressed in terms of " { $link ndup } ":"
     { $table
         { { $link dup } { $snippet "1 ndup" } }
@@ -178,7 +141,13 @@ HELP: nkeep
 "saved, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep 6 narray ." "{ 99 1 2 3 4 5 }" }
+  { $example
+      "USING: generalizations kernel prettyprint"
+      "sequences.generalizations ;"
+      ""
+      "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep 6 narray ."
+      "{ 99 1 2 3 4 5 }"
+  }
   "Some core words expressed in terms of " { $link nkeep } ":"
     { $table
         { { $link keep } { $snippet "1 nkeep" } }
@@ -302,46 +271,6 @@ HELP: n*quot
 }
 { $description "Construct a quotation containing the contents of " { $snippet "seq" } " repeated " { $snippet "n"} " times." } ;
 
-HELP: nappend
-{ $values
-     { "n" integer }
-     { "seq" sequence }
-}
-{ $description "Outputs a new sequence consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
-{ $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }
-{ $examples
-    { $example "USING: generalizations prettyprint math ;"
-               "{ 1 2 } { 3 4 } { 5 6 } { 7 8 } 4 nappend ."
-               "{ 1 2 3 4 5 6 7 8 }"
-    }
-} ;
-
-HELP: nappend-as
-{ $values
-     { "n" integer } { "exemplar" sequence }
-     { "seq" sequence }
-}
-{ $description "Outputs a new sequence of type " { $snippet "exemplar" } " consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
-{ $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }
-{ $examples
-    { $example "USING: generalizations prettyprint math ;"
-               "{ 1 2 } { 3 4 } { 5 6 } { 7 8 } 4 V{ } nappend-as ."
-               "V{ 1 2 3 4 5 6 7 8 }"
-    }
-} ;
-
-{ nappend nappend-as } related-words
-
-ARTICLE: "sequence-generalizations" "Generalized sequence operations"
-{ $subsections
-    narray
-    nsequence
-    firstn
-    set-firstn
-    nappend
-    nappend-as
-} ;
-
 ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
 { $subsections
     ndup
@@ -381,11 +310,10 @@ ARTICLE: "generalizations" "Generalized shuffle words and combinators"
 "macros where the arity of the input quotations depends on an "
 "input parameter."
 { $subsections
-    "sequence-generalizations"
     "shuffle-generalizations"
     "combinator-generalizations"
     "other-generalizations"
 }
-"Also see the " { $vocab-link "sequences.generalizations" } " vocabulary for generalized sequence iteration combinators." ;
+"Also see the " { $vocab-link "sequences.generalizations" } " vocabulary for generalized sequence operations." ;
 
 ABOUT: "generalizations"

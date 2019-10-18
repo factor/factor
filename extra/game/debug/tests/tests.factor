@@ -37,9 +37,9 @@ IN: game.debug.tests
     ] float-array{ } make
     mvp-matrix draw-debug-points
 
-    "Frame: " world frame-number>> number>string append
+    "Frame: " world frame#>> number>string append
     COLOR: purple { 5 5 } world dim>> draw-text
-    world [ 1 + ] change-frame-number drop ;
+    world [ 1 + ] change-frame# drop ;
 
 TUPLE: tests-world < wasd-world frame-number ;
 M: tests-world draw-world* draw-debug-tests ;
@@ -62,7 +62,7 @@ GAME: run-tests {
         { grab-input? t }
         { use-game-input? t }
         { pref-dim { 1024 768 } }
-        { tick-interval-micros $[ 60 fps ] }
+        { tick-interval-nanos $[ 60 fps ] }
     } ;
 
 MAIN: run-tests

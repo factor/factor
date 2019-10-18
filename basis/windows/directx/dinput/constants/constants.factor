@@ -1,9 +1,9 @@
-USING: windows.directx.dinput windows.kernel32 windows.ole32 windows.com
-windows.com.syntax alien alien.c-types alien.data alien.syntax
-kernel system namespaces combinators sequences fry math accessors
-macros words quotations libc continuations generalizations
-splitting locals assocs init specialized-arrays memoize
-classes.struct strings arrays ;
+USING: windows.directx.dinput windows.kernel32 windows.ole32
+windows.com windows.com.syntax alien alien.c-types alien.data
+alien.syntax kernel system namespaces combinators sequences fry
+math accessors macros words quotations libc continuations
+generalizations splitting locals assocs init specialized-arrays
+classes.struct strings arrays literals sequences.generalizations ;
 SPECIALIZED-ARRAY: DIOBJECTDATAFORMAT
 IN: windows.directx.dinput.constants
 
@@ -20,20 +20,21 @@ SYMBOLS:
 
 <PRIVATE
 
-MEMO: c-type* ( name -- c-type ) c-type ;
-MEMO: heap-size* ( c-type -- n ) heap-size ;
+: initialize ( variable quot -- )
+    call swap set-global ; inline
+
+<<
 
 GENERIC: array-base-type ( c-type -- c-type' )
 M: object array-base-type ;
-M: string array-base-type "[" split1 drop ;
 M: array array-base-type first ;
 
 : (field-spec-of) ( field struct -- field-spec )
-    c-type* fields>> [ name>> = ] with find nip ;
+    c-type fields>> [ name>> = ] with find nip ;
 : (offsetof) ( field struct -- offset )
     [ (field-spec-of) offset>> ] [ drop 0 ] if* ;
 : (sizeof) ( field struct -- size )
-    [ (field-spec-of) type>> array-base-type heap-size* ] [ drop 1 ] if* ;
+    [ (field-spec-of) type>> array-base-type heap-size ] [ drop 1 ] if* ;
 
 : (flag) ( thing -- integer )
     {
@@ -45,9 +46,9 @@ M: array array-base-type first ;
 : (flags) ( array -- n )
     0 [ (flag) bitor ] reduce ;
 
-: <DIOBJECTDATAFORMAT> ( struct {pguid-var,field,index,dwType-flags,dwFlags} -- alien )
+: <DIOBJECTDATAFORMAT> ( struct {pguid-var,field,index,dwType-flags,dwFlags} -- object )
     {
-        [ first dup word? [ get ] when ]
+        [ drop f ]
         [ second rot [ (offsetof) ] [ (sizeof) ] 2bi ]
         [ third * + ]
         [ fourth (flags) ]
@@ -55,51 +56,54 @@ M: array array-base-type first ;
     } cleave
     DIOBJECTDATAFORMAT <struct-boa> ;
 
-:: make-DIOBJECTDATAFORMAT-array ( struct array -- alien )
-    array length malloc-DIOBJECTDATAFORMAT-array :> alien
-    array [| args i |
-        struct args <DIOBJECTDATAFORMAT>
-        i alien set-nth
-    ] each-index
-    alien ;
+: make-DIOBJECTDATAFORMAT-arrays ( struct array -- values vars )
+    [ [ <DIOBJECTDATAFORMAT> ] [ first ] bi ] with
+    DIOBJECTDATAFORMAT-array{ } { } 1 2 mnmap-as ;
 
-: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
+: make-DIOBJECTDATAFORMAT-array-quot ( struct arr -- quot )
+    [ nip length ] [ make-DIOBJECTDATAFORMAT-arrays ] 2bi '[
+        _ malloc-DIOBJECTDATAFORMAT-array
+        [ _ dup byte-length memcpy ]
+        [ _ [ get >>pguid drop ] 2each ]
+        [ ] tri
+    ] ;
+
+>>
+
+MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
     [ DIDATAFORMAT heap-size DIOBJECTDATAFORMAT heap-size ] 4 ndip
-    [ nip length ] [ make-DIOBJECTDATAFORMAT-array ] 2bi
-    DIDATAFORMAT <struct-boa> ;
-
-: initialize ( symbol quot -- )
-    call swap set-global ; inline
+    [ nip length ] [ make-DIOBJECTDATAFORMAT-array-quot ] 2bi
+    '[ _ _ _ _ _ @ DIDATAFORMAT <struct-boa> ] ;
 
 : (malloc-guid-symbol) ( symbol guid -- )
-    '[ _ execute( -- value ) malloc-byte-array ] initialize ;
+    '[ _ malloc-byte-array ] initialize ;
 
 : define-guid-constants ( -- )
     {
-        { GUID_XAxis_malloced          GUID_XAxis }
-        { GUID_YAxis_malloced          GUID_YAxis }
-        { GUID_ZAxis_malloced          GUID_ZAxis }
-        { GUID_RxAxis_malloced         GUID_RxAxis }
-        { GUID_RyAxis_malloced         GUID_RyAxis }
-        { GUID_RzAxis_malloced         GUID_RzAxis }
-        { GUID_Slider_malloced         GUID_Slider }
-        { GUID_Button_malloced         GUID_Button }
-        { GUID_Key_malloced            GUID_Key }
-        { GUID_POV_malloced            GUID_POV }
-        { GUID_Unknown_malloced        GUID_Unknown }
-        { GUID_SysMouse_malloced       GUID_SysMouse }
-        { GUID_SysKeyboard_malloced    GUID_SysKeyboard }
-        { GUID_Joystick_malloced       GUID_Joystick }
-        { GUID_SysMouseEm_malloced     GUID_SysMouseEm }
-        { GUID_SysMouseEm2_malloced    GUID_SysMouseEm2 }
-        { GUID_SysKeyboardEm_malloced  GUID_SysKeyboardEm }
-        { GUID_SysKeyboardEm2_malloced GUID_SysKeyboardEm2 }
+        { GUID_XAxis_malloced          $ GUID_XAxis }
+        { GUID_YAxis_malloced          $ GUID_YAxis }
+        { GUID_ZAxis_malloced          $ GUID_ZAxis }
+        { GUID_RxAxis_malloced         $ GUID_RxAxis }
+        { GUID_RyAxis_malloced         $ GUID_RyAxis }
+        { GUID_RzAxis_malloced         $ GUID_RzAxis }
+        { GUID_Slider_malloced         $ GUID_Slider }
+        { GUID_Button_malloced         $ GUID_Button }
+        { GUID_Key_malloced            $ GUID_Key }
+        { GUID_POV_malloced            $ GUID_POV }
+        { GUID_Unknown_malloced        $ GUID_Unknown }
+        { GUID_SysMouse_malloced       $ GUID_SysMouse }
+        { GUID_SysKeyboard_malloced    $ GUID_SysKeyboard }
+        { GUID_Joystick_malloced       $ GUID_Joystick }
+        { GUID_SysMouseEm_malloced     $ GUID_SysMouseEm }
+        { GUID_SysMouseEm2_malloced    $ GUID_SysMouseEm2 }
+        { GUID_SysKeyboardEm_malloced  $ GUID_SysKeyboardEm }
+        { GUID_SysKeyboardEm2_malloced $ GUID_SysKeyboardEm2 }
     } [ first2 (malloc-guid-symbol) ] each ;
 
 : define-joystick-format-constant ( -- )
     c_dfDIJoystick2 [
         DIDF_ABSAXIS
-        DIJOYSTATE2 heap-size
+        $[ DIJOYSTATE2 heap-size ]
         DIJOYSTATE2 {
             { GUID_XAxis_malloced  "lX"           0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
             { GUID_YAxis_malloced  "lY"           0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
@@ -271,7 +275,7 @@ M: array array-base-type first ;
 : define-mouse-format-constant ( -- )
     c_dfDIMouse2 [
         DIDF_RELAXIS
-        DIMOUSESTATE2 heap-size
+        $[ DIMOUSESTATE2 heap-size ]
         DIMOUSESTATE2 {
             { GUID_XAxis_malloced  "lX"         0 {                DIDFT_ANYINSTANCE DIDFT_AXIS   } 0 }
             { GUID_YAxis_malloced  "lY"         0 {                DIDFT_ANYINSTANCE DIDFT_AXIS   } 0 }
@@ -831,7 +835,7 @@ M: array array-base-type first ;
 [ define-constants ] "windows.directx.dinput.constants" add-startup-hook
 
 : uninitialize ( variable quot -- )
-    '[ _ when* f ] change-global ; inline
+    [ [ get-global ] dip when* ] [ drop global delete-at ] 2bi ; inline
 
 : free-dinput-constants ( -- )
     {

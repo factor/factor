@@ -27,16 +27,11 @@ char *factor_vm::pinned_alien_offset(cell obj)
 	}
 }
 
-VM_C_API char *pinned_alien_offset(cell obj, factor_vm *parent)
-{
-	return parent->pinned_alien_offset(obj);
-}
-
 /* make an alien */
 cell factor_vm::allot_alien(cell delegate_, cell displacement)
 {
-	if(delegate_ == false_object && displacement == 0)
-		return false_object;
+	if(displacement == 0)
+		return delegate_;
 
 	data_root<object> delegate(delegate_,this);
 	data_root<alien> new_alien(allot<alien>(sizeof(alien)),this);
@@ -62,11 +57,6 @@ cell factor_vm::allot_alien(void *address)
 	return allot_alien(false_object,(cell)address);
 }
 
-VM_C_API cell allot_alien(void *address, factor_vm *vm)
-{
-	return vm->allot_alien(address);
-}
-
 /* make an alien pointing at an offset of another alien */
 void factor_vm::primitive_displaced_alien()
 {
@@ -90,7 +80,7 @@ void factor_vm::primitive_displaced_alien()
 if the object is a byte array, as a sanity check. */
 void factor_vm::primitive_alien_address()
 {
-	ctx->push(allot_cell((cell)pinned_alien_offset(ctx->pop())));
+	ctx->push(from_unsigned_cell((cell)pinned_alien_offset(ctx->pop())));
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
@@ -104,12 +94,12 @@ void *factor_vm::alien_pointer()
 #define DEFINE_ALIEN_ACCESSOR(name,type,from,to) \
 	VM_C_API void primitive_alien_##name(factor_vm *parent) \
 	{ \
-		parent->ctx->push(from(*(type*)(parent->alien_pointer()),parent)); \
+		parent->ctx->push(parent->from(*(type*)(parent->alien_pointer()))); \
 	} \
 	VM_C_API void primitive_set_alien_##name(factor_vm *parent) \
 	{ \
 		type *ptr = (type *)parent->alien_pointer(); \
-		type value = (type)to(parent->ctx->pop(),parent); \
+		type value = (type)parent->to(parent->ctx->pop()); \
 		*ptr = value; \
 	}
 
@@ -180,65 +170,6 @@ char *factor_vm::alien_offset(cell obj)
 		type_error(ALIEN_TYPE,obj);
 		return NULL; /* can't happen */
 	}
-}
-
-VM_C_API char *alien_offset(cell obj, factor_vm *parent)
-{
-	return parent->alien_offset(obj);
-}
-
-/* For FFI calls passing structs by value. Cannot allocate */
-void factor_vm::to_value_struct(cell src, void *dest, cell size)
-{
-	memcpy(dest,alien_offset(src),size);
-}
-
-VM_C_API void to_value_struct(cell src, void *dest, cell size, factor_vm *parent)
-{
-	return parent->to_value_struct(src,dest,size);
-}
-
-/* For FFI callbacks receiving structs by value */
-cell factor_vm::from_value_struct(void *src, cell size)
-{
-	byte_array *bytes = allot_byte_array(size);
-	memcpy(bytes->data<void>(),src,size);
-	return tag<byte_array>(bytes);
-}
-
-VM_C_API cell from_value_struct(void *src, cell size, factor_vm *parent)
-{
-	return parent->from_value_struct(src,size);
-}
-
-/* On some x86 OSes, structs <= 8 bytes are returned in registers. */
-cell factor_vm::from_small_struct(cell x, cell y, cell size)
-{
-	cell data[2];
-	data[0] = x;
-	data[1] = y;
-	return from_value_struct(data,size);
-}
-
-VM_C_API cell from_small_struct(cell x, cell y, cell size, factor_vm *parent)
-{
-	return parent->from_small_struct(x,y,size);
-}
-
-/* On OS X/PPC, complex numbers are returned in registers. */
-cell factor_vm::from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size)
-{
-	cell data[4];
-	data[0] = x1;
-	data[1] = x2;
-	data[2] = x3;
-	data[3] = x4;
-	return from_value_struct(data,size);
-}
-
-VM_C_API cell from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size, factor_vm *parent)
-{
-	return parent->from_medium_struct(x1, x2, x3, x4, size);
 }
 
 }

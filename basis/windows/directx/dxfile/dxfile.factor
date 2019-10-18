@@ -1,4 +1,4 @@
-USING: alien.syntax classes.struct windows.com
+USING: alien.syntax alien.c-types classes.struct windows.com
 windows.com.syntax windows.kernel32 windows.ole32 windows.types ;
 IN: windows.directx.dxfile
 

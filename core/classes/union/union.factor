@@ -36,7 +36,7 @@ PRIVATE>
     [ drop update-classes ]
     2tri ;
 
-M: union-class rank-class drop 2 ;
+M: union-class rank-class drop 7 ;
 
 M: union-class instance?
     "members" word-prop [ instance? ] with any? ;

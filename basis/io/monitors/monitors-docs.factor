@@ -117,8 +117,9 @@ $nl
 "An example which watches a directory for changes:"
 { $code
     "USE: io.monitors"
+    ""
     ": watch-loop ( monitor -- )"
-    "    dup next-change path>> print nl nl flush watch-loop ;"
+    "    dup next-change path>> print flush watch-loop ;"
     ""
     ": watch-directory ( path -- )"
     "    [ t [ watch-loop ] with-monitor ] with-monitors ;"

@@ -145,7 +145,7 @@ SYMBOL: +stopped+
 : associate-thread ( walker -- )
     walker-thread tset
     [ f walker-thread tget send-synchronous drop ]
-    self (>>exit-handler) ;
+    self exit-handler<< ;
 
 : start-walker-thread ( status continuation -- thread' )
     self [

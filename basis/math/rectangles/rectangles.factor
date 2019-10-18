@@ -58,10 +58,10 @@ M: rect contains-point?
     [ rect-bounds ] dip vmin <rect> ;
 
 : set-rect-bounds ( rect1 rect -- )
-    [ [ loc>> ] dip (>>loc) ]
-    [ [ dim>> ] dip (>>dim) ]
+    [ [ loc>> ] dip loc<< ]
+    [ [ dim>> ] dip dim<< ]
     2bi ; inline
 
 USE: vocabs.loader
 
-"prettyprint" "math.rectangles.prettyprint" require-when
+{ "math.rectangles" "prettyprint" } "math.rectangles.prettyprint" require-when

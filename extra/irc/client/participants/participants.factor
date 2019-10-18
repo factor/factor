@@ -37,8 +37,8 @@ M: irc-channel-chat has-participant? participants>> key? ;
 
 : apply-mode ( ? participant mode -- )
     {
-        { CHAR: o [ (>>operator) ] }
-        { CHAR: v [ (>>voice) ] }
+        { CHAR: o [ operator<< ] }
+        { CHAR: v [ voice<< ] }
         [ 3drop ]
     } case ;
 

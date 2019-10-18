@@ -64,7 +64,7 @@ GENERIC: poke ( value n bitstream -- )
     [ byte-pos>> 8 * ] [ bit-pos>> + ] bi ; inline
     
 : set-abp ( abp bitstream -- ) 
-    [ 8 /mod ] dip [ (>>bit-pos) ] [ (>>byte-pos) ] bi ; inline
+    [ 8 /mod ] dip [ bit-pos<< ] [ byte-pos<< ] bi ; inline
 
 : seek ( n bitstream -- )
     [ get-abp + ] [ set-abp ] bi ; inline
@@ -117,11 +117,11 @@ M:: lsb0-bit-writer poke ( value n bs -- )
     byte bs widthed>> |widthed :> new-byte
     new-byte #bits>> 8 = [
         new-byte bits>> bs bytes>> push
-        zero-widthed bs (>>widthed)
+        zero-widthed bs widthed<<
         remainder widthed>bytes
-        [ bs bytes>> push-all ] [ bs (>>widthed) ] bi*
+        [ bs bytes>> push-all ] [ bs widthed<< ] bi*
     ] [
-        byte bs (>>widthed)
+        byte bs widthed<<
     ] if ;
 
 : enough-bits? ( n bs -- ? )
@@ -146,10 +146,10 @@ ERROR: not-enough-bits n bit-reader ;
     n 8 /mod :> ( #bytes #bits )
     bs [ #bytes + ] change-byte-pos
     bit-pos>> #bits + dup 8 >= [
-        8 - bs (>>bit-pos)
+        8 - bs bit-pos<<
         bs [ 1 + ] change-byte-pos drop
     ] [
-        bs (>>bit-pos)
+        bs bit-pos<<
     ] if ;
 
 :: (peek) ( n bs endian> subseq-endian -- bits )

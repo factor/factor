@@ -169,7 +169,7 @@ ERROR: no-case object ;
 PRIVATE>
 
 : case>quot ( default assoc -- quot )
-    dup keys {
+    <reversed> dup keys {
         { [ dup empty? ] [ 2drop ] }
         { [ dup [ length 4 <= ] [ [ word? ] any? ] bi or ] [ drop linear-case-quot ] }
         { [ dup contiguous-range? ] [ drop dispatch-case-quot ] }

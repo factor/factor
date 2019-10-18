@@ -1,11 +1,11 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry kernel namespaces
+USING: accessors arrays assocs fry locals kernel namespaces
 sequences sequences.deep
 sets vectors
+cpu.architecture
 compiler.cfg.rpo
 compiler.cfg.def-use
-compiler.cfg.renaming
 compiler.cfg.registers
 compiler.cfg.dominance
 compiler.cfg.instructions
@@ -18,7 +18,20 @@ compiler.utilities ;
 FROM: namespaces => set ;
 IN: compiler.cfg.ssa.destruction
 
-! Maps vregs to leaders.
+! Because of the design of the register allocator, this pass
+! has three peculiar properties.
+!
+! 1) Instead of renaming vreg usages in the CFG, a map from
+! vregs to canonical representatives is computed. This allows
+! the register allocator to use the original SSA names to get
+! reaching definitions.
+! 2) Useless ##copy instructions, and all ##phi instructions,
+! are eliminated, so the register allocator does not have to
+! remove any redundant operations.
+! 3) A side effect of running this pass is that SSA liveness
+! information is computed, so the register allocator does not
+! need to compute it again.
+
 SYMBOL: leader-map
 
 : leader ( vreg -- vreg' ) leader-map get compress-path ;
@@ -28,91 +41,101 @@ SYMBOL: class-element-map
 
 : class-elements ( vreg -- elts ) class-element-map get at ;
 
+<PRIVATE
+
 ! Sequence of vreg pairs
 SYMBOL: copies
 
+: value-of ( vreg -- value )
+    dup insn-of dup ##tagged>integer? [ nip src>> ] [ drop ] if ;
+
 : init-coalescing ( -- )
-    H{ } clone leader-map set
-    H{ } clone class-element-map set
+    defs get
+    [ [ drop dup ] assoc-map leader-map set ]
+    [ [ [ dup dup value-of ] dip <vreg-info> 1array ] assoc-map class-element-map set ] bi
     V{ } clone copies set ;
 
-: classes-interfere? ( vreg1 vreg2 -- ? )
-    [ leader ] bi@ 2dup eq? [ 2drop f ] [
-        [ class-elements flatten ] bi@ sets-interfere?
-    ] if ;
-
-: update-leaders ( vreg1 vreg2 -- )
+: coalesce-leaders ( vreg1 vreg2 -- )
+    ! leader2 becomes the leader.
     swap leader-map get set-at ;
 
-: merge-classes ( vreg1 vreg2 -- )
-    [ [ class-elements ] bi@ push ]
-    [ drop class-element-map get delete-at ] 2bi ;
+: coalesce-elements ( merged vreg1 vreg2 -- )
+    ! delete leader1's class, and set leader2's class to merged.
+    class-element-map get [ delete-at ] [ set-at ] bi-curry bi* ;
 
-: eliminate-copy ( vreg1 vreg2 -- )
-    [ leader ] bi@
-    2dup eq? [ 2drop ] [
-        [ update-leaders ]
-        [ merge-classes ]
-        2bi
-    ] if ;
+: coalesce-vregs ( merged leader1 leader2 -- )
+    [ coalesce-leaders ] [ coalesce-elements ] 2bi ;
 
-: introduce-vreg ( vreg -- )
-    [ leader-map get conjoin ]
-    [ [ 1vector ] keep class-element-map get set-at ] bi ;
+:: maybe-eliminate-copy ( vreg1 vreg2 -- )
+    ! Eliminate a copy of possible.
+    vreg1 leader :> vreg1
+    vreg2 leader :> vreg2
+    vreg1 vreg2 eq? [
+        vreg1 class-elements vreg2 class-elements sets-interfere?
+        [ drop ] [ vreg1 vreg2 coalesce-vregs ] if
+    ] unless ;
 
 GENERIC: prepare-insn ( insn -- )
 
-: try-to-coalesce ( dst src -- ) 2array copies get push ;
+: maybe-eliminate-copy-later ( dst src -- )
+    2array copies get push ;
 
-M: insn prepare-insn
-    [ defs-vreg ] [ uses-vregs ] bi
-    2dup empty? not and [
-        first 
-        2dup [ rep-of ] bi@ eq?
-        [ try-to-coalesce ] [ 2drop ] if
-    ] [ 2drop ] if ;
+M: insn prepare-insn drop ;
+
+M: vreg-insn prepare-insn
+    [ temp-vregs [ leader-map get conjoin ] each ]
+    [
+        [ defs-vregs ] [ uses-vregs ] bi
+        2dup [ empty? not ] both? [
+            [ first ] bi@
+            2dup [ rep-of reg-class-of ] bi@ eq?
+            [ maybe-eliminate-copy-later ] [ 2drop ] if
+        ] [ 2drop ] if
+    ] bi ;
 
 M: ##copy prepare-insn
-    [ dst>> ] [ src>> ] bi try-to-coalesce ;
+    [ dst>> ] [ src>> ] bi maybe-eliminate-copy-later ;
+
+M: ##tagged>integer prepare-insn
+    [ dst>> ] [ src>> ] bi maybe-eliminate-copy ;
 
 M: ##phi prepare-insn
     [ dst>> ] [ inputs>> values ] bi
-    [ eliminate-copy ] with each ;
-
-: prepare-block ( bb -- )
-    instructions>> [ prepare-insn ] each ;
+    [ maybe-eliminate-copy ] with each ;
 
 : prepare-coalescing ( cfg -- )
     init-coalescing
-    defs get keys [ introduce-vreg ] each
-    [ prepare-block ] each-basic-block ;
+    [ [ prepare-insn ] each ] simple-analysis ;
 
 : process-copies ( -- )
-    copies get [
-        2dup classes-interfere?
-        [ 2drop ] [ eliminate-copy ] if
-    ] assoc-each ;
+    copies get [ maybe-eliminate-copy ] assoc-each ;
 
-: useless-copy? ( ##copy -- ? )
-    dup ##copy? [ [ dst>> ] [ src>> ] bi eq? ] [ drop f ] if ;
+GENERIC: useful-insn? ( insn -- ? )
 
-: perform-renaming ( cfg -- )
-    leader-map get keys [ dup leader ] H{ } map>assoc renamings set
-    [
-        instructions>> [
-            [ rename-insn-defs ]
-            [ rename-insn-uses ]
-            [ [ useless-copy? ] [ ##phi? ] bi or not ] tri
-        ] filter! drop
-    ] each-basic-block ;
+: useful-copy? ( insn -- ? )
+    [ dst>> leader ] [ src>> leader ] bi eq? not ; inline
+
+M: ##copy useful-insn? useful-copy? ;
+
+M: ##tagged>integer useful-insn? useful-copy? ;
+
+M: ##phi useful-insn? drop f ;
+
+M: insn useful-insn? drop t ;
+
+: cleanup-cfg ( cfg -- )
+    [ [ useful-insn? ] filter! ] simple-optimization ;
+
+PRIVATE>
 
 : destruct-ssa ( cfg -- cfg' )
     needs-dominance
 
     dup construct-cssa
     dup compute-defs
-    compute-ssa-live-sets
+    dup compute-insns
+    dup compute-ssa-live-sets
     dup compute-live-ranges
     dup prepare-coalescing
     process-copies
-    dup perform-renaming ;
+    dup cleanup-cfg ;

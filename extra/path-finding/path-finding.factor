@@ -57,8 +57,8 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
 
 : (init) ( from to astar -- )
     swap >>goal
-    H{ } clone over astar>> (>>g)
-    { } <hash-set> over astar>> (>>in-closed-set)
+    H{ } clone over astar>> g<<
+    { } <hash-set> over astar>> in-closed-set<<
     H{ } clone >>origin
     H{ } clone >>in-open-set
     <min-heap> >>open-set
@@ -77,7 +77,7 @@ M: bfs neighbours neighbours>> at ;
 PRIVATE>
 
 : find-path ( start target astar -- path/f )
-    (astar) new [ (>>astar) ] keep [ (init) ] [ (find-path) ] bi ;
+    (astar) new [ astar<< ] keep [ (init) ] [ (find-path) ] bi ;
 
 : <astar> ( neighbours cost heuristic -- astar )
     astar-simple new swap >>heuristic swap >>cost swap >>neighbours ;

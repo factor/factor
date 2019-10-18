@@ -1,8 +1,9 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel namespaces sequences math
 arrays compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.liveness.ssa compiler.cfg.rpo compiler.cfg.dominance ;
+compiler.cfg.liveness.ssa compiler.cfg.rpo
+compiler.cfg.dominance compiler.cfg ;
 IN: compiler.cfg.ssa.interference.live-ranges
 
 ! Live ranges for interference testing
@@ -11,35 +12,38 @@ IN: compiler.cfg.ssa.interference.live-ranges
 
 SYMBOLS: local-def-indices local-kill-indices ;
 
-: record-def ( n insn -- )
-    ! We allow multiple defs of a vreg as long as they're
-    ! all in the same basic block
-    defs-vreg dup [
-        local-def-indices get 2dup key?
-        [ 3drop ] [ set-at ] if
-    ] [ 2drop ] if ;
+: record-defs ( n insn -- )
+    defs-vregs [ local-def-indices get set-at ] with each ;
 
 : record-uses ( n insn -- )
     ! Record live intervals so that all but the first input interfere
     ! with the output. This lets us coalesce the output with the
     ! first input.
-    [ uses-vregs ] [ def-is-use-insn? ] bi over empty? [ 3drop ] [
+    dup uses-vregs [ 2drop ] [
+        swap def-is-use-insn?
         [ [ first local-kill-indices get set-at ] [ rest-slice ] 2bi ] unless
         [ 1 + ] dip [ local-kill-indices get set-at ] with each
-    ] if ;
+    ] if-empty ;
 
-: visit-insn ( insn n -- )
-    2 * swap [ record-def ] [ record-uses ] 2bi ;
+GENERIC: record-insn ( n insn -- )
+
+M: ##phi record-insn
+    record-defs ;
+
+M: vreg-insn record-insn
+    [ 2 * ] dip [ record-defs ] [ record-uses ] 2bi ;
+
+M: insn record-insn
+    2drop ;
 
 SYMBOLS: def-indices kill-indices ;
 
-: compute-local-live-ranges ( bb -- )
+: compute-local-live-ranges ( insns -- )
     H{ } clone local-def-indices set
     H{ } clone local-kill-indices set
-    [ instructions>> [ visit-insn ] each-index ]
-    [ [ local-def-indices get ] dip def-indices get set-at ]
-    [ [ local-kill-indices get ] dip kill-indices get set-at ]
-    tri ;
+    [ swap record-insn ] each-index
+    local-def-indices get basic-block get def-indices get set-at
+    local-kill-indices get basic-block get kill-indices get set-at ;
 
 PRIVATE>
 
@@ -48,7 +52,7 @@ PRIVATE>
 
     H{ } clone def-indices set
     H{ } clone kill-indices set
-    [ compute-local-live-ranges ] each-basic-block ;
+    [ compute-local-live-ranges ] simple-analysis ;
 
 : def-index ( vreg bb -- n )
     def-indices get at at ;

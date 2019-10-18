@@ -24,7 +24,18 @@ HELP: file-system-info
 { $values
 { "path" "a pathname string" }
 { "file-system-info" file-system-info } }
-{ $description "Returns a platform-specific object describing the file-system that contains the path. The cross-platform slot is " { $slot "free-space" } "." } ;
+{ $description "Returns a platform-specific object describing the file-system that contains the path. The cross-platform slot is " { $slot "free-space" } "." }
+{ $examples
+    { $unchecked-example
+        "USING: io.files.info io.pathnames math prettyprint ;"
+        "IN: scratchpad"
+        ""
+        ": gb ( m -- n ) 30 2^ * ;"
+        ""
+        "home file-system-info free-space>> 100 gb < ."
+        "f"
+    }
+} ;
 
 ARTICLE: "io.files.info" "File system meta-data"
 "File meta-data:"

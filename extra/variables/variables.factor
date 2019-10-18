@@ -72,7 +72,7 @@ PREDICATE: global-variable < variable
 : [global-getter] ( box -- quot )
     '[ _ value>> ] ;
 : [global-setter] ( box -- quot )
-    '[ _ (>>value) ] ;
+    '[ _ value<< ] ;
 
 : define-global ( word -- )
     global-box new [ [global-getter] ] [ [global-setter] ] bi (define-variable) ;

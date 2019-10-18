@@ -66,7 +66,7 @@ TUPLE: fluids-world < game-world
 SYMBOL: fluid
 
 : integrate ( world -- )
-    particles>> $[ 60 fps 1000000 /f ] integrate-particles! drop ;
+    particles>> 1/60 integrate-particles! drop ;
 
 : pause ( -- )
     fluid get [ not ] change-paused drop ;
@@ -78,8 +78,8 @@ M: fluids-world begin-game-world
     dup fluid set
     init-gpu
     initial-particles clone >>particles
-    "resource:extra/fluids/particle2.pgm" make-texture >>texture
-    "resource:extra/fluids/colors.ppm" make-texture >>ramp
+    "vocab:fluids/particle2.pgm" make-texture >>texture
+    "vocab:fluids/colors.ppm" make-texture >>ramp
     drop ;
 
 M: fluids-world end-game-world
@@ -108,7 +108,7 @@ GAME: fluids {
     { pixel-format-attributes {
         windowed double-buffered T{ depth-bits { value 24 } } } }
     { pref-dim { 1024 768 } }
-    { tick-interval-micros $[ 60 fps ] }
+    { tick-interval-nanos $[ 60 fps ] }
 } ;
 
 fluids-world H{

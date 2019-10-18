@@ -1,13 +1,15 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien.libraries accessors io.backend io.encodings.utf8 io.files
-io.streams.c init fry namespaces math make assocs kernel parser
-parser.notes lexer strings.parser vocabs sequences sequences.deep
-sequences.private words memory kernel.private continuations io
-vocabs.loader system strings sets vectors quotations byte-arrays
-sorting compiler.units definitions generic generic.standard
-generic.single tools.deploy.config combinators classes
-classes.builtin slots.private grouping command-line io.pathnames ;
+USING: arrays alien.libraries accessors io.backend
+io.encodings.utf8 io.files io.streams.c init fry namespaces math
+make assocs kernel parser parser.notes lexer strings.parser
+vocabs sequences sequences.deep sequences.private words memory
+kernel.private continuations io vocabs.loader system strings
+sets vectors quotations byte-arrays sorting compiler.units
+definitions generic generic.standard generic.single
+tools.deploy.config combinators combinators.private classes
+vocabs.loader.private classes.builtin slots.private grouping
+command-line io.pathnames ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
 QUALIFIED: compiler.crossref
@@ -19,6 +21,7 @@ QUALIFIED: layouts
 QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
+QUALIFIED: vocabs.loader
 FROM: alien.libraries.private => >deployed-library-path ;
 FROM: namespaces => set ;
 FROM: sets => members ;
@@ -315,7 +318,7 @@ IN: tools.deploy.shaker
         strip-io? [ io-backend , ] when
 
         { } {
-            "alarms"
+            "timers"
             "tools"
             "io.launcher"
             "random"
@@ -349,11 +352,14 @@ IN: tools.deploy.shaker
                 lexer-factory
                 print-use-hook
                 root-cache
+                require-when-vocabs
+                require-when-table
                 source-files.errors:error-types
                 source-files.errors:error-observers
                 vocabs:dictionary
                 vocabs:load-vocab-hook
                 vocabs:vocab-observers
+                vocabs.loader:add-vocab-root-hook
                 word
                 parser-notes
             } %
@@ -463,7 +469,8 @@ SYMBOL: deploy-vocab
 : startup-stripper ( -- )
     t "quiet" set-global
     f output-stream set-global
-    V{ "resource:" } clone vocab-roots set-global ;
+    [ V{ "resource:" } clone vocab-roots set-global ]
+    "vocabs.loader" startup-hooks get-global set-at ;
 
 : next-method* ( method -- quot )
     [ "method-class" word-prop ]
@@ -546,10 +553,18 @@ SYMBOL: deploy-vocab
     strip-words
     clear-megamorphic-caches ;
 
+: die-with ( error original-error -- * )
+    #! We don't want DCE to drop the error before the die call!
+    [ die 1 exit ] (( a -- * )) call-effect-unsafe ;
+
+: die-with2 ( error original-error -- * )
+    #! We don't want DCE to drop the error before the die call!
+    [ die 1 exit ] (( a b -- * )) call-effect-unsafe ;
+
 : deploy-error-handler ( quot -- )
     [
         strip-debugger?
-        [ error-continuation get call>> callstack>array die 1 exit ]
+        [ original-error get die-with2 ]
         ! Don't reference these words literally, if we're stripping the
         ! debugger out we don't want to load the prettyprinter at all
         [ [:c] execute( -- ) nl [print-error] execute( error -- ) flush ] if

@@ -156,17 +156,12 @@ M: object infer-call* \ call bad-macro-input ;
 
 \ compose [ infer-compose ] "special" set-word-prop
 
-ERROR: bad-executable obj ;
-
-M: bad-executable summary
-    drop "execute must be given a word" ;
-
 : infer-execute ( -- )
     pop-literal nip
     dup word? [
         apply-object
     ] [
-        \ bad-executable boa time-bomb
+        \ execute time-bomb
     ] if ;
 
 \ execute [ infer-execute ] "special" set-word-prop
@@ -305,7 +300,7 @@ M: bad-executable summary
 \ <callback> { integer word } { alien } define-primitive
 \ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive \ <displaced-alien> make-flushable
 \ <string> { integer integer } { string } define-primitive \ <string> make-flushable
-\ <tuple> { tuple-layout } { tuple } define-primitive \ <tuple> make-flushable
+\ <tuple> { array } { tuple } define-primitive \ <tuple> make-flushable
 \ <wrapper> { object } { wrapper } define-primitive \ <wrapper> make-foldable
 \ alien-address { alien } { integer } define-primitive \ alien-address make-flushable
 \ alien-cell { c-ptr integer } { pinned-c-ptr } define-primitive \ alien-cell make-flushable
@@ -349,6 +344,7 @@ M: bad-executable summary
 \ both-fixnums? { object object } { object } define-primitive
 \ byte-array>bignum { byte-array } { bignum } define-primitive \ byte-array>bignum make-foldable
 \ callstack { } { callstack } define-primitive \ callstack make-flushable
+\ callstack-bounds { } { alien alien } define-primitive \ callstack-bounds make-flushable
 \ callstack-for { c-ptr } { callstack } define-primitive \ callstack make-flushable
 \ callstack>array { callstack } { array } define-primitive \ callstack>array make-flushable
 \ check-datastack { array integer integer } { object } define-primitive \ check-datastack make-flushable
@@ -398,7 +394,6 @@ M: bad-executable summary
 \ float* { float float } { float } define-primitive \ float* make-foldable
 \ float+ { float float } { float } define-primitive \ float+ make-foldable
 \ float- { float float } { float } define-primitive \ float- make-foldable
-\ float-mod { float float } { float } define-primitive \ float-mod make-foldable
 \ float-u< { float float } { object } define-primitive \ float-u< make-foldable
 \ float-u<= { float float } { object } define-primitive \ float-u<= make-foldable
 \ float-u> { float float } { object } define-primitive \ float-u> make-foldable
@@ -412,6 +407,7 @@ M: bad-executable summary
 \ float>bignum { float } { bignum } define-primitive \ float>bignum make-foldable
 \ float>bits { real } { integer } define-primitive \ float>bits make-foldable
 \ float>fixnum { float } { fixnum } define-primitive \ bignum>fixnum make-foldable
+\ fpu-state { } { } define-primitive
 \ fputc { object alien } { } define-primitive
 \ fread { integer alien } { object } define-primitive
 \ fseek { integer integer alien } { } define-primitive
@@ -430,9 +426,9 @@ M: bad-executable summary
 \ quot-compiled? { quotation } { object } define-primitive
 \ quotation-code { quotation } { integer integer } define-primitive \ quotation-code make-flushable
 \ reset-dispatch-stats { } { } define-primitive
-\ resize-array { integer array } { array } define-primitive \ resize-array make-flushable
-\ resize-byte-array { integer byte-array } { byte-array } define-primitive \ resize-byte-array make-flushable
-\ resize-string { integer string } { string } define-primitive \ resize-string make-flushable
+\ resize-array { integer array } { array } define-primitive
+\ resize-byte-array { integer byte-array } { byte-array } define-primitive
+\ resize-string { integer string } { string } define-primitive
 \ retainstack { } { array } define-primitive \ retainstack make-flushable
 \ retainstack-for { c-ptr } { array } define-primitive \ retainstack-for make-flushable
 \ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
@@ -449,17 +445,16 @@ M: bad-executable summary
 \ set-alien-unsigned-8 { integer c-ptr integer } { } define-primitive
 \ set-alien-unsigned-cell { integer c-ptr integer } { } define-primitive
 \ set-context-object { object fixnum } { } define-primitive
+\ set-fpu-state { } { } define-primitive
 \ set-innermost-frame-quot { quotation callstack } { } define-primitive
 \ set-slot { object object fixnum } { } define-primitive
 \ set-special-object { object fixnum } { } define-primitive
 \ set-string-nth-fast { fixnum fixnum string } { } define-primitive
-\ set-string-nth-slow { fixnum fixnum string } { } define-primitive
 \ size { object } { fixnum } define-primitive \ size make-flushable
 \ slot { object fixnum } { object } define-primitive \ slot make-flushable
 \ special-object { fixnum } { object } define-primitive \ special-object make-flushable
-\ string-nth { fixnum string } { fixnum } define-primitive \ string-nth make-flushable
+\ string-nth-fast { fixnum string } { fixnum } define-primitive \ string-nth-fast make-flushable
 \ strip-stack-traces { } { } define-primitive
-\ system-micros { } { integer } define-primitive \ system-micros make-flushable
 \ tag { object } { fixnum } define-primitive \ tag make-foldable
 \ unimplemented { } { } define-primitive
 \ word-code { word } { integer integer } define-primitive \ word-code make-flushable

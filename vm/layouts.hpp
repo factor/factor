@@ -23,6 +23,11 @@ inline static cell align(cell a, cell b)
 	return (a + (b-1)) & ~(b-1);
 }
 
+inline static cell alignment_for(cell a, cell b)
+{
+	return align(a,b) - a;
+}
+
 static const cell data_alignment = 16;
 
 #define WORD_SIZE (signed)(sizeof(cell)*8)
@@ -91,8 +96,6 @@ inline static cell tag_fixnum(fixnum untagged)
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
-struct object;
-
 #define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
 
 struct object {
@@ -100,7 +103,10 @@ struct object {
 	cell header;
 
 	cell size() const;
+	template<typename Fixup> cell size(Fixup fixup) const;
+
 	cell binary_payload_start() const;
+	template<typename Fixup> cell binary_payload_start(Fixup fixup) const;
 
 	cell *slots() const { return (cell *)this; }
 
@@ -205,8 +211,6 @@ struct string : public object {
 	cell hashcode;
 
 	u8 *data() const { return (u8 *)(this + 1); }
-
-	cell nth(cell i) const;
 };
 
 struct code_block;

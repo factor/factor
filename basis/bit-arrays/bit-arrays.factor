@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.data accessors math alien.accessors kernel
-kernel.private sequences sequences.private byte-arrays
-parser prettyprint.custom fry ;
+USING: alien alien.data accessors io.binary math math.bitwise
+alien.accessors kernel kernel.private sequences
+sequences.private byte-arrays parser prettyprint.custom fry
+locals ;
 IN: bit-arrays
 
 TUPLE: bit-array
@@ -13,11 +14,10 @@ TUPLE: bit-array
 
 : n>byte ( m -- n ) -3 shift ; inline
 
-: byte/bit ( n alien -- byte bit )
-    over n>byte alien-unsigned-1 swap 7 bitand ; inline
+: bit/byte ( n -- bit byte ) [ 7 bitand ] [ n>byte ] bi ; inline
 
-: set-bit ( ? byte bit -- byte )
-    2^ rot [ bitor ] [ bitnot bitand ] if ; inline
+: bit-index ( n bit-array -- bit# byte# byte-array )
+    [ >fixnum bit/byte ] [ underlying>> ] bi* ; inline
 
 : bits>cells ( m -- n ) 31 + -5 shift ; inline
 
@@ -25,7 +25,7 @@ TUPLE: bit-array
 
 : (set-bits) ( bit-array n -- )
     [ [ length bits>cells ] keep ] dip swap underlying>>
-    '[ 2 shift [ _ _ ] dip set-alien-unsigned-4 ] each-integer ; inline
+    '[ [ _ _ ] dip 4 * set-alien-unsigned-4 ] each-integer ; inline
 
 : clean-up ( bit-array -- )
     ! Zero bits after the end.
@@ -47,12 +47,13 @@ PRIVATE>
 M: bit-array length length>> ; inline
 
 M: bit-array nth-unsafe
-    [ >fixnum ] [ underlying>> ] bi* byte/bit bit? ; inline
+    bit-index nth-unsafe swap bit? ; inline
+
+:: toggle-bit ( ? n x -- y )
+    x n ? [ set-bit ] [ clear-bit ] if ; inline
 
 M: bit-array set-nth-unsafe
-    [ >fixnum ] [ underlying>> ] bi*
-    [ byte/bit set-bit ] 2keep
-    swap n>byte set-alien-unsigned-1 ; inline
+    bit-index [ toggle-bit ] change-nth-unsafe ; inline
 
 GENERIC: clear-bits ( bit-array -- )
 
@@ -83,25 +84,17 @@ M: bit-array resize
     bit-array boa
     dup clean-up ; inline
 
-M: bit-array byte-length length 7 + -3 shift ; inline
+M: bit-array byte-length length bits>bytes ; inline
 
 SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
 
 : integer>bit-array ( n -- bit-array )
-    dup 0 = [
-        <bit-array>
-    ] [
-        [ log2 1 + <bit-array> 0 ] keep
-        [ dup 0 = ] [
-            [ pick underlying>> pick set-alien-unsigned-1 ] keep
-            [ 1 + ] [ -8 shift ] bi*
-        ] until 2drop
-    ] if ;
+    dup 0 =
+    [ <bit-array> ]
+    [ dup log2 1 + [ nip ] [ bits>bytes >le ] 2bi bit-array boa ] if ;
 
 : bit-array>integer ( bit-array -- n )
-    0 swap underlying>> dup length iota <reversed> [
-        alien-unsigned-1 swap 8 shift bitor
-    ] with each ;
+    underlying>> le> ;
 
 INSTANCE: bit-array sequence
 

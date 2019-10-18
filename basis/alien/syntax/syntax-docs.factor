@@ -1,6 +1,6 @@
 IN: alien.syntax
-USING: alien alien.c-types alien.parser alien.libraries
-classes.struct help.markup help.syntax see ;
+USING: alien alien.c-types alien.enums alien.libraries classes.struct
+help.markup help.syntax see ;
 
 HELP: DLL"
 { $syntax "DLL\" path\"" }
@@ -69,16 +69,15 @@ HELP: TYPEDEF:
 { $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
 { $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
 
-HELP: C-ENUM:
-{ $syntax "C-ENUM: type/f words... ;" }
+HELP: ENUM:
+{ $syntax "ENUM: type words... ;" "ENUM: type < base-type words..." }
 { $values { "type" "a name to typedef to int or f" } { "words" "a sequence of word names" } }
-{ $description "Creates a sequence of word definitions in the current vocabulary. Each word pushes an integer according to the rules of C enums." }
-{ $notes "This word emulates a C-style " { $snippet "enum" } " in Factor. While this feature can be used for any purpose, using integer constants is discouraged unless it is for interfacing with C libraries. Factor code should use " { $link "words.symbol" } " or " { $link "singletons" } " instead." }
+{ $description "Creates a c-type that boxes and unboxes integer values to symbols. A symbol is defined for each member word. The base c-type can optionally be specified and defaults to " { $link int } ". A constructor word " { $snippet "<type>" } " is defined for converting from integers to singletons. The generic word " { $link enum>number } " converts from singletons to integers. Enum-typed values are automatically prettyprinted as their singleton words. Unrecognizing enum numbers are kept as numbers." }
 { $examples
     "Here is an example enumeration definition:"
-    { $code "C-ENUM: color_t red { green 3 } blue ;" }
-    "It is equivalent to the following series of definitions:"
-    { $code "CONSTANT: red 0" "CONSTANT: green 3" "CONSTANT: blue 4" }
+    { $code "ENUM: color_t red { green 3 } blue ;" }
+    "The following expression returns true:"
+    { $code "3 <color_t> [ green = ] [ enum>number 3 = ] bi and" }
 } ;
 
 HELP: C-TYPE:
@@ -119,10 +118,6 @@ HELP: typedef
 { $notes "Using this word in the same source file which defines C bindings can cause problems, because words are compiled before top-level forms are run. Use the " { $link POSTPONE: TYPEDEF: } " word instead." } ;
 
 { POSTPONE: TYPEDEF: typedef } related-words
-
-HELP: c-struct?
-{ $values { "c-type" "a C type" } { "?" "a boolean" } }
-{ $description "Tests if a C type is a structure defined by " { $link POSTPONE: STRUCT: } "." } ;
 
 HELP: C-GLOBAL:
 { $syntax "C-GLOBAL: type name" }

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms arrays assocs calendar colors.constants
+USING: accessors timers arrays assocs calendar colors.constants
 combinators combinators.short-circuit documents
 documents.elements fry grouping kernel locals make math
 math.functions math.order math.ranges math.rectangles
@@ -15,7 +15,7 @@ IN: ui.gadgets.editors
 TUPLE: editor < line-gadget
 caret-color
 caret mark
-focused? blink blink-alarm ;
+focused? blink blink-timer ;
 
 <PRIVATE
 
@@ -60,14 +60,11 @@ SYMBOL: blink-interval
 750 milliseconds blink-interval set-global
 
 : stop-blinking ( editor -- )
-    [ [ cancel-alarm ] when* f ] change-blink-alarm drop ;
+    blink-timer>> [ stop-timer ] when* ;
 
 : start-blinking ( editor -- )
-    [ stop-blinking ] [
-        t >>blink
-        dup '[ _ blink-caret ] blink-interval get every
-        >>blink-alarm drop
-    ] bi ;
+    t >>blink
+    blink-timer>> [ restart-timer ] when* ;
 
 : restart-blinking ( editor -- )
     dup focused?>> [
@@ -80,10 +77,15 @@ PRIVATE>
 
 M: editor graft*
     [ dup caret>> activate-editor-model ]
-    [ dup mark>> activate-editor-model ] bi ;
+    [ dup mark>> activate-editor-model ]
+    [
+        [
+            '[ _ blink-caret ] blink-interval get dup <timer>
+        ] keep blink-timer<<
+    ] tri ;
 
 M: editor ungraft*
-    [ stop-blinking ]
+    [ [ stop-blinking ] [ f >>blink-timer drop ] bi ]
     [ dup caret>> deactivate-editor-model ]
     [ dup mark>> deactivate-editor-model ] tri ;
 

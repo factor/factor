@@ -5,8 +5,9 @@ io.encodings.utf8 hashtables kernel namespaces sequences
 vocabs.loader vocabs.metadata io combinators calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
 strings arrays prettyprint words vocabs sorting sets classes
-math alien urls splitting ascii combinators.short-circuit alarms
+math alien urls splitting ascii combinators.short-circuit timers
 words.symbol system summary ;
+FROM: sets => members ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -22,7 +23,9 @@ M: bad-developer-name summary
 
 <PRIVATE
 
-: vocab-root? ( string -- ? ) vocab-roots get member? ;
+: vocab-root? ( string -- ? )
+    trim-tail-separators
+    vocab-roots get member? ;
 
 : contains-dot? ( string -- ? ) ".." swap subseq? ;
 
@@ -128,7 +131,7 @@ M: bad-developer-name summary
         { "ch" "a character" }
         { "word" word }
         { "array" array }
-        { "alarm" alarm }
+        { "timers" timer }
         { "duration" duration }
         { "path" "a pathname string" }
         { "vocab" "a vocabulary specifier" }
@@ -162,15 +165,20 @@ M: bad-developer-name summary
 : 4bl ( -- )
     "    " write ; inline
 
+: ?print-nl ( seq1 seq2 -- )
+    [ empty? ] either? [ nl ] unless ;
+
 : $values. ( word -- )
     "declared-effect" word-prop [
         [ in>> ] [ out>> ] bi
         2dup [ empty? ] bi@ and [
             2drop
         ] [
+            [ members ] dip over diff
             "{ $values" print
-            [ 4bl ($values.) ]
-            [ [ nl 4bl ($values.) ] unless-empty ] bi*
+            [ drop 4bl ($values.) ]
+            [ ?print-nl ]
+            [ nip 4bl ($values.) ] 2tri
             nl "}" print
         ] if
     ] when* ;

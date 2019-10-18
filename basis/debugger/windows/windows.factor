@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs debugger io kernel literals math.parser namespaces
-prettyprint sequences system windows.kernel32 ;
+USING: accessors assocs debugger io kernel literals math.parser
+namespaces prettyprint sequences system windows.kernel32
+windows.ole32 windows.errors math ;
 IN: debugger.windows
 
 CONSTANT: seh-names
@@ -41,3 +42,14 @@ CONSTANT: seh-names
 M: windows signal-error.
     "Windows exception 0x" write
     third [ >hex write ] [ seh-name. ] bi nl ;
+
+M: ole32-error error.
+    "COM error 0x" write
+    dup code>> HEX: ffff,ffff bitand >hex write ": " write
+    message>> write ;
+
+M: windows-error error.
+    "Win32 error 0x" write
+    dup n>> HEX: ffff,ffff bitand >hex write ": " write
+    string>> write ;
+

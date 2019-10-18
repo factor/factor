@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs strings kernel sorting namespaces
-sequences definitions sets ;
+sequences definitions sets combinators ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -82,9 +82,6 @@ ERROR: bad-vocab-name name ;
 
 : check-vocab-name ( name -- name )
     dup string? [ bad-vocab-name ] unless ;
-
-SYMBOL: conditional-requires
-conditional-requires [ H{ } clone ] initialize
 
 : create-vocab ( name -- vocab )
     check-vocab-name

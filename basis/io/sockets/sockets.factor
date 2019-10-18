@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman,
+! Copyright (C) 2007, 2010 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: generic kernel io.backend namespaces continuations sequences
@@ -6,7 +6,7 @@ arrays io.encodings io.ports io.streams.duplex io.encodings.ascii
 alien.strings io.binary accessors destructors classes byte-arrays
 parser alien.c-types math.parser splitting grouping math assocs
 summary system vocabs.loader combinators present fry vocabs.parser
-classes.struct alien.data ;
+classes.struct alien.data strings ;
 IN: io.sockets
 
 << {
@@ -16,6 +16,8 @@ IN: io.sockets
 
 ! Addressing
 <PRIVATE
+
+UNION: ?string string POSTPONE: f ;
 
 GENERIC: protocol-family ( addrspec -- af )
 
@@ -31,6 +33,8 @@ GENERIC: inet-ntop ( data addrspec -- str )
 
 GENERIC: inet-pton ( str addrspec -- data )
 
+GENERIC# with-port 1 ( addrspec port -- addrspec )
+
 : make-sockaddr/size ( addrspec -- sockaddr size )
     [ make-sockaddr ] [ sockaddr-size ] bi ;
 
@@ -39,80 +43,88 @@ GENERIC: inet-pton ( str addrspec -- data )
 
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 
+M: f parse-sockaddr nip ;
+
 HOOK: sockaddr-of-family os ( alien af -- sockaddr )
 
 HOOK: addrspec-of-family os ( af -- addrspec )
 
 PRIVATE>
 
-TUPLE: abstract-inet host port ;
-
-M: abstract-inet present
-    [ host>> ":" ] [ port>> number>string ] bi 3append ;
-
-TUPLE: local path ;
+TUPLE: local { path read-only } ;
 
 : <local> ( path -- addrspec )
     normalize-path local boa ;
 
 M: local present path>> "Unix domain socket: " prepend ;
 
-TUPLE: inet4 < abstract-inet ;
+SLOT: port
+
+TUPLE: ipv4 { host ?string read-only } ;
+
+C: <ipv4> ipv4
+
+M: ipv4 inet-ntop ( data addrspec -- str )
+    drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
+
+<PRIVATE
+
+ERROR: malformed-ipv4 sequence ;
+
+ERROR: bad-ipv4-component string ;
+
+: parse-ipv4 ( string -- seq )
+    "." split dup length 4 = [ malformed-ipv4 ] unless
+    [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as ;
+
+ERROR: invalid-ipv4 string reason ;
+
+M: invalid-ipv4 summary drop "Invalid IPv4 address" ;
+
+PRIVATE>
+
+M: ipv4 inet-pton ( str addrspec -- data )
+    drop [ parse-ipv4 ] [ invalid-ipv4 ] recover ;
+
+M: ipv4 address-size drop 4 ;
+
+M: ipv4 protocol-family drop PF_INET ;
+
+M: ipv4 sockaddr-size drop sockaddr-in heap-size ;
+
+M: ipv4 empty-sockaddr drop sockaddr-in <struct> ;
+
+M: ipv4 make-sockaddr ( inet -- sockaddr )
+    sockaddr-in <struct>
+        AF_INET >>family
+        swap
+        [ port>> htons >>port ]
+        [ host>> "0.0.0.0" or ]
+        [ inet-pton *uint >>addr ] tri ;
+
+M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
+    [ addr>> <uint> ] dip inet-ntop <ipv4> ;
+
+TUPLE: inet4 < ipv4 { port integer read-only } ;
 
 C: <inet4> inet4
 
-M: inet4 inet-ntop ( data addrspec -- str )
-    drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
-
-ERROR: malformed-inet4 sequence ;
-ERROR: bad-inet4-component string ;
-
-: parse-inet4 ( string -- seq )
-    "." split dup length 4 = [
-        malformed-inet4
-    ] unless
-    [
-        string>number
-        [ "Dotted component not a number" throw ] unless*
-    ] B{ } map-as ;
-
-ERROR: invalid-inet4 string reason ;
-
-M: invalid-inet4 summary drop "Invalid IPv4 address" ;
-
-M: inet4 inet-pton ( str addrspec -- data )
-    drop
-    [ parse-inet4 ] [ invalid-inet4 ] recover ;
-
-M: inet4 address-size drop 4 ;
-
-M: inet4 protocol-family drop PF_INET ;
-
-M: inet4 sockaddr-size drop sockaddr-in heap-size ;
-
-M: inet4 empty-sockaddr drop sockaddr-in <struct> ;
-
-M: inet4 make-sockaddr ( inet -- sockaddr )
-    sockaddr-in <struct>
-        AF_INET >>family
-        swap [ port>> htons >>port ]
-            [ host>> "0.0.0.0" or ]
-            [ inet-pton *uint >>addr ] tri ;
+M: ipv4 with-port [ host>> ] dip <inet4> ;
 
 M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
-    [ [ addr>> <uint> ] dip inet-ntop ]
-    [ drop port>> ntohs ] 2bi <inet4> ;
+    [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
-TUPLE: inet6 < abstract-inet ;
+M: inet4 present
+    [ host>> ] [ port>> number>string ] bi ":" glue ;
 
-C: <inet6> inet6
+TUPLE: ipv6 { host ?string read-only } ;
 
-M: inet6 inet-ntop ( data addrspec -- str )
+C: <ipv6> ipv6
+
+M: ipv6 inet-ntop ( data addrspec -- str )
     drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
 
-ERROR: invalid-inet6 string reason ;
-
-M: invalid-inet6 summary drop "Invalid IPv6 address" ;
+ERROR: invalid-ipv6 string reason ;
 
 <PRIVATE
 
@@ -120,55 +132,67 @@ ERROR: bad-ipv6-component obj ;
 
 ERROR: bad-ipv4-embedded-prefix obj ;
 
+ERROR: more-than-8-components ;
+
 : parse-ipv6-component ( seq -- seq' )
     [ dup hex> [ nip ] [ bad-ipv6-component ] if* ] { } map-as ;
 
-: parse-inet6 ( string -- seq )
+: parse-ipv6 ( string -- seq )
     [ f ] [
         ":" split CHAR: . over last member? [
             unclip-last
-            [ parse-ipv6-component ] [ parse-inet4 ] bi* append
+            [ parse-ipv6-component ] [ parse-ipv4 ] bi* append
         ] [
             parse-ipv6-component
         ] if
     ] if-empty ;
 
-: pad-inet6 ( string1 string2 -- seq )
+: pad-ipv6 ( string1 string2 -- seq )
     2dup [ length ] bi@ + 8 swap -
-    dup 0 < [ "More than 8 components" throw ] when
+    dup 0 < [ more-than-8-components ] when
     <byte-array> glue ;
 
-: inet6-bytes ( seq -- bytes )
+: ipv6-bytes ( seq -- bytes )
     [ 2 >be ] { } map-as B{ } concat-as ;
 
 PRIVATE>
 
-M: inet6 inet-pton ( str addrspec -- data )
+M: ipv6 inet-pton ( str addrspec -- data )
     drop
-    [
-        "::" split1 [ parse-inet6 ] bi@ pad-inet6 inet6-bytes
-    ] [ invalid-inet6 ] recover ;
+    [ "::" split1 [ parse-ipv6 ] bi@ pad-ipv6 ipv6-bytes ]
+    [ invalid-ipv6 ]
+    recover ;
 
-M: inet6 address-size drop 16 ;
+M: ipv6 address-size drop 16 ;
 
-M: inet6 protocol-family drop PF_INET6 ;
+M: ipv6 protocol-family drop PF_INET6 ;
 
-M: inet6 sockaddr-size drop sockaddr-in6 heap-size ;
+M: ipv6 sockaddr-size drop sockaddr-in6 heap-size ;
 
-M: inet6 empty-sockaddr drop sockaddr-in6 <struct> ;
+M: ipv6 empty-sockaddr drop sockaddr-in6 <struct> ;
 
-M: inet6 make-sockaddr ( inet -- sockaddr )
+M: ipv6 make-sockaddr ( inet -- sockaddr )
     sockaddr-in6 <struct>
         AF_INET6 >>family
-        swap [ port>> htons >>port ]
-            [ host>> "::" or ]
-            [ inet-pton >>addr ] tri ;
+        swap
+        [ port>> htons >>port ]
+        [ host>> "::" or ]
+        [ inet-pton >>addr ] tri ;
+
+M: ipv6 parse-sockaddr
+    [ addr>> ] dip inet-ntop <ipv6> ;
+
+TUPLE: inet6 < ipv6 { port integer read-only } ;
+
+C: <inet6> inet6
+
+M: ipv6 with-port [ host>> ] dip <inet6> ;
 
 M: inet6 parse-sockaddr
-    [ [ addr>> ] dip inet-ntop ]
-    [ drop port>> ntohs ] 2bi <inet6> ;
+    [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
-M: f parse-sockaddr nip ;
+M: inet6 present
+    [ host>> ] [ port>> number>string ] bi ":" glue ;
 
 <PRIVATE
 
@@ -247,16 +271,10 @@ HOOK: (send) io-backend ( packet addrspec datagram -- )
 
 HOOK: addrinfo-error io-backend ( n -- )
 
-: resolve-passive-host ( -- addrspecs )
-    { T{ inet6 f "::" f } T{ inet4 f "0.0.0.0" f } } [ clone ] map ;
-
 : prepare-addrinfo ( -- addrinfo )
     addrinfo <struct>
         PF_UNSPEC >>family
         IPPROTO_TCP >>protocol ;
-
-: fill-in-ports ( addrspecs port -- addrspecs )
-    '[ _ >>port ] map ;
 
 PRIVATE>
 
@@ -306,21 +324,34 @@ SYMBOL: remote-address
 
 GENERIC: resolve-host ( addrspec -- seq )
 
-TUPLE: inet < abstract-inet ;
+TUPLE: hostname { host ?string read-only } ;
+
+TUPLE: inet < hostname port ;
+
+M: inet present
+    [ host>> ] [ port>> number>string ] bi ":" glue ;
 
 C: <inet> inet
 
+M: string resolve-host
+    f prepare-addrinfo f <void*>
+    [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
+    [ parse-addrinfo-list ] keep freeaddrinfo ;
+
+M: hostname resolve-host
+    host>> resolve-host ;
+
 M: inet resolve-host
-    [ port>> ] [ host>> ] bi [
-        f prepare-addrinfo f <void*>
-        [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
-        [ parse-addrinfo-list ] keep freeaddrinfo
-    ] [ resolve-passive-host ] if*
-    swap fill-in-ports ;
+    [ call-next-method ] [ port>> ] bi '[ _ with-port ] map ;
 
-M: f resolve-host drop { } ;
+M: inet4 resolve-host 1array ;
 
-M: object resolve-host 1array ;
+M: inet6 resolve-host 1array ;
+
+M: local resolve-host 1array ;
+
+M: f resolve-host
+    drop { T{ ipv6 f "::" } T{ ipv4 f "0.0.0.0" } } ;
 
 : host-name ( -- string )
     256 <byte-array> dup dup length gethostname

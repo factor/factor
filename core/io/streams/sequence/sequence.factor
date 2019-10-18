@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences io io.streams.plain kernel accessors math math.order
-growable destructors ;
+growable destructors combinators ;
 IN: io.streams.sequence
 
 ! Readers
@@ -46,3 +46,12 @@ M: growable stream-write push-all ;
 M: growable stream-flush drop ;
 
 INSTANCE: growable plain-writer
+
+! Seeking
+: (stream-seek) ( n seek-type stream -- )
+    swap {
+        { seek-absolute [ i<< ] }
+        { seek-relative [ [ + ] change-i drop ] }
+        { seek-end [ [ underlying>> length + ] [ i<< ] bi ] }
+        [ bad-seek-type ]
+    } case ;

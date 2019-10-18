@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system io.files io.pathnames namespaces kernel accessors
-assocs ;
+USING: calendar system io.files io.pathnames namespaces kernel
+accessors assocs ;
 IN: mason.config
 
 ! (Optional) Location for build directories
@@ -16,11 +16,6 @@ SYMBOL: builder-from
 
 ! Who receives build report e-mails.
 SYMBOL: builder-recipients
-
-! (Optional) twitter credentials for status updates.
-SYMBOL: builder-twitter-username
-
-SYMBOL: builder-twitter-password
 
 ! (Optional) CPU architecture to build for.
 SYMBOL: target-cpu
@@ -39,24 +34,36 @@ target-os get-global [
 ! Keep test-log around?
 SYMBOL: builder-debug
 
-! Host to send status notifications to.
-SYMBOL: status-host
+! URL for counter notifications.
+SYMBOL: counter-url
+
+counter-url [ "http://builds.factorcode.org/counter" ] initialize
+
+! URL for status notifications.
+SYMBOL: status-url
+
+status-url [ "http://builds.factorcode.org/status-update" ] initialize
+
+! Password for status notifications.
+SYMBOL: status-secret
+
+SYMBOL: upload-docs?
+
+! The below are only needed if upload-docs? is true.
+
+! Host to upload docs to
+SYMBOL: docs-host
 
 ! Username to log in.
-SYMBOL: status-username
-
-SYMBOL: upload-help?
-
-! The below are only needed if upload-help is true.
-
-! Host with HTML help
-SYMBOL: help-host
-
-! Username to log in.
-SYMBOL: help-username
+SYMBOL: docs-username
 
 ! Directory to upload docs to.
-SYMBOL: help-directory
+SYMBOL: docs-directory
+
+! URL to notify server about new docs
+SYMBOL: docs-update-url
+
+docs-update-url [ "http://builds.factorcode.org/docs-update" ] initialize
 
 ! Boolean. Do we release binaries and update the clean branch?
 SYMBOL: upload-to-factorcode?
@@ -89,6 +96,10 @@ SYMBOL: upload-username
 
 ! Directory with binary packages.
 SYMBOL: upload-directory
+
+! Upload timeout
+SYMBOL: upload-timeout
+1 hours upload-timeout set-global
 
 ! Optional: override ssh and scp command names
 SYMBOL: scp-command

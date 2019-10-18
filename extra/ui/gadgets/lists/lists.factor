@@ -78,7 +78,7 @@ M: list focusable-child* drop t ;
     dup list-empty? [
         2drop
     ] [
-        [ control-value length rem ] [ (>>index) ] [ ] tri
+        [ control-value length rem ] [ index<< ] [ ] tri
         [ relayout-1 ] [ scroll>selected ] bi
     ] if ;
 

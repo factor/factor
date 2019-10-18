@@ -1,5 +1,13 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax quotations io.pathnames ;
 IN: io.directories.hierarchy
+
+HELP: directory-tree-files
+{ $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
+{ $description "Outputs a sequence of all files and subdirectories inside the directory named by " { $snippet "path" } " or recursively inside its subdirectories." } ;
+
+HELP: with-directory-tree-files
+{ $values { "path" "a pathname string" } { "quot" quotation } }
+{ $description "Calls the quotation with the recursive directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
 
 HELP: delete-tree
 { $values { "path" "a pathname string" } }
@@ -30,6 +38,11 @@ $nl
 { $list
     { "Words named " { $snippet { $emphasis "operation" } "-file" } " which work on regular files only." }
     { "Words named " { $snippet { $emphasis "operation" } "-tree" } " works on directory trees recursively, and also accepts regular files." }
+}
+"Listing directory trees recursively:"
+{ $subsections
+    directory-tree-files
+    with-directory-tree-files
 }
 "Deleting directory trees recursively:"
 { $subsections delete-tree }

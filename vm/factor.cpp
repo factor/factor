@@ -23,7 +23,7 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->callstack_size = 128 * sizeof(cell);
 #endif
 
-	p->code_size = 8 * sizeof(cell);
+	p->code_size = 64;
 	p->young_size = sizeof(cell) / 4;
 	p->aging_size = sizeof(cell) / 2;
 	p->tenured_size = 24 * sizeof(cell);
@@ -123,13 +123,13 @@ void factor_vm::init_factor(vm_parameters *p)
 	if(p->image_path == NULL)
 		p->image_path = default_image_path();
 
-	srand((unsigned int)system_micros());
+	srand((unsigned int)nano_count());
 	init_ffi();
 	init_contexts(p->datastack_size,p->retainstack_size,p->callstack_size);
 	init_callbacks(p->callback_size);
 	load_image(p);
 	init_c_io();
-	init_inline_caching(p->max_pic_size);
+	init_inline_caching((int)p->max_pic_size);
 	if(p->signals)
 		init_signals();
 

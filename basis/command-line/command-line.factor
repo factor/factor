@@ -28,7 +28,7 @@ SYMBOL: command-line
 : load-vocab-roots ( -- )
     "user-init" get [
         "factor-roots" rc-path dup exists? [
-            utf8 file-lines [ add-vocab-root ] each
+            utf8 file-lines harvest [ add-vocab-root ] each
         ] [ drop ] if
     ] when ;
 

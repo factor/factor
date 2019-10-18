@@ -30,15 +30,17 @@ void factor_vm::collect_to_tenured()
 	collector.trace_roots();
 	collector.trace_contexts();
 
-	current_gc->event->started_card_scan();
+	gc_event *event = current_gc->event;
+
+	if(event) event->started_card_scan();
 	collector.trace_cards(data->tenured,
 		card_points_to_aging,
 		full_unmarker());
-	current_gc->event->ended_card_scan(collector.cards_scanned,collector.decks_scanned);
+	if(event) event->ended_card_scan(collector.cards_scanned,collector.decks_scanned);
 
-	current_gc->event->started_code_scan();
+	if(event) event->started_code_scan();
 	collector.trace_code_heap_roots(&code->points_to_aging);
-	current_gc->event->ended_code_scan(collector.code_blocks_scanned);
+	if(event) event->ended_code_scan(collector.code_blocks_scanned);
 
 	collector.tenure_reachable_objects();
 

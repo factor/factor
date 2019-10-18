@@ -33,6 +33,8 @@ $nl
     3array
     4array
 }
+"Resizing arrays:"
+{ $subsections resize-array }
 "The class of two-element arrays:"
 { $subsections pair }
 "Arrays can be accessed without bounds checks in a pointer unsafe way."
@@ -69,9 +71,10 @@ HELP: 4array
 { $values { "w" object } { "x" object } { "y" object } { "z" object } { "array" array } }
 { $description "Create a new array with four elements, with " { $snippet "w" } " appearing first." } ;
 
-HELP: resize-array ( n array -- newarray )
-{ $values { "n" "a non-negative integer" } { "array" array } { "newarray" "a new array" } }
-{ $description "Creates a new array of " { $snippet "n" } " elements. The contents of the existing array are copied into the new array; if the new array is shorter, only an initial segment is copied, and if the new array is longer the remaining space is filled in with "{ $link f } "." } ;
+HELP: resize-array ( n array -- new-array )
+{ $values { "n" "a non-negative integer" } { "array" array } { "new-array" array } }
+{ $description "Resizes the array to have a length of " { $snippet "n" } " elements. When making the array shorter, this word may either create a new array or modify the existing array in place. When making the array longer, this word always allocates a new array, filling remaining space with " { $link f } "." }
+{ $side-effects "array" } ;
 
 HELP: pair
 { $class-description "The class of two-element arrays, known as pairs." } ;

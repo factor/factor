@@ -54,15 +54,15 @@ ARTICLE: "syntax-integers" "Integer syntax"
 "More information on integers can be found in " { $link "integers" } "." ;
 
 ARTICLE: "syntax-ratios" "Ratio syntax"
-"The printed representation of a ratio is a pair of integers separated by a slash (/), prefixed by an optional whole number part followed by a plus (+). No intermediate whitespace is permitted. Here are some examples:"
+"The printed representation of a ratio is a pair of integers separated by a slash (" { $snippet "/" } "). A ratio can also be written as a proper fraction by following an integer part with " { $snippet "+" } " or " { $snippet "-" } " (matching the sign of the integer) and a ratio. No intermediate whitespace is permitted within a ratio literal. Here are some examples:"
 { $code
     "75/33"
     "1/10"
     "-5/-6"
     "1+1/3"
-    "-10+1/7"
+    "-10-1/7"
 }
-"More information on ratios can be found in " { $link "rationals" } ;
+"More information on ratios can be found in " { $link "rationals" } "." ;
 
 ARTICLE: "syntax-floats" "Float syntax"
 "Floating point literals are specified when a literal number contains a decimal point or exponent. Exponents are marked by an " { $snippet "e" } " or " { $snippet "E" } ":"

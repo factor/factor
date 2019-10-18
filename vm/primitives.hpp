@@ -35,6 +35,7 @@ namespace factor
 	_(byte_array_to_bignum) \
 	_(callback) \
 	_(callstack) \
+	_(callstack_bounds) \
 	_(callstack_for) \
 	_(callstack_to_array) \
 	_(check_datastack) \
@@ -77,7 +78,6 @@ namespace factor
 	_(float_greatereq) \
 	_(float_less) \
 	_(float_lesseq) \
-	_(float_mod) \
 	_(float_multiply) \
 	_(float_subtract) \
 	_(float_to_bignum) \
@@ -119,14 +119,11 @@ namespace factor
 	_(set_slot) \
 	_(set_special_object) \
 	_(set_string_nth_fast) \
-	_(set_string_nth_slow) \
 	_(size) \
 	_(sleep) \
 	_(special_object) \
 	_(string) \
-	_(string_nth) \
 	_(strip_stack_traces) \
-	_(system_micros) \
 	_(tuple) \
 	_(tuple_boa) \
 	_(unimplemented) \
@@ -140,14 +137,14 @@ namespace factor
 	_(unsigned_cell,cell,from_unsigned_cell,to_cell) \
 	_(signed_8,s64,from_signed_8,to_signed_8) \
 	_(unsigned_8,u64,from_unsigned_8,to_unsigned_8) \
-	_(signed_4,s32,from_signed_4,to_fixnum) \
-	_(unsigned_4,u32,from_unsigned_4,to_cell) \
-	_(signed_2,s16,from_signed_2,to_fixnum) \
-	_(unsigned_2,u16,from_unsigned_2,to_cell) \
-	_(signed_1,s8,from_signed_1,to_fixnum) \
-	_(unsigned_1,u8,from_unsigned_1,to_cell) \
-	_(float,float,from_float,to_float) \
-	_(double,double,from_double,to_double) \
+	_(signed_4,s32,from_signed_cell,to_fixnum) \
+	_(unsigned_4,u32,from_unsigned_cell,to_cell) \
+	_(signed_2,s16,from_signed_cell,to_fixnum) \
+	_(unsigned_2,u16,from_unsigned_cell,to_cell) \
+	_(signed_1,s8,from_signed_cell,to_fixnum) \
+	_(unsigned_1,u8,from_unsigned_cell,to_cell) \
+	_(float,float,allot_float,to_float) \
+	_(double,double,allot_float,to_double) \
 	_(cell,void *,allot_alien,pinned_alien_offset)
 
 #define DECLARE_PRIMITIVE(name) VM_C_API void primitive_##name(factor_vm *parent);

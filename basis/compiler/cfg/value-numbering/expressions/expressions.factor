@@ -1,77 +1,85 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.algebra classes.parser
-classes.tuple combinators combinators.short-circuit fry
+USING: accessors arrays classes classes.algebra combinators fry
 generic.parser kernel math namespaces quotations sequences slots
-splitting words compiler.cfg.instructions
+words make sets
+compiler.cfg.instructions
 compiler.cfg.instructions.syntax
 compiler.cfg.value-numbering.graph ;
+FROM: sequences.private => set-array-nth ;
 IN: compiler.cfg.value-numbering.expressions
-
-TUPLE: constant-expr < expr value ;
-
-C: <constant> constant-expr
-
-M: constant-expr equal?
-    over constant-expr? [
-        [ value>> ] bi@
-        2dup [ float? ] both? [ fp-bitwise= ] [
-            { [ [ class ] bi@ = ] [ = ] } 2&&
-        ] if
-    ] [ 2drop f ] if ;
-
-TUPLE: reference-expr < expr value ;
-
-C: <reference> reference-expr
-
-M: reference-expr equal?
-    over reference-expr? [ [ value>> ] bi@ eq? ] [ 2drop f ] if ;
-
-M: reference-expr hashcode*
-    nip value>> identity-hashcode ;
-
-: constant>vn ( constant -- vn ) <constant> expr>vn ; inline
-
-GENERIC: >expr ( insn -- expr )
-
-M: insn >expr drop next-input-expr ;
-
-M: ##load-immediate >expr val>> <constant> ;
-
-M: ##load-reference >expr obj>> <reference> ;
-
-M: ##load-constant >expr obj>> <constant> ;
 
 <<
 
+GENERIC: >expr ( insn -- expr )
+
 : input-values ( slot-specs -- slot-specs' )
-    [ type>> { use literal constant } member-eq? ] filter ;
+    [ type>> { use literal } member-eq? ] filter ;
 
-: expr-class ( insn -- expr )
-    name>> "##" ?head drop "-expr" append create-class-in ;
+: slot->expr-quot ( slot-spec -- quot )
+    [ name>> reader-word 1quotation ]
+    [
+        type>> {
+            { use [ [ vreg>vn ] ] }
+            { literal [ [ ] ] }
+        } case
+    ] bi append ;
 
-: define-expr-class ( insn expr slot-specs -- )
-    [ nip expr ] dip [ name>> ] map define-tuple-class ;
+: narray-quot ( length -- quot )
+    [
+        [ , [ f <array> ] % ]
+        [ 
+            dup iota [
+                - 1 - , [ swap [ set-array-nth ] keep ] %
+            ] with each
+        ] bi
+    ] [ ] make ;
 
-: >expr-quot ( expr slot-specs -- quot )
-     [
-        [ name>> reader-word 1quotation ]
+: >expr-quot ( insn slot-specs -- quot )
+    [
+        [ literalize , \ swap , ]
         [
-            type>> {
-                { use [ [ vreg>vn ] ] }
-                { literal [ [ ] ] }
-                { constant [ [ constant>vn ] ] }
-            } case
-        ] bi append
-    ] map cleave>quot swap suffix \ boa suffix ;
+            [ [ slot->expr-quot ] map cleave>quot % ]
+            [ length 1 + narray-quot % ]
+            bi
+        ] bi*
+    ] [ ] make ;
 
-: define->expr-method ( insn expr slot-specs -- )
-    [ 2drop \ >expr create-method-in ] [ >expr-quot nip ] 3bi define ;
+: define->expr-method ( insn slot-specs -- )
+    [ drop \ >expr create-method-in ] [ >expr-quot ] 2bi define ;
 
-: handle-pure-insn ( insn -- )
-    [ ] [ expr-class ] [ "insn-slots" word-prop input-values ] tri
-    [ define-expr-class ] [ define->expr-method ] 3bi ;
-
-insn-classes get [ pure-insn class<= ] filter [ handle-pure-insn ] each
+insn-classes get
+[ foldable-insn class<= ] filter
+{ ##copy ##load-integer ##load-reference } diff
+[
+    dup "insn-slots" word-prop input-values
+    define->expr-method
+] each
 
 >>
+
+TUPLE: integer-expr value ;
+
+C: <integer-expr> integer-expr
+
+TUPLE: reference-expr value ;
+
+C: <reference-expr> reference-expr
+
+M: reference-expr equal?
+    over reference-expr? [
+        [ value>> ] bi@
+        2dup [ float? ] both?
+        [ fp-bitwise= ] [ eq? ] if
+    ] [ 2drop f ] if ;
+
+M: reference-expr hashcode*
+    nip value>> dup float? [ double>bits ] [ identity-hashcode ] if ;
+
+M: insn >expr drop input-expr-counter counter neg ;
+
+M: ##copy >expr "Fail" throw ;
+
+M: ##load-integer >expr val>> <integer-expr> ;
+
+M: ##load-reference >expr obj>> <reference-expr> ;

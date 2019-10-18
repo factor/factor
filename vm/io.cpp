@@ -190,7 +190,10 @@ void factor_vm::primitive_fgetc()
 
 	int c = safe_fgetc(file);
 	if(c == EOF && feof(file))
+	{
+		clearerr(file);
 		ctx->push(false_object);
+	}
 	else
 		ctx->push(tag_fixnum(c));
 }
@@ -208,13 +211,17 @@ void factor_vm::primitive_fread()
 
 	data_root<byte_array> buf(allot_uninitialized_array<byte_array>(size),this);
 
-	int c = safe_fread(buf.untagged() + 1,1,size,file);
+	size_t c = safe_fread(buf.untagged() + 1,1,size,file);
 	if(c == 0)
+	{
+		clearerr(file);
 		ctx->push(false_object);
+	}
 	else
 	{
 		if(feof(file))
 		{
+			clearerr(file);
 			byte_array *new_buf = allot_byte_array(c);
 			memcpy(new_buf->data<char>(), buf->data<char>(),c);
 			buf = new_buf;
@@ -228,7 +235,7 @@ void factor_vm::primitive_fputc()
 {
 	FILE *file = pop_file_handle();
 	fixnum ch = to_fixnum(ctx->pop());
-	safe_fputc(ch, file);
+	safe_fputc((int)ch, file);
 }
 
 void factor_vm::primitive_fwrite()
@@ -254,8 +261,8 @@ void factor_vm::primitive_ftell()
 void factor_vm::primitive_fseek()
 {
 	FILE *file = pop_file_handle();
-	int whence = to_fixnum(ctx->pop());
-	off_t offset = to_signed_8(ctx->pop());
+	int whence = (int)to_fixnum(ctx->pop());
+	off_t offset = (off_t)to_signed_8(ctx->pop());
 	safe_fseek(file,offset,whence);
 }
 

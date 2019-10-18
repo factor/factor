@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io io.encodings.ascii io.files kernel sequences
-assocs math.parser namespaces regexp ;
+assocs math.parser namespaces regexp benchmark.knucleotide ;
 IN: benchmark.regex-dna
 
 ! Based on http://shootout.alioth.debian.org/gp4/benchmark.php?test=regexdna&lang=ruby&id=1
@@ -55,6 +55,6 @@ SYMBOL: clen
     length number>string print ;
 
 : regex-dna-main ( -- )
-    "resource:extra/benchmark/regex-dna/regex-dna-test-in.txt" regex-dna ;
+    knucleotide-in regex-dna ;
 
 MAIN: regex-dna-main

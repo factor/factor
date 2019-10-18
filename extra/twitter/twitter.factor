@@ -1,17 +1,50 @@
-! Copyright (C) 2009 Joe Groff.
+! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators hashtables http
 http.client json.reader kernel macros namespaces sequences
-urls.secure fry ;
+urls.secure fry oauth urls system ;
 IN: twitter
 
 ! Configuration
-SYMBOLS: twitter-username twitter-password twitter-source ;
+SYMBOLS: twitter-source twitter-consumer-token twitter-access-token ;
 
 twitter-source [ "factor" ] initialize
 
-: set-twitter-credentials ( username password -- )
-    [ twitter-username set ] [ twitter-password set ] bi* ;
+<PRIVATE
+
+: with-twitter-oauth ( quot -- )
+    [
+        twitter-consumer-token get consumer-token set
+        twitter-access-token get access-token set
+        call
+    ] with-scope ; inline
+
+: twitter-url ( string -- string' )
+    os windows?
+    "http://twitter.com/"
+    "https://twitter.com/" ? prepend ;
+
+PRIVATE>
+
+: obtain-twitter-request-token ( -- request-token )
+    [
+        "oauth/request_token" twitter-url
+        <request-token-params>
+        obtain-request-token
+    ] with-twitter-oauth ;
+
+: twitter-authorize-url ( token -- url )
+    "oauth/authorize" twitter-url >url
+        swap key>> "oauth_token" set-query-param ;
+
+: obtain-twitter-access-token ( request-token verifier -- access-token )
+    [
+        [ "oauth/access_token" twitter-url ] 2dip
+        <access-token-params>
+            swap >>verifier
+            swap >>request-token
+        obtain-access-token
+    ] with-twitter-oauth ;
 
 <PRIVATE
 
@@ -20,12 +53,11 @@ MACRO: keys-boa ( keys class -- )
     [ [ '[ _ swap at ] ] map ] dip '[ _ cleave _ boa ] ;
 
 ! Twitter requests
-
-: twitter-url ( string -- url )
-    "https://twitter.com/statuses/" ".json" surround ;
+: status-url ( string -- url )
+    "statuses/" ".json" surround twitter-url ;
 
 : set-request-twitter-auth ( request -- request )
-    twitter-username get twitter-password get set-basic-auth ;
+    [ <oauth-request-params> set-oauth ] with-twitter-oauth ;
 
 : twitter-request ( request -- data )
     set-request-twitter-auth
@@ -45,6 +77,7 @@ TUPLE: twitter-status
     in-reply-to-user-id
     favorited?
     user ;
+
 TUPLE: twitter-user
     id
     name
@@ -103,7 +136,7 @@ PRIVATE>
     ] H{ } make-assoc ;
 
 : (tweet) ( string -- json )
-    update-post-data "update" twitter-url
+    update-post-data "update" status-url
     <post-request> twitter-request ;
 
 PRIVATE>
@@ -117,7 +150,7 @@ PRIVATE>
 <PRIVATE
 
 : timeline ( url -- tweets )
-    twitter-url <get-request>
+    status-url <get-request>
     twitter-request json>twitter-statuses ;
 
 PRIVATE>

@@ -84,13 +84,16 @@ DEFER: byte-bit-count
 
 GENERIC: (bit-count) ( x -- n )
 
-M: fixnum (bit-count)
+: fixnum-bit-count ( x -- n )
     0 swap [
         dup 0 >
     ] [
         [ 8 bits byte-bit-count ] [ -8 shift ] bi
         [ + ] dip
     ] while drop ;
+
+M: fixnum (bit-count)
+    fixnum-bit-count ; inline
 
 M: bignum (bit-count)
     dup 0 = [ drop 0 ] [

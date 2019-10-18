@@ -8,14 +8,6 @@ THREADHANDLE start_thread(void *(*start_routine)(void *), void *args)
 	return (void *)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0);
 }
 
-u64 system_micros()
-{
-	FILETIME t;
-	GetSystemTimeAsFileTime(&t);
-	return (((u64)t.dwLowDateTime | (u64)t.dwHighDateTime<<32)
-		- EPOCH_OFFSET) / 10;
-}
-
 u64 nano_count()
 {
 	static double scale_factor;
@@ -58,7 +50,7 @@ void sleep_nanos(u64 nsec)
 LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
 	c->ESP = (cell)fix_callstack_top((stack_frame *)c->ESP);
-	signal_callstack_top = (stack_frame *)c->ESP;
+	ctx->callstack_top = (stack_frame *)c->ESP;
 
 	switch (e->ExceptionCode)
 	{
@@ -80,6 +72,8 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, 
 		signal_fpu_status = fpu_status(MXCSR(c));
 #else
 		signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
+
+		/* This seems to have no effect */
 		X87SW(c) = 0;
 #endif
 		MXCSR(c) &= 0xffffffc0;

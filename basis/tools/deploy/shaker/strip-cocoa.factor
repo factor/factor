@@ -13,12 +13,6 @@ IN: tools.deploy.shaker.cocoa
 
 : pool-values ( assoc -- assoc' ) [ pool-array ] assoc-map ;
 
-IN: cocoa.application
-
-: objc-error ( error -- ) die ;
-
-[ [ die ] 19 set-special-object ] "cocoa.application" add-startup-hook
-
 H{ } clone \ pool [
     global [
         ! Only keeps those methods that we actually call

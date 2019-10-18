@@ -55,7 +55,7 @@ GENERIC: handle-client* ( threaded-server -- )
 
 : listen-on ( threaded-server -- addrspecs )
     [ secure>> >secure ] [ insecure>> >insecure ] bi
-    [ resolve-host ] bi@ append ;
+    [ dup [ resolve-host ] when ] bi@ append ;
 
 : accepted-connection ( remote local -- )
     [

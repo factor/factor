@@ -52,24 +52,24 @@ SYNTAX: RULE:
     swap position-attrs <matcher> ;
 
 : shared-tag-attrs ( -- )
-    { "TYPE" string>token (>>body-token) } , ; inline
+    { "TYPE" string>token body-token<< } , ; inline
 
 : parse-delegate ( string -- pair )
     "::" split1 [ rule-set get swap ] unless* 2array ;
 
 : delegate-attr ( -- )
-    { "DELEGATE" f (>>delegate) } , ;
+    { "DELEGATE" f delegate<< } , ;
 
 : regexp-attr ( -- )
-    { "HASH_CHAR" f (>>chars) } , ;
+    { "HASH_CHAR" f chars<< } , ;
 
 : match-type-attr ( -- )
-    { "MATCH_TYPE" string>match-type (>>match-token) } , ;
+    { "MATCH_TYPE" string>match-type match-token<< } , ;
 
 : span-attrs ( -- )
-    { "NO_LINE_BREAK" string>boolean (>>no-line-break?) } ,
-    { "NO_WORD_BREAK" string>boolean (>>no-word-break?) } ,
-    { "NO_ESCAPE" string>boolean (>>no-escape?) } , ;
+    { "NO_LINE_BREAK" string>boolean no-line-break?<< } ,
+    { "NO_WORD_BREAK" string>boolean no-word-break?<< } ,
+    { "NO_ESCAPE" string>boolean no-escape?<< } , ;
 
 : literal-start ( -- )
     [ parse-literal-matcher >>start drop ] , ;

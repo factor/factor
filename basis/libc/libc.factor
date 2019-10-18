@@ -24,16 +24,16 @@ FUNCTION-ALIAS: set-errno
 LIBRARY: libc
 
 FUNCTION-ALIAS: (malloc)
-    void* malloc ( ulong size ) ;
+    void* malloc ( size_t size ) ;
 
 FUNCTION-ALIAS: (calloc)
-    void* calloc ( ulong count,  ulong size ) ;
+    void* calloc ( size_t count,  size_t size ) ;
 
 FUNCTION-ALIAS: (free)
     void free ( void* alien ) ;
 
 FUNCTION-ALIAS: (realloc)
-    void* realloc ( void* alien, ulong size ) ;
+    void* realloc ( void* alien, size_t size ) ;
 
 <PRIVATE
 
@@ -91,14 +91,17 @@ PRIVATE>
 : free ( alien -- )
     >c-ptr [ delete-malloc ] [ (free) ] bi ;
 
+FUNCTION: void memset ( void* buf, int char, size_t size ) ;
+
 FUNCTION: void memcpy ( void* dst, void* src, ulong size ) ;
 
 FUNCTION: int memcmp ( void* a, void* b, ulong size ) ;
 
-: memory= ( a b size -- ? )
-    memcmp 0 = ;
+: memory= ( a b size -- ? ) memcmp 0 = ; inline
 
 FUNCTION: size_t strlen ( c-string alien ) ;
+
+FUNCTION: int system ( c-string command ) ;
 
 DESTRUCTOR: free
 DESTRUCTOR: (free)

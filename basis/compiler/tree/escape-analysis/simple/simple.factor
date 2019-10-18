@@ -100,4 +100,5 @@ M: #alien-node escape-analysis*
     [ out-d>> unknown-allocations ]
     bi ;
 
-M: #alien-callback escape-analysis* drop ;
+M: #alien-callback escape-analysis*
+    child>> (escape-analysis) ;

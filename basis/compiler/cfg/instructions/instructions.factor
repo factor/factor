@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces words
-math math.order layouts classes.algebra classes.union
-compiler.units alien byte-arrays compiler.constants combinators
-compiler.cfg.registers compiler.cfg.instructions.syntax ;
+math math.order layouts classes.union compiler.units alien
+byte-arrays combinators compiler.cfg.registers
+compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
 
 <<
@@ -13,33 +13,57 @@ V{ } clone insn-classes set-global
 
 : new-insn ( ... class -- insn ) f swap boa ; inline
 
-! Virtual CPU instructions, used by CFG and machine IRs
+! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
+
+! Instructions which use vregs
+TUPLE: vreg-insn < insn ;
+
+! Instructions which do not have side effects; used for
+! dead code elimination
+TUPLE: flushable-insn < vreg-insn ;
 
 ! Instructions which are referentially transparent; used for
 ! value numbering
-TUPLE: pure-insn < insn ;
+TUPLE: foldable-insn < flushable-insn ;
+
+! Constants
+FOLDABLE-INSN: ##load-integer
+def: dst/int-rep
+literal: val ;
+
+FOLDABLE-INSN: ##load-reference
+def: dst/tagged-rep
+literal: obj ;
+
+! These four are inserted by representation selection
+FLUSHABLE-INSN: ##load-tagged
+def: dst/tagged-rep
+literal: val ;
+
+FLUSHABLE-INSN: ##load-float
+def: dst/float-rep
+literal: val ;
+
+FLUSHABLE-INSN: ##load-double
+def: dst/double-rep
+literal: val ;
+
+FLUSHABLE-INSN: ##load-vector
+def: dst
+literal: val rep ;
 
 ! Stack operations
-INSN: ##load-immediate
-def: dst/int-rep
-constant: val ;
-
-INSN: ##load-reference
-def: dst/int-rep
-constant: obj ;
-
-INSN: ##load-constant
-def: dst/int-rep
-constant: obj ;
-
-INSN: ##peek
-def: dst/int-rep
+FLUSHABLE-INSN: ##peek
+def: dst/tagged-rep
 literal: loc ;
 
-INSN: ##replace
-use: src/int-rep
+VREG-INSN: ##replace
+use: src/tagged-rep
 literal: loc ;
+
+INSN: ##replace-imm
+literal: src loc ;
 
 INSN: ##inc-d
 literal: n ;
@@ -54,818 +78,807 @@ literal: word ;
 INSN: ##jump
 literal: word ;
 
+INSN: ##prologue ;
+
+INSN: ##epilogue ;
+
 INSN: ##return ;
 
 ! Dummy instruction that simply inhibits TCO
 INSN: ##no-tco ;
 
 ! Jump tables
-INSN: ##dispatch
+VREG-INSN: ##dispatch
 use: src/int-rep
 temp: temp/int-rep ;
 
 ! Slot access
-INSN: ##slot
-def: dst/int-rep
-use: obj/int-rep slot/int-rep ;
+FLUSHABLE-INSN: ##slot
+def: dst/tagged-rep
+use: obj/tagged-rep slot/int-rep
+literal: scale tag ;
 
-INSN: ##slot-imm
-def: dst/int-rep
-use: obj/int-rep
+FLUSHABLE-INSN: ##slot-imm
+def: dst/tagged-rep
+use: obj/tagged-rep
 literal: slot tag ;
 
-INSN: ##set-slot
-use: src/int-rep obj/int-rep slot/int-rep ;
+VREG-INSN: ##set-slot
+use: src/tagged-rep obj/tagged-rep slot/int-rep
+literal: scale tag ;
 
-INSN: ##set-slot-imm
-use: src/int-rep obj/int-rep
+VREG-INSN: ##set-slot-imm
+use: src/tagged-rep obj/tagged-rep
 literal: slot tag ;
 
-! String element access
-INSN: ##string-nth
-def: dst/int-rep
-use: obj/int-rep index/int-rep
-temp: temp/int-rep ;
-
-INSN: ##set-string-nth-fast
-use: src/int-rep obj/int-rep index/int-rep
-temp: temp/int-rep ;
-
-PURE-INSN: ##copy
+! Register transfers
+FOLDABLE-INSN: ##copy
 def: dst
 use: src
 literal: rep ;
 
+FOLDABLE-INSN: ##tagged>integer
+def: dst/int-rep
+use: src/tagged-rep ;
+
 ! Integer arithmetic
-PURE-INSN: ##add
+FOLDABLE-INSN: ##add
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##add-imm
+FOLDABLE-INSN: ##add-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+literal: src2 ;
 
-PURE-INSN: ##sub
+FOLDABLE-INSN: ##sub
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##sub-imm
+FOLDABLE-INSN: ##sub-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+literal: src2 ;
 
-PURE-INSN: ##mul
+FOLDABLE-INSN: ##mul
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##mul-imm
+FOLDABLE-INSN: ##mul-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+literal: src2 ;
 
-PURE-INSN: ##and
+FOLDABLE-INSN: ##and
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##and-imm
+FOLDABLE-INSN: ##and-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+literal: src2 ;
 
-PURE-INSN: ##or
+FOLDABLE-INSN: ##or
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##or-imm
+FOLDABLE-INSN: ##or-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+literal: src2 ;
 
-PURE-INSN: ##xor
+FOLDABLE-INSN: ##xor
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##xor-imm
+FOLDABLE-INSN: ##xor-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+literal: src2 ;
 
-PURE-INSN: ##shl
+FOLDABLE-INSN: ##shl
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##shl-imm
+FOLDABLE-INSN: ##shl-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+literal: src2 ;
 
-PURE-INSN: ##shr
+FOLDABLE-INSN: ##shr
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##shr-imm
+FOLDABLE-INSN: ##shr-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+literal: src2 ;
 
-PURE-INSN: ##sar
+FOLDABLE-INSN: ##sar
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##sar-imm
+FOLDABLE-INSN: ##sar-imm
 def: dst/int-rep
 use: src1/int-rep
-constant: src2 ;
+literal: src2 ;
 
-PURE-INSN: ##min
+FOLDABLE-INSN: ##min
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##max
+FOLDABLE-INSN: ##max
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
-PURE-INSN: ##not
+FOLDABLE-INSN: ##not
 def: dst/int-rep
 use: src/int-rep ;
 
-PURE-INSN: ##neg
+FOLDABLE-INSN: ##neg
 def: dst/int-rep
 use: src/int-rep ;
 
-PURE-INSN: ##log2
+FOLDABLE-INSN: ##log2
+def: dst/int-rep
+use: src/int-rep ;
+
+FOLDABLE-INSN: ##bit-count
 def: dst/int-rep
 use: src/int-rep ;
 
 ! Float arithmetic
-PURE-INSN: ##add-float
+FOLDABLE-INSN: ##add-float
 def: dst/double-rep
 use: src1/double-rep src2/double-rep ;
 
-PURE-INSN: ##sub-float
+FOLDABLE-INSN: ##sub-float
 def: dst/double-rep
 use: src1/double-rep src2/double-rep ;
 
-PURE-INSN: ##mul-float
+FOLDABLE-INSN: ##mul-float
 def: dst/double-rep
 use: src1/double-rep src2/double-rep ;
 
-PURE-INSN: ##div-float
+FOLDABLE-INSN: ##div-float
 def: dst/double-rep
 use: src1/double-rep src2/double-rep ;
 
-PURE-INSN: ##min-float
+FOLDABLE-INSN: ##min-float
 def: dst/double-rep
 use: src1/double-rep src2/double-rep ;
 
-PURE-INSN: ##max-float
+FOLDABLE-INSN: ##max-float
 def: dst/double-rep
 use: src1/double-rep src2/double-rep ;
 
-PURE-INSN: ##sqrt
+FOLDABLE-INSN: ##sqrt
 def: dst/double-rep
 use: src/double-rep ;
 
-! libc intrinsics
-PURE-INSN: ##unary-float-function
-def: dst/double-rep
-use: src/double-rep
-literal: func ;
-
-PURE-INSN: ##binary-float-function
-def: dst/double-rep
-use: src1/double-rep src2/double-rep
-literal: func ;
-
 ! Single/double float conversion
-PURE-INSN: ##single>double-float
+FOLDABLE-INSN: ##single>double-float
 def: dst/double-rep
 use: src/float-rep ;
 
-PURE-INSN: ##double>single-float
+FOLDABLE-INSN: ##double>single-float
 def: dst/float-rep
 use: src/double-rep ;
 
 ! Float/integer conversion
-PURE-INSN: ##float>integer
+FOLDABLE-INSN: ##float>integer
 def: dst/int-rep
 use: src/double-rep ;
 
-PURE-INSN: ##integer>float
+FOLDABLE-INSN: ##integer>float
 def: dst/double-rep
 use: src/int-rep ;
 
 ! SIMD operations
-PURE-INSN: ##zero-vector
+FOLDABLE-INSN: ##zero-vector
 def: dst
 literal: rep ;
 
-PURE-INSN: ##fill-vector
+FOLDABLE-INSN: ##fill-vector
 def: dst
 literal: rep ;
 
-PURE-INSN: ##gather-vector-2
+FOLDABLE-INSN: ##gather-vector-2
 def: dst
 use: src1/scalar-rep src2/scalar-rep
 literal: rep ;
 
-PURE-INSN: ##gather-vector-4
+FOLDABLE-INSN: ##gather-int-vector-2
+def: dst
+use: src1/int-rep src2/int-rep
+literal: rep ;
+
+FOLDABLE-INSN: ##gather-vector-4
 def: dst
 use: src1/scalar-rep src2/scalar-rep src3/scalar-rep src4/scalar-rep
 literal: rep ;
 
-PURE-INSN: ##shuffle-vector
+FOLDABLE-INSN: ##gather-int-vector-4
+def: dst
+use: src1/int-rep src2/int-rep src3/int-rep src4/int-rep
+literal: rep ;
+
+FOLDABLE-INSN: ##select-vector
+def: dst/int-rep
+use: src
+literal: n rep ;
+
+FOLDABLE-INSN: ##shuffle-vector
 def: dst
 use: src shuffle
 literal: rep ;
 
-PURE-INSN: ##shuffle-vector-imm
+FOLDABLE-INSN: ##shuffle-vector-halves-imm
+def: dst
+use: src1 src2
+literal: shuffle rep ;
+
+FOLDABLE-INSN: ##shuffle-vector-imm
 def: dst
 use: src
 literal: shuffle rep ;
 
-PURE-INSN: ##tail>head-vector
+FOLDABLE-INSN: ##tail>head-vector
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##merge-vector-head
+FOLDABLE-INSN: ##merge-vector-head
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##merge-vector-tail
+FOLDABLE-INSN: ##merge-vector-tail
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##signed-pack-vector
+FOLDABLE-INSN: ##float-pack-vector
+def: dst
+use: src
+literal: rep ;
+
+FOLDABLE-INSN: ##signed-pack-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##unsigned-pack-vector
+FOLDABLE-INSN: ##unsigned-pack-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##unpack-vector-head
+FOLDABLE-INSN: ##unpack-vector-head
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##unpack-vector-tail
+FOLDABLE-INSN: ##unpack-vector-tail
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##integer>float-vector
+FOLDABLE-INSN: ##integer>float-vector
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##float>integer-vector
+FOLDABLE-INSN: ##float>integer-vector
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##compare-vector
+FOLDABLE-INSN: ##compare-vector
 def: dst
 use: src1 src2
 literal: rep cc ;
 
-PURE-INSN: ##test-vector
-def: dst/int-rep
+FOLDABLE-INSN: ##test-vector
+def: dst/tagged-rep
 use: src1
 temp: temp/int-rep
 literal: rep vcc ;
 
-INSN: ##test-vector-branch
+VREG-INSN: ##test-vector-branch
 use: src1
 temp: temp/int-rep
 literal: rep vcc ;
 
-INSN: _test-vector-branch
-literal: label
-use: src1
-temp: temp/int-rep
-literal: rep vcc ;
-
-PURE-INSN: ##add-vector
+FOLDABLE-INSN: ##add-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##saturated-add-vector
+FOLDABLE-INSN: ##saturated-add-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##add-sub-vector
+FOLDABLE-INSN: ##add-sub-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##sub-vector
+FOLDABLE-INSN: ##sub-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##saturated-sub-vector
+FOLDABLE-INSN: ##saturated-sub-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##mul-vector
+FOLDABLE-INSN: ##mul-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##mul-high-vector
+FOLDABLE-INSN: ##mul-high-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##mul-horizontal-add-vector
+FOLDABLE-INSN: ##mul-horizontal-add-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##saturated-mul-vector
+FOLDABLE-INSN: ##saturated-mul-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##div-vector
+FOLDABLE-INSN: ##div-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##min-vector
+FOLDABLE-INSN: ##min-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##max-vector
+FOLDABLE-INSN: ##max-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##avg-vector
+FOLDABLE-INSN: ##avg-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##dot-vector
+FOLDABLE-INSN: ##dot-vector
 def: dst/scalar-rep
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##sad-vector
+FOLDABLE-INSN: ##sad-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##horizontal-add-vector
+FOLDABLE-INSN: ##horizontal-add-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##horizontal-sub-vector
+FOLDABLE-INSN: ##horizontal-sub-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##horizontal-shl-vector-imm
+FOLDABLE-INSN: ##horizontal-shl-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
 
-PURE-INSN: ##horizontal-shr-vector-imm
+FOLDABLE-INSN: ##horizontal-shr-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
 
-PURE-INSN: ##abs-vector
+FOLDABLE-INSN: ##abs-vector
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##sqrt-vector
+FOLDABLE-INSN: ##sqrt-vector
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##and-vector
+FOLDABLE-INSN: ##and-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##andn-vector
+FOLDABLE-INSN: ##andn-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##or-vector
+FOLDABLE-INSN: ##or-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##xor-vector
+FOLDABLE-INSN: ##xor-vector
 def: dst
 use: src1 src2
 literal: rep ;
 
-PURE-INSN: ##not-vector
+FOLDABLE-INSN: ##not-vector
 def: dst
 use: src
 literal: rep ;
 
-PURE-INSN: ##shl-vector-imm
+FOLDABLE-INSN: ##shl-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
 
-PURE-INSN: ##shr-vector-imm
+FOLDABLE-INSN: ##shr-vector-imm
 def: dst
 use: src1
 literal: src2 rep ;
 
-PURE-INSN: ##shl-vector
+FOLDABLE-INSN: ##shl-vector
 def: dst
 use: src1 src2/int-scalar-rep
 literal: rep ;
 
-PURE-INSN: ##shr-vector
+FOLDABLE-INSN: ##shr-vector
 def: dst
 use: src1 src2/int-scalar-rep
 literal: rep ;
 
 ! Scalar/vector conversion
-PURE-INSN: ##scalar>integer
+FOLDABLE-INSN: ##scalar>integer
 def: dst/int-rep
 use: src
 literal: rep ;
 
-PURE-INSN: ##integer>scalar
+FOLDABLE-INSN: ##integer>scalar
 def: dst
 use: src/int-rep
 literal: rep ;
 
-PURE-INSN: ##vector>scalar
+FOLDABLE-INSN: ##vector>scalar
 def: dst/scalar-rep
 use: src
 literal: rep ;
 
-PURE-INSN: ##scalar>vector
+FOLDABLE-INSN: ##scalar>vector
 def: dst
 use: src/scalar-rep
 literal: rep ;
 
 ! Boxing and unboxing aliens
-PURE-INSN: ##box-alien
-def: dst/int-rep
+FOLDABLE-INSN: ##box-alien
+def: dst/tagged-rep
 use: src/int-rep
 temp: temp/int-rep ;
 
-PURE-INSN: ##box-displaced-alien
-def: dst/int-rep
-use: displacement/int-rep base/int-rep
+FOLDABLE-INSN: ##box-displaced-alien
+def: dst/tagged-rep
+use: displacement/int-rep base/tagged-rep
 temp: temp/int-rep
 literal: base-class ;
 
-PURE-INSN: ##unbox-any-c-ptr
+FOLDABLE-INSN: ##unbox-any-c-ptr
 def: dst/int-rep
-use: src/int-rep ;
+use: src/tagged-rep ;
 
-: ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
-: ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;
-
-PURE-INSN: ##unbox-alien
+FOLDABLE-INSN: ##unbox-alien
 def: dst/int-rep
-use: src/int-rep ;
+use: src/tagged-rep ;
 
-: ##unbox-c-ptr ( dst src class -- )
-    {
-        { [ dup \ f class<= ] [ drop ##unbox-f ] }
-        { [ dup alien class<= ] [ drop ##unbox-alien ] }
-        { [ dup byte-array class<= ] [ drop ##unbox-byte-array ] }
-        [ drop ##unbox-any-c-ptr ]
-    } cond ;
-
-! Alien accessors
-INSN: ##alien-unsigned-1
+! Zero-extending and sign-extending integers
+FOLDABLE-INSN: ##convert-integer
 def: dst/int-rep
 use: src/int-rep
-literal: offset ;
+literal: c-type ;
 
-INSN: ##alien-unsigned-2
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-unsigned-4
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-signed-1
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-signed-2
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-signed-4
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-cell
-def: dst/int-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-float
-def: dst/float-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-double
-def: dst/double-rep
-use: src/int-rep
-literal: offset ;
-
-INSN: ##alien-vector
+! Raw memory accessors
+FLUSHABLE-INSN: ##load-memory
 def: dst
-use: src/int-rep
-literal: offset rep ;
+use: base/int-rep displacement/int-rep
+literal: scale offset rep c-type ;
 
-INSN: ##set-alien-integer-1
-use: src/int-rep
-literal: offset
-use: value/int-rep ;
+FLUSHABLE-INSN: ##load-memory-imm
+def: dst
+use: base/int-rep
+literal: offset rep c-type ;
 
-INSN: ##set-alien-integer-2
-use: src/int-rep
-literal: offset
-use: value/int-rep ;
+VREG-INSN: ##store-memory
+use: src base/int-rep displacement/int-rep
+literal: scale offset rep c-type ;
 
-INSN: ##set-alien-integer-4
-use: src/int-rep
-literal: offset
-use: value/int-rep ;
-
-INSN: ##set-alien-cell
-use: src/int-rep
-literal: offset
-use: value/int-rep ;
-
-INSN: ##set-alien-float
-use: src/int-rep
-literal: offset
-use: value/float-rep ;
-
-INSN: ##set-alien-double
-use: src/int-rep
-literal: offset
-use: value/double-rep ;
-
-INSN: ##set-alien-vector
-use: src/int-rep
-literal: offset
-use: value
-literal: rep ;
+VREG-INSN: ##store-memory-imm
+use: src base/int-rep
+literal: offset rep c-type ;
 
 ! Memory allocation
-INSN: ##allot
-def: dst/int-rep
+FLUSHABLE-INSN: ##allot
+def: dst/tagged-rep
 literal: size class
 temp: temp/int-rep ;
 
-INSN: ##write-barrier
-use: src/int-rep slot/int-rep
+VREG-INSN: ##write-barrier
+use: src/tagged-rep slot/int-rep
+literal: scale tag
 temp: temp1/int-rep temp2/int-rep ;
 
-INSN: ##write-barrier-imm
-use: src/int-rep
-literal: slot
+VREG-INSN: ##write-barrier-imm
+use: src/tagged-rep
+literal: slot tag
 temp: temp1/int-rep temp2/int-rep ;
 
-INSN: ##alien-global
+FLUSHABLE-INSN: ##alien-global
 def: dst/int-rep
 literal: symbol library ;
 
-INSN: ##vm-field
-def: dst/int-rep
+FLUSHABLE-INSN: ##vm-field
+def: dst/tagged-rep
 literal: offset ;
 
-INSN: ##set-vm-field
-use: src/int-rep
+VREG-INSN: ##set-vm-field
+use: src/tagged-rep
 literal: offset ;
 
 ! FFI
-INSN: ##alien-invoke
-literal: params stack-frame ;
+FOLDABLE-INSN: ##unbox
+def: dst
+use: src/tagged-rep
+literal: unboxer rep ;
 
-INSN: ##alien-indirect
-literal: params stack-frame ;
+FOLDABLE-INSN: ##unbox-long-long
+def: dst1/int-rep dst2/int-rep
+use: src/tagged-rep
+literal: unboxer ;
 
-INSN: ##alien-assembly
-literal: params stack-frame ;
+FLUSHABLE-INSN: ##local-allot
+def: dst/int-rep
+literal: size align offset ;
 
-INSN: ##alien-callback
-literal: params stack-frame ;
+FOLDABLE-INSN: ##box
+def: dst/tagged-rep
+use: src
+literal: boxer rep gc-map ;
 
-! Instructions used by CFG IR only.
-INSN: ##prologue ;
-INSN: ##epilogue ;
+FOLDABLE-INSN: ##box-long-long
+def: dst/tagged-rep
+use: src1/int-rep src2/int-rep
+literal: boxer gc-map ;
 
-INSN: ##branch ;
+! Alien call inputs and outputs are arrays of triples with shape
+! { vreg rep stack#/reg }
 
-INSN: ##phi
+VREG-INSN: ##alien-invoke
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map ;
+
+VREG-INSN: ##alien-indirect
+use: src/int-rep
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map ;
+
+VREG-INSN: ##alien-assembly
+literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map ;
+
+VREG-INSN: ##callback-inputs
+literal: reg-outputs stack-outputs ;
+
+VREG-INSN: ##callback-outputs
+literal: reg-inputs ;
+
+! Control flow
+FLUSHABLE-INSN: ##phi
 def: dst
 literal: inputs ;
 
-! Conditionals
-INSN: ##compare-branch
+INSN: ##branch ;
+
+! Tagged conditionals
+VREG-INSN: ##compare-branch
+use: src1/tagged-rep src2/tagged-rep
+literal: cc ;
+
+VREG-INSN: ##compare-imm-branch
+use: src1/tagged-rep
+literal: src2 cc ;
+
+FOLDABLE-INSN: ##compare
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep
+literal: cc
+temp: temp/int-rep ;
+
+FOLDABLE-INSN: ##compare-imm
+def: dst/tagged-rep
+use: src1/tagged-rep
+literal: src2 cc
+temp: temp/int-rep ;
+
+! Integer conditionals
+VREG-INSN: ##compare-integer-branch
 use: src1/int-rep src2/int-rep
 literal: cc ;
 
-INSN: ##compare-imm-branch
+VREG-INSN: ##compare-integer-imm-branch
 use: src1/int-rep
-constant: src2
+literal: src2 cc ;
+
+VREG-INSN: ##test-branch
+use: src1/int-rep src2/int-rep
 literal: cc ;
 
-PURE-INSN: ##compare
-def: dst/int-rep
+VREG-INSN: ##test-imm-branch
+use: src1/int-rep
+literal: src2 cc ;
+
+FOLDABLE-INSN: ##compare-integer
+def: dst/tagged-rep
 use: src1/int-rep src2/int-rep
 literal: cc
 temp: temp/int-rep ;
 
-PURE-INSN: ##compare-imm
-def: dst/int-rep
+FOLDABLE-INSN: ##compare-integer-imm
+def: dst/tagged-rep
 use: src1/int-rep
-constant: src2
+literal: src2 cc
+temp: temp/int-rep ;
+
+FOLDABLE-INSN: ##test
+def: dst/tagged-rep
+use: src1/int-rep src2/int-rep
 literal: cc
 temp: temp/int-rep ;
 
-INSN: ##compare-float-ordered-branch
+FOLDABLE-INSN: ##test-imm
+def: dst/tagged-rep
+use: src1/int-rep
+literal: src2 cc
+temp: temp/int-rep ;
+
+! Float conditionals
+VREG-INSN: ##compare-float-ordered-branch
 use: src1/double-rep src2/double-rep
 literal: cc ;
 
-INSN: ##compare-float-unordered-branch
+VREG-INSN: ##compare-float-unordered-branch
 use: src1/double-rep src2/double-rep
 literal: cc ;
 
-PURE-INSN: ##compare-float-ordered
-def: dst/int-rep
+FOLDABLE-INSN: ##compare-float-ordered
+def: dst/tagged-rep
 use: src1/double-rep src2/double-rep
 literal: cc
 temp: temp/int-rep ;
 
-PURE-INSN: ##compare-float-unordered
-def: dst/int-rep
+FOLDABLE-INSN: ##compare-float-unordered
+def: dst/tagged-rep
 use: src1/double-rep src2/double-rep
 literal: cc
 temp: temp/int-rep ;
 
 ! Overflowing arithmetic
-INSN: ##fixnum-add
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+VREG-INSN: ##fixnum-add
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep
+literal: cc ;
 
-INSN: ##fixnum-sub
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+VREG-INSN: ##fixnum-sub
+def: dst/tagged-rep
+use: src1/tagged-rep src2/tagged-rep
+literal: cc ;
 
-INSN: ##fixnum-mul
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
+VREG-INSN: ##fixnum-mul
+def: dst/tagged-rep
+use: src1/tagged-rep src2/int-rep
+literal: cc ;
 
-INSN: ##gc
-temp: temp1/int-rep temp2/int-rep
-literal: size data-values tagged-values uninitialized-locs ;
-
-INSN: ##save-context
+VREG-INSN: ##save-context
 temp: temp1/int-rep temp2/int-rep ;
 
-! Instructions used by machine IR only.
-INSN: _prologue
-literal: stack-frame ;
+! GC checks
+VREG-INSN: ##check-nursery-branch
+literal: size cc
+temp: temp1/int-rep temp2/int-rep ;
 
-INSN: _epilogue
-literal: stack-frame ;
+INSN: ##call-gc
+literal: gc-map ;
 
-INSN: _label
-literal: label ;
-
-INSN: _branch
-literal: label ;
-
-INSN: _loop-entry ;
-
-INSN: _dispatch
-use: src/int-rep
-temp: temp ;
-
-INSN: _dispatch-label
-literal: label ;
-
-INSN: _compare-branch
-literal: label
-use: src1/int-rep src2/int-rep
-literal: cc ;
-
-INSN: _compare-imm-branch
-literal: label
-use: src1/int-rep
-constant: src2
-literal: cc ;
-
-INSN: _compare-float-unordered-branch
-literal: label
-use: src1/int-rep src2/int-rep
-literal: cc ;
-
-INSN: _compare-float-ordered-branch
-literal: label
-use: src1/int-rep src2/int-rep
-literal: cc ;
-
-! Overflowing arithmetic
-INSN: _fixnum-add
-literal: label
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
-
-INSN: _fixnum-sub
-literal: label
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
-
-INSN: _fixnum-mul
-literal: label
-def: dst/int-rep
-use: src1/int-rep src2/int-rep ;
-
+! Spills and reloads, inserted by register allocator
 TUPLE: spill-slot { n integer } ;
 C: <spill-slot> spill-slot
 
-! These instructions operate on machine registers and not
-! virtual registers
-INSN: _spill
+VREG-INSN: ##spill
 use: src
 literal: rep dst ;
 
-INSN: _reload
+VREG-INSN: ##reload
 def: dst
 literal: rep src ;
-
-INSN: _spill-area-size
-literal: n ;
 
 UNION: ##allocation
 ##allot
 ##box-alien
 ##box-displaced-alien ;
 
+UNION: conditional-branch-insn
+##compare-branch
+##compare-imm-branch
+##compare-integer-branch
+##compare-integer-imm-branch
+##test-branch
+##test-imm-branch
+##compare-float-ordered-branch
+##compare-float-unordered-branch
+##test-vector-branch
+##check-nursery-branch
+##fixnum-add
+##fixnum-sub
+##fixnum-mul ;
+
 ! For alias analysis
 UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 
-! Instructions that kill all live vregs but cannot trigger GC
-UNION: partial-sync-insn
-##unary-float-function
-##binary-float-function ;
-
-! Instructions that kill all live vregs
-UNION: kill-vreg-insn
-##call
-##prologue
-##epilogue
+! Instructions that contain subroutine calls to functions which
+! can callback arbitrary Factor code
+UNION: factor-call-insn
 ##alien-invoke
 ##alien-indirect
-##alien-callback ;
+##alien-assembly ;
+
+! Instructions that contain subroutine calls to functions which
+! allocate memory
+UNION: gc-map-insn
+##call-gc
+##box
+##box-long-long
+factor-call-insn ;
+
+M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
+
+! Each one has a gc-map slot
+TUPLE: gc-map scrub-d scrub-r gc-roots ;
+
+: <gc-map> ( -- gc-map ) gc-map new ;
+
+UNION: alien-call-insn
+##alien-invoke
+##alien-indirect
+##alien-assembly ;
+
+! Instructions that clobber registers. They receive inputs and
+! produce outputs in spill slots.
+UNION: hairy-clobber-insn
+##call-gc
+alien-call-insn
+##callback-inputs
+##callback-outputs
+##unbox-long-long ;
+
+! Instructions that clobber registers but are allowed to produce
+! outputs in registers. Inputs are in spill slots, except for
+! inputs coalesced with the output, in which case that input
+! will be in a register.
+UNION: clobber-insn
+hairy-clobber-insn
+##unbox
+##box
+##box-long-long ;
 
 ! Instructions that have complex expansions and require that the
 ! output registers are not equal to any of the input registers
 UNION: def-is-use-insn
 ##box-alien
 ##box-displaced-alien
-##string-nth
 ##unbox-any-c-ptr ;
-
-SYMBOL: vreg-insn
-
-[
-    vreg-insn
-    insn-classes get [
-        "insn-slots" word-prop [ type>> { def use temp } member-eq? ] any?
-    ] filter
-    define-union-class
-] with-compilation-unit

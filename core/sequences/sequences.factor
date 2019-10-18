@@ -444,9 +444,6 @@ PRIVATE>
 : 2each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
     (2each) each-integer ; inline
 
-: 2reverse-each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
-    [ [ <reversed> ] bi@ ] dip 2each ; inline
-
 : 2reduce ( ... seq1 seq2 identity quot: ( ... prev elt1 elt2 -- ... next ) -- ... result )
     [ -rot ] dip 2each ; inline
 
@@ -897,11 +894,6 @@ PRIVATE>
 
 : unclip-last-slice ( seq -- butlast-slice last )
     [ but-last-slice ] [ last ] bi ; inline
-
-: <flat-slice> ( seq -- slice )
-    dup slice? [ { } like ] when
-    [ drop 0 ] [ length ] [ ] tri <slice> ;
-    inline
 
 <PRIVATE
     

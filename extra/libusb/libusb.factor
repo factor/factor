@@ -19,7 +19,7 @@ LIBRARY: libusb
 
 ALIAS: libusb_le16_to_cpu libusb_cpu_to_le16
 
-C-ENUM: libusb_class_code
+ENUM: libusb_class_code
     { LIBUSB_CLASS_PER_INTERFACE 0 }
     { LIBUSB_CLASS_AUDIO         1 }
     { LIBUSB_CLASS_COMM          2 }
@@ -31,7 +31,7 @@ C-ENUM: libusb_class_code
     { LIBUSB_CLASS_DATA          10 }
     { LIBUSB_CLASS_VENDOR_SPEC HEX: ff } ;
 
-C-ENUM: libusb_descriptor_type
+ENUM: libusb_descriptor_type
     { LIBUSB_DT_DEVICE    HEX: 01 }
     { LIBUSB_DT_CONFIG    HEX: 02 }
     { LIBUSB_DT_STRING    HEX: 03 }
@@ -52,19 +52,19 @@ CONSTANT: LIBUSB_DT_HUB_NONVAR_SIZE       7
 CONSTANT: LIBUSB_ENDPOINT_ADDRESS_MASK    HEX: 0f
 CONSTANT: LIBUSB_ENDPOINT_DIR_MASK        HEX: 80
 
-C-ENUM: libusb_endpoint_direction
+ENUM: libusb_endpoint_direction
     { LIBUSB_ENDPOINT_IN  HEX: 80 }
     { LIBUSB_ENDPOINT_OUT HEX: 00 } ;
 
 CONSTANT: LIBUSB_TRANSFER_TYPE_MASK HEX: 03
 
-C-ENUM: libusb_transfer_type
+ENUM: libusb_transfer_type
     { LIBUSB_TRANSFER_TYPE_CONTROL     0 }
     { LIBUSB_TRANSFER_TYPE_ISOCHRONOUS 1 }
     { LIBUSB_TRANSFER_TYPE_BULK        2 }
     { LIBUSB_TRANSFER_TYPE_INTERRUPT   3 } ;
 
-C-ENUM: libusb_standard_request
+ENUM: libusb_standard_request
     { LIBUSB_REQUEST_GET_STATUS        HEX: 00 }
     { LIBUSB_REQUEST_CLEAR_FEATURE     HEX: 01 }
     { LIBUSB_REQUEST_SET_FEATURE       HEX: 03 }
@@ -77,13 +77,13 @@ C-ENUM: libusb_standard_request
     { LIBUSB_REQUEST_SET_INTERFACE     HEX: 0B }
     { LIBUSB_REQUEST_SYNCH_FRAME       HEX: 0C } ;
 
-C-ENUM: libusb_request_type
+ENUM: libusb_request_type
     { LIBUSB_REQUEST_TYPE_STANDARD HEX: 00 }
     { LIBUSB_REQUEST_TYPE_CLASS    HEX: 20 }
     { LIBUSB_REQUEST_TYPE_VENDOR   HEX: 40 }
     { LIBUSB_REQUEST_TYPE_RESERVED HEX: 60 } ;
 
-C-ENUM: libusb_request_recipient
+ENUM: libusb_request_recipient
     { LIBUSB_RECIPIENT_DEVICE    HEX: 00 }
     { LIBUSB_RECIPIENT_INTERFACE HEX: 01 }
     { LIBUSB_RECIPIENT_ENDPOINT  HEX: 02 }
@@ -91,7 +91,7 @@ C-ENUM: libusb_request_recipient
 
 CONSTANT: LIBUSB_ISO_SYNC_TYPE_MASK HEX: 0C
 
-C-ENUM: libusb_iso_sync_type
+ENUM: libusb_iso_sync_type
     { LIBUSB_ISO_SYNC_TYPE_NONE     0 }
     { LIBUSB_ISO_SYNC_TYPE_ASYNC    1 }
     { LIBUSB_ISO_SYNC_TYPE_ADAPTIVE 2 }
@@ -99,7 +99,7 @@ C-ENUM: libusb_iso_sync_type
 
 CONSTANT: LIBUSB_ISO_USAGE_TYPE_MASK HEX: 30
 
-C-ENUM: libusb_iso_usage_type
+ENUM: libusb_iso_usage_type
     { LIBUSB_ISO_USAGE_TYPE_DATA     0 }
     { LIBUSB_ISO_USAGE_TYPE_FEEDBACK 1 }
     { LIBUSB_ISO_USAGE_TYPE_IMPLICIT 2 } ;
@@ -176,7 +176,7 @@ C-TYPE: libusb_context
 C-TYPE: libusb_device
 C-TYPE: libusb_device_handle
 
-C-ENUM: libusb_error
+ENUM: libusb_error
     { LIBUSB_SUCCESS             0 }
     { LIBUSB_ERROR_IO            -1 }
     { LIBUSB_ERROR_INVALID_PARAM -2 }
@@ -192,7 +192,7 @@ C-ENUM: libusb_error
     { LIBUSB_ERROR_NOT_SUPPORTED -12 }
     { LIBUSB_ERROR_OTHER         -99 } ;
 
-C-ENUM: libusb_transfer_status
+ENUM: libusb_transfer_status
     LIBUSB_TRANSFER_COMPLETED
     LIBUSB_TRANSFER_ERROR
     LIBUSB_TRANSFER_TIMED_OUT
@@ -201,7 +201,7 @@ C-ENUM: libusb_transfer_status
     LIBUSB_TRANSFER_NO_DEVICE
     LIBUSB_TRANSFER_OVERFLOW ;
 
-C-ENUM: libusb_transfer_flags
+ENUM: libusb_transfer_flags
     { LIBUSB_TRANSFER_SHORT_NOT_OK  1 }
     { LIBUSB_TRANSFER_FREE_BUFFER   2 }
     { LIBUSB_TRANSFER_FREE_TRANSFER 4 } ;

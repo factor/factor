@@ -12,6 +12,7 @@ IN: continuations
         swap [ set-datastack ] dip
     ] (( stack quot -- new-stack )) call-effect-unsafe ;
 
+SYMBOL: original-error
 SYMBOL: error
 SYMBOL: error-continuation
 SYMBOL: error-thread
@@ -102,8 +103,8 @@ GENERIC: compute-restarts ( error -- seq )
 <PRIVATE
 
 : save-error ( error -- )
-    dup error set-global
-    compute-restarts restarts set-global ;
+    [ error set-global ]
+    [ compute-restarts restarts set-global ] bi ;
 
 PRIVATE>
 
@@ -113,7 +114,8 @@ SYMBOL: thread-error-hook
     dup save-error
     catchstack* empty? [
         thread-error-hook get-global
-        [ (( error -- * )) call-effect-unsafe ] [ die ] if*
+        [ original-error get-global die ] or
+        (( error -- * )) call-effect-unsafe
     ] when
     c> continue-with ;
 
@@ -176,7 +178,7 @@ M: condition compute-restarts
         ! 63 = self
         63 special-object error-thread set-global
         continuation error-continuation set-global
-        rethrow
+        [ original-error set-global ] [ rethrow ] bi
     ] 5 set-special-object
     ! VM adds this to kernel errors, so that user-space
     ! can identify them

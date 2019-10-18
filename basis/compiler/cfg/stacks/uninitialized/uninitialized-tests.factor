@@ -29,8 +29,8 @@ V{
 
 [ ] [ test-uninitialized ] unit-test
 
-[ V{ D 0 D 1 D 2 } ] [ 1 get uninitialized-locs ] unit-test
-[ V{ R 0 } ] [ 2 get uninitialized-locs ] unit-test
+[ { B{ 0 0 0 } B{ } } ] [ 1 get uninitialized-in ] unit-test
+[ { B{ 1 1 1 } B{ 0 } } ] [ 2 get uninitialized-in ] unit-test
 
 ! When merging, if a location is uninitialized in one branch and
 ! initialized in another, we have to consider it uninitialized,
@@ -57,4 +57,4 @@ V{
 
 [ ] [ test-uninitialized ] unit-test
 
-[ V{ D 0 } ] [ 3 get uninitialized-locs ] unit-test
+[ { B{ 0 } B{ } } ] [ 3 get uninitialized-in ] unit-test

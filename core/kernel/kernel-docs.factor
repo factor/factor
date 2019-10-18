@@ -792,14 +792,14 @@ HELP: prepose
 
 HELP: dip
 { $values { "x" object } { "quot" quotation } }
-{ $description "Calls " { $snippet "quot" } " with " { $snippet "obj" } " hidden on the retain stack." }
+{ $description "Removes " { $snippet "x" } " from the datastack, calls " { $snippet "quot" } ", and restores " { $snippet "x" } " to the top of the datastack when " { $snippet "quot" } " is finished." }
 { $examples
     { $example "USING: arrays kernel math prettyprint ;" "10 20 30 [ / ] dip 2array ." "{ 1/2 30 }" }
 } ;
 
 HELP: 2dip
 { $values { "x" object } { "y" object } { "quot" quotation } }
-{ $description "Calls " { $snippet "quot" } " with " { $snippet "x" } " and " { $snippet "y" } " hidden on the retain stack." }
+{ $description "Removes " { $snippet "x" } " and " { $snippet "y" } " from the datastack, calls " { $snippet "quot" } ", and restores the removed objects to the top of the datastack when " { $snippet "quot" } " is finished." }
 { $notes "The following are equivalent:"
     { $code "[ [ foo bar ] dip ] dip" }
     { $code "[ foo bar ] 2dip" }
@@ -807,7 +807,7 @@ HELP: 2dip
 
 HELP: 3dip
 { $values { "x" object } { "y" object } { "z" object } { "quot" quotation } }
-{ $description "Calls " { $snippet "quot" } " with " { $snippet "x" } ", " { $snippet "y" } " and " { $snippet "z" } " hidden on the retain stack." }
+{ $description "Removes " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } " from the datastack, calls " { $snippet "quot" } ", and restores the removed objects to the top of the datastack when " { $snippet "quot" } " is finished." }
 { $notes "The following are equivalent:"
     { $code "[ [ [ foo bar ] dip ] dip ] dip" }
     { $code "[ foo bar ] 3dip" }
@@ -815,7 +815,7 @@ HELP: 3dip
 
 HELP: 4dip
 { $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" quotation } }
-{ $description "Calls " { $snippet "quot" } " with " { $snippet "w" } ", " { $snippet "x" } ", " { $snippet "y" } " and " { $snippet "z" } " hidden on the retain stack." }
+{ $description "Removes " { $snippet "w" } ", " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } " from the datastack, calls " { $snippet "quot" } ", and restores the removed objects to the top of the datastack when " { $snippet "quot" } " is finished." }
 { $notes "The following are equivalent:"
     { $code "[ [ [ [ foo bar ] dip ] dip ] dip ] dip" }
     { $code "[ foo bar ] 4dip" }

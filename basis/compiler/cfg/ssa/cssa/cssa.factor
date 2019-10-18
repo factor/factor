@@ -1,13 +1,12 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel locals fry sequences
+USING: accessors assocs kernel locals fry sequences sets
 cpu.architecture
 compiler.cfg.rpo
 compiler.cfg.def-use
 compiler.cfg.utilities
 compiler.cfg.registers
-compiler.cfg.instructions
-compiler.cfg.representations ;
+compiler.cfg.instructions ;
 IN: compiler.cfg.ssa.cssa
 
 ! Convert SSA to conventional SSA. This pass runs after representation
@@ -19,12 +18,12 @@ IN: compiler.cfg.ssa.cssa
     ! ##fixnum-add, ##fixnum-sub or ##fixnum-mul) then we don't
     ! need to insert a copy since in fact doing so will result
     ! in incorrect code.
-    [ instructions>> last defs-vreg ] dip eq? not ;
+    [ instructions>> last defs-vregs ] dip swap in? not ;
 
 :: insert-copy ( bb src rep -- bb dst )
     bb src insert-copy? [
         rep next-vreg-rep :> dst
-        bb [ dst src rep src rep-of emit-conversion ] add-instructions
+        bb [ dst src rep ##copy ] add-instructions
         bb dst
     ] [ bb src ] if ;
 

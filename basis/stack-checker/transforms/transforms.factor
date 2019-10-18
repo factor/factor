@@ -67,11 +67,9 @@ IN: stack-checker.transforms
     [
         [ no-case ]
     ] [
-        dup last callable? [
-            dup last swap but-last
-        ] [
-            [ no-case ] swap
-        ] if case>quot
+        dup [ callable? ] find dup
+        [ [ head ] dip ] [ 2drop [ no-case ] ] if
+        swap case>quot
     ] if-empty
 ] 1 define-transform
 
@@ -145,7 +143,9 @@ IN: stack-checker.transforms
         [ depends-on-tuple-layout ]
         [ [ "boa-check" word-prop [ ] or ] dip ] 2bi
         '[ @ _ <tuple-boa> ]
-    ] [ drop f ] if
+    ] [
+        \ boa time-bomb
+    ] if
 ] 1 define-transform
 
 \ boa t "no-compile" set-word-prop

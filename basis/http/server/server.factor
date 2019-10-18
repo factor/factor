@@ -14,6 +14,7 @@ io.encodings.ascii
 io.encodings.binary
 io.streams.limited
 io.streams.string
+io.streams.throwing
 io.servers.connection
 io.timeouts
 io.crlf
@@ -27,6 +28,7 @@ html.templates
 html.streams
 html
 mime.types
+math.order
 xml.writer ;
 FROM: mime.multipart => parse-multipart ;
 IN: http.server
@@ -47,17 +49,22 @@ ERROR: no-boundary ;
     ";" split1 nip
     "=" split1 nip [ no-boundary ] unless* ;
 
+SYMBOL: request-limit
+
+request-limit [ 64 1024 * ] initialize
+
 SYMBOL: upload-limit
+
+upload-limit [ 200,000,000 ] initialize
 
 : read-multipart-data ( request -- mime-parts )
     [ "content-type" header ]
     [ "content-length" header string>number ] bi
     unlimited-input
-    upload-limit get stream-throws limit-input
-    stream-eofs limit-input
+    upload-limit get [ min ] when* limited-input
     binary decode-input
     parse-multipart-form-data parse-multipart ;
-
+ 
 : read-content ( request -- bytes )
     "content-length" header string>number read ;
 
@@ -276,14 +283,10 @@ LOG: httpd-benchmark DEBUG
 
 TUPLE: http-server < threaded-server ;
 
-SYMBOL: request-limit
-
-64 1024 * request-limit set-global
-
 M: http-server handle-client*
     drop [
-        request-limit get stream-throws limit-input
         ?refresh-all
+        request-limit get limited-input
         [ read-request ] ?benchmark
         [ do-request ] ?benchmark
         [ do-response ] ?benchmark

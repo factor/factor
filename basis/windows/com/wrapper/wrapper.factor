@@ -118,7 +118,7 @@ unless
     ] 2map ;
 
 : (make-callbacks) ( implementations -- sequence )
-    dup [ first ] map (make-iunknown-methods)
+    dup keys (make-iunknown-methods)
     [ [ first2 ] 2dip swap (make-interface-callbacks) ]
     curry map-index ;
 

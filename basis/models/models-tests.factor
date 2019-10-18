@@ -10,7 +10,7 @@ M: model-tester model-changed nip t >>hit? drop ;
 
 [ T{ model-tester f t } ]
 [
-    T{ model-tester f f } 3 <model> 2dup add-connection
+    T{ model-tester f f } clone 3 <model> 2dup add-connection
     5 swap set-model
 ] unit-test
 
@@ -31,3 +31,16 @@ T{ model-tester f f } "tester" set
     "tester" get
     "model-c" get value>>
 ] unit-test
+
+[ T{ model-tester f t } V{ 5 } ]
+[
+    T{ model-tester f f } clone V{ } clone <model> 2dup add-connection
+    5 swap [ push-model ] [ value>> ] bi
+] unit-test
+
+[ T{ model-tester f t } 5 V{ }  ]
+[
+    T{ model-tester f f } clone V{ 5 } clone <model> 2dup add-connection
+    [ pop-model ] [ value>> ] bi
+] unit-test
+

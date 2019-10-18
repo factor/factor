@@ -4,7 +4,6 @@ USING: arrays io.binary kernel combinators
 combinators.short-circuit math math.bitwise locals namespaces
 make sequences words system layouts math.order accessors
 cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
-QUALIFIED: sequences
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86-32 and x86-64.
@@ -71,10 +70,10 @@ M: byte n, [ value>> ] dip n, ;
 : 2, ( n -- ) 2 n, ; inline
 : cell, ( n -- ) bootstrap-cell n, ; inline
 
-: mod-r/m, ( reg# indirect -- )
+: mod-r/m, ( reg operand -- )
     [ 3 shift ] [ [ modifier 6 shift ] [ r/m ] bi ] bi* bitor bitor , ;
 
-: sib, ( indirect -- )
+: sib, ( operand -- )
     dup sib-present? [
         [ indirect-base* ]
         [ indirect-index* 3 shift ]
@@ -93,14 +92,14 @@ M: indirect displacement,
 
 M: register displacement, drop ;
 
-: addressing ( reg# indirect -- )
+: addressing ( reg operand -- )
     [ mod-r/m, ] [ sib, ] [ displacement, ] tri ;
 
 : rex.w? ( rex.w reg r/m -- ? )
     {
-        { [ dup register-128? ] [ drop operand-64? ] }
-        { [ dup not ] [ drop operand-64? ] }
-        [ nip operand-64? ]
+        { [ over register-128? ] [ nip operand-64? ] }
+        { [ over not ] [ nip operand-64? ] }
+        [ drop operand-64? ]
     } cond and ;
 
 : rex.r ( m op -- n )
@@ -119,16 +118,15 @@ M: register displacement, drop ;
 :: rex-prefix ( reg r/m rex.w -- )
     #! Compile an AMD64 REX prefix.
     rex.w reg r/m rex.w? BIN: 01001000 BIN: 01000000 ?
-    r/m rex.r
-    reg rex.b
+    reg rex.r
+    r/m rex.b
     dup reg r/m no-prefix? [ drop ] [ , ] if ;
 
-: 16-prefix ( reg r/m -- )
-    [ register-16? ] either? [ HEX: 66 , ] when ;
+: 16-prefix ( reg -- )
+    register-16? [ HEX: 66 , ] when ;
 
-: prefix ( reg r/m rex.w -- ) [ drop 16-prefix ] [ rex-prefix ] 3bi ;
-
-: prefix-1 ( reg rex.w -- ) f swap prefix ;
+: prefix-1 ( reg rex.w -- )
+    [ drop 16-prefix ] [ [ f ] 2dip rex-prefix ] 2bi ;
 
 : short-operand ( reg rex.w n -- )
     #! Some instructions encode their single operand as part of
@@ -138,57 +136,60 @@ M: register displacement, drop ;
 : opcode, ( opcode -- ) dup array? [ % ] [ , ] if ;
 
 : extended-opcode ( opcode -- opcode' )
-    dup array? [ OCT: 17 sequences:prefix ] [ OCT: 17 swap 2array ] if ;
+    dup array? [ OCT: 17 prefix ] [ OCT: 17 swap 2array ] if ;
 
 : extended-opcode, ( opcode -- ) extended-opcode opcode, ;
 
 : opcode-or ( opcode mask -- opcode' )
-    swap dup array?
-    [ unclip-last rot bitor suffix ] [ bitor ] if ;
+    over array?
+    [ [ unclip-last ] dip bitor suffix ] [ bitor ] if ;
 
-: 1-operand ( op reg,rex.w,opcode -- )
+: 1-operand ( operand reg,rex.w,opcode -- )
     #! The 'reg' is not really a register, but a value for the
     #! 'reg' field of the mod-r/m byte.
     first3 [ [ over ] dip prefix-1 ] dip opcode, swap addressing ;
 
-: immediate-operand-size-bit ( imm dst reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
-    pick integer? [ first3 BIN: 1 opcode-or 3array ] when ;
+: immediate-operand-size-bit ( dst imm reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
+    over integer? [ first3 BIN: 1 opcode-or 3array ] when ;
 
-: immediate-1 ( imm dst reg,rex.w,opcode -- )
-    immediate-operand-size-bit 1-operand 1, ;
+: immediate-1* ( dst imm reg,rex.w,opcode -- )
+    swap [ 1-operand ] dip 1, ;
 
-: immediate-4 ( imm dst reg,rex.w,opcode -- )
-    immediate-operand-size-bit 1-operand 4, ;
+: immediate-1 ( dst imm reg,rex.w,opcode -- )
+    immediate-operand-size-bit immediate-1* ;
 
-: immediate-fits-in-size-bit ( imm dst reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
-    pick integer? [ first3 BIN: 10 opcode-or 3array ] when ;
+: immediate-4 ( dst imm reg,rex.w,opcode -- )
+    immediate-operand-size-bit swap [ 1-operand ] dip 4, ;
 
-: immediate-1/4 ( imm dst reg,rex.w,opcode -- )
+: immediate-fits-in-size-bit ( dst imm reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
+    over integer? [ first3 BIN: 10 opcode-or 3array ] when ;
+
+: immediate-1/4 ( dst imm reg,rex.w,opcode -- )
     #! If imm is a byte, compile the opcode and the byte.
     #! Otherwise, set the 8-bit operand flag in the opcode, and
     #! compile the cell. The 'reg' is not really a register, but
     #! a value for the 'reg' field of the mod-r/m byte.
-    pick fits-in-byte? [
+    over fits-in-byte? [
         immediate-fits-in-size-bit immediate-1
     ] [
         immediate-4
     ] if ;
 
-: (2-operand) ( dst src op -- )
+: (2-operand) ( reg operand op -- )
     [ 2dup t rex-prefix ] dip opcode,
-    reg-code swap addressing ;
+    [ reg-code ] dip addressing ;
 
-: direction-bit ( dst src op -- dst' src' op' )
+: direction-bit ( dst src op -- reg operand op' )
     pick register? pick register? not and
-    [ BIN: 10 opcode-or swapd ] when ;
+    [ BIN: 10 opcode-or ] [ swapd ] if ;
 
-: operand-size-bit ( dst src op -- dst' src' op' )
-    over register-8? [ BIN: 1 opcode-or ] unless ;
+: operand-size-bit ( reg operand op -- reg operand op' )
+    pick register-8? [ BIN: 1 opcode-or ] unless ;
 
 : 2-operand ( dst src op -- )
-    #! Sets the opcode's direction bit. It is set if the
-    #! destination is a direct register operand.
-    [ drop 16-prefix ] [ direction-bit operand-size-bit (2-operand) ] 3bi ;
+    direction-bit operand-size-bit
+    pick 16-prefix
+    (2-operand) ;
 
 PRIVATE>
 
@@ -212,16 +213,22 @@ M: operand POP { BIN: 000 f HEX: 8f } 1-operand ;
 ! MOV where the src is immediate.
 <PRIVATE
 
-GENERIC: (MOV-I) ( src dst -- )
-M: register (MOV-I) t HEX: b8 short-operand cell, ;
+GENERIC# (MOV-I) 1 ( dst src -- )
+
+M: register (MOV-I)
+    dup byte?
+    [ [ t HEX: b0 short-operand ] [ 1, ] bi* ]
+    [ [ t HEX: b8 short-operand ] [ cell, ] bi* ]
+    if ;
+
 M: operand (MOV-I)
     { BIN: 000 t HEX: c6 }
-    pick byte? [ immediate-1 ] [ immediate-4 ] if ;
+    over byte? [ immediate-1 ] [ immediate-4 ] if ;
 
 PRIVATE>
 
 GENERIC: MOV ( dst src -- )
-M: immediate MOV swap (MOV-I) ;
+M: immediate MOV (MOV-I) ;
 M: operand MOV HEX: 88 2-operand ;
 
 : LEA ( dst src -- ) swap HEX: 8d 2-operand ;
@@ -239,6 +246,9 @@ M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 
 GENERIC# JUMPcc 1 ( addr opcode -- )
 M: integer JUMPcc extended-opcode, 4, ;
+
+: SETcc ( dst opcode -- )
+    { BIN: 000 t } swap suffix 1-operand ;
 
 PRIVATE>
 
@@ -259,6 +269,23 @@ PRIVATE>
 : JLE ( dst -- ) HEX: 8e JUMPcc ;
 : JG  ( dst -- ) HEX: 8f JUMPcc ;
 
+: SETO  ( dst -- ) { HEX: 0f HEX: 90 } SETcc ;
+: SETNO ( dst -- ) { HEX: 0f HEX: 91 } SETcc ;
+: SETB  ( dst -- ) { HEX: 0f HEX: 92 } SETcc ;
+: SETAE ( dst -- ) { HEX: 0f HEX: 93 } SETcc ;
+: SETE  ( dst -- ) { HEX: 0f HEX: 94 } SETcc ;
+: SETNE ( dst -- ) { HEX: 0f HEX: 95 } SETcc ;
+: SETBE ( dst -- ) { HEX: 0f HEX: 96 } SETcc ;
+: SETA  ( dst -- ) { HEX: 0f HEX: 97 } SETcc ;
+: SETS  ( dst -- ) { HEX: 0f HEX: 98 } SETcc ;
+: SETNS ( dst -- ) { HEX: 0f HEX: 99 } SETcc ;
+: SETP  ( dst -- ) { HEX: 0f HEX: 9a } SETcc ;
+: SETNP ( dst -- ) { HEX: 0f HEX: 9b } SETcc ;
+: SETL  ( dst -- ) { HEX: 0f HEX: 9c } SETcc ;
+: SETGE ( dst -- ) { HEX: 0f HEX: 9d } SETcc ;
+: SETLE ( dst -- ) { HEX: 0f HEX: 9e } SETcc ;
+: SETG  ( dst -- ) { HEX: 0f HEX: 9f } SETcc ;
+
 : LEAVE ( -- ) HEX: c9 , ;
 
 : RET ( n -- )
@@ -267,44 +294,60 @@ PRIVATE>
 ! Arithmetic
 
 GENERIC: ADD ( dst src -- )
-M: immediate ADD swap { BIN: 000 t HEX: 80 } immediate-1/4 ;
+M: immediate ADD { BIN: 000 t HEX: 80 } immediate-1/4 ;
 M: operand ADD OCT: 000 2-operand ;
 
 GENERIC: OR ( dst src -- )
-M: immediate OR swap { BIN: 001 t HEX: 80 } immediate-1/4 ;
+M: immediate OR { BIN: 001 t HEX: 80 } immediate-1/4 ;
 M: operand OR OCT: 010 2-operand ;
 
 GENERIC: ADC ( dst src -- )
-M: immediate ADC swap { BIN: 010 t HEX: 80 } immediate-1/4 ;
+M: immediate ADC { BIN: 010 t HEX: 80 } immediate-1/4 ;
 M: operand ADC OCT: 020 2-operand ;
 
 GENERIC: SBB ( dst src -- )
-M: immediate SBB swap { BIN: 011 t HEX: 80 } immediate-1/4 ;
+M: immediate SBB { BIN: 011 t HEX: 80 } immediate-1/4 ;
 M: operand SBB OCT: 030 2-operand ;
 
 GENERIC: AND ( dst src -- )
-M: immediate AND swap { BIN: 100 t HEX: 80 } immediate-1/4 ;
+M: immediate AND { BIN: 100 t HEX: 80 } immediate-1/4 ;
 M: operand AND OCT: 040 2-operand ;
 
 GENERIC: SUB ( dst src -- )
-M: immediate SUB swap { BIN: 101 t HEX: 80 } immediate-1/4 ;
+M: immediate SUB { BIN: 101 t HEX: 80 } immediate-1/4 ;
 M: operand SUB OCT: 050 2-operand ;
 
 GENERIC: XOR ( dst src -- )
-M: immediate XOR swap { BIN: 110 t HEX: 80 } immediate-1/4 ;
+M: immediate XOR { BIN: 110 t HEX: 80 } immediate-1/4 ;
 M: operand XOR OCT: 060 2-operand ;
 
 GENERIC: CMP ( dst src -- )
-M: immediate CMP swap { BIN: 111 t HEX: 80 } immediate-1/4 ;
+M: immediate CMP { BIN: 111 t HEX: 80 } immediate-1/4 ;
 M: operand CMP OCT: 070 2-operand ;
 
 GENERIC: TEST ( dst src -- )
-M: immediate TEST swap { BIN: 0 t HEX: f7 } immediate-4 ;
+M: immediate TEST { BIN: 0 t HEX: f7 } immediate-4 ;
 M: operand TEST OCT: 204 2-operand ;
 
 : XCHG ( dst src -- ) OCT: 207 2-operand ;
 
-: BSR ( dst src -- ) swap { HEX: 0f HEX: bd } (2-operand) ;
+: BSR ( dst src -- ) { HEX: 0f HEX: bd } (2-operand) ;
+
+GENERIC: BT ( value n -- )
+M: immediate BT ( value n -- ) { BIN: 100 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BT ( value n -- ) swap { HEX: 0f HEX: a3 } (2-operand) ;
+
+GENERIC: BTC ( value n -- )
+M: immediate BTC ( value n -- ) { BIN: 111 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BTC ( value n -- ) swap { HEX: 0f HEX: bb } (2-operand) ;
+
+GENERIC: BTR ( value n -- )
+M: immediate BTR ( value n -- ) { BIN: 110 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BTR ( value n -- ) swap { HEX: 0f HEX: b3 } (2-operand) ;
+
+GENERIC: BTS ( value n -- )
+M: immediate BTS ( value n -- ) { BIN: 101 t { HEX: 0f HEX: ba } } immediate-1* ;
+M: operand   BTS ( value n -- ) swap { HEX: 0f HEX: ab } (2-operand) ;
 
 : NOT  ( dst -- ) { BIN: 010 t HEX: f7 } 1-operand ;
 : NEG  ( dst -- ) { BIN: 011 t HEX: f7 } 1-operand ;
@@ -318,11 +361,11 @@ M: operand TEST OCT: 204 2-operand ;
 
 <PRIVATE
 
-: (SHIFT) ( dst src op -- )
-    over CL eq? [
-        nip t HEX: d3 3array 1-operand
+:: (SHIFT) ( dst src op -- )
+    src CL eq? [
+        dst { op t HEX: d3 } 1-operand
     ] [
-        swapd t HEX: c0 3array immediate-1
+        dst src { op t HEX: c0 } immediate-1
     ] if ; inline
 
 PRIVATE>
@@ -346,19 +389,17 @@ PRIVATE>
     ] if ;
 
 : MOVSX ( dst src -- )
-    swap
-    over register-32? OCT: 143 OCT: 276 extended-opcode ?
-    pick register-16? [ BIN: 1 opcode-or ] when
+    dup register-32? OCT: 143 OCT: 276 extended-opcode ?
+    over register-16? [ BIN: 1 opcode-or ] when
     (2-operand) ;
 
 : MOVZX ( dst src -- )
-    swap
     OCT: 266 extended-opcode
-    pick register-16? [ BIN: 1 opcode-or ] when
+    over register-16? [ BIN: 1 opcode-or ] when
     (2-operand) ;
 
 ! Conditional move
-: MOVcc ( dst src cc -- ) extended-opcode swapd (2-operand) ;
+: MOVcc ( dst src cc -- ) extended-opcode (2-operand) ;
 
 : CMOVO  ( dst src -- ) HEX: 40 MOVcc ;
 : CMOVNO ( dst src -- ) HEX: 41 MOVcc ;
@@ -404,39 +445,135 @@ PRIVATE>
 : FNCLEX ( -- ) HEX: db , HEX: e2 , ;
 : FNINIT ( -- ) HEX: db , HEX: e3 , ;
 
+ERROR: bad-x87-operands ;
+
+<PRIVATE
+
+:: (x87-op) ( operand opcode reg -- )
+    opcode ,
+    BIN: 1100,0000 reg
+    3 shift bitor
+    operand reg-code bitor , ;
+
+:: x87-st0-op ( src opcode reg -- )
+    src register?
+    [ src opcode reg (x87-op) ]
+    [ bad-x87-operands ] if ;
+
+:: x87-m-st0/n-op ( dst src opcode reg -- )
+    {
+        { [ dst ST0 = src indirect? and ] [
+            src { reg f opcode } 1-operand
+        ] }
+        { [ dst ST0 = src register? and ] [
+            src opcode reg (x87-op)
+        ] }
+        { [ src ST0 = dst register? and ] [
+            dst opcode 4 + reg (x87-op)
+        ] }
+        [ bad-x87-operands ]
+    } cond ;
+
+PRIVATE>
+
+: F2XM1 ( -- ) { HEX: D9 HEX: F0 } % ;
+: FABS ( -- ) { HEX: D9 HEX: E1 } % ;
+: FADD ( dst src -- ) HEX: D8 0 x87-m-st0/n-op ;
+: FCHS ( -- ) { HEX: D9 HEX: E0 } % ;
+
+: FCMOVB   ( src -- ) HEX: DA 0 x87-st0-op ;
+: FCMOVE   ( src -- ) HEX: DA 1 x87-st0-op ;
+: FCMOVBE  ( src -- ) HEX: DA 2 x87-st0-op ;
+: FCMOVU   ( src -- ) HEX: DA 3 x87-st0-op ;
+: FCMOVNB  ( src -- ) HEX: DB 0 x87-st0-op ;
+: FCMOVNE  ( src -- ) HEX: DB 1 x87-st0-op ;
+: FCMOVNBE ( src -- ) HEX: DB 2 x87-st0-op ;
+: FCMOVNU  ( src -- ) HEX: DB 3 x87-st0-op ;
+
+: FCOMI ( src -- ) HEX: DB 6 x87-st0-op ;
+: FUCOMI ( src -- ) HEX: DB 5 x87-st0-op ;
+: FCOS ( -- ) { HEX: D9 HEX: FF } % ;
+: FDECSTP ( -- ) { HEX: D9 HEX: F6 } % ;
+: FINCSTP ( -- ) { HEX: D9 HEX: F7 } % ;
+: FDIV  ( dst src -- ) HEX: D8 6 x87-m-st0/n-op ;
+: FDIVR ( dst src -- ) HEX: D8 7 x87-m-st0/n-op ;
+
+: FILDD ( src -- )  { BIN: 000 f HEX: DB } 1-operand ;
+: FILDQ ( src -- )  { BIN: 101 f HEX: DF } 1-operand ;
+: FISTPD ( dst -- ) { BIN: 011 f HEX: DB } 1-operand ;
+: FISTPQ ( dst -- ) { BIN: 111 f HEX: DF } 1-operand ;
+: FISTTPD ( dst -- ) { BIN: 001 f HEX: DB } 1-operand ;
+: FISTTPQ ( dst -- ) { BIN: 001 f HEX: DF } 1-operand ;
+
+: FLD    ( src -- ) HEX: D9 0 x87-st0-op ;
+: FLD1   ( -- ) { HEX: D9 HEX: E8 } % ;
+: FLDL2T ( -- ) { HEX: D9 HEX: E9 } % ;
+: FLDL2E ( -- ) { HEX: D9 HEX: EA } % ;
+: FLDPI  ( -- ) { HEX: D9 HEX: EB } % ;
+: FLDLG2 ( -- ) { HEX: D9 HEX: EC } % ;
+: FLDLN2 ( -- ) { HEX: D9 HEX: ED } % ;
+: FLDZ   ( -- ) { HEX: D9 HEX: EE } % ;
+
+: FMUL ( dst src -- ) HEX: D8 1 x87-m-st0/n-op ;
+: FNOP ( -- ) { HEX: D9 HEX: D0 } % ;
+: FPATAN ( -- ) { HEX: D9 HEX: F3 } % ;
+: FPREM  ( -- ) { HEX: D9 HEX: F8 } % ;
+: FPREM1 ( -- ) { HEX: D9 HEX: F5 } % ;
+: FRNDINT ( -- ) { HEX: D9 HEX: FC } % ;
+: FSCALE ( -- ) { HEX: D9 HEX: FD } % ;
+: FSIN ( -- ) { HEX: D9 HEX: FE } % ;
+: FSINCOS ( -- ) { HEX: D9 HEX: FB } % ;
+: FSQRT ( -- ) { HEX: D9 HEX: FA } % ;
+
+: FSUB  ( dst src -- ) HEX: D8 HEX: 4 x87-m-st0/n-op ;
+: FSUBR ( dst src -- ) HEX: D8 HEX: 5 x87-m-st0/n-op ;
+
+: FST  ( src -- ) HEX: DD 2 x87-st0-op ;
+: FSTP ( src -- ) HEX: DD 3 x87-st0-op ;
+
+: FXAM ( -- ) { HEX: D9 HEX: E5 } % ;
+: FXCH ( src -- ) HEX: D9 1 x87-st0-op ;
+
+: FXTRACT ( -- ) { HEX: D9 HEX: F4 } % ;
+: FYL2X ( -- ) { HEX: D9 HEX: F1 } % ;
+: FYL2XP1 ( -- ) { HEX: D9 HEX: F1 } % ;
+
 ! SSE multimedia instructions
 
 <PRIVATE
 
 : direction-bit-sse ( dst src op1 -- dst' src' op1' )
-    pick register-128? [ swapd ] [ BIN: 1 bitor ] if ;
+    pick register-128? [ swapd BIN: 1 bitor ] unless ;
 
 : 2-operand-sse ( dst src op1 op2 -- )
     [ , ] when* direction-bit-sse extended-opcode (2-operand) ;
 
 : direction-op-sse ( dst src op1s -- dst' src' op1' )
-    pick register-128? [ swapd first ] [ second ] if ;
+    pick register-128? [ first ] [ swapd second ] if ;
 
 : 2-operand-rm-mr-sse ( dst src op1{rm,mr} op2 -- )
     [ , ] when* direction-op-sse extended-opcode (2-operand) ;
 
-: 2-operand-rm-sse ( dst src op1 op2 -- )
-    [ , ] when* swapd extended-opcode (2-operand) ;
+: 2-operand-rm-mr-sse* ( dst src op12{rm,mr} -- )
+    direction-op-sse first2 [ , ] when* extended-opcode (2-operand) ;
 
-: 2-operand-mr-sse ( dst src op1 op2 -- )
+: 2-operand-rm-sse ( dst src op1 op2 -- )
     [ , ] when* extended-opcode (2-operand) ;
 
+: 2-operand-mr-sse ( dst src op1 op2 -- )
+    [ , ] when* extended-opcode swapd (2-operand) ;
+
 : 2-operand-int/sse ( dst src op1 op2 -- )
-    [ , ] when* swapd extended-opcode (2-operand) ;
+    [ , ] when* extended-opcode (2-operand) ;
 
-: 3-operand-rm-sse ( dst src imm op1 op2 -- )
-    rot [ 2-operand-rm-sse ] dip , ;
+:: 3-operand-rm-sse ( dst src imm op1 op2 -- )
+    dst src op1 op2 2-operand-rm-sse imm , ;
 
-: 3-operand-mr-sse ( dst src imm op1 op2 -- )
-    rot [ 2-operand-mr-sse ] dip , ;
+:: 3-operand-mr-sse ( dst src imm op1 op2 -- )
+    dst src op1 op2 2-operand-mr-sse imm , ;
 
-: 3-operand-rm-mr-sse ( dst src imm op1 op2 -- )
-    rot [ 2-operand-rm-mr-sse ] dip , ;
+:: 3-operand-rm-mr-sse ( dst src imm op1 op2 -- )
+    dst src op1 op2 2-operand-rm-mr-sse imm , ;
 
 : 2-operand-sse-cmp ( dst src cmp op1 op2 -- )
     3-operand-rm-sse ; inline
@@ -637,6 +774,9 @@ ALIAS: PINSRQ PINSRD
 : MOVDQA     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: 66 2-operand-rm-mr-sse ;
 : MOVDQU     ( dest src -- ) { HEX: 6f HEX: 7f } HEX: f3 2-operand-rm-mr-sse ;
 
+: MOVQ       ( dest src -- )
+    { { HEX: 7e HEX: f3 } { HEX: d6 HEX: 66 } } 2-operand-rm-mr-sse* ;
+
 <PRIVATE
 
 : 2shuffler ( indexes/mask -- mask )
@@ -739,7 +879,7 @@ PRIVATE>
 : CMPNLESS   ( dest src -- ) 6 HEX: c2 HEX: f3 2-operand-sse-cmp ;
 : CMPORDSS   ( dest src -- ) 7 HEX: c2 HEX: f3 2-operand-sse-cmp ;
 
-: MOVNTI     ( dest src -- ) { HEX: 0f HEX: c3 } (2-operand) ;
+: MOVNTI     ( dest src -- ) swap { HEX: 0f HEX: c3 } (2-operand) ;
 
 : PINSRW     ( dest src imm -- ) HEX: c4 HEX: 66 3-operand-rm-sse ;
 : SHUFPS     ( dest src imm -- ) 4shuffler HEX: c6 f       3-operand-rm-sse ;
@@ -793,4 +933,3 @@ PRIVATE>
 
 : HWNT ( -- ) HEX: 2e , ; ! Hint branch Weakly Not Taken
 : HST  ( -- ) HEX: 3e , ; ! Hint branch Strongly Taken
-

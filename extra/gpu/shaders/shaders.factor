@@ -8,7 +8,7 @@ kernel lexer literals locals math math.parser memoize multiline namespaces
 opengl opengl.gl opengl.shaders parser quotations sequences
 specialized-arrays splitting strings tr ui.gadgets.worlds
 variants vectors vocabs vocabs.loader vocabs.parser words
-words.constant half-floats typed ;
+words.constant math.floats.half typed ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: void*
@@ -632,4 +632,4 @@ M: program-instance dispose
     [ world>> ] [ program>> instances>> ] [ ] tri ?delete-at
     reset-memos ;
 
-"prettyprint" "gpu.shaders.prettyprint" require-when
+{ "gpu.shaders" "prettyprint" } "gpu.shaders.prettyprint" require-when

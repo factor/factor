@@ -51,11 +51,12 @@ SYMBOL: bootstrap-time
 
 : save/restore-error ( quot -- )
     error get-global
+    original-error get-global
     error-continuation get-global
-    [ call ] 2dip
+    [ call ] 3dip
     error-continuation set-global
+    original-error set-global
     error set-global ; inline
-
 
 [
     ! We time bootstrap
@@ -89,6 +90,7 @@ SYMBOL: bootstrap-time
     run-bootstrap-init
 
     f error set-global
+    f original-error set-global
     f error-continuation set-global
 
     nano-count swap - bootstrap-time set-global

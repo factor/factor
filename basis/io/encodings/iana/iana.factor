@@ -22,7 +22,7 @@ PRIVATE>
     utf8 file-lines { "" } split [
         [ " " split ] map
         [ first { "Name:" "Alias:" } member? ] filter
-        [ second ] map { "None" } diff
+        values { "None" } diff
     ] map harvest ;
 
 : make-aliases ( file -- n>e )

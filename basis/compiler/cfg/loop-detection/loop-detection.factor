@@ -79,6 +79,8 @@ PRIVATE>
 
 : loop-nesting-at ( bb -- n ) loop-nesting get at 0 or ;
 
+: current-loop-nesting ( -- n ) basic-block get loop-nesting-at ;
+
 : needs-loops ( cfg -- cfg' )
     needs-predecessors
     dup loops-valid?>> [ detect-loops t >>loops-valid? ] unless ;

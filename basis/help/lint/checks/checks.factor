@@ -34,7 +34,7 @@ SYMBOL: vocab-articles
 
 : extract-values ( element -- seq )
     \ $values swap elements dup empty? [
-        first rest [ first ] map
+        first rest keys
     ] unless ;
 
 : extract-value-effects ( element -- seq )

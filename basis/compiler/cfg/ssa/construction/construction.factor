@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel accessors sequences fry assocs
 sets math combinators
@@ -32,20 +32,23 @@ SYMBOL: defs
 ! Set of vregs defined in more than one basic block
 SYMBOL: defs-multi
 
-: compute-insn-defs ( bb insn -- )
-    defs-vreg dup [
+GENERIC: compute-insn-defs ( bb insn -- )
+
+M: insn compute-insn-defs 2drop ;
+
+M: vreg-insn compute-insn-defs
+    defs-vregs [
         defs get [ conjoin-at ] [ drop ] [ at assoc-size 1 > ] 2tri
         [ defs-multi get conjoin ] [ drop ] if
-    ] [ 2drop ] if ;
+    ] with each ;
 
 : compute-defs ( cfg -- )
     H{ } clone defs set
     H{ } clone defs-multi set
     [
-        dup instructions>> [
-            compute-insn-defs
-        ] with each
-    ] each-basic-block ;
+        [ basic-block get ] dip
+        [ compute-insn-defs ] with each
+    ] simple-analysis ;
 
 ! Maps basic blocks to sequences of vregs
 SYMBOL: inserting-phi-nodes
@@ -88,7 +91,9 @@ RENAMING: ssa-rename [ gen-name ] [ top-name ] [ ]
 
 GENERIC: rename-insn ( insn -- )
 
-M: insn rename-insn
+M: insn rename-insn drop ;
+
+M: vreg-insn rename-insn
     [ ssa-rename-insn-uses ]
     [ ssa-rename-insn-defs ]
     bi ;

@@ -64,7 +64,7 @@ $nl
 $nl
 "The listener can watch dynamic variables:"
 { $subsections "listener-watch" }
-"Nested listeners can be useful for testing code in other dynamic scopes. For example, when doing database maintanance using the " { $vocab-link "db.tuples" } " vocabulary, it can be useful to start a listener with a database connection:"
+"Nested listeners can be useful for testing code in other dynamic scopes. For example, when doing database maintenance using the " { $vocab-link "db.tuples" } " vocabulary, it can be useful to start a listener with a database connection:"
 { $code
     "USING: db db.sqlite listener ;"
     "\"data.db\" <sqlite-db> [ listener ] with-db"

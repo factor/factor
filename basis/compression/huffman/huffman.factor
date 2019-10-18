@@ -35,7 +35,7 @@ TUPLE: huffman-code
     tdesc
     [
         code next-size
-        [ code (>>value) code clone quot call code next-code ] each
+        [ code value<< code clone quot call code next-code ] each
     ] each ; inline
 
 : update-reverse-table ( huffman-code n table -- )

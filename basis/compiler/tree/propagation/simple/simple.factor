@@ -93,7 +93,7 @@ M: #declare propagate-before
     recover ;
 
 : predicate-output-infos/class ( info class -- info )
-    [ class>> ] dip compare-classes
+    [ class>> ] dip evaluate-class-predicate
     dup +incomparable+ eq? [ drop object-info ] [ <literal-info> ] if ;
 
 : predicate-output-infos ( info class -- info )
@@ -152,5 +152,7 @@ M: #call propagate-after
     [ drop ] [ c-type-class <class-info> swap first set-value-info ] if-void ;
 
 M: #alien-node propagate-before propagate-alien-invoke ;
+
+M: #alien-callback propagate-around child>> (propagate) ;
 
 M: #return annotate-node dup in-d>> (annotate-node) ;

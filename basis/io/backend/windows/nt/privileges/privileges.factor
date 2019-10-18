@@ -1,8 +1,10 @@
-USING: alien alien.c-types alien.data alien.syntax arrays continuations
-destructors generic io.mmap io.ports io.backend.windows io.files.windows
-kernel libc locals math math.bitwise namespaces quotations sequences windows
-windows.advapi32 windows.kernel32 windows.types io.backend system accessors
-io.backend.windows.privileges classes.struct windows.errors literals ;
+USING: alien alien.c-types alien.data alien.syntax arrays
+continuations destructors generic io.mmap io.ports
+io.backend.windows io.files.windows kernel libc fry locals math
+math.bitwise namespaces quotations sequences windows
+windows.advapi32 windows.kernel32 windows.types io.backend
+system accessors io.backend.windows.privileges classes.struct
+windows.errors literals ;
 IN: io.backend.windows.nt.privileges
 
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
@@ -11,8 +13,10 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 !  http://msdn.microsoft.com/msdnmag/issues/05/03/TokenPrivileges/
 
 : (open-process-token) ( handle -- handle )
-    flags{ TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY } PHANDLE <c-object>
-    [ OpenProcessToken win32-error=0/f ] keep *void* ;
+    flags{ TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY }
+    { PHANDLE }
+    [ OpenProcessToken win32-error=0/f ]
+    with-out-parameters ;
 
 : open-process-token ( -- handle )
     #! remember to CloseHandle
@@ -37,7 +41,11 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
         >>Privileges ;
 
 M: winnt set-privilege ( name ? -- )
-    [
-        -rot 0 -rot make-token-privileges
-        dup byte-length f f AdjustTokenPrivileges win32-error=0/f
+    '[
+        0
+        _ _ make-token-privileges
+        dup byte-length
+        f
+        f
+        AdjustTokenPrivileges win32-error=0/f
     ] with-process-token ;

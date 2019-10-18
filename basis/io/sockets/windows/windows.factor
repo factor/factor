@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors io.sockets io.sockets.private
-io.backend.windows io.backend windows.winsock system destructors
-alien.c-types classes.struct combinators ;
+USING: accessors alien.c-types classes.struct combinators
+destructors io.backend io.backend.windows io.sockets
+io.sockets.private kernel system windows.handles
+windows.winsock ;
 FROM: namespaces => get ;
 IN: io.sockets.windows
 
@@ -18,8 +19,8 @@ M: windows sockaddr-of-family ( alien af -- addrspec )
 
 M: windows addrspec-of-family ( af -- addrspec )
     {
-        { AF_INET [ T{ inet4 } ] }
-        { AF_INET6 [ T{ inet6 } ] }
+        { AF_INET [ T{ ipv4 } ] }
+        { AF_INET6 [ T{ ipv6 } ] }
         [ drop f ]
     } case ;
 
@@ -30,14 +31,14 @@ TUPLE: win32-socket < win32-file ;
 : <win32-socket> ( handle -- win32-socket )
     win32-socket new-win32-handle ;
 
-M: win32-socket dispose ( stream -- )
-    handle>> closesocket drop ;
+M: win32-socket dispose* ( stream -- )
+    handle>> closesocket socket-error* ;
 
 : unspecific-sockaddr/size ( addrspec -- sockaddr len )
-    [ empty-sockaddr/size ] [ protocol-family ] bi pick (>>family) ;
+    [ empty-sockaddr/size ] [ protocol-family ] bi pick family<< ;
 
 : opened-socket ( handle -- win32-socket )
-    <win32-socket> |dispose dup add-completion ;
+    <win32-socket> |dispose add-completion ;
 
 : open-socket ( addrspec type -- win32-socket )
     [ protocol-family ] dip

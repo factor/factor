@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings classes.struct
 io.encodings.utf8 kernel namespaces sequences
@@ -10,8 +10,10 @@ IN: x11.clipboard
 ! and http://common-lisp.net/~crhodes/clx/demo/clipboard.lisp.
 
 : XA_CLIPBOARD ( -- atom ) "CLIPBOARD" x-atom ;
-
 : XA_UTF8_STRING ( -- atom ) "UTF8_STRING" x-atom ;
+: XA_TARGETS ( -- atom ) "TARGETS" x-atom ;
+: XA_TIMESTAMP ( -- atom ) "TIMESTAMP" x-atom ;
+: XA_TEXT ( -- atom ) "TEXT" x-atom ;
 
 TUPLE: x-clipboard atom contents ;
 
@@ -43,16 +45,14 @@ TUPLE: x-clipboard atom contents ;
 
 : set-targets-prop ( evt -- )
     [ dpy get ] dip [ requestor>> ] [ property>> ] bi
-    "TARGETS" x-atom 32 PropModeReplace
-    {
-        "UTF8_STRING" "STRING" "TARGETS" "TIMESTAMP"
-    } [ x-atom ] int-array{ } map-as
+    XA_TARGETS 32 PropModeReplace
+    XA_UTF8_STRING XA_STRING XA_TARGETS XA_TIMESTAMP int-array{ } 4sequence
     4 XChangeProperty drop ;
 
 : set-timestamp-prop ( evt -- )
     [ dpy get ] dip
     [ requestor>> ]
-    [ property>> "TIMESTAMP" x-atom 32 PropModeReplace ]
+    [ property>> XA_TIMESTAMP 32 PropModeReplace ]
     [ time>> <int> ] tri
     1 XChangeProperty drop ;
 

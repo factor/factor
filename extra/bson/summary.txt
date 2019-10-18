@@ -1,1 +1,1 @@
-BSON reader and writer
+BSON (http://en.wikipedia.org/wiki/BSON) reader and writer

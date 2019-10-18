@@ -42,11 +42,6 @@ HELP: float* ( x y -- z )
 { $description "Primitive version of " { $link * } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link * } " instead." } ;
 
-HELP: float-mod ( x y -- z )
-{ $values { "x" float } { "y" float } { "z" float } }
-{ $description "Primitive version of " { $link mod } "." }
-{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link mod } " instead." } ;
-
 HELP: float/f ( x y -- z )
 { $values { "x" float } { "y" float } { "z" float } }
 { $description "Primitive version of " { $link /f } "." }

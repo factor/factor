@@ -7,8 +7,6 @@ FROM: mongodb.tuple.persistent => assoc>tuple ;
 
 IN: mongodb.tuple
 
-SINGLETONS: +fieldindex+ +compoundindex+ +deepindex+ +unique+ ;
-
 SYNTAX: MDBTUPLE:
     parse-tuple-definition
     mdb-check-slots
@@ -61,9 +59,9 @@ PRIVATE>
  
 : update-tuple ( tuple -- )
     [ tuple-collection name>> ]
-    [ id-selector ]
+    [ ensure-oid id-selector ]
     [ tuple>assoc ] tri
-    <update> update ;
+    <update> >upsert update ;
 
 : save-tuple ( tuple -- )
     update-tuple ;
@@ -75,7 +73,7 @@ PRIVATE>
 
 : delete-tuple ( tuple -- )
    [ tuple-collection name>> ] keep
-   id-selector delete ;
+   id-selector <delete> delete ;
 
 : delete-tuples ( seq -- )
     [ delete-tuple ] each ;

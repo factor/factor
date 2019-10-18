@@ -44,7 +44,7 @@ PRIVATE>
 M: mdb-persistent id>> ( object -- id )
    dup class id-slot reader-word execute( object -- id ) ;
 
-M: mdb-persistent (>>id) ( object value -- )
+M: mdb-persistent id<< ( object value -- )
    over class id-slot writer-word execute( object value -- ) ;
 
 

@@ -185,4 +185,4 @@ SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 
 USE: vocabs.loader
 
-"prettyprint" "urls.prettyprint" require-when
+{ "urls" "prettyprint" } "urls.prettyprint" require-when

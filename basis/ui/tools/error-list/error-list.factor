@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays sequences sorting assocs colors.constants fry
 combinators combinators.smart combinators.short-circuit editors make
@@ -48,6 +48,8 @@ M: source-file-renderer prototype-row
 
 M: source-file-renderer row-value
     drop dup [ first [ <pathname> ] [ f ] if* ] when ;
+
+M: source-file-renderer row-value? row-value = ;
 
 M: source-file-renderer column-titles
     drop { "" "File" "Errors" } ;
@@ -152,7 +154,7 @@ error-display "toolbar" f {
     [ swap '[ error-type _ at ] filter ] <smart-arrow> ;
 
 :: <error-list-gadget> ( model -- gadget )
-    vertical error-list-gadget new-track
+    vertical \ error-list-gadget new-track
         <error-toggle> [ >>error-toggle ] [ >>visible-errors ] bi*
         dup visible-errors>> model <error-model> >>model 
         f <model> >>source-file
@@ -176,16 +178,18 @@ M: error-list-gadget focusable-child*
 
 \ error-list-help H{ { +nullary+ t } } define-command
 
-error-list-gadget "toolbar" f {
+\ error-list-gadget "toolbar" f {
     { T{ key-down f f "F1" } error-list-help }
 } define-command-map
 
-: error-list-window ( -- )
-    error-list-model get [ drop all-errors ] <arrow>
-    <error-list-gadget> "Errors" open-status-window ;
+MEMO: error-list-gadget ( -- gadget )
+    error-list-model get-global [ drop all-errors ] <arrow>
+    <error-list-gadget> ;
+
+[ \ error-list-gadget reset-memoized ] "ui.tools.error-list" add-startup-hook
 
 : show-error-list ( -- )
-    [ error-list-gadget? ] find-window
-    [ raise-window ] [ error-list-window ] if* ;
+    [ error-list-gadget eq? ] find-window
+    [ raise-window ] [ error-list-gadget "Errors" open-status-window ] if* ;
 
 \ show-error-list H{ { +nullary+ t } } define-command

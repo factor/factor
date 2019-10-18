@@ -43,9 +43,9 @@ ERROR: bad-peek dst loc ;
 : visit-edge ( from to -- )
     ! If both blocks are subroutine calls, don't bother
     ! computing anything.
-    2dup [ kill-block? ] both? [ 2drop ] [
-        2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ] V{ } make
-        [ 2drop ] [ insert-simple-basic-block ] if-empty
+    2dup [ kill-block?>> ] both? [ 2drop ] [
+        2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ##branch ] V{ } make
+        [ 2drop ] [ insert-basic-block ] if-empty
     ] if ;
 
 : visit-block ( bb -- )

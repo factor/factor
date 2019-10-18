@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax kernel
-sequences words system combinators opengl.gl ;
+sequences words system combinators opengl.gl alien.destructors ;
 IN: opengl.glu
 
 <<
@@ -266,6 +266,22 @@ FUNCTION: GLint gluUnProject ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdo
 ! FUNCTION: GLint gluBuild3DMipmaps ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, void* data ) ;
 ! FUNCTION: GLboolean gluCheckExtension ( GLubyte* extName, GLubyte* extString ) ;
 ! FUNCTION: GLint gluUnProject4 ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble clipW, GLdouble* model, GLdouble* proj, GLint* view, GLdouble nearVal, GLdouble farVal, GLdouble* objX, GLdouble* objY, GLdouble* objZ, GLdouble* objW ) ;
+
+DESTRUCTOR: gluDeleteNurbsRenderer
+DESTRUCTOR: gluDeleteQuadric
+DESTRUCTOR: gluDeleteTess
+
+CALLBACK: void GLUtessBeginCallback ( GLenum type ) ;
+CALLBACK: void GLUtessBeginDataCallback ( GLenum type, void* data ) ;
+CALLBACK: void GLUtessEdgeFlagCallback ( GLboolean flag ) ;
+CALLBACK: void GLUtessEdgeFlagDataCallback ( GLboolean flag, void* data ) ;
+CALLBACK: void GLUtessVertexCallback ( void* vertex_data ) ;
+CALLBACK: void GLUtessVertexDataCallback ( void* vertex_data, void* data ) ;
+CALLBACK: void GLUtessEndCallback ( ) ;
+CALLBACK: void GLUtessEndDataCallback ( void* data ) ;
+CALLBACK: void GLUtessCombineDataCallback ( GLdouble* coords, void** vertex_data, GLfloat* weight, void** out_data, void* data ) ;
+CALLBACK: void GLUtessErrorCallback ( GLenum errno ) ;
+CALLBACK: void GLUtessErrorDataCallback ( GLenum errno, void* data ) ;
 
 : gl-look-at ( eye focus up -- )
     [ first3 ] tri@ gluLookAt ;

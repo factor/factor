@@ -44,7 +44,7 @@ GENERIC: node-call-graph ( tail? node -- )
     ] with-scope ;
 
 M: #return-recursive node-call-graph
-    nip dup label>> (>>return) ;
+    nip dup label>> return<< ;
 
 M: #call-recursive node-call-graph
     [ dup label>> call-site boa ] keep
@@ -60,6 +60,9 @@ M: #recursive node-call-graph
 
 M: #branch node-call-graph
     children>> [ (build-call-graph) ] with each ;
+
+M: #alien-callback node-call-graph
+    child>> (build-call-graph) ;
 
 M: node node-call-graph 2drop ;
 

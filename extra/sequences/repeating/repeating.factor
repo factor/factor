@@ -12,7 +12,7 @@ TUPLE: repeating circular len ;
     dupd <repeating> swap like ;
 
 M: repeating length len>> ;
-M: repeating set-length (>>len) ;
+M: repeating set-length len<< ;
 
 M: repeating virtual@ ( n seq -- n' seq' ) circular>> ;
 

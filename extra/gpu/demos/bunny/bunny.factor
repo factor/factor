@@ -119,10 +119,6 @@ UNIFORM-TUPLE: loading-uniforms
     100000 <uint-vector>
     (parse-bunny-model) ; inline
 
-:: normal ( a b c -- normal )
-    c a v-
-    b a v- cross normalize ; inline
-
 :: calc-bunny-normal ( a b c vertexes -- )
     a b c [ vertexes nth vertex>> ] tri@ normal :> n
     a b c [ vertexes nth [ n v+ ] change-normal drop ] tri@ ; inline
@@ -311,5 +307,5 @@ GAME: bunny-game {
         { grab-input? t }
         { use-game-input? t }
         { pref-dim { 1024 768 } }
-        { tick-interval-micros $[ 60 fps ] }
+        { tick-interval-nanos $[ 60 fps ] }
     } ;

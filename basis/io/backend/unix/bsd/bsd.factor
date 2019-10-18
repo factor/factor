@@ -7,7 +7,3 @@ IN: io.backend.unix.bsd
 
 M: bsd init-io ( -- )
     <kqueue-mx> mx set-global ;
-
-! M: bsd (monitor) ( path recursive? mailbox -- )
-!     swap [ "Recursive kqueue monitors not supported" throw ] when
-!     <vnode-monitor> ;

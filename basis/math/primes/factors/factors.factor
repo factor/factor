@@ -1,6 +1,6 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel make math math.functions
+USING: arrays assocs combinators kernel make math math.functions
 math.primes math.ranges sequences sequences.product sorting
 io math.parser ;
 IN: math.primes.factors
@@ -32,7 +32,7 @@ PRIVATE>
 : group-factors ( n -- seq )
     dup prime? [ 1 2array 1array ] [ (group-factors) ] if ; flushable
 
-: unique-factors ( n -- seq ) group-factors [ first ] map ; flushable
+: unique-factors ( n -- seq ) group-factors keys ; flushable
 
 : factors ( n -- seq )
     group-factors [ first2 swap <array> ] map concat ; flushable
@@ -47,8 +47,10 @@ PRIVATE>
     dup 1 = [
         1array
     ] [
-        group-factors [ first2 [0,b] [ ^ ] with map ] map
-        [ product ] product-map natural-sort
+        group-factors dup empty? [
+            [ first2 [0,b] [ ^ ] with map ] map
+            [ product ] product-map natural-sort
+        ] unless
     ] if ;
 
 : unix-factor ( string -- )

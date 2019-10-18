@@ -1,1 +1,0 @@
-Algebraic simplification of expressions

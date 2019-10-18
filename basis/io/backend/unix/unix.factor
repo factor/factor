@@ -25,25 +25,25 @@ TUPLE: fd < disposable fd ;
     fd new-disposable swap >>fd ;
 
 M: fd dispose
-    dup disposed>> [ drop ] [
+    [
         {
             [ cancel-operation ]
             [ t >>disposed drop ]
             [ unregister-disposable ]
             [ fd>> close-file ]
         } cleave
-    ] if ;
+    ] unless-disposed ;
 
 M: fd handle-fd dup check-disposed fd>> ;
 
 M: fd cancel-operation ( fd -- )
-    dup disposed>> [ drop ] [
+    [
         fd>>
         mx get-global
         [ remove-input-callbacks [ t swap resume-with ] each ]
         [ remove-output-callbacks [ t swap resume-with ] each ]
         2bi
-    ] if ;
+    ] unless-disposed ;
 
 M: unix tell-handle ( handle -- n )
     fd>> 0 SEEK_CUR [ lseek ] unix-system-call [ io-error ] [ ] bi ;
@@ -144,7 +144,7 @@ M: stdin dispose*
         tri
     ] with-destructors ;
 
-: wait-for-stdin ( stdin -- n )
+: wait-for-stdin ( stdin -- size )
     [ control>> CHAR: X over io:stream-write1 io:stream-flush ]
     [ size>> ssize_t heap-size swap io:stream-read *int ]
     bi ;
@@ -160,7 +160,12 @@ M: stdin dispose*
     ] if ;
 
 M: stdin refill
-    [ buffer>> ] [ dup wait-for-stdin ] bi* refill-stdin f ;
+    '[
+        buffer>> _ dup wait-for-stdin refill-stdin f
+    ] with-timeout ;
+
+M: stdin cancel-operation
+    [ size>> ] [ control>> ] bi [ cancel-operation ] bi@ ;
 
 : control-write-fd ( -- fd ) &: control_write *uint ;
 

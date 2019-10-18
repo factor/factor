@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry hints kernel locals
 math sequences sets sorting splitting namespaces linked-assocs
@@ -17,24 +17,31 @@ ERROR: bad-live-ranges interval ;
     ] [ drop ] if ;
 
 : trim-before-ranges ( live-interval -- )
-    [ ranges>> ] [ uses>> last 1 + ] bi
-    [ '[ from>> _ <= ] filter! drop ]
-    [ swap last (>>to) ]
+    dup last-use n>> 1 +
+    [ '[ [ from>> _ >= ] trim-tail-slice ] change-ranges drop ]
+    [ swap ranges>> last to<< ]
     2bi ;
 
 : trim-after-ranges ( live-interval -- )
-    [ ranges>> ] [ uses>> first ] bi
-    [ '[ to>> _ >= ] filter! drop ]
-    [ swap first (>>from) ]
+    dup first-use n>>
+    [ '[ [ to>> _ < ] trim-head-slice ] change-ranges drop ]
+    [ swap ranges>> first from<< ]
     2bi ;
 
+: last-use-rep ( live-interval -- rep/f )
+    last-use [ def-rep>> ] [ use-rep>> ] bi or ; inline
+
 : assign-spill ( live-interval -- )
-    dup vreg>> vreg-spill-slot >>spill-to drop ;
+    dup last-use-rep dup [
+        >>spill-rep
+        dup [ vreg>> ] [ spill-rep>> ] bi
+        assign-spill-slot >>spill-to drop
+    ] [ 2drop ] if ;
 
 : spill-before ( before -- before/f )
     ! If the interval does not have any usages before the spill location,
     ! then it is the second child of an interval that was split. We reload
-    ! the value and let the resolve pass insert a split later.
+    ! the value and let the resolve pass insert a spill later.
     dup uses>> empty? [ drop f ] [
         {
             [ ]
@@ -45,8 +52,15 @@ ERROR: bad-live-ranges interval ;
         } cleave
     ] if ;
 
+: first-use-rep ( live-interval -- rep/f )
+    first-use use-rep>> ; inline
+
 : assign-reload ( live-interval -- )
-    dup vreg>> vreg-spill-slot >>reload-from drop ;
+    dup first-use-rep dup [
+        >>reload-rep
+        dup [ vreg>> ] [ reload-rep>> ] bi
+        assign-spill-slot >>reload-from drop
+    ] [ 2drop ] if ;
 
 : spill-after ( after -- after/f )
     ! If the interval has no more usages after the spill location,
@@ -65,19 +79,21 @@ ERROR: bad-live-ranges interval ;
 : split-for-spill ( live-interval n -- before after )
     split-interval [ spill-before ] [ spill-after ] bi* ;
 
-: find-use-position ( live-interval new -- n )
-    [ uses>> ] [ start>> '[ _ >= ] ] bi* find nip 1/0. or ;
+: find-next-use ( live-interval new -- n )
+    [ uses>> ] [ start>> ] bi*
+    '[ [ spill-slot?>> not ] [ n>> ] bi _ >= and ] find nip
+    [ n>> ] [ 1/0. ] if* ;
 
 : find-use-positions ( live-intervals new assoc -- )
-    '[ [ _ find-use-position ] [ reg>> ] bi _ add-use-position ] each ;
+    '[ [ _ find-next-use ] [ reg>> ] bi _ add-use-position ] each ;
 
 : active-positions ( new assoc -- )
-    [ [ vreg>> active-intervals-for ] keep ] dip
+    [ [ active-intervals-for ] keep ] dip
     find-use-positions ;
 
 : inactive-positions ( new assoc -- )
     [
-        [ vreg>> inactive-intervals-for ] keep
+        [ inactive-intervals-for ] keep
         [ '[ _ intervals-intersect? ] filter ] keep
     ] dip
     find-use-positions ;
@@ -88,7 +104,7 @@ ERROR: bad-live-ranges interval ;
     >alist alist-max ;
 
 : spill-new? ( new pair -- ? )
-    [ uses>> first ] [ second ] bi* > ;
+    [ first-use n>> ] [ second ] bi* > ;
 
 : spill-new ( new pair -- )
     drop spill-after add-unhandled ;
@@ -102,13 +118,13 @@ ERROR: bad-live-ranges interval ;
     ! If there is an active interval using 'reg' (there should be at
     ! most one) are split and spilled and removed from the inactive
     ! set.
-    new vreg>> active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
+    new active-intervals-for [ [ reg>> reg = ] find swap dup ] keep
     '[ _ remove-nth! drop  new start>> spill ] [ 2drop ] if ;
 
 :: spill-intersecting-inactive ( new reg -- )
     ! Any inactive intervals using 'reg' are split and spilled
     ! and removed from the inactive set.
-    new vreg>> inactive-intervals-for [
+    new inactive-intervals-for [
         dup reg>> reg = [
             dup new intervals-intersect? [
                 new start>> spill f

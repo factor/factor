@@ -28,7 +28,7 @@ LIBRARY: LLVMCore
 TYPEDEF: uint unsigned
 TYPEDEF: unsigned enum
 
-C-ENUM: LLVMAttribute
+ENUM: LLVMAttribute
     { LLVMZExtAttribute         BIN: 1 }
     { LLVMSExtAttribute         BIN: 10 }
     { LLVMNoReturnAttribute     BIN: 100 }
@@ -41,7 +41,7 @@ C-ENUM: LLVMAttribute
     { LLVMReadNoneAttribute     BIN: 1000000000 }
     { LLVMReadOnlyAttribute     BIN: 10000000000 } ;
 
-C-ENUM: LLVMTypeKind
+ENUM: LLVMTypeKind
   LLVMVoidTypeKind
   LLVMFloatTypeKind
   LLVMDoubleTypeKind
@@ -58,7 +58,7 @@ C-ENUM: LLVMTypeKind
   LLVMOpaqueTypeKind
   LLVMVectorTypeKind ;
 
-C-ENUM: LLVMLinkage
+ENUM: LLVMLinkage
   LLVMExternalLinkage
   LLVMLinkOnceLinkage
   LLVMWeakLinkage
@@ -69,19 +69,19 @@ C-ENUM: LLVMLinkage
   LLVMExternalWeakLinkage
   LLVMGhostLinkage ;
 
-C-ENUM: LLVMVisibility
+ENUM: LLVMVisibility
   LLVMDefaultVisibility
   LLVMHiddenVisibility
   LLVMProtectedVisibility ;
 
-C-ENUM: LLVMCallConv
+ENUM: LLVMCallConv
   { LLVMCCallConv             0 }
   { LLVMFastCallConv          8 }
   { LLVMColdCallConv          9 }
   { LLVMX86StdcallCallConv    64 }
   { LLVMX86FastcallCallConv   65 } ;
 
-C-ENUM: LLVMIntPredicate
+ENUM: LLVMIntPredicate
   { LLVMIntEQ                 32 }
   { LLVMIntNE                 33 }
   { LLVMIntUGT                34 }
@@ -93,7 +93,7 @@ C-ENUM: LLVMIntPredicate
   { LLVMIntSLT                40 }
   { LLVMIntSLE                41 } ;
 
-C-ENUM: LLVMRealPredicate
+ENUM: LLVMRealPredicate
   LLVMRealPredicateFalse
   LLVMRealOEQ
   LLVMRealOGT

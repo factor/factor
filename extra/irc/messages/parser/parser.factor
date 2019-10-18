@@ -31,5 +31,5 @@ PRIVATE>
     [ >>parameters ]
     [ >>trailing ]
     tri*
-    [ (>>prefix) ] [ fill-irc-message-slots ] [ swap >>line ] tri
+    [ prefix<< ] [ fill-irc-message-slots ] [ swap >>line ] tri
     dup sender >>sender ;

@@ -3,6 +3,7 @@
 USING: alien.strings continuations io
 io.encodings.ascii kernel namespaces x11.xlib x11.io
 vocabs vocabs.loader ;
+FROM: alien.c-types => c-bool> ;
 IN: x11
 
 SYMBOL: dpy
@@ -11,7 +12,7 @@ SYMBOL: root
 
 : init-locale ( -- )
    LC_ALL "" setlocale [ "setlocale() failed" print flush ] unless
-   XSupportsLocale [ "XSupportsLocale() failed" print flush ] unless ;
+   XSupportsLocale c-bool> [ "XSupportsLocale() failed" print flush ] unless ;
 
 : flush-dpy ( -- ) dpy get XFlush drop ;
 
@@ -33,4 +34,4 @@ SYMBOL: root
 : with-x ( display-string quot -- )
     [ init-x ] dip [ close-x ] [ ] cleanup ; inline
 
-"io.backend.unix" "x11.io.unix" require-when
+{ "x11" "io.backend.unix" } "x11.io.unix" require-when

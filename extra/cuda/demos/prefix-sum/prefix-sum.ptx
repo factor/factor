@@ -1,0 +1,222 @@
+	.version 1.4
+	.target sm_10, map_f64_to_f32
+	// compiled with /usr/local/cuda/bin/../open64/lib//be
+	// nvopencc 3.0 built on 2010-03-11
+
+	//-----------------------------------------------------------
+	// Compiling /tmp/tmpxft_00000236_00000000-7_prefix-sum.cpp3.i (/var/folders/K6/K6oI14wZ2RWhSE+BYqTjA++++TI/-Tmp-/ccBI#.0ATpGM)
+	//-----------------------------------------------------------
+
+	//-----------------------------------------------------------
+	// Options:
+	//-----------------------------------------------------------
+	//  Target:ptx, ISA:sm_10, Endian:little, Pointer Size:32
+	//  -O3	(Optimization level)
+	//  -g0	(Debug level)
+	//  -m2	(Report advisories)
+	//-----------------------------------------------------------
+
+	.file	1	"<command-line>"
+	.file	2	"/tmp/tmpxft_00000236_00000000-6_prefix-sum.cudafe2.gpu"
+	.file	3	"/usr/lib/gcc/i686-apple-darwin10/4.2.1/include/stddef.h"
+	.file	4	"/usr/local/cuda/bin/../include/crt/device_runtime.h"
+	.file	5	"/usr/local/cuda/bin/../include/host_defines.h"
+	.file	6	"/usr/local/cuda/bin/../include/builtin_types.h"
+	.file	7	"/usr/local/cuda/bin/../include/device_types.h"
+	.file	8	"/usr/local/cuda/bin/../include/driver_types.h"
+	.file	9	"/usr/local/cuda/bin/../include/texture_types.h"
+	.file	10	"/usr/local/cuda/bin/../include/vector_types.h"
+	.file	11	"/usr/local/cuda/bin/../include/device_launch_parameters.h"
+	.file	12	"/usr/local/cuda/bin/../include/crt/storage_class.h"
+	.file	13	"/usr/include/i386/_types.h"
+	.file	14	"/usr/include/time.h"
+	.file	15	"prefix-sum.cu"
+	.file	16	"/usr/local/cuda/bin/../include/common_functions.h"
+	.file	17	"/usr/local/cuda/bin/../include/crt/func_macro.h"
+	.file	18	"/usr/local/cuda/bin/../include/math_functions.h"
+	.file	19	"/usr/local/cuda/bin/../include/device_functions.h"
+	.file	20	"/usr/local/cuda/bin/../include/math_constants.h"
+	.file	21	"/usr/local/cuda/bin/../include/sm_11_atomic_functions.h"
+	.file	22	"/usr/local/cuda/bin/../include/sm_12_atomic_functions.h"
+	.file	23	"/usr/local/cuda/bin/../include/sm_13_double_functions.h"
+	.file	24	"/usr/local/cuda/bin/../include/common_types.h"
+	.file	25	"/usr/local/cuda/bin/../include/sm_20_atomic_functions.h"
+	.file	26	"/usr/local/cuda/bin/../include/sm_20_intrinsics.h"
+	.file	27	"/usr/local/cuda/bin/../include/texture_fetch_functions.h"
+	.file	28	"/usr/local/cuda/bin/../include/math_functions_dbl_ptx1.h"
+
+	.extern	.shared .align 4 .b8 temp[];
+
+	.entry _Z16prefix_sum_blockIjEvPT_S1_j (
+		.param .u32 __cudaparm__Z16prefix_sum_blockIjEvPT_S1_j_in,
+		.param .u32 __cudaparm__Z16prefix_sum_blockIjEvPT_S1_j_out,
+		.param .u32 __cudaparm__Z16prefix_sum_blockIjEvPT_S1_j_n)
+	{
+	.reg .u32 %r<81>;
+	.reg .pred %p<11>;
+	.loc	15	28	0
+$LBB1__Z16prefix_sum_blockIjEvPT_S1_j:
+	ld.param.u32 	%r1, [__cudaparm__Z16prefix_sum_blockIjEvPT_S1_j_n];
+	cvt.s32.u16 	%r2, %tid.x;
+	setp.lt.u32 	%p1, %r2, %r1;
+	@!%p1 bra 	$Lt_0_7938;
+	.loc	15	35	0
+	ld.param.u32 	%r3, [__cudaparm__Z16prefix_sum_blockIjEvPT_S1_j_in];
+	mul24.lo.u32 	%r4, %r2, 4;
+	add.u32 	%r5, %r3, %r4;
+	ld.global.u32 	%r6, [%r5+0];
+	bra.uni 	$Lt_0_7682;
+$Lt_0_7938:
+	mov.u32 	%r6, 0;
+$Lt_0_7682:
+	mov.u32 	%r7, temp;
+	shr.u32 	%r8, %r2, 4;
+	add.u32 	%r9, %r2, %r8;
+	mul.lo.u32 	%r10, %r9, 4;
+	add.u32 	%r11, %r10, %r7;
+	st.shared.u32 	[%r11+0], %r6;
+	cvt.s32.u16 	%r12, %ntid.x;
+	add.s32 	%r13, %r12, %r2;
+	.loc	15	28	0
+	ld.param.u32 	%r1, [__cudaparm__Z16prefix_sum_blockIjEvPT_S1_j_n];
+	.loc	15	35	0
+	setp.lt.u32 	%p2, %r13, %r1;
+	@!%p2 bra 	$Lt_0_8450;
+	.loc	15	36	0
+	ld.param.u32 	%r14, [__cudaparm__Z16prefix_sum_blockIjEvPT_S1_j_in];
+	mul.lo.u32 	%r15, %r13, 4;
+	add.u32 	%r16, %r14, %r15;
+	ld.global.u32 	%r17, [%r16+0];
+	bra.uni 	$Lt_0_8194;
+$Lt_0_8450:
+	mov.u32 	%r17, 0;
+$Lt_0_8194:
+	shr.u32 	%r18, %r13, 4;
+	add.u32 	%r19, %r13, %r18;
+	mul.lo.u32 	%r20, %r19, 4;
+	add.u32 	%r21, %r20, %r7;
+	st.shared.u32 	[%r21+0], %r17;
+	.loc	15	39	0
+	mov.s32 	%r22, %r12;
+	mov.u32 	%r23, 0;
+	setp.le.s32 	%p3, %r12, %r23;
+	mov.s32 	%r24, 1;
+	@%p3 bra 	$Lt_0_13314;
+$Lt_0_9218:
+ //<loop> Loop body line 39, nesting depth: 1, estimated iterations: unknown
+	.loc	15	40	0
+	bar.sync 	0;
+	setp.le.s32 	%p4, %r22, %r2;
+	@%p4 bra 	$Lt_0_9474;
+ //<loop> Part of loop body line 39, head labeled $Lt_0_9218
+	.loc	15	43	0
+	mul24.lo.u32 	%r25, %r2, 2;
+	add.u32 	%r26, %r25, 1;
+	add.u32 	%r27, %r25, 2;
+	mul.lo.u32 	%r28, %r24, %r26;
+	mul.lo.u32 	%r29, %r24, %r27;
+	sub.u32 	%r30, %r29, 1;
+	shr.u32 	%r31, %r30, 4;
+	add.u32 	%r32, %r29, %r31;
+	mul.lo.u32 	%r33, %r32, 4;
+	add.u32 	%r34, %r33, %r7;
+	ld.shared.u32 	%r35, [%r34+-4];
+	sub.u32 	%r36, %r28, 1;
+	shr.u32 	%r37, %r36, 4;
+	add.u32 	%r38, %r28, %r37;
+	mul.lo.u32 	%r39, %r38, 4;
+	add.u32 	%r40, %r7, %r39;
+	ld.shared.u32 	%r41, [%r40+-4];
+	add.u32 	%r42, %r35, %r41;
+	st.shared.u32 	[%r34+-4], %r42;
+$Lt_0_9474:
+ //<loop> Part of loop body line 39, head labeled $Lt_0_9218
+	.loc	15	39	0
+	shr.s32 	%r22, %r22, 1;
+	shl.b32 	%r24, %r24, 1;
+	mov.u32 	%r43, 0;
+	setp.gt.s32 	%p5, %r22, %r43;
+	@%p5 bra 	$Lt_0_9218;
+	bra.uni 	$Lt_0_8706;
+$Lt_0_13314:
+$Lt_0_8706:
+	mov.u32 	%r44, 0;
+	setp.ne.s32 	%p6, %r2, %r44;
+	@%p6 bra 	$Lt_0_10242;
+	.loc	15	47	0
+	mul24.lo.s32 	%r45, %r12, 2;
+	mov.u32 	%r46, 0;
+	sub.u32 	%r47, %r45, 1;
+	shr.u32 	%r48, %r47, 4;
+	add.u32 	%r49, %r45, %r48;
+	mul.lo.u32 	%r50, %r49, 4;
+	add.u32 	%r51, %r7, %r50;
+	st.shared.u32 	[%r51+-4], %r46;
+$Lt_0_10242:
+	mov.u32 	%r52, 1;
+	setp.lt.s32 	%p7, %r12, %r52;
+	@%p7 bra 	$Lt_0_10754;
+	mov.s32 	%r22, 1;
+$Lt_0_11266:
+ //<loop> Loop body line 47, nesting depth: 1, estimated iterations: unknown
+	.loc	15	50	0
+	shr.s32 	%r24, %r24, 1;
+	.loc	15	51	0
+	bar.sync 	0;
+	setp.le.s32 	%p8, %r22, %r2;
+	@%p8 bra 	$Lt_0_11522;
+ //<loop> Part of loop body line 47, head labeled $Lt_0_11266
+	.loc	15	55	0
+	mul24.lo.u32 	%r53, %r2, 2;
+	add.u32 	%r54, %r53, 1;
+	mul.lo.u32 	%r55, %r24, %r54;
+	sub.u32 	%r56, %r55, 1;
+	shr.u32 	%r57, %r56, 4;
+	add.u32 	%r58, %r55, %r57;
+	mul.lo.u32 	%r59, %r58, 4;
+	add.u32 	%r60, %r59, %r7;
+	ld.shared.u32 	%r61, [%r60+-4];
+	.loc	15	56	0
+	add.u32 	%r62, %r53, 2;
+	mul.lo.u32 	%r63, %r24, %r62;
+	sub.u32 	%r64, %r63, 1;
+	shr.u32 	%r65, %r64, 4;
+	add.u32 	%r66, %r63, %r65;
+	mul.lo.u32 	%r67, %r66, 4;
+	add.u32 	%r68, %r67, %r7;
+	ld.shared.u32 	%r69, [%r68+-4];
+	st.shared.u32 	[%r60+-4], %r69;
+	.loc	15	57	0
+	ld.shared.u32 	%r70, [%r68+-4];
+	add.u32 	%r71, %r70, %r61;
+	st.shared.u32 	[%r68+-4], %r71;
+$Lt_0_11522:
+ //<loop> Part of loop body line 47, head labeled $Lt_0_11266
+	.loc	15	49	0
+	shl.b32 	%r22, %r22, 1;
+	setp.le.s32 	%p9, %r22, %r12;
+	@%p9 bra 	$Lt_0_11266;
+$Lt_0_10754:
+	.loc	15	60	0
+	bar.sync 	0;
+	@!%p1 bra 	$Lt_0_12290;
+	.loc	15	62	0
+	ld.shared.u32 	%r72, [%r11+0];
+	ld.param.u32 	%r73, [__cudaparm__Z16prefix_sum_blockIjEvPT_S1_j_out];
+	mul24.lo.u32 	%r74, %r2, 4;
+	add.u32 	%r75, %r73, %r74;
+	st.global.u32 	[%r75+0], %r72;
+$Lt_0_12290:
+	@!%p2 bra 	$Lt_0_12802;
+	.loc	15	63	0
+	ld.shared.u32 	%r76, [%r21+0];
+	ld.param.u32 	%r77, [__cudaparm__Z16prefix_sum_blockIjEvPT_S1_j_out];
+	mul.lo.u32 	%r78, %r13, 4;
+	add.u32 	%r79, %r77, %r78;
+	st.global.u32 	[%r79+0], %r76;
+$Lt_0_12802:
+	.loc	15	64	0
+	exit;
+$LDWend__Z16prefix_sum_blockIjEvPT_S1_j:
+	} // _Z16prefix_sum_blockIjEvPT_S1_j
+

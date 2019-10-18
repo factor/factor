@@ -174,7 +174,7 @@ M: gadget dim-changed
 
 PRIVATE>
 
-M: gadget (>>dim) ( dim gadget -- )
+M: gadget dim<< ( dim gadget -- )
     2dup dim>> =
     [ 2drop ]
     [ [ nip ] [ call-next-method ] 2bi dim-changed ] if ;
@@ -184,7 +184,7 @@ GENERIC: pref-dim* ( gadget -- dim )
 : pref-dim ( gadget -- dim )
     dup pref-dim>> [ ] [
         [ pref-dim* ] [ ] [ layout-state>> ] tri
-        [ drop ] [ dupd (>>pref-dim) ] if
+        [ drop ] [ dupd pref-dim<< ] if
     ] ?if ;
 
 : pref-dims ( gadgets -- seq ) [ pref-dim ] map ;
@@ -395,4 +395,4 @@ M: f request-focus-on 2drop ;
 
 USE: vocabs.loader
 
-"prettyprint" "ui.gadgets.prettyprint" require-when
+{ "ui.gadgets" "prettyprint" } "ui.gadgets.prettyprint" require-when

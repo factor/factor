@@ -5,10 +5,7 @@ ui.tools.listener ui.tools.browser ui.tools.common ui.tools.error-list
 ui.tools.walker ui.commands ui.gestures ui ui.private ;
 IN: ui.tools
 
-: main ( -- )
-    restore-windows? [ restore-windows ] [ listener-window ] if ;
-
-MAIN: main
+MAIN: listener-window
 
 \ refresh-all H{ { +nullary+ t } { +listener+ t } } define-command
 

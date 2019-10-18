@@ -25,6 +25,7 @@ IN: bootstrap.x86
 : nv-reg ( -- reg ) ESI ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
+: link-reg ( -- reg ) EBX ;
 : fixnum>slot@ ( -- ) temp0 2 SAR ;
 : rex-length ( -- n ) 0 ;
 
@@ -87,15 +88,9 @@ IN: bootstrap.x86
     ESP 4 [+] EAX MOV
     "begin_callback" jit-call
 
-    jit-load-vm
-    jit-load-context
-    jit-restore-context
-
     jit-call-quot
 
     jit-load-vm
-    jit-save-context
-
     ESP [] vm-reg MOV
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
@@ -117,13 +112,6 @@ IN: bootstrap.x86
     ! Windows-specific setup
     ctx-reg jit-update-seh
 
-    ! Clear x87 stack, but preserve rounding mode and exception flags
-    ESP 2 SUB
-    ESP [] FNSTCW
-    FNINIT
-    ESP [] FLDCW
-    ESP 2 ADD
-
     ! Load arguments
     EAX ESP stack-frame-size [+] MOV
     EDX ESP stack-frame-size 4 + [+] MOV
@@ -133,6 +121,18 @@ IN: bootstrap.x86
 
     jit-jump-quot
 ] \ unwind-native-frames define-sub-primitive
+
+[
+    ESP 2 SUB
+    ESP [] FNSTCW
+    FNINIT
+    AX ESP [] MOV
+    ESP 2 ADD
+] \ fpu-state define-sub-primitive
+
+[
+    ESP stack-frame-size [+] FLDCW
+] \ set-fpu-state define-sub-primitive
 
 [
     ! Load callstack object
@@ -252,9 +252,9 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    ! Save ds, rs registers
-    jit-load-vm
-    jit-save-context
+    ! Reset return value since its bogus right now, to avoid
+    ! confusing the GC
+    ESP -4 [+] 0 MOV
 
     ! Make the new context the current one
     ctx-reg swap MOV
@@ -276,6 +276,10 @@ IN: bootstrap.x86
     EDX ds-reg -4 [+] MOV
     ds-reg 8 SUB
 
+    ! Save ds, rs registers
+    jit-load-vm
+    jit-save-context
+
     ! Make the new context active
     EAX jit-switch-context
 
@@ -291,23 +295,30 @@ IN: bootstrap.x86
 
 [ jit-set-context ] \ (set-context) define-sub-primitive
 
+: jit-save-quot-and-param ( -- )
+    EDX ds-reg MOV
+    ds-reg 8 SUB ;
+
+: jit-push-param ( -- )
+    EAX EDX -4 [+] MOV
+    ds-reg 4 ADD
+    ds-reg [] EAX MOV ;
+
 : jit-start-context ( -- )
     ! Create the new context in return-reg
     jit-load-vm
+    jit-save-context
     ESP [] vm-reg MOV
     "new_context" jit-call
 
-    ! Save pointer to quotation and parameter
-    EDX ds-reg MOV
-    ds-reg 8 SUB
+    jit-save-quot-and-param
 
     ! Make the new context active
+    jit-load-vm
+    jit-save-context
     EAX jit-switch-context
 
-    ! Push parameter
-    EAX EDX -4 [+] MOV
-    ds-reg 4 ADD
-    ds-reg [] EAX MOV
+    jit-push-param
 
     ! Windows-specific setup
     jit-install-seh
@@ -333,7 +344,20 @@ IN: bootstrap.x86
     jit-set-context
 ] \ (set-context-and-delete) define-sub-primitive
 
+: jit-start-context-and-delete ( -- )
+    jit-load-vm
+    jit-load-context
+    ESP [] vm-reg MOV
+    ESP 4 [+] ctx-reg MOV
+    "reset_context" jit-call
+
+    jit-save-quot-and-param
+    ctx-reg jit-switch-context
+    jit-push-param
+
+    EAX EDX [] MOV
+    jit-jump-quot ;
+
 [
-    jit-delete-current-context
-    jit-start-context
+    jit-start-context-and-delete
 ] \ (start-context-and-delete) define-sub-primitive

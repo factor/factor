@@ -22,17 +22,7 @@ M: array c-type-align first c-type-align ;
 
 M: array c-type-align-first first c-type-align-first ;
 
-M: array c-type-stack-align? drop f ;
-
-M: array unbox-parameter drop void* unbox-parameter ;
-
-M: array unbox-return drop void* unbox-return ;
-
-M: array box-parameter drop void* box-parameter ;
-
-M: array box-return drop void* box-return ;
-
-M: array stack-size drop void* stack-size ;
+M: array base-type drop void* base-type ;
 
 PREDICATE: string-type < pair
     first2 [ c-string = ] [ word? ] bi* and ;
@@ -43,41 +33,15 @@ M: string-type c-type-class drop object ;
 
 M: string-type c-type-boxed-class drop object ;
 
-M: string-type heap-size
-    drop void* heap-size ;
+M: string-type heap-size drop void* heap-size ;
 
-M: string-type c-type-align
-    drop void* c-type-align ;
+M: string-type c-type-align drop void* c-type-align ;
 
-M: string-type c-type-align-first
-    drop void* c-type-align-first ;
+M: string-type c-type-align-first drop void* c-type-align-first ;
 
-M: string-type c-type-stack-align?
-    drop void* c-type-stack-align? ;
+M: string-type base-type drop void* base-type ;
 
-M: string-type unbox-parameter
-    drop void* unbox-parameter ;
-
-M: string-type unbox-return
-    drop void* unbox-return ;
-
-M: string-type box-parameter
-    drop void* box-parameter ;
-
-M: string-type box-return
-    drop void* box-return ;
-
-M: string-type stack-size
-    drop void* stack-size ;
-
-M: string-type c-type-rep
-    drop int-rep ;
-
-M: string-type c-type-boxer
-    drop void* c-type-boxer ;
-
-M: string-type c-type-unboxer
-    drop void* c-type-unboxer ;
+M: string-type c-type-rep drop int-rep ;
 
 M: string-type c-type-boxer-quot
     second dup binary =
@@ -91,6 +55,9 @@ M: string-type c-type-unboxer-quot
 
 M: string-type c-type-getter
     drop [ alien-cell ] ;
+
+M: string-type c-type-copier
+    drop [ ] ;
 
 M: string-type c-type-setter
     drop [ set-alien-cell ] ;

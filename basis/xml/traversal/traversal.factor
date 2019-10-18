@@ -50,7 +50,7 @@ PRIVATE>
     assure-name '[ _ _ tag-with-attr? ] find nip ;
 
 : tags-with-attr ( tag attr-value attr-name -- tags-seq )
-    assure-name '[ _ _ tag-with-attr? ] filter children>> ;
+    assure-name '[ _ _ tag-with-attr? ] { } filter-as ;
 
 : deep-tag-with-attr ( tag attr-value attr-name -- matching-tag )
     assure-name '[ _ _ tag-with-attr? ] deep-find ;

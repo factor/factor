@@ -1,8 +1,12 @@
+! Copyright (C) 2008, 2010 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: ascii kernel io io.files splitting strings
 io.encodings.ascii hashtables sequences assocs math
-math.statistics namespaces prettyprint math.parser combinators
-arrays sorting formatting grouping fry ;
+math.statistics namespaces math.parser combinators arrays
+sorting formatting grouping fry ;
 IN: benchmark.knucleotide
+
+CONSTANT: knucleotide-in "vocab:benchmark/knucleotide/knucleotide-input.txt"
 
 : discard-lines ( -- )
     readln
@@ -34,7 +38,7 @@ IN: benchmark.knucleotide
     tri ;
 
 : knucleotide ( -- )
-    "resource:extra/benchmark/knucleotide/knucleotide-input.txt"
+    knucleotide-in
     ascii [ read-input ] with-file-reader
     process-input ;
 

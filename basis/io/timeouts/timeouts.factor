@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel calendar alarms io io.encodings accessors
-namespaces fry io.streams.null ;
+USING: accessors fry io io.encodings io.streams.null kernel
+namespaces timers ;
 IN: io.timeouts
 
 GENERIC: timeout ( obj -- dt/f )
@@ -13,11 +13,11 @@ M: encoder set-timeout stream>> set-timeout ;
 
 GENERIC: cancel-operation ( obj -- )
 
-: queue-timeout ( obj timeout -- alarm )
+: queue-timeout ( obj timeout -- timer )
     [ '[ _ cancel-operation ] ] dip later ;
 
 : with-timeout* ( obj timeout quot -- )
-    3dup drop queue-timeout [ nip call ] dip cancel-alarm ;
+    3dup drop queue-timeout [ nip call ] dip stop-timer ;
     inline
 
 : with-timeout ( obj quot -- )

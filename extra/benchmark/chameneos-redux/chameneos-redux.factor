@@ -65,7 +65,7 @@ TUPLE: meeting-place count mailbox ;
     first2 {
         [ [ [ 1 + ] change-count ] bi@ 2drop ]
         [ 2dup = [ [ 1 + ] change-self-count ] when 2drop ]
-        [ [ [ color>> ] bi@ complement-color ] [ [ (>>color) ] bi-curry@ bi ] 2bi ]
+        [ [ [ color>> ] bi@ complement-color ] [ [ color<< ] bi-curry@ bi ] 2bi ]
         [ [ mailbox>> f swap mailbox-put ] bi@ ]
     } 2cleave ;
 

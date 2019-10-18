@@ -106,12 +106,12 @@ SYMBOL: callbacks
 ! returning from it, to avoid a bad interaction between threads
 ! and callbacks. See basis/compiler/tests/alien.factor for a
 ! test case.
-: wait-to-return ( yield-quot callback-id -- )
+: wait-to-return ( yield-quot: ( -- ) callback-id -- )
     dup current-callback eq?
-    [ 2drop ] [ over call( -- ) wait-to-return ] if ;
+    [ 2drop ] [ over call wait-to-return ] if ; inline recursive
 
 ! Used by compiler.codegen to wrap callback bodies
-: do-callback ( callback-quot yield-quot -- )
+: do-callback ( callback-quot yield-quot: ( -- ) -- )
     init-namespaces
     init-catchstack
     current-callback

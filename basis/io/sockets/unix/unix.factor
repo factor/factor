@@ -32,8 +32,8 @@ M: unix sockaddr-of-family ( alien af -- addrspec )
 
 M: unix addrspec-of-family ( af -- addrspec )
     {
-        { AF_INET [ T{ inet4 } ] }
-        { AF_INET6 [ T{ inet6 } ] }
+        { AF_INET [ T{ ipv4 } ] }
+        { AF_INET6 [ T{ ipv6 } ] }
         { AF_UNIX [ T{ local } ] }
         [ drop f ]
     } case ;

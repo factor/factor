@@ -39,7 +39,7 @@ ERROR: end-of-stream multipart ;
 
 : fill-bytes ( multipart -- multipart )
     buffer-size read
-    [ '[ _ append ] change-bytes ]
+    [ '[ _ B{ } append-as ] change-bytes ]
     [ t >>end-of-stream? ] if* ;
 
 : maybe-fill-bytes ( multipart -- multipart )
@@ -151,5 +151,5 @@ ERROR: no-content-disposition multipart ;
     dup end-of-stream?>> [ process-header parse-multipart-loop ] unless ;
 
 : parse-multipart ( separator -- mime-parts )
-    <multipart> parse-beginning fill-bytes parse-multipart-loop
-    mime-parts>> ;
+    <multipart> parse-beginning fill-bytes
+    parse-multipart-loop mime-parts>> ;

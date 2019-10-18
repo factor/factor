@@ -20,6 +20,8 @@ $nl
 }
 "Creating a string from a single character:"
 { $subsections 1string }
+"Resizing strings:"
+{ $subsections resize-string }
 { $see-also "syntax-strings" "sbufs" "unicode" "io.encodings" } ;
 
 ABOUT: "strings"
@@ -53,4 +55,5 @@ HELP: >string
 
 HELP: resize-string ( n str -- newstr )
 { $values { "n" "a non-negative integer" } { "str" string } { "newstr" string } }
-{ $description "Creates a new string " { $snippet "n" } " characters long The contents of the existing string are copied into the new string; if the new string is shorter, only an initial segment is copied, and if the new string is longer the remaining space is filled with " { $snippet "\\u000000" } "." } ;
+{ $description "Resizes the string to have a length of " { $snippet "n" } " elements. When making the string shorter, this word may either create a new string or modify the existing string in place. When making the string longer, this word always allocates a new string, filling remaining space with zeroes." }
+{ $side-effects "str" } ;

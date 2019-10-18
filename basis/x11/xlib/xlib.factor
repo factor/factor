@@ -565,7 +565,8 @@ CONSTANT: SelectionNotify       31
 CONSTANT: ColormapNotify        32
 CONSTANT: ClientMessage         33
 CONSTANT: MappingNotify         34
-CONSTANT: LASTEvent             35
+CONSTANT: GenericEvent          35
+CONSTANT: LASTEvent             36
 
 STRUCT: XAnyEvent
 { type int }
@@ -1013,6 +1014,34 @@ STRUCT: XKeymapEvent
 { window Window }
 { pad int[8] } ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Newer things, needed for XInput2 support. Not in the book.
+
+! GenericEvent is the standard event for all newer extensions.
+STRUCT: XGenericEvent
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ extension int }
+{ evtype int } ;
+
+STRUCT: XGenericEventCookie
+{ type int }
+{ serial ulong }
+{ send_event Bool }
+{ display Display* }
+{ extension int }
+{ evtype int }
+{ cookie uint }
+{ data void* } ;
+
+X-FUNCTION: Bool XGetEventData ( Display* dpy, XGenericEventCookie* cookie ) ;
+X-FUNCTION: void XFreeEventData ( Display* dpy, XGenericEventCookie* cookie ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 UNION-STRUCT: XEvent
 { int int }
 { XAnyEvent XAnyEvent }
@@ -1046,6 +1075,8 @@ UNION-STRUCT: XEvent
 { XMappingEvent XMappingEvent }
 { XErrorEvent XErrorEvent }
 { XKeymapEvent XKeymapEvent }
+{ XGenericEvent XGenericEvent }
+{ XGenericEventCookie XGenericEventCookie }
 { padding long[24] } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1217,6 +1248,16 @@ X-FUNCTION: Pixmap XCreateBitmapFromData (
     c-string data,
     uint width,
     uint height ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Appendix C - Extensions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+X-FUNCTION: Bool XQueryExtension (
+        Display* display,
+        c-string name,
+        int* major_opcode_return,
+        int* first_event_return,
+        int* first_error_return ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Appendix D - Compatibility Functions

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel alien.syntax alien.c-types math unix.types
-classes.struct accessors ;
+USING: accessors alien.c-types alien.syntax
+classes.struct kernel math unix.types ;
 IN: unix.time
 
 STRUCT: timeval
@@ -24,6 +24,10 @@ STRUCT: timespec
         swap >>nsec
         swap >>sec ;
 
+STRUCT: timezone
+    { tz_minuteswest int }
+    { tz_dsttime int } ;
+
 STRUCT: tm
     { sec int }
     { min int }
@@ -40,3 +44,5 @@ STRUCT: tm
 FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: tm* localtime ( time_t* clock ) ;
 FUNCTION: int gettimeofday ( timespec* TP, void* TZP ) ;
+FUNCTION: int settimeofday ( timeval* TP, timezone* TZP ) ;
+FUNCTION: int adjtime ( timeval* delta, timeval* olddelta ) ;

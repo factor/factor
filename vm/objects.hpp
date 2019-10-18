@@ -26,8 +26,6 @@ enum special_object {
 	OBJ_YIELD_CALLBACK,        /* used when Factor is embedded in a C app */
 	OBJ_SLEEP_CALLBACK,        /* used when Factor is embedded in a C app */
 
-	OBJ_COCOA_EXCEPTION = 19,  /* Cocoa exception handler quotation */
-
 	OBJ_STARTUP_QUOT = 20,     /* startup quotation */
 	OBJ_GLOBAL,                /* global namespace */
 	OBJ_SHUTDOWN_QUOT,         /* shutdown quotation */
@@ -57,6 +55,8 @@ enum special_object {
 	C_TO_FACTOR_WORD,
 	LAZY_JIT_COMPILE_WORD,
 	UNWIND_NATIVE_FRAMES_WORD,
+	GET_FPU_STATE_WORD,
+	SET_FPU_STATE_WORD,
 
 	/* Incremented on every modify-code-heap call; invalidates call( inline
 	caching */

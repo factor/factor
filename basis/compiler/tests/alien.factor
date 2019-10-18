@@ -5,11 +5,19 @@ io.backend io.pathnames io.streams.string kernel
 math memory namespaces namespaces.private parser
 quotations sequences specialized-arrays stack-checker
 stack-checker.errors system threads tools.test words
-alien.complex concurrency.promises ;
+alien.complex concurrency.promises alien.data
+byte-arrays classes compiler.test ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
 IN: compiler.tests.alien
+
+! Make sure that invalid inputs don't pass the stack checker
+[ [ void { } "cdecl" alien-indirect ] infer ] must-fail
+[ [ "void" { } cdecl alien-indirect ] infer ] must-fail
+[ [ void* 3 cdecl alien-indirect ] infer ] must-fail
+[ [ void* { "int" } cdecl alien-indirect ] infer ] must-fail
+[ [ void* { int } cdecl { } alien-callback ] infer ] must-fail
 
 <<
 : libfactor-ffi-tests-path ( -- string )
@@ -36,6 +44,8 @@ FUNCTION: void ffi_test_0 ;
 
 FUNCTION: int ffi_test_1 ;
 [ 3 ] [ ffi_test_1 ] unit-test
+
+[ ] [ \ ffi_test_1 def>> [ drop ] append compile-call ] unit-test
 
 FUNCTION: int ffi_test_2 int x int y ;
 [ 5 ] [ 2 3 ffi_test_2 ] unit-test
@@ -98,8 +108,6 @@ FUNCTION: TINY ffi_test_17 int x ;
     int { } cdecl alien-indirect ;
 
 { 1 1 } [ indirect-test-1 ] must-infer-as
-
-[ B{ } indirect-test-1 ] [ { "kernel-error" 3 6 B{ } } = ] must-fail-with
 
 [ 3 ] [ &: ffi_test_1 indirect-test-1 ] unit-test
 
@@ -450,11 +458,11 @@ STRUCT: double-rect
     void { void* void* double-rect } cdecl alien-indirect
     "example" get-global ;
 
-[ 1.0 2.0 3.0 4.0 ]
+[ byte-array 1.0 2.0 3.0 4.0 ]
 [
     1.0 2.0 3.0 4.0 <double-rect>
     double-rect-callback double-rect-test
-    >double-rect<
+    [ >c-ptr class ] [ >double-rect< ] bi
 ] unit-test
 
 STRUCT: test_struct_14
@@ -610,11 +618,6 @@ FUNCTION: short ffi_test_48 ( bool-field-test x ) ;
 [ 200 ] [ thread-callback-2 thread-callback-invoker ] unit-test
 [ 100 ] [ "p" get ?promise ] unit-test
 
-! Regression: calling an undefined function would raise a protection fault
-FUNCTION: void this_does_not_exist ( ) ;
-
-[ this_does_not_exist ] [ { "kernel-error" 9 f f } = ] must-fail-with
-
 ! More alien-assembly tests are in cpu.* vocabs
 : assembly-test-1 ( -- ) void { } cdecl [ ] alien-assembly ;
 
@@ -761,3 +764,84 @@ mingw? [
 
 [ S{ test-struct-11 f 7 -3 } ]
 [ 3 4 7 fastcall-struct-return-iii-callback fastcall-struct-return-iii-indirect ] unit-test
+
+: x64-regression-1 ( -- c )
+    int { int int int int int } cdecl [ + + + + ] alien-callback ;
+
+: x64-regression-2 ( x x x x x c -- y )
+    int { int int int int int } cdecl alien-indirect ; inline
+
+[ 661 ] [ 100 500 50 10 1 x64-regression-1 x64-regression-2 ] unit-test
+
+! Stack allocation
+: blah ( -- x ) { RECT } [ 1.5 >>x 2.0 >>y [ x>> ] [ y>> ] bi * >fixnum ] with-scoped-allocation ;
+
+[ 3 ] [ blah ] unit-test
+
+: out-param-test-1 ( -- b )
+    { int } [ [ 12 ] dip 0 int set-alien-value ] with-out-parameters ;
+
+[ 12 ] [ out-param-test-1 ] unit-test
+
+: out-param-test-2 ( -- b )
+    { { int initial: 12 } } [ drop ] with-out-parameters ;
+
+[ 12 ] [ out-param-test-2 ] unit-test
+
+: out-param-test-3 ( -- x y )
+    { { RECT initial: S{ RECT { x 3 } { y 4 } } } } [ drop ]
+    with-out-parameters
+    [ x>> ] [ y>> ] bi ;
+
+[ 3.0 4.0 ] [ out-param-test-3 ] unit-test
+
+: out-param-callback ( -- a )
+    void { int pointer: int } cdecl
+    [ [ 2 * ] dip 0 int set-alien-value ] alien-callback ;
+
+: out-param-indirect ( a a -- b )
+    { int } [
+        swap void { int pointer: int } cdecl
+        alien-indirect
+    ] with-out-parameters ;
+
+[ 12 ] [ 6 out-param-callback out-param-indirect ] unit-test
+
+! Alias analysis regression
+: aa-callback-1 ( -- c )
+    double { } cdecl [ 5.0 ] alien-callback ;
+
+: aa-indirect-1 ( c -- x )
+    double { } cdecl alien-indirect ; inline
+
+TUPLE: some-tuple x ;
+
+[ T{ some-tuple f 5.0 } ] [
+    [
+        some-tuple new
+        aa-callback-1
+        aa-indirect-1 >>x
+    ] compile-call
+] unit-test
+
+! Write barrier elimination was being done before scheduling and
+! GC check insertion, and didn't take subroutine calls into
+! account. Oops...
+: write-barrier-elim-in-wrong-place ( -- obj )
+    ! A callback used below
+    void { } cdecl [ compact-gc ] alien-callback
+    ! Allocate an object A in the nursery
+    1 f <array>
+    ! Subroutine call promotes the object to tenured
+    swap void { } cdecl alien-indirect
+    ! Allocate another object B in the nursery, store it into
+    ! the first
+    1 f <array> over set-first
+    ! Now object A's card should be marked and minor GC should
+    ! promote B to aging
+    minor-gc
+    ! Do stuff
+    [ 100 [ ] times ] infer.
+    ;
+
+[ { { f } } ] [ write-barrier-elim-in-wrong-place ] unit-test

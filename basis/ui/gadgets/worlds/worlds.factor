@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations kernel math models
-namespaces opengl opengl.textures sequences io colors combinators
-combinators.short-circuit fry math.vectors math.rectangles cache
-ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-ui.pixel-formats destructors literals strings ;
+USING: accessors arrays assocs cache colors combinators
+combinators.short-circuit concurrency.promises continuations
+destructors fry io kernel literals math math.rectangles
+math.vectors models namespaces opengl opengl.textures sequences
+strings ui.backend ui.gadgets ui.gadgets.tracks ui.gestures
+ui.pixel-formats ui.render ;
 IN: ui.gadgets.worlds
 
 SYMBOLS:
@@ -20,7 +21,6 @@ CONSTANT: default-world-pixel-format-attributes
     {
         windowed
         double-buffered
-        T{ depth-bits { value 16 } }
     }
 
 CONSTANT: default-world-window-controls
@@ -41,6 +41,7 @@ TUPLE: world < track
     window-loc
     pixel-format-attributes
     background-color
+    promise
     window-controls
     window-resources ;
 
@@ -76,14 +77,14 @@ TUPLE: world-attributes
 : show-status ( string/f gadget -- )
     dup find-world dup [
         dup status>> [
-            [ (>>status-owner) ] [ status>> set-model ] bi
+            [ status-owner<< ] [ status>> set-model ] bi
         ] [ 3drop ] if
     ] [ 3drop ] if ;
 
 : hide-status ( gadget -- )
     dup find-world dup [
         [ status-owner>> eq? ] keep
-        '[ f _ [ (>>status-owner) ] [ status>> set-model ] 2bi ] when
+        '[ f _ [ status-owner<< ] [ status>> set-model ] 2bi ] when
     ] [ 2drop ] if ;
 
 : window-resource ( resource -- resource )
@@ -119,7 +120,8 @@ M: world request-focus-on ( child gadget -- )
         f >>active?
         { 0 0 } >>window-loc
         f >>grab-input?
-        V{ } clone >>window-resources ;
+        V{ } clone >>window-resources
+        <promise> >>promise ;
 
 : initial-background-color ( attributes -- color )
     window-controls>> textured-background swap member-eq?
@@ -127,6 +129,7 @@ M: world request-focus-on ( child gadget -- )
     [ T{ rgba f 1.0 1.0 1.0 1.0 } ] if ;
 
 GENERIC# apply-world-attributes 1 ( world attributes -- world )
+
 M: world apply-world-attributes
     {
         [ title>> >>title ]
@@ -164,17 +167,13 @@ flush-layout-cache-hook [ [ ] ] initialize
 
 GENERIC: begin-world ( world -- )
 GENERIC: end-world ( world -- )
-
 GENERIC: resize-world ( world -- )
 
-M: world begin-world
-    drop ;
-M: world end-world
-    drop ;
-M: world resize-world
-    drop ;
+M: world begin-world drop ;
+M: world end-world drop ;
+M: world resize-world drop ;
 
-M: world (>>dim)
+M: world dim<<
     [ call-next-method ]
     [
         dup active?>> [

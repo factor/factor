@@ -1,20 +1,22 @@
 USING: accessors assocs compiler compiler.cfg
-compiler.cfg.debugger compiler.cfg.instructions compiler.cfg.mr
-compiler.cfg.registers compiler.codegen compiler.units
-cpu.architecture hashtables kernel namespaces sequences
-tools.test vectors words layouts literals math arrays
-alien.syntax math.private ;
+compiler.cfg.debugger compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.linear-scan
+compiler.cfg.ssa.destruction compiler.cfg.build-stack-frame
+compiler.codegen compiler.units cpu.architecture hashtables
+kernel namespaces sequences tools.test vectors words layouts
+literals math arrays alien.c-types alien.syntax math.private ;
 IN: compiler.tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
     gensym
-    [ build-mr generate ] dip
+    [ linear-scan build-stack-frame generate ] dip
     [ associate >alist t t modify-code-heap ] keep ;
 
 : compile-test-cfg ( -- word )
     cfg new 0 get >>entry
     dup cfg set
-    dup fake-representations representations get >>reps
+    dup fake-representations
+    destruct-ssa
     compile-cfg ;
 
 : compile-test-bb ( insns -- result )
@@ -33,13 +35,7 @@ IN: compiler.tests.low-level-ir
     compile-test-cfg
     execute( -- result ) ;
 
-! loading immediates
-[ f ] [
-    V{
-        T{ ##load-immediate f 0 $[ \ f type-number ] }
-    } compile-test-bb
-] unit-test
-
+! loading constants
 [ "hello" ] [
     V{
         T{ ##load-reference f 0 "hello" }
@@ -50,9 +46,9 @@ IN: compiler.tests.low-level-ir
 ! one of the sources
 [ t ] [
     V{
-        T{ ##load-immediate f 1 $[ 2 cell log2 shift array type-number - ] }
+        T{ ##load-tagged f 1 $[ 2 cell log2 shift array type-number - ] }
         T{ ##load-reference f 0 { t f t } }
-        T{ ##slot f 0 0 1 }
+        T{ ##slot f 0 0 1 0 0 }
     } compile-test-bb
 ] unit-test
 
@@ -65,9 +61,9 @@ IN: compiler.tests.low-level-ir
 
 [ t ] [
     V{
-        T{ ##load-immediate f 1 $[ 2 cell log2 shift array type-number - ] }
+        T{ ##load-tagged f 1 $[ 2 cell log2 shift array type-number - ] }
         T{ ##load-reference f 0 { t f t } }
-        T{ ##set-slot f 0 0 1 }
+        T{ ##set-slot f 0 0 1 0 0 }
     } compile-test-bb
     dup first eq?
 ] unit-test
@@ -82,14 +78,14 @@ IN: compiler.tests.low-level-ir
 
 [ 4 ] [
     V{
-        T{ ##load-immediate f 0 4 }
+        T{ ##load-tagged f 0 4 }
         T{ ##shl f 0 0 0 }
     } compile-test-bb
 ] unit-test
 
 [ 4 ] [
     V{
-        T{ ##load-immediate f 0 4 }
+        T{ ##load-tagged f 0 4 }
         T{ ##shl-imm f 0 0 4 }
     } compile-test-bb
 ] unit-test
@@ -97,24 +93,36 @@ IN: compiler.tests.low-level-ir
 [ 31 ] [
     V{
         T{ ##load-reference f 1 B{ 31 67 52 } }
-        T{ ##unbox-any-c-ptr f 0 1 }
-        T{ ##alien-unsigned-1 f 0 0 0 }
-        T{ ##shl-imm f 0 0 4 }
-    } compile-test-bb
-] unit-test
-
-[ CHAR: l ] [
-    V{
-        T{ ##load-reference f 0 "hello world" }
-        T{ ##load-immediate f 1 3 }
-        T{ ##string-nth f 0 0 1 2 }
-        T{ ##shl-imm f 0 0 4 }
+        T{ ##unbox-any-c-ptr f 2 1 }
+        T{ ##load-memory-imm f 3 2 0 int-rep uchar }
+        T{ ##shl-imm f 0 3 4 }
     } compile-test-bb
 ] unit-test
 
 [ 1 ] [
     V{
-        T{ ##load-immediate f 0 32 }
+        T{ ##load-tagged f 0 32 }
         T{ ##add-imm f 0 0 -16 }
+    } compile-test-bb
+] unit-test
+
+[ -1 ] [
+    V{
+        T{ ##load-tagged f 1 $[ -1 tag-fixnum ] }
+        T{ ##convert-integer f 0 1 char }
+    } compile-test-bb
+] unit-test
+
+[ -1 ] [
+    V{
+        T{ ##load-tagged f 1 $[ -1 9 2^ bitxor tag-fixnum ] }
+        T{ ##convert-integer f 0 1 char }
+    } compile-test-bb
+] unit-test
+
+[ $[ 255 tag-bits get neg shift ] ] [
+    V{
+        T{ ##load-tagged f 1 $[ -1 9 2^ bitxor tag-fixnum ] }
+        T{ ##convert-integer f 0 1 uchar }
     } compile-test-bb
 ] unit-test

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings alien.syntax arrays
 classes.struct fry io.encodings.ascii io.mmap kernel locals math
-math.intervals sequences specialized-arrays strings typed ;
+math.intervals sequences specialized-arrays strings typed assocs ;
 IN: elf
 
 ! FFI data
@@ -499,7 +499,7 @@ TYPED:: elf-segment-sections ( segment: Elf32/64_Phdr sections: Elf32/64_Shdr-ar
     segment [ p_offset>> dup ] [ p_filesz>> + ] bi [a,b)                            :> segment-interval
     sections [ dup [ sh_offset>> dup ] [ sh_size>> + ] bi [a,b) 2array ] { } map-as :> section-intervals
     section-intervals [ second segment-interval interval-intersect empty-interval = not ]
-    filter [ first ] map ;
+    filter keys ;
 
 TYPED:: virtual-address-segment ( elf: Elf32/64_Ehdr address -- program-header/f )
     elf elf-program-headers elf-loadable-segments [

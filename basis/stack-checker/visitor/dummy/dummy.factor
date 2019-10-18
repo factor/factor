@@ -25,4 +25,4 @@ M: f #drop, drop ;
 M: f #alien-invoke, drop ;
 M: f #alien-indirect, drop ;
 M: f #alien-assembly, drop ;
-M: f #alien-callback, drop ;
+M: f #alien-callback, 2drop ;

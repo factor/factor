@@ -1,11 +1,12 @@
 USING: accessors arrays classes compiler.test compiler.tree.debugger
 effects fry io kernel kernel.private math math.functions
-math.private math.vectors math.vectors.simd
+math.private math.vectors math.vectors.simd math.ranges
 math.vectors.simd.private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals combinators cpu.architecture namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
-quotations math.constants compiler.units splitting ;
+quotations math.constants compiler.units splitting math.matrices
+math.vectors.simd.cords alien.data ;
 FROM: math.vectors.simd.intrinsics => alien-vector set-alien-vector ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -128,7 +129,7 @@ CONSTANT: vector-words
         @
         [ dup [ class ] { } map-as ] dip '[ _ declare @ ]
         {
-            [ "print-mr" get [ nip test-mr mr. ] [ 2drop ] if ]
+            [ "print-mr" get [ nip regs. ] [ 2drop ] if ]
             [ "print-checks" get [ [ . ] bi@ ] [ 2drop ] if ]
             [ [ [ call ] dip call ] call( quot quot -- result ) ]
             [ [ [ call ] dip compile-call ] call( quot quot -- result ) ]
@@ -375,11 +376,56 @@ simd-classes&reps [
         [ dup '[ _ random ] replicate 1array ]
     } case ;
 
+: 2shuffles-for ( n -- shuffles )
+    {
+        { 2 [
+            {
+                { 0 1 }
+                { 0 3 }
+                { 2 3 }
+                { 2 0 }
+            }
+        ] }
+        { 4 [
+            {
+                { 0 1 2 3 }
+                { 4 1 2 3 }
+                { 0 5 2 3 }
+                { 0 1 6 3 }
+                { 0 1 2 7 }
+                { 4 5 2 3 }
+                { 0 1 6 7 }
+                { 4 5 6 7 }
+                { 0 5 2 7 }
+            }
+        ] }
+        { 8 [
+            4 2shuffles-for
+            4 2shuffles-for
+            [ [ 8 + ] map ] map
+            [ append ] 2map
+        ] }
+        [ dup 2 * '[ _ random ] replicate 1array ]
+    } case ;
+
 simd-classes [
     [ [ { } ] ] dip
     [ new length shuffles-for ] keep
     '[
         _ [ [ _ new [ length iota ] keep like 1quotation ] dip '[ _ vshuffle ] ]
+        [ = ] check-optimizer
+    ] unit-test
+] each
+
+simd-classes [
+    [ [ { } ] ] dip
+    [ new length 2shuffles-for ] keep
+    '[
+        _ [ [
+            _ new
+            [ [ length iota ] keep like ]
+            [ [ length dup dup + [a,b) ] keep like ] bi [ ] 2sequence
+        ] dip '[ _ vshuffle2-elements ] ]
         [ = ] check-optimizer
     ] unit-test
 ] each
@@ -564,6 +610,21 @@ STRUCT: simd-struct
 
 [ ] [ char-16 new 1array stack. ] unit-test
 
+! Test some sequence protocol stuff
+[ t ] [ 4 double-4{ 1 2 3 4 } new-sequence double-4? ] unit-test
+[ double-4{ 2 3 4 5 } ] [ double-4{ 1 2 3 4 } [ 1 + ] map ] unit-test
+
+! Test cross product
+[ float-4{ 0.0 0.0 1.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
+[ float-4{ 0.0 0.0 1.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 1.0 0.0 0.0 } [ { float-4 float-4 } declare cross ] compile-call ] unit-test
+[ float-4{ 0.0 -1.0 0.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test
+[ float-4{ 0.0 -1.0 0.0 0.0 } ] [ float-4{ 1.0 0.0 0.0 0.0 } float-4{ 0.0 0.0 1.0 0.0 } [ { float-4 float-4 } declare cross ] compile-call ] unit-test
+
+[ double-4{ 0.0 0.0 1.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 1.0 0.0 0.0 } cross ] unit-test
+[ double-4{ 0.0 0.0 1.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 1.0 0.0 0.0 } [ { double-4 double-4 } declare cross ] compile-call ] unit-test
+[ double-4{ 0.0 -1.0 0.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 0.0 1.0 0.0 } cross ] unit-test
+[ double-4{ 0.0 -1.0 0.0 0.0 } ] [ double-4{ 1.0 0.0 0.0 0.0 } double-4{ 0.0 0.0 1.0 0.0 } [ { double-4 double-4 } declare cross ] compile-call ] unit-test
+
 ! CSSA bug
 [ 4000000 ] [
     int-4{ 1000 1000 1000 1000 }
@@ -603,3 +664,47 @@ STRUCT: simd-struct
 
 [ float-4{ 0 0 0 0 } ]
 [ 5.0 float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-2 ] unit-test
+
+USE: alien
+
+: callback-1 ( -- c )
+    c:int { c:int c:int c:int c:int c:int } cdecl [ + + + + ] alien-callback ;
+
+: indirect-1 ( x x x x x c -- y )
+    c:int { c:int c:int c:int c:int c:int } cdecl alien-indirect ; inline
+
+: simd-spill-test-3 ( a b d c -- v )
+    { float float-4 float-4 float } declare
+    [ [ 3.0 + ] 2dip v+ ] dip sin v*n n*v
+    10 5 100 50 500 callback-1 indirect-1 665 assert= ;
+
+[ float-4{ 0 0 0 0 } ]
+[ 5.0 float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-3 ] unit-test
+
+! Stack allocation of SIMD values -- make sure that everything is
+! aligned right
+
+: simd-stack-test ( -- b c )
+    { c:int float-4 } [
+        [ 123 swap 0 c:int c:set-alien-value ]
+        [ float-4{ 1 2 3 4 } swap 0 float-4 c:set-alien-value ] bi*
+    ] with-out-parameters ;
+
+[ 123 float-4{ 1 2 3 4 } ] [ simd-stack-test ] unit-test
+
+! Stack allocation + spilling
+
+: (simd-stack-spill-test) ( -- n ) 17 ;
+
+: simd-stack-spill-test ( x -- b c )
+    { c:int } [
+        123 swap 0 c:int c:set-alien-value
+        >float (simd-stack-spill-test) float-4-with swap cos v*n
+    ] with-out-parameters ;
+
+[ ] [
+    1.047197551196598 simd-stack-spill-test
+    [ float-4{ 8.5 8.5 8.5 8.5 } approx= t assert= ]
+    [ 123 assert= ]
+    bi*
+] unit-test

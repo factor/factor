@@ -46,3 +46,15 @@ HELP: multiple-inheritance-attempted
 HELP: role-slot-overlap
 { $class-description "This error is thrown if a " { $link POSTPONE: TUPLE: } " or " { $link POSTPONE: ROLE: } " definition attempts to inherit a set of " { $link role } "s in which more than one attempts to define the same slot." } ;
 
+ARTICLE: "roles" "Roles"
+"The " { $vocab-link "roles" } " vocabulary provides a form of tuple interface that can be implemented by concrete tuple classes. A " { $link role } " definition is a mixin class that also prescribes a set of tuple slots. Roles are not tuple classes by themselves and cannot be instantiated by " { $link new } ". The vocabulary extends " { $link POSTPONE: TUPLE: } " syntax to allow concrete tuple types to declare membership to one or more roles, automatically including their prescribed slots." $nl
+"The role superclass:"
+{ $subsections role }
+"Syntax for making a new role:"
+{ $subsection POSTPONE: ROLE: } 
+"Syntax for making tuples that use roles:"
+{ $subsection POSTPONE: TUPLE: } 
+"Errors with roles:"
+{ $subsections multiple-inheritance-attempted role-slot-overlap } ;
+
+ABOUT: "roles"

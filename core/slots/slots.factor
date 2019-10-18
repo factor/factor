@@ -59,7 +59,7 @@ M: object reader-quot
     ] 2bi ;
 
 : writer-word ( name -- word )
-    "(>>" ")" surround "accessors" create
+    "<<" append "accessors" create
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;

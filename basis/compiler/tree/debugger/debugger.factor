@@ -4,7 +4,7 @@ USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
 prettyprint prettyprint.backend prettyprint.custom
 prettyprint.sections math words combinators
-combinators.short-circuit io sorting hints
+combinators.short-circuit io sorting hints sets
 compiler.tree
 compiler.tree.recursive
 compiler.tree.normalization
@@ -22,6 +22,7 @@ compiler.tree.identities
 compiler.tree.dead-code
 compiler.tree.modular-arithmetic ;
 FROM: fry => _ ;
+FROM: namespaces => set ;
 RENAME: _ match => __
 IN: compiler.tree.debugger
 
@@ -128,7 +129,8 @@ M: #alien-indirect node>quot params>> , \ #alien-indirect , ;
 
 M: #alien-assembly node>quot params>> , \ #alien-assembly , ;
 
-M: #alien-callback node>quot params>> , \ #alien-callback , ;
+M: #alien-callback node>quot
+    [ params>> , ] [ child>> nodes>quot , ] bi \ #alien-callback , ;
 
 M: node node>quot drop ;
 
@@ -222,7 +224,6 @@ SYMBOL: node-count
     ] with-scope ;
 
 : inlined? ( quot seq/word -- ? )
-    [ cleaned-up-tree ] dip
-    dup word? [ 1array ] when
-    '[ dup #call? [ word>> _ member? ] [ drop f ] if ]
-    contains-node? not ;
+    dup word? [ 1array ] when swap
+    [ cleaned-up-tree [ dup #call? [ word>> , ] [ drop ] if ] each-node ] V{ } make
+    intersect empty? ;

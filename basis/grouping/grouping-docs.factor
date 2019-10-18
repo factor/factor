@@ -32,8 +32,8 @@ ARTICLE: "grouping" "Groups and clumps"
             "{ 1 2 3 4 } 2 clump ." "{ { 1 2 } { 2 3 } { 3 4 } }"
         }
         { $unchecked-example
-            "USING: grouping ;"
-            "{ 1 2 3 4 } dup" "2 <clumps> unclip-last [ [ first ] map ] dip append sequence= ." "t"
+            "USING: grouping assocs sequences ;"
+            "{ 1 2 3 4 } dup" "2 <clumps> unclip-last [ keys ] dip append sequence= ." "t"
         }
     }
     { "With circular clumps, collecting the first element of each subsequence yields the original sequence. Collecting the " { $snippet "n" } "th element of each subsequence would rotate the original sequence " { $snippet "n" } " elements rightward:"
@@ -42,8 +42,8 @@ ARTICLE: "grouping" "Groups and clumps"
             "{ 1 2 3 4 } 2 circular-clump ." "{ { 1 2 } { 2 3 } { 3 4 } { 4 1 } }"
         }
         { $unchecked-example
-            "USING: grouping ;"
-            "{ 1 2 3 4 } dup" "2 <circular-clumps> [ first ] map sequence= ." "t"
+            "USING: grouping assocs sequences ;"
+            "{ 1 2 3 4 } dup" "2 <circular-clumps> keys sequence= ." "t"
         }
         { $unchecked-example
             "USING: grouping ;"

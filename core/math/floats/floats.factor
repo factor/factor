@@ -38,7 +38,6 @@ M: float * float* ; inline
 M: float / float/f ; inline
 M: float /f float/f ; inline
 M: float /i float/f >integer ; inline
-M: float mod float-mod ; inline
 
 M: real abs dup 0 < [ neg ] when ; inline
 

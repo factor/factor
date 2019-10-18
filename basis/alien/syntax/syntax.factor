@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays alien alien.c-types alien.arrays
+USING: accessors arrays alien alien.c-types alien.enums alien.arrays
 alien.strings kernel math namespaces parser sequences words
 quotations math.parser splitting grouping effects assocs
 combinators lexer strings.parser alien.parser fry vocabs.parser
@@ -16,11 +16,11 @@ SYNTAX: BAD-ALIEN <bad-alien> suffix! ;
 SYNTAX: LIBRARY: scan current-library set ;
 
 SYNTAX: FUNCTION:
-    (FUNCTION:) make-function define-declared ;
+    (FUNCTION:) make-function define-inline ;
 
 SYNTAX: FUNCTION-ALIAS:
-    scan create-function
-    (FUNCTION:) (make-function) define-declared ;
+    scan-token create-function
+    (FUNCTION:) (make-function) define-inline ;
 
 SYNTAX: CALLBACK:
     (CALLBACK:) define-inline ;
@@ -28,11 +28,8 @@ SYNTAX: CALLBACK:
 SYNTAX: TYPEDEF:
     scan-c-type CREATE-C-TYPE dup save-location typedef ;
 
-SYNTAX: C-ENUM:
-    scan dup "f" =
-    [ drop ]
-    [ (CREATE-C-TYPE) dup save-location int swap typedef ] if
-    0 parse-enum-members ;
+SYNTAX: ENUM:
+    parse-enum define-enum ;
 
 SYNTAX: C-TYPE:
     void CREATE-C-TYPE typedef ;

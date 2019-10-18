@@ -1,3 +1,4 @@
+
 ;;; fuel-syntax.el --- auxiliar definitions for factor code navigation.
 
 ;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
@@ -46,10 +47,10 @@
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
     "B" "BEFORE:" "BIN:"
-    "C:" "CALLBACK:" "C-ENUM:" "C-STRUCT:" "C-TYPE:" "C-UNION:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "call-next-method"
-    "DEFER:"
-    "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
-    "f" "FORGET:" "FROM:" "FUNCTION:"
+    "C:" "CALLBACK:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "CONSULT:" "call-next-method"
+    "DEFER:" "DESTRUCTOR:"
+    "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
+    "f" "FORGET:" "FROM:" "FUNCTION:" "FUNCTION-ALIAS:"
     "GAME:" "GENERIC#" "GENERIC:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
     "HELP:" "HEX:" "HOOK:"
@@ -59,7 +60,7 @@
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "NAN:"
     "OCT:"
-    "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
+    "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
     "SINGLETON:" "SINGLETONS:" "SLOT:" "SPECIALIZED-ARRAY:" "SPECIALIZED-ARRAYS:" "STRING:" "STRUCT:" "SYMBOL:" "SYMBOLS:" "SYNTAX:"
@@ -134,6 +135,9 @@
   (fuel-syntax--second-word-regex
    '("C-STRUCT:" "C-UNION:" "COM-INTERFACE:" "MIXIN:" "TUPLE:" "SINGLETON:" "SPECIALIZED-ARRAY:" "STRUCT:" "UNION:" "UNION-STRUCT:")))
 
+(defconst fuel-syntax--error-regex
+  (fuel-syntax--second-word-regex '("ERROR:")))
+
 (defconst fuel-syntax--tuple-decl-regex
   "^TUPLE: +\\([^ \n]+\\) +< +\\([^ \n]+\\)\\_>")
 
@@ -157,20 +161,24 @@
 (defconst fuel-syntax--sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
 (defconst fuel-syntax--alien-function-regex
-  "\\_<FUNCTION: \\(\\w+\\) \\(\\w+\\)")
+  "\\_<FUNCTION: +\\(\\w+\\)[\n ]+\\(\\w+\\)")
+
+(defconst fuel-syntax--alien-function-alias-regex
+  "\\_<FUNCTION-ALIAS: +\\(\\w+\\)[\n ]+\\(\\w+\\)[\n ]+\\(\\w+\\)")
 
 (defconst fuel-syntax--alien-callback-regex
-  "\\_<CALLBACK: \\(\\w+\\) \\(\\w+\\)")
+  "\\_<CALLBACK: +\\(\\w+\\) +\\(\\w+\\)")
 
 (defconst fuel-syntax--indent-def-starts '("" ":"
                                            "AFTER" "BEFORE"
-                                           "C-ENUM" "C-STRUCT" "C-UNION" "COM-INTERFACE"
-                                           "FROM" "FUNCTION:"
+                                           "COM-INTERFACE" "CONSULT"
+                                           "ENUM" "ERROR"
+                                           "FROM" "FUNCTION:" "FUNCTION-ALIAS:"
                                            "INTERSECTION:"
                                            "M" "M:" "MACRO" "MACRO:"
                                            "MEMO" "MEMO:" "METHOD"
                                            "SYNTAX"
-                                           "PREDICATE" "PRIMITIVE"
+                                           "PREDICATE" "PRIMITIVE" "PROTOCOL"
                                            "SINGLETONS"
                                            "STRUCT" "SYMBOLS" "TAG" "TUPLE"
                                            "TYPED" "TYPED:"
@@ -196,10 +204,10 @@
 (defconst fuel-syntax--single-liner-regex
   (regexp-opt '("ABOUT:"
                 "ALIAS:"
-                "CONSTANT:" "C:" "C-TYPE:"
-                "DEFER:"
+                "CONSTANT:" "C:" "C-GLOBAL:" "C-TYPE:"
+                "DEFER:" "DESTRUCTOR:"
                 "FORGET:"
-                "GAME:" "GENERIC:" "GENERIC#" "GLSL-PROGRAM:" 
+                "GAME:" "GENERIC:" "GENERIC#" "GLSL-PROGRAM:"
                 "HEX:" "HOOK:"
                 "IN:" "INSTANCE:"
                 "LIBRARY:"
@@ -241,6 +249,12 @@
 (defconst fuel-syntax--typedef-regex
   "\\_<TYPEDEF: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
+(defconst fuel-syntax--c-global-regex
+  "\\_<C-GLOBAL: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--c-type-regex
+  "\\_<C-TYPE: +\\(\\w+\\)\\( .*\\)?$")
+
 (defconst fuel-syntax--rename-regex
   "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
 
@@ -279,7 +293,7 @@
     ("\\_<\\(U\\)SING: \\(;\\)" (1 "<b") (2 ">b"))
     ("\\_<USING:\\( \\)" (1 "<b"))
     ("\\_<\\(C\\)-ENUM: \\(;\\)" (1 "<b") (2 ">b"))
-    ("\\_<C-ENUM:\\( \\|\n\\)" (1 "<b"))
+    ("\\_<ENUM:\\( \\|\n\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\|\n\\)\\([^;]\\|$\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)" (1 "<b"))
     ("\\_<\\(SYMBOLS\\|SPECIALIZED-ARRAYS\\|SINGLETONS\\|VARIANT\\): *?\\( \\|\n\\)\\([^;\n]\\|\\_>\\)"

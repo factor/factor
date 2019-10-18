@@ -7,6 +7,8 @@ IN: calendar
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
 
+HOOK: gmt os ( -- timestamp )
+
 TUPLE: duration
     { year real }
     { month real }
@@ -371,10 +373,6 @@ M: duration time-
 : timestamp>micros ( timestamp -- n )
     unix-1970 (time-) 1000000 * >integer ;
 
-: gmt ( -- timestamp )
-    #! GMT time, right now
-    unix-1970 system-micros microseconds time+ ;
-
 : now ( -- timestamp ) gmt >local-time ;
 : hence ( duration -- timestamp ) now swap time+ ;
 : ago ( duration -- timestamp ) now swap time- ;
@@ -534,7 +532,7 @@ M: integer end-of-year 12 31 <date> ;
     dup midnight time- ;
 
 : since-1970 ( duration -- timestamp )
-    unix-1970 time+ >local-time ;
+    unix-1970 time+ ;
 
 : timestamp>unix-time ( timestamp -- seconds )
     unix-1970 time- second>> ;

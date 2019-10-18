@@ -124,7 +124,7 @@ MEMO: perlin-noise-map-coords ( dim -- coords )
 
 TYPED:: perlin-noise-map ( table: byte-array transform: matrix4 coords: float-4-array -- map: float-array )
     coords [| coord | table transform coord m4.v perlin-noise ] data-map( float-4 -- c:float )
-    byte-array>float-array ;
+    float-array-cast ;
 
 : perlin-noise-image ( table transform dim -- image )
     [ perlin-noise-map-coords perlin-noise-map ] [ 5/7. 0.5 float-map>image ] bi ;

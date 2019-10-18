@@ -99,7 +99,7 @@ f { "a" "b" } f { "c" } <variable-effect> .""" """(( a b -- c ))""" }
 { <effect> <terminated-effect> <variable-effect> } related-words
 
 ARTICLE: "effects-variables" "Stack effect row variables"
-"The stack of effect of many " { $link POSTPONE: inline } " combinators can have variable stack effects, depending on the effect of the quotation they call. For example, the quotation parameter to " { $link each } " receives an element from the input sequence each time it is called, but it can also manipulate values on the stack below the element as long as it leaves the same number of elements on the stack. (This is how " { $link reduce } " is implemented in terms of " { $snippet "each" } ".) The stack effect of an " { $snippet "each" } " expression thus depends on the stack effect of its input quotation:"
+"The stack effect of many " { $link POSTPONE: inline } " combinators can have variable stack effects, depending on the effect of the quotation they call. For example, the quotation parameter to " { $link each } " receives an element from the input sequence each time it is called, but it can also manipulate values on the stack below the element as long as it leaves the same number of elements on the stack. (This is how " { $link reduce } " is implemented in terms of " { $snippet "each" } ".) The stack effect of an " { $snippet "each" } " expression thus depends on the stack effect of its input quotation:"
 { $example
  """USING: io sequences stack-checker ;
 [ [ write ] each ] infer."""

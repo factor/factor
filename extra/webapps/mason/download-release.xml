@@ -5,25 +5,19 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <link rel="stylesheet" href="http://factorcode.org/css/master.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-    <title>Factor binary package for <t:label t:name="platform" /></title>
-  </head>
-  <body>
-    <div><img src="http://factorcode.org/graphics/logo.png" alt="Logo" /></div>
+	<t:title>Factor binary package for <t:label t:name="platform" /></t:title>
 
-    <h1>Factor binary package for <t:label t:name="platform" /></h1>
+	<div><img src="http://factorcode.org/graphics/logo.png" alt="Logo" /></div>
 
-    <p>Requirements:</p>
-    <t:xml t:name="requirements" />
+	<h1>Factor binary package for <t:label t:name="platform" /></h1>
 
-    <h2>Download <t:xml t:name="release" /></h2>
+	<p>Requirements:</p>
+	<t:xml t:name="requirements" />
 
-    <p>This release was built from GIT ID <t:xml t:name="git-id" />.</p>
+	<h2>Download <t:xml t:name="release" /></h2>
 
-    <p>Once you download Factor, you can <a href="http://concatenative.org/wiki/view/Factor/Getting started">get started</a> with the language.</p>
-  </body>
-</html>
+	<p>This release was built from GIT ID <t:xml t:name="git-id" />.</p>
+
+	<p>Once you download Factor, you can <a href="http://concatenative.org/wiki/view/Factor/Learning">start learning</a> the language!</p>
 
 </t:chloe>

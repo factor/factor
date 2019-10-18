@@ -25,6 +25,19 @@ GENERIC: render* ( value name renderer -- xml )
 : render ( name renderer -- )
     render>xml write-xml ;
 
+<PRIVATE
+
+GENERIC: write-nested ( obj -- )
+
+M: string write-nested write ;
+
+M: sequence write-nested [ write-nested ] each ;
+
+PRIVATE>
+
+: render-string ( name renderer -- )
+    render>xml write-nested ;
+
 SINGLETON: label
 
 M: label render*

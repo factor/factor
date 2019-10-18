@@ -1,33 +1,46 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar continuations debugger io
-io.directories io.files kernel mason.common
-mason.email mason.updates mason.notify namespaces threads ;
+io.directories io.pathnames io.sockets io.streams.string kernel
+mason.config mason.disk mason.email mason.notify mason.updates
+namespaces prettyprint threads ;
 FROM: mason.build => build ;
 IN: mason
 
-: build-loop-error ( error -- )
-    [ "Build loop error:" print flush error. flush :c flush ]
-    [ error-continuation get call>> email-error ] bi ;
+: heartbeat-loop ( -- )
+    notify-heartbeat
+    5 minutes sleep
+    heartbeat-loop ;
 
-: build-loop-fatal ( error -- )
-    "FATAL BUILDER ERROR:" print
-    error. flush ;
+: fatal-error-body ( error callstack -- string )
+    [
+        "Fatal error on " write host-name print nl
+        [ error. ] [ callstack. ] bi*
+    ] with-string-writer ;
+
+: build-loop-error ( error callstack -- )
+    fatal-error-body
+     "build loop error"
+     email-fatal ;
 
 : build-loop ( -- )
-    ?prepare-build-machine
     [
-        notify-heartbeat
-        [
-            builds/factor set-current-directory
-            new-code-available? [ build ] when
-        ] [
-            build-loop-error
-        ] recover
+        builds-dir get make-directories
+        builds-dir get [
+            check-disk-space
+            update-sources
+            build? [ build ] [ 5 minutes sleep ] if
+        ] with-directory
     ] [
-        build-loop-fatal
+        error-continuation get call>> build-loop-error
+        5 minutes sleep
     ] recover
-    5 minutes sleep
+
     build-loop ;
 
-MAIN: build-loop
+: mason ( -- * )
+    [ heartbeat-loop ] "Heartbeat loop" spawn
+    [ build-loop ] "Build loop" spawn
+    stop ;
+
+MAIN: mason

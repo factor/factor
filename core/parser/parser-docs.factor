@@ -8,6 +8,11 @@ IN: parser
 ARTICLE: "reading-ahead" "Reading ahead"
 "Parsing words can consume input:"
 { $subsections
+    scan-token
+    scan-object
+}
+"Lower-level words:"
+{ $subsections
     scan
     scan-word
 }
@@ -249,3 +254,8 @@ HELP: staging-violation
 HELP: auto-use?
 { $var-description "If set to a true value, the behavior of the parser when encountering an unknown word name is changed. If only one loaded vocabulary has a word with this name, instead of throwing an error, the parser adds the vocabulary to the search path and prints a parse note. Off by default." }
 { $notes "This feature is intended to help during development. To generate a " { $link POSTPONE: USING: } " form automatically, enable " { $link auto-use? } ", load the source file, and copy and paste the " { $link POSTPONE: USING: } " form printed by the parser back into the file, then disable " { $link auto-use? } ". See " { $link "word-search-errors" } "." } ;
+
+HELP: scan-object
+{ $values { "object" object } }
+{ $description "Parses a literal representation of an object." }
+$parsing-note ;

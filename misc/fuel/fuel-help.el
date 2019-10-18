@@ -1,6 +1,6 @@
 ;;; fuel-help.el -- accessing Factor's help system
 
-;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -22,6 +22,7 @@
 (require 'fuel-syntax)
 (require 'fuel-font-lock)
 (require 'fuel-popup)
+(require 'fuel-menu)
 (require 'fuel-base)
 
 (require 'button)
@@ -314,25 +315,30 @@ With prefix, the current page is deleted from history."
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
     (set-keymap-parent map button-buffer-map)
-    (define-key map "a" 'fuel-apropos)
-    (define-key map "ba" 'fuel-help-bookmark-page)
-    (define-key map "bb" 'fuel-help-display-bookmarks)
-    (define-key map "bd" 'fuel-help-delete-bookmark)
-    (define-key map "c" 'fuel-help-clean-history)
-    (define-key map "e" 'fuel-help-edit)
-    (define-key map "h" 'fuel-help)
-    (define-key map "k" 'fuel-help-kill-page)
-    (define-key map "n" 'fuel-help-next)
-    (define-key map "l" 'fuel-help-previous)
-    (define-key map "p" 'fuel-help-previous)
-    (define-key map "r" 'fuel-help-refresh)
-    (define-key map "v" 'fuel-help-vocab)
-    (define-key map (kbd "SPC")  'scroll-up)
-    (define-key map (kbd "S-SPC") 'scroll-down)
-    (define-key map "\M-." 'fuel-edit-word-at-point)
-    (define-key map "\C-cz" 'run-factor)
-    (define-key map "\C-c\C-z" 'run-factor)
     map))
+
+(fuel-menu--defmenu fuel-help fuel-help-mode-map
+  ("Help on word..." "h" fuel-help)
+  ("Help on vocab..." "v" fuel-help-vocab)
+  ("Apropos..." "a" fuel-apropos)
+  --
+  ("Bookmark this page" "ba" fuel-help-bookmark-page)
+  ("Delete bookmark" "bd" fuel-help-delete-bookmark)
+  ("Show bookmarks..." "bb" fuel-help-display-bookmarks)
+  ("Clean browsing history" "c" fuel-help-clean-history)
+  --
+  ("Edit word at point" "\M-." fuel-edit-word-at-point)
+  ("Edit help file" "e" fuel-help-edit)
+  --
+  ("Next page" "n" fuel-help-next)
+  ("Previous page" ("p" "l") fuel-help-previous)
+  ("Refresh page" "r" fuel-help-refresh)
+  ("Kill page" "k" fuel-help-kill-page)
+  --
+  ("Scroll page up" ((kbd "SPC"))  scroll-up)
+  ("Scroll page down" ((kbd "S-SPC")) scroll-down)
+  --
+  ("Switch to listener" "\C-c\C-z" run-factor))
 
 
 ;;; IN: support

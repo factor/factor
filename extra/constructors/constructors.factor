@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes classes.tuple effects.parser
-fry generalizations generic.standard kernel lexer locals macros
-parser sequences slots vocabs words arrays ;
+USING: accessors arrays assocs classes classes.tuple
+effects.parser fry generalizations sequences.generalizations
+generic.standard kernel lexer locals macros parser sequences
+sets slots vocabs words ;
 IN: constructors
 
 ! An experiment
@@ -38,6 +39,15 @@ MACRO:: slots>constructor ( class slots -- quot )
         default-params swap assoc-union values _ firstn class boa
     ] ;
 
+ERROR: repeated-constructor-parameters class effect ;
+
+ERROR: unknown-constructor-parameters class effect unknown ;
+
+: ensure-constructor-parameters ( class effect -- class effect )
+    dup in>> all-unique? [ repeated-constructor-parameters ] unless
+    2dup [ all-slots [ name>> ] map ] [ in>> ] bi* swap diff
+    [ unknown-constructor-parameters ] unless-empty ;
+
 :: (define-constructor) ( constructor-word class effect def -- word quot )
     constructor-word
     class def define-initializer
@@ -53,7 +63,8 @@ MACRO:: slots>constructor ( class slots -- quot )
     scan-word [ name>> "<" ">" surround create-in dup reset-generic ] keep ;
 
 : parse-constructor ( -- class word effect def )
-    scan-constructor complete-effect parse-definition ;
+    scan-constructor complete-effect ensure-constructor-parameters
+    parse-definition ;
 
 SYNTAX: CONSTRUCTOR: parse-constructor f define-constructor ;
 

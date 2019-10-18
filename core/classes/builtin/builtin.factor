@@ -24,12 +24,7 @@ M: builtin-class instance? [ tag ] [ class>type ] bi* eq? ;
 
 M: builtin-class (flatten-class) dup set ;
 
-M: builtin-class (classes-intersect?)
-    {
-        { [ 2dup eq? ] [ 2drop t ] }
-        { [ over builtin-class? ] [ 2drop f ] }
-        [ swap classes-intersect? ]
-    } cond ;
+M: builtin-class (classes-intersect?) eq? ;
 
 : full-cover ( -- ) builtins get [ (flatten-class) ] each ;
 

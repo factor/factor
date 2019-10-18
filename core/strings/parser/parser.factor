@@ -81,7 +81,7 @@ name>char-hook [
             [ column>> ] [ line-text>> ] bi
         ] dip swap subseq
     ] [
-        lexer get (>>column)
+        lexer get column<<
     ] bi ;
 
 : rest-of-line ( lexer -- seq )

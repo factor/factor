@@ -91,13 +91,13 @@ void factor_vm::primitive_word_code()
 
 	if(profiling_p)
 	{
-		ctx->push(allot_cell((cell)w->profiling->entry_point()));
-		ctx->push(allot_cell((cell)w->profiling + w->profiling->size()));
+		ctx->push(from_unsigned_cell((cell)w->profiling->entry_point()));
+		ctx->push(from_unsigned_cell((cell)w->profiling + w->profiling->size()));
 	}
 	else
 	{
-		ctx->push(allot_cell((cell)w->code->entry_point()));
-		ctx->push(allot_cell((cell)w->code + w->code->size()));
+		ctx->push(from_unsigned_cell((cell)w->code->entry_point()));
+		ctx->push(from_unsigned_cell((cell)w->code + w->code->size()));
 	}
 }
 

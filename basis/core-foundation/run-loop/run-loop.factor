@@ -1,10 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.syntax kernel math
-namespaces sequences destructors combinators threads heaps
-deques calendar system core-foundation core-foundation.strings
-core-foundation.file-descriptors core-foundation.timers
-core-foundation.time ;
+USING: accessors alien alien.c-types alien.syntax calendar
+classes.struct combinators core-foundation
+core-foundation.file-descriptors core-foundation.strings
+core-foundation.time core-foundation.timers deques destructors
+heaps kernel math namespaces sequences system threads unix
+unix.time ;
+FROM: calendar.unix => system-micros ;
 IN: core-foundation.run-loop
 
 CONSTANT: kCFRunLoopRunFinished 1

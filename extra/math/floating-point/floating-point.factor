@@ -44,3 +44,14 @@ IN: math.floating-point
         [ (double-exponent-bits) 11 on-bits = ]
         [ (double-mantissa-bits) 0 = ]
     } 1&& ;
+
+: check-special ( n -- n )
+    dup fp-special? [ "cannot be special" throw ] when ;
+
+: double>ratio ( double -- a/b )
+    check-special double>bits
+    [ (double-sign) zero? 1 -1 ? ]
+    [ (double-mantissa-bits) 52 2^ / ]
+    [ (double-exponent-bits) ] tri
+    dup zero? [ 1 + ] [ [ 1 + ] dip ] if 1023 - 2 swap ^ * * ;
+

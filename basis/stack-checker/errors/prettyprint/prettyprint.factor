@@ -55,8 +55,10 @@ M: do-not-compile summary
     word>> name>> "Cannot compile call to “" "”" surround ;
 
 M: unbalanced-branches-error summary
-    word>> name>>
-    "The input quotations to “" "” don't match their expected effects" surround ;
+    [ word>> name>> ] [ quots>> length 1 = ] bi
+    [ "The input quotation to “" "” doesn't match its expected effect" ]
+    [ "The input quotations to “" "” don't match their expected effects" ] if
+    surround ;
 
 M: unbalanced-branches-error error.
     dup summary print

@@ -1,9 +1,10 @@
-! Copyright (C) 2009 Doug Coleman, Slava Pestov.
+! Copyright (C) 2009, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit kernel math math.order
-sequences assocs namespaces vectors fry arrays splitting
-compiler.cfg.def-use compiler.cfg compiler.cfg.rpo compiler.cfg.predecessors
-compiler.cfg.renaming compiler.cfg.instructions compiler.cfg.utilities ;
+USING: accessors combinators combinators.short-circuit kernel
+locals math math.order sequences assocs namespaces vectors fry
+arrays splitting compiler.cfg.def-use compiler.cfg
+compiler.cfg.rpo compiler.cfg.predecessors compiler.cfg.renaming
+compiler.cfg.instructions compiler.cfg.utilities ;
 IN: compiler.cfg.branch-splitting
 
 : clone-instructions ( insns -- insns' )
@@ -15,10 +16,12 @@ IN: compiler.cfg.branch-splitting
     ! 'back-edge?' work.
     <basic-block>
         swap
-        [ instructions>> clone-instructions >>instructions ]
-        [ successors>> clone >>successors ]
-        [ number>> >>number ]
-        tri ;
+        {
+            [ instructions>> clone-instructions >>instructions ]
+            [ successors>> clone >>successors ]
+            [ kill-block?>> >>kill-block? ]
+            [ number>> >>number ]
+        } cleave ;
 
 : new-blocks ( bb -- copies )
     dup predecessors>> [
@@ -26,24 +29,18 @@ IN: compiler.cfg.branch-splitting
         1vector >>predecessors
     ] with map ;
 
-: update-predecessor-successor ( pred copy old-bb -- )
-    '[
-        [ _ _ 3dup nip eq? [ drop nip ] [ 2drop ] if ] map
-    ] change-successors drop ;
-
 : update-predecessor-successors ( copies old-bb -- )
     [ predecessors>> swap ] keep
-    '[ _ update-predecessor-successor ] 2each ;
+    '[ [ _ ] 2dip update-predecessors ] 2each ;
 
-: update-successor-predecessor ( copies old-bb succ -- )
-    [
-        swap 1array split swap join V{ } like
-    ] change-predecessors drop ;
+:: update-successor-predecessor ( copies old-bb succ -- )
+    succ
+    [ { old-bb } split copies join V{ } like ] change-predecessors
+    drop ;
 
 : update-successor-predecessors ( copies old-bb -- )
-    dup successors>> [
-        update-successor-predecessor
-    ] with with each ;
+    dup successors>>
+    [ update-successor-predecessor ] with with each ;
 
 : split-branch ( bb -- )
     [ new-blocks ] keep

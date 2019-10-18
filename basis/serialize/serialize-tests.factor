@@ -45,7 +45,7 @@ CONSTANT: objects
         { 1 2 "three" }
         V{ 1 2 "three" }
         SBUF" hello world"
-        "hello \u123456 unicode"
+        "hello \u012345 unicode"
         \ dup
         [ \ dup dup ]
         T{ serialize-test f "a" 2 }

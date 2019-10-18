@@ -3,7 +3,8 @@
 USING: bootstrap.image.private compiler.constants
 compiler.units cpu.x86.assembler cpu.x86.assembler.operands
 kernel kernel.private layouts locals.backend make math
-math.private namespaces sequences slots.private vocabs ;
+math.private namespaces sequences slots.private strings.private
+vocabs ;
 IN: bootstrap.x86
 
 big-endian off
@@ -37,15 +38,17 @@ big-endian off
     ! Save C callstack pointer
     nv-reg context-callstack-save-offset [+] stack-reg MOV
 
-    ! Load Factor callstack pointer
+    ! Load Factor stack pointers
     stack-reg nv-reg context-callstack-bottom-offset [+] MOV
-
     nv-reg jit-update-tib
     jit-install-seh
 
+    rs-reg nv-reg context-retainstack-offset [+] MOV
+    ds-reg nv-reg context-datastack-offset [+] MOV
+
     ! Call into Factor code
-    nv-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
-    nv-reg CALL
+    link-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
+    link-reg CALL
 
     ! Load VM into vm-reg; only needed on x86-32, but doesn't
     ! hurt on x86-64
@@ -294,6 +297,21 @@ big-endian off
     ds-reg [] temp0 MOV
 ] \ slot define-sub-primitive
 
+[
+    ! load string index from stack
+    temp0 ds-reg bootstrap-cell neg [+] MOV
+    temp0 tag-bits get SHR
+    ! load string from stack
+    temp1 ds-reg [] MOV
+    ! load character
+    temp0 8-bit-version-of temp0 temp1 string-offset [++] MOV
+    temp0 temp0 8-bit-version-of MOVZX
+    temp0 tag-bits get SHL
+    ! store character to stack
+    ds-reg bootstrap-cell SUB
+    ds-reg [] temp0 MOV
+] \ string-nth-fast define-sub-primitive
+
 ! Shufflers
 [
     ds-reg bootstrap-cell SUB
@@ -449,7 +467,7 @@ big-endian off
     ! multiply
     temp0 temp1 IMUL2
     ! push result
-    ds-reg [] temp1 MOV
+    ds-reg [] temp0 MOV
 ] \ fixnum*fast define-sub-primitive
 
 [ \ AND jit-math ] \ fixnum-bitand define-sub-primitive
@@ -532,7 +550,7 @@ big-endian off
     temp0 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
     temp0 ds-reg [] OR
-    temp0 tag-mask get AND
+    temp0 tag-mask get TEST
     temp0 \ f type-number MOV
     temp1 1 tag-fixnum MOV
     temp0 temp1 CMOVE

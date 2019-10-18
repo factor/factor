@@ -11,8 +11,8 @@ M: winnt cpus ( -- n )
     system-info dwNumberOfProcessors>> ;
 
 : memory-status ( -- MEMORYSTATUSEX )
-    "MEMORYSTATUSEX" <struct>
-    dup class heap-size >>dwLength
+    MEMORYSTATUSEX <struct>
+    MEMORYSTATUSEX heap-size >>dwLength
     dup GlobalMemoryStatusEx win32-error=0/f ;
 
 M: winnt memory-load ( -- n )

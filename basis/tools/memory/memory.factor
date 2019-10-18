@@ -4,8 +4,9 @@ USING: accessors arrays assocs binary-search classes
 classes.struct combinators combinators.smart continuations fry
 generalizations generic grouping io io.styles kernel make math
 math.order math.parser math.statistics memory memory.private
-layouts namespaces parser prettyprint sequences sorting
-splitting strings system vm words hints hashtables ;
+layouts namespaces parser prettyprint sequences
+sequences.generalizations sorting splitting strings system vm
+words hints hashtables ;
 IN: tools.memory
 
 <PRIVATE

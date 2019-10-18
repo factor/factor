@@ -56,7 +56,7 @@ M:: iso2022-state encode-char ( char stream encoding -- )
     char encoding type>> value? [
         char find-type
         [ stream stream-write ]
-        [ encoding (>>type) ] bi*
+        [ encoding type<< ] bi*
     ] unless
     char encoding type>> value-at stream stream-write-num ;
 
@@ -92,7 +92,7 @@ M:: iso2022-state decode-char ( stream encoding -- char )
     stream stream-read1 {
         { ESC [
             stream read-escape [
-                encoding (>>type)
+                encoding type<<
                 stream encoding decode-char
             ] [ replacement-char ] if*
         ] }

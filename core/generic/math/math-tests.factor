@@ -18,4 +18,4 @@ IN: generic.math.tests
 [ number ] [ fixnum number math-class-max ] unit-test
 [ number ] [ number fixnum math-class-max ] unit-test
 
-
+[ t ] [ \ + math-generic? ] unit-test

@@ -1,19 +1,22 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences math combinators combinators.short-circuit
-classes vectors compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
+USING: kernel accessors sequences math combinators
+combinators.short-circuit vectors compiler.cfg
+compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.utilities ;
 IN: compiler.cfg.useless-conditionals
 
 : delete-conditional? ( bb -- ? )
     {
         [
-            instructions>> last class {
-                ##compare-branch
-                ##compare-imm-branch
-                ##compare-float-ordered-branch
-                ##compare-float-unordered-branch
-            } member-eq?
+            instructions>> last {
+                [ ##compare-branch? ]
+                [ ##compare-imm-branch? ]
+                [ ##compare-integer-branch? ]
+                [ ##compare-integer-imm-branch? ]
+                [ ##compare-float-ordered-branch? ]
+                [ ##compare-float-unordered-branch? ]
+            } 1||
         ]
         [ successors>> first2 [ skip-empty-blocks ] bi@ eq? ]
     } 1&& ;

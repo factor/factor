@@ -8,8 +8,7 @@ io io.encodings.ascii io.files io.files.temp kernel locals math
 math.matrices math.vectors.simd math.parser math.vectors
 method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
-specialized-vectors literals fry
-sequences.deep destructors math.bitwise opengl.gl
+specialized-vectors fry sequences.deep destructors math.bitwise opengl.gl
 game.models game.models.obj game.models.loader game.models.collada
 prettyprint images.tga literals ;
 FROM: alien.c-types => float ;
@@ -194,7 +193,7 @@ M: model-world wasd-far-plane drop 1024.0 ;
 M: model-world begin-game-world
     init-gpu
     { 0.0 0.0 2.0 } 0 0 set-wasd-view
-    [ <model-state> [ fill-model-state ] keep ] [ (>>model-state) ] bi ;
+    [ <model-state> [ fill-model-state ] keep ] [ model-state<< ] bi ;
 M: model-world apply-world-attributes
     {
         [ model-path>> >>model-path ]
@@ -212,7 +211,7 @@ M: model-world apply-world-attributes
              { windowed double-buffered }
            }
            { pref-dim { 1024 768 } }
-           { tick-interval-micros 16666 }
+           { tick-interval-nanos $[ 60 fps ] }
            { use-game-input? t }
            { model-path model-path }
         }

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.parser arrays io.encodings sequences kernel assocs
-hashtables io.encodings.ascii generic parser classes.tuple words
-words.symbol io io.files splitting namespaces math
-compiler.units accessors classes.singleton classes.mixin
-io.encodings.iana fry simple-flat-file lexer ;
+USING: arrays assocs biassocs kernel io.encodings math.parser
+sequences hashtables io.encodings.ascii generic parser
+classes.tuple words words.symbol io io.files splitting
+namespaces math compiler.units accessors classes.singleton
+classes.mixin io.encodings.iana fry simple-flat-file lexer ;
 IN: io.encodings.8-bit
 
 <PRIVATE
@@ -15,20 +15,22 @@ IN: io.encodings.8-bit
 SYMBOL: 8-bit-encodings
 8-bit-encodings [ H{ } clone ] initialize
 
-TUPLE: 8-bit biassoc ;
+TUPLE: 8-bit { biassoc biassoc read-only } ;
 
-: encode-8-bit ( char stream assoc -- )
-    swapd value-at
-    [ swap stream-write1 ] [ encode-error ] if* ; inline
+: 8-bit-encode ( char 8-bit -- byte )
+    biassoc>> value-at [ encode-error ] unless* ; inline
 
-M: 8-bit encode-char biassoc>> encode-8-bit ;
+M: 8-bit encode-char
+    swap [ 8-bit-encode ] dip stream-write1 ;
 
-: decode-8-bit ( stream assoc -- char/f )
-    swap stream-read1
-    [ swap at [ replacement-char ] unless* ]
-    [ drop f ] if* ; inline
+M: 8-bit encode-string
+    swap [ '[ _ 8-bit-encode ] B{ } map-as ] dip stream-write ;
 
-M: 8-bit decode-char biassoc>> decode-8-bit ;
+M: 8-bit decode-char
+    swap stream-read1 dup
+    [ swap biassoc>> at [ replacement-char ] unless* ]
+    [ 2drop f ]
+    if ;
 
 MIXIN: 8-bit-encoding
 

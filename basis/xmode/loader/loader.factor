@@ -45,7 +45,7 @@ RULE: MARK_PREVIOUS mark-previous-rule parse-rule-tag
 TAG: KEYWORDS parse-rule-tag
     rule-set get ignore-case?>> <keyword-map>
     swap children-tags [ over parse-keyword-tag ] each
-    swap (>>keywords) ;
+    swap keywords<< ;
 
 : ?<regexp> ( string/f -- regexp/f )
     dup [ rule-set get ignore-case?>> <?insensitive-regexp> ] when ;
@@ -53,13 +53,13 @@ TAG: KEYWORDS parse-rule-tag
 : (parse-rules-tag) ( tag -- rule-set )
     <rule-set> dup rule-set set
     {
-        { "SET" string>rule-set-name (>>name) }
-        { "IGNORE_CASE" string>boolean (>>ignore-case?) }
-        { "HIGHLIGHT_DIGITS" string>boolean (>>highlight-digits?) }
-        { "DIGIT_RE" ?<regexp> (>>digit-re) }
+        { "SET" string>rule-set-name name<< }
+        { "IGNORE_CASE" string>boolean ignore-case?<< }
+        { "HIGHLIGHT_DIGITS" string>boolean highlight-digits?<< }
+        { "DIGIT_RE" ?<regexp> digit-re<< }
         { "ESCAPE" f add-escape-rule }
-        { "DEFAULT" string>token (>>default) }
-        { "NO_WORD_SEP" f (>>no-word-sep) }
+        { "DEFAULT" string>token default<< }
+        { "NO_WORD_SEP" f no-word-sep<< }
     } init-from-tag ;
 
 : parse-rules-tag ( tag -- rule-set )

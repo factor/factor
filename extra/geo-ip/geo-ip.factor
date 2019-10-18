@@ -9,7 +9,7 @@ IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" temp-file ;
 
-CONSTANT: db-url "http://software77.net/cgi-bin/ip-country/geo-ip.pl?action=download"
+CONSTANT: db-url "http://software77.net/geo-ip/?DL=1"
 
 : download-db ( -- path )
     db-path dup exists? [
@@ -40,7 +40,7 @@ MEMO: ip-db ( -- seq )
 : filter-overlaps ( alist -- alist' )
     2 clump
     [ first2 [ first second ] [ first first ] bi* < ] filter
-    [ first ] map ;
+    keys ;
 
 MEMO: ip-intervals ( -- interval-map )
     ip-db [ [ [ from>> ] [ to>> ] bi 2array ] keep ] { } map>assoc

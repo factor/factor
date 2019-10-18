@@ -20,13 +20,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <wchar.h>
 
 /* C++ headers */
 #include <algorithm>
+#include <list>
 #include <map>
 #include <set>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 
 #define FACTOR_STRINGIZE(x) #x
 
@@ -75,6 +78,7 @@ namespace factor
 #include "platform.hpp"
 #include "primitives.hpp"
 #include "segments.hpp"
+#include "gc_info.hpp"
 #include "contexts.hpp"
 #include "run.hpp"
 #include "objects.hpp"
@@ -89,6 +93,8 @@ namespace factor
 #include "bitwise_hacks.hpp"
 #include "mark_bits.hpp"
 #include "free_list.hpp"
+#include "fixup.hpp"
+#include "tuples.hpp"
 #include "free_list_allocator.hpp"
 #include "write_barrier.hpp"
 #include "object_start_map.hpp"
@@ -100,7 +106,6 @@ namespace factor
 #include "gc.hpp"
 #include "debug.hpp"
 #include "strings.hpp"
-#include "tuples.hpp"
 #include "words.hpp"
 #include "float_bits.hpp"
 #include "io.hpp"
@@ -115,6 +120,7 @@ namespace factor
 #include "data_roots.hpp"
 #include "code_roots.hpp"
 #include "generic_arrays.hpp"
+#include "callstack.hpp"
 #include "slot_visitor.hpp"
 #include "collector.hpp"
 #include "copying_collector.hpp"
@@ -124,7 +130,6 @@ namespace factor
 #include "code_block_visitor.hpp"
 #include "compaction.hpp"
 #include "full_collector.hpp"
-#include "callstack.hpp"
 #include "arrays.hpp"
 #include "math.hpp"
 #include "byte_arrays.hpp"

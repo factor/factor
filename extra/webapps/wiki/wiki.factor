@@ -225,7 +225,7 @@ M: revision feed-entry-url id>> revision-url ;
         [ list-revisions ] >>entries ;
 
 : rollback-description ( description -- description' )
-    [ "Rollback of '" "'" surround ] [ "Rollback" ] if* ;
+    [ "Rollback to '" "'" surround ] [ "Rollback" ] if* ;
 
 : <rollback-action> ( -- action )
     <action>

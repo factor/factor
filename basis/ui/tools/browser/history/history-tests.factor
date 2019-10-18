@@ -5,7 +5,7 @@ IN: ui.tools.browser.history.tests
 TUPLE: dummy obj ;
 
 M: dummy history-value obj>> ;
-M: dummy set-history-value (>>obj) ;
+M: dummy set-history-value obj<< ;
 
 dummy new <history> "history" set
 

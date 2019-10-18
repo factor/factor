@@ -462,3 +462,20 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
     1 1
     [ [ HEX: f bitand ] bi@ [ shift ] [ drop -3 shift ] 2bi ] compile-call
 ] unit-test
+
+! GC root offsets were computed wrong on x86
+: gc-root-messup ( a -- b )
+    dup [
+        1024 (byte-array) 2array
+        10 void* "libc" "malloc" { ulong } alien-invoke
+        void "libc" "free" { void* } alien-invoke
+    ] when ;
+
+[ ] [ 2000 [ "hello" clone dup gc-root-messup first eq? t assert= ] times ] unit-test
+
+! Alias analysis bug
+[ t ] [
+    [
+        10 10 <byte-array> [ <displaced-alien> underlying>> ] keep eq?
+    ] compile-call
+] unit-test

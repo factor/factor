@@ -328,8 +328,8 @@ void factor_vm::primitive_quotation_code()
 {
 	quotation *quot = untag_check<quotation>(ctx->pop());
 
-	ctx->push(allot_cell((cell)quot->code->entry_point()));
-	ctx->push(allot_cell((cell)quot->code + quot->code->size()));
+	ctx->push(from_unsigned_cell((cell)quot->code->entry_point()));
+	ctx->push(from_unsigned_cell((cell)quot->code + quot->code->size()));
 }
 
 /* Allocates memory */

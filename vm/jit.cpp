@@ -116,6 +116,11 @@ void jit::compute_position(cell offset_)
 /* Allocates memory */
 code_block *jit::to_code_block()
 {
+	/* Emit dummy GC info */
+	code.grow_bytes(alignment_for(code.count + 4,data_alignment));
+	u32 dummy_gc_info = 0;
+	code.append_bytes(&dummy_gc_info,sizeof(u32));
+
 	code.trim();
 	relocation.trim();
 	parameters.trim();

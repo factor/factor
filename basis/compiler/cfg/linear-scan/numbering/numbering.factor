@@ -1,16 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors math sequences grouping namespaces
-compiler.cfg.linearization.order ;
+compiler.cfg.linearization ;
 IN: compiler.cfg.linear-scan.numbering
 
-ERROR: already-numbered insn ;
-
 : number-instruction ( n insn -- n' )
-    [ nip dup insn#>> [ already-numbered ] [ drop ] if ]
-    [ (>>insn#) ]
-    [ drop 2 + ]
-    2tri ;
+    [ insn#<< ] [ drop 2 + ] 2bi ;
 
 : number-instructions ( cfg -- )
     linearization-order

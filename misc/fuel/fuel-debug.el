@@ -1,6 +1,6 @@
 ;;; fuel-debug.el -- debugging factor code
 
-;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -17,6 +17,7 @@
 (require 'fuel-eval)
 (require 'fuel-popup)
 (require 'fuel-font-lock)
+(require 'fuel-menu)
 (require 'fuel-base)
 
 
@@ -314,11 +315,6 @@ the debugger."
 (defvar fuel-debug-mode-map
   (let ((map (make-keymap)))
     (suppress-keymap map)
-    (define-key map "g" 'fuel-debug-goto-error)
-    (define-key map "\C-c\C-c" 'fuel-debug-goto-error)
-    (define-key map "n" 'next-line)
-    (define-key map "p" 'previous-line)
-    (define-key map "u" 'fuel-debug-update-usings)
     (dotimes (n 9)
       (define-key map (vector (+ ?1 n))
         `(lambda () (interactive)
@@ -327,6 +323,12 @@ the debugger."
       (define-key map (vector (cdr ci))
         `(lambda () (interactive) (fuel-debug-show--compiler-info ,(car ci)))))
     map))
+
+(fuel-menu--defmenu fuel-debug  fuel-debug-mode-map
+  ("Go to error" ("g" "\C-c\C-c") fuel-debug-goto-error)
+  ("Next line" "n" next-line)
+  ("Previous line" "p" previous-line)
+  ("Update USINGs" "u" fuel-debug-update-usings))
 
 (defun fuel-debug-mode ()
   "A major mode for displaying Factor's compilation results and

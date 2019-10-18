@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
-USING: alien byte-arrays destructors help.markup help.syntax kernel math
-quotations ;
+USING: alien alien.data byte-arrays destructors help.markup help.syntax
+kernel math quotations ;
 IN: gpu.buffers
 
 HELP: <buffer-ptr>
@@ -149,6 +149,10 @@ HELP: dynamic-upload
 HELP: gpu-data-ptr
 { $class-description "This class is a union of the " { $link c-ptr } " and " { $link buffer-ptr } " classes. It represents a value that can be supplied either from CPU or GPU memory." } ;
 
+HELP: grow-buffer
+{ $values { "buffer" buffer } { "target-size" integer } }
+{ $description "If the " { $link buffer-size } " of the given " { $link buffer } " is less than " { $snippet "target-size" } ", reallocates the buffer to a size large enough to accommodate " { $snippet "target-size" } " bytes. If the buffer is reallocated, the original contents are lost." } ;
+
 HELP: index-buffer
 { $class-description "This " { $link buffer-kind } " declares that a " { $link buffer } "'s primary use will be to index vertex arrays." } ;
 
@@ -207,6 +211,13 @@ HELP: with-mapped-buffer
 }
 { $description "Maps " { $snippet "buffer" } " into CPU address space with " { $snippet "access" } " for the dynamic extent of " { $snippet "quot" } ". " { $snippet "quot" } " is called with a pointer to the mapped memory on top of the stack." } ;
 
+HELP: with-mapped-buffer-array
+{ $values
+    { "buffer" buffer } { "access" buffer-access-mode } { "c-type" "a C type" } { "quot" { $quotation "( ..a array -- ..b )" } }
+}
+{ $description "Maps " { $snippet "buffer" } " into CPU address space with " { $snippet "access" } " for the dynamic extent of " { $snippet "quot" } ". " { $snippet "quot" } " is called with the pointer to the mapped memory wrapped in a specialized array of " { $snippet "c-type" } "." }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." } ;
+
 { allocate-buffer allocate-byte-array buffer-size update-buffer read-buffer copy-buffer with-mapped-buffer } related-words
 
 HELP: write-access
@@ -236,11 +247,12 @@ ARTICLE: "gpu.buffers" "Buffer objects"
 { $subsections
     allocate-buffer
     allocate-byte-array
+    grow-buffer
     update-buffer
     read-buffer
     copy-buffer
     with-mapped-buffer
-}
-;
+    with-mapped-buffer-array
+} ;
 
 ABOUT: "gpu.buffers"

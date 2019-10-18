@@ -36,11 +36,21 @@ SYMBOL: visited
     [ reverse-post-order ] dip each ; inline
 
 : optimize-basic-block ( bb quot -- )
-    [ drop basic-block set ]
-    [ change-instructions drop ] 2bi ; inline
+    over kill-block?>> [ 2drop ] [
+        over basic-block set
+        change-instructions drop
+    ] if ; inline
 
-: local-optimization ( ... cfg quot: ( ... insns -- ... insns' ) -- ... cfg' )
-    dupd '[ _ optimize-basic-block ] each-basic-block ; inline
+: simple-optimization ( ... cfg quot: ( ... insns -- ... insns' ) -- ... )
+    '[ _ optimize-basic-block ] each-basic-block ; inline
+
+: analyze-basic-block ( bb quot -- )
+    over kill-block?>> [ 2drop ] [
+        [ dup basic-block set instructions>> ] dip call
+    ] if ; inline
+
+: simple-analysis ( ... cfg quot: ( ... insns -- ... ) -- ... )
+    '[ _ analyze-basic-block ] each-basic-block ; inline
 
 : needs-post-order ( cfg -- cfg' )
     dup post-order drop ;

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry generalizations inverse kernel
-namespaces sequences sorting strings unicode.categories
-xml.data xml.syntax xml.syntax.private ;
+namespaces sequences sequences.generalizations sorting strings
+unicode.categories xml.data xml.syntax xml.syntax.private ;
 IN: xml.syntax.inverse
 
 : remove-blanks ( seq -- newseq )

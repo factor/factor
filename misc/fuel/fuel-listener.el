@@ -1,6 +1,6 @@
 ;;; fuel-listener.el --- starting the fuel listener
 
-;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009, 2010  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -19,6 +19,7 @@
 (require 'fuel-eval)
 (require 'fuel-connection)
 (require 'fuel-syntax)
+(require 'fuel-menu)
 (require 'fuel-base)
 
 (require 'comint)
@@ -69,6 +70,11 @@ buffer."
   :type 'integer
   :group 'fuel-listener)
 
+(defcustom fuel-listener-prompt-read-only-p t
+  "Whether listener's prompt should be read-only."
+  :type 'boolean
+  :group 'fuel-listener)
+
 
 ;;; Listener history:
 
@@ -79,14 +85,17 @@ buffer."
         (comint-write-input-ring)
         (when (buffer-name (current-buffer))
           (insert "\nBye bye. It's been nice listening to you!\n")
-          (insert "Press C-cz to bring me back.\n" ))))))
+          (insert "Press C-c C-z to bring me back.\n" ))))))
 
 (defun fuel-listener--history-setup ()
-  (set (make-local-variable 'comint-input-ring-file-name) fuel-listener-history-filename)
-  (set (make-local-variable 'comint-input-ring-size) fuel-listener-history-size)
+  (set (make-local-variable 'comint-input-ring-file-name)
+       fuel-listener-history-filename)
+  (set (make-local-variable 'comint-input-ring-size)
+       fuel-listener-history-size)
   (add-hook 'kill-buffer-hook 'comint-write-input-ring nil t)
   (comint-read-input-ring t)
-  (set-process-sentinel (get-buffer-process (current-buffer)) 'fuel-listener--sentinel))
+  (set-process-sentinel (get-buffer-process (current-buffer))
+                        'fuel-listener--sentinel))
 
 
 ;;; Fuel listener buffer/process:
@@ -235,24 +244,30 @@ the vocabulary name."
   "Major mode for interacting with an inferior Factor listener process.
 \\{fuel-listener-mode-map}"
   (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
-  (set (make-local-variable 'comint-use-prompt-regexp) t)
-  (set (make-local-variable 'comint-prompt-read-only) t)
+  (set (make-local-variable 'comint-use-prompt-regexp) nil)
+  (set (make-local-variable 'comint-prompt-read-only)
+       fuel-listener-prompt-read-only-p)
   (fuel-listener--setup-completion)
   (fuel-listener--setup-stack-mode))
 
-(define-key fuel-listener-mode-map "\C-cz" 'run-factor)
-(define-key fuel-listener-mode-map "\C-c\C-z" 'run-factor)
 (define-key fuel-listener-mode-map "\C-a" 'fuel-listener--bol)
-(define-key fuel-listener-mode-map "\C-ca" 'fuel-autodoc-mode)
-(define-key fuel-listener-mode-map "\C-ch" 'fuel-help)
-(define-key fuel-listener-mode-map "\C-cr" 'fuel-refresh-all)
-(define-key fuel-listener-mode-map "\C-cs" 'fuel-stack-mode)
-(define-key fuel-listener-mode-map "\C-cp" 'fuel-apropos)
-(define-key fuel-listener-mode-map "\M-." 'fuel-edit-word-at-point)
-(define-key fuel-listener-mode-map "\C-cv" 'fuel-edit-vocabulary)
-(define-key fuel-listener-mode-map "\C-c\C-v" 'fuel-edit-vocabulary)
-(define-key fuel-listener-mode-map "\C-ck" 'fuel-run-file)
-(define-key fuel-listener-mode-map (kbd "TAB") 'fuel-completion--complete-symbol)
+
+(fuel-menu--defmenu listener fuel-listener-mode-map
+  ("Complete symbol" ((kbd "TAB") (kbd "M-TAB"))
+   fuel-completion--complete-symbol :enable (symbol-at-point))
+  ("Edit word definition" "\M-." fuel-edit-word-at-point
+   :enable (symbol-at-point))
+  ("Edit vocabulary" "\C-c\C-v" fuel-edit-vocabulary)
+  --
+  ("Word help" "\C-c\C-w" fuel-help)
+  ("Apropos" "\C-c\C-p" fuel-apropos)
+  (mode "Autodoc mode" "\C-c\C-a" fuel-autodoc-mode)
+  (mode "Show stack mode" "\C-c\C-s" fuel-stack-mode)
+  --
+  ("Run file" "\C-c\C-k" fuel-run-file)
+  ("Refresh vocabs" "\C-c\C-r" fuel-refresh-all))
+
+(define-key fuel-listener-mode-map [menu-bar completion] 'undefined)
 
 
 (provide 'fuel-listener)

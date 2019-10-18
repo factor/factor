@@ -35,7 +35,7 @@ M: growable set-length ( n seq -- )
     ] [
         2dup capacity > [ 2dup expand ] when
     ] if
-    (>>length) ;
+    length<< ;
 
 : new-size ( old -- new ) 1 + 3 * ; inline
 
@@ -44,7 +44,7 @@ M: growable set-length ( n seq -- )
     2dup length >= [
         2dup capacity >= [ over new-size over expand ] when
         [ >fixnum ] dip
-        over 1 fixnum+fast over (>>length)
+        over 1 fixnum+fast over length<<
     ] [
         [ >fixnum ] dip
     ] if ; inline
@@ -56,14 +56,14 @@ M: growable clone (clone) [ clone ] change-underlying ; inline
 M: growable lengthen ( n seq -- )
     2dup length > [
         2dup capacity > [ over new-size over expand ] when
-        2dup (>>length)
+        2dup length<<
     ] when 2drop ; inline
 
 M: growable shorten ( n seq -- )
     growable-check
     2dup length < [
         2dup contract
-        2dup (>>length)
+        2dup length<<
     ] when 2drop ; inline
 
 M: growable new-resizable new-sequence 0 over set-length ; inline

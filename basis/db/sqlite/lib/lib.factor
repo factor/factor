@@ -27,16 +27,17 @@ ERROR: sqlite-sql-error < sql-error n string ;
 
 : sqlite-open ( path -- db )
     normalize-path
-    void* <c-object>
-    [ sqlite3_open sqlite-check-result ] keep *void* ;
+    { void* } [ sqlite3_open sqlite-check-result ]
+    with-out-parameters ;
 
 : sqlite-close ( db -- )
     sqlite3_close sqlite-check-result ;
 
 : sqlite-prepare ( db sql -- handle )
-    utf8 encode dup length void* <c-object> void* <c-object>
-    [ sqlite3_prepare_v2 sqlite-check-result ] 2keep
-    drop *void* ;
+    utf8 encode dup length
+    { void* void* }
+    [ sqlite3_prepare_v2 sqlite-check-result ]
+    with-out-parameters drop ;
 
 : sqlite-bind-parameter-index ( handle name -- index )
     sqlite3_bind_parameter_index ;
@@ -164,7 +165,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     } case ;
 
 : sqlite-row ( handle -- seq )
-    dup sqlite-#columns [ sqlite-column ] with map ;
+    dup sqlite-#columns [ sqlite-column ] with { } map-integers ;
 
 : sqlite-step-has-more-rows? ( prepared -- ? )
     {

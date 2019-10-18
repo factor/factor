@@ -21,9 +21,12 @@ GENERIC: subset? ( set1 set2 -- ? )
 GENERIC: set= ( set1 set2 -- ? )
 GENERIC: duplicates ( set -- seq )
 GENERIC: all-unique? ( set -- ? )
+GENERIC: null? ( set -- ? )
 
 ! Defaults for some methods.
 ! Override them for efficiency
+
+M: set null? members null? ; inline
 
 M: set set-like drop ; inline
 
@@ -91,6 +94,9 @@ M: sequence set-like
 
 M: sequence members
     [ pruned ] keep like ;
+  
+M: sequence null?
+    empty? ; inline
 
 : combine ( sets -- set )
     [ f ]

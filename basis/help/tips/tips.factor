@@ -14,7 +14,7 @@ M: tip forget* tips get remove-eq! drop ;
 
 M: tip where loc>> ;
 
-M: tip set-where (>>loc) ;
+M: tip set-where loc<< ;
 
 : <tip> ( content -- tip ) f tip boa ;
 

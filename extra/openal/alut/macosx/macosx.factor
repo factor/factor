@@ -6,7 +6,7 @@ IN: openal.alut.macosx
 
 LIBRARY: alut
 
-FUNCTION: void alutLoadWAVFile ( ALbyte* fileName, ALenum* format, void** data, ALsizei* size, ALsizei* frequency ) ;
+FUNCTION: void alutLoadWAVFile ( c-string fileName, ALenum* format, void** data, ALsizei* size, ALsizei* frequency ) ;
 
 M: macosx load-wav-file ( path -- format data size frequency )
     0 <int> f <void*> 0 <int> 0 <int>

@@ -1,11 +1,10 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays continuations destructors io
-io.backend.windows libc io.ports io.pipes windows.types math
-windows.kernel32 windows namespaces make io.launcher kernel
-sequences windows.errors assocs splitting system strings
-io.launcher.windows io.files.windows io.backend io.files
-io.files.private combinators shuffle accessors locals ;
+USING: accessors alien.c-types combinators destructors
+io.backend io.backend.windows io.files.windows io.launcher
+io.launcher.windows io.pipes io.ports kernel locals strings
+system windows.errors windows.handles windows.kernel32
+windows.types ;
 IN: io.launcher.windows.nt
 
 : duplicate-handle ( handle -- handle' )
@@ -24,7 +23,7 @@ IN: io.launcher.windows.nt
     (pipe) [ in>> &dispose ] [ out>> dispose ] bi ;
 
 : null-output ( -- pipe )
-    (pipe) [ in>> dispose ] [ out>> &dispose ] bi ;
+    (pipe) [ out>> &dispose ] [ in>> dispose ] bi ;
 
 : null-pipe ( mode -- pipe )
     {
@@ -49,7 +48,7 @@ IN: io.launcher.windows.nt
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
-    CreateFile dup invalid-handle? <win32-file> &dispose ;
+    CreateFile check-invalid-handle <win32-file> &dispose ;
 
 : redirect-append ( path access-mode create-mode -- handle )
     [ path>> ] 2dip
@@ -105,6 +104,6 @@ IN: io.launcher.windows.nt
 
 M: winnt fill-redirection ( process args -- )
     dup lpStartupInfo>>
-    [ [ redirect-stdout ] dip (>>hStdOutput) ]
-    [ [ redirect-stderr ] dip (>>hStdError) ]
-    [ [ redirect-stdin ] dip (>>hStdInput) ] 3tri ;
+    [ [ redirect-stdout ] dip hStdOutput<< ]
+    [ [ redirect-stderr ] dip hStdError<< ]
+    [ [ redirect-stdin ] dip hStdInput<< ] 3tri ;

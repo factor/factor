@@ -35,7 +35,7 @@ struct factor_vm
 	int callback_id;
 
 	/* Pooling unused contexts to make context allocation cheaper */
-	std::vector<context *> unused_contexts;
+	std::list<context *> unused_contexts;
 
 	/* Active contexts, for tracing by the GC */
 	std::set<context *> active_contexts;
@@ -49,12 +49,11 @@ struct factor_vm
 	/* Is call counting enabled? */
 	bool profiling_p;
 
-	/* Global variables used to pass fault handler state from signal handler to
-	   user-space */
+	/* Global variables used to pass fault handler state from signal handler
+	to VM */
 	cell signal_number;
 	cell signal_fault_addr;
 	unsigned int signal_fpu_status;
-	stack_frame *signal_callstack_top;
 
 	/* GC is off during heap walking */
 	bool gc_off;
@@ -146,7 +145,6 @@ struct factor_vm
 
 	// run
 	void primitive_exit();
-	void primitive_system_micros();
 	void primitive_nano_count();
 	void primitive_sleep();
 	void primitive_set_slot();
@@ -169,15 +167,13 @@ struct factor_vm
 	void primitive_profiling();
 
 	// errors
-	void throw_error(cell error, stack_frame *stack);
-	void general_error(vm_error_type error, cell arg1, cell arg2, stack_frame *stack);
 	void general_error(vm_error_type error, cell arg1, cell arg2);
 	void type_error(cell type, cell tagged);
 	void not_implemented_error();
-	void memory_protection_error(cell addr, stack_frame *stack);
-	void signal_error(cell signal, stack_frame *stack);
+	void memory_protection_error(cell addr);
+	void signal_error(cell signal);
 	void divide_by_zero_error();
-	void fp_trap_error(unsigned int fpu_status, stack_frame *stack);
+	void fp_trap_error(unsigned int fpu_status);
 	void primitive_unimplemented();
 	void memory_signal_handler_impl();
 	void misc_signal_handler_impl();
@@ -302,6 +298,7 @@ struct factor_vm
 
 	// gc
 	void end_gc();
+	void set_current_gc_op(gc_op op);
 	void start_gc_again();
 	void update_code_heap_for_minor_gc(std::set<code_block *> *remembered_set);
 	void collect_nursery();
@@ -317,10 +314,11 @@ struct factor_vm
 	void collect_compact(bool trace_contexts_p);
 	void collect_growing_heap(cell requested_bytes, bool trace_contexts_p);
 	void gc(gc_op op, cell requested_bytes, bool trace_contexts_p);
+	void scrub_context(context *ctx);
+	void scrub_contexts();
 	void primitive_minor_gc();
 	void primitive_full_gc();
 	void primitive_compact_gc();
-	void inline_gc(cell *data_roots_base, cell data_roots_size);
 	void primitive_enable_gc_events();
 	void primitive_disable_gc_events();
 	object *allot_object(cell type, cell size);
@@ -381,10 +379,6 @@ struct factor_vm
 	cell std_vector_to_array(std::vector<cell> &elements);
 
 	// strings
-	cell string_nth(const string *str, cell index);
-	void set_string_nth_fast(string *str, cell index, cell ch);
-	void set_string_nth_slow(string *str_, cell index, cell ch);
-	void set_string_nth(string *str, cell index, cell ch);
 	string *allot_string_internal(cell capacity);
 	void fill_string(string *str_, cell start, cell capacity, cell fill);
 	string *allot_string(cell capacity, cell fill);
@@ -392,9 +386,7 @@ struct factor_vm
 	bool reallot_string_in_place_p(string *str, cell capacity);
 	string* reallot_string(string *str_, cell capacity);
 	void primitive_resize_string();
-	void primitive_string_nth();
 	void primitive_set_string_nth_fast();
-	void primitive_set_string_nth_slow();
 
 	// booleans
 	cell tag_boolean(cell untagged)
@@ -470,7 +462,6 @@ struct factor_vm
 	void primitive_float_subtract();
 	void primitive_float_multiply();
 	void primitive_float_divfloat();
-	void primitive_float_mod();
 	void primitive_float_less();
 	void primitive_float_lesseq();
 	void primitive_float_greater();
@@ -481,14 +472,6 @@ struct factor_vm
 	void primitive_bits_double();
 	fixnum to_fixnum(cell tagged);
 	cell to_cell(cell tagged);
-	cell from_signed_1(s8 n);
-	cell from_unsigned_1(u8 n);
-	cell from_signed_2(s16 n);
-	cell from_unsigned_2(u16 n);
-	cell from_signed_4(s32 n);
-	cell from_unsigned_4(u32 n);
-	cell from_signed_cell(fixnum integer);
-	cell from_unsigned_cell(cell integer);
 	cell from_signed_8(s64 n);
 	s64 to_signed_8(cell obj);
 	cell from_unsigned_8(u64 n);
@@ -498,8 +481,8 @@ struct factor_vm
 	inline void overflow_fixnum_add(fixnum x, fixnum y);
 	inline void overflow_fixnum_subtract(fixnum x, fixnum y);
 	inline void overflow_fixnum_multiply(fixnum x, fixnum y);
-	inline cell allot_integer(fixnum x);
-	inline cell allot_cell(cell x);
+	inline cell from_signed_cell(fixnum x);
+	inline cell from_unsigned_cell(cell x);
 	inline cell allot_float(double n);
 	inline bignum *float_to_bignum(cell tagged);
 	inline double bignum_to_float(cell tagged);
@@ -601,11 +584,15 @@ struct factor_vm
 	cell frame_executing_quot(stack_frame *frame);
 	stack_frame *frame_successor(stack_frame *frame);
 	cell frame_scan(stack_frame *frame);
+	cell frame_offset(stack_frame *frame);
+	void set_frame_offset(stack_frame *frame, cell offset);
+	void scrub_return_address();
 	void primitive_callstack_to_array();
 	stack_frame *innermost_stack_frame(callstack *stack);
 	void primitive_innermost_stack_frame_executing();
 	void primitive_innermost_stack_frame_scan();
 	void primitive_set_innermost_stack_frame_quot();
+	void primitive_callstack_bounds();
 	template<typename Iterator> void iterate_callstack(context *ctx, Iterator &iterator);
 
 	// alien
@@ -620,10 +607,6 @@ struct factor_vm
 	void primitive_dlclose();
 	void primitive_dll_validp();
 	char *alien_offset(cell obj);
-	void to_value_struct(cell src, void *dest, cell size);
-	cell from_value_struct(void *src, cell size);
-	cell from_small_struct(cell x, cell y, cell size);
-	cell from_medium_struct(cell x1, cell x2, cell x3, cell x4, cell size);
 
 	// quotations
 	void primitive_jit_compile();
@@ -669,7 +652,10 @@ struct factor_vm
 
 	// entry points
 	void c_to_factor(cell quot);
+	template<typename Func> Func get_entry_point(cell n);
 	void unwind_native_frames(cell quot, stack_frame *to);
+	cell get_fpu_state();
+	void set_fpu_state(cell state);
 
 	// factor
 	void default_parameters(vm_parameters *p);

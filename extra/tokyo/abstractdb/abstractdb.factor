@@ -7,4 +7,4 @@ IN: tokyo.abstractdb
 
 : <tokyo-abstractdb> ( name -- tokyo-abstractdb )
     tcadbnew [ swap tcadbopen drop ] keep
-    tokyo-abstractdb new [ (>>handle) ] keep ;
+    tokyo-abstractdb new [ handle<< ] keep ;

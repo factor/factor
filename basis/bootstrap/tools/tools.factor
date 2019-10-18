@@ -1,4 +1,4 @@
-USING: vocabs.loader sequences ;
+USING: vocabs.loader sequences system combinators ;
 IN: bootstrap.tools
 
 {
@@ -23,3 +23,8 @@ IN: bootstrap.tools
     "vocabs.refresh"
     "vocabs.refresh.monitor"
 } [ require ] each
+
+{
+    { [ os windows? ] [ "debugger.windows" require ] }
+    { [ os unix? ] [ "debugger.unix" require ] }
+} cond

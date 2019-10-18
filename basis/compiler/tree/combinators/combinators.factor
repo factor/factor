@@ -1,46 +1,47 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry kernel accessors sequences compiler.utilities
-arrays stack-checker.inlining namespaces compiler.tree
-math.order ;
+USING: assocs combinators combinators.short-circuit fry kernel
+locals accessors sequences compiler.utilities arrays
+stack-checker.inlining namespaces compiler.tree math.order ;
 IN: compiler.tree.combinators
 
-: each-node ( ... nodes quot: ( ... node -- ... ) -- ... )
-    dup dup '[
-        _ [
-            dup #branch? [
-                children>> [ _ each-node ] each
-            ] [
-                dup #recursive? [
-                    child>> _ each-node
-                ] [ drop ] if
-            ] if
+:: each-node ( ... nodes quot: ( ... node -- ... ) -- ... )
+    nodes [
+        quot
+        [
+            {
+                { [ dup #branch? ] [ children>> [ quot each-node ] each ] }
+                { [ dup #recursive? ] [ child>> quot each-node ] }
+                { [ dup #alien-callback? ] [ child>> quot each-node ] }
+                [ drop ]
+            } cond
         ] bi
     ] each ; inline recursive
 
-: map-nodes ( ... nodes quot: ( ... node -- ... node' ) -- ... nodes )
-    dup dup '[
-        @
-        dup #branch? [
-            [ [ _ map-nodes ] map ] change-children
-        ] [
-            dup #recursive? [
-                [ _ map-nodes ] change-child
-            ] when
-        ] if
+:: map-nodes ( ... nodes quot: ( ... node -- ... node' ) -- ... nodes )
+    nodes [
+        quot call
+        {
+            { [ dup #branch? ] [ [ [ quot map-nodes ] map ] change-children ] }
+            { [ dup #recursive? ] [ [ quot map-nodes ] change-child ] }
+            { [ dup #alien-callback? ] [ [ quot map-nodes ] change-child ] }
+            [ ]
+        } cond
     ] map-flat ; inline recursive
 
-: contains-node? ( ... nodes quot: ( ... node -- ... ? ) -- ... ? )
-    dup dup '[
-        _ keep swap [ drop t ] [
-            dup #branch? [
-                children>> [ _ contains-node? ] any?
-            ] [
-                dup #recursive? [
-                    child>> _ contains-node?
-                ] [ drop f ] if
-            ] if
-        ] if
+:: contains-node? ( ... nodes quot: ( ... node -- ... ? ) -- ... ? )
+    nodes [
+        {
+            quot
+            [
+                {
+                    { [ dup #branch? ] [ children>> [ quot contains-node? ] any? ] }
+                    { [ dup #recursive? ] [ child>> quot contains-node? ] }
+                    { [ dup #alien-callback? ] [ child>> quot contains-node? ] }
+                    [ drop f ]
+                } cond
+            ]
+        } 1||
     ] any? ; inline recursive
 
 : select-children ( seq flags -- seq' )

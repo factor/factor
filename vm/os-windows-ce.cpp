@@ -3,16 +3,6 @@
 namespace factor
 {
 
-u64 system_micros()
-{
-	SYSTEMTIME st;
-	FILETIME ft;
-	GetSystemTime(&st);
-	SystemTimeToFileTime(&st, &ft);
-	return (((s64)ft.dwLowDateTime
-		| (s64)ft.dwHighDateTime<<32) - EPOCH_OFFSET) / 10;
-}
-
 char *strerror(int err)
 {
 	/* strerror() is not defined on WinCE */

@@ -2,13 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel generic math math.functions
 math.parser namespaces io sequences trees shuffle
-assocs parser accessors math.order prettyprint.custom ;
+assocs parser accessors math.order prettyprint.custom
+trees.private ;
 IN: trees.avl
 
 TUPLE: avl < tree ;
 
 : <avl> ( -- tree )
     avl new-tree ;
+
+<PRIVATE
 
 TUPLE: avl-node < node balance ;
 
@@ -20,12 +23,15 @@ TUPLE: avl-node < node balance ;
     swap [ + ] change-balance drop ;
 
 : rotate ( node -- node )
-    dup node+link dup node-link pick set-node+link
-    tuck set-node-link ;    
+    dup node+link
+    dup node-link
+    pick set-node+link
+    [ set-node-link ] keep ;    
 
 : single-rotate ( node -- node )
-    0 over (>>balance) 0 over node+link 
-    (>>balance) rotate ;
+    0 >>balance
+    0 over node+link 
+    balance<< rotate ;
 
 : pick-balances ( a node -- balance balance )
     balance>> {
@@ -38,8 +44,8 @@ TUPLE: avl-node < node balance ;
     [
         node+link [
             node-link current-side get neg
-            over pick-balances rot 0 swap (>>balance)
-        ] keep (>>balance)
+            over pick-balances rot 0 swap balance<<
+        ] keep balance<<
     ] keep swap >>balance
     dup node+link [ rotate ] with-other-side
     over set-node+link rotate ;
@@ -61,14 +67,14 @@ DEFER: avl-set
 : avl-insert ( value key node -- node taller? )
     2dup key>> before? left right ? [
         [ node-link avl-set ] keep swap
-        [ tuck set-node-link ] dip
+        [ [ set-node-link ] keep ] dip
         [ dup current-side get increase-balance balance-insert ]
         [ f ] if
     ] with-side ;
 
 : (avl-set) ( value key node -- node taller? )
     2dup key>> = [
-        -rot pick (>>key) over (>>value) f
+        -rot pick key<< over value<< f
     ] [ avl-insert ] if ;
 
 : avl-set ( value key node -- node taller? )
@@ -79,8 +85,8 @@ M: avl set-at ( value key node -- node )
 
 : delete-select-rotate ( node -- node shorter? )
     dup node+link balance>> zero? [
-        current-side get neg over (>>balance)
-        current-side get over node+link (>>balance) rotate f
+        current-side get neg over balance<<
+        current-side get over node+link balance<< rotate f
     ] [
         select-rotate t
     ] if ;
@@ -94,7 +100,7 @@ M: avl set-at ( value key node -- node )
 
 : balance-delete ( node -- node shorter? )
     current-side get over balance>> {
-        { [ dup zero? ] [ drop neg over (>>balance) f ] }
+        { [ dup zero? ] [ drop neg over balance<< f ] }
         { [ dupd = ] [ drop 0 >>balance t ] }
         [ dupd neg increase-balance rebalance-delete ]
     } cond ;
@@ -145,6 +151,8 @@ M: avl delete-at ( key node -- )
     [ avl-delete 2drop ] change-root drop ;
 
 M: avl new-assoc 2drop <avl> ;
+
+PRIVATE>
 
 : >avl ( assoc -- avl )
     T{ avl f f 0 } assoc-clone-like ;

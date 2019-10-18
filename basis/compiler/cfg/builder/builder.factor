@@ -19,8 +19,7 @@ compiler.cfg.instructions
 compiler.cfg.predecessors
 compiler.cfg.builder.blocks
 compiler.cfg.stacks
-compiler.cfg.stacks.local
-compiler.alien ;
+compiler.cfg.stacks.local ;
 IN: compiler.cfg.builder
 
 ! Convert tree SSA IR to CFG IR. The result is not in SSA form; this is
@@ -57,6 +56,7 @@ GENERIC: emit-node ( node -- )
     [ basic-block get [ emit-node ] [ drop ] if ] each ;
 
 : begin-word ( -- )
+    make-kill-block
     ##prologue
     ##branch
     begin-basic-block ;
@@ -82,8 +82,12 @@ GENERIC: emit-node ( node -- )
 : emit-call ( word height -- )
     over loops get key?
     [ drop loops get at emit-loop-call ]
-    [ [ [ ##call ] [ adjust-d ] bi* ] emit-trivial-block ]
-    if ;
+    [
+        [
+            [ ##call ] [ adjust-d ] bi*
+            make-kill-block
+        ] emit-trivial-block
+    ] if ;
 
 ! #recursive
 : recursive-height ( #recursive -- n )
@@ -123,7 +127,7 @@ M: #recursive emit-node
     and ;
 
 : emit-trivial-if ( -- )
-    ds-pop \ f type-number cc/= ^^compare-imm ds-push ;
+    [ f cc/= ^^compare-imm ] unary-op ;
 
 : trivial-not-if? ( #if -- ? )
     children>> first2
@@ -132,12 +136,12 @@ M: #recursive emit-node
     and ;
 
 : emit-trivial-not-if ( -- )
-    ds-pop \ f type-number cc= ^^compare-imm ds-push ;
+    [ f cc= ^^compare-imm ] unary-op ;
 
 : emit-actual-if ( #if -- )
     ! Inputs to the final instruction need to be copied because of
     ! loc>vreg sync
-    ds-pop any-rep ^^copy \ f type-number cc/= ##compare-imm-branch emit-if ;
+    ds-pop any-rep ^^copy f cc/= ##compare-imm-branch emit-if ;
 
 M: #if emit-node
     {
@@ -194,59 +198,20 @@ M: #shuffle emit-node
     dup dup [ mapping>> ] [ make-input-map ] bi load-shuffle store-shuffle ;
 
 ! #return
-: emit-return ( -- )
-    ##branch begin-basic-block ##epilogue ##return ;
+: end-word ( -- )
+    ##branch
+    begin-basic-block
+    make-kill-block
+    ##epilogue
+    ##return ;
 
-M: #return emit-node drop emit-return ;
+M: #return emit-node drop end-word ;
 
 M: #return-recursive emit-node
-    label>> id>> loops get key? [ emit-return ] unless ;
+    label>> id>> loops get key? [ end-word ] unless ;
 
 ! #terminate
 M: #terminate emit-node drop ##no-tco end-basic-block ;
-
-! FFI
-: return-size ( ctype -- n )
-    #! Amount of space we reserve for a return value.
-    {
-        { [ dup c-struct? not ] [ drop 0 ] }
-        { [ dup large-struct? not ] [ drop 2 cells ] }
-        [ heap-size ]
-    } cond ;
-
-: <alien-stack-frame> ( params -- stack-frame )
-    stack-frame new
-        swap
-        [ return>> return-size >>return ]
-        [ alien-parameters parameter-offsets drop >>params ] bi
-        t >>calls-vm? ;
-
-: alien-node-height ( params -- )
-    [ out-d>> length ] [ in-d>> length ] bi - adjust-d ;
-
-: emit-alien-node ( node quot -- )
-    [
-        [ params>> dup dup <alien-stack-frame> ] dip call
-        alien-node-height
-    ] emit-trivial-block ; inline
-
-M: #alien-invoke emit-node
-    [ ##alien-invoke ] emit-alien-node ;
-
-M: #alien-indirect emit-node
-    [ ##alien-indirect ] emit-alien-node ;
-
-M: #alien-assembly emit-node
-    [ ##alien-assembly ] emit-alien-node ;
-
-M: #alien-callback emit-node
-    dup params>> xt>> dup
-    [
-        ##prologue
-        [ ##alien-callback ] emit-alien-node
-        ##epilogue
-        ##return
-    ] with-cfg-builder ;
 
 ! No-op nodes
 M: #introduce emit-node drop ;

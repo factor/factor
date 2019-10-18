@@ -3,6 +3,20 @@ USING: tools.test generalizations kernel math arrays sequences
 sequences.generalizations ascii fry math.parser io io.streams.string ;
 IN: sequences.generalizations.tests
 
+[ 1 2 3 4 ] [ { 1 2 3 4 } 4 firstn ] unit-test
+[ { 1 2 3 4 } ] [ 1 2 3 4 { f f f f } [ 4 set-firstn ] keep ] unit-test
+[ 1 2 3 4 { f f f } [ 4 set-firstn ] keep ] must-fail
+[ ] [ { } 0 firstn ] unit-test
+[ "a" ] [ { "a" } 1 firstn ] unit-test
+
+[ [ 1 2 ] ] [ 1 2 2 [ ] nsequence ] unit-test
+
+[ { 1 2 3 4 } ] [ { 1 } { 2 } { 3 } { 4 } 4 nappend ] unit-test
+[ V{ 1 2 3 4 } ] [ { 1 } { 2 } { 3 } { 4 } 4 V{ } nappend-as ] unit-test
+
+[ 4 nappend ] must-infer
+[ 4 { } nappend-as ] must-infer
+
 : neach-test ( a b c d -- )
     [ 4 nappend print ] 4 neach ;
 : nmap-test ( a b c d -- e )

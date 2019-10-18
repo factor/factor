@@ -8,15 +8,23 @@ IN: vocabs.loader
 
 SYMBOL: vocab-roots
 
-V{
-    "resource:core"
-    "resource:basis"
-    "resource:extra"
-    "resource:work"
-} clone vocab-roots set-global
+SYMBOL: add-vocab-root-hook
+
+[
+    V{
+        "resource:core"
+        "resource:basis"
+        "resource:extra"
+        "resource:work"
+    } clone vocab-roots set-global
+
+    [ drop ] add-vocab-root-hook set-global
+] "vocabs.loader" add-startup-hook
 
 : add-vocab-root ( root -- )
-    vocab-roots get adjoin ;
+    trim-tail-separators
+    [ vocab-roots get adjoin ]
+    [ add-vocab-root-hook get-global call( root -- ) ] bi ;
 
 SYMBOL: root-cache
 
@@ -66,10 +74,19 @@ DEFER: require
 
 <PRIVATE
 
-: load-conditional-requires ( vocab-name -- )
-    conditional-requires get
-    [ at [ require ] each ] 
-    [ delete-at ] 2bi ;
+SYMBOL: require-when-vocabs
+require-when-vocabs [ HS{ } clone ] initialize
+
+SYMBOL: require-when-table
+require-when-table [ V{ } clone ] initialize
+
+: load-conditional-requires ( vocab -- )
+    vocab-name require-when-vocabs get in? [
+        require-when-table get [
+            [ [ vocab dup [ source-loaded?>> +done+ = ] when ] all? ] dip
+            [ require ] curry when
+        ] assoc-each
+    ] when ;
 
 : load-source ( vocab -- )
     dup check-vocab-hook get call( vocab -- )
@@ -79,7 +96,7 @@ DEFER: require
         [ +parsing+ >>source-loaded? ] dip
         [ % ] [ call( -- ) ] if-bootstrapping
         +done+ >>source-loaded?
-        vocab-name load-conditional-requires
+        load-conditional-requires
     ] [ ] [ f >>source-loaded? ] cleanup ;
 
 : load-docs ( vocab -- )
@@ -97,10 +114,12 @@ PRIVATE>
     load-vocab drop ;
 
 : require-when ( if then -- )
-    over vocab
-    [ nip require ]
-    [ swap conditional-requires get [ swap suffix ] change-at ]
-    if ;
+    over [ vocab ] all? [
+        require drop
+    ] [
+        [ drop [ require-when-vocabs get adjoin ] each ]
+        [ 2array require-when-table get push ] 2bi
+    ] if ;
 
 : reload ( name -- )
     dup vocab

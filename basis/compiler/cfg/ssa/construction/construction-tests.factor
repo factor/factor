@@ -13,19 +13,19 @@ IN: compiler.cfg.ssa.construction.tests
 reset-counters
 
 V{
-    T{ ##load-immediate f 1 100 }
+    T{ ##load-integer f 1 100 }
     T{ ##add-imm f 2 1 50 }
     T{ ##add-imm f 2 2 10 }
     T{ ##branch }
 } 0 test-bb
 
 V{
-    T{ ##load-immediate f 3 3 }
+    T{ ##load-integer f 3 3 }
     T{ ##branch }
 } 1 test-bb
 
 V{
-    T{ ##load-immediate f 3 4 }
+    T{ ##load-integer f 3 4 }
     T{ ##branch }
 } 2 test-bb
 
@@ -48,7 +48,7 @@ V{
 
 [
     V{
-        T{ ##load-immediate f 1 100 }
+        T{ ##load-integer f 1 100 }
         T{ ##add-imm f 2 1 50 }
         T{ ##add-imm f 3 2 10 }
         T{ ##branch }
@@ -57,14 +57,14 @@ V{
 
 [
     V{
-        T{ ##load-immediate f 4 3 }
+        T{ ##load-integer f 4 3 }
         T{ ##branch }
     }
 ] [ 1 get instructions>> ] unit-test
 
 [
     V{
-        T{ ##load-immediate f 5 4 }
+        T{ ##load-integer f 5 4 }
         T{ ##branch }
     }
 ] [ 2 get instructions>> ] unit-test

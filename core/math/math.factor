@@ -159,16 +159,16 @@ PRIVATE>
         [ f ] if
     ] [ 3drop t ] if-iterate? ; inline recursive
 
-: each-integer ( n quot -- )
+: each-integer ( ... n quot: ( ... i -- ... ) -- ... )
     iterate-prep (each-integer) ; inline
 
-: times ( n quot -- )
+: times ( ... n quot: ( ... -- ... ) -- ... )
     [ drop ] prepose each-integer ; inline
 
-: find-integer ( n quot -- i )
+: find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i )
     iterate-prep (find-integer) ; inline
 
-: all-integers? ( n quot -- ? )
+: all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
     iterate-prep (all-integers?) ; inline
 
 : find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i )

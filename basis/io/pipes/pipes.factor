@@ -37,17 +37,22 @@ M: callable run-pipeline-element
         '[ _ call( -- result ) ] with-streams*
     ] with-destructors ;
 
-: <pipes> ( n -- pipes )
+GENERIC: <pipes> ( obj -- pipes )
+
+M: integer <pipes> ( n -- pipes )
     [
         [ (pipe) |dispose ] replicate
         T{ pipe } [ prefix ] [ suffix ] bi
         2 <clumps>
     ] with-destructors ;
 
+M: sequence <pipes>
+    [ { } ] [ length 1 - <pipes> ] if-empty ;
+
 PRIVATE>
 
 : run-pipeline ( seq -- results )
-    [ length dup zero? [ drop { } ] [ 1 - <pipes> ] if ] keep
+    [ <pipes> ] keep
     [
         [ [ first in>> ] [ second out>> ] bi ] dip
         run-pipeline-element

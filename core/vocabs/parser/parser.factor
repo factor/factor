@@ -86,7 +86,7 @@ PRIVATE>
 
 : set-current-vocab ( name -- )
     create-vocab
-    [ manifest get (>>current-vocab) ] [ (add-qualified) ] bi ;
+    [ manifest get current-vocab<< ] [ (add-qualified) ] bi ;
 
 : with-current-vocab ( name quot -- )
     manifest get clone manifest [

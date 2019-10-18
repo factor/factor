@@ -1,7 +1,7 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors arrays fry math math.intervals
-layouts combinators namespaces locals
+USING: kernel classes.algebra sequences accessors arrays fry
+math math.intervals layouts combinators namespaces locals
 stack-checker.inlining
 compiler.tree
 compiler.tree.combinators
@@ -11,6 +11,7 @@ compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
 compiler.tree.propagation.branches
 compiler.tree.propagation.constraints ;
+FROM: sequences.private => array-capacity ;
 IN: compiler.tree.propagation.recursive
 
 : check-fixed-point ( node infos1 infos2 -- )
@@ -24,7 +25,14 @@ IN: compiler.tree.propagation.recursive
     [ label>> calls>> [ node>> node-input-infos ] map flip ]
     [ latest-input-infos ] bi ;
 
+: counter-class ( interval class -- class' )
+    dup fixnum class<= [
+        swap array-capacity-interval interval-subset?
+        [ drop array-capacity ] when
+    ] [ nip ] if ;
+
 :: generalize-counter-interval ( interval initial-interval class -- interval' )
+    interval class counter-class :> class
     {
         { [ interval initial-interval interval-subset? ] [ initial-interval ] }
         { [ interval empty-interval eq? ] [ initial-interval ] }

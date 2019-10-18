@@ -80,23 +80,33 @@ void gc_event::ended_gc(factor_vm *parent)
 	total_time = (cell)(nano_count() - start_time);
 }
 
-gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_), start_time(nano_count())
+gc_state::gc_state(gc_op op_, factor_vm *parent) : op(op_)
 {
-	event = new gc_event(op,parent);
+	if(parent->gc_events)
+	{
+		event = new gc_event(op,parent);
+		start_time = nano_count();
+	}
+	else
+		event = NULL;
 }
 
 gc_state::~gc_state()
 {
-	delete event;
-	event = NULL;
+	if(event)
+	{
+		delete event;
+		event = NULL;
+	}
 }
 
 void factor_vm::end_gc()
 {
-	current_gc->event->ended_gc(this);
-	if(gc_events) gc_events->push_back(*current_gc->event);
-	delete current_gc->event;
-	current_gc->event = NULL;
+	if(gc_events)
+	{
+		current_gc->event->ended_gc(this);
+		gc_events->push_back(*current_gc->event);
+	}
 }
 
 void factor_vm::start_gc_again()
@@ -123,7 +133,14 @@ void factor_vm::start_gc_again()
 		break;
 	}
 
-	current_gc->event = new gc_event(current_gc->op,this);
+	if(gc_events)
+		current_gc->event = new gc_event(current_gc->op,this);
+}
+
+void factor_vm::set_current_gc_op(gc_op op)
+{
+	current_gc->op = op;
+	if(gc_events) current_gc->event->op = op;
 }
 
 void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
@@ -139,7 +156,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 	{
 		try
 		{
-			current_gc->event->op = current_gc->op;
+			if(gc_events) current_gc->event->op = current_gc->op;
 
 			switch(current_gc->op)
 			{
@@ -150,8 +167,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 				collect_aging();
 				if(data->high_fragmentation_p())
 				{
-					current_gc->op = collect_full_op;
-					current_gc->event->op = collect_full_op;
+					set_current_gc_op(collect_full_op);
 					collect_full(trace_contexts_p);
 				}
 				break;
@@ -159,8 +175,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 				collect_to_tenured();
 				if(data->high_fragmentation_p())
 				{
-					current_gc->op = collect_full_op;
-					current_gc->event->op = collect_full_op;
+					set_current_gc_op(collect_full_op);
 					collect_full(trace_contexts_p);
 				}
 				break;
@@ -180,7 +195,7 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 
 			break;
 		}
-		catch(const must_start_gc_again e)
+		catch(const must_start_gc_again &)
 		{
 			/* We come back here if a generation is full */
 			start_gc_again();
@@ -194,8 +209,54 @@ void factor_vm::gc(gc_op op, cell requested_bytes, bool trace_contexts_p)
 	current_gc = NULL;
 }
 
+/* primitive_minor_gc() is invoked by inline GC checks, and it needs to fill in
+uninitialized stack locations before actually calling the GC. See the comment
+in compiler.cfg.stacks.uninitialized for details. */
+
+struct call_frame_scrubber {
+	factor_vm *parent;
+	context *ctx;
+
+	explicit call_frame_scrubber(factor_vm *parent_, context *ctx_) :
+		parent(parent_), ctx(ctx_) {}
+
+	void operator()(stack_frame *frame)
+	{
+		cell return_address = parent->frame_offset(frame);
+		if(return_address == (cell)-1)
+			return;
+
+		code_block *compiled = parent->frame_code(frame);
+		gc_info *info = compiled->block_gc_info();
+
+		assert(return_address < compiled->size());
+		int index = info->return_address_index(return_address);
+		if(index != -1)
+			ctx->scrub_stacks(info,index);
+	}
+};
+
+void factor_vm::scrub_context(context *ctx)
+{
+	call_frame_scrubber scrubber(this,ctx);
+	iterate_callstack(ctx,scrubber);
+}
+
+void factor_vm::scrub_contexts()
+{
+	std::set<context *>::const_iterator begin = active_contexts.begin();
+	std::set<context *>::const_iterator end = active_contexts.end();
+	while(begin != end)
+	{
+		scrub_context(*begin);
+		begin++;
+	}
+}
+
 void factor_vm::primitive_minor_gc()
 {
+	scrub_contexts();
+
 	gc(collect_nursery_op,
 		0, /* requested size */
 		true /* trace contexts? */);
@@ -213,18 +274,6 @@ void factor_vm::primitive_compact_gc()
 	gc(collect_compact_op,
 		0, /* requested size */
 		true /* trace contexts? */);
-}
-
-void factor_vm::inline_gc(cell *data_roots_base, cell data_roots_size)
-{
-	data_roots.push_back(data_root_range(data_roots_base,data_roots_size));
-	primitive_minor_gc();
-	data_roots.pop_back();
-}
-
-VM_C_API void inline_gc(cell *data_roots_base, cell data_roots_size, factor_vm *parent)
-{
-	parent->inline_gc(data_roots_base,data_roots_size);
 }
 
 /*

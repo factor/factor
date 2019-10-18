@@ -9,7 +9,7 @@ IN: alien.data.map.tests
 [ float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 } ]
 [
     int-array{ 1 3 5 } [ dup ] data-map( int -- float[2] )
-    byte-array>float-array
+    float-array-cast
 ] unit-test
 
 [
@@ -20,7 +20,7 @@ IN: alien.data.map.tests
     }
 ] [
     3 iota [ float-4-with ] data-map( object -- float-4 )
-    byte-array>float-4-array
+    float-4-array-cast
 ] unit-test
 
 [
@@ -31,7 +31,7 @@ IN: alien.data.map.tests
     }
 ] [
     12 iota [ float-4-boa ] data-map( object[4] -- float-4 )
-    byte-array>float-4-array
+    float-4-array-cast
 ] unit-test
 
 [ float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 0.0 0.0 } ]
@@ -151,5 +151,5 @@ CONSTANT: plane-count 4
     [ ] data-map( object -- float ) ;
 
 [ float-array{ 0.0 0.5 1.0 } ]
-[ 2 data-map-compiler-bug-test byte-array>float-array ]
+[ 2 data-map-compiler-bug-test float-array-cast ]
 unit-test

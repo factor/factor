@@ -2,27 +2,35 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals alien alien.c-types alien.libraries alien.syntax
 arrays kernel fry math namespaces sequences system layouts io
-vocabs.loader accessors init classes.struct combinators command-line
-make compiler compiler.units compiler.constants compiler.alien
-compiler.codegen compiler.codegen.fixup
+vocabs.loader accessors init classes.struct combinators make
+words compiler.constants compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
-compiler.cfg.intrinsics compiler.cfg.stack-frame
-cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
-cpu.architecture vm ;
+compiler.cfg.builder.alien.boxing compiler.cfg.intrinsics
+compiler.cfg.stack-frame cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86 cpu.architecture vm vocabs ;
 FROM: layouts => cell ;
 IN: cpu.x86.32
 
+: x86-float-regs ( -- seq )
+    "cpu.x86.sse" vocab
+    { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 }
+    { ST0 ST1 ST2 ST3 ST4 ST5 ST6 }
+    ? ;
+
 M: x86.32 machine-registers
-    {
-        { int-regs { EAX ECX EDX EBP EBX } }
-        { float-regs { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } }
-    } ;
+    { int-regs { EAX ECX EDX EBP EBX } }
+    float-regs x86-float-regs 2array
+    2array ;
 
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 frame-reg EBP ;
-M: x86.32 temp-reg ECX ;
+
+M: x86.32 immediate-comparand? ( obj -- ? ) drop t ;
+
+M:: x86.32 %load-vector ( dst val rep -- )
+    dst 0 [] rep copy-memory* val rc-absolute rel-binary-literal ;
 
 M: x86.32 %mov-vm-ptr ( reg -- )
     0 MOV 0 rc-absolute-cell rel-vm ;
@@ -36,11 +44,6 @@ M: x86.32 %set-vm-field ( dst field -- )
 M: x86.32 %vm-field-ptr ( dst field -- )
     [ 0 MOV ] dip rc-absolute-cell rel-vm ;
 
-: local@ ( n -- op )
-    stack-frame get extra-stack-space dup 16 assert= + stack@ ;
-
-M: x86.32 extra-stack-space calls-vm?>> 16 0 ? ;
-
 M: x86.32 %mark-card
     drop HEX: ffffffff [+] card-mark <byte> MOV
     building get pop
@@ -53,25 +56,11 @@ M: x86.32 %mark-deck
     rc-absolute-cell rel-decks-offset
     building get push ;
 
-M:: x86.32 %dispatch ( src temp -- )
-    ! Load jump table base.
-    temp src HEX: ffffffff [+] LEA
-    building get length :> start
-    0 rc-absolute-cell rel-here
-    ! Go
-    temp HEX: 7f [+] JMP
-    building get length :> end
-    ! Fix up the displacement above
-    cell code-alignment
-    [ end start - + building get dup pop* push ]
-    [ align-code ]
-    bi ;
-
 M: x86.32 pic-tail-reg EDX ;
 
 M: x86.32 reserved-stack-space 0 ;
 
-M: x86.32 %alien-invoke 0 CALL rc-relative rel-dlsym ;
+M: x86.32 vm-stack-space 16 ;
 
 : save-vm-ptr ( n -- )
     stack@ 0 MOV 0 rc-absolute-cell rel-vm ;
@@ -83,35 +72,21 @@ M: x86.32 return-struct-in-registers? ( c-type -- ? )
     os { linux netbsd solaris } member? not
     and or ;
 
-: struct-return@ ( n -- operand )
-    [ next-stack@ ] [ stack-frame get params>> local@ ] if* ;
-
-! On x86, parameters are usually never passed in registers, except with Microsoft's
-! "thiscall" and "fastcall" abis
-M: int-regs return-reg drop EAX ;
-M: float-regs param-regs 2drop { } ;
-
-M: int-regs param-regs
-    nip {
-        { thiscall [ { ECX     } ] }
-        { fastcall [ { ECX EDX } ] }
-        [ drop { } ]
+! On x86, parameters are usually never passed in registers,
+! except with Microsoft's "thiscall" and "fastcall" abis
+M: x86.32 param-regs
+    {
+        { thiscall [ { { int-regs { ECX } } { float-regs { } } } ] }
+        { fastcall [ { { int-regs { ECX EDX } } { float-regs { } } } ] }
+        [ drop { { int-regs { } } { float-regs { } } } ]
     } case ;
 
-GENERIC: load-return-reg ( src rep -- )
-GENERIC: store-return-reg ( dst rep -- )
-
-M: stack-params load-return-reg drop EAX swap MOV ;
-M: stack-params store-return-reg drop EAX MOV ;
-
-M: int-rep load-return-reg drop EAX swap MOV ;
-M: int-rep store-return-reg drop EAX MOV ;
-
-M: float-rep load-return-reg drop FLDS ;
-M: float-rep store-return-reg drop FSTPS ;
-
-M: double-rep load-return-reg drop FLDL ;
-M: double-rep store-return-reg drop FSTPL ;
+! Need a fake return-reg for floats
+M: x86.32 return-regs
+    {
+        { int-regs { EAX EDX } }
+        { float-regs { ST0 } }
+    } ;
 
 M: x86.32 %prologue ( n -- )
     dup PUSH
@@ -121,227 +96,126 @@ M: x86.32 %prologue ( n -- )
 M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
 
-M: stack-params copy-register*
-    drop
-    {
-        { [ dup  integer? ] [ EAX swap next-stack@ MOV  EAX MOV ] }
-        { [ over integer? ] [ EAX swap MOV              param@ EAX MOV ] }
-    } cond ;
+M: x86.32 %load-stack-param ( dst rep n -- )
+    next-stack@ swap pick register? [ %copy ] [
+        {
+            { int-rep [ [ EAX ] dip MOV ?spill-slot EAX MOV ] }
+            { float-rep [ FLDS ?spill-slot FSTPS ] }
+            { double-rep [ FLDL ?spill-slot FSTPL ] }
+        } case
+    ] if ;
 
-M: x86.32 %save-param-reg [ local@ ] 2dip %copy ;
+M: x86.32 %store-stack-param ( src rep n -- )
+    stack@ swap pick register? [ [ swap ] dip %copy ] [
+        {
+            { int-rep [ [ [ EAX ] dip ?spill-slot MOV ] [ EAX MOV ] bi* ] }
+            { float-rep [ [ ?spill-slot FLDS ] [ FSTPS ] bi* ] }
+            { double-rep [ [ ?spill-slot FLDL ] [ FSTPL ] bi* ] }
+        } case
+    ] if ;
 
-M: x86.32 %load-param-reg [ swap local@ ] dip %copy ;
+:: load-float-return ( dst x87-insn rep -- )
+    dst register? [
+        ESP 4 SUB
+        ESP [] x87-insn execute
+        dst ESP [] rep %copy
+        ESP 4 ADD
+    ] [
+        dst ?spill-slot x87-insn execute
+    ] if ; inline
 
-: (%box) ( n rep -- )
-    #! If n is f, push the return register onto the stack; we
-    #! are boxing a return value of a C function. If n is an
-    #! integer, push [ESP+n] on the stack; we are boxing a
-    #! parameter being passed to a callback from C.
-    over [ [ local@ ] dip load-return-reg ] [ 2drop ] if ;
-
-M:: x86.32 %box ( n rep func -- )
-    n rep (%box)
-    rep rep-size save-vm-ptr
-    0 stack@ rep store-return-reg
-    func f %alien-invoke ;
-
-: (%box-long-long) ( n -- )
-    [
-        EDX over next-stack@ MOV
-        EAX swap cell - next-stack@ MOV 
-    ] when* ;
-
-M: x86.32 %box-long-long ( n func -- )
-    [ (%box-long-long) ] dip
-    8 save-vm-ptr
-    4 stack@ EDX MOV
-    0 stack@ EAX MOV
-    f %alien-invoke ;
-
-M:: x86.32 %box-large-struct ( n c-type -- )
-    EDX n struct-return@ LEA
-    8 save-vm-ptr
-    4 stack@ c-type heap-size MOV
-    0 stack@ EDX MOV
-    "from_value_struct" f %alien-invoke ;
-
-M: x86.32 %prepare-box-struct ( -- )
-    ! Compute target address for value struct return
-    EAX f struct-return@ LEA
-    ! Store it as the first parameter
-    0 local@ EAX MOV ;
-
-M: x86.32 %box-small-struct ( c-type -- )
-    #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
-    12 save-vm-ptr
-    8 stack@ swap heap-size MOV
-    4 stack@ EDX MOV
-    0 stack@ EAX MOV
-    "from_small_struct" f %alien-invoke ;
-
-M: x86.32 %pop-stack ( n -- )
-    EAX swap ds-reg reg-stack MOV ;
-
-M: x86.32 %pop-context-stack ( -- )
-    temp-reg %context
-    EAX temp-reg "datastack" context-field-offset [+] MOV
-    EAX EAX [] MOV
-    temp-reg "datastack" context-field-offset [+] bootstrap-cell SUB ;
-
-: call-unbox-func ( func -- )
-    4 save-vm-ptr
-    0 stack@ EAX MOV
-    f %alien-invoke ;
-
-M: x86.32 %unbox ( n rep func -- )
-    #! The value being unboxed must already be in EAX.
-    #! If n is f, we're unboxing a return value about to be
-    #! returned by the callback. Otherwise, we're unboxing
-    #! a parameter to a C function about to be called.
-    call-unbox-func
-    ! Store the return value on the C stack
-    over [ [ local@ ] dip store-return-reg ] [ 2drop ] if ;
-
-M: x86.32 %unbox-long-long ( n func -- )
-    call-unbox-func
-    ! Store the return value on the C stack
-    [
-        [ local@ EAX MOV ]
-        [ 4 + local@ EDX MOV ] bi
-    ] when* ;
-
-: %unbox-struct-1 ( -- )
-    #! Alien must be in EAX.
-    4 save-vm-ptr
-    0 stack@ EAX MOV
-    "alien_offset" f %alien-invoke
-    ! Load first cell
-    EAX EAX [] MOV ;
-
-: %unbox-struct-2 ( -- )
-    #! Alien must be in EAX.
-    4 save-vm-ptr
-    0 stack@ EAX MOV
-    "alien_offset" f %alien-invoke
-    ! Load second cell
-    EDX EAX 4 [+] MOV
-    ! Load first cell
-    EAX EAX [] MOV ;
-
-M: x86 %unbox-small-struct ( size -- )
-    #! Alien must be in EAX.
-    heap-size cell align cell /i {
-        { 1 [ %unbox-struct-1 ] }
-        { 2 [ %unbox-struct-2 ] }
+M: x86.32 %load-reg-param ( vreg rep reg -- )
+    swap {
+        { int-rep [ int-rep %copy ] }
+        { float-rep [ drop \ FSTPS float-rep load-float-return ] }
+        { double-rep [ drop \ FSTPL double-rep load-float-return ] }
     } case ;
 
-M:: x86.32 %unbox-large-struct ( n c-type -- )
-    ! Alien must be in EAX.
-    ! Compute destination address
-    EDX n local@ LEA
-    12 save-vm-ptr
-    8 stack@ c-type heap-size MOV
-    4 stack@ EDX MOV
-    0 stack@ EAX MOV
-    "to_value_struct" f %alien-invoke ;
+:: store-float-return ( src x87-insn rep -- )
+    src register? [
+        ESP 4 SUB
+        ESP [] src rep %copy
+        ESP [] x87-insn execute
+        ESP 4 ADD
+    ] [
+        src ?spill-slot x87-insn execute
+    ] if ; inline
 
-M: x86.32 %prepare-alien-indirect ( -- )
-    EAX ds-reg [] MOV
-    ds-reg 4 SUB
+M: x86.32 %store-reg-param ( vreg rep reg -- )
+    swap {
+        { int-rep [ swap int-rep %copy ] }
+        { float-rep [ drop \ FLDS float-rep store-float-return ] }
+        { double-rep [ drop \ FLDL double-rep store-float-return ] }
+    } case ;
+
+M: x86.32 %discard-reg-param ( rep reg -- )
+    drop {
+        { int-rep [ ] }
+        { float-rep [ ST0 FSTP ] }
+        { double-rep [ ST0 FSTP ] }
+    } case ;
+
+:: call-unbox-func ( src func -- )
+    EAX src tagged-rep %copy
     4 save-vm-ptr
     0 stack@ EAX MOV
-    "pinned_alien_offset" f %alien-invoke
-    EBP EAX MOV ;
+    func f f %c-invoke ;
 
-M: x86.32 %alien-indirect ( -- )
-    EBP CALL ;
+M:: x86.32 %unbox ( dst src func rep -- )
+    src func call-unbox-func
+    dst rep %load-return ;
+
+M:: x86.32 %unbox-long-long ( dst1 dst2 src func -- )
+    src int-rep 0 %store-stack-param
+    4 save-vm-ptr
+    func f f %c-invoke
+    dst1 EAX int-rep %copy
+    dst2 EDX int-rep %copy ;
+
+M:: x86.32 %box ( dst src func rep gc-map -- )
+    src rep 0 %store-stack-param
+    rep rep-size save-vm-ptr
+    func f gc-map %c-invoke
+    dst EAX tagged-rep %copy ;
+
+M:: x86.32 %box-long-long ( dst src1 src2 func gc-map -- )
+    src1 int-rep 0 %store-stack-param
+    src2 int-rep 4 %store-stack-param
+    8 save-vm-ptr
+    func f gc-map %c-invoke
+    dst EAX tagged-rep %copy ;
+
+M: x86.32 %c-invoke
+    [ 0 CALL rc-relative rel-dlsym ] dip gc-map-here ;
 
 M: x86.32 %begin-callback ( -- )
     0 save-vm-ptr
-    ESP 4 [+] 0 MOV
-    "begin_callback" f %alien-invoke ;
-
-M: x86.32 %alien-callback ( quot -- )
-    EAX EDX %restore-context
-    EAX swap %load-reference
-    EAX quot-entry-point-offset [+] CALL
-    EAX EDX %save-context ;
+    4 stack@ 0 MOV
+    "begin_callback" f f %c-invoke ;
 
 M: x86.32 %end-callback ( -- )
     0 save-vm-ptr
-    "end_callback" f %alien-invoke ;
+    "end_callback" f f %c-invoke ;
 
-M: x86.32 %end-callback-value ( ctype -- )
-    %pop-context-stack
-    4 stack@ EAX MOV
-    %end-callback
-    ! Place former top of data stack back in EAX
-    EAX 4 stack@ MOV
-    ! Unbox EAX
-    unbox-return ;
-
-GENERIC: float-function-param ( stack-slot dst src -- )
-
-M:: spill-slot float-function-param ( stack-slot dst src -- )
-    ! We can clobber dst here since its going to contain the
-    ! final result
-    dst src double-rep %copy
-    stack-slot dst double-rep %copy ;
-
-M: register float-function-param
-    nip double-rep %copy ;
-
-: float-function-return ( reg -- )
-    ESP [] FSTPL
-    ESP [] MOVSD
-    ESP 16 ADD ;
-
-M:: x86.32 %unary-float-function ( dst src func -- )
-    ESP -16 [+] dst src float-function-param
-    ESP 16 SUB
-    func "libm" load-library %alien-invoke
-    dst float-function-return ;
-
-M:: x86.32 %binary-float-function ( dst src1 src2 func -- )
-    ESP -16 [+] dst src1 float-function-param
-    ESP  -8 [+] dst src2 float-function-param
-    ESP 16 SUB
-    func "libm" load-library %alien-invoke
-    dst float-function-return ;
-
-: funny-large-struct-return? ( params -- ? )
+: funny-large-struct-return? ( return abi -- ? )
     #! MINGW ABI incompatibility disaster
-    [ return>> large-struct? ]
-    [ abi>> mingw = os windows? not or ]
-    bi and ;
+    [ large-struct? ] [ mingw eq? os windows? not or ] bi* and ;
 
-: stack-arg-size ( params -- n )
-    dup abi>> '[
-        alien-parameters flatten-value-types
-        [ _ alloc-parameter 2drop ] each
-        stack-params get
-    ] with-param-regs ;
+M: x86.32 %prepare-var-args ( -- ) ;
 
-M: x86.32 stack-cleanup ( params -- n )
+M:: x86.32 stack-cleanup ( stack-size return abi -- n )
     #! a) Functions which are stdcall/fastcall/thiscall have to
     #! clean up the caller's stack frame.
     #! b) Functions returning large structs on MINGW have to
     #! fix ESP.
     {
-        { [ dup abi>> callee-cleanup? ] [ stack-arg-size ] }
-        { [ dup funny-large-struct-return? ] [ drop 4 ] }
-        [ drop 0 ]
+        { [ abi callee-cleanup? ] [ stack-size ] }
+        { [ return abi funny-large-struct-return? ] [ 4 ] }
+        [ 0 ]
     } cond ;
 
-M: x86.32 %cleanup ( params -- )
-    stack-cleanup [ ESP swap SUB ] unless-zero ;
-
-M:: x86.32 %call-gc ( gc-root-count temp -- )
-    temp gc-root-base special@ LEA
-    8 save-vm-ptr
-    4 stack@ gc-root-count MOV
-    0 stack@ temp MOV
-    "inline_gc" f %alien-invoke ;
+M: x86.32 %cleanup ( n -- )
+    [ ESP swap SUB ] unless-zero ;
 
 M: x86.32 dummy-stack-params? f ;
 
@@ -349,14 +223,13 @@ M: x86.32 dummy-int-params? f ;
 
 M: x86.32 dummy-fp-params? f ;
 
-! Dreadful
-M: object flatten-value-type (flatten-stack-type) ;
-M: struct-c-type flatten-value-type (flatten-stack-type) ;
-M: long-long-type flatten-value-type (flatten-stack-type) ;
-M: c-type flatten-value-type
-    dup rep>> int-rep? [ (flatten-int-type) ] [ (flatten-stack-type) ] if ;
+M: x86.32 long-long-on-stack? t ;
 
-M: x86.32 struct-return-pointer-type
-    os linux? void* (stack-value) ? ;
+M: x86.32 float-on-stack? t ;
+
+M: x86.32 flatten-struct-type
+    call-next-method [ first t 2array ] map ;
+
+M: x86.32 struct-return-on-stack? os linux? not ;
 
 check-sse

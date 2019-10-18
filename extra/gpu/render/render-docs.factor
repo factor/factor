@@ -293,6 +293,7 @@ HELP: vertex-indexes
 { "An " { $link index-elements } " value submits vertex array elements in an order specified by an array of indexes." }
 { "A " { $link multi-index-range } " value submits multiple sequential slices of a vertex array." }
 { "A " { $link multi-index-elements } " value submits multiple separate lists of indexed vertex array elements." }
+{ "Specialized arrays of " { $link c:uchar } ", " { $link c:ushort } ", or " { $link c:uint } " elements may also be used directly as arrays of indexes." }
 } } ;
 
 ARTICLE: "gpu.render" "Rendering"

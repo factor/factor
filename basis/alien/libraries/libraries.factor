@@ -1,7 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings assocs io.backend
-kernel namespaces destructors sequences system io.pathnames ;
+kernel namespaces destructors sequences strings
+system io.pathnames ;
 IN: alien.libraries
 
 : dlopen ( path -- dll ) native-string>alien (dlopen) ;
@@ -12,7 +13,7 @@ SYMBOL: libraries
 
 libraries [ H{ } clone ] initialize
 
-TUPLE: library path abi dll ;
+TUPLE: library { path string } { abi abi initial: cdecl } dll ;
 
 ERROR: no-library name ;
 

@@ -72,7 +72,7 @@ CONSTANT: SOUND-UFO-HIT      8
 
 : init-sounds ( cpu -- )
   init-openal
-  [ 9 gen-sources swap (>>sounds) ] keep
+  [ 9 gen-sources swap sounds<< ] keep
   [ SOUND-SHOT        "vocab:space-invaders/resources/Shot.wav" init-sound ] keep 
   [ SOUND-UFO         "vocab:space-invaders/resources/Ufo.wav" init-sound ] keep 
   [ sounds>> SOUND-UFO swap nth AL_LOOPING AL_TRUE set-source-param ] keep
@@ -83,10 +83,10 @@ CONSTANT: SOUND-UFO-HIT      8
   [ SOUND-WALK3       "vocab:space-invaders/resources/Walk3.wav" init-sound ] keep 
   [ SOUND-WALK4       "vocab:space-invaders/resources/Walk4.wav" init-sound ] keep 
   [ SOUND-UFO-HIT    "vocab:space-invaders/resources/UfoHit.wav" init-sound ] keep
-  f swap (>>looping?) ;
+  f swap looping?<< ;
 
 : cpu-init ( cpu -- cpu )
-  make-opengl-bitmap over (>>bitmap)
+  make-opengl-bitmap over bitmap<<
   [ init-sounds ] keep
   [ reset ] keep ;
 
@@ -108,7 +108,7 @@ CONSTANT: SOUND-UFO-HIT      8
   #! Bit 5 = player one left
   #! Bit 6 = player one right
   [ port1>> dup HEX: FE bitand ] keep 
- (>>port1) ;
+ port1<< ;
 
 : read-port2 ( cpu -- byte )
   #! Port 2 maps player 2 controls and dip switches
@@ -139,7 +139,7 @@ M: space-invaders read-port ( port cpu -- byte )
 
 : write-port2 ( value cpu -- )
   #! Setting this value affects the value read from port 3
-  (>>port2o) ;
+  port2o<< ;
 
 :: bit-newly-set? ( old-value new-value bit -- bool )
   new-value bit bit? [ old-value bit bit? not ] dip and ;
@@ -159,23 +159,23 @@ M: space-invaders read-port ( port cpu -- byte )
   #! Bit 4 = Extended play sound
   over 0 bit? over looping?>> not and [ 
     dup SOUND-UFO play-invaders-sound 
-    t over (>>looping?)
+    t over looping?<<
   ] when 
   over 0 bit? not over looping?>> and [ 
     dup SOUND-UFO stop-invaders-sound 
-    f over (>>looping?)
+    f over looping?<<
   ] when 
   2dup 0 port3-newly-set? [ dup SOUND-UFO  play-invaders-sound ] when
   2dup 1 port3-newly-set? [ dup SOUND-SHOT play-invaders-sound ] when
   2dup 2 port3-newly-set? [ dup SOUND-BASE-HIT play-invaders-sound ] when
   2dup 3 port3-newly-set? [ dup SOUND-INVADER-HIT play-invaders-sound ] when
-  (>>port3o) ;
+  port3o<< ;
 
 : write-port4 ( value cpu -- )
   #! Affects the value returned by reading port 3
   [ port4hi>> ] keep 
-  [ (>>port4lo) ] keep 
-  (>>port4hi) ;
+  [ port4lo<< ] keep 
+  port4hi<< ;
 
 : write-port5 ( value cpu -- )
   #! Plays sounds
@@ -190,7 +190,7 @@ M: space-invaders read-port ( port cpu -- byte )
   2dup 2 port5-newly-set? [ dup SOUND-WALK3 play-invaders-sound ] when
   2dup 3 port5-newly-set? [ dup SOUND-WALK4 play-invaders-sound ] when
   2dup 4 port5-newly-set? [ dup SOUND-UFO-HIT play-invaders-sound ] when
-  (>>port5o) ;
+  port5o<< ;
 
 M: space-invaders write-port ( value port cpu -- )
   #! Write a byte to the hardware port, where 'port' is
@@ -219,7 +219,7 @@ M: space-invaders reset ( cpu -- )
   over get-cycles over inc-cycles
   [ swap instructions nth call( cpu -- ) ] keep  
   [ pc>> HEX: FFFF bitand ] keep 
-  (>>pc) ;
+  pc<< ;
 
 : gui-frame/2 ( cpu -- )
   [ gui-step ] keep
@@ -227,11 +227,11 @@ M: space-invaders reset ( cpu -- )
   over 16667 < [ ! cycles cpu
     nip gui-frame/2
   ] [
-    [ [ 16667 - ] dip (>>cycles) ] keep
+    [ [ 16667 - ] dip cycles<< ] keep
     dup last-interrupt>> HEX: 10 = [
-      HEX: 08 over (>>last-interrupt) HEX: 08 swap interrupt
+      HEX: 08 over last-interrupt<< HEX: 08 swap interrupt
     ] [
-      HEX: 10 over (>>last-interrupt) HEX: 10 swap interrupt
+      HEX: 10 over last-interrupt<< HEX: 10 swap interrupt
     ] if     
   ] if ;
 
@@ -239,46 +239,46 @@ M: space-invaders reset ( cpu -- )
   dup gui-frame/2 gui-frame/2 ;
 
 : coin-down ( cpu -- )
-  [ port1>> 1 bitor ] keep (>>port1) ;
+  [ port1>> 1 bitor ] keep port1<< ;
 
 : coin-up ( cpu --  )
-  [ port1>> 255 1 - bitand ] keep (>>port1) ;
+  [ port1>> 255 1 - bitand ] keep port1<< ;
 
 : player1-down ( cpu -- )
-  [ port1>> 4 bitor ] keep (>>port1) ;
+  [ port1>> 4 bitor ] keep port1<< ;
 
 : player1-up ( cpu -- )
-  [ port1>> 255 4 - bitand ] keep (>>port1) ;
+  [ port1>> 255 4 - bitand ] keep port1<< ;
 
 : player2-down ( cpu -- )
-  [ port1>> 2 bitor ] keep (>>port1) ;
+  [ port1>> 2 bitor ] keep port1<< ;
 
 : player2-up ( cpu -- )
-  [ port1>> 255 2 - bitand ] keep (>>port1) ;
+  [ port1>> 255 2 - bitand ] keep port1<< ;
 
 : fire-down ( cpu -- )
-  [ port1>> HEX: 10 bitor ] keep (>>port1) ;
+  [ port1>> HEX: 10 bitor ] keep port1<< ;
 
 : fire-up ( cpu -- )
-  [ port1>> 255 HEX: 10 - bitand ] keep (>>port1) ;
+  [ port1>> 255 HEX: 10 - bitand ] keep port1<< ;
 
 : left-down ( cpu -- )
-  [ port1>> HEX: 20 bitor ] keep (>>port1) ;
+  [ port1>> HEX: 20 bitor ] keep port1<< ;
 
 : left-up ( cpu -- )
-  [ port1>> 255 HEX: 20 - bitand ] keep (>>port1) ;
+  [ port1>> 255 HEX: 20 - bitand ] keep port1<< ;
 
 : right-down ( cpu -- )
-  [ port1>> HEX: 40 bitor ] keep (>>port1) ;
+  [ port1>> HEX: 40 bitor ] keep port1<< ;
 
 : right-up ( cpu -- )
-  [ port1>> 255 HEX: 40 - bitand ] keep (>>port1) ;
+  [ port1>> 255 HEX: 40 - bitand ] keep port1<< ;
 
 
 TUPLE: invaders-gadget < gadget cpu quit? windowed? ;
 
 invaders-gadget H{
-    { T{ key-down f f "ESC" }    [ t over (>>quit?) dup windowed?>> [ close-window ] [ drop ] if ] }
+    { T{ key-down f f "ESC" }    [ t over quit?<< dup windowed?>> [ close-window ] [ drop ] if ] }
     { T{ key-down f f "BACKSPACE" } [ cpu>> coin-down ] }
     { T{ key-up   f f "BACKSPACE" } [ cpu>> coin-up ] }
     { T{ key-down f f "1" }         [ cpu>> player1-down ] }
@@ -359,8 +359,8 @@ M: space-invaders update-video ( value addr cpu -- )
 
 : sync-frame ( micros -- micros )
   #! Sleep until the time for the next frame arrives.
-  1000 60 / >fixnum + system:system-micros - dup 0 >
-  [ milliseconds threads:sleep ] [ drop threads:yield ] if system:system-micros ;
+  1000 60 / >fixnum + gmt timestamp>micros - dup 0 >
+  [ milliseconds threads:sleep ] [ drop threads:yield ] if gmt timestamp>micros ;
 
 : invaders-process ( micros gadget -- )
   #! Run a space invaders gadget inside a 
@@ -377,12 +377,12 @@ M: space-invaders update-video ( value addr cpu -- )
 
 M: invaders-gadget graft* ( gadget -- )
   dup cpu>> init-sounds
-  f over (>>quit?)
-  [ system:system-micros swap invaders-process ] curry
+  f over quit?<<
+  [ gmt timestamp>micros swap invaders-process ] curry
   "Space invaders" threads:spawn drop ;
 
 M: invaders-gadget ungraft* ( gadget -- )
- t swap (>>quit?) ;
+ t swap quit?<< ;
 
 : (run) ( title cpu rom-info -- )
   over load-rom* <invaders-gadget> t >>windowed? swap open-window ;

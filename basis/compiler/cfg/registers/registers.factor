@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors namespaces kernel parser assocs sequences ;
+USING: accessors namespaces kernel math parser assocs sequences ;
 IN: compiler.cfg.registers
 
 ! Virtual registers, used by CFG and machine IRs, are just integers
@@ -34,7 +34,7 @@ ERROR: bad-vreg vreg ;
 
 ! ##inc-d and ##inc-r affect locations as follows. Location D 0 before
 ! an ##inc-d 1 becomes D 1 after ##inc-d 1.
-TUPLE: loc { n read-only } ;
+TUPLE: loc { n integer read-only } ;
 
 TUPLE: ds-loc < loc ;
 C: <ds-loc> ds-loc
