@@ -1,38 +1,46 @@
-! Copyright (c) 2007 Hans Schmid.
+! Copyright (c) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
-USING: columns grouping kernel math math.constants math.functions math.vectors
-    sequences ;
+USING: arrays kernel locals math math.constants math.functions
+math.vectors sequences sequences.extras sequences.private ;
 IN: math.transforms.fft
 
-! Fast Fourier Transform
-
 <PRIVATE
 
-: n^v ( n v -- w ) [ ^ ] with map ;
+! Discrete Fourier Transform
+:: (slow-fft) ( seq inverse? -- seq' )
+    seq length :> N
+    inverse? 1 -1 ? 2pi * i* N / N iota n*v :> omega
+    N iota [| k |
+        0 seq omega [ k * e^ * + ] 2each
+        inverse? [ N / ] when
+    ] map ; inline
 
-: omega ( n -- n' )
-    recip -2 pi i* * * exp ;
-
-: twiddle ( seq -- seq' )
-    dup length [ omega ] [ n^v ] bi v* ;
+! Cooley–Tukey Algorithm
+:: (fft) ( seq inverse? -- seq' )
+    seq length :> N
+    N 1 = [ seq ] [
+        seq even-indices inverse? (fft)
+        seq odd-indices inverse? (fft)
+        inverse? 1 -1 ? 2pi * i* N /
+        [ * e^ * ] curry map-index!
+        [ [ + inverse? [ 2 / ] when ] 2map ]
+        [ [ - inverse? [ 2 / ] when ] 2map ]
+        2bi append
+    ] if ; inline recursive
 
 PRIVATE>
 
-DEFER: fft
-
-: two ( seq -- seq' )
-    fft 2 v/n dup append ;
-
-<PRIVATE
-
-: even ( seq -- seq' ) 2 group 0 <column> ;
-: odd ( seq -- seq' ) 2 group 1 <column> ;
-
-: (fft) ( seq -- seq' )
-    [ odd two twiddle ] [ even two ] bi v+ ;
-
-PRIVATE>
+ERROR: not-enough-data ;
 
 : fft ( seq -- seq' )
-    dup length 1 = [ (fft) ] unless ;
+    [ not-enough-data ] [
+        f over length even? [ (fft) ] [ (slow-fft) ] if
+    ] if-empty ;
 
+: ifft ( seq -- seq' )
+    [ not-enough-data ] [
+        t over length even? [ (fft) ] [ (slow-fft) ] if
+    ] if-empty ;
+
+: correlate ( x y -- z )
+    [ fft ] [ reverse fft ] bi* v* ifft ;

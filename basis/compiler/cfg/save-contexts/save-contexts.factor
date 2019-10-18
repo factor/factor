@@ -37,7 +37,7 @@ M: insn modifies-context? drop f ;
         [
             int-rep next-vreg-rep
             int-rep next-vreg-rep
-            \ ##save-context new-insn
+            ##save-context new-insn
         ] dip
         [ save-context-offset ] keep
         [ insert-nth ] change-instructions drop

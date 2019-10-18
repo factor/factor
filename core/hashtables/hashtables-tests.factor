@@ -1,6 +1,6 @@
-USING: kernel math namespaces make tools.test vectors sequences
-sequences.private hashtables io prettyprint assocs
-continuations ;
+USING: accessors assocs continuations hashtables io kernel make
+math namespaces prettyprint sequences sequences.private
+tools.test vectors ;
 IN: hashtables.tests
 
 [ H{ } ] [ { } [ dup ] H{ } map>assoc ] unit-test
@@ -18,6 +18,12 @@ unit-test
 [ f ]
 [ { 1 { 2 3 } } hashtable? ]
 unit-test
+
+{ t } [
+    "value" "key"
+    [ associate ] [ H{ } clone [ set-at ] keep ] 2bi
+    [ = ] [ [ array>> length ] bi@ = ] 2bi and
+] unit-test
 
 ! Test some hashcodes.
 

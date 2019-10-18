@@ -1,15 +1,15 @@
-! (c)Joe Groff, Daniel Ehrenberg bsd license
+! Copyright (C) 2010, 2011 Joe Groff, Daniel Ehrenberg,
+! John Benediktsson, Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license
 USING: accessors alien alien.c-types alien.data alien.parser
-arrays byte-arrays classes classes.private classes.parser
-classes.tuple classes.tuple.parser classes.tuple.private
-combinators combinators.short-circuit combinators.smart
-cpu.architecture definitions functors.backend fry
-generalizations generic.parser kernel kernel.private lexer libc
-locals macros make math math.order parser quotations sequences
-slots slots.private specialized-arrays vectors words summary
-namespaces assocs vocabs.parser math.functions
-classes.struct.bit-accessors bit-arrays
-stack-checker.dependencies system layouts ;
+arrays byte-arrays classes classes.parser classes.private
+classes.struct.bit-accessors classes.tuple classes.tuple.parser
+combinators combinators.smart cpu.architecture definitions fry
+functors.backend generalizations generic generic.parser io kernel
+kernel.private lexer libc locals macros math math.order parser
+quotations sequences slots slots.private specialized-arrays
+stack-checker.dependencies summary vectors vocabs.loader
+vocabs.parser words ;
 FROM: delegate.private => group-words slot-group-words ;
 QUALIFIED: math
 IN: classes.struct
@@ -24,8 +24,11 @@ M: struct-must-have-slots summary
 TUPLE: struct
     { (underlying) c-ptr read-only } ;
 
+! We hijack the core slots vocab's slot-spec type for struct
+! fields. Note that 'offset' is in bits, not bytes, to support
+! bitfields.
 TUPLE: struct-slot-spec < slot-spec
-    type ;
+    type packed? ;
 
 ! For a struct-bit-slot-spec, offset is in bits, not bytes
 TUPLE: struct-bit-slot-spec < struct-slot-spec
@@ -49,7 +52,7 @@ M: struct >c-ptr
 
 M: struct equal?
     over struct? [
-        2dup [ class ] bi@ = [
+        2dup [ class-of ] same? [
             2dup [ >c-ptr ] both?
             [ [ >c-ptr ] [ binary-object ] bi* memory= ]
             [ [ >c-ptr not ] both? ]
@@ -59,7 +62,7 @@ M: struct equal?
 
 M: struct hashcode*
     binary-object over
-    [ <direct-uchar-array> hashcode* ] [ 3drop 0 ] if ; inline
+    [ uchar <c-direct-array> hashcode* ] [ 3drop 0 ] if ; inline
 
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
@@ -67,6 +70,9 @@ M: struct hashcode*
     ! This is sub-optimal if the class is not literal, but gets
     ! optimized down to efficient code if it is.
     '[ _ boa ] call( ptr -- struct ) ; inline
+
+: read-struct ( class -- struct )
+    [ heap-size read ] [ memory>struct ] bi ;
 
 <PRIVATE
 : (init-struct) ( class with-prototype: ( prototype -- alien ) sans-prototype: ( class -- alien ) -- alien )
@@ -133,11 +139,11 @@ M: struct-bit-slot-spec (writer-quot)
     drop [ >c-ptr ] ;
 
 MACRO: read-struct-slot ( slot -- )
-    dup type>> depends-on-c-type
+    dup type>> add-depends-on-c-type
     (reader-quot) ;
 
 MACRO: write-struct-slot ( slot -- )
-    dup type>> depends-on-c-type
+    dup type>> add-depends-on-c-type
     (writer-quot) ;
 PRIVATE>
 
@@ -146,7 +152,7 @@ M: struct-class boa>object
     [ <struct> ] [ struct-slots ] bi
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] curry keep ;
 
-M: struct-class initial-value* <struct> ; inline
+M: struct-class initial-value* <struct> t ; inline
 
 ! Struct slot accessors
 
@@ -170,7 +176,7 @@ TUPLE: struct-c-type < abstract-c-type
 
 INSTANCE: struct-c-type value-type
 
-M: struct-c-type c-type ;
+M: struct-c-type lookup-c-type ;
 
 M: struct-c-type base-type ;
 
@@ -192,6 +198,9 @@ M: struct-c-type base-type ;
     [ \ struct-slot-values ] [ struct-slot-values-quot ] bi
     define-inline-method ;
 
+: forget-struct-slot-values-method ( class -- )
+    \ struct-slot-values ?lookup-method forget ;
+
 : clone-underlying ( struct -- byte-array )
     binary-object memory>byte-array ; inline
 
@@ -199,6 +208,9 @@ M: struct-c-type base-type ;
     [ \ clone ]
     [ \ clone-underlying swap literalize \ memory>struct [ ] 3sequence ] bi
     define-inline-method ;
+
+: forget-clone-method ( class -- )
+    \ clone ?lookup-method forget ;
 
 :: c-type-for-class ( class slots size align -- c-type )
     struct-c-type new
@@ -213,11 +225,14 @@ M: struct-c-type base-type ;
 
 GENERIC: compute-slot-offset ( offset class -- offset' )
 
-: c-type-align-at ( class offset -- n )
-    0 = [ c-type-align-first ] [ c-type-align ] if ;
+: c-type-align-at ( slot-spec offset -- n )
+    over packed?>> [ 2drop 1 ] [
+        [ type>> ] dip
+        0 = [ c-type-align-first ] [ c-type-align ] if
+    ] if ;
 
 M: struct-slot-spec compute-slot-offset
-    [ type>> over c-type-align-at 8 * align ] keep
+    [ over c-type-align-at 8 * align ] keep
     [ [ 8 /i ] dip offset<< ] [ type>> heap-size 8 * + ] 2bi ;
 
 M: struct-bit-slot-spec compute-slot-offset
@@ -231,12 +246,12 @@ M: struct-bit-slot-spec compute-slot-offset
 
 : struct-alignment ( slots -- align )
     [ struct-bit-slot-spec? not ] filter
-    1 [ [ type>> ] [ offset>> ] bi c-type-align-at max ] reduce ;
+    1 [ dup offset>> c-type-align-at max ] reduce ;
 
 PRIVATE>
 
-M: struct byte-length class "struct-size" word-prop ; foldable
-M: struct binary-zero? binary-object <direct-uchar-array> [ 0 = ] all? ; inline
+M: struct byte-length class-of "struct-size" word-prop ; foldable
+M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inline
 
 ! class definition
 
@@ -262,39 +277,63 @@ M: struct binary-zero? binary-object <direct-uchar-array> [ 0 = ] all? ; inline
     bi ;
 
 : check-struct-slots ( slots -- )
-    [ type>> c-type drop ] each ;
+    [ type>> lookup-c-type drop ] each ;
 
 : redefine-struct-tuple-class ( class -- )
     [ struct f define-tuple-class ] [ make-final ] bi ;
 
-:: (define-struct-class) ( class slots offsets-quot -- )
-    slots empty? [ struct-must-have-slots ] when
+:: (define-struct-class) ( class slot-specs offsets-quot alignment-quot -- )
+    slot-specs check-struct-slots
+    slot-specs empty? [ struct-must-have-slots ] when
     class redefine-struct-tuple-class
-    slots make-slots dup check-struct-slots :> slot-specs
     slot-specs offsets-quot call :> unaligned-size
-    slot-specs struct-alignment :> alignment
+    slot-specs alignment-quot call :> alignment
     unaligned-size alignment align :> size
 
-    class  slot-specs  size  alignment  c-type-for-class :> c-type
+    class slot-specs size alignment c-type-for-class :> c-type
 
     c-type class typedef
     class slot-specs define-accessors
     class size "struct-size" set-word-prop
     class dup make-struct-prototype "prototype" set-word-prop
     class (struct-methods) ; inline
+
+: make-packed-slots ( slots -- slot-specs )
+    make-slots [ t >>packed? ] map! ;
+
 PRIVATE>
 
 : define-struct-class ( class slots -- )
-    [ compute-struct-offsets ] (define-struct-class) ;
+    make-slots
+    [ compute-struct-offsets ] [ struct-alignment ]
+    (define-struct-class) ;
+
+: define-packed-struct-class ( class slots -- )
+    make-packed-slots
+    [ compute-struct-offsets ] [ drop 1 ]
+    (define-struct-class) ;
 
 : define-union-struct-class ( class slots -- )
-    [ compute-union-offsets ] (define-struct-class) ;
+    make-slots
+    [ compute-union-offsets ] [ struct-alignment ]
+    (define-struct-class) ;
 
 ERROR: invalid-struct-slot token ;
 
 : struct-slot-class ( c-type -- class' )
-    c-type c-type-boxed-class
+    lookup-c-type c-type-boxed-class
     dup \ byte-array = [ drop \ c-ptr ] when ;
+
+M: struct-class reset-class
+    {
+        [ dup "c-type" word-prop fields>> forget-slot-accessors ]
+        [
+            [ forget-struct-slot-values-method ]
+            [ forget-clone-method ] bi
+        ]
+        [ { "c-type" "layout" "struct-size" } reset-props ]
+        [ call-next-method ]
+    } cleave ;
 
 SYMBOL: bits:
 
@@ -331,12 +370,12 @@ PRIVATE>
 : <struct-slot-spec> ( name c-type attributes -- slot-spec )
     [ struct-slot-spec new ] 3dip
     [ >>name ]
-    [ [ >>type ] [ struct-slot-class >>class ] bi ]
+    [ [ >>type ] [ struct-slot-class init-slot-class ] bi ]
     [ [ dup empty? ] [ peel-off-struct-attributes ] until drop ] tri* ;
 
 <PRIVATE
 : parse-struct-slot ( -- slot )
-    scan scan-c-type \ } parse-until <struct-slot-spec> ;
+    scan-token scan-c-type \ } parse-until <struct-slot-spec> ;
 
 : parse-struct-slots ( slots -- slots' more? )
     scan-token {
@@ -346,12 +385,16 @@ PRIVATE>
     } case ;
 
 : parse-struct-definition ( -- class slots )
-    CREATE-CLASS 8 <vector> [ parse-struct-slots ] [ ] while >array
+    scan-new-class 8 <vector> [ parse-struct-slots ] [ ] while >array
     dup [ name>> ] map check-duplicate-slots ;
 PRIVATE>
 
 SYNTAX: STRUCT:
     parse-struct-definition define-struct-class ;
+
+SYNTAX: PACKED-STRUCT:
+    parse-struct-definition define-packed-struct-class ;
+
 SYNTAX: UNION-STRUCT:
     parse-struct-definition define-union-struct-class ;
 
@@ -365,18 +408,19 @@ SYNTAX: S@
 
 <PRIVATE
 : scan-c-type` ( -- c-type/param )
-    scan dup "{" = [ drop \ } parse-until >array ] [ search ] if ;
+    scan-token dup "{" = [ drop \ } parse-until >array ] [ search ] if ;
 
 : parse-struct-slot` ( accum -- accum )
     scan-string-param scan-c-type` \ } parse-until
     [ <struct-slot-spec> suffix! ] 3curry append! ;
 
 : parse-struct-slots` ( accum -- accum more? )
-    scan {
+    scan-token {
         { ";" [ f ] }
         { "{" [ parse-struct-slot` t ] }
         [ invalid-struct-slot ]
     } case ;
+
 PRIVATE>
 
 FUNCTOR-SYNTAX: STRUCT:
@@ -384,7 +428,5 @@ FUNCTOR-SYNTAX: STRUCT:
     [ 8 <vector> ] append!
     [ parse-struct-slots` ] [ ] while
     [ >array define-struct-class ] append! ;
-
-USING: vocabs vocabs.loader ;
 
 { "classes.struct" "prettyprint" } "classes.struct.prettyprint" require-when

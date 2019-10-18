@@ -1,38 +1,42 @@
 USING: alien alien.c-types help.syntax help.markup libc
 kernel.private byte-arrays math strings hashtables alien.syntax
 alien.strings sequences io.encodings.string debugger destructors
-vocabs.loader classes.struct quotations ;
+vocabs.loader classes.struct quotations kernel ;
 IN: alien.data
+
+HELP: >c-array
+{ $values { "seq" sequence } { "c-type" "a C type" } { "array" byte-array } }
+{ $description "Outputs a freshly allocated byte-array whose elements are C type values from the given sequence." }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
 HELP: <c-array>
 { $values { "len" "a non-negative integer" } { "c-type" "a C type" } { "array" byte-array } }
 { $description "Creates a byte array large enough to hold " { $snippet "n" } " values of a C type." }
-{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
-HELP: <c-object>
-{ $values { "type" "a C type" } { "array" byte-array } }
-{ $description "Creates a byte array suitable for holding a value with the given C type." }
-{ $errors "Throws an " { $link no-c-type } " error if the type does not exist." } ;
-
-{ <c-object> malloc-object } related-words
+HELP: c-array{
+{ $description "Literal syntax, consists of a C-type followed by a series of values terminated by " { $snippet "}" } }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
 HELP: memory>byte-array
 { $values { "alien" c-ptr } { "len" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new byte array." } ;
 
+HELP: cast-array
+{ $values { "byte-array" byte-array } { "c-type" "a C type" } { "array" "a specialized array" } }
+{ $description "Converts a byte array into a specialized array by interpreting the bytes in as machine-specific values. Code which uses this word is unportable" }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
+
 HELP: malloc-array
-{ $values { "n" "a non-negative integer" } { "type" "a C type" } { "array" "a specialized array" } }
+{ $values { "n" "a non-negative integer" } { "c-type" "a C type" } { "array" "a specialized array" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type, then wraps the memory in a sequence object using " { $link <c-direct-array> } "." }
-{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist, if the requested size is negative, if a direct specialized array class appropriate to the type is not loaded, or if memory allocation fails." } ;
-
-HELP: malloc-object
-{ $values { "type" "a C type" } { "alien" alien } }
-{ $description "Allocates an unmanaged memory block large enough to hold a value of a C type." }
-{ $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
-{ $errors "Throws an error if the type does not exist or if memory allocation fails." } ;
 
 HELP: malloc-byte-array
 { $values { "byte-array" byte-array } { "alien" alien } }
@@ -62,10 +66,10 @@ classes.struct kernel math math.functions
 prettyprint ;
 IN: scratchpad
 
-STRUCT: point { x int } { y int } ;
+STRUCT: test-point { x int } { y int } ;
 
 : scoped-allocation-test ( -- x )
-    { point } [
+    { test-point } [
         3 >>x 4 >>y
         [ x>> sq ] [ y>> sq ] bi + sqrt
     ] with-scoped-allocation ;
@@ -92,7 +96,6 @@ ARTICLE: "malloc" "Manual memory management"
 $nl
 "Allocating a C datum with a fixed address:"
 { $subsections
-    malloc-object
     malloc-byte-array
 }
 "The " { $vocab-link "libc" } " vocabulary defines several words which directly call C standard library memory management functions:"
@@ -134,6 +137,10 @@ ARTICLE: "c-pointers" "Passing pointers to C functions"
 { $warning
 "The Factor garbage collector can move byte arrays around, and code passing byte arrays, or objects backed by byte arrays, must obey important guidelines. See " { $link "byte-arrays-gc" } "." } ;
 
+ARTICLE: "c-boxes" "C value boxes"
+"Sometimes it is useful to create a byte array storing a single C value, like a struct with a single field. A pair of utility macros exist to make this more convenient:"
+{ $subsections <ref> deref } ;
+
 ARTICLE: "c-data" "Passing data between Factor and C"
 "Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers."
 $nl
@@ -144,13 +151,12 @@ $nl
     "malloc"
     "c-strings"
     "c-out-params"
+    "c-boxes"
 }
 "Important guidelines for passing data in byte arrays:"
 { $subsections "byte-arrays-gc" }
 "C-style enumerated types are supported:"
-{ $subsections "alien.enums" POSTPONE: ENUM: }
-"C types can be aliased for convenience and consistency with native library documentation:"
-{ $subsections POSTPONE: TYPEDEF: }
+{ $subsections "alien.enums" }
 "A utility for defining " { $link "destructors" } " for deallocating memory:"
 { $subsections "alien.destructors" }
 "C struct and union types can be defined with " { $link POSTPONE: STRUCT: } " and " { $link POSTPONE: UNION: } ". See " { $link "classes.struct" } " for details. For passing arrays to and from C, use the " { $link "specialized-arrays" } " vocabulary." ;
@@ -167,15 +173,10 @@ HELP: malloc-string
     }
 } ;
 
-HELP: require-c-array
-{ $values { "c-type" "a C type" } }
-{ $description "Generates a specialized array of " { $snippet "c-type" } " using the " { $link <c-array> } " or " { $link <c-direct-array> } " vocabularies." }
-{ $notes "This word must be called inside a compilation unit. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence types loaded." } ;
-
 HELP: <c-direct-array>
 { $values { "alien" c-ptr } { "len" integer } { "c-type" "a C type" } { "array" "a specialized direct array" } }
 { $description "Constructs a new specialized array of length " { $snippet "len" } " and element type " { $snippet "c-type" } " over the range of memory referenced by " { $snippet "alien" } "." }
-{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. The vocabulary can be loaded with the " { $link require-c-array } " word. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." } ;
+{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." } ;
 
 ARTICLE: "c-strings" "C strings"
 "C string types are arrays with shape " { $snippet "{ c-string encoding }" } ", where " { $snippet "encoding" } " is an encoding descriptor. The type " { $link c-string } " is an alias for " { $snippet "{ c-string utf8 }" } ". See " { $link "encodings-descriptors" } " for information about encoding descriptors. In " { $link POSTPONE: TYPEDEF: } ", " { $link POSTPONE: FUNCTION: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: STRUCT: } " definitions, the shorthand syntax " { $snippet "c-string[encoding]" } " can be used to specify the string encoding."
@@ -199,3 +200,20 @@ $nl
 { $subsections alien>string }
 "For example, if a C function returns a " { $link c-string } " but stipulates that the caller must deallocate the memory afterward, you must define the function as returning " { $snippet "char*" } " and call " { $link (free) } " yourself." ;
 
+HELP: <ref>
+{ $values { "value" object } { "c-type" "a C type" } { "c-ptr" c-ptr } }
+{ $description "Creates a new byte array to store a Factor object as a C value." }
+{ $examples
+    { $example "USING: alien.c-types alien.data prettyprint sequences ;" "123 int <ref> length ." "4" }
+} ;
+
+HELP: deref
+{ $values { "c-ptr" c-ptr } { "c-type" "a C type" } { "value" object } }
+{ $description "Loads a C value from a byte array." }
+{ $examples
+    { $example "USING: alien.c-types alien.data prettyprint sequences ;" "321 int <ref> int deref ." "321" }
+} ;
+
+ARTICLE: "c-out-params" "Output parameters in C"
+"A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
+{ $subsection with-out-parameters } ;

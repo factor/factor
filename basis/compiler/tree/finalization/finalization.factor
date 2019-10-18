@@ -28,7 +28,7 @@ GENERIC: finalize* ( node -- nodes )
 : splice-final ( quot -- nodes ) splice-quot finalize ;
 
 : splice-predicate ( word -- nodes )
-    [ depends-on-definition ] [ def>> splice-final ] bi ;
+    [ add-depends-on-definition ] [ def>> splice-final ] bi ;
 
 M: #copy finalize* drop f ;
 

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math namespaces make sequences random
-strings math.parser math.intervals combinators math.bitwise
-nmake db db.tuples db.types classes words shuffle arrays
-destructors continuations db.tuples.private prettyprint
-db.private byte-arrays ;
+USING: accessors arrays byte-arrays classes classes.tuple
+combinators continuations db db.errors db.private db.tuples
+db.tuples.private db.types destructors kernel make math
+math.bitwise math.intervals math.parser namespaces nmake
+prettyprint random sequences shuffle strings words fry ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -190,13 +190,13 @@ M: db-connection <select-by-slots-statement> ( tuple class -- statement )
     } 2cleave ;
 
 M: db-connection query>statement ( query -- tuple )
-    [ tuple>> dup class ] keep
+    [ tuple>> dup class-of ] keep
     [ <select-by-slots-statement> ] dip make-query* ;
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
 
 M: db-connection <count-statement> ( query -- statement )
-    [ tuple>> dup class ] keep
+    [ tuple>> dup class-of ] keep
     [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
     dip make-query* ;
 
@@ -208,3 +208,9 @@ M: db-connection <count-statement> ( query -- statement )
 
 : drop-index ( index-name -- )
     [ "drop index " % % ] "" make sql-command ;
+
+: create-database ( string -- )
+    "create database " ";" surround sql-command ;
+
+: ensure-database ( string -- )
+    '[ _ create-database ] ignore-database-exists ;

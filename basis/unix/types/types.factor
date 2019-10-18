@@ -1,4 +1,4 @@
-USING: kernel system alien.c-types alien.syntax combinators vocabs.loader ;
+USING: kernel system alien.c-types alien.syntax combinators vocabs ;
 IN: unix.types
 
 TYPEDEF: char int8_t
@@ -47,7 +47,4 @@ C-TYPE: sockaddr
 os {
     { linux   [ "unix.types.linux"   require ] }
     { macosx  [ "unix.types.macosx"  require ] }
-    { freebsd [ "unix.types.freebsd" require ] }
-    { openbsd [ "unix.types.openbsd" require ] }
-    { netbsd  [ "unix.types.netbsd"  require ] }
 } case

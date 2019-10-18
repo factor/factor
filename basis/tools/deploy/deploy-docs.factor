@@ -45,7 +45,7 @@ ARTICLE: "tools.deploy.caveats" "Deploy tool caveats"
 "Finding the correct deploy flags is a trial and error process; you must find a tradeoff between deployed image size and correctness. If your program uses dynamic language features, you may need to elect to strip out fewer subsystems in order to have full functionality." ;
 
 ARTICLE: "tools.deploy" "Application deployment"
-"The stand-alone application deployment tool, implemented in the " { $vocab-link "tools.deploy" } " vocablary, compiles a vocabulary down to a native executable which runs the vocabulary's " { $link POSTPONE: MAIN: } " hook. Deployed executables do not depend on Factor being installed, and do not expose any source code, and thus are suitable for delivering commercial end-user applications."
+"The stand-alone application deployment tool, implemented in the " { $vocab-link "tools.deploy" } " vocabulary, compiles a vocabulary down to a native executable which runs the vocabulary's " { $link POSTPONE: MAIN: } " hook. Deployed executables do not depend on Factor being installed, and do not expose any source code, and thus are suitable for delivering commercial end-user applications."
 $nl
 "Most of the time, the words in the " { $vocab-link "tools.deploy" } " vocabulary should not be used directly; instead, use " { $link "ui.tools.deploy" } "."
 $nl

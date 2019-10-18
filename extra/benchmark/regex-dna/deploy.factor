@@ -4,7 +4,7 @@ H{
     { deploy-word-defs? f }
     { deploy-threads? t }
     { deploy-math? t }
-    { deploy-io 3 }
+    { deploy-io 2 }
     { deploy-reflection 1 }
     { deploy-unicode? f }
     { "stop-after-last-window?" t }

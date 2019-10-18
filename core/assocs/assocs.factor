@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences arrays math sequences.private vectors
-accessors ;
+USING: accessors arrays kernel math sequences sequences.private
+vectors ;
 IN: assocs
 
 MIXIN: assoc
@@ -58,10 +58,10 @@ PRIVATE>
     (assoc-each) each ; inline
 
 : assoc>map ( ... assoc quot: ( ... key value -- ... elt ) exemplar -- ... seq )
-    [ collector-for [ assoc-each ] dip ] [ like ] bi ; inline
+    [ >alist ] 2dip [ [ first2 ] prepose ] dip map-as ; inline
 
 : assoc-map-as ( ... assoc quot: ( ... key value -- ... newkey newvalue ) exemplar -- ... newassoc )
-    [ [ 2array ] compose V{ } assoc>map ] dip assoc-like ; inline
+    [ [ 2array ] compose { } assoc>map ] dip assoc-like ; inline
 
 : assoc-map ( ... assoc quot: ( ... key value -- ... newkey newvalue ) -- ... newassoc )
     over assoc-map-as ; inline
@@ -108,7 +108,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
 
 : assoc-empty? ( assoc -- ? )
-    assoc-size 0 = ;
+    assoc-size 0 = ; inline
 
 : assoc-stack ( key seq -- value )
     [ length 1 - ] keep (assoc-stack) ; flushable
@@ -117,7 +117,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
-    [ assoc-subset? ] [ swap assoc-subset? ] 2bi and ;
+    2dup [ assoc-size ] bi@ eq? [ assoc-subset? ] [ 2drop f ] if ;
 
 : assoc-hashcode ( n assoc -- code )
     >alist hashcode* ;
@@ -167,7 +167,12 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
 
 : map>assoc ( ... seq quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
-    [ [ 2array ] compose { } map-as ] dip assoc-like ; inline
+    dup sequence? [
+        [ [ 2array ] compose ] dip map-as
+    ] [
+        [ over assoc-size ] dip new-assoc
+        [ [ swapd set-at ] curry compose each ] keep
+    ] if ; inline
 
 : extract-keys ( seq assoc -- subassoc )
     [ [ dupd at ] curry ] keep map>assoc ;
@@ -182,7 +187,7 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
     [ ?push ] change-at ;
 
 : zip ( keys values -- alist )
-    2array flip ; inline
+    [ 2array ] { } 2map-as ; inline
 
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
@@ -230,7 +235,7 @@ C: <enum> enum
 
 M: enum at*
     seq>> 2dup bounds-check?
-    [ nth t ] [ 2drop f f ] if ; inline
+    [ nth-unsafe t ] [ 2drop f f ] if ; inline
 
 M: enum set-at seq>> set-nth ; inline
 

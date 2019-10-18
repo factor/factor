@@ -1,22 +1,24 @@
-! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators.short-circuit fry
 continuations debugger io.directories io.files io.launcher
-io.pathnames io.encodings.ascii kernel make mason.common mason.config
-mason.platform mason.report mason.notify namespaces sequences
-quotations macros system combinators splitting ;
+io.pathnames io.encodings.ascii kernel make mason.common
+mason.config mason.platform mason.report mason.notify namespaces
+sequences quotations macros system combinators splitting ;
 IN: mason.child
 
 : nmake-cmd ( -- args )
     { "nmake" "/f" "nmakefile" }
-    target-cpu get "." split "-" join suffix ;
+    target-cpu get name>> "." split "-" join suffix ;
 
 : gnu-make-cmd ( -- args )
-    gnu-make platform 2array ;
+    gnu-make
+    target-os get name>> target-cpu get name>> (platform)
+    2array ;
 
 : make-cmd ( -- args )
     {
-        { [ target-os get "winnt" = ] [ nmake-cmd ] }
+        { [ target-os get windows = ] [ nmake-cmd ] }
         [ gnu-make-cmd ]
     } cond ;
 
@@ -26,17 +28,19 @@ IN: mason.child
             make-cmd >>command
             "../compile-log" >>stdout
             +stdout+ >>stderr
+            +new-group+ >>group
         try-process
     ] with-directory ;
 
 : factor-vm ( -- string )
-    target-os get "winnt" = "./factor.com" "./factor" ? ;
+    target-os get windows = "./factor.com" "./factor" ? ;
 
 : boot-cmd ( -- cmd )
     [
         factor-vm ,
         "-i=" boot-image-name append ,
         "-no-user-init" ,
+        boot-flags get %
     ] { } make ;
 
 : boot ( -- )
@@ -47,6 +51,7 @@ IN: mason.child
             "../boot-log" >>stdout
             +stdout+ >>stderr
             1 hours >>timeout
+            +new-group+ >>group
         try-process
     ] with-directory ;
 
@@ -60,6 +65,7 @@ IN: mason.child
             "../test-log" >>stdout
             +stdout+ >>stderr
             4 hours >>timeout
+            +new-group+ >>group
         try-process
     ] with-directory ;
 

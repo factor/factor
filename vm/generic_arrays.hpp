@@ -4,7 +4,7 @@ namespace factor
 template<typename Array> cell array_capacity(const Array *array)
 {
 #ifdef FACTOR_DEBUG
-	assert(array->type() == Array::type_number);
+	FACTOR_ASSERT(array->type() == Array::type_number);
 #endif
 	return array->capacity >> TAG_BITS;
 }
@@ -19,6 +19,7 @@ template<typename Array> cell array_size(Array *array)
 	return array_size<Array>(array_capacity(array));
 }
 
+/* Allocates memory */
 template<typename Array> Array *factor_vm::allot_uninitialized_array(cell capacity)
 {
 	Array *array = allot<Array>(array_size<Array>(capacity));
@@ -31,9 +32,13 @@ template<typename Array> bool factor_vm::reallot_array_in_place_p(Array *array, 
 	return nursery.contains_p(array) && capacity <= array_capacity(array);
 }
 
+/* Allocates memory (sometimes) */
 template<typename Array> Array *factor_vm::reallot_array(Array *array_, cell capacity)
 {
 	data_root<Array> array(array_,this);
+
+	if (array_capacity(array.untagged()) == capacity)
+		return array.untagged();
 
 	if(reallot_array_in_place_p(array.untagged(),capacity))
 	{

@@ -15,9 +15,10 @@ IN: compiler.cfg.tco
 : return? ( bb -- ? )
     skip-empty-blocks
     instructions>> {
-        [ length 2 = ]
-        [ first ##epilogue? ]
-        [ second ##return? ]
+        [ length 3 = ]
+        [ first ##safepoint? ]
+        [ second ##epilogue? ]
+        [ third ##return? ]
     } 1&& ;
 
 : tail-call? ( bb -- ? )
@@ -33,14 +34,15 @@ IN: compiler.cfg.tco
     '[
         instructions>>
         [ pop* ] [ pop ] [ ] tri
-        [ [ \ ##epilogue new-insn ] dip push ]
-        [ _ dip push ] bi
+        [ [ ##safepoint new-insn ] dip push ]
+        [ [ ##epilogue new-insn ] dip push ]
+        [ _ dip push ] tri
     ]
     [ successors>> delete-all ]
     bi ; inline
 
 : convert-word-tail-call ( bb -- )
-    [ word>> \ ##jump new-insn ] convert-tail-call ;
+    [ word>> ##jump new-insn ] convert-tail-call ;
 
 : loop-tail-call? ( bb -- ? )
     instructions>> penultimate
@@ -48,7 +50,14 @@ IN: compiler.cfg.tco
 
 : convert-loop-tail-call ( bb -- )
     ! If a word calls itself, this becomes a loop in the CFG.
-    [ instructions>> [ pop* ] [ pop* ] [ [ \ ##branch new-insn ] dip push ] tri ]
+    [
+        instructions>> {
+            [ pop* ]
+            [ pop* ]
+            [ [ ##safepoint new-insn ] dip push ]
+            [ [ ##branch new-insn ] dip push ]
+        } cleave
+    ]
     [ successors>> delete-all ]
     [ [ cfg get entry>> successors>> first ] dip successors>> push ]
     tri ;

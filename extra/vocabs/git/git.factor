@@ -25,4 +25,4 @@ ERROR: git-revision-not-found path ;
     [ [ input-stream get swap parse-stream call( -- ) ] with-git-object-stream ]
     [ git-revision-not-found ] if* ;
 
-SYNTAX: USE-REV: scan scan use-vocab-rev ;
+SYNTAX: USE-REV: scan-token scan-token use-vocab-rev ;

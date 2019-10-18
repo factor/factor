@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping hashtables kernel locals
-math math.parser sequences sequences.deep
-specialized-arrays.instances.alien.c-types.float
-specialized-arrays.instances.alien.c-types.uint splitting xml
-xml.data xml.traversal math.order namespaces combinators images
-gpu.shaders io make game.models game.models.util
-io.encodings.ascii game.models.loader ;
+USING: accessors alien.c-types alien.data arrays assocs grouping
+hashtables kernel locals math math.parser sequences sequences.deep
+splitting xml xml.data xml.traversal math.order namespaces
+combinators images gpu.shaders io make game.models game.models.util
+io.encodings.ascii game.models.loader specialized-arrays ;
+QUALIFIED-WITH: alien.c-types c
+SPECIALIZED-ARRAYS: c:float c:uint ;
 IN: game.models.collada
 
 SINGLETON: collada-models
@@ -20,9 +20,6 @@ TUPLE: source semantic offset data ;
 SYMBOLS: up-axis unit-ratio ;
 
 : string>numbers ( string -- number-seq )
-    " \t\n" split harvest [ string>number ] map ;
-
-: string>floats ( string -- float-seq )
     " \t\n" split harvest [ string>number ] map ;
 
 : x/ ( tag child-name -- child-tag )
@@ -70,16 +67,16 @@ M: z-up >y-up-axis!
         [ 0 swap set-nth ] tri
     ] bi ;
 
-: source>seq ( source-tag up-axis scale -- sequence )
+: source>sequence ( source-tag up-axis scale -- sequence )
     rot
-    [ "float_array" x/ xt string>floats [ * ] with map ]
+    [ "float_array" x/ xt string>numbers [ * ] with map ]
     [ nip "technique_common" x/ "accessor" x/ "stride" x@ string>number ] 2bi
     group
     [ swap over length 2 > [ >y-up-axis! ] [ drop ] if ] with map ;
 
 : source>pair ( source-tag -- pair )
     [ "id" x@ ]
-    [ up-axis get unit-ratio get source>seq ] bi 2array ;
+    [ up-axis get unit-ratio get source>sequence ] bi 2array ;
 
 : mesh>sources ( mesh-tag -- hashtable )
     "source" [ source>pair ] x* >hashtable ;
@@ -142,7 +139,7 @@ VERTEX-FORMAT: collada-vertex-format
 
 : triangles>model ( sources vertices triangles-tag -- model )
     [ "input" tags-named collect-sources ] keep swap
-    
+
     [
         largest-offset+1 swap
         [ "count" x@ string>number ] [ triangles>numbers ] bi
@@ -150,8 +147,8 @@ VERTEX-FORMAT: collada-vertex-format
     ]
     [
         soa>aos 
-        [ flatten >float-array ]
-        [ flatten >uint-array ]
+        [ flatten c:float >c-array ]
+        [ flatten c:uint >c-array ]
         bi* collada-vertex-format f model boa
     ] bi ;
     
@@ -162,7 +159,7 @@ VERTEX-FORMAT: collada-vertex-format
     [
         { { up-axis y-up } { unit-ratio 1 } } [
             mesh>sources
-        ] bind
+        ] with-variables
     ]
     [ mesh>vertices ]
     [ mesh>triangles ] tri ;

@@ -7,7 +7,8 @@ locals macros math.parser namespaces parser vocabs.parser
 prettyprint quotations sequences source-files splitting
 stack-checker summary unicode.case vectors vocabs vocabs.loader
 vocabs.files vocabs.metadata words tools.errors
-source-files.errors io.streams.string make compiler.errors ;
+source-files.errors source-files.errors.debugger io.streams.string
+make compiler.errors ;
 IN: tools.test
 
 TUPLE: test-failure < source-file-error continuation ;
@@ -76,7 +77,8 @@ M: did-not-fail summary drop "Did not fail" ;
     [ { } quot with-datastack drop did-not-fail t ] [ drop f f ] recover ;
 
 : experiment-title ( word -- string )
-    "(" ?head drop ")" ?tail drop { { CHAR: - CHAR: \s } } substitute >title ;
+    "(" ?head drop ")" ?tail drop
+    H{ { CHAR: - CHAR: \s } } substitute >title ;
 
 MACRO: <experiment> ( word -- )
     [ stack-effect in>> length dup ]
@@ -104,12 +106,20 @@ MACRO: <experiment> ( word -- )
 <<
 
 SYNTAX: TEST:
-    scan
+    scan-token
     [ create-in ]
     [ "(" ")" surround search '[ _ parse-test ] ] bi
     define-syntax ;
 
 >>
+
+: fake-unit-test ( quot -- test-failures )
+    [
+        "fake" file set
+        V{ } clone test-failures set
+        call
+        test-failures get
+    ] with-scope ; inline
 
 PRIVATE>
 
@@ -128,7 +138,7 @@ SYMBOL: forget-tests?
     [ [ [ forget-source ] each ] with-compilation-unit ] [ drop ] if ;
 
 : test-vocab ( vocab -- )
-    vocab dup [
+    lookup-vocab dup [
         dup source-loaded?>> [
             vocab-tests
             [ [ run-test-file ] each ]
@@ -160,3 +170,4 @@ M: test-failure error. ( error -- )
 : test ( prefix -- ) child-vocabs test-vocabs ;
 
 : test-all ( -- ) vocabs filter-don't-test test-vocabs ;
+

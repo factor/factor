@@ -23,10 +23,8 @@ void factor_vm::init_c_io()
 
 void factor_vm::io_error()
 {
-#ifndef WINCE
 	if(errno == EINTR)
 		return;
-#endif
 
 	general_error(ERROR_IO,tag_fixnum(errno),false_object);
 }
@@ -50,7 +48,7 @@ int factor_vm::safe_fgetc(FILE *stream)
 	int c;
 	for(;;)
 	{
-		c = fgetc(stream);
+		c = getc(stream);
 		if(c == EOF)
 		{
 			if(feof(stream))
@@ -89,7 +87,7 @@ void factor_vm::safe_fputc(int c, FILE *stream)
 {
 	for(;;)
 	{
-		if(fputc(c,stream) == EOF)
+		if(putc(c,stream) == EOF)
 			io_error();
 		else
 			break;
@@ -198,37 +196,23 @@ void factor_vm::primitive_fgetc()
 		ctx->push(tag_fixnum(c));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_fread()
 {
 	FILE *file = pop_file_handle();
+	void *buf = (void*)alien_offset(ctx->pop());
 	fixnum size = unbox_array_size();
 
 	if(size == 0)
 	{
-		ctx->push(tag<string>(allot_string(0,0)));
+		ctx->push(from_unsigned_cell(0));
 		return;
 	}
 
-	data_root<byte_array> buf(allot_uninitialized_array<byte_array>(size),this);
-
-	size_t c = safe_fread(buf.untagged() + 1,1,size,file);
-	if(c == 0)
-	{
+	size_t c = safe_fread(buf,1,size,file);
+	if(c == 0 || feof(file))
 		clearerr(file);
-		ctx->push(false_object);
-	}
-	else
-	{
-		if(feof(file))
-		{
-			clearerr(file);
-			byte_array *new_buf = allot_byte_array(c);
-			memcpy(new_buf->data<char>(), buf->data<char>(),c);
-			buf = new_buf;
-		}
-
-		ctx->push(buf.value());
-	}
+	ctx->push(from_unsigned_cell(c));
 }
 
 void factor_vm::primitive_fputc()

@@ -6,7 +6,7 @@ math memory namespaces namespaces.private parser
 quotations sequences specialized-arrays stack-checker
 stack-checker.errors system threads tools.test words
 alien.complex concurrency.promises alien.data
-byte-arrays classes compiler.test ;
+byte-arrays classes compiler.test libc ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: char
@@ -23,7 +23,7 @@ IN: compiler.tests.alien
 : libfactor-ffi-tests-path ( -- string )
     "resource:" absolute-path
     {
-        { [ os winnt? ]  [ "libfactor-ffi-test.dll" ] }
+        { [ os windows? ]  [ "libfactor-ffi-test.dll" ] }
         { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }
         { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
     } cond append-path ;
@@ -227,8 +227,8 @@ FUNCTION: int ffi_test_12 int a int b RECT c int d int e int f ;
 FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
 
 [ 32.0 ] [
-    { 1.0 2.0 3.0 } >float-array
-    { 4.0 5.0 6.0 } >float-array
+    { 1.0 2.0 3.0 } float >c-array
+    { 4.0 5.0 6.0 } float >c-array
     ffi_test_23
 ] unit-test
 
@@ -334,6 +334,10 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 [ t ] [ 31 2^ 32 2^ ffi_test_38 63 2^ = ] unit-test
 
 ! Test callbacks
+: callback-throws ( -- x )
+    int { } cdecl [ "Hi" throw ] alien-callback ;
+
+[ t ] [ callback-throws alien? ] unit-test
 
 : callback-1 ( -- callback ) void { } cdecl [ ] alien-callback ;
 
@@ -462,7 +466,7 @@ STRUCT: double-rect
 [
     1.0 2.0 3.0 4.0 <double-rect>
     double-rect-callback double-rect-test
-    [ >c-ptr class ] [ >double-rect< ] bi
+    [ >c-ptr class-of ] [ >double-rect< ] bi
 ] unit-test
 
 STRUCT: test_struct_14
@@ -824,24 +828,8 @@ TUPLE: some-tuple x ;
     ] compile-call
 ] unit-test
 
-! Write barrier elimination was being done before scheduling and
-! GC check insertion, and didn't take subroutine calls into
-! account. Oops...
-: write-barrier-elim-in-wrong-place ( -- obj )
-    ! A callback used below
-    void { } cdecl [ compact-gc ] alien-callback
-    ! Allocate an object A in the nursery
-    1 f <array>
-    ! Subroutine call promotes the object to tenured
-    swap void { } cdecl alien-indirect
-    ! Allocate another object B in the nursery, store it into
-    ! the first
-    1 f <array> over set-first
-    ! Now object A's card should be marked and minor GC should
-    ! promote B to aging
-    minor-gc
-    ! Do stuff
-    [ 100 [ ] times ] infer.
-    ;
+! GC maps regression
+: anton's-regression ( -- )
+    f (free) f (free) ;
 
-[ { { f } } ] [ write-barrier-elim-in-wrong-place ] unit-test
+[ ] [ anton's-regression ] unit-test

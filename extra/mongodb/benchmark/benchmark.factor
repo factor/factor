@@ -1,6 +1,7 @@
 USING: calendar math fry kernel assocs math.ranges bson.reader io.streams.byte-array
 sequences formatting combinators namespaces io tools.time prettyprint io.encodings.binary
-accessors words mongodb.driver strings math.parser bson.writer ;
+accessors words mongodb.driver strings math.parser bson.writer
+hashtables ;
 FROM: mongodb.driver => find ;
 FROM: memory => gc ;
 
@@ -183,7 +184,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
 : (check-find-result) ( result -- )
     "x" check-for-key ; inline
-  
+
 : (find) ( cursor -- )
     [ find [ (check-find-result) ] each (find) ] when* ; inline recursive
 
@@ -191,15 +192,15 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     drop
     [ trial-size
       collection-name
-      trial-size 2 / "x" H{ } clone [ set-at ] keep
+      trial-size 2 / "x" associate
       '[ _ _ <query> 1 limit (find) ] times ] ;
-  
+
 : find-all ( quot -- quot: ( -- ) )
     drop
     collection-name
     H{ } clone
     '[ _ _ <query> (find) ] ;
-  
+
 : find-range ( quot -- quot: ( -- ) )
     drop
     [ trial-size batch-size /i
@@ -211,7 +212,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
 : batch ( -- )
     result [ t >>batch ] change ; inline
-   
+
 : index ( -- )
     result [ t >>index ] change ; inline
 
@@ -260,7 +261,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     "Deserialization Tests" print
     print-separator-bold
     \ deserialize [bench-quot] '[ _ call( doc-word -- ) ] each ; 
-    
+
 : run-insert-bench ( doc-word-seq feat-seq -- )
     "Insert Tests" print
     print-separator-bold 
@@ -281,7 +282,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     print-separator-bold
     \ find-range [bench-quot] '[ _ call( doc-word -- ) ] each ; 
 
-    
+
 : run-benchmarks ( -- )
     "db" "db" get* "host" "127.0.0.1" get* "port" 27017 get* ensure-number <mdb>
     [ print-header
@@ -307,8 +308,8 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
       { { } { index } } run-find-all-bench
       ! find-range
       { small-doc medium-doc large-doc }
-      { { } { index } } run-find-range-bench        
+      { { } { index } } run-find-range-bench
     ] with-db ;
-        
+
 MAIN: run-benchmarks
 

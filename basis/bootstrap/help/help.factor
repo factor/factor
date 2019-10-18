@@ -1,6 +1,6 @@
 USING: help help.topics help.syntax help.crossref
-help.definitions io io.files kernel namespaces vocabs sequences
-parser vocabs.loader vocabs.loader.private accessors assocs ;
+help.definitions io io.files kernel namespaces sequences
+parser vocabs vocabs.loader vocabs.loader.private accessors assocs ;
 IN: bootstrap.help
 
 : load-help ( -- )
@@ -9,7 +9,7 @@ IN: bootstrap.help
 
     t load-help? set-global
 
-    [ dup vocab [ ] [ no-vocab ] ?if ] load-vocab-hook [
+    [ dup lookup-vocab [ drop ] [ no-vocab ] if ] require-hook [
         dictionary get values
         [ docs-loaded?>> not ] filter
         [ load-docs ] each

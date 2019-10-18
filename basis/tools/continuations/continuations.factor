@@ -21,7 +21,7 @@ PRIVATE>
 SYMBOL: break-hook
 
 : break ( -- )
-    continuation callstack >>call
+    current-continuation callstack >>call
     break-hook get call( continuation -- continuation' )
     after-break ;
 
@@ -63,7 +63,7 @@ M: object add-breakpoint ;
 \ (step-into-execute) t "step-into?" set-word-prop
 
 : (step-into-continuation) ( -- )
-    continuation callstack >>call break ;
+    current-continuation callstack >>call break ;
 
 : (step-into-call-next-method) ( method -- )
     next-method-quot (step-into-quot) ;
@@ -115,7 +115,7 @@ PRIVATE>
     { execute [ (step-into-execute) ] }
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }
-    { continuation [ (step-into-continuation) ] }
+    { current-continuation [ (step-into-continuation) ] }
     { (call-next-method) [ (step-into-call-next-method) ] }
 } [ "step-into" set-word-prop ] assoc-each
 
@@ -124,7 +124,7 @@ PRIVATE>
     dup '[ _ execute break ] "step-into" set-word-prop ;
 
 {
-    >n ndrop >c c>
+    >n ndrop recover
     continue continue-with
     stop suspend (spawn)
     set-context start-context

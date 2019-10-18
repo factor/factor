@@ -1,8 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions furnace.auth furnace.db
-http.server.dispatchers webapps.mason.backend webapps.mason.grids
-webapps.mason.package webapps.mason.release webapps.mason.report
+furnace.redirection http.server.dispatchers urls
+webapps.mason.backend webapps.mason.grids webapps.mason.package
+webapps.mason.release webapps.mason.report
 webapps.mason.downloads webapps.mason.counter
 webapps.mason.status-update webapps.mason.docs-update
 webapps.mason.dashboard webapps.mason.make-release
@@ -57,4 +58,9 @@ build-engineer? define-capability
         <increment-counter-action> <mason-protected>
             "increment-counter" add-responder
 
-    "dashboard" add-responder ;
+        "dashboard" add-responder
+
+    <action>
+        [ URL" $mason-app/dashboard" <redirect> ] >>display
+        "" add-responder
+    ;

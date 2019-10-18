@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system io.directories io.encodings.utf16n alien.strings
+USING: system io.directories alien.strings
 io.pathnames io.backend io.files.windows destructors
 kernel accessors calendar windows windows.errors
 windows.kernel32 alien.c-types sequences splitting
@@ -17,8 +17,24 @@ M: windows touch-file ( path -- )
 M: windows move-file ( from to -- )
     [ normalize-path ] bi@ MoveFile win32-error=0/f ;
 
+ERROR: file-delete-failed path error ;
+
+: delete-file-throws ( path -- )
+    DeleteFile win32-error=0/f ;
+
+: delete-read-only-file ( path -- )
+    [ set-file-normal-attribute ] [ delete-file-throws ] bi ;
+
+: (delete-file) ( path -- )
+    dup DeleteFile 0 = [
+        GetLastError ERROR_ACCESS_DENIED =
+        [ delete-read-only-file ] [ throw-win32-error ] if
+    ] [ drop ] if ;
+
 M: windows delete-file ( path -- )
-    normalize-path DeleteFile win32-error=0/f ;
+    absolute-path
+    [ (delete-file) ]
+    [ \ file-delete-failed boa rethrow ] recover ;
 
 M: windows copy-file ( from to -- )
     dup parent-directory make-directories
@@ -48,7 +64,7 @@ M: windows delete-directory ( path -- )
 TUPLE: windows-directory-entry < directory-entry attributes ;
 
 M: windows >directory-entry ( byte-array -- directory-entry )
-    [ cFileName>> utf16n alien>string ]
+    [ cFileName>> alien>native-string ]
     [
         dwFileAttributes>>
         [ win32-file-type ] [ win32-file-attributes ] bi

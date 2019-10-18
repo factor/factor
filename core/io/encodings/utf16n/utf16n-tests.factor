@@ -1,4 +1,4 @@
-USING: accessors alien.c-types kernel
+USING: accessors alien.c-types alien.data kernel
 io.encodings.utf16 io.streams.byte-array tools.test ;
 IN: io.encodings.utf16n
 

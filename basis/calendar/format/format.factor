@@ -205,7 +205,7 @@ ERROR: invalid-timestamp-format ;
         read-sp checked-number >>year
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
-        " " read-token checked-number >>second
+        read-sp checked-number >>second
         readln parse-rfc822-gmt-offset >>gmt-offset ;
 
 : rfc822>timestamp ( str -- timestamp )
@@ -224,7 +224,7 @@ ERROR: invalid-timestamp-format ;
         read-sp checked-number >>year
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
-        " " read-token checked-number >>second
+        read-sp checked-number >>second
         readln parse-rfc822-gmt-offset >>gmt-offset ;
 
 : cookie-string>timestamp-1 ( str -- timestamp )
@@ -237,7 +237,7 @@ ERROR: invalid-timestamp-format ;
         read-sp checked-number >>day
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
-        " " read-token checked-number >>second
+        read-sp checked-number >>second
         read-sp checked-number >>year
         readln parse-rfc822-gmt-offset >>gmt-offset ;
 
@@ -264,7 +264,7 @@ ERROR: invalid-timestamp-format ;
     [ (hms>timestamp) ] with-string-reader ;
 
 : (ymd>timestamp) ( -- timestamp )
-    read-ymd 0 0 0 instant <timestamp> ;
+    read-ymd <date-gmt> ;
 
 : ymd>timestamp ( str -- timestamp )
     [ (ymd>timestamp) ] with-string-reader ;
@@ -292,7 +292,7 @@ TYPED: timestamp>ymdhms ( timestamp: timestamp -- str )
         {
             MONTH " " DD " "
             [
-                dup now [ year>> ] bi@ =
+                dup now [ year>> ] same?
                 [ [ hh ":" write ] [ mm ] bi ] [ YYYYY ] if
             ]
         } formatted

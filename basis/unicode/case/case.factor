@@ -20,12 +20,7 @@ SYMBOL: locale ! Just casing locale, or overall?
 : i-dot? ( -- ? )
     locale get { "tr" "az" } member? ;
 
-: lt? ( -- ? )
-    locale get "lt" = ;
-
 : lithuanian? ( -- ? ) locale get "lt" = ;
-
-: dot-over ( -- ch ) HEX: 307 ;
 
 : lithuanian>upper ( string -- lower )
     "i\u000307" "i" replace
@@ -89,7 +84,7 @@ PRIVATE>
 
 : >lower ( string -- lower )
     i-dot? [ turk>lower ] when
-    lt? [ lithuanian>lower ] when
+    lithuanian? [ lithuanian>lower ] when
     final-sigma
     [ lower>> ] [ ch>lower ] map-case ;
 
@@ -97,7 +92,7 @@ HINTS: >lower string ;
 
 : >upper ( string -- upper )
     i-dot? [ turk>upper ] when
-    lt? [ lithuanian>upper ] when
+    lithuanian? [ lithuanian>upper ] when
     [ upper>> ] [ ch>upper ] map-case ;
 
 HINTS: >upper string ;
@@ -106,7 +101,7 @@ HINTS: >upper string ;
 
 : (>title) ( string -- title )
     i-dot? [ turk>upper ] when
-    lt? [ lithuanian>upper ] when
+    lithuanian? [ lithuanian>upper ] when
     [ title>> ] [ ch>title ] map-case ; inline
 
 PRIVATE>

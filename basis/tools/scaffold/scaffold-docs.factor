@@ -9,19 +9,19 @@ HELP: developer-name
 
 HELP: help.
 { $values
-     { "word" word } }
+    { "word" word } }
 { $description "Prints out scaffold help markup for a given word." } ;
 
-HELP: scaffold-help
+HELP: scaffold-docs
 { $values { "vocab" vocab } }
 { $description "Takes an existing vocabulary and creates a help file with scaffolded help for each word. This word only works if no help file yet exists." } ;
 
 HELP: scaffold-undocumented
 { $values
-     { "string" string } }
-{ $description "Prints scaffolding documenation for undocumented words in a vocabuary except for automatically generated class predicates." } ;
+    { "string" string } }
+{ $description "Prints scaffolding documentation for undocumented words in a vocabulary except for automatically generated class predicates." } ;
 
-{ scaffold-help scaffold-undocumented } related-words
+{ scaffold-docs scaffold-undocumented } related-words
 
 HELP: scaffold-authors
 { $values
@@ -49,7 +49,7 @@ HELP: scaffold-tests
 
 HELP: scaffold-vocab
 { $values
-     { "vocab-root" "a vocabulary root string" } { "string" string } }
+    { "vocab-root" "a vocabulary root string" } { "string" string } }
 { $description "Creates a directory in the given root for a new vocabulary and adds a main .factor file and an authors.txt file." } ;
 
 HELP: scaffold-emacs
@@ -61,9 +61,12 @@ HELP: scaffold-factor-boot-rc
 HELP: scaffold-factor-rc
 { $description "Touches the .factor-rc file in your home directory and provides a clickable link to open it in an editor." } ;
 
+HELP: scaffold-factor-roots
+{ $description "Touches the .factor-roots file in your home directory and provides a clickable link to open it in an editor." } ;
+
 HELP: scaffold-rc
 { $values
-     { "path" "a pathname string" }
+    { "path" "a pathname string" }
 }
 { $description "Touches the given path in your home directory and provides a clickable link to open it in an editor." } ;
 
@@ -77,7 +80,7 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
 { $subsections scaffold-vocab }
 "Generate help scaffolding:"
 { $subsections
-    scaffold-help
+    scaffold-docs
     scaffold-undocumented
     help.
 }
@@ -87,6 +90,7 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
     scaffold-rc
     scaffold-factor-boot-rc
     scaffold-factor-rc
+    scaffold-factor-roots
     scaffold-emacs
 }
 ;

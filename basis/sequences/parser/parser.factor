@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors circular combinators.short-circuit fry io
 kernel locals math math.order sequences sorting.functor
-sorting.slots unicode.categories ;
+sorting.slots unicode.categories sequences.private ;
 IN: sequences.parser
 
 TUPLE: sequence-parser sequence n ;
@@ -64,7 +64,7 @@ TUPLE: sequence-parser sequence n ;
         [ 2drop 0 < ]
         [ [ drop ] 2dip length > ]
         [ drop > ]
-    } 3|| [ 3drop f ] [ slice boa ] if ; inline
+    } 3|| [ 3drop f ] [ <slice-unsafe> ] if ; inline
 
 :: take-sequence ( sequence-parser sequence -- obj/f )
     sequence-parser [ n>> dup sequence length + ] [ sequence>> ] bi

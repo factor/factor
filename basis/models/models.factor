@@ -87,6 +87,9 @@ M: model update-model drop ;
         ] with-locked-model
     ] if ;
 
+: ?set-model ( value model -- )
+    2dup value>> = [ 2drop ] [ set-model ] if ;
+
 : ((change-model)) ( model quot -- newvalue model )
     over [ [ value>> ] dip call ] dip ; inline
 

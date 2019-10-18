@@ -1,26 +1,18 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private sequences math namespaces
-init splitting assocs system.private layouts words ;
+USING: assocs init kernel.private namespaces ;
 IN: system
 
-SINGLETONS: x86.32 x86.64 arm ppc ;
+SINGLETONS: x86.32 x86.64 arm ppc.32 ppc.64 ;
 
 UNION: x86 x86.32 x86.64 ;
+UNION: ppc ppc.32 ppc.64 ;
 
 : cpu ( -- class ) \ cpu get-global ; foldable
 
-SINGLETONS: winnt wince ;
+SINGLETONS: windows macosx linux ;
 
-UNION: windows winnt wince ;
-
-SINGLETONS: freebsd netbsd openbsd solaris macosx linux ;
-
-SINGLETON: haiku
-
-UNION: bsd freebsd netbsd openbsd macosx ;
-
-UNION: unix bsd solaris linux haiku ;
+UNION: unix macosx linux ;
 
 : os ( -- class ) \ os get-global ; foldable
 
@@ -33,20 +25,15 @@ UNION: unix bsd solaris linux haiku ;
         { "x86.32" x86.32 }
         { "x86.64" x86.64 }
         { "arm" arm }
-        { "ppc" ppc }
+        { "ppc.32" ppc.32 }
+        { "ppc.64" ppc.64 }
     } at ;
 
 : string>os ( str -- class )
     H{
-        { "winnt" winnt }
-        { "wince" wince }
-        { "freebsd" freebsd }
-        { "netbsd" netbsd }
-        { "openbsd" openbsd }
-        { "solaris" solaris }
+        { "windows" windows }
         { "macosx" macosx }
         { "linux" linux }
-        { "haiku" haiku }
     } at ;
 
 PRIVATE>
@@ -55,6 +42,6 @@ PRIVATE>
 
 : vm ( -- path ) \ vm get-global ;
 
-: embedded? ( -- ? ) 15 special-object ;
+: embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
 
 : exit ( n -- * ) do-shutdown-hooks (exit) ;

@@ -72,7 +72,7 @@ MEMO: default-dictionary ( -- counts )
     load-dictionary ;
 
 : (correct) ( word dictionary -- word/f )
-    corrections [ f ] [ first ] if-empty ;
+    corrections ?first ;
 
 : correct ( word -- word/f )
     default-dictionary (correct) ;

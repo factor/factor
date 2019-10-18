@@ -10,11 +10,12 @@ SHARED_FLAG = -shared
 
 PLAF_DLL_OBJS = vm/os-unix.o
 PLAF_EXE_OBJS += vm/main-unix.o
+PLAF_MASTER_HEADERS += vm/os-unix.hpp
 
 ifdef NO_UI
 	X11_UI_LIBS =
 else
-	X11_UI_LIBS = -lpango-1.0 -lpangocairo-1.0 -lcairo -lglib-2.0 -lgobject-2.0 -lGL -lX11
+	X11_UI_LIBS = `pkg-config --libs gtk+-2.0 gtkglext-1.0`
 endif
 
 # CFLAGS += -fPIC

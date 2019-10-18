@@ -13,6 +13,7 @@ void factor_vm::primitive_float_to_fixnum()
 	ctx->replace(tag_fixnum(float_to_fixnum(ctx->peek())));
 }
 
+/* does not allocate, even though from_signed_cell can allocate */
 /* Division can only overflow when we are dividing the most negative fixnum
 by -1. */
 void factor_vm::primitive_fixnum_divint()
@@ -21,17 +22,20 @@ void factor_vm::primitive_fixnum_divint()
 	fixnum x = untag_fixnum(ctx->peek());
 	fixnum result = x / y;
 	if(result == -fixnum_min)
+		/* Does not allocate */
 		ctx->replace(from_signed_cell(-fixnum_min));
 	else
 		ctx->replace(tag_fixnum(result));
 }
 
+/* does not allocate, even though from_signed_cell can allocate */
 void factor_vm::primitive_fixnum_divmod()
 {
 	cell y = ((cell *)ctx->datastack)[0];
 	cell x = ((cell *)ctx->datastack)[-1];
 	if(y == tag_fixnum(-1) && x == tag_fixnum(fixnum_min))
 	{
+		/* Does not allocate */
 		((cell *)ctx->datastack)[-1] = from_signed_cell(-fixnum_min);
 		((cell *)ctx->datastack)[0] = tag_fixnum(0);
 	}
@@ -147,6 +151,12 @@ void factor_vm::primitive_bignum_mod()
 	ctx->push(tag<bignum>(bignum_remainder(x,y)));
 }
 
+void factor_vm::primitive_bignum_gcd()
+{
+	POP_BIGNUMS(x,y);
+	ctx->push(tag<bignum>(bignum_gcd(x,y)));
+}
+
 void factor_vm::primitive_bignum_and()
 {
 	POP_BIGNUMS(x,y);
@@ -213,29 +223,13 @@ void factor_vm::primitive_bignum_log2()
 	ctx->replace(tag<bignum>(bignum_integer_length(untag<bignum>(ctx->peek()))));
 }
 
-unsigned int factor_vm::bignum_producer(unsigned int digit)
-{
-	unsigned char *ptr = (unsigned char *)alien_offset(ctx->peek());
-	return *(ptr + digit);
-}
-
-unsigned int bignum_producer(unsigned int digit, factor_vm *parent)
-{
-	return parent->bignum_producer(digit);
-}
-
-void factor_vm::primitive_byte_array_to_bignum()
-{
-	unsigned int n_digits = (unsigned int)array_capacity(untag_check<byte_array>(ctx->peek()));
-	bignum * result = digit_stream_to_bignum(n_digits,factor::bignum_producer,0x100,0);
-	ctx->replace(tag<bignum>(result));
-}
-
+/* allocates memory */
 cell factor_vm::unbox_array_size_slow()
 {
 	if(tagged<object>(ctx->peek()).type() == BIGNUM_TYPE)
 	{
 		bignum *zero = untag<bignum>(bignum_zero);
+		GC_BIGNUM(zero);
 		bignum *max = cell_to_bignum(array_size_max);
 		bignum *n = untag<bignum>(ctx->peek());
 		if(bignum_compare(n,zero) != bignum_comparison_less
@@ -253,11 +247,6 @@ cell factor_vm::unbox_array_size_slow()
 void factor_vm::primitive_fixnum_to_float()
 {
 	ctx->replace(allot_float(fixnum_to_float(ctx->peek())));
-}
-
-void factor_vm::primitive_bignum_to_float()
-{
-	ctx->replace(allot_float(bignum_to_float(ctx->peek())));
 }
 
 void factor_vm::primitive_format_float()
@@ -327,11 +316,13 @@ void factor_vm::primitive_float_greatereq()
 	ctx->push(tag_boolean(x >= y));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_bits()
 {
 	ctx->push(from_unsigned_cell(float_bits((float)untag_float_check(ctx->pop()))));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_bits_float()
 {
 	ctx->push(allot_float(bits_float((u32)to_cell(ctx->pop()))));
@@ -377,16 +368,19 @@ VM_C_API cell to_cell(cell tagged, factor_vm *parent)
 	return parent->to_cell(tagged);
 }
 
+/* Allocates memory */
 VM_C_API cell from_signed_cell(fixnum integer, factor_vm *parent)
 {
 	return parent->from_signed_cell(integer);
 }
 
+/* Allocates memory */
 VM_C_API cell from_unsigned_cell(cell integer, factor_vm *parent)
 {
 	return parent->from_unsigned_cell(integer);
 }
 
+/* Allocates memory */
 cell factor_vm::from_signed_8(s64 n)
 {
 	if(n < fixnum_min || n > fixnum_max)

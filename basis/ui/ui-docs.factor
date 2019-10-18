@@ -1,8 +1,9 @@
-USING: help.markup help.syntax strings quotations debugger
-namespaces ui.backend ui.gadgets ui.gadgets.worlds
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
-ui.gadgets.private math.rectangles colors ui.text fonts
-kernel ui.private vocabs.loader classes sequences ;
+USING: classes colors debugger fonts help.markup help.syntax kernel
+math.rectangles namespaces quotations sequences strings ui.backend
+ui.gadgets ui.gadgets.books ui.gadgets.grids ui.gadgets.packs
+ui.gadgets.private ui.gadgets.tracks ui.gadgets.worlds ui.private ui.text
+vocabs.loader ;
+
 IN: ui
 
 HELP: windows
@@ -47,7 +48,7 @@ HELP: find-window
 HELP: register-window
 { $values { "world" world } { "handle" "a backend-specific handle" } }
 { $description "Adds a window to the global " { $link windows } " variable." }
-{ $notes "This word should only be called by the UI backend.  User code can open new windows with " { $link open-window } "." } ;
+{ $notes "This word should only be called by the UI backend. User code can open new windows with " { $link open-window } "." } ;
 
 HELP: unregister-window
 { $values { "handle" "a backend-specific handle" } }
@@ -75,7 +76,7 @@ HELP: raise-window
 HELP: with-ui
 { $values { "quot" { $quotation "( -- )" } } }
 { $description "Calls the quotation, starting the UI first if necessary. If the UI is started, this word does not return." }
-{ $notes "This word should be used in the " { $link POSTPONE: MAIN: } " word of an application that uses the UI in order for the vocabulary to work when run from either the UI listener (" { $snippet "\"my-app\" run" } " and the command line (" { $snippet "./factor -run=my-app" } ")." }
+{ $notes "This word should be used in the " { $link POSTPONE: MAIN: } " word of an application that uses the UI in order for the vocabulary to work when run from either the UI listener (" { $snippet "\"my-app\" run" } ") and the command line (" { $snippet "./factor -run=my-app" } ")." }
 { $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this word." } ;
 
 HELP: beep
@@ -255,7 +256,7 @@ $nl
 }
 "Gadgets implement a generic word to inform their parents of their preferred size:"
 { $subsections pref-dim* }
-"To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim  } ", which caches the result." ;
+"To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim } ", which caches the result." ;
 
 ARTICLE: "ui-null-layout" "Manual layouts"
 "When automatic layout is not appropriate, gadgets can be added to a parent with no layout policy, and then positioned and sized manually by setting the " { $snippet "loc" } " field." ;
@@ -269,8 +270,8 @@ ARTICLE: "ui-layout-impl" "Implementing layout gadgets"
     pref-dim
     pref-dims
     prefer
-    max-dim
-    dim-sum
+    max-dims
+    sum-dims
 }
 { $warning
     "When implementing the " { $link layout* } " generic word for a gadget which inherits from another layout, the " { $link children-on } " word might have to be re-implemented as well."

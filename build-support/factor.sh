@@ -24,8 +24,8 @@ test_program_installed() {
 }
 
 exit_script() {
-    if [[ $FIND_MAKE_TARGET -eq true ]] ; then
-		# Must be echo not $ECHO
+    if [[ $FIND_MAKE_TARGET = true ]] ; then
+        # Must be echo not $ECHO
         echo $MAKE_TARGET;
     fi
     exit $1
@@ -39,7 +39,7 @@ ensure_program_installed() {
         test_program_installed $i
         if [[ $? -eq 0 ]]; then
             $ECHO -n "not "
-        else    
+        else
             installed=$(( $installed + 1 ))
         fi
         $ECHO "found!"
@@ -52,6 +52,11 @@ ensure_program_installed() {
             $ECHO -n "any of [ $* ]"
         fi
         $ECHO " and try again."
+        if [[ $OS -eq macosx ]] ; then
+            $ECHO "If you have Xcode 4.3 or higher installed, you must install the"
+            $ECHO "Command Line Tools from Xcode Preferences > Downloads in order"
+            $ECHO "to build Factor."
+        fi
         exit_script 1;
     fi
 }
@@ -84,21 +89,32 @@ set_md5sum() {
 
 set_gcc() {
     case $OS in
-        openbsd) ensure_program_installed egcc; CC=egcc;;
-        *) CC=gcc;;
+        macosx)
+            xcode_major=`xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).*$/\1/p'`
+            if [[ $xcode_major -ge 4 ]]; then
+                CC=clang
+                CPP=clang++
+            else
+                CC=gcc
+                CPP=g++
+            fi
+        ;;
+        *)
+            CC=gcc
+            CPP=g++
+        ;;
     esac
 }
 
 set_make() {
-    case $OS in
-        netbsd) MAKE='gmake';;
-        freebsd) MAKE='gmake';;
-        openbsd) MAKE='gmake';;
-        dragonflybsd) MAKE='gmake';;
-        *) MAKE='make';;
-    esac
-    if ! [[ $MAKE -eq 'gmake' ]] ; then
-        ensure_program_installed gmake
+    MAKE='make'
+}
+
+check_git_branch() {
+    BRANCH=`git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,'`
+    if [ "$BRANCH" != "master" ] ; then
+        $ECHO "git branch is $BRANCH, not master"
+        exit_script 3
     fi
 }
 
@@ -107,8 +123,8 @@ check_installed_programs() {
     ensure_program_installed uname
     ensure_program_installed git
     ensure_program_installed wget curl
-    ensure_program_installed gcc
-    ensure_program_installed g++ cl
+    ensure_program_installed clang gcc
+    ensure_program_installed clang++ g++ cl
     ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut
@@ -119,18 +135,18 @@ check_library_exists() {
     GCC_OUT=factor-library-test.out
     $ECHO -n "Checking for library $1..."
     $ECHO "int main(){return 0;}" > $GCC_TEST
-    $CC $GCC_TEST -o $GCC_OUT -l $1
+    $CC $GCC_TEST -o $GCC_OUT -l $1 2>&-
     if [[ $? -ne 0 ]] ; then
         $ECHO "not found!"
-        $ECHO "Warning: library $1 not found."
         $ECHO "***Factor will compile NO_UI=1"
         NO_UI=1
+    else
+        $ECHO "found."
     fi
     $DELETE -f $GCC_TEST
     check_ret $DELETE
     $DELETE -f $GCC_OUT
     check_ret $DELETE
-    $ECHO "found."
 }
 
 check_X11_libraries() {
@@ -141,9 +157,26 @@ check_X11_libraries() {
     fi
 }
 
+check_gtk_libraries() {
+    if [ -z "$NO_UI" ]; then
+        check_library_exists gobject-2.0
+        check_library_exists gtk-x11-2.0
+        check_library_exists gdk-x11-2.0
+        check_library_exists gdk_pixbuf-2.0
+        check_library_exists gtkglext-x11-1.0
+        check_library_exists atk-1.0
+        check_library_exists gio-2.0
+        check_library_exists gdkglext-x11-1.0
+        check_library_exists pango-1.0
+    fi
+}
+
+
 check_libraries() {
     case $OS in
-            linux) check_X11_libraries;;
+            linux) check_X11_libraries
+                   check_gtk_libraries;;
+            unix) check_gtk_libraries;;
     esac
 }
 
@@ -161,19 +194,14 @@ find_os() {
     uname_s=`uname -s`
     check_ret uname
     case $uname_s in
-        CYGWIN_NT-5.2-WOW64) OS=winnt;;
-        *CYGWIN_NT*) OS=winnt;;
-        *CYGWIN*) OS=winnt;;
-        MINGW32*) OS=winnt;;
+        CYGWIN_NT-5.2-WOW64) OS=windows;;
+        *CYGWIN_NT*) OS=windows;;
+        *CYGWIN*) OS=windows;;
+        MINGW32*) OS=windows;;
         *darwin*) OS=macosx;;
         *Darwin*) OS=macosx;;
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
-        *NetBSD*) OS=netbsd;;
-        *FreeBSD*) OS=freebsd;;
-        *OpenBSD*) OS=openbsd;;
-        *DragonFly*) OS=dragonflybsd;;
-        SunOS) OS=solaris;;
     esac
 }
 
@@ -234,14 +262,14 @@ find_word_size() {
 
 set_factor_binary() {
     case $OS in
-        winnt) FACTOR_BINARY=factor.com;;
+        windows) FACTOR_BINARY=factor.com;;
         *) FACTOR_BINARY=factor;;
     esac
 }
 
 set_factor_library() {
     case $OS in
-        winnt) FACTOR_LIBRARY=factor.dll;;
+        windows) FACTOR_LIBRARY=factor.dll;;
         macosx) FACTOR_LIBRARY=libfactor.dylib;;
         *) FACTOR_LIBRARY=libfactor.a;;
     esac
@@ -285,18 +313,15 @@ check_os_arch_word() {
 
 set_build_info() {
     check_os_arch_word
-    if [[ $OS == macosx && $ARCH == ppc ]] ; then
-        MAKE_IMAGE_TARGET=macosx-ppc
-        MAKE_TARGET=macosx-ppc
-    elif [[ $OS == linux && $ARCH == ppc ]] ; then
-        MAKE_IMAGE_TARGET=linux-ppc
-        MAKE_TARGET=linux-ppc
-    elif [[ $OS == winnt && $ARCH == x86 && $WORD == 64 ]] ; then
-        MAKE_IMAGE_TARGET=winnt-x86.64
-        MAKE_TARGET=winnt-x86-64
-    elif [[ $OS == winnt && $ARCH == x86 && $WORD == 32 ]] ; then
-        MAKE_IMAGE_TARGET=winnt-x86.32
-        MAKE_TARGET=winnt-x86-32
+    if [[ $OS == linux && $ARCH == ppc ]] ; then
+        MAKE_IMAGE_TARGET=linux-ppc.32
+        MAKE_TARGET=linux-ppc-32
+    elif [[ $OS == windows && $ARCH == x86 && $WORD == 64 ]] ; then
+        MAKE_IMAGE_TARGET=windows-x86.64
+        MAKE_TARGET=windows-x86-64
+    elif [[ $OS == windows && $ARCH == x86 && $WORD == 32 ]] ; then
+        MAKE_IMAGE_TARGET=windows-x86.32
+        MAKE_TARGET=windows-x86-32
     elif [[ $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=unix-x86.64
         MAKE_TARGET=$OS-x86-64
@@ -320,7 +345,6 @@ parse_build_info() {
     if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
     if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
     if [[ $OS == macosx && $ARCH == ppc ]] ; then WORD=32; fi
-    if [[ $OS == wince && $ARCH == arm ]] ; then WORD=32; fi
     
     $ECHO "OS=$OS"
     $ECHO "ARCH=$ARCH"
@@ -394,14 +418,14 @@ cd_factor() {
 
 set_copy() {
     case $OS in
-        winnt) COPY=cp;;
+        windows) COPY=cp;;
         *) COPY=cp;;
     esac
 }
 
 set_delete() {
     case $OS in
-        winnt) DELETE=rm;;
+        windows) DELETE=rm;;
         *) DELETE=rm;;
     esac
 }
@@ -440,6 +464,11 @@ make_factor() {
     invoke_make NO_UI=$NO_UI $MAKE_TARGET -j5
 }
 
+make_clean_factor() {
+    make_clean
+    make_factor
+}
+
 update_boot_images() {
     $ECHO "Deleting old images..."
     $DELETE checksums.txt* > /dev/null 2>&1
@@ -447,13 +476,10 @@ update_boot_images() {
     $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
-        get_url http://factorcode.org/images/latest/checksums.txt
-        factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;
+        get_url http://downloads.factorcode.org/images/latest/checksums.txt
+        factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`
         set_md5sum
-        case $OS in
-             netbsd) disk_md5=`md5 $BOOT_IMAGE | cut -f4 -d' '`;;
-             *) disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '` ;;
-        esac
+        disk_md5=`$MD5SUM $BOOT_IMAGE|cut -f1 -d' '`
         $ECHO "Factorcode md5: $factorcode_md5";
         $ECHO "Disk md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
@@ -469,11 +495,11 @@ update_boot_images() {
 
 get_boot_image() {
     $ECHO "Downloading boot image $BOOT_IMAGE."
-    get_url http://factorcode.org/images/latest/$BOOT_IMAGE
+    get_url http://downloads.factorcode.org/images/latest/$BOOT_IMAGE
 }
 
 get_url() {
-    if [[ $DOWNLOADER -eq "" ]] ; then
+    if [[ -z $DOWNLOADER ]] ; then
         set_downloader;
     fi
     $ECHO $DOWNLOADER $1 ;
@@ -483,6 +509,7 @@ get_url() {
 
 get_config_info() {
     find_build_info
+    check_git_branch
     check_installed_programs
     check_libraries
 }
@@ -494,7 +521,7 @@ copy_fresh_image() {
 
 bootstrap() {
     ./$FACTOR_BINARY -i=$BOOT_IMAGE
-	copy_fresh_image
+    copy_fresh_image
 }
 
 install() {
@@ -507,13 +534,11 @@ install() {
     bootstrap
 }
 
-
 update() {
     get_config_info
     git_fetch_factorcode
     backup_factor
-    make_clean
-    make_factor
+    make_clean_factor
 }
 
 update_bootstrap() {
@@ -521,23 +546,28 @@ update_bootstrap() {
     bootstrap
 }
 
+net_bootstrap_no_pull() {
+    get_config_info
+    make_clean_factor
+    update_bootstrap
+}
+
 refresh_image() {
-    ./$FACTOR_BINARY -script -e="USING: vocabs.loader system memory ; refresh-all USE: memory save 0 exit"
+    ./$FACTOR_BINARY -script -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save 0 exit"
     check_ret factor
 }
 
 make_boot_image() {
     ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
     check_ret factor
-
 }
 
-install_build_system_apt() {
-    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev wget git-core git-doc rlwrap gcc make
+install_deps_linux() {
+    sudo apt-get --yes install libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap gcc make
     check_ret sudo
 }
 
-install_build_system_port() {
+install_deps_macosx() {
     test_program_installed git
     if [[ $? -ne 1 ]] ; then
         ensure_program_installed yes
@@ -551,7 +581,18 @@ install_build_system_port() {
 }
 
 usage() {
-    $ECHO "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|dlls|net-bootstrap|make-target|report [optional-target]"
+    $ECHO "usage: $0 command [optional-target]"
+    $ECHO "  install - git clone, compile, bootstrap"
+    $ECHO "  deps-linux - install required packages for Factor on Linux using apt-get"
+    $ECHO "  deps-macosx - install git on MacOSX using port"
+    $ECHO "  self-update - git pull, make local boot image, bootstrap"
+    $ECHO "  quick-update - git pull, refresh-all, save"
+    $ECHO "  update - git pull, download a boot image, recompile, bootstrap"
+    $ECHO "  bootstrap - bootstrap with an existing boot image"
+    $ECHO "  net-bootstrap - download a boot image, bootstrap"
+    $ECHO "  make-target - find and print the os-arch-cpu string"
+    $ECHO "  report - print the build variables"
+    $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
     $ECHO ""
@@ -571,14 +612,14 @@ set_delete
 
 case "$1" in
     install) install ;;
-    install-x11) install_build_system_apt; install ;;
-    install-macosx) install_build_system_port; install ;;
+    deps-linux) install_deps_linux ;;
+    deps-macosx) install_deps_macosx ;;
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
-    report) find_build_info ;;
-    net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
+    net-bootstrap) net_bootstrap_no_pull ;;
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script ;;
+    report) find_build_info ;;
     *) usage ;;
 esac

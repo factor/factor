@@ -4,13 +4,10 @@ USING: accessors alien alien.c-types alien.libraries arrays
 assocs classes combinators combinators.short-circuit
 compiler.units effects grouping kernel parser sequences
 splitting words fry locals lexer namespaces summary math
-vocabs.parser words.constant ;
+vocabs.parser words.constant classes.parser alien.enums ;
 IN: alien.parser
 
 SYMBOL: current-library
-
-: parse-c-type-name ( name -- word )
-    dup search [ ] [ no-word ] ?if ;
 
 DEFER: (parse-c-type)
 
@@ -18,7 +15,7 @@ ERROR: bad-array-type ;
 
 : parse-array-type ( name -- c-type )
     "[" split unclip
-    [ [ "]" ?tail [ bad-array-type ] unless parse-word ] map ]
+    [ [ "]" ?tail [ bad-array-type ] unless parse-datum ] map ]
     [ (parse-c-type) ]
     bi* prefix ;
 
@@ -26,8 +23,8 @@ ERROR: bad-array-type ;
     {
         { [ "*" ?tail ] [ (parse-c-type) <pointer> ] }
         { [ CHAR: ] over member? ] [ parse-array-type ] }
-        { [ dup search ] [ parse-c-type-name ] }
-        [ dup search [ ] [ no-word ] ?if ]
+        { [ dup search ] [ parse-word ] }
+        [ parse-word ]
     } cond ;
 
 : c-array? ( c-type -- ? )
@@ -70,7 +67,7 @@ ERROR: *-in-c-type-name name ;
     } cleave ;
 
 : CREATE-C-TYPE ( -- word )
-    scan (CREATE-C-TYPE) ;
+    scan-token (CREATE-C-TYPE) ;
 
 <PRIVATE
 GENERIC: return-type-name ( type -- name )
@@ -84,24 +81,25 @@ M: pointer return-type-name to>> return-type-name CHAR: * suffix ;
     [ [ <pointer> ] dip parse-pointers ] when ;
 
 : next-enum-member ( members name value -- members value' )
-    [ 2array suffix! ] [ 1 + ] bi ;
+    [ define-enum-value ]
+    [ [ 2array suffix! ] [ enum>number 1 + ] bi ] 2bi ;
 
 : parse-enum-name ( -- name )
-    scan (CREATE-C-TYPE) dup save-location ;
+    CREATE-C-TYPE dup save-location ;
 
 : parse-enum-base-type ( -- base-type token )
-    scan dup "<" =
-    [ drop scan-object scan ]
+    scan-token dup "<" =
+    [ drop scan-object scan-token ]
     [ [ int ] dip ] if ;
 
 : parse-enum-member ( members name value -- members value' )
     over "{" =
-    [ 2drop scan create-in scan-object next-enum-member "}" expect ]
-    [ [ create-in ] dip next-enum-member ] if ;
+    [ 2drop scan-token create-class-in scan-object next-enum-member "}" expect ]
+    [ [ create-class-in ] dip next-enum-member ] if ;
 
 : parse-enum-members ( members counter token -- members )
     dup ";" = not
-    [ swap parse-enum-member scan parse-enum-members ] [ 2drop ] if ;
+    [ swap parse-enum-member scan-token parse-enum-members ] [ 2drop ] if ;
 
 PRIVATE>
 
@@ -111,14 +109,14 @@ PRIVATE>
     [ V{ } clone 0 ] dip parse-enum-members ;
 
 : scan-function-name ( -- return function )
-    scan-c-type scan parse-pointers ;
+    scan-c-type scan-token parse-pointers ;
 
 :: (scan-c-args) ( end-marker types names -- )
-    scan :> type-str
+    scan-token :> type-str
     type-str end-marker = [
         type-str { "(" ")" } member? [
             type-str parse-c-type :> type
-            scan "," ?tail drop :> name
+            scan-token "," ?tail drop :> name
             type name parse-pointers :> ( type' name' )
             type' types push name' names push
         ] unless
@@ -157,7 +155,7 @@ PRIVATE>
     void* type-word typedef
     type-word names return function-effect "callback-effect" set-word-prop
     type-word lib "callback-library" set-word-prop
-    type-word return types lib library-abi callback-quot (( quot -- alien )) ;
+    type-word return types lib library-abi callback-quot ( quot -- alien ) ;
 
 : (CALLBACK:) ( -- word quot effect )
     current-library get
@@ -173,11 +171,22 @@ PREDICATE: alien-function-word < alien-function-alias-word
     [ def>> third ] [ name>> ] bi = ;
 
 PREDICATE: alien-callback-type-word < typedef-word
-    "callback-effect" word-prop ;
+    "callback-effect" word-prop >boolean ;
 
 : global-quot ( type word -- quot )
     swap [ name>> current-library get ] dip
     '[ _ _ address-of 0 _ alien-value ] ;
 
+: set-global-quot ( type word -- quot )
+    swap [ name>> current-library get ] dip
+    '[ _ _ address-of 0 _ set-alien-value ] ;
+
+: define-global-getter ( type word -- )
+    [ nip ] [ global-quot ] 2bi ( -- value ) define-declared ;
+
+: define-global-setter ( type word -- )
+    [ nip name>> "set-" prepend create-in ]
+    [ set-global-quot ] 2bi ( obj -- ) define-declared ;
+
 : define-global ( type word -- )
-    [ nip ] [ global-quot ] 2bi (( -- value )) define-declared ;
+    [ define-global-getter ] [ define-global-setter ] 2bi ;

@@ -15,10 +15,10 @@ M: core-text-renderer string-dim
     if-empty ;
 
 M: core-text-renderer flush-layout-cache
-    cached-lines get purge-cache ;
+    cached-lines get-global purge-cache ;
 
 M: core-text-renderer string>image ( font string -- image loc )
-    cached-line [ image>> ] [ loc>> ] bi ;
+    cached-line [ line>image ] [ loc>> ] bi ;
 
 M: core-text-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [

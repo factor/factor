@@ -19,9 +19,9 @@ void full_collector::trace_context_code_blocks()
 	code_visitor.visit_context_code_blocks();
 }
 
-void full_collector::trace_uninitialized_code_blocks()
+void full_collector::trace_code_roots()
 {
-	code_visitor.visit_uninitialized_code_blocks();
+	code_visitor.visit_code_roots();
 }
 
 void full_collector::trace_object_code_block(object *obj)
@@ -63,7 +63,7 @@ void factor_vm::collect_mark_impl(bool trace_contexts_p)
 	{
 		collector.trace_contexts();
 		collector.trace_context_code_blocks();
-		collector.trace_uninitialized_code_blocks();
+		collector.trace_code_roots();
 	}
 
 	while(!mark_stack.empty())
@@ -101,7 +101,7 @@ void factor_vm::collect_sweep_impl()
 	update_code_roots_for_sweep();
 
 	if(event) event->started_code_sweep();
-	code->allocator->sweep();
+	code->sweep();
 	if(event) event->ended_code_sweep();
 }
 
@@ -112,11 +112,14 @@ void factor_vm::collect_full(bool trace_contexts_p)
 
 	if(data->low_memory_p())
 	{
+		/* Full GC did not free up enough memory. Grow the heap. */
 		set_current_gc_op(collect_growing_heap_op);
 		collect_growing_heap(0,trace_contexts_p);
 	}
 	else if(data->high_fragmentation_p())
 	{
+		/* Enough free memory, but it is not contiguous. Perform a
+		compaction. */
 		set_current_gc_op(collect_compact_op);
 		collect_compact_impl(trace_contexts_p);
 	}

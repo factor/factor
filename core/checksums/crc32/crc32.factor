@@ -5,7 +5,7 @@ words io io.binary io.files quotations
 definitions checksums ;
 IN: checksums.crc32
 
-CONSTANT: crc32-polynomial HEX: edb88320
+CONSTANT: crc32-polynomial 0xedb88320
 
 CONSTANT: crc32-table V{ }
 
@@ -25,7 +25,7 @@ SINGLETON: crc32
 INSTANCE: crc32 checksum
 
 : init-crc32 ( input checksum -- x y input )
-    drop [ HEX: ffffffff dup ] dip ; inline
+    drop [ 0xffffffff dup ] dip ; inline
 
 : finish-crc32 ( x y -- bytes )
     bitxor 4 >be ; inline

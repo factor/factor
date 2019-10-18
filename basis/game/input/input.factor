@@ -1,5 +1,6 @@
 USING: arrays accessors continuations kernel math system
-sequences namespaces init vocabs vocabs.loader combinators ;
+sequences namespaces init vocabs combinators ;
+FROM: namespaces => change-global ;
 IN: game.input
 
 SYMBOLS: game-input-backend game-input-opened ;
@@ -108,6 +109,6 @@ SYMBOLS: pressed released ;
 {
     { [ os windows? ] [ "game.input.dinput" require ] }
     { [ os macosx? ] [ "game.input.iokit" require ] }
-    { [ os linux? ] [ "game.input.x11" require ] }
+    { [ os linux? ] [ "game.input.gtk" require ] }
     [ ]
 } cond

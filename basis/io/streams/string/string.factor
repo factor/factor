@@ -8,14 +8,16 @@ IN: io.streams.string
 
 ! Readers
 TUPLE: string-reader { underlying string read-only } { i array-capacity } ;
+INSTANCE: string-reader input-stream
 
 M: string-reader stream-element-type drop +character+ ;
-M: string-reader stream-read-partial stream-read ;
-M: string-reader stream-read sequence-read ;
+M: string-reader stream-read-unsafe sequence-read-unsafe ;
 M: string-reader stream-read1 sequence-read1 ;
 M: string-reader stream-read-until sequence-read-until ;
 M: string-reader stream-tell i>> ;
 M: string-reader stream-seek (stream-seek) ;
+M: string-reader stream-seekable? drop t ; inline
+M: string-reader stream-length underlying>> length ;
 M: string-reader dispose drop ;
 
 <PRIVATE

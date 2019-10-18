@@ -23,7 +23,7 @@ SYMBOLS: Cn Lu Ll Lt Lm Lo Mn Mc Me Nd Nl No Pc Pd Ps Pe Pi Pf Po Sm Sc Sk So Zs
     [category] [ not ] compose integer-predicate-class ;
 
 : parse-category ( -- word tokens quot )
-    CREATE-CLASS \ ; parse-until { | } split1
+    scan-new-class \ ; parse-until { | } split1
     [ [ name>> categories-map at ] map ]
     [ [ [ ] like ] [ [ drop f ] ] if* ] bi* ;
 

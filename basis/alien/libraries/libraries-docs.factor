@@ -24,17 +24,17 @@ HELP: library
     }
 } ;
 
-HELP: dlopen ( path -- dll )
+HELP: dlopen
 { $values { "path" "a pathname string" } { "dll" "a DLL handle" } }
 { $description "Opens a native library and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } "." }
 { $errors "Throws an error if the library could not be found, or if loading fails for some other reason." }
 { $notes "This is the low-level facility used to implement " { $link load-library } ". Use the latter instead." } ;
 
-HELP: dlsym ( name dll -- alien )
+HELP: dlsym
 { $values { "name" "a C symbol name" } { "dll" "a DLL handle" } { "alien" { $maybe alien } } }
 { $description "Looks up a symbol in a native library. If " { $snippet "dll" } " is " { $link f } " looks for the symbol in the runtime executable. If the symbol was not found, outputs " { $link f } "." } ;
 
-HELP: dlclose ( dll -- )
+HELP: dlclose
 { $values { "dll" "a DLL handle" } }
 { $description "Closes a DLL handle created by " { $link dlopen } ". This word might not be implemented on all platforms." } ;
 

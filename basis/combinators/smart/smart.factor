@@ -1,73 +1,124 @@
-! Copyright (C) 2009 Doug Coleman.
+! Copyright (C) 2009, 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry generalizations sequences.generalizations
-kernel macros math.order stack-checker math sequences ;
+USING: accessors arrays effects fry generalizations kernel
+macros math math.order sequences sequences.generalizations
+stack-checker stack-checker.backend stack-checker.errors
+stack-checker.values stack-checker.visitor words memoize ;
 IN: combinators.smart
 
-MACRO: drop-outputs ( quot -- quot' )
-    dup outputs '[ @ _ ndrop ] ;
+GENERIC: infer-known* ( known -- effect )
 
-MACRO: keep-inputs ( quot -- quot' )
-    dup inputs '[ _ _ nkeep ] ;
+: infer-known ( value -- effect )
+    known dup (literal-value?) [
+        (literal) [ infer-literal-quot ] with-infer drop
+    ] [ infer-known* ] if ;
 
-MACRO: output>sequence ( quot exemplar -- newquot )
-    [ dup outputs ] dip
-    '[ @ _ _ nsequence ] ;
+IDENTITY-MEMO: inputs/outputs ( quot -- in out )
+    infer [ in>> ] [ out>> ] bi [ length ] bi@ ;
 
-MACRO: output>array ( quot -- newquot )
-    '[ _ { } output>sequence ] ;
+: inputs ( quot -- n ) inputs/outputs drop ; inline
 
-MACRO: input<sequence ( quot -- newquot )
-    [ inputs ] keep
-    '[ _ firstn @ ] ;
+: outputs ( quot -- n ) inputs/outputs nip ; inline
 
-MACRO: input<sequence-unsafe ( quot -- newquot )
-    [ inputs ] keep
-    '[ _ firstn-unsafe @ ] ;
+\ inputs/outputs [
+    peek-d
+    infer-known [
+        [ pop-d 1array #drop, ]
+        [ [ in>> ] [ out>> ] bi [ length apply-object ] bi@ ] bi*
+    ] [
+        \ inputs/outputs dup required-stack-effect apply-word/effect
+        pop-d pop-d swap
+        [ [ input-parameter swap set-known ] [ push-d ] bi ] bi@
+    ] if*
+] "special" set-word-prop
 
-MACRO: reduce-outputs ( quot operation -- newquot )
-    [ dup outputs 1 [-] ] dip n*quot compose ;
+M: curried infer-known*
+    quot>> infer-known dup [
+        curry-effect
+    ] [
+        drop f
+    ] if ;
 
-MACRO: sum-outputs ( quot -- n )
-    '[ _ [ + ] reduce-outputs ] ;
+M: composed infer-known*
+    [ quot1>> ] [ quot2>> ] bi
+    [ infer-known ] bi@
+    2dup and [ compose-effects ] [ 2drop f ] if ;
 
-MACRO: map-reduce-outputs ( quot mapper reducer -- newquot )
-    [ dup outputs ] 2dip
-    [ swap '[ _ _ napply ] ]
-    [ [ 1 [-] ] dip n*quot ] bi-curry* bi
-    '[ @ @ @ ] ;
+M: declared-effect infer-known*
+    known>> infer-known* ;
 
-MACRO: append-outputs-as ( quot exemplar -- newquot )
-    [ dup outputs ] dip '[ @ _ _ nappend-as ] ;
+M: input-parameter infer-known* drop f ;
 
-MACRO: append-outputs ( quot -- seq )
-    '[ _ { } append-outputs-as ] ;
+M: object infer-known* drop f ;
 
-MACRO: preserving ( quot -- )
-    [ inputs ] keep '[ _ ndup @ ] ;
+: drop-inputs ( quot -- )
+    inputs ndrop ; inline
 
-MACRO: dropping ( quot -- quot' )
-    inputs '[ [ _ ndrop ] ] ;
+: drop-outputs ( quot -- )
+    [ call ] [ outputs ndrop ] bi ; inline
 
-MACRO: nullary ( quot -- quot' ) dropping ;
+: keep-inputs ( quot -- )
+    [ ] [ inputs ] bi nkeep ; inline
 
-MACRO: smart-if ( pred true false -- quot )
-    '[ _ preserving _ _ if ] ;
+: output>sequence ( quot exemplar -- seq )
+    [ [ call ] [ outputs ] bi ] dip nsequence ; inline
 
-MACRO: smart-when ( pred true -- quot )
-    '[ _ _ [ ] smart-if ] ;
+: output>array ( quot -- array )
+    { } output>sequence ; inline
 
-MACRO: smart-unless ( pred false -- quot )
-    '[ _ [ ] _ smart-if ] ;
+: input<sequence ( seq quot -- )
+    [ inputs firstn ] [ call ] bi ; inline
 
-MACRO: smart-if* ( pred true false -- quot )
-    '[ _ [ preserving ] [ dropping ] bi _ swap _ compose if ] ;
+: input<sequence-unsafe ( seq quot -- )
+    [ inputs firstn-unsafe ] [ call ] bi ; inline
 
-MACRO: smart-when* ( pred true -- quot )
-    '[ _ _ [ ] smart-if* ] ;
+: reduce-outputs ( quot operation -- )
+    [ [ call ] [ [ drop ] compose outputs ] bi ] dip swap call-n ; inline
 
-MACRO: smart-unless* ( pred false -- quot )
-    '[ _ [ ] _ smart-if* ] ;
+: sum-outputs ( quot -- n )
+    [ + ] reduce-outputs ; inline
 
-MACRO: smart-apply ( quot n -- quot )
-    [ dup inputs ] dip '[ _ _ _ mnapply ] ;
+: map-outputs ( quot mapper -- )
+    [ drop call ] [ swap outputs ] 2bi napply ; inline
+
+MACRO: map-reduce-outputs ( quot mapper reducer -- quot )
+    [ '[ _ _ map-outputs ] ] dip '[ _ _ reduce-outputs ] ;
+
+: append-outputs-as ( quot exemplar -- seq )
+    [ [ call ] [ outputs ] bi ] dip nappend-as ; inline
+
+: append-outputs ( quot -- seq )
+    { } append-outputs-as ; inline
+
+: preserving ( quot -- )
+    [ inputs ndup ] [ call ] bi ; inline
+
+: dropping ( quot -- quot' )
+    inputs '[ _ ndrop ] ; inline
+
+: nullary ( quot -- )
+    dropping call ; inline
+
+: smart-if ( pred true false -- )
+    [ preserving ] 2dip if ; inline
+
+: smart-when ( pred true -- )
+    [ ] smart-if ; inline
+
+: smart-unless ( pred false -- )
+    [ [ ] ] dip smart-if ; inline
+
+: smart-if* ( pred true false -- )
+    [ [ [ preserving ] [ dropping ] bi ] dip swap ] dip compose if ; inline
+
+: smart-when* ( pred true -- )
+    [ ] smart-if* ; inline
+
+: smart-unless* ( pred false -- )
+    [ [ ] ] dip smart-if* ; inline
+
+: smart-apply ( quot n -- )
+    [ dup inputs ] dip mnapply ; inline
+
+: smart-with ( param obj quot -- obj curry )
+    swapd dup inputs '[ [ _ -nrot ] dip call ] 2curry ; inline

@@ -1,16 +1,18 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
-classes.tuple classes.tuple.private colors colors.constants
-combinators continuations effects generic hashtables io
-io.pathnames io.styles kernel make math math.order math.parser
-namespaces prettyprint.config prettyprint.custom
-prettyprint.sections prettyprint.stylesheet quotations sbufs
-sequences strings vectors words words.symbol hash-sets ;
+classes.algebra.private classes.intersection classes.maybe
+classes.tuple classes.tuple.private classes.union colors
+colors.constants combinators continuations effects generic
+hash-sets hashtables io io.pathnames io.styles kernel
+make math math.order math.parser namespaces prettyprint.config
+prettyprint.custom prettyprint.sections prettyprint.stylesheet
+quotations sbufs sequences strings vectors words words.symbol
+classes.private ;
 FROM: sets => members ;
 IN: prettyprint.backend
 
-M: effect pprint* effect>string "(" ")" surround text ;
+M: effect pprint* effect>string text ;
 
 : ?effect-height ( word -- n )
     stack-effect [ effect-height ] [ 0 ] if* ;
@@ -22,12 +24,33 @@ M: effect pprint* effect>string "(" ")" surround text ;
     ?effect-height 0 < [ end-group ] when ;
 
 ! Atoms
-: word-name* ( word -- str )
-    name>> "( no name )" or ;
+GENERIC: word-name* ( obj -- str )
+
+M: maybe word-name*
+    class-name "maybe{ " " }" surround ;
+
+M: anonymous-complement word-name*
+    class-name "not{ " " }" surround ;
+
+M: anonymous-union word-name*
+    class-name "union{ " " }" surround ;
+
+M: anonymous-intersection word-name*
+    class-name "intersection{ " " }" surround ;
+
+M: word word-name* ( word -- str )
+    [ name>> "( no name )" or ] [ record-vocab ] bi ;
 
 : pprint-word ( word -- )
-    [ record-vocab ]
-    [ [ word-name* ] [ word-style ] bi styled-text ] bi ;
+    [ word-name* ] [ word-style ] bi styled-text ;
+
+GENERIC: pprint-class ( obj -- )
+
+M: classoid pprint-class pprint* ;
+
+M: class pprint-class \ f or pprint-word ;
+
+M: word pprint-class pprint-word ;
 
 : pprint-prefix ( word quot -- )
     <block swap pprint-word call block> ; inline
@@ -39,18 +62,21 @@ M: word pprint*
     [ pprint-word ] [ ?start-group ] [ ?end-group ] tri ;
 
 M: method pprint*
-    [
-        [
-            [ "M\\ " % "method-class" word-prop word-name* % ]
-            [ " " % "method-generic" word-prop word-name* % ] bi
-        ] "" make
-    ] [ word-style ] bi styled-text ;
+    <block
+    [ \ M\ pprint-word "method-class" word-prop pprint* ]
+    [ "method-generic" word-prop pprint-word ] bi
+    block> ;
+
+: pprint-prefixed-number ( n quot: ( n -- n' ) pre -- )
+    pick neg?
+    [ [ neg ] [ call ] [ prepend ] tri* "-" prepend text ]
+    [ [ call ] [ prepend ] bi* text ] if ; inline
 
 M: real pprint*
     number-base get {
-        { 16 [ \ HEX: [ 16 >base text ] pprint-prefix ] }
-        {  8 [ \ OCT: [  8 >base text ] pprint-prefix ] }
-        {  2 [ \ BIN: [  2 >base text ] pprint-prefix ] }
+        { 16 [ [ >hex ] "0x" pprint-prefixed-number ] }
+        {  8 [ [ >oct ] "0o" pprint-prefixed-number ] }
+        {  2 [ [ >bin ] "0b" pprint-prefixed-number ] }
         [ drop number>string text ]
     } case ;
 
@@ -59,7 +85,7 @@ M: float pprint*
         \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
     ] [
         number-base get {
-            { 16 [ \ HEX: [ 16 >base text ] pprint-prefix ] }
+            { 16 [ [ >hex ] "0x" pprint-prefixed-number ] }
             [ drop number>string text ]
         } case
     ] if ;
@@ -70,7 +96,7 @@ M: f pprint* drop \ f pprint-word ;
     [ effect>string ] [ effect-style ] bi styled-text ;
 
 ! Strings
-: ch>ascii-escape ( ch -- str )
+: ch>ascii-escape ( ch -- ch' ? )
     H{
         { CHAR: \a CHAR: a  }
         { CHAR: \e CHAR: e  }
@@ -80,10 +106,12 @@ M: f pprint* drop \ f pprint-word ;
         { CHAR: \0 CHAR: 0  }
         { CHAR: \\ CHAR: \\ }
         { CHAR: \" CHAR: \" }
-    } at ;
+    } ?at ; inline
 
 : unparse-ch ( ch -- )
-    dup ch>ascii-escape [ "\\" % ] [ ] ?if , ;
+    ch>ascii-escape [ "\\" % , ] [
+        dup 32 < [ dup 16 < "\\x0" "\\x" ? % >hex % ] [ , ] if
+    ] if ;
 
 : do-string-limit ( str -- trimmed )
     string-limit? get [
@@ -117,7 +145,7 @@ M: pathname pprint*
 : check-recursion ( obj quot -- )
     nesting-limit? [
         drop
-        [ class name>> "~" dup surround ] keep present-text 
+        [ class-of name>> "~" dup surround ] keep present-text 
     ] [
         over recursion-check get member-eq? [
             drop "~circularity~" swap present-text
@@ -133,7 +161,7 @@ M: pathname pprint*
     [ [ name>> ] dip ] assoc-map ;
 
 : tuple>assoc ( tuple -- assoc )
-    [ class all-slots ] [ tuple-slots ] bi zip filter-tuple-assoc ;
+    [ class-of all-slots ] [ tuple-slots ] bi zip filter-tuple-assoc ;
 
 : pprint-slot-value ( name value -- )
     <flow \ { pprint-word
@@ -152,7 +180,7 @@ M: pathname pprint*
     [ boa-tuples? get [ pprint-object ] ] dip [ check-recursion ] curry if ; inline
 
 : pprint-tuple ( tuple -- )
-    [ [ \ T{ ] dip [ class ] [ tuple>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
+    [ [ \ T{ ] dip [ class-of ] [ tuple>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
 
 M: tuple pprint*
     pprint-tuple ;
@@ -169,7 +197,7 @@ M: tuple pprint*
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
         over length over [-]
-        dup zero? [ 2drop f ] [ [ head-slice ] dip ] if
+        [ drop f ] [ [ head-slice ] dip ] if-zero
     ] when ;
 
 : pprint-elements ( seq -- )
@@ -189,6 +217,10 @@ M: tuple pprint-delims drop \ T{ \ } ;
 M: wrapper pprint-delims drop \ W{ \ } ;
 M: callstack pprint-delims drop \ CS{ \ } ;
 M: hash-set pprint-delims drop \ HS{ \ } ;
+M: anonymous-union pprint-delims drop \ union{ \ } ;
+M: anonymous-intersection pprint-delims drop \ intersection{ \ } ;
+M: anonymous-complement pprint-delims drop \ not{ \ } ;
+M: maybe pprint-delims drop \ maybe{ \ } ;
 
 M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
@@ -198,12 +230,16 @@ M: hashtable >pprint-sequence >alist ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
 M: hash-set >pprint-sequence members ;
+M: anonymous-union >pprint-sequence members>> ;
+M: anonymous-intersection >pprint-sequence participants>> ;
+M: anonymous-complement >pprint-sequence class>> 1array ;
+M: maybe >pprint-sequence class>> 1array ;
 
 : class-slot-sequence ( class slots -- sequence )
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
 
 M: tuple >pprint-sequence
-    [ class ] [ tuple-slots ] bi class-slot-sequence ;
+    [ class-of ] [ tuple-slots ] bi class-slot-sequence ;
 
 M: object pprint-narrow? drop f ;
 M: byte-vector pprint-narrow? drop f ;
@@ -236,6 +272,10 @@ M: hashtable pprint*
 M: curry pprint* pprint-object ;
 M: compose pprint* pprint-object ;
 M: hash-set pprint* pprint-object ;
+M: anonymous-union pprint* pprint-object ;
+M: anonymous-intersection pprint* pprint-object ;
+M: anonymous-complement pprint* pprint-object ;
+M: maybe pprint* pprint-object ;
 
 M: wrapper pprint*
     {

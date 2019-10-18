@@ -1,6 +1,6 @@
-USING: alien alien.complex help.syntax help.markup libc kernel.private
-byte-arrays strings hashtables alien.syntax alien.strings sequences
-io.encodings.string debugger destructors vocabs.loader
+USING: alien help.syntax help.markup libc kernel.private
+byte-arrays strings hashtables alien.syntax alien.strings
+sequences io.encodings.string debugger destructors vocabs.loader
 classes.struct math kernel ;
 QUALIFIED: math
 QUALIFIED: sequences
@@ -21,9 +21,9 @@ HELP: <c-type>
 HELP: no-c-type
 { $values { "name" c-type-name } }
 { $description "Throws a " { $link no-c-type } " error." }
-{ $error-description "Thrown by " { $link c-type } " if a given string does not name a C type. When thrown during compile time, indicates a typo in an " { $link alien-invoke } " or " { $link alien-callback } " form." } ;
+{ $error-description "Thrown by " { $link c-type } " if a given word is not a C type." } ;
 
-HELP: c-type
+HELP: lookup-c-type
 { $values { "name" c-type-name } { "c-type" c-type } }
 { $description "Looks up a C type by name." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist, or the word is not a C type." } ;
@@ -37,16 +37,6 @@ HELP: set-alien-value
 { $values { "value" object } { "c-ptr" c-ptr } { "offset" integer } { "c-type" c-type-name } }
 { $description "Stores a value at a byte offset from a base C pointer." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
-
-HELP: define-deref
-{ $values { "c-type" "a C type" } }
-{ $description "Defines a word " { $snippet "*name" } " with stack effect " { $snippet "( c-ptr -- value )" } " for reading a value with C type " { $snippet "name" } " stored at an alien pointer." }
-{ $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
-
-HELP: define-out
-{ $values { "c-type" "a C type" } }
-{ $description "Defines a word " { $snippet "<" { $emphasis "name" } ">" } " with stack effect " { $snippet "( value -- array )" } ". This word allocates a byte array large enough to hold a value with C type " { $snippet "name" } ", and writes the value at the top of the stack to the array." }
-{ $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
 HELP: char
 { $description "This C type represents a one-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to eight bits; output values will be returned as " { $link math:fixnum } "s." } ;
@@ -86,17 +76,13 @@ HELP: float
 { $description "This C type represents a single-precision IEEE 754 floating-point type. Input values will be converted to Factor " { $link math:float } "s and demoted to single-precision; output values will be returned as Factor " { $link math:float } "s." } ;
 HELP: double
 { $description "This C type represents a double-precision IEEE 754 floating-point type. Input values will be converted to Factor " { $link math:float } "s; output values will be returned as Factor " { $link math:float } "s." } ;
-HELP: complex-float
-{ $description "This C type represents a single-precision IEEE 754 floating-point complex type. Input values will be converted from Factor " { $link math:complex } " objects into a single-precision complex float type; output values will be returned as Factor " { $link math:complex } " objects." } ;
-HELP: complex-double
-{ $description "This C type represents a double-precision IEEE 754 floating-point complex type. Input values will be converted from Factor " { $link math:complex } " objects into a double-precision complex float type; output values will be returned as Factor " { $link math:complex } " objects." } ;
 
 HELP: pointer:
 { $syntax "pointer: c-type" }
 { $description "Constructs a " { $link pointer } " C type." } ;
 
 HELP: pointer
-{ $class-description "Represents a pointer C type. The " { $snippet "to" } " slot contains the C type being pointed to." { $link byte-array } " and " { $link alien } " values can be provided as pointer function inputs, but see " { $link "byte-arrays-gc" } " for notes about passing byte arrays into C functions. Objects with methods on " { $link >c-ptr } ", such as structs and specialized arrays, may also be used as pointer inputs."
+{ $class-description "Represents a pointer C type. The " { $snippet "to" } " slot contains the C type being pointed to. Both " { $link byte-array } " and " { $link alien } " values can be provided as pointer function inputs, but see " { $link "byte-arrays-gc" } " for notes about passing byte arrays into C functions. Objects with methods on " { $link >c-ptr } ", such as structs and specialized arrays, may also be used as pointer inputs."
 $nl
 "Pointer output values are represented in Factor as " { $link alien } "s. If the pointed-to type is a struct, the alien will automatically be wrapped in a struct object if it is not null."
 $nl
@@ -118,43 +104,6 @@ $nl
 "If this condition is not satisfied, " { $link "malloc" } " must be used instead."
 { $warning "Failure to comply with these requirements can lead to crashes, data corruption, and security exploits." } ;
 
-ARTICLE: "c-out-params" "Output parameters in C"
-"A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
-$nl
-"Each numerical C type, together with " { $snippet "void*" } ", has an associated " { $emphasis "out parameter constructor" } " word which takes a Factor object as input, constructs a byte array of the correct size, and converts the Factor object to a C value stored into the byte array:"
-{ $subsections
-    <char>
-    <uchar>
-    <short>
-    <ushort>
-    <int>
-    <uint>
-    <long>
-    <ulong>
-    <longlong>
-    <ulonglong>
-    <float>
-    <double>
-    <void*>
-}
-"You call the out parameter constructor with the required initial value, then pass the byte array to the C function, which receives a pointer to the start of the byte array's data area. The C function then returns, leaving the result in the byte array; you read it back using the next set of words:"
-{ $subsections
-    *char
-    *uchar
-    *short
-    *ushort
-    *int
-    *uint
-    *long
-    *ulong
-    *longlong
-    *ulonglong
-    *float
-    *double
-    *void*
-}
-"Note that while structure and union types do not get these words defined for them, there is no loss of generality since " { $link <void*> } " and " { $link *void* } " may be used." ;
-
 ARTICLE: "c-types.primitives" "Primitive C types"
 "The following numerical types are defined in the " { $vocab-link "alien.c-types" } " vocabulary; a " { $snippet "u" } " prefix denotes an unsigned type:"
 { $table
@@ -172,11 +121,8 @@ ARTICLE: "c-types.primitives" "Primitive C types"
     { { $link float } { "single-precision float (not the same as Factor's " { $link math:float } " class!)" } }
     { { $link double } { "double-precision float (the same format as Factor's " { $link math:float } " objects)" } }
 }
-"The following C99 complex number types are defined in the " { $vocab-link "alien.complex" } " vocabulary:"
-{ $table
-    { { $link complex-float } { "C99 or Fortran " { $snippet "complex float" } " type, converted to and from Factor " { $link math:complex } " values" } }
-    { { $link complex-double } { "C99 or Fortran " { $snippet "complex double" } " type, converted to and from Factor " { $link math:complex } " values" } }
-}
+"C99 complex number types are defined in the " { $vocab-link "alien.complex" } " vocabulary."
+$nl
 "When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision." ;
 
 ARTICLE: "c-types.pointers" "Pointer and array types"
@@ -226,6 +172,8 @@ $nl
     POSTPONE: CALLBACK:
     POSTPONE: TYPEDEF:
 }
+"Getting the c-type of a class:"
+{ $subsections lookup-c-type }
 { $heading "Related articles" }
 { $subsections
     "c-types.primitives"

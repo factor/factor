@@ -3,12 +3,9 @@
 USING: kernel math math.private math.order ;
 IN: math.floats.private
 
-: float-unordered? ( x y -- ? ) [ fp-nan? ] bi@ or ;
+: float-unordered? ( x y -- ? ) [ fp-nan? ] either? ;
 : float-min ( x y -- z ) [ float< ] most ; foldable
 : float-max ( x y -- z ) [ float> ] most ; foldable
-
-M: fixnum >float fixnum>float ; inline
-M: bignum >float bignum>float ; inline
 
 M: float >fixnum float>fixnum ; inline
 M: float >bignum float>bignum ; inline
@@ -42,7 +39,7 @@ M: float /i float/f >integer ; inline
 M: real abs dup 0 < [ neg ] when ; inline
 
 M: float fp-special?
-    double>bits -52 shift HEX: 7ff [ bitand ] keep = ; inline
+    double>bits -52 shift 0x7ff [ bitand ] keep = ; inline
 
 M: float fp-nan-payload
     double>bits 52 2^ 1 - bitand ; inline
@@ -76,5 +73,7 @@ M: float prev-float
     ] if ; inline
 
 M: float fp-sign double>bits 63 bit? ; inline
+
+M: float neg? fp-sign ; inline
 
 M: float abs double>bits 63 2^ bitnot bitand bits>double ; inline

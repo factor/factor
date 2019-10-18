@@ -61,8 +61,8 @@ VALUE: selected-file
 VALUE: translation-step
 VALUE: rotation-step
 
-3 to: translation-step 
-5 to: rotation-step
+3 \ translation-step set-value
+5 \ rotation-step set-value
 
 VAR: selected-file-model
 VAR: observer3d 

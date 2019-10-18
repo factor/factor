@@ -16,7 +16,7 @@ IN: compiler.tree.propagation.inlining
 
 ! Splicing nodes
 : splicing-call ( #call word -- nodes )
-    [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
+    [ [ in-d>> ] [ out-d>> ] bi ] dip <#call> 1array ;
 
 : open-code-#call ( #call word/quot -- nodes/f )
     [ [ in-d>> ] [ out-d>> ] bi ] dip build-sub-tree ;
@@ -105,7 +105,7 @@ SYMBOL: history
     "custom-inlining" word-prop ;
 
 : inline-custom ( #call word -- ? )
-    [ dup ] [ "custom-inlining" word-prop ] bi*
+    [ dup ] [ custom-inlining? ] bi*
     call( #call -- word/quot/f )
     object swap eliminate-dispatch ;
 

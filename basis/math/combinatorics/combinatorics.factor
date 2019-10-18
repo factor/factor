@@ -1,9 +1,10 @@
 ! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs binary-search fry kernel locals
-math math.order math.ranges namespaces sequences sorting ;
-
+USING: accessors arrays assocs binary-search classes.tuple fry
+kernel locals math math.order math.ranges namespaces sequences
+sequences.private sorting ;
+FROM: sequences => change-nth ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -17,7 +18,7 @@ IN: math.combinatorics
 PRIVATE>
 
 : factorial ( n -- n! )
-    iota 1 [ 1 + * ] reduce ;
+    dup 1 > [ [1,b] product ] [ drop 1 ] if ;
 
 : nPk ( n k -- nPk )
     2dup possible? [ dupd - [a,b) product ] [ 2drop 0 ] if ;
@@ -31,100 +32,146 @@ PRIVATE>
 <PRIVATE
 
 : factoradic ( n -- factoradic )
-    0 [ over 0 > ] [ 1 + [ /mod ] keep swap ] produce reverse 2nip ;
+    0 [ over 0 > ] [ 1 + [ /mod ] keep swap ] produce reverse! 2nip ;
 
 : (>permutation) ( seq n -- seq )
-    [ '[ _ dupd >= [ 1 + ] when ] map ] keep prefix ;
+    [ '[ _ dupd >= [ 1 + ] when ] map! ] keep prefix ;
 
 : >permutation ( factoradic -- permutation )
-    reverse 1 cut [ (>permutation) ] each ;
+    reverse! 1 cut [ (>permutation) ] each ;
 
 : permutation-indices ( n seq -- permutation )
     length [ factoradic ] dip 0 pad-head >permutation ;
+
+: permutation-iota ( seq -- iota )
+    length factorial iota ; inline
 
 PRIVATE>
 
 : permutation ( n seq -- seq' )
     [ permutation-indices ] keep nths ;
 
-: all-permutations ( seq -- seq' )
-    [ length factorial iota ] keep
-    '[ _ permutation ] map ;
+TUPLE: permutations length seq ;
+
+: <permutations> ( seq -- permutations )
+    [ length factorial ] keep permutations boa ;
+
+M: permutations length length>> ; inline
+M: permutations nth-unsafe seq>> permutation ;
+M: permutations hashcode* tuple-hashcode ;
+
+INSTANCE: permutations immutable-sequence
 
 : each-permutation ( seq quot -- )
-    [ [ length factorial iota ] keep ] dip
+    [ [ permutation-iota ] keep ] dip
     '[ _ permutation @ ] each ; inline
+
+: map-permutations ( seq quot -- seq' )
+    [ [ permutation-iota ] keep ] dip
+    '[ _ permutation @ ] map ; inline
+
+: filter-permutations ( seq quot -- seq' )
+    selector [ each-permutation ] dip ; inline
+
+: all-permutations ( seq -- seq' )
+    [ ] map-permutations ;
+
+: find-permutation ( seq quot -- elt )
+    [ dup [ permutation-iota ] keep ] dip
+    '[ _ permutation @ ] find drop
+    [ swap permutation ] [ drop f ] if* ; inline
 
 : reduce-permutations ( seq identity quot -- result )
     swapd each-permutation ; inline
 
 : inverse-permutation ( seq -- permutation )
-    <enum> >alist sort-values keys ;
+    <enum> sort-values keys ;
 
+<PRIVATE
+
+: cut-point ( seq -- n )
+    [ last ] keep [ [ > ] keep swap ] find-last drop nip ;
+
+: greater-from-last ( n seq -- i )
+    [ nip ] [ nth ] 2bi [ > ] curry find-last drop ;
+
+: reverse-tail! ( n seq -- seq )
+    [ swap 1 + tail-slice reverse! drop ] keep ;
+
+: (next-permutation) ( seq -- seq )
+    dup cut-point [
+        swap [ greater-from-last ] 2keep
+        [ exchange ] [ reverse-tail! nip ] 3bi
+    ] [ reverse! ] if* ;
+
+PRIVATE>
+
+: next-permutation ( seq -- seq )
+    dup [ ] [ drop (next-permutation) ] if-empty ;
 
 ! Combinadic-based combination methodology
 
 <PRIVATE
 
-TUPLE: combo
-    { seq sequence }
-    { k integer } ;
+! "Algorithm 515: Generation of a Vector from the Lexicographical Index"
+! Buckles, B. P., and Lybanon, M. ACM
+! Transactions on Mathematical Software, Vol. 3, No. 2, June 1977.
 
-C: <combo> combo
+:: combination-indices ( x! p n -- seq )
+    x 1 + x!
+    p 0 <array> :> c 0 :> k! 0 :> r!
+    p 1 - [| i |
+        i [ 0 ] [ 1 - c nth ] if-zero i c set-nth
+        [ k x < ] [
+            i c [ 1 + ] change-nth
+            n i c nth - p i 1 + - nCk r!
+            k r + k!
+        ] do while k r - k!
+    ] each-integer
+    p 2 < [ 0 ] [ p 2 - c nth ] if
+    p 1 < [ drop ] [ x + k - p 1 - c set-nth ] if
+    c [ 1 - ] map! ;
 
-: choose ( combo -- nCk )
-    [ seq>> length ] [ k>> ] bi nCk ;
-
-: largest-value ( a b x -- v )
-    dup 0 = [
-        drop 1 - nip
-    ] [
-        [ iota ] 2dip '[ _ nCk _ >=< ] search nip
-    ] if ;
-
-:: next-values ( a b x -- a' b' x' v )
-    a b x largest-value dup :> v  ! a'
-    b 1 -                         ! b'
-    x v b nCk -                   ! x'
-    v ;                           ! v == a'
-
-: dual-index ( m combo -- m' )
-    choose 1 - swap - ;
-
-: initial-values ( combo m -- n k m )
-    [ [ seq>> length ] [ k>> ] bi ] dip ;
-
-: combinadic ( combo m -- combinadic )
-    initial-values [ over 0 > ] [ next-values ] produce
-    [ 3drop ] dip ;
-
-:: combination-indices ( m combo -- seq )
-    combo m combo dual-index combinadic
-    combo seq>> length 1 - swap [ - ] with map ;
-
-: apply-combination ( m combo -- seq )
-    [ combination-indices ] keep seq>> nths ;
-
-: combinations-quot ( seq k quot -- seq quot )
-    [ <combo> [ choose iota ] keep ] dip
-    '[ _ apply-combination @ ] ; inline
+:: combinations-quot ( seq k quot -- seq quot )
+    seq length :> n
+    n k nCk iota [
+        k n combination-indices seq nths quot call
+    ] ; inline
 
 PRIVATE>
+
+: combination ( m seq k -- seq' )
+    swap [ length combination-indices ] [ nths ] bi ;
+
+TUPLE: combinations seq k length ;
+
+: <combinations> ( seq k -- combinations )
+    2dup [ length ] [ nCk ] bi* combinations boa ;
+
+M: combinations length length>> ; inline
+M: combinations nth-unsafe [ seq>> ] [ k>> ] bi combination ;
+M: combinations hashcode* tuple-hashcode ;
+
+INSTANCE: combinations immutable-sequence
 
 : each-combination ( seq k quot -- )
     combinations-quot each ; inline
 
-: map-combinations ( seq k quot -- )
+: map-combinations ( seq k quot -- seq' )
     combinations-quot map ; inline
+
+: filter-combinations ( seq k quot -- seq' )
+    selector [ each-combination ] dip ; inline
 
 : map>assoc-combinations ( seq k quot exemplar -- )
     [ combinations-quot ] dip map>assoc ; inline
 
-: combination ( m seq k -- seq' )
-    <combo> apply-combination ;
-
 : all-combinations ( seq k -- seq' )
-    [ ] combinations-quot map ;
+    [ ] map-combinations ;
+
+: find-combination ( seq k quot -- i elt )
+    [ combinations-quot find drop ]
+    [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
 
 : reduce-combinations ( seq k identity quot -- result )
     [ -rot ] dip each-combination ; inline
@@ -143,5 +190,4 @@ PRIVATE>
 
 : selections ( seq n -- selections )
     dup 0 > [ (selections) ] [ 2drop { } ] if ;
-
 

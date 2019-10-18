@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces sequences words io assocs
-quotations strings parser lexer arrays xml.data xml.writer debugger
+quotations strings parser lexer arrays xml.data
 splitting vectors sequences.deep combinators fry memoize ;
 IN: xml.traversal
 
@@ -28,7 +28,7 @@ IN: xml.traversal
     assure-name '[ _ swap tag-named? ] find nip ;
 
 : tags-named ( tag name/string -- tags-seq )
-    assure-name '[ _ swap tag-named? ] filter { } like ;
+    assure-name '[ _ swap tag-named? ] { } filter-as ;
 
 <PRIVATE
 
@@ -41,13 +41,16 @@ PRIVATE>
     prepare-deep '[ _ swap tag-named? ] deep-find ;
 
 : deep-tags-named ( tag name/string -- tags-seq )
-    prepare-deep '[ _ swap tag-named? ] deep-filter { } like ;
+    prepare-deep '[ _ swap tag-named? ] { } deep-filter-as ;
 
 : tag-with-attr? ( elem attr-value attr-name -- ? )
     rot dup tag? [ swap attr = ] [ 3drop f ] if ;
 
 : tag-with-attr ( tag attr-value attr-name -- matching-tag )
     assure-name '[ _ _ tag-with-attr? ] find nip ;
+
+: tag-named-with-attr ( tag tag-name attr-value attr-name -- matching-tag )
+    [ tags-named ] 2dip '[ _ _ tag-with-attr? ] find nip ;
 
 : tags-with-attr ( tag attr-value attr-name -- tags-seq )
     assure-name '[ _ _ tag-with-attr? ] { } filter-as ;

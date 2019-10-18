@@ -5,6 +5,7 @@ heaps kernel math math.order namespaces layouts sequences vectors
 linked-assocs compiler.cfg compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals ;
+FROM: assocs => change-at ;
 IN: compiler.cfg.linear-scan.allocation.state
 
 ! Start index of current live interval. We ensure that all

@@ -1,6 +1,6 @@
 USING: io io.streams.string io.streams.duplex listener
 tools.test parser math namespaces continuations vocabs kernel
-compiler.units eval vocabs.parser ;
+compiler.units eval vocabs.parser words definitions ;
 IN: listener.tests
 
 SYNTAX: hello "Hi" print ;
@@ -52,3 +52,16 @@ SYNTAX: hello "Hi" print ;
         drop
     ] unit-test
 ] with-file-vocabs
+
+[ "call" "scratchpad" create drop ] with-compilation-unit
+
+[
+    [ t ]
+    [
+        "call" "scratchpad" lookup-word
+        [ "call" search ] with-interactive-vocabs
+        eq?
+    ] unit-test 
+] with-file-vocabs
+
+[ "call" "scratchpad" lookup-word forget ] with-compilation-unit

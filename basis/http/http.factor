@@ -11,7 +11,7 @@ IN: http
 CONSTANT: max-redirects 10
 
 : (read-header) ( -- alist )
-    [ read-crlf dup f like ] [ parse-header-line ] produce nip ;
+    [ read-?crlf dup f like ] [ parse-header-line ] produce nip ;
 
 : collect-headers ( assoc -- assoc' )
     H{ } clone [ '[ _ push-at ] assoc-each ] keep ;
@@ -37,7 +37,7 @@ CONSTANT: max-redirects 10
     [ "Header injection attack" throw ] when ;
 
 : write-header ( assoc -- )
-    >alist sort-keys [
+    sort-keys [
         [ check-header-string write ": " write ]
         [ header-value>string check-header-string write crlf ] bi*
     ] assoc-each crlf ;
@@ -57,7 +57,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
             swap {
                 { "version" [ >>version ] }
                 { "comment" [ >>comment ] }
-                { "expires" [ cookie-string>timestamp >>expires ] }
+                { "expires" [ [ cookie-string>timestamp >>expires ] unless-empty ] }
                 { "max-age" [ string>number seconds >>max-age ] }
                 { "domain" [ >>domain ] }
                 { "path" [ >>path ] }
@@ -108,7 +108,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
 
 : (unparse-cookie) ( cookie -- strings )
     [
-        dup name>> check-cookie-string >lower
+        dup name>> check-cookie-string
         over value>> check-cookie-value unparse-cookie-value
         "$path" over path>> unparse-cookie-value
         "$domain" over domain>> unparse-cookie-value
@@ -120,7 +120,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
 
 : unparse-set-cookie ( cookie -- string )
     [
-        dup name>> check-cookie-string >lower
+        dup name>> check-cookie-string
         over value>> check-cookie-value unparse-cookie-value
         "path" over path>> unparse-cookie-value
         "domain" over domain>> unparse-cookie-value
@@ -144,8 +144,8 @@ redirects ;
     pick header>> set-at ;
 
 : set-basic-auth ( request username password -- request )
-    ":" glue >base64 "Basic " prepend "Authorization" set-header ;
-    
+    ":" glue >base64 "Basic " "" prepend-as "Authorization" set-header ;
+
 : <request> ( -- request )
     request new
         "1.1" >>version

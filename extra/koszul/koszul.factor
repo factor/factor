@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables assocs io kernel locals math
-math.vectors math.matrices math.matrices.elimination namespaces
-parser prettyprint sequences words combinators math.parser
-splitting sorting shuffle sets math.order ;
+USING: accessors arrays assocs combinators fry hashtables io
+kernel locals make math math.matrices math.matrices.elimination
+math.order math.parser math.vectors namespaces prettyprint
+sequences sets shuffle sorting splitting ;
 FROM: namespaces => set ;
 IN: koszul
 
@@ -55,7 +55,7 @@ SYMBOL: terms
 
 ! Addition
 : (alt+) ( x -- )
-    terms get [ [ swap +@ ] assoc-each ] bind ;
+    terms get [ [ swap +@ ] assoc-each ] with-variables ;
 
 : alt+ ( x y -- x+y )
     [ >alt ] bi@ [ (alt+) (alt+) ] with-terms ;
@@ -89,14 +89,14 @@ SYMBOL: terms
 
 : wedge ( x y -- x.y )
     [ >alt ] bi@ [
-        swap [
+        swap building get '[
             [
                 2swap [
-                    swapd * -rot (wedge) +@
+                    swapd * -rot (wedge) _ at+
                 ] 2keep
             ] assoc-each 2drop
         ] curry assoc-each
-    ] H{ } make-assoc canonicalize ;
+    ] H{ } make canonicalize ;
 
 ! Differential
 SYMBOL: boundaries

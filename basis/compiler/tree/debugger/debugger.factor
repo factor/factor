@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
-prettyprint prettyprint.backend prettyprint.custom
-prettyprint.sections math words combinators
+prettyprint prettyprint.backend prettyprint.config
+prettyprint.custom prettyprint.sections math words combinators
 combinators.short-circuit io sorting hints sets
 compiler.tree
 compiler.tree.recursive
@@ -123,14 +123,14 @@ M: #if node>quot
 M: #dispatch node>quot
     children>> [ nodes>quot ] map , \ dispatch , ;
 
-M: #alien-invoke node>quot params>> , \ #alien-invoke , ;
+M: #alien-invoke node>quot params>> , #alien-invoke , ;
 
-M: #alien-indirect node>quot params>> , \ #alien-indirect , ;
+M: #alien-indirect node>quot params>> , #alien-indirect , ;
 
-M: #alien-assembly node>quot params>> , \ #alien-assembly , ;
+M: #alien-assembly node>quot params>> , #alien-assembly , ;
 
 M: #alien-callback node>quot
-    [ params>> , ] [ child>> nodes>quot , ] bi \ #alien-callback , ;
+    [ params>> , ] [ child>> nodes>quot , ] bi #alien-callback , ;
 
 M: node node>quot drop ;
 
@@ -141,7 +141,9 @@ GENERIC: optimized. ( quot/word -- )
 
 M: word optimized. specialized-def optimized. ;
 
-M: callable optimized. build-tree optimize-tree nodes>quot . ;
+M: callable optimized.
+    build-tree optimize-tree nodes>quot
+    f length-limit [ . ] with-variable ;
 
 SYMBOL: words-called
 SYMBOL: generics-called
@@ -153,10 +155,10 @@ SYMBOL: node-count
     [
         build-tree optimize-tree
 
-        H{ } clone words-called set
-        H{ } clone generics-called set
-        H{ } clone methods-called set
-        H{ } clone intrinsics-called set
+        H{ } clone words-called ,,
+        H{ } clone generics-called ,,
+        H{ } clone methods-called ,,
+        H{ } clone intrinsics-called ,,
 
         0 swap [
             [ 1 + ] dip
@@ -166,11 +168,11 @@ SYMBOL: node-count
                     { [ dup generic? ] [ generics-called ] }
                     { [ dup method? ] [ methods-called ] }
                     [ words-called ]
-                } cond get inc-at
+                } cond building get at inc-at
             ] [ drop ] if
         ] each-node
-        node-count set
-    ] H{ } make-assoc ;
+        node-count ,,
+    ] H{ } make ;
 
 : report. ( report -- )
     [
@@ -185,7 +187,7 @@ SYMBOL: node-count
         } [
             nl print get keys natural-sort stack.
         ] assoc-each
-    ] bind ;
+    ] with-variables ;
 
 : optimizer-report. ( word -- )
     make-report report. ;

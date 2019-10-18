@@ -67,7 +67,16 @@ HELP: tag-named
     { "name/string" "an XML name or string representing the name" }
     { "matching-tag" tag } }
 { $description "Finds the first tag with matching name which is the direct child of the given tag." }
-{ $see-also deep-tags-named deep-tag-named tags-named } ;
+{ $see-also deep-tags-named deep-tag-named tag-named-with-attr tags-named } ;
+
+HELP: tag-named-with-attr
+{ $values { "tag" "an XML tag or document" }
+    { "tag-name" "an XML name or string representing the name" }
+    { "attr-value" "a string representing the attribute value" }
+    { "attr-name" "a string representing the attribute name" }
+    { "matching-tag" tag } }
+{ $description "Finds the first tag with matching name with the corresponding attribute name and value which is the direct child of the given tag." }
+{ $see-also tag-named } ;
 
 HELP: tags-named
 { $values { "tag" "an XML tag or document" }

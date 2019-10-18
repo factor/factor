@@ -1,6 +1,7 @@
 USING: kernel alien.c-types alien.data alien.strings sequences
 math alien.syntax unix namespaces continuations threads assocs
-io.backend.unix io.encodings.utf8 unix.types unix.utilities fry ;
+io.backend.unix io.encodings.utf8 unix.types unix.utilities fry 
+unix.ffi ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used
@@ -38,10 +39,9 @@ FUNCTION: int execve ( c-string path, c-string* argv, c-string* envp ) ;
 : with-fork ( child parent -- )
     [ fork-process ] 2dip if-zero ; inline
 
-CONSTANT: SIGKILL 9
-CONSTANT: SIGTERM 15
-
 FUNCTION: int kill ( pid_t pid, int sig ) ;
+FUNCTION: int raise ( int sig ) ;
+
 
 CONSTANT: PRIO_PROCESS 0
 CONSTANT: PRIO_PGRP 1
@@ -65,30 +65,30 @@ CONSTANT: WUNTRACED 2
 CONSTANT: WSTOPPED   2
 CONSTANT: WEXITED    4
 CONSTANT: WCONTINUED 8
-CONSTANT: WNOWAIT    HEX: 1000000
+CONSTANT: WNOWAIT    0x1000000
 
 ! Examining status
 
 : WTERMSIG ( status -- value )
-    HEX: 7f bitand ; inline
+    0x7f bitand ; inline
 
 : WIFEXITED ( status -- ? )
     WTERMSIG 0 = ; inline
 
 : WEXITSTATUS ( status -- value )
-    HEX: ff00 bitand -8 shift ; inline
+    0xff00 bitand -8 shift ; inline
 
 : WIFSIGNALED ( status -- ? )
-    HEX: 7f bitand 1 + -1 shift 0 > ; inline
+    0x7f bitand 1 + -1 shift 0 > ; inline
 
 : WCOREFLAG ( -- value )
-    HEX: 80 ; inline
+    0x80 ; inline
 
 : WCOREDUMP ( status -- ? )
     WCOREFLAG bitand 0 = not ; inline
 
 : WIFSTOPPED ( status -- ? )
-    HEX: ff bitand HEX: 7f = ; inline
+    0xff bitand 0x7f = ; inline
 
 : WSTOPSIG ( status -- value )
     WEXITSTATUS ; inline

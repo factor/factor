@@ -1,13 +1,16 @@
-! Copyright (C) 2007, 2010 Slava Pestov.
+! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler cpu.x86.assembler.operands layouts
-vocabs parser compiler.constants sequences math math.private
-generic.single.private threads.private ;
+vocabs parser compiler.constants compiler.codegen.relocation
+sequences math math.private generic.single.private
+threads.private locals ;
 IN: bootstrap.x86
 
 4 \ cell set
 
+: leaf-stack-frame-size ( -- n ) 4 bootstrap-cells ;
+: signal-handler-stack-frame-size ( -- n ) 12 bootstrap-cells ;
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : shift-arg ( -- reg ) ECX ;
 : div-arg ( -- reg ) EAX ;
@@ -22,32 +25,25 @@ IN: bootstrap.x86
 : vm-reg ( -- reg ) EBX ;
 : ctx-reg ( -- reg ) EBP ;
 : nv-regs ( -- seq ) { ESI EDI EBX } ;
+: volatile-regs ( -- seq ) { EAX ECX EDX } ;
 : nv-reg ( -- reg ) ESI ;
 : ds-reg ( -- reg ) ESI ;
 : rs-reg ( -- reg ) EDI ;
 : link-reg ( -- reg ) EBX ;
 : fixnum>slot@ ( -- ) temp0 2 SAR ;
 : rex-length ( -- n ) 0 ;
+: red-zone-size ( -- n ) 0 ;
 
 : jit-call ( name -- )
-    0 CALL rc-relative jit-dlsym ;
+    0 CALL f rc-relative rel-dlsym ;
 
 [
-    ! save stack frame size
-    stack-frame-size PUSH
-    ! push entry point
-    0 PUSH rc-absolute-cell rt-this jit-rel
-    ! alignment
-    ESP stack-frame-size 3 bootstrap-cells - SUB
-] jit-prolog jit-define
-
-[
-    pic-tail-reg 0 MOV rc-absolute-cell rt-here jit-rel
-    0 JMP rc-relative rt-entry-point-pic-tail jit-rel
+    pic-tail-reg 0 MOV 0 rc-absolute-cell rel-here
+    0 JMP f rc-relative rel-word-pic-tail
 ] jit-word-jump jit-define
 
 : jit-load-vm ( -- )
-    vm-reg 0 MOV 0 rc-absolute-cell jit-vm ;
+    vm-reg 0 MOV 0 rc-absolute-cell rel-vm ;
 
 : jit-load-context ( -- )
     ! VM pointer must be in vm-reg already
@@ -65,13 +61,13 @@ IN: bootstrap.x86
     rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
 [
-    ! ctx-reg is preserved across the call because it is non-volatile
-    ! in the C ABI
+    ! ctx-reg is preserved across the call because it is
+    ! non-volatile in the C ABI
     jit-load-vm
     jit-save-context
     ! call the primitive
     ESP [] vm-reg MOV
-    0 CALL rc-relative rt-dlsym jit-rel
+    0 CALL f f rc-relative rel-dlsym
     jit-restore-context
 ] jit-primitive jit-define
 
@@ -95,6 +91,9 @@ IN: bootstrap.x86
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
+: signal-handler-save-regs ( -- regs )
+    { EAX ECX EDX EBX EBP ESI EDI } ;
+
 [
     EAX ds-reg [] MOV
     ds-reg bootstrap-cell SUB
@@ -103,18 +102,23 @@ IN: bootstrap.x86
 [ jit-jump-quot ]
 \ (call) define-combinator-primitive
 
+! unwind-native-frames is marked as "special" in vm/quotations.cpp
+! so it does not have a standard prolog
 [
     ! Load ds and rs registers
     jit-load-vm
     jit-load-context
     jit-restore-context
 
+    ! clear the fault flag
+    vm-reg vm-fault-flag-offset [+] 0 MOV
+
     ! Windows-specific setup
     ctx-reg jit-update-seh
 
     ! Load arguments
-    EAX ESP stack-frame-size [+] MOV
-    EDX ESP stack-frame-size 4 + [+] MOV
+    EAX ESP bootstrap-cell [+] MOV
+    EDX ESP 2 bootstrap-cells [+] MOV
 
     ! Unwind stack frames
     ESP EDX MOV
@@ -177,7 +181,7 @@ IN: bootstrap.x86
 \ lazy-jit-compile define-combinator-primitive
 
 [
-    temp1 HEX: ffffffff CMP rc-absolute-cell rt-literal jit-rel
+    temp1 0xffffffff CMP f rc-absolute-cell rel-literal
 ] pic-check-tuple jit-define
 
 ! Inline cache miss entry points
@@ -191,7 +195,7 @@ IN: bootstrap.x86
     jit-save-context
     ESP 4 [+] vm-reg MOV
     ESP [] pic-tail-reg MOV
-    "inline_cache_miss" jit-call
+    0 CALL rc-relative rel-inline-cache-miss
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
@@ -252,9 +256,9 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    ! Reset return value since its bogus right now, to avoid
-    ! confusing the GC
-    ESP -4 [+] 0 MOV
+    ! Push a bogus return address so the GC can track this frame back
+    ! to the owner
+    0 CALL
 
     ! Make the new context the current one
     ctx-reg swap MOV
@@ -357,6 +361,10 @@ IN: bootstrap.x86
 
     EAX EDX [] MOV
     jit-jump-quot ;
+
+[
+    0 EAX MOVABS rc-absolute rel-safepoint
+] \ jit-safepoint jit-define
 
 [
     jit-start-context-and-delete

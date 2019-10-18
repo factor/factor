@@ -2,34 +2,31 @@ USING: alien alien.syntax alien.c-types alien.parser
 eval kernel tools.test sequences system libc alien.strings
 io.encodings.ascii io.encodings.utf8 math.constants classes.struct classes
 accessors compiler.units ;
+FROM: alien.c-types => short ;
 IN: alien.c-types.tests
 
 CONSTANT: xyz 123
 
 [ 492 ] [ { int xyz } heap-size ] unit-test
 
-[ -1 ] [ -1 <char> *char ] unit-test
-[ -1 ] [ -1 <short> *short ] unit-test
-[ -1 ] [ -1 <int> *int ] unit-test
-
 UNION-STRUCT: foo
     { a int }
     { b int } ;
 
-[ t ] [ pointer: void c-type void* c-type = ] unit-test
-[ t ] [ pointer: int  c-type void* c-type = ] unit-test
-[ t ] [ pointer: int* c-type void* c-type = ] unit-test
-[ f ] [ pointer: foo  c-type void* c-type = ] unit-test
-[ t ] [ pointer: foo* c-type void* c-type = ] unit-test
+[ t ] [ pointer: void lookup-c-type void* lookup-c-type = ] unit-test
+[ t ] [ pointer: int  lookup-c-type void* lookup-c-type = ] unit-test
+[ t ] [ pointer: int* lookup-c-type void* lookup-c-type = ] unit-test
+[ f ] [ pointer: foo  lookup-c-type void* lookup-c-type = ] unit-test
+[ t ] [ pointer: foo* lookup-c-type void* lookup-c-type = ] unit-test
 
-[ t ] [ c-string c-type c-string c-type = ] unit-test
+[ t ] [ c-string lookup-c-type c-string lookup-c-type = ] unit-test
 
 [ t ] [ foo heap-size int heap-size = ] unit-test
 
 TYPEDEF: int MyInt
 
-[ t ] [ int   c-type          MyInt c-type = ] unit-test
-[ t ] [ void* c-type pointer: MyInt c-type = ] unit-test
+[ t ] [ int   lookup-c-type          MyInt lookup-c-type = ] unit-test
+[ t ] [ void* lookup-c-type pointer: MyInt lookup-c-type = ] unit-test
 
 [ 32 ] [ { int 8 } heap-size ] unit-test
 
@@ -37,28 +34,20 @@ TYPEDEF: int MyInt
 
 TYPEDEF: char MyChar
 
-[ t ] [ pointer: void c-type pointer: MyChar c-type = ] unit-test
+[ t ] [ pointer: void lookup-c-type pointer: MyChar lookup-c-type = ] unit-test
 
 TYPEDEF: { c-string ascii } MyFunkyString
 
-[ { c-string ascii } ] [ MyFunkyString c-type ] unit-test
+[ { c-string ascii } ] [ MyFunkyString lookup-c-type ] unit-test
 
 TYPEDEF: c-string MyString
 
-[ t ] [ c-string c-type MyString          c-type = ] unit-test
-[ t ] [ void* c-type pointer: MyString c-type = ] unit-test
+[ t ] [ c-string lookup-c-type MyString          lookup-c-type = ] unit-test
+[ t ] [ void* lookup-c-type pointer: MyString lookup-c-type = ] unit-test
 
 TYPEDEF: int* MyIntArray
 
-[ t ] [ void* c-type MyIntArray c-type = ] unit-test
-
-[
-    0 B{ 1 2 3 4 } <displaced-alien> <void*>
-] must-fail
-
-os windows? cpu x86.64? and [
-    [ -2147467259 ] [ 2147500037 <long> *long ] unit-test
-] when
+[ t ] [ void* lookup-c-type MyIntArray lookup-c-type = ] unit-test
 
 [ 0 ] [ -10 uchar c-type-clamp ] unit-test
 [ 12 ] [ 12 uchar c-type-clamp ] unit-test
@@ -68,8 +57,8 @@ os windows? cpu x86.64? and [
 
 C-TYPE: opaque
 
-[ t ] [ void* c-type pointer: opaque c-type = ] unit-test
-[ opaque c-type ] [ no-c-type? ] must-fail-with
+[ t ] [ void* lookup-c-type pointer: opaque lookup-c-type = ] unit-test
+[ opaque lookup-c-type ] [ no-c-type? ] must-fail-with
 
 [ """
     USING: alien.syntax ;
@@ -81,8 +70,8 @@ C-TYPE: forward
 STRUCT: backward { x forward* } ;
 STRUCT: forward { x backward* } ;
 
-[ t ] [ forward c-type struct-c-type? ] unit-test
-[ t ] [ backward c-type struct-c-type? ] unit-test
+[ t ] [ forward lookup-c-type struct-c-type? ] unit-test
+[ t ] [ backward lookup-c-type struct-c-type? ] unit-test
 
 DEFER: struct-redefined
 

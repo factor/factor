@@ -12,10 +12,10 @@ IN: checksums
 
 : test-data ( -- bytes )
     B{
-        HEX: 00 HEX: 01
-        HEX: f2 HEX: 03
-        HEX: f4 HEX: f5
-        HEX: f6 HEX: f7
+        0x00 0x01
+        0xf2 0x03
+        0xf4 0xf5
+        0xf6 0xf7
     } ;
 
 [ B{ 34 13 } ] [ test-data internet checksum-bytes ] unit-test

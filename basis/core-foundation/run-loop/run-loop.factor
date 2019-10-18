@@ -80,41 +80,38 @@ TUPLE: run-loop fds sources timers ;
 : add-fd-to-run-loop ( fd callback -- )
     [
         <CFFileDescriptor> |CFRelease
+        [ enable-all-callbacks ]
         [ run-loop fds>> push ]
         [ create-fd-source |CFRelease add-source-to-run-loop ]
-        bi
+        tri
     ] with-destructors ;
-
-: add-timer-to-run-loop ( timer -- )
-    [ run-loop timers>> push ]
-    [
-        CFRunLoopGetMain
-        swap CFRunLoopDefaultMode
-        CFRunLoopAddTimer
-    ] bi ;
-
-: invalidate-run-loop-timers ( -- )
-    run-loop [
-        [ [ CFRunLoopTimerInvalidate ] [ CFRelease ] bi ] each
-        V{ } clone
-    ] change-timers drop ;
 
 <PRIVATE
 
 : (reset-timer) ( timer timestamp -- )
     >CFAbsoluteTime CFRunLoopTimerSetNextFireDate ;
 
-: nano-count>micros ( x -- n )
-    nano-count - 1,000 /f system-micros + ;
-
 : reset-timer ( timer -- )
-    {
-        { [ run-queue deque-empty? not ] [ system-micros ] }
-        { [ sleep-queue heap-empty? not ] [ sleep-queue heap-peek nip nano-count>micros ] }
-        [ system-micros 1,000,000 + ]
-    } cond (reset-timer) ;
+    sleep-time
+    [ 1000 /f ] [ 1,000,000 ] if* system-micros +
+    (reset-timer) ;
 
 PRIVATE>
+
+: add-timer-to-run-loop ( timer -- )
+    [ reset-timer ]
+    [ run-loop timers>> push ]
+    [
+        CFRunLoopGetMain
+        swap CFRunLoopDefaultMode
+        CFRunLoopAddTimer
+    ] tri ;
+
+: invalidate-run-loop-timers ( -- )
+    run-loop [
+        [ [ CFRunLoopTimerInvalidate ] [ CFRelease ] bi ] each
+        V{ } clone
+    ] change-timers drop ;
 
 : reset-run-loop ( -- )
     run-loop
@@ -123,13 +120,12 @@ PRIVATE>
 
 : timer-callback ( -- callback )
     void { CFRunLoopTimerRef void* } cdecl
-    [ 2drop reset-run-loop yield ] alien-callback ;
+    [ drop reset-timer yield ] alien-callback ;
 
 : init-thread-timer ( -- )
-    timer-callback <CFTimer> add-timer-to-run-loop ;
+    60 timer-callback <CFTimer> add-timer-to-run-loop ;
 
 : run-one-iteration ( nanos -- handled? )
-    reset-run-loop
     CFRunLoopDefaultMode
-    swap [ nanoseconds ] [ 5 minutes ] if* >CFTimeInterval
+    swap [ 1,000,000,000 / ] [ 300 ] if*
     t CFRunLoopRunInMode kCFRunLoopRunHandledSource = ;

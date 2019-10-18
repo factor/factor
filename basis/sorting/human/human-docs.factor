@@ -6,8 +6,8 @@ IN: sorting.human
 
 HELP: find-numbers
 { $values
-     { "string" string }
-     { "seq" sequence }
+     { "sequence" sequence }
+     { "sequence'" sequence }
 }
 { $description "Splits a string on numbers and returns a sequence of sequences and integers." } ;
 

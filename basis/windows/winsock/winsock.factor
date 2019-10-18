@@ -7,10 +7,10 @@ classes.struct windows.com.syntax init ;
 FROM: alien.c-types => short ;
 IN: windows.winsock
 
-TYPEDEF: void* SOCKET
+TYPEDEF: int* SOCKET
 
 : <wsadata> ( -- byte-array )
-    HEX: 190 <byte-array> ;
+    0x190 <byte-array> ;
 
 CONSTANT: SOCK_STREAM    1
 CONSTANT: SOCK_DGRAM     2
@@ -18,27 +18,27 @@ CONSTANT: SOCK_RAW       3
 CONSTANT: SOCK_RDM       4
 CONSTANT: SOCK_SEQPACKET 5
 
-CONSTANT: SO_DEBUG       HEX:   1
-CONSTANT: SO_ACCEPTCONN  HEX:   2
-CONSTANT: SO_REUSEADDR   HEX:   4
-CONSTANT: SO_KEEPALIVE   HEX:   8
-CONSTANT: SO_DONTROUTE   HEX:  10
-CONSTANT: SO_BROADCAST   HEX:  20
-CONSTANT: SO_USELOOPBACK HEX:  40
-CONSTANT: SO_LINGER      HEX:  80
-CONSTANT: SO_OOBINLINE   HEX: 100
+CONSTANT: SO_DEBUG       0x1
+CONSTANT: SO_ACCEPTCONN  0x2
+CONSTANT: SO_REUSEADDR   0x4
+CONSTANT: SO_KEEPALIVE   0x8
+CONSTANT: SO_DONTROUTE   0x10
+CONSTANT: SO_BROADCAST   0x20
+CONSTANT: SO_USELOOPBACK 0x40
+CONSTANT: SO_LINGER      0x80
+CONSTANT: SO_OOBINLINE   0x100
 : SO_DONTLINGER ( -- n ) SO_LINGER bitnot ; inline
 
-CONSTANT: SO_SNDBUF     HEX: 1001
-CONSTANT: SO_RCVBUF     HEX: 1002
-CONSTANT: SO_SNDLOWAT   HEX: 1003
-CONSTANT: SO_RCVLOWAT   HEX: 1004
-CONSTANT: SO_SNDTIMEO   HEX: 1005
-CONSTANT: SO_RCVTIMEO   HEX: 1006
-CONSTANT: SO_ERROR      HEX: 1007
-CONSTANT: SO_TYPE       HEX: 1008
+CONSTANT: SO_SNDBUF     0x1001
+CONSTANT: SO_RCVBUF     0x1002
+CONSTANT: SO_SNDLOWAT   0x1003
+CONSTANT: SO_RCVLOWAT   0x1004
+CONSTANT: SO_SNDTIMEO   0x1005
+CONSTANT: SO_RCVTIMEO   0x1006
+CONSTANT: SO_ERROR      0x1007
+CONSTANT: SO_TYPE       0x1008
 
-CONSTANT: TCP_NODELAY   HEX:    1
+CONSTANT: TCP_NODELAY   0x1
 
 CONSTANT: AF_UNSPEC      0
 CONSTANT: AF_UNIX        1
@@ -96,13 +96,13 @@ CONSTANT: INADDR_ANY 0
 
 : INVALID_SOCKET ( -- n ) -1 <alien> ; inline
 
-CONSTANT: SOCKET_ERROR -1
+: SOCKET_ERROR ( -- n ) -1 <alien> ; inline
 
 CONSTANT: SD_RECV 0
 CONSTANT: SD_SEND 1
 CONSTANT: SD_BOTH 2
 
-CONSTANT: SOL_SOCKET HEX: ffff
+CONSTANT: SOL_SOCKET 0xffff
 
 C-TYPE: sockaddr
 
@@ -125,6 +125,11 @@ STRUCT: hostent
     { addrtype short }
     { length short }
     { addr-list void* } ;
+
+STRUCT: protoent
+    { name c-string }
+    { aliases void* }
+    { proto short } ;
 
 STRUCT: addrinfo
     { flags int }
@@ -170,6 +175,8 @@ FUNCTION: int recv ( SOCKET s, c-string buf, int len, int flags ) ;
 
 FUNCTION: int getsockname ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
 FUNCTION: int getpeername ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
+
+FUNCTION: protoent* getprotobyname ( c-string name ) ;
 
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED
@@ -376,7 +383,6 @@ FUNCTION: DWORD WSAWaitForMultipleEvents ( DWORD cEvents,
 
 LIBRARY: mswsock
 
-! Not in Windows CE
 FUNCTION: int AcceptEx ( void* listen, void* accept, void* out-buf, int recv-len, int addr-len, int remote-len, void* out-len, void* overlapped ) ;
 
 FUNCTION: void GetAcceptExSockaddrs (
@@ -394,35 +400,40 @@ CONSTANT: SIO_GET_EXTENSION_FUNCTION_POINTER -939524090
 
 CONSTANT: WSAID_CONNECTEX GUID: {25a207b9-ddf3-4660-8ee9-76e58c74063e}
 
+ERROR: winsock-exception n string ;
+
 : winsock-expected-error? ( n -- ? )
     ${ ERROR_IO_PENDING ERROR_SUCCESS WSA_IO_PENDING } member? ;
 
-: (winsock-error-string) ( n -- str )
+: (maybe-winsock-exception) ( n -- winsock-exception/f )
     ! #! WSAStartup returns the error code 'n' directly
     dup winsock-expected-error?
-    [ drop f ] [ n>win32-error-string ] if ;
+    [ drop f ] [ [ ] [ n>win32-error-string ] bi \ winsock-exception boa ] if ;
 
-: winsock-error-string ( -- string/f )
-    WSAGetLastError (winsock-error-string) ;
+: maybe-winsock-exception ( -- winsock-exception/f )
+    WSAGetLastError (maybe-winsock-exception) ;
 
 : winsock-error ( -- )
-    winsock-error-string [ throw ] when* ;
+    maybe-winsock-exception [ throw ] when* ;
 
+: (throw-winsock-error) ( n -- * )
+    [ ] [ n>win32-error-string ] bi winsock-exception ;
+
+: throw-winsock-error ( -- * )
+    WSAGetLastError (throw-winsock-error) ;
+    
 : winsock-error=0/f ( n/f -- )
-    { 0 f } member? [
-        winsock-error-string throw
-    ] when ;
+    { 0 f } member? [ throw-winsock-error ] when ;
 
 : winsock-error!=0/f ( n/f -- )
-    { 0 f } member? [
-        winsock-error-string throw
-    ] unless ;
+    { 0 f } member? [ throw-winsock-error ] unless ;
 
+! WSAStartup and WSACleanup return the error code directly
 : winsock-return-check ( n/f -- )
     dup { 0 f } member? [
         drop
     ] [
-        (winsock-error-string) throw
+        [ ] [ n>win32-error-string ] bi winsock-exception
     ] if ;
 
 : socket-error* ( n -- )
@@ -431,7 +442,7 @@ CONSTANT: WSAID_CONNECTEX GUID: {25a207b9-ddf3-4660-8ee9-76e58c74063e}
         dup WSA_IO_PENDING = [
             drop
         ] [
-            (winsock-error-string) throw
+            (maybe-winsock-exception) throw
         ] if
     ] when ;
 
@@ -439,7 +450,7 @@ CONSTANT: WSAID_CONNECTEX GUID: {25a207b9-ddf3-4660-8ee9-76e58c74063e}
     SOCKET_ERROR = [ winsock-error ] when ;
 
 : init-winsock ( -- )
-    HEX: 0202 <wsadata> WSAStartup winsock-return-check ;
+    0x0202 <wsadata> WSAStartup winsock-return-check ;
 
 : shutdown-winsock ( -- ) WSACleanup winsock-return-check ;
 

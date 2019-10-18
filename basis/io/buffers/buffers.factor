@@ -14,12 +14,12 @@ TUPLE: buffer
 disposed ;
 
 : <buffer> ( n -- buffer )
-    dup malloc 0 0 f buffer boa ;
+    dup malloc 0 0 f buffer boa ; inline
 
-M: buffer dispose* ptr>> free ;
+M: buffer dispose* ptr>> free ; inline
 
 : buffer-reset ( n buffer -- )
-    swap >>fill 0 >>pos drop ;
+    swap >>fill 0 >>pos drop ; inline
 
 : buffer-capacity ( buffer -- n )
     [ size>> ] [ fill>> ] bi - >fixnum ; inline
@@ -39,15 +39,17 @@ M: buffer dispose* ptr>> free ;
     [ buffer-peek ] [ 1 swap buffer-consume ] bi ; inline
 
 : buffer-length ( buffer -- n )
-    [ fill>> ] [ pos>> ] bi - ; inline
+    [ fill>> ] [ pos>> ] bi - >fixnum ; inline
 
 : buffer@ ( buffer -- alien )
     [ pos>> ] [ ptr>> ] bi <displaced-alien> ; inline
 
-: buffer-read ( n buffer -- byte-array )
+: buffer-read-unsafe ( n buffer -- n ptr )
     [ buffer-length min ] keep
-    [ buffer@ ] [ buffer-consume ] 2bi
-    swap memory>byte-array ;
+    [ buffer@ ] [ buffer-consume ] 2bi ; inline
+
+: buffer-read ( n buffer -- byte-array )
+    buffer-read-unsafe swap memory>byte-array ;
 
 HINTS: buffer-read fixnum buffer ;
 

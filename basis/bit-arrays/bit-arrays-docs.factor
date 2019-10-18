@@ -43,7 +43,7 @@ HELP: ?{
 HELP: bit-array
 { $description "The class of fixed-length bit arrays." } ;
 
-HELP: <bit-array> ( n -- bit-array )
+HELP: <bit-array>
 { $values { "n" "a non-negative integer" } { "bit-array" "a new " { $link bit-array } } }
 { $description "Creates a new bit array with the given length and all elements initially set to " { $link f } "." } ;
 

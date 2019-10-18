@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings classes.struct
-io.encodings.utf8 kernel namespaces sequences
+USING: accessors alien.c-types alien.data alien.strings
+classes.struct io.encodings.utf8 kernel namespaces sequences
 specialized-arrays x11 x11.constants x11.xlib ;
 SPECIALIZED-ARRAY: int
 IN: x11.clipboard
@@ -28,11 +28,11 @@ TUPLE: x-clipboard atom contents ;
     CurrentTime XConvertSelection drop ;
 
 : snarf-property ( prop-return -- string )
-    dup *void* [ *void* utf8 alien>string ] [ drop f ] if ;
+    dup void* deref [ void* deref utf8 alien>string ] [ drop f ] if ;
 
 : window-property ( win prop delete? -- string )
     [ [ dpy get ] 2dip 0 -1 ] dip AnyPropertyType
-    0 <Atom> 0 <int> 0 <ulong> 0 <ulong> f <void*>
+    0 Atom <ref> 0 int <ref> 0 ulong <ref> 0 ulong <ref> f void* <ref>
     [ XGetWindowProperty drop ] keep snarf-property ;
 
 : selection-from-event ( event window -- string )
@@ -53,7 +53,7 @@ TUPLE: x-clipboard atom contents ;
     [ dpy get ] dip
     [ requestor>> ]
     [ property>> XA_TIMESTAMP 32 PropModeReplace ]
-    [ time>> <int> ] tri
+    [ time>> int <ref> ] tri
     1 XChangeProperty drop ;
 
 : send-notify ( evt prop -- )

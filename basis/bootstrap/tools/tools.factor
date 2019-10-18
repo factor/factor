@@ -1,4 +1,4 @@
-USING: vocabs.loader sequences system combinators ;
+USING: vocabs sequences system combinators ;
 IN: bootstrap.tools
 
 {
@@ -14,7 +14,7 @@ IN: bootstrap.tools
     "tools.disassembler"
     "tools.dispatch"
     "tools.memory"
-    "tools.profiler"
+    "tools.profiler.sampling"
     "tools.test"
     "tools.time"
     "tools.threads"

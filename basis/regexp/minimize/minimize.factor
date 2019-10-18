@@ -47,7 +47,7 @@ IN: regexp.minimize
     over '[ drop first2 _ _ stay-same? ] assoc-filter ;
 
 : partition>classes ( partitions -- synonyms ) ! old-state => new-state
-    >alist sort-keys
+    sort-keys
     [ drop first2 swap ] assoc-map
     <reversed>
     >hashtable ;

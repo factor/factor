@@ -6,6 +6,7 @@ USING: accessors arrays byte-arrays fry hints kernel lists make math
     math.primes.lists math.primes.miller-rabin math.ranges math.ratios
     namespaces parser prettyprint quotations sequences sorting strings
     unicode.case vocabs vocabs.parser words ;
+FROM: sequences => change-nth ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -79,7 +80,7 @@ PRIVATE>
     ] if ;
 
 : number>digits ( n -- seq )
-    [ dup 0 = not ] [ 10 /mod ] produce reverse nip ;
+    [ dup 0 = not ] [ 10 /mod ] produce reverse! nip ;
 
 : number-length ( n -- m )
     abs [
@@ -117,7 +118,7 @@ PRIVATE>
     [ propagate dup ] map nip reverse swap suffix ;
 
 : permutations? ( n m -- ? )
-    [ count-digits ] bi@ = ;
+    [ count-digits ] same? ;
 
 : sum-divisors ( n -- sum )
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
@@ -158,5 +159,5 @@ SYNTAX: SOLUTION:
     scan-word
     [ name>> "-main" append create-in ] keep
     [ drop current-vocab main<< ]
-    [ [ . ] swap prefix (( -- )) define-declared ]
+    [ [ . ] swap prefix ( -- ) define-declared ]
     2bi ;

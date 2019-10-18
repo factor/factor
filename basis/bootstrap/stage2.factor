@@ -1,11 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors init namespaces words words.symbol io
-kernel.private math memory continuations kernel io.files
-io.pathnames io.backend system parser vocabs sequences
-vocabs.loader combinators splitting source-files strings
-definitions assocs compiler.units math.parser
-generic sets command-line ;
+USING: command-line compiler.units continuations definitions io
+io.pathnames kernel math math.parser memory namespaces parser
+parser.notes sequences sets splitting system
+vocabs vocabs.loader ;
 IN: bootstrap.stage2
 
 SYMBOL: core-bootstrap-time
@@ -62,6 +60,10 @@ SYMBOL: bootstrap-time
     ! We time bootstrap
     nano-count
 
+    ! parser.notes sets this to t in the global namespace.
+    ! We have to change it back in finish-bootstrap.factor
+    f parser-quiet? set-global
+
     default-image-name "output-image" set-global
 
     "math compiler threads help io tools ui ui.tools unicode handbook" "include" set-global
@@ -72,8 +74,7 @@ SYMBOL: bootstrap-time
     (command-line) parse-command-line
 
     ! Set dll paths
-    os wince? [ "windows.ce" require ] when
-    os winnt? [ "windows.nt" require ] when
+    os windows? [ "windows" require ] when
 
     "staging" get "deploy-vocab" get or [
         "stage2: deployment mode" print

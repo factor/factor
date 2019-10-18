@@ -5,7 +5,7 @@ IN: sbufs
 ARTICLE: "sbufs" "String buffers"
 "The " { $vocab-link "sbufs" } " vocabulary implements resizable mutable sequence of characters. The literal syntax is covered in " { $link "syntax-sbufs" } "."
 $nl
-"String buffers implement the " { $link "sequence-protocol" } " and thus all " { $link "sequences" } " can be used with them. String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words are more convenient to use in most cases (see " { $link "namespaces-make" } ")."
+"String buffers implement the " { $link "sequence-protocol" } " and thus all " { $link "sequences" } " can be used with them. String buffers can be used to construct new strings by accumulating substrings and characters, however usually they are only used indirectly, since the sequence construction words are more convenient to use in most cases (see " { $link "namespaces-make" } ")."
 $nl
 "String buffers form a class of objects:"
 { $subsections

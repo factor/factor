@@ -11,7 +11,7 @@ IN: alien.remote-control.tests
     try-process ;
 
 : run-test ( -- line )
-    os windows? "temp/a.exe" "temp/a.out" ?
+    os windows? "a.exe" "a.out" ?
     ascii [ readln ] with-process-reader ;
 
 :: test-embedding ( code -- line )
@@ -36,8 +36,8 @@ int main(int argc, char **argv)
 }
         ]I
     ] with-string-writer
-    "resource:temp" [ compile-file ] with-directory
-    "resource:" [ run-test ] with-directory ;
+    [ compile-file ] with-temp-directory
+    [ run-test ] with-temp-directory ;
 
 ! [ "Done." ] [ "" test-embedding ] unit-test
 

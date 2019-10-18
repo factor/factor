@@ -1,9 +1,10 @@
-! Copyright (C) 2005, 2010 Slava Pestov.
+! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals alien alien.c-types alien.libraries alien.syntax
 arrays kernel fry math namespaces sequences system layouts io
 vocabs.loader accessors init classes.struct combinators make
-words compiler.constants compiler.codegen.fixup
+words compiler.constants compiler.codegen.gc-maps
+compiler.codegen.labels compiler.codegen.relocation
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.builder.alien.boxing compiler.cfg.intrinsics
 compiler.cfg.stack-frame cpu.x86.assembler
@@ -12,7 +13,7 @@ FROM: layouts => cell ;
 IN: cpu.x86.32
 
 : x86-float-regs ( -- seq )
-    "cpu.x86.sse" vocab
+    "cpu.x86.sse" lookup-vocab
     { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 }
     { ST0 ST1 ST2 ST3 ST4 ST5 ST6 }
     ? ;
@@ -45,13 +46,13 @@ M: x86.32 %vm-field-ptr ( dst field -- )
     [ 0 MOV ] dip rc-absolute-cell rel-vm ;
 
 M: x86.32 %mark-card
-    drop HEX: ffffffff [+] card-mark <byte> MOV
+    drop 0xffffffff [+] card-mark <byte> MOV
     building get pop
     rc-absolute-cell rel-cards-offset
     building get push ;
 
 M: x86.32 %mark-deck
-    drop HEX: ffffffff [+] card-mark <byte> MOV
+    drop 0xffffffff [+] card-mark <byte> MOV
     building get pop
     rc-absolute-cell rel-decks-offset
     building get push ;
@@ -66,10 +67,10 @@ M: x86.32 vm-stack-space 16 ;
     stack@ 0 MOV 0 rc-absolute-cell rel-vm ;
 
 M: x86.32 return-struct-in-registers? ( c-type -- ? )
-    c-type
+    lookup-c-type
     [ return-in-registers?>> ]
     [ heap-size { 1 2 4 8 } member? ] bi
-    os { linux netbsd solaris } member? not
+    os linux? not
     and or ;
 
 ! On x86, parameters are usually never passed in registers,
@@ -87,11 +88,6 @@ M: x86.32 return-regs
         { int-regs { EAX EDX } }
         { float-regs { ST0 } }
     } ;
-
-M: x86.32 %prologue ( n -- )
-    dup PUSH
-    0 PUSH rc-absolute-cell rel-this
-    3 cells - decr-stack-reg ;
 
 M: x86.32 %prepare-jump
     pic-tail-reg 0 MOV xt-tail-pic-offset rc-absolute-cell rel-here ;
@@ -217,6 +213,9 @@ M:: x86.32 stack-cleanup ( stack-size return abi -- n )
 M: x86.32 %cleanup ( n -- )
     [ ESP swap SUB ] unless-zero ;
 
+M: x86.32 %safepoint
+    0 EAX MOVABS rc-absolute rel-safepoint ;
+
 M: x86.32 dummy-stack-params? f ;
 
 M: x86.32 dummy-int-params? f ;
@@ -228,8 +227,8 @@ M: x86.32 long-long-on-stack? t ;
 M: x86.32 float-on-stack? t ;
 
 M: x86.32 flatten-struct-type
-    call-next-method [ first t 2array ] map ;
+    call-next-method [ first t f 3array ] map ;
 
 M: x86.32 struct-return-on-stack? os linux? not ;
 
-check-sse
+check-cpu-features

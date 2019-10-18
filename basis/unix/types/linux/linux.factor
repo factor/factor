@@ -31,5 +31,3 @@ TYPEDEF: ulonglong __fsblkcnt64_t
 TYPEDEF: ulonglong __fsfilcnt64_t
 TYPEDEF: ulonglong ino64_t
 TYPEDEF: ulonglong off64_t
-
-ALIAS: <time_t> <long>

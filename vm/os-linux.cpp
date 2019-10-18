@@ -24,43 +24,4 @@ const char *vm_executable_path()
 	}
 }
 
-#ifdef SYS_inotify_init
-
-VM_C_API int inotify_init()
-{
-	return syscall(SYS_inotify_init);
-}
-
-VM_C_API int inotify_add_watch(int fd, const char *name, u32 mask)
-{
-	return syscall(SYS_inotify_add_watch, fd, name, mask);
-}
-
-VM_C_API int inotify_rm_watch(int fd, u32 wd)
-{
-	return syscall(SYS_inotify_rm_watch, fd, wd);
-}
-
-#else
-
-VM_C_API int inotify_init()
-{
-	current_vm()->not_implemented_error();
-	return -1;
-}
-
-VM_C_API int inotify_add_watch(int fd, const char *name, u32 mask)
-{
-	current_vm()->not_implemented_error();
-	return -1;
-}
-
-VM_C_API int inotify_rm_watch(int fd, u32 wd)
-{
-	current_vm()->not_implemented_error();
-	return -1;
-}
-
-#endif
-
 }

@@ -203,18 +203,6 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(^|(?&lt;=\s))((BIN:|OCT:)\s+)?-?\d+(\s|$)</string>
-			<key>name</key>
-			<string>constant.numeric.integer.factor</string>
-		</dict>
-		<dict>
-			<key>match</key>
-			<string>(^|(?&lt;=\s))HEX:\s+-?[\dA-Fa-f]+(\s|$)</string>
-			<key>name</key>
-			<string>constant.numeric.hexadecimal.integer.factor</string>
-		</dict>
-		<dict>
-			<key>match</key>
 			<string>(^|(?&lt;=\s))-?+\d+\.\d+(E(\+|-)\d+)?(\s|$)</string>
 			<key>name</key>
 			<string>constant.numeric.float.factor</string>

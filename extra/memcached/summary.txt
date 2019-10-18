@@ -1,0 +1,1 @@
+Provides access to memcached, a high-performance, distributed memory object caching system.

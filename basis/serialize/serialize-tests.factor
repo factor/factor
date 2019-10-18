@@ -59,7 +59,7 @@ CONSTANT: objects
 
 : check-serialize-1 ( obj -- ? )
     "=====" print
-    dup class .
+    dup class-of .
     dup .
     dup
     object>bytes
@@ -71,7 +71,7 @@ CONSTANT: objects
         drop t ! we don't care if numbers aren't interned
     ] [
         "=====" print
-        dup class .
+        dup class-of .
         dup 2array dup .
         object>bytes
         bytes>object dup .

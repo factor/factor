@@ -49,7 +49,6 @@ GENERIC: v*high ( u v -- w )
 
 <PRIVATE
 : (h+) ( u -- w ) 2 <groups> [ first2 + ] map ;
-: (h-) ( u -- w ) 2 <groups> [ first2 - ] map ;
 PRIVATE>
 
 GENERIC: v*hs+ ( u v -- w )
@@ -57,6 +56,15 @@ M: object v*hs+ [ * ] 2map (h+) ; inline
 
 GENERIC: v/ ( u v -- w )
 M: object v/ [ / ] 2map ; inline
+
+GENERIC: v^ ( u v -- w )
+M: object v^ [ ^ ] 2map ; inline
+
+GENERIC: v^n ( u n -- w )
+M: object v^n [ ^ ] curry map ; inline
+
+GENERIC: n^v ( n v -- w )
+M: object n^v [ ^ ] with map ; inline
 
 GENERIC: vavg ( u v -- w )
 M: object vavg [ + 2 / ] 2map ; inline
@@ -163,6 +171,9 @@ M: object vnot [ not ] map ; inline
 GENERIC: vall? ( v -- ? )
 M: object vall? [ ] all? ; inline
 
+GENERIC: vcount ( v -- count )
+M: object vcount [ ] count ; inline
+
 GENERIC: vany? ( v -- ? )
 M: object vany? [ ] any? ; inline
 
@@ -191,7 +202,7 @@ GENERIC: v? ( mask true false -- result )
 M: object v? 
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
 
-:: vif ( mask true-quot false-quot -- result )
+:: vif ( mask true-quot: ( -- vector ) false-quot: ( -- vector ) -- result )
     {
         { [ mask vall?  ] [ true-quot  call ] }
         { [ mask vnone? ] [ false-quot call ] }
@@ -206,12 +217,18 @@ M: object v?
 : vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
 
 GENERIC: v. ( u v -- x )
-M: object v. [ conjugate * ] [ + ] 2map-reduce ; inline
+M: object v. [ * ] [ + ] 2map-reduce ; inline
+
+GENERIC: h. ( u v -- x )
+M: object h. [ conjugate * ] [ + ] 2map-reduce ; inline
 
 GENERIC: norm-sq ( v -- x )
 M: object norm-sq [ absq ] [ + ] map-reduce ; inline
 
 : norm ( v -- x ) norm-sq sqrt ; inline
+
+: p-norm ( v p -- x )
+    [ [ [ abs ] dip ^ ] curry map-sum ] keep recip ^ ; inline
 
 : normalize ( u -- v ) dup norm v/n ; inline
 

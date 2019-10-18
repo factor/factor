@@ -8,17 +8,25 @@ vocabs.hierarchy words ;
 
 IN: tools.completion
 
-:: (fuzzy) ( accum i full ch -- accum i full ? )
-    ch i full index-from [
-        :> i i accum push
-        accum i 1 + full t
+<PRIVATE
+
+: smart-index-from ( obj i seq -- n/f )
+    rot [ ch>lower ] [ ch>upper ] bi
+    '[ dup _ eq? [ drop t ] [ _ eq? ] if ] find-from drop ;
+
+PRIVATE>
+
+:: (fuzzy) ( accum i full ch -- accum i ? )
+    ch i full smart-index-from [
+        [ accum push ]
+        [ accum swap 1 + t ] bi
     ] [
-        f -1 full f
+        f -1 f
     ] if* ;
 
 : fuzzy ( full short -- indices )
     dup [ length <vector> 0 ] curry 2dip
-    [ (fuzzy) ] all? 3drop ;
+    [ (fuzzy) ] with all? 2drop ;
 
 : (runs) ( runs n seq -- runs n )
     [
@@ -30,7 +38,7 @@ IN: tools.completion
     ] each ;
 
 : runs ( seq -- newseq )
-    V{ V{ } } [ clone ] map over first rot (runs) drop ;
+    [ V{ } clone 1vector ] dip [ first ] keep (runs) drop ;
 
 : score-1 ( i full -- n )
     {
@@ -64,14 +72,14 @@ IN: tools.completion
     dupd fuzzy score max ;
 
 : completion ( short candidate -- result )
-    [ second >lower swap complete ] keep 2array ;
+    [ second swap complete ] keep 2array ;
 
 : completion, ( short candidate -- )
     completion dup first 0 > [ , ] [ drop ] if ;
 
 : completions ( short candidates -- seq )
     [ ] [
-        [ >lower ] dip [ [ completion, ] with each ] { } make
+        [ [ completion, ] with each ] { } make
         rank-completions
     ] bi-curry if-empty ;
 
@@ -82,7 +90,7 @@ IN: tools.completion
     all-words name-completions ;
 
 : vocabs-matching ( str -- seq )
-    all-vocabs-recursive no-roots no-prefixes name-completions ;
+    all-vocabs-recursive filter-vocabs name-completions ;
 
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;

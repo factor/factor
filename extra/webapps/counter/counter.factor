@@ -38,6 +38,6 @@ USING: db.sqlite furnace.alloy namespaces ;
     <counter-app>
         counter-db <alloy>
         main-responder set-global
-    8080 httpd ;
+    8080 httpd drop ;
 
 MAIN: run-counter

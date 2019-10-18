@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays sequences kernel kernel.private accessors math
 alien.accessors byte-arrays io io.encodings io.encodings.utf8
@@ -51,22 +51,21 @@ M: windows native-string-encoding utf16n ;
 : dll-path ( dll -- string )
     path>> alien>native-string ;
 
-HOOK: string>symbol* os ( str/seq -- alien )
+GENERIC: string>symbol ( str/seq -- alien )
 
-M: winnt string>symbol* utf8 string>alien ;
+M: string string>symbol utf8 string>alien ;
 
-M: wince string>symbol* utf16n string>alien ;
+M: sequence string>symbol [ utf8 string>alien ] map ;
 
-M: unix string>symbol* utf8 string>alien ;
+: (symbol>string) ( alien -- str )
+    utf8 alien>string ;
 
-GENERIC: string>symbol ( str -- alien )
-
-M: string string>symbol string>symbol* ;
-
-M: sequence string>symbol [ string>symbol* ] map ;
+GENERIC: symbol>string ( symbol(s) -- string(s) )
+M: byte-array symbol>string (symbol>string) ;
+M: array symbol>string [ (symbol>string) ] map ;
 
 [
-     8 special-object utf8 alien>string string>cpu \ cpu set-global
-     9 special-object utf8 alien>string string>os \ os set-global
-    67 special-object utf8 alien>string \ vm-compiler set-global
+    OBJ-CPU special-object utf8 alien>string string>cpu \ cpu set-global
+    OBJ-OS special-object utf8 alien>string string>os \ os set-global
+    OBJ-VM-COMPILER special-object utf8 alien>string \ vm-compiler set-global
 ] "alien.strings" add-startup-hook

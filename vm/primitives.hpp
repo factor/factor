@@ -21,24 +21,24 @@ namespace factor
 	_(bignum_lesseq) \
 	_(bignum_log2) \
 	_(bignum_mod) \
+	_(bignum_gcd) \
 	_(bignum_multiply) \
 	_(bignum_not) \
 	_(bignum_or) \
 	_(bignum_shift) \
 	_(bignum_subtract) \
 	_(bignum_to_fixnum) \
-	_(bignum_to_float) \
 	_(bignum_xor) \
 	_(bits_double) \
 	_(bits_float) \
 	_(byte_array) \
-	_(byte_array_to_bignum) \
 	_(callback) \
 	_(callstack) \
 	_(callstack_bounds) \
 	_(callstack_for) \
 	_(callstack_to_array) \
 	_(check_datastack) \
+	_(clear_samples) \
 	_(clone) \
 	_(code_blocks) \
 	_(code_room) \
@@ -58,6 +58,7 @@ namespace factor
 	_(dll_validp) \
 	_(dlopen) \
 	_(dlsym) \
+	_(dlsym_raw) \
 	_(double_bits) \
 	_(enable_gc_events) \
 	_(existsp) \
@@ -90,6 +91,7 @@ namespace factor
 	_(ftell) \
 	_(full_gc) \
 	_(fwrite) \
+	_(get_samples) \
 	_(identity_hashcode) \
 	_(innermost_stack_frame_executing) \
 	_(innermost_stack_frame_scan) \
@@ -101,7 +103,6 @@ namespace factor
 	_(modify_code_heap) \
 	_(nano_count) \
 	_(optimized_p) \
-	_(profiling) \
 	_(quot_compiled_p) \
 	_(quotation_code) \
 	_(reset_dispatch_stats) \
@@ -110,6 +111,7 @@ namespace factor
 	_(resize_string) \
 	_(retainstack) \
 	_(retainstack_for) \
+	_(sampling_profiler) \
 	_(save_image) \
 	_(save_image_and_exit) \
 	_(set_context_object) \

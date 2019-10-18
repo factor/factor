@@ -12,7 +12,7 @@ TUPLE: parse-result remaining ast ;
 TUPLE: parse-error position messages ; 
 TUPLE: parser peg compiled id ;
 
-M: parser equal?    { [ [ class ] bi@ = ] [ [ id>> ] bi@ = ] } 2&& ;
+M: parser equal?    { [ [ class-of ] same? ] [ [ id>> ] same? ] } 2&& ;
 M: parser hashcode* id>> hashcode* ;
 
 C: <parse-result> parse-result
@@ -22,9 +22,9 @@ SYMBOL: error-stack
 
 : (merge-errors) ( a b -- c )
   {
-    { [ over position>> not ] [ nip ] } 
-    { [ dup  position>> not ] [ drop ] } 
-    [ 2dup [ position>> ] bi@ <=> {
+    { [ over position>> not ] [ nip ] }
+    { [ dup  position>> not ] [ drop ] }
+    [ 2dup [ position>> ] compare {
         { +lt+ [ nip ] }
         { +gt+ [ drop ] }
         { +eq+ [ messages>> over messages>> union [ position>> ] dip <parse-error> ] }
@@ -240,17 +240,15 @@ TUPLE: peg-head rule-id involved-set eval-set ;
    ] if* ; inline
 
 : with-packrat ( input quot -- result )
-  #! Run the quotation with a packrat cache active.
-  [ 
-    swap input set
-    0 pos set
-    f lrstack set
-    V{ } clone error-stack set
-    H{ } clone \ heads set
-    H{ } clone \ packrat set
-    call
-  ] with-scope ; inline
-
+    #! Run the quotation with a packrat cache active.
+    [
+        swap input ,,
+        0 pos ,,
+        f lrstack ,,
+        V{ } clone error-stack ,,
+        H{ } clone \ heads ,,
+        H{ } clone \ packrat ,,
+    ] H{ } make swap with-variables ; inline
 
 GENERIC: (compile) ( peg -- quot )
 
@@ -270,7 +268,7 @@ GENERIC: (compile) ( peg -- quot )
 : define-parser-word ( parser word -- )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  2dup swap peg>> (compile) (( -- result )) define-declared
+  2dup swap peg>> (compile) ( -- result ) define-declared
   swap id>> "peg-id" set-word-prop ;
 
 : compile-parser ( parser -- word )
@@ -295,13 +293,13 @@ SYMBOL: delayed
   #! Work through all delayed parsers and recompile their
   #! words to have the correct bodies.
   delayed get [
-    call( -- parser ) compile-parser-quot (( -- result )) define-declared
+    call( -- parser ) compile-parser-quot ( -- result ) define-declared
   ] assoc-each ;
 
 : compile ( parser -- word )
   [
     H{ } clone delayed [ 
-      compile-parser-quot (( -- result )) define-temp fixup-delayed 
+      compile-parser-quot ( -- result ) define-temp fixup-delayed 
     ] with-variable
   ] with-compilation-unit ;
 

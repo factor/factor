@@ -9,7 +9,8 @@ sets vectors quotations byte-arrays sorting compiler.units
 definitions generic generic.standard generic.single
 tools.deploy.config combinators combinators.private classes
 vocabs.loader.private classes.builtin slots.private grouping
-command-line io.pathnames ;
+command-line io.pathnames memoize namespaces.private
+hashtables locals ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
 QUALIFIED: compiler.crossref
@@ -22,8 +23,9 @@ QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
 QUALIFIED: vocabs.loader
-FROM: alien.libraries.private => >deployed-library-path ;
+FROM: assocs => change-at ;
 FROM: namespaces => set ;
+FROM: sequences => change-nth ;
 FROM: sets => members ;
 IN: tools.deploy.shaker
 
@@ -57,21 +59,21 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-debugger ( -- )
-    strip-debugger? "debugger" vocab and [
+    strip-debugger? "debugger" lookup-vocab and [
         "Stripping debugger" show
         "vocab:tools/deploy/shaker/strip-debugger.factor"
         run-file
     ] when ;
 
 : strip-ui-error-hook ( -- )
-    strip-debugger? deploy-ui? get and "ui" vocab and [
+    strip-debugger? deploy-ui? get and "ui" lookup-vocab and [
         "Installing generic UI error hook" show
         "vocab:tools/deploy/shaker/strip-ui-error-hook.factor"
         run-file
     ] when ;
 
 : strip-libc ( -- )
-    "libc" vocab [
+    "libc" lookup-vocab [
         "Stripping manual memory management debug code" show
         "vocab:tools/deploy/shaker/strip-libc.factor"
         run-file
@@ -87,14 +89,28 @@ IN: tools.deploy.shaker
     "vocab:tools/deploy/shaker/strip-call.factor" run-file ;
 
 : strip-cocoa ( -- )
-    "cocoa" vocab [
+    "cocoa" lookup-vocab [
         "Stripping unused Cocoa methods" show
         "vocab:tools/deploy/shaker/strip-cocoa.factor"
         run-file
     ] when ;
 
+: strip-gobject ( -- )
+    "gobject-introspection.types" lookup-vocab [
+        "Stripping GObject type info" show
+        "vocab:tools/deploy/shaker/strip-gobject.factor"
+        run-file
+    ] when ;
+
+: strip-gtk-icon ( -- )
+    "ui.backend.gtk" lookup-vocab [
+        "Stripping GTK icon loading code" show
+        "vocab:tools/deploy/shaker/strip-gtk-icon.factor"
+        run-file
+    ] when ;
+
 : strip-specialized-arrays ( -- )
-    strip-dictionary? "specialized-arrays" vocab and [
+    strip-dictionary? "specialized-arrays" lookup-vocab and [
         "Stripping specialized arrays" show
         "vocab:tools/deploy/shaker/strip-specialized-arrays.factor"
         run-file
@@ -222,6 +238,10 @@ IN: tools.deploy.shaker
     strip-word-names? [ dup strip-word-names strip-stack-traces ] when
     2drop ;
 
+: strip-memoized ( -- )
+    "Clearing memoized word caches" show
+    [ memoized? ] instances [ reset-memoized ] each ;
+
 : compiler-classes ( -- seq )
     { "compiler" "stack-checker" }
     [ child-vocabs [ words ] map concat [ class? ] filter ]
@@ -270,7 +290,7 @@ IN: tools.deploy.shaker
     recursive-subst ;
 
 : new-default-method ( -- gensym )
-    [ [ "No method" throw ] (( -- * )) define-temp ] with-compilation-unit ;
+    [ [ "No method" throw ] ( -- * ) define-temp ] with-compilation-unit ;
 
 : strip-default-methods ( -- )
     ! In a development image, each generic has its own default method.
@@ -282,56 +302,44 @@ IN: tools.deploy.shaker
         new-default-method '[ _ strip-default-method ] each
     ] when ;
 
-: strip-vocab-globals ( except names -- words )
+: vocab-tree-globals ( except names -- words )
     [ child-vocabs [ words ] map concat ] map concat
-    swap [ first2 lookup ] map sift diff ;
+    swap [ first2 lookup-word ] map sift diff ;
 
 : stripped-globals ( -- seq )
     [
-        "inspector-hook" "inspector" lookup ,
-
+        "inspector-hook" "inspector" lookup-word ,
         {
+            source-files:source-files
             continuations:error
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            init:startup-hooks
-            source-files:source-files
-            input-stream
-            output-stream
-            error-stream
-            vm
-            image
-            current-directory
         } %
 
-        "io-thread" "io.thread" lookup ,
+        "disposables" "destructors" lookup-word ,
 
-        "disposables" "destructors" lookup ,
-
-        "functor-words" "functors.backend" lookup ,
-        
-        deploy-threads? [
-            "initial-thread" "threads" lookup ,
-        ] unless
-
-        strip-io? [ io-backend , ] when
+        "functor-words" "functors.backend" lookup-word ,
 
         { } {
-            "timers"
-            "tools"
-            "io.launcher"
-            "random"
             "stack-checker"
-            "bootstrap"
             "listener"
-        } strip-vocab-globals %
+            "bootstrap"
+        } vocab-tree-globals %
+
+        ! Don't want to strip globals from test programs
+        { } { "tools" } vocab-tree-globals
+        { } { "tools.deploy.test" } vocab-tree-globals diff %
+
+        deploy-unicode? get [
+            { } { "unicode" } vocab-tree-globals %
+        ] unless
 
         strip-dictionary? [
-            "libraries" "alien" lookup ,
+            "libraries" "alien" lookup-word ,
 
             { { "yield-hook" "compiler.utilities" } }
-            { "cpu" "compiler" } strip-vocab-globals %
+            { "cpu" "compiler" } vocab-tree-globals %
 
             {
                 gensym
@@ -349,7 +357,6 @@ IN: tools.deploy.shaker
                 compiler.crossref:generic-call-site-crossref
                 compiler-impl
                 compiler.errors:compiler-errors
-                lexer-factory
                 print-use-hook
                 root-cache
                 require-when-vocabs
@@ -357,45 +364,81 @@ IN: tools.deploy.shaker
                 source-files.errors:error-types
                 source-files.errors:error-observers
                 vocabs:dictionary
-                vocabs:load-vocab-hook
+                vocabs:require-hook
                 vocabs:vocab-observers
                 vocabs.loader:add-vocab-root-hook
                 word
-                parser-notes
+                parser-quiet?
             } %
 
-            { } { "layouts" } strip-vocab-globals %
+            { } { "layouts" } vocab-tree-globals %
 
-            { } { "math.partial-dispatch" } strip-vocab-globals %
+            { } { "math.partial-dispatch" } vocab-tree-globals %
 
-            { } { "math.vectors.simd" } strip-vocab-globals %
+            { } { "math.vectors.simd" } vocab-tree-globals %
 
-            { } { "peg" } strip-vocab-globals %
+            { } { "peg" } vocab-tree-globals %
         ] when
 
         strip-prettyprint? [
-            { } { "prettyprint.config" } strip-vocab-globals %
+            { } { "prettyprint.config" } vocab-tree-globals %
         ] when
 
         strip-debugger? [
-            {
-                compiler.errors:compiler-errors
-                continuations:thread-error-hook
-            } %
+            \ compiler.errors:compiler-errors ,
         ] when
-
-        "windows-messages" "windows.messages" lookup [ , ] when*
     ] { } make ;
 
-: strip-globals ( stripped-globals -- )
-    strip-globals? [
+: cleared-globals ( -- seq )
+    [
+
+        {
+            init:startup-hooks
+            input-stream
+            output-stream
+            error-stream
+            vm
+            image
+            current-directory
+        } %
+
+        "io-thread" "io.thread" lookup-word ,
+
+        deploy-threads? [
+            "initial-thread" "threads" lookup-word ,
+        ] unless
+
+        strip-io? [ io-backend , ] when
+
+        { } {
+            "timers"
+            "io.launcher"
+            "random"
+        } vocab-tree-globals %
+
+        "windows-messages" "windows.messages" lookup-word [ , ] when*
+    ] { } make ;
+
+: strip-global? ( name stripped-globals -- ? )
+    '[ _ member? ] [ tuple? ] bi or ;
+
+: clear-global? ( name cleared-globals -- ? )
+    '[ _ member? ] [ string? ] bi or ;
+
+: strip-globals ( -- )
+    strip-globals? [| |
         "Stripping globals" show
-        global swap
-        '[ drop _ member? not ] assoc-filter
-        [ drop string? not ] assoc-filter ! strip CLI args
-        sift-assoc
-        21 set-special-object
-    ] [ drop ] if ;
+        stripped-globals :> to-strip
+        cleared-globals :> to-clear
+        global boxes>>
+        [ drop to-strip strip-global? not ] assoc-filter!
+        [
+            [
+                swap to-clear clear-global?
+                [ f swap value<< ] [ drop ] if
+            ] assoc-each
+        ] [ rehash ] bi
+    ] when ;
 
 : strip-c-io ( -- )
     ! On all platforms, if deploy-io is 1, we strip out C streams.
@@ -403,7 +446,7 @@ IN: tools.deploy.shaker
     ! On Windows, even if deploy-io is 3, C streams are still used
     ! for the console, so don't strip it there.
     strip-io?
-    deploy-io get 3 = os windows? not and
+    native-io? os windows? not and
     or [
         "Stripping C I/O" show
         "vocab:tools/deploy/shaker/strip-c-io.factor" run-file
@@ -440,9 +483,9 @@ IN: tools.deploy.shaker
 
 SYMBOL: deploy-vocab
 
-: [:c] ( -- word ) ":c" "debugger" lookup ;
+: [:c] ( -- word ) ":c" "debugger" lookup-word ;
 
-: [print-error] ( -- word ) "print-error" "debugger" lookup ;
+: [print-error] ( -- word ) "print-error" "debugger" lookup-word ;
 
 : deploy-startup-quot ( word -- )
     [
@@ -467,7 +510,7 @@ SYMBOL: deploy-vocab
     set-startup-quot ;
 
 : startup-stripper ( -- )
-    t "quiet" set-global
+    t parser-quiet? set-global
     f output-stream set-global
     [ V{ "resource:" } clone vocab-roots set-global ]
     "vocabs.loader" startup-hooks get-global set-at ;
@@ -509,7 +552,7 @@ SYMBOL: deploy-vocab
 : write-vocab-manifest ( vocab-manifest-out -- )
     "Writing vocabulary manifest to " write dup print flush
     vocabs "VOCABS:" prefix
-    deploy-libraries get [ libraries get at path>> ] map members "LIBRARIES:" prefix append
+    deploy-libraries get [ library path>> ] map members "LIBRARIES:" prefix append
     swap utf8 set-file-lines ;
 
 : prepare-deploy-libraries ( -- )
@@ -521,9 +564,9 @@ SYMBOL: deploy-vocab
     ] each
     
     [
-        "deploy-libraries" "alien.libraries" lookup forget
-        "deploy-library" "alien.libraries" lookup forget
-        ">deployed-library-path" "alien.libraries.private" lookup forget
+        "deploy-libraries" "alien.libraries" lookup-word forget
+        "deploy-library" "alien.libraries" lookup-word forget
+        ">deployed-library-path" "alien.libraries.private" lookup-word forget
     ] with-compilation-unit ;
 
 : strip ( vocab-manifest-out -- )
@@ -534,6 +577,8 @@ SYMBOL: deploy-vocab
     strip-destructors
     strip-call
     strip-cocoa
+    strip-gobject
+    strip-gtk-icon
     strip-debugger
     strip-ui-error-hook
     strip-specialized-arrays
@@ -543,23 +588,25 @@ SYMBOL: deploy-vocab
     strip-c-io
     strip-default-methods
     strip-compiler-classes
-    f 5 set-special-object ! we can't use the Factor debugger or Factor I/O anymore
+    ! we can't use the Factor debugger or Factor I/O anymore
+    f ERROR-HANDLER-QUOT set-special-object
     deploy-vocab get vocab-main deploy-startup-quot
     find-megamorphic-caches
     stripped-word-props
-    stripped-globals strip-globals
+    strip-globals
     compress-objects
     compress-quotations
     strip-words
+    strip-memoized
     clear-megamorphic-caches ;
 
 : die-with ( error original-error -- * )
     #! We don't want DCE to drop the error before the die call!
-    [ die 1 exit ] (( a -- * )) call-effect-unsafe ;
+    [ die 1 exit ] ( a -- * ) call-effect-unsafe ;
 
 : die-with2 ( error original-error -- * )
     #! We don't want DCE to drop the error before the die call!
-    [ die 1 exit ] (( a b -- * )) call-effect-unsafe ;
+    [ die 1 exit ] ( a b -- * ) call-effect-unsafe ;
 
 : deploy-error-handler ( quot -- )
     [
@@ -593,7 +640,7 @@ SYMBOL: deploy-vocab
             "Saving final image" show
             save-image-and-exit
         ] deploy-error-handler
-    ] bind ;
+    ] with-variables ;
 
 : do-deploy ( -- )
     "output-image" get

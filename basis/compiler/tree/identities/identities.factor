@@ -8,7 +8,7 @@ compiler.tree.propagation.info ;
 IN: compiler.tree.identities
 
 : define-identities ( word identities -- )
-    [ integer-derived-ops ] dip
+    [ integer-derived-ops dup empty? f assert= ] dip
     '[ _ "identities" set-word-prop ] each ;
 
 SYMBOL: X
@@ -27,18 +27,6 @@ SYMBOL: X
     { { 1 X } nip }
     { { X 0 } nip }
     { { 0 X } drop }
-} define-identities
-
-\ / {
-    { { X 1 } drop }
-} define-identities
-
-\ mod {
-    { { X 1 } 0 }
-} define-identities
-
-\ rem {
-    { { X 1 } 0 }
 } define-identities
 
 \ bitand {
@@ -74,12 +62,12 @@ SYMBOL: X
 GENERIC: apply-identities* ( node -- node )
 
 : simplify-to-constant ( #call constant -- nodes )
-    [ [ in-d>> #drop ] [ out-d>> first ] bi ] dip swap #push
+    [ [ in-d>> <#drop> ] [ out-d>> first ] bi ] dip swap <#push>
     2array ;
 
 : select-input ( node n -- #shuffle )
     [ [ in-d>> ] [ out-d>> ] bi ] dip
-    pick nth over first associate #data-shuffle ;
+    pick nth over first associate <#data-shuffle> ;
 
 M: #call apply-identities*
     dup word>> "identities" word-prop [

@@ -1,11 +1,11 @@
 USING: tools.test kernel.private kernel arrays sequences
 math.private math generic words quotations alien alien.c-types
-strings sbufs sequences.private slots.private combinators
-definitions system layouts vectors math.partial-dispatch
-math.order math.functions accessors hashtables classes assocs
-io.encodings.utf8 io.encodings.ascii io.encodings fry slots
-sorting.private combinators.short-circuit grouping prettyprint
-generalizations
+alien.data strings sbufs sequences.private slots.private
+combinators definitions system layouts vectors
+math.partial-dispatch math.order math.functions accessors
+hashtables classes assocs io.encodings.utf8 io.encodings.ascii
+io.encodings fry slots sorting.private combinators.short-circuit
+grouping prettyprint generalizations
 compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
@@ -17,6 +17,7 @@ compiler.tree.propagation.info
 compiler.tree.checker
 compiler.tree.debugger ;
 FROM: math => float ;
+QUALIFIED-WITH: alien.c-types c
 IN: compiler.tree.cleanup.tests
 
 [ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
@@ -244,32 +245,32 @@ cell-bits 32 = [
 ] when
 
 [ t ] [
-    [ B{ 1 0 } *short 0 number= ]
+    [ B{ 1 0 } c:short deref 0 number= ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ B{ 1 0 } *short 0 { number number } declare number= ]
+    [ B{ 1 0 } c:short deref 0 { number number } declare number= ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ B{ 1 0 } *short 0 = ]
+    [ B{ 1 0 } c:short deref 0 = ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ B{ 1 0 } *short dup number? [ 0 number= ] [ drop f ] if ]
+    [ B{ 1 0 } c:short deref dup number? [ 0 number= ] [ drop f ] if ]
     \ number= inlined?
 ] unit-test
 
 [ t ] [
-    [ HEX: ff bitand 0 HEX: ff between? ]
+    [ 0xff bitand 0 0xff between? ]
     \ >= inlined?
 ] unit-test
 
 [ t ] [
-    [ HEX: ff swap HEX: ff bitand >= ]
+    [ 0xff swap 0xff bitand >= ]
     \ >= inlined?
 ] unit-test
 
@@ -356,13 +357,13 @@ cell-bits 32 = [
 [ f ] [
     [
         { integer } declare iota [ ] map
-    ] \ >fixnum inlined?
+    ] \ integer>fixnum inlined?
 ] unit-test
 
 [ f ] [
     [
         { integer } declare { } set-nth-unsafe
-    ] \ >fixnum inlined?
+    ] \ integer>fixnum inlined?
 ] unit-test
 
 [ f ] [
@@ -519,8 +520,6 @@ cell-bits 32 = [
         14 ndrop
     ] cleaned-up-tree nodes>quot
 ] unit-test
-
-USING: alien alien.c-types ;
 
 [ t ] [
     [ int { } cdecl [ 2 2 + ] alien-callback ]

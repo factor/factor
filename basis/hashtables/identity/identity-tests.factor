@@ -29,3 +29,8 @@ CONSTANT: will
     t the-real-slim-shady identity-associate
     t "marshall mathers"  identity-associate =
 ] unit-test
+
+CONSTANT: same-as-it-ever-was "same as it ever was"
+
+{ IH{ { $ same-as-it-ever-was $ same-as-it-ever-was } } }
+[ H{ { $ same-as-it-ever-was $ same-as-it-ever-was } } IH{ } assoc-like ] unit-test

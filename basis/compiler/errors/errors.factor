@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors source-files.errors kernel namespaces assocs fry
-summary ;
+summary command-line ;
 IN: compiler.errors
 
 SYMBOL: +compiler-error+
@@ -26,7 +26,7 @@ M: linkage-error error-type drop +linkage-error+ ;
     compiler-errors linkage-errors
     [ get-global delete-at ] bi-curry@ bi ;
 
-: compiler-error ( error -- )
+: save-compiler-error ( error -- )
     dup asset>> compiler-errors get-global set-at ;
 
 T{ error-type
@@ -44,7 +44,7 @@ T{ error-type
 : <linkage-error> ( error word -- linkage-error )
     \ linkage-error <definition-error> ;
 
-: linkage-error ( error word class -- )
+: linkage-error ( name message word class -- )
     '[ _ boa ] dip <linkage-error> dup asset>> linkage-errors get set-at ; inline
 
 T{ error-type
@@ -57,16 +57,26 @@ T{ error-type
    { fatal? f }
 } define-error-type
 
-TUPLE: no-such-library name ;
+TUPLE: no-such-library name message ;
 
 M: no-such-library summary drop "Library not found" ;
 
-: no-such-library ( name word -- ) \ no-such-library linkage-error ;
+: no-such-library-error ( name message word -- ) \ no-such-library linkage-error ;
 
-TUPLE: no-such-symbol name ;
+TUPLE: no-such-symbol name message ;
 
 M: no-such-symbol summary drop "Symbol not found" ;
 
-: no-such-symbol ( name word -- ) \ no-such-symbol linkage-error ;
+: no-such-symbol-error ( name message word -- ) \ no-such-symbol linkage-error ;
 
 ERROR: not-compiled word error ;
+
+T{ error-type
+    { type +user-init-error+ }
+    { word ":user-init-errors" }
+    { plural "rc file errors" }
+    { icon "vocab:ui/tools/error-list/icons/user-init-error.tiff" }
+    { quot [ user-init-errors get-global values ] }
+    { forget-quot [ user-init-errors get-global delete-at ] }
+} define-error-type
+

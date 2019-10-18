@@ -18,9 +18,8 @@ SYNTAX: eval( \ eval parse-call( ;
 
 : (eval>string) ( str -- output )
     [
-        "quiet" on
-        parser-notes off
-        '[ _ (( -- )) (eval) ] [ print-error ] recover
+        parser-quiet? on
+        '[ _ ( -- ) (eval) ] [ print-error ] recover
     ] with-string-writer ;
 
 : eval>string ( str -- output )

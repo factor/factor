@@ -16,10 +16,6 @@ SYMBOL: using
 ERROR: not-a-vocab-root string ;
 ERROR: vocab-name-contains-separator path ;
 ERROR: vocab-name-contains-dot path ;
-ERROR: bad-developer-name name ;
-
-M: bad-developer-name summary
-    drop "Developer name must be a string." ;
 
 <PRIVATE
 
@@ -171,7 +167,7 @@ M: bad-developer-name summary
 : $values. ( word -- )
     "declared-effect" word-prop [
         [ in>> ] [ out>> ] bi
-        2dup [ empty? ] bi@ and [
+        2dup [ empty? ] both? [
             2drop
         ] [
             [ members ] dip over diff
@@ -253,7 +249,7 @@ PRIVATE>
 : help. ( word -- )
     [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
 
-: scaffold-help ( vocab -- )
+: scaffold-docs ( vocab -- )
     ensure-vocab-exists
     [
         dup "-docs.factor" vocab/suffix>path scaffolding? [
@@ -342,11 +338,13 @@ SYMBOL: examples-flag
     [ home ] dip append-path touch. ;
 
 : scaffold-factor-boot-rc ( -- )
-    os windows? "factor-boot-rc" ".factor-boot-rc" ? scaffold-rc ;
+    ".factor-boot-rc" scaffold-rc ;
 
 : scaffold-factor-rc ( -- )
-    os windows? "factor-rc" ".factor-rc" ? scaffold-rc ;
+    ".factor-rc" scaffold-rc ;
 
+: scaffold-factor-roots ( -- )
+    ".factor-roots" scaffold-rc ;
 
 HOOK: scaffold-emacs os ( -- )
 

@@ -87,9 +87,11 @@ M: gadget contains-point? ( loc gadget -- ? )
     [ contains-point? ] with find-last nip
     [ [ loc>> v- ] [ pick-up ] bi ] [ nip ] ?if ;
 
-: max-dim ( dims -- dim ) { 0 0 } [ vmax ] reduce ;
+: max-dims ( seq -- dim )
+    [ 0 0 ] dip [ first2 swapd [ max ] 2bi@ ] each 2array ;
 
-: dim-sum ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
+: sum-dims ( seq -- dim )
+    [ 0 0 ] dip [ first2 swapd [ + ] 2bi@ ] each 2array ;
 
 : each-child ( gadget quot -- )
     [ children>> ] dip each ; inline
@@ -336,7 +338,7 @@ PRIVATE>
 
 : add-gadgets ( parent children -- parent )
     not-in-layout
-    [ over (add-gadget) ] each
+    over '[ _ (add-gadget) ] each
     dup relayout ;
 
 : parents ( gadget -- seq )

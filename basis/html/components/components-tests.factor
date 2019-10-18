@@ -1,7 +1,7 @@
 USING: tools.test kernel io.streams.string
 io.streams.null accessors inspector html.streams
 html.components html.forms namespaces
-xml.writer ;
+xml.writer xml.syntax ;
 FROM: html.components => inspector ;
 IN: html.components.tests
 
@@ -196,3 +196,15 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 [ ] [
     "error" hidden render
 ] unit-test
+
+! Test xml in html components
+[ ] [
+    [XML <foo/> XML] "xmltest" set-value
+] unit-test
+
+[ "<foo/>" ] [
+    [
+        "xmltest" html render
+    ] with-string-writer
+] unit-test
+

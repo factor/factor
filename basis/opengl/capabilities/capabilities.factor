@@ -27,7 +27,7 @@ IN: opengl.capabilities
     "." split [ string>number ] map ;
 
 : version-before? ( version1 version2 -- ? )
-    swap version-seq swap version-seq before=? ;
+    [ version-seq ] bi@ before=? ;
 
 : (gl-version) ( -- version vendor )
     GL_VERSION glGetString " " split1 ;

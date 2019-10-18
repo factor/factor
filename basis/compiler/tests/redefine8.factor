@@ -26,5 +26,5 @@ IN: compiler.tests.redefine8
 ] unit-test
 
 [ 2.0 ] [
-    1.0 "my-generic" "compiler.tests.redefine8" lookup execute
+    1.0 "my-generic" "compiler.tests.redefine8" lookup-word execute
 ] unit-test

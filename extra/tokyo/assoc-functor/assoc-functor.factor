@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs destructors fry functors
-kernel locals sequences serialize tokyo.alien.tcutil tokyo.utils vectors ;
+USING: accessors alien.c-types alien.data arrays assocs
+destructors fry functors kernel locals sequences serialize
+tokyo.alien.tcutil tokyo.utils vectors ;
 IN: tokyo.assoc-functor
 
 FUNCTOR: define-tokyo-assoc-api ( T N -- )
@@ -27,30 +28,30 @@ INSTANCE: TYPE assoc
 
 M: TYPE dispose* [ DBDEL f ] change-handle drop ;
 
-M: TYPE at* ( key db -- value/f ? )
-    handle>> swap object>bytes dup length 0 <int>
+M: TYPE at*
+    handle>> swap object>bytes dup length 0 int <ref>
     DBGET [ [ memory>object ] [ tcfree ] bi t ] [ f f ] if* ;
 
-M: TYPE assoc-size ( db -- size ) handle>> DBRNUM ;
+M: TYPE assoc-size handle>> DBRNUM ;
 
 : DBKEYS ( db -- keys )
     [ assoc-size <vector> ] [ handle>> ] bi
-    dup DBITERINIT drop 0 <int>
+    dup DBITERINIT drop 0 int <ref>
     [ 2dup DBITERNEXT dup ] [
         [ memory>object ] [ tcfree ] bi
         [ pick ] dip swap push
     ] while 3drop ;
 
-M: TYPE >alist ( db -- alist )
+M: TYPE >alist
     [ DBKEYS dup ] keep '[ dup _ at 2array ] map! drop ;
 
-M: TYPE set-at ( value key db -- )
+M: TYPE set-at
     handle>> swap rot [ object>bytes dup length ] bi@ DBPUT drop ;
 
-M: TYPE delete-at ( key db -- )
+M: TYPE delete-at
     handle>> swap object>bytes dup length DBOUT drop ;
 
-M: TYPE clear-assoc ( db -- ) handle>> DBVANISH drop ;
+M: TYPE clear-assoc handle>> DBVANISH drop ;
 
 M: TYPE equal? assoc= ;
 

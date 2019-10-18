@@ -1,5 +1,5 @@
 USING: math classes.struct windows.types alien.syntax windows.directx.d3d9types
-windows.com.syntax windows.com windows.directx.d3d9 ;
+windows.com.syntax windows.com windows.directx windows.directx.d3d9 ;
 IN: windows.directx.d3dx9math
 
 LIBRARY: d3dx9

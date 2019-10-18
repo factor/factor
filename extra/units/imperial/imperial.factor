@@ -7,9 +7,37 @@ IN: units.imperial
 
 : yards ( n -- dimensioned ) 3 * feet ;
 
+: hands ( n -- dimensioned ) 4 * inches ;
+
+: palms ( n -- dimensioned ) 3 * inches ;
+
+: nails ( n -- dimensioned ) 1/16 * yards ;
+
+: fingers ( n -- dimensioned ) 1/8 * yards ;
+
 : miles ( n -- dimensioned ) 1760 * yards ;
 
+: furlongs ( n -- dimensioned ) 1/8 * miles ;
+
+: chains ( n -- dimensioned ) 1/10 * furlongs ;
+
+: links ( n -- dimensioned ) 1/100 * chains ;
+
+: rods ( n -- dimensioned ) 11/2 * yards ;
+
+ALIAS: poles rods
+
+ALIAS: perches rods
+
+: ramsdens-chains ( n -- dimensioned ) 100 * feet ;
+
 : nautical-miles ( n -- dimensioned ) 1852 * m ;
+
+: fathoms ( n -- dimensioned ) 6 * feet ;
+
+: shackles ( n -- dimensioned ) 15 * fathoms ;
+
+: cables ( n -- dimensioned ) 608 * feet ;
 
 : pounds ( n -- dimensioned ) 22/10 / kg ;
 
@@ -23,11 +51,13 @@ IN: units.imperial
 
 : cups ( n -- dimensioned ) 1/2 * pints ;
 
-: fluid-ounces ( n -- dimensioned ) 1/16 * pints ;
+: us-fluid-ounces ( n -- dimensioned ) 1/16 * pints ;
 
-: teaspoons ( n -- dimensioned ) 1/6 * fluid-ounces ;
+: teaspoons ( n -- dimensioned ) 1/6 * us-fluid-ounces ;
 
-: tablespoons ( n -- dimensioned ) 1/2 * fluid-ounces ;
+: tablespoons ( n -- dimensioned ) 1/2 * us-fluid-ounces ;
+
+: us-gill ( n -- dimensioned ) 4 * us-fluid-ounces ;
 
 : knots ( n -- dimensioned ) 1852/3600 * m/s ;
 
@@ -52,8 +82,6 @@ IN: units.imperial
 : pecks ( n -- dimensioned ) 8 * dry-quarts ;
 
 : bushels ( n -- dimensioned ) 4 * pecks ;
-
-: rods ( n -- dimensioned ) 11/2 * yards ;
 
 
 

@@ -8,9 +8,7 @@ quotations math.bitwise alien.libraries literals ;
 IN: openssl.libssl
 
 << {
-    { [ os openbsd? ] [ ] } ! VM is linked with it
-    { [ os netbsd? ] [ ] }
-    { [ os winnt? ] [ "libssl" "ssleay32.dll" cdecl add-library ] }
+    { [ os windows? ] [ "libssl" "ssleay32.dll" cdecl add-library ] }
     { [ os macosx? ] [ "libssl" "libssl.dylib" cdecl add-library ] }
     { [ os unix? ] [ "libssl" "libssl.so" cdecl add-library ] }
 } cond >>
@@ -254,15 +252,15 @@ FUNCTION: void* BIO_f_ssl (  ) ;
 : SSL_CTX_set_session_cache_mode ( ctx mode -- n )
     [ SSL_CTRL_SET_SESS_CACHE_MODE ] dip f SSL_CTX_ctrl ;
 
-CONSTANT: SSL_SESS_CACHE_OFF    HEX: 0000
-CONSTANT: SSL_SESS_CACHE_CLIENT HEX: 0001
-CONSTANT: SSL_SESS_CACHE_SERVER HEX: 0002
+CONSTANT: SSL_SESS_CACHE_OFF    0x0000
+CONSTANT: SSL_SESS_CACHE_CLIENT 0x0001
+CONSTANT: SSL_SESS_CACHE_SERVER 0x0002
 
 CONSTANT: SSL_SESS_CACHE_BOTH flags{ SSL_SESS_CACHE_CLIENT SSL_SESS_CACHE_SERVER }
 
-CONSTANT: SSL_SESS_CACHE_NO_AUTO_CLEAR      HEX: 0080
-CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_LOOKUP HEX: 0100
-CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_STORE  HEX: 0200
+CONSTANT: SSL_SESS_CACHE_NO_AUTO_CLEAR      0x0080
+CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_LOOKUP 0x0100
+CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_STORE  0x0200
 
 CONSTANT: SSL_SESS_CACHE_NO_INTERNAL
     flags{ SSL_SESS_CACHE_NO_INTERNAL_LOOKUP SSL_SESS_CACHE_NO_INTERNAL_STORE }
@@ -280,9 +278,9 @@ H{ } clone verify-messages set-global
 : verify-message ( n -- word ) verify-messages get-global at ;
 
 SYNTAX: X509_V_:
-    scan "X509_V_" prepend create-in
-    scan-word
-    [ 1quotation (( -- value )) define-inline ]
+    scan-token "X509_V_" prepend create-in
+    scan-number
+    [ 1quotation ( -- value ) define-inline ]
     [ verify-messages get set-at ]
     2bi ;
 

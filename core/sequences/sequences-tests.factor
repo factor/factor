@@ -1,6 +1,7 @@
-USING: arrays kernel math math.order namespaces sequences kernel.private
-sequences.private strings sbufs tools.test vectors assocs
-generic vocabs.loader ;
+USING: arrays byte-arrays kernel math math.order math.parser
+namespaces sequences kernel.private sequences.private strings
+sbufs tools.test vectors assocs generic vocabs.loader
+generic.single ;
 IN: sequences.tests
 
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -44,6 +45,15 @@ IN: sequences.tests
 
 [ 4 CHAR: o ]
 [ 3 "hello world" "aeiou" [ member? ] curry find-from ] unit-test
+
+[ f f ] [ "abcd" [ 10 > nip ] find-index ] unit-test
+[ f f ] [ "abcd" [ drop CHAR: e = ] find-index ] unit-test
+[ 3 CHAR: d ] [ "abcdefg" [ 3 = nip ] find-index ] unit-test
+[ 3 CHAR: d ] [ "abcdefg" [ drop CHAR: d = ] find-index ] unit-test
+
+[ 0 CHAR: a ] [ 0 "abcdef" [ drop CHAR: a >= ] find-index-from ] unit-test
+[ 1 CHAR: b ] [ 0 "abcdef" [ drop CHAR: a > ] find-index-from ] unit-test
+[ 2 CHAR: c ] [ 1 "abcdef" [ drop CHAR: b > ] find-index-from ] unit-test
 
 [ f ] [ 3 [ ]     member? ] unit-test
 [ f ] [ 3 [ 1 2 ] member? ] unit-test
@@ -100,6 +110,9 @@ unit-test
 [ "a" -1 append ] must-fail
 [ -1 "a" append ] must-fail
 
+{ t } [ B{ 0 } { 1 } append byte-array? ] unit-test
+{ t } [ B{ 0 } { 1 } prepend byte-array? ] unit-test
+
 [ [ ]       ] [ 1 [ ]           remove ] unit-test
 [ [ ]       ] [ 1 [ 1 ]         remove ] unit-test
 [ [ 3 1 1 ] ] [ 2 [ 3 2 1 2 1 ] remove ] unit-test
@@ -119,10 +132,10 @@ unit-test
 [ "xx" ] [ "blahxx" 2 tail* ] unit-test
 
 [ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice = ] unit-test
-[ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice [ hashcode ] bi@ = ] unit-test
+[ t ] [ "xxfoo" 2 head-slice "xxbar" 2 head-slice [ hashcode ] same? ] unit-test
 
 [ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* = ] unit-test
-[ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* [ hashcode ] bi@ = ] unit-test
+[ t ] [ "xxfoo" 2 head-slice SBUF" barxx" 2 tail-slice* [ hashcode ] same? ] unit-test
 
 [ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
 [ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
@@ -201,7 +214,8 @@ unit-test
 
 [ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] bi@ ] unit-test
 
-[ 1 ] [ 0.5 { 1 2 3 } nth ] unit-test
+[ 0.5 { 1 2 3 } nth ] [ no-method? ] must-fail-with
+[ 0.5 "asdfasdf" nth ] [ no-method? ] must-fail-with
 
 ! Pathological case
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
@@ -210,7 +224,7 @@ unit-test
 
 [ t ] [ "hi" <reversed> SBUF" hi" <reversed> = ] unit-test
 
-[ t ] [ "hi" <reversed> SBUF" hi" <reversed> [ hashcode ] bi@ = ] unit-test
+[ t ] [ "hi" <reversed> SBUF" hi" <reversed> [ hashcode ] same? ] unit-test
 
 [ -10 "hi" "bye" copy ] must-fail
 [ 10 "hi" "bye" copy ] must-fail
@@ -236,6 +250,14 @@ unit-test
 [ -3 10 iota nth ] must-fail
 [ 11 10 iota nth ] must-fail
 
+[ f ] [ f ?first ] unit-test
+[ f ] [ { } ?first ] unit-test
+[ 0 ] [ 10 iota ?first ] unit-test
+
+[ f ] [ f ?last ] unit-test
+[ f ] [ { } ?last ] unit-test
+[ 9 ] [ 10 iota ?last ] unit-test
+
 [ -1/0. 0 remove-nth! ] must-fail
 [ "" ] [ "" [ CHAR: \s = ] trim ] unit-test
 [ "" ] [ "" [ CHAR: \s = ] trim-head ] unit-test
@@ -255,6 +277,8 @@ unit-test
 [ { "a" "b" "c" "d" } ] [ { 0 1 2 3 } { "a" "b" "c" "d" } nths ] unit-test
 [ { "d" "c" "b" "a" } ] [ { 3 2 1 0 } { "a" "b" "c" "d" } nths ] unit-test
 [ { "d" "a" "b" "c" } ] [ { 3 0 1 2 } { "a" "b" "c" "d" } nths ] unit-test
+
+[ "dac" ] [ { 3 0 2 } "abcd" nths ] unit-test
                           
 TUPLE: bogus-hashcode ;
 
@@ -315,3 +339,11 @@ USE: make
 
 [ { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } ]
 [ { 1 2 } { "a" "b" } cartesian-product ] unit-test
+
+[ { } [ string>digits sum ] [ + ] map-reduce ] must-infer
+[ { } [ ] [ + ] map-reduce ] must-fail
+[ 4 ] [ { 1 1 } [ 1 + ] [ + ] map-reduce ] unit-test
+
+[ { } { } [ [ string>digits product ] bi@ + ] [ + ] 2map-reduce ] must-infer
+[ { } { } [ + ] [ + ] 2map-reduce ] must-fail
+[ 24 ] [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test

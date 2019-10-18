@@ -29,10 +29,9 @@ yield
 
 :: spawn-namespace-test ( -- ? )
     <promise> :> p gensym :> g
-    [
-        g "x" set
+    g "x" [
         [ "x" get p fulfill ] "B" spawn drop
-    ] with-scope
+    ] with-variable
     p ?promise g eq? ;
 
 [ t ] [ spawn-namespace-test ] unit-test
@@ -68,12 +67,12 @@ yield
 ! The unit test asserts that the callstack is empty from the
 ! quotation passed to start-context-and-delete.
 
-[ { } ] [
+[ 3 ] [
     <promise> [
         '[
             _ [
-                callstack swap fulfill stop
+                [ callstack swap fulfill stop ] start-context-and-delete
             ] start-context-and-delete
         ] in-thread
-    ] [ ?promise callstack>array ] bi
+    ] [ ?promise callstack>array length ] bi
 ] unit-test

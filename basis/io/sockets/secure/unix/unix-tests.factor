@@ -3,7 +3,7 @@ USING: accessors kernel namespaces io io.sockets
 io.sockets.secure io.encodings.ascii io.streams.duplex
 io.backend.unix classes words destructors threads tools.test
 concurrency.promises byte-arrays locals calendar io.timeouts
-io.sockets.secure.unix.debug ;
+io.sockets.secure.debug ;
 
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
 
@@ -26,7 +26,7 @@ io.sockets.secure.unix.debug ;
         "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop stream-contents
     ] with-secure-context ;
 
-[ ] [ [ class name>> write ] server-test ] unit-test
+[ ] [ [ class-of name>> write ] server-test ] unit-test
 
 [ "secure" ] [ client-test ] unit-test
 
@@ -41,7 +41,11 @@ io.sockets.secure.unix.debug ;
     ] server-test
 ] unit-test
 
-[ client-test ] [ premature-close? ] must-fail-with
+! Actually, this should not be an error since many HTTPS servers
+! (eg, google.com) do this.
+
+! [ client-test ] [ premature-close? ] must-fail-with
+[ "hello" ] [ client-test ] unit-test
 
 ! Now, try validating the certificate. This should fail because its
 ! actually an invalid certificate

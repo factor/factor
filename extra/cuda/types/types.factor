@@ -183,110 +183,110 @@ STRUCT: double4
     { z double }
     { w double } ;
 
-char2 c-type 
+char2 lookup-c-type 
     2 >>align
     2 >>align-first
     drop
-char4 c-type 
+char4 lookup-c-type 
     4 >>align
     4 >>align-first
     drop
 
-uchar2 c-type 
+uchar2 lookup-c-type 
     2 >>align
     2 >>align-first
     drop
-uchar4 c-type 
+uchar4 lookup-c-type 
     4 >>align
     4 >>align-first
     drop
 
-short2 c-type 
+short2 lookup-c-type 
     4 >>align
     4 >>align-first
     drop
-short4 c-type 
+short4 lookup-c-type 
     8 >>align
     8 >>align-first
     drop
 
-ushort2 c-type 
+ushort2 lookup-c-type 
     4 >>align
     4 >>align-first
     drop
-ushort4 c-type 
+ushort4 lookup-c-type 
     8 >>align
     8 >>align-first
     drop
 
-int2 c-type 
+int2 lookup-c-type 
     8 >>align
     8 >>align-first
     drop
-int4 c-type 
+int4 lookup-c-type 
     16 >>align
     16 >>align-first
     drop
 
-uint2 c-type 
+uint2 lookup-c-type 
     8 >>align
     8 >>align-first
     drop
-uint4 c-type 
+uint4 lookup-c-type 
     16 >>align
     16 >>align-first
     drop
 
-long2 c-type 
+long2 lookup-c-type 
     long heap-size 2 * >>align
     long heap-size 2 * >>align-first
     drop
-long4 c-type 
+long4 lookup-c-type 
     16 >>align
     16 >>align-first
     drop
 
-ulong2 c-type 
+ulong2 lookup-c-type 
     long heap-size 2 * >>align
     long heap-size 2 * >>align-first
     drop
-ulong4 c-type 
+ulong4 lookup-c-type 
     16 >>align
     16 >>align-first
     drop
 
-longlong2 c-type 
+longlong2 lookup-c-type 
     16 >>align
     16 >>align-first
     drop
-longlong4 c-type 
-    16 >>align
-    16 >>align-first
-    drop
-
-ulonglong2 c-type 
-    16 >>align
-    16 >>align-first
-    drop
-ulonglong4 c-type 
+longlong4 lookup-c-type 
     16 >>align
     16 >>align-first
     drop
 
-float2 c-type 
+ulonglong2 lookup-c-type 
+    16 >>align
+    16 >>align-first
+    drop
+ulonglong4 lookup-c-type 
+    16 >>align
+    16 >>align-first
+    drop
+
+float2 lookup-c-type 
     8 >>align
     8 >>align-first
     drop
-float4 c-type 
+float4 lookup-c-type 
     16 >>align
     16 >>align-first
     drop
 
-double2 c-type 
+double2 lookup-c-type 
     16 >>align
     16 >>align-first
     drop
-double4 c-type 
+double4 lookup-c-type 
     16 >>align
     16 >>align-first
     drop

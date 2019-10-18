@@ -1,7 +1,9 @@
-USING: definitions io.launcher kernel parser words sequences math
-math.parser namespaces editors make system combinators.short-circuit
-fry threads vocabs.loader ;
+USING: combinators.short-circuit editors kernel make
+math.parser namespaces sequences system vocabs ;
 IN: editors.emacs
+
+SINGLETON: emacsclient
+emacsclient editor-class set-global
 
 SYMBOL: emacsclient-path
 
@@ -9,7 +11,7 @@ HOOK: default-emacsclient os ( -- path )
 
 M: object default-emacsclient ( -- path ) "emacsclient" ;
 
-: emacsclient ( file line -- )
+M: emacsclient editor-command ( file line -- command )
     [
         {
             [ emacsclient-path get-global ]
@@ -18,12 +20,7 @@ M: object default-emacsclient ( -- path ) "emacsclient" ;
         "--no-wait" ,
         number>string "+" prepend ,
         ,
-    ] { } make
-    os windows? [ run-detached drop ] [ try-process ] if ;
-
-: emacs ( word -- )
-    where first2 emacsclient ;
-
-[ emacsclient ] edit-hook set-global
+    ] { } make ;
 
 os windows? [ "editors.emacs.windows" require ] when
+

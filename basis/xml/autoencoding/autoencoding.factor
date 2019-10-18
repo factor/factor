@@ -19,7 +19,7 @@ IN: xml.autoencoding
 
 : 10xxxxxx? ( ch -- ? )
     -6 shift 3 bitand 2 = ;
-          
+
 : start<name ( ch -- tag )
     ! This is unfortunate, and exists for the corner case
     ! that the first letter of the document is < and second is
@@ -27,7 +27,7 @@ IN: xml.autoencoding
     ascii?
     [ utf8 decode-stream next make-tag ] [
         next
-        [ get-next 10xxxxxx? not ] take-until
+        [ drop get-next 10xxxxxx? not ] take-until
         get-char suffix utf8 decode
         utf8 decode-stream next
         continue-make-tag
@@ -77,9 +77,9 @@ IN: xml.autoencoding
     get-char {
         { CHAR: < [ start< ] }
         { 0 [ start-utf16be ] }
-        { HEX: EF [ skip-utf8-bom ] }
-        { HEX: FF [ skip-utf16le-bom ] }
-        { HEX: FE [ skip-utf16be-bom ] }
+        { 0xEF [ skip-utf8-bom ] }
+        { 0xFF [ skip-utf16le-bom ] }
+        { 0xFE [ skip-utf16be-bom ] }
         [ drop utf8 decode-stream check f ]
     } case ;
 

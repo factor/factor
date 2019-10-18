@@ -1,19 +1,19 @@
 ! Copyright (C) 2009 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup peg peg.search ;
-IN: peg.ebnf 
+IN: peg.ebnf
 
 HELP: <EBNF
 { $syntax "<EBNF ...ebnf... EBNF>" }
 { $values { "...ebnf..." "EBNF DSL text" } }
-{ $description 
-    "Creates a " { $vocab-link "peg" } 
+{ $description
+    "Creates a " { $vocab-link "peg" }
     " object that parses a string using the syntax "
     "defined with the EBNF DSL. The peg object can be run using the " { $link parse }
     " word and can be used with the " { $link search } " and " { $link replace } " words."
 }
 { $examples
-    { $example 
+    { $example
        "USING: kernel prettyprint peg.ebnf peg.search ;"
        "\"abcdab\" <EBNF rule=\"a\" \"b\" => [[ drop \"foo\" ]] EBNF> replace ."
        "\"foocdfoo\""
@@ -23,15 +23,15 @@ HELP: <EBNF
 HELP: [EBNF
 { $syntax "[EBNF ...ebnf... EBNF]" }
 { $values { "...ebnf..." "EBNF DSL text" } }
-{ $description 
+{ $description
     "Creates and calls a quotation that parses a string using the syntax "
-    "defined with the EBNF DSL. The quotation has stack effect " 
+    "defined with the EBNF DSL. The quotation has stack effect "
     { $snippet "( string -- ast )" } " where 'string' is the text to be parsed "
     "and 'ast' is the resulting abstract syntax tree. If the parsing fails the "
     "quotation throws an exception."
 }
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"ab\" [EBNF rule=\"a\" \"b\" EBNF] ."
        "V{ \"a\" \"b\" }"
@@ -41,15 +41,15 @@ HELP: [EBNF
 HELP: EBNF:
 { $syntax "EBNF: word ...ebnf... ;EBNF" }
 { $values { "word" "a word" } { "...ebnf..." "EBNF DSL text" } }
-{ $description 
+{ $description
     "Defines a word that when called will parse a string using the syntax "
-    "defined with the EBNF DSL. The word has stack effect " 
+    "defined with the EBNF DSL. The word has stack effect "
     { $snippet "( string -- ast )" } " where 'string' is the text to be parsed "
     "and 'ast' is the resulting abstract syntax tree. If the parsing fails the "
     "word throws an exception."
 }
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "IN: scratchpad"
        "EBNF: foo rule=\"a\" \"b\" ;EBNF"
@@ -62,7 +62,7 @@ ARTICLE: "peg.ebnf.strings" "Strings"
 "A string in a rule will match that sequence of characters from the input string. "
 "The AST result from the match is the string itself."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"helloworld\" [EBNF rule=\"hello\" \"world\" EBNF] ."
        "V{ \"hello\" \"world\" }"
@@ -73,7 +73,7 @@ ARTICLE: "peg.ebnf.any" "Any"
 "A full stop character (.) will match any single token in the input string. "
 "The AST resulting from this is the token itself."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"abc\" [EBNF rule=\"a\" . \"c\" EBNF] ."
        "V{ \"a\" 98 \"c\" }"
@@ -86,12 +86,34 @@ ARTICLE: "peg.ebnf.sequence" "Sequence"
 "goes. The AST result is a vector containing the results of each rule element in "
 "the sequence."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"abbba\" [EBNF rule=\"a\" (\"b\")* \"a\" EBNF] ."
        "V{ \"a\" V{ \"b\" \"b\" \"b\" } \"a\" }"
     }
-} 
+}
+;
+
+ARTICLE: "peg.ebnf.grouping" "Group"
+"Any sequence of rules may be grouped using parentheses (" { $snippet "()" } "). "
+"The parenthesized sequence can then be modified as a group. Parentheses also "
+"delimit sets of choices separated by pipe (|) characters."
+$nl
+"A group can also be delimited with curly braces (" { $snippet "{}" } "), in "
+"which case an implicit optional whitespace-matching rule will be inserted between "
+"rules sequenced within the braces."
+{ $examples
+    { $example
+       "USING: prettyprint peg.ebnf ;"
+       "\"abcca\" [EBNF rule=\"a\" (\"b\" | \"c\")* \"a\" EBNF] ."
+       "V{ \"a\" V{ \"b\" \"c\" \"c\" } \"a\" }"
+    }
+    { $example
+       "USING: prettyprint peg.ebnf ;"
+       "\"ab  c\nd \" [EBNF rule={\"a\" \"b\" \"c\" \"d\"} EBNF] ."
+       "V{ \"a\" \"b\" \"c\" \"d\" }"
+    }
+}
 ;
 
 ARTICLE: "peg.ebnf.choice" "Choice"
@@ -99,7 +121,7 @@ ARTICLE: "peg.ebnf.choice" "Choice"
 "are matched against the input stream in order. If a match succeeds then the remaining "
 "choices are discarded and the result of the match is the AST result of the choice."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"a\" [EBNF rule=\"a\" | \"b\" | \"c\" EBNF] ."
        "\"a\""
@@ -114,15 +136,27 @@ ARTICLE: "peg.ebnf.choice" "Choice"
        "\"d\" [EBNF rule=\"a\" | \"b\" | \"c\" EBNF] ."
        "Peg parsing error at character position 0.\nExpected token 'c' or token 'b' or token 'a'"
     }
-} 
+}
+;
+
+ARTICLE: "peg.ebnf.ignore" "Ignore"
+"Any rule element followed by a tilde (~) will be matched, and its results "
+"discarded from the AST."
+{ $examples
+    { $example
+       "USING: prettyprint peg.ebnf ;"
+       "\"abc\" [EBNF rule=\"a\" \"b\"~ \"c\" EBNF] ."
+       "V{ \"a\" \"c\" }"
+    }
+}
 ;
 
 ARTICLE: "peg.ebnf.option" "Option"
 "Any rule element followed by a question mark (?) is considered optional. The "
 "rule is tested against the input. If it succeeds the result is stored in the AST. "
-"If it fails then the parse still suceeds and false (f) is stored in the AST."
+"If it fails then the parse still succeeds and false (f) is stored in the AST."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"abc\" [EBNF rule=\"a\" \"b\"? \"c\" EBNF] ."
        "V{ \"a\" \"b\" \"c\" }"
@@ -132,7 +166,7 @@ ARTICLE: "peg.ebnf.option" "Option"
        "\"ac\" [EBNF rule=\"a\" \"b\"? \"c\" EBNF] ."
        "V{ \"a\" f \"c\" }"
     }
-} 
+}
 ;
 
 ARTICLE: "peg.ebnf.character-class" "Character Class"
@@ -143,12 +177,12 @@ ARTICLE: "peg.ebnf.character-class" "Character Class"
 "The AST resulting from the match is an integer of the character code for the "
 "character that matched."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"123\" [EBNF rule=[0-9]+ EBNF] ."
        "V{ 49 50 51 }"
     }
-} 
+}
 ;
 
 ARTICLE: "peg.ebnf.one-or-more" "One or more"
@@ -156,12 +190,12 @@ ARTICLE: "peg.ebnf.one-or-more" "One or more"
 "from the input string. The AST result is the vector of the AST results from "
 "the matched rule."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"aab\" [EBNF rule=\"a\"+ \"b\" EBNF] ."
        "V{ V{ \"a\" \"a\" } \"b\" }"
     }
-} 
+}
 ;
 
 ARTICLE: "peg.ebnf.zero-or-more" "Zero or more"
@@ -169,7 +203,7 @@ ARTICLE: "peg.ebnf.zero-or-more" "Zero or more"
 "from the input string. The AST result is the vector of the AST results from "
 "the matched rule. This will be empty if there are no matches."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"aab\" [EBNF rule=\"a\"* \"b\" EBNF] ."
        "V{ V{ \"a\" \"a\" } \"b\" }"
@@ -179,7 +213,7 @@ ARTICLE: "peg.ebnf.zero-or-more" "Zero or more"
        "\"b\" [EBNF rule=\"a\"* \"b\" EBNF] ."
        "V{ V{ } \"b\" }"
     }
-} 
+}
 ;
 
 ARTICLE: "peg.ebnf.and" "And"
@@ -190,12 +224,12 @@ ARTICLE: "peg.ebnf.and" "And"
 "does not leave any result in the AST. This can be used for lookahead and "
 "disambiguation in choices."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"ab\" [EBNF rule=&(\"a\") \"a\" \"b\" EBNF] ."
        "V{ \"a\" \"b\" }"
     }
-} 
+}
 ;
 
 ARTICLE: "peg.ebnf.not" "Not"
@@ -206,20 +240,20 @@ ARTICLE: "peg.ebnf.not" "Not"
 "however and does not leave any result in the AST. This can be used for lookahead and "
 "disambiguation in choices."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf ;"
        "\"<abcd>\" [EBNF rule=\"<\" (!(\">\") .)* \">\" EBNF] ."
        "V{ \"<\" V{ 97 98 99 100 } \">\" }"
     }
-} 
+}
 ;
-                    
+
 ARTICLE: "peg.ebnf.action" "Action"
 "An action is a quotation that is run after a rule matches. The quotation "
 "consumes the AST of the rule match and leaves a new AST as the result. "
 "The stack effect of the action can be " { $snippet "( ast -- ast )" } " or "
 { $snippet "( -- ast )" } ". "
-"If it is the latter then the original AST is implcitly dropped and will be "
+"If it is the latter then the original AST is implicitly dropped and will be "
 "replaced by the AST left on the stack. This is mostly useful if variables are "
 "used in the rule since they can be referenced like locals in the action quotation. "
 "The action is defined by having a ' => ' at the end of a rule and "
@@ -227,7 +261,7 @@ ARTICLE: "peg.ebnf.action" "Action"
 "If an action leaves the object 'ignore' on the stack then the result of that "
 "action will not be put in the AST of the result."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf strings ;"
        "\"<abcd>\" [EBNF rule=\"<\" ((!(\">\") .)* => [[ >string ]]) \">\" EBNF] ."
        "V{ \"<\" \"abcd\" \">\" }"
@@ -237,17 +271,17 @@ ARTICLE: "peg.ebnf.action" "Action"
        "\"123\" [EBNF rule=[0-9]+ => [[ string>number ]] EBNF] ."
        "123"
     }
-} 
+}
 ;
 
 ARTICLE: "peg.ebnf.semantic-action" "Semantic Action"
 "Semantic actions allow providing a quotation that gets run on the AST of a "
 "matched rule that returns success or failure. The result of the parse is decided by "
 "the result of the semantic action. The stack effect for the quotation is "
-{ $snippet ( ast -- ? ) } ". " 
-"A semantic action follows the rule it applies to and is delimeted by '?[' and ']?'."
+{ $snippet "( ast -- ? )" } ". "
+"A semantic action follows the rule it applies to and is delimited by '?[' and ']?'."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf math math.parser ;"
        "\"1\" [EBNF rule=[0-9] ?[ digit> odd? ]? EBNF] ."
        "49"
@@ -257,7 +291,7 @@ ARTICLE: "peg.ebnf.semantic-action" "Semantic Action"
        "\"2\" [EBNF rule=[0-9] ?[ digit> odd? ]? EBNF] ."
        "Sequence index out of bounds\nindex 0\nseq   V{ }"
     }
-} 
+}
 ;
 
 ARTICLE: "peg.ebnf.variable" "Variable"
@@ -265,16 +299,16 @@ ARTICLE: "peg.ebnf.variable" "Variable"
 "followed by the variable name. These can then be used in rule actions to refer to "
 "the AST result of the rule element with that variable name."
 { $examples
-    { $example 
+    { $example
        "USING: prettyprint peg.ebnf math.parser ;"
        "\"1+2\" [EBNF rule=[0-9]:a \"+\" [0-9]:b => [[ a digit> b digit> + ]] EBNF] ."
        "3"
     }
-} 
+}
 ;
 
 ARTICLE: "peg.ebnf.foreign-rules" "Foreign Rules"
-"Rules can call outto other peg.ebnf defined parsers. The result of "
+"Rules can call out to other peg.ebnf defined parsers. The result of "
 "the foreign call then becomes the AST of the successful parse. Foreign rules "
 "are invoked using '<foreign word-name>' or '<foreign word-name rule>'. The "
 "latter allows calling a specific rule in a previously designed peg.ebnf parser. "
@@ -283,7 +317,7 @@ ARTICLE: "peg.ebnf.foreign-rules" "Foreign Rules"
 { $vocab-link "peg" } " defined parser and it will be called to perform the parse "
 "for that rule."
 { $examples
-    { $code 
+    { $code
        "USING: prettyprint peg.ebnf ;"
        "EBNF: parse-string"
        "StringBody = (!('\"') .)*"
@@ -302,7 +336,7 @@ ARTICLE: "peg.ebnf.foreign-rules" "Foreign Rules"
        "abc = <foreign a-token> 'b' 'c'"
        ";EBNF"
    }
-} 
+}
 ;
 
 ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
@@ -319,7 +353,7 @@ ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
 "This parser when run with the string \"++--\" or the array "
 "{ CHAR: + CHAR: + CHAR: - CHAR: - } will succeed with an AST of { \"++\" \"--\" }. "
 "If you want to add whitespace handling to the grammar you need to put it "
-"between the terminals: "
+"between the terminals:"
 { $examples
     { $code
         "EBNF: foo"
@@ -332,7 +366,7 @@ ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
 "In a large grammar this gets tedious and makes the grammar hard to read. "
 "Instead you can write a rule to split the input sequence into tokens, and "
 "have the grammar operate on these tokens. This is how the previous example "
-"might look: "
+"might look:"
 { $examples
     { $code
         "EBNF: foo"
@@ -355,7 +389,7 @@ ARTICLE: "peg.ebnf.tokenizers" "Tokenizers"
 $nl
 "In this example I split the tokenizer into a separate parser and use "
 "'foreign' to call it from the main one. This allows testing of the "
-"tokenizer separately: "
+"tokenizer separately:"
 { $examples
     { $example
         "USING: prettyprint peg peg.ebnf kernel math.parser strings"
@@ -397,7 +431,7 @@ $nl
 "working in one pass. There is no tokenization occurring over the whole string "
 "followed by the parse of that result. It tokenizes as it needs to. You can even "
 "switch tokenizers multiple times during a grammar. Rules use the tokenizer that "
-"was defined lexically before the rule. This is usefull in the JavaScript grammar: "
+"was defined lexically before the rule. This is useful in the JavaScript grammar:"
 { $examples
     { $code
         "EBNF: javascript"
@@ -440,19 +474,21 @@ ARTICLE: "peg.ebnf" "EBNF"
     POSTPONE: [EBNF
     POSTPONE: EBNF:
 }
-"The EBNF syntax is composed of a series of rules of the form: "
-{ $code 
+"The EBNF syntax is composed of a series of rules of the form:"
+{ $code
   "rule1 = ..."
   "rule2 = ..."
 }
 "The last defined rule is the main rule for the EBNF. It is the first one run "
 "and it is expected that the remaining rules are used by that rule. Rules may be "
 "left recursive. "
-"Each rule can contain the following: "
+"Each rule can contain the following:"
 { $subsections "peg.ebnf.strings"
 "peg.ebnf.any"
 "peg.ebnf.sequence"
+"peg.ebnf.grouping"
 "peg.ebnf.choice"
+"peg.ebnf.ignore"
 "peg.ebnf.option"
 "peg.ebnf.one-or-more"
 "peg.ebnf.zero-or-more"
@@ -469,7 +505,7 @@ ARTICLE: "peg.ebnf" "EBNF"
 "own tokenizer that for an EBNF grammar, and write the grammar in terms of "
 "those tokens, allowing you to ignore the whitespace issue. The tokenizer "
 "can be changed at various parts in the grammar as needed. The JavaScript grammar "
-"does this to define the optional semicolon rule for example." 
+"does this to define the optional semicolon rule for example."
 { $subsections "peg.ebnf.tokenizers" }
 ;
 

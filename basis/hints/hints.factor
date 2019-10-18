@@ -3,14 +3,14 @@
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions effects fry generic generic.single
 generic.standard hashtables io.binary io.encodings
-io.streams.string kernel kernel.private math
-math.integers.private math.parser namespaces parser sbufs
-sequences splitting splitting.private strings vectors words ;
+io.streams.string kernel kernel.private math math.parser
+namespaces parser sbufs sequences splitting splitting.private
+strings vectors words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
 
-M: class specializer-predicate "predicate" word-prop ;
+M: class specializer-predicate predicate-def ;
 
 M: object specializer-predicate '[ _ eq? ] ;
 
@@ -18,7 +18,7 @@ GENERIC: specializer-declaration ( spec -- class )
 
 M: class specializer-declaration ;
 
-M: object specializer-declaration class ;
+M: object specializer-declaration class-of ;
 
 : specializer ( word -- specializer )
     "specializer" word-prop ;
@@ -92,6 +92,10 @@ SYNTAX: HINTS:
 { { string string } { array array } }
 "specializer" set-word-prop
 
+\ prepend
+{ { string string } { array array } }
+"specializer" set-word-prop
+
 \ subseq
 { { fixnum fixnum string } { fixnum fixnum array } }
 "specializer" set-word-prop
@@ -129,7 +133,5 @@ SYNTAX: HINTS:
 M\ hashtable at* { { fixnum object } { word object } } "specializer" set-word-prop
 
 M\ hashtable set-at { { object fixnum object } { object word object } } "specializer" set-word-prop
-
-\ bignum/f { { bignum bignum } { bignum fixnum } { fixnum bignum } { fixnum fixnum } } "specializer" set-word-prop
 
 \ encode-string { string object object } "specializer" set-word-prop

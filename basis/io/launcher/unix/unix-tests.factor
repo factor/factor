@@ -1,10 +1,11 @@
 IN: io.launcher.unix.tests
-USING: io.files io.files.temp io.directories io.pathnames
-tools.test io.launcher arrays io namespaces continuations math
-io.encodings.binary io.encodings.ascii accessors kernel
-sequences io.encodings.utf8 destructors io.streams.duplex locals
-concurrency.promises threads unix.process calendar unix
-unix.process debugger.unix io.timeouts io.launcher.unix ;
+USING: io.backend.unix io.files io.files.temp io.directories
+io.pathnames tools.test io.launcher arrays io namespaces
+continuations math io.encodings.binary io.encodings.ascii
+accessors kernel sequences io.encodings.utf8 destructors
+io.streams.duplex locals concurrency.promises threads
+unix.process calendar unix debugger.unix io.timeouts
+io.launcher.unix ;
 
 [ ] [
     [ "launcher-test-1" temp-file delete-file ] ignore-errors
@@ -124,6 +125,28 @@ unix.process debugger.unix io.timeouts io.launcher.unix ;
     ] with-stream
 ] unit-test
 
+! Test process timeouts
+[
+    <process>
+        { "sleep" "10" } >>command
+        1 seconds >>timeout
+    run-process
+] [ process-was-killed? ] must-fail-with
+
+[
+    <process>
+        { "sleep" "10" } >>command
+        1 seconds >>timeout
+    try-process
+] [ process-was-killed? ] must-fail-with
+
+[
+    <process>
+        { "sleep" "10" } >>command
+        1 seconds >>timeout
+    try-output-process
+] [ io-timeout? ] must-fail-with
+
 ! Killed processes were exiting with code 0 on FreeBSD
 [ f ] [
     [let 
@@ -135,7 +158,7 @@ unix.process debugger.unix io.timeouts io.launcher.unix ;
             [ p fulfill ] [ wait-for-process s fulfill ] bi
         ] in-thread
 
-        p 1 seconds ?promise-timeout handle>> kill-process*
+        p 1 seconds ?promise-timeout kill-process*
         s 3 seconds ?promise-timeout 0 =
     ]
 ] unit-test
@@ -158,3 +181,36 @@ unix.process debugger.unix io.timeouts io.launcher.unix ;
     [ wait-for-process ]
     tri
 ] unit-test
+
+! Test priority
+[ 0 ] [
+    <process>
+        { "bash" "-c" "sleep 2&" } >>command
+        +low-priority+ >>priority
+    run-process status>>
+] unit-test
+
+! Check that processes launched with the group option kill their children (or not)
+! This test should leave two sleeps running for 30 seconds.
+[
+    <process> { "bash" "-c" "sleep 30& sleep 30" } >>command
+        +same-group+ >>group
+        500 milliseconds >>timeout
+    run-process
+] [ process-was-killed? ] must-fail-with
+
+! This test should kill the sleep after 500ms.
+[
+    <process> { "bash" "-c" "sleep 30& sleep 30" } >>command
+        +new-group+ >>group
+        500 milliseconds >>timeout
+    run-process
+] [ process-was-killed? ] must-fail-with
+
+! This test should kill the sleep after 500ms.
+[
+    <process> { "bash" "-c" "sleep 30& sleep 30" } >>command
+        +new-session+ >>group
+        500 milliseconds >>timeout
+    run-process
+] [ process-was-killed? ] must-fail-with

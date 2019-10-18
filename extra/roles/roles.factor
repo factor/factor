@@ -12,7 +12,7 @@ PREDICATE: role < mixin-class
     "role-slots" word-prop >boolean ;
 
 : parse-role-definition ( -- class superroles slots )
-    CREATE-CLASS scan {
+    scan-new-class scan-token {
         { ";" [ { } { } ] }
         { "<" [ scan-word 1array [ parse-tuple-slots ] { } make ] }
         { "<{" [ \ } parse-until >array [ parse-tuple-slots ] { } make ] }
@@ -20,7 +20,8 @@ PREDICATE: role < mixin-class
     } case ;
 
 : slot-name ( name/array -- name )
-    dup string? [ ] [ first ] if ;
+    dup string? [ first ] unless ;
+
 : slot-names ( array -- names )
     [ slot-name ] map ;
 

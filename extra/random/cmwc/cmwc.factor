@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays fry kernel locals math
-math.bitwise random sequences sequences.private
+USING: accessors alien.c-types alien.data arrays fry kernel
+locals math math.bitwise random sequences sequences.private
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 IN: random.cmwc
@@ -24,7 +24,7 @@ TUPLE: cmwc-seed { Q uint-array read-only } { c read-only } ;
         swap >>c
         swap >>b
         swap >>a
-        swap [ 1 - >>i ] [ <uint-array> >>Q ] bi
+        swap [ 1 - >>i ] [ uint <c-array> >>Q ] bi
         dup b>> 1 - >>r
         dup Q>> length 1 - >>mod ; inline
 

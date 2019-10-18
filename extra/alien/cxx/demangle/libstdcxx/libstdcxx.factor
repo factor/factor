@@ -1,7 +1,7 @@
 ! (c)2010 Joe Groff bsd license
-USING: alien alien.c-types alien.libraries alien.strings
-alien.syntax combinators destructors io.encodings.ascii kernel
-libc locals sequences system ;
+USING: alien alien.c-types alien.data alien.libraries
+alien.strings alien.syntax combinators destructors
+io.encodings.ascii kernel libc locals sequences system ;
 IN: alien.cxx.demangle.libstdcxx
 
 FUNCTION: char* __cxa_demangle ( char* mangled_name, char* output_buffer, size_t* length, int* status ) ;
@@ -22,9 +22,9 @@ ERROR: invalid-demangle-args name ;
     "_Z" head? ;
 
 :: demangle ( mangled-name -- c++-name )
-    0 <ulong> :> length
-    0 <int> :> status [
+    0 ulong <ref> :> length
+    0 int <ref> :> status [
         mangled-name ascii string>alien f length status __cxa_demangle &(free) :> demangled-buf
-        mangled-name status *int demangle-error
+        mangled-name status int deref demangle-error
         demangled-buf ascii alien>string
     ] with-destructors ;

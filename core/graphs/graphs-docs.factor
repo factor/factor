@@ -16,9 +16,6 @@ $nl
 
 ABOUT: "graphs"
 
-HELP: graph
-{ $var-description "Temporary variable used by various graph words." } ;
-
 HELP: add-vertex
 { $values { "vertex" object } { "edges" "a sequence" } { "graph" "an assoc mapping vertices to sequences of edges" } }
 { $description "Adds a vertex to a directed graph, with " { $snippet "edges" } "  as the outward edges from the vertex." }

@@ -56,7 +56,7 @@ HELP: define-operation
         { { $link +description+ } " - can be set to a string description of the operation" }
         { { $link +primary+ } " - if set to a true value, the operation will be output by " { $link primary-operation } " when applied to an object satisfying the predicate" }
         { { $link +secondary+ } " - if set to a true value, the operation will be output by " { $link secondary-operation } " when applied to an object satisfying the predicate" }
-        { { $link +keyboard+ } " - can be set to a keyboard gesture; the guesture will be used by " { $link define-operation-map } }
+        { { $link +keyboard+ } " - can be set to a keyboard gesture; the gesture will be used by " { $link define-operation-map } }
     }
 } ;
 

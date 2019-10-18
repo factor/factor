@@ -1,6 +1,5 @@
-USING: kernel system windows.kernel32 io.backend.windows
-io.files.windows io.ports windows destructors environment
-io.files.unique ;
+USING: destructors environment io.files.unique io.files.windows
+system windows.kernel32 ;
 IN: io.files.unique.windows
 
 M: windows (touch-unique-file) ( path -- )

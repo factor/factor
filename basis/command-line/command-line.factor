@@ -1,33 +1,50 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init continuations hashtables io io.encodings.utf8
-io.files io.pathnames kernel kernel.private namespaces parser
-sequences strings system splitting vocabs.loader alien.strings ;
+USING: accessors alien.strings assocs continuations fry init
+io.encodings.utf8 io.files io.pathnames kernel kernel.private
+namespaces parser parser.notes sequences source-files
+source-files.errors splitting system vocabs.loader ;
 IN: command-line
+
+SYMBOL: user-init-errors
+SYMBOL: +user-init-error+
+
+TUPLE: user-init-error error file line# asset ;
+
+: <user-init-error> ( error -- error' )
+    [ ] [ error-file ] [ error-line ] tri
+    f user-init-error boa ; inline
+M: user-init-error error-file file>> ;
+M: user-init-error error-line line#>> ;
+M: user-init-error error-type drop +user-init-error+ ;
 
 SYMBOL: script
 SYMBOL: command-line
 
 : (command-line) ( -- args )
-    10 special-object sift [ alien>native-string ] map ;
+    OBJ-ARGS special-object sift [ alien>native-string ] map ;
 
 : rc-path ( name -- path )
-    os windows? [ "." prepend ] unless
     home prepend-path ;
 
-: run-bootstrap-init ( -- )
-    "user-init" get [
-        "factor-boot-rc" rc-path ?run-file
+: try-user-init ( file -- )
+    "user-init" get swap '[
+        _ [ ?run-file ] [
+            <user-init-error>
+            swap user-init-errors get set-at
+            notify-error-observers
+        ] recover
     ] when ;
 
+: run-bootstrap-init ( -- )
+    ".factor-boot-rc" rc-path try-user-init ;
+
 : run-user-init ( -- )
-    "user-init" get [
-        "factor-rc" rc-path ?run-file
-    ] when ;
+    ".factor-rc" rc-path try-user-init ;
 
 : load-vocab-roots ( -- )
     "user-init" get [
-        "factor-roots" rc-path dup exists? [
+        ".factor-roots" rc-path dup exists? [
             utf8 file-lines harvest [ add-vocab-root ] each
         ] [ drop ] if
     ] when ;
@@ -40,14 +57,23 @@ SYMBOL: command-line
     "=" split1 [ var-param ] [ bool-param ] if* ;
 
 : run-script ( file -- )
-    t "quiet" set-global run-file ;
+    t parser-quiet? [
+        [ run-file ]
+        [ source-file main>> [ execute( -- ) ] when* ] bi
+    ] with-variable ;
+
+: (parse-command-line) ( run? args -- )
+    [ command-line off script off drop ] [
+        unclip "-" ?head
+        [ param (parse-command-line) ]
+        [
+            rot [ prefix f ] when
+            script set command-line set
+        ] if
+    ] if-empty ;
 
 : parse-command-line ( args -- )
-    [ command-line off script off ] [
-        unclip "-" ?head
-        [ param parse-command-line ]
-        [ script set command-line set ] if
-    ] if-empty ;
+    [ [ "-run=" head? ] any? ] keep (parse-command-line) ;
 
 SYMBOL: main-vocab-hook
 
@@ -59,12 +85,15 @@ SYMBOL: main-vocab-hook
     ] if ;
 
 : default-cli-args ( -- )
-    global [
-        "quiet" off
+    [
         "e" off
         "user-init" on
-        embedded? "quiet" set
         main-vocab "run" set
-    ] bind ;
+    ] with-global ;
 
-[ default-cli-args ] "command-line" add-startup-hook
+[
+    H{ } user-init-errors set-global
+    default-cli-args
+] "command-line" add-startup-hook
+
+{ "debugger" "command-line" } "command-line.debugger" require-when

@@ -13,9 +13,7 @@ IN: pack.tests
 ] unit-test
 
 [ B{ 1 2 0 3 0 0 4 0 0 0 5 0 0 0 0 0 0 0 } ] [
-    [
-        { 1 2 3 4 5 } "cstiq" pack-le
-    ] with-scope
+    { 1 2 3 4 5 } "cstiq" pack-le
 ] unit-test
 
 [ { 1 2 3 4 5 } ] [

@@ -24,7 +24,7 @@ ARTICLE: "enums" "Enumerations"
     <enum>
 }
 "Inverting a permutation using enumerations:"
-{ $example "IN: scratchpad" ": invert ( perm -- perm' )" "    <enum> >alist sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
+{ $example "IN: scratchpad" ": invert ( perm -- perm' )" "    <enum> sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
 
 HELP: enum
 { $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
@@ -189,7 +189,7 @@ HELP: assoc
 } ;
 
 HELP: at*
-{ $values { "key" "an object to look up in the assoc" } { "assoc" assoc } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } { "?" "a boolean indicating if the key was present" } }
+{ $values { "key" "an object to look up in the assoc" } { "assoc" assoc } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } { "?" "a " { $link boolean } " indicating if the key was present" } }
 { $contract "Looks up the value associated with a key. The boolean flag can decide between the case of a missing value, and a value of " { $link f } "." } ;
 
 HELP: set-at
@@ -202,12 +202,12 @@ HELP: new-assoc
 { $contract "Creates a new assoc of the same size as " { $snippet "exemplar" } " which can hold " { $snippet "capacity" } " entries before growing." } ;
 
 HELP: assoc-find
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" "a boolean" } }
+{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" boolean } }
 { $description "Applies a predicate quotation to each entry in the assoc. Returns the key and value that the quotation succeeds on, or " { $link f } " for both if the quotation fails. It also returns a boolean describing whether there was anything found; this can be used to distinguish between a key and a value equal to " { $link f } ", or nothing being found." } ;
 
 HELP: clear-assoc
 { $values { "assoc" assoc } }
-{ $contract "Removes all entries from the assoc."  }
+{ $contract "Removes all entries from the assoc." }
 { $side-effects "assoc" } ;
 
 HELP: delete-at
@@ -224,21 +224,21 @@ HELP: assoc-like
 { $contract "Creates a new assoc having the same entries as " { $snippet "assoc" } " and the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: assoc-empty?
-{ $values { "assoc" assoc } { "?" "a boolean" } }
+{ $values { "assoc" assoc } { "?" boolean } }
 { $description "Tests if the assoc contains no entries." } ;
 
 HELP: key?
-{ $values { "key" object } { "assoc" assoc } { "?" "a boolean" } }
+{ $values { "key" object } { "assoc" assoc } { "?" boolean } }
 { $description "Tests if an assoc contains a key." } ;
 
 { at at* key? ?at } related-words
 
 HELP: at
-{ $values { "key" "an object" } { "assoc" assoc } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } }
+{ $values { "key" object } { "assoc" assoc } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } }
 { $description "Looks up the value associated with a key. This word makes no distinction between a missing value and a value set to " { $link f } "; if the difference is important, use " { $link at* } "." } ;
 
 HELP: ?at
-{ $values { "key" "an object" } { "assoc" assoc } { "value/key" "the value associated to the key, or the key if the key is not present in the assoc" } { "?" "a boolean" } }
+{ $values { "key" object } { "assoc" assoc } { "value/key" "the value associated to the key, or the key if the key is not present in the assoc" } { "?" "a " { $link boolean } " indicating if the key was present" } }
 { $description "Looks up the value associated with a key. If the key was not present, an error can be thrown without extra stack shuffling. This word handles assocs that store " { $link f } "." } ;
 
 HELP: assoc-each
@@ -262,7 +262,7 @@ HELP: assoc-map
         "    [ - ] curry assoc-map ;"
         "H{ { \"bananas\" 5 } { \"apples\" 42 } { \"pears\" 17 } }"
         "2 discount ."
-        "H{ { \"bananas\" 3 } { \"apples\" 39 } { \"pears\" 15 } }"
+        "H{ { \"bananas\" 3 } { \"apples\" 40 } { \"pears\" 15 } }"
     }
 } ;
 
@@ -291,19 +291,23 @@ HELP: assoc-partition
 { $description "Calls a predicate quotation on each key of the input assoc. If the test yields true, the key/value pair is added to " { $snippet "true-assoc" } "; if false, it's added to " { $snippet "false-assoc" } "." } ;
 
 HELP: assoc-any?
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "?" "a boolean" } }
+{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "?" boolean } }
 { $description "Tests if the assoc contains an entry satisfying a predicate by applying the quotation to each entry in turn. Iteration stops if an entry is found for which the quotation outputs a true value." } ;
 
 HELP: assoc-all?
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "?" "a boolean" } }
+{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "?" boolean } }
 { $description "Tests if all entries in the assoc satisfy a predicate by applying the quotation to each entry in turn. a predicate quotation to entry in the assoc. Iteration stops if an entry is found for which the quotation outputs " { $link f } ". If the assoc is empty, always outputs " { $link t } "." } ;
 
+HELP: assoc-refine
+{ $values { "seq" sequence } { "assoc" assoc } }
+{ $description "Outputs the intersection of all the assocs of the assocs sequence " { $snippet "seq" } ", or " { $link f } " if " { $snippet "seq" } " is empty." } ;
+
 HELP: assoc-subset?
-{ $values { "assoc1" assoc } { "assoc2" assoc } { "?" "a new assoc" } }
+{ $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }
 { $description "Tests if " { $snippet "assoc2" } " contains all key/value pairs of " { $snippet "assoc1" } "." } ;
 
 HELP: assoc=
-{ $values { "assoc1" assoc } { "assoc2" assoc } { "?" "a boolean" } }
+{ $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }
 { $description "Tests if two assocs contain the same entries. Unlike " { $link = } ", the two assocs may be of different types." }
 { $notes "Assoc implementations should define a method for the " { $link equal? } " generic word which calls this word after checking that both inputs have the same type." } ;
 
@@ -318,19 +322,19 @@ HELP: assoc-stack
 { $notes "This word is used to implement abstractions such as nested scopes; if the sequence is a stack represented by a vector, then the most recently pushed assoc -- the innermost scope -- will be searched first." } ;
 
 HELP: value-at*
-{ $values { "value" "an object" } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } { "?" "a boolean" } }
-{ $description "Looks up the key associated with a value. The boolean flag can decide beteen the case of a missing key, and a key of " { $link f } "." } ;
+{ $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } { "?" boolean } }
+{ $description "Looks up the key associated with a value. The boolean flag can decide between the case of a missing key, and a key of " { $link f } "." } ;
 
 HELP: value-at
-{ $values { "value" "an object" } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } }
+{ $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } }
 { $description "Looks up the key associated with a value. No distinction is made between a missing key and a key set to " { $link f } "." } ;
 
 HELP: value?
-{ $values { "value" "an object" } { "assoc" assoc } { "?" "a boolean" } }
+{ $values { "value" object } { "assoc" assoc } { "?" boolean } }
 { $description "Tests if an assoc contains at least one key with the given value." } ;
 
 HELP: delete-at*
-{ $values { "key" "a key" } { "assoc" assoc } { "old" "the previous value or " { $link f } } { "?" "a boolean" } }
+{ $values { "key" "a key" } { "assoc" assoc } { "old" "the previous value or " { $link f } } { "?" boolean } }
 { $description "Removes an entry from the assoc and outputs the previous value together with a boolean indicating whether it was present." }
 { $side-effects "assoc" } ;
 
@@ -365,7 +369,7 @@ HELP: assoc-union
 
 HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
-{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
+{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." }
 ;
 
 HELP: assoc-diff!
@@ -388,11 +392,11 @@ HELP: 2cache
 { $side-effects "assoc" } ;
 
 HELP: map>assoc
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( ... elt -- ... key value )" } } { "exemplar" assoc } { "assoc" "a new assoc" } }
+{ $values { "seq" sequence } { "quot" { $quotation "( ... elt -- ... key value )" } } { "exemplar" assoc } { "assoc" "a new assoc" } }
 { $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new assoc having the same type as " { $snippet "exemplar" } "." } ;
 
 HELP: assoc>map
-{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... elt )" } } { "exemplar" "a sequence" } { "seq" "a new sequence" } }
+{ $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... elt )" } } { "exemplar" sequence } { "seq" "a new sequence" } }
 { $description "Applies the quotation to each entry of the assoc and collects the results into a new sequence of the same type as the exemplar." } ;
 
 HELP: change-at
@@ -434,7 +438,7 @@ HELP: assoc-map-as
 { $values
      { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... newkey newvalue )" } } { "exemplar" assoc }
      { "newassoc" assoc } }
-{ $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the stame type as the exemplar." }
+{ $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the same type as the exemplar." }
 { $examples { $example "USING: prettyprint assocs hashtables math ;" " H{ { 1 2 } { 3 4 } } [ sq ] { } assoc-map-as ." "{ { 1 4 } { 3 16 } }" } } ;
 
 HELP: extract-keys
@@ -453,7 +457,7 @@ HELP: push-at
 { $values
      { "value" object } { "key" object } { "assoc" assoc } }
 { $description "Pushes the " { $snippet "value" } " onto a " { $snippet "vector" } " stored at the " { $snippet "key" } " in the " { $snippet "assoc" } ". If the " { $snippet "key" } " does not yet exist, creates a new " { $snippet "vector" } " at that " { $snippet "key" } " and pushes the " { $snippet "value" } "." }
-{ $examples { $example  "USING: prettyprint assocs kernel ;"
+{ $examples { $example "USING: prettyprint assocs kernel ;"
 "H{ { \"cats\" V{ \"Mittens\" } } } \"Mew\" \"cats\" pick push-at ."
 "H{ { \"cats\" V{ \"Mittens\" \"Mew\" } } }"
 } } ;
@@ -463,7 +467,7 @@ HELP: search-alist
      { "key" object } { "alist" "an array of key/value pairs" }
      { "pair/f" "a key/value pair" } { "i/f" integer } }
 { $description "Iterates over " { $snippet "alist" } " and stops when the key is matched or the end of the " { $snippet "alist" } " has been reached. If there is no match, both outputs are " { $link f } "." }
-{ $notes "This word is used to implement " { $link at* } " and " { $link set-at } " on sequences, and should not be called direclty." }
+{ $notes "This word is used to implement " { $link at* } " and " { $link set-at } " on sequences, and should not be called directly." }
 { $examples { $example "USING: prettyprint assocs.private kernel ;"
                         "3 { { 1 2 } { 3 4 } } search-alist [ . ] bi@"
                        "{ 3 4 }\n1"
@@ -478,10 +482,10 @@ HELP: unzip
      { "assoc" assoc }
      { "keys" sequence } { "values" sequence } }
 { $description "Outputs an array of keys and an array of values of the input " { $snippet "assoc" } "." }
-{ $examples 
+{ $examples
     { $example "USING: prettyprint assocs kernel ;"
                "{ { 1 4 } { 2 5 } { 3 6 } } unzip [ . ] bi@"
-               "{ 1 2 3 }\n{ 4 5 6 }" 
+               "{ 1 2 3 }\n{ 4 5 6 }"
     }
 } ;
 
@@ -490,8 +494,8 @@ HELP: zip
      { "keys" sequence } { "values" sequence }
      { "alist" "an array of key/value pairs" } }
 { $description "Combines two sequences pairwise into a single sequence of key/value pairs." }
-{ $examples 
-    { $example "" "USING: prettyprint assocs ;"
+{ $examples
+    { $example "USING: prettyprint assocs ;"
                "{ 1 2 3 } { 4 5 6 } zip ."
                "{ { 1 4 } { 2 5 } { 3 6 } }"
     }

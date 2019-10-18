@@ -11,7 +11,7 @@ IN: formatting
 <PRIVATE
 
 : compose-all ( seq -- quot )
-    [ ] [ compose ] reduce ;
+    [ ] [ compose ] reduce ; inline
 
 : fix-sign ( string -- string )
     dup CHAR: 0 swap index 0 =
@@ -46,7 +46,7 @@ char      = "'" (.)              => [[ second ]]
 pad-char  = (zero|char)?         => [[ CHAR: \s or ]]
 pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]]
 pad-width = ([0-9])*             => [[ >digits ]]
-pad       = pad-align pad-char pad-width => [[ reverse >quotation dup first 0 = [ drop [ ] ] when ]]
+pad       = pad-align pad-char pad-width => [[ <reversed> >quotation dup first 0 = [ drop [ ] ] when ]]
 
 sign      = ("+")?               => [[ [ dup CHAR: - swap index [ "+" prepend ] unless ] [ ] ? ]]
 
@@ -70,7 +70,7 @@ fmt-X     = "X"                  => [[ [ >hex >upper ] ]]
 unknown   = (.)*                 => [[ unknown-printf-directive ]]
 
 strings_  = fmt-c|fmt-C|fmt-s|fmt-S
-strings   = pad width strings_   => [[ reverse compose-all ]]
+strings   = pad width strings_   => [[ <reversed> compose-all ]]
 
 numbers_  = fmt-d|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
 numbers   = sign pad numbers_    => [[ unclip-last prefix compose-all [ fix-sign ] append ]]
@@ -85,14 +85,15 @@ formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second '[ _ dip ] ]]
 
 plain-text = (!("%").)+          => [[ >string '[ _ swap ] ]]
 
-text      = (formats|plain-text)* => [[ reverse [ [ [ push ] keep ] append ] map ]]
+text      = (formats|plain-text)* => [[ <reversed> [ [ [ push ] keep ] append ] map ]]
 
 ;EBNF
 
 PRIVATE>
 
 MACRO: printf ( format-string -- )
-    parse-printf [ length ] keep compose-all '[ _ <vector> @ reverse [ write ] each ] ;
+    parse-printf [ length ] keep compose-all
+    '[ _ <vector> @ <reversed> [ write ] each ] ;
 
 : sprintf ( format-string -- result )
     [ printf ] with-string-writer ; inline

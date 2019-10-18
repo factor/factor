@@ -1,6 +1,6 @@
-USING: alien.c-types accessors assocs classes destructors
-functors kernel lexer math parser sequences specialized-arrays
-ui.backend words ;
+USING: alien.c-types alien.data accessors assocs classes
+destructors functors kernel lexer math parser sequences
+specialized-arrays ui.backend words ;
 SPECIALIZED-ARRAY: int
 IN: ui.pixel-formats
 
@@ -58,9 +58,6 @@ TUPLE: pixel-format < disposable world handle ;
 M: pixel-format dispose*
     [ (free-pixel-format) ] [ f >>handle drop ] bi ;
 
-: pixel-format-attribute ( pixel-format attribute-name -- value )
-    (pixel-format-attribute) ;
-
 <PRIVATE
 
 FUNCTOR: define-pixel-format-attribute-table ( NAME PERM TABLE -- )
@@ -77,17 +74,17 @@ M: object >PFA
 M: word >PFA
     TABLE at [ { } ] unless* ;
 M: pixel-format-attribute >PFA
-    dup class TABLE at
+    dup class-of TABLE at
     [ swap value>> suffix ]
     [ drop { } ] if* ;
 
 : >PFA-int-array ( attribute -- int-array )
-    [ >PFA ] map concat PERM prepend 0 suffix >int-array ;
+    [ >PFA ] map concat PERM prepend 0 suffix int >c-array ;
 
 ;FUNCTOR
 
 SYNTAX: PIXEL-FORMAT-ATTRIBUTE-TABLE:
-    scan scan-object scan-object define-pixel-format-attribute-table ;
+    scan-token scan-object scan-object define-pixel-format-attribute-table ;
 
 PRIVATE>
 

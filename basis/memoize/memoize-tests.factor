@@ -30,6 +30,6 @@ unit-test
 
 [ "IN: memoize.tests\n: fib ( -- ) ;\n" ] [ [ \ fib see ] with-string-writer ] unit-test
 
-[ sq ] (( a -- b )) memoize-quot "q" set
+[ sq ] ( a -- b ) memoize-quot "q" set
 
 [ 9 ] [ 3 "q" get call ] unit-test

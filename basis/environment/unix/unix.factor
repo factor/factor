@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.strings
 alien.syntax kernel layouts sequences system unix
-environment io.encodings.utf8 unix.utilities vocabs.loader
+environment io.encodings.utf8 unix.utilities vocabs
 combinators alien.accessors unix.ffi ;
 IN: environment.unix
 
@@ -17,7 +17,7 @@ M: unix set-os-env ( value key -- ) swap 1 setenv io-error ;
 M: unix unset-os-env ( key -- ) unsetenv io-error ;
 
 M: unix (os-envs) ( -- seq )
-    environ *void* utf8 alien>strings ;
+    environ void* deref utf8 alien>strings ;
 
 : set-void* ( value alien -- ) 0 set-alien-cell ;
 

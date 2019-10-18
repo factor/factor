@@ -49,8 +49,7 @@ M: tag [undo-xml] ( tag -- quot: ( tag -- ) )
     } cleave '[ _ _ _ tri ] ;
 
 : firstn-strong ( seq n -- ... )
-    [ swap length =/fail ]
-    [ firstn ] 2bi ; inline
+    [ assure-length ] [ firstn ] 2bi ; inline
 
 M: sequence [undo-xml] ( sequence -- quot: ( seq -- ) )
     remove-blanks [ length ] [ [ [undo-xml] ] { } map-as ] bi
@@ -67,9 +66,9 @@ M: interpolated [undo-xml]
 
 : >enum ( assoc -- enum )
     ! Assumes keys are 0..n
-    >alist sort-keys values <enum> ;
+    sort-keys values <enum> ;
 
 : undo-xml ( xml -- quot )
-    [undo-xml] '[ H{ } clone [ _ bind ] keep >enum ] ;
+    [undo-xml] '[ H{ } clone [ _ with-variables ] keep >enum ] ;
 
 \ interpolate-xml 1 [ undo-xml ] define-pop-inverse

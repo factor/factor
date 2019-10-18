@@ -15,11 +15,14 @@ SYMBOL: inner-d-index
 
 DEFER: commit-literals
 
+SYMBOL: (meta-d)
+SYMBOL: (meta-r)
+
 ! Compile-time data stack
-: meta-d ( -- stack ) commit-literals \ meta-d get ;
+: meta-d ( -- stack ) commit-literals (meta-d) get ;
 
 ! Compile-time retain stack
-: meta-r ( -- stack ) \ meta-r get ;
+: meta-r ( -- stack ) (meta-r) get ;
 
 ! Uncommitted literals. This is a form of local dead-code
 ! elimination; the goal is to reduce the number of IR nodes
@@ -29,7 +32,7 @@ SYMBOL: literals
 
 : (push-literal) ( obj -- )
     dup <literal> make-known
-    [ nip \ meta-d get push ] [ #push, ] 2bi ;
+    [ nip (meta-d) get push ] [ #push, ] 2bi ;
 
 : commit-literals ( -- )
     literals get [
@@ -48,7 +51,7 @@ SYMBOL: literals
 
 : init-inference ( -- )
     terminated? off
-    V{ } clone \ meta-d set
+    V{ } clone (meta-d) set
     V{ } clone literals set
     0 input-count set
     0 inner-d-index set ;

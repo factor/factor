@@ -11,7 +11,11 @@ HELP: prime?
 { $values { "n" "an integer" } { "?" "a boolean" } }
 { $description "Test if an integer is a prime number." } ;
 
-{ primes-upto primes-between } related-words
+{ nprimes primes-upto primes-between } related-words
+
+HELP: nprimes
+{ $values { "n" "a non-negative integer" } { "seq" "a sequence" } }
+{ $description "Return a sequence containing the " { $snippet "n" } " first primes numbers." } ;
 
 HELP: primes-upto
 { $values { "n" "an integer" } { "seq" "a sequence" } }
@@ -51,7 +55,7 @@ HELP: unique-primes
 { $description "Generates a sequence of " { $snippet "n" } " unique prime numbers with exactly " { $snippet "numbits" } " bits." } ;
 
 ARTICLE: "math.primes" "Prime numbers"
-"The " { $vocab-link "math.primes" } " vocabulary implements words related to prime numbers. Serveral useful vocabularies exist for testing primality. The Sieve of Eratosthenes in " { $vocab-link "math.primes.erato" } " is useful for testing primality below five million. For larger integers, " { $vocab-link "math.primes.miller-rabin" } " is a fast probabilstic primality test. The " { $vocab-link "math.primes.lucas-lehmer" } " vocabulary implements an algorithm for finding huge Mersenne prime numbers." $nl
+"The " { $vocab-link "math.primes" } " vocabulary implements words related to prime numbers. Several useful vocabularies exist for testing primality. The Sieve of Eratosthenes in " { $vocab-link "math.primes.erato" } " is useful for testing primality below five million. For larger integers, " { $vocab-link "math.primes.miller-rabin" } " is a fast probabilistic primality test. The " { $vocab-link "math.primes.lucas-lehmer" } " vocabulary implements an algorithm for finding huge Mersenne prime numbers." $nl
 "Testing if a number is prime:"
 { $subsections prime? }
 "Generating prime numbers:"

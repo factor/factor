@@ -1,1 +1,1 @@
-winnt
+windows

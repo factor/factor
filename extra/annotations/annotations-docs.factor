@@ -4,9 +4,9 @@ words combinators.smart tools.crossref ;
 IN: annotations
 
 <PRIVATE
-: comment-word ( base -- word ) "!" prepend "annotations" lookup ; 
-: comment-usage-word ( base -- word ) "s" append "annotations" lookup ; 
-: comment-usage.-word ( base -- word ) "s." append "annotations" lookup ; 
+: comment-word ( base -- word ) "!" prepend "annotations" lookup-word ;
+: comment-usage-word ( base -- word ) "s" append "annotations" lookup-word ;
+: comment-usage.-word ( base -- word ) "s." append "annotations" lookup-word ;
 PRIVATE>
 
 : $annotation ( element -- )
@@ -56,7 +56,7 @@ annotation-tags natural-sort
 ] bi
 <article> "annotations" add-article
 
-"annotations" vocab "annotations" >>help drop
+"annotations" lookup-vocab "annotations" >>help drop
 
 annotation-tags [
     {

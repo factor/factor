@@ -1,12 +1,14 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.data alien.syntax ascii
-assocs byte-arrays classes.struct classes.tuple.parser
-classes.tuple.private classes.tuple combinators compiler.tree.debugger
-compiler.units delegate destructors io.encodings.utf8 io.pathnames
-io.streams.string kernel libc literals math mirrors namespaces
-prettyprint prettyprint.config see sequences specialized-arrays
-system tools.test parser lexer eval layouts generic.single classes
-vocabs ;
+USING: accessors alien alien.c-types alien.data alien.syntax
+ascii assocs byte-arrays classes.struct
+classes.struct.prettyprint classes.struct.prettyprint.private
+classes.tuple.parser classes.tuple.private classes.tuple
+combinators compiler.tree.debugger compiler.units delegate
+destructors io.encodings.utf8 io.pathnames io.streams.string
+kernel libc literals math mirrors namespaces prettyprint
+prettyprint.config see sequences specialized-arrays system
+tools.test parser lexer eval layouts generic.single classes
+vocabs generic classes.private definitions ;
 FROM: math => float ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
 QUALIFIED-WITH: alien.c-types c
@@ -26,7 +28,7 @@ STRUCT: struct-test-foo
     { z bool } ;
 
 STRUCT: struct-test-bar
-    { w ushort initial: HEX: ffff }
+    { w ushort initial: 0xffff }
     { foo struct-test-foo } ;
 
 [ 12 ] [ struct-test-foo heap-size ] unit-test
@@ -51,7 +53,7 @@ STRUCT: struct-test-bar
 [ {
     { "underlying" B{ 98 0 0 98 127 0 0 127 0 0 0 0 } }
     { { "x" char } 98            }
-    { { "y" int  } HEX: 7F00007F }
+    { { "y" int  } 0x7F00007F }
     { { "z" bool } f             }
 } ] [
     B{ 98 0 0 98 127 0 0 127 0 0 0 0 } struct-test-foo memory>struct
@@ -131,6 +133,9 @@ STRUCT: struct-test-bar
     [ make-mirror clear-assoc ] keep
 ] unit-test
 
+[ POSTPONE: STRUCT: ]
+[ struct-test-foo struct-definer-word ] unit-test
+
 UNION-STRUCT: struct-test-float-and-bits
     { f c:float }
     { bits uint } ;
@@ -139,6 +144,9 @@ UNION-STRUCT: struct-test-float-and-bits
 [ 4 ] [ struct-test-float-and-bits heap-size ] unit-test
 
 [ 123 ] [ [ struct-test-foo malloc-struct &free y>> ] with-destructors ] unit-test
+
+[ POSTPONE: UNION-STRUCT: ]
+[ struct-test-float-and-bits struct-definer-word ] unit-test
 
 STRUCT: struct-test-string-ptr
     { x c-string } ;
@@ -153,36 +161,30 @@ STRUCT: struct-test-string-ptr
 
 [ "S{ struct-test-foo { x 0 } { y 7654 } { z f } }" ]
 [
-    [
-        boa-tuples? off
-        c-object-pointers? off
+    H{ { boa-tuples? f } { c-object-pointers? f } } [
         struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
-    ] with-scope
+    ] with-variables
 ] unit-test
 
 [ "S@ struct-test-foo B{ 0 0 0 0 0 0 0 0 0 0 0 0 }" ]
 [
-    [
-        c-object-pointers? on
+    H{ { c-object-pointers? t } } [
         12 <byte-array> struct-test-foo memory>struct [ pprint ] with-string-writer
-    ] with-scope
+    ] with-variables
 ] unit-test
 
 [ "S{ struct-test-foo f 0 7654 f }" ]
 [
-    [
-        boa-tuples? on
-        c-object-pointers? off
+    H{ { boa-tuples? t } { c-object-pointers? f } } [
         struct-test-foo <struct> 7654 >>y [ pprint ] with-string-writer
-    ] with-scope
+    ] with-variables
 ] unit-test
 
 [ "S@ struct-test-foo f" ]
 [
-    [
-        c-object-pointers? off
+    H{ { c-object-pointers? f } } [
         f struct-test-foo memory>struct [ pprint ] with-string-writer
-    ] with-scope
+    ] with-variables
 ] unit-test
 
 [ "USING: alien.c-types classes.struct ;
@@ -221,7 +223,7 @@ UNION-STRUCT: struct-test-float-and-bits
         { type bool }
         { class object }
     }
-} ] [ struct-test-foo c-type fields>> ] unit-test
+} ] [ struct-test-foo lookup-c-type fields>> ] unit-test
 
 [ {
     T{ struct-slot-spec
@@ -238,7 +240,7 @@ UNION-STRUCT: struct-test-float-and-bits
         { class $[ cell 4 = integer fixnum ? ] }
         { initial 0 }
     }
-} ] [ struct-test-float-and-bits c-type fields>> ] unit-test
+} ] [ struct-test-float-and-bits lookup-c-type fields>> ] unit-test
 
 STRUCT: struct-test-equality-1
     { x int } ;
@@ -265,7 +267,7 @@ STRUCT: struct-test-equality-2
     [
         struct-test-equality-1 <struct> 5 >>x
         struct-test-equality-1 malloc-struct &free 5 >>x
-        [ hashcode ] bi@ =
+        [ hashcode ] same?
     ] with-destructors
 ] unit-test
 
@@ -289,7 +291,7 @@ SPECIALIZED-ARRAY: struct-test-optimization
 
 [ t ] [ [ struct-test-optimization memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
 [ t ] [
-    [ 3 <direct-struct-test-optimization-array> third y>> ]
+    [ 3 struct-test-optimization <c-direct-array> third y>> ]
     { <tuple> <tuple-boa> memory>struct y>> } inlined?
 ] unit-test
 
@@ -297,7 +299,7 @@ SPECIALIZED-ARRAY: struct-test-optimization
 
 [ t ] [
     [ struct-test-optimization memory>struct x>> second ]
-    { memory>struct x>> <direct-int-array> <tuple> <tuple-boa> } inlined?
+    { memory>struct x>> int <c-direct-array> <tuple> <tuple-boa> } inlined?
 ] unit-test
 
 [ f ] [ [ memory>struct y>> ] { memory>struct y>> } inlined? ] unit-test
@@ -320,7 +322,7 @@ STRUCT: clone-test-struct { x int } { y char[3] } ;
     clone-test-struct <struct>
     1 >>x char-array{ 9 1 1 } >>y
     clone
-    [ x>> ] [ y>> >char-array ] bi
+    [ x>> ] [ y>> char >c-array ] bi
 ] unit-test
 
 [ t 1 char-array{ 9 1 1 } ] [
@@ -328,7 +330,7 @@ STRUCT: clone-test-struct { x int } { y char[3] } ;
         clone-test-struct malloc-struct &free
         1 >>x char-array{ 9 1 1 } >>y
         clone
-        [ >c-ptr byte-array? ] [ x>> ] [ y>> >char-array ] tri
+        [ >c-ptr byte-array? ] [ x>> ] [ y>> char >c-array ] tri
     ] with-destructors
 ] unit-test
 
@@ -460,8 +462,8 @@ cpu ppc? [
         { y int }
         { x longlong } ;
 
-    [ 12 ] [ ppc-align-test-2 heap-size ] unit-test
-    [ 4 ] [ "x" ppc-align-test-2 offset-of ] unit-test
+    [ 16 ] [ ppc-align-test-2 heap-size ] unit-test
+    [ 8 ] [ "x" ppc-align-test-2 offset-of ] unit-test
 ] when
 
 STRUCT: struct-test-delegate
@@ -482,3 +484,62 @@ SPECIALIZED-ARRAY: void*
 STRUCT: silly-array-field-test { x int*[3] } ;
 
 [ t ] [ silly-array-field-test <struct> x>> void*-array? ] unit-test
+
+! Packed structs
+PACKED-STRUCT: packed-struct-test
+    { d c:int }
+    { e c:short }
+    { f c:int }
+    { g c:char }
+    { h c:int } ;
+
+[ 15 ] [ packed-struct-test heap-size ] unit-test
+
+[ 0 ] [ "d" packed-struct-test offset-of ] unit-test
+[ 4 ] [ "e" packed-struct-test offset-of ] unit-test
+[ 6 ] [ "f" packed-struct-test offset-of ] unit-test
+[ 10 ] [ "g" packed-struct-test offset-of ] unit-test
+[ 11 ] [ "h" packed-struct-test offset-of ] unit-test
+
+[ POSTPONE: PACKED-STRUCT: ]
+[ packed-struct-test struct-definer-word ] unit-test
+
+STRUCT: struct-1 { a c:int } ;
+PACKED-STRUCT: struct-1-packed { a c:int } ;
+UNION-STRUCT: struct-1-union { a c:int } ;
+
+[ "USING: alien.c-types classes.struct ;
+IN: classes.struct.tests
+STRUCT: struct-1 { a int initial: 0 } ;
+" ]
+[ \ struct-1 [ see ] with-string-writer ] unit-test
+[ "USING: alien.c-types classes.struct ;
+IN: classes.struct.tests
+PACKED-STRUCT: struct-1-packed { a int initial: 0 } ;
+" ]
+[ \ struct-1-packed [ see ] with-string-writer ] unit-test
+[ "USING: alien.c-types classes.struct ;
+IN: classes.struct.tests
+STRUCT: struct-1-union { a int initial: 0 } ;
+" ]
+[ \ struct-1-union [ see ] with-string-writer ] unit-test
+
+! Bug #206
+STRUCT: going-to-redefine { a uint } ;
+[ ] [
+    "IN: classes.struct.tests TUPLE: going-to-redefine b ;" eval( -- )
+] unit-test
+[ f ] [ \ going-to-redefine \ clone ?lookup-method ] unit-test
+[ f ] [ \ going-to-redefine \ struct-slot-values ?lookup-method ] unit-test
+
+! Test reset-class on structs, which should forget all the accessors, clone, and struct-slot-values
+STRUCT: some-accessors { aaa uint } { bbb int } ;
+[ ] [ [ \ some-accessors reset-class ] with-compilation-unit ] unit-test
+[ f ] [ \ some-accessors \ a>> ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ a<< ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ b>> ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ b<< ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ clone ?lookup-method ] unit-test
+[ f ] [ \ some-accessors \ struct-slot-values ?lookup-method ] unit-test
+
+<< \ some-accessors forget >>

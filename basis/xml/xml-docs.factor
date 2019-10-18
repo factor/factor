@@ -10,7 +10,7 @@ HELP: string>xml
 
 HELP: read-xml
 { $values { "stream" "an input stream" } { "xml" xml } }
-{ $description "Exausts the given stream, reading an XML document from it. A binary stream, one without encoding, should be used as input, and the encoding is automatically detected." } ;
+{ $description "Exhausts the given stream, reading an XML document from it. A binary stream, one without encoding, should be used as input, and the encoding is automatically detected." } ;
 
 HELP: file>xml
 { $values { "filename" string } { "xml" xml } }

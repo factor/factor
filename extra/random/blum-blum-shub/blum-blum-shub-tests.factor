@@ -8,13 +8,13 @@ IN: blum-blum-shub.tests
 ] unit-test
 
 
-[ 70576473 ] [
+[ 887708070 ] [
     T{ blum-blum-shub f 590695557939 811977232793 } clone [
         32 random-bits
     ] with-random
 ] unit-test
 
-[ 5570804936418322777 ] [
+[ 3812677130378646276 ] [
     T{ blum-blum-shub f 590695557939 811977232793 } clone [
         64 random-bits
     ] with-random

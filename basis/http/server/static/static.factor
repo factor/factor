@@ -7,9 +7,10 @@ io.files.info io.directories io.pathnames io.encodings.binary
 fry xml.entities destructors urls html xml.syntax
 html.templates.fhtml http http.server http.server.responses
 http.server.redirection xml.writer ;
+FROM: sets => adjoin ;
 IN: http.server.static
 
-TUPLE: file-responder root hook special allow-listings ;
+TUPLE: file-responder root hook special index-names allow-listings ;
 
 : modified-since ( request -- date )
     "if-modified-since" header ";" split1 drop
@@ -23,7 +24,8 @@ TUPLE: file-responder root hook special allow-listings ;
     file-responder new
         swap >>hook
         swap >>root
-        H{ } clone >>special ;
+        H{ } clone >>special
+        V{ "index.html" } >>index-names ;
 
 : (serve-static) ( path mime-type -- response )
     [
@@ -75,7 +77,9 @@ TUPLE: file-responder root hook special allow-listings ;
     ] if ;
 
 : find-index ( filename -- path )
-    "index.html" append-path dup exists? [ drop f ] unless ;
+    file-responder get index-names>>
+    [ append-path dup exists? [ drop f ] unless ] with map-find
+    drop ;
 
 : serve-directory ( filename -- response )
     url get path>> "/" tail? [
@@ -97,8 +101,12 @@ M: file-responder call-responder* ( path responder -- response )
     ".." over member?
     [ drop <400> ] [ "/" join serve-object ] if ;
 
-! file responder integration
+: add-index ( name responder -- )
+    index-names>> adjoin ;
+
+: serve-fhtml ( path -- response )
+    <fhtml> "text/html" <content> ;
+
 : enable-fhtml ( responder -- responder )
-    [ <fhtml> "text/html" <content> ]
-    "application/x-factor-server-page"
-    pick special>> set-at ;
+    [ serve-fhtml ] "application/x-factor-server-page" pick special>> set-at
+    "index.fhtml" over add-index ;

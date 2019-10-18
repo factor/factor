@@ -1,5 +1,6 @@
 USING: tools.test quotations math kernel sequences
-assocs namespaces make compiler.units compiler.test ;
+assocs namespaces make compiler.units compiler.test
+locals random ;
 IN: compiler.tests.curry
 
 [ 3 ] [ 5 [ [ 2 - ] curry call ] compile-call ] unit-test
@@ -45,9 +46,10 @@ IN: compiler.tests.curry
         [ call f ] curry assoc-find 3drop
     ] { } make ; inline
 
-[ t ] [
-    global [ [ drop , ] funky-assoc>map ] compile-call
-    global keys =
+[ t ] [| |
+    1000 iota [ drop 1,000,000 random 1,000,000 random ] H{ } map>assoc :> a-hashtable
+    a-hashtable [ [ drop , ] funky-assoc>map ] compile-call
+    a-hashtable keys =
 ] unit-test
 
 [ 3 ] [ 1 [ 2 ] [ curry [ 3 ] [ 4 ] if ] compile-call ] unit-test

@@ -9,9 +9,30 @@ IN: math.matrices
 : zero-matrix ( m n -- matrix )
     '[ _ 0 <array> ] replicate ;
 
+: diagonal-matrix ( diagonal-seq -- matrix )
+    dup length dup zero-matrix
+    [ '[ dup _ nth set-nth ] each-index ] keep ; inline
+
 : identity-matrix ( n -- matrix )
-    #! Make a nxn identity matrix.
-    iota dup [ = 1 0 ? ] cartesian-map ;
+    1 <repetition> diagonal-matrix ; inline
+
+: eye ( m n k -- matrix )
+    [ [ iota ] bi@ ] dip neg '[ _ + = 1 0 ? ] cartesian-map ;
+
+: hilbert-matrix ( m n -- matrix )
+    [ iota ] bi@ [ + 1 + recip ] cartesian-map ;
+
+: toeplitz-matrix ( n -- matrix )
+    iota dup [ - abs 1 + ] cartesian-map ;
+
+: hankel-matrix ( n -- matrix )
+    [ iota dup ] keep '[ + abs 1 + dup _ > [ drop 0 ] when ] cartesian-map ;
+
+: box-matrix ( r -- matrix )
+    2 * 1 + dup '[ _ 1 <array> ] replicate ;
+
+: vandermonde-matrix ( u n -- matrix )
+    iota [ v^n ] with map reverse flip ;
 
 :: rotation-matrix3 ( axis theta -- matrix )
     theta cos :> c
@@ -124,7 +145,7 @@ IN: math.matrices
     dupd proj v- ;
 
 : angle-between ( v u -- a )
-    [ normalize ] bi@ v. acos ;
+    [ normalize ] bi@ h. acos ;
 
 : (gram-schmidt) ( v seq -- newseq )
     [ dupd proj v- ] each ;
@@ -138,3 +159,12 @@ IN: math.matrices
 : m^n ( m n -- n ) 
     make-bits over first length identity-matrix
     [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
+
+: stitch ( m -- m' )
+    [ ] [ [ append ] 2map ] map-reduce ;
+
+: kron ( m1 m2 -- m )
+    '[ [ _ n*m  ] map ] map stitch stitch ;
+
+: outer ( u v -- m )
+    [ n*v ] curry map ;

@@ -43,7 +43,7 @@ TUPLE: declared-fixnum { x fixnum } ;
 
 [ f ] [
     [ { integer } declare 127 bitand 3 + ]
-    { >fixnum } inlined?
+    { integer>fixnum } inlined?
 ] unit-test
 
 [ t ] [
@@ -133,6 +133,12 @@ TUPLE: declared-fixnum { x fixnum } ;
         { iota } declare [ 256 rem ] map
     ] { mod fixnum-mod rem } inlined?
 ] unit-test
+
+[ [ drop 0 ] ]
+[ [ >integer 1 rem ] test-modular-arithmetic ] unit-test
+
+[ [ drop 0 ] ]
+[ [ >integer 1 mod ] test-modular-arithmetic ] unit-test
 
 [ [ >fixnum 255 >R R> fixnum-bitand ] ]
 [ [ >integer 256 rem ] test-modular-arithmetic ] unit-test

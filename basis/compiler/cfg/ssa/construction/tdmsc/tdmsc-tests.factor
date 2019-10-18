@@ -24,10 +24,10 @@ V{ } 5 test-bb
 
 [ ] [ test-tdmsc ] unit-test
 
-[ V{ 4 } ] [ 1 get 1array merge-set [ number>> ] map ] unit-test
-[ V{ 4 } ] [ 2 get 1array merge-set [ number>> ] map ] unit-test
-[ V{ } ] [ 0 get 1array merge-set ] unit-test
-[ V{ } ] [ 4 get 1array merge-set ] unit-test
+[ { 4 } ] [ 1 get 1array merge-set [ number>> ] map ] unit-test
+[ { 4 } ] [ 2 get 1array merge-set [ number>> ] map ] unit-test
+[ { } ] [ 0 get 1array merge-set ] unit-test
+[ { } ] [ 4 get 1array merge-set ] unit-test
 
 V{ } 0 test-bb
 V{ } 1 test-bb
@@ -70,5 +70,5 @@ V{ } 7 test-bb
 
 [ ] [ test-tdmsc ] unit-test
 
-[ V{ 2 } ] [ { 2 3 4 5 } [ get ] map merge-set [ number>> ] map ] unit-test
-[ V{ } ] [ { 0 1 6 7 } [ get ] map merge-set ] unit-test
+[ { 2 } ] [ { 2 3 4 5 } [ get ] map merge-set [ number>> ] map ] unit-test
+[ { } ] [ { 0 1 6 7 } [ get ] map merge-set ] unit-test

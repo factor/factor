@@ -11,11 +11,16 @@ struct code_heap {
 	/* The actual memory area */
 	segment *seg;
 
+	/* Memory area reserved for safepoint guard page */
+	void *safepoint_page;
+
 	/* Memory area reserved for SEH. Only used on Windows */
 	char *seh_area;
 
 	/* Memory allocator */
 	free_list_allocator<code_block> *allocator;
+
+	std::set<cell> all_blocks;
 
 	/* Keys are blocks which need to be initialized by initialize_code_block().
 	Values are literal tables. Literal table arrays are GC roots until the
@@ -38,6 +43,20 @@ struct code_heap {
 	void clear_mark_bits();
 	void free(code_block *compiled);
 	void flush_icache();
+	void guard_safepoint();
+	void unguard_safepoint();
+	void verify_all_blocks_set();
+	void initialize_all_blocks_set();
+
+	void sweep();
+
+	code_block *code_block_for_address(cell address);
+
+	bool safepoint_p(cell addr)
+	{
+		cell page_mask = ~(getpagesize() - 1);
+		return (addr & page_mask) == (cell)safepoint_page;
+	}
 };
 
 struct code_heap_room {

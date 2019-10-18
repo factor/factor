@@ -25,8 +25,8 @@ IN: benchmark.dispatch2
 
 : don't-flush-me ( obj -- ) drop ;
 
-: dispatch-test ( -- )
+: dispatch2-benchmark ( -- )
     1000000 sequences
-    [ [ 0 swap nth don't-flush-me ] each ] curry times ;
+    [ [ first don't-flush-me ] each ] curry times ;
 
-MAIN: dispatch-test
+MAIN: dispatch2-benchmark

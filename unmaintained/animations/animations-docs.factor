@@ -1,7 +1,7 @@
 USING: help.markup help.syntax ;
 IN: animations
 
-HELP: animate ( quot duration -- )
+HELP: animate
 
 { $values
     { "quot" "a quot which uses " { $link progress } }
@@ -23,7 +23,7 @@ HELP: animate ( quot duration -- )
     { $notes "The amount of time elapsed between these iterations will very." }
 } ;
 
-HELP: reset-progress ( -- )
+HELP: reset-progress
 { $description
     "Initiates the timer. Call this before using "
     "a loop which makes use of " { $link progress } "."

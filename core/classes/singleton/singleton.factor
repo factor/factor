@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.algebra classes.algebra.private
 classes.predicate classes.predicate.private kernel sequences
-words ;
+words vocabs.parser accessors ;
 IN: classes.singleton
 
 <PRIVATE

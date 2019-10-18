@@ -5,7 +5,7 @@ combinators.short-circuit concurrency.promises continuations
 destructors ftp io io.directories io.encodings
 io.encodings.8-bit.latin1 io.encodings.binary io.encodings.utf8
 io.files io.files.info io.files.types io.pathnames
-io.servers.connection io.sockets io.streams.string io.timeouts
+io.servers io.sockets io.streams.string io.timeouts
 kernel logging math math.bitwise math.parser namespaces
 sequences simple-tokenizer splitting strings threads
 tools.files unicode.case ;
@@ -126,7 +126,7 @@ ERROR: type-error type ;
     ] recover ;
 
 : random-local-server ( -- server )
-    remote-address get class new binary <server> ;
+    remote-address get class-of new binary <server> ;
 
 : port>bytes ( port -- hi lo )
     [ -8 shift ] keep [ 8 bits ] bi@ ;
@@ -277,7 +277,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
     229 server-response ;
 
 : handle-MDTM ( obj -- )
-    tokenized>> 1 swap ?nth [
+    tokenized>> ?second [
         fixup-relative-path
         dup file-info dup directory? [
             drop not-a-plain-file
@@ -300,7 +300,7 @@ ERROR: no-directory-permissions ;
     "Failed to change directory." 553 server-response ;
 
 : handle-CWD ( obj -- )
-    tokenized>> 1 swap ?nth [
+    tokenized>> ?second [
         fixup-relative-path
         dup can-serve-directory? [
             set-current-directory
@@ -365,7 +365,7 @@ M: ftp-server handle-client* ( server -- )
         "ftp.server" >>name
         5 minutes >>timeout ;
 
-: ftpd ( directory port -- )
+: ftpd ( directory port -- server )
     <ftp-server> start-server ;
 
 ! sudo tcpdump -i en1 -A -s 10000  tcp port 21

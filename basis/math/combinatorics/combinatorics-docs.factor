@@ -4,7 +4,7 @@ IN: math.combinatorics
 HELP: factorial
 { $values { "n" "a non-negative integer" } { "n!" integer } }
 { $description "Outputs the product of all positive integers less than or equal to " { $snippet "n" } "." }
-{ $examples 
+{ $examples
     { $example "USING: math.combinatorics prettyprint ;"
         "4 factorial ." "24" }
 } ;
@@ -36,6 +36,10 @@ HELP: permutation
         "5 { \"apple\" \"banana\" \"orange\" } permutation ." "{ \"orange\" \"banana\" \"apple\" }" }
 } ;
 
+HELP: <permutations>
+{ $values { "seq" sequence } { "permutations" sequence } }
+{ $description "An efficient sequence containing the lexicographical permutations of " { $snippet "seq" } "." } ;
+
 HELP: all-permutations
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Outputs a sequence containing all permutations of " { $snippet "seq" } " in lexicographical order." }
@@ -46,7 +50,7 @@ HELP: all-permutations
 
 HELP: each-permutation
 { $values { "seq" sequence } { "quot" { $quotation "( seq -- )" } } }
-{ $description "Applies the quotation to each permuation of " { $snippet "seq" } " in order." } ;
+{ $description "Applies the quotation to each permutation of " { $snippet "seq" } " in order." } ;
 
 HELP: inverse-permutation
 { $values { "seq" sequence } { "permutation" sequence } }
@@ -69,6 +73,10 @@ HELP: combination
     { $example "USING: math.combinatorics prettyprint ;"
         "0 { \"a\" \"b\" \"c\" \"d\" } 2 combination ." "{ \"a\" \"b\" }" }
 } ;
+
+HELP: <combinations>
+{ $values { "seq" sequence } { "k" "a non-negative integer" } { "combinations" sequence } }
+{ $description "An efficient sequence containing the combinations of " { $snippet "seq" } " choosing " { $snippet "k" } " elements." } ;
 
 HELP: all-combinations
 { $values { "seq" sequence } { "k" "a non-negative integer" } { "seq'" sequence } }
@@ -103,6 +111,12 @@ HELP: >permutation
 { $notes "For clarification, the following two statements are equivalent:" { $code "10 factoradic >permutation" "{ 1 2 0 0 } >permutation" } }
 { $examples { $example "USING: math.combinatorics.private prettyprint ;" "{ 0 0 0 0 } >permutation ." "{ 0 1 2 3 }" } } ;
 
+HELP: next-permutation
+{ $values { "seq" sequence } }
+{ $description "Rearranges the elements in " { $snippet "seq" } " into the lexicographically next greater permutation of elements." }
+{ $notes "Performs an in-place modification of " { $snippet "seq" } "." }
+{ $examples { $example "USING: math.combinatorics prettyprint ;" "\"ABC\" next-permutation ." "\"ACB\"" } } ;
+
 HELP: all-subsets
 { $values { "seq" sequence } { "subsets" sequence } }
 { $description
@@ -121,7 +135,7 @@ HELP: selections
 { $description
     "Returns all the ways to take n (possibly the same) items from the "
     "sequence of items."
-} 
+}
 { $examples
     { $example
         "USING: math.combinatorics prettyprint ;"

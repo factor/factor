@@ -22,22 +22,22 @@ IN: compiler.cfg.intrinsics.simd
 : sign-bit-mask ( rep -- byte-array )
     signed-rep {
         { char-16-rep [ uchar-array{
-            HEX: 80 HEX: 80 HEX: 80 HEX: 80
-            HEX: 80 HEX: 80 HEX: 80 HEX: 80
-            HEX: 80 HEX: 80 HEX: 80 HEX: 80
-            HEX: 80 HEX: 80 HEX: 80 HEX: 80
+            0x80 0x80 0x80 0x80
+            0x80 0x80 0x80 0x80
+            0x80 0x80 0x80 0x80
+            0x80 0x80 0x80 0x80
         } underlying>> ] }
         { short-8-rep [ ushort-array{
-            HEX: 8000 HEX: 8000 HEX: 8000 HEX: 8000
-            HEX: 8000 HEX: 8000 HEX: 8000 HEX: 8000
+            0x8000 0x8000 0x8000 0x8000
+            0x8000 0x8000 0x8000 0x8000
         } underlying>> ] }
         { int-4-rep [ uint-array{
-            HEX: 8000,0000 HEX: 8000,0000
-            HEX: 8000,0000 HEX: 8000,0000
+            0x8000,0000 0x8000,0000
+            0x8000,0000 0x8000,0000
         } underlying>> ] }
         { longlong-2-rep [ ulonglong-array{
-            HEX: 8000,0000,0000,0000
-            HEX: 8000,0000,0000,0000
+            0x8000,0000,0000,0000
+            0x8000,0000,0000,0000
         } underlying>> ] }
     } case ;
 
@@ -555,6 +555,10 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
     {
         [ vcc-none ^^test-vector ]
     } emit-v-vector-op ;
+: emit-simd-vgetmask ( node -- )
+    {
+        [ ^^move-vector-mask ]
+    } emit-v-vector-op ;
 
 : emit-simd-v>float ( node -- )
     {
@@ -632,7 +636,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
     dup [
         '[
             ds-drop prepare-store-memory
-            _ f ##store-memory-imm
+            _ f ##store-memory-imm,
         ]
         [ byte-array inline-store-memory? ]
         inline-accessor
@@ -700,6 +704,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { alien-vector              [ emit-alien-vector             ] }
         { set-alien-vector          [ emit-set-alien-vector         ] }
         { assert-positive           [ drop                          ] }
+        { (simd-vgetmask)           [ emit-simd-vgetmask            ] }
     } enable-intrinsics ;
 
 enable-simd

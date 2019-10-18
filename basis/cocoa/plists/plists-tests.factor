@@ -15,13 +15,13 @@ IN: cocoa.plists.tests
             H{ { "DeviceUsagePage" 1 } { "DeviceUsage" 5 } }
             H{ { "DeviceUsagePage" 1 } { "DeviceUsage" 6 } }
         } [ >cf &CFRelease ] [ >cf &CFRelease ] bi
-        [ plist> ] bi@ =
+        [ plist> ] same?
     ] unit-test
 
     [ t ] [
         { "DeviceUsagePage" 1 }
         [ >cf &CFRelease ] [ >cf &CFRelease ] bi
-        [ plist> ] bi@ =
+        [ plist> ] same?
     ] unit-test
 
     [ V{ "DeviceUsagePage" "Yes" } ] [

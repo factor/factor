@@ -7,7 +7,7 @@ math.intervals interval-maps memoize csv accessors assocs
 strings math splitting grouping arrays combinators.smart ;
 IN: geo-ip
 
-: db-path ( -- path ) "IpToCountry.csv" temp-file ;
+: db-path ( -- path ) "IpToCountry.csv" cache-file ;
 
 CONSTANT: db-url "http://software77.net/geo-ip/?DL=1"
 
@@ -50,7 +50,7 @@ GENERIC: lookup-ip ( ip -- ip-entry )
 
 M: string lookup-ip
     "." split [ string>number ] map
-    { HEX: 1000000 HEX: 10000 HEX: 100 HEX: 1 } v.
+    { 0x1000000 0x10000 0x100 0x1 } v.
     lookup-ip ;
 
 M: integer lookup-ip ip-intervals interval-at ;

@@ -1,13 +1,14 @@
-! Copyright (C) 2005, 2010 Slava Pestov.
+! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math namespaces make sequences
-system layouts alien alien.c-types alien.accessors alien.libraries
-slots splitting assocs combinators fry locals compiler.constants
-classes.struct compiler.codegen compiler.codegen.fixup
-compiler.cfg.instructions compiler.cfg.builder
-compiler.cfg.intrinsics compiler.cfg.stack-frame
-cpu.x86.assembler cpu.x86.assembler.operands cpu.x86
-cpu.architecture vm ;
+system layouts alien alien.c-types alien.accessors
+alien.libraries slots splitting assocs combinators fry locals
+compiler.constants classes.struct compiler.codegen
+compiler.codegen.gc-maps compiler.codegen.labels
+compiler.codegen.relocation compiler.cfg.instructions
+compiler.cfg.builder compiler.cfg.intrinsics
+compiler.cfg.stack-frame cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86 cpu.architecture vm ;
 FROM: layouts => cell cells ;
 IN: cpu.x86.64
 
@@ -57,12 +58,6 @@ M: x86.64 %set-vm-field ( src offset -- )
 
 M: x86.64 %vm-field-ptr ( dst offset -- )
     [ vm-reg ] dip [+] LEA ;
-
-M: x86.64 %prologue ( n -- )
-    R11 -7 [RIP+] LEA
-    dup PUSH
-    R11 PUSH
-    stack-reg swap 3 cells - SUB ;
 
 M: x86.64 %prepare-jump
     pic-tail-reg xt-tail-pic-offset [RIP+] LEA ;
@@ -129,6 +124,9 @@ M: x86.64 stack-cleanup 3drop 0 ;
 
 M: x86.64 %cleanup 0 assert= ;
 
+M: x86.64 %safepoint
+    0 [RIP+] EAX MOV rc-relative rel-safepoint ;
+
 M: x86.64 long-long-on-stack? f ;
 
 M: x86.64 float-on-stack? f ;
@@ -139,11 +137,11 @@ M: x86.64 struct-return-on-stack? f ;
 ! x86-64.
 enable-alien-4-intrinsics
 
-USE: vocabs.loader
+USE: vocabs
 
 {
     { [ os unix? ] [ "cpu.x86.64.unix" require ] }
-    { [ os winnt? ] [ "cpu.x86.64.winnt" require ] }
+    { [ os windows? ] [ "cpu.x86.64.windows" require ] }
 } cond
 
-check-sse
+check-cpu-features

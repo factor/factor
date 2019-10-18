@@ -1,0 +1,2336 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-pbutils-0.10"/>
+  <c:include name="gst/pbutils/codec-utils.h"/>
+  <c:include name="gst/pbutils/descriptions.h"/>
+  <c:include name="gst/pbutils/encoding-profile.h"/>
+  <c:include name="gst/pbutils/encoding-target.h"/>
+  <c:include name="gst/pbutils/gstdiscoverer.h"/>
+  <c:include name="gst/pbutils/gstpluginsbaseversion.h"/>
+  <c:include name="gst/pbutils/install-plugins.h"/>
+  <c:include name="gst/pbutils/missing-plugins.h"/>
+  <c:include name="gst/pbutils/pbutils-enumtypes.h"/>
+  <c:include name="gst/pbutils/pbutils.h"/>
+  <namespace name="GstPbutils"
+             version="0.10"
+             shared-library="libgstpbutils-0.10.so.0,libgstreamer-0.10.so.0"
+             c:identifier-prefixes="Gst"
+             c:symbol-prefixes="gst">
+    <alias name="DiscovererAudioInfoClass"
+           c:type="GstDiscovererAudioInfoClass">
+      <type name="Gst.MiniObjectClass" c:type="GstMiniObjectClass"/>
+    </alias>
+    <alias name="DiscovererContainerInfoClass"
+           c:type="GstDiscovererContainerInfoClass">
+      <type name="Gst.MiniObjectClass" c:type="GstMiniObjectClass"/>
+    </alias>
+    <alias name="DiscovererInfoClass" c:type="GstDiscovererInfoClass">
+      <type name="Gst.MiniObjectClass" c:type="GstMiniObjectClass"/>
+    </alias>
+    <alias name="DiscovererStreamInfoClass"
+           c:type="GstDiscovererStreamInfoClass">
+      <type name="Gst.MiniObjectClass" c:type="GstMiniObjectClass"/>
+    </alias>
+    <alias name="DiscovererVideoInfoClass"
+           c:type="GstDiscovererVideoInfoClass">
+      <type name="Gst.MiniObjectClass" c:type="GstMiniObjectClass"/>
+    </alias>
+    <alias name="EncodingAudioProfileClass"
+           c:type="GstEncodingAudioProfileClass">
+      <type name="EncodingProfileClass" c:type="GstEncodingProfileClass"/>
+    </alias>
+    <alias name="EncodingContainerProfileClass"
+           c:type="GstEncodingContainerProfileClass">
+      <type name="EncodingProfileClass" c:type="GstEncodingProfileClass"/>
+    </alias>
+    <alias name="EncodingProfileClass" c:type="GstEncodingProfileClass">
+      <type name="Gst.MiniObjectClass" c:type="GstMiniObjectClass"/>
+    </alias>
+    <alias name="EncodingTargetClass" c:type="GstEncodingTargetClass">
+      <type name="Gst.MiniObjectClass" c:type="GstMiniObjectClass"/>
+    </alias>
+    <alias name="EncodingVideoProfileClass"
+           c:type="GstEncodingVideoProfileClass">
+      <type name="EncodingProfileClass" c:type="GstEncodingProfileClass"/>
+    </alias>
+    <class name="Discoverer"
+           c:symbol-prefix="discoverer"
+           c:type="GstDiscoverer"
+           version="0.10.31"
+           parent="GObject.Object"
+           glib:type-name="GstDiscoverer"
+           glib:get-type="gst_discoverer_get_type"
+           glib:type-struct="DiscovererClass">
+      <doc xml:whitespace="preserve">The #GstDiscoverer structure.</doc>
+      <constructor name="new"
+                   c:identifier="gst_discoverer_new"
+                   version="0.10.31"
+                   throws="1">
+        <doc xml:whitespace="preserve">Creates a new #GstDiscoverer with the provided timeout.
+If an error occurred when creating the discoverer, @err will be set
+accordingly and %NULL will be returned. If @err is set, the caller must
+free it when no longer needed using g_error_free().</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">The new #GstDiscoverer.</doc>
+          <type name="Discoverer" c:type="GstDiscoverer*"/>
+        </return-value>
+        <parameters>
+          <parameter name="timeout" transfer-ownership="none">
+            <doc xml:whitespace="preserve">timeout per file, in nanoseconds. Allowed are values between one second (#GST_SECOND) and one hour (3600 * #GST_SECOND)</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="discover_uri"
+              c:identifier="gst_discoverer_discover_uri"
+              version="0.10.31"
+              throws="1">
+        <doc xml:whitespace="preserve">Synchronously discovers the given @uri.
+A copy of @uri will be made internally, so the caller can safely g_free()
+afterwards.
+error occurred.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the result of the scanning. Can be %NULL if an</doc>
+          <type name="DiscovererInfo" c:type="GstDiscovererInfo*"/>
+        </return-value>
+        <parameters>
+          <parameter name="uri" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The URI to run on.</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="discover_uri_async"
+              c:identifier="gst_discoverer_discover_uri_async"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">Appends the given @uri to the list of URIs to discoverer. The actual
+discovery of the @uri will only take place if gst_discoverer_start() has
+been called.
+A copy of @uri will be made internally, so the caller can safely g_free()
+afterwards.
+uris, else %FALSE</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the @uri was succesfully appended to the list of pending</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="uri" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the URI to add.</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="start"
+              c:identifier="gst_discoverer_start"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">Allow asynchronous discovering of URIs to take place.
+A #GMainLoop must be available for #GstDiscoverer to properly work in
+asynchronous mode.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="stop" c:identifier="gst_discoverer_stop" version="0.10.31">
+        <doc xml:whitespace="preserve">Stop the discovery of any pending URIs and clears the list of
+pending URIS (if any).</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <property name="timeout"
+                writable="1"
+                construct="1"
+                transfer-ownership="none">
+        <type name="guint64"/>
+      </property>
+      <field name="parent">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="DiscovererPrivate" c:type="GstDiscovererPrivate*"/>
+      </field>
+      <field name="_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+      <glib:signal name="discovered">
+        <doc xml:whitespace="preserve">Will be emitted when all information on a URI could be discovered.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the results #GstDiscovererInfo</doc>
+            <type name="DiscovererInfo"/>
+          </parameter>
+          <parameter name="p0" transfer-ownership="none">
+            <doc xml:whitespace="preserve">#GError, which will be non-NULL if an error occurred during discovery</doc>
+            <type name="GLib.Error"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="finished">
+        <doc xml:whitespace="preserve">Will be emitted when all pending URIs have been processed.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="starting">
+        <doc xml:whitespace="preserve">Will be emitted when the discover starts analyzing the pending URIs</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+    </class>
+    <class name="DiscovererAudioInfo"
+           c:symbol-prefix="discoverer_audio_info"
+           c:type="GstDiscovererAudioInfo"
+           version="0.10.31"
+           parent="DiscovererStreamInfo"
+           glib:type-name="GstDiscovererAudioInfo"
+           glib:get-type="gst_discoverer_audio_info_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">#GstDiscovererStreamInfo specific to audio streams.</doc>
+      <method name="get_bitrate"
+              c:identifier="gst_discoverer_audio_info_get_bitrate"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the average or nominal bitrate of the stream in bits/second.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_channels"
+              c:identifier="gst_discoverer_audio_info_get_channels"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of channels in the stream.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_depth"
+              c:identifier="gst_discoverer_audio_info_get_depth"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of bits used per sample in each channel.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_max_bitrate"
+              c:identifier="gst_discoverer_audio_info_get_max_bitrate"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the maximum bitrate of the stream in bits/second.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_sample_rate"
+              c:identifier="gst_discoverer_audio_info_get_sample_rate"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the sample rate of the stream in Hertz.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+    </class>
+    <record name="DiscovererClass"
+            c:type="GstDiscovererClass"
+            glib:is-gtype-struct-for="Discoverer">
+      <field name="parentclass">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="finished">
+        <callback name="finished">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="discoverer" transfer-ownership="none">
+              <type name="Discoverer" c:type="GstDiscoverer*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="starting">
+        <callback name="starting">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="discoverer" transfer-ownership="none">
+              <type name="Discoverer" c:type="GstDiscoverer*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="discovered">
+        <callback name="discovered">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="discoverer" transfer-ownership="none">
+              <type name="Discoverer" c:type="GstDiscoverer*"/>
+            </parameter>
+            <parameter name="info" transfer-ownership="none">
+              <type name="DiscovererInfo" c:type="GstDiscovererInfo*"/>
+            </parameter>
+            <parameter name="err" transfer-ownership="none">
+              <type name="GLib.Error" c:type="GError*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_reserved">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <class name="DiscovererContainerInfo"
+           c:symbol-prefix="discoverer_container_info"
+           c:type="GstDiscovererContainerInfo"
+           version="0.10.31"
+           parent="DiscovererStreamInfo"
+           glib:type-name="GstDiscovererContainerInfo"
+           glib:get-type="gst_discoverer_container_info_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">#GstDiscovererStreamInfo specific to container streams.</doc>
+      <method name="get_streams"
+              c:identifier="gst_discoverer_container_info_get_streams"
+              version="0.10.31"
+              introspectable="0">
+        <doc xml:whitespace="preserve">#GstDiscovererStreamInfo this container stream offers.
+Free with gst_discoverer_stream_info_list_free() after usage.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the list of</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="Gst.DiscovererStreamInfo"/>
+          </type>
+        </return-value>
+      </method>
+    </class>
+    <class name="DiscovererInfo"
+           c:symbol-prefix="discoverer_info"
+           c:type="GstDiscovererInfo"
+           version="0.10.31"
+           parent="Gst.MiniObject"
+           glib:type-name="GstDiscovererInfo"
+           glib:get-type="gst_discoverer_info_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">Structure containing the information of a URI analyzed by #GstDiscoverer.</doc>
+      <method name="copy"
+              c:identifier="gst_discoverer_info_copy"
+              introspectable="0">
+        <return-value>
+          <type name="DiscovererInfo" c:type="GstDiscovererInfo*"/>
+        </return-value>
+      </method>
+      <method name="get_audio_streams"
+              c:identifier="gst_discoverer_info_get_audio_streams"
+              version="0.10.31"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Finds all the #GstDiscovererAudioInfo contained in @info
+matching #GstDiscovererStreamInfo. The caller should free it with
+gst_discoverer_stream_info_list_free().</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">A #GList of</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="Gst.DiscovererStreamInfo"/>
+          </type>
+        </return-value>
+      </method>
+      <method name="get_container_streams"
+              c:identifier="gst_discoverer_info_get_container_streams"
+              version="0.10.31"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Finds all the #GstDiscovererContainerInfo contained in @info
+matching #GstDiscovererStreamInfo. The caller should free it with
+gst_discoverer_stream_info_list_free().</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">A #GList of</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="Gst.DiscovererStreamInfo"/>
+          </type>
+        </return-value>
+      </method>
+      <method name="get_duration"
+              c:identifier="gst_discoverer_info_get_duration"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the duration of the URI in #GstClockTime (nanoseconds).</doc>
+          <type name="Gst.ClockTime" c:type="GstClockTime"/>
+        </return-value>
+      </method>
+      <method name="get_misc"
+              c:identifier="gst_discoverer_info_get_misc"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">(for example: information about missing plugins). If you wish to use the
+#GstStructure after the life-time of @info, you will need to copy it.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">Miscellaneous information stored as a #GstStructure</doc>
+          <type name="Gst.Structure" c:type="GstStructure*"/>
+        </return-value>
+      </method>
+      <method name="get_result"
+              c:identifier="gst_discoverer_info_get_result"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the result of the discovery as a #GstDiscovererResult.</doc>
+          <type name="DiscovererResult" c:type="GstDiscovererResult"/>
+        </return-value>
+      </method>
+      <method name="get_seekable"
+              c:identifier="gst_discoverer_info_get_seekable"
+              version="0.10.32">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the wheter the URI is seekable.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="get_stream_info"
+              c:identifier="gst_discoverer_info_get_stream_info"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">#GstDiscovererStreamInfo.
+This structure can be traversed to see the original hierarchy. Unref with
+gst_discoverer_stream_info_unref() after usage.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the structure (or topology) of the URI as a</doc>
+          <type name="DiscovererStreamInfo" c:type="GstDiscovererStreamInfo*"/>
+        </return-value>
+      </method>
+      <method name="get_stream_list"
+              c:identifier="gst_discoverer_info_get_stream_list"
+              version="0.10.31"
+              introspectable="0">
+        <doc xml:whitespace="preserve">all streams contained in the #info. Free after usage
+with gst_discoverer_stream_info_list_free().</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the list of</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="Gst.DiscovererStreamInfo"/>
+          </type>
+        </return-value>
+      </method>
+      <method name="get_streams"
+              c:identifier="gst_discoverer_info_get_streams"
+              version="0.10.31"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Finds the #GstDiscovererStreamInfo contained in @info that match the
+given @streamtype.
+matching #GstDiscovererStreamInfo. The caller should free it with
+gst_discoverer_stream_info_list_free().</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">A #GList of</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="Gst.DiscovererStreamInfo"/>
+          </type>
+        </return-value>
+        <parameters>
+          <parameter name="streamtype" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GType derived from #GstDiscovererStreamInfo</doc>
+            <type name="GType" c:type="GType"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_tags"
+              c:identifier="gst_discoverer_info_get_tags"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">the tags after the life-time of @info, you will need to copy them.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">all tags contained in the %URI. If you wish to use</doc>
+          <type name="Gst.TagList" c:type="GstTagList*"/>
+        </return-value>
+      </method>
+      <method name="get_uri"
+              c:identifier="gst_discoverer_info_get_uri"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">Copy it if you wish to use it after the life-time of @info.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the URI to which this information corresponds to.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_video_streams"
+              c:identifier="gst_discoverer_info_get_video_streams"
+              version="0.10.31"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Finds all the #GstDiscovererVideoInfo contained in @info
+matching #GstDiscovererStreamInfo. The caller should free it with
+gst_discoverer_stream_info_list_free().</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">A #GList of</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="Gst.DiscovererStreamInfo"/>
+          </type>
+        </return-value>
+      </method>
+    </class>
+    <record name="DiscovererPrivate"
+            c:type="GstDiscovererPrivate"
+            disguised="1">
+    </record>
+    <enumeration name="DiscovererResult"
+                 version="0.10.31"
+                 glib:type-name="GstDiscovererResult"
+                 glib:get-type="gst_discoverer_result_get_type"
+                 c:type="GstDiscovererResult">
+      <doc xml:whitespace="preserve">Result values for the discovery process.</doc>
+      <member name="ok"
+              value="0"
+              c:identifier="GST_DISCOVERER_OK"
+              glib:nick="ok"/>
+      <member name="uri_invalid"
+              value="1"
+              c:identifier="GST_DISCOVERER_URI_INVALID"
+              glib:nick="uri-invalid"/>
+      <member name="error"
+              value="2"
+              c:identifier="GST_DISCOVERER_ERROR"
+              glib:nick="error"/>
+      <member name="timeout"
+              value="3"
+              c:identifier="GST_DISCOVERER_TIMEOUT"
+              glib:nick="timeout"/>
+      <member name="busy"
+              value="4"
+              c:identifier="GST_DISCOVERER_BUSY"
+              glib:nick="busy"/>
+      <member name="missing_plugins"
+              value="5"
+              c:identifier="GST_DISCOVERER_MISSING_PLUGINS"
+              glib:nick="missing-plugins"/>
+    </enumeration>
+    <class name="DiscovererStreamInfo"
+           c:symbol-prefix="discoverer_stream_info"
+           c:type="GstDiscovererStreamInfo"
+           version="0.10.31"
+           parent="Gst.MiniObject"
+           glib:type-name="GstDiscovererStreamInfo"
+           glib:get-type="gst_discoverer_stream_info_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">Base structure for information concerning a media stream. Depending on the
+stream type, one can find more media-specific information in
+#GstDiscovererAudioInfo, #GstDiscovererVideoInfo, and
+#GstDiscovererContainerInfo.
+The #GstDiscovererStreamInfo represents the topology of the stream. Siblings
+can be iterated over with gst_discoverer_stream_info_get_next() and
+gst_discoverer_stream_info_get_previous(). Children (sub-streams) of a
+stream can be accessed using the #GstDiscovererContainerInfo API.
+As a simple example, if you run #GstDiscoverer on an AVI file with one audio
+and one video stream, you will get a #GstDiscovererContainerInfo
+corresponding to the AVI container, which in turn will have a
+#GstDiscovererAudioInfo sub-stream and a #GstDiscovererVideoInfo sub-stream
+for the audio and video streams respectively.</doc>
+      <function name="list_free"
+                c:identifier="gst_discoverer_stream_info_list_free">
+        <doc xml:whitespace="preserve">Decrements the reference count of all contained #GstDiscovererStreamInfo
+and fress the #GList.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="infos" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GList of #GstDiscovererStreamInfo</doc>
+            <type name="GLib.List" c:type="GList*">
+              <type name="gpointer" c:type="gpointer"/>
+            </type>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="get_caps"
+              c:identifier="gst_discoverer_stream_info_get_caps"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">#gst_caps_unref after usage.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the #GstCaps of the stream. Unref with</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </return-value>
+      </method>
+      <method name="get_misc"
+              c:identifier="gst_discoverer_stream_info_get_misc"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">example codec version, profile, etc..). If you wish to use the #GstStructure
+after the life-time of @info you will need to copy it.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">additional information regarding the stream (for</doc>
+          <type name="Gst.Structure" c:type="GstStructure*"/>
+        </return-value>
+      </method>
+      <method name="get_next"
+              c:identifier="gst_discoverer_stream_info_get_next"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">for final streams.
+Unref with #gst_discoverer_stream_info_unref after usage.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the next #GstDiscovererStreamInfo in a chain. %NULL</doc>
+          <type name="DiscovererStreamInfo" c:type="GstDiscovererStreamInfo*"/>
+        </return-value>
+      </method>
+      <method name="get_previous"
+              c:identifier="gst_discoverer_stream_info_get_previous"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">%NULL for starting points. Unref with #gst_discoverer_stream_info_unref
+after usage.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the previous #GstDiscovererStreamInfo in a chain.</doc>
+          <type name="DiscovererStreamInfo" c:type="GstDiscovererStreamInfo*"/>
+        </return-value>
+      </method>
+      <method name="get_stream_type_nick"
+              c:identifier="gst_discoverer_stream_info_get_stream_type_nick"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">"container",...).</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a human readable name for the stream type of the given @info (ex : "audio",</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_tags"
+              c:identifier="gst_discoverer_stream_info_get_tags"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">use the tags after the life-time of @info you will need to copy them.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the tags contained in this stream. If you wish to</doc>
+          <type name="Gst.TagList" c:type="GstTagList*"/>
+        </return-value>
+      </method>
+    </class>
+    <class name="DiscovererVideoInfo"
+           c:symbol-prefix="discoverer_video_info"
+           c:type="GstDiscovererVideoInfo"
+           version="0.10.31"
+           parent="DiscovererStreamInfo"
+           glib:type-name="GstDiscovererVideoInfo"
+           glib:get-type="gst_discoverer_video_info_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">#GstDiscovererStreamInfo specific to video streams (this includes images).</doc>
+      <method name="get_bitrate"
+              c:identifier="gst_discoverer_video_info_get_bitrate"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the average or nominal bitrate of the video stream in bits/second.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_depth"
+              c:identifier="gst_discoverer_video_info_get_depth"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the depth in bits of the video stream.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_framerate_denom"
+              c:identifier="gst_discoverer_video_info_get_framerate_denom"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the framerate of the video stream (denominator).</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_framerate_num"
+              c:identifier="gst_discoverer_video_info_get_framerate_num"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the framerate of the video stream (numerator).</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_height"
+              c:identifier="gst_discoverer_video_info_get_height"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the height of the video stream in pixels.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_max_bitrate"
+              c:identifier="gst_discoverer_video_info_get_max_bitrate"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the maximum bitrate of the video stream in bits/second.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_par_denom"
+              c:identifier="gst_discoverer_video_info_get_par_denom"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the Pixel Aspect Ratio (PAR) of the video stream (denominator).</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_par_num"
+              c:identifier="gst_discoverer_video_info_get_par_num"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the Pixel Aspect Ratio (PAR) of the video stream (numerator).</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_width"
+              c:identifier="gst_discoverer_video_info_get_width"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the width of the video stream in pixels.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="is_image"
+              c:identifier="gst_discoverer_video_info_is_image"
+              version="0.10.31">
+        <doc xml:whitespace="preserve">one frame).</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">#TRUE if the video stream corresponds to an image (i.e. only contains</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="is_interlaced"
+              c:identifier="gst_discoverer_video_info_is_interlaced"
+              version="0.10.31">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the stream is interlaced, else %FALSE.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+    </class>
+    <constant name="ENCODING_CATEGORY_CAPTURE" value="capture">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="ENCODING_CATEGORY_DEVICE" value="device">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="ENCODING_CATEGORY_ONLINE_SERVICE" value="online-service">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <constant name="ENCODING_CATEGORY_STORAGE_EDITING" value="storage-editing">
+      <type name="utf8" c:type="gchar*"/>
+    </constant>
+    <class name="EncodingAudioProfile"
+           c:symbol-prefix="encoding_audio_profile"
+           c:type="GstEncodingAudioProfile"
+           version="0.10.32"
+           parent="EncodingProfile"
+           glib:type-name="GstEncodingAudioProfile"
+           glib:get-type="gst_encoding_audio_profile_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">Variant of #GstEncodingProfile for audio streams.</doc>
+      <constructor name="new"
+                   c:identifier="gst_encoding_audio_profile_new"
+                   version="0.10.32">
+        <doc xml:whitespace="preserve">Creates a new #GstEncodingAudioProfile
+All provided allocatable arguments will be internally copied, so can be
+safely freed/unreferenced after calling this method.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #GstEncodingAudioProfile.</doc>
+          <type name="EncodingAudioProfile" c:type="GstEncodingAudioProfile*"/>
+        </return-value>
+        <parameters>
+          <parameter name="format" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GstCaps</doc>
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </parameter>
+          <parameter name="preset" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the preset(s) to use on the encoder, can be #NULL</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="restriction" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GstCaps used to restrict the input to the encoder, can be NULL. See gst_encoding_profile_get_restriction() for more details.</doc>
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </parameter>
+          <parameter name="presence" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the number of time this stream must be used. 0 means any number of times (including never)</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </constructor>
+    </class>
+    <class name="EncodingContainerProfile"
+           c:symbol-prefix="encoding_container_profile"
+           c:type="GstEncodingContainerProfile"
+           version="0.10.32"
+           parent="EncodingProfile"
+           glib:type-name="GstEncodingContainerProfile"
+           glib:get-type="gst_encoding_container_profile_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">Encoding profiles for containers. Keeps track of a list of #GstEncodingProfile</doc>
+      <constructor name="new"
+                   c:identifier="gst_encoding_container_profile_new"
+                   version="0.10.32">
+        <doc xml:whitespace="preserve">Creates a new #GstEncodingContainerProfile.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">The newly created #GstEncodingContainerProfile.</doc>
+          <type name="EncodingContainerProfile"
+                c:type="GstEncodingContainerProfile*"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The name of the container profile, can be %NULL</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="description" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The description of the container profile, can be %NULL</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="format" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The format to use for this profile</doc>
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </parameter>
+          <parameter name="preset" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The preset to use for this profile</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="add_profile"
+              c:identifier="gst_encoding_container_profile_add_profile"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Add a #GstEncodingProfile to the list of profiles handled by @container.
+No copy of @profile will be made, if you wish to use it elsewhere after this
+method you should increment its reference count.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the @stream was properly added, else %FALSE.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="profile" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GstEncodingProfile to add.</doc>
+            <type name="EncodingProfile" c:type="GstEncodingProfile*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="contains_profile"
+              c:identifier="gst_encoding_container_profile_contains_profile"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Checks if @container contains a #GstEncodingProfile identical to
+to @profile, else %FALSE.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if @container contains a #GstEncodingProfile identical</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="profile" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstEncodingProfile</doc>
+            <type name="EncodingProfile" c:type="GstEncodingProfile*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_profiles"
+              c:identifier="gst_encoding_container_profile_get_profiles">
+        <return-value transfer-ownership="none">
+          <type name="GLib.List" c:type="GList*">
+            <type name="gpointer" c:type="gpointer"/>
+          </type>
+        </return-value>
+      </method>
+    </class>
+    <class name="EncodingProfile"
+           c:symbol-prefix="encoding_profile"
+           c:type="GstEncodingProfile"
+           version="0.10.32"
+           parent="Gst.MiniObject"
+           glib:type-name="GstEncodingProfile"
+           glib:get-type="gst_encoding_profile_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">The opaque base class object for all encoding profiles. This contains generic
+information like name, description, format and preset.</doc>
+      <function name="find"
+                c:identifier="gst_encoding_profile_find"
+                version="0.10.32">
+        <doc xml:whitespace="preserve">Find the #GstEncodingProfile with the specified name and category.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">The matching #GstEncodingProfile or %NULL.</doc>
+          <type name="EncodingProfile" c:type="GstEncodingProfile*"/>
+        </return-value>
+        <parameters>
+          <parameter name="targetname" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The name of the target</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="profilename" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The name of the profile</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="category" transfer-ownership="none" allow-none="1">
+            <doc xml:whitespace="preserve">The target category. Can be %NULL</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="get_description"
+              c:identifier="gst_encoding_profile_get_description"
+              version="0.10.32">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the description of the profile, can be %NULL.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_format"
+              c:identifier="gst_encoding_profile_get_format"
+              version="0.10.32">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstCaps corresponding to the media format used in the profile.</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </return-value>
+      </method>
+      <method name="get_input_caps"
+              c:identifier="gst_encoding_profile_get_input_caps"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Computes the full output caps that this @profile will be able to consume.
+when you are done with the caps.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">The full caps the given @profile can consume. Call gst_caps_unref()</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </return-value>
+      </method>
+      <method name="get_name"
+              c:identifier="gst_encoding_profile_get_name"
+              version="0.10.32">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the name of the profile, can be %NULL.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_presence"
+              c:identifier="gst_encoding_profile_get_presence"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">container profile. If 0, it is not a mandatory stream.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The number of times the profile is used in its parent</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_preset"
+              c:identifier="gst_encoding_profile_get_preset"
+              version="0.10.32">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the name of the #GstPreset to be used in the profile.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_restriction"
+              c:identifier="gst_encoding_profile_get_restriction"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">that will be used in the profile. The fields present in restriction caps are
+properties of the raw stream (that is before encoding), such as height and
+width for video and depth and sampling rate for audio. Does not apply to
+#GstEncodingContainerProfile (since there is no corresponding raw stream).
+Can be %NULL.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The restriction #GstCaps to apply before the encoder</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </return-value>
+      </method>
+      <method name="get_type_nick"
+              c:identifier="gst_encoding_profile_get_type_nick"
+              version="0.10.32">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the human-readable name of the type of @profile.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="is_equal"
+              c:identifier="gst_encoding_profile_is_equal"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Checks whether the two #GstEncodingProfile are equal</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if @a and @b are equal, else %FALSE.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="b" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstEncodingProfile</doc>
+            <type name="EncodingProfile" c:type="GstEncodingProfile*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_description"
+              c:identifier="gst_encoding_profile_set_description"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Set @description as the given description for the @profile. A copy of @description will be made
+internally.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="description" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the description to set on the profile</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_format"
+              c:identifier="gst_encoding_profile_set_format"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Sets the media format used in the profile.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="format" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the media format to use in the profile.</doc>
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_name"
+              c:identifier="gst_encoding_profile_set_name"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Set @name as the given name for the @profile. A copy of @name will be made
+internally.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name to set on the profile</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_presence"
+              c:identifier="gst_encoding_profile_set_presence"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Set the number of time the profile is used in its parent
+container profile. If 0, it is not a mandatory stream</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="presence" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the number of time the profile can be used</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_preset"
+              c:identifier="gst_encoding_profile_set_preset"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Sets the preset to use for the profile.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="preset" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the element preset to use</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_restriction"
+              c:identifier="gst_encoding_profile_set_restriction"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Set the restriction #GstCaps to apply before the encoder
+that will be used in the profile. See gst_encoding_profile_set_restriction()
+for more about restrictions. Does not apply to #GstEncodingContainerProfile.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="restriction" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the restriction to apply</doc>
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </class>
+    <class name="EncodingTarget"
+           c:symbol-prefix="encoding_target"
+           c:type="GstEncodingTarget"
+           version="0.10.32"
+           parent="Gst.MiniObject"
+           glib:type-name="GstEncodingTarget"
+           glib:get-type="gst_encoding_target_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">Collection of #GstEncodingProfile for a specific target or use-case.
+When being stored/loaded, targets come from a specific category, like
+#GST_ENCODING_CATEGORY_DEVICE.</doc>
+      <constructor name="new"
+                   c:identifier="gst_encoding_target_new"
+                   version="0.10.32"
+                   introspectable="0">
+        <doc xml:whitespace="preserve">Creates a new #GstEncodingTarget.
+The name and category can only consist of lowercase ASCII letters for the
+first character, followed by either lowercase ASCII letters, digits or
+hyphens ('-').
+The @category &lt;emphasis&gt;should&lt;/emphasis&gt; be one of the existing
+well-defined categories, like #GST_ENCODING_CATEGORY_DEVICE, but it
+&lt;emphasis&gt;can&lt;/emphasis&gt; be a application or user specific category if
+needed.
+there was an error.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">The newly created #GstEncodingTarget or %NULL if</doc>
+          <type name="EncodingTarget" c:type="GstEncodingTarget*"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The name of the target.</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="category" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The name of the category to which this @target belongs. For example: #GST_ENCODING_CATEGORY_DEVICE.</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="description" transfer-ownership="none">
+            <doc xml:whitespace="preserve">A description of #GstEncodingTarget in the current locale.</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="profiles" transfer-ownership="none">
+            <doc xml:whitespace="preserve">A #GList of #GstEncodingProfile.</doc>
+            <type name="GLib.List" c:type="GList*">
+              <type name="Gst.EncodingProfile"/>
+            </type>
+          </parameter>
+        </parameters>
+      </constructor>
+      <function name="load"
+                c:identifier="gst_encoding_target_load"
+                version="0.10.32"
+                throws="1">
+        <doc xml:whitespace="preserve">Searches for the #GstEncodingTarget with the given name, loads it
+and returns it.
+If the category name is specified only targets from that category will be
+searched for.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">The #GstEncodingTarget if available, else %NULL.</doc>
+          <type name="EncodingTarget" c:type="GstEncodingTarget*"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the #GstEncodingTarget to load.</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="category" transfer-ownership="none" allow-none="1">
+            <doc xml:whitespace="preserve">the name of the target category, like #GST_ENCODING_CATEGORY_DEVICE. Can be %NULL</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="load_from_file"
+                c:identifier="gst_encoding_target_load_from_file"
+                version="0.10.32"
+                throws="1">
+        <doc xml:whitespace="preserve">Opens the provided file and returns the contained #GstEncodingTarget.
+%NULL</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">The #GstEncodingTarget contained in the file, else</doc>
+          <type name="EncodingTarget" c:type="GstEncodingTarget*"/>
+        </return-value>
+        <parameters>
+          <parameter name="filepath" transfer-ownership="none">
+            <doc xml:whitespace="preserve">The file location to load the #GstEncodingTarget from</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="add_profile"
+              c:identifier="gst_encoding_target_add_profile"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Adds the given @profile to the @target. Each added profile must have
+a unique name within the profile.
+The @target will steal a reference to the @profile. If you wish to use
+the profile after calling this method, you should increase its reference
+count.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the profile was added, else %FALSE.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="profile" transfer-ownership="full">
+            <doc xml:whitespace="preserve">the #GstEncodingProfile to add</doc>
+            <type name="EncodingProfile" c:type="GstEncodingProfile*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_category"
+              c:identifier="gst_encoding_target_get_category"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">#GST_ENCODING_CATEGORY_DEVICE.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The category of the @target. For example:</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_description"
+              c:identifier="gst_encoding_target_get_description"
+              version="0.10.32">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The description of the @target.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_name"
+              c:identifier="gst_encoding_target_get_name"
+              version="0.10.32">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The name of the @target.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_profile"
+              c:identifier="gst_encoding_target_get_profile"
+              version="0.10.32">
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">The matching #GstEncodingProfile, or %NULL.</doc>
+          <type name="EncodingProfile" c:type="GstEncodingProfile*"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the profile to retrieve</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_profiles"
+              c:identifier="gst_encoding_target_get_profiles"
+              version="0.10.32"
+              introspectable="0">
+        <doc xml:whitespace="preserve">#GstEncodingProfile(s) this @target handles.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">A list of</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="Gst.EncodingProfile"/>
+          </type>
+        </return-value>
+      </method>
+      <method name="save"
+              c:identifier="gst_encoding_target_save"
+              version="0.10.32"
+              throws="1">
+        <doc xml:whitespace="preserve">Saves the @target to a default user-local directory.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the target was correctly saved, else %FALSE.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="save_to_file"
+              c:identifier="gst_encoding_target_save_to_file"
+              version="0.10.32"
+              throws="1">
+        <doc xml:whitespace="preserve">Saves the @target to the provided file location.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the target was correctly saved, else %FALSE.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="filepath" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the location to store the @target at.</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </class>
+    <class name="EncodingVideoProfile"
+           c:symbol-prefix="encoding_video_profile"
+           c:type="GstEncodingVideoProfile"
+           version="0.10.32"
+           parent="EncodingProfile"
+           glib:type-name="GstEncodingVideoProfile"
+           glib:get-type="gst_encoding_video_profile_get_type"
+           glib:fundamental="1">
+      <doc xml:whitespace="preserve">Variant of #GstEncodingProfile for video streams, allows specifying the @pass.</doc>
+      <constructor name="new"
+                   c:identifier="gst_encoding_video_profile_new"
+                   version="0.10.32">
+        <doc xml:whitespace="preserve">Creates a new #GstEncodingVideoProfile
+All provided allocatable arguments will be internally copied, so can be
+safely freed/unreferenced after calling this method.
+If you wish to control the pass number (in case of multi-pass scenarios),
+please refer to the gst_encoding_video_profile_set_pass() documentation.
+If you wish to use/force a constant framerate please refer to the
+gst_encoding_video_profile_set_variableframerate() documentation.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #GstEncodingVideoProfile.</doc>
+          <type name="EncodingVideoProfile" c:type="GstEncodingVideoProfile*"/>
+        </return-value>
+        <parameters>
+          <parameter name="format" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GstCaps</doc>
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </parameter>
+          <parameter name="preset" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the preset(s) to use on the encoder, can be #NULL</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="restriction" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GstCaps used to restrict the input to the encoder, can be NULL. See gst_encoding_profile_get_restriction() for more details.</doc>
+            <type name="Gst.Caps" c:type="GstCaps*"/>
+          </parameter>
+          <parameter name="presence" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the number of time this stream must be used. 0 means any number of times (including never)</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="get_pass"
+              c:identifier="gst_encoding_video_profile_get_pass"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">1 for multi-pass. 0 if this is not a multi-pass profile</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The pass number if this is part of a multi-pass profile. Starts at</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_variableframerate"
+              c:identifier="gst_encoding_video_profile_get_variableframerate"
+              version="0.10.32">
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">Whether non-constant video framerate is allowed for encoding.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="set_pass"
+              c:identifier="gst_encoding_video_profile_set_pass"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">Sets the pass number of this video profile. The first pass profile should have
+this value set to 1. If this video profile isn't part of a multi-pass profile,
+you may set it to 0 (the default value).</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="pass" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the pass number for this profile</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_variableframerate"
+              c:identifier="gst_encoding_video_profile_set_variableframerate"
+              version="0.10.32">
+        <doc xml:whitespace="preserve">If set to %TRUE, then the incoming streamm will be allowed to have non-constant
+framerate. If set to %FALSE (default value), then the incoming stream will
+be normalized by dropping/duplicating frames in order to produce a
+constance framerate.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="variableframerate" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a boolean</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+    </class>
+    <record name="InstallPluginsContext"
+            c:type="GstInstallPluginsContext"
+            version="0.10.12"
+            glib:type-name="GstInstallPluginsContext"
+            glib:get-type="gst_install_plugins_context_get_type"
+            c:symbol-prefix="install_plugins_context">
+      <doc xml:whitespace="preserve">Opaque context structure for the plugin installation. Use the provided
+API to set details on it.</doc>
+      <constructor name="new"
+                   c:identifier="gst_install_plugins_context_new"
+                   version="0.10.12">
+        <doc xml:whitespace="preserve">Creates a new #GstInstallPluginsContext.
+gst_install_plugins_context_free() when no longer needed</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a new #GstInstallPluginsContext. Free with</doc>
+          <type name="InstallPluginsContext"
+                c:type="GstInstallPluginsContext*"/>
+        </return-value>
+      </constructor>
+      <method name="free"
+              c:identifier="gst_install_plugins_context_free"
+              version="0.10.12">
+        <doc xml:whitespace="preserve">Frees a #GstInstallPluginsContext.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="set_xid"
+              c:identifier="gst_install_plugins_context_set_xid"
+              version="0.10.12">
+        <doc xml:whitespace="preserve">This function is for X11-based applications (such as most Gtk/Qt
+applications on linux/unix) only. You can use it to tell the external
+installer the XID of your main application window. That way the installer
+can make its own window transient to your application window during the
+installation.
+If set, the XID will be passed to the installer via a --transient-for=XID
+command line option.
+Gtk+/Gnome application should be able to obtain the XID of the top-level
+window like this:
+&lt;programlisting&gt;
+##include &amp;lt;gtk/gtk.h&amp;gt;
+##ifdef GDK_WINDOWING_X11
+##include &amp;lt;gdk/gdkx.h&amp;gt;
+##endif
+...
+##ifdef GDK_WINDOWING_X11
+xid = GDK_WINDOW_XWINDOW (GTK_WIDGET (application_window)-&amp;gt;window);
+##endif
+...
+&lt;/programlisting&gt;</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="xid" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the XWindow ID (XID) of the top-level application</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
+    <callback name="InstallPluginsResultFunc"
+              c:type="GstInstallPluginsResultFunc"
+              version="0.10.12">
+      <doc xml:whitespace="preserve">The prototype of the callback function that will be called once the
+external plugin installer program has returned. You only need to provide
+a callback function if you are using the asynchronous interface.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="result" transfer-ownership="none">
+          <doc xml:whitespace="preserve">whether the installation of the requested plugins succeeded or not</doc>
+          <type name="InstallPluginsReturn" c:type="GstInstallPluginsReturn"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" closure="1">
+          <doc xml:whitespace="preserve">the user data passed to gst_install_plugins_async()</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <enumeration name="InstallPluginsReturn"
+                 version="0.10.12"
+                 glib:type-name="GstInstallPluginsReturn"
+                 glib:get-type="gst_install_plugins_return_get_type"
+                 c:type="GstInstallPluginsReturn">
+      <doc xml:whitespace="preserve">Result codes returned by gst_install_plugins_async() and
+gst_install_plugins_sync(), and also the result code passed to the
+#GstInstallPluginsResultFunc specified with gst_install_plugin_async().
+These codes indicate success or failure of starting an external installer
+program and to what extent the requested plugins could be installed.</doc>
+      <member name="success"
+              value="0"
+              c:identifier="GST_INSTALL_PLUGINS_SUCCESS"
+              glib:nick="success"/>
+      <member name="not_found"
+              value="1"
+              c:identifier="GST_INSTALL_PLUGINS_NOT_FOUND"
+              glib:nick="not-found"/>
+      <member name="error"
+              value="2"
+              c:identifier="GST_INSTALL_PLUGINS_ERROR"
+              glib:nick="error"/>
+      <member name="partial_success"
+              value="3"
+              c:identifier="GST_INSTALL_PLUGINS_PARTIAL_SUCCESS"
+              glib:nick="partial-success"/>
+      <member name="user_abort"
+              value="4"
+              c:identifier="GST_INSTALL_PLUGINS_USER_ABORT"
+              glib:nick="user-abort"/>
+      <member name="crashed"
+              value="100"
+              c:identifier="GST_INSTALL_PLUGINS_CRASHED"
+              glib:nick="crashed"/>
+      <member name="invalid"
+              value="101"
+              c:identifier="GST_INSTALL_PLUGINS_INVALID"
+              glib:nick="invalid"/>
+      <member name="started_ok"
+              value="200"
+              c:identifier="GST_INSTALL_PLUGINS_STARTED_OK"
+              glib:nick="started-ok"/>
+      <member name="internal_failure"
+              value="201"
+              c:identifier="GST_INSTALL_PLUGINS_INTERNAL_FAILURE"
+              glib:nick="internal-failure"/>
+      <member name="helper_missing"
+              value="202"
+              c:identifier="GST_INSTALL_PLUGINS_HELPER_MISSING"
+              glib:nick="helper-missing"/>
+      <member name="install_in_progress"
+              value="203"
+              c:identifier="GST_INSTALL_PLUGINS_INSTALL_IN_PROGRESS"
+              glib:nick="install-in-progress"/>
+    </enumeration>
+    <constant name="PLUGINS_BASE_VERSION_MAJOR" value="0">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="PLUGINS_BASE_VERSION_MICRO" value="32">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="PLUGINS_BASE_VERSION_MINOR" value="10">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="PLUGINS_BASE_VERSION_NANO" value="0">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <function name="codec_utils_aac_caps_set_level_and_profile"
+              c:identifier="gst_codec_utils_aac_caps_set_level_and_profile"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Sets the level and profile on @caps if it can be determined from
+gst_codec_utils_aac_get_profile() for more details on the parameters.
+If mpegversion is 4, the "base-profile" field is also set in @caps.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the level and profile could be set, %FALSE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstCaps to which level and profile fields are to be added</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+        <parameter name="audio_config" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to the AudioSpecificConfig as specified in the Elementary Stream Descriptor (esds) in ISO/IEC 14496-1 (see below for a more details).</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of @audio_config in bytes</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="codec_utils_aac_get_level"
+              c:identifier="gst_codec_utils_aac_get_level"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Determines the level of a stream as defined in ISO/IEC 14496-3. For AAC LC
+streams, the constraints from the AAC audio profile are applied. For AAC
+Main, LTP, SSR and others, the Main profile is used.
+The @audio_config parameter follows the following format, starting from the
+most significant bit of the first byte:
+&lt;itemizedlist&gt;
+&lt;listitem&gt;&lt;para&gt;
+Bit 0:4 contains the AudioObjectType
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+Bit 5:8 contains the sample frequency index (if this is 0xf, then the
+next 24 bits define the actual sample frequency, and subsequent
+fields are appropriately shifted).
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;
+Bit 9:12 contains the channel configuration
+&lt;/para&gt;&lt;/listitem&gt;
+&lt;/itemizedlist&gt;
+&lt;note&gt;
+HE-AAC support has not yet been implemented.
+&lt;/note&gt;
+determined.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The level as a const string and %NULL if the level could not be</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="audio_config" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to the AudioSpecificConfig as specified in the Elementary Stream Descriptor (esds) in ISO/IEC 14496-1.</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of @audio_config in bytes</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="codec_utils_aac_get_profile"
+              c:identifier="gst_codec_utils_aac_get_profile"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Returns the profile of the given AAC stream as a string. The profile is
+determined using the AudioObjectType field which is in the first 5 bits of
+&lt;note&gt;
+HE-AAC support has not yet been implemented.
+&lt;/note&gt;
+determined.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The profile as a const string and %NULL if the profile could not be</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="audio_config" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to the AudioSpecificConfig as specified in the Elementary Stream Descriptor (esds) in ISO/IEC 14496-1 (see gst_codec_utils_aac_get_level() for a more details).</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of @audio_config in bytes</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="codec_utils_aac_get_sample_rate_from_index"
+              c:identifier="gst_codec_utils_aac_get_sample_rate_from_index"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Translates the sample rate index found in AAC headers to the actual sample
+rate.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The sample rate if @sr_idx is valid, 0 otherwise.</doc>
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="sr_idx" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Sample rate index as from the AudioSpecificConfig (MPEG-4 container) or ADTS frame header</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="codec_utils_h264_caps_set_level_and_profile"
+              c:identifier="gst_codec_utils_h264_caps_set_level_and_profile"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Sets the level and profile in @caps if it can be determined from @sps. See
+gst_codec_utils_h264_get_level() and gst_codec_utils_h264_get_profile()
+for more details on the parameters.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the level and profile could be set, %FALSE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstCaps to which the level and profile are to be added</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+        <parameter name="sps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Pointer to the sequence parameter set for the stream.</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the data available in @sps.</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="codec_utils_h264_get_level"
+              c:identifier="gst_codec_utils_h264_get_level"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Converts the level indication (level_idc) in the stream's
+sequence parameter set into a string. The SPS is expected to have the
+same format as for gst_codec_utils_h264_get_profile().</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The level as a const string, or %NULL if there is an error.</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="sps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Pointer to the sequence parameter set for the stream.</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the data available in @sps.</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="codec_utils_h264_get_profile"
+              c:identifier="gst_codec_utils_h264_get_profile"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Converts the profile indication (profile_idc) in the stream's
+sequence parameter set into a string. The SPS is expected to have the
+following format, as defined in the H.264 specification. The SPS is viewed
+as a bitstream here, with bit 0 being the most significant bit of the first
+byte.
+&lt;itemizedlist&gt;
+&lt;listitem&gt;&lt;para&gt;Bit 0:7   - Profile indication&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Bit 8     - constraint_set0_flag&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Bit 9     - constraint_set1_flag&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Bit 10    - constraint_set2_flag&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Bit 11    - constraint_set3_flag&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Bit 12    - constraint_set3_flag&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Bit 13:15 - Reserved&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Bit 16:24 - Level indication&lt;/para&gt;&lt;/listitem&gt;
+&lt;/itemizedlist&gt;</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The profile as a const string, or %NULL if there is an error.</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="sps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Pointer to the sequence parameter set for the stream.</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the data available in @sps.</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="codec_utils_mpeg4video_caps_set_level_and_profile"
+              c:identifier="gst_codec_utils_mpeg4video_caps_set_level_and_profile"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Sets the level and profile in @caps if it can be determined from
+gst_codec_utils_mpeg4video_get_profile() for more details on the
+parameters.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the level and profile could be set, %FALSE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstCaps to which the level and profile are to be added</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+        <parameter name="vis_obj_seq" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Pointer to the visual object sequence for the stream.</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the data available in @sps.</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="codec_utils_mpeg4video_get_level"
+              c:identifier="gst_codec_utils_mpeg4video_get_level"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Converts the level indication in the stream's visual object sequence into
+a string. @vis_obj_seq is expected to be the data following the visual
+object sequence start code. Only the first byte
+(profile_and_level_indication) is used.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The level as a const string, or NULL if there is an error.</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="vis_obj_seq" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Pointer to the visual object sequence for the stream.</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the data available in @sps.</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="codec_utils_mpeg4video_get_profile"
+              c:identifier="gst_codec_utils_mpeg4video_get_profile"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Converts the profile indication in the stream's visual object sequence into
+a string. @vis_obj_seq is expected to be the data following the visual
+object sequence start code. Only the first byte
+(profile_and_level_indication) is used.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The profile as a const string, or NULL if there is an error.</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="vis_obj_seq" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Pointer to the visual object sequence for the stream.</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">Length of the data available in @sps.</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="encoding_list_all_targets"
+              c:identifier="gst_encoding_list_all_targets"
+              version="0.10.32">
+      <doc xml:whitespace="preserve">List all available #GstEncodingTarget for the specified category, or all categories
+if @categoryname is %NULL.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">The list of #GstEncodingTarget</doc>
+        <type name="GLib.List" c:type="GList*">
+          <type name="EncodingTarget"/>
+        </type>
+      </return-value>
+      <parameters>
+        <parameter name="categoryname"
+                   transfer-ownership="none"
+                   allow-none="1">
+          <doc xml:whitespace="preserve">The category, for ex: #GST_ENCODING_CATEGORY_DEVICE. Can be %NULL.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="encoding_list_available_categories"
+              c:identifier="gst_encoding_list_available_categories"
+              version="0.10.32">
+      <doc xml:whitespace="preserve">Lists all #GstEncodingTarget categories present on disk.
+of #GstEncodingTarget categories.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">A list</doc>
+        <type name="GLib.List" c:type="GList*">
+          <type name="utf8"/>
+        </type>
+      </return-value>
+    </function>
+    <function name="install_plugins_async"
+              c:identifier="gst_install_plugins_async"
+              version="0.10.12">
+      <doc xml:whitespace="preserve">Requests plugin installation without blocking. Once the plugins have been
+installed or installation has failed, @func will be called with the result
+of the installation and your provided @user_data pointer.
+This function requires a running GLib/Gtk main loop. If you are not
+running a GLib/Gtk main loop, make sure to regularly call
+g_main_context_iteration(NULL,FALSE).
+The installer strings that make up @detail are typically obtained by
+calling gst_missing_plugin_message_get_installer_detail() on missing-plugin
+messages that have been caught on a pipeline's bus or created by the
+application via the provided API, such as gst_missing_element_message_new().
+It is possible to request the installation of multiple missing plugins in
+one go (as might be required if there is a demuxer for a certain format
+installed but no suitable video decoder and no suitable audio decoder).</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">result code whether an external installer could be started</doc>
+        <type name="InstallPluginsReturn" c:type="GstInstallPluginsReturn"/>
+      </return-value>
+      <parameters>
+        <parameter name="details" transfer-ownership="none">
+          <doc xml:whitespace="preserve">NULL-terminated array of installer string details (see below)</doc>
+          <type name="utf8" c:type="gchar**"/>
+        </parameter>
+        <parameter name="ctx" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstInstallPluginsContext, or NULL</doc>
+          <type name="InstallPluginsContext"
+                c:type="GstInstallPluginsContext*"/>
+        </parameter>
+        <parameter name="func"
+                   transfer-ownership="none"
+                   scope="async"
+                   closure="3">
+          <doc xml:whitespace="preserve">the function to call when the installer program returns</doc>
+          <type name="InstallPluginsResultFunc"
+                c:type="GstInstallPluginsResultFunc"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the user data to pass to @func when called, or NULL</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="install_plugins_installation_in_progress"
+              c:identifier="gst_install_plugins_installation_in_progress"
+              version="0.10.12">
+      <doc xml:whitespace="preserve">Checks whether plugin installation (initiated by this application only)
+is currently in progress.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if plugin installation is in progress, otherwise FALSE</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+    </function>
+    <function name="install_plugins_return_get_name"
+              c:identifier="gst_install_plugins_return_get_name"
+              version="0.10.12">
+      <doc xml:whitespace="preserve">Convenience function to return the descriptive string associated
+with a status code.  This function returns English strings and
+should not be used for user messages. It is here only to assist
+in debugging.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">a descriptive string for the status code in @ret</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="ret" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the return status code</doc>
+          <type name="InstallPluginsReturn" c:type="GstInstallPluginsReturn"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="install_plugins_supported"
+              c:identifier="gst_install_plugins_supported"
+              version="0.10.15">
+      <doc xml:whitespace="preserve">Checks whether plugin installation is likely to be supported by the
+current environment. This currently only checks whether the helper script
+that is to be provided by the distribution or operating system vendor
+exists.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if plugin installation is likely to be supported.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+    </function>
+    <function name="install_plugins_sync"
+              c:identifier="gst_install_plugins_sync"
+              version="0.10.12">
+      <doc xml:whitespace="preserve">Requests plugin installation and block until the plugins have been
+installed or installation has failed.
+This function should almost never be used, it only exists for cases where
+a non-GLib main loop is running and the user wants to run it in a separate
+thread and marshal the result back asynchronously into the main thread
+using the other non-GLib main loop. You should almost always use
+gst_install_plugins_async() instead of this function.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the result of the installation.</doc>
+        <type name="InstallPluginsReturn" c:type="GstInstallPluginsReturn"/>
+      </return-value>
+      <parameters>
+        <parameter name="details" transfer-ownership="none">
+          <doc xml:whitespace="preserve">NULL-terminated array of installer string details</doc>
+          <type name="utf8" c:type="gchar**"/>
+        </parameter>
+        <parameter name="ctx" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstInstallPluginsContext, or NULL</doc>
+          <type name="InstallPluginsContext"
+                c:type="GstInstallPluginsContext*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="is_missing_plugin_message"
+              c:identifier="gst_is_missing_plugin_message">
+      <doc xml:whitespace="preserve">Checks whether @msg is a missing plugins message.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if @msg is a missing-plugins message, otherwise %FALSE.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="msg" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstMessage</doc>
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_decoder_installer_detail_new"
+              c:identifier="gst_missing_decoder_installer_detail_new"
+              version="0.10.15">
+      <doc xml:whitespace="preserve">Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated detail string, or NULL on error. Free string</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="decode_caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the (fixed) caps for which a decoder element is needed</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_decoder_message_new"
+              c:identifier="gst_missing_decoder_message_new">
+      <doc xml:whitespace="preserve">Creates a missing-plugin message for @element to notify the application
+that a decoder element for a particular set of (fixed) caps is missing.
+This function is mainly for use in plugins.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a new #GstMessage, or NULL on error</doc>
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstElement posting the message</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="decode_caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the (fixed) caps for which a decoder element is needed</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_element_installer_detail_new"
+              c:identifier="gst_missing_element_installer_detail_new"
+              version="0.10.15">
+      <doc xml:whitespace="preserve">Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated detail string, or NULL on error. Free string</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="factory_name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the name of the missing element (element factory), e.g. "videoscale" or "cdparanoiasrc"</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_element_message_new"
+              c:identifier="gst_missing_element_message_new">
+      <doc xml:whitespace="preserve">Creates a missing-plugin message for @element to notify the application
+that a certain required element is missing. This function is mainly for
+use in plugins.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a new #GstMessage, or NULL on error</doc>
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstElement posting the message</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="factory_name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the name of the missing element (element factory), e.g. "videoscale" or "cdparanoiasrc"</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_encoder_installer_detail_new"
+              c:identifier="gst_missing_encoder_installer_detail_new"
+              version="0.10.15">
+      <doc xml:whitespace="preserve">Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated detail string, or NULL on error. Free string</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="encode_caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the (fixed) caps for which an encoder element is needed</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_encoder_message_new"
+              c:identifier="gst_missing_encoder_message_new">
+      <doc xml:whitespace="preserve">Creates a missing-plugin message for @element to notify the application
+that an encoder element for a particular set of (fixed) caps is missing.
+This function is mainly for use in plugins.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a new #GstMessage, or NULL on error</doc>
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstElement posting the message</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="encode_caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the (fixed) caps for which an encoder element is needed</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_plugin_message_get_description"
+              c:identifier="gst_missing_plugin_message_get_description">
+      <doc xml:whitespace="preserve">Returns a localised string describing the missing feature, for use in
+error dialogs and the like. Should never return NULL unless @msg is not
+a valid missing-plugin message.
+This function is mainly for applications that need a human-readable string
+describing a missing plugin, given a previously collected missing-plugin
+message
+string with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated description string, or NULL on error. Free</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="msg" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a missing-plugin #GstMessage of type #GST_MESSAGE_ELEMENT</doc>
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_plugin_message_get_installer_detail"
+              c:identifier="gst_missing_plugin_message_get_installer_detail">
+      <doc xml:whitespace="preserve">Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions.
+with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated detail string, or NULL on error. Free string</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="msg" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a missing-plugin #GstMessage of type #GST_MESSAGE_ELEMENT</doc>
+          <type name="Gst.Message" c:type="GstMessage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_uri_sink_installer_detail_new"
+              c:identifier="gst_missing_uri_sink_installer_detail_new"
+              version="0.10.15">
+      <doc xml:whitespace="preserve">Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated detail string, or NULL on error. Free string</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="protocol" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the URI protocol the missing source needs to implement, e.g. "http" or "mms"</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_uri_sink_message_new"
+              c:identifier="gst_missing_uri_sink_message_new">
+      <doc xml:whitespace="preserve">Creates a missing-plugin message for @element to notify the application
+that a sink element for a particular URI protocol is missing. This
+function is mainly for use in plugins.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a new #GstMessage, or NULL on error</doc>
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstElement posting the message</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="protocol" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the URI protocol the missing sink needs to implement, e.g. "http" or "smb"</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_uri_source_installer_detail_new"
+              c:identifier="gst_missing_uri_source_installer_detail_new"
+              version="0.10.15">
+      <doc xml:whitespace="preserve">Returns an opaque string containing all the details about the missing
+element to be passed to an external installer called via
+gst_install_plugins_async() or gst_install_plugins_sync().
+This function is mainly for applications that call external plugin
+installation mechanisms using one of the two above-mentioned functions in
+the case where the application knows exactly what kind of plugin it is
+missing.
+with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated detail string, or NULL on error. Free string</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="protocol" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the URI protocol the missing source needs to implement, e.g. "http" or "mms"</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="missing_uri_source_message_new"
+              c:identifier="gst_missing_uri_source_message_new">
+      <doc xml:whitespace="preserve">Creates a missing-plugin message for @element to notify the application
+that a source element for a particular URI protocol is missing. This
+function is mainly for use in plugins.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a new #GstMessage, or NULL on error</doc>
+        <type name="Gst.Message" c:type="GstMessage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GstElement posting the message</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="protocol" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the URI protocol the missing source needs to implement, e.g. "http" or "mms"</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_add_codec_description_to_tag_list"
+              c:identifier="gst_pb_utils_add_codec_description_to_tag_list">
+      <doc xml:whitespace="preserve">Adds a codec tag describing the format specified by @caps to @taglist.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if a codec tag was added, FALSE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="taglist" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstTagList</doc>
+          <type name="Gst.TagList" c:type="GstTagList*"/>
+        </parameter>
+        <parameter name="codec_tag" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a GStreamer codec tag such as #GST_TAG_AUDIO_CODEC, #GST_TAG_VIDEO_CODEC or #GST_TAG_CODEC</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the (fixed) #GstCaps for which a codec tag should be added.</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_codec_description"
+              c:identifier="gst_pb_utils_get_codec_description">
+      <doc xml:whitespace="preserve">Returns a localised (as far as this is possible) string describing the
+media format specified in @caps, for use in error dialogs or other messages
+to be seen by the user. Should never return NULL unless @caps is invalid.
+Also see the convenience function
+gst_pb_utils_add_codec_description_to_tag_list().
+string with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated description string, or NULL on error. Free</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the (fixed) #GstCaps for which an format description is needed</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_decoder_description"
+              c:identifier="gst_pb_utils_get_decoder_description">
+      <doc xml:whitespace="preserve">Returns a localised string describing an decoder for the format specified
+in @caps, for use in error dialogs or other messages to be seen by the user.
+Should never return NULL unless @factory_name or @caps are invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated description string, or NULL on error. Free</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the (fixed) #GstCaps for which an decoder description is needed</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_element_description"
+              c:identifier="gst_pb_utils_get_element_description">
+      <doc xml:whitespace="preserve">Returns a localised string describing the given element, for use in
+error dialogs or other messages to be seen by the user. Should never
+return NULL unless @factory_name is invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated description string, or NULL on error. Free</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="factory_name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the name of the element, e.g. "gnomevfssrc"</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_encoder_description"
+              c:identifier="gst_pb_utils_get_encoder_description">
+      <doc xml:whitespace="preserve">Returns a localised string describing an encoder for the format specified
+in @caps, for use in error dialogs or other messages to be seen by the user.
+Should never return NULL unless @factory_name or @caps are invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated description string, or NULL on error. Free</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="caps" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the (fixed) #GstCaps for which an encoder description is needed</doc>
+          <type name="Gst.Caps" c:type="GstCaps*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_sink_description"
+              c:identifier="gst_pb_utils_get_sink_description">
+      <doc xml:whitespace="preserve">Returns a localised string describing a sink element handling the protocol
+specified in @protocol, for use in error dialogs or other messages to be
+seen by the user. Should never return NULL unless @protocol is invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated description string, or NULL on error. Free</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="protocol" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the protocol the sink element needs to handle, e.g. "http"</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_get_source_description"
+              c:identifier="gst_pb_utils_get_source_description">
+      <doc xml:whitespace="preserve">Returns a localised string describing a source element handling the protocol
+specified in @protocol, for use in error dialogs or other messages to be
+seen by the user. Should never return NULL unless @protocol is invalid.
+This function is mainly for internal use, applications would typically
+use gst_missing_plugin_message_get_description() to get a description of
+a missing feature from a missing-plugin message.
+string with g_free() when not needed any longer.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly-allocated description string, or NULL on error. Free</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="protocol" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the protocol the source element needs to handle, e.g. "http"</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="pb_utils_init"
+              c:identifier="gst_pb_utils_init"
+              version="0.10.12">
+      <doc xml:whitespace="preserve">Initialises the base utils support library. This function is not
+thread-safe. Applications should call it after calling gst_init(),
+plugins should call it from their plugin_init function.
+This function may be called multiple times. It will do nothing if the
+library has already been initialised.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </function>
+    <function name="plugins_base_version"
+              c:identifier="gst_plugins_base_version"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">Gets the version number of the GStreamer Plugins Base libraries.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="major"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">pointer to a guint to store the major version number, or %NULL</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+        <parameter name="minor"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">pointer to a guint to store the minor version number, or %NULL</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+        <parameter name="micro"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">pointer to a guint to store the micro version number, or %NULL</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+        <parameter name="nano"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">pointer to a guint to store the nano version number, or %NULL</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="plugins_base_version_string"
+              c:identifier="gst_plugins_base_version_string"
+              version="0.10.31">
+      <doc xml:whitespace="preserve">This function returns a string that is useful for describing this version
+strings, logging, about dialogs ...</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a newly allocated string describing this version of gst-plugins-base</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+    </function>
+  </namespace>
+</repository>

@@ -20,13 +20,9 @@ HELP: up-axis
 HELP: unit-ratio
 { $description "Scaling ratio for the coordinates of the tags being read." } ;
 
-HELP: string>numbers ( string -- number-seq )
+HELP: string>numbers
 { $values { "string" string } { "number-seq" sequence } }
 { $description "Splits a string on whitespace and converts the elements to a number sequence." } ;
-
-HELP: string>floats ( string -- float-seq )
-{ $values { "string" string } { "float-seq" sequence } }
-{ $description "Splits a string on whitespace and converts the elements to a float sequence." } ;
 
 HELP: x-up { $class-description "Right-handed 3D coordinate system where X is up." } ;
 HELP: y-up { $class-description "Right-handed 3D coordinate system where Y is up." } ;
@@ -36,7 +32,7 @@ HELP: >y-up-axis!
 { $values { "seq" sequence } { "from-axis" rh-up } }
 { $description "Destructively swizzles the first three elements of the input sequence to a right-handed 3D coordinate system where Y is up and returns the modified sequence." } ;
 
-HELP: source>seq
+HELP: source>sequence
 { $values { "source-tag" tag } { "up-axis" rh-up } { "scale" number } { "sequence" sequence } }
 { $description "Convert the " { $emphasis "float_array" } " in a " { $emphasis "source tag" } " to a sequence of number sequences according to the element stride. The values are scaled according to " { $emphasis "scale" } " and swizzled from " { $emphasis "up-axis" } " so that the Y coordinate points up." } ;
 

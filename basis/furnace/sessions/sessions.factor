@@ -98,7 +98,7 @@ CONSTANT: session-id-key "__s"
 : put-session-cookie ( response -- response' )
     <session-cookie> put-cookie ;
 
-M: sessions modify-form ( responder -- )
+M: sessions modify-form ( responder -- xml/f )
     drop session get id>> session-id-key hidden-form-field ;
 
 M: sessions call-responder* ( path responder -- response )

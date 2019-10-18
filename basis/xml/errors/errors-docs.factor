@@ -19,15 +19,15 @@ HELP: notags
 { $xml-error "<?xml version='1.0'?>" } ;
 
 HELP: extra-attrs
-{ $class-description "XML parsing error describing the case where the XML prolog (" { $snippet "<?xml ...?>" } ") contains attributes other than the three allowed ones, " { $snippet "standalone" } ", " { $snippet "version" } " and " { $snippet "encoding" } ". Contains one slot, " { $snippet "attrs" } ", which is a hashtable of all the extra attributes' names. This is a subclass of " { $link xml-error-at } "." }
+{ $class-description "XML parsing error describing the case where the XML prolog (" { $snippet "<?xml ...?>" } ") contains attributes other than the three allowed ones, " { $snippet "standalone" } ", " { $snippet "version" } " and " { $snippet "encoding" } ". Contains one slot, " { $snippet "attrs" } ", which is a hashtable of all the extra attributes' names." }
 { $xml-error "<?xml version='1.0' reason='because I said so'?>\n<foo/>" } ;
 
 HELP: nonexist-ns
-{ $class-description "XML parsing error describing the case where a namespace doesn't exist but it is used in a tag. Contains one slot, " { $snippet "name" } ", which contains the name of the undeclared namespace, and is a subclass of " { $link xml-error-at } "." }
+{ $class-description "XML parsing error describing the case where a namespace doesn't exist but it is used in a tag. Contains one slot, " { $snippet "name" } ", which contains the name of the undeclared namespace." }
 { $xml-error "<a:b>c</a:b>" } ;
 
 HELP: not-yes/no
-{ $class-description "XML parsing error used to describe the case where standalone is set in the XML prolog to something other than " { $snippet "yes" } " or " { $snippet "no" } ". This is a subclass of " { $link xml-error-at } " and contains one slot, text, which contains offending value." }
+{ $class-description "XML parsing error used to describe the case where standalone is set in the XML prolog to something other than " { $snippet "yes" } " or " { $snippet "no" } ". This contains one slot, text, which contains offending value." }
 { $xml-error "<?xml version='1.0' standalone='maybe'?>\n<x/>" } ;
 
 HELP: unclosed
@@ -35,14 +35,14 @@ HELP: unclosed
 { $xml-error "<x>some text" } ;
 
 HELP: mismatched
-{ $class-description "XML parsing error describing mismatched tags. Contains two slots: " { $snippet "open" } " is the name of the opening tag and " { $snippet "close" } " is the name of the closing tag. This is a subclass of " { $link xml-error-at } " showing the location of the closing tag" }
+{ $class-description "XML parsing error describing mismatched tags. Contains two slots: " { $snippet "open" } " is the name of the opening tag and " { $snippet "close" } " is the name of the closing tag. This shows the location of the closing tag" }
 { $xml-error "<a></c>" } ;
 
 HELP: expected
-{ $class-description "XML parsing error describing when an expected token was not present. Delegates to " { $link xml-error-at } ". Contains two slots, " { $snippet "should-be" } ", which has the expected string, and " { $snippet "was" } ", which has the actual string." } ;
+{ $class-description "XML parsing error describing when an expected token was not present. Contains two slots, " { $snippet "should-be" } ", which has the expected string, and " { $snippet "was" } ", which has the actual string." } ;
 
 HELP: no-entity
-{ $class-description "XML parsing error describing the use of an undefined entity. This is a subclass of " { $link xml-error-at } ". Contains one slot, thing, containing a string representing the entity." }
+{ $class-description "XML parsing error describing the use of an undefined entity. Contains one slot, " { $snippet "thing" } ", containing a string representing the entity." }
 { $xml-error "<x>&foo;</x>" } ;
 
 
@@ -115,7 +115,7 @@ ARTICLE: "xml.errors" "XML parsing errors"
     attr-w/<
     misplaced-directive
 }
-"Additionally, most of these errors are a kind of " { $link xml-error-at } " which provides more information about where the error occurred."
+"Additionally, most of these errors are a kind of " { $link xml-error } " which provides more information about where the error occurred."
 $nl
 "Note that, in parsing an XML document, only the first error is reported." ;
 

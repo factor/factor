@@ -49,13 +49,6 @@ M: extra-words equal?
 
 C: <extra-words> extra-words
 
-: clear-manifest ( -- )
-    manifest get
-    [ search-vocab-names>> clear-assoc ]
-    [ search-vocabs>> delete-all ]
-    [ qualified-vocabs>> delete-all ]
-    tri ;
-
 ERROR: no-word-in-vocab word vocab ;
 
 <PRIVATE
@@ -77,7 +70,7 @@ ERROR: no-word-in-vocab word vocab ;
     words>> swap [ swap [ swap ":" glue ] dip ] curry assoc-map ;
 
 : (lookup) ( name assoc -- word/f )
-    at dup forward-reference? [ drop f ] when ;
+    at* [ dup forward-reference? [ drop f ] when ] when ;
 
 : (use-words) ( assoc -- extra-words seq )
     <extra-words> manifest get qualified-vocabs>> ;
@@ -93,10 +86,10 @@ PRIVATE>
         [ set-current-vocab ] dip call
     ] with-variable ; inline
 
-TUPLE: no-current-vocab ;
+TUPLE: no-current-vocab-error ;
 
 : no-current-vocab ( -- vocab )
-    \ no-current-vocab boa
+    \ no-current-vocab-error boa
     { { "Define words in scratchpad vocabulary" "scratchpad" } }
     throw-restarts dup set-current-vocab ;
 
@@ -221,17 +214,17 @@ M: extra-words update trim-forgotten ;
 M: exclude update trim-forgotten ;
 
 M: qualified update
-    dup vocab>> vocab [
+    dup vocab>> lookup-vocab [
         dup [ prefix>> ] [ vocab>> load-vocab ] bi qualified-words
         >>words
     ] [ drop f ] if ;
 
-M: vocab update dup name>> vocab eq? ;
+M: vocab update dup name>> lookup-vocab eq? ;
 
 : update-manifest ( manifest -- )
-    [ dup [ name>> vocab ] when ] change-current-vocab
-    [ [ drop vocab ] assoc-filter ] change-search-vocab-names
-    dup search-vocab-names>> keys [ vocab ] V{ } map-as >>search-vocabs
+    [ dup [ name>> lookup-vocab ] when ] change-current-vocab
+    [ [ drop lookup-vocab ] assoc-filter ] change-search-vocab-names
+    dup search-vocab-names>> keys [ lookup-vocab ] V{ } map-as >>search-vocabs
     qualified-vocabs>> [ update ] filter! drop ;
 
 M: manifest definitions-changed ( assoc manifest -- )

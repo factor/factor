@@ -1,9 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables kernel kernel.private math
-namespaces sequences words quotations layouts combinators
-sequences.private classes classes.builtin classes.algebra
-definitions math.order math.private assocs ;
+USING: arrays assocs classes classes.algebra combinators
+definitions generic kernel kernel.private math math.order
+math.private namespaces quotations sequences words ;
 IN: generic.math
 
 PREDICATE: math-class < class
@@ -51,7 +50,7 @@ ERROR: no-math-method left right generic ;
 <PRIVATE
 
 : (math-method) ( generic class -- quot )
-    over method
+    over ?lookup-method
     [ 1quotation ]
     [ default-math-method ] ?if ;
 
@@ -88,7 +87,7 @@ SYMBOL: generic-word
     swap [ [ tag-dispatch-entry ] curry dip ] curry assoc-map math-alist>quot ;
 
 : tuple-dispatch-entry ( class picker -- quot )
-    [ 1quotation [ { tuple } declare class ] [ eq? ] surround ] dip prepend ;
+    [ 1quotation [ { tuple } declare class-of ] [ eq? ] surround ] dip prepend ;
 
 : tuple-dispatch ( picker alist -- alist' )
     swap [ [ tuple-dispatch-entry ] curry dip ] curry assoc-map math-alist>quot ;
@@ -122,7 +121,7 @@ M: math-combination perform-combination
         define
     ] with-variable ;
 
-PREDICATE: math-generic < generic ( word -- ? )
+PREDICATE: math-generic < generic
     "combination" word-prop math-combination? ;
 
 M: math-generic definer drop \ MATH: f ;

@@ -2,9 +2,9 @@ USING: definitions io.launcher kernel math math.parser parser
 namespaces prettyprint editors make ;
 IN: editors.textedit
 
-: textedit ( file line -- )
-    drop
-    [ "open" , "-a" , "TextEdit", , ] { } make
-    run-detached drop ;
+SINGLETON: textedit
+textedit editor-class set-global
 
-[ textedit ] edit-hook set-global
+M: textedit editor-command ( file line -- command )
+    drop
+    [ "open" , "-a" , "TextEdit", , ] { } make ;

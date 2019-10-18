@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.directories io.files io.launcher kernel make
 namespaces prettyprint sequences mason.common mason.config
@@ -11,7 +11,7 @@ IN: mason.release.branch
 
 : push-to-clean-branch-cmd ( -- args )
     [
-        "git" , "push" ,
+        { "git" "push" "-f" } %
         [
             branch-username get % "@" %
             branch-host get % ":" %
@@ -38,11 +38,10 @@ IN: mason.release.branch
 : upload-clean-image ( -- )
     5 [ upload-clean-image-cmd short-running-process ] retry ;
 
-: (update-clean-branch) ( -- )
-    "factor" [
-        push-to-clean-branch
-        upload-clean-image
-    ] with-directory ;
-
 : update-clean-branch ( -- )
-    upload-to-factorcode? get [ (update-clean-branch) ] when ;
+    update-clean-branch? get [
+        "factor" [
+            push-to-clean-branch
+            upload-clean-image
+        ] with-directory
+    ] when ;

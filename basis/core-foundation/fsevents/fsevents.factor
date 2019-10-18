@@ -1,11 +1,12 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings alien.syntax kernel
-math sequences namespaces make assocs init accessors
+USING: alien alien.c-types alien.data alien.strings alien.syntax
+kernel math sequences namespaces make assocs init accessors
 continuations combinators io.encodings.utf8 destructors locals
 arrays specialized-arrays classes.struct core-foundation
 core-foundation.arrays core-foundation.run-loop
 core-foundation.strings core-foundation.time unix.types ;
+FROM: namespaces => change-global ;
 IN: core-foundation.fsevents
 
 SPECIALIZED-ARRAY: void*
@@ -38,7 +39,7 @@ STRUCT: FSEventStreamContext
 
 CALLBACK: void FSEventStreamCallback ( FSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, FSEventStreamEventFlags* eventFlags, FSEventStreamEventId* eventIds ) ;
 
-CONSTANT: FSEventStreamEventIdSinceNow HEX: FFFFFFFFFFFFFFFF
+CONSTANT: FSEventStreamEventIdSinceNow 0xFFFFFFFFFFFFFFFF
 
 FUNCTION: FSEventStreamRef FSEventStreamCreate (
     CFAllocatorRef           allocator,
@@ -164,9 +165,9 @@ SYMBOL: event-stream-callbacks
     event-stream-callbacks get delete-at ;
 
 :: (master-event-source-callback) ( eventStream info numEvents eventPaths eventFlags eventIds -- )
-    eventPaths numEvents <direct-void*-array> [ utf8 alien>string ] { } map-as
-    eventFlags numEvents <direct-int-array>
-    eventIds numEvents <direct-longlong-array>
+    eventPaths numEvents void* <c-direct-array> [ utf8 alien>string ] { } map-as
+    eventFlags numEvents int <c-direct-array>
+    eventIds numEvents longlong <c-direct-array>
     3array flip
     info event-stream-callbacks get at [ drop ] or call( changes -- ) ;
 

@@ -1,0 +1,1 @@
+Send files to the trash bin.

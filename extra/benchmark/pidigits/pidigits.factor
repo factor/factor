@@ -3,7 +3,7 @@
 ! A copy of the license is available at http://factorcode.org/license.txt
 USING: arrays formatting fry grouping io kernel locals math math.functions
     math.matrices math.parser math.primes.factors math.vectors prettyprint
-    sequences sequences.deep sets ;
+    sequences sequences.deep ;
 IN: benchmark.pidigits
 
 : extract ( z x -- n )
@@ -53,7 +53,7 @@ IN: benchmark.pidigits
 : pidigits ( n -- )
     [ 1 { { 1 0 } { 0 1 } } ] dip 0 0 (pidigits) ;
 
-: pidigits-main ( -- )
+: pidigits-benchmark ( -- )
     2000 pidigits ;
 
-MAIN: pidigits-main
+MAIN: pidigits-benchmark

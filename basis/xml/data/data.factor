@@ -2,27 +2,28 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private assocs arrays
 delegate.protocols delegate vectors accessors multiline
-macros words quotations combinators slots fry strings ;
+macros words quotations combinators slots fry strings
+combinators.short-circuit ;
 IN: xml.data
 
 TUPLE: interpolated var ;
 C: <interpolated> interpolated
 
-UNION: nullable-string string POSTPONE: f ;
-
 TUPLE: name
-    { space nullable-string }
+    { space maybe{ string } }
     { main string }
-    { url nullable-string } ;
+    { url maybe{ string } } ;
 C: <name> name
 
 : ?= ( object/f object/f -- ? )
     2dup and [ = ] [ 2drop t ] if ;
 
 : names-match? ( name1 name2 -- ? )
-    [ [ space>> ] bi@ ?= ]
-    [ [ url>> ] bi@ ?= ]
-    [ [ main>> ] bi@ ?= ] 2tri and and ;
+    {
+        [ [ space>> ] bi@ ?= ]
+        [ [ url>> ] bi@ ?= ]
+        [ [ main>> ] bi@ ?= ]
+    } 2&& ;
 
 : <simple-name> ( string -- name )
     "" swap f <name> ;
@@ -97,8 +98,6 @@ TUPLE: attlist-decl < directive
     { att-defs string } ;
 C: <attlist-decl> attlist-decl
 
-UNION: boolean t POSTPONE: f ;
-
 TUPLE: entity-decl < directive
     { name string }
     { def string }
@@ -111,7 +110,7 @@ C: <system-id> system-id
 TUPLE: public-id { pubid-literal string } { system-literal string } ;
 C: <public-id> public-id
 
-UNION: id system-id public-id POSTPONE: f ;
+UNION: id system-id public-id ;
 
 TUPLE: dtd
     { directives sequence }
@@ -119,12 +118,10 @@ TUPLE: dtd
     { parameter-entities assoc } ;
 C: <dtd> dtd
 
-UNION: dtd/f dtd POSTPONE: f ;
-
 TUPLE: doctype-decl < directive
     { name string }
-    { external-id id }
-    { internal-subset dtd/f } ;
+    { external-id maybe{ id } }
+    { internal-subset maybe{ dtd } } ;
 C: <doctype-decl> doctype-decl
 
 TUPLE: notation-decl < directive
@@ -197,7 +194,7 @@ CONSULT: name xml body>> ;
     [ [ prolog>> ] [ before>> ] [ after>> ] tri ] dip
     swap <xml> ;
 
-: seq>xml ( xml seq -- newxml )
+: sequence>xml ( xml seq -- newxml )
     over body>> like tag>xml ;
 PRIVATE>
 
@@ -206,7 +203,7 @@ M: xml clone
 
 M: xml like
     swap dup xml? [ nip ] [
-        dup tag? [ tag>xml ] [ seq>xml ] if
+        dup tag? [ tag>xml ] [ sequence>xml ] if
     ] if ;
 
 ! tag with children=f is contained

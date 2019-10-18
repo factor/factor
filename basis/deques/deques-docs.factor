@@ -48,9 +48,18 @@ HELP: push-all-front
      { "seq" sequence } { "deque" deque } }
 { $description "Pushes a sequence of elements onto the front of a deque." } ;
 
+HELP: peek-front*
+{ $values { "deque" deque } { "obj" object } { "?" boolean } }
+{ $contract "Returns the object at the front of the deque, and a boolean indicating if an object was found." } ;
+
 HELP: peek-front
 { $values { "deque" deque } { "obj" object } }
-{ $contract "Returns the object at the front of the deque." } ;
+{ $description "Returns the object at the front of the deque." }
+{ $errors "Throws an error if the deque is empty." } ;
+
+HELP: ?peek-front
+{ $values { "deque" deque } { "obj/f" "an object or " { $link f } } }
+{ $description "A forgiving version of " { $link peek-front } ". If the deque is empty, returns " { $link f } "." } ;
 
 HELP: pop-front
 { $values { "deque" deque } { "obj" object } }
@@ -62,9 +71,18 @@ HELP: pop-front*
 { $contract "Pop the object off the front of the deque." }
 { $notes "This operation is O(1)." } ;
 
+HELP: peek-back*
+{ $values { "deque" deque } { "obj" object } { "?" boolean } }
+{ $contract "Returns the object at the back of the deque, and a boolean indicating if an object was found." } ;
+
 HELP: peek-back
 { $values { "deque" deque } { "obj" object } }
-{ $contract "Returns the object at the back of the deque." } ;
+{ $description "Returns the object at the back of the deque." }
+{ $errors "Throws an error if the deque is empty." } ;
+
+HELP: ?peek-back
+{ $values { "deque" deque } { "obj/f" "an object or " { $link f } } }
+{ $description "A forgiving version of " { $link peek-back } ". If the deque is empty, returns " { $link f } "." } ;
 
 HELP: pop-back
 { $values { "deque" deque } { "obj" object } }

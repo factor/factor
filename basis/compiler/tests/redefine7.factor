@@ -23,5 +23,5 @@ IN: compiler.tests.redefine7
 ] unit-test
 
 [ 2.0 ] [
-    1.0 "my-inline" "compiler.tests.redefine7" lookup execute
+    1.0 "my-inline" "compiler.tests.redefine7" lookup-word execute
 ] unit-test

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs byte-arrays combinators compiler.cfg.builder
 continuations fry sequences compiler.tree.propagation.info
-cpu.architecture kernel words make math math.intervals
-math.vectors.simd.intrinsics namespaces ;
+compiler.tree.propagation.nodes cpu.architecture kernel layouts words
+make math math.intervals math.vectors.simd.intrinsics namespaces ;
 IN: compiler.tree.propagation.simd
 
 CONSTANT: vector>vector-intrinsics
@@ -69,6 +69,7 @@ CONSTANT: vector-other-intrinsics
         (simd-vany?)
         (simd-vall?)
         (simd-vnone?)
+        (simd-vgetmask)
         (simd-select)
         set-alien-vector
     }
@@ -83,7 +84,11 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
         literal>> scalar-rep-of {
             { float-rep [ float ] }
             { double-rep [ float ] }
-            [ drop integer ]
+            { longlong-scalar-rep [ integer ] }
+            { ulonglong-scalar-rep [ integer ] }
+            { int-scalar-rep [ cell 8 = [ fixnum ] [ integer ] if ] }
+            { uint-scalar-rep [ cell 8 = [ fixnum ] [ integer ] if ] }
+            [ drop fixnum ]
         } case
     ] [ drop real ] if
     <class-info> ;
@@ -104,8 +109,10 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
     real [0,inf] <class/interval-info> value-info-intersect
 ] "outputs" set-word-prop
 
+\ (simd-vgetmask) { fixnum } "default-output-classes" set-word-prop
+
 : clone-with-value-infos ( node -- node' )
-    clone dup in-d>> [ dup value-info ] H{ } map>assoc >>info ;
+    clone dup in-d>> extract-value-info >>info ;
 
 : try-intrinsic ( node intrinsic-quot -- ? )
     '[

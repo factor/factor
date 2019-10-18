@@ -14,7 +14,7 @@ tags [ H{ } clone ] initialize
 : define-chloe-tag ( name quot -- ) swap tags get set-at ;
 
 SYNTAX: CHLOE:
-    scan parse-definition define-chloe-tag ;
+    scan-token parse-definition define-chloe-tag ;
 
 CONSTANT: chloe-ns "http://factorcode.org/chloe/1.0"
 

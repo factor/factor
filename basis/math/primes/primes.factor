@@ -1,6 +1,6 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.short-circuit fry kernel math
+USING: combinators combinators.short-circuit fry kernel make math
 math.bitwise math.functions math.order math.primes.erato
 math.primes.erato.private math.primes.miller-rabin math.ranges
 literals random sequences sets vectors ;
@@ -28,7 +28,7 @@ IN: math.primes
     108 max 10000 min <vector> ] keep
     3 < [ [ 2 swap push ] keep ] when ;
 
-: simple? ( n -- ? ) { [ even? ] [ 3 mod 0 = ] [ 5 mod 0 = ] } 1|| ;
+: simple? ( n -- ? ) { [ even? ] [ 3 divisor? ] [ 5 divisor? ] } 1|| ;
 
 PRIVATE>
 
@@ -65,6 +65,8 @@ PRIVATE>
     } cond ;
 
 : primes-upto ( n -- seq ) 2 swap primes-between ;
+
+: nprimes ( n -- seq ) [ 2 swap [ dup , next-prime ] times ] { } make nip ;
 
 : coprime? ( a b -- ? ) gcd nip 1 = ; foldable
 

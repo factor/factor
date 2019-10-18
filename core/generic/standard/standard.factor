@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors definitions generic generic.single kernel
-namespaces words math math.order combinators sequences
-generic.single.private quotations kernel.private
-assocs arrays layouts make ;
+USING: accessors arrays combinators definitions generic
+generic.single generic.single.private kernel layouts make math
+namespaces quotations sequences words ;
 IN: generic.standard
 
 ERROR: bad-dispatch-position # ;

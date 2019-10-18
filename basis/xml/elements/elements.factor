@@ -9,7 +9,7 @@ IN: xml.elements
 
 : take-interpolated ( quot -- interpolated )
     interpolating? get [
-        drop get-char CHAR: > =
+        drop get-char CHAR: > eq?
         [ next f ]
         [ "->" take-string [ blank? ] trim ]
         if <interpolated>
@@ -18,33 +18,30 @@ IN: xml.elements
 : interpolate-quote ( -- interpolated )
     [ quoteless-attr ] take-interpolated ;
 
-: parse-attr ( -- )
-    parse-name pass-blank "=" expect pass-blank
-    get-char CHAR: < =
-    [ "<-" expect interpolate-quote ]
-    [ t parse-quote* ] if 2array , ;
-
 : start-tag ( -- name ? )
     #! Outputs the name and whether this is a closing tag
-    get-char CHAR: / = dup [ next ] when
+    get-char CHAR: / eq? dup [ next ] when
     parse-name swap ;
-
-: (middle-tag) ( -- )
-    pass-blank version-1.0? get-char name-start?
-    [ parse-attr (middle-tag) ] when ;
 
 : assure-no-duplicates ( attrs-alist -- attrs-alist )
     H{ } clone 2dup '[ swap _ push-at ] assoc-each
-    [ nip length 2 >= ] assoc-filter >alist
+    [ nip length 2 >= ] { } assoc-filter-as
     [ first first2 duplicate-attr ] unless-empty ;
 
+: parse-attr ( -- array )
+    parse-name pass-blank "=" expect pass-blank
+    get-char CHAR: < eq?
+    [ "<-" expect interpolate-quote ]
+    [ t parse-quote* ] if 2array ;
+
 : middle-tag ( -- attrs-alist )
-    ! f make will make a vector if it has any elements
-    [ (middle-tag) ] f make pass-blank
-    assure-no-duplicates ;
+    ! f produce-as will make a vector if it has any elements
+    [ pass-blank version-1.0? get-char name-start? ]
+    [ parse-attr ] f produce-as pass-blank
+    dup length 1 > [ assure-no-duplicates ] when ;
 
 : end-tag ( name attrs-alist -- tag )
-    tag-ns pass-blank get-char CHAR: / =
+    tag-ns pass-blank get-char CHAR: / eq?
     [ pop-ns <contained> next ">" expect ]
     [ depth inc <opener> close ] if ;
 
@@ -136,7 +133,7 @@ DEFER: make-tag ! Is this unavoidable?
     [ take-external-id ] [ f ] if ;
 
 : take-internal ( -- dtd/f )
-    get-char CHAR: [ =
+    get-char CHAR: [ eq?
     [ next take-internal-subset ] [ f ] if ;
 
 : take-doctype-decl ( -- doctype-decl )
@@ -169,9 +166,9 @@ DEFER: make-tag ! Is this unavoidable?
     [ "-" bad-name ] take-interpolated ;
 
 : make-tag ( -- tag )
-    {
-        { [ get-char dup CHAR: ! = ] [ drop next direct ] }
-        { [ dup CHAR: ? = ] [ drop next instruct ] }
-        { [ dup CHAR: - = ] [ drop next interpolate-tag ] }
+    get-char {
+        { CHAR: ! [ next direct ] }
+        { CHAR: ? [ next instruct ] }
+        { CHAR: - [ next interpolate-tag ] }
         [ drop normal-tag ]
-    } cond ;
+    } case ;

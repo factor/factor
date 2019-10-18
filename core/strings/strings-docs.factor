@@ -53,7 +53,7 @@ HELP: >string
 { $notes "This operation is only appropriate if the underlying sequence holds Unicode code points, which is rare unless it is a " { $link slice } " of another string. To convert a sequence of bytes to a string, use the words documented in " { $link "io.encodings.string" } "." }
 { $errors "Throws an error if the sequence contains elements other than integers." } ;
 
-HELP: resize-string ( n str -- newstr )
+HELP: resize-string
 { $values { "n" "a non-negative integer" } { "str" string } { "newstr" string } }
 { $description "Resizes the string to have a length of " { $snippet "n" } " elements. When making the string shorter, this word may either create a new string or modify the existing string in place. When making the string longer, this word always allocates a new string, filling remaining space with zeroes." }
 { $side-effects "str" } ;

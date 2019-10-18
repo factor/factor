@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators concurrency.promises
 destructors fry io io.crlf io.encodings.utf8 io.sockets
-io.sockets.secure.unix.debug io.streams.duplex io.timeouts
+io.sockets.secure.debug io.streams.duplex io.timeouts
 kernel locals math.parser namespaces prettyprint sequences
 splitting threads ;
 IN: pop3.server
@@ -254,7 +254,7 @@ This is the body of the second test.
                     1 minutes timeouts
                     "+OK POP3 server ready\r\n" write flush
                     process
-                    global [ flush ] bind
+                    [ flush ] with-global
                 ] with-stream
             ] with-disposal
         ] with-test-context

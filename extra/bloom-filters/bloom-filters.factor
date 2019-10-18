@@ -6,6 +6,7 @@ IN: bloom-filters
 
 FROM: math.ranges => [1,b] ;
 FROM: math.intervals => (a,b) interval-contains? ;
+FROM: sequences => change-nth ;
 
 /*
 

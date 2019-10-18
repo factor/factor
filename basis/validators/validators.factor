@@ -1,15 +1,16 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel continuations sequences math namespaces make sets
-math.parser math.ranges assocs regexp unicode.categories arrays
-hashtables words classes quotations xmode.catalog unicode.case ;
+USING: arrays assocs classes continuations hashtables kernel
+make math math.functions math.parser math.ranges namespaces
+quotations regexp sequences sets unicode.case unicode.categories
+words xmode.catalog ;
 IN: validators
 
 : v-checkbox ( str -- ? )
     >lower "on" = ;
 
 : v-default ( str def -- str/def )
-    [ drop empty? not ] 2keep ? ;
+    [ drop empty? not ] most ;
 
 : v-required ( str -- str )
     dup empty? [ "required" throw ] when ;
@@ -94,7 +95,7 @@ IN: validators
 : luhn? ( str -- ? )
     string>digits <reversed>
     [ odd? [ 2 * 10 /mod + ] when ] map-index
-    sum 10 mod 0 = ;
+    sum 10 divisor? ;
 
 : v-credit-card ( str -- n )
     "- " without

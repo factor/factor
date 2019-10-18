@@ -88,7 +88,7 @@ M: mdb-getmore-msg verify-query-result
 
 PRIVATE>
 
-SYNTAX: r/ ( token -- mdbregexp )
+SYNTAX: r/
     \ / [ >mdbregexp ] parse-literal ; 
 
 : with-db ( mdb quot -- )
@@ -98,9 +98,11 @@ SYNTAX: r/ ( token -- mdbregexp )
     [ <mdb-pool> ] dip
     [ mdb-pool swap with-variable ] curry with-disposal ; inline
 
-: with-mdb-connection ( quot -- )
-    [ mdb-pool get ] dip 
+: with-mdb-pool ( ..a mdb-pool quot -- ..b )
     '[ _ with-connection ] with-pooled-connection ; inline
+
+: with-mdb-connection ( quot -- )
+    [ mdb-pool get ] dip with-mdb-pool ; inline
 
 : >id-selector ( assoc -- selector )
     [ MDB_OID_FIELD swap at ] keep
@@ -225,13 +227,21 @@ M: mdb-query-msg find
 M: mdb-cursor find
     get-more ;
 
+: each-chunk ( selector quot: ( seq -- ) -- )
+    swap find
+    [ pick call( seq -- ) ] when*
+    [ swap each-chunk ] [ drop ] if* ;
+
+: find-all ( selector -- seq )
+    [ V{ } clone ] dip
+    over '[ _ push-all ] each-chunk >array ;
+
 : explain. ( mdb-query-msg -- )
     t >>explain find nip . ;
 
 : find-one ( mdb-query-msg -- result/f )
-    fix-query-collection 
-    1 >>return# send-query-plain objects>>
-    dup empty? [ drop f ] [ first ] if ;
+    fix-query-collection 1 >>return#
+    send-query-plain objects>> ?first ;
 
 : count ( mdb-query-msg -- result )
     [ count-cmd make-cmd ] dip

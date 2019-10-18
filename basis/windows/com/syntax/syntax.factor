@@ -1,6 +1,6 @@
-USING: alien alien.c-types alien.accessors alien.parser
-effects kernel windows.ole32 parser lexer splitting grouping
-sequences namespaces assocs quotations generalizations
+USING: alien alien.c-types alien.data alien.accessors
+alien.parser effects kernel windows.ole32 parser lexer splitting
+grouping sequences namespaces assocs quotations generalizations
 accessors words macros alien.syntax fry arrays layouts math
 classes.struct windows.kernel32 locals ;
 FROM: alien.parser.private => parse-pointers return-type-name ;
@@ -11,7 +11,7 @@ IN: windows.com.syntax
 MACRO: com-invoke ( n return parameters -- )
     [ 2nip length ] 3keep
     '[
-        _ npick *void* _ cell * alien-cell _ _
+        _ npick void* deref _ cell * alien-cell _ _
         stdcall alien-indirect
     ] ;
 
@@ -43,8 +43,8 @@ ERROR: no-com-interface interface ;
     <com-function-definition> ;
 
 :: (parse-com-functions) ( functions -- )
-    scan dup ";" = [ drop ] [
-        parse-c-type scan parse-pointers
+    scan-token dup ";" = [ drop ] [
+        parse-c-type scan-token parse-pointers
         (parse-com-function) functions push
         functions (parse-com-functions)
     ] if ;
@@ -74,7 +74,7 @@ ERROR: no-com-interface interface ;
     define-declared ;
 
 : define-words-for-com-interface ( definition -- )
-    [ [ (iid-word) ] [ iid>> 1quotation ] bi (( -- iid )) define-declared ]
+    [ [ (iid-word) ] [ iid>> 1quotation ] bi ( -- iid ) define-declared ]
     [
         dup family-tree-functions
         [ (define-word-for-function) ] with each-index
@@ -86,13 +86,13 @@ SYNTAX: COM-INTERFACE:
     CREATE-C-TYPE
     void* over typedef
     scan-object find-com-interface-definition
-    scan string>guid
+    scan-token string>guid
     parse-com-functions
     <com-interface-definition>
     dup save-com-interface-definition
     define-words-for-com-interface ;
 
-SYNTAX: GUID: scan string>guid suffix! ;
+SYNTAX: GUID: scan-token string>guid suffix! ;
 
 USE: vocabs.loader
 

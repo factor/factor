@@ -2,32 +2,34 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit assocs math kernel sequences
 io.files hashtables quotations splitting grouping arrays io
-math.parser hash2 math.order byte-arrays namespaces
-compiler.units parser io.encodings.ascii values interval-maps
+math.parser math.order byte-arrays namespaces math.bitwise
+compiler.units parser io.encodings.ascii interval-maps
 ascii sets combinators locals math.ranges sorting make
 strings.parser io.encodings.utf8 memoize simple-flat-file ;
-FROM: namespaces => set ;
 IN: unicode.data
 
 <PRIVATE
 
-VALUE: simple-lower
-VALUE: simple-upper
-VALUE: simple-title
-VALUE: canonical-map
-VALUE: combine-map
-VALUE: class-map
-VALUE: compatibility-map
-VALUE: category-map
-VALUE: special-casing
-VALUE: properties
+CONSTANT: simple-lower H{ }
+CONSTANT: simple-upper H{ }
+CONSTANT: simple-title H{ }
+CONSTANT: canonical-map H{ }
+CONSTANT: combine-map H{ }
+CONSTANT: class-map H{ }
+CONSTANT: compatibility-map H{ }
+SYMBOL: category-map ! B{ }
+CONSTANT: special-casing H{ }
+CONSTANT: properties H{ }
+
+: >2ch ( a b -- c ) [ 21 shift ] dip + ;
+: 2ch> ( c -- a b ) [ -21 shift ] [ 21 on-bits mask ] bi ;
 
 PRIVATE>
 
-VALUE: name-map
+CONSTANT: name-map H{ }
 
 : canonical-entry ( char -- seq ) canonical-map at ; inline
-: combine-chars ( a b -- char/f ) combine-map hash2 ; inline
+: combine-chars ( a b -- char/f ) >2ch combine-map at ; inline
 : compatibility-entry ( char -- seq ) compatibility-map at ; inline
 : combining-class ( char -- n ) class-map at ; inline
 : non-starter? ( char -- ? ) combining-class { 0 f } member? not ; inline
@@ -55,7 +57,7 @@ CONSTANT: categories
 MEMO: categories-map ( -- hashtable )
     categories <enum> [ swap ] H{ } assoc-map-as ;
 
-CONSTANT: num-chars HEX: 2FA1E
+CONSTANT: num-chars 0x2FA1E
 
 PRIVATE>
 
@@ -64,10 +66,10 @@ PRIVATE>
     ! that this gives Cf or Mn
     ! Cf = 26; Mn = 5; Cn = 29
     ! Use a compressed array instead?
-    dup category-map ?nth [ ] [
-        dup HEX: E0001 HEX: E007F between?
+    dup category-map get-global ?nth [ ] [
+        dup 0xE0001 0xE007F between?
         [ drop 26 ] [
-            HEX: E0100 HEX: E01EF between?  5 29 ?
+            0xE0100 0xE01EF between?  5 29 ?
         ] if
     ] ?if ;
 
@@ -86,7 +88,7 @@ PRIVATE>
     [ [ hex> ] dip ] assoc-map ;
 
 : process-data ( index data -- hash )
-    (process-data) [ hex> ] assoc-map [ nip ] assoc-filter >hashtable ;
+    (process-data) [ hex> ] assoc-map [ nip ] H{ } assoc-filter-as ;
 
 : (chain-decomposed) ( hash value -- newvalue )
     [
@@ -113,14 +115,13 @@ PRIVATE>
     [ 0 = not ] filter ;
 
 : remove-exclusions ( alist -- alist )
-    exclusions [ dup ] H{ } map>assoc assoc-diff ;
+    exclusions unique assoc-diff ;
 
-: process-canonical ( data -- hash2 hash )
+: process-canonical ( data -- hash hash )
     (process-decomposed) [ first* ] filter
     [
         [ second length 2 = ] filter remove-exclusions
-        ! using 1009 as the size, the maximum load is 4
-        [ first2 first2 rot 3array ] map 1009 alist>hash2
+        [ first2 >2ch swap ] H{ } assoc-map-as
     ] [ >hashtable chain-decomposed ] bi ;
 
 : process-compatibility ( data -- hash )
@@ -141,7 +142,7 @@ PRIVATE>
     2dup bounds-check? [ set-nth ] [ 3drop ] if ;
 
 :: fill-ranges ( table -- table )
-    name-map >alist sort-values keys
+    name-map sort-values keys
     [ { [ "first>" tail? ] [ "last>" tail? ] } 1|| ] filter
     2 group [
         [ name>char ] bi@ [ [a,b] ] [ table ?nth ] bi
@@ -156,7 +157,7 @@ PRIVATE>
 
 : process-names ( data -- names-hash )
     1 swap (process-data) [
-        >lower { { CHAR: \s CHAR: - } } substitute swap
+        >lower H{ { CHAR: \s CHAR: - } } substitute swap
     ] H{ } assoc-map-as ;
 
 : multihex ( hexstring -- string )
@@ -172,7 +173,7 @@ C: <code-point> code-point
 
 : set-code-point ( seq -- )
     4 head [ multihex ] map first4
-    <code-point> swap first set ;
+    <code-point> swap first ,, ;
 
 ! Extra properties
 : parse-properties ( -- {{[a,b],prop}} )
@@ -195,29 +196,26 @@ C: <code-point> code-point
 : load-special-casing ( -- special-casing )
     "vocab:unicode/data/SpecialCasing.txt" data
     [ length 5 = ] filter
-    [ [ set-code-point ] each ] H{ } make-assoc ;
+    [ [ set-code-point ] each ] H{ } make ;
 
 load-data {
-    [ process-names to: name-map ]
-    [ 13 swap process-data to: simple-lower ]
-    [ 12 swap process-data to: simple-upper ]
-    [ 14 swap process-data simple-upper assoc-union to: simple-title ]
-    [ process-combining to: class-map ]
-    [ process-canonical to: canonical-map to: combine-map ]
-    [ process-compatibility to: compatibility-map ]
-    [ process-category to: category-map ]
+    [ process-names name-map swap assoc-union! drop ]
+    [ 13 swap process-data simple-lower swap assoc-union! drop ]
+    [ 12 swap process-data simple-upper swap assoc-union! drop ]
+    [ 14 swap process-data simple-upper assoc-union simple-title swap assoc-union! drop ]
+    [ process-combining class-map swap assoc-union! drop ]
+    [ process-canonical canonical-map swap assoc-union! drop combine-map swap assoc-union! drop ]
+    [ process-compatibility compatibility-map swap assoc-union! drop ]
+    [ process-category category-map set-global ]
 } cleave
 
-: postprocess-class ( -- )
-    combine-map [ values ] map concat
-    [ combining-class not ] filter
-    [ 0 swap class-map set-at ] each ;
+combine-map keys [ 2ch> nip ] map
+[ combining-class not ] filter
+[ 0 swap class-map set-at ] each
 
-postprocess-class
+load-special-casing special-casing swap assoc-union! drop
 
-load-special-casing to: special-casing
-
-load-properties to: properties
+load-properties properties swap assoc-union! drop
 
 [ name>char [ "Invalid character" throw ] unless* ]
 name>char-hook set-global

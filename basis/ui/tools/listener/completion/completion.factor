@@ -17,8 +17,11 @@ SLOT: history
 
 : history-list ( interactor -- alist )
     history>> elements>>
-    [ dup string>> { { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
+    [ dup string>> H{ { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
     <reversed> ;
+
+: history-completions ( short interactor -- seq )
+    history-list over empty? [ nip ] [ members completions ] if ;
 
 TUPLE: word-completion manifest ;
 C: <word-completion> word-completion
@@ -35,7 +38,7 @@ GENERIC: completion-quot ( interactor completion-mode -- quot )
 M: word-completion completion-quot [ words-matching ] (completion-quot) ;
 M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
 M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
-M: history-completion completion-quot drop '[ drop _ history-list ] ;
+M: history-completion completion-quot drop '[ _ history-completions ] ;
 
 GENERIC: completion-element ( completion-mode -- element )
 
@@ -72,15 +75,23 @@ M: word-completion row-color
 M: vocab-completion row-color
     drop vocab? COLOR: black COLOR: dark-gray ? ;
 
+: (complete-vocab?) ( str -- ? )
+    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
+    member? ; inline
+
 : complete-vocab? ( tokens -- ? )
-    1 short head* 2 short tail*
-    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" } intersects? ;
+    dup last empty? [
+        harvest ?last (complete-vocab?)
+    ] [
+        harvest dup length 1 >
+        [ 2 tail* ?first (complete-vocab?) ] [ drop f ] if
+    ] if ;
 
 : chop-; ( seq -- seq' )
     { ";" } split1-last [ ] [ ] ?if ;
 
 : complete-vocab-list? ( tokens -- ? )
-    chop-; 1 short head* { "USING:" } intersects? ;
+    chop-; 1 short head* "USING:" swap member? ;
 
 : complete-CHAR:? ( tokens -- ? )
     2 short tail* "CHAR:" swap member? ;

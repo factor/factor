@@ -1,5 +1,5 @@
-USING: kernel combinators quotations arrays sequences assocs
-generalizations macros fry math ;
+USING: arrays combinators fry generalizations kernel macros
+math sequences ;
 IN: combinators.short-circuit
 
 <PRIVATE

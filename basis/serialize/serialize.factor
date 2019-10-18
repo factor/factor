@@ -12,7 +12,7 @@ vectors byte-arrays quotations hashtables hashtables.identity
 assocs help.syntax help.markup splitting io.streams.byte-array
 io.encodings.string io.encodings.utf8 io.encodings.binary
 combinators accessors locals prettyprint compiler.units
-sequences.private classes.tuple.private vocabs.loader ;
+sequences.private classes.tuple.private vocabs ;
 IN: serialize
 
 GENERIC: (serialize) ( obj -- )
@@ -40,12 +40,12 @@ SYMBOL: serialized
 ! otherwise be confused with a small number.
 : serialize-cell ( n -- )
     [ 0 write1 ] [
-        dup HEX: 7e <= [
-            HEX: 80 bitor write1
+        dup 0x7e <= [
+            0x80 bitor write1
         ] [
             dup log2 8 /i 1 + 
-            dup HEX: 7f >= [
-                HEX: ff write1
+            dup 0x7f >= [
+                0xff write1
                 dup serialize-cell
             ] [
                 dup write1
@@ -56,8 +56,8 @@ SYMBOL: serialized
 
 : deserialize-cell ( -- n )
     read1 {
-        { [ dup HEX: ff = ] [ drop deserialize-cell read be> ] }
-        { [ dup HEX: 80 >= ] [ HEX: 80 bitxor ] }
+        { [ dup 0xff = ] [ drop deserialize-cell read be> ] }
+        { [ dup 0x80 >= ] [ 0x80 bitxor ] }
         [ read be> ]
     } cond ;
 
@@ -93,7 +93,7 @@ M: float (serialize) ( obj -- )
 M: tuple (serialize) ( obj -- )
     [
         CHAR: T write1
-        [ class (serialize) ]
+        [ class-of (serialize) ]
         [ add-object ]
         [ tuple>array rest (serialize) ]
         tri
@@ -162,7 +162,7 @@ M: wrapper (serialize) ( obj -- )
     CHAR: W write1
     wrapped>> (serialize) ;
 
-DEFER: (deserialize) ( -- obj )
+DEFER: (deserialize)
 
 SYMBOL: deserialized
 
@@ -194,7 +194,7 @@ SYMBOL: deserialized
     (deserialize-string) dup intern-object ;
 
 : deserialize-word ( -- word )
-    (deserialize) (deserialize) 2dup [ require ] keep lookup
+    (deserialize) (deserialize) 2dup [ require ] keep lookup-word
     dup [ 2nip ] [
         drop
         2array unparse "Unknown word: " prepend throw

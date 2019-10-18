@@ -77,7 +77,7 @@ TUPLE: annotation < entity parent ;
         swap >>id
         swap >>parent ;
 
-: annotation ( id -- annotation )
+: lookup-annotation ( id -- annotation )
     [ f ] dip <annotation> select-tuple ;
 
 : paste ( id -- paste )
@@ -226,7 +226,7 @@ M: annotation entity-url
 
 : <raw-annotation-action> ( -- action )
     <action>
-        [ validate-integer-id "id" value annotation from-object ] >>init
+        [ validate-integer-id "id" value lookup-annotation from-object ] >>init
         [ "contents" value "text/plain" <content> ] >>display ;
 
 : <delete-annotation-action> ( -- action )
@@ -235,7 +235,7 @@ M: annotation entity-url
         [ { { "id" [ v-number ] } } validate-params ] >>validate
 
         [
-            f "id" value annotation
+            f "id" value lookup-annotation
             [ delete-tuples ]
             [ parent>> paste-url <redirect> ]
             bi

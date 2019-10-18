@@ -41,7 +41,7 @@ PRIVATE>
     name c-type fields>> [
         class swap
         {
-            [ name>> { { CHAR: space CHAR: - } } substitute ]
+            [ name>> H{ { CHAR: space CHAR: - } } substitute ]
             [ type>> ] [ reader>> ] [ writer>> ]
         } cleave define-struct-accessors
     ] each ;

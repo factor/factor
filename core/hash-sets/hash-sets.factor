@@ -1,30 +1,37 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs hashtables kernel sets
+USING: accessors assocs hashtables kernel sets sets.private
 sequences parser ;
-QUALIFIED: sets
+
 IN: hash-sets
 
 ! In a better implementation, less memory would be used
 TUPLE: hash-set { table hashtable read-only } ;
 
-: <hash-set> ( members -- hash-set )
-    H{ } clone [ [ dupd set-at ] curry each ] keep hash-set boa ;
+: <hash-set> ( capacity -- hash-set )
+    <hashtable> hash-set boa ; inline
+
+: >hash-set ( members -- hash-set )
+    unique hash-set boa ; inline
 
 INSTANCE: hash-set set
 M: hash-set in? table>> key? ; inline
 M: hash-set adjoin table>> dupd set-at ; inline
 M: hash-set delete table>> delete-at ; inline
 M: hash-set members table>> keys ; inline
-M: hash-set set-like drop dup hash-set? [ members <hash-set> ] unless ;
+M: hash-set set-like drop dup hash-set? [ members >hash-set ] unless ;
 M: hash-set clone table>> clone hash-set boa ;
 M: hash-set null? table>> assoc-empty? ;
+M: hash-set cardinality table>> assoc-size ;
+M: hash-set intersect small/large sequence/tester filter >hash-set ;
+M: hash-set union [ members ] bi@ append >hash-set ;
+M: hash-set diff sequence/tester [ not ] compose filter >hash-set ;
 
-M: sequence fast-set <hash-set> ;
+M: sequence fast-set >hash-set ;
 M: f fast-set drop H{ } clone hash-set boa ;
 
 M: sequence duplicates
-    f fast-set [ [ in? ] [ adjoin ] 2bi ] curry filter ;
+    f fast-set [ ?adjoin not ] curry filter ;
 
 <PRIVATE
 
@@ -34,5 +41,4 @@ M: sequence duplicates
 PRIVATE>
 
 M: sequence all-unique?
-    dup length <hashtable> hash-set boa
-    [ (all-unique?) ] curry all? ;
+    dup length <hash-set> [ (all-unique?) ] curry all? ;

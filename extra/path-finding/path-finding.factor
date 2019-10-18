@@ -40,7 +40,7 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
 
 : ?set-g ( origin node astar -- )
     [ cost-through ] 3keep [ swap ] 2dip
-    3dup astar>> g>> at [ 1/0. ] unless* > [ 4drop ] [ set-g ] if ;
+    3dup astar>> g>> at [ 1/0. ] unless* >= [ 4drop ] [ set-g ] if ;
 
 : build-path ( target astar -- path )
     [ over ] [ over [ [ origin>> at ] keep ] dip ] produce 2nip reverse ;
@@ -58,7 +58,7 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
 : (init) ( from to astar -- )
     swap >>goal
     H{ } clone over astar>> g<<
-    { } <hash-set> over astar>> in-closed-set<<
+    HS{ } clone over astar>> in-closed-set<<
     H{ } clone >>origin
     H{ } clone >>in-open-set
     <min-heap> >>open-set
@@ -74,6 +74,11 @@ M: bfs cost 3drop 1 ;
 M: bfs heuristic 3drop 0 ;
 M: bfs neighbours neighbours>> at ;
 
+TUPLE: dijkstra < astar costs ;
+M: dijkstra cost costs>> swapd at at ;
+M: dijkstra heuristic 3drop 0 ;
+M: dijkstra neighbours costs>> at keys ;
+
 PRIVATE>
 
 : find-path ( start target astar -- path/f )
@@ -87,3 +92,6 @@ PRIVATE>
 
 : <bfs> ( neighbours -- astar )
     [ bfs new ] dip >>neighbours ;
+
+: <dijkstra> ( costs -- astar )
+    [ dijkstra new ] dip >>costs ;

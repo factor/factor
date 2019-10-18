@@ -3,6 +3,7 @@ USING: accessors audio.engine combinators concurrency.promises
 destructors fry game.input game.loop generic kernel math parser
 sequences threads ui ui.gadgets ui.gadgets.worlds ui.gestures
 words words.constant ;
+FROM: namespaces => change-global ;
 IN: game.worlds
 
 TUPLE: game-world < world
@@ -81,7 +82,7 @@ M: game-world apply-world-attributes
     [ name>> "-attributes" append create-in ] dip define-constant ;
 
 SYNTAX: GAME:
-    CREATE
+    scan-new-word
     game-attributes parse-main-window-attributes
     2dup define-attributes-word
     parse-definition

@@ -124,9 +124,9 @@ HELP: mod
 { $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
-    { $list 
+    { $list
         "Modulus of fixnums always yields a fixnum."
-        "Modulus of bignums always yields a bignum."    
+        "Modulus of bignums always yields a bignum."
         { "Modulus of rationals always yields a rational. In this case, the remainder is computed using the formula " { $snippet "x - (x mod y) * y" } "." }
     }
 }
@@ -136,9 +136,9 @@ HELP: /mod
 { $values { "x" integer } { "y" integer } { "z" integer } { "w" integer } }
 { $description
     "Computes the quotient " { $snippet "z" } " and remainder " { $snippet "w" } " of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
-    { $list 
+    { $list
         "The quotient of two fixnums may overflow and yield a bignum; the remainder is always a fixnum"
-        "The quotient and remainder of two bignums is always a bignum."            
+        "The quotient and remainder of two bignums is always a bignum."
     }
 }
 { $see-also "division-by-zero" } ;
@@ -147,8 +147,8 @@ HELP: bitand
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in both inputs." }
 { $examples
-    { $example "USING: math prettyprint ;" "BIN: 101 BIN: 10 bitand .b" "0" }
-    { $example "USING: math prettyprint ;" "BIN: 110 BIN: 10 bitand .b" "10" }
+    { $example "USING: math prettyprint ;" "0b101 0b10 bitand .b" "0" }
+    { $example "USING: math prettyprint ;" "0b110 0b10 bitand .b" "10" }
 }
 { $notes "This word implements bitwise and, so applying it to booleans will throw an error. Boolean and is the " { $link and } " word." } ;
 
@@ -156,8 +156,8 @@ HELP: bitor
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in at least one of the inputs." }
 { $examples
-    { $example "USING: math prettyprint ;" "BIN: 101 BIN: 10 bitor .b" "111" }
-    { $example "USING: math prettyprint ;" "BIN: 110 BIN: 10 bitor .b" "110" }
+    { $example "USING: math prettyprint ;" "0b101 0b10 bitor .b" "111" }
+    { $example "USING: math prettyprint ;" "0b110 0b10 bitor .b" "110" }
 }
 { $notes "This word implements bitwise inclusive or, so applying it to booleans will throw an error. Boolean inclusive or is the " { $link and } " word." } ;
 
@@ -165,15 +165,15 @@ HELP: bitxor
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in exactly one of the inputs." }
 { $examples
-    { $example "USING: math prettyprint ;" "BIN: 101 BIN: 10 bitxor .b" "111" }
-    { $example "USING: math prettyprint ;" "BIN: 110 BIN: 10 bitxor .b" "100" }
+    { $example "USING: math prettyprint ;" "0b101 0b10 bitxor .b" "111" }
+    { $example "USING: math prettyprint ;" "0b110 0b10 bitxor .b" "100" }
 }
 { $notes "This word implements bitwise exclusive or, so applying it to booleans will throw an error. Boolean exclusive or is the " { $link xor } " word." } ;
 
 HELP: shift
 { $values { "x" integer } { "n" integer } { "y" integer } }
 { $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits “falling off” the right hand side and being discarded." }
-{ $examples { $example "USING: math prettyprint ;" "BIN: 101 5 shift .b" "10100000" } { $example "USING: math prettyprint ;" "BIN: 11111 -2 shift .b" "111" } } ;
+{ $examples { $example "USING: math prettyprint ;" "0b101 5 shift .b" "10100000" } { $example "USING: math prettyprint ;" "0b11111 -2 shift .b" "111" } } ;
 
 HELP: bitnot
 { $values { "x" integer } { "y" integer } }
@@ -185,7 +185,7 @@ $nl
 HELP: bit?
 { $values { "x" integer } { "n" integer } { "?" "a boolean" } }
 { $description "Tests if the " { $snippet "n" } "th bit of " { $snippet "x" } " is set." }
-{ $examples { $example "USING: math prettyprint ;" "BIN: 101 2 bit? ." "t" } } ;
+{ $examples { $example "USING: math prettyprint ;" "0b101 2 bit? ." "t" } } ;
 
 HELP: log2
 { $values { "x" "a positive integer" } { "n" integer } }
@@ -213,10 +213,10 @@ HELP: rem
 { $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive or zero."
-    { $list 
+    { $list
         "Given fixnums, always yields a fixnum."
         "Given bignums, always yields a bignum."
-        "Given rationals, always yields a rational."    
+        "Given rationals, always yields a rational."
     }
 }
 { $see-also "division-by-zero" mod } ;
@@ -244,7 +244,7 @@ HELP: 2/
 
 HELP: 2^
 { $values { "n" "a positive integer" } { "2^n" "a positive integer" } }
-{ $description "Computes two to the power of " { $snippet "n" } ". This word will only give correct results if " { $snippet "n" } " is greater than zero; for the general case, use " { $snippet  "2 swap ^" } "." } ;
+{ $description "Computes two to the power of " { $snippet "n" } ". This word will only give correct results if " { $snippet "n" } " is greater than zero; for the general case, use " { $snippet "2 swap ^" } "." } ;
 
 HELP: zero?
 { $values { "x" number } { "?" "a boolean" } }
@@ -262,7 +262,7 @@ HELP: if-zero
 HELP: when-zero
 { $values
      { "n" number } { "quot" "the first quotation of an " { $link if-zero } } }
-{ $description "Makes an implicit check if the sequence is empty. A zero is dropped and the " { $snippet "quot" } " is called." }
+{ $description "Makes an implicit check if the number is zero. A zero is dropped and the " { $snippet "quot" } " is called." }
 { $examples "This word is equivalent to " { $link if-zero } " with an empty second quotation:"
     { $example
     "USING: math prettyprint ;"
@@ -421,17 +421,13 @@ HELP: all-integers?
 
 HELP: find-integer
 { $values { "n" integer } { "quot" { $quotation "( ... i -- ... ? )" } } { "i" "an integer or " { $link f } } }
-{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
+{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find } "." } ;
 
 HELP: find-last-integer
 { $values { "n" integer } { "quot" { $quotation "( ... i -- ... ? )" } } { "i" "an integer or " { $link f } } }
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
-
-HELP: byte-array>bignum
-{ $values { "x" byte-array } { "y" bignum } }
-{ $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link le> } " or " { $link be> } " instead." } ;
 
 ARTICLE: "division-by-zero" "Division by zero"
 "Behavior of division operations when a denominator of zero is used depends on the data types in question, as well as the platform being used."
@@ -448,7 +444,7 @@ ARTICLE: "number-protocol" "Number protocol"
 "Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
 $nl
 "Two examples where you should note the types of the inputs and outputs:"
-{ $example "USE: classes" "3 >fixnum 6 >bignum * class ." "bignum" }
+{ $example "USE: classes" "3 >fixnum 6 >bignum * class-of ." "bignum" }
 { $example "1/2 2.0 + ." "2.5" }
 "The following usual operations are supported by all numbers."
 { $subsections

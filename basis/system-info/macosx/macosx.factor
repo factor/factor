@@ -1,9 +1,49 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008 Doug Coleman, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings alien.syntax
-byte-arrays kernel namespaces sequences unix
-system-info.backend system io.encodings.utf8 ;
+
+USING: alien alien.c-types alien.data alien.strings alien.syntax
+arrays assocs byte-arrays combinators core-foundation io.binary
+io.encodings.utf8 kernel math namespaces sequences system
+system-info unix ;
+
 IN: system-info.macosx
+
+<PRIVATE
+
+TYPEDEF: SInt16 OSErr
+TYPEDEF: UInt32 OSType
+FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
+
+: gestalt ( selector -- response )
+    0 SInt32 <ref> [ Gestalt ] keep
+    swap [ throw ] unless-zero le> ;
+
+: system-version ( -- n ) "sysv" be> gestalt ;
+: system-version-major ( -- n ) "sys1" be> gestalt ;
+: system-version-minor ( -- n ) "sys2" be> gestalt ;
+: system-version-bugfix ( -- n ) "sys3" be> gestalt ;
+
+CONSTANT: system-code-names H{
+    { 0x1080 "Mountain Lion" }
+    { 0x1070 "Lion" }
+    { 0x1060 "Snow Leopard" }
+    { 0x1050 "Leopard" }
+    { 0x1040 "Tiger" }
+    { 0x1030 "Panther" }
+    { 0x1020 "Jaguar" }
+    { 0x1010 "Puma" }
+    { 0x1000 "Cheetah" }
+}
+
+: system-code-name ( -- str/f )
+    system-version 0xFFF0 bitand system-code-names at ;
+
+PRIVATE>
+
+M: macosx os-version
+    system-version-major
+    system-version-minor
+    system-version-bugfix 3array ;
 
 ! See /usr/include/sys/sysctl.h for constants
 
@@ -11,23 +51,23 @@ LIBRARY: libc
 FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen ) ;
 
 : make-int-array ( seq -- byte-array )
-    [ <int> ] map concat ;
+    [ int <ref> ] map concat ;
 
 : (sysctl-query) ( name namelen oldp oldlenp -- oldp )
     over [ f 0 sysctl io-error ] dip ;
 
 : sysctl-query ( seq n -- byte-array )
     [ [ make-int-array ] [ length ] bi ] dip
-    [ <byte-array> ] [ <uint> ] bi (sysctl-query) ;
+    [ <byte-array> ] [ uint <ref> ] bi (sysctl-query) ;
 
 : sysctl-query-string ( seq -- n )
     4096 sysctl-query utf8 alien>string ;
 
 : sysctl-query-uint ( seq -- n )
-    4 sysctl-query *uint ;
+    4 sysctl-query uint deref ;
 
 : sysctl-query-ulonglong ( seq -- n )
-    8 sysctl-query *ulonglong ;
+    8 sysctl-query ulonglong deref ;
 
 : machine ( -- str ) { 6 1 } sysctl-query-string ;
 : model ( -- str ) { 6 2 } sysctl-query-string ;

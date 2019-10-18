@@ -60,6 +60,7 @@ M: ignore-close-stream dispose drop ;
 C: <ignore-close-stream> ignore-close-stream
 
 TUPLE: style-stream < filter-writer style ;
+INSTANCE: style-stream output-stream
 
 : do-nested-style ( style style-stream -- style stream )
     [ style>> swap assoc-union ] [ stream>> ] bi ; inline

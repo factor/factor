@@ -6,7 +6,7 @@ IN: math.derivatives
 
 TUPLE: state x func h err i j errt fac hh ans a done ;
 
-: largest-float ( -- x ) HEX: 7fefffffffffffff bits>double ; foldable
+: largest-float ( -- x ) 0x7fefffffffffffff bits>double ; foldable
 : ntab ( -- val ) 8 ; inline
 : con ( -- val ) 1.6 ; inline
 : con2 ( -- val ) con con * ; inline

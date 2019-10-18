@@ -90,10 +90,10 @@ XML-NS: foo http://blah.com
 [ [XML <-> XML] ] must-infer
 [ [XML <foo><-></foo> <bar val=<->/> XML] ] must-infer
 
-[ xml-chunk ] [ [ [XML <foo/> XML] ] first class ] unit-test
-[ xml ] [ [ <XML <foo/> XML> ] first class ] unit-test
-[ xml-chunk ] [ [ [XML <foo val=<->/> XML] ] third class ] unit-test
-[ xml ] [ [ <XML <foo val=<->/> XML> ] third class ] unit-test
+[ xml-chunk ] [ [ [XML <foo/> XML] ] first class-of ] unit-test
+[ xml ] [ [ <XML <foo/> XML> ] first class-of ] unit-test
+[ xml-chunk ] [ [ [XML <foo val=<->/> XML] ] third class-of ] unit-test
+[ xml ] [ [ <XML <foo val=<->/> XML> ] third class-of ] unit-test
 [ 1 ] [ [ [XML <foo/> XML] ] length ] unit-test
 [ 1 ] [ [ <XML <foo/> XML> ] length ] unit-test
 

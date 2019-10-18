@@ -49,16 +49,16 @@ os windows? [
     [ "+001.0E+01" ] [ 10 "%+010.1E" sprintf ] unit-test
 ] if
 
-[ "ff" ] [ HEX: ff "%x" sprintf ] unit-test
-[ "FF" ] [ HEX: ff "%X" sprintf ] unit-test
-[ "0f" ] [ HEX: f "%02x" sprintf ] unit-test
-[ "0F" ] [ HEX: f "%02X" sprintf ] unit-test
+[ "ff" ] [ 0xff "%x" sprintf ] unit-test
+[ "FF" ] [ 0xff "%X" sprintf ] unit-test
+[ "0f" ] [ 0xf "%02x" sprintf ] unit-test
+[ "0F" ] [ 0xf "%02X" sprintf ] unit-test
 [ "2008-09-10" ] [ 2008 9 10 "%04d-%02d-%02d" sprintf ] unit-test
 [ "Hello, World!" ] [ "Hello, World!" "%s" sprintf ] unit-test
 [ "printf test" ] [ "printf test" sprintf ] unit-test
 [ "char a = 'a'" ] [ CHAR: a "char %c = 'a'" sprintf ] unit-test
-[ "00" ] [ HEX: 0 "%02x" sprintf ] unit-test
-[ "ff" ] [ HEX: ff "%02x" sprintf ] unit-test
+[ "00" ] [ 0x0 "%02x" sprintf ] unit-test
+[ "ff" ] [ 0xff "%02x" sprintf ] unit-test
 [ "0 message(s)" ] [ 0 "message" "%d %s(s)" sprintf ] unit-test
 [ "0 message(s) with %" ] [ 0 "message" "%d %s(s) with %%" sprintf ] unit-test
 [ "justif: \"left      \"" ] [ "left" "justif: \"%-10s\"" sprintf ] unit-test

@@ -62,11 +62,11 @@ CONSTANT: number-of-requests 1000
         server-promise get ?promise drop
     ] benchmark . flush ;
 
-: socket-benchmarks ( -- )
+: sockets-benchmark ( -- )
     1 clients
     10 clients
     20 clients
     40 clients
     100 clients ;
 
-MAIN: socket-benchmarks
+MAIN: sockets-benchmark

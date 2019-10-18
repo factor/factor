@@ -1,12 +1,15 @@
-! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences splitting system accessors
 math.functions make io io.files io.pathnames io.directories
 io.directories.hierarchy io.launcher io.encodings.utf8 prettyprint
 combinators.short-circuit parser combinators math calendar
 calendar.format arrays mason.config locals debugger fry
-continuations strings io.sockets ;
+continuations strings io.sockets prettyprint.config ;
 IN: mason.common
+
+: print-timestamp ( string -- )
+    now timestamp>string write bl print flush ;
 
 ERROR: no-host-name ;
 
@@ -18,21 +21,10 @@ SYMBOL: current-git-id
 : short-running-process ( command -- )
     #! Give network operations and shell commands at most
     #! 30 minutes to complete, to catch hangs.
-    >process 30 minutes >>timeout try-output-process ;
-
-HOOK: (really-delete-tree) os ( path -- )
-
-M: windows (really-delete-tree)
-    #! Workaround: Cygwin GIT creates read-only files for
-    #! some reason.
-    [ { "chmod" "ug+rw" "-R" } swap absolute-path suffix short-running-process ]
-    [ delete-tree ]
-    bi ;
-
-M: unix (really-delete-tree) delete-tree ;
-
-: really-delete-tree ( path -- )
-    dup exists? [ (really-delete-tree) ] [ drop ] if ;
+    >process
+        30 minutes >>timeout
+        +new-group+ >>group
+    try-output-process ;
 
 : retry ( n quot -- )
     [ iota ] dip
@@ -41,7 +33,10 @@ M: unix (really-delete-tree) delete-tree ;
 : upload-process ( process -- )
     #! Give network operations and shell commands at most
     #! 30 minutes to complete, to catch hangs.
-    >process upload-timeout get >>timeout try-output-process ;
+    >process
+        upload-timeout get >>timeout
+        +new-group+ >>group
+    try-output-process ;
 
 :: upload-safely ( local username host remote -- )
     remote ".incomplete" append :> temp
@@ -55,7 +50,7 @@ M: unix (really-delete-tree) delete-tree ;
     dup utf8 file-lines parse-fresh
     [ "Empty file: " swap append throw ] [ nip first ] if-empty ;
 
-: to-file ( object file -- ) utf8 [ . ] with-file-writer ;
+: to-file ( object file -- ) utf8 [ [ . ] without-limits ] with-file-writer ;
 
 : datestamp ( timestamp -- string )
     [

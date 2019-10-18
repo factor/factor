@@ -6,7 +6,7 @@ locals.errors ;
 IN: locals
 
 SYNTAX: :>
-    scan locals get [ :>-outside-lambda-error ] unless*
+    scan-token locals get [ :>-outside-lambda-error ] unless*
     parse-def suffix! ;
 
 SYNTAX: [| parse-lambda append! ;
@@ -20,6 +20,8 @@ SYNTAX: M:: (M::) define ;
 SYNTAX: MACRO:: (::) define-macro ;
 
 SYNTAX: MEMO:: (::) define-memoized ;
+
+SYNTAX: IDENTITY-MEMO:: (::) define-identity-memoized ;
 
 {
     "locals.macros"

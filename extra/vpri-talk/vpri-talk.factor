@@ -90,7 +90,7 @@ CONSTANT: vpri-slides
         }
     }
     { $slide "Object system"
-        "We can compute perimiters now."
+        "We can compute perimeters now."
         { $code "100 20 <rectangle> perimeter ." }
         { $code "3 <circle> perimeter ." }
     }

@@ -31,7 +31,7 @@ IN: json.reader.tests
 ! unicode is allowed in json
 { "ß∂¬ƒ˚∆" } [ """  "ß∂¬ƒ˚∆""""  json> ] unit-test
 { 8 9 10 12 13 34 47 92 } >string 1array [ """ "\\b\\t\\n\\f\\r\\"\\/\\\\" """ json> ] unit-test
-{ HEX: abcd } >string 1array [ """ "\\uaBCd" """ json> ] unit-test
+{ 0xabcd } >string 1array [ """ "\\uaBCd" """ json> ] unit-test
 
 { H{ { "a" { } } { "b" 123 } } } [ "{\"a\":[],\"b\":123}" json> ] unit-test
 { { } } [ "[]" json> ] unit-test 

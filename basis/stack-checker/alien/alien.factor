@@ -24,7 +24,7 @@ TUPLE: alien-assembly-params < alien-node-params { quot callable } ;
 TUPLE: alien-callback-params < alien-node-params xt ;
 
 : param-prep-quot ( params -- quot )
-    parameters>> [ c-type c-type-unboxer-quot ] map spread>quot ;
+    parameters>> [ lookup-c-type c-type-unboxer-quot ] map deep-spread>quot ;
 
 : alien-stack ( params extra -- )
     over parameters>> length + consume-d >>in-d
@@ -32,13 +32,13 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     drop ;
 
 : return-prep-quot ( params -- quot )
-    return>> [ [ ] ] [ c-type c-type-boxer-quot ] if-void ;
+    return>> [ [ ] ] [ lookup-c-type c-type-boxer-quot ] if-void ;
 
 : infer-return ( params -- )
     return-prep-quot infer-quot-here ;
 
 : pop-return ( params -- params )
-    pop-literal [ depends-on-c-type ] [ nip >>return ] bi ;
+    pop-literal [ add-depends-on-c-type ] [ nip >>return ] bi ;
 
 : pop-library ( params -- params )
     pop-literal nip >>library ;
@@ -47,7 +47,7 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     pop-literal nip >>function ;
 
 : pop-params ( params -- params )
-    pop-literal [ [ depends-on-c-type ] each ] [ nip >>parameters ] bi ;
+    pop-literal [ [ add-depends-on-c-type ] each ] [ nip >>parameters ] bi ;
 
 : pop-abi ( params -- params )
     pop-literal nip >>abi ;
@@ -112,19 +112,23 @@ TUPLE: alien-callback-params < alien-node-params xt ;
     xt>> '[ _ callback-xt { alien } declare ] infer-quot-here ;
 
 : callback-return-quot ( ctype -- quot )
-    return>> [ [ ] ] [ c-type c-type-unboxer-quot ] if-void ;
+    return>> [ [ ] ] [ lookup-c-type c-type-unboxer-quot ] if-void ;
 
 : callback-parameter-quot ( params -- quot )
-    parameters>> [ c-type ] map
+    parameters>> [ lookup-c-type ] map
     [ [ c-type-class ] map '[ _ declare ] ]
-    [ [ c-type-boxer-quot ] map spread>quot ]
+    [ [ c-type-boxer-quot ] map deep-spread>quot ]
     bi append ;
 
 GENERIC: wrap-callback-quot ( params quot -- quot' )
 
+SYMBOL: wait-for-callback-hook
+
+wait-for-callback-hook [ [ drop ] ] initialize
+
 M: callable wrap-callback-quot
     swap [ callback-parameter-quot ] [ callback-return-quot ] bi surround
-    yield-hook get
+    wait-for-callback-hook get
     '[ _ _ do-callback ]
     >quotation ;
 

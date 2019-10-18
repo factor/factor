@@ -14,8 +14,6 @@ QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS: c:float c:int c:uchar c:ushort c:uint c:void* ;
 IN: gpu.render
 
-UNION: ?integer integer POSTPONE: f ;
-
 VARIANT: uniform-type
     bool-uniform
     bvec2-uniform
@@ -55,7 +53,7 @@ ALIAS: mat4x4-uniform mat4-uniform
 TUPLE: uniform
     { name         string   read-only initial: "" }
     { uniform-type class    read-only initial: float-uniform }
-    { dim          ?integer read-only initial: f } ;
+    { dim          maybe{ integer } read-only initial: f } ;
 
 VARIANT: index-type
     ubyte-indexes
@@ -81,10 +79,8 @@ TUPLE: index-elements
 
 C: <index-elements> index-elements
 
-UNION: ?buffer buffer POSTPONE: f ;
-
 TUPLE: multi-index-elements
-    { buffer ?buffer read-only }
+    { buffer maybe{ buffer } read-only }
     { ptrs   read-only }
     { counts uint-array read-only }
     { index-type index-type read-only } ;
@@ -220,8 +216,8 @@ M: uniform-tuple (bind-uniforms)
     dup texture-uniform = [ drop 1 ] [ "uniform-tuple-texture-units" word-prop 0 or ] if ;
 
 : all-uniform-tuple-slots ( class -- slots )
-    dup "uniform-tuple-slots" word-prop 
-    [ swap superclass all-uniform-tuple-slots prepend ] [ drop { } ] if* ;
+    dup "uniform-tuple-slots" word-prop
+    [ [ superclass all-uniform-tuple-slots ] dip append ] [ drop { } ] if* ;
 
 DEFER: uniform-texture-accessors
 
@@ -293,13 +289,13 @@ GENERIC: bind-uniform-vec4  ( index sequence -- )
 M: object >uniform-bool-array [ >c-bool ] int-array{ } map-as ; inline
 M: binary-data >uniform-bool-array ; inline 
 
-M: object >uniform-int-array >int-array ; inline
+M: object >uniform-int-array c:int >c-array ; inline
 M: binary-data >uniform-int-array ; inline 
 
-M: object >uniform-uint-array >uint-array ; inline
+M: object >uniform-uint-array c:uint >c-array ; inline
 M: binary-data >uniform-uint-array ; inline 
 
-M: object >uniform-float-array >float-array ; inline
+M: object >uniform-float-array c:float >c-array ; inline
 M: binary-data >uniform-float-array ; inline 
 
 M: object >uniform-bvec-array '[ _ head-slice [ >c-bool ] int-array{ } map-as ] map concat ; inline
@@ -316,7 +312,7 @@ M: binary-data >uniform-vec-array drop ; inline
 
 M:: object >uniform-matrix ( sequence cols rows -- c-array )
      sequence flip cols head-slice
-     [ rows head-slice >float-array ] { } map-as concat ; inline
+     [ rows head-slice c:float >c-array ] { } map-as concat ; inline
 M: binary-data >uniform-matrix 2drop ; inline
 
 M: object >uniform-matrix-array 
@@ -468,7 +464,7 @@ DEFER: [bind-uniform-tuple]
         quot-prefix prepend
     ] 2map :> ( texture-unit' value-cleave )
 
-    texture-unit' 
+    texture-unit'
     value>>-quot { value-cleave 2cleave } append ;
 
 :: [bind-uniform] ( texture-unit uniform prefix -- texture-unit' quot )
@@ -491,7 +487,7 @@ DEFER: [bind-uniform-tuple]
 
 :: [bind-uniforms] ( superclass uniforms -- quot )
     superclass "uniform-tuple-texture-units" word-prop 0 or :> first-texture-unit
-    superclass \ (bind-uniforms) method :> next-method
+    superclass \ (bind-uniforms) lookup-method :> next-method
     first-texture-unit uniforms "" [bind-uniform-tuple] nip :> bind-quot
 
     { 2dup next-method } bind-quot [ ] append-as ;
@@ -507,7 +503,7 @@ DEFER: [bind-uniform-tuple]
     ] 3bi ;
 
 : parse-uniform-tuple-definition ( -- class superclass uniforms )
-    CREATE-CLASS scan {
+    scan-new-class scan-token {
         { ";" [ uniform-tuple f ] }
         { "<" [ scan-word parse-definition [ first3 uniform boa ] map ] }
         { "{" [
@@ -549,7 +545,7 @@ SYNTAX: UNIFORM-TUPLE:
     [ gl-attachment ] with map
     dup length 1 =
     [ first glDrawBuffer ]
-    [ [ length ] [ >int-array ] bi glDrawBuffers ] if ;
+    [ [ length ] [ c:int >c-array ] bi glDrawBuffers ] if ;
 
 : bind-named-output-attachments ( program-instance framebuffer attachments -- )
     rot '[ first _ swap output-index ] sort-with values
@@ -584,7 +580,6 @@ M: buffer-ptr bind-transform-feedback-output
 
 PRIVATE>
 
-UNION: ?any-framebuffer any-framebuffer POSTPONE: f ;
 UNION: transform-feedback-output buffer buffer-range POSTPONE: f ;
 
 TUPLE: render-set
@@ -592,8 +587,8 @@ TUPLE: render-set
     { vertex-array vertex-array initial: T{ vertex-array-collection } read-only }
     { uniforms uniform-tuple read-only }
     { indexes vertex-indexes initial: T{ index-range } read-only } 
-    { instances ?integer initial: f read-only }
-    { framebuffer ?any-framebuffer initial: system-framebuffer read-only }
+    { instances maybe{ integer } initial: f read-only }
+    { framebuffer maybe{ any-framebuffer } initial: system-framebuffer read-only }
     { output-attachments sequence initial: { default-attachment } read-only }
     { transform-feedback-output transform-feedback-output initial: f read-only } ;
 

@@ -50,13 +50,13 @@ C: <foo> foo
 { 1 2 } [
   1 2 <foo> T{ foo f ?a ?b } match [
     ?a ?b
-  ] bind
+  ] with-variables
 ] unit-test
 
 { 1 2 } [
   1 2 <foo> \ ?a \ ?b <foo> match [
     ?a ?b
-  ] bind
+  ] with-variables
 ] unit-test
 
 { H{ { ?a ?a } } } [ 

@@ -1,7 +1,11 @@
 namespace factor
 {
 
-static const cell special_object_count = 70;
+// Special object count and identifiers must be kept in sync with:
+//   core/kernel/kernel.factor
+//   core/bootstrap/image/image.factor
+
+static const cell special_object_count = 80;
 
 enum special_object {
 	OBJ_WALKER_HOOK = 3,       /* non-local exit hook, used by library only */
@@ -38,6 +42,7 @@ enum special_object {
 	JIT_WORD_CALL,
 	JIT_IF_WORD,
 	JIT_IF,
+	JIT_SAFEPOINT,
 	JIT_EPILOG,
 	JIT_RETURN,
 	JIT_PROFILING,
@@ -52,21 +57,25 @@ enum special_object {
 	JIT_DECLARE_WORD,
 
 	/* External entry points */
-	C_TO_FACTOR_WORD,
+	C_TO_FACTOR_WORD = 43,
 	LAZY_JIT_COMPILE_WORD,
 	UNWIND_NATIVE_FRAMES_WORD,
 	GET_FPU_STATE_WORD,
 	SET_FPU_STATE_WORD,
+	SIGNAL_HANDLER_WORD,
+	LEAF_SIGNAL_HANDLER_WORD,
+	FFI_SIGNAL_HANDLER_WORD,
+	FFI_LEAF_SIGNAL_HANDLER_WORD,
 
 	/* Incremented on every modify-code-heap call; invalidates call( inline
 	caching */
-	REDEFINITION_COUNTER = 47,
+	REDEFINITION_COUNTER = 52,
 
 	/* Callback stub generation in callbacks.c */
-	CALLBACK_STUB = 48,
-	
+	CALLBACK_STUB = 53,
+
 	/* Polymorphic inline cache generation in inline_cache.c */
-	PIC_LOAD = 49,
+	PIC_LOAD = 54,
 	PIC_TAG,
 	PIC_TUPLE,
 	PIC_CHECK_TAG,
@@ -76,23 +85,28 @@ enum special_object {
 	PIC_MISS_TAIL_WORD,
 
 	/* Megamorphic cache generation in dispatch.c */
-	MEGA_LOOKUP = 57,
+	MEGA_LOOKUP = 62,
 	MEGA_LOOKUP_WORD,
 	MEGA_MISS_WORD,
 
-	OBJ_UNDEFINED = 60,       /* default quotation for undefined words */
+	OBJ_UNDEFINED = 65,       /* default quotation for undefined words */
 
-	OBJ_STDERR = 61,          /* stderr FILE* handle */
+	OBJ_STDERR = 66,          /* stderr FILE* handle */
 
-	OBJ_STAGE2 = 62,          /* have we bootstrapped? */
+	OBJ_STAGE2 = 67,          /* have we bootstrapped? */
 
-	OBJ_CURRENT_THREAD = 63,
+	OBJ_CURRENT_THREAD = 68,
 
-	OBJ_THREADS = 64,
-	OBJ_RUN_QUEUE = 65,
-	OBJ_SLEEP_QUEUE = 66,
+	OBJ_THREADS = 69,
+	OBJ_RUN_QUEUE = 70,
+	OBJ_SLEEP_QUEUE = 71,
 
-	OBJ_VM_COMPILER = 67,     /* version string of the compiler we were built with */
+	OBJ_VM_COMPILER = 72,     /* version string of the compiler we were built with */
+
+	OBJ_WAITING_CALLBACKS = 73,
+
+	OBJ_SIGNAL_PIPE = 74,     /* file descriptor for pipe used to communicate signals
+	                          only used on unix */
 };
 
 /* save-image-and-exit discards special objects that are filled in on startup

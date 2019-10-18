@@ -3,7 +3,7 @@
 USING: io.files io.files.temp io words alien kernel math.parser
 alien.syntax io.launcher assocs arrays sequences namespaces make
 system math io.encodings.ascii accessors tools.disassembler
-tools.disassembler.private ;
+tools.disassembler.private locals ;
 IN: tools.disassembler.gdb
 
 SINGLETON: gdb-disassembler
@@ -12,21 +12,19 @@ SINGLETON: gdb-disassembler
 
 : out-file ( -- path ) "gdb-out.txt" temp-file ;
 
-: make-disassemble-cmd ( from to -- )
+:: make-disassemble-cmd ( from to -- )
     in-file ascii [
         "attach " write
         current-process-handle number>string print
-        "disassemble " write
-        [ number>string write bl ] bi@
+        "x/" write to from - 4 / number>string write
+        "i" write bl from number>string write
     ] with-file-writer ;
-
-: gdb-binary ( -- string ) "gdb" ;
 
 : run-gdb ( -- lines )
     <process>
         +closed+ >>stdin
         out-file >>stdout
-        [ gdb-binary , "-x" , in-file , "-batch" , ] { } make >>command
+        [ "gdb" , "-x" , in-file , "-batch" , ] { } make >>command
     try-process
     out-file ascii file-lines ;
 

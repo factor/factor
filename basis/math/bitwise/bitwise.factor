@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart fry kernel
 macros math math.bits sequences sequences.private words
-byte-arrays alien alien.c-types specialized-arrays ;
+byte-arrays alien alien.c-types alien.data specialized-arrays
+kernel.private layouts ;
 SPECIALIZED-ARRAY: uchar
 IN: math.bitwise
 
@@ -15,11 +16,12 @@ IN: math.bitwise
 : mask ( x n -- ? ) bitand ; inline
 : mask? ( x n -- ? ) mask 0 > ; inline
 : wrap ( m n -- m' ) 1 - bitand ; inline
-: bits ( m n -- m' ) 2^ wrap ; inline
-: mask-bit ( m n -- m' ) 2^ mask ; inline
 : on-bits ( m -- n ) 2^ 1 - ; inline
+: bits ( m n -- m' ) on-bits mask ; inline
+: mask-bit ( m n -- m' ) 2^ mask ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
-: >signed ( x n -- y ) 2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
+: >signed ( x n -- y )
+    [ bits ] keep 2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
 : >odd ( m -- n ) 0 set-bit ; foldable
 : >even ( m -- n ) 0 clear-bit ; foldable
 : next-even ( m -- n ) >even 2 + ; foldable
@@ -75,8 +77,8 @@ DEFER: byte-bit-count
 \ byte-bit-count
 256 iota [
     8 <bits> 0 [ [ 1 + ] when ] reduce
-] B{ } map-as '[ HEX: ff bitand _ nth-unsafe ]
-(( byte -- table )) define-declared
+] B{ } map-as '[ 0xff bitand _ nth-unsafe ]
+( byte -- table ) define-declared
 
 \ byte-bit-count make-inline
 
@@ -85,15 +87,26 @@ DEFER: byte-bit-count
 GENERIC: (bit-count) ( x -- n )
 
 : fixnum-bit-count ( x -- n )
-    0 swap [
-        dup 0 >
-    ] [
-        [ 8 bits byte-bit-count ] [ -8 shift ] bi
-        [ + ] dip
-    ] while drop ;
+    { fixnum } declare
+    {
+        [ byte-bit-count ]
+        [ -8 shift byte-bit-count + ]
+        [ -16 shift byte-bit-count + ]
+        [ -24 shift byte-bit-count + ]
+        [
+            cell 8 = [
+                {
+                    [ -32 shift byte-bit-count + ]
+                    [ -40 shift byte-bit-count + ]
+                    [ -48 shift byte-bit-count + ]
+                    [ -56 shift byte-bit-count + ]
+                } cleave >fixnum
+            ] [ drop ] if
+        ]
+    } cleave ;
 
 M: fixnum (bit-count)
-    fixnum-bit-count ; inline
+    fixnum-bit-count { fixnum } declare ; inline
 
 M: bignum (bit-count)
     dup 0 = [ drop 0 ] [
@@ -116,7 +129,7 @@ M: byte-array bit-count
     byte-array-bit-count ;
 
 M: object bit-count
-    binary-object <direct-uchar-array> byte-array-bit-count ;
+    binary-object uchar <c-direct-array> byte-array-bit-count ;
 
 : even-parity? ( obj -- ? ) bit-count even? ;
 

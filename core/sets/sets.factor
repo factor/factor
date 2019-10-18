@@ -1,7 +1,6 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs hashtables kernel vectors
-math sequences ;
+USING: assocs hashtables kernel math sequences vectors ;
 FROM: assocs => change-at ;
 IN: sets
 
@@ -22,11 +21,16 @@ GENERIC: set= ( set1 set2 -- ? )
 GENERIC: duplicates ( set -- seq )
 GENERIC: all-unique? ( set -- ? )
 GENERIC: null? ( set -- ? )
+GENERIC: cardinality ( set -- n )
+
+M: f cardinality drop 0 ;
 
 ! Defaults for some methods.
 ! Override them for efficiency
 
 M: set null? members null? ; inline
+
+M: set cardinality members length ;
 
 M: set set-like drop ; inline
 
@@ -41,22 +45,32 @@ M: set union
 : sequence/tester ( set1 set2 -- set1' quot )
     [ members ] [ tester ] bi* ; inline
 
+: small/large ( set1 set2 -- set1' set2' )
+    2dup [ cardinality ] bi@ > [ swap ] when ;
+
 PRIVATE>
 
 M: set intersect
-    [ sequence/tester filter ] keep set-like ;
+    [ small/large sequence/tester filter ] keep set-like ;
 
 M: set diff
     [ sequence/tester [ not ] compose filter ] keep set-like ;
 
 M: set intersects?
-    sequence/tester any? ;
+    small/large sequence/tester any? ;
+
+<PRIVATE
+
+: (subset?) ( set1 set2 -- ? )
+    sequence/tester all? ; inline
+
+PRIVATE>
 
 M: set subset?
-    sequence/tester all? ;
-    
+    2dup [ cardinality ] bi@ > [ 2drop f ] [ (subset?) ] if ;
+
 M: set set=
-    2dup subset? [ swap subset? ] [ 2drop f ] if ;
+    2dup [ cardinality ] bi@ eq? [ (subset?) ] [ 2drop f ] if ;
 
 M: set fast-set ;
 
@@ -94,26 +108,32 @@ M: sequence set-like
 
 M: sequence members
     [ pruned ] keep like ;
-  
+
 M: sequence null?
     empty? ; inline
 
-: combine ( sets -- set )
+M: sequence cardinality
+    pruned length ;
+
+: combine ( sets -- set/f )
     [ f ]
     [ [ [ members ] map concat ] [ first ] bi set-like ]
     if-empty ;
 
-: gather ( seq quot -- newseq )
+: gather ( ... seq quot: ( ... elt -- ... elt' ) -- ... newseq )
     map concat members ; inline
 
 : adjoin-at ( value key assoc -- )
     [ [ f fast-set ] unless* [ adjoin ] keep ] change-at ;
 
 : within ( seq set -- subseq )
-    fast-set [ in? ] curry filter ;
+    tester filter ;
 
 : without ( seq set -- subseq )
-    fast-set [ in? not ] curry filter ;
+    tester [ not ] compose filter ;
+
+: ?adjoin ( elt set -- ? )
+    2dup in? [ 2drop f ] [ adjoin t ] if ; inline
 
 ! Temporarily for compatibility
 

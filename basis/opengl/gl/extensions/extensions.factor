@@ -7,7 +7,7 @@ ERROR: unknown-gl-platform ;
 << {
     { [ os windows? ] [ "opengl.gl.windows" ] }
     { [ os macosx? ]  [ "opengl.gl.macosx" ] }
-    { [ os unix? ] [ "opengl.gl.x11" ] }
+    { [ os unix? ] [ "opengl.gl.gtk" ] }
     [ unknown-gl-platform ]
 } cond use-vocab >>
 
@@ -42,7 +42,7 @@ reset-gl-function-number-counter
     '[ @  _ _ _ alien-indirect ] ;
 
 :: define-indirect ( abi return function-name function-ptr-quot types names -- )
-    function-name create-in dup reset-generic
+    function-name create-function
     function-ptr-quot return types abi indirect-quot
     names return function-effect
     define-declared ;
@@ -50,6 +50,6 @@ reset-gl-function-number-counter
 SYNTAX: GL-FUNCTION:
     gl-function-calling-convention
     scan-function-name
-    "{" expect "}" parse-tokens over prefix
+    "{" expect "}" parse-tokens over suffix
     gl-function-counter '[ _ _ gl-function-pointer ]
     ";" scan-c-args define-indirect ;

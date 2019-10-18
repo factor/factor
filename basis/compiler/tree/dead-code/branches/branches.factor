@@ -39,7 +39,7 @@ M: #branch remove-dead-code*
     [ drop filter-live ] [ swap nths ] 2bi
     [ length make-values ] keep
     [ drop ] [ zip ] 2bi
-    #data-shuffle ;
+    <#data-shuffle> ;
 
 : insert-drops ( nodes values indices -- nodes' )
     '[

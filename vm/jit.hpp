@@ -14,9 +14,11 @@ struct jit {
 	factor_vm *parent;
 
 	explicit jit(code_block_type type, cell owner, factor_vm *parent);
+	~jit();
+
 	void compute_position(cell offset);
 
-	void emit_relocation(cell code_template);
+	void emit_relocation(cell relocation_template);
 	void emit(cell code_template);
 
 	void parameter(cell parameter) { parameters.add(parameter); }
@@ -66,7 +68,11 @@ struct jit {
 	}
 
 	
-	code_block *to_code_block();
+	code_block *to_code_block(cell frame_size);
+
+private:
+	jit(const jit&);
+	void operator=(const jit&);
 };
 
 }

@@ -1,6 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.c-types alien.destructors accessors classes.struct kernel ;
+USING: alien.c-types alien.destructors alien.syntax
+classes.struct ;
 IN: core-foundation
 
 TYPEDEF: void* CFTypeRef
@@ -21,6 +22,12 @@ TYPEDEF: longlong SInt64
 TYPEDEF: ulong CFTypeID
 TYPEDEF: UInt32 CFOptionFlags
 TYPEDEF: void* CFUUIDRef
+TYPEDEF: SInt32 OSStatus
+TYPEDEF: uchar[4] FourCharCode
+TYPEDEF: FourCharCode OSType
+
+STRUCT: FSRef
+    { opaque uchar[80] } ;
 
 STRUCT: CFRange
     { location CFIndex }

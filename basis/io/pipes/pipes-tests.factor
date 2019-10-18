@@ -1,7 +1,8 @@
 USING: io io.pipes io.streams.string io.encodings.utf8
 io.encodings.binary io.streams.duplex io.encodings io.timeouts
 namespaces continuations tools.test kernel calendar destructors
-accessors debugger math sequences ;
+accessors debugger math sequences threads
+concurrency.count-downs fry ;
 IN: io.pipes.tests
 
 [ "Hello" ] [
@@ -11,6 +12,7 @@ IN: io.pipes.tests
     ] with-stream
 ] unit-test
 
+! Test run-pipeline
 [ { } ] [ { } run-pipeline ] unit-test
 [ { f } ] [ { [ f ] } run-pipeline ] unit-test
 [ { "Hello" } ] [
@@ -26,6 +28,7 @@ IN: io.pipes.tests
     } run-pipeline
 ] unit-test
 
+! Test timeout
 [
     utf8 <pipe> [
         1 seconds over set-timeout
@@ -33,6 +36,7 @@ IN: io.pipes.tests
     ] with-disposal
 ] must-fail
 
+! Test writing to a half-open pipe
 [ ] [
     1000 [
         utf8 <pipe> [
@@ -41,6 +45,34 @@ IN: io.pipes.tests
             bi
         ] curry ignore-errors
     ] times
+] unit-test
+
+! Test non-blocking operation
+[ ] [
+    [
+        2 <count-down> "count-down" set
+
+        utf8 <pipe> &dispose
+        utf8 <pipe> &dispose
+        [
+            [
+                '[
+                    _ stream-read1 drop
+                    "count-down" get count-down
+                ] in-thread
+            ] bi@
+            
+            ! Give the threads enough time to start blocking on
+            ! read
+            1 seconds sleep
+        ]
+        ! At this point, two threads are blocking on read
+        [ [ "Hi" over stream-write stream-flush ] bi@ ]
+        ! At this point, both threads should wake up
+        2bi
+
+        "count-down" get await
+    ] with-destructors
 ] unit-test
 
 ! 0 read should not block

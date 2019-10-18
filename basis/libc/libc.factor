@@ -43,7 +43,7 @@ TUPLE: malloc-ptr value continuation ;
 M: malloc-ptr hashcode* value>> hashcode* ;
 
 M: malloc-ptr equal?
-    over malloc-ptr? [ [ value>> ] bi@ = ] [ 2drop f ] if ;
+    over malloc-ptr? [ [ value>> ] same? ] [ 2drop f ] if ;
 
 : <malloc-ptr> ( value -- malloc-ptr )
     malloc-ptr new swap >>value ;

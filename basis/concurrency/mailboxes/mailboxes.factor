@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: dlists deques threads sequences continuations namespaces
 math quotations words kernel arrays assocs init system
-concurrency.conditions accessors debugger debugger.threads
-locals fry ;
+concurrency.conditions accessors locals fry vocabs.loader ;
 IN: concurrency.mailboxes
 
 TUPLE: mailbox { threads dlist } { data dlist } ;
@@ -77,9 +76,6 @@ M: mailbox mailbox-get-timeout block-if-empty data>> pop-back ;
 
 TUPLE: linked-error error thread ;
 
-M: linked-error error.
-    [ thread>> error-in-thread. ] [ error>> error. ] bi ;
-
 C: <linked-error> linked-error
 
 : ?linked ( message -- message )
@@ -88,10 +84,12 @@ C: <linked-error> linked-error
 TUPLE: linked-thread < thread supervisor ;
 
 M: linked-thread error-in-thread
-    [ <linked-error> ] [ supervisor>> ] bi mailbox-put ;
+    [ <linked-error> ] [ supervisor>> ] bi mailbox-put stop ;
 
 : <linked-thread> ( quot name mailbox -- thread' )
     [ linked-thread new-thread ] dip >>supervisor ;
 
 : spawn-linked-to ( quot name mailbox -- thread )
     <linked-thread> [ (spawn) ] keep ;
+
+{ "concurrency.mailboxes" "debugger" } "concurrency.mailboxes.debugger" require-when

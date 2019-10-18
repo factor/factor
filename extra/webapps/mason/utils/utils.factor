@@ -24,12 +24,9 @@ IN: webapps.mason.utils
 : requirements ( builder -- xml )
     [
         os>> {
-            { "winnt" "Windows XP, Windows Vista or Windows 7" }
+            { "windows" "Windows XP, Windows Vista or Windows 7" }
             { "macosx" "Mac OS X 10.5 Leopard" }
             { "linux" "Ubuntu Linux 9.04 (other distributions may also work)" }
-            { "freebsd" "FreeBSD 7.1" }
-            { "netbsd" "NetBSD 5.0" }
-            { "openbsd" "OpenBSD 4.5" }
         } at
     ] [
         dup cpu>> "x86.32" = [
@@ -43,17 +40,22 @@ IN: webapps.mason.utils
 : download-url ( string -- string' )
     "http://downloads.factorcode.org/" prepend ;
 
-: package-url ( builder -- url )
-    [ URL" $mason-app/package" ] dip
+: platform-url ( url builder -- url )
     [ os>> "os" set-query-param ]
     [ cpu>> "cpu" set-query-param ] bi
     adjust-url ;
 
+: package-url ( builder -- url )
+    [ URL" http://builds.factorcode.org/package" ] dip
+    platform-url ;
+
+: report-url ( builder -- url )
+    [ URL" http://builds.factorcode.org/report" ] dip
+    platform-url ;
+
 : release-url ( builder -- url )
-    [ URL" $mason-app/release" ] dip
-    [ os>> "os" set-query-param ]
-    [ cpu>> "cpu" set-query-param ] bi
-    adjust-url ;
+    [ URL" http://builds.factorcode.org/release" ] dip
+    platform-url ;
 
 : validate-secret ( -- )
     { { "secret" [ v-one-line ] } } validate-params

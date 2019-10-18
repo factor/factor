@@ -50,7 +50,7 @@ HELP: class<=
 { $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 = class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
 
 HELP: sort-classes
-{ $values { "seq" "a sequence of class" } { "newseq" "a new seqence of classes" } }
+{ $values { "seq" "a sequence of class" } { "newseq" "a new sequence of classes" } }
 { $description "Outputs a linear sort of a sequence of classes. Larger classes come before their subclasses." } ;
 
 HELP: class-or

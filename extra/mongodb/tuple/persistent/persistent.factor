@@ -16,7 +16,7 @@ DEFER: assoc>tuple
 <PRIVATE
 
 : mdbinfo>tuple-class ( tuple-info -- class )
-   [ first ] keep second lookup ; inline
+   [ first ] keep second lookup-word ; inline
 
 : tuple-instance ( tuple-info -- instance )
     mdbinfo>tuple-class new ; inline 
@@ -62,7 +62,7 @@ CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
       { [ dup value>> mdb-persistent? ]
         [ [ value>> ] [ quot>> ] bi write-mdb-persistent ] }
       { [ dup value>> data-tuple? ]
-        [ [ value>> ] [ quot>> ] bi (( tuple -- assoc )) call-effect ]  }
+        [ [ value>> ] [ quot>> ] bi ( tuple -- assoc ) call-effect ]  }
       { [ dup value>> [ hashtable? ] [ linked-assoc? ] bi or ]
         [ [ value>> ] [ quot>> ] bi '[ _ write-field ] assoc-map ] }
       [ value>> ]

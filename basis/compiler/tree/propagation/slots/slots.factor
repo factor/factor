@@ -60,7 +60,7 @@ IN: compiler.tree.propagation.slots
     #! heap would use the old layout since instances are updated
     #! immediately after compilation.
     {
-        [ class read-only-slot? ]
+        [ class-of read-only-slot? ]
         [ nip layout-up-to-date? ]
         [ swap slot <literal-info> ]
     } 2&& ;

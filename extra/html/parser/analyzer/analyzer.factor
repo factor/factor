@@ -171,8 +171,8 @@ ERROR: undefined-find-nth m n seq quot ;
     [ [ name>> { "form" "input" } member? ] filter ] map ;
 
 : find-html-objects ( vector string -- vector' )
-    dupd find-opening-tags-by-name
-    [ first2 find-between* ] curry map ;
+    over find-opening-tags-by-name
+    [ first2 find-between* ] with map ;
 
 : form-action ( vector -- string )
     [ name>> "form" = ] find nip "action" attribute ;

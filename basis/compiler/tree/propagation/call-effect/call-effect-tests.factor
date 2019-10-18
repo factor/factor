@@ -5,19 +5,19 @@ compiler.tree.builder compiler.tree.optimizer compiler.tree.debugger sequences
 eval combinators ;
 IN: compiler.tree.propagation.call-effect.tests
 
-[ t ] [ \ + (( a b -- c )) execute-effect-unsafe? ] unit-test
-[ t ] [ \ + (( a b c -- d e )) execute-effect-unsafe? ] unit-test
-[ f ] [ \ + (( a b c -- d )) execute-effect-unsafe? ] unit-test
-[ f ] [ \ call (( x -- )) execute-effect-unsafe? ] unit-test
+[ t ] [ \ + ( a b -- c ) execute-effect-unsafe? ] unit-test
+[ t ] [ \ + ( a b c -- d e ) execute-effect-unsafe? ] unit-test
+[ f ] [ \ + ( a b c -- d ) execute-effect-unsafe? ] unit-test
+[ f ] [ \ call ( x -- ) execute-effect-unsafe? ] unit-test
 
-[ t ] [ [ + ] cached-effect (( a b -- c )) effect= ] unit-test
-[ t ] [ 5 [ + ] curry cached-effect (( a -- c )) effect= ] unit-test
-[ t ] [ 5 [ ] curry cached-effect (( -- c )) effect= ] unit-test
-[ t ] [ [ dup ] [ drop ] compose cached-effect (( a -- b )) effect= ] unit-test
-[ t ] [ [ drop ] [ dup ] compose cached-effect (( a b -- c d )) effect= ] unit-test
-[ t ] [ [ 2drop ] [ dup ] compose cached-effect (( a b c -- d e )) effect= ] unit-test
-[ t ] [ [ 1 2 3 ] [ 2drop ] compose cached-effect (( -- a )) effect= ] unit-test
-[ t ] [ [ 1 2 ] [ 3drop ] compose cached-effect (( a -- )) effect= ] unit-test
+[ t ] [ [ + ] cached-effect ( a b -- c ) effect= ] unit-test
+[ t ] [ 5 [ + ] curry cached-effect ( a -- c ) effect= ] unit-test
+[ t ] [ 5 [ ] curry cached-effect ( -- c ) effect= ] unit-test
+[ t ] [ [ dup ] [ drop ] compose cached-effect ( a -- b ) effect= ] unit-test
+[ t ] [ [ drop ] [ dup ] compose cached-effect ( a b -- c d ) effect= ] unit-test
+[ t ] [ [ 2drop ] [ dup ] compose cached-effect ( a b c -- d e ) effect= ] unit-test
+[ t ] [ [ 1 2 3 ] [ 2drop ] compose cached-effect ( -- a ) effect= ] unit-test
+[ t ] [ [ 1 2 ] [ 3drop ] compose cached-effect ( a -- ) effect= ] unit-test
 
 : optimized-quot ( quot -- quot' )
     build-tree optimize-tree nodes>quot ;
@@ -44,11 +44,11 @@ IN: compiler.tree.propagation.call-effect.tests
 [ 3 ] [ 1 2 '[ _ + ] call( a -- b ) ] unit-test
 [ 3 ] [ 1 2 '[ _ ] [ + ] compose call( a -- b ) ] unit-test
 
-[ t ] [ [ 2 '[ _ ] [ + ] compose ] final-info first infer-value (( object -- object )) effect= ] unit-test
-[ t ] [ [ 2 '[ _ ] 1 '[ _ + ] compose ] final-info first infer-value (( -- object )) effect= ] unit-test
-[ t ] [ [ 2 '[ _ + ] ] final-info first infer-value (( object -- object )) effect= ] unit-test
+[ t ] [ [ 2 '[ _ ] [ + ] compose ] final-info first infer-value ( object -- object ) effect= ] unit-test
+[ t ] [ [ 2 '[ _ ] 1 '[ _ + ] compose ] final-info first infer-value ( -- object ) effect= ] unit-test
+[ t ] [ [ 2 '[ _ + ] ] final-info first infer-value ( object -- object ) effect= ] unit-test
 [ f ] [ [ [ [ ] [ 1 ] if ] ] final-info first infer-value ] unit-test
-[ t ] [ [ [ 1 ] '[ @ ] ] final-info first infer-value (( -- object )) effect= ] unit-test
+[ t ] [ [ [ 1 ] '[ @ ] ] final-info first infer-value ( -- object ) effect= ] unit-test
 [ f ] [ [ dup drop ] final-info first infer-value ] unit-test
 
 ! This should not hang
@@ -66,11 +66,11 @@ TUPLE: a-tuple x ;
 
 : test-quotatation ( -- quot ) [ call(-redefine-test ] ;
 
-[ t ] [ test-quotatation cached-effect (( a -- b )) effect<= ] unit-test
+[ t ] [ test-quotatation cached-effect ( a -- b ) effect<= ] unit-test
 
 [ ] [ "IN: compiler.tree.propagation.call-effect.tests USE: math : call(-redefine-test ( a b -- c ) + ;" eval( -- ) ] unit-test
 
-[ t ] [ test-quotatation cached-effect (( a b -- c )) effect<= ] unit-test
+[ t ] [ test-quotatation cached-effect ( a b -- c ) effect<= ] unit-test
 
 : inline-cache-invalidation-test ( a b c -- c ) call( a b -- c ) ;
 
@@ -78,7 +78,7 @@ TUPLE: a-tuple x ;
 
 [ ] [ "IN: compiler.tree.propagation.call-effect.tests USE: math : call(-redefine-test ( a -- c ) 1 + ;" eval( -- ) ] unit-test
 
-[ 1 3 test-quotatation inline-cache-invalidation-test ] [ T{ wrong-values f [ call(-redefine-test ] (( a b -- c )) } = ] must-fail-with
+[ 1 3 test-quotatation inline-cache-invalidation-test ] [ T{ wrong-values f [ call(-redefine-test ] ( a b -- c ) } = ] must-fail-with
 
 ! See if redefining a tuple class bumps effect counter
 TUPLE: my-tuple a b c ;

@@ -55,7 +55,7 @@ HELP: newline-after?
 
 HELP: short-section?
 { $values { "section" section } { "?" "a boolean" } }
-{ $contract "Tests if a section should be output as a " { $link short-section } ". The default implementation calls " { $link section-fits? } " but this behavior can be cutomized." } ;
+{ $contract "Tests if a section should be output as a " { $link short-section } ". The default implementation calls " { $link section-fits? } " but this behavior can be customized." } ;
 
 HELP: section
 { $class-description "A piece of prettyprinter output. Instances of this class are not used directly, instead one instantiates various subclasses of this class:"

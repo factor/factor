@@ -1,8 +1,9 @@
 ! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators hashtables http
-http.client json.reader kernel macros namespaces sequences
-urls.secure fry oauth urls system ;
+http.client json.reader kernel macros make namespaces sequences
+io.sockets.secure fry oauth urls ;
+FROM: assocs => change-at ;
 IN: twitter
 
 ! Configuration
@@ -20,9 +21,8 @@ twitter-source [ "factor" ] initialize
     ] with-scope ; inline
 
 : twitter-url ( string -- string' )
-    os windows?
-    "http://twitter.com/"
-    "https://twitter.com/" ? prepend ;
+    ssl-supported?
+    "https://twitter.com/" "http://twitter.com/" ? prepend ;
 
 PRIVATE>
 
@@ -131,9 +131,9 @@ PRIVATE>
 
 : update-post-data ( update -- assoc )
     [
-        "status" set
-        twitter-source get "source" set
-    ] H{ } make-assoc ;
+        "status" ,,
+        twitter-source get "source" ,,
+    ] H{ } make ;
 
 : (tweet) ( string -- json )
     update-post-data "update" status-url

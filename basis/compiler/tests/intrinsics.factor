@@ -6,6 +6,8 @@ sbufs strings.private slots.private alien math.order
 alien.accessors alien.c-types alien.data alien.syntax alien.strings
 namespaces libc io.encodings.ascii classes compiler.test ;
 FROM: math => float ;
+FROM: alien.c-types => short ;
+QUALIFIED-WITH: alien.c-types c
 IN: compiler.tests.intrinsics
 
 ! Make sure that intrinsic ops compile to correct code.
@@ -47,12 +49,12 @@ IN: compiler.tests.intrinsics
 [ CHAR: b ] [ 1 [ "abc" string-nth ] compile-call ] unit-test
 [ CHAR: b ] [ [ 1 "abc" string-nth ] compile-call ] unit-test
 
-[ HEX: 123456 ] [ 0 "\u123456bc" [ string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ 0 [ "\u123456bc" string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ [ 0 "\u123456bc" string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ 1 "a\u123456c" [ string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ 1 [ "a\u123456c" string-nth ] compile-call ] unit-test
-[ HEX: 123456 ] [ [ 1 "a\u123456c" string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ 0 "\u123456bc" [ string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ 0 [ "\u123456bc" string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ [ 0 "\u123456bc" string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ 1 "a\u123456c" [ string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ 1 [ "a\u123456c" string-nth ] compile-call ] unit-test
+[ 0x123456 ] [ [ 1 "a\u123456c" string-nth ] compile-call ] unit-test
 
 [ ] [ [ 0 special-object ] compile-call drop ] unit-test
 [ ] [ 1 special-object [ 1 set-special-object ] compile-call ] unit-test
@@ -242,9 +244,9 @@ IN: compiler.tests.intrinsics
 [ -4294967296 ] [ -1 [ 32 fixnum-shift ] compile-call ] unit-test
 [ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-call ] unit-test
 
-[ HEX: 10000000 ] [ HEX: 1000000 HEX: 10 [ fixnum* ] compile-call ] unit-test
-[ HEX: 8000000 ] [ HEX: -8000000 >fixnum [ 0 swap fixnum- ] compile-call ] unit-test
-[ HEX: 8000000 ] [ HEX: -7ffffff >fixnum [ 1 swap fixnum- ] compile-call ] unit-test
+[ 0x10000000 ] [ 0x1000000 0x10 [ fixnum* ] compile-call ] unit-test
+[ 0x8000000 ] [ -0x8000000 >fixnum [ 0 swap fixnum- ] compile-call ] unit-test
+[ 0x8000000 ] [ -0x7ffffff >fixnum [ 1 swap fixnum- ] compile-call ] unit-test
 
 [ t ] [ 1 26 fixnum-shift dup [ fixnum+ ] compile-call 1 27 fixnum-shift = ] unit-test
 [ -134217729 ] [ 1 27 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
@@ -261,8 +263,8 @@ IN: compiler.tests.intrinsics
 [ t ] [ f [ f eq? ] compile-call ] unit-test
 
 cell 8 = [
-    [ HEX: 40400000 ] [
-        HEX: 4200 [ HEX: 7fff fixnum-bitand 13 fixnum-shift-fast 112 23 fixnum-shift-fast fixnum+fast ]
+    [ 0x40400000 ] [
+        0x4200 [ 0x7fff fixnum-bitand 13 fixnum-shift-fast 112 23 fixnum-shift-fast fixnum+fast ]
         compile-call
     ] unit-test
 ] when
@@ -323,7 +325,7 @@ ERROR: bug-in-fixnum* x y a b ;
 
 : compiled-fixnum>bignum ( a -- b ) fixnum>bignum ;
 
-[ bignum ] [ 0 compiled-fixnum>bignum class ] unit-test
+[ bignum ] [ 0 compiled-fixnum>bignum class-of ] unit-test
 
 [ ] [
     10000 [
@@ -429,46 +431,46 @@ ERROR: bug-in-fixnum* x y a b ;
 [ ] [ "hello world" ascii malloc-string "s" set ] unit-test
 
 "s" get [
-    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-call ascii alien>string ] unit-test
-    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare *void* ] compile-call ascii alien>string ] unit-test
+    [ "hello world" ] [ "s" get void* <ref> [ { byte-array } declare void* deref ] compile-call ascii alien>string ] unit-test
+    [ "hello world" ] [ "s" get void* <ref> [ { c-ptr } declare void* deref ] compile-call ascii alien>string ] unit-test
 
     [ ] [ "s" get free ] unit-test
 ] when
 
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare <void*> ] compile-call *void* ] unit-test
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare <void*> ] compile-call *void* ] unit-test
-[ f ] [ f [ { POSTPONE: f } declare <void*> ] compile-call *void* ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare void* <ref> ] compile-call void* deref ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare void* <ref> ] compile-call void* deref ] unit-test
+[ f ] [ f [ { POSTPONE: f } declare void* <ref> ] compile-call void* deref ] unit-test
 
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 [ -4 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-signed-1 ] compile-call ] unit-test
 
-[ -100 ] [ -100 <char> [ { byte-array } declare *char ] compile-call ] unit-test
-[ 156 ] [ -100 <uchar> [ { byte-array } declare *uchar ] compile-call ] unit-test
+[ -100 ] [ -100 char <ref> [ { byte-array } declare char deref ] compile-call ] unit-test
+[ 156 ] [ -100 uchar <ref> [ { byte-array } declare uchar deref ] compile-call ] unit-test
 
-[ -100 ] [ -100 \ <char> def>> [ { fixnum } declare ] prepend compile-call *char ] unit-test
-[ 156 ] [ -100 \ <uchar> def>> [ { fixnum } declare ] prepend compile-call *uchar ] unit-test
+[ -100 ] [ -100 [ char <ref> ] [ { fixnum } declare ] prepend compile-call char deref ] unit-test
+[ 156 ] [ -100 [ uchar <ref> ] [ { fixnum } declare ] prepend compile-call uchar deref ] unit-test
 
-[ -1000 ] [ -1000 <short> [ { byte-array } declare *short ] compile-call ] unit-test
-[ 64536 ] [ -1000 <ushort> [ { byte-array } declare *ushort ] compile-call ] unit-test
+[ -1000 ] [ -1000 short <ref> [ { byte-array } declare short deref ] compile-call ] unit-test
+[ 64536 ] [ -1000 ushort <ref> [ { byte-array } declare ushort deref ] compile-call ] unit-test
 
-[ -1000 ] [ -1000 \ <short> def>> [ { fixnum } declare ] prepend compile-call *short ] unit-test
-[ 64536 ] [ -1000 \ <ushort> def>> [ { fixnum } declare ] prepend compile-call *ushort ] unit-test
+[ -1000 ] [ -1000 [ short <ref> ] [ { fixnum } declare ] prepend compile-call short deref ] unit-test
+[ 64536 ] [ -1000 [ ushort <ref> ] [ { fixnum } declare ] prepend compile-call ushort deref ] unit-test
 
-[ -100000 ] [ -100000 <int> [ { byte-array } declare *int ] compile-call ] unit-test
-[ 4294867296 ] [ -100000 <uint> [ { byte-array } declare *uint ] compile-call ] unit-test
+[ -100000 ] [ -100000 int <ref> [ { byte-array } declare int deref ] compile-call ] unit-test
+[ 4294867296 ] [ -100000 uint <ref> [ { byte-array } declare uint deref ] compile-call ] unit-test
 
-[ -100000 ] [ -100000 \ <int> def>> [ { fixnum } declare ] prepend compile-call *int ] unit-test
-[ 4294867296 ] [ -100000 \ <uint> def>> [ { fixnum } declare ] prepend compile-call *uint ] unit-test
+[ -100000 ] [ -100000 [ int <ref> ] [ { fixnum } declare ] prepend compile-call int deref ] unit-test
+[ 4294867296 ] [ -100000 [ uint <ref> ] [ { fixnum } declare ] prepend compile-call uint deref ] unit-test
 
-[ t ] [ pi pi <double> *double = ] unit-test
+[ t ] [ pi pi double <ref> double deref = ] unit-test
 
-[ t ] [ pi <double> [ { byte-array } declare *double ] compile-call pi = ] unit-test
+[ t ] [ pi double <ref> [ { byte-array } declare double deref ] compile-call pi = ] unit-test
 
 ! Silly
-[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-call ] keep *float pi - -0.001 0.001 between? ] unit-test
-[ t ] [ pi <float> [ { byte-array } declare *float ] compile-call pi - -0.001 0.001 between? ] unit-test
+[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-call ] keep c:float deref pi - -0.001 0.001 between? ] unit-test
+[ t ] [ pi c:float <ref> [ { byte-array } declare c:float deref ] compile-call pi - -0.001 0.001 between? ] unit-test
 
-[ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-call ] keep *double pi = ] unit-test
+[ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-call ] keep double deref pi = ] unit-test
 
 [ 4 ] [
     2 B{ 1 2 3 4 5 6 } <displaced-alien> [
@@ -477,15 +479,15 @@ ERROR: bug-in-fixnum* x y a b ;
 ] unit-test
 
 [ ALIEN: 123 ] [
-    HEX: 123 [ <alien> ] compile-call
+    0x123 [ <alien> ] compile-call
 ] unit-test
 
 [ ALIEN: 123 ] [
-    HEX: 123 [ { fixnum } declare <alien> ] compile-call
+    0x123 [ { fixnum } declare <alien> ] compile-call
 ] unit-test
 
 [ ALIEN: 123 ] [
-    [ HEX: 123 <alien> ] compile-call
+    [ 0x123 <alien> ] compile-call
 ] unit-test
 
 [ f ] [
@@ -527,17 +529,19 @@ ERROR: bug-in-fixnum* x y a b ;
 [ ALIEN: 1234 ALIEN: 2234 ] [
     ALIEN: 234 [
         { c-ptr } declare
-        [ HEX: 1000 swap <displaced-alien> ]
-        [ HEX: 2000 swap <displaced-alien> ] bi
+        [ 0x1000 swap <displaced-alien> ]
+        [ 0x2000 swap <displaced-alien> ] bi
     ] compile-call
 ] unit-test
 
+! These tests must fail because we're not allowed to store
+! a pointer to a byte array inside of an alien object
 [
-    B{ 0 0 0 0 } [ { byte-array } declare <void*> ] compile-call
+    B{ 0 0 0 0 } [ { byte-array } declare void* <ref> ] compile-call
 ] must-fail
 
 [
-    B{ 0 0 0 0 } [ { c-ptr } declare <void*> ] compile-call
+    B{ 0 0 0 0 } [ { c-ptr } declare void* <ref> ] compile-call
 ] must-fail
 
 [

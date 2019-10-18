@@ -1,7 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes classes.tuple generic.math generic.single arrays
 io.pathnames vocabs.loader io sequences assocs words.symbol
-words.alias words.constant combinators vocabs.parser ;
+words.alias words.constant combinators vocabs.parser command-line ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -45,11 +45,14 @@ ARTICLE: "syntax-integers" "Integer syntax"
     "-10"
     "2432902008176640000"
 }
-"Integers are entered in base 10 unless prefixed with a base change parsing word."
-{ $subsections
-    POSTPONE: BIN:
-    POSTPONE: OCT:
-    POSTPONE: HEX:
+"Integers are entered in base 10 unless prefixed with a base-changing prefix. " { $snippet "0x" } " begins a hexadecimal literal, " { $snippet "0o" } " an octal literal, and " { $snippet "0b" } " a binary literal. A sign, if any, goes before the base prefix."
+{ $example
+    "USE: prettyprint"
+    "10 ."
+    "0b10 ."
+    "-0o10 ."
+    "0x10 ."
+    "10\n2\n-8\n16"
 }
 "More information on integers can be found in " { $link "integers" } "." ;
 
@@ -105,18 +108,18 @@ ARTICLE: "syntax-floats" "Float syntax"
 { $subsections POSTPONE: NAN: }
 "Hexadecimal float literals are also supported. These consist of a hexadecimal literal with a decimal point and an optional base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
-    "8.0 HEX: 1.0p3 = ."
+    "8.0 0x1.0p3 = ."
     "t"
 }
 { $example
-    "1024.0 HEX: 1.0P10 = ."
+    "-1024.0 -0x1.0P10 = ."
     "t"
 }
 { $example
-    "10.125 HEX: 1.44p3 = ."
+    "10.125 0x1.44p3 = ."
     "t"
 }
-"The normalized hex form " { $snippet "HEX: ±1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of IEEE 754 representation."
+"The normalized hex form " { $snippet "±0x1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of the binary IEEE 754 representation."
 $nl
 "More information on floats can be found in " { $link "floats" } "." ;
 
@@ -195,7 +198,7 @@ ARTICLE: "syntax-hash-sets" "Hash set syntax"
 
 ARTICLE: "syntax-tuples" "Tuple syntax"
 { $subsections POSTPONE: T{ }
-"Tuples are documented in " { $link "tuples" } "."  ;
+"Tuples are documented in " { $link "tuples" } "." ;
 
 ARTICLE: "syntax-quots" "Quotation syntax"
 { $subsections
@@ -214,7 +217,7 @@ ARTICLE: "syntax-pathnames" "Pathname syntax"
 
 ARTICLE: "syntax-effects" "Stack effect syntax"
 "Note that this is " { $emphasis "not" } " syntax to declare stack effects of words. This pushes an " { $link effect } " instance on the stack for reflection, for use with words such as " { $link define-declared } ", " { $link call-effect } " and " { $link execute-effect } "."
-{ $subsections POSTPONE: (( }
+{ $subsections POSTPONE: ( }
 { $see-also "effects" "inference" "tools.inference" } ;
 
 ARTICLE: "syntax-literals" "Literals"
@@ -271,7 +274,7 @@ HELP: inline
 { $description
     "Declares the most recently defined word as an inline word. The optimizing compiler copies definitions of inline words when compiling calls to them."
     $nl
-    "Combinators must be inlined in order to compile with the optimizing compiler - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization."
+    "Combinators must be inlined in order to compile with the optimizing compiler - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization. Note that inlined words that can be compiled stand-alone are also, themselves, compiled by the optimizing compiler."
     $nl
     "The non-optimizing quotation compiler ignores inlining declarations."
 } ;
@@ -340,37 +343,37 @@ $nl
 HELP: {
 { $syntax "{ elements... }" }
 { $values { "elements" "a list of objects" } }
-{ $description "Marks the beginning of a literal array. Literal arrays are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal array. Literal arrays are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "{ 1 2 3 }" } } ;
 
 HELP: V{
 { $syntax "V{ elements... }" }
 { $values { "elements" "a list of objects" } }
-{ $description "Marks the beginning of a literal vector. Literal vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal vector. Literal vectors are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "V{ 1 2 3 }" } } ;
 
 HELP: B{
 { $syntax "B{ elements... }" }
 { $values { "elements" "a list of integers" } }
-{ $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "B{ 1 2 3 }" } } ;
 
 HELP: H{
 { $syntax "H{ { key value }... }" }
 { $values { "key" "an object" } { "value" "an object" } }
-{ $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs. Literal hashtables are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs. Literal hashtables are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
 HELP: HS{
 { $syntax "HS{ members ... }" }
 { $values { "members" "a list of objects" } }
-{ $description "Marks the beginning of a literal hash set, given as a list of its members. Literal hashtables are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal hash set, given as a list of its members. Literal hashtables are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "HS{ 3 \"foo\" }" } } ;
 
 HELP: C{
 { $syntax "C{ real-part imaginary-part }" }
 { $values { "real-part" "a real number" } { "imaginary-part" "a real number" } }
-{ $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
+{ $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." } ;
 
 HELP: T{
 { $syntax "T{ class }" "T{ class f slot-values... }" "T{ class { slot-name slot-value } ... }" }
@@ -453,7 +456,7 @@ HELP: SINGLETON:
 { $examples
     { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
 } ;
-    
+
 HELP: SINGLETONS:
 { $syntax "SINGLETONS: words... ;" }
 { $values { "words" "a sequence of new words to define" } }
@@ -478,7 +481,7 @@ HELP: CONSTANT:
 { $syntax "CONSTANT: word value" }
 { $values { "word" word } { "value" object } }
 { $description "Creates a word which pushes a value on the stack." }
-{ $examples { $code "CONSTANT: magic 1" "CONSTANT: science HEX: ff0f" } } ;
+{ $examples { $code "CONSTANT: magic 1" "CONSTANT: science 0xff0f" } } ;
 
 { define-constant POSTPONE: CONSTANT: } related-words
 
@@ -533,13 +536,14 @@ HELP: QUALIFIED:
 { $examples { $example
     "USING: prettyprint ;"
     "QUALIFIED: math"
-    "1 2 math:+ ." "3"
+    "1 2 math:+ ."
+    "3"
 } } ;
 
 HELP: QUALIFIED-WITH:
 { $syntax "QUALIFIED-WITH: vocab word-prefix" }
 { $description "Like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
-{ $examples { $code
+{ $examples { $example
     "USING: prettyprint ;"
     "QUALIFIED-WITH: math m"
     "1 2 m:+ ."
@@ -559,7 +563,7 @@ HELP: FROM:
 
 HELP: EXCLUDE:
 { $syntax "EXCLUDE: vocab => words ... ;" }
-{ $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } "  to the search path." }
+{ $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } " to the search path." }
 { $examples { $code
     "EXCLUDE: math.parser => bin> hex> ;" "! imports everything but bin> and hex>" } } ;
 
@@ -624,13 +628,7 @@ HELP: P"
 HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "A stack effect declaration. This is treated as a comment unless it appears inside a word definition." }
-{ $see-also "effects" } ;
-
-HELP: ((
-{ $syntax "(( inputs -- outputs ))" }
-{ $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "Literal stack effect syntax." }
+{ $description "Literal stack effect syntax.  Also used by syntax words (such as " { $link POSTPONE: : } "), typically declaring the stack effect of the word definition which follows." }
 { $notes "Useful for meta-programming with " { $link define-declared } "." }
 { $examples
     { $example
@@ -641,13 +639,15 @@ HELP: ((
         ""
         "["
         "    my-dynamic-word 2 { [ + ] [ * ] } random curry"
-        "    (( x -- y )) define-declared"
+        "    ( x -- y ) define-declared"
         "] with-compilation-unit"
         ""
         "2 my-dynamic-word ."
         "4"
     }
-} ;
+}
+{ $see-also "effects" }
+;
 
 HELP: !
 { $syntax "! comment..." }
@@ -657,30 +657,16 @@ HELP: !
 { POSTPONE: ! POSTPONE: #! } related-words
 
 HELP: #!
-{ $syntax "#! comment..." }
+{ $syntax "#!comment..." }
 { $values { "comment" "characters" } }
-{ $description "Discards all input until the end of the line." } ;
-
-HELP: HEX:
-{ $syntax "HEX: NNN" "HEX: NNN.NNNpEEE" }
-{ $values { "N" "hexadecimal digit (0-9, a-f, A-F)" } { "pEEE" "decimal exponent value" } }
-{ $description "Adds an integer or floating-point value read from a hexadecimal literal to the parse tree." }
-{ $examples
-    { $example "USE: prettyprint" "HEX: ff ." "255" }
-    { $example "USE: prettyprint" "HEX: 1.8p5 ." "48.0" }
-} ;
-
-HELP: OCT:
-{ $syntax "OCT: integer" }
-{ $values { "integer" "octal digits (0-7)" } }
-{ $description "Adds an integer read from an octal literal to the parse tree." }
-{ $examples { $example "USE: prettyprint" "OCT: 31337 ." "13023" } } ;
-
-HELP: BIN:
-{ $syntax "BIN: integer" }
-{ $values { "integer" "binary digits (0 and 1)" } }
-{ $description "Adds an integer read from an binary literal to the parse tree." }
-{ $examples { $example "USE: prettyprint" "BIN: 100 ." "4" } } ;
+{ $description "Discards all input until the end of the line." }
+{ $notes "To allow Unix-style \"shebang\" scripts to work as expected, " { $snippet "#!" } " is parsed as a separate token regardless of following whitespace if it appears at the beginning of a line."
+{ $example
+    "#!/usr/bin/env/factor"
+    "USING: io ;"
+    "\"Hello world\" print"
+    "Hello world"
+} } ;
 
 HELP: NAN:
 { $syntax "NAN: payload" }
@@ -715,7 +701,7 @@ HELP: MATH:
 { $description "Defines a new generic word which uses the " { $link math-combination } " method combination." } ;
 
 HELP: HOOK:
-{ $syntax "HOOK: word variable ( stack -- effect ) " }
+{ $syntax "HOOK: word variable ( stack -- effect )" }
 { $values { "word" "a new word to define" } { "variable" word } }
 { $description "Defines a new hook word in the current vocabulary. Hook words are generic words which dispatch on the value of a variable, so methods are defined with " { $link POSTPONE: M: } ". Hook words differ from other generic words in that the dispatch value is removed from the stack before the chosen method is called." }
 { $examples
@@ -727,7 +713,7 @@ HELP: HOOK:
         "TUPLE: air-transport ;"
         "HOOK: deliver transport ( destination -- )"
         "M: land-transport deliver \"Land delivery to \" write print ;"
-        "M: air-transport deliver \"Air delivery to \"  write print ;"
+        "M: air-transport deliver \"Air delivery to \" write print ;"
         "T{ air-transport } transport set"
         "\"New York City\" deliver"
         "Air delivery to New York City"
@@ -849,7 +835,7 @@ HELP: C:
     "The following two lines are equivalent:"
     { $code
         "C: <color> color"
-        ": <color> color boa ;"
+        ": <color> ( red green blue -- color ) color boa ;"
     }
     "In both cases, a word " { $snippet "<color>" } " is defined, which reads three values from the stack and creates a " { $snippet "color" } " instance having these values in the " { $snippet "red" } ", " { $snippet "green" } " and " { $snippet "blue" } " slots, respectively."
 } ;
@@ -857,7 +843,7 @@ HELP: C:
 HELP: MAIN:
 { $syntax "MAIN: word" }
 { $values { "word" word } }
-{ $description "Defines the main entry point for the current vocabulary. This word will be executed when this vocabulary is passed to " { $link run } "." } ;
+{ $description "Defines the main entry point for the current vocabulary and source file. This word will be executed when this vocabulary is passed to " { $link run } " or the source file is passed to " { $link run-script } "." } ;
 
 HELP: <PRIVATE
 { $syntax "<PRIVATE ... PRIVATE>" }

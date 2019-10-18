@@ -1,5 +1,7 @@
 USING: accessors assocs classes.mixin classes.tuple
-classes.tuple.parser compiler.units fry kernel sequences mongodb.driver
+classes.tuple.parser compiler.units fry kernel sequences
+hashtables
+mongodb.driver
 mongodb.msg mongodb.tuple.collection 
 mongodb.tuple.persistent mongodb.tuple.state strings ;
 FROM: mongodb.driver => update delete find count ;
@@ -38,12 +40,14 @@ SYNTAX: MDBTUPLE:
     [ drop-table ] 
     [ ensure-table ] bi ;
 
+DEFER: tuple>query
+
 <PRIVATE
 
 GENERIC: id-selector ( object -- selector )
 
 M: toid id-selector
-   [ value>> ] [ key>> ] bi H{ } clone [ set-at ] keep ; inline
+   [ value>> ] [ key>> ] bi associate ; inline
 
 M: mdb-persistent id-selector
    >toid id-selector ;
@@ -52,6 +56,10 @@ M: mdb-persistent id-selector
    swap '[ [ _ ] 2dip
            [ id-selector ] dip
            <update> >upsert update ] assoc-each ; inline
+
+: prepare-tuple-query ( tuple/query -- query )
+    dup mdb-query-msg? [ tuple>query ] unless ;
+
 PRIVATE>
  
 : save-tuple-deep ( tuple -- )
@@ -83,12 +91,16 @@ PRIVATE>
    tuple>selector <query> ;
 
 : select-tuple ( tuple/query -- tuple/f )
-   dup mdb-query-msg? [ tuple>query ] unless
+   prepare-tuple-query
    find-one [ assoc>tuple ] [ f ] if* ;
 
 : select-tuples ( tuple/query -- cursor tuples/f )
-   dup mdb-query-msg? [ tuple>query ] unless
+   prepare-tuple-query
    find [ assoc>tuple ] map ;
+
+: select-all-tuples ( tuple/query -- tuples )
+   prepare-tuple-query
+   find-all [ assoc>tuple ] map ;
 
 : count-tuples ( tuple/query -- n )
    dup mdb-query-msg? [ tuple>query ] unless count ;

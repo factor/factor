@@ -24,7 +24,7 @@ icons [ H{ } clone ] initialize
         define
     ] 2bi ;
 
-SYNTAX: ICON: scan-word scan define-icon ;
+SYNTAX: ICON: scan-word scan-token define-icon ;
 
 >>
 

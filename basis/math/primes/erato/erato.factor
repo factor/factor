@@ -28,7 +28,7 @@ CONSTANT: masks B{ 0 128 0 0 0 0 0 64 0 0 0 32 0 16 0 0 0 8 0 4 0 0 0 2 0 0 0 0 
         2drop
     ] if ;
 
-: init-sieve ( n -- arr ) 29 + 30 /i 255 <array> >byte-array ;
+: init-sieve ( n -- arr ) 30 /i 1 + 255 <array> >byte-array ;
 
 PRIVATE>
 

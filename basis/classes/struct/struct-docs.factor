@@ -55,11 +55,22 @@ HELP: UNION-STRUCT:
 { $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
 { $description "Defines a new " { $link struct } " type where all of the slots share the same storage. See " { $link POSTPONE: STRUCT: } " for details on the syntax." } ;
 
+HELP: PACKED-STRUCT:
+{ $syntax "PACKED-STRUCT: class { slot type } { slot type } ... ;" }
+{ $values { "class" "a new " { $link struct } " class to define" } { "slots" "a list of slot specifiers" } }
+{ $description "Defines a new " { $link struct } " type with no alignment padding between slots or at the end. In all other respects, behaves like " { $link POSTPONE: STRUCT: } "." } ;
+
 HELP: define-struct-class
 { $values
     { "class" class } { "slots" "a sequence of " { $link struct-slot-spec } "s" }
 }
 { $description "Defines a new " { $link struct } " class. This is the runtime equivalent of the " { $link POSTPONE: STRUCT: } " syntax." } ;
+
+HELP: define-packed-struct-class
+{ $values
+    { "class" class } { "slots" "a sequence of " { $link struct-slot-spec } "s" }
+}
+{ $description "Defines a new " { $link struct } " class. This is the runtime equivalent of the " { $link POSTPONE: PACKED-STRUCT: } " syntax." } ;
 
 HELP: define-union-struct-class
 { $values
@@ -88,6 +99,10 @@ HELP: memory>struct
 }
 { $description "Constructs a new " { $link struct } " of the specified " { $snippet "class" } " at the memory location referenced by " { $snippet "ptr" } ". The referenced memory is unchanged." } ;
 
+HELP: read-struct
+{ $values { "class" class } { "struct" struct } }
+{ $description "Reads a new " { $link struct } " of the specified " { $snippet "class" } "." } ;
+
 HELP: struct
 { $class-description "The parent class of all struct types." } ;
 
@@ -110,18 +125,18 @@ ARTICLE: "classes.struct.examples" "Struct class examples"
 { $code "test-struct <struct> ." }
 "Creating a new instance with slots initialized from the stack:"
 { $code
-    "USING: libc specialized-arrays ;"
+    "USING: libc specialized-arrays alien.data ;"
     "SPECIALIZED-ARRAY: char"
     ""
     "42"
-    "\"Hello, chicken.\" >char-array"
+    "\"Hello, chicken.\" char >c-array"
     "1024 malloc"
     "test-struct <struct-boa> ."
 } ;
 
 ARTICLE: "classes.struct.define" "Defining struct classes"
 "Struct classes are defined using a syntax similar to the " { $link POSTPONE: TUPLE: } " syntax for defining tuple classes:"
-{ $subsections POSTPONE: STRUCT: }
+{ $subsections POSTPONE: STRUCT: POSTPONE: PACKED-STRUCT: }
 "Union structs are also supported, which behave like structs but share the same memory for all the slots."
 { $subsections POSTPONE: UNION-STRUCT: } ;
 

@@ -61,9 +61,9 @@ ERROR: bad-math-inverse ;
 
 : undo-literal ( object -- quot ) [ =/fail ] curry ;
 
-PREDICATE: normal-inverse < word "inverse" word-prop ;
-PREDICATE: math-inverse < word "math-inverse" word-prop ;
-PREDICATE: pop-inverse < word "pop-length" word-prop ;
+PREDICATE: normal-inverse < word "inverse" word-prop >boolean ;
+PREDICATE: math-inverse < word "math-inverse" word-prop >boolean ;
+PREDICATE: pop-inverse < word "pop-length" word-prop >boolean ;
 UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : enough? ( stack word -- ? )
@@ -156,7 +156,7 @@ MACRO: undo ( quot -- ) [undo] ;
 \ undo 1 [ ] define-pop-inverse
 \ map 1 [ [undo] '[ dup sequence? assure _ map ] ] define-pop-inverse
 
-\ exp \ log define-dual
+\ e^ \ log define-dual
 \ sq \ sqrt define-dual
 
 ERROR: missing-literal ;
@@ -225,7 +225,7 @@ DEFER: __
 \ prepend 1 [ [ ?head assure ] curry ] define-pop-inverse
 
 : assure-same-class ( obj1 obj2 -- )
-    [ class ] bi@ = assure ; inline
+    [ class-of ] same? assure ; inline
 
 \ output>sequence 2 [ [undo] '[ dup _ assure-same-class _ input<sequence ] ] define-pop-inverse
 \ input<sequence 1 [ [undo] '[ _ { } output>sequence ] ] define-pop-inverse
@@ -244,7 +244,7 @@ DEFER: __
 
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )
-    "predicate" word-prop [ dupd call assure ] curry ;
+    predicate-def [ dupd call assure ] curry ;
 
 : slot-readers ( class -- quot )
     all-slots [ name>> reader-word 1quotation ] map [ cleave ] curry ;

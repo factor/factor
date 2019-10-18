@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.directories.unix kernel system unix
-classes.struct unix.ffi ;
+USING: alien.c-types alien.data io.directories.unix kernel
+system unix classes.struct unix.ffi ;
 IN: io.directories.unix.linux
 
 M: linux find-next-file ( DIR* -- dirent )
     dirent <struct>
-    f <void*>
+    f void* <ref>
     [ [ readdir64_r ] unix-system-call 0 = [ (io-error) ] unless ] 2keep
-    *void* [ drop f ] unless ;
+    void* deref [ drop f ] unless ;

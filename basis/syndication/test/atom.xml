@@ -7,6 +7,7 @@
      </subtitle>
      <updated>2005-07-31T12:29:29Z</updated>
      <id>tag:example.org,2003:3</id>
+     <link rel="hub" href="https://pubsubhubbub.example.org/"/>
      <link rel="alternate" type="text/html"
       hreflang="en" href="http://example.org/"/>
      <link rel="self" type="application/atom+xml"

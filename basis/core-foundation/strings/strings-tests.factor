@@ -12,4 +12,4 @@ IN: core-foundation
 [ "\0" ] [ "\0" <CFString> [ CF>string ] [ CFRelease ] bi ] unit-test
 
 ! This shouldn't fail
-[ ] [ { HEX: 123456 } >string <CFString> CFRelease ] unit-test
+[ ] [ { 0x123456 } >string <CFString> CFRelease ] unit-test

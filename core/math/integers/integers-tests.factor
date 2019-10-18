@@ -1,9 +1,11 @@
 USING: kernel math math.functions math.order namespaces
 prettyprint math.private continuations tools.test sequences
-random ;
+random prettyprint.config ;
 IN: math.integers.tests
 
-[ "-8" ] [ -8 unparse ] unit-test
+10 number-base [
+    [ "-8" ] [ -8 unparse ] unit-test
+] with-variable
 
 [ t ] [ 0 fixnum? ] unit-test
 [ t ] [ 31415 number? ] unit-test
@@ -34,29 +36,31 @@ IN: math.integers.tests
 
 [ -10000000001981284352 ] [
     -10000000000000000000
-    HEX: -100000000 bitand
+    -0x100000000 bitand
 ] unit-test
 
 [ 9999999997686317056 ] [
     10000000000000000000
-    HEX: -100000000 bitand
+    -0x100000000 bitand
 ] unit-test
 
 [ 4294967296 ] [
     -10000000000000000000
-    HEX: 100000000 bitand
+    0x100000000 bitand
 ] unit-test
 
 [ 0 ] [
     10000000000000000000
-    HEX: 100000000 bitand
+    0x100000000 bitand
 ] unit-test
 
 [ -1 ] [ -1 >bignum >fixnum ] unit-test
 
-[ "8589934592" ]
-[ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
-unit-test
+10 number-base [
+    [ "8589934592" ]
+    [ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
+    unit-test
+] with-variable
 
 [ 7 ] [ 255 log2 ] unit-test
 [ 8 ] [ 256 log2 ] unit-test
@@ -68,29 +72,29 @@ unit-test
 [ 8 ] [ 257 >bignum log2 ] unit-test
 [ 0 ] [ 1   >bignum log2 ] unit-test
 
-[ t ] [ BIN: 1101 0 bit? ] unit-test
-[ f ] [ BIN: 1101 1 bit? ] unit-test
-[ t ] [ BIN: 1101 2 bit? ] unit-test
-[ t ] [ BIN: 1101 3 bit? ] unit-test
-[ f ] [ BIN: 1101 4 bit? ] unit-test
+[ t ] [ 0b1101 0 bit? ] unit-test
+[ f ] [ 0b1101 1 bit? ] unit-test
+[ t ] [ 0b1101 2 bit? ] unit-test
+[ t ] [ 0b1101 3 bit? ] unit-test
+[ f ] [ 0b1101 4 bit? ] unit-test
 
-[ t ] [ BIN: 1101 >bignum 0 bit? ] unit-test
-[ f ] [ BIN: 1101 >bignum 1 bit? ] unit-test
-[ t ] [ BIN: 1101 >bignum 2 bit? ] unit-test
-[ t ] [ BIN: 1101 >bignum 3 bit? ] unit-test
-[ f ] [ BIN: 1101 >bignum 4 bit? ] unit-test
+[ t ] [ 0b1101 >bignum 0 bit? ] unit-test
+[ f ] [ 0b1101 >bignum 1 bit? ] unit-test
+[ t ] [ 0b1101 >bignum 2 bit? ] unit-test
+[ t ] [ 0b1101 >bignum 3 bit? ] unit-test
+[ f ] [ 0b1101 >bignum 4 bit? ] unit-test
 
-[ t ] [ BIN: -1101 0 bit? ] unit-test
-[ t ] [ BIN: -1101 1 bit? ] unit-test
-[ f ] [ BIN: -1101 2 bit? ] unit-test
-[ f ] [ BIN: -1101 3 bit? ] unit-test
-[ t ] [ BIN: -1101 4 bit? ] unit-test
+[ t ] [ -0b1101 0 bit? ] unit-test
+[ t ] [ -0b1101 1 bit? ] unit-test
+[ f ] [ -0b1101 2 bit? ] unit-test
+[ f ] [ -0b1101 3 bit? ] unit-test
+[ t ] [ -0b1101 4 bit? ] unit-test
 
-[ t ] [ BIN: -1101 >bignum 0 bit? ] unit-test
-[ t ] [ BIN: -1101 >bignum 1 bit? ] unit-test
-[ f ] [ BIN: -1101 >bignum 2 bit? ] unit-test
-[ f ] [ BIN: -1101 >bignum 3 bit? ] unit-test
-[ t ] [ BIN: -1101 >bignum 4 bit? ] unit-test
+[ t ] [ -0b1101 >bignum 0 bit? ] unit-test
+[ t ] [ -0b1101 >bignum 1 bit? ] unit-test
+[ f ] [ -0b1101 >bignum 2 bit? ] unit-test
+[ f ] [ -0b1101 >bignum 3 bit? ] unit-test
+[ t ] [ -0b1101 >bignum 4 bit? ] unit-test
 
 [ t ] [ 1067811677921310779 >bignum 59 bit? ] unit-test
 
@@ -181,18 +185,6 @@ unit-test
 [ 14 ] [ 13 2 align ] unit-test
 [ 11 ] [ 11 1 align ] unit-test
 
-[ HEX: 332211 ] [
-    B{ HEX: 11 HEX: 22 HEX: 33 } byte-array>bignum
-] unit-test
-
-[ HEX: 7a2c793b2ff08554 ] [
-    B{ HEX: 54 HEX: 85 HEX: f0 HEX: 2f HEX: 3b HEX: 79 HEX: 2c HEX: 7a } byte-array>bignum
-] unit-test
-
-[ HEX: 988a259c3433f237 ] [
-    B{ HEX: 37 HEX: f2 HEX: 33 HEX: 34 HEX: 9c HEX: 25 HEX: 8a HEX: 98 } byte-array>bignum
-] unit-test
-
 [ t ] [ 256 power-of-2? ] unit-test
 [ f ] [ 123 power-of-2? ] unit-test
 
@@ -211,13 +203,13 @@ unit-test
 [ -1. ] [ 2000 2^ neg 2000 2^ 1 + ratio>float ] unit-test
 [ 0.4 ] [ 6 15 ratio>float ] unit-test
 
-[ HEX: 3fe553522d230931 ]
+[ 0x3fe553522d230931 ]
 [ 61967020039 92984792073 ratio>float double>bits ] unit-test
 
 : random-integer ( -- n )
     32 random-bits
-    1 random zero? [ neg ] when
-    1 random zero? [ >bignum ] when ;
+    { t f } random [ neg ] when
+    { t f } random [ >bignum ] when ;
 
 [ t ] [
     10000 [
@@ -229,8 +221,46 @@ unit-test
 ] unit-test
 
 ! Ensure that /f is accurate for fixnums > 2^53 on 64-bit platforms
-[ HEX: 1.758bec11492f9p-54 ] [ 1 12345678901234567 /f ] unit-test
-[ HEX: -1.758bec11492f9p-54 ] [ 1 -12345678901234567 /f ] unit-test
+[ 0x1.758bec11492f9p-54 ] [ 1 12345678901234567 /f ] unit-test
+[ -0x1.758bec11492f9p-54 ] [ 1 -12345678901234567 /f ] unit-test
+
+! Ensure that /f rounds to nearest and not to zero
+[ 0x1.0p55 ] [ 0x7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
+[ 0x1.0p55 ] [ -0x7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
+[ -0x1.0p55 ] [ -0x7f,ffff,ffff,ffff >bignum 1 /f ] unit-test
+[ -0x1.0p55 ] [ 0x7f,ffff,ffff,ffff >bignum -1 /f ] unit-test
+
+[ 0x1.0000,0000,0000,0p56 ] [ 0x100,0000,0000,0007 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p56 ] [ -0x100,0000,0000,0007 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p120 ] [ 0x100,0000,0000,0007,FFFF,FFFF,FFFF,FFFF >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p120 ] [ -0x100,0000,0000,0007,FFFF,FFFF,FFFF,FFFF >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p56 ] [ 0x100,0000,0000,0008 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,0p56 ] [ -0x100,0000,0000,0008 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p56 ] [ 0x100,0000,0000,0009 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p56 ] [ -0x100,0000,0000,0009 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p120 ] [ 0x100,0000,0000,0008,0000,0000,0000,0001 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p120 ] [ -0x100,0000,0000,0008,0000,0000,0000,0001 >bignum -1 /f ] unit-test
+
+! Ensure that /f rounds to even on tie
+[ 0x1.0000,0000,0000,1p56 ] [ 0x100,0000,0000,0017 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p56 ] [ -0x100,0000,0000,0017 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p120 ] [ 0x100,0000,0000,0017,FFFF,FFFF,FFFF,FFFF >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,1p120 ] [ -0x100,0000,0000,0017,FFFF,FFFF,FFFF,FFFF >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p56 ] [ 0x100,0000,0000,0018 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p56 ] [ -0x100,0000,0000,0018 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p56 ] [ 0x100,0000,0000,0019 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p56 ] [ -0x100,0000,0000,0019 >bignum -1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p120 ] [ 0x100,0000,0000,0018,0000,0000,0000,0001 >bignum 1 /f ] unit-test
+[ 0x1.0000,0000,0000,2p120 ] [ -0x100,0000,0000,0018,0000,0000,0000,0001 >bignum -1 /f ] unit-test
 
 [ 17 ] [ 17 >bignum 5 max ] unit-test
 [ 5 ] [ 17 >bignum 5 min ] unit-test
+
+[ 1 ] [ 1 202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784 /f double>bits ] unit-test
+[ 12 ] [ 3 50600563326827654588123836679729326762389162441035529589225339506857584891998836722990095925359281123796769466079202977847452184346448369216753349985184627480379356069141590341116726935523304085309941919618186267140501870856173174654525838912289889085202514128089692388083353653807625633046581877161501565826926935273373696 /f double>bits ] unit-test
+[ 123 ] [ 123 202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784 /f double>bits ] unit-test
+[ 1234 ] [ 617 101201126653655309176247673359458653524778324882071059178450679013715169783997673445980191850718562247593538932158405955694904368692896738433506699970369254960758712138283180682233453871046608170619883839236372534281003741712346349309051677824579778170405028256179384776166707307615251266093163754323003131653853870546747392 /f double>bits ] unit-test
+[ 1/0. ] [ 2048 2^ 1 /f ] unit-test
+[ -1/0. ] [ 2048 2^ -1 /f ] unit-test
+[ -1/0. ] [ 2048 2^ neg 1 /f ] unit-test
+[ 1/0. ] [ 2048 2^ neg -1 /f ] unit-test

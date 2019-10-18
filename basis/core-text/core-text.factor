@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.data alien.syntax kernel
 destructors accessors fry words hashtables strings sequences
-memoize assocs math math.order math.vectors math.rectangles
+memoize assocs make math math.order math.vectors math.rectangles
 math.functions locals init namespaces combinators fonts colors
 cache core-foundation core-foundation.strings
 core-foundation.attributed-strings core-foundation.utilities
@@ -34,20 +34,26 @@ FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
 
 ERROR: not-a-string object ;
 
+MEMO: make-attributes ( open-font color -- hashtable )
+    [
+        kCTForegroundColorAttributeName ,,
+        kCTFontAttributeName ,,
+    ] H{ } make ;
+
 : <CTLine> ( string open-font color -- line )
     [
         [
             dup selection? [ string>> ] when
             dup string? [ not-a-string ] unless
         ] 2dip
-        [
-            kCTForegroundColorAttributeName set
-            kCTFontAttributeName set
-        ] H{ } make-assoc <CFAttributedString> &CFRelease
+        make-attributes <CFAttributedString> &CFRelease
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line < disposable line metrics image loc dim ;
+TUPLE: line < disposable line metrics image loc dim rendered-line ;
+
+TUPLE: rendered-line font string loc dim ;
+C: <rendered-line> rendered-line
 
 : typographic-bounds ( line -- width ascent descent leading )
     { CGFloat CGFloat CGFloat }
@@ -118,7 +124,6 @@ TUPLE: line < disposable line metrics image loc dim ;
         line line-rect :> rect
         rect origin>> CGPoint>loc :> (loc)
         rect size>> CGSize>dim :> (dim)
-        (loc) (dim) v+ :> (ext)
         (loc) [ floor ] map :> loc
         (loc) (dim) [ + ceiling ] 2map :> ext
         ext loc [ - >integer 1 max ] 2map :> dim
@@ -126,27 +131,39 @@ TUPLE: line < disposable line metrics image loc dim ;
 
         line >>line
 
-        metrics >>metrics
+        font string loc dim <rendered-line> >>rendered-line
 
-        dim [
-            {
-                [ font dim fill-background ]
-                [ loc dim line string fill-selection-background ]
-                [ loc set-text-position ]
-                [ [ line ] dip CTLineDraw ]
-            } cleave
-        ] make-bitmap-image >>image
+        metrics >>metrics
 
         metrics loc dim line-loc >>loc
 
         metrics metrics>dim >>dim
     ] with-destructors ;
 
+:: render ( line -- line image )
+    line line>> :> ctline
+    line rendered-line>> string>> :> string
+    line rendered-line>> font>> :> font
+    line rendered-line>> loc>> :> loc
+    line rendered-line>> dim>> :> dim
+
+    line dim [
+        {
+            [ font dim fill-background ]
+            [ loc dim ctline string fill-selection-background ]
+            [ loc set-text-position ]
+            [ [ ctline ] dip CTLineDraw ]
+        } cleave
+    ] make-bitmap-image ;
+
+: line>image ( line -- image )
+    dup image>> [ render >>image ] unless image>> ;
+
 M: line dispose* line>> CFRelease ;
 
 SYMBOL: cached-lines
 
 : cached-line ( font string -- line )
-    cached-lines get [ <line> ] 2cache ;
+    cached-lines get-global [ <line> ] 2cache ;
 
 [ <cache-assoc> cached-lines set-global ] "core-text" add-startup-hook

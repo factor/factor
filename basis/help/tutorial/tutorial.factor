@@ -22,9 +22,11 @@ $nl
 "You are now ready to go on to the next section: " { $link "first-program-logic" } "." ;
 
 ARTICLE: "first-program-logic" "Writing some logic in your first program"
+"The Factor workflow is to edit source code on disk and then to refresh the live image. Let's examine the file that we just created with the scaffold tool."
+$nl
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
-    "! Copyright (C) 2009 <your name here>"
+    "! Copyright (C) 2011 <your name here>"
     "! See http://factorcode.org/license.txt for BSD license."
     "USING: ;"
     "IN: palindrome"
@@ -60,7 +62,7 @@ $nl
 ARTICLE: "first-program-test" "Testing your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
 { $code
-    "! Copyright (C) 2009 <your name here>"
+    "! Copyright (C) 2011 <your name here>"
     "! See http://factorcode.org/license.txt for BSD license."
     "USING: kernel sequences ;"
     "IN: palindrome"
@@ -102,7 +104,7 @@ $nl
 "For example, we'd like it to identify the following as a palindrome:"
 { $code "\"A man, a plan, a canal: Panama.\"" }
 "However, right now, the simplistic algorithm we use says this is not a palindrome:"
-{ $unchecked-example "\"A man, a plan, a canal: Panama.\" palindrome?" "f" }
+{ $unchecked-example "\"A man, a plan, a canal: Panama.\" palindrome? ." "f" }
 "We would like it to output " { $link t } " there. We can encode this requirement with a unit test that we add to " { $snippet "palindrome-tests.factor" } ":"
 { $code "[ t ] [ \"A man, a plan, a canal: Panama.\" palindrome? ] unit-test" }
 "If you now run unit tests, you will see a unit test failure:"
@@ -127,7 +129,7 @@ $nl
 "Finally, pass the string and the quotation to the " { $link filter } " word:"
 { $code "filter" }
 "Now the stack should contain the following string:"
-{ "\"AmanaplanacanalPanama\"" }
+{ "\"AmanaplanacanalPanama\"" } ". "
 "This is almost what we want; we just need to convert the string to lower case now. This can be done by calling " { $link >lower } "; the " { $snippet ">" } " prefix is a naming convention for conversion operations, and should be read as “to”:"
 { $code ">lower" }
 "Finally, let's print the top of the stack and discard it:"

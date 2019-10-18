@@ -2,6 +2,7 @@ include vm/Config.unix
 CFLAGS += -fPIC
 
 PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o vm/mvm-unix.o
+PLAF_MASTER_HEADERS += vm/os-macosx.hpp vm/mach_signal.hpp
 
 DLL_EXTENSION = .dylib
 SHARED_DLL_EXTENSION = .dylib
@@ -14,10 +15,24 @@ else
 	LIBS = -lm -framework Cocoa -framework AppKit
 endif
 
-LINKER = $(CPP) $(CFLAGS) -dynamiclib -single_module -std=gnu99 \
+LINKER = $(CPP) $(CFLAGS) -dynamiclib -single_module \
 	-current_version $(VERSION) \
 	-compatibility_version $(VERSION) \
 	-fvisibility=hidden \
 	$(LIBS) $(LIBPATH) -o
 
 LINK_WITH_ENGINE = -lfactor
+
+LEOPARD_P := $(shell [[ `uname -r | sed -E -e 's/^([0-9]+).*/\1/'` -le 9 ]]; echo $$?)
+XCODE_4_P := $(shell [[ `xcodebuild -version | sed -E -ne 's/^Xcode ([0-9]+).([0-9]).*/\1\2/p'` -ge 43 ]]; echo $$?)
+
+ifeq ($(LEOPARD_P),0)
+	CC = gcc-4.2
+	CPP = g++-4.2
+endif
+
+ifeq ($(XCODE_4_P),0)
+	CC = clang
+	CPP = clang++
+endif
+

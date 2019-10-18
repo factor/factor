@@ -15,7 +15,7 @@ io.encodings.binary
 io.streams.limited
 io.streams.string
 io.streams.throwing
-io.servers.connection
+io.servers
 io.timeouts
 io.crlf
 fry logging logging.insomniac calendar urls urls.encoding
@@ -29,7 +29,8 @@ html.streams
 html
 mime.types
 math.order
-xml.writer ;
+xml.writer
+vocabs ;
 FROM: mime.multipart => parse-multipart ;
 IN: http.server
 
@@ -37,7 +38,8 @@ IN: http.server
     dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
 
 : read-request-line ( request -- request )
-    read-crlf parse-request-line first3
+    read-?crlf [ dup "" = ] [ drop read-?crlf ] while
+    parse-request-line first3
     [ >>method ] [ >url check-absolute >>url ] [ >>version ] tri* ;
 
 : read-request-header ( request -- request )
@@ -127,7 +129,7 @@ GENERIC: write-full-response ( request response -- )
     over unparse-content-type "content-type" pick set-at
     over cookies>> [
         ensure-domain unparse-set-cookie
-        "set-cookie" swap 2array over push
+        "set-cookie" swap 2array suffix!
     ] each
     write-header ;
 
@@ -271,7 +273,7 @@ SYMBOL: params
     ] [ [ \ do-request log-error ] [ <500> ] bi ] recover ;
 
 : ?refresh-all ( -- )
-    development? get-global [ global [ refresh-all ] bind ] when ;
+    development? get-global [ [ refresh-all ] with-global ] when ;
 
 LOG: httpd-benchmark DEBUG
 
@@ -298,7 +300,7 @@ M: http-server handle-client*
         "http" protocol-port >>insecure
         "https" protocol-port >>secure ;
 
-: httpd ( port -- )
+: httpd ( port -- http-server )
     <http-server>
         swap >>insecure
         f >>secure

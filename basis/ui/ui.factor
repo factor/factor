@@ -7,6 +7,7 @@ destructors dlists fry init kernel lexer make math namespaces
 parser sequences sets strings threads ui.backend ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures vocabs.parser
 words ;
+FROM: namespaces => change-global ;
 IN: ui
 
 <PRIVATE
@@ -113,13 +114,17 @@ M: world ungraft*
     dup hand-world get-global eq?
     [ hand-loc get-global swap move-hand ] [ drop ] if ;
 
-: layout-queued ( -- seq )
+: (layout-queued) ( deque -- seq )
     [
         in-layout? on
-        layout-queue [
+        [
             dup layout find-world [ , ] when*
         ] slurp-deque
-    ] { } make members ;
+    ] { } make members ; inline
+
+: layout-queued ( -- seq )
+    layout-queue dup deque-empty?
+    [ drop { } ] [ (layout-queued) ] if ;
 
 : redraw-worlds ( seq -- )
     [ dup update-hand draw-world ] each ;
@@ -141,7 +146,7 @@ SYMBOL: ui-thread
 
 PRIVATE>
 
-: find-window ( quot -- world )
+: find-window ( quot: ( world -- ? ) -- world )
     [ windows get values ] dip
     '[ dup children>> [ ] [ nip first ] if-empty @ ]
     find-last nip ; inline
@@ -170,7 +175,7 @@ PRIVATE>
     call( -- ) notify-ui-thread start-ui-thread ;
 
 : ?attributes ( gadget title/attributes -- attributes )
-    dup string? [ world-attributes new swap >>title ] [ clone ] if
+    dup string? [ <world-attributes> swap >>title ] [ clone ] if
     swap [ [ [ 1array ] [ f ] if* ] curry unless* ] curry change-gadgets ;
 
 PRIVATE>
@@ -221,11 +226,11 @@ HOOK: system-alert ui-backend ( caption text -- )
 
 : define-main-window ( word attributes quot -- )
     [
-        '[ [ f _ clone @ open-window ] with-ui ] (( -- )) define-declared
+        '[ [ f _ clone @ open-window ] with-ui ] ( -- ) define-declared
     ] [ 2drop current-vocab main<< ] 3bi ;
 
 SYNTAX: MAIN-WINDOW:
-    CREATE
+    scan-new-word
     world-attributes parse-main-window-attributes
     parse-definition
     define-main-window ;

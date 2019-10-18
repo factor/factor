@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup channels concurrency.distributed ;
+USING: channels concurrency.distributed help.markup help.syntax
+io.servers ;
 IN: channels.remote
 
 HELP: <remote-channel>
@@ -45,9 +46,9 @@ HELP: publish
 ARTICLE: { "remote-channels" "remote-channels" } "Remote Channels"
 "Remote channels are channels that can be accessed by other Factor instances. It uses distributed concurrency to serialize and send data between channels."
 $nl
-"To start a remote node, distributed concurrency must have been started. This can be done using " { $link start-node } "."
+"To start a remote node, distributed concurrency must have been started. This can be done using " { $link start-server } "."
 $nl
-{ $snippet "\"myhost.com\" 9001 start-node" } 
+{ $snippet "\"myhost.com\" 9001 start-server" } 
 $nl
 "Once the node is started, channels can be published using " { $link publish }
 " to be accessed remotely. " { $link publish } " returns an id which a remote node "

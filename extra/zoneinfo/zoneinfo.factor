@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators combinators.smart io.encodings.utf8 io.files
 kernel namespaces sequences splitting unicode.case accessors
-math.parser calendar ;
+math.parser calendar memoize fry ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -125,9 +125,23 @@ TUPLE: leap ;
     [ "\t " split harvest ] map harvest
     [ [ parse-line ] map ] with-scope ;
 
-: load-zoneinfo-files ( -- seq )
+MEMO: zoneinfo-files ( -- seq )
     zoneinfo-paths [ parse-zoneinfo-file ] map ;
+    
+GENERIC: zone-matches? ( string rule -- ? )
 
+M: raw-rule zone-matches? name>> = ;
+M: raw-zone zone-matches? name>> = ;
+M: raw-link zone-matches? from>> = ;
+M: raw-leap zone-matches? 2drop f ;
+
+: find-timezone-rules ( string -- seq )
+    [ zoneinfo-files ] dip '[
+        [ [ _ ] dip zone-matches? ] filter
+    ] map concat sift ;
+
+: find-applicable-rules ( string -- seq )
+    find-timezone-rules [ until>> empty? ] filter ;
 
 
 ! Rule

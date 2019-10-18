@@ -1,4 +1,5 @@
-USING: help.markup help.syntax strings words compiler.units ;
+USING: help.markup help.syntax strings words compiler.units
+vocabs.loader ;
 IN: vocabs
 
 ARTICLE: "vocabularies" "Vocabularies"
@@ -26,7 +27,7 @@ $nl
 }
 "Looking up existing vocabularies and creating new vocabularies:"
 { $subsections
-    vocab
+    lookup-vocab
     child-vocabs
     create-vocab
 }
@@ -50,7 +51,7 @@ HELP: vocabs
 { $values { "seq" "a sequence of strings" } }
 { $description "Outputs a sequence of all defined vocabulary names." } ;
 
-HELP: vocab
+HELP: lookup-vocab
 { $values { "vocab-spec" "a vocabulary specifier" } { "vocab" vocab } }
 { $description "Outputs a named vocabulary, or " { $link f } " if no vocabulary with this name exists." }
 { $class-description "Instances represent vocabularies." } ;
@@ -76,8 +77,13 @@ HELP: forget-vocab
 { $description "Removes a vocabulary. All words in the vocabulary are forgotten." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
-HELP: load-vocab-hook
-{ $var-description { $quotation "( name -- vocab )" } " which loads a vocabulary. This quotation is called by " { $link load-vocab } ". The default value should not need to be changed; this functinality is implemented via a hook stored in a variable to break a circular dependency which would otherwise exist from " { $vocab-link "vocabs" } " to " { $vocab-link "vocabs.loader" } " to " { $vocab-link "parser" } " back to " { $vocab-link "vocabs" } "." } ;
+HELP: require-hook
+{ $var-description { $quotation "( name -- )" } " which loads a vocabulary. This quotation is called by " { $link require } ". The default value should not need to be changed; this functionality is implemented via a hook stored in a variable to break a circular dependency which would otherwise exist from " { $vocab-link "vocabs" } " to " { $vocab-link "vocabs.loader" } " to " { $vocab-link "parser" } " back to " { $vocab-link "vocabs" } "." } ;
+
+HELP: require
+{ $values { "object" "a vocabulary specifier" } }
+{ $description "Loads a vocabulary if it has not already been loaded. Throws an error if the vocabulary does not exist on disk or in the dictionary." }
+{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "vocabs.refresh" } "." } ;
 
 HELP: words-named
 { $values { "str" string } { "seq" "a sequence of words" } }
@@ -93,7 +99,7 @@ HELP: child-vocabs
 { $examples
     { $unchecked-example
         "\"io.streams\" child-vocabs ."
-        "{\n    \"io.streams.c\"\n    \"io.streams.duplex\"\n    \"io.streams.lines\"\n    \"io.streams.nested\"\n    \"io.streams.plain\"\n    \"io.streams.string\"\n}"
+        "{ \"io.streams.c\" \"io.streams.duplex\" \"io.streams.lines\" \"io.streams.nested\" \"io.streams.plain\" \"io.streams.string\" }"
     }
 } ;
 

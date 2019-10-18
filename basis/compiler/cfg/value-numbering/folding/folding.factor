@@ -24,7 +24,7 @@ M: ##shl-imm binary-constant-fold* drop shift ;
 : binary-constant-fold ( insn -- insn' )
     [ dst>> ]
     [ [ src1>> vreg>integer ] [ src2>> ] [ ] tri binary-constant-fold* ] bi
-    \ ##load-integer new-insn ; inline
+    ##load-integer new-insn ; inline
 
 : unary-constant-fold? ( insn -- ? )
     src>> vreg>insn ##load-integer? ; inline
@@ -36,4 +36,4 @@ M: ##neg unary-constant-fold* drop neg ;
 
 : unary-constant-fold ( insn -- insn' )
     [ dst>> ] [ [ src>> vreg>integer ] [ ] bi unary-constant-fold* ] bi
-    \ ##load-integer new-insn ; inline
+    ##load-integer new-insn ; inline

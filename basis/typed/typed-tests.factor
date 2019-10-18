@@ -1,6 +1,7 @@
 USING: accessors effects eval kernel layouts math namespaces
 quotations tools.test typed words words.symbol combinators.short-circuit
-compiler.tree.debugger prettyprint definitions compiler.units sequences ;
+compiler.tree.debugger prettyprint definitions compiler.units sequences
+classes.intersection strings classes.union ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
@@ -52,7 +53,7 @@ TUPLE: unboxable2
 TYPED: unboxy ( in: unboxable -- out: unboxable2 )
     dup [ x>> ] [ y>> ] bi - unboxable2 boa ;
 
-[ (( in: fixnum in: fixnum -- out: fixnum out: fixnum out: fixnum )) ]
+[ ( in: fixnum in: fixnum -- out: fixnum out: fixnum out: fixnum ) ]
 [ \ unboxy "typed-word" word-prop stack-effect ] unit-test
 
 [ T{ unboxable2 { u T{ unboxable { x 12 } { y 3 } } } { xy 9 } } ]
@@ -161,3 +162,20 @@ TYPED: forget-fail ( a: forget-class -- ) drop ;
 [ ] [ [ \ forget-class forget ] with-compilation-unit ] unit-test
 
 [ ] [ [ \ forget-fail forget ] with-compilation-unit ] unit-test
+
+TYPED: typed-maybe ( x: maybe{ integer } -- ? ) >boolean ;
+
+[ f ] [ f typed-maybe ] unit-test
+[ t ] [ 30 typed-maybe ] unit-test
+[ 30.0 typed-maybe ] [ input-mismatch-error? ] must-fail-with
+
+TYPED: typed-union ( x: union{ integer string } -- ? ) >boolean ;
+
+[ t ] [ 3 typed-union ] unit-test
+[ t ] [ "asdf" typed-union ] unit-test
+[ 3.3 typed-union ] [ input-mismatch-error? ] must-fail-with
+
+TYPED: typed-intersection ( x: intersection{ integer bignum } -- ? ) >boolean ;
+
+[ t ] [ 5555555555555555555555555555555555555555555555555555 typed-intersection ] unit-test
+[ 0 typed-intersection ] [ input-mismatch-error? ] must-fail-with

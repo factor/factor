@@ -1,11 +1,11 @@
 USING: alien.syntax windows.types windows.directx.d3d9 windows.com.syntax
-windows.com windows.directx.d3dx9math windows.directx.d3d9types classes.struct
-windows.gdi32 ;
+windows.com windows.directx windows.directx.d3dx9math windows.directx.d3d9types
+classes.struct windows.gdi32 ;
 IN: windows.directx.d3dx9core
 
 LIBRARY: d3dx9
 
-CONSTANT: D3DX_VERSION HEX: 0902
+CONSTANT: D3DX_VERSION 0x0902
 CONSTANT: D3DX_SDK_VERSION 42
 
 FUNCTION: BOOL D3DXCheckVersion ( UINT D3DSdkVersion, UINT D3DXSdkVersion ) ;

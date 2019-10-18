@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order words combinators locals
-unicode.categories combinators.short-circuit sequences
-fry macros arrays assocs sets classes mirrors unicode.script
-unicode.data ;
+USING: accessors kernel math math.order words combinators
+combinators.smart combinators.short-circuit locals
+unicode.categories sequences fry macros arrays assocs sets
+classes unicode.script unicode.data ;
 FROM: ascii => ascii? ;
 FROM: sets => members ;
 IN: regexp.classes
@@ -96,7 +96,7 @@ M: hex-digit-class class-member? ( obj class -- ? )
 : java-blank? ( ch -- ? )
     {
         CHAR: \s CHAR: \t CHAR: \n
-        HEX: b HEX: 7 CHAR: \r
+        0xb 0x7 CHAR: \r
     } member? ;
 
 M: java-blank-class class-member? ( obj class -- ? )
@@ -148,7 +148,7 @@ DEFER: substitute
 : flatten ( seq class -- newseq )
     '[ dup _ instance? [ seq>> ] [ 1array ] if ] map concat ; inline
 
-:: seq>instance ( seq empty class -- instance )
+:: sequence>instance ( seq empty class -- instance )
     seq length {
         { 0 [ empty ] }
         { 1 [ seq first ] }
@@ -167,12 +167,22 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     [ or-class? ] partition
     class-partition boa ;
 
-: class-partition>seq ( class-partition -- seq )
-    make-mirror values concat ;
+: class-partition>sequence ( class-partition -- seq )
+    [
+        {
+            [ integers>> ]
+            [ not-integers>> ]
+            [ simples>> ]
+            [ not-simples>> ]
+            [ and>> ]
+            [ or>> ]
+            [ other>> ]
+        } cleave
+    ] output>array concat ;
 
 : repartition ( partition -- partition' )
     ! This could be made more efficient; only and and or are effected
-    class-partition>seq partition-classes ;
+    class-partition>sequence partition-classes ;
 
 : filter-not-integers ( partition -- partition' )
     dup
@@ -195,7 +205,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     [ t swap remove ] change-other
     dup contradiction?
     [ drop f ]
-    [ filter-not-integers class-partition>seq members t and-class seq>instance ] if ;
+    [ filter-not-integers class-partition>sequence members t and-class sequence>instance ] if ;
 
 : <and-class> ( seq -- class )
     dup and-class flatten partition-classes
@@ -226,7 +236,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     [ f swap remove ] change-other
     dup tautology?
     [ drop t ]
-    [ filter-integers class-partition>seq members f or-class seq>instance ] if ;
+    [ filter-integers class-partition>sequence members f or-class sequence>instance ] if ;
 
 : <or-class> ( seq -- class )
     dup or-class flatten partition-classes

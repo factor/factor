@@ -10,8 +10,9 @@ ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
 ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
-colors io.styles ;
+colors io.styles classes ;
 FROM: io.styles => foreground background ;
+FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < track
@@ -19,6 +20,7 @@ output current input last-line prototype scrolls?
 selection-color caret mark selecting? ;
 
 TUPLE: pane-stream pane ;
+INSTANCE: pane-stream output-stream
 
 C: <pane-stream> pane-stream
 
@@ -141,7 +143,18 @@ PRIVATE>
 
 : <pane> ( -- pane ) f pane new-pane ;
 
+GENERIC: gadget-alt-text ( gadget -- string )
+
+M: object gadget-alt-text
+    class-of name>> "( " " )" surround ;
+
 GENERIC: write-gadget ( gadget stream -- )
+
+M: object write-gadget
+    [ gadget-alt-text ] dip stream-write ;
+
+M: filter-writer write-gadget
+    stream>> write-gadget ;
 
 M: pane-stream write-gadget ( gadget pane-stream -- )
     pane>> current>> swap add-gadget drop ;
@@ -420,7 +433,16 @@ pane H{
     { T{ button-down f { S+ } 1 } [ select-to-caret ] }
     { T{ button-up f { S+ } 1 } [ end-selection ] }
     { T{ button-up } [ end-selection ] }
-    { T{ drag } [ extend-selection ] }
+    { T{ drag { # 1 } } [ extend-selection ] }
     { copy-action [ com-copy ] }
     { T{ button-down f f 3 } [ pane-menu ] }
 } set-gestures
+
+GENERIC: content-gadget ( object -- gadget/f )
+M: object content-gadget drop f ;
+
+M: string content-gadget
+    '[ _ write ] make-pane <scroller>
+        { 450 100 } >>pref-dim
+    <wrapper> ;
+

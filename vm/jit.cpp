@@ -4,7 +4,6 @@ namespace factor
 {
 
 /* Simple code generator used by:
-- profiler (profiler.cpp),
 - quotation compiler (quotations.cpp),
 - megamorphic caches (dispatch.cpp),
 - polymorphic inline caches (inline_cache.cpp) */
@@ -21,19 +20,30 @@ jit::jit(code_block_type type_, cell owner_, factor_vm *vm)
 	  position(0),
 	  offset(0),
 	  parent(vm)
-{}
-
-void jit::emit_relocation(cell code_template_)
 {
-	data_root<array> code_template(code_template_,parent);
-	cell capacity = array_capacity(code_template.untagged());
-	for(cell i = 1; i < capacity; i += 3)
-	{
-		relocation_class rel_class = (relocation_class)untag_fixnum(array_nth(code_template.untagged(),i));
-		relocation_type rel_type = (relocation_type)untag_fixnum(array_nth(code_template.untagged(),i + 1));
-		cell offset = array_nth(code_template.untagged(),i + 2);
+	fixnum old_count = atomic::fetch_add(&parent->current_jit_count, 1);
+	FACTOR_ASSERT(old_count >= 0);
+	(void)old_count;
+}
 
-		relocation_entry new_entry(rel_type,rel_class,code.count + untag_fixnum(offset));
+jit::~jit()
+{
+	fixnum old_count = atomic::fetch_subtract(&parent->current_jit_count, 1);
+	FACTOR_ASSERT(old_count >= 1);
+	(void)old_count;
+}
+
+void jit::emit_relocation(cell relocation_template_)
+{
+	data_root<byte_array> relocation_template(relocation_template_,parent);
+	cell capacity = array_capacity(relocation_template.untagged())
+		/ sizeof(relocation_entry);
+	relocation_entry *relocations = relocation_template->data<relocation_entry>();
+	for(cell i = 0; i < capacity; i++)
+	{
+		relocation_entry entry = relocations[i];
+		relocation_entry new_entry(entry.rel_type(), entry.rel_class(),
+			entry.rel_offset() + code.count);
 		relocation.append_bytes(&new_entry,sizeof(relocation_entry));
 	}
 }
@@ -43,9 +53,9 @@ void jit::emit(cell code_template_)
 {
 	data_root<array> code_template(code_template_,parent);
 
-	emit_relocation(code_template.value());
+	emit_relocation(array_nth(code_template.untagged(),0));
 
-	data_root<byte_array> insns(array_nth(code_template.untagged(),0),parent);
+	data_root<byte_array> insns(array_nth(code_template.untagged(),1),parent);
 
 	if(computing_offset_p)
 	{
@@ -68,6 +78,7 @@ void jit::emit(cell code_template_)
 	code.append_byte_array(insns.value());
 }
 
+/* Allocates memory */
 void jit::emit_with_literal(cell code_template_, cell argument_) {
 	data_root<array> code_template(code_template_,parent);
 	data_root<object> argument(argument_,parent);
@@ -75,6 +86,7 @@ void jit::emit_with_literal(cell code_template_, cell argument_) {
 	emit(code_template.value());
 }
 
+/* Allocates memory */
 void jit::emit_with_parameter(cell code_template_, cell argument_) {
 	data_root<array> code_template(code_template_,parent);
 	data_root<object> argument(argument_,parent);
@@ -82,6 +94,7 @@ void jit::emit_with_parameter(cell code_template_, cell argument_) {
 	emit(code_template.value());
 }
 
+/* Allocates memory */
 bool jit::emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p)
 {
 	data_root<word> word(word_,parent);
@@ -89,6 +102,7 @@ bool jit::emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p)
 	parameters.append(untag<array>(array_nth(code_template.untagged(),0)));
 	literals.append(untag<array>(array_nth(code_template.untagged(),1)));
 	emit(array_nth(code_template.untagged(),2));
+
 	if(array_capacity(code_template.untagged()) == 5)
 	{
 		if(tail_call_p)
@@ -114,7 +128,7 @@ void jit::compute_position(cell offset_)
 }
 
 /* Allocates memory */
-code_block *jit::to_code_block()
+code_block *jit::to_code_block(cell frame_size)
 {
 	/* Emit dummy GC info */
 	code.grow_bytes(alignment_for(code.count + 4,data_alignment));
@@ -133,7 +147,8 @@ code_block *jit::to_code_block()
 		owner.value(),
 		relocation.elements.value(),
 		parameters.elements.value(),
-		literals.elements.value());
+		literals.elements.value(),
+		frame_size);
 }
 
 }

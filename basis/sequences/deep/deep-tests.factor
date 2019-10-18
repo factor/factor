@@ -4,6 +4,8 @@ IN: sequences.deep.tests
 
 [ [ "hello" 3 4 swap ] ] [ [ { "hello" V{ 3 4 } } swap ] flatten ] unit-test
 
+{ "ABC" } [ { { 65 } 66 { { 67 } } } "" flatten-as ] unit-test
+
 [ "foo" t ] [ { { "foo" } "bar" } [ string? ] (deep-find) ] unit-test
 
 [ f f ] [ { { "foo" } "bar" } [ number? ] (deep-find) ] unit-test

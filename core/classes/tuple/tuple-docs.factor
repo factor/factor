@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax kernel
 classes.tuple.private classes slots quotations words arrays
 generic.standard sequences definitions compiler.units
-growable vectors sbufs assocs math ;
+growable vectors sbufs assocs math strings ;
 IN: classes.tuple
 
 ARTICLE: "slot-read-only-declaration" "Read-only slots"
@@ -125,30 +125,30 @@ ARTICLE: "tuple-inheritance-example" "Tuple subclassing example"
 "Rectangles, parallelograms and circles are all shapes. We support two operations on shapes:"
 { $list
     "Computing the area"
-    "Computing the perimiter"
+    "Computing the perimeter"
 }
-"Rectangles and parallelograms use the same algorithm for computing the area, whereas they use different algorithms for computing perimiter. Also, rectangles and parallelograms both have " { $snippet "width" } " and " { $snippet "height" } " slots. We can exploit this with subclassing:"
+"Rectangles and parallelograms use the same algorithm for computing the area, whereas they use different algorithms for computing perimeter. Also, rectangles and parallelograms both have " { $snippet "width" } " and " { $snippet "height" } " slots. We can exploit this with subclassing:"
 { $code
     "USING: accessors kernel math math.constants math.functions ;"
     "GENERIC: area ( shape -- n )"
-    "GENERIC: perimiter ( shape -- n )"
+    "GENERIC: perimeter ( shape -- n )"
     ""
     "TUPLE: shape ;"
     ""
     "TUPLE: circle < shape radius ;"
     "M: circle area radius>> sq pi * ;"
-    "M: circle perimiter radius>> 2 * pi * ;"
+    "M: circle perimeter radius>> 2 * pi * ;"
     ""
     "TUPLE: quad < shape width height ;"
     "M: quad area [ width>> ] [ height>> ] bi * ;"
     ""
     "TUPLE: rectangle < quad ;"
-    "M: rectangle perimiter [ width>> 2 * ] [ height>> 2 * ] bi + ;"
+    "M: rectangle perimeter [ width>> 2 * ] [ height>> 2 * ] bi + ;"
     ""
     ": hypot ( a b -- c ) [ sq ] bi@ + sqrt ;"
     ""
     "TUPLE: parallelogram < quad skew ;"
-    "M: parallelogram perimiter"
+    "M: parallelogram perimeter"
     "    [ width>> 2 * ] [ [ height>> ] [ skew>> ] bi hypot 2 * ] bi + ;"
 } ;
 
@@ -175,7 +175,7 @@ $nl
 $nl
 "There are two alternatives which are preferred to subclassing in this case. The first is " { $link "mixins" } "."
 $nl
-"The second is to use ad-hoc slot polymorphism. If two classes define a slot with the same name, then code which uses " { $link "accessors" } " can operate on instances of both objects, assuming the values stored in that slot implement a common protocol. This allows code to be shared without creating contrieved relationships between classes."
+"The second is to use ad-hoc slot polymorphism. If two classes define a slot with the same name, then code which uses " { $link "accessors" } " can operate on instances of both objects, assuming the values stored in that slot implement a common protocol. This allows code to be shared without creating contrived relationships between classes."
 { $heading "Anti-pattern #3: subclassing to override a method definition" }
 "While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of “monkey patching” methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document what subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parametrized constructor."
 { $see-also "parametrized-constructors" } ;
@@ -190,7 +190,7 @@ $nl
 { $subsections
     "tuple-inheritance-example"
     "tuple-inheritance-anti-example"
-} 
+}
 "Declaring a tuple class final prohibits other classes from subclassing it:"
 { $subsections POSTPONE: final }
 { $see-also "call-next-method" "parametrized-constructors" "unions" "mixins" } ;
@@ -215,12 +215,14 @@ ARTICLE: "tuple-examples" "Tuple examples"
 { $table
     { "Reader" "Writer" "Setter" "Changer" }
     { { $snippet "name>>" } { $snippet "name<<" } { $snippet ">>name" } { $snippet "change-name" } }
+    { { $snippet "position>>" } { $snippet "position<<" } { $snippet ">>position" } { $snippet "change-position" } }
     { { $snippet "salary>>" } { $snippet "salary<<" } { $snippet ">>salary" } { $snippet "change-salary" } }
-    { { $snippet "position>>" } { $snippet "position<<" } { $snippet ">>position" } { $snippet "change-position" }   }
 }
 "We can define a constructor which makes an empty employee:"
-{ $code ": <employee> ( -- employee )"
-    "    employee new ;" }
+{ $code
+    ": <employee> ( -- employee )"
+    "    employee new ;"
+}
 "Or we may wish the default constructor to always give employees a starting salary:"
 { $code
     ": <employee> ( -- employee )"
@@ -413,15 +415,15 @@ $nl
     }
 } ;
 
-HELP: tuple>array ( tuple -- array )
+HELP: tuple>array
 { $values { "tuple" tuple } { "array" array } }
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and remainder are declared slots." } ;
 
-HELP: <tuple> ( layout -- tuple )
+HELP: <tuple>
 { $values { "layout" "a tuple layout array" } { "tuple" tuple } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link new } "." } ;
 
-HELP: <tuple-boa> ( slots... layout -- tuple )
+HELP: <tuple-boa>
 { $values { "slots..." "values" } { "layout" "a tuple layout array" } { "tuple" tuple } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link boa } "." } ;
 
@@ -442,7 +444,19 @@ HELP: boa
 { $values { "slots..." "slot values" } { "class" tuple-class } { "tuple" tuple } }
 { $description "Creates a new instance of " { $snippet "class" } " and fill in the slots from the stack, with the top-most stack element being stored in the right-most slot." }
 { $notes "The name " { $snippet "boa" } " is shorthand for “by order of arguments”, and “BOA constructor” is a pun on “boa constrictor”." }
-{ $errors "Throws an error if the slot values do not match class declarations on slots (see" { $link "tuple-declarations" } ")." } ;
+{ $errors "Throws an error if the slot values do not match class declarations on slots (see " { $link "tuple-declarations" } ")." } ;
 
 HELP: bad-superclass
 { $error-description "Thrown if an attempt is made to subclass a class that is not a tuple class, or a tuple class declared " { $link POSTPONE: final } "." } ;
+
+HELP: offset-of-slot
+{ $values { "name" string } { "tuple" tuple } { "n" integer } }
+{ $description "Returns the offset of a tuple slot accessed by " { $snippet "name" } "." } ;
+
+HELP: get-slot-named
+{ $values { "name" string } { "tuple" tuple } { "value" object } }
+{ $description "Returns the " { $snippet "value" } " stored in a tuple slot accessed by " { $snippet "name" } "." } ;
+
+HELP: set-slot-named
+{ $values { "value" object } { "name" string } { "tuple" tuple } }
+{ $description "Stores the " { $snippet "value" } " into a tuple slot accessed by " { $snippet "name" } "." } ;

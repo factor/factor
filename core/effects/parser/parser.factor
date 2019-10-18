@@ -25,16 +25,11 @@ SYMBOL: effect-var
     [ invalid-row-variable ] if ;
 
 : parse-effect-value ( token -- value )
-    ":" ?tail [
-        scan-token {
-            { [ dup "(" = ] [ drop ")" parse-effect ] }
-            [ parse-word dup class? [ bad-effect ] unless ]
-        } cond 2array
-    ] when ;
+    ":" ?tail [ scan-object 2array ] when ;
 PRIVATE>
 
 : parse-effect-token ( first? var end -- var more? )
-    scan {
+    scan-token {
         { [ end-token? ] [ drop nip f ] }
         { [ effect-opener? ] [ bad-effect ] }
         { [ effect-closer? ] [ stack-effect-omits-dashes ] }
@@ -51,13 +46,13 @@ PRIVATE>
     [ "--" parse-effect-tokens ] dip parse-effect-tokens
     <variable-effect> ;
 
-: complete-effect ( -- effect )
+: scan-effect ( -- effect )
     "(" expect ")" parse-effect ;
 
 : parse-call( ( accum word -- accum )
     [ ")" parse-effect ] dip 2array append! ;
 
 : (:) ( -- word def effect )
-    CREATE-WORD
-    complete-effect
+    scan-new-word
+    scan-effect
     parse-definition swap ;

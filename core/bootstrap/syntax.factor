@@ -16,7 +16,6 @@ IN: bootstrap.syntax
         ":"
         ";"
         "<PRIVATE"
-        "BIN:"
         "B{"
         "BV{"
         "C:"
@@ -26,7 +25,6 @@ IN: bootstrap.syntax
         "FORGET:"
         "GENERIC#"
         "GENERIC:"
-        "HEX:"
         "HOOK:"
         "H{"
         "HS{"
@@ -37,7 +35,6 @@ IN: bootstrap.syntax
         "MATH:"
         "MIXIN:"
         "NAN:"
-        "OCT:"
         "P\""
         "POSTPONE:"
         "PREDICATE:"
@@ -85,6 +82,10 @@ IN: bootstrap.syntax
         "<<"
         ">>"
         "call-next-method"
+        "not{"
+        "maybe{"
+        "union{"
+        "intersection{"
         "initial:"
         "read-only"
         "call("
@@ -97,5 +98,5 @@ IN: bootstrap.syntax
         ">>>>>>>"
     } [ "syntax" create drop ] each
 
-    "t" "syntax" lookup define-symbol
+    "t" "syntax" lookup-word define-symbol
 ] with-compilation-unit

@@ -3,7 +3,7 @@
 USING: io.backend kernel continuations destructors namespaces
 sequences assocs hashtables sorting arrays threads boxes
 io.timeouts accessors concurrency.mailboxes fry
-system vocabs.loader combinators ;
+system vocabs combinators ;
 IN: io.monitors
 
 HOOK: init-monitors io-backend ( -- )
@@ -77,6 +77,5 @@ SYMBOL: +rename-file+
 {
     { [ os macosx? ] [ "io.monitors.macosx" require ] }
     { [ os linux? ] [ "io.monitors.linux" require ] }
-    { [ os winnt? ] [ "io.monitors.windows.nt" require ] }
-    { [ os bsd? ] [ ] }
+    { [ os windows? ] [ "io.monitors.windows" require ] }
 } cond

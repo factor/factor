@@ -3,8 +3,7 @@
 USING: accessors arrays assocs fry kernel locals make math
 namespaces sequences sets combinators.short-circuit
 compiler.cfg.def-use compiler.cfg.dependence
-compiler.cfg.instructions compiler.cfg.liveness compiler.cfg.rpo
-cpu.architecture ;
+compiler.cfg.instructions compiler.cfg.rpo cpu.architecture ;
 IN: compiler.cfg.scheduling
 
 ! Instruction scheduling to reduce register pressure, from:
@@ -58,6 +57,7 @@ UNION: final-insn
 ##branch
 ##dispatch
 conditional-branch-insn
+##safepoint
 ##epilogue ##return
 ##callback-outputs ;
 
@@ -81,40 +81,6 @@ conditional-branch-insn
         [ (reorder) ] V{ } make reverse
     ] dip 3append ;
 
-ERROR: not-all-instructions-were-scheduled old-bb new-bb ;
-
-SYMBOL: check-scheduling?
-f check-scheduling? set-global
-
-:: check-instructions ( new-bb old-bb -- )
-    new-bb old-bb [ instructions>> ] bi@
-    [ [ length ] bi@ = ] [ [ unique ] bi@ = ] 2bi and
-    [ old-bb new-bb not-all-instructions-were-scheduled ] unless ;
-
-ERROR: definition-after-usage vregs old-bb new-bb ;
-
-:: check-usages ( new-bb old-bb -- )
-    HS{ } clone :> useds
-    new-bb instructions>> split-3-ways drop nip
-    [| insn |
-        insn uses-vregs [ useds adjoin ] each
-        insn defs-vregs :> defs-vregs
-        defs-vregs useds intersects?
-        [ defs-vregs old-bb new-bb definition-after-usage ] when
-    ] each ;
-
-: check-scheduling ( new-bb old-bb -- )
-    [ check-instructions ] [ check-usages ] 2bi ;
-
-: with-scheduling-check ( bb quot: ( bb -- ) -- )
-    check-scheduling? get [
-        over dup clone
-        [ call( bb -- ) ] 2dip
-        check-scheduling
-    ] [
-        call( bb -- )
-    ] if ; inline
-
 : number-insns ( insns -- )
     [ >>insn# drop ] each-index ;
 
@@ -123,25 +89,12 @@ ERROR: definition-after-usage vregs old-bb new-bb ;
 
 : schedule-block ( bb -- )
     [
-        [
-            [ number-insns ]
-            [ reorder ]
-            [ clear-numbers ] tri
-        ] change-instructions drop
-    ] with-scheduling-check ;
-
-! Really, instruction scheduling should be aware that there are
-! multiple types of registers, but this number is just used
-! to decide whether to schedule instructions
-: num-registers ( -- x ) int-regs machine-registers at length ;
-
-: might-spill? ( bb -- ? )
-    [ live-in assoc-size ]
-    [ instructions>> [ defs-vregs length ] map-sum ] bi
-    + num-registers >= ;
+        [ number-insns ]
+        [ reorder ]
+        [ clear-numbers ] tri
+    ] change-instructions drop ;
 
 : schedule-instructions ( cfg -- cfg' )
     dup [
-        dup { [ kill-block?>> not ] [ might-spill? ] } 1&&
-        [ schedule-block ] [ drop ] if
+        dup kill-block?>> [ drop ] [ schedule-block ] if
     ] each-basic-block ;

@@ -225,7 +225,7 @@ M: object vm-stack-space 0 ;
 ! %store-memory work
 HOOK: complex-addressing? cpu ( -- ? )
 
-HOOK: gc-root-offsets cpu ( seq -- seq' )
+HOOK: gc-root-offset cpu ( spill-slot -- n )
 
 HOOK: %load-immediate cpu ( reg val -- )
 HOOK: %load-reference cpu ( reg obj -- )
@@ -322,6 +322,7 @@ HOOK: %unpack-vector-tail cpu ( dst src rep -- )
 HOOK: %integer>float-vector cpu ( dst src rep -- )
 HOOK: %float>integer-vector cpu ( dst src rep -- )
 HOOK: %compare-vector cpu ( dst src1 src2 rep cc -- )
+HOOK: %move-vector-mask cpu ( dst src rep -- )
 HOOK: %test-vector cpu ( dst src1 temp rep vcc -- )
 HOOK: %test-vector-branch cpu ( label src1 temp rep vcc -- )
 HOOK: %add-vector cpu ( dst src1 src2 rep -- )
@@ -381,6 +382,7 @@ HOOK: %integer>float-vector-reps cpu ( -- reps )
 HOOK: %float>integer-vector-reps cpu ( -- reps )
 HOOK: %compare-vector-reps cpu ( cc -- reps )
 HOOK: %compare-vector-ccs cpu ( rep cc -- {cc,swap?}s not? )
+HOOK: %move-vector-mask-reps cpu ( -- reps )
 HOOK: %test-vector-reps cpu ( -- reps )
 HOOK: %add-vector-reps cpu ( -- reps )
 HOOK: %saturated-add-vector-reps cpu ( -- reps )
@@ -495,6 +497,8 @@ HOOK: %call-gc cpu ( gc-map -- )
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
 
+HOOK: %safepoint cpu ( -- )
+
 HOOK: test-instruction? cpu ( -- ? )
 
 M: object test-instruction? f ;
@@ -575,8 +579,17 @@ HOOK: dummy-fp-params? cpu ( -- ? )
 ! If t, long longs are never passed in param regs
 HOOK: long-long-on-stack? cpu ( -- ? )
 
+! If t, long longs are aligned on an odd register. On Linux
+! 32-bit PPC, long longs are 8-byte aligned but passed in
+! registers so they need to be aligned on an odd numbered
+! (r3, r5, etc) register.
+HOOK: long-long-odd-register? cpu ( -- ? )
+
 ! If t, floats are never passed in param regs
 HOOK: float-on-stack? cpu ( -- ? )
+
+! If t, put floats in the second word of a double word on the stack
+HOOK: float-right-align-on-stack? cpu ( -- ? )
 
 ! If t, the struct return pointer is never passed in a param reg
 HOOK: struct-return-on-stack? cpu ( -- ? )

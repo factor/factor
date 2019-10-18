@@ -6,16 +6,16 @@ IN: gdbm.ffi
 
 << "libgdbm" {
     { [ os macosx? ] [ "libgdbm.dylib" ] }
-    { [ os unix?   ] [ "libgdbm.so"    ] }
-    { [ os winnt?  ] [ "gdbm3.dll"     ] }
+    { [ os unix? ] [ "libgdbm.so.3" ] }
+    { [ os windows? ] [ "gdbm3.dll" ] }
 } cond cdecl add-library >>
 
 LIBRARY: libgdbm
 
 C-GLOBAL: c-string gdbm_version
 
-CONSTANT: GDBM_SYNC   HEX: 20
-CONSTANT: GDBM_NOLOCK HEX: 40
+CONSTANT: GDBM_SYNC   0x20
+CONSTANT: GDBM_NOLOCK 0x40
 
 CONSTANT: GDBM_INSERT  0
 CONSTANT: GDBM_REPLACE 1

@@ -128,7 +128,7 @@ CONSTANT: window-control>styleMask
 
 : make-context-transparent ( view -- )
     -> openGLContext
-    0 <int> NSOpenGLCPSurfaceOpacity -> setValues:forParameter: ;
+    0 int <ref> NSOpenGLCPSurfaceOpacity -> setValues:forParameter: ;
 
 M:: cocoa-ui-backend (open-window) ( world -- )
     world [ [ dim>> ] dip <FactorView> ]
@@ -179,7 +179,7 @@ M: cocoa-ui-backend raise-window* ( world -- )
     ] when* ;
 
 : pixel-size ( pixel-format -- size )
-    color-bits pixel-format-attribute -3 shift ;
+    color-bits (pixel-format-attribute) -3 shift ;
 
 : offscreen-buffer ( world pixel-format -- alien w h pitch )
     [ dim>> first2 ] [ pixel-size ] bi*
@@ -217,7 +217,6 @@ M: cocoa-ui-backend beep ( -- )
     NSBeep ;
 
 M: cocoa-ui-backend system-alert
-    invalidate-run-loop-timers
     NSAlert -> alloc -> init -> autorelease [
         {
             [ swap <NSString> -> setInformativeText: ]
@@ -225,8 +224,7 @@ M: cocoa-ui-backend system-alert
             [ "OK" <NSString> -> addButtonWithTitle: drop ]
             [ -> runModal drop ]
         } cleave
-    ] [ 2drop ] if*
-    init-thread-timer ;
+    ] [ 2drop ] if* ;
 
 CLASS: FactorApplicationDelegate < NSObject
 [
@@ -258,4 +256,6 @@ M: cocoa-ui-backend (with-ui)
 
 cocoa-ui-backend ui-backend set-global
 
-[ running.app? "ui.tools" "listener" ? ] main-vocab-hook set-global
+M: cocoa-ui-backend ui-backend-available?
+    running.app? ;
+

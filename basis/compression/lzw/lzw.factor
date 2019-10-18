@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io kernel math namespaces
-sequences vectors ;
+USING: accessors combinators io kernel math math.order
+namespaces sequences vectors ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.lzw
 
@@ -62,8 +62,13 @@ GENERIC: code-space-full? ( lzw -- ? )
 M: tiff-lzw code-space-full? size-and-limit 1 - = ;
 M: gif-lzw code-space-full? size-and-limit = ;
 
+GENERIC: increment-code-size ( lzw -- lzw )
+
+M: lzw increment-code-size [ 1 + ] change-code-size ;
+M: gif-lzw increment-code-size [ 1 + 12 min ] change-code-size ;
+
 : maybe-increment-code-size ( lzw -- lzw )
-    dup code-space-full? [ [ 1 + ] change-code-size ] when ;
+    dup code-space-full? [ increment-code-size ] when ;
 
 : add-to-table ( seq lzw -- )
     [ table>> push ]
@@ -108,7 +113,7 @@ DEFER: lzw-uncompress-char
             [ output>> push-all ] [ add-to-table ] 2bi
         ] [ code>old-code ] bi
     ] if ;
-    
+
 : lzw-uncompress-char ( lzw -- )
     [ >>code handle-uncompress-code lzw-uncompress-char ]
     lzw-process-next-code ;

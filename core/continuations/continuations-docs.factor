@@ -61,7 +61,7 @@ $nl
     "errors-post-mortem"
     "errors-anti-examples"
 }
-"When Factor encouters a critical error, it calls the following word:"
+"When Factor encounters a critical error, it calls the following word:"
 { $subsections die } ;
 
 ARTICLE: "continuations.private" "Continuation implementation details"
@@ -131,7 +131,7 @@ HELP: >continuation<
 
 HELP: ifcc
 { $values { "capture" { $quotation "( continuation -- )" } } { "restore" quotation } }
-{ $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and "{ $snippet "restore" } " is called." } ;
+{ $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and " { $snippet "restore" } " is called." } ;
 
 { callcc0 continue callcc1 continue-with ifcc } related-words
 
@@ -163,14 +163,6 @@ HELP: restarts
 { $var-description "Global variable holding the set of possible restarts for the most recently thrown error." }
 { $notes "Only updated by " { $link throw } ", not " { $link rethrow } "." } ;
 
-HELP: >c
-{ $values { "continuation" continuation } }
-{ $description "Pushes an exception handler continuation on the catch stack. The continuation must have been reified by " { $link callcc1 } "." } ;
-
-HELP: c>
-{ $values { "continuation" continuation } }
-{ $description "Pops an exception handler continuation from the catch stack." } ;
-
 HELP: throw
 { $values { "error" object } }
 { $description "Saves the current continuation in the " { $link error-continuation } " global variable and throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." } ;
@@ -178,7 +170,7 @@ HELP: throw
 { cleanup recover } related-words
 
 HELP: cleanup
-{ $values { "try" quotation } { "cleanup-always" quotation } { "cleanup-error" quotation } }
+{ $values { "try" { $quotation "( ..a -- ..a )" } } { "cleanup-always" { $quotation "( ..a -- ..b )" } } { "cleanup-error" { $quotation "( ..b -- ..b )" } } }
 { $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
 
 HELP: recover
@@ -265,7 +257,7 @@ HELP: return
 HELP: with-return
 { $values
      { "quot" quotation } }
-{ $description "Captures a continuation that can be reified by calling the " { $link return } " word. If so, it will resume execution immediatly after the " { $link with-return } " word. If " { $link return } " is not called, then execution proceeds as if this word were simply " { $link call } "." }
+{ $description "Captures a continuation that can be reified by calling the " { $link return } " word. If so, it will resume execution immediately after the " { $link with-return } " word. If " { $link return } " is not called, then execution proceeds as if this word were simply " { $link call } "." }
 { $examples
     "Only \"Hi\" will print:"
     { $example

@@ -4,7 +4,7 @@ USING: accessors arrays assocs calendar combinators locals
 source-files.errors colors.constants combinators.short-circuit
 compiler.units help.tips concurrency.flags concurrency.mailboxes
 continuations destructors documents documents.elements fry hashtables
-help help.markup io io.styles kernel lexer listener math models sets
+help help.markup io io.styles kernel lexer listener make math models sets
 models.delay models.arrow namespaces parser prettyprint quotations
 sequences strings threads vocabs vocabs.refresh vocabs.loader
 vocabs.parser words debugger ui ui.commands ui.pens.solid ui.gadgets
@@ -23,6 +23,8 @@ IN: ui.tools.listener
 ! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
 output history flag mailbox thread waiting token-model word-model popup ;
+
+INSTANCE: interactor input-stream
 
 : register-self ( interactor -- )
     <mailbox> >>mailbox
@@ -48,7 +50,7 @@ M: interactor manifest>>
     ] if ;
 
 : vocab-exists? ( name -- ? )
-    '[ _ { [ vocab ] [ find-vocab-root ] } 1|| ] [ drop f ] recover ;
+    '[ _ { [ lookup-vocab ] [ find-vocab-root ] } 1|| ] [ drop f ] recover ;
 
 GENERIC: (word-at-caret) ( token completion-mode -- obj )
 
@@ -101,9 +103,9 @@ M: input (print-input)
 M: word (print-input)
     "Command: "
     [
-        "sans-serif" font-name set
-        bold font-style set
-    ] H{ } make-assoc format . ;
+        "sans-serif" font-name ,,
+        bold font-style ,,
+    ] H{ } make format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
@@ -150,15 +152,12 @@ M: interactor stream-readln
         3bi
     ] if ;
 
-M: interactor stream-read
-    swap [
-        drop ""
-    ] [
-        [ interactor-read dup [ "\n" join ] when ] dip short head
+M:: interactor stream-read-unsafe ( n buf interactor -- count )
+    n [ 0 ] [
+        drop
+        interactor interactor-read dup [ "\n" join ] when
+        n short [ head-slice 0 buf copy ] keep
     ] if-zero ;
-
-M: interactor stream-read-partial
-    stream-read ;
 
 M: interactor stream-read1
     dup interactor-read {
@@ -167,6 +166,15 @@ M: interactor stream-read1
         { [ dup first empty? ] [ 2drop CHAR: \n ] }
         [ nip first first ]
     } cond ;
+
+M: interactor stream-read-until ( seps stream -- seq sep/f )
+    swap '[
+        _ interactor-read [
+            "\n" join CHAR: \n suffix
+            [ _ member? ] dupd find
+            [ [ head ] when* ] dip dup not
+        ] [ f f f ] if*
+    ] [ drop ] produce swap [ concat "" prepend-as ] dip ;
 
 M: interactor dispose drop ;
 
@@ -318,7 +326,7 @@ M: object accept-completion-hook 2drop ;
 
 : quot-action ( interactor -- lines )
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri
-    [ parse-lines ] with-compilation-unit ;
+    parse-lines-interactive ;
 
 : <debugger-popup> ( error continuation -- popup )
     over compute-restarts [ hide-glass ] <debugger> "Error" <labeled-gadget> ;
@@ -342,7 +350,7 @@ M: object accept-completion-hook 2drop ;
 : handle-interactive ( lines interactor -- quot/f ? )
     [ nip ] [ try-parse ] 2bi {
         { [ dup quotation? ] [ nip t ] }
-        { [ dup not ] [ drop "\n" swap user-input* drop f f ] }
+        { [ dup not ] [ drop insert-newline f f ] }
         [ handle-parse-error f f ]
     } cond ;
 
@@ -394,7 +402,7 @@ interactor "completion" f {
         listener
         nl
         "The listener has exited. To start it again, click “Restart Listener”." print
-    ] with-streams* ;
+    ] with-input-output+error-streams* ;
 
 : start-listener-thread ( listener -- )
     '[
@@ -419,7 +427,7 @@ interactor "completion" f {
 \ com-help H{ { +nullary+ t } } define-command
 
 : com-auto-use ( -- )
-    auto-use? [ not ] change ;
+    auto-use? toggle ;
 
 \ com-auto-use H{ { +nullary+ t } { +listener+ t } } define-command
 
@@ -450,3 +458,23 @@ M: listener-gadget graft*
 
 M: listener-gadget ungraft*
     [ com-end ] [ call-next-method ] bi ;
+
+<PRIVATE
+
+:: make-font-style ( family size -- assoc )
+    H{ } clone
+        family font-name pick set-at
+        size font-size pick set-at ;
+
+PRIVATE>
+
+:: set-listener-font ( family size -- )
+    get-listener input>> :> inter
+    family size make-font-style
+    inter output>> make-span-stream :> ostream
+    ostream inter output<<
+    inter font>> clone
+        family >>name
+        size >>size
+    inter font<<
+    ostream output-stream set ;

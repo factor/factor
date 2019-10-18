@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays byte-arrays combinators
-combinators.smart destructors io.encodings.ascii io.encodings.string
-kernel libc locals math namespaces opencl.ffi sequences shuffle
-specialized-arrays variants ;
+USING: accessors alien alien.c-types alien.data arrays
+byte-arrays combinators combinators.smart destructors
+io.encodings.ascii io.encodings.string kernel libc locals make
+math namespaces opencl.ffi sequences shuffle specialized-arrays
+variants ;
 IN: opencl
 SPECIALIZED-ARRAYS: void* char size_t ;
 
@@ -17,7 +18,7 @@ ERROR: cl-error err ;
     dup f = [ cl-error ] [ drop ] if ; inline
  
 : info-data-size ( handle name info-quot -- size_t )
-    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop *size_t ; inline
+    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
 
 : info-data-bytes ( handle name info-quot size -- bytes )
     swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
@@ -26,31 +27,31 @@ ERROR: cl-error err ;
     [ 3dup info-data-size info-data-bytes ] dip call ; inline
 
 : 2info-data-size ( handle1 handle2 name info-quot -- size_t )
-    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop *size_t ; inline
+    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
 
 : 2info-data-bytes ( handle1 handle2 name info-quot size -- bytes )
     swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
 
 : 2info ( handle1 handle2 name info_quot lift_quot -- value )
     [ 4dup 2info-data-size 2info-data-bytes ] dip call ; inline
-    
+
 : info-bool ( handle name quot -- ? )
-    [ *uint CL_TRUE = ] info ; inline
+    [ uint deref CL_TRUE = ] info ; inline
 
 : info-ulong ( handle name quot -- ulong )
-    [ *ulonglong ] info ; inline
+    [ ulonglong deref ] info ; inline
 
 : info-int ( handle name quot -- int )
-    [ *int ] info ; inline
+    [ int deref ] info ; inline
 
 : info-uint ( handle name quot -- uint )
-    [ *uint ] info ; inline
+    [ uint deref ] info ; inline
 
 : info-size_t ( handle name quot -- size_t )
-    [ *size_t ] info ; inline
+    [ size_t deref ] info ; inline
 
 : 2info-size_t ( handle1 handle2 name quot -- size_t )
-    [ *size_t ] 2info ; inline
+    [ size_t deref ] 2info ; inline
 
 : info-string ( handle name quot -- string )
     [ ascii decode 1 head* ] info ; inline
@@ -59,7 +60,7 @@ ERROR: cl-error err ;
     [ ascii decode 1 head* ] 2info ; inline
 
 : info-size_t-array ( handle name quot -- size_t-array )
-    [ [ length size_t heap-size / ] keep swap <direct-size_t-array> ] info ; inline
+    [ [ length size_t heap-size / ] keep swap size_t <c-direct-array> ] info ; inline
 
 TUPLE: cl-handle < disposable handle ;
 PRIVATE>
@@ -311,9 +312,9 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
 
 : platform-devices ( platform-id -- devices )
     CL_DEVICE_TYPE_ALL [
-        0 f 0 <uint> [ clGetDeviceIDs cl-success ] keep *uint
+        0 f 0 uint <ref> [ clGetDeviceIDs cl-success ] keep uint deref
     ] [
-        rot dup <void*-array> [ f clGetDeviceIDs cl-success ] keep
+        rot dup void* <c-array> [ f clGetDeviceIDs cl-success ] keep
     ] 2bi ; inline
 
 : command-queue-info-ulong ( handle name -- ulong )
@@ -340,7 +341,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
         [ length ]
         [ strings>char*-array ]
         [ [ length ] size_t-array{ } map-as ] tri
-        0 <int> [ clCreateProgramWithSource ] keep *int cl-success
+        0 int <ref> [ clCreateProgramWithSource ] keep int deref cl-success
     ] with-destructors ;
 
 :: (build-program) ( program-handle device options -- program )
@@ -403,7 +404,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     [ clGetEventProfilingInfo ] info-ulong ;
 
 : bind-kernel-arg-buffer ( kernel index buffer -- )
-    [ handle>> ] [ cl_mem heap-size ] [ handle>> <void*> ] tri*
+    [ handle>> ] [ cl_mem heap-size ] [ handle>> void* deref ] tri*
     clSetKernelArg cl-success ; inline
 
 : bind-kernel-arg-data ( kernel index byte-array -- )
@@ -413,20 +414,21 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
 GENERIC: bind-kernel-arg ( kernel index data -- )
 M: cl-buffer  bind-kernel-arg bind-kernel-arg-buffer ;
 M: byte-array bind-kernel-arg bind-kernel-arg-data ;
+
 PRIVATE>
 
 : with-cl-state ( context/f device/f queue/f quot -- )
     [
         [
-            [ cl-current-queue   set ] when*
-            [ cl-current-device  set ] when*
-            [ cl-current-context set ] when*
-        ] 3curry H{ } make-assoc
-    ] dip bind ; inline
+            [ cl-current-queue   ,, ] when*
+            [ cl-current-device  ,, ] when*
+            [ cl-current-context ,, ] when*
+        ] 3curry H{ } make
+    ] dip with-variable ; inline
 
 : cl-platforms ( -- platforms )
-    0 f 0 <uint> [ clGetPlatformIDs cl-success ] keep *uint
-    dup <void*-array> [ f clGetPlatformIDs cl-success ] keep
+    0 f 0 uint <ref> [ clGetPlatformIDs cl-success ] keep uint deref
+    dup void* <c-array> [ f clGetPlatformIDs cl-success ] keep
     [
         dup
         [ platform-info ]
@@ -437,14 +439,14 @@ PRIVATE>
 : <cl-context> ( devices -- cl-context )
     [ f ] dip
     [ length ] [ [ id>> ] void*-array{ } map-as ] bi
-    f f 0 <int> [ clCreateContext ] keep *int cl-success
+    f f 0 int <ref> [ clCreateContext ] keep int deref cl-success
     cl-context new-disposable swap >>handle ;
 
 : <cl-queue> ( context device out-of-order? profiling? -- command-queue )
     [ [ handle>> ] [ id>> ] bi* ] 2dip
     [ [ CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE ] [ 0 ] if ]
     [ [ CL_QUEUE_PROFILING_ENABLE ] [ 0 ] if ] bi* bitor
-    0 <int> [ clCreateCommandQueue ] keep *int cl-success
+    0 int <ref> [ clCreateCommandQueue ] keep int deref cl-success
     cl-queue new-disposable swap >>handle ;
 
 : cl-out-of-order-execution? ( command-queue -- ? )
@@ -462,7 +464,7 @@ PRIVATE>
         [ buffer-access-constant ]
         [ [ CL_MEM_COPY_HOST_PTR ] [ CL_MEM_ALLOC_HOST_PTR ] if ] tri* bitor
     ] 2dip
-    0 <int> [ clCreateBuffer ] keep *int cl-success
+    0 int <ref> [ clCreateBuffer ] keep int deref cl-success
     cl-buffer new-disposable swap >>handle ;
 
 : cl-read-buffer ( buffer-range -- byte-array )
@@ -488,7 +490,7 @@ PRIVATE>
         [ [ buffer>> handle>> ] [ offset>> ] bi ]
         tri* swapd
     ] 2dip [ length ] keep [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty
-    f <void*> [ clEnqueueCopyBuffer cl-success ] keep *void* cl-event
+    f void* <ref> [ clEnqueueCopyBuffer cl-success ] keep void* deref cl-event
     new-disposable swap >>handle ;
 
 : cl-queue-read-buffer ( buffer-range alien dependent-events -- event )
@@ -496,7 +498,7 @@ PRIVATE>
         [ (current-cl-queue) handle>> ] dip
         [ buffer>> handle>> CL_FALSE ] [ offset>> ] [ size>> ] tri
     ] 2dip [ length ] keep [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty
-    f <void*> [ clEnqueueReadBuffer cl-success ] keep *void* cl-event
+    f void* <ref> [ clEnqueueReadBuffer cl-success ] keep void* <ref> cl-event
     new-disposable swap >>handle ;
 
 : cl-queue-write-buffer ( buffer-range alien dependent-events -- event )
@@ -504,7 +506,7 @@ PRIVATE>
         [ (current-cl-queue) handle>> ] dip
         [ buffer>> handle>> CL_FALSE ] [ offset>> ] [ size>> ] tri
     ] 2dip [ length ] keep [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty
-    f <void*> [ clEnqueueWriteBuffer cl-success ] keep *void* cl-event
+    f void* <ref> [ clEnqueueWriteBuffer cl-success ] keep void* deref cl-event
     new-disposable swap >>handle ;
 
 : <cl-sampler> ( normalized-coords? addressing-mode filter-mode -- sampler )
@@ -512,7 +514,7 @@ PRIVATE>
     [ [ CL_TRUE ] [ CL_FALSE ] if ]
     [ addressing-mode-constant ]
     [ filter-mode-constant ]
-    tri* 0 <int> [ clCreateSampler ] keep *int cl-success 
+    tri* 0 int <ref> [ clCreateSampler ] keep int deref cl-success 
     cl-sampler new-disposable swap >>handle ;
 
 : cl-normalized-coords? ( sampler -- ? )
@@ -531,7 +533,7 @@ PRIVATE>
 
 : <cl-kernel> ( program kernel-name -- kernel )
     [ handle>> ] [ ascii encode 0 suffix ] bi*
-    0 <int> [ clCreateKernel ] keep *int cl-success
+    0 int <ref> [ clCreateKernel ] keep int deref cl-success
     cl-kernel new-disposable swap >>handle ; inline
 
 : cl-kernel-name ( kernel -- string )
@@ -549,7 +551,7 @@ PRIVATE>
     kernel handle>>
     sizes [ length f ] [ [ ] size_t-array{ } map-as f ] bi
     dependent-events [ length ] [ [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty ] bi
-    f <void*> [ clEnqueueNDRangeKernel cl-success ] keep *void*
+    f void* <ref> [ clEnqueueNDRangeKernel cl-success ] keep void* deref
     cl-event new-disposable swap >>handle ;
 
 : cl-event-type ( event -- command-type )
@@ -573,7 +575,7 @@ PRIVATE>
 
 : cl-marker ( -- event )
     (current-cl-queue)
-    f <void*> [ clEnqueueMarker cl-success ] keep *void* cl-event new-disposable
+    f void* <ref> [ clEnqueueMarker cl-success ] keep void* deref cl-event new-disposable
     swap >>handle ; inline
 
 : cl-barrier ( -- )

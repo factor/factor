@@ -25,6 +25,11 @@ struct segment {
 	{
 		return (addr >= end && addr < end + getpagesize());
 	}
+
+	bool in_segment_p(cell addr)
+	{
+		return (addr >= start && addr < end);
+	}
 };
 
 }

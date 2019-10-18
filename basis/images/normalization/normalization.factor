@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman, Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types byte-arrays combinators fry
-grouping images kernel locals math math.vectors
+USING: accessors alien.c-types alien.data byte-arrays
+combinators fry grouping images kernel locals math math.vectors
 sequences specialized-arrays math.floats.half ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: half
@@ -47,13 +47,13 @@ GENERIC: normalize-component-type* ( image component-type -- image )
     [ 255.0 * >integer ] B{ } map-as ;
 
 M: float-components normalize-component-type*
-    drop float-array-cast normalize-floats ;
+    drop float cast-array normalize-floats ;
 
 M: half-components normalize-component-type*
-    drop half-array-cast normalize-floats ;
+    drop half cast-array normalize-floats ;
 
 : ushorts>ubytes ( bitmap -- bitmap' )
-    ushort-array-cast [ -8 shift ] B{ } map-as ; inline
+    ushort cast-array [ -8 shift ] B{ } map-as ; inline
 
 M: ushort-components normalize-component-type*
     drop ushorts>ubytes ;

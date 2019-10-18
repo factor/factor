@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators continuations destructors kernel
-math namespaces sequences ;
+USING: combinators destructors kernel kernel.private math
+namespaces sequences sequences.private ;
 IN: io
 
 SYMBOLS: +byte+ +character+ ;
@@ -9,10 +9,11 @@ SYMBOLS: +byte+ +character+ ;
 GENERIC: stream-element-type ( stream -- type )
 
 GENERIC: stream-read1 ( stream -- elt )
-GENERIC: stream-read ( n stream -- seq )
+GENERIC: stream-read-unsafe ( n buf stream -- count )
 GENERIC: stream-read-until ( seps stream -- seq sep/f )
-GENERIC: stream-read-partial ( n stream -- seq )
+GENERIC: stream-read-partial-unsafe ( n buf stream -- count )
 GENERIC: stream-readln ( stream -- str/f )
+GENERIC: stream-contents ( stream -- seq )
 
 GENERIC: stream-write1 ( elt stream -- )
 GENERIC: stream-write ( data stream -- )
@@ -25,29 +26,30 @@ SINGLETONS: seek-absolute seek-relative seek-end ;
 
 GENERIC: stream-tell ( stream -- n )
 GENERIC: stream-seek ( n seek-type stream -- )
+GENERIC: stream-seekable? ( stream -- ? )
+GENERIC: stream-length ( stream -- n/f )
 
-: stream-print ( str stream -- ) [ stream-write ] [ stream-nl ] bi ;
+: stream-print ( str stream -- )
+    [ stream-write ] [ stream-nl ] bi ; inline
 
 ! Default streams
-SYMBOL: input-stream
-SYMBOL: output-stream
+MIXIN: input-stream
+MIXIN: output-stream
 SYMBOL: error-stream
 
-: readln ( -- str/f ) input-stream get stream-readln ;
-: read1 ( -- elt ) input-stream get stream-read1 ;
-: read ( n -- seq ) input-stream get stream-read ;
-: read-until ( seps -- seq sep/f ) input-stream get stream-read-until ;
-: read-partial ( n -- seq ) input-stream get stream-read-partial ;
-: tell-input ( -- n ) input-stream get stream-tell ;
-: tell-output ( -- n ) output-stream get stream-tell ;
-: seek-input ( n seek-type -- ) input-stream get stream-seek ;
-: seek-output ( n seek-type -- ) output-stream get stream-seek ;
+: readln ( -- str/f ) input-stream get stream-readln ; inline
+: read1 ( -- elt ) input-stream get stream-read1 ; inline
+: read-until ( seps -- seq sep/f ) input-stream get stream-read-until ; inline
+: tell-input ( -- n ) input-stream get stream-tell ; inline
+: tell-output ( -- n ) output-stream get stream-tell ; inline
+: seek-input ( n seek-type -- ) input-stream get stream-seek ; inline
+: seek-output ( n seek-type -- ) output-stream get stream-seek ; inline
 
-: write1 ( elt -- ) output-stream get stream-write1 ;
-: write ( seq -- ) output-stream get stream-write ;
-: flush ( -- ) output-stream get stream-flush ;
+: write1 ( elt -- ) output-stream get stream-write1 ; inline
+: write ( seq -- ) output-stream get stream-write ; inline
+: flush ( -- ) output-stream get stream-flush ; inline
 
-: nl ( -- ) output-stream get stream-nl ;
+: nl ( -- ) output-stream get stream-nl ; inline
 
 : with-input-stream* ( stream quot -- )
     input-stream swap with-variable ; inline
@@ -61,6 +63,24 @@ SYMBOL: error-stream
 : with-output-stream ( stream quot -- )
     [ with-output-stream* ] curry with-disposal ; inline
 
+: with-error-stream* ( stream quot -- )
+    error-stream swap with-variable ; inline
+
+: with-error-stream ( stream quot -- )
+    [ with-error-stream* ] curry with-disposal ; inline
+
+: with-output+error-stream* ( stream quot -- )
+    [ dup ] dip [ with-error-stream* ] curry with-output-stream* ; inline
+
+: with-output+error-stream ( stream quot -- )
+    [ with-output+error-stream* ] curry with-disposal ; inline
+
+: with-output>error ( quot -- )
+    error-stream get swap with-output-stream* ; inline
+
+: with-error>output ( quot -- )
+    output-stream get swap with-error-stream* ; inline
+
 : with-streams* ( input output quot -- )
     swapd [ with-output-stream* ] curry with-input-stream* ; inline
 
@@ -70,7 +90,13 @@ SYMBOL: error-stream
     #! buffer before closing the FD.
     swapd [ with-output-stream ] curry with-input-stream ; inline
 
-: print ( str -- ) output-stream get stream-print ;
+: with-input-output+error-streams* ( input output+error quot -- )
+    swapd [ with-output+error-stream* ] curry with-input-stream* ; inline
+
+: with-input-output+error-streams ( input output+error quot -- )
+    swapd [ with-output+error-stream ] curry with-input-stream ; inline
+
+: print ( str -- ) output-stream get stream-print ; inline
 
 : bl ( -- ) " " write ;
 
@@ -79,44 +105,157 @@ SYMBOL: error-stream
 
 <PRIVATE
 
-: (stream-element-exemplar) ( type -- exemplar )
-    {
-        { +byte+ [ B{ } ] }
-        { +character+ [ "" ] }
-    } case ; inline
+: stream-exemplar ( stream -- exemplar )
+    stream-element-type +byte+ = B{ } "" ? ; inline
 
-: stream-element-exemplar ( stream -- exemplar )
-    stream-element-type (stream-element-exemplar) ; inline
+: stream-exemplar-growable ( stream -- exemplar )
+    stream-element-type +byte+ = BV{ } SBUF" " ? ; inline
+
+: (new-sequence-for-stream) ( n stream -- seq )
+    stream-exemplar new-sequence ; inline
+
+: resize-if-necessary ( wanted-n got-n seq -- seq' )
+    2over = [ [ 2drop ] dip ] [ resize nip ] if ; inline
+
+: (read-into-new) ( n stream quot -- seq/f )
+    [ dup ] 2dip
+    [ 2dup (new-sequence-for-stream) swap ] dip curry keep
+    over 0 = [ 3drop f ] [ resize-if-necessary ] if ; inline
+
+: (read-into) ( buf stream quot -- buf-slice/f )
+    [ dup length over ] 2dip call
+    [ (head) <slice-unsafe> ] [ zero? not ] bi ; inline
 
 PRIVATE>
 
-: each-stream-line ( stream quot -- )
+: stream-read ( n stream -- seq/f )
+    [ stream-read-unsafe ] (read-into-new) ; inline
+
+: stream-read-partial ( n stream -- seq/f )
+    [ stream-read-partial-unsafe ] (read-into-new) ; inline
+
+ERROR: invalid-read-buffer buf stream ;
+
+: stream-read-into ( buf stream -- buf-slice more? )
+    [ stream-read-unsafe { fixnum } declare ] (read-into) ; inline
+
+: stream-read-partial-into ( buf stream -- buf-slice more? )
+    [ stream-read-partial-unsafe { fixnum } declare ] (read-into) ; inline
+
+: read ( n -- seq ) input-stream get stream-read ; inline
+
+: read-partial ( n -- seq ) input-stream get stream-read-partial ; inline
+
+: read-into ( buf -- buf-slice more? )
+    input-stream get stream-read-into ; inline
+
+: read-partial-into ( buf -- buf-slice more? )
+    input-stream get stream-read-partial-into ; inline
+
+: each-stream-line ( ... stream quot: ( ... line -- ... ) -- ... )
     swap [ stream-readln ] curry each-morsel ; inline
 
-: each-line ( quot -- )
+: each-line ( ... quot: ( ... line -- ... ) -- ... )
     input-stream get swap each-stream-line ; inline
 
 : stream-lines ( stream -- seq )
-    [ [ ] collector [ each-stream-line ] dip { } like ] with-disposal ;
+    [
+        [ ] collector [ each-stream-line ] dip { } like
+    ] with-disposal ; inline
 
 : lines ( -- seq )
     input-stream get stream-lines ; inline
 
-: stream-contents ( stream -- seq )
+CONSTANT: each-block-size 65536
+
+: each-stream-block-slice ( ... stream quot: ( ... block-slice -- ... ) -- ... )
+    [ drop ] prepose
+    swap [ each-block-size swap (new-sequence-for-stream) ] keep
+    [ stream-read-partial-into ] 2curry each-morsel drop ; inline
+
+: each-stream-block ( ... stream quot: ( ... block -- ... ) -- ... )
+    swap [ each-block-size swap stream-read-partial ] curry each-morsel ; inline
+
+: each-block-slice ( ... quot: ( ... block -- ... ) -- ... )
+    input-stream get swap each-stream-block-slice ; inline
+
+: each-block ( ... quot: ( ... block -- ... ) -- ... )
+    input-stream get swap each-stream-block ; inline
+
+: (stream-contents-by-length) ( stream len -- seq )
+    dup rot [
+        [ (new-sequence-for-stream) ]
+        [ [ stream-read-unsafe ] curry keep resize ] bi
+    ] with-disposal ; inline
+
+: (stream-contents-by-block) ( stream -- seq )
     [
-        [ [ 65536 swap stream-read-partial dup ] curry [ ] produce nip ]
-        [ stream-element-exemplar concat-as ] bi
-    ] with-disposal ;
+        [ [ ] collector [ each-stream-block ] dip { } like ]
+        [ stream-exemplar concat-as ] bi
+    ] with-disposal ; inline
+
+: (stream-contents-by-length-or-block) ( stream -- seq )
+    dup stream-length
+    [ (stream-contents-by-length) ]
+    [ (stream-contents-by-block)  ] if* ; inline
+
+: (stream-contents-by-element) ( stream -- seq )
+    [
+        [ [ stream-read1 dup ] curry [ ] ]
+        [ stream-exemplar produce-as nip ] bi
+    ] with-disposal ; inline
 
 : contents ( -- seq )
     input-stream get stream-contents ; inline
 
-: each-stream-block ( stream quot: ( block -- ) -- )
-    swap [ 8192 swap stream-read-partial ] curry each-morsel ; inline
-
-: each-block ( quot: ( block -- ) -- )
-    input-stream get swap each-stream-block ; inline
+: stream-copy* ( in out -- )
+    [ stream-write ] curry each-stream-block ; inline
 
 : stream-copy ( in out -- )
-    [ [ [ write ] each-block ] with-output-stream ]
-    curry with-input-stream ;
+    [ [ stream-copy* ] with-disposal ] curry with-disposal ; inline
+
+! Default implementations of stream operations in terms of read1/write1
+
+<PRIVATE
+: read-loop ( buf stream n i -- count )
+     2dup = [ nip nip nip ] [
+        pick stream-read1 [
+            over [ pick set-nth-unsafe ] 2curry 3dip
+            1 + read-loop
+        ] [ nip nip nip ] if*
+     ] if ; inline recursive
+
+: finalize-read-until ( seq sep/f -- seq/f sep/f )
+    2dup [ empty? ] [ not ] bi* and [ 2drop f f ] when ; inline
+
+: read-until-loop ( seps stream -- seq sep/f )
+    [ [ stream-read1 dup [ rot member? not ] [ nip f ] if* ] 2curry [ ] ]
+    [ stream-exemplar ] bi produce-as swap finalize-read-until ; inline
+PRIVATE>
+
+M: input-stream stream-read-unsafe rot 0 read-loop ; inline
+M: input-stream stream-read-partial-unsafe stream-read-unsafe ; inline
+M: input-stream stream-read-until read-until-loop ; inline
+M: input-stream stream-readln
+    "\n" swap stream-read-until drop ; inline
+M: input-stream stream-contents (stream-contents-by-length-or-block) ; inline
+M: input-stream stream-seekable? drop f ; inline
+M: input-stream stream-length drop f ; inline
+
+M: output-stream stream-write [ stream-write1 ] curry each ; inline
+M: output-stream stream-flush drop ; inline
+M: output-stream stream-nl CHAR: \n swap stream-write1 ; inline
+M: output-stream stream-seekable? drop f ; inline
+M: output-stream stream-length drop f ; inline
+
+M: f stream-read1 drop f ; inline
+M: f stream-read-unsafe 3drop 0 ; inline
+M: f stream-read-until 2drop f f ; inline
+M: f stream-read-partial-unsafe 3drop 0 ; inline
+M: f stream-readln drop f ; inline
+M: f stream-contents drop f ; inline
+
+M: f stream-write1 2drop ; inline
+M: f stream-write 2drop ; inline
+M: f stream-flush drop ; inline
+M: f stream-nl drop ; inline

@@ -49,7 +49,7 @@ M: no-tokenizer summary
     drop "Tokenizer not found" ;
 
 SYNTAX: TOKENIZER: 
-  scan dup search [ nip ] [ no-tokenizer ] if*
+  scan-word-name dup search [ nip ] [ no-tokenizer ] if*
   execute( -- tokenizer ) \ tokenizer set-global ;
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -61,6 +61,7 @@ TUPLE: ebnf-ensure group ;
 TUPLE: ebnf-ensure-not group ;
 TUPLE: ebnf-choice options ;
 TUPLE: ebnf-sequence elements ;
+TUPLE: ebnf-ignore group ;
 TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-repeat1 group ;
 TUPLE: ebnf-optional group ;
@@ -81,6 +82,7 @@ C: <ebnf-ensure> ebnf-ensure
 C: <ebnf-ensure-not> ebnf-ensure-not
 C: <ebnf-choice> ebnf-choice
 C: <ebnf-sequence> ebnf-sequence
+C: <ebnf-ignore> ebnf-ignore
 C: <ebnf-repeat0> ebnf-repeat0
 C: <ebnf-repeat1> ebnf-repeat1
 C: <ebnf-optional> ebnf-optional
@@ -215,6 +217,7 @@ PEG: escaper ( string -- ast )
         'range-parser' ,
         'any-character' ,
       ] choice* 
+      [ dup , "~" token hide , ] seq* [ first <ebnf-ignore> ] action ,
       [ dup , "*" token hide , ] seq* [ first <ebnf-repeat0> ] action ,
       [ dup , "+" token hide , ] seq* [ first <ebnf-repeat1> ] action ,
       [ dup , "?[" token ensure-not , "?" token hide , ] seq* [ first <ebnf-optional> ] action ,
@@ -257,10 +260,14 @@ DEFER: 'choice'
 : 'group' ( -- parser )
   #! A grouping with no suffix. Used for precedence.
   [ ] [
+    "~" token sp ensure-not ,
     "*" token sp ensure-not ,
     "+" token sp ensure-not ,
     "?" token sp ensure-not ,
   ] seq* hide grouped ; 
+
+: 'ignore' ( -- parser )
+  [ <ebnf-ignore> ] "~" syntax grouped ;
 
 : 'repeat0' ( -- parser )
   [ <ebnf-repeat0> ] "*" syntax grouped ;
@@ -276,7 +283,7 @@ DEFER: 'choice'
     "]]" token ensure-not ,
     "]?" token ensure-not ,
     [ drop t ] satisfy ,
-  ] seq* repeat0 [ concat >string ] action ;
+  ] seq* repeat0 [ "" concat-as ] action ;
 
 : 'ensure-not' ( -- parser )
   #! Parses the '!' syntax to ensure that 
@@ -305,6 +312,7 @@ DEFER: 'choice'
       'ensure' sp ,
       'element' sp ,
       'group' sp , 
+      'ignore' sp ,
       'repeat0' sp ,
       'repeat1' sp ,
       'optional' sp , 
@@ -373,7 +381,7 @@ SYMBOL: ignore-ws
     parser set 
     swap (transform) 
     main set 
-  ] bind ;
+  ] with-variables ;
 
 M: ebnf (transform) ( ast -- parser )
   rules>> [ (transform) ] map last ;
@@ -425,6 +433,9 @@ M: ebnf-ensure (transform) ( ast -- parser )
 M: ebnf-ensure-not (transform) ( ast -- parser )
   transform-group ensure-not ;
 
+M: ebnf-ignore (transform) ( ast -- parser )
+  transform-group [ drop ignore ] action ;
+
 M: ebnf-repeat0 (transform) ( ast -- parser )
   transform-group repeat0 ;
 
@@ -445,7 +456,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
   elements>> filter-hidden dup length 1 = [ 
     first build-locals 
   ]  [
-    dup [ ebnf-var? ] filter empty? [
+    dup [ ebnf-var? ] any? not [
       drop 
     ] [ 
       [
@@ -465,7 +476,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
     ] if
   ] if ;
 
-M: ebnf-var build-locals ( code ast -- )
+M: ebnf-var build-locals ( code ast -- code )
   [
     "FROM: locals => [let :> ; FROM: kernel => dup nip ; [let " %
     " dup :> " % name>> %
@@ -474,15 +485,15 @@ M: ebnf-var build-locals ( code ast -- )
     " nip ]" %     
   ] "" make ;
 
-M: object build-locals ( code ast -- )
+M: object build-locals ( code ast -- code )
   drop ;
-   
+
 ERROR: bad-effect quot effect ;
 
 : check-action-effect ( quot -- quot )
   dup infer {
-    { [ dup (( a -- b )) effect<= ] [ drop ] }
-    { [ dup (( -- b )) effect<= ] [ drop [ drop ] prepose ] }
+    { [ dup ( a -- b ) effect<= ] [ drop ] }
+    { [ dup ( -- b ) effect<= ] [ drop [ drop ] prepose ] }
     [ bad-effect ]
   } cond ;
 
@@ -532,7 +543,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
     dup remaining>> [ blank? ] trim [
       [ 
         "Unable to fully parse EBNF. Left to parse was: " %
-        remaining>> % 
+        % 
       ] "" make throw
     ] unless-empty
   ] [
@@ -559,7 +570,7 @@ SYNTAX: [EBNF
   suffix! \ call suffix! reset-tokenizer ;
 
 SYNTAX: EBNF: 
-  reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  
+  reset-tokenizer scan-new-word dup ";EBNF" parse-multiline-string  
   ebnf>quot swapd
-  (( input -- ast )) define-declared "ebnf-parser" set-word-prop 
+  ( input -- ast ) define-declared "ebnf-parser" set-word-prop 
   reset-tokenizer ;

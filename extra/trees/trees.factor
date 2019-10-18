@@ -5,7 +5,7 @@ prettyprint.private kernel.private assocs random combinators
 parser math.order accessors deques make prettyprint.custom ;
 IN: trees
 
-TUPLE: tree root count ;
+TUPLE: tree root { count integer } ;
 
 <PRIVATE
 
@@ -28,7 +28,7 @@ TUPLE: node key value left right ;
 : new-node ( key value class -- node )
     new
         swap >>value
-        swap >>key ;
+        swap >>key ; inline
 
 : <node> ( key value -- node )
     node new-node ;

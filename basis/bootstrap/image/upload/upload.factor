@@ -10,7 +10,7 @@ SYMBOL: upload-images-destination
 
 : destination ( -- dest )
     upload-images-destination get
-    "slava@factorcode.org:/var/www/factorcode.org/newsite/images/latest/"
+    "slava_pestov@downloads.factorcode.org:downloads.factorcode.org/images/latest/"
     or ;
 
 : checksums ( -- temp ) "checksums.txt" temp-file ;
@@ -30,7 +30,7 @@ SYMBOL: upload-images-destination
     [
         "scp" ,
         boot-image-names %
-        "temp/checksums.txt" , destination ,
+        checksums , destination ,
     ] { } make try-process ;
 
 : new-images ( -- )

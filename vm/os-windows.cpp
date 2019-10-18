@@ -22,6 +22,11 @@ void *factor_vm::ffi_dlsym(dll *dll, symbol_char *symbol)
 	return (void *)GetProcAddress(dll ? (HMODULE)dll->handle : hFactorDll, symbol);
 }
 
+void *factor_vm::ffi_dlsym_raw(dll *dll, symbol_char *symbol)
+{
+	return ffi_dlsym(dll, symbol);
+}
+
 void factor_vm::ffi_dlclose(dll *dll)
 {
 	FreeLibrary((HMODULE)dll->handle);
@@ -143,6 +148,20 @@ long getpagesize()
 	return g_pagesize;
 }
 
+void code_heap::guard_safepoint()
+{
+	DWORD ignore;
+	if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_NOACCESS, &ignore))
+		fatal_error("Cannot protect safepoint guard page", (cell)safepoint_page);
+}
+
+void code_heap::unguard_safepoint()
+{
+	DWORD ignore;
+	if (!VirtualProtect(safepoint_page, getpagesize(), PAGE_READWRITE, &ignore))
+		fatal_error("Cannot unprotect safepoint guard page", (cell)safepoint_page);
+}
+
 void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
 {
 	if(MoveFileEx((path1),(path2),MOVEFILE_REPLACE_EXISTING) == false)
@@ -150,5 +169,243 @@ void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
 }
 
 void factor_vm::init_signals() {}
+
+THREADHANDLE start_thread(void *(*start_routine)(void *), void *args)
+{
+	return (void *)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0);
+}
+
+u64 nano_count()
+{
+	static double scale_factor;
+
+	static u32 hi = 0;
+	static u32 lo = 0;
+
+	LARGE_INTEGER count;
+	BOOL ret = QueryPerformanceCounter(&count);
+	if(ret == 0)
+		fatal_error("QueryPerformanceCounter", 0);
+
+	if(scale_factor == 0.0)
+	{
+		LARGE_INTEGER frequency;
+		BOOL ret = QueryPerformanceFrequency(&frequency);
+		if(ret == 0)
+			fatal_error("QueryPerformanceFrequency", 0);
+		scale_factor = (1000000000.0 / frequency.QuadPart);
+	}
+
+#ifdef FACTOR_64
+	hi = count.HighPart;
+#else
+	/* On VirtualBox, QueryPerformanceCounter does not increment
+	the high part every time the low part overflows.  Workaround. */
+	if(lo > count.LowPart)
+		hi++;
+#endif
+	lo = count.LowPart;
+
+	return (u64)((((u64)hi << 32) | (u64)lo) * scale_factor);
+}
+
+void sleep_nanos(u64 nsec)
+{
+	Sleep((DWORD)(nsec/1000000));
+}
+
+typedef enum _EXCEPTION_DISPOSITION
+{
+	ExceptionContinueExecution = 0,
+	ExceptionContinueSearch = 1,
+	ExceptionNestedException = 2,
+	ExceptionCollidedUnwind = 3
+} EXCEPTION_DISPOSITION;
+
+LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
+{
+	switch (e->ExceptionCode)
+	{
+	case EXCEPTION_ACCESS_VIOLATION:
+		signal_fault_addr = e->ExceptionInformation[1];
+		verify_memory_protection_error(signal_fault_addr);
+		dispatch_signal_handler(
+			(cell*)&c->ESP,
+			(cell*)&c->EIP,
+			(cell)factor::memory_signal_handler_impl
+		);
+		break;
+
+	case STATUS_FLOAT_DENORMAL_OPERAND:
+	case STATUS_FLOAT_DIVIDE_BY_ZERO:
+	case STATUS_FLOAT_INEXACT_RESULT:
+	case STATUS_FLOAT_INVALID_OPERATION:
+	case STATUS_FLOAT_OVERFLOW:
+	case STATUS_FLOAT_STACK_CHECK:
+	case STATUS_FLOAT_UNDERFLOW:
+	case STATUS_FLOAT_MULTIPLE_FAULTS:
+	case STATUS_FLOAT_MULTIPLE_TRAPS:
+#ifdef FACTOR_64
+		signal_fpu_status = fpu_status(MXCSR(c));
+#else
+		signal_fpu_status = fpu_status(X87SW(c) | MXCSR(c));
+
+		/* This seems to have no effect */
+		X87SW(c) = 0;
+#endif
+		MXCSR(c) &= 0xffffffc0;
+		dispatch_signal_handler(
+			(cell*)&c->ESP,
+			(cell*)&c->EIP,
+			(cell)factor::fp_signal_handler_impl
+		);
+		break;
+	default:
+		signal_number = e->ExceptionCode;
+		dispatch_signal_handler(
+			(cell*)&c->ESP,
+			(cell*)&c->EIP,
+			(cell)factor::synchronous_signal_handler_impl
+		);
+		break;
+	}
+
+	return ExceptionContinueExecution;
+}
+
+VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
+{
+	if (factor_vm::fatal_erroring_p)
+		return ExceptionContinueSearch;
+
+	factor_vm *vm = current_vm_p();
+	if (vm)
+		return vm->exception_handler(e,frame,c,dispatch);
+	else
+		return ExceptionContinueSearch;
+}
+
+static BOOL WINAPI ctrl_handler(DWORD dwCtrlType)
+{
+	switch (dwCtrlType) {
+	case CTRL_C_EVENT:
+		{
+			/* The CtrlHandler runs in its own thread without stopping the main thread.
+			Since in practice nobody uses the multi-VM stuff yet, we just grab the first
+			VM we can get. This will not be a good idea when we actually support native
+			threads. */
+			FACTOR_ASSERT(thread_vms.size() == 1);
+			factor_vm *vm = thread_vms.begin()->second;
+			vm->safepoint.enqueue_fep(vm);
+			return TRUE;
+		}
+	default:
+		return FALSE;
+	}
+}
+
+void factor_vm::open_console()
+{
+	handle_ctrl_c();
+}
+
+void factor_vm::ignore_ctrl_c()
+{
+	SetConsoleCtrlHandler(factor::ctrl_handler, FALSE);
+}
+
+void factor_vm::handle_ctrl_c()
+{
+	SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
+}
+
+void factor_vm::lock_console()
+{
+}
+
+void factor_vm::unlock_console()
+{
+}
+
+void factor_vm::close_console()
+{
+}
+
+void factor_vm::sampler_thread_loop()
+{
+	LARGE_INTEGER counter, new_counter, units_per_second;
+	DWORD ok;
+
+	ok = QueryPerformanceFrequency(&units_per_second);
+	FACTOR_ASSERT(ok);
+
+	ok = QueryPerformanceCounter(&counter);
+	FACTOR_ASSERT(ok);
+
+	counter.QuadPart *= samples_per_second;
+	while (atomic::load(&sampling_profiler_p))
+	{
+		SwitchToThread();
+		ok = QueryPerformanceCounter(&new_counter);
+		FACTOR_ASSERT(ok);
+		new_counter.QuadPart *= samples_per_second;
+		cell samples = 0;
+		while (new_counter.QuadPart - counter.QuadPart > units_per_second.QuadPart)
+		{
+			++samples;
+			counter.QuadPart += units_per_second.QuadPart;
+		}
+
+		if (samples > 0)
+		{
+			DWORD suscount = SuspendThread(thread);
+			FACTOR_ASSERT(suscount == 0);
+
+			CONTEXT context;
+			memset((void*)&context, 0, sizeof(CONTEXT));
+			context.ContextFlags = CONTEXT_CONTROL;
+			BOOL context_ok = GetThreadContext(thread, &context);
+			FACTOR_ASSERT(context_ok);
+
+			suscount = ResumeThread(thread);
+			FACTOR_ASSERT(suscount == 1);
+
+			safepoint.enqueue_samples(this, samples, context.EIP, false);
+		}
+	}
+}
+
+static DWORD WINAPI sampler_thread_entry(LPVOID parent_vm)
+{
+	static_cast<factor_vm*>(parent_vm)->sampler_thread_loop();
+	return 0;
+}
+
+void factor_vm::start_sampling_profiler_timer()
+{
+	sampler_thread = CreateThread(
+		NULL,
+		0,
+		&sampler_thread_entry,
+		static_cast<LPVOID>(this),
+		0,
+		NULL
+	);
+}
+
+void factor_vm::end_sampling_profiler_timer()
+{
+	atomic::store(&sampling_profiler_p, false);
+	DWORD wait_result = WaitForSingleObject(sampler_thread,
+		3000*(DWORD)samples_per_second);
+	if (wait_result != WAIT_OBJECT_0)
+		TerminateThread(sampler_thread, 0);
+	sampler_thread = NULL;
+}
+
+void abort()
+{
+	::abort();
+}
 
 }

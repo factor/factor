@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml xml.data kernel io io.encodings interval-maps splitting fry
 math.parser sequences combinators assocs locals accessors math arrays
-byte-arrays values ascii io.files biassocs math.order
+byte-arrays ascii io.files biassocs math.order namespaces
 combinators.short-circuit io.binary io.encodings.iana ;
 FROM: io.encodings.ascii => ascii ;
 IN: io.encodings.gb18030
@@ -62,11 +62,11 @@ TUPLE: range ufirst ulast bfirst blast ;
     ] ;
 
 : unlinear ( num -- bytes )
-    B{ HEX: 81 HEX: 30 HEX: 81 HEX: 30 } linear -
-    10 /mod HEX: 30 + swap
-    126 /mod HEX: 81 + swap
-    10 /mod HEX: 30 + swap
-    HEX: 81 +
+    B{ 0x81 0x30 0x81 0x30 } linear -
+    10 /mod 0x30 + swap
+    126 /mod 0x81 + swap
+    10 /mod 0x30 + swap
+    0x81 +
     4byte-array reverse! ;
 
 : >interval-map-by ( start-quot end-quot value-quot seq -- interval-map )
@@ -78,39 +78,39 @@ TUPLE: range ufirst ulast bfirst blast ;
 : ranges-gb>u ( ranges -- interval-map )
     [ bfirst>> ] [ blast>> ] [ ] >interval-map-by ;
 
-VALUE: gb>u
-VALUE: u>gb
-VALUE: mapping
+SYMBOL: gb>u
+SYMBOL: u>gb
+SYMBOL: mapping
 
 "vocab:io/encodings/gb18030/gb-18030-2000.xml"
 ascii <file-reader> xml>gb-data
-[ ranges-u>gb to: u>gb ] [ ranges-gb>u to: gb>u ] bi
->biassoc to: mapping
+[ ranges-u>gb u>gb set-global ] [ ranges-gb>u gb>u set-global ] bi
+>biassoc mapping set-global
 
 : lookup-range ( char -- byte-array )
-    dup u>gb interval-at [
+    dup u>gb get-global interval-at [
         [ ufirst>> - ] [ bfirst>> ] bi + unlinear
     ] [ encode-error ] if* ;
 
 M: gb18030 encode-char ( char stream encoding -- )
     drop [
-        dup mapping at
+        dup mapping get-global at
         [ ] [ lookup-range ] ?if
     ] dip stream-write ;
 
 : second-byte? ( ch -- ? ) ! of a double-byte character
-    { [ HEX: 40 HEX: 7E between? ] [ HEX: 80 HEX: fe between? ] } 1||  ;
+    { [ 0x40 0x7E between? ] [ 0x80 0xfe between? ] } 1||  ;
 
-: quad-1/3? ( ch -- ? ) HEX: 81 HEX: fe between? ;
+: quad-1/3? ( ch -- ? ) 0x81 0xfe between? ;
 
-: quad-2/4? ( ch -- ? ) HEX: 30 HEX: 39 between? ;
+: quad-2/4? ( ch -- ? ) 0x30 0x39 between? ;
 
 : last-bytes? ( byte-array -- ? )
     { [ length 2 = ] [ first quad-1/3? ] [ second quad-2/4? ] } 1&& ;
 
 : decode-quad ( byte-array -- char )
-    dup mapping value-at [ ] [
-        linear dup gb>u interval-at [
+    dup mapping get-global value-at [ ] [
+        linear dup gb>u get-global interval-at [
             [ bfirst>> - ] [ ufirst>> ] bi +
         ] [ drop replacement-char ] if*
     ] ?if ;
@@ -123,7 +123,7 @@ M: gb18030 encode-char ( char stream encoding -- )
 : two-byte ( stream byte -- char )
     over stream-read1 {
         { [ dup not ] [ 3drop replacement-char ] }
-        { [ dup second-byte? ] [ 2byte-array mapping value-at nip ] }
+        { [ dup second-byte? ] [ 2byte-array mapping get-global value-at nip ] }
         { [ dup quad-2/4? ] [ four-byte ] }
         [ 3drop replacement-char ]
     } cond ;
@@ -131,7 +131,7 @@ M: gb18030 encode-char ( char stream encoding -- )
 M: gb18030 decode-char ( stream encoding -- char )
     drop dup stream-read1 {
         { [ dup not ] [ 2drop f ] }
-        { [ dup ascii? ] [ nip 1byte-array mapping value-at ] }
+        { [ dup ascii? ] [ nip 1byte-array mapping get-global value-at ] }
         { [ dup quad-1/3? ] [ two-byte ] }
         [ 2drop replacement-char ]
     } cond ;

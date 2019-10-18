@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays circular colors colors.constants
-columns destructors fonts gpu.buffers gpu.render gpu.shaders gpu.state
-gpu.textures images kernel literals locals make math math.constants
-math.functions math.vectors sequences specialized-arrays typed ui.text fry ;
+USING: accessors alien.c-types alien.data arrays circular colors
+colors.constants columns destructors fonts gpu.buffers
+gpu.render gpu.shaders gpu.state gpu.textures images kernel
+literals locals make math math.constants math.functions
+math.vectors sequences specialized-arrays typed ui.text fry ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAYS: float uint ;
 IN: game.debug
@@ -108,7 +109,7 @@ CONSTANT: debug-text-texture-parameters
     image upside-down?>>
     [ { x0 y0 0 0 x1 y0 1 0 x1 y1 1 1 x0 y1 0 1 } ]
     [ { x0 y0 0 1 x1 y0 1 1 x1 y1 1 0 x0 y1 0 0 } ]
-    if >float-array ;
+    if float >c-array ;
 
 : debug-text-uniform-variables ( string color -- image uniforms )
     text>image dup image>texture

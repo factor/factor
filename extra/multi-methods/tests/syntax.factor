@@ -38,7 +38,7 @@ SYMBOL: some-var
 multi-methods:GENERIC: hook-test ( obj -- obj )
 
 METHOD: hook-test { array { some-var array } } reverse ;
-METHOD: hook-test { { some-var array } } class ;
+METHOD: hook-test { { some-var array } } class-of ;
 METHOD: hook-test { hashtable { some-var number } } assoc-size ;
 
 { 1 2 3 } some-var set

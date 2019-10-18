@@ -17,7 +17,7 @@ GENERIC: add-recent-where ( obj -- obj symbol )
 M: link add-recent-where recent-articles ;
 M: word-link add-recent-where recent-words ;
 M: vocab-spec add-recent-where recent-vocabs ;
-M: apropos add-recent-where recent-searches ;
+M: apropos-search add-recent-where recent-searches ;
 M: object add-recent-where f ;
 
 : $recent ( element -- )

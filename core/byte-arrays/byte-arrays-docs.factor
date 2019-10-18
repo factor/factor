@@ -30,7 +30,7 @@ ABOUT: "byte-arrays"
 HELP: byte-array
 { $description "The class of byte arrays. See " { $link "syntax-byte-arrays" } " for syntax and " { $link "byte-arrays" } " for general information." } ;
 
-HELP: <byte-array> ( n -- byte-array )
+HELP: <byte-array>
 { $values { "n" "a non-negative integer" } { "byte-array" "a new byte array" } }
 { $description "Creates a new byte array holding " { $snippet "n" } " bytes." } ;
 
@@ -70,7 +70,7 @@ HELP: 4byte-array
 
 { 1byte-array 2byte-array 3byte-array 4byte-array } related-words
 
-HELP: resize-byte-array ( n byte-array -- new-byte-array )
+HELP: resize-byte-array
 { $values { "n" "a non-negative integer" } { "byte-array" byte-array } { "new-byte-array" byte-array } }
 { $description "Resizes the byte array to have a length of " { $snippet "n" } " elements. When making the byte array shorter, this word may either create a new byte array or modify the existing byte array in place. When making the byte array longer, this word always allocates a new byte array, filling remaining space with zeroes." }
 { $side-effects "byte-array" } ;

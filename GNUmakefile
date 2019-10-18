@@ -1,13 +1,13 @@
 ifdef CONFIG
 	CC = gcc
 	CPP = g++
-	AR = ar
-	LD = ld
 
 	VERSION = 0.94
 
 	BUNDLE = Factor.app
 	LIBPATH = -L/usr/X11R6/lib
+
+	include $(CONFIG)
 
 	CFLAGS = -Wall $(SITE_CFLAGS)
 
@@ -16,8 +16,6 @@ ifdef CONFIG
 	else
 		CFLAGS += -O3
 	endif
-
-	include $(CONFIG)
 
 	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
 	EXECUTABLE = factor$(EXE_SUFFIX)$(EXE_EXTENSION)
@@ -58,15 +56,85 @@ ifdef CONFIG
 		vm/object_start_map.o \
 		vm/objects.o \
 		vm/primitives.o \
-		vm/profiler.o \
 		vm/quotations.o \
 		vm/run.o \
+		vm/safepoints.o \
+		vm/sampling_profiler.o \
 		vm/strings.o \
 		vm/to_tenured_collector.o \
 		vm/tuples.o \
 		vm/utilities.o \
-	        vm/vm.o \
+		vm/vm.o \
 		vm/words.o
+
+	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
+		vm/assert.hpp \
+		vm/layouts.hpp \
+		vm/platform.hpp \
+		vm/primitives.hpp \
+		vm/segments.hpp \
+		vm/gc_info.hpp \
+		vm/contexts.hpp \
+		vm/run.hpp \
+		vm/objects.hpp \
+		vm/sampling_profiler.hpp \
+		vm/errors.hpp \
+		vm/bignumint.hpp \
+		vm/bignum.hpp \
+		vm/booleans.hpp \
+		vm/instruction_operands.hpp \
+		vm/code_blocks.hpp \
+		vm/bump_allocator.hpp \
+		vm/bitwise_hacks.hpp \
+		vm/mark_bits.hpp \
+		vm/free_list.hpp \
+		vm/fixup.hpp \
+		vm/tuples.hpp \
+		vm/free_list_allocator.hpp \
+		vm/write_barrier.hpp \
+		vm/object_start_map.hpp \
+		vm/nursery_space.hpp \
+		vm/aging_space.hpp \
+		vm/tenured_space.hpp \
+		vm/data_heap.hpp \
+		vm/code_heap.hpp \
+		vm/gc.hpp \
+		vm/debug.hpp \
+		vm/strings.hpp \
+		vm/words.hpp \
+		vm/float_bits.hpp \
+		vm/io.hpp \
+		vm/image.hpp \
+		vm/alien.hpp \
+		vm/callbacks.hpp \
+		vm/dispatch.hpp \
+		vm/entry_points.hpp \
+		vm/safepoints.hpp \
+		vm/vm.hpp \
+		vm/allot.hpp \
+		vm/tagged.hpp \
+		vm/data_roots.hpp \
+		vm/code_roots.hpp \
+		vm/generic_arrays.hpp \
+		vm/callstack.hpp \
+		vm/slot_visitor.hpp \
+		vm/collector.hpp \
+		vm/copying_collector.hpp \
+		vm/nursery_collector.hpp \
+		vm/aging_collector.hpp \
+		vm/to_tenured_collector.hpp \
+		vm/code_block_visitor.hpp \
+		vm/compaction.hpp \
+		vm/full_collector.hpp \
+		vm/arrays.hpp \
+		vm/math.hpp \
+		vm/byte_arrays.hpp \
+		vm/jit.hpp \
+		vm/quotations.hpp \
+		vm/inline_cache.hpp \
+		vm/mvm.hpp \
+		vm/factor.hpp \
+		vm/utilities.hpp
 
 	EXE_OBJS = $(PLAF_EXE_OBJS)
 
@@ -81,24 +149,16 @@ default:
 help:
 	@echo "Run '$(MAKE)' with one of the following parameters:"
 	@echo ""
-	@echo "freebsd-x86-32"
-	@echo "freebsd-x86-64"
 	@echo "linux-x86-32"
 	@echo "linux-x86-64"
-	@echo "linux-ppc"
+	@echo "linux-ppc-32"
+	@echo "linux-ppc-64"
 	@echo "linux-arm"
-	@echo "openbsd-x86-32"
-	@echo "openbsd-x86-64"
-	@echo "netbsd-x86-32"
-	@echo "netbsd-x86-64"
 	@echo "macosx-x86-32"
 	@echo "macosx-x86-64"
-	@echo "macosx-ppc"
-	@echo "solaris-x86-32"
-	@echo "solaris-x86-64"
-	@echo "wince-arm"
-	@echo "winnt-x86-32"
-	@echo "winnt-x86-64"
+	@echo "macosx-x86-fat"
+	@echo "windows-x86-32"
+	@echo "windows-x86-64"
 	@echo ""
 	@echo "Additional modifiers:"
 	@echo ""
@@ -109,32 +169,14 @@ help:
 
 ALL = factor factor-ffi-test factor-lib
 
-openbsd-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.x86.32
-
-openbsd-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.openbsd.x86.64
-
-freebsd-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
-
-freebsd-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
-
-netbsd-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.x86.32
-
-netbsd-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.netbsd.x86.64
-
-macosx-ppc:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.ppc
-
 macosx-x86-32:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32
 
 macosx-x86-64:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.64
+
+macosx-x86-fat:
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat
 
 linux-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32
@@ -142,28 +184,22 @@ linux-x86-32:
 linux-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.64
 
-linux-ppc:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc
+linux-ppc-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.32
+
+linux-ppc-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64
 
 linux-arm:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm
 
-solaris-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.solaris.x86.32
+windows-x86-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32
+	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.32
 
-solaris-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.solaris.x86.64
-
-winnt-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.nt.x86.32
-	$(MAKE) factor-console CONFIG=vm/Config.windows.nt.x86.32
-
-winnt-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.nt.x86.64
-	$(MAKE) factor-console CONFIG=vm/Config.windows.nt.x86.64
-
-wince-arm:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.ce.arm
+windows-x86-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64
+	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64
 
 ifdef CONFIG
 
@@ -179,12 +215,12 @@ $(ENGINE): $(DLL_OBJS)
 factor-lib: $(ENGINE)
 
 factor: $(EXE_OBJS) $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(DLL_OBJS) \
-		$(CFLAGS) -o $(EXECUTABLE) $(EXE_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBPATH) -L. $(DLL_OBJS) \
+		$(CFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(DLL_OBJS) \
-		$(CFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(EXE_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBPATH) -L. $(DLL_OBJS) \
+		$(CFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
@@ -197,13 +233,16 @@ vm/resources.o:
 vm/ffi_test.o: vm/ffi_test.c
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
-.cpp.o:
+vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
+	$(TOOLCHAIN_PREFIX)$(CPP) -c -x c++-header $(CFLAGS) -o $@ $<
+
+%.o: %.cpp vm/master.hpp.gch
 	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
-.S.o:
-	$(TOOLCHAIN_PREFIX)$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
+%.o: %.S
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) -o $@ $<
 
-.mm.o:
+%.o: %.mm vm/master.hpp.gch
 	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
@@ -211,6 +250,7 @@ vm/ffi_test.o: vm/ffi_test.c
 endif
 
 clean:
+	rm -f vm/*.gch
 	rm -f vm/*.o
 	rm -f factor.dll
 	rm -f factor.lib

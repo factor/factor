@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors cpu.architecture vocabs.loader system
+USING: accessors cpu.architecture vocabs system
 sequences namespaces parser kernel kernel.private classes
 classes.private arrays hashtables vectors classes.tuple sbufs
 hashtables.private sequences.private math classes.tuple.private
-growable namespaces.private assocs words command-line vocabs io
+growable namespaces.private assocs words command-line io
 io.encodings.string libc splitting math.parser memory compiler.units
-math.order quotations quotations.private assocs.private ;
+math.order quotations quotations.private assocs.private vocabs.loader ;
 FROM: compiler => enable-optimizer ;
 IN: bootstrap.compiler
 
@@ -42,7 +42,7 @@ gc
     ! Compile a set of words ahead of the full compile.
     ! This set of words was determined semi-empirically
     ! using the profiler. It improves bootstrap time
-    ! significantly, because frequenly called words
+    ! significantly, because frequently called words
     ! which are also quick to compile are replaced by
     ! compiled definitions as soon as possible.
     {
@@ -94,7 +94,7 @@ gc
 
     {
         member-eq? split harvest sift cut cut-slice start index clone
-        set-at reverse push-all class number>string string>number
+        set-at reverse push-all class-of number>string string>number
         like clone-like
     } compile-unoptimized
 
@@ -107,6 +107,17 @@ gc
 
     "." write flush
 
+    os windows? [
+        "GetLastError" "windows.kernel32" lookup-word
+        "FormatMessageW" "windows.kernel32" lookup-word
+        2array compile-unoptimized
+    ] when
+
+    os unix? [
+        "(dlerror)" "alien.libraries.unix" lookup-word
+        1array compile-unoptimized
+    ] when
+
     {
         malloc calloc free memcpy
     } compile-unoptimized
@@ -118,7 +129,6 @@ gc
     " done" print flush
 
     "alien.syntax" require
-    "alien.complex" require
     "io.streams.byte-array.fast" require
 
 ] unless

@@ -62,7 +62,7 @@ HELP: n*p
 
 HELP: pextend-conv
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "p'" "a polynomial" } { "q'" "a polynomial" } }
-{ $description "Convulution, extending to " { $snippet "p_m + q_n - 1" } "." }
+{ $description "Convolution, extending to " { $snippet "p_m + q_n - 1" } "." }
 { $examples { $example "USING: kernel math.polynomials prettyprint ;" "{ 1 0 1 } { 0 1 } pextend-conv [ . ] bi@" "{ 1 0 1 0 }\n{ 0 1 0 0 }" } } ;
 
 HELP: p*

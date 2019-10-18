@@ -3,7 +3,7 @@
 USING: arrays combinators locals io.directories
 io.directories.hierarchy io.files io.launcher io.pathnames
 kernel make mason.common mason.config mason.platform namespaces
-prettyprint sequences ;
+prettyprint sequences system ;
 IN: mason.release.archive
 
 : base-name ( -- string )
@@ -11,8 +11,8 @@ IN: mason.release.archive
 
 : extension ( os -- extension )
     {
-        { "winnt" [ ".zip" ] }
-        { "macosx" [ ".dmg" ] }
+        { windows [ ".zip" ] }
+        { macosx [ ".dmg" ] }
         [ drop ".tar.gz" ]
     } case ;
 
@@ -28,15 +28,15 @@ IN: mason.release.archive
     "dmg-root" make-directory
     "factor" "dmg-root" copy-tree-into
     "factor" "dmg-root" make-disk-image
-    "dmg-root" really-delete-tree ;
+    "dmg-root" delete-tree ;
 
 :: make-unix-archive ( archive-name -- )
     { "tar" "-cvzf" archive-name "factor" } short-running-process ;
 
 : make-archive ( archive-name -- )
     target-os get {
-        { "winnt" [ make-windows-archive ] }
-        { "macosx" [ make-macosx-archive ] }
+        { windows [ make-windows-archive ] }
+        { macosx [ make-macosx-archive ] }
         [ drop make-unix-archive ]
     } case ;
 

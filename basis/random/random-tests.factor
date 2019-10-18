@@ -1,5 +1,5 @@
-USING: random sequences tools.test kernel math math.functions
-sets grouping random.private ;
+USING: random sequences tools.test kernel math math.constants
+math.functions sets grouping random.private math.statistics ;
 IN: random.tests
 
 [ 4 ] [ 4 random-bytes length ] unit-test
@@ -33,3 +33,59 @@ IN: random.tests
 
 [ ]
 [ [ 100 random-bytes ] with-system-random drop ] unit-test
+
+{ t t }
+[ 500000 [ 0 1 normal-random-float ] replicate [ mean 0 .2 ~ ] [ std 1 .2 ~ ] bi ] unit-test
+
+{ t }
+[ 500000 [ .15 exponential-random-float ] replicate [ mean ] [ std ] bi .2 ~ ] unit-test
+
+{ t }
+[ 500000 [ 1 exponential-random-float ] replicate [ mean ] [ std ] bi .2 ~ ] unit-test
+
+{ t t }
+[
+    500000 [ 1 3 pareto-random-float ] replicate [ mean ] [ std ] bi
+    [ 1.5 .5 ~ ] [ 3 sqrt 2 / .5 ~ ] bi*
+] unit-test
+
+{ t t }
+[
+    500000 [ 2 3 gamma-random-float ] replicate
+    [ mean 6 .2 ~ ] [ std 2 sqrt 3 * .2 ~ ] bi
+] unit-test
+
+{ t t }
+[
+    500000 [ 2 3 beta-random-float ] replicate
+    [ mean 2 2 3 + / .2 ~ ]
+    [ std 2 sqrt 3 sqrt + 2 3 + dup 1 + sqrt * / .2 ~ ] bi
+] unit-test
+
+{ t }
+[ 500000 [ 3 4 von-mises-random-float ] replicate mean 3 .2 ~ ] unit-test
+
+{ t t }
+[
+    500000 [ 2 7 triangular-random-float ] replicate
+    [ mean 2 7 + 2 / .2 ~ ] [ std 7 2 - 2 6 sqrt * / .2 ~ ] bi
+] unit-test
+
+{ t t }
+[
+    500000 [ 2 3 laplace-random-float ] replicate
+    [ mean 2 .2 ~ ] [ std 2 sqrt 3 * .2 ~ ] bi
+] unit-test
+
+{ t t }
+[
+    500000 [ 12 rayleigh-random-float ] replicate
+    [ mean pi 2 / sqrt 12 * .2 ~ ]
+    [ std 2 pi 2 / - sqrt 12 * .2 ~ ] bi
+] unit-test
+
+{ t t }
+[
+    500000 [ 3 4 logistic-random-float ] replicate
+    [ mean 3 .2 ~ ] [ std pi 4 * 3 sqrt / .2 ~ ] bi
+] unit-test

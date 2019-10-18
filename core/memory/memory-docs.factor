@@ -6,26 +6,18 @@ HELP: instances
 { $values { "quot" { $quotation "( obj -- ? )" } } { "seq" "a fresh sequence" } }
 { $description "Outputs a sequence of all objects in the heap which satisfy the quotation." } ;
 
-HELP: gc ( -- )
+HELP: gc
 { $description "Performs a full garbage collection." } ;
 
-HELP: data-room ( -- data-room )
-{ $values { "data-room" data-room } }
-{ $description "Queries the VM for memory usage information." } ;
-
-HELP: code-room ( -- code-room )
-{ $values { "code-room" code-room } }
-{ $description "Queries the VM for memory usage information." } ;
-
-HELP: size ( obj -- n )
+HELP: size
 { $values { "obj" "an object" } { "n" "a size in bytes" } }
 { $description "Outputs the size of the object in memory, in bytes. Tagged immediate objects such as fixnums and " { $link f } " will yield a size of 0." } ;
 
-HELP: save-image ( path -- )
+HELP: save-image
 { $values { "path" "a pathname string" } }
 { $description "Saves a snapshot of the heap to the given file, overwriting the file if it already exists." } ;
 
-HELP: save-image-and-exit ( path -- )
+HELP: save-image-and-exit
 { $values { "path" "a pathname string" } }
 { $description "Saves a snapshot of the heap to the given file, overwriting the file if it already exists. This word compacts the code heap and immediately exits Factor, since the Factor VM cannot continue executing after compiled code blocks have been moved around." } ;
 

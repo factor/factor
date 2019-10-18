@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel locals math math.functions
-math.order sequences summary system threads vocabs.loader ;
+math.order sequences summary system vocabs vocabs.loader ;
 IN: calendar
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
@@ -33,19 +33,19 @@ TUPLE: timestamp
 C: <timestamp> timestamp
 
 : gmt-offset-duration ( -- duration )
-    0 0 0 gmt-offset <duration> ;
+    0 0 0 gmt-offset <duration> ; inline
 
 : <date> ( year month day -- timestamp )
-    0 0 0 gmt-offset-duration <timestamp> ;
+    0 0 0 gmt-offset-duration <timestamp> ; inline
 
 : <date-gmt> ( year month day -- timestamp )
-    0 0 0 instant <timestamp> ;
+    0 0 0 instant <timestamp> ; inline
 
 : <year> ( year -- timestamp )
-    1 1 <date> ;
+    1 1 <date> ; inline
 
 : <year-gmt> ( year -- timestamp )
-    1 1 <date-gmt> ;
+    1 1 <date-gmt> ; inline
 
 ERROR: not-a-month ;
 M: not-a-month summary
@@ -63,12 +63,6 @@ CONSTANT: month-names
         "January" "February" "March" "April" "May" "June"
         "July" "August" "September" "October" "November" "December"
     }
-
-<PRIVATE
-
-: (month-name) ( n -- string ) 1 - month-names nth ;
-
-PRIVATE>
 
 GENERIC: month-name ( obj -- string )
 
@@ -161,13 +155,13 @@ M: timestamp easter ( timestamp -- timestamp )
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-: years ( x -- duration ) instant clone swap >>year ;
-: months ( x -- duration ) instant clone swap >>month ;
-: days ( x -- duration ) instant clone swap >>day ;
+: years ( x -- duration ) instant swap >>year ;
+: months ( x -- duration ) instant swap >>month ;
+: days ( x -- duration ) instant swap >>day ;
 : weeks ( x -- duration ) 7 * days ;
-: hours ( x -- duration ) instant clone swap >>hour ;
-: minutes ( x -- duration ) instant clone swap >>minute ;
-: seconds ( x -- duration ) instant clone swap >>second ;
+: hours ( x -- duration ) instant swap >>hour ;
+: minutes ( x -- duration ) instant swap >>minute ;
+: seconds ( x -- duration ) instant swap >>second ;
 : milliseconds ( x -- duration ) 1000 / seconds ;
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
@@ -315,13 +309,21 @@ GENERIC: time- ( time1 time2 -- time3 )
     gmt-offset-duration convert-timezone ;
 
 : >gmt ( timestamp -- timestamp' )
-    instant convert-timezone ;
+    dup gmt-offset>> dup instant =
+    [ drop ] [
+        [ neg +second 0 ] change-second
+        [ neg +minute 0 ] change-minute
+        [ neg +hour   0 ] change-hour
+        [ neg +day    0 ] change-day
+        [ neg +month  0 ] change-month
+        [ neg +year   0 ] change-year drop
+    ] if ;
 
 M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
 : same-day? ( ts1 ts2 -- ? )
-    [ >gmt >date< <date> ] bi@ = ;
+    [ >gmt >date< <date> ] same? ;
 
 : (time-) ( timestamp timestamp -- n )
     [ >gmt ] bi@
@@ -348,33 +350,53 @@ M: timestamp time-
 : before ( duration -- -duration )
     -1 time* ;
 
+<PRIVATE
+
+: -slots ( obj1 obj2 quot -- n obj1 obj2 )
+    [ bi@ - ] curry 2keep ; inline
+
+PRIVATE>
+
 M: duration time-
-    before time+ ;
+    over timestamp? [
+        before time+
+    ] [
+        [ year>> ] -slots
+        [ month>> ] -slots
+        [ day>> ] -slots
+        [ hour>> ] -slots
+        [ minute>> ] -slots
+        [ second>> ] -slots
+        2drop <duration>
+    ] if ;
 
 : <zero> ( -- timestamp )
-    0 0 0 0 0 0 instant <timestamp> ;
+    0 0 0 <date-gmt> ; inline
 
 : valid-timestamp? ( timestamp -- ? )
     clone instant >>gmt-offset
     dup <zero> time- <zero> time+ = ;
 
 : unix-1970 ( -- timestamp )
-    1970 1 1 0 0 0 instant <timestamp> ;
+    1970 <year-gmt> ; inline
 
 : millis>timestamp ( x -- timestamp )
-    [ unix-1970 ] dip milliseconds time+ ;
+    [ unix-1970 ] dip 1000 / +second ;
 
 : timestamp>millis ( timestamp -- n )
     unix-1970 (time-) 1000 * >integer ;
 
 : micros>timestamp ( x -- timestamp )
-    [ unix-1970 ] dip microseconds time+ ;
+    [ unix-1970 ] dip 1000000 / +second ;
 
 : timestamp>micros ( timestamp -- n )
     unix-1970 (time-) 1000000 * >integer ;
 
-: now ( -- timestamp ) gmt >local-time ;
+: now ( -- timestamp )
+    gmt gmt-offset-duration (time+) >>gmt-offset ;
+
 : hence ( duration -- timestamp ) now swap time+ ;
+
 : ago ( duration -- timestamp ) now swap time- ;
 
 : zeller-congruence ( year month day -- n )
@@ -422,8 +444,11 @@ M: timestamp day-name day-of-week day-names nth ;
 : noon ( timestamp -- new-timestamp )
     midnight 12 >>hour ; inline
 
+: today ( -- timestamp )
+    now midnight ; inline
+
 : beginning-of-month ( timestamp -- new-timestamp )
-    midnight 1 >>day ;
+    midnight 1 >>day ; inline
 
 : end-of-month ( timestamp -- new-timestamp )
     [ midnight ] [ days-in-month ] bi >>day ;
@@ -438,7 +463,7 @@ M: timestamp day-name day-of-week day-names nth ;
 
 :: nth-day-this-month ( timestamp n day -- new-timestamp )
     timestamp beginning-of-month day day-this-week
-    dup timestamp [ month>> ] bi@ = [ 1 weeks time+ ] unless
+    dup timestamp [ month>> ] same? [ 1 weeks time+ ] unless
     n 1 - [ weeks time+ ] unless-zero ;
 
 : last-day-this-month ( timestamp day -- new-timestamp )
@@ -529,21 +554,20 @@ M: timestamp end-of-year 12 >>month 31 >>day ;
 M: integer end-of-year 12 31 <date> ;
 
 : time-since-midnight ( timestamp -- duration )
-    dup midnight time- ;
+    dup midnight time- ; inline
 
 : since-1970 ( duration -- timestamp )
-    unix-1970 time+ ;
+    unix-1970 time+ ; inline
 
 : timestamp>unix-time ( timestamp -- seconds )
-    unix-1970 time- second>> ;
+    unix-1970 (time-) ; inline
 
 : unix-time>timestamp ( seconds -- timestamp )
-    seconds unix-1970 time+ ;
-
-M: duration sleep
-    duration>nanoseconds >integer nano-count + sleep-until ;
+    [ unix-1970 ] dip +second ; inline
 
 {
     { [ os unix? ] [ "calendar.unix" ] }
     { [ os windows? ] [ "calendar.windows" ] }
 } cond require
+
+{ "threads" "calendar" } "calendar.threads" require-when

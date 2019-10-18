@@ -9,7 +9,7 @@ compiler.cfg.def-use
 compiler.cfg.registers
 compiler.cfg.dominance
 compiler.cfg.instructions
-compiler.cfg.liveness.ssa
+compiler.cfg.liveness
 compiler.cfg.ssa.cssa
 compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges
@@ -28,9 +28,9 @@ IN: compiler.cfg.ssa.destruction
 ! 2) Useless ##copy instructions, and all ##phi instructions,
 ! are eliminated, so the register allocator does not have to
 ! remove any redundant operations.
-! 3) A side effect of running this pass is that SSA liveness
-! information is computed, so the register allocator does not
-! need to compute it again.
+! 3) This pass computes live sets and fills out GC maps with
+! compiler.cfg.liveness, so the linear scan register allocator
+! does not need to compute liveness again.
 
 SYMBOL: leader-map
 
@@ -134,7 +134,7 @@ PRIVATE>
     dup construct-cssa
     dup compute-defs
     dup compute-insns
-    dup compute-ssa-live-sets
+    dup compute-live-sets
     dup compute-live-ranges
     dup prepare-coalescing
     process-copies

@@ -1,16 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations definitions generic help.topics threads
-stack-checker summary io.pathnames io.styles kernel namespaces
-parser prettyprint quotations tools.crossref tools.annotations
-editors tools.profiler tools.test tools.time tools.walker vocabs
-vocabs.loader words sequences classes compiler.errors
-compiler.units accessors vocabs.parser macros.expander ui
-ui.tools.browser ui.tools.listener ui.tools.listener.completion
-ui.tools.profiler ui.tools.inspector ui.tools.traceback
-ui.commands ui.gadgets.editors ui.gestures ui.operations
-ui.tools.deploy models help.tips source-files.errors destructors
-libc libc.private ;
+USING: accessors combinators.short-circuit compiler.errors
+compiler.units continuations definitions destructors editors
+help.topics io.pathnames io.styles kernel libc.private
+macros.expander models parser prettyprint quotations
+source-files.errors stack-checker threads tools.annotations
+tools.crossref tools.test tools.time tools.walker ui.commands
+ui.gestures ui.operations ui.tools.browser ui.tools.deploy
+ui.tools.inspector ui.tools.listener ui.tools.traceback vocabs
+vocabs.loader vocabs.parser words ;
 IN: ui.tools.operations
 
 ! Objects
@@ -35,7 +33,7 @@ IN: ui.tools.operations
 [ drop t ] \ com-unparse H{ } define-operation
 
 ! Models
-[ model? ] \ inspect-model H{
+[ { [ model? ] [ ref>> ] } 1&& ] \ inspect-model H{
     { +primary+ t }
 } define-operation
 
@@ -68,9 +66,6 @@ IN: ui.tools.operations
     { +primary+ t }
     { +secondary+ t }
 } define-operation
-
-! Pathnames
-: edit-file ( pathname -- ) edit ;
 
 [ pathname? ] \ edit-file H{
     { +keyboard+ T{ key-down f { C+ } "e" } }
@@ -119,7 +114,9 @@ IN: ui.tools.operations
     { +listener+ t }
 } define-operation
 
-[ word? ] \ watch H{ } define-operation
+[ annotated? not ] \ watch H{ } define-operation
+
+[ annotated? ] \ reset H{ } define-operation
 
 [ word? ] \ breakpoint H{ } define-operation
 
@@ -165,11 +162,6 @@ M: word com-stack-effect 1quotation com-stack-effect ;
 
 [ quotation? ] \ time H{
     { +keyboard+ T{ key-down f { C+ } "t" } }
-    { +listener+ t }
-} define-operation
-
-[ quotation? ] \ com-profile H{
-    { +keyboard+ T{ key-down f { C+ } "o" } }
     { +listener+ t }
 } define-operation
 

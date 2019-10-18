@@ -10,14 +10,13 @@ void init_globals()
 
 void factor_vm::default_parameters(vm_parameters *p)
 {
+	p->embedded_image = false;
 	p->image_path = NULL;
 
 	p->datastack_size = 32 * sizeof(cell);
 	p->retainstack_size = 32 * sizeof(cell);
 
-#if defined(__OpenBSD__) && defined(FACTOR_X86)
-	p->callstack_size = 64 * sizeof(cell);
-#elif defined(FACTOR_PPC)
+#if defined(FACTOR_PPC)
 	p->callstack_size = 256 * sizeof(cell);
 #else
 	p->callstack_size = 128 * sizeof(cell);
@@ -34,7 +33,7 @@ void factor_vm::default_parameters(vm_parameters *p)
 	p->signals = true;
 
 #ifdef WINDOWS
-	p->console = false;
+	p->console = GetConsoleWindow() != NULL;
 #else
 	p->console = true;
 #endif
@@ -84,15 +83,14 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 /* Compile code in boot image so that we can execute the startup quotation */
 void factor_vm::prepare_boot_image()
 {
-	std::cout << "*** Stage 2 early init... ";
-	fflush(stdout);
+	std::cout << "*** Stage 2 early init... " << std::flush;
 
 	compile_all_words();
 	update_code_heap_words(true);
 	initialize_all_quotations();
 	special_objects[OBJ_STAGE2] = true_object;
 
-	std::cout << "done\n";
+	std::cout << "done" << std::endl;
 }
 
 void factor_vm::init_factor(vm_parameters *p)
@@ -121,7 +119,15 @@ void factor_vm::init_factor(vm_parameters *p)
 		p->executable_path = executable_path;
 
 	if(p->image_path == NULL)
-		p->image_path = default_image_path();
+	{
+		if (embedded_image_p())
+		{
+			p->embedded_image = true;
+			p->image_path = p->executable_path;
+		}
+		else
+			p->image_path = default_image_path();
+	}
 
 	srand((unsigned int)nano_count());
 	init_ffi();
@@ -130,14 +136,6 @@ void factor_vm::init_factor(vm_parameters *p)
 	load_image(p);
 	init_c_io();
 	init_inline_caching((int)p->max_pic_size);
-	if(p->signals)
-		init_signals();
-
-	if(p->console)
-		open_console();
-
-	init_profiler();
-
 	special_objects[OBJ_CPU] = allot_alien(false_object,(cell)FACTOR_CPU_STRING);
 	special_objects[OBJ_OS] = allot_alien(false_object,(cell)FACTOR_OS_STRING);
 	special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
@@ -151,6 +149,13 @@ void factor_vm::init_factor(vm_parameters *p)
 
 	if(!to_boolean(special_objects[OBJ_STAGE2]))
 		prepare_boot_image();
+
+	if(p->signals)
+		init_signals();
+
+	if(p->console)
+		open_console();
+
 }
 
 /* May allocate memory */
@@ -179,8 +184,9 @@ void factor_vm::stop_factor()
 
 char *factor_vm::factor_eval_string(char *string)
 {
-	char *(*callback)(char *) = (char *(*)(char *))alien_offset(special_objects[OBJ_EVAL_CALLBACK]);
-	return callback(string);
+	void *func = alien_offset(special_objects[OBJ_EVAL_CALLBACK]);
+	CODE_TO_FUNCTION_POINTER(func);
+	return ((char *(*)(char *))func)(string);
 }
 
 void factor_vm::factor_eval_free(char *result)
@@ -190,14 +196,16 @@ void factor_vm::factor_eval_free(char *result)
 
 void factor_vm::factor_yield()
 {
-	void (*callback)() = (void (*)())alien_offset(special_objects[OBJ_YIELD_CALLBACK]);
-	callback();
+	void *func = alien_offset(special_objects[OBJ_YIELD_CALLBACK]);
+	CODE_TO_FUNCTION_POINTER(func);
+	((void (*)())func)();
 }
 
 void factor_vm::factor_sleep(long us)
 {
-	void (*callback)(long) = (void (*)(long))alien_offset(special_objects[OBJ_SLEEP_CALLBACK]);
-	callback(us);
+	void *func = alien_offset(special_objects[OBJ_SLEEP_CALLBACK]);
+	CODE_TO_FUNCTION_POINTER(func);
+	((void (*)(long))func)(us);
 }
 
 void factor_vm::start_standalone_factor(int argc, vm_char **argv)
@@ -212,9 +220,10 @@ void factor_vm::start_standalone_factor(int argc, vm_char **argv)
 
 factor_vm *new_factor_vm()
 {
-	factor_vm *newvm = new factor_vm();
+	THREADHANDLE thread = thread_id();
+	factor_vm *newvm = new factor_vm(thread);
 	register_vm_with_thread(newvm);
-	thread_vms[thread_id()] = newvm;
+	thread_vms[thread] = newvm;
 
 	return newvm;
 }

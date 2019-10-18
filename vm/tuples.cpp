@@ -3,6 +3,7 @@
 namespace factor
 {
 
+/* Allocates memory */
 /* push a new tuple on the stack, filling its slots with f */
 void factor_vm::primitive_tuple()
 {
@@ -15,6 +16,7 @@ void factor_vm::primitive_tuple()
 	ctx->push(t.value());
 }
 
+/* Allocates memory */
 /* push a new tuple on the stack, filling its slots from the stack */
 void factor_vm::primitive_tuple_boa()
 {

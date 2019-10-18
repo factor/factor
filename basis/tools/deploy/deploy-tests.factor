@@ -1,12 +1,24 @@
-USING: tools.test system io io.encodings.ascii io.pathnames
-io.files io.files.info io.files.temp kernel tools.deploy.config
-tools.deploy.config.editor tools.deploy.backend math sequences
-io.launcher arrays namespaces continuations layouts accessors
-urls math.parser io.directories tools.deploy tools.deploy.test
-vocabs ;
+USING: bootstrap.image tools.test system io io.encodings.ascii
+io.pathnames io.files io.files.info io.files.temp kernel
+tools.deploy.config tools.deploy.config.editor
+tools.deploy.backend math sequences io.launcher arrays
+namespaces continuations layouts accessors urls math.parser
+io.directories splitting tools.deploy tools.deploy.test vocabs ;
+
 IN: tools.deploy.tests
 
-[ "no such vocab, fool!" deploy ] [ no-vocab? ] must-fail-with
+! Delete all cached staging images in case syntax or
+! other core vocabularies have changed and staging
+! images are stale.
+cache-directory [
+    [ "staging." head? ] filter
+    my-arch ".image" append [ tail? ] curry filter
+    [ delete-file ] each
+] with-directory-files
+
+[ "nosuchvocab" deploy ] [ no-vocab? ] must-fail-with
+
+[ "no such vocab, fool!" deploy ] [ bad-vocab-name? ] must-fail-with
 
 [ ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
 
@@ -14,9 +26,11 @@ IN: tools.deploy.tests
 
 [ ] [ "hello-ui" shake-and-bake 1300000 small-enough? ] unit-test
 
-[ "staging.math-threads-compiler-ui.image" ] [
-    "hello-ui" deploy-config
-    [ bootstrap-profile staging-image-name file-name ] bind
+[ "math-threads-compiler-ui" ] [
+    "hello-ui" deploy-config [
+        bootstrap-profile staging-image-name file-name
+        "." split second
+    ] with-variables
 ] unit-test
 
 [ ] [ "maze" shake-and-bake 1200000 small-enough? ] unit-test
@@ -52,7 +66,7 @@ os macosx? [
 ] each
 
 USING: http.client http.server http.server.dispatchers
-http.server.responses http.server.static io.servers.connection ;
+http.server.responses http.server.static io.servers ;
 
 SINGLETON: quit-responder
 
@@ -68,9 +82,9 @@ M: quit-responder call-responder*
         <http-server>
             0 >>insecure
             f >>secure
-        dup start-server*
-        sockets>> first addr>> port>>
-        dup number>string "resource:temp/port-number" ascii set-file-contents
+        start-server
+        servers>> first addr>> port>>
+        dup number>string "port-number" temp-file ascii set-file-contents
     ] with-scope
     "port" set ;
 
@@ -128,9 +142,25 @@ os macosx? [
 [ t ] [
     "tools.deploy.test.18" shake-and-bake
     deploy-test-command ascii [ readln ] with-process-reader
-    "test.image" temp-file =
+    test-image temp-file =
 ] unit-test
 
 [ ] [ "resource:license.txt" "license.txt" temp-file copy-file ] unit-test
 
 [ ] [ "tools.deploy.test.19" shake-and-bake run-temp-image ] unit-test
+
+[ ] [ "tools.deploy.test.20" shake-and-bake ] unit-test
+
+[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>Factor</foo>" ]
+[ deploy-test-command ascii [ readln ] with-process-reader ] unit-test
+
+[ ] [ "tools.deploy.test.20" drop 850000 small-enough? ] unit-test
+
+[ ] [ "tools.deploy.test.21" shake-and-bake ] unit-test
+
+[ "1 2 3" ]
+[ deploy-test-command ascii [ readln ] with-process-reader ] unit-test
+
+[ ] [ "tools.deploy.test.21" drop 800000 small-enough? ] unit-test
+
+[ ] [ "benchmark.ui-panes" shake-and-bake run-temp-image ] unit-test

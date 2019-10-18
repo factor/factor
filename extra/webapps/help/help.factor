@@ -1,9 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors http.server.dispatchers
-http.server.static furnace.actions furnace.redirection urls
-validators locals io.files io.directories html.forms
-html.components help.html ;
+USING: accessors db.sqlite furnace.actions furnace.alloy
+furnace.redirection help.html help.topics html.components
+html.forms html.templates.chloe http.server
+http.server.dispatchers http.server.static io.directories
+io.files io.files.temp kernel locals namespaces sequences
+unicode.categories urls ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
@@ -15,30 +17,36 @@ M: result link-href href>> ;
 :: <search-action> ( help-dir -- action )
     <page-action>
         { help-webapp "search" } >>template
-
         [
-            {
-                { "search" [ 1 v-min-length 50 v-max-length v-one-line ] }
-            } validate-params
-
-            help-dir [
-                "search" value article-apropos "articles" set-value
-                "search" value word-apropos "words" set-value
-                "search" value vocab-apropos "vocabs" set-value
-            ] with-directory
+            "search" param [ blank? ] trim [
+                help-dir [
+                    [ article-apropos "articles" set-value ]
+                    [ word-apropos "words" set-value ]
+                    [ vocab-apropos "vocabs" set-value ] tri
+                ] with-directory
+            ] unless-empty
+            help-navbar "navbar" set-value
 
             { help-webapp "search" } <chloe-content>
-        ] >>submit ;
+        ] >>display ;
+
+: help-url ( topic -- url )
+    topic>filename "$help-webapp/content/" prepend >url ;
 
 : <main-action> ( -- action )
-    <page-action>
-        { help-webapp "help" } >>template ;
+    <action>
+        [ "handbook" >link help-url <redirect> ] >>display ;
 
-: <help-webapp> ( help-dir -- webapp )
+:: <help-webapp> ( help-dir -- webapp )
     help-webapp new-dispatcher
         <main-action> "" add-responder
-        over <search-action> "search" add-responder
-        swap <static> "content" add-responder
+        help-dir <search-action> "search" add-responder
+        help-dir <static> "content" add-responder
         "resource:basis/definitions/icons/" <static> "icons" add-responder ;
 
+: run-help-webapp ( -- )
+    "docs" cache-file <help-webapp>
+        main-responder set-global
+    8080 httpd drop ;
 
+MAIN: run-help-webapp

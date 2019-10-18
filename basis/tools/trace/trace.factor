@@ -15,7 +15,7 @@ exclude-vocabs { "math" "accessors" } swap set-global
 <PRIVATE
 
 : callstack-depth ( callstack -- n )
-    callstack>array length 2/ ;
+    callstack>array midpoint@ ;
 
 SYMBOL: end
 

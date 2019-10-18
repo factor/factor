@@ -9,3 +9,7 @@ IN: io.crlf
 : read-crlf ( -- seq )
     "\r" read-until
     [ CHAR: \r assert= read1 CHAR: \n assert= ] [ f like ] if* ;
+
+: read-?crlf ( -- seq )
+    "\r\n" read-until
+    [ CHAR: \r = [ read1 CHAR: \n assert= ] when ] [ f like ] if* ;

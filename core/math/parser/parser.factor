@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors byte-arrays combinators kernel kernel.private
-math namespaces sequences sequences.private splitting strings
-make ;
+make math namespaces sequences sequences.private splitting
+strings ;
 IN: math.parser
 
 : digit> ( ch -- n )
@@ -11,9 +11,11 @@ IN: math.parser
                              [ CHAR: a 10 - - dup 10 < [ drop 255 ] when ]
     } cond ; inline
 
+ERROR: invalid-radix radix ;
+
 <PRIVATE
 
-TUPLE: number-parse 
+TUPLE: number-parse
     { str read-only }
     { length fixnum read-only }
     { radix fixnum read-only } ;
@@ -74,12 +76,21 @@ TUPLE: float-parse
     [ nip swap /f ]
     [ drop 2.0 swap exponent>> (pow) * ] 2tri ; inline
 
+: ?default-exponent ( float-parse n/f -- float-parse' n/f' )
+    over exponent>> [
+        over radix>> 10 =
+        [ [ [ radix>> ] [ point>> ] bi 0 float-parse boa ] dip ]
+        [ drop f ] if
+    ] unless ; inline
+
 : ?make-float ( float-parse n/f -- float/f )
+    { float-parse object } declare
+    ?default-exponent
     {
         { [ dup not ] [ 2drop f ] }
         { [ over radix>> 10 = ] [ make-float-dec-exponent ] }
         [ make-float-bin-exponent ]
-    } cond ; inline
+    } cond ;
 
 : ?neg ( n/f -- -n/f )
     [ neg ] [ f ] if* ; inline
@@ -97,7 +108,7 @@ TUPLE: float-parse
     -rot [ str>> ] [ length>> ] bi 10 number-parse boa 0 ; inline
 
 : <float-parse> ( i number-parse n -- float-parse i number-parse n )
-     [ drop nip radix>> 0 0 float-parse boa ] 3keep ; inline
+     [ drop nip radix>> 0 f float-parse boa ] 3keep ; inline
 
 DEFER: @exponent-digit
 DEFER: @mantissa-digit
@@ -176,7 +187,8 @@ DEFER: @neg-digit
     } case ; inline
 
 : ->denominator ( i number-parse n -- n/f )
-    @split [ @denom-first-digit ] require-next-digit ?make-ratio ; inline
+    { fixnum number-parse integer } declare
+    @split [ @denom-first-digit ] require-next-digit ?make-ratio ;
 
 : @num-digit-or-punc ( i number-parse n char -- n/f )
     {
@@ -190,7 +202,8 @@ DEFER: @neg-digit
     digit-in-radix [ [ @num-digit-or-punc ] add-digit ] [ @abort ] if ;
 
 : ->numerator ( i number-parse n -- n/f )
-    @split [ @num-digit ] require-next-digit ?add-ratio ; inline
+    { fixnum number-parse integer } declare
+    @split [ @num-digit ] require-next-digit ?add-ratio ;
 
 : @pos-digit-or-punc ( i number-parse n char -- n/f )
     {
@@ -205,9 +218,27 @@ DEFER: @neg-digit
     { fixnum number-parse integer fixnum } declare
     digit-in-radix [ [ @pos-digit-or-punc ] add-digit ] [ @abort ] if ;
 
+: (->radix) ( number-parse radix -- number-parse' )
+    [ [ str>> ] [ length>> ] bi ] dip number-parse boa ; inline
+
+: ->radix ( i number-parse n quot radix -- i number-parse n quot )
+    [ (->radix) ] curry 2dip ; inline
+
+: with-radix-char ( i number-parse n radix-quot nonradix-quot -- n/f )
+    [
+        rot {
+            { CHAR: b [ drop  2 ->radix require-next-digit ] }
+            { CHAR: o [ drop  8 ->radix require-next-digit ] }
+            { CHAR: x [ drop 16 ->radix require-next-digit ] }
+            { f       [ 3drop 2drop 0 ] }
+            [ [ drop ] 2dip swap call ]
+        } case
+    ] 2curry next-digit ; inline
+
 : @pos-first-digit ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
+        { CHAR: 0 [ [ @pos-digit ] [ @pos-digit-or-punc ] with-radix-char ] }
         [ @pos-digit ]
     } case ; inline
 
@@ -227,6 +258,7 @@ DEFER: @neg-digit
 : @neg-first-digit ( i number-parse n char -- n/f )
     {
         { CHAR: . [ ->required-mantissa ] }
+        { CHAR: 0 [ [ @neg-digit ] [ @neg-digit-or-punc ] with-radix-char ] }
         [ @neg-digit ]
     } case ; inline
 
@@ -237,12 +269,20 @@ DEFER: @neg-digit
         [ @pos-first-digit ]
     } case ; inline
 
+: @first-char-no-radix ( i number-parse n char -- n/f ) 
+    {
+        { CHAR: - [ [ @neg-digit ] require-next-digit ?neg ] }
+        { CHAR: + [ [ @pos-digit ] require-next-digit ] }
+        [ @pos-digit ]
+    } case ; inline
+
 PRIVATE>
 
-: base> ( str radix -- n/f )
-    <number-parse> [ @first-char ] require-next-digit ;
+: string>number ( str -- n/f )
+    10 <number-parse> [ @first-char ] require-next-digit ;
 
-: string>number ( str -- n/f ) 10 base> ; inline
+: base> ( str radix -- n/f )
+    <number-parse> [ @first-char-no-radix ] require-next-digit ;
 
 : bin> ( str -- n/f )  2 base> ; inline
 : oct> ( str -- n/f )  8 base> ; inline
@@ -271,13 +311,18 @@ PRIVATE>
 <PRIVATE
 
 : positive>base ( num radix -- str )
-    dup 1 <= [ "Invalid radix" throw ] when
+    dup 1 <= [ invalid-radix ] when
     [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
     reverse! ; inline
 
 PRIVATE>
 
 GENERIC# >base 1 ( n radix -- str )
+
+: number>string ( n -- str ) 10 >base ; inline
+: >bin ( n -- str ) 2 >base ; inline
+: >oct ( n -- str ) 8 >base ; inline
+: >hex ( n -- str ) 16 >base ; inline
 
 <PRIVATE
 
@@ -332,9 +377,8 @@ M: ratio >base
 <PRIVATE
 
 : mantissa-expt-normalize ( mantissa expt -- mantissa' expt' )
-    dup zero?
-    [ over log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + - ] bi-curry bi* ]
-    [ 1023 - ] if ;
+    [ dup log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + neg ] bi ]
+    [ 1023 - ] if-zero ;
 
 : mantissa-expt ( float -- mantissa expt )
     [ 52 2^ 1 - bitand ]
@@ -345,8 +389,8 @@ M: ratio >base
     -0.0 double>bits bitand zero? "" "-" ? ;
 
 : float>hex-value ( mantissa -- str )
-    16 >base 13 CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
-    [ "0" ] [ ] if-empty "1." prepend ;
+    >hex 13 CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
+    [ "0" ] when-empty "1." prepend ;
 
 : float>hex-expt ( mantissa -- str )
     10 >base "p" prepend ;
@@ -362,10 +406,11 @@ M: ratio >base
     dup [ 0 = ] find drop head >string
     fix-float ;
 
-: float>base ( n base -- str )
+: float>base ( n radix -- str )
     {
         { 16 [ float>hex ] }
-        [ drop "%.16g" format-float ]
+        { 10 [ "%.16g" format-float ] }
+        [ invalid-radix ]
     } case ; inline
 
 PRIVATE>
@@ -382,10 +427,5 @@ M: float >base
         { [ over -0.0 fp-bitwise= ] [ 2drop "-0.0" ] }
         [ float>base ]
     } cond ;
-
-: number>string ( n -- str ) 10 >base ; inline
-: >bin ( n -- str ) 2 >base ; inline
-: >oct ( n -- str ) 8 >base ; inline
-: >hex ( n -- str ) 16 >base ; inline
 
 : # ( n -- ) number>string % ; inline

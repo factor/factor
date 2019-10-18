@@ -1,27 +1,31 @@
 ! Copyright (C) 2007, 2009 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math sequences accessors deques
-search-deques summary hashtables fry ;
+USING: accessors arrays combinators combinators.short-circuit
+deques fry hashtables kernel parser search-deques sequences
+summary vocabs.loader ;
 IN: dlists
 
-<PRIVATE
+TUPLE: dlist-link { prev maybe{ dlist-link } } { next maybe{ dlist-link } } ;
 
-MIXIN: ?dlist-node
+TUPLE: dlist-node < dlist-link obj ;
 
-INSTANCE: f ?dlist-node
+M: dlist-link obj>> ;
 
-TUPLE: dlist-node obj { prev ?dlist-node } { next ?dlist-node } ;
+M: dlist-link node-value obj>> ;
 
-INSTANCE: dlist-node ?dlist-node
+: new-dlist-link ( obj prev next class -- node )
+    new
+        swap >>next
+        swap >>prev
+        swap >>obj ; inline
 
-C: <dlist-node> dlist-node
-
-PRIVATE>
+: <dlist-node> ( obj prev next -- dlist-node )
+    \ dlist-node new-dlist-link ; inline
 
 TUPLE: dlist
-{ front ?dlist-node }
-{ back ?dlist-node } ;
+{ front maybe{ dlist-link } }
+{ back maybe{ dlist-link } } ;
 
 : <dlist> ( -- list )
     dlist new ; inline
@@ -31,7 +35,15 @@ TUPLE: dlist
 
 M: dlist deque-empty? front>> not ; inline
 
-M: dlist-node node-value obj>> ;
+M: dlist equal?
+    over dlist? [
+        [ front>> ] bi@
+        [ 2dup { [ and ] [ [ obj>> ] same? ] } 2&& ]
+        [ [ next>> ] bi@ ] while
+        or not
+    ] [
+        2drop f
+    ] if ;
 
 : set-prev-when ( dlist-node dlist-node/f -- )
     [ prev<< ] [ drop ] if* ; inline
@@ -41,6 +53,9 @@ M: dlist-node node-value obj>> ;
 
 : set-next-prev ( dlist-node -- )
     dup next>> set-prev-when ; inline
+
+: set-prev-next ( dlist-node -- )
+    dup prev>> set-next-when ;
 
 : normalize-front ( dlist -- )
     dup back>> [ f >>front ] unless drop ; inline
@@ -54,28 +69,41 @@ M: dlist-node node-value obj>> ;
 : set-front-to-back ( dlist -- )
     dup front>> [ dup back>> >>front ] unless drop ; inline
 
-: (dlist-find-node) ( ... dlist-node quot: ( ... node -- ... ? ) -- ... node/f ? )
+: (dlist-find-node) ( ... dlist-node quot: ( ... node -- ... ? ) -- ... node/f )
     over [
         [ call ] 2keep rot
-        [ drop t ] [ [ next>> ] dip (dlist-find-node) ] if
-    ] [ 2drop f f ] if ; inline recursive
+        [ drop ] [ [ next>> ] dip (dlist-find-node) ] if
+    ] [ 2drop f ] if ; inline recursive
 
-: dlist-find-node ( ... dlist quot: ( ... node -- ... ? ) -- ... node/f ? )
+: dlist-find-node ( ... dlist quot: ( ... node -- ... ? ) -- ... node/f )
     [ front>> ] dip (dlist-find-node) ; inline
 
+: dlist-find-node-prev ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f ? )
+    dlist-find-node [ prev>> ] [ f ] if* ; inline
+
 : dlist-each-node ( ... dlist quot: ( ... node -- ... ) -- ... )
-    '[ @ f ] dlist-find-node 2drop ; inline
+    '[ @ f ] dlist-find-node drop ; inline
+
+PRIVATE>
 
 : unlink-node ( dlist-node -- )
     dup prev>> over next>> set-prev-when
     dup next>> swap prev>> set-next-when ; inline
 
-PRIVATE>
-
 M: dlist push-front* ( obj dlist -- dlist-node )
     [ front>> f swap <dlist-node> dup dup set-next-prev ] keep
     [ front<< ] keep
     set-back-to-front ;
+
+: push-node-front ( dlist-node dlist -- )
+    [ front>> >>next drop ]
+    [ front<< ]
+    [ [ set-next-prev ] [ set-back-to-front ] bi* ] 2tri ;
+
+: push-node-back ( dlist-node dlist -- )
+    [ back>> >>prev drop ]
+    [ back<< ]
+    [ [ set-prev-next ] [ set-front-to-back ] bi* ] 2tri ;
 
 M: dlist push-back* ( obj dlist -- dlist-node )
     [ back>> f <dlist-node> ] keep
@@ -83,31 +111,26 @@ M: dlist push-back* ( obj dlist -- dlist-node )
     [ back<< ] 2keep
     set-front-to-back ;
 
-ERROR: empty-dlist ;
+M: dlist peek-front* ( dlist -- obj/f ? )
+    front>> [ obj>> t ] [ f f ] if* ;
 
-M: empty-dlist summary ( dlist -- )
-    drop "Empty dlist" ;
-
-M: dlist peek-front ( dlist -- obj )
-    front>> [ obj>> ] [ empty-dlist ] if* ;
+M: dlist peek-back* ( dlist -- obj/f ? )
+    back>> [ obj>> t ] [ f f ] if* ;
 
 M: dlist pop-front* ( dlist -- )
     [
         [
-            [ empty-dlist ] unless*
+            [ empty-deque ] unless*
             next>>
             f over set-prev-when
         ] change-front drop
     ] keep
     normalize-back ;
 
-M: dlist peek-back ( dlist -- obj )
-    back>> [ obj>> ] [ empty-dlist ] if* ;
-
 M: dlist pop-back* ( dlist -- )
     [
         [
-            [ empty-dlist ] unless*
+            [ empty-deque ] unless*
             prev>>
             f over set-next-when
         ] change-back drop
@@ -115,7 +138,7 @@ M: dlist pop-back* ( dlist -- )
     normalize-front ;
 
 : dlist-find ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f ? )
-    '[ obj>> @ ] dlist-find-node [ obj>> t ] [ drop f f ] if ; inline
+    '[ obj>> @ ] dlist-find-node [ obj>> t ] [ f f ] if* ; inline
 
 : dlist-any? ( ... dlist quot: ( ... value -- ... ? ) -- ... ? )
     dlist-find nip ; inline
@@ -124,11 +147,13 @@ M: dlist deque-member? ( value dlist -- ? )
     [ = ] with dlist-any? ;
 
 M: dlist delete-node ( dlist-node dlist -- )
-    {
-        { [ 2dup front>> eq? ] [ nip pop-front* ] }
-        { [ 2dup back>> eq? ] [ nip pop-back* ] }
-        [ drop unlink-node ]
-    } cond ;
+    [
+        {
+            { [ 2dup front>> eq? ] [ nip pop-front* ] }
+            { [ 2dup back>> eq? ] [ nip pop-back* ] }
+            [ drop unlink-node ]
+        } cond
+    ] [ drop f >>prev f >>next drop ] 2bi ;
 
 : delete-node-if* ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f ? )
     dupd dlist-find-node [
@@ -138,8 +163,8 @@ M: dlist delete-node ( dlist-node dlist -- )
             2drop f f
         ] if
     ] [
-        2drop f f
-    ] if ; inline
+        drop f f
+    ] if* ; inline
 
 : delete-node-if ( ... dlist quot: ( ... value -- ... ? ) -- ... obj/f )
     '[ obj>> @ ] delete-node-if* drop ; inline
@@ -152,15 +177,23 @@ M: dlist clear-deque ( dlist -- )
 : dlist-each ( ... dlist quot: ( ... value -- ... ) -- ... )
     '[ obj>> @ ] dlist-each-node ; inline
 
-: dlist>seq ( dlist -- seq )
+: dlist>sequence ( dlist -- seq )
     [ ] collector [ dlist-each ] dip ;
+
+: >dlist ( seq -- dlist )
+    <dlist> [ '[ _ push-back ] each ] keep ;
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
 
 : dlist-filter ( ... dlist quot: ( ... value -- ... ? ) -- ... dlist' )
-    over [ '[ dup obj>> @ [ drop ] [ _ delete-node ] if ] dlist-each-node ] keep ; inline
+    [ not ] compose
+    <dlist> [ '[ dup obj>> @ [ drop ] [ obj>> _ push-back ] if ] dlist-each-node ] keep ; inline
 
 M: dlist clone
     <dlist> [ '[ _ push-back ] dlist-each ] keep ;
 
 INSTANCE: dlist deque
+
+SYNTAX: DL{ \ } [ >dlist ] parse-literal ;
+
+{ "dlists" "prettyprint" } "dlists.prettyprint" require-when

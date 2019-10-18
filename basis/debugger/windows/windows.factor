@@ -33,7 +33,7 @@ CONSTANT: seh-names
         { $ STATUS_CONTROL_C_EXIT             "STATUS_CONTROL_C_EXIT"           }
         { $ STATUS_FLOAT_MULTIPLE_FAULTS      "STATUS_FLOAT_MULTIPLE_FAULTS"    }
         { $ STATUS_FLOAT_MULTIPLE_TRAPS       "STATUS_FLOAT_MULTIPLE_TRAPS"     }
-        { HEX: e06d7363 "Visual C++ exception" }
+        { 0xe06d7363 "Visual C++ exception" }
     }
 
 : seh-name. ( n -- )
@@ -45,11 +45,11 @@ M: windows signal-error.
 
 M: ole32-error error.
     "COM error 0x" write
-    dup code>> HEX: ffff,ffff bitand >hex write ": " write
+    dup code>> 0xffff,ffff bitand >hex write ": " write
     message>> write ;
 
 M: windows-error error.
     "Win32 error 0x" write
-    dup n>> HEX: ffff,ffff bitand >hex write ": " write
+    dup n>> 0xffff,ffff bitand >hex write ": " write
     string>> write ;
 

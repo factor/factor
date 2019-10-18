@@ -1,12 +1,14 @@
-! Copyright (C) 2007, 2010 Slava Pestov, Doug Coleman,
+! Copyright (C) 2007, 2011 Slava Pestov, Doug Coleman,
 ! Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic kernel io.backend namespaces continuations sequences
-arrays io.encodings io.ports io.streams.duplex io.encodings.ascii
-alien.strings io.binary accessors destructors classes byte-arrays
-parser alien.c-types math.parser splitting grouping math assocs
-summary system vocabs.loader combinators present fry vocabs.parser
-classes.struct alien.data strings ;
+USING: accessors alien.c-types alien.data alien.strings arrays
+byte-arrays classes classes.struct combinators
+combinators.short-circuit continuations destructors fry
+grouping init io.backend io.binary io.encodings.ascii
+io.encodings.binary io.pathnames io.ports io.streams.duplex
+kernel locals math math.parser memoize namespaces present
+sequences sequences.private splitting strings summary system
+vocabs vocabs.parser ;
 IN: io.sockets
 
 << {
@@ -14,10 +16,12 @@ IN: io.sockets
     { [ os unix? ] [ "unix.ffi" ] }
 } cond use-vocab >>
 
+GENERIC# with-port 1 ( addrspec port -- addrspec )
+
 ! Addressing
 <PRIVATE
 
-UNION: ?string string POSTPONE: f ;
+GENERIC: protocol ( addrspec -- n )
 
 GENERIC: protocol-family ( addrspec -- af )
 
@@ -32,8 +36,6 @@ GENERIC: address-size ( addrspec -- n )
 GENERIC: inet-ntop ( data addrspec -- str )
 
 GENERIC: inet-pton ( str addrspec -- data )
-
-GENERIC# with-port 1 ( addrspec port -- addrspec )
 
 : make-sockaddr/size ( addrspec -- sockaddr size )
     [ make-sockaddr ] [ sockaddr-size ] bi ;
@@ -51,37 +53,44 @@ HOOK: addrspec-of-family os ( af -- addrspec )
 
 PRIVATE>
 
-TUPLE: local { path read-only } ;
+TUPLE: local { path string read-only } ;
 
 : <local> ( path -- addrspec )
-    normalize-path local boa ;
+    absolute-path local boa ;
 
 M: local present path>> "Unix domain socket: " prepend ;
 
+M: local protocol drop 0 ;
+
 SLOT: port
 
-TUPLE: ipv4 { host ?string read-only } ;
-
-C: <ipv4> ipv4
-
-M: ipv4 inet-ntop ( data addrspec -- str )
-    drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
+TUPLE: ipv4 { host maybe{ string } read-only } ;
 
 <PRIVATE
+
+ERROR: invalid-ipv4 string reason ;
+
+M: invalid-ipv4 summary drop "Invalid IPv4 address" ;
 
 ERROR: malformed-ipv4 sequence ;
 
 ERROR: bad-ipv4-component string ;
 
 : parse-ipv4 ( string -- seq )
-    "." split dup length 4 = [ malformed-ipv4 ] unless
-    [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as ;
+    [ f ] [
+        "." split dup length 4 = [ malformed-ipv4 ] unless
+        [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as
+    ] if-empty ;
 
-ERROR: invalid-ipv4 string reason ;
-
-M: invalid-ipv4 summary drop "Invalid IPv4 address" ;
+: check-ipv4 ( string -- )
+    [ parse-ipv4 drop ] [ invalid-ipv4 ] recover ;
 
 PRIVATE>
+
+: <ipv4> ( host -- ipv4 ) dup check-ipv4 ipv4 boa ;
+
+M: ipv4 inet-ntop ( data addrspec -- str )
+    drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
 
 M: ipv4 inet-pton ( str addrspec -- data )
     drop [ parse-ipv4 ] [ invalid-ipv4 ] recover ;
@@ -100,14 +109,15 @@ M: ipv4 make-sockaddr ( inet -- sockaddr )
         swap
         [ port>> htons >>port ]
         [ host>> "0.0.0.0" or ]
-        [ inet-pton *uint >>addr ] tri ;
+        [ inet-pton uint deref >>addr ] tri ;
 
 M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
-    [ addr>> <uint> ] dip inet-ntop <ipv4> ;
+    [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
 
 TUPLE: inet4 < ipv4 { port integer read-only } ;
 
-C: <inet4> inet4
+: <inet4> ( host port -- inet4 )
+    over check-ipv4 inet4 boa ;
 
 M: ipv4 with-port [ host>> ] dip <inet4> ;
 
@@ -117,16 +127,17 @@ M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
 M: inet4 present
     [ host>> ] [ port>> number>string ] bi ":" glue ;
 
-TUPLE: ipv6 { host ?string read-only } ;
+M: inet4 protocol drop 0 ;
 
-C: <ipv6> ipv6
-
-M: ipv6 inet-ntop ( data addrspec -- str )
-    drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
-
-ERROR: invalid-ipv6 string reason ;
+TUPLE: ipv6
+{ host maybe{ string } read-only }
+{ scope-id integer read-only } ;
 
 <PRIVATE
+
+ERROR: invalid-ipv6 host reason ;
+
+M: invalid-ipv6 summary drop "Invalid IPv6 address" ;
 
 ERROR: bad-ipv6-component obj ;
 
@@ -146,6 +157,18 @@ ERROR: more-than-8-components ;
             parse-ipv6-component
         ] if
     ] if-empty ;
+
+: check-ipv6 ( string -- )
+    [ "::" split1 [ parse-ipv6 ] bi@ 2drop ] [ invalid-ipv6 ] recover ;
+
+PRIVATE>
+
+: <ipv6> ( host -- ipv6 ) dup check-ipv6 0 ipv6 boa ;
+
+M: ipv6 inet-ntop ( data addrspec -- str )
+    drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
+
+<PRIVATE
 
 : pad-ipv6 ( string1 string2 -- seq )
     2dup [ length ] bi@ + 8 swap -
@@ -176,23 +199,34 @@ M: ipv6 make-sockaddr ( inet -- sockaddr )
         AF_INET6 >>family
         swap
         [ port>> htons >>port ]
-        [ host>> "::" or ]
-        [ inet-pton >>addr ] tri ;
+        [ [ host>> "::" or ] keep inet-pton >>addr ]
+        [ scope-id>> >>scopeid ]
+        tri ;
 
 M: ipv6 parse-sockaddr
-    [ addr>> ] dip inet-ntop <ipv6> ;
+    [ [ addr>> ] dip inet-ntop ] [ drop scopeid>> ] 2bi
+    ipv6 boa ;
+
+M: ipv6 present
+    [ host>> ] [ scope-id>> ] bi
+    [ number>string "%" glue ] unless-zero ;
 
 TUPLE: inet6 < ipv6 { port integer read-only } ;
 
-C: <inet6> inet6
+: <inet6> ( host port -- inet6 )
+    [ dup check-ipv6 0 ] dip inet6 boa ;
 
-M: ipv6 with-port [ host>> ] dip <inet6> ;
+M: ipv6 with-port
+    [ [ host>> ] [ scope-id>> ] bi ] dip
+    inet6 boa ;
 
 M: inet6 parse-sockaddr
     [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
 M: inet6 present
-    [ host>> ] [ port>> number>string ] bi ":" glue ;
+    [ call-next-method ] [ port>> number>string ] bi ":" glue ;
+
+M: inet6 protocol drop 0 ;
 
 <PRIVATE
 
@@ -234,10 +268,6 @@ M: object (client) ( remote -- client-in client-out local )
 
 TUPLE: server-port < port addr encoding ;
 
-: check-server-port ( port -- port )
-    dup check-disposed
-    dup server-port? [ "Not a server port" throw ] unless ; inline
-
 GENERIC: (server) ( addrspec -- handle )
 
 GENERIC: (accept) ( server addrspec -- handle sockaddr )
@@ -246,16 +276,28 @@ TUPLE: datagram-port < port addr ;
 
 HOOK: (datagram) io-backend ( addr -- datagram )
 
-: check-datagram-port ( port -- port )
-    dup check-disposed
-    dup datagram-port? [ "Not a datagram port" throw ] unless ; inline
+TUPLE: raw-port < port addr ;
 
-HOOK: (receive) io-backend ( datagram -- packet addrspec )
+HOOK: (raw) io-backend ( addr -- raw )
 
-: check-datagram-send ( packet addrspec port -- packet addrspec port )
-    check-datagram-port
-    2dup addr>> [ class ] bi@ assert=
-    pick class byte-array assert= ;
+HOOK: (broadcast) io-backend ( datagram -- datagram )
+
+HOOK: (receive-unsafe) io-backend ( n buf datagram -- count addrspec )
+
+ERROR: invalid-port object ;
+
+: check-port ( packet addrspec port -- packet addrspec port )
+    2dup addr>> [ class-of ] bi@ assert=
+    pick class-of byte-array assert= ;
+
+: check-connectionless-port ( port -- port )
+    dup { [ datagram-port? ] [ raw-port? ] } 1|| [ invalid-port ] unless ;
+
+: check-send ( packet addrspec port -- packet addrspec port )
+    check-connectionless-port dup check-disposed check-port ;
+
+: check-receive ( port -- port )
+    check-connectionless-port dup check-disposed ;
 
 HOOK: (send) io-backend ( packet addrspec datagram -- )
 
@@ -315,16 +357,47 @@ SYMBOL: remote-address
         >>addr
     ] with-destructors ;
 
-: receive ( datagram -- packet addrspec )
-    check-datagram-port
-    [ (receive) ] [ addr>> ] bi parse-sockaddr ;
+: <raw> ( addrspec -- datagram )
+    [
+        [ (raw) |dispose ] keep
+        [ drop raw-port <port> ] [ get-local-address ] 2bi
+        >>addr
+    ] with-destructors ;
+
+: <broadcast> ( addrspec -- datagram )
+    <datagram> (broadcast) ;
+
+: receive-unsafe ( n buf datagram -- count addrspec )
+    check-receive
+    [ (receive-unsafe) ] [ addr>> ] bi parse-sockaddr ; inline
+
+CONSTANT: datagram-size 65536
+
+:: receive ( datagram -- packet addrspec )
+    datagram-size (byte-array) :> buf
+    datagram-size buf datagram
+    receive-unsafe :> ( count addrspec )
+    count buf resize addrspec ; inline
+
+:: receive-into ( buf datagram -- buf-slice addrspec )
+    buf length :> n
+    n buf datagram receive-unsafe :> ( count addrspec )
+    buf count head-slice addrspec ; inline
 
 : send ( packet addrspec datagram -- )
-    check-datagram-send (send) ;
+    check-send (send) ; inline
+
+MEMO: ipv6-supported? ( -- ? )
+    [ "::1" 0 <inet6> binary <server> dispose t ] [ drop f ] recover ;
+
+[ \ ipv6-supported? reset-memoized ]
+"io.sockets:ipv6-supported?" add-startup-hook
 
 GENERIC: resolve-host ( addrspec -- seq )
 
-TUPLE: hostname { host ?string read-only } ;
+HOOK: resolve-localhost os ( -- obj )
+
+TUPLE: hostname { host maybe{ string } read-only } ;
 
 TUPLE: inet < hostname port ;
 
@@ -334,12 +407,17 @@ M: inet present
 C: <inet> inet
 
 M: string resolve-host
-    f prepare-addrinfo f <void*>
-    [ getaddrinfo addrinfo-error ] keep *void* addrinfo memory>struct
+    f prepare-addrinfo f void* <ref>
+    [ getaddrinfo addrinfo-error ] keep void* deref addrinfo memory>struct
     [ parse-addrinfo-list ] keep freeaddrinfo ;
+
+M: string with-port <inet> ;
 
 M: hostname resolve-host
     host>> resolve-host ;
+
+M: hostname with-port
+    [ host>> ] dip <inet> ;
 
 M: inet resolve-host
     [ call-next-method ] [ port>> ] bi '[ _ with-port ] map ;
@@ -351,7 +429,13 @@ M: inet6 resolve-host 1array ;
 M: local resolve-host 1array ;
 
 M: f resolve-host
-    drop { T{ ipv6 f "::" } T{ ipv4 f "0.0.0.0" } } ;
+    drop resolve-localhost ;
+
+M: object resolve-localhost
+    ipv6-supported?
+    { T{ ipv4 f "0.0.0.0" } T{ ipv6 f "::" } }
+    { T{ ipv4 f "0.0.0.0" } }
+    ? ;
 
 : host-name ( -- string )
     256 <byte-array> dup dup length gethostname
@@ -382,5 +466,5 @@ M: invalid-local-address summary
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }
-    { [ os winnt? ] [ "io.sockets.windows.nt" require ] }
+    { [ os windows? ] [ "io.sockets.windows" require ] }
 } cond

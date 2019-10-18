@@ -16,7 +16,3 @@ M: callable infer ( quot -- effect )
 : infer. ( quot -- )
     #! Safe to call from inference transforms.
     infer effect>string print ;
-
-: inputs ( quot -- n ) infer in>> length ;
-
-: outputs ( quot -- n ) infer out>> length ;

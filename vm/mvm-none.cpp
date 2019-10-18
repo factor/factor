@@ -1,8 +1,5 @@
 #include "master.hpp"
 
-/* Multi-VM threading is not supported on NetBSD due to
-http://gnats.netbsd.org/25563 */
-
 namespace factor
 {
 
@@ -15,13 +12,12 @@ void init_mvm()
 
 void register_vm_with_thread(factor_vm *vm)
 {
-	assert(!global_vm);
+	FACTOR_ASSERT(!global_vm);
 	global_vm = vm;
 }
 
-factor_vm *current_vm()
+factor_vm *current_vm_p()
 {
-	assert(global_vm != NULL);
 	return global_vm;
 }
 

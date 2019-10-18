@@ -8,11 +8,11 @@ IN: unicode.normalize
 <PRIVATE
 ! Conjoining Jamo behavior
 
-CONSTANT: hangul-base HEX: ac00
-CONSTANT: hangul-end HEX: D7AF
-CONSTANT: initial-base HEX: 1100
-CONSTANT: medial-base HEX: 1161
-CONSTANT: final-base HEX: 11a7
+CONSTANT: hangul-base 0xac00
+CONSTANT: hangul-end 0xD7AF
+CONSTANT: initial-base 0x1100
+CONSTANT: medial-base 0x1161
+CONSTANT: final-base 0x11a7
 
 CONSTANT: initial-count 19
 CONSTANT: medial-count 21
@@ -22,13 +22,13 @@ CONSTANT: final-count 28
     pick [ between? ] [ 3drop f ] if ; inline
 
 : hangul? ( ch -- ? ) hangul-base hangul-end ?between? ; inline
-: jamo? ( ch -- ? ) HEX: 1100 HEX: 11FF ?between? ; inline
+: jamo? ( ch -- ? ) 0x1100 0x11FF ?between? ; inline
 
 ! These numbers come from UAX 29
 : initial? ( ch -- ? )
-    dup HEX: 1100 HEX: 1159 ?between? [ ] [ HEX: 115F = ] ?if ; inline
-: medial? ( ch -- ? ) HEX: 1160 HEX: 11A2 ?between? ; inline
-: final? ( ch -- ? ) HEX: 11A8 HEX: 11F9 ?between? ; inline
+    dup 0x1100 0x1159 ?between? [ ] [ 0x115F = ] ?if ; inline
+: medial? ( ch -- ? ) 0x1160 0x11A2 ?between? ; inline
+: final? ( ch -- ? ) 0x11A8 0x11F9 ?between? ; inline
 
 : hangul>jamo ( hangul -- jamo-string )
     hangul-base - final-count /mod final-base +

@@ -88,7 +88,7 @@ operations [ <linked-hash> ] initialize
 : define-operation-map ( class group blurb object translator -- )
     operations>commands define-command-map ;
 
-: operation-quot ( target command -- quot )
+: operation-quot ( target operation -- quot )
     [ translator>> ] [ command>> ] bi '[ _ @ _ execute ] ;
 
 M: operation invoke-command ( target command -- )

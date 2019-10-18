@@ -132,7 +132,7 @@ GENERIC: handle-rule-end ( match-count rule -- )
         find-escape-rule dup [
             dup rule-start-matches? dup [
                 swap handle-rule-start
-                delegate-end-escaped? [ not ] change
+                delegate-end-escaped? toggle
                 t
             ] [
                 2drop f
@@ -162,7 +162,7 @@ M: escape-rule handle-rule-start
     drop
     ?end-rule
     process-escape? get [
-        escaped? [ not ] change
+        escaped? toggle
         position [ + ] change
     ] [ drop ] if ;
 
@@ -250,7 +250,7 @@ M: mark-previous-rule handle-rule-start
 
 : rule-set-empty? ( ruleset -- ? )
     [ rules>> ] [ keywords>> ] bi
-    [ assoc-empty? ] bi@ and ;
+    [ assoc-empty? ] both? ;
 
 : check-word-break ( -- ? )
     current-char dup blank? [

@@ -34,7 +34,7 @@ SYMBOL: running-site-watcher
     send-site-email ;
 
 : send-reports ( seq -- )
-    [ ] [ [ send-report ] each ] if-empty ;
+    [ [ send-report ] each ] unless-empty ;
 
 PRIVATE>
 

@@ -19,6 +19,6 @@ IN: mason.cleanup
         build-dir [
             compress-image
             compress-test-log
-            "factor" really-delete-tree
+            "factor" delete-tree
         ] with-directory
     ] unless ;

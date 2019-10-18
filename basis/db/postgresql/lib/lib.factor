@@ -93,7 +93,7 @@ M: postgresql-result-null summary ( obj -- str )
     ] 2map flip [
         f f
     ] [
-        first2 [ >void*-array ] [ >uint-array ] bi*
+        first2 [ void* >c-array ] [ uint >c-array ] bi*
     ] if-empty ;
 
 : param-formats ( statement -- seq )

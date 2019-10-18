@@ -1,11 +1,10 @@
 ! (c)Joe Groff bsd license
-USING: io kernel math.vectors.simd terrain.generation threads ;
+USING: accessors kernel math.vectors.simd terrain.generation ;
 FROM: alien.c-types => float ;
 IN: benchmark.terrain-generation
 
 : terrain-generation-benchmark ( -- )
-    "Generating terrain segment..." write flush yield
-    <terrain> float-4{ 0 0 0 1 } terrain-segment drop
-    "done" print ;
+    <terrain> float-4{ 0 0 0 1 } terrain-segment
+    dim>> { 512 512 } assert= ;
 
 MAIN: terrain-generation-benchmark

@@ -14,13 +14,13 @@ IN: help.crossref.tests
 
 [ t ] [
     "foo" article-children
-    "foo" "help.crossref.tests" lookup >link 1array sequence=
+    "foo" "help.crossref.tests" lookup-word >link 1array sequence=
 ] unit-test
 
-[ "foo" ] [ "foo" "help.crossref.tests" lookup article-parent ] unit-test
+[ "foo" ] [ "foo" "help.crossref.tests" lookup-word article-parent ] unit-test
 
 [ ] [
-    [ "foo" "help.crossref.tests" lookup forget ] with-compilation-unit
+    [ "foo" "help.crossref.tests" lookup-word forget ] with-compilation-unit
 ] unit-test
 
 [ ] [

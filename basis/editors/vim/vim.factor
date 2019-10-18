@@ -1,23 +1,26 @@
-USING: definitions io io.launcher kernel math math.parser
-namespaces parser prettyprint sequences editors accessors
-make strings ;
+USING: editors io.backend io.launcher kernel make math.parser
+namespaces sequences strings system vocabs.loader math ;
 IN: editors.vim
 
+TUPLE: vim ;
+T{ vim } editor-class set-global
+
 SYMBOL: vim-path
-SYMBOL: vim-editor
-HOOK: vim-command vim-editor ( file line -- array )
 
-SINGLETON: vim
+HOOK: find-vim-path editor-class ( -- path )
+HOOK: vim-ui? editor-class ( -- ? )
+M: vim vim-ui? f ;
+M: vim find-vim-path "vim" ;
 
-M: vim vim-command
+: actual-vim-path ( -- path )
+    \ vim-path get-global [ find-vim-path ] unless* ;
+
+M: vim editor-command ( file line -- command )
     [
-        vim-path get dup string? [ , ] [ % ] if
+        actual-vim-path dup string? [ , ] [ % ] if
+        vim-ui? [ "-g" , ] when
         [ , ] [ number>string "+" prepend , ] bi*
     ] { } make ;
 
-: vim ( file line -- )
-    vim-command run-detached drop ;
+M: vim editor-detached? f ;
 
-"vim" vim-path set-global
-[ vim ] edit-hook set-global
-\ vim vim-editor set-global

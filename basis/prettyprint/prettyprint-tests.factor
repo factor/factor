@@ -1,22 +1,23 @@
-USING: arrays definitions io.streams.string io.streams.duplex
-kernel math namespaces parser prettyprint prettyprint.config
-prettyprint.sections sequences tools.test vectors words
-effects splitting generic.standard prettyprint.private
-continuations generic compiler.units tools.continuations
-tools.continuations.private eval accessors make vocabs.parser see
-listener ;
+USING: accessors arrays classes.intersection classes.maybe
+classes.union compiler.units continuations definitions effects
+eval generic generic.standard hashtables io io.streams.duplex
+io.streams.string kernel listener make math namespaces parser
+prettyprint prettyprint.config prettyprint.private
+prettyprint.sections see sequences splitting
+strings tools.continuations tools.continuations.private
+tools.test vectors vocabs.parser words ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
 [ "4096" ] [ 4096 unparse ] unit-test
-[ "BIN: 1000000000000" ] [ 2 number-base [ 4096 unparse ] with-variable ] unit-test
-[ "OCT: 10000" ] [ 8 number-base [ 4096 unparse ] with-variable ] unit-test
-[ "HEX: 1000" ] [ 16 number-base [ 4096 unparse ] with-variable ] unit-test
+[ "0b1000000000000" ] [ 2 number-base [ 4096 unparse ] with-variable ] unit-test
+[ "0o10000" ] [ 8 number-base [ 4096 unparse ] with-variable ] unit-test
+[ "0x1000" ] [ 16 number-base [ 4096 unparse ] with-variable ] unit-test
 [ "1.0" ] [ 1.0 unparse ] unit-test
 [ "8.0" ] [ 8.0 unparse ] unit-test
 [ "8.0" ] [ 2 number-base [ 8.0 unparse ] with-variable ] unit-test
 [ "8.0" ] [ 8 number-base [ 8.0 unparse ] with-variable ] unit-test
-[ "HEX: 1.0p3" ] [ 16 number-base [ 8.0 unparse ] with-variable ] unit-test
+[ "0x1.0p3" ] [ 16 number-base [ 8.0 unparse ] with-variable ] unit-test
 [ "1267650600228229401496703205376" ] [ 1 100 shift unparse ] unit-test
 
 [ "+" ] [ \ + unparse ] unit-test
@@ -37,6 +38,10 @@ unit-test
 
 [ "\"\\e\"" ]
 [ "\e" unparse ]
+unit-test
+
+[ "\"\\x01\"" ]
+[ 1 1string unparse ]
 unit-test
 
 [ "f" ] [ f unparse ] unit-test
@@ -103,7 +108,7 @@ unit-test
         [
             [ parse-fresh drop ] with-compilation-unit
             [
-                "prettyprint.tests" lookup see
+                "prettyprint.tests" lookup-word see
             ] with-string-writer "\n" split but-last
         ] keep =
     ] with-interactive-vocabs ;
@@ -261,7 +266,7 @@ M: class-see-layout class-see-layout ;
 [ t ] [
     "IN: prettyprint.tests\nGENERIC: generic-decl-test ( a -- b ) flushable\n"
     dup eval( -- )
-    "generic-decl-test" "prettyprint.tests" lookup
+    "generic-decl-test" "prettyprint.tests" lookup-word
     [ see ] with-string-writer =
 ] unit-test
 
@@ -387,3 +392,80 @@ TUPLE: final-tuple ; final
     ] with-variable
 ] unit-test
 
+[ "maybe{ integer }\n" ] [ [  maybe{ integer } . ] with-string-writer ] unit-test
+TUPLE: bob a b ;
+[ "maybe{ bob }\n" ] [ [ maybe{ bob } . ] with-string-writer ] unit-test
+[ "maybe{ word }\n" ] [ [ maybe{ word } . ] with-string-writer ] unit-test
+
+TUPLE: har a ;
+GENERIC: harhar ( obj -- obj )
+M: maybe{ har } harhar ;
+M: integer harhar M\ integer harhar drop ;
+[
+"""USING: prettyprint.tests ;
+M: maybe{ har } harhar ;
+
+USING: kernel math prettyprint.tests ;
+M: integer harhar M\\ integer harhar drop ;\n"""
+] [
+    [ \ harhar see-methods ] with-string-writer
+] unit-test
+
+TUPLE: mo { a union{ float integer } } ;
+TUPLE: fo { a intersection{ fixnum integer } } ;
+
+[
+"""USING: math ;
+IN: prettyprint.tests
+TUPLE: mo { a union{ integer float } initial: 0 } ;
+"""
+] [
+    [ \ mo see ] with-string-writer
+] unit-test
+
+[
+"""USING: math ;
+IN: prettyprint.tests
+TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
+"""
+] [
+    [ \ fo see ] with-string-writer
+] unit-test
+
+[
+"""union{
+    intersection{ string hashtable }
+    union{ integer float }
+}
+"""
+] [ [ union{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
+
+[
+"""intersection{
+    intersection{ string hashtable }
+    union{ integer float }
+}
+"""
+] [ [ intersection{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
+
+[
+"""maybe{ union{ integer float } }\n"""
+] [
+    [ maybe{ union{ float integer } } . ] with-string-writer
+] unit-test
+
+[
+"""maybe{ maybe{ integer } }\n"""
+] [
+    [ maybe{ maybe{ integer } } . ] with-string-writer
+] unit-test
+
+{ "{ 0 1 2 3 4 }" } [
+    [ 5 length-limit [ 5 iota >array pprint ] with-variable ]
+    with-string-writer
+] unit-test
+
+{ "{ 0 1 2 3 4 ~1 more~ }" } [
+    [ 5 length-limit [ 6 iota >array pprint ] with-variable ]
+    with-string-writer
+] unit-test

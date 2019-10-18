@@ -46,20 +46,19 @@
 (defconst fuel-syntax--parsing-words
   '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
     "ABOUT:" "AFTER:" "ALIAS:" "ALIEN:" "ARTICLE:"
-    "B" "BEFORE:" "BIN:"
+    "B" "BEFORE:"
     "C:" "CALLBACK:" "C-GLOBAL:" "C-TYPE:" "CHAR:" "COM-INTERFACE:" "CONSTANT:" "CONSULT:" "call-next-method"
     "DEFER:" "DESTRUCTOR:"
     "EBNF:" ";EBNF" "ENUM:" "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:" "FUNCTION:" "FUNCTION-ALIAS:"
     "GAME:" "GENERIC#" "GENERIC:"
     "GLSL-SHADER:" "GLSL-PROGRAM:"
-    "HELP:" "HEX:" "HOOK:"
+    "HELP:" "HOOK:"
     "IN:" "initial:" "INSTANCE:" "INTERSECTION:"
     "LIBRARY:"
     "M:" "M::" "MACRO:" "MACRO::" "MAIN:" "MATH:"
     "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "NAN:"
-    "OCT:"
     "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROTOCOL:" "PROVIDE:"
     "QUALIFIED-WITH:" "QUALIFIED:"
     "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
@@ -129,7 +128,7 @@
    '("IN:" "USE:" "FROM:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
 
 (defconst fuel-syntax--int-constant-def-regex
-  (fuel-syntax--second-word-regex '("ALIEN:" "CHAR:" "BIN:" "HEX:" "NAN:" "OCT:")))
+  (fuel-syntax--second-word-regex '("ALIEN:" "CHAR:" "NAN:")))
 
 (defconst fuel-syntax--type-definition-regex
   (fuel-syntax--second-word-regex
@@ -208,12 +207,11 @@
                 "DEFER:" "DESTRUCTOR:"
                 "FORGET:"
                 "GAME:" "GENERIC:" "GENERIC#" "GLSL-PROGRAM:"
-                "HEX:" "HOOK:"
+                "HOOK:"
                 "IN:" "INSTANCE:"
                 "LIBRARY:"
                 "MAIN:" "MATH:" "MIXIN:"
                 "NAN:"
-                "OCT:"
                 "POSTPONE:" "PRIVATE>" "<PRIVATE"
                 "QUALIFIED-WITH:" "QUALIFIED:"
                 "RENAME:"

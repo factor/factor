@@ -1,5 +1,5 @@
 USING: help.markup help.syntax ui.commands ui.gadgets.slots
-ui.gadgets.editors kernel ;
+ui.gadgets.panes ui.gadgets.editors kernel ;
 IN: ui.tools.inspector
 
 ARTICLE: "ui-inspector-edit" "Editing slot values in the inspector"
@@ -15,6 +15,8 @@ ARTICLE: "ui-inspector" "UI inspector"
 $nl
 "To display an object in the UI inspector, right-click a presentation and choose " { $strong "Inspector" } " from the menu that appears. The inspector can also be opened from the listener using a word:"
 { $subsections inspector }
+"Objects may extend the inspector window with a content gadget, in order to provide a rich representation of the object's content in the inspector."
+{ $subsections content-gadget }
 "The inspector embeds a table gadget, which supports keyboard navigation; see " { $link "ui.gadgets.tables" } ". It also provides a few other commands:"
 { $command-map inspector-gadget "toolbar" }
 { $command-map inspector-gadget "multi-touch" }

@@ -1,0 +1,1 @@
+IStream interface wrapper for Factor stream objects

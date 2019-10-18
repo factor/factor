@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db db.sqlite db.tuples db.types kernel
-math math.order sequences combinators.short-circuit ;
+math math.order sequences combinators.short-circuit
+io.pathnames ;
 IN: webapps.mason.backend
 
 CONSTANT: +idle+ "idle"
@@ -58,23 +59,30 @@ counter "COUNTER" {
     [ counter new dup insert-tuple ] unless* ;
 
 : counter-value ( -- n )
-    [ counter-tuple value>> 0 or ] with-transaction ;
+    counter-tuple value>> 0 or ;
 
 : increment-counter-value ( -- n )
-    [
-        counter-tuple [ 0 or 1 + dup ] change-value update-tuple
-    ] with-transaction ;
+    counter-tuple [ 0 or 1 + dup ] change-value update-tuple ;
+
+: all-builders ( -- builders )
+    builder new select-tuples ; inline
+
+: crashed? ( builder -- ? )
+    heartbeat-timestamp>> 30 minutes ago before? ;
+
+: broken? ( builder -- ? )
+    [ clean-git-id>> ] [ last-git-id>> ] bi = not ;
 
 : funny-builders ( -- crashed broken )
-    builder new select-tuples
-    [ [ heartbeat-timestamp>> 30 minutes ago before? ] filter ]
-    [ [ [ clean-git-id>> ] [ last-git-id>> ] bi = not ] filter ]
+    all-builders
+    [ [ crashed? ] filter ]
+    [ [ broken? ] filter ]
     bi ;
 
 : os/cpu ( builder -- string )
     [ os>> ] [ cpu>> ] bi "/" glue ;
 
-: mason-db ( -- db ) "resource:mason.db" <sqlite-db> ;
+: mason-db ( -- db ) home "mason.db" append-path <sqlite-db> ;
 
 : with-mason-db ( quot -- )
     mason-db [ with-transaction ] with-db ; inline

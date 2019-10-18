@@ -19,7 +19,7 @@ IN: math.text.english
         f f "twenty" "thirty" "forty" "fifty" "sixty"
         "seventy" "eighty" "ninety"
     } nth ;
-    
+
 : scale-numbers ( n -- str )  ! up to 10^99
     {
         f "thousand" "million" "billion" "trillion" "quadrillion"
@@ -51,9 +51,9 @@ SYMBOL: and-needed?
 : tens-place ( n -- str )
     100 mod dup 20 >= [
         10 /mod [ tens ] dip
-        dup 0 = [ drop ] [ small-numbers "-" glue ] if
+        [ small-numbers "-" glue ] unless-zero
     ] [
-        dup 0 = [ drop "" ] [ small-numbers ] if
+        [ "" ] [ small-numbers ] if-zero
     ] if ;
 
 : 3digits>text ( n -- str )

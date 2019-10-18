@@ -30,7 +30,7 @@ FUNCTION: HRESULT DwmExtendFrameIntoClientArea ( HWND hWnd, MARGINS* pMarInset )
 FUNCTION: HRESULT DwmEnableBlurBehindWindow ( HWND hWnd, DWM_BLURBEHIND* pBlurBehind ) ;
 FUNCTION: HRESULT DwmIsCompositionEnabled ( BOOL* pfEnabled ) ;
 
-CONSTANT: WM_DWMCOMPOSITIONCHANGED HEX: 31E
+CONSTANT: WM_DWMCOMPOSITIONCHANGED 0x31E
 
 : composition-enabled? ( -- ? )
     windows-major 6 >=

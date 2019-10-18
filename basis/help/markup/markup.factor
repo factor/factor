@@ -1,12 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes colors colors.constants
-combinators combinators.smart definitions definitions.icons effects
-fry generic hashtables help.stylesheet help.topics io io.styles
-kernel make math namespaces parser present prettyprint
-prettyprint.stylesheet quotations see sequences sets slots
-sorting splitting strings vectors vocabs vocabs.loader words
-words.symbol ;
+combinators combinators.smart compiler.units definitions
+definitions.icons effects fry generic hashtables help.stylesheet
+help.topics io io.styles kernel locals make math namespaces
+parser present prettyprint prettyprint.stylesheet quotations
+see sequences sequences.private sets slots sorting splitting
+strings urls vectors vocabs vocabs.loader words words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 FROM: namespaces => set ;
 IN: help.markup
@@ -76,9 +76,9 @@ ALIAS: $slot $snippet
     [ strong-style get print-element* ] ($span) ;
 
 : $url ( children -- )
-    [
-        dup first href associate url-style get assoc-union
-        print-element*
+    first dup >url [
+        dup present href associate url-style get assoc-union
+        [ write-object ] with-style
     ] ($span) ;
 
 : $nl ( children -- )
@@ -206,17 +206,30 @@ M: word link-long-text
 
 : topic-span ( topic quot -- ) [ >topic ] dip ($span) ; inline
 
+ERROR: number-of-arguments found required ;
+
+: check-first ( seq -- first )
+    dup length 1 = [ length 1 number-of-arguments ] unless
+    first-unsafe ;
+
+: check-first2 ( seq -- first second )
+    dup length 2 = [ length 2 number-of-arguments ] unless
+    first2-unsafe ;
+
 PRIVATE>
 
 : ($link) ( topic -- ) [ link-text ] topic-span ;
-: $link ( element -- ) first ($link) ;
+
+: $link ( element -- ) check-first ($link) ;
 
 : ($long-link) ( topic -- ) [ link-long-text ] topic-span ;
-: $long-link ( element -- ) first ($long-link) ;
+
+: $long-link ( element -- ) check-first ($long-link) ;
 
 : ($pretty-link) ( topic -- )
     [ [ link-icon ] [ drop bl ] [ link-text ] tri ] topic-span ;
-: $pretty-link ( element -- ) first ($pretty-link) ;
+
+: $pretty-link ( element -- ) check-first ($pretty-link) ;
 
 : ($long-pretty-link) ( topic -- )
     [ [ link-icon ] [ drop bl ] [ link-long-text ] tri ] topic-span ;
@@ -238,24 +251,24 @@ PRIVATE>
     [ $subsection* ] each ($blank-line) ;
 
 : $subsection ( element -- )
-    first $subsection* ;
+    check-first $subsection* ;
 
 : ($vocab-link) ( text vocab -- )
     >vocab-link write-link ;
 
 : $vocab-subsection ( element -- )
     [
-        first2 dup vocab-help
+        check-first2 dup vocab-help
         [ 2nip ($long-pretty-link) ]
         [ [ >vocab-link link-icon bl ] [ ($vocab-link) ] bi ]
         if*
     ] ($subsection) ;
 
 : $vocab-link ( element -- )
-    first dup vocab-name swap ($vocab-link) ;
+    check-first dup vocab-name swap ($vocab-link) ;
 
 : $vocabulary ( element -- )
-    first vocabulary>> [
+    check-first vocabulary>> [
         "Vocabulary" $heading nl dup ($vocab-link)
     ] when* ;
 
@@ -269,7 +282,7 @@ PRIVATE>
     [ [ ($link) ] textual-list ] ($span) ;
 
 : $vocab-links ( vocabs -- )
-    [ vocab ] map $links ;
+    [ lookup-vocab ] map $links ;
 
 : $breadcrumbs ( topics -- )
     [ [ ($link) ] " > " (textual-list) ] ($span) ;
@@ -277,11 +290,26 @@ PRIVATE>
 : $see-also ( topics -- )
     "See also" $heading $links ;
 
+<PRIVATE
+:: update-related-words ( words -- affected-words )
+    words words [| affected word |
+        word "related" [ affected union words ] change-word-prop
+    ] reduce ;
+
+:: clear-unrelated-words ( words affected-words -- )
+    affected-words words diff
+    [ "related" [ words diff ] change-word-prop ] each ;
+
+: notify-related-words ( affected-words -- )
+    [ dup associate notify-definition-observers ] each ;
+PRIVATE>
+
 : related-words ( seq -- )
-    dup '[ _ "related" set-word-prop ] each ;
+    dup update-related-words
+    [ clear-unrelated-words ] [ notify-related-words ] bi ;
 
 : $related ( element -- )
-    first dup "related" word-prop remove
+    check-first dup "related" word-prop remove
     [ $see-also ] unless-empty ;
 
 : ($grid) ( style quot -- )
@@ -372,15 +400,15 @@ M: f ($instance)
         ] with-style
     ] ($block) ; inline
 
-: $see ( element -- ) first [ see* ] ($see) ;
+: $see ( element -- ) check-first [ see* ] ($see) ;
 
-: $synopsis ( element -- ) first [ synopsis write ] ($see) ;
+: $synopsis ( element -- ) check-first [ synopsis write ] ($see) ;
 
 : $definition ( element -- )
     "Definition" $heading $see ;
 
 : $methods ( element -- )
-    first methods [
+    check-first methods [
         "Methods" $heading
         [ see-all ] ($see)
     ] unless-empty ;
@@ -388,7 +416,7 @@ M: f ($instance)
 : $value ( object -- )
     "Variable value" $heading
     "Current value in global namespace:" print-element
-    first dup [ pprint-short ] ($code) ;
+    check-first dup [ pprint-short ] ($code) ;
 
 : $curious ( element -- )
     "For the curious..." $heading print-element ;
@@ -452,7 +480,7 @@ M: array elements*
 
 : $definition-icons ( element -- )
     drop
-    icons get >alist sort-keys
+    icons get sort-keys
     [ [ <$link> ] [ definition-icon-path <$image> ] bi* swap ] assoc-map
     { "" "Definition class" } prefix
     $table ;

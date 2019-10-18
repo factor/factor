@@ -1,6 +1,6 @@
 USING: accessors math math.bitwise tools.test kernel words
-specialized-arrays alien.c-types math.vectors.simd
-sequences destructors libc literals ;
+specialized-arrays alien.c-types alien.data math.vectors.simd
+sequences destructors libc literals classes.struct ;
 SPECIALIZED-ARRAY: int
 IN: math.bitwise.tests
 
@@ -26,9 +26,16 @@ IN: math.bitwise.tests
 [ 8 ] [ 0 3 toggle-bit ] unit-test
 [ 0 ] [ 8 3 toggle-bit ] unit-test
 
-[ 4 ] [ BIN: 1010101 bit-count ] unit-test
-[ 0 ] [ BIN: 0 bit-count ] unit-test
-[ 1 ] [ BIN: 1 bit-count ] unit-test
+[ 4 ] [ 0b1010101 bit-count ] unit-test
+[ 0 ] [ 0b0 bit-count ] unit-test
+[ 1 ] [ 0b1 bit-count ] unit-test
+[ 2 ] [ B{ 1 1 } bit-count ] unit-test
+[ 64 ] [ 0xffffffffffffffff bit-count ] unit-test
+
+STRUCT: bit-count-struct { a uint } ;
+
+[ 2 ] [ S{ bit-count-struct { a 3 } } bit-count ] unit-test
+
 
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: uint-4
@@ -37,14 +44,36 @@ SPECIALIZED-ARRAY: uint-4
 
 [ 1 ] [
     [
-        2 malloc-int-array &free 1 0 pick set-nth bit-count
+        2 int malloc-array &free 1 0 pick set-nth bit-count
     ] with-destructors
 ] unit-test
 
 [ 1 ] [ B{ 1 0 0 } bit-count ] unit-test
 [ 3 ] [ B{ 1 1 1 } bit-count ] unit-test
 
-[ t ] [ BIN: 0 even-parity? ] unit-test
-[ f ] [ BIN: 1 even-parity? ] unit-test
-[ f ] [ BIN: 0 odd-parity? ] unit-test
-[ t ] [ BIN: 1 odd-parity? ] unit-test
+[ t ] [ 0b0 even-parity? ] unit-test
+[ f ] [ 0b1 even-parity? ] unit-test
+[ f ] [ 0b0 odd-parity? ] unit-test
+[ t ] [ 0b1 odd-parity? ] unit-test
+
+[ -1 ] [ 0xff 4 >signed ] unit-test
+[ -1 ] [ 0xff 8 >signed ] unit-test
+[ 255 ] [ 0xff 16 >signed ] unit-test
+
+[ 2 ] [ 3 >even ] unit-test
+[ 3 ] [ 3 >odd ] unit-test
+[ 5 ] [ 4 >odd ] unit-test
+
+[ t ] [ 0xff 1 mask? ] unit-test
+[ f ] [ 0x0 1 mask? ] unit-test
+
+[ 7 ] [ 5 next-odd ] unit-test
+[ 7 ] [ 6 next-odd ] unit-test
+
+[ 6 ] [ 5 next-even ] unit-test
+[ 8 ] [ 6 next-even ] unit-test
+
+[ f ] [ 0x1 0 bit-clear? ] unit-test
+[ t ] [ 0x0 1 bit-clear? ] unit-test
+
+[ -1 bit-count ] [ invalid-bit-count-target? ] must-fail-with

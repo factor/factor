@@ -242,7 +242,7 @@ CONSTANT: google-slides
     { $slide "Unicode strings"
         "Strings are sequences of 21-bit Unicode code points"
         "Efficient implementation: ASCII byte string unless it has chars > 127"
-        "If a byte char has high bit set, the remaining 14 bits come from auxilliary vector"
+        "If a byte char has high bit set, the remaining 14 bits come from auxiliary vector"
     }
     { $slide "Unicode strings"
         "Unicode-aware case conversion, char classes, collation, word breaks, and so on..."
@@ -359,7 +359,7 @@ CONSTANT: google-slides
     }
     { $slide "Example: time server"
         { $vocab-link "time-server" }
-        { "Demonstrates " { $vocab-link "io.servers.connection" } " vocabulary, threads" }
+        { "Demonstrates " { $vocab-link "io.servers" } " vocabulary, threads" }
     }
     { $slide "Example: what is my IP?"
         { $vocab-link "webapps.ip" }
@@ -379,7 +379,7 @@ CONSTANT: google-slides
     { $slide "Example: environment variables"
         { $vocab-link "environment" }
         "Hooks are generic words which dispatch on dynamically-scoped variables"
-        { "Implemented in an OS-specific way: " { $vocab-link "environment.unix" } ", " { $vocab-link "environment.winnt" } }
+        { "Implemented in an OS-specific way: " { $vocab-link "environment.unix" } ", " { $vocab-link "environment.windows" } }
     }
     { $slide "Example: environment variables"
         "Implementations use C FFI"

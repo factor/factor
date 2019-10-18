@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types kernel locals math math.ranges
-math.bitwise math.vectors math.vectors.simd random
+USING: accessors alien.c-types alien.data kernel locals math
+math.ranges math.bitwise math.vectors math.vectors.simd random
 sequences specialized-arrays sequences.private classes.struct
 combinators.short-circuit fry ;
+FROM: sequences => change-nth ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: uint-4
 IN: random.sfmt
@@ -111,14 +112,14 @@ M:: sfmt generate ( sfmt -- )
 
 : <sfmt-array> ( sfmt -- uint-array uint-4-array )
     state>>
-    [ n>> 4 * [1,b] >uint-array ] [ seed>> ] bi
+    [ n>> 4 * [1,b] uint >c-array ] [ seed>> ] bi
     [
         [
             [ -30 shift ] [ ] bi bitxor
             state-multiplier * 32 bits
         ] dip + 32 bits
     ] uint-array{ } accumulate-as nip
-    dup uint-4-array-cast ;
+    dup uint-4 cast-array ;
 
 : <sfmt-state> ( seed n m mask parity -- sfmt )
     sfmt-state <struct>
@@ -159,8 +160,8 @@ M: sfmt seed-random ( sfmt seed -- sfmt )
 
 : <sfmt-19937> ( seed -- sfmt )
     156 122
-    uint-4{ HEX: dfffffef HEX: ddfecb7f HEX: bffaffff HEX: bffffff6 }
-    uint-4{ HEX: 1 HEX: 0 HEX: 0 HEX: 13c9e684 }
+    uint-4{ 0xdfffffef 0xddfecb7f 0xbffaffff 0xbffffff6 }
+    uint-4{ 0x1 0x0 0x0 0x13c9e684 }
     <sfmt> ; inline
 
 : default-sfmt ( -- sfmt )

@@ -47,8 +47,8 @@ M: insn visit-insn drop ;
     [ <reversed> [ visit-insn ] each ]
     [
         [ [ ##inc-d? ] [ ##inc-r? ] bi or not ] filter!
-        ds-height get [ \ ##inc-d new-insn prefix ] unless-zero
-        rs-height get [ \ ##inc-r new-insn prefix ] unless-zero
+        ds-height get [ ##inc-d new-insn prefix ] unless-zero
+        rs-height get [ ##inc-r new-insn prefix ] unless-zero
     ] bi ;
 
 : normalize-height ( cfg -- cfg' )

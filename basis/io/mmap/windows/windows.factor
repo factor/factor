@@ -1,4 +1,4 @@
-USING: accessors destructors io.backend.windows.privileges
+USING: accessors destructors windows.privileges
 io.files.windows io.mmap io.mmap.private kernel literals locals
 math math.bitwise system windows.errors windows.handles
 windows.kernel32 ;

@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings alien.syntax arrays
-classes.struct fry io.encodings.ascii io.mmap kernel locals math
-math.intervals sequences specialized-arrays strings typed assocs ;
+USING: accessors alien alien.c-types alien.data alien.strings
+alien.syntax arrays classes.struct fry io.encodings.ascii
+io.mmap kernel locals math math.intervals sequences
+specialized-arrays strings typed assocs ;
 IN: elf
 
 ! FFI data
@@ -18,10 +19,10 @@ CONSTANT: EI_OSABI      7
 CONSTANT: EI_ABIVERSION 8
 CONSTANT: EI_PAD        9
 
-CONSTANT: ELFMAG0       HEX: 7f
-CONSTANT: ELFMAG1       HEX: 45
-CONSTANT: ELFMAG2       HEX: 4c
-CONSTANT: ELFMAG3       HEX: 46
+CONSTANT: ELFMAG0       0x7f
+CONSTANT: ELFMAG1       0x45
+CONSTANT: ELFMAG2       0x4c
+CONSTANT: ELFMAG3       0x46
 
 CONSTANT: ELFCLASS32 1
 CONSTANT: ELFCLASS64 2
@@ -52,10 +53,10 @@ CONSTANT: ET_REL    1
 CONSTANT: ET_EXEC   2
 CONSTANT: ET_DYN    3
 CONSTANT: ET_CORE   4
-CONSTANT: ET_LOOS   HEX: FE00
-CONSTANT: ET_HIOS   HEX: FEFF
-CONSTANT: ET_LOPROC HEX: FF00
-CONSTANT: ET_HIPROC HEX: FFFF
+CONSTANT: ET_LOOS   0xFE00
+CONSTANT: ET_HIOS   0xFEFF
+CONSTANT: ET_LOPROC 0xFF00
+CONSTANT: ET_HIPROC 0xFFFF
 
 CONSTANT: EM_NONE         0
 CONSTANT: EM_M32          1
@@ -154,16 +155,16 @@ CONSTANT: EM_UNICORE      110
 CONSTANT: EV_NONE    0
 CONSTANT: EV_CURRENT 1
 
-CONSTANT: EF_ARM_EABIMASK HEX: ff000000
-CONSTANT: EF_ARM_BE8      HEX: 00800000
+CONSTANT: EF_ARM_EABIMASK 0xff000000
+CONSTANT: EF_ARM_BE8      0x00800000
 
-CONSTANT: SHN_UNDEF  HEX: 0000
-CONSTANT: SHN_LOPROC HEX: FF00
-CONSTANT: SHN_HIPROC HEX: FF1F
-CONSTANT: SHN_LOOS   HEX: FF20
-CONSTANT: SHN_HIOS   HEX: FF3F
-CONSTANT: SHN_ABS    HEX: FFF1
-CONSTANT: SHN_COMMON HEX: FFF2
+CONSTANT: SHN_UNDEF  0x0000
+CONSTANT: SHN_LOPROC 0xFF00
+CONSTANT: SHN_HIPROC 0xFF1F
+CONSTANT: SHN_LOOS   0xFF20
+CONSTANT: SHN_HIOS   0xFF3F
+CONSTANT: SHN_ABS    0xFFF1
+CONSTANT: SHN_COMMON 0xFFF2
 
 CONSTANT: SHT_NULL               0
 CONSTANT: SHT_PROGBITS           1
@@ -177,27 +178,27 @@ CONSTANT: SHT_NOBITS             8
 CONSTANT: SHT_REL                9
 CONSTANT: SHT_SHLIB              10
 CONSTANT: SHT_DYNSYM             11
-CONSTANT: SHT_LOOS               HEX: 60000000
-CONSTANT: SHT_GNU_LIBLIST        HEX: 6ffffff7
-CONSTANT: SHT_CHECKSUM           HEX: 6ffffff8
-CONSTANT: SHT_LOSUNW             HEX: 6ffffffa
-CONSTANT: SHT_SUNW_move          HEX: 6ffffffa
-CONSTANT: SHT_SUNW_COMDAT        HEX: 6ffffffb
-CONSTANT: SHT_SUNW_syminfo       HEX: 6ffffffc
-CONSTANT: SHT_GNU_verdef         HEX: 6ffffffd
-CONSTANT: SHT_GNU_verneed        HEX: 6ffffffe
-CONSTANT: SHT_GNU_versym         HEX: 6fffffff
-CONSTANT: SHT_HISUNW             HEX: 6fffffff
-CONSTANT: SHT_HIOS               HEX: 6fffffff
-CONSTANT: SHT_LOPROC             HEX: 70000000
-CONSTANT: SHT_ARM_EXIDX          HEX: 70000001
-CONSTANT: SHT_ARM_PREEMPTMAP     HEX: 70000002
-CONSTANT: SHT_ARM_ATTRIBUTES     HEX: 70000003
-CONSTANT: SHT_ARM_DEBUGOVERLAY   HEX: 70000004
-CONSTANT: SHT_ARM_OVERLAYSECTION HEX: 70000005
-CONSTANT: SHT_HIPROC             HEX: 7fffffff
-CONSTANT: SHT_LOUSER             HEX: 80000000
-CONSTANT: SHT_HIUSER             HEX: 8fffffff
+CONSTANT: SHT_LOOS               0x60000000
+CONSTANT: SHT_GNU_LIBLIST        0x6ffffff7
+CONSTANT: SHT_CHECKSUM           0x6ffffff8
+CONSTANT: SHT_LOSUNW             0x6ffffffa
+CONSTANT: SHT_SUNW_move          0x6ffffffa
+CONSTANT: SHT_SUNW_COMDAT        0x6ffffffb
+CONSTANT: SHT_SUNW_syminfo       0x6ffffffc
+CONSTANT: SHT_GNU_verdef         0x6ffffffd
+CONSTANT: SHT_GNU_verneed        0x6ffffffe
+CONSTANT: SHT_GNU_versym         0x6fffffff
+CONSTANT: SHT_HISUNW             0x6fffffff
+CONSTANT: SHT_HIOS               0x6fffffff
+CONSTANT: SHT_LOPROC             0x70000000
+CONSTANT: SHT_ARM_EXIDX          0x70000001
+CONSTANT: SHT_ARM_PREEMPTMAP     0x70000002
+CONSTANT: SHT_ARM_ATTRIBUTES     0x70000003
+CONSTANT: SHT_ARM_DEBUGOVERLAY   0x70000004
+CONSTANT: SHT_ARM_OVERLAYSECTION 0x70000005
+CONSTANT: SHT_HIPROC             0x7fffffff
+CONSTANT: SHT_LOUSER             0x80000000
+CONSTANT: SHT_HIUSER             0x8fffffff
 
 CONSTANT: SHF_WRITE            1
 CONSTANT: SHF_ALLOC            2
@@ -209,8 +210,8 @@ CONSTANT: SHF_LINK_ORDER       128
 CONSTANT: SHF_OS_NONCONFORMING 256
 CONSTANT: SHF_GROUP            512
 CONSTANT: SHF_TLS              1024
-CONSTANT: SHF_MASKOS           HEX: 0f000000
-CONSTANT: SHF_MASKPROC         HEX: f0000000
+CONSTANT: SHF_MASKOS           0x0f000000
+CONSTANT: SHF_MASKPROC         0xf0000000
 
 CONSTANT: STB_LOCAL  0
 CONSTANT: STB_GLOBAL 1
@@ -247,45 +248,45 @@ CONSTANT: PT_NOTE        4
 CONSTANT: PT_SHLIB       5
 CONSTANT: PT_PHDR        6
 CONSTANT: PT_TLS         7
-CONSTANT: PT_LOOS        HEX: 60000000
-CONSTANT: PT_HIOS        HEX: 6fffffff
-CONSTANT: PT_LOPROC      HEX: 70000000
-CONSTANT: PT_ARM_ARCHEXT HEX: 70000000
-CONSTANT: PT_ARM_EXIDX   HEX: 70000001
-CONSTANT: PT_ARM_UNWIND  HEX: 70000001
-CONSTANT: PT_HIPROC      HEX: 7fffffff
+CONSTANT: PT_LOOS        0x60000000
+CONSTANT: PT_HIOS        0x6fffffff
+CONSTANT: PT_LOPROC      0x70000000
+CONSTANT: PT_ARM_ARCHEXT 0x70000000
+CONSTANT: PT_ARM_EXIDX   0x70000001
+CONSTANT: PT_ARM_UNWIND  0x70000001
+CONSTANT: PT_HIPROC      0x7fffffff
 
-CONSTANT: PT_ARM_ARCHEXT_FMTMSK       HEX: ff000000
-CONSTANT: PT_ARM_ARCHEXT_PROFMSK      HEX: 00ff0000
-CONSTANT: PT_ARM_ARCHEXT_ARCHMSK      HEX: 000000ff
-CONSTANT: PT_ARM_ARCHEXT_FMT_OS       HEX: 00000000
-CONSTANT: PT_ARM_ARCHEXT_FMT_ABI      HEX: 01000000
-CONSTANT: PT_ARM_ARCHEXT_PROF_NONE    HEX: 00000000
-CONSTANT: PT_ARM_ARCHEXT_PROF_ARM     HEX: 00410000
-CONSTANT: PT_ARM_ARCHEXT_PROF_RT      HEX: 00520000
-CONSTANT: PT_ARM_ARCHEXT_PROF_MC      HEX: 004d0000
-CONSTANT: PT_ARM_ARCHEXT_PROF_CLASSIC HEX: 00530000
+CONSTANT: PT_ARM_ARCHEXT_FMTMSK       0xff000000
+CONSTANT: PT_ARM_ARCHEXT_PROFMSK      0x00ff0000
+CONSTANT: PT_ARM_ARCHEXT_ARCHMSK      0x000000ff
+CONSTANT: PT_ARM_ARCHEXT_FMT_OS       0x00000000
+CONSTANT: PT_ARM_ARCHEXT_FMT_ABI      0x01000000
+CONSTANT: PT_ARM_ARCHEXT_PROF_NONE    0x00000000
+CONSTANT: PT_ARM_ARCHEXT_PROF_ARM     0x00410000
+CONSTANT: PT_ARM_ARCHEXT_PROF_RT      0x00520000
+CONSTANT: PT_ARM_ARCHEXT_PROF_MC      0x004d0000
+CONSTANT: PT_ARM_ARCHEXT_PROF_CLASSIC 0x00530000
 
-CONSTANT: PT_ARM_ARCHEXT_ARCH_UNKN      HEX: 00
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv4    HEX: 01
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv4T   HEX: 02
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv5T   HEX: 03
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv5TE  HEX: 04
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv5TEJ HEX: 05
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6    HEX: 06
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6KZ  HEX: 07
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6T2  HEX: 08
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6K   HEX: 09
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv7    HEX: 0A
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6M   HEX: 0B
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6SM  HEX: 0C
-CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv7EM  HEX: 0D
+CONSTANT: PT_ARM_ARCHEXT_ARCH_UNKN      0x00
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv4    0x01
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv4T   0x02
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv5T   0x03
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv5TE  0x04
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv5TEJ 0x05
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6    0x06
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6KZ  0x07
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6T2  0x08
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6K   0x09
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv7    0x0A
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6M   0x0B
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv6SM  0x0C
+CONSTANT: PT_ARM_ARCHEXT_ARCH_ARCHv7EM  0x0D
 
 CONSTANT: PF_X        1
 CONSTANT: PF_W        2
 CONSTANT: PF_R        4
-CONSTANT: PF_MASKOS   HEX: 00ff0000
-CONSTANT: PF_MASKPROC HEX: ff000000
+CONSTANT: PF_MASKOS   0x00ff0000
+CONSTANT: PF_MASKPROC 0xff000000
 
 CONSTANT: DT_NULL            0
 CONSTANT: DT_NEEDED          1
@@ -321,14 +322,14 @@ CONSTANT: DT_FLAGS           30
 CONSTANT: DT_ENCODING        32
 CONSTANT: DT_PREINIT_ARRAY   32
 CONSTANT: DT_PREINIT_ARRAYSZ 33
-CONSTANT: DT_LOOS            HEX: 60000000
-CONSTANT: DT_HIOS            HEX: 6fffffff
-CONSTANT: DT_LOPROC          HEX: 70000000
-CONSTANT: DT_ARM_RESERVED1   HEX: 70000000
-CONSTANT: DT_ARM_SYMTABSZ    HEX: 70000001
-CONSTANT: DT_ARM_PREEMPTYMAP HEX: 70000002
-CONSTANT: DT_ARM_RESERVED2   HEX: 70000003
-CONSTANT: DT_HIPROC          HEX: 7fffffff
+CONSTANT: DT_LOOS            0x60000000
+CONSTANT: DT_HIOS            0x6fffffff
+CONSTANT: DT_LOPROC          0x70000000
+CONSTANT: DT_ARM_RESERVED1   0x70000000
+CONSTANT: DT_ARM_SYMTABSZ    0x70000001
+CONSTANT: DT_ARM_PREEMPTYMAP 0x70000002
+CONSTANT: DT_ARM_RESERVED2   0x70000003
+CONSTANT: DT_HIPROC          0x7fffffff
 
 TYPEDEF: ushort    Elf32_Half
 TYPEDEF: uint      Elf32_Word
@@ -482,15 +483,15 @@ TYPED:: elf-section-headers ( elf: Elf32/64_Ehdr -- headers: Elf32/64_Shdr-array
     elf [ e_shoff>> ] [ e_shnum>> ] bi :> ( off num )
     off elf >c-ptr <displaced-alien> num
     elf 64-bit?
-    [ <direct-Elf64_Shdr-array> ]
-    [ <direct-Elf32_Shdr-array> ] if ;
+    [ Elf64_Shdr <c-direct-array> ]
+    [ Elf32_Shdr <c-direct-array> ] if ;
 
 TYPED:: elf-program-headers ( elf: Elf32/64_Ehdr -- headers: Elf32/64_Phdr-array )
     elf [ e_phoff>> ] [ e_phnum>> ] bi :> ( off num )
     off elf >c-ptr <displaced-alien> num
     elf 64-bit?
-    [ <direct-Elf64_Phdr-array> ]
-    [ <direct-Elf32_Phdr-array> ] if ;
+    [ Elf64_Phdr <c-direct-array> ]
+    [ Elf32_Phdr <c-direct-array> ] if ;
 
 TYPED: elf-loadable-segments ( headers: Elf32/64_Phdr-array -- headers: Elf32/64_Phdr-array )
     [ p_type>> PT_LOAD = ] filter ;
@@ -505,7 +506,7 @@ TYPED:: virtual-address-segment ( elf: Elf32/64_Ehdr address -- program-header/f
     elf elf-program-headers elf-loadable-segments [
         [ p_vaddr>> dup ] [ p_memsz>> + ] bi [a,b)
         address swap interval-contains?
-    ] filter [ f ] [ first ] if-empty ;
+    ] find nip ;
 
 TYPED:: virtual-address-section ( elf: Elf32/64_Ehdr address -- section-header/f )
     elf address virtual-address-segment :> segment
@@ -514,13 +515,13 @@ TYPED:: virtual-address-section ( elf: Elf32/64_Ehdr address -- section-header/f
     sections [
         [ sh_offset>> dup ] [ sh_size>> + ] bi [a,b)
         faddress swap interval-contains?
-    ] filter [ f ] [ first ] if-empty ;
+    ] find nip ;
 
 TYPED:: elf-segment-data ( elf: Elf32/64_Ehdr header: Elf32/64_Phdr -- uchar-array/f )
-    header [ p_offset>> elf >c-ptr <displaced-alien> ] [ p_filesz>> ] bi <direct-uchar-array> ;
+    header [ p_offset>> elf >c-ptr <displaced-alien> ] [ p_filesz>> ] bi uchar <c-direct-array> ;
 
 TYPED:: elf-section-data ( elf: Elf32/64_Ehdr header: Elf32/64_Shdr -- uchar-array/f )
-    header [ sh_offset>> elf >c-ptr <displaced-alien> ] [ sh_size>> ] bi <direct-uchar-array> ;
+    header [ sh_offset>> elf >c-ptr <displaced-alien> ] [ sh_size>> ] bi uchar <c-direct-array> ;
 
 TYPED:: elf-section-data-by-index ( elf: Elf32/64_Ehdr index -- header/f uchar-array/f )
     elf elf-section-headers     :> sections
@@ -536,7 +537,7 @@ TYPED:: elf-section-data-by-name ( elf: Elf32/64_Ehdr name: string -- header/f u
     elf elf-section-headers                      :> sections
     elf e_shstrndx>>                             :> ndx
     elf ndx sections nth elf-section-data >c-ptr :> section-names
-    sections 1 tail [
+    sections rest [
         sh_name>> section-names <displaced-alien> ascii alien>string name =
     ] find nip
     [ dup elf swap elf-section-data ]
@@ -554,8 +555,8 @@ TYPED:: elf-symbols ( elf: Elf32/64_Ehdr section-data: uchar-array -- symbols )
     elf ".strtab" elf-section-data-by-name nip >c-ptr :> strings
     section-data [ >c-ptr ] [ length ] bi
     elf 64-bit?
-    [ Elf64_Sym heap-size / <direct-Elf64_Sym-array> ]
-    [ Elf32_Sym heap-size / <direct-Elf32_Sym-array> ] if
+    [ Elf64_Sym heap-size / Elf64_Sym <c-direct-array> ]
+    [ Elf32_Sym heap-size / Elf32_Sym <c-direct-array> ] if
     [ [ st_name>> strings <displaced-alien> ascii alien>string ] keep 2array ] { } map-as ;
 
 ! High level interface
@@ -608,7 +609,7 @@ M:: segment sections ( segment -- sections )
     symbol [ elf-header>> ] [ sym>> st_value>> ] bi virtual-address-segment :> segment
     symbol sym>> st_value>> segment p_vaddr>> - segment p_offset>> + :> faddress
     faddress symbol elf-header>> >c-ptr <displaced-alien>
-    symbol sym>> st_size>> <direct-uchar-array> ;
+    symbol sym>> st_size>> uchar <c-direct-array> ;
 
 : find-section ( sections name -- section/f )
     '[ name>> _ = ] find nip ; inline

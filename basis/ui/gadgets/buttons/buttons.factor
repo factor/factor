@@ -67,7 +67,7 @@ pressed selected pressed-selected ;
 
 C: <button-pen> button-pen
 
-: button-pen ( button pen -- button pen )
+: lookup-button-pen ( button pen -- button pen )
     over find-button {
         { [ dup { [ pressed?>> ] [ selected?>> ] } 1&& ] [
             drop pressed-selected>>
@@ -79,10 +79,10 @@ C: <button-pen> button-pen
     } cond ;
 
 M: button-pen draw-interior
-    button-pen dup [ draw-interior ] [ 2drop ] if ;
+    lookup-button-pen dup [ draw-interior ] [ 2drop ] if ;
 
 M: button-pen draw-boundary
-    button-pen dup [ draw-boundary ] [ 2drop ] if ;
+    lookup-button-pen dup [ draw-boundary ] [ 2drop ] if ;
 
 M: button-pen pen-pref-dim
     [
@@ -95,10 +95,10 @@ M: button-pen pen-pref-dim
     ] [ vmax ] reduce-outputs ;
 
 M: button-pen pen-background
-    button-pen pen-background ;
+    lookup-button-pen pen-background ;
 
 M: button-pen pen-foreground
-    button-pen pen-foreground ;
+    lookup-button-pen pen-foreground ;
 
 <PRIVATE
 
@@ -137,7 +137,7 @@ CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
     dup label? [ [ clone t >>bold? ] change-font ] when drop ;
 
 : border-button-theme ( gadget -- gadget )
-    dup children>> first border-button-label-theme
+    dup gadget-child border-button-label-theme
     horizontal >>orientation
     <border-button-pen> >>interior
     dup dup interior>> pen-pref-dim >>min-dim
@@ -218,7 +218,7 @@ TUPLE: radio-control < button value ;
         align-left ; inline
 
 M: radio-control model-changed
-    2dup [ value>> ] bi@ = >>selected? relayout-1 drop ;
+    2dup [ value>> ] same? >>selected? relayout-1 drop ;
 
 :: <radio-controls> ( model assoc parent quot: ( value model label -- gadget ) -- parent )
     parent assoc [ model swap quot call add-gadget ] assoc-each ; inline
@@ -248,7 +248,7 @@ PRIVATE>
         1 >>fill
         { 5 5 } >>gap
         swap
-        [ [ "toolbar" ] dip class command-map commands>> ]
+        [ [ "toolbar" ] dip class-of get-command-at commands>> ]
         [ '[ [ _ ] 2dip <command-button> add-gadget ] ]
         bi assoc-each ;
 

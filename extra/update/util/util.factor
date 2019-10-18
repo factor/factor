@@ -17,7 +17,7 @@ IN: update.util
 DEFER: to-strings
 
 : to-string ( obj -- str )
-  dup class
+  dup class-of
     {
       { \ string    [ ] }
       { \ quotation [ call( -- string ) ] }
@@ -46,7 +46,7 @@ DEFER: to-strings
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : gnu-make ( -- string )
-  os { freebsd openbsd netbsd } member? [ "gmake" ] [ "make" ] if ;
+    "make" ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -49,7 +49,7 @@ TUPLE: lsb0-bit-writer < bit-writer ;
 : new-bit-writer ( class -- bs )
     new
         BV{ } clone >>bytes
-        0 0 <widthed> >>widthed ; inline
+        zero-widthed >>widthed ; inline
 
 : <msb0-bit-writer> ( -- bs )
     msb0-bit-writer new-bit-writer ;
@@ -170,7 +170,7 @@ M: msb0-bit-reader peek ( n bs -- bits ) \ be> \ subseq>bits-be (peek) ;
     ] unless
     writer bytes>> ;
 
-:: byte-array-n>seq ( byte-array n -- seq )
+:: byte-array-n>sequence ( byte-array n -- seq )
     byte-array length 8 * n / iota
     byte-array <msb0-bit-reader> '[
         drop n _ read

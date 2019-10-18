@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar calendar.holidays
 calendar.holidays.private combinators combinators.short-circuit
-fry kernel lexer math namespaces parser sequences shuffle
+fry kernel lexer math namespaces parser sequences 
 vocabs words ;
 IN: calendar.holidays.us
 
@@ -89,6 +89,8 @@ HOLIDAY: cinco-de-mayo may 5 >>day ;
 HOLIDAY: mothers-day may 2 sunday-of-month ;
 
 HOLIDAY: armed-forces-day may 3 saturday-of-month ;
+
+HOLIDAY: national-donut-day june 1 friday-of-month ;
 
 HOLIDAY: flag-day june 14 >>day ;
 

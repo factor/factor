@@ -1,5 +1,5 @@
-USING: kernel math namespaces sequences sbufs strings
-tools.test classes ;
+USING: classes kernel math namespaces sbufs sequences
+sequences.private strings tools.test ;
 IN: sbufs.tests
 
 [ 5 ] [ "Hello" >sbuf length ] unit-test
@@ -19,6 +19,10 @@ IN: sbufs.tests
 
 [ SBUF" x" ] [ 1 <sbuf> CHAR: x >bignum over push ] unit-test
 
-[ fixnum ] [ 1 >bignum SBUF" " new-sequence length class ] unit-test
+[ fixnum ] [ 1 >bignum SBUF" " new-sequence length class-of ] unit-test
 
-[ fixnum ] [ 1 >bignum iota [ ] SBUF" " map-as length class ] unit-test
+[ fixnum ] [ 1 >bignum iota [ ] SBUF" " map-as length class-of ] unit-test
+
+[ 1.5 SBUF" " new-sequence ] must-fail
+
+[ CHAR: A 0.5 0.5 SBUF" a" set-nth-unsafe ] must-fail

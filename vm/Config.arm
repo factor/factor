@@ -1,1 +1,2 @@
-
+PLAF_MASTER_HEADERS += \
+	cpu-arm.hpp

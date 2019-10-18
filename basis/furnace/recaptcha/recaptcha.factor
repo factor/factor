@@ -21,7 +21,7 @@ M: recaptcha call-responder*
 
 <PRIVATE
 
-: (render-recaptcha) ( private-key -- xml )
+: (render-recaptcha) ( url -- xml )
     dup
     [XML
         <script type="text/javascript"
@@ -39,7 +39,8 @@ M: recaptcha call-responder*
     XML] ;
 
 : recaptcha-url ( secure? -- ? )
-    "https://api.recaptcha.net/challenge" "http://api.recaptcha.net/challenge" ?
+    "http://www.google.com/recaptcha/api/challenge"
+    "https://www.google.com/recaptcha/api/challenge" ?
     recaptcha-error cget [ "?error=" glue ] when* >url ;
 
 : render-recaptcha ( -- xml )
@@ -58,7 +59,7 @@ M: recaptcha call-responder*
         { "privatekey" private-key }
         { "remoteip" remote-ip }
     } URL" http://api-verify.recaptcha.net/verify"
-    <post-request> http-request nip parse-recaptcha-response ;
+    http-post nip parse-recaptcha-response ;
 
 : validate-recaptcha-params ( -- )
     {

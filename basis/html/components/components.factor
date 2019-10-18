@@ -190,7 +190,7 @@ M: comparison render*
 ! HTML component
 SINGLETON: html
 
-M: html render* 2drop <unescaped> ;
+M: html render* 2drop dup string? [ <unescaped> ] when ;
 
 ! XML component
 SINGLETON: xml

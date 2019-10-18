@@ -10,8 +10,8 @@ $nl
 "The first way is to use an environment variable. Factor looks at the " { $snippet "FACTOR_ROOTS" } " environment variable for a list of " { $snippet ":" } "-separated paths (on Unix) or a list of " { $snippet ";" } "-separated paths (on Windows)."
 $nl
 "The second way is to create a configuration file. You can list additional vocabulary roots in a file that Factor reads at startup:"
-{ $subsections "factor-roots" }
-"Finally, you can add vocabulary roots by calling a word from your " { $snippet "factor-rc" } " file (see " { $link "factor-rc" } "):"
+{ $subsections ".factor-roots" }
+"Finally, you can add vocabulary roots by calling a word from your " { $snippet ".factor-rc" } " file (see " { $link ".factor-rc" } "):"
 { $subsections add-vocab-root } ;
 
 ARTICLE: "vocabs.roots" "Vocabulary roots"
@@ -28,7 +28,12 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
 { $subsections "add-vocab-roots" } ;
 
 ARTICLE: "vocabs.icons" "Vocabulary icons"
-"An icon file representing the vocabulary can be provided for use by " { $link "tools.deploy" } ". A file named " { $snippet "icon.ico" } " will be used as the application icon when the application is deployed on Windows. A file named " { $snippet "icon.icns" } " will be used when the application is deployed on MacOS X." ;
+"An icon file representing the vocabulary can be provided for use by " { $link "tools.deploy" } ". If any of the following files exist inside the vocabulary directory, they will be used as icons when the application is deployed."
+{ $list
+    { { $snippet "icon.ico" } " on Windows" }
+    { { $snippet "icon.icns" } " on MacOS X" }
+    { { $snippet "icon.png" } " on Linux and *BSD" }
+} ;
 
 ARTICLE: "vocabs.loader" "Vocabulary loader"
 "The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies using the vocabulary loader. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."
@@ -68,8 +73,7 @@ ABOUT: "vocabs.loader"
 
 HELP: load-vocab
 { $values { "name" "a string" } { "vocab" "a hashtable or " { $link f } } }
-{ $description "Outputs a named vocabulary. If the vocabulary does not exist, throws a restartable " { $link no-vocab } " error. If the user invokes the restart, this word outputs " { $link f } "." }
-{ $error-description "Thrown by " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " when a given vocabulary does not exist. Vocabularies must be created by " { $link POSTPONE: IN: } " before being used." } ;
+{ $description "Attempts to load a vocabulary from disk, or looks up the vocabulary in the dictionary, and then outputs that vocabulary object." } ;
 
 HELP: vocab-main
 { $values { "vocab-spec" "a vocabulary specifier" } { "main" word } }
@@ -81,7 +85,7 @@ HELP: vocab-roots
 HELP: add-vocab-root
 { $values { "root" "a pathname string" } }
 { $description "Adds a directory pathname to the list of vocabulary roots." }
-{ $see-also "factor-roots" } ;
+{ $see-also ".factor-roots" } ;
 
 HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }
@@ -107,11 +111,6 @@ HELP: reload
 { $values { "name" "a vocabulary name" } }
 { $description "Reloads the source code and documentation for a vocabulary." }
 { $errors "Throws a " { $link no-vocab } " error if the vocabulary does not exist on disk." } ;
-
-HELP: require
-{ $values { "vocab" "a vocabulary specifier" } }
-{ $description "Loads a vocabulary if it has not already been loaded." }
-{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "vocabs.refresh" } "." } ;
 
 HELP: require-when
 { $values { "if" "a sequence of vocabulary specifiers" } { "then" "a vocabulary specifier" } }

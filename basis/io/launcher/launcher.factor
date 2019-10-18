@@ -1,11 +1,11 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system kernel namespaces strings hashtables sequences assocs
-combinators vocabs.loader init threads continuations math accessors
-concurrency.flags destructors environment io io.encodings.ascii
-io.backend io.timeouts io.pipes io.pipes.private io.encodings
-io.encodings.utf8 io.streams.duplex io.ports debugger prettyprint
-summary calendar ;
+USING: system kernel namespaces strings hashtables sequences
+assocs combinators vocabs init threads continuations math
+accessors concurrency.flags destructors environment fry io
+io.encodings.ascii io.backend io.timeouts io.pipes
+io.pipes.private io.encodings io.encodings.utf8
+io.streams.duplex io.ports debugger prettyprint summary calendar ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -21,11 +21,14 @@ stdout
 stderr
 
 priority
+group
 
 timeout
 
 handle status
-killed ;
+killed
+
+pipe ;
 
 SYMBOL: +closed+
 SYMBOL: +stdout+
@@ -45,10 +48,15 @@ SYMBOL: +high-priority+
 SYMBOL: +highest-priority+
 SYMBOL: +realtime-priority+
 
+SYMBOL: +same-group+
+SYMBOL: +new-group+
+SYMBOL: +new-session+
+
 : <process> ( -- process )
     process new
     H{ } clone >>environment
-    +append-environment+ >>environment-mode ;
+    +append-environment+ >>environment-mode
+    +same-group+ >>group ;
 
 : process-started? ( process -- ? )
     dup handle>> swap status>> or ;
@@ -136,37 +144,36 @@ M: process-was-killed error.
     [ (wait-for-process) ] with-timeout ;
 
 : run-detached ( desc -- process )
-    >process
-    dup dup run-process* process-started
-    dup timeout>> [ over set-timeout ] when* ;
+    >process [ dup run-process* process-started ] keep ;
 
 : run-process ( desc -- process )
     run-detached
     dup detached>> [ dup wait-for-process drop ] unless ;
 
-ERROR: process-failed process code ;
+ERROR: process-failed process ;
 
 M: process-failed error.
-    dup "Process exited with error code " write code>> . nl
-    "Launch descriptor:" print nl
-    process>> . ;
+    [
+        "Process exited with error code " write process>> status>> . nl
+        "Launch descriptor:" print nl
+    ] [ process>> . ] bi ;
 
 : wait-for-success ( process -- )
-    dup wait-for-process dup 0 =
-    [ 2drop ] [ process-failed ] if ;
+    dup wait-for-process 0 = [ drop ] [ process-failed ] if ;
 
 : try-process ( desc -- )
     run-process wait-for-success ;
 
-HOOK: kill-process* io-backend ( handle -- )
+HOOK: kill-process* io-backend ( process -- )
 
 : kill-process ( process -- )
     t >>killed
-    handle>> [ kill-process* ] when* ;
+    [ pipe>> [ dispose ] when* ]
+    [ dup handle>> [ kill-process* ] [ drop ] if ] bi ;
 
 M: process timeout timeout>> ;
 
-M: process set-timeout swap >>timeout drop ;
+M: process set-timeout timeout<< ;
 
 M: process cancel-operation kill-process ;
 
@@ -176,16 +183,19 @@ M: object run-pipeline-element
     3bi
     wait-for-process ;
 
+<PRIVATE
+
+: <process-with-pipe> ( desc -- process pipe )
+    >process (pipe) |dispose [ >>pipe ] keep ;
+
+PRIVATE>
+
 : <process-reader*> ( desc encoding -- stream process )
     [
         [
-            (pipe) {
-                [ |dispose drop ]
-                [
-                    swap >process
-                        [ swap out>> or ] change-stdout
-                    run-detached
-                ]
+            <process-with-pipe> {
+                [ '[ _ out>> or ] change-stdout ]
+                [ drop run-detached ]
                 [ out>> dispose ]
                 [ in>> <input-port> ]
             } cleave
@@ -203,13 +213,9 @@ M: object run-pipeline-element
 : <process-writer*> ( desc encoding -- stream process )
     [
         [
-            (pipe) {
-                [ |dispose drop ]
-                [
-                    swap >process
-                        [ swap in>> or ] change-stdin
-                    run-detached
-                ]
+            <process-with-pipe> {
+                [ '[ _ in>> or ] change-stdin ]
+                [ drop run-detached ]
                 [ in>> dispose ]
                 [ out>> <output-port> ]
             } cleave
@@ -272,6 +278,6 @@ M: output-process-error error.
 
 {
     { [ os unix? ] [ "io.launcher.unix" require ] }
-    { [ os winnt? ] [ "io.launcher.windows.nt" require ] }
+    { [ os windows? ] [ "io.launcher.windows" require ] }
     [ ]
 } cond

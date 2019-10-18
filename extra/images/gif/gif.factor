@@ -3,7 +3,7 @@
 USING: accessors arrays combinators compression.lzw
 constructors destructors grouping images images.loader io
 io.binary io.buffers io.encodings.string io.encodings.utf8
-io.ports kernel make math math.bitwise namespaces sequences ;
+kernel make math math.bitwise namespaces sequences ;
 IN: images.gif
 
 SINGLETON: gif-image
@@ -55,16 +55,16 @@ introducer label comment-data ;
 TUPLE: trailer byte ;
 CONSTRUCTOR: trailer ( byte -- obj ) ;
 
-CONSTANT: image-descriptor HEX: 2c
+CONSTANT: IMAGE-DESCRIPTOR 0x2c
 ! Extensions
-CONSTANT: extension-identifier HEX: 21
-CONSTANT: plain-text-extension HEX: 01
-CONSTANT: graphic-control-extension HEX: f9
-CONSTANT: comment-extension HEX: fe
-CONSTANT: application-extension HEX: ff
-CONSTANT: trailer HEX: 3b
-CONSTANT: graphic-control-extension-block-size HEX: 04
-CONSTANT: block-terminator HEX: 00
+CONSTANT: EXTENSION-IDENTIFIER 0x21
+CONSTANT: PLAIN-TEXT-EXTENSION 0x01
+CONSTANT: GRAPHICS-CONTROL-EXTENSION 0xf9
+CONSTANT: COMMENT-EXTENSION 0xfe
+CONSTANT: APPLICATION-EXTENSION 0xff
+CONSTANT: TRAILER 0x3b
+CONSTANT: GRAPHIC-CONTROL-EXTENSION-BLOCK-SIZE 0x04
+CONSTANT: BLOCK-TERMINATOR 0x00
 
 : <loading-gif> ( -- loading-gif )
     \ loading-gif new
@@ -73,14 +73,6 @@ CONSTANT: block-terminator HEX: 00
         V{ } clone >>plain-text-extensions
         V{ } clone >>comment-extensions
         t >>loading? ;
-
-GENERIC: stream-peek1 ( stream -- byte )
-
-M: input-port stream-peek1
-    dup check-disposed dup wait-to-read
-    [ drop f ] [ buffer>> buffer-peek ] if ; inline
-
-: peek1 ( -- byte ) input-stream get stream-peek1 ;
 
 : (read-sub-blocks) ( -- )
     read1 [ read , (read-sub-blocks) ] unless-zero ;
@@ -99,11 +91,11 @@ M: input-port stream-peek1
 
 : read-graphic-control-extension ( -- graphic-control-extension )
     \ graphics-control-extension new
-        1 read le> graphic-control-extension-block-size assert=
+        1 read le> GRAPHIC-CONTROL-EXTENSION-BLOCK-SIZE assert=
         1 read le> >>flags
         2 read le> >>delay-time
         1 read le> >>transparent-color-index
-        1 read le> block-terminator assert= ;
+        1 read le> BLOCK-TERMINATOR assert= ;
 
 : read-plain-text-extension ( -- plain-text-extension )
     \ plain-text-extension new
@@ -148,7 +140,8 @@ ERROR: unimplemented message ;
 : sort? ( image -- ? ) flags>> 5 bit? ; inline
 : color-table-size ( image -- ? ) flags>> 3 bits 1 + 2^ 3 * ; inline
 : transparency? ( image -- ? )
-    graphic-control-extensions>> first flags>> 0 bit? ; inline
+    graphic-control-extensions>>
+    [ f ] [ first flags>> 0 bit? ] if-empty ; inline
 
 : color-resolution ( image -- ? ) flags>> -4 shift 3 bits ; inline
 
@@ -175,18 +168,18 @@ ERROR: unimplemented message ;
 
 : read-extension ( loading-gif -- loading-gif )
     read1 {
-        { plain-text-extension [
+        { PLAIN-TEXT-EXTENSION [
             read-plain-text-extension over plain-text-extensions>> push
         ] }
 
-        { graphic-control-extension [
+        { GRAPHICS-CONTROL-EXTENSION [
             read-graphic-control-extension
             over graphic-control-extensions>> push
         ] }
-        { comment-extension [
+        { COMMENT-EXTENSION [
             read-comment-extension over comment-extensions>> push
         ] }
-        { application-extension [
+        { APPLICATION-EXTENSION [
             read-application-extension over application-extensions>> push
         ] }
         { f [ gif-unexpected-eof ] }
@@ -197,13 +190,13 @@ ERROR: unhandled-data byte ;
 
 : read-data ( loading-gif -- loading-gif )
     read1 {
-        { extension-identifier [ read-extension ] }
-        { graphic-control-extension [
+        { EXTENSION-IDENTIFIER [ read-extension ] }
+        { GRAPHICS-CONTROL-EXTENSION [
             read-graphic-control-extension
             over graphic-control-extensions>> push
         ] }
-        { image-descriptor [ read-table-based-image ] }
-        { trailer [ f >>loading? ] }
+        { IMAGE-DESCRIPTOR [ read-table-based-image ] }
+        { TRAILER [ f >>loading? ] }
         [ unhandled-data ]
     } case ;
 

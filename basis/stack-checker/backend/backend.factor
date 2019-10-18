@@ -85,7 +85,7 @@ GENERIC: apply-object ( obj -- )
 
 M: wrapper apply-object
     wrapped>>
-    [ dup word? [ depends-on-effect ] [ drop ] if ]
+    [ dup word? [ add-depends-on-effect ] [ drop ] if ]
     [ push-literal ]
     bi ;
 
@@ -99,10 +99,10 @@ M: object apply-object push-literal ;
 
 : infer-quot-here ( quot -- )
     meta-r [
-        V{ } clone \ meta-r set
+        V{ } clone (meta-r) set
         [ apply-object terminated? get not ] all?
         [ commit-literals check->r ] [ literals get delete-all ] if
-    ] dip \ meta-r set ;
+    ] dip (meta-r) set ;
 
 : infer-quot ( quot rstate -- )
     recursive-state get [

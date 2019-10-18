@@ -10,7 +10,7 @@ FROM: sets => members ;
 IN: ui.gestures
 
 : get-gesture-handler ( gesture gadget -- quot )
-    class superclasses [ "gestures" word-prop ] map assoc-stack ;
+    class-of superclasses [ "gestures" word-prop ] map assoc-stack ;
 
 GENERIC: handle-gesture ( gesture gadget -- ? )
 
@@ -267,7 +267,7 @@ SYMBOL: drag-timer
     } 0&& nip ;
 
 : update-click# ( button -- )
-    global [
+    [
         dup multi-click? [
             hand-click# inc
         ] [
@@ -275,7 +275,7 @@ SYMBOL: drag-timer
         ] if
         hand-last-button set
         nano-count hand-last-time set
-    ] bind ;
+    ] with-global ;
 
 : update-clicked ( -- )
     hand-gadget get-global hand-clicked set-global

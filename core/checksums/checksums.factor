@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io io.backend io.files kernel math math.parser
-sequences byte-arrays byte-vectors quotations ;
+USING: accessors byte-arrays byte-vectors io io.backend
+io.files kernel math math.parser sequences ;
 IN: checksums
 
 MIXIN: checksum

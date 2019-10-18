@@ -194,3 +194,8 @@ unit-test
         H{ { 1 7 } { 5 6 } }
     } assoc-refine
 ] unit-test
+
+[ f ] [ "a" { } assoc-stack ] unit-test
+[ 1 ] [ "a" { H{ { "a" 1 } } H{ { "b" 2 } } } assoc-stack ] unit-test
+[ 2 ] [ "b" { H{ { "a" 1 } } H{ { "b" 2 } } } assoc-stack ] unit-test
+[ f ] [ "c" { H{ { "a" 1 } } H{ { "b" 2 } } } assoc-stack ] unit-test

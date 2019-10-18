@@ -25,7 +25,7 @@ INSTANCE: slice-chunking chunking
 INSTANCE: slice-chunking sequence
 
 M: slice-chunking nth group@ <slice> ; inline
-M: slice-chunking nth-unsafe group@ slice boa ; inline
+M: slice-chunking nth-unsafe group@ <slice-unsafe> ; inline
 
 MIXIN: abstract-groups
 INSTANCE: abstract-groups sequence
@@ -99,7 +99,7 @@ INSTANCE: sliced-clumps abstract-clumps
 
 : clump ( seq n -- array ) <clumps> { } like ;
 
-: monotonic? ( seq quot -- ? )
+: monotonic? ( seq quot: ( elt1 elt2 -- ? ) -- ? )
     over length 2 < [ 2drop t ] [
         over length 2 = [
             [ first2-unsafe ] dip call

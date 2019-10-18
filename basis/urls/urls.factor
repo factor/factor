@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
@@ -24,14 +24,12 @@ TUPLE: url protocol username password host port path query anchor ;
         nip delete-query-param
     ] if ;
 
-: parse-host ( string -- host port )
+ERROR: malformed-port ;
+
+: parse-host ( string -- host/f port/f )
     [
-        ":" split1 [ url-decode ] [
-            dup [
-                string>number
-                dup [ "Invalid port" throw ] unless
-            ] when
-        ] bi*
+        ":" split1-last [ url-decode ]
+        [ dup [ string>number [ malformed-port ] unless* ] when ] bi*
     ] [ f f ] if* ;
 
 GENERIC: >url ( obj -- url )
@@ -68,22 +66,22 @@ url      = ((protocol "://")        => [[ first ]] auth hostname)?
 PRIVATE>
 
 M: string >url
+    [ <url> ] dip
     parse-url {
         [
             first [
-                [ first ] ! protocol
+                [ first >>protocol ]
                 [
                     second
-                    [ first [ first2 ] [ f f ] if* ] ! username, password
-                    [ second parse-host ] ! host, port
-                    bi
+                    [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
+                    [ second parse-host [ >>host ] [ >>port ] bi* ] bi
                 ] bi
-            ] [ f f f f f ] if*
+            ] when*
         ]
-        [ second ] ! pathname
-        [ third ] ! query
-        [ fourth ] ! anchor
-    } cleave url boa
+        [ second >>path ]
+        [ third >>query ]
+        [ fourth >>anchor ]
+    } cleave
     dup host>> [ [ "/" or ] change-path ] when ;
 
 : protocol-port ( protocol -- port )
@@ -93,6 +91,14 @@ M: string >url
         { "ftp" [ 21 ] }
         [ drop f ]
     } case ;
+
+: relative-url ( url -- url' )
+    clone
+        f >>protocol
+        f >>host
+        f >>port ;
+
+: relative-url? ( url -- ? ) protocol>> not ;
 
 <PRIVATE
 
@@ -115,8 +121,6 @@ M: string >url
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
 
-PRIVATE>
-
 M: url present
     [
         {
@@ -127,6 +131,8 @@ M: url present
         } cleave
     ] "" make ;
 
+PRIVATE>
+
 : url-append-path ( path1 path2 -- path )
     {
         { [ dup "/" head? ] [ nip ] }
@@ -136,6 +142,14 @@ M: url present
         [ [ "/" split1-last drop "/" ] dip 3append ]
     } cond ;
 
+<PRIVATE
+
+: derive-port ( url base -- url' )
+    over relative-url? [ [ port>> ] either? ] [ drop port>> ] if ;
+
+: derive-path ( url base -- url' )
+    [ path>> ] bi@ swap url-append-path ;
+
 PRIVATE>
 
 : derive-url ( base url -- url' )
@@ -144,19 +158,11 @@ PRIVATE>
         [ [ username>>  ] either? >>username ]
         [ [ password>>  ] either? >>password ]
         [ [ host>>      ] either? >>host ]
-        [ [ port>>      ] either? >>port ]
-        [ [ path>>      ] bi@ swap url-append-path >>path ]
+        [ derive-port             >>port ]
+        [ derive-path             >>path ]
         [ [ query>>     ] either? >>query ]
         [ [ anchor>>    ] either? >>anchor ]
     } 2cleave ;
-
-: relative-url ( url -- url' )
-    clone
-        f >>protocol
-        f >>host
-        f >>port ;
-
-: relative-url? ( url -- ? ) protocol>> not ;
 
 ! Half-baked stuff follows
 : secure-protocol? ( protocol -- ? )
@@ -177,6 +183,9 @@ PRIVATE>
     ] [ protocol>> ] bi
     secure-protocol? [ >secure-addr ] when ;
 
+: set-url-addr ( url addr -- url )
+    [ host>> >>host ] [ port>> >>port ] bi ;
+
 : ensure-port ( url -- url' )
     clone dup protocol>> '[ _ protocol-port or ] change-port ;
 
@@ -186,3 +195,4 @@ SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 USE: vocabs.loader
 
 { "urls" "prettyprint" } "urls.prettyprint" require-when
+{ "urls" "io.sockets.secure" } "urls.secure" require-when

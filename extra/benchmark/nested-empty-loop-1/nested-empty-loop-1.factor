@@ -24,6 +24,6 @@ IN: benchmark.nested-empty-loop-1
 
 HINTS: nested-empty-loop fixnum ;
 
-: nested-empty-loop-main ( -- ) 7 nested-empty-loop ;
+: nested-empty-loop-1-benchmark ( -- ) 7 nested-empty-loop ;
 
-MAIN: nested-empty-loop-main
+MAIN: nested-empty-loop-1-benchmark

@@ -4,6 +4,7 @@ USING: accessors arrays definitions kernel kernel.private
 slots.private math namespaces sequences strings vectors sbufs
 quotations assocs hashtables sorting vocabs math.order sets
 words.private ;
+FROM: assocs => change-at ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -30,6 +31,9 @@ M: word definition def>> ;
     [ pick props>> ?set-at >>props drop ]
     [ nip remove-word-prop ] if ;
 
+: change-word-prop ( ..a word prop quot: ( ..a value -- ..b newvalue ) -- ..b )
+    [ swap props>> ] dip change-at ; inline
+
 : reset-props ( word seq -- ) [ remove-word-prop ] with each ;
 
 <PRIVATE
@@ -47,18 +51,18 @@ TUPLE: undefined word ;
     #! above.
     [ undefined f ] ;
 
-PREDICATE: deferred < word ( obj -- ? ) def>> undefined-def = ;
+PREDICATE: deferred < word def>> undefined-def = ;
 M: deferred definer drop \ DEFER: f ;
 M: deferred definition drop f ;
 
-PREDICATE: primitive < word ( obj -- ? ) "primitive" word-prop ;
+PREDICATE: primitive < word "primitive" word-prop ;
 M: primitive definer drop \ PRIMITIVE: f ;
 M: primitive definition drop f ;
 
-: lookup ( name vocab -- word ) vocab-words at ;
+: lookup-word ( name vocab -- word ) vocab-words at ;
 
 : target-word ( word -- target )
-    [ name>> ] [ vocabulary>> ] bi lookup ;
+    [ name>> ] [ vocabulary>> ] bi lookup-word ;
 
 SYMBOL: bootstrapping?
 
@@ -165,7 +169,7 @@ M: word reset-word
     ] tri ;
 
 : <word> ( name vocab -- word )
-    2dup [ hashcode ] bi@ bitxor >fixnum (word) dup new-word ;
+    2dup 0 hash-combine hash-combine >fixnum (word) dup new-word ;
 
 : <uninterned-word> ( name -- word )
     f \ <uninterned-word> counter >fixnum (word)
@@ -189,7 +193,7 @@ ERROR: bad-create name vocab ;
     [ bad-create ] unless ;
 
 : create ( name vocab -- word )
-    check-create 2dup lookup
+    check-create 2dup lookup-word
     dup [ 2nip ] [
         drop
         vocab-name <word>

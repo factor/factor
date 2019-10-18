@@ -1,13 +1,14 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data arrays continuations io
-io.backend.windows io.pipes.windows.nt io.pathnames libc
-io.ports windows.types math windows.kernel32 namespaces make
-io.launcher kernel sequences windows.errors splitting system
-threads init strings combinators io.backend accessors
-concurrency.flags io.files assocs io.files.private windows
-destructors classes classes.struct specialized-arrays
-debugger prettyprint ;
+USING: accessors alien alien.c-types alien.data arrays assocs
+classes classes.struct combinators concurrency.flags
+continuations debugger destructors init io io.backend
+io.backend.windows io.files io.files.private io.files.windows
+io.launcher io.pathnames io.pipes io.pipes.windows io.ports
+kernel libc locals make math namespaces prettyprint sequences
+specialized-arrays splitting splitting.monotonic
+strings system threads windows windows.errors windows.handles
+windows.kernel32 windows.types combinators.short-circuit ;
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
@@ -27,7 +28,7 @@ TUPLE: CreateProcess-args
 : default-CreateProcess-args ( -- obj )
     CreateProcess-args new
         STARTUPINFO <struct>
-        dup class heap-size >>cb
+        dup class-of heap-size >>cb
     >>lpStartupInfo
     PROCESS_INFORMATION <struct> >>lpProcessInformation
     TRUE >>bInheritHandles
@@ -57,7 +58,28 @@ TUPLE: CreateProcess-args
     0 count-trailing-backslashes
     2 * CHAR: \\ <repetition> append ;
 
+! Find groups of \, groups of \ followed by ", or naked "
+: escape-double-quote ( str -- newstr )
+    [
+        { [ drop CHAR: \ = ] [ nip "\\\"" member? ] } 2&&
+    ] monotonic-split [
+        dup last CHAR: " = [
+            dup length 1 > [
+                ! String of backslashes + double-quote
+                length 1 - 2 * CHAR: \ <repetition> "\\\"" append
+            ] [
+                ! Single double-quote
+                drop "\\\""
+            ] if
+        ] when
+    ] map "" concat-as ;
+
+! Naked double-quotes get a backslash before them
+! Backslashes before a double-quote get doubled in the output
+! If there's a space, double trailing backslashes and surround by quotes
+! See http://msdn.microsoft.com/en-us/library/ms647232.aspx
 : escape-argument ( str -- newstr )
+    escape-double-quote
     CHAR: \s over member? [
         fix-trailing-backslashes "\"" dup surround
     ] when ;
@@ -76,19 +98,8 @@ TUPLE: CreateProcess-args
         [ drop f ]
     } case ;
 
-: app-name/cmd-line ( process -- app-name cmd-line )
-    command>> dup string? [
-        " " split1
-    ] [
-        unclip swap join-arguments
-    ] if ;
-
 : cmd-line ( process -- cmd-line )
     command>> dup string? [ join-arguments ] unless ;
-
-: fill-lpApplicationName ( process args -- process args )
-    over app-name/cmd-line
-    [ >>lpApplicationName ] [ >>lpCommandLine ] bi* ;
 
 : fill-lpCommandLine ( process args -- process args )
     over cmd-line >>lpCommandLine ;
@@ -96,7 +107,7 @@ TUPLE: CreateProcess-args
 : fill-dwCreateFlags ( process args -- process args )
     0
     pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
-    pick detached>> os winnt? and [ DETACHED_PROCESS bitor ] when
+    pick detached>> os windows? and [ DETACHED_PROCESS bitor ] when
     pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
@@ -113,13 +124,9 @@ TUPLE: CreateProcess-args
 : fill-startup-info ( process args -- process args )
     dup lpStartupInfo>> STARTF_USESTDHANDLES >>dwFlags drop ;
 
-HOOK: fill-redirection io-backend ( process args -- )
-
-M: wince fill-redirection 2drop ;
-
 : make-CreateProcess-args ( process -- args )
     default-CreateProcess-args
-    os wince? [ fill-lpApplicationName ] [ fill-lpCommandLine ] if
+    fill-lpCommandLine
     fill-dwCreateFlags
     fill-lpEnvironment
     fill-startup-info
@@ -136,20 +143,8 @@ M: launch-error error.
     "Launch descriptor:" print nl
     process>> . ;
 
-M: windows run-process* ( process -- handle )
-    [
-        [
-            current-directory get absolute-path cd
-    
-            dup make-CreateProcess-args
-            [ fill-redirection ] keep
-            dup call-CreateProcess
-            lpProcessInformation>>
-        ] with-destructors
-    ] [ launch-error ] recover ;
-
-M: windows kill-process* ( handle -- )
-    hProcess>> 255 TerminateProcess win32-error=0/f ;
+M: windows kill-process* ( process -- )
+    handle>> hProcess>> 255 TerminateProcess win32-error=0/f ;
 
 : dispose-process ( process-information -- )
     #! From MSDN: "Handles in PROCESS_INFORMATION must be closed
@@ -172,5 +167,118 @@ M: windows wait-for-processes ( -- ? )
     [ handle>> hProcess>> ] void*-array{ } map-as
     [ length ] keep 0 0
     WaitForMultipleObjects
-    dup HEX: ffffffff = [ win32-error ] when
+    dup 0xffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;
+
+: duplicate-handle ( handle -- handle' )
+    GetCurrentProcess ! source process
+    swap handle>> ! handle
+    GetCurrentProcess ! target process
+    f void* <ref> [ ! target handle
+        DUPLICATE_SAME_ACCESS ! desired access
+        TRUE ! inherit handle
+        0 ! options
+        DuplicateHandle win32-error=0/f
+    ] keep void* deref <win32-handle> &dispose ;
+
+! /dev/null simulation
+: null-input ( -- pipe )
+    (pipe) [ in>> &dispose ] [ out>> dispose ] bi ;
+
+: null-output ( -- pipe )
+    (pipe) [ out>> &dispose ] [ in>> dispose ] bi ;
+
+: null-pipe ( mode -- pipe )
+    {
+        { GENERIC_READ [ null-input ] }
+        { GENERIC_WRITE [ null-output ] }
+    } case ;
+
+! The below code is based on the example given in
+! http://msdn2.microsoft.com/en-us/library/ms682499.aspx
+
+: redirect-default ( obj access-mode create-mode -- handle )
+    3drop f ;
+
+: redirect-closed ( obj access-mode create-mode -- handle )
+    drop nip null-pipe ;
+
+:: redirect-file ( path access-mode create-mode -- handle )
+    path normalize-path
+    access-mode
+    share-mode
+    default-security-attributes
+    create-mode
+    FILE_ATTRIBUTE_NORMAL ! flags and attributes
+    f ! template file
+    CreateFile check-invalid-handle <win32-file> &dispose ;
+
+: redirect-append ( path access-mode create-mode -- handle )
+    [ path>> ] 2dip
+    drop OPEN_ALWAYS
+    redirect-file
+    dup 0 FILE_END set-file-pointer ;
+
+: redirect-handle ( handle access-mode create-mode -- handle )
+    2drop ;
+
+: redirect-stream ( stream access-mode create-mode -- handle )
+    [ underlying-handle ] 2dip redirect-handle ;
+
+: redirect ( obj access-mode create-mode -- handle )
+    {
+        { [ pick not ] [ redirect-default ] }
+        { [ pick +closed+ eq? ] [ redirect-closed ] }
+        { [ pick string? ] [ redirect-file ] }
+        { [ pick appender? ] [ redirect-append ] }
+        { [ pick win32-file? ] [ redirect-handle ] }
+        [ redirect-stream ]
+    } cond
+    dup [ dup t set-inherit handle>> ] when ;
+
+: redirect-stdout ( process args -- handle )
+    drop
+    stdout>>
+    GENERIC_WRITE
+    CREATE_ALWAYS
+    redirect
+    STD_OUTPUT_HANDLE GetStdHandle or ;
+
+: redirect-stderr ( process args -- handle )
+    over stderr>> +stdout+ eq? [
+        nip
+        lpStartupInfo>> hStdOutput>>
+    ] [
+        drop
+        stderr>>
+        GENERIC_WRITE
+        CREATE_ALWAYS
+        redirect
+        STD_ERROR_HANDLE GetStdHandle or
+    ] if ;
+
+: redirect-stdin ( process args -- handle )
+    drop
+    stdin>>
+    GENERIC_READ
+    OPEN_EXISTING
+    redirect
+    STD_INPUT_HANDLE GetStdHandle or ;
+    
+: fill-redirection ( process args -- )
+    dup lpStartupInfo>>
+    [ [ redirect-stdout ] dip hStdOutput<< ]
+    [ [ redirect-stderr ] dip hStdError<< ]
+    [ [ redirect-stdin ] dip hStdInput<< ] 3tri ;
+
+M: windows run-process* ( process -- handle )
+    [
+        [
+            current-directory get absolute-path cd
+    
+            dup make-CreateProcess-args
+            [ fill-redirection ] keep
+            dup call-CreateProcess
+            lpProcessInformation>>
+        ] with-destructors
+    ] [ launch-error ] recover ;    

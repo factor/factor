@@ -6,7 +6,6 @@ cpu.architecture layouts
 compiler.cfg
 compiler.cfg.def-use
 compiler.cfg.liveness
-compiler.cfg.liveness.ssa
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linearization
@@ -98,7 +97,7 @@ SYMBOL: machine-live-outs
     init-unhandled ;
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill ;
+    [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill, ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
@@ -118,7 +117,7 @@ SYMBOL: machine-live-outs
     pending-interval-heap get (expire-old-intervals) ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload ;
+    [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload, ;
 
 : handle-reload ( live-interval -- )
     dup reload-from>> [ insert-reload ] [ drop ] if ;
@@ -147,9 +146,15 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 M: vreg-insn assign-registers-in-insn
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
+: assign-gc-roots ( gc-map -- )
+    [ [ vreg>spill-slot ] map ] change-gc-roots drop ;
+
+: assign-derived-roots ( gc-map -- )
+    [ [ [ vreg>spill-slot ] bi@ ] assoc-map ] change-derived-roots drop ;
+
 M: gc-map-insn assign-registers-in-insn
     [ [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ]
-    [ gc-map>> [ [ vreg>spill-slot ] map ] change-gc-roots drop ]
+    [ gc-map>> [ assign-gc-roots ] [ assign-derived-roots ] bi ]
     bi ;
 
 M: insn assign-registers-in-insn drop ;

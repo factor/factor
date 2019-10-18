@@ -1,9 +1,10 @@
-USING: alien arrays definitions generic assocs hashtables io
-kernel math namespaces parser prettyprint sequences strings
-tools.test vectors words quotations classes
+USING: accessors alien arrays definitions generic assocs
+hashtables io kernel math namespaces parser prettyprint
+sequences strings tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
-classes.algebra source-files compiler.units kernel.private
-sorting vocabs io.streams.string eval see ;
+classes.algebra classes.union.private source-files
+compiler.units kernel.private sorting vocabs io.streams.string
+eval see math.private slots generic.single ;
 IN: classes.union.tests
 
 ! DEFER: bah
@@ -49,6 +50,8 @@ UNION: empty-union-2 ;
 
 M: empty-union-2 empty-union-test ;
 
+[ [ drop f ] ] [ \ empty-union-1? def>> ] unit-test
+
 ! Redefining a class didn't update containing unions
 UNION: redefine-bug-1 fixnum ;
 
@@ -67,15 +70,15 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 
 [ ] [ "IN: classes.union.tests SINGLETON: foo UNION: blah foo ;" <string-reader> "union-reset-test" parse-stream drop ] unit-test
 
-[ t ] [ "blah" "classes.union.tests" lookup union-class? ] unit-test
+[ t ] [ "blah" "classes.union.tests" lookup-word union-class? ] unit-test
 
-[ t ] [ "foo?" "classes.union.tests" lookup predicate? ] unit-test
+[ t ] [ "foo?" "classes.union.tests" lookup-word predicate? ] unit-test
 
 [ ] [ "IN: classes.union.tests USE: math UNION: blah integer ;" <string-reader> "union-reset-test" parse-stream drop ] unit-test
 
-[ t ] [ "blah" "classes.union.tests" lookup union-class? ] unit-test
+[ t ] [ "blah" "classes.union.tests" lookup-word union-class? ] unit-test
 
-[ f ] [ "foo?" "classes.union.tests" lookup predicate? ] unit-test
+[ f ] [ "foo?" "classes.union.tests" lookup-word predicate? ] unit-test
 
 GENERIC: test-generic ( x -- y )
 
@@ -90,3 +93,42 @@ M: a-union test-generic ;
 [ ] [ [ \ a-tuple forget-class ] with-compilation-unit ] unit-test
 
 [ t ] [ \ test-generic "methods" word-prop assoc-empty? ] unit-test
+
+! Fast union predicates
+
+[ t ] [ integer union-of-builtins? ] unit-test
+
+[ t ] [ \ integer? def>> \ fixnum-bitand swap member? ] unit-test
+
+[ ] [ "IN: classes.union.tests USE: math UNION: fast-union-1 fixnum ; UNION: fast-union-2 fast-union-1 bignum ;" eval( -- ) ] unit-test
+
+[ t ] [ "fast-union-2?" "classes.union.tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test
+
+[ ] [ "IN: classes.union.tests USE: vectors UNION: fast-union-1 vector ;" eval( -- ) ] unit-test
+
+[ f ] [ "fast-union-2?" "classes.union.tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test
+
+! Test union{
+
+TUPLE: stuff { a union{ integer string } } ;
+
+[ 0 ] [ stuff new a>> ] unit-test
+[ 3 ] [ stuff new 3 >>a a>> ] unit-test
+[ "asdf" ] [ stuff new "asdf" >>a a>> ] unit-test
+[ stuff new 3.4 >>a a>> ] [ bad-slot-value? ] must-fail-with
+
+TUPLE: things { a union{ integer float } } ;
+
+[ 0 ] [ stuff new a>> ] unit-test
+[ 3 ] [ stuff new 3 >>a a>> ] unit-test
+[ "asdf" ] [ stuff new "asdf" >>a a>> ] unit-test
+[ stuff new 3.4 >>a a>> ] [ bad-slot-value? ] must-fail-with
+
+PREDICATE: numba-ova-10 < union{ float integer }
+    10 > ;
+
+[ f ] [ 100/3 numba-ova-10? ] unit-test
+[ t ] [ 100 numba-ova-10? ] unit-test
+[ t ] [ 100.0 numba-ova-10? ] unit-test
+[ f ] [ 5 numba-ova-10? ] unit-test
+[ f ] [ 5.75 numba-ova-10? ] unit-test

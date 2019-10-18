@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make assocs sequences kernel classes splitting
 words vocabs.loader accessors strings combinators arrays
@@ -15,7 +15,7 @@ IN: furnace.utilities
 ERROR: no-such-word name vocab ;
 
 : string>word ( string -- word )
-    ":" split1 swap 2dup lookup dup
+    ":" split1 swap 2dup lookup-word dup
     [ 2nip ] [ drop no-such-word ] if ;
 
 : strings>words ( seq -- seq' )
@@ -27,10 +27,12 @@ ERROR: no-such-word name vocab ;
 : each-responder ( quot -- )
    nested-responders swap each ; inline
 
-: base-path ( string -- pair )
+ERROR: no-such-responder responder ;
+
+: base-path ( string -- seq )
     dup responder-nesting get
-    [ second class superclasses [ name>> = ] with any? ] with find nip
-    [ first ] [ "No such responder: " swap append throw ] ?if ;
+    [ second class-of superclasses [ name>> = ] with any? ] with find nip
+    [ first ] [ no-such-responder ] ?if ;
 
 : resolve-base-path ( string -- string' )
     "$" ?head [
@@ -106,7 +108,7 @@ CONSTANT: nested-forms-key "__n"
             [ host>> ]
             [ port>> remap-port ]
             tri 3array
-        ] bi@ =
+        ] same?
     ] when ;
 
 : cookie-client-state ( key request -- value/f )

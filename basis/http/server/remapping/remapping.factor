@@ -1,6 +1,6 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs kernel io.servers.connection ;
+USING: accessors namespaces assocs kernel io.servers ;
 IN: http.server.remapping
 
 SYMBOL: port-remapping
@@ -9,4 +9,4 @@ SYMBOL: port-remapping
     [ port-remapping get at ] keep or ;
 
 : secure-http-port ( -- n )
-    secure-port remap-port ;
+    secure-addr port>> remap-port ;

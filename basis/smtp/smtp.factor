@@ -7,7 +7,6 @@ io.encodings.ascii io.timeouts io.sockets io.sockets.secure io.crlf
 kernel logging sequences combinators splitting assocs strings
 math.order math.parser random system calendar summary calendar.format
 accessors sets hashtables base64 debugger classes prettyprint words ;
-FROM: namespaces => set ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -28,7 +27,7 @@ C: <plain-auth> plain-auth
 SYMBOL: smtp-auth
 no-auth smtp-auth set-global
 
-LOG: log-smtp-connection NOTICE ( addrspec -- )
+LOG: log-smtp-connection NOTICE
 
 : with-smtp-connection ( quot -- )
     smtp-server get
@@ -79,15 +78,6 @@ ERROR: bad-email-address email ;
 : data ( -- )
     "DATA" command ;
 
-ERROR: message-contains-dot message ;
-
-M: message-contains-dot summary ( obj -- string )
-    drop "Message cannot contain . on a line by itself" ;
-
-: validate-message ( msg -- msg' )
-    "." over member?
-    [ message-contains-dot ] when ;
-
 : send-body ( email -- )
     binary encode-output
     [ body>> ] [ encoding>> ] bi encode >base64-lines write
@@ -120,7 +110,7 @@ TUPLE: response code messages ;
 ERROR: smtp-error response ;
 
 M: smtp-error error.
-    "SMTP error (" write dup class pprint ")" print
+    "SMTP error (" write dup class-of pprint ")" print
     response>> messages>> [ print ] each ;
 
 ERROR: smtp-server-busy < smtp-error ;
@@ -203,18 +193,18 @@ ERROR: invalid-header-string string ;
 
 : email>headers ( email -- assoc )
     [
-        now timestamp>rfc822 "Date" set
-        message-id "Message-Id" set
-        "1.0" "MIME-Version" set
-        "base64" "Content-Transfer-Encoding" set
+        now timestamp>rfc822 "Date" ,,
+        message-id "Message-Id" ,,
+        "1.0" "MIME-Version" ,,
+        "base64" "Content-Transfer-Encoding" ,,
         {
-            [ from>> "From" set ]
-            [ to>> ", " join "To" set ]
-            [ cc>> ", " join [ "Cc" set ] unless-empty ]
-            [ subject>> "Subject" set ]
-            [ email-content-type "Content-Type" set ]
+            [ from>> "From" ,, ]
+            [ to>> ", " join "To" ,, ]
+            [ cc>> ", " join [ "Cc" ,, ] unless-empty ]
+            [ subject>> "Subject" ,, ]
+            [ email-content-type "Content-Type" ,, ]
         } cleave
-    ] { } make-assoc ;
+    ] H{ } make ;
 
 : (send-email) ( headers email -- )
     [

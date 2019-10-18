@@ -4,10 +4,8 @@ USING: definitions io.launcher kernel parser words sequences
 math math.parser namespaces editors make ;
 IN: editors.textwrangler
 
-: tw ( file line -- )
-    [ "edit +" % # " " % % ] "" make run-process drop ;
+SINGLETON: textwrangler
+textwrangler editor-class set-global
 
-: tw-word ( word -- )
-    where first2 tw ;
-
-[ tw ] edit-hook set-global
+M: textwrangler editor-command ( file line -- command )
+    [ "edit +" % # " " % % ] "" make ;

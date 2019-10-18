@@ -16,6 +16,10 @@
 		</p>
 
 		<p>
+			<t:recaptcha />
+		</p>
+
+		<p>
 			<button type="submit">Save</button>
 		</p>
 

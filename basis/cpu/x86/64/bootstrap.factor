@@ -1,9 +1,10 @@
-! Copyright (C) 2007, 2010 Slava Pestov.
+! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
-system layouts vocabs parser compiler.constants math
-math.private cpu.x86.assembler cpu.x86.assembler.operands
-sequences generic.single.private threads.private ;
+system layouts vocabs parser compiler.constants
+compiler.codegen.relocation math math.private cpu.x86.assembler
+cpu.x86.assembler.operands sequences generic.single.private
+threads.private locals ;
 IN: bootstrap.x86
 
 8 \ cell set
@@ -29,24 +30,18 @@ IN: bootstrap.x86
 : rex-length ( -- n ) 1 ;
 
 : jit-call ( name -- )
-    RAX 0 MOV rc-absolute-cell jit-dlsym
+    RAX 0 MOV f rc-absolute-cell rel-dlsym
     RAX CALL ;
 
 [
-    ! load entry point
-    RAX 0 MOV rc-absolute-cell rt-this jit-rel
-    ! save stack frame size
-    stack-frame-size PUSH
-    ! push entry point
-    RAX PUSH
-    ! alignment
-    RSP stack-frame-size 3 bootstrap-cells - SUB
-] jit-prolog jit-define
-
-[
     pic-tail-reg 5 [RIP+] LEA
-    0 JMP rc-relative rt-entry-point-pic-tail jit-rel
+    0 JMP f rc-relative rel-word-pic-tail
 ] jit-word-jump jit-define
+
+: jit-load-vm ( -- )
+    ! no-op on x86-64. in factor contexts vm-reg always contains the
+    ! vm pointer.
+    ;
 
 : jit-load-context ( -- )
     ctx-reg vm-reg vm-context-offset [+] MOV ;
@@ -68,7 +63,7 @@ IN: bootstrap.x86
     jit-save-context
     ! call the primitive
     arg1 vm-reg MOV
-    RAX 0 MOV rc-absolute-cell rt-dlsym jit-rel
+    RAX 0 MOV f f rc-absolute-cell rel-dlsym
     RAX CALL
     jit-restore-context
 ] jit-primitive jit-define
@@ -90,6 +85,9 @@ IN: bootstrap.x86
     "end_callback" jit-call
 ] \ c-to-factor define-sub-primitive
 
+: signal-handler-save-regs ( -- regs )
+    { RAX RCX RDX RBX RBP RSI RDI R8 R9 R10 R11 R12 R13 R14 R15 } ;
+
 [
     arg1 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
@@ -104,11 +102,14 @@ IN: bootstrap.x86
 
     ! Load VM pointer into vm-reg, since we're entering from
     ! C code
-    vm-reg 0 MOV 0 rc-absolute-cell jit-vm
+    vm-reg 0 MOV 0 rc-absolute-cell rel-vm
 
     ! Load ds and rs registers
     jit-load-context
     jit-restore-context
+
+    ! Clear the fault flag
+    vm-reg vm-fault-flag-offset [+] 0 MOV
 
     ! Call quotation
     jit-jump-quot
@@ -166,7 +167,7 @@ IN: bootstrap.x86
 \ lazy-jit-compile define-combinator-primitive
 
 [
-    temp2 HEX: ffffffff MOV rc-absolute-cell rt-literal jit-rel
+    temp2 0xffffffff MOV f rc-absolute-cell rel-literal
     temp1 temp2 CMP
 ] pic-check-tuple jit-define
 
@@ -180,7 +181,8 @@ IN: bootstrap.x86
     jit-save-context
     arg1 RBX MOV
     arg2 vm-reg MOV
-    "inline_cache_miss" jit-call
+    RAX 0 MOV rc-absolute-cell rel-inline-cache-miss
+    RAX CALL
     jit-load-context
     jit-restore-context ;
 
@@ -233,9 +235,9 @@ IN: bootstrap.x86
 
 ! Contexts
 : jit-switch-context ( reg -- )
-    ! Reset return value since its bogus right now, to avoid
-    ! confusing the GC
-    RSP -8 [+] 0 MOV
+    ! Push a bogus return address so the GC can track this frame back
+    ! to the owner
+    0 CALL
 
     ! Make the new context the current one
     ctx-reg swap MOV
@@ -310,6 +312,10 @@ IN: bootstrap.x86
     ctx-reg jit-switch-context
     jit-push-param
     jit-jump-quot ;
+
+[
+    0 [RIP+] EAX MOV rc-relative rel-safepoint
+] \ jit-safepoint jit-define
 
 [
     jit-start-context-and-delete

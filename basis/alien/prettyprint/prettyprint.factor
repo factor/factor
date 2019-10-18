@@ -124,7 +124,7 @@ M: enum-c-type-word synopsis*
         [ seeing-word ]
         [ definer. ]
         [ pprint-word ]
-        [ c-type base-type>> dup int eq? [ drop ] [ "<" text pprint-word ] if ]
+        [ lookup-c-type base-type>> dup int eq? [ drop ] [ "<" text pprint-word ] if ]
     } cleave ;
 M: enum-c-type-word definition
-    c-type members>> ;
+   lookup-c-type members>> ;

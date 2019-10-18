@@ -65,6 +65,13 @@ $nl
     "[let { 1 2 3 4 } :> myarr [infix myarr[4/2]*3 infix] ] ."
     "9"
 }
+$nl
+"You can create sub-" { $vocab-link "sequences" } " inside infix expressions using " { $snippet "arr[from:to]" } " notation."
+{ $example
+    "USING: arrays locals infix ;"
+    "[let \"foobar\" :> s [infix s[0:3] infix] ] ."
+    "\"foo\""
+}
 ;
 
 ABOUT: "infix"

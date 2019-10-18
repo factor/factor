@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces tools.test
 heaps heaps.private math.parser random assocs sequences sorting
-accessors math.order ;
+accessors math.order locals ;
 IN: heaps.tests
 
 [ <min-heap> heap-pop ] must-fail
@@ -27,19 +27,31 @@ IN: heaps.tests
 [ 0 ] [ <max-heap> heap-size ] unit-test
 [ 1 ] [ <max-heap> t 1 pick heap-push heap-size ] unit-test
 
-: heap-sort ( alist -- keys )
-    <min-heap> [ heap-push-all ] keep heap-pop-all ;
+: heap-sort ( alist heap -- keys )
+    [ heap-push-all ] keep heap-pop-all ;
 
 : random-alist ( n -- alist )
     iota [
         drop 32 random-bits dup number>string
-    ] H{ } map>assoc ;
+    ] H{ } map>assoc >alist ;
 
-: test-heap-sort ( n -- ? )
-    random-alist dup >alist sort-keys swap heap-sort = ;
+:: test-heap-sort ( n heap reverse? -- ? )
+    n random-alist
+    [ sort-keys reverse? [ reverse ] when ] keep
+    heap heap-sort = ;
+
+: test-minheap-sort ( n -- ? )
+    <min-heap> f test-heap-sort ;
+
+: test-maxheap-sort ( n -- ? )
+    <max-heap> t test-heap-sort ;
 
 14 [
-    [ t ] swap [ 2^ test-heap-sort ] curry unit-test
+    [ t ] swap [ 2^ <min-heap> f test-heap-sort ] curry unit-test
+] each-integer
+
+14 [
+    [ t ] swap [ 2^ <max-heap> t test-heap-sort ] curry unit-test
 ] each-integer
 
 : test-entry-indices ( n -- ? )

@@ -1,0 +1,707 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="Atk" version="1.0"/>
+  <include name="Clutter" version="1.0"/>
+  <include name="Cogl" version="1.0"/>
+  <include name="GL" version="1.0"/>
+  <include name="GLib" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gio" version="2.0"/>
+  <include name="Json" version="1.0"/>
+  <include name="Pango" version="1.0"/>
+  <include name="PangoCairo" version="1.0"/>
+  <include name="PangoFT2" version="1.0"/>
+  <include name="cairo" version="1.0"/>
+  <include name="fontconfig" version="2.0"/>
+  <include name="freetype2" version="2.0"/>
+  <package name="cally-1.0"/>
+  <c:include name="cally/cally.h"/>
+  <namespace name="Cally"
+             version="1.0"
+             shared-library="libclutter-glx-1.0.so.0"
+             c:identifier-prefixes="Cally"
+             c:symbol-prefixes="cally">
+    <callback name="ActionCallback" c:type="CallyActionCallback" version="1.6">
+      <doc xml:whitespace="preserve">Action function, to be used on #AtkAction implementations as
+an individual action. Unlike #CallyActionFunc, this function
+uses the @user_data argument passed to cally_actor_add_action_full().</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="cally_actor" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #CallyActor</doc>
+          <type name="Actor" c:type="CallyActor*"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" closure="1">
+          <doc xml:whitespace="preserve">user data passed to the function</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <callback name="ActionFunc" c:type="CallyActionFunc" version="1.4">
+      <doc xml:whitespace="preserve">Action function, to be used on #AtkAction implementations as a individual
+action</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="cally_actor" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #CallyActor</doc>
+          <type name="Actor" c:type="CallyActor*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <class name="Actor"
+           c:symbol-prefix="actor"
+           c:type="CallyActor"
+           version="1.4"
+           parent="Atk.GObjectAccessible"
+           glib:type-name="CallyActor"
+           glib:get-type="cally_actor_get_type"
+           glib:type-struct="ActorClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyActor&lt;/structname&gt; structure contains only private
+data and should be accessed using the provided API</doc>
+      <implements name="Atk.Action"/>
+      <implements name="Atk.Component"/>
+      <constructor name="new" c:identifier="cally_actor_new" version="1.4">
+        <doc xml:whitespace="preserve">Creates a new #CallyActor for the given @actor</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #AtkObject</doc>
+          <type name="Atk.Object" c:type="AtkObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="actor" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #ClutterActor</doc>
+            <type name="Clutter.Actor" c:type="ClutterActor*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="add_action"
+              c:identifier="cally_actor_add_action"
+              shadowed-by="add_action_full"
+              version="1.4"
+              introspectable="0">
+        <doc xml:whitespace="preserve">Adds a new action to be accessed with the #AtkAction interface.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">added action id, or -1 if failure</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+        <parameters>
+          <parameter name="action_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the action name</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="action_description" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the action description</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="action_keybinding" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the action keybinding</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="action_func" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the callback of the action, to be executed with do_action</doc>
+            <type name="ActionFunc" c:type="CallyActionFunc"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_action_full"
+              c:identifier="cally_actor_add_action_full"
+              shadows="add_action"
+              version="1.6">
+        <doc xml:whitespace="preserve">Adds a new action to be accessed with the #AtkAction interface.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">added action id, or -1 if failure</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+        <parameters>
+          <parameter name="action_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the action name</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="action_description" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the action description</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="action_keybinding" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the action keybinding</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="callback"
+                     transfer-ownership="none"
+                     scope="notified"
+                     closure="4"
+                     destroy="5">
+            <doc xml:whitespace="preserve">the callback of the action</doc>
+            <type name="ActionCallback" c:type="CallyActionCallback"/>
+          </parameter>
+          <parameter name="user_data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">data to be passed to @callback</doc>
+            <type name="gpointer" c:type="gpointer"/>
+          </parameter>
+          <parameter name="notify" transfer-ownership="none" scope="async">
+            <doc xml:whitespace="preserve">function to be called when removing the action</doc>
+            <type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="remove_action"
+              c:identifier="cally_actor_remove_action"
+              version="1.4">
+        <doc xml:whitespace="preserve">Removes a action, using the @action_id returned by cally_actor_add_action()</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the operation was succesful, %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="action_id" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the action id</doc>
+            <type name="gint" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="remove_action_by_name"
+              c:identifier="cally_actor_remove_action_by_name"
+              version="1.4">
+        <doc xml:whitespace="preserve">Removes an action, using the @action_name used when the action was added
+with cally_actor_add_action()</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the operation was succesful, %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="action_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the action to remove</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent" readable="0" private="1">
+        <type name="Atk.GObjectAccessible" c:type="AtkGObjectAccessible"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="ActorPrivate" c:type="CallyActorPrivate*"/>
+      </field>
+    </class>
+    <record name="ActorClass"
+            c:type="CallyActorClass"
+            glib:is-gtype-struct-for="Actor"
+            version="1.4">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyActorClass&lt;/structname&gt; structure contains only
+private data</doc>
+      <field name="parent_class" readable="0" private="1">
+        <type name="Atk.GObjectAccessibleClass"
+              c:type="AtkGObjectAccessibleClass"/>
+      </field>
+      <field name="notify_clutter">
+        <callback name="notify_clutter">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="object" transfer-ownership="none">
+              <type name="GObject.Object" c:type="GObject*"/>
+            </parameter>
+            <parameter name="pspec" transfer-ownership="none">
+              <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="focus_clutter">
+        <callback name="focus_clutter">
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="actor" transfer-ownership="none">
+              <type name="Clutter.Actor" c:type="ClutterActor*"/>
+            </parameter>
+            <parameter name="data" transfer-ownership="none">
+              <type name="gpointer" c:type="gpointer"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="add_actor">
+        <callback name="add_actor">
+          <return-value transfer-ownership="none">
+            <type name="gint" c:type="gint"/>
+          </return-value>
+          <parameters>
+            <parameter name="container" transfer-ownership="none">
+              <type name="Clutter.Actor" c:type="ClutterActor*"/>
+            </parameter>
+            <parameter name="actor" transfer-ownership="none">
+              <type name="Clutter.Actor" c:type="ClutterActor*"/>
+            </parameter>
+            <parameter name="data" transfer-ownership="none">
+              <type name="gpointer" c:type="gpointer"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="remove_actor">
+        <callback name="remove_actor">
+          <return-value transfer-ownership="none">
+            <type name="gint" c:type="gint"/>
+          </return-value>
+          <parameters>
+            <parameter name="container" transfer-ownership="none">
+              <type name="Clutter.Actor" c:type="ClutterActor*"/>
+            </parameter>
+            <parameter name="actor" transfer-ownership="none">
+              <type name="Clutter.Actor" c:type="ClutterActor*"/>
+            </parameter>
+            <parameter name="data" transfer-ownership="none">
+              <type name="gpointer" c:type="gpointer"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_padding_dummy" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="32">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="ActorPrivate" c:type="CallyActorPrivate" disguised="1">
+    </record>
+    <class name="Clone"
+           c:symbol-prefix="clone"
+           c:type="CallyClone"
+           version="1.4"
+           parent="Actor"
+           glib:type-name="CallyClone"
+           glib:get-type="cally_clone_get_type"
+           glib:type-struct="CloneClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyClone&lt;/structname&gt; structure contains only private
+data and should be accessed using the provided API</doc>
+      <implements name="Atk.Action"/>
+      <implements name="Atk.Component"/>
+      <constructor name="new" c:identifier="cally_clone_new" version="1.4">
+        <doc xml:whitespace="preserve">Creates a new #CallyClone for the given @actor. @actor must be a
+#ClutterClone.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #AtkObject</doc>
+          <type name="Atk.Object" c:type="AtkObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="actor" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #ClutterActor</doc>
+            <type name="Clutter.Actor" c:type="ClutterActor*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <field name="parent" readable="0" private="1">
+        <type name="Actor" c:type="CallyActor"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="ClonePrivate" c:type="CallyClonePrivate*"/>
+      </field>
+    </class>
+    <record name="CloneClass"
+            c:type="CallyCloneClass"
+            glib:is-gtype-struct-for="Clone"
+            version="1.4">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyCloneClass&lt;/structname&gt; structure contains only
+private data</doc>
+      <field name="parent_class" readable="0" private="1">
+        <type name="ActorClass" c:type="CallyActorClass"/>
+      </field>
+      <field name="_padding_dummy" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="8">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="ClonePrivate" c:type="CallyClonePrivate" disguised="1">
+    </record>
+    <class name="Group"
+           c:symbol-prefix="group"
+           c:type="CallyGroup"
+           version="1.4"
+           parent="Actor"
+           glib:type-name="CallyGroup"
+           glib:get-type="cally_group_get_type"
+           glib:type-struct="GroupClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyGroup&lt;/structname&gt; structure contains only
+private data and should be accessed using the provided API</doc>
+      <implements name="Atk.Action"/>
+      <implements name="Atk.Component"/>
+      <constructor name="new" c:identifier="cally_group_new" version="1.4">
+        <doc xml:whitespace="preserve">Creates a #CallyGroup for @actor</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #CallyGroup</doc>
+          <type name="Atk.Object" c:type="AtkObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="actor" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #ClutterGroup</doc>
+            <type name="Clutter.Actor" c:type="ClutterActor*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <field name="parent" readable="0" private="1">
+        <type name="Actor" c:type="CallyActor"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="GroupPrivate" c:type="CallyGroupPrivate*"/>
+      </field>
+    </class>
+    <record name="GroupClass"
+            c:type="CallyGroupClass"
+            glib:is-gtype-struct-for="Group"
+            version="1.4">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyGroupClass&lt;/structname&gt; structure contains only
+private data</doc>
+      <field name="parent_class" readable="0" private="1">
+        <type name="ActorClass" c:type="CallyActorClass"/>
+      </field>
+      <field name="_padding_dummy" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="8">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="GroupPrivate" c:type="CallyGroupPrivate" disguised="1">
+    </record>
+    <class name="Rectangle"
+           c:symbol-prefix="rectangle"
+           c:type="CallyRectangle"
+           version="1.4"
+           parent="Actor"
+           glib:type-name="CallyRectangle"
+           glib:get-type="cally_rectangle_get_type"
+           glib:type-struct="RectangleClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyRectangle&lt;/structname&gt; structure contains only private
+data and should be accessed using the provided API</doc>
+      <implements name="Atk.Action"/>
+      <implements name="Atk.Component"/>
+      <constructor name="new" c:identifier="cally_rectangle_new" version="1.4">
+        <doc xml:whitespace="preserve">Creates a new #CallyRectangle for the given @actor. @actor must be
+a #ClutterRectangle.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #AtkObject</doc>
+          <type name="Atk.Object" c:type="AtkObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="actor" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #ClutterActor</doc>
+            <type name="Clutter.Actor" c:type="ClutterActor*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <field name="parent" readable="0" private="1">
+        <type name="Actor" c:type="CallyActor"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="RectanglePrivate" c:type="CallyRectanglePrivate*"/>
+      </field>
+    </class>
+    <record name="RectangleClass"
+            c:type="CallyRectangleClass"
+            glib:is-gtype-struct-for="Rectangle"
+            version="1.4">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyRectangleClass&lt;/structname&gt; structure contains
+only private data</doc>
+      <field name="parent_class" readable="0" private="1">
+        <type name="ActorClass" c:type="CallyActorClass"/>
+      </field>
+      <field name="_padding_dummy" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="8">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="RectanglePrivate"
+            c:type="CallyRectanglePrivate"
+            disguised="1">
+    </record>
+    <class name="Root"
+           c:symbol-prefix="root"
+           c:type="CallyRoot"
+           version="1.4"
+           parent="Atk.GObjectAccessible"
+           glib:type-name="CallyRoot"
+           glib:get-type="cally_root_get_type"
+           glib:type-struct="RootClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyRoot&lt;/structname&gt; structure contains only private
+data and should be accessed using the provided API</doc>
+      <constructor name="new" c:identifier="cally_root_new" version="1.4">
+        <doc xml:whitespace="preserve">Creates a new #CallyRoot object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #AtkObject</doc>
+          <type name="Atk.Object" c:type="AtkObject*"/>
+        </return-value>
+      </constructor>
+      <field name="parent" readable="0" private="1">
+        <type name="Atk.GObjectAccessible" c:type="AtkGObjectAccessible"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="RootPrivate" c:type="CallyRootPrivate*"/>
+      </field>
+    </class>
+    <record name="RootClass"
+            c:type="CallyRootClass"
+            glib:is-gtype-struct-for="Root"
+            version="1.4">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyRootClass&lt;/structname&gt; structure contains only
+private data</doc>
+      <field name="parent_class" readable="0" private="1">
+        <type name="Atk.GObjectAccessibleClass"
+              c:type="AtkGObjectAccessibleClass"/>
+      </field>
+      <field name="_padding_dummy" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="16">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="RootPrivate" c:type="CallyRootPrivate" disguised="1">
+    </record>
+    <class name="Stage"
+           c:symbol-prefix="stage"
+           c:type="CallyStage"
+           version="1.4"
+           parent="Group"
+           glib:type-name="CallyStage"
+           glib:get-type="cally_stage_get_type"
+           glib:type-struct="StageClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyStage&lt;/structname&gt; structure contains only
+private data and should be accessed using the provided API</doc>
+      <implements name="Atk.Action"/>
+      <implements name="Atk.Component"/>
+      <constructor name="new" c:identifier="cally_stage_new" version="1.4">
+        <doc xml:whitespace="preserve">Creates a new #CallyStage for the given @actor. @actor should be a
+#ClutterStage.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #AtkObject</doc>
+          <type name="Atk.Object" c:type="AtkObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="actor" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #ClutterActor</doc>
+            <type name="Clutter.Actor" c:type="ClutterActor*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <field name="parent" readable="0" private="1">
+        <type name="Group" c:type="CallyGroup"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="StagePrivate" c:type="CallyStagePrivate*"/>
+      </field>
+      <glib:signal name="activate" version="1.4">
+        <doc xml:whitespace="preserve">The ::activate signal is emitted when the stage receives the key
+focus from the underlying window system.
+event listener to "window:activate"</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="create" version="1.4">
+        <doc xml:whitespace="preserve">The ::create signal is emitted when the stage is created.
+event listener to "window:create"</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="deactivate" version="1.4">
+        <doc xml:whitespace="preserve">The ::deactivate signal is emitted when the stage loses key focus
+from the underlying window system.
+event listener to "window:deactivate"</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="destroy" version="1.4">
+        <doc xml:whitespace="preserve">The ::destroy signal is emitted when the stage is destroyed.
+event listener to "window:destroy"</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+    </class>
+    <record name="StageClass"
+            c:type="CallyStageClass"
+            glib:is-gtype-struct-for="Stage"
+            version="1.4">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyStageClass&lt;/structname&gt; structure contains only
+private data</doc>
+      <field name="parent_class" readable="0" private="1">
+        <type name="GroupClass" c:type="CallyGroupClass"/>
+      </field>
+      <field name="_padding_dummy" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="16">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="StagePrivate" c:type="CallyStagePrivate" disguised="1">
+    </record>
+    <class name="Text"
+           c:symbol-prefix="text"
+           c:type="CallyText"
+           version="1.4"
+           parent="Actor"
+           glib:type-name="CallyText"
+           glib:get-type="cally_text_get_type"
+           glib:type-struct="TextClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyText&lt;/structname&gt; structure contains only private
+data and should be accessed using the provided API</doc>
+      <implements name="Atk.Action"/>
+      <implements name="Atk.Component"/>
+      <implements name="Atk.EditableText"/>
+      <implements name="Atk.Text"/>
+      <constructor name="new" c:identifier="cally_text_new" version="1.4">
+        <doc xml:whitespace="preserve">Creates a new #CallyText for the given @actor. @actor must be a
+#ClutterText.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #AtkObject</doc>
+          <type name="Atk.Object" c:type="AtkObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="actor" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #ClutterActor</doc>
+            <type name="Clutter.Actor" c:type="ClutterActor*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <field name="parent" readable="0" private="1">
+        <type name="Actor" c:type="CallyActor"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="TextPrivate" c:type="CallyTextPrivate*"/>
+      </field>
+    </class>
+    <record name="TextClass"
+            c:type="CallyTextClass"
+            glib:is-gtype-struct-for="Text"
+            version="1.4">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyTextClass&lt;/structname&gt; structure contains only
+private data</doc>
+      <field name="parent_class" readable="0" private="1">
+        <type name="ActorClass" c:type="CallyActorClass"/>
+      </field>
+      <field name="_padding_dummy" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="8">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="TextPrivate" c:type="CallyTextPrivate" disguised="1">
+    </record>
+    <class name="Texture"
+           c:symbol-prefix="texture"
+           c:type="CallyTexture"
+           version="1.4"
+           parent="Actor"
+           glib:type-name="CallyTexture"
+           glib:get-type="cally_texture_get_type"
+           glib:type-struct="TextureClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyTexture&lt;/structname&gt; structure contains only
+private data and should be accessed using the provided API</doc>
+      <implements name="Atk.Action"/>
+      <implements name="Atk.Component"/>
+      <constructor name="new" c:identifier="cally_texture_new" version="1.4">
+        <doc xml:whitespace="preserve">Creates a new #CallyTexture for the given @actor. @actor must be
+a #ClutterTexture.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #AtkObject</doc>
+          <type name="Atk.Object" c:type="AtkObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="actor" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #ClutterActor</doc>
+            <type name="Clutter.Actor" c:type="ClutterActor*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <field name="parent" readable="0" private="1">
+        <type name="Actor" c:type="CallyActor"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="TexturePrivate" c:type="CallyTexturePrivate*"/>
+      </field>
+    </class>
+    <record name="TextureClass"
+            c:type="CallyTextureClass"
+            glib:is-gtype-struct-for="Texture"
+            version="1.4">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyTextureClass&lt;/structname&gt; structure contains
+only private data</doc>
+      <field name="parent_class" readable="0" private="1">
+        <type name="ActorClass" c:type="CallyActorClass"/>
+      </field>
+      <field name="_padding_dummy" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="8">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="TexturePrivate" c:type="CallyTexturePrivate" disguised="1">
+    </record>
+    <class name="Util"
+           c:symbol-prefix="util"
+           c:type="CallyUtil"
+           version="1.4"
+           parent="Atk.Util"
+           glib:type-name="CallyUtil"
+           glib:get-type="cally_util_get_type"
+           glib:type-struct="UtilClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyUtil&lt;/structname&gt; structure contains only
+private data and should be accessed using the provided API</doc>
+      <field name="parent" readable="0" private="1">
+        <type name="Atk.Util" c:type="AtkUtil"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="UtilPrivate" c:type="CallyUtilPrivate*"/>
+      </field>
+    </class>
+    <record name="UtilClass"
+            c:type="CallyUtilClass"
+            glib:is-gtype-struct-for="Util"
+            version="1.4">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;CallyUtilClass&lt;/structname&gt; structure contains only
+private data</doc>
+      <field name="parent_class" readable="0" private="1">
+        <type name="Atk.UtilClass" c:type="AtkUtilClass"/>
+      </field>
+      <field name="_padding_dummy" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="8">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="UtilPrivate" c:type="CallyUtilPrivate" disguised="1">
+    </record>
+    <function name="accessibility_init"
+              c:identifier="cally_accessibility_init"
+              version="1.4">
+      <doc xml:whitespace="preserve">Initializes the accessibility support.
+initialized.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if accessibility support has been correctly</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+    </function>
+    <function name="get_cally_initialized"
+              c:identifier="cally_get_cally_initialized"
+              version="1.4">
+      <doc xml:whitespace="preserve">Returns if the accessibility support using cally is enabled.
+initialized.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if accessibility support has been correctly</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+    </function>
+  </namespace>
+</repository>

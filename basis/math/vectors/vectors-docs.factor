@@ -9,6 +9,7 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
     v+-
     v*
     v/
+    v^
 }
 "Vector unary operations:"
 { $subsections
@@ -30,6 +31,8 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
     n+v
     v-n
     n-v
+    v^n
+    n^v
 }
 "Saturated arithmetic (only on " { $link "specialized-arrays" } "):"
 { $subsections
@@ -43,6 +46,7 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
     norm
     norm-sq
     normalize
+    p-norm
 }
 "Comparing entire vectors:"
 { $subsections
@@ -122,12 +126,11 @@ ARTICLE: "math-vectors-misc" "Miscellaneous vector functions"
 } ;
 
 ARTICLE: "math-vectors-simd-logic" "Componentwise logic with SIMD vectors"
-"Processor SIMD units supported by the " { $vocab-link "math.vectors.simd" } " vocabulary represent boolean values as bitmasks, where a true result's binary representation is all ones and a false representation is all zeroes. This is the format in which results from comparison words such as " { $link v= } " return their results and in which logic and test words such as " { $link vand } " and " { $link vall? } " take their inputs when working with SIMD types. For a float vector, false will manifest itself as " { $snippet "0.0" } " and true as a " { $link POSTPONE: NAN: } " literal with a string of set bits in its payload:"
+"Processor SIMD units supported by the " { $vocab-link "math.vectors.simd" } " vocabulary represent boolean values as bitmasks, where a true result's binary representation is all ones and a false representation is all zeroes. This is the format in which results from comparison words such as " { $link v= } " return their results and in which logic and test words such as " { $link vand } " and " { $link vall? } " take their inputs when working with SIMD types. For a float vector, false will manifest itself as " { $snippet "0.0" } " and true as a " { $link POSTPONE: NAN: } " literal with a string of on bits in its payload:"
 { $example
-"""USING: math.vectors math.vectors.simd prettyprint ;
-
-float-4{ 1.0 2.0 3.0 0/0. } float-4{ 1.0 -2.0 3.0 0/0. } v= ."""
-"""float-4{ NAN: fffffe0000000 0.0 NAN: fffffe0000000 0.0 }"""
+    "USING: math.vectors math.vectors.simd prettyprint ;"
+    "float-4{ 1.0 2.0 3.0 0/0. } float-4{ 1.0 -2.0 3.0 0/0. } v= ."
+    "float-4{ NAN: fffffe0000000 0.0 NAN: fffffe0000000 0.0 }"
 }
 "For an integer vector, false will manifest as " { $snippet "0" } " and true as " { $snippet "-1" } " (for signed vectors) or the largest representable value of the element type (for unsigned vectors):"
 { $example
@@ -150,7 +153,7 @@ int-4{ f f t f } ."""
 $nl
 "Providing a SIMD boolean vector with element values other than the proper true and false representations as an input to the vector logical or test operations is undefined. Do not count on operations such as " { $link vall? } " or " { $link v? } " using bitwise operations to construct their results."
 $nl
-"This applies to the output of the following element comparison words: "
+"This applies to the output of the following element comparison words:"
 { $list
 { $link v< }
 { $link v<= }
@@ -212,7 +215,7 @@ HELP: vtruncate
 
 HELP: n+v
 { $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Adds " { $snippet "n" } " to each element of " { $snippet "u" } "." } ;
+{ $description "Adds " { $snippet "n" } " to each element of " { $snippet "v" } "." } ;
 
 HELP: v+n
 { $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
@@ -220,7 +223,7 @@ HELP: v+n
 
 HELP: n-v
 { $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Subtracts each element of " { $snippet "u" } " from " { $snippet "n" } "." } ;
+{ $description "Subtracts each element of " { $snippet "v" } " from " { $snippet "n" } "." } ;
 
 HELP: v-n
 { $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
@@ -228,7 +231,7 @@ HELP: v-n
 
 HELP: n*v
 { $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
+{ $description "Multiplies each element of " { $snippet "v" } " by " { $snippet "n" } "." } ;
 
 HELP: v*n
 { $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
@@ -236,13 +239,21 @@ HELP: v*n
 
 HELP: n/v
 { $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
-{ $description "Divides " { $snippet "n" } " by each element of " { $snippet "u" } "." }
+{ $description "Divides " { $snippet "n" } " by each element of " { $snippet "v" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: v/n
 { $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
 { $description "Divides each element of " { $snippet "u" } " by " { $snippet "n" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
+
+HELP: n^v
+{ $values { "n" "a number" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Raises " { $snippet "n" } " to the power of each element of " { $snippet "v" } "." } ;
+
+HELP: v^n
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "w" "a sequence of numbers" } }
+{ $description "Raises each element of " { $snippet "u" } " to the power of " { $snippet "n" } "." } ;
 
 HELP: v+
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
@@ -276,6 +287,10 @@ HELP: v/
 { $description "Divides " { $snippet "u" } " by " { $snippet "v" } " component-wise." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
+HELP: v^
+{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $description "Raises " { $snippet "u" } " to the power of " { $snippet "v" } " component-wise." } ;
+
 HELP: vmax
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
 { $description "Creates a sequence where each element is the maximum of the corresponding elements from " { $snippet "u" } " and " { $snippet "v" } "." }
@@ -289,6 +304,10 @@ HELP: vmin
 HELP: v.
 { $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
 { $description "Computes the dot product of two vectors." } ;
+
+HELP: h.
+{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
+{ $description "Computes the Hermitian inner product of two vectors." } ;
 
 HELP: vs+
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
@@ -407,7 +426,7 @@ HELP: vbroadcast
 { $description "Outputs a new SIMD array of the same type as " { $snippet "u" } " where every element is equal to the " { $snippet "n" } "th element of " { $snippet "u" } "." }
 { $examples
     { $example
-        "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
+        "USING: alien.c-types math.vectors math.vectors.simd prettyprint ;"
         "int-4{ 69 42 911 13 } 2 vbroadcast ."
         "int-4{ 911 911 911 911 }"
     }
@@ -422,7 +441,7 @@ HELP: vshuffle
 } }
 { $examples
     { $example
-        "USING: alien.c-types math.vectors math.vectors.simd" "prettyprint ;"
+        "USING: alien.c-types math.vectors math.vectors.simd prettyprint ;"
         "int-4{ 69 42 911 13 } { 1 3 2 3 } vshuffle ."
         "int-4{ 42 13 911 13 }"
     }
@@ -438,15 +457,10 @@ HELP: vshuffle
         "        { 4 [ uchar-16{ 3 2 1 0 7 6 5 4 11 10 9 8 15 14 13 12 } ] }"
         "    } case ;"
         ""
-        "int-4{ HEX: 11223344 HEX: 11223344 HEX: 11223344 HEX: 11223344 }"
+        "int-4{ 0x11223344 0x11223344 0x11223344 0x11223344 }"
         "4 endian-swap vshuffle"
         "16 number-base [ . ] with-variable"
-        """int-4{
-    HEX: 44332211
-    HEX: 44332211
-    HEX: 44332211
-    HEX: 44332211
-}"""
+        "int-4{ 0x44332211 0x44332211 0x44332211 0x44332211 }"
     }
 } ;
 
@@ -457,6 +471,10 @@ HELP: norm-sq
 HELP: norm
 { $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
 { $description "Computes the length of a mathematical vector." } ;
+
+HELP: p-norm
+{ $values { "v" "a sequence of numbers" } { "p" "a positive real number" } { "x" "a non-negative real number" } }
+{ $description "Computes the length of a mathematical vector in " { $snippet "L^p" } " space." } ;
 
 HELP: normalize
 { $values { "u" "a sequence of numbers, not all zero" } { "v" "a sequence of numbers" } }

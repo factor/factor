@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math make strings arrays vectors sequences
-sets math.order accessors ;
+USING: arrays kernel make math sequences sets strings ;
 IN: splitting
 
 <PRIVATE
@@ -45,6 +44,9 @@ PRIVATE>
 : split1-slice ( seq subseq -- before-slice after-slice )
     [ snip-slice ] (split1) ;
 
+: split1-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
+    dupd find drop [ swap [ dup 1 + ] dip snip ] [ f ] if* ; inline
+
 : split1-last ( seq subseq -- before after )
     [ <reversed> ] bi@ split1 [ reverse ] bi@
     dup [ swap ] when ;
@@ -55,7 +57,7 @@ PRIVATE>
 
 <PRIVATE
 
-: (split) ( n seq quot: ( elt -- ? ) -- )
+: (split) ( n seq quot: ( ... elt -- ... ? ) -- )
     [ find-from drop ]
     [ [ [ 3dup swapd subseq , ] dip [ drop 1 + ] 2dip (split) ] 3curry ]
     [ drop [ swap [ tail ] unless-zero , ] 2curry ]
@@ -66,20 +68,45 @@ PRIVATE>
 PRIVATE>
 
 : split ( seq separators -- pieces )
-    [ [ member? ] curry split, ] { } make ;
+    [ [ member? ] curry split, ] { } make ; inline
 
-: split-when ( seq quot -- pieces )
+: split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
     [ split, ] { } make ; inline
+
+<PRIVATE
+
+: (split*) ( n seq quot: ( ... elt -- ... ? ) -- )
+    [ find-from ]
+    [ [ [ 1 + ] 3dip [ 3dup swapd subseq , ] dip [ drop ] 2dip (split*) ] 3curry ]
+    [ drop [ [ drop ] 2dip 2dup length < [ swap [ tail ] unless-zero , ] [ 2drop ] if ] 2curry ]
+    3tri if ; inline recursive
+
+: split*, ( ... seq quot: ( ... elt -- ... ? ) -- ... ) [ 0 ] 2dip (split*) ; inline
+
+PRIVATE>
+
+: split* ( seq separators -- pieces )
+    [ [ member? ] curry split*, ] { } make ; inline
+
+: split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
+    [ split*, ] { } make ; inline
 
 GENERIC: string-lines ( str -- seq )
 
 M: string string-lines
-    dup "\r\n" intersects? [
-        "\n" split [
+    dup [ "\r\n" member? ] any? [
+        "\n" split
+        [
             but-last-slice [
-                "\r" ?tail drop "\r" split
-            ] map
-        ] keep last "\r" split suffix concat
+                dup ?last CHAR: \r = [ but-last ] when
+                [ CHAR: \r = ] split-when
+            ] map! drop
+        ] [
+            [ length 1 - ] keep
+            [ [ CHAR: \r = ] split-when ] change-nth
+        ]
+        [ concat ]
+        tri
     ] [
         1array
     ] if ;

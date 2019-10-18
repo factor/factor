@@ -53,9 +53,12 @@ void factor_vm::load_code_heap(FILE *file, image_header *h, vm_parameters *p)
 	}
 
 	code->allocator->initial_free_list(h->code_size);
+	code->initialize_all_blocks_set();
 }
 
 struct startup_fixup {
+	static const bool translated_code_block_map = true;
+
 	cell data_offset;
 	cell code_offset;
 
@@ -160,7 +163,7 @@ struct startup_code_block_relocation_visitor {
 
 	void operator()(instruction_operand op)
 	{
-		code_block *compiled = op.parent_code_block();
+		code_block *compiled = op.compiled;
 		cell old_offset = op.rel_offset() + (cell)compiled->entry_point() - fixup.code_offset;
 
 		switch(op.rel_type())
@@ -218,11 +221,42 @@ void factor_vm::fixup_code(cell data_offset, cell code_offset)
 	code->allocator->iterate(updater,fixup);
 }
 
+bool factor_vm::read_embedded_image_footer(FILE *file, embedded_image_footer *footer)
+{
+	safe_fseek(file, -(off_t)sizeof(embedded_image_footer), SEEK_END);
+	safe_fread(footer, (off_t)sizeof(embedded_image_footer), 1, file);
+	return footer->magic == image_magic;
+}
+
+FILE* factor_vm::open_image(vm_parameters *p)
+{
+	if (p->embedded_image)
+	{
+		FILE *file = OPEN_READ(p->executable_path);
+		if (file == NULL)
+		{
+			std::cout << "Cannot open embedded image" << std::endl;
+			std::cout << strerror(errno) << std::endl;
+			exit(1);
+		}
+		embedded_image_footer footer;
+		if (!read_embedded_image_footer(file, &footer))
+		{
+			std::cout << "No embedded image" << std::endl;
+			exit(1);
+		}
+		safe_fseek(file, (off_t)footer.image_offset, SEEK_SET);
+		return file;
+	}
+	else
+		return OPEN_READ(p->image_path);
+}
+
 /* Read an image file from disk, only done once during startup */
 /* This function also initializes the data and code heaps */
 void factor_vm::load_image(vm_parameters *p)
 {
-	FILE *file = OPEN_READ(p->image_path);
+	FILE *file = open_image(p);
 	if(file == NULL)
 	{
 		std::cout << "Cannot open image file: " << p->image_path << std::endl;
@@ -336,6 +370,20 @@ void factor_vm::primitive_save_image_and_exit()
 		exit(0);
 	else
 		exit(1);
+}
+
+bool factor_vm::embedded_image_p()
+{
+	const vm_char *vm_path = vm_executable_path();
+	if (!vm_path)
+		return false;
+	FILE *file = OPEN_READ(vm_path);
+	if (!file)
+		return false;
+	embedded_image_footer footer;
+	bool embedded_p = read_embedded_image_footer(file, &footer);
+	fclose(file);
+	return embedded_p;
 }
 
 }

@@ -184,23 +184,23 @@ HELP: interval-max
 
 HELP: interval-mod
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Outputs an interval containing all possible values obtained by aplying " { $link mod } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+{ $description "Outputs an interval containing all possible values obtained by applying " { $link mod } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
 
 HELP: interval-rem
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Outputs an interval containing all possible values obtained by aplying " { $link rem } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+{ $description "Outputs an interval containing all possible values obtained by applying " { $link rem } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
 
 HELP: interval-bitand
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Outputs an interval containing all possible values obtained by aplying " { $link bitand } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+{ $description "Outputs an interval containing all possible values obtained by applying " { $link bitand } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
 
 HELP: interval-bitor
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Outputs an interval containing all possible values obtained by aplying " { $link bitor } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+{ $description "Outputs an interval containing all possible values obtained by applying " { $link bitor } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
 
 HELP: interval-bitxor
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
-{ $description "Outputs an interval containing all possible values obtained by aplying " { $link bitxor } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+{ $description "Outputs an interval containing all possible values obtained by applying " { $link bitxor } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
 
 HELP: interval-min
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }

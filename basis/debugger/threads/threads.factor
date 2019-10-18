@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors debugger continuations threads threads.private
-io io.styles prettyprint kernel math.parser namespaces make ;
+USING: accessors debugger continuations threads io io.styles
+prettyprint kernel make math.parser namespaces ;
 IN: debugger.threads
 
 : error-in-thread. ( thread -- )
@@ -12,17 +12,15 @@ IN: debugger.threads
         ", " % dup quot>> unparse-short % ")" %
     ] "" make swap write-object ":" print ;
 
-M: thread error-in-thread ( error thread -- )
-    initial-thread get-global eq? [
-        die drop
-    ] [
-        global [
-            error-thread get-global error-in-thread. nl
+! ( error thread -- )
+[
+    dup initial-thread get-global eq? [ die ] [
+        [
+            error-in-thread. nl
             print-error nl
             :c
             flush
-        ] bind
-    ] if ;
-
-[ self error-in-thread stop ]
-thread-error-hook set-global
+        ] with-global
+        stop
+    ] if
+] thread-error-hook set-global

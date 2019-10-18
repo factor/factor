@@ -37,7 +37,7 @@ struct tagged
 	cell value() const
 	{
 #ifdef FACTOR_DEBUG
-		assert(type_p());
+		FACTOR_ASSERT(type_p());
 #endif
 		return value_;
 	}
@@ -45,7 +45,7 @@ struct tagged
 	Type *untagged() const
 	{
 #ifdef FACTOR_DEBUG
-		assert(type_p());
+		FACTOR_ASSERT(type_p());
 #endif
 		return (Type *)(UNTAG(value_));
 	}

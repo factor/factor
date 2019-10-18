@@ -22,7 +22,7 @@ M: curry call uncurry call ;
 M: compose call uncompose [ call ] dip call ;
 
 M: wrapper equal?
-    over wrapper? [ [ wrapped>> ] bi@ = ] [ 2drop f ] if ;
+    over wrapper? [ [ wrapped>> ] same? ] [ 2drop f ] if ;
 
 UNION: callable quotation curry compose ;
 

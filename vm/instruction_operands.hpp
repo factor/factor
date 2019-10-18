@@ -30,7 +30,13 @@ enum relocation_type {
 	type since its used in a situation where relocation arguments cannot
 	be passed in, and so RT_DLSYM is inappropriate (Windows only) */
 	RT_EXCEPTION_HANDLER,
-
+	/* arg is a literal table index, holding a pair (symbol/dll) */
+	RT_DLSYM_TOC,
+	/* address of inline_cache_miss function. This is a separate
+	relocation to reduce compile time and size for PICs. */
+	RT_INLINE_CACHE_MISS,
+	/* address of safepoint page in code heap */
+	RT_SAFEPOINT
 };
 
 enum relocation_class {
@@ -45,9 +51,9 @@ enum relocation_class {
 	/* absolute address in a PowerPC LWZ instruction */
 	RC_ABSOLUTE_PPC_2,
 	/* relative address in a PowerPC LWZ/STW/BC instruction */
-	RC_RELATIVE_PPC_2,
+	RC_RELATIVE_PPC_2_PC,
 	/* relative address in a PowerPC B/BL instruction */
-	RC_RELATIVE_PPC_3,
+	RC_RELATIVE_PPC_3_PC,
 	/* relative address in an ARM B/BL instruction */
 	RC_RELATIVE_ARM_3,
 	/* pointer to address in an ARM LDR/STR instruction */
@@ -58,13 +64,15 @@ enum relocation_class {
 	RC_ABSOLUTE_2,
 	/* absolute address in a 1 byte location */
 	RC_ABSOLUTE_1,
+	/* absolute address in a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
+	RC_ABSOLUTE_PPC_2_2_2_2,
 };
 
-static const cell rel_absolute_ppc_2_mask = 0xffff;
-static const cell rel_relative_ppc_2_mask = 0xfffc;
-static const cell rel_relative_ppc_3_mask = 0x3fffffc;
-static const cell rel_indirect_arm_mask = 0xfff;
-static const cell rel_relative_arm_3_mask = 0xffffff;
+static const cell rel_absolute_ppc_2_mask = 0x0000ffff;
+static const cell rel_relative_ppc_2_mask = 0x0000fffc;
+static const cell rel_relative_ppc_3_mask = 0x03fffffc;
+static const cell rel_indirect_arm_mask   = 0x00000fff;
+static const cell rel_relative_arm_3_mask = 0x00ffffff;
 
 /* code relocation table consists of a table of entries for each fixup */
 struct relocation_entry {
@@ -101,6 +109,7 @@ struct relocation_entry {
 		case RT_VM:
 			return 1;
 		case RT_DLSYM:
+		case RT_DLSYM_TOC:
 			return 2;
 		case RT_ENTRY_POINT:
 		case RT_ENTRY_POINT_PIC:
@@ -113,6 +122,8 @@ struct relocation_entry {
 		case RT_CARDS_OFFSET:
 		case RT_DECKS_OFFSET:
 		case RT_EXCEPTION_HANDLER:
+		case RT_INLINE_CACHE_MISS:
+		case RT_SAFEPOINT:
 			return 0;
 		default:
 			critical_error("Bad rel type in number_of_parameters()",rel_type());
@@ -139,17 +150,8 @@ struct instruction_operand {
 		return rel.rel_offset();
 	}
 
-	cell parameter_index()
-	{
-		return index;
-	}
-
-	code_block *parent_code_block()
-	{
-		return compiled;
-	}
-
 	fixnum load_value_2_2();
+	fixnum load_value_2_2_2_2();
 	fixnum load_value_masked(cell mask, cell bits, cell shift);
 	fixnum load_value(cell relative_to);
 	fixnum load_value();
@@ -157,6 +159,7 @@ struct instruction_operand {
 	code_block *load_code_block();
 
 	void store_value_2_2(fixnum value);
+	void store_value_2_2_2_2(fixnum value);
 	void store_value_masked(fixnum value, cell mask, cell shift);
 	void store_value(fixnum value);
 	void store_code_block(code_block *compiled);

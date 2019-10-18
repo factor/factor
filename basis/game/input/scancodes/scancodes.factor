@@ -1,175 +1,175 @@
 IN: game.input.scancodes
 
-CONSTANT: key-undefined HEX: 0000
-CONSTANT: key-error-roll-over HEX: 0001
-CONSTANT: key-error-post-fail HEX: 0002
-CONSTANT: key-error-undefined HEX: 0003
-CONSTANT: key-a HEX: 0004
-CONSTANT: key-b HEX: 0005
-CONSTANT: key-c HEX: 0006
-CONSTANT: key-d HEX: 0007
-CONSTANT: key-e HEX: 0008
-CONSTANT: key-f HEX: 0009
-CONSTANT: key-g HEX: 000a
-CONSTANT: key-h HEX: 000b
-CONSTANT: key-i HEX: 000c
-CONSTANT: key-j HEX: 000d
-CONSTANT: key-k HEX: 000e
-CONSTANT: key-l HEX: 000f
-CONSTANT: key-m HEX: 0010
-CONSTANT: key-n HEX: 0011
-CONSTANT: key-o HEX: 0012
-CONSTANT: key-p HEX: 0013
-CONSTANT: key-q HEX: 0014
-CONSTANT: key-r HEX: 0015
-CONSTANT: key-s HEX: 0016
-CONSTANT: key-t HEX: 0017
-CONSTANT: key-u HEX: 0018
-CONSTANT: key-v HEX: 0019
-CONSTANT: key-w HEX: 001a
-CONSTANT: key-x HEX: 001b
-CONSTANT: key-y HEX: 001c
-CONSTANT: key-z HEX: 001d
-CONSTANT: key-1 HEX: 001e
-CONSTANT: key-2 HEX: 001f
-CONSTANT: key-3 HEX: 0020
-CONSTANT: key-4 HEX: 0021
-CONSTANT: key-5 HEX: 0022
-CONSTANT: key-6 HEX: 0023
-CONSTANT: key-7 HEX: 0024
-CONSTANT: key-8 HEX: 0025
-CONSTANT: key-9 HEX: 0026
-CONSTANT: key-0 HEX: 0027
-CONSTANT: key-return HEX: 0028
-CONSTANT: key-escape HEX: 0029
-CONSTANT: key-backspace HEX: 002a
-CONSTANT: key-tab HEX: 002b
-CONSTANT: key-space HEX: 002c
-CONSTANT: key-- HEX: 002d
-CONSTANT: key-= HEX: 002e
-CONSTANT: key-[ HEX: 002f
-CONSTANT: key-] HEX: 0030
-CONSTANT: key-\ HEX: 0031
-CONSTANT: key-#-non-us HEX: 0032
-CONSTANT: key-; HEX: 0033
-CONSTANT: key-' HEX: 0034
-CONSTANT: key-` HEX: 0035
-CONSTANT: key-, HEX: 0036
-CONSTANT: key-. HEX: 0037
-CONSTANT: key-/ HEX: 0038
-CONSTANT: key-caps-lock HEX: 0039
-CONSTANT: key-f1 HEX: 003a
-CONSTANT: key-f2 HEX: 003b
-CONSTANT: key-f3 HEX: 003c
-CONSTANT: key-f4 HEX: 003d
-CONSTANT: key-f5 HEX: 003e
-CONSTANT: key-f6 HEX: 003f
-CONSTANT: key-f7 HEX: 0040
-CONSTANT: key-f8 HEX: 0041
-CONSTANT: key-f9 HEX: 0042
-CONSTANT: key-f10 HEX: 0043
-CONSTANT: key-f11 HEX: 0044
-CONSTANT: key-f12 HEX: 0045
-CONSTANT: key-print-screen HEX: 0046
-CONSTANT: key-scroll-lock HEX: 0047
-CONSTANT: key-pause HEX: 0048
-CONSTANT: key-insert HEX: 0049
-CONSTANT: key-home HEX: 004a
-CONSTANT: key-page-up HEX: 004b
-CONSTANT: key-delete HEX: 004c
-CONSTANT: key-end HEX: 004d
-CONSTANT: key-page-down HEX: 004e
-CONSTANT: key-right-arrow HEX: 004f
-CONSTANT: key-left-arrow HEX: 0050
-CONSTANT: key-down-arrow HEX: 0051
-CONSTANT: key-up-arrow HEX: 0052
-CONSTANT: key-keypad-numlock HEX: 0053
-CONSTANT: key-keypad-/ HEX: 0054
-CONSTANT: key-keypad-* HEX: 0055
-CONSTANT: key-keypad-- HEX: 0056
-CONSTANT: key-keypad-+ HEX: 0057
-CONSTANT: key-keypad-enter HEX: 0058
-CONSTANT: key-keypad-1 HEX: 0059
-CONSTANT: key-keypad-2 HEX: 005a
-CONSTANT: key-keypad-3 HEX: 005b
-CONSTANT: key-keypad-4 HEX: 005c
-CONSTANT: key-keypad-5 HEX: 005d
-CONSTANT: key-keypad-6 HEX: 005e
-CONSTANT: key-keypad-7 HEX: 005f
-CONSTANT: key-keypad-8 HEX: 0060
-CONSTANT: key-keypad-9 HEX: 0061
-CONSTANT: key-keypad-0 HEX: 0062
-CONSTANT: key-keypad-. HEX: 0063
-CONSTANT: key-\-non-us HEX: 0064
-CONSTANT: key-application HEX: 0065
-CONSTANT: key-power HEX: 0066
-CONSTANT: key-keypad-= HEX: 0067
-CONSTANT: key-f13 HEX: 0068
-CONSTANT: key-f14 HEX: 0069
-CONSTANT: key-f15 HEX: 006a
-CONSTANT: key-f16 HEX: 006b
-CONSTANT: key-f17 HEX: 006c
-CONSTANT: key-f18 HEX: 006d
-CONSTANT: key-f19 HEX: 006e
-CONSTANT: key-f20 HEX: 006f
-CONSTANT: key-f21 HEX: 0070
-CONSTANT: key-f22 HEX: 0071
-CONSTANT: key-f23 HEX: 0072
-CONSTANT: key-f24 HEX: 0073
-CONSTANT: key-execute HEX: 0074
-CONSTANT: key-help HEX: 0075
-CONSTANT: key-menu HEX: 0076
-CONSTANT: key-select HEX: 0077
-CONSTANT: key-stop HEX: 0078
-CONSTANT: key-again HEX: 0079
-CONSTANT: key-undo HEX: 007a
-CONSTANT: key-cut HEX: 007b
-CONSTANT: key-copy HEX: 007c
-CONSTANT: key-paste HEX: 007d
-CONSTANT: key-find HEX: 007e
-CONSTANT: key-mute HEX: 007f
-CONSTANT: key-volume-up HEX: 0080
-CONSTANT: key-volume-down HEX: 0081
-CONSTANT: key-locking-caps-lock HEX: 0082
-CONSTANT: key-locking-num-lock HEX: 0083
-CONSTANT: key-locking-scroll-lock HEX: 0084
-CONSTANT: key-keypad-, HEX: 0085
-CONSTANT: key-keypad-=-as-400 HEX: 0086
-CONSTANT: key-international-1 HEX: 0087
-CONSTANT: key-international-2 HEX: 0088
-CONSTANT: key-international-3 HEX: 0089
-CONSTANT: key-international-4 HEX: 008a
-CONSTANT: key-international-5 HEX: 008b
-CONSTANT: key-international-6 HEX: 008c
-CONSTANT: key-international-7 HEX: 008d
-CONSTANT: key-international-8 HEX: 008e
-CONSTANT: key-international-9 HEX: 008f
-CONSTANT: key-lang-1 HEX: 0090
-CONSTANT: key-lang-2 HEX: 0091
-CONSTANT: key-lang-3 HEX: 0092
-CONSTANT: key-lang-4 HEX: 0093
-CONSTANT: key-lang-5 HEX: 0094
-CONSTANT: key-lang-6 HEX: 0095
-CONSTANT: key-lang-7 HEX: 0096
-CONSTANT: key-lang-8 HEX: 0097
-CONSTANT: key-lang-9 HEX: 0098
-CONSTANT: key-alternate-erase HEX: 0099
-CONSTANT: key-sysreq HEX: 009a
-CONSTANT: key-cancel HEX: 009b
-CONSTANT: key-clear HEX: 009c
-CONSTANT: key-prior HEX: 009d
-CONSTANT: key-enter HEX: 009e
-CONSTANT: key-separator HEX: 009f
-CONSTANT: key-out HEX: 00a0
-CONSTANT: key-oper HEX: 00a1
-CONSTANT: key-clear-again HEX: 00a2
-CONSTANT: key-crsel-props HEX: 00a3
-CONSTANT: key-exsel HEX: 00a4
-CONSTANT: key-left-control HEX: 00e0
-CONSTANT: key-left-shift HEX: 00e1
-CONSTANT: key-left-alt HEX: 00e2
-CONSTANT: key-left-gui HEX: 00e3
-CONSTANT: key-right-control HEX: 00e4
-CONSTANT: key-right-shift HEX: 00e5
-CONSTANT: key-right-alt HEX: 00e6
-CONSTANT: key-right-gui HEX: 00e7
+CONSTANT: key-undefined 0x0000
+CONSTANT: key-error-roll-over 0x0001
+CONSTANT: key-error-post-fail 0x0002
+CONSTANT: key-error-undefined 0x0003
+CONSTANT: key-a 0x0004
+CONSTANT: key-b 0x0005
+CONSTANT: key-c 0x0006
+CONSTANT: key-d 0x0007
+CONSTANT: key-e 0x0008
+CONSTANT: key-f 0x0009
+CONSTANT: key-g 0x000a
+CONSTANT: key-h 0x000b
+CONSTANT: key-i 0x000c
+CONSTANT: key-j 0x000d
+CONSTANT: key-k 0x000e
+CONSTANT: key-l 0x000f
+CONSTANT: key-m 0x0010
+CONSTANT: key-n 0x0011
+CONSTANT: key-o 0x0012
+CONSTANT: key-p 0x0013
+CONSTANT: key-q 0x0014
+CONSTANT: key-r 0x0015
+CONSTANT: key-s 0x0016
+CONSTANT: key-t 0x0017
+CONSTANT: key-u 0x0018
+CONSTANT: key-v 0x0019
+CONSTANT: key-w 0x001a
+CONSTANT: key-x 0x001b
+CONSTANT: key-y 0x001c
+CONSTANT: key-z 0x001d
+CONSTANT: key-1 0x001e
+CONSTANT: key-2 0x001f
+CONSTANT: key-3 0x0020
+CONSTANT: key-4 0x0021
+CONSTANT: key-5 0x0022
+CONSTANT: key-6 0x0023
+CONSTANT: key-7 0x0024
+CONSTANT: key-8 0x0025
+CONSTANT: key-9 0x0026
+CONSTANT: key-0 0x0027
+CONSTANT: key-return 0x0028
+CONSTANT: key-escape 0x0029
+CONSTANT: key-backspace 0x002a
+CONSTANT: key-tab 0x002b
+CONSTANT: key-space 0x002c
+CONSTANT: key-- 0x002d
+CONSTANT: key-= 0x002e
+CONSTANT: key-[ 0x002f
+CONSTANT: key-] 0x0030
+CONSTANT: key-\ 0x0031
+CONSTANT: key-#-non-us 0x0032
+CONSTANT: key-; 0x0033
+CONSTANT: key-' 0x0034
+CONSTANT: key-` 0x0035
+CONSTANT: key-, 0x0036
+CONSTANT: key-. 0x0037
+CONSTANT: key-/ 0x0038
+CONSTANT: key-caps-lock 0x0039
+CONSTANT: key-f1 0x003a
+CONSTANT: key-f2 0x003b
+CONSTANT: key-f3 0x003c
+CONSTANT: key-f4 0x003d
+CONSTANT: key-f5 0x003e
+CONSTANT: key-f6 0x003f
+CONSTANT: key-f7 0x0040
+CONSTANT: key-f8 0x0041
+CONSTANT: key-f9 0x0042
+CONSTANT: key-f10 0x0043
+CONSTANT: key-f11 0x0044
+CONSTANT: key-f12 0x0045
+CONSTANT: key-print-screen 0x0046
+CONSTANT: key-scroll-lock 0x0047
+CONSTANT: key-pause 0x0048
+CONSTANT: key-insert 0x0049
+CONSTANT: key-home 0x004a
+CONSTANT: key-page-up 0x004b
+CONSTANT: key-delete 0x004c
+CONSTANT: key-end 0x004d
+CONSTANT: key-page-down 0x004e
+CONSTANT: key-right-arrow 0x004f
+CONSTANT: key-left-arrow 0x0050
+CONSTANT: key-down-arrow 0x0051
+CONSTANT: key-up-arrow 0x0052
+CONSTANT: key-keypad-numlock 0x0053
+CONSTANT: key-keypad-/ 0x0054
+CONSTANT: key-keypad-* 0x0055
+CONSTANT: key-keypad-- 0x0056
+CONSTANT: key-keypad-+ 0x0057
+CONSTANT: key-keypad-enter 0x0058
+CONSTANT: key-keypad-1 0x0059
+CONSTANT: key-keypad-2 0x005a
+CONSTANT: key-keypad-3 0x005b
+CONSTANT: key-keypad-4 0x005c
+CONSTANT: key-keypad-5 0x005d
+CONSTANT: key-keypad-6 0x005e
+CONSTANT: key-keypad-7 0x005f
+CONSTANT: key-keypad-8 0x0060
+CONSTANT: key-keypad-9 0x0061
+CONSTANT: key-keypad-0 0x0062
+CONSTANT: key-keypad-. 0x0063
+CONSTANT: key-\-non-us 0x0064
+CONSTANT: key-application 0x0065
+CONSTANT: key-power 0x0066
+CONSTANT: key-keypad-= 0x0067
+CONSTANT: key-f13 0x0068
+CONSTANT: key-f14 0x0069
+CONSTANT: key-f15 0x006a
+CONSTANT: key-f16 0x006b
+CONSTANT: key-f17 0x006c
+CONSTANT: key-f18 0x006d
+CONSTANT: key-f19 0x006e
+CONSTANT: key-f20 0x006f
+CONSTANT: key-f21 0x0070
+CONSTANT: key-f22 0x0071
+CONSTANT: key-f23 0x0072
+CONSTANT: key-f24 0x0073
+CONSTANT: key-execute 0x0074
+CONSTANT: key-help 0x0075
+CONSTANT: key-menu 0x0076
+CONSTANT: key-select 0x0077
+CONSTANT: key-stop 0x0078
+CONSTANT: key-again 0x0079
+CONSTANT: key-undo 0x007a
+CONSTANT: key-cut 0x007b
+CONSTANT: key-copy 0x007c
+CONSTANT: key-paste 0x007d
+CONSTANT: key-find 0x007e
+CONSTANT: key-mute 0x007f
+CONSTANT: key-volume-up 0x0080
+CONSTANT: key-volume-down 0x0081
+CONSTANT: key-locking-caps-lock 0x0082
+CONSTANT: key-locking-num-lock 0x0083
+CONSTANT: key-locking-scroll-lock 0x0084
+CONSTANT: key-keypad-, 0x0085
+CONSTANT: key-keypad-=-as-400 0x0086
+CONSTANT: key-international-1 0x0087
+CONSTANT: key-international-2 0x0088
+CONSTANT: key-international-3 0x0089
+CONSTANT: key-international-4 0x008a
+CONSTANT: key-international-5 0x008b
+CONSTANT: key-international-6 0x008c
+CONSTANT: key-international-7 0x008d
+CONSTANT: key-international-8 0x008e
+CONSTANT: key-international-9 0x008f
+CONSTANT: key-lang-1 0x0090
+CONSTANT: key-lang-2 0x0091
+CONSTANT: key-lang-3 0x0092
+CONSTANT: key-lang-4 0x0093
+CONSTANT: key-lang-5 0x0094
+CONSTANT: key-lang-6 0x0095
+CONSTANT: key-lang-7 0x0096
+CONSTANT: key-lang-8 0x0097
+CONSTANT: key-lang-9 0x0098
+CONSTANT: key-alternate-erase 0x0099
+CONSTANT: key-sysreq 0x009a
+CONSTANT: key-cancel 0x009b
+CONSTANT: key-clear 0x009c
+CONSTANT: key-prior 0x009d
+CONSTANT: key-enter 0x009e
+CONSTANT: key-separator 0x009f
+CONSTANT: key-out 0x00a0
+CONSTANT: key-oper 0x00a1
+CONSTANT: key-clear-again 0x00a2
+CONSTANT: key-crsel-props 0x00a3
+CONSTANT: key-exsel 0x00a4
+CONSTANT: key-left-control 0x00e0
+CONSTANT: key-left-shift 0x00e1
+CONSTANT: key-left-alt 0x00e2
+CONSTANT: key-left-gui 0x00e3
+CONSTANT: key-right-control 0x00e4
+CONSTANT: key-right-shift 0x00e5
+CONSTANT: key-right-alt 0x00e6
+CONSTANT: key-right-gui 0x00e7

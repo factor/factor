@@ -26,7 +26,7 @@ log-level [ DEBUG ] initialize
 ERROR: undefined-log-level ;
 
 : log-level<=> ( log-level log-level -- ? )
-    [ log-levels at* [ undefined-log-level ] unless ] bi@ <=> ;
+    [ log-levels at* [ undefined-log-level ] unless ] compare ;
 
 : log? ( log-level -- ? )
     log-level get log-level<=> +lt+ = not ;
@@ -138,11 +138,11 @@ PRIVATE>
 
 SYNTAX: LOG:
     #! Syntax: name level
-    CREATE-WORD dup scan-word
+    scan-new-word dup scan-word
     '[ 1array stack>message _ _ log-message ]
-    (( message -- )) define-declared ;
+    ( message -- ) define-declared ;
 
-USE: vocabs.loader
+USE: vocabs
 
 "logging.parser" require
 "logging.analysis" require

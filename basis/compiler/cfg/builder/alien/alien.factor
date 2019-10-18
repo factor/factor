@@ -10,7 +10,7 @@ compiler.cfg.builder compiler.cfg.builder.alien.params
 compiler.cfg.builder.alien.boxing compiler.cfg.builder.blocks
 compiler.cfg.instructions compiler.cfg.stack-frame
 compiler.cfg.stacks compiler.cfg.stacks.local
-compiler.cfg.registers compiler.cfg.hats ;
+compiler.cfg.registers compiler.cfg.hats compiler.errors ;
 FROM: compiler.errors => no-such-symbol no-such-library ;
 IN: compiler.cfg.builder.alien
 
@@ -39,12 +39,12 @@ IN: compiler.cfg.builder.alien
     dup large-struct? [
         heap-size cell f ^^local-allot [
             '[ _ prefix ]
-            [ int-rep struct-return-on-stack? 2array prefix ] bi*
+            [ int-rep struct-return-on-stack? f 3array prefix ] bi*
         ] keep
     ] [ drop f ] if ;
 
 : (caller-parameters) ( vregs reps -- )
-    [ first2 next-parameter ] 2each ;
+    [ first3 next-parameter ] 2each ;
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     [ abi>> ] [ parameters>> ] [ return>> ] tri
@@ -67,11 +67,17 @@ M: string dlsym-valid? dlsym ;
 
 M: array dlsym-valid? '[ _ dlsym ] any? ;
 
-: check-dlsym ( symbols dll -- )
-    dup dll-valid? [
-        dupd dlsym-valid?
-        [ drop ] [ cfg get word>> no-such-symbol ] if
-    ] [ dll-path cfg get word>> no-such-library drop ] if ;
+: check-dlsym ( symbols library -- )
+    {
+        { [ dup library-dll dll-valid? not ] [
+            [ library-dll dll-path ] [ dlerror>> ] bi
+            cfg get word>> no-such-library-error drop 
+        ] }
+        { [ 2dup library-dll dlsym-valid? not ] [
+            drop dlerror cfg get word>> no-such-symbol-error
+        ] }
+        [ 2drop ]
+    } cond ;
 
 : decorated-symbol ( params -- symbols )
     [ function>> ] [ parameters>> [ stack-size ] map-sum number>string ] bi
@@ -85,8 +91,8 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
 
 : caller-linkage ( params -- symbols dll )
     [ dup abi>> callee-cleanup? [ decorated-symbol ] [ function>> ] if ]
-    [ library>> load-library ]
-    bi 2dup check-dlsym ;
+    [ library>> library ]
+    bi 2dup check-dlsym library-dll ;
 
 : caller-return ( params -- )
     return>> [ ] [
@@ -106,7 +112,7 @@ M: #alien-invoke emit-node
             [ caller-stack-frame ]
             [ caller-linkage ]
         } cleave
-        <gc-map> ##alien-invoke
+        <gc-map> ##alien-invoke,
     ]
     [ caller-return ]
     bi ;
@@ -118,7 +124,7 @@ M: #alien-indirect emit-node ( node -- )
         [ caller-parameters ]
         [ prepare-caller-return ]
         [ caller-stack-frame ] tri
-        <gc-map> ##alien-indirect
+        <gc-map> ##alien-indirect,
     ]
     [ caller-return ]
     bi ;
@@ -131,21 +137,21 @@ M: #alien-assembly emit-node
             [ prepare-caller-return ]
             [ caller-stack-frame ]
             [ quot>> ]
-        } cleave <gc-map> ##alien-assembly
+        } cleave <gc-map> ##alien-assembly,
     ]
     [ caller-return ]
     bi ;
 
-: callee-parameter ( rep on-stack? -- dst )
-    [ next-vreg dup ] 2dip next-parameter ;
+: callee-parameter ( rep on-stack? odd-register? -- dst )
+    [ next-vreg dup ] 3dip next-parameter ;
 
 : prepare-struct-callee ( c-type -- vreg )
     large-struct?
-    [ int-rep struct-return-on-stack? callee-parameter ] [ f ] if ;
+    [ int-rep struct-return-on-stack? f callee-parameter ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
-    [ [ [ first2 callee-parameter ] map ] map ]
+    [ [ [ first3 callee-parameter ] map ] map ]
     [ [ keys ] map ]
     bi ;
 
@@ -176,6 +182,9 @@ M: #alien-assembly emit-node
 : emit-callback-body ( nodes -- )
     [ last #return? t assert= ] [ but-last emit-nodes ] bi ;
 
+: emit-callback-return ( params -- )
+    basic-block get [ callee-return ##callback-outputs, ] [ drop ] if ;
+
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
@@ -184,12 +193,12 @@ M: #alien-callback emit-node
         begin-word
 
         {
-            [ params>> callee-parameters ##callback-inputs ]
+            [ params>> callee-parameters ##callback-inputs, ]
             [ params>> box-parameters ]
             [ child>> emit-callback-body ]
-            [ params>> callee-return ##callback-outputs ]
+            [ params>> emit-callback-return ]
             [ params>> callback-stack-cleanup ]
         } cleave
 
-        end-word
+        basic-block get [ end-word ] when
     ] with-cfg-builder ;

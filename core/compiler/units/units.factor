@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel continuations assocs namespaces
-sequences words vocabs definitions hashtables init sets math
-math.order classes classes.private classes.algebra classes.tuple
-classes.tuple.private generic source-files.errors kernel.private ;
+USING: accessors arrays assocs classes classes.private
+classes.tuple classes.tuple.private continuations definitions
+generic init kernel kernel.private math namespaces sequences
+sets source-files.errors vocabs words ;
 FROM: namespaces => set ;
 IN: compiler.units
 
@@ -106,7 +106,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 ! Incremented each time stack effects potentially changed, used
 ! by compiler.tree.propagation.call-effect for call( and execute(
 ! inline caching
-: effect-counter ( -- n ) 47 special-object ; inline
+: effect-counter ( -- n ) REDEFINITION-COUNTER special-object ; inline
 
 GENERIC: always-bump-effect-counter? ( defspec -- ? )
 
@@ -116,7 +116,7 @@ M: object always-bump-effect-counter? drop f ;
 
 : changed-vocabs ( assoc -- vocabs )
     [ drop word? ] assoc-filter
-    [ drop vocabulary>> dup [ vocab ] when dup ] assoc-map ;
+    [ drop vocabulary>> dup [ lookup-vocab ] when dup ] assoc-map ;
 
 : updated-definitions ( -- assoc )
     H{ } clone
@@ -141,9 +141,8 @@ M: object always-bump-effect-counter? drop f ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [
-        47 special-object 0 or
-        1 +
-        47 set-special-object
+        REDEFINITION-COUNTER special-object 0 or
+        1 + REDEFINITION-COUNTER set-special-object
     ] when ;
 
 : notify-observers ( -- )

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math kernel sequences ;
+USING: help.markup help.syntax math kernel sequences arrays ;
 IN: random
 
 HELP: seed-random
@@ -43,6 +43,34 @@ HELP: random-bytes
     { $unchecked-example "USING: prettyprint random ;"
                "5 random-bytes ."
                "B{ 135 50 185 119 240 }"
+    }
+} ;
+
+HELP: random-integers
+{ $values { "length" integer } { "n" integer } { "sequence" array } }
+{ $description "Outputs an array with " { $snippet "length" } " random integers from [0,n)." }
+{ $examples 
+    { $unchecked-example "USING: prettyprint random ;"
+               "10 100 random-integers ."
+               "{ 32 62 71 89 54 12 57 57 10 19 }"
+    }
+} ;
+
+HELP: random-units
+{ $values { "length" integer } { "sequence" array } }
+{ $description "Outputs an array with " { $snippet "length" } " random uniform floats from [0,1]." }
+{ $examples 
+    { $unchecked-example "USING: prettyprint random ;"
+               "7 random-units ."
+               "{
+    0.1881956429982787
+    0.9063571897519639
+    0.9550470241550406
+    0.6289397941552234
+    0.9441213853903183
+    0.7673290082934152
+    0.573743749061385
+}"
     }
 } ;
 
@@ -130,6 +158,8 @@ $nl
 { $subsections sample }
 "Deleting a random element from a sequence:"
 { $subsections delete-random }
+"Sequences of random numbers:"
+{ $subsections random-bytes random-integers random-units }
 "Random numbers with " { $snippet "n" } " bits:"
 { $subsections
     random-bits

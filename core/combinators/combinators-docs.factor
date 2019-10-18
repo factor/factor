@@ -145,12 +145,12 @@ $nl
 "Here is an array containing the " { $link f } " class:"
 { $example "{ POSTPONE: f } ." "{ POSTPONE: f }" }
 "The " { $link f } " object is an instance of the " { $link f } " class:"
-{ $example "USE: classes" "f class ." "POSTPONE: f" }
+{ $example "USE: classes" "f class-of ." "POSTPONE: f" }
 "The " { $link f } " class is an instance of " { $link word } ":"
-{ $example "USE: classes" "\\ f class ." "word" }
+{ $example "USE: classes" "\\ f class-of ." "word" }
 "On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
 { $example "t \\ t eq? ." "t" }
-"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
+"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is important, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
 
 ARTICLE: "conditionals-boolean-equivalence" "Expressing conditionals with boolean logic"
 "Certain simple conditional forms can be expressed in a simpler manner using boolean logic."
@@ -234,7 +234,7 @@ HELP: call-effect
   "The following two lines are equivalent:"
   { $code
     "call( a b -- c )"
-    "(( a b -- c )) call-effect"
+    "( a b -- c ) call-effect"
   }
 } ;
 
@@ -245,7 +245,7 @@ HELP: execute-effect
   "The following two lines are equivalent:"
   { $code
     "execute( a b -- c )"
-    "(( a b -- c )) execute-effect"
+    "( a b -- c ) execute-effect"
   }
 } ;
 
@@ -253,7 +253,7 @@ HELP: execute-effect-unsafe
 { $values { "word" word } { "effect" effect } }
 { $description "Given a word and a stack effect, executes the word, blindly declaring at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary word which is not required at compile time." }
 { $warning "If the word being executed has an incorrect stack effect, undefined behavior will result. User code should use " { $link POSTPONE: execute( } " instead." } ;
-    
+
 { call-effect call-effect-unsafe execute-effect execute-effect-unsafe } related-words
 
 HELP: cleave
@@ -326,12 +326,14 @@ HELP: cond
 }
 { $errors "Throws a " { $link no-cond } " error if none of the test quotations yield a true value." }
 { $examples
-    { $code
-        "{"
-        "    { [ dup 0 > ] [ \"positive\" ] }"
-        "    { [ dup 0 < ] [ \"negative\" ] }"
-        "    [ \"zero\" ]"
-        "} cond"
+    { $example
+        "USING: combinators io kernel math ;"
+        "0 {"
+        "    { [ dup 0 > ] [ drop \"positive\" ] }"
+        "    { [ dup 0 < ] [ drop \"negative\" ] }"
+        "    [ drop \"zero\" ]"
+        "} cond print"
+        "zero"
     }
 } ;
 
@@ -340,25 +342,28 @@ HELP: no-cond
 { $error-description "Thrown by " { $link cond } " if none of the test quotations yield a true value. Some uses of " { $link cond } " include a default case where the test quotation is " { $snippet "[ t ]" } "; such a " { $link cond } " form will never throw this error." } ;
 
 HELP: case
-{ $values { "obj" object } { "assoc" "a sequence of object/word,quotation pairs, with an optional quotation at the end" } }
+{ $values { "obj" object } { "assoc" "a sequence of object/word, quotation pairs, with an optional quotation at the end" } }
 { $description
     "Compares " { $snippet "obj" } " against the first element of every pair, first evaluating the first element if it is a word. If some pair matches, removes " { $snippet "obj" } " from the stack and calls the second element of that pair, which must be a quotation."
     $nl
-    "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "cases" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-cond } " error is rasied."
+    "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "assoc" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-cond } " error is raised."
     $nl
     "The following two phrases are equivalent:"
     { $code "{ { X [ Y ] } { Z [ T ] } } case" }
     { $code "dup X = [ drop Y ] [ dup Z = [ drop T ] [ no-case ] if ] if" }
 }
 { $examples
-    { $code
-        "SYMBOL: yes  SYMBOL: no  SYMBOL: maybe"
+    { $example
+        "USING: combinators io kernel ;"
+        "IN: scratchpad"
+        "SYMBOLS: yes no maybe ;"
         "maybe {"
         "    { yes [ ] } ! Do nothing"
         "    { no [ \"No way!\" throw ] }"
         "    { maybe [ \"Make up your mind!\" print ] }"
-        "    [ \"Invalid input; try again.\" print ]"
+        "    [ drop \"Invalid input; try again.\" print ]"
         "} case"
+        "Make up your mind!"
     }
 } ;
 
@@ -372,10 +377,10 @@ HELP: recursive-hashcode
 
 HELP: cond>quot
 { $values { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }
-{ $description  "Creates a quotation that when called, has the same effect as applying " { $link cond } " to " { $snippet "assoc" } "."
+{ $description "Creates a quotation that when called, has the same effect as applying " { $link cond } " to " { $snippet "assoc" } "."
 $nl
 "The generated quotation is more efficient than the naive implementation of " { $link cond } ", though, since it expands into a series of conditionals, and no iteration through " { $snippet "assoc" } " has to be performed." }
-{ $notes "This word is used behind the scenes to compile " { $link cond } " forms efficiently; it can also be called directly,  which is useful for meta-programming." } ;
+{ $notes "This word is used behind the scenes to compile " { $link cond } " forms efficiently; it can also be called directly, which is useful for meta-programming." } ;
 
 HELP: case>quot
 { $values { "default" quotation } { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }
@@ -391,9 +396,9 @@ $nl
 HELP: distribute-buckets
 { $values { "alist" "an alist" } { "initial" object } { "quot" { $quotation "( obj -- assoc )" } } { "buckets" "a new array" } }
 { $description "Sorts the entries of " { $snippet "assoc" } " into buckets, using the quotation to yield a set of keys for each entry. The hashcode of each key is computed, and the entry is placed in all corresponding buckets. Each bucket is initially cloned from " { $snippet "initial" } "; this should either be an empty vector or a one-element vector containing a pair." }
-{ $notes "This word is used in the implemention of " { $link hash-case-quot } " and " { $link standard-combination } "." } ;
+{ $notes "This word is used in the implementation of " { $link hash-case-quot } " and " { $link standard-combination } "." } ;
 
-HELP: dispatch ( n array -- )
+HELP: dispatch
 { $values { "n" "a fixnum" } { "array" "an array of quotations" } }
 { $description "Calls the " { $snippet "n" } "th quotation in the array." }
 { $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;

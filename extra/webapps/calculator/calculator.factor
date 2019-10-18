@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: furnace furnace.actions furnace.redirection
 http.server.dispatchers html.forms validators urls accessors
-math ;
+math kernel ;
 IN: webapps.calculator
 
 TUPLE: calculator < dispatcher ;
@@ -39,6 +39,6 @@ USING: db.sqlite furnace.alloy namespaces http.server ;
     <calculator>
         calculator-db <alloy>
         main-responder set-global
-    8080 httpd ;
+    8080 httpd drop ;
 
 MAIN: run-calculator

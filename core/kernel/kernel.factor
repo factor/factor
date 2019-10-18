@@ -32,20 +32,20 @@ DEFER: if
 : if ( ..a ? true: ( ..a -- ..b ) false: ( ..a -- ..b ) -- ..b ) ? call ;
 
 ! Single branch
-: unless ( ? false -- )
+: unless ( ..a ? false: ( ..a -- ..a ) -- ..a )
     swap [ drop ] [ call ] if ; inline
 
-: when ( ? true -- )
+: when ( ..a ? true: ( ..a -- ..a ) -- ..a )
     swap [ call ] [ drop ] if ; inline
 
 ! Anaphoric
 : if* ( ..a ? true: ( ..a ? -- ..b ) false: ( ..a -- ..b ) -- ..b )
     pick [ drop call ] [ 2nip call ] if ; inline
 
-: when* ( ? true -- )
+: when* ( ..a ? true: ( ..a ? -- ..a ) -- ..a )
     over [ call ] [ 2drop ] if ; inline
 
-: unless* ( ? false -- )
+: unless* ( ..a ? false: ( ..a -- ..a x ) -- ..a x )
     over [ drop ] [ nip call ] if ; inline
 
 ! Default
@@ -64,11 +64,14 @@ DEFER: if
 : 4dip ( w x y z quot -- w x y z ) swap [ 3dip ] dip ; inline
 
 ! Keepers
-: keep ( x quot -- x ) over [ call ] dip ; inline
+: keep ( ..a x quot: ( ..a x -- ..b ) -- ..b x )
+    over [ call ] dip ; inline
 
-: 2keep ( x y quot -- x y ) [ 2dup ] dip 2dip ; inline
+: 2keep ( ..a x y quot: ( ..a x y -- ..b ) -- ..b x y )
+    [ 2dup ] dip 2dip ; inline
 
-: 3keep ( x y z quot -- x y z ) [ 3dup ] dip 3dip ; inline
+: 3keep ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x y z )
+    [ 3dup ] dip 3dip ; inline
 
 ! Cleavers
 : bi ( x p q -- )
@@ -217,6 +220,8 @@ M: identity-tuple hashcode* nip identity-hashcode ; inline
         2dup both-fixnums? [ 2drop f ] [ equal? ] if
     ] if ; inline
 
+: same? ( x y quot -- ? ) bi@ = ; inline
+
 GENERIC: clone ( obj -- cloned )
 
 M: object clone ; inline
@@ -241,5 +246,114 @@ ERROR: assert got expect ;
 : declare ( spec -- ) drop ;
 
 : do-primitive ( number -- ) "Improper primitive call" throw ;
+
+! Special object count and identifiers must be kept in sync with:
+!   vm/objects.hpp
+!   basis/bootstrap/image/image.factor
+
+CONSTANT: special-object-count 80
+
+CONSTANT: OBJ-WALKER-HOOK 3
+
+CONSTANT: OBJ-CALLCC-1 4
+
+CONSTANT: ERROR-HANDLER-QUOT 5
+CONSTANT: OBJ-ERROR 6
+
+CONSTANT: OBJ-CELL-SIZE 7
+CONSTANT: OBJ-CPU 8
+CONSTANT: OBJ-OS 9
+
+CONSTANT: OBJ-ARGS 10
+CONSTANT: OBJ-STDIN 11
+CONSTANT: OBJ-STDOUT 12
+
+CONSTANT: OBJ-IMAGE 13
+CONSTANT: OBJ-EXECUTABLE 14
+
+CONSTANT: OBJ-EMBEDDED 15
+CONSTANT: OBJ-EVAL-CALLBACK 16
+CONSTANT: OBJ-YIELD-CALLBACK 17
+CONSTANT: OBJ-SLEEP-CALLBACK 18
+
+CONSTANT: OBJ-STARTUP-QUOT 20
+CONSTANT: OBJ-GLOBAL 21
+CONSTANT: OBJ-SHUTDOWN-QUOT 22
+
+CONSTANT: JIT-PROLOG 23
+CONSTANT: JIT-PRIMITIVE-WORD 24
+CONSTANT: JIT-PRIMITIVE 25
+CONSTANT: JIT-WORD-JUMP 26
+CONSTANT: JIT-WORD-CALL 27
+CONSTANT: JIT-IF-WORD 28
+CONSTANT: JIT-IF 29
+CONSTANT: JIT-SAFEPOINT 30
+CONSTANT: JIT-EPILOG 31
+CONSTANT: JIT-RETURN 32
+CONSTANT: JIT-PROFILING 33
+CONSTANT: JIT-PUSH-IMMEDIATE 34
+CONSTANT: JIT-DIP-WORD 35
+CONSTANT: JIT-DIP 36
+CONSTANT: JIT-2DIP-WORD 37
+CONSTANT: JIT-2DIP 38
+CONSTANT: JIT-3DIP-WORD 39
+CONSTANT: JIT-3DIP 40
+CONSTANT: JIT-EXECUTE 41
+CONSTANT: JIT-DECLARE-WORD 42
+
+CONSTANT: C-TO-FACTOR-WORD 43
+CONSTANT: LAZY-JIT-COMPILE-WORD 44
+CONSTANT: UNWIND-NATIVE-FRAMES-WORD 45
+CONSTANT: GET-FPU-STATE-WORD 46
+CONSTANT: SET-FPU-STATE-WORD 47
+CONSTANT: SIGNAL-HANDLER-WORD 48
+CONSTANT: LEAF-SIGNAL-HANDLER-WORD 49
+CONSTANT: FFI-SIGNAL-HANDLER-WORD 50
+CONSTANT: FFI-LEAF-SIGNAL-HANDLER-WORD 51
+
+CONSTANT: REDEFINITION-COUNTER 52
+
+CONSTANT: CALLBACK-STUB 53
+
+CONSTANT: PIC-LOAD 54
+CONSTANT: PIC-TAG 55
+CONSTANT: PIC-TUPLE 56
+CONSTANT: PIC-CHECK-TAG 57
+CONSTANT: PIC-CHECK-TUPLE 58
+CONSTANT: PIC-HIT 59
+CONSTANT: PIC-MISS-WORD 60
+CONSTANT: PIC-MISS-TAIL-WORD 61
+
+CONSTANT: MEGA-LOOKUP 62
+CONSTANT: MEGA-LOOKUP-WORD 63
+CONSTANT: MEGA-MISS-WORD 64
+
+CONSTANT: OBJ-UNDEFINED 65
+
+CONSTANT: OBJ-STDERR 66
+
+CONSTANT: OBJ-STAGE2 67
+
+CONSTANT: OBJ-CURRENT-THREAD 68
+
+CONSTANT: OBJ-THREADS 69
+CONSTANT: OBJ-RUN-QUEUE 70
+CONSTANT: OBJ-SLEEP-QUEUE 71
+
+CONSTANT: OBJ-VM-COMPILER 72
+
+CONSTANT: OBJ-WAITING-CALLBACKS 73
+
+CONSTANT: OBJ-SIGNAL-PIPE 74
+
+! Context object count and identifiers must be kept in sync with:
+!   vm/contexts.hpp
+
+CONSTANT: context-object-count 10
+
+CONSTANT: CONTEXT-OBJ-NAMESTACK 0
+CONSTANT: CONTEXT-OBJ-CATCHSTACK 1
+CONSTANT: CONTEXT-OBJ-CONTEXT 2
+CONSTANT: CONTEXT-OBJ-IN-CALLBACK-P 3
 
 PRIVATE>

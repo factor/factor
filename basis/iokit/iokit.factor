@@ -156,9 +156,9 @@ TUPLE: mach-error error-code error-string ;
     io-objects-from-iterator* [ release-io-object ] dip ;
     
 : properties-from-io-object ( o -- o nsdictionary )
-    dup f <void*> [
+    dup f void* <ref> [
         kCFAllocatorDefault kNilOptions
         IORegistryEntryCreateCFProperties mach-error
     ]
-    keep *void* ;
+    keep void* deref ;
 

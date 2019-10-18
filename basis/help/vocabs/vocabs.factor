@@ -12,7 +12,7 @@ FROM: vocabs.hierarchy => child-vocabs ;
 IN: help.vocabs
 
 : about ( vocab -- )
-    [ require ] [ vocab help ] bi ;
+    [ require ] [ lookup-vocab help ] bi ;
 
 : vocab-row ( vocab -- row )
     [ <$pretty-link> ] [ vocab-summary ] bi 2array ;
@@ -226,7 +226,7 @@ C: <vocab-author> vocab-author
 
 : describe-words ( vocab -- )
     {
-        { [ dup vocab ] [ words $words ] }
+        { [ dup lookup-vocab ] [ words $words ] }
         { [ dup find-vocab-root ] [ vocab-is-not-loaded ] }
         [ drop ]
     } cond ;
@@ -239,7 +239,8 @@ C: <vocab-author> vocab-author
     [
         [ vocab-tags [ "Tags:" swap \ $tags prefix 2array , ] unless-empty ]
         [ vocab-authors [ "Authors:" swap \ $authors prefix 2array , ] unless-empty ]
-        bi
+        [ vocab-platforms [ "Platforms:" swap \ $links prefix 2array , ] unless-empty ]
+        tri
     ] { } make
     [ "Meta-data" $heading $table ] unless-empty ;
 
@@ -253,8 +254,10 @@ C: <vocab-author> vocab-author
     } cleave ;
 
 : keyed-vocabs ( str quot -- seq )
-    [ all-vocabs-recursive ] 2dip
-    '[ [ _ swap @ member? ] filter no-prefixes ] assoc-map ; inline
+    [ all-vocabs-recursive ] 2dip '[
+        [ _ swap @ member? ] filter no-prefixes
+        [ name>> ] sort-with
+    ] assoc-map ; inline
 
 : tagged ( tag -- assoc )
     [ vocab-tags ] keyed-vocabs ;

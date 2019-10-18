@@ -87,6 +87,26 @@ IN: peg.ebnf.tests
 {
   T{ ebnf-sequence f
      V{ 
+       T{ ebnf-non-terminal f "one" }
+       T{ ebnf-ignore f
+          T{ ebnf-sequence f
+             V{
+                T{ ebnf-choice f
+                   V{ T{ ebnf-non-terminal f "two" } T{ ebnf-non-terminal f "three" } }
+                }
+                T{ ebnf-non-terminal f "four" }
+             }
+          }
+        }
+     }
+  } 
+} [
+  "one ((two | three) four)~" 'choice' parse
+] unit-test
+
+{
+  T{ ebnf-sequence f
+     V{ 
          T{ ebnf-non-terminal f "one" } 
          T{ ebnf-optional f T{ ebnf-non-terminal f "two" } }
          T{ ebnf-non-terminal f "three" }
@@ -304,6 +324,26 @@ main = Primary
   "abc" [EBNF a="a" "b" foo=(a "c") EBNF]
 ] unit-test
 
+{ V{ "a" "c" } } [
+  "abc" [EBNF a="a" "b"~ foo=(a "c") EBNF]
+] unit-test
+
+{ V{ V{ "a" V{ "b" "b" } } "c" } } [
+  "abbc" [EBNF a=("a" "b"*) foo=(a "c") EBNF]
+] unit-test
+
+{ V{ "a" "c" } } [
+  "abc" [EBNF a=("a" ("b")~) foo=(a "c") EBNF]
+] unit-test
+
+{ V{ "a" "c" } } [
+  "abc" [EBNF a=("a" "b"~) foo=(a "c") EBNF]
+] unit-test
+
+{ "c" } [
+  "abc" [EBNF a=("a" "b")~ foo=(a "c") EBNF]
+] unit-test
+
 { V{ V{ "a" "b" } "c" } } [
   "abc" [EBNF a="a" "b" foo={a "c"} EBNF]
 ] unit-test
@@ -358,6 +398,14 @@ main = Primary
 
 { V{ V{ V{ "a" "b" } "c" } V{ V{ "a" "b" } "c" } } } [
   "ab c ab c" [EBNF a="a" "b" foo={a "c"}* EBNF]
+] unit-test
+
+{ V{ V{ "a" "c" } V{ "a" "c" } } } [
+  "ab c ab c" [EBNF a="a" "b"~ foo={a "c"}* EBNF]
+] unit-test
+
+{ V{ } } [
+  "ab c ab c" [EBNF a="a" "b" foo=(a "c")* EBNF]
 ] unit-test
 
 { V{ } } [
@@ -471,7 +519,7 @@ SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
 MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
 Space             = " " | "\t" | "\r" | "\n" | SingleLineComment | MultiLineComment
 Spaces            = Space* => [[ ignore ]]
-Number            = Digits:ws '.' Digits:fs => [[ ws "." fs 3array concat >string string>number ast-number boa ]]
+Number            = Digits:ws '.' Digits:fs => [[ ws "." fs 3array "" concat-as string>number ast-number boa ]]
                     | Digits => [[ >string string>number ast-number boa ]]  
 Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
                      | "?"   | ":"   | "!==" | "~="  | "===" | "=="  | "="   | ">="

@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make sequences io io.files io.pathnames kernel
-assocs words vocabs definitions parser continuations hashtables
-sorting source-files arrays combinators strings system
-math.parser splitting init accessors sets ;
+USING: accessors arrays assocs continuations definitions init
+io io.files io.pathnames kernel make namespaces parser
+sequences sets splitting strings vocabs words ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -27,7 +26,6 @@ SYMBOL: add-vocab-root-hook
     [ add-vocab-root-hook get-global call( root -- ) ] bi ;
 
 SYMBOL: root-cache
-
 root-cache [ H{ } clone ] initialize
 
 ERROR: not-found-in-roots path ;
@@ -43,34 +41,34 @@ M: string vocab-path ( string -- path/f )
 PRIVATE>
 
 : vocab-dir ( vocab -- dir )
-    vocab-name { { CHAR: . CHAR: / } } substitute ;
+    vocab-name H{ { CHAR: . CHAR: / } } substitute ;
 
-: vocab-dir+ ( vocab str/f -- path )
+: append-vocab-dir ( vocab str/f -- path )
     [ vocab-name "." split ] dip
     [ [ dup last ] dip append suffix ] when*
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-name dup root-cache get at
-    [ ] [ ".factor" vocab-dir+ find-root-for ] ?if ;
+    vocab-name root-cache get [
+        dup ".private" tail? [ drop f ] [
+            ".factor" append-vocab-dir find-root-for
+        ] if
+    ] cache ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
 
 : vocab-source-path ( vocab -- path/f )
-    dup ".factor" vocab-dir+ vocab-append-path ;
+    dup ".factor" append-vocab-dir vocab-append-path ;
 
 : vocab-docs-path ( vocab -- path/f )
-    dup "-docs.factor" vocab-dir+ vocab-append-path ;
+    dup "-docs.factor" append-vocab-dir vocab-append-path ;
 
 SYMBOL: load-help?
 
 ! Defined by vocabs.metadata
 SYMBOL: check-vocab-hook
-
 check-vocab-hook [ [ drop ] ] initialize
-
-DEFER: require
 
 <PRIVATE
 
@@ -83,7 +81,7 @@ require-when-table [ V{ } clone ] initialize
 : load-conditional-requires ( vocab -- )
     vocab-name require-when-vocabs get in? [
         require-when-table get [
-            [ [ vocab dup [ source-loaded?>> +done+ = ] when ] all? ] dip
+            [ [ lookup-vocab dup [ source-loaded?>> +done+ = ] when ] all? ] dip
             [ require ] curry when
         ] assoc-each
     ] when ;
@@ -103,18 +101,15 @@ require-when-table [ V{ } clone ] initialize
     load-help? get [
         [
             +parsing+ >>docs-loaded?
-            [ vocab-docs-path [ ?run-file ] when* ] keep
+            dup vocab-docs-path [ ?run-file ] when*
             +done+ >>docs-loaded?
         ] [ ] [ f >>docs-loaded? ] cleanup
     ] when drop ;
 
 PRIVATE>
 
-: require ( vocab -- )
-    load-vocab drop ;
-
 : require-when ( if then -- )
-    over [ vocab ] all? [
+    over [ lookup-vocab ] all? [
         require drop
     ] [
         [ drop [ require-when-vocabs get adjoin ] each ]
@@ -122,7 +117,7 @@ PRIVATE>
     ] if ;
 
 : reload ( name -- )
-    dup vocab
+    dup lookup-vocab
     [ [ load-source ] [ load-docs ] bi ]
     [ require ]
     ?if ;
@@ -143,28 +138,36 @@ SYMBOL: blacklist
 : add-to-blacklist ( error vocab -- )
     vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
 
-GENERIC: (load-vocab) ( name -- vocab )
+GENERIC: (require) ( name -- )
 
-M: vocab (load-vocab)
+M: vocab (require)
     [
-        dup source-loaded?>> +parsing+ eq? [
+        dup source-loaded?>> +parsing+ eq? [ drop ] [
             dup source-loaded?>> [ dup load-source ] unless
             dup docs-loaded?>> [ dup load-docs ] unless
-        ] unless
+            drop
+        ] if
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
-M: vocab-link (load-vocab)
-    vocab-name (load-vocab) ;
+M: vocab-link (require)
+    vocab-name (require) ;
 
-M: string (load-vocab) create-vocab (load-vocab) ;
+M: string (require) create-vocab (require) ;
 
 PRIVATE>
 
 [
-    dup vocab-name blacklist get at* [ rethrow ] [
+    dup vocab-name blacklist get at*
+    [ rethrow ]
+    [
         drop dup find-vocab-root
-        [ (load-vocab) ] [ dup vocab [ ] [ no-vocab ] ?if ] if
+        [ (require) ]
+        [ dup lookup-vocab [ drop ] [ no-vocab ] if ]
+        if
     ] if
-] load-vocab-hook set-global
+] require-hook set-global
 
 M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;
+
+! put here to avoid circularity between vocabs.loader and source-files.errors
+{ "source-files.errors" "debugger" } "source-files.errors.debugger" require-when

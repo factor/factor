@@ -20,7 +20,7 @@ TUPLE: boilerplate < filter-responder template init ;
 : wrap-boilerplate? ( response -- ? )
     { [ code>> 200 = ] [ content-type>> "text/html" = ] } 1&& ;
 
-M:: boilerplate call-responder* ( path responder -- )
+M:: boilerplate call-responder* ( path responder -- response )
     begin-form
     path responder call-next-method
     responder init>> call( -- )

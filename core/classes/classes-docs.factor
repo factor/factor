@@ -5,7 +5,7 @@ classes.predicate quotations ;
 IN: classes
 
 ARTICLE: "class-predicates" "Class predicate words"
-"With a handful of exceptions, each class has a membership predicate word, named " { $snippet { $emphasis "class" } "?" } " . A quotation calling this predicate is stored in the " { $snippet "\"predicate\"" } " word property."
+"With a handful of exceptions, each class has a membership predicate word, named " { $snippet { $emphasis "class" } "?" } ". A quotation calling this predicate is stored in the " { $snippet "\"predicate\"" } " word property."
 $nl
 "When it comes to predicates, the exceptional classes are:"
 { $table
@@ -19,7 +19,9 @@ $nl
     predicate
     predicate?
 }
-"A predicate word holds a reference to the class it is predicating over in the " { $snippet "\"predicating\"" } " word property." ;
+"A predicate word holds a reference to the class it is predicating over in the " { $snippet "\"predicating\"" } " word property." $nl
+"Implementation of class reloading:"
+{ $subsections reset-class forget-class forget-methods } ;
 
 ARTICLE: "classes" "Classes"
 "Conceptually, a " { $snippet "class" } " is a set of objects whose members can be identified with a predicate, and on which generic words can specialize methods. Classes are organized into a general partial order, and an object may be an instance of more than one class."
@@ -31,7 +33,7 @@ $nl
 "Classes themselves form a class:"
 { $subsections class? }
 "You can ask an object for its class:"
-{ $subsections class }
+{ $subsections class-of }
 "Testing if an object is an instance of a class:"
 { $subsections instance? }
 "You can ask a class for its superclass:"
@@ -69,11 +71,11 @@ $nl
 
 ABOUT: "classes"
 
-HELP: class
+HELP: class-of
 { $values { "object" object } { "class" class } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
 { $class-description "The class of all class words." }
-{ $examples { $example "USING: classes prettyprint ;" "1.0 class ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
+{ $examples { $example "USING: classes prettyprint ;" "1.0 class-of ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class-of ." "point" } } ;
 
 HELP: classes
 { $values { "seq" "a sequence of class words" } }
@@ -94,7 +96,7 @@ $low-level-note ;
 HELP: superclass
 { $values { "class" class } { "super" class } }
 { $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." }
-{ $examples 
+{ $examples
     { $example "USING: classes prettyprint ;"
                "t superclass ."
                "word"
@@ -106,7 +108,7 @@ HELP: superclasses
      { "class" class }
      { "supers" sequence } }
 { $description "Outputs a sequence of superclasses of a class along with the class itself." }
-{ $examples 
+{ $examples
     { $example "USING: classes prettyprint ;"
                "t superclasses ."
                "{ word t }"
@@ -120,7 +122,7 @@ HELP: subclass-of?
     { "?" boolean }
 }
 { $description "Outputs a boolean value indicating whether " { $snippet "class" } " is at any level a subclass of " { $snippet "superclass" } "." }
-{ $examples 
+{ $examples
     { $example "USING: classes classes.tuple prettyprint words ;"
                "tuple-class \\ class subclass-of? ."
                "t"
@@ -151,3 +153,16 @@ HELP: instance?
      { "object" object } { "class" class }
      { "?" "a boolean" } }
 { $description "Tests whether the input object is a member of the class." } ;
+
+HELP: reset-class
+{ $values { "class" class } }
+{ $description "Forgets all of words that the class defines, but not words that are defined on the class. For instance, on a tuple class, this word should reset all of the tuple accessors but not things like " { $link nth } " that may be defined on the class elsewhere." } ;
+
+HELP: forget-class
+{ $values { "class" class } }
+{ $description "Removes a class by forgetting all of the methods defined on that class and all of the methods generated when that class was defined. Also resets any caches that may contain that class." } ;
+
+HELP: forget-methods
+{ $values { "class" class } }
+{ $description "Forgets all methods defined on a class. In contrast to " { $link reset-class } ", this not only forgets accessors but also any methods at all on the class." } ;
+

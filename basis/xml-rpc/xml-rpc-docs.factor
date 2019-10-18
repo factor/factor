@@ -7,7 +7,7 @@ HELP: send-rpc
 { $see-also receive-rpc } ;
 
 HELP: receive-rpc
-{ $values  { "xml" "an XML document" } { "rpc" "an RPC data type" } }
+{ $values { "xml" "an XML document" } { "rpc" "an RPC data type" } }
 { $description "parses an XML document into an RPC data type, for further local processing" }
 { $see-also send-rpc } ;
 
@@ -22,7 +22,7 @@ HELP: base64
 
 HELP: <rpc-method>
 { $values { "name" "a string" } { "params" "a sequence" } { "rpc-method" rpc-method } }
-{ $description "creates a tuple reprsenting a method call which can be translated using send-rpc into an XML-RPC document" }
+{ $description "creates a tuple representing a method call which can be translated using send-rpc into an XML-RPC document" }
 { $see-also rpc-method <rpc-response> <rpc-fault> } ;
 
 HELP: rpc-method
@@ -35,7 +35,7 @@ HELP: <rpc-response>
 { $see-also rpc-response <rpc-method> <rpc-fault> } ;
 
 HELP: rpc-response
-{ $class-description "represents an XML-RPC method response, with a number of paramters holding data. Contains one field, params, a sequence" }
+{ $class-description "represents an XML-RPC method response, with a number of parameters holding data. Contains one field, params, a sequence" }
 { $see-also <rpc-response> rpc-method rpc-fault } ;
 
 HELP: <rpc-fault>

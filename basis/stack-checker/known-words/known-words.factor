@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2010 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2004, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors alien alien.accessors alien.private arrays
 byte-arrays classes continuations.private effects generic
@@ -10,11 +10,11 @@ quotations.private sbufs sbufs.private sequences
 sequences.private slots.private strings strings.private system
 threads.private classes.tuple classes.tuple.private vectors
 vectors.private words words.private definitions assocs summary
-compiler.units system.private combinators
+compiler.units system.private combinators tools.memory.private
 combinators.short-circuit locals locals.backend locals.types
 combinators.private stack-checker.values generic.single
 generic.single.private alien.libraries tools.dispatch.private
-tools.profiler.private macros
+macros tools.profiler.sampling.private classes.algebra
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -25,6 +25,7 @@ stack-checker.transforms
 stack-checker.dependencies
 stack-checker.recursive-state
 stack-checker.row-polymorphism ;
+QUALIFIED-WITH: generic.single.private gsp
 IN: stack-checker.known-words
 
 : infer-special ( word -- )
@@ -39,14 +40,15 @@ IN: stack-checker.known-words
 : infer-shuffle-word ( word -- )
     "shuffle" word-prop infer-shuffle ;
 
+! This is a hack for combinators combinators.short-circuit.smart.
 : infer-local-reader ( word -- )
-    (( -- value )) apply-word/effect ;
+    ( -- value ) apply-word/effect ;
 
 : infer-local-writer ( word -- )
-    (( value -- )) apply-word/effect ;
+    ( value -- ) apply-word/effect ;
 
 : non-inline-word ( word -- )
-    dup depends-on-effect
+    dup add-depends-on-effect
     {
         { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
         { [ dup "special" word-prop ] [ infer-special ] }
@@ -60,25 +62,25 @@ IN: stack-checker.known-words
     } cond ;
 
 {
-    { drop  (( x     --             )) }
-    { 2drop (( x y   --             )) }
-    { 3drop (( x y z --             )) }
-    { dup   (( x     -- x x         )) }
-    { 2dup  (( x y   -- x y x y     )) }
-    { 3dup  (( x y z -- x y z x y z )) }
-    { rot   (( x y z -- y z x       )) }
-    { -rot  (( x y z -- z x y       )) }
-    { dupd  (( x y   -- x x y       )) }
-    { swapd (( x y z -- y x z       )) }
-    { nip   (( x y   -- y           )) }
-    { 2nip  (( x y z -- z           )) }
-    { over  (( x y   -- x y x       )) }
-    { pick  (( x y z -- x y z x     )) }
-    { swap  (( x y   -- y x         )) }
+    { drop  ( x     --             ) }
+    { 2drop ( x y   --             ) }
+    { 3drop ( x y z --             ) }
+    { dup   ( x     -- x x         ) }
+    { 2dup  ( x y   -- x y x y     ) }
+    { 3dup  ( x y z -- x y z x y z ) }
+    { rot   ( x y z -- y z x       ) }
+    { -rot  ( x y z -- z x y       ) }
+    { dupd  ( x y   -- x x y       ) }
+    { swapd ( x y z -- y x z       ) }
+    { nip   ( x y   -- y           ) }
+    { 2nip  ( x y z -- z           ) }
+    { over  ( x y   -- x y x       ) }
+    { pick  ( x y z -- x y z x     ) }
+    { swap  ( x y   -- y x         ) }
 } [ "shuffle" set-word-prop ] assoc-each
 
 : check-declaration ( declaration -- declaration )
-    dup { [ array? ] [ [ class? ] all? ] } 1&&
+    dup { [ array? ] [ [ classoid? ] all? ] } 1&&
     [ bad-declaration-error ] unless ;
 
 : infer-declare ( -- )
@@ -88,6 +90,7 @@ IN: stack-checker.known-words
 
 \ declare [ infer-declare ] "special" set-word-prop
 
+! Call
 GENERIC: infer-call* ( value known -- )
 
 : (infer-call) ( value -- ) dup known infer-call* ;
@@ -282,6 +285,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ (code-blocks) { } { array } define-primitive \ (code-blocks)  make-flushable
 \ (dlopen) { byte-array } { dll } define-primitive
 \ (dlsym) { byte-array object } { c-ptr } define-primitive
+\ (dlsym-raw) { byte-array object } { c-ptr } define-primitive
 \ (exists?) { string } { object } define-primitive
 \ (exit) { integer } { } define-primitive
 \ (format-float) { float byte-array } { byte-array } define-primitive \ (format-float) make-foldable
@@ -329,6 +333,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ bignum-bitxor { bignum bignum } { bignum } define-primitive \ bignum-bitxor make-foldable
 \ bignum-log2 { bignum } { bignum } define-primitive \ bignum-log2 make-foldable
 \ bignum-mod { bignum bignum } { bignum } define-primitive \ bignum-mod make-foldable
+\ bignum-gcd { bignum bignum } { bignum } define-primitive \ bignum-gcd make-foldable
 \ bignum-shift { bignum fixnum } { bignum } define-primitive \ bignum-shift make-foldable
 \ bignum/i { bignum bignum } { bignum } define-primitive \ bignum/i make-foldable
 \ bignum/mod { bignum bignum } { bignum bignum } define-primitive \ bignum/mod make-foldable
@@ -338,23 +343,21 @@ M: object infer-call* \ call bad-macro-input ;
 \ bignum> { bignum bignum } { object } define-primitive \ bignum> make-foldable
 \ bignum>= { bignum bignum } { object } define-primitive \ bignum>= make-foldable
 \ bignum>fixnum { bignum } { fixnum } define-primitive \ bignum>fixnum make-foldable
-\ bignum>float { bignum } { float } define-primitive \ bignum>float make-foldable
 \ bits>double { integer } { float } define-primitive \ bits>double make-foldable
 \ bits>float { integer } { float } define-primitive \ bits>float make-foldable
 \ both-fixnums? { object object } { object } define-primitive
-\ byte-array>bignum { byte-array } { bignum } define-primitive \ byte-array>bignum make-foldable
 \ callstack { } { callstack } define-primitive \ callstack make-flushable
 \ callstack-bounds { } { alien alien } define-primitive \ callstack-bounds make-flushable
 \ callstack-for { c-ptr } { callstack } define-primitive \ callstack make-flushable
 \ callstack>array { callstack } { array } define-primitive \ callstack>array make-flushable
 \ check-datastack { array integer integer } { object } define-primitive \ check-datastack make-flushable
-\ code-room { } { byte-array } define-primitive \ code-room  make-flushable
+\ (code-room) { } { byte-array } define-primitive \ (code-room)  make-flushable
 \ compact-gc { } { } define-primitive
 \ compute-identity-hashcode { object } { } define-primitive
 \ context-object { fixnum } { object } define-primitive \ context-object make-flushable
 \ context-object-for { fixnum c-ptr } { object } define-primitive \ context-object-for make-flushable
 \ current-callback { } { fixnum } define-primitive \ current-callback make-flushable
-\ data-room { } { byte-array } define-primitive \ data-room make-flushable
+\ (data-room) { } { byte-array } define-primitive \ (data-room) make-flushable
 \ datastack { } { array } define-primitive \ datastack make-flushable
 \ datastack-for { c-ptr } { array } define-primitive \ datastack-for make-flushable
 \ die { } { } define-primitive
@@ -366,6 +369,8 @@ M: object infer-call* \ call bad-macro-input ;
 \ enable-gc-events { } { } define-primitive
 \ eq? { object object } { object } define-primitive \ eq? make-foldable
 \ fclose { alien } { } define-primitive
+\ ffi-signal-handler { } { } define-primitive
+\ ffi-leaf-signal-handler { } { } define-primitive
 \ fflush { alien } { } define-primitive
 \ fgetc { alien } { object } define-primitive
 \ fixnum* { fixnum fixnum } { integer } define-primitive \ fixnum* make-foldable
@@ -409,7 +414,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ float>fixnum { float } { fixnum } define-primitive \ bignum>fixnum make-foldable
 \ fpu-state { } { } define-primitive
 \ fputc { object alien } { } define-primitive
-\ fread { integer alien } { object } define-primitive
+\ fread-unsafe { integer c-ptr alien } { integer } define-primitive
 \ fseek { integer integer alien } { } define-primitive
 \ ftell { alien } { integer } define-primitive
 \ fwrite { c-ptr integer alien } { } define-primitive
@@ -417,12 +422,15 @@ M: object infer-call* \ call bad-macro-input ;
 \ innermost-frame-executing { callstack } { object } define-primitive
 \ innermost-frame-scan { callstack } { fixnum } define-primitive
 \ jit-compile { quotation } { } define-primitive
-\ lookup-method { object array } { word } define-primitive
+\ leaf-signal-handler { } { } define-primitive
+\ gsp:lookup-method { object array } { word } define-primitive
 \ minor-gc { } { } define-primitive
 \ modify-code-heap { array object object } { } define-primitive
 \ nano-count { } { integer } define-primitive \ nano-count make-flushable
 \ optimized? { word } { object } define-primitive
 \ profiling { object } { } define-primitive
+\ (get-samples) { } { object } define-primitive
+\ (clear-samples) { } { } define-primitive
 \ quot-compiled? { quotation } { object } define-primitive
 \ quotation-code { quotation } { integer integer } define-primitive \ quotation-code make-flushable
 \ reset-dispatch-stats { } { } define-primitive
@@ -450,6 +458,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ set-slot { object object fixnum } { } define-primitive
 \ set-special-object { object fixnum } { } define-primitive
 \ set-string-nth-fast { fixnum fixnum string } { } define-primitive
+\ signal-handler { } { } define-primitive
 \ size { object } { fixnum } define-primitive \ size make-flushable
 \ slot { object fixnum } { object } define-primitive \ slot make-flushable
 \ special-object { fixnum } { object } define-primitive \ special-object make-flushable

@@ -1,0 +1,6 @@
+Moved to unmaintained by Joe Groff October 13, 2011
+
+The input stream protocol was changed; streams should now provide methods for
+stream-read-unsafe and stream-read-partial-unsafe, which read into a caller-
+provided buffer. This module has no tests so I didn't want to break it in the
+process of updating it.

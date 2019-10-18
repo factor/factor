@@ -5,7 +5,7 @@ alien.libraries ;
 IN: compression.zlib.ffi
 
 << "zlib" {
-    { [ os winnt? ] [ "zlib1.dll" ] }
+    { [ os windows? ] [ "zlib1.dll" ] }
     { [ os macosx? ] [ "libz.dylib" ] }
     { [ os unix? ] [ "libz.so" ] }
 } cond cdecl add-library >>

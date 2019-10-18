@@ -15,7 +15,7 @@ PREDICATE: change-tracking-tuple-class < tuple-class
 
 <PRIVATE
 
-M: change-tracking-tuple-class writer-quot ( class slot-spec -- )
+M: change-tracking-tuple-class writer-quot ( class slot-spec -- quot )
     [ call-next-method ]
     [ name>> "changed?" = [ '[ _ [ t >>changed? drop ] bi ] ] unless ] bi ;
 

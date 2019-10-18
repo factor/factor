@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs effects fry generalizations
-grouping kernel lexer macros math math.order math.vectors
-namespaces parser effects.parser quotations sequences
-sequences.private splitting.monotonic stack-checker strings
-unicode.case words ;
+USING: accessors arrays assocs combinators.smart effects
+effects.parser fry generalizations grouping kernel lexer macros
+math math.order math.vectors namespaces parser quotations
+sequences sequences.private splitting.monotonic stack-checker
+strings unicode.case words ;
 IN: roman
 
 <PRIVATE
@@ -59,7 +59,7 @@ PRIVATE>
 SYNTAX: ROMAN-OP:
     scan-word [ name>> "roman" prepend create-in ] keep
     1quotation '[ _ binary-roman-op ]
-    complete-effect define-declared ;
+    scan-effect define-declared ;
 
 >>
 
@@ -69,4 +69,4 @@ ROMAN-OP: * ( x y -- z )
 ROMAN-OP: /i ( x y -- z )
 ROMAN-OP: /mod ( x y -- z w )
 
-SYNTAX: ROMAN: scan roman> suffix! ;
+SYNTAX: ROMAN: scan-token roman> suffix! ;

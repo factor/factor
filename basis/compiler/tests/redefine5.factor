@@ -23,6 +23,6 @@ IN: compiler.tests.redefine5
 ] unit-test
 
 [ 0 ] [
-    "my-tuple" "compiler.tests.redefine5" lookup boa
-    "my-inline" "compiler.tests.redefine5" lookup execute
+    "my-tuple" "compiler.tests.redefine5" lookup-word boa
+    "my-inline" "compiler.tests.redefine5" lookup-word execute
 ] unit-test

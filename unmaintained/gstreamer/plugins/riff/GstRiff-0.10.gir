@@ -1,0 +1,834 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="GstAudio" version="0.10"/>
+  <include name="GstBase" version="0.10"/>
+  <include name="GstInterfaces" version="0.10"/>
+  <include name="GstTag" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-riff-0.10"/>
+  <c:include name="gst/riff/riff-ids.h"/>
+  <c:include name="gst/riff/riff-media.h"/>
+  <c:include name="gst/riff/riff-read.h"/>
+  <namespace name="GstRiff"
+             version="0.10"
+             shared-library="libgstriff-0.10.so.0"
+             c:identifier-prefixes="Gst"
+             c:symbol-prefixes="gst">
+    <constant name="RIFF_IBM_FORMAT_ADPCM" value="259">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_IBM_FORMAT_ALAW" value="258">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_IBM_FORMAT_MULAW" value="257">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_IF_KEYFRAME" value="16">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_IF_LIST" value="1">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_IF_NO_TIME" value="256">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_STRH_DISABLED" value="1">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_STRH_VIDEOPALCHANGES" value="65536">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_A52" value="8192">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_AAC" value="255">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_AAC_AC" value="16707">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_AAC_pm" value="28781">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ADPCM" value="2">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ADPCM_IMA_DK3" value="98">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ADPCM_IMA_DK4" value="97">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ADPCM_IMA_WAV" value="105">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ALAW" value="6">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_AMR_NB" value="87">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_AMR_WB" value="88">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_APTX" value="37">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_AUDIOFILE_AF10" value="38">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_AUDIOFILE_AF36" value="36">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_BTV_DIGITAL" value="1024">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CANOPUS_ATRAC" value="99">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CIRRUS" value="96">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CONTROL_RES_CR10" value="55">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CONTROL_RES_VQLPC" value="52">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CREATIVE_ADPCM" value="512">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CREATIVE_FASTSPEECH10" value="515">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CREATIVE_FASTSPEECH8" value="514">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CS2" value="608">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CS_IMAADPCM" value="57">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_CU_CODEC" value="25">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DF_G726" value="133">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DF_GSM610" value="134">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DIALOGIC_OKI_ADPCM" value="23">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DIGIADPCM" value="54">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DIGIFIX" value="22">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DIGIREAL" value="53">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DIGISTD" value="21">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DIGITAL_G723" value="291">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DOLBY_AC2" value="48">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DOLBY_AC3_SPDIF" value="146">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DSAT_DISPLAY" value="103">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DSP_TRUESPEECH" value="34">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DTS" value="8193">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_DVI_ADPCM" value="17">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ECHOSC1" value="35">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ECHOSC3" value="58">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ESPCM" value="97">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_EXTENSIBLE" value="65534">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_FLAC" value="61868">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_FM_TOWNS_SND" value="768">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_G722_ADPCM" value="101">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_G723_ADPCM" value="20">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_G726ADPCM" value="320">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_G726_ADPCM" value="100">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_G728_CELP" value="65">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_G729A" value="131">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_GSM610" value="49">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_GSM_AMR_CBR" value="31265">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_GSM_AMR_VBR" value="31266">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_IBM_CVSD" value="5">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_IEEE_FLOAT" value="3">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ILINK_VC" value="560">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_IMC" value="1025">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_IPI_HSX" value="592">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_IPI_RPELP" value="593">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ISIAUDIO" value="136">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ITU_G721_ADPCM" value="64">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_LH_CODEC" value="4352">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_LRC" value="40">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_LUCENT_G723" value="89">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MALDEN_PHONYTALK" value="160">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MEDIASONIC_G723" value="147">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MEDIASPACE_ADPCM" value="18">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MEDIAVISION_ADPCM" value="24">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MPEGL12" value="80">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MPEGL3" value="85">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MSG723" value="66">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MSN" value="50">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MSRT24" value="130">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MULAW" value="7">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_MVI_MVI2" value="132">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_NMS_VBXADPCM" value="56">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_NORRIS" value="5120">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_OKI_ADPCM" value="16">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_OLIADPCM" value="4097">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_OLICELP" value="4098">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_OLIGSM" value="4096">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_OLIOPR" value="4100">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_OLISBC" value="4099">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ONLIVE" value="137">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_PAC" value="83">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_PACKED" value="153">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_PCM" value="1">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_PHILIPS_LPCBB" value="152">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_PROSODY_1612" value="39">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_PROSODY_8KBPS" value="148">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_QDESIGN_MUSIC" value="1104">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_QUALCOMM_HALFRATE" value="337">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_QUALCOMM_PUREVOICE" value="336">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_QUARTERDECK" value="544">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_RAW_SPORT" value="576">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_RHETOREX_ADPCM" value="256">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ROCKWELL_ADPCM" value="59">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ROCKWELL_DIGITALK" value="60">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_RT24" value="82">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SANYO_LD_ADPCM" value="293">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SBC24" value="145">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SIERRA_ADPCM" value="19">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SIPROLAB_ACELP4800" value="305">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SIPROLAB_ACELP8V3" value="306">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SIPROLAB_ACEPLNET" value="304">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SIPROLAB_G729" value="307">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SIPROLAB_G729A" value="308">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SIPROLAB_KELVIN" value="309">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SIREN" value="654">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SOFTSOUND" value="128">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SONARC" value="33">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SONIC" value="8264">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SONIC_LS" value="8264">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SONY_ATRAC3" value="624">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_SOUNDSPACE_MUSICOMPRESS" value="5376">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_TPC" value="1665">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_TUBGSM" value="341">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_UHER_ADPCM" value="528">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_UNKNOWN" value="0">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VIVO_G723" value="273">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VIVO_SIREN" value="274">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VME_VMPCM" value="1664">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VORBIS1" value="26447">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VORBIS1PLUS" value="26479">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VORBIS2" value="26448">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VORBIS2PLUS" value="26480">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VORBIS3" value="26449">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VORBIS3PLUS" value="26481">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE" value="98">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_AC10" value="113">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_AC16" value="114">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_AC20" value="115">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_AC8" value="112">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_BYTE_ALIGNED" value="105">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_METASOUND" value="117">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_METAVOICE" value="116">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_RT29HW" value="118">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_TQ40" value="121">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_TQ60" value="129">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_VR12" value="119">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VOXWARE_VR18" value="120">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_VSELP" value="4">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_WMAV1" value="352">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_WMAV2" value="353">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_WMAV3" value="354">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_WMAV3_L" value="355">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_WMS" value="10">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_XEBEC" value="61">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_YAMAHA_ADPCM" value="32">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="RIFF_WAVE_FORMAT_ZYXEL_ADPCM" value="151">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <function name="riff_create_audio_caps"
+              c:identifier="gst_riff_create_audio_caps"
+              introspectable="0">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Caps" c:type="GstCaps*"/>
+      </return-value>
+      <parameters>
+        <parameter name="codec_id" transfer-ownership="none">
+          <type name="guint16" c:type="guint16"/>
+        </parameter>
+        <parameter name="strh" transfer-ownership="none">
+          <type c:type="gst_riff_strh*"/>
+        </parameter>
+        <parameter name="strf" transfer-ownership="none">
+          <type c:type="gst_riff_strf_auds*"/>
+        </parameter>
+        <parameter name="strf_data" transfer-ownership="none">
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="strd_data" transfer-ownership="none">
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="codec_name" transfer-ownership="none">
+          <type name="utf8" c:type="char**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_create_audio_template_caps"
+              c:identifier="gst_riff_create_audio_template_caps">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Caps" c:type="GstCaps*"/>
+      </return-value>
+    </function>
+    <function name="riff_create_iavs_caps"
+              c:identifier="gst_riff_create_iavs_caps"
+              introspectable="0">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Caps" c:type="GstCaps*"/>
+      </return-value>
+      <parameters>
+        <parameter name="codec_fcc" transfer-ownership="none">
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+        <parameter name="strh" transfer-ownership="none">
+          <type c:type="gst_riff_strh*"/>
+        </parameter>
+        <parameter name="strf" transfer-ownership="none">
+          <type c:type="gst_riff_strf_iavs*"/>
+        </parameter>
+        <parameter name="strf_data" transfer-ownership="none">
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="strd_data" transfer-ownership="none">
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="codec_name" transfer-ownership="none">
+          <type name="utf8" c:type="char**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_create_iavs_template_caps"
+              c:identifier="gst_riff_create_iavs_template_caps">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Caps" c:type="GstCaps*"/>
+      </return-value>
+    </function>
+    <function name="riff_create_video_caps"
+              c:identifier="gst_riff_create_video_caps"
+              introspectable="0">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Caps" c:type="GstCaps*"/>
+      </return-value>
+      <parameters>
+        <parameter name="codec_fcc" transfer-ownership="none">
+          <doc xml:whitespace="preserve">fourCC codec for this codec.</doc>
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+        <parameter name="strh" transfer-ownership="none">
+          <doc xml:whitespace="preserve">pointer to the strh stream header structure.</doc>
+          <type c:type="gst_riff_strh*"/>
+        </parameter>
+        <parameter name="strf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">pointer to the strf stream header structure, including any data that is within the range of strf.size, but excluding any additional data withint this chunk but outside strf.size.</doc>
+          <type c:type="gst_riff_strf_vids*"/>
+        </parameter>
+        <parameter name="strf_data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstBuffer containing the additional data in the strf chunk outside reach of strf.size. Ususally a palette.</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="strd_data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GstBuffer containing the data in the strd stream header chunk. Usually codec initialization data.</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="codec_name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">if given, will be filled with a human-readable codec name.</doc>
+          <type name="utf8" c:type="char**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_create_video_template_caps"
+              c:identifier="gst_riff_create_video_template_caps">
+      <return-value transfer-ownership="full">
+        <type name="Gst.Caps" c:type="GstCaps*"/>
+      </return-value>
+    </function>
+    <function name="riff_init" c:identifier="gst_riff_init">
+      <doc xml:whitespace="preserve">Initialize riff library.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </function>
+    <function name="riff_parse_chunk" c:identifier="gst_riff_parse_chunk">
+      <doc xml:whitespace="preserve">Reads a single chunk.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">FALSE on error, TRUE otherwise</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">caller element (used for debugging).</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="buf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">input buffer.</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="offset" transfer-ownership="none">
+          <doc xml:whitespace="preserve">offset in the buffer in the caller. Is incremented by the read size by this function.</doc>
+          <type name="guint" c:type="guint*"/>
+        </parameter>
+        <parameter name="fourcc" transfer-ownership="none">
+          <doc xml:whitespace="preserve">fourcc (returned by this function0 of the chunk.</doc>
+          <type name="guint32" c:type="guint32*"/>
+        </parameter>
+        <parameter name="chunk_data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">buffer (returned by the function) containing the chunk data, which may be NULL if chunksize == 0</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_parse_file_header"
+              c:identifier="gst_riff_parse_file_header">
+      <doc xml:whitespace="preserve">Reads the first few bytes from the provided buffer, checks
+if this stream is a RIFF stream, and determines document type.
+This function takes ownership of @buf so it should not be used anymore
+after calling this function.
+caller should error out; we already throw an error), or TRUE
+if it is.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">FALSE if this is not a RIFF stream (in which case the</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">caller element (used for debugging/error).</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="buf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">input buffer from which the file header will be parsed, should be at least 12 bytes long.</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="doctype" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a fourcc (returned by this function) to indicate the type of document (according to the header).</doc>
+          <type name="guint32" c:type="guint32*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_parse_info" c:identifier="gst_riff_parse_info">
+      <doc xml:whitespace="preserve">Parses stream metadata from input data.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">caller element (used for debugging/error).</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="buf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">input data to be used for parsing, stripped from header.</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="taglist" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to a taglist (returned by this function) containing information about this stream. May be NULL if no supported tags were found.</doc>
+          <type name="Gst.TagList" c:type="GstTagList**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_parse_strf_auds"
+              c:identifier="gst_riff_parse_strf_auds"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Parses an audio stream´s strf structure plus optionally some
+extradata from input data. This function takes ownership of @buf.
+use.
+should be skipped on error, but it is not fatal.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if parsing succeeded, otherwise FALSE. The stream</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">caller element (used for debugging/error).</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="buf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">input data to be used for parsing, stripped from header.</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="strf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer (returned by this function) to a filled-in strf/auds structure. Caller should free it.</doc>
+          <type c:type="gst_riff_strf_auds**"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer (returned by this function) to a buffer containing extradata for this particular stream (e.g. codec initialization data).</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_parse_strf_iavs"
+              c:identifier="gst_riff_parse_strf_iavs"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Parses a interleaved (also known as "complex")  stream´s strf
+structure plus optionally some extradata from input data. This 
+function takes ownership of @buf.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if parsing succeeded, otherwise FALSE.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">caller element (used for debugging/error).</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="buf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">input data to be used for parsing, stripped from header.</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="strf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer (returned by this function) to a filled-in strf/iavs structure. Caller should free it.</doc>
+          <type c:type="gst_riff_strf_iavs**"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer (returned by this function) to a buffer containing extradata for this particular stream (e.g. codec initialization data).</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_parse_strf_vids"
+              c:identifier="gst_riff_parse_strf_vids"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Parses a video stream´s strf structure plus optionally some
+extradata from input data. This function takes ownership of @buf.
+should be skipped on error, but it is not fatal.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if parsing succeeded, otherwise FALSE. The stream</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">caller element (used for debugging/error).</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="buf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">input data to be used for parsing, stripped from header.</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="strf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer (returned by this function) to a filled-in strf/vids structure. Caller should free it.</doc>
+          <type c:type="gst_riff_strf_vids**"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer (returned by this function) to a buffer containing extradata for this particular stream (e.g. palette, codec initialization data).</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_parse_strh"
+              c:identifier="gst_riff_parse_strh"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Parses a strh structure from input data. Takes ownership of @buf.
+should be skipped on error, but it is not fatal.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if parsing succeeded, otherwise FALSE. The stream</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">caller element (used for debugging/error).</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="buf" transfer-ownership="none">
+          <doc xml:whitespace="preserve">input data to be used for parsing, stripped from header.</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer*"/>
+        </parameter>
+        <parameter name="strh" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer (returned by this function) to a filled-in strh structure. Caller should free it.</doc>
+          <type c:type="gst_riff_strh**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="riff_read_chunk" c:identifier="gst_riff_read_chunk">
+      <doc xml:whitespace="preserve">Reads a single chunk of data. Since 0.10.8 'JUNK' chunks
+are skipped automatically.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">flow status.</doc>
+        <type name="Gst.FlowReturn" c:type="GstFlowReturn"/>
+      </return-value>
+      <parameters>
+        <parameter name="element" transfer-ownership="none">
+          <doc xml:whitespace="preserve">caller element (used for debugging).</doc>
+          <type name="Gst.Element" c:type="GstElement*"/>
+        </parameter>
+        <parameter name="pad" transfer-ownership="none">
+          <doc xml:whitespace="preserve">pad to pull data from.</doc>
+          <type name="Gst.Pad" c:type="GstPad*"/>
+        </parameter>
+        <parameter name="offset" transfer-ownership="none">
+          <doc xml:whitespace="preserve">offset to pull from, incremented by this function.</doc>
+          <type name="guint64" c:type="guint64*"/>
+        </parameter>
+        <parameter name="tag" transfer-ownership="none">
+          <doc xml:whitespace="preserve">fourcc of the chunk (returned by this function).</doc>
+          <type name="guint32" c:type="guint32*"/>
+        </parameter>
+        <parameter name="chunk_data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">buffer (returned by this function).</doc>
+          <type name="Gst.Buffer" c:type="GstBuffer**"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>

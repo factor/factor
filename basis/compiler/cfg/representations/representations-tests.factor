@@ -6,6 +6,7 @@ math compiler.constants compiler.cfg.representations.conversion
 compiler.cfg.representations.rewrite
 compiler.cfg.comparisons
 make ;
+FROM: alien.c-types => char ;
 IN: compiler.cfg.representations
 
 [ { double-rep double-rep } ] [
@@ -27,7 +28,7 @@ IN: compiler.cfg.representations
 
 H{ } clone representations set
 
-3 \ vreg-counter set-global
+3 vreg-counter set-global
 
 [
     {
@@ -196,7 +197,7 @@ V{
 3 { 3 4 } edges
 2 4 edge
 
-3 \ vreg-counter set-global
+3 vreg-counter set-global
 
 [ ] [ test-representations ] unit-test
 
@@ -395,7 +396,7 @@ cpu x86.32? [
 
 ! Don't convert the def site into anything but tagged-rep since
 ! we might lose precision
-5 \ vreg-counter set-global
+5 vreg-counter set-global
 
 [ f ] [
     V{
@@ -425,7 +426,7 @@ cpu x86.32? [
 ] unit-test
 
 ! Peephole optimization if input to ##shl-imm is tagged
-3 \ vreg-counter set-global
+3 vreg-counter set-global
 
 [
     V{
@@ -444,7 +445,7 @@ cpu x86.32? [
     } test-peephole
 ] unit-test
 
-3 \ vreg-counter set-global
+3 vreg-counter set-global
 
 [
     V{
@@ -496,7 +497,7 @@ cpu x86.32? [
 ] unit-test
 
 ! Peephole optimization if both input and output of ##shl-imm
-! needs to be tagged
+! need to be tagged
 [
     V{
         T{ ##peek f 0 D 0 }
@@ -511,7 +512,26 @@ cpu x86.32? [
     } test-peephole
 ] unit-test
 
-6 \ vreg-counter set-global
+! Peephole optimization if neither input nor output of ##shl-imm need to be tagged
+[
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##shl-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 2 3 4 0 0 int-rep char }
+    }
+] [
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##shl-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 2 3 4 0 0 int-rep char }
+    } test-peephole
+] unit-test
+
+6 vreg-counter set-global
 
 ! Peephole optimization if input to ##sar-imm is tagged
 [
@@ -526,6 +546,110 @@ cpu x86.32? [
         T{ ##peek f 1 D 0 }
         T{ ##sar-imm f 2 1 3 }
         T{ ##replace f 2 D 0 }
+    } test-peephole
+] unit-test
+
+6 vreg-counter set-global
+
+! (Lack of) peephole optimization if output of ##sar-imm needs to be tagged
+[
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##sar-imm f 7 1 3 }
+        T{ ##shl-imm f 2 7 $[ tag-bits get ] }
+        T{ ##replace f 2 D 0 }
+    }
+] [
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##replace f 2 D 0 }
+    } test-peephole
+] unit-test
+
+! Peephole optimization if input of ##sar-imm is tagged but output is untagged
+! need to be tagged
+[
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##sar-imm f 1 0 $[ 3 tag-bits get + ] }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 1 3 4 0 0 int-rep char }
+    }
+] [
+    V{
+        T{ ##peek f 0 D 0 }
+        T{ ##sar-imm f 1 0 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 1 3 4 0 0 int-rep char }
+    } test-peephole
+] unit-test
+
+! Peephole optimization if neither input nor output of ##sar-imm need to be tagged
+[
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 2 3 4 0 0 int-rep char }
+    }
+] [
+    V{
+        T{ ##load-integer f 1 100 }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##load-integer f 4 100 }
+        T{ ##store-memory f 2 3 4 0 0 int-rep char }
+    } test-peephole
+] unit-test
+
+[
+    V{
+        T{ ##load-vector f 0 B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } short-8-rep }
+        T{ ##select-vector f 1 0 0 short-8-rep }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##add f 4 2 3 }
+        T{ ##load-integer f 5 100 }
+        T{ ##load-integer f 6 100 }
+        T{ ##store-memory f 4 5 6 0 0 int-rep char }
+    }
+] [
+    V{
+        T{ ##load-vector f 0 B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } short-8-rep }
+        T{ ##select-vector f 1 0 0 short-8-rep }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##add f 4 2 3 }
+        T{ ##load-integer f 5 100 }
+        T{ ##load-integer f 6 100 }
+        T{ ##store-memory f 4 5 6 0 0 int-rep char }
+    } test-peephole
+] unit-test
+
+6 vreg-counter set-global
+
+[
+    V{
+        T{ ##load-vector f 0 B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } int-4-rep }
+        T{ ##select-vector f 1 0 0 int-4-rep }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##add f 7 2 3 }
+        T{ ##shl-imm f 4 7 $[ tag-bits get ] }
+        T{ ##replace f 4 D 0 }
+    }
+] [
+    V{
+        T{ ##load-vector f 0 B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } int-4-rep }
+        T{ ##select-vector f 1 0 0 int-4-rep }
+        T{ ##sar-imm f 2 1 3 }
+        T{ ##load-integer f 3 100 }
+        T{ ##add f 4 2 3 }
+        T{ ##replace f 4 D 0 }
     } test-peephole
 ] unit-test
 
@@ -562,7 +686,7 @@ cpu x86.32? [
 
 ! Make sure we don't exceed immediate bounds
 cpu x86.64? [
-    4 \ vreg-counter set-global
+    4 vreg-counter set-global
 
     [
         V{
@@ -611,7 +735,7 @@ cpu x86.64? [
     } test-peephole
 ] unit-test
 
-4 \ vreg-counter set-global
+4 vreg-counter set-global
 
 [
     V{
@@ -736,17 +860,17 @@ cpu x86.64? [
     } test-peephole
 ] unit-test
 
-4 \ vreg-counter set-global
+4 vreg-counter set-global
 
 [
     V{
-        T{ ##peek f 5 D 0 }
-        T{ ##sar-imm f 0 5 $[ tag-bits get ] }
-        T{ ##peek f 6 D 1 }
-        T{ ##sar-imm f 1 6 $[ tag-bits get ] }
-        T{ ##mul f 2 0 1 }
-        T{ ##mul-imm f 3 2 -16 }
-        T{ ##replace f 3 D 0 }
+        T{ ##peek { dst 0 } { loc D 0 } }
+        T{ ##peek { dst 1 } { loc D 1 } }
+        T{ ##sar-imm { dst 5 } { src1 0 } { src2 4 } }
+        T{ ##sar-imm { dst 6 } { src1 1 } { src2 4 } }
+        T{ ##mul { dst 2 } { src1 5 } { src2 6 } }
+        T{ ##mul-imm { dst 3 } { src1 2 } { src2 -16 } }
+        T{ ##replace { src 3 } { loc D 0 } }
     }
 ] [
     V{
@@ -759,7 +883,7 @@ cpu x86.64? [
 ] unit-test
 
 ! Tag/untag elimination for ##not
-2 \ vreg-counter set-global
+2 vreg-counter set-global
 
 [
     V{

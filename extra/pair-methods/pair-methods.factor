@@ -26,7 +26,7 @@ ERROR: no-pair-method a b generic ;
 : pair-generic-definition ( word -- def )
     [ sorted-pair-methods [ first2 pair-method-cond ] map ]
     [ [ no-pair-method ] curry suffix ] bi 1quotation
-    [ 2dup [ class ] bi@ <=> +gt+ eq? ?swap ] [ cond ] surround ;
+    [ 2dup [ class-of ] compare +gt+ eq? ?swap ] [ cond ] surround ;
 
 : make-pair-generic ( word -- )
     dup pair-generic-definition define ;
@@ -37,7 +37,7 @@ ERROR: no-pair-method a b generic ;
     [ drop make-pair-generic ] 2tri ;
 
 : (PAIR-GENERIC:) ( -- )
-    CREATE-GENERIC complete-effect define-pair-generic ;
+    scan-new-generic scan-effect define-pair-generic ;
 
 SYNTAX: PAIR-GENERIC: (PAIR-GENERIC:) ;
 

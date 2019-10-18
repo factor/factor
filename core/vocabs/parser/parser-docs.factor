@@ -1,7 +1,7 @@
 USING: help.markup help.syntax parser strings words assocs vocabs ;
 IN: vocabs.parser
 
-ARTICLE: "word-search-errors"  "Word lookup errors"
+ARTICLE: "word-search-errors" "Word lookup errors"
 "If the parser cannot not find a word in the current vocabulary search path, it attempts to look for the word in all loaded vocabularies."
 $nl
 "If " { $link auto-use? } " mode is off, a restartable error is thrown with a restart for each vocabulary in question, together with a restart which defers the word in the current vocabulary, as if " { $link POSTPONE: DEFER: } " was used."
@@ -142,7 +142,7 @@ HELP: add-words-from
 
 HELP: add-words-excluding
 { $values { "vocab" "a vocabulary specifier" } { "words" "a sequence of word names" } }
-{ $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } "  to the manifest." }
+{ $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } " to the manifest." }
 { $notes "This word is used to implement " { $link POSTPONE: EXCLUDE: } "." } ;
 
 HELP: add-renamed-word

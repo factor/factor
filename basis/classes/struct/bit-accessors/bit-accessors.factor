@@ -1,13 +1,14 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math fry locals math.order alien.accessors ;
+USING: alien.accessors fry kernel locals math math.bitwise
+math.order sequences ;
 IN: classes.struct.bit-accessors
 
 ! Bitfield accessors are little-endian on all platforms
 ! Why not? It's unspecified in C
 
 : ones-between ( start end -- n )
-    [ 2^ 1 - ] bi@ swap bitnot bitand ;
+    [ on-bits ] bi@ swap unmask ;
 
 :: manipulate-bits ( offset bits step-quot -- quot shift-amount offset' bits' )
     offset 8 /mod :> ( i start-bit )
@@ -25,10 +26,10 @@ IN: classes.struct.bit-accessors
                     combine-quot: ( prev-quot shift-amount next-quot -- quot )
                     -- quot )
     offset bits step-quot manipulate-bits
-    dup zero? [ 3drop ] [
+    [ 2drop ] [
         step-quot combine-quot bit-manipulator
         combine-quot call( prev shift next -- quot )
-    ] if ; inline recursive
+    ] if-zero ; inline recursive
 
 : bit-reader ( offset bits -- quot: ( alien -- n ) )
     [ neg '[ _ alien-unsigned-1 _ bitand _ shift ] ]

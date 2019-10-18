@@ -47,7 +47,7 @@ SYMBOLS: +bottom+ +top+ ;
 SYMBOLS: combinator quotations ;
 
 : simple-unbalanced-branches-error ( word quots branches -- * )
-    [ length [ (( ..a -- ..b )) ] replicate ]
+    [ length [ ( ..a -- ..b ) ] replicate ]
     [ [ length [ "x" <array> ] bi@ <effect> ] { } assoc>map ] bi
     unbalanced-branches-error ;
 
@@ -70,9 +70,9 @@ SYMBOLS: combinator quotations ;
 : datastack-phi ( seq -- phi-in phi-out )
     [ input-count branch-variable ]
     [ inner-d-index branch-variable infimum inner-d-index set ]
-    [ \ meta-d active-variable ] tri
+    [ (meta-d) active-variable ] tri
     unify-branches
-    [ input-count set ] [ ] [ dup >vector \ meta-d set ] tri* ;
+    [ input-count set ] [ ] [ dup >vector (meta-d) set ] tri* ;
 
 : terminated-phi ( seq -- terminated )
     terminated? branch-variable ;
@@ -87,7 +87,7 @@ SYMBOLS: combinator quotations ;
     tri ;
 
 : copy-inference ( -- )
-    \ meta-d [ clone ] change
+    (meta-d) [ clone ] change
     literals [ clone ] change
     input-count [ ] change
     inner-d-index [ ] change ;
@@ -128,8 +128,8 @@ M: declared-effect curried/composed? known>> curried/composed? ;
 
 : declare-if-effects ( -- )
     H{ } clone V{ } clone
-    [ [ \ if (( ..a -- ..b )) ] 2dip 0 declare-effect-d ]
-    [ [ \ if (( ..a -- ..b )) ] 2dip 1 declare-effect-d ] 2bi ;
+    [ [ \ if ( ..a -- ..b ) ] 2dip 0 declare-effect-d ]
+    [ [ \ if ( ..a -- ..b ) ] 2dip 1 declare-effect-d ] 2bi ;
 
 : infer-if ( -- )
     \ if combinator set

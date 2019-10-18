@@ -1,4 +1,4 @@
-USING: accessors alien.data.map byte-arrays combinators combinators.short-circuit
+USING: accessors alien.data alien.data.map byte-arrays combinators combinators.short-circuit
 fry generalizations images kernel locals math math.constants math.functions
 math.libm math.matrices.simd math.vectors math.vectors.conversion math.vectors.simd
 memoize random random.mersenne-twister sequences sequences.private specialized-arrays
@@ -124,7 +124,7 @@ MEMO: perlin-noise-map-coords ( dim -- coords )
 
 TYPED:: perlin-noise-map ( table: byte-array transform: matrix4 coords: float-4-array -- map: float-array )
     coords [| coord | table transform coord m4.v perlin-noise ] data-map( float-4 -- c:float )
-    float-array-cast ;
+    c:float cast-array ;
 
 : perlin-noise-image ( table transform dim -- image )
     [ perlin-noise-map-coords perlin-noise-map ] [ 5/7. 0.5 float-map>image ] bi ;

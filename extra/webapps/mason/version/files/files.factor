@@ -8,13 +8,15 @@ IN: webapps.mason.version.files
     [ "releases/" % % "/" % % ] "" make ;
 
 : remote-directory ( string -- string' )
-    [ upload-directory get ] dip "/" glue ;
+    [ package-directory get ] dip "/" glue ;
 
 SLOT: os
 SLOT: cpu
 
 : platform ( builder -- string )
     [ os>> ] [ cpu>> ] bi (platform) ;
+
+SLOT: last-release
 
 : binary-package-name ( builder -- string )
     [ [ platform % "/" % ] [ last-release>> % ] bi ] "" make

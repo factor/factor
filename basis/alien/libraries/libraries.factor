@@ -2,28 +2,37 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.strings assocs io.backend
 kernel namespaces destructors sequences strings
-system io.pathnames ;
+system io.pathnames fry combinators vocabs ;
 IN: alien.libraries
 
 : dlopen ( path -- dll ) native-string>alien (dlopen) ;
 
 : dlsym ( name dll -- alien ) [ string>symbol ] dip (dlsym) ;
 
+: dlsym-raw ( name dll -- alien ) [ string>symbol ] dip (dlsym-raw) ;
+
+HOOK: dlerror os ( -- message/f )
+
 SYMBOL: libraries
 
 libraries [ H{ } clone ] initialize
 
-TUPLE: library { path string } { abi abi initial: cdecl } dll ;
+TUPLE: library { path string } { abi abi initial: cdecl } dll dlerror ;
 
 ERROR: no-library name ;
 
 : library ( name -- library ) libraries get at ;
 
 : <library> ( path abi -- library )
-    over dup [ dlopen ] when \ library boa ;
+    over dup
+    [ dlopen dup dll-valid? [ f ] [ dlerror ] if ] [ f ] if
+    \ library boa ;
+
+: library-dll ( library -- dll )
+    dup [ dll>> ] when ;
 
 : load-library ( name -- dll )
-    library dup [ dll>> ] when ;
+    library library-dll ;
 
 M: dll dispose dlclose ;
 
@@ -32,9 +41,15 @@ M: library dispose dll>> [ dispose ] when* ;
 : remove-library ( name -- )
     libraries get delete-at* [ dispose ] [ drop ] if ;
 
+: add-library? ( name path abi -- ? )
+    [ library ] 2dip
+    '[ [ path>> _ = ] [ abi>> _ = ] bi and not ] [ t ] if* ;
+
 : add-library ( name path abi -- )
-    [ 2drop remove-library ]
-    [ <library> swap libraries get set-at ] 3bi ;
+    3dup add-library? [
+        [ 2drop remove-library ]
+        [ <library> swap libraries get set-at ] 3bi
+    ] [ 3drop ] if ;
 
 : library-abi ( library -- abi )
     library [ abi>> ] [ cdecl ] if* ;
@@ -42,7 +57,7 @@ M: library dispose dll>> [ dispose ] when* ;
 ERROR: no-such-symbol name library ;
 
 : address-of ( name library -- value )
-    2dup load-library dlsym [ 2nip ] [ no-such-symbol ] if* ;
+    2dup load-library dlsym-raw [ 2nip ] [ no-such-symbol ] if* ;
 
 SYMBOL: deploy-libraries
 
@@ -53,17 +68,9 @@ deploy-libraries [ V{ } clone ] initialize
     [ deploy-libraries get 2dup member? [ 2drop ] [ push ] if ]
     [ no-library ] if ;
 
-<PRIVATE
-
 HOOK: >deployed-library-path os ( path -- path' )
 
-M: windows >deployed-library-path
-    file-name ;
-
-M: unix >deployed-library-path
-    file-name "$ORIGIN" prepend-path ;
-
-M: macosx >deployed-library-path
-    file-name "@executable_path/../Frameworks" prepend-path ;
-
-PRIVATE>
+<< {
+    { [ os windows? ] [ "alien.libraries.windows" ] }
+    { [ os unix? ] [ "alien.libraries.unix" ] }
+} cond require >>

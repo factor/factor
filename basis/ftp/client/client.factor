@@ -61,7 +61,7 @@ ERROR: ftp-error got expected ;
     strings>> first "|" split 2 tail* first string>number ;
 
 : open-passive-client ( url protocol -- stream )
-    [ host>> ftp-epsv parse-epsv <inet> ] dip <client> drop ;
+    [ url-addr ftp-epsv parse-epsv with-port ] dip <client> drop ;
 
 : list ( url -- ftp-response )
     utf8 open-passive-client
@@ -84,7 +84,7 @@ ERROR: ftp-error got expected ;
     ftp-set-binary 200 ftp-assert ;
 
 : ftp-connect ( url -- stream )
-    [ host>> ] [ port>> ] bi <inet> utf8 <client> drop ;
+    url-addr utf8 <client> drop ;
 
 : with-ftp-client ( url quot -- )
     [ [ ftp-connect ] keep ] dip

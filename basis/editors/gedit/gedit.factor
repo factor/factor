@@ -4,14 +4,15 @@ USING: editors io.launcher kernel make math.parser namespaces
 sequences ;
 IN: editors.gedit
 
+SINGLETON: gedit
+gedit editor-class set-global
+
 : gedit-path ( -- path )
     \ gedit-path get-global [
         "gedit"
     ] unless* ;
 
-: gedit ( file line -- )
+M: gedit editor-command ( file line -- command )
     [
         gedit-path , number>string "+" prepend , ,
-    ] { } make run-detached drop ;
-
-[ gedit ] edit-hook set-global
+    ] { } make ;

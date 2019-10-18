@@ -112,7 +112,7 @@ C: <box> box
 : states>code ( words dfa -- )
     '[
         dup _ word>quot
-        (( last-match index string -- ? ))
+        ( last-match index string -- ? )
         define-declared
     ] each ;
 
@@ -132,7 +132,7 @@ PRIVATE>
 
 : dfa>word ( dfa -- quot )
     dfa>main-word execution-quot word-template
-    (( start-index string regexp -- i/f )) define-temp ;
+    ( start-index string regexp -- i/f ) define-temp ;
 
 : dfa>shortest-word ( dfa -- word )
     t shortest? [ dfa>word ] with-variable ;

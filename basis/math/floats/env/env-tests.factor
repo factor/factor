@@ -42,10 +42,10 @@ os linux? cpu x86.64? and [
 [ t ] +fp-invalid-operation+ [ -1.0 ] [ fsqrt ] test-fp-exception-compiled unit-test
 
 [
-    HEX: 3fd5,5555,5555,5555
-    HEX: 3fc9,9999,9999,999a
-    HEX: bfc9,9999,9999,999a
-    HEX: bfd5,5555,5555,5555
+    0x3fd5,5555,5555,5555
+    0x3fc9,9999,9999,999a
+    0xbfc9,9999,9999,999a
+    0xbfd5,5555,5555,5555
 ] [
     +round-nearest+ [
          1.0 3.0 /f double>bits
@@ -56,10 +56,10 @@ os linux? cpu x86.64? and [
 ] unit-test
 
 [
-    HEX: 3fd5,5555,5555,5555
-    HEX: 3fc9,9999,9999,9999
-    HEX: bfc9,9999,9999,999a
-    HEX: bfd5,5555,5555,5556
+    0x3fd5,5555,5555,5555
+    0x3fc9,9999,9999,9999
+    0xbfc9,9999,9999,999a
+    0xbfd5,5555,5555,5556
 ] [
     +round-down+ [
          1.0 3.0 /f double>bits
@@ -70,10 +70,10 @@ os linux? cpu x86.64? and [
 ] unit-test
 
 [
-    HEX: 3fd5,5555,5555,5556
-    HEX: 3fc9,9999,9999,999a
-    HEX: bfc9,9999,9999,9999
-    HEX: bfd5,5555,5555,5555
+    0x3fd5,5555,5555,5556
+    0x3fc9,9999,9999,999a
+    0xbfc9,9999,9999,9999
+    0xbfd5,5555,5555,5555
 ] [
     +round-up+ [
          1.0 3.0 /f double>bits
@@ -84,10 +84,10 @@ os linux? cpu x86.64? and [
 ] unit-test
 
 [
-    HEX: 3fd5,5555,5555,5555
-    HEX: 3fc9,9999,9999,9999
-    HEX: bfc9,9999,9999,9999
-    HEX: bfd5,5555,5555,5555
+    0x3fd5,5555,5555,5555
+    0x3fc9,9999,9999,9999
+    0xbfc9,9999,9999,9999
+    0xbfd5,5555,5555,5555
 ] [
     +round-zero+ [
          1.0 3.0 /f double>bits
@@ -99,10 +99,10 @@ os linux? cpu x86.64? and [
 
 ! ensure rounding mode is restored to +round-nearest+
 [
-    HEX: 3fd5,5555,5555,5555
-    HEX: 3fc9,9999,9999,999a
-    HEX: bfc9,9999,9999,999a
-    HEX: bfd5,5555,5555,5555
+    0x3fd5,5555,5555,5555
+    0x3fc9,9999,9999,999a
+    0xbfc9,9999,9999,999a
+    0xbfd5,5555,5555,5555
 ] [
      1.0 3.0 /f double>bits
      1.0 5.0 /f double>bits
@@ -110,80 +110,75 @@ os linux? cpu x86.64? and [
     -1.0 3.0 /f double>bits
 ] unit-test
 
-! FP traps cause a kernel panic on OpenBSD 4.5 i386
-os openbsd eq? cpu x86.32 eq? and [
+: fp-trap-error? ( error -- ? )
+    2 head { "kernel-error" 17 } = ;
 
-    : fp-trap-error? ( error -- ? )
-        2 head { "kernel-error" 17 } = ;
+: test-traps ( traps inputs quot -- quot' fail-quot )
+    append '[ _ _ with-fp-traps ] [ fp-trap-error? ] ;
 
-    : test-traps ( traps inputs quot -- quot' fail-quot )
-        append '[ _ _ with-fp-traps ] [ fp-trap-error? ] ;
+: test-traps-compiled ( traps inputs quot -- quot' fail-quot )
+    swapd '[ @ [ _ _ with-fp-traps ] compile-call ] [ fp-trap-error? ] ;
 
-    : test-traps-compiled ( traps inputs quot -- quot' fail-quot )
-        swapd '[ @ [ _ _ with-fp-traps ] compile-call ] [ fp-trap-error? ] ;
+{ +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps must-fail-with
+{ +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps must-fail-with
+{ +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps must-fail-with
+{ +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps must-fail-with
+{ +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps must-fail-with
 
-    { +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps must-fail-with
-    { +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps must-fail-with
-    { +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps must-fail-with
-    { +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps must-fail-with
-    { +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps must-fail-with
+{ +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps-compiled must-fail-with
+{ +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps-compiled must-fail-with
+{ +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps-compiled must-fail-with
+{ +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps-compiled must-fail-with
+{ +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps-compiled must-fail-with
 
-    { +fp-zero-divide+ } [ 1.0 0.0 ] [ /f ] test-traps-compiled must-fail-with
-    { +fp-inexact+ } [ 1.0 3.0 ] [ /f ] test-traps-compiled must-fail-with
-    { +fp-invalid-operation+ } [ -1.0 ] [ fsqrt ] test-traps-compiled must-fail-with
-    { +fp-overflow+ } [ 2.0 ] [ 100,000.0 ^ ] test-traps-compiled must-fail-with
-    { +fp-underflow+ +fp-inexact+ } [ 2.0 ] [ -100,000.0 ^ ] test-traps-compiled must-fail-with
+! Ensure ordered comparisons raise traps
+:: test-comparison-quot ( word -- quot )
+    [
+        { float float } declare
+        { +fp-invalid-operation+ } [ word execute ] with-fp-traps
+    ] ;
 
-    ! Ensure ordered comparisons raise traps
-    :: test-comparison-quot ( word -- quot )
-        [
-            { float float } declare
-            { +fp-invalid-operation+ } [ word execute ] with-fp-traps
-        ] ;
+: test-comparison ( inputs word -- quot fail-quot )
+    test-comparison-quot append [ fp-trap-error? ] ;
 
-    : test-comparison ( inputs word -- quot fail-quot )
-        test-comparison-quot append [ fp-trap-error? ] ;
+: test-comparison-compiled ( inputs word -- quot fail-quot )
+    test-comparison-quot '[ @ _ compile-call ] [ fp-trap-error? ] ;
 
-    : test-comparison-compiled ( inputs word -- quot fail-quot )
-        test-comparison-quot '[ @ _ compile-call ] [ fp-trap-error? ] ;
+\ float< "intrinsic" word-prop [
+    [ 0/0. -15.0 ] \ < test-comparison must-fail-with
+    [ 0/0. -15.0 ] \ < test-comparison-compiled must-fail-with
+    [ -15.0 0/0. ] \ < test-comparison must-fail-with
+    [ -15.0 0/0. ] \ < test-comparison-compiled must-fail-with
+    [ 0/0. -15.0 ] \ <= test-comparison must-fail-with
+    [ 0/0. -15.0 ] \ <= test-comparison-compiled must-fail-with
+    [ -15.0 0/0. ] \ <= test-comparison must-fail-with
+    [ -15.0 0/0. ] \ <= test-comparison-compiled must-fail-with
+    [ 0/0. -15.0 ] \ > test-comparison must-fail-with
+    [ 0/0. -15.0 ] \ > test-comparison-compiled must-fail-with
+    [ -15.0 0/0. ] \ > test-comparison must-fail-with
+    [ -15.0 0/0. ] \ > test-comparison-compiled must-fail-with
+    [ 0/0. -15.0 ] \ >= test-comparison must-fail-with
+    [ 0/0. -15.0 ] \ >= test-comparison-compiled must-fail-with
+    [ -15.0 0/0. ] \ >= test-comparison must-fail-with
+    [ -15.0 0/0. ] \ >= test-comparison-compiled must-fail-with
 
-    \ float< "intrinsic" word-prop [
-        [ 0/0. -15.0 ] \ < test-comparison must-fail-with
-        [ 0/0. -15.0 ] \ < test-comparison-compiled must-fail-with
-        [ -15.0 0/0. ] \ < test-comparison must-fail-with
-        [ -15.0 0/0. ] \ < test-comparison-compiled must-fail-with
-        [ 0/0. -15.0 ] \ <= test-comparison must-fail-with
-        [ 0/0. -15.0 ] \ <= test-comparison-compiled must-fail-with
-        [ -15.0 0/0. ] \ <= test-comparison must-fail-with
-        [ -15.0 0/0. ] \ <= test-comparison-compiled must-fail-with
-        [ 0/0. -15.0 ] \ > test-comparison must-fail-with
-        [ 0/0. -15.0 ] \ > test-comparison-compiled must-fail-with
-        [ -15.0 0/0. ] \ > test-comparison must-fail-with
-        [ -15.0 0/0. ] \ > test-comparison-compiled must-fail-with
-        [ 0/0. -15.0 ] \ >= test-comparison must-fail-with
-        [ 0/0. -15.0 ] \ >= test-comparison-compiled must-fail-with
-        [ -15.0 0/0. ] \ >= test-comparison must-fail-with
-        [ -15.0 0/0. ] \ >= test-comparison-compiled must-fail-with
-
-        [ f ] [ 0/0. -15.0 ] \ u< test-comparison drop unit-test
-        [ f ] [ 0/0. -15.0 ] \ u< test-comparison-compiled drop unit-test
-        [ f ] [ -15.0 0/0. ] \ u< test-comparison drop unit-test
-        [ f ] [ -15.0 0/0. ] \ u< test-comparison-compiled drop unit-test
-        [ f ] [ 0/0. -15.0 ] \ u<= test-comparison drop unit-test
-        [ f ] [ 0/0. -15.0 ] \ u<= test-comparison-compiled drop unit-test
-        [ f ] [ -15.0 0/0. ] \ u<= test-comparison drop unit-test
-        [ f ] [ -15.0 0/0. ] \ u<= test-comparison-compiled drop unit-test
-        [ f ] [ 0/0. -15.0 ] \ u> test-comparison drop unit-test
-        [ f ] [ 0/0. -15.0 ] \ u> test-comparison-compiled drop unit-test
-        [ f ] [ -15.0 0/0. ] \ u> test-comparison drop unit-test
-        [ f ] [ -15.0 0/0. ] \ u> test-comparison-compiled drop unit-test
-        [ f ] [ 0/0. -15.0 ] \ u>= test-comparison drop unit-test
-        [ f ] [ 0/0. -15.0 ] \ u>= test-comparison-compiled drop unit-test
-        [ f ] [ -15.0 0/0. ] \ u>= test-comparison drop unit-test
-        [ f ] [ -15.0 0/0. ] \ u>= test-comparison-compiled drop unit-test
-    ] when
-
-] unless
+    [ f ] [ 0/0. -15.0 ] \ u< test-comparison drop unit-test
+    [ f ] [ 0/0. -15.0 ] \ u< test-comparison-compiled drop unit-test
+    [ f ] [ -15.0 0/0. ] \ u< test-comparison drop unit-test
+    [ f ] [ -15.0 0/0. ] \ u< test-comparison-compiled drop unit-test
+    [ f ] [ 0/0. -15.0 ] \ u<= test-comparison drop unit-test
+    [ f ] [ 0/0. -15.0 ] \ u<= test-comparison-compiled drop unit-test
+    [ f ] [ -15.0 0/0. ] \ u<= test-comparison drop unit-test
+    [ f ] [ -15.0 0/0. ] \ u<= test-comparison-compiled drop unit-test
+    [ f ] [ 0/0. -15.0 ] \ u> test-comparison drop unit-test
+    [ f ] [ 0/0. -15.0 ] \ u> test-comparison-compiled drop unit-test
+    [ f ] [ -15.0 0/0. ] \ u> test-comparison drop unit-test
+    [ f ] [ -15.0 0/0. ] \ u> test-comparison-compiled drop unit-test
+    [ f ] [ 0/0. -15.0 ] \ u>= test-comparison drop unit-test
+    [ f ] [ 0/0. -15.0 ] \ u>= test-comparison-compiled drop unit-test
+    [ f ] [ -15.0 0/0. ] \ u>= test-comparison drop unit-test
+    [ f ] [ -15.0 0/0. ] \ u>= test-comparison-compiled drop unit-test
+] when
 
 ! Ensure traps get cleared
 [ 1/0. ] [ 1.0 0.0 /f ] unit-test

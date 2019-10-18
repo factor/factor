@@ -1,5 +1,5 @@
 IN: logging.tests
-USING: tools.test logging math ;
+USING: tools.test logging logging.analysis io math ;
 
 : input-logging-test ( a b -- c ) + ;
 
@@ -22,3 +22,5 @@ USING: tools.test logging math ;
     
     [ f ] [ 1 0 error-logging-test ] unit-test
 ] with-logging
+
+[ ] [ "logging-test" { "input-logging-test" } analyze-log-file ] unit-test

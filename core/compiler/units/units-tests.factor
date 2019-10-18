@@ -38,9 +38,10 @@ SYMBOL: counter
 
 0 counter set-global
 
-M: observer definitions-changed 2drop global [ counter inc ] bind ;
+M: observer definitions-changed
+    2drop [ counter inc ] with-global ;
 
-[ gensym [ ] (( -- )) define-declared ] with-compilation-unit
+[ gensym [ ] ( -- ) define-declared ] with-compilation-unit
 
 [ 1 ] [ counter get-global ] unit-test
 

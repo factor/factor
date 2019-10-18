@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables sequences.parser
-html.parser.utils kernel namespaces sequences math
+html.parser.utils kernel namespaces sequences make math
 unicode.case unicode.categories combinators.short-circuit
 quoting fry ;
 IN: html.parser
@@ -94,11 +94,11 @@ SYMBOL: tagstack
     dup sequence-parse-end? [
         drop
     ] [
-        [ parse-key/value swap set ] [ (parse-attributes) ] bi
+        [ parse-key/value swap ,, ] [ (parse-attributes) ] bi
     ] if ;
 
 : parse-attributes ( sequence-parser -- hashtable )
-    [ (parse-attributes) ] H{ } make-assoc ;
+    [ (parse-attributes) ] H{ } make ;
 
 : (parse-tag) ( string -- string' hashtable )
     [

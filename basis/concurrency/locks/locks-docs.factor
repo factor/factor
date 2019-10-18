@@ -60,7 +60,7 @@ ARTICLE: "concurrency.locks.rw" "Read-write locks"
 $nl
 "While this can be achieved with a simple " { $link "concurrency.locks.mutex" } ", performance will suffer, since in fact multiple threads can view the structure at the same time; serialization must only be enforced for writes."
 $nl
-"Read/write locks allow any number of threads to hold the read lock simulateneously, however attempting to acquire a write lock blocks until all other threads release read locks and write locks."
+"Read/write locks allow any number of threads to hold the read lock simultaneously, however attempting to acquire a write lock blocks until all other threads release read locks and write locks."
 $nl
 "Read/write locks are reentrant. A thread holding a write lock may acquire a read lock or a write lock without blocking. However a thread holding a read lock may not acquire a write lock recursively since that could break invariants assumed by the code executing with the read lock held."
 { $subsections

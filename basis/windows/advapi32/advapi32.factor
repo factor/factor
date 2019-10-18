@@ -51,11 +51,11 @@ CONSTANT: ACCESS_DENIED_ACE_TYPE 1
 CONSTANT: SYSTEM_AUDIT_ACE_TYPE 2
 CONSTANT: SYSTEM_ALARM_ACE_TYPE 3
 
-CONSTANT: OBJECT_INHERIT_ACE HEX: 1
-CONSTANT: CONTAINER_INHERIT_ACE HEX: 2
-CONSTANT: NO_PROPAGATE_INHERIT_ACE HEX: 4
-CONSTANT: INHERIT_ONLY_ACE HEX: 8
-CONSTANT: VALID_INHERIT_FLAGS HEX: f
+CONSTANT: OBJECT_INHERIT_ACE 0x1
+CONSTANT: CONTAINER_INHERIT_ACE 0x2
+CONSTANT: NO_PROPAGATE_INHERIT_ACE 0x4
+CONSTANT: INHERIT_ONLY_ACE 0x8
+CONSTANT: VALID_INHERIT_FLAGS 0xf
 
 STRUCT: ACE_HEADER
     { AceType BYTE }
@@ -126,25 +126,6 @@ CONSTANT: SE_SELF_RELATIVE 32768
 
 TYPEDEF: DWORD SECURITY_DESCRIPTOR_CONTROL
 TYPEDEF: SECURITY_DESCRIPTOR_CONTROL* PSECURITY_DESCRIPTOR_CONTROL
-
-
-! typedef enum _TOKEN_INFORMATION_CLASS {
-CONSTANT: TokenUser 1
-CONSTANT: TokenGroups 2
-CONSTANT: TokenPrivileges 3
-CONSTANT: TokenOwner 4
-CONSTANT: TokenPrimaryGroup 5
-CONSTANT: TokenDefaultDacl 6
-CONSTANT: TokenSource 7
-CONSTANT: TokenType 8
-CONSTANT: TokenImpersonationLevel 9
-CONSTANT: TokenStatistics 10
-CONSTANT: TokenRestrictedSids 11
-CONSTANT: TokenSessionId 12
-CONSTANT: TokenGroupsAndPrivileges 13
-CONSTANT: TokenSessionReference 14
-CONSTANT: TokenSandBoxInert 15
-! } TOKEN_INFORMATION_CLASS;
 
 ENUM: ACCESS_MODE
     NOT_USED_ACCESS
@@ -262,39 +243,39 @@ CONSTANT: SE_GROUP_ENABLED 4
 CONSTANT: SE_GROUP_OWNER 8
 CONSTANT: SE_GROUP_LOGON_ID -1073741824
 
-CONSTANT: NTE_BAD_UID HEX: 80090001
-CONSTANT: NTE_BAD_HASH HEX: 80090002
-CONSTANT: NTE_BAD_KEY HEX: 80090003
-CONSTANT: NTE_BAD_LEN HEX: 80090004
-CONSTANT: NTE_BAD_DATA HEX: 80090005
-CONSTANT: NTE_BAD_SIGNATURE HEX: 80090006
-CONSTANT: NTE_BAD_VER HEX: 80090007
-CONSTANT: NTE_BAD_ALGID HEX: 80090008
-CONSTANT: NTE_BAD_FLAGS HEX: 80090009
-CONSTANT: NTE_BAD_TYPE HEX: 8009000A
-CONSTANT: NTE_BAD_KEY_STATE HEX: 8009000B
-CONSTANT: NTE_BAD_HASH_STATE HEX: 8009000C
-CONSTANT: NTE_NO_KEY HEX: 8009000D
-CONSTANT: NTE_NO_MEMORY HEX: 8009000E
-CONSTANT: NTE_EXISTS HEX: 8009000F
-CONSTANT: NTE_PERM HEX: 80090010
-CONSTANT: NTE_NOT_FOUND HEX: 80090011
-CONSTANT: NTE_DOUBLE_ENCRYPT HEX: 80090012
-CONSTANT: NTE_BAD_PROVIDER HEX: 80090013
-CONSTANT: NTE_BAD_PROV_TYPE HEX: 80090014
-CONSTANT: NTE_BAD_PUBLIC_KEY HEX: 80090015
-CONSTANT: NTE_BAD_KEYSET HEX: 80090016
-CONSTANT: NTE_PROV_TYPE_NOT_DEF HEX: 80090017
-CONSTANT: NTE_PROV_TYPE_ENTRY_BAD HEX: 80090018
-CONSTANT: NTE_KEYSET_NOT_DEF HEX: 80090019
-CONSTANT: NTE_KEYSET_ENTRY_BAD HEX: 8009001A
-CONSTANT: NTE_PROV_TYPE_NO_MATCH HEX: 8009001B
-CONSTANT: NTE_SIGNATURE_FILE_BAD HEX: 8009001C
-CONSTANT: NTE_PROVIDER_DLL_FAIL HEX: 8009001D
-CONSTANT: NTE_PROV_DLL_NOT_FOUND HEX: 8009001E
-CONSTANT: NTE_BAD_KEYSET_PARAM HEX: 8009001F
-CONSTANT: NTE_FAIL HEX: 80090020
-CONSTANT: NTE_SYS_ERR HEX: 80090021
+CONSTANT: NTE_BAD_UID 0x80090001
+CONSTANT: NTE_BAD_HASH 0x80090002
+CONSTANT: NTE_BAD_KEY 0x80090003
+CONSTANT: NTE_BAD_LEN 0x80090004
+CONSTANT: NTE_BAD_DATA 0x80090005
+CONSTANT: NTE_BAD_SIGNATURE 0x80090006
+CONSTANT: NTE_BAD_VER 0x80090007
+CONSTANT: NTE_BAD_ALGID 0x80090008
+CONSTANT: NTE_BAD_FLAGS 0x80090009
+CONSTANT: NTE_BAD_TYPE 0x8009000A
+CONSTANT: NTE_BAD_KEY_STATE 0x8009000B
+CONSTANT: NTE_BAD_HASH_STATE 0x8009000C
+CONSTANT: NTE_NO_KEY 0x8009000D
+CONSTANT: NTE_NO_MEMORY 0x8009000E
+CONSTANT: NTE_EXISTS 0x8009000F
+CONSTANT: NTE_PERM 0x80090010
+CONSTANT: NTE_NOT_FOUND 0x80090011
+CONSTANT: NTE_DOUBLE_ENCRYPT 0x80090012
+CONSTANT: NTE_BAD_PROVIDER 0x80090013
+CONSTANT: NTE_BAD_PROV_TYPE 0x80090014
+CONSTANT: NTE_BAD_PUBLIC_KEY 0x80090015
+CONSTANT: NTE_BAD_KEYSET 0x80090016
+CONSTANT: NTE_PROV_TYPE_NOT_DEF 0x80090017
+CONSTANT: NTE_PROV_TYPE_ENTRY_BAD 0x80090018
+CONSTANT: NTE_KEYSET_NOT_DEF 0x80090019
+CONSTANT: NTE_KEYSET_ENTRY_BAD 0x8009001A
+CONSTANT: NTE_PROV_TYPE_NO_MATCH 0x8009001B
+CONSTANT: NTE_SIGNATURE_FILE_BAD 0x8009001C
+CONSTANT: NTE_PROVIDER_DLL_FAIL 0x8009001D
+CONSTANT: NTE_PROV_DLL_NOT_FOUND 0x8009001E
+CONSTANT: NTE_BAD_KEYSET_PARAM 0x8009001F
+CONSTANT: NTE_FAIL 0x80090020
+CONSTANT: NTE_SYS_ERR 0x80090021
 
 ! SID is a variable length structure
 TYPEDEF: void* PSID
@@ -309,28 +290,28 @@ CONSTANT: GROUP_SECURITY_INFORMATION 2
 CONSTANT: DACL_SECURITY_INFORMATION 4
 CONSTANT: SACL_SECURITY_INFORMATION 8
 
-CONSTANT: DELETE                     HEX: 00010000
-CONSTANT: READ_CONTROL               HEX: 00020000
-CONSTANT: WRITE_DAC                  HEX: 00040000
-CONSTANT: WRITE_OWNER                HEX: 00080000
-CONSTANT: SYNCHRONIZE                HEX: 00100000
-CONSTANT: STANDARD_RIGHTS_REQUIRED   HEX: 000f0000
+CONSTANT: DELETE                     0x00010000
+CONSTANT: READ_CONTROL               0x00020000
+CONSTANT: WRITE_DAC                  0x00040000
+CONSTANT: WRITE_OWNER                0x00080000
+CONSTANT: SYNCHRONIZE                0x00100000
+CONSTANT: STANDARD_RIGHTS_REQUIRED   0x000f0000
 
 ALIAS: STANDARD_RIGHTS_READ       READ_CONTROL
 ALIAS: STANDARD_RIGHTS_WRITE      READ_CONTROL
 ALIAS: STANDARD_RIGHTS_EXECUTE    READ_CONTROL
 
-CONSTANT: TOKEN_TOKEN_ADJUST_DEFAULT   HEX: 0080
-CONSTANT: TOKEN_ADJUST_GROUPS          HEX: 0040
-CONSTANT: TOKEN_ADJUST_PRIVILEGES      HEX: 0020
-CONSTANT: TOKEN_ADJUST_SESSIONID       HEX: 0100
-CONSTANT: TOKEN_ASSIGN_PRIMARY         HEX: 0001
-CONSTANT: TOKEN_DUPLICATE              HEX: 0002
+CONSTANT: TOKEN_TOKEN_ADJUST_DEFAULT   0x0080
+CONSTANT: TOKEN_ADJUST_GROUPS          0x0040
+CONSTANT: TOKEN_ADJUST_PRIVILEGES      0x0020
+CONSTANT: TOKEN_ADJUST_SESSIONID       0x0100
+CONSTANT: TOKEN_ASSIGN_PRIMARY         0x0001
+CONSTANT: TOKEN_DUPLICATE              0x0002
 ALIAS: TOKEN_EXECUTE                STANDARD_RIGHTS_EXECUTE
-CONSTANT: TOKEN_IMPERSONATE            HEX: 0004
-CONSTANT: TOKEN_QUERY                  HEX: 0008
-CONSTANT: TOKEN_QUERY_SOURCE           HEX: 0010
-CONSTANT: TOKEN_ADJUST_DEFAULT         HEX: 0080
+CONSTANT: TOKEN_IMPERSONATE            0x0004
+CONSTANT: TOKEN_QUERY                  0x0008
+CONSTANT: TOKEN_QUERY_SOURCE           0x0010
+CONSTANT: TOKEN_ADJUST_DEFAULT         0x0080
 CONSTANT: TOKEN_READ flags{ STANDARD_RIGHTS_READ TOKEN_QUERY }
 
 CONSTANT: TOKEN_WRITE
@@ -355,28 +336,28 @@ CONSTANT: TOKEN_ALL_ACCESS
         TOKEN_ADJUST_DEFAULT
     }
 
-CONSTANT: HKEY_CLASSES_ROOT        HEX: 80000000
-CONSTANT: HKEY_CURRENT_USER        HEX: 80000001
-CONSTANT: HKEY_LOCAL_MACHINE       HEX: 80000002
-CONSTANT: HKEY_USERS               HEX: 80000003
-CONSTANT: HKEY_PERFORMANCE_DATA    HEX: 80000004
-CONSTANT: HKEY_CURRENT_CONFIG      HEX: 80000005
-CONSTANT: HKEY_DYN_DATA            HEX: 80000006
-CONSTANT: HKEY_PERFORMANCE_TEXT    HEX: 80000050
-CONSTANT: HKEY_PERFORMANCE_NLSTEXT HEX: 80000060
+CONSTANT: HKEY_CLASSES_ROOT        0x80000000
+CONSTANT: HKEY_CURRENT_USER        0x80000001
+CONSTANT: HKEY_LOCAL_MACHINE       0x80000002
+CONSTANT: HKEY_USERS               0x80000003
+CONSTANT: HKEY_PERFORMANCE_DATA    0x80000004
+CONSTANT: HKEY_CURRENT_CONFIG      0x80000005
+CONSTANT: HKEY_DYN_DATA            0x80000006
+CONSTANT: HKEY_PERFORMANCE_TEXT    0x80000050
+CONSTANT: HKEY_PERFORMANCE_NLSTEXT 0x80000060
 
-CONSTANT: KEY_QUERY_VALUE         HEX: 0001
-CONSTANT: KEY_SET_VALUE           HEX: 0002
-CONSTANT: KEY_CREATE_SUB_KEY      HEX: 0004
-CONSTANT: KEY_ENUMERATE_SUB_KEYS  HEX: 0008
-CONSTANT: KEY_NOTIFY              HEX: 0010
-CONSTANT: KEY_CREATE_LINK         HEX: 0020
-CONSTANT: KEY_READ                HEX: 20019
-CONSTANT: KEY_WOW64_32KEY         HEX: 0200
-CONSTANT: KEY_WOW64_64KEY         HEX: 0100
-CONSTANT: KEY_WRITE               HEX: 20006
+CONSTANT: KEY_QUERY_VALUE         0x0001
+CONSTANT: KEY_SET_VALUE           0x0002
+CONSTANT: KEY_CREATE_SUB_KEY      0x0004
+CONSTANT: KEY_ENUMERATE_SUB_KEYS  0x0008
+CONSTANT: KEY_NOTIFY              0x0010
+CONSTANT: KEY_CREATE_LINK         0x0020
+CONSTANT: KEY_READ                0x20019
+CONSTANT: KEY_WOW64_32KEY         0x0200
+CONSTANT: KEY_WOW64_64KEY         0x0100
+CONSTANT: KEY_WRITE               0x20006
 ALIAS: KEY_EXECUTE             KEY_READ
-CONSTANT: KEY_ALL_ACCESS          HEX: F003F
+CONSTANT: KEY_ALL_ACCESS          0xF003F
 
 CONSTANT: REG_NONE                         0
 CONSTANT: REG_SZ                           1
@@ -468,7 +449,7 @@ CONSTANT: CALG_DH_EPHEM flags{ ALG_CLASS_KEY_EXCHANGE ALG_TYPE_STREAM ALG_TYPE_D
 CONSTANT: CALG_DESX flags{ ALG_CLASS_DATA_ENCRYPT ALG_TYPE_BLOCK ALG_SID_DESX }
 ! CONSTANT: CALG_TLS1PRF flags{ ALG_CLASS_DHASH ALG_TYPE_ANY ALG_SID_TLS1PRF }
 
-CONSTANT: CRYPT_VERIFYCONTEXT HEX: F0000000
+CONSTANT: CRYPT_VERIFYCONTEXT 0xF0000000
 CONSTANT: CRYPT_NEWKEYSET 8
 CONSTANT: CRYPT_DELETEKEYSET 16
 CONSTANT: CRYPT_MACHINE_KEYSET 32
@@ -662,27 +643,145 @@ CONSTANT: szOID_SERVER_GATED_CRYPTO "4235658"
 CONSTANT: szOID_SGC_NETSCAPE "2.16.840.1.113730.4.1"
 CONSTANT: szOID_PKIX_KP_CLIENT_AUTH "1.3.6.1.5.5.7.3.2"
 
-CONSTANT: CRYPT_NOHASHOID HEX: 00000001
-CONSTANT: CRYPT_NO_SALT HEX: 10
-CONSTANT: CRYPT_PREGEN HEX: 40
-CONSTANT: CRYPT_RECIPIENT HEX: 10
-CONSTANT: CRYPT_INITIATOR HEX: 40
-CONSTANT: CRYPT_ONLINE HEX: 80
-CONSTANT: CRYPT_SF HEX: 100
-CONSTANT: CRYPT_CREATE_IV HEX: 200
-CONSTANT: CRYPT_KEK HEX: 400
-CONSTANT: CRYPT_DATA_KEY HEX: 800
-CONSTANT: CRYPT_VOLATILE HEX: 1000
-CONSTANT: CRYPT_SGCKEY HEX: 2000
+CONSTANT: CRYPT_NOHASHOID 0x00000001
+CONSTANT: CRYPT_NO_SALT 0x10
+CONSTANT: CRYPT_PREGEN 0x40
+CONSTANT: CRYPT_RECIPIENT 0x10
+CONSTANT: CRYPT_INITIATOR 0x40
+CONSTANT: CRYPT_ONLINE 0x80
+CONSTANT: CRYPT_SF 0x100
+CONSTANT: CRYPT_CREATE_IV 0x200
+CONSTANT: CRYPT_KEK 0x400
+CONSTANT: CRYPT_DATA_KEY 0x800
+CONSTANT: CRYPT_VOLATILE 0x1000
+CONSTANT: CRYPT_SGCKEY 0x2000
 
-CONSTANT: KEYSTATEBLOB HEX: C
-CONSTANT: OPAQUEKEYBLOB HEX: 9
-CONSTANT: PLAINTEXTKEYBLOB HEX: 8
-CONSTANT: PRIVATEKEYBLOB HEX: 7
-CONSTANT: PUBLICKEYBLOB HEX: 6
-CONSTANT: PUBLICKEYBLOBEX HEX: A
-CONSTANT: SIMPLEBLOB HEX: 1
-CONSTANT: SYMMETRICWRAPKEYBLOB HEX: B
+CONSTANT: KEYSTATEBLOB 0xC
+CONSTANT: OPAQUEKEYBLOB 0x9
+CONSTANT: PLAINTEXTKEYBLOB 0x8
+CONSTANT: PRIVATEKEYBLOB 0x7
+CONSTANT: PUBLICKEYBLOB 0x6
+CONSTANT: PUBLICKEYBLOBEX 0xA
+CONSTANT: SIMPLEBLOB 0x1
+CONSTANT: SYMMETRICWRAPKEYBLOB 0xB
+
+TYPEDEF: void* SID
+
+CONSTANT: SECURITY_MAX_SID_SIZE 68
+
+ENUM: WELL_KNOWN_SID_TYPE
+    { WinNullSid                                     0 }
+    { WinWorldSid                                    1 }
+    { WinLocalSid                                    2 }
+    { WinCreatorOwnerSid                             3 }
+    { WinCreatorGroupSid                             4 }
+    { WinCreatorOwnerServerSid                       5 }
+    { WinCreatorGroupServerSid                       6 }
+    { WinNtAuthoritySid                              7 }
+    { WinDialupSid                                   8 }
+    { WinNetworkSid                                  9 }
+    { WinBatchSid                                    10 }
+    { WinInteractiveSid                              11 }
+    { WinServiceSid                                  12 }
+    { WinAnonymousSid                                13 }
+    { WinProxySid                                    14 }
+    { WinEnterpriseControllersSid                    15 }
+    { WinSelfSid                                     16 }
+    { WinAuthenticatedUserSid                        17 }
+    { WinRestrictedCodeSid                           18 }
+    { WinTerminalServerSid                           19 }
+    { WinRemoteLogonIdSid                            20 }
+    { WinLogonIdsSid                                 21 }
+    { WinLocalSystemSid                              22 }
+    { WinLocalServiceSid                             23 }
+    { WinNetworkServiceSid                           24 }
+    { WinBuiltinDomainSid                            25 }
+    { WinBuiltinAdministratorsSid                    26 }
+    { WinBuiltinUsersSid                             27 }
+    { WinBuiltinGuestsSid                            28 }
+    { WinBuiltinPowerUsersSid                        29 }
+    { WinBuiltinAccountOperatorsSid                  30 }
+    { WinBuiltinSystemOperatorsSid                   31 }
+    { WinBuiltinPrintOperatorsSid                    32 }
+    { WinBuiltinBackupOperatorsSid                   33 }
+    { WinBuiltinReplicatorSid                        34 }
+    { WinBuiltinPreWindows2000CompatibleAccessSid    35 }
+    { WinBuiltinRemoteDesktopUsersSid                36 }
+    { WinBuiltinNetworkConfigurationOperatorsSid     37 }
+    { WinAccountAdministratorSid                     38 }
+    { WinAccountGuestSid                             39 }
+    { WinAccountKrbtgtSid                            40 }
+    { WinAccountDomainAdminsSid                      41 }
+    { WinAccountDomainUsersSid                       42 }
+    { WinAccountDomainGuestsSid                      43 }
+    { WinAccountComputersSid                         44 }
+    { WinAccountControllersSid                       45 }
+    { WinAccountCertAdminsSid                        46 }
+    { WinAccountSchemaAdminsSid                      47 }
+    { WinAccountEnterpriseAdminsSid                  48 }
+    { WinAccountPolicyAdminsSid                      49 }
+    { WinAccountRasAndIasServersSid                  50 }
+    { WinNTLMAuthenticationSid                       51 }
+    { WinDigestAuthenticationSid                     52 }
+    { WinSChannelAuthenticationSid                   53 }
+    { WinThisOrganizationSid                         54 }
+    { WinOtherOrganizationSid                        55 }
+    { WinBuiltinIncomingForestTrustBuildersSid       56 }
+    { WinBuiltinPerfMonitoringUsersSid               57 }
+    { WinBuiltinPerfLoggingUsersSid                  58 }
+    { WinBuiltinAuthorizationAccessSid               59 }
+    { WinBuiltinTerminalServerLicenseServersSid      60 }
+    { WinBuiltinDCOMUsersSid                         61 }
+    { WinBuiltinIUsersSid                            62 }
+    { WinIUserSid                                    63 }
+    { WinBuiltinCryptoOperatorsSid                   64 }
+    { WinUntrustedLabelSid                           65 }
+    { WinLowLabelSid                                 66 }
+    { WinMediumLabelSid                              67 }
+    { WinHighLabelSid                                68 }
+    { WinSystemLabelSid                              69 }
+    { WinWriteRestrictedCodeSid                      70 }
+    { WinCreatorOwnerRightsSid                       71 }
+    { WinCacheablePrincipalsGroupSid                 72 }
+    { WinNonCacheablePrincipalsGroupSid              73 }
+    { WinEnterpriseReadonlyControllersSid            74 }
+    { WinAccountReadonlyControllersSid               75 }
+    { WinBuiltinEventLogReadersGroup                 76 }
+    { WinNewEnterpriseReadonlyControllersSid         77 }
+    { WinBuiltinCertSvcDComAccessGroup               78 } ;
+
+ENUM: TOKEN_INFORMATION_CLASS
+    { TokenUser    1 }
+    TokenGroups
+    TokenPrivileges
+    TokenOwner
+    TokenPrimaryGroup
+    TokenDefaultDacl
+    TokenSource
+    TokenType
+    TokenImpersonationLevel
+    TokenStatistics
+    TokenRestrictedSids
+    TokenSessionId
+    TokenGroupsAndPrivileges
+    TokenSessionReference
+    TokenSandBoxInert
+    TokenAuditPolicy
+    TokenOrigin
+    TokenElevationType
+    TokenLinkedToken
+    TokenElevation
+    TokenHasRestrictions
+    TokenAccessInformation
+    TokenVirtualizationAllowed
+    TokenVirtualizationEnabled
+    TokenIntegrityLevel
+    TokenUIAccess
+    TokenMandatoryPolicy
+    TokenLogonSid
+    MaxTokenInfoClass ;
+    
+TYPEDEF: TOKEN_INFORMATION_CLASS* PTOKEN_INFORMATION_CLASS
 
 TYPEDEF: uint ALG_ID
 
@@ -819,7 +918,7 @@ FUNCTION: BOOL AllocateAndInitializeSid (
 ! : CreateServiceA ;
 ! : CreateServiceW ;
 ! : CreateTraceInstanceId ;
-! : CreateWellKnownSid ;
+FUNCTION: BOOL CreateWellKnownSid ( WELL_KNOWN_SID_TYPE WellKnownSidType, PSID DomainSid, PSID pSid, DWORD *cbSid ) ;
 ! : CredDeleteA ;
 ! : CredDeleteW ;
 ! : CredEnumerateA ;
@@ -1006,7 +1105,7 @@ FUNCTION: BOOL GetSecurityDescriptorSacl ( PSECURITY_DESCRIPTOR pSecurityDescrip
 ! : GetSidLengthRequired ;
 ! : GetSidSubAuthority ;
 ! : GetSidSubAuthorityCount ;
-! : GetTokenInformation ;
+FUNCTION: BOOL GetTokenInformation ( HANDLE TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass, LPVOID TokenInformation, DWORD TokenInformationLenghth, PWORD ReturnLength ) ;
 ! : GetTraceEnableFlags ;
 ! : GetTraceEnableLevel ;
 ! : GetTraceLoggerHandle ;

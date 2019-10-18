@@ -40,7 +40,7 @@ visit-time request-rate crawl-delay unknowns ;
     [ first "sitemap" = ] partition [ values ] dip
     [
         {
-            [ [ first "user-agent" = ] bi@ and ]
+            [ [ first "user-agent" = ] both? ]
             [ nip first "user-agent" = not ]
         } 2|| 
     ] monotonic-split ;

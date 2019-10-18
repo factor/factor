@@ -57,7 +57,7 @@ TUPLE: buffer < gpu-object
     } case ; inline
 
 : get-buffer-int ( target enum -- value )
-    0 <int> [ glGetBufferParameteriv ] keep *int ; inline
+    0 int <ref> [ glGetBufferParameteriv ] keep int deref ; inline
 
 : bind-buffer ( buffer -- target )
     [ kind>> gl-target dup ] [ handle>> glBindBuffer ] bi ; inline

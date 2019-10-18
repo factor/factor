@@ -25,7 +25,7 @@ M: lex-hash set-at
         [ swap hash>> set-at ]
     } case ;
 
-:: at-pos ( t l c -- p ) t l head-slice [ length ] map sum l 1 - + c + ;
+:: at-pos ( t l c -- p ) t l head-slice [ length ] map-sum l 1 - + c + ;
 
 M: lex-hash at*
     swap {
@@ -52,7 +52,7 @@ M: lex-hash at*
     define-syntax word make-inline ;
     
 SYNTAX: ON-BNF:
-    CREATE-WORD reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
+    scan-new-word reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
     main swap at create-bnf ;
 
 ! Tokenizer like standard factor lexer

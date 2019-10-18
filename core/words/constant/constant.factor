@@ -7,7 +7,7 @@ PREDICATE: constant < word "constant" word-prop >boolean ;
 
 : define-constant ( word value -- )
     [ "constant" set-word-prop ]
-    [ [ ] curry (( -- value )) define-inline ] 2bi ;
+    [ [ ] curry ( -- value ) define-inline ] 2bi ;
 
 M: constant reset-word
     [ call-next-method ] [ f "constant" set-word-prop ] bi ;

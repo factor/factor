@@ -1,20 +1,21 @@
-! Copyright (C) 2005, 2010 Slava Pestov.
+! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays kernel kernel.private math namespaces
-make sequences strings effects generic generic.standard
-classes classes.algebra slots.private combinators accessors
-words sequences.private assocs alien quotations hashtables ;
+USING: accessors alien arrays assocs byte-arrays classes
+classes.algebra classes.algebra.private classes.maybe
+combinators generic generic.standard hashtables kernel
+kernel.private make math quotations sequences sequences.private
+slots.private strings words ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
 
-PREDICATE: reader-method < method "reading" word-prop ;
+PREDICATE: reader-method < method "reading" word-prop >boolean ;
 
 PREDICATE: writer < word "writer" word-prop ;
 
-PREDICATE: writer-method < method "writing" word-prop ;
+PREDICATE: writer-method < method "writing" word-prop >boolean ;
 
 : <slot-spec> ( -- slot-spec )
     slot-spec new
@@ -45,7 +46,7 @@ M: object reader-quot
     "reading" associate ;
 
 : define-reader-generic ( name -- )
-    reader-word (( object -- value )) define-simple-generic ;
+    reader-word ( object -- value ) define-simple-generic ;
 
 : define-reader ( class slot-spec -- )
     [ nip name>> define-reader-generic ]
@@ -64,21 +65,22 @@ M: object reader-quot
 
 ERROR: bad-slot-value value class ;
 
-: (instance-check-quot) ( class -- quot )
-    [
-        \ dup ,
-        [ "predicate" word-prop % ]
-        [ [ bad-slot-value ] curry , ] bi
-        \ unless ,
-    ] [ ] make ;
+GENERIC: instance-check-quot ( obj -- quot )
 
-: instance-check-quot ( class -- quot )
+M: class instance-check-quot ( class -- quot )
     {
         { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
         { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
-        { [ dup integer bootstrap-word eq? ] [ drop [ >integer ] ] }
-        [ (instance-check-quot) ]
+        [ call-next-method ]
     } cond ;
+
+M: object instance-check-quot
+    [
+        \ dup ,
+        [ predicate-def % ]
+        [ [ bad-slot-value ] curry , ] bi
+        \ unless ,
+    ] [ ] make ;
 
 GENERIC# writer-quot 1 ( class slot-spec -- quot )
 
@@ -92,7 +94,7 @@ M: object writer-quot
     "writing" associate ;
 
 : define-writer-generic ( name -- )
-    writer-word (( value object -- )) define-simple-generic ;
+    writer-word ( value object -- ) define-simple-generic ;
 
 : define-writer ( class slot-spec -- )
     [ nip name>> define-writer-generic ] [
@@ -110,7 +112,7 @@ M: object writer-quot
 : define-setter ( name -- )
     dup setter-word dup deferred? [
         [ \ over , swap writer-word , ] [ ] make
-        (( object value -- object )) define-inline
+        ( object value -- object ) define-inline
     ] [ 2drop ] if ;
 
 : changer-word ( name -- word )
@@ -123,7 +125,7 @@ M: object writer-quot
             over reader-word 1quotation
             [ dip call ] curry [ ] like [ dip swap ] curry %
             swap setter-word ,
-        ] [ ] make (( object quot -- object )) define-inline
+        ] [ ] make ( object quot -- object ) define-inline
     ] [ 2drop ] if ;
 
 : define-slot-methods ( class slot-spec -- )
@@ -148,25 +150,64 @@ M: object writer-quot
         [ define-changer ]
     } cleave ;
 
-ERROR: no-initial-value class ;
+DEFER: initial-value
 
-GENERIC: initial-value* ( class -- object )
+GENERIC: initial-value* ( class -- object ? )
 
-M: class initial-value* no-initial-value ;
+M: class initial-value* drop f f ;
 
-: initial-value ( class -- object )
+M: maybe initial-value*
+    drop f t ;
+
+! Default initial value is f, 0, or the default inital value
+! of the smallest class. Special case 0 because float is ostensibly
+! smaller than integer in union{ integer float } because of
+! alphabetical sorting.
+M: anonymous-union initial-value*
     {
-        { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop ] }
-        { [ \ f bootstrap-word over class<= ] [ f ] }
-        { [ \ array-capacity bootstrap-word over class<= ] [ 0 ] }
-        { [ float bootstrap-word over class<= ] [ 0.0 ] }
-        { [ string bootstrap-word over class<= ] [ "" ] }
-        { [ array bootstrap-word over class<= ] [ { } ] }
-        { [ byte-array bootstrap-word over class<= ] [ B{ } ] }
-        { [ pinned-alien bootstrap-word over class<= ] [ <bad-alien> ] }
-        { [ quotation bootstrap-word over class<= ] [ [ ] ] }
+        { [ f over instance? ] [ drop f t ] }
+        { [ 0 over instance? ] [ drop 0 t ] }
+        [
+            members>> sort-classes [ initial-value ] { } map>assoc
+            ?last [ second t ] [ f f ] if*
+        ]
+    } cond ;
+
+! See if any of the initial values fit the intersection class,
+! or else return that none do, and leave it up to the user to provide
+! an initial: value.
+M: anonymous-intersection initial-value*
+    {
+        { [ f over instance? ] [ drop f t ] }
+        { [ 0 over instance? ] [ drop 0 t ] }
+        [
+            [ ]
+            [ participants>> sort-classes [ initial-value ] { } map>assoc ]
+            [ ] tri
+
+            [ [ first2 nip ] dip instance? ] curry find swap [
+                nip second t
+            ] [
+                2drop f f
+            ] if
+        ]
+    } cond ;
+
+: initial-value ( class -- object ? )
+    {
+        { [ dup only-classoid? ] [ dup initial-value* ] }
+        { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop t ] }
+        { [ \ f bootstrap-word over class<= ] [ f t ] }
+        { [ \ array-capacity bootstrap-word over class<= ] [ 0 t ] }
+        { [ bignum bootstrap-word over class<= ] [ 0 >bignum t ] }
+        { [ float bootstrap-word over class<= ] [ 0.0 t ] }
+        { [ string bootstrap-word over class<= ] [ "" t ] }
+        { [ array bootstrap-word over class<= ] [ { } t ] }
+        { [ byte-array bootstrap-word over class<= ] [ B{ } t ] }
+        { [ pinned-alien bootstrap-word over class<= ] [ <bad-alien> t ] }
+        { [ quotation bootstrap-word over class<= ] [ [ ] t ] }
         [ dup initial-value* ]
-    } cond nip ;
+    } cond [ drop ] 2dip ;
 
 GENERIC: make-slot ( desc -- slot-spec )
 
@@ -177,10 +218,15 @@ M: string make-slot
 : peel-off-name ( slot-spec array -- slot-spec array )
     [ first >>name ] [ rest ] bi ; inline
 
+: init-slot-class ( slot-spec class -- slot-spec )
+    [ >>class ] [ initial-value [ >>initial ] [ drop ] if ] bi ;
+
 : peel-off-class ( slot-spec array -- slot-spec array )
     dup empty? [
-        dup first class? [
-            [ first >>class ] [ rest ] bi
+        dup first classoid? [
+            [ first init-slot-class ]
+            [ rest ]
+            bi
         ] when
     ] unless ;
 
@@ -195,17 +241,17 @@ ERROR: bad-slot-attribute key ;
         } case
     ] unless ;
 
-ERROR: bad-initial-value name ;
+ERROR: bad-initial-value name initial-value class ;
 
 : check-initial-value ( slot-spec -- slot-spec )
-    dup initial>> [
-        [ ] [
-            dup [ initial>> ] [ class>> ] bi instance?
-            [ name>> bad-initial-value ] unless
-        ] if-bootstrapping
-    ] [
-        dup class>> initial-value >>initial
-    ] if ;
+    [ ] [
+        [ ] [ initial>> ] [ class>> ] tri
+        2dup instance? [
+            2drop
+        ] [
+            [ name>> ] 2dip bad-initial-value
+        ] if
+    ] if-bootstrapping ;
 
 M: array make-slot
     <slot-spec>
@@ -229,3 +275,11 @@ M: slot-spec make-slot
 
 : slot-named ( name specs -- spec/f )
     slot-named* nip ;
+
+! Predefine some slots, because there are change-* words in other vocabs
+! that nondeterministically cause ambiguities when USEd alongside
+! accessors
+
+SLOT: at
+SLOT: nth
+SLOT: global

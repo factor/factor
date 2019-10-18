@@ -31,7 +31,7 @@ ERROR: duplicate-slot-names names ;
 ERROR: invalid-slot-name name ;
 
 : parse-long-slot-name ( -- spec )
-    [ scan , \ } parse-until % ] { } make ;
+    [ scan-token , \ } parse-until % ] { } make ;
 
 : parse-slot-name-delim ( end-delim string/f -- ? )
     ! Check for mistakes of this form:
@@ -55,8 +55,8 @@ ERROR: invalid-slot-name name ;
     ";" parse-tuple-slots-delim ;
 
 : parse-tuple-definition ( -- class superclass slots )
-    CREATE-CLASS
-    scan {
+    scan-new-class
+    scan-token {
         { ";" [ tuple f ] }
         { "<" [ scan-word [ parse-tuple-slots ] { } make ] }
         [ tuple swap [ parse-slot-name [ parse-tuple-slots ] when ] { } make ]
@@ -69,10 +69,10 @@ ERROR: bad-literal-tuple ;
 ERROR: bad-slot-name class slot ;
 
 : check-slot-name ( class slots name -- name )
-    2dup swap slot-named* nip [ 2nip ] [ nip bad-slot-name ] if ;
+    2dup swap slot-named [ 2nip ] [ nip bad-slot-name ] if ;
 
 : parse-slot-value ( class slots -- )
-    scan check-slot-name scan-object 2array , scan-token {
+    scan-token check-slot-name scan-object 2array , scan-token {
         { "}" [ ] }
         [ bad-literal-tuple ]
     } case ;

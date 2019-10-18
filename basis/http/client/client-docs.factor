@@ -20,6 +20,26 @@ HELP: <post-request>
 { $description "Constructs an HTTP POST request for submitting post data to the URL." }
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
+HELP: <head-request>
+{ $values { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $description "Constructs an HTTP HEAD request for retrieving the URL." }
+{ $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
+
+HELP: <delete-request>
+{ $values { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $description "Constructs an HTTP DELETE request for the requested URL." }
+{ $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
+
+HELP: <options-request>
+{ $values { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $description "Constructs an HTTP OPTIONS request for the requested URL." }
+{ $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
+
+HELP: <trace-request>
+{ $values { "url" "a " { $link url } " or " { $link string } } { "request" request } }
+{ $description "Constructs an HTTP TRACE request for the requested URL." }
+{ $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
+
 HELP: download
 { $values { "url" "a " { $link url } " or " { $link string } } }
 { $description "Downloads the contents of the URL to a file in the " { $link current-directory } " having the same file name." }
@@ -43,6 +63,26 @@ HELP: http-post
 HELP: http-put
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PUT request." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: http-head
+{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Same as " { $link http-get } " except that the server is not supposed to return a message-body in the response, as per RFC2616. However in practise, most web servers respond to GET and HEAD method calls with identical responses." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+ 
+HELP: http-delete
+{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Requests that the origin server delete the resource identified by the URL." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: http-options
+{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Submits an HTTP OPTIONS request." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: http-trace
+{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Submits an HTTP TRACE request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: with-http-get
@@ -105,10 +145,43 @@ ARTICLE: "http.client.post" "POST requests with the HTTP client"
 
 ARTICLE: "http.client.put" "PUT requests with the HTTP client"
 "Basic usage involves passing post data and a " { $link url } ", and getting a " { $link response } " and data back:"
-{ $subsections http-post }
+{ $subsections http-put }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
-{ $subsections <post-request> }
+{ $subsections <put-request> }
 "Both words take a post data parameter; see " { $link "http.client.post-data" } "." ;
+
+ARTICLE: "http.client.head" "HEAD requests with the HTTP client"
+"Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
+{ $subsections http-head }
+"Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
+{ $subsections
+    <head-request>
+} ;
+
+ARTICLE: "http.client.delete" "DELETE requests with the HTTP client"
+"Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
+{ $subsections http-delete }
+"Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
+{ $subsections
+    <delete-request>
+} ;
+
+ARTICLE: "http.client.options" "OPTIONS requests with the HTTP client"
+"Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
+{ $subsections http-options }
+"Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
+{ $subsections
+    <options-request>
+}
+"RFC2616 does not define any use for an entity body, yet allows for the inclusion of one as part of the OPTIONS method. This is not supported with this version of the " { $vocab-link "http.client" } ". The current implementation of " { $link http-options } " only supports a " { $link url } " request with no corresponding post-data, as per the stack effect." ;
+
+ARTICLE: "http.client.trace" "TRACE requests with the HTTP client"
+"Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
+{ $subsections http-trace }
+"Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
+{ $subsections
+    <trace-request>
+} ;
 
 ARTICLE: "http.client.encoding" "Character encodings and the HTTP client"
 "The " { $link http-request } ", " { $link http-get } " and " { $link http-post } " words output a sequence containing data that was sent by the server."
@@ -129,7 +202,7 @@ ARTICLE: "http.client.errors" "HTTP client errors"
 ARTICLE: "http.client" "HTTP client"
 "The " { $vocab-link "http.client" } " vocabulary implements an HTTP and HTTPS client on top of " { $link "http" } "."
 $nl
-"For HTTPS support, you must load the " { $vocab-link "urls.secure" } " vocab first. If you don't need HTTPS support, don't load " { $vocab-link "urls.secure" } "; this will reduce the size of images generated by " { $vocab-link "tools.deploy" } "."
+"For HTTPS support, you must load the " { $vocab-link "io.sockets.secure" } " vocab first. If you don't need HTTPS support, don't load " { $vocab-link "io.sockets.secure" } "; this will reduce the size of images generated by " { $vocab-link "tools.deploy" } "."
 $nl
 "There are two primary usage patterns, data retrieval with GET requests and form submission with POST requests:"
 { $subsections
@@ -139,7 +212,14 @@ $nl
 }
 "Submission data for POST and PUT requests:"
 { $subsections "http.client.post-data" }
-"More esoteric use-cases, for example HTTP methods other than the above, are accomodated by constructing an empty request object with " { $link <request> } " and filling everything in by hand."
+"Other HTTP methods are also supported:"
+{ $subsections
+    "http.client.head"
+    "http.client.delete"
+    "http.client.options"
+    "http.client.trace"
+}
+"More esoteric use-cases, for example HTTP methods other than the above, are accommodated by constructing an empty request object with " { $link <request> } " and filling everything in by hand."
 { $subsections
     "http.client.encoding"
     "http.client.errors"

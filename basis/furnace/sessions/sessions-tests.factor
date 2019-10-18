@@ -1,6 +1,6 @@
 USING: tools.test http furnace.sessions furnace.actions
 http.server http.server.responses math namespaces make kernel
-accessors io.sockets io.servers.connection prettyprint
+accessors io.sockets io.servers prettyprint
 io.streams.string io.files io.files.temp io.directories
 splitting destructors sequences db db.tuples db.sqlite
 continuations urls math.parser furnace furnace.utilities ;

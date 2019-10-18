@@ -5,13 +5,13 @@ IN: help.syntax.tests
 [
     [ "foobar" ] [
         "IN: help.syntax.tests USE: help.syntax ABOUT: \"foobar\"" eval( -- )
-        "help.syntax.tests" vocab vocab-help
+        "help.syntax.tests" lookup-vocab vocab-help
     ] unit-test
     
     [ { "foobar" } ] [
         "IN: help.syntax.tests USE: help.syntax ABOUT: { \"foobar\" }" eval( -- )
-        "help.syntax.tests" vocab vocab-help
+        "help.syntax.tests" lookup-vocab vocab-help
     ] unit-test
     
-    [ ] [ "help.syntax.tests" vocab f >>help drop ] unit-test
+    [ ] [ "help.syntax.tests" lookup-vocab f >>help drop ] unit-test
 ] with-file-vocabs

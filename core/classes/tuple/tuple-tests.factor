@@ -6,7 +6,8 @@ io.streams.string kernel kernel.private math math.constants
 math.order namespaces parser parser.notes prettyprint
 quotations random see sequences sequences.private slots
 slots.private splitting strings summary threads tools.test
-vectors vocabs words words.symbol fry literals memory ;
+vectors vocabs words words.symbol fry literals memory
+combinators.short-circuit ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -42,13 +43,13 @@ TUPLE: point x y ;
 
 [ 100 ] [ "p" get x>> ] unit-test
 [ 200 ] [ "p" get y>> ] unit-test
-[ f ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
+[ f ] [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
 
-[ ] [ "p" get 300 ">>z" "accessors" lookup execute drop ] unit-test
+[ ] [ "p" get 300 ">>z" "accessors" lookup-word execute drop ] unit-test
 
 [ 3 ] [ "p" get tuple-size ] unit-test
 
-[ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
+[ 300 ] [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
 
 [ ] [ "IN: classes.tuple.tests TUPLE: point z y ;" eval( -- ) ] unit-test
 
@@ -56,7 +57,7 @@ TUPLE: point x y ;
 
 [ "p" get x>> ] must-fail
 [ 200 ] [ "p" get y>> ] unit-test
-[ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
+[ 300 ] [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
 
 TUPLE: predicate-test ;
 
@@ -67,7 +68,7 @@ C: <predicate-test> predicate-test
 [ t ] [ <predicate-test> predicate-test? ] unit-test
 
 PREDICATE: silly-pred < tuple
-    class \ rect = ;
+    class-of \ rect = ;
 
 GENERIC: area ( obj -- n )
 M: silly-pred area dup w>> swap h>> * ;
@@ -218,7 +219,7 @@ C: <laptop> laptop
 [ t ] [ "laptop" get tuple? ] unit-test
 
 : test-laptop-slot-values ( -- )
-    [ laptop ] [ "laptop" get class ] unit-test
+    [ laptop ] [ "laptop" get class-of ] unit-test
     [ "Pentium" ] [ "laptop" get cpu>> ] unit-test
     [ 128 ] [ "laptop" get ram>> ] unit-test
     [ t ] [ "laptop" get battery>> 3 hours = ] unit-test ;
@@ -245,7 +246,7 @@ C: <server> server
 [ t ] [ "server" get tuple? ] unit-test
 
 : test-server-slot-values ( -- )
-    [ server ] [ "server" get class ] unit-test
+    [ server ] [ "server" get class-of ] unit-test
     [ "PowerPC" ] [ "server" get cpu>> ] unit-test
     [ 64 ] [ "server" get ram>> ] unit-test
     [ "1U" ] [ "server" get rackmount>> ] unit-test ;
@@ -472,11 +473,11 @@ must-fail-with
     "forget-accessors-test" parse-stream
 ] unit-test
 
-[ t ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+[ t ] [ "forget-accessors-test" "classes.tuple.tests" lookup-word class? ] unit-test
 
 : accessor-exists? ( name -- ? )
-    [ "forget-accessors-test" "classes.tuple.tests" lookup ] dip
-    ">>" append "accessors" lookup method >boolean ;
+    [ "forget-accessors-test" "classes.tuple.tests" lookup-word ] dip
+    ">>" append "accessors" lookup-word ?lookup-method >boolean ;
 
 [ t ] [ "x" accessor-exists? ] unit-test
 [ t ] [ "y" accessor-exists? ] unit-test
@@ -488,7 +489,7 @@ must-fail-with
     "forget-accessors-test" parse-stream
 ] unit-test
 
-[ f ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
+[ f ] [ "forget-accessors-test" "classes.tuple.tests" lookup-word class? ] unit-test
 
 [ f ] [ "x" accessor-exists? ] unit-test
 [ f ] [ "y" accessor-exists? ] unit-test
@@ -507,7 +508,7 @@ TUPLE: another-forget-accessors-test ;
 
 ! Shadowing test
 [ f ] [
-    t parser-notes? [
+    f parser-quiet? [
         [
             "IN: classes.tuple.tests TUPLE: shadow-1 a b ; TUPLE: shadow-2 < shadow-1 a b ;" eval( -- )
         ] with-string-writer empty?
@@ -532,39 +533,47 @@ unit-test
 must-fail-with
 
 ! Check fixnum coercer
-[ 0 ] [ 0.0 "hi" declared-types boa n>> ] unit-test
+[ 0.0 "hi" declared-types boa n>> ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
 
-[ 0 ] [ declared-types new 0.0 >>n n>> ] unit-test
+[ declared-types new 0.0 >>n n>> ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
+
+[ T{ declared-types f 33333 "asdf" } ]
+[ 33333 >bignum "asdf" declared-types boa ] unit-test
+
+[ 444444444444444444444444444444444444444444444444433333 >bignum "asdf" declared-types boa ]
+[
+    T{ out-of-fixnum-range f 444444444444444444444444444444444444444444444444433333 } =
+] must-fail-with
 
 ! Check bignum coercer
 TUPLE: bignum-coercer { n bignum initial: $[ 0 >bignum ] } ;
 
-[ 13 bignum ] [ 13.5 bignum-coercer boa n>> dup class ] unit-test
+[ 13 bignum ] [ 13.5 bignum-coercer boa n>> dup class-of ] unit-test
 
-[ 13 bignum ] [ bignum-coercer new 13.5 >>n n>> dup class ] unit-test
+[ 13 bignum ] [ bignum-coercer new 13.5 >>n n>> dup class-of ] unit-test
 
 ! Check float coercer
 TUPLE: float-coercer { n float } ;
 
-[ 13.0 float ] [ 13 float-coercer boa n>> dup class ] unit-test
+[ 13.0 float ] [ 13 float-coercer boa n>> dup class-of ] unit-test
 
-[ 13.0 float ] [ float-coercer new 13 >>n n>> dup class ] unit-test
+[ 13.0 float ] [ float-coercer new 13 >>n n>> dup class-of ] unit-test
 
 ! Check integer coercer
 TUPLE: integer-coercer { n integer } ;
 
-[ 13 fixnum ] [ 13.5 integer-coercer boa n>> dup class ] unit-test
+[ 13.5 integer-coercer boa n>> dup class-of ] [ T{ bad-slot-value f 13.5 integer } = ] must-fail-with
 
-[ 13 fixnum ] [ integer-coercer new 13.5 >>n n>> dup class ] unit-test
+[ integer-coercer new 13.5 >>n n>> dup class-of ] [ T{ bad-slot-value f 13.5 integer } = ] must-fail-with
 
 : foo ( a b -- c ) declared-types boa ;
 
 \ foo def>> must-infer
 
-[ T{ declared-types f 0 "hi" } ] [ 0.0 "hi" foo ] unit-test
+[ 0.0 "hi" foo ] [ T{ no-method f 0.0 integer>fixnum-strict } = ] must-fail-with
 
 [ "hi" 0.0 declared-types boa ]
-[ T{ no-method f "hi" >fixnum } = ]
+[ T{ no-method f "hi" integer>fixnum-strict } = ]
 must-fail-with
 
 [ 0 { } declared-types boa ]
@@ -572,7 +581,7 @@ must-fail-with
 must-fail-with
 
 [ "hi" 0.0 foo ]
-[ T{ no-method f "hi" >fixnum } = ]
+[ T{ no-method f "hi" integer>fixnum-strict } = ]
 must-fail-with
 
 [ 0 { } foo ]
@@ -594,7 +603,7 @@ T{ reshape-test f "hi" } "tuple" set
 
 [ ] [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval( -- ) ] unit-test
 
-[ f ] [ \ reshape-test \ x<< method ] unit-test
+[ f ] [ \ reshape-test \ x<< ?lookup-method ] unit-test
 
 [ "tuple" get 5 >>x ] must-fail
 
@@ -610,7 +619,7 @@ T{ reshape-test f "hi" } "tuple" set
 
 TUPLE: boa-coercer-test { x array-capacity } ;
 
-[ fixnum ] [ 0 >bignum boa-coercer-test boa x>> class ] unit-test
+[ fixnum ] [ 0 >bignum boa-coercer-test boa x>> class-of ] unit-test
 
 [ T{ boa-coercer-test f 0 } ] [ T{ boa-coercer-test } ] unit-test
 
@@ -631,11 +640,15 @@ DEFER: error-y
 
 [ f ] [ \ error-y tuple-class? ] unit-test
 
+[ f ] [ \ error-y error-class? ] unit-test
+
 [ t ] [ \ error-y generic? ] unit-test
 
 [ ] [ "IN: classes.tuple.tests ERROR: error-y ;" eval( -- ) ] unit-test
 
 [ t ] [ \ error-y tuple-class? ] unit-test
+
+[ t ] [ \ error-y error-class? ] unit-test
 
 [ f ] [ \ error-y generic? ] unit-test
 
@@ -645,7 +658,7 @@ DEFER: error-y
     drop
 ] unit-test
 
-[ ] [ "forget-subclass-test'" "classes.tuple.tests" lookup new "bad-object" set ] unit-test
+[ ] [ "forget-subclass-test'" "classes.tuple.tests" lookup-word new "bad-object" set ] unit-test
 
 [ ] [
     "IN: classes.tuple.tests TUPLE: forget-subclass-test a ;"
@@ -674,7 +687,7 @@ SLOT: kex
     drop
 ] unit-test
 
-[ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
+[ t ] [ \ change-slot-test \ kex>> ?lookup-method >boolean ] unit-test
 
 [ ] [
     "IN: classes.tuple.tests USING: kernel accessors ; TUPLE: change-slot-test kex ;"
@@ -682,7 +695,7 @@ SLOT: kex
     drop
 ] unit-test
 
-[ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
+[ t ] [ \ change-slot-test \ kex>> ?lookup-method >boolean ] unit-test
 
 [ ] [
     "IN: classes.tuple.tests USING: kernel accessors ; TUPLE: change-slot-test ; SLOT: kex M: change-slot-test kex>> drop 3 ;"
@@ -690,8 +703,8 @@ SLOT: kex
     drop
 ] unit-test
 
-[ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
-[ f ] [ \ change-slot-test \ kex>> method "reading" word-prop ] unit-test
+[ t ] [ \ change-slot-test \ kex>> ?lookup-method >boolean ] unit-test
+[ f ] [ \ change-slot-test \ kex>> ?lookup-method "reading" word-prop ] unit-test
 
 DEFER: redefine-tuple-twice
 
@@ -710,7 +723,7 @@ DEFER: redefine-tuple-twice
 ERROR: base-error x y ;
 ERROR: derived-error < base-error z ;
 
-[ (( x y z -- * )) ] [ \ derived-error stack-effect ] unit-test
+[ ( x y z -- * ) ] [ \ derived-error stack-effect ] unit-test
 
 ! Make sure that tuple reshaping updates code heap roots
 TUPLE: code-heap-ref ;
@@ -803,3 +816,71 @@ TUPLE: final-subclass < final-superclass ;
 [ ] [ "IN: classes.tuple.tests TUPLE: final-superclass x ;" eval( -- ) ] unit-test
 
 [ t ] [ \ final-subclass final-class? ] unit-test
+
+! Test reset-class on tuples
+! Should forget all accessors on rclasstest
+TUPLE: rclasstest a b ;
+[ ] [ [ \ rclasstest reset-class ] with-compilation-unit ] unit-test
+[ f ] [ \ rclasstest \ a>> ?lookup-method ] unit-test
+[ f ] [ \ rclasstest \ a<< ?lookup-method ] unit-test
+[ f ] [ \ rclasstest \ b>> ?lookup-method ] unit-test
+[ f ] [ \ rclasstest \ b<< ?lookup-method ] unit-test
+
+<< \ rclasstest forget >>
+
+! initial: should type check
+TUPLE: initial-class ;
+
+DEFER: initial-slot
+
+[ ] [ "IN: classes.tuple.tests TUPLE: initial-slot { x initial-class } ;" eval( -- ) ] unit-test
+
+[ t ] [ initial-slot new x>> initial-class? ] unit-test
+
+[ "IN: classes.tuple.tests TUPLE: initial-slot { x initial-class initial: f } ;" eval( -- ) ]
+[ error>> T{ bad-initial-value f "x" f initial-class } = ] must-fail-with
+
+[ "IN: classes.tuple.tests TUPLE: initial-slot { x initial-class initial: 3 } ;" eval( -- ) ]
+[ error>> T{ bad-initial-value f "x" 3 initial-class } = ] must-fail-with
+
+[ "IN: classes.tuple.tests USE: math TUPLE: foo < foo ;" eval( -- ) ] [ error>> bad-superclass? ] must-fail-with
+
+[ "IN: classes.tuple.tests USE: math TUPLE: foo < + ;" eval( -- ) ] [ error>> bad-superclass? ] must-fail-with
+
+
+! Test no-slot error and get/set-slot-named
+
+TUPLE: no-slot-tuple0 a b c ;
+C: <no-slot-tuple0> no-slot-tuple0
+
+[ 1 2 3 <no-slot-tuple0> "d" over get-slot-named ]
+[
+    {
+        [ no-slot? ]
+        [ tuple>> no-slot-tuple0? ]
+        [ name>> "d" = ]
+    } 1&&
+] must-fail-with
+
+{ 1 }
+[ 1 2 3 <no-slot-tuple0> "a" swap get-slot-named ] unit-test
+
+{ 2 }
+[ 1 2 3 <no-slot-tuple0> "b" swap get-slot-named ] unit-test
+
+{ 3 }
+[ 1 2 3 <no-slot-tuple0> "c" swap get-slot-named ] unit-test
+
+{ 4 } [
+    1 2 3 <no-slot-tuple0> 4 "a" pick set-slot-named
+    "a" swap get-slot-named
+] unit-test
+
+[ 1 2 3 <no-slot-tuple0> 4 "d" pick set-slot-named ]
+[
+    {
+        [ no-slot? ]
+        [ tuple>> no-slot-tuple0? ]
+        [ name>> "d" = ]
+    } 1&&
+] must-fail-with

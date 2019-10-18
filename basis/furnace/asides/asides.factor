@@ -46,8 +46,7 @@ SYMBOL: aside-id
 
 : init-asides ( asides -- )
     asides set
-    request get request-aside-id
-    get-aside
+    request get request-aside
     set-aside ;
 
 M: asides call-responder*
@@ -88,7 +87,7 @@ ERROR: end-aside-in-get-error ;
 : end-aside ( default -- response )
     aside-id get aside-id off get-aside [ move-on ] [ <redirect> ] ?if ;
 
-M: asides link-attr ( tag -- )
+M: asides link-attr ( tag responder -- )
     drop
     "aside" optional-attr {
         { "none" [ aside-id off ] }
@@ -103,7 +102,7 @@ M: asides modify-query ( query asides -- query' )
         aside-id-key associate assoc-union
     ] when* ;
 
-M: asides modify-form ( asides -- )
+M: asides modify-form ( asides -- xml/f )
     drop
     aside-id get
     aside-id-key

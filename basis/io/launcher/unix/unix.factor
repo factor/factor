@@ -14,16 +14,23 @@ IN: io.launcher.unix
 : assoc>env ( assoc -- env )
     [ "=" glue ] { } assoc>map ;
 
+: setup-process-group ( process -- process )
+    dup group>> {
+        { +same-group+ [ ] }
+        { +new-group+ [ 0 0 setpgid io-error ] }
+        { +new-session+ [ setsid io-error ] }
+    } case ;
+
 : setup-priority ( process -- process )
     dup priority>> [
-        H{
-            { +lowest-priority+ 20 }
-            { +low-priority+ 10 }
-            { +normal-priority+ 0 }
-            { +high-priority+ -10 }
-            { +highest-priority+ -20 }
-            { +realtime-priority+ -20 }
-        } at set-priority
+        {
+            { +lowest-priority+ [ 20 ] }
+            { +low-priority+ [ 10 ] }
+            { +normal-priority+ [ 0 ] }
+            { +high-priority+ [ -10 ] }
+            { +highest-priority+ [ -20 ] }
+            { +realtime-priority+ [ -20 ] }
+        } case set-priority
     ] when* ;
 
 : reset-fd ( fd -- )
@@ -69,6 +76,7 @@ IN: io.launcher.unix
     ] when ;
 
 : spawn-process ( process -- * )
+    [ setup-process-group ] [ 2drop 249 _exit ] recover
     [ setup-priority ] [ 2drop 250 _exit ] recover
     [ setup-redirection ] [ 2drop 251 _exit ] recover
     [ current-directory get absolute-path cd ] [ 2drop 252 _exit ] recover
@@ -82,8 +90,12 @@ M: unix current-process-handle ( -- handle ) getpid ;
 M: unix run-process* ( process -- pid )
     [ spawn-process ] curry [ ] with-fork ;
 
-M: unix kill-process* ( pid -- )
-    SIGTERM kill io-error ;
+M: unix kill-process* ( process -- )
+    [ handle>> SIGTERM ] [ group>> ] bi {
+        { +same-group+ [ kill ] }
+        { +new-group+ [ killpg ] }
+        { +new-session+ [ killpg ] }
+    } case io-error ;
 
 : find-process ( handle -- process )
     processes get swap [ nip swap handle>> = ] curry

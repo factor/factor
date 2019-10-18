@@ -8,6 +8,7 @@ html.forms
 html.components
 http.server
 http.server.dispatchers
+http.server.static
 furnace
 furnace.actions
 furnace.redirection
@@ -190,6 +191,7 @@ posting "POSTINGS"
         <planet-action> "" add-responder
         <planet-feed-action> "feed.xml" add-responder
         <planet-admin> "admin" add-responder
+        "vocab:webapps/planet/icons/" <static> "icons" add-responder
     <boilerplate>
         { planet "planet-common" } >>template ;
 

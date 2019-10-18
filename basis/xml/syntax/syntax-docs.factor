@@ -6,7 +6,7 @@ IN: xml.syntax
 ABOUT: "xml.syntax"
 
 ARTICLE: "xml.syntax" "Syntax extensions for XML"
-"The " { $link "xml.syntax" } " vocabulary defines a number of new parsing words forXML processing."
+"The " { $link "xml.syntax" } " vocabulary defines a number of new parsing words for XML processing."
 { $subsections
     { "xml.syntax" "tags" }
     { "xml.syntax" "literals" }

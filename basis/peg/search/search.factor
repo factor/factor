@@ -16,12 +16,12 @@ MEMO: any-char-parser ( -- parser )
   [ drop t ] satisfy ;
 
 : search ( string parser -- seq )
-  any-char-parser [ drop f ] action 2array choice repeat0 
+  any-char-parser [ drop f ] action 2choice repeat0
   [ parse sift ] [ 3drop { } ] recover ;
 
 
 : (replace) ( string parser -- seq )
-  any-char-parser 2array choice repeat0 parse sift ;
+  any-char-parser 2choice repeat0 parse sift ;
 
 : replace ( string parser -- result )
  [  (replace) [ tree-write ] each ] with-string-writer ;

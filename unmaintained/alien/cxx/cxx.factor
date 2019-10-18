@@ -24,7 +24,7 @@ PRIVATE>
     add-mixin-instance define-class-tuple ;
 
 :: define-c++-method ( class-name generic name types effect virtual -- )
-    [ name % "_" % class-name { { CHAR: : CHAR: _ } } substitute % ] "" make           :> name'
+    [ name % "_" % class-name H{ { CHAR: : CHAR: _ } } substitute % ] "" make           :> name'
     effect [ in>> "self" suffix ] [ out>> ] bi <effect> :> effect'
     types class-name "*" append suffix                  :> types'
     effect in>> "," join                                :> args

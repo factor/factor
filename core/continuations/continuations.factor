@@ -1,8 +1,7 @@
-! Copyright (C) 2003, 2010 Slava Pestov.
+! Copyright (C) 2003, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays vectors kernel kernel.private sequences
-namespaces make math splitting sorting quotations assocs
-combinators combinators.private accessors words ;
+USING: accessors assocs combinators combinators.private kernel
+kernel.private make namespaces sequences vectors ;
 IN: continuations
 
 : with-datastack ( stack quot -- new-stack )
@@ -10,7 +9,7 @@ IN: continuations
         [ [ datastack ] dip swap [ { } like set-datastack ] dip ] dip
         swap [ call datastack ] dip
         swap [ set-datastack ] dip
-    ] (( stack quot -- new-stack )) call-effect-unsafe ;
+    ] ( stack quot -- new-stack ) call-effect-unsafe ;
 
 SYMBOL: original-error
 SYMBOL: error
@@ -21,20 +20,16 @@ SYMBOL: restarts
 <PRIVATE
 
 : catchstack* ( -- catchstack )
-    1 context-object { vector } declare ; inline
-
-: >c ( continuation -- ) catchstack* push ;
-
-: c> ( -- continuation ) catchstack* pop ;
+    CONTEXT-OBJ-CATCHSTACK context-object { vector } declare ; inline
 
 ! We have to defeat some optimizations to make continuations work
 : dummy-1 ( -- obj ) f ;
-: dummy-2 ( obj -- obj ) dup drop ;
+: dummy-2 ( obj -- obj ) ;
 
 : catchstack ( -- catchstack ) catchstack* clone ; inline
 
 : set-catchstack ( catchstack -- )
-    >vector 1 set-context-object ; inline
+    >vector CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
 
 : init-catchstack ( -- ) f set-catchstack ;
 
@@ -44,7 +39,7 @@ TUPLE: continuation data call retain name catch ;
 
 C: <continuation> continuation
 
-: continuation ( -- continuation )
+: current-continuation ( -- continuation )
     datastack callstack retainstack namestack catchstack
     <continuation> ;
 
@@ -56,7 +51,7 @@ C: <continuation> continuation
 PRIVATE>
 
 : ifcc ( capture restore -- )
-    [ dummy-1 continuation ] 2dip [ dummy-2 ] prepose ?if ; inline
+    [ dummy-1 current-continuation ] 2dip [ dummy-2 ] prepose ?if ; inline
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
@@ -72,20 +67,25 @@ PRIVATE>
         set-retainstack
         [ set-datastack ] dip
         set-callstack
-    ] (( continuation -- * )) call-effect-unsafe ;
+    ] ( continuation -- * ) call-effect-unsafe ;
 
 PRIVATE>
 
 : continue-with ( obj continuation -- * )
     [
-        swap 4 set-special-object
+        swap OBJ-CALLCC-1 set-special-object
         >continuation<
         set-catchstack
         set-namestack
         set-retainstack
-        [ set-datastack drop 4 special-object f 4 set-special-object f ] dip
+        [
+            set-datastack drop
+            OBJ-CALLCC-1 special-object
+            f OBJ-CALLCC-1 set-special-object
+            f
+        ] dip
         set-callstack
-    ] (( obj continuation -- * )) call-effect-unsafe ;
+    ] ( obj continuation -- * ) call-effect-unsafe ;
 
 : continue ( continuation -- * )
     f swap continue-with ;
@@ -108,19 +108,38 @@ GENERIC: compute-restarts ( error -- seq )
 
 PRIVATE>
 
-SYMBOL: thread-error-hook
+GENERIC: error-in-thread ( error thread -- * )
+
+SYMBOL: thread-error-hook ! ( error thread -- )
+
+thread-error-hook [ [ die ] ] initialize
+
+M: object error-in-thread ( error thread -- * )
+    thread-error-hook get-global call( error thread -- * ) ;
+
+: in-callback? ( -- ? ) CONTEXT-OBJ-IN-CALLBACK-P context-object ;
+
+SYMBOL: callback-error-hook ! ( error -- * )
+
+callback-error-hook [ [ die ] ] initialize
 
 : rethrow ( error -- * )
     dup save-error
-    catchstack* empty? [
-        thread-error-hook get-global
-        [ original-error get-global die ] or
-        (( error -- * )) call-effect-unsafe
-    ] when
-    c> continue-with ;
+    catchstack* [
+        in-callback?
+        [ callback-error-hook get-global call( error -- * ) ]
+        [ OBJ-CURRENT-THREAD special-object error-in-thread ]
+        if
+    ] [ pop continue-with ] if-empty ;
 
 : recover ( ..a try: ( ..a -- ..b ) recovery: ( ..a error -- ..b ) -- ..b )
-    [ [ swap >c call c> drop ] curry ] dip ifcc ; inline
+    [
+        [
+            [ catchstack* push ] dip
+            call
+            catchstack* pop*
+        ] curry
+    ] dip ifcc ; inline
 
 : ignore-errors ( quot -- )
     [ drop ] recover ; inline
@@ -175,13 +194,13 @@ M: condition compute-restarts
     init-catchstack
     ! VM calls on error
     [
-        ! 63 = self
-        63 special-object error-thread set-global
-        continuation error-continuation set-global
+        ! 65 = self
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation error-continuation set-global
         [ original-error set-global ] [ rethrow ] bi
-    ] 5 set-special-object
+    ] ERROR-HANDLER-QUOT set-special-object
     ! VM adds this to kernel errors, so that user-space
     ! can identify them
-    "kernel-error" 6 set-special-object ;
+    "kernel-error" OBJ-ERROR set-special-object ;
 
 PRIVATE>

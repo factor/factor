@@ -27,7 +27,7 @@ CONSTANT: gamma-p6
 
 : gamma-lanczos6 ( x -- gamma[x] )
     #! gamma(x) = gamma(x+1) / x
-    [ (gamma-lanczos6) exp ] keep / ;
+    [ (gamma-lanczos6) e^ ] keep / ;
 
 : gammaln-lanczos6 ( x -- gammaln[x] )
     #! log(gamma(x)) = log(gamma(x+1)) - log(x)
@@ -104,7 +104,7 @@ PRIVATE>
         nip
         /
         over /
-        swap -1.0 * exp
+        swap -1.0 * e^
         *
     ] if ;
 

@@ -60,9 +60,9 @@ PREDICATE: file-exists-error < couchdb-error
 ! server
 TUPLE: server { host string } { port integer } { uuids vector } { uuids-to-cache integer } ;
 
-: default-couch-host ( -- host ) "localhost" ; inline
-: default-couch-port ( -- port ) 5984 ; inline
-: default-uuids-to-cache ( -- n ) 100 ; inline
+CONSTANT: default-couch-host "localhost"
+CONSTANT: default-couch-port 5984
+CONSTANT: default-uuids-to-cache 100
 
 : <server> ( host port -- server )
     V{ } clone default-uuids-to-cache server boa ;
@@ -156,7 +156,7 @@ C: <db> db
     <json-post-data> couch get db-url "_temp_view" append couch-post ;
 
 : temp-view-map ( map -- results )
-    "map" H{ } clone [ set-at ] keep temp-view ;
+    "map" associate temp-view ;
 
 : save-doc-as ( assoc id -- )
     [ dup <json-post-data> ] dip id-url couch-put response-ok

@@ -1,15 +1,17 @@
 ! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays assocs combinators fry kernel locals
+USING: alien.data arrays assocs combinators fry kernel locals
 macros math math.vectors namespaces quotations sequences system
 compiler.cfg.comparisons compiler.cfg.intrinsics
-compiler.codegen.fixup cpu.architecture cpu.x86
-cpu.x86.assembler cpu.x86.assembler.operands cpu.x86.features ;
+compiler.codegen.labels compiler.codegen.relocation
+cpu.architecture cpu.x86 cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86.features ;
+QUALIFIED-WITH: alien.c-types c
 IN: cpu.x86.sse
 
 ! Scalar floating point with SSE2
-M: x86 %load-float <float> float-rep %load-vector ;
-M: x86 %load-double <double> double-rep %load-vector ;
+M: x86 %load-float c:float <ref> float-rep %load-vector ;
+M: x86 %load-double c:double <ref> double-rep %load-vector ;
 
 M: float-rep copy-register* drop MOVAPS ;
 M: double-rep copy-register* drop MOVAPS ;
@@ -474,15 +476,24 @@ M: x86 %compare-vector-ccs
         { vcc-notall [ dst mask CMP dst temp \ CMOVNE (%boolean) ] }
     } case ;
 
-: %move-vector-mask ( dst src rep -- mask )
+: (%move-vector-mask) ( dst src rep -- mask )
     {
-        { double-2-rep [ MOVMSKPS HEX: f ] }
-        { float-4-rep  [ MOVMSKPS HEX: f ] }
-        [ drop PMOVMSKB HEX: ffff ]
+        { double-2-rep [ MOVMSKPS 0xf ] }
+        { float-4-rep  [ MOVMSKPS 0xf ] }
+        [ drop PMOVMSKB 0xffff ]
     } case ;
 
+M: x86 %move-vector-mask ( dst src rep -- )
+    (%move-vector-mask) drop ;
+
+M: x86 %move-vector-mask-reps
+    {
+        { sse? { float-4-rep } }
+        { sse2? { double-2-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } }
+    } available-reps ;
+
 M:: x86 %test-vector ( dst src temp rep vcc -- )
-    dst src rep %move-vector-mask :> mask
+    dst src rep (%move-vector-mask) :> mask
     dst temp mask vcc %test-vector-mask ;
 
 :: %test-vector-mask-branch ( label temp mask vcc -- )
@@ -494,7 +505,7 @@ M:: x86 %test-vector ( dst src temp rep vcc -- )
     } case ;
 
 M:: x86 %test-vector-branch ( label src temp rep vcc -- )
-    temp src rep %move-vector-mask :> mask
+    temp src rep (%move-vector-mask) :> mask
     label temp mask vcc %test-vector-mask-branch ;
 
 M: x86 %test-vector-reps
@@ -697,8 +708,8 @@ M: x86 %avg-vector-reps
 M: x86 %dot-vector
     [ two-operand ] keep
     {
-        { float-4-rep [ HEX: ff DPPS ] }
-        { double-2-rep [ HEX: ff DPPD ] }
+        { float-4-rep [ 0xff DPPS ] }
+        { double-2-rep [ 0xff DPPD ] }
     } case ;
 
 M: x86 %dot-vector-reps

@@ -32,7 +32,7 @@ C: <scaled> scaled
 M: scaled modified-nth ( n seq -- elt )
     [ seq>> nth ] [ c>> * ] bi ;
 
-M:: scaled modified-set-nth ( elt n seq -- elt )
+M:: scaled modified-set-nth ( elt n seq -- )
     ! don't set c to 0!
     elt seq c>> / n seq seq>> set-nth ;
 
@@ -63,7 +63,7 @@ M: summed length seqs>> [ length ] [ max ] map-reduce ;
     ] if* ;
 PRIVATE>
 
-M: summed modified-nth ( n seq -- )
+M: summed modified-nth ( n seq -- elt )
     seqs>> [ ?nth ?+ ] with 0 swap reduce ;
 
 M: summed modified-set-nth ( elt n seq -- ) immutable ;
@@ -72,7 +72,7 @@ M: summed set-length ( n seq -- )
     seqs>> [ set-length ] with each ;
 
 M: summed virtual-exemplar ( summed -- seq )
-    seqs>> [ f ] [ first ] if-empty ;
+    seqs>> ?first ;
 
 : <2summed> ( seq seq -- summed-seq ) 2array <summed> ;
 : <3summed> ( seq seq seq -- summed-seq ) 3array <summed> ;

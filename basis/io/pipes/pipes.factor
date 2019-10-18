@@ -3,7 +3,7 @@
 USING: io.encodings io.backend io.ports io.streams.duplex
 io splitting grouping sequences namespaces kernel
 destructors math concurrency.combinators accessors fry
-arrays continuations quotations system vocabs.loader combinators ;
+arrays continuations quotations system vocabs combinators ;
 IN: io.pipes
 
 TUPLE: pipe in out ;
@@ -60,6 +60,6 @@ PRIVATE>
 
 {
     { [ os unix? ] [ "io.pipes.unix" require ] }
-    { [ os winnt? ] [ "io.pipes.windows.nt" require ] }
+    { [ os windows? ] [ "io.pipes.windows" require ] }
     [ ]
 } cond

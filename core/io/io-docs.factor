@@ -1,6 +1,6 @@
 USING: help.markup help.syntax quotations hashtables kernel
 classes strings continuations destructors math byte-arrays
-alien ;
+alien specialized-arrays sequences ;
 IN: io
 
 ARTICLE: "stream-types" "Binary and text streams"
@@ -12,7 +12,7 @@ ARTICLE: "stream-types" "Binary and text streams"
 $nl
 "Binary streams have an element type of " { $link +byte+ } ". Elements are integers in the range " { $snippet "[0,255]" } ", representing bytes. Reading a sequence of elements produces a " { $link byte-array } ". Any object implementing the " { $link >c-ptr } " and " { $link byte-length } " generic words can be written to a binary stream."
 $nl
-"Character streams have an element tye of " { $link +character+ } ". Elements are non-negative integers, representing Unicode code points. Only instances of the " { $link string } " class can be read or written on a character stream."
+"Character streams have an element type of " { $link +character+ } ". Elements are non-negative integers, representing Unicode code points. Only instances of the " { $link string } " class can be read or written on a character stream."
 $nl
 "Most external streams are binary streams, and can be wrapped in string streams once a suitable encoding has been provided; see " { $link "io.encodings" } "." ;
 
@@ -39,9 +39,26 @@ HELP: stream-read1
 $io-error ;
 
 HELP: stream-read
-{ $values { "n" "a non-negative integer" } { "stream" "an input stream" } { "seq" { $or byte-array string f } } }
+{ $values { "n" "a non-negative integer" } { "stream" "an input stream" } { "seq/f" { $or byte-array string f } } }
 { $contract "Reads " { $snippet "n" } " elements from the stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link read } "; see " { $link "stdio" } "." }
+$io-error ;
+
+HELP: stream-read-unsafe
+{ $values { "n" "a non-negative integer" } { "buf" { $or c-ptr string } } { "stream" "an input stream" } { "count" integer } }
+{ $contract "Reads up to " { $snippet "n" } " elements from the stream. The data is stored directly into the buffer provided by " { $snippet "buf" } ", which must be a string (in the case of a character stream) or a byte array, specialized array, or other pointer to memory (in the case of a byte stream). There must be space in the buffer for at least " { $snippet "n" } " elements. Returns the number of elements read from the stream, which will be equal to " { $snippet "n" } " unless the end of the stream is reached. If the stream is exhausted, returns zero." }
+{ $warning "This word does not perform bounds checking on " { $snippet "buf" } ". Most code should use " { $link stream-read } " or " { $link stream-read-into } " instead." }
+$io-error ;
+
+HELP: read-into
+{ $values { "buf" { $or byte-array specialized-array string } } { "buf-slice" slice } { "more?" boolean } }
+{ $contract "Reads from the current " { $link input-stream } " into the sequence " { $snippet "buf" } ", until either the length of " { $snippet "buf" } " is reached or the stream is exhausted. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, and a boolean value that will be " { $link f } " if the stream was exhausted." }
+$io-error ;
+
+HELP: stream-read-into
+{ $values { "buf" { $or byte-array specialized-array string } } { "stream" "an input stream" } { "buf-slice" slice } { "more?" boolean } }
+{ $contract "Reads from the stream into the sequence " { $snippet "buf" } ", until either the length of " { $snippet "buf" } " is reached or the stream is exhausted. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, and a boolean value that will be " { $link f } " if the stream was exhausted." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link read-into } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-read-until
@@ -53,8 +70,25 @@ $io-error ;
 HELP: stream-read-partial
 { $values
      { "n" "a non-negative integer" } { "stream" "an input stream" }
-     { "seq" { $or byte-array string f } } }
+     { "seq/f" { $or byte-array string f } } }
 { $description "Reads at most " { $snippet "n" } " elements from a stream and returns up to that many characters without blocking. If no characters are available, blocks until some are and returns them." } ;
+
+HELP: stream-read-partial-unsafe
+{ $values { "n" "a non-negative integer" } { "buf" { $or c-ptr string } } { "stream" "an input stream" } { "count" integer } }
+{ $contract "Reads up to " { $snippet "n" } " elements from the stream without blocking. If no data is available immediately on the stream, blocks until data is available. The data is stored directly into the buffer provided by " { $snippet "buf" } ", which must be a string (in the case of a character stream), or a byte array, specialized array, or other pointer to memory (in the case of a byte stream). There must be space in the buffer for at least " { $snippet "n" } " elements. Returns the number of elements read from the stream, or zero if the end of the stream was reached." }
+{ $warning "This word does not perform bounds checking on " { $snippet "buf" } ". Most code should use " { $link stream-read-partial } " or " { $link stream-read-partial-into } " instead." }
+$io-error ;
+
+HELP: read-partial-into
+{ $values { "buf" { $or byte-array specialized-array string } } { "buf-slice" slice } { "more?" boolean } }
+{ $contract "Reads available data from the current " { $link input-stream } " into the sequence " { $snippet "buf" } " without blocking until all immediately available data is read or the length of " { $snippet "buf" } " is reached. If no data is immediately available, blocks until data is available. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, and a boolean that will be " { $link f } " if the stream was exhausted." }
+$io-error ;
+
+HELP: stream-read-partial-into
+{ $values { "buf" { $or byte-array specialized-array string } } { "stream" "an input stream" } { "buf-slice" slice } { "more?" boolean } }
+{ $contract "Reads available data from the stream into the sequence " { $snippet "buf" } " without blocking until all immediately available data is read or the length of " { $snippet "buf" } " is reached. If no data is immediately available, blocks until data is available. Returns a " { $link slice } " over the part of " { $snippet "buf" } " that was written to, and a boolean that will be " { $link f } " if the stream was exhausted." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link read-partial-into } "; see " { $link "stdio" } "." }
+$io-error ;
 
 HELP: stream-write1
 { $values { "elt" "an element" } { "stream" "an output stream" } }
@@ -87,9 +121,14 @@ HELP: stream-print
 { $notes "Most code only works on one stream at a time and should instead use " { $link print } "; see " { $link "stdio" } "." }
 $io-error ;
 
+HELP: stream-copy*
+{ $values { "in" "an input stream" } { "out" "an output stream" } }
+{ $description "Copies the contents of one stream into another. The streams are left open when the copy is completed. The " { $link stream-copy } " word can be used instead to close them on completion, if desired." }
+$io-error ;
+
 HELP: stream-copy
 { $values { "in" "an input stream" } { "out" "an output stream" } }
-{ $description "Copies the contents of one stream into another, closing both streams when done." } 
+{ $description "Copies the contents of one stream into another, closing both streams when done. To copy without closing the streams, use " { $link stream-copy* } "." }
 $io-error ;
 
 HELP: stream-tell
@@ -98,7 +137,6 @@ HELP: stream-tell
 }
 { $description "Returns the index of the stream pointer if the stream is seekable." }
 { $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
-
 
 HELP: stream-seek
 { $values
@@ -110,27 +148,42 @@ HELP: stream-seek
 }
 { $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
 
+HELP: stream-seekable?
+{ $values
+     { "stream" "a stream" } { "?" boolean }
+}
+{ $description "Returns true if " { $snippet "stream" } " is a seekable stream." }
+{ $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
+
+HELP: stream-length
+{ $values
+     { "stream" "a stream" } { "n/f" "an integer or " { $link f } }
+}
+{ $description "Returns the length of the data supplied by " { $snippet "stream" } ", or " { $link f } " if the stream is not seekable or has unknown length." }
+{ $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
+
 HELP: seek-absolute
 { $values
-    
+
      { "value" "a seek singleton" }
 }
 { $description "Seeks to an offset from the beginning of the stream." } ;
 
 HELP: seek-end
 { $values
-    
+
      { "value" "a seek singleton" }
 }
 { $description "Seeks to an offset from the end of the stream. If the offset puts the stream pointer past the end of the data on an output stream, writing to it will pad the difference with zeros." } ;
 
 HELP: seek-relative
 { $values
-    
+
      { "value" "a seek singleton" }
 }
 { $description "Seeks to an offset from the current position of the stream pointer." } ;
 
+{ stream-seek stream-tell stream-seekable? stream-length } related-words
 { seek-absolute seek-relative seek-end } related-words
 
 HELP: seek-input
@@ -203,19 +256,19 @@ $io-error ;
 
 HELP: with-input-stream
 { $values { "stream" "an input stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to  " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;
+{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;
 
 HELP: with-output-stream
 { $values { "stream" "an output stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to  " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;
+{ $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;
 
 HELP: with-streams
 { $values { "input" "an input stream" } { "output" "an output stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to  " { $snippet "input" } " and " { $link output-stream } " rebound to  " { $snippet "output" } ". The stream is closed if the quotation returns or throws an error." } ;
+{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "input" } " and " { $link output-stream } " rebound to " { $snippet "output" } ". The stream is closed if the quotation returns or throws an error." } ;
 
 HELP: with-streams*
 { $values { "input" "an input stream" } { "output" "an output stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to  " { $snippet "input" } " and " { $link output-stream } " rebound to  " { $snippet "output" } "." }
+{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "input" } " and " { $link output-stream } " rebound to " { $snippet "output" } "." }
 { $notes "This word does not close the stream. Compare with " { $link with-streams } "." } ;
 
 { with-input-stream with-input-stream* } related-words
@@ -224,12 +277,12 @@ HELP: with-streams*
 
 HELP: with-input-stream*
 { $values { "stream" "an input stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to  " { $snippet "stream" } "." }
+{ $description "Calls the quotation in a new dynamic scope, with " { $link input-stream } " rebound to " { $snippet "stream" } "." }
 { $notes "This word does not close the stream. Compare with " { $link with-input-stream } "." } ;
 
 HELP: with-output-stream*
 { $values { "stream" "an output stream" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to  " { $snippet "stream" } "." }
+{ $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to " { $snippet "stream" } "." }
 { $notes "This word does not close the stream. Compare with " { $link with-output-stream } "." } ;
 
 HELP: bl
@@ -245,11 +298,11 @@ HELP: lines
 { $description "Reads lines of text until from the " { $link input-stream } " until it is exhausted, collecting them in a sequence of strings." } ;
 
 HELP: each-line
-{ $values { "quot" { $quotation "( str -- )" } } }
+{ $values { "quot" { $quotation "( ... line -- ... )" } } }
 { $description "Calls the quotation with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
 
 HELP: each-block
-{ $values { "quot" { $quotation "( block -- )" } } }
+{ $values { "quot" { $quotation "( ... block -- ... )" } } }
 { $description "Calls the quotation with successive blocks of data, until the current " { $link input-stream } " is exhausted." } ;
 
 HELP: stream-contents
@@ -262,6 +315,18 @@ HELP: contents
 { $description "Reads all elements in the " { $link input-stream } " until the stream is exhausted. The type of the sequence depends on the stream's element type." }
 $io-error ;
 
+HELP: tell-input
+{ $values
+        { "n" integer }
+}
+{ $description "Returns the index of the stream stored in " { $link input-stream } "." } ;
+
+HELP: tell-output
+{ $values
+        { "n" integer }
+}
+{ $description "Returns the index of the stream stored in " { $link output-stream } "." } ;
+
 ARTICLE: "stream-protocol" "Stream protocol"
 "The stream protocol consists of a large number of generic words, many of which are optional."
 $nl
@@ -272,9 +337,16 @@ $nl
 "These words are required for binary and string input streams:"
 { $subsections
     stream-read1
-    stream-read
+    stream-read-unsafe
     stream-read-until
+    stream-read-partial-unsafe
+}
+"The " { $link stream-read-unsafe } " and " { $link stream-read-partial-unsafe } " words should be implemented by streams but not used by client code. The following safe words are provided for reading from input streams:"
+{ $subsections
+    stream-read
+    stream-read-into
     stream-read-partial
+    stream-read-partial-into
 }
 "This word is only required for string input streams:"
 { $subsections stream-readln }
@@ -288,8 +360,12 @@ $nl
 { $subsections stream-nl }
 "These words are for seekable streams:"
 { $subsections
+    stream-seekable?
     stream-tell
     stream-seek
+    tell-input
+    tell-output
+    stream-length
 }
 { $see-also "io.timeouts" } ;
 
@@ -340,8 +416,11 @@ $nl
 { $subsections
     read1
     read
+    read-into
     read-until
     read-partial
+    read-partial-into
+    readln
 }
 "If the default input stream is a character stream (" { $link stream-element-type } " outputs " { $link +character+ } "), lines of text can be read:"
 { $subsections readln }
@@ -370,12 +449,6 @@ $nl
 }
 "Seeking on the default output stream:"
 { $subsections seek-output }
-"Seeking descriptors:"
-{ $subsections
-    seek-absolute
-    seek-relative
-    seek-end
-}
 "A pair of combinators for rebinding the " { $link output-stream } " variable:"
 { $subsections
     with-output-stream
@@ -405,6 +478,7 @@ $nl
     each-block
 }
 "Copying the contents of one stream to another:"
+{ $subsections stream-copy* }
 { $subsections stream-copy } ;
 
 ARTICLE: "stream-examples" "Stream example"

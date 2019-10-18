@@ -66,7 +66,7 @@ M: hashtable rewrite-element
 
 M: tuple rewrite-element
     dup rewrite-literal? [
-        [ tuple-slots rewrite-elements ] [ class ] bi '[ _ boa ] %
+        [ tuple-slots rewrite-elements ] [ class-of ] bi '[ _ boa ] %
     ] [ , ] if ;
 
 M: quotation rewrite-element rewrite-sugar* ;

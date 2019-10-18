@@ -10,7 +10,7 @@ TUPLE: mirror { object read-only } ;
 
 C: <mirror> mirror
 
-: object-slots ( mirror -- slots ) object>> class all-slots ; inline
+: object-slots ( mirror -- slots ) object>> class-of all-slots ; inline
 
 M: mirror at*
     [ nip object>> ] [ object-slots slot-named ] 2bi

@@ -3,8 +3,8 @@
 USING: accessors arrays assocs base64 calendar calendar.format
 combinators debugger generic hashtables http http.client
 http.client.private io io.encodings.string io.encodings.utf8
-kernel math math.order math.parser namespaces sequences strings
-xml xml.data xml.syntax xml.traversal xml.writer ;
+kernel make math math.order math.parser namespaces sequences
+strings xml xml.data xml.syntax xml.traversal xml.writer ;
 IN: xml-rpc
 
 ! * Sending RPC requests
@@ -17,8 +17,6 @@ M: integer item>xml
     dup 31 2^ neg 31 2^ 1 - between?
     [ "Integers must fit in 32 bits" throw ] unless
     [XML <i4><-></i4> XML] ;
-
-UNION: boolean t POSTPONE: f ;
 
 M: boolean item>xml
     "1" "0" ? [XML <boolean><-></boolean> XML] ;
@@ -72,7 +70,7 @@ M: base64 item>xml
     params <XML <methodResponse><-></methodResponse> XML> ;
 
 : return-fault ( fault-code fault-string -- xml )
-    [ "faultString" set "faultCode" set ] H{ } make-assoc item>xml
+    [ "faultString" ,, "faultCode" ,, ] H{ } make item>xml
     <XML
         <methodResponse>
             <fault>
@@ -136,12 +134,12 @@ TAG: boolean xml>item
 : unstruct-member ( tag -- )
     children-tags first2
     first-child-tag xml>item
-    [ children>string ] dip swap set ;
+    [ children>string ] dip swap ,, ;
 
 TAG: struct xml>item
     [
         children-tags [ unstruct-member ] each
-    ] H{ } make-assoc ;
+    ] H{ } make ;
 
 TAG: base64 xml>item
     children>string base64> <base64> ;
@@ -163,7 +161,7 @@ TAG: array xml>item
 
 : parse-fault ( xml -- fault-code fault-string )
     first-child-tag first-child-tag first-child-tag
-    xml>item [ "faultCode" get "faultString" get ] bind ;
+    xml>item [ "faultCode" get "faultString" get ] with-variables ;
 
 : receive-rpc ( xml -- rpc )
     dup main>> dup "methodCall" =

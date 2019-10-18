@@ -76,7 +76,7 @@ SYMBOL: total
 ! Part II: Topologically sorting specializers
 : maximal-element ( seq quot -- n elt )
     dupd [
-        swapd [ call +lt+ = ] 2curry filter empty?
+        swapd [ call +lt+ = ] 2curry any? not
     ] 2curry find [ "Topological sort failed" throw ] unless* ;
     inline
 
@@ -109,7 +109,7 @@ SYMBOL: total
     } case ;
 
 : (multi-predicate) ( class picker -- quot )
-    swap "predicate" word-prop append ;
+    swap predicate-def append ;
 
 : multi-predicate ( classes -- quot )
     dup length iota <reversed>
@@ -130,7 +130,7 @@ ERROR: no-method arguments generic ;
 
 : multi-dispatch-quot ( methods generic -- quot )
     [ make-default-method ]
-    [ drop [ [ multi-predicate ] dip ] assoc-map reverse ]
+    [ drop [ [ multi-predicate ] dip ] assoc-map reverse! ]
     2bi alist>quot ;
 
 ! Generic words
@@ -164,9 +164,9 @@ M: method-body crossref?
 
 : method-word-props ( specializer generic -- assoc )
     [
-        "multi-method-generic" set
-        "multi-method-specializer" set
-    ] H{ } make-assoc ;
+        "multi-method-generic" ,,
+        "multi-method-specializer" ,,
+    ] H{ } make ;
 
 : <method> ( specializer generic -- word )
     [ method-word-props ] 2keep
@@ -202,7 +202,7 @@ M: no-method error.
     dup arguments>> short.
     nl
     "Inputs have signature:" print
-    dup arguments>> [ class ] map niceify-method .
+    dup arguments>> [ class-of ] map niceify-method .
     nl
     "Available methods: " print
     generic>> methods canonicalize-specializers drop sort-methods
@@ -224,7 +224,7 @@ M: no-method error.
     ] if ;
 
 ! Syntax
-SYNTAX: GENERIC: CREATE-WORD complete-effect define-generic ;
+SYNTAX: GENERIC: scan-new-word scan-effect define-generic ;
 
 : parse-method ( -- quot classes generic )
     parse-definition [ 2 tail ] [ second ] [ first ] tri ;
@@ -232,10 +232,10 @@ SYNTAX: GENERIC: CREATE-WORD complete-effect define-generic ;
 : create-method-in ( specializer generic -- method )
     create-method dup save-location f set-word ;
 
-: CREATE-METHOD ( -- method )
+: scan-new-method ( -- method )
     scan-word scan-object swap create-method-in ;
 
-: (METHOD:) ( -- method def ) CREATE-METHOD parse-definition ;
+: (METHOD:) ( -- method def ) scan-new-method parse-definition ;
 
 SYNTAX: METHOD: (METHOD:) define ;
 

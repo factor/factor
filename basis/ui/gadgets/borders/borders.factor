@@ -14,8 +14,7 @@ TUPLE: border < gadget
     new swap add-gadget ; inline
 
 : <border> ( child gap -- border )
-    swap border new-border
-        swap >>size ;
+    [ border new-border ] dip >>size ;
 
 : <filled-border> ( child gap -- border )
     <border> { 1 1 } >>fill ;

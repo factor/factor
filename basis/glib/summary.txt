@@ -1,1 +1,1 @@
-Binding for GLib
+GLib binding

@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays calendar calendar.unix
-classes.struct combinators combinators.short-circuit io.backend
-io.directories io.files.info io.files.types kernel literals
-math math.bitwise sequences specialized-arrays strings system
-unix unix.ffi unix.groups unix.stat unix.time unix.users
-vocabs.loader ;
+USING: accessors alien.c-types alien.data arrays calendar
+calendar.unix classes.struct combinators
+combinators.short-circuit io.backend
+io.files.info io.files.types kernel literals math math.bitwise
+sequences specialized-arrays strings system unix unix.ffi
+unix.groups unix.stat unix.time unix.users vocabs ;
 IN: io.files.info.unix
 SPECIALIZED-ARRAY: timeval
 
@@ -17,7 +17,7 @@ name-max flags id ;
 
 HOOK: new-file-system-info os ( --  file-system-info )
 
-M: unix new-file-system-info ( -- ) unix-file-system-info new ;
+M: unix new-file-system-info unix-file-system-info new ;
 
 HOOK: file-system-statfs os ( path -- statfs )
 
@@ -119,24 +119,24 @@ M: file-info file-mode? [ permissions>> ] dip mask? ;
 
 PRIVATE>
 
-CONSTANT: UID           OCT: 0004000
-CONSTANT: GID           OCT: 0002000
-CONSTANT: STICKY        OCT: 0001000
-CONSTANT: USER-ALL      OCT: 0000700
-CONSTANT: USER-READ     OCT: 0000400
-CONSTANT: USER-WRITE    OCT: 0000200
-CONSTANT: USER-EXECUTE  OCT: 0000100
-CONSTANT: GROUP-ALL     OCT: 0000070
-CONSTANT: GROUP-READ    OCT: 0000040
-CONSTANT: GROUP-WRITE   OCT: 0000020
-CONSTANT: GROUP-EXECUTE OCT: 0000010
-CONSTANT: OTHER-ALL     OCT: 0000007
-CONSTANT: OTHER-READ    OCT: 0000004
-CONSTANT: OTHER-WRITE   OCT: 0000002
-CONSTANT: OTHER-EXECUTE OCT: 0000001
-CONSTANT: ALL-READ      OCT: 0000444
-CONSTANT: ALL-WRITE     OCT: 0000222
-CONSTANT: ALL-EXECUTE   OCT: 0000111
+CONSTANT: UID           0o0004000
+CONSTANT: GID           0o0002000
+CONSTANT: STICKY        0o0001000
+CONSTANT: USER-ALL      0o0000700
+CONSTANT: USER-READ     0o0000400
+CONSTANT: USER-WRITE    0o0000200
+CONSTANT: USER-EXECUTE  0o0000100
+CONSTANT: GROUP-ALL     0o0000070
+CONSTANT: GROUP-READ    0o0000040
+CONSTANT: GROUP-WRITE   0o0000020
+CONSTANT: GROUP-EXECUTE 0o0000010
+CONSTANT: OTHER-ALL     0o0000007
+CONSTANT: OTHER-READ    0o0000004
+CONSTANT: OTHER-WRITE   0o0000002
+CONSTANT: OTHER-EXECUTE 0o0000001
+CONSTANT: ALL-READ      0o0000444
+CONSTANT: ALL-WRITE     0o0000222
+CONSTANT: ALL-EXECUTE   0o0000111
 
 : uid? ( obj -- ? ) UID file-mode? ;
 : gid? ( obj -- ? ) GID file-mode? ;
@@ -185,9 +185,6 @@ CONSTANT: ALL-EXECUTE   OCT: 0000111
 : remove-file-permissions ( path n -- )
     over file-permissions [ bitnot ] dip bitand set-file-permissions ;
 
-M: unix copy-file-and-info ( from to -- )
-    [ copy-file ] [ swap file-permissions set-file-permissions ] 2bi ;
-
 <PRIVATE
 
 : timestamp>timeval ( timestamp -- timeval )
@@ -195,7 +192,7 @@ M: unix copy-file-and-info ( from to -- )
 
 : timestamps>byte-array ( timestamps -- byte-array )
     [ [ timestamp>timeval ] [ \ timeval <struct> ] if* ] map
-    >timeval-array ;
+    timeval >c-array ;
 
 PRIVATE>
 
@@ -205,10 +202,10 @@ PRIVATE>
     timestamps>byte-array [ utimes ] unix-system-call drop ;
 
 : set-file-access-time ( path timestamp -- )
-    f 2array set-file-times ;
+    over file-info modified>> 2array set-file-times ;
 
 : set-file-modified-time ( path timestamp -- )
-    f swap 2array set-file-times ;
+    over file-info accessed>> swap 2array set-file-times ;
 
 : set-file-ids ( path uid gid -- )
     [ normalize-path ] 2dip [ -1 or ] bi@

@@ -1,6 +1,7 @@
 ! (c)2010 Joe Groff, Erik Charlebois bsd license
 USING: accessors alien.c-types arrays combinators delegate fry
-generic.parser kernel macros math parser sequences words words.symbol ;
+generic.parser kernel macros math parser sequences words words.symbol
+classes.singleton assocs ;
 IN: alien.enums
 
 <PRIVATE
@@ -12,7 +13,7 @@ PRIVATE>
 
 GENERIC: enum>number ( enum -- number ) foldable
 M: integer enum>number ;
-M: symbol enum>number "enum-value" word-prop ;
+M: word enum>number "enum-value" word-prop ;
 
 <PRIVATE
 : enum-boxer ( members -- quot )
@@ -21,7 +22,7 @@ M: symbol enum>number "enum-value" word-prop ;
 PRIVATE>
 
 MACRO: number>enum ( enum-c-type -- )
-    c-type members>> enum-boxer ;
+    lookup-c-type members>> enum-boxer ;
 
 M: enum-c-type c-type-boxed-class drop object ;
 M: enum-c-type c-type-boxer-quot members>> enum-boxer ;
@@ -29,27 +30,28 @@ M: enum-c-type c-type-unboxer-quot drop [ enum>number ] ;
 M: enum-c-type c-type-setter
    [ enum>number ] swap base-type>> c-type-setter '[ _ 2dip @ ] ;
 
+: define-enum-value ( class value -- )
+    enum>number "enum-value" set-word-prop ;
+
 <PRIVATE
 
-: define-enum-value ( class value -- )
-    "enum-value" set-word-prop ;
-
-: define-enum-members ( member-names -- )
-    [
-        [ first define-symbol ]
-        [ first2 define-enum-value ] bi
-    ] each ;
+: define-enum-members ( members -- )
+    [ first define-singleton-class ] each ;
 
 : define-enum-constructor ( word -- )
     [ name>> "<" ">" surround create-in ] keep
-    [ number>enum ] curry (( number -- enum )) define-inline ;
+    [ number>enum ] curry ( number -- enum ) define-inline ;
 
 PRIVATE>
 
-: define-enum ( word base-type members -- )
+: (define-enum) ( word base-type members -- )
     [ dup define-enum-constructor ] 2dip
-    dup define-enum-members
-    <enum-c-type> swap typedef ;
+    [ define-enum-members ]
+    [ <enum-c-type> swap typedef ] bi ;
+
+: define-enum ( word base-type members -- )
+    [ (define-enum) ]
+    [ [ define-enum-value ] assoc-each ] bi ;
     
 PREDICATE: enum-c-type-word < c-type-word
     "c-type" word-prop enum-c-type? ;

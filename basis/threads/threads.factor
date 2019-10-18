@@ -1,10 +1,11 @@
-! Copyright (C) 2004, 2010 Slava Pestov.
+! Copyright (C) 2004, 2011 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables heaps kernel kernel.private math
-namespaces sequences vectors continuations continuations.private
+USING: alien.private arrays hashtables heaps kernel kernel.private
+math namespaces sequences vectors continuations continuations.private
 dlists assocs system combinators init boxes accessors math.order
 deques strings quotations fry ;
+FROM: assocs => change-at ;
 IN: threads
 
 <PRIVATE
@@ -12,7 +13,7 @@ IN: threads
 ! Wrap sub-primitives; we don't want them inlined into callers
 ! since their behavior depends on what frames are on the callstack
 : context ( -- context )
-    2 context-object ; inline
+    CONTEXT-OBJ-CONTEXT context-object ; inline
 
 : set-context ( obj context -- obj' )
     (set-context) ; inline
@@ -28,10 +29,10 @@ IN: threads
 
 ! Context introspection
 : namestack-for ( context -- namestack )
-    [ 0 ] dip context-object-for ;
+    [ CONTEXT-OBJ-NAMESTACK ] dip context-object-for ;
 
 : catchstack-for ( context -- catchstack )
-    [ 1 ] dip context-object-for ;
+    [ CONTEXT-OBJ-CATCHSTACK ] dip context-object-for ;
 
 : continuation-for ( context -- continuation )
     {
@@ -59,7 +60,7 @@ mailbox
 sleep-entry ;
 
 : self ( -- thread )
-    63 special-object { thread } declare ; inline
+    OBJ-CURRENT-THREAD special-object { thread } declare ; inline
 
 : thread-continuation ( thread -- continuation )
     context>> check-box value>> continuation-for ;
@@ -74,11 +75,11 @@ sleep-entry ;
 : tset ( value key -- )
     tnamespace set-at ;
 
-: tchange ( key quot -- )
+: tchange ( ..a key quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ tnamespace ] dip change-at ; inline
 
 : threads ( -- assoc )
-    64 special-object { hashtable } declare ; inline
+    OBJ-THREADS special-object { hashtable } declare ; inline
 
 : thread-registered? ( thread -- ? )
     id>> threads key? ;
@@ -91,15 +92,18 @@ sleep-entry ;
 : unregister-thread ( thread -- )
     id>> threads delete-at ;
 
-: set-self ( thread -- ) 63 set-special-object ; inline
+: set-self ( thread -- ) OBJ-CURRENT-THREAD set-special-object ; inline
 
 PRIVATE>
 
 : run-queue ( -- dlist )
-    65 special-object { dlist } declare ; inline
+    OBJ-RUN-QUEUE special-object { dlist } declare ; inline
 
 : sleep-queue ( -- heap )
-    66 special-object { min-heap } declare ; inline
+    OBJ-SLEEP-QUEUE special-object { min-heap } declare ; inline
+
+: waiting-callbacks ( -- assoc )
+    OBJ-WAITING-CALLBACKS special-object { hashtable } declare ; inline
 
 : new-thread ( quot name class -- thread )
     new
@@ -123,6 +127,7 @@ PRIVATE>
 
 : sleep-time ( -- nanos/f )
     {
+        { [ current-callback waiting-callbacks key? ] [ 0 ] }
         { [ run-queue deque-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
         [ sleep-queue heap-peek nip nano-count [-] ]
@@ -162,8 +167,6 @@ CONSTANT: [start]
         stop
     ]
 
-: no-runnable-threads ( -- ) die ;
-
 GENERIC: (next) ( obj thread -- obj' )
 
 M: thread (next)
@@ -176,8 +179,13 @@ M: thread (next)
     [ context>> box> set-context-and-delete ]
     [ t >>runnable drop [start] start-context-and-delete ] if ;
 
+: wake-up-callbacks ( -- )
+    current-callback waiting-callbacks delete-at*
+    [ resume-now ] [ drop ] if ;
+
 : next ( -- obj thread )
     expire-sleep-loop
+    wake-up-callbacks
     run-queue pop-back
     dup array? [ first2 ] [ [ f ] dip ] if
     f >>state
@@ -223,14 +231,13 @@ M: real sleep
     '[ _ set-datastack @ ]
     "Thread" spawn drop ;
 
-GENERIC: error-in-thread ( error thread -- )
-
 <PRIVATE
 
 : init-thread-state ( -- )
-    H{ } clone 64 set-special-object
-    <dlist> 65 set-special-object
-    <min-heap> 66 set-special-object ;
+    H{ } clone OBJ-THREADS set-special-object
+    <dlist> OBJ-RUN-QUEUE set-special-object
+    <min-heap> OBJ-SLEEP-QUEUE set-special-object
+    H{ } clone OBJ-WAITING-CALLBACKS set-special-object ;
 
 : init-initial-thread ( -- )
     [ ] "Initial" <thread>
@@ -243,6 +250,10 @@ GENERIC: error-in-thread ( error thread -- )
 : init-threads ( -- )
     init-thread-state
     init-initial-thread ;
+
+: wait-for-callback ( callback -- )
+    self swap waiting-callbacks set-at
+    "Callback return" suspend drop ;
 
 PRIVATE>
 

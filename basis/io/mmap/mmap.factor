@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors io.files io.files.info
 io.backend kernel quotations system alien alien.accessors
-accessors vocabs.loader combinators alien.c-types alien.data
+accessors vocabs combinators alien.c-types alien.data
 math ;
 IN: io.mmap
 
@@ -60,5 +60,5 @@ PRIVATE>
 
 {
     { [ os unix? ] [ "io.mmap.unix" require ] }
-    { [ os winnt? ] [ "io.mmap.windows" require ] }
+    { [ os windows? ] [ "io.mmap.windows" require ] }
 } cond

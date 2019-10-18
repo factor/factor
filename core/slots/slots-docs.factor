@@ -77,7 +77,7 @@ $nl
 { $list
     { "If the class is a union or mixin class which " { $emphasis "contains" } " one of the above known classes, then the initial value of the class is that of the known class, with preference given to classes earlier in the list. For example, if the slot is declared " { $link object } " (this is the default), the initial value is " { $link f } ". Similarly for " { $link sequence } " and " { $link assoc } "." }
     { "If the class is a tuple class, the initial value of the slot is a new, shared instance of the class created with " { $link new } "." }
-    { "Otherwise, a " { $link no-initial-value } " error is thrown. In this case, an initial value must be specified explicitly using " { $link initial: } "." }
+    { "Otherwise, a " { $link bad-initial-value } " error is thrown. In this case, an initial value must be specified explicitly using " { $link initial: } "." }
 }
 "A word can be used to check if a class has an initial value or not:"
 { $subsections initial-value } ;
@@ -162,12 +162,12 @@ HELP: define-accessors
 { $description "Defines slot methods." }
 $low-level-note ;
 
-HELP: slot ( obj m -- value )
+HELP: slot
 { $values { "obj" object } { "m" "a non-negative fixnum" } { "value" object } }
 { $description "Reads the object stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
 { $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
-HELP: set-slot ( value obj n -- )
+HELP: set-slot
 { $values { "value" object } { "obj" object } { "n" "a non-negative fixnum" } }
 { $description "Writes " { $snippet "value" } " to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
 { $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;

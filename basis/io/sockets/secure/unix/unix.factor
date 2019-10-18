@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
+! Copyright (C) 2007, 2011, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors unix byte-arrays kernel sequences namespaces
 math math.order combinators init alien alien.c-types
@@ -11,16 +11,22 @@ unix.ffi ;
 FROM: io.ports => shutdown ;
 IN: io.sockets.secure.unix
 
+M: openssl ssl-supported? t ;
+
 M: ssl-handle handle-fd file>> handle-fd ;
 
-: syscall-error ( r -- * )
-    ERR_get_error dup zero? [
-        drop
+: syscall-error ( handle r -- event )
+    nip
+    ERR_get_error [
         {
             { -1 [ errno ECONNRESET = [ premature-close ] [ (io-error) ] if ] }
-            { 0 [ premature-close ] }
+            ! OpenSSL docs say this it is an error condition for
+            ! a server to not send a close notify, but web
+            ! servers in the wild don't seem to do this, for
+            ! example https://www.google.com.
+            { 0 [ f ] }
         } case
-    ] [ nip (ssl-error) ] if ;
+    ] [ nip (ssl-error) ] if-zero ;
 
 : check-accept-response ( handle r -- event )
     over handle>> over SSL_get_error
@@ -159,7 +165,7 @@ M: secure (accept)
         { SSL_ERROR_NONE [ 2drop f ] }
         { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
         { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
-        { SSL_ERROR_SYSCALL [ dup zero? [ 2drop f ] [ syscall-error ] if ] }
+        { SSL_ERROR_SYSCALL [ [ drop f ] [ syscall-error ] if-zero ] }
         { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 

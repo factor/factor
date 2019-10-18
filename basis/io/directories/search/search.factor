@@ -2,16 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations deques dlists fry
 io.backend io.directories io.files.info io.pathnames kernel
-locals math sequences sorting system unicode.case vocabs.loader ;
+locals math sequences sorting system unicode.case vocabs
+vocabs.loader ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )
     absolute-path
-    dup directory-entries [ [ append-path ] change-name ] with map ;
+    dup directory-entries [ [ append-path ] change-name ] with map! ;
 
 : qualified-directory-files ( path -- seq )
     absolute-path
-    dup directory-files [ append-path ] with map ;
+    dup directory-files [ append-path ] with map! ;
 
 : with-qualified-directory-files ( path quot -- )
     '[ "" qualified-directory-files @ ] with-directory ; inline
@@ -109,7 +110,7 @@ ERROR: file-not-found path bfs? quot ;
 : find-by-extensions ( path extensions -- seq )
     [ >lower ] map
     '[ >lower _ [ tail? ] with any? ] find-all-files ;
-    
+
 : find-by-extension ( path extension -- seq )
     1array find-by-extensions ;
 

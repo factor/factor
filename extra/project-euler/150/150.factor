@@ -36,11 +36,8 @@ IN: project-euler.150
 : partial-sums ( seq -- sums )
     0 [ + ] accumulate swap suffix ; inline
 
-: (partial-sum-infimum) ( inf sum elt -- inf sum )
-    + [ min ] keep ; inline
-
-: partial-sum-infimum ( seq -- seq )
-    0 0 rot [ (partial-sum-infimum) ] each drop ; inline
+: partial-sum-infimum ( seq quot -- seq )
+    [ 0 0 ] 2dip [ + [ min ] keep ] compose each drop ; inline
 
 : map-infimum ( seq quot -- min )
     [ min ] compose 0 swap reduce ; inline
@@ -61,7 +58,7 @@ IN: project-euler.150
                 x z + table nth-unsafe
                 [ y z + 1 + swap nth-unsafe ]
                 [ y        swap nth-unsafe ] bi -
-            ] map partial-sum-infimum
+            ] partial-sum-infimum
         ] map-infimum
     ] map-infimum ;
 

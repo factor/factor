@@ -8,10 +8,10 @@ IN: unicode.categories.tests
     printable? alpha? control? uncased? character? 
 } [ execute ] with map ] unit-test
 [ "Nd" ] [ CHAR: 3 category ] unit-test
-[ "Lo" ] [ HEX: 3400 category ] unit-test
-[ "Lo" ] [ HEX: 3450 category ] unit-test
-[ "Lo" ] [ HEX: 4DB5 category ] unit-test
-[ "Cs" ] [ HEX: DD00 category ] unit-test
+[ "Lo" ] [ 0x3400 category ] unit-test
+[ "Lo" ] [ 0x3450 category ] unit-test
+[ "Lo" ] [ 0x4DB5 category ] unit-test
+[ "Cs" ] [ 0xDD00 category ] unit-test
 [ t ] [ CHAR: \t blank? ] unit-test
 [ t ] [ CHAR: \s blank? ] unit-test
 [ t ] [ CHAR: \r blank? ] unit-test

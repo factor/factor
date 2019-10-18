@@ -153,7 +153,7 @@ IN: math.intervals.tests
 
 [ t ] [ -1 1 (a,b) 0 1 (a,b) interval/ [-inf,inf] = ] unit-test
 
-"math.ratios.private" vocab [
+"math.ratios.private" lookup-vocab [
     [ t ] [
         -1 1 (a,b) 0.5 1 (a,b) interval/ -2.0 2.0 (a,b) =
     ] unit-test
@@ -277,7 +277,7 @@ IN: math.intervals.tests
         { 2/ interval-2/ }
         { neg interval-neg }
     }
-    "math.ratios.private" vocab [
+    "math.ratios.private" lookup-vocab [
         { recip interval-recip } suffix
     ] when ;
 
@@ -308,7 +308,7 @@ unary-ops [
         { min interval-min }
         { max interval-max }
     }
-    "math.ratios.private" vocab [
+    "math.ratios.private" lookup-vocab [
         { / interval/ } suffix
     ] when ;
 

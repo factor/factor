@@ -9,6 +9,9 @@
 #include <dlfcn.h>
 #include <signal.h>
 #include <pthread.h>
+#include <sched.h>
+
+#include "atomic-gcc.hpp"
 
 namespace factor
 {
@@ -39,8 +42,12 @@ inline static THREADHANDLE thread_id() { return pthread_self(); }
 
 u64 nano_count();
 void sleep_nanos(u64 nsec);
-void open_console();
 
 void move_file(const vm_char *path1, const vm_char *path2);
+
+static inline void breakpoint()
+{
+    __builtin_trap();
+}
 
 }

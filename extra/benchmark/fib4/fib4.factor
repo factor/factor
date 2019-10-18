@@ -17,6 +17,6 @@ C: <box> box
         swap i>> swap i>> + <box>
     ] if ; inline recursive
 
-: fib-main ( -- ) T{ box f 34 } tuple-fib i>> 9227465 assert= ;
+: fib4-benchmark ( -- ) T{ box f 34 } tuple-fib i>> 9227465 assert= ;
 
-MAIN: fib-main
+MAIN: fib4-benchmark

@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Phil Dawes
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences io namespaces make combinators
-unicode.categories io.files combinators.short-circuit
-io.streams.string ;
+USING: combinators fry io io.files io.streams.string kernel
+make math memoize namespaces sequences sequences.private
+unicode.categories ;
 IN: csv
 
 SYMBOL: delimiter
@@ -12,55 +12,62 @@ CHAR: , delimiter set-global
 <PRIVATE
 
 : delimiter> ( -- delimiter ) delimiter get ; inline
-    
-DEFER: quoted-field ( -- endchar )
-    
-: trim-whitespace ( str -- str )
-    [ blank? ] trim ; inline
 
-: skip-to-field-end ( -- endchar )
-  "\n" delimiter> suffix read-until nip ; inline
-  
-: not-quoted-field ( -- endchar )
-    "\"\n" delimiter> suffix read-until
-    dup {
-        { CHAR: "    [ 2drop quoted-field ] }
-        { delimiter> [ swap trim-whitespace % ] }
-        { CHAR: \n   [ swap trim-whitespace % ] }
-        { f          [ swap trim-whitespace % ] }
-    } case ;
-  
-: maybe-escaped-quote ( -- endchar )
-    read1 dup {
-        { CHAR: "    [ , quoted-field ] }
-        { delimiter> [ ] }
-        { CHAR: \n   [ ] }
-        [ 2drop skip-to-field-end ]
-    } case ;
-  
-: quoted-field ( -- endchar )
-    "\"" read-until
-    drop % maybe-escaped-quote ;
+MEMO: (field-end) ( delimiter -- delimiter' )
+    "\n" swap suffix ; inline
 
-: field ( -- sep string )
-    [ not-quoted-field ] "" make  ;
+MEMO: (quoted-field) ( delimiter -- delimiter' )
+    "\"\n" swap suffix ; inline
 
-: (row) ( -- sep )
-    field , 
-    dup delimiter> = [ drop (row) ] when ;
+DEFER: quoted-field
 
-: row ( -- eof? array[string] )
+: maybe-escaped-quote ( delimeter quoted? -- delimiter endchar )
+    read1 pick over =
+    [ nip ] [
+        {
+            { CHAR: "    [ [ CHAR: " , ] when quoted-field ] }
+            { CHAR: \n   [ ] } ! Error: newline inside string?
+            [ [ , drop f maybe-escaped-quote ] when* ]
+        } case
+     ] if ;
+
+: quoted-field ( delimiter -- delimiter endchar )
+    "\"" read-until drop % t maybe-escaped-quote ;
+
+: ?trim ( string -- string' )
+    dup length [ drop "" ] [
+        over first-unsafe blank?
+        [ drop t ] [ 1 - over nth-unsafe blank? ] if
+        [ [ blank? ] trim ] when
+    ] if-zero ; inline
+
+: field ( delimiter -- delimiter sep string )
+    dup (quoted-field) read-until
+    dup CHAR: " = [
+        drop
+        [ [ quoted-field ] "" make ]
+        [
+            over (field-end) read-until
+            [ "\"" glue ] dip swap ?trim
+        ]
+        if-empty
+    ] [ swap ?trim ] if ;
+
+: (row) ( delimiter -- delimiter sep )
+    f [ 2dup = ] [ drop field , ] do while ;
+
+: row ( delimiter -- delimiter eof? array[string] )
     [ (row) ] { } make ;
 
 : (csv) ( -- )
-    row
-    dup [ empty? ] all? [ drop ] [ , ] if
-    [ (csv) ] when ;
-  
+    delimiter>
+    [ dup [ empty? ] all? [ drop ] [ , ] if ]
+    [ row ] do while drop ;
+
 PRIVATE>
 
 : csv-row ( stream -- row )
-    [ row nip ] with-input-stream ;
+    [ delimiter> row 2nip ] with-input-stream ;
 
 : csv ( stream -- rows )
     [ [ (csv) ] { } make ] with-input-stream
@@ -77,8 +84,8 @@ PRIVATE>
 
 <PRIVATE
 
-: needs-escaping? ( cell -- ? )
-    [ { [ "\n\"" member? ] [ delimiter get = ] } 1|| ] any? ; inline
+: needs-escaping? ( cell delimiter -- ? )
+    '[ dup "\n\"" member? [ drop t ] [ _ = ] if ] any? ; inline
 
 : escape-quotes ( cell -- cell' )
     [
@@ -90,22 +97,25 @@ PRIVATE>
 
 : enclose-in-quotes ( cell -- cell' )
     "\"" dup surround ; inline
-    
-: escape-if-required ( cell -- cell' )
-    dup needs-escaping?
+
+: escape-if-required ( cell delimiter -- cell' )
+    dupd needs-escaping?
     [ escape-quotes enclose-in-quotes ] when ; inline
 
+: (write-row) ( row delimiter -- )
+    dup '[ _ write1 ] swap
+    '[ _ escape-if-required write ] interleave nl ; inline
+
 PRIVATE>
-    
+
 : write-row ( row -- )
-    [ delimiter get write1 ]
-    [ escape-if-required write ] interleave nl ; inline
+    delimiter> (write-row) ; inline
 
 <PRIVATE
 
 : (write-csv) ( rows -- )
-    [ write-row ] each ;
-    
+    delimiter> '[ _ (write-row) ] each ;
+
 PRIVATE>
 
 : write-csv ( rows stream -- )
@@ -113,5 +123,5 @@ PRIVATE>
 
 : csv>string ( csv -- string )
     [ (write-csv) ] with-string-writer ;
-    
+
 : csv>file ( rows path encoding -- ) <file-writer> write-csv ;

@@ -9,12 +9,13 @@ code_heap::code_heap(cell size)
 	seg = new segment(align_page(size),true);
 	if(!seg) fatal_error("Out of memory in code_heap constructor",size);
 
-	cell start = seg->start + seh_area_size;
+	cell start = seg->start + getpagesize() + seh_area_size;
 
 	allocator = new free_list_allocator<code_block>(seg->end - start,start);
 
-	/* See os-windows-nt-x86.64.cpp for seh_area usage */
-	seh_area = (char *)seg->start;
+	/* See os-windows-x86.64.cpp for seh_area usage */
+	safepoint_page = (void *)seg->start;
+	seh_area = (char *)seg->start + getpagesize();
 }
 
 code_heap::~code_heap()
@@ -59,9 +60,10 @@ void code_heap::clear_mark_bits()
 
 void code_heap::free(code_block *compiled)
 {
-	assert(!uninitialized_p(compiled));
+	FACTOR_ASSERT(!uninitialized_p(compiled));
 	points_to_nursery.erase(compiled);
 	points_to_aging.erase(compiled);
+	all_blocks.erase((cell)compiled);
 	allocator->free(compiled);
 }
 
@@ -70,15 +72,86 @@ void code_heap::flush_icache()
 	factor::flush_icache(seg->start,seg->size);
 }
 
+struct clear_free_blocks_from_all_blocks_iterator
+{
+	code_heap *code;
+
+	clear_free_blocks_from_all_blocks_iterator(code_heap *code) : code(code) {}
+
+	void operator()(code_block *free_block, cell size) {
+		std::set<cell>::iterator erase_from =
+			code->all_blocks.lower_bound((cell)free_block);
+		std::set<cell>::iterator erase_to =
+			code->all_blocks.lower_bound((cell)free_block + size);
+
+		code->all_blocks.erase(erase_from, erase_to);
+	}
+};
+
+void code_heap::sweep()
+{
+	clear_free_blocks_from_all_blocks_iterator clearer(this);
+	allocator->sweep(clearer);
+#ifdef FACTOR_DEBUG
+	verify_all_blocks_set();
+#endif
+}
+
+struct all_blocks_set_verifier {
+	std::set<cell> *all_blocks;
+
+	all_blocks_set_verifier(std::set<cell> *all_blocks) : all_blocks(all_blocks) {}
+
+	void operator()(code_block *block, cell size)
+	{
+		FACTOR_ASSERT(all_blocks->find((cell)block) != all_blocks->end());
+	}
+};
+
+void code_heap::verify_all_blocks_set()
+{
+	all_blocks_set_verifier verifier(&all_blocks);
+	allocator->iterate(verifier);
+}
+
+code_block *code_heap::code_block_for_address(cell address)
+{
+	std::set<cell>::const_iterator blocki =
+		all_blocks.upper_bound(address);
+	FACTOR_ASSERT(blocki != all_blocks.begin());
+	--blocki;
+	code_block* found_block = (code_block*)*blocki;
+	FACTOR_ASSERT((cell)found_block->entry_point() <= address
+		/* XXX this isn't valid during fixup. should store the size in the map
+		&& address - (cell)found_block->entry_point() < found_block->size()*/);
+	return found_block;
+}
+
+struct all_blocks_set_inserter {
+	code_heap *code;
+
+	all_blocks_set_inserter(code_heap *code) : code(code) {}
+
+	void operator()(code_block *block, cell size)
+	{
+		code->all_blocks.insert((cell)block);
+	}
+};
+
+void code_heap::initialize_all_blocks_set()
+{
+	all_blocks.clear();
+	all_blocks_set_inserter inserter(this);
+	allocator->iterate(inserter);
+#if defined(FACTOR_DEBUG)
+	verify_all_blocks_set();
+#endif
+}
+
 /* Allocate a code heap during startup */
 void factor_vm::init_code_heap(cell size)
 {
 	code = new code_heap(size);
-}
-
-bool factor_vm::in_code_heap_p(cell ptr)
-{
-	return (ptr >= code->seg->start && ptr <= code->seg->end);
 }
 
 struct word_updater {
@@ -147,6 +220,7 @@ void factor_vm::primitive_modify_code_heap()
 				cell relocation = array_nth(compiled_data,2);
 				cell labels = array_nth(compiled_data,3);
 				cell code = array_nth(compiled_data,4);
+				cell frame_size = untag_fixnum(array_nth(compiled_data,5));
 
 				code_block *compiled = add_code_block(
 					code_block_optimized,
@@ -155,17 +229,16 @@ void factor_vm::primitive_modify_code_heap()
 					word.value(),
 					relocation,
 					parameters,
-					literals);
+					literals,
+					frame_size);
 
-				word->code = compiled;
+				word->entry_point = compiled->entry_point();
 			}
 			break;
 		default:
 			critical_error("Expected a quotation or an array",data.value());
 			break;
 		}
-
-		update_word_entry_point(word.untagged());
 	}
 
 	if(update_existing_words)
@@ -187,6 +260,7 @@ code_heap_room factor_vm::code_room()
 	return room;
 }
 
+/* Allocates memory */
 void factor_vm::primitive_code_room()
 {
 	code_heap_room room = code_room();
@@ -227,8 +301,8 @@ struct code_block_accumulator {
 		if it were a fixnum, and have library code shift it to the
 		left by 4. */
 		cell entry_point = (cell)compiled->entry_point();
-		assert((entry_point & (data_alignment - 1)) == 0);
-		assert((entry_point & TAG_MASK) == FIXNUM_TYPE);
+		FACTOR_ASSERT((entry_point & (data_alignment - 1)) == 0);
+		FACTOR_ASSERT((entry_point & TAG_MASK) == FIXNUM_TYPE);
 		objects.push_back(entry_point);
 	}
 };

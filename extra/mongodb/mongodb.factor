@@ -1,4 +1,4 @@
-USING: vocabs.loader ;
+USING: vocabs ;
 
 IN: mongodb
 

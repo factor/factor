@@ -18,7 +18,7 @@ TUPLE: decimal { mantissa read-only } { exponent read-only } ;
     [ [ CHAR: 0 = ] trim-tail [ "" ] when-empty ] bi*
     [ append string>number ] [ nip length neg ] 2bi <decimal> ; 
 
-: parse-decimal ( -- decimal ) scan string>decimal ;
+: parse-decimal ( -- decimal ) scan-token string>decimal ;
 
 SYNTAX: D: parse-decimal suffix! ;
 
@@ -51,8 +51,8 @@ M: decimal equal?
         [
             scale-decimals
             {
-                [ [ mantissa>> ] bi@ = ]
-                [ [ exponent>> ] bi@ = ]
+                [ [ mantissa>> ] same? ]
+                [ [ exponent>> ] same? ]
             } 2&&
         ]
     } 2&& ;

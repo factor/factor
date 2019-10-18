@@ -1,4 +1,4 @@
-USING: alien.c-types alien.syntax windows.ole32 windows.types ;
+USING: alien.c-types alien.syntax windows.directx windows.ole32 windows.types ;
 IN: windows.directx.d3dcompiler
 
 LIBRARY: d3dcompiler
@@ -78,7 +78,7 @@ FUNCTION: HRESULT D3DGetInputAndOutputSignatureBlob (
 CONSTANT: D3DCOMPILER_STRIP_REFLECTION_DATA 1
 CONSTANT: D3DCOMPILER_STRIP_DEBUG_INFO      2
 CONSTANT: D3DCOMPILER_STRIP_TEST_BLOBS      4
-CONSTANT: D3DCOMPILER_STRIP_FORCE_DWORD     HEX: 7fffffff
+CONSTANT: D3DCOMPILER_STRIP_FORCE_DWORD     0x7fffffff
 TYPEDEF: int D3DCOMPILER_STRIP_FLAGS
 
 FUNCTION: HRESULT D3DStripShader (

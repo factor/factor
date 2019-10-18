@@ -17,12 +17,12 @@ TUPLE: lunar-rescue < space-invaders ;
   lunar-rescue new cpu-init ;
 
 CONSTANT: rom-info {
-    { HEX: 0000 "lrescue/lrescue.1" }
-    { HEX: 0800 "lrescue/lrescue.2" }
-    { HEX: 1000 "lrescue/lrescue.3" }
-    { HEX: 1800 "lrescue/lrescue.4" }
-    { HEX: 4000 "lrescue/lrescue.5" }
-    { HEX: 4800 "lrescue/lrescue.6" }
+    { 0x0000 "lrescue/lrescue.1" }
+    { 0x0800 "lrescue/lrescue.2" }
+    { 0x1000 "lrescue/lrescue.3" }
+    { 0x1800 "lrescue/lrescue.4" }
+    { 0x4000 "lrescue/lrescue.5" }
+    { 0x4800 "lrescue/lrescue.6" }
   }
 
 : run-lunar ( -- )  

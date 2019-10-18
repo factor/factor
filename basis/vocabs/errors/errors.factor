@@ -9,7 +9,7 @@ IN: vocabs.errors
 : vocab-heading. ( vocab -- )
     nl
     "==== " write
-    [ vocab-name ] [ vocab write-object ] bi ":" print
+    [ vocab-name ] [ lookup-vocab write-object ] bi ":" print
     nl ;
 
 : load-error. ( triple -- )

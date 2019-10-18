@@ -2,7 +2,8 @@ USING: accessors alien.c-types arrays combinators destructors
 http.client io io.encodings.ascii io.files io.files.temp kernel
 locals math math.matrices math.parser math.vectors opengl
 opengl.capabilities opengl.gl opengl.demo-support sequences
-splitting vectors words specialized-arrays ;
+splitting vectors words specialized-arrays alien.data ;
+FROM: sequences => change-nth ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 SPECIALIZED-ARRAY: c:uint
@@ -40,9 +41,9 @@ IN: bunny.model
     ascii [ parse-model ] with-file-reader
     [ normals ] 2keep 3array ;
 
-: model-path ( -- path ) "bun_zipper.ply" temp-file ;
+: model-path ( -- path ) "bun_zipper.ply" cache-file ;
 
-: model-url ( -- url ) "http://factorcode.org/bun_zipper.ply" ;
+: model-url ( -- url ) "http://duriansoftware.com/joe/media/bun_zipper.ply" ;
 
 : maybe-download ( -- path )
     model-path dup exists? [
@@ -71,11 +72,11 @@ TUPLE: bunny-buffers array element-array nv ni ;
     {
         [
             [ first concat ] [ second concat ] bi
-            append >float-array underlying>>
+            append c:float >c-array underlying>>
             GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
         ]
         [
-            third concat >uint-array underlying>>
+            third concat c:uint >c-array underlying>>
             GL_ELEMENT_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
         ]
         [ first length 3 * ]

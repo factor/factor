@@ -1,13 +1,13 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.tuple help.markup help.syntax kernel math
-quotations sequences stack-checker ;
+quotations sequences stack-checker arrays ;
 IN: combinators.smart
 
 HELP: input<sequence
 { $values
-     { "quot" quotation }
-     { "newquot" quotation }
+    { "seq" sequence }
+    { "quot" quotation }
 }
 { $description "Infers the number of inputs, " { $snippet "n" } ", to " { $snippet "quot" } " and calls the " { $snippet "quot" } " with the first " { $snippet "n" } " values from a sequence." }
 { $examples
@@ -20,10 +20,10 @@ HELP: input<sequence
 
 HELP: output>array
 { $values
-     { "quot" quotation }
-     { "newquot" quotation }
+    { "quot" quotation }
+    { "array" array }
 }
-{ $description "Infers the number or outputs from the quotation and constructs an array from those outputs." }
+{ $description "Infers the number of outputs from the quotation and constructs an array from those outputs." }
 { $examples
     { $example
         "USING: combinators combinators.smart math prettyprint ;
@@ -36,8 +36,8 @@ HELP: output>array
 
 HELP: output>sequence
 { $values
-     { "quot" quotation } { "exemplar" "an exemplar" }
-     { "newquot" quotation }
+    { "quot" quotation } { "exemplar" "an exemplar" }
+    { "seq" sequence }
 }
 { $description "Infers the number of outputs from the quotation and constructs a new sequence from those objects of the same type as the exemplar." }
 { $examples
@@ -50,8 +50,7 @@ HELP: output>sequence
 
 HELP: reduce-outputs
 { $values
-     { "quot" quotation } { "operation" quotation }
-     { "newquot" quotation }
+    { "quot" quotation } { "operation" quotation }
 }
 { $description "Infers the number of outputs from " { $snippet "quot" } " and reduces them using " { $snippet "operation" } ". The identity for the " { $link reduce } " operation is the first output." }
 { $examples
@@ -64,8 +63,8 @@ HELP: reduce-outputs
 
 HELP: sum-outputs
 { $values
-     { "quot" quotation }
-     { "n" integer }
+    { "quot" quotation }
+    { "n" integer }
 }
 { $description "Infers the number of outputs from " { $snippet "quot" } " and returns their sum." }
 { $examples
@@ -78,8 +77,8 @@ HELP: sum-outputs
 
 HELP: append-outputs
 { $values
-     { "quot" quotation }
-     { "seq" sequence }
+    { "quot" quotation }
+    { "seq" sequence }
 }
 { $description "Infers the number of outputs from " { $snippet "quot" } " and returns a sequence of the outputs appended." }
 { $examples
@@ -92,8 +91,8 @@ HELP: append-outputs
 
 HELP: append-outputs-as
 { $values
-     { "quot" quotation } { "exemplar" sequence }
-     { "seq" sequence }
+    { "quot" quotation } { "exemplar" sequence }
+    { "seq" sequence }
 }
 { $description "Infers the number of outputs from " { $snippet "quot" } " and returns a sequence of type " { $snippet "exemplar" } " of the outputs appended." }
 { $examples
@@ -119,7 +118,7 @@ HELP: keep-inputs
 HELP: dropping
 { $values
     { "quot" quotation }
-    { "quot" quotation }
+    { "quot'" quotation }
 }
 { $description "Outputs a quotation that, when called, will have the effect of dropping the number of inputs to the original quotation." }
 { $examples
@@ -132,7 +131,7 @@ HELP: dropping
 
 HELP: input<sequence-unsafe
 { $values
-    { "quot" quotation }
+    { "seq" sequence }
     { "quot" quotation }
 }
 { $description "An unsafe version of " { $link input<sequence-unsafe } "." } ;
@@ -140,7 +139,6 @@ HELP: input<sequence-unsafe
 HELP: map-reduce-outputs
 { $values
     { "quot" quotation } { "mapper" quotation } { "reducer" quotation }
-    { "quot" quotation }
 }
 { $description "Infers the number of outputs from " { $snippet "quot" } " and, treating those outputs as a sequence, calls " { $link map-reduce } " on them." }
 { $examples
@@ -154,20 +152,17 @@ HELP: map-reduce-outputs
 HELP: nullary
 { $values
     { "quot" quotation }
-    { "quot" quotation }
 }
 { $description "Infers the number of inputs to a quotation and drops them from the stack." }
 { $examples
-    { $example
+    { $code
         """USING: combinators.smart kernel math ;
 1 2 [ + ] nullary"""
-""
     }
 } ;
 
 HELP: preserving
 { $values
-    { "quot" quotation }
     { "quot" quotation }
 }
 { $description "Calls a quotation and leaves any consumed inputs on the stack beneath the quotation's outputs." }
@@ -184,7 +179,6 @@ HELP: preserving
 HELP: smart-apply
 { $values
     { "quot" quotation } { "n" integer }
-    { "quot" quotation }
 }
 { $description "Applies a quotation to the datastack " { $snippet "n" } " times, starting lower on the stack and working up in increments of the number of inferred inputs to the quotation." }
 { $examples
@@ -199,44 +193,43 @@ HELP: smart-apply
 HELP: smart-if
 { $values
     { "pred" quotation } { "true" quotation } { "false" quotation }
-    { "quot" quotation }
 }
 { $description "A version of " { $link if } " that takes three quotations, where the first quotation is a predicate that preserves any inputs it consumes." } ;
 
 HELP: smart-if*
 { $values
     { "pred" quotation } { "true" quotation } { "false" quotation }
-    { "quot" quotation }
 }
 { $description "A version of " { $link if } " that takes three quotations, where the first quotation is a predicate that preserves any inputs it consumes, the second is the " { $snippet "true" } " branch, and the third is the " { $snippet "false" } " branch. If the " { $snippet "true" }  " branch is taken, the values are left on the stack and the quotation is called. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped and the quotation is called." } ;
 
 HELP: smart-unless
 { $values
     { "pred" quotation } { "false" quotation }
-    { "quot" quotation }
 }
 { $description "A version of " { $link unless } " that takes two quotations, where the first quotation is a predicate that preserves any inputs it consumes and the second is the " { $snippet "false" } " branch." } ;
 
 HELP: smart-unless*
 { $values
     { "pred" quotation } { "false" quotation }
-    { "quot" quotation }
 }
 { $description "A version of " { $link unless } " that takes two quotations, where the first quotation is a predicate that preserves any inputs it consumes and the second is the " { $snippet "false" } " branch. If the " { $snippet "true" }  " branch is taken, the values are left on the stack. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped and the quotation is called." } ;
 
 HELP: smart-when
 { $values
     { "pred" quotation } { "true" quotation }
-    { "quot" quotation }
 }
 { $description "A version of " { $link when } " that takes two quotations, where the first quotation is a predicate that preserves any inputs it consumes and the second is the " { $snippet "true" } " branch." } ;
 
 HELP: smart-when*
 { $values
     { "pred" quotation } { "true" quotation }
-    { "quot" quotation }
 }
 { $description "A version of " { $link when } " that takes two quotations, where the first quotation is a predicate that preserves any inputs it consumes and the second is the " { $snippet "true" } " branch. If the " { $snippet "true" }  " branch is taken, the values are left on the stack and the quotation is called. If the " { $snippet "false" } " branch is taken, the number of inputs inferred from predicate quotation is dropped." } ;
+
+HELP: smart-with
+{ $values
+    { "param" object } { "obj" object } { "quot" { $quotation "( param ..a -- ..b" } } { "curry" curry } }
+{ $description "A version of " { $link with } " that puts the parameter before any inputs the quotation uses." } ;
 
 ARTICLE: "combinators.smart" "Smart combinators"
 "A " { $emphasis "smart combinator" } " is a macro which reflects on the stack effect of an input quotation. The " { $vocab-link "combinators.smart" } " vocabulary implements a few simple smart combinators which look at the static stack effects of input quotations and generate code which produces or consumes the relevant number of stack values." $nl

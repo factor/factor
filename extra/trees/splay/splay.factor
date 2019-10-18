@@ -16,7 +16,7 @@ TUPLE: splay < tree ;
     dup left>>
     [ right>> swap left<< ] 2keep
     [ right<< ] keep ;
-                                                        
+
 : rotate-left ( node -- node )
     dup right>>
     [ left>> swap right<< ] 2keep
@@ -94,18 +94,13 @@ DEFER: (splay)
     dup [ dup get-largest key>> swap splay-at ] when ;
 
 : splay-join ( n2 n1 -- node )
-    splay-largest [
-        [ right<< ] keep
-    ] [
-        drop f
-    ] if* ;
+    splay-largest [ [ right<< ] keep ] when* ;
 
 : remove-splay ( key tree -- )
-    [ get-splay nip ] keep [
-        dup dec-count
+    2dup get-splay [
         dup right>> swap left>> splay-join
-        swap root<<
-    ] [ drop ] if* ;
+        >>root dec-count drop
+    ] [ 3drop ] if ;
 
 : set-splay ( value key tree -- )
     2dup get-splay [ 2nip value<< ] [

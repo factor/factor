@@ -39,7 +39,7 @@ DEFER: record-literal-allocation
 
 : object-slots ( object -- slots/f )
     {
-        { [ dup class immutable-tuple-class? ] [ tuple-slots ] }
+        { [ dup class-of immutable-tuple-class? ] [ tuple-slots ] }
         [ drop f ]
     } cond ;
 

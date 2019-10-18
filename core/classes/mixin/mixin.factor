@@ -18,11 +18,11 @@ M: mixin-class reset-class
 
 M: mixin-class rank-class drop 8 ;
 
-TUPLE: check-mixin-class class ;
+ERROR: check-mixin-class-error class ;
 
 : check-mixin-class ( mixin -- mixin )
     dup mixin-class? [
-        \ check-mixin-class boa throw
+        check-mixin-class-error
     ] unless ;
 
 <PRIVATE

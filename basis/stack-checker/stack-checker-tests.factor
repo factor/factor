@@ -7,7 +7,7 @@ sorting assocs definitions prettyprint io inspector
 classes.tuple classes.union classes.predicate debugger
 threads.private io.streams.string io.timeouts io.thread
 sequences.private destructors combinators eval locals.backend
-system compiler.units shuffle vocabs ;
+system compiler.units shuffle vocabs combinators.smart ;
 IN: stack-checker.tests
 
 [ 1234 infer ] must-fail
@@ -384,7 +384,8 @@ DEFER: eee'
 [ forget-test ] must-infer
 
 [ [ cond ] infer ] [ T{ unknown-macro-input f cond } = ] must-fail-with
-[ [ bi ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
+[ [ call ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
+[ [ dip ] infer ] [ T{ unknown-macro-input f call } = ] must-fail-with
 
 [ [ each ] infer ] [ T{ unknown-macro-input f each } = ] must-fail-with
 [ [ if* ] infer ] [ T{ unknown-macro-input f if* } = ] must-fail-with
@@ -501,3 +502,40 @@ USING: alien.c-types alien ;
     void { } cdecl [ recursive-callback-2 drop ] alien-callback ; inline recursive
 
 [ recursive-callback-2 ] must-infer
+
+! test one-sided row polymorphism
+
+: poly-output ( x a: ( x -- ..a ) -- ..a ) call ; inline
+
+[ [ ] poly-output ] must-infer
+[ [ f f f ] poly-output ] must-infer
+
+: poly-input ( ..a a: ( ..a -- x ) -- x ) call ; inline
+
+[ [ ] poly-input ] must-infer
+[ [ drop drop drop ] poly-input ] must-infer
+
+: poly-output-input ( x a: ( x -- ..a ) b: ( ..a -- y ) -- y ) [ call ] bi@ ; inline
+
+[ [ ] [ ] poly-output-input ] must-infer
+[ [ f f f ] [ drop drop drop ] poly-output-input ] must-infer
+[ [ [ f f ] [ drop drop drop ] poly-output-input ] infer ] [ unbalanced-branches-error? ] must-fail-with
+[ [ [ f f f ] [ drop drop ] poly-output-input ] infer ] [ unbalanced-branches-error? ] must-fail-with
+
+: poly-input-output ( ..a a: ( ..a -- x ) b: ( x -- ..b ) -- ..b ) [ call ] bi@ ; inline
+
+[ [ ] [ ] poly-input-output ] must-infer
+[ [ drop drop drop ] [ f f f ] poly-input-output ] must-infer
+[ [ drop drop ] [ f f f ] poly-input-output ] must-infer
+[ [ drop drop drop ] [ f f ] poly-input-output ] must-infer
+
+! Check that 'inputs' and 'outputs' work at compile-time
+
+: inputs-test0 ( -- n )
+    [ 5 + ] inputs ;
+
+: inputs-test1 ( x -- n )
+    [ + ] curry inputs ;
+
+[ 1 ] [ inputs-test0 ] unit-test
+[ 1 ] [ 10 inputs-test1 ] unit-test

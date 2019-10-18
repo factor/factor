@@ -23,7 +23,7 @@ $nl
 "The default value is " { $link +append-environment+ } "." ;
 
 ARTICLE: "io.launcher.redirection" "Input/output redirection"
-"On all operating systems except for Windows CE, the default input/output/error streams can be redirected."
+"On all operating systems, the default input/output/error streams can be redirected."
 $nl
 "To specify redirection, set the " { $snippet "stdin" } ", " { $snippet "stdout" } " and " { $snippet "stderr" } " slots of a " { $link process } " to one of the following values:"
 { $list
@@ -34,6 +34,15 @@ $nl
     { "an " { $link appender } " wrapping a path name - output is sent to the end given file, as with " { $link <file-appender> } }
     { "a file stream or a socket - the stream is connected to the given Factor stream, which cannot be used again from within Factor and must be closed after the process has been started" }
 } ;
+
+ARTICLE: "io.launcher.group" "Setting process groups"
+"The process group of a child process can be controlled by setting the " { $snippet "group" } " slot of a " { $link process } " tuple:"
+{ $list
+    { $link +same-group+ }
+    { $link +new-group+ }
+    { $link +new-session+ }
+}
+"The default value is " { $link +same-group+ } ", which denotes that the child process should be part of the process group of the parent process. The " { $link +new-group+ } " option creates a new process group, while the " { $link +new-session+ } " creates a new session." ;
 
 ARTICLE: "io.launcher.priority" "Setting process priority"
 "The priority of the child process can be set by storing one of the below symbols in the " { $snippet "priority" } " slot of a " { $link process } " tuple:"
@@ -126,9 +135,9 @@ HELP: kill-process
 { $description "Kills a running process. Does nothing if the process has already exited." } ;
 
 HELP: kill-process*
-{ $values { "handle" "a process handle" } }
+{ $values { "process" "process" } }
 { $contract "Kills a running process." }
-{ $notes "User code should call " { $link kill-process } " intead." } ;
+{ $notes "User code should call " { $link kill-process } " instead." } ;
 
 HELP: process
 { $class-description "A class representing a process. Instances are created by calling " { $link <process> } "." } ;
@@ -260,11 +269,11 @@ ARTICLE: "io.launcher.examples" "Launcher examples"
 }
 "Running a command, appending error messages to a log file, and reading the output for further processing:"
 { $code
-    "\"log.txt\" <file-appender> ["
+    "\"log.txt\" ascii <file-appender> ["
     "    <process>"
     "        swap >>stderr"
     "        \"report\" >>command"
-    "    ascii <process-reader> lines sort reverse [ print ] each"
+    "    ascii <process-reader> stream-lines sort reverse [ print ] each"
     "] with-disposal"
 } ;
 
@@ -283,6 +292,7 @@ ARTICLE: "io.launcher" "Operating system processes"
     "io.launcher.environment"
     "io.launcher.redirection"
     "io.launcher.priority"
+    "io.launcher.group"
     "io.launcher.timeouts"
 } ;
 

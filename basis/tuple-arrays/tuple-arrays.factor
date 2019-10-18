@@ -21,7 +21,7 @@ MACRO: boa-unsafe ( class -- quot ) tuple-layout '[ _ <tuple-boa> ] ;
     [ new ] [ smart-tuple>array ] bi ; inline
 
 : tuple-slice ( n seq -- slice )
-    [ n>> [ * dup ] keep + ] [ seq>> ] bi slice boa ; inline
+    [ n>> [ * dup ] keep + ] [ seq>> ] bi <slice-unsafe> ; inline
 
 : read-tuple ( slice class -- tuple )
     '[ _ boa-unsafe ] input<sequence-unsafe ; inline

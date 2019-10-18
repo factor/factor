@@ -9,10 +9,19 @@ TUPLE: history document elements index ;
 : <history> ( document -- history )
     V{ } clone 0 history boa ;
 
+<PRIVATE
+
+: push-if-not-last ( elt seq -- )
+    dup empty? [ push ] [
+        dup last pick = [ 2drop ] [ push ] if
+    ] if ;
+
+PRIVATE>
+
 : history-add ( history -- input )
     dup elements>> length 1 + >>index
     [ document>> doc-string [ <input> ] [ empty? ] bi ] keep
-    '[ [ _ elements>> push ] keep ] unless ;
+    '[ [ _ elements>> push-if-not-last ] keep ] unless ;
 
 <PRIVATE
 

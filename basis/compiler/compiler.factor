@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs definitions math graphs generic
-generic.single combinators combinators.smart macros
-source-files.errors combinators.short-circuit classes.algebra
+generic.single combinators macros make source-files.errors
+combinators.short-circuit classes.algebra vocabs.loader
 
 stack-checker stack-checker.dependencies stack-checker.inlining
 stack-checker.errors
@@ -32,7 +32,7 @@ SYMBOL: compiled
     } 1|| not ;
 
 : compiler-message ( string -- )
-    "trace-compilation" get [ global [ print flush ] bind ] [ drop ] if ;
+    "trace-compilation" get [ [ print flush ] with-global ] [ drop ] if ;
 
 : start ( word -- )
     dup name>> compiler-message
@@ -92,7 +92,7 @@ M: word combinator? inline? ;
     drop [ clear-compiler-error ] [ deoptimize* ] bi ;
 
 : remember-error ( word error -- * )
-    [ swap <compiler-error> compiler-error ]
+    [ swap <compiler-error> save-compiler-error ]
     [ [ drop ] [ not-compiled-def ] 2bi deoptimize-with ]
     2bi ;
 
@@ -150,7 +150,7 @@ M: optimizing-compiler update-call-sites ( class generic -- words )
     #! Words containing call sites with inferred type 'class'
     #! which inlined a method on 'generic'
     generic-call-sites-of swap '[
-        nip _ 2dup [ classoid? ] both?
+        nip _ 2dup [ valid-classoid? ] both?
         [ classes-intersect? ] [ 2drop f ] if
     ] assoc-filter keys ;
 
@@ -164,11 +164,11 @@ M: optimizing-compiler recompile ( words -- alist )
 
 M: optimizing-compiler to-recompile ( -- words )
     [
-        changed-effects get new-words get assoc-diff outdated-effect-usages
-        changed-definitions get new-words get assoc-diff outdated-definition-usages
-        maybe-changed get new-words get assoc-diff outdated-conditional-usages
-        changed-definitions get [ drop word? ] assoc-filter 1array
-    ] append-outputs assoc-combine keys ;
+        changed-effects get new-words get assoc-diff outdated-effect-usages %
+        changed-definitions get new-words get assoc-diff outdated-definition-usages %
+        maybe-changed get new-words get assoc-diff outdated-conditional-usages %
+        changed-definitions get [ drop word? ] assoc-filter 1array %
+    ] { } make assoc-combine keys ;
 
 M: optimizing-compiler process-forgotten-words
     [ delete-compiled-xref ] each ;
@@ -181,3 +181,5 @@ M: optimizing-compiler process-forgotten-words
 
 : disable-optimizer ( -- )
     f compiler-impl set-global ;
+
+{ "threads" "compiler" } "compiler.threads" require-when

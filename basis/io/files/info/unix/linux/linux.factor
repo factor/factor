@@ -17,7 +17,7 @@ M: linux new-file-system-info linux-file-system-info new ;
 M: linux file-system-statfs ( path -- byte-array )
     \ statfs64 <struct> [ statfs64 io-error ] keep ;
 
-M: linux statfs>file-system-info ( struct -- statfs )
+M: linux statfs>file-system-info ( file-system-info statfs -- file-system-info' )
     {
         [ f_type>> >>type ]
         [ f_bsize>> >>block-size ]
@@ -35,7 +35,7 @@ M: linux statfs>file-system-info ( struct -- statfs )
 M: linux file-system-statvfs ( path -- byte-array )
     \ statvfs64 <struct> [ statvfs64 io-error ] keep ;
 
-M: linux statvfs>file-system-info ( struct -- statfs )
+M: linux statvfs>file-system-info ( file-system-info statfs -- file-system-info' )
     {
         [ f_flag>> >>flags ]
         [ f_namemax>> >>name-max ]
@@ -56,10 +56,7 @@ frequency pass-number ;
     } cleave ;
 
 : parse-mtab ( -- array )
-    [
-        "/etc/mtab" utf8 <file-reader>
-        CHAR: \s delimiter set csv
-    ] with-scope
+    CHAR: \s [ "/etc/mtab" utf8 file>csv ] with-delimiter
     [ mtab-csv>mtab-entry ] map ;
 
 M: linux file-systems
@@ -85,7 +82,7 @@ M: linux file-systems
 
 ERROR: file-system-not-found ;
 
-M: linux file-system-info ( path -- )
+M: linux file-system-info ( path -- file-system-info )
     normalize-path
     [
         [ new-file-system-info ] dip

@@ -1,5 +1,6 @@
-USING: compiler.codegen.fixup tools.test cpu.architecture math kernel make
-compiler.constants words ;
+USING: compiler.codegen compiler.codegen.labels
+compiler.codegen.relocation tools.test cpu.architecture math
+kernel make compiler.constants words ;
 IN: compiler.codegen.tests
 
 [ ] [ [ ] with-fixup drop ] unit-test

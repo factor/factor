@@ -82,7 +82,7 @@ template<typename Block> struct mark_bits {
 		else
 		{
 #ifdef FACTOR_DEBUG
-			assert(start.first < bits_size);
+			FACTOR_ASSERT(start.first < bits_size);
 #endif
 			bits[start.first] |= ~start_mask;
 
@@ -92,7 +92,7 @@ template<typename Block> struct mark_bits {
 			if(end_mask != 0)
 			{
 #ifdef FACTOR_DEBUG
-				assert(end.first < bits_size);
+				FACTOR_ASSERT(end.first < bits_size);
 #endif
 				bits[end.first] |= end_mask;
 			}
@@ -126,17 +126,18 @@ template<typename Block> struct mark_bits {
 	Block *forward_block(const Block *original)
 	{
 #ifdef FACTOR_DEBUG
-		assert(marked_p(original));
+		FACTOR_ASSERT(marked_p(original));
 #endif
 		std::pair<cell,cell> position = bitmap_deref(original);
+		cell offset = (cell)original & (data_alignment - 1);
 
 		cell approx_popcount = forwarding[position.first];
 		cell mask = ((cell)1 << position.second) - 1;
 
 		cell new_line_number = approx_popcount + popcount(marked[position.first] & mask);
-		Block *new_block = line_block(new_line_number);
+		Block *new_block = (Block*)((char*)line_block(new_line_number) + offset);
 #ifdef FACTOR_DEBUG
-		assert(new_block <= original);
+		FACTOR_ASSERT(new_block <= original);
 #endif
 		return new_block;
 	}

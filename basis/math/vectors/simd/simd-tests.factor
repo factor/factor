@@ -92,6 +92,7 @@ CONSTANT: vector-words
         { vneg { +vector+ -> +vector+ } }
         { vtruncate { +vector+ -> +vector+ } }
         { sum { +vector+ -> +scalar+ } }
+        { vcount { +vector+ -> +scalar+ } }
         { vabs { +vector+ -> +vector+ } }
         { vsqrt { +vector+ -> +vector+ } }
         { vbitand { +vector+ +vector+ -> +vector+ } }
@@ -119,24 +120,58 @@ CONSTANT: vector-words
 : vector-word-inputs ( schema -- seq ) { -> } split first ;
 
 : with-ctors ( -- seq )
-    simd-classes [ [ name>> "-with" append ] [ vocabulary>> ] bi lookup ] map ;
+    simd-classes [ [ name>> "-with" append ] [ vocabulary>> ] bi lookup-word ] map ;
 
 : boa-ctors ( -- seq )
-    simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup ] map ;
+    simd-classes [ [ name>> "-boa" append ] [ vocabulary>> ] bi lookup-word ] map ;
 
-: check-optimizer ( seq quot eq-quot -- failures )
-    dup '[
-        @
-        [ dup [ class ] { } map-as ] dip '[ _ declare @ ]
-        {
-            [ "print-mr" get [ nip regs. ] [ 2drop ] if ]
-            [ "print-checks" get [ [ . ] bi@ ] [ 2drop ] if ]
-            [ [ [ call ] dip call ] call( quot quot -- result ) ]
-            [ [ [ call ] dip compile-call ] call( quot quot -- result ) ]
-            [ [ t "always-inline-simd-intrinsics" [ [ call ] dip compile-call ] with-variable ] call( quot quot -- result ) ]
-        } 2cleave
-        [ drop @ ] [ nip @ ] 3bi and not
-    ] filter ; inline
+TUPLE: simd-test-failure
+    input
+    input-quot
+    unoptimized-result
+    optimized-result
+    nonintrinsic-result ;
+
+:: check-optimizer (
+    seq
+    test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
+    eq-quot: ( resulta resultb -- ? )
+    --
+    failures
+)
+    #! Use test-quot to generate a bunch of test cases from the
+    #! given inputs. Run each test case optimized and
+    #! unoptimized. Compare results with eq-quot.
+    #!
+    #! seq: sequence of inputs
+    #! test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
+    #! eq-quot: ( result1 result2 -- ? )
+    seq [| input |
+        input test-quot call :> ( input-quot code-quot )
+        input-quot [ class-of ] { } map-as :> input-classes
+        input-classes code-quot '[ _ declare @ ] :> code-quot'
+
+        "print-mr" get [ code-quot' regs. ] when
+        "print-checks" get [ input-quot . code-quot' . ] when
+
+        input-quot code-quot' [ [ call ] dip call ]
+        call( i c -- result ) :> unoptimized-result
+        input-quot code-quot' [ [ call ] dip compile-call ]
+        call( i c -- result ) :> optimized-result
+        input-quot code-quot' [
+            t "always-inline-simd-intrinsics"
+            [ [ call ] dip compile-call ]
+            with-variable
+        ] call( i c -- result ) :> nonintrinsic-result
+
+        unoptimized-result optimized-result eq-quot call
+        optimized-result nonintrinsic-result eq-quot call
+        and
+        [ f ] [
+            input input-quot unoptimized-result optimized-result nonintrinsic-result
+            simd-test-failure boa
+        ] if
+    ] map sift ; inline
 
 "== Checking -new constructors" print
 
@@ -156,11 +191,11 @@ CONSTANT: vector-words
     ] [ = ] check-optimizer
 ] unit-test
 
-[ HEX: ffffffff ] [ HEX: ffffffff uint-4-with first ] unit-test
+[ 0xffffffff ] [ 0xffffffff uint-4-with first ] unit-test
 
-[ HEX: ffffffff ] [ HEX: ffffffff [ uint-4-with ] compile-call first ] unit-test
+[ 0xffffffff ] [ 0xffffffff [ uint-4-with ] compile-call first ] unit-test
 
-[ HEX: ffffffff ] [ [ HEX: ffffffff uint-4-with ] compile-call first ] unit-test
+[ 0xffffffff ] [ [ 0xffffffff uint-4-with ] compile-call first ] unit-test
 
 "== Checking -boa constructors" print
 
@@ -171,7 +206,7 @@ CONSTANT: vector-words
     ] [ = ] check-optimizer
 ] unit-test
 
-[ HEX: ffffffff ] [ HEX: ffffffff 2 3 4 [ uint-4-boa ] compile-call first ] unit-test
+[ 0xffffffff ] [ 0xffffffff 2 3 4 [ uint-4-boa ] compile-call first ] unit-test
 
 "== Checking vector operations" print
 
@@ -200,13 +235,13 @@ CONSTANT: vector-words
     word '[ _ execute ] ;
 
 : remove-float-words ( alist -- alist' )
-    { vsqrt n/v v/n v/ normalize } unique assoc-diff ;
+    { distance vsqrt n/v v/n v/ normalize } unique assoc-diff ;
 
 : remove-integer-words ( alist -- alist' )
     { vlshift vrshift v*high v*hs+ } unique assoc-diff ;
 
 : boolean-ops ( -- words )
-    { vand vandn vor vxor vnot } ;
+    { vand vandn vor vxor vnot vcount } ;
 
 : remove-boolean-words ( alist -- alist' )
     boolean-ops unique assoc-diff ;
@@ -216,7 +251,7 @@ CONSTANT: vector-words
     float = [ remove-integer-words ] [ remove-float-words ] if
     remove-boolean-words ;
 
-: check-vector-ops ( class elt-class compare-quot -- )
+: check-vector-ops ( class elt-class compare-quot -- failures )
     [
         [ nip ops-to-check ] 2keep
         '[ first2 vector-word-inputs _ _ check-vector-op ]
@@ -228,6 +263,7 @@ CONSTANT: vector-words
         { [ 2dup [ fp-nan? ] either? ] [ 2drop f ] }
         { [ 2dup [ fp-infinity? ] either? ] [ fp-bitwise= ] }
         { [ 2dup [ float? ] both? ] [ -1.e8 ~ ] }
+        [ = ]
     } cond ;
 
 : approx= ( x y -- ? )
@@ -238,6 +274,7 @@ CONSTANT: vector-words
     {
         { [ 2dup [ float? ] both? ] [ fp-bitwise= ] }
         { [ 2dup [ sequence? ] both? ] [ [ fp-bitwise= ] 2all? ] }
+        [ = ]
     } cond ;
 
 : simd-classes&reps ( -- alist )
@@ -321,6 +358,9 @@ simd-classes&reps [
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hlshift ] compile-call ] unit-test
 
 [ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 >bignum hlshift ] compile-call ] unit-test
+
+[ char-16{ 0 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 } ]
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hlshift ] compile-call ] unit-test
 
 [ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
@@ -330,15 +370,27 @@ simd-classes&reps [
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 hrshift ] compile-call ] unit-test
 
 [ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
+[ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } [ { char-16 } declare 1 >bignum hrshift ] compile-call ] unit-test
+
+[ char-16{ 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 0 } ]
 [ char-16{ 1 2 4 8 1 2 4 8 1 2 4 8 1 2 4 8 } 1 [ { char-16 fixnum } declare hrshift ] compile-call ] unit-test
+
+[ int-4{ 4 8 12 16 } ]
+[ int-4{ 1 2 3 4 } 2 vlshift ] unit-test
+
+[ int-4{ 4 8 12 16 } ]
+[ int-4{ 1 2 3 4 } 2 [ { int-4 fixnum } declare vlshift ] compile-call ] unit-test
+
+[ int-4{ 4 8 12 16 } ]
+[ int-4{ 1 2 3 4 } 2 >bignum [ { int-4 bignum } declare vlshift ] compile-call ] unit-test
 
 ! Invalid inputs should not cause the compiler to throw errors
 [ ] [
-    [ [ { int-4 } declare t hrshift ] (( a -- b )) define-temp drop ] with-compilation-unit
+    [ [ { int-4 } declare t hrshift ] ( a -- b ) define-temp drop ] with-compilation-unit
 ] unit-test
 
 [ ] [
-    [ [ { int-4 } declare { 3 2 1 } vshuffle ] (( a -- b )) define-temp drop ] with-compilation-unit
+    [ [ { int-4 } declare { 3 2 1 } vshuffle ] ( a -- b ) define-temp drop ] with-compilation-unit
 ] unit-test
 
 ! Shuffles
@@ -510,16 +562,16 @@ TUPLE: inconsistent-vector-test bool branch ;
 
 ! Test element access -- it should box bignums for int-4 on x86
 : test-accesses ( seq -- failures )
-    [ length iota >array ] keep
+    [ length iota dup [ >bignum ] map append ] keep
     '[ [ _ 1quotation ] dip '[ _ swap nth ] ] [ = ] check-optimizer ; inline
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
-[ { } ] [ int-4{ HEX: 7fffffff 3 4 -8 } test-accesses ] unit-test
-[ { } ] [ uint-4{ HEX: ffffffff 2 3 4 } test-accesses ] unit-test
+[ { } ] [ int-4{ 0x7fffffff 3 4 -8 } test-accesses ] unit-test
+[ { } ] [ uint-4{ 0xffffffff 2 3 4 } test-accesses ] unit-test
 
-[ HEX: 7fffffff ] [ int-4{ HEX: 7fffffff 3 4 -8 } first ] unit-test
-[ -8 ] [ int-4{ HEX: 7fffffff 3 4 -8 } last ] unit-test
-[ HEX: ffffffff ] [ uint-4{ HEX: ffffffff 2 3 4 } first ] unit-test
+[ 0x7fffffff ] [ int-4{ 0x7fffffff 3 4 -8 } first ] unit-test
+[ -8 ] [ int-4{ 0x7fffffff 3 4 -8 } last ] unit-test
+[ 0xffffffff ] [ uint-4{ 0xffffffff 2 3 4 } first ] unit-test
 
 [ { } ] [ double-2{ 1.0 2.0 } test-accesses ] unit-test
 [ { } ] [ longlong-2{ 1 2 } test-accesses ] unit-test
@@ -531,8 +583,8 @@ TUPLE: inconsistent-vector-test bool branch ;
     '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer ;
 
 [ { } ] [ float-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
-[ { } ] [ int-4{ HEX: 7fffffff 3 4 -8 } test-broadcast ] unit-test
-[ { } ] [ uint-4{ HEX: ffffffff 2 3 4 } test-broadcast ] unit-test
+[ { } ] [ int-4{ 0x7fffffff 3 4 -8 } test-broadcast ] unit-test
+[ { } ] [ uint-4{ 0xffffffff 2 3 4 } test-broadcast ] unit-test
 
 [ { } ] [ double-2{ 1.0 2.0 } test-broadcast ] unit-test
 [ { } ] [ longlong-2{ 1 2 } test-broadcast ] unit-test
@@ -664,8 +716,6 @@ STRUCT: simd-struct
 
 [ float-4{ 0 0 0 0 } ]
 [ 5.0 float-4{ 1 2 3 4 } float-4{ 4 5 6 7 } 0.0 simd-spill-test-2 ] unit-test
-
-USE: alien
 
 : callback-1 ( -- c )
     c:int { c:int c:int c:int c:int c:int } cdecl [ + + + + ] alien-callback ;

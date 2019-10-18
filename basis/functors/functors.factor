@@ -46,13 +46,13 @@ M: object (fake-quotations>) , ;
     [ fake-quotations> first ] append! ;
 
 : parse-declared* ( accum -- accum )
-    complete-effect
+    scan-effect
     [ parse-definition* ] dip
     suffix! ;
 
 FUNCTOR-SYNTAX: TUPLE:
     scan-param suffix!
-    scan {
+    scan-token {
         { ";" [ tuple suffix! f suffix! ] }
         { "<" [ scan-param suffix! [ parse-tuple-slots ] { } make suffix! ] }
         [
@@ -84,7 +84,7 @@ FUNCTOR-SYNTAX: M:
 FUNCTOR-SYNTAX: C:
     scan-param suffix!
     scan-param suffix!
-    complete-effect
+    scan-effect
     [ [ [ boa ] curry ] append! ] dip suffix!
     \ define-declared* suffix! ;
 
@@ -109,7 +109,7 @@ FUNCTOR-SYNTAX: INSTANCE:
 
 FUNCTOR-SYNTAX: GENERIC:
     scan-param suffix!
-    complete-effect suffix!
+    scan-effect suffix!
     \ define-simple-generic* suffix! ;
 
 FUNCTOR-SYNTAX: MACRO:
@@ -122,12 +122,12 @@ FUNCTOR-SYNTAX: inline [ word make-inline ] append! ;
 FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } suffix! ;
 
 : (INTERPOLATE) ( accum quot -- accum )
-    [ scan interpolate-locals ] dip
+    [ scan-token interpolate-locals ] dip
     '[ _ with-string-writer @ ] suffix! ;
 
 PRIVATE>
 
-SYNTAX: IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ;
+SYNTAX: IS [ parse-word ] (INTERPOLATE) ;
 
 SYNTAX: DEFERS [ current-vocab create ] (INTERPOLATE) ;
 
@@ -147,23 +147,19 @@ DEFER: ;FUNCTOR delimiter
 : pop-functor-words ( -- )
     functor-words unuse-words ;
 
-: (parse-bindings) ( end -- )
-    dup parse-binding dup [
-        first2 [ make-local ] dip 2array ,
-        (parse-bindings)
-    ] [ 2drop ] if ;
+: (parse-bindings) ( end -- words )
+    [ dup parse-binding dup ]
+    [ first2 [ make-local ] dip 2array ]
+    produce 2nip ;
 
 : with-bindings ( quot -- words assoc )
-    '[
-        in-lambda? on
-        _ H{ } make-assoc
-    ] { } make swap ; inline
+    in-lambda? on H{ } make ; inline
 
 : parse-bindings ( end -- words assoc )
     [
-        namespace use-words
+        building get use-words
         (parse-bindings)
-        namespace unuse-words
+        building get unuse-words
     ] with-bindings ;
 
 : parse-functor-body ( -- form )
@@ -175,7 +171,7 @@ DEFER: ;FUNCTOR delimiter
     pop-functor-words ;
 
 : (FUNCTOR:) ( -- word def effect )
-    CREATE-WORD [ parse-functor-body ] parse-locals-definition ;
+    scan-new-word [ parse-functor-body ] parse-locals-definition ;
 
 PRIVATE>
 

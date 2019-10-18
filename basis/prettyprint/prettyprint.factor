@@ -1,10 +1,11 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors assocs colors combinators grouping io
-io.streams.string io.styles kernel make math math.parser namespaces
-parser prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.sections quotations sequences sorting strings vocabs
-vocabs.prettyprint words sets generic ;
+USING: arrays accessors assocs classes colors combinators
+continuations grouping io io.streams.string io.styles kernel
+make math math.parser namespaces parser prettyprint.backend
+prettyprint.config prettyprint.custom prettyprint.sections
+quotations sequences sorting strings vocabs vocabs.prettyprint
+words sets generic ;
 FROM: namespaces => set ;
 IN: prettyprint
 
@@ -38,7 +39,14 @@ IN: prettyprint
 : .o ( n -- ) >oct print ;
 : .h ( n -- ) >hex print ;
 
-: stack. ( seq -- ) [ short. ] each ;
+: stack. ( seq -- )
+    [
+        [ short. ] [
+            drop
+            [ class-of name>> "~pprint error: " "~" surround ]
+            keep write-object nl
+        ] recover
+    ] each ;
 
 : .s ( -- ) datastack stack. ;
 : .r ( -- ) retainstack stack. ;
@@ -93,11 +101,10 @@ SYMBOL: ->
         [
             "Quotation: " write
             dup [ second ] [ third ] bi remove-breakpoints
-            [
-                3 nesting-limit set
-                100 length-limit set
-                pprint
-            ] with-scope
+            H{
+                { nesting-limit 3 }
+                { length-limit 100 }
+            } clone [ pprint ] with-variables
         ] with-cell
     ] with-row
     dup frame-word? [

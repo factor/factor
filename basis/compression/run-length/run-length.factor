@@ -9,7 +9,7 @@ IN: compression.run-length
     2 group [ first2 <array> ] map B{ } concat-as ;
 
 : 8hi-lo ( byte -- hi lo )
-    [ HEX: f0 bitand -4 shift ] [ HEX: f bitand ] bi ; inline
+    [ 0xf0 bitand -4 shift ] [ 0xf bitand ] bi ; inline
 
 :: run-length-uncompress-bitmap4 ( byte-array m n -- byte-array' )
     byte-array <sequence-parser> :> sp
@@ -21,7 +21,7 @@ IN: compression.run-length
     [
         ! i j [ number>string ] bi@ " " glue .
         sp next dup 0 = [
-            sp next dup HEX: 03 HEX: ff between? [
+            sp next dup 0x03 0xff between? [
                 nip [ sp ] dip dup odd?
                 [ 1 + take-n but-last ] [ take-n ] if
                 [ j matrix i swap nth copy ] [ length j + j! ] bi
@@ -53,7 +53,7 @@ IN: compression.run-length
     [
         ! i j [ number>string ] bi@ " " glue .
         sp next dup 0 = [
-            sp next dup HEX: 03 HEX: ff between? [
+            sp next dup 0x03 0xff between? [
                 nip [ sp ] dip dup odd?
                 [ 1 + take-n but-last ] [ take-n ] if
                 [ j matrix i swap nth copy ] [ length j + j! ] bi

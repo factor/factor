@@ -23,7 +23,7 @@ IN: compiler.cfg.useless-conditionals
 
 : delete-conditional ( bb -- )
     [ first skip-empty-blocks 1vector ] change-successors
-    instructions>> [ pop* ] [ [ \ ##branch new-insn ] dip push ] bi ;
+    instructions>> [ pop* ] [ [ ##branch new-insn ] dip push ] bi ;
 
 : delete-useless-conditionals ( cfg -- cfg' )
     dup [

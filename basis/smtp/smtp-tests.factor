@@ -11,8 +11,6 @@ IN: smtp.tests
 [ "slava@factorcode.org" ]
 [ "slava@factorcode.org" validate-address ] unit-test
 
-[ { "hello" "." "world" } validate-message ] must-fail
-
 [ "aGVsbG8Kd29ybGQ=\r\n.\r\n" ] [
     T{ email { body "hello\nworld" } } [ send-body ] with-string-writer
 ] unit-test

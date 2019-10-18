@@ -1,8 +1,8 @@
 ! (c)2009 Joe Groff bsd license
-USING: accessors alien.c-types arrays byte-arrays combinators
-destructors gpu gpu.buffers gpu.private gpu.textures
-gpu.textures.private images kernel locals math math.rectangles opengl
-opengl.framebuffers opengl.gl opengl.textures sequences
+USING: accessors alien.c-types alien.data arrays byte-arrays
+combinators destructors gpu gpu.buffers gpu.private gpu.textures
+gpu.textures.private images kernel locals math math.rectangles
+opengl opengl.framebuffers opengl.gl opengl.textures sequences
 specialized-arrays typed ui.gadgets.worlds variants ;
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: uint
@@ -18,7 +18,8 @@ TUPLE: renderbuffer < gpu-object
 <PRIVATE
 
 : get-framebuffer-int ( enum -- value )
-    GL_RENDERBUFFER swap 0 <int> [ glGetRenderbufferParameteriv ] keep *int ;
+    GL_RENDERBUFFER swap 0 int <ref>
+    [ glGetRenderbufferParameteriv ] keep int deref ;
 
 PRIVATE>
 
@@ -80,7 +81,6 @@ UNION: texture-attachment
 M: texture-attachment dispose texture>> dispose ;
 
 UNION: framebuffer-attachment renderbuffer texture-attachment ;
-UNION: ?framebuffer-attachment framebuffer-attachment POSTPONE: f ;
 
 GENERIC: attachment-object ( attachment -- object )
 M: renderbuffer attachment-object ;
@@ -88,8 +88,8 @@ M: texture-attachment attachment-object texture>> texture-object ;
 
 TUPLE: framebuffer < gpu-object
     { color-attachments array read-only }
-    { depth-attachment ?framebuffer-attachment read-only initial: f }
-    { stencil-attachment ?framebuffer-attachment read-only initial: f } ;
+    { depth-attachment maybe{ framebuffer-attachment } read-only initial: f }
+    { stencil-attachment maybe{ framebuffer-attachment } read-only initial: f } ;
 
 UNION: any-framebuffer system-framebuffer framebuffer ;
 
@@ -99,14 +99,11 @@ VARIANT: framebuffer-attachment-side
 VARIANT: framebuffer-attachment-face
     back-face front-face ;
 
-UNION: ?framebuffer-attachment-side framebuffer-attachment-side POSTPONE: f ;
-UNION: ?framebuffer-attachment-face framebuffer-attachment-face POSTPONE: f ;
-
 VARIANT: color-attachment-ref
     default-attachment
     system-attachment: {
-        { side ?framebuffer-attachment-side initial: f }
-        { face ?framebuffer-attachment-face initial: back-face }
+        { side maybe{ framebuffer-attachment-side } initial: f }
+        { face maybe{ framebuffer-attachment-face } initial: back-face }
     }
     color-attachment: { { index integer } } ;
 
@@ -280,8 +277,8 @@ M: opengl-2 (clear-integer-color-attachment)
 M: opengl-3 (clear-integer-color-attachment)
     [ GL_COLOR 0 ] dip 4 0 pad-tail
     swap {
-        { int-type  [ >int-array  glClearBufferiv  ] }
-        { uint-type [ >uint-array glClearBufferuiv ] }
+        { int-type  [ int >c-array  glClearBufferiv  ] }
+        { uint-type [ uint >c-array glClearBufferuiv ] }
     } case ;
 
 :: (clear-color-attachment) ( type attachment value -- )

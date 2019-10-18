@@ -93,7 +93,7 @@ unless
 
 : compile-alien-callback ( word return parameters abi quot -- word )
     '[ _ _ _ _ alien-callback ]
-    [ [ (( -- alien )) define-declared ] pick [ call ] dip ]
+    [ [ ( -- alien ) define-declared ] pick [ call ] dip ]
     with-compilation-unit ;
 
 : (callback-word) ( function-name interface counter -- word )
@@ -158,5 +158,5 @@ M: com-wrapper dispose*
 
 : com-wrap ( object wrapper -- wrapped-object )
     [ vtbls>> ] [ (malloc-wrapped-object) ] bi
-    [ over length <direct-void*-array> 0 swap copy ] keep
+    [ over length void* <c-direct-array> 0 swap copy ] keep
     [ +wrapped-objects+ get-global set-at ] keep ;

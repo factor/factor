@@ -16,7 +16,7 @@ IN: mason.email
             _ >>subject
         send-email
     ] [
-        "E-MAILING FAILED:" print
+        "E-MAILING FAILED:" print-timestamp
         error. flush
     ] recover ;
 

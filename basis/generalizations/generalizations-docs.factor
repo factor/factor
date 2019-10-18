@@ -157,7 +157,7 @@ HELP: nkeep
 } ;
 
 HELP: ncurry
-{ $values { "quot" quotation } { "n" integer } }
+{ $values { "n" integer } }
 { $description "A generalization of " { $link curry } " that can work for any stack depth."
 } 
 { $examples
@@ -170,7 +170,7 @@ HELP: ncurry
 } ;
 
 HELP: nwith
-{ $values { "quot" quotation } { "n" integer } }
+{ $values { "n" integer } }
 { $description "A generalization of " { $link with } " that can work for any stack depth."
 } 
 { $examples

@@ -78,7 +78,7 @@ HELP: no-compilation-unit
 { $description "Throws a " { $link no-compilation-unit } " error." }
 { $error-description "Thrown when an attempt is made to define a word outside of a " { $link with-compilation-unit } " combinator." } ;
 
-HELP: modify-code-heap ( alist update-existing? reset-pics? -- )
+HELP: modify-code-heap
 { $values { "alist" "an association list with words as keys" } { "update-existing?" "a boolean" } { "reset-pics?" "a boolean" } }
 { $description "Lowest-level primitive for defining words. Associates words with code blocks in the code heap."
 $nl

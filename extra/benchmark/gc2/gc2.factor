@@ -15,10 +15,10 @@ SYMBOL: oldies
 : age ( -- )
     1000 [ allocate drop ] times ;
 
-: gc2 ( -- )
+: gc2-benchmark ( -- )
     [
         make-old-objects
         50000 [ age ] times
     ] with-scope ;
 
-MAIN: gc2
+MAIN: gc2-benchmark

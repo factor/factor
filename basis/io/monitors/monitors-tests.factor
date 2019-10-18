@@ -1,11 +1,11 @@
-IN: io.monitors.tests
 USING: io.monitors tools.test io.files system sequences
 continuations namespaces concurrency.count-downs kernel io
 threads calendar prettyprint destructors io.timeouts
 io.files.temp io.directories io.directories.hierarchy
 io.pathnames accessors concurrency.promises ;
+IN: io.monitors.tests
 
-os { winnt linux macosx } member? [
+os { windows linux macosx } member? [
     [
         [ "monitor-test" temp-file delete-tree ] ignore-errors
 

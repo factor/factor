@@ -43,11 +43,11 @@ IN: math.floats.tests
 [ t ] [ pi double>bits bits>double pi = ] unit-test
 [ t ] [ e double>bits bits>double e = ] unit-test
 
-[ BIN: 11111111111000000000000000000000000000000000000000000000000000 ]
+[ 0b11111111111000000000000000000000000000000000000000000000000000 ]
 [ 1.5 double>bits ] unit-test
 
 [ 1.5 ]
-[ BIN: 11111111111000000000000000000000000000000000000000000000000000 bits>double ]
+[ 0b11111111111000000000000000000000000000000000000000000000000000 bits>double ]
 unit-test
 
 [ 2.0 ] [ 1.0 1 + ] unit-test
@@ -61,6 +61,21 @@ unit-test
 [ t ] [ 64 iota [ 2^ 0.5 * ] map [ < ] monotonic? ] unit-test
 
 [ 5 ] [ 10.5 1.9 /i ] unit-test
+
+[ t ] [ 0   0   /f                 fp-nan? ] unit-test
+[ t ] [ 0.0 0.0 /f                 fp-nan? ] unit-test
+[ t ] [ 0.0 0.0 /                  fp-nan? ] unit-test
+[ t ] [ 0   0   [ >bignum ] bi@ /f fp-nan? ] unit-test
+
+[ 1/0. ] [ 1 0 /f ] unit-test
+[ 1/0. ] [ 1.0 0.0 /f ] unit-test
+[ 1/0. ] [ 1.0 0.0 / ] unit-test
+[ 1/0. ] [ 1 0 [ >bignum ] bi@ /f ] unit-test
+
+[ -1/0. ] [ -1 0 /f ] unit-test
+[ -1/0. ] [ -1.0 0.0 /f ] unit-test
+[ -1/0. ] [ -1.0 0.0 / ] unit-test
+[ -1/0. ] [ -1 0 [ >bignum ] bi@ /f ] unit-test
 
 [ t ] [ 0/0. 0/0. unordered? ] unit-test
 [ t ] [ 1.0 0/0. unordered? ] unit-test

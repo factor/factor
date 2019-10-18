@@ -31,7 +31,7 @@ M: incremental pref-dim*
     >>loc drop ;
 
 : prefer-incremental ( gadget -- )
-    dup forget-pref-dim dup pref-dim >>dim drop ;
+    dup forget-pref-dim prefer ;
 
 M: incremental dim-changed drop ;
 

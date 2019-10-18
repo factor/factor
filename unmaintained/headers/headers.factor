@@ -36,14 +36,14 @@ C-STRUCT: iph
     iph-hl|v -4 shift ;
 
 : iph-v ( iph -- n )
-    iph-hl|v HEX: 0f bitand ;
+    iph-hl|v 0x0f bitand ;
 
 : set-iph-hl ( n iph -- )
-    [ iph-hl|v HEX: 0f bitand >r 4 shift r> bitor ] keep
+    [ iph-hl|v 0x0f bitand >r 4 shift r> bitor ] keep
     set-iph-hl|v ;
 
 : set-iph-v ( n iph -- )
-    [ iph-hl|v HEX: f0 bitand bitor ] keep
+    [ iph-hl|v 0xf0 bitand bitor ] keep
     set-iph-hl|v ;
 
 C-STRUCT: icmph
@@ -74,13 +74,13 @@ C-STRUCT: tcph
     tcph-x2|off -4 shift ;
 
 : tcph-off ( iph -- n )
-    tcph-x2|off HEX: 0f bitand ;
+    tcph-x2|off 0x0f bitand ;
 
 : set-tcph-x2 ( n iph -- )
-    [ tcph-x2|off HEX: 0f bitand >r 4 shift r> bitor ] keep
+    [ tcph-x2|off 0x0f bitand >r 4 shift r> bitor ] keep
     set-tcph-x2|off ;
 
 : set-tcph-off ( n iph -- )
-    [ tcph-x2|off HEX: 0f bitand bitor ] keep
+    [ tcph-x2|off 0x0f bitand bitor ] keep
     set-tcph-x2|off ;
 

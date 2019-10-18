@@ -23,7 +23,8 @@ M: persistent-hash at*
 
 M: persistent-hash new-at ( value key assoc -- assoc' )
     [
-        { [ 0 ] [ ] [ dup hashcode >fixnum ] [ root>> ] } spread
+        [ 0 ] 3dip
+        [ dup hashcode >fixnum ] [ root>> ] bi*
         (new-at) 1 0 ?
     ] [ count>> ] bi +
     persistent-hash boa ;

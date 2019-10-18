@@ -4,10 +4,20 @@ USING: arrays hashtables io kernel math math.parser memory
 namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
 definitions compiler.units accessors colors prettyprint fry
-sets vocabs.parser source-files.errors locals vocabs vocabs.loader ;
+sets vocabs.parser source-files.errors locals vocabs vocabs.loader
+parser.notes ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
+GENERIC# prompt. 1 ( stream prompt -- )
+
+: prompt ( -- str )
+    manifest get current-vocab>> [ name>> "IN: " prepend ] [ "" ] if* 
+    auto-use? get [ " auto-use" append ] when ;
+
+M: object prompt.
+    nip H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl
+    flush ;
 
 : parse-lines-interactive ( lines -- quot/f )
     [ parse-lines ] with-compilation-unit ;
@@ -82,7 +92,7 @@ t error-summary? set-global
             ] each
         ] tabular-output nl
     ] unless-empty ;
-    
+
 : trimmed-stack. ( seq -- )
     dup length max-stack-items get > [
         max-stack-items get cut*
@@ -97,15 +107,12 @@ t error-summary? set-global
         [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
     ] [ drop ] if ;
 
-: prompt. ( -- )
-    current-vocab name>> auto-use? get [ " - auto" append ] when "( " " )" surround
-    H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl flush ;
-
 :: (listener) ( datastack -- )
+    parser-quiet? off
     error-summary? get [ error-summary ] when
     visible-vars.
     datastack datastack.
-    prompt.
+    input-stream get prompt prompt.
 
     [
         read-quot [
@@ -168,7 +175,7 @@ SYMBOL: interactive-vocabs
     "tools.dispatch"
     "tools.errors"
     "tools.memory"
-    "tools.profiler"
+    "tools.profiler.sampling"
     "tools.test"
     "tools.threads"
     "tools.time"
@@ -178,14 +185,12 @@ SYMBOL: interactive-vocabs
     "vocabs.refresh"
     "vocabs.hierarchy"
     "words"
-    "scratchpad"
 } interactive-vocabs set-global
 
-: only-use-vocabs ( vocabs -- )
-    clear-manifest
-    [ vocab ] filter
+: use-loaded-vocabs ( vocabs -- )
+    [ lookup-vocab ] filter
     [
-        vocab
+        lookup-vocab
         [ find-vocab-root not ]
         [ source-loaded?>> +done+ eq? ] bi or
     ] filter
@@ -194,7 +199,7 @@ SYMBOL: interactive-vocabs
 : with-interactive-vocabs ( quot -- )
     [
         "scratchpad" set-current-vocab
-        interactive-vocabs get only-use-vocabs
+        interactive-vocabs get use-loaded-vocabs
         call
     ] with-manifest ; inline
 

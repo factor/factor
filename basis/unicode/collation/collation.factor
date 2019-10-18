@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io.files io.encodings.ascii kernel values splitting
+USING: sequences io.files io.encodings.ascii kernel splitting
 accessors math.parser ascii io assocs strings math namespaces make
 sorting combinators math.order arrays unicode.normalize unicode.data
 locals macros sequences.deep words unicode.breaks quotations
@@ -8,7 +8,7 @@ combinators.short-circuit simple-flat-file ;
 IN: unicode.collation
 
 <PRIVATE
-VALUE: ducet
+SYMBOL: ducet
 
 TUPLE: weight primary secondary tertiary ignorable? ;
 
@@ -25,7 +25,7 @@ TUPLE: weight primary secondary tertiary ignorable? ;
 : parse-ducet ( file -- ducet )
     data [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
 
-"vocab:unicode/collation/allkeys.txt" parse-ducet to: ducet
+"vocab:unicode/collation/allkeys.txt" parse-ducet ducet set-global
 
 ! Fix up table for long contractions
 : help-one ( assoc key -- )
@@ -39,21 +39,21 @@ TUPLE: weight primary secondary tertiary ignorable? ;
     dup keys [ length 3 >= ] filter
     [ help-one ] with each ;
 
-ducet insert-helpers
+ducet get-global insert-helpers
 
 : base ( char -- base )
     {
-        { [ dup HEX: 3400 HEX:  4DB5 between? ] [ drop HEX: FB80 ] } ! Extension A
-        { [ dup HEX: 20000 HEX: 2A6D6 between? ] [ drop HEX: FB80 ] } ! Extension B
-        { [ dup HEX: 4E00 HEX: 9FC3 between? ] [ drop HEX: FB40 ] } ! CJK
-        [ drop HEX: FBC0 ] ! Other
+        { [ dup 0x3400 0x4DB5 between? ] [ drop 0xFB80 ] } ! Extension A
+        { [ dup 0x20000 0x2A6D6 between? ] [ drop 0xFB80 ] } ! Extension B
+        { [ dup 0x4E00 0x9FC3 between? ] [ drop 0xFB40 ] } ! CJK
+        [ drop 0xFBC0 ] ! Other
     } cond ;
 
 : AAAA ( char -- weight )
-    [ base ] [ -15 shift ] bi + HEX: 20 2 f weight boa ;
+    [ base ] [ -15 shift ] bi + 0x20 2 f weight boa ;
 
 : BBBB ( char -- weight )
-    HEX: 7FFF bitand HEX: 8000 bitor 0 0 f weight boa ;
+    0x7FFF bitand 0x8000 bitor 0 0 f weight boa ;
 
 : illegal? ( char -- ? )
     { [ "Noncharacter_Code_Point" property? ] [ category "Cs" = ] } 1|| ;
@@ -77,7 +77,7 @@ ducet insert-helpers
 
 :: ?combine ( char slice i -- ? )
     i slice nth char suffix :> str
-    str ducet key? dup
+    str ducet get-global key? dup
     [ str i slice set-nth ] when ;
 
 : add ( char -- )
@@ -93,7 +93,7 @@ ducet insert-helpers
 : graphemes>weights ( graphemes -- weights )
     [
         dup weight? [ 1array ] ! From tailoring
-        [ dup ducet at [ ] [ derive-weight ] ?if ] if
+        [ dup ducet get-global at [ ] [ derive-weight ] ?if ] if
     ] { } map-as concat ;
 
 : append-weights ( weights quot -- )
@@ -101,7 +101,7 @@ ducet insert-helpers
     map [ zero? not ] filter % 0 , ; inline
 
 : variable-weight ( weight -- )
-    dup ignorable?>> [ primary>> ] [ drop HEX: FFFF ] if , ;
+    dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if , ;
 
 : weights>bytes ( weights -- byte-array )
     [
@@ -134,7 +134,7 @@ PRIVATE>
     [
         [ collation-key ] dip
         [ [ 0 = not ] trim-tail but-last ] times
-    ] curry bi@ = ;
+    ] curry same? ;
 PRIVATE>
 
 : primary= ( str1 str2 -- ? )
@@ -149,10 +149,8 @@ PRIVATE>
 : quaternary= ( str1 str2 -- ? )
     0 insensitive= ;
 
-<PRIVATE
 : w/collation-key ( str -- {str,key} )
     [ collation-key ] keep 2array ;
-PRIVATE>
 
 : sort-strings ( strings -- sorted )
     [ w/collation-key ] map natural-sort values ;

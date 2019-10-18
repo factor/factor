@@ -12,6 +12,7 @@ compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.resolve ;
+FROM: assocs => change-at ;
 IN: compiler.cfg.linear-scan
 
 ! References:

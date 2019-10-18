@@ -29,17 +29,17 @@ TYPEDEF: uint unsigned
 TYPEDEF: unsigned enum
 
 ENUM: LLVMAttribute
-    { LLVMZExtAttribute         BIN: 1 }
-    { LLVMSExtAttribute         BIN: 10 }
-    { LLVMNoReturnAttribute     BIN: 100 }
-    { LLVMInRegAttribute        BIN: 1000 }
-    { LLVMStructRetAttribute    BIN: 10000 }
-    { LLVMNoUnwindAttribute     BIN: 100000 }
-    { LLVMNoAliasAttribute      BIN: 1000000 }
-    { LLVMByValAttribute        BIN: 10000000 }
-    { LLVMNestAttribute         BIN: 100000000 }
-    { LLVMReadNoneAttribute     BIN: 1000000000 }
-    { LLVMReadOnlyAttribute     BIN: 10000000000 } ;
+    { LLVMZExtAttribute         0b1 }
+    { LLVMSExtAttribute         0b10 }
+    { LLVMNoReturnAttribute     0b100 }
+    { LLVMInRegAttribute        0b1000 }
+    { LLVMStructRetAttribute    0b10000 }
+    { LLVMNoUnwindAttribute     0b100000 }
+    { LLVMNoAliasAttribute      0b1000000 }
+    { LLVMByValAttribute        0b10000000 }
+    { LLVMNestAttribute         0b100000000 }
+    { LLVMReadNoneAttribute     0b1000000000 }
+    { LLVMReadOnlyAttribute     0b10000000000 } ;
 
 ENUM: LLVMTypeKind
   LLVMVoidTypeKind

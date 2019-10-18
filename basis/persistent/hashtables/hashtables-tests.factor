@@ -91,7 +91,7 @@ M: hash-0-b hashcode* 2drop 0 ;
     bi ;
 
 : ok? ( assoc1 assoc2 -- ? )
-    [ assoc= ] [ [ assoc-size ] bi@ = ] 2bi and ;
+    [ assoc= ] [ [ assoc-size ] same? ] 2bi and ;
 
 : test-persistent-hashtables-1 ( n -- ? )
     random-assocs ok? ;

@@ -1,6 +1,7 @@
-USING: accessors alien.c-types alien.syntax arrays assocs
+USING: accessors alien alien.c-types alien.syntax arrays assocs
 biassocs classes.struct combinators kernel literals math
-math.bitwise math.floats.env math.floats.env.private system ;
+math.bitwise math.floats.env math.floats.env.private system
+cpu.ppc.assembler ;
 IN: math.floats.env.ppc
 
 STRUCT: ppc-fpu-env
@@ -10,12 +11,41 @@ STRUCT: ppc-fpu-env
 STRUCT: ppc-vmx-env
     { vscr uint } ;
 
-! defined in the vm, cpu-ppc*.S
-FUNCTION: void get_ppc_fpu_env ( ppc-fpu-env* env ) ;
-FUNCTION: void set_ppc_fpu_env ( ppc-fpu-env* env ) ;
+: get_ppc_fpu_env ( env -- )
+    void { void* } cdecl [
+        0 MFFS
+        0 3 0 STFD
+    ] alien-assembly ;
 
-FUNCTION: void get_ppc_vmx_env ( ppc-vmx-env* env ) ;
-FUNCTION: void set_ppc_vmx_env ( ppc-vmx-env* env ) ;
+: set_ppc_fpu_env ( env -- )
+    void { void* } cdecl [
+        0 3 0 LFD
+        0xff 0 0 0 MTFSF
+    ] alien-assembly ;
+
+: get_ppc_vmx_env ( env -- )
+    void { void* } cdecl [
+        0 MFVSCR
+        4 1 16 SUBI
+        5 0xf LI
+        4 4 5 ANDC
+        0 0 4 STVXL
+        5 0xc LI
+        6 5 4 LWZX
+        6 3 0 STW
+    ] alien-assembly ;
+
+: set_ppc_vmx_env ( env -- )
+    void { void* } cdecl [
+        3 1 16 SUBI
+        5 0xf LI
+        4 4 5 ANDC
+        5 0xc LI
+        6 3 0 LWZ
+        6 5 4 STWX
+        0 0 4 LVXL
+        0 MTVSCR
+    ] alien-assembly ;
 
 : <ppc-fpu-env> ( -- ppc-fpu-env )
     ppc-fpu-env (struct)
@@ -32,38 +62,38 @@ M: ppc-vmx-env (set-fp-env-register)
     set_ppc_vmx_env ;
 
 M: ppc (fp-env-registers)
-    <ppc-fpu-env> <ppc-vmx-env> 2array ;
+    <ppc-fpu-env> 1array ;
 
-CONSTANT: ppc-exception-flag-bits HEX: fff8,0700
+CONSTANT: ppc-exception-flag-bits 0xfff8,0700
 CONSTANT: ppc-exception-flag>bit
     H{
-        { +fp-invalid-operation+ HEX: 2000,0000 }
-        { +fp-overflow+          HEX: 1000,0000 }
-        { +fp-underflow+         HEX: 0800,0000 }
-        { +fp-zero-divide+       HEX: 0400,0000 }
-        { +fp-inexact+           HEX: 0200,0000 }
+        { +fp-invalid-operation+ 0x2000,0000 }
+        { +fp-overflow+          0x1000,0000 }
+        { +fp-underflow+         0x0800,0000 }
+        { +fp-zero-divide+       0x0400,0000 }
+        { +fp-inexact+           0x0200,0000 }
     }
 
-CONSTANT: ppc-fp-traps-bits HEX: f8
+CONSTANT: ppc-fp-traps-bits 0xf8
 CONSTANT: ppc-fp-traps>bit
     H{
-        { +fp-invalid-operation+ HEX: 80 }
-        { +fp-overflow+          HEX: 40 }
-        { +fp-underflow+         HEX: 20 }
-        { +fp-zero-divide+       HEX: 10 }
-        { +fp-inexact+           HEX: 08 }
+        { +fp-invalid-operation+ 0x80 }
+        { +fp-overflow+          0x40 }
+        { +fp-underflow+         0x20 }
+        { +fp-zero-divide+       0x10 }
+        { +fp-inexact+           0x08 }
     }
 
-CONSTANT: ppc-rounding-mode-bits HEX: 3
+CONSTANT: ppc-rounding-mode-bits 0x3
 CONSTANT: ppc-rounding-mode>bit
     $[ H{
-        { +round-nearest+ HEX: 0 }
-        { +round-zero+    HEX: 1 }
-        { +round-up+      HEX: 2 }
-        { +round-down+    HEX: 3 }
+        { +round-nearest+ 0x0 }
+        { +round-zero+    0x1 }
+        { +round-up+      0x2 }
+        { +round-down+    0x3 }
     } >biassoc ]
 
-CONSTANT: ppc-denormal-mode-bits HEX: 4
+CONSTANT: ppc-denormal-mode-bits 0x4
 
 M: ppc-fpu-env (get-exception-flags) ( register -- exceptions )
     fpscr>> ppc-exception-flag>bit mask> ; inline
@@ -90,7 +120,7 @@ M: ppc-fpu-env (set-denormal-mode) ( register mode -- register' )
         } case
     ] curry change-fpscr ; inline
 
-CONSTANT: vmx-denormal-mode-bits HEX: 10000
+CONSTANT: vmx-denormal-mode-bits 0x10000
 
 M: ppc-vmx-env (get-exception-flags) ( register -- exceptions )
     drop { } ; inline

@@ -189,7 +189,7 @@ M: lazy-append nil? ( lazy-append -- ? )
 
 TUPLE: lazy-from-by n quot ;
 
-C: lfrom-by lazy-from-by
+: lfrom-by ( n quot: ( n -- o ) -- lazy-from-by ) lazy-from-by boa ; inline
 
 : lfrom ( n -- list )
     [ 1 + ] lfrom-by ;
@@ -281,7 +281,7 @@ M: lazy-concat nil? ( lazy-concat -- ? )
     dup nil? [
         drop nil
     ] [
-        [ car ] [ cdr ] bi
+        uncons
         [ car lcartesian-product ] [ cdr ] bi
         list>array swap [
             swap [ swap [ suffix ] with lazy-map  ] with lazy-map  lconcat

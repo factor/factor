@@ -6,7 +6,7 @@ gpu.render gpu.shaders gpu.state gpu.textures gpu.util images
 images.loader kernel literals locals make math math.rectangles
 math.vectors namespaces opengl.gl sequences specialized-arrays
 ui.gadgets.worlds ui.gestures ui.pixel-formats gpu.effects.step
-images.pgm images.ppm ;
+images.pgm images.ppm alien.data ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: fluids
@@ -113,8 +113,8 @@ GAME: fluids {
 
 fluids-world H{
     { T{ button-down } [ [
-        hand-loc get >float-array
-        world get dim>> >float-array v/ 2 v*n 1 v-n { 1 -1 } v*
+        hand-loc get float >c-array
+        world get dim>> float >c-array v/ 2 v*n 1 v-n { 1 -1 } v*
         float-array{ 0 0.2 } 2.0 particle_t <struct-boa> suffix
     ] change-particles drop ] }
 } set-gestures

@@ -109,3 +109,6 @@ M: model set-image [ value>> >>image drop ] [ >>model ] 2bi ;
 M: image-control graft* start-control ;
 M: image-control ungraft* [ stop-control ] [ call-next-method ] bi ;
 PRIVATE>
+
+M: image content-gadget
+    <image-gadget> ;

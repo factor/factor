@@ -6,7 +6,7 @@ tokyo.alien.tctdb classes.struct ;
 IN: tokyo.alien.tcrdb
 
 << "tokyotyrant" {
-    { [ os macosx? ] [ "/opt/local/lib/libtokyotyrant.dylib" ] }
+    { [ os macosx? ] [ "libtokyotyrant.dylib" ] }
     { [ os unix? ] [ "libtokyotyrant.so" ] }
     { [ os windows? ] [ "tokyotyrant.dll" ] }
 } cond cdecl add-library >>

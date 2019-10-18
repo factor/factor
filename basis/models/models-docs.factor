@@ -64,6 +64,10 @@ HELP: set-model
 { $values { "value" object } { "model" model } }
 { $description "Changes the value of a model and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
 
+HELP: ?set-model
+{ $values { "value" object } { "model" model } }
+{ $description "Similar to " { $link set-model } ", but only sets the value if the new value is different." } ;
+
 { set-model change-model change-model* (change-model) push-model pop-model } related-words
 
 HELP: change-model

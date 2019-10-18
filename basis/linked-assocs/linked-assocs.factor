@@ -29,7 +29,7 @@ M: linked-assoc set-at
     assoc>> set-at ;
 
 M: linked-assoc >alist
-    dlist>> dlist>seq ;
+    dlist>> dlist>sequence ;
 
 M: linked-assoc clear-assoc
     [ assoc>> clear-assoc ] [ dlist>> clear-deque ] bi ;

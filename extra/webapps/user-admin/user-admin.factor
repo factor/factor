@@ -32,7 +32,7 @@ TUPLE: user-admin < dispatcher ;
     [ [ param empty? not ] keep set-value ] each ;
 
 : selected-capabilities ( -- seq )
-    "capabilities" value [ value ] filter [ string>word ] map ;
+    "capabilities" value [ value ] filter strings>words ;
 
 : validate-user ( -- )
     {

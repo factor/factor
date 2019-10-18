@@ -5,7 +5,7 @@ sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files vocabs io.encodings.utf8 source-files classes
 hashtables compiler.units accessors sets lexer vocabs.parser
- slots parser.notes ;
+slots parser.notes classes.algebra ;
 IN: parser
 
 : location ( -- loc )
@@ -15,16 +15,14 @@ IN: parser
 : save-location ( definition -- )
     location remember-definition ;
 
-M: parsing-word stack-effect drop (( parsed -- parsed )) ;
+M: parsing-word stack-effect drop ( parsed -- parsed ) ;
 
 : create-in ( str -- word )
     current-vocab create dup set-word dup save-location ;
 
-: CREATE ( -- word ) scan create-in ;
-
-: CREATE-WORD ( -- word ) CREATE dup reset-generic ;
-
 SYMBOL: auto-use?
+
+: auto-use ( -- ) auto-use? on ;
 
 : no-word-restarted ( restart-value -- word )
     dup word? [
@@ -48,13 +46,42 @@ SYMBOL: auto-use?
     [ drop <no-word-error> throw-restarts no-word-restarted ]
     if ;
 
-: parse-word ( string -- word/number )
+: parse-word ( string -- word )
+    dup search [ ] [ no-word ] ?if ;
+
+ERROR: number-expected ;
+
+: parse-number ( string -- number )
+    string>number [ number-expected ] unless* ;
+
+: parse-datum ( string -- word/number )
     dup search [ ] [
         dup string>number [ ] [ no-word ] ?if
     ] ?if ;
 
-: scan-word ( -- word/number/f )
-    scan dup [ parse-word ] when ;
+: (scan-datum) ( -- word/number/f )
+    (scan-token) dup [ parse-datum ] when ;
+
+: scan-datum ( -- word/number )
+    (scan-datum) [ \ word unexpected-eof ] unless* ;
+
+: scan-word ( -- word )
+    (scan-token) parse-word ;
+
+: scan-number ( -- number )
+    (scan-token) parse-number ;
+
+: scan-word-name ( -- string )
+    scan-token
+    dup string>number [
+        "Word names cannot be numbers" throw
+    ] when ;
+
+: scan-new ( -- word )
+    scan-word-name create-in ;
+
+: scan-new-word ( -- word )
+    scan-new dup reset-generic ;
 
 ERROR: staging-violation word ;
 
@@ -68,14 +95,16 @@ ERROR: staging-violation word ;
     (execute-parsing) ;
 
 : scan-object ( -- object )
-    scan-word {
-        { [ dup not ] [ unexpected-eof ] }
-        { [ dup parsing-word? ] [ V{ } clone swap execute-parsing first ] }
-        [ ]
-    } cond  ;
+    scan-datum
+    dup parsing-word? [
+        V{ } clone swap execute-parsing first
+    ] when ;
 
-: parse-step ( accum end -- accum ? )
-    scan-word {
+: scan-class ( -- class )
+    scan-object \ f or ;
+
+: parse-until-step ( accum end -- accum ? )
+    (scan-datum) {
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
@@ -84,7 +113,7 @@ ERROR: staging-violation word ;
     } cond ;
 
 : (parse-until) ( accum end -- accum )
-    [ parse-step ] keep swap [ (parse-until) ] [ drop ] if ;
+    [ parse-until-step ] keep swap [ (parse-until) ] [ drop ] if ;
 
 : parse-until ( end -- vec )
     100 <vector> swap (parse-until) ;
@@ -99,7 +128,7 @@ M: f parse-quotation \ ] parse-until >quotation ;
     [ f parse-until >quotation ] with-lexer ;
 
 : parse-lines ( lines -- quot )
-    lexer-factory get call( lines -- lexer ) (parse-lines) ;
+    >array <lexer> (parse-lines) ;
 
 : parse-literal ( accum end quot -- accum )
     [ parse-until ] dip call suffix! ; inline
@@ -110,10 +139,7 @@ M: f parse-quotation \ ] parse-until >quotation ;
 ERROR: bad-number ;
 
 : scan-base ( base -- n )
-    scan swap base> [ bad-number ] unless* ;
-
-: parse-base ( parsed base -- parsed )
-    scan-base suffix! ;
+    scan-token swap base> [ bad-number ] unless* ;
 
 SYMBOL: bootstrap-syntax
 
@@ -135,7 +161,7 @@ print-use-hook [ [ ] ] initialize
     ] with-file-vocabs ;
 
 : parsing-file ( file -- )
-    "quiet" get [ drop ] [ "Loading " write print flush ] if ;
+    parser-quiet? get [ drop ] [ "Loading " write print flush ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
     swap assoc-diff keys [

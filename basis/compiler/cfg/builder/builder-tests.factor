@@ -221,3 +221,12 @@ IN: compiler.cfg.builder.tests
 
 ! Regression. Make sure everything is inlined correctly
 [ f ] [ M\ hashtable set-at [ { [ ##call? ] [ word>> \ set-slot eq? ] } 1&& ] contains-insn? ] unit-test
+
+! Regression. Make sure branch splitting works.
+[ 2 ] [ [ 1 2 ? ] [ ##return? ] count-insns ] unit-test
+
+! Make sure fast union predicates don't have conditionals.
+[ f ] [
+    [ tag 1 swap fixnum-shift-fast ]
+    [ ##compare-integer-imm-branch? ] contains-insn?
+] unit-test

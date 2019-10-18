@@ -1,5 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays assocs kernel locals math sequences ;
+FROM: sequences => change-nth ;
 IN: sequences.product
 
 TUPLE: product-sequence { sequences array read-only } { lengths array read-only } ;
@@ -14,7 +15,7 @@ M: product-sequence length lengths>> product ;
 <PRIVATE
 
 : ns ( n lengths -- ns )
-    [ V{ } clone ] 2dip [ /mod swap [ over push ] dip ] each drop ;
+    [ /mod ] map nip ;
 
 : nths ( ns seqs -- nths )
     [ nth ] { } 2map-as ;
@@ -33,29 +34,29 @@ M: product-sequence length lengths>> product ;
 
 : carry-ns ( ns lengths -- )
     0 (carry-n) ;
-    
+
 : product-iter ( ns lengths -- )
     [ 0 over [ 1 + ] change-nth ] dip carry-ns ;
 
 : start-product-iter ( sequences -- ns lengths )
-    [ [ drop 0 ] map ] [ [ length ] map ] bi ;
+    [ length 0 <array> ] [ [ length ] map ] bi ;
 
 : end-product-iter? ( ns lengths -- ? )
-    [ 1 tail* first ] bi@ = ;
+    [ last ] same? ;
 
 PRIVATE>
 
-M: product-sequence nth 
+M: product-sequence nth
     product@ nths ;
 
-:: product-each ( sequences quot -- )
+:: product-each ( ... sequences quot: ( ... seq -- ... ) -- ... )
     sequences start-product-iter :> ( ns lengths )
     lengths [ 0 = ] any? [
         [ ns lengths end-product-iter? ]
         [ ns sequences nths quot call ns lengths product-iter ] until
     ] unless ; inline
 
-:: product-map-as ( sequences quot exemplar -- sequence )
+:: product-map-as ( ... sequences quot: ( ... seq -- ... value ) exemplar -- ... sequence )
     0 :> i!
     sequences [ length ] [ * ] map-reduce exemplar
     [| result |
@@ -63,10 +64,10 @@ M: product-sequence nth
         result
     ] new-like ; inline
 
-: product-map ( sequences quot -- sequence )
+: product-map ( ... sequences quot: ( ... seq -- ... value ) -- ... sequence )
     over product-map-as ; inline
 
-:: product-map>assoc ( sequences quot exemplar -- assoc )
+:: product-map>assoc ( ... sequences quot: ( ... seq -- ... key value ) exemplar -- ... assoc )
     0 :> i!
     sequences [ length ] [ * ] map-reduce { }
     [| result |

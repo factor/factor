@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel sequences words fry generic
 generic.single accessors classes.tuple classes classes.algebra
@@ -23,9 +23,11 @@ IN: compiler.tree.propagation.transforms
     ] [ drop f ] if
 ] "custom-inlining" set-word-prop
 
-: rem-custom-inlining ( #call -- quot/f )
-    second value-info literal>> dup integer?
-    [ power-of-2? [ 1 - bitand ] f ? ] [ drop f ] if ;
+: rem-custom-inlining ( inputs -- quot/f )
+    dup first value-info class>> integer class<= [
+        second value-info literal>> dup integer?
+        [ power-of-2? [ 1 - bitand ] f ? ] [ drop f ] if
+    ] [ drop f ] if ;
 
 {
     mod-integer-integer
@@ -93,11 +95,11 @@ IN: compiler.tree.propagation.transforms
             }
             {
                 [ 2dup simplify-bitand? ]
-                [ 2drop [ >fixnum fixnum-bitand ] ]
+                [ 2drop [ integer>fixnum fixnum-bitand ] ]
             }
             {
                 [ 2dup swap simplify-bitand? ]
-                [ 2drop [ [ >fixnum ] dip fixnum-bitand ] ]
+                [ 2drop [ [ integer>fixnum ] dip fixnum-bitand ] ]
             }
             [ 2drop f ]
         } cond
@@ -112,7 +114,7 @@ IN: compiler.tree.propagation.transforms
     2^? [
         cell-bits tag-bits get - 1 -
         '[
-            >fixnum dup 0 < [ 2drop 0 ] [
+            integer>fixnum dup 0 < [ 2drop 0 ] [
                 dup _ < [ fixnum-shift ] [
                     fixnum-shift
                 ] if
@@ -165,7 +167,7 @@ ERROR: bad-partial-eval quot word ;
 : inline-new ( class -- quot/f )
     dup tuple-class? [
         dup tuple-layout
-        [ depends-on-tuple-layout ]
+        [ add-depends-on-tuple-layout ]
         [ drop all-slots [ initial>> literalize ] [ ] map-as ]
         [ nip ]
         2tri
@@ -175,8 +177,14 @@ ERROR: bad-partial-eval quot word ;
 \ new [ inline-new ] 1 define-partial-eval
 
 \ instance? [
-    dup class?
-    [ "predicate" word-prop ] [ drop f ] if
+    dup classoid?
+    [
+        predicate-def
+        ! union{ and intersection{ have useless expansions, and recurse infinitely
+        dup { [ length 2 >= ] [ second \ instance? = ] } 1&& [
+            drop f
+        ] when
+    ] [ drop f ] if
 ] 1 define-partial-eval
 
 ! Shuffling
@@ -301,16 +309,23 @@ M\ set intersect [ intersect-quot ] 1 define-partial-eval
     [ \ push def>> ] [ f ] if
 ] "custom-inlining" set-word-prop
 
+: custom-inline-fixnum ( x -- y )
+    in-d>> first value-info class>> fixnum \ f class-or class<=
+    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if ;
+
 ! Speeds up fasta benchmark
 \ >fixnum [
-    in-d>> first value-info class>> fixnum \ f class-or class<=
-    [ [ dup [ \ >fixnum no-method ] unless ] ] [ f ] if
+    custom-inline-fixnum
 ] "custom-inlining" set-word-prop
+
+{ integer>fixnum integer>fixnum-strict } [
+    [ custom-inline-fixnum ] "custom-inlining" set-word-prop
+] each
 
 ! We want to constant-fold calls to heap-size, and recompile those
 ! calls when a C type is redefined
 \ heap-size [
-    [ depends-on-c-type ] [ heap-size '[ _ ] ] bi
+    [ add-depends-on-c-type ] [ heap-size '[ _ ] ] bi
 ] 1 define-partial-eval
 
 ! Eliminates a few redundant checks here and there

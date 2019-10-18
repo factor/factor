@@ -17,7 +17,7 @@ STRUCT: statvfs
     { f_namemax ulong } ;
 
 ! Flags
-CONSTANT: ST_RDONLY   HEX: 1 ! Read-only file system
-CONSTANT: ST_NOSUID   HEX: 2 ! Does not honor setuid/setgid
+CONSTANT: ST_RDONLY   0x1 ! Read-only file system
+CONSTANT: ST_NOSUID   0x2 ! Does not honor setuid/setgid
 
 FUNCTION: int statvfs ( c-string path, statvfs* buf ) ;

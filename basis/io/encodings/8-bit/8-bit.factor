@@ -54,4 +54,4 @@ M: 8-bit-encoding <decoder>
 
 PRIVATE>
 
-SYNTAX: 8-BIT: scan scan scan load-encoding ;
+SYNTAX: 8-BIT: scan-token scan-token scan-token load-encoding ;

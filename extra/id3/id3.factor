@@ -101,12 +101,12 @@ CONSTANT: id3v1+-length 227
         } cleave
     ] output>array sift ;
 
-: seq>synchsafe ( seq -- n )
+: sequence>synchsafe ( seq -- n )
     0 [ [ 7 shift ] dip bitor ] reduce ;
 
-: synchsafe>seq ( n -- seq )
+: synchsafe>sequence ( n -- seq )
     dup 1 + log2 1 + 7 / ceiling
-    [ [ -7 shift ] keep HEX: 7f bitand  ] replicate nip reverse ;
+    [ [ -7 shift ] keep 0x7f bitand  ] replicate nip reverse ;
 
 : filter-text-data ( data -- filtered )
     [ printable? ] filter ;
@@ -119,14 +119,14 @@ CONSTANT: id3v1+-length 227
 
 : decode-text ( string -- string' )
     dup 2 short head
-    { { HEX: ff HEX: fe } { HEX: fe HEX: ff } } member?
+    { { 0xff 0xfe } { 0xfe 0xff } } member?
     utf16 ascii ? decode ;
 
 : (read-frame) ( seq -- frame )
     [ <frame> ] dip
     {
         [ 4 head-slice decode-text >>tag ]
-        [ [ 4 8 ] dip subseq seq>synchsafe >>size ]
+        [ [ 4 8 ] dip subseq sequence>synchsafe >>size ]
         [ [ 8 10 ] dip subseq >byte-array >>flags ]
         [ read-frame-data decode-text >>data ]
     } cleave ;
@@ -149,7 +149,7 @@ CONSTANT: id3v1+-length 227
     {
         [ [ 3 5 ] dip <slice> >array >>version ]
         [ [ 5 ] dip nth >>flags ]
-        [ [ 6 10 ] dip <slice> seq>synchsafe >>size ]
+        [ [ 6 10 ] dip <slice> sequence>synchsafe >>size ]
     } cleave ;
 
 : merge-frames ( id3 assoc -- id3 )

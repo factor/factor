@@ -56,11 +56,48 @@ static const cell data_alignment = 16;
 
 #define TYPE_COUNT 14
 
+static inline const char *type_name(cell type)
+{
+	switch (type)
+	{
+	case FIXNUM_TYPE:
+		return "fixnum";
+	case F_TYPE:
+		return "f";
+	case ARRAY_TYPE:
+		return "array";
+	case FLOAT_TYPE:
+		return "float";
+	case QUOTATION_TYPE:
+		return "quotation";
+	case BIGNUM_TYPE:
+		return "bignum";
+	case ALIEN_TYPE:
+		return "alien";
+	case TUPLE_TYPE:
+		return "tuple";
+	case WRAPPER_TYPE:
+		return "wrapper";
+	case BYTE_ARRAY_TYPE:
+		return "byte-array";
+	case CALLSTACK_TYPE:
+		return "callstack";
+	case STRING_TYPE:
+		return "string";
+	case WORD_TYPE:
+		return "word";
+	case DLL_TYPE:
+		return "dll";
+	default:
+		FACTOR_ASSERT(false);
+		return "";
+	}
+}
+
 enum code_block_type
 {
 	code_block_unoptimized,
 	code_block_optimized,
-	code_block_profiling,
 	code_block_pic
 };
 
@@ -86,7 +123,7 @@ inline static bool immediate_p(cell obj)
 inline static fixnum untag_fixnum(cell tagged)
 {
 #ifdef FACTOR_DEBUG
-	assert(TAG(tagged) == FIXNUM_TYPE);
+	FACTOR_ASSERT(TAG(tagged) == FIXNUM_TYPE);
 #endif
 	return ((fixnum)tagged) >> TAG_BITS;
 }
@@ -215,7 +252,11 @@ struct string : public object {
 
 struct code_block;
 
-/* Assembly code makes assumptions about the layout of this struct */
+/* Assembly code makes assumptions about the layout of this struct:
+	basis/bootstrap/images/images.factor
+	basis/compiler/constants/constants.factor
+	core/bootstrap/primitives.factor
+*/
 struct word : public object {
 	static const cell type_number = WORD_TYPE;
 	/* TAGGED hashcode */
@@ -232,16 +273,14 @@ struct word : public object {
 	cell pic_def;
 	/* TAGGED alternative entry point for direct tail calls. Used for inline caching */
 	cell pic_tail_def;
-	/* TAGGED call count for profiling */
-	cell counter;
 	/* TAGGED machine code for sub-primitive */
 	cell subprimitive;
 	/* UNTAGGED entry point: jump here to execute word */
 	void *entry_point;
 	/* UNTAGGED compiled code block */
-	code_block *code;
-	/* UNTAGGED profiler stub */
-	code_block *profiling;
+
+	/* defined in code_blocks.hpp */
+	code_block *code() const;
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -261,7 +300,11 @@ struct boxed_float : object {
 	double n;
 };
 
-/* Assembly code makes assumptions about the layout of this struct */
+/* Assembly code makes assumptions about the layout of this struct:
+	basis/bootstrap/images/images.factor
+	basis/compiler/constants/constants.factor
+	core/bootstrap/primitives.factor
+*/
 struct quotation : public object {
 	static const cell type_number = QUOTATION_TYPE;
 	/* tagged */
@@ -272,8 +315,9 @@ struct quotation : public object {
 	cell cache_counter;
 	/* UNTAGGED entry point; jump here to call quotation */
 	void *entry_point;
-	/* UNTAGGED compiled code block */
-	code_block *code;
+
+	/* defined in code_blocks.hpp */
+	code_block *code() const;
 };
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -305,25 +349,18 @@ struct dll : public object {
 	void *handle;
 };
 
-struct stack_frame {
-	/* Updated by procedure prologue with procedure start address */
-	void *entry_point;
-	/* Frame size in bytes */
-	cell size;
-};
-
 struct callstack : public object {
 	static const cell type_number = CALLSTACK_TYPE;
 	/* tagged */
 	cell length;
 	
-	stack_frame *frame_at(cell offset) const
+	void *frame_top_at(cell offset) const
 	{
-		return (stack_frame *)((char *)(this + 1) + offset);
+		return (void *)((char *)(this + 1) + offset);
 	}
 
-	stack_frame *top() const { return (stack_frame *)(this + 1); }
-	stack_frame *bottom() const { return (stack_frame *)((cell)(this + 1) + untag_fixnum(length)); }
+	void *top() const { return (void *)(this + 1); }
+	void *bottom() const { return (void *)((cell)(this + 1) + untag_fixnum(length)); }
 };
 
 struct tuple : public object {

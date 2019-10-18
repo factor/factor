@@ -17,9 +17,18 @@ inline cell log2(cell x)
 	#else
 		asm ("bsr %1, %0;":"=r"(n):"r"(x));
 	#endif
-#elif defined(FACTOR_PPC)
-	asm ("cntlzw %1, %0;":"=r"(n):"r"(x));
-	n = (31 - n);
+#elif defined(FACTOR_PPC64)
+#if defined(__GNUC__)
+	n = (63 - __builtin_clzll(x));
+#else
+	#error Unsupported compiler
+#endif
+#elif defined(FACTOR_PPC32)
+#if defined(__GNUC__)
+	n = (31 - __builtin_clz(x));
+#else
+	#error Unsupported compiler
+#endif
 #else
 	#error Unsupported CPU
 #endif
@@ -38,6 +47,13 @@ inline cell rightmost_set_bit(cell x)
 
 inline cell popcount(cell x)
 {
+#if defined(__GNUC__)
+#ifdef FACTOR_64
+	return __builtin_popcountll(x);
+#else
+	return __builtin_popcount(x);
+#endif
+#else
 #ifdef FACTOR_64
 	u64 k1 = 0x5555555555555555ll;
 	u64 k2 = 0x3333333333333333ll;
@@ -58,6 +74,7 @@ inline cell popcount(cell x)
 	x = (x * kf) >> ks; // returns 8 most significant bits of x + (x<<8) + (x<<16) + (x<<24) + ...
 
 	return x;
+#endif
 }
 
 inline bool bitmap_p(u8 *bitmap, cell index)

@@ -6,7 +6,7 @@ sequences locals system splitting tools.deploy.backend
 tools.deploy.config tools.deploy.config.editor assocs hashtables
 prettyprint combinators windows.kernel32 windows.shell32 windows.user32
 alien.c-types vocabs.metadata vocabs.loader tools.deploy.windows.ico
-io.files.windows.nt ;
+io.files.windows ;
 IN: tools.deploy.windows
 
 CONSTANT: app-icon-resource-id "APPICON"
@@ -28,17 +28,17 @@ CONSTANT: app-icon-resource-id "APPICON"
     [ binary file-contents app-icon-resource-id embed-icon-resource ]
     [ 2drop ] if ;
 
-M: winnt deploy*
+M: windows deploy*
     "resource:" [
         dup deploy-config [
             deploy-name get
             {
                 [ create-exe-dir dup ]
                 [ drop embed-ico ]
-                [ image-name ]
-                [ drop namespace make-deploy-image ]
+                [ drop deployed-image-name ]
+                [ drop namespace make-deploy-image-executable ]
                 [ nip "" [ copy-resources ] [ copy-libraries ] 3bi ]
                 [ nip open-in-explorer ]
             } 2cleave 
-        ] bind
+        ] with-variables
     ] with-directory ;

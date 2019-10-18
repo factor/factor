@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit unicode.categories kernel math
-combinators splitting sequences math.parser io.files io assocs
-arrays namespaces make math.ranges unicode.normalize
-unicode.normalize.private values io.encodings.ascii
-unicode.data compiler.units fry unicode.categories.syntax
-alien.syntax sets accessors interval-maps memoize locals words
-simple-flat-file ;
+USING: accessors alien.syntax arrays assocs combinators
+combinators.short-circuit compiler.units fry interval-maps io
+io.encodings.ascii io.files kernel literals locals make math
+math.parser math.ranges memoize namespaces sequences
+sets simple-flat-file splitting unicode.categories
+unicode.categories.syntax unicode.data unicode.normalize
+unicode.normalize.private words ;
+FROM: sequences => change-nth ;
 IN: unicode.breaks
 
 <PRIVATE
@@ -31,15 +32,15 @@ CONSTANT: graphemes 12
     [ dup medial? [ drop V ] [ final? T Any ? ] if ] if ;
 
 : hangul-class ( ch -- class )
-    hangul-base - HEX: 1C mod zero? LV LVT ? ;
+    hangul-base - 0x1C mod zero? LV LVT ? ;
 
 CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : control-class ( ch -- class )
     {
         { CHAR: \r [ CR ] }
         { CHAR: \n [ LF ] }
-        { HEX: 200C [ Extend ] }
-        { HEX: 200D [ Extend ] }
+        { 0x200C [ Extend ] }
+        { 0x200D [ Extend ] }
         [ drop Control ]
     } case ;
 
@@ -94,10 +95,10 @@ SYMBOL: table
     graphemes iota { SpacingMark } connect
     { Prepend } graphemes iota connect ;
 
-VALUE: grapheme-table
+SYMBOL: grapheme-table
 
 : grapheme-break? ( class1 class2 -- ? )
-    grapheme-table nth nth not ;
+    grapheme-table get-global nth nth not ;
 
 PRIVATE>
 
@@ -127,20 +128,20 @@ PRIVATE>
     [ first-grapheme ] >pieces ;
 
 : string-reverse ( str -- rts )
-    >graphemes reverse concat ;
+    >graphemes reverse! concat ;
 
 <PRIVATE
 
 graphemes init-table table
 [ make-grapheme-table finish-table ] with-variable
-to: grapheme-table
+grapheme-table set-global
 
 ! Word breaks
 
-VALUE: word-break-table
+SYMBOL: word-break-table
 
 "vocab:unicode/data/WordBreakProperty.txt" load-interval-file
-to: word-break-table
+word-break-table set-global
 
 CONSTANT: wOther 0
 CONSTANT: wCR 1
@@ -167,7 +168,7 @@ CONSTANT: words 13
     } ;
 
 : word-break-prop ( char -- word-break-prop )
-    word-break-table interval-at
+    word-break-table get-global interval-at
     word-break-classes at [ wOther ] unless* ;
 
 SYMBOL: check-letter-before
@@ -188,7 +189,7 @@ SYMBOL: check-number-after
     { wALetter wNumeric wKatakana wExtendNumLet } { wExtendNumLet }
     [ connect ] [ swap connect ] 2bi ;
 
-VALUE: word-table
+SYMBOL: word-table
 
 : finish-word-table ( -- table )
     table get [
@@ -197,10 +198,10 @@ VALUE: word-table
 
 words init-table table
 [ make-word-table finish-word-table ] with-variable
-to: word-table
+word-table set-global
 
 : word-table-nth ( class1 class2 -- ? )
-    word-table nth nth ;
+    word-table get-global nth nth ;
 
 :: property-not= ( str i property -- ? )
     i [
@@ -208,8 +209,11 @@ to: word-table
         [ f ] if*
     ] [ t ] if ;
 
+: (format/extended?) ( class -- ? )
+    ${ wExtend wFormat } member? ; inline
+
 : format/extended? ( ch -- ? )
-    word-break-prop { 4 5 } member? ;
+    word-break-prop (format/extended?) ;
 
 : (walk-up) ( str i -- j )
     swap [ format/extended? not ] find-from drop ;
@@ -238,17 +242,18 @@ to: word-table
     } case ;
 
 :: word-break-next ( old-class new-char i str -- next-class ? )
-    new-char format/extended?
-    [ old-class dup { 1 2 3 } member? ] [
-        new-char word-break-prop old-class over word-table-nth
+    new-char word-break-prop :> new-class
+    new-class (format/extended?)
+    [ old-class dup ${ wCR wLF wNewline } member? ] [
+        new-class old-class over word-table-nth
         [ str i ] dip word-break?
     ] if ;
 
 PRIVATE>
 
 : first-word ( str -- i )
-    [ unclip-slice word-break-prop over <enum> ] keep
-    '[ swap _ word-break-next ] assoc-find 2drop
+    [ unclip-slice word-break-prop over ] keep
+    '[ _ word-break-next ] find-index drop
     nip swap length or 1 + ;
 
 : >words ( str -- words )

@@ -1,27 +1,32 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax arrays calendar
-kernel math unix unix.time unix.types namespaces system
-accessors classes.struct ;
+USING: accessors alien.data calendar calendar.private
+classes.struct kernel math system unix unix.time unix.types ;
 IN: calendar.unix
 
+: timeval>seconds ( timeval -- seconds )
+    [ sec>> ] [ usec>> 1,000,000 / ] bi + ; inline
+
+: timeval>micros ( timeval -- micros )
+    [ sec>> 1,000,000 * ] [ usec>> ] bi + ; inline
+
 : timeval>duration ( timeval -- duration )
-    [ sec>> seconds ] [ usec>> microseconds ] bi time+ ;
+    timeval>seconds seconds ; inline
 
 : timeval>unix-time ( timeval -- timestamp )
-    timeval>duration since-1970 ;
+    [ unix-1970 ] dip timeval>seconds +second ; inline
 
-: timespec>duration ( timespec -- seconds )
-    [ sec>> seconds ] [ nsec>> nanoseconds ] bi time+ ;
+: timespec>seconds ( timespec -- seconds )
+    [ sec>> ] [ nsec>> 1,000,000,000 / ] bi + ; inline
 
-: timespec>nanoseconds ( timespec -- seconds )
-    [ sec>> 1000000000 * ] [ nsec>> ] bi + ;
+: timespec>duration ( timespec -- duration )
+    timespec>seconds seconds ; inline
 
 : timespec>unix-time ( timespec -- timestamp )
-    timespec>duration since-1970 ;
+    [ unix-1970 ] dip timespec>seconds +second ; inline
 
 : get-time ( -- alien )
-    f time <time_t> localtime ;
+    f time time_t <ref> localtime ; inline
 
 : timezone-name ( -- string )
     get-time zone>> ;
@@ -30,11 +35,10 @@ M: unix gmt-offset ( -- hours minutes seconds )
     get-time gmtoff>> 3600 /mod 60 /mod ;
 
 : current-timeval ( -- timeval )
-    timeval <struct> f [ gettimeofday io-error ] 2keep drop ;
+    timeval <struct> f [ gettimeofday io-error ] 2keep drop ; inline
 
 : system-micros ( -- n )
-    current-timeval
-    [ sec>> 1,000,000 * ] [ usec>> ] bi + ;
+    current-timeval timeval>micros ;
 
 M: unix gmt
     current-timeval timeval>unix-time ;

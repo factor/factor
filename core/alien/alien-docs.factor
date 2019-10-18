@@ -41,7 +41,7 @@ HELP: alien
 HELP: dll
 { $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information." } ;
 
-HELP: dll-valid? ( dll -- ? )
+HELP: dll-valid?
 { $values { "dll" dll } { "?" "a boolean" } }
 { $description "Returns true if the library exists and is loaded." } ;
 
@@ -53,7 +53,7 @@ HELP: <bad-alien>
 { $values  { "alien" c-ptr } }
 { $description "Constructs an invalid alien pointer that has expired." } ;
 
-HELP: <displaced-alien> ( displacement c-ptr -- alien )
+HELP: <displaced-alien>
 { $values { "displacement" "an integer" } { "c-ptr" c-ptr } { "alien" "a new alien" } }
 { $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $snippet "c-ptr" } "." }
 { $notes "Passing a value of " { $link f } " for " { $snippet "c-ptr" } " creates an alien with an absolute address; this is how " { $link <alien> } " is implemented."
@@ -62,7 +62,7 @@ $nl
 
 { <alien> <displaced-alien> alien-address } related-words
 
-HELP: alien-address ( c-ptr -- addr )
+HELP: alien-address
 { $values { "c-ptr" c-ptr } { "addr" "a non-negative integer" } }
 { $description "Outputs the address of an alien." }
 { $notes "Taking the address of a " { $link byte-array } " is explicitly prohibited since byte arrays can be moved by the garbage collector between the time the address is taken, and when it is accessed. If you need to pass pointers to C functions which will persist across alien calls, you must allocate unmanaged memory instead. See " { $link "malloc" } "." } ;
@@ -250,7 +250,7 @@ $nl
 { $subsection alien-assembly } ;
 
 ARTICLE: "dll.private" "DLL handles"
-"DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging prinouts; see " { $link "syntax-aliens" } "."
+"DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging printouts; see " { $link "syntax-aliens" } "."
 $nl
 "Usually one never has to deal with DLL handles directly; the C library interface creates them as required. However if direct access to these operating system facilities is required, the following primitives can be used:"
 { $subsections
@@ -275,7 +275,7 @@ $nl
         $nl
         "If " { $snippet "image" } " is " { $snippet "NULL" } ", Factor will load an image file whose name is obtained by suffixing the executable name with " { $snippet ".image" } "."
         $nl
-        "The " { $snippet "argc" } " and " { $snippet "argv" } " parameters are interpreted just like normal command line arguments when running Factor stand-alone; see " { $link "cli" } "."
+        "The " { $snippet "argc" } " and " { $snippet "argv" } " parameters are interpreted just like normal command line arguments when running Factor stand-alone; see " { $link "command-line" } "."
         $nl
         "The " { $snippet "embedded" } " flag ensures that this function returns as soon as Factor has been initialized. Otherwise, Factor will start up normally."
     } }
@@ -297,7 +297,7 @@ $nl
     } }
 } ;
 
-ARTICLE: "embedding-restrictions" "Embedding API restrictions" 
+ARTICLE: "embedding-restrictions" "Embedding API restrictions"
 "The Factor VM is not thread safe, and does not support multiple instances. There must only be one Factor instance per process, and this instance must be consistently accessed from the same thread for its entire lifetime. Once initialized, a Factor instance cannot be destroyed other than by exiting the process." ;
 
 ARTICLE: "embedding-factor" "What embedding looks like from Factor"
@@ -307,14 +307,13 @@ $nl
 $nl
 "There is a word which can detect when Factor is embedded:"
 { $subsections embedded? }
-"No special support is provided for calling out from Factor into the owner process. The C library inteface works fine for this task - see " { $link "alien" } "." ;
+"No special support is provided for calling out from Factor into the owner process. The C library interface works fine for this task - see " { $link "alien" } "." ;
 
 ARTICLE: "embedding" "Embedding Factor into C applications"
 "The Factor " { $snippet "Makefile" } " builds the Factor VM both as an executable and a library. The library can be used by other applications. File names for the library on various operating systems:"
 { $table
     { "OS" "Library name" "Shared?" }
     { "Windows XP/Vista" { $snippet "factor.dll" } "Yes" }
-    ! { "Windows CE" { $snippet "factor-ce.dll" } "Yes" }
     { "Mac OS X" { $snippet "libfactor.dylib" } "Yes" }
     { "Other Unix" { $snippet "libfactor.a" } "No" }
 }

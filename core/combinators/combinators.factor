@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays sequences sequences.private math.private
-kernel kernel.private math assocs quotations vectors
-hashtables sorting words sets math.order make ;
+USING: accessors arrays assocs hashtables kernel kernel.private
+make math math.order math.private quotations sequences
+sequences.private sets sorting words ;
 IN: combinators
 
 ! Most of these combinators have compile-time expansions in
@@ -16,8 +16,8 @@ IN: combinators
 : execute-effect-unsafe ( word effect -- ) drop execute ;
 
 M: object throw
-    5 special-object [ die ] or
-    (( error -- * )) call-effect-unsafe ;
+    ERROR-HANDLER-QUOT special-object [ die ] or
+    ( error -- * ) call-effect-unsafe ;
 
 PRIVATE>
 
@@ -65,11 +65,14 @@ SLOT: terminated?
     [ [ 3keep ] curry ] map concat [ 3drop ] append [ ] like ;
 
 ! spread
-: spread>quot ( seq -- quot )
+: shallow-spread>quot ( seq -- quot )
     [ ] [ [ dup empty? [ [ dip ] curry ] unless ] dip append ] reduce ;
 
+: deep-spread>quot ( seq -- quot )
+    [ ] [ [ [ dip ] curry ] dip append ] reduce ;
+
 : spread ( objs... seq -- )
-    spread>quot call ;
+    deep-spread>quot call ;
 
 ! cond
 ERROR: no-cond ;
@@ -84,7 +87,7 @@ ERROR: no-cond ;
 
 : cond>quot ( assoc -- quot )
     [ dup pair? [ [ t ] swap 2array ] unless ] map
-    reverse [ no-cond ] swap alist>quot ;
+    reverse! [ no-cond ] swap alist>quot ;
 
 ! case
 ERROR: no-case object ;

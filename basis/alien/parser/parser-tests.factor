@@ -38,7 +38,7 @@ CONSTANT: eleven 11
 
 FUNCTION: void* alien-parser-function-effect-test ( int *arg1 float arg2 ) ;
 
-[ (( arg1 arg2 -- void* )) ] [
+[ ( arg1 arg2 -- void* ) ] [
     \ alien-parser-function-effect-test "declared-effect" word-prop
 ] unit-test
 
@@ -46,7 +46,7 @@ FUNCTION: void* alien-parser-function-effect-test ( int *arg1 float arg2 ) ;
 
 FUNCTION-ALIAS: (alien-parser-function-effect-test) void* alien-parser-function-effect-test ( int *arg1 float arg2 ) ;
 
-[ (( arg1 arg2 -- void* )) ] [
+[ ( arg1 arg2 -- void* ) ] [
     \ (alien-parser-function-effect-test) "declared-effect" word-prop
 ] unit-test
 
@@ -54,7 +54,7 @@ FUNCTION-ALIAS: (alien-parser-function-effect-test) void* alien-parser-function-
 
 CALLBACK: void* alien-parser-callback-effect-test ( int *arg1 float arg2 ) ;
 
-[ (( arg1 arg2 -- void* )) ] [
+[ ( arg1 arg2 -- void* ) ] [
     \ alien-parser-callback-effect-test "callback-effect" word-prop
 ] unit-test
 

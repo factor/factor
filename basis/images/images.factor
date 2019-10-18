@@ -62,7 +62,10 @@ UNION: alpha-channel BGRA RGBA ABGR ARGB LA A INTENSITY ;
 
 UNION: alpha-channel-precedes-colors ABGR ARGB XBGR XRGB ;
 
-TUPLE: image dim component-order component-type upside-down? bitmap ;
+TUPLE: image
+    dim component-order component-type
+    upside-down? premultiplied-alpha?
+    bitmap ;
 
 : <image> ( -- image ) image new ; inline
 
@@ -125,6 +128,9 @@ TUPLE: image dim component-order component-type upside-down? bitmap ;
 
 : bytes-per-pixel ( image -- n )
     [ component-order>> ] [ component-type>> ] bi (bytes-per-pixel) ;
+    
+: bytes-per-image ( image -- n )
+    [ dim>> product ] [ bytes-per-pixel ] bi * ;
 
 <PRIVATE
 

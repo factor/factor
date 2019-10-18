@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables arrays colors colors.constants fry
 kernel math math.functions math.ranges math.rectangles math.order
@@ -6,7 +6,9 @@ math.vectors namespaces opengl sequences ui.gadgets
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
 ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
 ui.gadgets.menus ui.gadgets.line-support models combinators
-combinators.short-circuit fonts locals strings sets sorting ;
+combinators.short-circuit fonts locals splitting strings sets
+sorting ;
+FROM: sequences => change-nth ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -68,10 +70,13 @@ GENERIC: cell-height ( font cell -- y )
 GENERIC: cell-padding ( cell -- y )
 GENERIC: draw-cell ( font cell -- )
 
-M: string cell-width text-width ;
-M: string cell-height text-height ceiling ;
+: single-line ( str -- str' )
+    dup [ "\r\n" member? ] any? [ string-lines " " join ] when ;
+
+M: string cell-width single-line text-width ;
+M: string cell-height single-line text-height ceiling ;
 M: string cell-padding drop 0 ;
-M: string draw-cell draw-text ;
+M: string draw-cell single-line draw-text ;
 
 CONSTANT: image-padding 2
 
@@ -319,7 +324,7 @@ PRIVATE>
 
 : row-action ( table -- )
     dup selected-row
-    [ swap [ action>> call( value -- ) ] [ dup hook>> call( table -- ) ] bi ]
+    [ swap [ dup hook>> call( table -- ) ] [ action>> call( value -- ) ] bi ]
     [ 2drop ]
     if ;
 

@@ -30,7 +30,7 @@ M: object array-base-type ;
 M: array array-base-type first ;
 
 : (field-spec-of) ( field struct -- field-spec )
-    c-type fields>> [ name>> = ] with find nip ;
+    lookup-c-type fields>> [ name>> = ] with find nip ;
 : (offsetof) ( field struct -- offset )
     [ (field-spec-of) offset>> ] [ drop 0 ] if* ;
 : (sizeof) ( field struct -- size )
@@ -62,7 +62,7 @@ M: array array-base-type first ;
 
 : make-DIOBJECTDATAFORMAT-array-quot ( struct arr -- quot )
     [ nip length ] [ make-DIOBJECTDATAFORMAT-arrays ] 2bi '[
-        _ malloc-DIOBJECTDATAFORMAT-array
+        _ DIOBJECTDATAFORMAT malloc-array
         [ _ dup byte-length memcpy ]
         [ _ [ get >>pguid drop ] 2each ]
         [ ] tri

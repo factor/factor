@@ -1,7 +1,7 @@
 USING: help.markup help.syntax math math.functions ;
 IN: math.derivatives
 
-HELP: derivative ( x function -- m )
+HELP: derivative
 { $values { "x" "a position on the function" } { "function" "a differentiable function" } { "m" number } }
 { $description
     "Approximates the slope of the tangent line by using Ridders' "

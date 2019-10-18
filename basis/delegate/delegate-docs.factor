@@ -46,7 +46,7 @@ ARTICLE: "delegate" "Delegation"
 $nl
 "A " { $emphasis "protocol" } " is a collection of related generic words. An object is said to " { $emphasis "consult" } " another object if it implements a protocol by forwarding all methods onto the other object."
 $nl
-"Using this vocabulary, protocols can be defined and consulation can be set up without any repetitive boilerplate."
+"Using this vocabulary, protocols can be defined and consultation can be set up without any repetitive boilerplate."
 $nl
 "Unlike " { $link "tuple-subclassing" } ", which expresses " { $emphasis "is-a" } " relationships by statically including the methods and slots of the superclass in all subclasses, consultation forwards generic word calls to another distinct object."
 $nl

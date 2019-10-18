@@ -11,7 +11,7 @@ SYMBOL: _
 : define-match-var ( name -- )
     create-in
     dup t "match-var" set-word-prop
-    dup [ get ] curry (( -- value )) define-declared ;
+    dup [ get ] curry ( -- value ) define-declared ;
 
 : define-match-vars ( seq -- )
     [ define-match-var ] each ;
@@ -23,7 +23,7 @@ SYNTAX: MATCH-VARS: ! vars ...
     dup word? [ "match-var" word-prop ] [ drop f ] if ;
 
 : set-match-var ( value var -- ? )
-    dup namespace key? [ get = ] [ set t ] if ;
+    building get ?at [ = ] [ ,, t ] if ;
 
 : (match) ( value1 value2 -- matched? )
     {
@@ -32,7 +32,7 @@ SYNTAX: MATCH-VARS: ! vars ...
         { [ 2dup = ] [ 2drop t ] }
         { [ 2dup [ _ eq? ] either? ] [ 2drop t ] }
         { [ 2dup [ sequence? ] both? ] [
-            2dup [ length ] bi@ =
+            2dup [ length ] same?
             [ [ (match) ] 2all? ] [ 2drop f ] if ] }
         { [ 2dup [ tuple? ] both? ]
           [ [ tuple>array ] bi@ [ (match) ] 2all? ] }
@@ -40,7 +40,7 @@ SYNTAX: MATCH-VARS: ! vars ...
     } cond ;
 
 : match ( value1 value2 -- bindings )
-    [ (match) ] H{ } make-assoc swap [ drop f ] unless ;
+    [ (match) ] H{ } make swap [ drop f ] unless ;
 
 MACRO: match-cond ( assoc -- )
     <reversed>
@@ -48,7 +48,7 @@ MACRO: match-cond ( assoc -- )
     [
         first2
         [ [ dupd match ] curry ] dip
-        [ bind ] curry rot
+        [ with-variables ] curry rot
         [ ?if ] 2curry append
     ] reduce ;
 
@@ -63,7 +63,7 @@ MACRO: match-cond ( assoc -- )
 
 : match-replace ( object pattern1 pattern2 -- result )
     [ match [ "Pattern does not match" throw ] unless* ] dip swap
-    [ replace-patterns ] bind ;
+    [ replace-patterns ] with-variables ;
 
 : ?1-tail ( seq -- tail/f )
     dup length zero? not [ rest ] [ drop f ] if ;
@@ -73,7 +73,7 @@ MACRO: match-cond ( assoc -- )
         2dup length head over match
         [ swap ?1-tail ] [ [ rest ] dip (match-first) ] ?if
     ] if ;
-    
+
 : match-first ( seq pattern-seq -- bindings )
     (match-first) drop ;
 

@@ -3,7 +3,8 @@ USING: accessors arrays classes classes.tuple combinators
 combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
 sequences slots words locals effects.parser
-locals.parser macros stack-checker.dependencies ;
+locals.parser macros stack-checker.dependencies
+classes.maybe classes.algebra ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 
@@ -18,6 +19,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 
 : unboxable-tuple-class? ( type -- ? )
     {
+        [ only-classoid? not ]
         [ all-slots empty? not ]
         [ immutable-tuple-class? ]
         [ final-class? ]
@@ -28,14 +30,14 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 : typed-stack-effect? ( effect -- ? )
     [ object = ] all? not ;
 
-: depends-on-unboxing ( class -- )
-    [ dup tuple-layout depends-on-tuple-layout ]
-    [ depends-on-final ]
+: add-depends-on-unboxing ( class -- )
+    [ dup tuple-layout add-depends-on-tuple-layout ]
+    [ add-depends-on-final ]
     bi ;
 
 : (unboxer) ( type -- quot )
     dup unboxable-tuple-class? [
-        dup depends-on-unboxing
+        dup add-depends-on-unboxing
         all-slots [
             [ name>> reader-word 1quotation ]
             [ class>> (unboxer) ] bi compose
@@ -43,7 +45,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
     ] [ drop [ ] ] if ;
 
 :: unboxer ( error-quot word types type -- quot )
-    type "coercer" word-prop [ ] or
+    type word? [ type "coercer" word-prop ] [ f ] if [ ] or
     type type word types error-quot '[ dup _ instance? [ _ _ _ @ ] unless ]
     type (unboxer)
     compose compose ;
@@ -55,7 +57,7 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 : (unboxed-types) ( type -- types )
     dup unboxable-tuple-class?
     [
-        dup depends-on-unboxing
+        dup add-depends-on-unboxing
         all-slots [ class>> (unboxed-types) ] map concat
     ]
     [ 1array ] if ;
@@ -72,9 +74,6 @@ PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 
 ! typed outputs
 
-: output-mismatch-quot ( word types -- quot )
-    [ output-mismatch-error ] 2curry ;
-
 :: typed-outputs ( quot word types -- quot' )
     [ output-mismatch-error ] word types make-unboxer
     quot prepose ;
@@ -84,7 +83,7 @@ DEFER: make-boxer
 : boxer ( type -- quot )
     dup unboxable-tuple-class?
     [
-        dup depends-on-unboxing
+        dup add-depends-on-unboxing
         [ all-slots [ class>> ] map make-boxer ]
         [ [ boa ] curry ]
         bi compose

@@ -1,16 +1,15 @@
 USING: alien.data kernel locals math math.bitwise
 windows.kernel32 sequences byte-arrays unicode.categories
-io.encodings.string io.encodings.utf16n alien.strings
-arrays literals windows.types specialized-arrays
-math.parser ;
+io.encodings.string alien.strings arrays literals
+windows.types specialized-arrays math.parser ;
 SPECIALIZED-ARRAY: TCHAR
 IN: windows.errors
 
-CONSTANT: APPLICATION_ERROR_MASK       HEX: 20000000
-CONSTANT: ERROR_SEVERITY_SUCCESS       HEX: 00000000
-CONSTANT: ERROR_SEVERITY_INFORMATIONAL HEX: 40000000
-CONSTANT: ERROR_SEVERITY_WARNING       HEX: 80000000
-CONSTANT: ERROR_SEVERITY_ERROR         HEX: C0000000
+CONSTANT: APPLICATION_ERROR_MASK       0x20000000
+CONSTANT: ERROR_SEVERITY_SUCCESS       0x00000000
+CONSTANT: ERROR_SEVERITY_INFORMATIONAL 0x40000000
+CONSTANT: ERROR_SEVERITY_WARNING       0x80000000
+CONSTANT: ERROR_SEVERITY_ERROR         0xC0000000
 
 CONSTANT: ERROR_SUCCESS                               0
 CONSTANT: ERROR_INVALID_FUNCTION                      1
@@ -693,13 +692,13 @@ CONSTANT: SUBLANG_NEUTRAL 0
 CONSTANT: LANG_NEUTRAL 0
 CONSTANT: SUBLANG_DEFAULT 1
 
-CONSTANT: FORMAT_MESSAGE_ALLOCATE_BUFFER  HEX: 00000100
-CONSTANT: FORMAT_MESSAGE_IGNORE_INSERTS   HEX: 00000200
-CONSTANT: FORMAT_MESSAGE_FROM_STRING      HEX: 00000400
-CONSTANT: FORMAT_MESSAGE_FROM_HMODULE     HEX: 00000800
-CONSTANT: FORMAT_MESSAGE_FROM_SYSTEM      HEX: 00001000
-CONSTANT: FORMAT_MESSAGE_ARGUMENT_ARRAY   HEX: 00002000
-CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   HEX: 000000FF
+CONSTANT: FORMAT_MESSAGE_ALLOCATE_BUFFER  0x00000100
+CONSTANT: FORMAT_MESSAGE_IGNORE_INSERTS   0x00000200
+CONSTANT: FORMAT_MESSAGE_FROM_STRING      0x00000400
+CONSTANT: FORMAT_MESSAGE_FROM_HMODULE     0x00000800
+CONSTANT: FORMAT_MESSAGE_FROM_SYSTEM      0x00001000
+CONSTANT: FORMAT_MESSAGE_ARGUMENT_ARRAY   0x00002000
+CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   0x000000FF
 
 : make-lang-id ( lang1 lang2 -- n )
     10 shift bitor ; inline
@@ -715,8 +714,8 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   HEX: 000000FF
     32768 [ TCHAR <c-array> ] [ ] bi
     f pick [ FormatMessage ] dip
     swap zero?
-    [ drop "Unknown error 0x" id HEX: ffff,ffff bitand >hex append ]
-    [ utf16n alien>string [ blank? ] trim ] if ;
+    [ drop "Unknown error 0x" id 0xffff,ffff bitand >hex append ]
+    [ alien>native-string [ blank? ] trim ] if ;
 
 : win32-error-string ( -- str )
     GetLastError n>win32-error-string ;
@@ -734,8 +733,18 @@ ERROR: windows-error n string ;
 : win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
 : win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
 
+: n>win32-error-check ( n -- )
+    dup ERROR_SUCCESS = [
+        drop
+    ] [
+        dup n>win32-error-string windows-error
+    ] if ;
+    
+: throw-win32-error ( -- * )
+    win32-error-string throw ;
+
 : check-invalid-handle ( handle -- handle )
-    dup INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ;
+    dup INVALID_HANDLE_VALUE = [ throw-win32-error ] when ;
 
 CONSTANT: expected-io-errors
     ${
@@ -752,7 +761,7 @@ CONSTANT: expected-io-errors
     dup expected-io-error? [
         drop
     ] [
-        win32-error-string throw
+        throw-win32-error
     ] if ;
 
 : io-error ( return-value -- )

@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: ascii assocs io.pathnames kernel namespaces
-vocabs.loader ;
+vocabs ;
 IN: audio.loader
 
 ERROR: unknown-audio-extension extension ;

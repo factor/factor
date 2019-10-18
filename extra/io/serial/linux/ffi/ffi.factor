@@ -1,0 +1,161 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.syntax assocs classes.struct
+io.serial kernel system ;
+IN: io.serial.linux.ffi
+
+CONSTANT: NCCS 32
+
+TYPEDEF: uchar cc_t
+TYPEDEF: uint speed_t
+TYPEDEF: uint tcflag_t
+
+STRUCT: termios
+    { iflag tcflag_t }
+    { oflag tcflag_t }
+    { cflag tcflag_t }
+    { lflag tcflag_t }
+    { line cc_t }
+    { cc { cc_t NCCS } }
+    { ispeed speed_t }
+    { ospeed speed_t } ;
+
+FUNCTION: speed_t cfgetispeed ( termios* t ) ;
+FUNCTION: speed_t cfgetospeed ( termios* t ) ;
+FUNCTION: int cfsetispeed ( termios* t, speed_t s ) ;
+FUNCTION: int cfsetospeed ( termios* t, speed_t s ) ;
+FUNCTION: int tcgetattr ( int i1, termios* t ) ;
+FUNCTION: int tcsetattr ( int i1, int i2, termios* t ) ;
+FUNCTION: int tcdrain ( int i1 ) ;
+FUNCTION: int tcflow ( int i1, int i2 ) ;
+FUNCTION: int tcflush ( int i1, int i2 ) ;
+FUNCTION: int tcsendbreak ( int i1, int i2 ) ;
+FUNCTION: void cfmakeraw ( termios* t ) ;
+FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
+
+CONSTANT: TCSANOW     0
+CONSTANT: TCSADRAIN   1
+CONSTANT: TCSAFLUSH   2
+
+CONSTANT: TCIFLUSH    0
+CONSTANT: TCOFLUSH    1
+CONSTANT: TCIOFLUSH   2
+
+CONSTANT: TCOOFF      0
+CONSTANT: TCOON       1
+CONSTANT: TCIOFF      2
+CONSTANT: TCION       3
+
+! iflag
+CONSTANT: IGNBRK  0o0000001
+CONSTANT: BRKINT  0o0000002
+CONSTANT: IGNPAR  0o0000004
+CONSTANT: PARMRK  0o0000010
+CONSTANT: INPCK   0o0000020
+CONSTANT: ISTRIP  0o0000040
+CONSTANT: INLCR   0o0000100
+CONSTANT: IGNCR   0o0000200
+CONSTANT: ICRNL   0o0000400
+CONSTANT: IUCLC   0o0001000
+CONSTANT: IXON    0o0002000
+CONSTANT: IXANY   0o0004000
+CONSTANT: IXOFF   0o0010000
+CONSTANT: IMAXBEL 0o0020000
+CONSTANT: IUTF8   0o0040000
+
+! oflag
+CONSTANT: OPOST   0o0000001
+CONSTANT: OLCUC   0o0000002
+CONSTANT: ONLCR   0o0000004
+CONSTANT: OCRNL   0o0000010
+CONSTANT: ONOCR   0o0000020
+CONSTANT: ONLRET  0o0000040
+CONSTANT: OFILL   0o0000100
+CONSTANT: OFDEL   0o0000200
+CONSTANT: NLDLY  0o0000400
+CONSTANT:   NL0  0o0000000
+CONSTANT:   NL1  0o0000400
+CONSTANT: CRDLY  0o0003000
+CONSTANT:   CR0  0o0000000
+CONSTANT:   CR1  0o0001000
+CONSTANT:   CR2  0o0002000
+CONSTANT:   CR3  0o0003000
+CONSTANT: TABDLY 0o0014000
+CONSTANT:   TAB0 0o0000000
+CONSTANT:   TAB1 0o0004000
+CONSTANT:   TAB2 0o0010000
+CONSTANT:   TAB3 0o0014000
+CONSTANT: BSDLY  0o0020000
+CONSTANT:   BS0  0o0000000
+CONSTANT:   BS1  0o0020000
+CONSTANT: FFDLY  0o0100000
+CONSTANT:   FF0  0o0000000
+CONSTANT:   FF1  0o0100000
+
+! cflags
+CONSTANT: CSIZE   0o0000060
+CONSTANT:   CS5   0o0000000
+CONSTANT:   CS6   0o0000020
+CONSTANT:   CS7   0o0000040
+CONSTANT:   CS8   0o0000060
+CONSTANT: CSTOPB  0o0000100
+CONSTANT: CREAD   0o0000200
+CONSTANT: PARENB  0o0000400
+CONSTANT: PARODD  0o0001000
+CONSTANT: HUPCL   0o0002000
+CONSTANT: CLOCAL  0o0004000
+CONSTANT: CIBAUD  0o002003600000
+CONSTANT: CRTSCTS 0o020000000000
+
+! lflags
+CONSTANT: ISIG    0o0000001
+CONSTANT: ICANON  0o0000002
+CONSTANT: XCASE  0o0000004
+CONSTANT: ECHO    0o0000010
+CONSTANT: ECHOE   0o0000020
+CONSTANT: ECHOK   0o0000040
+CONSTANT: ECHONL  0o0000100
+CONSTANT: NOFLSH  0o0000200
+CONSTANT: TOSTOP  0o0000400
+CONSTANT: ECHOCTL 0o0001000
+CONSTANT: ECHOPRT 0o0002000
+CONSTANT: ECHOKE  0o0004000
+CONSTANT: FLUSHO  0o0010000
+CONSTANT: PENDIN  0o0040000
+CONSTANT: IEXTEN  0o0100000
+
+M: linux lookup-baud ( n -- n )
+    H{
+        { 0       0o0000000 }
+        { 50      0o0000001 }
+        { 75      0o0000002 }
+        { 110     0o0000003 }
+        { 134     0o0000004 }
+        { 150     0o0000005 }
+        { 200     0o0000006 }
+        { 300     0o0000007 }
+        { 600     0o0000010 }
+        { 1200    0o0000011 }
+        { 1800    0o0000012 }
+        { 2400    0o0000013 }
+        { 4800    0o0000014 }
+        { 9600    0o0000015 }
+        { 19200   0o0000016 }
+        { 38400   0o0000017 }
+        { 57600   0o0010001 }
+        { 115200  0o0010002 }
+        { 230400  0o0010003 }
+        { 460800  0o0010004 }
+        { 500000  0o0010005 }
+        { 576000  0o0010006 }
+        { 921600  0o0010007 }
+        { 1000000 0o0010010 }
+        { 1152000 0o0010011 }
+        { 1500000 0o0010012 }
+        { 2000000 0o0010013 }
+        { 2500000 0o0010014 }
+        { 3000000 0o0010015 }
+        { 3500000 0o0010016 }
+        { 4000000 0o0010017 }
+    } ?at [ invalid-baud ] unless ;
+

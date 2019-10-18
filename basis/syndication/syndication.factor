@@ -28,8 +28,7 @@ TUPLE: entry title url description date ;
     [ rfc822>timestamp ] [ drop rfc3339>timestamp ] recover ;
 
 : rss1.0-entry ( tag -- entry )
-    entry new
-    swap {
+    <entry> swap {
         [ "title" tag-named children>string >>title ]
         [ "link" tag-named children>string >url >>url ]
         [ "description" tag-named children>string >>description ]
@@ -41,16 +40,14 @@ TUPLE: entry title url description date ;
     } cleave ;
 
 : rss1.0 ( xml -- feed )
-    feed new
-    swap [
+    <feed> swap [
         "channel" tag-named
         [ "title" tag-named children>string >>title ]
         [ "link" tag-named children>string >url >>url ] bi
     ] [ "item" tags-named [ rss1.0-entry ] map set-entries ] bi ;
 
 : rss2.0-entry ( tag -- entry )
-    entry new
-    swap {
+    <entry> swap {
         [ "title" tag-named children>string >>title ]
         [ { "link" "guid" } any-tag-named children>string >url >>url ]
         [ { "description" "encoded" } any-tag-named children>string >>description ]
@@ -61,24 +58,21 @@ TUPLE: entry title url description date ;
     } cleave ;
 
 : rss2.0 ( xml -- feed )
-    feed new
-    swap
-    "channel" tag-named 
+    <feed> swap
+    "channel" tag-named
     [ "title" tag-named children>string >>title ]
     [ "link" tag-named children>string >url >>url ]
     [ "item" tags-named [ rss2.0-entry ] map set-entries ]
     tri ;
 
-: atom-entry-link ( tag -- url/f )
-    "link" tags-named
-    [ "rel" attr { f "alternate" } member? ] find nip
-    dup [ "href" attr >url ] when ;
+: atom-link ( tag -- url/f )
+    "link" "alternate" "rel" tag-named-with-attr
+    [ "href" attr >url ] [ f ] if* ;
 
 : atom1.0-entry ( tag -- entry )
-    entry new
-    swap {
+    <entry> swap {
         [ "title" tag-named children>string >>title ]
-        [ atom-entry-link >>url ]
+        [ atom-link >>url ]
         [
             { "content" "summary" } any-tag-named
             dup children>> [ string? not ] any?
@@ -93,10 +87,9 @@ TUPLE: entry title url description date ;
     } cleave ;
 
 : atom1.0 ( xml -- feed )
-    feed new
-    swap
+    <feed> swap
     [ "title" tag-named children>string >>title ]
-    [ "link" tag-named "href" attr >url >>url ]
+    [ atom-link >>url ]
     [ "entry" tags-named [ atom1.0-entry ] map set-entries ]
     tri ;
 

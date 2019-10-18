@@ -17,7 +17,7 @@ IN: math.rectangles.positioning
     [ loc>> first ] 2dip swap [ first ] bi@ - min 0 max ;
 
 : preferred-y ( visible-rect -- y )
-    [ loc>> ] [ dim>> ] bi [ second ] bi@ + ;
+    rect-bounds [ second ] bi@ + ;
 
 : alternate-y ( visible-rect popup-dim -- y )
     [ loc>> ] dip [ second ] bi@ - ;

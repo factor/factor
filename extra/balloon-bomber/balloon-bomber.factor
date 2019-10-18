@@ -17,11 +17,11 @@ TUPLE: balloon-bomber < space-invaders ;
   balloon-bomber new cpu-init ;
 
 CONSTANT: rom-info {
-    { HEX: 0000 "ballbomb/tn01" }
-    { HEX: 0800 "ballbomb/tn02" }
-    { HEX: 1000 "ballbomb/tn03" }
-    { HEX: 1800 "ballbomb/tn04" }
-    { HEX: 4000 "ballbomb/tn05-1" }
+    { 0x0000 "ballbomb/tn01" }
+    { 0x0800 "ballbomb/tn02" }
+    { 0x1000 "ballbomb/tn03" }
+    { 0x1800 "ballbomb/tn04" }
+    { 0x4000 "ballbomb/tn05-1" }
   }
 
 : run-balloon ( -- )  

@@ -9,9 +9,9 @@ IN: checksums.hmac
 
 : seq-bitxor ( seq seq -- seq ) [ bitxor ] 2map ;
 
-: opad ( checksum-state -- seq ) block-size>> HEX: 5c <array> ;
+: opad ( checksum-state -- seq ) block-size>> 0x5c <array> ;
 
-: ipad ( checksum-state -- seq ) block-size>> HEX: 36 <array> ;
+: ipad ( checksum-state -- seq ) block-size>> 0x36 <array> ;
 
 :: init-key ( checksum key checksum-state -- o i )
     checksum-state block-size>> key length <

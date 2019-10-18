@@ -5,39 +5,40 @@ compiler.tree.debugger math libc destructors sequences.private
 multiline eval words vocabs namespaces assocs prettyprint
 alien.data math.vectors definitions compiler.test ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
-FROM: alien.c-types => int float bool char float ulonglong ushort uint
-heap-size little-endian? ;
+FROM: alien.c-types => int float bool uchar char float ulonglong ushort uint
+heap-size ;
+FROM: alien.data => little-endian? ;
 IN: specialized-arrays.tests
 
 SPECIALIZED-ARRAY: int
-SPECIALIZED-ARRAYS: bool ushort char uint float ulonglong ;
+SPECIALIZED-ARRAYS: bool uchar ushort char uint float ulonglong ;
 
-[ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
+[ t ] [ { 1 2 3 } int >c-array int-array? ] unit-test
 
 [ t ] [ int-array{ 1 2 3 } int-array? ] unit-test
 
 [ 2 ] [ int-array{ 1 2 3 } second ] unit-test
 
 [ t ] [
-    { t f t } >bool-array underlying>>
+    { t f t } bool >c-array underlying>>
     { 1 0 1 } bool heap-size {
-        { 1 [ >char-array ] }
-        { 4 [ >uint-array ] }
+        { 1 [ char >c-array ] }
+        { 4 [ uint >c-array ] }
     } case underlying>> =
 ] unit-test
 
 [ ushort-array{ 1234 } ] [
-    little-endian? B{ 210 4 } B{ 4 210 } ? ushort-array-cast
+    little-endian? B{ 210 4 } B{ 4 210 } ? ushort cast-array
 ] unit-test
 
-[ B{ 210 4 1 } ushort-array-cast ] must-fail
+[ B{ 210 4 1 } ushort cast-array ] must-fail
 
 [ { 3 1 3 3 7 } ] [
-    int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array
+    int-array{ 3 1 3 3 7 } malloc-byte-array 5 int <c-direct-array> >array
 ] unit-test
 
-[ float-array{ HEX: 1.222,222   HEX: 1.111,112   } ]
-[ float-array{ HEX: 1.222,222,2 HEX: 1.111,111,1 } ] unit-test
+[ float-array{ 0x1.222,222p0   0x1.111,112p0   } ]
+[ float-array{ 0x1.222,222,2p0 0x1.111,111,1p0 } ] unit-test
 
 [ f ] [ float-array{ 4 3 2 1 } dup clone [ underlying>> ] bi@ eq? ] unit-test
 
@@ -74,7 +75,7 @@ SPECIALIZED-ARRAY: test-struct
 
 [ 5/4 ] [
     [
-        2 malloc-test-struct-array
+        2 \ test-struct malloc-array
         dup &free drop
         1 2 make-point over set-first
         3 4 make-point over set-second
@@ -86,7 +87,7 @@ SPECIALIZED-ARRAY: test-struct
 
 [ ] [
     [
-        10 malloc-test-struct-array
+        10 \ test-struct malloc-array
         &free drop
     ] with-destructors
 ] unit-test
@@ -129,7 +130,7 @@ SPECIALIZED-ARRAY: fixed-string
 
 ! Test prettyprinting
 [ "int-array{ 1 2 3 }" ] [ int-array{ 1 2 3 } unparse ] unit-test
-[ "int-array@ f 100" ] [ f 100 <direct-int-array> unparse ] unit-test
+[ "c-array@ int f 100" ] [ f 100 <direct-int-array> unparse ] unit-test
 
 ! If the C type doesn't exist, don't generate a vocab
 SYMBOL: __does_not_exist__
@@ -155,7 +156,7 @@ SPECIALIZED-ARRAY: __does_not_exist__
 
 [ f ] [
     "__does_not_exist__-array{"
-    __does_not_exist__ specialized-array-vocab lookup
+    __does_not_exist__ specialized-array-vocab lookup-word
     deferred?
 ] unit-test
 
@@ -174,7 +175,7 @@ SPECIALIZED-ARRAY: struct-resize-test
 
 : struct-resize-test-usage ( seq -- seq )
     [ struct-resize-test <struct> swap >>x ] map
-    >struct-resize-test-array
+    \ struct-resize-test >c-array
     [ x>> ] { } map-as ;
     
 [ { 10 20 30 } ] [ { 10 20 30 } struct-resize-test-usage ] unit-test
@@ -198,6 +199,7 @@ SPECIALIZED-ARRAY: struct-resize-test
 [ int-array{ 4 5 6 7 8 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-tail ] unit-test
 [ int-array{ 6 7 8 } ] [ int-array{ 1 2 3 4 5 6 7 8 } 3 direct-tail* ] unit-test
 
+[ uchar-array{ 0 1 255 } ] [ 3 6 B{ 1 1 1 0 1 255 2 2 2 } direct-slice ] unit-test
 
 [ int-array{ 1 2 3 4 55555 6 7 8 } ] [
     int-array{ 1 2 3 4 5 6 7 8 }

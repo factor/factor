@@ -4,7 +4,7 @@ USING: compiler.units continuations fry kernel vocabs vocabs.parser ;
 IN: vocabs.generated
 
 : generate-vocab ( vocab-name quot -- vocab )
-    [ dup vocab [ ] ] dip '[
+    [ dup lookup-vocab [ ] ] dip '[
         [
             [
                 [ _ with-current-vocab ] [ ] [ forget-vocab ] cleanup

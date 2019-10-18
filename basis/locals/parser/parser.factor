@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators effects.parser
+USING: accessors arrays assocs combinators effects.parser
 generic.parser kernel lexer locals.errors fry
 locals.rewrite.closures locals.types make namespaces parser
 quotations sequences splitting words vocabs.parser ;
@@ -14,15 +14,15 @@ SYMBOL: in-lambda?
 : make-local ( name -- word )
     "!" ?tail [
         <local-reader>
-        dup <local-writer> dup name>> set
+        dup <local-writer> dup name>> ,,
     ] [ <local> ] if
-    dup dup name>> set ;
+    dup dup name>> ,, ;
 
 : make-locals ( seq -- words assoc )
-    [ [ make-local ] map ] H{ } make-assoc ;
+    [ [ make-local ] map ] H{ } make ;
 
 : parse-local-defs ( -- words assoc )
-    [ "|" [ make-local ] map-tokens ] H{ } make-assoc ;
+    [ "|" [ make-local ] map-tokens ] H{ } make ;
 
 SINGLETON: lambda-parser
 
@@ -36,7 +36,7 @@ SYMBOL: locals
         [ use-words @ ]
         [ unuse-words ] tri
     ] with-scope ; inline
-    
+
 : (parse-lambda) ( assoc -- quot )
     [ \ ] parse-until >quotation ] ((parse-lambda)) ;
 
@@ -46,10 +46,14 @@ SYMBOL: locals
     ?rewrite-closures ;
 
 : parse-multi-def ( locals -- multi-def )
-    [ ")" [ make-local ] map-tokens ] bind <multi-def> ;
+    [ [ ")" [ make-local ] map-tokens ] H{ } make ] dip
+    swap assoc-union! drop <multi-def> ;
 
 : parse-def ( name/paren locals -- def )
-    over "(" = [ nip parse-multi-def ] [ [ make-local ] bind <def> ] if ;
+    over "(" =
+    [ nip parse-multi-def ]
+    [ [ [ make-local ] H{ } make ] dip swap assoc-union! drop <def> ]
+    if ;
 
 M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) ;
@@ -64,25 +68,31 @@ M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) <let> ?rewrite-closures ;
 
 : parse-locals ( -- effect vars assoc )
-    complete-effect
+    scan-effect
     dup
     in>> [ dup pair? [ first ] when ] map make-locals ;
 
-: parse-locals-definition ( word reader -- word quot effect )
-    [ parse-locals ] dip
+: (parse-locals-definition) ( effect vars assoc reader -- word quot effect )
     ((parse-lambda)) <lambda>
     [ nip "lambda" set-word-prop ]
     [ nip rewrite-closures dup length 1 = [ first ] [ bad-rewrite ] if ]
     [ drop nip ] 3tri ; inline
 
+: parse-locals-definition ( word reader -- word quot effect )
+    [ parse-locals ] dip (parse-locals-definition) ; inline
+
+: parse-locals-method-definition ( word reader -- word quot effect )
+    [ parse-locals pick check-method-effect ] dip
+    (parse-locals-definition) ; inline
+
 : (::) ( -- word def effect )
-    CREATE-WORD
+    scan-new-word
     [ parse-definition ]
     parse-locals-definition ;
 
 : (M::) ( -- word def )
-    CREATE-METHOD
+    scan-new-method
     [
-        [ parse-definition ] 
-        parse-locals-definition drop
+        [ parse-definition ]
+        parse-locals-method-definition drop
     ] with-method-definition ;

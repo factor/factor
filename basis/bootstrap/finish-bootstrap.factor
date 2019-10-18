@@ -1,22 +1,12 @@
-USING: init command-line debugger system continuations
-namespaces eval kernel vocabs.loader io ;
+USING: init io command-line.startup debugger system
+continuations parser.notes namespaces ;
 
 [
+    ! Set parser-quiet? to match parser.notes top-level form
+    t parser-quiet? set-global
+    
     boot
-    do-startup-hooks
-    [
-        (command-line) parse-command-line
-        load-vocab-roots
-        run-user-init
-
-        "e" get script get or [
-            "e" get [ eval( -- ) ] when*
-            script get [ run-script ] when*
-        ] [
-            "run" get run
-        ] if
-
-        output-stream get [ stream-flush ] when*
-        0 exit
-    ] [ print-error 1 exit ] recover
+    [ do-startup-hooks command-line-startup ]
+    [ print-error :c flush 1 exit ]
+    recover
 ] set-startup-quot

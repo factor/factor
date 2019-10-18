@@ -139,7 +139,7 @@ HELP: closer
 { $class-description "Describes a closing tag, like " { $snippet "</a>" } ". Contains one slot, " { $snippet "name" } ", containing the closer's name." } ;
 
 HELP: contained
-{ $class-description "Represents a self-closing tag, like " { $snippet "<a/>" } ". Contains two slots," { $snippet "name" } " and " { $snippet "attrs" } " containing, respectively, the name of the tag and its attributes." } ;
+{ $class-description "Represents a self-closing tag, like " { $snippet "<a/>" } ". Contains two slots, " { $snippet "name" } " and " { $snippet "attrs" } " containing, respectively, the name of the tag and its attributes." } ;
 
 { opener closer contained } related-words
 
@@ -201,7 +201,7 @@ HELP: notation-decl
 { $class-description "Describes the class of element declarations, like " { $snippet "<!NOTATION jpg SYSTEM './jpgviewer'>" } "." } ;
 
 HELP: <notation-decl>
-{ $values { "name" string } { "id" id } { "notation-decl" notation-decl } }
+{ $values { "name" string } { "id" string } { "notation-decl" notation-decl } }
 { $description "Creates an notation declaration object, of the class " { $link notation-decl } "." } ;
 
 HELP: doctype-decl

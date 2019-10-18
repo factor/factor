@@ -10,6 +10,16 @@ IN: compiler.cfg.ssa.construction.tests
     0 vreg-counter set-global
     0 basic-block set-global ;
 
+: test-ssa ( -- )
+    cfg new 0 get >>entry
+    dup cfg set
+    construct-ssa
+    drop ;
+
+: clean-up-phis ( insns -- insns' )
+    [ dup ##phi? [ [ [ [ number>> ] dip ] assoc-map ] change-inputs ] when ] map ;
+
+! Test 1
 reset-counters
 
 V{
@@ -38,12 +48,6 @@ V{
 1 3 edge
 2 3 edge
 
-: test-ssa ( -- )
-    cfg new 0 get >>entry
-    dup cfg set
-    construct-ssa
-    drop ;
-
 [ ] [ test-ssa ] unit-test
 
 [
@@ -69,9 +73,6 @@ V{
     }
 ] [ 2 get instructions>> ] unit-test
 
-: clean-up-phis ( insns -- insns' )
-    [ dup ##phi? [ [ [ [ number>> ] dip ] assoc-map ] change-inputs ] when ] map ;
-
 [
     V{
         T{ ##phi f 6 H{ { 1 4 } { 2 5 } } }
@@ -83,6 +84,7 @@ V{
     clean-up-phis
 ] unit-test
 
+! Test 2
 reset-counters
 
 V{ } 0 test-bb
@@ -111,3 +113,88 @@ V{ } 6 test-bb
     4 get instructions>>
     clean-up-phis
 ] unit-test
+
+! Test 3
+reset-counters
+
+V{
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##load-integer f 3 3 }
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##load-integer f 3 4 }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##return }
+} 4 test-bb
+
+0 { 1 2 3 } edges
+1 4 edge
+2 4 edge
+3 4 edge
+
+[ ] [ test-ssa ] unit-test
+
+[ V{ } ] [ 4 get instructions>> [ ##phi? ] filter ] unit-test
+
+! Test 4
+reset-counters
+
+V{
+    T{ ##branch }
+} 0 test-bb
+
+V{
+    T{ ##branch }
+} 1 test-bb
+
+V{
+    T{ ##load-integer f 0 4 }
+    T{ ##branch }
+} 2 test-bb
+
+V{
+    T{ ##load-integer f 0 4 }
+    T{ ##branch }
+} 3 test-bb
+
+V{
+    T{ ##branch }
+} 4 test-bb
+
+V{
+    T{ ##branch }
+} 5 test-bb
+
+V{
+    T{ ##branch }
+} 6 test-bb
+
+V{
+    T{ ##return }
+} 7 test-bb
+
+0 { 1 6 } edges
+1 { 2 3 4 } edges
+2 5 edge
+3 5 edge
+4 5 edge
+5 7 edge
+6 7 edge
+
+[ ] [ test-ssa ] unit-test
+
+[ V{ } ] [ 5 get instructions>> [ ##phi? ] filter ] unit-test
+
+[ V{ } ] [ 7 get instructions>> [ ##phi? ] filter ] unit-test

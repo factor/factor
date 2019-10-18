@@ -9,14 +9,14 @@ IN: cuda.contexts
 
 : create-context ( device flags -- context )
     swap
-    [ CUcontext <c-object> ] 2dip
-    [ cuCtxCreate cuda-error ] 3keep 2drop *void* ; inline
+    [ { CUcontext } ] 2dip
+    '[ _ _ cuCtxCreate cuda-error ] with-out-parameters ; inline
 
 : sync-context ( -- )
     cuCtxSynchronize cuda-error ; inline
 
 : context-device ( -- n )
-    CUdevice <c-object> [ cuCtxGetDevice cuda-error ] keep *int ; inline
+    { CUdevice } [ cuCtxGetDevice cuda-error ] with-out-parameters ; inline
 
 : destroy-context ( context -- ) cuCtxDestroy cuda-error ; inline
 

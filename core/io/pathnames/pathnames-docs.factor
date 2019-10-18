@@ -51,7 +51,7 @@ HELP: append-path
 { $examples
     { $unchecked-example """USING: io.pathnames prettyprint ;
 "first" "second.txt" append-path ."""
-"first/second.txt"
+"\"first/second.txt\""
     }
 } ;
 
@@ -61,7 +61,7 @@ HELP: prepend-path
 { $examples
     { $unchecked-example """USING: io.pathnames prettyprint ;
 "second.txt" "first" prepend-path ."""
-"first/second.txt"
+"\"first/second.txt\""
     }
 } ;
 
@@ -106,8 +106,8 @@ HELP: absolute-path
     { "path" "a pathname string" }
     { "path'" "a pathname string" }
 }
-{ $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } " or " { $snippet "voacb:" } " prefix, if present (see " { $link "io.pathnames.special" } ")." }
-{ $notes "This word is exaclty the same as " { $link normalize-path } ", except on Windows NT platforms, where it does not prepend the Unicode path prefix. Most code should call " { $link normalize-path } " instead." } ;
+{ $description "Prepends the " { $link current-directory } " to the pathname and resolves a " { $snippet "resource:" } ", " { $snippet "~" } " or " { $snippet "vocab:" } " prefix, if present (see " { $link "io.pathnames.special" } ")." }
+{ $notes "This word is exactly the same as " { $link normalize-path } ", except on Windows NT platforms, where it does not prepend the Unicode path prefix. Most code should call " { $link normalize-path } " instead." } ;
 
 HELP: resolve-symlinks
 { $values { "path" "a pathname string" } { "path'" "a new pathname string" } }
@@ -124,14 +124,16 @@ HELP: home
 { $examples
     { $unchecked-example "USING: io.pathnames prettyprint ;"
                 "home ."
-                "/home/factor-user"
+                "\"/home/factor-user\""
     }
 } ;
 
 ARTICLE: "io.pathnames.special" "Special pathnames"
 "If a pathname begins with " { $snippet "resource:" } ", it is resolved relative to the directory containing the current image (see " { $link image } ")."
 $nl
-"If a pathname begins with " { $snippet "vocab:" } ", then it will be searched for in all current vocabulary roots (see " { $link "add-vocab-roots" } ")." ;
+"If a pathname begins with " { $snippet "vocab:" } ", then it will be searched for in all current vocabulary roots (see " { $link "add-vocab-roots" } ")."
+$nl
+"If a pathname begins with " { $snippet "~" } ", it will be searched for in the home directory. Subsequent tildes in the pathname will be construed as literal tilde path or filenames and will not be treated specially. To access a filename named " { $snippet "~" } ", you must construct a path to reference the filename, even if it's within the current directory such as " { $snippet "./~" } "." ;
 
 ARTICLE: "io.pathnames.presentations" "Pathname presentations"
 "Pathname presentations are objects that wrap a pathname string. Clicking a pathname presentation in the UI brings up the file in one of the supported editors. See " { $link "editor" } " for more details."
@@ -142,7 +144,7 @@ ARTICLE: "io.pathnames.presentations" "Pathname presentations"
 "Literal pathname presentations:"
 { $subsections POSTPONE: P" }
 "Many words that accept pathname strings can also work on pathname presentations." ;
-    
+
 ARTICLE: "io.pathnames" "Pathnames"
 "Pathnames are strings that refer to a file on disk. Pathname semantics are platform-specific, and Factor makes no attempt to abstract away the differences. Note that on Windows, both forward and backward slashes are accepted as directory separators."
 $nl

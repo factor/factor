@@ -54,8 +54,8 @@ M: model -> dup , ;
 : <book*> ( quot -- book ) f make-layout f make-book ; inline
 
 ERROR: not-in-template word ;
-SYNTAX: $ CREATE-WORD dup
-    [ [ dup templates get at [ nip , ] [ not-in-template ] if* ] curry (( -- )) define-declared "$" expect ]
+SYNTAX: $ scan-new-word dup
+    [ [ dup templates get at [ nip , ] [ not-in-template ] if* ] curry ( -- ) define-declared "$" expect ]
     [ [ <placeholder> [ swap templates get set-at ] keep , ] curry ] bi append! ;
 
 : insert-gadget ( number parent gadget -- ) -rot [ but-last insert-nth ] change-children drop ;

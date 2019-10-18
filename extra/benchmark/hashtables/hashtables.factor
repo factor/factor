@@ -3,6 +3,7 @@
 USING: accessors assocs combinators kernel locals math
 math.ranges memoize sequences strings hashtables
 math.parser grouping ;
+FROM: assocs => change-at ;
 IN: benchmark.hashtables
 
 MEMO: strings ( -- str )
@@ -58,7 +59,7 @@ M: collision hashcode* value>> hashcode* 15 bitand ;
         2bi
     ] with each ;
 
-: hashtable-benchmark ( -- )
+: hashtables-benchmark ( -- )
     H{ } clone
     10000 [
         dup {
@@ -72,4 +73,4 @@ M: collision hashcode* value>> hashcode* 15 bitand ;
     ] times
     drop ;
 
-MAIN: hashtable-benchmark
+MAIN: hashtables-benchmark

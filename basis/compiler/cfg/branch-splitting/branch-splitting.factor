@@ -1,19 +1,20 @@
-! Copyright (C) 2009, 2010 Doug Coleman, Slava Pestov.
+! Copyright (C) 2009, 2011 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit kernel
-locals math math.order sequences assocs namespaces vectors fry
-arrays splitting compiler.cfg.def-use compiler.cfg
+USING: arrays accessors assocs combinators combinators.short-circuit
+dlists deques kernel locals math math.order sequences
+sets vectors fry splitting compiler.cfg.def-use compiler.cfg
 compiler.cfg.rpo compiler.cfg.predecessors compiler.cfg.renaming
 compiler.cfg.instructions compiler.cfg.utilities ;
+FROM: namespaces => get set ;
 IN: compiler.cfg.branch-splitting
 
 : clone-instructions ( insns -- insns' )
     [ clone dup rename-insn-temps ] map ;
 
 : clone-basic-block ( bb -- bb' )
-    ! The new block temporarily gets the same RPO number as the old one,
-    ! until the next time RPO is computed. This is just to make
-    ! 'back-edge?' work.
+    ! The new block temporarily gets the same RPO number as the
+    ! old one, until the next time RPO is computed. This is just
+    ! to make 'back-edge?' work.
     <basic-block>
         swap
         {
@@ -25,18 +26,21 @@ IN: compiler.cfg.branch-splitting
 
 : new-blocks ( bb -- copies )
     dup predecessors>> [
-        [ clone-basic-block ] dip
-        1vector >>predecessors
+        [ clone-basic-block ] [ 1vector ] bi*
+        >>predecessors
     ] with map ;
 
 : update-predecessor-successors ( copies old-bb -- )
     [ predecessors>> swap ] keep
-    '[ [ _ ] 2dip update-predecessors ] 2each ;
+    '[ [ _ ] dip update-successors ] 2each ;
 
 :: update-successor-predecessor ( copies old-bb succ -- )
-    succ
-    [ { old-bb } split copies join V{ } like ] change-predecessors
-    drop ;
+    succ predecessors>> dup >array :> ( preds preds' )
+    preds delete-all
+    preds' [
+        dup old-bb eq?
+        [ drop copies preds push-all ] [ preds push ] if
+    ] each ;
 
 : update-successor-predecessors ( copies old-bb -- )
     dup successors>>
@@ -77,11 +81,29 @@ UNION: irrelevant ##peek ##replace ##inc-d ##inc-r ;
         ] if
     ] if ;
 
+SYMBOL: worklist
+SYMBOL: visited
+
+: add-to-worklist ( bb -- )
+    dup visited get in? [ drop ] [
+        [ visited get adjoin ]
+        [ worklist get push-front ] bi
+    ] if ;
+
+: init-worklist ( cfg -- )
+    <dlist> worklist set
+    HS{ } clone visited set
+    entry>> add-to-worklist ;
+
 : split-branches ( cfg -- cfg' )
     needs-predecessors
-    
-    dup [
-        dup split-branch? [ split-branch ] [ drop ] if
-    ] each-basic-block
+    dup init-worklist
+    ! For back-edge?
+    dup post-order drop
+
+    worklist get [
+        dup split-branch? [ dup split-branch ] when
+        successors>> [ add-to-worklist ] each
+    ] slurp-deque
 
     cfg-changed ;

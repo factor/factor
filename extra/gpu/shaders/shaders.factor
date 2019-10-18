@@ -28,20 +28,17 @@ VARIANT: geometry-shader-output
     line-strips-output
     triangle-strips-output ;
 
-UNION: ?string string POSTPONE: f ;
-
 ERROR: too-many-feedback-formats-error formats ;
 ERROR: invalid-link-feedback-format-error format ;
 ERROR: inaccurate-feedback-attribute-error attribute ;
 
 TUPLE: vertex-attribute
-    { name            ?string        read-only initial: f }
-    { component-type  component-type read-only initial: float-components }
-    { dim             integer        read-only initial: 4 }
-    { normalize?      boolean        read-only initial: f } ;
+    { name            maybe{ string } read-only initial: f }
+    { component-type  component-type  read-only initial: float-components }
+    { dim             integer         read-only initial: 4 }
+    { normalize?      boolean         read-only initial: f } ;
 
 MIXIN: vertex-format
-UNION: ?vertex-format vertex-format POSTPONE: f ;
 
 TUPLE: shader
     { name word read-only initial: t }
@@ -57,7 +54,7 @@ TUPLE: program
     { line integer read-only }
     { shaders array read-only }
     { vertex-formats array read-only }
-    { feedback-format ?vertex-format read-only }
+    { feedback-format maybe{ vertex-format } read-only }
     { geometry-shader-parameters array read-only }
     { instances hashtable read-only } ;
 
@@ -199,7 +196,7 @@ TR: hyphens>underscores "-" "_" ;
     name length 1 + :> name-buffer-length
     {
         index name-buffer-length dup
-        [ f 0 <int> 0 <int> ] dip <byte-array>
+        [ f 0 int <ref> 0 int <ref> ] dip <byte-array>
         [ glGetTransformFeedbackVarying ] 3keep
         ascii alien>string
         vertex-attribute assert-feedback-attribute    
@@ -356,7 +353,7 @@ PRIVATE>
     [ "vertex-format-attributes" set-word-prop ] 2bi ;
 
 SYNTAX: VERTEX-FORMAT:
-    CREATE-CLASS parse-definition
+    scan-new-class parse-definition
     [ first4 vertex-attribute boa ] map
     define-vertex-format ;
 
@@ -365,7 +362,7 @@ SYNTAX: VERTEX-FORMAT:
     define-struct-class ;
 
 SYNTAX: VERTEX-STRUCT:
-    CREATE-CLASS scan-word define-vertex-struct ;
+    scan-new-class scan-word define-vertex-struct ;
 
 TUPLE: vertex-array-object < gpu-object
     { program-instance program-instance read-only }
@@ -527,7 +524,7 @@ DEFER: <shader-instance>
     [ nip ] [ drop link-program ] if ;
 
 TUPLE: feedback-format
-    { vertex-format ?vertex-format read-only } ;
+    { vertex-format maybe{ vertex-format } read-only } ;
 
 : validate-feedback-format ( sequence -- vertex-format/f )
     dup length 1 <=
@@ -589,7 +586,7 @@ TYPED: <program-instance> ( program: program -- instance: program-instance )
 PRIVATE>
 
 SYNTAX: GLSL-SHADER:
-    CREATE dup
+    scan-new dup
     dup old-instances [
         scan-word
         f
@@ -601,7 +598,7 @@ SYNTAX: GLSL-SHADER:
     define-constant ;
 
 SYNTAX: GLSL-SHADER-FILE:
-    CREATE dup
+    scan-new dup
     dup old-instances [
         scan-word execute( -- kind )
         scan-object in-word's-path
@@ -613,7 +610,7 @@ SYNTAX: GLSL-SHADER-FILE:
     define-constant ;
 
 SYNTAX: GLSL-PROGRAM:
-    CREATE dup
+    scan-new dup
     dup old-instances [
         f
         lexer get line>>

@@ -41,10 +41,7 @@ ARTICLE: "specialized-array-words" "Specialized array words"
     { { $snippet "T-array" } { "The class of arrays with elements of type " { $snippet "T" } } }
     { { $snippet "<T-array>" } { "Constructor for arrays with elements of type " { $snippet "T" } "; stack effect " { $snippet "( len -- array )" } } }
     { { $snippet "(T-array)" } { "Constructor for arrays with elements of type " { $snippet "T" } ", where the initial contents are uninitialized; stack effect " { $snippet "( len -- array )" } } }
-    { { $snippet "malloc-T-array" } { "Constructor for arrays with elements of type " { $snippet "T" } " backed by newly-allocated unmanaged memory; stack effect " { $snippet "( alien len -- array )" } } }
     { { $snippet "<direct-T-array>" } { "Constructor for arrays with elements of type " { $snippet "T" } " backed by raw memory; stack effect " { $snippet "( alien len -- array )" } } }
-    { { $snippet "T-array-cast" } { "Converts a byte array into a specialized array by interpreting the bytes in as machine-specific values. Code which uses this word is unportable" } }
-    { { $snippet ">T-array" } { "Converts a sequence into a specialized array of type " { $snippet "T" } "; stack effect " { $snippet "( seq -- array )" } } }
     { { $snippet "T-array{" } { "Literal syntax, consists of a series of values terminated by " { $snippet "}" } } }
 }
 "Behind the scenes, these words are placed in a vocabulary named " { $snippet "specialized-arrays.instances.T" } ", however this vocabulary should not be placed in a " { $link POSTPONE: USING: } " form directly. Instead, always use " { $link POSTPONE: SPECIALIZED-ARRAY: } " or " { $link POSTPONE: SPECIALIZED-ARRAYS: } ". This ensures that the vocabulary can get generated the first time it is needed."
@@ -70,7 +67,7 @@ $nl
     "FUNCTION: void process_data ( int* data, int len ) ;"
     "int-array{ 10 20 30 } dup length process_data"
 }
-"Literal specialized arrays, as well as specialized arrays created with " { $snippet "<T-array>" } " and " { $snippet ">T-array" } " are backed by a " { $link byte-array } " in the Factor heap, and can move as a result of garbage collection. If this is unsuitable, the array can be allocated in unmanaged memory instead."
+"Literal specialized arrays, as well as specialized arrays created with " { $snippet "<T-array>" } " and " { $snippet "T >c-array" } " are backed by a " { $link byte-array } " in the Factor heap, and can move as a result of garbage collection. If this is unsuitable, the array can be allocated in unmanaged memory instead."
 $nl
 "In the following example, it is presumed that the C library holds on to a pointer to the array's data after the " { $snippet "init_with_data()" } " call returns; this is one situation where unmanaged memory has to be used instead. Note the use of destructors to ensure the memory is deallocated after the block ends:"
 { $code
@@ -86,7 +83,7 @@ $nl
 }
 "Finally, sometimes a C library returns a pointer to an array in unmanaged memory, together with a length. In this case, a specialized array can be constructed to view this memory using " { $snippet "<direct-T-array>" } ":"
 { $code
-    "USING: alien.c-types classes.struct ;"
+    "USING: alien.c-types alien.data classes.struct ;"
     ""
     "STRUCT: device_info"
     "    { id int }"
@@ -94,7 +91,7 @@ $nl
     ""
     "FUNCTION: void get_device_info ( int* length ) ;"
     ""
-    "0 <int> [ get_device_info ] keep <direct-int-array> ."
+    "0 int <ref> [ get_device_info ] keep <direct-int-array> ."
 }
 "For a full discussion of Factor heap allocation versus unmanaged memory allocation, see " { $link "byte-arrays-gc" } "."
 $nl

@@ -27,7 +27,7 @@ SYMBOL: render-output
     [ 10 /i ] map ;
 
 : bitmap= ( bitmap1 bitmap2 -- ? )
-    [ bitmap>> twiddle ] bi@ = ;
+    [ bitmap>> twiddle ] same? ;
 
 : check-rendering ( gadget -- )
     screenshot

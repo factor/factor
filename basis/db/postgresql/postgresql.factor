@@ -4,9 +4,9 @@ USING: arrays assocs alien alien.syntax continuations io
 kernel math math.parser namespaces make prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
-combinators classes locals words tools.walker db.private
-nmake accessors random db.queries destructors db.tuples.private
-db.postgresql db.errors.postgresql splitting ;
+combinators classes classes.tuple locals words tools.walker
+db.private nmake accessors random db.queries destructors
+db.tuples.private db.postgresql db.errors.postgresql splitting ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty database username password ;

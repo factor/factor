@@ -21,15 +21,15 @@ STRUCT: objc-super
     { receiver id }
     { class Class } ;
 
-CONSTANT: CLS_CLASS        HEX: 1
-CONSTANT: CLS_META         HEX: 2
-CONSTANT: CLS_INITIALIZED  HEX: 4
-CONSTANT: CLS_POSING       HEX: 8
-CONSTANT: CLS_MAPPED       HEX: 10
-CONSTANT: CLS_FLUSH_CACHE  HEX: 20
-CONSTANT: CLS_GROW_CACHE   HEX: 40
-CONSTANT: CLS_NEED_BIND    HEX: 80
-CONSTANT: CLS_METHOD_ARRAY HEX: 100
+CONSTANT: CLS_CLASS        0x1
+CONSTANT: CLS_META         0x2
+CONSTANT: CLS_INITIALIZED  0x4
+CONSTANT: CLS_POSING       0x8
+CONSTANT: CLS_MAPPED       0x10
+CONSTANT: CLS_FLUSH_CACHE  0x20
+CONSTANT: CLS_GROW_CACHE   0x40
+CONSTANT: CLS_NEED_BIND    0x80
+CONSTANT: CLS_METHOD_ARRAY 0x100
 
 FUNCTION: int objc_getClassList ( void* buffer, int bufferLen ) ;
 
@@ -61,10 +61,6 @@ FUNCTION: char class_addMethod ( Class class, SEL name, void* imp, void* types )
 FUNCTION: char class_addProtocol ( Class class, Protocol protocol ) ;
 
 FUNCTION: uint method_getNumberOfArguments ( Method method ) ;
-
-FUNCTION: uint method_getSizeOfArguments ( Method method ) ;
-
-FUNCTION: uint method_getArgumentInfo ( Method method, int argIndex, c-string* type, int* offset ) ;
 
 FUNCTION: void* method_copyReturnType ( Method method ) ;
 

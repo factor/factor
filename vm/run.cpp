@@ -8,6 +8,12 @@ void factor_vm::primitive_exit()
 	exit((int)to_fixnum(ctx->pop()));
 }
 
+void exit(int status)
+{
+	factor_vm::close_console();
+	::exit(status);
+}
+
 void factor_vm::primitive_nano_count()
 {
 	u64 nanos = nano_count();

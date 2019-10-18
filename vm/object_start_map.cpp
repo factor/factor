@@ -33,7 +33,7 @@ cell object_start_map::find_object_containing_card(cell card_index)
 		{
 #ifdef FACTOR_DEBUG
 			/* First card should start with an object */
-			assert(card_index > 0);
+			FACTOR_ASSERT(card_index > 0);
 #endif
 			card_index--;
 		}

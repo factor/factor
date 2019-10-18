@@ -4,7 +4,7 @@ USING: help.markup help.syntax ;
 IN: io.encodings.shift-jis
 
 ARTICLE: "io.encodings.shift-jis" "Shift JIS"
-"Shift JIS is a text encoding for Japanese. There are multiple versions, depending on whether the offical standard or the modified Microsoft version is required."
+"Shift JIS is a text encoding for Japanese. There are multiple versions, depending on whether the official standard or the modified Microsoft version is required."
 { $subsections
     shift-jis
     windows-31j

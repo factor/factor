@@ -23,7 +23,7 @@ M: epoll-mx dispose* fd>> close-file ;
 : make-event ( fd events -- event )
     epoll-event <struct>
         swap >>events
-        swap >>fd ;
+        swap over data>> fd<< ;
 
 :: do-epoll-ctl ( fd mx what events -- )
     mx fd>> what fd fd events make-event epoll_ctl io-error ;
@@ -55,7 +55,7 @@ M: epoll-mx remove-output-callbacks ( fd mx -- seq )
     epoll_wait multiplexer-error ;
 
 : handle-event ( event mx -- )
-    [ fd>> ] dip
+    [ data>> fd>> ] dip
     [ EPOLLIN EPOLLOUT bitor do-epoll-del ]
     [ input-available ] [ output-available ] 2tri ;
 

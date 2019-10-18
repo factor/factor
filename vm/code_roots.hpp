@@ -20,7 +20,7 @@ struct code_root {
 	~code_root()
 	{
 #ifdef FACTOR_DEBUG
-		assert(parent->code_roots.back() == this);
+		FACTOR_ASSERT(parent->code_roots.back() == this);
 #endif
 		parent->code_roots.pop_back();
 	}

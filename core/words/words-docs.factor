@@ -12,7 +12,7 @@ $nl
 { $subsections
     create
     create-in
-    lookup
+    lookup-word
 } ;
 
 ARTICLE: "uninterned-words" "Uninterned words"
@@ -98,17 +98,17 @@ $nl
     { { { $snippet "\"inline\"" } ", " { $snippet "\"foldable\"" } ", " { $snippet "flushable" } } { $link "declarations" } }
 
     { { $snippet "\"loc\"" } { "Location information - " { $link where } } }
-    
+
     { { { $snippet "\"methods\"" } ", " { $snippet "\"combination\"" } } { "Set on generic words - " { $link "generic" } } }
-    
+
     { { { $snippet "\"reading\"" } ", " { $snippet "\"writing\"" } } { "Set on slot accessor words - " { $link "slots" } } }
 
     { { $snippet "\"declared-effect\"" } { $link "effects" } }
-    
+
     { { { $snippet "\"help\"" } ", " { $snippet "\"help-loc\"" } ", " { $snippet "\"help-parent\"" } } { "Where word help is stored - " { $link "writing-help" } } }
 
     { { $snippet "\"specializer\"" } { $link "hints" } }
-    
+
     { { $snippet "\"predicating\"" } " Set on class predicates, stores the corresponding class word" }
 }
 "Properties which are defined for classes only:"
@@ -117,13 +117,13 @@ $nl
     { { $snippet "\"class\"" } { "A boolean indicating whether this word is a class - " { $link "classes" } } }
 
     { { $snippet "\"coercer\"" } { "A quotation for converting the top of the stack to an instance of this class" } }
-    
+
     { { $snippet "\"constructor\"" } { $link "tuple-constructors" } }
-    
+
     { { $snippet "\"type\"" } { $link "builtin-classes" } }
-    
+
     { { { $snippet "\"superclass\"" } ", " { $snippet "\"predicate-definition\"" } } { $link "predicates" } }
-    
+
     { { $snippet "\"members\"" } { $link "unions" } }
 
     { { $snippet "\"slots\"" } { $link "slots" } }
@@ -165,7 +165,7 @@ ARTICLE: "words" "Words"
 $nl
 "There are two ways of creating word definitions:"
 { $list
-    "using parsing words at parse time,"
+    "using parsing words at parse time."
     "using defining words at run time."
 }
 "The latter is a more dynamic feature that can be used to implement code generation and such, and in fact parse time defining words are implemented in terms of run time defining words."
@@ -218,7 +218,7 @@ HELP: remove-word-prop
 { $description "Removes a word property, so future lookups will output " { $link f } " until it is set again. Word property names are conventionally strings." }
 { $side-effects "word" } ;
 
-HELP: word-code ( word -- start end )
+HELP: word-code
 { $values { "word" word } { "start" "the word's start address" } { "end" "the word's end address" } }
 { $description "Outputs the memory range containing the word's machine code." } ;
 
@@ -245,12 +245,12 @@ HELP: reset-generic
 $low-level-note
 { $side-effects "word" } ;
 
-HELP: <word> ( name vocab -- word )
+HELP: <word>
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Allocates a word with the specified name and vocabulary. User code should call " { $link <uninterned-word> } " to create uninterned words and " { $link create } " to create interned words, instead of calling this constructor directly." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
-HELP: <uninterned-word> ( name -- word )
+HELP: <uninterned-word>
 { $values { "name" string } { "word" word } }
 { $description "Creates an uninterned word with the specified name,  that is not equal to any other word in the system." }
 { $notes "Unlike " { $link create } ", this word does not have to be called from inside " { $link with-compilation-unit } "." } ;
@@ -279,7 +279,7 @@ HELP: set-word
 { $values { "word" word } }
 { $description "Sets the recently defined word." } ;
 
-HELP: lookup
+HELP: lookup-word
 { $values { "name" string } { "vocab" string } { "word" { $maybe word } } }
 { $description "Looks up a word in the dictionary. If the vocabulary or the word is not defined, outputs " { $link f } "." } ;
 
@@ -330,7 +330,7 @@ HELP: define-temp
 { $notes
     "The following phrases are equivalent:"
     { $code "[ 2 2 + . ] call" }
-    { $code "[ 2 2 + . ] (( -- )) define-temp execute" }
+    { $code "[ 2 2 + . ] ( -- ) define-temp execute" }
     "This word must be called from inside " { $link with-compilation-unit } "."
 } ;
 

@@ -12,11 +12,11 @@ tool-dims [ H{ } clone ] initialize
 TUPLE: tool < track ;
 
 M: tool pref-dim*
-    { [ class tool-dims get at ] [ call-next-method ] } 1|| ;
+    { [ class-of tool-dims get at ] [ call-next-method ] } 1|| ;
 
 M: tool layout*
     [ call-next-method ]
-    [ [ dim>> ] [ class ] bi tool-dims get set-at ]
+    [ [ dim>> ] [ class-of ] bi tool-dims get set-at ]
     bi ;
 
 : set-tool-dim ( dim class -- ) tool-dims get set-at ;

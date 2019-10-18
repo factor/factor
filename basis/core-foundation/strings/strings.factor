@@ -1,28 +1,30 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data alien.syntax alien.strings
-io.encodings.string kernel sequences byte-arrays
-io.encodings.utf8 math core-foundation core-foundation.arrays
-destructors parser fry alien words ;
+USING: alien alien.c-types alien.data alien.strings alien.syntax
+byte-arrays combinators.short-circuit core-foundation
+core-foundation.arrays core-foundation.data destructors fry
+io.encodings.string io.encodings.utf8 kernel math math.order
+parser sequences words ;
+
 IN: core-foundation.strings
 
 TYPEDEF: void* CFStringRef
 
 TYPEDEF: int CFStringEncoding
-CONSTANT: kCFStringEncodingMacRoman HEX: 0
-CONSTANT: kCFStringEncodingWindowsLatin1 HEX: 0500
-CONSTANT: kCFStringEncodingISOLatin1 HEX: 0201
-CONSTANT: kCFStringEncodingNextStepLatin HEX: 0B01
-CONSTANT: kCFStringEncodingASCII HEX: 0600
-CONSTANT: kCFStringEncodingUnicode HEX: 0100
-CONSTANT: kCFStringEncodingUTF8 HEX: 08000100
-CONSTANT: kCFStringEncodingNonLossyASCII HEX: 0BFF
-CONSTANT: kCFStringEncodingUTF16 HEX: 0100
-CONSTANT: kCFStringEncodingUTF16BE HEX: 10000100
-CONSTANT: kCFStringEncodingUTF16LE HEX: 14000100
-CONSTANT: kCFStringEncodingUTF32 HEX: 0c000100
-CONSTANT: kCFStringEncodingUTF32BE HEX: 18000100
-CONSTANT: kCFStringEncodingUTF32LE HEX: 1c000100
+CONSTANT: kCFStringEncodingMacRoman 0x0
+CONSTANT: kCFStringEncodingWindowsLatin1 0x0500
+CONSTANT: kCFStringEncodingISOLatin1 0x0201
+CONSTANT: kCFStringEncodingNextStepLatin 0x0B01
+CONSTANT: kCFStringEncodingASCII 0x0600
+CONSTANT: kCFStringEncodingUnicode 0x0100
+CONSTANT: kCFStringEncodingUTF8 0x08000100
+CONSTANT: kCFStringEncodingNonLossyASCII 0x0BFF
+CONSTANT: kCFStringEncodingUTF16 0x0100
+CONSTANT: kCFStringEncodingUTF16BE 0x10000100
+CONSTANT: kCFStringEncodingUTF16LE 0x14000100
+CONSTANT: kCFStringEncodingUTF32 0x0c000100
+CONSTANT: kCFStringEncodingUTF32BE 0x18000100
+CONSTANT: kCFStringEncodingUTF32LE 0x1c000100
 
 FUNCTION: CFStringRef CFStringCreateWithBytes (
     CFAllocatorRef alloc,
@@ -60,11 +62,14 @@ FUNCTION: CFStringRef CFStringCreateWithCString (
     CFStringEncoding encoding
 ) ;
 
+FUNCTION: CFStringRef CFCopyDescription ( CFTypeRef cf ) ;
+FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id ) ;
+
 : prepare-CFString ( string -- byte-array )
     [
-        dup HEX: 10ffff >
-        [ drop HEX: fffd ] when
-    ] map utf8 encode ;
+        dup { [ 0x10ffff > ] [ 0xd800 0xdfff between? ] } 1||
+        [ drop 0xfffd ] when
+    ] map! utf8 encode ;
 
 : <CFString> ( string -- alien )
     [ f ] dip
@@ -88,7 +93,12 @@ FUNCTION: CFStringRef CFStringCreateWithCString (
 : <CFStringArray> ( seq -- alien )
     [ [ <CFString> &CFRelease ] map <CFArray> ] with-destructors ;
 
+: CF>description ( cf -- description )
+    [ CFCopyDescription &CFRelease CF>string ] with-destructors ;
+: CFType>description ( cf -- description )
+    CFGetTypeID [ CFCopyTypeIDDescription &CFRelease CF>string ] with-destructors ;
+
 SYNTAX: CFSTRING: 
-    CREATE scan-object 
+    scan-new-word scan-object 
     [ drop ] [ '[ _ [ _ <CFString> ] initialize-alien ] ] 2bi
-    (( -- alien )) define-declared ;
+    ( -- alien ) define-declared ;

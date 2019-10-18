@@ -1,11 +1,12 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel io io.binary io.files io.streams.byte-array math
-math.functions math.parser namespaces splitting grouping strings
-sequences byte-arrays locals sequences.private macros fry
-io.encodings.binary math.bitwise checksums accessors
-checksums.common checksums.stream combinators combinators.smart
-specialized-arrays literals hints ;
+USING: alien.c-types alien.data kernel io io.binary io.files
+io.streams.byte-array math math.functions math.parser namespaces
+splitting grouping strings sequences byte-arrays locals
+sequences.private macros fry io.encodings.binary math.bitwise
+checksums accessors checksums.common checksums.stream
+combinators combinators.smart specialized-arrays literals hints ;
+FROM: sequences.private => change-nth-unsafe ;
 SPECIALIZED-ARRAY: uint
 IN: checksums.md5
 
@@ -18,7 +19,7 @@ TUPLE: md5-state < checksum-state state old-state ;
 : <md5-state> ( -- md5 )
     md5-state new-checksum-state
         64 >>block-size
-        uint-array{ HEX: 67452301 HEX: efcdab89 HEX: 98badcfe HEX: 10325476 }
+        uint-array{ 0x67452301 0xefcdab89 0x98badcfe 0x10325476 }
         [ clone >>state ] [ >>old-state ] bi ;
 
 M: md5 initialize-checksum-state drop <md5-state> ;
@@ -183,7 +184,7 @@ HINTS: (process-md5-block-I) { uint-array md5-state } ;
     ] unless ;
 
 : uint-array-cast-le ( byte-array -- uint-array )
-    byte-array>le uint-array-cast ;
+    byte-array>le uint cast-array ;
 
 HINTS: uint-array-cast-le byte-array ;
 

@@ -8,8 +8,8 @@ IN: math.polynomials
 
 : 2pad-head ( p q n -- p q ) [ 0 pad-head ] curry bi@ ;
 : 2pad-tail ( p q n -- p q ) [ 0 pad-tail ] curry bi@ ;
-: pextend ( p q -- p q ) 2dup [ length ] bi@ max 2pad-tail ;
-: pextend-left ( p q -- p q ) 2dup [ length ] bi@ max 2pad-head ;
+: pextend ( p q -- p q ) 2dup max-length 2pad-tail ;
+: pextend-left ( p q -- p q ) 2dup max-length 2pad-head ;
 : unempty ( seq -- seq ) [ { 0 } ] when-empty ;
 : 2unempty ( seq seq -- seq seq ) [ unempty ] bi@ ;
 
@@ -36,7 +36,7 @@ ALIAS: n*p n*v
     [ drop length [ iota ] keep ]
     [ nip <reversed> ]
     [ drop ] 2tri
-    '[ _ _ <slice> _ v* sum ] map reverse ;
+    '[ _ _ <slice> _ v* sum ] map reverse! ;
 
 : p-sq ( p -- p^2 ) dup p* ; inline
 
@@ -91,11 +91,14 @@ PRIVATE>
     dup length iota v* rest ;
 
 : polyval ( x p -- p[x] )
-    [ length swap powers ] [ nip ] 2bi v. ;
+    ! Horner scheme
+    [ nip <reversed> unclip-slice swap ]
+    [ drop ] 2bi
+    '[ [ _ * ] dip + ] each ;
 
 MACRO: polyval* ( p -- )
     reverse
-    [ 1 tail [ \ * swap \ + [ ] 3sequence ] map ]
+    [ rest [ \ * swap \ + [ ] 3sequence ] map ]
     [ first \ drop swap [ ] 2sequence ] bi
     prefix \ cleave [ ] 2sequence ;
 

@@ -202,7 +202,6 @@ HELP: space-ensure-solids
 
 
 HELP: space-transform 
-" ( space m -- space )" 
 { $values { "space" "a space" } { "m" "a matrix" } }
 { $description "Transform a space using a matrix" } ;
 
@@ -210,7 +209,7 @@ HELP: space-translate
 { $values { "space" "a space" } { "v" "a vector" } }
 { $description "Translate a space following a vector" } ;
 
-HELP: describe-space " ( space -- )"
+HELP: describe-space
 { $values { "space" "a space" } }
 { $description "return a description of space" } ;
 

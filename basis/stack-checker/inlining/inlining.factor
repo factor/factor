@@ -58,14 +58,14 @@ SYMBOL: enter-out
 : emit-enter-recursive ( label -- )
     enter-out get >>enter-out
     enter-in get enter-out get #enter-recursive,
-    enter-out get >vector \ meta-d set ;
+    enter-out get >vector (meta-d) set ;
 
 : entry-stack-height ( label -- stack )
     enter-out>> length ;
 
 : check-return ( word label -- )
     2dup
-    [ stack-effect effect-height ]
+    [ stack-height ]
     [ entry-stack-height current-stack-height swap - ]
     bi*
     = [ 2drop ] [
@@ -77,7 +77,7 @@ SYMBOL: enter-out
 
 : end-recursive-word ( word label -- )
     [ check-return ]
-    [ meta-d dup copy-values dup \ meta-d set #return-recursive, ]
+    [ meta-d dup copy-values dup (meta-d) set #return-recursive, ]
     bi ;
 
 : recursive-word-inputs ( label -- n )
@@ -127,7 +127,7 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
 
 : check-call-site-stack ( label -- )
     [ ] [ call-site-stack ] [ trimmed-enter-out ] tri
-    [ dup undeclared-known [ [ undeclared-known ] bi@ = ] [ 2drop t ] if ] 2all?
+    [ dup undeclared-known [ [ undeclared-known ] same? ] [ 2drop t ] if ] 2all?
     [ drop ] [ word>> inconsistent-recursive-call-error inference-error ] if ;
 
 : check-call ( label -- )
@@ -147,7 +147,7 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
 
 : inline-word ( word -- )
     commit-literals
-    [ depends-on-definition ]
+    [ add-depends-on-definition ]
     [ declare-input-effects ]
     [
         dup inline-recursive-label [

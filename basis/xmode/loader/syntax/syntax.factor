@@ -11,7 +11,7 @@ IN: xmode.loader.syntax
     new swap init-from-tag swap add-rule ; inline
 
 SYNTAX: RULE:
-    scan scan-word scan-word [
+    scan-token scan-word scan-word [
         [ parse-definition call( -- ) ] { } make
         swap [ (parse-rule-tag) ] 2curry
     ] dip swap define-tag ;

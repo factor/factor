@@ -5,13 +5,11 @@ IN: io.directories
 HELP: cwd
 { $values { "path" "a pathname string" } }
 { $description "Outputs the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of “current directory”, so this word throws an error there." }
 { $notes "User code should use the value of the " { $link current-directory } " variable instead." } ;
 
 HELP: cd
 { $values { "path" "a pathname string" } }
 { $description "Changes the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of “current directory”, so this word throws an error there." }
 { $notes "User code should use " { $link with-directory } " or " { $link set-current-directory } " instead." } ;
 
 { cd cwd current-directory set-current-directory with-directory } related-words
@@ -52,7 +50,7 @@ HELP: with-directory-files
 { $examples
     "Print all files in your home directory which are larger than a megabyte:"
     { $code
-        """USING: io.directoies io.files.info io.pathnames ;
+        """USING: io.directories io.files.info io.pathnames ;
 home [
     [
         dup link-info size>> 20 2^ >

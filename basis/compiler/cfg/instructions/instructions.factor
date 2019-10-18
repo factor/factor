@@ -84,6 +84,8 @@ INSN: ##epilogue ;
 
 INSN: ##return ;
 
+INSN: ##safepoint ;
+
 ! Dummy instruction that simply inhibits TCO
 INSN: ##no-tco ;
 
@@ -378,6 +380,11 @@ def: dst
 use: src1 src2
 literal: rep cc ;
 
+FOLDABLE-INSN: ##move-vector-mask
+def: dst/int-rep
+use: src
+literal: rep ;
+
 FOLDABLE-INSN: ##test-vector
 def: dst/tagged-rep
 use: src1
@@ -608,7 +615,7 @@ literal: offset rep c-type ;
 ! Memory allocation
 FLUSHABLE-INSN: ##allot
 def: dst/tagged-rep
-literal: size class
+literal: size class-of
 temp: temp/int-rep ;
 
 VREG-INSN: ##write-barrier
@@ -830,12 +837,15 @@ UNION: conditional-branch-insn
 UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
 UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
 
-! Instructions that contain subroutine calls to functions which
-! can callback arbitrary Factor code
-UNION: factor-call-insn
+UNION: alien-call-insn
 ##alien-invoke
 ##alien-indirect
 ##alien-assembly ;
+
+! Instructions that contain subroutine calls to functions which
+! can callback arbitrary Factor code
+UNION: factor-call-insn
+alien-call-insn ;
 
 ! Instructions that contain subroutine calls to functions which
 ! allocate memory
@@ -848,14 +858,9 @@ factor-call-insn ;
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 
 ! Each one has a gc-map slot
-TUPLE: gc-map scrub-d scrub-r gc-roots ;
+TUPLE: gc-map scrub-d scrub-r gc-roots derived-roots ;
 
 : <gc-map> ( -- gc-map ) gc-map new ;
-
-UNION: alien-call-insn
-##alien-invoke
-##alien-indirect
-##alien-assembly ;
 
 ! Instructions that clobber registers. They receive inputs and
 ! produce outputs in spill slots.

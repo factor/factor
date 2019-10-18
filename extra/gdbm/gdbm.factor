@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.destructors
 alien.enums alien.syntax classes.struct combinators destructors
-gdbm.ffi io.backend kernel libc locals math namespaces sequences
-serialize strings ;
+fry gdbm.ffi io.backend kernel libc locals math namespaces
+sequences serialize strings ;
 IN: gdbm
 
 ENUM: gdbm-role reader writer wrcreat newdb ;
@@ -14,7 +14,7 @@ TUPLE: gdbm
     { role initial: wrcreat }
     { sync boolean }
     { nolock boolean }
-    { mode integer initial: OCT: 644 } ;
+    { mode integer initial: 0o644 } ;
 
 : <gdbm> ( -- gdbm ) gdbm new ;
 
@@ -76,7 +76,8 @@ DESTRUCTOR: gdbm-close
 
 : gdbm-store ( key content flag -- )
     [
-        { [ dbf ] [ object>datum ] [ object>datum ] [ ] } spread
+        [ dbf ] 3dip
+        [ object>datum ] [ object>datum ] [ ] tri*
         gdbm_store check-error
     ] with-destructors ;
 
@@ -146,8 +147,10 @@ PRIVATE>
 : gdbm-file-descriptor ( -- desc ) dbf gdbm_fdesc ;
 
 : with-gdbm ( gdbm quot -- )
-    [ gdbm-open &gdbm-close current-dbf set ] prepose curry
-    [ with-scope ] curry with-destructors ; inline
+    '[
+        _ gdbm-open &gdbm-close current-dbf
+        _ with-variable
+    ] with-destructors ; inline
 
 :: with-gdbm-role ( name role quot -- )
     <gdbm> name >>name role >>role quot with-gdbm ; inline

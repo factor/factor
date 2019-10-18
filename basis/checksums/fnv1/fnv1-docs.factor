@@ -43,7 +43,7 @@ HELP: fnv1a-1024
 { $class-description "Fowler-Noll-Vo checksum algorithm, v1a, 1024-bit." } ;
 
 ARTICLE: "checksums.fnv1" "Fowler-Noll-Vo checksum"
-  "The Fowler-Noll-Vo checksum algorithm is another simple and fast checksum. It comes in 32, 64, 128, 256, 512 and 1024-bit versions, each in 1 and 1a variants. The 1a variants tend to produce a slightly better result. See http://en.wikipedia.org/wiki/Fowler_Noll_Vo_hash for more details."
+  "The Fowler-Noll-Vo checksum algorithm is another simple and fast checksum. It comes in 32, 64, 128, 256, 512 and 1024-bit versions, each in 1 and 1a variants. The 1a variants tend to produce a slightly better result. See " { $url "http://en.wikipedia.org/wiki/Fowler_Noll_Vo_hash" } " for more details."
 { $subsections
     fnv1-32
     fnv1a-32

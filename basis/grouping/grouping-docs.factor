@@ -26,7 +26,7 @@ ARTICLE: "grouping" "Groups and clumps"
             "{ 1 2 3 4 } dup" "2 <groups> concat sequence= ." "t"
         }
     }
-    { "With clumps, collecting the first element of each subsequence but the last one, together with the last subseqence, yields the original sequence:"
+    { "With clumps, collecting the first element of each subsequence but the last one, together with the last subsequence, yields the original sequence:"
         { $unchecked-example
             "USING: grouping ;"
             "{ 1 2 3 4 } 2 clump ." "{ { 1 2 } { 2 3 } { 3 4 } }"
@@ -181,7 +181,7 @@ HELP: <sliced-circular-clumps>
 { <sliced-clumps> <sliced-circular-clumps> <sliced-groups> } related-words
 
 HELP: monotonic?
-{ $values { "seq" sequence } { "quot" { $quotation "( elt elt -- ? )" } } { "?" "a boolean" } }
+{ $values { "seq" sequence } { "quot" { $quotation "( elt1 elt2 -- ? )" } } { "?" "a boolean" } }
 { $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
 { $examples
     "Testing if a sequence is non-decreasing:"

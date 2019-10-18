@@ -28,20 +28,20 @@ HELP: sort
 { $notes "The algorithm used is the merge sort." } ;
 
 HELP: sort-with
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( object -- key )" } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation "( elt -- key )" } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " by applying " { $link compare } " with " { $snippet "quot" } " to each pair of elements in the sequence." } ;
 
 HELP: inv-sort-with
-{ $values { "seq" "a sequence" } { "quot" { $quotation "( object -- key )" } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation "( elt -- key )" } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " by applying " { $link compare } " with " { $snippet "quot" } " to each pair of elements in the sequence and inverting the results." } ;
 
 HELP: sort-keys
-{ $values { "seq" "an alist" } { "sortedseq" "a new sorted sequence" } }
-{ $description "Sorts the elements of " { $snippet "seq" } " comparing first elements of pairs using the " { $link <=> } " word." } ;
+{ $values { "obj" "an object" } { "sortedseq" "a new sorted sequence" } }
+{ $description "Sorts the elements of " { $snippet "obj" } " (converting to an alist first if not a sequence), comparing first elements of pairs using the " { $link <=> } " word." } ;
 
 HELP: sort-values
-{ $values { "seq" "an alist" } { "sortedseq" "a new sorted sequence" } }
-{ $description "Sorts the elements of " { $snippet "seq" } " comparing second elements of pairs using the " { $link <=> } " word." } ;
+{ $values { "obj" "an object" } { "sortedseq" "a new sorted sequence" } }
+{ $description "Sorts the elements of " { $snippet "obj" } " (converting to an alist first if not a sequence), comparing second elements of pairs using the " { $link <=> } " word." } ;
 
 HELP: natural-sort
 { $values { "seq" "a sequence of real numbers" } { "sortedseq" "a new sorted sequence" } }

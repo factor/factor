@@ -3,7 +3,7 @@
 USING: alien.c-types alien.data alien.syntax combinators
 continuations io.encodings.string io.encodings.utf8 kernel
 sequences strings calendar system accessors unix unix.time
-unix.ffi calendar.unix vocabs.loader classes.struct ;
+unix.ffi calendar.unix vocabs classes.struct ;
 IN: unix.utmpx
 
 CONSTANT: EMPTY 0
@@ -64,5 +64,4 @@ M: unix utmpx>utmpx-record ( utmpx -- utmpx-record )
     
 os {
     { macosx [ "unix.utmpx.macosx" require ] }
-    { netbsd [ "unix.utmpx.netbsd" require ] }
 } case

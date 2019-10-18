@@ -1,4 +1,4 @@
-USING: strings help.markup help.syntax assocs ;
+USING: strings help.markup help.syntax assocs urls ;
 IN: urls.encoding
 
 HELP: url-decode

@@ -1,0 +1,2939 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gio" version="2.0"/>
+  <package name="json-glib-1.0"/>
+  <c:include name="json-glib/json-glib.h"/>
+  <namespace name="Json"
+             version="1.0"
+             shared-library="libjson-glib-1.0.so.0"
+             c:identifier-prefixes="Json"
+             c:symbol-prefixes="json">
+    <record name="Array"
+            c:type="JsonArray"
+            glib:type-name="JsonArray"
+            glib:get-type="json_array_get_type"
+            c:symbol-prefix="array">
+      <doc xml:whitespace="preserve">A JSON array type. The contents of the #JsonArray structure are private
+and should only be accessed by the provided API</doc>
+      <constructor name="new" c:identifier="json_array_new">
+        <doc xml:whitespace="preserve">Creates a new #JsonArray.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #JsonArray</doc>
+          <type name="Array" c:type="JsonArray*"/>
+        </return-value>
+      </constructor>
+      <constructor name="sized_new" c:identifier="json_array_sized_new">
+        <doc xml:whitespace="preserve">Creates a new #JsonArray with @n_elements slots already allocated.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #JsonArray</doc>
+          <type name="Array" c:type="JsonArray*"/>
+        </return-value>
+        <parameters>
+          <parameter name="n_elements" transfer-ownership="none">
+            <doc xml:whitespace="preserve">number of slots to pre-allocate</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="add_array_element"
+              c:identifier="json_array_add_array_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently adds an array into @array. The @array takes ownership
+of the newly added #JsonArray</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="full">
+            <doc xml:whitespace="preserve">a #JsonArray</doc>
+            <type name="Array" c:type="JsonArray*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_boolean_element"
+              c:identifier="json_array_add_boolean_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently adds a boolean @value into @array</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a boolean value</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_double_element"
+              c:identifier="json_array_add_double_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently adds a floating point @value into @array</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a floating point value</doc>
+            <type name="gdouble" c:type="gdouble"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_element" c:identifier="json_array_add_element">
+        <doc xml:whitespace="preserve">Appends @node inside @array. The array will take ownership of the
+#JsonNode.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="node" transfer-ownership="full">
+            <doc xml:whitespace="preserve">a #JsonNode</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_int_element"
+              c:identifier="json_array_add_int_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently adds an integer @value into @array</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an integer value</doc>
+            <type name="gint64" c:type="gint64"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_null_element"
+              c:identifier="json_array_add_null_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently adds a null element into @array</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="add_object_element"
+              c:identifier="json_array_add_object_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently adds an object into @array. The @array takes ownership
+of the newly added #JsonObject</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="full">
+            <doc xml:whitespace="preserve">a #JsonObject</doc>
+            <type name="Object" c:type="JsonObject*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_string_element"
+              c:identifier="json_array_add_string_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently adds a string @value into @array</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a string value</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="dup_element"
+              c:identifier="json_array_dup_element"
+              version="0.6">
+        <doc xml:whitespace="preserve">Retrieves a copy of the #JsonNode containing the value of the
+element at @index_ inside a #JsonArray
+index. Use json_node_free() when done.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a copy of the #JsonNode at the requested</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element to retrieve</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="foreach_element"
+              c:identifier="json_array_foreach_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Iterates over all elements of @array and calls @func on
+each one of them.
+It is safe to change the value of a #JsonNode of the @array
+from within the iterator @func, but it is not safe to add or
+remove elements from the @array.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="func"
+                     transfer-ownership="none"
+                     scope="call"
+                     closure="1">
+            <doc xml:whitespace="preserve">the function to be called on each element</doc>
+            <type name="ArrayForeach" c:type="JsonArrayForeach"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">data to be passed to the function</doc>
+            <type name="gpointer" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_array_element"
+              c:identifier="json_array_get_array_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently retrieves the array from the element at @index_
+inside @array</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the array</doc>
+          <type name="Array" c:type="JsonArray*"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element to retrieve</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_boolean_element"
+              c:identifier="json_array_get_boolean_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently retrieves the boolean value of the element at @index_
+inside @array</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the integer value</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element to retrieve</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_double_element"
+              c:identifier="json_array_get_double_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently retrieves the floating point value of the element at</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the floating point value</doc>
+          <type name="gdouble" c:type="gdouble"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element to retrieve</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_element" c:identifier="json_array_get_element">
+        <doc xml:whitespace="preserve">Retrieves the #JsonNode containing the value of the element at @index_
+inside a #JsonArray.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to the #JsonNode at the requested index</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element to retrieve</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_elements" c:identifier="json_array_get_elements">
+        <doc xml:whitespace="preserve">Gets the elements of a #JsonArray as a list of #JsonNode&lt;!-- --&gt;s.
+containing the elements of the array. The contents of the list are
+owned by the array and should never be modified or freed. Use
+g_list_free() on the returned list when done using it</doc>
+        <return-value transfer-ownership="container">
+          <doc xml:whitespace="preserve">a #GList</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="Node"/>
+          </type>
+        </return-value>
+      </method>
+      <method name="get_int_element"
+              c:identifier="json_array_get_int_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently retrieves the integer value of the element at @index_
+inside @array</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the integer value</doc>
+          <type name="gint64" c:type="gint64"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element to retrieve</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_length" c:identifier="json_array_get_length">
+        <doc xml:whitespace="preserve">Retrieves the length of a #JsonArray</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the length of the array</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_null_element"
+              c:identifier="json_array_get_null_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently retrieves whether the element at @index_ is set to null</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the element is null</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element to retrieve</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_object_element"
+              c:identifier="json_array_get_object_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently retrieves the object from the element at @index_
+inside @array</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object</doc>
+          <type name="Object" c:type="JsonObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element to retrieve</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_string_element"
+              c:identifier="json_array_get_string_element"
+              version="0.8">
+        <doc xml:whitespace="preserve">Conveniently retrieves the string value of the element at @index_
+inside @array
+the #JsonArray and should not be modified or freed</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the string value; the returned string is owned by</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element to retrieve</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="ref" c:identifier="json_array_ref">
+        <doc xml:whitespace="preserve">Increase by one the reference count of a #JsonArray.
+increased by one.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the passed #JsonArray, with the reference count</doc>
+          <type name="Array" c:type="JsonArray*"/>
+        </return-value>
+      </method>
+      <method name="remove_element" c:identifier="json_array_remove_element">
+        <doc xml:whitespace="preserve">Removes the #JsonNode inside @array at @index_ freeing its allocated
+resources.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the position of the element to be removed</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="unref" c:identifier="json_array_unref">
+        <doc xml:whitespace="preserve">Decreases by one the reference count of a #JsonArray. If the
+reference count reaches zero, the array is destroyed and all
+its allocated resources are freed.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+    </record>
+    <callback name="ArrayForeach" c:type="JsonArrayForeach" version="0.8">
+      <doc xml:whitespace="preserve">The function to be passed to json_array_foreach_element(). You
+should not add or remove elements to and from @array within
+this function. It is safe to change the value of @element_node.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="array" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the iterated #JsonArray</doc>
+          <type name="Array" c:type="JsonArray*"/>
+        </parameter>
+        <parameter name="index_" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the index of the element</doc>
+          <type name="guint" c:type="guint"/>
+        </parameter>
+        <parameter name="element_node" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #JsonNode containing the value at @index_</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" closure="3">
+          <doc xml:whitespace="preserve">data passed to the function</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <callback name="BoxedDeserializeFunc"
+              c:type="JsonBoxedDeserializeFunc"
+              version="0.10"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Deserializes the contents of the passed #JsonNode into a #GBoxed</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">the newly created boxed type</doc>
+        <type name="gpointer" c:type="gpointer"/>
+      </return-value>
+      <parameters>
+        <parameter name="node" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #JsonNode</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <callback name="BoxedSerializeFunc"
+              c:type="JsonBoxedSerializeFunc"
+              version="0.10">
+      <doc xml:whitespace="preserve">Serializes the passed #GBoxed and stores it inside a #JsonNode</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">the newly created #JsonNode</doc>
+        <type name="Node" c:type="JsonNode*"/>
+      </return-value>
+      <parameters>
+        <parameter name="boxed" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GBoxed</doc>
+          <type name="gpointer" c:type="gconstpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <class name="Builder"
+           c:symbol-prefix="builder"
+           c:type="JsonBuilder"
+           version="0.12"
+           parent="GObject.Object"
+           glib:type-name="JsonBuilder"
+           glib:get-type="json_builder_get_type"
+           glib:type-struct="BuilderClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;JsonBuilder&lt;/structname&gt; structure contains only
+private data and shouls be accessed using the provided API</doc>
+      <constructor name="new" c:identifier="json_builder_new">
+        <doc xml:whitespace="preserve">Creates a new #JsonBuilder. You can use this object to generate a
+JSON tree and obtain the root #JsonNode&lt;!-- --&gt;s.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #JsonBuilder instance</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+      </constructor>
+      <method name="add_boolean_value"
+              c:identifier="json_builder_add_boolean_value">
+        <doc xml:whitespace="preserve">If called after json_builder_set_member_name(), sets @value as member of the
+most recent opened object, otherwise @value is added as element of the most
+recent opened array.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the member or element</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_double_value"
+              c:identifier="json_builder_add_double_value">
+        <doc xml:whitespace="preserve">If called after json_builder_set_member_name(), sets @value as member of the
+most recent opened object, otherwise @value is added as element of the most
+recent opened array.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the member or element</doc>
+            <type name="gdouble" c:type="gdouble"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_int_value" c:identifier="json_builder_add_int_value">
+        <doc xml:whitespace="preserve">If called after json_builder_set_member_name(), sets @value as member of the
+most recent opened object, otherwise @value is added as element of the most
+recent opened array.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the member or element</doc>
+            <type name="gint64" c:type="gint64"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_null_value" c:identifier="json_builder_add_null_value">
+        <doc xml:whitespace="preserve">If called after json_builder_set_member_name(), sets null as member of the
+most recent opened object, otherwise null is added as element of the most
+recent opened array.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+      </method>
+      <method name="add_string_value"
+              c:identifier="json_builder_add_string_value">
+        <doc xml:whitespace="preserve">If called after json_builder_set_member_name(), sets @value as member of the
+most recent opened object, otherwise @value is added as element of the most
+recent opened array.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the member or element</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_value" c:identifier="json_builder_add_value">
+        <doc xml:whitespace="preserve">If called after json_builder_set_member_name(), sets @node as member of the
+most recent opened object, otherwise @node is added as element of the most
+recent opened array.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+        <parameters>
+          <parameter name="node" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the member or element</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="begin_array" c:identifier="json_builder_begin_array">
+        <doc xml:whitespace="preserve">Opens a subarray inside the given @builder. When done adding members to
+the subarray, json_builder_end_array() must be called.
+Can be called for first or only if the call is associated to an object member
+or an array element.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+      </method>
+      <method name="begin_object" c:identifier="json_builder_begin_object">
+        <doc xml:whitespace="preserve">Opens a subobject inside the given @builder. When done adding members to
+the subobject, json_builder_end_object() must be called.
+Can be called for first or only if the call is associated to an object member
+or an array element.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+      </method>
+      <method name="end_array" c:identifier="json_builder_end_array">
+        <doc xml:whitespace="preserve">Closes the subarray inside the given @builder that was opened by the most
+recent call to json_builder_begin_array().
+Cannot be called after json_builder_set_member_name().</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+      </method>
+      <method name="end_object" c:identifier="json_builder_end_object">
+        <doc xml:whitespace="preserve">Closes the subobject inside the given @builder that was opened by the most
+recent call to json_builder_begin_object().
+Cannot be called after json_builder_set_member_name().</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+      </method>
+      <method name="get_root" c:identifier="json_builder_get_root">
+        <doc xml:whitespace="preserve">Returns the root of the current constructed tree, if the build is complete
+(ie: all opened objects, object members and arrays are being closed).
+Free the returned value with json_node_free().</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the #JsonNode, or %NULL if the build is not complete.</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+      </method>
+      <method name="reset" c:identifier="json_builder_reset">
+        <doc xml:whitespace="preserve">Resets the state of the @builder back to its initial state.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="set_member_name"
+              c:identifier="json_builder_set_member_name">
+        <doc xml:whitespace="preserve">Set the name of the next member in an object. The next call must add a value,
+open an object or an array.
+Can be called only if the call is associated to an object.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonBuilder, or %NULL if the call was inconsistent</doc>
+          <type name="Builder" c:type="JsonBuilder*"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="BuilderPrivate" c:type="JsonBuilderPrivate*"/>
+      </field>
+    </class>
+    <record name="BuilderClass"
+            c:type="JsonBuilderClass"
+            glib:is-gtype-struct-for="Builder"
+            version="0.12">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;JsonBuilder&lt;/structname&gt; structure contains only
+private data</doc>
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="_json_reserved1" introspectable="0">
+        <callback name="_json_reserved1">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved2" introspectable="0">
+        <callback name="_json_reserved2">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+    </record>
+    <record name="BuilderPrivate" c:type="JsonBuilderPrivate" disguised="1">
+    </record>
+    <class name="Generator"
+           c:symbol-prefix="generator"
+           c:type="JsonGenerator"
+           parent="GObject.Object"
+           glib:type-name="JsonGenerator"
+           glib:get-type="json_generator_get_type"
+           glib:type-struct="GeneratorClass">
+      <doc xml:whitespace="preserve">JSON data streams generator. The contents of the #JsonGenerator structure
+are private and should only be accessed via the provided API.</doc>
+      <constructor name="new" c:identifier="json_generator_new">
+        <doc xml:whitespace="preserve">Creates a new #JsonGenerator. You can use this object to generate a
+JSON data stream starting from a data object model composed by
+#JsonNode&lt;!-- --&gt;s.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #JsonGenerator instance</doc>
+          <type name="Generator" c:type="JsonGenerator*"/>
+        </return-value>
+      </constructor>
+      <method name="set_root" c:identifier="json_generator_set_root">
+        <doc xml:whitespace="preserve">Sets @node as the root of the JSON data stream to be serialized by
+the #JsonGenerator.
+&lt;note&gt;The node is copied by the generator object, so it can be safely
+freed after calling this function.&lt;/note&gt;</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="node" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #JsonNode</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="to_data" c:identifier="json_generator_to_data">
+        <doc xml:whitespace="preserve">Generates a JSON data stream from @generator and returns it as a
+buffer.
+Use g_free() to free the allocated resources.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a newly allocated buffer holding a JSON data stream.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="length"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <doc xml:whitespace="preserve">return location for the length of the returned buffer, or %NULL</doc>
+            <type name="gulong" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="to_file" c:identifier="json_generator_to_file" throws="1">
+        <doc xml:whitespace="preserve">Creates a JSON data stream and puts it inside @filename, overwriting the
+current file contents. This operation is atomic.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if saving was successful.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="filename" transfer-ownership="none">
+            <doc xml:whitespace="preserve">path to the target file</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="to_stream"
+              c:identifier="json_generator_to_stream"
+              version="0.12"
+              throws="1">
+        <doc xml:whitespace="preserve">Outputs JSON data and streams it (synchronously) to @stream.
+on failure. In case of error, the #GError will be filled accordingly</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the write operation was successful, and %FALSE</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="stream" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GOutputStream</doc>
+            <type name="Gio.OutputStream" c:type="GOutputStream*"/>
+          </parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">a #GCancellable, or %NULL</doc>
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="indent" writable="1" transfer-ownership="none">
+        <doc xml:whitespace="preserve">Number of spaces to be used to indent when pretty printing.</doc>
+        <type name="guint"/>
+      </property>
+      <property name="indent-char"
+                version="0.6"
+                writable="1"
+                transfer-ownership="none">
+        <doc xml:whitespace="preserve">The character that should be used when indenting in pretty print.</doc>
+        <type name="guint"/>
+      </property>
+      <property name="pretty" writable="1" transfer-ownership="none">
+        <doc xml:whitespace="preserve">Whether the output should be "pretty-printed", with indentation and
+newlines. The indentation level can be controlled by using the
+JsonGenerator:indent property</doc>
+        <type name="gboolean"/>
+      </property>
+      <property name="root"
+                version="0.4"
+                writable="1"
+                transfer-ownership="none">
+        <doc xml:whitespace="preserve">The root #JsonNode to be used when constructing a JSON data
+stream.</doc>
+        <type name="Node"/>
+      </property>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="GeneratorPrivate" c:type="JsonGeneratorPrivate*"/>
+      </field>
+    </class>
+    <record name="GeneratorClass"
+            c:type="JsonGeneratorClass"
+            glib:is-gtype-struct-for="Generator">
+      <doc xml:whitespace="preserve">#JsonGenerator class</doc>
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="_json_reserved1" introspectable="0">
+        <callback name="_json_reserved1">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved2" introspectable="0">
+        <callback name="_json_reserved2">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved3" introspectable="0">
+        <callback name="_json_reserved3">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved4" introspectable="0">
+        <callback name="_json_reserved4">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+    </record>
+    <record name="GeneratorPrivate"
+            c:type="JsonGeneratorPrivate"
+            disguised="1">
+    </record>
+    <record name="Node"
+            c:type="JsonNode"
+            glib:type-name="JsonNode"
+            glib:get-type="json_node_get_type"
+            c:symbol-prefix="node">
+      <doc xml:whitespace="preserve">A generic container of JSON data types. The contents of the #JsonNode
+structure are private and should only be accessed via the provided
+functions and never directly.</doc>
+      <constructor name="new" c:identifier="json_node_new">
+        <doc xml:whitespace="preserve">Creates a new #JsonNode of @type.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #JsonNode</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+        <parameters>
+          <parameter name="type" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #JsonNodeType</doc>
+            <type name="NodeType" c:type="JsonNodeType"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="copy" c:identifier="json_node_copy">
+        <doc xml:whitespace="preserve">Copies @node. If the node contains complex data types then the reference
+count of the objects is increased.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the copied #JsonNode</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+      </method>
+      <method name="dup_array" c:identifier="json_node_dup_array">
+        <return-value transfer-ownership="full">
+          <type name="Array" c:type="JsonArray*"/>
+        </return-value>
+      </method>
+      <method name="dup_object" c:identifier="json_node_dup_object">
+        <doc xml:whitespace="preserve">Retrieves the #JsonObject inside @node. The reference count of
+the returned object is increased.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the #JsonObject</doc>
+          <type name="Object" c:type="JsonObject*"/>
+        </return-value>
+      </method>
+      <method name="dup_string" c:identifier="json_node_dup_string">
+        <doc xml:whitespace="preserve">Gets a copy of the string value stored inside a #JsonNode
+of the #JsonNode contents. Use g_free() to free the allocated resources</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a newly allocated string containing a copy</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="free" c:identifier="json_node_free">
+        <doc xml:whitespace="preserve">Frees the resources allocated by @node.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="get_array" c:identifier="json_node_get_array">
+        <doc xml:whitespace="preserve">Retrieves the #JsonArray stored inside a #JsonNode</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonArray</doc>
+          <type name="Array" c:type="JsonArray*"/>
+        </return-value>
+      </method>
+      <method name="get_boolean" c:identifier="json_node_get_boolean">
+        <doc xml:whitespace="preserve">Gets the boolean value stored inside a #JsonNode</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a boolean value.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="get_double" c:identifier="json_node_get_double">
+        <doc xml:whitespace="preserve">Gets the double value stored inside a #JsonNode</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a double value.</doc>
+          <type name="gdouble" c:type="gdouble"/>
+        </return-value>
+      </method>
+      <method name="get_int" c:identifier="json_node_get_int">
+        <doc xml:whitespace="preserve">Gets the integer value stored inside a #JsonNode</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">an integer value.</doc>
+          <type name="gint64" c:type="gint64"/>
+        </return-value>
+      </method>
+      <method name="get_node_type"
+              c:identifier="json_node_get_node_type"
+              version="0.8">
+        <doc xml:whitespace="preserve">Retrieves the #JsonNodeType of @node</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the type of the node</doc>
+          <type name="NodeType" c:type="JsonNodeType"/>
+        </return-value>
+      </method>
+      <method name="get_object" c:identifier="json_node_get_object">
+        <doc xml:whitespace="preserve">Retrieves the #JsonObject stored inside a #JsonNode</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonObject</doc>
+          <type name="Object" c:type="JsonObject*"/>
+        </return-value>
+      </method>
+      <method name="get_parent" c:identifier="json_node_get_parent">
+        <doc xml:whitespace="preserve">Retrieves the parent #JsonNode of @node.
+the root node</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the parent node, or %NULL if @node is</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+      </method>
+      <method name="get_string" c:identifier="json_node_get_string">
+        <doc xml:whitespace="preserve">Gets the string value stored inside a #JsonNode</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a string value.</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_value" c:identifier="json_node_get_value">
+        <doc xml:whitespace="preserve">Retrieves a value from a #JsonNode and copies into @value. When done
+using it, call g_value_unset() on the #GValue.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">return location for an uninitialized value</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_value_type"
+              c:identifier="json_node_get_value_type"
+              version="0.4">
+        <doc xml:whitespace="preserve">Returns the #GType of the payload of the node.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GType for the payload.</doc>
+          <type name="GType" c:type="GType"/>
+        </return-value>
+      </method>
+      <method name="is_null" c:identifier="json_node_is_null" version="0.8">
+        <doc xml:whitespace="preserve">Checks whether @node is a %JSON_NODE_NULL
+&lt;note&gt;A null node is not the same as a %NULL #JsonNode&lt;/note&gt;</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the node is null</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="set_array" c:identifier="json_node_set_array">
+        <doc xml:whitespace="preserve">Sets @array inside @node and increases the #JsonArray reference count</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="array" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #JsonArray</doc>
+            <type name="Array" c:type="JsonArray*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_boolean" c:identifier="json_node_set_boolean">
+        <doc xml:whitespace="preserve">Sets @value as the boolean content of the @node, replacing any existing
+content.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a boolean value</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_double" c:identifier="json_node_set_double">
+        <doc xml:whitespace="preserve">Sets @value as the double content of the @node, replacing any existing
+content.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a double value</doc>
+            <type name="gdouble" c:type="gdouble"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_int" c:identifier="json_node_set_int">
+        <doc xml:whitespace="preserve">Sets @value as the integer content of the @node, replacing any existing
+content.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an integer value</doc>
+            <type name="gint64" c:type="gint64"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_object" c:identifier="json_node_set_object">
+        <doc xml:whitespace="preserve">Sets @objects inside @node. The reference count of @object is increased.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #JsonObject</doc>
+            <type name="Object" c:type="JsonObject*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_parent"
+              c:identifier="json_node_set_parent"
+              version="0.8">
+        <doc xml:whitespace="preserve">Sets the parent #JsonNode of @node</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="parent" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the parent #JsonNode of @node</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_string" c:identifier="json_node_set_string">
+        <doc xml:whitespace="preserve">Sets @value as the string content of the @node, replacing any existing
+content.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a string value</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_value" c:identifier="json_node_set_value">
+        <doc xml:whitespace="preserve">Sets @value inside @node. The passed #GValue is copied into the #JsonNode</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GValue to set</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="take_array" c:identifier="json_node_take_array">
+        <doc xml:whitespace="preserve">Sets @array into @node without increasing the #JsonArray reference count.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="array" transfer-ownership="full">
+            <doc xml:whitespace="preserve">a #JsonArray</doc>
+            <type name="Array" c:type="JsonArray*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="take_object" c:identifier="json_node_take_object">
+        <doc xml:whitespace="preserve">Sets @object inside @node. The reference count of @object is not increased.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="full">
+            <doc xml:whitespace="preserve">a #JsonObject</doc>
+            <type name="Object" c:type="JsonObject*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="type_name" c:identifier="json_node_type_name">
+        <doc xml:whitespace="preserve">Retrieves the user readable name of the data type contained by @node.
+is owned by the node and should never be modified or freed</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a string containing the name of the type. The returned string</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+    </record>
+    <enumeration name="NodeType" c:type="JsonNodeType">
+      <doc xml:whitespace="preserve">Indicates the content of a #JsonNode.</doc>
+      <member name="object" value="0" c:identifier="JSON_NODE_OBJECT"/>
+      <member name="array" value="1" c:identifier="JSON_NODE_ARRAY"/>
+      <member name="value" value="2" c:identifier="JSON_NODE_VALUE"/>
+      <member name="null" value="3" c:identifier="JSON_NODE_NULL"/>
+    </enumeration>
+    <record name="Object"
+            c:type="JsonObject"
+            glib:type-name="JsonObject"
+            glib:get-type="json_object_get_type"
+            c:symbol-prefix="object">
+      <doc xml:whitespace="preserve">A JSON object type. The contents of the #JsonObject structure are private
+and should only be accessed by the provided API</doc>
+      <constructor name="new" c:identifier="json_object_new">
+        <doc xml:whitespace="preserve">Creates a new #JsonObject, an JSON object type representation.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #JsonObject</doc>
+          <type name="Object" c:type="JsonObject*"/>
+        </return-value>
+      </constructor>
+      <method name="add_member"
+              c:identifier="json_object_add_member"
+              deprecated="Use json_object_set_member() instead"
+              deprecated-version="0.8">
+        <doc xml:whitespace="preserve">Adds a member named @member_name and containing @node into a #JsonObject.
+The object will take ownership of the #JsonNode.
+This function will return if the @object already contains a member</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="node" transfer-ownership="full">
+            <doc xml:whitespace="preserve">the value of the member</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="dup_member"
+              c:identifier="json_object_dup_member"
+              version="0.6">
+        <doc xml:whitespace="preserve">Retrieves a copy of the #JsonNode containing the value of @member_name
+inside a #JsonObject
+object member or %NULL. Use json_node_free() when done.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a copy of the node for the requested</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the JSON object member to access</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="foreach_member"
+              c:identifier="json_object_foreach_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Iterates over all members of @object and calls @func on
+each one of them.
+It is safe to change the value of a #JsonNode of the @object
+from within the iterator @func, but it is not safe to add or
+remove members from the @object.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="func"
+                     transfer-ownership="none"
+                     scope="call"
+                     closure="1">
+            <doc xml:whitespace="preserve">the function to be called on each member</doc>
+            <type name="ObjectForeach" c:type="JsonObjectForeach"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">data to be passed to the function</doc>
+            <type name="gpointer" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_array_member"
+              c:identifier="json_object_get_array_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function that retrieves the array
+stored in @member_name of @object</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the array inside the object's member</doc>
+          <type name="Array" c:type="JsonArray*"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_boolean_member"
+              c:identifier="json_object_get_boolean_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function that retrieves the boolean value
+stored in @member_name of @object</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the boolean value of the object's member</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_double_member"
+              c:identifier="json_object_get_double_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function that retrieves the floating point value
+stored in @member_name of @object</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the floating point value of the object's member</doc>
+          <type name="gdouble" c:type="gdouble"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_int_member"
+              c:identifier="json_object_get_int_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function that retrieves the integer value
+stored in @member_name of @object</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the integer value of the object's member</doc>
+          <type name="gint64" c:type="gint64"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_member" c:identifier="json_object_get_member">
+        <doc xml:whitespace="preserve">Retrieves the #JsonNode containing the value of @member_name inside
+a #JsonObject.
+member, or %NULL</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to the node for the requested object</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the JSON object member to access</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_members" c:identifier="json_object_get_members">
+        <doc xml:whitespace="preserve">Retrieves all the names of the members of a #JsonObject. You can
+obtain the value for each member using json_object_get_member().
+of member names. The content of the list is owned by the #JsonObject
+and should never be modified or freed. When you have finished using
+the returned list, use g_list_free() to free the resources it has
+allocated.</doc>
+        <return-value transfer-ownership="container">
+          <doc xml:whitespace="preserve">a #GList</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="utf8"/>
+          </type>
+        </return-value>
+      </method>
+      <method name="get_null_member"
+              c:identifier="json_object_get_null_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function that checks whether the value
+stored in @member_name of @object is null</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the value is null</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_object_member"
+              c:identifier="json_object_get_object_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function that retrieves the object
+stored in @member_name of @object</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the object inside the object's member</doc>
+          <type name="Object" c:type="JsonObject*"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_size" c:identifier="json_object_get_size">
+        <doc xml:whitespace="preserve">Retrieves the number of members of a #JsonObject.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of members</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_string_member"
+              c:identifier="json_object_get_string_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function that retrieves the string value
+stored in @member_name of @object</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the string value of the object's member</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_values" c:identifier="json_object_get_values">
+        <doc xml:whitespace="preserve">Retrieves all the values of the members of a #JsonObject.
+#JsonNode&lt;!-- --&gt;s. The content of the list is owned by the #JsonObject
+and should never be modified or freed. When you have finished using the
+returned list, use g_list_free() to free the resources it has allocated.</doc>
+        <return-value transfer-ownership="container">
+          <doc xml:whitespace="preserve">a #GList of</doc>
+          <type name="GLib.List" c:type="GList*">
+            <type name="Node"/>
+          </type>
+        </return-value>
+      </method>
+      <method name="has_member" c:identifier="json_object_has_member">
+        <doc xml:whitespace="preserve">Checks whether @object has a member named @member_name.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the JSON object has the requested member</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of a JSON object member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="ref" c:identifier="json_object_ref">
+        <doc xml:whitespace="preserve">Increase by one the reference count of a #JsonObject.
+increased by one.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the passed #JsonObject, with the reference count</doc>
+          <type name="Object" c:type="JsonObject*"/>
+        </return-value>
+      </method>
+      <method name="remove_member" c:identifier="json_object_remove_member">
+        <doc xml:whitespace="preserve">Removes @member_name from @object, freeing its allocated resources.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member to remove</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_array_member"
+              c:identifier="json_object_set_array_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function for setting an array @value of
+The @object will take ownership of the passed #JsonArray</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="full">
+            <doc xml:whitespace="preserve">the value of the member</doc>
+            <type name="Array" c:type="JsonArray*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_boolean_member"
+              c:identifier="json_object_set_boolean_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function for setting a boolean @value of</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the member</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_double_member"
+              c:identifier="json_object_set_double_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function for setting a floating point @value
+of @member_name inside @object.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the member</doc>
+            <type name="gdouble" c:type="gdouble"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_int_member"
+              c:identifier="json_object_set_int_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function for setting an integer @value of</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the member</doc>
+            <type name="gint64" c:type="gint64"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_member"
+              c:identifier="json_object_set_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Sets @node as the value of @member_name inside @object.
+If @object already contains a member called @member_name then
+the member's current value is overwritten. Otherwise, a new
+member is added to @object.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="node" transfer-ownership="full">
+            <doc xml:whitespace="preserve">the value of the member</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_null_member"
+              c:identifier="json_object_set_null_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function for setting a null @value of</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_object_member"
+              c:identifier="json_object_set_object_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function for setting an object @value of
+The @object will take ownership of the passed #JsonObject</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="full">
+            <doc xml:whitespace="preserve">the value of the member</doc>
+            <type name="Object" c:type="JsonObject*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_string_member"
+              c:identifier="json_object_set_string_member"
+              version="0.8">
+        <doc xml:whitespace="preserve">Convenience function for setting a string @value of</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the member</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="unref" c:identifier="json_object_unref">
+        <doc xml:whitespace="preserve">Decreases by one the reference count of a #JsonObject. If the
+reference count reaches zero, the object is destroyed and all
+its allocated resources are freed.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+    </record>
+    <callback name="ObjectForeach" c:type="JsonObjectForeach" version="0.8">
+      <doc xml:whitespace="preserve">The function to be passed to json_object_foreach_member(). You
+should not add or remove members to and from @object within
+this function. It is safe to change the value of @member_node.</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="object" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the iterated #JsonObject</doc>
+          <type name="Object" c:type="JsonObject*"/>
+        </parameter>
+        <parameter name="member_name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the name of the member</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="member_node" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #JsonNode containing the @member_name value</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" closure="3">
+          <doc xml:whitespace="preserve">data passed to the function</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <class name="Parser"
+           c:symbol-prefix="parser"
+           c:type="JsonParser"
+           parent="GObject.Object"
+           glib:type-name="JsonParser"
+           glib:get-type="json_parser_get_type"
+           glib:type-struct="ParserClass">
+      <doc xml:whitespace="preserve">JSON data streams parser. The contents of the #JsonParser structure are
+private and should only be accessed via the provided API.</doc>
+      <constructor name="new" c:identifier="json_parser_new">
+        <doc xml:whitespace="preserve">Creates a new #JsonParser instance. You can use the #JsonParser to
+load a JSON stream from either a file or a buffer and then walk the
+hierarchy using the data types API.
+to release all the memory it allocates.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #JsonParser. Use g_object_unref()</doc>
+          <type name="Parser" c:type="JsonParser*"/>
+        </return-value>
+      </constructor>
+      <function name="error_quark" c:identifier="json_parser_error_quark">
+        <return-value transfer-ownership="none">
+          <type name="GLib.Quark" c:type="GQuark"/>
+        </return-value>
+      </function>
+      <method name="get_current_line"
+              c:identifier="json_parser_get_current_line">
+        <doc xml:whitespace="preserve">Retrieves the line currently parsed, starting from 1.
+This function has defined behaviour only while parsing; calling this
+function from outside the signal handlers emitted by #JsonParser will
+yield 0.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the currently parsed line, or 0.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_current_pos"
+              c:identifier="json_parser_get_current_pos">
+        <doc xml:whitespace="preserve">Retrieves the current position inside the current line, starting
+from 0.
+This function has defined behaviour only while parsing; calling this
+function from outside the signal handlers emitted by #JsonParser will
+yield 0.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the position in the current line, or 0.</doc>
+          <type name="guint" c:type="guint"/>
+        </return-value>
+      </method>
+      <method name="get_root" c:identifier="json_parser_get_root">
+        <doc xml:whitespace="preserve">Retrieves the top level node from the parsed JSON stream.
+node is owned by the #JsonParser and should never be modified
+or freed.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the root #JsonNode . The returned</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+      </method>
+      <method name="has_assignment"
+              c:identifier="json_parser_has_assignment"
+              version="0.4">
+        <doc xml:whitespace="preserve">A JSON data stream might sometimes contain an assignment, like:
+|[
+]|
+even though it would technically constitute a violation of the RFC.
+#JsonParser will ignore the left hand identifier and parse the right
+hand value of the assignment. #JsonParser will record, though, the
+existence of the assignment in the data stream and the variable name
+used.
+used in the assignment. The string is owned by #JsonParser and should
+never be modified or freed.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if there was an assignment, %FALSE otherwise. If</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="variable_name"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">Return location for the variable name, or %NULL</doc>
+            <type name="utf8" c:type="gchar**"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="load_from_data"
+              c:identifier="json_parser_load_from_data"
+              throws="1">
+        <doc xml:whitespace="preserve">Loads a JSON stream from a buffer and parses it. You can call this function
+multiple times with the same #JsonParser object, but the contents of the
+parser will be destroyed each time.
+of error, @error is set accordingly and %FALSE is returned</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the buffer was succesfully parser. In case</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the buffer to parse</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="length" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the length of the buffer, or -1</doc>
+            <type name="glong" c:type="gssize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="load_from_file"
+              c:identifier="json_parser_load_from_file"
+              throws="1">
+        <doc xml:whitespace="preserve">Loads a JSON stream from the content of @filename and parses it. See
+json_parser_load_from_data().
+In case of error, @error is set accordingly and %FALSE is returned</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the file was successfully loaded and parsed.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="filename" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the path for the file to parse</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="load_from_stream"
+              c:identifier="json_parser_load_from_stream"
+              version="0.12"
+              throws="1">
+        <doc xml:whitespace="preserve">Loads the contents of an input stream and parses them.
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the @cancellable object from another thread. If the
+operation was cancelled, the error %G_IO_ERROR_CANCELLED will be set
+on the passed @error.
+parsed, and %FALSE otherwise</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the data stream was successfully read and</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="stream" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an open #GInputStream</doc>
+            <type name="Gio.InputStream" c:type="GInputStream*"/>
+          </parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">a #GCancellable, or %NULL</doc>
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="load_from_stream_async"
+              c:identifier="json_parser_load_from_stream_async"
+              version="0.12">
+        <doc xml:whitespace="preserve">Asynchronously reads the contents of @stream.
+For more details, see json_parser_load_from_stream() which is the
+synchronous version of this call.
+When the operation is finished, @callback will be called. You should
+then call json_parser_load_from_stream_finish() to get the result
+of the operation.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="stream" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GInputStream</doc>
+            <type name="Gio.InputStream" c:type="GInputStream*"/>
+          </parameter>
+          <parameter name="cancellable"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">a #GCancellable, or %NULL</doc>
+            <type name="Gio.Cancellable" c:type="GCancellable*"/>
+          </parameter>
+          <parameter name="callback"
+                     transfer-ownership="none"
+                     scope="async"
+                     closure="3">
+            <doc xml:whitespace="preserve">a #GAsyncReadyCallback to call when the request is satisfied</doc>
+            <type name="Gio.AsyncReadyCallback" c:type="GAsyncReadyCallback"/>
+          </parameter>
+          <parameter name="user_data" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the data to pass to @callback</doc>
+            <type name="gpointer" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="load_from_stream_finish"
+              c:identifier="json_parser_load_from_stream_finish"
+              version="0.12"
+              throws="1">
+        <doc xml:whitespace="preserve">Finishes an asynchronous stream loading started with
+json_parser_load_from_stream_async().
+and parsed, and %FALSE otherwise. In case of error, the #GError will be
+filled accordingly.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the content of the stream was successfully retrieves</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="result" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GAsyncResult</doc>
+            <type name="Gio.AsyncResult" c:type="GAsyncResult*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="ParserPrivate" c:type="JsonParserPrivate*"/>
+      </field>
+      <glib:signal name="array-element">
+        <doc xml:whitespace="preserve">The ::array-element signal is emitted each time the #JsonParser
+has successfully parsed a single element of a #JsonArray. The
+array and element index are passed to the signal handlers.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #JsonArray</doc>
+            <type name="Array"/>
+          </parameter>
+          <parameter name="p0" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the newly parsed element</doc>
+            <type name="gint"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="array-end">
+        <doc xml:whitespace="preserve">The ::array-end signal is emitted each time the #JsonParser
+has successfully parsed an entire #JsonArray</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the parsed #JsonArray</doc>
+            <type name="Array"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="array-start">
+        <doc xml:whitespace="preserve">The ::array-start signal is emitted each time the #JsonParser
+starts parsing a #JsonArray</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="error">
+        <doc xml:whitespace="preserve">The ::error signal is emitted each time a #JsonParser encounters
+an error in a JSON stream.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a pointer to the #GError</doc>
+            <type name="gpointer"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="object-end">
+        <doc xml:whitespace="preserve">The ::object-end signal is emitted each time the #JsonParser
+has successfully parsed an entire #JsonObject.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the parsed #JsonObject</doc>
+            <type name="Object"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="object-member">
+        <doc xml:whitespace="preserve">The ::object-member signal is emitted each time the #JsonParser
+has successfully parsed a single member of a #JsonObject. The
+object and member are passed to the signal handlers.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+        <parameters>
+          <parameter name="object" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #JsonObject</doc>
+            <type name="Object"/>
+          </parameter>
+          <parameter name="p0" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the newly parsed member</doc>
+            <type name="utf8"/>
+          </parameter>
+        </parameters>
+      </glib:signal>
+      <glib:signal name="object-start">
+        <doc xml:whitespace="preserve">The ::object-start signal is emitted each time the #JsonParser
+starts parsing a #JsonObject.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="parse-end">
+        <doc xml:whitespace="preserve">The ::parse-end signal is emitted when the parser successfully
+finished parsing a JSON data stream</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+      <glib:signal name="parse-start">
+        <doc xml:whitespace="preserve">The ::parse-start signal is emitted when the parser began parsing
+a JSON data stream.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none"/>
+        </return-value>
+      </glib:signal>
+    </class>
+    <record name="ParserClass"
+            c:type="JsonParserClass"
+            glib:is-gtype-struct-for="Parser">
+      <doc xml:whitespace="preserve">#JsonParser class.</doc>
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="parse_start">
+        <callback name="parse_start">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="parser" transfer-ownership="none">
+              <type name="Parser" c:type="JsonParser*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="object_start">
+        <callback name="object_start">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="parser" transfer-ownership="none">
+              <type name="Parser" c:type="JsonParser*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="object_member">
+        <callback name="object_member">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="parser" transfer-ownership="none">
+              <type name="Parser" c:type="JsonParser*"/>
+            </parameter>
+            <parameter name="object" transfer-ownership="none">
+              <type name="Object" c:type="JsonObject*"/>
+            </parameter>
+            <parameter name="member_name" transfer-ownership="none">
+              <type name="utf8" c:type="gchar*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="object_end">
+        <callback name="object_end">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="parser" transfer-ownership="none">
+              <type name="Parser" c:type="JsonParser*"/>
+            </parameter>
+            <parameter name="object" transfer-ownership="none">
+              <type name="Object" c:type="JsonObject*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="array_start">
+        <callback name="array_start">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="parser" transfer-ownership="none">
+              <type name="Parser" c:type="JsonParser*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="array_element">
+        <callback name="array_element">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="parser" transfer-ownership="none">
+              <type name="Parser" c:type="JsonParser*"/>
+            </parameter>
+            <parameter name="array" transfer-ownership="none">
+              <type name="Array" c:type="JsonArray*"/>
+            </parameter>
+            <parameter name="index_" transfer-ownership="none">
+              <type name="gint" c:type="gint"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="array_end">
+        <callback name="array_end">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="parser" transfer-ownership="none">
+              <type name="Parser" c:type="JsonParser*"/>
+            </parameter>
+            <parameter name="array" transfer-ownership="none">
+              <type name="Array" c:type="JsonArray*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="parse_end">
+        <callback name="parse_end">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="parser" transfer-ownership="none">
+              <type name="Parser" c:type="JsonParser*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="error">
+        <callback name="error">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="parser" transfer-ownership="none">
+              <type name="Parser" c:type="JsonParser*"/>
+            </parameter>
+            <parameter name="error" transfer-ownership="none">
+              <type name="GLib.Error" c:type="GError*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="_json_reserved1" introspectable="0">
+        <callback name="_json_reserved1">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved2" introspectable="0">
+        <callback name="_json_reserved2">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved3" introspectable="0">
+        <callback name="_json_reserved3">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved4" introspectable="0">
+        <callback name="_json_reserved4">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved5" introspectable="0">
+        <callback name="_json_reserved5">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved6" introspectable="0">
+        <callback name="_json_reserved6">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved7" introspectable="0">
+        <callback name="_json_reserved7">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_reserved8" introspectable="0">
+        <callback name="_json_reserved8">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+    </record>
+    <enumeration name="ParserError" c:type="JsonParserError">
+      <doc xml:whitespace="preserve">Error enumeration for #JsonParser
+This enumeration can be extended at later date</doc>
+      <member name="parse" value="0" c:identifier="JSON_PARSER_ERROR_PARSE"/>
+      <member name="trailing_comma"
+              value="1"
+              c:identifier="JSON_PARSER_ERROR_TRAILING_COMMA"/>
+      <member name="missing_comma"
+              value="2"
+              c:identifier="JSON_PARSER_ERROR_MISSING_COMMA"/>
+      <member name="missing_colon"
+              value="3"
+              c:identifier="JSON_PARSER_ERROR_MISSING_COLON"/>
+      <member name="invalid_bareword"
+              value="4"
+              c:identifier="JSON_PARSER_ERROR_INVALID_BAREWORD"/>
+      <member name="unknown"
+              value="5"
+              c:identifier="JSON_PARSER_ERROR_UNKNOWN"/>
+    </enumeration>
+    <record name="ParserPrivate" c:type="JsonParserPrivate" disguised="1">
+    </record>
+    <class name="Reader"
+           c:symbol-prefix="reader"
+           c:type="JsonReader"
+           version="0.12"
+           parent="GObject.Object"
+           glib:type-name="JsonReader"
+           glib:get-type="json_reader_get_type"
+           glib:type-struct="ReaderClass">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;JsonReader&lt;/structname&gt; structure contains only
+private data and should only be accessed using the provided API</doc>
+      <constructor name="new" c:identifier="json_reader_new" version="0.12">
+        <doc xml:whitespace="preserve">Creates a new #JsonReader. You can use this object to read the contents of
+the JSON tree starting from @node
+release the allocated resources when done</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the newly created #JsonReader. Use g_object_unref() to</doc>
+          <type name="Reader" c:type="JsonReader*"/>
+        </return-value>
+        <parameters>
+          <parameter name="node" transfer-ownership="none" allow-none="1">
+            <doc xml:whitespace="preserve">a #JsonNode, or %NULL</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <function name="error_quark" c:identifier="json_reader_error_quark">
+        <return-value transfer-ownership="none">
+          <type name="GLib.Quark" c:type="GQuark"/>
+        </return-value>
+      </function>
+      <method name="count_elements"
+              c:identifier="json_reader_count_elements"
+              version="0.12">
+        <doc xml:whitespace="preserve">Counts the elements of the current position, if @reader is
+positioned on an array
+the #JsonReader is set in an error state</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of elements, or -1. In case of failure</doc>
+          <type name="gint" c:type="gint"/>
+        </return-value>
+      </method>
+      <method name="count_members"
+              c:identifier="json_reader_count_members"
+              version="0.12">
+        <doc xml:whitespace="preserve">Counts the members of the current position, if @reader is
+positioned on an object
+the #JsonReader is set in an error state</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the number of members, or -1. In case of failure</doc>
+          <type name="gint" c:type="gint"/>
+        </return-value>
+      </method>
+      <method name="end_element"
+              c:identifier="json_reader_end_element"
+              version="0.12">
+        <doc xml:whitespace="preserve">Moves the cursor back to the previous node after being positioned
+inside an array
+This function resets the error state of @reader, if any was set</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="end_member"
+              c:identifier="json_reader_end_member"
+              version="0.12">
+        <doc xml:whitespace="preserve">Moves the cursor back to the previous node after being positioned
+inside an object
+This function resets the error state of @reader, if any was set</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="get_boolean_value"
+              c:identifier="json_reader_get_boolean_value"
+              version="0.12">
+        <doc xml:whitespace="preserve">Retrieves the boolean value of the current position of @reader</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the boolean value</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="get_double_value"
+              c:identifier="json_reader_get_double_value"
+              version="0.12">
+        <doc xml:whitespace="preserve">Retrieves the floating point value of the current position of @reader</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the floating point value</doc>
+          <type name="gdouble" c:type="gdouble"/>
+        </return-value>
+      </method>
+      <method name="get_error"
+              c:identifier="json_reader_get_error"
+              version="0.12">
+        <doc xml:whitespace="preserve">Retrieves the #GError currently set on @reader, if the #JsonReader
+is in error state</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the pointer to the error, or %NULL</doc>
+          <type name="GLib.Error" c:type="GError*"/>
+        </return-value>
+      </method>
+      <method name="get_int_value"
+              c:identifier="json_reader_get_int_value"
+              version="0.12">
+        <doc xml:whitespace="preserve">Retrieves the integer value of the current position of @reader</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the integer value</doc>
+          <type name="gint64" c:type="gint64"/>
+        </return-value>
+      </method>
+      <method name="get_null_value"
+              c:identifier="json_reader_get_null_value"
+              version="0.12">
+        <doc xml:whitespace="preserve">Checks whether the value of the current position of @reader is 'null'</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if 'null' is set, and %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="get_string_value"
+              c:identifier="json_reader_get_string_value"
+              version="0.12">
+        <doc xml:whitespace="preserve">Retrieves the string value of the current position of @reader</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the string value</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+      </method>
+      <method name="get_value"
+              c:identifier="json_reader_get_value"
+              version="0.12">
+        <doc xml:whitespace="preserve">Retrieves the #JsonNode of the current position of @reader
+is owned by the #JsonReader and it should not be modified or freed
+directly</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #JsonNode, or %NULL. The returned node</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+      </method>
+      <method name="is_array"
+              c:identifier="json_reader_is_array"
+              version="0.12">
+        <doc xml:whitespace="preserve">Checks whether the @reader is currently on an array
+otherwise</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the #JsonReader is on an array, and %FALSE</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="is_object"
+              c:identifier="json_reader_is_object"
+              version="0.12">
+        <doc xml:whitespace="preserve">Checks whether the @reader is currently on an object
+otherwise</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the #JsonReader is on an object, and %FALSE</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="is_value"
+              c:identifier="json_reader_is_value"
+              version="0.12">
+        <doc xml:whitespace="preserve">Checks whether the @reader is currently on a value
+otherwise</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the #JsonReader is on a value, and %FALSE</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="read_element"
+              c:identifier="json_reader_read_element"
+              version="0.12">
+        <doc xml:whitespace="preserve">Advances the cursor of @reader to the element @index_ of array at the
+current position.
+You can use the json_reader_get_value* family of functions to retrieve
+the value of the element; for instance:
+|[
+json_reader_read_element (reader, 0);
+int_value = json_reader_get_int_value (reader);
+]|
+After reading the value, json_reader_end_element() should be called to
+reposition the cursor inside the #JsonReader, e.g.:
+|[
+json_reader_read_element (reader, 1);
+str_value = json_reader_get_string_value (reader);
+json_reader_end_element (reader);
+json_reader_read_element (reader, 2);
+str_value = json_reader_get_string_value (reader);
+json_reader_end_element (reader);
+]|
+If @reader is not currently on an array, or if the @index_ is bigger than
+the size of the array, the #JsonReader will be put in an error state until
+json_reader_end_element() is called.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE on success, and %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="index_" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the index of the element</doc>
+            <type name="guint" c:type="guint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="read_member"
+              c:identifier="json_reader_read_member"
+              version="0.12">
+        <doc xml:whitespace="preserve">Advances the cursor of @reader to the @member_name of the object at the
+current position.
+You can use the json_reader_get_value* family of functions to retrieve
+the value of the member; for instance:
+|[
+json_reader_read_member (reader, "width");
+width = json_reader_get_int_value (reader);
+]|
+After reading the value, json_reader_end_member() should be called to
+reposition the cursor inside the #JsonReader, e.g.:
+|[
+json_reader_read_member (reader, "author");
+author = json_reader_get_string_value (reader);
+json_reader_end_element (reader);
+json_reader_read_element (reader, "title");
+title = json_reader_get_string_value (reader);
+json_reader_end_element (reader);
+]|
+If @reader is not currently on an object, or if the @member_name is not
+defined in the object, the #JsonReader will be put in an error state until
+json_reader_end_member() is called.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE on success, and %FALSE otherwise</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="member_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the member to read</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_root"
+              c:identifier="json_reader_set_root"
+              version="0.12">
+        <doc xml:whitespace="preserve">Sets the root #JsonNode to be read by @reader. The @reader will take
+a copy of @root
+If another #JsonNode is currently set as root, it will be replaced.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="root" transfer-ownership="none" allow-none="1">
+            <doc xml:whitespace="preserve">a #JsonNode</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="root"
+                version="0.12"
+                writable="1"
+                construct="1"
+                transfer-ownership="none">
+        <doc xml:whitespace="preserve">The root of the JSON tree that the #JsonReader should read.</doc>
+        <type name="Node"/>
+      </property>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="priv">
+        <type name="ReaderPrivate" c:type="JsonReaderPrivate*"/>
+      </field>
+    </class>
+    <record name="ReaderClass"
+            c:type="JsonReaderClass"
+            glib:is-gtype-struct-for="Reader"
+            version="0.12">
+      <doc xml:whitespace="preserve">The &lt;structname&gt;JsonReaderClass&lt;/structname&gt; structure contains only
+private data</doc>
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+      <field name="_json_padding0" introspectable="0">
+        <callback name="_json_padding0">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_padding1" introspectable="0">
+        <callback name="_json_padding1">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_padding2" introspectable="0">
+        <callback name="_json_padding2">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_padding3" introspectable="0">
+        <callback name="_json_padding3">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+      <field name="_json_padding4" introspectable="0">
+        <callback name="_json_padding4">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+        </callback>
+      </field>
+    </record>
+    <enumeration name="ReaderError" version="0.12" c:type="JsonReaderError">
+      <doc xml:whitespace="preserve">Error codes enumeration for #JsonReader errors</doc>
+      <member name="no_array"
+              value="0"
+              c:identifier="JSON_READER_ERROR_NO_ARRAY"/>
+      <member name="invalid_index"
+              value="1"
+              c:identifier="JSON_READER_ERROR_INVALID_INDEX"/>
+      <member name="no_object"
+              value="2"
+              c:identifier="JSON_READER_ERROR_NO_OBJECT"/>
+      <member name="invalid_member"
+              value="3"
+              c:identifier="JSON_READER_ERROR_INVALID_MEMBER"/>
+    </enumeration>
+    <record name="ReaderPrivate" c:type="JsonReaderPrivate" disguised="1">
+    </record>
+    <interface name="Serializable"
+               c:symbol-prefix="serializable"
+               c:type="JsonSerializable"
+               glib:type-name="JsonSerializable"
+               glib:get-type="json_serializable_get_type"
+               glib:type-struct="SerializableIface">
+      <virtual-method name="deserialize_property"
+                      invoker="deserialize_property">
+        <doc xml:whitespace="preserve">Asks a #JsonSerializable implementation to deserialize the
+property contained inside @property_node into @value.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the property was successfully deserialized.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">a pointer to an uninitialized #GValue</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+          <parameter name="pspec" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GParamSpec</doc>
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+          <parameter name="property_node" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #JsonNode containing the serialized property</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <virtual-method name="serialize_property" invoker="serialize_property">
+        <doc xml:whitespace="preserve">Asks a #JsonSerializable implementation to serialize a #GObject
+property into a #JsonNode object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a #JsonNode containing the serialized property</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the property</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+          <parameter name="pspec" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GParamSpec</doc>
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="default_deserialize_property"
+              c:identifier="json_serializable_default_deserialize_property"
+              version="0.10">
+        <doc xml:whitespace="preserve">Calls the default implementation of the #JsonSerializable
+deserialize_property() virtual function
+This function can be used inside a custom implementation
+of the deserialize_property() virtual function in lieu of:
+|[
+JsonSerializable *iface;
+gboolean res;
+iface = g_type_default_interface_peek (JSON_TYPE_SERIALIZABLE);
+res = iface-&gt;deserialize_property (serializable, property_name,
+value,
+pspec,
+property_node);
+]|</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the property was successfully deserialized.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a pointer to an uninitialized #GValue</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+          <parameter name="pspec" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GParamSpec</doc>
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+          <parameter name="property_node" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #JsonNode containing the serialized property</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="default_serialize_property"
+              c:identifier="json_serializable_default_serialize_property"
+              version="0.10">
+        <doc xml:whitespace="preserve">Calls the default implementation of the #JsonSerializable
+serialize_property() virtual function
+This function can be used inside a custom implementation
+of the serialize_property() virtual function in lieu of:
+|[
+JsonSerializable *iface;
+JsonNode *node;
+iface = g_type_default_interface_peek (JSON_TYPE_SERIALIZABLE);
+node = iface-&gt;serialize_property (serializable, property_name,
+value,
+pspec);
+]|
+property</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a #JsonNode containing the serialized</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the property</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+          <parameter name="pspec" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GParamSpec</doc>
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="deserialize_property"
+              c:identifier="json_serializable_deserialize_property">
+        <doc xml:whitespace="preserve">Asks a #JsonSerializable implementation to deserialize the
+property contained inside @property_node into @value.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">%TRUE if the property was successfully deserialized.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value"
+                     direction="out"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <doc xml:whitespace="preserve">a pointer to an uninitialized #GValue</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+          <parameter name="pspec" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GParamSpec</doc>
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+          <parameter name="property_node" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #JsonNode containing the serialized property</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="serialize_property"
+              c:identifier="json_serializable_serialize_property">
+        <doc xml:whitespace="preserve">Asks a #JsonSerializable implementation to serialize a #GObject
+property into a #JsonNode object.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a #JsonNode containing the serialized property</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </return-value>
+        <parameters>
+          <parameter name="property_name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the name of the property</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="value" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the value of the property</doc>
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+          <parameter name="pspec" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GParamSpec</doc>
+            <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </interface>
+    <record name="SerializableIface"
+            c:type="JsonSerializableIface"
+            glib:is-gtype-struct-for="Serializable">
+      <doc xml:whitespace="preserve">Interface that allows serializing and deserializing #GObject&lt;!-- --&gt;s
+with properties storing complex data types. The json_serialize_gobject()
+function will check if the passed #GObject implements this interface,
+so it can also be used to override the default property serialization
+sequence.</doc>
+      <field name="g_iface">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="serialize_property">
+        <callback name="serialize_property">
+          <return-value transfer-ownership="full">
+            <doc xml:whitespace="preserve">a #JsonNode containing the serialized property</doc>
+            <type name="Node" c:type="JsonNode*"/>
+          </return-value>
+          <parameters>
+            <parameter name="serializable" transfer-ownership="none">
+              <type name="Serializable" c:type="JsonSerializable*"/>
+            </parameter>
+            <parameter name="property_name" transfer-ownership="none">
+              <doc xml:whitespace="preserve">the name of the property</doc>
+              <type name="utf8" c:type="gchar*"/>
+            </parameter>
+            <parameter name="value" transfer-ownership="none">
+              <doc xml:whitespace="preserve">the value of the property</doc>
+              <type name="GObject.Value" c:type="GValue*"/>
+            </parameter>
+            <parameter name="pspec" transfer-ownership="none">
+              <doc xml:whitespace="preserve">a #GParamSpec</doc>
+              <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="deserialize_property">
+        <callback name="deserialize_property">
+          <return-value transfer-ownership="none">
+            <doc xml:whitespace="preserve">%TRUE if the property was successfully deserialized.</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="serializable" transfer-ownership="none">
+              <type name="Serializable" c:type="JsonSerializable*"/>
+            </parameter>
+            <parameter name="property_name" transfer-ownership="none">
+              <doc xml:whitespace="preserve">the name of the property</doc>
+              <type name="utf8" c:type="gchar*"/>
+            </parameter>
+            <parameter name="value"
+                       direction="out"
+                       caller-allocates="1"
+                       transfer-ownership="none">
+              <doc xml:whitespace="preserve">a pointer to an uninitialized #GValue</doc>
+              <type name="GObject.Value" c:type="GValue*"/>
+            </parameter>
+            <parameter name="pspec" transfer-ownership="none">
+              <doc xml:whitespace="preserve">a #GParamSpec</doc>
+              <type name="GObject.ParamSpec" c:type="GParamSpec*"/>
+            </parameter>
+            <parameter name="property_node" transfer-ownership="none">
+              <doc xml:whitespace="preserve">a #JsonNode containing the serialized property</doc>
+              <type name="Node" c:type="JsonNode*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+    </record>
+    <function name="boxed_can_deserialize"
+              c:identifier="json_boxed_can_deserialize"
+              version="0.10">
+      <doc xml:whitespace="preserve">Checks whether it is possible to deserialize a #GBoxed of
+type @gboxed_type from a #JsonNode of type @node_type</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the type can be deserialized, %FALSE otherwise</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="gboxed_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a boxed type</doc>
+          <type name="GType" c:type="GType"/>
+        </parameter>
+        <parameter name="node_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #JsonNode type</doc>
+          <type name="NodeType" c:type="JsonNodeType"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="boxed_can_serialize"
+              c:identifier="json_boxed_can_serialize"
+              version="0.10">
+      <doc xml:whitespace="preserve">Checks whether it is possible to serialize a #GBoxed of
+type @gboxed_type into a #JsonNode. The type of the
+#JsonNode is placed inside @node_type if the function
+returns %TRUE and it's undefined otherwise.
+and %FALSE otherwise.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the type can be serialized,</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="gboxed_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a boxed type</doc>
+          <type name="GType" c:type="GType"/>
+        </parameter>
+        <parameter name="node_type"
+                   direction="out"
+                   caller-allocates="1"
+                   transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #JsonNode type to which the boxed type can be serialized into</doc>
+          <type name="NodeType" c:type="JsonNodeType*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="boxed_deserialize"
+              c:identifier="json_boxed_deserialize"
+              version="0.10">
+      <doc xml:whitespace="preserve">Deserializes @node into a #GBoxed of @gboxed_type
+g_boxed_free() to release the resources allocated by this
+function</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">the newly allocated #GBoxed. Use</doc>
+        <type name="gpointer" c:type="gpointer"/>
+      </return-value>
+      <parameters>
+        <parameter name="gboxed_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a boxed type</doc>
+          <type name="GType" c:type="GType"/>
+        </parameter>
+        <parameter name="node" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #JsonNode</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="boxed_register_deserialize_func"
+              c:identifier="json_boxed_register_deserialize_func"
+              version="0.10"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Registers a deserialization function for a #GBoxed of type @gboxed_type
+from a #JsonNode of type @node_type</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="gboxed_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a boxed type</doc>
+          <type name="GType" c:type="GType"/>
+        </parameter>
+        <parameter name="node_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a node type</doc>
+          <type name="NodeType" c:type="JsonNodeType"/>
+        </parameter>
+        <parameter name="deserialize_func" transfer-ownership="none">
+          <doc xml:whitespace="preserve">deserialization function for @boxed_type from a #JsonNode of type @node_type</doc>
+          <type name="BoxedDeserializeFunc" c:type="JsonBoxedDeserializeFunc"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="boxed_register_serialize_func"
+              c:identifier="json_boxed_register_serialize_func"
+              version="0.10"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Registers a serialization function for a #GBoxed of type @gboxed_type
+to a #JsonNode of type @node_type</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="gboxed_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a boxed type</doc>
+          <type name="GType" c:type="GType"/>
+        </parameter>
+        <parameter name="node_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a node type</doc>
+          <type name="NodeType" c:type="JsonNodeType"/>
+        </parameter>
+        <parameter name="serialize_func" transfer-ownership="none">
+          <doc xml:whitespace="preserve">serialization function for @boxed_type into a #JsonNode of type @node_type</doc>
+          <type name="BoxedSerializeFunc" c:type="JsonBoxedSerializeFunc"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="boxed_serialize"
+              c:identifier="json_boxed_serialize"
+              version="0.10">
+      <doc xml:whitespace="preserve">Serializes @boxed, a pointer to a #GBoxed of type @gboxed_type,
+into a #JsonNode
+boxed type, or %NULL if serialization either failed or was not possible</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a #JsonNode with the serialization of the</doc>
+        <type name="Node" c:type="JsonNode*"/>
+      </return-value>
+      <parameters>
+        <parameter name="gboxed_type" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a boxed type</doc>
+          <type name="GType" c:type="GType"/>
+        </parameter>
+        <parameter name="boxed" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to a #GBoxed of type @gboxed_type</doc>
+          <type name="gpointer" c:type="gconstpointer"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="construct_gobject"
+              c:identifier="json_construct_gobject"
+              version="0.4"
+              deprecated="Use json_gobject_from_data() instead"
+              deprecated-version="0.10"
+              throws="1">
+      <doc xml:whitespace="preserve">Deserializes a JSON data stream and creates the corresponding
+#GObject class. If @gtype implements the #JsonSerializableIface
+interface, it will be asked to deserialize all the JSON members
+into the respective properties; otherwise, the default implementation
+will be used to translate the compatible JSON native types.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a #GObject or %NULL</doc>
+        <type name="GObject.Object" c:type="GObject*"/>
+      </return-value>
+      <parameters>
+        <parameter name="gtype" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GType of object to construct</doc>
+          <type name="GType" c:type="GType"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a JSON data stream</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="length" transfer-ownership="none">
+          <doc xml:whitespace="preserve">length of the data stream</doc>
+          <type name="gulong" c:type="gsize"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="gobject_deserialize"
+              c:identifier="json_gobject_deserialize"
+              version="0.10">
+      <doc xml:whitespace="preserve">Creates a new #GObject of type @gtype, and constructs it
+using the members of the passed #JsonObject
+instance. Use g_object_unref() to free the resources
+allocated by this function</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">The newly created #GObject</doc>
+        <type name="GObject.Object" c:type="GObject*"/>
+      </return-value>
+      <parameters>
+        <parameter name="gtype" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the type of the #GObject to create</doc>
+          <type name="GType" c:type="GType"/>
+        </parameter>
+        <parameter name="node" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #JsonNode of type %JSON_NODE_OBJECT describing the instance of type @gtype</doc>
+          <type name="Node" c:type="JsonNode*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="gobject_from_data"
+              c:identifier="json_gobject_from_data"
+              version="0.10"
+              throws="1">
+      <doc xml:whitespace="preserve">Deserializes a JSON data stream and creates the corresponding
+#GObject class. If @gtype implements the #JsonSerializableIface
+interface, it will be asked to deserialize all the JSON members
+into the respective properties; otherwise, the default implementation
+will be used to translate the compatible JSON native types.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a #GObject or %NULL</doc>
+        <type name="GObject.Object" c:type="GObject*"/>
+      </return-value>
+      <parameters>
+        <parameter name="gtype" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GType of object to construct</doc>
+          <type name="GType" c:type="GType"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a JSON data stream</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </parameter>
+        <parameter name="length" transfer-ownership="none">
+          <doc xml:whitespace="preserve">length of the data stream, or -1 if it is NUL-terminated</doc>
+          <type name="glong" c:type="gssize"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="gobject_serialize"
+              c:identifier="json_gobject_serialize"
+              version="0.10">
+      <doc xml:whitespace="preserve">Creates a #JsonNode representing the passed #GObject
+instance. Each member of the returned JSON object will
+map to a property of the #GObject
+of type %JSON_NODE_OBJECT. Use json_node_free() to free
+the resources allocated by this function</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">the newly created #JsonNode</doc>
+        <type name="Node" c:type="JsonNode*"/>
+      </return-value>
+      <parameters>
+        <parameter name="gobject" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GObject</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="gobject_to_data"
+              c:identifier="json_gobject_to_data"
+              version="0.10">
+      <doc xml:whitespace="preserve">Serializes a #GObject into a JSON data stream, iterating recursively
+over each property.
+If @gobject implements the #JsonSerializableIface interface, it will
+be asked to serialize all its properties; otherwise, the default
+implementation will be use to translate the compatible types into
+JSON native types.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a JSON data stream representing the passed #GObject</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="gobject" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GObject</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter name="length"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">return value for the length of the buffer, or %NULL</doc>
+          <type name="gulong" c:type="gsize*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="serialize_gobject"
+              c:identifier="json_serialize_gobject"
+              deprecated="Use json_gobject_to_data() instead"
+              deprecated-version="0.10">
+      <doc xml:whitespace="preserve">Serializes a #GObject into a JSON data stream. If @gobject implements
+the #JsonSerializableIface interface, it will be asked to serizalize all
+its properties; otherwise, the default implementation will be use to
+translate the compatible types into JSON native types.</doc>
+      <return-value transfer-ownership="full">
+        <doc xml:whitespace="preserve">a JSON data stream representing the passed #GObject</doc>
+        <type name="utf8" c:type="gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="gobject" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a #GObject</doc>
+          <type name="GObject.Object" c:type="GObject*"/>
+        </parameter>
+        <parameter name="length"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">return value for the length of the buffer, or %NULL</doc>
+          <type name="gulong" c:type="gsize*"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>

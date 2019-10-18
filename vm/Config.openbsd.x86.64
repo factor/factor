@@ -1,2 +1,0 @@
-include vm/Config.openbsd
-include vm/Config.x86.64

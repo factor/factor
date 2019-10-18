@@ -1,12 +1,11 @@
-! Copyright (C) 2005, 2010 Slava Pestov.
+! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs binary-search classes
 classes.struct combinators combinators.smart continuations fry
 generalizations generic grouping io io.styles kernel make math
-math.order math.parser math.statistics memory memory.private
-layouts namespaces parser prettyprint sequences
-sequences.generalizations sorting splitting strings system vm
-words hints hashtables ;
+math.order math.parser math.statistics memory layouts namespaces
+parser prettyprint sequences sequences.generalizations sorting
+splitting strings system vm words hints hashtables ;
 IN: tools.memory
 
 <PRIVATE
@@ -58,9 +57,12 @@ IN: tools.memory
 
 PRIVATE>
 
+: data-room ( -- data-heap-room )
+    (data-room) data-heap-room memory>struct ;
+
 : data-room. ( -- )
     "== Data heap ==" print nl
-    data-room data-heap-room memory>struct {
+    data-room {
         [ nursery-room. nl ]
         [ aging-room. nl ]
         [ tenured-room. nl ]
@@ -70,8 +72,8 @@ PRIVATE>
 <PRIVATE
 
 : heap-stat-step ( obj counts sizes -- )
-    [ [ class ] dip inc-at ]
-    [ [ [ size ] [ class ] bi ] dip at+ ] bi-curry* bi ;
+    [ [ class-of ] dip inc-at ]
+    [ [ [ size ] [ class-of ] bi ] dip at+ ] bi-curry* bi ;
 
 PRIVATE>
 
@@ -245,12 +247,12 @@ M: code-blocks nth-unsafe
 
 INSTANCE: code-blocks immutable-sequence
 
-: code-blocks ( -- blocks )
+: get-code-blocks ( -- blocks )
     (code-blocks) <code-blocks> ;
 
 : with-code-blocks ( quot -- )
     [
-        code-blocks
+        get-code-blocks
         [ \ code-blocks set ]
         [ first entry-point>> code-heap-start set ]
         [ last [ entry-point>> ] [ size>> ] bi + code-heap-end set ] tri
@@ -286,10 +288,13 @@ INSTANCE: code-blocks immutable-sequence
 
 PRIVATE>
 
+: code-room ( -- mark-sweep-sizes )
+    (code-room) mark-sweep-sizes memory>struct ;
+
 : code-room. ( -- )
     "== Code heap ==" print nl
-    code-room mark-sweep-sizes memory>struct mark-sweep-table. nl
-    code-blocks code-block-stats code-block-table. ;
+    code-room mark-sweep-table. nl
+    get-code-blocks code-block-stats code-block-table. ;
 
 : room. ( -- )
     data-room. nl code-room. ;

@@ -25,19 +25,21 @@ M: cache-assoc set-at
     [ <cache-entry> ] 2dip
     assoc>> set-at ;
 
-M: cache-assoc clear-assoc assoc>> clear-assoc ;
+M: cache-assoc clear-assoc
+    [ assoc>> values dispose-each ]
+    [ assoc>> clear-assoc ]
+    bi ;
 
 M: cache-assoc >alist assoc>> [ value>> ] { } assoc-map-as ;
 
 INSTANCE: cache-assoc assoc
 
-M: cache-assoc dispose*
-    [ values dispose-each ] [ clear-assoc ] bi ;
+M: cache-assoc dispose* clear-assoc ;
 
 PRIVATE>
 
 : purge-cache ( cache -- )
     dup max-age>> '[
-        [ nip [ 1 + ] change-age age>> _ >= ] assoc-partition
-        [ values dispose-each ] dip
+        [ nip [ 1 + ] change-age age>> _ < ] assoc-partition
+        values dispose-each
     ] change-assoc drop ;

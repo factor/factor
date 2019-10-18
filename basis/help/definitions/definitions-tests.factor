@@ -16,7 +16,7 @@ IN: help.definitions.tests
     [ t ] [ "hello" articles get key? ] unit-test
     [ t ] [ "hello2" articles get key? ] unit-test
     [ t ] [
-        "hello" "help.definitions.tests" lookup "help" word-prop >boolean
+        "hello" "help.definitions.tests" lookup-word "help" word-prop >boolean
     ] unit-test
 
     [ 2 ] [
@@ -29,12 +29,12 @@ IN: help.definitions.tests
     [ t ] [ "hello" articles get key? ] unit-test
     [ f ] [ "hello2" articles get key? ] unit-test
     [ f ] [
-        "hello" "help.definitions.tests" lookup "help" word-prop
+        "hello" "help.definitions.tests" lookup-word "help" word-prop
     ] unit-test
 
     [ ] [ "IN: help.definitions.tests USING: help.syntax ; : xxx ( -- ) ; HELP: xxx ;" eval( -- ) ] unit-test
 
-    [ ] [ "xxx" "help.definitions.tests" lookup print-topic ] unit-test
+    [ ] [ "xxx" "help.definitions.tests" lookup-word print-topic ] unit-test
 
-    [ ] [ "xxx" "help.definitions.tests" lookup >link synopsis print ] unit-test
+    [ ] [ "xxx" "help.definitions.tests" lookup-word >link synopsis print ] unit-test
 ] with-file-vocabs

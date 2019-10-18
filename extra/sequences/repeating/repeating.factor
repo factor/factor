@@ -1,21 +1,42 @@
 ! Copyright (C) 2008 Alex Chapman
+! Copyright (C) 2012 John Benediktsson
 ! See http;//factorcode.org/license.txt for BSD license
-USING: accessors circular kernel sequences ;
+USING: accessors circular kernel math sequences sequences.private ;
 IN: sequences.repeating
 
-TUPLE: repeating circular len ;
+TUPLE: cycles
+{ circular circular read-only }
+{ length integer read-only } ;
 
-: <repeating> ( seq length -- repeating )
-    [ <circular> ] dip repeating boa ;
+: <cycles> ( seq length -- cycles )
+    [ <circular> ] dip cycles boa ;
 
-: repeated ( seq length -- new-seq )
-    dupd <repeating> swap like ;
+: cycle ( seq length -- new-seq )
+    dupd <cycles> swap like ;
 
-M: repeating length len>> ;
-M: repeating set-length len<< ;
+M: cycles length length>> ;
 
-M: repeating virtual@ ( n seq -- n' seq' ) circular>> ;
+M: cycles set-length length<< ;
 
-M: repeating virtual-exemplar circular>> ;
+M: cycles virtual@ ( n seq -- n' seq' ) circular>> ;
 
-INSTANCE: repeating virtual-sequence
+M: cycles virtual-exemplar circular>> ;
+
+INSTANCE: cycles virtual-sequence
+
+TUPLE: repeats
+{ seq sequence read-only }
+{ length integer read-only } ;
+
+: <repeats> ( seq times -- repeats )
+    over length * repeats boa ;
+
+: repeat ( seq times -- new-seq )
+    dupd <repeats> swap like ;
+
+M: repeats length length>> ;
+
+M: repeats nth-unsafe
+    [ length>> / ] [ seq>> [ length * >integer ] keep nth ] bi ;
+
+INSTANCE: repeats immutable-sequence

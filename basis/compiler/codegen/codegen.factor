@@ -1,10 +1,11 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make math math.order math.parser sequences
-accessors kernel layouts assocs words summary arrays combinators
-classes.algebra sets continuations.private fry cpu.architecture
-classes classes.struct locals slots parser generic.parser
-strings quotations hashtables
+USING: byte-arrays namespaces make math math.order math.parser
+sequences accessors kernel layouts assocs words summary arrays
+combinators sets continuations.private fry
+cpu.architecture classes classes.struct locals slots parser
+generic.parser strings quotations hashtables
+sequences.generalizations
 compiler.constants
 compiler.cfg
 compiler.cfg.linearization
@@ -13,7 +14,9 @@ compiler.cfg.comparisons
 compiler.cfg.stack-frame
 compiler.cfg.registers
 compiler.cfg.builder
-compiler.codegen.fixup
+compiler.codegen.gc-maps
+compiler.codegen.labels
+compiler.codegen.relocation
 compiler.utilities ;
 FROM: namespaces => set ;
 IN: compiler.codegen
@@ -75,11 +78,37 @@ M: ##dispatch generate-insn
     [ lookup-label resolve-label ]
     [
         instructions>> [
-            [ class insn-counts get inc-at ]
+            [ class-of insn-counts get-global inc-at ]
             [ generate-insn ]
             bi
         ] each
     ] tri ;
+
+: init-fixup ( -- )
+    V{ } clone label-table set
+    V{ } clone binary-literal-table set ;
+
+: check-fixup ( seq -- )
+    length data-alignment get mod 0 assert= ;
+
+: with-fixup ( quot -- code )
+    '[
+        init-relocation
+        init-gc-maps
+        init-fixup
+        [
+            @
+            emit-binary-literals
+            emit-gc-maps
+            label-table [ compute-labels ] change
+            parameter-table get >array
+            literal-table get >array
+            relocation-table get >byte-array
+            label-table get
+        ] B{ } make
+        dup check-fixup
+        cfg get [ stack-frame>> [ total-size>> ] [ 0 ] if* ] [ 0 ] if*
+    ] call 6 narray ; inline
 
 : generate ( cfg -- code )
     [
@@ -133,6 +162,7 @@ CODEGEN: ##inc-r %inc-r
 CODEGEN: ##call %call
 CODEGEN: ##jump %jump
 CODEGEN: ##return %return
+CODEGEN: ##safepoint %safepoint
 CODEGEN: ##slot %slot
 CODEGEN: ##slot-imm %slot-imm
 CODEGEN: ##set-slot %set-slot
@@ -195,6 +225,7 @@ CODEGEN: ##unpack-vector-tail %unpack-vector-tail
 CODEGEN: ##integer>float-vector %integer>float-vector
 CODEGEN: ##float>integer-vector %float>integer-vector
 CODEGEN: ##compare-vector %compare-vector
+CODEGEN: ##move-vector-mask %move-vector-mask
 CODEGEN: ##test-vector %test-vector
 CODEGEN: ##add-vector %add-vector
 CODEGEN: ##saturated-add-vector %saturated-add-vector

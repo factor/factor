@@ -131,7 +131,7 @@ ARTICLE: "help-impl" "Help system implementation"
 }
 "Help article implementation:"
 { $subsections
-    article
+    lookup-article
     articles
 }
 "Links:"
@@ -476,9 +476,10 @@ HELP: HELP:
 { $description "Defines documentation for a word." }
 { $examples
     { $code
-        ": foo 2 + ;"
+        "USING: help help.markup help.syntax math ;"
+        ": foo ( m -- n ) 2 + ;"
         "HELP: foo"
-        "{ $values { \"m\" \"an integer\" } { \"n\" \"an integer\" } }"
+        "{ $values { \"m\" integer } { \"n\" integer } }"
         "{ $description \"Increments a value by 2.\" } ;"
         "\\ foo help"
     }
@@ -490,8 +491,10 @@ HELP: ARTICLE:
 { $description "Defines a help article. String topic names are reserved for core documentation. Contributed modules should name articles by arrays, where the first element of an array identifies the module; for example, " { $snippet "{ \"httpd\" \"intro\" }" } "." }
 { $examples
     { $code
+        "USING: help help.syntax ;"
         "ARTICLE: \"example\" \"An example article\""
         "\"Hello world.\" ;"
+        "\"example\" help"
     }
 } ;
 
@@ -502,4 +505,4 @@ HELP: ABOUT:
 
 HELP: vocab-help
 { $values { "vocab-spec" "a vocabulary specifier" } { "help" "a help article" } }
-{ $description "Outputs the main help article for a vocabulary. The main help article can be set with " { $link POSTPONE: ABOUT:  } "." } ;
+{ $description "Outputs the main help article for a vocabulary. The main help article can be set with " { $link POSTPONE: ABOUT: } "." } ;

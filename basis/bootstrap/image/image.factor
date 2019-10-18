@@ -1,24 +1,27 @@
-! Copyright (C) 2004, 2010 Slava Pestov.
+! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.strings arrays byte-arrays generic hashtables
 hashtables.private io io.binary io.files io.encodings.binary
 io.pathnames kernel kernel.private math namespaces make parser
-prettyprint sequences sequences.generalizations strings sbufs
-vectors words quotations assocs system layouts splitting
-grouping growable classes classes.private classes.builtin
-classes.tuple classes.tuple.private vocabs vocabs.loader
-source-files definitions debugger quotations.private combinators
+prettyprint sequences combinators.smart strings sbufs vectors
+words quotations assocs system layouts splitting grouping
+growable classes classes.private classes.builtin classes.tuple
+classes.tuple.private vocabs vocabs.loader source-files
+definitions debugger quotations.private combinators
 combinators.short-circuit math.order math.private accessors
 slots.private generic.single.private compiler.units
-compiler.constants fry locals bootstrap.image.syntax
-generalizations ;
+compiler.constants compiler.codegen.relocation fry locals
+bootstrap.image.syntax parser.notes namespaces.private ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
-    [ "winnt" = "winnt" "unix" ? ] dip "-" glue ;
+    2dup [ windows? ] [ ppc? ] bi* or [
+      [ drop unix ] dip
+    ] unless
+    [ name>> ] [ name>> ] bi* "-" glue ;
 
 : my-arch ( -- arch )
-    os name>> cpu name>> arch ;
+    os cpu arch ;
 
 : boot-image-name ( arch -- string )
     "boot." ".image" surround ;
@@ -28,8 +31,8 @@ IN: bootstrap.image
 
 : images ( -- seq )
     {
-        "winnt-x86.32" "unix-x86.32"
-        "winnt-x86.64" "unix-x86.64"
+        "windows-x86.32" "unix-x86.32"
+        "windows-x86.64" "unix-x86.64"
     } ;
 
 <PRIVATE
@@ -45,7 +48,7 @@ M: eql-wrapper hashcode* obj>> hashcode* ;
 GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 : eql? ( obj1 obj2 -- ? )
-    { [ [ class ] bi@ = ] [ (eql?) ] } 2&& ;
+    { [ [ class-of ] same? ] [ (eql?) ] } 2&& ;
 
 M: fixnum (eql?) eq? ;
 
@@ -53,7 +56,7 @@ M: bignum (eql?) = ;
 
 M: float (eql?) fp-bitwise= ;
 
-M: sequence (eql?) 2dup [ length ] bi@ = [ [ eql? ] 2all? ] [ 2drop f ] if ;
+M: sequence (eql?) 2dup [ length ] same? [ [ eql? ] 2all? ] [ 2drop f ] if ;
 
 M: object (eql?) = ;
 
@@ -84,12 +87,12 @@ SYMBOL: objects
 
 ! Constants
 
-CONSTANT: image-magic HEX: 0f0e0d0c
+CONSTANT: image-magic 0x0f0e0d0c
 CONSTANT: image-version 4
 
 CONSTANT: data-base 1024
 
-CONSTANT: special-objects-size 70
+CONSTANT: special-objects-size 80
 
 CONSTANT: header-size 10
 
@@ -101,62 +104,40 @@ CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
-SYMBOL: jit-relocations
-
-SYMBOL: jit-offset
-
-: compute-offset ( -- offset )
-    building get length jit-offset get + ;
-
-: jit-rel ( rc rt -- )
-    compute-offset 3array jit-relocations get push-all ;
-
-SYMBOL: jit-parameters
-
-: jit-parameter ( parameter -- )
-    jit-parameters get push ;
-
-SYMBOL: jit-literals
-
-: jit-literal ( literal -- )
-    jit-literals get push ;
-
-: jit-vm ( offset rc -- )
-    [ jit-parameter ] dip rt-vm jit-rel ;
-
-: jit-dlsym ( name rc -- )
-    rt-dlsym jit-rel string>symbol jit-parameter f jit-parameter ;
-
 :: jit-conditional ( test-quot false-quot -- )
     [ 0 test-quot call ] B{ } make length :> len
-    building get length jit-offset get + len +
-    [ jit-offset set false-quot call ] B{ } make
+    building get length extra-offset get + len +
+    [ extra-offset set false-quot call ] B{ } make
     [ length test-quot call ] [ % ] bi ; inline
 
-: make-jit ( quot -- jit-parameters jit-literals jit-code )
+: make-jit ( quot -- parameters literals code )
+    #! code is a { relocation insns } pair
     [
-        0 jit-offset set
-        V{ } clone jit-parameters set
-        V{ } clone jit-literals set
-        V{ } clone jit-relocations set
+        0 extra-offset set
+        init-relocation
         call( -- )
-        jit-parameters get >array
-        jit-literals get >array
-        jit-relocations get >array
-    ] B{ } make prefix ;
+        parameter-table get >array
+        literal-table get >array
+        relocation-table get >byte-array
+    ] B{ } make 2array ;
+
+: make-jit-no-params ( quot -- code )
+    make-jit 2nip ;
 
 : jit-define ( quot name -- )
-    [ make-jit 2nip ] dip set ;
+    [ make-jit-no-params ] dip set ;
 
 : define-sub-primitive ( quot word -- )
     [ make-jit 3array ] dip sub-primitives get set-at ;
 
 : define-combinator-primitive ( quot non-tail-quot tail-quot word -- )
     [
-        [ make-jit ]
-        [ make-jit 2nip ]
-        [ make-jit 2nip ]
-        tri* 5 narray
+        [
+            [ make-jit ]
+            [ make-jit-no-params ]
+            [ make-jit-no-params ]
+            tri*
+        ] output>array
     ] dip
     sub-primitives get set-at ;
 
@@ -185,44 +166,49 @@ SPECIAL-OBJECT: jit-word-jump 26
 SPECIAL-OBJECT: jit-word-call 27
 SPECIAL-OBJECT: jit-if-word 28
 SPECIAL-OBJECT: jit-if 29
-SPECIAL-OBJECT: jit-epilog 30
-SPECIAL-OBJECT: jit-return 31
-SPECIAL-OBJECT: jit-profiling 32
-SPECIAL-OBJECT: jit-push 33
-SPECIAL-OBJECT: jit-dip-word 34
-SPECIAL-OBJECT: jit-dip 35
-SPECIAL-OBJECT: jit-2dip-word 36
-SPECIAL-OBJECT: jit-2dip 37
-SPECIAL-OBJECT: jit-3dip-word 38
-SPECIAL-OBJECT: jit-3dip 39
-SPECIAL-OBJECT: jit-execute 40
-SPECIAL-OBJECT: jit-declare-word 41
+SPECIAL-OBJECT: jit-safepoint 30
+SPECIAL-OBJECT: jit-epilog 31
+SPECIAL-OBJECT: jit-return 32
+SPECIAL-OBJECT: jit-profiling 33
+SPECIAL-OBJECT: jit-push 34
+SPECIAL-OBJECT: jit-dip-word 35
+SPECIAL-OBJECT: jit-dip 36
+SPECIAL-OBJECT: jit-2dip-word 37
+SPECIAL-OBJECT: jit-2dip 38
+SPECIAL-OBJECT: jit-3dip-word 39
+SPECIAL-OBJECT: jit-3dip 40
+SPECIAL-OBJECT: jit-execute 41
+SPECIAL-OBJECT: jit-declare-word 42
 
-SPECIAL-OBJECT: c-to-factor-word 42
-SPECIAL-OBJECT: lazy-jit-compile-word 43
-SPECIAL-OBJECT: unwind-native-frames-word 44
-SPECIAL-OBJECT: fpu-state-word 45
-SPECIAL-OBJECT: set-fpu-state-word 46
+SPECIAL-OBJECT: c-to-factor-word 43
+SPECIAL-OBJECT: lazy-jit-compile-word 44
+SPECIAL-OBJECT: unwind-native-frames-word 45
+SPECIAL-OBJECT: fpu-state-word 46
+SPECIAL-OBJECT: set-fpu-state-word 47
+SPECIAL-OBJECT: signal-handler-word 48
+SPECIAL-OBJECT: leaf-signal-handler-word 49
+SPECIAL-OBJECT: ffi-signal-handler-word 50
+SPECIAL-OBJECT: ffi-leaf-signal-handler-word 51
 
-SPECIAL-OBJECT: callback-stub 48
+SPECIAL-OBJECT: callback-stub 53
 
 ! PIC stubs
-SPECIAL-OBJECT: pic-load 49
-SPECIAL-OBJECT: pic-tag 50
-SPECIAL-OBJECT: pic-tuple 51
-SPECIAL-OBJECT: pic-check-tag 52
-SPECIAL-OBJECT: pic-check-tuple 53
-SPECIAL-OBJECT: pic-hit 54
-SPECIAL-OBJECT: pic-miss-word 55
-SPECIAL-OBJECT: pic-miss-tail-word 56
+SPECIAL-OBJECT: pic-load 54
+SPECIAL-OBJECT: pic-tag 55
+SPECIAL-OBJECT: pic-tuple 56
+SPECIAL-OBJECT: pic-check-tag 57
+SPECIAL-OBJECT: pic-check-tuple 58
+SPECIAL-OBJECT: pic-hit 59
+SPECIAL-OBJECT: pic-miss-word 60
+SPECIAL-OBJECT: pic-miss-tail-word 61
 
 ! Megamorphic dispatch
-SPECIAL-OBJECT: mega-lookup 57
-SPECIAL-OBJECT: mega-lookup-word 58
-SPECIAL-OBJECT: mega-miss-word 59
+SPECIAL-OBJECT: mega-lookup 62
+SPECIAL-OBJECT: mega-lookup-word 63
+SPECIAL-OBJECT: mega-miss-word 64
 
 ! Default definition for undefined words
-SPECIAL-OBJECT: undefined-quot 60
+SPECIAL-OBJECT: undefined-quot 65
 
 : special-object-offset ( symbol -- n )
     special-objects get at header-size + ;
@@ -291,14 +277,14 @@ GENERIC: ' ( obj -- ptr )
 
 : bignum-radix ( -- n ) bignum-bits 2^ 1 - ;
 
-: bignum>seq ( n -- seq )
+: bignum>sequence ( n -- seq )
     #! n is positive or zero.
     [ dup 0 > ]
     [ [ bignum-bits neg shift ] [ bignum-radix bitand ] bi ]
     produce nip ;
 
 : emit-bignum ( n -- )
-    dup dup 0 < [ neg ] when bignum>seq
+    dup dup 0 < [ neg ] when bignum>sequence
     [ nip length 1 + emit-fixnum ]
     [ drop 0 < 1 0 ? emit ]
     [ nip emit-seq ]
@@ -349,7 +335,7 @@ M: f ' drop \ f type-number ;
 ! Words
 
 : word-sub-primitive ( word -- obj )
-    global [ target-word ] bind sub-primitives get at ;
+    [ target-word ] with-global sub-primitives get at ;
 
 : emit-word ( word -- )
     [
@@ -364,11 +350,8 @@ M: f ' drop \ f type-number ;
                     [ props>> , ]
                     [ pic-def>> , ]
                     [ pic-tail-def>> , ]
-                    [ drop 0 , ] ! count
                     [ word-sub-primitive , ]
-                    [ drop 0 , ] ! xt
-                    [ drop 0 , ] ! code
-                    [ drop 0 , ] ! profiling
+                    [ drop 0 , ] ! entry point
                 } cleave
             ] { } make [ ' ] map
         ] bi
@@ -459,11 +442,11 @@ ERROR: tuple-removed class ;
 
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
-    [ class transfer-word require-tuple-layout ] bi prefix [ ' ] map
+    [ class-of transfer-word require-tuple-layout ] bi prefix [ ' ] map
     tuple [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
-    dup class name>> "tombstone" =
+    dup class-of name>> "tombstone" =
     [ [ (emit-tuple) ] cache-eql-object ]
     [ [ (emit-tuple) ] cache-eq-object ]
     if ;
@@ -472,7 +455,7 @@ M: tuple ' emit-tuple ;
 
 M: tombstone '
     state>> "((tombstone))" "((empty))" ?
-    "hashtables.private" lookup def>> first
+    "hashtables.private" lookup-word def>> first
     [ emit-tuple ] cache-eql-object ;
 
 ! Arrays
@@ -507,8 +490,7 @@ M: quotation '
             emit ! array
             f ' emit ! cached-effect
             f ' emit ! cache-counter
-            0 emit ! xt
-            0 emit ! code
+            0 emit ! entry point
         ] emit-object
     ] cache-eql-object ;
 
@@ -521,11 +503,12 @@ M: quotation '
     {
         dictionary source-files builtins
         update-map implementors-map
-    } [ [ bootstrap-word ] [ get ] bi ] H{ } map>assoc
+    } [ [ bootstrap-word ] [ get global-box boa ] bi ] H{ } map>assoc
     {
         class<=-cache class-not-cache classes-intersect-cache
         class-and-cache class-or-cache next-method-quot-cache
-    } [ H{ } clone ] H{ } map>assoc assoc-union
+    } [ H{ } clone global-box boa ] H{ } map>assoc assoc-union
+    global-hashtable boa
     bootstrap-global set ;
 
 : emit-jit-data ( -- )
@@ -544,6 +527,10 @@ M: quotation '
     \ unwind-native-frames unwind-native-frames-word set
     \ fpu-state fpu-state-word set
     \ set-fpu-state set-fpu-state-word set
+    \ signal-handler signal-handler-word set
+    \ leaf-signal-handler leaf-signal-handler-word set
+    \ ffi-signal-handler ffi-signal-handler-word set
+    \ ffi-leaf-signal-handler ffi-leaf-signal-handler-word set
     undefined-def undefined-quot set ;
 
 : emit-special-objects ( -- )
@@ -598,12 +585,14 @@ M: quotation '
 PRIVATE>
 
 : make-image ( arch -- )
-    [
-        architecture set
+    architecture associate H{
+        { parser-quiet? f }
+        { auto-use? f }
+    } assoc-union! [
         "resource:/core/bootstrap/stage1.factor" run-file
         build-image
         write-image
-    ] with-scope ;
+    ] with-variables ;
 
 : make-images ( -- )
     images [ make-image ] each ;

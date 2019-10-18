@@ -3,16 +3,16 @@ IN: base64
 
 HELP: >base64
 { $values { "seq" sequence } { "base64" "a string of base64 characters" } }
-{ $description "Converts a sequence to its base64 representation by taking six bits at a time as an index into a lookup table containing alphanumerics, '+', and '/'.  The result is padded with '=' if the input was not a multiple of six bits." }
+{ $description "Converts a sequence to its base64 representation by taking six bits at a time as an index into a lookup table containing alphanumerics, '+', and '/'. The result is padded with '=' if the input was not a multiple of six bits." }
 { $examples
     { $example "USING: prettyprint base64 strings ;" "\"The monorail is a free service.\" >base64 >string ." "\"VGhlIG1vbm9yYWlsIGlzIGEgZnJlZSBzZXJ2aWNlLg==\"" }
 }
-{ $see-also base64> >base64-lines } ;
+{ $see-also >base64-lines base64> } ;
 
 HELP: >base64-lines
 { $values { "seq" sequence } { "base64" "a string of base64 characters" } }
-{ $description "Converts a sequence to its base64 representation by taking six bits at a time as an index into a lookup table containing alphanumerics, '+', and '/'.  The result is padded with '=' if the input was not a multiple of six bits. A crlf is inserted for every 76 characters of output." }
-{ $see-also base64> >base64-lines } ;
+{ $description "Converts a sequence to its base64 representation by taking six bits at a time as an index into a lookup table containing alphanumerics, '+', and '/'. The result is padded with '=' if the input was not a multiple of six bits. A crlf is inserted for every 76 characters of output." }
+{ $see-also >base64 base64> } ;
 
 
 HELP: base64>

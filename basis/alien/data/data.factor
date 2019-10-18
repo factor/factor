@@ -1,21 +1,46 @@
 ! (c)2009, 2010 Slava Pestov, Joe Groff bsd license
-USING: accessors alien alien.c-types alien.arrays alien.strings
-arrays byte-arrays cpu.architecture fry io io.encodings.binary
-io.files io.streams.memory kernel libc math math.functions 
-sequences words macros combinators generalizations
-stack-checker.dependencies combinators.short-circuit ;
+USING: accessors alien alien.arrays alien.c-types alien.strings
+arrays byte-arrays combinators combinators.short-circuit
+cpu.architecture fry generalizations io io.streams.memory kernel
+libc locals macros math math.functions parser sequences
+stack-checker.dependencies summary words ;
 QUALIFIED: math
 IN: alien.data
 
-GENERIC: require-c-array ( c-type -- )
+: <ref> ( value c-type -- c-ptr )
+    [ heap-size <byte-array> ] keep
+    '[ 0 _ set-alien-value ] keep ; inline
 
-M: array require-c-array first require-c-array ;
+: deref ( c-ptr c-type -- value )
+    [ 0 ] dip alien-value ; inline
+
+: little-endian? ( -- ? ) 1 int <ref> char deref 1 = ; foldable
 
 GENERIC: c-array-constructor ( c-type -- word ) foldable
 
 GENERIC: c-(array)-constructor ( c-type -- word ) foldable
 
 GENERIC: c-direct-array-constructor ( c-type -- word ) foldable
+
+GENERIC: c-array-type ( c-type -- word ) foldable
+
+GENERIC: c-array-type? ( c-type -- word ) foldable
+
+GENERIC: c-array? ( obj c-type -- ? ) foldable
+
+M: word c-array?
+    c-array-type? execute( seq -- array ) ; inline
+
+M: pointer c-array?
+    drop void* c-array? ;
+
+GENERIC: >c-array ( seq c-type -- array )
+
+M: word >c-array
+    c-array-type new clone-like ; inline
+
+M: pointer >c-array
+    drop void* >c-array ;
 
 GENERIC: <c-array> ( len c-type -- array )
 
@@ -41,23 +66,23 @@ M: word <c-direct-array>
 M: pointer <c-direct-array>
     drop void* <c-direct-array> ;
 
-: malloc-array ( n type -- array )
+SYNTAX: c-array{ \ } [ unclip >c-array ] parse-literal ;
+
+SYNTAX: c-array@
+    scan-object [ scan-object scan-object ] dip
+    <c-direct-array> suffix! ;
+
+ERROR: bad-byte-array-length byte-array type ;
+
+M: bad-byte-array-length summary
+    drop "Byte array length doesn't divide type width" ;
+
+: cast-array ( byte-array c-type -- array )
+    [ binary-object ] dip [ heap-size /mod 0 = ] keep swap
+    [ <c-direct-array> ] [ bad-byte-array-length ] if ; inline
+
+: malloc-array ( n c-type -- array )
     [ heap-size calloc ] [ <c-direct-array> ] 2bi ; inline
-
-: (malloc-array) ( n type -- alien )
-    [ heap-size * malloc ] [ <c-direct-array> ] 2bi ; inline
-
-: <c-object> ( type -- array )
-    heap-size <byte-array> ; inline
-
-: (c-object) ( type -- array )
-    heap-size (byte-array) ; inline
-
-: malloc-object ( type -- alien )
-    1 swap heap-size calloc ; inline
-
-: (malloc-object) ( type -- alien )
-    heap-size malloc ; inline
 
 : malloc-byte-array ( byte-array -- alien )
     binary-object [ nip malloc dup ] 2keep memcpy ;
@@ -68,11 +93,11 @@ M: pointer <c-direct-array>
 : malloc-string ( string encoding -- alien )
     string>alien malloc-byte-array ;
 
-M: memory-stream stream-read
-    [
-        [ index>> ] [ alien>> ] bi <displaced-alien>
-        swap memory>byte-array
-    ] [ [ + ] change-index drop ] 2bi ;
+M:: memory-stream stream-read-unsafe ( n buf stream -- count )
+    stream alien>> :> src
+    buf src n memcpy
+    n src <displaced-alien> stream alien<<
+    n ; inline
 
 M: value-type c-type-rep drop int-rep ;
 
@@ -102,7 +127,7 @@ ERROR: local-allocation-error ;
     ;
 
 MACRO: (simple-local-allot) ( c-type -- quot )
-    [ depends-on-c-type ]
+    [ add-depends-on-c-type ]
     [ dup '[ _ heap-size _ c-type-align (local-allot) ] ] bi ;
 
 : [hairy-local-allot] ( c-type initial -- quot )

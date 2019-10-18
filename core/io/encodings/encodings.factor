@@ -1,12 +1,17 @@
 ! Copyright (C) 2008, 2010 Daniel Ehrenberg, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sbufs vectors namespaces growable
-strings io classes continuations destructors combinators
-io.streams.plain splitting byte-arrays
-sequences.private accessors ;
+USING: accessors combinators destructors io io.streams.plain
+kernel math namespaces sbufs sequences sequences.private
+splitting strings ;
 IN: io.encodings
 
 ! The encoding descriptor protocol
+
+GENERIC: guess-encoded-length ( string-length encoding -- byte-length )
+GENERIC: guess-decoded-length ( byte-length encoding -- string-length )
+
+M: object guess-decoded-length drop ; inline
+M: object guess-encoded-length drop ; inline
 
 GENERIC: decode-char ( stream encoding -- char/f )
 
@@ -18,21 +23,23 @@ M: object encode-string [ encode-char ] 2curry each ; inline
 
 GENERIC: <decoder> ( stream encoding -- newstream )
 
-CONSTANT: replacement-char HEX: fffd
+CONSTANT: replacement-char 0xfffd
 
-TUPLE: decoder stream code cr ;
+TUPLE: decoder { stream read-only } { code read-only } { cr boolean } ;
+INSTANCE: decoder input-stream
 
 ERROR: decode-error ;
 
 GENERIC: <encoder> ( stream encoding -- newstream )
 
-TUPLE: encoder stream code ;
+TUPLE: encoder { stream read-only } { code read-only } ;
+INSTANCE: encoder output-stream
 
 ERROR: encode-error ;
 
 ! Decoding
 
-M: object <decoder> f decoder boa ;
+M: object <decoder> f decoder boa ; inline
 
 <PRIVATE
 
@@ -43,51 +50,51 @@ M: object <decoder> f decoder boa ;
 : >decoder< ( decoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ; inline
 
-: fix-read1 ( stream char -- char )
-    over cr>> [
-        over cr-
-        dup CHAR: \n = [
-            drop dup stream-read1
-        ] when
-    ] when nip ; inline
-
 M: decoder stream-element-type
-    drop +character+ ;
+    drop +character+ ; inline
 
-M: decoder stream-tell stream>> stream-tell ;
+: (read1) ( decoder -- ch )
+    >decoder< decode-char ; inline
 
-M: decoder stream-seek stream>> stream-seek ;
-
-M: decoder stream-read1
-    dup >decoder< decode-char fix-read1 ;
-
-: fix-read ( stream string -- string )
+: fix-cr ( decoder c -- c' )
     over cr>> [
         over cr-
-        "\n" ?head [
-            over stream-read1 [ suffix ] when*
-        ] when
-    ] when nip ; inline
+        dup CHAR: \n eq? [ drop (read1) ] [ nip ] if
+    ] [ nip ] if ; inline
 
-: (read) ( n quot -- n string )
-    over 0 <string> [
-        [
-            over [ swapd set-nth-unsafe f ] [ 3drop t ] if
-        ] curry compose find-integer
-    ] keep ; inline
+M: decoder stream-read1 ( decoder -- ch )
+    dup (read1) fix-cr ; inline
 
-: finish-read ( n string -- string/f )
-    {
-        { [ over 0 = ] [ 2drop f ] }
-        { [ over not ] [ nip ] }
-        [ swap head ]
-    } cond ; inline
+: (read-first) ( n buf decoder -- buf stream encoding n c )
+    [ rot [ >decoder< ] dip 2over decode-char ]
+    [ swap fix-cr ] bi ; inline
 
-M: decoder stream-read
-    [ nip ] [ >decoder< [ decode-char ] 2curry (read) finish-read ] 2bi
-    fix-read ;
+: (store-read) ( buf stream encoding n c i -- buf stream encoding n )
+    [ rot [ set-nth-unsafe ] keep ] 2curry 3dip ; inline
 
-M: decoder stream-read-partial stream-read ;
+: (finish-read) ( buf stream encoding n i -- i )
+    2nip 2nip ; inline
+
+: (read-next) ( stream encoding n i -- stream encoding n i c )
+    [ 2dup decode-char ] 2dip rot ; inline
+
+: (read-rest) ( buf stream encoding n i -- count )
+    2dup = [ (finish-read) ] [
+        (read-next) [
+            swap [ (store-read) ] [ 1 + ] bi (read-rest)
+        ] [ (finish-read) ] if*
+    ] if ; inline recursive
+
+M: decoder stream-read-unsafe
+    pick 0 = [ 3drop 0 ] [
+        (read-first) [
+            0 (store-read)
+            1 (read-rest)
+        ] [ 2drop 2drop 0 ] if*
+    ] if ; inline
+
+M: decoder stream-contents
+    (stream-contents-by-element) ;
 
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
@@ -104,13 +111,16 @@ M: decoder stream-read-partial stream-read ;
         { CHAR: \n [ line-ends\n ] }
     } case ; inline
 
-: ((read-until)) ( buf quot: ( -- char stop? ) -- string/f sep/f )
+! If the stop? branch is taken convert the sbuf to a string
+! If sep is present, returns ``string sep'' (string can be "")
+! If sep is f, returns ``string f'' or ``f f''
+: read-until-loop ( buf quot: ( -- char stop? ) -- string/f sep/f )
     dup call
-    [ [ drop "" like ] dip ]
-    [ pick push ((read-until)) ] if ; inline recursive
+    [ nip [ "" like ] dip [ f like f ] unless* ]
+    [ pick push read-until-loop ] if ; inline recursive
 
 : (read-until) ( quot -- string/f sep/f )
-    100 <sbuf> swap ((read-until)) ; inline
+    [ 100 <sbuf> ] dip read-until-loop ; inline
 
 : decoder-read-until ( seps stream encoding -- string/f sep/f )
     [ decode-char dup [ dup rot member? ] [ 2drop f t ] if ] 3curry
@@ -127,23 +137,23 @@ M: decoder stream-readln dup >decoder< decoder-readln handle-readln ;
 M: decoder dispose stream>> dispose ;
 
 ! Encoding
-M: object <encoder> encoder boa ;
+M: object <encoder> encoder boa ; inline
 
 : >encoder< ( encoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ; inline
 
 M: encoder stream-element-type
-    drop +character+ ;
+    drop +character+ ; inline
 
 M: encoder stream-write1
-    >encoder< encode-char ;
+    >encoder< encode-char ; inline
 
 M: encoder stream-write
-    >encoder< encode-string ;
+    >encoder< encode-string ; inline
 
-M: encoder dispose stream>> dispose ;
+M: encoder dispose stream>> dispose ; inline
 
-M: encoder stream-flush stream>> stream-flush ;
+M: encoder stream-flush stream>> stream-flush ; inline
 
 INSTANCE: encoder plain-writer
 PRIVATE>

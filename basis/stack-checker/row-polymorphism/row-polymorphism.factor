@@ -42,7 +42,34 @@ IN: stack-checker.row-polymorphism
         out-var [ out-diff swap vars adjust-variable ] when*
     ] when ;
 
+! A bit of a hack. If the declared effect is one-sided monomorphic and the actual effect is a
+! shallow subtype of the root effect, adjust it here
+:: (balance-actual-depth) ( declared actual -- depth/f )
+    {
+        { [ {
+            [ declared in-var>> ]
+            [ declared out-var>> not ]
+            [ actual out>> length declared out>> length < ]
+        } 0&& ] [ declared out>> length actual out>> length - ] }
+        { [ {
+            [ declared in-var>> not ]
+            [ declared out-var>> ]
+            [ actual in>> length declared in>> length < ]
+        } 0&& ] [ declared in>> length actual in>> length - ] }
+        [ f ]
+    } cond ;
+
+: (balance-by) ( effect n -- effect' )
+    "x" <array> swap
+    [ in>> append ]
+    [ out>> append ]
+    [ nip terminated?>> ] 2tri <terminated-effect> ;
+
+: balance-actual ( declared actual -- declared actual' )
+    2dup (balance-actual-depth) [ (balance-by) ] when* ;
+
 : (check-variables) ( vars declared actual -- ? )
+    balance-actual
     [ [ in>>  ] [ in-var>>  ] check-variable ]
     [ [ out>> ] [ out-var>> ] check-variable ]
     [ 2drop ] 3tri unify-variables ;

@@ -7,8 +7,9 @@ words.alias quotations io assocs splitting classes.tuple
 generic.standard generic.hook generic.math generic.parser classes
 io.pathnames vocabs vocabs.parser classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
-classes.singleton classes.tuple.parser compiler.units
-combinators effects.parser slots hash-sets ;
+classes.singleton classes.tuple.parser compiler.units classes.maybe
+combinators effects.parser slots hash-sets source-files
+classes.algebra.private ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -20,10 +21,10 @@ IN: bootstrap.syntax
 ! in stage2.
 
 : define-delimiter ( name -- )
-    "syntax" lookup t "delimiter" set-word-prop ;
+    "syntax" lookup-word t "delimiter" set-word-prop ;
 
 : define-core-syntax ( name quot -- )
-    [ dup "syntax" lookup [ ] [ no-word-error ] ?if ] dip
+    [ dup "syntax" lookup-word [ ] [ no-word-error ] ?if ] dip
     define-syntax ;
 
 [
@@ -69,14 +70,9 @@ IN: bootstrap.syntax
         scan-token scan-token "=>" expect scan-token add-renamed-word
     ] define-core-syntax
 
-    "HEX:" [ 16 parse-base ] define-core-syntax
-    "OCT:" [ 8 parse-base ] define-core-syntax
-    "BIN:" [ 2 parse-base ] define-core-syntax
-
     "NAN:" [ 16 scan-base <fp-nan> suffix! ] define-core-syntax
 
     "f" [ f suffix! ] define-core-syntax
-    "t" "syntax" lookup define-singleton-class
 
     "CHAR:" [
         scan-token {
@@ -104,11 +100,11 @@ IN: bootstrap.syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
-    "HS{" [ \ } [ <hash-set> ] parse-literal ] define-core-syntax
+    "HS{" [ \ } [ >hash-set ] parse-literal ] define-core-syntax
 
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
-    "M\\" [ scan-word scan-word method <wrapper> suffix! ] define-core-syntax
+    "M\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
     "inline" [ word make-inline ] define-core-syntax
     "recursive" [ word make-recursive ] define-core-syntax
     "foldable" [ word make-foldable ] define-core-syntax
@@ -117,11 +113,11 @@ IN: bootstrap.syntax
     "deprecated" [ word make-deprecated ] define-core-syntax
 
     "SYNTAX:" [
-        CREATE-WORD parse-definition define-syntax
+        scan-new-word parse-definition define-syntax
     ] define-core-syntax
 
     "SYMBOL:" [
-        CREATE-WORD define-symbol
+        scan-new-word define-symbol
     ] define-core-syntax
 
     "SYMBOLS:" [
@@ -138,11 +134,11 @@ IN: bootstrap.syntax
     ] define-core-syntax
     
     "ALIAS:" [
-        CREATE-WORD scan-word define-alias
+        scan-new-word scan-word define-alias
     ] define-core-syntax
 
     "CONSTANT:" [
-        CREATE-WORD scan-object define-constant
+        scan-new-word scan-object define-constant
     ] define-core-syntax
 
     ":" [
@@ -154,7 +150,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "GENERIC#" [
-        [ scan-word <standard-combination> ] (GENERIC:)
+        [ scan-number <standard-combination> ] (GENERIC:)
     ] define-core-syntax
 
     "MATH:" [
@@ -170,15 +166,15 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "UNION:" [
-        CREATE-CLASS parse-definition define-union-class
+        scan-new-class parse-definition define-union-class
     ] define-core-syntax
 
     "INTERSECTION:" [
-        CREATE-CLASS parse-definition define-intersection-class
+        scan-new-class parse-definition define-intersection-class
     ] define-core-syntax
 
     "MIXIN:" [
-        CREATE-CLASS define-mixin-class
+        scan-new-class define-mixin-class
     ] define-core-syntax
 
     "INSTANCE:" [
@@ -189,14 +185,14 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "PREDICATE:" [
-        CREATE-CLASS
+        scan-new-class
         "<" expect
-        scan-word
+        scan-class
         parse-definition define-predicate-class
     ] define-core-syntax
 
     "SINGLETON:" [
-        CREATE-CLASS define-singleton-class
+        scan-new-class define-singleton-class
     ] define-core-syntax
 
     "TUPLE:" [
@@ -212,7 +208,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "C:" [
-        CREATE-WORD scan-word define-boa-word
+        scan-new-word scan-word define-boa-word
     ] define-core-syntax
 
     "ERROR:" [
@@ -226,14 +222,14 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "(" [
-        ")" parse-effect drop
+        ")" parse-effect suffix!
     ] define-core-syntax
 
-    "((" [
-        "))" parse-effect suffix!
+    "MAIN:" [
+        scan-word
+        [ current-vocab main<< ]
+        [ file get [ main<< ] [ drop ] if* ] bi
     ] define-core-syntax
-
-    "MAIN:" [ scan-word current-vocab main<< ] define-core-syntax
 
     "<<" [
         [
@@ -249,10 +245,26 @@ IN: bootstrap.syntax
             not-in-a-method-error
         ] if*
     ] define-core-syntax
-    
-    "initial:" "syntax" lookup define-symbol
 
-    "read-only" "syntax" lookup define-symbol
+    "maybe{" [
+        \ } [ <anonymous-union> <maybe> ] parse-literal
+    ] define-core-syntax
+
+    "not{" [
+        \ } [ <anonymous-union> <anonymous-complement> ] parse-literal
+    ] define-core-syntax
+
+    "intersection{" [
+         \ } [ <anonymous-intersection> ] parse-literal
+    ] define-core-syntax
+
+    "union{" [
+        \ } [ <anonymous-union> ] parse-literal
+    ] define-core-syntax
+
+    "initial:" "syntax" lookup-word define-symbol
+
+    "read-only" "syntax" lookup-word define-symbol
 
     "call(" [ \ call-effect parse-call( ] define-core-syntax
 

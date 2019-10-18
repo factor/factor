@@ -20,10 +20,10 @@ IN: ui.backend.cocoa.views
 
 CONSTANT: modifiers
     {
-        { S+ HEX: 20000 }
-        { C+ HEX: 40000 }
-        { A+ HEX: 100000 }
-        { M+ HEX: 80000 }
+        { S+ 0x20000 }
+        { C+ 0x40000 }
+        { A+ 0x100000 }
+        { M+ 0x80000 }
     }
 
 CONSTANT: key-codes
@@ -152,7 +152,7 @@ CLASS: FactorView < NSOpenGLView NSTextInput
     METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ]
 
     ! Events
-    METHOD: char acceptsFirstMouse: id event [ 1 ]
+    METHOD: char acceptsFirstMouse: id event [ 0 ]
 
     METHOD: void mouseEntered: id event [ self event send-mouse-moved ]
 
@@ -332,7 +332,7 @@ CLASS: FactorView < NSOpenGLView NSTextInput
 ]
 
 : sync-refresh-to-screen ( GLView -- )
-    -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 <int>
+    -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 int <ref>
     CGLSetParameter drop ;
 
 : <FactorView> ( dim pixel-format -- view )

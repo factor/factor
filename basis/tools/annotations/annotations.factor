@@ -4,7 +4,7 @@ USING: accessors kernel math sorting words parser io summary
 quotations sequences sequences.generalizations prettyprint
 continuations effects definitions compiler.units namespaces
 assocs tools.time generic inspector fry locals generalizations
-macros ;
+macros sequences.deep ;
 IN: tools.annotations
 
 <PRIVATE
@@ -29,27 +29,45 @@ ERROR: cannot-annotate-twice word ;
 
 M: cannot-annotate-twice summary drop "Cannot annotate a word twice" ;
 
+PREDICATE: annotated < word "unannotated-def" word-prop >boolean ;
+
 <PRIVATE
 
 : check-annotate-twice ( word -- word )
-    dup "unannotated-def" word-prop [
-        cannot-annotate-twice
-    ] when ;
+    dup annotated? [ cannot-annotate-twice ] when ;
+
+: annotate-generic ( word quot -- )
+    [ "methods" word-prop values ] dip each ; inline
+
+: prepare-annotate ( word quot -- word quot quot )
+    [ check-annotate-twice ] dip
+    [ dup def>> 2dup "unannotated-def" set-word-prop ] dip ;
 
 GENERIC# (annotate) 1 ( word quot -- )
 
 M: generic (annotate)
-    [ "methods" word-prop values ] dip '[ _ (annotate) ] each ;
+    '[ _ (annotate) ] annotate-generic ;
 
 M: word (annotate)
-    [ check-annotate-twice ] dip
-    [ dup def>> 2dup "unannotated-def" set-word-prop ] dip
+    prepare-annotate
     call( old -- new ) define ;
+
+GENERIC# (deep-annotate) 1 ( word quot -- )
+
+M: generic (deep-annotate)
+    '[ _ (deep-annotate) ] annotate-generic ;
+
+M: word (deep-annotate)
+    prepare-annotate
+    '[ dup callable? [ _ call( old -- new ) ] when ] deep-map define ;
 
 PRIVATE>
 
 : annotate ( word quot -- )
     [ (annotate) ] with-compilation-unit ;
+
+: deep-annotate ( word quot -- )
+    [ (deep-annotate) ] with-compilation-unit ;
 
 <PRIVATE
 
@@ -57,9 +75,11 @@ PRIVATE>
     effect quot call :> values
     values length :> n
     [
-        "--- " write str write bl word .
-        n ndup n narray values swap zip simple-table.
-        flush
+        [
+            "--- " write str write bl word .
+            n ndup n narray values swap zip simple-table.
+            flush
+        ] with-output>error
     ] ; inline
 
 MACRO: entering ( word -- quot )
@@ -80,9 +100,11 @@ PRIVATE>
 
 : (watch-vars) ( word vars quot -- newquot )
    '[
-        "--- Entering: " write _ .
-        "--- Variable values:" print _ [ dup get ] H{ } map>assoc describe
-        @
+        [
+            "--- Entering: " write _ .
+            "--- Variable values:" print _ [ dup get ] H{ } map>assoc describe
+            @
+        ] with-output>error
     ] ;
 
 PRIVATE>

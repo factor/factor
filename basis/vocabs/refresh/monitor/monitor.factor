@@ -3,7 +3,8 @@
 USING: accessors assocs command-line concurrency.messaging
 continuations init io.backend io.files io.monitors io.pathnames
 kernel namespaces sequences sets splitting threads fry
-tr vocabs vocabs.loader vocabs.refresh vocabs.cache ;
+tr vocabs vocabs.loader vocabs.refresh vocabs.cache
+io.files.links ;
 IN: vocabs.refresh.monitor
 
 TR: convert-separators "/\\" ".." ;
@@ -19,7 +20,8 @@ TR: convert-separators "/\\" ".." ;
 : chop-vocab-root ( path -- path' )
     "resource:" prepend-path normalize-path
     dup vocab-roots get
-    [ normalize-path ] map
+    [ [ normalize-path ] map ]
+    [ [ resolve-symlinks ] map ] bi append
     [ head? ] with find nip
     ?head drop ;
 
@@ -29,7 +31,10 @@ TR: convert-separators "/\\" ".." ;
 : monitor-loop ( monitor -- )
     #! On OS X, monitors give us the full path, so we chop it
     #! off if its there.
-    [ next-change path>> path>vocab changed-vocab reset-cache ]
+    [
+        next-change path>> path>vocab
+        [ changed-vocab ] [ reset-cache ] bi
+    ]
     [ monitor-loop ]
     bi ;
 

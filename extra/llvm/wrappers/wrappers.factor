@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings
+USING: accessors alien.c-types alien.data alien.strings
 io.encodings.utf8 destructors kernel
 llvm.core llvm.engine ;
 
@@ -33,9 +33,9 @@ M: engine dispose* value>> LLVMDisposeExecutionEngine ;
 
 : (engine) ( provider -- engine )
     [
-        value>> f <void*> f <void*>
+        value>> f void* <ref> f void* <ref>
         [ swapd 0 swap LLVMCreateJITCompiler drop ] 2keep
-        *void* [ llvm-throw ] when* *void*
+        void* deref [ llvm-throw ] when* void* deref
     ]
     [ t >>disposed drop ] bi
     engine <dispose> ;
@@ -57,6 +57,6 @@ TUPLE: buffer value disposed ;
 M: buffer dispose* value>> LLVMDisposeMemoryBuffer ;
 
 : <buffer> ( path -- module )
-    f <void*> f <void*>
+    f void* <ref> f void* <ref>
     [ LLVMCreateMemoryBufferWithContentsOfFile drop ] 2keep
-    *void* [ llvm-throw ] when* *void* buffer <dispose> ;
+    void* deref [ llvm-throw ] when* void* deref buffer <dispose> ;

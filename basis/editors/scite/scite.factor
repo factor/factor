@@ -5,6 +5,9 @@ USING: io.files io.launcher kernel namespaces io.directories.search.windows
 math math.parser editors sequences make unicode.case ;
 IN: editors.scite
 
+SINGLETON: scite
+scite editor-class set-global
+
 : scite-path ( -- path )
     \ scite-path get-global [
         "Scintilla Text Editor"
@@ -17,15 +20,10 @@ IN: editors.scite
         [ "scite.exe" ] unless*
     ] unless* ;
 
-: scite-command ( file line -- cmd )
+M: scite editor-command ( file line -- cmd )
     swap
     [
         scite-path ,
         ,
         number>string "-goto:" prepend ,
     ] { } make ;
-
-: scite ( file line -- )
-    scite-command run-detached drop ;
-
-[ scite ] edit-hook set-global

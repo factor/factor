@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math math.order
-sequences quotations math.functions.private ;
+sequences quotations math.functions.private math.constants ;
 IN: math.functions
 
 ARTICLE: "integer-functions" "Integer functions"
@@ -49,11 +49,13 @@ ARTICLE: "power-functions" "Powers and logarithms"
 "Squares:"
 { $subsections sq sqrt }
 "Exponential and natural logarithm:"
-{ $subsections exp cis log }
+{ $subsections e^ cis log }
 "Other logarithms:"
 { $subsections log1+ log10 }
 "Raising a number to a power:"
-{ $subsections ^ 10^ }
+{ $subsections ^ e^ 10^ }
+"Logistics functions:"
+{ $subsections sigmoid }
 "Finding the root of a number:"
 { $subsections nth-root }
 "Converting between rectangular and polar form:"
@@ -106,9 +108,13 @@ HELP: align
 { $description "Outputs the least multiple of " { $snippet "w" } " greater than " { $snippet "m" } "." }
 { $notes "This word will give an incorrect result if " { $snippet "w" } " is not a power of 2." } ;
 
-HELP: exp
+HELP: e^
 { $values { "x" number } { "y" number } }
 { $description "Exponential function, " { $snippet "y=e^x" } "." } ;
+
+HELP: frexp
+{ $values { "x" number } { "y" float } { "exp" integer } }
+{ $description "Break the number " { $snippet "x" } " into a normalized fraction " { $snippet "y" } " and an integral power of 2 " { $snippet "e^" } "." $nl "The function returns a number " { $snippet "y" } " in the interval [1/2, 1) or 0, and a number " { $snippet "exp" } " such that " { $snippet "x = y*(2**exp)" } "." } ;
 
 HELP: log
 { $values { "x" number } { "y" number } }
@@ -236,9 +242,9 @@ HELP: >polar
 
 HELP: cis
 { $values { "arg" "a real number" } { "z" "a complex number on the unit circle" } }
-{ $description "Computes a point on the unit circle using Euler's formula for " { $snippet "exp(arg*i)" } "." } ;
+{ $description "Computes a point on the unit circle using Euler's formula for " { $snippet "e^(arg*i)" } "." } ;
 
-{ cis exp } related-words
+{ cis e^ } related-words
 
 HELP: polar>
 { $values { "abs" "a non-negative real number" } { "arg" real } { "z" number } }
@@ -267,7 +273,7 @@ HELP: nth-root
 
 HELP: 10^
 { $values { "x" number } { "y" number } }
-{ $description "Raises " { $snippet "x" } " to the power of 10. If " { $snippet "x" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." } ;
+{ $description "Raises 10 to the power of " { $snippet "x" } ". If " { $snippet "x" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." } ;
 
 HELP: gcd
 { $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
@@ -288,6 +294,10 @@ HELP: mod-inv
     { $example "USING: math prettyprint ;" "173 815 * 1119 mod ." "1" }
 } ;
 
+HELP: ^mod
+{ $values { "x" real } { "y" real } { "n" real } { "z" real } }
+{ $description "Outputs the result of computing " { $snippet "x^y mod n" } "." } ;
+
 HELP: ~
 { $values { "x" real } { "y" real } { "epsilon" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " and " { $snippet "y" } " are approximately equal to each other. There are three possible comparison tests, chosen based on the sign of " { $snippet "epsilon" } ":"
@@ -297,7 +307,6 @@ HELP: ~
         { { $snippet "epsilon" } " is negative: relative distance test." }
     }
 } ;
-
 
 HELP: truncate
 { $values { "x" real } { "y" "a whole real number" } }
@@ -318,3 +327,20 @@ HELP: round
 { $values { "x" real } { "y" "a whole real number" } }
 { $description "Outputs the whole number closest to " { $snippet "x" } "." }
 { $notes "The result is not necessarily an integer." } ;
+
+HELP: roots
+{ $values { "x" number } { "t" integer } { "seq" sequence } }
+{ $description "Outputs the " { $snippet "t" } " roots of a number " { $snippet "x" } "." }
+{ $notes "The results are not necessarily real." } ;
+
+HELP: sigmoid
+{ $values { "x" number } { "y" number } }
+{ $description "Outputs the sigmoid, an S-shaped \"logistic\" function, from 0 to 1, of the number " { $snippet "x" } "." } ;
+
+HELP: signum
+{ $values { "x" number } { "y" number } }
+{ $description "Calculates the signum value.  For a real number, " { $snippet "x" } ", this is its sign (-1, 0, or 1).  For a complex number, " { $snippet "x" } ", this is the point on the unit circle of the complex plane that is nearest to " { $snippet "x" } "." } ;
+
+HELP: copysign
+{ $values { "x" number } { "y" number } { "x'" number } }
+{ $description "Returns " { $snippet "x" } " with the sign of " { $snippet "y" } ", as a " { $link float } "." } ;

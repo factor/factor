@@ -13,7 +13,7 @@ IN: benchmark.heaps
     [ length [ dup heap-pop* ] times ] bi
     drop ;
 
-: heap-benchmark ( -- )
+: heaps-benchmark ( -- )
     100 [ heap-test ] times ;
 
-MAIN: heap-benchmark
+MAIN: heaps-benchmark

@@ -18,6 +18,8 @@ ARTICLE: "set-operations" "Operations on sets"
 { $subsections in? }
 "All sets can be represented as a sequence, without duplicates, of their members:"
 { $subsections members }
+"To get the number of elements in a set:"
+{ $subsections cardinality }
 "Sets can have members added or removed destructively:"
 { $subsections
     adjoin
@@ -84,6 +86,11 @@ HELP: adjoin
     }
 }
 { $side-effects "set" } ;
+
+HELP: ?adjoin
+{ $values { "elt" object } { "set" set } { "?" "a boolean" } }
+{ $description "A version of " { $link adjoin } " which returns whether the element was added to the set." }
+{ $notes "This is slightly less efficient than " { $link adjoin } " due to the initial membership test." } ;
 
 HELP: delete
 { $values { "elt" object } { "set" set } }
@@ -184,3 +191,11 @@ HELP: without
 HELP: null?
 { $values { "set" set } { "?" "a boolean" } }
 { $description "Tests whether the given set is empty. This outputs " { $snippet "t" } " when given a null set of any type." } ;
+
+HELP: cardinality
+{ $values { "set" set } { "n" "a non-negative integer" } }
+{ $description "Returns the number of elements in the set. All sets support this operation." } ;
+
+HELP: combine
+{ $values { "sets" "a sequence of sets" } { "set/f" "a " { $link set } " or " { $link f } } }
+{ $description "Outputs the union of a sequence of sets, or " { $link f } " if the sequence is empty." } ;

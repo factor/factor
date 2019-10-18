@@ -3,7 +3,7 @@
 USING: accessors combinators.short-circuit continuations
 debugger io io.directories io.encodings.utf8 io.files
 io.launcher io.sockets io.streams.string kernel mason.common
-mason.email sequences splitting ;
+mason.email sequences splitting io.directories.hierarchy ;
 IN: mason.git
 
 : git-id ( -- id )
@@ -21,6 +21,7 @@ IN: mason.git
 
 : git-clone ( -- )
     #! Must be run from builds-dir
+    "Cloning initial repository" print-timestamp
     git-clone-cmd try-output-process ;
 
 : git-pull-cmd ( -- cmd )
@@ -41,12 +42,12 @@ IN: mason.git
 
 : git-repo-corrupted ( error -- )
     repo-corrupted-body "corrupted repo" email-fatal
-    "factor" really-delete-tree
+    "factor" delete-tree
     git-clone ;
 
 : git-pull-failed ( error -- )
     dup output-process-error? [
-        dup output>> "not uptodate. Cannot merge." swap start
+        dup output>> "not uptodate. Cannot merge." swap subseq?
         [ git-repo-corrupted ]
         [ rethrow ]
         if
@@ -83,7 +84,7 @@ IN: mason.git
 
 : git-repo-dirty ( files -- )
     repo-dirty-body "dirty repo" email-fatal
-    "factor" really-delete-tree
+    "factor" delete-tree
     git-clone ;
 
 PRIVATE>

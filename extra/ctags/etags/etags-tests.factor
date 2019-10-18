@@ -63,10 +63,3 @@ IN: ctags.etags.tests
   "if2,11"
   { "1234567890" "12345" } { if 2 } etag =
 ] unit-test
-
-! etag-length
-[ t ]
-[
-  14
-  V{ "if2,11" "if2,11" } etag-length =
-] unit-test

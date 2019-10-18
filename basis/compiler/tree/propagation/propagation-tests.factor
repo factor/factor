@@ -9,7 +9,7 @@ compiler.tree.debugger compiler.tree.checker slots.private words
 hashtables classes assocs locals specialized-arrays system
 sorting math.libm math.floats.private math.integers.private
 math.intervals quotations effects alien alien.data sets
-strings.private vocabs ;
+strings.private vocabs generic.single ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*
@@ -755,7 +755,7 @@ MIXIN: empty-mixin
 
 [ V{ double-array } ] [ [| | double-array{ } ] final-classes ] unit-test
 
-[ V{ t } ] [ [ netbsd unix? ] final-literals ] unit-test
+[ V{ t } ] [ [ macosx unix? ] final-literals ] unit-test
 
 [ V{ array } ] [ [ [ <=> ] sort [ <=> ] sort ] final-classes ] unit-test
 
@@ -899,7 +899,7 @@ SYMBOL: not-an-assoc
 [ f ] [ [ 5 instance? ] { instance? } inlined? ] unit-test
 [ t ] [ [ array instance? ] { instance? } inlined? ] unit-test
 
-[ t ] [ [ (( a b c -- c b a )) shuffle ] { shuffle } inlined? ] unit-test
+[ t ] [ [ ( a b c -- c b a ) shuffle ] { shuffle } inlined? ] unit-test
 [ f ] [ [ { 1 2 3 } swap shuffle ] { shuffle } inlined? ] unit-test
 
 ! Type function for 'clone' had a subtle issue
@@ -1001,3 +1001,43 @@ M: tuple-with-read-only-slot clone
 [ V{ alien } ] [
     [ { byte-array } declare [ 10 bitand 2 + ] dip <displaced-alien> ] final-classes
 ] unit-test
+
+! 'tag' should have a declared output interval
+[ V{ t } ] [
+    [ tag 0 15 between? ] final-literals
+] unit-test
+
+[ t ] [
+    [ maybe{ integer } instance? ] { instance? } inlined?
+] unit-test
+
+TUPLE: inline-please a ;
+[ t ] [
+    [ maybe{ inline-please } instance? ] { instance? } inlined?
+] unit-test
+
+GENERIC: derp ( obj -- obj' )
+
+M: integer derp 5 + ;
+M: f derp drop t ;
+
+[ t ]
+[
+    [ dup maybe{ integer } instance? [ derp ] when ] { instance? } inlined?
+] unit-test
+
+! Type-check ratios with bitand operators
+
+: bitand-ratio0 ( x -- y )
+    1 bitand zero? ;
+
+: bitand-ratio1 ( x -- y )
+    1 swap bitand zero? ;
+
+[ 2+1/2 bitand-ratio0 ] [ no-method? ] must-fail-with 
+[ 2+1/2 bitand-ratio1 ] [ no-method? ] must-fail-with
+
+: shift-test0 ( x -- y )
+    4.3 shift ;
+
+[ 1 shift-test0 ] [ no-method? ] must-fail-with

@@ -3,8 +3,8 @@
 USING: accessors arrays sequences sorting assocs colors.constants fry
 combinators combinators.smart combinators.short-circuit editors make
 memoize compiler.units fonts kernel io.pathnames prettyprint
-source-files.errors math.parser init math.order models models.arrow
-models.arrow.smart models.search models.mapping debugger
+source-files.errors source-files.errors.debugger math.parser init math.order
+models models.arrow models.arrow.smart models.search models.mapping debugger
 namespaces summary locals ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
@@ -59,7 +59,7 @@ M: source-file-renderer column-alignment drop { 0 0 1 } ;
 M: source-file-renderer filled-column drop 1 ;
 
 : <source-file-model> ( model -- model' )
-    [ group-by-source-file >alist sort-keys ] <arrow> ;
+    [ group-by-source-file sort-keys ] <arrow> ;
 
 :: <source-file-table> ( error-list -- table )
     error-list model>> <source-file-model>
@@ -83,7 +83,7 @@ M: error-renderer row-columns
             [ error-type error-icon ]
             [ line#>> [ number>string ] [ "" ] if* ]
             [ asset>> [ unparse-short ] [ "" ] if* ]
-            [ error>> summary ]
+            [ error>> safe-summary ]
         } cleave
     ] output>array ;
 

@@ -181,5 +181,5 @@ HELP: tset
 { $description "Sets the value of a thread-local variable." } ;
 
 HELP: tchange
-{ $values { "key" object } { "quot" { $quotation "( value -- newvalue )" } } }
+{ $values { "key" object } { "quot" { $quotation "( ..a value -- ..b newvalue )" } } }
 { $description "Applies the quotation to the current value of a thread-local variable, storing the result back to the same variable." } ;

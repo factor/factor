@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.destructors alien.syntax accessors
-destructors fry kernel math math.bitwise sequences libc colors
-images images.memory core-graphics.types core-foundation.utilities
-opengl.gl literals ;
+USING: alien alien.c-types alien.data alien.destructors
+alien.syntax accessors destructors fry kernel math math.bitwise
+sequences libc colors images images.memory core-graphics.types
+core-foundation.utilities opengl.gl literals ;
 IN: core-graphics
 
 TYPEDEF: int CGImageAlphaInfo
@@ -15,10 +15,10 @@ CONSTANT: kCGImageAlphaFirst 4
 CONSTANT: kCGImageAlphaNoneSkipLast 5
 CONSTANT: kCGImageAlphaNoneSkipFirst 6
 
-CONSTANT: kCGBitmapAlphaInfoMask HEX: 1f
+CONSTANT: kCGBitmapAlphaInfoMask 0x1f
 CONSTANT: kCGBitmapFloatComponents 256
 
-CONSTANT: kCGBitmapByteOrderMask HEX: 7000
+CONSTANT: kCGBitmapByteOrderMask 0x7000
 CONSTANT: kCGBitmapByteOrderDefault 0
 CONSTANT: kCGBitmapByteOrder16Little 4096
 CONSTANT: kCGBitmapByteOrder32Little 8192
@@ -99,9 +99,23 @@ FUNCTION: void CGContextSetShouldSmoothFonts (
    bool shouldSmoothFonts
 ) ;
 
+FUNCTION: void CGContextDrawImage (
+   CGContextRef c,
+   CGRect rect,
+   CGImageRef image
+) ;
+
+FUNCTION: size_t CGImageGetWidth (
+   CGImageRef image
+) ;
+
+FUNCTION: size_t CGImageGetHeight (
+   CGImageRef image
+) ;
+
 FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
 
-CONSTANT: kCGLRendererGenericFloatID HEX: 00020400
+CONSTANT: kCGLRendererGenericFloatID 0x00020400
 
 FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
 
@@ -141,4 +155,5 @@ PRIVATE>
 : make-bitmap-image ( dim quot -- image )
     '[ <CGBitmapContext> &CGContextRelease @ ] make-memory-bitmap
     ARGB >>component-order
-    ubyte-components >>component-type ; inline
+    ubyte-components >>component-type
+    t >>premultiplied-alpha? ; inline

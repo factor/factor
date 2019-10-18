@@ -5,7 +5,7 @@ IN: environment
 
 HELP: (os-envs)
 { $values
-    
+
      { "seq" sequence } }
 { $description "Returns a sequence of key/value pairs from the operating system." }
 { $notes "In most cases, use " { $link os-envs } " instead." } ;
@@ -22,8 +22,27 @@ HELP: os-env
 { $description "Looks up the value of a shell environment variable." }
 { $examples
     "This is an operating system-specific feature. On Unix, you can do:"
-    { $unchecked-example "\"USER\" os-env print" "jane" }
+    { $unchecked-example
+        "USING: environment io ;"
+        "\"USER\" os-env print"
+        "jane"
+    }
 } ;
+
+HELP: change-os-env
+{ $values { "key" string } { "quot" { $quotation "( old -- new )" } } }
+{ $description "Applies a quotation to change the value stored in an environment variable." }
+{ $examples
+    "This is an operating system-specific feature. On Unix, you can do:"
+    { $unchecked-example
+        "USING: environment io ;"
+        "\"USER\" os-env print"
+        "\"USER\" [ \"-doe\" append ] change-os-env"
+        "\"USER\" os-env print"
+        "jane\njane-doe"
+    }
+}
+{ $side-effects "key" } ;
 
 HELP: os-envs
 { $values { "assoc" "an association mapping strings to strings" } }
@@ -53,12 +72,11 @@ HELP: unset-os-env
     "Names and values of environment variables are operating system-specific."
 } ;
 
-{ os-env os-envs set-os-env unset-os-env set-os-envs } related-words
+{ os-env os-envs set-os-env unset-os-env set-os-envs change-os-env } related-words
 
 
 ARTICLE: "environment" "Environment variables"
 "The " { $vocab-link "environment" } " vocabulary interfaces to the platform-dependent mechanism for setting environment variables." $nl
-"Windows CE has no concept of environment variables, so these words are undefined on that platform." $nl
 "Reading environment variables:"
 { $subsections
     os-env
@@ -69,6 +87,7 @@ ARTICLE: "environment" "Environment variables"
     set-os-env
     unset-os-env
     set-os-envs
+    change-os-env
 } ;
 
 ABOUT: "environment"

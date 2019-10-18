@@ -1,10 +1,12 @@
 USING: cocoa cocoa.plists core-foundation iokit iokit.hid
 kernel cocoa.enumeration destructors math.parser cocoa.application 
+core-foundation.data core-foundation.strings
 sequences locals combinators.short-circuit threads
 namespaces assocs arrays combinators hints alien
 core-foundation.run-loop accessors sequences.private
 alien.c-types alien.data math parser game.input vectors
 bit-arrays unix.types ;
+FROM: namespaces => change-global ;
 IN: game.input.iokit
 
 SINGLETON: iokit-game-input-backend
@@ -40,23 +42,23 @@ CONSTANT: buttons-matching-hash
 CONSTANT: keys-matching-hash
     H{ { "UsagePage" 7 } { "Type" 2 } }
 CONSTANT: x-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 30 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x30 } { "Type" 1 } }
 CONSTANT: y-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 31 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x31 } { "Type" 1 } }
 CONSTANT: z-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 32 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x32 } { "Type" 1 } }
 CONSTANT: rx-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 33 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x33 } { "Type" 1 } }
 CONSTANT: ry-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 34 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x34 } { "Type" 1 } }
 CONSTANT: rz-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 35 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x35 } { "Type" 1 } }
 CONSTANT: slider-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 36 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x36 } { "Type" 1 } }
 CONSTANT: wheel-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 38 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x38 } { "Type" 1 } }
 CONSTANT: hat-switch-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 39 } { "Type" 1 } }
+    H{ { "UsagePage" 1 } { "Usage" 0x39 } { "Type" 1 } }
 
 : device-elements-matching ( device matching-hash -- vector )
     [
@@ -68,7 +70,7 @@ CONSTANT: hat-switch-matching-hash
     buttons-matching-hash device-elements-matching length ;
 
 : ?axis ( device hash -- axis/f )
-    device-elements-matching [ f ] [ first ] if-empty ;
+    device-elements-matching ?first ;
 
 : ?x-axis ( device -- ? )
     x-axis-matching-hash ?axis ;
@@ -119,23 +121,23 @@ CONSTANT: hat-switch-matching-hash
     IOHIDElementGetUsagePage 1 = ; inline
 
 : x-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 30 = ; inline
+    IOHIDElementGetUsage 0x30 = ; inline
 : y-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 31 = ; inline
+    IOHIDElementGetUsage 0x31 = ; inline
 : z-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 32 = ; inline
+    IOHIDElementGetUsage 0x32 = ; inline
 : rx-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 33 = ; inline
+    IOHIDElementGetUsage 0x33 = ; inline
 : ry-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 34 = ; inline
+    IOHIDElementGetUsage 0x34 = ; inline
 : rz-axis? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 35 = ; inline
+    IOHIDElementGetUsage 0x35 = ; inline
 : slider? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 36 = ; inline
+    IOHIDElementGetUsage 0x36 = ; inline
 : wheel? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 38 = ; inline
+    IOHIDElementGetUsage 0x38 = ; inline
 : hat-switch? ( {usage-page,usage} -- ? )
-    IOHIDElementGetUsage HEX: 39 = ; inline
+    IOHIDElementGetUsage 0x39 = ; inline
 
 CONSTANT: pov-values
     {
@@ -270,11 +272,26 @@ M: iokit-game-input-backend reset-mouse
 : device-removed-callback ( -- alien )
     [ (device-removed-callback) ] IOHIDDeviceCallback ;
 
+! Lion sends the input callback an IOHIDQueue as the "sender".
+! Leopard and Snow Leopard send an IOHIDDevice.
+! This function gets the IOHIDDevice regardless of which is received
+: get-input-device ( sender -- device )
+    dup CFGetTypeID {
+        { [ dup IOHIDDeviceGetTypeID = ] [ drop ] }
+        { [ dup IOHIDQueueGetTypeID = ] [ drop IOHIDQueueGetDevice ] }
+        [
+            drop
+            "input callback doesn't know how to deal with "
+            swap CF>description append throw
+        ]
+    } cond ;
+
 :: (device-input-callback) ( context result sender value -- )
+    sender get-input-device :> device
     {
-        { [ sender mouse-device? ] [ +mouse-state+ get-global value record-mouse ] }
-        { [ sender controller-device? ] [
-            sender +controller-states+ get-global at value record-controller
+        { [ device mouse-device? ] [ +mouse-state+ get-global value record-mouse ] }
+        { [ device controller-device? ] [
+            device +controller-states+ get-global at value record-controller
         ] }
         [ +keyboard-state+ get-global value record-keyboard ]
     } cond ;

@@ -6,7 +6,7 @@ IN: xml.char-classes
 
 CATEGORY: 1.0name-start
     Ll Lu Lo Lt Nl | {
-        [ HEX: 2BB HEX: 2C1 between? ]
+        [ 0x2BB 0x2C1 between? ]
         [ "\u000559\u0006E5\u0006E6_:" member? ]
     } 1|| ;
 
@@ -28,16 +28,33 @@ CATEGORY: 1.1name-char
 : name-char? ( 1.0? char -- ? )
     swap [ 1.0name-char? ] [ 1.1name-char? ] if ;
 
-: text? ( 1.0? char -- ? )
+HINTS: name-start? { object fixnum } ;
+HINTS: name-char? { object fixnum } ;
+
+<PRIVATE
+
+: 1.0-text? ( char -- ? )
     ! 1.0:
     ! #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+    {
+        [ 0x20 0xD7FF between? ]
+        [ "\t\r\n" member? ]
+        [ 0xE000 0xFFFD between? ]
+        [ 0x10000 0x10FFFF between? ]
+    } 1|| ; inline
+
+: 1.1-text? ( char -- ? )
     ! 1.1:
     ! [#x1-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
     {
-        { [ dup HEX: 20 < ] [ swap [ "\t\r\n" member? ] [ zero? not ] if ] }
-        { [ nip dup HEX: D800 < ] [ drop t ] }
-        { [ dup HEX: E000 < ] [ drop f ] }
-        [ { HEX: FFFE HEX: FFFF } member? not ]
-    } cond ;
+        [ 0x1 0xD7FF between? ]
+        [ 0xE000 0xFFFD between? ]
+        [ 0x10000 0x10FFFF between? ]
+    } 1|| ; inline
+
+PRIVATE>
+
+: text? ( 1.0? char -- ? )
+    swap [ 1.0-text? ] [ 1.1-text? ] if ;
 
 HINTS: text? { object fixnum } ;

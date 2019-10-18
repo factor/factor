@@ -6,8 +6,8 @@ classes.tuple classes.union combinators definitions effects generic
 generic.single generic.standard generic.hook io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.sections sequences sets sorting strings summary words
-words.symbol words.constant words.alias vocabs slots ;
+prettyprint.sections sequences sets slots sorting strings summary
+words words.symbol words.constant words.alias vocabs ;
 FROM: namespaces => set ;
 FROM: classes => members ;
 RENAME: members sets => set-members
@@ -47,7 +47,7 @@ M: word print-stack-effect? drop t ;
 <PRIVATE
 
 : seeing-word ( word -- )
-    vocabulary>> dup [ vocab ] when pprinter-in set ;
+    vocabulary>> dup [ lookup-vocab ] when pprinter-in set ;
 
 : word-synopsis ( word -- )
     {
@@ -81,7 +81,7 @@ M: hook-generic synopsis*
 
 M: method synopsis*
     [ definer. ]
-    [ "method-class" word-prop pprint-word ]
+    [ "method-class" word-prop pprint-class ]
     [ "method-generic" word-prop pprint-word ] tri ;
 
 M: mixin-instance synopsis*
@@ -139,7 +139,7 @@ M: mixin-class see-class*
     <block \ MIXIN: pprint-word
     dup pprint-word <block
     dup members [
-        hard line-break
+        hard add-line-break
         \ INSTANCE: pprint-word pprint-word pprint-word
     ] with each block> block> ;
 
@@ -204,7 +204,12 @@ M: tuple-class see-class*
 M: word see-class* drop ;
 
 M: builtin-class see-class*
-    drop "! Built-in class" comment. ;
+    "! Built-in class" comment.
+    <block
+    \ PRIMITIVE: pprint-word
+    [ pprint-word ]
+    [ <block "slots" word-prop [ pprint-slot ] each pprint-; block> ] bi
+    block> ;
 
 : see-class ( class -- )
     dup class? [
@@ -224,7 +229,7 @@ M: word see*
 : seeing-implementors ( class -- seq )
     dup implementors
     [ [ reader? ] [ writer? ] bi or not ] filter
-    [ method ] with map
+    [ lookup-method ] with map
     natural-sort ;
 
 : seeing-methods ( generic -- seq )

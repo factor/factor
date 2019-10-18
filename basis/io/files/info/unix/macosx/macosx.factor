@@ -1,20 +1,33 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.strings combinators
-grouping io.encodings.utf8 io.files kernel math sequences system
-unix io.files.unix arrays unix.statfs.macosx unix.statvfs.macosx
-unix.getfsstat.macosx io.files.info.unix io.files.info
-classes.struct specialized-arrays ;
+USING: accessors alien.c-types alien.data alien.strings arrays
+calendar.unix classes.struct combinators grouping
+io.encodings.utf8 io.files io.files.info io.files.info.unix
+io.files.unix kernel math sequences specialized-arrays
+system unix unix.getfsstat.macosx unix.statfs.macosx
+unix.statvfs.macosx ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: statfs64
 IN: io.files.info.unix.macosx
+
+TUPLE: macosx-file-info < unix-file-info birth-time flags gen ;
+
+M: macosx new-file-info ( -- class ) macosx-file-info new ;
+
+M: macosx stat>file-info ( stat -- file-info )
+    [ call-next-method ] keep
+    {
+        [ st_flags>> >>flags ]
+        [ st_gen>> >>gen ]
+        [ st_birthtimespec>> timespec>unix-time >>birth-time ]
+    } cleave ;
 
 TUPLE: macosx-file-system-info < unix-file-system-info
 io-size owner type-id filesystem-subtype ;
 
 M: macosx file-systems ( -- array )
-    f <void*> dup 0 getmntinfo64 dup io-error
-    [ *void* ] dip <direct-statfs64-array>
+    f void* <ref> dup 0 getmntinfo64 dup io-error
+    [ void* deref ] dip \ statfs64 <c-direct-array>
     [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ;
 
 M: macosx new-file-system-info macosx-file-system-info new ;

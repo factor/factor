@@ -62,8 +62,7 @@ SYMBOL: conversation-id
 
 : init-conversations ( conversations -- )
     conversations set
-    request get request-conversation-id
-    get-conversation
+    request get request-conversation
     set-conversation ;
 
 M: conversations call-responder*
@@ -107,7 +106,7 @@ M: conversations call-responder*
         bi
     ] [ 2drop ] if ;
 
-M: conversations modify-form ( conversations -- )
+M: conversations modify-form ( conversations -- xml/f )
     drop
     conversation-id get
     conversation-id-key

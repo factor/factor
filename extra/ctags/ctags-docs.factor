@@ -13,7 +13,7 @@ ARTICLE: "ctags" "Ctags file"
     ctag-lineno
 } ;
 
-HELP: ctags ( path -- )
+HELP: ctags
 { $values { "path" "a pathname string" } }
 { $description "Generates a index file in ctags format and stores in " { $snippet "path" } "." }
 { $examples
@@ -24,7 +24,7 @@ HELP: ctags ( path -- )
   }
 } ;
 
-HELP: ctags-write ( seq path -- )
+HELP: ctags-write
 { $values { "seq" sequence }
           { "path" "a pathname string" } }
 { $description "Stores a " { $snippet "alist" } " in " { $snippet "path" } ". " { $snippet "alist" } " must be an association list with ctags format: key must be a valid word and value a sequence whose first element is a resource name and second element is a line number" }
@@ -50,7 +50,7 @@ HELP: ctag-strings
   }
 } ;
 
-HELP: ctag ( seq -- str )
+HELP: ctag
 { $values { "seq" sequence }
           { "str" string } }
 { $description "Outputs a string " { $snippet "str" } " in ctag format for sequence with two elements, first one must be a valid word and second one a sequence whose first element is a resource name and second element is a line number" }
@@ -62,7 +62,7 @@ HELP: ctag ( seq -- str )
   }
 } ;
 
-HELP: ctag-lineno ( ctag -- n )
+HELP: ctag-lineno
 { $values { "ctag" sequence }
           { "n" integer } }
 { $description "Provides de line number " { $snippet "n" } " from a sequence in ctag format " }
@@ -74,7 +74,7 @@ HELP: ctag-lineno ( ctag -- n )
   }
 } ;
 
-HELP: ctag-path ( ctag -- path )
+HELP: ctag-path
 { $values { "ctag" sequence }
           { "path" string } }
 { $description "Provides a path string " { $snippet "path" } " from a sequence in ctag format" }
@@ -86,7 +86,7 @@ HELP: ctag-path ( ctag -- path )
   }
 } ;
 
-HELP: ctag-word ( ctag -- word )
+HELP: ctag-word
 { $values { "ctag" sequence }
           { "word" word } }
 { $description "Provides the " { $snippet "word" } " from a sequence in ctag format " }

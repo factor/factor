@@ -224,7 +224,7 @@ var price = (order == null ? null : order.price);""" }
     }
     ! { $slide "Stack languages are fundamental"
     !     "Very simple semantics"
-    !     "Easy to generate stack code programatically"
+    !     "Easy to generate stack code programmatically"
     !     "Everything is almost entirely library code in Factor"
     !     "Factor is easy to extend"
     ! }

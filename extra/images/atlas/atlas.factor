@@ -51,9 +51,9 @@ ERROR: atlas-image-formats-dont-match images ;
 
 : atlas-image-format ( image-placements -- component-order component-type upside-down? )
     [ image>> ] map dup unclip '[ _
-        [ [ component-order>> ] bi@ = ]
-        [ [ component-type>>  ] bi@ = ]
-        [ [ upside-down?>>    ] bi@ = ] 2tri and and
+        [ [ component-order>> ] same? ]
+        [ [ component-type>>  ] same? ]
+        [ [ upside-down?>>    ] same? ] 2tri and and
     ] all?
     [ first [ component-order>> ] [ component-type>> ] [ upside-down?>> ] tri ]
     [ atlas-image-formats-dont-match ] if ; inline

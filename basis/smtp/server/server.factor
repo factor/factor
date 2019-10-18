@@ -4,7 +4,7 @@ USING: combinators kernel prettyprint io io.timeouts sequences
 namespaces io.sockets io.sockets.secure continuations calendar
 io.encodings.ascii io.streams.duplex destructors locals
 concurrency.promises threads accessors smtp.private
-io.sockets.secure.unix.debug io.crlf ;
+io.sockets.secure.debug io.crlf ;
 IN: smtp.server
 
 ! Mock SMTP server for testing purposes.
@@ -66,7 +66,7 @@ SYMBOL: data-mode
                 "220 OK\r\n" write flush t
             ]
         }
-        { [ data-mode get ] [ dup global [ print ] bind t ] }
+        { [ data-mode get ] [ dup [ print ] with-global t ] }
         [ "500 ERROR\r\n" write flush t ]
     } cond nip [ process ] when ;
 
@@ -80,7 +80,7 @@ SYMBOL: data-mode
                     1 minutes timeouts
                     "220 hello\r\n" write flush
                     process
-                    global [ flush ] bind
+                    [ flush ] with-global
                 ] with-stream
             ] with-disposal
         ] with-test-context

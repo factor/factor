@@ -65,13 +65,13 @@ cell object::binary_payload_start(Fixup fixup) const
 		return 0;
 	/* these objects have some binary data at the end */
 	case WORD_TYPE:
-		return sizeof(word) - sizeof(cell) * 3;
+		return sizeof(word) - sizeof(cell);
 	case ALIEN_TYPE:
 		return sizeof(cell) * 3;
 	case DLL_TYPE:
 		return sizeof(cell) * 2;
 	case QUOTATION_TYPE:
-		return sizeof(quotation) - sizeof(cell) * 2;
+		return sizeof(quotation) - sizeof(cell);
 	case STRING_TYPE:
 		return sizeof(string);
 	/* everything else consists entirely of pointers */
@@ -134,6 +134,8 @@ template<typename Fixup> struct slot_visitor {
 	void visit_contexts();
 	void visit_code_block_objects(code_block *compiled);
 	void visit_embedded_literals(code_block *compiled);
+	void visit_sample_callstacks();
+	void visit_sample_threads();
 };
 
 template<typename Fixup>
@@ -250,6 +252,28 @@ void slot_visitor<Fixup>::visit_literal_table_roots()
 }
 
 template<typename Fixup>
+void slot_visitor<Fixup>::visit_sample_callstacks()
+{
+	for (std::vector<cell>::iterator iter = parent->sample_callstacks.begin();
+		iter != parent->sample_callstacks.end();
+		++iter)
+	{
+		visit_handle(&*iter);
+	}
+}
+
+template<typename Fixup>
+void slot_visitor<Fixup>::visit_sample_threads()
+{
+	for (std::vector<profiling_sample>::iterator iter = parent->samples.begin();
+		iter != parent->samples.end();
+		++iter)
+	{
+		visit_handle(&iter->thread);
+	}
+}
+
+template<typename Fixup>
 void slot_visitor<Fixup>::visit_roots()
 {
 	visit_handle(&parent->true_object);
@@ -261,6 +285,8 @@ void slot_visitor<Fixup>::visit_roots()
 	visit_bignum_roots();
 	visit_callback_roots();
 	visit_literal_table_roots();
+	visit_sample_callstacks();
+	visit_sample_threads();
 
 	visit_object_array(parent->special_objects,parent->special_objects + special_object_count);
 }
@@ -274,44 +300,67 @@ struct call_frame_slot_visitor {
 		parent(parent_), visitor(visitor_) {}
 
 	/*
-	next  -> [entry_point]
-	         [size]
-	         [return address] -- x86 only, backend adds 1 to each spill location
-	         [spill area]
-	         ...
-	frame -> [entry_point]
-	         [size]
+	frame top -> [return address]
+	             [spill area]
+	             ...
+	             [entry_point]
+	             [size]
 	*/
-	void operator()(stack_frame *frame)
+	void operator()(void *frame_top, cell frame_size, code_block *owner, void *addr)
 	{
-		cell return_address = parent->frame_offset(frame);
-		if(return_address == (cell)-1)
-			return;
+		cell return_address = owner->offset(addr);
 
-		code_block *compiled = visitor->fixup.translate_code(parent->frame_code(frame));
+		code_block *compiled = Fixup::translated_code_block_map
+			? owner
+			: visitor->fixup.translate_code(owner);
 		gc_info *info = compiled->block_gc_info();
 
-		assert(return_address < compiled->size());
-		int index = info->return_address_index(return_address);
-		if(index == -1)
+		FACTOR_ASSERT(return_address < compiled->size());
+		cell callsite = info->return_address_index(return_address);
+		if(callsite == (cell)-1)
 			return;
 
 #ifdef DEBUG_GC_MAPS
 		std::cout << "call frame code block " << compiled << " with offset " << return_address << std::endl;
 #endif
+		cell *stack_pointer = (cell *)frame_top;
 		u8 *bitmap = info->gc_info_bitmap();
-		cell base = info->spill_slot_base(index);
-		cell *stack_pointer = (cell *)(parent->frame_successor(frame) + 1);
 
-		for(int spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++)
+		/* Subtract old value of base pointer from every derived pointer. */
+		for(cell spill_slot = 0; spill_slot < info->derived_root_count; spill_slot++)
 		{
-			if(bitmap_p(bitmap,base + spill_slot))
+			u32 base_pointer = info->lookup_base_pointer(callsite, spill_slot);
+			if(base_pointer != (u32)-1)
 			{
 #ifdef DEBUG_GC_MAPS
-				std::cout << "visiting spill slot " << spill_slot << std::endl;
+				std::cout << "visiting derived root " << spill_slot
+					<< " with base pointer " << base_pointer
+					<< std::endl;
+#endif
+				stack_pointer[spill_slot] -= stack_pointer[base_pointer];
+			}
+		}
+
+		/* Update all GC roots, including base pointers. */
+		cell callsite_gc_roots = info->callsite_gc_roots(callsite);
+
+		for(cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++)
+		{
+			if(bitmap_p(bitmap,callsite_gc_roots + spill_slot))
+			{
+#ifdef DEBUG_GC_MAPS
+				std::cout << "visiting GC root " << spill_slot << std::endl;
 #endif
 				visitor->visit_handle(stack_pointer + spill_slot);
 			}
+		}
+
+		/* Add the base pointers to obtain new derived pointer values. */
+		for(cell spill_slot = 0; spill_slot < info->derived_root_count; spill_slot++)
+		{
+			u32 base_pointer = info->lookup_base_pointer(callsite, spill_slot);
+			if(base_pointer != (u32)-1)
+				stack_pointer[spill_slot] += stack_pointer[base_pointer];
 		}
 	}
 };
@@ -320,14 +369,14 @@ template<typename Fixup>
 void slot_visitor<Fixup>::visit_callstack_object(callstack *stack)
 {
 	call_frame_slot_visitor<Fixup> call_frame_visitor(parent,this);
-	parent->iterate_callstack_object(stack,call_frame_visitor);
+	parent->iterate_callstack_object(stack,call_frame_visitor,fixup);
 }
 
 template<typename Fixup>
 void slot_visitor<Fixup>::visit_callstack(context *ctx)
 {
 	call_frame_slot_visitor<Fixup> call_frame_visitor(parent,this);
-	parent->iterate_callstack(ctx,call_frame_visitor);
+	parent->iterate_callstack(ctx,call_frame_visitor,fixup);
 }
 
 template<typename Fixup>

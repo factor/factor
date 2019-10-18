@@ -46,9 +46,9 @@ M: utf32le encode-char
 
 ! UTF-32
 
-CONSTANT: bom-le B{ HEX: ff HEX: fe 0 0 }
+CONSTANT: bom-le B{ 0xff 0xfe 0 0 }
 
-CONSTANT: bom-be B{ 0 0 HEX: fe HEX: ff }
+CONSTANT: bom-be B{ 0 0 0xfe 0xff }
 
 : bom>le/be ( bom -- le/be )
     dup bom-le sequence= [ drop utf32le ] [

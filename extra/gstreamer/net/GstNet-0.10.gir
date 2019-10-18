@@ -1,0 +1,318 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gst" version="0.10"/>
+  <include name="libxml2" version="2.0"/>
+  <package name="gstreamer-net-0.10"/>
+  <c:include name="gst/net/gstnet.h"/>
+  <namespace name="GstNet"
+             version="0.10"
+             shared-library="libgstreamer-0.10.so.0,libgstnet-0.10.so.0"
+             c:identifier-prefixes="Gst"
+             c:symbol-prefixes="gst">
+    <constant name="NET_TIME_PACKET_SIZE" value="16">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <class name="NetClientClock"
+           c:symbol-prefix="net_client_clock"
+           c:type="GstNetClientClock"
+           parent="Gst.SystemClock"
+           glib:type-name="GstNetClientClock"
+           glib:get-type="gst_net_client_clock_get_type"
+           glib:type-struct="NetClientClockClass">
+      <doc xml:whitespace="preserve">This object implements a custom #GstClock that synchronizes its time
+to a remote time provider such as #GstNetTimeProvider.
+A new clock is created with gst_net_client_clock_new() which takes the
+address and port of the remote time provider along with a name and
+an initial time.
+This clock will poll the time provider and will update its calibration
+parameters based on the local and remote observations.
+Various parameters of the clock can be configured with the parent #GstClock
+"timeout", "window-size" and "window-threshold" object properties.
+A #GstNetClientClock is typically set on a #GstPipeline with 
+gst_pipeline_use_clock().
+Last reviewed on 2005-11-23 (0.9.5)</doc>
+      <constructor name="new" c:identifier="gst_net_client_clock_new">
+        <doc xml:whitespace="preserve">Create a new #GstNetClientClock that will report the time
+provided by the #GstNetTimeProvider on @remote_address and 
+clock.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">a new #GstClock that receives a time from the remote</doc>
+          <type name="Gst.Clock" c:type="GstClock*"/>
+        </return-value>
+        <parameters>
+          <parameter name="name" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a name for the clock</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="remote_address" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the address of the remote clock provider</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="remote_port" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the port of the remote clock provider</doc>
+            <type name="gint" c:type="gint"/>
+          </parameter>
+          <parameter name="base_time" transfer-ownership="none">
+            <doc xml:whitespace="preserve">initial time of the clock</doc>
+            <type name="Gst.ClockTime" c:type="GstClockTime"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <property name="address" writable="1" transfer-ownership="none">
+        <type name="utf8"/>
+      </property>
+      <property name="port" writable="1" transfer-ownership="none">
+        <type name="gint"/>
+      </property>
+      <field name="clock">
+        <type name="Gst.SystemClock" c:type="GstSystemClock"/>
+      </field>
+      <field name="address">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="port">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="sock" readable="0" private="1">
+        <type name="gint" c:type="int"/>
+      </field>
+      <field name="control_sock" readable="0" private="1">
+        <array zero-terminated="0" c:type="gint" fixed-size="2">
+          <type name="gint" c:type="int"/>
+        </array>
+      </field>
+      <field name="current_timeout" readable="0" private="1">
+        <type name="Gst.ClockTime" c:type="GstClockTime"/>
+      </field>
+      <field name="servaddr">
+        <type name="gpointer" c:type="gpointer*"/>
+      </field>
+      <field name="thread">
+        <type name="GLib.Thread" c:type="GThread*"/>
+      </field>
+      <field name="priv" readable="0" private="1">
+        <type name="NetClientClockPrivate" c:type="GstNetClientClockPrivate*"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="3">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </class>
+    <record name="NetClientClockClass"
+            c:type="GstNetClientClockClass"
+            glib:is-gtype-struct-for="NetClientClock">
+      <field name="parent_class">
+        <type name="Gst.SystemClockClass" c:type="GstSystemClockClass"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="4">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </record>
+    <record name="NetClientClockPrivate"
+            c:type="GstNetClientClockPrivate"
+            disguised="1">
+    </record>
+    <record name="NetTimePacket" c:type="GstNetTimePacket">
+      <doc xml:whitespace="preserve">Various functions for receiving, sending an serializing #GstNetTimePacket
+structures.
+Last reviewed on 2005-11-23 (0.9.5)</doc>
+      <field name="local_time" writable="1">
+        <type name="Gst.ClockTime" c:type="GstClockTime"/>
+      </field>
+      <field name="remote_time" writable="1">
+        <type name="Gst.ClockTime" c:type="GstClockTime"/>
+      </field>
+      <method name="send" c:identifier="gst_net_time_packet_send">
+        <doc xml:whitespace="preserve">Sends a #GstNetTimePacket over a socket. Essentially a thin wrapper around
+sendto(2) and gst_net_time_packet_serialize(). 
+MT safe.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">The return value of sendto(2).</doc>
+          <type name="gint" c:type="gint"/>
+        </return-value>
+        <parameters>
+          <parameter name="fd" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a file descriptor created by socket(2)</doc>
+            <type name="gint" c:type="gint"/>
+          </parameter>
+          <parameter name="addr" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a pointer to a sockaddr to hold the address of the sender</doc>
+            <type name="gpointer" c:type="gpointer*"/>
+          </parameter>
+          <parameter name="len" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the size of the data pointed to by @addr</doc>
+            <type name="gint32" c:type="socklen_t"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="serialize" c:identifier="gst_net_time_packet_serialize">
+        <doc xml:whitespace="preserve">Serialized a #GstNetTimePacket into a newly-allocated sequence of
+#GST_NET_TIME_PACKET_SIZE bytes, in network byte order. The value returned is
+suitable for passing to write(2) or sendto(2) for communication over the
+network.
+MT safe. Caller owns return value (g_free to free).</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">A newly allocated sequence of #GST_NET_TIME_PACKET_SIZE bytes.</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </return-value>
+      </method>
+    </record>
+    <class name="NetTimeProvider"
+           c:symbol-prefix="net_time_provider"
+           c:type="GstNetTimeProvider"
+           parent="Gst.Object"
+           glib:type-name="GstNetTimeProvider"
+           glib:get-type="gst_net_time_provider_get_type"
+           glib:type-struct="NetTimeProviderClass">
+      <doc xml:whitespace="preserve">This object exposes the time of a #GstClock on the network.
+A #GstNetTimeProvider is created with gst_net_time_provider_new() which
+takes a #GstClock, an address and a port number as arguments.
+After creating the object, a client clock such as #GstNetClientClock can
+query the exposed clock over the network for its values.
+The #GstNetTimeProvider typically wraps the clock used by a #GstPipeline.
+Last reviewed on 2005-11-23 (0.9.5)</doc>
+      <constructor name="new" c:identifier="gst_net_time_provider_new">
+        <doc xml:whitespace="preserve">Allows network clients to get the current time of @clock.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new #GstNetTimeProvider, or NULL on error</doc>
+          <type name="NetTimeProvider" c:type="GstNetTimeProvider*"/>
+        </return-value>
+        <parameters>
+          <parameter name="clock" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GstClock to export over the network</doc>
+            <type name="Gst.Clock" c:type="GstClock*"/>
+          </parameter>
+          <parameter name="address" transfer-ownership="none">
+            <doc xml:whitespace="preserve">an address to bind on as a dotted quad (xxx.xxx.xxx.xxx), or NULL to bind to all addresses</doc>
+            <type name="utf8" c:type="gchar*"/>
+          </parameter>
+          <parameter name="port" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a port to bind on, or 0 to let the kernel choose</doc>
+            <type name="gint" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <property name="active" writable="1" transfer-ownership="none">
+        <type name="gboolean"/>
+      </property>
+      <property name="address" writable="1" transfer-ownership="none">
+        <type name="utf8"/>
+      </property>
+      <property name="clock" writable="1" transfer-ownership="none">
+        <type name="Gst.Clock"/>
+      </property>
+      <property name="port" writable="1" transfer-ownership="none">
+        <type name="gint"/>
+      </property>
+      <field name="parent">
+        <type name="Gst.Object" c:type="GstObject"/>
+      </field>
+      <field name="address" readable="0" private="1">
+        <type name="utf8" c:type="gchar*"/>
+      </field>
+      <field name="port" readable="0" private="1">
+        <type name="gint" c:type="int"/>
+      </field>
+      <field name="sock" readable="0" private="1">
+        <type name="gint" c:type="int"/>
+      </field>
+      <field name="control_sock" readable="0" private="1">
+        <array zero-terminated="0" c:type="gint" fixed-size="2">
+          <type name="gint" c:type="int"/>
+        </array>
+      </field>
+      <field name="thread" readable="0" private="1">
+        <type name="GLib.Thread" c:type="GThread*"/>
+      </field>
+      <field name="clock" readable="0" private="1">
+        <type name="Gst.Clock" c:type="GstClock*"/>
+      </field>
+      <union name="active" c:type="active">
+        <field name="_gst_reserved1" writable="1">
+          <type name="gpointer" c:type="gpointer"/>
+        </field>
+        <field name="active" writable="1">
+          <type name="gint" c:type="gint"/>
+        </field>
+      </union>
+      <field name="priv" readable="0" private="1">
+        <type name="NetTimeProviderPrivate"
+              c:type="GstNetTimeProviderPrivate*"/>
+      </field>
+      <field name="_gst_reserved" readable="0" private="1">
+        <array zero-terminated="0" c:type="gpointer" fixed-size="2">
+          <type name="gpointer" c:type="gpointer"/>
+        </array>
+      </field>
+    </class>
+    <record name="NetTimeProviderClass"
+            c:type="GstNetTimeProviderClass"
+            glib:is-gtype-struct-for="NetTimeProvider">
+      <field name="parent_class">
+        <type name="Gst.ObjectClass" c:type="GstObjectClass"/>
+      </field>
+    </record>
+    <record name="NetTimeProviderPrivate"
+            c:type="GstNetTimeProviderPrivate"
+            disguised="1">
+    </record>
+    <function name="net_time_packet_new"
+              c:identifier="gst_net_time_packet_new"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Creates a new #GstNetTimePacket from a buffer received over the network. The
+caller is responsible for ensuring that @buffer is at least
+#GST_NET_TIME_PACKET_SIZE bytes long.
+If @buffer is #NULL, the local and remote times will be set to
+#GST_CLOCK_TIME_NONE.
+MT safe. Caller owns return value (g_free to free).</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">The new #GstNetTimePacket.</doc>
+        <type name="NetTimePacket" c:type="GstNetTimePacket*"/>
+      </return-value>
+      <parameters>
+        <parameter name="buffer" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a buffer from which to construct the packet, or NULL</doc>
+          <type name="guint8" c:type="guint8*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="net_time_packet_receive"
+              c:identifier="gst_net_time_packet_receive"
+              introspectable="0">
+      <doc xml:whitespace="preserve">Receives a #GstNetTimePacket over a socket. Handles interrupted system calls,
+but otherwise returns NULL on error. See recvfrom(2) for more information on
+how to interpret @sockaddr.
+MT safe. Caller owns return value (g_free to free).</doc>
+      <return-value>
+        <doc xml:whitespace="preserve">The new #GstNetTimePacket.</doc>
+        <type name="NetTimePacket" c:type="GstNetTimePacket*"/>
+      </return-value>
+      <parameters>
+        <parameter name="fd" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a file descriptor created by socket(2)</doc>
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="addr" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to a sockaddr to hold the address of the sender</doc>
+          <type name="gpointer" c:type="gpointer*"/>
+        </parameter>
+        <parameter name="len" transfer-ownership="none">
+          <doc xml:whitespace="preserve">a pointer to the size of the data pointed to by @addr</doc>
+          <type name="gint32" c:type="socklen_t*"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>

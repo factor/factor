@@ -36,7 +36,7 @@ SYMBOL: header-bits
 ! We do this in its own compilation unit so that they can be
 ! folded below
 <<
-: cell ( -- n ) 7 special-object ; foldable
+: cell ( -- n ) OBJ-CELL-SIZE special-object ; foldable
 
 : (first-bignum) ( m -- n ) tag-bits get - 1 - 2^ ; foldable
 >>

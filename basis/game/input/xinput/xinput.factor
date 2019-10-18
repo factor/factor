@@ -1,7 +1,7 @@
 USING: game.input math math.order kernel macros fry sequences quotations
 arrays windows.directx.xinput combinators accessors windows.types
 game.input.dinput sequences.private namespaces classes.struct
-windows.errors windows.com.syntax io.encodings.utf16n alien.strings ;
+windows.errors windows.com.syntax alien.strings ;
 IN: game.input.xinput
 
 SINGLETON: xinput-game-input-backend
@@ -56,7 +56,7 @@ MACRO: map-index-compose ( seq quot -- seq )
 : fill-controller-state ( XINPUT_STATE -- controller-state )
     Gamepad>> controller-state new dup rot
     {
-        [ wButtons>> HEX: f bitand >pov swap pov<< ]
+        [ wButtons>> 0xf bitand >pov swap pov<< ]
         [ wButtons>> fill-buttons swap buttons<< ]
         [ sThumbLX>> >axis swap x<< ]
         [ sThumbLY>> >axis swap y<< ]
@@ -84,13 +84,13 @@ M: xinput-game-input-backend (close-game-input)
     FALSE XInputEnable ;
 
 M: xinput-game-input-backend (reset-game-input)
-    global [
+    [
         {
             +dinput+ +keyboard-device+ +keyboard-state+
             +controller-devices+ +controller-guids+
             +device-change-window+ +device-change-handle+
         } [ off ] each
-    ] bind ;
+    ] with-global ;
 
 M: xinput-game-input-backend get-controllers
     { 0 1 2 3 } ;
@@ -98,7 +98,7 @@ M: xinput-game-input-backend get-controllers
 M: xinput-game-input-backend product-string
     dup number?
     [ drop "Controller (Xbox 360 Wireless Receiver for Windows)" ]
-    [ handle>> device-info tszProductName>> utf16n alien>string ]
+    [ handle>> device-info tszProductName>> alien>native-string ]
     if ;
 
 M: xinput-game-input-backend product-id

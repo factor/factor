@@ -39,13 +39,13 @@ M: ##inc-r visit-insn n>> rs-loc handle-inc ;
 ERROR: uninitialized-peek insn ;
 
 : visit-peek ( ##peek -- )
-    dup loc>> [ n>> ] [ class get ] bi ?nth 0 =
+    dup loc>> [ n>> ] [ class-of get ] bi ?nth 0 =
     [ uninitialized-peek ] [ drop ] if ; inline
 
 M: ##peek visit-insn visit-peek ;
 
 : visit-replace ( ##replace -- )
-    loc>> [ n>> ] [ class get ] bi
+    loc>> [ n>> ] [ class-of get ] bi
     2dup length < [ [ 1 ] 2dip set-nth ] [ 2drop ] if ;
 
 M: ##replace visit-insn visit-replace ;
@@ -68,7 +68,7 @@ M: insn visit-insn drop ;
 : finish ( -- pair ) ds-loc get rs-loc get 2array ;
 
 : (join-sets) ( seq1 seq2 -- seq )
-    2dup [ length ] bi@ max '[ _ 1 pad-tail ] bi@ [ bitand ] 2map ;
+    2dup max-length '[ _ 1 pad-tail ] bi@ [ bitand ] 2map ;
 
 PRIVATE>
 
@@ -77,5 +77,5 @@ FORWARD-ANALYSIS: uninitialized
 M: uninitialized-analysis transfer-set ( pair bb analysis -- pair' )
     drop [ prepare ] dip visit-block finish ;
 
-M: uninitialized-analysis join-sets ( sets analysis -- pair )
+M: uninitialized-analysis join-sets ( sets bb dfa -- set )
     2drop sift [ f ] [ [ ] [ [ (join-sets) ] 2map ] map-reduce ] if-empty ;

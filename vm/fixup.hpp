@@ -10,6 +10,8 @@ struct identity {
 };
 
 struct no_fixup {
+	static const bool translated_code_block_map = false;
+
 	object *fixup_data(object *obj)
 	{
 		return obj;

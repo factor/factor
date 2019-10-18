@@ -3,8 +3,9 @@ kernel.private math hashtables.private math.private namespaces
 sequences tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts
 words definitions compiler.units io combinators vectors grouping
-make alien.c-types combinators.short-circuit math.order
-math.libm math.parser math.functions alien.syntax ;
+make alien.c-types alien.data combinators.short-circuit math.order
+math.libm math.parser math.functions alien.syntax memory
+stack-checker ;
 FROM: math => float ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
@@ -50,7 +51,7 @@ unit-test
 
 [ 3 ]
 [
-    global [ 3 \ foo set ] bind
+    global [ 3 \ foo set ] with-variables
     \ foo [ global >n get namespaces.private:ndrop ] compile-call
 ] unit-test
 
@@ -58,20 +59,20 @@ unit-test
 
 [ 3 ]
 [
-    global [ 3 \ foo set ] bind
+    global [ 3 \ foo set ] with-variables
     \ foo [ global [ get ] swap blech call ] compile-call
 ] unit-test
 
 [ 3 ]
 [
-    global [ 3 \ foo set ] bind
+    global [ 3 \ foo set ] with-variables
     \ foo [ global [ get ] swap >n call namespaces.private:ndrop ] compile-call
 ] unit-test
 
 [ 3 ]
 [
-    global [ 3 \ foo set ] bind
-    \ foo [ global [ get ] bind ] compile-call
+    global [ 3 \ foo set ] with-variables
+    \ foo [ global [ get ] with-variables ] compile-call
 ] unit-test
 
 [ 12 13 ] [
@@ -105,7 +106,7 @@ unit-test
 [ ] [
     [
         [ 200 dup [ 200 3array ] curry map drop ] times
-    ] [ (( n -- )) define-temp ] with-compilation-unit drop
+    ] [ ( n -- ) define-temp ] with-compilation-unit drop
 ] unit-test
 
 ! Test how dispatch handles the end of a basic block
@@ -274,7 +275,8 @@ M: cucumber equal? "The cucumber has no equal" throw ;
 
 [ 4294967295 B{ 255 255 255 255 } -1 ]
 [
-    -1 <int> -1 <int>
+    -1 int <ref>
+    -1 int <ref>
     [ [ 0 alien-unsigned-4 swap ] [ 0 alien-signed-2 ] bi ]
     compile-call
 ] unit-test
@@ -460,7 +462,14 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 ! Forgot to two-operand shifts
 [ 2 0 ] [
     1 1
-    [ [ HEX: f bitand ] bi@ [ shift ] [ drop -3 shift ] 2bi ] compile-call
+    [ [ 0xf bitand ] bi@ [ shift ] [ drop -3 shift ] 2bi ] compile-call
+] unit-test
+
+! Alias analysis bug
+[ t ] [
+    [
+        10 10 <byte-array> [ <displaced-alien> underlying>> ] keep eq?
+    ] compile-call
 ] unit-test
 
 ! GC root offsets were computed wrong on x86
@@ -473,9 +482,45 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 
 [ ] [ 2000 [ "hello" clone dup gc-root-messup first eq? t assert= ] times ] unit-test
 
-! Alias analysis bug
-[ t ] [
-    [
-        10 10 <byte-array> [ <displaced-alien> underlying>> ] keep eq?
-    ] compile-call
-] unit-test
+! Write barrier elimination was being done before scheduling and
+! GC check insertion, and didn't take subroutine calls into
+! account. Oops...
+: write-barrier-elim-in-wrong-place ( -- obj )
+    ! A callback used below
+    void { } cdecl [ compact-gc ] alien-callback
+    ! Allocate an object A in the nursery
+    1 f <array>
+    ! Subroutine call promotes the object to tenured
+    swap void { } cdecl alien-indirect
+    ! Allocate another object B in the nursery, store it into
+    ! the first
+    1 f <array> over set-first
+    ! Now object A's card should be marked and minor GC should
+    ! promote B to aging
+    minor-gc
+    ! Do stuff
+    [ 100 [ ] times ] infer.
+    ;
+
+[ { { f } } ] [ write-barrier-elim-in-wrong-place ] unit-test
+
+! GC maps must support derived pointers
+: (derived-pointer-test-1) ( -- byte-array )
+    2 <byte-array> ;
+
+: derived-pointer-test-1 ( -- byte-array )
+    ! A callback used below
+    void { } cdecl [ compact-gc ] alien-callback
+    ! Put the construction in a word since instruction selection
+    ! eliminates the untagged pointer entirely if the value is a
+    ! byte array
+    (derived-pointer-test-1) { c-ptr } declare
+    ! Store into an array, an untagged pointer to the payload
+    ! is now an available expression
+    123 over 0 set-alien-unsigned-1
+    ! GC, moving the array and derived pointer
+    swap void { } cdecl alien-indirect
+    ! Store into the array again
+    231 over 1 set-alien-unsigned-1 ;
+
+[ B{ 123 231 } ] [ derived-pointer-test-1 ] unit-test

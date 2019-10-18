@@ -9,6 +9,6 @@ IN: benchmark.fib1
         swap 1 fixnum-fast fast-fixnum-fib fixnum+fast
     ] if ;
 
-: fib-main ( -- ) 34 fast-fixnum-fib 9227465 assert= ;
+: fib1-benchmark ( -- ) 34 fast-fixnum-fib 9227465 assert= ;
 
-MAIN: fib-main
+MAIN: fib1-benchmark

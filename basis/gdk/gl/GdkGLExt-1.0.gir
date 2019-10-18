@@ -1,0 +1,1601 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GLib" version="2.0"/>
+  <include name="GModule" version="2.0"/>
+  <include name="GObject" version="2.0"/>
+  <include name="Gdk" version="3.0"/>
+  <include name="GdkPixbuf" version="2.0"/>
+  <include name="Gio" version="2.0"/>
+  <include name="Pango" version="1.0"/>
+  <include name="cairo" version="1.0"/>
+  <package name="gdkglext-1.0"/>
+  <namespace name="GdkGL"
+             version="1.0"
+             shared-library="libgdkglext-x11-1.0.so.0"
+             c:identifier-prefixes="GdkGL,Gdk"
+             c:symbol-prefixes="gdk_gl,gdk">
+    <constant name="ATTRIB_LIST_NONE" value="0">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <bitfield name="BufferMask"
+              glib:type-name="GdkGLBufferMask"
+              glib:get-type="gdk_gl_buffer_mask_get_type"
+              c:type="GdkGLBufferMask">
+      <member name="front_left_buffer_bit"
+              value="1"
+              c:identifier="GDK_GL_FRONT_LEFT_BUFFER_BIT"
+              glib:nick="front-left-buffer-bit"/>
+      <member name="front_right_buffer_bit"
+              value="2"
+              c:identifier="GDK_GL_FRONT_RIGHT_BUFFER_BIT"
+              glib:nick="front-right-buffer-bit"/>
+      <member name="back_left_buffer_bit"
+              value="4"
+              c:identifier="GDK_GL_BACK_LEFT_BUFFER_BIT"
+              glib:nick="back-left-buffer-bit"/>
+      <member name="back_right_buffer_bit"
+              value="8"
+              c:identifier="GDK_GL_BACK_RIGHT_BUFFER_BIT"
+              glib:nick="back-right-buffer-bit"/>
+      <member name="aux_buffers_bit"
+              value="16"
+              c:identifier="GDK_GL_AUX_BUFFERS_BIT"
+              glib:nick="aux-buffers-bit"/>
+      <member name="depth_buffer_bit"
+              value="32"
+              c:identifier="GDK_GL_DEPTH_BUFFER_BIT"
+              glib:nick="depth-buffer-bit"/>
+      <member name="stencil_buffer_bit"
+              value="64"
+              c:identifier="GDK_GL_STENCIL_BUFFER_BIT"
+              glib:nick="stencil-buffer-bit"/>
+      <member name="accum_buffer_bit"
+              value="128"
+              c:identifier="GDK_GL_ACCUM_BUFFER_BIT"
+              glib:nick="accum-buffer-bit"/>
+    </bitfield>
+    <class name="Config"
+           c:symbol-prefix="config"
+           c:type="GdkGLConfig"
+           parent="GObject.Object"
+           glib:type-name="GdkGLConfig"
+           glib:get-type="gdk_gl_config_get_type"
+           glib:type-struct="ConfigClass">
+      <constructor name="new" c:identifier="gdk_gl_config_new">
+        <doc xml:whitespace="preserve">Returns an OpenGL frame buffer configuration that match the specified
+attributes.
+attrib_list is a int array that contains the attribute/value pairs.
+GDK_GL_USE_GL, GDK_GL_BUFFER_SIZE, GDK_GL_LEVEL, GDK_GL_RGBA,
+GDK_GL_DOUBLEBUFFER, GDK_GL_STEREO, GDK_GL_AUX_BUFFERS,
+GDK_GL_RED_SIZE, GDK_GL_GREEN_SIZE, GDK_GL_BLUE_SIZE, GDK_GL_ALPHA_SIZE,
+GDK_GL_DEPTH_SIZE, GDK_GL_STENCIL_SIZE, GDK_GL_ACCUM_RED_SIZE,
+GDK_GL_ACCUM_GREEN_SIZE, GDK_GL_ACCUM_BLUE_SIZE, GDK_GL_ACCUM_ALPHA_SIZE.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new #GdkGLConfig.</doc>
+          <type name="Config" c:type="GdkGLConfig*"/>
+        </return-value>
+        <parameters>
+          <parameter name="attrib_list" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a list of attribute/value pairs. The last attribute must be GDK_GL_ATTRIB_LIST_NONE.</doc>
+            <array c:type="int*">
+              <type name="gint"/>
+            </array>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_by_mode" c:identifier="gdk_gl_config_new_by_mode">
+        <doc xml:whitespace="preserve">Returns an OpenGL frame buffer configuration that match the specified
+display mode.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new #GdkGLConfig.</doc>
+          <type name="Config" c:type="GdkGLConfig*"/>
+        </return-value>
+        <parameters>
+          <parameter name="mode" transfer-ownership="none">
+            <doc xml:whitespace="preserve">display mode bit mask.</doc>
+            <type name="ConfigMode" c:type="GdkGLConfigMode"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_by_mode_for_screen"
+                   c:identifier="gdk_gl_config_new_by_mode_for_screen">
+        <doc xml:whitespace="preserve">Returns an OpenGL frame buffer configuration that match the specified
+display mode.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new #GdkGLConfig.</doc>
+          <type name="Config" c:type="GdkGLConfig*"/>
+        </return-value>
+        <parameters>
+          <parameter name="screen" transfer-ownership="none">
+            <doc xml:whitespace="preserve">target screen.</doc>
+            <type name="Gdk.Screen" c:type="GdkScreen*"/>
+          </parameter>
+          <parameter name="mode" transfer-ownership="none">
+            <doc xml:whitespace="preserve">display mode bit mask.</doc>
+            <type name="ConfigMode" c:type="GdkGLConfigMode"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <constructor name="new_for_screen"
+                   c:identifier="gdk_gl_config_new_for_screen">
+        <doc xml:whitespace="preserve">Returns an OpenGL frame buffer configuration that match the specified
+attributes.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new #GdkGLConfig.</doc>
+          <type name="Config" c:type="GdkGLConfig*"/>
+        </return-value>
+        <parameters>
+          <parameter name="screen" transfer-ownership="none">
+            <doc xml:whitespace="preserve">target screen.</doc>
+            <type name="Gdk.Screen" c:type="GdkScreen*"/>
+          </parameter>
+          <parameter name="attrib_list" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a list of attribute/value pairs. The last attribute must be GDK_GL_ATTRIB_LIST_NONE.</doc>
+            <array c:type="int*">
+              <type name="gint"/>
+            </array>
+          </parameter>
+        </parameters>
+      </constructor>
+      <method name="get_attrib" c:identifier="gdk_gl_config_get_attrib">
+        <doc xml:whitespace="preserve">Gets information about a OpenGL frame buffer configuration.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if it succeeded, FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="attribute" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the attribute to be returned.</doc>
+            <type name="gint" c:type="int"/>
+          </parameter>
+          <parameter name="value"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full">
+            <doc xml:whitespace="preserve">returns the requested value.</doc>
+            <type name="gint" c:type="int*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_colormap" c:identifier="gdk_gl_config_get_colormap">
+        <doc xml:whitespace="preserve">Gets the #GdkColormap that is appropriate for the OpenGL frame buffer
+configuration.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the appropriate #GdkColormap.</doc>
+          <type name="Gdk.Colormap" c:type="GdkColormap*"/>
+        </return-value>
+      </method>
+      <method name="get_depth" c:identifier="gdk_gl_config_get_depth">
+        <doc xml:whitespace="preserve">Gets the color depth of the OpenGL-capable visual.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">number of bits per pixel</doc>
+          <type name="gint" c:type="gint"/>
+        </return-value>
+      </method>
+      <method name="get_layer_plane"
+              c:identifier="gdk_gl_config_get_layer_plane">
+        <doc xml:whitespace="preserve">Gets the layer plane (level) of the frame buffer.
+Zero is the default frame buffer.
+Positive layer planes correspond to frame buffers that overlay the default
+buffer, and negative layer planes correspond to frame buffers that underlie
+the default frame buffer.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">layer plane.</doc>
+          <type name="gint" c:type="gint"/>
+        </return-value>
+      </method>
+      <method name="get_n_aux_buffers"
+              c:identifier="gdk_gl_config_get_n_aux_buffers">
+        <doc xml:whitespace="preserve">Gets the number of auxiliary color buffers.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">number of auxiliary color buffers.</doc>
+          <type name="gint" c:type="gint"/>
+        </return-value>
+      </method>
+      <method name="get_n_sample_buffers"
+              c:identifier="gdk_gl_config_get_n_sample_buffers">
+        <doc xml:whitespace="preserve">Gets the number of multisample buffers.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">number of multisample buffers.</doc>
+          <type name="gint" c:type="gint"/>
+        </return-value>
+      </method>
+      <method name="get_screen" c:identifier="gdk_gl_config_get_screen">
+        <doc xml:whitespace="preserve">Gets #GdkScreen.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkScreen.</doc>
+          <type name="Gdk.Screen" c:type="GdkScreen*"/>
+        </return-value>
+      </method>
+      <method name="get_visual" c:identifier="gdk_gl_config_get_visual">
+        <doc xml:whitespace="preserve">Gets the #GdkVisual that is appropriate for the OpenGL frame buffer
+configuration.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the appropriate #GdkVisual.</doc>
+          <type name="Gdk.Visual" c:type="GdkVisual*"/>
+        </return-value>
+      </method>
+      <method name="has_accum_buffer"
+              c:identifier="gdk_gl_config_has_accum_buffer">
+        <doc xml:whitespace="preserve">Returns whether the configured frame buffer has accumulation buffer.
+otherwise.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the frame buffer has accumulation buffer, FALSE</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="has_alpha" c:identifier="gdk_gl_config_has_alpha">
+        <doc xml:whitespace="preserve">Returns whether the configured color buffer has alpha bits.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the color buffer has alpha bits, FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="has_depth_buffer"
+              c:identifier="gdk_gl_config_has_depth_buffer">
+        <doc xml:whitespace="preserve">Returns whether the configured frame buffer has depth buffer.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the frame buffer has depth buffer, FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="has_stencil_buffer"
+              c:identifier="gdk_gl_config_has_stencil_buffer">
+        <doc xml:whitespace="preserve">Returns whether the configured frame buffer has stencil buffer.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the frame buffer has stencil buffer, FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="is_double_buffered"
+              c:identifier="gdk_gl_config_is_double_buffered">
+        <doc xml:whitespace="preserve">Returns whether the configuration supports the double-buffered visual.
+otherwise.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the double-buffered visual is supported, FALSE</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="is_rgba" c:identifier="gdk_gl_config_is_rgba">
+        <doc xml:whitespace="preserve">Returns whether the configured frame buffer is RGBA mode.
+otherwise.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the configured frame buffer is RGBA mode, FALSE</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="is_stereo" c:identifier="gdk_gl_config_is_stereo">
+        <doc xml:whitespace="preserve">Returns whether the configuration supports the stereo visual.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the stereo visual is supported, FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="layer_plane">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="n_aux_buffers">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="n_sample_buffers">
+        <type name="gint" c:type="gint"/>
+      </field>
+      <field name="is_rgba" bits="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="is_double_buffered" bits="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="as_single_mode" bits="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="is_stereo" bits="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="has_alpha" bits="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="has_depth_buffer" bits="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="has_stencil_buffer" bits="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+      <field name="has_accum_buffer" bits="1">
+        <type name="guint" c:type="guint"/>
+      </field>
+    </class>
+    <enumeration name="ConfigAttrib"
+                 glib:type-name="GdkGLConfigAttrib"
+                 glib:get-type="gdk_gl_config_attrib_get_type"
+                 c:type="GdkGLConfigAttrib">
+      <member name="use_gl"
+              value="1"
+              c:identifier="GDK_GL_USE_GL"
+              glib:nick="use-gl"/>
+      <member name="buffer_size"
+              value="2"
+              c:identifier="GDK_GL_BUFFER_SIZE"
+              glib:nick="buffer-size"/>
+      <member name="level"
+              value="3"
+              c:identifier="GDK_GL_LEVEL"
+              glib:nick="level"/>
+      <member name="rgba"
+              value="4"
+              c:identifier="GDK_GL_RGBA"
+              glib:nick="rgba"/>
+      <member name="doublebuffer"
+              value="5"
+              c:identifier="GDK_GL_DOUBLEBUFFER"
+              glib:nick="doublebuffer"/>
+      <member name="stereo"
+              value="6"
+              c:identifier="GDK_GL_STEREO"
+              glib:nick="stereo"/>
+      <member name="aux_buffers"
+              value="7"
+              c:identifier="GDK_GL_AUX_BUFFERS"
+              glib:nick="aux-buffers"/>
+      <member name="red_size"
+              value="8"
+              c:identifier="GDK_GL_RED_SIZE"
+              glib:nick="red-size"/>
+      <member name="green_size"
+              value="9"
+              c:identifier="GDK_GL_GREEN_SIZE"
+              glib:nick="green-size"/>
+      <member name="blue_size"
+              value="10"
+              c:identifier="GDK_GL_BLUE_SIZE"
+              glib:nick="blue-size"/>
+      <member name="alpha_size"
+              value="11"
+              c:identifier="GDK_GL_ALPHA_SIZE"
+              glib:nick="alpha-size"/>
+      <member name="depth_size"
+              value="12"
+              c:identifier="GDK_GL_DEPTH_SIZE"
+              glib:nick="depth-size"/>
+      <member name="stencil_size"
+              value="13"
+              c:identifier="GDK_GL_STENCIL_SIZE"
+              glib:nick="stencil-size"/>
+      <member name="accum_red_size"
+              value="14"
+              c:identifier="GDK_GL_ACCUM_RED_SIZE"
+              glib:nick="accum-red-size"/>
+      <member name="accum_green_size"
+              value="15"
+              c:identifier="GDK_GL_ACCUM_GREEN_SIZE"
+              glib:nick="accum-green-size"/>
+      <member name="accum_blue_size"
+              value="16"
+              c:identifier="GDK_GL_ACCUM_BLUE_SIZE"
+              glib:nick="accum-blue-size"/>
+      <member name="accum_alpha_size"
+              value="17"
+              c:identifier="GDK_GL_ACCUM_ALPHA_SIZE"
+              glib:nick="accum-alpha-size"/>
+      <member name="config_caveat"
+              value="32"
+              c:identifier="GDK_GL_CONFIG_CAVEAT"
+              glib:nick="config-caveat"/>
+      <member name="x_visual_type"
+              value="34"
+              c:identifier="GDK_GL_X_VISUAL_TYPE"
+              glib:nick="x-visual-type"/>
+      <member name="transparent_type"
+              value="35"
+              c:identifier="GDK_GL_TRANSPARENT_TYPE"
+              glib:nick="transparent-type"/>
+      <member name="transparent_index_value"
+              value="36"
+              c:identifier="GDK_GL_TRANSPARENT_INDEX_VALUE"
+              glib:nick="transparent-index-value"/>
+      <member name="transparent_red_value"
+              value="37"
+              c:identifier="GDK_GL_TRANSPARENT_RED_VALUE"
+              glib:nick="transparent-red-value"/>
+      <member name="transparent_green_value"
+              value="38"
+              c:identifier="GDK_GL_TRANSPARENT_GREEN_VALUE"
+              glib:nick="transparent-green-value"/>
+      <member name="transparent_blue_value"
+              value="39"
+              c:identifier="GDK_GL_TRANSPARENT_BLUE_VALUE"
+              glib:nick="transparent-blue-value"/>
+      <member name="transparent_alpha_value"
+              value="40"
+              c:identifier="GDK_GL_TRANSPARENT_ALPHA_VALUE"
+              glib:nick="transparent-alpha-value"/>
+      <member name="drawable_type"
+              value="32784"
+              c:identifier="GDK_GL_DRAWABLE_TYPE"
+              glib:nick="drawable-type"/>
+      <member name="render_type"
+              value="32785"
+              c:identifier="GDK_GL_RENDER_TYPE"
+              glib:nick="render-type"/>
+      <member name="x_renderable"
+              value="32786"
+              c:identifier="GDK_GL_X_RENDERABLE"
+              glib:nick="x-renderable"/>
+      <member name="fbconfig_id"
+              value="32787"
+              c:identifier="GDK_GL_FBCONFIG_ID"
+              glib:nick="fbconfig-id"/>
+      <member name="max_pbuffer_width"
+              value="32790"
+              c:identifier="GDK_GL_MAX_PBUFFER_WIDTH"
+              glib:nick="max-pbuffer-width"/>
+      <member name="max_pbuffer_height"
+              value="32791"
+              c:identifier="GDK_GL_MAX_PBUFFER_HEIGHT"
+              glib:nick="max-pbuffer-height"/>
+      <member name="max_pbuffer_pixels"
+              value="32792"
+              c:identifier="GDK_GL_MAX_PBUFFER_PIXELS"
+              glib:nick="max-pbuffer-pixels"/>
+      <member name="visual_id"
+              value="32779"
+              c:identifier="GDK_GL_VISUAL_ID"
+              glib:nick="visual-id"/>
+      <member name="screen"
+              value="32780"
+              c:identifier="GDK_GL_SCREEN"
+              glib:nick="screen"/>
+      <member name="sample_buffers"
+              value="100000"
+              c:identifier="GDK_GL_SAMPLE_BUFFERS"
+              glib:nick="sample-buffers"/>
+      <member name="samples"
+              value="100001"
+              c:identifier="GDK_GL_SAMPLES"
+              glib:nick="samples"/>
+    </enumeration>
+    <enumeration name="ConfigCaveat"
+                 glib:type-name="GdkGLConfigCaveat"
+                 glib:get-type="gdk_gl_config_caveat_get_type"
+                 c:type="GdkGLConfigCaveat">
+      <member name="config_caveat_dont_care"
+              value="-1"
+              c:identifier="GDK_GL_CONFIG_CAVEAT_DONT_CARE"
+              glib:nick="config-caveat-dont-care"/>
+      <member name="config_caveat_none"
+              value="32768"
+              c:identifier="GDK_GL_CONFIG_CAVEAT_NONE"
+              glib:nick="config-caveat-none"/>
+      <member name="slow_config"
+              value="32769"
+              c:identifier="GDK_GL_SLOW_CONFIG"
+              glib:nick="slow-config"/>
+      <member name="non_conformant_config"
+              value="32781"
+              c:identifier="GDK_GL_NON_CONFORMANT_CONFIG"
+              glib:nick="non-conformant-config"/>
+    </enumeration>
+    <record name="ConfigClass"
+            c:type="GdkGLConfigClass"
+            glib:is-gtype-struct-for="Config">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+    </record>
+    <enumeration name="ConfigError"
+                 glib:type-name="GdkGLConfigError"
+                 glib:get-type="gdk_gl_config_error_get_type"
+                 c:type="GdkGLConfigError">
+      <member name="bad_screen"
+              value="1"
+              c:identifier="GDK_GL_BAD_SCREEN"
+              glib:nick="bad-screen"/>
+      <member name="bad_attribute"
+              value="2"
+              c:identifier="GDK_GL_BAD_ATTRIBUTE"
+              glib:nick="bad-attribute"/>
+      <member name="no_extension"
+              value="3"
+              c:identifier="GDK_GL_NO_EXTENSION"
+              glib:nick="no-extension"/>
+      <member name="bad_visual"
+              value="4"
+              c:identifier="GDK_GL_BAD_VISUAL"
+              glib:nick="bad-visual"/>
+      <member name="bad_context"
+              value="5"
+              c:identifier="GDK_GL_BAD_CONTEXT"
+              glib:nick="bad-context"/>
+      <member name="bad_value"
+              value="6"
+              c:identifier="GDK_GL_BAD_VALUE"
+              glib:nick="bad-value"/>
+      <member name="bad_enum"
+              value="7"
+              c:identifier="GDK_GL_BAD_ENUM"
+              glib:nick="bad-enum"/>
+    </enumeration>
+    <bitfield name="ConfigMode"
+              glib:type-name="GdkGLConfigMode"
+              glib:get-type="gdk_gl_config_mode_get_type"
+              c:type="GdkGLConfigMode">
+      <member name="rgb"
+              value="0"
+              c:identifier="GDK_GL_MODE_RGB"
+              glib:nick="rgb"/>
+      <member name="rgba"
+              value="0"
+              c:identifier="GDK_GL_MODE_RGBA"
+              glib:nick="rgba"/>
+      <member name="index"
+              value="1"
+              c:identifier="GDK_GL_MODE_INDEX"
+              glib:nick="index"/>
+      <member name="single"
+              value="0"
+              c:identifier="GDK_GL_MODE_SINGLE"
+              glib:nick="single"/>
+      <member name="double"
+              value="2"
+              c:identifier="GDK_GL_MODE_DOUBLE"
+              glib:nick="double"/>
+      <member name="stereo"
+              value="4"
+              c:identifier="GDK_GL_MODE_STEREO"
+              glib:nick="stereo"/>
+      <member name="alpha"
+              value="8"
+              c:identifier="GDK_GL_MODE_ALPHA"
+              glib:nick="alpha"/>
+      <member name="depth"
+              value="16"
+              c:identifier="GDK_GL_MODE_DEPTH"
+              glib:nick="depth"/>
+      <member name="stencil"
+              value="32"
+              c:identifier="GDK_GL_MODE_STENCIL"
+              glib:nick="stencil"/>
+      <member name="accum"
+              value="64"
+              c:identifier="GDK_GL_MODE_ACCUM"
+              glib:nick="accum"/>
+      <member name="multisample"
+              value="128"
+              c:identifier="GDK_GL_MODE_MULTISAMPLE"
+              glib:nick="multisample"/>
+    </bitfield>
+    <class name="Context"
+           c:symbol-prefix="context"
+           c:type="GdkGLContext"
+           parent="GObject.Object"
+           glib:type-name="GdkGLContext"
+           glib:get-type="gdk_gl_context_get_type"
+           glib:type-struct="ContextClass">
+      <constructor name="new" c:identifier="gdk_gl_context_new">
+        <doc xml:whitespace="preserve">Creates a new OpenGL rendering context.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new #GdkGLContext.</doc>
+          <type name="Context" c:type="GdkGLContext*"/>
+        </return-value>
+        <parameters>
+          <parameter name="gldrawable" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkGLDrawable.</doc>
+            <type name="Drawable" c:type="GdkGLDrawable*"/>
+          </parameter>
+          <parameter name="share_list"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">the #GdkGLContext with which to share display lists and texture objects. NULL indicates that no sharing is to take place.</doc>
+            <type name="Context" c:type="GdkGLContext*"/>
+          </parameter>
+          <parameter name="direct" transfer-ownership="none">
+            <doc xml:whitespace="preserve">whether rendering is to be done with a direct connection to the graphics system.</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+          <parameter name="render_type" transfer-ownership="none">
+            <doc xml:whitespace="preserve">GDK_GL_RGBA_TYPE or GDK_GL_COLOR_INDEX_TYPE (currently not used).</doc>
+            <type name="gint" c:type="int"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <function name="get_current" c:identifier="gdk_gl_context_get_current">
+        <doc xml:whitespace="preserve">Returns the current #GdkGLContext.
+context.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the current #GdkGLContext or NULL if there is no current</doc>
+          <type name="Context" c:type="GdkGLContext*"/>
+        </return-value>
+      </function>
+      <method name="copy" c:identifier="gdk_gl_context_copy">
+        <doc xml:whitespace="preserve">Copy state from @src rendering context to @glcontext.
+the glPushAttrib() function. You can use GL_ALL_ATTRIB_BITS to copy all the
+rendering state information.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">FALSE if it fails, TRUE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="src" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the source context.</doc>
+            <type name="Context" c:type="GdkGLContext*"/>
+          </parameter>
+          <parameter name="mask" transfer-ownership="none">
+            <doc xml:whitespace="preserve">which portions of @src state are to be copied to @glcontext.</doc>
+            <type name="gulong" c:type="unsigned long"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_gl_config" c:identifier="gdk_gl_context_get_gl_config">
+        <doc xml:whitespace="preserve">Gets #GdkGLConfig with which the @glcontext is configured.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkGLConfig.</doc>
+          <type name="Config" c:type="GdkGLConfig*"/>
+        </return-value>
+      </method>
+      <method name="get_gl_drawable"
+              c:identifier="gdk_gl_context_get_gl_drawable">
+        <doc xml:whitespace="preserve">Gets #GdkGLDrawable to which the @glcontext is bound.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkGLDrawable or NULL if no #GdkGLDrawable is bound.</doc>
+          <type name="Drawable" c:type="GdkGLDrawable*"/>
+        </return-value>
+      </method>
+      <method name="get_render_type"
+              c:identifier="gdk_gl_context_get_render_type">
+        <doc xml:whitespace="preserve">Gets render_type of the @glcontext.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">GDK_GL_RGBA_TYPE or GDK_GL_COLOR_INDEX_TYPE.</doc>
+          <type name="gint" c:type="int"/>
+        </return-value>
+      </method>
+      <method name="get_share_list"
+              c:identifier="gdk_gl_context_get_share_list">
+        <doc xml:whitespace="preserve">Gets #GdkGLContext with which the @glcontext shares the display lists and
+texture objects.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkGLContext.</doc>
+          <type name="Context" c:type="GdkGLContext*"/>
+        </return-value>
+      </method>
+      <method name="is_direct" c:identifier="gdk_gl_context_is_direct">
+        <doc xml:whitespace="preserve">Returns whether the @glcontext is a direct rendering context.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the @glcontext is a direct rendering contest.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <field name="parent_instance">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+    </class>
+    <record name="ContextClass"
+            c:type="GdkGLContextClass"
+            glib:is-gtype-struct-for="Context">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+    </record>
+    <constant name="DONT_CARE" value="-1">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <bitfield name="DebugFlag" c:type="GdkGLDebugFlag">
+      <member name="misc" value="1" c:identifier="GDK_GL_DEBUG_MISC"/>
+      <member name="func" value="2" c:identifier="GDK_GL_DEBUG_FUNC"/>
+      <member name="impl" value="4" c:identifier="GDK_GL_DEBUG_IMPL"/>
+    </bitfield>
+    <interface name="Drawable"
+               c:symbol-prefix="drawable"
+               c:type="GdkGLDrawable"
+               glib:type-name="GdkGLDrawable"
+               glib:get-type="gdk_gl_drawable_get_type">
+      <method name="get_gl_config"
+              c:identifier="gdk_gl_drawable_get_gl_config">
+        <doc xml:whitespace="preserve">Gets #GdkGLConfig with which the @gldrawable is configured.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkGLConfig.</doc>
+          <type name="Config" c:type="GdkGLConfig*"/>
+        </return-value>
+      </method>
+      <method name="get_size" c:identifier="gdk_gl_drawable_get_size">
+        <doc xml:whitespace="preserve">Fills *width and *height with the size of GL drawable.
+width or height can be NULL if you only want the other one.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="width"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">location to store drawable's width, or NULL.</doc>
+            <type name="gint" c:type="gint*"/>
+          </parameter>
+          <parameter name="height"
+                     direction="out"
+                     caller-allocates="0"
+                     transfer-ownership="full"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">location to store drawable's height, or NULL.</doc>
+            <type name="gint" c:type="gint*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="gl_begin" c:identifier="gdk_gl_drawable_gl_begin">
+        <doc xml:whitespace="preserve">Delimits the begining of the OpenGL execution.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if it is successful, FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="glcontext" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkGLContext.</doc>
+            <type name="Context" c:type="GdkGLContext*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="gl_end" c:identifier="gdk_gl_drawable_gl_end">
+        <doc xml:whitespace="preserve">Delimits the end of the OpenGL execution.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="is_double_buffered"
+              c:identifier="gdk_gl_drawable_is_double_buffered">
+        <doc xml:whitespace="preserve">Returns whether the @gldrawable supports the double-buffered visual.
+FALSE otherwise.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the double-buffered visual is supported,</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </method>
+      <method name="make_current" c:identifier="gdk_gl_drawable_make_current">
+        <doc xml:whitespace="preserve">Attach an OpenGL rendering context to a @gldrawable.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if it is successful, FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="glcontext" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkGLContext.</doc>
+            <type name="Context" c:type="GdkGLContext*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="swap_buffers" c:identifier="gdk_gl_drawable_swap_buffers">
+        <doc xml:whitespace="preserve">Exchange front and back buffers.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="wait_gdk" c:identifier="gdk_gl_drawable_wait_gdk">
+        <doc xml:whitespace="preserve">Complete GDK drawing execution prior to subsequent OpenGL calls.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+      <method name="wait_gl" c:identifier="gdk_gl_drawable_wait_gl">
+        <doc xml:whitespace="preserve">Complete OpenGL execution prior to subsequent GDK drawing calls.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+      </method>
+    </interface>
+    <enumeration name="DrawableAttrib"
+                 glib:type-name="GdkGLDrawableAttrib"
+                 glib:get-type="gdk_gl_drawable_attrib_get_type"
+                 c:type="GdkGLDrawableAttrib">
+      <member name="preserved_contents"
+              value="32795"
+              c:identifier="GDK_GL_PRESERVED_CONTENTS"
+              glib:nick="preserved-contents"/>
+      <member name="largest_pbuffer"
+              value="32796"
+              c:identifier="GDK_GL_LARGEST_PBUFFER"
+              glib:nick="largest-pbuffer"/>
+      <member name="width"
+              value="32797"
+              c:identifier="GDK_GL_WIDTH"
+              glib:nick="width"/>
+      <member name="height"
+              value="32798"
+              c:identifier="GDK_GL_HEIGHT"
+              glib:nick="height"/>
+      <member name="event_mask"
+              value="32799"
+              c:identifier="GDK_GL_EVENT_MASK"
+              glib:nick="event-mask"/>
+    </enumeration>
+    <record name="DrawableClass" c:type="GdkGLDrawableClass">
+      <field name="base_iface" writable="1">
+        <type name="GObject.TypeInterface" c:type="GTypeInterface"/>
+      </field>
+      <field name="create_new_context" introspectable="0">
+        <callback name="create_new_context" introspectable="0">
+          <return-value>
+            <type name="Context" c:type="GdkGLContext*"/>
+          </return-value>
+          <parameters>
+            <parameter name="gldrawable" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+            <parameter name="share_list" transfer-ownership="none">
+              <type name="Context" c:type="GdkGLContext*"/>
+            </parameter>
+            <parameter name="direct" transfer-ownership="none">
+              <type name="gboolean" c:type="gboolean"/>
+            </parameter>
+            <parameter name="render_type" transfer-ownership="none">
+              <type name="gint" c:type="int"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="make_context_current">
+        <callback name="make_context_current">
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="draw" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+            <parameter name="read" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+            <parameter name="glcontext" transfer-ownership="none">
+              <type name="Context" c:type="GdkGLContext*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="is_double_buffered">
+        <callback name="is_double_buffered">
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="gldrawable" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="swap_buffers">
+        <callback name="swap_buffers">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="gldrawable" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="wait_gl">
+        <callback name="wait_gl">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="gldrawable" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="wait_gdk">
+        <callback name="wait_gdk">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="gldrawable" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="gl_begin">
+        <callback name="gl_begin">
+          <return-value transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </return-value>
+          <parameters>
+            <parameter name="draw" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+            <parameter name="read" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+            <parameter name="glcontext" transfer-ownership="none">
+              <type name="Context" c:type="GdkGLContext*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="gl_end">
+        <callback name="gl_end">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="gldrawable" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_gl_config" introspectable="0">
+        <callback name="get_gl_config" introspectable="0">
+          <return-value>
+            <type name="Config" c:type="GdkGLConfig*"/>
+          </return-value>
+          <parameters>
+            <parameter name="gldrawable" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+      <field name="get_size">
+        <callback name="get_size">
+          <return-value transfer-ownership="none">
+            <type name="none" c:type="void"/>
+          </return-value>
+          <parameters>
+            <parameter name="gldrawable" transfer-ownership="none">
+              <type name="Drawable" c:type="GdkGLDrawable*"/>
+            </parameter>
+            <parameter name="width" transfer-ownership="none">
+              <type name="gint" c:type="gint*"/>
+            </parameter>
+            <parameter name="height" transfer-ownership="none">
+              <type name="gint" c:type="gint*"/>
+            </parameter>
+          </parameters>
+        </callback>
+      </field>
+    </record>
+    <enumeration name="DrawableType"
+                 glib:type-name="GdkGLDrawableType"
+                 glib:get-type="gdk_gl_drawable_type_get_type"
+                 c:type="GdkGLDrawableType">
+      <member name="window"
+              value="32802"
+              c:identifier="GDK_GL_WINDOW"
+              glib:nick="window"/>
+      <member name="pbuffer"
+              value="32803"
+              c:identifier="GDK_GL_PBUFFER"
+              glib:nick="pbuffer"/>
+    </enumeration>
+    <bitfield name="DrawableTypeMask"
+              glib:type-name="GdkGLDrawableTypeMask"
+              glib:get-type="gdk_gl_drawable_type_mask_get_type"
+              c:type="GdkGLDrawableTypeMask">
+      <member name="window_bit"
+              value="1"
+              c:identifier="GDK_GL_WINDOW_BIT"
+              glib:nick="window-bit"/>
+      <member name="pixmap_bit"
+              value="2"
+              c:identifier="GDK_GL_PIXMAP_BIT"
+              glib:nick="pixmap-bit"/>
+      <member name="pbuffer_bit"
+              value="4"
+              c:identifier="GDK_GL_PBUFFER_BIT"
+              glib:nick="pbuffer-bit"/>
+    </bitfield>
+    <bitfield name="EventMask"
+              glib:type-name="GdkGLEventMask"
+              glib:get-type="gdk_gl_event_mask_get_type"
+              c:type="GdkGLEventMask">
+      <member name="mask"
+              value="134217728"
+              c:identifier="GDK_GL_PBUFFER_CLOBBER_MASK"
+              glib:nick="mask"/>
+    </bitfield>
+    <enumeration name="EventType"
+                 glib:type-name="GdkGLEventType"
+                 glib:get-type="gdk_gl_event_type_get_type"
+                 c:type="GdkGLEventType">
+      <member name="damaged"
+              value="32800"
+              c:identifier="GDK_GL_DAMAGED"
+              glib:nick="damaged"/>
+      <member name="saved"
+              value="32801"
+              c:identifier="GDK_GL_SAVED"
+              glib:nick="saved"/>
+    </enumeration>
+    <constant name="NONE" value="32768">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <enumeration name="PbufferAttrib"
+                 glib:type-name="GdkGLPbufferAttrib"
+                 glib:get-type="gdk_gl_pbuffer_attrib_get_type"
+                 c:type="GdkGLPbufferAttrib">
+      <member name="preserved_contents"
+              value="32795"
+              c:identifier="GDK_GL_PBUFFER_PRESERVED_CONTENTS"
+              glib:nick="preserved-contents"/>
+      <member name="largest_pbuffer"
+              value="32796"
+              c:identifier="GDK_GL_PBUFFER_LARGEST_PBUFFER"
+              glib:nick="largest-pbuffer"/>
+      <member name="height"
+              value="32832"
+              c:identifier="GDK_GL_PBUFFER_HEIGHT"
+              glib:nick="height"/>
+      <member name="width"
+              value="32833"
+              c:identifier="GDK_GL_PBUFFER_WIDTH"
+              glib:nick="width"/>
+    </enumeration>
+    <class name="Pixmap"
+           c:symbol-prefix="pixmap"
+           c:type="GdkGLPixmap"
+           parent="Gdk.Drawable"
+           glib:type-name="GdkGLPixmap"
+           glib:get-type="gdk_gl_pixmap_get_type"
+           glib:type-struct="PixmapClass">
+      <constructor name="new" c:identifier="gdk_gl_pixmap_new">
+        <doc xml:whitespace="preserve">Creates an off-screen rendering area.
+attrib_list is currently unused. This must be set to NULL or empty
+(first attribute of None). See GLX 1.3 spec.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new #GdkGLPixmap.</doc>
+          <type name="Pixmap" c:type="GdkGLPixmap*"/>
+        </return-value>
+        <parameters>
+          <parameter name="glconfig" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkGLConfig.</doc>
+            <type name="Config" c:type="GdkGLConfig*"/>
+          </parameter>
+          <parameter name="pixmap" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GdkPixmap to be used as the rendering area.</doc>
+            <type name="Gdk.Pixmap" c:type="GdkPixmap*"/>
+          </parameter>
+          <parameter name="attrib_list"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">this must be set to NULL or empty (first attribute of None).</doc>
+            <array c:type="int*">
+              <type name="gint"/>
+            </array>
+          </parameter>
+        </parameters>
+      </constructor>
+      <function name="get_gl_pixmap" c:identifier="gdk_pixmap_get_gl_pixmap">
+        <doc xml:whitespace="preserve">Returns the #GdkGLPixmap held by the @pixmap.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkGLPixmap.</doc>
+          <type name="Pixmap" c:type="GdkGLPixmap*"/>
+        </return-value>
+        <parameters>
+          <parameter name="pixmap" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkPixmap.</doc>
+            <type name="Gdk.Pixmap" c:type="GdkPixmap*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="is_gl_capable" c:identifier="gdk_pixmap_is_gl_capable">
+        <doc xml:whitespace="preserve">Returns whether the @pixmap is OpenGL-capable.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the @pixmap is OpenGL-capable, FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="pixmap" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkPixmap.</doc>
+            <type name="Gdk.Pixmap" c:type="GdkPixmap*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="set_gl_capability"
+                c:identifier="gdk_pixmap_set_gl_capability">
+        <doc xml:whitespace="preserve">Set the OpenGL-capability to the @pixmap.
+This function creates a new #GdkGLPixmap held by the @pixmap.
+attrib_list is currently unused. This must be set to NULL or empty
+(first attribute of None).
+NULL otherwise.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkGLPixmap used by the @pixmap if it is successful,</doc>
+          <type name="Pixmap" c:type="GdkGLPixmap*"/>
+        </return-value>
+        <parameters>
+          <parameter name="pixmap" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GdkPixmap to be used as the rendering area.</doc>
+            <type name="Gdk.Pixmap" c:type="GdkPixmap*"/>
+          </parameter>
+          <parameter name="glconfig" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkGLConfig.</doc>
+            <type name="Config" c:type="GdkGLConfig*"/>
+          </parameter>
+          <parameter name="attrib_list"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">this must be set to NULL or empty (first attribute of None).</doc>
+            <array c:type="int*">
+              <type name="gint"/>
+            </array>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="unset_gl_capability"
+                c:identifier="gdk_pixmap_unset_gl_capability">
+        <doc xml:whitespace="preserve">Unset the OpenGL-capability of the @pixmap.
+This function destroys the #GdkGLPixmap held by the @pixmap.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="pixmap" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkPixmap.</doc>
+            <type name="Gdk.Pixmap" c:type="GdkPixmap*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="get_pixmap" c:identifier="gdk_gl_pixmap_get_pixmap">
+        <doc xml:whitespace="preserve">Returns the #GdkPixmap associated with @glpixmap.
+Notice that #GdkGLPixmap is not #GdkPixmap, but another
+#GdkDrawable which have an associated #GdkPixmap.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkPixmap associated with @glpixmap.</doc>
+          <type name="Gdk.Pixmap" c:type="GdkPixmap*"/>
+        </return-value>
+      </method>
+      <field name="parent_instance">
+        <type name="Gdk.Drawable" c:type="GdkDrawable"/>
+      </field>
+      <field name="drawable">
+        <type name="Gdk.Drawable" c:type="GdkDrawable*"/>
+      </field>
+    </class>
+    <record name="PixmapClass"
+            c:type="GdkGLPixmapClass"
+            glib:is-gtype-struct-for="Pixmap">
+      <field name="parent_class">
+        <type name="Gdk.DrawableClass" c:type="GdkDrawableClass"/>
+      </field>
+    </record>
+    <callback name="Proc" c:type="GdkGLProc">
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </callback>
+    <enumeration name="RenderType"
+                 glib:type-name="GdkGLRenderType"
+                 glib:get-type="gdk_gl_render_type_get_type"
+                 c:type="GdkGLRenderType">
+      <member name="rgba_type"
+              value="32788"
+              c:identifier="GDK_GL_RGBA_TYPE"
+              glib:nick="rgba-type"/>
+      <member name="color_index_type"
+              value="32789"
+              c:identifier="GDK_GL_COLOR_INDEX_TYPE"
+              glib:nick="color-index-type"/>
+    </enumeration>
+    <bitfield name="RenderTypeMask"
+              glib:type-name="GdkGLRenderTypeMask"
+              glib:get-type="gdk_gl_render_type_mask_get_type"
+              c:type="GdkGLRenderTypeMask">
+      <member name="rgba_bit"
+              value="1"
+              c:identifier="GDK_GL_RGBA_BIT"
+              glib:nick="rgba-bit"/>
+      <member name="color_index_bit"
+              value="2"
+              c:identifier="GDK_GL_COLOR_INDEX_BIT"
+              glib:nick="color-index-bit"/>
+    </bitfield>
+    <constant name="SUCCESS" value="0">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <enumeration name="TransparentType"
+                 glib:type-name="GdkGLTransparentType"
+                 glib:get-type="gdk_gl_transparent_type_get_type"
+                 c:type="GdkGLTransparentType">
+      <member name="none"
+              value="32768"
+              c:identifier="GDK_GL_TRANSPARENT_NONE"
+              glib:nick="none"/>
+      <member name="rgb"
+              value="32776"
+              c:identifier="GDK_GL_TRANSPARENT_RGB"
+              glib:nick="rgb"/>
+      <member name="index"
+              value="32777"
+              c:identifier="GDK_GL_TRANSPARENT_INDEX"
+              glib:nick="index"/>
+    </enumeration>
+    <enumeration name="VisualType"
+                 glib:type-name="GdkGLVisualType"
+                 glib:get-type="gdk_gl_visual_type_get_type"
+                 c:type="GdkGLVisualType">
+      <member name="visual_type_dont_care"
+              value="-1"
+              c:identifier="GDK_GL_VISUAL_TYPE_DONT_CARE"
+              glib:nick="visual-type-dont-care"/>
+      <member name="true_color"
+              value="32770"
+              c:identifier="GDK_GL_TRUE_COLOR"
+              glib:nick="true-color"/>
+      <member name="direct_color"
+              value="32771"
+              c:identifier="GDK_GL_DIRECT_COLOR"
+              glib:nick="direct-color"/>
+      <member name="pseudo_color"
+              value="32772"
+              c:identifier="GDK_GL_PSEUDO_COLOR"
+              glib:nick="pseudo-color"/>
+      <member name="static_color"
+              value="32773"
+              c:identifier="GDK_GL_STATIC_COLOR"
+              glib:nick="static-color"/>
+      <member name="gray_scale"
+              value="32774"
+              c:identifier="GDK_GL_GRAY_SCALE"
+              glib:nick="gray-scale"/>
+      <member name="static_gray"
+              value="32775"
+              c:identifier="GDK_GL_STATIC_GRAY"
+              glib:nick="static-gray"/>
+    </enumeration>
+    <class name="Window"
+           c:symbol-prefix="window"
+           c:type="GdkGLWindow"
+           parent="Gdk.Drawable"
+           glib:type-name="GdkGLWindow"
+           glib:get-type="gdk_gl_window_get_type"
+           glib:type-struct="WindowClass">
+      <constructor name="new" c:identifier="gdk_gl_window_new">
+        <doc xml:whitespace="preserve">Creates an on-screen rendering area.
+attrib_list is currently unused. This must be set to NULL or empty
+(first attribute of None). See GLX 1.3 spec.</doc>
+        <return-value transfer-ownership="full">
+          <doc xml:whitespace="preserve">the new #GdkGLWindow.</doc>
+          <type name="Window" c:type="GdkGLWindow*"/>
+        </return-value>
+        <parameters>
+          <parameter name="glconfig" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkGLConfig.</doc>
+            <type name="Config" c:type="GdkGLConfig*"/>
+          </parameter>
+          <parameter name="window" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GdkWindow to be used as the rendering area.</doc>
+            <type name="Gdk.Window" c:type="GdkWindow*"/>
+          </parameter>
+          <parameter name="attrib_list"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">this must be set to NULL or empty (first attribute of None).</doc>
+            <array c:type="int*">
+              <type name="gint"/>
+            </array>
+          </parameter>
+        </parameters>
+      </constructor>
+      <function name="get_gl_window" c:identifier="gdk_window_get_gl_window">
+        <doc xml:whitespace="preserve">Returns the #GdkGLWindow held by the @window.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkGLWindow.</doc>
+          <type name="Window" c:type="GdkGLWindow*"/>
+        </return-value>
+        <parameters>
+          <parameter name="window" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkWindow.</doc>
+            <type name="Gdk.Window" c:type="GdkWindow*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="is_gl_capable" c:identifier="gdk_window_is_gl_capable">
+        <doc xml:whitespace="preserve">Returns whether the @window is OpenGL-capable.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">TRUE if the @window is OpenGL-capable, FALSE otherwise.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="window" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkWindow.</doc>
+            <type name="Gdk.Window" c:type="GdkWindow*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="set_gl_capability"
+                c:identifier="gdk_window_set_gl_capability">
+        <doc xml:whitespace="preserve">Set the OpenGL-capability to the @window.
+This function creates a new #GdkGLWindow held by the @window.
+attrib_list is currently unused. This must be set to NULL or empty
+(first attribute of None).
+NULL otherwise.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkGLWindow used by the @window if it is successful,</doc>
+          <type name="Window" c:type="GdkGLWindow*"/>
+        </return-value>
+        <parameters>
+          <parameter name="window" transfer-ownership="none">
+            <doc xml:whitespace="preserve">the #GdkWindow to be used as the rendering area.</doc>
+            <type name="Gdk.Window" c:type="GdkWindow*"/>
+          </parameter>
+          <parameter name="glconfig" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkGLConfig.</doc>
+            <type name="Config" c:type="GdkGLConfig*"/>
+          </parameter>
+          <parameter name="attrib_list"
+                     transfer-ownership="none"
+                     allow-none="1">
+            <doc xml:whitespace="preserve">this must be set to NULL or empty (first attribute of None).</doc>
+            <array c:type="int*">
+              <type name="gint"/>
+            </array>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="unset_gl_capability"
+                c:identifier="gdk_window_unset_gl_capability">
+        <doc xml:whitespace="preserve">Unset the OpenGL-capability of the @window.
+This function destroys the #GdkGLWindow held by the @window.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="window" transfer-ownership="none">
+            <doc xml:whitespace="preserve">a #GdkWindow.</doc>
+            <type name="Gdk.Window" c:type="GdkWindow*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="get_window" c:identifier="gdk_gl_window_get_window">
+        <doc xml:whitespace="preserve">Returns the #GdkWindow associated with @glwindow.
+Notice that #GdkGLWindow is not #GdkWindow, but another
+#GdkDrawable which have an associated #GdkWindow.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkWindow associated with @glwindow.</doc>
+          <type name="Gdk.Window" c:type="GdkWindow*"/>
+        </return-value>
+      </method>
+      <field name="parent_instance">
+        <type name="Gdk.Drawable" c:type="GdkDrawable"/>
+      </field>
+      <field name="drawable">
+        <type name="Gdk.Drawable" c:type="GdkDrawable*"/>
+      </field>
+    </class>
+    <record name="WindowClass"
+            c:type="GdkGLWindowClass"
+            glib:is-gtype-struct-for="Window">
+      <field name="parent_class">
+        <type name="Gdk.DrawableClass" c:type="GdkDrawableClass"/>
+      </field>
+    </record>
+    <function name="drawable_get_current"
+              c:identifier="gdk_gl_drawable_get_current">
+      <doc xml:whitespace="preserve">Returns the current #GdkGLDrawable.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the current #GdkGLDrawable or NULL if there is no current drawable.</doc>
+        <type name="Drawable" c:type="GdkGLDrawable*"/>
+      </return-value>
+    </function>
+    <function name="get_binary_age" c:identifier="gdk_gl_get_binary_age">
+      <doc xml:whitespace="preserve">Returns the GtkGLExt library binary age.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The binary age of the GtkGLExt library.</doc>
+        <type name="gint" c:type="int"/>
+      </return-value>
+    </function>
+    <function name="get_interface_age" c:identifier="gdk_gl_get_interface_age">
+      <doc xml:whitespace="preserve">Returns the GtkGLExt library interface age.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The interface age of the GtkGLExt library.</doc>
+        <type name="gint" c:type="int"/>
+      </return-value>
+    </function>
+    <function name="get_major_version" c:identifier="gdk_gl_get_major_version">
+      <doc xml:whitespace="preserve">Returns the GtkGLExt library major version number.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The major version number of the GtkGLExt library.</doc>
+        <type name="gint" c:type="int"/>
+      </return-value>
+    </function>
+    <function name="get_micro_version" c:identifier="gdk_gl_get_micro_version">
+      <doc xml:whitespace="preserve">Returns the GtkGLExt library micro version number.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The micro version number of the GtkGLExt library.</doc>
+        <type name="gint" c:type="int"/>
+      </return-value>
+    </function>
+    <function name="get_minor_version" c:identifier="gdk_gl_get_minor_version">
+      <doc xml:whitespace="preserve">Returns the GtkGLExt library minor version number.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">The minor version number of the GtkGLExt library.</doc>
+        <type name="gint" c:type="int"/>
+      </return-value>
+    </function>
+    <function name="get_proc_address" c:identifier="gdk_gl_get_proc_address">
+      <doc xml:whitespace="preserve">Returns the address of the OpenGL, GLU, or GLX function.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">the address of the function named by @proc_name.</doc>
+        <type name="gpointer"/>
+      </return-value>
+      <parameters>
+        <parameter name="proc_name" transfer-ownership="none">
+          <doc xml:whitespace="preserve">function name.</doc>
+          <type name="utf8" c:type="char*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="init" c:identifier="gdk_gl_init">
+      <doc xml:whitespace="preserve">Call this function before using any other GdkGLExt functions in your
+applications.  It will initialize everything needed to operate the
+library and parses some standard command line options. @argc and
+standard arguments.
+&lt;note&gt;&lt;para&gt;This function will terminate your program if it was
+unable to initialize the library for some reason. If you want your
+program to fall back to a textual interface you want to call
+gdk_gl_init_check() instead.&lt;/para&gt;&lt;/note&gt;</doc>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="argc"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">Address of the &lt;parameter&gt;argc&lt;/parameter&gt; parameter of your main() function. Changed if any arguments were handled.</doc>
+          <type name="gint" c:type="int*"/>
+        </parameter>
+        <parameter name="argv"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <doc xml:whitespace="preserve">Address of the &lt;parameter&gt;argv&lt;/parameter&gt; parameter of main(). Any parameters understood by gdk_gl_init() are stripped before return.</doc>
+          <array length="0" c:type="char***">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="init_check" c:identifier="gdk_gl_init_check">
+      <doc xml:whitespace="preserve">This function does the same work as gdk_gl_init() with only
+initialized. Instead it returns %FALSE on failure.
+This way the application can fall back to some other means of communication
+with the user - for example a curses or command line interface.
+%FALSE otherwise.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">%TRUE if the GUI has been successfully initialized,</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="argc"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">Address of the &lt;parameter&gt;argc&lt;/parameter&gt; parameter of your &lt;function&gt;main()&lt;/function&gt; function. Changed if any arguments were handled.</doc>
+          <type name="gint" c:type="int*"/>
+        </parameter>
+        <parameter name="argv"
+                   direction="inout"
+                   caller-allocates="0"
+                   transfer-ownership="full"
+                   allow-none="1">
+          <doc xml:whitespace="preserve">Address of the &lt;parameter&gt;argv&lt;/parameter&gt; parameter of &lt;function&gt;main()&lt;/function&gt;. Any parameters understood by gdk_gl_init() are stripped before return.</doc>
+          <array length="0" c:type="char***">
+            <type name="utf8"/>
+          </array>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="query_extension" c:identifier="gdk_gl_query_extension">
+      <doc xml:whitespace="preserve">Indicates whether the window system supports the OpenGL extension
+(GLX, WGL, etc.).</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if OpenGL is supported, FALSE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+    </function>
+    <function name="query_extension_for_display"
+              c:identifier="gdk_gl_query_extension_for_display">
+      <doc xml:whitespace="preserve">Indicates whether the window system supports the OpenGL extension
+(GLX, WGL, etc.).</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if OpenGL is supported, FALSE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkDisplay where the query is sent to.</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="query_gl_extension"
+              c:identifier="gdk_gl_query_gl_extension">
+      <doc xml:whitespace="preserve">Determines whether a given OpenGL extension is supported.
+There must be a valid current rendering context to call
+gdk_gl_query_gl_extension().
+gdk_gl_query_gl_extension() returns information about OpenGL extensions
+only. This means that window system dependent extensions (for example,
+GLX extensions) are not reported by gdk_gl_query_gl_extension().
+supported.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">TRUE if the OpenGL extension is supported, FALSE if not</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="extension" transfer-ownership="none">
+          <doc xml:whitespace="preserve">name of OpenGL extension.</doc>
+          <type name="utf8" c:type="char*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="query_version" c:identifier="gdk_gl_query_version">
+      <doc xml:whitespace="preserve">Returns the version numbers of the OpenGL extension to the window system.
+In the X Window System, it returns the GLX version.
+In the Microsoft Windows, it returns the Windows version.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">FALSE if it fails, TRUE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="major"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">returns the major version number of the OpenGL extension.</doc>
+          <type name="gint" c:type="int*"/>
+        </parameter>
+        <parameter name="minor"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">returns the minor version number of the OpenGL extension.</doc>
+          <type name="gint" c:type="int*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="query_version_for_display"
+              c:identifier="gdk_gl_query_version_for_display">
+      <doc xml:whitespace="preserve">Returns the version numbers of the OpenGL extension to the window system.
+In the X Window System, it returns the GLX version.
+In the Microsoft Windows, it returns the Windows version.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:whitespace="preserve">FALSE if it fails, TRUE otherwise.</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:whitespace="preserve">the #GdkDisplay where the query is sent to.</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="major"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">returns the major version number of the OpenGL extension.</doc>
+          <type name="gint" c:type="int*"/>
+        </parameter>
+        <parameter name="minor"
+                   direction="out"
+                   caller-allocates="0"
+                   transfer-ownership="full">
+          <doc xml:whitespace="preserve">returns the minor version number of the OpenGL extension.</doc>
+          <type name="gint" c:type="int*"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>

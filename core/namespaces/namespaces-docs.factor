@@ -8,7 +8,7 @@ ARTICLE: "namespaces-combinators" "Namespace combinators"
     make-assoc
     with-scope
     with-variable
-    bind
+    with-variables
 } ;
 
 ARTICLE: "namespaces-change" "Changing variable values"
@@ -19,6 +19,7 @@ ARTICLE: "namespaces-change" "Changing variable values"
     dec
     change
     change-global
+    toggle
 } ;
 
 ARTICLE: "namespaces-global" "Global variables"
@@ -28,6 +29,7 @@ ARTICLE: "namespaces-global" "Global variables"
     get-global
     set-global
     initialize
+    with-global
 } ;
 
 ARTICLE: "namespaces.private" "Namespace implementation details"
@@ -93,6 +95,18 @@ HELP: change-global
 { $description "Applies the quotation to the old value of the global variable, and assigns the resulting value to the global variable." }
 { $side-effects "variable" } ;
 
+HELP: toggle
+{ $values
+    { "variable" "a variable, by convention a symbol" }    
+}
+{ $description "Changes the boolean value of a variable to its opposite." } ;
+
+HELP: with-global
+{ $values
+    { "quot" quotation }    
+}
+{ $description "Runs the quotation in the global namespace." } ;
+
 HELP: +@
 { $values { "n" "a number" } { "variable" "a variable, by convention a symbol" } }
 { $description "Adds " { $snippet "n" } " to the value of the variable. A variable value of " { $link f } " is interpreted as being zero." }
@@ -136,7 +150,7 @@ HELP: make-assoc
 { $values { "quot" quotation } { "exemplar" assoc } { "hash" "a new assoc" } }
 { $description "Calls the quotation in a new namespace of the same type as " { $snippet "exemplar" } ", and outputs this namespace when the quotation returns. Useful for quickly building assocs." } ;
 
-HELP: bind
+HELP: with-variables
 { $values { "ns" assoc } { "quot" quotation } }
 { $description "Calls the quotation in the dynamic scope of " { $snippet "ns" } ". When variables are looked up by the quotation, " { $snippet "ns" } " is checked first, and setting variables in the quotation stores them in " { $snippet "ns" } "." } ;
 

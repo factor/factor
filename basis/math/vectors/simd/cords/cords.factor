@@ -79,7 +79,7 @@ SYNTAX: A{ \ } [ >A ] parse-literal ;
     [ create-in (define-simd-128-cord) ] 2bi ;
 
 SYNTAX: SIMD-128-CORD:
-    scan-word scan define-simd-128-cord ;
+    scan-word scan-token define-simd-128-cord ;
 
 PRIVATE>
 >>

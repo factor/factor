@@ -12,7 +12,7 @@ $nl
 "To start the tool, pass a vocabulary name to a word:"
 { $subsections deploy-tool }
 "Alternatively, right-click on a vocabulary presentation in the UI and choose " { $strong "Deploy tool" } " from the resulting popup menu."
-{ $see-also "tools.deploy" } ;
+{ $see-also "tools.deploy" "deploy-flags" } ;
 
 TIP: "Generate stand-alone applications from vocabularies with the " { $link "ui.tools.deploy" } "." ;
 

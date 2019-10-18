@@ -1,10 +1,18 @@
-USING: definitions io.launcher kernel math math.parser parser
-namespaces prettyprint editors make ;
+USING: core-foundation.launch-services editors editors.vim
+io.pathnames io.standard-paths kernel namespaces ;
 IN: editors.macvim
 
-: macvim ( file line -- )
-    drop
-    [ "open" , "-a" , "MacVim", , ] { } make
-    run-detached drop ;
+TUPLE: macvim < vim ;
+T{ macvim } \ editor-class set-global
 
-[ macvim ] edit-hook set-global
+: find-macvim-bundle-path ( -- path/f )
+    "org.vim.MacVim" find-native-bundle [
+        "Contents/MacOS/Vim" append-path
+    ] [
+        f
+    ] if* ;
+    
+M: macvim find-vim-path find-macvim-bundle-path ;
+
+M: macvim vim-ui? t ;
+M: macvim editor-detached? t ;

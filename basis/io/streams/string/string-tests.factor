@@ -59,3 +59,9 @@ unit-test
     dup stream-readln
     2 rot stream-read
 ] unit-test
+
+! Issue #70 github
+[ f ] [ "" [ 0 read ] with-string-reader ] unit-test
+[ f ] [ "" [ 1 read ] with-string-reader ] unit-test
+[ f ] [ "" [ readln ] with-string-reader ] unit-test
+[ "\"\"" ] [ "\"\"" [ readln ] with-string-reader ] unit-test

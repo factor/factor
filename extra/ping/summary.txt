@@ -1,0 +1,1 @@
+Uses ICMP to test the reachability of a network host.

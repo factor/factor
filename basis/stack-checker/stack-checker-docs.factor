@@ -48,7 +48,7 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
   ": perform ( value action -- result ) quot>> call( value -- result ) ;"
 }
 { $subheading "Passing an unknown quotation to an inline combinator" }
-"Suppose we want to write :"
+"Suppose we want to write:"
 { $code ": perform ( values action -- results ) quot>> map ;" }
 "However this fails to pass the stack checker since there is no guarantee the quotation has the right stack effect for " { $link map } ". It can be wrapped in a new quotation with a declaration:"
 { $code ": perform ( values action -- results )" "    quot>> [ call( value -- result ) ] curry map ;" }
@@ -91,9 +91,10 @@ $nl
 "However a small change can be made:"
 { $example ": good ( ? quot: ( ? -- ) -- ) [ good ] 2keep [ not ] dip call ; inline recursive" "[ [ drop ] good ] infer." "( x -- )" }
 "An inline recursive word must have a fixed stack effect in its base case. The following will not infer:"
-{ $code
+{ $example
     ": foo ( quot ? -- ) [ f foo ] [ call ] if ; inline"
     "[ [ 5 ] t foo ] infer."
+    "The inline recursive word “foo” must be declared recursive\nword foo"
 } ;
 
 ARTICLE: "tools.inference" "Stack effect tools"

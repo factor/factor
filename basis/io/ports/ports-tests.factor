@@ -1,6 +1,6 @@
-USING: destructors io io.directories io.encodings.binary
-io.files io.files.temp kernel libc math sequences
-specialized-arrays.instances.alien.c-types.int tools.test ;
+USING: accessors alien.c-types alien.data destructors io
+io.directories io.encodings.ascii io.encodings.binary io.files
+io.files.temp io.pipes kernel libc math sequences tools.test ;
 IN: io.ports.tests
 
 ! Make sure that writing malloced storage to a file works, and
@@ -11,15 +11,21 @@ IN: io.ports.tests
         [
             100,000 iota
             0
-            100,000 malloc-int-array &free [ copy ] keep write
+            100,000 int malloc-array &free [ copy ] keep write
         ] with-destructors
     ] with-file-writer
 ] unit-test
 
 [ t ] [
     "test.txt" temp-file binary [
-        100,000 4 * read int-array-cast 100,000 iota sequence=
+        100,000 4 * read int cast-array 100,000 iota sequence=
     ] with-file-reader
 ] unit-test
 
 [ ] [ "test.txt" temp-file delete-file ] unit-test
+
+! Getting the stream-element-type of an output-port was broken
+[ +byte+ ] [ binary <pipe> [ stream-element-type ] [ dispose ] bi ] unit-test
+[ +byte+ ] [ binary <pipe> [ out>> stream-element-type ] [ dispose ] bi ] unit-test
+[ +character+ ] [ ascii <pipe> [ stream-element-type ] [ dispose ] bi ] unit-test
+[ +character+ ] [ ascii <pipe> [ out>> stream-element-type ] [ dispose ] bi ] unit-test

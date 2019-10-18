@@ -6,8 +6,7 @@ IN: core-foundation.time
 TYPEDEF: double CFTimeInterval
 TYPEDEF: double CFAbsoluteTime
 
-: >CFTimeInterval ( duration -- interval )
-    duration>seconds ; inline
+ALIAS: >CFTimeInterval duration>seconds
 
 MEMO: epoch ( -- micros )
     T{ timestamp { year 2001 } { month 1 } { day 1 } } timestamp>micros ;

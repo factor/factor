@@ -127,9 +127,14 @@ Factor.prototype.using = function(v, next) {
   factor.get_word("kernel", "using").execute(next);
 }
 
+var fjsc_repl = false;
+
 Factor.prototype.set_in = function(v, next) {
   factor.cont.data_stack.push(v);
   factor.get_word("kernel", "set-in").execute(next);
+  if (fjsc_repl) {
+    fjsc_repl.ps = '( ' + v + ' )';
+  }
 }
 
 Factor.prototype.get_word = function(vocab,name) {

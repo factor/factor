@@ -1,0 +1,1 @@
+Embed a Factor image into a VM to create a single standalone executable file

@@ -1,22 +1,23 @@
-! Copyright (C) 2004, 2010 Slava Pestov.
+! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slots arrays definitions generic hashtables summary io
-kernel math namespaces make prettyprint prettyprint.config
-sequences assocs sequences.private strings io.styles
-io.pathnames vectors words system splitting math.parser
-classes.mixin classes.tuple continuations continuations.private
-combinators generic.math classes.builtin classes compiler.units
-generic.standard generic.single vocabs init kernel.private
-io.encodings accessors math.order destructors source-files
-parser classes.tuple.parser effects.parser lexer generic.parser
-strings.parser vocabs.loader vocabs.parser source-files.errors ;
+USING: alien.strings slots arrays definitions generic hashtables
+summary io kernel math namespaces make prettyprint
+prettyprint.config sequences assocs sequences.private strings
+io.styles io.pathnames vectors words system splitting
+math.parser classes.mixin classes.tuple continuations
+continuations.private combinators generic.math classes.builtin
+classes compiler.units generic.standard generic.single vocabs
+init kernel.private io.encodings accessors math.order
+destructors source-files parser classes.tuple.parser
+effects.parser lexer generic.parser strings.parser vocabs.loader
+vocabs.parser source-files.errors ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
 
 M: object error-help drop f ;
 
-M: tuple error-help class ;
+M: tuple error-help class-of ;
 
 M: source-file-error error-help error>> error-help ;
 
@@ -64,7 +65,7 @@ M: string error. print ;
 
 : print-error ( error -- )
     [ error. flush ] curry
-    [ global [ "Error in print-error!" print drop ] bind ]
+    [ [ "Error in print-error!" print drop ] with-global ]
     recover ;
 
 : :error ( -- )
@@ -88,7 +89,7 @@ M: string error. print ;
 : type-check-error. ( obj -- )
     "Type check error" print
     "Object: " write dup fourth short.
-    "Object type: " write dup fourth class .
+    "Object type: " write dup fourth class-of .
     "Expected type: " write third type>class . ;
 
 : divide-by-zero-error. ( obj -- )
@@ -107,8 +108,9 @@ HOOK: signal-error. os ( obj -- )
     "FFI error" print drop ;
 
 : undefined-symbol-error. ( obj -- )
-    "The image refers to a library or symbol that was not found at load time"
-    print drop ;
+    "Cannot resolve C library function" print
+    "Symbol: " write dup third symbol>string print
+    "Library: " write fourth . ;
 
 : stack-underflow. ( obj name -- )
     write " stack underflow" print drop ;
@@ -132,11 +134,14 @@ HOOK: signal-error. os ( obj -- )
 : fp-trap-error. ( error -- )
     "Floating point trap" print drop ;
 
+: interrupt-error. ( error -- )
+    "Interrupt" print drop ;
+
 PREDICATE: vm-error < array
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
-        [ second 0 17 between? ]
+        [ second 0 18 between? ]
     } cond ;
 
 : vm-errors ( error -- n errors )
@@ -159,6 +164,7 @@ PREDICATE: vm-error < array
         { 15 [ callstack-overflow.     ] }
         { 16 [ memory-error.           ] }
         { 17 [ fp-trap-error.          ] }
+        { 18 [ interrupt-error.        ] }
     } ; inline
 
 M: vm-error summary drop "VM error" ;
@@ -174,7 +180,7 @@ M: no-method error.
     "Generic word " write
     dup generic>> pprint
     " does not define a method for the " write
-    dup object>> class pprint
+    dup object>> class-of pprint
     " class." print
     "Dispatching on object: " write object>> short. ;
 
@@ -191,7 +197,7 @@ M: no-next-method summary
 M: inconsistent-next-method summary
     drop "Executing call-next-method with inconsistent parameters" ;
 
-M: check-method summary
+M: check-method-error summary
     drop "Invalid parameters for create-method" ;
 
 M: not-a-tuple summary
@@ -199,9 +205,6 @@ M: not-a-tuple summary
 
 M: bad-superclass summary
     drop "Tuple classes can only inherit from non-final tuple classes" ;
-
-M: no-initial-value summary
-    drop "Initial value must be provided for slots specialized to this class" ;
 
 M: bad-initial-value summary
     drop "Incompatible initial value" ;
@@ -265,7 +268,7 @@ M: attempt-all-error summary drop "Nothing to attempt" ;
 
 M: already-disposed summary drop "Attempting to operate on disposed object" ;
 
-M: no-current-vocab summary
+M: no-current-vocab-error summary
     drop "Not in a vocabulary; IN: form required" ;
 
 M: no-word-error summary
@@ -348,10 +351,13 @@ M: bad-escape error.
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
 
-M: check-mixin-class summary drop "Not a mixin class" ;
+M: check-mixin-class-error summary drop "Not a mixin class" ;
 
-M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
+M: not-found-in-roots summary
+    path>> "Cannot resolve vocab: " prepend ;
 
 M: wrong-values summary drop "Quotation's stack effect does not match call site" ;
 
 M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
+
+{ "threads" "debugger" } "debugger.threads" require-when

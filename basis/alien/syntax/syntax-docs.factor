@@ -83,7 +83,7 @@ HELP: ENUM:
 HELP: C-TYPE:
 { $syntax "C-TYPE: type" }
 { $values { "type" "a new C type" } }
-{ $description "Defines a new, opaque C type. Since it is opaque, " { $snippet "type" } " will not be directly usable as a parameter or return type of a " { $link POSTPONE: FUNCTION: } " or as a slot of a " { $link POSTPONE: STRUCT: } ". However, it can be used as the type of a " { $link pointer } "."
+{ $description "Defines a new, opaque C type. Since it is opaque, " { $snippet "type" } " will not be directly usable as a parameter or return type of a " { $link POSTPONE: FUNCTION: } " or as a slot of a " { $link POSTPONE: STRUCT: } ". However, it can be used as the type of a " { $link pointer } "." $nl
 { $snippet "C-TYPE:" } " can also be used to forward declare C types, allowing circular dependencies to occur between types. For example:"
 { $code """C-TYPE: forward 
 STRUCT: backward { x forward* } ;
@@ -122,4 +122,14 @@ HELP: typedef
 HELP: C-GLOBAL:
 { $syntax "C-GLOBAL: type name" }
 { $values { "type" "a C type" } { "name" "a C global variable name" } }
-{ $description "Defines a new word named " { $snippet "name" } " which accesses a global variable in the current library, set with " { $link POSTPONE: LIBRARY: } "." } ;
+{ $description "Defines a getter " { $snippet "name" } " and setter " { $snippet "set-name" } " for the global value in the current library, set with " { $link POSTPONE: LIBRARY: } "." } ;
+
+ARTICLE: "alien.enums" "Enumeration types"
+"The " { $vocab-link "alien.enums" } " vocab contains the implementation for " { $link POSTPONE: ENUM: } " C types, and provides words for converting between enum singletons and integers. It is possible to dispatch off of members of an enum."
+$nl
+"Defining enums:"
+{ $subsection POSTPONE: ENUM: }
+"Defining enums at run-time:"
+{ $subsection define-enum }
+"Conversions between enums and integers:"
+{ $subsections enum>number number>enum } ;
