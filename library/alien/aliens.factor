@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: arrays hashtables io kernel lists math namespaces parser ;
+USING: arrays hashtables io kernel lists math namespaces parser sequences ;
 
 UNION: c-ptr byte-array alien displaced-alien ;
 
@@ -15,8 +15,7 @@ M: alien = ( obj obj -- ? )
         2drop f
     ] if ;
 
-: library ( name -- object )
-    dup [ "libraries" get hash ] when ;
+: library ( name -- object ) "libraries" get hash ;
 
 : load-library ( name -- dll )
     #! Higher level wrapper around dlopen primitive.
@@ -33,9 +32,9 @@ M: alien = ( obj obj -- ? )
         [ "abi" set "name" set ] make-hash swap set
     ] bind ;
 
+: add-simple-library ( name file -- ) 
+    win32? ".dll" ".so" ? append
+    win32? "stdcall" "cdecl" ? add-library ;
+
 : library-abi ( library -- abi )
     library "abi" swap ?hash [ "cdecl" ] unless* ;
-
-: DLL" skip-blank parse-string dlopen swons ; parsing
-
-: ALIEN: scan-word <alien> swons ; parsing

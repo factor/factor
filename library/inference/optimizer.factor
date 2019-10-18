@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: optimizer
 USING: compiler-backend generic hashtables inference kernel
-lists math matrices namespaces sequences vectors ;
+lists math namespaces sequences vectors ;
 
 ! We use the recursive-state variable here, to track nested
 ! label scopes, to prevent infinite loops when inlining
@@ -39,9 +39,7 @@ DEFER: optimize-node
     optimize-1 [ optimize-loop ] when ;
 
 : optimize ( dataflow -- dataflow )
-    [
-        dup solve-recursion dup split-node optimize-loop
-    ] with-scope ;
+    [ dup split-node optimize-loop ] with-scope ;
 
 : prune-if ( node quot -- successor/t )
     over >r call [ r> node-successor ] [ r> drop t ] if ;
@@ -54,27 +52,28 @@ M: node optimize-node* ( node -- t )
     drop t ;
 
 ! #shuffle
+: can-compose? ( shuffle -- ? )
+    dup shuffle-in-d length swap shuffle-in-r length +
+    vregs length <= ;
+
 : compose-shuffle-nodes ( #shuffle #shuffle -- #shuffle/t )
     [ [ node-shuffle ] 2apply compose-shuffle ] keep
-    over shuffle-in-d length pick shuffle-in-r length + vregs > [
-        2drop t
-    ] [
-        [ set-node-shuffle ] keep
-    ] if ;
+    over can-compose?
+    [ [ set-node-shuffle ] keep ] [ 2drop t ] if ;
 
 M: #shuffle optimize-node*  ( node -- node/t )
     dup node-successor dup #shuffle? [
         compose-shuffle-nodes
     ] [
         drop [
-            dup node-in-d over node-out-d =
-            [ dup node-in-r swap node-out-r = ] [ drop f ] if
+            dup node-in-d over node-out-d sequence=
+            >r dup node-in-r swap node-out-r sequence= r> and
         ] prune-if
     ] if ;
 
 ! #if
 : static-branch? ( node -- lit ? )
-    node-in-d first dup literal? ;
+    node-in-d first dup value? ;
 
 : static-branch ( conditional n -- node )
     over drop-inputs
@@ -82,7 +81,7 @@ M: #shuffle optimize-node*  ( node -- node/t )
 
 M: #if optimize-node* ( node -- node )
     dup static-branch?
-    [ literal-value 0 1 ? static-branch ] [ 2drop t ] if ;
+    [ value-literal 0 1 ? static-branch ] [ 2drop t ] if ;
 
 ! #values
 : optimize-fold ( node -- node/t )

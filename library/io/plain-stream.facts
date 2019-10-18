@@ -1,0 +1,6 @@
+USING: help io ;
+
+HELP: <plain-writer> "( stream -- new-stream )"
+{ $values { "stream" "an input stream" } { "new-stream" "an input stream" } }
+{ $description "Wraps an input stream in a stream supporting the extended stream output protocol in a trivial way." }
+{ $notes "Stream constructors should call this word to wrap streams that do not natively support the extended stream output protocol." } ;

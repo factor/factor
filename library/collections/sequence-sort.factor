@@ -1,5 +1,5 @@
 IN: sequences-internals
-USING: arrays kernel math sequences ;
+USING: arrays generic kernel math sequences ;
 
 : midpoint@ length 2 /i ; inline
 
@@ -44,8 +44,6 @@ C: sorter ( seq start end -- sorter )
         ] when
     ] when ; inline
 
-DEFER: (nsort)
-
 : (nsort) ( quot seq start end -- )
     2dup < [
         <sorter> sort-step
@@ -63,7 +61,7 @@ DEFER: (nsort)
     dup length 1 <= [
         2nip slice-from
     ] [
-        3dup >r >r >r midpoint swap call dup 0 = [
+        3dup >r >r >r midpoint swap call dup zero? [
             r> r> 3drop r> dup slice-from swap slice-to + 2 /i
         ] [
             r> swap r> swap r> partition (binsearch)
@@ -86,9 +84,7 @@ IN: sequences
 : sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )
     swap [ swap nsort ] immutable ; inline
 
-: number-sort ( seq -- seq ) [ - ] sort ;
-
-: string-sort ( seq -- seq ) [ lexi ] sort ;
+: natural-sort ( seq -- seq ) [ <=> ] sort ;
 
 : binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )
     swap dup empty?

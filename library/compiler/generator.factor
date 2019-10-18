@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: assembler compiler errors inference kernel lists math
-memory namespaces sequences strings vectors words ;
+USING: alien assembler compiler errors inference kernel
+kernel-internals lists math memory namespaces sequences strings
+vectors words ;
 
 ! Compile a VOP.
 GENERIC: generate-node ( vop -- )
@@ -18,14 +19,14 @@ GENERIC: generate-node ( vop -- )
     compiled-offset >r
     compile-aligned
     swap save-xt
-    [ [ generate-node ] each ] each
+    [ [ dup [ generate-node ] with-vop ] each ] each
     compile-aligned
     compiled-offset r> - ;
 
 : generate-reloc ( -- length )
     relocation-table get
-    dup [ compile-cell ] each
-    length cell * ;
+    dup [ assemble-cell ] each
+    length cells ;
 
 : (generate) ( word linear -- )
     #! Compile a word definition from linear IR.
@@ -54,25 +55,18 @@ SYMBOL: previous-offset
 M: %label generate-node ( vop -- )
     vop-label save-xt ;
 
-M: %end-dispatch generate-node ( vop -- ) drop ;
-
-: compile-target ( word -- ) 0 compile-cell absolute ;
-
-M: %target-label generate-node vop-label compile-target ;
-
-M: %target generate-node
-    vop-label dup postpone-word  compile-target ;
+M: %target-label generate-node ( vop -- )
+    drop label 0 assemble-cell absolute-cell ;
 
 M: %parameters generate-node ( vop -- ) drop ;
 
-GENERIC: v>operand
+M: %parameter generate-node ( vop -- ) drop ;
 
-M: integer v>operand tag-bits shift ;
+M: %alien-invoke generate-node
+    #! call a C function.
+    drop 0 input 1 input load-library compile-c-call ;
 
-M: f v>operand address ;
-
-: dest/src ( vop -- dest src )
-    dup 0 vop-out v>operand swap 0 vop-in v>operand ;
+: dest/src ( -- dest src ) 0 output-operand 0 input-operand ;
 
 ! These constants must match native/card.h
 : card-bits 7 ;
@@ -80,4 +74,4 @@ M: f v>operand address ;
 
 : shift-add ( by -- n )
     #! Used in fixnum-shift overflow check.
-    1 swap cell 8 * swap 1- - shift ;
+    >r 1 cell-bits r> 1- - shift ;

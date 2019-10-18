@@ -1,0 +1,57 @@
+USING: help math ;
+
+HELP: cosh "( x -- y )"
+$values-x/y
+{ $description "Hyperbolic cosine." } ;
+
+HELP: sech "( x -- y )"
+$values-x/y
+{ $description "Hyperbolic secant." } ;
+
+HELP: sinh "( x -- y )"
+$values-x/y
+{ $description "Hyperbolic sine." } ;
+
+HELP: sinh "( x -- y )"
+$values-x/y
+{ $description "Hyperbolic sine." } ;
+
+HELP: cosech "( x -- y )"
+$values-x/y
+{ $description "Hyperbolic cosecant." } ;
+
+HELP: tanh "( x -- y )"
+$values-x/y
+{ $description "Hyperbolic tangent." } ;
+
+HELP: coth "( x -- y )"
+$values-x/y
+{ $description "Hyperbolic cotangent." } ;
+
+HELP: cos "( x -- y )"
+$values-x/y
+{ $description "Trigonometric cosine." } ;
+
+HELP: sec "( x -- y )"
+$values-x/y
+{ $description "Trigonometric secant." } ;
+
+HELP: sin "( x -- y )"
+$values-x/y
+{ $description "Trigonometric sine." } ;
+
+HELP: sin "( x -- y )"
+$values-x/y
+{ $description "Trigonometric sine." } ;
+
+HELP: cosec "( x -- y )"
+$values-x/y
+{ $description "Trigonometric cosecant." } ;
+
+HELP: tan "( x -- y )"
+$values-x/y
+{ $description "Trigonometric tangent." } ;
+
+HELP: cot "( x -- y )"
+$values-x/y
+{ $description "Trigonometric cotangent." } ;

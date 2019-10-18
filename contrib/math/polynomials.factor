@@ -7,7 +7,7 @@ USING: kernel sequences vectors math math-internals namespaces arrays ;
 
 : 2length ( seq seq -- ) [ length ] 2apply ;
 
-: zero-vector ( n -- vector ) 0 <repeated> >vector ;
+: zero-vector ( n -- vector ) 0 <array> >vector ;
 
 : zero-pad ( n seq -- seq )
     #! extend seq by n zeros
@@ -110,9 +110,8 @@ IN: math-contrib
 
 : pdiff ( p -- p' )
     #! Polynomial derivative.
-    dup empty? [ [ length ] keep v* 1 swap tail ] unless ;
+    dup length v* { 0 } ?head drop ;
 
-: polyval ( x p -- n )
-    #! evaluate polynomial in a straightforward way
-    ptrim dup length 1 swap <range> [ pick swap ^ ] map 1 rot cut swapd v. swap pop + nip ;
-
+: polyval ( p x -- p[x] )
+    #! Evaluate a polynomial.
+    >r dup length r> powers v. ;

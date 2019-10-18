@@ -1,15 +1,23 @@
-USING: compiler hashtables kernel math namespaces sequences test ;
+IN: temporary
+USING: compiler hashtables kernel math memory namespaces
+sequences strings test ;
 
-: store-hash ( hashtable n -- )
-    [ dup pick set-hash ] each drop ;
+: hash-bench-step ( hash elt -- )
+    3 random-int {
+        { [ dup 0 = ] [ drop dup rot set-hash ] }
+        { [ dup 1 = ] [ drop swap remove-hash ] }
+        { [ dup 2 = ] [ drop swap hash drop ] }
+    } cond ;
 
-: lookup-hash ( hashtable n -- )
-    [ over hash drop ] each drop ;
-
-: hashtable-benchmark ( -- )
-    100 [
+: hashtable-benchmark ( seq -- )
+    10000 <hashtable> swap 10 [
         drop
-        80000 100000 <hashtable> swap 2dup store-hash lookup-hash
-    ] each ; compiled
+        [
+            [
+                ( hash elt -- )
+                hash-bench-step
+            ] each-with
+        ] 2keep
+    ] each 2drop ; compiled
 
-[ ] [ hashtable-benchmark ] unit-test
+[ ] [ [ string? ] instances hashtable-benchmark ] unit-test

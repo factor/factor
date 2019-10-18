@@ -104,13 +104,13 @@ C: io-callback ( -- callback )
 
 : (wait-for-io) ( timeout -- error overlapped len )
     >r completion-port get 
-    <indirect-pointer> [ 0 swap set-indirect-pointer-value ] keep 
-    <indirect-pointer> 
-    <indirect-pointer>
+    "indirect-pointer" <c-object> [ 0 swap set-indirect-pointer-value ] keep 
+    "indirect-pointer" <c-object>
+    "indirect-pointer" <c-object>
     pick over r> -rot >r >r GetQueuedCompletionStatus r> r> ;
 
 : overlapped>callback ( overlapped -- callback )
-    indirect-pointer-value dup 0 = [
+    indirect-pointer-value dup zero? [
         drop f
     ] [
         <alien> overlapped-ext-user-data get-io-callback

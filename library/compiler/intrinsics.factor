@@ -22,8 +22,8 @@ namespaces sequences words ;
 
 : slot@ ( node -- n/f )
     #! Compute slot offset.
-    dup node-in-d reverse dup first dup literal? [
-        literal-value cell * swap second
+    dup node-in-d reverse-slice dup first dup value? [
+        value-literal cells swap second
         rot value-tag dup [ - ] [ 2drop f ] if
     ] [
         3drop f
@@ -59,6 +59,21 @@ namespaces sequences words ;
     1 %write-barrier ,
 ] "intrinsic" set-word-prop
 
+! \ char-slot [
+!     drop
+!     in-2
+!     -1 %inc-d ,
+!     0 1 %char-slot ,
+!     1 <vreg> 0 %replace-d ,
+! ] "intrinsic" set-word-prop
+! 
+! \ set-char-slot [
+!     drop
+!     in-3
+!     -3 %inc-d ,
+!     0 2 1 %set-char-slot ,
+! ] "intrinsic" set-word-prop
+
 \ type [
     drop
     in-1
@@ -75,7 +90,7 @@ namespaces sequences words ;
 
 \ getenv [
     -1 %inc-d ,
-    node-peek literal-value 0 <vreg> swap %getenv ,
+    node-peek value-literal 0 <vreg> swap %getenv ,
     1 %inc-d ,
     out-1
 ] "intrinsic" set-word-prop
@@ -83,7 +98,7 @@ namespaces sequences words ;
 \ setenv [
     -1 %inc-d ,
     in-1
-    node-peek literal-value 0 <vreg> swap %setenv ,
+    node-peek value-literal 0 <vreg> swap %setenv ,
     -1 %inc-d ,
 ] "intrinsic" set-word-prop
 
@@ -103,13 +118,13 @@ namespaces sequences words ;
     >r binary-inputs dup -1 %inc-d , r> execute , out-1 ; inline
 
 : binary-imm ( node -- in1 in2 )
-    -1 %inc-d , in-1 node-peek literal-value 0 <vreg> ;
+    -1 %inc-d , in-1 node-peek value-literal 0 <vreg> ;
 
 : binary-op-imm ( node op -- )
     >r binary-imm dup r> execute , out-1 ; inline
 
 : literal-immediate? ( value -- ? )
-    dup literal? [ literal-value immediate? ] [ drop f ] if ;
+    dup value? [ value-literal immediate? ] [ drop f ] if ;
 
 : binary-op-imm? ( node -- ? )
     fixnum-imm? >r node-peek literal-immediate? r> and ;
@@ -182,25 +197,8 @@ namespaces sequences words ;
     out-1
 ] "intrinsic" set-word-prop
 
-: fast-fixnum* ( n -- )
-    -1 %inc-d ,
-    in-1
-    log2 0 <vreg> 0 <vreg> %fixnum<< ,
-    out-1 ;
-
-: slow-fixnum* ( node -- ) \ %fixnum* binary-op-reg ;
-
 \ fixnum* [
-    ! Turn multiplication by a power of two into a left shift.
-    dup node-peek dup literal-immediate? [
-        literal-value dup power-of-2? [
-            nip fast-fixnum*
-        ] [
-            drop slow-fixnum*
-        ] if
-    ] [
-        drop slow-fixnum*
-    ] if
+    \ %fixnum* binary-op-reg
 ] "intrinsic" set-word-prop
 
 : slow-shift ( -- ) \ fixnum-shift %call , ;
@@ -208,7 +206,7 @@ namespaces sequences words ;
 : negative-shift ( n -- )
     -1 %inc-d ,
     in-1
-    dup cell -8 * <= [
+    dup cell-bits neg <= [
         drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
         T{ vreg f 2 } 0 %replace-d ,
     ] [
@@ -216,31 +214,21 @@ namespaces sequences words ;
         out-1
     ] if ;
 
-: positive-shift ( n -- )
-    dup cell 8 * tag-bits - <= [
-        -1 %inc-d ,
-        in-1
-        0 <vreg> 0 <vreg> %fixnum<< ,
-        out-1
-    ] [
-        drop slow-shift
-    ] if ;
-
 : fast-shift ( n -- )
-    dup 0 = [
+    dup zero? [
         -1 %inc-d ,
         drop
     ] [
         dup 0 < [
             negative-shift
         ] [
-            positive-shift
+            drop slow-shift
         ] if
     ] if ;
 
 \ fixnum-shift [
-    node-peek dup literal? [
-        literal-value fast-shift
+    node-peek dup value? [
+        value-literal fast-shift
     ] [
         drop slow-shift
     ] if

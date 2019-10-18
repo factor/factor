@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: alien arrays compiler-backend errors generic hashtables
-io kernel kernel-internals lists math parser sequences strings
+USING: alien arrays errors generic hashtables io kernel
+kernel-internals lists math parser sequences strings
 threads unix-internals vectors words ;
 
 ! We want namespaces::bind to shadow the bind system call from
@@ -12,11 +12,6 @@ USING: namespaces ;
 ! This will go elsewhere soon
 : byte-bit ( n alien -- byte bit )
     over -5 shift alien-unsigned-4 swap 31 bitand ;
-
-: bit-length ( n -- n ) cell / ceiling ;
-
-: <bit-array> ( n -- array )
-    bit-length <byte-array> ;
 
 : bit-nth ( n alien -- ? )
     byte-bit 1 swap shift bitand 0 > ;
@@ -29,7 +24,7 @@ USING: namespaces ;
     swap -5 shift set-alien-unsigned-4 ;
 
 : clear-bits ( alien len -- )
-    bit-length [ 0 -rot set-alien-unsigned-cell ] each-with ;
+    [ 0 -rot set-alien-unsigned-1 ] each-with ;
 
 ! Global variables
 SYMBOL: read-fdset
@@ -42,7 +37,7 @@ SYMBOL: write-tasks
 
 : (io-error) err_no strerror throw ;
 
-: check-null ( n -- ) 0 = [ (io-error) ] when ;
+: check-null ( n -- ) zero? [ (io-error) ] when ;
 
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
 
@@ -131,11 +126,11 @@ GENERIC: task-container ( task -- vector )
     ] if ;
 
 : timeout? ( port -- ? )
-    port-cutoff dup 0 = not swap millis < and ;
+    port-cutoff dup zero? not swap millis < and ;
 
 : handle-fdset ( fdset tasks -- )
     [
-        cdr dup io-task-port timeout? [
+        nip dup io-task-port timeout? [
             dup io-task-port "Timeout" swap report-error
             nip pop-callback continue
         ] [
@@ -146,7 +141,7 @@ GENERIC: task-container ( task -- vector )
 
 : init-fdset ( fdset tasks -- )
     >r dup FD_SETSIZE clear-bits r>
-    [ car t swap rot set-bit-nth ] hash-each-with ;
+    [ drop t swap rot set-bit-nth ] hash-each-with ;
 
 : init-fdsets ( -- read write except )
     read-fdset get [ read-tasks get init-fdset ] keep
@@ -174,7 +169,7 @@ GENERIC: task-container ( task -- vector )
 
 : refill ( port -- ? )
     #! Return f if there is a recoverable error
-    dup buffer-length 0 = [
+    dup buffer-length zero? [
         dup (refill)  dup 0 >= [
             swap n>buffer t
         ] [
@@ -239,7 +234,7 @@ M: port stream-read1 ( stream -- char/f )
     dup io-error ;
 
 : <writer> ( fd -- writer )
-    buffered-port output over set-port-type ;
+    buffered-port output over set-port-type <plain-writer> ;
 
 : write-step ( port -- )
     dup >port< dup buffer@ swap buffer-length write dup 0 >= [
@@ -264,7 +259,7 @@ C: write-task ( port -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
 M: write-task do-io-task
-    io-task-port dup buffer-length 0 = over port-error or [
+    io-task-port dup buffer-length zero? over port-error or [
         0 swap buffer-reset t
     ] [
         write-step f
@@ -288,8 +283,6 @@ M: port stream-flush ( stream -- )
     dup output check-port
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
-M: port stream-finish ( stream -- ) output check-port ;
-
 : wait-to-write ( len port -- )
     tuck can-write? [ dup stream-flush ] unless pending-error ;
 
@@ -297,9 +290,9 @@ M: port stream-write1 ( char writer -- )
     dup output check-port
     1 over wait-to-write ch>buffer ;
 
-M: port stream-format ( string style writer -- )
+M: port stream-write ( string writer -- )
     dup output check-port
-    nip over length over wait-to-write >buffer ;
+    over length over wait-to-write >buffer ;
 
 M: port stream-close ( stream -- )
     dup port-type closed eq? [
@@ -312,8 +305,8 @@ M: port stream-close ( stream -- )
 
 ! Make a duplex stream for reading/writing a pair of fds
 
-: <fd-stream> ( infd outfd flush? -- stream )
-    >r >r <reader> r> <writer> r> <duplex-stream> ;
+: <fd-stream> ( infd outfd -- stream )
+    >r <reader> r> <writer> <duplex-stream> ;
 
 USE: io
 
@@ -322,8 +315,8 @@ USE: io
     #! other time can have unintended consequences.
     global [
         H{ } clone read-tasks set
-        FD_SETSIZE <bit-array> read-fdset set
+        FD_SETSIZE <byte-array> read-fdset set
         H{ } clone write-tasks set
-        FD_SETSIZE <bit-array> write-fdset set
-        0 1 t <fd-stream> stdio set
+        FD_SETSIZE <byte-array> write-fdset set
+        0 1 <fd-stream> stdio set
     ] bind ;

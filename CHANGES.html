@@ -4,6 +4,137 @@
 <head><title>Factor change log</title></head>
 <body>
 
+<h1>Factor 0.80:</h1>
+
+<ul>
+
+<li>New help system, browsable in the UI and via the HTTP server (<code>/responder/help</code>). In the UI listener, invoke <code>handbook</code> to read the documentation root, and invoke <code>\ foo help</code> to look at documentation for the word <code>foo</code>.</li>
+
+<li>Sequences:
+
+<ul>
+<li>Association list words <code>assoc*</code>, <code>set-assoc</code>, <code>acons</code> and <code>remove-assoc</code> are gone.</li>
+<li>The <code>repeated</code> virtual sequence type is gone. Instead, the
+<code>&lt;array&gt;</code> word takes an initial element in addition to an
+initial size.</li>
+<li>The <code>fill</code> word to create a new string with an initial character
+repeated a certain number of times has been renamed to <code>&lt;string&gt;</code>.</li>
+<li>Add a new <code>interleave ( seq quot between -- )</code> combinator that applies
+a quotation to each element of a sequence, calling another quotation in between each
+pair.</li>
+<li>Add a new <code>&lt;=&gt; ( obj1 obj2 -- n )</code> word for comparing two
+objects using an intrinsic order. For numbers this is the standard order, for strings
+this is lexicographic order, and for words, this compares word names.</li>
+<li>The <code>natural-sort ( seq -- seq )</code> word replaces <code>number-sort</code>,
+<code>string-sort</code> and <code>word-sort</code>.</li>
+</ul>
+
+</li>
+
+<li>Hashtables:
+<ul>
+<li><code>hash* ( key hash -- [[ key value ]] )</code> is now <code>hash* ( key hash -- value ? )</code></li>
+<li><code>hash-clear</code> is now <code>clear-hash</code></li>
+<li><code>hash-each</code>, <code>hash-each-with</code>, <code>hash-all?</code>, <code>hash-all-with?</code>, <code>hash-subset</code>, <code>hash-subset-with</code> now pass the key and value separately on the stack to the given quotation, instead of passing a cons cell</li>
+<li>Literal syntax change: <code>H{ [[ key value ]] ... }</code> is now <code>H{ { key value } }</code></li>
+</ul>
+</li>
+
+<li>Math:
+
+<ul>
+
+<li>The <code>sum</code> and <code>product</code> words have been moved to
+<code>contrib/math/</code>.</li>
+<li>The <code>mod</code> word is now supported for ratios and floating point numbers.</li>
+<li>The <code>truncate</code>, <code>floor</code> and <code>ceiling</code> words are now supported for floating point numbers.</li>
+<li>The NaN, positive infinity and negative infinity floating point numbers now parse and unparse as <code>0.0/0.0</code>, <code>1.0/0.0</code>, and <code>-1.0/0.0</code> respectively.</li>
+<li>The NaN value is now equal to itself under <code>=</code>.</li>
+<li>Negative and postive zero are no longer equal under <code>=</code>. However, the new <code>zero?</code> word tests if the top of the stack is a zero, and it tests for both positive and negative zero.</li>
+</ul>
+
+</li>
+
+<li>Streams:
+
+<ul>
+<li><code>stream-format ( string style stream -- )</code> now takes a hashtable
+rather than an association list for specifying style information.</li>
+<li><code>stream-write</code> and <code>stream-terpri</code> are now generic words, and there is a new <code>with-nested-stream</code> generic word. You can wrap your output streams in a <code>&lt;plain-writer&gt;</code> to avoid implementing these.</li>
+</ul>
+</li>
+
+
+<li>C library interface:
+
+<ul>
+<li>Some alien word changes:
+<pre>&lt;foo&gt; ==&gt; "foo" &lt;c-object&gt;
+&lt;foo-array&gt; ==&gt; "foo" &lt;c-array&gt;</pre>
+<li>Support for binding to Objective C libraries is now included.
+<ul>
+<li>Normal usage of Objective C classes and methods is done using the <code>OBJC-CLASS:</code>
+and <code>OBJC-MESSAGE:</code> parsing words. See the example in
+<code>examples/cocoa-speech.factor</code>.</li>
+<li>Objective C runtime introspection functions and structures are defined in the
+<code>objective-c</code> vocabulary.</li>
+</ul>
+</li>
+<li>Added a pair of words for between Factor strings and C strings, <code>alien&gt;string</code> and <code>string&gt;alien</code>.
+</li>
+
+<li>Compiler changes:
+
+<ul>
+<li>AMD64 compiler backend.</li>
+<li>Fixed some problems with compilation of inlined recursive words.</li>
+</ul>
+
+</li>
+
+<li>UI changes:
+
+<ul>
+<li>Fixed invalid OpenGL calls which caused problems on Windows machines with ATI
+drivers, and Linux machines with the MesaGL implementation.</li>
+<li>The listener looks different now. An expandable top area is used for browsing objects, words and help, and the stack display has been shrunk to a single status line at the bottom of the window.</li>
+<li>A left click on a presentation now invokes the default command. A right click
+shows a menu of possibilities.</li>
+</ul>
+
+</li>
+
+<li>Bootstrap changes:
+
+<ul>
+<li>Source files are no longer loaded in the stage-2 bootstrap. Since stage-2 bootstrap
+runs in the interpreter, this reduces bootstrap time by a few minutes. Instead, all
+source files, including the compiler backend, are loaded in stage-1 bootstrap, and thus
+boot images are now CPU-specific. Boot images can be created as follows:
+<pre>
+USE: image
+"x86" make-image
+"ppc" make-image
+"amd64" make-image
+</pre></li>
+</ul>
+
+</li>
+
+<li>Contributed libraries:
+
+<ul>
+<li>All libraries in <code>contrib/</code> have been tested and updated for recent language
+changes, and you can run <code>contrib/load.factor</code> to load all of them at once (Trent Buck)</li>
+<li>Updated <code>contrib/x11/</code> with many more examples (Eduardo Cavazos)</li>
+<li>Added splay tree library in <code>contrib/splay-trees.factor</code> (Mackenzie Straight)</li>
+<li>Improved AJAX support in <code>contrib/httpd/</code>. The "prototype" JavaScript library is now included (Chris Double)</li>
+</ul>
+
+</li>
+
+</ul>
+
 <h1>Factor 0.79:</h1>
 
 <ul>
@@ -109,6 +240,7 @@ However, most uses of <code>catch</code> can be replaced by <code>cleanup</code>
 <li>Advanced math library with quaternions, matrices, polynomials, statistics and various
 functions in <code>contrib/math/</code>. (Doug Coleman)</li>
 <li>Dimensioned units in <code>contrib/units/</code>. (Doug Coleman)</li>
+<li>X11 binding in <code>contrib/x11/</code> (Eduardo Cavazos)</li>
 </ul>
 
 </li>

@@ -1,8 +1,8 @@
 IN: inference
 USING: arrays alien assembler errors generic hashtables
-interpreter io io-internals kernel kernel-internals lists math
-math-internals memory parser sequences strings vectors words
-prettyprint ;
+hashtables-internals interpreter io io-internals kernel
+kernel-internals lists math math-internals memory parser
+sequences strings vectors words prettyprint ;
 
 ! We transform calls to these words into 'branched' forms;
 ! eg, there is no VOP for fixnum<=, only fixnum<= followed
@@ -35,17 +35,13 @@ prettyprint ;
     dup "infer-effect" word-prop consume/produce
     [ [ t ] [ f ] if ] infer-quot ;
 
-{ fixnum<= fixnum< fixnum>= fixnum> eq? } [
-    dup dup literalize [ manual-branch ] cons
-    "infer" set-word-prop
-] each
+{ fixnum<= fixnum< fixnum>= fixnum> eq? }
+[ dup [ manual-branch ] curry "infer" set-word-prop ] each
 
 ! Primitive combinators
 \ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop
 
-\ call [
-    pop-literal infer-quot-value
-] "infer" set-word-prop
+\ call [ pop-literal infer-quot-value ] "infer" set-word-prop
 
 \ execute [ [ word ] [ ] ] "infer-effect" set-word-prop
 
@@ -63,14 +59,14 @@ prettyprint ;
 \ cond [ [ object ] [ ] ] "infer-effect" set-word-prop
 
 \ cond [
-    pop-literal [ first2 cons ] map reverse-slice
+    pop-literal reverse-slice
     [ no-cond ] swap alist>quot infer-quot-value
 ] "infer" set-word-prop
 
 \ dispatch [ [ fixnum array ] [ ] ] "infer-effect" set-word-prop
 
 \ dispatch [
-    pop-literal nip [ <literal> ] map
+    pop-literal nip [ <value> ] map
     #dispatch pop-d drop infer-branches
 ] "infer" set-word-prop
 
@@ -94,9 +90,6 @@ prettyprint ;
 
 \ <sbuf> [ [ integer ] [ sbuf ] ] "infer-effect" set-word-prop
 \ <sbuf> t "flushable" set-word-prop
-
-\ sbuf>string [ [ sbuf ] [ string ] ] "infer-effect" set-word-prop
-\ sbuf>string t "flushable" set-word-prop
 
 \ >fixnum [ [ number ] [ fixnum ] ] "infer-effect" set-word-prop
 \ >fixnum t "flushable" set-word-prop
@@ -258,10 +251,6 @@ prettyprint ;
 \ bignum>= t "flushable" set-word-prop
 \ bignum>= t "foldable" set-word-prop
 
-\ float= [ [ bignum bignum ] [ object ] ] "infer-effect" set-word-prop
-\ float= t "flushable" set-word-prop
-\ float= t "foldable" set-word-prop
-
 \ float+ [ [ float float ] [ float ] ] "infer-effect" set-word-prop
 \ float+ t "flushable" set-word-prop
 \ float+ t "foldable" set-word-prop
@@ -281,6 +270,10 @@ prettyprint ;
 \ float< [ [ float float ] [ object ] ] "infer-effect" set-word-prop
 \ float< t "flushable" set-word-prop
 \ float< t "foldable" set-word-prop
+
+\ float-mod [ [ float float ] [ float ] ] "infer-effect" set-word-prop
+\ float-mod t "flushable" set-word-prop
+\ float-mod t "foldable" set-word-prop
 
 \ float<= [ [ float float ] [ object ] ] "infer-effect" set-word-prop
 \ float<= t "flushable" set-word-prop
@@ -441,16 +434,22 @@ prettyprint ;
 \ alien-float t "flushable" set-word-prop
 
 \ set-alien-float [ [ float c-ptr integer ] [ ] ] "infer-effect" set-word-prop
+\ alien-float [ [ c-ptr integer ] [ float ] ] "infer-effect" set-word-prop
+\ alien-float t "flushable" set-word-prop
+
+\ set-alien-double [ [ float c-ptr integer ] [ ] ] "infer-effect" set-word-prop
 \ alien-double [ [ c-ptr integer ] [ float ] ] "infer-effect" set-word-prop
 \ alien-double t "flushable" set-word-prop
 
-\ set-alien-double [ [ float c-ptr integer ] [ ] ] "infer-effect" set-word-prop
-\ alien-c-string [ [ c-ptr integer ] [ string ] ] "infer-effect" set-word-prop
-\ alien-c-string t "flushable" set-word-prop
+\ alien>string [ [ c-ptr ] [ string ] ] "infer-effect" set-word-prop
+\ alien>string t "flushable" set-word-prop
 
-\ set-alien-c-string [ [ string c-ptr integer ] [ ] ] "infer-effect" set-word-prop
+\ string>alien [ [ string ] [ byte-array ] ] "infer-effect" set-word-prop
+\ string>alien t "flushable" set-word-prop
+
 \ string>memory [ [ string integer ] [ ] ] "infer-effect" set-word-prop
 \ memory>string [ [ integer integer ] [ string ] ] "infer-effect" set-word-prop
+
 \ alien-address [ [ alien ] [ integer ] ] "infer-effect" set-word-prop
 
 \ slot [ [ object fixnum ] [ object ] ] "infer-effect" set-word-prop
@@ -466,17 +465,17 @@ prettyprint ;
 \ char-slot [ [ fixnum object ] [ fixnum ] ] "infer-effect" set-word-prop
 \ char-slot t "flushable" set-word-prop
 
-\ set-char-slot [ [ integer fixnum object ] [ ] ] "infer-effect" set-word-prop
-\ resize-array [ [ integer array ] [ array ] ] "infer-effect" set-word-prop
-\ resize-string [ [ integer string ] [ string ] ] "infer-effect" set-word-prop
+\ set-char-slot [ [ fixnum fixnum object ] [ ] ] "infer-effect" set-word-prop
+\ resize-array [ [ fixnum array ] [ array ] ] "infer-effect" set-word-prop
+\ resize-string [ [ fixnum string ] [ string ] ] "infer-effect" set-word-prop
 
-\ <hashtable> [ [ number ] [ hashtable ] ] "infer-effect" set-word-prop
-\ <hashtable> t "flushable" set-word-prop
+\ (hashtable) [ [ ] [ hashtable ] ] "infer-effect" set-word-prop
+\ (hashtable) t "flushable" set-word-prop
 
-\ <array> [ [ number ] [ array ] ] "infer-effect" set-word-prop
+\ <array> [ [ integer object ] [ array ] ] "infer-effect" set-word-prop
 \ <array> t "flushable" set-word-prop
 
-\ <tuple> [ [ number ] [ tuple ] ] "infer-effect" set-word-prop
+\ <tuple> [ [ integer ] [ tuple ] ] "infer-effect" set-word-prop
 \ <tuple> t "flushable" set-word-prop
 
 \ begin-scan [ [ ] [ ] ] "infer-effect" set-word-prop
@@ -501,8 +500,8 @@ prettyprint ;
 \ (clone) [ [ object ] [ object ] ] "infer-effect" set-word-prop
 \ (clone) t "flushable" set-word-prop
 
-\ (array>tuple) [ [ array ] [ tuple ] ] "infer-effect" set-word-prop
-\ (array>tuple) t "flushable" set-word-prop
+\ array>tuple [ [ array ] [ tuple ] ] "infer-effect" set-word-prop
+\ array>tuple t "flushable" set-word-prop
 
 \ tuple>array [ [ tuple ] [ array ] ] "infer-effect" set-word-prop
 \ tuple>array t "flushable" set-word-prop
@@ -510,18 +509,7 @@ prettyprint ;
 \ array>vector [ [ array ] [ vector ] ] "infer-effect" set-word-prop
 \ array>vector t "flushable" set-word-prop
 
-\ datastack [ [ ] [ vector ] ] "infer-effect" set-word-prop
-\ set-datastack [ [ vector ] [ ] ] "infer-effect" set-word-prop
-
-\ callstack [ [ ] [ vector ] ] "infer-effect" set-word-prop
-\ set-callstack [ [ vector ] [ ] ] "infer-effect" set-word-prop
-
-\ c-stack [
-    "c-stack cannot be compiled (yet)" throw
-] "infer" set-word-prop
-
-\ set-c-stack [
-    "set-c-stack cannot be compiled (yet)" throw
-] "infer" set-word-prop
-
 \ flush-icache [ [ ] [ ] ] "infer-effect" set-word-prop
+
+\ <string> [ [ integer integer ] [ string ] ] "infer-effect" set-word-prop
+\ <string> t "flushable" set-word-prop

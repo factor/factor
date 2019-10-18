@@ -1,78 +1,121 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-presentations
-USING: arrays compiler gadgets gadgets-buttons gadgets-labels
-gadgets-menus gadgets-outliner gadgets-panes gadgets-theme
-generic hashtables inference inspector io jedit kernel lists
-memory namespaces parser prettyprint sequences strings styles
-words ;
+USING: arrays gadgets gadgets-borders gadgets-labels
+gadgets-layouts gadgets-outliner gadgets-panes hashtables io
+kernel sequences strings styles ;
 
-SYMBOL: commands
+! Character styles
 
-V{ } clone commands global set-hash
+: apply-style ( style gadget key quot -- style gadget )
+    >r pick hash r> when* ; inline
 
-: define-command ( class name quot -- )
-    3array commands get push ;
+: apply-foreground-style ( style gadget -- style gadget )
+    foreground [ over set-label-color ] apply-style ;
 
-: applicable ( object -- seq )
-    commands get [ first call ] subset-with ;
+: apply-background-style ( style gadget -- style gadget )
+    background [ <solid> over set-gadget-interior ] apply-style ;
 
-: command-quot ( presented quot -- quot )
-    [ \ drop , curry , [ pane get pane-call ] % ] [ ] make ;
+: specified-font ( style -- font )
+    [ font swap hash [ "monospace" ] unless* ] keep
+    [ font-style swap hash [ plain ] unless* ] keep
+    font-size swap hash [ 12 ] unless* 3array ;
 
-TUPLE: command-button object ;
+: apply-font-style ( style gadget -- style gadget )
+    over specified-font over set-label-font ;
 
-: command-menu ( command-button -- )
-    command-button-object dup applicable
-    [ [ third command-quot ] keep second swons ] map-with
-    <menu> show-hand-menu ;
+: apply-command-style ( style gadget -- style gadget )
+    presented [ <command-button> ] apply-style ;
 
-C: command-button ( gadget object -- button )
-    [
-        set-command-button-object
-        [ command-menu ] <roll-button>
-    ] keep
-    [ set-gadget-delegate ] keep
-    dup menu-button-actions ;
+: <presentation> ( style text -- gadget )
+    <label>
+    apply-foreground-style
+    apply-background-style
+    apply-font-style
+    apply-command-style
+    nip ;
 
-M: command-button gadget-help ( button -- string )
-    command-button-object dup word? [ synopsis ] [ summary ] if ;
+! Paragraph styles
 
-: init-commands ( style gadget -- gadget )
-    presented rot assoc [ <command-button> ] when* ;
+: apply-wrap-style ( style pane -- style pane )
+    wrap-margin [
+        2dup <paragraph> swap set-pane-prototype
+        <paragraph> over set-pane-current
+    ] apply-style ;
 
-: style-font ( style -- font )
-    [ font swap assoc [ "Monospaced" ] unless* ] keep
-    [ font-style swap assoc [ plain ] unless* ] keep
-    font-size swap assoc [ 12 ] unless* 3array ;
+: apply-border-width-style ( style gadget -- style gadget )
+    border-width [ <border> ] apply-style ;
 
-: <styled-label> ( style text -- label )
-    <label> foreground pick assoc [ over set-label-color ] when*
-    swap style-font over set-label-font ;
+: apply-border-color-style ( style gadget -- style gadget )
+    border-color [
+        <solid> over set-gadget-boundary
+    ] apply-style ;
 
-: <presentation> ( style text -- presentation )
-    gadget pick assoc
-    [ ] [ >r dup dup r> <styled-label> init-commands ] ?if
-    outline rot assoc [ <outliner> ] when* ;
+: apply-page-color-style ( style gadget -- style gadget )
+    page-color [
+        <solid> over set-gadget-interior
+    ] apply-style ;
 
-: gadget. ( gadget -- )
-    gadget swons unit
-    "This stream does not support live gadgets"
-    swap format terpri ;
+: apply-outliner-style ( style gadget -- style gadget )
+    outline [ <outliner> ] apply-style ;
 
-[ drop t ] "Prettyprint" [ . ] define-command
-[ drop t ] "Describe" [ describe ] define-command
-[ drop t ] "Push on data stack" [ ] define-command
+: <styled-paragraph> ( style pane -- gadget )
+    apply-wrap-style
+    apply-border-width-style
+    apply-border-color-style
+    apply-page-color-style
+    apply-command-style
+    apply-outliner-style
+    nip ;
 
-[ word? ] "See word" [ see ] define-command
-[ word? ] "Word call hierarchy" [ uses. ] define-command
-[ word? ] "Word caller hierarchy" [ usage. ] define-command
-[ word? ] "Open in jEdit" [ jedit ] define-command
-[ word? ] "Reload original source" [ reload ] define-command
-[ compound? ] "Annotate with watchpoint" [ watch ] define-command
-[ compound? ] "Annotate with breakpoint" [ break ] define-command
-[ compound? ] "Annotate with profiling" [ profile ] define-command
-[ word? ] "Compile" [ recompile ] define-command
-[ word? ] "Infer stack effect" [ unit infer . ] define-command
+: <nested-pane> ( quot style -- gadget )
+    #! Create a pane, call the quotation to fill it out.
+    >r <pane> dup r> swap <styled-paragraph>
+    >r swap with-pane r> ; inline
 
-[ [ gadget? ] is? ] "Display gadget" [ gadget. ] define-command
+M: pane with-nested-stream ( quot style stream -- )
+    >r <nested-pane> r> write-gadget ;
+
+! Stream utilities
+M: pack stream-close ( stream -- ) drop ;
+
+M: paragraph stream-close ( stream -- ) drop ;
+
+: gadget-write ( string gadget -- )
+    over empty? [ 2drop ] [ >r <label> r> add-gadget ] if ;
+
+M: pack stream-write ( string stream -- ) gadget-write ;
+
+: gadget-bl ( style stream -- )
+    >r " " <presentation> <word-break-gadget> r> add-gadget ;
+
+M: paragraph stream-write ( string stream -- )
+    swap " " split
+    [ over gadget-write ] [ H{ } over gadget-bl ] interleave
+    drop ;
+
+: gadget-write1 ( char gadget -- )
+    >r ch>string r> stream-write ;
+
+M: pack stream-write1 ( char stream -- ) gadget-write1 ;
+
+M: paragraph stream-write1 ( char stream -- )
+    over CHAR: \s =
+    [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
+
+: gadget-format ( string style stream -- )
+    pick empty? pick hash-empty? and
+    [ 3drop ] [ >r swap <presentation> r> add-gadget ] if ;
+
+M: pack stream-format ( string style stream -- )
+    gadget-format ;
+
+M: paragraph stream-format ( string style stream -- )
+    presented pick hash [
+        gadget-format
+    ] [
+        rot " " split
+        [ pick pick gadget-format ]
+        [ 2dup gadget-bl ] interleave
+        2drop
+    ] if ;

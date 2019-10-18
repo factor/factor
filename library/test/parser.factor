@@ -6,16 +6,16 @@ USE: kernel
 USE: generic
 USE: words
 
-[ CHAR: a 1 ]
+[ 1 CHAR: a ]
 [ 0 "abcd" next-char ] unit-test
 
-[ CHAR: \s 6 ]
+[ 6 CHAR: \s ]
 [ 1 "\\u0020hello" next-escape ] unit-test
 
-[ CHAR: \n 2 ]
+[ 2 CHAR: \n ]
 [ 1 "\\nhello" next-escape ] unit-test
 
-[ CHAR: \s 6 ]
+[ 6 CHAR: \s ]
 [ 0 "\\u0020hello" next-char ] unit-test
 
 [ [ 1 [ 2 [ 3 ] 4 ] 5 ] ]

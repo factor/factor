@@ -1,4 +1,26 @@
-USING: kernel lists math sequences errors vectors prettyprint io unparser namespaces 
+! Copyright (C) 2006 Chris Double.
+! 
+! Redistribution and use in source and binary forms, with or without
+! modification, are permitted provided that the following conditions are met:
+! 
+! 1. Redistributions of source code must retain the above copyright notice,
+!    this list of conditions and the following disclaimer.
+! 
+! 2. Redistributions in binary form must reproduce the above copyright notice,
+!    this list of conditions and the following disclaimer in the documentation
+!    and/or other materials provided with the distribution.
+! 
+! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+USING: kernel lists math sequences errors vectors prettyprint io namespaces arrays
        words parser hashtables lazy parser-combinators kernel-internals strings ;
 IN: cpu-8080
 
@@ -437,7 +459,7 @@ M: cpu reset ( cpu -- )
   [ 0 swap set-cpu-f  ] keep
   [ 0 swap set-cpu-pc  ] keep
   [ HEX: F000 swap set-cpu-sp  ] keep 
-  [ HEX: FFFF 0 <repeated> >vector swap set-cpu-ram ] keep
+  [ HEX: FFFF 0 <array> swap set-cpu-ram ] keep
   [ f swap set-cpu-halted? ] keep
   [ HEX: 10 swap set-cpu-last-interrupt ] keep
   0 swap set-cpu-cycles ;
@@ -558,18 +580,18 @@ C: cpu ( cpu -- cpu )
   #! where the 1st item is the getter and the 2nd is the setter
   #! for that register.
   H{
-    [[ "A"  { cpu-a  set-cpu-a  } ]]
-    [[ "B"  { cpu-b  set-cpu-b  } ]]
-    [[ "C"  { cpu-c  set-cpu-c  } ]]
-    [[ "D"  { cpu-d  set-cpu-d  } ]]
-    [[ "E"  { cpu-e  set-cpu-e  } ]]
-    [[ "H"  { cpu-h  set-cpu-h  } ]]
-    [[ "L"  { cpu-l  set-cpu-l  } ]]
-    [[ "AF" { cpu-af set-cpu-af } ]]
-    [[ "BC" { cpu-bc set-cpu-bc } ]]
-    [[ "DE" { cpu-de set-cpu-de } ]]
-    [[ "HL" { cpu-hl set-cpu-hl } ]]
-    [[ "SP" { cpu-sp set-cpu-sp } ]]
+    { "A"  { cpu-a  set-cpu-a  } }
+    { "B"  { cpu-b  set-cpu-b  } }
+    { "C"  { cpu-c  set-cpu-c  } }
+    { "D"  { cpu-d  set-cpu-d  } }
+    { "E"  { cpu-e  set-cpu-e  } }
+    { "H"  { cpu-h  set-cpu-h  } }
+    { "L"  { cpu-l  set-cpu-l  } }
+    { "AF" { cpu-af set-cpu-af } }
+    { "BC" { cpu-bc set-cpu-bc } }
+    { "DE" { cpu-de set-cpu-de } }
+    { "HL" { cpu-hl set-cpu-hl } }
+    { "SP" { cpu-sp set-cpu-sp } }
   } hash ;
 
 
@@ -577,14 +599,14 @@ C: cpu ( cpu -- cpu )
   #! Given a string containing a flag name, return a vector
   #! where the 1st item is a word that tests that flag.
   H{
-    [[ "NZ"  { flag-nz?  } ]]
-    [[ "NC"  { flag-nc?  } ]]
-    [[ "PO"  { flag-po?  } ]]
-    [[ "PE"  { flag-pe?  } ]]
-    [[ "Z"  { flag-z?  } ]]
-    [[ "C"  { flag-c? } ]]
-    [[ "P"  { flag-p?  } ]]
-    [[ "M" { flag-m?  } ]]
+    { "NZ"  { flag-nz?  } }
+    { "NC"  { flag-nc?  } }
+    { "PO"  { flag-po?  } }
+    { "PE"  { flag-pe?  } }
+    { "Z"  { flag-z?  } }
+    { "C"  { flag-c? } }
+    { "P"  { flag-p?  } }
+    { "M" { flag-m?  } }
   } hash ;
 
 SYMBOL: $1
@@ -699,81 +721,81 @@ SYMBOL: $4
 : patterns ( -- hashtable )
   #! table of code quotation patterns for each type of instruction.
   H{
-    [[ "NOP"          [ drop ]               ]]
-    [[ "RET-NN"          [ ret-from-sub  ]               ]]
-    [[ "RST-0"      [ 0 swap (emulate-RST) ] ]]
-    [[ "RST-8"      [ 8 swap (emulate-RST) ] ]]
-    [[ "RST-10H"      [ HEX: 10 swap (emulate-RST) ] ]]
-    [[ "RST-18H"      [ HEX: 18 swap (emulate-RST) ] ]]
-    [[ "RST-20H"      [ HEX: 20 swap (emulate-RST) ] ]]
-    [[ "RST-28H"      [ HEX: 28 swap (emulate-RST) ] ]]
-    [[ "RST-30H"      [ HEX: 30 swap (emulate-RST) ] ]]
-    [[ "RST-38H"      [ HEX: 38 swap (emulate-RST) ] ]]
-    [[ "RET-F|FF"      [ dup $1 [ 6 over inc-cycles ret-from-sub ] [ drop ] if ] ]]
-    [[ "CP-N"      [ [ cpu-a ] keep [ next-byte ] keep sub-byte drop ] ]]
-    [[ "CP-R"      [ [ cpu-a ] keep [ $1 ] keep sub-byte drop  ] ]]
-    [[ "CP-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep sub-byte drop ] ]]
-    [[ "OR-N"      [ [ cpu-a ] keep [ next-byte ] keep [ or-byte ] keep set-cpu-a ] ]]
-    [[ "OR-R"      [ [ cpu-a ] keep [ $1 ] keep [ or-byte ] keep set-cpu-a ] ]]
-    [[ "OR-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ or-byte ] keep set-cpu-a  ] ]]
-    [[ "XOR-N"      [ [ cpu-a ] keep [ next-byte ] keep [ xor-byte ] keep set-cpu-a ] ]]
-    [[ "XOR-R"      [ [ cpu-a ] keep [ $1 ] keep [ xor-byte ] keep set-cpu-a ] ]]
-    [[ "XOR-(RR)"   [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ xor-byte ] keep set-cpu-a  ] ]]
-    [[ "AND-N"      [ [ cpu-a ] keep [ next-byte ] keep [ and-byte ] keep set-cpu-a  ] ]]
-    [[ "AND-R"      [ [ cpu-a ] keep [ $1 ] keep [ and-byte ] keep set-cpu-a ] ]]
-    [[ "AND-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ and-byte ] keep set-cpu-a  ] ]]
-    [[ "ADC-R,N"      [ [ $1 ] keep [ next-byte ] keep [ add-byte-with-carry ] keep $2 ] ]]
-    [[ "ADC-R,R"      [ [ $1 ] keep [ $3 ] keep [ add-byte-with-carry ] keep $2 ] ]]
-    [[ "ADC-R,(RR)"      [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ add-byte-with-carry ] keep $2 ] ]]
-    [[ "ADD-R,N"      [ [ $1 ] keep [ next-byte ] keep [ add-byte ] keep $2 ] ]]
-    [[ "ADD-R,R"      [ [ $1 ] keep [ $3 ] keep [ add-byte ] keep $2 ] ]]
-    [[ "ADD-RR,RR"    [ [ $1 ] keep [ $3 ] keep [ add-word ] keep $2 ] ]]
-    [[ "ADD-R,(RR)"    [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ add-byte ] keep $2   ]  ]]
-    [[ "SBC-R,N"      [ [ $1 ] keep [ next-byte ] keep [ sub-byte-with-carry ] keep $2 ] ]]
-    [[ "SBC-R,R"      [ [ $1 ] keep [ $3 ] keep [ sub-byte-with-carry ] keep $2 ] ]]
-    [[ "SBC-R,(RR)"      [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ sub-byte-with-carry ] keep $2 ] ]]
-    [[ "SUB-R"      [ [ cpu-a ] keep [ $1 ] keep [ sub-byte ] keep set-cpu-a ] ]]
-    [[ "SUB-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ sub-byte ] keep set-cpu-a ] ]]
-    [[ "SUB-N"      [ [ cpu-a ] keep [ next-byte ] keep [ sub-byte ] keep set-cpu-a ] ]]
-    [[ "CPL"          [ (emulate-CPL) ]               ]]
-    [[ "DAA"          [ (emulate-DAA) ]               ]]
-    [[ "RLA"          [ (emulate-RLA) ]               ]]
-    [[ "RRA"          [ (emulate-RRA) ]               ]]
-    [[ "CCF"          [ carry-flag swap cpu-f-bitxor= ]               ]]
-    [[ "SCF"          [ carry-flag swap cpu-f-bitor= ]               ]]
-    [[ "RLCA"          [ (emulate-RLCA) ]               ]]
-    [[ "RRCA"          [ (emulate-RRCA) ]               ]]
-    [[ "HALT"          [ drop  ]               ]]
-    [[ "DI"          [ [ 255 interrupt-flag - ] swap cpu-f-bitand  ]               ]]
-    [[ "EI"          [ [ interrupt-flag ] swap cpu-f-bitor  ]  ]]  
-    [[ "POP-RR"     [ [ pop-sp ] keep $2 ] ]]
-    [[ "PUSH-RR"     [ [ $1 ] keep push-sp ] ]]
-    [[ "INC-R"     [ [ $1 ] keep [ inc-byte ] keep $2 ] ]]
-    [[ "DEC-R"     [ [ $1 ] keep [ dec-byte ] keep $2 ] ]]
-    [[ "INC-RR"     [ [ $1 ] keep [ inc-word ] keep $2 ] ]]
-    [[ "DEC-RR"     [ [ $1 ] keep [ dec-word ] keep $2 ] ]]
-    [[ "DEC-(RR)"     [ [ $1 ] keep [ read-byte ] keep [ dec-byte ] keep [ $1 ] keep write-byte ] ]]
-    [[ "INC-(RR)" [ [ $1 ] keep [ read-byte ] keep [ inc-byte ] keep  [ $1 ] keep write-byte ] ]]
-    [[ "JP-NN"           [ [ cpu-pc ] keep [ read-word ] keep set-cpu-pc ]               ]]
-    [[ "JP-F|FF,NN"      [ [ $1 ] keep swap [ [ next-word ] keep [ set-cpu-pc ] keep [ cpu-cycles ] keep swap 5 + swap set-cpu-cycles ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] if ] ]]
-    [[ "JP-(RR)"      [ [ $1 ] keep set-cpu-pc ] ]]
-    [[ "CALL-NN"         [ (emulate-CALL) ] ]]
-    [[ "CALL-F|FF,NN"    [ [ $1 ] keep swap [ 7 over inc-cycles (emulate-CALL) ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] if ]   ]]
-    [[ "LD-RR,NN"     [ [ next-word ] keep $2 ] ]]
-    [[ "LD-RR,RR"     [ [ $3 ] keep $2 ] ]]
-    [[ "LD-R,N"     [ [ next-byte ] keep $2 ] ]]
-    [[ "LD-(RR),N"    [ [ next-byte ] keep [ $1 ] keep write-byte ] ]]
-    [[ "LD-(RR),R"    [ [ $3 ] keep [ $1 ] keep write-byte ] ]]
-    [[ "LD-R,R"    [ [ $3 ] keep $2 ] ]]
-    [[ "LD-R,(RR)"    [ [ $3 ] keep [ read-byte ] keep $2  ] ]]
-    [[ "LD-(NN),RR"    [ [ $1 ] keep [ next-word ] keep write-word ] ]]
-    [[ "LD-(NN),R"    [  [ $1 ] keep [ next-word ] keep write-byte ] ]]
-    [[ "LD-RR,(NN)"    [ [ next-word ] keep [ read-word ] keep $2 ]  ]]
-    [[ "LD-R,(NN)"    [ [ next-word ] keep [ read-byte ] keep $2 ] ]]
-    [[ "OUT-(N),R"    [ [ $1 ] keep [ next-byte ] keep write-port ] ]]
-    [[ "IN-R,(N)"    [ [ next-byte ] keep [ read-port ] keep set-cpu-a ] ]]
-    [[ "EX-(RR),RR"  [  [ $1 ] keep [ read-word ] keep [ $3 ] keep [ $1 ] keep [ write-word ] keep $4 ] ]]
-    [[ "EX-RR,RR"    [ [ $1 ] keep [ $3 ] keep [ $2 ] keep $4 ] ]]
+    { "NOP"          [ drop ]               }
+    { "RET-NN"          [ ret-from-sub  ]               }
+    { "RST-0"      [ 0 swap (emulate-RST) ] }
+    { "RST-8"      [ 8 swap (emulate-RST) ] }
+    { "RST-10H"      [ HEX: 10 swap (emulate-RST) ] }
+    { "RST-18H"      [ HEX: 18 swap (emulate-RST) ] }
+    { "RST-20H"      [ HEX: 20 swap (emulate-RST) ] }
+    { "RST-28H"      [ HEX: 28 swap (emulate-RST) ] }
+    { "RST-30H"      [ HEX: 30 swap (emulate-RST) ] }
+    { "RST-38H"      [ HEX: 38 swap (emulate-RST) ] }
+    { "RET-F|FF"      [ dup $1 [ 6 over inc-cycles ret-from-sub ] [ drop ] if ] }
+    { "CP-N"      [ [ cpu-a ] keep [ next-byte ] keep sub-byte drop ] }
+    { "CP-R"      [ [ cpu-a ] keep [ $1 ] keep sub-byte drop  ] }
+    { "CP-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep sub-byte drop ] }
+    { "OR-N"      [ [ cpu-a ] keep [ next-byte ] keep [ or-byte ] keep set-cpu-a ] }
+    { "OR-R"      [ [ cpu-a ] keep [ $1 ] keep [ or-byte ] keep set-cpu-a ] }
+    { "OR-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ or-byte ] keep set-cpu-a  ] }
+    { "XOR-N"      [ [ cpu-a ] keep [ next-byte ] keep [ xor-byte ] keep set-cpu-a ] }
+    { "XOR-R"      [ [ cpu-a ] keep [ $1 ] keep [ xor-byte ] keep set-cpu-a ] }
+    { "XOR-(RR)"   [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ xor-byte ] keep set-cpu-a  ] }
+    { "AND-N"      [ [ cpu-a ] keep [ next-byte ] keep [ and-byte ] keep set-cpu-a  ] }
+    { "AND-R"      [ [ cpu-a ] keep [ $1 ] keep [ and-byte ] keep set-cpu-a ] }
+    { "AND-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ and-byte ] keep set-cpu-a  ] }
+    { "ADC-R,N"      [ [ $1 ] keep [ next-byte ] keep [ add-byte-with-carry ] keep $2 ] }
+    { "ADC-R,R"      [ [ $1 ] keep [ $3 ] keep [ add-byte-with-carry ] keep $2 ] }
+    { "ADC-R,(RR)"      [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ add-byte-with-carry ] keep $2 ] }
+    { "ADD-R,N"      [ [ $1 ] keep [ next-byte ] keep [ add-byte ] keep $2 ] }
+    { "ADD-R,R"      [ [ $1 ] keep [ $3 ] keep [ add-byte ] keep $2 ] }
+    { "ADD-RR,RR"    [ [ $1 ] keep [ $3 ] keep [ add-word ] keep $2 ] }
+    { "ADD-R,(RR)"    [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ add-byte ] keep $2   ]  }
+    { "SBC-R,N"      [ [ $1 ] keep [ next-byte ] keep [ sub-byte-with-carry ] keep $2 ] }
+    { "SBC-R,R"      [ [ $1 ] keep [ $3 ] keep [ sub-byte-with-carry ] keep $2 ] }
+    { "SBC-R,(RR)"      [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ sub-byte-with-carry ] keep $2 ] }
+    { "SUB-R"      [ [ cpu-a ] keep [ $1 ] keep [ sub-byte ] keep set-cpu-a ] }
+    { "SUB-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ sub-byte ] keep set-cpu-a ] }
+    { "SUB-N"      [ [ cpu-a ] keep [ next-byte ] keep [ sub-byte ] keep set-cpu-a ] }
+    { "CPL"          [ (emulate-CPL) ]               }
+    { "DAA"          [ (emulate-DAA) ]               }
+    { "RLA"          [ (emulate-RLA) ]               }
+    { "RRA"          [ (emulate-RRA) ]               }
+    { "CCF"          [ carry-flag swap cpu-f-bitxor= ]               }
+    { "SCF"          [ carry-flag swap cpu-f-bitor= ]               }
+    { "RLCA"          [ (emulate-RLCA) ]               }
+    { "RRCA"          [ (emulate-RRCA) ]               }
+    { "HALT"          [ drop  ]               }
+    { "DI"          [ [ 255 interrupt-flag - ] swap cpu-f-bitand  ]               }
+    { "EI"          [ [ interrupt-flag ] swap cpu-f-bitor  ]  }  
+    { "POP-RR"     [ [ pop-sp ] keep $2 ] }
+    { "PUSH-RR"     [ [ $1 ] keep push-sp ] }
+    { "INC-R"     [ [ $1 ] keep [ inc-byte ] keep $2 ] }
+    { "DEC-R"     [ [ $1 ] keep [ dec-byte ] keep $2 ] }
+    { "INC-RR"     [ [ $1 ] keep [ inc-word ] keep $2 ] }
+    { "DEC-RR"     [ [ $1 ] keep [ dec-word ] keep $2 ] }
+    { "DEC-(RR)"     [ [ $1 ] keep [ read-byte ] keep [ dec-byte ] keep [ $1 ] keep write-byte ] }
+    { "INC-(RR)" [ [ $1 ] keep [ read-byte ] keep [ inc-byte ] keep  [ $1 ] keep write-byte ] }
+    { "JP-NN"           [ [ cpu-pc ] keep [ read-word ] keep set-cpu-pc ]               }
+    { "JP-F|FF,NN"      [ [ $1 ] keep swap [ [ next-word ] keep [ set-cpu-pc ] keep [ cpu-cycles ] keep swap 5 + swap set-cpu-cycles ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] if ] }
+    { "JP-(RR)"      [ [ $1 ] keep set-cpu-pc ] }
+    { "CALL-NN"         [ (emulate-CALL) ] }
+    { "CALL-F|FF,NN"    [ [ $1 ] keep swap [ 7 over inc-cycles (emulate-CALL) ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] if ]   }
+    { "LD-RR,NN"     [ [ next-word ] keep $2 ] }
+    { "LD-RR,RR"     [ [ $3 ] keep $2 ] }
+    { "LD-R,N"     [ [ next-byte ] keep $2 ] }
+    { "LD-(RR),N"    [ [ next-byte ] keep [ $1 ] keep write-byte ] }
+    { "LD-(RR),R"    [ [ $3 ] keep [ $1 ] keep write-byte ] }
+    { "LD-R,R"    [ [ $3 ] keep $2 ] }
+    { "LD-R,(RR)"    [ [ $3 ] keep [ read-byte ] keep $2  ] }
+    { "LD-(NN),RR"    [ [ $1 ] keep [ next-word ] keep write-word ] }
+    { "LD-(NN),R"    [  [ $1 ] keep [ next-word ] keep write-byte ] }
+    { "LD-RR,(NN)"    [ [ next-word ] keep [ read-word ] keep $2 ]  }
+    { "LD-R,(NN)"    [ [ next-word ] keep [ read-byte ] keep $2 ] }
+    { "OUT-(N),R"    [ [ $1 ] keep [ next-byte ] keep write-port ] }
+    { "IN-R,(N)"    [ [ next-byte ] keep [ read-port ] keep set-cpu-a ] }
+    { "EX-(RR),RR"  [  [ $1 ] keep [ read-word ] keep [ $3 ] keep [ $1 ] keep [ write-word ] keep $4 ] }
+    { "EX-RR,RR"    [ [ $1 ] keep [ $3 ] keep [ $2 ] keep $4 ] }
   } ;
 
 : 8-bit-registers ( -- parser )

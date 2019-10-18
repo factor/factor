@@ -21,7 +21,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: cont-responder
-USING: http httpd math random namespaces io
+USING: http httpd math namespaces io
        lists strings kernel html hashtables
        parser generic sequences ;
 
@@ -40,8 +40,7 @@ SYMBOL: post-refresh-get?
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  [ 32 [ 9 random-int CHAR: 0 + , ] times ] "" make
-  string>number 36 >base ;
+  [ "ID" % 32 [ 9 random-int CHAR: 0 + , ] times ] "" make ;
 
 SYMBOL: table
 
@@ -51,7 +50,7 @@ SYMBOL: table
     
 : reset-continuation-table ( -- ) 
   #! Create the initial global table
-  continuation-table hash-clear ;
+  continuation-table clear-hash ;
 
 H{ } clone table global set-hash
 
@@ -81,7 +80,7 @@ TUPLE: item expire? quot id time-added ;
   #! if they are 'timeout-seconds' old (ie. were added
   #! more than 'timeout-seconds' ago.
   continuation-table clone [ ( timeout-seconds [[ id item ]] -- )
-    uncons swapd expired? [
+    swapd expired? [
       continuation-table remove-hash
     ] [
       drop
@@ -274,7 +273,7 @@ SYMBOL: root-continuation
 : id-or-root ( -- id )
   #! Return the continuation id for the current requested continuation
   #! or the root continuation if no id is supplied.
-  "id" "query" get assoc [ root-continuation get ] unless* ;
+  "id" "query" get hash [ root-continuation get ] unless* ;
 
 : cont-get/post-responder ( id-or-f -- ) 
   #! httpd responder that retrieves a continuation and calls it.
@@ -283,7 +282,7 @@ SYMBOL: root-continuation
   #! no root continuation exists the expired continuation handler
   #! should be called.
   drop [
-    "response" get alist>hash 
+    "response" get 
      id-or-root [
       resume-continuation
     ] [
@@ -296,14 +295,17 @@ SYMBOL: root-continuation
   #! by returning a quotation that will pass the original 
   #! quotation to the callback continuation.
   [ , callback-cc get , \ continue-with , ] [ ] make ;
-  
+
+: quot-url ( quot -- url )
+  callback-quot expirable register-continuation id>url ;
+
 : quot-href ( text quot -- )
   #! Write to standard output an HTML HREF where the href,
   #! when referenced, will call the quotation and then return
   #! back to the most recent 'show' call (via the callback-cc).
   #! The text of the link will be the 'text' argument on the 
   #! stack.
-  <a callback-quot expirable register-continuation id>url =href a> write </a> ;
+  <a quot-url =href a> write </a> ;
 
 : init-session-namespace ( -- )
   #! Setup the initial session namespace. Currently this only
@@ -376,13 +378,3 @@ SYMBOL: root-continuation
 : button ( label -- )
   #! Output an HTML submit button with the given label.
   <input "submit" =type =value input/> ;
-
-: with-simple-html-output ( quot -- )
-  #! Run the quotation inside an HTML stream wrapped
-  #! around stdio.
-  <pre> 
-    stdio get <html-stream> [
-      call
-    ] with-stream
-  </pre> ;
-

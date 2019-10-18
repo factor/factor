@@ -94,23 +94,23 @@ TUPLE: editor line caret font color ;
 
 : editor-actions ( editor -- )
     H{
-        [[ [ gain-focus ] [ focus-editor ] ]]
-        [[ [ lose-focus ] [ unfocus-editor ] ]]
-        [[ [ button-down 1 ] [ click-editor ] ]]
-        [[ [ "BACKSPACE" ] [ [ T{ char-elt } delete-prev-elt ] with-editor ] ]]
-        [[ [ "DELETE" ] [ [ T{ char-elt } delete-next-elt ] with-editor ] ]]
-        [[ [ "CTRL" "BACKSPACE" ] [ [ T{ word-elt } delete-prev-elt ] with-editor ] ]]
-        [[ [ "CTRL" "DELETE" ] [ [ T{ word-elt } delete-next-elt ] with-editor ] ]]
-        [[ [ "ALT" "BACKSPACE" ] [ [ T{ document-elt } delete-prev-elt ] with-editor ] ]]
-        [[ [ "ALT" "DELETE" ] [ [ T{ document-elt } delete-next-elt ] with-editor ] ]]
-        [[ [ "LEFT" ] [ [ T{ char-elt } prev-elt ] with-editor ] ]]
-        [[ [ "RIGHT" ] [ [ T{ char-elt } next-elt ] with-editor ] ]]
-        [[ [ "CTRL" "LEFT" ] [ [ T{ word-elt } prev-elt ] with-editor ] ]]
-        [[ [ "CTRL" "RIGHT" ] [ [ T{ word-elt } next-elt ] with-editor ] ]]
-        [[ [ "HOME" ] [ [ T{ document-elt } prev-elt ] with-editor ] ]]
-        [[ [ "END" ] [ [ T{ document-elt } next-elt ] with-editor ] ]]
-        [[ [ "CTRL" "k" ] [ [ line-clear ] with-editor ] ]]
-        [[ [ "TAB" ] [ do-completion ] ]]
+        { [ gain-focus ] [ focus-editor ] }
+        { [ lose-focus ] [ unfocus-editor ] }
+        { [ button-down ] [ click-editor ] }
+        { [ "BACKSPACE" ] [ [ T{ char-elt } delete-prev-elt ] with-editor ] }
+        { [ "DELETE" ] [ [ T{ char-elt } delete-next-elt ] with-editor ] }
+        { [ "CTRL" "BACKSPACE" ] [ [ T{ word-elt } delete-prev-elt ] with-editor ] }
+        { [ "CTRL" "DELETE" ] [ [ T{ word-elt } delete-next-elt ] with-editor ] }
+        { [ "ALT" "BACKSPACE" ] [ [ T{ document-elt } delete-prev-elt ] with-editor ] }
+        { [ "ALT" "DELETE" ] [ [ T{ document-elt } delete-next-elt ] with-editor ] }
+        { [ "LEFT" ] [ [ T{ char-elt } prev-elt ] with-editor ] }
+        { [ "RIGHT" ] [ [ T{ char-elt } next-elt ] with-editor ] }
+        { [ "CTRL" "LEFT" ] [ [ T{ word-elt } prev-elt ] with-editor ] }
+        { [ "CTRL" "RIGHT" ] [ [ T{ word-elt } next-elt ] with-editor ] }
+        { [ "HOME" ] [ [ T{ document-elt } prev-elt ] with-editor ] }
+        { [ "END" ] [ [ T{ document-elt } next-elt ] with-editor ] }
+        { [ "CTRL" "k" ] [ [ line-clear ] with-editor ] }
+        { [ "TAB" ] [ do-completion ] }
     } add-actions ;
 
 C: editor ( text -- )
@@ -134,7 +134,7 @@ C: editor ( text -- )
 M: editor user-input* ( ch editor -- ? )
     [ insert-char ] with-editor f ;
 
-M: editor pref-dim ( editor -- dim )
+M: editor pref-dim* ( editor -- dim )
     label-size { 1 0 0 } v+ ;
 
 M: editor layout* ( editor -- )

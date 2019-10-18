@@ -1,5 +1,24 @@
+! Copyright (C) 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
 USING: arrays hashtables kernel lists math namespaces sequences ;
+
+! Optimizations performed here:
+! - combining %inc-d/%inc-r within a single basic block
+! - if a literal is loaded into a vreg but the vreg is
+!   overwritten before being read, the literal load is deleted
+! - if a %replace is writing a vreg to a stack location already
+!   holding that vreg, or a stack location that is not read
+!   before being popped, the %replace is deleted
+! - if a %peek is reading a stack location into a vreg that
+!   already holds that vreg, or if the vreg is overwritten
+!   before being read, the %peek is deleted
+! - removing dead loads of stack locations into vregs
+! - removing dead stores of vregs into stack locations
+
+: vop-in ( vop n -- input ) swap vop-inputs nth ;
+: set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
+: vop-out ( vop n -- input ) swap vop-outputs nth ;
 
 : (split-blocks) ( n linear -- )
     2dup length = [
@@ -87,7 +106,7 @@ GENERIC: trim-dead* ( tail vop -- )
 
 M: tuple trim-dead* ( tail vop -- ) dup forget-vregs , drop ;
 
-: simplify-inc ( vop -- ) dup 0 vop-in 0 = not ?, ;
+: simplify-inc ( vop -- ) dup 0 vop-in zero? not ?, ;
 
 M: %inc-d trim-dead* ( tail vop -- ) simplify-inc drop ;
 
@@ -113,7 +132,7 @@ M: %peek trim-dead* ( tail vop -- )
 
 : forget-stack-loc ( loc -- )
     #! Forget that any vregs hold this stack location.
-    vreg-contents [ [ cdr swap = not ] hash-subset-with ] change ;
+    vreg-contents [ [ nip swap = not ] hash-subset-with ] change ;
 
 : remember-replace ( vop -- )
     #! If a vreg claims to hold the stack location we are

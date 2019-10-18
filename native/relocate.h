@@ -21,19 +21,21 @@ typedef enum {
 	F_CARDS
 } F_RELTYPE;
 
+#define REL_ABSOLUTE_CELL 0
+#define REL_ABSOLUTE 1
+#define REL_RELATIVE 2
+#define REL_2_2 3
+
 /* the rel type is built like a cell to avoid endian-specific code in
 the compiler */
-#define REL_TYPE(r) ((r)->type & 0xff)
-/* on PowerPC, some values are stored in the high 16 bits of a pair
-of consecutive cells */
-#define REL_16_16(r) ((r)->type & 0xff00)
-#define REL_RELATIVE(r) ((r)->type & 0xff0000)
+#define REL_TYPE(r) ((r)->type & 0x000000ff)
+#define REL_CLASS(r) (((r)->type & 0x0000ff00) >> 8)
+#define REL_ARGUMENT(r) (((r)->type & 0xffff0000) >> 16)
 
 /* code relocation consists of a table of entries for each fixup */
 typedef struct {
 	CELL type;
 	CELL offset;
-	CELL argument;
 } F_REL;
 
 CELL code_relocation_base;
@@ -48,12 +50,12 @@ void relocate_code();
 
 /* on PowerPC, return the 32-bit literal being loaded at the code at the
 given address */
-INLINE CELL reloc_get_16_16(CELL cell)
+INLINE CELL reloc_get_2_2(CELL cell)
 {
 	return ((get(cell - CELLS) & 0xffff) << 16) | (get(cell) & 0xffff);
 }
 
-INLINE void reloc_set_16_16(CELL cell, CELL value)
+INLINE void reloc_set_2_2(CELL cell, CELL value)
 {
 	put(cell - CELLS,((get(cell - CELLS) & ~0xffff) | ((value >> 16) & 0xffff)));
 	put(cell,((get(cell) & ~0xffff) | (value & 0xffff)));

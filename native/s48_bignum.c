@@ -376,10 +376,23 @@ s48_bignum_remainder(bignum_type numerator, bignum_type denominator)
     }                                                                  \
   }
 
+FOO_TO_BIGNUM(cell,CELL,CELL)
+FOO_TO_BIGNUM(fixnum,F_FIXNUM,CELL)
 FOO_TO_BIGNUM(long,long,unsigned long)
 FOO_TO_BIGNUM(ulong,unsigned long,unsigned long)
 FOO_TO_BIGNUM(long_long,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,u64)
+
+/* this is inefficient; its only used for fixnum multiplication overflow so
+it probaly does not matter */
+bignum_type s48_fixnum_pair_to_bignum(CELL x, F_FIXNUM y)
+{
+  return s48_bignum_add(
+    s48_bignum_arithmetic_shift(
+      s48_fixnum_to_bignum(y),
+      sizeof(unsigned long) * 8),
+    s48_cell_to_bignum(x));
+}
 
 #define BIGNUM_TO_FOO(name,type,utype) \
   type s48_bignum_to_##name(bignum_type bignum)                                     \
@@ -396,6 +409,8 @@ FOO_TO_BIGNUM(ulong_long,u64,u64)
     }                                                                               \
   }
 
+BIGNUM_TO_FOO(cell,CELL,CELL);
+BIGNUM_TO_FOO(fixnum,F_FIXNUM,CELL);
 BIGNUM_TO_FOO(long,long,unsigned long)
 BIGNUM_TO_FOO(ulong,unsigned long,unsigned long)
 BIGNUM_TO_FOO(long_long,s64,u64)
@@ -941,7 +956,7 @@ bignum_divide_unsigned_normalized(bignum_type u, bignum_type v, bignum_type q)
   bignum_digit_type * u_scan_start = (u_scan - v_length);
   bignum_digit_type * v_start = (BIGNUM_START_PTR (v));
   bignum_digit_type * v_end = (v_start + v_length);
-  bignum_digit_type * q_scan;
+  bignum_digit_type * q_scan = NULL;
   bignum_digit_type v1 = (v_end[-1]);
   bignum_digit_type v2 = (v_end[-2]);
   bignum_digit_type ph;        /* high half of double-digit product */
@@ -1615,7 +1630,7 @@ s48_bignum_bitwise_xor(bignum_type arg1, bignum_type arg2)
 bignum_type
 bignum_magnitude_ash(bignum_type arg1, long n)
 {
-  bignum_type result;
+  bignum_type result = NULL;
   bignum_digit_type *scan1;
   bignum_digit_type *scanr;
   bignum_digit_type *end;

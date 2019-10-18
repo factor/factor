@@ -1,0 +1,66 @@
+USING: help io jedit parser ;
+
+HELP: file-vocabs "( -- )"
+{ $description "Installs the initial the vocabulary search path for parsing a file." } ;
+
+HELP: parse-lines "( lines -- quot )"
+{ $values { "lines" "a sequence of strings" } { "quot" "a new quotation" } }
+{ $description "Parses the Factor source code which has been tokenized into lines. The vocabulary search path is taken from the current scope." }
+{ $errors "Throws a parse error if the input is malformed." } ;
+
+HELP: parse-error "( msg -- )"
+{ $values { "msg" "an object" } }
+{ $description "Throws a parse error encapsulating a message along with current parser state, including the file being parsed, line number, and column number." } ;
+
+HELP: with-parser "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Calls a quotation, wrapping any errors thrown inside parse errors." } ;
+
+HELP: parse "( str -- quot )"
+{ $values { "str" "a string" } { "quot" "a new quotation" } }
+{ $description "Parses Factor source code from a string. The current vocabulary search path is used." }
+{ $errors "Throws a parse error if the input is malformed." } ;
+
+HELP: eval "( str -- )"
+{ $values { "str" "a string" } }
+{ $description "Parses Factor source code from a string, and calls the resulting quotation. The current vocabulary search path is used." }
+{ $errors "Throws an error if the input is malformed, or if the quotation throws an error." } ;
+
+HELP: parse-stream "( stream name -- quot )"
+{ $values { "stream" "an input stream" } { "name" "a file name for error reporting" } { "quot" "a new quotation" } }
+{ $description "Parses Factor source code read from the stream. The initial vocabulary search path is used." }
+{ $errors "Throws an I/O error if there was an error reading from the stream. Throws a parse error if the input is malformed." } ;
+
+HELP: parse-file "( file -- quot )"
+{ $values { "file" "a path name string" } { "quot" "a new quotation" } }
+{ $description "Parses the Factor source code stored in a file. The initial vocabulary search path is used." }
+{ $errors "Throws an I/O error if there was an error reading from the file. Throws a parse error if the input is malformed." } ;
+
+HELP: run-file "( file -- )"
+{ $values { "file" "a path name string" } }
+{ $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used." }
+{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation." }  ;
+
+HELP: try-run-file "( file -- )"
+{ $values { "file" "a path name string" } }
+{ $description "Forgiving variant of " { $link run-file } " which logs errors to the default stream without re-throwing them." }  ;
+
+HELP: parse-resource "( path -- quot )"
+{ $values { "path" "a resource name string" } { "quot" "a new quotation" } }
+{ $description "Parses a library resource." }
+{ $notes "the source file name given to the parser is special for resources and begins with " { $snippet "resource:" } ". This allows words that operate on source files, like " { $link jedit } ", to use a different resource path at run time than was used at parse time." }
+{ $errors "Throws an I/O error if there was an error reading the resource. Throws a parse error if the input is malformed." } ;
+
+HELP: run-resource "( path -- )"
+{ $values { "path" "a resource name string" } }
+{ $description "Parses and runs a library resource." }
+{ $errors "Throws an I/O error if there was an error reading the resource. Throws a parse error if the input is malformed." } ;
+
+HELP: word-file "( word -- file )"
+{ $values { "word" "a word" } { "file" "a path name string" } }
+{ $description "Outputs the file name containing the most recent redefinition of the word, or " { $link f } " if the word was not defined in a file." } ;
+
+HELP: reload "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Reloads the source file containing the most recent redefinition of the word." }
+{ $errors "Throws an error if the word was not defined in a file, or if an error occurs while running the file." } ;

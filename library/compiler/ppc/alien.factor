@@ -3,38 +3,36 @@
 IN: compiler-backend
 USING: alien assembler kernel math ;
 
-M: %alien-invoke generate-node ( vop -- )
-    dup 0 vop-in swap 1 vop-in load-library compile-c-call ;
+GENERIC: store-insn ( offset reg-class -- )
 
-GENERIC: store-insn
-GENERIC: load-insn
-GENERIC: return-reg
+GENERIC: load-insn ( elt parameter reg-class -- )
 
-M: int-regs store-insn drop stack@ STW ;
-M: int-regs return-reg drop 3 ;
+M: int-regs store-insn drop >r 3 1 r> stack@ STW ;
+
 M: int-regs load-insn drop 3 + 1 rot stack@ LWZ ;
 
 M: float-regs store-insn
-    >r stack@ r> float-regs-size 4 = [ STFS ] [ STFD ] if ;
-M: float-regs return-reg drop 1 ;
+    >r >r 1 1 r> stack@ r>
+    float-regs-size 4 = [ STFS ] [ STFD ] if ;
+
 M: float-regs load-insn
     >r 1+ 1 rot stack@ r> 
     float-regs-size 4 = [ LFS ] [ LFD ] if ;
 
-M: stack-params load-insn ( from to reg-class -- )
+M: stack-params load-insn
     drop >r 0 1 rot stack@ LWZ 0 1 r> stack@ STW ;
 
 M: %unbox generate-node ( vop -- )
-    [ 1 vop-in f compile-c-call ] keep
-    [ 2 vop-in return-reg 1 ] keep
-    [ 0 vop-in ] keep
-    2 vop-in store-insn ; 
+    drop
+    ! Call the unboxer
+    1 input f compile-c-call
+    ! Store the return value on the C stack
+    0 input 2 input store-insn ;
 
 M: %parameter generate-node ( vop -- )
-    [ 0 vop-in ] keep
-    [ 1 vop-in ] keep
-    2 vop-in load-insn ;
+    ! Move a value from the C stack into the fastcall register
+    drop 0 input 1 input 2 input load-insn ;
 
-M: %box generate-node ( vop -- ) 0 vop-in f compile-c-call ;
+M: %box generate-node ( vop -- ) drop 0 input f compile-c-call ;
 
 M: %cleanup generate-node ( vop -- ) drop ;

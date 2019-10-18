@@ -17,10 +17,9 @@ M: vector set-nth-unsafe ( obj n vec -- )
 M: vector set-nth ( obj n vec -- )
     growable-check 2dup ensure set-nth-unsafe ;
 
-: >vector ( list -- vector )
-    dup length <vector> [ swap nappend ] keep ; inline
+: >vector ( seq -- vector ) [ <vector> ] >sequence ; inline
 
-M: object thaw >vector ;
+M: object thaw drop V{ } clone ;
 
 M: vector clone ( vector -- vector ) clone-growable ;
 

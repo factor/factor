@@ -32,7 +32,6 @@ SYMBOL: inspector-stack
         inspector-help
         terpri
         "inspector " listener-prompt set
-        [ inspector-stack get "Inspector history:" ] callstack-hook set
         V{ } clone inspector-stack set
         (inspect)
         listener
@@ -45,3 +44,9 @@ SYMBOL: inspector-stack
 : go ( n -- ) inspector-slots get nth (inspect) ;
 
 : up ( -- ) inspector-stack get dup pop* pop (inspect) ;
+
+! Another feature.
+IN: errors
+
+: :error ( -- ) error get inspect ;
+: :cc ( -- ) error-continuation get inspect ;

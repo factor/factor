@@ -15,15 +15,25 @@ M: cons peek ( list -- last )
     #! Last element of a list.
     last car ;
 
-M: f each ( list quot -- ) 2drop ;
+: (list-each) ( list quot -- )
+    over [
+        [ >r car r> call ] 2keep >r cdr r> (list-each)
+    ] [
+        2drop
+    ] if ; inline
 
-M: cons each ( list quot -- | quot: elt -- )
-    [ >r car r> call ] 2keep >r cdr r> each ;
+M: general-list each ( list quot -- | quot: elt -- )
+    (list-each) ;
 
-M: f map ( f quot -- f ) drop ;
+: (list-map) ( list quot -- list )
+    over [
+        over cdr over >r >r >r car r> call
+        r> r> rot >r (list-map) r> swons
+    ] [
+        drop
+    ] if ; inline
 
-M: cons map ( cons quot -- cons )
-    over cdr over >r >r >r car r> call r> r> rot >r map r> swons ;
+M: general-list map ( list quot -- list ) (list-map) ;
 
 : (list-find) ( list quot i -- i elt )
     pick [
@@ -57,7 +67,7 @@ M: general-list tail ( n list -- tail )
     swap [ cdr ] times ;
 
 M: general-list nth ( n list -- element )
-    over 0 number= [ nip car ] [ >r 1- r> cdr nth ] if ;
+    over zero? [ nip car ] [ >r 1- r> cdr nth ] if ;
 
 M: cons = ( obj cons -- ? )
     {
@@ -68,5 +78,6 @@ M: cons = ( obj cons -- ? )
 
 M: f = ( obj f -- ? ) eq? ;
 
-: curry ( obj quot -- quot )
-    >r literalize r> cons ;
+: curry ( obj quot -- quot ) >r literalize r> cons ;
+
+: assoc ( key alist -- value ) [ car = ] find-with nip cdr ;

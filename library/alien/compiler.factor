@@ -1,15 +1,10 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: alien
 USING: assembler compiler compiler-backend compiler-frontend
-errors generic hashtables inference io kernel lists math
-namespaces prettyprint sequences strings words parser ;
-
-! ! ! WARNING ! ! !
-! Reloading this file into a running Factor instance on Win32
-! or Unix with FFI I/O will bomb the runtime, since I/O words
-! would become uncompiled, and FFI calls can only be made from
-! compiled code.
+errors generic hashtables inference inspector io kernel
+kernel-internals lists math namespaces parser prettyprint
+sequences strings words ;
 
 ! USAGE:
 ! 
@@ -28,12 +23,8 @@ namespaces prettyprint sequences strings words parser ;
 
 TUPLE: alien-error library symbol ;
 
-M: alien-error error. ( error -- )
-    "C library interface words cannot be interpreted. " write
-    "Either the compiler is disabled, " write
-    "or the " write dup alien-error-library pprint
-    " library does not define the " write
-    alien-error-symbol pprint " symbol." print ;
+M: alien-error summary ( error -- )
+    drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     #! Call a C library function.
@@ -72,7 +63,7 @@ C: alien-node make-node ;
 : stack-space ( parameters -- n )
     0 [ c-aligned + ] reduce ;
 
-: unbox-parameter ( n parameter -- node )
+: unbox-parameter ( stack# type -- node )
     c-type [ "unboxer" get "reg-class" get ] bind %unbox ;
 
 : unbox-parameters ( params -- )
@@ -80,16 +71,16 @@ C: alien-node make-node ;
     [ [ c-aligned - dup ] keep unbox-parameter , ] each drop ;
 
 : reg-class-full? ( class -- ? )
-    dup class get swap fastcall-regs >= ;
+    dup class get swap fastcall-regs length >= ;
 
 : spill-param ( reg-class -- n reg-class )
-    reg-class-size stack-params [ tuck + ] change
+    reg-size stack-params [ tuck + ] change
     T{ stack-params } ;
 
 : inc-reg-class ( reg-class -- )
     #! On Mac OS X, float parameters 'shadow' integer registers.
     dup class inc dup float-regs? dual-fp/int-regs? and [
-        int-regs [ over reg-class-size 4 / + ] change
+        int-regs [ over reg-size 4 / + ] change
     ] when drop ;
 
 : fastcall-param ( reg-class -- n reg-class )
@@ -125,16 +116,16 @@ C: alien-node make-node ;
         c-type [ "boxer" get "reg-class" get ] bind %box ,
     ] if ;
 
+: linearize-cleanup ( node -- )
+    node-param cdr library-abi "stdcall" =
+    [ dup parameters stack-space %cleanup , ] unless ;
+
 M: alien-node linearize* ( node -- )
     dup parameters linearize-parameters
-    dup node-param dup uncons %alien-invoke ,
-    cdr library-abi "stdcall" =
-    [ dup parameters stack-space %cleanup , ] unless
-    dup linearize-return linearize-next ;
-
-: unpair ( seq -- odds evens )
-    2 swap group flip dup empty?
-    [ drop { } { } ] [ first2 ] if ;
+    dup node-param uncons %alien-invoke ,
+    dup linearize-cleanup
+    dup linearize-return
+    linearize-next ;
 
 : parse-arglist ( lst -- types stack effect )
     unpair [

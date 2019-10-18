@@ -49,7 +49,7 @@ C: frame ( -- frame )
 : pref-dim-grid ( grid -- grid )
     [ [ [ pref-dim ] [ { 0 0 0 } ] if* ] map ] map ;
 
-M: frame pref-dim ( frame -- dim )
+M: frame pref-dim* ( frame -- dim )
     frame-grid pref-dim-grid
     dup flip frame-pref-dim first
     swap frame-pref-dim second

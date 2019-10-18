@@ -1,15 +1,12 @@
 ! Factor test suite.
 
 IN: test
-USING: arrays errors kernel lists math memory namespaces parser
-prettyprint sequences io strings words ;
+USING: arrays errors inspector io kernel lists math memory
+namespaces parser prettyprint sequences strings words ;
 
 TUPLE: assert got expect ;
 
-M: assert error.
-    "Assertion failed" print
-    "Expected: " write dup assert-expect .
-    "Got: " write assert-got . ;
+M: assert summary drop "Assertion failed" ;
 
 : assert= ( a b -- )
     2dup = [ 2drop ] [ <assert> throw ] if ;
@@ -21,7 +18,7 @@ M: assert error.
     #! Evaluates the given code and prints the time taken to
     #! execute it.
     millis >r gc-time >r call gc-time r> - millis r> -
-    [ # " ms run / " % # " ms GC time" % ] "" make print ;
+    [ # " ms run / " % # " ms GC time" % ] "" make print flush ;
 
 : unit-test ( output input -- )
     [
@@ -52,7 +49,7 @@ SYMBOL: failures
 
 : test ( name -- ? )
     [
-        "=====> " write dup write "..." print
+        "=====> " write dup write "..." print flush
         test-path [
             [ [ run-resource ] with-scope ] keep
         ] assert-depth drop
@@ -74,18 +71,16 @@ SYMBOL: failures
 
 : tests
     {
-        "lists/cons" "lists/lists" "lists/assoc"
+        "lists/cons" "lists/lists"
         "lists/namespaces"
         "combinators"
         "continuations" "errors"
         "collections/hashtables" "collections/sbuf"
         "collections/strings" "collections/namespaces"
         "collections/vectors" "collections/sequences"
-        "collections/queues"
-        "generic" "tuple" "files" "parser"
+        "collections/queues" "generic" "tuple" "parser"
         "parse-number" "init" "io/io"
-        "words" "prettyprint" "random"
-        "stream" "math/bitops"
+        "words" "prettyprint" "random" "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"
         "math/complex" "math/irrational"
         "math/integer" "threads" "parsing-word"
@@ -103,15 +98,16 @@ SYMBOL: failures
         "benchmark/continuations" "benchmark/ack"
         "benchmark/hashtables" "benchmark/strings"
         "benchmark/vectors" "benchmark/prettyprint"
-        "benchmark/image"
+        "benchmark/iteration"
     } run-tests ;
 
 : compiler-tests
     {
-        "io/buffer" "compiler/optimizer"
+        "io/buffer"
         "compiler/simple"
         "compiler/stack" "compiler/ifte"
         "compiler/generic" "compiler/bail-out"
         "compiler/linearizer" "compiler/intrinsics"
-        "compiler/identities"
+        "compiler/identities" "compiler/optimizer"
+        "compiler/alien"
     } run-tests ;

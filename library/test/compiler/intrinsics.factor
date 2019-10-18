@@ -1,9 +1,10 @@
 IN: temporary
 USING: arrays compiler kernel kernel-internals lists math
-math-internals sequences test words ;
+math-internals sequences strings test words ;
 
 ! Oops!
 [ 5000 ] [ [ 5000 ] compile-1 ] unit-test
+[ "hi" ] [ [ "hi" ] compile-1 ] unit-test
 
 ! Make sure that intrinsic ops compile to correct code.
 [ 1 ] [ [[ 1 2 ]] [ 0 slot ] compile-1 ] unit-test
@@ -17,6 +18,14 @@ math-internals sequences test words ;
 
 ! Write barrier hits on the wrong value were causing segfaults
 [ -3 ] [ -3 1 2 [ cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
+
+[ CHAR: b ] [ 1 "abc" [ char-slot ] compile-1 ] unit-test
+[ CHAR: b ] [ 1 [ "abc" char-slot ] compile-1 ] unit-test
+[ CHAR: b ] [ [ 1 "abc" char-slot ] compile-1 ] unit-test
+
+[ "axc" ] [ CHAR: x 1 "abc" [ [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
+[ "axc" ] [ CHAR: x 1 [ "abc" [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
+[ "axc" ] [ CHAR: x [ 1 "abc" [ set-char-slot ] keep dup rehash-string ] compile-1 ] unit-test
 
 [ ] [ 1 [ drop ] compile-1 ] unit-test
 [ ] [ [ 1 drop ] compile-1 ] unit-test
@@ -164,6 +173,7 @@ math-internals sequences test words ;
 [ t ] [ 1 20 shift 1 20 shift [ fixnum* ] compile-1 1 40 shift = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift [ fixnum* ] compile-1 1 40 shift neg = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift neg [ fixnum* ] compile-1 1 40 shift = ] unit-test
+[ -351382792 ] [ -43922849 [ 3 fixnum-shift ] compile-1 ] unit-test
 
 [ 268435456 ] [ -268435456 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
 
@@ -176,6 +186,29 @@ math-internals sequences test words ;
 
 ! regression
 [ 3 ] [
-    100001 <array> 3 100000 pick set-nth
+    100001 f <array> 3 100000 pick set-nth
     [ 100000 swap array-nth ] compile-1
 ] unit-test
+
+! 64-bit overflow
+cell 8 = [
+    [ t ] [ 1 59 fixnum-shift dup [ fixnum+ ] compile-1 1 60 fixnum-shift = ] unit-test
+    [ -1152921504606846977 ] [ 1 60 shift neg >fixnum [ -1 fixnum+ ] compile-1 ] unit-test
+    
+    [ t ] [ 1 40 shift 1 40 shift [ fixnum* ] compile-1 1 80 shift = ] unit-test
+    [ t ] [ 1 40 shift neg 1 40 shift [ fixnum* ] compile-1 1 80 shift neg = ] unit-test
+    [ t ] [ 1 40 shift neg 1 40 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
+    [ t ] [ 1 30 shift neg 1 50 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
+    [ t ] [ 1 50 shift neg 1 30 shift neg [ fixnum* ] compile-1 1 80 shift = ] unit-test
+
+    [ 18446744073709551616 ] [ 1 64 [ fixnum-shift ] compile-1 ] unit-test
+    [ 18446744073709551616 ] [ 1 [ 64 fixnum-shift ] compile-1 ] unit-test
+    [ 18446744073709551616 ] [ 1 [ 32 fixnum-shift 32 fixnum-shift ] compile-1 ] unit-test
+    [ -18446744073709551616 ] [ -1 64 [ fixnum-shift ] compile-1 ] unit-test
+    [ -18446744073709551616 ] [ -1 [ 64 fixnum-shift ] compile-1 ] unit-test
+    [ -18446744073709551616 ] [ -1 [ 32 fixnum-shift 32 fixnum-shift ] compile-1 ] unit-test
+    
+    [ 1152921504606846976 ] [ -1152921504606846976 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
+
+    [ 1152921504606846976 0 ] [ -1152921504606846976 >fixnum -1 [ fixnum/mod ] compile-1 ] unit-test
+] when

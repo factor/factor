@@ -33,14 +33,12 @@ USE: parser
 USE: lists
 USE: errors
 USE: strings
-USE: logic
 USE: live-updater
 USE: prettyprint
-USE: unparser
 USE: words
 USE: vectors
-USE: logging
 USE: sequences
+USE: hashtables
 
 : <evaluator> ( stack msg history -- )
   #! Create an 'evaluator' object that holds
@@ -73,7 +71,7 @@ USE: sequences
   #! Replace occurrences of single quotes with
   #! backslash quote.
   [
-    [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ % ] [ % ] ?if ] each
+      [ dup H{ { CHAR: ' "\\'" } { CHAR: " "\\\"" } } hash [ % ] [ % ] ?if ] each
   ] "" make ;
  
 : make-eval-javascript ( string -- string )
@@ -119,10 +117,10 @@ USE: sequences
     "browser" "responder" set
     <table "1" =border table> 
       <tr> <th "2" =colspan th> "Source" write </th> </tr>
-      <tr> <td "2" =colspan td> [ [ parse ] catch [ "No such word" write ] [ car see ] if ] with-simple-html-output </td> </tr>
+      <tr> <td "2" =colspan td> [ [ parse ] catch [ "No such word" write ] [ car see ] if ] with-html-stream </td> </tr>
       <tr> <th> "Apropos" write </th> <th> "Usages" write </th> </tr>
-      <tr> <td "top" =valign td> [ apropos ] with-simple-html-output </td> 
-           <td "top" =valign td> [ [ parse ] catch [ "No such word" write ] [ car usages. ] if ] with-simple-html-output </td>
+      <tr> <td "top" =valign td> [ apropos ] with-html-stream </td> 
+           <td "top" =valign td> [ [ parse ] catch [ "No such word" write ] [ car usages. ] if ] with-html-stream </td>
       </tr>
     </table>
   ] make-hash ;
@@ -234,4 +232,3 @@ USE: sequences
   ] forever ;
 
 "eval" [ [ ] "None" [ ] <evaluator> eval-responder ] install-cont-responder
-

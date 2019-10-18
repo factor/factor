@@ -1,5 +1,6 @@
-USING: kernel math infix parser namespaces sequences strings prettyprint
-    errors lists hashtables vectors html io generic words ;
+USING: kernel math parser namespaces sequences strings
+prettyprint errors lists hashtables vectors io generic
+words ;
 IN: xml
 
 ! * Simple SAX-ish parser
@@ -124,12 +125,18 @@ M: xml-string-error error.
     ] if ;
 
 : entities
+    #! We have both directions here as a shortcut.
     H{
-        [[ "lt" CHAR: < ]]
-        [[ "gt" CHAR: > ]]
-        [[ "amp" CHAR: & ]]
-        [[ "apos" CHAR: ' ]]
-        [[ "quot" CHAR: " ]]
+        { "lt" CHAR: < }
+        { "gt" CHAR: > }
+        { "amp" CHAR: & }
+        { "apos" CHAR: ' }
+        { "quot" CHAR: " }
+        { CHAR: < "&lt;"   }
+        { CHAR: > "&gt;"   }
+        { CHAR: & "&amp;"  }
+        { CHAR: ' "&apos;" }
+        { CHAR: " "&quot;" }
     } ;
 
 : parse-entity ( -- ch )
@@ -286,11 +293,8 @@ M: unclosed error.
     "Tags: " print
     unclosed-tags [ "  <" write write ">" print ] each ;
 
-: seq-last ( seq -- last )
-    [ length 1 - ] keep nth ;
-
 : push-datum ( object -- )
-    xml-stack get seq-last cdr push ;
+    xml-stack get peek cdr push ;
 
 GENERIC: process ( object -- )
 
@@ -308,17 +312,17 @@ M: closer process
     closer-name xml-stack get pop uncons
     >r [ 
         opener-name [
-	    2dup = [ 2drop ] [ swap <mismatched> throw ] if
-	] keep
+            2dup = [ 2drop ] [ swap <mismatched> throw ] if
+        ] keep
     ] keep opener-props r> <tag> push-datum ;
 
 : initialize-xml-stack ( -- )
     f V{ } clone cons unit >vector xml-stack set ;
 
-: xml ( string -- vector )
+: xml ( string -- tag )
     #! Produces a tree of XML nodes
     [
-	initialize-xml-stack
+        initialize-xml-stack
         [ process ] xml-each
         xml-stack get
         dup length 1 = [ <unclosed> throw ] unless
@@ -329,26 +333,18 @@ M: closer process
 
 : print-props ( hash -- )
     [
-        " " % unswons % "=\"" % % "\"" %
+        " " % swap % "=\"" % % "\"" %
     ] hash-each ;
 
 GENERIC: (xml>string) ( object -- )
 
-: reverse-entities ! not as many as entities needed for printing
-    H{
-        [[ CHAR: & "amp" ]]
-        [[ CHAR: < "lt" ]]
-        [[ CHAR: " "quot" ]]
-    } ;
-
-M: string (xml>string)
+: chars>entities ( str -- str )
+    #! Convert <, >, &, ' and " to HTML entities.
     [
-        dup reverse-entities hash [
-            CHAR: & , % CHAR: ; ,
-        ] [
-            ,
-        ] ?if
-    ] each ;
+        [ dup entities hash [ % ] [ , ] ?if ] each
+    ] "" make ;
+
+M: string (xml>string) chars>entities % ;
 
 : print-open/close ( tag -- )
     CHAR: > ,
@@ -404,13 +400,23 @@ M: comment (xml>string)
 
 ! * System for words specialized on tag names
 
+TUPLE: process-missing process tag ;
+M: process-missing error.
+    "Tag <" write
+    process-missing-tag tag-name write
+    "> not implemented on process " write
+    dup process-missing-process word-name print ;
+
+: run-process ( tag word -- )
+    2dup "xtable" word-prop
+    >r dup tag-name r> hash* [ 2nip call ] [
+        drop <process-missing> throw
+    ] if ;
+
 : PROCESS:
     CREATE
     dup H{ } clone "xtable" set-word-prop
-    dup literalize [
-        "xtable" word-prop
-        >r dup tag-name r> hash call
-    ] cons define-compound ; parsing
+    dup literalize [ run-process ] cons define-compound ; parsing
 
 : TAG:
     scan scan-word [

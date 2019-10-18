@@ -1,52 +1,57 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: alien assembler compiler inference kernel
+USING: alien arrays assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 M: %slot generate-node ( vop -- )
-    dest/src
+    drop
     ! turn tagged fixnum slot # into an offset, multiple of 4
-    dup 1 SHR
-    ! compute slot address in 0 vop-out
-    dupd ADD
-    ! load slot value in 0 vop-out
-    dup unit MOV ;
+    0 input-operand fixnum>slot@
+    ! compute slot address
+    dest/src ADD
+    ! load slot value
+    0 output-operand dup 1array MOV ;
 
 M: %fast-slot generate-node ( vop -- )
-    dup 0 vop-in swap 0 vop-out v>operand tuck >r 2list r>
-    swap MOV ;
+    drop 0 output-operand 1 input-operand 0 input 2array MOV ;
 
-: card-offset 1 getenv ;
+: card-offset 1 getenv ; inline
 
 M: %write-barrier generate-node ( vop -- )
-    #! Mark the card pointed to by vreg.
-    0 vop-in v>operand
-    dup card-bits SHR
-    card-offset 2list card-mark OR
-    0 rel-cards ;
+    #! Mark the card pointed to by vreg. This could be a tad
+    #! shorter on x86 (use indirect addressing instead of a
+    #! scratch register) however on AMD64, you cannot do this
+    #! with a 64-bit immediate. So we avoid code duplication by
+    #! sacrificing a few bytes of generated code size.
+    drop
+    0 input-operand card-bits SHR
+    0 scratch card-offset MOV rel-absolute-cell rel-cards
+    0 scratch 0 input-operand ADD
+    0 scratch 1array card-mark OR ;
 
 M: %set-slot generate-node ( vop -- )
-    dup 2 vop-in v>operand over 1 vop-in v>operand
-    ! turn tagged fixnum slot # into an offset, multiple of 4
-    over 1 SHR
-    ! compute slot address in 1 vop-in
-    dupd ADD
+    drop
+    ! turn tagged fixnum slot # into an offset
+    2 input-operand fixnum>slot@
+    ! compute slot address
+    2 input-operand 1 input-operand ADD
     ! store new slot value
-    >r 0 vop-in v>operand r> unit swap MOV ;
+    2 input-operand 1array 0 input-operand MOV ;
 
 M: %fast-set-slot generate-node ( vop -- )
-    dup 2 vop-in over 1 vop-in v>operand
-    swap 2list swap 0 vop-in v>operand MOV ;
+    drop 1 input-operand 2 input 2array 0 input-operand MOV ;
 
-: userenv@ ( n -- addr )
-    cell * "userenv" f dlsym + ;
+: userenv@ ( n -- addr ) cells "userenv" f dlsym + ;
 
 M: %getenv generate-node ( vop -- )
-    dup 0 vop-out v>operand swap 0 vop-in
-    [ userenv@ unit MOV ] keep 0 rel-userenv ;
+    drop
+    0 output-operand 0 input userenv@ MOV
+    0 input rel-absolute-cell rel-userenv
+    0 output-operand dup 1array MOV ;
 
 M: %setenv generate-node ( vop -- )
-    dup 1 vop-in
-    [ userenv@ unit swap 0 vop-in v>operand MOV ] keep
-    0 rel-userenv ;
+    drop
+    0 scratch 1 input userenv@ MOV
+    1 input rel-absolute-cell rel-userenv
+    0 scratch 1array 0 input-operand MOV ;

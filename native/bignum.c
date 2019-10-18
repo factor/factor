@@ -7,7 +7,7 @@ CELL to_cell(CELL x)
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(x);
 	case BIGNUM_TYPE:
-		return s48_bignum_to_long(untag_bignum_fast(x));
+		return s48_bignum_to_fixnum(untag_bignum_fast(x));
 	default:
 		type_error(BIGNUM_TYPE,x);
 		return 0;
@@ -24,7 +24,7 @@ F_ARRAY* to_bignum(CELL tagged)
 	switch(type_of(tagged))
 	{
 	case FIXNUM_TYPE:
-		return s48_long_to_bignum(untag_fixnum_fast(tagged));
+		return s48_fixnum_to_bignum(untag_fixnum_fast(tagged));
 	case BIGNUM_TYPE:
 		return (F_ARRAY*)UNTAG(tagged);
 	case RATIO_TYPE:

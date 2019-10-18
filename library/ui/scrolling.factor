@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: arrays gadgets gadgets-books gadgets-layouts generic kernel
-lists math namespaces sequences styles threads ;
+USING: arrays gadgets gadgets-layouts kernel math namespaces
+sequences ;
 
 ! A viewport can be scrolled.
 TUPLE: viewport ;
@@ -27,7 +27,7 @@ C: viewport ( content -- viewport )
     t over set-gadget-root?
     [ add-gadget ] keep ;
 
-M: viewport pref-dim gadget-child pref-dim ;
+M: viewport pref-dim* gadget-child pref-dim ;
 
 : set-slider ( page max value slider -- )
     #! page/max/value are 3-vectors.
@@ -88,8 +88,8 @@ M: viewport focusable-child* ( viewport -- gadget )
 : scroll-down-line scroller-y 1 swap slide-by-line ;
 
 : scroller-actions ( scroller -- )
-    dup [ scroll-up-line ] [ button-down 4 ] set-action
-    dup [ scroll-down-line ] [ button-down 5 ] set-action
+    dup [ scroll-up-line ] [ wheel-up ] set-action
+    dup [ scroll-down-line ] [ wheel-down ] set-action
     [ scroller-viewport relayout-1 ] [ slider-changed ] set-action ;
 
 C: scroller ( gadget -- scroller )

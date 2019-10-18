@@ -1,9 +1,8 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: errors generic kernel math-internals ;
 
-! Math operations
 G: number= ( x y -- ? ) math-combination ; foldable
 M: object number= 2drop f ;
 
@@ -27,68 +26,41 @@ G: bitor  ( x y -- z ) math-combination ; foldable
 G: bitxor ( x y -- z ) math-combination ; foldable
 G: shift  ( x n -- y ) math-combination ; foldable
 
-GENERIC: 1+ ( x -- x+1 ) foldable
-GENERIC: 1- ( x -- x-1 ) foldable
-
 GENERIC: bitnot ( n -- n ) foldable
 
-GENERIC: truncate ( n -- n ) foldable
-GENERIC: floor    ( n -- n ) foldable
-GENERIC: ceiling  ( n -- n ) foldable
-
-: max ( x y -- z ) [ > ] 2keep ? ; inline
-: min ( x y -- z ) [ < ] 2keep ? ; inline
-
-: between? ( x min max -- ? )
-    #! Push if min <= x <= max. Handles case where min > max
-    #! by swapping them.
-    pick rot >= [ <= ] [ 2drop f ] if ; inline
-
-: sq dup * ; inline
-
-: neg 0 swap - ; inline
-: recip 1 swap / ; inline
-
-: rem ( x y -- x%y )
-    #! Like modulus, but always gives a positive result.
-    [ mod ] keep  over 0 < [ + ] [ drop ] if ; inline
-
-: sgn ( n -- -1/0/1 )
-    #! Push the sign of a real number.
-    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] if ; foldable
-
+GENERIC: 1+ ( x -- x+1 ) foldable
+GENERIC: 1- ( x -- x-1 ) foldable
 GENERIC: abs ( z -- |z| ) foldable
 GENERIC: absq ( n -- |n|^2 ) foldable
 
-: align ( offset width -- offset )
-    2dup mod dup 0 number= [ 2drop ] [ - + ] if ; inline
+GENERIC: zero? ( x -- ? ) foldable
+M: object zero? drop f ;
+
+: sq dup * ; inline
+: neg 0 swap - ; inline
+: recip 1 swap / ; inline
+: max ( x y -- z ) [ > ] 2keep ? ; foldable
+: min ( x y -- z ) [ < ] 2keep ? ; foldable
+: between? ( x min max -- ? ) pick >= >r >= r> and ; foldable
+: rem ( x y -- z ) tuck mod over + swap mod ; foldable
+: sgn ( m -- n ) dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
+: align ( m w -- n ) 1- [ + ] keep bitnot bitand ; inline
+: truncate ( x -- y ) dup 1 mod - ; foldable
+
+: floor ( x -- y )
+    dup 1 mod dup 0 =
+    [ drop ] [ dup 0 < [ - 1- ] [ - ] if ] if ; foldable
+
+: ceiling ( x -- y ) neg floor neg ; foldable
 
 : (repeat) ( i n quot -- )
     pick pick >=
     [ 3drop ] [ [ swap >r call 1+ r> ] keep (repeat) ] if ;
     inline
 
-: repeat ( n quot -- | quot: n -- n )
-    #! The loop counter is kept on the stack, and ranges from
-    #! 0 to n-1.
-    0 -rot (repeat) ; inline
+: repeat ( n quot -- | quot: n -- n ) 0 -rot (repeat) ; inline
 
 : times ( n quot -- | quot: -- )
     swap [ >r dup slip r> ] repeat drop ; inline
 
-: power-of-2? ( n -- ? )
-    dup 0 > [
-        dup dup neg bitand =
-    ] [
-        drop f
-    ] if ; foldable
-
-: log2 ( n -- b )
-    #! Log base two for integers.
-    dup 0 <= [
-        "Input must be positive" throw
-    ] [
-        dup 1 = [ drop 0 ] [ 2 /i log2 1+ ] if
-    ] if ; foldable
-
-GENERIC: number>string ( str -- num ) foldable
+GENERIC: number>string ( n -- str ) foldable

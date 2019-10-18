@@ -1,7 +1,8 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: opengl
-USING: alien errors kernel math namespaces opengl sdl sequences ;
+USING: alien errors io kernel math namespaces opengl sdl
+sequences ;
 
 : gl-color ( { r g b a } -- ) first4 glColor4d ; inline
 
@@ -32,38 +33,38 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     dup resize-event-w swap resize-event-h 0 gl-flags
     init-surface ;
 
-: with-gl-screen ( quot -- )
+: with-gl-screen ( width height quot -- )
     >r 0 gl-flags r> with-screen ; inline
 
 : gl-error ( -- )
-    glGetError dup 0 = [ drop ] [ gluErrorString throw ] if ;
+    glGetError dup zero?
+    [ drop ] [ "GL error: " write gluErrorString print ] if ;
 
 : with-gl-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it
     #! is required (eg, hardware surface).
     [ init-gl call gl-error ] [ SDL_GL_SwapBuffers ] cleanup ;
+    inline
 
 : do-state ( what quot -- )
     swap glBegin call glEnd ; inline
 
 : do-matrix ( mode quot -- )
-    swap glMatrixMode glPushMatrix call glPopMatrix ; inline
+    swap [ glMatrixMode glPushMatrix call ] keep
+    glMatrixMode glPopMatrix ; inline
+
+: top-left drop 0 0 glTexCoord2d 0 0 0 glVertex3d ; inline
+
+: top-right 1 0 glTexCoord2d first 0 0 glVertex3d ; inline
+
+: bottom-left 0 1 glTexCoord2d second 0 swap 0 glVertex3d ; inline
 
 : gl-vertex first3 glVertex3d ; inline
-
-: top-left drop 0 0 glTexCoord2d { 0 0 0 } gl-vertex ; inline
-
-: top-right 1 0 glTexCoord2d { 1 0 0 } v* gl-vertex ; inline
-
-: bottom-left 0 1 glTexCoord2d { 0 1 0 } v* gl-vertex ; inline
 
 : bottom-right 1 1 glTexCoord2d gl-vertex ; inline
 
 : four-sides ( dim -- )
     dup top-left dup top-right dup bottom-right bottom-left ;
-
-: gl-line ( from to color -- )
-    gl-color [ gl-vertex ] 2apply ;
 
 : gl-fill-rect ( dim -- )
     #! Draws a two-dimensional box.
@@ -82,7 +83,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     #! Draw a filled polygon.
     dup length 2 > GL_POLYGON GL_LINES ? (gl-poly) ;
 
-: gl-poly ( points color -- )
+: gl-poly ( points -- )
     #! Draw a polygon.
     GL_LINE_LOOP (gl-poly) ;
 

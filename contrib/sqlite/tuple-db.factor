@@ -37,15 +37,15 @@ TUPLE: db-field name bind-name slot type ;
 TUPLE: mapping tuple table fields one-to-one one-to-many   ;
 
 : sanitize-conversions ( -- alist )
-  [ 
-    [[ CHAR: - "_" ]]
-    [[ CHAR: ? "p" ]] 
-  ] ;
+  H{
+    { CHAR: - "_" }
+    { CHAR: ? "p" }
+  } ;
 
 : sanitize ( string -- string ) 
   #! Convert a string so it can be used as a table or field name.
     [
-        [ dup sanitize-conversions assoc [ % ] [ , ] ?if ] each
+        [ dup sanitize-conversions hash [ % ] [ , ] ?if ] each
     ] "" make ;
 
 : tuple-fields ( class -- seq )

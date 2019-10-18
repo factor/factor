@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: math
-USING: errors generic kernel math sequences sequences-internals ;
+USING: errors generic kernel kernel-internals sequences
+sequences-internals ;
 
 UNION: integer fixnum bignum ;
 
@@ -10,26 +11,22 @@ UNION: integer fixnum bignum ;
 : odd? ( n -- ? ) 1 bitand 1 = ;
 
 : (gcd) ( b a y x -- a d )
-    dup 0 number= [
+    dup zero? [
         drop nip
     ] [
         tuck /mod >r pick * swap >r swapd - r> r> (gcd)
     ] if ; inline
 
-: gcd ( x y -- a d )
-    #! Compute the greatest common divisor d and multiplier a
-    #! such that a*x=d mod y.
-    swap 0 1 2swap (gcd) abs ; foldable
+: gcd ( x y -- a d ) 0 1 2swap (gcd) abs ; foldable
 
 : (next-power-of-2) ( i n -- n )
     2dup >= [
         drop
     ] [
-        >r 1 shift 1 max r> (next-power-of-2)
+        >r 1 shift r> (next-power-of-2)
     ] if ;
 
-: next-power-of-2 ( n -- n )
-    0 swap (next-power-of-2) ;
+: next-power-of-2 ( n -- n ) 1 swap (next-power-of-2) ;
 
 IN: math-internals
 
@@ -39,17 +36,14 @@ IN: math-internals
 : division-by-zero ( x y -- ) "Division by zero" throw ;
 
 M: integer / ( x y -- x/y )
-    dup 0 number= [
+    dup zero? [
         division-by-zero
     ] [
         dup 0 < [ [ neg ] 2apply ] when
         2dup gcd nip tuck /i >r /i r> fraction>
     ] if ;
 
-M: fixnum number=
-    #! Fixnums are immediate values, so equality testing is
-    #! trivial.
-    eq? ;
+M: fixnum number= eq? ;
 
 M: fixnum < fixnum< ;
 M: fixnum <= fixnum<= ;
@@ -74,6 +68,8 @@ M: fixnum bitxor fixnum-bitxor ;
 M: fixnum shift fixnum-shift ;
 
 M: fixnum bitnot fixnum-bitnot ;
+
+M: fixnum zero? 0 eq? ;
 
 M: bignum number= bignum= ;
 M: bignum < bignum< ;
@@ -100,6 +96,4 @@ M: bignum shift bignum-shift ;
 
 M: bignum bitnot bignum-bitnot ;
 
-M: integer truncate ;
-M: integer floor ;
-M: integer ceiling ;
+M: bignum zero? 0 >bignum bignum= ;

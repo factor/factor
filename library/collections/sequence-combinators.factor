@@ -1,7 +1,13 @@
 ! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: sequences-internals
-USING: arrays generic kernel kernel-internals math vectors ;
+USING: arrays generic kernel kernel-internals math sequences
+vectors ;
+
+: collect ( n generator -- array | quot: n -- value )
+    >r [ f <array> ] keep r> swap [
+        [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
+    ] repeat drop ; inline
 
 : (map) ( quot seq i -- quot seq value )
     pick pick >r >r swap nth-unsafe swap call r> r> rot ; inline
@@ -16,6 +22,18 @@ USING: arrays generic kernel kernel-internals math vectors ;
 : (monotonic) ( quot seq i -- ? )
     2dup 1+ swap nth-unsafe >r swap nth-unsafe r> rot call ;
     inline
+
+: (interleave) ( n -- array )
+    dup zero? [
+        drop { }
+    ] [
+        t <array> f 0 pick set-nth-unsafe
+    ] if ;
+
+: (subset) ( quot accum elt -- quot accum )
+    -rot [
+        >r over >r call [ r> r> push ] [ r> r> 2drop ] if
+    ] 2keep ; inline
 
 IN: sequences
 
@@ -38,14 +56,6 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
 
 : find-with ( obj seq quot -- i elt | quot: elt -- ? )
     swap [ with rot ] find 2swap 2drop ; inline
-
-: collect ( n generator -- vector | quot: n -- value )
-    #! Primitive mapping out of an integer sequence into an
-    #! array. Used by map and 2map. Don't call, use map
-    #! instead.
-    >r [ <array> ] keep r> swap [
-        [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
-    ] repeat drop ; inline
 
 G: map [ over ] standard-combination ; inline
 
@@ -77,11 +87,9 @@ M: object map ( seq quot -- seq )
     -rot 2dup min-length [ (2each) ] repeat 3drop ; inline
 
 : 2reduce ( seq seq identity quot -- value | quot: e x y -- z )
-    #! Don't use with lists.
     >r -rot r> 2each ; inline
 
 : 2map ( seq seq quot -- seq )
-    #! Don't use with lists.
     -rot
     [ 2dup min-length [ (2map) ] collect ] keep like
     >r 3drop r> ; inline
@@ -119,6 +127,9 @@ M: object find ( seq quot -- i elt )
 : find-last ( seq quot -- i elt )
     >r [ length 1- ] keep r> find-last* ; inline
 
+: find-last-with ( obj seq quot -- i elt | quot: elt -- ? )
+    swap [ with rot ] find-last 2swap 2drop ; inline
+
 : contains? ( seq quot -- ? )
     find drop -1 > ; inline
 
@@ -126,35 +137,29 @@ M: object find ( seq quot -- i elt )
     find-with drop -1 > ; inline
 
 : all? ( seq quot -- ? )
-    #! ForAll(P in X) <==> !Exists(!P in X)
     swap [ swap call not ] contains-with? not ; inline
 
 : all-with? ( obj seq quot -- ? | quot: elt -- ? )
     swap [ with rot ] all? 2nip ; inline
 
 : subset ( seq quot -- seq | quot: elt -- ? )
-    #! all elements for which the quotation returned a value
-    #! other than f are collected in a new list.
-    swap [
-        dup length <vector> -rot [
-            rot >r 2dup >r >r swap call [
-                r> r> r> [ push ] keep swap
-            ] [
-                r> r> drop r> swap
-            ] if
-        ] each drop
-    ] keep like ; inline
+    over >r V{ } clone rot [ (subset) ] each r> like nip ;
+    inline
 
 : subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
     swap [ with rot ] subset 2nip ; inline
 
 : monotonic? ( seq quot -- ? | quot: elt elt -- ? )
-    #! Eg, { 1 2 3 4 } [ < ] monotonic? ==> t
-    #!     { 1 3 2 4 } [ < ] monotonic? ==> f
-    #! Don't use with lists.
     swap dup length 1- [
         pick pick >r >r (monotonic) r> r> rot
     ] all? 2nip ; inline
+
+: interleave ( seq quot between -- )
+    rot dup length (interleave) [
+        [ -rot [ -rot 2slip call ] 2keep ]
+        [ -rot [ drop call ] 2keep ]
+        if
+    ] 2each 2drop ; inline
 
 : cache-nth ( i seq quot -- elt | quot: i -- elt )
     pick pick ?nth dup [

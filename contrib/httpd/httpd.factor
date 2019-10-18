@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: errors kernel lists namespaces io strings threads http
-sequences ;
+USING: errors hashtables kernel lists namespaces io strings 
+threads http sequences ;
 
 : (url>path) ( uri -- path )
     url-decode "http://" ?head [
@@ -20,15 +20,15 @@ sequences ;
     ".." over subseq? [ drop f ] when ;
 
 : request-method ( cmd -- method )
-    [
-        [[ "GET" "get" ]]
-        [[ "POST" "post" ]]
-        [[ "HEAD" "head" ]]
-    ] assoc [ "bad" ] unless* ;
+    H{
+        { "GET" "get" }
+        { "POST" "post" }
+        { "HEAD" "head" }
+    } hash [ "bad" ] unless* ;
 
 : host ( -- string )
     #! The host the current responder was called from.
-    "Host" "header" get assoc ":" split1 drop ;
+    "Host" "header" get hash ":" split1 drop ;
 
 : (handle-request) ( arg cmd -- method path host )
     request-method dup "method" set swap

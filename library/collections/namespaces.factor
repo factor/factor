@@ -1,88 +1,37 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: namespaces
-USING: hashtables kernel kernel-internals lists math sequences
-strings vectors words ;
+USING: arrays hashtables kernel kernel-internals lists math
+sequences strings vectors words ;
 
-! Variables in Factor:
-!
-!   SYMBOL: x
-!
-!   5 x set
-!   x get 2 + .
-! 7
-!   7 x set
-!   x get 2 + .
-! 9
-!
-! get ( name -- value ) and set ( value name -- ) search in
-! the namespaces on the namespace stack, in top-down order.
-!
-! At the bottom of the namespace stack, is the global
-! namespace; it is always present.
-!
-! bind ( namespace quot -- ) executes a quotation with a
-! namespace pushed on the namespace stack.
-
-: namestack ( -- ns ) 3 getenv ; inline
-
-: set-namestack ( ns -- ) 3 setenv ; inline
-
-: namespace ( -- namespace )
-    #! Push the current namespace.
-    namestack car ; inline
-
-: >n ( namespace -- n:namespace )
-    #! Push a namespace on the name stack.
-    namestack cons set-namestack ; inline
-
-: n> ( n:namespace -- namespace )
-    #! Pop the top of the name stack.
-    namestack uncons set-namestack ; inline
-
-: global ( -- g ) 4 getenv ;
-
-: (get) ( var ns -- value )
-    #! Internal word for searching the namestack.
-    dup [
-        2dup car hash* [
-            nip cdr ( found )
-        ] [
-            cdr (get) ( keep looking )
-        ] ?if
-    ] [
-        2drop f
-    ] if ; flushable
-
-: get ( variable -- value )
-    #! Push the value of a variable by searching the namestack
-    #! from the top down.
-    namestack (get) ; flushable
-
+: namestack* ( -- ns ) 3 getenv ; inline
+: namestack ( -- ns ) namestack* clone ; inline
+: set-namestack ( ns -- ) clone 3 setenv ; inline
+: namespace ( -- namespace ) namestack* peek ; inline
+: >n ( namespace -- n:namespace ) namestack* push ; inline
+: n> ( n:namespace -- namespace ) namestack* pop ; inline
+: global ( -- g ) 4 getenv ; inline
+: get ( variable -- value ) namestack* hash-stack ; flushable
 : set ( value variable -- ) namespace set-hash ;
+: on ( var -- ) t swap set ; inline
+: off ( var -- ) f swap set ; inline
+: set-global ( value var -- ) global set-hash ; inline
 
 : nest ( variable -- hash )
-    #! If the variable is set in the current namespace, return
-    #! its value, otherwise set its value to a new namespace.
     dup namespace hash [ ] [ >r H{ } clone dup r> set ] ?if ;
 
-: change ( var quot -- )
-    #! Execute the quotation with the variable value on the
-    #! stack. The set the variable to the return value of the
-    #! quotation.
+: change ( var quot -- quot: old -- new )
     >r dup get r> rot slip set ; inline
 
-: on ( var -- ) t swap set ; inline
+: +@ ( n var -- ) [ [ 0 ] unless* + ] change ;
 
-: off ( var -- ) f swap set ; inline
+: inc ( var -- ) 1 swap +@ ; inline
 
-: inc ( var -- ) [ 1+ ] change ; inline
+: dec ( var -- ) -1 swap +@ ; inline
 
-: dec ( var -- ) [ 1- ] change ; inline
+: bind ( namespace quot -- ) swap >n call n> drop ; inline
 
-: bind ( namespace quot -- )
-    #! Execute a quotation with a namespace on the namestack.
-    swap >n call n> drop ; inline
+: counter ( var -- n ) global [ dup inc get ] bind ;
 
 : make-hash ( quot -- hash ) H{ } clone >n call n> ; inline
 
@@ -92,27 +41,18 @@ strings vectors words ;
 SYMBOL: building
 
 : make ( quot proto -- )
-    #! Call , and % from "quot" to append to a sequence
-    #! that has the same type as "proto".
     [
         dup thaw building set >r call building get r> like
     ] with-scope ; inline
 
-: , ( obj -- )
-    #! Add to the sequence being built with make-seq.
-    building get push ;
+: , ( obj -- ) building get push ;
 
 : ?, ( obj ? -- ) [ , ] [ drop ] if ;
 
-: % ( seq -- )
-    #! Append to the sequence being built with make-seq.
-    building get swap nappend ;
+: % ( seq -- ) building get swap nappend ;
 
-: # ( n -- )
-    #! Only useful with "" make.
-    number>string % ;
+: # ( n -- ) number>string % ;
 
-! Building hashtables, and computing a transitive closure.
 SYMBOL: hash-buffer
 
 : closure, ( value key -- old )
@@ -120,9 +60,10 @@ SYMBOL: hash-buffer
 
 : (closure) ( key hash -- )
     tuck hash dup [
-        hash-keys [
-            dup dup closure, [ 2drop ] [ swap (closure) ] if
-        ] each-with
+        [
+            drop dup dup closure,
+            [ 2drop ] [ swap (closure) ] if
+        ] hash-each-with
     ] [
         2drop
     ] if ;
@@ -137,4 +78,8 @@ SYMBOL: hash-buffer
 IN: lists
 
 : alist>quot ( default alist -- quot )
-    [ unswons [ % , , \ if , ] [ ] make ] each ;
+    [ [ first2 swap % , , \ if , ] [ ] make ] each ;
+
+IN: kernel-internals
+
+: init-namespaces ( -- ) global 1array >vector set-namestack ;

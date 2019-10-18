@@ -30,12 +30,10 @@ SYMBOL: meta-executing
     meta-cf get [ meta-cf [ uncons ] change ] [ up next ] if ;
 
 : meta-interp ( -- interp )
-    meta-d get f meta-r get meta-n get meta-c get
-    <continuation> ;
+    meta-d get meta-r get meta-n get meta-c get <continuation> ;
 
 : set-meta-interp ( interp -- )
-    >continuation<
-    meta-c set meta-n set meta-r set drop meta-d set ;
+    >continuation< meta-c set meta-n set meta-r set meta-d set ;
 
 : host-word ( word -- )
     [
@@ -73,6 +71,14 @@ M: word do ( word -- )
     ] ?if ;
 
 M: object do ( object -- ) do-1 ;
+
+! The interpreter loses object identity of the name and catch
+! stacks -- they are copied after each step -- so we execute
+! them atomically and don't allow stepping into these words
+\ >n [ \ >n host-word ] "meta-word" set-word-prop
+\ n> [ \ n> host-word ] "meta-word" set-word-prop
+\ >c [ \ >c host-word ] "meta-word" set-word-prop
+\ c> [ \ c> host-word ] "meta-word" set-word-prop
 
 \ call [ pop-d meta-call ] "meta-word" set-word-prop
 \ execute [ pop-d do ] "meta-word" set-word-prop

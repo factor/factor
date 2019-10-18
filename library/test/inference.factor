@@ -175,11 +175,47 @@ DEFER: agent
 [ { 0 2 } ]
 [ [ [ drop ] 0 agent ] infer ] unit-test
 
-! : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
-! [ [ no-base-case-1 ] infer ] unit-test-fails
-
 : no-base-case-2 no-base-case-2 ;
 [ [ no-base-case-2 ] infer ] unit-test-fails
+
+! Regression
+: cat dup [ throw ] [ throw ] if ;
+: dog dup [ cat ] [ 3drop ] if ;
+[ { 3 0 } ] [ [ dog ] infer ] unit-test
+
+! Regression
+DEFER: monkey
+: friend dup [ friend ] [ monkey ] if ;
+: monkey dup [ 3drop ] [ friend ] if ;
+[ { 3 0 } ] [ [ friend ] infer ] unit-test
+
+! Regression -- same as above but we infer the second word first
+DEFER: blah2
+: blah dup [ blah ] [ blah2 ] if ;
+: blah2 dup [ blah ] [ 3drop ] if ;
+[ { 3 0 } ] [ [ blah2 ] infer ] unit-test
+
+! Regression
+DEFER: blah4
+: blah3 dup [ blah3 ] [ dup [ blah4 ] [ blah3 ] if ] if ;
+: blah4 dup [ blah4 ] [ dup [ 3drop ] [ blah3 ] if ] if ;
+[ { 3 0 } ] [ [ blah4 ] infer ] unit-test
+
+! Regression
+: bad-combinator ( obj quot -- )
+    over [
+        2drop
+    ] [
+        [ swap slip ] keep swap bad-combinator
+    ] if ; inline
+
+[ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
+
+! Regression
+DEFER: do-crap
+: more-crap dup [ drop ] [ dup do-crap call ] if ;
+: do-crap dup [ do-crap ] [ more-crap ] if ;
+[ [ do-crap ] infer ] unit-test-fails
 
 [ { 2 1 } ] [ [ swons ] infer ] unit-test
 [ { 1 2 } ] [ [ uncons ] infer ] unit-test
@@ -242,3 +278,6 @@ DEFER: agent
 ! This hangs
 
 ! [ ] [ [ [ dup call ] dup call ] infer ] unit-test-fails
+
+! : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
+! [ [ no-base-case-1 ] infer ] unit-test-fails

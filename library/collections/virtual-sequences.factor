@@ -3,15 +3,6 @@
 IN: sequences
 USING: errors generic kernel math sequences-internals vectors ;
 
-! A repeated sequence is the same element n times.
-TUPLE: repeated length object ;
-
-M: repeated length repeated-length ;
-
-M: repeated nth nip repeated-object ;
-
-M: repeated nth-unsafe nip repeated-object ;
-
 ! A reversal of an underlying sequence.
 TUPLE: reversed ;
 
@@ -28,7 +19,9 @@ M: reversed set-nth ( elt n seq -- ) reversed@ set-nth ;
 M: reversed set-nth-unsafe ( elt n seq -- )
     reversed@ set-nth-unsafe ;
 
-M: reversed thaw ( seq -- seq ) delegate reverse ;
+M: reversed like ( seq reversed -- seq ) delegate like ;
+
+M: reversed thaw ( seq -- seq ) delegate thaw ;
 
 ! A slice of another sequence.
 TUPLE: slice seq from to ;
@@ -49,8 +42,6 @@ C: slice ( from to seq -- seq )
     [ set-slice-to ] keep
     [ set-slice-from ] keep ;
 
-: <range> ( from to -- seq ) dup <slice> ;
-
 M: slice length ( range -- n )
     dup slice-to swap slice-from - ;
 
@@ -66,3 +57,5 @@ M: slice set-nth ( obj n slice -- ) slice@ set-nth ;
 M: slice set-nth-unsafe ( n slice -- obj ) slice@ set-nth-unsafe ;
 
 M: slice like ( seq slice -- seq ) slice-seq like ;
+
+M: slice thaw ( seq -- seq ) slice-seq thaw ;

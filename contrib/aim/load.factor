@@ -1,9 +1,9 @@
-IN: network-util
-USING: parser sequences ;
+IN: scratchpad
+USING: kernel parser sequences words compiler ;
 
-[
-    "contrib/crypto/load.factor"
-    "contrib/aim/net-bytes.factor"
-    "contrib/aim/aim.factor"
-] [ run-file ] each
+"/contrib/crypto/load.factor" run-resource
 
+{ 
+    "net-bytes"
+    "aim"
+} [ "/contrib/aim/" swap ".factor" append3 run-resource ] each

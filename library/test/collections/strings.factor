@@ -1,5 +1,4 @@
 IN: temporary
-USING: vectors ;
 USE: errors
 USE: kernel
 USE: math
@@ -8,6 +7,7 @@ USE: strings
 USE: test
 USE: sequences
 USE: lists
+USE: vectors
 
 [ ] [ 10 [ [ -1000000 <sbuf> ] catch drop ] times ] unit-test
 
@@ -45,15 +45,15 @@ USE: lists
 [ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?tail ] unit-test
 [ "Beginning and end" f ] [ "Beginning and end" "eginning " ?tail ] unit-test
 
-[ [ "This" "is" "a" "split" "sentence" ] ]
+[ { "This" "is" "a" "split" "sentence" } ]
 [ "This is a split sentence" " " split ]
 unit-test
 
-[ [ "OneWord" ] ]
+[ { "OneWord" } ]
 [ "OneWord" " " split ]
 unit-test
 
-[ [ "a" "b" "c" "d" "e" "f" ] ]
+[ { "a" "b" "c" "d" "e" "f" } ]
 [ "aXXbXXcXXdXXeXXf" "XX" split ] unit-test
 
 [ "Hello world" t ] [ "Hello world\n" "\n" ?tail ] unit-test
@@ -68,8 +68,8 @@ unit-test
 [ t ] [ CHAR: 0 digit? ] unit-test
 [ f ] [ CHAR: x digit? ] unit-test
 
-[ t ] [ "abc" "abd" lexi 0 < ] unit-test
-[ t ] [ "z" "abd" lexi 0 > ] unit-test
+[ t ] [ "abc" "abd" <=> 0 < ] unit-test
+[ t ] [ "z" "abd" <=> 0 > ] unit-test
 
 [ f ] [ [ 0 10 "hello" subseq ] catch not ] unit-test
 

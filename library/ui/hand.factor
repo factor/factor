@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic io kernel lists math matrices namespaces
-prettyprint sequences vectors ;
+USING: kernel math namespaces sequences ;
 
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state.
@@ -16,26 +15,23 @@ TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 C: hand ( -- hand )
     dup delegate>gadget V{ } clone over set-hand-buttons ;
 
-: button/ ( n hand -- )
-    dup hand-gadget over set-hand-clicked
-    dup screen-loc over set-hand-click-loc
-    dup hand-gadget over relative over set-hand-click-rel
-    hand-buttons push ;
+: button-gesture ( buttons gesture -- )
+    #! Send a gesture like [ button-down 2 ]; if nobody
+    #! handles it, send [ button-down ].
+    swap hand get hand-clicked 3dup >r add r> handle-gesture
+    [ nip handle-gesture drop ] [ 3drop ] if ;
 
-: button\ ( n hand -- )
-    hand-buttons delete ;
-
-: drag-gesture ( hand gadget gesture -- )
-    #! Send a gesture like [ drag 2 ].
-    rot hand-buttons first add swap handle-gesture drop ;
+: drag-gesture ( -- )
+    #! Send a gesture like [ drag 2 ]; if nobody handles it,
+    #! send [ drag ].
+    hand get hand-buttons first [ drag ] button-gesture ;
 
 : fire-motion ( hand -- )
     #! Fire a motion gesture to the gadget underneath the hand,
     #! and if a mouse button is down, fire a drag gesture to the
     #! gadget that was clicked.
     [ motion ] over hand-gadget handle-gesture drop
-    dup hand-buttons empty?
-    [ dup dup hand-clicked [ drag ] drag-gesture ] unless drop ;
+    hand-buttons empty? [ drag-gesture ] unless ;
 
 : each-gesture ( gesture seq -- )
     [ handle-gesture* drop ] each-with ;

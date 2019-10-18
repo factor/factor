@@ -134,5 +134,5 @@ void primitive_save_image(void)
 	/* do a full GC to push everything into tenured space */
 	garbage_collection(TENURED);
 	filename = untag_string(dpop());
-	save_image(to_c_string(filename));
+	save_image(to_c_string(filename,true));
 }

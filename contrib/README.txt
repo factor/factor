@@ -14,6 +14,8 @@ library, but is useful enough to ship with the Factor distribution.
   
 - contrib/crypto/ -- MD5 and SHA1 cryptographic hashes (Doug Coleman)
 
+- contrib/factory/ -- X11 window manager (Eduardo Cavazos)
+
 - contrib/httpd/ -- HTTP server and client (Slava Pestov, Chris Double)
 
 - contrib/math/ -- extended math library (Doug Coleman)
@@ -23,15 +25,19 @@ library, but is useful enough to ship with the Factor distribution.
 
 - contrib/postgresql/ -- PostgreSQL binding (Doug Coleman)
 
+- contrib/random-tester/ -- Random compiler tester (Doug Coleman)
+
 - contrib/space-invaders/ -- Intel 8080-based Space Invaders arcade
   machine emulator (Chris Double)
 
 - contrib/sqlite/ -- SQLite binding (Chris Double)
 
+- contrib/x11 -- X Window System client library (Eduardo Cavazos)
+
 - contrib/coroutines.factor -- coroutines (Chris Double)
 
 - contrib/dlists.factor -- double-linked-lists (Mackenzie Straight)
 
-- contrib/xml.factor -- XML parser and writer (Daniel Ehrenberg)
+- contrib/splay-trees.factor -- Splay trees (Mackenzie Straight)
 
-- contrib/x11 -- X Window System client library (Eduardo Cavazos)
+- contrib/xml.factor -- XML parser and writer (Daniel Ehrenberg)

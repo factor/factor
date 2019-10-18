@@ -27,6 +27,7 @@
 ! list of things to do. All data is stored in a directory in the 
 ! filesystem with the users name.
 IN: todo-example
+USING: xml ;
 USE: cont-responder
 USE: html
 USE: io
@@ -35,7 +36,6 @@ USE: namespaces
 USE: inspector
 USE: lists
 USE: cont-examples
-USE: regexp
 USE: prettyprint
 USE: todo
 USE: math

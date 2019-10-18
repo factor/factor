@@ -20,6 +20,9 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
 	userenv[GEN_ENV] = tag_fixnum(gen_count);
 	userenv[CARD_OFF_ENV] = tag_cell(cards_offset);
+	userenv[IMAGE_ENV] = tag_object(from_c_string(image));
+	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
+	userenv[COMPILED_BASE_ENV] = tag_cell(compiling.base);
 }
 
 INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
@@ -37,13 +40,13 @@ INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
 int main(int argc, char** argv)
 {
 	char *image;
-	CELL ds_size = 2048;
-	CELL cs_size = 2048;
+	CELL ds_size = 512;
+	CELL cs_size = 512;
 	CELL generations = 2;
-	CELL young_size = 8;
-	CELL aging_size = 16;
-	CELL code_size = 2;
-	CELL literal_size = 64;
+	CELL young_size = 2 * CELLS;
+	CELL aging_size = 4 * CELLS;
+	CELL code_size = CELLS;
+	CELL literal_size = 128;
 	CELL args;
 	CELL i;
 
@@ -57,7 +60,6 @@ int main(int argc, char** argv)
 		printf(" +Yn   Size of n-1 youngest generations, megabytes\n");
 		printf(" +An   Size of tenured and semi-spaces, megabytes\n");
 		printf(" +Xn   Code heap size, megabytes\n");
-		printf(" +Ln   Literal table size, kilobytes. Only for bootstrapping\n");
 		printf("Other options are handled by the Factor library.\n");
 		printf("See the documentation for details.\n");
 		printf("Send bug reports to Slava Pestov <slava@jedit.org>.\n");
@@ -72,7 +74,6 @@ int main(int argc, char** argv)
 		if(factor_arg(argv[i],"+Y%d",&young_size)) continue;
 		if(factor_arg(argv[i],"+A%d",&aging_size)) continue;
 		if(factor_arg(argv[i],"+X%d",&code_size)) continue;
-		if(factor_arg(argv[i],"+L%d",&literal_size)) continue;
 
 		if(strncmp(argv[i],"+",1) == 0)
 		{
@@ -98,7 +99,6 @@ int main(int argc, char** argv)
 		args = cons(tag_object(from_c_string(argv[argc])),args);
 	}
 
-	userenv[IMAGE_ENV] = tag_object(from_c_string(image));
 	userenv[ARGS_ENV] = args;
 
 	platform_run();

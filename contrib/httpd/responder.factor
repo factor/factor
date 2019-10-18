@@ -1,15 +1,15 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: hashtables http kernel lists math namespaces parser
-sequences io strings ;
+USING: arrays hashtables http kernel lists math namespaces
+parser sequences io strings ;
 
 ! Variables
 SYMBOL: vhosts
 SYMBOL: responders
 
 : print-header ( alist -- )
-    [ unswons write ": " write url-encode print ] each ;
+    [ swap write ": " write url-encode print ] hash-each ;
 
 : response ( header msg -- )
     "HTTP/1.0 " write print print-header ;
@@ -19,7 +19,7 @@ SYMBOL: responders
 
 : error-head ( error -- )
     dup log-error
-    [ [[ "Content-Type" "text/html" ]] ] over response ;
+    H{ { "Content-Type" "text/html" } } over response ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request
@@ -34,7 +34,7 @@ SYMBOL: responders
     ] with-scope ;
 
 : serving-content ( mime -- )
-    "Content-Type" swons unit
+    "Content-Type" associate
     "200 Document follows" response terpri ;
 
 : serving-html "text/html" serving-content ;
@@ -42,7 +42,7 @@ SYMBOL: responders
 : serving-text "text/plain" serving-content ;
 
 : redirect ( to -- )
-    "Location" swons unit
+    "Location" associate
     "301 Moved Permanently" response terpri ;
 
 : directory-no/ ( -- )
@@ -51,28 +51,26 @@ SYMBOL: responders
         "raw-query" get [ CHAR: ? , % ] when*
     ] "" make redirect ;
 
-: query>alist ( query -- alist )
+: query>hash ( query -- hash )
     dup [
         "&" split [
-            "=" split1
-            dup [ url-decode ] when swap
-            dup [ url-decode ] when swap cons
+            "=" split1 [ dup [ url-decode ] when ] 2apply 2array
         ] map
-    ] when ;
+    ] when alist>hash ;
 
-: read-post-request ( header -- alist )
-    "Content-Length" swap assoc dup
-    [ string>number read query>alist ] when ;
+: read-post-request ( header -- hash )
+    "Content-Length" swap hash dup
+    [ string>number read query>hash ] when ;
 
-: log-user-agent ( alist -- )
-    "User-Agent" swap assoc* [
-        unswons [ % ": " % % ] "" make log-message
+: log-user-agent ( hash -- )
+    "User-Agent" swap hash [
+        [ "User Agent: " % ": " % % ] "" make log-message
     ] when* ;
 
 : prepare-url ( url -- url )
     #! This is executed in the with-request namespace.
     "?" split1
-    dup "raw-query" set query>alist "query" set
+    dup "raw-query" set query>hash "query" set
     dup "request" set ;
 
 : prepare-header ( -- )
@@ -87,11 +85,11 @@ SYMBOL: responders
 ! - request -- the entire URL requested, including responder
 !              name
 ! - raw-query -- raw query string
-! - query -- an alist of query parameters, eg
+! - query -- a hashtable of query parameters, eg
 !            foo.bar?a=b&c=d becomes
-!            [ [[ "a" "b" ]] [[ "c" "d" ]] ]
-! - header -- an alist of headers from the user's client
-! - response -- an alist of the POST request response
+!            H{ { "a" "b" } { "c" "d" } }
+! - header -- a hashtable of headers from the user's client
+! - response -- a hashtable of the POST request response
 
 : add-responder ( responder -- )
     #! Add a responder object to the list.

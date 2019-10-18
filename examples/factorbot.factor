@@ -1,10 +1,9 @@
 ! Simple IRC bot written in Factor.
 
 ! Load the HTTP server first (contrib/httpd/load.factor).
-! This file uses the url-encode and url-decode words.
 
-USING: errors generic hashtables http io kernel math namespaces
-parser prettyprint sequences strings unparser words ;
+USING: errors generic hashtables html http io kernel math
+namespaces parser prettyprint sequences strings words ;
 IN: factorbot
 
 SYMBOL: irc-stream
@@ -48,7 +47,7 @@ M: object handle-irc ( line -- )
 M: privmsg handle-irc ( line -- )
     parse-privmsg
     " " split1 swap
-    [ "factorbot-commands" ] search dup
+    "factorbot-commands" lookup dup
     [ execute ] [ 2drop ] if ;
 
 M: ping handle-irc ( line -- )
@@ -63,31 +62,24 @@ M: ping handle-irc ( line -- )
 : respond ( line -- )
     receiver get nickname get = speaker receiver ? get say ;
 
-: word-string ( word -- string )
-    [
-        "IN: " % dup word-vocabulary %
-        " " % dup definer word-name %
-        " " % dup word-name %
-        "stack-effect" word-prop [ " (" % % ")" % ] when*
-    ] "" make ;
-
-: word-url ( word -- url )
-    [
-        "http://factor.modalwebserver.co.nz/responder/browser/?vocab=" %
-        dup word-vocabulary url-encode %
-        "&word=" %
-        word-name url-encode %
-    ] "" make ;
-
 : irc-loop ( -- )
-    irc-stream get stream-readln
-    [ dup print flush parse-irc irc-loop ] when* ;
+    [
+        irc-stream get stream-readln
+        [ dup print flush parse-irc irc-loop ] when*
+    ] [
+        irc-stream get stream-close
+    ] cleanup ;
 
 : factorbot
     "irc.freenode.net" connect
     "factorbot" login
     "#concatenative" join
     irc-loop ;
+
+: factorbot-loop [ factorbot ] try factorbot-loop ;
+
+: multiline-respond ( string -- )
+    <string-reader> lines [ respond ] each ;
 
 IN: factorbot-commands
 
@@ -98,9 +90,13 @@ IN: factorbot-commands
         "Sorry, I couldn't find anything for " swap append respond
     ] [
         nip [
-            dup word-string " -- " rot word-url append3 respond
+            dup synopsis " -- http://factorcode.org"
+            rot browser-link-href append3 respond
         ] each
     ] if ;
 
 : quit ( text -- )
     drop speaker get "slava" = [ disconnect ] when ;
+
+: memory ( text -- )
+    drop [ room. ] string-out multiline-respond ;

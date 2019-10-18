@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-api
-USE: buffer
 USE: errors
 USE: kernel
 USE: io-internals

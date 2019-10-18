@@ -8,8 +8,8 @@ USE: words
 
 : fie [ ] [ ] if ;
 
-[ ] [ \ fie word-def dataflow linearize drop ] unit-test
+[ ] [ \ fie dup word-def dataflow linearize drop ] unit-test
 
 : foo [ drop ] each-word ;
 
-[ ] [ \ foo word-def dataflow linearize drop ] unit-test
+[ ] [ \ foo dup word-def dataflow linearize drop ] unit-test

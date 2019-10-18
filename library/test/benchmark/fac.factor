@@ -2,7 +2,7 @@ IN: temporary
 USING: compiler kernel math sequences test ;
 
 : (fac) ( n! i -- n! )
-    dup 0 = [
+    dup zero? [
         drop
     ] [
         [ * ] keep 1- (fac)

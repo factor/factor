@@ -44,14 +44,13 @@ SYMBOL: slider-changed
     [ slider-changed ] swap handle-gesture drop ;
 
 : elevator-drag ( elevator -- )
-    dup drag-loc >r find-slider r> over gadget-orientation v.
-    over screen>slider
-    swap set-slider-value* ;
+    [ find-slider ] keep drag-loc over gadget-orientation v.
+    over screen>slider swap set-slider-value* ;
 
 : thumb-actions ( thumb -- )
-    dup [ drop ] [ button-up 1 ] set-action
-    dup [ drop ] [ button-down 1 ] set-action
-    [ find-elevator elevator-drag ] [ drag 1 ] set-action ;
+    dup [ drop ] [ button-up ] set-action
+    dup [ drop ] [ button-down ] set-action
+    [ find-elevator elevator-drag ] [ drag ] set-action ;
 
 : <thumb> ( vector -- thumb )
     <gadget> [ set-gadget-orientation ] keep
@@ -73,7 +72,7 @@ SYMBOL: slider-changed
     swap slide-by-page ;
 
 : elevator-actions ( elevator -- )
-    [ elevator-click ] [ button-down 1 ] set-action ;
+    [ elevator-click ] [ button-down ] set-action ;
 
 C: elevator ( vector -- elevator )
     dup delegate>gadget [ set-gadget-orientation ] keep
@@ -107,7 +106,7 @@ M: elevator layout* ( elevator -- )
 : slider-vertical? gadget-orientation { 0 1 0 } = ;
 
 : <slide-button> ( orientation polygon amount -- )
-    >r gray swap <polygon-gadget> r>
+    >r { 0.5 0.5 0.5 1.0 } swap <polygon-gadget> r>
     [ swap slide-by-line ] curry <repeat-button>
     [ set-gadget-orientation ] keep ;
 

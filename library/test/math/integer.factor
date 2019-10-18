@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel math prettyprint test ;
+USING: kernel math namespaces prettyprint test ;
 
 [ "-8" ] [ -8 unparse ] unit-test
 
@@ -55,7 +55,7 @@ USING: kernel math prettyprint test ;
 ] unit-test
 
 : verify-gcd ( x y )
-    2dup gcd ( a d )
+    2dup swap gcd ( a d )
     >r rot * swap rem r> = ; 
 
 [ t ] [ 123 124 verify-gcd ] unit-test
@@ -67,7 +67,7 @@ USING: kernel math prettyprint test ;
 [ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
 unit-test
 
-[ 0 0 ^ ] unit-test-fails
+[ 0.0/0.0 ] [ 0 0 ^ ] unit-test
 [ 1 ] [ 10 0 ^ ] unit-test
 [ 1/8 ] [ 1/2 3 ^ ] unit-test
 [ 1/8 ] [ 2 -3 ^ ] unit-test
@@ -83,7 +83,7 @@ unit-test
 [ 0 ] [ -7/8 ceiling ] unit-test
 [ -1 ] [ -3/2 ceiling ] unit-test
 
-[ 0 ] [ 0 next-power-of-2 ] unit-test
+[ 1 ] [ 0 next-power-of-2 ] unit-test
 [ 1 ] [ 1 next-power-of-2 ] unit-test
 [ 2 ] [ 2 next-power-of-2 ] unit-test
 [ 4 ] [ 3 next-power-of-2 ] unit-test
@@ -97,3 +97,11 @@ unit-test
 [ 0 ] [ -1 -268435456 >fixnum /i ] unit-test
 [ 0 -1 ] [ -1 -268435456 >fixnum /mod ] unit-test
 [ 14355 ] [ 1591517158873146351817850880000000 32769 mod ] unit-test
+
+[ { 0 1 1 0 } ] [ [ -10 [ , ] each-bit ] { } make ] unit-test
+
+[ -351382792 ] [ -43922849 3 shift ] unit-test
+
+[ t ] [ 0 zero? ] unit-test
+[ f ] [ 30 zero? ] unit-test
+[ t ] [ 0 >bignum zero? ] unit-test

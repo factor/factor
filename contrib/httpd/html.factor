@@ -1,71 +1,83 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: html
-USING: generic http io kernel lists math namespaces
-presentation sequences strings styles words ;
-
-: html-entities ( -- alist )
-    [
-        [[ CHAR: < "&lt;"   ]]
-        [[ CHAR: > "&gt;"   ]]
-        [[ CHAR: & "&amp;"  ]]
-        [[ CHAR: ' "&apos;" ]]
-        [[ CHAR: " "&quot;" ]]
-    ] ;
-
-: chars>entities ( str -- str )
-    #! Convert <, >, &, ' and " to HTML entities.
-    [
-        [ dup html-entities assoc [ % ] [ , ] ?if ] each
-    ] "" make ;
+USING: cont-responder generic hashtables help http inspector io
+kernel lists prototype-js math namespaces sequences strings
+styles words xml ;
 
 : hex-color, ( triplet -- )
-    3 swap head [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
+    3 swap head
+    [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
 
 : fg-css, ( color -- )
     "color: #" % hex-color, "; " % ;
 
+: bg-css, ( color -- )
+    "background-color: #" % hex-color, "; " % ;
+
 : style-css, ( flag -- )
-    dup [ italic bold-italic ] member?
+    dup
+    { italic bold-italic } member?
     [ "font-style: italic; " % ] when
-    [ bold bold-italic ] member?
+    { bold bold-italic } member?
     [ "font-weight: bold; " % ] when ;
 
-: underline-css, ( flag -- )
-    [ "text-decoration: underline; " % ] when ;
-
 : size-css, ( size -- )
-    "font-size: " % # "; " % ;
+    "font-size: " % # "pt; " % ;
 
 : font-css, ( font -- )
     "font-family: " % % "; " % ;
 
-: assoc-apply ( value-alist quot-alist -- )
+: hash-apply ( value-hash quot-hash -- )
     #! Looks up the key of each pair in the first list in the
     #! second list to produce a quotation. The quotation is
     #! applied to the value of the pair. If there is no
     #! corresponding quotation, the value is popped off the
     #! stack.
     swap [
-        unswons rot assoc* dup [ cdr call ] [ 2drop ] if
-    ] each-with ;
+        swap rot hash dup [ call ] [ 2drop ] if
+    ] hash-each-with ;
 
-: css-style ( style -- )
+: span-css-style ( style -- str )
     [
-        [
-            [ foreground  fg-css, ]
-            [ font        font-css, ]
-            [ font-style  style-css, ]
-            [ font-size   size-css, ]
-            [ underline   underline-css, ]
-        ] assoc-apply
+        H{
+            { foreground  [ fg-css,        ] }
+            { background  [ bg-css,        ] }
+            { font        [ font-css,      ] }
+            { font-style  [ style-css,     ] }
+            { font-size   [ size-css,      ] }
+        } hash-apply
     ] "" make ;
 
 : span-tag ( style quot -- )
-    over css-style dup "" = [
+    over span-css-style dup empty? [
         drop call
     ] [
         <span =style span> call </span>
+    ] if ;
+
+: border-css, ( border -- )
+    "border: 1px solid #" % hex-color, "; " % ;
+
+: padding-css, ( padding -- ) "padding: " % # "px; " % ;
+
+: pre-css, ( -- ) "white-space: pre; font-family:monospace; " % ;
+
+: div-css-style ( style -- str )
+    [
+        H{
+            { page-color [ bg-css, ] }
+            { border-color [ border-css, ] }
+            { border-width [ padding-css, ] }
+            { wrap-margin [ [ pre-css, ] unless ] }
+        } hash-apply
+    ] "" make ;
+
+: div-tag ( style quot -- )
+    swap div-css-style dup empty? [
+        drop call
+    ] [
+        <div =style div> call </div>
     ] if ;
 
 : resolve-file-link ( path -- link )
@@ -79,69 +91,121 @@ presentation sequences strings styles words ;
     [ "/" % resolve-file-link url-encode % ] "" make ;
 
 : file-link-tag ( style quot -- )
-    over file swap assoc [
+    over file swap hash [
         <a file-link-href =href a> call </a>
     ] [
         call
     ] if* ;
 
-: browser-link-href ( word -- href )
-    dup word-name swap word-vocabulary
-    [
-        "/responder/browser/?vocab=" %
-        url-encode %
-        "&word=" %
-        url-encode %
-    ] "" make ;
+: do-escaping ( string style -- string )
+    html swap hash [ chars>entities ] unless ;
 
-: browser-link-tag ( style quot -- style )
-    over presented swap assoc dup word? [
-        <a browser-link-href =href a> call </a>
+GENERIC: browser-link-href ( presented -- href )
+
+M: object browser-link-href drop f ;
+
+M: word browser-link-href
+    "/responder/browser/" swap [
+        dup word-vocabulary "vocab" set word-name "word" set
+    ] make-hash build-url ;
+
+M: link browser-link-href
+    link-name [ \ f ] unless* dup word? [
+        browser-link-href
     ] [
-        drop call
+        "/responder/help/" swap "topic" associate build-url
     ] if ;
+
+: object-link-tag ( style quot -- )
+    presented pick hash browser-link-href
+    [ <a =href a> call </a> ] [ call ] if* ;
+
+TUPLE: nested-stream ;
+
+C: nested-stream [ set-delegate ] keep ;
+
+M: nested-stream stream-close drop ;
 
 TUPLE: html-stream ;
 
+C: html-stream ( stream -- stream ) [ set-delegate ] keep ;
+
 M: html-stream stream-write1 ( char stream -- )
-    [
-        dup html-entities assoc [ write ] [ write1 ] ?if
-    ] with-wrapper ;
+    >r ch>string r> stream-write ;
+
+: delegate-write delegate stream-write ;
+
+M: html-stream stream-write ( str stream -- )
+    >r chars>entities r> delegate-write ;
 
 M: html-stream stream-format ( str style stream -- )
     [
         [
             [
-                [ drop chars>entities write ] span-tag
+                [
+                    do-escaping stdio get delegate-write
+                ] span-tag
             ] file-link-tag
-        ] browser-link-tag
-    ] with-wrapper ;
-
-C: html-stream ( stream -- stream )
-    #! Wraps the given stream in an HTML stream. An HTML stream
-    #! converts special characters to entities when being
-    #! written, and supports writing attributed strings with
-    #! the following attributes:
-    #!
-    #! foreground - an rgb triplet in a list
-    #! background - an rgb triplet in a list
-    #! font
-    #! font-style
-    #! font-size
-    #! underline
-    #! file
-    #! word
-    #! vocab
-    [ >r <wrapper-stream> r> set-delegate ] keep ;
+        ] object-link-tag
+    ] with-stream* ;
 
 : with-html-stream ( quot -- )
-    [ stdio [ <html-stream> ] change  call ] with-scope ;
+    stdio get <html-stream> swap with-stream* ;
+
+: html-outliner ( caption contents -- )
+    <table "display: inline; " =style table>
+        <tr>
+            <td>
+                "+" get-random-id dup >r rot [
+                    with-html-stream
+                ] curry [ , \ show-final , ] [ ] make updating-anchor
+            </td>
+            <td>
+                call
+            </td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> <div r> =id div> </td>
+        </tr>
+    </table> ;
+
+: outliner-tag ( style quot -- )
+    outline pick hash [ html-outliner ] [ call ] if* ;
+
+M: html-stream with-nested-stream ( quot style stream -- )
+    [
+        [
+            [
+                [
+                    stdio get <nested-stream> swap with-stream*
+                ] div-tag
+            ] object-link-tag
+        ] outliner-tag
+    ] with-stream* ;
+
+M: html-stream stream-terpri [ <br/> ] with-stream* ;
+
+: default-css ( -- )
+  <style>
+    "A:link { text-decoration: none; color: black; }" print
+    "A:visited { text-decoration: none; color: black; }" print
+    "A:active { text-decoration: none; color: black; }" print
+    "A:hover, A:hover { text-decoration: none; color: black; }" print
+  </style> ;
+
+: xhtml-preamble
+    "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" print
+    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" print ;
 
 : html-document ( title quot -- )
+    xhtml-preamble
     swap chars>entities dup
     <html>
         <head>
             <title> write </title>
+            default-css
+            include-prototype-js
         </head>
         <body>
             <h1> write </h1>

@@ -23,8 +23,8 @@
 !
 ! Examples of using the concurrency library.
 IN: concurrency-examples
-USING: concurrency dlists errors gadgets-theme io kernel lists
-math namespaces opengl prettyprint sequences threads unparser ;
+USING: concurrency dlists errors gadgets-theme gadgets-panes io kernel lists
+math math-contrib namespaces opengl prettyprint sequences threads ;
 
 : (logger) ( mailbox -- )
   #! Using the given mailbox, start a thread which
@@ -43,7 +43,7 @@ math namespaces opengl prettyprint sequences threads unparser ;
     "Pong server shutting down" swap send
   ] if ;
   
-: pong-server0 ( -- process)
+: pong-server0 ( -- process )
   [ (pong-server0) ] spawn ;
 
 TUPLE: ping-message from ;
@@ -176,7 +176,7 @@ C: promised-label ( promise -- promised-label )
     drop "Unfulfilled Promise" 
   ] if ;
 
-M: promised-label pref-dim ( promised-label - dim )
+M: promised-label pref-dim* ( promised-label - dim )
   label-size ;
 
 M: promised-label draw-gadget* ( promised-label -- )

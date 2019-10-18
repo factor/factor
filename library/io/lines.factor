@@ -1,5 +1,5 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: io
 USING: errors generic io kernel math namespaces sequences
 vectors ;
@@ -41,9 +41,6 @@ M: line-reader stream-read ( count line -- string )
         drop
     ] if ;
 
-: (lines) ( seq -- seq )
-    readln [ over push (lines) ] when* ;
+: (lines) ( seq -- seq ) readln [ , (lines) ] when* ;
 
-: lines ( stream -- seq )
-    #! Read all lines from the stream into a sequence.
-    [ V{ } clone (lines) ] with-stream ;
+: lines ( stream -- seq ) [ [ (lines) ] { } make ] with-stream ;

@@ -9,13 +9,10 @@ namespaces parser prettyprint sequences strings vectors words ;
     #! shorter, pad it with unknown results at the bottom.
     dup 0 [ length max ] reduce swap [ add-inputs ] map-with ;
 
-: unify-length ( seq seq -- seq )
-    2array unify-lengths first2 ;
-
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
-    dup all-eq? [ first ] [ drop <value> ] if ;
+    dup all-eq? [ first ] [ drop <computed> ] if ;
 
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
@@ -57,12 +54,13 @@ namespaces parser prettyprint sequences strings vectors words ;
     unify-effect meta-d set d-in set ;
 
 : callstack-effect ( seq -- )
-    dup length 0 <repeated>
+    dup length 0 <array>
     swap meta-r active-variable
     unify-effect meta-r set drop ;
 
 : unify-effects ( seq -- )
-    dup datastack-effect callstack-effect ;
+    dup datastack-effect dup callstack-effect
+    [ terminated? swap hash ] all? terminated? set ;
 
 : unify-dataflow ( effects -- nodes )
     [ [ dataflow-graph get ] bind ] map ;
@@ -83,7 +81,7 @@ namespaces parser prettyprint sequences strings vectors words ;
             base-case-continuation set
             copy-inference
             dup value-recursion recursive-state set
-            dup literal-value infer-quot
+            dup value-literal infer-quot
             terminated? get [ #values node, ] unless
             f
         ] callcc1 [ terminate ] when drop

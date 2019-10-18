@@ -8,7 +8,7 @@ TUPLE: divider splitter ;
 
 : divider-size { 8 8 0 } ;
 
-M: divider pref-dim drop divider-size ;
+M: divider pref-dim* drop divider-size ;
 
 TUPLE: splitter split ;
 
@@ -21,9 +21,9 @@ TUPLE: splitter split ;
     0 max 1 min over set-splitter-split relayout-1 ;
 
 : divider-actions ( thumb -- )
-    dup [ drop ] [ button-down 1 ] set-action
-    dup [ drop ] [ button-up 1 ] set-action
-    [ gadget-parent divider-motion ] [ drag 1 ] set-action ;
+    dup [ drop ] [ button-down ] set-action
+    dup [ drop ] [ button-up ] set-action
+    [ gadget-parent divider-motion ] [ drag ] set-action ;
 
 C: divider ( -- divider )
     dup delegate>gadget
@@ -55,3 +55,6 @@ C: splitter ( first second split vector -- splitter )
 
 M: splitter layout* ( splitter -- )
     dup splitter-layout packed-layout ;
+
+: find-splitter ( gadget -- splitter )
+    [ splitter? ] find-parent ;

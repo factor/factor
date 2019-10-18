@@ -1,0 +1,6 @@
+IN: sequences
+USING: help kernel ;
+
+HELP: sequence= "( seq1 seq2 -- ? )"
+{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "?" "a boolean" } }
+{ $description "Tests if the two sequences have the same length and elements. This is weaker than " { $link = } ", since it does not ensure that the sequences are instances of the same class." } ;

@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: assembler compiler compiler-backend errors generic
-hashtables kernel lists math namespaces parser sequences strings
-words ;
+hashtables kernel kernel-internals lists math namespaces parser
+sequences strings words ;
 
 ! Some code for interfacing with C structures.
 
@@ -35,7 +35,7 @@ words ;
     #! type is exactly like void*.
     [
         "width" set
-        cell "align" set
+        bootstrap-cell "align" set
         [ swap <displaced-alien> ] "getter" set
     ] "struct-name" get define-c-type
-    "struct-name" get "in" get init-c-type ;
+    "struct-name" get in get init-c-type ;

@@ -64,7 +64,7 @@ void primitive_fwrite(void)
 	if(string_capacity(text) == 0)
 		return;
 
-	if(fwrite(to_c_string_unchecked(text),1,
+	if(fwrite(to_c_string(text,false),1,
 		untag_fixnum_fast(text->length),
 		file) == 0)
 		io_error();

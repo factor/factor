@@ -19,7 +19,11 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     [ swap ?hash [ object ] unless* ] map-with ;
 
 : dispatching-classes ( node -- seq )
-    dup dup node-param dispatching-values node-classes* ;
+    dup node-in-d empty? [
+        drop { }
+    ] [
+        dup dup node-param dispatching-values node-classes*
+    ] if ;
 
 : already-inlined? ( node -- ? )
     #! Was this node inlined from definition of 'word'?
@@ -46,8 +50,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     dup inlining-class swap node-param "methods" word-prop hash ;
 
 : method-dataflow ( node -- dataflow )
-    dup will-inline swap node-in-d dataflow-with
-    dup solve-recursion ;
+    dup will-inline swap node-in-d dataflow-with ;
 
 : inline-method ( node -- node )
     #! We set the #call node's param to f so that it gets killed

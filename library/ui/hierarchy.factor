@@ -1,22 +1,39 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: gadgets-layouts generic hashtables kernel lists math
 namespaces sequences vectors ;
 
-: remove-gadget ( gadget parent -- )
-    f pick set-gadget-parent
-    [ gadget-children delete ] keep
-    relayout ;
+GENERIC: add-notify* ( gadget -- )
+
+M: gadget add-notify* drop ;
+
+: add-notify ( gadget -- )
+    dup [ add-notify ] each-child add-notify* ;
+
+GENERIC: remove-notify* ( gadget -- )
+
+M: gadget remove-notify* drop ;
+
+: remove-notify ( gadget -- )
+    dup [ remove-notify* ] each-child remove-notify* ;
+
+: (unparent) ( gadget -- )
+    dup remove-notify
+    dup forget-pref-dim f swap set-gadget-parent ;
 
 : unparent ( gadget -- )
     [
-        dup gadget-parent dup
-        [ 2dup remove-gadget ] when 2drop
+        dup gadget-parent dup [
+            over (unparent)
+            [ gadget-children delete ] keep relayout
+        ] [
+            2drop
+        ] if
     ] when* ;
 
 : (clear-gadget) ( gadget -- )
-    dup gadget-children [ f swap set-gadget-parent ] each
+    dup gadget-children [ (unparent) ] each
     f swap set-gadget-children ;
 
 : clear-gadget ( gadget -- )
@@ -25,7 +42,8 @@ namespaces sequences vectors ;
 : (add-gadget) ( gadget box -- )
     over unparent
     dup pick set-gadget-parent
-    [ gadget-children ?push ] keep set-gadget-children ;
+    [ gadget-children ?push ] 2keep swapd set-gadget-children
+    add-notify ;
 
 : add-gadget ( gadget parent -- )
     #! Add a gadget to a parent gadget.
@@ -47,7 +65,7 @@ namespaces sequences vectors ;
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
 
-: find-parent ( gadget quot -- ? )
+: find-parent ( gadget quot -- gadget )
     >r parents r> find nip ; inline
 
 : screen-loc ( gadget -- point )

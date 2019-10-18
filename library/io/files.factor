@@ -14,13 +14,9 @@ styles ;
 
 : directory ( dir -- list )
     (directory)
-    H{ [[ "." "." ]] [[ ".." ".." ]] }
-    swap remove-all string-sort ;
+    [ { "." ".." } member? not ] subset natural-sort ;
 
 : file-length ( file -- length ) stat third ;
-
-: file-extension ( filename -- extension )
-    "." split dup length 1 <= [ drop f ] [ peek ] if ;
 
 : resource-path ( path -- path )
     "resource-path" get [ "." ] unless* swap path+ ;
@@ -29,18 +25,18 @@ styles ;
     #! Open a file path relative to the Factor source code root.
     resource-path <file-reader> ;
 
+: (file.) ( name path -- )
+    file associate [ format* ] with-style ;
+
 DEFER: directory.
 
-: file-style ( text path -- text style )
-    dup directory? [
-        >r "/" append r>
-        dup [ directory. ] curry outline swons unit
-    ] [
-        f
-    ] if swap file swons swons ;
+: (directory.) ( name path -- )
+    dup [ directory. ] curry
+    [ "/" append (file.) ] write-outliner ;
 
 : file. ( dir name -- )
-    tuck path+ file-style format ;
+    tuck path+
+    dup directory? [ (directory.) ] [ (file.) terpri ] if ;
 
 : directory. ( dir -- )
-    dup directory [ file. terpri ] each-with ;
+    dup directory [ file. ] each-with ;

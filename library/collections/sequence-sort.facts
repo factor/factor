@@ -1,0 +1,15 @@
+IN: sequences
+USING: help kernel words ;
+
+HELP: sort "( seq quot -- sortedseq )"
+{ $values { "seq" "a sequence" } { "quot" "a comparator quotation" } { "sortedseq" "a new sorted sequence" } }
+{ $description "Sorts the elements into a new sequence of the same class as " { $snippet "seq" } "." } ;
+
+HELP: nsort "( seq quot -- sortedseq )"
+{ $values { "seq" "a mutable sequence" } { "quot" "a comparator quotation" } { "sortedseq" "a new sorted sequence" } }
+{ $description "Sorts the sequence in-place." }
+{ $side-effects "seq" } ;
+
+HELP: natural-sort "( seq -- sortedseq )"
+{ $values { "seq" "a sequence of real numbers" } { "sortedseq" "a new sorted sequence" } }
+{ $description "Sorts a sequence of objects in natural order using the " { $link <=> } " word." } ;

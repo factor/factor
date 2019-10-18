@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: arrays errors generic hashtables kernel lists math
-namespaces parser sequences words ;
+USING: arrays errors generic hashtables kernel kernel-internals
+lists math memory namespaces parser sequences words ;
 
 ! The linear IR is the second of the two intermediate
 ! representations used by Factor. It is basically a high-level
@@ -18,9 +18,6 @@ namespaces parser sequences words ;
 : label? ( obj -- ? )
     dup word? [ "label" word-prop ] [ drop f ] if ;
 
-! A location is a virtual register or a stack slot. We can
-! ask a VOP if it reads or writes a location.
-
 ! A virtual register
 TUPLE: vreg n ;
 
@@ -28,11 +25,15 @@ TUPLE: vreg n ;
 TUPLE: int-regs ;
 TUPLE: float-regs size ;
 
-GENERIC: fastcall-regs ( register-class -- n )
+GENERIC: return-reg ( register-class -- reg )
 
-GENERIC: reg-class-size ( register-class -- n )
+GENERIC: fastcall-regs ( register-class -- regs )
 
-M: float-regs reg-class-size float-regs-size ;
+GENERIC: reg-size ( register-class -- n )
+
+M: int-regs reg-size drop cell ;
+
+M: float-regs reg-size float-regs-size ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;
@@ -43,16 +44,40 @@ TUPLE: cs-loc n ;
 ! A pseudo-register class for parameters spilled on the stack
 TUPLE: stack-params ;
 
+GENERIC: v>operand
+
+M: integer v>operand tag-bits shift ;
+
+M: vreg v>operand vreg-n vregs nth ;
+
+M: f v>operand address ;
+
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
 
-: vop-in ( vop n -- input ) swap vop-inputs nth ;
-: set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
-: vop-out ( vop n -- input ) swap vop-outputs nth ;
-: set-vop-out ( input vop n -- ) swap vop-outputs set-nth ;
+: (scratch)
+    vop get dup vop-inputs swap vop-outputs append
+    [ vreg? ] subset [ v>operand ] map vregs diff ;
+
+: scratch ( n -- reg )
+    #! Output a scratch register that is not used by the
+    #! current VOP.
+    \ scratch get nth ;
+
+: with-vop ( vop quot -- )
+    [
+        swap vop set (scratch) \ scratch set call
+    ] with-scope ; inline
+
+: input ( n -- obj ) vop get vop-inputs nth ;
+: input-operand ( n -- n ) input v>operand ;
+: output ( n -- obj ) vop get vop-outputs nth ;
+: output-operand ( n -- n ) output v>operand ;
+: label ( -- label ) vop get vop-label ;
 
 GENERIC: basic-block? ( vop -- ? )
 M: vop basic-block? drop f ;
+
 ! simplifies some code
 M: f basic-block? drop f ;
 
@@ -93,25 +118,13 @@ TUPLE: %return ;
 C: %return make-vop ;
 : %return empty-vop <%return> ;
 
-TUPLE: %return-to ;
-C: %return-to make-vop ;
-: %return-to label-vop <%return-to> ;
-
 TUPLE: %jump ;
 C: %jump make-vop ;
 : %jump label-vop <%jump> ;
 
-TUPLE: %jump-label ;
-C: %jump-label make-vop ;
-: %jump-label label-vop <%jump-label> ;
-
 TUPLE: %call ;
 C: %call make-vop ;
 : %call label-vop <%call> ;
-
-TUPLE: %call-label ;
-C: %call-label make-vop ;
-: %call-label label-vop <%call-label> ;
 
 TUPLE: %jump-t ;
 C: %jump-t make-vop ;
@@ -125,14 +138,6 @@ C: %dispatch make-vop ;
 TUPLE: %target-label ;
 C: %target-label make-vop ;
 : %target-label label-vop <%target-label> ;
-
-TUPLE: %target ;
-C: %target make-vop ;
-: %target label-vop <%target> ;
-
-TUPLE: %end-dispatch ;
-C: %end-dispatch make-vop ;
-: %end-dispatch empty-vop <%end-dispatch> ;
 
 ! stack operations
 TUPLE: %peek ;
@@ -179,11 +184,6 @@ C: %immediate make-vop ;
 
 M: %immediate basic-block? drop t ;
 
-: in-1 0 0 %peek-d , ;
-: in-2 0 1 %peek-d ,  1 0 %peek-d , ;
-: in-3 0 2 %peek-d ,  1 1 %peek-d ,  2 0 %peek-d , ;
-: out-1 T{ vreg f 0 } 0 %replace-d , ;
-
 ! indirect load of a literal through a table
 TUPLE: %indirect ;
 C: %indirect make-vop ;
@@ -197,18 +197,22 @@ C: %untag make-vop ;
 : %untag <vreg> dest-vop <%untag> ;
 M: %untag basic-block? drop t ;
 
+: slot-vop [ <vreg> ] 2apply 2-vop ;
+
 TUPLE: %slot ;
 C: %slot make-vop ;
-: %slot ( n vreg ) >r <vreg> r> <vreg> 2-vop <%slot> ;
+: %slot ( n vreg ) slot-vop <%slot> ;
 M: %slot basic-block? drop t ;
+
+: set-slot-vop
+    rot <vreg> rot <vreg> rot <vreg> dup >r 3array r> 1array f ;
 
 TUPLE: %set-slot ;
 C: %set-slot make-vop ;
 
 : %set-slot ( value obj n )
     #! %set-slot writes to vreg obj.
-    rot <vreg> rot <vreg> rot <vreg> over >r 3array r> 1array
-    f <%set-slot> ;
+    set-slot-vop <%set-slot> ;
 
 M: %set-slot basic-block? drop t ;
 
@@ -227,6 +231,21 @@ C: %fast-set-slot make-vop ;
     >r >r <vreg> r> <vreg> r> over >r 3array r> 1array f
     <%fast-set-slot> ;
 M: %fast-set-slot basic-block? drop t ;
+
+! Char readers and writers
+TUPLE: %char-slot ;
+C: %char-slot make-vop ;
+: %char-slot ( n vreg ) slot-vop <%char-slot> ;
+M: %char-slot basic-block? drop t ;
+
+TUPLE: %set-char-slot ;
+C: %set-char-slot make-vop ;
+
+: %set-char-slot ( value ch n )
+    #! %set-char-slot writes to vreg obj.
+    set-slot-vop <%set-char-slot> ;
+
+M: %set-char-slot basic-block? drop t ;
 
 TUPLE: %write-barrier ;
 C: %write-barrier make-vop ;
@@ -262,17 +281,13 @@ TUPLE: %fixnum-bitnot ;
 C: %fixnum-bitnot make-vop ; : %fixnum-bitnot 2-vop <%fixnum-bitnot> ;
 M: %fixnum-bitnot basic-block? drop t ;
 
-! At the VOP level, the 'shift' operation is split into five
+! At the VOP level, the 'shift' operation is split into four
 ! distinct operations:
-! - shifts with a large positive count: calls runtime to make
+! - shifts with a positive count: calls runtime to make
 !   a bignum
-! - shifts with a small positive count: %fixnum<<
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a large negative count: %fixnum-sgn
-TUPLE: %fixnum<< ;
-C: %fixnum<< make-vop ;   : %fixnum<<   3-vop <%fixnum<<> ;
-
 TUPLE: %fixnum>> ;
 C: %fixnum>> make-vop ;   : %fixnum>>   3-vop <%fixnum>>> ;
 M: %fixnum>> basic-block? drop t ;
@@ -315,12 +330,6 @@ C: %tag make-vop ;
 : %tag ( vreg ) <vreg> dest-vop <%tag> ;
 M: %tag basic-block? drop t ;
 
-: check-dest ( vop reg -- )
-    swap 0 vop-out = [ "bad VOP destination" throw ] unless ;
-
-: check-src ( vop reg -- )
-    swap 0 vop-in = [ "bad VOP source" throw ] unless ;
-
 TUPLE: %getenv ;
 C: %getenv make-vop ;
 : %getenv swap src/dest-vop <%getenv> ;
@@ -329,12 +338,11 @@ M: %getenv basic-block? drop t ;
 TUPLE: %setenv ;
 C: %setenv make-vop ;
 : %setenv 2-in-vop <%setenv> ;
-M: %setenv basic-block? drop t ;
 
 ! alien operations
 TUPLE: %parameters ;
 C: %parameters make-vop ;
-M: %parameters stack-reserve 0 vop-in ;
+M: %parameters stack-reserve vop-inputs first ;
 : %parameters ( n -- vop ) src-vop <%parameters> ;
 
 TUPLE: %parameter ;

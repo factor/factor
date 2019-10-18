@@ -1,8 +1,12 @@
 ! Copyright (C) 2005 Alex Chapman.
-! See http://factor.sf.net/license.txt for BSD license.
-IN: alien
-USING: compiler kernel lists math namespaces parser
-sequences words ;
+! See http://factorcode.org/license.txt for BSD license.
+IN: !syntax
+USING: alien compiler kernel lists math namespaces parser
+sequences syntax words ;
+
+: DLL" skip-blank parse-string dlopen swons ; parsing
+
+: ALIEN: scan-word <alien> swons ; parsing
 
 ! usage of 'LIBRARY:' and 'FUNCTION:' :
 !
@@ -13,7 +17,6 @@ sequences words ;
 !
 !     : glTranslatef ( x y z -- )
 !         "void" "gl" "glTranslatef" [ "GLfloat" "GLfloat" "GLfloat" ] alien-invoke ;
-!     \ glTranslatef compile
 !
 ! other forms:
 !

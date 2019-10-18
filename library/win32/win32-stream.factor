@@ -24,7 +24,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-stream
-USING: alien continuations generic io-internals kernel
+USING: alien generic io-internals kernel
 kernel-internals lists math namespaces prettyprint sequences
 io strings threads win32-api win32-io-internals ;
 
@@ -72,7 +72,7 @@ SYMBOL: cutoff
     out-buffer get buffer-length 0 > [ flush-output ] when ;
 
 M: integer do-write ( int -- )
-    out-buffer get [ buffer-capacity 0 = [ flush-output ] when ] keep
+    out-buffer get [ buffer-capacity zero? [ flush-output ] when ] keep
     >r ch>string r> >buffer ;
 
 M: string do-write ( str -- )
@@ -96,7 +96,7 @@ M: string do-write ( str -- )
     dup in-buffer get n>buffer update-file-pointer ;
 
 : consume-input ( count -- str ) 
-    in-buffer get buffer-length 0 = [ fill-input ] when
+    in-buffer get buffer-length zero? [ fill-input ] when
     in-buffer get buffer-size min
     dup in-buffer get buffer-first-n
     swap in-buffer get buffer-consume ;
@@ -105,11 +105,11 @@ M: string do-write ( str -- )
     dup length 0 > [ >string ] [ drop f ] if ;
 
 : do-read-count ( sbuf count -- str )
-    dup 0 = [ 
+    dup zero? [ 
         drop >string 
     ] [
         dup consume-input
-        dup length dup 0 = [
+        dup length dup zero? [
             3drop >string-or-f
         ] [
             >r swap r> - >r swap [ swap nappend ] keep r> do-read-count
@@ -119,22 +119,28 @@ M: string do-write ( str -- )
 : peek-input ( -- str )
     1 in-buffer get buffer-first-n ;
 
-M: win32-stream stream-format ( str style stream -- )
-    win32-stream-this nip [ do-write ] bind ;
+M: win32-stream stream-write ( str stream -- )
+    win32-stream-this [ do-write ] bind ;
+
+M: win32-stream stream-write1 ( char stream -- )
+    win32-stream-this [ >fixnum do-write ] bind ;
 
 M: win32-stream stream-read ( count stream -- str )
     win32-stream-this [ dup <sbuf> swap do-read-count ] bind ;
 
 M: win32-stream stream-read1 ( stream -- str )
     win32-stream-this [
-        1 consume-input dup length 0 = [ drop f ] when first 
+        1 consume-input dup length zero? [ drop f ] when first 
     ] bind ;
+
+M: win32-stream stream-readln ( stream -- str )
+    win32-stream-this [ readln ] bind ;
+
+M: win32-stream stream-terpri
+    win32-stream-this [ CHAR: \n do-write ] bind ;
 
 M: win32-stream stream-flush ( stream -- )
     win32-stream-this [ maybe-flush-output ] bind ;
-
-M: win32-stream stream-finish ( stream -- )
-    drop ;
 
 M: win32-stream stream-close ( stream -- )
     win32-stream-this [
@@ -143,6 +149,9 @@ M: win32-stream stream-close ( stream -- )
         in-buffer get buffer-free 
         out-buffer get buffer-free
     ] bind ;
+
+M: win32-stream stream-format ( string style stream -- )
+    win32-stream-this [ drop do-write ] bind ;
 
 M: win32-stream win32-stream-handle ( stream -- handle )
     win32-stream-this [ handle get ] bind ;
@@ -154,6 +163,9 @@ M: win32-stream expire ( stream -- )
     win32-stream-this [
         timeout get [ millis cutoff get > [ handle get CancelIo ] when ] when
     ] bind ;
+
+M: win32-stream with-nested-stream ( quot style stream -- )
+    win32-stream-this [ drop stream get swap with-stream* ] bind ;
 
 C: win32-stream ( handle -- stream )
     swap [
@@ -172,5 +184,4 @@ C: win32-stream ( handle -- stream )
 
 : <win32-file-writer> ( path -- stream )
     f t win32-open-file <win32-stream> ;
-
 

@@ -1,13 +1,14 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-layouts
 USING: gadgets generic io kernel math namespaces ;
 
 ! Incremental layout allows adding lines to panes to be O(1).
 ! Note that incremental packs are distinct from ordinary packs
 ! defined in layouts.factor, since you don't want all packs to
-! be incremental. In particular, if the children of the pack
-! change size, the incremental strategy does not work.
+! be incremental. In particular, incremental packs do not
+! support non-default values for pack-align, pack-fill and
+! pack-gap.
 
 ! The cursor is the current size of the incremental pack.
 ! New gadgets are added at cursor-cursor*gadget-orientation.
@@ -18,7 +19,7 @@ C: incremental ( pack -- incremental )
     [ set-gadget-delegate ] keep
     dup delegate pref-dim over set-incremental-cursor ;
 
-M: incremental pref-dim ( incremental -- dim )
+M: incremental pref-dim* ( incremental -- dim )
     dup gadget-relayout? [
         dup delegate pref-dim over set-incremental-cursor
     ] when incremental-cursor ;
@@ -37,7 +38,7 @@ M: incremental pref-dim ( incremental -- dim )
     swap set-rect-loc ;
 
 : prefer-incremental ( gadget -- )
-    dup pref-dim over set-rect-dim layout ;
+    dup forget-pref-dim dup pref-dim over set-rect-dim layout ;
 
 : add-incremental ( gadget incremental -- )
     2dup (add-gadget)
@@ -47,6 +48,6 @@ M: incremental pref-dim ( incremental -- dim )
     prefer-incremental ;
 
 : clear-incremental ( incremental -- )
-    dup (clear-gadget)
+    dup (clear-gadget) dup forget-pref-dim
     { 0 0 0 } over set-incremental-cursor
     gadget-parent [ relayout ] when* ;

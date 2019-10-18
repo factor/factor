@@ -29,14 +29,15 @@ INLINE CELL string_size(CELL size)
 	return align8(sizeof(F_STRING) + (size + 1) * CHARS);
 }
 
-F_STRING* allot_string(CELL capacity);
-F_STRING* string(CELL capacity, CELL fill);
+F_STRING* allot_string(F_FIXNUM capacity);
+F_STRING* string(F_FIXNUM capacity, CELL fill);
+void primitive_string(void);
 void rehash_string(F_STRING* str);
 void primitive_rehash_string(void);
 F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill);
 void primitive_resize_string(void);
-char* to_c_string(F_STRING* s);
-char* to_c_string_unchecked(F_STRING* s);
+F_ARRAY *string_to_alien(F_STRING *s, bool check);
+char* to_c_string(F_STRING* s, bool check);
 void string_to_memory(F_STRING* s, BYTE* string);
 void primitive_string_to_memory(void);
 DLLEXPORT void box_c_string(const char* c_string);

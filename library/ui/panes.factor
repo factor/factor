@@ -1,29 +1,29 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets-presentations
-DEFER: <presentation>
-DEFER: gadget.
-
 IN: gadgets-panes
 USING: arrays gadgets gadgets-buttons gadgets-editors
 gadgets-labels gadgets-layouts gadgets-scrolling gadgets-theme
-generic hashtables io kernel line-editor lists math namespaces
-prettyprint sequences strings styles threads ;
+generic hashtables io kernel line-editor math namespaces
+sequences strings styles threads ;
 
 ! A pane is an area that can display text.
 
 ! output: pile
 ! current: shelf
 ! input: editor
-TUPLE: pane output active current input continuation scrolls? ;
+TUPLE: pane output active current input prototype
+continuation scrolls? ;
 
 : add-output 2dup set-pane-output add-gadget ;
 
 : <active-line> ( current input -- line )
     [ 2array ] [ 1array ] if* make-shelf ;
 
-: init-active-line ( pane -- )
-    dup pane-active unparent
+: init-line ( pane -- )
+    dup pane-prototype clone swap set-pane-current ;
+
+: prepare-line ( pane -- )
+    dup init-line dup pane-active unparent
     [ dup pane-current swap pane-input <active-line> ] keep
     2dup set-pane-active add-gadget ;
 
@@ -31,21 +31,15 @@ TUPLE: pane output active current input continuation scrolls? ;
     dup pane-continuation f rot set-pane-continuation ;
 
 : pane-eval ( string pane -- )
-    pop-continuation dup
-    [ [ continue-with ] in-thread ] when 2drop ;
+    pop-continuation dup [
+        [ continue-with ] in-thread
+    ] when 2drop ;
 
 SYMBOL: structured-input
 
-: elements. ( quot -- )
-    [
-        2 nesting-limit set
-        5 length-limit set
-        <block pprint-elements block> newline
-    ] with-pprint ;
-
 : pane-call ( quot pane -- )
-    2dup [ elements. ] with-stream*
-    >r structured-input global set-hash
+    "<< command >>" over stream-print
+    >r structured-input set-global
     "\"structured-input\" \"gadgets-panes\" lookup global hash call"
     r> pane-eval ;
 
@@ -56,52 +50,41 @@ SYMBOL: structured-input
 : replace-input ( string pane -- )
     pane-input set-editor-text ;
 
-: <input-button> ( string -- button )
-    dup <label> dup editor-theme
-    swap [ nip pane get replace-input ] curry
-    <roll-button> ;
-
 : print-input ( string pane -- )
-    [ <input-button> gadget. ] with-stream* ;
+    [
+        dup [
+            <input> presented set
+            bold font-style set
+        ] make-hash format terpri
+    ] with-stream* ;
 
-: pane-return ( pane -- )
-    dup pane-input dup [
-        editor-commit swap 2dup print-input 2dup pane-eval
-    ] when 2drop ;
+: pane-commit ( pane -- )
+    dup pane-input editor-commit swap 2dup print-input pane-eval ;
 
 : pane-clear ( pane -- )
     dup pane-output clear-incremental pane-current clear-gadget ;
  
 : pane-actions ( line -- )
     H{
-        [[ [ button-down 1 ] [ pane-input [ click-editor ] when* ] ]]
-        [[ [ "RETURN" ] [ pane-return ] ]]
-        [[ [ "UP" ] [ pane-input [ [ history-prev ] with-editor ] when* ] ]]
-        [[ [ "DOWN" ] [ pane-input [ [ history-next ] with-editor ] when* ] ]]
-        [[ [ "CTRL" "l" ] [ pane get pane-clear ] ]]
+        { [ button-down ] [ pane-input click-editor ] }
+        { [ "RETURN" ] [ pane-commit ] }
+        { [ "UP" ] [ pane-input [ history-prev ] with-editor ] }
+        { [ "DOWN" ] [ pane-input [ history-next ] with-editor ] }
+        { [ "CTRL" "l" ] [ pane-clear ] }
     } add-actions ;
 
-C: pane ( input? scrolls? -- pane )
-    #! You can create output-only panes. If the scrolls flag is
-    #! set, the pane will scroll to the bottom when input is
-    #! added.
-    [ set-pane-scrolls? ] keep
+C: pane ( -- pane )
     <pile> over set-delegate
+    <shelf> over set-pane-prototype
     <pile> <incremental> over add-output
-    <shelf> over set-pane-current
-    swap [ "" <editor> over set-pane-input ] when
-    dup init-active-line
-    dup pane-actions ;
+    dup prepare-line ;
+
+: <input-pane> ( -- pane )
+    <pane> t over set-pane-scrolls?
+    "" <editor> over set-pane-input dup pane-actions ;
 
 M: pane focusable-child* ( pane -- editor )
     pane-input [ t ] unless* ;
-
-: pane-write-1 ( style text pane -- )
-    pick not pick empty? and [
-        3drop
-    ] [
-        >r <presentation> r> pane-current add-gadget
-    ] if ;
 
 : prepare-print ( current -- gadget )
     #! Optimization: if line has 1 child, add the child.
@@ -111,21 +94,29 @@ M: pane focusable-child* ( pane -- editor )
         { [ t ] [ drop ] }
     } cond ;
 
-: pane-print-1 ( current pane -- )
-    >r prepare-print r> pane-output add-incremental ;
+M: pane stream-terpri ( pane -- )
+    dup pane-current prepare-print
+    over pane-output add-incremental
+    prepare-line ;
 
-: pane-terpri ( pane -- )
-    dup pane-current over pane-print-1
-    <shelf> over set-pane-current init-active-line ;
+: pane-write ( pane seq -- )
+    [ over pane-current stream-write ]
+    [ dup stream-terpri ] interleave drop ;
 
-: pane-write ( style pane list -- )
-    3dup car swap pane-write-1 cdr dup
-    [ over pane-terpri pane-write ] [ 3drop ] if ;
+: pane-format ( style pane seq -- )
+    [ pick pick pane-current stream-format ]
+    [ dup stream-terpri ] interleave 2drop ;
+
+: write-gadget ( gadget pane -- )
+    #! Print a gadget to the given pane.
+    pane-current add-gadget ;
+
+: gadget. ( gadget -- )
+    #! Print a gadget to the current pane.
+    stdio get write-gadget terpri ;
 
 ! Panes are streams.
 M: pane stream-flush ( pane -- ) drop ;
-
-M: pane stream-finish ( pane -- ) drop ;
 
 M: pane stream-readln ( pane -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
@@ -134,19 +125,25 @@ M: pane stream-readln ( pane -- line )
     dup pane-scrolls? [ pane-input scroll>caret ] [ drop ] if ;
 
 M: pane stream-write1 ( char pane -- )
-    [ >r ch>string <label> r> pane-current add-gadget ] keep
-    scroll-pane ;
+    [ pane-current stream-write1 ] keep scroll-pane ;
+
+M: pane stream-write ( string pane -- )
+    [ swap "\n" split pane-write ] keep scroll-pane ;
 
 M: pane stream-format ( string style pane -- )
-    [ rot "\n" split pane-write ] keep scroll-pane ;
+    [ rot "\n" split pane-format ] keep scroll-pane ;
 
 M: pane stream-close ( pane -- ) drop ;
 
-: make-pane ( quot -- pane )
-    #! Execute the quotation with output to an output-only pane.
-    f f <pane> [ swap with-stream ] keep ; inline
+: ?terpri
+    dup pane-current gadget-children empty?
+    [ dup stream-terpri ] unless drop ;
 
 : with-pane ( pane quot -- )
     #! Clear the pane and run the quotation in a scope with
     #! stdio set to the pane.
-    >r dup pane-clear r> with-stream* ; inline
+    over pane-clear over >r with-stream* r> ?terpri ; inline
+
+: make-pane ( quot -- pane )
+    #! Execute the quotation with output to an output-only pane.
+    <pane> [ swap with-pane ] keep ; inline

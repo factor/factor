@@ -7,23 +7,22 @@ namespaces parser sequences words ;
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
 
-TUPLE: value recursion uid ;
+: <computed> \ <computed> counter ;
 
-C: value ( -- value )
-    gensym over set-value-uid
-    recursive-state get over set-value-recursion ;
+TUPLE: value uid literal recursion ;
+
+C: value ( obj -- value )
+    <computed> over set-value-uid
+    recursive-state get over set-value-recursion
+    [ set-value-literal ] keep ;
+
+M: value hashcode value-uid ;
 
 M: value = eq? ;
 
-M: value hashcode value-uid hashcode ;
+M: integer value-uid ;
 
-TUPLE: literal value ;
-
-C: literal ( obj -- value )
-    <value> over set-delegate
-    [ set-literal-value ] keep ;
-
-M: literal hashcode delegate hashcode ;
+M: integer value-recursion drop f ;
 
 ! The dataflow IR is the first of the two intermediate
 ! representations used by Factor. It annotates concatenative
@@ -64,7 +63,7 @@ C: #label make-node ;
 
 TUPLE: #entry ;
 C: #entry make-node ;
-: #entry ( -- node ) meta-d get clone in-node <#entry> ;
+: #entry ( -- node ) f param-node <#entry> ;
 
 TUPLE: #call ;
 C: #call make-node ;
@@ -129,18 +128,6 @@ SYMBOL: current-node
         ! first node
         dup dataflow-graph set  current-node set
     ] if ;
-
-: nest-node ( -- dataflow current )
-    dataflow-graph get  dataflow-graph off
-    current-node get    current-node off ;
-
-: unnest-node ( new-node dataflow current -- new-node )
-    >r >r dataflow-graph get 1array over set-node-children
-    r> dataflow-graph set
-    r> current-node set ;
-
-: with-nesting ( quot -- new-node | quot: -- new-node )
-    nest-node 2slip unnest-node ; inline
 
 : node-values ( node -- values )
     [

@@ -1,7 +1,8 @@
-IN: temporary
 USING: arrays assembler compiler compiler-backend generic
 hashtables inference kernel kernel-internals lists math
-optimizer prettyprint sequences strings test vectors words ;
+optimizer prettyprint sequences strings test vectors words
+sequences-internals ;
+IN: temporary
 
 : kill-1
     [ 1 2 3 ] [ + ] over drop drop ; compiled
@@ -38,8 +39,8 @@ optimizer prettyprint sequences strings test vectors words ;
 : set= 2dup subset? >r swap subset? r> and ;
 
 : kill-set=
-    dataflow dup solve-recursion dup split-node
-    kill-set hash-keys [ literal-value ] map set= ;
+    dataflow dup split-node
+    kill-set hash-keys [ value-literal ] map set= ;
 
 : foo 1 2 3 ;
 
@@ -49,11 +50,11 @@ optimizer prettyprint sequences strings test vectors words ;
 
 [ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
 
-: literal-kill-test-1 4 compiled-offset cell 2 * - ; compiled
+: literal-kill-test-1 4 compiled-offset 2 cells - ; compiled
 
 [ 4 ] [ literal-kill-test-1 drop ] unit-test
 
-: literal-kill-test-2 3 compiled-offset cell 2 * - ; compiled
+: literal-kill-test-2 3 compiled-offset 2 cells - ; compiled
 
 [ 3 ] [ literal-kill-test-2 drop ] unit-test
 
@@ -100,36 +101,46 @@ optimizer prettyprint sequences strings test vectors words ;
 
 [ 4 ] [ 2 2 literal-kill-test-7 ] unit-test
 
+: literal-kill-test-8
+    dup [ >r dup slip r> literal-kill-test-8 ] [ 2drop ] if ; inline
+
+[ t ] [
+    [ [ ] swap literal-kill-test-8 ] dataflow
+    dup split-node live-values hash-values [ value? ] subset empty?
+] unit-test
+
 ! Test method inlining
+[ f ] [ fixnum { } min-class ] unit-test
+
 [ string ] [
     \ string
-    [ repeated integer string array reversed sbuf
+    [ integer string array reversed sbuf
     slice vector general-list ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 [ f ] [
     \ fixnum
     [ fixnum integer letter ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 [ fixnum ] [
     \ fixnum
     [ fixnum integer object ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 [ integer ] [
     \ fixnum
     [ integer float object ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 [ object ] [
     \ word
     [ integer float object ]
-    min-class
+    [ class-compare ] sort min-class
 ] unit-test
 
 GENERIC: xyz
@@ -205,3 +216,34 @@ TUPLE: pred-test ;
 : blah over cons? [ bleh >r 2cdr r> ] [ 2drop f f f ] if ; compiled
 
 [ f ] [ [ 1 2 3 ] [ 1 3 2 ] blah drop 2car = ] unit-test
+
+! regression
+: (the-test) dup 0 > [ 1- (the-test) ] when ; inline
+: the-test 2 dup (the-test) ; compiled
+
+[ 2 0 ] [ the-test ] unit-test
+
+! regression
+: (double-recursion) ( start end -- )
+    < [
+        6 1 (double-recursion)
+        3 2 (double-recursion)
+    ] when ; inline
+
+: double-recursion 0 2 (double-recursion) ; compiled
+
+[ ] [ double-recursion ] unit-test
+
+! regression
+: double-label-1
+    [ f double-label-1 ] [ swap nth-unsafe ] if ; inline
+: double-label-2
+    dup general-list? [ ] [ ] if 0 t double-label-1 ; compiled
+
+[ 0 ] [ 10 double-label-2 ] unit-test
+
+! regression
+GENERIC: void-generic
+: breakage "hi" void-generic ;
+[ ] [ \ breakage compile ] unit-test
+[ breakage ] unit-test-fails

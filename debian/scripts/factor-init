@@ -1,0 +1,47 @@
+#!/bin/sh
+# Help function
+###############
+help () {
+    cat <<EOF
+Usage: factor-init -o DEST [ OPTION ]
+
+Create an editable image from one of the default images that
+is distributed with the Factor runtime.
+
+Options:
+
+  -b         copy the basic image (default)
+  -e         copy the extended image (includes contrib libs)
+  -i FILE    copy the image FILE
+  -o FILE    write the editable image to FILE
+  -h         print this help information
+EOF
+    exit 0
+}
+
+# Default values
+################
+BINARY_PATH='/usr/lib/factor'
+SRC="$BINARY_PATH/basic.image"
+DST=''
+
+# Argument parsing
+##################
+while getopts "hbei:o:" x
+do
+    case "$x" in
+        b) SRC="$BINARY_PATH/basic.image";;
+        e) SRC="$BINARY_PATH/extended.image";;
+        i) SRC="$OPTARG";;
+        o) DST="$OPTARG";;
+        h) help;;
+    esac
+done
+
+# Logic
+#######
+if test -n "$DST"; then
+    exec /bin/cp -v "$SRC" "$DST"
+else
+    help
+fi

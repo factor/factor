@@ -1,22 +1,23 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 IN: compiler
-USING: compiler-backend compiler-frontend errors inference io
-kernel lists math namespaces optimizer prettyprint sequences
-words ;
-
-: supported-cpu? ( -- ? )
-    cpu "unknown" = not ;
-
-: precompile ( quotation -- basic-blocks )
-    dataflow optimize linearize split-blocks simplify ;
+USING: compiler-backend compiler-frontend errors hashtables
+inference io kernel lists math namespaces optimizer prettyprint
+sequences words ;
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
-    "Compiling " write dup . dup word-def precompile generate ;
+    dup word-def dataflow optimize linearize
+    [ split-blocks simplify generate ] hash-each ;
+
+: inform-compile ( word -- ) "Compiling " write . flush ;
 
 : compile-postponed ( -- )
-    compile-words get dup empty?
-    [ dup pop (compile) compile-postponed ] unless drop ;
+    compile-words get dup empty? [
+        dup pop
+        dup inform-compile
+        (compile)
+        compile-postponed
+    ] unless drop ;
 
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;
@@ -28,7 +29,9 @@ words ;
 : try-compile ( word -- )
     [ compile ] [ error. drop ] recover ;
 
-: compile-all ( -- ) [ try-compile ] each-word ;
+: compile-all ( -- )
+    [ f "no-effect" set-word-prop ] each-word
+    [ try-compile ] each-word ;
 
 : recompile ( word -- ) dup update-xt compile ;
 
@@ -39,3 +42,10 @@ words ;
     ] [
         call
     ] if ;
+
+\ dataflow profile
+\ optimize profile
+\ linearize profile
+\ split-blocks profile
+\ simplify profile
+\ generate profile

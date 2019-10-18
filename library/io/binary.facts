@@ -1,0 +1,21 @@
+USING: help io ;
+
+HELP: be> "( seq -- x )"
+{ $values { "seq" "a sequence of bytes" } { "x" "a non-negative integer" } }
+{ $description "Converts a sequence of bytes in big endian order into an unsigned integer." } ;
+
+HELP: le> "( seq -- x )"
+{ $values { "seq" "a sequence of bytes" } { "x" "a non-negative integer" } }
+{ $description "Converts a sequence of bytes in little endian order into an unsigned integer." } ;
+
+HELP: nth-byte "( x n -- b )"
+{ $values { "x" "an integer" } { "n" "a non-negative integer" } { "b" "a byte" } }
+{ $description "Outputs the " { $snippet "n" } "th least significant byte of the sign-extended 2's complement representation of " { $snippet "x" } "." } ;
+
+HELP: >le "( x n -- str )"
+{ $values { "x" "an integer" } { "n" "a non-negative integer" } { "str" "a string" } }
+{ $description "Converts an integer " { $snippet "x" } " into a string of " { $snippet "n" } " bytes in little endian order. Truncation will occur if the integer is not in the range " { $snippet "[-2^(8n),2^(8n))" } "." } ;
+
+HELP: >be "( x n -- str )"
+{ $values { "x" "an integer" } { "n" "a non-negative integer" } { "str" "a string" } }
+{ $description "Converts an integer " { $snippet "x" } " into a string of " { $snippet "n" } " bytes in big endian order. Truncation will occur if the integer is not in the range " { $snippet "[-2^(8n),2^(8n))" } "." } ;

@@ -1,9 +1,14 @@
 #include "factor.h"
 
 /* untagged */
-F_STRING* allot_string(CELL capacity)
+F_STRING* allot_string(F_FIXNUM capacity)
 {
-	F_STRING* string = allot_object(STRING_TYPE,
+	F_STRING* string;
+
+	if(capacity < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity));
+
+	string = allot_object(STRING_TYPE,
 		sizeof(F_STRING) + (capacity + 1) * CHARS);
 	/* strings are null-terminated in memory, even though they also
 	have a length field. The null termination allows us to add
@@ -17,12 +22,12 @@ F_STRING* allot_string(CELL capacity)
 /* call this after constructing a string */
 void rehash_string(F_STRING* str)
 {
-	F_FIXNUM hash = 0;
+	s32 hash = 0;
 	CELL i;
 	CELL capacity = string_capacity(str);
 	for(i = 0; i < capacity; i++)
-		hash = 31*hash + string_nth(str,i);
-	str->hashcode = tag_fixnum(hash);
+		hash = (31*hash + string_nth(str,i));
+	str->hashcode = (s32)tag_fixnum(hash);
 }
 
 void primitive_rehash_string(void)
@@ -31,7 +36,7 @@ void primitive_rehash_string(void)
 }
 
 /* untagged */
-F_STRING *string(CELL capacity, CELL fill)
+F_STRING *string(F_FIXNUM capacity, CELL fill)
 {
 	CELL i;
 
@@ -43,6 +48,14 @@ F_STRING *string(CELL capacity, CELL fill)
 	rehash_string(string);
 
 	return string;
+}
+
+void primitive_string(void)
+{
+	CELL initial = to_cell(dpop());
+	F_FIXNUM length = to_fixnum(dpop());
+	maybe_gc(string_size(length));
+	dpush(tag_object(string(length,initial)));
 }
 
 F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
@@ -108,19 +121,33 @@ void box_c_string(const char *c_string)
 	dpush(c_string ? tag_object(from_c_string(c_string)) : F);
 }
 
-/* untagged */
-char *to_c_string(F_STRING *s)
+F_ARRAY *string_to_alien(F_STRING *s, bool check)
 {
-	CELL i;
 	CELL capacity = string_capacity(s);
-	for(i = 0; i < capacity; i++)
+	F_ARRAY *_c_str;
+	
+	if(check)
 	{
-		u16 ch = string_nth(s,i);
-		if(ch == '\0' || ch > 255)
-			general_error(ERROR_C_STRING,tag_object(s));
+		CELL i;
+		for(i = 0; i < capacity; i++)
+		{
+			u16 ch = string_nth(s,i);
+			if(ch == '\0' || ch > 255)
+				general_error(ERROR_C_STRING,tag_object(s));
+		}
 	}
 
-	return to_c_string_unchecked(s);
+	_c_str = allot_array(BYTE_ARRAY_TYPE,capacity / CELLS + 1);
+	BYTE *c_str = (BYTE*)(_c_str + 1);
+	string_to_memory(s,c_str);
+	c_str[capacity] = '\0';
+	return _c_str;
+}
+
+/* untagged */
+char *to_c_string(F_STRING *s, bool check)
+{
+	return (char*)(string_to_alien(s,check) + 1);
 }
 
 void string_to_memory(F_STRING *s, BYTE *string)
@@ -138,23 +165,12 @@ void primitive_string_to_memory(void)
 	string_to_memory(str,address);
 }
 
-/* untagged */
-char *to_c_string_unchecked(F_STRING *s)
-{
-	CELL capacity = string_capacity(s);
-	F_STRING *_c_str = allot_string(capacity / CHARS + 1);
-	BYTE *c_str = (BYTE*)(_c_str + 1);
-	string_to_memory(s,c_str);
-	c_str[capacity] = '\0';
-	return (char*)c_str;
-}
-
 /* FFI calls this */
 char* unbox_c_string(void)
 {
 	CELL str = dpop();
 	if(type_of(str) == STRING_TYPE)
-		return to_c_string(untag_string(str));
+		return to_c_string(untag_string(str),true);
 	else
 		return (char*)alien_offset(str);
 }

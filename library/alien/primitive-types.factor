@@ -1,12 +1,13 @@
-USING: alien compiler-backend kernel math namespaces ;
+USING: alien compiler-backend kernel kernel-internals
+math namespaces ;
 
 [
     [ alien-unsigned-cell <alien> ] "getter" set
     [
         >r >r alien-address r> r> set-alien-unsigned-cell
     ] "setter" set
-    cell "width" set
-    cell "align" set
+    bootstrap-cell "width" set
+    bootstrap-cell "align" set
     "box_alien" "boxer" set
     "unbox_alien" "unboxer" set
 ] "void*" define-primitive-type
@@ -28,6 +29,24 @@ USING: alien compiler-backend kernel math namespaces ;
     "box_unsinged_8" "boxer" set
     "unbox_unsigned_8" "unboxer" set
 ] "ulonglong" define-primitive-type
+
+[
+    [ alien-signed-cell ] "getter" set
+    [ set-alien-signed-cell ] "setter" set
+    bootstrap-cell "width" set
+    bootstrap-cell "align" set
+    "box_signed_cell" "boxer" set
+    "unbox_signed_cell" "unboxer" set
+] "long" define-primitive-type
+
+[
+    [ alien-unsigned-cell ] "getter" set
+    [ set-alien-unsigned-cell ] "setter" set
+    bootstrap-cell "width" set
+    bootstrap-cell "align" set
+    "box_unsigned_cell" "boxer" set
+    "unbox_unsigned_cell" "unboxer" set
+] "ulong" define-primitive-type
 
 [
     [ alien-signed-4 ] "getter" set
@@ -84,10 +103,13 @@ USING: alien compiler-backend kernel math namespaces ;
 ] "uchar" define-primitive-type
 
 [
-    [ alien-c-string ] "getter" set
-    [ set-alien-c-string ] "setter" set
-    cell "width" set
-    cell "align" set
+    [ alien-unsigned-cell <alien> alien>string ] "getter" set
+    [
+        >r >r string>alien alien-address r> r>
+        set-alien-unsigned-cell
+    ] "setter" set
+    bootstrap-cell "width" set
+    bootstrap-cell "align" set
     "box_c_string" "boxer" set
     "unbox_c_string" "unboxer" set
 ] "char*" define-primitive-type
@@ -95,17 +117,17 @@ USING: alien compiler-backend kernel math namespaces ;
 [
     [ alien-unsigned-4 ] "getter" set
     [ set-alien-unsigned-4 ] "setter" set
-    cell "width" set
-    cell "align" set
+    bootstrap-cell "width" set
+    bootstrap-cell "align" set
     "box_utf16_string" "boxer" set
     "unbox_utf16_string" "unboxer" set
 ] "ushort*" define-primitive-type
 
 [
-    [ alien-unsigned-4 0 = not ] "getter" set
+    [ alien-unsigned-4 zero? not ] "getter" set
     [ 1 0 ? set-alien-unsigned-4 ] "setter" set
-    cell "width" set
-    cell "align" set
+    bootstrap-cell "width" set
+    bootstrap-cell "align" set
     "box_boolean" "boxer" set
     "unbox_boolean" "unboxer" set
 ] "bool" define-primitive-type
@@ -113,8 +135,8 @@ USING: alien compiler-backend kernel math namespaces ;
 [
     [ alien-float ] "getter" set
     [ set-alien-float ] "setter" set
-    cell "width" set
-    cell "align" set
+    4 "width" set
+    4 "align" set
     "box_float" "boxer" set
     "unbox_float" "unboxer" set
     T{ float-regs f 4 } "reg-class" set
@@ -123,13 +145,9 @@ USING: alien compiler-backend kernel math namespaces ;
 [
     [ alien-double ] "getter" set
     [ set-alien-double ] "setter" set
-    cell 2 * "width" set
-    cell 2 * "align" set
+    8 "width" set
+    8 "align" set
     "box_double" "boxer" set
     "unbox_double" "unboxer" set
     T{ float-regs f 8 } "reg-class" set
 ] "double" define-primitive-type
-
-! FIXME for 64-bit platforms
-"int" "long" typedef
-"uint" "ulong" typedef

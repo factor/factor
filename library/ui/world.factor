@@ -9,24 +9,17 @@ sequences sequences strings styles threads ;
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The invalid slot is a list of gadgets that
 ! need to be layout.
-TUPLE: world running? glass status content invalid ;
+TUPLE: world running? glass status invalid timers ;
+
+: timers ( -- hash ) world get world-timers ;
 
 : add-layer ( gadget -- )
     world get add-gadget ;
 
 C: world ( -- world )
     <stack> over set-delegate
-    <frame> over 2dup set-world-content add-gadget
-    t over set-gadget-root? ;
-
-: set-application ( gadget -- )
-    world get world-content @center frame-add ;
-
-: set-status ( gadget -- )
-    #! Set the status bar gadget to the given gadget. It must
-    #! implement the set-message generic word.
-    world get 2dup set-world-status
-    world-content @bottom frame-add ;
+    t over set-gadget-root?
+    H{ } clone over set-world-timers ;
 
 : add-invalid ( gadget -- )
     world get [ world-invalid cons ] keep set-world-invalid ;
@@ -61,11 +54,13 @@ M: f set-message 2drop ;
     #! Show a message in the status bar.
     world get world-status set-message ;
 
+: relevant-help ( -- string )
+    hand get hand-gadget
+    parents [ gadget-help ] map [ ] find nip ;
+
 : update-help ( -- )
     #! Update mouse-over help message.
-    hand get hand-gadget
-    parents [ gadget-help ] map [ ] find nip
-    show-message ;
+    relevant-help show-message ;
 
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
@@ -75,13 +70,19 @@ M: f set-message 2drop ;
 : hand-grab ( -- gadget )
     hand get rect-loc world get pick-up ;
 
+: update-hand-gadget ( -- )
+    hand-grab hand get set-hand-gadget ;
+
 : move-hand ( loc -- )
     under-hand >r hand get set-rect-loc
-    hand-grab hand get set-hand-gadget
+    update-hand-gadget
     under-hand r> hand-gestures update-help ;
 
-M: motion-event handle-event ( event -- )
-    motion-event-loc move-hand ;
+: update-clicked ( -- )
+    hand get
+    dup hand-gadget over set-hand-clicked
+    dup screen-loc over set-hand-click-loc
+    dup hand-gadget over relative swap set-hand-click-rel ;
 
 : update-hand ( -- )
     #! Called when a gadget is removed or added.
@@ -101,7 +102,9 @@ M: motion-event handle-event ( event -- )
     world get world-invalid >r layout-world r>
     [ update-hand draw-world ] when ;
 
-: next-event ( -- event ? ) <event> dup SDL_PollEvent ;
+: next-event ( -- event ? ) "event" <c-object> dup SDL_PollEvent ;
+
+GENERIC: handle-event ( event -- )
 
 : world-loop ( -- )
     #! Keep polling for events until there are no more events in
@@ -115,11 +118,3 @@ M: motion-event handle-event ( event -- )
 
 : run-world ( -- )
     [ start-world world-loop ] [ stop-world ] cleanup ;
-
-M: quit-event handle-event ( event -- )
-    drop stop-world ;
-
-M: resize-event handle-event ( event -- )
-    flush-fonts
-    gl-resize
-    width get height get 0 3array world get set-gadget-dim ;

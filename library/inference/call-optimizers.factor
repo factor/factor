@@ -18,8 +18,8 @@ math math-internals sequences words ;
 : partial-eval? ( #call -- ? )
     dup node-param "foldable" word-prop [
         dup node-in-d [
-            dup literal?
-            [ 2drop t ] [ swap node-literals ?hash* ] if
+            dup value?
+            [ 2drop t ] [ swap node-literals ?hash* nip ] if
         ] all-with?
     ] [
         drop f
@@ -27,8 +27,8 @@ math math-internals sequences words ;
 
 : literal-in-d ( #call -- inputs )
     dup node-in-d [
-        dup literal?
-        [ nip literal-value ] [ swap node-literals ?hash ] if
+        dup value?
+        [ nip value-literal ] [ swap node-literals ?hash ] if
     ] map-with ;
 
 : partial-eval ( #call -- node )
@@ -70,7 +70,7 @@ SYMBOL: @
 
 : literals-match? ( values template -- ? )
     [
-        over literal? [ >r literal-value r> ] [ nip @ ] if =
+        over value? [ >r value-literal r> ] [ nip @ ] if =
     ] 2map [ ] all? ;
 
 : values-match? ( values template -- ? )
@@ -114,17 +114,9 @@ SYMBOL: @
     { { @ -1 } [ drop 0 swap - ] }
 } define-identities
 
-[ rem mod fixnum-mod bignum-mod ] {
+[ fixnum-mod bignum-mod ] {
     { { @ 1 }  [ 2drop 0 ] }
 } define-identities
-
-! [ ^ ] {
-!     { { 1 @ }  [ 2drop 1 ]             }
-!     { { @ 1 }  [ drop ]                }
-!     { { @ 2 }  [ drop dup * ]          }
-!     { { @ -1 } [ drop 1 swap / ]       }
-!     { { @ -2 } [ drop dup * 1 swap / ] }
-! } define-identities
 
 [ bitand fixnum-bitand bignum-bitand ] {
     { { @ -1 } [ drop ] }

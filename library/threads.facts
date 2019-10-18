@@ -1,0 +1,39 @@
+USING: help threads ;
+
+HELP: run-queue "( -- queue )"
+{ $values { "queue" "a queue" } }
+{ $description "Outputs the runnable thread queue." } ;
+
+HELP: schedule-thread "( continuation -- )"
+{ $values { "continuation" "a continuation" } }
+{ $description "Adds a runnable thread to the end of the run queue." } ;
+
+HELP: sleep-queue "( -- vector )"
+{ $values { "vector" "a vector" } }
+{ $description "Outputs the sleeping thread queue. This is not actually a queue, but a vector of cons cells, where each cons cell consists of a wakeup time and a continuation." } ;
+
+HELP: sleep-queue* "( -- vector )"
+{ $values { "vector" "a vector" } }
+{ $description "Outputs the sleeping thread queue, sorted by wakeup time." } ;
+
+HELP: sleep-time "( vector -- ms )"
+{ $values { "vector" "a sorted sleep queue" } { "ms" "a non-negative integer" } }
+{ $description "Outputs the time until the next sleeping thread is scheduled to wake up, or -1 if there are no sleeping threads. The input must be a sorted sleep queue output by " { $link sleep-queue* } "." } ;
+
+HELP: next-thread "( -- continuation )"
+{ $values { "continuation" "a continuation" } }
+{ $description "Outputs the next runnable thread. If there are no runnable threads, waits for a sleeping thread to wake up." } ;
+
+HELP: stop "( -- )"
+{ $description "Stops the current thread." } ;
+
+HELP: yield "( -- )"
+{ $description "Adds the current thread to the end of the run queue, and switches to the next runnable thread." } ;
+
+HELP: sleep "( ms -- )"
+{ $values { "ms" "a non-negative integer" } }
+{ $description "Suspends the current thread for " { $snippet "ms" } " milliseconds. It will not get woken up before this time period elapses, but since the multitasker is co-operative, the precise wakeup time is dependent on when other threads yield." } ;
+
+HELP: in-thread "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Spawns a new thread. The new thread begins running immediately. If an unhandled error occurs in the thread, the error is logged to the default stream in the dynamic extent of the caller of this word." } ;

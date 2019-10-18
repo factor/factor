@@ -1,168 +1,128 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: assembler compiler errors kernel math math-internals
-memory namespaces words ;
+USING: arrays assembler compiler errors kernel kernel-internals
+math math-internals memory namespaces words ;
 
-: literal-overflow
-    #! If the src operand is a literal.
-    ! Untag the operand.
-    over tag-bits SAR
-    tag-bits neg shift ;
+: literal-overflow ( -- dest src )
+    #! Called if the src operand is a literal.
+    #! Untag the dest operand.
+    dest/src over tag-bits SAR tag-bits neg shift ;
 
-: computed-overflow
-    #! If the src operand is a register.
-    ! Untag both operands.
-    2dup  tag-bits SAR  tag-bits SAR ;
+: computed-overflow ( -- dest src )
+    #! Called if the src operand is a register.
+    #! Untag both operands.
+    dest/src 2dup tag-bits SAR tag-bits SAR ;
 
-: simple-overflow ( dest src inv word -- )
+: simple-overflow ( inverse word -- )
     #! If the previous arithmetic operation overflowed, then we
     #! turn the result into a bignum and leave it in EAX.
-    >r >r
     <label> "end" set
     "end" get JNO
     ! There was an overflow. Recompute the original operand.
-    2dup r> execute
-    dup integer? [
-        literal-overflow
-    ] [
-        computed-overflow
-    ] if
+    >r >r dest/src r> execute
+    0 input integer? [ literal-overflow ] [ computed-overflow ] if
     ! Compute a result, this time it will fit.
-    dupd r> execute
+    r> execute
     ! Create a bignum.
-    PUSH
-    "s48_long_to_bignum" f compile-c-call
+    "s48_long_to_bignum" f 0 output-operand 1array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
-    EAX bignum-tag OR
-    ESP 4 ADD
+    T{ int-regs } return-reg bignum-tag OR
     "end" get save-xt ; inline
 
 M: %fixnum+ generate-node ( vop -- )
-    dest/src 2dup ADD  \ SUB \ ADD simple-overflow ;
+    drop dest/src ADD  \ SUB \ ADD simple-overflow ;
 
 M: %fixnum- generate-node ( vop -- )
-    dest/src 2dup SUB  \ ADD \ SUB simple-overflow ;
+    drop dest/src SUB  \ ADD \ SUB simple-overflow ;
 
 M: %fixnum* generate-node ( vop -- )
     drop
     ! both inputs are tagged, so one of them needs to have its
     ! tag removed.
-    EAX tag-bits SAR
-    ECX IMUL
+    1 input-operand tag-bits SAR
+    0 input-operand IMUL
     <label> "end" set
     "end" get JNO
-    EDX PUSH
-    EAX PUSH
-    "s48_long_long_to_bignum" f compile-c-call
-    ESP 8 ADD
+    "s48_fixnum_pair_to_bignum" f
+    1 input-operand remainder-reg 2array compile-c-call*
     ! now we have to shift it by three bits to remove the second
     ! tag
-    tag-bits neg PUSH
-    EAX PUSH
-    "s48_bignum_arithmetic_shift" f compile-c-call
+    "s48_bignum_arithmetic_shift" f
+    1 input-operand tag-bits neg 2array compile-c-call*
     ! an untagged pointer to the bignum is now in EAX; tag it
-    EAX bignum-tag OR
-    ESP 8 ADD
+    T{ int-regs } return-reg bignum-tag OR
     "end" get save-xt ;
 
 M: %fixnum-mod generate-node ( vop -- )
     #! This has specific register requirements. Inputs are in
-    #! EAX and ECX, and the result is in EDX.
+    #! ECX and EAX, and the result is in EDX.
     drop
-    CDQ
-    ECX IDIV ;
+    prepare-division
+    0 input-operand IDIV ;
 
 : generate-fixnum/mod
     #! The same code is used for %fixnum/i and %fixnum/mod.
     #! This has specific register requirements. Inputs are in
-    #! EAX and ECX, and the result is in EDX.
+    #! ECX and EAX, and the result is in EDX.
     <label> "end" set
-    drop
-    CDQ
-    ECX IDIV
+    prepare-division
+    0 input-operand IDIV
     ! Make a copy since following shift is destructive
-    ECX EAX MOV
+    0 input-operand 1 input-operand MOV
     ! Tag the value, since division cancelled tags from both
     ! inputs
-    EAX tag-bits SHL
+    1 input-operand tag-bits SHL
     ! Did it overflow?
     "end" get JNO
     ! There was an overflow, so make ECX into a bignum. we must
     ! save EDX since its volatile.
-    EDX PUSH
-    ECX PUSH
-    "s48_long_to_bignum" f compile-c-call
+    remainder-reg PUSH
+    "s48_long_to_bignum" f
+    0 input-operand 1array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
-    EAX bignum-tag OR
-    ESP cell ADD
+    T{ int-regs } return-reg bignum-tag OR
     ! the remainder is now in EDX
-    EDX POP
+    remainder-reg POP
     "end" get save-xt ;
 
-M: %fixnum/i generate-node generate-fixnum/mod ;
+M: %fixnum/i generate-node drop generate-fixnum/mod ;
 
-M: %fixnum/mod generate-node generate-fixnum/mod ;
+M: %fixnum/mod generate-node drop generate-fixnum/mod ;
 
-M: %fixnum-bitand generate-node ( vop -- ) dest/src AND ;
+M: %fixnum-bitand generate-node ( vop -- ) drop dest/src AND ;
 
-M: %fixnum-bitor generate-node ( vop -- ) dest/src OR ;
+M: %fixnum-bitor generate-node ( vop -- ) drop dest/src OR ;
 
-M: %fixnum-bitxor generate-node ( vop -- ) dest/src XOR ;
+M: %fixnum-bitxor generate-node ( vop -- ) drop dest/src XOR ;
 
 M: %fixnum-bitnot generate-node ( vop -- )
+    drop
     ! Negate the bits of the operand
-    0 vop-out v>operand dup NOT
+    0 output-operand NOT
     ! Mask off the low 3 bits to give a fixnum tag
-    tag-mask XOR ;
-
-M: %fixnum<< generate-node
-    ! This has specific register requirements.
-    <label> "no-overflow" set
-    <label> "end" set
-    ! make a copy
-    ECX EAX MOV
-    0 vop-in
-    ! check for potential overflow
-    dup shift-add ECX over ADD
-    2 * 1- ECX swap CMP
-    ! is there going to be an overflow?
-    "no-overflow" get JBE
-    ! there is going to be an overflow, make a bignum
-    EAX tag-bits SAR
-    dup ( n) PUSH
-    EAX PUSH
-    "s48_long_to_bignum" f compile-c-call
-    EDX POP
-    EAX PUSH
-    "s48_bignum_arithmetic_shift" f compile-c-call
-    ! tag the result
-    EAX bignum-tag OR
-    ESP cell 2 * ADD
-    "end" get JMP
-    ! there is not going to be an overflow
-    "no-overflow" get save-xt
-    EAX swap SHL
-    "end" get save-xt ;
+    0 output-operand tag-mask XOR ;
 
 M: %fixnum>> generate-node
+    drop
     ! shift register
-    dup 0 vop-out v>operand dup rot 0 vop-in SAR
+    0 output-operand 0 input SAR
     ! give it a fixnum tag
-    tag-mask bitnot AND ;
+    0 output-operand tag-mask bitnot AND ;
 
 M: %fixnum-sgn generate-node
+    #! This has specific register requirements.
+    drop
     ! store 0 in EDX if EAX is >=0, otherwise store -1.
-    CDQ
+    prepare-division
     ! give it a fixnum tag.
-    0 vop-out v>operand tag-bits SHL ;
+    0 output-operand tag-bits SHL ;
 
-: fixnum-jump ( vop -- label )
-    dup 1 vop-in v>operand over 0 vop-in v>operand CMP
-    vop-label ;
+: fixnum-jump ( -- label )
+    1 input-operand 0 input-operand CMP label ;
 
-M: %jump-fixnum<  generate-node ( vop -- ) fixnum-jump JL ;
-M: %jump-fixnum<= generate-node ( vop -- ) fixnum-jump JLE ;
-M: %jump-fixnum>  generate-node ( vop -- ) fixnum-jump JG ;
-M: %jump-fixnum>= generate-node ( vop -- ) fixnum-jump JGE ;
-M: %jump-eq?      generate-node ( vop -- ) fixnum-jump JE ;
+M: %jump-fixnum<  generate-node ( vop -- ) drop fixnum-jump JL ;
+M: %jump-fixnum<= generate-node ( vop -- ) drop fixnum-jump JLE ;
+M: %jump-fixnum>  generate-node ( vop -- ) drop fixnum-jump JG ;
+M: %jump-fixnum>= generate-node ( vop -- ) drop fixnum-jump JGE ;
+M: %jump-eq?      generate-node ( vop -- ) drop fixnum-jump JE ;

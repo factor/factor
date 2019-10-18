@@ -4,13 +4,22 @@ IN: strings
 USING: generic kernel kernel-internals lists math sequences
 sequences-internals ;
 
-M: string nth ( n str -- ch ) bounds-check char-slot ;
+M: string hashcode
+    dup string-hashcode [ ] [
+        dup rehash-string string-hashcode
+    ] ?if ;
 
-M: string nth-unsafe ( n str -- ch ) >r >fixnum r> char-slot ;
+M: string nth bounds-check char-slot ;
 
-GENERIC: >string ( seq -- string ) flushable
+M: string nth-unsafe >r >fixnum r> char-slot ;
 
-M: string >string ;
+M: string set-nth bounds-check set-nth-unsafe ;
+
+M: string set-nth-unsafe 
+    f over set-string-hashcode
+    >r >fixnum >r >fixnum r> r> set-char-slot ;
+
+M: string clone (clone) ;
 
 ! Characters
 PREDICATE: integer blank     " \t\n\r" member? ;
@@ -30,10 +39,20 @@ PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
     #! escaping?
     dup printable? swap "\"\\" member? not and ; foldable
 
-: url-quotable? ( ch -- ? )
-    #! In a URL, can this character be used without
-    #! URL-encoding?
-    dup letter?
-    over LETTER? or
-    over digit? or
-    swap "/_?." member? or ; foldable
+: padding ( string count char -- string )
+    >r swap length - 0 max r> <string> ; flushable
+
+: pad-left ( string count char -- string )
+    pick >r padding r> append ; flushable
+
+: pad-right ( string count char -- string )
+    pick >r padding r> swap append ; flushable
+
+: ch>string ( ch -- str ) 1 swap <string> ; flushable
+
+: >string ( seq -- array ) [ 0 <string> ] >sequence ; inline
+
+M: string thaw drop SBUF" " clone ;
+
+M: string like ( seq sbuf -- string )
+    drop dup string? [ >string ] unless ;

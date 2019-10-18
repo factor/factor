@@ -3,28 +3,33 @@
 
 #include "platform.h"
 
-#define FIXNUM_MAX (LONG_MAX >> TAG_BITS)
-#define FIXNUM_MIN (LONG_MIN >> TAG_BITS)
+#ifdef _WIN64
+        typedef long long F_FIXNUM;
+        typedef unsigned long long CELL;
+#else
+        typedef long F_FIXNUM;
+        typedef unsigned long CELL;
+#endif
 
-#define F_FIXNUM long int /* unboxed */
+#define CELLS ((signed)sizeof(CELL))
 
 #define WORD_SIZE (CELLS*8)
 #define HALF_WORD_SIZE (CELLS*4)
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
 
+#define FIXNUM_MAX (((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
+#define FIXNUM_MIN (-((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)))
+
 /* must always be 16 bits */
 #define CHARS ((signed)sizeof(u16))
 
-typedef unsigned long int CELL;
-#define CELLS ((signed)sizeof(CELL))
-
-typedef unsigned char u8; 	 
-typedef unsigned short u16; 	 
-typedef unsigned int u32; 	 
-typedef unsigned long long u64; 	 
-typedef signed char s8; 	 
-typedef signed short s16; 	 
-typedef signed int s32; 	 
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
+typedef signed char s8;
+typedef signed short s16;
+typedef signed int s32;
 typedef signed long long s64;
 
 /* must always be 8 bits */
@@ -38,6 +43,8 @@ CELL ds_bot;
 	register CELL ds asm("esi");
 #elif defined(FACTOR_PPC)
 	register CELL ds asm("r14");
+#elif defined(FACTOR_AMD64)
+        register CELL ds asm("r14");
 #else
 	CELL ds;
 #endif
@@ -50,6 +57,8 @@ CELL cs_bot;
 	register CELL cs asm("ebx");
 #elif defined(FACTOR_PPC)
 	register CELL cs asm("r15");
+#elif defined(FACTOR_AMD64)
+        register CELL cs asm("r15");
 #else
 	CELL cs;
 #endif

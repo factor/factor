@@ -7,7 +7,7 @@ styles threads ;
 
 TUPLE: button rollover? pressed? ;
 
-: button-down? ( n -- ? ) hand get hand-buttons member? ;
+: button-down? ( -- ? ) hand get hand-buttons empty? not ;
 
 : mouse-over? ( gadget -- ? ) hand get hand-gadget child? ;
 
@@ -15,7 +15,7 @@ TUPLE: button rollover? pressed? ;
 
 : button-update ( button -- )
     dup mouse-over? over set-button-rollover?
-    dup button-rollover? 1 button-down? and
+    dup button-rollover? button-down? and
     over mouse-clicked? and over set-button-pressed?
     relayout-1 ;
 
@@ -30,13 +30,13 @@ TUPLE: button rollover? pressed? ;
 
 : button-gestures ( button quot -- )
     dupd [ action ] set-action
-    dup [ button-clicked ] [ button-up 1 ] set-action
-    dup [ button-update ] [ button-down 1 ] set-action
+    dup [ button-clicked ] [ button-up ] set-action
+    dup [ button-update ] [ button-down ] set-action
     dup [ button-update ] [ mouse-leave ] set-action
     [ button-update ] [ mouse-enter ] set-action ;
 
 C: button ( gadget quot -- button )
-    rot <border> over set-gadget-delegate
+    rot <default-border> over set-gadget-delegate
     [ swap button-gestures ] keep ;
 
 : <highlight-button> ( gadget quot -- button )
@@ -55,8 +55,8 @@ C: button ( gadget quot -- button )
     dup button-update remove-timer ;
 
 : repeat-actions ( button -- )
-    dup [ repeat-button-down ] [ button-down 1 ] set-action
-    [ repeat-button-up ] [ button-up 1 ] set-action ;
+    dup [ repeat-button-down ] [ button-down ] set-action
+    [ repeat-button-up ] [ button-up ] set-action ;
 
 : <repeat-button> ( gadget quot -- button )
     #! Button that calls the quotation every 100ms as long as

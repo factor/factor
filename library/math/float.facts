@@ -1,0 +1,8 @@
+USING: help math ;
+
+HELP: float f
+{ $description "The class of double-precision floating point numbers." } ;
+
+HELP: >float "( x -- y )"
+{ $values { "x" "a real number" } { "y" "a float" } }
+{ $description "Converts a real to a float. This is the identity on floats, and performs a floating point division on rationals." } ;

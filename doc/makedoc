@@ -1,8 +1,7 @@
 #!/bin/sh
-cd doc/
-pdflatex handbook
-./makeglos handbook
+echo X | pdflatex handbook
 makeindex handbook
+sh makeglos handbook
 pdflatex handbook
 pdflatex handbook
 pdflatex handbook

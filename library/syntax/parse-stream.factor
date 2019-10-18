@@ -1,44 +1,44 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: io kernel lists math namespaces sequences words ;
+USING: errors generic io kernel lists math namespaces sequences
+words ;
 
 : file-vocabs ( -- )
-    "scratchpad" "in" set
-    [ "syntax" "scratchpad" ] "use" set ;
+    "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
+
+: with-parser ( quot -- ) [ <parse-error> rethrow ] recover ;
 
 : parse-lines ( lines -- quot )
     [
-        dup length [ ]
-        [ 1+ line-number set (parse) ] 2reduce
+        dup length [ ] [ 1+ line-number set (parse) ] 2reduce
         reverse
     ] with-parser ;
+
+: parse ( str -- code ) <string-reader> lines parse-lines ;
+
+: eval ( "X" -- X ) parse call ;
 
 : parse-stream ( stream name -- quot )
     [ file set file-vocabs lines parse-lines ] with-scope ;
 
-: parse-file ( file -- quot )
-    [ <file-reader> ] keep parse-stream ;
+: parsing-file ( file -- ) "Loading " write print flush ;
 
-: run-file ( file -- )
-    parse-file call ;
+: parse-file ( file -- quot )
+    dup parsing-file [ <file-reader> ] keep parse-stream ;
+
+: run-file ( file -- ) parse-file call ;
+
+: try-run-file ( file -- ) [ [ run-file ] keep ] try drop ;
 
 : parse-resource ( path -- quot )
-    #! Resources are loaded from the resource-path variable, or
-    #! the current directory if it is not set. Words defined in
-    #! resources have a definition source path starting with
-    #! resource:. This allows words that operate on source
-    #! files, like "jedit", to use a different resource path
-    #! at run time than was used at parse time.
+    dup parsing-file
     [ <resource-stream> "resource:" ] keep append parse-stream ;
 
-: run-resource ( file -- )
-    parse-resource call ;
+: run-resource ( file -- ) parse-resource call ;
 
 : word-file ( word -- file )
     "file" word-prop dup
     [ "resource:/" ?head [ resource-path ] when ] when ;
 
-: reload ( word -- )
-    #! Reload the source file the word originated from.
-    word-file run-file ;
+: reload ( word -- ) word-file run-file ;

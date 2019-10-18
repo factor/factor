@@ -2,13 +2,13 @@ IN: temporary
 USING: arrays kernel lists math namespaces sequences
 sequences-internals strings test vectors ;
 
-[ V{ 1 2 3 4 } ] [ 1 5 <range> >vector ] unit-test
-[ 3 ] [ 1 4 <range> length ] unit-test
+[ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
+[ 3 ] [ 1 4 dup <slice> length ] unit-test
 [ 2 ] [ 1 3 { 1 2 3 4 } <slice> length ] unit-test
 [ V{ 2 3 } ] [ 1 3 { 1 2 3 4 } <slice> >vector ] unit-test
 [ V{ 4 5 } ] [ 2 { 1 2 3 4 5 } tail-slice* >vector ] unit-test
-[ V{ 3 4 } ] [ 2 4 1 10 <range> subseq >vector ] unit-test
-[ V{ 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq >vector ] unit-test
+[ V{ 3 4 } ] [ 2 4 1 10 dup <slice> subseq >vector ] unit-test
+[ V{ 3 4 } ] [ 0 2 2 4 1 10 dup <slice> <slice> subseq >vector ] unit-test
 [ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
@@ -134,17 +134,17 @@ unit-test
     sorter-seq >array nip
 ] unit-test
 
-[ [ ] ] [ [ ] number-sort ] unit-test
+[ [ ] ] [ [ ] natural-sort ] unit-test
 
 [ t ] [
     100 [
         drop
-        1000 [ drop 1000 random-int ] map number-sort [ <= ] monotonic?
+        100 [ drop 20 random-int [ drop 1000 random-int ] map ] map natural-sort [ <=> 0 <= ] monotonic?
     ] all?
 ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
-[ 4 [ CHAR: a fill ] map ]
+[ 4 [ CHAR: a <string> ] map ]
 unit-test
 
 [ V{ } ] [ "f" V{ } clone [ delete ] keep ] unit-test
@@ -175,8 +175,6 @@ unit-test
 
 [ -1 f ] [ -1 { 1 2 3 } [ 1 = ] find* ] unit-test
 
-[ { 1 2 3 } ] [ { 1 1 2 2 3 3 } prune ] unit-test
-
 [ 0 ] [ { "a" "b" "c" } { "A" "B" "C" } mismatch ] unit-test
 
 [ 1 ] [ { "a" "b" "c" } { "a" "B" "C" } mismatch ] unit-test
@@ -191,8 +189,8 @@ unit-test
 
 [ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] 2apply ] unit-test
 
-[ -1 ] [ "ab" "abc" lexi ] unit-test
-[ 1 ] [ "abc" "ab" lexi ] unit-test
+[ -1 ] [ "ab" "abc" <=> ] unit-test
+[ 1 ] [ "abc" "ab" <=> ] unit-test
 
 [ 1 4 9 16 16 V{ f 1 4 9 16 } ] [
     V{ } clone "cache-test" set
@@ -205,3 +203,10 @@ unit-test
 ] unit-test
 
 [ 1 ] [ 1/2 { 1 2 3 } nth ] unit-test
+
+[ { } ] [ 0 { } group ] unit-test
+
+! Pathological case
+[ "ihbye" ] [ "hi" reverse-slice "bye" append ] unit-test
+
+[ 10 "hi" "bye" copy-into ] unit-test-fails

@@ -5,11 +5,8 @@ IN: temporary
 : done-cf? ( -- ? ) meta-cf get not ;
 : done? ( -- ? ) done-cf? meta-r get length 0 = and ;
 
-: interpret ( quot -- )
-    #! The quotation is called with each word as its executed.
-    done? [ drop ] [ [ next swap call ] keep interpret ] if ;
-
-: run ( -- ) [ do ] interpret ;
+: run ( -- )
+    done? [ next do run ] unless ;
 
 : init-interpreter ( -- )
     V{ } clone meta-r set
@@ -62,8 +59,8 @@ IN: temporary
     [ 2 2 + ] test-interpreter
 ] unit-test
 
-[ V{ } ] [
-    [ 3 "x" set ] test-interpreter
+[ V{ } 2 ] [
+    2 "x" set [ [ 3 "x" set ] with-scope ] test-interpreter "x" get
 ] unit-test
 
 [ V{ 3 } ] [

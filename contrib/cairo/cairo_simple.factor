@@ -12,8 +12,7 @@
 ! Then, start Factor as usual (./f factor.image) and enter these
 ! at the listener:
 !
-! "cairo.factor" run-file
-! "cairo_sdl.factor" run-file
+! "/contrib/cairo/load.factor" run-resource
 ! "cairo_simple.factor" run-file
 
 IN: cairo-simple
@@ -24,9 +23,7 @@ USE: errors
 USE: kernel
 USE: namespaces
 USE: sdl
-USE: sdl-event
-USE: sdl-gfx
-USE: sdl-video
+USE: alien
 
 : redraw ( -- )
 	cr get
@@ -52,7 +49,7 @@ USE: sdl-video
 : cairo-sdl-test ( -- )
     320 240 32 SDL_HWSURFACE  [
 		set-up-cairo
-        	<event> event-loop
+        	"event" <c-object> event-loop
 		cr get cairo_destroy
 	SDL_Quit
     ] with-screen ;

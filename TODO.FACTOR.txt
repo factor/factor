@@ -1,115 +1,35 @@
-+ ui:
-
-- fix remaining GL issues
-- UI issue: try resizing slider while menu is open
-- make-pane: if no input, just return pane-output
-- keyboard completion
-- get outliner working with lots of lines of output
-- listener continuations
+- fix remaining HTML stream issues
+- help cross-referencing
+- UI browser pane needs 'back' button
+- runtime primitives like fopen: check for null input
+- amd64 alien calls
+- port ffi to win64
+- intrinsic char-slot set-char-slot for x86
 - fix up the min thumb size hack
-- off-by-one error in pick-up?
-- closing ui does not stop timers
-- adding/removing timers automatically for animated gadgets
-- tabular output
-- debugger should use outlining
-- support nested incremental layouts more efficiently
-- only redraw dirty gadgets
-- find out why so many small bignums get consed
-- use incremental strategy for all pack layouts where possible
-- multiline editing in listener
-- text selection
-- clipboard support
-- bug: slider bars go to 0 pixel width/height
-- bug: left click to bring up context menu, click splitter bar
-  and pane grows to 100%
-- bug: click tutorial, full screen, the right-most arrow icon
-  loses the vertical bar
-
-+ tutorial:
-
-- multiline code snippets
-- s-expression text styling language
-- word wrap
-
-+ misc
-
+- the invalid recursion form case needs to be fixed, for inlines too
 - code walker & exceptions
-- investigate if rehashing on startup is really necessary
-- remove word transfer hack in bootstrap
 - signal handler should not lose stack pointers
-
-+ ffi:
-
-- C structs, enums, unions: use new-style string mode parsing
-- smarter out parameter handling
-- clarify powerpc passing of value struct parameters
-- ffi unicode strings: null char security hole
-- utf16 string boxing
-- value type structs
-- bitfields in C structs
-- setting struct members that are not *
-- callbacks
 - FIELD: char key_vector[32];
 - FIELD: union { char b[20]; short s[10]; long l[5]; } data;
 - MEMBER: long pad[24];
-- convert factor sequences to c arrays, and vice versa
-
-+ compiler:
-
-- inference: try changing nth and set-nth array methods to call -unsafe,
-  unbalanced branches error
-- compile interruption checks
-- check that set-datastack and set-callstack compile correctly in the
-  face of optimization
-- floating point intrinsics
-- new basic block optimizer
-- fix fixnum/mod overflow on PowerPC
-- intrinsic char-slot set-char-slot
-- [ ] [ throw ] ifte ==> should raise 'unbalanced branches' error
-- declare slot types for built-ins
-- remove dead code after a 'throw'
-- flushing optimization
+- C structs, enums, unions: use new-style string mode parsing
+- ffi unicode strings: null char security hole
+- utf16 string boxing
 - [ [ dup call ] dup call ] infer hangs
-- the invalid recursion form case needs to be fixed, for inlines too
-- recursion is iffy; if the stack at the recursive call doesn't match
-  up, throw an error
-- compile continuations
-
-+ sequences:
-
 - slice: if sequence or seq start is changed, abstraction violation
-- split: return vectors
-- set-path: iterative
-- specialized arrays
-- instances: do not use make-list
-- >c/c>: vector stack
-- search: slow
-- vectorize >n, n>, (get)
-- mutable strings simplifying string operarations
-- real Unicode support (strings are already 16 bits and can be extended
-  to 21 if the need arises, but we need full character classification
-  predicates, comparison, case conversion, sorting...)
-
-+ kernel:
-
-- better prettyprinting of cond
-- better handling of random arrangements of html words when
-  prettyprinting
-- friendlier .factor-rc load error handling
-- reader syntax for byte arrays, displaced aliens
 - out of memory error when printing global namespace
-- merge timers with sleeping tasks
-- what about tasks and timers between image restarts
-- there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
 - code gc
-
-+ i/o:
-
-- i/o tasks hanging around
-- faster stream-copy
-- reading and writing byte arrays
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
-- utf16, utf8 encoding
 - if two tasks write to a unix stream, the buffer can overflow
+- font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
+- make 3.4 bits>double an error
+
+- 2220.446049250313 [ dup float? [ tanh ] when ] 
+  - call and compile-1 give  C{ 0.0/0.0 0.0/0.0 }  0.0/0.0
+- 2.718281828459045e+19 [ dup float? [ sech ] when ]
+  - call/compile-1:  C{ 0.0/0.0 0.0/0.0 }  0.0
+- 0.0/0.0 next-power-of-2 never terminates -- comparison always returns false
+- 0.0/0.0 >fixnum .  -> 0    0.0/0.0 >bignum .  -> 0
+

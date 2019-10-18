@@ -6,7 +6,7 @@ namespaces sequences styles ;
 
 SYMBOL: origin
 
-{ 0 0 0 } origin global set-hash
+{ 0 0 0 } origin set-global
 
 TUPLE: rect loc dim ;
 
@@ -23,7 +23,7 @@ M: array rect-dim drop { 0 0 0 } ;
 
 : |v-| ( vec vec -- vec ) v- [ 0 max ] map ;
 
-: <extent-rect> ( loc ext ) dupd swap |v-| <rect> ;
+: <extent-rect> ( loc ext -- rect ) dupd swap |v-| <rect> ;
 
 : >absolute ( rect -- rect )
     rect-bounds >r origin get v+ r> <rect> ;
@@ -41,7 +41,7 @@ M: array rect-dim drop { 0 0 0 } ;
     2rect-extent vmax >r vmin r> <extent-rect> ;
 
 TUPLE: gadget
-    parent children orientation
+    pref-dim parent children orientation
     gestures visible? relayout? root?
     interior boundary ;
 
@@ -62,8 +62,6 @@ C: gadget ( -- gadget )
 GENERIC: user-input* ( ch gadget -- ? )
 
 M: gadget user-input* 2drop t ;
-
-: invalidate ( gadget -- ) t swap set-gadget-relayout? ;
 
 DEFER: add-invalid
 
@@ -92,9 +90,14 @@ M: gadget children-on ( rect/point gadget -- list )
 
 : max-dim ( dims -- dim ) { 0 0 0 } [ vmax ] reduce ;
 
+: each-child ( gadget quot -- )
+    >r gadget-children r> each ; inline
+
+: each-child-with ( obj gadget quot -- )
+    >r gadget-children r> each-with ; inline
+
 : set-gadget-delegate ( delegate gadget -- )
-    dup pick gadget-children [ set-gadget-parent ] each-with
-    set-delegate ;
+    dup pick [ set-gadget-parent ] each-child-with set-delegate ;
 
 ! Pointer help protocol
 GENERIC: gadget-help

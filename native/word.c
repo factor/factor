@@ -24,7 +24,7 @@ void primitive_word(void)
 	word->vocabulary = vocabulary;
 	word->primitive = tag_fixnum(0);
 	word->def = F;
-	word->props = tag_object(hashtable(8));
+	word->props = F;
 	word->xt = (CELL)undefined;
 	dpush(tag_object(word));
 }

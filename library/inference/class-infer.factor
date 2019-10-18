@@ -23,24 +23,24 @@ M: f apply-tie ( f -- ) drop ;
 
 TUPLE: class-tie value class ;
 
-: set-value-class ( class value -- )
+: set-value-class* ( class value -- )
     2dup swap <class-tie> ties get hash [ apply-tie ] when*
     value-classes get set-hash ;
 
 M: class-tie apply-tie ( tie -- )
     dup class-tie-class swap class-tie-value
-    set-value-class ;
+    set-value-class* ;
 
 TUPLE: literal-tie value literal ;
 
-: set-value-literal ( literal value -- )
-    over class over set-value-class
+: set-value-literal* ( literal value -- )
+    over class over set-value-class*
     2dup swap <literal-tie> ties get hash [ apply-tie ] when*
     value-literals get set-hash ;
 
 M: literal-tie apply-tie ( tie -- )
     dup literal-tie-literal swap literal-tie-value
-    set-value-literal ;
+    set-value-literal* ;
 
 GENERIC: infer-classes* ( node -- )
 
@@ -50,22 +50,24 @@ M: node infer-classes* ( node -- ) drop ;
 GENERIC: child-ties ( node -- seq )
 
 M: node child-ties ( node -- seq )
-    node-children length f <repeated> ;
+    node-children length f <array> ;
 
-: value-class ( value -- class )
+: value-class* ( value -- class )
     value-classes get hash [ object ] unless* ;
 
-: value-literal ( value -- class )
+: value-literal* ( value -- class )
     value-literals get hash ;
 
 : annotate-node ( node -- )
     #! Annotate the node with the currently-inferred set of
     #! value classes.
     dup node-values
-    [ value-class ] map>hash swap set-node-classes ;
+    [ dup value-class* ] map>hash swap set-node-classes ;
 
 : intersect-classes ( classes values -- )
-    [ [ value-class class-and ] keep set-value-class ] 2each ;
+    [
+        [ value-class* class-and ] keep set-value-class*
+    ] 2each ;
 
 : type/tag-ties ( node n -- )
     over node-out-d first over [ <literal-tie> ] map-with
@@ -77,8 +79,8 @@ M: node child-ties ( node -- seq )
 \ tag [ num-tags type/tag-ties ] "create-ties" set-word-prop
 
 \ eq? [
-    dup node-in-d second literal? [
-        dup node-in-d first2 literal-value <literal-tie>
+    dup node-in-d second value? [
+        dup node-in-d first2 value-literal* <literal-tie>
         over node-out-d first general-t <class-tie>
         ties get set-hash
     ] when drop
@@ -100,7 +102,7 @@ M: node child-ties ( node -- seq )
     ] if ;
 
 \ make-tuple [
-    dup node-in-d first literal-value 1array
+    dup node-in-d first value-literal 1array
 ] "output-classes" set-word-prop
 
 : output-classes ( node -- seq )
@@ -119,8 +121,8 @@ M: #call infer-classes* ( node -- )
     ] when drop ;
 
 M: #shuffle infer-classes* ( node -- )
-    node-out-d [ literal? ] subset
-    [ [ literal-value ] keep set-value-literal ] each ;
+    node-out-d [ value? ] subset
+    [ [ value-literal ] keep set-value-literal* ] each ;
 
 M: #if child-ties ( node -- seq )
     node-in-d first dup general-t <class-tie>

@@ -1,5 +1,11 @@
 IN: temporary
-USING: html io kernel namespaces styles test ;
+USING: html http io kernel namespaces styles test xml ;
+
+[
+    "/responder/foo?z=%20"
+] [
+    "/responder/foo" H{ { "z" " " } } build-url
+] unit-test
 
 [
     "&lt;html&gt;&amp;&apos;sgml&apos;"
@@ -16,16 +22,7 @@ USING: html io kernel namespaces styles test ;
 [ "" ]
 [
     [
-        [ ] [ drop ] span-tag
-    ] string-out
-] unit-test
-
-[ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
-[
-    [
-        [ [ foreground 1 0 1 ] [[ font "Monospaced" ]] ]
-        [ drop "car" write ]
-        span-tag
+        H{ } [ drop ] span-tag
     ] string-out
 ] unit-test
 
@@ -34,30 +31,23 @@ USING: html io kernel namespaces styles test ;
 
 [ "hello world" ]
 [
-    [ "hello world" [ ] html-format ] string-out
+    [ "hello world" H{ } html-format ] string-out
 ] unit-test
 
-[ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
+[ "<span style='font-family: monospace; '>car</span>" ]
 [
     [
         "car"
-        [ [ foreground 1 0 1 ] [[ font "Monospaced" ]] ]
+        H{ { font "monospace" } }
         html-format
     ] string-out
 ] unit-test
 
+[ "<span style='color: #ff00ff; '>car</span>" ]
 [
-    "<html><head><title>Foo</title></head><body><h1>Foo</h1></body></html>"
-] [
     [
-        "Foo" [ ] html-document
-    ] string-out
-] unit-test
-
-[
-    "<html><head><title>Foo</title></head><body><h1>Foo</h1><pre>Hi</pre></body></html>"
-] [
-    [
-        "Foo" [ "Hi" write ] simple-html-document
+        "car"
+        H{ { foreground { 1 0 1 1 } } }
+        html-format
     ] string-out
 ] unit-test

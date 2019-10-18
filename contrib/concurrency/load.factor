@@ -1,17 +1,10 @@
-USE: kernel
-USE: httpd
-USE: threads
-USE: prettyprint
-USE: errors
-USE: io
+IN: scratchpad
+USING: kernel parser compiler words sequences ;
 
-USE: parser
+"/contrib/dlists.factor" run-resource
+"/contrib/math/load.factor" run-resource
 
-: a "../dlists.factor" run-file 
-    "concurrency.factor" run-file ;
-: b "concurrency-examples.factor" run-file ;
-: c "concurrency-tests.factor" run-file ;
-a
-b
-USE: concurrency
-USE: concurreny-examples
+{ 
+    "concurrency"
+    "concurrency-examples"
+} [ "/contrib/concurrency/" swap ".factor" append3 run-resource ] each

@@ -1,29 +1,41 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: image
-USING: arrays alien generic hashtables io kernel
-kernel-internals lists math namespaces sequences strings vectors
-words ;
+USING: alien arrays generic hashtables help io kernel
+kernel-internals lists math namespaces parser sequences strings
+vectors words ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
 
-"Creating primitives and basic runtime structures..." print
+"Creating primitives and basic runtime structures..." print flush
+
+H{ } clone c-types set
+"/library/alien/primitive-types.factor" parse-resource
 
 ! These symbols need the same hashcode in the target as in the
 ! host.
-{ vocabularies typemap builtins }
+{
+    vocabularies typemap builtins c-types
+    cell crossref articles terms
+}
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
 
 H{ } clone vocabularies set
-f crossref set
+H{ } clone articles set
+H{ } clone terms set
+
+crossref off
 
 vocabularies get [ "syntax" set [ reveal ] each ] bind
 
+! Call the quotation parsed from primitive-types.factor
+call
+
 : make-primitive ( { vocab word } n -- )
-    >r first2 create r> f define ;
+    >r first2 create f r> define ;
 
 {
     { "execute" "words"                     }
@@ -34,7 +46,6 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "<vector>" "vectors"                  }
     { "rehash-string" "strings"             }
     { "<sbuf>" "strings"                    }
-    { "sbuf>string" "strings"               }
     { ">fixnum" "math"                      }
     { ">bignum" "math"                      }
     { ">float" "math"                       }
@@ -79,11 +90,11 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "bignum<=" "math-internals"           }
     { "bignum>" "math-internals"            }
     { "bignum>=" "math-internals"           }
-    { "float=" "math-internals"             }
     { "float+" "math-internals"             }
     { "float-" "math-internals"             }
     { "float*" "math-internals"             }
     { "float/f" "math-internals"            }
+    { "float-mod" "math-internals"          }
     { "float<" "math-internals"             }
     { "float<=" "math-internals"            }
     { "float>" "math-internals"             }
@@ -176,8 +187,8 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "set-alien-float" "alien"             }
     { "alien-double" "alien"                }
     { "set-alien-double" "alien"            }
-    { "alien-c-string" "alien"              }
-    { "set-alien-c-string" "alien"          }
+    { "alien>string" "alien"                }
+    { "string>alien" "alien"                }
     { "throw" "errors"                      }
     { "string>memory" "kernel-internals"    }
     { "memory>string" "kernel-internals"    }
@@ -190,7 +201,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "set-char-slot" "kernel-internals"    }
     { "resize-array" "arrays"               }
     { "resize-string" "strings"             }
-    { "<hashtable>" "hashtables"            }
+    { "(hashtable)" "hashtables-internals"  }
     { "<array>" "arrays"                    }
     { "<tuple>" "kernel-internals"          }
     { "begin-scan" "memory"                 }
@@ -207,44 +218,13 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "expired?" "alien"                    }
     { "<wrapper>" "kernel"                  }
     { "(clone)" "kernel-internals"          }
-    { "(array>tuple)" "kernel-internals"    }
+    { "array>tuple" "kernel-internals"      }
     { "tuple>array" "generic"               }
     { "array>vector" "vectors"              }
+    { "<string>" "strings"                  }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
-: set-stack-effect ( { vocab word effect } -- )
-    first3 >r lookup r> "stack-effect" set-word-prop ;
-
-{
-    { "drop" "kernel" " x -- " }
-    { "2drop" "kernel" " x y -- " }
-    { "3drop" "kernel" " x y z -- " }
-    { "dup" "kernel"  " x -- x x " }
-    { "2dup" "kernel"  " x y -- x y x y " }
-    { "3dup" "kernel"  " x y z -- x y z x y z " }
-    { "rot" "kernel"  " x y z -- y z x " }
-    { "-rot" "kernel"  " x y z -- z x y " }
-    { "dupd" "kernel"  " x y -- x x y " }
-    { "swapd" "kernel"  " x y z -- y x z " }
-    { "nip" "kernel"  " x y -- y " }
-    { "2nip" "kernel"  " x y z -- z " }
-    { "tuck" "kernel"  " x y -- y x y " }
-    { "over" "kernel" " x y -- x y x " }
-    { "pick" "kernel" " x y z -- x y z x " }
-    { "swap" "kernel" " x y -- y x " }
-    { ">r" "kernel"   " x -- r: x " }
-    { "r>" "kernel"   " r: x -- x " }
-    { "datastack" "kernel" " -- ds " }
-    { "callstack" "kernel" " -- cs " }
-    { "set-datastack" "kernel" " ds -- " }
-    { "set-callstack" "kernel" " cs -- " }
-    { "flush-icache" "assembler" " -- " }
-} [
-    set-stack-effect
-] each
-
 FORGET: make-primitive
-FORGET: set-stack-effect
 
 ! Okay, now we have primitives fleshed out. Bring up the generic
 ! word system.
@@ -268,7 +248,7 @@ FORGET: set-stack-effect
     register-builtin ;
 
 H{ } clone typemap set
-num-types <array> builtins set
+num-types f <array> builtins set
 
 ! These symbols are needed by the code that executes below
 "object" "generic" create drop
@@ -277,12 +257,12 @@ num-types <array> builtins set
 "fixnum?" "math" create t "inline" set-word-prop
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
 "fixnum" "math" create 0 "math-priority" set-word-prop
-"fixnum" "math" create ">fixnum" [ "math" ] search unit "coercer" set-word-prop
+"fixnum" "math" create ">fixnum" "math" lookup unit "coercer" set-word-prop
 
 "bignum?" "math" create t "inline" set-word-prop
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
 "bignum" "math" create 1 "math-priority" set-word-prop
-"bignum" "math" create ">bignum" [ "math" ] search unit "coercer" set-word-prop
+"bignum" "math" create ">bignum" "math" lookup unit "coercer" set-word-prop
 
 "cons?" "lists" create t "inline" set-word-prop
 "cons" "lists" create 2 "cons?" "lists" create
@@ -296,7 +276,7 @@ num-types <array> builtins set
 "float?" "math" create t "inline" set-word-prop
 "float" "math" create 5 "float?" "math" create { } define-builtin
 "float" "math" create 3 "math-priority" set-word-prop
-"float" "math" create ">float" [ "math" ] search unit "coercer" set-word-prop
+"float" "math" create ">float" "math" lookup unit "coercer" set-word-prop
 
 "complex?" "math" create t "inline" set-word-prop
 "complex" "math" create 6 "complex?" "math" create
@@ -315,8 +295,9 @@ num-types <array> builtins set
 "hashtable?" "hashtables" create t "inline" set-word-prop
 "hashtable" "hashtables" create 10 "hashtable?" "hashtables" create
 {
-    { 1 { "hash-size" "hashtables" } { "set-hash-size" "kernel-internals" } }
-    { 2 { "underlying" "sequences-internals" } { "set-underlying" "sequences-internals" } }
+    { 1 { "hash-count" "hashtables" } { "set-hash-count" "hashtables-internals" } }
+    { 2 { "hash-deleted" "hashtables" } { "set-hash-deleted" "hashtables-internals" } }
+    { 3 { "hash-array" "hashtables-internals" } { "set-hash-array" "hashtables-internals" } }
 } define-builtin
 
 "vector?" "vectors" create t "inline" set-word-prop
@@ -330,7 +311,7 @@ num-types <array> builtins set
 "string" "strings" create 12 "string?" "strings" create
 {
     { 1 { "length" "sequences" } f }
-    { 2 { "hashcode" "kernel" } f }
+    { 2 { "string-hashcode" "kernel-internals" } { "set-string-hashcode" "kernel-internals" } }
 } define-builtin
 
 "sbuf?" "strings" create t "inline" set-word-prop 

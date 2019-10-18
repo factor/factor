@@ -12,7 +12,6 @@ void* primitives[] = {
 	primitive_vector,
 	primitive_rehash_string,
 	primitive_sbuf,
-	primitive_sbuf_to_string,
 	primitive_to_fixnum,
 	primitive_to_bignum,
 	primitive_to_float,
@@ -57,11 +56,11 @@ void* primitives[] = {
 	primitive_bignum_lesseq,
 	primitive_bignum_greater,
 	primitive_bignum_greatereq,
-	primitive_float_eq,
 	primitive_float_add,
 	primitive_float_subtract,
 	primitive_float_multiply,
 	primitive_float_divfloat,
+	primitive_float_mod,
 	primitive_float_less,
 	primitive_float_lesseq,
 	primitive_float_greater,
@@ -154,8 +153,8 @@ void* primitives[] = {
 	primitive_set_alien_float,
 	primitive_alien_double,
 	primitive_set_alien_double,
-	primitive_alien_c_string,
-	primitive_set_alien_c_string,
+	primitive_alien_to_string,
+	primitive_string_to_alien,
 	primitive_throw,
 	primitive_string_to_memory,
 	primitive_memory_to_string,
@@ -187,7 +186,8 @@ void* primitives[] = {
 	primitive_clone,
 	primitive_array_to_tuple,
 	primitive_tuple_to_array,
-	primitive_array_to_vector
+	primitive_array_to_vector,
+	primitive_string
 };
 
 CELL primitive_to_xt(CELL primitive)

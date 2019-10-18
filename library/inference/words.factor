@@ -1,16 +1,16 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic interpreter kernel lists math
-math-internals namespaces sequences strings vectors words
-hashtables parser prettyprint ;
+USING: arrays errors generic hashtables interpreter kernel lists
+math math-internals namespaces parser prettyprint sequences
+strings vectors words ;
 
 : consume-values ( n node -- )
     over ensure-values
     over 0 rot node-inputs [ pop-d 2drop ] each ;
 
 : produce-values ( n node -- )
-    over [ drop <value> push-d ] each 0 swap node-outputs ;
+    over [ drop <computed> push-d ] each 0 swap node-outputs ;
 
 : consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and
@@ -25,21 +25,82 @@ hashtables parser prettyprint ;
     " was already attempted, and failed" append3
     inference-error ;
 
-: with-recursive-state ( word label quot -- )
-    >r over word-def cons cons
-    recursive-state [ cons ] change r>
-    call
-    recursive-state [ cdr ] change ; inline
+TUPLE: rstate label base-case? ;
 
-: inline-block ( word -- node-block )
-    gensym 2dup [
-        [
+: nest-node ( -- dataflow current )
+    dataflow-graph get  dataflow-graph off
+    current-node get    current-node off ;
+
+: unnest-node ( new-node dataflow current -- new-node )
+    >r >r dataflow-graph get 1array over set-node-children
+    r> dataflow-graph set
+    r> current-node set ;
+
+: with-recursive-state ( word label base-case quot -- )
+    >r <rstate> cons recursive-state [ cons ] change r>
+    nest-node 2slip unnest-node ; inline
+
+: inline-block ( word base-case -- node-block variables )
+    [
+        copy-inference
+        >r gensym 2dup r> [
             dup #label >r
             #entry node,
             swap word-def infer-quot
             #return node, r>
-        ] with-nesting
-    ] with-recursive-state ;
+        ] with-recursive-state
+    ] make-hash ;
+
+: apply-infer ( hash -- )
+    { meta-d meta-r d-in }
+    [ [ swap hash ] keep set ] each-with ;
+
+GENERIC: collect-recursion* ( label node -- )
+
+M: node collect-recursion* ( label node -- ) 2drop ;
+
+M: #call-label collect-recursion* ( label node -- )
+    tuck node-param = [ node-in-d , ] [ drop ] if ;
+
+: collect-recursion ( #label -- seq )
+    #! Collect the input stacks of all #call-label nodes that
+    #! call given label.
+    dup node-param swap
+    [ [ collect-recursion* ] each-node-with ] { } make ;
+
+: amend-d-in ( new old -- )
+    [ length ] 2apply - d-in [ + ] change ;
+
+: join-values ( node -- )
+    #! We have to infer recursive labels twice to determine
+    #! which literals survive the recursion (eg, quotations)
+    #! and which don't (loop indices, etc). The latter cannot
+    #! be folded.
+    meta-d get [
+        >r collect-recursion r> add unify-lengths
+        flip [ unify-values ] map dup meta-d set
+    ] keep amend-d-in ;
+
+: splice-node ( node -- )
+    #! Labels which do not call themselves are just spliced into
+    #! the IR, and no #label node is added.
+    dup node-successor [
+        dup node, penultimate-node f over set-node-successor
+        dup current-node set
+    ] when drop ;
+
+: inline-closure ( word -- )
+    #! This is not a closure in the lexical scope sense, but a
+    #! closure under recursive value substitution.
+    #! If the block does not call itself, there is no point in
+    #! having the block node in the IR. Just add its contents.
+    dup f inline-block over recursive-label? [
+        meta-d get >r
+        drop join-values f inline-block apply-infer
+        r> over node-child set-node-in-d node,
+    ] [
+        apply-infer node-child node-successor splice-node drop
+    ] if ;
 
 : infer-compound ( word base-case -- terminates? effect )
     #! Infer a word's stack effect in a separate inferencer
@@ -47,9 +108,10 @@ hashtables parser prettyprint ;
     #! control flow by throwing an exception or restoring a
     #! continuation.
     [
-        inferring-base-case set
+        dup inferring-base-case set
         recursive-state get init-inference
-        [ inline-block drop terminated? get effect ] keep
+        over >r inline-block nip
+        [ terminated? get effect ] bind r>
     ] with-scope over consume/produce over [ terminate ] when ;
 
 GENERIC: apply-word
@@ -58,12 +120,18 @@ M: object apply-word ( word -- )
     #! A primitive with an unknown stack effect.
     no-effect ;
 
+: save-effect ( word terminates effect -- )
+    inferring-base-case get [
+        3drop
+    ] [
+        >r dupd "terminates" set-word-prop r>
+        "infer-effect" set-word-prop
+    ] if ;
+
 M: compound apply-word ( word -- )
     #! Infer a compound word's stack effect.
     [
-        dup dup f infer-compound
-        >r "terminates" set-word-prop r>
-        "infer-effect" set-word-prop
+        dup f infer-compound save-effect
     ] [
         swap t "no-effect" set-word-prop rethrow
     ] recover ;
@@ -90,19 +158,17 @@ M: word apply-object ( word -- )
 M: symbol apply-object ( word -- )
     apply-literal ;
 
-: (base-case) ( word label -- )
-    over "inline" word-prop [
-        meta-d get clone >r
-        over inline-block drop
-        [ #call-label ] [ #call ] ?if
-        r> over set-node-in-d node,
-    ] [
-        drop dup t infer-compound nip "base-case" set-word-prop
-    ] if ;
+: inline-base-case ( word label -- )
+    meta-d get clone >r over t inline-block apply-infer drop
+    [ #call-label ] [ #call ] ?if r> over set-node-in-d node, ;
 
 : base-case ( word label -- )
-    [ inferring-base-case on (base-case) ]
-    [ inferring-base-case off ] cleanup ;
+    over "inline" word-prop [
+        inline-base-case
+    ] [
+        drop dup t infer-compound swap
+        [ 2drop ] [ "base-case" set-word-prop ] if
+    ] if ;
 
 : no-base-case ( word -- )
     {
@@ -115,7 +181,7 @@ M: symbol apply-object ( word -- )
     base-case-continuation get
     [ t swap continue-with ] [ no-base-case ] if* ;
 
-: recursive-word ( word [[ label quot ]] -- )
+: recursive-word ( word rstate -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
@@ -125,28 +191,13 @@ M: symbol apply-object ( word -- )
         over "base-case" word-prop [
             nip consume/produce
         ] [
-            inferring-base-case get [
+            dup rstate-base-case? [
                 notify-base-case
             ] [
-                car base-case
+                rstate-label base-case
             ] if
         ] if*
     ] if* ;
-
-: splice-node ( node -- )
-    dup node-successor [
-        dup node, penultimate-node f over set-node-successor
-        dup current-node set
-    ] when drop ;
-
-: block, ( block -- )
-    #! If the block does not call itself, there is no point in
-    #! having the block node in the IR. Just add its contents.
-    dup recursive-label? [
-        node,
-    ] [
-        node-child node-successor splice-node
-    ] if ;
 
 M: compound apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
@@ -154,5 +205,5 @@ M: compound apply-object ( word -- )
         recursive-word
     ] [
         dup "inline" word-prop
-        [ inline-block block, ] [ apply-default ] if
+        [ inline-closure ] [ apply-default ] if
     ] if* ;

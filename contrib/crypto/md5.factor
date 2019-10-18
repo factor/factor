@@ -1,6 +1,6 @@
 IN: crypto-internals
 USING: kernel io strings sequences namespaces math
-       unparser test parser lists crypto ;
+       test parser lists crypto ;
 
 SYMBOL: a
 SYMBOL: b

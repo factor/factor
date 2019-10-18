@@ -12,14 +12,13 @@
 ! Then, start Factor as usual (./f factor.image) and enter these
 ! at the listener:
 !
-! "cairo.factor" run-file
-! "cairo_sdl.factor" run-file
+! "/contrib/cairo/load.factor" run-resource
 ! "cairo_text.factor" run-file
 
 IN: cairo-text
 SYMBOL: angle
 
-USING: cairo cairo-sdl compiler errors kernel namespaces sdl sdl-event sdl-gfx sdl-video lists math sequences ;
+USING: cairo cairo-sdl compiler errors kernel namespaces sdl lists math sequences alien ;
 
 : draw-rect ( angle -- )
 	cr get
@@ -96,7 +95,7 @@ USING: cairo cairo-sdl compiler errors kernel namespaces sdl sdl-event sdl-gfx s
 
     320 240 32 SDL_HWSURFACE  [
 		set-up-cairo
-        	<event> event-loop
+        	"event" <c-object> event-loop
 	SDL_Quit
     ] with-screen ;
 

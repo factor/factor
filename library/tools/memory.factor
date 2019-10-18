@@ -3,7 +3,7 @@
 IN: memory
 USING: arrays errors generic hashtables io kernel
 kernel-internals lists math namespaces parser prettyprint
-sequences strings unparser vectors words ;
+sequences strings vectors words ;
 
 : generations ( -- n ) 15 getenv ;
 
@@ -51,11 +51,15 @@ sequences strings unparser vectors words ;
     [ begin-scan [ (each-object) ] keep ]
     [ end-scan ] cleanup drop ; inline
 
+: (instances) ( obj quot seq -- )
+    >r over >r call [ r> r> push ] [ r> r> 2drop ] if ; inline
+
 : instances ( quot -- seq )
-    #! Return a list of all object that return true when the
+    #! Return a vector of all objects that return true when the
     #! quotation is applied to them.
-    [ [ [ swap call ] 2keep rot ?, ] each-object drop ] V{ } make ;
-    inline
+    10000 <vector> [
+        -rot [ (instances) ] 2keep
+    ] each-object nip ; inline
 
 G: each-slot ( obj quot -- )
     [ over ] standard-combination ; inline
@@ -85,11 +89,11 @@ M: object each-slot ( obj quot -- )
 
 : heap-stats ( -- counts sizes )
     #! Return a list of instance count/total size pairs.
-    num-types zero-array num-types zero-array
+    num-types 0 <array> num-types 0 <array>
     [ >r 2dup r> heap-stat-step ] each-object ;
 
 : heap-stat. ( { instances bytes type } -- )
-    dup first 0 = [
+    dup first zero? [
         dup third type>class pprint ": " write
         dup second pprint " bytes, " write
         dup first pprint " instances" print

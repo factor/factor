@@ -1,17 +1,16 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: listener
-USING: errors io kernel lists math memory namespaces parser
-presentation sequences strings styles vectors words ;
+USING: errors hashtables io kernel lists math memory namespaces
+parser sequences strings styles vectors words ;
 
 SYMBOL: listener-prompt
 SYMBOL: quit-flag
 
 SYMBOL: listener-hook
 SYMBOL: datastack-hook
-SYMBOL: callstack-hook
 
-global [ "  " listener-prompt set ] bind
+"  " listener-prompt set-global
 
 : bye ( -- )
     #! Exit the current listener.
@@ -40,21 +39,22 @@ global [ "  " listener-prompt set ] bind
     listener-prompt get write flush
     [ read-multiline [ call ] [ bye ] if ] try ;
 
-: listener ( -- )
-    #! Run a listener loop that executes user input.
-    quit-flag get [ quit-flag off ] [ listen listener ] if ;
+: (listener) ( -- )
+    quit-flag get [ quit-flag off ] [ listen (listener) ] if ;
 
-: credits ( -- )
-    "Slava Pestov:       dup drop swap >r r>" print
-    "Alex Chapman:       OpenGL binding" print
-    "Doug Coleman:       Mersenne Twister random number generator" print
-    "Chris Double:       continuation-based web framework" print
-    "Mackenzie Straight: Windows port" print ;
+: listener ( -- )
+    #! Run a listener loop that executes user input. We start
+    #! the listener in a new scope and copy the vocabulary
+    #! search path.
+    [
+        use [ clone ] change
+        [ datastack ] datastack-hook set
+        (listener)
+    ] with-scope ;
 
 : print-banner ( -- )
     "Factor " write version write
-    " on " write os write "/" write cpu write
-    ". For credits, type ``credits''." print ;
+    " on " write os write "/" write cpu print ;
 
 IN: shells
 

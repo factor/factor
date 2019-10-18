@@ -25,10 +25,10 @@ M: general-t bool>str drop "true" ;
 M: f bool>str drop "false" ;
 
 : str>bool
-    [
-        [[ "true" t ]]
-        [[ "false" f ]]
-    ] assoc ;
+    H{
+        { "true" t }
+        { "false" f }
+    } hash ;
 
 [ t ] [ t bool>str str>bool ] unit-test
 [ f ] [ f bool>str str>bool ] unit-test
@@ -97,6 +97,13 @@ M: very-funny gooey sq ;
 
 [ f ] [ \ reversed \ slice class< ] unit-test
 [ f ] [ \ slice \ reversed class< ] unit-test
+
+PREDICATE: word no-docs "documentation" word-prop not ;
+
+UNION: no-docs-union no-docs integer ;
+
+[ t ] [ no-docs no-docs-union class< ] unit-test
+[ f ] [ no-docs-union no-docs class< ] unit-test
 
 TUPLE: a ;
 TUPLE: b ;

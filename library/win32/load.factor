@@ -16,5 +16,5 @@ USING: alien io kernel parser sequences ;
     "/library/win32/win32-server.factor"
     "/library/bootstrap/win32-io.factor"
 ] [
-    dup print run-resource
+    run-resource
 ] each

@@ -18,15 +18,15 @@ M: object load-value ( vreg n value -- )
 : load-literal ( vreg obj -- )
     dup immediate? [ %immediate ] [ %indirect ] if , ;
 
-M: literal load-value ( vreg n value -- )
-    nip literal-value load-literal ;
+M: value load-value ( vreg n value -- )
+    nip value-literal load-literal ;
 
 SYMBOL: vreg-allocator
 SYMBOL: live-d
 SYMBOL: live-r
 
 : value-dropped? ( value -- ? )
-    dup literal?
+    dup value?
     over live-d get member? not
     rot live-r get member? not and
     or ;
@@ -50,7 +50,7 @@ SYMBOL: live-r
     dup node-out-r length swap node-in-r length - %inc-r , ;
 
 : literal>stack ( stack-pos value storer -- )
-    >r literal-value r> fixnum-imm? pick immediate? and [
+    >r value-literal r> fixnum-imm? pick immediate? and [
         >r 0 swap load-literal 0 <vreg> r>
     ] unless swapd execute , ; inline
 
@@ -59,7 +59,7 @@ SYMBOL: live-r
 : vreg>stack ( stack-pos value storer -- )
     {
         { [ over not ] [ 3drop ] }
-        { [ over literal? ] [ literal>stack ] }
+        { [ over value? ] [ literal>stack ] }
         { [ t ] [ computed>stack ] }
     } cond ; inline
 
@@ -71,8 +71,8 @@ SYMBOL: live-r
     \ %replace-r (vregs>stack) \ %replace-d (vregs>stack) ;
 
 : literals/computed ( stack -- literals computed )
-    dup [ dup literal? [ drop f ] unless ] map
-    swap [ dup literal? [ drop f ] when ] map ;
+    dup [ dup value? [ drop f ] unless ] map
+    swap [ dup value? [ drop f ] when ] map ;
 
 : vregs>stacks ( -- )
     live-d get literals/computed

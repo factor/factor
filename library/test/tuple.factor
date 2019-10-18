@@ -1,5 +1,5 @@
 USING: errors generic kernel kernel-internals math parser
-sequences test words ;
+sequences test words hashtables ;
 IN: temporary
 
 TUPLE: rect x y w h ;
@@ -101,7 +101,8 @@ TUPLE: delegate-clone ;
 [ "temporary-1" ]
 [
     "IN: temporary-1 SYMBOL: foobar IN: temporary TUPLE: foobar ;" eval
-    "foobar" [ "temporary-1" "temporary" ] search word-vocabulary
+    "foobar" { "temporary" "temporary-1" } [ vocab ] map
+    hash-stack word-vocabulary
 ] unit-test
 
 TUPLE: size-test a b c d ;

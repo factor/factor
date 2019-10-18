@@ -25,7 +25,6 @@
 ! 'password' and list of items. Each item has a priority, description, 
 ! and indication if it is complete. 
 IN: todo
-USE: parser
 USE: strings
 USE: io
 USE: namespaces
@@ -36,7 +35,6 @@ USE: prettyprint
 USE: hashtables
 USE: sequences
 USE: http
-USE: unparser
 
 : <todo> ( user password -- <todo> )
   #! Create an empty todo list
@@ -151,7 +149,7 @@ USE: unparser
 : priority-comparator ( item1 item2 -- number )
   #! Return 0 if item equals item2, -1 if item1 < item2 and
   #! 1 if item1 > item2.
-  >r item-priority r> item-priority lexi ;
+  >r item-priority r> item-priority <=> ;
   
 : todo-items ( <todo> -- alist )
   #! Return a list of items for the given todo list.

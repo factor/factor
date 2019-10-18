@@ -1,8 +1,14 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-layouts
 USING: errors gadgets generic hashtables kernel lists math
 namespaces sequences ;
+
+: invalidate ( gadget -- ) t swap set-gadget-relayout? ;
+
+: forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
+
+: invalidate* ( gadget -- ) dup invalidate forget-pref-dim ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
@@ -11,7 +17,7 @@ namespaces sequences ;
     dup gadget-relayout? [
         drop
     ] [
-        dup invalidate
+        dup invalidate*
         dup gadget-root?
         [ add-invalid ]
         [ gadget-parent [ relayout ] when* ] if
@@ -35,9 +41,15 @@ namespaces sequences ;
         [ set-rect-dim ] keep dup add-invalid invalidate
     ] if ;
 
-GENERIC: pref-dim ( gadget -- dim )
+GENERIC: pref-dim* ( gadget -- dim )
 
-M: gadget pref-dim rect-dim ;
+: pref-dim ( gadget -- dim )
+    pref-dim* ;
+    ! dup gadget-pref-dim [ ] [
+    !     dup pref-dim* dup rot set-gadget-pref-dim
+    ! ] ?if ;
+
+M: gadget pref-dim* rect-dim ;
 
 GENERIC: layout* ( gadget -- )
 
@@ -47,7 +59,7 @@ M: gadget layout* drop ;
 
 DEFER: layout
 
-: layout-children ( gadget -- ) gadget-children [ layout ] each ;
+: layout-children ( gadget -- ) [ layout ] each-child ;
 
 : layout ( gadget -- )
     #! Position the children of the gadget inside the gadget.
@@ -60,8 +72,7 @@ DEFER: layout
 
 TUPLE: pack align fill gap ;
 
-: pref-dims ( gadget -- list )
-    gadget-children [ pref-dim ] map ;
+: pref-dims ( gadget -- list ) [ pref-dim ] map ;
 
 : orient ( gadget seq1 seq2 -- seq )
     >r >r gadget-orientation r> r> [ pick set-axis ] 2map nip ;
@@ -105,15 +116,18 @@ C: pack ( vector -- pack )
 
 : <shelf> ( -- pack ) { 1 0 0 } <pack> ;
 
-M: pack pref-dim ( pack -- dim )
+: pack-pref-dim ( children gadget -- dim )
     [
-        [
-            pref-dims [ max-dim ] keep
-            [ { 0 0 0 } [ v+ ] reduce ] keep length 1 - 0 max
-        ] keep pack-gap n*v v+
+        >r [ max-dim ] keep
+        [ { 0 0 0 } [ v+ ] reduce ] keep length 1 - 0 max
+        r> pack-gap n*v v+
     ] keep gadget-orientation set-axis ;
 
-M: pack layout* ( pack -- ) dup pref-dims packed-layout ;
+M: pack pref-dim* ( pack -- dim )
+    [ gadget-children pref-dims ] keep pack-pref-dim ;
+
+M: pack layout* ( pack -- )
+    dup gadget-children pref-dims packed-layout ;
 
 : fast-children-on ( dim axis gadgets -- i )
     swapd [ rect-loc origin get v+ v- over v. ] binsearch nip ;

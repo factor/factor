@@ -1,74 +1,83 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: help
-DEFER: <tutorial-button>
-
 IN: gadgets-listener
-USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
-gadgets-panes gadgets-presentations gadgets-scrolling
-gadgets-splitters gadgets-theme generic hashtables help
-inspector io kernel listener lists math namespaces prettyprint
-sdl sequences shells styles threads words ;
+USING: arrays compiler gadgets gadgets-editors gadgets-labels
+gadgets-layouts gadgets-panes gadgets-scrolling
+gadgets-splitters gadgets-theme generic hashtables
+inference inspector io jedit kernel listener lists math
+namespaces parser prettyprint sequences shells threads words
+help ;
 
-SYMBOL: datastack-display
-SYMBOL: callstack-display
+SYMBOL: stack-bar
+SYMBOL: browser-pane
 
-TUPLE: display title pane ;
+: reveal-in-split ( gadget n -- )
+    >r find-splitter dup splitter-split r> - abs 1/16 <
+    [ 1/3 over set-splitter-split dup relayout ] when drop ;
 
-: <display-title> ( text -- label )
-    <label> dup display-title-theme ;
+: in-browser ( quot -- )
+    browser-pane get dup 0 reveal-in-split swap with-pane ; inline
 
-: add-display-title ( title display -- )
-    2dup set-display-title @top frame-add ;
-
-C: display ( -- display )
-    dup delegate>frame
-    "" <display-title> over add-display-title
-    f f <pane> 2dup swap set-display-pane
-    <scroller> over @center frame-add ;
-
-: present-stack ( seq title display -- )
-    [ display-title set-label-text ] keep
-    [ display-title relayout ] keep
-    display-pane [ stack. ] with-pane ;
-
-: present-datastack ( -- )
-    datastack-hook get call datastack-display get present-stack ;
-
-: present-callstack ( -- )
-    callstack-hook get call callstack-display get present-stack ;
+: in-listener ( quot -- )
+    pane get dup 1 reveal-in-split pane-call ; inline
 
 : usable-words ( -- words )
-    "use" get prune [ words ] map concat ;
+    use get hash-concat hash-values ;
 
 : word-completion ( -- )
     usable-words [ word-name ] map
     pane get pane-input set-possibilities ;
 
+: show-stack ( seq pack -- )
+    dup clear-gadget [
+        dup empty? [
+            "Empty stack" write drop
+        ] [
+            "Stack top: " write reverse-slice
+            [ [ unparse-short ] keep simple-object bl ] each bl
+        ] if
+    ] with-stream* ;
+
 : ui-listener-hook ( -- )
-    present-datastack present-callstack word-completion ;
+    datastack-hook get call stack-bar get show-stack
+    word-completion ;
+
+: help-button
+    "Please read the " write { "handbook" } $link "." print ;
 
 : listener-thread
     pane get [
-        [ datastack "Data stack:" ] datastack-hook set
-        [ callstack "Return stack:" ] callstack-hook set
         [ ui-listener-hook ] listener-hook set
-        <tutorial-button> gadget.
-        tty
+        help-button
+        listener
     ] with-stream* ;
 
-: <stack-display> ( -- gadget )
-    <display> dup datastack-display set
-    <display> dup callstack-display set
-    1/2 <x-splitter> ;
+M: label set-message ( string/f status -- )
+    set-label-text* ;
 
-: <status-bar> ( -- gadget )
-    "" <label> dup status-theme ;
+: <status-bar> ( -- gadget ) "" <label> dup status-theme ;
+
+: <bottom-bar> ( -- gadget )
+    <status-bar> dup world get set-world-status
+    <shelf> dup stack-bar set-global
+    2array make-pile 1 over set-pack-fill ;
+
+: <browser-scroller> ( -- gadget )
+    <pane> dup browser-pane set-global <scroller> ;
+
+: <listener-scroller> ( -- gadget )
+    <input-pane> dup pane set-global <scroller> ;
+
+: <listener> ( -- gadget )
+    <frame> dup solid-interior
+    <browser-scroller> <listener-scroller>
+    0 <x-splitter> over @center frame-add
+    <bottom-bar> over @bottom frame-add ;
+
+: set-application ( gadget -- )
+    world get dup clear-gadget add-gadget ;
 
 : listener-application ( -- )
-    t t <pane> dup pane global set-hash
-    <scroller> <stack-display>
-    2/3 <y-splitter> set-application
-    <status-bar> set-status
+    <listener> set-application
     [ clear listener-thread ] in-thread
     pane get request-focus ;

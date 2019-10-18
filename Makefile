@@ -50,7 +50,8 @@ OBJS = $(PLAF_OBJS) native/array.o native/bignum.o \
 	native/hashtable.o \
 	native/icache.o \
 	native/io.o \
-	native/wrapper.o
+	native/wrapper.o \
+	native/ffi_test.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
@@ -84,7 +85,7 @@ macosx-sdl:
 		CFLAGS="$(DEFAULT_CFLAGS) -DFACTOR_SDL" \
 		LIBS="$(DEFAULT_LIBS) -lSDL -lSDLmain -framework Cocoa -framework OpenGL" 
 
-linux:
+linux linux-x86 linux-amd64:
 	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
 		LIBS="-ldl $(DEFAULT_LIBS)"

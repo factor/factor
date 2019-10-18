@@ -39,12 +39,12 @@ unit-test
 
 : bar ( x -- y ) 2 + ;
 
-[ "IN: temporary : bar ( x -- y ) 2 + ;\n" ] [ [ \ bar see ] string-out ] unit-test
+[ "IN: temporary : bar 2 + ;\n" ] [ [ \ bar see ] string-out ] unit-test
 
 : baz dup ;
 
 [ ] [ [ baz ] infer drop ] unit-test
-[ "IN: temporary : baz ( object -- object object ) dup ;\n" ]
+[ "IN: temporary : baz dup ;\n" ]
 [ [ \ baz see ] string-out ] unit-test
 
 [ ] [ \ fixnum see ] unit-test
@@ -55,6 +55,16 @@ unit-test
 
 [ ] [ \ compound see ] unit-test
 
-[ ] [ \ pprinter see ] unit-test
+[ ] [ \ duplex-stream see ] unit-test
 
 [ "ALIEN: 1234" ] [ 1234 <alien> unparse ] unit-test
+
+TUPLE: cat gender declawed? castrated? ;
+
+[ "T{ cat \n    f \"m\" \n    t f\n}" ]
+[
+    [
+        10 margin set
+        T{ cat f "m" t f } unparse
+    ] with-scope
+] unit-test

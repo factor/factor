@@ -5,7 +5,7 @@ USING: arrays generic kernel sequences math ;
 
 ! Matrices
 : zero-matrix ( m n -- matrix )
-    swap [ drop zero-array ] map-with ;
+    swap [ drop 0 <array> ] map-with ;
 
 : identity-matrix ( n -- matrix )
     #! Make a nxn identity matrix.

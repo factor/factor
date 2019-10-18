@@ -14,7 +14,7 @@ USING: compiler errors generic kernel math memory words ;
 !
 ! 14 15 10 STW
 
-: insn ( operand opcode -- ) 26 shift bitor compile-cell ;
+: insn ( operand opcode -- ) 26 shift bitor assemble-cell ;
 
 : b-form ( bo bi bd aa lk -- n )
     >r 1 shift >r 2 shift >r 16 shift >r 21 shift
@@ -160,13 +160,13 @@ USING: compiler errors generic kernel math memory words ;
 
 G: (B) ( dest aa lk -- ) [ pick ] standard-combination ;
 M: integer (B) i-form 18 insn ;
-M: word (B) 0 -rot (B) relative-24 ;
+M: word (B) 0 -rot (B) relative-3 ;
 
 : B 0 0 (B) ; : BL 0 1 (B) ;
 
 GENERIC: BC
 M: integer BC 0 0 b-form 16 insn ;
-M: word BC >r 0 BC r> relative-14 ;
+M: word BC >r 0 BC r> relative-2 ;
 
 : BLT 12 0 rot BC ;  : BGE 4 0 rot BC ;
 : BGT 12 1 rot BC ;  : BLE 4 1 rot BC ;

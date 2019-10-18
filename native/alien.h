@@ -27,6 +27,9 @@ void primitive_alien_address(void);
 
 void* alien_offset(CELL object);
 
+void primitive_alien_to_string(void);
+void primitive_string_to_alien(void);
+
 void fixup_alien(ALIEN* alien);
 void fixup_displaced_alien(DISPLACED_ALIEN* d);
 void collect_displaced_alien(DISPLACED_ALIEN* d);
@@ -59,5 +62,3 @@ void primitive_alien_float(void);
 void primitive_set_alien_float(void);
 void primitive_alien_double(void);
 void primitive_set_alien_double(void);
-void primitive_alien_c_string(void);
-void primitive_set_alien_c_string(void);

@@ -1,7 +1,7 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays errors hashtables io kernel
-kernel-internals lists math namespaces opengl prettyprint
+kernel-internals math namespaces opengl prettyprint
 sequences styles ;
 IN: freetype
 
@@ -10,7 +10,8 @@ IN: freetype
 SYMBOL: freetype
 SYMBOL: open-fonts
 
-: freetype-error ( n -- ) 0 = [ "FreeType error" throw ] unless ;
+: freetype-error ( n -- )
+    zero? [ "FreeType error" throw ] unless ;
 
 : init-freetype ( -- )
     global [
@@ -53,19 +54,19 @@ M: font = eq? ;
     init-freetype [ close-freetype ] cleanup ; inline
 
 : ttf-name ( font style -- name )
-    cons H{
-        [[ [[ "Monospaced" plain       ]] "VeraMono" ]]
-        [[ [[ "Monospaced" bold        ]] "VeraMoBd" ]]
-        [[ [[ "Monospaced" bold-italic ]] "VeraMoBI" ]]
-        [[ [[ "Monospaced" italic      ]] "VeraMoIt" ]]
-        [[ [[ "Sans Serif" plain       ]] "Vera"     ]]
-        [[ [[ "Sans Serif" bold        ]] "VeraBd"   ]]
-        [[ [[ "Sans Serif" bold-italic ]] "VeraBI"   ]]
-        [[ [[ "Sans Serif" italic      ]] "VeraIt"   ]]
-        [[ [[ "Serif" plain            ]] "VeraSe"   ]]
-        [[ [[ "Serif" bold             ]] "VeraSeBd" ]]
-        [[ [[ "Serif" bold-italic      ]] "VeraBI"   ]]
-        [[ [[ "Serif" italic           ]] "VeraIt"   ]]
+    2array H{
+        { { "monospace" plain        } "VeraMono" }
+        { { "monospace" bold         } "VeraMoBd" }
+        { { "monospace" bold-italic  } "VeraMoBI" }
+        { { "monospace" italic       } "VeraMoIt" }
+        { { "sans-serif" plain       } "Vera"     }
+        { { "sans-serif" bold        } "VeraBd"   }
+        { { "sans-serif" bold-italic } "VeraBI"   }
+        { { "sans-serif" italic      } "VeraIt"   }
+        { { "serif" plain            } "VeraSe"   }
+        { { "serif" bold             } "VeraSeBd" }
+        { { "serif" bold-italic      } "VeraBI"   }
+        { { "serif" italic           } "VeraIt"   }
     } hash ;
 
 : ttf-path ( name -- string )

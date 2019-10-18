@@ -1,17 +1,25 @@
 ! Copyright (C) 2003, 2005 Slava Pestov
 IN: http
-USING: errors kernel lists math namespaces parser sequences
-io strings ;
+USING: errors hashtables io kernel lists math namespaces parser
+sequences strings ;
 
-: header-line ( alist line -- alist )
-    ": " split1 dup [ cons swons ] [ 2drop ] if ;
+: header-line ( line -- )
+    ": " split1 dup [ swap set ] [ 2drop ] if ;
 
-: (read-header) ( alist -- alist )
+: (read-header) ( hash -- hash )
     readln dup
     empty? [ drop ] [ header-line (read-header) ] if ;
 
-: read-header ( -- alist )
-    [ ] (read-header) ;
+: read-header ( -- hash )
+    [ (read-header) ] make-hash ;
+
+: url-quotable? ( ch -- ? )
+    #! In a URL, can this character be used without
+    #! URL-encoding?
+    dup letter?
+    over LETTER? or
+    over digit? or
+    swap "/_?." member? or ; foldable
 
 : url-encode ( str -- str )
     [
@@ -54,3 +62,12 @@ io strings ;
 
 : url-decode ( str -- str )
     [ 0 swap url-decode-iter ] "" make ;
+
+: build-url ( path query-params -- str )
+    [
+        swap % dup hash-empty? [
+            "?" %
+            dup hash>alist
+            [ [ url-encode ] map "=" join ] map "&" join %
+        ] unless drop
+    ] "" make ;

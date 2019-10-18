@@ -1,0 +1,38 @@
+USING: generic help ;
+
+HELP: define-typecheck "( class generic quot -- )"
+{ $values { "class" "a class word" } { "generic" "a generic word" } { "quot" "a quotation" } }
+{ $description
+    "Defines a generic word with the " { $link simple-combination } " and having one method on " { $snippet "class" } "."
+    $terpri
+    "Analogous to the following code:"
+    { $code
+        "GENERIC: generic"
+        "M: class generic quot ;"
+    }
+}
+{ $notes "This word is used internally to wrap low-level code that does not do type-checking in safe user-visible words." } ;
+
+HELP: define-slot-word "( class slot word quot -- )"
+{ $values { "class" "a class word" } { "slot" "a non-negative integer" } { "word" "a new word" } { "quot" "a quotation" } }
+{ $description "Defines " { $snippet "word" } " to be a simple type-checking generic word that receives the slot number on the stack as a fixnum." }
+$low-level-note ;
+
+HELP: define-slots "( class spec -- )"
+{ $values { "class" "a class word" } { "spec" "a sequence of triples" } }
+{ $description
+    "Defines a set of slot accessor/mutator words."
+    $terpri
+    "Each entry in the " { $snippet "spec" } " sequence is a three-element sequence with the following elements:"
+    { $list
+        "a slot number"
+        { "a reader word, or " { $link f } }
+        { "a writer word, or " { $link f } }
+    }
+    "If the reader or writer is " { $link f } ", the corresponding word is not defined."
+}
+$low-level-note ;
+
+HELP: simple-slots "( class slots base -- spec )"
+{ $values { "class" "a class word" } { "slots" "a sequence of strings" } { "base" "a slot number" } }
+{ $description "Constructs a slot specification for " { $link define-slots } " where each slot is named by an element of " { $snippet "slots" } " prefixed by the name of the class. Slots are numbered consecutively starting from " { $snippet "base" } ". Reader and writer words are defined in the current vocabulary, with the reader word having the same name as the slot, and the writer word name prefixed by " { $snippet "\"set-\"" } "." } ;

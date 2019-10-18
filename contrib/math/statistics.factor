@@ -11,11 +11,13 @@ USING: kernel math sequences ;
 
 : harmonic-mean ( seq -- n )
     #! harmonic mean, reciprocal of sum of reciprocals.
-    [ recip ] map sum recip ;
+    #! positive reals only
+    0 [ recip + ] reduce recip ;
 
+! : number-sort [ - ] sort ;
 : median ( seq -- n )
     #! middle number if odd, avg of two middle numbers if even
-    number-sort dup length dup even? [
+    [ - ] sort dup length dup even? [
         1+ 2 /i dup 1- rot [ nth ] keep swapd nth + 2 /
     ] [
         2 /i swap nth
@@ -23,14 +25,14 @@ USING: kernel math sequences ;
 
 : range ( seq -- n )
     #! max - min
-    dup first 2dup [ min ] reduce >r [ max ] reduce r> - ;
+    minmax swap - ;
 
 : var ( seq -- )
     #! variance, normalize by N-1
     dup length 1- dup 0 = [
         0 2nip
     ] [
-        swap [ mean ] keep [ over - sq ] map sum nip swap /
+        swap [ mean ] keep 0 [ pick - sq + ] reduce nip swap /
     ] if ;
 
 : std

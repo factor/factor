@@ -2,6 +2,8 @@
 	#define FACTOR_X86
 #elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
 	#define FACTOR_PPC
+#elif defined(__amd64__) || defined(__x86_64__)
+	#define FACTOR_AMD64
 #endif
 
 #ifdef __APPLE__
@@ -15,6 +17,8 @@
 	#define FACTOR_CPU_STRING "x86"
 #elif defined(FACTOR_PPC)
 	#define FACTOR_CPU_STRING "ppc"
+#elif defined(FACTOR_AMD64)
+	#define FACTOR_CPU_STRING "amd64"
 #else
 	#define FACTOR_CPU_STRING "unknown"
 #endif
@@ -33,14 +37,14 @@
 
 #if defined(WIN32)
 	#define DLLEXPORT __declspec(dllexport)
-    #define SETJMP setjmp
-    #define LONGJMP longjmp
-    #define JMP_BUF jmp_buf
+        #define SETJMP setjmp
+        #define LONGJMP longjmp
+        #define JMP_BUF jmp_buf
 #else
 	#define DLLEXPORT
-    #define SETJMP(jmpbuf) sigsetjmp(jmpbuf,1)
-    #define LONGJMP siglongjmp
-    #define JMP_BUF sigjmp_buf
+        #define SETJMP(jmpbuf) sigsetjmp(jmpbuf,1)
+        #define LONGJMP siglongjmp
+        #define JMP_BUF sigjmp_buf
 #endif
 
 #define INLINE inline static

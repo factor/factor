@@ -1,0 +1,64 @@
+USING: help prettyprint ;
+
+HELP: declaration. "( word prop -- )"
+{ $values { "word" "a word" } { "prop" "a word" } }
+{ $description "Prettyprints " { $snippet "prop" } " if " { $snippet "word" } " defines a word property string named by " { $snippet "prop" } "." }
+$prettyprinting-note ;
+
+HELP: in. "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Prettyprints a " { $snippet "IN:" } " declaration for the word." }
+$prettyprinting-note ;
+
+HELP: (synopsis) "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Prettyprints the prologue of the word's source definition." }
+$prettyprinting-note ;
+
+HELP: comment. "( string -- )"
+{ $description "Prettyprints some text with the comment style." }
+$prettyprinting-note ;
+
+HELP: stack-effect "( word -- str )"
+{ $values { "word" "a word" } { "str" "a string" } }
+{ $description "Outputs the stack effect of a word, as a stack picture string. The stack effect is taken from either online help, or a cached inferred effect." }
+$prettyprinting-note ;
+
+HELP: synopsis "( word -- str )"
+{ $values { "word" "a word" } { "str" "a string" } }
+{ $description "Outputs a short string describing the word in Factor pseudo-code." }
+{ $examples { $example "\\ append synopsis print" "IN: sequences : append ( seq1 seq2 -- seq )" } } ;
+
+HELP: (see) "( word -- )"
+{ $values { "word" "a word" } }
+{ $contract "Prettyprints the definition of the word." }
+$prettyprinting-note ;
+
+HELP: see-body "( quot word -- )"
+{ $values { "quot" "a quotation" } { "word" "a word" } }
+{ $description "Prettyprints the elements of a quotation, followed by a semicolon (;) and any declarations for the word." }
+$prettyprinting-note ;
+
+HELP: method. "( word class method -- )"
+{ $values { "word" "a generic word" } { "class" "a class word" } { "method" "a method quotation" } }
+{ $description "Prettyprints a method definition." }
+$prettyprinting-note ;
+
+HELP: class. "( class -- )"
+{ $values { "class" "a class word" } }
+{ $contract "Prettyprints the class definition." }
+$prettyprinting-note ;
+
+HELP: methods. "( class -- )"
+{ $values { "class" "a class word" } }
+{ $contract "Prettyprints all methods defined on this class." }
+$prettyprinting-note ;
+
+HELP: see "( word -- )"
+{ $values { "word" "a word" } }
+{ $description "Prettyprints the definition of a word." } ;
+
+HELP: apropos "( substr -- )"
+{ $values { "substr" "a string" } }
+{ $description "Outputs a list of all words whose name is a completion for " { $snippet "substr" } ", in the sense that after tokenizing both the word name and " { $snippet "substr" } " on a set of dividers, each chunk in the word name contains the corresponding chunk from " { $snippet "substr" } "." }
+{ $examples { $example "\"h-e\" apropos" "IN: hashtables : hash-subset ( hash quot -- subhash )\nIN: hashtables : hash-subset-with" } } ;

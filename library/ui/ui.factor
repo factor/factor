@@ -15,23 +15,20 @@ global [ first-time on ] bind
         first-time get [
             <world> world set
             world get solid-interior
-            { 800 600 0 } world get set-gadget-dim
+            { 600 700 0 } world get set-gadget-dim
             <hand> hand set
             first-time off
         ] when
     ] bind ;
 
-: check-running
-    world get world-running?
-    [ "The UI is already running" throw ] when ;
-
 IN: shells
 
 : ui ( -- )
-    #! Start the Factor graphics subsystem with the given screen
-    #! dimensions.
     [
-        init-world check-running
-        world get rect-dim first2
+        init-world world get rect-dim first2
         [ listener-application run-world ] with-gl-screen
     ] with-freetype ;
+
+IN: gadgets
+
+: ui* [ ui ] in-thread ;

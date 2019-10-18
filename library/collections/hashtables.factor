@@ -1,166 +1,211 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
-IN: hashtables
-USING: arrays generic kernel lists math sequences vectors
-kernel-internals sequences-internals ;
+! Copyright (C) 2005 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+IN: hashtables-internals
+USING: arrays hashtables kernel kernel-internals math sequences
+sequences-internals ;
 
-! A hashtable is implemented as an array of buckets. The
-! array index is determined using a hash function, and the
-! buckets are associative lists which are searched
-! linearly.
+TUPLE: tombstone ;
 
-! The unsafe words go in kernel internals. Everything else, even
-! if it is somewhat 'implementation detail', is in the
-! public 'hashtables' vocabulary.
+: ((empty)) T{ tombstone f } ; inline
+: ((tombstone)) T{ tombstone t } ; inline
 
-: bucket-count ( hash -- n ) underlying array-capacity ;
+: hash@ ( key keys -- n ) >r hashcode r> length 2 /i rem 2 * ;
 
-IN: kernel-internals
+: probe ( heys i -- hash i ) 2 + over length mod ;
 
-: hash-bucket ( n hash -- alist )
-    >r >fixnum r> underlying array-nth ;
+: (key@) ( key keys i -- n )
+    3dup swap nth-unsafe {
+        { [ dup ((tombstone)) eq? ] [ 2drop probe (key@) ] }
+        { [ dup ((empty)) eq? ] [ 2drop 3drop -1 ] }
+        { [ = ] [ 2nip ] }
+        { [ t ] [ probe (key@) ] }
+    } cond ;
 
-: set-hash-bucket ( obj n hash -- )
-    >r >fixnum r> underlying set-array-nth ;
+: key@ ( key hash -- n ) hash-array 2dup hash@ (key@) ;
 
-: change-bucket ( n hash quot -- )
-    -rot underlying
-    [ array-nth swap call ] 2keep
-    set-array-nth ; inline
+: if-key ( key hash true false -- | true: index key hash -- )
+    >r >r [ key@ ] 2keep pick -1 > r> r> if ; inline
 
-: each-bucket ( hash quot -- | quot: n hash -- )
-    over bucket-count [ [ -rot call ] 3keep ] repeat 2drop ;
-    inline
+: <hash-array> ( n -- array ) 1+ 4 * ((empty)) <array> ;
 
-: hash-size+ ( hash -- ) dup hash-size 1+ swap set-hash-size ;
-: hash-size- ( hash -- ) dup hash-size 1- swap set-hash-size ;
+: reset-hash ( n hash -- )
+    swap <hash-array> over set-hash-array
+    0 over set-hash-count 0 swap set-hash-deleted ;
 
-: grow-hash ( hash -- )
-    #! A good way to earn a living.
-    dup hash-size 2 * <array> swap set-underlying ;
-
-: (set-bucket-count) ( n hash -- )
-    >r <array> r> set-underlying ;
-    
-IN: hashtables
-
-: (hashcode) ( key table -- index )
-    #! Compute the index of the bucket for a key.
-    >r hashcode r> bucket-count rem ; inline
-
-: hash* ( key table -- [[ key value ]] )
-    #! Look up a value in the hashtable.
-    2dup (hashcode) swap hash-bucket assoc* ; flushable
-
-: hash ( key table -- value ) hash* cdr ; flushable
-
-: set-hash* ( key hash quot -- )
-    #! Apply the quotation to yield a new association list.
-    #! If the association list already contains the key,
-    #! decrement the hash size, since it will get removed.
-    -rot 2dup (hashcode) over [
-        ( quot key hash assoc -- )
-        swapd 2dup
-        assoc* [ rot hash-size- ] [ rot drop ] if
-        rot call
-    ] change-bucket ; inline
-
-: grow-hash? ( hash -- ? )
-    dup bucket-count 3 * 2 /i swap hash-size < ;
-
-: hash>alist ( hash -- alist )
-    #! Push a list of key/value pairs in a hashtable.
-    underlying concat ; flushable
-
-: (set-hash) ( value key hash -- )
-    dup hash-size+ [ set-assoc ] set-hash* ;
-
-: set-bucket-count ( new hash -- )
-    dup hash>alist >r [ (set-bucket-count) ] keep r>
-    0 pick set-hash-size
-    [ unswons rot (set-hash) ] each-with ;
-
-: grow-hash ( hash -- )
-    #! Increase the hashtable size if its too small.
-    dup grow-hash? [
-        dup hash-size new-size swap set-bucket-count
+: (new-key@) ( key keys i -- n )
+    3dup swap nth-unsafe dup tombstone? [
+        2drop 2nip
     ] [
-        drop
+        = [ 2nip ] [ probe (new-key@) ] if
     ] if ;
 
-: set-hash ( value key table -- )
-    #! Store the value in the hashtable. Either replaces an
-    #! existing value in the appropriate bucket, or adds a new
-    #! key/value pair.
-    dup grow-hash (set-hash) ;
+: new-key@ ( key hash -- n )
+    hash-array 2dup hash@ (new-key@) ;
 
-: remove-hash ( key table -- )
-    #! Remove a value from a hashtable.
-    [ remove-assoc ] set-hash* ;
+: nth-pair ( n seq -- key value )
+    [ nth-unsafe ] 2keep >r 1+ r> nth-unsafe ;
 
-: hash-clear ( hash -- )
-    0 over set-hash-size [ f -rot set-hash-bucket ] each-bucket ;
+: set-nth-pair ( value key n seq -- )
+    [ set-nth-unsafe ] 2keep >r 1+ r> set-nth-unsafe ;
+
+: hash-count+ dup hash-count 1+ swap set-hash-count ;
+
+: hash-deleted+ dup hash-deleted 1+ swap set-hash-deleted ;
+
+: hash-deleted- dup hash-deleted 1- swap set-hash-deleted ;
+
+: change-size ( hash old -- )
+    dup ((tombstone)) eq? [
+        drop hash-deleted-
+    ] [
+        ((empty)) eq? [ hash-count+ ] [ drop ] if
+    ] if ;
+
+: (set-hash) ( value key hash -- )
+    2dup new-key@ swap
+    [ hash-array 2dup nth-unsafe ] keep
+    ( value key n hash-array old hash )
+    swap change-size set-nth-pair ;
+
+: (each-pair) ( quot array i -- | quot: k v -- )
+    over length over number= [
+        3drop
+    ] [
+        [
+            swap nth-pair over tombstone?
+            [ 3drop ] [ rot call ] if
+        ] 3keep 2 + (each-pair)
+    ] if ; inline
+
+: each-pair ( array quot -- | quot: k v -- )
+    swap 0 (each-pair) ; inline
+
+: (all-pairs?) ( quot array i -- ? | quot: k v -- ? )
+    over length over number= [
+        3drop t
+    ] [
+        3dup >r >r >r swap nth-pair over tombstone? [
+            3drop r> r> r> 2 + (all-pairs?)
+        ] [
+            rot call
+            [ r> r> r> 2 + (all-pairs?) ] [ r> r> r> 3drop f ] if
+        ] if
+    ] if ; inline
+
+: all-pairs? ( array quot -- ? | quot: k v -- ? )
+    swap 0 (all-pairs?) ; inline
+
+: hash>seq ( i hash -- seq )
+    hash-array dup length 2 /i
+    [ 2 * pick + over nth-unsafe ] map
+    [ tombstone? not ] subset 2nip ;
+
+IN: hashtables
+
+: <hashtable> ( capacity -- hashtable )
+    (hashtable) [ reset-hash ] keep ;
+
+: hash* ( key hash -- value ? )
+    [
+        nip >r 1+ r> hash-array nth-unsafe t
+    ] [
+        3drop f f
+    ] if-key ;
+
+: hash-member? ( key hash -- ? )
+    [ 3drop t ] [ 3drop f ] if-key ;
+
+: ?hash* ( key hash -- value/f ? )
+    dup [ hash* ] [ 2drop f f ] if ;
+
+: hash ( key hash -- value ) hash* drop ; inline
+
+: ?hash ( key hash -- value )
+    dup [ hash ] [ 2drop f ] if ;
+
+: clear-hash ( hash -- )
+    [ hash-array length ] keep reset-hash ;
+
+: remove-hash ( key hash -- )
+    [
+        nip
+        dup hash-deleted+
+        hash-array >r >r ((tombstone)) dup r> r> set-nth-pair
+    ] [
+        3drop
+    ] if-key ;
+
+: hash-size ( hash -- n ) dup hash-count swap hash-deleted - ;
+
+: hash-empty? ( hash -- ? ) hash-size zero? ;
+
+: grow-hash ( hash -- )
+    [ dup hash-array swap hash-size 1+ ] keep
+    [ reset-hash ] keep swap [ swap pick (set-hash) ] each-pair
+    drop ;
+
+: ?grow-hash ( hash -- )
+    dup hash-count 3 * over hash-array length >
+    [ dup grow-hash ] when drop ;
+
+: set-hash ( value key hash -- )
+    [ (set-hash) ] keep ?grow-hash ;
+
+: associate ( value key -- hashtable )
+    2 <hashtable> [ set-hash ] keep ;
+
+: hash-keys ( hash -- keys ) 0 swap hash>seq ;
+
+: hash-values ( hash -- keys ) 1 swap hash>seq ;
+
+: hash>alist ( hash -- assoc )
+    dup hash-keys swap hash-values 2array flip ;
 
 : alist>hash ( alist -- hash )
-    dup length 1 max <hashtable> swap
-    [ unswons pick set-hash ] each ; foldable
+    [ length <hashtable> ] keep
+    [ first2 swap pick (set-hash) ] each ;
 
-: hash-keys ( hash -- list )
-    hash>alist [ car ] map ; flushable
+: hash-each ( hash quot -- | quot: k v -- )
+    >r hash-array r> each-pair ; inline
 
-: hash-values ( hash -- alist )
-    hash>alist [ cdr ] map ; flushable
+: hash-each-with ( obj hash quot -- | quot: obj k v -- )
+    swap [ 2swap [ >r -rot r> call ] 2keep ] hash-each 2drop ;
+    inline
 
-: hash-each ( hash quot -- | quot: [[ k v ]] -- )
-    swap underlying [ swap each ] each-with ; inline
+: hash-all? ( hash quot -- | quot: k v -- ? )
+    >r hash-array r> all-pairs? ; inline
 
-: hash-each-with ( obj hash quot -- | quot: obj [[ k v ]] -- )
-    swap [ with ] hash-each 2drop ; inline
+: hash-all-with? ( obj hash quot -- | quot: obj k v -- ? )
+    swap
+    [ 2swap [ >r -rot r> call ] 2keep rot ] hash-all? 2nip ;
+    inline
 
-: hash-all? ( hash quot -- | quot: [[ k v ]] -- ? )
-    swap underlying [ swap all? ] all-with? ; inline
-
-: hash-all-with? ( obj hash quot -- ? | quot: [[ k v ]] -- ? )
-    swap [ with rot ] hash-all? 2nip ; inline
-
-: hash-contained? ( h1 h2 -- ? )
-    #! Test if h2 contains all the key/value pairs of h1.
+: subhash? ( h1 h2 -- ? )
     swap [
-        uncons >r swap hash* dup [
-            cdr r> =
-        ] [
-            r> 2drop f
-        ] if
+        >r swap hash* [ r> = ] [ r> 2drop f ] if
     ] hash-all-with? ; flushable
 
-: hash-filter-step ( quot assoc -- assoc n )
-    [ swap subset dup length ] keep length - ; inline
+: hash-subset ( hash quot -- hash | quot: k v -- ? )
+    over hash-size <hashtable> rot [
+        2swap [
+            >r pick pick >r >r call [
+                r> r> swap r> set-hash
+            ] [
+                r> r> r> 3drop
+            ] if
+        ] 2keep
+    ] hash-each nip ; inline
 
-: (hash-filter) ( quot hash -- n )
-    #! Output the number of key/value pairs that were removed.
-    0 swap underlying [
-        pick >r swap >r hash-filter-step r> + swap r> -rot
-    ] inject nip ; inline
+: hash-subset-with ( obj hash quot -- hash | quot: obj { k v } -- ?  )
+    swap
+    [ 2swap [ >r -rot r> call ] 2keep rot ] hash-subset 2nip ;
+    inline
 
-: hash-filter ( hash quot -- | quot: [[ k v ]] -- ? )
-    #! Remove all key/value pairs that do not satisfy the
-    #! predicate.
-    swap [ (hash-filter) ] keep
-    [ hash-size + ] keep
-    set-hash-size ; inline
-
-: hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
-    #! Make a new hash that only includes the key/value pairs
-    #! which satisfy the predicate.
-    >r clone r> over >r hash-filter r> ; inline
-
-: hash-subset-with ( obj hash quot -- hash )
-    swap [ with rot ] hash-subset 2nip ; inline
-
-M: hashtable clone ( hash -- hash ) clone-growable ;
+M: hashtable clone ( hash -- hash )
+    (clone) dup hash-array clone over set-hash-array ;
 
 : hashtable= ( hash hash -- ? )
-    2dup hash-contained? >r swap hash-contained? r> and ;
+    2dup subhash? >r swap subhash? r> and ;
 
 M: hashtable = ( obj hash -- ? )
     {
@@ -170,48 +215,44 @@ M: hashtable = ( obj hash -- ? )
         { [ t ] [ hashtable= ] }
     } cond ;
 
-M: hashtable hashcode ( hash -- n )
-    #! Poor.
-    hash-size ;
-
-: cache ( key hash quot -- value | quot: key -- value )
-    pick pick hash [
-        >r 3drop r>
-    ] [                                             
-        pick rot >r >r call dup r> r> set-hash
-    ] if* ; inline
-
-: map>hash ( seq quot -- hash | quot: elt -- value )
-    over >r map r> dup length <hashtable> -rot
-    [ pick set-hash ] 2each ; inline
-
 : ?hash ( key hash/f -- value/f )
     dup [ hash ] [ 2drop f ] if ; flushable
 
 : ?hash* ( key hash/f -- value/f )
-    dup [ hash* ] [ 2drop f ] if ; flushable
+    dup [ hash* ] [ 2drop f f ] if ; flushable
 
 : ?set-hash ( value key hash/f -- hash )
-    [ 1 <hashtable> ] unless* [ set-hash ] keep ;
+    [ [ set-hash ] keep ] [ associate ] if ;
+
+: hash-stack ( key seq -- value )
+    [ dupd hash-member? ] find-last nip ?hash ; flushable
 
 : hash-intersect ( hash1 hash2 -- hash1/\hash2 )
-    #! Remove all keys from hash2 not in hash1.
-    [ car swap hash ] hash-subset-with ;
+    [ drop swap hash ] hash-subset-with ;
 
 : hash-diff ( hash1 hash2 -- hash2-hash1 )
-    #! Remove all keys from hash2 in hash1.
-    [ car swap hash not ] hash-subset-with ;
+    [ drop swap hash not ] hash-subset-with ;
 
 : hash-update ( hash1 hash2 -- )
-    #! Add all key/value pairs from hash2 to hash1.
-    [ unswons rot set-hash ] hash-each-with ;
+    [ swap rot set-hash ] hash-each-with ;
+
+: hash-concat ( seq -- hash )
+    H{ } clone swap [ dupd hash-update ] each ;
 
 : hash-union ( hash1 hash2 -- hash1\/hash2 )
-    #! Make a new hashtable with all key/value pairs from
-    #! hash1 and hash2. Values in hash2 take precedence.
     >r clone dup r> hash-update ;
 
 : remove-all ( hash seq -- seq )
-    #! Remove all elements from the sequence that are keys
-    #! in the hashtable.
-    [ swap hash* not ] subset-with ; flushable
+    [ swap hash-member? not ] subset-with ; flushable
+
+: cache ( key hash quot -- value | quot: key -- value )
+    pick pick hash [
+        >r 3drop r>
+    ] [
+        pick rot >r >r call dup r> r> set-hash
+    ] if* ; inline
+
+: map>hash ( seq quot -- hash | quot: key -- key value )
+    over length <hashtable> rot
+    [ -rot [ >r call swap r> set-hash ] 2keep ] each nip ;
+    inline

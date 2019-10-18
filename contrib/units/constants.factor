@@ -1,4 +1,4 @@
-USING: kernel math dimensioned si-units ;
+USING: kernel math si-units ;
 ! From: http://physics.nist.gov/constants
 
 IN: si-units

@@ -17,6 +17,13 @@ USE: test
 [ t ] [ e pi i * ^ real -1.0 = ] unit-test
 [ t ] [ e pi i * ^ imaginary -0.00001 0.00001 between? ] unit-test
 
+[ 0.0/0.0 ] [ 0 0 ^ ] unit-test
+[ 1.0/0.0 ] [ 0 -2 ^ ] unit-test
+[ 0.0/0.0 ] [ 0 0.0 ^ ] unit-test
+[ 1.0/0.0 ] [ 0 -2.0 ^ ] unit-test
+[ 0 ] [ 0 3.0 ^ ] unit-test
+[ 0 ] [ 0 3 ^ ] unit-test
+
 [ 1.0 ] [ 0 cosh ] unit-test
 [ 0.0 ] [ 1 acosh ] unit-test
             

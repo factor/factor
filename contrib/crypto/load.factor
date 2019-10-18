@@ -1,10 +1,14 @@
-IN: crypto
-USING: parser sequences words compiler ;
-[
-    "contrib/crypto/common.factor"
-    "contrib/crypto/md5.factor"
-    "contrib/crypto/sha1.factor"
-] [ run-file ] each
+IN: scratchpad
+USING: kernel parser sequences words compiler ;
 
-"crypto" words [ try-compile ] each
+"/contrib/math/load.factor" run-resource
 
+{
+    "common"
+    "random"
+    "miller-rabin"
+    "md5"
+    "sha1"
+    "rsa"
+    "rc4"
+} [ "/contrib/crypto/" swap ".factor" append3 run-resource ] each

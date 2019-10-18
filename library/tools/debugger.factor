@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
-USING: generic inspector kernel kernel-internals lists math
-namespaces parser prettyprint sequences io sequences-internals
-strings vectors words ;
+USING: generic hashtables inspector io kernel kernel-internals
+lists math namespaces parser prettyprint sequences
+sequences-internals strings vectors words ;
 
 SYMBOL: error
 SYMBOL: error-continuation
@@ -68,18 +68,9 @@ M: kernel-error error. ( error -- )
         [ user-interrupt. ]
     } dispatch ;
 
-M: no-method error. ( error -- )
-    "No suitable method." print
-    "Generic word: " write dup no-method-generic .
-    "Methods: " write dup no-method-generic order .
-    "Object: " write dup no-method-object short.
-    "Object class: " write no-method-object class short. ;
+M: no-method summary drop "No suitable method" ;
 
-M: no-math-method error. ( error -- )
-    "No suitable arithmetic method." print
-    "Generic word: " write dup no-math-method-generic .
-    "Left operand: " write dup no-math-method-left short.
-    "Right operand: " write no-math-method-right short. ;
+M: no-math-method summary drop "No suitable arithmetic method" ;
 
 : parse-dump ( error -- )
     "Parsing " write
@@ -89,19 +80,15 @@ M: no-math-method error. ( error -- )
     
     dup parse-error-text dup string? [ print ] [ drop ] if
     
-    parse-error-col [ 0 ] unless* CHAR: \s fill write "^" print ;
+    parse-error-col [ 0 ] unless*
+    CHAR: \s <string> write "^" print ;
 
 M: parse-error error. ( error -- )
     dup parse-dump  delegate error. ;
 
-M: bounds-error error. ( error -- )
-    "Sequence index out of bounds" print
-    "Sequence: " write dup bounds-error-seq short.
-    "Minimum: 0" print
-    "Maximum: " write dup bounds-error-seq length .
-    "Requested: " write bounds-error-index . ;
+M: bounds-error summary drop "Sequence index out of bounds" ;
 
-M: string error. ( error -- ) print ;
+M: tuple error. ( error -- ) describe ;
 
 M: object error. ( error -- ) . ;
 
@@ -110,32 +97,32 @@ M: object error. ( error -- ) . ;
 : :r ( -- ) error-continuation get continuation-call stack. ;
 
 : :get ( var -- value )
-    error-continuation get continuation-name (get) ;
+    error-continuation get continuation-name hash-stack ;
 
 : debug-help ( -- )
-    ":s :r show stacks at time of error." print
-    ":get ( var -- value ) inspects the error namestack." print ;
+    ":s :r show stacks at time of error" print
+    ":get ( var -- value ) accesses variables at time of error" print
+    ":error starts the inspector with the error" print
+    ":cc starts the inspector with the error continuation" print
+    flush ;
 
 : flush-error-handler ( -- )
-    #! Last resort.
     [ "Error in default error handler!" print ] when ;
 
 : print-error ( error -- )
-    #! Print the error.
+    "An unhandled error was caught:" print terpri
     [ dup error. ] catch nip flush-error-handler ;
 
-: try ( quot -- )
-    #! Execute a quotation, and if it throws an error, print it
-    #! and return to the caller.
-    [ print-error debug-help ] recover ;
+: try ( quot -- ) [ print-error terpri debug-help ] recover ;
 
 : save-error ( error continuation -- )
-    global [ error-continuation set error set ] bind ;
+    error-continuation set-global error set-global ;
 
 : error-handler ( error -- )
     dup continuation save-error rethrow ;
 
 : init-error-handler ( -- )
+    V{ } clone set-catchstack
     ( kernel calls on error )
     [ error-handler ] 5 setenv
     kernel-error 12 setenv ;
