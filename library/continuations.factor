@@ -34,7 +34,10 @@ USE: namespaces
 USE: stack
 USE: vectors
 
-: reify datastack >pop> callstack >pop> namestack catchstack ;
+: reify ( quot -- )
+    >r datastack >pop> callstack >pop> namestack catchstack
+    r> call ;
+
 : (callcc) cons cons cons cons swap call ;
 
 : continue0 ( ds rs ns cs -- )
@@ -49,7 +52,7 @@ USE: vectors
     #!
     #! When called, the quotation restores execution state to
     #! the point after the callcc0 call.
-    reify [ continue0 ] (callcc) ;
+    [ [ continue0 ] (callcc) ] reify ;
 
 : continue1 ( obj ds rs ns cs -- obj )
     set-catchstack set-namestack
@@ -64,11 +67,4 @@ USE: vectors
     #! When called, the quotation restores execution state to
     #! the point after the callcc1 call, and places X at the top
     #! of the original datastack.
-    reify [ continue1 ] (callcc) ;
-
-: suspend ( -- )
-    "top-level-continuation" get dup [
-        call
-    ] [
-        toplevel
-    ] ifte ;
+    [ [ continue1 ] (callcc) ] reify ;

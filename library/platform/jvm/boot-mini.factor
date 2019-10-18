@@ -45,14 +45,15 @@ USE: parser
 "/library/vector-combinators.factor"        run-resource ! vectors
 "/library/lists.factor"                     run-resource ! lists
 "/library/assoc.factor"                     run-resource ! lists
+"/library/hashtables.factor"                run-resource ! hashtables
 "/library/platform/jvm/strings.factor"      run-resource ! strings
 "/library/platform/jvm/sbuf.factor"         run-resource ! strings
 "/library/strings.factor"                   run-resource ! strings
 "/library/platform/jvm/errors.factor"       run-resource ! errors
 "/library/platform/jvm/namespaces.factor"   run-resource ! namespaces
 "/library/namespaces.factor"                run-resource ! namespaces
-"/library/sbuf.factor"                      run-resource ! strings
 "/library/list-namespaces.factor"           run-resource ! namespaces
+"/library/sbuf.factor"                      run-resource ! strings
 "/library/math/namespace-math.factor"       run-resource ! arithmetic
 "/library/continuations.factor"             run-resource ! continuations
 "/library/errors.factor"                    run-resource ! errors
@@ -66,6 +67,7 @@ USE: parser
 "/library/platform/jvm/regexp.factor"       run-resource ! regexp
 "/library/stream.factor"                    run-resource ! streams
 "/library/platform/jvm/stream.factor"       run-resource ! streams
+"/library/platform/jvm/files.factor"        run-resource ! files
 "/library/stdio.factor"                     run-resource ! stdio
 "/library/platform/jvm/unparser.factor"     run-resource ! unparser
 "/library/platform/jvm/parser.factor"       run-resource ! parser
@@ -73,11 +75,13 @@ USE: parser
 
 !!! Math library.
 "/library/platform/jvm/real-math.factor" run-resource ! real-math
+"/library/math/constants.factor"         run-resource ! math
 "/library/math/math.factor"              run-resource ! math
 "/library/math/pow.factor"               run-resource ! math
 "/library/math/list-math.factor"         run-resource ! math
 
 !!! Development tools.
+"/library/platform/jvm/processes.factor"   run-resource ! processes
 "/library/vocabulary-style.factor"         run-resource ! style
 "/library/prettyprint.factor"              run-resource ! prettyprint
 "/library/platform/jvm/prettyprint.factor" run-resource ! prettyprint

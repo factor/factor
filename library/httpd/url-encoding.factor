@@ -26,21 +26,19 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: url-encoding
-USE: arithmetic
 USE: combinators
 USE: kernel
+USE: logic
 USE: format
+USE: math
 USE: parser
-USE: regexp
 USE: stack
 USE: strings
 USE: unparser
 
 : url-encode ( str -- str )
     [
-        dup "[a-zA-Z0-9/_?]" re-matches [
-            "%" swap >number >hex 2 digits cat2
-        ] unless
+        dup url-quotable? [ "%" swap >hex 2 digits cat2 ] unless
     ] str-map ;
 
 : url-decode-hex ( index str -- )
@@ -49,20 +47,20 @@ USE: unparser
     ] [
         ! Note that hex> will push f if there is an invalid
         ! hex literal
-        [ succ dup 2 + ] dip substring hex> [ >char % ]  when*
+        >r succ dup 2 + r> substring hex> [ >char % ] when*
     ] ifte ;
 
 : url-decode-% ( index str -- index str )
-    2dup url-decode-hex [ 3 + ] dip ;
+    2dup url-decode-hex >r 3 + r> ;
 
-: url-decode-+-or-other ( index str -- index str )
-    dup "+" = [ drop " " ] when % [ succ ] dip ;
+: url-decode-+-or-other ( index str ch -- index str )
+    CHAR: + CHAR: \s replace % >r succ r> ;
 
 : url-decode-iter ( index str -- )
     2dup str-length >= [
         2drop
     ] [
-        2dup str-nth dup "%" = [
+        2dup str-nth dup CHAR: % = [
             drop url-decode-%
         ] [
             url-decode-+-or-other

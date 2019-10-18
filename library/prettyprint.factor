@@ -26,13 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: prettyprint
-USE: arithmetic
 USE: combinators
 USE: errors
 USE: format
 USE: kernel
 USE: logic
 USE: lists
+USE: math
 USE: namespaces
 USE: prettyprint
 USE: stack
@@ -41,7 +41,6 @@ USE: strings
 USE: styles
 USE: unparser
 USE: vectors
-USE: vocabularies
 USE: words
 
 : tab-size
@@ -91,7 +90,7 @@ DEFER: prettyprint*
 
 : check-recursion ( indent obj quot -- )
     >r over prettyprint-limit >= [
-        r> drop drop "#< ... >" write
+        r> drop drop "#< ... > " write
     ] [
         r> call
     ] ifte ;
@@ -103,14 +102,16 @@ DEFER: prettyprint*
     prettyprint> "]" write ;
 
 : (prettyprint-list) ( indent list -- indent )
-    uncons >r prettyprint-element r>
-    dup cons? [
-        (prettyprint-list)
-    ] [
-        [
-            "|" write prettyprint-space prettyprint-element
-        ] when*
-    ] ifte ;
+    [
+        uncons >r prettyprint-element r>
+        dup cons? [
+            (prettyprint-list)
+        ] [
+            [
+                "|" write prettyprint-space prettyprint-element
+            ] when*
+        ] ifte
+    ] when* ;
 
 : prettyprint-list ( indent list -- indent )
     #! Pretty-print a list, without [ and ].
@@ -129,14 +130,18 @@ DEFER: prettyprint*
     #! Pretty-print a vector, without { and }.
     [ [ prettyprint-element ] vector-each ] check-recursion ;
 
-: prettyprint-{} ( indent list -- indent )
-    swap prettyprint-{ swap prettyprint-vector prettyprint-} ;
+: prettyprint-{} ( indent vector -- indent )
+    dup vector-length 0 = [
+        drop "{ }" write
+    ] [
+        swap prettyprint-{ swap prettyprint-vector prettyprint-}
+    ] ifte ;
 
 : trim-newline ( str -- str )
     dup ends-with-newline? dup [ nip ] [ drop ] ifte ;
 
 : prettyprint-comment ( comment -- )
-    [ "comments" ] get-style [ trim-newline write-attr ] bind ;
+    trim-newline [ "comments" ] get-style write-attr ;
 
 : word-link ( word -- link )
     <%
@@ -147,15 +152,14 @@ DEFER: prettyprint*
     %> ;
 
 : word-attrs ( word -- attrs )
-    dup word-style clone swap
     dup defined? [
-        swap [ word-link "link" set ] extend
+        dup >r word-link "object-link" r> word-style acons
     ] [
-        drop
+        word-style
     ] ifte ;
 
 : prettyprint-word ( word -- )
-    dup word-attrs [ word-name write-attr ] bind ;
+    dup word-name swap word-attrs write-attr ;
 
 : prettyprint-object ( indent obj -- indent )
     unparse write ;
@@ -173,6 +177,19 @@ DEFER: prettyprint*
 : prettyprint ( obj -- )
     0 swap prettyprint* drop terpri ;
 
+: vocab-link ( vocab -- link )
+    <% "vocabularies'" % % %> ;
+
+: vocab-attrs ( word -- attrs )
+    vocab-link "object-link" default-style acons ;
+
+: prettyprint-vocab ( vocab -- )
+    dup vocab-attrs write-attr ;
+
+: prettyprint-IN: ( indent word -- )
+    "IN:" write prettyprint-space
+    word-vocabulary prettyprint-vocab prettyprint-newline ;
+
 : prettyprint-: ( indent -- indent )
     ":" write prettyprint-space
     tab-size + ;
@@ -181,18 +198,16 @@ DEFER: prettyprint*
     ";" write
     tab-size - ;
 
-: prettyprint-:; ( indent word list -- indent )
-    >r
-    >r prettyprint-: r>
-    prettyprint-word prettyprint-space r>
-    prettyprint-list prettyprint-; ;
+: prettyprint-plist ( word -- )
+    dup "parsing" word-property [ " parsing" write ] when
+    "inline" word-property [ " inline" write ] when ;
 
 : . ( obj -- )
-    <namespace> [
+    [
         "prettyprint-single-line" on
         tab-size 4 * "prettyprint-limit" set
         prettyprint
-    ] bind ;
+    ] with-scope ;
 
 : [.] ( list -- )
     #! Unparse each element on its own line.
@@ -202,3 +217,8 @@ DEFER: prettyprint*
 : .s datastack  . ;
 : .r callstack  . ;
 : .c catchstack . ;
+
+! For integers only
+: .b >bin print ;
+: .o >oct print ;
+: .h >hex print ;

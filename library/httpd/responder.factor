@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=0:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -28,6 +28,8 @@
 IN: httpd-responder
 
 USE: combinators
+USE: httpd
+USE: kernel
 USE: lists
 USE: logging
 USE: namespaces
@@ -36,27 +38,49 @@ USE: stack
 USE: streams
 USE: strings
 
-USE: httpd
+! Responders are called in a new namespace with these
+! variables:
+
+! - method -- one of get, post, or head.
+! - request -- the entire URL requested, including responder
+!              name
+! - raw-query -- raw query string
+! - query -- an alist of query parameters, eg
+!            foo.bar?a=b&c=d becomes
+!            [ [ "a" | "b" ] [ "c" | "d" ] ]
+! - header -- an alist of headers from the user's client
+! - response -- an alist of the POST request response
 
 : <responder> ( -- responder )
     <namespace> [
+        ( url -- )
         [
             drop "GET method not implemented" httpd-error
         ] "get" set
-
+        ( url -- )
         [
             drop "POST method not implemented" httpd-error
         ] "post" set
+        ( url -- )
+        [
+            drop "HEAD method not implemented" httpd-error
+        ] "head" set
+        ( url -- )
+        [
+            drop bad-request
+        ] "bad" set
     ] extend ;
 
-: serving-html ( -- )
-    "200 Document follows" "text/html" response print ;
-
-: serving-text ( -- )
-    "200 Document follows" "text/plain" response print ;
-
 : get-responder ( name -- responder )
-    "httpd-responders" get [ get ] bind ;
+    "httpd-responders" get get* [
+        "404" "httpd-responders" get get*
+    ] unless* ;
+
+: default-responder ( -- responder )
+    "default" get-responder ;
+
+: set-default-responder ( name -- )
+    get-responder "default" "httpd-responders" get set* ;
 
 : responder-argument ( argument -- argument )
     dup f-or-"" [ drop "default-argument" get ] when ;
@@ -64,28 +88,37 @@ USE: httpd
 : call-responder ( method argument responder -- )
     [ responder-argument swap get call ] bind ;
 
-: no-such-responder ( name -- )
-    "404 no such responder: " swap cat2 httpd-error ;
+: serve-default-responder ( method url -- )
+    default-responder call-responder ;
 
-: bad-responder-query ( argument -- )
-    "404 missing parameter" httpd-error ;
+: serve-explicit-responder ( method url -- )
+    "/" split1 dup [
+        swap get-responder call-responder
+    ] [
+        ! Just a responder name by itself
+        drop "request" get "/" cat2 redirect drop
+    ] ifte ;
+
+: log-responder ( url -- )
+    "Calling responder " swap cat2 log ;
 
 : trim-/ ( url -- url )
     #! Trim a leading /, if there is one.
-    dup "/" str-head? dup [ nip ] [ drop ] ifte ;
+    "/" ?str-head drop ;
 
-: log-responder ( argument -- )
-    "Calling responder " swap cat2 log ;
-
-: serve-responder ( argument method -- )
-    swap
-    trim-/
-    dup "/" split1 dup [
-        nip unswons dup get-responder dup [
-            swap log-responder call-responder
-        ] [
-            drop nip nip no-such-responder
-        ] ifte
+: serve-responder ( method url -- )
+    #! Responder URLs come in two forms:
+    #! /foo/bar... - default-responder used
+    #! /responder/foo/bar - responder foo, argument bar
+    dup log-responder trim-/ "responder/" ?str-head [
+        serve-explicit-responder
     ] [
-        3drop bad-responder-query
+        serve-default-responder
     ] ifte ;
+
+: no-such-responder ( -- )
+    "404 No such responder" httpd-error ;
+
+: add-responder ( responder -- )
+    #! Add a responder object to the list.
+    "responder" over get*  "httpd-responders" get set* ;

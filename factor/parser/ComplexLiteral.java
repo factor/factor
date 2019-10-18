@@ -52,12 +52,12 @@ public class ComplexLiteral extends FactorParsingDefinition
 	{
 		// Read two numbers
 		Number real = FactorJava.toNumber(
-			reader.nextNonEOF(true,false));
+			reader.nextNonEOL(true,false));
 		Number imaginary = FactorJava.toNumber(
-			reader.nextNonEOF(true,false));
+			reader.nextNonEOL(true,false));
 
 		// Read the end
-		String end = (String)reader.nextNonEOF(false,false);
+		String end = (String)reader.nextNonEOL(false,false);
 		if(!end.equals(this.end))
 			reader.error("Expected " + this.end);
 

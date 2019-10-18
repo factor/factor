@@ -26,58 +26,85 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: httpd
-USE: arithmetic
 USE: combinators
 USE: errors
+USE: httpd-responder
+USE: kernel
 USE: lists
 USE: logging
 USE: logic
 USE: namespaces
-USE: regexp
 USE: stack
 USE: stdio
 USE: streams
 USE: strings
-
-USE: httpd-responder
+USE: threads
 USE: url-encoding
 
-: bad-request ( -- )
-    "400 Bad request" httpd-error ;
+: httpd-log-stream ( -- stream )
+    #! Set httpd-log-file to save httpd log to a file.
+    "httpd-log-file" get dup [
+        <filecr>
+    ] [
+        drop "stdio" get
+    ] ifte ;
 
 : url>path ( uri -- path )
-    url-decode dup "http://.*?(/.*)" group1 dup [
-        nip
+    url-decode dup "http://" str-head? dup [
+        "/" split1 f "" replace nip nip
     ] [
         drop
     ] ifte ;
 
-: secure-path ( request -- path )
-    dup [
-        "(.*?)( HTTP.*|)" group1 dup [
-            dup #".*\.\.+" re-matches [ drop f ] when
-        ] when
-    ] when ;
+: secure-path ( path -- path )
+    ".." over str-contains? [ drop f ] when ;
 
-: httpd-request ( request -- )
+: request-method ( cmd -- method )
+    [
+        [ "GET" | "get" ]
+        [ "POST" | "post" ]
+        [ "HEAD" | "head" ]
+    ] assoc [ "bad" ] unless* ;
+
+: (handle-request) ( arg cmd -- url method )
+    request-method dup "method" set swap
+    prepare-url prepare-header ;
+
+: handle-request ( arg cmd -- )
+    [ (handle-request) serve-responder ] with-scope ;
+
+: parse-request ( request -- )
     dup log
-    secure-path dup [
-        url>path
-
-        [
-            [ "GET (.+)"  | [ car "get"  serve-responder ] ]
-            [ "POST (.+)" | [ car "post" serve-responder ] ]
-            [ t           | [ drop bad-request           ] ]
-        ] re-cond
+    " " split1 dup [
+        " HTTP" split1 drop url>path secure-path dup [
+            swap handle-request
+        ] [
+            2drop bad-request
+        ] ifte
     ] [
-        drop bad-request
+        2drop bad-request
     ] ifte ;
 
 : httpd-client ( socket -- )
     [
-        "stdio" get "client" set log-client
-        read [ httpd-request ] when*
-    ] with-stream ;
+        [
+            "stdio" get "client" set log-client
+            read [ parse-request ] when*
+        ] with-stream
+    ] [
+        [ default-error-handler drop ] when*
+    ] catch ;
+
+: httpd-connection ( socket -- )
+    #! We're single-threaded in Java Factor, and
+    #! multi-threaded in CFactor.
+    java? [
+        httpd-client
+    ] [
+        [
+            httpd-client
+        ] in-thread drop
+    ] ifte ;
 
 : quit-flag ( -- ? )
     global [ "httpd-quit" get ] bind ;
@@ -86,17 +113,17 @@ USE: url-encoding
     global [ "httpd-quit" off ] bind ;
 
 : httpd-loop ( server -- server )
-    [
-        quit-flag not
+    quit-flag [
+        dup dup accept httpd-connection
+        httpd-loop
+    ] unless ;
+
+: (httpd) ( port -- )
+    <server> [
+        httpd-loop
     ] [
-        dup accept httpd-client
-    ] while ;
+        swap fclose clear-quit-flag rethrow
+    ] catch ;
 
 : httpd ( port -- )
-    [
-        <server> [
-            httpd-loop
-        ] [
-            swap fclose clear-quit-flag rethrow
-        ] catch
-    ] with-logging ;
+    [ httpd-log-stream "log" set (httpd) ] with-scope ;

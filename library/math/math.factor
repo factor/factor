@@ -26,10 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: logic
+USE: math
 USE: real-math
 USE: stack
 
@@ -45,19 +45,17 @@ USE: stack
     ! This is the naive implementation, for benchmarking purposes.
     1 swap [ succ * ] times* ;
 
-: 2^ ( x -- 2^x )
-    1 swap [ 2 * ] times ;
-
-: harmonic ( n -- 1 + 1/2 + 1/3 + ... + 1/n )
-    0 swap [ succ recip + ] times* ;
-
 : mag2 ( x y -- mag )
     #! Returns the magnitude of the vector (x,y).
     swap sq swap sq + fsqrt ;
 
 : abs ( z -- abs )
     #! Compute the complex absolute value.
-    >rect mag2 ; inline
+    dup complex? [
+        >rect mag2
+    ] [
+        dup 0 < [ neg ] when
+    ] ifte ;
 
 : conjugate ( z -- z* )
     >rect neg rect> ;
@@ -74,3 +72,6 @@ USE: stack
 
 : polar> ( abs arg -- z )
     cis * ; inline
+
+: align ( offset width -- offset )
+    2dup mod dup 0 = [ 2drop ] [ - + ] ifte ;

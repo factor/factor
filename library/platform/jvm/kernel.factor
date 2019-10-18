@@ -25,11 +25,13 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel
+IN: words
 
 : word ( -- word )
     ! Pushes most recently defined word.
     interpreter "factor.FactorInterpreter" "last" jvar-get ;
+
+IN: kernel
 
 : inline ( -- )
     #! Marks the most recently defined word to be inlined.
@@ -54,35 +56,23 @@ IN: kernel
     [ "java.lang.Object" "java.lang.Object" ]
     "factor.FactorLib" "equal" jinvoke-static ;
 
+: class-of* ( obj -- class )
+    [ ] "java.lang.Object" "getClass" jinvoke ;
+
 : class-of ( obj -- class )
-    [ ] "java.lang.Object" "getClass" jinvoke
-    [ ] "java.lang.Class" "getName" jinvoke ;
-
-: clone ( obj -- obj )
-    [ ] "factor.PublicCloneable" "clone" jinvoke ;
-
-: clone-array ( obj -- obj )
-    [ [ "java.lang.Object" ] ]
-    "factor.FactorLib" "cloneArray"
-    jinvoke-static ;
-
-: deep-clone-array ( obj -- obj )
-    [ [ "java.lang.Object" ] ]
-    "factor.FactorLib" "deepCloneArray"
-    jinvoke-static ;
+    class-of* [ ] "java.lang.Class" "getName" jinvoke ;
 
 : is ( obj class -- boolean )
     ! Like "instanceof" in Java.
     [ "java.lang.Object" ] "java.lang.Class" "isInstance"
     jinvoke ;
 
+: clone ( obj -- obj )
+    [ ] "factor.PublicCloneable" "clone" jinvoke ;
+
 : toplevel ( -- )
     interpreter
     [ ] "factor.FactorInterpreter" "topLevel" jinvoke ;
-
-: exec ( args -- exitCode )
-    [ [ "java.lang.String" ] ] "factor.FactorLib" "exec"
-    jinvoke-static ;
 
 : exit* ( code -- )
     [ "int" ] "java.lang.System" "exit" jinvoke-static ;
@@ -90,7 +80,7 @@ IN: kernel
 : garbage-collection ( -- )
     [ ] "java.lang.System" "gc" jinvoke-static ;
 
-IN: arithmetic
+IN: math
 DEFER: >bignum
 
 IN: kernel
@@ -107,3 +97,24 @@ IN: kernel
 : java? t ;
 : native? f ;
 : version "factor.FactorInterpreter" "VERSION" jvar-static-get ;
+
+: jvm-runtime ( -- java.lang.Runtime )
+    #! Return the java.lang.Runtime object for the JVM
+    f "java.lang.Runtime" "getRuntime" jinvoke-static ;
+
+: free-memory ( -- int )
+  #! Return the free memory in the JVM.
+  jvm-runtime f "java.lang.Runtime" "freeMemory" jinvoke
+  >bignum ;
+
+: total-memory ( -- int )
+  #! Return the total memory available to the JVM.
+  jvm-runtime f "java.lang.Runtime" "totalMemory" jinvoke
+  >bignum ;
+
+: room free-memory total-memory ;
+
+: resource ( path -- url )
+    interpreter class-of*
+    [ "java.lang.String" ]
+    "java.lang.Class" "getResource" jinvoke ;

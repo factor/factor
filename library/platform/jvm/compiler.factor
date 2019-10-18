@@ -32,7 +32,6 @@ USE: namespaces
 USE: stack
 USE: stdio
 USE: words
-USE: vocabularies
 
 : class-name ( class -- name )
     [ ] "java.lang.Class" "getName" jinvoke ;
@@ -57,7 +56,7 @@ USE: vocabularies
 : compiled>compound ( word -- def )
     #! Convert a compiled word definition into the compound
     #! definition which compiles to it.
-    dup worddef>list <compound> ;
+    dup word-parameter <compound> ;
 
 : decompile ( word -- )
     #! Decompiles a word; from now on, it will be interpreted
@@ -86,14 +85,14 @@ USE: vocabularies
 : effect>list ( effect -- list )
     [ "inD" "outD" "inR" "outR" ]
     [ dupd "factor.compiler.StackEffect" swap jvar-get ]
-    inject nip ;
+    map nip ;
 
 : effect>typelist ( effect -- list )
     [ "inDtypes" "outDtypes" "inRtypes" "outRtypes" ]
     [
         dupd "factor.compiler.StackEffect" swap jvar-get
-        array>list [ class-name ] inject
-    ] inject nip ;
+        array>list [ class-name ] map
+    ] map nip ;
 
 : balance ( code -- effect )
     #! Push stack effect of a quotation.

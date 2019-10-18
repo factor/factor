@@ -1,15 +1,13 @@
 IN: scratchpad
-USE: arithmetic
 USE: combinators
 USE: continuations
 USE: kernel
 USE: lists
+USE: math
 USE: namespaces
 USE: stack
 USE: stdio
 USE: test
-
-"Checking continuations." print
 
 : callcc1-test ( x -- list )
     [
@@ -23,10 +21,13 @@ USE: test
     [
         "test-cc" set
         5 "x" set
-        <namespace> [
+        [
             6 "x" set "test-cc" get call
-        ] bind
+        ] with-scope
     ] callcc0 "x" get 5 = ;
 
-[ t ] [ ] [ 10 callcc1-test 10 count = ] test-word
-[ t ] [ ] [ callcc-namespace-test ] test-word
+[ t ] [ 10 callcc1-test 10 count = ] unit-test
+[ t ] [ callcc-namespace-test ] unit-test
+
+! This caused the Java Factor to run out of memory
+[ ] [ 100000 [ [ call ] callcc0 ] times ] unit-test

@@ -26,12 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: namespaces
-USE: arithmetic
 USE: combinators
 USE: hashtables
 USE: kernel
 USE: lists
+USE: math
 USE: stack
+USE: strings
 USE: vectors
 
 DEFER: namespace
@@ -44,7 +45,8 @@ DEFER: >n
 : set-global ( g -- ) 4 setenv ;
 
 : init-namespaces ( -- )
-    64 <vector> set-namestack* global >n ;
+    64 <vector> set-namestack* global >n
+    global "global" set ;
 
 : namespace-buckets 23 ;
 
@@ -76,9 +78,9 @@ DEFER: >n
 : set ( value variable -- ) namespace set* ;
 : put ( variable value -- ) namespace put* ;
 
-: vars ( -- list ) namespace hash-keys ;
-: values ( -- list ) namespace hash-values ;
 : vars-values ( -- list ) namespace hash>alist ;
+: vars ( -- list ) vars-values [ car ] map ;
+: values ( -- list ) vars-values [ cdr ] map ;
 
 ! We don't have bound objects in native Factor.
 : namespace? hashtable? ;

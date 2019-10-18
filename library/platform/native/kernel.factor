@@ -25,15 +25,18 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: namespaces
-DEFER: init-namespaces
+IN: vectors
+DEFER: vector=
+DEFER: vector-hashcode
 
 IN: kernel
-USE: arithmetic
+
 USE: combinators
 USE: errors
+USE: io-internals
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: stack
 USE: stdio
@@ -41,62 +44,88 @@ USE: strings
 USE: vectors
 USE: words
 USE: unparser
+USE: vectors
+
+: cpu ( -- arch )
+    #! Returns one of "x86" or "unknown".
+    11 getenv ;
+
+! The 'fake vtable' used here speeds things up a lot.
+! It is quite clumsy, however. A higher-level CLOS-style
+! 'generic words' system will be built later.
+
+: generic ( obj vtable -- )
+    >r dup type r> vector-nth execute ;
+
+: 2generic ( n n vtable -- )
+    >r 2dup arithmetic-type r> vector-nth execute ;
+
+: default-hashcode drop 0 ;
 
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.
-    [
-        [ cons? ] [ 4 cons-hashcode ]
-        [ string? ] [ str-hashcode ]
-        [ fixnum? ] [ ( return the object ) ]
-        [ drop t ] [ drop 0 ]
-    ] cond ;
+    {
+        nop
+        word-hashcode
+        cons-hashcode
+        default-hashcode
+        >fixnum
+        >fixnum
+        default-hashcode
+        default-hashcode
+        default-hashcode
+        vector-hashcode
+        str-hashcode
+        sbuf-hashcode
+        default-hashcode
+        >fixnum
+        >fixnum
+        default-hashcode
+        default-hashcode
+    } generic ;
 
+IN: math DEFER: number= ( defined later... )
+IN: kernel
 : = ( obj obj -- ? )
     #! Push t if a is isomorphic to b.
-    2dup eq? [
-        2drop t
-    ] [
-        [
-            [ cons? ] [ cons= ]
-            [ string? ] [ str= ]
-            [ drop t ] [ 2drop f ]
-        ] cond
-    ] ifte ;
+    {
+        number=
+        eq?
+        cons=
+        eq?
+        number=
+        number=
+        eq?
+        eq?
+        eq?
+        vector=
+        str=
+        sbuf=
+        eq?
+        number=
+        number=
+        eq?
+        eq?
+    } generic ;
+
+: 2= ( a b c d -- ? )
+    #! Test if a = c, b = d.
+    swapd = [ = ] [ 2drop f ] ifte ;
 
 : clone ( obj -- obj )
     [
         [ cons? ] [ clone-list ]
-        [ vector? ] [ clone-vector ]
+        [ vector? ] [ vector-clone ]
+        [ sbuf? ] [ sbuf-clone ]
         [ drop t ] [ ( return the object ) ]
     ] cond ;
 
-: class-of ( obj -- name )
-    [
-        [ fixnum? ] [ drop "fixnum" ]
-        [ cons?   ] [ drop "cons" ]
-        [ word?   ] [ drop "word" ]
-        [ f =     ] [ drop "f" ]
-        [ t =     ] [ drop "t" ]
-        [ vector? ] [ drop "vector" ]
-        [ string? ] [ drop "string" ]
-        [ sbuf?   ] [ drop "sbuf" ]
-        [ handle? ] [ drop "handle" ]
-        [ drop t  ] [ drop "unknown" ]
-    ] cond ;
-
-: toplevel ( -- )
-    init-namespaces
-    init-errors
-    0 <vector> set-datastack
-    0 <vector> set-callstack ;
+: set-boot ( quot -- )
+    #! Set the boot quotation.
+    8 setenv ;
 
 : java? f ;
 : native? t ;
-
-: room. ( -- )
-    room
-    unparse write " bytes total, " write
-    unparse write " bytes used" print ;
 
 ! No compiler...
 : inline ;
@@ -109,5 +138,3 @@ IN: strings
 : >char ;
 : >upper ;
 : >lower ;
-IN: lists
-: sort ;

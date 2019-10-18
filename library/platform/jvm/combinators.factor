@@ -30,6 +30,8 @@ USE: kernel
 USE: lists
 USE: stack
 
+! These are DEPRECATED!
+
 : expand ( list -- list )
     #! Evaluates a quotation on a new stack, and pushes the
     #! reversed stack onto the original stack.

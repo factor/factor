@@ -3,12 +3,12 @@
 ! Some of these words should be moved to the standard library.
 
 IN: test
-USE: arithmetic
 USE: combinators
 USE: compiler
 USE: errors
 USE: kernel
 USE: lists
+USE: math
 USE: namespaces
 USE: parser
 USE: prettyprint
@@ -17,26 +17,26 @@ USE: stdio
 USE: strings
 USE: words
 USE: unparser
-USE: vocabularies
 
 : assert ( t -- )
     [ "Assertion failed!" throw ] unless ;
 
-: assert= ( x y -- )
-    = assert ;
+: print-test ( input output -- )
+    "TESTING: " write 2list . flush ;
 
-: must-compile ( word -- )
-    "compile" get [
-        "Checking if " write dup write " was compiled" print
-        dup compile
-        worddef compiled? assert
-    ] [
-        drop
-    ] ifte ;
+: keep-datastack ( quot -- )
+    datastack >r call r> set-datastack drop ;
+
+: unit-test ( output input -- )
+    [
+        2dup print-test
+        swap >r >r clear r> call datastack vector>list r>
+        = assert
+    ] keep-datastack 2drop ;
 
 : test-word ( output input word -- )
-    3dup 3list .
-    append expand assert= ;
+    #! Old-style test.
+    append unit-test ;
 
 : do-not-test-word ( output input word -- )
     #! Flag for tests that are known not to work.
@@ -45,44 +45,91 @@ USE: vocabularies
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to
     #! execute it.
+    "Timing " write dup .
     millis >r call millis r> - . ;
 
 : test ( name -- )
     ! Run the given test.
-    "/library/test/" swap ".factor" cat3 run-resource ;
+    depth pred >r
+    "Testing " write dup write "..." print
+    "/library/test/" swap ".factor" cat3 run-resource
+    "Checking before/after depth..." print
+    depth r> = assert
+    ;
 
 : all-tests ( -- )
     "Running Factor test suite..." print
     "vocabularies" get [ f "scratchpad" set ] bind
     [
-        "assoc"
-        "auxiliary"
+        "crashes"
+        "lists/cons"
+        "lists/lists"
+        "lists/assoc"
+        "lists/destructive"
+        "lists/namespaces"
         "combinators"
-        "compiler"
-        "compiler-types"
         "continuations"
-        "dictionary"
-        "format"
+        "errors"
         "hashtables"
-        "html"
-        "httpd"
-        "inference"
-        "list"
-        "math"
-        "miscellaneous"
-        "namespaces"
+        "strings"
+        "sbuf"
+        "namespaces/namespaces"
+        "files"
+        "format"
+        "parser"
         "parse-number"
         "prettyprint"
-        "primitives"
-        "random"
-        "reader"
-        "recompile"
-        "stack"
-        "string"
-        "tail"
-        "types"
+        "image"
+        "init"
+        "inspector"
+        "interpreter"
+        "io/io"
         "vectors"
+        "words"
+        "unparser"
+        "random"
+        "stream"
+        "math/bignum"
+        "math/bitops"
+        "math/gcd"
+        "math/math-combinators"
+        "math/rational"
+        "math/float"
+        "math/complex"
+        "math/irrational"
+        "math/simpson"
+        "math/namespaces"
+        "httpd/url-encoding"
+        "httpd/html"
+        "httpd/httpd"
     ] [
         test
     ] each
-    "All tests passed." print ;
+    
+    native? [
+        [
+            "threads"
+            "x86-compiler/simple"
+            "x86-compiler/ifte"
+            "x86-compiler/generic"
+        ] [
+            test
+        ] each
+    ] when
+
+    java? [
+        [
+            "lists/java"
+            "namespaces/java"
+            "jvm-compiler/auxiliary"
+            "jvm-compiler/compiler"
+            "jvm-compiler/compiler-types"
+            "jvm-compiler/inference"
+            "jvm-compiler/primitives"
+            "jvm-compiler/tail"
+            "jvm-compiler/types"
+            "jvm-compiler/miscellaneous"
+        ] [
+            test
+        ] each
+    ] when ;

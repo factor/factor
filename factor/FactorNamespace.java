@@ -81,7 +81,6 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	 * Cloning constructor.
 	 */
 	public FactorNamespace(Map words, Object obj)
-		throws Exception
 	{
 		this.words = new TreeMap();
 
@@ -94,8 +93,14 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 				Map.Entry entry = (Map.Entry)iter.next();
 				Object key = entry.getKey();
 				Object value = entry.getValue();
-				if(!(value instanceof VarBinding))
-					this.words.put(key,value);
+				if(value instanceof VarBinding)
+				{
+					VarBinding b = (VarBinding)value;
+					if(b.instance != null)
+						continue;
+				}
+
+				this.words.put(key,value);
 			}
 		}
 
@@ -140,7 +145,7 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	} //}}}
 
 	//{{{ isDefined() method
-	public synchronized boolean isDefined(String name) throws Exception
+	public synchronized boolean isDefined(String name)
 	{
 		Object o = words.get(name);
 		if(o instanceof VarBinding)
@@ -165,7 +170,7 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	} //}}}
 
 	//{{{ getVariable() method
-	public synchronized Object getVariable(String name) throws Exception
+	public synchronized Object getVariable(String name)
 	{
 		Object o = words.get(name);
 		if(o instanceof VarBinding)
@@ -194,7 +199,6 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 
 	//{{{ setVariable() method
 	public synchronized void setVariable(String name, Object value)
-		throws Exception
 	{
 		if(name == null)
 			throw new NullPointerException();
@@ -227,7 +231,7 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 				if(!constraint.isAssignableFrom(
 					value.getClass()))
 				{
-					throw new FactorRuntimeException(
+					throw new RuntimeException(
 						"Can only store "
 						+ constraint
 						+ " in " + this);
@@ -314,7 +318,7 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	/**
 	 * Returns a list of variable values.
 	 */
-	public synchronized Cons toValueList() throws Exception
+	public synchronized Cons toValueList()
 	{
 		initAllFields();
 
@@ -342,7 +346,7 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	/**
 	 * Returns a list of pairs of variable names, and their values.
 	 */
-	public synchronized Cons toVarValueList() throws Exception
+	public synchronized Cons toVarValueList()
 	{
 		initAllFields();
 
@@ -384,16 +388,30 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 			this.instance = instance;
 		}
 
-		public Object get() throws Exception
+		public Object get()
 		{
-			return FactorJava.convertFromJavaType(
-				field.get(instance));
+			try
+			{
+				return FactorJava.convertFromJavaType(
+					field.get(instance));
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 
-		public void set(Object value) throws Exception
+		public void set(Object value)
 		{
-			field.set(instance,FactorJava.convertToJavaType(
-				value,field.getType()));
+			try
+			{
+				field.set(instance,FactorJava.convertToJavaType(
+					value,field.getType()));
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 	} //}}}
 

@@ -173,11 +173,25 @@ implements Constants, FactorExternalizable, PublicCloneable
 		}
 		else
 		{
-			mw.visitMethodInsn(INVOKESTATIC,
-				"factor/FactorJava",
-				methodName,
-				"(Ljava/lang/Object;)"
-				+ FactorJava.javaClassToVMClass(type));
+			String signature;
+			if(type.isArray())
+			{
+				signature = "(Ljava/lang/Object;)"
+					+ "[Ljava/lang/Object;";
+			}
+			else
+			{
+				signature = "(Ljava/lang/Object;)"
+					+ FactorJava.javaClassToVMClass(type);
+			}
+			mw.visitMethodInsn(INVOKESTATIC,"factor/FactorJava",
+				methodName,signature);
+			/* if(type.isArray())
+			{
+				mw.visitTypeInsn(CHECKCAST,
+					type.getName()
+					.replace('.','/'));
+			} */
 		}
 	} //}}}
 

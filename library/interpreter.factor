@@ -26,12 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: interpreter
-USE: arithmetic
 USE: combinators
 USE: continuations
+USE: errors
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: parser
 USE: stack
@@ -40,82 +41,103 @@ USE: strings
 USE: styles
 USE: words
 USE: unparser
-
-: exit ( -- )
-    t "quit-flag" set ;
+USE: vectors
 
 : print-banner ( -- )
-    "Factor " version cat2 print
+    <% "This is " % java? [ "JVM " % ] when
+    native? [ "native " % ] when "Factor " % version % %> print
     "Copyright (C) 2003, 2004 Slava Pestov" print
-    "Enter ``help'' for help." print
-    "Enter ``exit'' to exit." print ;
+    "Copyright (C) 2004 Chris Double" print
+    "Type ``exit'' to exit, ``help'' for help." print ;
+
+: init-history ( -- )
+    64 <vector> "history" set ;
 
 : history+ ( cmd -- )
-    global [ "history" cons@ ] bind ;
+    "history" get vector-push ;
 
-: history# ( -- number )
-    global [ "history" get length ] bind ;
+: print-numbered-entry ( index vector -- )
+    <% over unparse % ": " % vector-nth % %> print ;
 
-: print-numbered-list* ( number list -- )
-    #! Print each element of the list with a number.
-    dup [
-        uncons [ over pred ] dip print-numbered-list*
-        swap fixnum>str swap ": " swap cat3 print
-    ] [
-        2drop
-    ] ifte ;
+: print-numbered-vector ( list -- )
+    dup vector-length [ over print-numbered-entry ] times* drop ;
 
-: print-numbered-list ( list -- )
-    dup length pred swap print-numbered-list* ;
-
-: history ( -- )
+: history. ( -- )
     "X redo    -- evaluate the expression with number X." print
     "X re-edit -- edit the expression with number X." print
-    "history" get print-numbered-list ;
+    "history" get print-numbered-vector ;
 
-: get-history ( index -- )
-    "history" get reverse nth ;
+: get-history ( index -- str )
+    "history" get vector-nth ;
 
 : redo ( index -- )
-    get-history dup print eval ;
+    get-history dup "  ( " write write " )" print eval ;
 
 : re-edit ( index -- )
     get-history edit ;
 
+: history# ( -- number )
+    "history" get vector-length ;
+
 : print-prompt ( -- )
-    <% "    " % history# fixnum>str % "] " % %>
-    [ "prompt" ] get-style
-    [ write-attr ] bind
+    <% "  ( " % history# unparse % " )" % %>
+    [ "prompt" ] get-style write-attr
+    ! Print the space without a style, to workaround a bug in
+    ! the GUI listener where the style from the prompt carries
+    ! over to the input
+    " " write
     flush ;
+
+: exit ( -- )
+    "quit-flag" on ;
+
+: eval-catch ( str -- )
+    [ eval ] [ [ default-error-handler drop ] when* ] catch ;
 
 : interpret ( -- )
     print-prompt read dup [
-        dup history+ eval
+        dup history+ eval-catch
     ] [
-        drop "quit-flag" on
+        drop exit
     ] ifte ;
 
 : interpreter-loop ( -- )
-    [ "quit-flag" get not ] [ interpret ] while
-    "quit-flag" off ;
+    "quit-flag" get [
+        "quit-flag" off
+    ] [
+        interpret interpreter-loop
+    ] ifte ;
 
-: help
-    "clear              -- clear datastack." print
-    ".s                 -- print datastack." print
-    ".                  -- print top of datastack." print
-    "" print
-    "global describe    -- list all global variables." print
-    "describe           -- describe object at top of stack." print
-    "" print
-    "words.             -- list all words." print
-    "\"word\" see         -- show definition of \"word\"." print
-    "\"str\" apropos      -- list all words whose name contains \"str\"." print
-    "\"word\" usages.     -- list all words that call \"word\"." print
-    "" print
-    "[ expr ] balance . -- show stack effect of expression." print
-    "" print
-    "history            -- list previously entered expressions." print
-    "X redo             -- redo expression number X from history list." print
-    "" print
-    "exit               -- exit the interpreter." print
-    "" print ;
+: room. ( -- )
+    room
+    1024 /i unparse write " KB total, " write
+    1024 /i unparse write " KB free" print ;
+
+: help ( -- )
+    "SESSION:" print
+    native? [
+        "\"foo.image\" save-image   -- save heap to a file" print
+    ] when
+    "history.                 -- show previous commands" print
+    "room.                    -- show memory usage" print
+    "garbage-collection       -- force a GC" print
+    "exit                     -- exit interpreter" print
+    terpri
+    "WORDS:" print
+    "vocabs.                  -- list vocabularies" print 
+    "\"math\" words.            -- list the math vocabulary" print
+    "\"neg\" see                -- show word definition" print
+    "\"str\" apropos.           -- list all words containing str" print
+    "\"car\" usages.            -- list all words invoking car" print
+    terpri
+    "STACKS:" print
+    ".s .r .n .c              -- show contents of the 4 stacks" print
+    "clear                    -- clear datastack" print
+    terpri
+    "OBJECTS:" print
+    "global describe          -- list global variables." print
+    "\"foo\" get .              -- print a variable value." print
+    ".                        -- print top of stack." print
+    terpri
+    "HTTP SERVER:             USE: httpd 8888 httpd" print
+    "TELNET SERVER:           USE: telnetd 9999 telnetd" print ;

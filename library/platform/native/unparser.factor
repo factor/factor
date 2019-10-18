@@ -26,45 +26,117 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: unparser
-USE: arithmetic
 USE: combinators
 USE: kernel
+USE: format
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: parser
 USE: stack
 USE: stdio
 USE: strings
 USE: words
-USE: vocabularies
 
-: fixnum% ( num -- )
-    "base" get /mod swap dup 0 > [
-        fixnum%
+: >digit ( n -- ch )
+    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
+
+: integer% ( num radix -- )
+    tuck /mod >digit % dup 0 > [
+        swap integer%
     ] [
-        drop
-    ] ifte >digit % ;
+        2drop
+    ] ifte ;
 
-: fixnum- ( num -- num )
+: integer- ( num -- num )
     dup 0 < [ "-" % neg ] when ;
 
-: fixnum>str ( num -- str )
-    <% fixnum- fixnum% %> ;
+: >base ( num radix -- string )
+    #! Convert a number to a string in a certain base.
+    <% over 0 < [
+        swap neg swap integer% CHAR: - %
+    ] [
+        integer%
+    ] ifte reverse%> ;
+
+: >dec ( num -- string )
+    #! Convert an integer to its decimal representation.
+    10 >base ;
+
+: >bin ( num -- string )
+    #! Convert an integer to its binary representation.
+    2 >base ;
+
+: >oct ( num -- string )
+    #! Convert an integer to its octal representation.
+    8 >base ;
+
+: >hex ( num -- string )
+    #! Convert an integer to its hexadecimal representation.
+    16 >base ;
+
+DEFER: unparse
+
+: unparse-ratio ( num -- str )
+    <% dup
+    numerator unparse %
+    CHAR: / %
+    denominator unparse % %> ;
+
+: unparse-complex ( num -- str )
+    >rect <% "#{ " % swap unparse % " " % unparse % " }" % %> ;
+
+: ch>ascii-escape ( ch -- esc )
+    [
+        [ CHAR: \e | "\\e" ]
+        [ CHAR: \n | "\\n" ]
+        [ CHAR: \r | "\\r" ]
+        [ CHAR: \t | "\\t" ]
+        [ CHAR: \0 | "\\0" ]
+        [ CHAR: \\ | "\\\\" ]
+        [ CHAR: \" | "\\\"" ]
+    ] assoc ;
+
+: ch>unicode-escape ( ch -- esc )
+    >hex 4 digits "\\u" swap cat2 ;
+
+: unparse-ch ( ch -- ch/str )
+    dup quotable? [
+        dup ch>ascii-escape dup [
+            nip
+        ] [
+            drop ch>unicode-escape
+        ] ifte
+    ] unless ;
 
 : unparse-str ( str -- str )
-    #! Not done
-    <% CHAR: " % % CHAR: " % %> ;
+    <% CHAR: " % [ unparse-ch % ] str-each CHAR: " % %> ;
 
 : unparse-word ( word -- str )
     word-name dup "#<unnamed>" ? ;
 
+: fix-float ( str -- str )
+    #! This is terrible. Will go away when we do our own float
+    #! output.
+    "." over str-contains? [ ".0" cat2 ] unless ;
+
+: unparse-unknown ( obj -- str )
+    <% "#<" %
+    dup type type-name %
+    " @ " % 
+    address unparse %
+    ">" % %> ;
+
 : unparse ( obj -- str )
     [
-        [ t eq?   ] [ drop "t" ]
-        [ f eq?   ] [ drop "f" ]
-        [ word?   ] [ unparse-word ]
-        [ fixnum? ] [ fixnum>str ]
-        [ string? ] [ unparse-str ]
-        [ drop t  ] [ <% "#<" % class-of % ">" % %> ]
+        [ t eq?    ] [ drop "t" ]
+        [ f eq?    ] [ drop "f" ]
+        [ word?    ] [ unparse-word ]
+        [ integer? ] [ >dec ]
+        [ ratio?   ] [ unparse-ratio ]
+        [ float?   ] [ unparse-float fix-float ]
+        [ complex? ] [ unparse-complex ]
+        [ string?  ] [ unparse-str ]
+        [ drop t   ] [ unparse-unknown ]
     ] cond ;

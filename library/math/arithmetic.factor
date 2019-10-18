@@ -25,42 +25,36 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: arithmetic
+IN: math
 USE: combinators
 USE: kernel
 USE: logic
 USE: stack
 
-: i #{ 0 1 } ; inline
-: -i #{ 0 -1 } ; inline
-: inf 1.0 0.0 / ; inline
-: -inf -1.0 0.0 / ; inline
-: e 2.7182818284590452354 ; inline
-: pi 3.14159265358979323846 ; inline
-: pi/2 1.5707963267948966 ; inline
+: integer? dup fixnum? swap bignum? or ;
+: rational? dup integer? swap ratio? or ;
+: real? dup number? swap complex? not and ;
 
-: /f / >float ; inline
+: odd? 2 mod 1 = ;
+: even? 2 mod 0 = ;
 
 : f>0 ( obj -- obj )
     #! If f at the top of the stack, turn it into 0.
-    [ 0 ] unless* ;
+    f 0 replace ;
 
 : 0>f ( obj -- obj )
     #! If 0 at the top of the stack, turn it into f.
-    dup 0 = [ drop f ] when ;
-
-: compare ( x y [ if x < y ] [ if x = y ] [ if x > y ] -- )
-    >=< call ; inline interpret-only
+    0 f replace ;
 
 : max ( x y -- z )
-    2dup > -rot ? ;
+    2dup > [ drop ] [ nip ] ifte ;
 
 : min ( x y -- z )
-    2dup < -rot ? ;
+    2dup < [ drop ] [ nip ] ifte ;
 
 : between? ( x min max -- ? )
     #! Push if min <= x <= max.
-    [ [ dup ] dip max ] dip min = ;
+    >r dupd max r> min = ;
 
 : sq dup * ; inline
 
@@ -69,10 +63,3 @@ USE: stack
 
 : neg 0 swap - ; inline
 : recip 1 swap / ; inline
-
-: round ( x to -- y )
-    dupd rem - ;
-
-: deg2rad pi * 180 / ;
-
-: rad2deg 180 * pi / ;

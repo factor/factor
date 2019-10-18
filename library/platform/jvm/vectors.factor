@@ -41,17 +41,6 @@ USE: stack
 : set-vector-length ( vector -- length )
     "factor.FactorArray" "top" jvar-set ;
 
-: vector>list ( vector -- list )
-    #! Turns a vector into a list.
-    [ ] "factor.FactorArray" "toList" jinvoke ;
-
-: stack>list ( vector -- list )
-    #! Turns a vector into a list.
-    vector>list ;
-
-: list>vector ( list -- vector )
-    [ "factor.Cons" ] "factor.FactorArray" jnew ;
-
 : vector-nth ( index vector -- )
     [ "int" ] "factor.FactorArray" "get" jinvoke ;
 

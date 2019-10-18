@@ -172,11 +172,17 @@ public class FactorMath
 	} //}}}
 
 	//{{{ shiftLeft() method
-	public static Number shiftLeft(Number x, int by)
+	public static Number shift(Number x, int by)
 	{
 		if(by < 0)
-			throw new ArithmeticException("Cannot shift by negative amount");
+			return shiftRight(x,-by);
+		else
+			return shiftLeft(x,by);
+	} //}}}
 
+	//{{{ shiftLeft() method
+	public static Number shiftLeft(Number x, int by)
+	{
 		if(x instanceof BigInteger)
 			return ((BigInteger)x).shiftLeft(by);
 		else if(x instanceof Integer)
@@ -185,7 +191,7 @@ public class FactorMath
 			if(by >= 32)
 				return BigInteger.valueOf(ix).shiftLeft(by);
 			else
-				return longToNumber(ix << by);
+				return longToNumber((long)ix << by);
 		}
 		else
 			return BigInteger.valueOf(x.longValue()).shiftLeft(by);
@@ -194,25 +200,10 @@ public class FactorMath
 	//{{{ shiftRight() method
 	public static Number shiftRight(Number x, int by)
 	{
-		if(by < 0)
-			throw new ArithmeticException("Cannot shift by negative amount");
-
 		if(x instanceof BigInteger)
 			return ((BigInteger)x).shiftRight(by);
 		else
 			return longToNumber(x.longValue() >> by);
-	} //}}}
-
-	//{{{ shiftRightUnsigned() method
-	public static Number shiftRightUnsigned(Number x, int by)
-	{
-		if(by < 0)
-			throw new ArithmeticException("Cannot shift by negative amount");
-
-		if(x instanceof BigInteger)
-			throw new RuntimeException();
-		else
-			return longToNumber(x.longValue() >>> by);
 	} //}}}
 
 	//{{{ _divide() method

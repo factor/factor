@@ -27,9 +27,13 @@
 
 IN: streams
 USE: combinators
+USE: continuations
 USE: io-internals
+USE: errors
 USE: kernel
+USE: logic
 USE: stack
+USE: stdio
 USE: strings
 USE: namespaces
 
@@ -41,65 +45,54 @@ USE: namespaces
         "in" set
 
         ( str -- )
-        [ "out" get write-fd-8 ] "fwrite" set
+        [ "out" get blocking-write ] "fwrite" set
         
         ( -- str )
+        [ "in" get dup [ blocking-read-line ] when ] "freadln" set
+        
+        ( count -- str )
         [
-            "in" get read-line-fd-8 dup [ sbuf>str ] when
-        ] "freadln" set
+            "in" get dup [ blocking-read# ] [ nip ] ifte
+        ] "fread#" set
+        
+        ( -- )
+        [ "out" get [ blocking-flush ] when* ] "fflush" set
         
         ( -- )
         [
-            "out" get [ flush-fd ] when*
-        ] "fflush" set
-        
-        ( -- )
-        [
-            "in" get [ close-fd ] when*
-            "out" get [ close-fd ] when*
+            "out" get [ dup blocking-flush close-port ] when*
+            "in" get [ close-port ] when*
         ] "fclose" set
     ] extend ;
-
-: <file-stream> ( path read? write? -- stream )
-    open-file dup <fd-stream> ;
 
 : <filecr> ( path -- stream )
-    t f <file-stream> ;
+    t f open-file <fd-stream> ;
 
 : <filecw> ( path -- stream )
-    f t <file-stream> ;
+    f t open-file <fd-stream> ;
 
 : <filebr> ( path -- stream )
-    t f <file-stream> ;
+    <filecr> ;
 
 : <filebw> ( path -- stream )
-    f t <file-stream> ;
-
-: <server> ( port -- stream )
-    #! Starts listening on localhost:port. Returns a stream that
-    #! you can close with fclose, and accept connections from
-    #! with accept. No other stream operations are supported.
-    server-socket <stream> [
-        "socket" set
-
-        ( -- )
-        [ "socket" get close-fd ] "fclose" set
-    ] extend ;
-
-: <socket-stream> ( fd -- stream )
-    #! A slight variation on <fd-stream> that calls shutdown(2)
-    #! when closed.
-    dup <fd-stream> [
-        ( -- )
-        [
-            "in"  get [ dup shutdown-fd close-fd ] when*
-            ( out == in )
-        ] "fclose" set
-    ] extend ;
-
-: accept ( server -- client )
-    #! Accept a connection from a server socket.
-    [ "socket" get ] bind accept-fd <socket-stream> ;
+    <filecw> ;
 
 : init-stdio ( -- )
-    stdin stdout <fd-stream> "stdio" set ;
+    stdin stdout <fd-stream> <stdio-stream> "stdio" set ;
+
+: (fcopy) ( from to -- )
+    #! Copy the contents of the fd-stream 'from' to the
+    #! fd-stream 'to'. Use fcopy; this word does not close
+    #! streams.
+    "out" swap get* >r "in" swap get* r> blocking-copy ;
+
+: fcopy ( from to -- )
+    #! Copy the contents of the fd-stream 'from' to the
+    #! fd-stream 'to'.
+    [ 2dup (fcopy) ] [ -rot fclose fclose rethrow ] catch ;
+
+: resource-path ( -- path )
+    "resource-path" get [ "." ] unless* ;
+
+: <resource-stream> ( path -- stream )
+    resource-path swap cat2 <filecr> ;

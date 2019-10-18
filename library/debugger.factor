@@ -42,28 +42,34 @@ USE: unparser
 
 : parse-dump ( error -- )
     <%
-    "parse-name" get [ "<interactive>" ] unless* % ":" %
-    "line-number" get [ 1 ] unless* fixnum>str % ": " %
+    "error-file" get [ "<interactive>" ] unless* % ":" %
+    "error-line-number" get [ 1 ] unless* unparse % ": " %
     %> write
     error.
     
-    "line" get print
+    "error-line" get print
     
-    <% "pos" get " " fill % "^" % %> print ;
+    <% "error-col" get " " fill % "^" % %> print ;
 
 : in-parser? ( -- ? )
-    "line" get "pos" get and ;
+    "error-line" get "error-col" get and ;
+
+: error-handler-hook
+    #! The game overrides this.
+    ;
 
 : default-error-handler ( error -- )
     #! Print the error and return to the top level.
-    in-parser? [ parse-dump ] [ standard-dump ] ifte terpri
+    [
+        in-parser? [ parse-dump ] [ standard-dump ] ifte terpri
 
-    "Stacks have been reset." print
-    ":s :r :n :c show stacks at time of error." print
+        "Stacks have been reset." print
+        ":s :r :n :c show stacks at time of error." print
 
-    java? [ ":j shows Java stack trace." print ] when
+        java? [ ":j shows Java stack trace." print ] when
+        error-handler-hook
 
-    suspend ;
+    ] when* ;
 
 : :s ( -- ) "error-datastack"  get . ;
 : :r ( -- ) "error-callstack"  get . ;

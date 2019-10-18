@@ -39,8 +39,7 @@ import org.objectweb.asm.*;
  */
 public abstract class FactorWordDefinition implements Constants
 {
-	protected FactorWord word;
-
+	public FactorWord word;
 	public boolean compileFailed;
 
 	//{{{ FactorWordDefinition constructor
@@ -54,12 +53,6 @@ public abstract class FactorWordDefinition implements Constants
 
 	public abstract void eval(FactorInterpreter interp)
 		throws Exception;
-	
-	//{{{ getWord() method
-	public FactorWord getWord(FactorInterpreter interp)
-	{
-		return word;
-	} //}}}
 	
 	//{{{ fromList() method
 	public void fromList(Cons cons, FactorInterpreter interp)

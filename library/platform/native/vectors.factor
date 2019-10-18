@@ -26,11 +26,55 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: vectors
+USE: combinators
+USE: kernel
 USE: lists
+USE: math
 USE: stack
 
-: stack>list ( vector -- list )
-    [ ] swap [ swons ] vector-each ;
+: 2vector-nth ( n vec vec -- obj obj )
+    >r over >r vector-nth r> r> vector-nth ;
 
-: vector>list ( vector -- list )
-    stack>list nreverse ;
+: ?vector= ( n vec vec -- ? )
+    #! Reached end?
+    drop vector-length = ;
+
+: (vector=) ( n vec vec -- ? )
+    3dup ?vector= [
+        3drop t ( reached end without any unequal elts )
+    ] [
+        3dup 2vector-nth = [
+            >r >r succ r> r> (vector=)
+        ] [
+            3drop f
+        ] ifte
+    ] ifte ;
+
+: vector-length= ( vec vec -- ? )
+    vector-length swap vector-length = ;
+
+: vector= ( obj vec -- ? )
+    #! Check if two vectors are equal. Two vectors are
+    #! considered equal if they have the same length and contain
+    #! equal elements.
+    2dup eq? [
+        2drop t
+    ] [
+        over vector? [
+            2dup vector-length= [
+                0 -rot (vector=)
+            ] [
+                2drop f
+            ] ifte
+        ] [
+            2drop f
+        ] ifte
+    ] ifte ;
+
+: ?vector-nth ( n vec -- obj/f )
+    2dup vector-length >= [ 2drop f ] [ vector-nth ] ifte ;
+
+: vector-hashcode ( vec -- n )
+    0 swap 4 [
+        over ?vector-nth hashcode rot bitxor swap
+    ] times* drop ;

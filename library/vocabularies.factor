@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: vocabularies
+IN: words
 USE: combinators
 USE: kernel
 USE: lists
@@ -57,8 +57,53 @@ USE: strings
 
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
-    vocab [ values ] bind ;
+    #! Filter empty slots.
+    vocab [ values ] bind [ ] subset ;
 
 : intern ( "word" -- word )
     #! Returns the top of the stack if it already been interned.
     dup string? [ "use" get search ] when ;
+
+: init-search-path ( -- )
+    ! For files
+    "scratchpad" "file-in" set
+    [ "builtins" "syntax" "scratchpad" ] "file-use" set
+    ! For interactive
+    "scratchpad" "in" set
+    [
+        "user"
+        "arithmetic"
+        "builtins"
+        "combinators"
+        "compiler"
+        "continuations"
+        "debugger"
+        "errors"
+        "files"
+        "hashtables"
+        "inferior"
+        "inspector"
+        "interpreter"
+        "jedit"
+        "kernel"
+        "lists"
+        "logic"
+        "math"
+        "namespaces"
+        "parser"
+        "prettyprint"
+        "processes"
+        "stack"
+        "streams"
+        "stdio"
+        "strings"
+        "syntax"
+        "test"
+        "threads"
+        "trace"
+        "unparser"
+        "vectors"
+        "vocabularies"
+        "words"
+        "scratchpad"
+    ] "use" set ;

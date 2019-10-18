@@ -25,89 +25,58 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-USE: arithmetic
-USE: combinators
-USE: format
-USE: inspector
-USE: init
-USE: kernel
 USE: lists
-USE: logic
-USE: math
-USE: namespaces
-USE: stack
-USE: stdio
-USE: streams
-USE: strings
-USE: vectors
-USE: words
-USE: cross-compiler
+USE: image
 
 primitives,
 [
-    "/library/ansi.factor"
-    "/library/assoc.factor"
-    "/library/combinators.factor"
+    "/library/platform/native/kernel.factor"
+    "/library/platform/native/stack.factor"
+    "/library/platform/native/types.factor"
+    "/library/math/math.factor"
+    "/library/platform/native/math.factor"
     "/library/cons.factor"
-    "/library/continuations.factor"
-    "/library/debugger.factor"
-    "/library/errors.factor"
-    "/library/format.factor"
-    "/library/hashtables.factor"
-    "/library/init.factor"
-    "/library/inspector.factor"
-    "/library/inspect-vocabularies.factor"
-    "/library/interpreter.factor"
-    "/library/list-namespaces.factor"
-    "/library/logging.factor"
+    "/library/combinators.factor"
     "/library/logic.factor"
-    "/library/namespaces.factor"
-    "/library/prettyprint.factor"
-    "/library/sbuf.factor"
-    "/library/stdio.factor"
-    "/library/stream.factor"
-    "/library/strings.factor"
-    "/library/styles.factor"
-    "/library/telnetd.factor"
-    "/library/vectors.factor"
+    "/library/platform/native/vectors.factor"
     "/library/vector-combinators.factor"
-    "/library/vocabularies.factor"
-    "/library/vocabulary-style.factor"
-    "/library/words.factor"
+    "/library/lists.factor"
+    "/library/assoc.factor"
+    "/library/math/arithmetic.factor"
     "/library/math/math-combinators.factor"
+    "/library/vectors.factor"
+    "/library/platform/native/strings.factor"
+    "/library/strings.factor"
+    "/library/hashtables.factor"
+    "/library/platform/native/namespaces.factor"
+    "/library/namespaces.factor"
     "/library/math/namespace-math.factor"
+    "/library/list-namespaces.factor"
+    "/library/sbuf.factor"
+    "/library/continuations.factor"
     "/library/platform/native/errors.factor"
+    "/library/errors.factor"
+    "/library/platform/native/threads.factor"
+    "/library/stream.factor"
     "/library/platform/native/io-internals.factor"
     "/library/platform/native/stream.factor"
-    "/library/platform/native/kernel.factor"
-    "/library/platform/native/image.factor"
-    "/library/platform/native/namespaces.factor"
+    "/library/stdio.factor"
+    "/library/platform/native/words.factor"
+    "/library/words.factor"
+    "/library/platform/native/vocabularies.factor"
+    "/library/vocabularies.factor"
     "/library/platform/native/parse-numbers.factor"
     "/library/platform/native/parser.factor"
     "/library/platform/native/parse-syntax.factor"
     "/library/platform/native/parse-stream.factor"
-    "/library/platform/native/prettyprint.factor"
-    "/library/platform/native/stack.factor"
-    "/library/platform/native/words.factor"
-    "/library/platform/native/vectors.factor"
-    "/library/platform/native/vocabularies.factor"
-    "/library/platform/native/unparser.factor"
     "/library/platform/native/init.factor"
 ] [
     cross-compile-resource
 ] each
-[
-    ! We don't include all of 'lists' or 'math' yet...
-    between? min max
-    append add remove contains unique
-    pred succ neg fib each nreverse nreverse-iter
-    max 2list length reverse nth list? 2rlist
-    all? clone-list clone-list-iter subset subset-iter
-    subset-add car= cdr= cons= cons-hashcode
-    tree-contains? =-or-contains? 
-    last* last inject
-] [ worddef worddef, ] each
 
 version,
 
-[ boot ] (set-boot)
+IN: init
+DEFER: cold-boot
+
+[ cold-boot ] (set-boot)

@@ -46,8 +46,11 @@ public class Def extends FactorParsingDefinition
 	public void eval(FactorInterpreter interp, FactorReader reader)
 		throws Exception
 	{
-		// Read the word name
 		FactorWord newWord = reader.nextWord(true);
+
+		if(newWord == null)
+			return;
+
 		reader.pushExclusiveState(word,newWord);
 	}
 }

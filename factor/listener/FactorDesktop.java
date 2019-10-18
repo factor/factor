@@ -39,142 +39,31 @@ import javax.swing.text.html.*;
 
 public class FactorDesktop extends JFrame
 {
-	private JTabbedPane tabs;
-	private FactorInterpreter interp;
-	private boolean standalone;
-	private Map listeners;
-
 	//{{{ main() method
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
-		new FactorDesktop(args,true);
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				new FactorDesktop(args,true);
+			}
+		});
 	} //}}}
 
 	//{{{ FactorDesktop constructor
 	public FactorDesktop(String[] args, boolean standalone)
 	{
 		super("Factor");
-		tabs = new JTabbedPane();
-		this.standalone = standalone;
-		listeners = new HashMap();
 
-		getContentPane().add(BorderLayout.CENTER,tabs);
-
-		try
-		{
-			interp = new FactorInterpreter();
-			interp.interactive = false;
-			interp.init(args,null);
-			interp.global.setVariable("desktop",this);
-		}
-		catch(Exception e)
-		{
-			System.err.println("Failed to initialize interpreter:");
-			e.printStackTrace();
-		}
-
-		newListener();
+		getContentPane().add(BorderLayout.CENTER,
+			new FactorListenerPanel(
+			FactorListenerPanel.newInterpreter(args)));
 
 		setSize(640,480);
 		setDefaultCloseOperation(standalone
 			? EXIT_ON_CLOSE
 			: DISPOSE_ON_CLOSE);
 		show();
-	} //}}}
-
-	//{{{ newListener() method
-	public FactorListener newListener()
-	{
-		final FactorListener listener = new FactorListener();
-		listener.addEvalListener(new EvalHandler());
-
-		try
-		{
-			interp.call(new Cons(listener,
-				new Cons(interp.searchVocabulary(
-					"listener","new-listener-hook"),
-				null)));
-			interp.run();
-		}
-		catch(Exception e)
-		{
-			System.err.println("Failed to initialize listener:");
-			e.printStackTrace();
-		}
-
-		JScrollPane scroller = new JScrollPane(listener);
-		listeners.put(listener,scroller);
-		tabs.addTab("Listener",scroller);
-
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				listener.requestFocus();
-			}
-		});
-
-		return listener;
-	} //}}}
-
-	//{{{ closeListener() method
-	public void closeListener(FactorListener listener)
-	{
-		// remove tab containing the listener
-		tabs.remove((Component)listeners.get(listener));
-		if(tabs.getTabCount() == 0)
-		{
-			if(standalone)
-				System.exit(0);
-			else
-				dispose();
-		}
-	} //}}}
-
-	//{{{ getInterpreter() method
-	public FactorInterpreter getInterpreter()
-	{
-		return interp;
-	} //}}}
-
-	//{{{ eval() method
-	public void eval(Cons cmd)
-	{
-		try
-		{
-			interp.call(cmd);
-			interp.run();
-		}
-		catch(Exception e)
-		{
-			System.err.println("Failed to eval " + cmd + ":");
-			e.printStackTrace();
-		}
-	} //}}}
-
-	//{{{ EvalHandler class
-	class EvalHandler implements EvalListener
-	{
-		public void eval(Cons cmd)
-		{
-			FactorDesktop.this.eval(cmd);
-		}
-	} //}}}
-
-	//{{{ EvalAction class
-	class EvalAction extends AbstractAction
-	{
-		private Cons code;
-
-		public EvalAction(String label, Cons code)
-		{
-			super(label);
-			this.code = code;
-		}
-
-		public void actionPerformed(ActionEvent evt)
-		{
-			FactorDesktop.this.eval(code);
-		}
 	} //}}}
 }

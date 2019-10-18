@@ -26,44 +26,61 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: httpd-responder
+USE: httpd
 USE: namespaces
+USE: stack
+USE: strings
 
 USE: test-responder
 USE: inspect-responder
 USE: quit-responder
 USE: file-responder
+USE: resource-responder
 USE: wiki-responder
 
-: default-responders ( -- )
-    #! Remove all existing responders, and create a blank
-    #! responder table.
-    <namespace> [
-        <responder> [
-            "test" "responder" set
-            [ test-responder ] "get" set
-        ] extend "test" set
+#! Remove all existing responders, and create a blank
+#! responder table.
+global [ <namespace> "httpd-responders" set ] bind
 
-        <responder> [
-            "inspect" "responder" set
-            [ inspect-responder ] "get" set
-            "global" "default-argument" set
-        ] extend "inspect" set
+<responder> [
+    "404" "responder" set
+    [ drop no-such-responder ] "get" set
+] extend add-responder
 
-        <responder> [
-            "quit" "responder" set
-            [ quit-responder ] "get" set
-        ] extend "quit" set
+<responder> [
+    "test" "responder" set
+    [ test-responder ] "get" set
+] extend add-responder
 
-        <responder> [
-            "file" "responder" set
-            [ file-responder ] "get" set
-        ] extend "file" set
+<responder> [
+    "inspect" "responder" set
+    [ inspect-responder ] "get" set
+    "global" "default-argument" set
+] extend add-responder
 
-        <responder> [
-            "wiki" "responder" set
-            [ wiki-get-responder ] "get" set
-            [ wiki-post-responder ] "post" set
-            <namespace> "wiki" set
-            "WikiHome" "default-argument" set
-        ] extend "wiki" set
-    ] extend "httpd-responders" set ;
+<responder> [
+    "quit" "responder" set
+    [ quit-responder ] "get" set
+] extend add-responder
+
+<responder> [
+    "file" "responder" set
+    [ file-responder ] "get" set
+    [ file-responder ] "post" set
+    [ file-responder ] "head" set
+] extend add-responder
+
+<responder> [
+    "resource" "responder" set
+    [ resource-responder ] "get" set
+] extend add-responder
+
+"file" set-default-responder
+
+!        <responder> [
+!            "wiki" "responder" set
+!            [ wiki-get-responder ] "get" set
+!            [ wiki-post-responder ] "post" set
+!            <namespace> "wiki" set
+!            "WikiHome" "default-argument" set
+!        ] extend add-responder

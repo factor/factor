@@ -40,7 +40,6 @@ USE: words
 USE: prettyprint
 USE: unparser
 USE: vectors
-USE: vocabularies
 
 : relative>absolute-object-path ( string -- string )
     "object-path" get [ "'" rot cat3 ] when* ;
@@ -49,29 +48,42 @@ USE: vocabularies
     #! Print a list of defined variables.
     vars [ print ] each ;
 
+: link-style ( path -- style )
+    relative>absolute-object-path
+    "object-link" default-style acons ;
+
 : var. ( [ name | value ] -- )
-    uncons unparse swap relative>absolute-object-path
-    default-style clone [ "link" set write-attr ] bind ;
+    uncons unparse swap link-style write-attr ;
 
 : var-name. ( max name -- )
-    default-style clone [
-        tuck pad-string write
-        dup relative>absolute-object-path "link" set
-        write-attr
-    ] bind ;
+    tuck pad-string write dup link-style write-attr ;
 
 : value. ( max name value -- )
     >r var-name. ": " write r> . ;
 
+: alist-keys>str ( alist -- alist )
+    [ unswons unparse swons ] map ;
+
+: name-padding ( alist -- col )
+    [ car ] map max-str-length ;
+
 : describe-assoc ( alist -- )
-    dup [ car ] inject max-str-length swap
+    dup name-padding swap
     [ dupd uncons value. ] each drop ;
-   
+
+: alist-sort ( list -- list )
+    [ swap car swap car str-lexi> ] sort ;
+
+: describe-assoc* ( alist -- )
+    #! Used to describe alists made from hashtables and
+    #! namespaces.
+    alist-keys>str alist-sort describe-assoc ;
+
 : describe-namespace ( namespace -- )
-    [ vars-values ] bind describe-assoc ;
+    [ vars-values ] bind describe-assoc* ;
 
 : describe-hashtable ( hashtables -- )
-    hash>alist describe-assoc ;
+    hash>alist describe-assoc* ;
 
 : describe ( obj -- )
     [
@@ -84,18 +96,18 @@ USE: vocabularies
         [ assoc? ]
         [ describe-assoc ]
         
-        [ hashtable? ]
-        [ describe-hashtable ]
-        
         [ has-namespace? ]
         [ describe-namespace ]
+        
+        [ hashtable? ]
+        [ describe-hashtable ]
         
         [ drop t ]
         [ prettyprint ]
     ] cond ;
 
-: describe-object-path ( string -- )
-    <namespace> [
-        dup "object-path" set
-        global-object-path describe
-    ] bind ;
+: lookup ( str -- object )
+    global [ "'" split object-path ] bind ;
+
+: describe-path ( string -- )
+    [ dup "object-path" set lookup describe ] with-scope ;

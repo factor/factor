@@ -49,29 +49,6 @@ public class FactorLib
 			return o3;
 	} //}}}
 
-	//{{{ cloneArray() method
-	public static Object[] cloneArray(Object[] array)
-	{
-		Object[] newArray = new Object[array.length];
-		System.arraycopy(array,0,newArray,0,array.length);
-		return newArray;
-	} //}}}
-
-	//{{{ deepCloneArray() method
-	public static Object[] deepCloneArray(Object[] array)
-	{
-		Object[] newArray = new Object[array.length];
-		for(int i = 0; i < array.length; i++)
-		{
-			Object o = array[i];
-			if(o instanceof PublicCloneable)
-				newArray[i] = ((PublicCloneable)o).clone();
-			else
-				newArray[i] = o;
-		}
-		return newArray;
-	} //}}}
-
 	//{{{ error() method
 	public static void error(Object obj) throws Throwable
 	{
@@ -151,13 +128,14 @@ public class FactorLib
 	} //}}}
 
 	//{{{ exec() method
-	public static int exec(String[] args) throws Exception
+	public static int exec(String[] args, String dir) throws Exception
 	{
 		int exitCode = -1;
 
 		try
 		{
-			Process process = Runtime.getRuntime().exec(args);
+			Process process = Runtime.getRuntime().exec(args,
+				null,new File(dir));
 			process.getInputStream().close();
 			process.getOutputStream().close();
 			process.getErrorStream().close();
@@ -181,17 +159,7 @@ public class FactorLib
 	 */
 	public static boolean objectsEqual(Object o1, Object o2)
 	{
-		if(o1 == null)
-		{
-			if(o2 == null)
-				return true;
-			else
-				return false;
-		}
-		else if(o2 == null)
-			return false;
-		else
-			return o1.equals(o2);
+		return (o1 == null ? o2 == null : o1.equals(o2));
 	} //}}}
 
 	//{{{ copy() method
@@ -201,21 +169,26 @@ public class FactorLib
 	public static void copy(InputStream in, OutputStream out)
 		throws IOException
 	{
-		byte[] buf = new byte[4096];
-
-		int count;
-
-		for(;;)
+		try
 		{
-			count = in.read(buf,0,buf.length);
-			if(count == -1 || count == 0)
-				break;
+			byte[] buf = new byte[4096];
 
-			out.write(buf,0,count);
+			int count;
+
+			for(;;)
+			{
+				count = in.read(buf,0,buf.length);
+				if(count == -1 || count == 0)
+					break;
+
+				out.write(buf,0,count);
+			}
 		}
-
-		in.close();
-		out.close();
+		finally
+		{
+			in.close();
+			out.close();
+		}
 	} //}}}
 
 	//{{{ readLine() method
@@ -243,7 +216,12 @@ public class FactorLib
 				break;
 			buf.append((char)b);
 		}
-		return buf.toString();
+
+		/* EOF? */
+		if(b == -1 && buf.length() == 0)
+			return null;
+		else
+			return buf.toString();
 	} //}}}
 
 	//{{{ readCount() method
@@ -255,7 +233,7 @@ public class FactorLib
 		int read = 0;
 		while((read = in.read(bytes,offset,count - offset)) > 0)
 			offset += read;
-		return new String(bytes,"ASCII");
+		return new String(bytes,0,offset,"ASCII");
 	} //}}}
 
 	//{{{ readCount() method
@@ -267,6 +245,6 @@ public class FactorLib
 		int read = 0;
 		while((read = in.read(chars,offset,count - offset)) > 0)
 			offset += read;
-		return new String(chars);
+		return new String(chars,0,offset);
 	} //}}}
 }

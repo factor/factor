@@ -52,8 +52,8 @@ USE: parser
 "/library/platform/jvm/errors.factor"       run-resource ! errors
 "/library/platform/jvm/namespaces.factor"   run-resource ! namespaces
 "/library/namespaces.factor"                run-resource ! namespaces
-"/library/sbuf.factor"                      run-resource ! strings
 "/library/list-namespaces.factor"           run-resource ! namespaces
+"/library/sbuf.factor"                      run-resource ! strings
 "/library/math/namespace-math.factor"       run-resource ! arithmetic
 "/library/continuations.factor"             run-resource ! continuations
 "/library/errors.factor"                    run-resource ! errors
@@ -67,6 +67,7 @@ USE: parser
 "/library/platform/jvm/regexp.factor"       run-resource ! regexp
 "/library/stream.factor"                    run-resource ! streams
 "/library/platform/jvm/stream.factor"       run-resource ! streams
+"/library/platform/jvm/files.factor"        run-resource ! files
 "/library/stdio.factor"                     run-resource ! stdio
 "/library/platform/jvm/unparser.factor"     run-resource ! unparser
 "/library/platform/jvm/parser.factor"       run-resource ! parser
@@ -76,16 +77,22 @@ USE: parser
 
 !!! Math library.
 "/library/platform/jvm/real-math.factor" run-resource ! real-math
+"/library/math/constants.factor"         run-resource ! math
 "/library/math/math.factor"              run-resource ! math
 "/library/math/pow.factor"               run-resource ! math
 "/library/math/trig-hyp.factor"          run-resource ! math
 "/library/math/arc-trig-hyp.factor"      run-resource ! math
 "/library/math/quadratic.factor"         run-resource ! math
 "/library/math/list-math.factor"         run-resource ! math
+"/library/math/simpson.factor"           run-resource ! math
 
 !!! Development tools.
+"/library/platform/jvm/processes.factor"   run-resource ! processes
+"/library/extend-stream.factor"            run-resource ! streams
+"/library/stdio-binary.factor"             run-resource ! stdio
 "/library/vocabulary-style.factor"         run-resource ! style
 "/library/prettyprint.factor"              run-resource ! prettyprint
+"/library/files.factor"                    run-resource ! files
 "/library/platform/jvm/prettyprint.factor" run-resource ! prettyprint
 "/library/interpreter.factor"              run-resource ! interpreter
 "/library/inspector.factor"                run-resource ! inspector
@@ -93,17 +100,20 @@ USE: parser
 "/library/platform/jvm/compiler.factor"    run-resource ! compiler
 "/library/platform/jvm/debugger.factor"    run-resource ! debugger
 "/library/debugger.factor"                 run-resource ! debugger
-"/library/platform/jvm/listener.factor"    run-resource ! listener
 "/library/test/test.factor"                run-resource ! test
+"/library/platform/jvm/test.factor"        run-resource ! test
 "/library/ansi.factor"                     run-resource ! ansi
 "/library/telnetd.factor"                  run-resource ! telnetd
+"/library/inferior.factor"                 run-resource ! inferior
 
 !!! Java -> native VM image cross-compiler.
-"/library/platform/native/image.factor"          run-resource ! cross-compiler
-"/library/platform/native/cross-compiler.factor" run-resource ! cross-compiler
+"/library/image.factor"                       run-resource ! cross-compiler
+"/library/cross-compiler.factor"              run-resource ! cross-compiler
+"/library/platform/jvm/cross-compiler.factor" run-resource ! cross-compiler
 
 !!! HTTPD.
 "/library/httpd/url-encoding.factor"       run-resource ! url-encoding
+"/library/httpd/html-tags.factor"          run-resource ! html
 "/library/httpd/html.factor"               run-resource ! html
 "/library/httpd/http-common.factor"        run-resource ! httpd
 "/library/httpd/responder.factor"          run-resource ! httpd-responder
@@ -111,10 +121,17 @@ USE: parser
 "/library/httpd/inspect-responder.factor"  run-resource ! inspect-responder
 "/library/httpd/file-responder.factor"     run-resource ! file-responder
 "/library/httpd/quit-responder.factor"     run-resource ! quit-responder
+"/library/httpd/resource-responder.factor" run-resource ! resource-responder
 "/library/httpd/test-responder.factor"     run-resource ! test-responder
 "/library/httpd/wiki-responder.factor"     run-resource ! wiki-responder
 "/library/httpd/default-responders.factor" run-resource ! default-responders
 
+!!! jEdit integration.
+"/library/jedit/jedit-local.factor" run-resource  ! jedit
+"/library/jedit/jedit-remote.factor" run-resource ! jedit
+"/library/jedit/jedit.factor" run-resource        ! jedit
+
 !!! Final initialization...
 "/library/init.factor"                     run-resource ! init
 "/library/platform/jvm/init.factor"        run-resource ! init
+"/library/platform/jvm/listener.factor"    run-resource ! listener

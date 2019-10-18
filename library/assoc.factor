@@ -56,8 +56,25 @@ USE: stack
     #! [ [ 1 | "one" ] [ 2 | "two" ] [ 3 | "three" ] ]
     assoc* dup [ cdr ] when ;
 
+: acons ( value key alist -- alist )
+    >r swons r> cons ;
+
 : set-assoc ( value key alist -- alist )
     #! Sets the key in the alist. Does not modify the existing
     #! list by consing a new key/value pair onto the alist. The
     #! newly-added pair 'shadows' the previous value.
-    >r swons r> [ dupd car= not ] subset cons ;
+    [ dupd car = not ] subset acons ;
+
+: assoc-apply ( value-alist quot-alist -- )
+    #! Looks up the key of each pair in the first list in the
+    #! second list to produce a quotation. The quotation is
+    #! applied to the value of the pair. If there is no
+    #! corresponding quotation, the value is popped off the
+    #! stack.
+    swap [
+        over >r unswons rot assoc* dup [
+            cdr call
+        ] [
+            2drop
+        ] ifte r>
+    ] each drop ;

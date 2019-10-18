@@ -32,6 +32,7 @@ USE: kernel
 USE: format
 USE: namespaces
 USE: stack
+USE: stdio
 USE: streams
 USE: strings
 
@@ -66,16 +67,14 @@ USE: strings
     #! Set foreground color.
     "\e[4" swap "m" cat3 ; inline
 
-: ansi-attrs ( -- esc )
-    "bold"    get [ bold % ] when
-    "ansi-fg" get [ fg % ] when*
-    "ansi-bg" get [ bg % ] when* ;
+: ansi-attrs ( style -- )
+    "bold"    over assoc [ bold % ] when
+    "ansi-fg" over assoc [ fg % ] when*
+    "ansi-bg" over assoc [ bg % ] when*
+    drop ;
 
-: ansi-attr-string ( string -- string )
+: ansi-attr-string ( string style -- string )
     <% ansi-attrs % reset % %> ;
-
-: <ansi-stream>/fwrite-attr ( string stream -- )
-    [ ansi-attr-string ] dip fwrite ;
 
 : <ansi-stream> ( stream -- stream )
     #! Wraps the given stream in an ANSI stream. ANSI streams
@@ -84,7 +83,6 @@ USE: strings
     #! ansi-fg - foreground color
     #! ansi-bg - background color
     <extend-stream> [
-        [
-            "stream" get <ansi-stream>/fwrite-attr
-        ] "fwrite-attr" set
+        ( string style -- )
+        [ ansi-attr-string write ] "fwrite-attr" set
     ] extend ;

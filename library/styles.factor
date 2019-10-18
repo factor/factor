@@ -28,15 +28,13 @@
 IN: styles
 USE: combinators
 USE: kernel
+USE: lists
 USE: namespaces
 USE: stack
 
-! A style is a namespace whose variable names and values hold
+! A style is an alist whose key/value pairs hold
 ! significance to the 'fwrite-attr' word when applied to a
 ! stream that supports attributed string output.
-!
-! The default style enumerates the canonical names and values
-! to determine a style.
 
 : default-style ( -- style )
     #! Push the default style object.
@@ -65,36 +63,18 @@ USE: stack
     ! XXX: use object path...
     "styles" get [ set ] bind ;
 
-: init-styles ( -- )
+<namespace> "styles" set
 
-    <namespace> "styles" set
-    "styles" get [
-        <namespace> [
-            f "ansi-fg"         set
-            f "ansi-bg"         set
-            f "fg"              set
-            f "bg"              set
-            f "bold"            set
-            f "italics"         set
-            f "underline"       set
-            f "link"            set
-            "Monospaced" "font" set
-        ] extend "default"      set
-    
-        ! A paragraph break
-        <namespace> [
-            t "paragraph"       set
-        ] extend "paragraph"    set
-    ] bind
+[
+    [ "font" | "Monospaced" ]
+] "default" set-style
 
-    [
-        [ "bold" | t ]
-    ] <style> "prompt" set-style
-    
-    [
-        [ "ansi-fg" | "0" ]
-        [ "ansi-bg" | "2" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] <style> "comments" set-style ;
+[
+    [ "bold" | t ]
+] default-style append "prompt" set-style
 
-init-styles
+[
+    [ "ansi-fg" | "0" ]
+    [ "ansi-bg" | "2" ]
+    [ "fg" | [ 255 0 0 ] ]
+] default-style append "comments" set-style

@@ -30,6 +30,7 @@ USE: combinators
 USE: format
 USE: lists
 USE: logic
+USE: kernel
 USE: namespaces
 USE: stack
 USE: stdio
@@ -47,58 +48,97 @@ USE: url-encoding
         [ CHAR: " | "&quot;" ]
     ] ;
 
+: char>entity ( ch -- str )
+    dup >r html-entities assoc dup r> ? ;
+
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
     [ dup html-entities assoc dup rot ? ] str-map ;
 
-: opening-tag ( tag attrs -- )
-    "<" % swap % [ " " % % ] when* ">" % ;
-
-: closing-tag ( tag -- )
-    "</" % % ">" % ;
-
-: html-tag ( str tag attrs -- str )
-    #! Wrap a string in an HTML tag.
-    <% dupd opening-tag swap % closing-tag %> ;
-
-: responder-link% ( -- )
-    "/" % "responder" get % "/" % ;
-
-: link-attrs ( link -- attrs )
-    <% "href=\"" % responder-link% % "\"" % %> ;
-
-: link-tag ( string link -- string )
-    "a" swap link-attrs html-tag ;
-
-: bold-tag ( string -- string )
-    "b" f html-tag ;
-
-: italics-tag ( string -- string )
-    "i" f html-tag ;
-
-: underline-tag ( string -- string )
-    "u" f html-tag ;
-
 : >hex-color ( triplet -- hex )
-    [ >hex 2 digits ] inject "#" swons cat ;
+    [ >hex 2 digits ] map "#" swons cat ;
 
-: fg-tag ( string color -- string )
-    "font" swap "color=\"" swap >hex-color "\"" cat3 html-tag ;
+: fg-css% ( color -- )
+    "color: " % >hex-color % "; " % ;
 
-: size-tag ( string size -- string )
-    "font" swap "size=\"" swap "\"" cat3 html-tag ;
+: bold-css% ( flag -- )
+    [ "font-weight: bold; " % ] when ;
 
-: html-attr-string ( string -- string )
-    chars>entities
-    "fg" get [ fg-tag ] when*
-    "bold" get [ bold-tag ] when
-    "italics" get [ italics-tag ] when
-    "underline" get [ underline-tag ] when
-    "size" get [ size-tag ] when*
-    "link" get [ url-encode link-tag ] when* ;
+: italics-css% ( flag -- )
+    [ "font-style: italic; " % ] when ;
 
-: <html-stream>/fwrite-attr ( string stream -- )
-    [ html-attr-string ] dip fwrite ;
+: underline-css% ( flag -- )
+    [ "text-decoration: underline; " % ] when ;
+
+: size-css% ( size -- )
+    "font-size: " % unparse % "; " % ;
+
+: font-css% ( font -- )
+    "font-family: " % % "; " % ;
+
+: css-style ( style -- )
+    <% [
+        [ "fg"        fg-css% ]
+        [ "bold"      bold-css% ]
+        [ "italics"   italics-css% ]
+        [ "underline" underline-css% ]
+        [ "size"      size-css% ]
+        [ "font"      font-css% ]
+    ] assoc-apply %> ;
+
+: span-tag ( style quot -- )
+    over css-style dup "" = [
+        drop call
+    ] [
+        <span style= span> call </span>
+    ] ifte ;
+
+: resolve-file-link ( path -- link )
+    #! The file responder needs relative links not absolute
+    #! links.
+    "doc-root" get [
+        ?str-head [ "/" ?str-head drop ] when
+    ] when* "/" ?str-tail drop ;
+
+: file-link-href ( path -- href )
+    <% "/" % resolve-file-link url-encode % %> ;
+
+: file-link-tag ( style quot -- )
+    over "file-link" swap assoc [
+        <a href= file-link-href a> call </a>
+    ] [
+        call
+    ] ifte* ;
+
+: object-link-href ( path -- href )
+    #! Perhaps this should not be hard-coded.
+    "/responder/inspect/" swap cat2 ;
+
+: object-link-tag ( style quot -- )
+    over "object-link" swap assoc [
+        <a href= object-link-href url-encode a> call </a>
+    ] [
+        call
+    ] ifte* ;
+
+: icon-tag ( string style quot -- )
+    over "icon" swap assoc dup [
+        <img src= "/responder/resource/" swap cat2 img/>
+        #! Ignore the quotation, since no further style
+        #! can be applied
+        3drop
+    ] [
+        drop call
+    ] ifte ;
+
+: html-write-attr ( string style -- )
+    [
+        [
+            [
+                [ drop chars>entities write ] span-tag
+            ] file-link-tag
+        ] object-link-tag
+    ] icon-tag ;
 
 : <html-stream> ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream
@@ -110,33 +150,30 @@ USE: url-encoding
     #! fg - an rgb triplet in a list
     #! bg - an rgb triplet in a list
     #! bold
-    #! italic
+    #! italics
     #! underline
+    #! size
+    #! link - an object path
     <extend-stream> [
-        [ chars>entities "stream" get fwrite ] "fwrite" set
-        [ chars>entities "stream" get fprint ] "fprint" set
-        [ "stream" get <html-stream>/fwrite-attr ] "fwrite-attr" set
+        [ chars>entities write ] "fwrite" set
+        [ chars>entities print ] "fprint" set
+        [ html-write-attr ] "fwrite-attr" set
     ] extend ;
 
 : with-html-stream ( quot -- )
-     <namespace> [
-        "stdio" get <html-stream> "stdio" set call
-    ] bind ;
-
-: html-head ( title -- )
-    "<html><head><title>" write
-    dup write
-    "</title></head><body><h1>" write write "</h1>" write ;
-
-: html-tail ( -- ) "</body></html>" print ;
+    [ "stdio" get <html-stream> "stdio" set call ] with-scope ;
 
 : html-document ( title quot -- )
-    swap chars>entities html-head call html-tail ;
-
-: preformatted-html ( quot -- )
-    "<pre>" print call "</pre>" print ;
+    swap chars>entities dup
+    <html>
+        <head>
+            <title> write </title>
+        </head>
+        <body>
+            <h1> write </h1>
+            call
+        </body>
+    </html> ;
 
 : simple-html-document ( title quot -- )
-    swap [
-        [ [ call ] with-html-stream ] preformatted-html
-    ] html-document ;
+    swap [ <pre> with-html-stream </pre> ] html-document ;

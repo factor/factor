@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=0:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -27,104 +27,73 @@
 
 IN: file-responder
 USE: combinators
+USE: errors
+USE: files
 USE: html
+USE: httpd
+USE: httpd-responder
 USE: kernel
 USE: lists
+USE: logging
 USE: namespaces
 USE: parser
-USE: regexp
 USE: stack
 USE: stdio
 USE: streams
 USE: strings
+USE: unparser
 
-USE: httpd
-USE: httpd-responder
+: serving-path ( filename -- filename )
+    f>"" "doc-root" get swap cat2 ;
 
-!!! Support words.
-: mime-types ( -- alist )
-    [
-        [  "html"   | "text/html"                ]
-        [  "txt"    | "text/plain"               ]
-                                                
-        [  "gif"    | "image/gif"                ]
-        [  "png"    | "image/png"                ]
-        [  "jpg"    | "image/jpeg"               ]
-        [  "jpeg"   | "image/jpeg"               ]
-                    
-        [  "jar"    | "application/octet-stream" ]
-        [  "zip"    | "application/octet-stream" ]
-        [  "tgz"    | "application/octet-stream" ]
-        [  "tar.gz" | "application/octet-stream" ]
-        [  "gz"     | "application/octet-stream" ]
-    ] ;
+: file-response ( mime-type length -- )
+    [,
+        unparse "Content-Length" swons ,
+        "Content-Type" swons ,
+    ,] "200 OK" response terpri ;
 
-: mime-type ( filename -- mime-type )
-    file-extension mime-types assoc [ "text/plain" ] unless* ;
-
-!!! Serving files.
-: file-header ( filename -- header )
-    "200 Document follows" swap mime-type response ;
+: serve-static ( filename mime-type -- )
+    over file-length file-response  "method" get "head" = [
+        drop
+    ] [
+        <filebr> "stdio" get fcopy
+    ] ifte ;
 
 : serve-file ( filename -- )
-    dup file-header print <filebr> "stdio" get fcopy ;
-
-!!! Serving directories.
-: file>html ( filename -- ... )
-    "<li><a href=\"" swap
-    !dup directory? [ "/" cat2 ] when
-    chars>entities
-    "\">" over "</a></li>" ;
-
-: directory>html ( directory -- html )
-    directory [ file>html ] map cat ;
+    dup mime-type dup "application/x-factor-server-page" = [
+        drop run-file
+    ] [
+        serve-static
+    ] ifte ;
 
 : list-directory ( directory -- )
     serving-html
-    [
-        "<html><head><title>" swap
-        "</title></head><body><h1>" over
-        "</h1><ul>" over
-        directory>html
-        "</ul></body></html>"
-    ] cons expand cat write ;
-
-: serve-directory ( directory -- )
-    dup "/index.html" cat2 dup exists? [
-        nip serve-file
+     "method" get "head" = [
+        drop
     ] [
-        drop list-directory
+        dup [ directory. ] simple-html-document
     ] ifte ;
 
-!!! Serving objects.
-: serve-static ( filename -- )
-    dup directory? [
-        serve-directory
+: serve-directory ( filename -- )
+    "/" ?str-tail [
+        dup "/index.html" cat2 dup exists? [
+            serve-file
+        ] [
+            drop list-directory
+        ] ifte
     ] [
-        serve-file
+        drop directory-no/
     ] ifte ;
 
-: serve-script ( argument filename -- )
-    <namespace> [ swap "argument" set run-file ] bind ;
-
-: parse-object-name ( filename -- argument filename )
-    dup [
-        dup #"(.*?)\?(.*)" groups dup [ nip call ] when swap
-    ] [
-        drop f "/"
-    ] ifte ;
+: serve-object ( filename -- )
+    dup directory? [ serve-directory ] [ serve-file ] ifte ;
 
 : file-responder ( filename -- )
     "doc-root" get [
-        parse-object-name "doc-root" get swap cat2
-        dup exists? [
-            dup file-extension "lhtml" = [
-                serve-script
-            ] [
-                nip serve-static
-            ] ifte
+        serving-path dup exists? [
+            serve-object
         ] [
-            2drop "404 not found" httpd-error
+            drop "404 not found" httpd-error
         ] ifte
     ] [
         drop "404 doc-root not set" httpd-error

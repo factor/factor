@@ -25,15 +25,13 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: vocabularies
+IN: words
 USE: combinators
 USE: lists
 USE: kernel
 USE: namespaces
 USE: stack
 USE: styles
-USE: vocabularies
-USE: words
 
 : get-vocab-style ( vocab -- style )
     #! Each vocab has a style object specifying how words are
@@ -41,7 +39,8 @@ USE: words
     "vocabularies" 2rlist get-style ;
 
 : set-vocab-style ( style vocab -- )
-    "styles" get [ "vocabularies" get ] bind [ set ] bind ;
+    swap default-style append swap
+    [ "styles" "vocabularies" ] object-path set* ;
 
 : word-style ( word -- style )
     word-vocabulary dup [
@@ -50,40 +49,73 @@ USE: words
         drop default-style
     ] ifte ;
 
-: init-vocab-styles ( -- )
-    "styles" get [ <namespace> "vocabularies" set ] bind
+"styles" get [ <namespace> "vocabularies" set ] bind
 
-    [
-        [ "ansi-fg" | "1" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] <style> "builtins" set-vocab-style
-    [
-        [ "ansi-fg" | "1" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] <style> "kernel" set-vocab-style
-    [
-        [ "ansi-fg" | "1" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] <style> "combinators" set-vocab-style
-    [
-        [ "ansi-fg" | "2" ]
-        [ "fg" | [ 0 255 0 ] ]
-    ] <style> "stack" set-vocab-style
-    [
-        [ "ansi-fg" | "3" ]
-        [ "fg" | [ 255 255 0 ] ]
-    ] <style> "arithmetic" set-vocab-style
-    [
-        [ "ansi-fg" | "3" ]
-        [ "fg" | [ 255 255 0 ] ]
-    ] <style> "math" set-vocab-style
-    [
-        [ "ansi-fg" | "4" ]
-        [ "fg" | [ 0 0 255 ] ]
-    ] <style> "namespaces" set-vocab-style
-    [
-        [ "ansi-fg" | "5" ]
-        [ "fg" | [ 255 0 255 ] ]
-    ] <style> "lists" set-vocab-style ;
-
-init-vocab-styles
+[
+    [ "ansi-fg" | "1" ]
+    [ "fg" | [ 204 0 0 ] ]
+] "arithmetic" set-vocab-style
+[
+    [ "ansi-fg" | "3" ]
+    [ "fg" | [ 255 132 0 ] ]
+] "combinators" set-vocab-style
+[
+    [ "ansi-fg" | "5" ]
+    [ "fg" | [ 102 0 204 ] ]
+] "continuations" set-vocab-style
+[
+    [ "ansi-fg" | "1" ]
+    [ "fg" | [ 255 0 0 ] ]
+] "errors" set-vocab-style
+[
+    [ "ansi-fg" | "4" ]
+    [ "fg" | [ 153 102 255 ] ]
+] "hashtables" set-vocab-style
+[
+    [ "ansi-fg" | "2" ]
+    [ "fg" | [ 0 102 153 ] ]
+] "lists" set-vocab-style
+[
+    [ "ansi-fg" | "6" ]
+    [ "fg" | [ 0 153 102 ] ]
+] "logic" set-vocab-style
+[
+    [ "ansi-fg" | "1" ]
+    [ "fg" | [ 204 0 0 ] ]
+] "math" set-vocab-style
+[
+    [ "ansi-fg" | "6" ]
+    [ "fg" | [ 0 153 255 ] ]
+] "namespaces" set-vocab-style
+[
+    [ "ansi-fg" | "2" ]
+    [ "fg" | [ 102 204 255 ] ]
+] "parser" set-vocab-style
+[
+    [ "ansi-fg" | "2" ]
+    [ "fg" | [ 102 204 255 ] ]
+] "prettyprint" set-vocab-style
+[
+    [ "ansi-fg" | "2" ]
+    [ "fg" | [ 0 0 0 ] ]
+] "stack" set-vocab-style
+[
+    [ "ansi-fg" | "4" ]
+    [ "fg" | [ 204 0 204 ] ]
+] "stdio" set-vocab-style
+[
+    [ "ansi-fg" | "4" ]
+    [ "fg" | [ 102 0 204 ] ]
+] "streams" set-vocab-style
+[
+    [ "ansi-fg" | "6" ]
+    [ "fg" | [ 255 0 204 ] ]
+] "strings" set-vocab-style
+[
+    [ "ansi-fg" | "4" ]
+    [ "fg" | [ 102 204 255 ] ]
+] "unparser" set-vocab-style
+[
+    [ "ansi-fg" | "3" ]
+    [ "fg" | [ 2 185 2 ] ]
+] "vectors" set-vocab-style

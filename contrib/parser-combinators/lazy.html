@@ -1,0 +1,280 @@
+<html>
+  <head>
+    <title>Lazy Evaluation</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+      </head>
+  <body>
+    <h1>Lazy Evaluation</h1>
+<p>The 'lazy' vocabulary adds lazy lists to Factor. This provides the
+    ability to describe infinite structures, and to delay execution of
+    expressions until they are actually used.</p>
+<p>Lazy lists, like normal lists, are composed of a head and tail. In
+    a lazy list the tail is something called a 'promise'. To convert a
+    'promise' into its actual value a word called 'force' is used. To
+    convert a value into a 'promise' the word to use is 'delay'.</p>
+<p>Many of the lazy list words are named similar to the standard list
+    words but with an 'l' suffixed to it. Here are the commonly used
+    words and their equivalent list operation:</p>
+<table border="1">
+<tr><th>Lazy List</th><th>Normal List</th></tr>
+<tr><td><a href="#lcons">lcons</a></td><td>cons</td></tr>
+<tr><td><a href="#lunit">lunit</a></td><td>unit</td></tr>
+<tr><td><a href="#lcar">lcar</a></td><td>car</td></tr>
+<tr><td><a href="#lcdr">lcdr</a></td><td>cdr</td></tr>
+<tr><td><a href="#lnth">lnth</a></td><td>nth</td></tr>
+<tr><td><a href="#luncons">luncons</a></td><td>uncons</td></tr>
+<tr><td><a href="#lmap">lmap</a></td><td>map</td></tr>
+<tr><td><a href="#lsubset">lsubset</a></td><td>subset</td></tr>
+<tr><td><a href="#leach">leach</a></td><td>each</td></tr>
+<tr><td><a href="#lappend">lappend</a></td><td>append</td></tr>
+</table>
+<p>A few additional words specific to lazy lists are:</p>
+<table border="1">
+<tr><td><a href="#ltake">ltake</a></td><td>Returns a normal list containing a specified
+number of items from the lazy list.</td></tr>
+<tr><td><a href="#lappendstar">lappend*</a></td><td>Given a lazy list of lazy lists,
+concatenate them together in a lazy manner, returning a single lazy
+list.</td></tr>
+<tr><td><a href="#list>llist">list>llist</a></td><td>Given a normal list, return a lazy list
+that contains the same elements as the normal list.</td></tr>
+</table>
+<p>A couple of helper functions are also provided by the lazy
+vocabulary.</p>
+<table border="1">
+<tr><td>curry1</td><td>Given a value and a quotation, returns a new
+quotation that when called will have the value on the stack.</td></tr>
+<tr><td>curry2</td><td>Given two values and a quotation, returns a new
+quotation that when called will have the two values on the
+stack.</td></tr>
+</table>
+<h2>Reference</h2>
+<!-- lcons description -->
+<a name="lcons">
+<h3>lcons ( value promise -- lcons )</h3>
+<p>Provides the same effect as 'cons' does for normal lists. It
+creates a cons cell where the first element is the value given and the
+second element is a promise.</p>
+<a name="promise">
+<p>A promise is either a value that has had 'force' called on it, or
+a quotation that when 'call' is applied to it, returns the actual
+value.</p>
+<pre class="code">
+  ( 1 ) 5 6 delay <a href="#lcons">lcons</a> dup .
+       => [ 5 6 ]
+  ( 2 ) dup <a href="#lcar">lcar</a> .
+       => 5
+  ( 3 ) dup <a href="#lcdr">lcdr</a> .
+       => 6
+</pre>
+  
+<!-- lunit description -->
+<a name="lunit">
+<h3>lunit ( value -- llist )</h3>
+<p>Provides the same effect as 'unit' does for normal lists. It
+creates a lazy list where the first element is the value given.</p>
+<pre class="code">
+  ( 1 ) 42 <a href="#lunit">lunit</a> dup .
+       => [ 42 f ]
+  ( 2 ) dup <a href="#lcar">lcar</a> .
+       => 42
+  ( 3 ) dup <a href="#lcdr">lcdr</a> .
+       => f
+  ( 4 ) [ . ] <a href="#leach">leach</a>
+       => 42
+</pre>
+
+<!-- lcar description -->
+<a name="lcar">
+<h3>lcar ( lcons -- value )</h3>
+<p>Provides the same effect as 'car' does for normal lists. It
+returns the first element in a lazy cons cell.</p>
+<pre class="code">
+  ( 1 ) 42 <a href="#lunit">lunit</a> dup .
+       => [ 42 f ]
+  ( 2 ) <a href="#lcar">lcar</a> .
+       => 42
+</pre>
+
+<!-- lcdr description -->
+<a name="lcdr">
+<h3>lcdr ( lcons -- value )</h3>
+<p>Provides the same effect as 'cdr' does for normal lists. It
+returns the second element in a lazy cons cell and forces it. This
+causes that element to be evaluated immediately.</p>
+<pre class="code">
+  ( 1 ) 5 [ 5 6 + ] <a href="#lcons">lcons</a> dup .
+       => [ 5 5 6 + ]
+  ( 2 ) <a href="#lcdr">lcdr</a> .
+       => 11
+</pre>
+
+<pre class="code">
+  ( 1 ) 5 lfrom dup .
+       => [ 5 5 succ lfrom ]
+  ( 2 ) <a href="#lcdr">lcdr</a> dup <a href="#lcar">lcar</a> .
+       => 6
+  ( 3 ) <a href="#lcdr">lcdr</a> dup <a href="#lcar">lcar</a> .
+       => 7
+  ( 4 ) <a href="#lcdr">lcdr</a> dup <a href="#lcar">lcar</a> .
+       => 8
+</pre>
+
+<!-- lnth description -->
+<a name="lnth">
+<h3>lnth ( n llist -- value )</h3>
+<p>Provides the same effect as 'nth' does for normal lists. It
+returns the nth value in the lazy list. It causes all the values up to
+'n' to be evaluated.</p>
+<pre class="code">
+  ( 1 ) 1 lfrom 
+       => [ 1 1 succ lfrom ]
+  ( 2 ) 5 swap <a href="#lnth">lnth</a> .
+       => 6
+</pre>
+
+<!-- luncons description -->
+<a name="luncons">
+<h3>luncons ( lcons -- car cdr )</h3>
+<p>Provides the same effect as 'uncons' does for normal lists. It
+returns the car and cdr of the lazy list. Note that cdr is forced
+resulting in it being evaluated.</p>
+<pre class="code">
+  ( 1 ) 5 [ 6 ] <a href="#lcons">lcons</a> dup .
+       => [ 5 6 ]
+  ( 2 ) <a href="#luncons">luncons</a> .s
+       => { 5 6 }
+</pre>
+
+<!-- lmap description -->
+<a name="lmap">
+<h3>lmap ( llist quot -- llist )</h3>
+<p>Provides the same effect as 'map' does for normal lists. It
+lazily maps over a lazy list applying the quotation to each element.
+A new lazy list is returned which contains the results of the
+quotation.</p>
+<p>When initially called <a href="#lmap">lmap</a> will only call quot on the first element
+of the list. It then constructs a lazy list that performs the
+next '<a href="#lmap">lmap</a>' operation on the next element when it is evaluated. This
+allows mapping over infinite lists.</p>
+<pre class="code">
+  ( 1 ) 1 lfrom 
+       => < infinite list of incrementing numbers >
+  ( 2 ) [ 2 * ] <a href="#lmap">lmap</a>
+       => < infinite list of numbers incrementing by 2 >
+  ( 3 ) 5 swap <a href="#ltake">ltake</a> .
+       => [ 2 4 6 8 10 ]
+</pre>
+
+<!-- lsubset description -->
+<a name="lsubset">
+<h3>lsubset ( llist pred -- llist )</h3>
+<p>Provides the same effect as 'subset' does for normal lists. It
+lazily iterates over a lazy list applying the predicate quotation to each
+element. If that quotation returns true, the element will be included
+in the resulting lazy list. If it is false, the element will be skipped.
+A new lazy list is returned which contains  all elements where the
+predicate returned true.</p>
+<p>When initially called <a href="#lsubset">lsubset</a> will only call
+the predicate quotation on the first element
+of the list. It then constructs a lazy list that performs the
+next '<a href="#lsubset">lsubset</a>' operation on the next element when it is evaluated. This
+allows subsetting over infinite lists.</p>
+<pre class="code">
+  ( 1 ) 1 lfrom 
+       => < infinite list of incrementing numbers >
+  ( 2 ) [ prime? ] <a href="#lsubset">lsubset</a>
+       => < infinite list of prime numbers >
+  ( 3 ) 5 swap <a href="#ltake">ltake</a> .
+       => [ 2 3 5 7 11 ]
+</pre>
+
+<!-- leach description -->
+<a name="leach">
+<h3>leach ( llist quot --  )</h3>
+<p>Provides the same effect as 'each' does for normal lists. It
+lazily iterates over a lazy list applying the quotation to each
+element. If this operation is applied to an infinite list it will
+never return unless the quotation escapes out by calling a continuation.</p>
+<pre class="code">
+  ( 1 ) 1 lfrom 
+       => < infinite list of incrementing numbers >
+  ( 2 ) [ 2 mod 1 = ] <a href="#lsubset">lsubset</a>
+       => < infinite list of odd numbers >
+  ( 3 ) [ . ] <a href="#leach">leach</a> 
+       => 1
+          3
+          5
+          7
+          ... for ever ...
+</pre>
+
+<!-- ltake description -->
+<a name="ltake">
+<h3>ltake ( n llist -- list )</h3>
+<p>Iterates over the lazy list 'n' times, appending each element to a
+normal list. The normal list is returned. This provides a convenient
+way of getting elements out of a lazy list.</p>
+<pre class="code">
+  ( 1 ) : ones 1 [ ones ] <a href="#lcons">lcons</a> ;
+  ( 2 ) 5 ones <a href="#ltake">ltake</a>
+       => [ 1 1 1 1 1  ]
+</pre>
+
+<!-- lappend description -->
+<a name="lappend">
+<h3>lappend ( llist1 llist2 -- llist )</h3>
+<p>Lazily appends two lists together. The actual appending is done
+lazily on iteration rather than immediately so it works very fast no
+matter how large the list.</p>
+<pre class="code">
+  ( 1 ) [ 1 2 3 ] <a href="#list>llist">list>llist</a> [ 4 5 6 ] <a href="#list>llist">list>llist</a> <a href="#lappend">lappend</a>
+  ( 2 ) [ . ] <a href="#leach">leach</a>
+       => 1
+          2
+          3
+          4
+          5
+          6
+</pre>
+
+<!-- lappend* description -->
+<a name="lappendstar">
+<h3>lappend* ( llists -- llist )</h3>
+<p>Given a lazy list of lazy lists, concatenate them together in a
+lazy fashion. The actual appending is done lazily on iteration rather
+than immediately so it works very fast no matter how large the lists.</p>
+<pre class="code">
+  ( 1 ) [ 1 2 3 ] <a href="#list>llist">list>llist</a> 
+  ( 2 ) [ 4 5 6 ] <a href="#list>llist">list>llist</a> 
+  ( 3 ) [ 7 8 9 ] <a href="#list>llist">list>llist</a>
+  ( 4 ) 3list <a href="#list>llist">list>llist</a> <a href="#lappendstar">lappend*</a>
+  ( 5 ) [ . ] <a href="#leach">leach</a>
+       => 1
+          2
+          3
+          4
+          5
+          6
+          7
+          8
+          9
+</pre>
+
+<!-- list>llist description -->
+<a name="list>llist">
+<h3>list>llist ( list  -- llist )</h3>
+<p>Converts a normal list into a lazy list. This is done lazily so the
+initial list is not iterated through immediately.</p>
+<pre class="code">
+  ( 1 ) [ 1 2 3 ] <a href="#list>llist">list>llist</a> 
+  ( 2 ) [ . ] <a href="#leach">leach</a>
+       => 1
+          2
+          3
+</pre>
+
+<p class="footer">
+News and updates to this software can be obtained from the authors
+weblog: <a href="http://radio.weblogs.com/0102385">Chris Double</a>.</p>
+<p id="copyright">Copyright (c) 2004, Chris Double. All Rights Reserved.</p>
+</body> </html>

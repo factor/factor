@@ -1,0 +1,141 @@
+FFI:
+- is signed -vs- unsigned pointers an issue?
+
+- command line parsing cleanup
+
+- BIN: 2: bad
+
+- compile word twice; no more 'cannot compile' error!
+- doc comments in assoc, image, inferior
+- styles - could use some cleanup
+- list - trim down
+- move quadratic and simpson to contrib
+- init-assembler called twice
+- compiler: drop literal peephole optimization
+- compiling when*
+- compiling unless*
+- getenv/setenv: if literal arg, compile as a load/store
+- inline words
+
+[error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
+[error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
+
+[error] AWT-EventQueue-0: java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 98
+[error] AWT-EventQueue-0:  at org.gjt.sp.jedit.Buffer.getLineOfOffset(Buffer.java:882)
+[error] AWT-EventQueue-0:  at errorlist.DefaultErrorSource$DefaultError.getLineNumber(Unknown Source)
+[error] AWT-EventQueue-0:  at errorlist.DefaultErrorSource.getLineErrors(Unknown Source)
+[error] AWT-EventQueue-0:  at errorlist.ErrorOverview.paintComponent(Unknown Source)
+
+[error] EditBus: Exception while sending message on EditBus:
+[error] EditBus: java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 98
+[error] EditBus:  at org.gjt.sp.jedit.Buffer.getLineOfOffset(Buffer.java:882)
+[error] EditBus:  at errorlist.DefaultErrorSource$DefaultError.getLineNumber(Unknown Source)
+[error] EditBus:  at errorlist.ErrorList$ErrorCellRenderer.getTreeCellRendererComponent(Unknown Source)
+[error] EditBus:  at javax.swing.plaf.basic.BasicTreeUI$NodeDimensionsHandler.getNodeDimensions(BasicTreeUI.java:2751)
+
+[error] EditBus: Exception while sending message on EditBus:
+[error] EditBus: java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 98
+[error] EditBus:  at org.gjt.sp.jedit.Buffer.getLineOfOffset(Buffer.java:882)
+[error] EditBus:  at errorlist.DefaultErrorSource$DefaultError.getLineNumber(Unknown Source)
+[error] EditBus:  at errorlist.ErrorList$ErrorCellRenderer.getTreeCellRendererComponent(Unknown Source)
+[error] EditBus:  at javax.swing.plaf.basic.BasicTreeUI$NodeDimensionsHandler.getNodeDimensions(BasicTreeUI.java:2751)
+[error] EditBus:  at javax.swing.tree.AbstractLayoutCache.getNodeDimensions(AbstractLayoutCache.java:475)
+
+- perhaps /i should work with all numbers
+- profiler is inaccurate: wrong word on cs
+- buffer change handler in sidekick is screwed
+- dec> bin> oct> hex> throw errors
+- parse-number doesn't
+- eval with multilien strings and #!
+- quit responder breaks with multithreading
+- nicer way to combine two paths
+- don't show listener on certain commands
+- plugin should not exit jEdit on fatal errors
+- wordpreview: don't show for string literals and comments
+- alist -vs- assoc terminology
+- file responder: don't show full path in title
+
+- clean up listener's action popups
+- jedit ==> jedit-word, jedit takes a file name
+- add a socket timeout
+- fix error postoning -- not all errors thrown by i/o code are
+  postponed
+- some way to run httpd from command line
+
++ bignums:
+
+- move some s48_ functions into bignum.c
+- remove unused functions
+
+- >lower, >upper for strings
+- accept multi-line input in listener
+
++ docs:
+
+- explain how log uses >polar and rect>
+- when* unless*
+- simple i/o section
+- unparse examples, and difference from prettyprint
+- review doc formatting with latex2html
+- recursion -vs- iteration in vectors chapter, and combinator
+  construction
+- [, , ,] -- mention that , are usually in nested words
+- finish namespaces docs
+- mention word accessors/mutators
+- to document:
+  continuations
+  streams
+  multitasking
+  unit testing
+
++ tests:
+
+- java factor: equal numbers have non-equal hashcodes!
+- FactorLib.equal() not very good
+- investigate mandel.factor
+
++ listener/plugin:
+
+- NPE in ErrorHighlight
+- some way to not have previous definitions from a source file
+  clutter the namespace
+- use inferior.factor for everything not just listener
+- fedit broken with listener
+- maple-like: press enter at old commands to evaluate there
+- input style after clicking link
+- listener backspace overzealous
+- completion in the listener
+- special completion for USE:/IN:
+- inspector links when describe called without object path
+
++ native:
+
+- better i/o scheduler
+
++ JVM compiler:
+
+- compiled stack traces broken
+- save classes to disk
+- tail call optimization broken again
+- don't compile inline words
+- recursive words with code after ifte
+- less unnecessary args to auxiliary methods
+- inlining tail-recursive immediates
+- direct stack access leaks memory on stack
+- unnecessary local allocation: max is instance var, but several methods
+  get compiled.
+
++ misc:
+
+- don't rehash strings on every startup
+- 'cascading' styles
+- ditch expand
+
++ httpd:
+
+- wiki responder:
+  - port to native
+  - text styles
+- log with date
+ basic authentication, using httpdAuth function from a config file
+- file responder; last-modified field

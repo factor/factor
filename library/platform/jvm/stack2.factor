@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: stack
+USE: combinators
 USE: kernel
 USE: vectors
 
@@ -65,7 +66,11 @@ USE: vectors
     clone set-callstack* ; interpret-only
 
 : clear ( -- )
-    #! Clear the datastack. For interactive use only; invoking this from a
-    #! word definition will clobber any values left on the data stack by the
-    #! caller.
+    #! Clear the datastack. For interactive use only; invoking
+    #! this from a word definition will clobber any values left
+    #! on the data stack by the caller.
     datastack* vector-clear ;
+
+: depth ( -- n )
+    #! Push the number of elements on the datastack.
+    datastack vector-length ;

@@ -25,31 +25,32 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: parser
-USE: arithmetic
+IN: syntax
+
 USE: combinators
 USE: errors
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
+USE: parser
 USE: stack
 USE: strings
 USE: words
-USE: vocabularies
+USE: vectors
 USE: unparser
 
-! Parsing words. 'builtins' is a stupid vocabulary name now
-! that it does not contain Java words anymore!
-
-IN: builtins
+! The variable "in-definition" is set inside a : ... ;.
+! ( and #! then add "stack-effect" and "documentation"
+! properties to the current word if it is set.
 
 ! Constants
 : t t parsed ; parsing
 : f f parsed ; parsing
 
 ! Lists
-: [ f ; parsing
+: [ [ ] ; parsing
 : ] nreverse parsed ; parsing
 
 : | ( syntax: | cdr ] )
@@ -57,22 +58,61 @@ IN: builtins
     #! 'parsed' acts accordingly.
     "|" ; parsing
 
+! Vectors
+: { f ; parsing
+: } nreverse list>vector parsed ; parsing
+
+! Do not execute parsing word
+: POSTPONE: ( -- ) scan-word parsed ; parsing
+
 ! Colon defs
+: CREATE ( -- word )
+    scan "in" get create dup set-word
+    f over "documentation" set-word-property
+    f over "stack-effect" set-word-property ;
+
+: remember-where ( word -- )
+    "line-number" get over "line" set-word-property
+    "col"         get over "col"  set-word-property
+    "file"        get over "file" set-word-property
+    drop ;
+
 : :
     #! Begin a word definition. Word name follows.
-    scan "in" get create f ; parsing
+    CREATE dup remember-where [ ]
+    "in-definition" on ; parsing
+
+: ;-hook ( word def -- )
+    ";-hook" get [ call ] [ define-compound ] ifte* ;
 
 : ;
     #! End a word definition.
-    nreverse define ; parsing
+    "in-definition" off
+    nreverse
+    ;-hook ; parsing
+
+! Symbols
+: SYMBOL: CREATE define-symbol ; parsing
+
+: \
+    #! Parsed as a piece of code that pushes a word on the stack
+    #! \ foo ==> [ foo ] car
+    scan-word unit parsed [ car ] car parsed ; parsing
 
 ! Vocabularies
-: DEFER: scan "in" get create drop ; parsing
+: DEFER: CREATE drop ; parsing
 : USE: scan "use" cons@ ; parsing
 : IN: scan dup "use" cons@ "in" set ; parsing
 
 ! \x
-: escape ( ch -- esc )
+: unicode-escape>ch ( -- esc )
+    #! Read \u....
+    next-ch digit> 16 *
+    next-ch digit> + 16 *
+    next-ch digit> + 16 *
+    next-ch digit> + ;
+
+: ascii-escape>ch ( ch -- esc )
     [
         [ CHAR: e | CHAR: \e ]
         [ CHAR: n | CHAR: \n ]
@@ -85,7 +125,12 @@ IN: builtins
         [ CHAR: \" | CHAR: \" ]
     ] assoc ;
 
-! String literal
+: escape ( ch -- esc )
+    dup CHAR: u = [
+        drop unicode-escape>ch
+    ] [
+        ascii-escape>ch
+    ] ifte ;
 
 : parse-escape ( -- )
     next-ch escape dup [ drop "Bad escape" throw ] unless ;
@@ -93,6 +138,10 @@ IN: builtins
 : parse-ch ( ch -- ch )
     dup CHAR: \\ = [ drop parse-escape ] when ;
 
+! Char literal
+: CHAR: ( -- ) next-word-ch parse-ch parsed ; parsing
+
+! String literal
 : parse-string ( -- )
     next-ch dup CHAR: " = [
         drop
@@ -103,21 +152,50 @@ IN: builtins
 : "
     #! Note the ugly hack to carry the new value of 'pos' from
     #! the <% %> scope up to the original scope.
-    <% parse-string "pos" get %> swap "pos" set parsed ; parsing
+    <% parse-string "col" get %> swap "col" set parsed ; parsing
 
-! Char literal
-: CHAR: ( -- ) skip-blank next-ch parse-ch parsed ; parsing
+! Complex literal
+: #{
+    #! Read #{ real imaginary #}
+    scan str>number scan str>number rect> "}" expect parsed ;
 
 ! Comments
-: ( ")" until drop ; parsing
+: doc-comment-here? ( parsed -- ? )
+    not "in-definition" get and ;
+
+: parsed-stack-effect ( parsed str -- parsed )
+    over doc-comment-here? [
+        word "stack-effect" set-word-property
+    ] [
+        drop
+    ] ifte ;
+
+: ( ")" until parsed-stack-effect ; parsing
+
 : ! until-eol drop ; parsing
-: #! until-eol drop ; parsing
-    
+
+: documentation+ ( str word -- )
+    [
+        "documentation" word-property [
+            swap "\n" swap cat3
+        ] when*
+    ] keep
+    "documentation" set-word-property ;
+
+: parsed-documentation ( parsed str -- parsed )
+    over doc-comment-here? [
+        word documentation+
+    ] [
+        drop
+    ] ifte ;
+
+: #! until-eol parsed-documentation ; parsing
+
 ! Reading numbers in other bases
 
 : BASE: ( base -- )
     #! Read a number in a specific base.
-    "base" get >r "base" set scan number, r> "base" set ;
+    scan swap str>integer parsed ;
 
 : HEX: 16 BASE: ; parsing
 : DEC: 10 BASE: ; parsing

@@ -30,64 +30,78 @@ USE: combinators
 USE: compiler
 USE: continuations
 USE: errors
+USE: files
 USE: interpreter
 USE: kernel
 USE: lists
 USE: namespaces
 USE: parser
+USE: prettyprint
+USE: random
 USE: stack
 USE: stdio
 USE: streams
 USE: strings
+USE: words
 
 ! This file is run as the last stage of boot.factor; it relies
 ! on all other words already being defined.
 
-: init-search-path ( -- )
-    #! Sets up the default vocabularies.
-    [
-        "user" ! This is first
-        "arithmetic"
-        "builtins"
-        "combinators"
-        "compiler"
-        "errors"
-        "debugger"
-        "hashtables"
-        "inspector"
-        "interpreter"
-        "kernel"
-        "lists"
-        "logic"
-        "math"
-        "namespaces"
-        "parser"
-        "prettyprint"
-        "stack"
-        "stdio"
-        "strings"
-        "test"
-        "trace"
-        "unparser"
-        "vectors"
-        "vocabularies"
-        "words"
-        "scratchpad" ! This is last
-    ] "use" set
-    ! New words go in 'user' vocabulary.
-    "user" "in" set ;
+: ?run-file ( file -- )
+    dup exists? [ (run-file) ] [ drop ] ifte ;
 
-: init-scratchpad ( -- )
-    #! The contents of the scratchpad vocabulary is not saved
-    #! between runs.
-    <namespace> "scratchpad" "vocabularies" get set* ;
+: run-user-init ( -- )
+    #! Run user init file if it exists
+    "user-init" get [
+        <% "~" get % "/" get % ".factor-" % "rc" % %>
+        ?run-file
+    ] when ;
+
+: cli-var-param ( name value -- )
+    swap ":" split set-object-path ;
+
+: cli-param ( param -- )
+    #! Handle a command-line argument starting with '-' by
+    #! setting that variable to t, or if the argument is
+    #! prefixed with 'no-', setting the variable to f.
+    #!
+    #! Arguments containing = are handled differently; they
+    #! set the object path.
+    "=" split1 dup [
+        cli-var-param
+    ] [
+        drop dup "no-" str-head? dup [
+            f put drop
+        ] [
+            drop t put
+        ] ifte
+    ] ifte ;
+
+: cli-arg ( argument -- argument )
+    #! Handle a command-line argument. If the argument was
+    #! consumed, returns f. Otherwise returns the argument.
+    dup [
+        dup "-" str-head? dup [
+            cli-param drop f
+        ] [
+            drop
+        ] ifte
+    ] when ;
+
+: parse-switches ( args -- args )
+    [ cli-arg ] map ;
+
+: run-files ( args -- )
+    [ [ run-file ] when* ] each ;
+
+: parse-command-line ( args -- )
+    #! Parse command line arguments.
+    parse-switches run-files ;
 
 : init-interpreter ( -- )
-    #! If we're run stand-alone, start the interpreter on stdio.
-    "interactive" get [
-        [ "top-level-continuation" set ] callcc0
+    init-history
 
-        interpreter-loop
-    ] [
-        f "top-level-continuation" set
-    ] ifte ;
+    print-banner
+    room.
+
+    interpreter-loop ;

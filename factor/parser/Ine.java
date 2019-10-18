@@ -51,6 +51,9 @@ public class Ine extends FactorParsingDefinition
 	{
 		FactorReader.ParseState state = reader.popState(start,word);
 		FactorWord w = (FactorWord)state.arg;
+		if(w == null)
+			return;
+
 		reader.append(w.vocabulary);
 		reader.append(w.name);
 		reader.append(new FactorCompoundDefinition(

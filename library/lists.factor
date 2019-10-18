@@ -26,11 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: logic
+USE: math
 USE: stack
+USE: vectors
 
 : 2list ( a b -- [ a b ] )
     #! Construct a proper list of 2 elements.
@@ -44,11 +45,25 @@ USE: stack
     #! Construct a proper list of 2 elements in reverse stack order.
     swap unit cons ;
 
+: copy-cons ( accum cons -- accum cdr )
+    uncons >r unit dup rot set-cdr r> ;
+
+: (clone-list) ( accum list -- last )
+    dup cons? [ copy-cons (clone-list) ] [ over set-cdr ] ifte ;
+
+: clone-list* ( list -- list last )
+    #! Push the cloned list, and the last cons cell of the
+    #! cloned list.
+    uncons >r unit dup r> (clone-list) ;
+
+: clone-list ( list -- list )
+    #! Push a shallow copy of a list.
+    dup [ clone-list* drop ] when ;
+
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
-    #! Append two lists. The first list must be proper. A new
-    #! list is constructed by copying the first list and setting
-    #! its tail to the second.
-    over [ >r uncons r> append cons ] [ nip ] ifte ;
+    #! Append two lists. A new list is constructed by copying
+    #! the first list and setting its tail to the second.
+    over [ >r clone-list* r> swap set-cdr ] [ nip ] ifte ;
 
 : add ( [ list1 ] elem -- [ list1 elem ] )
     #! Push a new proper list with an element added to the end.
@@ -66,37 +81,15 @@ USE: stack
 : cddr ( list -- cddr )
     cdr cdr ; inline
 
-: clone-list-iter ( result list -- last [ ] )
-    #! DESTRUCTIVE. Helper word for 'clone-list'.
-    [
-        dup cons?
-    ] [
-        uncons >r unit tuck >r rplacd r> r>
-    ] while ;
-
-: clone-list ( list -- list )
-    #! Push a shallow copy of a list.
-    dup [
-        uncons >r unit dup r> clone-list-iter swap rplacd
-    ] when ;
-
-: contains ( element list -- remainder )
+: contains? ( element list -- remainder )
     #! If the proper list contains the element, push the
     #! remainder of the list, starting from the cell whose car
     #! is elem. Otherwise push f.
     dup [
-        2dup car = [
-            nip
-        ] [
-            cdr contains
-        ] ifte
+        2dup car = [ nip ] [ cdr contains? ] ifte
     ] [
         2drop f
     ] ifte ;
-
-: count ( n -- [ 1 2 3 ... n ] )
-    #! If n <= 0, pushes the empty list.
-    [ [ ] times* ] cons expand ;
 
 : nth ( n list -- list[n] )
     #! Gets the nth element of a proper list by successively
@@ -111,7 +104,7 @@ USE: stack
     #! For example, given a proper list, pushes a cons cell
     #! whose car is the last element of the list, and whose cdr
     #! is f.
-    [ dup cdr cons? ] [ cdr ] while ;
+    dup cdr cons? [ cdr last* ] when ;
 
 : last ( list -- last )
     #! Pushes last element of a list. Since this pushes the
@@ -137,7 +130,7 @@ USE: stack
     #! list is destructively modified to point to the second
     #! list, unless the first list is f, in which case the
     #! second list is returned.
-    over [ over last* rplacd ] [ nip ] ifte ;
+    over [ over last* set-cdr ] [ nip ] ifte ;
 
 : first ( list -- obj )
     #! Push the head of the list, or f if the list is empty.
@@ -146,7 +139,7 @@ USE: stack
 : next ( obj list -- obj )
     #! Push the next object in the list after an object. Wraps
     #! around to beginning of list if object is at the end.
-    tuck contains dup [
+    tuck contains? dup [
         ! Is there another entry in the list?
         cdr dup [
             nip car
@@ -159,38 +152,26 @@ USE: stack
     ] ifte ;
 
 : nreverse-iter ( list cons -- list cons )
-    [ dup dup cdr 2swap rplacd nreverse-iter ] when* ;
+    [ dup dup cdr 2swap set-cdr nreverse-iter ] when* ;
 
 : nreverse ( list -- list )
     #! DESTRUCTIVE. Reverse the given list, without consing.
     f swap nreverse-iter ;
 
-~<< partition-iterI
-    R1 R2 A D C -- A C r:R1 r:R2 r:A r:D r:C >>~
+: partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
+    >r >r [ r> cons r> ] [ r> r> swapd cons ] ifte ; inline
 
-~<< partition-iterT{
-    r:R1 r:R2 r:A r:D r:C -- A R1 r:R1 r:R2 r:D r:C >>~
+: partition-step ( ret1 ret2 ref combinator car -- ret1 ret2 )
+    >r 2swap r> -rot >r >r dup >r swap call r> swap r> r>
+    partition-add ; inline
 
-~<< }partition-iterT
-    R1 r:R1X r:R2 r:D r:C -- R1 R2 D C >>~
-
-~<< partition-iterF{
-    r:R1 r:R2 r:A r:D r:C -- A R2 r:R1 r:R2 r:D r:C >>~
-
-~<< }partition-iterF
-    R2 r:R1 r:R2X r:D r:C -- R1 R2 D C >>~
-
-: partition-iter ( ref ret1 ret2 list combinator -- ref ret1 ret2 )
-    #! Helper word for 'partition'.
-    over [
-        ! Note this ifte must be in tail position!
-        >r uncons r> partition-iterI >r >r dup r> r> call [
-            partition-iterT{ cons }partition-iterT partition-iter
-        ] [
-            partition-iterF{ cons }partition-iterF partition-iter
-        ] ifte
+: partition-iter ( ret1 ret2 ref combinator list -- ret1 ret2 )
+    dup [
+        3dup cdr >r >r >r
+        car partition-step
+        r> r> r> partition-iter
     ] [
-        2drop
+        3drop
     ] ifte ; inline interpret-only
 
 : partition ( ref list combinator -- list1 list2 )
@@ -200,19 +181,8 @@ USE: stack
     #! the first or second list.
     #! The combinator must have stack effect:
     #! ( ref element -- ? )
-    [ ] [ ] 2swap partition-iter rot drop ; inline interpret-only
-
-: remove ( obj list -- list )
-    #! Remove all occurrences of the object from the list.
-    dup [
-        2dup car = [
-            cdr remove
-        ] [
-            uncons swapd remove cons
-        ] ifte
-    ] [
-        nip
-    ] ifte ;
+    swap >r >r >r [ ] [ ] r> r> r> partition-iter ;
+    inline interpret-only
 
 : sort ( list comparator -- sorted )
     #! Sort the elements in a proper list using a comparator.
@@ -264,13 +234,9 @@ DEFER: tree-contains?
 : unique ( elem list -- list )
     #! Prepend an element to a proper list if it is not
     #! already contained in the list.
-    2dup contains [
-        nip
-    ] [
-        cons
-    ] ifte ;
+    2dup contains? [ nip ] [ cons ] ifte ;
 
-: each ( [ list ] [ quotation ] -- )
+: each ( list quotation -- )
     #! Push each element of a proper list in turn, and apply a
     #! quotation to each element.
     #!
@@ -282,7 +248,7 @@ DEFER: tree-contains?
         2drop
     ] ifte ; inline interpret-only
 
-: inject ( list code -- list )
+: map ( list code -- list )
     #! Applies the code to each item, returns a list that
     #! contains the result of each application.
     #!
@@ -293,12 +259,57 @@ DEFER: tree-contains?
         transp over >r >r call r> cons r>
     ] each drop nreverse ; inline interpret-only
 
-: map ( [ items ] [ code ] -- [ mapping ] )
-    #! Applies the code to each item, returns a list that
-    #! contains the result of each application.
-    #!
-    #! This combinator will not compile.
-    2list restack each unstack ; inline interpret-only
+: 2uncons ( list1 list2 -- car1 car2 cdr1 cdr2 )
+    uncons >r >r uncons r> swap r> ;
+
+: 2each-step ( list list quot -- cdr cdr )
+    >r 2uncons r> -rot >r >r call r> r> ; inline interpret-only
+
+: 2each ( list list quot -- )
+    #! Apply the quotation to each pair of elements from the
+    #! two lists in turn. The quotation must have stack effect
+    #! ( x y -- ).
+    >r 2dup and [
+        r> dup >r 2each-step r> 2each
+    ] [
+        r> 3drop
+    ] ifte ; inline interpret-only
+
+: 2map-step ( accum quot elt elt -- accum )
+    2swap swap >r call r> cons ;
+
+: <2map ( list list quot -- accum quot list list )
+    >r f -rot r> -rot ;
+
+: 2map ( list list quot -- list )
+    #! Apply the quotation to each pair of elements from the
+    #! two lists in turn, collecting the return value into a
+    #! new list. The quotation must have stack effect
+    #! ( x y -- z ).
+    <2map [ pick >r 2map-step r> ] 2each drop nreverse ;
+    inline interpret-only
+
+: substitute ( new old list -- list )
+    [ 2dup = [ drop over ] when ] map nip nip ;
+
+: (head) ( accum list n -- last list )
+    dup 1 = [ drop ] [ pred >r copy-cons r> (head) ] ifte ;
+
+: head* ( n list -- head last rest )
+    #! Push the head of the list, the last cons cell of the
+    #! head, and the rest of the list.
+    uncons >r unit tuck r> rot (head) ;
+
+: head ( n list -- head )
+    #! Push a new list containing the first n elements.
+    over 0 = [ 2drop f ] [ head* 2drop ] ifte ;
+
+: set-nth ( value index list -- list )
+    over 0 = [
+        nip cdr cons
+    ] [
+        rot >r head* cdr r> swons swap set-cdr
+    ] ifte ;
 
 : subset-add ( car pred accum -- accum )
     >r over >r call r> r> rot [ cons ] [ nip ] ifte ;
@@ -319,6 +330,14 @@ DEFER: tree-contains?
     #! In order to compile, the quotation must consume as many
     #! values as it produces.
     f -rot subset-iter nreverse ; inline interpret-only
+
+: remove ( obj list -- list )
+    #! Remove all occurrences of the object from the list.
+    [ dupd = not ] subset nip ;
+
+: remove-nth ( n list -- list )
+    #! Push a new list with the nth element removed.
+    over 0 = [ nip cdr ] [ head* cdr swap set-cdr ] ifte ;
 
 : length ( list -- length )
     #! Pushes the length of the given proper list.
@@ -345,18 +364,44 @@ DEFER: tree-contains?
         2drop t
     ] ifte ;
 
+: (count) ( n list -- list )
+    >r pred dup 0 < [ drop r> ] [ dup r> cons (count) ] ifte ;
+
+: count ( n -- [ 0 ... n-1 ] )
+    [ ] (count) ;
+
 : car= swap car swap car = ;
 : cdr= swap cdr swap cdr = ;
 
 : cons= ( obj cons -- ? )
-    over cons? [ 2dup car= >r cdr= r> and ] [ 2drop f ] ifte ;
-
-: cons-hashcode ( cons count -- hash )
-    dup 0 = [
-        nip
+    2dup eq? [
+        2drop t
     ] [
-        pred >r uncons r> tuck
-        cons-hashcode >r
-        cons-hashcode r>
-        xor
+        over cons? [ 2dup car= >r cdr= r> and ] [ 2drop f ] ifte
     ] ifte ;
+
+: (cons-hashcode) ( cons count -- hash )
+    dup 0 = [
+        2drop 0
+    ] [
+        over cons? [
+            pred >r uncons r> tuck
+            (cons-hashcode) >r
+            (cons-hashcode) r>
+            bitxor
+        ] [
+            drop hashcode
+        ] ifte
+    ] ifte ;
+
+: cons-hashcode ( cons -- hash )
+    4 (cons-hashcode) ;
+
+: list>vector ( list -- vector )
+    dup length <vector> swap [ over vector-push ] each ;
+
+: stack>list ( vector -- list )
+    [ ] swap [ swons ] vector-each ;
+
+: vector>list ( vector -- list )
+    stack>list nreverse ;

@@ -96,7 +96,8 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		RecursiveState recursiveCheck) throws Exception
 	{
 		// Each word has its own class loader
-		FactorClassLoader loader = new FactorClassLoader();
+		FactorClassLoader loader = new FactorClassLoader(
+			getClass().getClassLoader());
 
 		StackEffect effect = getStackEffect(interp);
 

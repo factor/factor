@@ -26,31 +26,27 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: strings
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: stack
 
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
 
+: f>"" ( str/f -- str )
+    [ "" ] unless* ;
+
 : str-length< ( str str -- boolean )
     #! Compare string lengths.
-    [ str-length ] 2apply < ;
+    swap str-length swap str-length < ;
 
 : cat ( [ "a" "b" "c" ] -- "abc" )
     ! If f appears in the list, it is not appended to the
     ! string.
     80 <sbuf> swap [ [ over sbuf-append ] when* ] each sbuf>str ;
-
-: cat2 ( "a" "b" -- "ab" )
-    swap
-    80 <sbuf>
-    dup >r sbuf-append r>
-    dup >r sbuf-append r>
-    sbuf>str ;
 
 : cat3 ( "a" "b" "c" -- "abc" )
     [ ] cons cons cons cat ;
@@ -84,66 +80,48 @@ USE: stack
 : str/ ( str index -- str str )
     #! Returns 2 strings, that when concatenated yield the
     #! original string.
-    2dup str-tail [ str-head ] dip ;
+    2dup str-tail >r str-head r> ;
 
 : str// ( str index -- str str )
     #! Returns 2 strings, that when concatenated yield the
     #! original string, without the character at the given
     #! index.
-    2dup succ str-tail [ str-head ] dip ;
+    2dup succ str-tail >r str-head r> ;
 
 : >title ( str -- str )
-    1 str/ [ >upper ] dip >lower cat2 ;
+    1 str/ >r >upper r> >lower cat2 ;
 
 : str-headcut ( str begin -- str str )
     str-length str/ ;
 
+: =? ( x y z -- z/f )
+    #! Push z if x = y, otherwise f.
+    -rot = [ drop f ] unless ;
+
 : str-head? ( str begin -- str )
     #! If the string starts with begin, return the rest of the
     #! string after begin. Otherwise, return f.
-    2dup str-length< [
-        2drop f
-    ] [
-        tuck str-headcut
-        [ = ] dip f ?
-    ] ifte ;
+    2dup str-length< [ 2drop f ] [ tuck str-headcut =? ] ifte ;
+
+: ?str-head ( str begin -- str ? )
+    dupd str-head? dup [ nip t ] [ drop f ] ifte ;
 
 : str-tailcut ( str end -- str str )
-    str-length [ dup str-length ] dip - str/ ;
+    str-length >r dup str-length r> - str/ swap ;
 
 : str-tail? ( str end -- str )
     #! If the string ends with end, return the start of the
     #! string before end. Otherwise, return f.
-    2dup str-length< [
+    2dup str-length< [ 2drop f ] [ tuck str-tailcut =? ] ifte ;
+
+: ?str-tail ( str end -- str ? )
+    dupd str-tail? dup [ nip t ] [ drop f ] ifte ;
+
+: split1 ( string split -- before after )
+    2dup index-of dup -1 = [
         2drop f
     ] [
-        tuck str-tailcut swap
-        [ = ] dip f ?
-    ] ifte ;
-
-: split ( string split -- list )
-    2dup index-of dup -1 = [
-        2drop dup str-length 0 = [
-            drop f
-        ] [
-            unit
-        ] ifte
-    ] [
-        swap [ str// ] dip split cons
-    ] ifte ;
-
-: split1 ( string split -- pair )
-    #! The car of the pair is the string up to the first
-    #! occurrence of split; the cdr is the remainder of
-    #! the string.
-    dupd index-of dup -1 = [
-        drop dup str-length 0 = [
-            drop f
-        ] [
-            unit
-        ] ifte
-    ] [
-        str// cons
+        swapd str/ rot str-length str/ nip
     ] ifte ;
 
 : max-str-length ( list -- len )
@@ -159,7 +137,7 @@ USE: stack
     #! Execute the code, with each character of the string
     #! pushed onto the stack.
     over str-length [
-        -rot 2dup [ [ str-nth ] dip call ] 2dip
+        -rot 2dup >r >r >r str-nth r> call r> r>
     ] times* 2drop ;
 
 : str-sort ( list -- sorted )
@@ -167,5 +145,24 @@ USE: stack
     #! order.
     [ str-lexi> ] sort ;
 
-: blank? ( ch -- ? )
-    " \t\n\r" str-contains? ;
+: blank? ( ch -- ? ) " \t\n\r" str-contains? ;
+: letter? ( ch -- ? ) CHAR: a CHAR: z between? ;
+: LETTER? ( ch -- ? ) CHAR: A CHAR: Z between? ;
+: digit? ( ch -- ? ) CHAR: 0 CHAR: 9 between? ;
+: printable? ( ch -- ? ) CHAR: \s CHAR: ~ between? ;
+
+: quotable? ( ch -- ? )
+    #! In a string literal, can this character be used without
+    #! escaping?
+    dup printable? swap "\"\\" str-contains? not and ;
+
+: url-quotable? ( ch -- ? )
+    #! In a URL, can this character be used without
+    #! URL-encoding?
+    [
+        [ letter?              ] [ drop t ]
+        [ LETTER?              ] [ drop t ]
+        [ digit?               ] [ drop t ]
+        [ "/_?." str-contains? ] [ drop t ]
+        [                      ] [ drop f ]
+    ] cond ;

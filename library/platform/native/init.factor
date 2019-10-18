@@ -26,45 +26,38 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: init
-USE: ansi
-USE: arithmetic
-USE: errors
 USE: combinators
-USE: hashtables
+USE: compiler
+USE: errors
 USE: kernel
-USE: lists
-USE: logic
-USE: interpreter
-USE: io-internals
-USE: math
 USE: namespaces
 USE: parser
-USE: stack
 USE: stdio
 USE: streams
-USE: strings
-USE: styles
-USE: vectors
-USE: vocabularies
+USE: threads
 USE: words
-USE: unparser
+USE: vectors
+
+: init-errors ( -- )
+    64 <vector> set-catchstack* ;
+
+: init-gc ( -- )
+    [ garbage-collection ] 7 setenv ;
 
 : boot ( -- )
-    init-namespaces
-
-    ! Some flags are *on* by default, unless user specifies
-    ! -no-<flag> CLI switch
-    t "user-init" set
-    t "interactive" set
-    
-    init-stdio
-    "stdio" get <ansi-stream> "stdio" set
+    #! Initialize an interpreter with the basic services.
+    init-gc
     init-errors
-    init-search-path
-    init-scratchpad
-    init-styles
-    init-vocab-styles
+    init-namespaces
+    init-threads
+    init-stdio
+    "HOME" os-env [ "." ] unless* "~" set
     10 "base" set
-    print-banner
-    room.
-    init-interpreter ;
+    "/" "/" set
+    init-search-path ;
+
+: cold-boot ( -- )
+    #! An initially-generated image has this as the boot
+    #! quotation.
+    boot
+    "/library/platform/native/boot-stage2.factor" run-resource ;

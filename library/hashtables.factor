@@ -26,10 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: hashtables
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: lists
+USE: math
 USE: stack
 USE: vectors
 
@@ -45,11 +45,11 @@ USE: vectors
     #! array index is determined using a hash function, and the
     #! buckets are associative lists which are searched
     #! linearly. The number of buckets must be a power of two.
-    dup <vector> dup >r set-vector-length r> ;
+    empty-vector ;
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.
-    >r hashcode HEX: ffffff bitand r> vector-length pred mod ;
+    >r hashcode HEX: ffffff bitand r> vector-length mod ;
 
 : hash* ( key table -- [ key | value ] )
     #! Look up a value in the hashtable. First the bucket is
@@ -84,10 +84,13 @@ USE: vectors
     #! Push a list of keys in a hashtable.
     [ ] swap [ car swons ] hash-each ;
 
-: hash-values ( hash -- list )
+: hash-values ( hash -- alist )
     #! Push a list of values in a hashtable.
     [ ] swap [ cdr swons ] hash-each ;
 
 : hash>alist ( hash -- list )
     #! Push a list of key/value pairs in a hashtable.
     [ ] swap [ swons ] hash-each ;
+
+: alist>hash ( alist -- hash )
+    37 <hashtable> swap [ unswons pick set-hash ] each ;

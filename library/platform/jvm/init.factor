@@ -38,37 +38,8 @@ USE: stack
 USE: stdio
 USE: streams
 USE: strings
-
-: cli-param ( param -- )
-    #! Handle a command-line argument starting with '-' by
-    #! setting that variable to t, or if the argument is
-    #! prefixed with 'no-', setting the variable to f.
-    dup "no-" str-head? dup [
-        f put drop
-    ] [
-        drop t put
-    ] ifte ;
-
-: cli-arg ( argument -- argument )
-    #! Handle a command-line argument. If the argument was
-    #! consumed, returns f. Otherwise returns the argument.
-    dup [
-        dup "-" str-head? dup [
-            cli-param drop f
-        ] [
-            drop
-        ] ifte
-    ] when ;
-
-: parse-switches ( args -- args )
-    [ cli-arg ] inject ;
-
-: run-files ( args -- )
-    [ [ run-file ] when* ] each ;
-
-: parse-command-line ( args -- )
-    #! Parse command line arguments.
-    "args" get parse-switches run-files ;
+USE: styles
+USE: words
 
 : stdin ( -- stdin )
     "java.lang.System" "in"  jvar-static-get
@@ -79,28 +50,18 @@ USE: strings
 
 : init-stdio ( -- )
     #! Initialize standard input/output.
-    stdin stdout <char-stream> "stdio" set ;
+    stdin stdout <char-stream> <stdio-stream> "stdio" set ;
 
 : init-environment ( -- )
     #! Initialize OS-specific constants.
     "user.home" system-property "~" set
     "file.separator" system-property "/" set ;
 
-: run-user-init ( -- )
-    #! Run user init file if it exists
-    "~" get "/" get ".factor-rc" cat3 "init-path" set
-
-    "user-init" get [
-        "init-path" get dup exists? [
-            interactive-run-file
-        ] [
-            drop
-        ] ifte
-    ] when ;
-
 : boot ( -- )
     #! The boot word is run by the intepreter when starting from
     #! an object database.
+
+    10 "base" set
 
     ! Some flags are *on* by default, unless user specifies
     ! -no-<flag> CLI switch
@@ -110,8 +71,7 @@ USE: strings
     init-stdio
     init-environment
     init-search-path
-    init-scratchpad
-    parse-command-line
+    "args" get parse-command-line
     run-user-init
 
     "compile" get [
@@ -120,5 +80,4 @@ USE: strings
 
     t "startup-done" set
     
-    print-banner
-    init-interpreter ;
+    "interactive" get [ init-interpreter 1 exit* ] when ;

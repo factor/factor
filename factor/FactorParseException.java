@@ -31,12 +31,20 @@ package factor;
 
 public class FactorParseException extends FactorException
 {
+	private String filename;
+	private int lineno;
+	private int position;
+	private String msg;
+
 	public FactorParseException(
 		String filename,
 		int lineno,
 		String str)
 	{
 		super(filename + ":" + lineno + ": " + str);
+		this.filename = filename;
+		this.lineno = lineno;
+		this.msg = str;
 	}
 
 	public FactorParseException(
@@ -48,6 +56,30 @@ public class FactorParseException extends FactorException
 	{
 		super(filename + ":" + lineno + ": " + str
 			+ "\n" + getDetailMessage(line,position));
+		this.filename = filename;
+		this.lineno = lineno;
+		this.position = position;
+		this.msg = str;
+	}
+
+	public String getFileName()
+	{
+		return filename;
+	}
+
+	public int getLineNumber()
+	{
+		return lineno;
+	}
+
+	public int getPosition()
+	{
+		return position;
+	}
+
+	public String getParserMessage()
+	{
+		return msg;
 	}
 
 	private static String getDetailMessage(String line, int position)

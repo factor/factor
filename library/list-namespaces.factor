@@ -46,6 +46,15 @@ USE: stack
     #! Prepend x to the list stored in var.
     tuck get cons put ;
 
+: acons@ ( value key var -- )
+    #! Prepend [ key | value ] to the alist stored in var.
+    [ get acons ] keep set ;
+
+: uncons@ ( var -- car )
+    #! Push the car of the list in var, and set the var to the
+    #! cdr.
+    dup get uncons rot set ;
+
 : remove@ ( obj var -- )
     #! Remove all occurrences of the object from the list
     #! stored in the variable.
@@ -63,6 +72,11 @@ USE: stack
 : , ( obj -- )
     #! Append an object to the currently constructing list.
     "list-buffer" cons@ ;
+
+: unique, ( obj -- )
+    #! Append an object to the currently constructing list, only
+    #! if the object does not already occur in the list.
+    "list-buffer" unique@ ;
 
 : list, ( list -- )
     #! Append each element to the currently constructing list.

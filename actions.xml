@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE ACTIONS SYSTEM "actions.dtd">
+
+<ACTIONS>
+	<ACTION NAME="factor-eval-selection">
+		<CODE>
+			sel = textArea.selectedText;
+			if(sel == null)
+				view.toolkit.beep();
+			else
+				FactorPlugin.eval(view,sel);
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-run-file">
+		<CODE>
+			buffer.save(view,null);
+			VFSManager.waitForRequests();
+			FactorPlugin.eval(view,
+				"\""
+				+ FactorReader.charsToEscapes(buffer.path)
+				+ "\" run-file");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-apropos">
+		<CODE>
+			word = FactorPlugin.getWordAtCaret(textArea);
+			if(word == null)
+				view.toolkit.beep();
+			else
+			{
+				FactorPlugin.eval(view,
+					"\""
+					+ FactorReader.charsToEscapes(word)
+					+ "\" apropos.");
+			}
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-see">
+		<CODE>
+			FactorPlugin.factorWordOperation(view,"see");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-edit">
+		<CODE>
+			FactorPlugin.factorWordOperation(view,"jedit");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-edit-dialog">
+		<CODE>
+			new EditWordDialog(view,FactorPlugin
+				.getSideKickParser());
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-usages">
+		<CODE>
+			FactorPlugin.factorWordOperation(view,"usages.");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-insert-use">
+		<CODE>
+			word = FactorPlugin.getWordAtCaret(textArea);
+			if(word == null)
+				view.toolkit.beep();
+			else
+				FactorPlugin.insertUseDialog(view,word);
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-extract-word">
+		<CODE>
+			FactorPlugin.extractWord(view);
+		</CODE>
+	</ACTION>
+</ACTIONS>

@@ -26,15 +26,21 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: prettyprint
-USE: arithmetic
 USE: combinators
 USE: lists
+USE: math
 USE: prettyprint
 USE: stack
 USE: stdio
 USE: unparser
-USE: vocabularies
 USE: words
+
+: prettyprint-:; ( indent word list -- indent )
+    over >r >r dup
+    >r dupd prettyprint-IN: prettyprint-: r>
+    prettyprint-word prettyprint-space
+    r>
+    prettyprint-list prettyprint-; r> prettyprint-plist ;
 
 : prettyprint-~<< ( indent -- indent )
     "~<<" write prettyprint-space
@@ -45,7 +51,7 @@ USE: words
     tab-size - ;
 
 : prettyprint-~<<>>~ ( indent word list -- indent )
-    [ [ prettyprint-~<< ] dip prettyprint-word ] dip
+    [ [ prettyprint-~<< ] dip prettyprint-word " " write ] dip
     [ write " " write ] each
     prettyprint->>~ ;
 
@@ -53,8 +59,9 @@ USE: words
     0 swap
     intern dup worddef
     [
-        [ compound-or-compiled? ] [ worddef>list prettyprint-:; ]
-        [ shuffle? ] [ worddef>list prettyprint-~<<>>~ ]
+        [ compound-or-compiled? ] [ word-parameter prettyprint-:; ]
+        [ shuffle? ] [ word-parameter prettyprint-~<<>>~ ]
         [ primitive? ] [ "PRIMITIVE: " write unparse write drop ]
+        [ symbol? ] [ "SYMBOL: " write drop unparse write ]
         [ drop t ] [ 2drop "Not defined" write ]
     ] cond prettyprint-newline ;

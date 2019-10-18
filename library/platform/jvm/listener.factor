@@ -28,6 +28,7 @@
 IN: listener
 USE: combinators
 USE: continuations
+USE: init
 USE: interpreter
 USE: kernel
 USE: lists
@@ -54,6 +55,18 @@ USE: unparser
     "javax.swing.text.StyleConstants" swap jvar-static-get
     ; inline
 
+: set-icon-style ( attribute-set icon -- )
+    [
+        "javax.swing.text.MutableAttributeSet"
+        "javax.swing.Icon"
+    ] "javax.swing.text.StyleConstants"
+    "setIcon" jinvoke-static ;
+
+: <icon> ( resource -- icon )
+    resource
+    [ "java.net.URL" ]
+    "javax.swing.ImageIcon" jnew ;
+
 : swing-attribute+ ( attribute-set value key -- )
     style-constant attribute+ ;
 
@@ -63,39 +76,87 @@ USE: unparser
     "java.awt.Color"
     jnew ;
 
-: link-key ( -- attr )
-    "factor.listener.FactorListener" "Link" jvar-static-get
+: actions-key ( -- attr )
+    "factor.listener.FactorListener" "Actions" jvar-static-get
     ; inline
 
-: obj>listener-link ( obj -- link )
-    #! Listener links are quotations.
-    dup string? [
-        ! Inspector link.
-        unparse " describe-object-path" cat2
-    ] when ;
+: <action-menu-item> ( path pair -- pair )
+    uncons >r " " swap cat3 r> cons ;
 
-: link-attribute ( attribute-set target -- )
-    [ dup t "Underline" swing-attribute+ ] dip
-    obj>listener-link link-key attribute+ ;
+: <actions-menu> ( path actions -- alist )
+    [ dupd <action-menu-item> ] map nip ;
 
-: style>attribute-set ( -- attribute-set )
-    <attribute-set>
-    "link" get [ dupd link-attribute ] when*
-    "bold" get [ dup t "Bold" swing-attribute+ ] when
-    "italics" get [ dup t "Italic" swing-attribute+ ] when
-    "underline" get [ dup t "Underline" swing-attribute+ ] when
-    "fg" get [ dupd >color "Foreground" swing-attribute+ ] when*
-    "bg" get [ dupd >color "Background" swing-attribute+ ] when*
-    "font" get [ dupd "FontFamily" swing-attribute+ ] when*
-    "size" get [ dupd "FontSize" swing-attribute+ ] when* ;
+: object-actions ( -- list )
+    [
+        [ "describe-path"  | "Describe" ]
+        [ "lookup"         | "Push" ]
+        [ "lookup execute" | "Execute" ]
+        [ "lookup jedit"   | "jEdit" ]
+        [ "lookup usages." | "Usages" ]
+    ] ;
 
-: reset-attrs ( -- )
-    default-style [ style>attribute-set ] bind t
-    "listener" get
+: <object-actions-menu> ( path -- alist )
+    unparse object-actions <actions-menu> ;
+
+: file-actions ( -- list )
+    [
+        [ ""           | "Push" ]
+        [ "run-file"   | "Run file" ]
+        [ "directory." | "List directory" ]
+        [ "cd"         | "Change directory" ]
+    ] ;
+
+: <file-actions-menu> ( path -- alist )
+    unparse file-actions <actions-menu> ;
+
+: underline-attribute ( attribute-set -- )
+    t "Underline" swing-attribute+ ;
+
+: object-link-attribute ( attribute-set target -- )
+    over underline-attribute
+    <object-actions-menu> actions-key attribute+ ;
+
+: file-link-attribute ( attribute-set target -- )
+    over underline-attribute
+    <file-actions-menu> actions-key attribute+ ;
+
+: icon-attribute ( string style value -- )
+    dupd <icon> set-icon-style
+    >r drop " " r> ;
+
+: style>attribute-set ( string style -- string attribute-set )
+    #! We need the string, since outputting an icon changes the
+    #! string to " ".
+    <attribute-set> swap [
+        [ "object-link" dupd object-link-attribute ]
+        [ "file-link"   dupd file-link-attribute ]
+        [ "bold"        drop dup t "Bold" swing-attribute+ ]
+        [ "italics"     drop dup t "Italic" swing-attribute+ ]
+        [ "underline"   drop dup t "Underline" swing-attribute+ ]
+        [ "fg"          dupd >color "Foreground" swing-attribute+ ]
+        [ "bg"          dupd >color "Background" swing-attribute+ ]
+        [ "font"        dupd "FontFamily" swing-attribute+ ]
+        [ "size"        dupd "FontSize" swing-attribute+ ]
+        [ "icon"        icon-attribute ]
+    ] assoc-apply ;
+
+: set-character-attrs ( attrs -- )
+    t "listener" get
     [ "javax.swing.text.AttributeSet" "boolean" ]
     "javax.swing.JTextPane"
     "setCharacterAttributes"
     jinvoke ;
+
+: set-paragraph-attrs ( attrs -- )
+    t "listener" get
+    [ "javax.swing.text.AttributeSet" "boolean" ]
+    "javax.swing.JTextPane"
+    "setCharacterAttributes"
+    jinvoke ;
+
+: reset-attrs ( -- )
+    f default-style style>attribute-set set-character-attrs
+    drop ;
 
 : listener-readln* ( continuation -- )
     "listener" get
@@ -104,17 +165,14 @@ USE: unparser
 	"readLine" jinvoke ;
 
 : listener-readln ( -- line )
-    reset-attrs [ listener-readln* suspend ] callcc1 ;
+    reset-attrs [ listener-readln* toplevel ] callcc1 ;
 
-: listener-write-attr ( string -- )
+: listener-write-attr ( string style -- )
     style>attribute-set "listener" get
     [ "java.lang.String" "javax.swing.text.AttributeSet" ]
     "factor.listener.FactorListener"
     "insertWithAttrs"
     jinvoke ;
-
-: listener-write ( string -- )
-    default-style [ listener-write-attr ] bind ;
 
 !: listener-edit ( string -- )
 !    "listener" get
@@ -130,8 +188,8 @@ USE: unparser
         ( -- string )
         [ listener-readln ] "freadln" set
         ( string -- )
-        [ listener-write ] "fwrite" set
-        ( string -- )
+        [ default-style listener-write-attr ] "fwrite" set
+        ( string style -- )
         [ listener-write-attr ] "fwrite-attr" set
         ( string -- )
         ![ listener-edit ] "fedit" set
@@ -143,28 +201,10 @@ USE: unparser
         [ this fwrite "\n" this fwrite ] "fprint" set
     ] extend ;
 
-: close-listener ( listener -- )
-    #! Closes the listener. If no more listeners remain, the
-    #! desktop exits.
-    "desktop" get
-    [ "factor.listener.FactorListener" ]
-    "factor.listener.FactorDesktop" "closeListener"
-    jinvoke ;
-
 : new-listener-hook ( listener -- )
-    #! Called when user opens a new listener in the desktop.
-    <namespace> [
+    #! Called when user opens a new listener
+    [
         dup "listener" set
         <listener-stream> "stdio" set
-        interpreter-loop
-        "listener" get close-listener
-    ] bind ;
-
-: new-listener ( -- )
-    #! Opens a new listener.
-    "desktop" get
-    [ ] "factor.listener.FactorDesktop" "newListener"
-    jinvoke ;
-
-: running-desktop? ( -- )
-    this "factor.listener.FactorDesktop" is ;
+        init-interpreter
+    ] with-scope ;

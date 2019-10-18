@@ -73,8 +73,15 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public FactorClassLoader loader;
 	public String className;
 
+	/**
+	 * For text editor integration.
+	 */
+	public String file;
+	public int line;
+	public int col;
+
 	private FactorNamespace namespace;
-	
+
 	//{{{ FactorWord constructor
 	/**
 	 * Do not use this constructor unless you're writing a packages
@@ -82,7 +89,7 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	 * intern() method instead.
 	 */
 	public FactorWord(String vocabulary, String name,
-		FactorWordDefinition def) throws Exception
+		FactorWordDefinition def)
 	{
 		this.vocabulary = vocabulary;
 		this.name = name;
@@ -191,7 +198,6 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	//{{{ toString() method
 	public String toString()
 	{
-		return name == null ? "#<unnamed>"
-			: FactorReader.charsToEscapes(name);
+		return name == null ? "#<unnamed>" : name;
 	} //}}}
 }

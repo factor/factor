@@ -1,0 +1,898 @@
+IMPLEMENTATION OF THE FACTOR COMPILER
+
+Compilation of Factor is a messy business, driven by heuristics and not
+formal theory. The compiler is inherently limited -- some expressions
+cannot be compiled by definition. The programmer must take care to
+ensure that performance-critical sections of code are written such that
+they can be compiled.
+
+=== Introduction
+
+==== The problem
+
+The Factor interpreter introduces a lot of overhead:
+
+- Execution of a quotation involves iteration down a linked list.
+
+- Stack access is not as fast as local variables, since Java
+  bound-checks all array accesses.
+
+- At the lowest level, everything is expressed as Java reflection calls
+  to the Factor and Java platform libraries. Java reflection is not as
+  fast as statically-compiled Java calls.
+
+- Since Factor is dynamically-typed, intermediate values on the stack
+  are all stored as java.lang.Object types, so type checks and
+  possibly coercions must be done at each step of the computation.
+
+==== The solution
+
+The following optimizations naturally suggest themselves, and lead to
+the implementation of the Factor compiler:
+
+- Compiling Factor code down to Java platform bytecode.
+
+- Using virtual machine local variables instead of an array stack to
+  store intermediate values.
+
+- Statically compiling in Java calls where the class, method and
+  variable names are known ahead of time.
+
+- Type inference and soft typing to eliminate unnecessary type checks.
+  (At the time of writing, this is in progress and is not documented in
+  this paper.)
+
+=== Preliminaries: interpreter internals
+
+A word object is essentially a property list. The one property we are
+concerned with here is "def", which holds a FactorWordDefinition object.
+
+The accessor word "worddef" pushes the "def" slot of a given word name
+or word object:
+
+    0] "+" worddef .
+#<factor.FactorCompoundDefinition: +>
+
+Generally, the word definition is an opaque object, however there are
+various ways to deconstruct it, which will not be convered here (see the
+worddef>list word if you are interested).
+
+When a word object is being executed, the eval() method of its
+definition is invoked. The eval() method takes one parameter, which is
+the FactorInterpreter instance. The interpreter instance provides access
+to the stacks, global namespace, vocabularies, and so on.
+
+(In this article, we will use the term "word" and "word definition"
+somewhat interchangably; this does not cause any confusion. If a "word"
+is mentioned where one would expect a definition, simply assume the
+"def" slot of the word is being accessed.)
+
+The class FactorWordDefinition is abstract; a number of subclasses
+exist:
+
+- FactorCompoundDefinition: a standard colon definition consisting of
+  a quotation; for example, : sq dup * ; is syntax for a compound
+  definition named "sq" with quotation [ dup * ].
+
+  Of course, its eval() method simply pushes the quotation on the
+  interpreter's callstack.
+
+- FactorShuffleDefinition: a stack rearrangement word, whose syntax is
+  described in detail in parser.txt. For example,
+  ~<< swap a b -- b a >>~ is syntax for a shuffle definition named
+  "swap" that exchanges the top two values on the data stack.
+
+- FactorPrimitiveDefinition: primitive word definitions are written in
+  Java. Various concrete subclasses of this class in the
+  factor.primitives package provide implementations of eval().
+
+When a word definition is compiled, the compiler dynamically generates a
+new class, creates a new instance, and replaces the "def" slot of the
+word in question with the instance of the compiled class.
+
+So the compiler's primary job is to generate appropriate Java bytecode
+for the eval() method.
+
+=== Preliminaries: the specimen
+
+Consider the following (naive) implementation of the Fibonacci sequence:
+
+: fib ( n -- nth fibonacci number )
+    dup 1 <= [
+        drop 1 
+    ] [
+        pred dup fib swap pred fib + 
+    ] ifte ;
+
+A quick overview of the words used here:
+
+- dup: a shuffle word that duplicates the top of the stack.
+
+- <=: compare the top two numbers on the stack.
+
+- drop: remove the top of the stack.
+
+- pred: decrement the top of the stack by one. Indeed, it is defined as
+  simply : pred 1 - ;.
+
+- swap: exchange the top two stack elements.
+
+- +: add the top two stack elements.
+
+- ifte: execute one of two given quotations, depending on the condition
+  on the stack.
+
+=== Java reflection
+
+The biggest performance improvement comes from the transformation of
+Java reflection calls into static bytecode.
+
+Indeed, when the compiler was first written, the only type of word it
+could compile were such simple expressions that interfaced with Java and
+nothing else.
+
+In the above definition of "fib", the three key words <= - and + (note
+that - is not referenced directly, but rather is a factor of the word
+pred). All three of these words are implemented as Java calls into the
+Factor math library:
+
+: <= ( a b -- boolean )
+    [
+        "java.lang.Number" "java.lang.Number" 
+    ] "factor.math.FactorMath" "lessEqual" jinvoke-static ;
+
+: - ( a b -- a-b )
+    [
+        "java.lang.Number" "java.lang.Number" 
+    ] "factor.math.FactorMath" "subtract" jinvoke-static ;
+
+: + ( a b -- a+b )
+    [
+        "java.lang.Number" "java.lang.Number" 
+    ] "factor.math.FactorMath" "add" jinvoke-static ;
+
+During interpretation, the execution of one of these words involves a
+lot of overhead. First, the argument list is transformed into a Java
+Class[] array; then the Class object corresponding to the containing
+class is looked up; then the appropriate Method object defined in this
+class is looked up; then the method is invoked, by passing it an
+Object[] array consisting of arguments from the stack.
+
+As one might guess, this is horribly inefficient. Indeed, look at the
+time taken to compute the 25th Fibonacci number using pure
+interpretation (of course depending on your hardware, results might
+vary):
+
+    0] [ 25 fib ] time
+24538
+
+One quickly notices that in fact, all the overhead from the reflection
+API is unnecessary; the containing class, method name and argument types
+are, after all, known ahead of time.
+
+For instance, the word "<=" might be compiled into the following
+pseudo-bytecode (the details are a bit more complex in reality; we'll
+get to it later):
+
+MOVE datastack[top - 2] to JVM stack // get operands in right order
+CHECKCAST java/lang/Number
+MOVE datastack[top - 1] to JVM stack
+CHECKCAST java/lang/Number
+DECREMENT datastack.top 2            // pop the operands
+INVOKESTATIC                         // invoke the method
+	"factor/FactorMath"
+	"lessEqual"
+	"(Ljava/lang/Number;Ljava/lang/Number;)Ljava/lang/Number;"
+MOVE JVM stack top to datastack      // push return value
+
+Notice that no dynamic class or method lookups are done, and no arrays
+are constructed; in fact, a modern Java virtual machine with a native
+code compiler should be able to transform an INVOKESTATIC into a simple
+subroutine call.
+
+So what how much overhead is eliminated in practice? It is easy to find
+out:
+
+    5] [ + - <= ] [ compile ] each
+    1] [ 25 fib ] time
+937
+
+This is still quite slow -- however, already we've gained a 26x speed
+improvement!
+
+Words consisting entirely of literal parameters to Java primitives such
+as jinvoke, jnew, jvar-get/set, or jvar-get/set-static are compiled in a
+similar manner; there is nothing new there.
+
+=== First attempt at compiling compound definitions
+
+Now consider the problem of compiling a word that does not directly call
+Java primitives, but instead calls other words, which are already been
+compiled.
+
+For instance, consider the following word (recall that (...) is a comment!):
+
+: mag2 ( x y -- sqrt[x*x+y*y] )
+    swap dup * swap dup * + sqrt ;
+
+Lets assume that 'swap', 'dup', '*' and '+' are defined as before, and
+that 'sqrt' is an already-compiled word that calls into the math
+library.
+
+Assume that the pseudo-bytecode INVOKEWORD <word> invokes the "eval"
+method of a FactorWordDefinition instance.
+
+(In reality, it is a bit more complex:
+
+GETFIELD ... some field that stores a FactorWordDefinition instance ...
+ALOAD 0 // push interpreter parameter to eval() on the stack
+INVOKEVIRTUAL
+	"factor/FactorWordDefinition"
+	"eval"
+	"(Lfactor/FactorInterpreter;)V"
+
+However the above takes up more space and adds no extra information over
+the INVOKE notation.)
+
+Now, we have the tools necessary to try compiling "mag2" as follows:
+
+INVOKEWORD swap
+INVOKEWORD dup
+INVOKEWORD *
+INVOKEWORD swap
+INVOKEWORD dup
+INVOKEWORD *
+INVOKEWORD +
+INVOKEWORD sqrt
+
+In other words, the words still shuffle values back and forth on the
+interpreter data stack as before; however, instead of the interpreter
+iterating down a word thread, compiled bytecode invokes words directly.
+
+This might seem like the obvious approach; however, it turns out it
+brings very little performance benefit over simply iterating down a
+linked list representing a quotation!
+
+What we would like to do is just eliminate use of the interpreter's
+stack for intermediate values altogether, and just loading the inputs at
+the beginning and storing them at the end.
+
+=== Avoiding the interpreter stack
+
+The JVM is a stack machine, however its semantics are so different that
+a direct mapping of interpreter stack use to stack bytecode would not
+be feasable:
+
+- No arbitrary stack access is allowed in Java; only a few, fixed stack
+  bytecodes like POP, DUP, SWAP are provided.
+
+- A Java function receives input parameters in local variables, not in
+  the JVM stack.
+
+In fact, the second point suggests that it is a better idea is to use
+JVM *local variables* for temporary storage in compiled definitions.
+
+Since no indirect addressing of locals is permitted, stack positions
+used in computations must be known ahead of time. This process is known
+as "stack effect deduction", and is the key concept of the Factor
+compiler.
+
+=== Fundamental idea: eval/core split
+
+Earlier, we showed pseudo-bytecode for the word <=, however it was noted
+that the reality is a bit more complicated.
+
+Recall that FactorWordDefinition.eval() takes an interpreter instance.
+It is the responsibility of this method to marshall and unmarshall
+values on the interpreter stack before and after the word performs any
+computation on the values.
+
+In actual fact, compiled word definitions have a second method named
+core(). Instead of accessing the interpreter data stack directly, this
+method takes inputs from formal parameters passed to the method, in the
+natural stack order.
+
+So, lets look at possible disassembly for the eval() and core() methods
+of the word <=:
+
+void eval(FactorInterpreter interp)
+
+ALOAD 0 // push interpreter instance on JVM stack
+MOVE datastack[top - 2] to JVM stack // get operands in right order
+CHECKCAST java/lang/Number
+MOVE datastack[top - 1] to JVM stack
+CHECKCAST java/lang/Number
+DECREMENT datastack.top 2            // pop the operands
+INVOKESTATIC                         // invoke the method
+	... compiled definition class name ...
+	"core"
+	"(Lfactor/FactorInterpreter;Ljava/lang/Object;Ljava/lang/Object;)
+	 Ljava/lang/Object;"
+MOVE JVM stack top to datastack      // push return value
+
+Object core(FactorInterpreter interp, Object x, Object y)
+
+ALOAD 0                              // push formal parameters
+ALOAD 1
+ALOAD 2
+INVOKESTATIC                         // invoke the actual method
+	"factor/FactorMath"
+	"lessEqual"
+	"(Ljava/lang/Number;Ljava/lang/Number;)Ljava/lang/Number;"
+ARETURN                              // pass return value up to eval()
+
+==== Using the JVM stack and locals for intermediates
+
+At first glance it seems nothing was achieved with the eval/core split,
+excepting an extra layer of overhead.
+
+However, the new revalation here is that compiled word definitions can
+call each other's core methods *directly*, passing in the parameters
+through JVM local variables, without the interpreter data stack being
+involved!
+
+Instead of pseudo-bytecode, from now on we will consider a very
+abstract, high level "register transfer language". The extra verbosity
+of bytecode will only distract from the key ideas.
+
+Tentatively, we would like to compile the word 'mag2' as follows:
+
+r0 * r0 -> r0
+r1 * r1 -> r1
+r0 + r1 -> r0
+sqrt r0 -> r0
+return r0
+
+However this looks very different from the original, RPN definition; in
+particular, we have named values, and the stack operations are gone!
+
+As it turns out, there is a automatic way to transform the stack program
+'mag2' into the register transfer program above (the reverse is also
+possible, but will not be discussed here).
+
+==== Stack effect deduction
+
+Consider the following quotation:
+
+[ swap dup * swap dup * + sqrt ]
+
+The transformation of the above stack code into register code consists
+of two passes.
+
+(A one-pass approach is also possible; however because of the design of
+the assembler used by the compiler, an extra pass will be required
+elsewhere if this transformation described here is single-pass).
+
+The first pass is simply to determine the total number of input and
+output parameters of the quotation (its "stack effect"). We proceed as
+follows.
+
+1. Create a 'simulated' datastack. It does not contain actual values,
+   but rather markers.
+
+   Set the input parameter count to zero.
+
+2. Iterate through each element of the quotation, and act as follows:
+
+   - If the element is a literal, allocate a simulated stack entry.
+
+   - If the element is a word, ensure that the stack has at least as
+     many items as the word's input parameter count.
+     
+     If the stack does not have enough items, increment the input
+     parameter count by the difference between the stack item count and
+     the word's expected input parameter count, and fill the stack with
+     the difference.
+
+     Decrement the stack pointer by the word's input parameter count.
+
+     Increment the stack pointer by the word's output parameter count,
+     filling the new entries with markers.
+
+3. When the end of the quotation is reached, the output parameter count
+   is the number of items on the simulated stack. The input parameter
+   count is the value of the intermediate parameter created in step 1.
+
+Note that this algorithm is recursive -- to determine the stack effect
+of a word, the stack effects of all its factors must be known. For now,
+assume the stack effects of words that use the Java primitives are
+"trivially" known.
+
+A brief walkthrough of the above algorithm for the quotation
+[ swap dup * swap dup * + sqrt ]:
+
+swap - the simulated stack is empty but swap expects two parameters,
+       so the input parameter count becomes 2.
+
+       two empty markers are pushed on the simulated stack:
+       # #
+
+dup  - requires one parameter, which is already present.
+       another empty marker is pushed on the simulated stack:
+       
+       # # #
+
+*    - requires two parameters, and returns one parameter, so the
+       simulated stack is now:
+       
+       # #
+
+swap - requires and returns two parameters.
+
+       # #
+
+dup  - requires one, returns two parameters.
+
+       # # #
+
+*    - requires two, and returns one parameter.
+
+       # #
+
++    - requires two, and returns one parameter.
+
+       #
+
+sqrt - requires one, and returns one parameter.
+
+       #
+
+So the input parameter count is two, and the output parameter count is
+one (since at the end of the quotation the simulated datastack contains
+one item marker).
+
+==== The dataflow algorithm
+
+The second pass of the compiler algorithm relies on the stack effect
+already being known. It consists of these steps:
+
+1. Create a new simulated stack. For each input parameter, a new entry
+   is allocated. This time, entries are not blank markers, but rather
+   register numbers.
+
+2. Iterate through each element of the quotation, and act as follows:
+
+   - If the element is a literal, allocate a simulated stack entry.
+     This time, allocation finds an unused register number by checking
+     each stack entry.
+
+   - If the element is a shuffle word, apply the shuffle to the
+     simulated stack *and do not emit any code!*
+
+   - If the element is another word, pop the appropriate number of
+     register numbers from the simulated stack, and emit assembly code
+     for invoking the word with parameters stored in these registers.
+
+     Decrement the simulated stack pointer by the word's input parameter
+     count.
+
+     Increment the simulated stack pointer by the word's output
+     parameter count, filling the new entries with newly-allocated
+     register numbers.
+
+     Emit assembly code for moving the return values of the word into
+     the newly allocated registers.
+
+Voila! The 'simulated stack' is a compile time only notion, and the
+resulting emitted code does not explicitly reference any stacks at all;
+in fact, applying this algorithm to the following quotation:
+
+[ swap dup * swap dup * + sqrt ]
+
+Yields the following output:
+
+r0 * r0 -> r0
+r1 * r1 -> r1
+r0 + r1 -> r0
+sqrt r0 -> r0
+return r0
+
+==== Multiple return values
+
+A minor implementation detail is multiple return values. Java does not
+support them directly, but a Factor word can return any number of
+values. This is implemented by temporarily using the interpreter data
+stack to return multiple values. This is the only time the interpreter
+data stack is used.
+
+==== The call stack
+
+Sometimes Factor code uses the call stack as an 'extra hand' for
+temporary storage:
+
+dup >r + r> *
+
+The dataflow algorithm can be trivially generalized with two simulated
+stacks; there is nothing more to be said about this.
+
+=== Questioning assumptions
+
+The dataflow compilation algorithm gives us another nice performance
+improvement. However, the algorithm assumes that the stack effect of
+each word is known a priori, or can be deduced using the algorithm.
+
+The algorithm falls down when faced with the following more complicated 
+expressions:
+
+- Combinators calling the 'call' and 'ifte' primitives
+
+- Recursive words
+
+So ironically, this algorithm is unsuitable for code where it would help
+the most -- complex code with a lot of branching, and tight loops and
+recursions.
+
+=== Eliminating explicit 'call':
+
+As described above, the dataflow algorithm would break when it
+encountered the 'call' primitive:
+
+[ 2 + ] 5 swap call
+
+The 'call' primitive executes the quotation at the top of the stack. So
+its stack effect depends on its input parameter!
+
+The first problem we faced was compilation of Java reflection
+primitives. A critical observation was that all the information to
+compile them efficiently was 'already there' in the source.
+
+Our intuitition tells us that in the above code, the occurrence of
+'call' *always* receives the parameter of [ 2 + ]; so somehow, the
+quotation can be transformed into the following, which we can already
+compile:
+
+[ 2 + ] 5 swap drop 2 +
+               ^^^^^^^^
+	       "immediate instantiation" of 'call'
+
+Or indeed, once the unused literal [ 2 + ] is factored out, simply:
+
+5 2 +
+
+==== Generalizing the 'simulated stack'
+
+It might seem surprising that such expressions can be easily compiled,
+once the 'simulated stack' is generalized such that it can hold literal
+values!
+
+The only change that needs to be made, is that in both passes, when a
+literal is encountered, it is pushed directly on the simulated stack.
+
+Also, when the primitive 'call' is encountered, its stack effect is
+assumed to be the stack effect of the literal quotation at the top of
+the simulated stack.
+
+(What if the top of the simulated stack is a register number? The word
+cannot be compiled, since the stack effect can potentially be
+arbitrary!)
+
+Being able to compile 'call' whose parameters are literals from the
+same word definition doesn't really add nothing new.
+
+A real breakthrough would be compiling "combinators"; words that take
+parameters that are themselves quotations.
+
+As it turns out, combinators themselves are not compiled -- however,
+specific *instances* of combinators in other word definitions are.
+
+For example, we can rewrite our word 'mag2' as follows:
+
+: mag2 ( x y -- sqrt[x*x+y*y] )
+    [ sq ] 2apply + sqrt ;
+
+Where 2apply is defined as follows:
+
+: 2apply ( x y [ code ] -- )
+    2dup 2>r nip call 2r> call ;
+
+How can we compile this new, equivalent, form of 'mag2'?
+
+==== Inline words
+
+Normally, when the dataflow algorithm encounters a word as an element
+of a quotation, a call to that word's core() method is emitted. However,
+if the word is compiled 'immediately', its definition is substituted in.
+
+Assume for a second that in the new form of 'mag2', the word '2apply' is
+compiled inline (ignoring the specifics of how this decision is made).
+In other words, it is as if 'mag2' was defined as follows:
+
+: mag2 ( x y -- sqrt[x*x+y*y] )
+    [ sq ] 2dup 2>r nip call 2r> call + sqrt ;
+
+However, we already have a way of compiling the above code; in fact it
+is compiled into the equivalent of:
+
+: mag2 ( x y -- sqrt[x*x+y*y] )
+    [ sq ] 2dup 2>r nip drop sq 2r> drop sq + sqrt ;
+                        ^^^^^^^     ^^^^^^^
+			immediate instantiation of 'call'
+
+As an aside, recall that the stack words 2dup, 2>r, nip, drop, and 2r>
+do not emit any code, and the 'drop' of the literal [ sq ] ensures that
+it never makes it to the compiled definition. The end-result is that the
+register-transfer code is identical to the earlier definition of 'mag2'
+which did not involve 2apply:
+
+r0 * r0 -> r0
+r1 * r1 -> r1
+r0 + r1 -> r0
+sqrt r0 -> r0
+return r0
+
+So, how is the decision made to compile a word inline, or not? It is
+quite simple. If the word has a deducable stack effect on the simulated
+stack of the current compilation, but it does *not* have a deducable
+stack effect on an empty simulated stack, it is compiled immediate.
+
+For example, the following word has a deducable stack effect, regardless
+of the values of any literals on the simulated stack:
+
+: sq ( x -- x^2 )
+    dup * ;
+
+So the word 'sq' is always compiled normally.
+
+However, the '2apply' word we saw earlier does not have a deducable
+stack effect unless there is a literal quotation at the top of the
+simulated stack:
+
+: 2apply ( x y [ code ] -- )
+    2dup 2>r nip call 2r> call ;
+
+So it is compiled inline.
+
+Sometimes it is desirable to have short non-combinator words inlined.
+While this is not necessary (whereas non-inlined combinators do not
+compile), it can increase performance, especially if the word returns
+multiple values (and without inlining, the interpreter datastack will
+need to be used).
+
+To mark a word for inline compilation, use the word 'inline' like so:
+
+: sq ( x -- x^2 )
+    dup * ; inline
+
+The word 'inline' sets the inline slot of the most recently defined word
+object.
+
+(Indeed, to push a reference to the most recently defined word object,
+use the word 'word').
+
+=== Branching
+
+The only branching primitive supported by factor is 'ifte'. The syntax
+is as follows:
+
+2 2 + 4 = ( condition that leaves boolean on the stack )
+[
+    ( code to execute if condition is true )
+] [
+    ( code to execute if condition is false )
+] ifte
+
+Note that the different components might be spread between words, and
+affected by stack operations in transit. Due to the dataflow algorithm
+and inlining, all useful cases can be handled correctly.
+
+==== Not all branching forms have a deducable stack effect
+
+The first observation we gain is that if the two branches leave the
+stack in inconsistent states, then stack positions used by subsequent
+code will depend on the outcome of the branch.
+
+This practice is discouraged anyway -- it leads to hard-to-understand
+code -- so it is not supported by the compiler. If you must do it, the
+words will always run in the interpreter.
+
+Attempting to compile or balance an expression with such a branch raises
+an error:
+
+    9] : bad-ifte 3 = [ 1 2 3 ] [ 2 2 + ] ifte ;
+    10] word effect .
+break called.
+
+:r prints the callstack.
+:j prints the Java stack.
+:x returns to top level.
+:s returns to top level, retaining the data stack.
+:g continues execution (but expect another error).
+
+ERROR: Stack effect of [ 1 2 3 ] ( java.lang.Object -- java.lang.Object
+java.lang.Object java.lang.Object ) is inconsistent with [ 2 2 + ] (
+java.lang.Object -- java.lang.Object )
+Head is ( java.lang.Object -- )
+Recursive state:
+[ #<ifte,base=null,effect=( java.lang.Object -- boolean java.lang.Object
+java.lang.Object ); null.null()> #<bad-ifte,base=null,effect=( -- );
+null.null()> ]
+
+==== Merging
+
+Lets return to our register transfer language, and add a branching
+notation:
+
+- two-instruction sequence to branch to <label> if <register> is null
+  ALOAD <register>
+  IFNULL <label>
+
+- unconditional goto to <label>
+  GOTO <label>
+
+So a simple conditional
+
+rot [
+    (true)
+] [
+    (false)
+] ifte
+
+Will be compiled as follows, where the inputs are in registers 1, 2, 3
+
+1	ALOAD 1
+2	IFNULL 5
+3	(true)
+4	GOTO 6
+5	(false)
+6	RETURN
+
+However the question arises, what becomes of the simulated stack after
+the branches are done.
+
+For example, consider this snippet:
+
+random-int random-int random-boolean [
+    swap
+] [
+    
+] ifte
+
+The first three words followed by the branch itself are compiled like
+so:
+
+1	1 <- random-int
+2	2 <- random-int
+3	3 <- random-boolean
+4	ALOAD 3
+5	IFNULL 8
+
+However, a problem arises because if the true branch is taken, the
+simulated stack contains register 1 at the top, and register 2 below;
+but if the false branch is taken, it is the opposite!
+
+The solution is to "merge" the stacks at the end of each branch. So
+the remainder of our code might be compiled as follows:
+
+6	1 <-> 2 // new notation: exchange registers 1 and 2
+7	GOTO 8
+8	RETURN
+
+=== Recursion
+
+Consider our old friend 'fib':
+
+: fib ( n -- nth fibonacci number )
+    dup 1 <= [
+        drop 1 
+    ] [
+        pred dup fib swap pred fib + 
+    ] ifte ;
+
+Using the tools we have, we cannot deduce its stack effect yet, since
+the false branch of the 'ifte' refers to the word 'fib' itself.
+
+A critical observation is if the word is to complete, eventually, the
+test will fail and 'drop 1' will be executed.
+
+Note that this implies that when given a parameter of 0 or 1, the
+stack effect of 'fib' is ( X -- X ).
+
+==== What is the stack effect?
+
+To see how to deduce the stack effect of the recursive case, it is
+necessary to make a mental leap. Consider the case where the parameter
+to fib is 2. The word recurses twice, and in each case, the parameter
+to the recursive call is <= 1, so 'drop 1' is executed.
+
+So when the parameter is 2, the stack effect is also ( X -- X )!
+
+In fact it is not hard to usee that if the stack effect of 'fib' with
+parameter n-1 and n-2 is ( X -- X ), then the stack effect of 'fib' with
+parameter n is also ( X -- X ).
+
+Therefore by induction, for any input, 'fib' has stack effect
+( X -- X ).
+
+Once the stack effect is known, it is easy enough to compile; just treat
+the two recursive calls like calls to any other word with stack effect
+( X -- X ).
+
+==== Not all recursive forms have a deducable stack effect
+
+Consider the following word:
+
+: push ( list -- ... )
+    dup [
+        uncons push
+    ] unless ;
+
+If the top of the stack is null, the word returns. So the base case is (
+X -- X ).
+
+However if the top of the stack is a list of one element, the word has
+stack effect ( X -- X X ), since 'uncons' has stack effect ( X -- X X )
+and the base case is ( X -- X ).
+
+If we proceed, we find that if the top of the stack is a list of two
+elements, the stack effect of the word is ( X -- X X X ).
+
+The stack positions used for intermediate values can no longer be
+determined ahead of time.
+
+A word whose stack effect depends on input is said to 'diverge'. Since
+it is generally good practice to only write converging recursive words,
+it is not a big loss that the compiler does not support them. Of course,
+such words still work in the interpreter.
+
+==== Auxiliary methods
+
+So far, we can compile recursive words such as 'fib' and tail-recursive
+words such as 'list?'. Now, lets try applying our techniques to a word
+that calls a recursive combinator:
+
+: reverse ( list -- list )
+    [ ] swap [ swons ] each ;
+
+Recall that 'swons' creates a cons cell with stack effect
+( cdr car -- [ car , cdr ] ) -- the opposite order of 'cons', which has stack effect ( car cdr -- [ car , cdr ] ).
+
+The combinator 'each' is defined as follows:
+
+: each ( [ list ] [ quotation ] -- )
+    over [
+        >r uncons r> tuck 2>r call 2r> each
+    ] [
+        2drop
+    ] ifte ;
+
+If we apply our previous inling technique, however, the end result is
+absurd, since the recursive call to 'each' remains:
+
+: reverse ( list -- list )
+    f swap [ swons ] over [
+        >r uncons r> tuck 2>r call 2r> each
+    ] [
+        2drop
+    ] ifte ;
+
+However, if the recursive call is changed to 'reverse', then the result
+is also incorrect, since '[ ] swap' would be executed on each iteration.
+
+The solution is to place instances of recursive combinators in an
+'auxiliary method' in the same class as the definition being compiled.
+
+So in fact, 'reverse' is compiled as three methods, eval(), core(), and 
+aux_each_0().
+
+==== Wrapping up
+
+There are two implementation details not covered here; they are not
+really 'interesting' and best described by the source code anyway:
+
+- tail-recursive words are compiled with a GOTO not a method invocation
+  at the end of the recursive case.
+
+- some extra steps are needed to normalize the stack after recursive
+  calls, and when auxiliary methods are being generated.
+
+=== Conclusion
+
+Finally, lets see what kind of improvement we get over naive
+interpretation when our old friend the 'fib' word is compiled using all
+the techniques mentioned above:
+
+    3] "fib" compile
+    4] [ 25 fib ] time
+123
+
+That's right -- a 200x improvement over pure interpretation.

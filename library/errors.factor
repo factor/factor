@@ -26,11 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: errors
-USE: arithmetic
 USE: combinators
 USE: continuations
 USE: kernel
 USE: lists
+USE: math
 USE: namespaces
 USE: stack
 USE: strings
@@ -40,15 +40,25 @@ USE: vectors
 : c> ( catch -- ) catchstack* vector-pop ;
 
 : save-error ( error -- )
-    #! Save the stacks for post-mortem inspection after an
-    #! error.
-    global [
-        "error" set
-        datastack >pop> "error-datastack" set
-        callstack >pop> >pop> "error-callstack" set
-        namestack "error-namestack" set
-        catchstack "error-catchstack" set
-    ] bind ;
+    #! Save the stacks and parser state for post-mortem
+    #! inspection after an error.
+    namespace [
+        "col" get
+        "line" get
+        "line-number" get
+        "file" get
+        global [
+            "error-file" set
+            "error-line-number" set
+            "error-line" set
+            "error-col" set
+            "error" set
+            datastack "error-datastack" set
+            callstack "error-callstack" set
+            namestack "error-namestack" set
+            catchstack "error-catchstack" set
+        ] bind
+    ] when ;
 
 : catch ( try catch -- )
     #! Call the try quotation. If an error occurs restore the
@@ -60,5 +70,3 @@ USE: vectors
     #! Use rethrow when passing an error on from a catch block.
     #! For convinience, this word is a no-op if error is f.
     [ c> call ] when* ;
-
-: throw ( error -- ) dup save-error rethrow ;

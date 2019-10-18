@@ -3,6 +3,7 @@
 ! $Id$
 !
 ! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2004 Chris Double.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -32,7 +33,6 @@ USE: lists
 USE: logic
 USE: namespaces
 USE: stack
-USE: vocabularies
 
 : worddef? ( obj -- boolean )
     "factor.FactorWordDefinition" is ;
@@ -42,26 +42,29 @@ USE: vocabularies
         intern dup [ [ "def" get ] bind ] when
     ] unless ;
 
-: word-property ( pname word -- pvalue )
-    [ get ] bind ;
+: word-property ( word pname -- pvalue )
+    swap [ get ] bind ;
 
-: set-word-property ( pvalue pname word -- )
-    [ set ] bind ;
+: set-word-property ( pvalue word pname -- )
+    swap [ set ] bind ;
 
 : redefine ( word def -- )
     swap [ "def" set ] bind ;
 
-: word? ( obj -- boolean )
+: word? ( obj -- ? )
     "factor.FactorWord" is ;
 
-: compiled? ( worddef -- boolean )
+: compiled? ( worddef -- ? )
     "factor.compiler.CompiledDefinition" is ;
 
-: compound? ( worddef -- boolean )
+: compound? ( worddef -- ? )
     "factor.FactorCompoundDefinition" is ;
 
 : compound-or-compiled? ( worddef -- ? )
     dup compiled? swap compound? or ;
+
+: symbol? ( worddef -- ? )
+    "factor.FactorSymbolDefinition" is ;
 
 : comment? ( obj -- ? )
     "factor.FactorDocComment" is ;
@@ -87,14 +90,12 @@ USE: vocabularies
     "factor.FactorShuffleDefinition" is ;
 
 : word-of-worddef ( worddef -- word )
-    interpreter swap
-    [ "factor.FactorInterpreter" ]
-    "factor.FactorWordDefinition" "getWord" jinvoke ;
+    "factor.FactorWordDefinition" "word" jvar-get ;
 
 : defined? ( obj -- ? )
     dup word? [ worddef ] [ drop f ] ifte ;
 
-: worddef>list ( worddef -- list )
+: word-parameter ( worddef -- list )
     worddef interpreter swap
     [ "factor.FactorInterpreter" ] "factor.FactorWordDefinition"
     "toList" jinvoke ;
@@ -103,4 +104,9 @@ USE: vocabularies
     dup [ dup car comment? [ cdr skip-docs ] when ] when ;
 
 : compound>list ( worddef -- list )
-    worddef>list dup [ skip-docs ] when ;
+    word-parameter dup [ skip-docs ] when ;
+
+: define-compound ( word def -- )
+    #! Define a compound word at runtime.
+    >r dup >r [ "vocabulary" get "name" get ] bind r> r>
+    <compound> define ;

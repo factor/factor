@@ -34,6 +34,28 @@ package factor;
  */
 public class ReadTable
 {
+	public static final ReadTable DEFAULT_READTABLE;
+
+	//{{{ Class initializer
+	static
+	{
+		DEFAULT_READTABLE = new ReadTable();
+
+		DEFAULT_READTABLE.setCharacterType('\t',ReadTable.WHITESPACE);
+		DEFAULT_READTABLE.setCharacterType('\n',ReadTable.WHITESPACE);
+		DEFAULT_READTABLE.setCharacterType('\r',ReadTable.WHITESPACE);
+		DEFAULT_READTABLE.setCharacterType(' ',ReadTable.WHITESPACE);
+
+		DEFAULT_READTABLE.setCharacterType('!',ReadTable.CONSTITUENT);
+		DEFAULT_READTABLE.setCharacterType('"',ReadTable.DISPATCH);
+		DEFAULT_READTABLE.setCharacterRange('#','[',ReadTable.CONSTITUENT);
+		DEFAULT_READTABLE.setCharacterType('\\',ReadTable.SINGLE_ESCAPE);
+		DEFAULT_READTABLE.setCharacterRange(']','~',ReadTable.CONSTITUENT);
+
+		DEFAULT_READTABLE.setCharacterType('!',ReadTable.DISPATCH);
+		DEFAULT_READTABLE.setCharacterType('(',ReadTable.CONSTITUENT);
+	} //}}}
+
 	/**
 	 * Invalid character.
 	 */

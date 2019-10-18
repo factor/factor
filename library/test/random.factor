@@ -1,28 +1,43 @@
 IN: scratchpad
-USE: arithmetic
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: random
-USE: stdio
+USE: stack
 USE: test
 
-"Checking random number generation." print
-
 [ t ]
-[ [ 1 2 3 ] ]
-[ random-element number? ]
-test-word
+[ [ 1 2 3 ] random-element number? ]
+unit-test
 
 [
     [ 10 | t ]
     [ 20 | f ]
     [ 30 | "monkey" ]
+    [ 24 | 1/2 ]
+    [ 13 | { "Hello" "Banana" } ]
 ] "random-pairs" set
 
-[ f ]
-[ "random-pairs" get ]
-[ random-element* [ t f "monkey" ] contains not ] test-word
+"random-pairs" get [ cdr ] map "random-values" set
 
-"Random number checks complete." print
+[ f ]
+[
+    "random-pairs" get
+    random-element* "random-values" get contains? not
+] unit-test
+
+: check-random-int ( min max -- )
+    2dup random-int -rot between? assert ;
+
+[ ] [ 100 [ -12 674 check-random-int ] times ] unit-test
+
+: check-random-subset ( expected pairs -- )
+    random-subset* [ over contains? ] all? nip ;
+
+[ t ] [
+    "random-values" get
+    "random-pairs" get
+    check-random-subset
+] unit-test

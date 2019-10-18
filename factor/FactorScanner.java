@@ -42,6 +42,11 @@ public class FactorScanner
 	 */
 	public static final Object EOF = new Object();
 
+	/**
+	 * Special object returned on EOL.
+	 */
+	public static final Object EOL = new Object();
+
 	private String filename;
 	private BufferedReader in;
 
@@ -73,6 +78,7 @@ public class FactorScanner
 		this.filename = filename;
 		this.in = in;
 		buf = new StringBuffer();
+		setReadTable(ReadTable.DEFAULT_READTABLE);
 	} //}}}
 
 	//{{{ getReadTable() method
@@ -87,8 +93,26 @@ public class FactorScanner
 		this.readtable = readtable;
 	} //}}}
 
+	//{{{ getLineNumber() method
+	public int getLineNumber()
+	{
+		return lineNo;
+	} //}}}
+
+	//{{{ getColumnNumber() method
+	public int getColumnNumber()
+	{
+		return position;
+	} //}}}
+
+	//{{{ getFileName() method
+	public String getFileName()
+	{
+		return filename;
+	} //}}}
+
 	//{{{ nextLine() method
-	private void nextLine() throws IOException
+	public void nextLine() throws IOException
 	{
 		lineNo++;
 		line = in.readLine();
@@ -97,8 +121,45 @@ public class FactorScanner
 			nextLine();
 	} //}}}
 
+	//{{{ isEOL() method
+	private boolean isEOL()
+	{
+		return position >= line.length();
+	} //}}}
+	
+	//{{{ skipWhitespace() method
+	/**
+	 * The Factor parser is so much nicer in Factor than Java!
+	 */
+	public void skipWhitespace() throws FactorParseException
+	{
+		for(;;)
+		{
+			if(isEOL())
+				return;
+
+			char ch = line.charAt(position++);
+
+			int type = readtable.getCharacterType(ch);
+
+			switch(type)
+			{
+			case ReadTable.INVALID:
+				error("Invalid character in input: " + ch);
+				break;
+			case ReadTable.WHITESPACE:
+				break;
+			default:
+				position--;
+				return;
+			}
+		}
+	} //}}}
+	
 	//{{{ next() method
 	/**
+	 * Read a word name. Note that no escaping of characters is done.
+	 *
 	 * @param readNumbers If true, will return either a Number or a
 	 * String. Otherwise, only Strings are returned.
 	 * @param start If true, dispatches will be handled by their parsing
@@ -112,21 +173,20 @@ public class FactorScanner
 		int base)
 		throws IOException, FactorParseException
 	{
-		if(line == null || position == line.length())
-			nextLine();
 		if(line == null)
 			return EOF;
+		if(position == line.length())
+			return EOL;
 
 		for(;;)
 		{
-			if(position == line.length())
+			if(position >= line.length())
 			{
 				// EOL
 				if(buf.length() != 0)
 					return word(readNumbers,base);
-				nextLine();
-				if(line == null)
-					return EOF;
+				else
+					return EOL;
 			}
 
 			char ch = line.charAt(position++);
@@ -151,29 +211,32 @@ public class FactorScanner
 					return word(readNumbers,base);
 				}
 			case ReadTable.CONSTITUENT:
-				buf.append(ch);
-				break;
 			case ReadTable.SINGLE_ESCAPE:
-				buf.append(escape());
+				buf.append(ch);
 				break;
 			}
 		}
 	} //}}}
 
-	//{{{ nextNonEOF() method
-	public Object nextNonEOF(
+	//{{{ nextNonEOL() method
+	public Object nextNonEOL(
 		boolean readNumbers,
 		boolean start,
 		int base)
 		throws IOException, FactorParseException
 	{
 		Object next = next(readNumbers,start,base);
+		if(next == EOL)
+			error("Unexpected EOL");
 		if(next == EOF)
 			error("Unexpected EOF");
 		return next;
 	} //}}}
 
 	//{{{ readUntil() method
+	/**
+	 * Characters are escaped.
+	 */
 	public String readUntil(char start, char end, boolean escapesAllowed)
 		throws IOException, FactorParseException
 	{
@@ -181,11 +244,17 @@ public class FactorScanner
 
 		for(;;)
 		{
-			if(position == line.length())
+			if(isEOL())
+			{
 				error("Expected " + end + " before EOL");
+				break;
+			}
 
 			if(line == null)
+			{
 				error("Expected " + end + " before EOF");
+				break;
+			}
 
 			char ch = line.charAt(position++);
 
@@ -221,10 +290,16 @@ public class FactorScanner
 	//{{{ readNonEOF() method
 	public char readNonEOF() throws FactorParseException, IOException
 	{
-		if(position == line.length())
+		if(isEOL())
+		{
 			error("Unexpected EOL");
+			return '\0';
+		}
 		if(line == null)
+		{
 			error("Unexpected EOF");
+			return '\0';
+		}
 
 		return line.charAt(position++);
 	} //}}}
@@ -242,7 +317,7 @@ public class FactorScanner
 	//{{{ atEndOfWord() method
 	public boolean atEndOfWord() throws IOException
 	{
-		if(position == line.length())
+		if(isEOL())
 			return true;
 		if(line == null)
 			return true;
@@ -278,7 +353,10 @@ public class FactorScanner
 			return '\0';
 		case 'u':
 			if(line.length() - position < 4)
+			{
 				error("Unexpected EOL");
+				return '\0';
+			}
 
 			String hex = line.substring(position,position + 4);
 
@@ -295,7 +373,6 @@ public class FactorScanner
 			return '\0';
 		default:
 			error("Unknown escape: " + ch);
-			// can't happen
 			return '\0';
 		}
 	} //}}}

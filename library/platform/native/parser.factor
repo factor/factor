@@ -26,17 +26,16 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: parser
-USE: arithmetic
 USE: combinators
 USE: errors
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: stack
 USE: strings
 USE: words
-USE: vocabularies
 USE: unparser
 
 ! The parser uses a number of variables:
@@ -51,71 +50,111 @@ USE: unparser
 
 : parsing? ( word -- ? )
     dup word? [
-        "parsing" swap word-property
+        "parsing" word-property
     ] [
         drop f
     ] ifte ;
 
-: parsing ( -- ) t "parsing" word set-word-property ;
+: parsing ( -- )
+    #! Mark the most recently defined word to execute at parse
+    #! time, rather than run time. The word can use 'scan' to
+    #! read ahead in the input stream.
+    t word "parsing" set-word-property ;
 
-: <parsing "line" set 0 "pos" set ;
-: parsing> "line" off "pos" off ;
-: end? ( -- ? ) "pos" get "line" get str-length >= ;
-: ch ( -- ch ) "pos" get "line" get str-nth ;
-: advance ( -- ) "pos" succ@ ;
+: end? ( -- ? )
+    "col" get "line" get str-length >= ;
 
-: ch-blank? ( -- ? ) end? [ f ] [ ch blank? ] ifte ;
-: skip-blank ( -- ) [ ch-blank? ] [ advance ] while ;
-: ch-word? ( -- ? ) end? [ f ] [ ch blank? not ] ifte ;
-: skip-word ( -- ) [ ch-word? ] [ advance ] while ;
+: (with-parser) ( quot -- )
+    end? [ drop ] [ [ call ] keep (with-parser) ] ifte ;
 
-: ch-dispatch? ( -- ? )
+: with-parser ( text quot -- )
+    #! Keep calling the quotation until we reach the end of the
+    #! input.
+    swap "line" set 0 "col" set
+    (with-parser)
+    "line" off "col" off ;
+
+: ch ( -- ch ) "col" get "line" get str-nth ;
+: advance ( -- ) "col" succ@ ;
+
+: skip ( n line quot -- n )
+    #! Find the next character that satisfies the quotation,
+    #! which should have stack effect ( ch -- ? ).
+    >r 2dup str-length < [
+        2dup str-nth r> dup >r call [
+            r> 2drop
+        ] [
+            >r succ r> r> skip
+        ] ifte
+    ] [
+        r> drop nip str-length
+    ] ifte ;
+
+: skip-blank ( n line -- n )
+    [ blank? not ] skip ;
+
+: skip-word ( n line -- n )
+    [ blank? ] skip ;
+
+: denotation? ( ch -- ? )
     #! Hard-coded for now. Make this customizable later.
-    #! A 'dispatch' is a character that is treated as its
+    #! A 'denotation' is a character that is treated as its
     #! own word, eg:
     #!
     #! "hello world"
     #!
     #! Will call the parsing word ".
-    ch "\"" str-contains? ;
+    "\"" str-contains? ;
 
-: (scan) ( -- start end )
-    skip-blank "pos" get
-    end? [
-        dup
+: (scan) ( n line -- start end )
+    dup >r skip-blank dup r>
+    2dup str-length < [
+        2dup str-nth denotation? [
+            drop succ
+        ] [
+            skip-word
+        ] ifte
     ] [
-        ch-dispatch? [ advance ] [ skip-word ] ifte "pos" get
+        drop
     ] ifte ;
 
-: scan ( -- str )
-    (scan) 2dup = [ 2drop f ] [ "line" get substring ] ifte ;
-
-: parse-word ( str -- obj )
-    dup "use" get search dup [
-        nip
+: scan ( -- token )
+    "col" get "line" get dup >r (scan) dup "col" set
+    2dup = [
+        r> 3drop f
     ] [
-        drop str>fixnum
+        r> substring
     ] ifte ;
+
+: scan-word ( -- obj )
+    scan dup [
+        dup "use" get search dup [
+            nip
+        ] [
+            drop str>number
+        ] ifte
+    ] when ;
 
 : parsed| ( obj -- )
     #! Some ugly ugly code to handle [ a | b ] expressions.
-    >r dup nreverse last* r> swap rplacd swons ;
+    >r nreverse dup last* r> swap set-cdr swons ;
 
-: expect-] ( -- )
-    scan "]" = not [ "Expected ]" throw ] when ;
+: expect ( word -- )
+    dup scan = not [
+        "Expected " swap cat2 throw
+    ] [
+        drop
+    ] ifte ;
 
 : parsed ( obj -- )
-    over "|" = [ nip parsed| expect-] ] [ swons ] ifte ;
+    over "|" = [ nip parsed| "]" expect ] [ swons ] ifte ;
 
-: number, ( num -- )
-    str>fixnum parsed ;
-
-: word, ( str -- )
+: (parse) ( str -- )
     [
-        parse-word dup parsing? [ execute ] [ parsed ] ifte
-    ] when* ;
-
-: (parse) <parsing [ end? not ] [ scan word, ] while parsing> ;
+        scan-word [
+            dup parsing? [ execute ] [ parsed ] ifte
+        ] when*
+    ] with-parser ;
 
 : parse ( str -- code )
     #! Parse the string into a parse tree that can be executed.
@@ -126,10 +165,10 @@ USE: unparser
 
 ! Used by parsing words
 : ch-search ( ch -- index )
-    "pos" get "line" get rot index-of* ;
+    "col" get "line" get rot index-of* ;
 
 : (until) ( index -- str )
-    "pos" get swap dup succ "pos" set "line" get substring ;
+    "col" get swap dup succ "col" set "line" get substring ;
 
 : until ( ch -- str )
     ch-search (until) ;
@@ -139,3 +178,11 @@ USE: unparser
 
 : next-ch ( -- ch )
     end? [ "Unexpected EOF" throw ] [ ch advance ] ifte ;
+
+: next-word-ch ( -- ch )
+    "col" get "line" get skip-blank "col" set next-ch ;
+
+! Once this file has loaded, we can use 'parsing' normally.
+! This hack is needed because in Java Factor, 'parsing' is
+! not parsing, but in CFactor, it is.
+t "parsing" [ "parser" ] search "parsing" set-word-property

@@ -31,13 +31,9 @@
 !!! 'math' vocabulary instead.
 
 IN: real-math
-USE: arithmetic
 USE: kernel
+USE: math
 USE: stack
-
-: fabs ( x -- abs )
-    [ "double" ] "java.lang.Math" "abs"
-    jinvoke-static ; inline
 
 : facos ( x -- acos )
     [ "double" ] "java.lang.Math" "acos"
@@ -51,7 +47,7 @@ USE: stack
     [ "double" ] "java.lang.Math" "atan"
     jinvoke-static ; inline
 
-: fatan2 ( x y -- atan2 )
+: fatan2 ( y x -- atan2 )
     [ "double" "double" ] "java.lang.Math" "atan2"
     jinvoke-static ; inline
 

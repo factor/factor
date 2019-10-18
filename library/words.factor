@@ -34,13 +34,17 @@ USE: namespaces
 USE: stack
 
 : word-name ( word -- name )
-    "name" swap word-property ;
+    "name" word-property ;
 
-: set-word-name ( word -- vocab )
-    "name" swap set-word-property ;
+: set-word-name ( word name -- )
+    "name" set-word-property ;
 
-: word-vocabulary ( word name -- )
-    "vocabulary" swap word-property ;
+: word-vocabulary ( word -- vocab )
+    "vocabulary" word-property ;
 
 : set-word-vocabulary ( word vocab -- )
-    "vocabulary" swap set-word-property ;
+    "vocabulary" set-word-property ;
+
+: each-word ( quot -- )
+    #! Apply a quotation to each word in the image.
+    vocabs [ words [ swap dup >r call r> ] each ] each drop ;

@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: arithmetic
+IN: math
 USE: combinators
 USE: kernel
 USE: logic
@@ -51,13 +51,21 @@ USE: stack
     "factor.math.FactorMath" "divide"
     jinvoke-static ; inline
 
+: /i ( a b -- a/b )
+    #! Truncating division.
+    [ "java.lang.Number" "java.lang.Number" ]
+    "factor.math.FactorMath" "_divide"
+    jinvoke-static ; inline
+
+: /f / >float ; inline
+
 : mod ( a b -- a%b )
     [ "java.lang.Number" "java.lang.Number" ]
     "factor.math.FactorMath" "mod"
     jinvoke-static ; inline
 
 : /mod ( a b -- a/b a%b )
-    2dup / >fixnum -rot mod ;
+    2dup /i -rot mod ;
 
 : > ( a b -- boolean )
     [ "java.lang.Number" "java.lang.Number" ]
@@ -87,6 +95,9 @@ USE: stack
     ]
     "factor.FactorLib" "branch3" jinvoke-static ;
 
+: compare ( x y [ if x < y ] [ if x = y ] [ if x > y ] -- )
+    >=< call ; inline interpret-only
+
 : bitand ( x y -- x&y )
     #! Bitwise and.
     [ "java.lang.Number" "java.lang.Number" ]
@@ -111,29 +122,24 @@ USE: stack
     "factor.math.FactorMath" "not"
     jinvoke-static ; inline
 
-: shift< ( x by -- )
+: shift ( x by -- )
     #! Shift 'by' bits to the left.
     [ "java.lang.Number" "int" ]
-    "factor.math.FactorMath" "shiftLeft"
-    jinvoke-static ; inline
-
-: shift> ( x by -- )
-    #! Shift 'by' bits to the right.
-    [ "java.lang.Number" "int" ]
-    "factor.math.FactorMath" "shiftRight"
-    jinvoke-static ; inline
-
-: shift>> ( x by -- )
-    #! Shift 'by' bits to the right, without performing sign
-    #! extension.
-    [ "java.lang.Number" "int" ]
-    "factor.math.FactorMath" "shiftRightUnsigned"
+    "factor.math.FactorMath" "shift"
     jinvoke-static ; inline
 
 : rem ( x y -- remainder )
     [ "double" "double" ] "java.lang.Math" "IEEEremainder"
     jinvoke-static ; inline
 
+: round ( x to -- y )
+    dupd rem - ;
+
 : gcd ( a b -- c )
     [ "java.lang.Number" "java.lang.Number" ]
     "factor.math.FactorMath" "gcd" jinvoke-static ;
+
+: float>bits ( f -- bignum )
+    [ "double" ]
+    "java.lang.Double" "doubleToRawLongBits"
+    jinvoke-static >bignum ;

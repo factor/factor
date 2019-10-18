@@ -26,13 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: test-responder
-USE: stdio
-USE: prettyprint
-
+USE: html
 USE: httpd
 USE: httpd-responder
+USE: stack
+USE: test
 
 : test-responder ( argument -- )
-    serving-text
-    "This is the test responder." print
-    "Argument is " write . ;
+    drop
+    serving-html
+    "Factor Test Suite" [ all-tests ] simple-html-document ;

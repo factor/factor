@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: vocabularies
+IN: words
 USE: combinators
 USE: inspector
 USE: lists
@@ -36,19 +36,18 @@ USE: stack
 USE: stdio
 USE: strings
 USE: unparser
-USE: words
 
 : word-uses? ( of in -- ? )
     2dup = [
         2drop f ! Don't say that a word uses itself
     ] [
-        worddef>list tree-contains?
+        word-parameter tree-contains?
     ] ifte ;
 
 : usages-in-vocab ( of vocab -- usages )
     #! Push a list of all usages of a word in a vocabulary.
     words [
-        dup defined? [
+        dup compound? [
             dupd word-uses?
         ] [
             drop f ! Ignore words without a definition
@@ -65,7 +64,11 @@ USE: words
 
 : usages. ( word -- )
     #! List all usages of a word in all vocabularies.
-    intern vocabs [ dupd usages-in-vocab. ] each drop ;
+    intern [
+        vocabs [ dupd usages-in-vocab. ] each drop
+    ] [
+        "Not defined" print
+    ] ifte* ;
 
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
@@ -92,3 +95,9 @@ USE: words
 : use. ( -- )
     #! Print the vocabulary search path for interactive parsers.
     "use" get . ;
+
+: vocabs. ( -- )
+    vocabs . ;
+
+: words. ( vocab -- )
+    words . ;

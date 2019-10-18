@@ -26,9 +26,16 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: vectors
-USE: arithmetic
 USE: kernel
+USE: lists
+USE: math
 USE: stack
+
+: empty-vector ( len -- vec )
+    #! Creates a vector with 'len' elements set to f. Unlike
+    #! <vector>, which gives an empty vector with a certain
+    #! capacity.
+    dup <vector> dup >r set-vector-length r> ;
 
 : vector-empty? ( obj -- ? )
     vector-length 0 = ;
@@ -55,6 +62,6 @@ USE: stack
 
 DEFER: vector-map
 
-: clone-vector ( vector -- vector )
+: vector-clone ( vector -- vector )
     #! Shallow copy of a vector.
     [ ] vector-map ;

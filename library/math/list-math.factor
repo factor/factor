@@ -25,15 +25,28 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: math USE: arithmetic USE: lists USE: stack
+IN: math
+USE: lists
+USE: math
+USE: stack
 
-: [+] ( list -- sum )
+: |+ ( list -- sum )
     #! sum all elements in a list.
     0 swap [ + ] each ;
 
-: [*] ( list -- sum )
+: +| ( list list -- list )
+    [ + ] 2map ;
+
+: |* ( list -- sum )
     #! multiply all elements in a list.
     1 swap [ * ] each ;
 
+: *| ( list list -- list )
+    [ * ] 2map ;
+
+: *|+ ( list list -- dot )
+    #! Dot product
+    *| |+ ;
+
 : average ( list -- avg )
-    dup [+] swap length / ;
+    dup |+ swap length / ;

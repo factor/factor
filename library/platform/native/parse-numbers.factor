@@ -26,24 +26,19 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: parser
-USE: arithmetic
 USE: combinators
 USE: errors
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: stack
 USE: strings
 USE: words
-USE: vocabularies
 USE: unparser
 
 ! Number parsing
-
-: letter? CHAR: a CHAR: z between? ;
-: LETTER? CHAR: A CHAR: Z between? ;
-: digit? CHAR: 0 CHAR: 9 between? ;
 
 : not-a-number "Not a number" throw ;
 
@@ -55,27 +50,54 @@ USE: unparser
         [ drop t ] [ not-a-number ]
     ] cond ;
 
-: >digit ( n -- ch )
-    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
+: digit ( num digit base -- num )
+    2dup <= [ rot * + ] [ not-a-number ] ifte ;
 
-: digit ( num digit -- num )
-    "base" get swap 2dup > [
-        >r * r> +
-    ] [
+: (str>integer) ( str base -- num )
+    over str-length 0 = [
         not-a-number
-    ] ifte ;
-
-: (str>fixnum) ( str -- num )
-    0 swap [ digit> digit ] str-each ;
-
-: str>fixnum ( str -- num )
-    #! Parse a string representation of an integer.
-    dup str-length 0 = [
-        drop not-a-number
     ] [
-        dup "-" str-head? dup [
-            nip str>fixnum neg
-        ] [
-            drop (str>fixnum)
-        ] ifte
+        0 rot [ digit> pick digit ] str-each nip
     ] ifte ;
+
+: str>integer ( str base -- num )
+    swap "-" ?str-head [
+        swap (str>integer) neg
+    ] [
+        swap (str>integer)
+    ] ifte ;
+
+: str>ratio ( str -- num )
+    dup CHAR: / index-of str//
+    swap 10 str>integer swap 10 str>integer / ;
+
+: str>number ( str -- num )
+    #! Affected by "base" variable.
+    [
+        [ "/" swap str-contains? ] [ str>ratio      ]
+        [ "." swap str-contains? ] [ str>float      ]
+        [ drop t                 ] [ 10 str>integer ]
+    ] cond ;
+
+: base> ( str base -- num/f )
+    [ str>integer ] [ [ 2drop f ] when ] catch ;
+
+: bin> ( str -- num )
+    #! Convert a binary string to a number.
+    2 base> ;
+
+: oct> ( str -- num )
+    #! Convert an octal string to a number.
+    8 base> ;
+
+: dec> ( str -- num )
+    #! Convert a decimal string to a number.
+    10 base> ;
+
+: hex> ( str -- num )
+    #! Convert a hexadecimal string to a number.
+    16 base> ;
+
+! Something really sucks about these words here
+: parse-number ( str -- num )
+    [ str>number ] [ [ drop f ] when ] catch ;

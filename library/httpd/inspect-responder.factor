@@ -36,5 +36,5 @@ USE: httpd-responder
 
 : inspect-responder ( argument -- )
     serving-html dup [
-        describe-object-path
+        describe-path
     ] simple-html-document ;

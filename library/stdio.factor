@@ -26,10 +26,27 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: stdio
+USE: combinators
 USE: errors
+USE: kernel
+USE: lists
 USE: namespaces
 USE: stack
 USE: streams
+
+: <stdio-stream> ( stream -- stream )
+    #! We disable fclose on stdio so that various tricks like
+    #! with-stream can work.
+    clone [
+        ( string -- )
+        [
+            namespace fwrite
+            "\n" namespace fwrite
+            namespace fflush
+        ] "fprint" set
+
+        [ ] "fclose" set
+    ] extend ;
 
 : flush ( -- )
     "stdio" get fflush ;
@@ -37,18 +54,25 @@ USE: streams
 : read ( -- string )
     "stdio" get freadln ;
 
+: read1 ( count -- string )
+    "stdio" get fread1 ;
+
 : read# ( count -- string )
     "stdio" get fread# ;
 
 : write ( string -- )
     "stdio" get fwrite ;
 
-: write-attr ( string -- )
+: write-attr ( string style -- )
     #! Write an attributed string to standard output.
     "stdio" get fwrite-attr ;
 
+: write-icon ( resource -- )
+    #! Write an icon. Eg, /library/icons/File.png
+    "icon" swons unit "" swap write-attr ;
+
 : print ( string -- )
-    "stdio" get tuck fprint fflush ;
+    "stdio" get fprint ;
 
 : edit ( string -- )
     "stdio" get fedit ;
@@ -57,7 +81,15 @@ USE: streams
     #! Print a newline to standard output.
     "\n" write ;
 
+: close ( -- )
+    "stdio" get fclose ;
+
 : with-stream ( stream quot -- )
-    <namespace> [
-        swap "stdio" set [ "stdio" get fclose rethrow ] catch
-    ] bind ;
+    [ swap "stdio" set  [ close rethrow ] catch ] with-scope ;
+
+: with-string ( quot -- str )
+    #! Execute a quotation, and push a string containing all
+    #! text printed by the quotation.
+    1024 <string-output-stream> [
+        call "stdio" get stream>str
+    ] with-stream ;

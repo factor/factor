@@ -26,14 +26,15 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: arithmetic
 USE: combinators
+USE: math
 USE: real-math
 USE: kernel
 USE: stack
 
-!!! Power-related functions:
-!!!     exp log sqrt pow
+! Power-related functions:
+!     exp log sqrt pow
+USE: logic
 
 : exp >rect swap fexp swap polar> ;
 : log >polar swap flog swap rect> ;
@@ -46,10 +47,14 @@ USE: stack
     ] ifte ;
 
 : ^mag ( w abs arg -- magnitude )
-    [ [ >rect swap ] dip swap fpow ] dip rot * fexp / ;
+    >r >r >rect swap r> swap fpow r> rot * fexp / ;
 
 : ^theta ( w abs arg -- theta )
-    [ [ >rect ] dip flog * swap ] dip * + ;
+    >r >r >rect r> flog * swap r> * + ;
 
 : ^ ( z w -- z^w )
-    swap >polar 3dup ^theta [ ^mag ] dip polar> ;
+    over real? over integer? and [
+        fpow
+    ] [
+        swap >polar 3dup ^theta >r ^mag r> polar>
+    ] ifte ;

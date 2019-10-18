@@ -48,7 +48,8 @@ public class FactorListener extends JTextPane
 		= Cursor.getPredefinedCursor
 		(Cursor.WAIT_CURSOR);
 
-	public static final Object Link = new Object();
+	public static final Object Input = new Object();
+	public static final Object Actions = new Object();
 
 	private EventListenerList listenerList;
 
@@ -64,8 +65,22 @@ public class FactorListener extends JTextPane
 
 		listenerList = new EventListenerList();
 
-		getInputMap().put(KeyStroke.getKeyStroke('\n'),
+		InputMap inputMap = getInputMap();
+		
+		/* Replace enter to evaluate the input */
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),
 			new EnterAction());
+
+		/* Replace backspace to stop backspacing over the prompt */
+		inputMap.put(KeyStroke.getKeyStroke('\b'),
+			new BackspaceAction());
+
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME,0),
+			new HomeAction());
+
+		/* Workaround */
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0),
+			new DummyAction());
 	} //}}}
 
 	//{{{ insertWithAttrs() method
@@ -79,7 +94,7 @@ public class FactorListener extends JTextPane
 		int offset1 = doc.getLength();
 		doc.insertString(offset1,text,null);
 		int offset2 = offset1 + text.length();
-		doc.setCharacterAttributes(offset1,offset2,attrs,false);
+		doc.setCharacterAttributes(offset1,offset2,attrs,true);
 		setCaretPosition(offset2);
 	} //}}}
 
@@ -88,12 +103,12 @@ public class FactorListener extends JTextPane
 		throws BadLocationException
 	{
 		StyledDocument doc = (StyledDocument)getDocument();
+		cmdStart = doc.getLength();
+		Element elem = doc.getParagraphElement(cmdStart);
+		/* System.err.println(elem.getAttributes().getClass()); */
 		setCursor(DefaultCursor);
 		this.readLineContinuation = continuation;
-		cmdStart = doc.getLength();
 		setCaretPosition(cmdStart);
-		/* doc.setCharacterAttributes(cmdStart,cmdStart,input,false);
-		setCharacterAttributes(input,false); */
 	} //}}}
 
 	//{{{ getLine() method
@@ -104,7 +119,13 @@ public class FactorListener extends JTextPane
 		if(cmdStart > length)
 			return "";
 		else
-			return doc.getText(cmdStart,length - cmdStart);
+		{
+			String line = doc.getText(cmdStart,length - cmdStart);
+			if(line.endsWith("\n"))
+				return line.substring(0,line.length() - 1);
+			else
+				return line;
+		}
 	} //}}}
 
 	//{{{ addEvalListener() method
@@ -119,8 +140,28 @@ public class FactorListener extends JTextPane
 		listenerList.remove(EvalListener.class,l);
 	} //}}}
 
+	//{{{ eval() method
+	public void eval(String eval)
+	{
+		if(eval == null)
+			return;
+
+		try
+		{
+			StyledDocument doc = (StyledDocument)getDocument();
+			setCaretPosition(doc.getLength());
+			doc.insertString(doc.getLength(),eval + "\n",
+				getCharacterAttributes());
+		}
+		catch(BadLocationException ble)
+		{
+			ble.printStackTrace();
+		}
+		fireEvalEvent(eval);
+	} //}}}
+
 	//{{{ fireEvalEvent() method
-	private void fireEvalEvent(String code)
+	public void fireEvalEvent(String code)
 	{
 		setCursor(WaitCursor);
 
@@ -138,61 +179,87 @@ public class FactorListener extends JTextPane
 		}
 	} //}}}
 
-	//{{{ getLinkAt() method
-	private String getLinkAt(int pos)
+	//{{{ getAttributes() method
+	private AttributeSet getAttributes(int pos)
 	{
 		StyledDocument doc = (StyledDocument)getDocument();
 		Element e = doc.getCharacterElement(pos);
-		AttributeSet a = e.getAttributes();
+		return e.getAttributes();
+	} //}}}
+
+	//{{{ getActions() method
+	private Cons getActions(int pos)
+	{
+		AttributeSet a = getAttributes(pos);
 		if(a == null)
 			return null;
 		else
-			return (String)a.getAttribute(Link);
+			return (Cons)a.getAttribute(Actions);
 	} //}}}
 
-	//{{{ activateLink() method
-	private void activateLink(int pos)
+	//{{{ getActionsPopup() method
+	private JPopupMenu getActionsPopup(int pos)
 	{
-		String eval = getLinkAt(pos);
-		if(eval == null)
+		Cons actions = getActions(pos);
+		if(actions == null)
+			return null;
+
+		JPopupMenu popup = new JPopupMenu();
+		while(actions != null)
+		{
+			Cons action = (Cons)actions.car;
+			JMenuItem item = new JMenuItem((String)action.cdr);
+			item.setActionCommand((String)action.car);
+			item.addActionListener(new EvalAction());
+			popup.add(item);
+			actions = actions.next();
+		}
+
+		return popup;
+	} //}}}
+
+	//{{{ showPopupMenu() method
+	private void showPopupMenu(int pos)
+	{
+		JPopupMenu actions = getActionsPopup(pos);
+		if(actions == null)
 			return;
 
 		try
 		{
 			StyledDocument doc = (StyledDocument)getDocument();
-			doc.insertString(doc.getLength(),eval + "\n",
-				getCharacterAttributes());
+			Element e = doc.getCharacterElement(pos);
+			Point pt = modelToView(e.getStartOffset())
+				.getLocation();
+			FontMetrics fm = getFontMetrics(getFont());
+
+			actions.show(this,pt.x,pt.y + fm.getHeight());
 		}
-		catch(BadLocationException ble)
+		catch(Exception e)
 		{
-			ble.printStackTrace();
+			e.printStackTrace();
 		}
-		fireEvalEvent(eval);
 	} //}}}
 
 	//{{{ MouseHandler class
 	class MouseHandler extends MouseInputAdapter
 	{
-		public void mouseClicked(MouseEvent e)
+		public void mousePressed(MouseEvent e)
 		{
-			JEditorPane editor = (JEditorPane) e.getSource();
-
 			Point pt = new Point(e.getX(), e.getY());
-			int pos = editor.viewToModel(pt);
+			int pos = viewToModel(pt);
 			if(pos >= 0)
-				activateLink(pos);
+				showPopupMenu(pos);
 		}
 
 		public void mouseMoved(MouseEvent e)
 		{
-			JEditorPane editor = (JEditorPane) e.getSource();
-
 			Point pt = new Point(e.getX(), e.getY());
-			int pos = editor.viewToModel(pt);
+			int pos = viewToModel(pt);
 			if(pos >= 0)
 			{
 				Cursor cursor;
-				if(getLinkAt(pos) != null)
+				if(getActions(pos) != null)
 					cursor = MoveCursor;
 				else
 					cursor = DefaultCursor;
@@ -203,11 +270,23 @@ public class FactorListener extends JTextPane
 		}
 	} //}}}
 
+	//{{{ EvalAction class
+	class EvalAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			eval(evt.getActionCommand());
+		}
+	} //}}}
+
 	//{{{ EnterAction class
 	class EnterAction extends AbstractAction
 	{
 		public void actionPerformed(ActionEvent evt)
 		{
+			setCaretPosition(getDocument().getLength());
+			replaceSelection("\n");
+
 			try
 			{
 				fireEvalEvent(getLine());
@@ -216,6 +295,52 @@ public class FactorListener extends JTextPane
 			{
 				e.printStackTrace();
 			}
+		}
+	} //}}}
+
+	//{{{ BackspaceAction class
+	class BackspaceAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			if(getSelectionStart() != getSelectionEnd())
+			{
+				replaceSelection("");
+				return;
+			}
+
+			int caret = getCaretPosition();
+			if(caret == cmdStart)
+			{
+				getToolkit().beep();
+				return;
+			}
+
+			try
+			{
+				getDocument().remove(caret - 1,1);
+			}
+			catch(BadLocationException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	} //}}}
+
+	//{{{ HomeAction class
+	class HomeAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			setCaretPosition(cmdStart);
+		}
+	} //}}}
+
+	//{{{ DummyAction class
+	class DummyAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
 		}
 	} //}}}
 }

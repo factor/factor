@@ -30,36 +30,23 @@ USE: kernel
 USE: lists
 USE: stack
 
-: 2apply ( x y [ code ] -- )
-    #! First applies the code to x, then to y.
-    #!
-    #! If the quotation compiles, this combinator compiles.
-    2dup >r >r nip call r> r> call ; inline interpret-only
+: slip ( quot x -- x )
+    >r call r> ; inline interpret-only
 
-: cleave ( x [ code1 ] [ code2 ] -- )
-    #! Executes each quotation, with x on top of the stack.
-    #!
-    #! If the quotation compiles, this combinator compiles.
-    >r over >r call r> r> call ; inline interpret-only
+: 2slip ( quot x y -- x y )
+    >r >r call r> r> ; inline interpret-only
 
-: dip ( a [ b ] -- b a )
-    #! Call b as if b was not present on the stack.
-    #!
-    #! If the quotation compiles, this combinator compiles.
-    swap >r call r> ; inline interpret-only
+: 3slip ( quot x y z -- x y z )
+    >r >r >r call r> r> r> ; inline interpret-only
 
-: 2dip ( a b [ c ] -- c a b )
-    #! Call c as if a and b were not present on the stack.
-    #!
-    #! If the quotation compiles, this combinator compiles.
-    -rot >r >r call r> r> ; inline interpret-only
+: keep ( a quot -- a )
+    #! Execute the quotation with a on the stack, and restore a
+    #! after the quotation returns.
+    over >r call r> ;
 
-: forever ( code -- )
-    #! The code is evaluated in an infinite loop. Typically, a
-    #! continuation is used to escape the infinite loop.
-    #!
-    #! This combinator will not compile.
-    dup dip forever ; interpret-only
+: apply ( code input -- code output )
+    #! Apply code to input.
+    swap dup >r call r> swap ;
 
 : cond ( x list -- )
     #! The list is of this form:
@@ -90,7 +77,80 @@ USE: stack
         2drop
     ] ifte ; interpret-only
 
-: interleave ( X list -- )
+: ifte* ( cond true false -- )
+    #! If the condition is not f, execute the 'true' quotation,
+    #! with the condition on the stack. Otherwise, pop the
+    #! condition and execute the 'false' quotation.
+    pick [ drop call ] [ nip nip call ] ifte ;
+    inline interpret-only
+
+: unless ( cond quot -- )
+    #! Execute a quotation only when the condition is f. The
+    #! condition is popped off the stack.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
+    [ ] swap ifte ; inline interpret-only
+
+: unless* ( cond quot -- )
+    #! If cond is f, pop it off the stack and evaluate the
+    #! quotation. Otherwise, leave cond on the stack.
+    #!
+    #! In order to compile, the quotation must consume one less
+    #! value than it produces.
+    over [ drop ] [ nip call ] ifte ; inline interpret-only
+
+: when ( cond quot -- )
+    #! Execute a quotation only when the condition is not f. The
+    #! condition is popped off the stack.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
+    [ ] ifte ; inline interpret-only
+
+: when* ( cond quot -- )
+    #! If the condition is true, it is left on the stack, and
+    #! the quotation is evaluated. Otherwise, the condition is
+    #! popped off the stack.
+    #!
+    #! In order to compile, the quotation must consume one more
+    #! value than it produces.
+    over [ call ] [ 2drop ] ifte ; inline interpret-only
+
+: forever ( quot -- )
+    #! The code is evaluated in an infinite loop. Typically, a
+    #! continuation is used to escape the infinite loop.
+    #!
+    #! This combinator will not compile.
+    dup slip forever ; interpret-only
+
+! DEPRECATED
+
+: 2apply ( x y quot -- )
+    #! First applies the code to x, then to y.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    2dup >r >r nip call r> r> call ; inline interpret-only
+
+: cleave ( x quot quot -- )
+    #! Executes each quotation, with x on top of the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    >r over >r call r> r> call ; inline interpret-only
+
+: dip ( a [ b ] -- b a )
+    #! Call b as if b was not present on the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    swap >r call r> ; inline interpret-only
+
+: 2dip ( a b [ c ] -- c a b )
+    #! Call c as if a and b were not present on the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    -rot >r >r call r> r> ; inline interpret-only
+
+: interleave ( X quot -- )
     #! Evaluate each element of the list with X on top of the
     #! stack. When done, X is popped off the stack.
     #!
@@ -104,45 +164,13 @@ USE: stack
         2drop
     ] ifte ; interpret-only
 
-: unless ( cond [ if false ] -- )
-    #! Execute a quotation only when the condition is f. The
-    #! condition is popped off the stack.
+: while ( cond body -- )
+    #! Evaluate cond. If it leaves t on the stack, evaluate
+    #! body, and recurse.
     #!
-    #! In order to compile, the quotation must consume as many
-    #! values as it produces.
-    [ ] swap ifte ; inline interpret-only
-
-: unless* ( cond [ if false ] -- )
-    #! If cond is f, pop it off the stack and evaluate the
-    #! quotation. Otherwise, leave cond on the stack.
-    #!
-    #! In order to compile, the quotation must consume one less
-    #! value than it produces.
-    over [ drop ] [ nip call ] ifte ; inline interpret-only
-
-: when ( cond [ if true ] -- )
-    #! Execute a quotation only when the condition is not f. The
-    #! condition is popped off the stack.
-    #!
-    #! In order to compile, the quotation must consume as many
-    #! values as it produces.
-    [ ] ifte ; inline interpret-only
-
-: when* ( cond [ code ] -- )
-    #! If the condition is true, it is left on the stack, and
-    #! the quotation is evaluated. Otherwise, the condition is
-    #! popped off the stack.
-    #!
-    #! In order to compile, the quotation must consume one more
-    #! value than it produces.
-    dupd [ drop ] ifte ; inline interpret-only
-
-: while ( [ P ] [ R ] -- )
-    #! Evaluate P. If it leaves t on the stack, evaluate R, and
-    #! recurse.
-    #!
-    #! In order to compile, the stack effect of P * ( X -- ) * R
-    #! must consume as many values as it produces.
+    #! In order to compile, the stack effect of
+    #! cond * ( X -- ) * body must consume as many values as
+    #! it produces.
     2dup >r >r >r call [
         r> call r> r> while
     ] [
