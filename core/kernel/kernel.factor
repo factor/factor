@@ -1,19 +1,25 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel.private ;
+USING: kernel.private slots.private math.private ;
 IN: kernel
 
-: version ( -- str ) "0.91" ; foldable
+DEFER: dip
+DEFER: 2dip
+DEFER: 3dip
 
 ! Stack stuff
-: roll ( x y z t -- y z t x ) >r rot r> swap ; inline
-
-: -roll ( x y z t -- t x y z ) swap >r -rot r> ; inline
+: 2over ( x y z -- x y z x y ) pick pick ; inline
 
 : clear ( -- ) { } set-datastack ;
 
 ! Combinators
-: call ( callable -- ) uncurry (call) ;
+GENERIC: call ( callable -- )
+
+GENERIC: execute ( word -- )
+
+GENERIC: ?execute ( word -- value )
+
+M: object ?execute ;
 
 DEFER: if
 
@@ -25,136 +31,215 @@ DEFER: if
 
 : if ( ? true false -- ) ? call ;
 
-: if* ( cond true false -- )
-    pick [ drop call ] [ 2nip call ] if ; inline
-
-: ?if ( default cond true false -- )
-    pick [ roll 2drop call ] [ 2nip call ] if ; inline
-
-: unless ( cond false -- )
+! Single branch
+: unless ( ? false -- )
     swap [ drop ] [ call ] if ; inline
 
-: unless* ( cond false -- )
-    over [ drop ] [ nip call ] if ; inline
-
-: when ( cond true -- )
+: when ( ? true -- )
     swap [ call ] [ drop ] if ; inline
 
-: when* ( cond true -- )
+! Anaphoric
+: if* ( ? true false -- )
+    pick [ drop call ] [ 2nip call ] if ; inline
+
+: when* ( ? true -- )
     over [ call ] [ 2drop ] if ; inline
 
-: slip ( quot x -- x ) >r call r> ; inline
+: unless* ( ? false -- )
+    over [ drop ] [ nip call ] if ; inline
 
-: 2slip ( quot x y -- x y ) >r >r call r> r> ; inline
+! Default
+: ?if ( default cond true false -- )
+    pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
 
-: 3slip ( quot x y z -- x y z ) >r >r >r call r> r> r> ; inline
+! Dippers.
+! Not declared inline because the compiler special-cases them
 
-: dip ( obj callable -- obj ) swap slip ; inline
+: dip ( x quot -- x ) swap [ call ] dip ;
 
-: keep ( x quot -- x ) over slip ; inline
+: 2dip ( x y quot -- x y ) swap [ dip ] dip ;
 
-: 2keep ( x y quot -- x y ) pick pick 2slip ; inline
+: 3dip ( x y z quot -- x y z ) swap [ 2dip ] dip ;
 
-: 3keep ( x y z quot -- x y z )
-    >r 3dup r> -roll 3slip ; inline
+: 4dip ( w x y z quot -- w x y z ) swap [ 3dip ] dip ; inline
 
-: 2apply ( x y quot -- ) tuck 2slip call ; inline
+! Keepers
+: keep ( x quot -- x ) over [ call ] dip ; inline
 
-: while ( pred body tail -- )
-    >r >r dup slip r> r> roll
-    [ >r tuck 2slip r> while ]
-    [ 2nip call ] if ; inline
+: 2keep ( x y quot -- x y ) [ 2dup ] dip 2dip ; inline
+
+: 3keep ( x y z quot -- x y z ) [ 3dup ] dip 3dip ; inline
+
+! Cleavers
+: bi ( x p q -- )
+    [ keep ] dip call ; inline
+
+: tri ( x p q r -- )
+    [ [ keep ] dip keep ] dip call ; inline
+
+! Double cleavers
+: 2bi ( x y p q -- )
+    [ 2keep ] dip call ; inline
+
+: 2tri ( x y p q r -- )
+    [ [ 2keep ] dip 2keep ] dip call ; inline
+
+! Triple cleavers
+: 3bi ( x y z p q -- )
+    [ 3keep ] dip call ; inline
+
+: 3tri ( x y z p q r -- )
+    [ [ 3keep ] dip 3keep ] dip call ; inline
+
+! Spreaders
+: bi* ( x y p q -- )
+    [ dip ] dip call ; inline
+
+: tri* ( x y z p q r -- )
+    [ [ 2dip ] dip dip ] dip call ; inline
+
+! Double spreaders
+: 2bi* ( w x y z p q -- )
+    [ 2dip ] dip call ; inline
+
+: 2tri* ( u v w x y z p q r -- )
+    [ 4dip ] 2dip 2bi* ; inline
+
+! Appliers
+: bi@ ( x y quot -- )
+    dup bi* ; inline
+
+: tri@ ( x y z quot -- )
+    dup dup tri* ; inline
+
+! Double appliers
+: 2bi@ ( w x y z quot -- )
+    dup 2bi* ; inline
+
+: 2tri@ ( u v w x y z quot -- )
+    dup dup 2tri* ; inline
 
 ! Quotation building
-
 : 2curry ( obj1 obj2 quot -- curry )
     curry curry ; inline
 
 : 3curry ( obj1 obj2 obj3 quot -- curry )
     curry curry curry ; inline
 
-: curry* ( param obj quot -- obj curry )
+: with ( param obj quot -- obj curry )
     swapd [ swapd call ] 2curry ; inline
 
-: compose ( quot1 quot2 -- curry )
-    ! Not inline because this is treated as a primitive by
-    ! the compiler
-    [ slip call ] 2curry ;
+: prepose ( quot1 quot2 -- compose )
+    swap compose ; inline
 
-: 3compose ( quot1 quot2 quot3 -- curry )
-    [ 2slip slip call ] 3curry ; inline
+! Curried cleavers
+<PRIVATE
 
-! Object protocol
+: [curry] ( quot -- quot' ) [ curry ] curry ; inline
 
-GENERIC: delegate ( obj -- delegate )
+PRIVATE>
 
-M: object delegate drop f ;
+: bi-curry ( x p q -- p' q' ) [ [curry] ] bi@ bi ; inline
 
-GENERIC: set-delegate ( delegate tuple -- )
+: tri-curry ( x p q r -- p' q' r' ) [ [curry] ] tri@ tri ; inline
 
-GENERIC: hashcode* ( depth obj -- code )
+: bi-curry* ( x y p q -- p' q' ) [ [curry] ] bi@ bi* ; inline
 
-M: object hashcode* 2drop 0 ;
+: tri-curry* ( x y z p q r -- p' q' r' ) [ [curry] ] tri@ tri* ; inline
 
-: hashcode ( obj -- code ) 3 swap hashcode* ; inline
+: bi-curry@ ( x y q -- p' q' ) [curry] bi@ ; inline
 
-GENERIC: equal? ( obj1 obj2 -- ? )
-
-M: object equal? 2drop f ;
-
-: = ( obj1 obj2 -- ? )
-    2dup eq? [ 2drop t ] [ equal? ] if ; inline
-
-GENERIC: <=> ( obj1 obj2 -- n )
-
-GENERIC: clone ( obj -- cloned )
-
-M: object clone ;
-
-M: callstack clone (clone) ;
-
-! Tuple construction
-
-GENERIC# get-slots 1 ( tuple slots -- ... )
-
-GENERIC# set-slots 1 ( ... tuple slots -- )
-
-GENERIC: construct-empty ( class -- tuple )
-
-GENERIC: construct ( ... slots class -- tuple ) inline
-
-GENERIC: construct-boa ( ... class -- tuple )
-
-: construct-delegate ( delegate class -- tuple )
-    >r { set-delegate } r> construct ; inline
+: tri-curry@ ( x y z q -- p' q' r' ) [curry] tri@ ; inline
 
 ! Booleans
+UNION: boolean POSTPONE: t POSTPONE: f ;
 
-: not ( obj -- ? ) f eq? ; inline
+: >boolean ( obj -- ? ) [ t ] [ f ] if ; inline
 
-: >boolean ( obj -- ? ) t f ? ; inline
+: not ( obj -- ? ) [ f ] [ t ] if ; inline
 
 : and ( obj1 obj2 -- ? ) over ? ; inline
 
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
 
-: xor ( obj1 obj2 -- ? ) dup not swap ? ; inline
+: xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
 
-: both? ( x y quot -- ? ) 2apply and ; inline
+: both? ( x y quot -- ? ) bi@ and ; inline
 
-: either? ( x y quot -- ? ) 2apply or ; inline
+: either? ( x y quot -- ? ) bi@ or ; inline
 
-: compare ( obj1 obj2 quot -- n ) 2apply <=> ; inline
+: most ( x y quot -- z ) 2keep ? ; inline
 
-: most ( x y quot -- z )
-    >r 2dup r> call [ drop ] [ nip ] if ; inline
+! Loops
+: loop ( pred: ( -- ? ) -- )
+    [ call ] keep [ loop ] curry when ; inline recursive
+
+: do ( pred body -- pred body )
+    dup 2dip ; inline
+
+: while ( pred: ( -- ? ) body: ( -- ) -- )
+    swap do compose [ loop ] curry when ; inline
+
+: until ( pred: ( -- ? ) body: ( -- ) -- )
+    [ [ not ] compose ] dip while ; inline
+
+! Object protocol
+GENERIC: hashcode* ( depth obj -- code )
+
+M: object hashcode* 2drop 0 ; inline
+
+M: f hashcode* 2drop 31337 ; inline
+
+: hashcode ( obj -- code ) 3 swap hashcode* ; inline
+
+: identity-hashcode ( obj -- code )
+    dup tag 0 eq? [
+        dup tag 1 eq? [ drop 0 ] [
+            dup (identity-hashcode) dup 0 eq? [
+                drop dup compute-identity-hashcode
+                (identity-hashcode)
+            ] [ nip ] if
+        ] if
+    ] unless ; inline
+
+GENERIC: equal? ( obj1 obj2 -- ? )
+
+M: object equal? 2drop f ; inline
+
+TUPLE: identity-tuple ;
+
+M: identity-tuple equal? 2drop f ; inline
+
+M: identity-tuple hashcode* nip identity-hashcode ; inline
+
+: = ( obj1 obj2 -- ? )
+    2dup eq? [ 2drop t ] [
+        2dup both-fixnums? [ 2drop f ] [ equal? ] if
+    ] if ; inline
+
+GENERIC: clone ( obj -- cloned )
+
+M: object clone ; inline
+
+M: callstack clone (clone) ; inline
+
+! Tuple construction
+GENERIC: new ( class -- tuple )
+
+GENERIC: boa ( ... class -- tuple )
 
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded
-: throw ( error -- * ) 5 getenv [ die ] or curry (throw) ;
+GENERIC: throw ( error -- * )
+
+ERROR: assert got expect ;
+
+: assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;
 
 <PRIVATE
 
 : declare ( spec -- ) drop ;
+
+: do-primitive ( number -- ) "Improper primitive call" throw ;
 
 PRIVATE>

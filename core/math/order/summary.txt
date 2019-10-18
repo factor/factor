@@ -1,0 +1,1 @@
+Generic protocol for totally-ordered objects

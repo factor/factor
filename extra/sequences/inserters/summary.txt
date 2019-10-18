@@ -1,0 +1,1 @@
+Direct the output of map-as, filter-as, etc. combinators into existing growable sequences

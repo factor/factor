@@ -1,0 +1,40 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Recover lost password: step 3 of 4</t:title>
+
+	<p>Choose a new password for your account.</p>
+
+	<t:form t:action="$realm/recover-3">
+
+		<table>
+
+			<t:hidden t:name="username" />
+			<t:hidden t:name="ticket" />
+
+			<tr>
+				<th class="field-label">Password:</th>
+				<td><t:password t:name="new-password" /></td>
+			</tr>
+
+			<tr>
+				<th class="field-label">Verify password:</th>
+				<td><t:password t:name="verify-password" /></td>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td>Enter your password twice to ensure it is correct.</td>
+			</tr>
+
+		</table>
+
+		<p>
+			<button type="submit">Set password</button>
+			<t:validation-errors />
+		</p>
+
+	</t:form>
+
+</t:chloe>

@@ -1,96 +1,82 @@
 /* This file is linked into the runtime for the sole purpose
  * of testing FFI code. */
-#include <stdio.h>
-#include "master.h"
 #include "ffi_test.h"
+
+#include <assert.h>
+#include <string.h>
 
 void ffi_test_0(void)
 {
-	printf("ffi_test_0()\n");
 }
 
 int ffi_test_1(void)
 {
-	printf("ffi_test_1()\n");
 	return 3;
 }
 
 int ffi_test_2(int x, int y)
 {
-	printf("ffi_test_2(%d,%d)\n",x,y);
 	return x + y;
 }
 
 int ffi_test_3(int x, int y, int z, int t)
 {
-	printf("ffi_test_3(%d,%d,%d,%d)\n",x,y,z,t);
 	return x + y + z * t;
 }
 
 float ffi_test_4(void)
 {
-	printf("ffi_test_4()\n");
 	return 1.5;
 }
 
 double ffi_test_5(void)
 {
-	printf("ffi_test_5()\n");
 	return 1.5;
 }
 
 double ffi_test_6(float x, float y)
 {
-	printf("ffi_test_6(%f,%f)\n",x,y);
 	return x * y;
 }
 
 double ffi_test_7(double x, double y)
 {
-	printf("ffi_test_7(%f,%f)\n",x,y);
 	return x * y;
 }
 
 double ffi_test_8(double x, float y, double z, float t, int w)
 {
-	printf("ffi_test_8(%f,%f,%f,%f,%d)\n",x,y,z,t,w);
 	return x * y + z * t + w;
 }
 
 int ffi_test_9(int a, int b, int c, int d, int e, int f, int g)
 {
-	printf("ffi_test_9(%d,%d,%d,%d,%d,%d,%d)\n",a,b,c,d,e,f,g);
 	return a + b + c + d + e + f + g;
 }
 
 int ffi_test_10(int a, int b, double c, int d, float e, int f, int g, int h)
 {
-	printf("ffi_test_10(%d,%d,%f,%d,%f,%d,%d,%d)\n",a,b,c,d,e,f,g,h);
 	return a - b - c - d - e - f - g - h;
 }
 
 int ffi_test_11(int a, struct foo b, int c)
 {
-	printf("ffi_test_11(%d,{%d,%d},%d)\n",a,b.x,b.y,c);
 	return a * b.x + c * b.y;
 }
 
 int ffi_test_12(int a, int b, struct rect c, int d, int e, int f)
 {
-	printf("ffi_test_12(%d,%d,{%f,%f,%f,%f},%d,%d,%d)\n",a,b,c.x,c.y,c.w,c.h,d,e,f);
 	return a + b + c.x + c.y + c.w + c.h + d + e + f;
 }
 
 int ffi_test_13(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k)
 {
-	printf("ffi_test_13(%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)\n",a,b,c,d,e,f,g,h,i,j,k);
 	return a + b + c + d + e + f + g + h + i + j + k;
 }
 
 struct foo ffi_test_14(int x, int y)
 {
 	struct foo r;
-	printf("ffi_test_14(%d,%d)\n",x,y);
 	r.x = x; r.y = y;
 	return r;
 }
@@ -117,13 +103,12 @@ struct tiny ffi_test_17(int x)
 	return r;
 }
 
-F_STDCALL int ffi_test_18(int x, int y, int z, int t)
+FACTOR_STDCALL(int) ffi_test_18(int x, int y, int z, int t)
 {
-	printf("ffi_test_18(%d,%d,%d,%d)\n",x,y,z,t);
 	return x + y + z * t;
 }
 
-F_STDCALL struct bar ffi_test_19(long x, long y, long z)
+FACTOR_STDCALL(struct bar) ffi_test_19(long x, long y, long z)
 {
 	struct bar r;
 	r.x = x; r.y = y; r.z = z;
@@ -134,8 +119,6 @@ void ffi_test_20(double x1, double x2, double x3,
 	double y1, double y2, double y3,
 	double z1, double z2, double z3)
 {
-	printf("ffi_test_20(%f,%f,%f,%f,%f,%f,%f,%f,%f)\n",
-		x1, x2, x3, y1, y2, y3, z1, z2, z3);
 }
 
 long long ffi_test_21(long x, long y)
@@ -145,7 +128,6 @@ long long ffi_test_21(long x, long y)
 
 long ffi_test_22(long x, long long y, long long z)
 {
-	printf("ffi_test_22(%ld,%lld,%lld)\n",x,y,z);
 	return x + y / z;
 }
 
@@ -224,7 +206,15 @@ struct test_struct_7 ffi_test_30(void)
 	return s;
 }
 
-void ffi_test_31(int x0, int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8, int x9, int x10, int x11, int x12, int x13, int x14, int x15, int x16, int x17, int x18, int x19, int x20, int x21, int x22, int x23, int x24, int x25, int x26, int x27, int x28, int x29, int x30, int x31, int x32, int x33, int x34, int x35, int x36, int x37, int x38, int x39, int x40, int x41) { }
+int ffi_test_31(int x0, int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8, int x9, int x10, int x11, int x12, int x13, int x14, int x15, int x16, int x17, int x18, int x19, int x20, int x21, int x22, int x23, int x24, int x25, int x26, int x27, int x28, int x29, int x30, int x31, int x32, int x33, int x34, int x35, int x36, int x37, int x38, int x39, int x40, int x41)
+{
+	return x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10 + x11 + x12 + x13 + x14 + x15 + x16 + x17 + x18 + x19 + x20 + x21 + x22 + x23 + x24 + x25 + x26 + x27 + x28 + x29 + x30 + x31 + x32 + x33 + x34 + x35 + x36 + x37 + x38 + x39 + x40 + x41;
+}
+
+float ffi_test_31_point_5(float x0, float x1, float x2, float x3, float x4, float x5, float x6, float x7, float x8, float x9, float x10, float x11, float x12, float x13, float x14, float x15, float x16, float x17, float x18, float x19, float x20, float x21, float x22, float x23, float x24, float x25, float x26, float x27, float x28, float x29, float x30, float x31, float x32, float x33, float x34, float x35, float x36, float x37, float x38, float x39, float x40, float x41)
+{
+	return x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10 + x11 + x12 + x13 + x14 + x15 + x16 + x17 + x18 + x19 + x20 + x21 + x22 + x23 + x24 + x25 + x26 + x27 + x28 + x29 + x30 + x31 + x32 + x33 + x34 + x35 + x36 + x37 + x38 + x39 + x40 + x41;
+}
 
 double ffi_test_32(struct test_struct_8 x, int y)
 {
@@ -245,3 +235,97 @@ double ffi_test_35(struct test_struct_11 x, int y)
 {
 	return (x.x + x.y) * y;
 }
+
+double ffi_test_36(struct test_struct_12 x)
+{
+	return x.x;
+}
+
+static int global_var;
+
+void ffi_test_36_point_5(void)
+{
+	global_var = 0;
+}
+
+int ffi_test_37(int (*f)(int, int, int))
+{
+	global_var = f(global_var,global_var * 2,global_var * 3);
+	return global_var;
+}
+
+unsigned long long ffi_test_38(unsigned long long x, unsigned long long y)
+{
+	return x * y;
+}
+
+int ffi_test_39(long a, long b, struct test_struct_13 s)
+{
+	assert(a == b);
+	return s.x1 + s.x2 + s.x3 + s.x4 + s.x5 + s.x6;
+}
+
+struct test_struct_14 ffi_test_40(double x1, double x2)
+{
+	struct test_struct_14 retval;
+	retval.x1 = x1;
+	retval.x2 = x2;
+	return retval;
+}
+
+struct test_struct_12 ffi_test_41(int a, double x)
+{
+	struct test_struct_12 retval;
+	retval.a = a;
+	retval.x = x;
+	return retval;
+}
+
+struct test_struct_15 ffi_test_42(float x, float y)
+{
+	struct test_struct_15 retval;
+	retval.x = x;
+	retval.y = y;
+	return retval;
+}
+
+struct test_struct_16 ffi_test_43(float x, int a)
+{
+	struct test_struct_16 retval;
+	retval.x = x;
+	retval.a = a;
+	return retval;
+}
+
+struct test_struct_14 ffi_test_44(void)
+{
+	struct test_struct_14 retval;
+	retval.x1 = 1.0;
+	retval.x2 = 2.0;
+	return retval;
+}
+
+/* C99 features */
+#ifndef _MSC_VER
+
+_Complex float ffi_test_45(int x)
+{
+	return x;
+}
+
+_Complex double ffi_test_46(int x)
+{
+	return x;
+}
+
+_Complex float ffi_test_47(_Complex float x, _Complex double y)
+{
+	return x + 2 * y;
+}
+
+short ffi_test_48(struct bool_field_test x)
+{
+	return x.parents;
+}
+
+#endif

@@ -1,0 +1,60 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Edit User</t:title>
+
+	<t:form t:action="$user-admin/edit" t:for="username" autocomplete="off">
+
+	<table>
+	
+	<tr>
+		<th class="field-label">User name:</th>
+		<td><t:label t:name="username" /></td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">Real name:</th>
+		<td><t:field t:name="realname" /></td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">New password:</th>
+		<td><t:password t:name="new-password" /></td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">Verify:</th>
+		<td><t:password t:name="verify-password" /></td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">E-mail:</th>
+		<td><t:field t:name="email" /></td>
+	</tr>
+	
+	<tr>
+		<th class="field-label big-field-label">Capabilities:</th>
+		<td>
+			<t:each t:name="capabilities">
+				<t:checkbox t:name="@value" t:label="@value" /><br/>
+			</t:each>
+		</td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">Profile:</th>
+		<td><t:inspector t:name="profile" /></td>
+	</tr>
+
+	</table>
+	
+	<p>
+		<button type="submit" >Update</button>
+		<t:validation-errors />
+	</p>
+
+	</t:form>
+
+	<t:button t:action="$user-admin/delete" t:for="username">Delete</t:button>
+</t:chloe>

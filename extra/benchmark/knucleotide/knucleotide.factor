@@ -1,6 +1,6 @@
-USING: kernel io io.files splitting strings
+USING: kernel locals io io.files splitting strings io.encodings.ascii
        hashtables sequences assocs math namespaces prettyprint
-       math.parser combinators arrays sorting ;
+       math.parser combinators arrays sorting unicode.case ;
 
 IN: benchmark.knucleotide
 
@@ -8,8 +8,8 @@ IN: benchmark.knucleotide
     swap >float number>string
     "." split1 rot
     over length over <
-    [ CHAR: 0 pad-right ] 
-    [ head ] if "." swap 3append ;
+    [ CHAR: 0 pad-tail ] 
+    [ head ] if "." glue ;
 
 : discard-lines ( -- )
     readln
@@ -21,15 +21,12 @@ IN: benchmark.knucleotide
     CHAR: \n swap remove >upper ;
 
 : tally ( x exemplar -- b )
-    clone tuck
-    [
-      [ [ 1+ ] [ 1 ] if* ] change-at
-    ] curry each ;
+    clone [ [ inc-at ] curry each ] keep ;
 
 : small-groups ( x n -- b )
     swap
-    [ length swap - 1+ ] 2keep
-    [ >r over + r> subseq ] 2curry map ;
+    [ length swap - 1 + iota ] 2keep
+    [ [ over + ] dip subseq ] 2curry map ;
 
 : handle-table ( inputs n -- )
     small-groups
@@ -42,11 +39,11 @@ IN: benchmark.knucleotide
     ] each
     drop ;
 
-: handle-n ( inputs x -- )
-    tuck length
-    small-groups H{ } tally
-    at [ 0 ] unless*
-    number>string 8 CHAR: \s pad-right write ;
+:: handle-n ( inputs x -- )
+    inputs x length small-groups :> groups
+    groups H{ } tally :> b
+    x b at [ 0 ] unless*
+    number>string 8 CHAR: \s pad-tail write ;
 
 : process-input ( input -- )
     dup 1 handle-table nl
@@ -56,9 +53,8 @@ IN: benchmark.knucleotide
     drop ;
 
 : knucleotide ( -- )
-    "extra/benchmark/knucleotide/knucleotide-input.txt" resource-path
-    <file-reader>
-    [ read-input ] with-stream
+    "resource:extra/benchmark/knucleotide/knucleotide-input.txt"
+    ascii [ read-input ] with-file-reader
     process-input ;
 
 MAIN: knucleotide

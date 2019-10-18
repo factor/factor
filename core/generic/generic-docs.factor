@@ -1,52 +1,56 @@
-USING: help.markup help.syntax generic.math generic.standard
-words classes definitions kernel alien combinators sequences 
-math ;
+USING: help.markup help.syntax words classes classes.algebra
+definitions kernel alien sequences math quotations
+generic.single generic.standard generic.hook generic.math
+combinators prettyprint effects ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
-"Consider the case where a generic word has methods on two classes, say A and B, which share a non-empty intersection. If the generic word is called on an object which is an instance of both A and B, a choice of method must be made. If A is a subclass of B, the method for A to be called; this makes sense, because we're defining general behavior for instances of B, and refining it for instances of A. Conversely, if B is a subclass of A, then we expect B's method to be called. However, if neither is a subclass of the other, we have an ambiguous situation and undefined behavior will result. Either the method for A or B will be called, and there is no way to predict ahead of time."
-$nl
-"The generic word system linearly orders all the methods on a generic word by their class. Conceptually, method dispatch is implemented by testing the object against the predicate word for every class, in order. If methods are defined on overlapping classes, this order will fail to be unique and the problem described above can occur."
+"Conceptually, method dispatch is implemented by testing the object against the predicate word for every class, in linear order (" { $link "class-linearization" } ")."
 $nl
 "Here is an example:"
 { $code
-    "GENERIC: explain"
-    "M: number explain drop \"an integer\" print ;"
-    "M: sequence explain drop \"a sequence\" print ;"
+    "GENERIC: explain ( object -- )"
     "M: object explain drop \"an object\" print ;"
+    "M: generic explain drop \"a generic word\" print ;"
+    "M: class explain drop \"a class word\" print ;"
 }
-"Neither " { $link number } " nor " { $link sequence } " are subclasses of each other, yet their intersection is the non-empty " { $link integer } " class. As a result, the outcome of calling " { $snippet "bar" } " with an " { $link integer } " on the stack is undefined - either one of the two methods may be called. This situation can lead to subtle bugs. To avoid it, explicitly disambiguate the method order by defining a method on the intersection. If in this case we want integers to behave like numbers, we would also define:"
-{ $code "M: integer explain drop \"an integer\" print ;" }
-"On the other hand, if we want integers to behave like sequences here, we could define:"
-{ $code "M: integer explain drop \"a sequence\" print ;" }
-"The " { $link order } " word can be useful to clarify method dispatch order."
-{ $subsection order } ;
+"The linear order is the following, from least-specific to most-specific:"
+{ $code "{ object generic class }" }
+"Neither " { $link class } " nor " { $link generic } " are subclasses of each other, and their intersection is non-empty. Calling " { $snippet "explain" } " with a word on the stack that is both a class and a generic word will print " { $snippet "a class word" } " because " { $link class } " is more specific than " { $link generic } " in the class linearization order. (One example of a word which is both a class and a generic word is the class of classes, " { $link class } ", which is also a word to get the class of an object.)"
+$nl
+"The " { $link order } " word can be useful to clarify method dispatch order:"
+{ $subsections order } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"
 "In most cases, generic words and methods are defined at parse time with " { $link POSTPONE: GENERIC: } " (or some other parsing word) and " { $link POSTPONE: M: } "."
 $nl
-"Sometimes, generic words need to be inspected defined at run time; words for performing these tasks are found in the " { $vocab-link "generic" } " vocabulary."
+"Sometimes, generic words need to be inspected or defined at run time; words for performing these tasks are found in the " { $vocab-link "generic" } " vocabulary."
 $nl
 "The set of generic words is a class which implements the " { $link "definition-protocol" } ":"
-{ $subsection generic }
-{ $subsection generic? }
+{ $subsections
+    generic
+    generic?
+}
 "New generic words can be defined:"
-{ $subsection define-generic }
-{ $subsection define-simple-generic }
-"Methods are tuples:"
-{ $subsection <method> }
+{ $subsections
+    define-generic
+    define-simple-generic
+}
 "Methods can be added to existing generic words:"
-{ $subsection define-method }
+{ $subsections create-method }
 "Method definitions can be looked up:"
-{ $subsection method }
-{ $subsection methods }
+{ $subsections method }
+"Finding the most specific method for an object:"
+{ $subsections effective-method }
 "A generic word contains methods; the list of methods specializing on a class can also be obtained:"
-{ $subsection implementors }
-"Low-level words which rebuilds the generic word after methods are added or removed, or the method combination is changed:"
-{ $subsection make-generic }
-{ $subsection ?make-generic }
-"A " { $emphasis "method specifier" } " refers to a method and implements the " { $link "definition-protocol" } ":"
-{ $subsection method-spec } ;
+{ $subsections implementors }
+"Low-level word which rebuilds the generic word after methods are added or removed, or the method combination is changed:"
+{ $subsections make-generic }
+"Low-level method constructor:"
+{ $subsections <method> }
+"Methods may be pushed on the stack with a literal syntax:"
+{ $subsections POSTPONE: M\ }
+{ $see-also "see" } ;
 
 ARTICLE: "method-combination" "Custom method combination"
 "Abstractly, a generic word can be thought of as a big chain of type conditional tests applied to the top of the stack, with methods as the bodies of each test. The " { $emphasis "method combination" } " is this control flow glue between the set of methods, and several aspects of it can be customized:"
@@ -61,39 +65,48 @@ ARTICLE: "method-combination" "Custom method combination"
     { { $link POSTPONE: HOOK: } { $link hook-combination } }
     { { $link POSTPONE: MATH: } { $link math-combination } }
 }
-"Developing a custom method combination requires that a parsing word calling " { $link define-generic } " be defined; additionally, it is a good idea to implement the definition protocol words " { $link definer } " and " { $link synopsis* } " on the class of words having this method combination, to properly support developer tools."
+"Developing a custom method combination requires that a parsing word calling " { $link define-generic } " be defined; additionally, it is a good idea to implement the " { $link "definition-protocol" } " on the class of words having this method combination, to properly support developer tools."
 $nl
 "The combination quotation passed to " { $link define-generic } " has stack effect " { $snippet "( word -- quot )" } ". It's job is to call various introspection words, including at least obtaining the set of methods defined on the generic word, then combining these methods in some way to produce a quotation."
-$nl
-"Method combination utilities:"
-{ $subsection single-combination }
-{ $subsection class-predicates }
-{ $subsection simplify-alist }
-{ $subsection math-upgrade }
-{ $subsection object-method }
-{ $subsection error-method }
-"More quotation construction utilities can be found in " { $link "quotations" } " and " { $link "combinators-quot" } "."
 { $see-also "generic-introspection" } ;
 
+ARTICLE: "call-next-method" "Calling less-specific methods"
+"If a generic word is called with an object and multiple methods specialize on classes that this object is an instance of, usually the most specific method is called (" { $link "method-order" } ")."
+$nl
+"Less-specific methods can be called directly:"
+{ $subsections POSTPONE: call-next-method }
+"A lower-level word which the above expands into:"
+{ $subsections (call-next-method) }
+"To look up the next applicable method reflectively:"
+{ $subsections next-method }
+"Errors thrown by improper calls to " { $link POSTPONE: call-next-method } ":"
+{ $subsections
+    inconsistent-next-method
+    no-next-method
+} ;
+
 ARTICLE: "generic" "Generic words and methods"
-"A " { $emphasis "generic word" } " is composed of zero or more " { $emphasis "methods" } " together with a " { $emphasis "method combination" } ". A method " { $emphasis "specializes" } " on a class; when a generic word executed, the method combination chooses the most appropriate method and calls its definition."
+"A " { $emphasis "generic word" } " is composed of zero or more " { $emphasis "methods" } " together with a " { $emphasis "method combination" } ". A method " { $emphasis "specializes" } " on a class; when a generic word is executed, the method combination chooses the most appropriate method and calls its definition."
 $nl
 "A generic word behaves roughly like a long series of class predicate conditionals in a " { $link cond } " form, however methods can be defined in independent source files, reducing coupling and increasing extensibility. The method combination determines which object the generic word will " { $emphasis "dispatch" } " on; this could be the top of the stack, or some other value."
 $nl
 "Generic words which dispatch on the object at the top of the stack:"
-{ $subsection POSTPONE: GENERIC: }
+{ $subsections POSTPONE: GENERIC: }
 "A method combination which dispatches on a specified stack position:"
-{ $subsection POSTPONE: GENERIC# }
+{ $subsections POSTPONE: GENERIC# }
 "A method combination which dispatches on the value of a variable at the time the generic word is called:"
-{ $subsection POSTPONE: HOOK: }
+{ $subsections POSTPONE: HOOK: }
 "A method combination which dispatches on a pair of stack values, which must be numbers, and upgrades both to the same type of number:"
-{ $subsection POSTPONE: MATH: }
+{ $subsections POSTPONE: MATH: }
 "Method definition:"
-{ $subsection POSTPONE: M: }
-"Generic words must declare their stack effect in order to compile. See " { $link "effect-declaration" } "."
-{ $subsection "method-order" }
-{ $subsection "generic-introspection" }
-{ $subsection "method-combination" }
+{ $subsections POSTPONE: M: }
+"Generic words must declare their stack effect in order to compile. See " { $link "effects" } "."
+{ $subsections
+    "method-order"
+    "call-next-method"
+    "method-combination"
+    "generic-introspection"
+}
 "Generic words specialize behavior based on the class of an object; sometimes behavior needs to be specialized on the object's " { $emphasis "structure" } "; this is known as " { $emphasis "pattern matching" } " and is implemented in the " { $vocab-link "match" } " vocabulary." ;
 
 ABOUT: "generic"
@@ -108,42 +121,26 @@ HELP: make-generic
 { $description "Regenerates the definition of a generic word by applying the method combination to the set of defined methods." }
 $low-level-note ;
 
-HELP: ?make-generic
-{ $values { "word" generic } }
-{ $description "Regenerates the definition of a generic word, unless bootstrap is in progress, in which case nothing is done. This avoids regenerating generic words multiple times during bootstrap as methods are defined. Instead, all generic words are built once at the end of the process, resulting in a performance improvement." }
-$low-level-note ;
-
-HELP: init-methods
-{ $values { "word" word } }
-{ $description "Prepare to define a generic word." } ;
-
 HELP: define-generic
-{ $values { "word" word } { "combination" "a method combination" } }
+{ $values { "word" word } { "combination" "a method combination" } { "effect" effect } }
 { $description "Defines a generic word. A method combination is an object which responds to the " { $link perform-combination } " generic word." }
 { $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." } ;
 
-HELP: method-spec
-{ $class-description "The class of method specifiers, which are two-element arrays consisting of a class word followed by a generic word." }
-{ $examples { $code "{ fixnum + }" "{ editor draw-gadget* }" } } ;
+HELP: M\
+{ $syntax "M\\ class generic" }
+{ $class-description "Pushes a method on the stack." }
+{ $examples { $code "M\\ fixnum + see" } { $code "USING: ui.gadgets ui.gadgets.editors ;" "M\\ editor draw-gadget* edit" } } ;
 
 HELP: method
-{ $values { "class" class } { "generic" generic } { "method/f" "a " { $link method } " or " { $link f } } }
+{ $values { "class" class } { "generic" generic } { "method/f" { $maybe method } } }
 { $description "Looks up a method definition." }
-{ $class-description "Instances of this class are methods. A method consists of a quotation together with a source location where it was defined." } ;
+{ $class-description "The class of method bodies, which are words with special word properties set." } ;
 
-{ method method-def method-loc define-method POSTPONE: M: } related-words
+{ method create-method POSTPONE: M: } related-words
 
 HELP: <method>
-{ $values { "def" "a quotation" } { "method" "a new method definition" } }
-{ $description "Creates a new  "{ $link method } " instance." } ;
-
-HELP: sort-methods
-{ $values { "assoc" "an assoc mapping classes to methods" } { "newassoc" "an association list mapping classes to quotations" } }
-{ $description "Outputs a sequence of pairs, where the first element of each pair is a class and the second element is the corresponding method quotation. The methods are sorted by class order; see " { $link sort-classes } "." } ;
-
-HELP: methods
-{ $values { "word" generic } { "assoc" "an association list mapping classes to quotations" } }
-{ $description "Outputs a sequence of pairs, where the first element of each pair is a class and the second element is the corresponding method quotation. The methods are sorted by class order; see " { $link sort-classes } "." } ;
+{ $values { "class" class } { "generic" generic } { "method" "a new method definition" } }
+{ $description "Creates a new method." } ;
 
 HELP: order
 { $values { "generic" generic } { "seq" "a sequence of classes" } }
@@ -152,21 +149,37 @@ HELP: order
 HELP: check-method
 { $values { "class" class } { "generic" generic } }
 { $description "Asserts that " { $snippet "class" } " is a class word and " { $snippet "generic" } " is a generic word, throwing a " { $link check-method } " error if the assertion fails." }
-{ $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link define-method } " is given an invalid class or generic word." } ;
+{ $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link create-method } " is given an invalid class or generic word." } ;
 
 HELP: with-methods
-{ $values { "word" generic } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
+{ $values { "class" class } { "generic" generic } { "quot" { $quotation "( methods -- )" } } }
 { $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
 $low-level-note ;
 
-HELP: define-method
-{ $values { "method" "an instance of " { $link method } } { "class" class } { "generic" generic } }
-{ $description "Defines a method. This is the runtime equivalent of " { $link POSTPONE: M: } "." } ;
+HELP: create-method
+{ $values { "class" class } { "generic" generic } { "method" method } }
+{ $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
+{ $notes "To define a method, pass the output value to " { $link define } "." } ;
 
-HELP: implementors
-{ $values { "class" class } { "seq" "a sequence of generic words" } }
-{ $description "Finds all generic words in the dictionary implementing methods for this class." } ;
+{ sort-classes order } related-words
 
-HELP: forget-methods
-{ $values { "class" class } }
-{ $description "Remove all method definitions which specialize on the class." } ;
+HELP: (call-next-method)
+{ $values { "method" method } }
+{ $description "Low-level word implementing " { $link POSTPONE: call-next-method } "." }
+{ $notes "In most cases, " { $link POSTPONE: call-next-method } " should be used instead." } ;
+
+HELP: no-next-method
+{ $error-description "Thrown by " { $link POSTPONE: call-next-method } " if the current method is already the least specific method." }
+{ $examples
+    "The following code throws this error:"
+    { $code
+        "GENERIC: error-test ( object -- )"
+        ""
+        "M: number error-test 3 + call-next-method ;"
+        ""
+        "M: integer error-test recip call-next-method ;"
+        ""
+        "123 error-test"
+    }
+    "This results in the method on " { $link integer } " being called, which then calls the method on " { $link number } ". The latter then calls " { $link POSTPONE: call-next-method } ", however there is no method less specific than the method on " { $link number } " and so an error is thrown."
+} ;

@@ -1,6 +1,6 @@
-IN: turing
 USING: arrays assocs io kernel math namespaces
-prettyprint sequences strings vectors words ;
+prettyprint sequences strings vectors words accessors ;
+IN: turing
 
 ! A turing machine simulator.
 
@@ -55,16 +55,16 @@ SYMBOL: tape
 : turing-step ( -- )
     #! Do one step of the turing machine.
     next-state
-    dup state-sym set-sym
-    dup state-dir position [ + ] change
-    state-next state set ;
+    dup sym>> set-sym
+    dup dir>> position [ + ] change
+    next>> state set ;
 
-: c
+: c ( -- )
     #! Print current turing machine state.
     state get .
     tape get .
     2 position get 2 * + CHAR: \s <string> write "^" print ;
 
-: n
+: n ( -- )
     #! Do one step and print new state.
     turing-step c ;

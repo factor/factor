@@ -1,0 +1,1 @@
+H{ "foo" => 1 "bar" => 2 } style literal syntax

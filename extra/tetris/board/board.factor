@@ -1,56 +1,55 @@
-! Copyright (C) 2006, 2007 Alex Chapman
+! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences arrays tetris.piece math ;
+USING: accessors arrays kernel math sequences tetris.piece ;
 IN: tetris.board
 
-TUPLE: board width height rows ;
+TUPLE: board { width integer } { height integer } rows ;
 
 : make-rows ( width height -- rows )
-    [ drop f <array> ] curry* map ;
+    iota [ drop f <array> ] with map ;
 
 : <board> ( width height -- board )
-    2dup make-rows board construct-boa ;
+    2dup make-rows board boa ;
 
 #! A block is simply an array of form { x y } where { 0 0 } is the top-left of
 #! the tetris board, and { 9 19 } is the bottom right on a 10x20 board.
 
 : board@block ( board block -- n row )
-    [ second swap board-rows nth ] keep first swap ;
+    [ second swap rows>> nth ] keep first swap ;
 
-: board-set-block ( board block colour -- ) -rot board@block set-nth ;
+: set-block ( board block colour -- ) -rot board@block set-nth ;
   
-: board-block ( board block -- colour ) board@block nth ;
+: block ( board block -- colour ) board@block nth ;
 
-: block-free? ( board block -- ? ) board-block not ;
+: block-free? ( board block -- ? ) block not ;
 
 : block-in-bounds? ( board block -- ? )
-    [ first swap board-width bounds-check? ] 2keep
-    second swap board-height bounds-check? and ;
+    [ first swap width>> iota bounds-check? ]
+    [ second swap height>> iota bounds-check? ] 2bi and ;
 
 : location-valid? ( board block -- ? )
     2dup block-in-bounds? [ block-free? ] [ 2drop f ] if ;
 
 : piece-valid? ( board piece -- ? )
-    piece-blocks [ location-valid? ] curry* all? ;
+    piece-blocks [ location-valid? ] with all? ;
 
 : row-not-full? ( row -- ? ) f swap member? ;
 
-: add-row ( board -- )
-    dup board-rows over board-width f <array>
-    add* swap set-board-rows ;
+: add-row ( board -- board )
+    dup rows>> over width>> f <array> prefix >>rows ;
 
 : top-up-rows ( board -- )
-    dup board-height over board-rows length = [
+    dup height>> over rows>> length = [
         drop
     ] [
-        dup add-row top-up-rows
+        add-row top-up-rows
     ] if ;
 
-: remove-full-rows ( board -- )
-    dup board-rows [ row-not-full? ] subset swap set-board-rows ;
+: remove-full-rows ( board -- board )
+    [ [ row-not-full? ] filter ] change-rows ;
 
 : check-rows ( board -- n )
     #! remove full rows, then add blank ones at the top, returning the number
     #! of rows removed (and added)
-    dup remove-full-rows dup board-height over board-rows length - >r top-up-rows r> ;
+    remove-full-rows dup height>> over rows>> length - swap top-up-rows ;
 

@@ -1,4 +1,4 @@
-USING: classes kernel sequences vocabs math ;
+USING: classes classes.tuple kernel sequences vocabs math ;
 IN: benchmark.dispatch1
 
 GENERIC: g ( obj -- obj )
@@ -65,10 +65,10 @@ TUPLE: x30 ;
 M: x30 g ;
 
 : my-classes ( -- seq )
-    "benchmark.dispatch1" words [ tuple-class? ] subset ;
+    "benchmark.dispatch1" words [ tuple-class? ] filter ;
 
 : a-bunch-of-objects ( -- seq )
-    my-classes [ construct-empty ] map ;
+    my-classes [ new ] map ;
 
 : dispatch-benchmark ( -- )
     1000000 a-bunch-of-objects

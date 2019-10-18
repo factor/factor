@@ -1,7 +1,10 @@
-CFLAGS += -DWINDOWS -mno-cygwin
+CFLAGS += -mno-cygwin
 LIBS = -lm
 PLAF_DLL_OBJS += vm/os-windows.o
+SHARED_FLAG = -shared
 EXE_EXTENSION=.exe
+CONSOLE_EXTENSION=.com
 DLL_EXTENSION=.dll
-LINKER = $(CC) -shared -mno-cygwin -o 
+SHARED_DLL_EXTENSION=.dll
+LINKER = $(CPP) -shared -mno-cygwin -o 
 LINK_WITH_ENGINE = -l$(DLL_PREFIX)factor$(DLL_SUFFIX)

@@ -1,0 +1,1 @@
+Delay models update a fixed period of time after the underlying model changes

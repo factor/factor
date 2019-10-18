@@ -1,0 +1,60 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:atom t:href="$blogs/post.atom" t:rest="id">
+		<t:label t:name="author" />: <t:label t:name="title" />
+	</t:atom>
+
+	<t:atom t:href="$blogs/by.atom" t:rest="author">
+		Recent Posts by <t:label t:name="author" />
+	</t:atom>
+
+	<t:title> <t:label t:name="author" />: <t:label t:name="title" /> </t:title>
+
+	<p class="posting-body">
+		<t:farkup t:name="content" />
+	</p>
+
+	<div class="posting-footer">
+		Post by
+		<t:a t:href="$blogs/" t:rest="author">
+			<t:label t:name="author" />
+		</t:a>
+		on
+		<t:label t:name="date" />
+		|
+		<t:a t:href="$blogs/edit-post" t:rest="id">Edit Post</t:a>
+		|
+		<t:button t:action="$blogs/delete-post" t:for="id,author" class="link-button link">Delete Post</t:button>
+	</div>
+
+	<t:bind-each t:name="comments">
+		<hr/>
+
+		<p class="comment-header">
+			<a name="@id">Comment by <t:label t:name="author" /> on <t:label t:name="date" />:</a>
+		</p>
+
+		<p class="posting-body">
+			<t:farkup t:name="content" t:no-follow="true" t:disable-images="true" />
+		</p>
+		
+		<t:button t:action="$blogs/delete-comment" t:for="id,parent" class="link-button link">Delete Comment</t:button>
+
+	</t:bind-each>
+
+	<t:bind t:name="new-comment">
+
+		<h2>New Comment</h2>
+
+		<div class="post-form">
+			<t:form t:action="$blogs/new-comment" t:for="parent">
+				<p><t:textarea t:name="content" t:rows="20" t:cols="60" /></p>
+				<p><input type="SUBMIT" value="Done" /></p>
+			</t:form>
+		</div>
+
+	</t:bind>
+
+</t:chloe>

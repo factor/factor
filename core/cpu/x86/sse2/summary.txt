@@ -1,1 +1,0 @@
-SSE2 floating point intrinsics for Pentium 4 and above

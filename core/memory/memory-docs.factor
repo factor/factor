@@ -1,69 +1,21 @@
-USING: help.markup help.syntax debugger sequences kernel ;
+USING: help.markup help.syntax debugger sequences kernel
+quotations math ;
 IN: memory
 
-ARTICLE: "memory" "Object memory"
-"You can query memory status:"
-{ $subsection data-room }
-{ $subsection code-room }
-"There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
-{ $subsection each-object }
-{ $subsection instances }
-"You can check an object's the heap memory usage:"
-{ $subsection size }
-"The garbage collector can be invoked manually:"
-{ $subsection data-gc }
-{ $subsection code-gc }
-"The current image can be saved:"
-{ $subsection save }
-{ $subsection save-image }
-{ $subsection save-image-and-exit }
-{ $see-also "tools.memory" } ;
-
-ABOUT: "memory"
-
-HELP: begin-scan ( -- )
-{ $description "Moves all objects to tenured space, disables the garbage collector, and resets the heap scan pointer to point at the first object in the heap. The " { $link next-object } " word can then be called to advance the heap scan pointer and return successive objects."
-$nl
-"This word must always be paired with a call to " { $link end-scan } "." }
-{ $notes "This is a low-level facility and can be dangerous. Use the " { $link each-object } " combinator instead." } ;
-
-HELP: next-object ( -- obj )
-{ $values { "obj" object } }
-{ $description "Outputs the object at the heap scan pointer, and then advances the heap scan pointer. If the end of the heap has been reached, outputs " { $link f } ". This is unambiguous since the " { $link f } " object is tagged immediate and not actually stored in the heap." }
-{ $errors "Throws a " { $link heap-scan-error. } " if called outside a " { $link begin-scan } "/" { $link end-scan } " pair." }
-{ $notes "This is a low-level facility and can be dangerous. Use the " { $link each-object } " combinator instead." } ;
-
-HELP: end-scan ( -- )
-{ $description "Finishes a heap iteration by re-enabling the garbage collector. This word must always be paired with a call to " { $link begin-scan } "." }
-{ $notes "This is a low-level facility and can be dangerous. Use the " { $link each-object } " combinator instead." } ;
-
-HELP: each-object
-{ $values { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } }
-{ $description "Applies a quotation to each object in the heap. The garbage collector is switched off while this combinator runs, so the given quotation must not allocate too much memory." }
-{ $notes "This word is the low-level facility used to implement the " { $link instances } " word." } ;
-
 HELP: instances
-{ $values { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "seq" "a fresh sequence" } }
-{ $description "Outputs a sequence of all objects in the heap which satisfy the quotation." }
-{ $notes "This word relies on " { $link each-object } ", so in particular the garbage collector is switched off while it runs and the given quotation must not allocate too much memory." } ;
+{ $values { "quot" { $quotation "( obj -- ? )" } } { "seq" "a fresh sequence" } }
+{ $description "Outputs a sequence of all objects in the heap which satisfy the quotation." } ;
 
-HELP: data-gc ( -- )
+HELP: gc ( -- )
 { $description "Performs a full garbage collection." } ;
 
-HELP: code-gc ( -- )
-{ $description "Collects all generations up to and including tenured space, and also collects the code heap." } ;
+HELP: data-room ( -- data-room )
+{ $values { "data-room" data-room } }
+{ $description "Queries the VM for memory usage information." } ;
 
-HELP: gc-time ( -- n )
-{ $values { "n" "a timestamp in milliseconds" } }
-{ $description "Outputs the total time spent in garbage collection during this Factor session." } ;
-
-HELP: data-room ( -- cards semi generations )
-{ $values { "cards" "number of bytes reserved for card marking" } { "semi" "number of bytes reserved for tenured semi-space" } { "generations" "array of free/total bytes pairs" } }
-{ $description "Queries the runtime for memory usage information." } ;
-
-HELP: code-room ( -- code-free code-total )
-{ $values { "code-free" "bytes free in the code heap" } { "code-total" "total bytes in the code heap" } }
-{ $description "Queries the runtime for memory usage information." } ;
+HELP: code-room ( -- code-room )
+{ $values { "code-room" code-room } }
+{ $description "Queries the VM for memory usage information." } ;
 
 HELP: size ( obj -- n )
 { $values { "obj" "an object" } { "n" "a size in bytes" } }
@@ -81,3 +33,23 @@ HELP: save-image-and-exit ( path -- )
 
 HELP: save
 { $description "Saves a snapshot of the heap to the current image file." } ;
+
+ARTICLE: "images" "Images"
+"Factor has the ability to save the entire state of the system into an " { $emphasis "image file" } ". The image contains a complete dump of all data and code in the current Factor instance."
+{ $subsections
+    save
+    save-image
+    save-image-and-exit
+}
+"To start Factor with a custom image, use the " { $snippet "-i=" { $emphasis "image" } } " command line switch; see " { $link "runtime-cli-args" } "."
+$nl
+"One reason to save a custom image is if you find yourself loading the same libraries in every Factor session; some libraries take a little while to compile, so saving an image with those libraries loaded can save you a lot of time."
+$nl
+"For example, to save an image with the web framework loaded,"
+{ $code "USE: furnace" "save" }
+"New images can be created from scratch:"
+{ $subsections "bootstrap.image" }
+"The " { $link "tools.deploy" } " tool creates stripped-down images containing just enough code to run a single application."
+{ $see-also "tools.memory" } ;
+
+ABOUT: "images"

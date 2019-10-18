@@ -1,85 +1,44 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel furnace furnace.validator http.server.responders
-       help help.topics html splitting sequences words strings 
-       quotations macros vocabs tools.browser combinators
-       arrays io.files ;
-IN: webapps.help 
+USING: kernel accessors http.server.dispatchers
+http.server.static furnace.actions furnace.redirection urls
+validators locals io.files io.directories html.forms
+html.components help.html ;
+IN: webapps.help
 
-: show-help ( topic -- )
-    serving-html
-    dup article-title [
-        [ help ] with-html-stream
-    ] simple-html-document ;
+TUPLE: help-webapp < dispatcher ;
 
-: string>topic ( string -- topic )
-    " " split dup length 1 = [ first ] when ;
+M: result link-title title>> ;
 
-\ show-help {
-    { "topic" "handbook" v-default string>topic }
-} define-action
+M: result link-href href>> ;
 
-M: link browser-link-href
-    link-name
-    dup word? over f eq? or [
-        browser-link-href
-    ] [
-        dup array? [ " " join ] when
-        [ show-help ] curry quot-link
-    ] if ;
+:: <search-action> ( help-dir -- action )
+    <page-action>
+        { help-webapp "search" } >>template
 
-: show-word ( word vocab -- )
-    lookup show-help ;
+        [
+            {
+                { "search" [ 1 v-min-length 50 v-max-length v-one-line ] }
+            } validate-params
 
-\ show-word {
-    { "word" "call" v-default }
-    { "vocab" "kernel" v-default }
-} define-action
+            help-dir [
+                "search" value article-apropos "articles" set-value
+                "search" value word-apropos "words" set-value
+                "search" value vocab-apropos "vocabs" set-value
+            ] with-directory
 
-M: f browser-link-href
-    drop \ f browser-link-href ;
+            { help-webapp "search" } <chloe-content>
+        ] >>submit ;
 
-M: word browser-link-href
-    dup word-name swap word-vocabulary
-    [ show-word ] 2curry quot-link ;
+: <main-action> ( -- action )
+    <page-action>
+        { help-webapp "help" } >>template ;
 
-: show-vocab ( vocab -- )
-    f >vocab-link show-help ;
+: <help-webapp> ( help-dir -- webapp )
+    help-webapp new-dispatcher
+        <main-action> "" add-responder
+        over <search-action> "search" add-responder
+        swap <static> "content" add-responder
+        "resource:basis/definitions/icons/" <static> "icons" add-responder ;
 
-\ show-vocab {
-    { "vocab" "kernel" v-default }
-} define-action
 
-M: vocab-spec browser-link-href
-    vocab-name [ show-vocab ] curry quot-link ;
-
-: show-vocabs-tagged ( tag -- )
-    <vocab-tag> show-help ;
-
-\ show-vocabs-tagged {
-    { "tag" }
-} define-action
-
-M: vocab-tag browser-link-href
-    vocab-tag-name [ show-vocabs-tagged ] curry quot-link ;
-
-: show-vocabs-by ( author -- )
-    <vocab-author> show-help ;
-
-\ show-vocabs-by {
-    { "author" }
-} define-action
-
-M: vocab-author browser-link-href
-    vocab-author-name [ show-vocabs-by ] curry quot-link ;
-
-"help" "show-help" "extra/webapps/help" web-app
-
-! Hard-coding for factorcode.org
-PREDICATE: pathname resource-pathname
-    pathname-string "resource:" head? ;
-
-M: resource-pathname browser-link-href
-    pathname-string
-    "resource:" ?head drop
-    "/responder/source/" swap append ;

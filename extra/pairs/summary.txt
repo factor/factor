@@ -1,0 +1,1 @@
+Assoc implementation optimized for a single key/value pair

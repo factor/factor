@@ -1,0 +1,1 @@
+Read PCM audio data from uncompressed audio files

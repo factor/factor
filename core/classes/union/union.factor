@@ -1,27 +1,48 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel assocs combinators classes
-generic.standard namespaces arrays ;
+classes.private classes.algebra classes.algebra.private
+namespaces arrays math quotations definitions ;
 IN: classes.union
 
-PREDICATE: class union-class
+PREDICATE: union-class < class
     "metaclass" word-prop union-class eq? ;
 
-! Union classes for dispatch on multiple classes.
+<PRIVATE
+
 : union-predicate-quot ( members -- quot )
-    0 (dispatch#) [
-        [ [ drop t ] ] { } map>assoc
-        object bootstrap-word [ drop f ] 2array add*
-        single-combination
-    ] with-variable ;
+    [
+        [ drop f ]
+    ] [
+        unclip "predicate" word-prop swap [
+            "predicate" word-prop [ dup ] prepend
+            [ drop t ]
+        ] { } map>assoc alist>quot
+    ] if-empty ;
 
 : define-union-predicate ( class -- )
-    dup predicate-word
-    over members union-predicate-quot
-    define-predicate ;
+    dup members union-predicate-quot define-predicate ;
+
+M: union-class update-class define-union-predicate ;
+
+: (define-union-class) ( class members -- )
+    f swap f union-class make-class-props (define-class) ;
+
+PRIVATE>
 
 : define-union-class ( class members -- )
-    dupd f union-class define-class define-union-predicate ;
+    [ (define-union-class) ]
+    [ drop changed-conditionally ]
+    [ drop update-classes ]
+    2tri ;
 
-M: union-class reset-class
-    { "metaclass" "members" } reset-props ;
+M: union-class rank-class drop 2 ;
+
+M: union-class instance?
+    "members" word-prop [ instance? ] with any? ;
+
+M: union-class normalize-class
+    members <anonymous-union> normalize-class ;
+
+M: union-class (flatten-class)
+    members <anonymous-union> (flatten-class) ;

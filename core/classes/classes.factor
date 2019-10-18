@@ -1,204 +1,125 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: accessors arrays definitions assocs kernel kernel.private
+slots.private namespaces make sequences strings words words.symbol
+vectors math quotations combinators sorting effects graphs
+vocabs sets ;
 IN: classes
-USING: arrays definitions assocs kernel
-kernel.private slots.private namespaces sequences strings words
-vectors math quotations combinators sorting effects graphs ;
 
-PREDICATE: word class ( obj -- ? ) "class" word-prop ;
+ERROR: bad-inheritance class superclass ;
 
-SYMBOL: typemap
-SYMBOL: class<map
-SYMBOL: update-map
-SYMBOL: builtins
-
-PREDICATE: word builtin-class
-    "metaclass" word-prop builtin-class eq? ;
-
-PREDICATE: class tuple-class
-    "metaclass" word-prop tuple-class eq? ;
-
-: classes ( -- seq ) class<map get keys ;
-
-: type>class ( n -- class ) builtins get nth ;
-
-: predicate-word ( word -- predicate )
-    [ word-name "?" append ] keep word-vocabulary create ;
-
-: predicate-effect 1 { "?" } <effect> ;
-
-PREDICATE: compound predicate
-    "predicating" word-prop >boolean ;
-
-: define-predicate ( class predicate quot -- )
-    over [
-        dupd predicate-effect define-declared
-        2dup 1quotation "predicate" set-word-prop
-        swap "predicating" set-word-prop
-    ] [
-        3drop
-    ] if ;
-
-: superclass ( class -- super )
-    "superclass" word-prop ;
-
-: members ( class -- seq ) "members" word-prop ;
-
-: class-empty? ( class -- ? ) members dup [ empty? ] when ;
-
-: (flatten-union-class) ( class -- )
-    dup members [
-        [ (flatten-union-class) ] each
-    ] [
-        dup set
-    ] ?if ;
-
-: flatten-union-class ( class -- assoc )
-    [ (flatten-union-class) ] H{ } make-assoc ;
-
-: (flatten-class) ( class -- )
-    {
-        { [ dup tuple-class? ] [ dup set ] }
-        { [ dup builtin-class? ] [ dup set ] }
-        { [ dup members ] [ members [ (flatten-class) ] each ] }
-        { [ dup superclass ] [ superclass (flatten-class) ] }
-    } cond ;
-
-: flatten-class ( class -- assoc )
-    [ (flatten-class) ] H{ } make-assoc ;
-
-: class-hashes ( class -- seq )
-    flatten-class keys [
-        dup builtin-class?
-        [ "type" word-prop ] [ hashcode ] if
-    ] map ;
-
-: (flatten-builtin-class) ( class -- )
-    {
-        { [ dup members ] [ members [ (flatten-builtin-class) ] each ] }
-        { [ dup superclass ] [ superclass (flatten-builtin-class) ] }
-        { [ t ] [ dup set ] }
-    } cond ;
-
-: flatten-builtin-class ( class -- assoc )
-    [ (flatten-builtin-class) ] H{ } make-assoc ;
-
-: types ( class -- seq )
-    flatten-builtin-class keys
-    [ "type" word-prop ] map natural-sort ;
-
-: class< ( class1 class2 -- ? ) swap class<map get at key? ;
+PREDICATE: class < word "class" word-prop ;
 
 <PRIVATE
 
-DEFER: (class<)
+SYMBOL: class<=-cache
+SYMBOL: class-not-cache
+SYMBOL: classes-intersect-cache
+SYMBOL: class-and-cache
+SYMBOL: class-or-cache
+SYMBOL: next-method-quot-cache
 
-: superclass< ( cls1 cls2 -- ? )
-    >r superclass r> 2dup and [ (class<) ] [ 2drop f ] if ;
+: init-caches ( -- )
+    H{ } clone class<=-cache set
+    H{ } clone class-not-cache set
+    H{ } clone classes-intersect-cache set
+    H{ } clone class-and-cache set
+    H{ } clone class-or-cache set
+    H{ } clone next-method-quot-cache set ;
 
-: union-class< ( cls1 cls2 -- ? )
-    [ flatten-union-class ] 2apply keys
-    [ nip [ (class<) ] curry* contains? ] curry assoc-all? ;
+: reset-caches ( -- )
+    class<=-cache get clear-assoc
+    class-not-cache get clear-assoc
+    classes-intersect-cache get clear-assoc
+    class-and-cache get clear-assoc
+    class-or-cache get clear-assoc
+    next-method-quot-cache get clear-assoc ;
 
-: (class<) ( class1 class2 -- ? )
-    {
-        { [ 2dup eq? ] [ 2drop t ] }
-        { [ over class-empty? ] [ 2drop t ] }
-        { [ 2dup superclass< ] [ 2drop t ] }
-        { [ 2dup [ members not ] both? ] [ 2drop f ] }
-        { [ t ] [ union-class< ] }
-    } cond ;
+SYMBOL: update-map
 
-: lookup-union ( classes -- class )
-    typemap get at dup empty? [ drop object ] [ first ] if ;
+SYMBOL: implementors-map
 
-: (class-or) ( class class -- class )
-    [ flatten-builtin-class ] 2apply union lookup-union ;
-
-: (class-and) ( class class -- class )
-    [ flatten-builtin-class ] 2apply intersect lookup-union ;
-
-: tuple-class-and ( class1 class2 -- class )
-    dupd eq? [ drop null ] unless ;
-
-: largest-class ( seq -- n elt )
-    dup [
-        [ 2dup class< >r swap class< not r> and ]
-        curry* subset empty?
-    ] curry find [ "Topological sort failed" throw ] unless* ;
-
-PRIVATE>
-
-: sort-classes ( seq -- newseq )
-    >vector
-    [ dup empty? not ]
-    [ dup largest-class >r over delete-nth r> ]
-    [ ] unfold nip ;
-
-: class-or ( class1 class2 -- class )
-    {
-        { [ 2dup class< ] [ nip ] }
-        { [ 2dup swap class< ] [ drop ] }
-        { [ t ] [ (class-or) ] }
-    } cond ;
-
-: class-and ( class1 class2 -- class )
-    {
-        { [ 2dup class< ] [ drop ] }
-        { [ 2dup swap class< ] [ nip ] }
-        { [ 2dup [ tuple-class? ] both? ] [ tuple-class-and ] }
-        { [ t ] [ (class-and) ] }
-    } cond ;
-
-: classes-intersect? ( class1 class2 -- ? )
-    class-and class-empty? not ;
-
-: min-class ( class seq -- class/f )
-    [ dupd classes-intersect? ] subset dup empty? [
-        2drop f
-    ] [
-        tuck [ class< ] curry* all? [ peek ] [ drop f ] if
-    ] if ;
+GENERIC: rank-class ( class -- n )
 
 GENERIC: reset-class ( class -- )
 
+M: class reset-class
+    {
+        "class"
+        "metaclass"
+        "superclass"
+        "members"
+        "participants"
+        "predicate"
+    } reset-props ;
+
 M: word reset-class drop ;
 
-<PRIVATE
+PRIVATE>
 
-! class<map
-: bigger-classes ( class -- seq )
-    classes [ (class<) ] curry* subset ;
+: classes ( -- seq ) implementors-map get keys ;
 
-: bigger-classes+ ( class -- )
-    [ bigger-classes [ dup ] H{ } map>assoc ] keep
-    class<map get set-at ;
+PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
-: bigger-classes- ( class -- )
-    class<map get delete-at ;
+: create-predicate-word ( word -- predicate )
+    [ name>> "?" append ] [ vocabulary>> ] bi create
+    dup predicate? [ dup reset-generic ] unless ;
 
-: smaller-classes ( class -- seq )
-    classes swap [ (class<) ] curry subset ;
+: predicate-word ( word -- predicate )
+    "predicate" word-prop first ;
 
-: smaller-classes+ ( class -- )
-    dup smaller-classes class<map get add-vertex ;
+M: predicate flushable? drop t ;
 
-: smaller-classes- ( class -- )
-    dup smaller-classes class<map get remove-vertex ;
+M: predicate forget*
+    [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
 
-: class<map+ ( class -- )
-    H{ } clone over class<map get set-at
-    dup smaller-classes+ bigger-classes+ ;
+M: predicate reset-word
+    [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
 
-: class<map- ( class -- )
-    dup smaller-classes- bigger-classes- ;
+: define-predicate ( class quot -- )
+    [ predicate-word ] dip (( object -- ? )) define-declared ;
+
+: superclass ( class -- super )
+    #! Output f for non-classes to work with algebra code
+    dup class? [ "superclass" word-prop ] [ drop f ] if ;
+
+: superclasses ( class -- supers )
+    [ superclass ] follow reverse ;
+
+: superclass-of? ( class superclass -- ? )
+    superclasses member-eq? ;
+
+: subclass-of? ( class superclass -- ? )
+    swap superclass-of? ;
+
+: members ( class -- seq )
+    #! Output f for non-classes to work with algebra code
+    dup class? [ "members" word-prop ] [ drop f ] if ;
+
+: participants ( class -- seq )
+    #! Output f for non-classes to work with algebra code
+    dup class? [ "participants" word-prop ] [ drop f ] if ;
+
+GENERIC: implementors ( class/classes -- seq )
 
 ! update-map
 : class-uses ( class -- seq )
-    [ dup members % superclass [ , ] when* ] { } make ;
+    [
+        [ members % ]
+        [ participants % ]
+        [ superclass [ , ] when* ]
+        tri
+    ] { } make ;
 
-: class-usages ( class -- assoc )
-    [ update-map get at ] closure ;
+: class-usage ( class -- seq ) update-map get at ;
+
+: class-usages ( class -- seq ) [ class-usage ] closure keys ;
+
+M: class implementors implementors-map get at keys ;
+
+M: sequence implementors [ implementors ] gather ;
+
+<PRIVATE
 
 : update-map+ ( class -- )
     dup class-uses update-map get add-vertex ;
@@ -206,74 +127,102 @@ M: word reset-class drop ;
 : update-map- ( class -- )
     dup class-uses update-map get remove-vertex ;
 
-! typemap
-: push-at ( value key assoc -- )
-    2dup at* [
-        2nip push
-    ] [
-        drop >r >r 1vector r> r> set-at
-    ] if ;
+: implementors-map+ ( class -- )
+    [ H{ } clone ] dip implementors-map get set-at ;
 
-: typemap+ ( class -- )
-    dup flatten-builtin-class typemap get push-at ;
+: implementors-map- ( class -- )
+    implementors-map get delete-at ;
 
-: pop-at ( value key assoc -- )
-    at* [ delete ] [ 2drop ] if ;
-
-: typemap- ( class -- )
-    dup flatten-builtin-class typemap get pop-at ;
-
-! Class definition
-: cache-class ( class -- )
-    dup typemap+ dup class<map+ update-map+ ;
-
-: cache-classes ( assoc -- )
-    [ drop cache-class ] assoc-each ;
-
-GENERIC: uncache-class ( class -- )
-
-M: class uncache-class
-    dup update-map- dup class<map- typemap- ;
-
-M: word uncache-class drop ;
-
-: uncache-classes ( assoc -- )
-    [ drop uncache-class ] assoc-each ;
-
-GENERIC: update-methods ( class -- )
-
-PRIVATE>
-
-: define-class-props ( members superclass metaclass -- assoc )
+: make-class-props ( superclass members participants metaclass -- assoc )
     [
-        "metaclass" set
-        dup [ bootstrap-word ] when "superclass" set
-        [ bootstrap-word ] map "members" set
+        {
+            [ dup [ bootstrap-word ] when "superclass" set ]
+            [ [ bootstrap-word ] map "members" set ]
+            [ [ bootstrap-word ] map "participants" set ]
+            [ "metaclass" set ]
+        } spread
     ] H{ } make-assoc ;
 
+GENERIC: metaclass-changed ( use class -- )
+
+: ?metaclass-changed ( class usages/f -- )
+    dup [ [ metaclass-changed ] with each ] [ 2drop ] if ;
+
+: check-metaclass ( class metaclass -- usages/f )
+    over class? [
+        over "metaclass" word-prop eq?
+        [ drop f ] [ class-usage keys ] if
+    ] [ 2drop f ] if ;
+
+: ?define-symbol ( word -- )
+    dup deferred? [ define-symbol ] [ drop ] if ;
+
 : (define-class) ( word props -- )
-    over reset-class
-    >r dup word-props r> union over set-word-props
-    dup intern-symbol
-    t "class" set-word-prop ;
+    reset-caches
+    2dup "metaclass" swap at check-metaclass
+    {
+        [ 2drop update-map- ]
+        [ 2drop dup class? [ reset-class ] [ implementors-map+ ] if ]
+        [ 2drop ?define-symbol ]
+        [ drop [ assoc-union ] curry change-props drop ]
+        [
+            2drop
+            dup create-predicate-word
+            [ 1quotation "predicate" set-word-prop ]
+            [ swap "predicating" set-word-prop ]
+            2bi
+        ]
+        [ 2drop t "class" set-word-prop ]
+        [ 2drop update-map+ ]
+        [ nip ?metaclass-changed ]
+    } 3cleave ;
 
-: define-class ( word members superclass metaclass -- )
-    #! If it was already a class, update methods after.
-    define-class-props
-    over class? >r
-    over class-usages [
-        uncache-classes
-        dupd (define-class)
-    ] keep cache-classes
-    r> [ update-methods ] [ drop ] if ;
+GENERIC: update-class ( class -- )
 
-GENERIC: class ( object -- class ) inline
+M: class update-class drop ;
 
-M: object class type type>class ;
+GENERIC: update-methods ( class seq -- )
 
-<PRIVATE
+: update-classes ( class -- )
+    dup class-usages
+    [ nip [ update-class ] each ] [ update-methods ] 2bi ;
 
-: class-of-tuple ( obj -- class )
-    2 slot { word } declare ; inline
+: check-inheritance ( subclass superclass -- )
+    2dup superclass-of? [ bad-inheritance ] [ 2drop ] if ;
+
+: define-class ( word superclass members participants metaclass -- )
+    [ 2dup check-inheritance ] 3dip
+    make-class-props [ (define-class) ] [ drop changed-definition ] 2bi ;
+
+: forget-predicate ( class -- )
+    dup "predicate" word-prop
+    dup length 1 = [
+        first
+        [ nip ] [ "predicating" word-prop = ] 2bi
+        [ forget ] [ drop ] if
+    ] [ 2drop ] if ;
+
+GENERIC: forget-methods ( class -- )
 
 PRIVATE>
+
+: forget-class ( class -- )
+    dup f check-metaclass {
+        [ drop forget-predicate ]
+        [ drop forget-methods ]
+        [ drop implementors-map- ]
+        [ drop update-map- ]
+        [ drop reset-class ]
+        [ 2drop reset-caches ]
+        [ ?metaclass-changed ]
+    } 2cleave ;
+
+M: class metaclass-changed
+    swap class? [ drop ] [ forget-class ] if ;
+
+M: class forget* ( class -- )
+    [ call-next-method ] [ forget-class ] bi ;
+
+GENERIC: class ( object -- class )
+
+GENERIC: instance? ( object class -- ? ) flushable

@@ -1,105 +1,231 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel kernel.private math namespaces
-sequences strings words effects generic generic.standard
-classes slots.private ;
+USING: arrays byte-arrays kernel kernel.private math namespaces
+make sequences strings effects generic generic.standard
+classes classes.algebra slots.private combinators accessors
+words sequences.private assocs alien quotations hashtables ;
 IN: slots
 
-TUPLE: slot-spec type name offset reader writer ;
+TUPLE: slot-spec name offset class initial read-only ;
 
-C: <slot-spec> slot-spec
+PREDICATE: reader < word "reader" word-prop ;
 
-: define-typecheck ( class generic quot -- )
-    <method> over define-simple-generic -rot define-method ;
+PREDICATE: reader-method < method "reading" word-prop ;
 
-: define-slot-word ( class slot word quot -- )
-    rot >fixnum add* define-typecheck ;
+PREDICATE: writer < word "writer" word-prop ;
 
-: reader-effect ( class spec -- effect )
-    >r ?word-name 1array r> slot-spec-name 1array <effect> ;
+PREDICATE: writer-method < method "writing" word-prop ;
 
-: reader-quot ( decl -- quot )
-    [
+: <slot-spec> ( -- slot-spec )
+    slot-spec new
+        object bootstrap-word >>class ;
+
+: define-typecheck ( class generic quot props -- )
+    [ create-method ] 2dip
+    [ [ props>> ] [ drop ] [ ] tri* assoc-union! drop ]
+    [ drop define ]
+    [ 2drop make-inline ]
+    3tri ;
+
+GENERIC# reader-quot 1 ( class slot-spec -- quot )
+
+M: object reader-quot 
+    nip [
+        dup offset>> ,
         \ slot ,
-        dup object bootstrap-word eq?
-        [ drop ] [ 1array , \ declare , ] if
+        dup class>> object bootstrap-word eq?
+        [ drop ] [ class>> 1array , \ declare , ] if
     ] [ ] make ;
 
-PREDICATE: compound slot-reader
-    "reading" word-prop >boolean ;
+: reader-word ( name -- word )
+    ">>" append "accessors" create
+    dup t "reader" set-word-prop ;
 
-: set-reader-props ( class spec -- )
-    2dup reader-effect
-    over slot-spec-reader
-    swap "declared-effect" set-word-prop
-    slot-spec-reader swap "reading" set-word-prop ;
+: reader-props ( slot-spec -- assoc )
+    "reading" associate ;
 
-: define-reader ( class spec -- )
-    dup slot-spec-reader [
-        [ set-reader-props ] 2keep
-        dup slot-spec-offset
-        over slot-spec-reader
-        rot slot-spec-type reader-quot
-        define-slot-word
+: define-reader-generic ( name -- )
+    reader-word (( object -- value )) define-simple-generic ;
+
+: define-reader ( class slot-spec -- )
+    [ nip name>> define-reader-generic ]
+    [
+        {
+            [ drop ]
+            [ nip name>> reader-word ]
+            [ reader-quot ]
+            [ nip reader-props ]
+        } 2cleave define-typecheck
+    ] 2bi ;
+
+: writer-word ( name -- word )
+    "(>>" ")" surround "accessors" create
+    dup t "writer" set-word-prop ;
+
+ERROR: bad-slot-value value class ;
+
+: (instance-check-quot) ( class -- quot )
+    [
+        \ dup ,
+        [ "predicate" word-prop % ]
+        [ [ bad-slot-value ] curry , ] bi
+        \ unless ,
+    ] [ ] make ;
+
+: instance-check-quot ( class -- quot )
+    {
+        { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
+        { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
+        { [ dup integer bootstrap-word eq? ] [ drop [ >integer ] ] }
+        [ (instance-check-quot) ]
+    } cond ;
+
+GENERIC# writer-quot 1 ( class slot-spec -- quot )
+
+M: object writer-quot
+    nip
+    [ class>> instance-check-quot dup empty? [ [ dip ] curry ] unless ]
+    [ offset>> [ set-slot ] curry ]
+    bi append ;
+
+: writer-props ( slot-spec -- assoc )
+    "writing" associate ;
+
+: define-writer-generic ( name -- )
+    writer-word (( value object -- )) define-simple-generic ;
+
+: define-writer ( class slot-spec -- )
+    [ nip name>> define-writer-generic ] [
+        {
+            [ drop ]
+            [ nip name>> writer-word ]
+            [ writer-quot ]
+            [ nip writer-props ]
+        } 2cleave define-typecheck
+    ] 2bi ;
+
+: setter-word ( name -- word )
+    ">>" prepend "accessors" create ;
+
+: define-setter ( name -- )
+    dup setter-word dup deferred? [
+        [ \ over , swap writer-word , ] [ ] make
+        (( object value -- object )) define-inline
+    ] [ 2drop ] if ;
+
+: changer-word ( name -- word )
+    "change-" prepend "accessors" create ;
+
+: define-changer ( name -- )
+    dup changer-word dup deferred? [
+        [
+            \ over ,
+            over reader-word 1quotation
+            [ dip call ] curry [ ] like [ dip swap ] curry %
+            swap setter-word ,
+        ] [ ] make (( object quot -- object )) define-inline
+    ] [ 2drop ] if ;
+
+: define-slot-methods ( class slot-spec -- )
+    [ define-reader ]
+    [
+        dup read-only>> [ 2drop ] [
+            [ name>> define-setter drop ]
+            [ name>> define-changer drop ]
+            [ define-writer ]
+            2tri
+        ] if
+    ] 2bi ;
+
+: define-accessors ( class specs -- )
+    [ define-slot-methods ] with each ;
+
+: define-protocol-slot ( name -- )
+    {
+        [ define-reader-generic ]
+        [ define-writer-generic ]
+        [ define-setter ]
+        [ define-changer ]
+    } cleave ;
+
+ERROR: no-initial-value class ;
+
+GENERIC: initial-value* ( class -- object )
+
+M: class initial-value* no-initial-value ;
+
+: initial-value ( class -- object )
+    {
+        { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop ] }
+        { [ \ f bootstrap-word over class<= ] [ f ] }
+        { [ \ array-capacity bootstrap-word over class<= ] [ 0 ] }
+        { [ float bootstrap-word over class<= ] [ 0.0 ] }
+        { [ string bootstrap-word over class<= ] [ "" ] }
+        { [ array bootstrap-word over class<= ] [ { } ] }
+        { [ byte-array bootstrap-word over class<= ] [ B{ } ] }
+        { [ pinned-alien bootstrap-word over class<= ] [ <bad-alien> ] }
+        { [ quotation bootstrap-word over class<= ] [ [ ] ] }
+        [ dup initial-value* ]
+    } cond nip ;
+
+GENERIC: make-slot ( desc -- slot-spec )
+
+M: string make-slot
+    <slot-spec>
+        swap >>name ;
+
+: peel-off-name ( slot-spec array -- slot-spec array )
+    [ first >>name ] [ rest ] bi ; inline
+
+: peel-off-class ( slot-spec array -- slot-spec array )
+    dup empty? [
+        dup first class? [
+            [ first >>class ] [ rest ] bi
+        ] when
+    ] unless ;
+
+ERROR: bad-slot-attribute key ;
+
+: peel-off-attributes ( slot-spec array -- slot-spec array )
+    dup empty? [
+        unclip {
+            { initial: [ [ first >>initial ] [ rest ] bi ] }
+            { read-only [ [ t >>read-only ] dip ] }
+            [ bad-slot-attribute ]
+        } case
+    ] unless ;
+
+ERROR: bad-initial-value name ;
+
+: check-initial-value ( slot-spec -- slot-spec )
+    dup initial>> [
+        [ ] [
+            dup [ initial>> ] [ class>> ] bi instance?
+            [ name>> bad-initial-value ] unless
+        ] if-bootstrapping
     ] [
-        2drop
+        dup class>> initial-value >>initial
     ] if ;
 
-: writer-effect ( class spec -- effect )
-    slot-spec-name swap ?word-name 2array 0 <effect> ;
+M: array make-slot
+    <slot-spec>
+        swap
+        peel-off-name
+        peel-off-class
+        [ dup empty? ] [ peel-off-attributes ] until drop
+    check-initial-value ;
 
-PREDICATE: compound slot-writer
-    "writing" word-prop >boolean ;
+M: slot-spec make-slot
+    check-initial-value ;
 
-: set-writer-props ( class spec -- )
-    2dup writer-effect
-    over slot-spec-writer
-    swap "declared-effect" set-word-prop
-    slot-spec-writer swap "writing" set-word-prop ;
+: make-slots ( slots -- specs )
+    [ make-slot ] map ;
 
-: define-writer ( class spec -- )
-    dup slot-spec-writer [
-        [ set-writer-props ] 2keep
-        dup slot-spec-offset
-        swap slot-spec-writer
-        [ set-slot ]
-        define-slot-word
-    ] [
-        2drop
-    ] if ;
+: finalize-slots ( specs base -- specs )
+    over length iota [ + ] with map [ >>offset ] 2map ;
 
-: define-slot ( class spec -- )
-    2dup define-reader define-writer ;
+: slot-named* ( name specs -- offset spec/f )
+    [ name>> = ] with find ;
 
-: define-slots ( class specs -- )
-    [ define-slot ] curry* each ;
-
-: reader-word ( class name vocab -- word )
-    >r >r "-" r> 3append r> create ;
-
-: writer-word ( class name vocab -- word )
-    >r [ swap "set-" % % "-" % % ] "" make r> create ;
-
-: (simple-slot-word) ( class name -- class name vocab )
-    over word-vocabulary >r >r word-name r> r> ;
-
-: simple-reader-word ( class name -- word )
-    (simple-slot-word) reader-word ;
-
-: simple-writer-word ( class name -- word )
-    (simple-slot-word) writer-word ;
-
-: simple-slot ( class name # -- spec )
-    >r object bootstrap-word over r> f f <slot-spec>
-    pick pick simple-reader-word over set-slot-spec-reader
-    rot rot simple-writer-word over set-slot-spec-writer ;
-
-: simple-slots ( class slots base -- specs )
-    over length [ + ] curry* map
-    [ >r >r dup r> r> simple-slot ] 2map nip ;
-
-: slot-of-reader ( reader specs -- spec/f )
-    [ slot-spec-reader eq? ] curry* find nip ;
-
-: slot-of-writer ( writer specs -- spec/f )
-    [ slot-spec-writer eq? ] curry* find nip ;
+: slot-named ( name specs -- spec/f )
+    slot-named* nip ;

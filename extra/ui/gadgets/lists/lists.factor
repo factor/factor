@@ -1,65 +1,70 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.commands ui.gestures ui.render ui.gadgets
-ui.gadgets.labels ui.gadgets.scrollers
-kernel sequences models opengl math namespaces
-ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
-math.vectors tuples ;
+USING: accessors math.vectors classes.tuple math.rectangles colors
+kernel locals sequences models opengl math math.order namespaces
+ui.commands ui.gestures ui.render ui.gadgets ui.gadgets.labels
+ui.gadgets.scrollers ui.gadgets.presentations ui.gadgets.viewports
+ui.gadgets.packs ;
 IN: ui.gadgets.lists
 
-TUPLE: list index presenter color hook ;
+TUPLE: list < pack index presenter color hook ;
 
-: list-theme ( list -- )
-    { 0.8 0.8 1.0 1.0 } swap set-list-color ;
+: list-theme ( list -- list )
+    selection-color >>color ; inline
 
 : <list> ( hook presenter model -- gadget )
-    <filled-pile> list construct-control
-    [ set-list-presenter ] keep
-    [ set-list-hook ] keep
-    0 over set-list-index
-    dup list-theme ;
+    list new
+        { 0 1 } >>orientation
+        1 >>fill
+        0 >>index
+        swap >>model
+        swap >>presenter
+        swap >>hook
+        list-theme ;
 
 : calc-bounded-index ( n list -- m )
-    control-value length 1- min 0 max ;
+    control-value length 1 - min 0 max ;
 
 : bound-index ( list -- )
-    dup list-index over calc-bounded-index
-    swap set-list-index ;
+    dup index>> over calc-bounded-index >>index drop ;
 
 : list-presentation-hook ( list -- quot )
-    list-hook [ [ [ list? ] is? ] find-parent ] swap append ;
+    hook>> [ [ list? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
-    keep <presentation>
-    [ set-presentation-hook ] keep
-    [ text-theme ] keep ;
+    [ call( elt -- obj ) ] [ drop ] 2bi [ >label text-theme ] dip
+    <presentation>
+    swap >>hook ; inline
 
 : <list-items> ( list -- seq )
-    dup list-presentation-hook
-    over list-presenter
-    rot control-value [
-        >r 2dup r> swap <list-presentation>
+    [ list-presentation-hook ]
+    [ presenter>> ]
+    [ control-value ]
+    tri [
+        [ 2dup ] dip swap <list-presentation>
     ] map 2nip ;
 
 M: list model-changed
     nip
     dup clear-gadget
-    dup <list-items> over add-gadgets
+    dup <list-items> add-gadgets
     bound-index ;
 
 : selected-rect ( list -- rect )
-    dup list-index swap gadget-children ?nth ;
+    dup index>> swap children>> ?nth ;
 
 M: list draw-gadget*
     origin get [
-        dup list-color gl-color
-        selected-rect [ rect-extent gl-fill-rect ] when*
+        dup color>> gl-color
+        selected-rect [
+            rect-bounds gl-fill-rect
+        ] when*
     ] with-translation ;
 
 M: list focusable-child* drop t ;
 
 : list-value ( list -- object )
-    dup list-index swap control-value ?nth ;
+    dup index>> swap control-value ?nth ;
 
 : scroll>selected ( list -- )
     #! We change the rectangle's width to zero to avoid
@@ -73,40 +78,38 @@ M: list focusable-child* drop t ;
     dup list-empty? [
         2drop
     ] [
-        [ control-value length rem ] keep
-        [ set-list-index ] keep
-        [ relayout-1 ] keep
-        scroll>selected
+        [ control-value length rem ] [ (>>index) ] [ ] tri
+        [ relayout-1 ] [ scroll>selected ] bi
     ] if ;
 
 : select-previous ( list -- )
-    dup list-index 1- swap select-index ;
+    [ index>> 1 - ] keep select-index ;
 
 : select-next ( list -- )
-    dup list-index 1+ swap select-index ;
+    [ index>> 1 + ] keep select-index ;
 
 : invoke-value-action ( list -- )
     dup list-empty? [
-        dup list-hook call
+        dup hook>> call( list -- )
     ] [
-        dup list-index swap nth-gadget invoke-secondary
+        [ index>> ] keep nth-gadget invoke-secondary
     ] if ;
 
-: select-gadget ( gadget list -- )
-    swap over gadget-children index
-    [ swap select-index ] [ drop ] if* ;
+:: select-gadget ( gadget list -- )
+    gadget list children>> index
+    [ list select-index ] when* ;
 
 : clamp-loc ( point max -- point )
     vmin { 0 0 } vmax ;
 
 : select-at ( point list -- )
-    [ rect-dim clamp-loc ] keep
+    [ dim>> clamp-loc ] keep
     [ pick-up ] keep
     select-gadget ;
 
 : list-page ( list vec -- )
-    >r dup selected-rect rect-bounds 2 v/n v+
-    over visible-dim r> v* v+ swap select-at ;
+    [ dup selected-rect rect-bounds 2 v/n v+ over visible-dim ] dip
+    v* v+ swap select-at ;
 
 : list-page-up ( list -- ) { 0 -1 } list-page ;
 

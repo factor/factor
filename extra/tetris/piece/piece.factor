@@ -1,47 +1,50 @@
-! Copyright (C) 2006, 2007 Alex Chapman
+! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays tetris.tetromino math math.vectors 
-sequences quotations lazy-lists ;
+USING: accessors arrays kernel math math.vectors sequences tetris.tetromino lists.lazy ;
 IN: tetris.piece
 
-#! A piece adds state to the tetromino that is the piece's delegate. The
-#! rotation is an index into the tetromino's states array, and the position is
-#! added to the tetromino's blocks to give them their location on the tetris
-#! board. If the location is f then the piece is not yet on the board.
-TUPLE: piece rotation location ;
+#! The rotation is an index into the tetromino's states array, and the
+#! position is added to the tetromino's blocks to give them their location on the
+#! tetris board. If the location is f then the piece is not yet on the board.
+
+TUPLE: piece
+    { tetromino tetromino }
+    { rotation integer initial: 0 }
+    { location array initial: { 0 0 } } ;
 
 : <piece> ( tetromino -- piece )
-    piece construct-delegate
-    0 over set-piece-rotation
-    { 0 0 } over set-piece-location ;
+    piece new swap >>tetromino ;
 
 : (piece-blocks) ( piece -- blocks )
-    #! rotates the tetromino
-    dup piece-rotation swap tetromino-states nth ;
+    #! rotates the piece
+    [ rotation>> ] [ tetromino>> states>> ] bi nth ;
 
 : piece-blocks ( piece -- blocks )
-    #! rotates and positions the tetromino
-    dup (piece-blocks) swap piece-location [ v+ ] curry map ;
+    #! rotates and positions the piece
+    [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
 
 : piece-width ( piece -- width )
     piece-blocks blocks-width ;
 
-: set-start-location ( piece board-width -- )
-    2 /i over piece-width 2 /i - 0 2array swap set-piece-location ;
+: set-start-location ( piece board-width -- piece )
+    over piece-width [ 2 /i ] bi@ - 0 2array >>location ;
 
 : <random-piece> ( board-width -- piece )
-    random-tetromino <piece> [ swap set-start-location ] keep ;
+    random-tetromino <piece> swap set-start-location ;
 
 : <piece-llist> ( board-width -- llist )
     [ [ <random-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
 
 : modulo ( n m -- n )
   #! -2 7 mod => -2, -2 7 modulo =>  5
-  tuck mod over + swap mod ;
+  [ mod ] [ + ] [ mod ] tri ;
 
-: rotate-piece ( piece inc -- )
-    over piece-rotation + over tetromino-states length modulo swap set-piece-rotation ;
+: (rotate-piece) ( rotation inc n-states -- rotation' )
+    [ + ] dip modulo ;
 
-: move-piece ( piece move -- )
-    over piece-location v+ swap set-piece-location ;
+: rotate-piece ( piece inc -- piece )
+    over tetromino>> states>> length
+    [ (rotate-piece) ] 2curry change-rotation ;
 
+: move-piece ( piece move -- piece )
+    [ v+ ] curry change-location ;

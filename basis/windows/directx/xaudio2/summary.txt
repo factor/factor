@@ -1,0 +1,1 @@
+XAudio2 bindings. Corresponds to xaudio2.h.

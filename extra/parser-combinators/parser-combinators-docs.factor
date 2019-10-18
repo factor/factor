@@ -1,6 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax parser-combinators ;
+USING: help.markup help.syntax ;
+IN: parser-combinators
 
 HELP: list-of
 { $values
@@ -11,7 +12,7 @@ HELP: list-of
     "'items' is a parser that can parse the individual elements. 'separator' "
     "is a parser for the symbol that separatest them. The result tree of "
     "the resulting parser is an array of the parsed elements." }
-{ $example "USE: parser-combinators" "\"1,2,3,4\" 'integer' \",\" token list-of parse-1 ." "{ 1 2 3 4 }" }
+{ $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"1,2,3,4\" 'integer' \",\" token list-of parse-1 ." "{ 1 2 3 4 }" }
 { $see-also list-of } ;
 
 HELP: any-char-parser
@@ -22,4 +23,4 @@ HELP: any-char-parser
     "from the input string. The value consumed is the "
     "result of the parse." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators ;" "\"foo\" any-char-parser parse-1 ." "102" } } ;
+{ $example "USING: lists.lazy parser-combinators prettyprint ;" "\"foo\" any-char-parser parse-1 ." "102" } } ;

@@ -1,0 +1,1 @@
+Higher level API for Tokyo Cabinet's Abstract database API. Implements the associative protocol.

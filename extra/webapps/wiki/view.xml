@@ -1,0 +1,19 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title><t:label t:name="title" /></t:title>
+
+	<div class="description">
+		<t:farkup t:name="content" />
+	</div>
+
+	<p>
+		<em>This revision created on <t:label t:name="date" /> by <t:a t:href="$wiki/user-edits" t:rest="author"><t:label t:name="author" /></t:a>
+			<t:if t:value="description">
+				(<t:label t:name="description" />)
+			</t:if>
+		</em>
+	</p>
+
+</t:chloe>

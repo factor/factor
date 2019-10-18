@@ -1,0 +1,5 @@
+This Wiki uses [[Farkup]] to mark up text.
+
+Two special article names are recognized by the Wiki: [[Contents]] and [[Footer]]. They do not exist by default, but if you create them, they will be visible on every page.
+
+The Wiki supports hierarchical article organization. You can separate components in article names with slashes, and Wiki links only display the last component. An example: [[Factor/Features]].

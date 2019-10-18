@@ -1,29 +1,46 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel kernel.private math
-math.private sequences sequences.private vectors.private
-growable ;
+USING: arrays kernel math sequences sequences.private growable
+accessors ;
 IN: vectors
 
-: <vector> ( n -- vector ) f <array> 0 array>vector ; inline
+TUPLE: vector
+{ underlying array }
+{ length array-capacity } ;
 
-: >vector ( seq -- vector ) V{ } clone-like ; inline
+: <vector> ( n -- vector ) 0 <array> 0 vector boa ; inline
+
+: >vector ( seq -- vector ) V{ } clone-like ;
 
 M: vector like
     drop dup vector? [
-        dup array? [ dup length array>vector ] [ >vector ] if
-    ] unless ;
+        dup array? [ dup length vector boa ] [ >vector ] if
+    ] unless ; inline
 
-M: vector new drop [ f <array> ] keep >fixnum array>vector ;
+M: vector new-sequence
+    drop [ f <array> ] [ >fixnum ] bi vector boa ; inline
 
 M: vector equal?
     over vector? [ sequence= ] [ 2drop f ] if ;
 
-M: sequence new-resizable drop <vector> ;
+M: array like
+    #! If we have an array, we're done.
+    #! If we have a vector, and it's at full capacity, we're done.
+    #! Otherwise, call resize-array, which is a relatively
+    #! fast primitive.
+    drop dup array? [
+        dup vector? [
+            [ length ] [ underlying>> ] bi
+            2dup length eq?
+            [ nip ] [ resize-array ] if
+        ] [ >array ] if
+    ] unless ; inline
+
+M: sequence new-resizable drop <vector> ; inline
 
 INSTANCE: vector growable
 
-: 1vector ( x -- vector ) 1array >vector ;
+: 1vector ( x -- vector ) V{ } 1sequence ;
 
 : ?push ( elt seq/f -- seq )
     [ 1 <vector> ] unless* [ push ] keep ;

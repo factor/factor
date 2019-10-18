@@ -26,17 +26,17 @@ IN: units.si
 : cd ( n -- dimensioned ) { cd } { } <dimensioned> ;
 
 ! SI derived units
-: m^2 { m m } { } <dimensioned> ;
-: m^3 { m m m } { } <dimensioned> ;
-: m/s { m } { s } <dimensioned> ;
-: m/s^2 { m } { s s } <dimensioned> ;
-: 1/m { } { m } <dimensioned> ;
-: kg/m^3 { kg } { m m m } <dimensioned> ;
-: A/m^2 { A } { m m } <dimensioned> ;
-: A/m { A } { m } <dimensioned> ;
-: mol/m^3 { mol } { m m m } <dimensioned> ;
-: cd/m^2 { cd } { m m } <dimensioned> ;
-: kg/kg { kg } { kg } <dimensioned> ;
+: m^2 ( n -- dimensioned ) { m m } { } <dimensioned> ;
+: m^3 ( n -- dimensioned ) { m m m } { } <dimensioned> ;
+: m/s ( n -- dimensioned ) { m } { s } <dimensioned> ;
+: m/s^2 ( n -- dimensioned ) { m } { s s } <dimensioned> ;
+: 1/m ( n -- dimensioned ) { } { m } <dimensioned> ;
+: kg/m^3 ( n -- dimensioned ) { kg } { m m m } <dimensioned> ;
+: A/m^2 ( n -- dimensioned ) { A } { m m } <dimensioned> ;
+: A/m ( n -- dimensioned ) { A } { m } <dimensioned> ;
+: mol/m^3 ( n -- dimensioned ) { mol } { m m m } <dimensioned> ;
+: cd/m^2 ( n -- dimensioned ) { cd } { m m } <dimensioned> ;
+: kg/kg ( n -- dimensioned ) { kg } { kg } <dimensioned> ;
 
 ! Radians are really m/m, and steradians are m^2/m^2
 ! but they need to be in reduced form here.
@@ -65,9 +65,9 @@ IN: units.si
 : kat ( n -- katal ) { mol } { s } <dimensioned> ;
 
 ! Extensions to the SI
-: arc-deg pi 180 / * radians ;
-: arc-min pi 10800 / * radians ;
-: arc-sec pi 648000 / * radians ;
+: arc-deg ( n -- x ) pi 180 / * radians ;
+: arc-min ( n -- x ) pi 10800 / * radians ;
+: arc-sec ( n -- x ) pi 648000 / * radians ;
 : L ( n -- liter ) 1/1000 * m^3 ;
 : tons ( n -- metric-ton ) 1000 * kg ;
 : Np ( n -- neper ) { } { } <dimensioned> ;
@@ -83,43 +83,43 @@ IN: units.si
 : bar ( n -- bar ) 100000 * Pa ;
 : b ( n -- barn ) 1/10000000000000000000000000000 * m^2 ;
 : Ci ( n -- curie ) 37000000000 * Bq ;
-: R 258/10000 { s A } { kg } <dimensioned> ;
-: rad 100 / Gy ;
+: R ( -- dimensioned ) 258/10000 { s A } { kg } <dimensioned> ;
+: rad ( n -- dimensioned ) 100 / Gy ;
 
 ! roentgen equivalent man, equal to one roentgen of X-rays
-: roentgen-equivalent-man 100 / Sv ;
+: roentgen-equivalent-man ( n -- dimensioned ) 100 / Sv ;
 
 ! inaccurate, use calendar where possible
-: minutes 60 * s ;
-: hours 60 * minutes ;
-: days 24 * hours ;
+: minutes ( n -- dimensioned ) 60 * s ;
+: hours ( n -- dimensioned ) 60 * minutes ;
+: days ( n -- dimensioned ) 24 * hours ;
 
 ! Y Z E P T G M k h da 1 d c m mu n p f a z y
-: yotta 1000000000000000000000000 * ;
-: zetta 1000000000000000000000 * ;
-: exa   1000000000000000000 * ;
-: peta  1000000000000000 * ;
-: tera  1000000000000 * ;
-: giga  1000000000 * ;
-: mega  1000000 * ;
-: kilo  1000 * ;
-: hecto 100 * ;
-: deca  10 * ;
-: deci  10 / ;
-: centi 100 / ;
-: milli 1000 / ;
-: micro 1000000 / ;
-: nano  1000000000 / ;
-: pico  1000000000000 / ;
-: femto 1000000000000000 / ;
-: atto  1000000000000000000 / ;
-: zepto 1000000000000000000000 / ;
-: yocto 1000000000000000000000000 / ;
+: yotta ( n -- x ) 1000000000000000000000000 * ;
+: zetta ( n -- x ) 1000000000000000000000 * ;
+: exa   ( n -- x ) 1000000000000000000 * ;
+: peta  ( n -- x ) 1000000000000000 * ;
+: tera  ( n -- x ) 1000000000000 * ;
+: giga  ( n -- x ) 1000000000 * ;
+: mega  ( n -- x ) 1000000 * ;
+: kilo  ( n -- x ) 1000 * ;
+: hecto ( n -- x ) 100 * ;
+: deca  ( n -- x ) 10 * ;
+: deci  ( n -- x ) 10 / ;
+: centi ( n -- x ) 100 / ;
+: milli ( n -- x ) 1000 / ;
+: micro ( n -- x ) 1000000 / ;
+: nano  ( n -- x ) 1000000000 / ;
+: pico  ( n -- x ) 1000000000000 / ;
+: femto ( n -- x ) 1000000000000000 / ;
+: atto  ( n -- x ) 1000000000000000000 / ;
+: zepto ( n -- x ) 1000000000000000000000 / ;
+: yocto ( n -- x ) 1000000000000000000000000 / ;
 
-: km kilo m ;
-: cm centi m ;
-: mm milli m ;
-: nm nano m ;
-: g milli kg ;
-: ms milli s ;
-: angstrom 10 / nm ;
+: km ( n -- dimensioned ) kilo m ;
+: cm ( n -- dimensioned ) centi m ;
+: mm ( n -- dimensioned ) milli m ;
+: nm ( n -- dimensioned ) nano m ;
+: g ( n -- dimensioned ) milli kg ;
+: ms ( n -- dimensioned ) milli s ;
+: angstrom ( n -- dimensioned ) 10 / nm ;

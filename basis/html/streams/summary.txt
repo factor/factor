@@ -1,0 +1,1 @@
+HTML implementation of formatted output stream protocol

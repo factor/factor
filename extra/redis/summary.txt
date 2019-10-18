@@ -1,0 +1,1 @@
+Words for communicating with the Redis key-value database

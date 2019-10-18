@@ -1,8 +1,12 @@
-USING: crypto.common kernel math sequences ;
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel math sequences fry ;
 IN: crypto.xor
 
-TUPLE: no-xor-key ;
+: mod-nth ( n seq -- elt ) [ length mod ] [ nth ] bi ;
 
-: xor-crypt ( key seq -- seq )
-    over empty? [ no-xor-key construct-empty throw ] when
-    dup length rot [ mod-nth bitxor ] curry 2map ;
+ERROR: empty-xor-key ;
+
+: xor-crypt ( seq key -- seq' )
+    [ empty-xor-key ] when-empty
+    [ dup length iota ] dip '[ _ mod-nth bitxor ] 2map ;

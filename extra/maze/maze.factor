@@ -1,9 +1,10 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
 USING: sequences namespaces math math.vectors opengl opengl.gl
-arrays kernel random ui ui.gadgets ui.gadgets.canvas ui.render ;
+arrays kernel random ui ui.gadgets ui.gadgets.canvas ui.render
+math.order math.rectangles accessors ;
 IN: maze
 
-: line-width 8 ;
+CONSTANT: line-width 8
 
 SYMBOL: visited
 
@@ -16,18 +17,18 @@ SYMBOL: visited
 
 : choices ( cell -- seq )
     { { -1 0 } { 1 0 } { 0 -1 } { 0 1 } }
-    [ v+ ] curry* map
-    [ unvisited? ] subset ;
+    [ v+ ] with map
+    [ unvisited? ] filter ;
 
 : random-neighbour ( cell -- newcell ) choices random ;
 
 : vertex ( pair -- )
-    first2 [ 0.5 + line-width * ] 2apply glVertex2d ;
+    first2 [ 0.5 + line-width * ] bi@ glVertex2d ;
 
 : (draw-maze) ( cell -- )
     dup vertex
     glEnd
-    GL_POINTS [ dup vertex ] do-state
+    GL_POINTS glBegin dup vertex glEnd
     GL_LINE_STRIP glBegin
     dup vertex
     dup visit
@@ -43,17 +44,16 @@ SYMBOL: visited
     line-width 2 - glLineWidth
     line-width 2 - glPointSize
     1.0 1.0 1.0 1.0 glColor4d
-    dup [ drop t <array> ] curry* map visited set
+    dup iota [ drop t <array> ] with map visited set
     GL_LINE_STRIP glBegin
     { 0 0 } dup vertex (draw-maze)
     glEnd ;
 
-TUPLE: maze ;
+TUPLE: maze < canvas ;
 
-: <maze> ( -- gadget )
-    <canvas> { set-delegate } maze construct ;
+: <maze> ( -- gadget ) maze new-canvas ;
 
-: n ( gadget -- n ) rect-dim first2 min line-width /i ;
+: n ( gadget -- n ) dim>> first2 min line-width /i ;
 
 M: maze layout* delete-canvas-dlist ;
 
@@ -61,7 +61,7 @@ M: maze draw-gadget* [ n draw-maze ] draw-canvas ;
 
 M: maze pref-dim* drop { 400 400 } ;
 
-: maze-window ( -- )
-    [ <maze> "Maze" open-window ] with-ui ;
+MAIN-WINDOW: maze-window { { title "Maze" } }
+    <maze> >>gadgets ;
 
 MAIN: maze-window

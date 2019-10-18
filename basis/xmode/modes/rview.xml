@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+  Relational View (rview) mode by Will Sargent <wsargent@atg.com>
+-->
+<MODE>
+	<PROPS>
+                <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+                <PROPERTY NAME="lineComment" VALUE="//" />
+	</PROPS>
+
+        <!--
+          Unicode escapes are allowed in identifiers.
+          Ignoring case is bad.
+          Digits may be returned from functions.
+        -->
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+                <SEQ TYPE="COMMENT1">/**/</SEQ>
+
+		<!-- Javadoc comment -->
+		<SPAN TYPE="COMMENT2">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+                <!-- Java comment (C style) -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="RVIEWSTMT">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+                <SEQ TYPE="OPERATOR">}</SEQ>
+                <SEQ TYPE="OPERATOR">{</SEQ>
+                <SEQ TYPE="OPERATOR">=</SEQ>
+
+                <!-- Function calls -->
+                <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+				<SEQ TYPE="OPERATOR">)</SEQ>
+
+                <EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+                <KEYWORDS>
+
+                        <!--
+                          Keywords (WAY more than I thought there were, please
+                          e-mail me if I've left one out).
+                        -->
+                        <KEYWORD1>unique</KEYWORD1>
+                        <KEYWORD1>relationalview</KEYWORD1>
+                        <KEYWORD1>class</KEYWORD1>
+
+                        <KEYWORD1>rowmap</KEYWORD1>
+                        <KEYWORD1>table</KEYWORD1>
+                        <KEYWORD1>function</KEYWORD1>
+                        <KEYWORD1>subview</KEYWORD1>
+                        <KEYWORD1>query</KEYWORD1>
+
+                        <KEYWORD1>join</KEYWORD1>
+                        <KEYWORD1>jointype</KEYWORD1>
+                        <KEYWORD1>leftouter</KEYWORD1>
+                        <KEYWORD1>rightouter</KEYWORD1>
+
+                        <KEYWORD1>switch</KEYWORD1>
+                        <KEYWORD1>case</KEYWORD1>
+
+                        <KEYWORD1>sql</KEYWORD1>
+                        <KEYWORD1>constraints</KEYWORD1>
+                        <KEYWORD1>where</KEYWORD1>
+                        <KEYWORD1>orderby</KEYWORD1>
+                        <KEYWORD1>return</KEYWORD1>
+                        <KEYWORD1>distinct</KEYWORD1>
+
+                        <!--
+                          Allow parameters...
+                        -->
+                        <KEYWORD1>allow</KEYWORD1>
+                        <KEYWORD1>delete</KEYWORD1>
+                        <!-- also used in update function -->
+                        <KEYWORD1>update</KEYWORD1>
+                        <KEYWORD1>select</KEYWORD1>
+                        <KEYWORD1>insert</KEYWORD1>
+
+                        <!-- We're allowed to return primitive types -->
+                        <KEYWORD3>boolean</KEYWORD3>
+                        <KEYWORD3>byte</KEYWORD3>
+                        <KEYWORD3>char</KEYWORD3>
+                        <KEYWORD3>double</KEYWORD3>
+                        <KEYWORD3>float</KEYWORD3>
+                        <KEYWORD3>int</KEYWORD3>
+                        <KEYWORD3>long</KEYWORD3>
+                        <KEYWORD3>short</KEYWORD3>
+
+                        <KEYWORD1>useCallableStatement</KEYWORD1>
+
+                        <!--
+                          JDBC mapping statements (must be UPPERCASE)
+                        -->
+                        <KEYWORD3>CHAR</KEYWORD3>
+                        <KEYWORD3>VARCHAR</KEYWORD3>
+                        <KEYWORD3>LONGVARCHAR</KEYWORD3>
+                        <KEYWORD3>NUMERIC</KEYWORD3>
+                        <KEYWORD3>DECIMAL</KEYWORD3>
+                        <KEYWORD3>BIT</KEYWORD3>
+                        <KEYWORD3>TINYINT</KEYWORD3>
+                        <KEYWORD3>SMALLINT</KEYWORD3>
+                        <KEYWORD3>INTEGER</KEYWORD3>
+                        <KEYWORD3>BIGINT</KEYWORD3>
+                        <KEYWORD3>REAL</KEYWORD3>
+                        <KEYWORD3>FLOAT</KEYWORD3>
+                        <KEYWORD3>DOUBLE</KEYWORD3>
+                        <KEYWORD3>BINARY</KEYWORD3>
+                        <KEYWORD3>VARBINARY</KEYWORD3>
+                        <KEYWORD3>LONGVARBINARY</KEYWORD3>
+                        <KEYWORD3>DATE</KEYWORD3>
+                        <KEYWORD3>TIME</KEYWORD3>
+                        <KEYWORD3>TIMESTAMP</KEYWORD3>
+                </KEYWORDS>
+        </RULES>
+
+        <!--
+          Everything that happens in between quotes happens here.
+        -->
+        <RULES SET="RVIEWSTMT" ESCAPE="\" DEFAULT="LITERAL1"
+		HIGHLIGHT_DIGITS="TRUE" IGNORE_CASE="TRUE">
+                <!-- Allow quoting for characters. -->
+                <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+                        <BEGIN>'</BEGIN>
+                        <END>'</END>
+                </SPAN>
+
+                <!--
+                  Standard arithmetic
+                -->
+                <SEQ TYPE="OPERATOR">+</SEQ>
+                <SEQ TYPE="OPERATOR">-</SEQ>
+                <SEQ TYPE="OPERATOR">/</SEQ>
+                <SEQ TYPE="OPERATOR">*</SEQ>
+                <SEQ TYPE="OPERATOR">=</SEQ>
+
+                <!--
+                  Standard logic
+                -->
+                <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+                <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+                <SEQ TYPE="OPERATOR">&gt;</SEQ>
+                <SEQ TYPE="OPERATOR">&lt;</SEQ>
+
+                <!--
+                  For callable statements, { } must be used.
+                -->
+                <SEQ TYPE="OPERATOR">}</SEQ>
+                <SEQ TYPE="OPERATOR">{</SEQ>
+
+                <!--
+                  Escape colons for full tables
+                -->
+                <SEQ TYPE="NULL">::</SEQ>
+
+                <!-- Mark most colons as a label indicator -->
+                <MARK_FOLLOWING TYPE="LABEL">:</MARK_FOLLOWING>
+
+                <!-- Function calls (these can happen even inside quotes) -->
+                <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+				<SEQ TYPE="OPERATOR">)</SEQ>
+
+                <KEYWORDS>
+                        <KEYWORD1>SELECT</KEYWORD1>
+                        <KEYWORD1>FROM</KEYWORD1>
+                        <KEYWORD1>WHERE</KEYWORD1>
+                        <KEYWORD1>AND</KEYWORD1>
+                        <KEYWORD1>NOT</KEYWORD1>
+                        <KEYWORD1>IN</KEYWORD1>
+                        <KEYWORD1>BETWEEN</KEYWORD1>
+                        <KEYWORD1>UPDATE</KEYWORD1>
+                        <KEYWORD1>SET</KEYWORD1>
+
+                        <KEYWORD1>call</KEYWORD1>
+                        <KEYWORD1>desc</KEYWORD1>
+
+                        <!--
+                          It's possible to do casting to a particular SQL
+                          type, so include the JDBC types here
+                        -->
+                        <KEYWORD3>CHAR</KEYWORD3>
+                        <KEYWORD3>VARCHAR</KEYWORD3>
+                        <KEYWORD3>LONGVARCHAR</KEYWORD3>
+                        <KEYWORD3>NUMERIC</KEYWORD3>
+                        <KEYWORD3>DECIMAL</KEYWORD3>
+                        <KEYWORD3>BIT</KEYWORD3>
+                        <KEYWORD3>TINYINT</KEYWORD3>
+                        <KEYWORD3>SMALLINT</KEYWORD3>
+                        <KEYWORD3>INTEGER</KEYWORD3>
+                        <KEYWORD3>BIGINT</KEYWORD3>
+                        <KEYWORD3>REAL</KEYWORD3>
+                        <KEYWORD3>FLOAT</KEYWORD3>
+                        <KEYWORD3>DOUBLE</KEYWORD3>
+                        <KEYWORD3>BINARY</KEYWORD3>
+                        <KEYWORD3>VARBINARY</KEYWORD3>
+                        <KEYWORD3>LONGVARBINARY</KEYWORD3>
+                        <KEYWORD3>DATE</KEYWORD3>
+                        <KEYWORD3>TIME</KEYWORD3>
+                        <KEYWORD3>TIMESTAMP</KEYWORD3>
+                </KEYWORDS>
+        </RULES>
+
+
+</MODE>

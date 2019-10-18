@@ -1,14 +1,14 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel strings math sequences lazy-lists words
-math.parser promises ;
-IN: parser-combinators 
+USING: kernel strings math sequences lists.lazy words
+math.parser promises parser-combinators unicode.categories ;
+IN: parser-combinators.simple
 
 : 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
 
 : 'integer' ( -- parser )
-  'digit' <!+> [ 10 swap digits>integer ] <@ ;
+  'digit' <!+> [ 10 digits>integer ] <@ ;
 
 : 'string' ( -- parser )
   [ CHAR: " = ] satisfy 

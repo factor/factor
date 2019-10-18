@@ -1,4 +1,4 @@
-IN: temporary
+IN: ui.gadgets.lists.tests
 USING: ui.gadgets.lists models prettyprint math tools.test
 kernel ;
 

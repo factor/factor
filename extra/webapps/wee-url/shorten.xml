@@ -1,0 +1,10 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+        <t:form t:action="$wee-url">
+		<p>Shorten URL: <t:field t:name="url" t:size="40" /></p>
+		<button type="submit">Shorten</button>
+	</t:form>
+
+</t:chloe>

@@ -1,70 +1,90 @@
-! Copyright (C) 2006 Chris Double. All Rights Reserved.
-! See http://factorcode.org/license.txt for BSD license.
-!
-USING: kernel furnace fjsc  parser-combinators namespaces
-       lazy-lists io io.files furnace.validator sequences
-       http.client http.server http.server.responders
-       webapps.file html ;
+! Copyright (C) 2008 Chris Double. All Rights Reserved.
+USING: 
+    accessors
+    fjsc
+    furnace
+    furnace.actions
+    furnace.boilerplate
+    furnace.redirection
+    furnace.utilities
+    html.forms
+    http
+    http.client
+    http.server
+    http.server.dispatchers
+    http.server.responses
+    http.server.static
+    io
+    io.pathnames
+    io.streams.string
+    kernel
+    namespaces
+    peg
+    sequences
+    urls 
+    validators
+;
 IN: webapps.fjsc
 
-: compile ( code -- )
-  #! Compile the factor code as a string, outputting the http
-  #! response containing the javascript.
-  serving-text
-  'expression' parse-1 fjsc-compile
-  write flush ;
+TUPLE: fjsc < dispatcher ;
 
-! The 'compile' action results in an URL that looks like
-! 'responder/fjsc/compile'. It takes one query or post
-! parameter called 'code'. It calls the 'compile' word
-! passing the parameter to it on the stack.
-\ compile {
-  { "code" v-required }
-} define-action
+: absolute-url ( url -- url )
+    "http://" request get "host" header append 
+    over "/" head? [ "/" append ] unless 
+    swap append  ;
 
-: compile-url ( url -- )
-  #! Compile the factor code at the given url, return the javascript.
-  dup "http:" head? [ "Unable to access remote sites." throw ] when
-  "http://" host rot 3append http-get 2nip compile "();" write flush ;
+: do-compile-url ( url -- response )
+    [ 
+        absolute-url http-get nip 'expression' parse fjsc-compile write "();" write
+    ] with-string-writer
+    "application/javascript" <content> ;
 
-\ compile-url {
-  { "url" v-required }
-} define-action
+: v-local ( string -- string )
+    dup "http:" head? [ "Unable to compile code from remote sites" throw ] when ;
 
-: render-page* ( model body-template head-template -- )
-  [
-      [ render-component ] [ f rot render-component ] html-document 
-  ] serve-html ;
+: validate-compile-url ( -- )
+    {
+        { "url" [ v-required v-local ] }
+    } validate-params ;
 
-: repl ( -- )
-  #! The main 'repl' page.
-  f "repl" "head" render-page* ;
+: <compile-url-action> ( -- action )
+    <action>
+        [ validate-compile-url ] >>validate
+        [ "url" value do-compile-url ] >>submit
+        [ validate-compile-url "url" value do-compile-url ] >>display ;
 
-! An action called 'repl'
-\ repl { } define-action
+: do-compile ( code -- response )
+    [ 
+        'expression' parse fjsc-compile write
+    ] with-string-writer
+    "application/javascript" <content> ;
 
-: fjsc-web-app ( -- )
-  ! Create the web app, providing access
-  ! under '/responder/fjsc' which calls the
-  ! 'repl' action.
-  "fjsc" "repl" "extra/webapps/fjsc" web-app
+: validate-compile ( -- )
+    {
+        { "code" [ v-required ] }
+    } validate-params ;
 
-  ! An URL to the javascript resource files used by
-  ! the 'fjsc' responder.
-  "fjsc-resources" [
-   [
-     "extra/fjsc/resources/" resource-path "doc-root" set
-     file-responder
-   ] with-scope
-  ] add-simple-responder
+: <compile-action> ( -- action )
+    <action>
+        [ validate-compile ] >>validate
+        [ "code" value do-compile ] >>submit
+        [ validate-compile "code" value do-compile ] >>display ;
 
-  ! An URL to the resource files used by
-  ! 'termlib'.
-  "fjsc-repl-resources" [
-   [
-     "extra/webapps/fjsc/resources/" resource-path "doc-root" set
-     file-responder
-   ] with-scope
-  ] add-simple-responder ;
+: <main-action> ( -- action )
+    <page-action>
+        { fjsc "main" } >>template ;
 
-MAIN: fjsc-web-app
+: <fjsc> ( -- fjsc )
+    dispatcher new-dispatcher
+        "extra/webapps/fjsc/www" resource-path <static> "static" add-responder
+        "extra/fjsc/resources" resource-path <static> "fjsc" add-responder
+        fjsc new-dispatcher
+            <main-action> "" add-responder
+            <compile-action> "compile" add-responder
+            <compile-url-action> "compile-url" add-responder
+            <boilerplate>
+                { fjsc "fjsc" } >>template 
+         >>default ;
+
+: activate-fjsc ( -- )
+    <fjsc> main-responder set-global ;

@@ -1,17 +1,13 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs hashtables assocs io kernel math
+USING: accessors arrays hashtables assocs io kernel locals math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
-splitting sorting shuffle ;
+splitting sorting shuffle sets math.order ;
 IN: koszul
 
 ! Utilities
-: SYMBOLS:
-    ";" parse-tokens [ create-in define-symbol ] each ;
-    parsing
-
-: -1^ odd? -1 1 ? ;
+: -1^ ( m -- n ) odd? -1 1 ? ;
 
 : >alt ( obj -- vec )
     {
@@ -19,11 +15,11 @@ IN: koszul
         { [ dup number? ] [ { } associate ] }
         { [ dup array? ] [ 1 swap associate ] }
         { [ dup hashtable? ] [ ] }
-        { [ t ] [ 1array >alt ] }
+        [ 1array >alt ]
     } cond ;
 
-: canonicalize
-    [ nip zero? not ] assoc-subset ;
+: canonicalize ( assoc -- assoc' )
+    [ nip zero? not ] assoc-filter ;
 
 SYMBOL: terms
 
@@ -35,17 +31,17 @@ SYMBOL: terms
 ! Printing elements
 : num-alt. ( n -- str )
     {
-        { [ dup 1 = ] [ drop " + " ] }
-        { [ dup -1 = ] [ drop " - " ] }
-        { [ t ] [ number>string " + " swap append ] }
-    } cond ;
+        { 1 [ " + " ] }
+        { -1 [ " - " ] }
+        [ number>string " + " prepend ]
+    } case ;
 
 : (alt.) ( basis n -- str )
     over empty? [
         nip number>string
     ] [
         num-alt.
-        swap [ word-name ] map "." join
+        swap [ name>> ] map "." join
         append
     ] if ;
 
@@ -61,7 +57,7 @@ SYMBOL: terms
     terms get [ [ swap +@ ] assoc-each ] bind ;
 
 : alt+ ( x y -- x+y )
-    [ >alt ] 2apply [ (alt+) (alt+) ] with-terms ;
+    [ >alt ] bi@ [ (alt+) (alt+) ] with-terms ;
 
 ! Multiplication
 : alt*n ( vec n -- vec )
@@ -75,15 +71,15 @@ SYMBOL: terms
     [ natural-sort ] keep [ index ] curry map ;
 
 : (inversions) ( n seq -- n )
-    [ > ] curry* subset length ;
+    [ > ] with count ;
 
 : inversions ( seq -- n )
-    0 swap [ length ] keep [
-        [ nth ] 2keep swap 1+ tail-slice (inversions) +
+    0 swap [ length iota ] keep [
+        [ nth ] 2keep swap 1 + tail-slice (inversions) +
     ] curry each ;
 
 : duplicates? ( seq -- ? )
-    dup prune [ length ] 2apply > ;
+    dup prune [ length ] bi@ > ;
 
 : (wedge) ( n basis1 basis2 -- n basis )
     append dup duplicates? [
@@ -94,7 +90,7 @@ SYMBOL: terms
     ] if ;
 
 : wedge ( x y -- x.y )
-    [ >alt ] 2apply [
+    [ >alt ] bi@ [
         swap [
             [
                 2swap [
@@ -112,20 +108,19 @@ SYMBOL: boundaries
 
 : ((d)) ( basis -- value ) boundaries get at ;
 
-: dx.y ( x y -- vec ) >r ((d)) r> wedge ;
+: dx.y ( x y -- vec ) [ ((d)) ] dip wedge ;
 
 DEFER: (d)
 
 : x.dy ( x y -- vec ) (d) wedge -1 alt*n ;
 
 : (d) ( product -- value )
-    dup empty?
-    [ drop H{ } ] [ unclip swap [ x.dy ] 2keep dx.y alt+ ] if ;
+    [ H{ } ] [ unclip swap [ x.dy ] 2keep dx.y alt+ ] if-empty ;
 
 : linear-op ( vec quot -- vec )
-	[
         [
-            -rot >r swap call r> alt*n (alt+)
+        [
+            -rot [ swap call ] dip alt*n (alt+)
         ] curry assoc-each
     ] with-terms ; inline
 
@@ -146,31 +141,31 @@ DEFER: (d)
 
 ! Computing a basis
 : graded ( seq -- seq )
-    dup 0 [ length max ] reduce 1+ [ drop V{ } clone ] map
+    dup 0 [ length max ] reduce 1 + [ V{ } clone ] replicate
     [ dup length pick nth push ] reduce ;
 
 : nth-basis-elt ( generators n -- elt )
-    over length [
+    over length iota [
         3dup bit? [ nth ] [ 2drop f ] if
-    ] map [ ] subset 2nip ;
+    ] map sift 2nip ;
 
 : basis ( generators -- seq )
-    natural-sort dup length 2^ [ nth-basis-elt ] curry* map ;
+    natural-sort dup length 2^ iota [ nth-basis-elt ] with map ;
 
 : (tensor) ( seq1 seq2 -- seq )
     [
-        [ swap append natural-sort ] curry map
-    ] curry* map concat ;
+        [ prepend natural-sort ] curry map
+    ] with map concat ;
 
 : tensor ( graded-basis1 graded-basis2 -- bigraded-basis )
-    [ [ swap (tensor) ] curry map ] curry* map ;
+    [ [ swap (tensor) ] curry map ] with map ;
 
 ! Computing cohomology
 : (op-matrix) ( range quot basis-elt -- row )
     swap call [ at 0 or ] curry map ; inline
 
 : op-matrix ( domain range quot -- matrix )
-    rot [ >r 2dup r> (op-matrix) ] map 2nip ; inline
+    rot [ (op-matrix) ] with with map ; inline
 
 : d-matrix ( domain range -- matrix )
     [ (d) ] op-matrix ;
@@ -181,41 +176,41 @@ DEFER: (d)
 ! Graded by degree
 : (graded-ker/im-d) ( n seq -- null/rank )
     #! d: C(n) ---> C(n+1)
-    [ ?nth ] 2keep >r 1+ r> ?nth
+    [ ?nth ] [ [ 1 + ] dip ?nth ] 2bi
     dim-im/ker-d ;
 
 : graded-ker/im-d ( graded-basis -- seq )
-    [ length ] keep [ (graded-ker/im-d) ] curry map ;
+    [ length iota ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
-    basis graded graded-ker/im-d flip first2 1 head* 0 add* v- ;
+    basis graded graded-ker/im-d unzip but-last 0 prefix v- ;
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
     #! d: C(u,z) ---> C(u+2,z-1)
-    [ ?nth ?nth ] 3keep >r >r 2 + r> 1 - r> ?nth ?nth
+    [ ?nth ?nth ] 3keep [ [ 2 + ] dip 1 - ] dip ?nth ?nth
     dim-im/ker-d ;
 
-: bigraded-ker/im-d ( bigraded-basis -- seq )
-    dup length [
-        over first length [
-            >r 2dup r> swap rot (bigraded-ker/im-d)
-        ] map 2nip
-    ] curry* map ;
+:: bigraded-ker/im-d ( basis -- seq )
+    basis length iota [| z |
+         basis first length iota [| u |
+            u z basis (bigraded-ker/im-d)
+        ] map
+    ] map ;
 
 : bigraded-betti ( u-generators z-generators -- seq )
-    [ basis graded ] 2apply tensor bigraded-ker/im-d
+    [ basis graded ] bi@ tensor bigraded-ker/im-d
     [ [ [ first ] map ] map ] keep
-    [ [ second ] map 2 head* { 0 0 } swap append ] map
-    1 tail dup first length 0 <array> add
+    [ [ second ] map 2 head* { 0 0 } prepend ] map
+    rest dup first length 0 <array> suffix
     [ v- ] 2map ;
 
 ! Laplacian
-: m.m' dup flip m. ;
-: m'.m dup flip swap m. ;
+: m.m' ( matrix -- matrix' ) dup flip m. ;
+: m'.m ( matrix -- matrix' ) dup flip swap m. ;
 
 : empty-matrix? ( matrix -- ? )
-    dup empty? [ drop t ] [ first empty? ] if ;
+    [ t ] [ first empty? ] if-empty ;
 
 : ?m+ ( m1 m2 -- m3 )
     over empty-matrix? [
@@ -229,29 +224,27 @@ DEFER: (d)
     ] if ;
 
 : laplacian-matrix ( basis1 basis2 basis3 -- matrix )
-    dupd d-matrix m.m' >r d-matrix m'.m r> ?m+ ;
+    dupd d-matrix m.m' [ d-matrix m'.m ] dip ?m+ ;
 
 : laplacian-betti ( basis1 basis2 basis3 -- n )
     laplacian-matrix null/rank drop ;
 
-: laplacian-kernel ( basis1 basis2 basis3 -- basis )
-    >r tuck r>
-    laplacian-matrix dup empty-matrix? [
-        2drop f
-    ] [
-        nullspace [
-            [ [ wedge (alt+) ] 2each ] with-terms
-        ] curry* map
+:: laplacian-kernel ( basis1 basis2 basis3 -- basis )
+    basis1 basis2 basis3 laplacian-matrix :> lap
+    lap empty-matrix? [ f ] [
+        lap nullspace [| x |
+            basis2 x [ [ wedge (alt+) ] 2each ] with-terms
+        ] map
     ] if ;
 
 : graded-triple ( seq n -- triple )
-    3 [ 1- + ] curry* map swap [ ?nth ] curry map ;
+    3 [ 1 - + ] with map swap [ ?nth ] curry map ;
 
 : graded-triples ( seq -- triples )
-    dup length [ graded-triple ] curry* map ;
+    dup length [ graded-triple ] with map ;
 
 : graded-laplacian ( generators quot -- seq )
-    >r basis graded graded-triples [ first3 ] r> compose map ;
+    [ basis graded graded-triples [ first3 ] ] dip compose map ;
     inline
 
 : graded-laplacian-betti ( generators -- seq )
@@ -261,29 +254,30 @@ DEFER: (d)
     [ laplacian-kernel ] graded-laplacian ;
 
 : graded-basis. ( seq -- )
-    dup length [
+    [
         "=== Degree " write pprint
         ": dimension " write dup length .
         [ alt. ] each
-    ] 2each ;
+    ] each-index ;
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
     #! d: C(u,z) ---> C(u+2,z-1)
-    [ >r >r 2 - r> 1 + r> ?nth ?nth ] 3keep
-    [ ?nth ?nth ] 3keep
-    >r >r 2 + r> 1 - r> ?nth ?nth
+    [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ] 
+    [ ?nth ?nth ] 
+    [ [ 2 + ] [ 1 - ] [ ] tri* ?nth ?nth ]
+    3tri
     3array ;
 
-: bigraded-triples ( grid -- triples )
-    dup length [
-        over first length [
-            >r 2dup r> swap rot bigraded-triple
-        ] map 2nip
-    ] curry* map ;
+:: bigraded-triples ( grid -- triples )
+    grid length iota [| z |
+        grid first length iota [| u |
+            u z grid bigraded-triple
+        ] map
+    ] map ;
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
-    >r [ basis graded ] 2apply tensor bigraded-triples r>
-    [ [ first3 ] swap compose map ] curry map ; inline
+    [ [ basis graded ] bi@ tensor bigraded-triples ] dip
+    [ [ first3 ] prepose map ] curry map ; inline
 
 : bigraded-laplacian-betti ( u-generators z-generators -- seq )
     [ laplacian-betti ] bigraded-laplacian ;
@@ -292,11 +286,11 @@ DEFER: (d)
     [ laplacian-kernel ] bigraded-laplacian ;
 
 : bigraded-basis. ( seq -- )
-    dup length [
+    [
         "=== U-degree " write .
-        dup length [
+        [
             "  === Z-degree " write pprint
             ": dimension " write dup length .
             [ "  " write alt. ] each
-        ] 2each
-    ] 2each ;
+        ] each-index
+    ] each-index ;

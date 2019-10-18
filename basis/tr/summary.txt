@@ -1,0 +1,1 @@
+Fast character-to-character translation of ASCII strings

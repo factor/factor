@@ -1,0 +1,1 @@
+Utility words for memory DCs and bitmaps

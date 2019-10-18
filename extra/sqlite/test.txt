@@ -1,3 +1,0 @@
-create table test (name varchar(30), address varchar(30));
-insert into test values('John', 'America');
-insert into test values('Jane', 'New Zealand');

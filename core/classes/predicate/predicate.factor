@@ -1,24 +1,49 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes kernel namespaces words ;
+USING: classes classes.private classes.algebra
+classes.algebra.private kernel namespaces make words sequences
+quotations arrays kernel.private assocs combinators ;
 IN: classes.predicate
 
-PREDICATE: class predicate-class
+PREDICATE: predicate-class < class
     "metaclass" word-prop predicate-class eq? ;
 
-: predicate-quot ( class -- quot )
+<PRIVATE
+
+GENERIC: predicate-quot ( class -- quot )
+
+M: predicate-class predicate-quot
     [
         \ dup ,
-        dup superclass "predicate" word-prop %
-        "predicate-definition" word-prop , [ drop f ] , \ if ,
+        [ superclass "predicate" word-prop % ]
+        [ "predicate-definition" word-prop , ] bi
+        [ drop f ] , \ if ,
     ] [ ] make ;
 
-: define-predicate-class ( superclass class definition -- )
-    >r dup f roll predicate-class define-class r>
-    dupd "predicate-definition" set-word-prop
-    dup predicate-word over predicate-quot define-predicate ;
+PRIVATE>
+
+: define-predicate-class ( class superclass definition -- )
+    [ drop f f predicate-class define-class ]
+    [ nip "predicate-definition" set-word-prop ]
+    [
+        2drop
+        [ dup predicate-quot define-predicate ]
+        [ update-classes ]
+        bi
+    ] 3tri ;
 
 M: predicate-class reset-class
-    {
-        "metaclass" "predicate-definition" "superclass"
-    } reset-props ;
+    [ call-next-method ] [ { "predicate-definition" } reset-props ] bi ;
+
+M: predicate-class rank-class drop 1 ;
+
+M: predicate-class instance?
+    2dup superclass instance? [
+        "predicate-definition" word-prop call( object -- ? )
+    ] [ 2drop f ] if ;
+
+M: predicate-class (flatten-class)
+    superclass (flatten-class) ;
+
+M: predicate-class (classes-intersect?)
+    superclass classes-intersect? ;

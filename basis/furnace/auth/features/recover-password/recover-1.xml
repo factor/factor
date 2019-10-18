@@ -1,0 +1,39 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Recover lost password: step 1 of 4</t:title>
+
+	<p>Enter the username and e-mail address you used to register for this site, and you will receive a link for activating a new password.</p>
+
+	<t:form t:action="$realm/recover-password">
+
+		<table>
+
+			<tr>
+				<th class="field-label">User name:</th>
+				<td><t:field t:name="username" /></td>
+			</tr>
+
+			<tr>
+				<th class="field-label">E-mail:</th>
+				<td><t:field t:name="email" /></td>
+			</tr>
+
+			<tr>
+				<th class="field-label">Captcha:</th>
+				<td><t:field t:name="captcha" /></td>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to e-mail you will be blocked.</td>
+			</tr>
+
+		</table>
+
+		<button type="submit">Recover password</button>
+
+	</t:form>
+
+</t:chloe>

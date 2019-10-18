@@ -1,0 +1,63 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:atom t:href="$pastebin/paste.atom" t:query="id">
+		Paste: <t:label t:name="summary" />
+	</t:atom>
+
+	<t:title>Paste: <t:label t:name="summary" /></t:title>
+
+	<table>
+		<tr><th class="field-label">Author: </th><td><t:label t:name="author" /></td></tr>
+		<tr><th class="field-label">Mode: </th><td><t:label t:name="mode" /></td></tr>
+		<tr><th class="field-label">Date: </th><td><t:label t:name="date" /></td></tr>
+	</table>
+
+	<t:a t:href="$pastebin/paste.txt" t:query="id">Plain Text</t:a> |
+	<t:button t:action="$pastebin/delete-paste" t:for="id" class="link-button link">Delete Paste</t:button>
+
+	<pre class="description"><t:code t:name="contents" t:mode="mode" /></pre>
+
+	<t:bind-each t:name="annotations">
+
+		<h2><a name="@id">Annotation: <t:label t:name="summary" /></a></h2>
+
+		<table>
+			<tr><th class="field-label">Author: </th><td><t:label t:name="author" /></td></tr>
+			<tr><th class="field-label">Mode: </th><td><t:label t:name="mode" /></td></tr>
+			<tr><th class="field-label">Date: </th><td><t:label t:name="date" /></td></tr>
+		</table>
+
+		<t:a t:href="$pastebin/annotation.txt" t:query="id">Plain Text</t:a> |
+		<t:button t:action="$pastebin/delete-annotation" t:for="id" class="link-button link">Delete Annotation</t:button>
+
+		<pre class="description"><t:code t:name="contents" t:mode="mode"/></pre>
+
+	</t:bind-each>
+
+	<t:bind t:name="new-annotation">
+
+		<h2>New Annotation</h2>
+
+		<t:form t:action="$pastebin/new-annotation" t:for="parent">
+
+			<table>
+				<tr><th class="field-label">Summary: </th><td><t:field t:name="summary" /></td></tr>
+				<tr><th class="field-label">Author: </th><td><t:field t:name="author" /></td></tr>
+				<tr><th class="field-label">Mode: </th><td><t:choice t:name="mode" t:choices="modes" /></td></tr>
+				<tr><th class="field-label big-field-label">Body: </th><td><t:textarea t:name="contents" t:rows="20" t:cols="60" /></td></tr>
+				<tr><th class="field-label">Captcha: </th><td><t:field t:name="captcha" /></td></tr>
+				<tr>
+				<td></td>
+				<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to register will be blocked.</td>
+				</tr>
+			</table>
+
+			<p> <button type="submit">Done</button> </p>
+
+		</t:form>
+
+	</t:bind>
+
+</t:chloe>

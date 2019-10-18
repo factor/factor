@@ -1,135 +1,118 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: words
-USING: arrays definitions graphs assocs kernel kernel.private
+USING: accessors arrays definitions kernel kernel.private
 slots.private math namespaces sequences strings vectors sbufs
-quotations assocs hashtables sorting math.parser words.private
-vocabs ;
+quotations assocs hashtables sorting vocabs math.order sets
+words.private ;
+IN: words
 
 : word ( -- word ) \ word get-global ;
 
 : set-word ( word -- ) \ word set-global ;
 
-GENERIC: execute ( word -- )
-
 M: word execute (execute) ;
 
-! Used by the compiler
-SYMBOL: changed-words
-
-: word-changed? ( word -- ? )
-    changed-words get [ key? ] [ drop f ] if* ;
-
-: changed-word ( word -- )
-    dup changed-words get [ set-at ] [ 2drop ] if* ;
-
-: unchanged-word ( word -- )
-    changed-words get [ delete-at ] [ drop ] if* ;
+M: word ?execute execute( -- value ) ; inline
 
 M: word <=>
-    [ dup word-name swap word-vocabulary 2array ] compare ;
+    [ [ name>> ] [ vocabulary>> ] bi 2array ] compare ;
 
-M: word definition drop f ;
+M: word definer drop \ : \ ; ;
 
-PREDICATE: word undefined ( obj -- ? ) word-def not ;
-M: undefined definer drop \ DEFER: f ;
+M: word definition def>> ;
 
-PREDICATE: word compound  ( obj -- ? ) word-def quotation? ;
+: word-prop ( word name -- value ) swap props>> at ;
 
-M: compound definer drop \ : \ ; ;
-
-M: compound definition word-def ;
-
-PREDICATE: word primitive ( obj -- ? ) word-def fixnum? ;
-M: primitive definer drop \ PRIMITIVE: f ;
-
-PREDICATE: word symbol    ( obj -- ? ) word-def t eq? ;
-M: symbol definer drop \ SYMBOL: f ;
-
-: word-prop ( word name -- value ) swap word-props at ;
-
-: remove-word-prop ( word name -- )
-    swap word-props delete-at ;
+: remove-word-prop ( word name -- ) swap props>> delete-at ;
 
 : set-word-prop ( word value name -- )
     over
-    [ pick word-props ?set-at swap set-word-props ]
+    [ pick props>> ?set-at >>props drop ]
     [ nip remove-word-prop ] if ;
 
-: reset-props ( word seq -- ) [ remove-word-prop ] curry* each ;
+: reset-props ( word seq -- ) [ remove-word-prop ] with each ;
+
+<PRIVATE
+
+: caller ( callstack -- word ) callstack>array <reversed> third ;
+
+PRIVATE>
+
+TUPLE: undefined word ;
+: undefined ( -- * ) callstack caller \ undefined boa throw ;
+
+: undefined-def ( -- quot )
+    #! 'f' inhibits tail call optimization in non-optimizing
+    #! compiler, ensuring that we can pull out the caller word
+    #! above.
+    [ undefined f ] ;
+
+PREDICATE: deferred < word ( obj -- ? ) def>> undefined-def = ;
+M: deferred definer drop \ DEFER: f ;
+M: deferred definition drop f ;
+
+PREDICATE: primitive < word ( obj -- ? ) "primitive" word-prop ;
+M: primitive definer drop \ PRIMITIVE: f ;
+M: primitive definition drop f ;
 
 : lookup ( name vocab -- word ) vocab-words at ;
 
 : target-word ( word -- target )
-    dup word-name swap word-vocabulary lookup ;
+    [ name>> ] [ vocabulary>> ] bi lookup ;
 
 SYMBOL: bootstrapping?
 
 : if-bootstrapping ( true false -- )
-    bootstrapping? get -rot if ; inline
+    [ bootstrapping? get ] 2dip if ; inline
 
 : bootstrap-word ( word -- target )
     [ target-word ] [ ] if-bootstrapping ;
 
-PREDICATE: word interned dup target-word eq? ;
+GENERIC: crossref? ( word -- ? )
 
-GENERIC# (quot-uses) 1 ( obj assoc -- )
+M: word crossref?
+    dup "forgotten" word-prop [ drop f ] [ vocabulary>> >boolean ] if ;
 
-M: object (quot-uses) 2drop ;
+: inline? ( word -- ? ) "inline" word-prop ; inline
 
-M: interned (quot-uses) dupd set-at ;
+GENERIC: subwords ( word -- seq )
 
-: seq-uses ( seq assoc -- ) [ (quot-uses) ] curry each ;
-
-M: array (quot-uses) seq-uses ;
-
-M: callable (quot-uses) seq-uses ;
-
-M: wrapper (quot-uses) >r wrapped r> (quot-uses) ;
-
-: quot-uses ( quot -- assoc )
-    global [ H{ } clone [ (quot-uses) ] keep ] bind ;
-
-M: word uses ( word -- seq )
-    word-def quot-uses keys ;
-
-M: compound redefined* ( word -- )
-    dup changed-word
-    { "inferred-effect" "base-case" "no-effect" } reset-props ;
-
-<PRIVATE
-
-: definition-changed? ( word def -- ? )
-    swap word-def = not ;
+M: word subwords drop f ;
 
 : define ( word def -- )
-    2dup definition-changed? [
-        over redefined
-        over unxref
-        over set-word-def
-        dup update-xt
-        dup word-vocabulary [
-            dup changed-word dup xref
-        ] when drop
-    ] [
-        2drop
+    over changed-definition [ ] like >>def drop ;
+
+: changed-effect ( word -- )
+    [ dup changed-effects get set-in-unit ]
+    [ dup primitive? [ drop ] [ changed-definition ] if ] bi ;
+
+: set-stack-effect ( effect word -- )
+    2dup "declared-effect" word-prop = [ 2drop ] [
+        [ nip changed-effect ]
+        [ nip subwords [ changed-effect ] each ]
+        [ swap "declared-effect" set-word-prop ]
+        2tri
     ] if ;
 
-PRIVATE>
-
-: define-symbol ( word -- ) t define ;
-
-: intern-symbol ( word -- )
-    dup undefined? [ define-symbol ] [ drop ] if ;
-
-: define-compound ( word def -- ) [ ] like define ;
-
 : define-declared ( word def effect -- )
-    pick swap "declared-effect" set-word-prop
-    define-compound ;
+    [ nip swap set-stack-effect ] [ drop define ] 3bi ;
 
-: make-inline ( word -- )
-    t "inline" set-word-prop ;
+: make-deprecated ( word -- )
+    t "deprecated" set-word-prop ;
+
+ERROR: cannot-be-inline word ;
+
+GENERIC: make-inline ( word -- )
+
+M: word make-inline
+    dup inline? [ drop ] [
+        [ t "inline" set-word-prop ]
+        [ changed-effect ]
+        bi
+    ] if ;
+
+: make-recursive ( word -- )
+    t "recursive" set-word-prop ;
 
 : make-flushable ( word -- )
     t "flushable" set-word-prop ;
@@ -137,81 +120,102 @@ PRIVATE>
 : make-foldable ( word -- )
     dup make-flushable t "foldable" set-word-prop ;
 
-: define-inline ( word quot -- )
-    dupd define-compound make-inline ;
+: define-inline ( word def effect -- )
+    [ define-declared ] [ 2drop make-inline ] 3bi ;
 
-: reset-word ( word -- )
+GENERIC: flushable? ( word -- ? )
+
+M: word flushable? "flushable" word-prop ;
+
+GENERIC: reset-word ( word -- )
+
+M: word reset-word
+    dup flushable? [ dup changed-conditionally ] when
     {
-        "parsing" "inline" "foldable"
-        "predicating"
-        "reading" "writing"
-        "constructing"
-        "declared-effect" "constructor-quot" "delimiter"
+        "unannotated-def" "parsing" "inline" "recursive"
+        "foldable" "flushable" "reading" "writing" "reader"
+        "writer" "delimiter" "deprecated"
     } reset-props ;
 
 : reset-generic ( word -- )
-    dup reset-word { "methods" "combination" } reset-props ;
+    [ subwords forget-all ]
+    [ reset-word ]
+    [
+        f >>pic-def
+        f >>pic-tail-def
+        {
+            "methods"
+            "combination"
+            "default-method"
+            "engines"
+            "decision-tree"
+        } reset-props
+    ] tri ;
+
+: <word> ( name vocab -- word )
+    2dup [ hashcode ] bi@ bitxor >fixnum (word) dup new-word ;
+
+: <uninterned-word> ( name -- word )
+    f \ <uninterned-word> counter >fixnum (word)
+    new-words get [ dup new-word ] when ;
 
 : gensym ( -- word )
-    "G:" \ gensym counter number>string append f <word> ;
+    "( gensym )" <uninterned-word> ;
 
-: define-temp ( quot -- word )
-    gensym [ swap define-compound ] keep ;
+: define-temp ( quot effect -- word )
+    [ gensym dup ] 2dip define-declared ;
 
 : reveal ( word -- )
-    dup word-name over word-vocabulary vocab-words set-at ;
+    dup [ name>> ] [ vocabulary>> ] bi dup vocab-words
+    [ ] [ no-vocab ] ?if
+    set-at ;
 
-TUPLE: check-create name vocab ;
+ERROR: bad-create name vocab ;
 
 : check-create ( name vocab -- name vocab )
-    2dup [ string? ] both? [
-        \ check-create construct-boa throw
-    ] unless ;
+    2dup [ string? ] [ [ string? ] [ vocab? ] bi or ] bi* and
+    [ bad-create ] unless ;
 
 : create ( name vocab -- word )
     check-create 2dup lookup
-    dup [ 2nip ] [ drop <word> dup reveal ] if ;
+    dup [ 2nip ] [
+        drop
+        vocab-name <word>
+        dup reveal
+        dup changed-definition
+    ] if ;
 
 : constructor-word ( name vocab -- word )
-    >r "<" swap ">" 3append r> create ;
+    [ "<" ">" surround ] dip create ;
 
-: parsing? ( obj -- ? )
-    dup word? [ "parsing" word-prop ] [ drop f ] if ;
+PREDICATE: parsing-word < word "parsing" word-prop ;
+
+M: parsing-word definer drop \ SYNTAX: \ ; ;
+
+: define-syntax ( word quot -- )
+    [ drop ] [ define ] 2bi t "parsing" set-word-prop ;
 
 : delimiter? ( obj -- ? )
     dup word? [ "delimiter" word-prop ] [ drop f ] if ;
+
+: deprecated? ( obj -- ? )
+    dup word? [ "deprecated" word-prop ] [ drop f ] if ;
 
 ! Definition protocol
 M: word where "loc" word-prop ;
 
 M: word set-where swap "loc" set-word-prop ;
 
-GENERIC: (forget-word) ( word -- )
-
-M: interned (forget-word)
-    dup word-name swap word-vocabulary vocab-words delete-at ;
-
-M: word (forget-word)
-    drop ;
-
-: rename-word ( word newname newvocab -- )
-    pick (forget-word)
-    pick set-word-vocabulary
-    over set-word-name
-    reveal ;
-
-: forget-word ( word -- )
-    dup delete-xref
-    dup unchanged-word
-    (forget-word) ;
-
-M: word forget forget-word ;
+M: word forget*
+    dup "forgotten" word-prop [ drop ] [
+        [ [ name>> ] [ vocabulary>> vocab-words ] bi delete-at ]
+        [ t "forgotten" set-word-prop ]
+        bi
+    ] if ;
 
 M: word hashcode*
-    nip 1 slot { fixnum } declare ;
+    nip 1 slot { fixnum } declare ; inline foldable
 
 M: word literalize <wrapper> ;
 
-: ?word-name dup word? [ word-name ] when ;
-
-: xref-words ( -- ) all-words [ xref ] each ;
+INSTANCE: word definition

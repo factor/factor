@@ -1,6 +1,7 @@
-USING: kernel math namespaces prettyprint
-math.private continuations tools.test sequences ;
-IN: temporary
+USING: kernel math math.functions math.order namespaces
+prettyprint math.private continuations tools.test sequences
+random ;
+IN: math.integers.tests
 
 [ "-8" ] [ -8 unparse ] unit-test
 
@@ -23,8 +24,8 @@ IN: temporary
 
 [ -1 ] [ 1 neg ] unit-test
 [ -1 ] [ 1 >bignum neg ] unit-test
-[ 268435456 ] [ -268435456 >fixnum -1 * ] unit-test
-[ 268435456 ] [ -268435456 >fixnum neg ] unit-test
+[ 134217728 ] [ -134217728 >fixnum -1 * ] unit-test
+[ 134217728 ] [ -134217728 >fixnum neg ] unit-test
 
 [ 9 3 ] [ 93 10 /mod ] unit-test
 [ 9 3 ] [ 93 >bignum 10 /mod ] unit-test
@@ -91,6 +92,8 @@ unit-test
 [ f ] [ BIN: -1101 >bignum 3 bit? ] unit-test
 [ t ] [ BIN: -1101 >bignum 4 bit? ] unit-test
 
+[ t ] [ 1067811677921310779 >bignum 59 bit? ] unit-test
+
 [ 2 ] [ 0 next-power-of-2 ] unit-test
 [ 2 ] [ 1 next-power-of-2 ] unit-test
 [ 2 ] [ 2 next-power-of-2 ] unit-test
@@ -98,11 +101,16 @@ unit-test
 [ 16 ] [ 13 next-power-of-2 ] unit-test
 [ 16 ] [ 16 next-power-of-2 ] unit-test
 
-[ 268435456 ] [ -268435456 >fixnum -1 /i ] unit-test
-[ 268435456 0 ] [ -268435456 >fixnum -1 /mod ] unit-test
-[ 0 ] [ -1 -268435456 >fixnum /i ] unit-test
-[ 0 -1 ] [ -1 -268435456 >fixnum /mod ] unit-test
+[ 134217728 ] [ -134217728 >fixnum -1 /i ] unit-test
+[ 134217728 0 ] [ -134217728 >fixnum -1 /mod ] unit-test
+[ 0 ] [ -1 -134217728 >fixnum /i ] unit-test
+[ 4420880996869850977 ] [ 13262642990609552931 3 /i ] unit-test
+[ 0 -1 ] [ -1 -134217728 >fixnum /mod ] unit-test
+[ 0 -1 ] [ -1 -134217728 >bignum /mod ] unit-test
 [ 14355 ] [ 1591517158873146351817850880000000 32769 mod ] unit-test
+[ 8 530505719624382123 ] [ 13262642990609552931 1591517158873146351 /mod ] unit-test
+[ 8 ] [ 13262642990609552931 1591517158873146351 /i ] unit-test
+[ 530505719624382123 ] [ 13262642990609552931 1591517158873146351 mod ] unit-test
 
 [ -351382792 ] [ -43922849 3 shift ] unit-test
 
@@ -110,7 +118,7 @@ unit-test
 [ f ] [ 30 zero? ] unit-test
 [ t ] [ 0 >bignum zero? ] unit-test
 
-[ 4294967280 ] [ 268435455 >fixnum 16 fixnum* ] unit-test
+[ 2147483632 ] [ 134217727 >fixnum 16 fixnum* ] unit-test
 
 [ 23603949310011464311086123800853779733506160743636399259558684142844552151041 ]
 [
@@ -121,8 +129,8 @@ unit-test
 
 ! We don't care if this fails or returns 0 (its CPU-specific)
 ! as long as it doesn't crash
-[ ] [ [ 0 0 /i ] catch clear ] unit-test
-[ ] [ [ 100000000000000000 0 /i ] catch clear ] unit-test
+[ ] [ [ 0 0 /i drop ] ignore-errors ] unit-test
+[ ] [ [ 100000000000000000 0 /i drop ] ignore-errors ] unit-test
 
 [ -2 ] [ 1 bitnot ] unit-test
 [ -2 ] [ 1 >bignum bitnot ] unit-test
@@ -149,7 +157,7 @@ unit-test
 [ 4294967296 ] [ 1 32 shift ] unit-test
 [ 1267650600228229401496703205376 ] [ 1 100 shift ] unit-test
 
-[ t ] [ 1 27 shift fixnum? ] unit-test
+[ t ] [ 1 26 shift fixnum? ] unit-test
 
 [ t ] [
     t
@@ -184,3 +192,45 @@ unit-test
 [ HEX: 988a259c3433f237 ] [
     B{ HEX: 37 HEX: f2 HEX: 33 HEX: 34 HEX: 9c HEX: 25 HEX: 8a HEX: 98 } byte-array>bignum
 ] unit-test
+
+[ t ] [ 256 power-of-2? ] unit-test
+[ f ] [ 123 power-of-2? ] unit-test
+
+[ f ] [ -128 power-of-2? ] unit-test
+[ f ] [ 0 power-of-2? ] unit-test
+[ t ] [ 1 power-of-2? ] unit-test
+
+: ratio>float ( a b -- f ) [ >bignum ] bi@ /f ;
+
+[ 5. ] [ 5 1 ratio>float ] unit-test
+[ 4. ] [ 4 1 ratio>float ] unit-test
+[ 2. ] [ 2 1 ratio>float ] unit-test
+[ .5 ] [ 1 2 ratio>float ] unit-test
+[ .75 ] [ 3 4 ratio>float ] unit-test
+[ 1. ] [ 2000 2^ 2000 2^ 1 + ratio>float ] unit-test
+[ -1. ] [ 2000 2^ neg 2000 2^ 1 + ratio>float ] unit-test
+[ 0.4 ] [ 6 15 ratio>float ] unit-test
+
+[ HEX: 3fe553522d230931 ]
+[ 61967020039 92984792073 ratio>float double>bits ] unit-test
+
+: random-integer ( -- n )
+    32 random-bits
+    1 random zero? [ neg ] when
+    1 random zero? [ >bignum ] when ;
+
+[ t ] [
+    10000 [
+        drop
+        random-integer
+        random-integer
+        [ >float / ] [ /f ] 2bi 0.1 ~
+    ] all-integers?
+] unit-test
+
+! Ensure that /f is accurate for fixnums > 2^53 on 64-bit platforms
+[ HEX: 1.758bec11492f9p-54 ] [ 1 12345678901234567 /f ] unit-test
+[ HEX: -1.758bec11492f9p-54 ] [ 1 -12345678901234567 /f ] unit-test
+
+[ 17 ] [ 17 >bignum 5 max ] unit-test
+[ 5 ] [ 17 >bignum 5 min ] unit-test

@@ -1,10 +1,10 @@
 USING: kernel math namespaces io tools.test sequences vectors
 continuations debugger parser memory arrays words
-kernel.private ;
-IN: temporary
+kernel.private accessors eval ;
+IN: continuations.tests
 
-: (callcc1-test)
-    swap 1- tuck swap ?push
+: (callcc1-test) ( n obj -- n' obj )
+    [ 1 - dup ] dip ?push
     over 0 = [ "test-cc" get continue-with ] when
     (callcc1-test) ;
 
@@ -22,16 +22,14 @@ IN: temporary
         ] with-scope
     ] callcc0 "x" get 5 = ;
 
-[ t ] [ 10 callcc1-test 10 reverse >vector = ] unit-test
+[ t ] [ 10 callcc1-test 10 iota reverse >vector = ] unit-test
 [ t ] [ callcc-namespace-test ] unit-test
 
-[ f ] [ [ ] catch ] unit-test
-
-[ 5 ] [ [ 5 throw ] catch ] unit-test
+[ 5 throw ] [ 5 = ] must-fail-with
 
 [ t ] [
-    [ "Hello" throw ] catch drop
-    global [ error get ] bind
+    [ "Hello" throw ] ignore-errors
+    error get-global
     "Hello" =
 ] unit-test
 
@@ -41,33 +39,70 @@ IN: temporary
 
 "!!! The following error is part of the test" print
 
-[ [ "2 car" ] parse ] catch print-error
+[ ] [ [ [ "2 car" ] eval ] try ] unit-test
 
-[ f throw ] unit-test-fails
+[ f throw ] must-fail
 
 ! Weird PowerPC bug.
 [ ] [
-    [ "4" throw ] catch drop
-    data-gc
-    data-gc
+    [ "4" throw ] ignore-errors
+    gc
+    gc
 ] unit-test
 
-[ f ] [ { } kernel-error? ] unit-test
-[ f ] [ { "A" "B" } kernel-error? ] unit-test
-
 ! ! See how well callstack overflow is handled
-! [ clear drop ] unit-test-fails
+! [ clear drop ] must-fail
 ! 
 ! : callstack-overflow callstack-overflow f ;
-! [ callstack-overflow ] unit-test-fails
+! [ callstack-overflow ] must-fail
 
-: don't-compile-me { } [ ] each ;
+: don't-compile-me ( -- ) ;
+: foo ( -- ) callstack "c" set don't-compile-me ;
+: bar ( -- a b ) 1 foo 2 ;
 
-: foo callstack "c" set 3 don't-compile-me ;
-: bar 1 foo 2 ;
+<< { don't-compile-me foo bar } [ t "no-compile" set-word-prop ] each >>
 
-[ 1 3 2 ] [ bar ] unit-test
+[ 1 2 ] [ bar ] unit-test
 
-[ t ] [ \ bar word-def "c" get innermost-frame-quot = ] unit-test
+[ t ] [ \ bar def>> "c" get innermost-frame-executing = ] unit-test
 
 [ 1 ] [ "c" get innermost-frame-scan ] unit-test
+
+SYMBOL: always-counter
+SYMBOL: error-counter
+
+[
+    0 always-counter set
+    0 error-counter set
+
+    [ ] [ always-counter inc ] [ error-counter inc ] cleanup
+
+    [ 1 ] [ always-counter get ] unit-test
+    [ 0 ] [ error-counter get ] unit-test
+
+    [
+        [ "a" throw ]
+        [ always-counter inc ]
+        [ error-counter inc ] cleanup
+    ] [ "a" = ] must-fail-with
+
+    [ 2 ] [ always-counter get ] unit-test
+    [ 1 ] [ error-counter get ] unit-test
+
+    [
+        [ ]
+        [ always-counter inc "a" throw ]
+        [ error-counter inc ] cleanup
+    ] [ "a" = ] must-fail-with
+
+    [ 3 ] [ always-counter get ] unit-test
+    [ 1 ] [ error-counter get ] unit-test
+] with-scope
+
+[ ] [ [ return ] with-return ] unit-test
+
+[ { } [ ] attempt-all ] [ attempt-all-error? ] must-fail-with
+
+[ { 4 } ] [ { 2 2 } [ + ] with-datastack ] unit-test
+
+[ with-datastack ] must-infer

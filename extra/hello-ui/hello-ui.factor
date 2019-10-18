@@ -1,7 +1,5 @@
-USING: ui ui.gadgets.labels ;
+USING: accessors ui ui.gadgets.labels ;
 IN: hello-ui
 
-: hello ( -- )
-    [ "Hello world" <label> "Hi" open-window ] with-ui ;
-
-MAIN: hello
+MAIN-WINDOW: hello { { title "Hi" } }
+    "Hello world" <label> >>gadgets ;

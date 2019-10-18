@@ -1,0 +1,1 @@
+Generalization of make for constructing several sequences simultaneously

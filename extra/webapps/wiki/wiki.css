@@ -1,0 +1,51 @@
+.comparison th {
+    border-width: 1px;
+    border-color: #666;
+    border-style: solid;
+    width: 50%;
+}
+
+.comparison table {
+    border-color: #666;
+    border-style: solid;
+    border-width: 1px;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.insert {
+    background-color: #9f9;
+}
+
+.delete {
+    background-color: #f99;
+}
+
+.revisions table, .revisions td, .revisions th {
+    border-color: #666;
+    border-style: solid;
+}
+
+.revisions table {
+    border-width: 0 0 1px 1px;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.revisions td, .revisions th {
+    margin: 0;
+    padding: 4px;
+    border-width: 1px 1px 0 0;
+}
+
+.contents {
+    padding: 4px;
+    margin: 4px;
+    border: 1px dashed gray;
+    background: #f5f1fd;
+    width: 200px;
+}
+
+.footer {
+    font-size: 75%;
+}

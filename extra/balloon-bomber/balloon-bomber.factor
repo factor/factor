@@ -3,21 +3,28 @@
 !
 ! Balloon Bomber: http://www.mameworld.net/maws/romset/ballbomb
 !
-USING: kernel space-invaders cpu.8080 ui ;
+USING: 
+    cpu.8080
+    kernel 
+    space-invaders
+    ui 
+;
 IN: balloon-bomber
 
-TUPLE: balloon-bomber ; 
+TUPLE: balloon-bomber < space-invaders ; 
 
 : <balloon-bomber> ( -- cpu )
-  <space-invaders> balloon-bomber construct-delegate ;
+  balloon-bomber new cpu-init ;
 
-: run ( -- )  
-  "Balloon Bomber" <balloon-bomber> {
+CONSTANT: rom-info {
     { HEX: 0000 "ballbomb/tn01" }
     { HEX: 0800 "ballbomb/tn02" }
     { HEX: 1000 "ballbomb/tn03" }
     { HEX: 1800 "ballbomb/tn04" }
     { HEX: 4000 "ballbomb/tn05-1" }
-  } [ (run) ] with-ui ;
+  }
 
-MAIN: run
+: run-balloon ( -- )  
+  [ "Balloon Bomber" <balloon-bomber>  rom-info (run) ] with-ui ;
+
+MAIN: run-balloon

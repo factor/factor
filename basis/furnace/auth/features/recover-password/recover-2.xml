@@ -1,0 +1,9 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Recover lost password: step 2 of 4</t:title>
+
+	<p>If you entered the correct username and e-mail address, you should receive an e-mail shortly. Click the link in the e-mail for further instructions.</p>
+
+</t:chloe>

@@ -1,0 +1,1 @@
+Moving averages and other calculations useful for finance.

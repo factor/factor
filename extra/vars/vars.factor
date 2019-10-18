@@ -2,25 +2,30 @@
 
 ! Thanks to Mackenzie Straight for the idea
 
-USING: kernel parser words namespaces sequences quotations ;
+USING: accessors kernel parser lexer words words.symbol
+namespaces sequences quotations ;
 
 IN: vars
 
-: define-var-symbol ( str -- ) create-in define-symbol ;
+: define-var-getter ( word -- )
+    [ name>> ">" append create-in ] [ [ get ] curry ] bi
+    (( -- value )) define-declared ;
 
-: define-var-getter ( str -- )
-dup ">" append create-in swap in get lookup [ get ] curry define-compound ;
-
-: define-var-setter ( str -- )
-">" over append create-in swap in get lookup [ set ] curry define-compound ;
+: define-var-setter ( word -- )
+    [ name>> ">" prepend create-in ] [ [ set ] curry ] bi
+    (( value -- )) define-declared ;
 
 : define-var ( str -- )
-dup define-var-symbol dup define-var-getter define-var-setter ;
+    create-in
+    [ define-symbol ]
+    [ define-var-getter ]
+    [ define-var-setter ] tri ;
 
-: VAR: ! var
-    scan define-var ; parsing
+SYNTAX: VAR: ! var
+    scan define-var ;
 
-: define-vars ( seq -- ) [ define-var ] each ;
+: define-vars ( seq -- )
+    [ define-var ] each ;
 
-: VARS: ! vars ...
-";" parse-tokens define-vars ; parsing
+SYNTAX: VARS: ! vars ...
+    ";" parse-tokens define-vars ;

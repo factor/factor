@@ -1,0 +1,72 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>New User Registration</t:title>
+
+	<t:form t:action="register" autocomplete="off">
+
+		<table>
+
+			<tr>
+				<th class="field-label">User name:</th>
+				<td><t:field t:name="username" /></td>
+			</tr>
+
+			<tr>
+				<th class="field-label">Real name:</th>
+				<td><t:field t:name="realname" /></td>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td>Specifying a real name is optional.</td>
+			</tr>
+
+			<tr>
+				<th class="field-label">Password:</th>
+				<td><t:password t:name="new-password" /></td>
+			</tr>
+
+			<tr>
+				<th class="field-label">Verify:</th>
+				<td><t:password t:name="verify-password" /></td>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td>Enter your password twice to ensure it is correct.</td>
+			</tr>
+
+			<tr>
+				<th class="field-label">E-mail:</th>
+				<td><t:field t:name="email" /></td>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td>Specifying an e-mail address is optional. It enables the "recover password" feature.</td>
+			</tr>
+
+			<tr>
+				<th class="field-label">Captcha:</th>
+				<td><t:field t:name="captcha" /></td>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to register will be blocked.</td>
+			</tr>
+
+		</table>
+
+		<p>
+
+			<button type="submit">Register</button>
+			<t:validation-errors />
+
+		</p>
+
+	</t:form>
+
+</t:chloe>

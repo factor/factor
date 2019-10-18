@@ -1,0 +1,22 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Concatenative Planet: Administration</t:title>
+
+	<ul>
+		<t:bind-each t:name="blogroll">
+			<li>
+				<t:a t:href="$planet/admin/edit-blog" t:query="id">
+					<t:label t:name="name" />
+				</t:a>
+			</li>
+		</t:bind-each>
+	</ul>
+
+	<div>
+		<t:a t:href="$planet/admin/new-blog">Add Blog</t:a>
+		| <t:button t:action="$planet/admin/update" class="link-button link">Update</t:button>
+	</div>
+
+</t:chloe>

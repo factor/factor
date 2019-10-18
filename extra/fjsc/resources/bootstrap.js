@@ -188,7 +188,7 @@ Factor.prototype.make_quotation = function(source, func) {
 
 Factor.prototype.server_eval = function(text, handler, next) {
    var self = this;
-   $.post("/responder/fjsc/compile", { code: text }, function(result) {
+   $.post("compile", { code: text }, function(result) {
      factor.run_eval = function(func) {
        factor.cont.next = function() { handler(text,result); } 
        try {
@@ -510,6 +510,12 @@ factor.add_word("alien", "set-alien-property", "primitive", function(next) {
   var property_name = stack.pop();
   var data = stack.pop();
   obj[property_name] = v;
+  factor.call_next(next);
+});
+
+factor.add_word("alien", "uneval", "primitive", function(next) {
+  var stack = factor.cont.data_stack;
+  stack.push(uneval(stack.pop()));
   factor.call_next(next);
 });
 

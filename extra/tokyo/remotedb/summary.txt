@@ -1,0 +1,1 @@
+Higher level API for Tokyo Tyrant's Remote database API. Implements the associative protocol.

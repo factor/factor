@@ -1,0 +1,1 @@
+Direct2D bindings. Corresponds to d2derr.h.

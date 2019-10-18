@@ -1,32 +1,32 @@
-USING: arrays kernel kernel.private math namespaces
+USING: accessors arrays kernel kernel.private math namespaces
 sequences sequences.private strings tools.test vectors
 continuations random growable classes ;
-IN: temporary
+IN: vectors.tests
 
-[ ] [ 10 [ [ -1000000 <vector> ] catch drop ] times ] unit-test
+[ ] [ 10 [ [ -1000000 <vector> ] ignore-errors ] times ] unit-test
 
 [ 3 ] [ [ t f t ] length ] unit-test
 [ 3 ] [ V{ t f t } length ] unit-test
 
-[ -3 V{ } nth ] unit-test-fails
-[ 3 V{ } nth ] unit-test-fails
-[ 3 54.3 nth ] unit-test-fails
+[ -3 V{ } nth ] must-fail
+[ 3 V{ } nth ] must-fail
+[ 3 54.3 nth ] must-fail
 
-[ "hey" [ 1 2 ] set-length ] unit-test-fails
-[ "hey" V{ 1 2 } set-length ] unit-test-fails
+[ "hey" [ 1 2 ] set-length ] must-fail
+[ "hey" V{ 1 2 } set-length ] must-fail
 
 [ 3 ] [ 3 0 <vector> [ set-length ] keep length ] unit-test
 [ "yo" ] [
     "yo" 4 1 <vector> [ set-nth ] keep 4 swap nth
 ] unit-test
 
-[ 1 V{ } nth ] unit-test-fails
-[ -1 V{ } set-length ] unit-test-fails
+[ 1 V{ } nth ] must-fail
+[ -1 V{ } set-length ] must-fail
 [ V{ } ] [ [ ] >vector ] unit-test
 [ V{ 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
 [ t ] [
-    100 [ drop 100 random ] map >vector
+    100 [ 100 random ] V{ } replicate-as
     dup >array >vector =
 ] unit-test
 
@@ -62,22 +62,22 @@ IN: temporary
 [ ] [ V{ 1 5 } "funny-stack" get push ] unit-test
 [ ] [ V{ 2 3 } "funny-stack" get push ] unit-test
 [ V{ 2 3 } ] [ "funny-stack" get pop ] unit-test
-[ V{ 1 5 } ] [ "funny-stack" get peek ] unit-test
+[ V{ 1 5 } ] [ "funny-stack" get last ] unit-test
 [ V{ 1 5 } ] [ "funny-stack" get pop ] unit-test
-[ "funny-stack" get pop ] unit-test-fails
-[ "funny-stack" get pop ] unit-test-fails
+[ "funny-stack" get pop ] must-fail
+[ "funny-stack" get pop ] must-fail
 [ ] [ "funky" "funny-stack" get push ] unit-test
 [ "funky" ] [ "funny-stack" get pop ] unit-test
 
 [ t ] [
-    V{ 1 2 3 4 } dup underlying length
-    >r clone underlying length r>
+    V{ 1 2 3 4 } dup underlying>> length
+    [ clone underlying>> length ] dip
     =
 ] unit-test
 
 [ f ] [
     V{ 1 2 3 4 } dup clone
-    [ underlying ] 2apply eq?
+    [ underlying>> ] bi@ eq?
 ] unit-test
 
 [ 0 ] [
@@ -91,9 +91,11 @@ IN: temporary
 [ 4 ] [ 5 V{ 1 2 3 4 5 } index ] unit-test
 
 [ t ] [
-    100 >array dup >vector <reversed> >array >r reverse r> =
+    100 iota >array dup >vector <reversed> >array [ reverse ] dip =
 ] unit-test
 
-[ fixnum ] [ 1 >bignum V{ } new length class ] unit-test
+[ fixnum ] [ 1 >bignum V{ } new-sequence length class ] unit-test
 
-[ fixnum ] [ 1 >bignum [ ] V{ } map-as length class ] unit-test
+[ fixnum ] [ 1 >bignum iota [ ] V{ } map-as length class ] unit-test
+
+[ V{ "lulz" } ] [ "lulz" 1vector ] unit-test

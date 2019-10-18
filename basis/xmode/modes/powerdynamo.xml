@@ -1,0 +1,464 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!--
+Sybase PowerDynamo mode file for jEdit - v 1.0
+(For the 5 people in the world who still have to program in dynamo.)
+
+By Ben Williams (benw@webmedia.com.au)
+
+1.0  2003-11-13
+Initial release - supports dynamo script, SQL tags, and mostly complete support
+for the other tags (data, document, etc). more support planned for future.
+
+-->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="wordBreakChars" VALUE=" @	%^*()+=|\{}[]:;,.?$&amp;" />
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE">
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-script">
+			<BEGIN>&lt;!--script</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- these are the other dynamo tag types. for the meoment, we'll just hand them over to powerdynamo-script,
+			 but in future versions we can easily add individual processing for each of them, as they should have.
+		-->
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-data">
+			<BEGIN>&lt;!--data</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-document">
+			<BEGIN>&lt;!--document</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-script">
+			<BEGIN>&lt;!--evaluate</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-script">
+			<BEGIN>&lt;!--execute</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--formatting</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--/formatting</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--include</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--label</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="transact-sql::MAIN">
+			<BEGIN>&lt;!--sql</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--sql_error_code</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--sql_error_info</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--sql_state</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--sql_on_no_error</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--/sql_on_no_error</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--sql_on_error</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--/sql_on_error</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--sql_on_no_rows</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--/sql_on_no_rows</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--sql_on_rows</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-tag-general">
+			<BEGIN>&lt;!--/sql_on_rows</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-script">
+			<BEGIN>&lt;!--script</BEGIN>
+			<END>--?&gt;</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="TAGS_LITERAL">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="TAGS_LITERAL">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+	</RULES>
+
+	<RULES SET="TAGS_LITERAL" DEFAULT="LITERAL1">
+		<SPAN TYPE="LABEL" DELEGATE="powerdynamo-script">
+			<BEGIN>&lt;!--script</BEGIN>
+			<END>?--&gt;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="powerdynamo-script" ESCAPE="\" HIGHLIGHT_DIGITS="TRUE">
+		<!--PROPS>
+			<PROPERTY NAME="commentStart" VALUE="/*" />
+			<PROPERTY NAME="lineComment" VALUE="//" />
+		</PROPS-->
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">@</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<KEYWORDS>
+			<!-- Language constructs (24) -->
+			<KEYWORD1>abstract</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>byte</KEYWORD1>
+			<KEYWORD1>boolean</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>class</KEYWORD1>
+			<KEYWORD1>char</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>double</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>exists</KEYWORD1>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>false</KEYWORD1>
+			<KEYWORD1>file</KEYWORD1>
+			<KEYWORD1>final</KEYWORD1>
+			<KEYWORD1>float</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+			<KEYWORD1>implements</KEYWORD1>
+			<KEYWORD1>int</KEYWORD1>
+			<KEYWORD1>interface</KEYWORD1>
+			<KEYWORD1>instanceof</KEYWORD1>
+			<KEYWORD1>long</KEYWORD1>
+			<KEYWORD1>length</KEYWORD1>
+			<KEYWORD1>native</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>null</KEYWORD1>
+			<KEYWORD1>package</KEYWORD1>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>synchronized</KEYWORD1>
+			<KEYWORD1>short</KEYWORD1>
+			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>super</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>true</KEYWORD1>
+			<KEYWORD1>this</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>throws</KEYWORD1>
+			<KEYWORD1>threadsafe</KEYWORD1>
+			<KEYWORD1>transient</KEYWORD1>
+			<KEYWORD1>var</KEYWORD1>
+			<KEYWORD1>void</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+
+			<!-- objects -->
+			<KEYWORD2></KEYWORD2>
+			<KEYWORD2>document</KEYWORD2>
+			<KEYWORD2>connection</KEYWORD2>
+			<KEYWORD2>file</KEYWORD2>
+			<KEYWORD2>query</KEYWORD2>
+			<KEYWORD2>session</KEYWORD2>
+			<KEYWORD2>site</KEYWORD2>
+			<KEYWORD2>system</KEYWORD2>
+			<KEYWORD2>typeof</KEYWORD2>
+
+			<!-- methods & attributes -->
+			<KEYWORD3>AskQuestion</KEYWORD3>
+			<KEYWORD3>autoCommit</KEYWORD3>
+			<KEYWORD3>Close</KEYWORD3>
+			<KEYWORD3>Commit</KEYWORD3>
+			<KEYWORD3>Connect</KEYWORD3>
+			<KEYWORD3>CreateConnection</KEYWORD3>
+			<KEYWORD3>CreateDocument</KEYWORD3>
+			<KEYWORD3>CreatePropertySheet</KEYWORD3>
+			<KEYWORD3>CreateQuery</KEYWORD3>
+			<KEYWORD3>CreateWizard</KEYWORD3>
+			<KEYWORD3>cachedOutputTimeOut</KEYWORD3>
+			<KEYWORD3>charAt</KEYWORD3>
+			<KEYWORD3>connected</KEYWORD3>
+			<KEYWORD3>connection</KEYWORD3>
+			<KEYWORD3>connectionId</KEYWORD3>
+			<KEYWORD3>connectionName</KEYWORD3>
+			<KEYWORD3>connectionType</KEYWORD3>
+			<KEYWORD3>connectParameters</KEYWORD3>
+			<KEYWORD3>contentType</KEYWORD3>
+			<KEYWORD3>DeleteConnection</KEYWORD3>
+			<KEYWORD3>DeleteDocument</KEYWORD3>
+			<KEYWORD3>Disconnect</KEYWORD3>
+			<KEYWORD3>database</KEYWORD3>
+			<KEYWORD3>dataSource</KEYWORD3>
+			<KEYWORD3>dataSourceList</KEYWORD3>
+			<KEYWORD3>description</KEYWORD3>
+			<KEYWORD3>Exec</KEYWORD3>
+			<KEYWORD3>Execute</KEYWORD3>
+			<KEYWORD3>ExportTo</KEYWORD3>
+			<KEYWORD3>eof</KEYWORD3>
+			<KEYWORD3>errorNumber</KEYWORD3>
+			<KEYWORD3>errorString</KEYWORD3>
+			<KEYWORD3>GetColumnCount</KEYWORD3>
+			<KEYWORD3>GetColumnIndex</KEYWORD3>
+			<KEYWORD3>GetColumnLabel</KEYWORD3>
+			<KEYWORD3>GetConnection</KEYWORD3>
+			<KEYWORD3>GetConnectionIdList</KEYWORD3>
+			<KEYWORD3>GetConnectionNameList</KEYWORD3>
+			<KEYWORD3>GetCWD</KEYWORD3>
+			<KEYWORD3>GetDirectory</KEYWORD3>
+			<KEYWORD3>GetDocument</KEYWORD3>
+			<KEYWORD3>GetEmpty</KEYWORD3>
+			<KEYWORD3>GetEnv</KEYWORD3>
+			<KEYWORD3>GetErrorCode</KEYWORD3>
+			<KEYWORD3>GetErrorInfo</KEYWORD3>
+			<KEYWORD3>GetEventList</KEYWORD3>
+			<KEYWORD3>GetFilePtr</KEYWORD3>
+			<KEYWORD3>GetGenerated</KEYWORD3>
+			<KEYWORD3>GetRootDocument</KEYWORD3>
+			<KEYWORD3>GetRowCount</KEYWORD3>
+			<KEYWORD3>GetServerVariable</KEYWORD3>
+			<KEYWORD3>GetState</KEYWORD3>
+			<KEYWORD3>GetSupportedMoves</KEYWORD3>
+			<KEYWORD3>GetValue</KEYWORD3>
+			<KEYWORD3>ImportFrom</KEYWORD3>
+			<KEYWORD3>Include</KEYWORD3>
+			<KEYWORD3>id</KEYWORD3>
+			<KEYWORD3>indexOf</KEYWORD3>
+			<KEYWORD3>lastIndexOf</KEYWORD3>
+			<KEYWORD3>lastModified</KEYWORD3>
+			<KEYWORD3>length</KEYWORD3>
+			<KEYWORD3>location</KEYWORD3>
+			<KEYWORD3>Move</KEYWORD3>
+			<KEYWORD3>MoveFirst</KEYWORD3>
+			<KEYWORD3>MoveLast</KEYWORD3>
+			<KEYWORD3>MoveNext</KEYWORD3>
+			<KEYWORD3>MovePrevious</KEYWORD3>
+			<KEYWORD3>MoveRelative</KEYWORD3>
+			<KEYWORD3>mode</KEYWORD3>
+			<KEYWORD3>name</KEYWORD3>
+			<KEYWORD3>OnEvent</KEYWORD3>
+			<KEYWORD3>Open</KEYWORD3>
+			<KEYWORD3>Opened</KEYWORD3>
+			<KEYWORD3>parent</KEYWORD3>
+			<KEYWORD3>password</KEYWORD3>
+			<KEYWORD3>ReadChar</KEYWORD3>
+			<KEYWORD3>ReadLine</KEYWORD3>
+			<KEYWORD3>Refresh</KEYWORD3>
+			<KEYWORD3>Rollback</KEYWORD3>
+			<KEYWORD3>redirect</KEYWORD3>
+			<KEYWORD3>Seek</KEYWORD3>
+			<KEYWORD3>SetEnv</KEYWORD3>
+			<KEYWORD3>SetSQL</KEYWORD3>
+			<KEYWORD3>ShowMessage</KEYWORD3>
+			<KEYWORD3>substring</KEYWORD3>
+			<KEYWORD3>server</KEYWORD3>
+			<KEYWORD3>simulateCursors</KEYWORD3>
+			<KEYWORD3>size</KEYWORD3>
+			<KEYWORD3>source</KEYWORD3>
+			<KEYWORD3>status</KEYWORD3>
+			<KEYWORD3>timeOut</KEYWORD3>
+			<KEYWORD3>toLowerCase</KEYWORD3>
+			<KEYWORD3>toUpperCase</KEYWORD3>
+			<KEYWORD3>type</KEYWORD3>
+			<KEYWORD3>userId</KEYWORD3>
+			<KEYWORD3>value</KEYWORD3>
+			<KEYWORD3>WriteLine</KEYWORD3>
+			<KEYWORD3>Write</KEYWORD3>
+			<KEYWORD3>write</KEYWORD3>
+			<KEYWORD3>writeln</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES IGNORE_CASE="TRUE" SET="powerdynamo-tag-general">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<KEYWORDS>
+			<KEYWORD2>NAME</KEYWORD2>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES IGNORE_CASE="TRUE" SET="powerdynamo-tag-data">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<KEYWORDS>
+			<KEYWORD2>NAME</KEYWORD2>
+			<KEYWORD2>QUERY</KEYWORD2>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES IGNORE_CASE="TRUE" SET="powerdynamo-tag-document">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<KEYWORDS>
+			<KEYWORD2>CONTENT_TYPE</KEYWORD2>
+			<KEYWORD2>REDIRECT</KEYWORD2>
+			<KEYWORD2>STATUS</KEYWORD2>
+			<KEYWORD2>CACHED_OUTPUT_TIMEOUT</KEYWORD2>
+		</KEYWORDS>
+	</RULES>
+
+</MODE>

@@ -1,0 +1,3 @@
+create table person (name varchar(30), country varchar(30));
+insert into person values('John', 'America');
+insert into person values('Jane', 'New Zealand');

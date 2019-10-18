@@ -1,0 +1,1 @@
+Windows environment variables implementation

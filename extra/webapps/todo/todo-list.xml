@@ -1,0 +1,37 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>My Todo List</t:title>
+
+	<table class="todo-list">
+
+		<tr>
+			<th>Summary</th>
+			<th>Priority</th>
+			<th>View</th>
+			<th>Edit</th>
+		</tr>
+
+		<t:bind-each t:name="items">
+
+			<tr>
+				<td>
+					<t:label t:name="summary" />
+				</td>
+				<td>
+					<t:label t:name="priority" />
+				</td>
+				<td>
+					<t:a t:href="$todo-list/view" t:query="id">View</t:a>
+				</td>
+				<td>
+					<t:a t:href="$todo-list/edit" t:query="id">Edit</t:a>
+				</td>
+			</tr>
+
+		</t:bind-each>
+
+	</table>
+
+</t:chloe>

@@ -3,10 +3,10 @@ IN: benchmark.typecheck3
 
 TUPLE: hello n ;
 
-: hello-n* dup tag 2 eq? [ 4 slot ] [ 3 throw ] if ;
+: hello-n* ( obj -- val ) 2 slot ;
 
-: foo 0 100000000 [ over hello-n* + ] times ;
+: foo ( obj -- obj n ) 0 100000000 [ over hello-n* + ] times ;
 
-: typecheck-main 0 hello construct-boa foo 2drop ;
+: typecheck-main ( -- ) 0 hello boa foo 2drop ;
 
 MAIN: typecheck-main

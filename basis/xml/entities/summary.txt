@@ -1,0 +1,1 @@
+Contains built-in XML entities

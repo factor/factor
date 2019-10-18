@@ -1,0 +1,1 @@
+Scan code constants for HID keyboards

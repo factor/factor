@@ -1,0 +1,1 @@
+Common code used for analysis and code generation of alien bindings

@@ -14,6 +14,6 @@ SYMBOL: n
         ] if
     ] with-scope ;
 
-: fib-main 30 namespace-fib 1346269 assert= ;
+: fib-main ( -- ) 30 namespace-fib 1346269 assert= ;
 
 MAIN: fib-main

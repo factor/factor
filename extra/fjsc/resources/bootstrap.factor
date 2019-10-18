@@ -3,10 +3,6 @@ USE: kernel-internals
 : bind ( ns quot -- )
   swap >n call n> drop ;
 
-: alert ( string -- )
-  #! Display the string in an alert box
-  window { } "" "alert" { "string" } alien-invoke ;
-
 "browser-dom" set-in
 
 : elements ( string -- result )
@@ -38,3 +34,6 @@ USE: kernel-internals
     drop "Click done!" alert 
   ] callcc0 ;
   
+: alert ( string -- )
+  #! Display the string in an alert box
+  window { } "" "alert" { "string" } alien-invoke ;

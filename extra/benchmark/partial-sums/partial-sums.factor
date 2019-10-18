@@ -1,62 +1,44 @@
-USING: math math.functions kernel sequences io io.styles
-prettyprint words hints ;
+! Copyright (C) 2008, 2010 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: math math.functions kernel io io.styles prettyprint
+combinators hints fry namespaces sequences ;
 IN: benchmark.partial-sums
 
-: summing ( n quot -- y )
-    [ + ] compose 0.0 -rot 1 -rot (each-integer) ; inline
-
-: 2/3^k ( n -- y ) [ 2.0 3.0 / swap 1- ^ ] summing ;
-
-HINTS: 2/3^k fixnum ;
-
-: k^-0.5 ( n -- y ) [ -0.5 ^ ] summing ;
-
-HINTS: k^-0.5 fixnum ;
-
-: 1/k(k+1) ( n -- y ) [ dup 1+ * recip ] summing ;
-
-HINTS: 1/k(k+1) fixnum ;
-
+! Helper words
+: summing-integers ( n quot -- y ) [ 0.0 ] [ iota ] [ ] tri* '[ 1 + @ + ] each ; inline
+: summing-floats ( n quot -- y ) '[ >float @ ] summing-integers ; inline
 : cube ( x -- y ) dup dup * * ; inline
+: -1^ ( n -- -1/1 ) 2 mod 2 * 1 - ; inline
 
-: flint-hills ( n -- y )
-    [ dup cube swap sin sq * recip ] summing ;
+! The functions
+: 2/3^k ( n -- y ) [ 2.0 3.0 / swap 1 - ^ ] summing-floats ; inline
+: k^-0.5 ( n -- y ) [ -0.5 ^ ] summing-floats ; inline
+: 1/k(k+1) ( n -- y ) [ dup 1 + * recip ] summing-floats ; inline
+: flint-hills ( n -- y ) [ [ cube ] [ sin sq ] bi * recip ] summing-floats ; inline
+: cookson-hills ( n -- y ) [ [ cube ] [ cos sq ] bi * recip ] summing-floats ; inline
+: harmonic ( n -- y ) [ recip ] summing-floats ; inline
+: riemann-zeta ( n -- y ) [ sq recip ] summing-floats ; inline
+: alternating-harmonic ( n -- y ) [ [ -1^ ] keep /f ] summing-integers ; inline
+: gregory ( n -- y ) [ [ -1^ ] [ 2.0 * 1 - ] bi / ] summing-integers ; inline
 
-HINTS: flint-hills fixnum ;
+: partial-sums ( n -- results )
+    [
+        {
+            [ 2/3^k                 \ 2/3^k                set ]
+            [ k^-0.5                \ k^-0.5               set ]
+            [ 1/k(k+1)              \ 1/k(k+1)             set ]
+            [ flint-hills           \ flint-hills          set ]
+            [ cookson-hills         \ cookson-hills        set ]
+            [ harmonic              \ harmonic             set ]
+            [ riemann-zeta          \ riemann-zeta         set ]
+            [ alternating-harmonic  \ alternating-harmonic set ]
+            [ gregory               \ gregory              set ]
+        } cleave
+    ] { } make-assoc ;
 
-: cookson-hills ( n -- y )
-    [ dup cube swap cos sq * recip ] summing ;
+HINTS: partial-sums fixnum ;
 
-HINTS: cookson-hills fixnum ;
-
-: harmonic ( n -- y ) [ recip ] summing ;
-
-HINTS: harmonic fixnum ;
-
-: riemann-zeta ( n -- y ) [ sq recip ] summing ;
-
-HINTS: riemann-zeta fixnum ;
-
-: -1^ 2 mod zero? 1 -1 ? ; inline
-
-: alternating-harmonic ( n -- y ) [ dup -1^ swap / ] summing ;
-
-HINTS: alternating-harmonic fixnum ;
-
-: gregory ( n -- y ) [ dup -1^ swap 2 * 1- / ] summing ;
-
-HINTS: gregory fixnum ;
-
-: functions
-    { 2/3^k k^-0.5 1/k(k+1) flint-hills cookson-hills harmonic riemann-zeta alternating-harmonic gregory } ;
-
-: partial-sums ( n -- )
-    standard-table-style [
-        functions [
-            [ tuck execute pprint-cell pprint-cell ] with-row
-        ] curry* each
-    ] tabular-output ;
-
-: partial-sums-main 2500000 partial-sums ;
+: partial-sums-main ( -- )
+    2500000 partial-sums simple-table. ;
 
 MAIN: partial-sums-main

@@ -1,6 +1,4 @@
-./extra/xmode/modes/java.xml:		<!-- for the common usage of the cvs keyword $Id: java.xml 9228 2007-03-27 22:01:25Z ezust $ -->
-./extra/xmode/modes/fortran.xml:      Version $Id: fortran.xml 10573 2007-09-14 02:04:59Z ezust $
-./extra/xmode/modes/nsis2.xml:$Id: nsis2.xml 9932 2007-07-06 15:44:46Z Vampire0 $
-./extra/webapps/article-manager/resources/jscalendar-1.0/calendar-setup.js:// $Id: calendar-setup.js,v 1.25 2005/03/07 09:51:33 mishoo Exp $
-./extra/webapps/article-manager/resources/jscalendar-1.0/calendar.js:// $Id: calendar.js,v 1.51 2005/03/07 16:44:31 mishoo Exp $
-./vm/bignumint.h:$Id: s48_bignumint.h,v 1.14 2005/12/21 02:36:52 spestov Exp $
+./basis/xmode/modes/java.xml:		<!-- for the common usage of the cvs keyword $Id: java.xml 9228 2007-03-27 22:01:25Z ezust $ -->
+./basis/xmode/modes/fortran.xml:      Version $Id: fortran.xml 10573 2007-09-14 02:04:59Z ezust $
+./basis/xmode/modes/nsis2.xml:$Id: nsis2.xml 9932 2007-07-06 15:44:46Z Vampire0 $
+./vm/bignumint.hpp:$Id: s48_bignumint.h,v 1.14 2005/12/21 02:36:52 spestov Exp $

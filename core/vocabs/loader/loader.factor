@@ -1,202 +1,132 @@
-! Copyright (C) 2007 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces splitting sequences io.files kernel assocs
-words vocabs definitions parser continuations inspector debugger
-io io.styles io.streams.lines hashtables sorting prettyprint
-source-files arrays combinators strings system math.parser ;
+USING: namespaces make sequences io io.files io.pathnames kernel
+assocs words vocabs definitions parser continuations hashtables
+sorting source-files arrays combinators strings system
+math.parser splitting init accessors sets ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
 
 V{
     "resource:core"
+    "resource:basis"
     "resource:extra"
     "resource:work"
 } clone vocab-roots set-global
 
-! No such thing as current directory on Windows CE
-wince? [ "." vocab-roots get push ] unless
+: add-vocab-root ( root -- )
+    vocab-roots get adjoin ;
 
-: vocab-dir+ ( vocab str/f -- path )
-    >r vocab-name "." split r>
-    [ >r dup peek r> append add ] when*
-    "/" join ;
+SYMBOL: root-cache
+
+root-cache [ H{ } clone ] initialize
+
+ERROR: not-found-in-roots path ;
+
+<PRIVATE
+
+: find-root-for ( path -- path/f )
+    vocab-roots get [ prepend-path exists? ] with find nip ;
+
+M: string vocab-path ( string -- path/f )
+    dup find-root-for [ prepend-path ] [ not-found-in-roots ] if* ;
+
+PRIVATE>
 
 : vocab-dir ( vocab -- dir )
-    f vocab-dir+ ;
+    vocab-name { { CHAR: . CHAR: / } } substitute ;
 
-: vocab-source ( vocab -- path )
-    ".factor" vocab-dir+ ;
-
-: vocab-docs ( vocab -- path )
-    "-docs.factor" vocab-dir+ ;
-
-: vocab-tests ( vocab -- path )
-    "-tests.factor" vocab-dir+ ;
+: vocab-dir+ ( vocab str/f -- path )
+    [ vocab-name "." split ] dip
+    [ [ dup last ] dip append suffix ] when*
+    "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-dir vocab-roots get
-    swap [ path+ ?resource-path exists? ] curry find nip ;
+    vocab-name dup root-cache get at
+    [ ] [ ".factor" vocab-dir+ find-root-for ] ?if ;
 
-M: string vocab-root
-    dup vocab [ vocab-root ] [ find-vocab-root ] ?if ;
+: vocab-append-path ( vocab path -- newpath )
+    swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
 
-M: vocab-link vocab-root
-    dup vocab-link-root [ ] [ vocab-link-name vocab-root ] ?if ;
+: vocab-source-path ( vocab -- path/f )
+    dup ".factor" vocab-dir+ vocab-append-path ;
 
-: vocab-files ( vocab -- seq )
-    [
-        dup vocab-root dup [
-            swap
-            2dup vocab-source path+ ,
-            2dup vocab-docs path+ ,
-            2dup vocab-tests path+ ,
-        ] when 2drop
-    ] { } make [ ?resource-path exists? ] subset ;
-
-TUPLE: no-vocab name ;
-
-: no-vocab ( name -- * ) \ no-vocab construct-boa throw ;
-
-M: no-vocab summary drop "Vocabulary does not exist" ;
+: vocab-docs-path ( vocab -- path/f )
+    dup "-docs.factor" vocab-dir+ vocab-append-path ;
 
 SYMBOL: load-help?
 
-: source-was-loaded t swap set-vocab-source-loaded? ;
+<PRIVATE
 
-: source-wasn't-loaded f swap set-vocab-source-loaded? ;
+: load-source ( vocab -- )
+    [
+        +parsing+ >>source-loaded?
+        dup vocab-source-path [ parse-file ] [ [ ] ] if*
+        [ +parsing+ >>source-loaded? ] dip
+        [ % ] [ call( -- ) ] if-bootstrapping
+        +done+ >>source-loaded? drop
+    ] [ ] [ f >>source-loaded? ] cleanup ;
 
-: load-source ( root name -- )
-    [ source-was-loaded ] keep [
-        [ vocab-source path+ bootstrap-file ]
-        [ ] [ source-wasn't-loaded ]
-        cleanup
-    ] keep source-was-loaded ;
-
-: docs-were-loaded t swap set-vocab-docs-loaded? ;
-
-: docs-were't-loaded f swap set-vocab-docs-loaded? ;
-
-: load-docs ( root name -- )
+: load-docs ( vocab -- )
     load-help? get [
-        [ docs-were-loaded ] keep [
-            [ vocab-docs path+ ?bootstrap-file ]
-            [ ] [ docs-were't-loaded ]
-            cleanup
-        ] keep source-was-loaded
-    ] [
-        2drop
-    ] if ;
+        [
+            +parsing+ >>docs-loaded?
+            [ vocab-docs-path [ ?run-file ] when* ] keep
+            +done+ >>docs-loaded?
+        ] [ ] [ f >>docs-loaded? ] cleanup
+    ] when drop ;
 
-: amend-vocab-from-root ( root name -- vocab )
-    dup vocab-source-loaded? [ 2dup load-source ] unless
-    dup vocab-docs-loaded? [ 2dup load-docs ] unless
-    nip vocab ;
+PRIVATE>
 
-: load-vocab-from-root ( root name -- )
-    2dup vocab-source path+ ?resource-path exists? [
-        2dup create-vocab set-vocab-root
-        2dup load-source load-docs
-    ] [
-        nip no-vocab
-    ] if ;
+: require ( vocab -- )
+    load-vocab drop ;
 
-: reload-vocab ( name -- )
-    dup find-vocab-root dup [
-        swap load-vocab-from-root
-    ] [
-        drop no-vocab
-    ] if ;
-
-: require ( vocab -- ) load-vocab drop ;
+: reload ( name -- )
+    dup vocab
+    [ [ load-source ] [ load-docs ] bi ]
+    [ require ]
+    ?if ;
 
 : run ( vocab -- )
     dup load-vocab vocab-main [
-        execute
+        execute( -- )
     ] [
         "The " write vocab-name write
         " vocabulary does not define an entry point." print
         "To define one, refer to \\ MAIN: help" print
     ] ?if ;
 
-: modified ( seq quot -- seq )
-    [ dup ] swap compose { } map>assoc
-    [ nip ] assoc-subset
-    [ nip source-modified? ] assoc-subset keys ; inline
+SYMBOL: blacklist
 
-: vocab-path+ ( vocab path -- newpath )
-    swap vocab-root dup [ swap path+ ] [ 2drop f ] if ;
+<PRIVATE
 
-: vocab-source-path ( vocab -- path/f )
-    dup vocab-source vocab-path+ ;
-
-: vocab-tests-path ( vocab -- path/f )
-    dup vocab-tests vocab-path+ ;
-
-: vocab-docs-path ( vocab -- path/f )
-    dup vocab-docs vocab-path+ ;
-
-: modified-sources ( vocabs -- seq )
-    [ vocab-source-path ] modified ;
-
-: modified-docs ( vocabs -- seq )
-    [ vocab-docs-path ] modified ;
-
-: update-roots ( vocabs -- )
-    [ dup find-vocab-root swap vocab set-vocab-root ] each ;
-
-: to-refresh ( prefix -- modified-sources modified-docs )
-    child-vocabs
-    dup update-roots
-    dup modified-sources swap modified-docs ;
-
-: do-refresh ( modified-sources modified-docs -- )
-    2dup
-    [ f swap set-vocab-docs-loaded? ] each
-    [ f swap set-vocab-source-loaded? ] each
-    append prune [ [ require ] each ] no-parse-hook ;
-
-: refresh ( prefix -- ) to-refresh do-refresh ;
-
-: refresh-all ( -- ) "" refresh ;
+: add-to-blacklist ( error vocab -- )
+    vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
 
 GENERIC: (load-vocab) ( name -- vocab )
 
 M: vocab (load-vocab)
-    dup vocab-root
-    [ swap vocab-name amend-vocab-from-root ] when* ;
-
-M: string (load-vocab)
-    [ ".private" ?tail drop reload-vocab ] keep vocab ;
+    [
+        dup source-loaded?>> +parsing+ eq? [
+            dup source-loaded?>> [ dup load-source ] unless
+            dup docs-loaded?>> [ dup load-docs ] unless
+        ] unless
+    ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
 M: vocab-link (load-vocab)
-    vocab-name (load-vocab) ;
+    vocab-name create-vocab (load-vocab) ;
 
-[ dup vocab [ ] [ ] ?if (load-vocab) ]
-load-vocab-hook set-global
+M: string (load-vocab)
+    create-vocab (load-vocab) ;
 
-: vocab-where ( vocab -- loc )
-    vocab-source-path dup [ 1 2array ] when ;
+PRIVATE>
 
-M: vocab where vocab-where ;
+[
+    dup vocab-name blacklist get at* [ rethrow ] [
+        drop dup find-vocab-root
+        [ (load-vocab) ] [ dup vocab [ ] [ no-vocab ] ?if ] if
+    ] if
+] load-vocab-hook set-global
 
-M: vocab-link where vocab-where ;
-
-: vocab-file-contents ( vocab name -- seq )
-    vocab-path+ dup [
-        ?resource-path dup exists? [
-            <file-reader> lines
-        ] [
-            drop f
-        ] if
-    ] when ;
-
-: set-vocab-file-contents ( seq vocab name -- )
-    dupd vocab-path+ [
-        ?resource-path
-        <file-writer> [ [ print ] each ] with-stream
-    ] [
-        "The " swap vocab-name
-        " vocabulary was not loaded from the file system"
-        3append throw
-    ] ?if ;
+M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;

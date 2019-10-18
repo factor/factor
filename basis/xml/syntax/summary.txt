@@ -1,0 +1,1 @@
+'Generic words' that dispatch on XML tag names

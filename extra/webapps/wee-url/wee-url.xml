@@ -1,0 +1,13 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>WeeURL!</t:title>
+
+	<div class="navbar"><t:a t:href="$wee-url">Shorten URL</t:a></div>
+
+	<h1><t:write-title /></h1>
+
+        <t:call-next-template />
+
+</t:chloe>

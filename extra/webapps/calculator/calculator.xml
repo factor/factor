@@ -1,0 +1,30 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+<html>
+	<head> <title>Calculator</title> </head>
+
+	<body>
+		<h1>Calculator</h1>
+
+		<t:form t:action="$calculator">
+
+			<table>
+				<tr><td>First value:</td><td> <t:field t:name="x" /> </td></tr>
+				<tr><td>Second value:</td><td> <t:field t:name="y" /> </td></tr>
+			</table>
+
+			<input type="SUBMIT" value="Compute" />
+
+			<t:if t:value="z">
+				<br/>
+
+				Result: <t:label t:name="z" />
+			</t:if>
+
+		</t:form>
+	</body>
+</html>
+
+</t:chloe>

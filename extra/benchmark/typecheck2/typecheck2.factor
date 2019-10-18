@@ -3,10 +3,10 @@ IN: benchmark.typecheck2
 
 TUPLE: hello n ;
 
-: hello-n* dup tuple? [ 4 slot ] [ 3 throw ] if ;
+: hello-n* ( obj -- value ) dup tuple? [ 2 slot ] [ 3 throw ] if ;
 
-: foo 0 100000000 [ over hello-n* + ] times ;
+: foo ( obj -- obj n ) 0 100000000 [ over hello-n* + ] times ;
 
-: typecheck-main 0 hello construct-boa foo 2drop ;
+: typecheck-main ( -- ) 0 hello boa foo 2drop ;
 
 MAIN: typecheck-main

@@ -1,10 +1,11 @@
 USING: generic help.syntax help.markup kernel math parser words
-effects classes generic.standard tuples generic.math arrays
-io.files vocabs.loader io sequences assocs ;
+effects classes classes.tuple generic.math generic.single arrays
+io.pathnames vocabs.loader io sequences assocs words.symbol
+words.alias words.constant combinators vocabs.parser ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
-"At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries.  The parser is case-sensitive and whitespace between tokens is significant, so the following three expressions tokenize differently:"
+"At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries. The parser is case-sensitive and whitespace between tokens is significant, so the following three expressions tokenize differently:"
 { $code "2X+\n2 X +\n2 x +" }
 "As the parser reads tokens it makes a distinction between numbers, ordinary words, and parsing words. Tokens are appended to the parse tree, the top level of which is a quotation returned by the original parser invocation. Nested levels of the parse tree are created by parsing words."
 $nl
@@ -25,8 +26,17 @@ $nl
 "While parsing words supporting arbitrary syntax can be defined, the default set is found in the " { $vocab-link "syntax" } " vocabulary and provides the basis for all further syntactic interaction with Factor." ;
 
 ARTICLE: "syntax-comments" "Comments"
-{ $subsection POSTPONE: ! }
-{ $subsection POSTPONE: #! } ;
+{ $subsections
+    POSTPONE: !
+    POSTPONE: #!
+} ;
+
+ARTICLE: "syntax-immediate" "Parse time evaluation"
+"Code can be evaluated at parse time. This is a rarely-used feature; one use-case is " { $link "loading-libs" } ", where you want to execute some code before the words in a source file are compiled."
+{ $subsections
+    POSTPONE: <<
+    POSTPONE: >>
+} ;
 
 ARTICLE: "syntax-integers" "Integer syntax"
 "The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign."
@@ -36,50 +46,104 @@ ARTICLE: "syntax-integers" "Integer syntax"
     "2432902008176640000"
 }
 "Integers are entered in base 10 unless prefixed with a base change parsing word."
-{ $subsection POSTPONE: BIN: }
-{ $subsection POSTPONE: OCT: }
-{ $subsection POSTPONE: HEX: }
+{ $subsections
+    POSTPONE: BIN:
+    POSTPONE: OCT:
+    POSTPONE: HEX:
+}
 "More information on integers can be found in " { $link "integers" } "." ;
 
 ARTICLE: "syntax-ratios" "Ratio syntax"
-"The printed representation of a ratio is a pair of integers separated by a slash (/). No intermediate whitespace is permitted. Either integer may be signed, however the ratio will be normalized into a form where the denominator is positive and the greatest common divisor of the two terms is 1."
+"The printed representation of a ratio is a pair of integers separated by a slash (/), prefixed by an optional whole number part followed by a plus (+). No intermediate whitespace is permitted. Here are some examples:"
 { $code
     "75/33"
     "1/10"
     "-5/-6"
+    "1+1/3"
+    "-10+1/7"
 }
 "More information on ratios can be found in " { $link "rationals" } ;
 
 ARTICLE: "syntax-floats" "Float syntax"
-"Floating point literals must contain a decimal point, and may contain an exponent:"
+"Floating point literals are specified when a literal number contains a decimal point or exponent. Exponents are marked by an " { $snippet "e" } " or " { $snippet "E" } ":"
 { $code
     "10.5"
     "-3.1456"
-    "7.e13"
+    "7e13"
     "1.0e-5"
+    "1.0E+5"
 }
+"Literal numbers without a decimal point or an exponent always parse as integers:"
+{ $example
+    "1 float? ."
+    "f"
+}
+{ $example
+    "1. float? ."
+    "t"
+}
+{ $example
+    "1e0 float? ."
+    "t"
+}
+"Literal floating point approximations of ratios can also be input by placing a decimal point in the denominator:"
+{ $example
+    "1/2. ."
+    "0.5"
+}
+{ $example
+    "1/3. ."
+    "0.3333333333333333"
+}
+"The special float values have their own syntax:"
+{ $table
+{ "Positive infinity" { $snippet "1/0." } }
+{ "Negative infinity" { $snippet "-1/0." } }
+{ "Not-a-number" { $snippet "0/0." } }
+}
+"A Not-a-number literal with an arbitrary payload can also be input:"
+{ $subsections POSTPONE: NAN: }
+"Hexadecimal float literals are also supported. These consist of a hexadecimal literal with a decimal point and an optional base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
+{ $example
+    "8.0 HEX: 1.0p3 = ."
+    "t"
+}
+{ $example
+    "1024.0 HEX: 1.0P10 = ."
+    "t"
+}
+{ $example
+    "10.125 HEX: 1.44p3 = ."
+    "t"
+}
+"The normalized hex form " { $snippet "HEX: ±1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of IEEE 754 representation."
+$nl
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
-"A complex number is given by two components, a ``real'' part and ''imaginary'' part. The components must either be integers, ratios or floats."
+"A complex number is given by two components, a “real” part and “imaginary” part. The components must either be integers, ratios or floats."
 { $code
     "C{ 1/2 1/3 }   ! the complex number 1/2+1/3i"
     "C{ 0 1 }       ! the imaginary unit"
 }
-{ $subsection POSTPONE: C{ }
+{ $subsections POSTPONE: C{ }
 "More information on complex numbers can be found in " { $link "complex-numbers" } "." ;
 
 ARTICLE: "syntax-numbers" "Number syntax"
 "If a vocabulary lookup of a token fails, the parser attempts to parse it as a number."
-{ $subsection "syntax-integers" }
-{ $subsection "syntax-ratios" }
-{ $subsection "syntax-floats" }
-{ $subsection "syntax-complex-numbers" } ;
+{ $subsections
+    "syntax-integers"
+    "syntax-ratios"
+    "syntax-floats"
+    "syntax-complex-numbers"
+} ;
 
 ARTICLE: "syntax-words" "Word syntax"
-"A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use-case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
-{ $subsection POSTPONE: \ }
-{ $subsection POSTPONE: POSTPONE: }
+"A word occurring inside a quotation is executed when the quotation is called. Sometimes a word needs to be pushed on the data stack instead. The canonical use case for this is passing the word to the " { $link execute } " combinator, or alternatively, reflectively accessing word properties (" { $link "word-props" } ")."
+{ $subsections
+    POSTPONE: \
+    POSTPONE: POSTPONE:
+}
 "The implementation of the " { $link POSTPONE: \ } " word is discussed in detail in " { $link "reading-ahead" } ". Words are documented in " { $link "words" } "." ;
 
 ARTICLE: "escape" "Character escape codes"
@@ -93,87 +157,93 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\0" } "a null byte (ASCII 0)" }
     { { $snippet "\\e" } "escape (ASCII 27)" }
     { { $snippet "\\\"" } { $snippet "\"" } }
-}
-"A Unicode character can be specified by its code number by writing " { $snippet "\\u" } " followed by a four-digit hexadecimal number. That is, the following two expressions are equivalent:"
-{ $code
-    "CHAR: \\u0078"
-    "78"
-}
-"While not useful for single characters, this syntax is also permitted inside strings." ;
+    { { $snippet "\\u" { $emphasis "xxxxxx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xxxxxx" } } } }
+    { { $snippet "\\u{" { $emphasis "name" } "}" } { "The Unicode code point named " { $snippet { $emphasis "name" } } } }
+} ;
 
 ARTICLE: "syntax-strings" "Character and string syntax"
-"Factor has no distinct character type, however Unicode character value integers can be read by specifying a literal character, or an escaped representation thereof."
-{ $subsection POSTPONE: CHAR: }
-{ $subsection POSTPONE: " }
-{ $subsection "escape" }
+"Factor has no distinct character type. Integers representing Unicode code points can be read by specifying a literal character, or an escaped representation thereof."
+{ $subsections
+    POSTPONE: CHAR:
+    POSTPONE: "
+    "escape"
+}
 "Strings are documented in " { $link "strings" } "." ;
 
 ARTICLE: "syntax-sbufs" "String buffer syntax"
-{ $subsection POSTPONE: SBUF" }
+{ $subsections POSTPONE: SBUF" }
 "String buffers are documented in " { $link "sbufs" } "." ;
 
 ARTICLE: "syntax-arrays" "Array syntax"
-{ $subsection POSTPONE: { }
-{ $subsection POSTPONE: } }
+{ $subsections
+    POSTPONE: {
+    POSTPONE: }
+}
 "Arrays are documented in " { $link "arrays" } "." ;
 
 ARTICLE: "syntax-vectors" "Vector syntax"
-{ $subsection POSTPONE: V{ }
+{ $subsections POSTPONE: V{ }
 "Vectors are documented in " { $link "vectors" } "." ;
 
 ARTICLE: "syntax-hashtables" "Hashtable syntax"
-{ $subsection POSTPONE: H{ }
+{ $subsections POSTPONE: H{ }
 "Hashtables are documented in " { $link "hashtables" } "." ;
 
 ARTICLE: "syntax-tuples" "Tuple syntax"
-{ $subsection POSTPONE: T{ }
+{ $subsections POSTPONE: T{ }
 "Tuples are documented in " { $link "tuples" } "."  ;
 
 ARTICLE: "syntax-quots" "Quotation syntax"
-{ $subsection POSTPONE: [ }
-{ $subsection POSTPONE: ] }
+{ $subsections
+    POSTPONE: [
+    POSTPONE: ]
+}
 "Quotations are documented in " { $link "quotations" } "." ;
 
-ARTICLE: "syntax-bit-arrays" "Bit array syntax"
-{ $subsection POSTPONE: ?{ }
-"Bit arrays are documented in " { $link "bit-arrays" } "." ;
-
-ARTICLE: "syntax-float-arrays" "Float array syntax"
-{ $subsection POSTPONE: F{ }
-"Float arrays are documented in " { $link "float-arrays" } "." ;
-
 ARTICLE: "syntax-byte-arrays" "Byte array syntax"
-{ $subsection POSTPONE: B{ }
+{ $subsections POSTPONE: B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
-{ $subsection POSTPONE: P" }
-"Pathnames are documented in " { $link "file-streams" } "." ;
+{ $subsections POSTPONE: P" }
+"Pathnames are documented in " { $link "io.pathnames" } "." ;
+
+ARTICLE: "syntax-effects" "Stack effect syntax"
+"Note that this is " { $emphasis "not" } " syntax to declare stack effects of words. This pushes an " { $link effect } " instance on the stack for reflection, for use with words such as " { $link define-declared } ", " { $link call-effect } " and " { $link execute-effect } "."
+{ $subsections POSTPONE: (( }
+{ $see-also "effects" "inference" "tools.inference" } ;
 
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
 $nl
-"If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are ``live''."
+"If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are “live”."
 $nl
-"Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to word which may potentially mutate them."
-{ $subsection "syntax-numbers" }
-{ $subsection "syntax-words" }
-{ $subsection "syntax-quots" }
-{ $subsection "syntax-arrays" }
-{ $subsection "syntax-vectors" }
-{ $subsection "syntax-strings" }
-{ $subsection "syntax-sbufs" }
-{ $subsection "syntax-byte-arrays" }
-{ $subsection "syntax-bit-arrays" }
-{ $subsection "syntax-hashtables" }
-{ $subsection "syntax-tuples" }
-{ $subsection "syntax-pathnames" } ;
+"Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to a word which may potentially mutate them."
+{ $subsections
+    "syntax-numbers"
+    "syntax-words"
+    "syntax-quots"
+    "syntax-arrays"
+    "syntax-strings"
+    "syntax-byte-arrays"
+    "syntax-vectors"
+    "syntax-sbufs"
+    "syntax-hashtables"
+    "syntax-tuples"
+    "syntax-pathnames"
+    "syntax-effects"
+} ;
 
 ARTICLE: "syntax" "Syntax"
 "Factor has two main forms of syntax: " { $emphasis "definition" } " syntax and " { $emphasis "literal" } " syntax. Code is data, so the syntax for code is a special case of object literal syntax. This section documents literal syntax. Definition syntax is covered in " { $link "words" } ". Extending the parser is the main topic of " { $link "parser" } "."
-{ $subsection "parser-algorithm" }
-{ $subsection "syntax-comments" }
-{ $subsection "syntax-literals" } ;
+{ $subsections
+    "parser-algorithm"
+    "word-search"
+    "top-level-forms"
+    "syntax-comments"
+    "syntax-literals"
+    "syntax-immediate"
+} ;
 
 ABOUT: "syntax"
 
@@ -181,10 +251,15 @@ HELP: delimiter
 { $syntax ": foo ... ; delimiter" }
 { $description "Declares the most recently defined word as a delimiter. Delimiters are words which are only ever valid as the end of a nested block to be read by " { $link parse-until } ". An unpaired occurrence of a delimiter is a parse error." } ;
 
-HELP: parsing
-{ $syntax ": foo ... ; parsing" }
-{ $description "Declares the most recently defined word as a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example ": hello \"Hello parser!\" print ; parsing\n: world hello ;" "Hello parser!" } } ;
+HELP: deprecated
+{ $syntax ": foo ... ; deprecated" }
+{ $description "Declares the most recently defined word as deprecated. If the " { $vocab-link "tools.deprecation" } " vocabulary is loaded, usages of deprecated words will be noted by the " { $link "tools.errors" } " system." }
+{ $notes "Code that uses deprecated words continues to function normally; the errors are purely informational. However, code that uses deprecated words should be updated, for the deprecated words are intended to be removed soon." } ;
+
+HELP: SYNTAX:
+{ $syntax "SYNTAX: foo ... ;" }
+{ $description "Defines a parsing word." }
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< SYNTAX: HELLO \"Hello parser!\" print ; >>\n: world ( -- ) HELLO ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
@@ -196,6 +271,11 @@ HELP: inline
     "The non-optimizing quotation compiler ignores inlining declarations."
 } ;
 
+HELP: recursive
+{ $syntax ": foo ... ; recursive" }
+{ $description "Declares the most recently defined word as a recursive word." }
+{ $notes "This declaration is only required for " { $link POSTPONE: inline } " words which call themselves. See " { $link "inference-recursive-combinators" } "." } ;
+
 HELP: foldable
 { $syntax ": foo ... ; foldable" }
 { $description
@@ -206,6 +286,9 @@ HELP: foldable
         "both inputs and outputs of foldable words must be immutable."
     }
     "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " will output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects and proceeds to mutate them."
+}
+{ $notes
+    "Folding optimizations are not applied if the call site of a word is in the same source file as the word. This is a side-effect of the compilation unit system; see " { $link "compilation-units" } "."
 }
 { $examples "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable." } ;
 
@@ -220,7 +303,7 @@ HELP: flushable
 HELP: t
 { $syntax "t" }
 { $values { "t" "the canonical truth value" } }
-{ $description "The canonical instance of " { $link general-t } ". It is just a symbol." } ;
+{ $class-description "The canonical truth value, which is an instance of itself." } ;
 
 HELP: f
 { $syntax "f" }
@@ -267,18 +350,6 @@ HELP: B{
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "B{ 1 2 3 }" } } ;
 
-HELP: ?{
-{ $syntax "?{ elements... }" }
-{ $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "?{ t f t }" } } ;
-
-HELP: F{
-{ $syntax "F{ elements... }" }
-{ $values { "elements" "a list of real numbers" } }
-{ $description "Marks the beginning of a literal float array. Literal float arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "F{ 1.0 2.0 3.0 }" } } ;
-
 HELP: H{
 { $syntax "H{ { key value }... }" }
 { $values { "key" "an object" } { "value" "an object" } }
@@ -286,16 +357,37 @@ HELP: H{
 { $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
 HELP: C{
-{ $syntax "C{ real imaginary }" }
-{ $values { "real" "a real number" } { "imaginary" "a real number" } }
+{ $syntax "C{ real-part imaginary-part }" }
+{ $values { "real-part" "a real number" } { "imaginary-part" "a real number" } }
 { $description "Parses a complex number given in rectangular form as a pair of real numbers. Literal complex numbers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: T{
-{ $syntax "T{ class delegate slots... }" }
-{ $values { "class" "a tuple class word" } { "delegate" "a delegate" } { "slots" "list of objects" } }
-{ $description "Marks the beginning of a literal tuple. Literal tuples are terminated by " { $link POSTPONE: } } "."
+{ $syntax "T{ class }" "T{ class f slot-values... }" "T{ class { slot-name slot-value } ... }" }
+{ $values { "class" "a tuple class word" } { "slots" "slot values" } }
+{ $description "Marks the beginning of a literal tuple."
 $nl
-"The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, they are ignored." } ;
+"Three literal syntax forms are recognized:"
+{ $list
+    { "empty tuple form: if no slot values are specified, then the literal tuple will have all slots set to their initial values (see " { $link "slot-initial-values" } ")." }
+    { "BOA-form: if the first element of " { $snippet "slots" } " is " { $snippet "f" } ", then the remaining elements are slot values corresponding to slots in the order in which they are defined in the " { $link POSTPONE: TUPLE: } " form." }
+    { "assoc-form: otherwise, " { $snippet "slots" } " is interpreted as a sequence of " { $snippet "{ slot-name value }" } " pairs. The " { $snippet "slot-name" } " should not be quoted." }
+}
+"BOA form is more concise, whereas assoc form is more readable for larger tuples with many slots, or if only a few slots are to be specified."
+$nl
+"With BOA form, specifying an insufficient number of values is given after the class word, the remaining slots of the tuple are set to their initial values (see " { $link "slot-initial-values" } "). If too many values are given, an error will be raised." }
+{ $examples
+"An empty tuple; since vectors have their own literal syntax, the above is equivalent to " { $snippet "V{ }" } ""
+{ $code "T{ vector }" }
+"A BOA-form tuple:"
+{ $code
+    "USE: colors"
+    "T{ rgba f 1.0 0.0 0.5 }"
+}
+"An assoc-form tuple equal to the above:"
+{ $code
+    "USE: colors"
+    "T{ rgba { red 1.0 } { green 0.0 } { blue 0.5 } }"
+} } ;
 
 HELP: W{
 { $syntax "W{ object }" }
@@ -310,12 +402,12 @@ HELP: POSTPONE:
 { $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
 
 HELP: :
-{ $syntax ": word definition... ;" }
+{ $syntax ": word ( stack -- effect ) definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
-{ $description "Defines a compound word in the current vocabulary." }
+{ $description "Defines a word with the given stack effect in the current vocabulary." }
 { $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )\n    \"Greetings, \" write print ;\n: friend ( -- )\n    ask-name greet ;" } } ;
 
-{ POSTPONE: : POSTPONE: ; define-compound } related-words
+{ POSTPONE: : POSTPONE: ; define } related-words
 
 HELP: ;
 { $syntax ";" }
@@ -329,15 +421,61 @@ HELP: SYMBOL:
 { $syntax "SYMBOL: word" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
-{ $examples { $example "SYMBOL: foo\nfoo ." "foo" } } ;
+{ $examples { $example "USE: prettyprint" "IN: scratchpad" "SYMBOL: foo\nfoo ." "foo" } } ;
 
-{ define-symbol POSTPONE: SYMBOL: } related-words
+{ define-symbol POSTPONE: SYMBOL: POSTPONE: SYMBOLS: } related-words
+
+HELP: SYMBOLS:
+{ $syntax "SYMBOLS: words... ;" }
+{ $values { "words" "a sequence of new words to define" } }
+{ $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
+{ $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
+
+HELP: SINGLETON:
+{ $syntax "SINGLETON: class" }
+{ $values
+    { "class" "a new singleton to define" }
+}
+{ $description
+    "Defines a new singleton class. The class word itself is the sole instance of the singleton class."
+}
+{ $examples
+    { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
+} ;
+    
+HELP: SINGLETONS:
+{ $syntax "SINGLETONS: words... ;" }
+{ $values { "words" "a sequence of new words to define" } }
+{ $description "Creates a new singleton for every token until the " { $snippet ";" } "." } ;
+
+HELP: ALIAS:
+{ $syntax "ALIAS: new-word existing-word" }
+{ $values { "new-word" word } { "existing-word" word } }
+{ $description "Creates a new inlined word that calls the existing word." }
+{ $examples
+    { $example "USING: prettyprint sequences ;"
+               "IN: alias.test"
+               "ALIAS: sequence-nth nth"
+               "0 { 10 20 30 } sequence-nth ."
+               "10"
+    }
+} ;
+
+{ define-alias POSTPONE: ALIAS: } related-words
+
+HELP: CONSTANT:
+{ $syntax "CONSTANT: word value" }
+{ $values { "word" word } { "value" object } }
+{ $description "Creates a word which pushes a value on the stack." }
+{ $examples { $code "CONSTANT: magic 1" "CONSTANT: science HEX: ff0f" } } ;
+
+{ define-constant POSTPONE: CONSTANT: } related-words
 
 HELP: \
 { $syntax "\\ word" }
 { $values { "word" "a word" } }
 { $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
-{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } } ;
+{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } "If " { $snippet "foo" } " is a symbol, the following two lines are equivalent:" { $code "foo" "\\ foo" } } ;
 
 HELP: DEFER:
 { $syntax "DEFER: word" }
@@ -354,20 +492,76 @@ HELP: FORGET:
 HELP: USE:
 { $syntax "USE: vocabulary" }
 { $values { "vocabulary" "a vocabulary name" } }
-{ $description "Adds a new vocabulary at the front of the search path. Subsequent word lookups by the parser will search this vocabulary first." }
-{ $errors "Throws an error if the vocabulary does not exist." } ;
+{ $description "Adds a new vocabulary to the search path, loading it first if necessary." }
+{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
+{ $errors "Throws an error if the vocabulary does not exist or could not be loaded." } ;
 
-HELP: USE-IF:
-{ $syntax "USE-IF: word vocabulary" }
-{ $values { "word" "a word with stack effect " { $snippet "( -- ? )" } } { "vocabulary" "a vocabulary name" } }
-{ $description "Adds a vocabulary at the front of the search path if the word evaluates to a true value." }
+HELP: UNUSE:
+{ $syntax "UNUSE: vocabulary" }
+{ $values { "vocabulary" "a vocabulary name" } }
+{ $description "Removes a vocabulary from the search path." }
 { $errors "Throws an error if the vocabulary does not exist." } ;
 
 HELP: USING:
 { $syntax "USING: vocabularies... ;" }
 { $values { "vocabularies" "a list of vocabulary names" } }
-{ $description "Adds a list of vocabularies to the front of the search path, with later vocabularies taking precedence." }
+{ $description "Adds a list of vocabularies to the search path." }
+{ $notes "If adding the vocabularies introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
 { $errors "Throws an error if one of the vocabularies does not exist." } ;
+
+HELP: QUALIFIED:
+{ $syntax "QUALIFIED: vocab" }
+{ $description "Adds the vocabulary's words, prefixed with the vocabulary name, to the search path." }
+{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
+  { $code
+  "USE: fish"
+  "QUALIFIED: go"
+  "go:fishing"
+  }
+}
+{ $examples { $example
+    "USING: prettyprint ;"
+    "QUALIFIED: math"
+    "1 2 math:+ ." "3"
+} } ;
+
+HELP: QUALIFIED-WITH:
+{ $syntax "QUALIFIED-WITH: vocab word-prefix" }
+{ $description "Like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
+{ $examples { $code
+    "USING: prettyprint ;"
+    "QUALIFIED-WITH: math m"
+    "1 2 m:+ ."
+    "3"
+} } ;
+
+HELP: FROM:
+{ $syntax "FROM: vocab => words ... ;" }
+{ $description "Adds " { $snippet "words" } " from " { $snippet "vocab" } " to the search path." }
+{ $notes "If adding the words introduces ambiguity, the words will take precedence when resolving any ambiguous names." }
+{ $examples
+  "Both the " { $vocab-link "vocabs.parser" } " and " { $vocab-link "binary-search" } " vocabularies define a word named " { $snippet "search" } ". The following will throw an " { $link ambiguous-use-error } ":"
+  { $code "USING: vocabs.parser binary-search ;" "... search ..." }
+  "Because " { $link POSTPONE: FROM: } " takes precedence over a " { $link POSTPONE: USING: } ", the ambiguity can be resolved explicitly. Suppose you wanted the " { $vocab-link "binary-search" } " vocabulary's " { $snippet "search" } " word:"
+  { $code "USING: vocabs.parser binary-search ;" "FROM: binary-search => search ;" "... search ..." }
+ } ;
+
+HELP: EXCLUDE:
+{ $syntax "EXCLUDE: vocab => words ... ;" }
+{ $description "Adds all words except for " { $snippet "words" } " from " { $snippet "vocab" } "  to the search path." }
+{ $examples { $code
+    "EXCLUDE: math.parser => bin> hex> ;" "! imports everything but bin> and hex>" } } ;
+
+HELP: RENAME:
+{ $syntax "RENAME: word vocab => new-name" }
+{ $description "Imports " { $snippet "word" } " from " { $snippet "vocab" } ", but renamed to " { $snippet "new-name" } "." }
+{ $notes "If adding the words introduces ambiguity, the words will take precedence when resolving any ambiguous names." }
+{ $examples { $example
+    "USING: prettyprint ;"
+    "RENAME: + math => -"
+    "2 3 - ."
+    "5"
+} } ;
 
 HELP: IN:
 { $syntax "IN: vocabulary" }
@@ -376,32 +570,73 @@ HELP: IN:
 
 HELP: CHAR:
 { $syntax "CHAR: token" }
-{ $values { "token" "a literal character or escape code" } }
-{ $description "Adds the Unicode code point of the character represented by the token to the parse tree." } ;
+{ $values { "token" "a literal character, escape code, or Unicode code point name" } }
+{ $description "Adds a Unicode code point to the parse tree." }
+{ $examples
+    { $code
+        "CHAR: x"
+        "CHAR: \\u000032"
+        "CHAR: \\u{exclamation-mark}"
+        "CHAR: exclamation-mark"
+        "CHAR: ugaritic-letter-samka"
+    }
+} ;
 
 HELP: "
-{ $syntax "\"string...\"" }
+{ $syntax "\"string...\"" "\"\"\"string...\"\"\"" }
 { $values { "string" "literal and escaped characters" } }
-{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", and appends the resulting string to the parse tree. String literals cannot span multiple lines. Strings containing the " { $link POSTPONE: " } " character and various other special characters can be read by inserting escape sequences." }
-{ $examples { $example "\"Hello\\nworld\" print" "Hello\nworld" } } ;
+{ $description "Reads from the input string until the next occurrence of " { $snippet "\"" } " or " { $snippet "\"\"\"" } ", and appends the resulting string to the parse tree. String literals can span multiple lines. Various special characters can be read by inserting " { $link "escape" } ". For triple quoted strings, the double-quote character does not require escaping." }
+{ $examples
+    "A string with an escaped newline in it:"
+    { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" }
+    "A string with an actual newline in it:"
+    { $example "USE: io" "\"Hello\nworld\" print" "Hello\nworld" }
+    "A string with a named Unicode code point:"
+    { $example "USE: io" "\"\\u{greek-capital-letter-sigma}\" print" "\u{greek-capital-letter-sigma}" }
+    "A triple-quoted string:"
+    { $example "USE: io \"\"\"Teach a man to \"fish\"...\nand fish will go extinct\"\"\" print" """Teach a man to \"fish\"...
+and fish will go extinct""" }
+} ;
 
 HELP: SBUF"
 { $syntax "SBUF\" string... \"" }
 { $values { "string" "literal and escaped characters" } }
 { $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", converts the string to a string buffer, and appends it to the parse tree." }
-{ $examples { $example "SBUF\" Hello world\" >string print" "Hello world" } } ;
+{ $examples { $example "USING: io strings ;" "SBUF\" Hello world\" >string print" "Hello world" } } ;
 
 HELP: P"
 { $syntax "P\" pathname\"" }
 { $values { "pathname" "a pathname string" } }
-{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", creates a new " { $link pathname } ", and appends it to the parse tree." }
-{ $examples { $example "USE: io.files" "P\" foo.txt\" pathname-string print" "foo.txt" } } ;
+{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", creates a new " { $link pathname } ", and appends it to the parse tree. Pathnames presented in the UI are clickable, which opens them in a text editor configured with " { $link "editor" } "." }
+{ $examples { $example "USING: accessors io io.files ;" "P\" foo.txt\" string>> print" "foo.txt" } } ;
 
 HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "Recursive words must have a declared stack effect to compile. See " { $link "effect-declaration" } " for details." } ;
+{ $description "A stack effect declaration. This is treated as a comment unless it appears inside a word definition." }
+{ $see-also "effects" } ;
+
+HELP: ((
+{ $syntax "(( inputs -- outputs ))" }
+{ $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
+{ $description "Literal stack effect syntax." }
+{ $notes "Useful for meta-programming with " { $link define-declared } "." }
+{ $examples
+    { $example
+        "USING: compiler.units kernel math prettyprint random words ;"
+        "IN: scratchpad"
+        ""
+        "SYMBOL: my-dynamic-word"
+        ""
+        "["
+        "    my-dynamic-word 2 { [ + ] [ * ] } random curry"
+        "    (( x -- y )) define-declared"
+        "] with-compilation-unit"
+        ""
+        "2 my-dynamic-word ."
+        "4"
+    }
+} ;
 
 HELP: !
 { $syntax "! comment..." }
@@ -416,36 +651,51 @@ HELP: #!
 { $description "Discards all input until the end of the line." } ;
 
 HELP: HEX:
-{ $syntax "HEX: integer" }
-{ $values { "integer" "hexadecimal digits (0-9, a-f, A-F)" } }
-{ $description "Adds an integer read from a hexadecimal literal to the parse tree." }
-{ $examples { $example "HEX: ff ." "255" } } ;
+{ $syntax "HEX: NNN" "HEX: NNN.NNNpEEE" }
+{ $values { "N" "hexadecimal digit (0-9, a-f, A-F)" } { "pEEE" "decimal exponent value" } }
+{ $description "Adds an integer or floating-point value read from a hexadecimal literal to the parse tree." }
+{ $examples
+    { $example "USE: prettyprint" "HEX: ff ." "255" }
+    { $example "USE: prettyprint" "HEX: 1.8p5 ." "48.0" }
+} ;
 
 HELP: OCT:
 { $syntax "OCT: integer" }
 { $values { "integer" "octal digits (0-7)" } }
 { $description "Adds an integer read from an octal literal to the parse tree." }
-{ $examples { $example "OCT: 31337 ." "13023" } } ;
+{ $examples { $example "USE: prettyprint" "OCT: 31337 ." "13023" } } ;
 
 HELP: BIN:
 { $syntax "BIN: integer" }
 { $values { "integer" "binary digits (0 and 1)" } }
 { $description "Adds an integer read from an binary literal to the parse tree." }
-{ $examples { $example "BIN: 100 ." "4" } } ;
+{ $examples { $example "USE: prettyprint" "BIN: 100 ." "4" } } ;
+
+HELP: NAN:
+{ $syntax "NAN: payload" }
+{ $values { "payload" "64-bit hexadecimal integer" } }
+{ $description "Adds a floating point Not-a-Number literal to the parse tree." }
+{ $examples
+    { $example
+        "USE: prettyprint"
+        "NAN: 80000deadbeef ."
+        "NAN: 80000deadbeef"
+    }
+} ;
 
 HELP: GENERIC:
-{ $syntax "GENERIC: word" }
+{ $syntax "GENERIC: word ( stack -- effect )" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." } ;
 
 HELP: GENERIC#
-{ $syntax "GENERIC# word n" }
-{ $values { "word" "a new word to define" } { "n" "the stack position to dispatch on, either 0, 1 or 2" } }
+{ $syntax "GENERIC# word n ( stack -- effect )" }
+{ $values { "word" "a new word to define" } { "n" "the stack position to dispatch on" } }
 { $description "Defines a new generic word which dispatches on the " { $snippet "n" } "th most element from the top of the stack in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "The following two definitions are equivalent:"
-    { $code "GENERIC: foo" }
-    { $code "GENERIC# foo 0" }
+    { $code "GENERIC: foo ( obj -- )" }
+    { $code "GENERIC# foo 0 ( obj -- )" }
 } ;
 
 HELP: MATH:
@@ -454,11 +704,13 @@ HELP: MATH:
 { $description "Defines a new generic word which uses the " { $link math-combination } " method combination." } ;
 
 HELP: HOOK:
-{ $syntax "HOOK: word variable" }
+{ $syntax "HOOK: word variable ( stack -- effect ) " }
 { $values { "word" "a new word to define" } { "variable" word } }
 { $description "Defines a new hook word in the current vocabulary. Hook words are generic words which dispatch on the value of a variable, so methods are defined with " { $link POSTPONE: M: } ". Hook words differ from other generic words in that the dispatch value is removed from the stack before the chosen method is called." }
 { $examples
     { $example
+        "USING: io namespaces ;"
+        "IN: scratchpad"
         "SYMBOL: transport"
         "TUPLE: land-transport ;"
         "TUPLE: air-transport ;"
@@ -482,24 +734,27 @@ HELP: M:
 HELP: UNION:
 { $syntax "UNION: class members... ;" }
 { $values { "class" "a new class word to define" } { "members" "a list of class words separated by whitespace" } }
-{ $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." }
-{ $notes "Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates." } ;
+{ $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." } ;
+
+HELP: INTERSECTION:
+{ $syntax "INTERSECTION: class participants... ;" }
+{ $values { "class" "a new class word to define" } { "participants" "a list of class words separated by whitespace" } }
+{ $description "Defines an intersection class. An object is an instance of an intersection class if it is an instance of all of its participants." } ;
 
 HELP: MIXIN:
 { $syntax "MIXIN: class" }
 { $values { "class" "a new class word to define" } }
 { $description "Defines a mixin class. A mixin is similar to a union class, except it has no members initially, and new members can be added with the " { $link POSTPONE: INSTANCE: } " word." }
-{ $notes "Mixins classes are used to mark implementations of a protocol and define default methods." }
 { $examples "The " { $link sequence } " and " { $link assoc } " mixin classes." } ;
 
 HELP: INSTANCE:
 { $syntax "INSTANCE: instance mixin" }
-{ $values { "instance" "a class word" } { "instance" "a class word" } }
+{ $values { "instance" "a class word" } { "mixin" "a mixin class word" } }
 { $description "Makes " { $snippet "instance" } " an instance of " { $snippet "mixin" } "." } ;
 
 HELP: PREDICATE:
-{ $syntax "PREDICATE: superclass class predicate... ;" }
-{ $values { "superclass" "an existing class word" } { "class" "a new class word to define" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
+{ $syntax "PREDICATE: class < superclass predicate... ;" }
+{ $values { "class" "a new class word to define" } { "superclass" "an existing class word" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
 { $description
     "Defines a predicate class deriving from " { $snippet "superclass" } "."
     $nl
@@ -509,26 +764,77 @@ HELP: PREDICATE:
         "it satisfies the predicate"
     }
     "Each predicate must be defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be exhaustively tested during method dispatch."
+}
+{ $examples
+    { $code "USING: math ;" "PREDICATE: positive < integer 0 > ;" }
 } ;
 
 HELP: TUPLE:
-{ $syntax "TUPLE: class slots... ;" }
-{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class with membership predicate " { $snippet "name?" } "."
+{ $syntax "TUPLE: class slots... ;" "TUPLE: class < superclass slots ... ;" }
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot specifiers" } }
+{ $description "Defines a new tuple class."
 $nl
-"Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
+"The superclass is optional; if left unspecified, it defaults to " { $link tuple } "."
+$nl
+"Slot specifiers take one of the following three forms:"
+{ $list
+    { { $snippet "name" } " - a slot which can hold any object, with no attributes" }
+    { { $snippet "{ name attributes... }" } " - a slot which can hold any object, with optional attributes" }
+    { { $snippet "{ name class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
+}
+"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." }
+{ $examples
+    "A simple tuple class:"
+    { $code "TUPLE: color red green blue ;" }
+    "Declaring slots to be integer-valued:"
+    { $code "TUPLE: color" "{ red integer }" "{ green integer }" "{ blue integer } ;" }
+    "An example mixing short and long slot specifiers:"
+    { $code "TUPLE: person" "{ age integer initial: 0 }" "{ department string initial: \"Marketing\" }" "manager ;" }
+} ;
+
+HELP: initial:
+{ $syntax "TUPLE: ... { slot initial: value } ... ;" }
+{ $values { "slot" "a slot name" } { "value" "any literal" } }
+{ $description "Specifies an initial value for a tuple slot." } ;
+
+HELP: read-only
+{ $syntax "TUPLE: ... { slot read-only } ... ;" }
+{ $values { "slot" "a slot name" } }
+{ $description "Defines a tuple slot to be read-only. If a tuple has read-only slots, instances of the tuple should only be created by calling " { $link boa } ", instead of " { $link new } ". Using " { $link boa } " is the only way to set the value of a read-only slot." } ;
+
+{ initial: read-only } related-words
+
+HELP: SLOT:
+{ $syntax "SLOT: name" }
+{ $values { "name" "a slot name" } }
+{ $description "Defines a protocol slot; that is, defines the accessor words for a slot named " { $snippet "slot" } " without associating it with any specific tuple." } ;
+
+HELP: ERROR:
+{ $syntax "ERROR: class slots... ;" }
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
+{ $description "Defines a new tuple class whose class word throws a new instance of the error." }
+{ $notes
+    "The following two snippets are equivalent:"
+    { $code
+        "ERROR: invalid-values x y ;"
+        ""
+        "TUPLE: invalid-values x y ;"
+        ": invalid-values ( x y -- * )"
+        "    \\ invalid-values boa throw ;"
+    }
+} ;
 
 HELP: C:
 { $syntax "C: constructor class" }
 { $values { "constructor" "a new word to define" } { "class" tuple-class } }
-{ $description "Define a constructor word for a tuple class which simply performs BOA (by order of arguments) construction using " { $link construct-boa } "." }
+{ $description "Define a constructor word for a tuple class which simply performs BOA (by order of arguments) construction using " { $link boa } "." }
 { $examples
     "Suppose the following tuple has been defined:"
     { $code "TUPLE: color red green blue ;" }
     "The following two lines are equivalent:"
     { $code
         "C: <color> color"
-        ": <color> color construct-boa ;"
+        ": <color> color boa ;"
     }
     "In both cases, a word " { $snippet "<color>" } " is defined, which reads three values from the stack and creates a " { $snippet "color" } " instance having these values in the " { $snippet "red" } ", " { $snippet "green" } " and " { $snippet "blue" } " slots, respectively."
 } ;
@@ -540,7 +846,7 @@ HELP: MAIN:
 
 HELP: <PRIVATE
 { $syntax "<PRIVATE ... PRIVATE>" }
-{ $description "Marks the start of a block of private word definitions. Private word definitions are placed in a vocabulary named by suffixing the current vocabulary with " { $snippet ".private" } "." }
+{ $description "Begins a block of private word definitions. Private word definitions are placed in the current vocabulary name, suffixed with " { $snippet ".private" } "." }
 { $notes
     "The following is an example of usage:"
     { $code
@@ -549,7 +855,7 @@ HELP: <PRIVATE
         "<PRIVATE"
         ""
         ": (fac) ( accum n -- n! )"
-        "    dup 1 <= [ drop ] [ [ * ] keep 1- (fac) ] if ;"
+        "    dup 1 <= [ drop ] [ [ * ] keep 1 - (fac) ] if ;"
         ""
         "PRIVATE>"
         ""
@@ -560,7 +866,7 @@ HELP: <PRIVATE
         "IN: factorial.private"
         ""
         ": (fac) ( accum n -- n! )"
-        "    dup 1 <= [ drop ] [ [ * ] keep 1- (fac) ] if ;"
+        "    dup 1 <= [ drop ] [ [ * ] keep 1 - (fac) ] if ;"
         ""
         "IN: factorial"
         ""
@@ -570,6 +876,52 @@ HELP: <PRIVATE
 
 HELP: PRIVATE>
 { $syntax "<PRIVATE ... PRIVATE>" }
-{ $description "Marks the end of a block of private word definitions." } ;
+{ $description "Ends a block of private word definitions." } ;
 
 { POSTPONE: <PRIVATE POSTPONE: PRIVATE> } related-words
+
+HELP: <<
+{ $syntax "<< ... >>" }
+{ $description "Evaluates some code at parse time." }
+{ $notes "Calling words defined in the same source file at parse time is prohibited; see compilation unit as where it was defined; see " { $link "compilation-units" } "." } ;
+
+HELP: >>
+{ $syntax ">>" }
+{ $description "Marks the end of a parse time code block." } ;
+
+HELP: call-next-method
+{ $syntax "call-next-method" }
+{ $description "Calls the next applicable method. Only valid inside a method definition. The values at the top of the stack are passed on to the next method, and they must be compatible with that method's class specializer." }
+{ $notes "This word looks like an ordinary word but it is a parsing word. It cannot be factored out of a method definition, since the code expansion references the current method object directly." }
+{ $errors
+    "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
+} ;
+
+{ POSTPONE: call-next-method (call-next-method) next-method } related-words
+
+{ POSTPONE: << POSTPONE: >> } related-words
+
+HELP: call(
+{ $syntax "call( stack -- effect )" }
+{ $description "Calls the quotation on the top of the stack, asserting that it has the given stack effect. The quotation does not need to be known at compile time." }
+{ $examples
+  { $code
+    "TUPLE: action name quot ;"
+    ": perform-action ( action -- )"
+    "    [ name>> print ] [ quot>> call( -- ) ] bi ;"
+  }
+} ;
+
+HELP: execute(
+{ $syntax "execute( stack -- effect )" }
+{ $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." }
+{ $examples
+  { $code
+    "IN: scratchpad"
+    ""
+    ": eat ( -- ) ; : sleep ( -- ) ; : hack ( -- ) ;"
+    "{ eat sleep hack } [ execute( -- ) ] each"
+  }
+} ;
+
+{ POSTPONE: call( POSTPONE: execute( } related-words

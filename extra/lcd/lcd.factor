@@ -1,19 +1,28 @@
-USING: sequences kernel math io ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors calendar.format calendar.model fonts fry
+grouping kernel math models.arrow namespaces sequences ui
+ui.gadgets.labels ;
 IN: lcd
 
 : lcd-digit ( digit row -- str )
-    {
-        "  _       _  _       _   _   _   _   _  "
-        " | |  |   _| _| |_| |_  |_    | |_| |_| "     
-        " |_|  |  |_  _|   |  _| |_|   | |_|   | "
-    } nth >r 4 * dup 4 + r> subseq ;
+    [ dup CHAR: : = [ drop 10 ] [ CHAR: 0 - ] if ] dip {
+        "  _       _  _       _   _   _   _   _      "
+        " | |  |   _| _| |_| |_  |_    | |_| |_|  *  "
+        " |_|  |  |_  _|   |  _| |_|   | |_|   |  *  "
+        "                                            "
+    } nth 4 <groups> nth ;
 
-: lcd-row ( num row -- )
-    swap [ CHAR: 0 - swap lcd-digit write ] curry* each ;
+: lcd-row ( row digit -- string )
+    '[ _ lcd-digit ] { } map-as concat ;
 
-: lcd ( digit-str -- )
-    3 [ lcd-row nl ] curry* each ;
+: lcd ( digit-str -- string )
+    4 iota [ lcd-row ] with map "\n" join ;
 
-: lcd-demo ( -- ) "31337" lcd ;
+: <time-display> ( model -- gadget )
+    [ timestamp>hms lcd ] <arrow> <label-control>
+    "99:99:99" lcd >>string
+    monospace-font >>font ;
 
-MAIN: lcd-demo
+MAIN-WINDOW: time-window { { title "Time" } }
+    time get <time-display> >>gadgets ;

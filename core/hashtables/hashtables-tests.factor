@@ -1,16 +1,14 @@
-IN: temporary
-USING: kernel math namespaces tools.test vectors sequences
+USING: kernel math namespaces make tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
 continuations ;
-
-[ f ] [ "hi" V{ 1 2 3 } at ] unit-test
+IN: hashtables.tests
 
 [ H{ } ] [ { } [ dup ] H{ } map>assoc ] unit-test
 
-[ ] [ 1000 [ dup sq ] H{ } map>assoc "testhash" set ] unit-test
+[ ] [ 1000 iota [ dup sq ] H{ } map>assoc "testhash" set ] unit-test
 
 [ V{ } ]
-[ 1000 [ dup sq swap "testhash" get at = not ] subset ]
+[ 1000 iota [ dup sq swap "testhash" get at = not ] filter ]
 unit-test
 
 [ t ]
@@ -28,7 +26,6 @@ unit-test
 
 [ t ] [ 12 hashcode 12 hashcode = ] unit-test
 [ t ] [ 12 >bignum hashcode 12 hashcode = ] unit-test
-[ t ] [ 12.0 hashcode 12 >bignum hashcode = ] unit-test
 
 ! Test various odd keys to see if they work.
 
@@ -119,7 +116,7 @@ H{ } clone "counting" set
 
 ! Resource leak...
 H{ } "x" set
-100 [ drop "x" get clear-assoc ] each
+100 [ drop "x" get clear-assoc ] each-integer
 
 ! Crash discovered by erg
 [ t ] [ 0.75 <hashtable> dup clone = ] unit-test
@@ -127,15 +124,15 @@ H{ } "x" set
 ! Another crash discovered by erg
 [ ] [
     H{ } clone
-    [ 1 swap set-at ] catch drop
-    [ 2 swap set-at ] catch drop
-    [ 3 swap set-at ] catch drop
+    [ 1 swap set-at ] ignore-errors
+    [ 2 swap set-at ] ignore-errors
+    [ 3 swap set-at ] ignore-errors
     drop
 ] unit-test
 
 [ H{ { -1 4 } { -3 16 } { -5 36 } } ] [
     H{ { 1 2 } { 3 4 } { 5 6 } }
-    [ >r neg r> sq ] assoc-map
+    [ [ neg ] dip sq ] assoc-map
 ] unit-test
 
 ! Bug discovered by littledan
@@ -157,6 +154,21 @@ H{ } "x" set
 ] unit-test
 
 [ { "one" "two" 3 } ] [
-    H{ { 1 "one" } { 2 "two" } }
-    { 1 2 3 } clone [ substitute ] keep
+    { 1 2 3 } H{ { 1 "one" } { 2 "two" } } substitute
 ] unit-test
+
+! We want this to work
+[ ] [ hashtable new "h" set ] unit-test
+
+[ 0 ] [ "h" get assoc-size ] unit-test
+
+[ f f ] [ "goo" "h" get at* ] unit-test
+
+[ ] [ 1 2 "h" get set-at ] unit-test
+
+[ 1 ] [ "h" get assoc-size ] unit-test
+
+[ 1 ] [ 2 "h" get at ] unit-test
+
+! Random test case
+[ "A" ] [ 100 iota [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 swap at ] unit-test

@@ -4,19 +4,19 @@ IN: partial-continuations
 USING: kernel continuations arrays sequences quotations ;
 
 : breset ( quot -- )
-    [ 1array swap keep first continue-with ] callcc1 nip ;
+    [ 1array swap keep first continue-with ] callcc1 nip ; inline
 
-: (bshift) ( v r k -- )
-    >r dup first -rot r>
+: (bshift) ( v r k -- obj )
+    [ dup first -rot ] dip
     [
         rot set-first
         continue-with
     ] callcc1
-    >r drop nip set-first r> ;
+    [ drop nip set-first ] dip ;
 
 : bshift ( r quot -- )
     swap [ ! quot r k
-        over >r
-        [ (bshift) ] 2curry swap call
-        r> first continue-with
-    ] callcc1 2nip ;
+        over [
+            [ (bshift) ] 2curry swap call
+        ] dip first continue-with
+    ] callcc1 2nip ; inline

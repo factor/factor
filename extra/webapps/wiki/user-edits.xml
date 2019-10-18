@@ -1,0 +1,11 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:atom t:href="$wiki/user-edits.atom" t:rest="author">
+		Edits by <t:label t:name="author" />
+	</t:atom>
+
+	<t:title>Edits by <t:label t:name="author" /></t:title>
+
+</t:chloe>

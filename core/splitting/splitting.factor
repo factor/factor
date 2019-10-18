@@ -1,80 +1,85 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces strings arrays vectors sequences ;
+USING: kernel math make strings arrays vectors sequences
+sets math.order accessors ;
 IN: splitting
 
-TUPLE: groups seq n sliced? ;
+<PRIVATE
 
-: check-groups 0 <= [ "Invalid group count" throw ] when ;
+: ?chomp ( seq begin tester chopper -- newseq ? )
+    [ [ 2dup ] dip call ] dip
+    [ [ length ] dip call t ] curry
+    [ drop f ] if ; inline
 
-: <groups> ( seq n -- groups )
-    dup check-groups f groups construct-boa ; inline
-
-: <sliced-groups> ( seq n -- groups )
-    <groups> t over set-groups-sliced? ;
-
-M: groups length
-    dup groups-seq length swap groups-n [ + 1- ] keep /i ;
-
-M: groups set-length
-    [ groups-n * ] keep delegate set-length ;
-
-: group@ ( n groups -- from to seq )
-    [ groups-n [ * dup ] keep + ] keep
-    groups-seq [ length min ] keep ;
-
-M: groups nth
-    [ group@ ] keep
-    groups-sliced? [ <slice> ] [ subseq ] if ;
-
-M: groups set-nth
-    group@ <slice> 0 swap copy ;
-
-M: groups like drop { } like ;
-
-INSTANCE: groups sequence
-
-: group ( seq n -- array ) <groups> { } like ;
+PRIVATE>
 
 : ?head ( seq begin -- newseq ? )
-    2dup head? [ length tail t ] [ drop f ] if ;
+    [ head? ] [ tail ] ?chomp ;
 
 : ?head-slice ( seq begin -- newseq ? )
-    2dup head? [ length tail-slice t ] [ drop f ] if ;
+    [ head? ] [ tail-slice ] ?chomp ;
 
 : ?tail ( seq end -- newseq ? )
-    2dup tail? [ length head* t ] [ drop f ] if ;
+    [ tail? ] [ head* ] ?chomp ;
 
 : ?tail-slice ( seq end -- newseq ? )
-    2dup tail? [ length head-slice* t ] [ drop f ] if ;
+    [ tail? ] [ head-slice* ] ?chomp ;
+
+<PRIVATE
+
+: (split1) ( seq subseq quot -- before after )
+    [
+        swap [
+            [ drop length ] [ start dup ] 2bi
+            [ [ nip ] [ + ] 2bi t ]
+            [ 2drop f f f ]
+            if
+        ] keep swap
+    ] dip [ 2nip f ] if ; inline
+
+PRIVATE>
 
 : split1 ( seq subseq -- before after )
-    dup pick start dup [
-        [ >r over r> head -rot length ] keep + tail
-    ] [
-        2drop f
-    ] if ;
+    [ snip ] (split1) ;
 
-: last-split1 ( seq subseq -- before after )
-    [ <reversed> ] 2apply split1 [ reverse ] 2apply
+: split1-slice ( seq subseq -- before-slice after-slice )
+    [ snip-slice ] (split1) ;
+
+: split1-last ( seq subseq -- before after )
+    [ <reversed> ] bi@ split1 [ reverse ] bi@
     dup [ swap ] when ;
 
-: (split) ( separators n seq -- )
-    3dup rot [ member? ] curry find* drop
-    [ [ swap subseq , ] 2keep 1+ swap (split) ]
-    [ swap dup zero? [ drop ] [ tail ] if , drop ] if* ; inline
+: split1-last-slice ( seq subseq -- before-slice after-slice )
+    [ <reversed> ] bi@ split1-slice [ <reversed> ] bi@
+    [ f ] [ swap ] if-empty ;
 
-: split, ( seq separators -- ) 0 rot (split) ;
+<PRIVATE
 
-: split ( seq separators -- pieces ) [ split, ] { } make ;
+: (split) ( n seq quot: ( elt -- ? ) -- )
+    [ find-from drop ]
+    [ [ [ 3dup swapd subseq , ] dip [ drop 1 + ] 2dip (split) ] 3curry ]
+    [ drop [ swap [ tail ] unless-zero , ] 2curry ]
+    3tri if* ; inline recursive
 
-: string-lines ( str -- seq )
-    dup [ "\r\n" member? ] contains? [
+: split, ( seq quot -- ) [ 0 ] 2dip (split) ; inline
+
+PRIVATE>
+
+: split ( seq separators -- pieces )
+    [ [ member? ] curry split, ] { } make ;
+
+: split-when ( seq quot -- pieces )
+    [ split, ] { } make ; inline
+
+GENERIC: string-lines ( str -- seq )
+
+M: string string-lines
+    dup "\r\n" intersects? [
         "\n" split [
-            1 head-slice* [
+            but-last-slice [
                 "\r" ?tail drop "\r" split
             ] map
-        ] keep peek "\r" split add concat
+        ] keep last "\r" split suffix concat
     ] [
         1array
     ] if ;

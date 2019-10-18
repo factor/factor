@@ -8,36 +8,53 @@ ARTICLE: "hashtables.private" "Hashtable implementation details"
 $nl
 "There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
 $nl
-"The " { $link hash-count } " slot is the number of entries including deleted entries, and " { $link hash-deleted } " is the number of deleted entries."
-{ $subsection <hash-array> }
-{ $subsection nth-pair }
-{ $subsection set-nth-pair }
-{ $subsection find-pair }
+"The " { $snippet "count" } " slot is the number of entries including deleted entries, and " { $snippet "deleted" } " is the number of deleted entries."
+{ $subsections
+    <hash-array>
+    set-nth-pair
+}
 "If a hashtable's keys are mutated, or if hashing algorithms change, hashtables can be rehashed:"
-{ $subsection rehash } ;
+{ $subsections rehash } ;
 
 ARTICLE: "hashtables" "Hashtables"
 "A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made. The literal syntax is covered in " { $link "syntax-hashtables" } "."
 $nl
-"Hashtable words are in the " { $vocab-link "hashtables" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "hashtables.private" } " vocabulary."
-$nl
-"Hashtables implement the " { $link "assocs-protocol" } "."
+"Words for constructing hashtables are in the " { $vocab-link "hashtables" } " vocabulary. Hashtables implement the " { $link "assocs-protocol" } ", and all " { $link "assocs" } " can be used on them; there are no hashtable-specific words to access and modify keys, because associative mapping operations are generic and work with all associative mappings."
 $nl
 "Hashtables are a class of objects."
-{ $subsection hashtable }
-{ $subsection hashtable? }
+{ $subsections
+    hashtable
+    hashtable?
+}
 "You can create a new hashtable with an initial capacity."
-{ $subsection <hashtable> }
+{ $subsections <hashtable> }
 "If you don't care about initial capacity, a more elegant way to create a new hashtable is to write:"
 { $code "H{ } clone" }
 "To convert an assoc to a hashtable:"
-{ $subsection >hashtable }
+{ $subsections >hashtable }
+"Further topics:"
+{ $subsections
+    "hashtables.keys"
+    "hashtables.utilities"
+    "hashtables.private"
+} ;
+
+ARTICLE: "hashtables.keys" "Hashtable keys"
+"Hashtables rely on the " { $link hashcode } " word to rapidly locate values associated with keys. The objects used as keys in a hashtable must obey certain restrictions."
+$nl
+"The " { $link hashcode } " of a key is a function of its slot values, and if the hashcode changes then the hashtable will be left in an inconsistent state. The easiest way to avoid this problem is to never mutate objects used as hashtable keys."
+$nl
+"In certain advanced applications, this cannot be avoided and the best design involves mutating hashtable keys. In this case, a custom " { $link hashcode* } " method must be defined which only depends on immutable slots."
+$nl
+"In addition, the " { $link equal? } " and " { $link hashcode* } " methods must be congruent, and if one is defined the other should be defined also. This is documented in detail in the documentation for these respective words."
+{ $subsections hashcode hashcode* identity-hashcode } ;
+
+ARTICLE: "hashtables.utilities" "Hashtable utilities"
 "Utility words to create a new hashtable from a single key/value pair:"
-{ $subsection associate }
-{ $subsection ?set-at }
-"Removing duplicate elements from a sequence in linear time, using a hashtable:"
-{ $subsection prune }
-{ $subsection "hashtables.private" } ;
+{ $subsections
+    associate
+    ?set-at
+} ;
 
 ABOUT: "hashtables"
 
@@ -62,23 +79,11 @@ HELP: new-key@
 { $values { "key" "a key" } { "hash" hashtable } { "array" "the underlying array of the hashtable" } { "n" "the index where the key would be stored" } { "empty?" "a boolean indicating whether the location is currently empty" } }
 { $description "Searches the hashtable for the key using a linear probing strategy. If the key is not present in the hashtable, outputs the index where it should be stored." } ;
 
-HELP: nth-pair
-{ $values { "n" "an index in the sequence" } { "seq" "a sequence" } { "key" "the first element of the pair" } { "value" "the second element of the pair" } }
-{ $description "Fetches the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
-{ $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because it does not perform bounds checks." } ;
-
-{ nth-pair set-nth-pair } related-words
-
 HELP: set-nth-pair
 { $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "seq" "a sequence" } { "n" "an index in the sequence" } }
 { $description "Stores a pair of values into the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
 { $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because it does not perform bounds checks." }
 { $side-effects "seq" } ;
-
-HELP: find-pair
-{ $values { "array" "an array of pairs" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" "the successful key" } { "value" "the successful value" } { "?" "a boolean of whether there was success" } }
-{ $description "Applies a quotation to successive pairs in the array, yielding the first successful pair." }
-{ $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because passing an array of odd length can lead to memory corruption." } ;
 
 HELP: reset-hash
 { $values { "n" "a positive integer specifying hashtable capacity" } { "hash" hashtable } }
@@ -95,11 +100,6 @@ HELP: hash-deleted+
 { $description "Called to increment the deleted entry counter when an entry is removed with " { $link delete-at } }
 { $side-effects "hash" } ;
 
-HELP: (set-hash)
-{ $values { "value" "a value" } { "key" "a key to add" } { "hash" hashtable } { "new?" "a boolean" } }
-{ $description "Stores the key/value pair into the hashtable. This word does not grow the hashtable if it exceeds capacity, therefore a hang can result. User code should use " { $link set-at } " instead, which grows the hashtable if necessary." }
-{ $side-effects "hash" } ;
-
 HELP: grow-hash
 { $values { "hash" hashtable } }
 { $description "Enlarges the capacity of a hashtable. User code does not need to call this word directly." }
@@ -114,24 +114,19 @@ HELP: <hashtable>
 { $values { "n" "a positive integer specifying hashtable capacity" } { "hash" "a new hashtable" } }
 { $description "Create a new hashtable capable of storing " { $snippet "n" } " key/value pairs before growing." } ;
 
-HELP: (hashtable) ( -- hash )
-{ $values { "hash" "a new hashtable" } }
-{ $description "Allocates a hashtable stub object without an underlying array. User code should call " { $link <hashtable> } " instead." } ;
-
 HELP: associate
 { $values { "value" "a value" } { "key" "a key" } { "hash" "a new " { $link hashtable } } }
 { $description "Create a new hashtable holding one key/value pair." } ;
 
-HELP: >hashtable
-{ $values { "assoc" "an assoc" } { "hashtable" "a hashtable" } }
-{ $description "Constructs a hashtable from any assoc." } ;
+HELP: ?set-at
+{ $values
+     { "value" object } { "key" object } { "assoc/f" "an assoc or " { $link f } }
+     { "assoc" assoc } }
+{ $description "If the third input is an assoc, stores the key/value pair into that assoc, or else creates a new hashtable with the key/value pair as its only entry." } ;
 
-HELP: prune
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and elements are ordered according to their position in " { $snippet "seq" } "." }
-{ $examples
-    { $example "USE: hashtables" "{ 1 1 t 3 t } prune ." "V{ 1 t 3 }" }
-} ;
+HELP: >hashtable
+{ $values { "assoc" assoc } { "hashtable" hashtable } }
+{ $description "Constructs a hashtable from any assoc." } ;
 
 HELP: rehash
 { $values { "hash" hashtable } }

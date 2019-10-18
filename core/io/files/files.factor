@@ -1,159 +1,63 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: kernel kernel.private sequences init namespaces system io
+io.backend io.pathnames io.encodings io.files.private
+alien.strings ;
 IN: io.files
-USING: io.backend io.files.private io hashtables kernel math
-memory namespaces sequences strings assocs arrays definitions
-system combinators splitting ;
 
-HOOK: <file-reader> io-backend ( path -- stream )
+HOOK: (file-reader) io-backend ( path -- stream )
 
-HOOK: <file-writer> io-backend ( path -- stream )
+HOOK: (file-writer) io-backend ( path -- stream )
 
-HOOK: <file-appender> io-backend ( path -- stream )
+HOOK: (file-appender) io-backend ( path -- stream )
 
-HOOK: delete-file io-backend ( path -- )
+: <file-reader> ( path encoding -- stream )
+    swap normalize-path (file-reader) swap <decoder> ;
 
-HOOK: rename-file io-backend ( from to -- )
+: <file-writer> ( path encoding -- stream )
+    swap normalize-path (file-writer) swap <encoder> ;
 
-HOOK: make-directory io-backend ( path -- )
+: <file-appender> ( path encoding -- stream )
+    swap normalize-path (file-appender) swap <encoder> ;
 
-HOOK: delete-directory io-backend ( path -- )
+: file-lines ( path encoding -- seq )
+    <file-reader> stream-lines ;
 
-: path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
+: with-file-reader ( path encoding quot -- )
+    [ <file-reader> ] dip with-input-stream ; inline
 
-HOOK: root-directory? io-backend ( path -- ? )
+: file-contents ( path encoding -- seq )
+    <file-reader> stream-contents ;
 
-M: object root-directory? ( path -- ? ) path-separator? ;
+: with-file-writer ( path encoding quot -- )
+    [ <file-writer> ] dip with-output-stream ; inline
 
-: trim-path-separators ( str -- newstr )
-    [ path-separator? ] right-trim ;
+: set-file-lines ( seq path encoding -- )
+    [ [ print ] each ] with-file-writer ;
 
-: path+ ( str1 str2 -- str )
-    >r trim-path-separators "/" r>
-    [ path-separator? ] left-trim 3append ;
+: set-file-contents ( seq path encoding -- )
+    [ write ] with-file-writer ;
 
-: stat ( path -- directory? permissions length modified )
-    normalize-pathname (stat) ;
+: with-file-appender ( path encoding quot -- )
+    [ <file-appender> ] dip with-output-stream ; inline
 
-: exists? ( path -- ? ) stat >r 3drop r> >boolean ;
+: exists? ( path -- ? )
+    normalize-path native-string>alien (exists?) ;
 
-: directory? ( path -- ? ) stat 3drop ;
-
-: special-directory? ( name -- ? )
-    { "." ".." } member? ;
-
-: fixup-directory ( path seq -- newseq )
-    [
-        dup string?
-        [ tuck path+ directory? 2array ] [ nip ] if
-    ] curry* map
-    [ first special-directory? not ] subset ;
-
-: directory ( path -- seq )
-    normalize-directory dup (directory) fixup-directory ;
-
-: file-length ( path -- n ) stat 4array third ;
-
-: file-modified ( path -- n ) stat >r 3drop r> ;
-
-: last-path-separator ( path -- n ? )
-    [ length 2 [-] ] keep [ path-separator? ] find-last* ;
-
-TUPLE: no-parent-directory path ;
-
-: no-parent-directory ( path -- * )
-    \ no-parent-directory construct-boa throw ;
-
-: parent-directory ( path -- parent )
-    trim-path-separators {
-        { [ dup empty? ] [ drop "/" ] }
-        { [ dup root-directory? ] [ ] }
-        { [ dup [ path-separator? ] contains? not ] [ drop "." ] }
-        { [ t ] [
-            dup last-path-separator drop 1+ cut
-            special-directory? [ no-parent-directory ] when
-        ] }
-    } cond ;
-
-: file-name ( path -- string )
-    dup last-path-separator [ 1+ tail ] [ drop ] if ;
-
-: resource-path ( path -- newpath )
-    \ resource-path get [ image parent-directory ] unless*
-    swap path+ ;
-
-: ?resource-path ( path -- newpath )
-    "resource:" ?head [ resource-path ] when ;
-
-: make-directories ( path -- )
-    normalize-pathname trim-path-separators {
-        { [ dup "." = ] [ ] }
-        { [ dup root-directory? ] [ ] }
-        { [ dup empty? ] [ ] }
-        { [ dup exists? ] [ ] }
-        { [ t ] [
-            dup parent-directory make-directories
-            dup make-directory
-        ] }
-    } cond drop ;
-
-HOOK: copy-file io-backend ( from to -- )
-
-M: object copy-file
-    dup parent-directory make-directories
-    <file-writer> [
-        stdio get swap
-        <file-reader> [
-            stdio get swap stream-copy
-        ] with-stream
-    ] with-stream ;
-
-: copy-directory ( from to -- )
-    dup make-directories
-    >r dup directory swap r> [
-        >r >r first r> over path+ r> rot path+ copy-file
-    ] 2curry each ;
-
-: home ( -- dir )
-    {
-        { [ winnt? ] [ "USERPROFILE" os-env ] }
-        { [ wince? ] [ "" resource-path ] }
-        { [ unix? ] [ "HOME" os-env ] }
-    } cond ;
-
-TUPLE: pathname string ;
-
-C: <pathname> pathname
-
-M: pathname <=> [ pathname-string ] compare ;
-
-HOOK: library-roots io-backend ( -- seq )
-HOOK: binary-roots io-backend ( -- seq )
-
-: find-file ( seq str -- path/f )
-    [
-        [ path+ exists? ] curry find nip
-    ] keep over [ path+ ] [ drop ] if ;
-
-: find-library ( str -- path/f )
-    library-roots swap find-file ;
-
-: find-binary ( str -- path/f )
-    binary-roots swap find-file ;
-
+! Current directory
 <PRIVATE
-: append-path ( path files -- paths )
-    [ path+ ] curry* map ;
 
-: get-paths ( dir -- paths )
-    dup directory keys append-path ;
+HOOK: cd io-backend ( path -- )
 
-: (walk-dir) ( path -- )
-    dup directory? [
-        get-paths dup % [ (walk-dir) ] each
-    ] [
-        drop
-    ] if ;
+HOOK: cwd io-backend ( -- path )
+
+M: object cwd ( -- path ) "." ;
+
 PRIVATE>
 
-: walk-dir ( path -- seq ) [ (walk-dir) ] { } make ;
+[
+    cwd current-directory set-global
+    13 special-object alien>native-string cwd prepend-path \ image set-global
+    14 special-object alien>native-string cwd prepend-path \ vm set-global
+    image parent-directory "resource-path" set-global
+] "io.files" add-startup-hook

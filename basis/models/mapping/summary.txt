@@ -1,0 +1,1 @@
+Mapping models combine an assoc of models into a single model

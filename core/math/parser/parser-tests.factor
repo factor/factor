@@ -1,16 +1,44 @@
-USING: kernel math math.parser sequences tools.test ;
-IN: temporary
+USING: kernel literals math math.parser sequences tools.test ;
+IN: math.parser.tests
 
 [ f ]
 [ f string>number ]
 unit-test
 
 [ f ]
+[ ";" string>number ]
+unit-test
+
+[ f ]
+[ "<>" string>number ]
+unit-test
+
+[ f ]
+[ "^" string>number ]
+unit-test
+
+[ f ]
+[ "789:;<=>?@" string>number ]
+unit-test
+
+[ f ]
 [ "12345abcdef" string>number ]
 unit-test
 
-[ t ]
-[ "-12" string>number 0 < ]
+[ 12 ]
+[ "+12" string>number ]
+unit-test
+
+[ -12 ]
+[ "-12" string>number ]
+unit-test
+
+[ f ]
+[ "-+12" string>number ]
+unit-test
+
+[ f ]
+[ "+-12" string>number ]
 unit-test
 
 [ f ]
@@ -25,24 +53,88 @@ unit-test
 [ "e" string>number ]
 unit-test
 
+[ 1/2 ] [ "1/2" string>number ] unit-test
+[ -1/2 ] [ "-1/2" string>number ] unit-test
+[ 2 ] [ "4/2" string>number ] unit-test
+[ f ] [ "1/-2" string>number ] unit-test
+[ f ] [ "1/2/3" string>number ] unit-test
+[ 1+1/2 ] [ "1+1/2" string>number ] unit-test
+[ 1+1/2 ] [ "+1+1/2" string>number ] unit-test
+[ f ] [ "1-1/2" string>number ] unit-test
+[ -1-1/2 ] [ "-1-1/2" string>number ] unit-test
+[ f ] [ "-1+1/2" string>number ] unit-test
+[ f ] [ "1+2" string>number ] unit-test
+[ f ] [ "1+" string>number ] unit-test
+[ f ] [ "1-" string>number ] unit-test
+[ f ] [ "1+1/2+2" string>number ] unit-test
+
+[ 100000 ] [ "100,000" string>number ] unit-test
+
+[ 100000.0 ] [ "100,000.0" string>number ] unit-test
+
+[ f ] [ "," string>number ] unit-test
+[ f ] [ "-," string>number ] unit-test
+[ f ] [ "1," string>number ] unit-test
+[ f ] [ "-1," string>number ] unit-test
+[ f ] [ ",2" string>number ] unit-test
+[ f ] [ "-,2" string>number ] unit-test
+
+[ 2.0 ] [ "2." string>number ] unit-test
+[ 2.0 ] [ "+2." string>number ] unit-test
+[ 0.25 ] [ ".25" string>number ] unit-test
+[ -2.0 ] [ "-2." string>number ] unit-test
+[ -0.25 ] [ "-.25" string>number ] unit-test
+[ f ]  [ "-." string>number ] unit-test
+
+[ 255 ] [ "ff" hex> ] unit-test
+
+[ 100.0 ] [ "1.0e2" string>number ] unit-test
+[ 100.0 ] [ "100.0" string>number ] unit-test
+[ 100.0 ] [ "100." string>number ] unit-test
+
+[ 100.0 ] [ "1e2" string>number ] unit-test
+[ 100.0 ] [ "1e+2" string>number ] unit-test
+[ HEX: 1e2 ] [ "1e2" hex> ] unit-test
+
+[ HEX: 1.999999999999ap-3 ] [ "0.2" string>number ] unit-test
+[ HEX: 1.3333333333333p0  ] [ "1.2" string>number ] unit-test
+[ HEX: 1.5555555555555p0  ] [ "1.333,333,333,333,333,333" string>number ] unit-test
+[ HEX: 1.aaaaaaaaaaaabp0  ] [ "1.666,666,666,666,666,666" string>number ] unit-test
+
 [ "100.0" ]
 [ "1.0e2" string>number number>string ]
 unit-test
+
+[ -100.0 ] [ "-1.0e2" string>number ] unit-test
+[ -100.0 ] [ "-100.0" string>number ] unit-test
+[ -100.0 ] [ "-100." string>number ] unit-test
 
 [ "-100.0" ]
 [ "-1.0e2" string>number number>string ]
 unit-test
 
+[ -100.0 ] [ "-1.e2" string>number ] unit-test
+
 [ "0.01" ]
 [ "1.0e-2" string>number number>string ]
 unit-test
+
+[ 0.01 ] [ "1.0e-2" string>number ] unit-test
 
 [ "-0.01" ]
 [ "-1.0e-2" string>number number>string ]
 unit-test
 
-[ "-1.0e-12" ]
-[ "-1.0e-12" string>number number>string ]
+[ -0.01 ] [ "-1.0e-2" string>number ] unit-test
+
+[ "-0.01" ]
+[ "-1.e-2" string>number number>string ]
+unit-test
+
+[ -1.0e-12 ] [ "-1.0e-12" string>number ] unit-test
+
+[ t ]
+[ "-1.0e-12" string>number number>string { "-1.0e-12" "-1.0e-012" } member? ]
 unit-test
 
 [ f ]
@@ -56,7 +148,7 @@ unit-test
 [ f ]
 [ "." string>number ]
 unit-test
-
+ 
 [ f ]
 [ ".e" string>number ]
 unit-test
@@ -77,12 +169,12 @@ unit-test
 [ "-101.0e-2" string>number number>string ]
 unit-test
 
-[ 5.0 ]
-[ "10.0/2" string>number ]
+[ f ]
+[ "1e1/2" string>number ]
 unit-test
 
 [ f ]
-[ "1e1/2" string>number ]
+[ "1e1.2" string>number ]
 unit-test
 
 [ f ]
@@ -95,16 +187,53 @@ unit-test
 
 [ f ] [ "\0." string>number ] unit-test
 
-! [ t ] [
-!     { "1.0/0.0" "-1.0/0.0" "0.0/0.0" }
-!     [ dup string>number number>string = ] all?
-! ] unit-test
-! 
-! [ t ] [
-!     { 1.0/0.0 -1.0/0.0 0.0/0.0 }
-!     [ dup number>string string>number = ] all?
-! ] unit-test
+[ 1 1 >base ] must-fail
+[ 1 0 >base ] must-fail
+[ 1 -1 >base ] must-fail
 
-[ 1 1 >base ] unit-test-fails
-[ 1 0 >base ] unit-test-fails
-[ 1 -1 >base ] unit-test-fails
+[ "0/0." ] [ 0.0 0.0 / number>string ] unit-test
+
+[ "1/0." ] [ 1.0 0.0 / number>string ] unit-test
+
+[ "-1/0." ] [ -1.0 0.0 / number>string ] unit-test
+
+[ t ] [ "0/0." string>number fp-nan? ] unit-test
+
+[ 1/0. ] [ "1/0." string>number ] unit-test
+
+[ -1/0. ] [ "-1/0." string>number ] unit-test
+
+[ -0.5 ] [ "-1/2." string>number ] unit-test
+
+[ "-0.0" ] [ -0.0 number>string ] unit-test
+
+[ "-3/4" ] [ -3/4 number>string ] unit-test
+[ "-1-1/4" ] [ -5/4 number>string ] unit-test
+
+[ "1.0p0" ] [ 1.0 >hex ] unit-test
+[ "1.8p2" ] [ 6.0 >hex ] unit-test
+[ "1.08p2" ] [ 4.125 >hex ] unit-test
+[ "1.8p-2" ] [ 0.375 >hex ] unit-test
+[ "-1.8p2" ] [ -6.0 >hex ] unit-test
+[ "1.8p10" ] [ 1536.0 >hex ] unit-test
+[ "0.0" ] [ 0.0 >hex ] unit-test
+[ "1.0p-1074" ] [ 1 bits>double >hex ] unit-test
+[ "-0.0" ] [ -0.0 >hex ] unit-test
+
+[ 1.0 ] [ "1.0" hex> ] unit-test
+[ 1.5 ] [ "1.8" hex> ] unit-test
+[ 1.875 ] [ "1.e" hex> ] unit-test
+[ 1.90625 ] [ "1.e8" hex> ] unit-test
+[ 1.03125 ] [ "1.08" hex> ] unit-test
+[ 15.5 ] [ "f.8" hex> ] unit-test
+[ 15.53125 ] [ "f.88" hex> ] unit-test
+[ -15.5 ] [ "-f.8" hex> ] unit-test
+[ 15.5 ] [ "f.8p0" hex> ] unit-test
+[ -15.5 ] [ "-f.8p0" hex> ] unit-test
+[ 62.0 ] [ "f.8p2" hex> ] unit-test
+[ 3.875 ] [ "f.8p-2" hex> ] unit-test
+[ $[ 1 bits>double ] ] [ "1.0p-1074" hex> ] unit-test
+[ 0.0 ] [ "1.0p-1075" hex> ] unit-test
+[ 1/0. ] [ "1.0p1024" hex> ] unit-test
+[ -1/0. ] [ "-1.0p1024" hex> ] unit-test
+

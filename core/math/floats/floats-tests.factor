@@ -1,14 +1,22 @@
-USING: kernel math math.constants tools.test sequences ;
-IN: temporary
+USING: kernel math math.constants math.order tools.test sequences
+grouping ;
+IN: math.floats.tests
 
 [ t ] [ 0.0 float? ] unit-test
 [ t ] [ 3.1415 number? ] unit-test
 [ f ] [ 12 float? ] unit-test
 
-[ t ] [ 1 1.0 = ] unit-test
-[ t ] [ 1 >bignum 1.0 = ] unit-test
-[ t ] [ 1.0 1 = ] unit-test
-[ t ] [ 1.0 1 >bignum = ] unit-test
+[ f ] [ 1 1.0 = ] unit-test
+[ t ] [ 1 1.0 number= ] unit-test
+
+[ f ] [ 1 >bignum 1.0 = ] unit-test
+[ t ] [ 1 >bignum 1.0 number= ] unit-test
+
+[ f ] [ 1.0 1 = ] unit-test
+[ t ] [ 1.0 1 number= ] unit-test
+
+[ f ] [ 1.0 1 >bignum = ] unit-test
+[ t ] [ 1.0 1 >bignum number= ] unit-test
 
 [ f ] [ 1 1.3 = ] unit-test
 [ f ] [ 1 >bignum 1.3 = ] unit-test
@@ -42,17 +50,31 @@ IN: temporary
 [ BIN: 11111111111000000000000000000000000000000000000000000000000000 bits>double ]
 unit-test
 
-[ 2.0 ] [ 1.0 1+ ] unit-test
-[ 0.0 ] [ 1.0 1- ] unit-test
-
-! [ t ] [ -0.0 -0.0 = ] unit-test
-! [ f ] [ 0.0 -0.0 = ] unit-test
+[ 2.0 ] [ 1.0 1 + ] unit-test
+[ 0.0 ] [ 1.0 1 - ] unit-test
 
 [ t ] [ 0.0 zero? ] unit-test
 [ t ] [ -0.0 zero? ] unit-test
 
-! [ t ] [ 0.0/0.0 0.0/0.0 = ] unit-test
-
 [ 0 ] [ 1/0. >bignum ] unit-test
 
-[ t ] [ 64 [ 2^ 0.5 * ] map [ < ] monotonic? ] unit-test
+[ t ] [ 64 iota [ 2^ 0.5 * ] map [ < ] monotonic? ] unit-test
+
+[ 5 ] [ 10.5 1.9 /i ] unit-test
+
+[ t ] [ 0/0. 0/0. unordered? ] unit-test
+[ t ] [ 1.0 0/0. unordered? ] unit-test
+[ t ] [ 0/0. 1.0 unordered? ] unit-test
+[ f ] [ 1.0 1.0 unordered? ] unit-test
+
+[ t ] [ -0.0 fp-sign ] unit-test
+[ t ] [ -1.0 fp-sign ] unit-test
+[ f ] [ 0.0 fp-sign ] unit-test
+[ f ] [ 1.0 fp-sign ] unit-test
+
+[ t ] [ -0.0 abs 0.0 fp-bitwise= ] unit-test
+[ 1.5 ] [ -1.5 abs ] unit-test
+[ 1.5 ] [ 1.5 abs ] unit-test
+
+[ 5.0 ] [ 3 5.0 max ] unit-test
+[ 3 ] [ 3 5.0 min ] unit-test

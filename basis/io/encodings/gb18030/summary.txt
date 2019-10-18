@@ -1,0 +1,1 @@
+GB18030 encoding for Chinese text

@@ -1,0 +1,1 @@
+Scaffolding for demo scenes that can be explored using FPS-style controls

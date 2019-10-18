@@ -1,51 +1,50 @@
 ! Factor port of
 ! http://shootout.alioth.debian.org/gp4/benchmark.php?test=spectralnorm&lang=all
-USING: float-arrays kernel math math.functions math.vectors
-sequences sequences.private prettyprint words tools.time hints ;
+USING: alien.c-types specialized-arrays kernel math
+math.functions math.vectors sequences prettyprint words hints
+locals ;
+SPECIALIZED-ARRAY: double
 IN: benchmark.spectral-norm
 
-: fast-truncate >fixnum >float ; inline
+:: inner-loop ( u n quot -- seq )
+    n iota [| i |
+        n iota 0.0 [| j |
+            u i j quot call +
+        ] reduce
+    ] double-array{ } map-as ; inline
 
 : eval-A ( i j -- n )
-    [ >float ] 2apply
-    dupd + dup 1+ * 2 /f fast-truncate + 1+
-    recip ; inline
+    [ >float ] bi@
+    [ drop ] [ + [ ] [ 1 + ] bi * 0.5 * ] 2bi
+    + 1 + recip ; inline
 
 : (eval-A-times-u) ( u i j -- x )
-    tuck eval-A >r swap nth-unsafe r> * ; inline
+    [ swap nth ] [ eval-A ] bi-curry bi* * ; inline
 
 : eval-A-times-u ( n u -- seq )
-    over [
-        pick 0.0 [
-            swap >r >r 2dup r> (eval-A-times-u) r> +
-        ] reduce nip
-    ] F{ } map-as 2nip ; inline
+    [ (eval-A-times-u) ] inner-loop ; inline
 
 : (eval-At-times-u) ( u i j -- x )
-    tuck swap eval-A >r swap nth-unsafe r> * ; inline
+    [ swap nth ] [ swap eval-A ] bi-curry bi* * ; inline
 
-: eval-At-times-u ( n u -- seq )
-    over [
-        pick 0.0 [
-            swap >r >r 2dup r> (eval-At-times-u) r> +
-        ] reduce nip
-    ] F{ } map-as 2nip ; inline
+: eval-At-times-u ( u n -- seq )
+    [ (eval-At-times-u) ] inner-loop ; inline
 
-: eval-AtA-times-u ( n u -- seq )
-    dupd eval-A-times-u eval-At-times-u ; inline
+: eval-AtA-times-u ( u n -- seq )
+    [ eval-A-times-u ] [ eval-At-times-u ] bi ; inline
 
-: u/v ( n -- u v )
-    dup 1.0 <float-array> dup
+: ones ( n -- seq ) [ 1.0 ] double-array{ } replicate-as ; inline
+
+:: u/v ( n -- u v )
+    n ones dup
     10 [
         drop
-        dupd eval-AtA-times-u
-        2dup eval-AtA-times-u
-        swap
-    ] times
-    rot drop ; inline
+        n eval-AtA-times-u
+        [ n eval-AtA-times-u ] keep
+    ] times ; inline
 
 : spectral-norm ( n -- norm )
-    u/v [ v. ] keep norm-sq /f sqrt ;
+    u/v [ v. ] [ norm-sq ] bi /f sqrt ;
 
 HINTS: spectral-norm fixnum ;
 

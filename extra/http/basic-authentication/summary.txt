@@ -1,1 +1,0 @@
-HTTP Basic Authentication implementation

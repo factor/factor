@@ -1,0 +1,1 @@
+Words for allocating objects and arrays of C types

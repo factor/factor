@@ -1,0 +1,1 @@
+Shared code for storing session state in the database

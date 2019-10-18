@@ -1,0 +1,13 @@
+pre {
+	font-size: 75%;
+}
+
+.todo-list {
+	border-style: none;
+}
+
+.todo-list td, .todo-list th {
+	border-width: 1px;
+	padding: 2px;
+	border-style: solid;
+}

@@ -1,19 +1,14 @@
 ! Copyright (C) 2007 Gavin Harrison
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: kernel math sequences kernel.private namespaces arrays
-io io.files splitting io.binary math.functions vectors
-quotations combinators.private ;
+USING: kernel math sequences kernel.private namespaces arrays io
+io.files splitting grouping io.binary math.functions vectors
+quotations combinators io.encodings.binary ;
 IN: icfp.2006
 
 SYMBOL: regs
 SYMBOL: arrays
 SYMBOL: finger
 SYMBOL: open-arrays
-
-: call-nth ( n array -- )
-    >r >fixnum r> 2dup nth quotation?
-    [ dispatch ] [ "Not a quotation" throw ] if ; inline
 
 : reg-val ( m -- n ) regs get nth ;
 
@@ -51,19 +46,19 @@ SYMBOL: open-arrays
     get-cba rot reg-val zero? [
         2drop
     ] [
-        >r reg-val r> set-reg
+        [ reg-val ] dip set-reg
     ] if f ;
 
 : binary-op ( quot -- ? )
-    >r get-cba r>
-    swap >r >r [ reg-val ] 2apply swap r> call r>
+    [ get-cba ] dip
+    swap [ [ [ reg-val ] bi@ swap ] dip call ] dip
     set-reg f ; inline
-    
+
 : op1 ( opcode -- ? )
     [ swap arr-val ] binary-op ;
 
 : op2 ( opcode -- ? )
-    get-cba >r [ reg-val ] 2apply r> reg-val set-arr f ;
+    get-cba [ [ reg-val ] bi@ ] dip reg-val set-arr f ;
 
 : op3 ( opcode -- ? )
     [ + >32bit ] binary-op ;
@@ -78,18 +73,18 @@ SYMBOL: open-arrays
     [ bitand HEX: ffffffff swap - ] binary-op ;
 
 : new-array ( size location -- )
-    >r 0 <array> r> arrays get set-nth ;
+    [ 0 <array> ] dip arrays get set-nth ;
 
 : ?grow-storage ( -- )
     open-arrays get dup empty? [
-        >r arrays get length r> push
+        [ arrays get length ] dip push
     ] [
         drop
     ] if ;
 
 : op8 ( opcode -- ? )
     ?grow-storage
-    get-cb >r reg-val open-arrays get pop [ new-array ] keep r> 
+    get-cb [ reg-val open-arrays get pop [ new-array ] keep ] dip
     set-reg f ;
 
 : op9 ( opcode -- ? )
@@ -111,7 +106,7 @@ SYMBOL: open-arrays
 
 : op13 ( opcode -- ? )
     [ get-value ] keep get-special set-reg f ;
-    
+
 : advance ( -- val opcode )
     finger get arrays get first nth
     finger inc dup get-op ;
@@ -119,17 +114,27 @@ SYMBOL: open-arrays
 : run-op ( -- bool )
     advance
     {
-        [ op0 ] [ op1 ] [ op2 ] [ op3 ]
-        [ op4 ] [ op5 ] [ op6 ] [ drop t ]
-        [ op8 ] [ op9 ] [ op10 ] [ op11 ]
-        [ op12 ] [ op13 ]
-    } call-nth ;
+        { 0 [ op0 ] }
+        { 1 [ op1 ] }
+        { 2 [ op2 ] }
+        { 3 [ op3 ] }
+        { 4 [ op4 ] }
+        { 5 [ op5 ] }
+        { 6 [ op6 ] }
+        { 7 [ drop t ] }
+        { 8 [ op8 ] }
+        { 9 [ op9 ] }
+        { 10 [ op10 ] }
+        { 11 [ op11 ] }
+        { 12 [ op12 ] }
+        { 13 [ op13 ] }
+    } case ;
 
 : exec-loop ( bool -- )
     [ run-op exec-loop ] unless ;
 
 : load-platters ( path -- )
-    <file-reader> contents 4 group [ be> ] map
+    binary file-contents 4 group [ be> ] map
     0 arrays get set-nth ;
 
 : init ( path -- )
@@ -143,4 +148,4 @@ SYMBOL: open-arrays
     init f exec-loop ;
 
 : run-sand ( -- )
-    "extra/icfp/2006/sandmark.umz" resource-path run-prog ;
+    "resource:extra/icfp/2006/sandmark.umz" run-prog ;

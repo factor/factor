@@ -1,0 +1,1 @@
+Redirection responses which redirect the client to another URL

@@ -1,0 +1,1 @@
+DirectX audio bindings. Corresponds to audiodefs.h.

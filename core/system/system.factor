@@ -1,61 +1,58 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: system
 USING: kernel kernel.private sequences math namespaces
-splitting assocs ;
+init splitting assocs system.private layouts words ;
+IN: system
 
-: cell ( -- n ) 7 getenv ; foldable
+SINGLETONS: x86.32 x86.64 arm ppc ;
 
-: cells ( m -- n ) cell * ; inline
+UNION: x86 x86.32 x86.64 ;
 
-: cell-bits ( -- n ) 8 cells ; inline
+: cpu ( -- class ) \ cpu get-global ; foldable
 
-: cpu ( -- cpu ) 8 getenv ; foldable
+SINGLETONS: winnt wince ;
 
-: os ( -- os ) 9 getenv ; foldable
+UNION: windows winnt wince ;
 
-: image ( -- path ) 13 getenv ;
+SINGLETONS: freebsd netbsd openbsd solaris macosx linux ;
 
-: vm ( -- path ) 14 getenv ;
+SINGLETON: haiku
 
-: wince? ( -- ? )
-    os "wince" = ; foldable
+UNION: bsd freebsd netbsd openbsd macosx ;
 
-: winnt? ( -- ? )
-    os "windows" = ; foldable
+UNION: unix bsd solaris linux haiku ;
 
-: windows? ( -- ? )
-    wince? winnt? or ; foldable
+: os ( -- class ) \ os get-global ; foldable
 
-: win32? ( -- ? )
-    winnt? cell 4 = and ; foldable
+<PRIVATE
 
-: win64? ( -- ? )
-    winnt? cell 8 = and ; foldable
+: string>cpu ( str -- class )
+    H{
+        { "x86.32" x86.32 }
+        { "x86.64" x86.64 }
+        { "arm" arm }
+        { "ppc" ppc }
+    } at ;
 
-: macosx? ( -- ? ) os "macosx" = ; foldable
+: string>os ( str -- class )
+    H{
+        { "winnt" winnt }
+        { "wince" wince }
+        { "freebsd" freebsd }
+        { "netbsd" netbsd }
+        { "openbsd" openbsd }
+        { "solaris" solaris }
+        { "macosx" macosx }
+        { "linux" linux }
+        { "haiku" haiku }
+    } at ;
 
-: embedded? ( -- ? ) 15 getenv ;
+PRIVATE>
 
-: unix? ( -- ? )
-    os {
-        "freebsd" "openbsd" "linux" "macosx" "solaris"
-    } member? ;
+: image ( -- path ) \ image get-global ;
 
-: bsd? ( -- ? )
-    os { "freebsd" "openbsd" "macosx" } member? ;
+: vm ( -- path ) \ vm get-global ;
 
-: linux? ( -- ? )
-    os "linux" = ;
+: embedded? ( -- ? ) 15 special-object ;
 
-: solaris? ( -- ? )
-    os "solaris" = ;
-
-: bootstrap-cell \ cell get cell or ; inline
-
-: bootstrap-cells bootstrap-cell * ; inline
-
-: bootstrap-cell-bits 8 bootstrap-cells ; inline
-
-: os-envs ( -- assoc )
-    (os-envs) [ "=" split1 ] H{ } map>assoc ;
+: exit ( n -- ) do-shutdown-hooks (exit) ;

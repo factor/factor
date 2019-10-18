@@ -1,0 +1,266 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<MODE>
+	<!--
+		Made by Krassimir Berov: k.berov@gmail.com 
+	-->
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="[" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="]" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
+		<PROPERTY NAME="indentNextLine" VALUE="(FOREACH|FOR|WHILE|IF|ELSIF|ELSE|UNLESS|SWITCH|CASE|TRY|CATCH)(\s.*?)?;" />
+	</PROPS>
+
+	<!-- ESCAPE is not exactly right but it is needed to correctly
+	     handle JavaScript in on* parameters -->
+	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SEQ TYPE="OPERATOR">=</SEQ><!-- give priority to TT -->
+
+	</RULES>
+
+	<RULES SET="JAVASCRIPT" DEFAULT="MARKUP" IGNORE_CASE="TRUE">
+		<SEQ TYPE="MARKUP" DELEGATE="javascript::MAIN">&gt;</SEQ>
+		<!-- handle <SCRIPT SRC="..."> properly -->
+		<SEQ TYPE="MARKUP" DELEGATE="html::MAIN">SRC=</SEQ>
+	</RULES>
+
+	<RULES SET="CSS" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="css::MAIN">&gt;</SEQ>
+	</RULES>
+	<RULES IGNORE_CASE="TRUE">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+		<SPAN TYPE="COMMENT2">
+			<BEGIN>[%#</BEGIN>
+			<END>%]</END>
+		</SPAN>
+		<SPAN_REGEXP DELEGATE="perl::MAIN" HASH_CHAR="[%">
+			<BEGIN>\[%\s*?PERL\s*?%\]</BEGIN>
+			<END>\[%\s*?END\s*?%\]</END>
+		</SPAN_REGEXP>
+
+		<SPAN TYPE="LITERAL3" DELEGATE="TT">
+			<BEGIN>[%</BEGIN>
+			<END>%]</END>
+		</SPAN>
+	</RULES>
+	<RULES SET="TT"
+			IGNORE_CASE="FALSE"
+			HIGHLIGHT_DIGITS="TRUE"
+			DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<!-- Scalar variables -->
+		<SEQ_REGEXP HASH_CHAR="$" TYPE="KEYWORD2">\$#?[\w:]+</SEQ_REGEXP>
+		<!-- Scalar variables
+		<SEQ_REGEXP ->ADD HASH_CHARS here if uncommenting<- TYPE="KEYWORD2">\s[a-z_0-9]+\s</SEQ_REGEXP> -->
+		<!-- Compound Variables -->
+		<MARK_PREVIOUS TYPE="KEYWORD4" MATCH_TYPE="CONTEXT">.</MARK_PREVIOUS>
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="CONTEXT">(</MARK_PREVIOUS>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<KEYWORDS>
+			<!-- Template directives -->
+			<KEYWORD1>SET</KEYWORD1>
+			<KEYWORD1>GET</KEYWORD1>
+			<KEYWORD1>CALL</KEYWORD1>
+			<KEYWORD1>DEFAULT</KEYWORD1>
+			<KEYWORD1>IF</KEYWORD1>
+			<KEYWORD1>ELSIF</KEYWORD1>
+			<KEYWORD1>ELSE</KEYWORD1>
+			<KEYWORD1>UNLESS</KEYWORD1>
+			<KEYWORD1>LAST</KEYWORD1>
+			<KEYWORD1>NEXT</KEYWORD1>
+			<KEYWORD1>FOR</KEYWORD1>
+			<KEYWORD1>FOREACH</KEYWORD1>
+			<KEYWORD1>WHILE</KEYWORD1>
+			<KEYWORD1>SWITCH</KEYWORD1>
+			<KEYWORD1>CASE</KEYWORD1>
+			<KEYWORD1>PROCESS</KEYWORD1>
+			<KEYWORD1>INCLUDE</KEYWORD1>
+			<KEYWORD1>INSERT</KEYWORD1>
+			<KEYWORD1>WRAPPER</KEYWORD1>
+			<KEYWORD1>BLOCK</KEYWORD1>
+			<KEYWORD1>MACRO</KEYWORD1>
+			<KEYWORD1>END</KEYWORD1>
+			<KEYWORD1>USE</KEYWORD1>
+			<KEYWORD1>IN</KEYWORD1>
+			<KEYWORD1>FILTER</KEYWORD1>
+			<KEYWORD1>TRY</KEYWORD1>
+			<KEYWORD1>THROW</KEYWORD1>
+			<KEYWORD1>CATCH</KEYWORD1>
+			<KEYWORD1>FINAL</KEYWORD1>
+			<KEYWORD1>META</KEYWORD1>
+			<KEYWORD1>TAGS</KEYWORD1>
+			<KEYWORD1>DEBUG</KEYWORD1>
+			<KEYWORD1>PERL</KEYWORD1>
+			<!-- Compile Time Constant Folding -->
+			<KEYWORD1>constants</KEYWORD1>
+			<!-- Special Variables -->
+			<KEYWORD2>template</KEYWORD2>
+			<KEYWORD2>component</KEYWORD2>
+			<KEYWORD2>loop</KEYWORD2>
+			<KEYWORD2>error</KEYWORD2>
+			<KEYWORD2>content</KEYWORD2>
+
+			<!-- VMethods -->
+			<!-- Scalar Virtual Methods -->
+			<KEYWORD3>defined</KEYWORD3>
+			<KEYWORD3>length</KEYWORD3>
+			<KEYWORD3>repeat</KEYWORD3>
+			<KEYWORD3>replace</KEYWORD3>
+			<KEYWORD3>match</KEYWORD3>
+			<KEYWORD3>search</KEYWORD3>
+			<KEYWORD3>split</KEYWORD3>
+			<KEYWORD3>chunk</KEYWORD3>
+			<KEYWORD3>list</KEYWORD3>
+			<KEYWORD3>hash</KEYWORD3>
+			<KEYWORD3>size</KEYWORD3>
+
+			<!-- Hash Virtual Methods -->
+			<KEYWORD3>keys</KEYWORD3>
+			<KEYWORD3>values</KEYWORD3>
+			<KEYWORD3>each</KEYWORD3>
+			<KEYWORD3>sort</KEYWORD3>
+			<KEYWORD3>nsort</KEYWORD3>
+			<KEYWORD3>import</KEYWORD3>
+			<KEYWORD3>defined</KEYWORD3>
+			<KEYWORD3>exists</KEYWORD3>
+			<KEYWORD3>item</KEYWORD3>
+
+			<!-- List Virtual Methods -->
+			<KEYWORD3>first</KEYWORD3>
+			<KEYWORD3>last</KEYWORD3>
+			<KEYWORD3>max</KEYWORD3>
+			<KEYWORD3>reverse</KEYWORD3>
+			<KEYWORD3>join</KEYWORD3>
+			<KEYWORD3>grep</KEYWORD3>
+			<KEYWORD3>unshift</KEYWORD3>
+			<KEYWORD3>push</KEYWORD3>
+			<KEYWORD3>shift</KEYWORD3>
+			<KEYWORD3>pop</KEYWORD3>
+			<KEYWORD3>unique</KEYWORD3>
+			<KEYWORD3>merge</KEYWORD3>
+			<KEYWORD3>slice</KEYWORD3>
+			<KEYWORD3>splice</KEYWORD3>
+			<KEYWORD3>count</KEYWORD3>
+
+			<!-- Standard filters -->
+			<FUNCTION>format</FUNCTION>
+			<FUNCTION>upper</FUNCTION>
+			<FUNCTION>lower</FUNCTION>
+			<FUNCTION>ucfirst</FUNCTION>
+			<FUNCTION>lcfirst</FUNCTION>
+			<FUNCTION>trim</FUNCTION>
+			<FUNCTION>collapse</FUNCTION>
+			<FUNCTION>html</FUNCTION>
+			<FUNCTION>html_entity</FUNCTION>
+			<FUNCTION>html_para</FUNCTION>
+			<FUNCTION>html_break</FUNCTION>
+			<FUNCTION>html_para_break</FUNCTION>
+			<FUNCTION>html_line_break</FUNCTION>
+			<FUNCTION>uri</FUNCTION>
+			<FUNCTION>url</FUNCTION>
+			<FUNCTION>indent</FUNCTION>
+			<FUNCTION>truncate</FUNCTION>
+			<FUNCTION>repeat</FUNCTION>
+			<FUNCTION>remove</FUNCTION>
+			<FUNCTION>replace</FUNCTION>
+			<FUNCTION>redirect</FUNCTION>
+			<FUNCTION>eval</FUNCTION>
+			<FUNCTION>evaltt</FUNCTION>
+			<FUNCTION>perl</FUNCTION>
+			<FUNCTION>evalperl</FUNCTION>
+			<FUNCTION>stdout</FUNCTION>
+			<FUNCTION>stderr</FUNCTION>
+			<FUNCTION>null</FUNCTION>
+			<FUNCTION>latex</FUNCTION>
+		</KEYWORDS>
+	</RULES>
+</MODE>

@@ -1,0 +1,16 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+<h3>Enter your contact details</h3>
+
+<t:form t:action="$site-watcher-app/update-notify">
+<table>
+  <tr><th>E-mail:</th><td><t:field t:name="email" t:size="80" /></td></tr>
+  <tr><th>Twitter:</th><td><t:field t:name="twitter" t:size="80" /></td></tr>
+  <tr><th>SMS:</th><td><t:field t:name="sms" t:size="80" /></td></tr>
+</table>
+<p> <button type="submit">Done</button> </p>
+</t:form>
+
+</t:chloe>

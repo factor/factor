@@ -1,0 +1,73 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Edit Profile</t:title>
+
+	<t:form t:action="$realm/edit-profile" autocomplete="off">
+
+	<table>
+	
+	<tr>
+		<th class="field-label">User name:</th>
+		<td><t:label t:name="username" /></td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">Real name:</th>
+		<td><t:field t:name="realname" /></td>
+	</tr>
+	
+	<tr>
+		<td></td>
+		<td>Specifying a real name is optional.</td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">Current password:</th>
+		<td><t:password t:name="password" /></td>
+	</tr>
+	
+	<tr>
+		<td></td>
+		<td>If you don't want to change your current password, leave this field blank.</td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">New password:</th>
+		<td><t:password t:name="new-password" /></td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">Verify:</th>
+		<td><t:password t:name="verify-password" /></td>
+	</tr>
+	
+	<tr>
+		<td></td>
+		<td>If you are changing your password, enter it twice to ensure it is correct.</td>
+	</tr>
+	
+	<tr>
+		<th class="field-label">E-mail:</th>
+		<td><t:field t:name="email" /></td>
+	</tr>
+	
+	<tr>
+		<td></td>
+		<td>Specifying an e-mail address is optional. It enables the "recover password" feature.</td>
+	</tr>
+	
+	</table>
+
+	<p>
+		<button type="submit">Update</button>
+		<t:validation-errors />
+	</p>
+
+	</t:form>
+	
+	<t:if t:code="furnace.auth.features.deactivate-user:allow-deactivation?">
+		<t:button t:action="$realm/deactivate-user">Delete User</t:button>
+	</t:if>
+</t:chloe>

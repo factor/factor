@@ -1,0 +1,168 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+<SOAP-ENV:Body>
+<ns1:doGoogleSearchResponse xmlns:ns1="urn:GoogleSearch" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<return xsi:type="ns1:GoogleSearchResult">
+<directoryCategories xmlns:ns2="http://schemas.xmlsoap.org/soap/encoding/" xsi:type="ns2:Array" ns2:arrayType="ns1:DirectoryCategory[1]">
+<item xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string">Top/Regional/North_America/Canada/Arts_and_Entertainment/Music/Organizations</fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</item>
+</directoryCategories>
+<documentFiltering xsi:type="xsd:boolean">false</documentFiltering>
+<endIndex xsi:type="xsd:int">10</endIndex>
+<estimateIsExact xsi:type="xsd:boolean">false</estimateIsExact>
+<estimatedTotalResultsCount xsi:type="xsd:int">268000000</estimatedTotalResultsCount>
+<resultElements xmlns:ns3="http://schemas.xmlsoap.org/soap/encoding/" xsi:type="ns3:Array" ns3:arrayType="ns1:ResultElement[10]">
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://www.foxnews.com/oreilly/</URL>
+<cachedSize xsi:type="xsd:string">47k</cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">The O$-1òùReilly &lt;b&gt;Factor&lt;/b&gt; with Bill OòùReilly on FOXNews.com. Bill OòùReilly hosts The &lt;br&gt;  OòùReilly &lt;b&gt;Factor&lt;/b&gt;, the most-watched program on cable news.</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">Bill O$-1òùReilly | The OòùReilly &lt;b&gt;Factor&lt;/b&gt; - FOXNews.com</title>
+</item>
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://www.factor.ca/</URL>
+<cachedSize xsi:type="xsd:string">8k</cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">The &lt;b&gt;Foundation to Assist Canadian Talent on Records&lt;/b&gt;.</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">&lt;b&gt;FACTOR&lt;/b&gt;</title>
+</item>
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://www.billoreilly.com/</URL>
+<cachedSize xsi:type="xsd:string">112k</cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">Call the Radio &lt;b&gt;Factor&lt;/b&gt; LIVE on the air with your question or comment! &lt;b&gt;...&lt;/b&gt; Check out &lt;br&gt;  the O&amp;#39;Reilly &lt;b&gt;Factor&lt;/b&gt; Archive for more on past programs! &lt;b&gt;...&lt;/b&gt;</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">Bill&amp;#39;s Official Home On The Web</title>
+</item>
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://www.factorcode.org/</URL>
+<cachedSize xsi:type="xsd:string">13k</cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">&lt;b&gt;Factor&lt;/b&gt; is a dynamically typed, stack-based programming language. &lt;b&gt;...&lt;/b&gt; Slava Pestov &lt;br&gt;  is &lt;b&gt;Factor&amp;#39;s&lt;/b&gt; lead developer. The project also has a number of active &lt;b&gt;...&lt;/b&gt;</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">&lt;b&gt;Factor&lt;/b&gt;, a stack programming language</title>
+</item>
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://www.newsfactor.com/</URL>
+<cachedSize xsi:type="xsd:string"></cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">The starting point for a network of technology news and information sites, &lt;br&gt;  including Wireless NewsFactor and CRM Daily.</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">NewsFactor Network</title>
+</item>
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://www.baddesigns.com/</URL>
+<cachedSize xsi:type="xsd:string">4k</cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">A scrapbook of illustrated examples of things that are hard to use because they &lt;br&gt;  do not follow human &lt;b&gt;factors&lt;/b&gt; principles.</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">Bad Human &lt;b&gt;Factors&lt;/b&gt; Designs</title>
+</item>
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://www.nbc.com/Fear_Factor/</URL>
+<cachedSize xsi:type="xsd:string">50k</cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">Find information on the Fear &lt;b&gt;Factor&lt;/b&gt; TV show! Watch exclusive Fear &lt;b&gt;Factor&lt;/b&gt; video &lt;br&gt;  clips with host Joe Rogan on the official NBC TV site.</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">Fear &lt;b&gt;Factor&lt;/b&gt; TV Show: Find Joe Rogan Video Clips Online . NBC &lt;b&gt;...&lt;/b&gt;</title>
+</item>
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://www.hfes.org/</URL>
+<cachedSize xsi:type="xsd:string">28k</cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">Information about the Society, its member services, and activities.</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">Human &lt;b&gt;Factors&lt;/b&gt; and Ergonomics Society</title>
+</item>
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://www.miamisci.org/ph/</URL>
+<cachedSize xsi:type="xsd:string">4k</cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">Virtual chemistry lab about the pH scale.</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">Miami Museum of Science-The pH &lt;b&gt;Factor&lt;/b&gt;</title>
+</item>
+<item xsi:type="ns1:ResultElement">
+<URL xsi:type="xsd:string">http://mathforum.org/dr.math/faq/faq.learn.factor.html</URL>
+<cachedSize xsi:type="xsd:string">15k</cachedSize>
+<directoryCategory xsi:type="ns1:DirectoryCategory">
+<fullViewableName xsi:type="xsd:string"></fullViewableName>
+<specialEncoding xsi:type="xsd:string"></specialEncoding>
+</directoryCategory>
+<directoryTitle xsi:type="xsd:string"></directoryTitle>
+<hostName xsi:type="xsd:string"></hostName>
+<relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
+<snippet xsi:type="xsd:string">Students regularly ask questions about how to &lt;b&gt;factor&lt;/b&gt;. Here are some answers from our &lt;br&gt;  &lt;b&gt;...&lt;/b&gt; Identify and &lt;b&gt;factor&lt;/b&gt; out common &lt;b&gt;factors&lt;/b&gt; of all the coefficients. 2. &lt;b&gt;...&lt;/b&gt;</snippet>
+<summary xsi:type="xsd:string"></summary>
+<title xsi:type="xsd:string">Math Forum: Ask Dr. Math FAQ: Learning to &lt;b&gt;Factor&lt;/b&gt;</title>
+</item>
+</resultElements>
+<searchComments xsi:type="xsd:string"></searchComments>
+<searchQuery xsi:type="xsd:string">factor</searchQuery>
+<searchTime xsi:type="xsd:double">0.022271</searchTime>
+<searchTips xsi:type="xsd:string"></searchTips>
+<startIndex xsi:type="xsd:int">1</startIndex>
+</return>
+</ns1:doGoogleSearchResponse>
+
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

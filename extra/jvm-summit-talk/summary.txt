@@ -1,0 +1,1 @@
+Slides from Slava's talk at JVM Language Summit 2009

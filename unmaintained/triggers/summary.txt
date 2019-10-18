@@ -1,0 +1,1 @@
+triggers allow you to register code to be 'triggered'

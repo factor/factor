@@ -1,71 +1,37 @@
+! Copyright (C) 2005, 2009 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: io kernel math math.functions sequences prettyprint
+io.files io.files.temp io.encodings io.encodings.ascii
+io.encodings.binary fry benchmark.mandel.params
+benchmark.mandel.colors ;
 IN: benchmark.mandel
-USING: arrays io kernel math namespaces sequences strings sbufs
-math.functions math.parser io.files colors.hsv ;
 
-: max-color 360 ; inline
-: zoom-fact 0.8 ; inline
-: width 640 ; inline
-: height 480 ; inline
-: nb-iter 40 ; inline
-: center -0.65 ; inline
+: x-scale ( -- x ) width  200000 zoom-fact * / ; inline
+: y-scale ( -- y ) height 150000 zoom-fact * / ; inline
 
-: scale 255 * >fixnum ; inline
+: scale ( x y -- z ) [ x-scale * ] [ y-scale * ] bi* rect> ; inline
 
-: scale-rgb ( r g b -- n )
-    rot scale rot scale rot scale 3array ;
+: c ( i j -- c ) scale center width height scale 2 / - + ; inline
 
-: sat 0.85 ; inline
-: val 0.85 ; inline
+: count-iterations ( z max-iterations step-quot test-quot -- #iters )
+    '[ drop @ dup @ ] find-last-integer nip ; inline
 
-: <color-map> ( nb-cols -- map )
-    dup [
-        360 * swap 1+ / sat val
-        3array hsv>rgb first3 scale-rgb
-    ] curry* map ;
+: pixel ( c -- iterations )
+    [ C{ 0.0 0.0 } max-iterations ] dip
+    '[ sq _ + ] [ absq 4.0 >= ] count-iterations ; inline
 
-: iter ( c z nb-iter -- x )
-    over absq 4.0 >= over zero? or
-    [ 2nip ] [ 1- >r sq dupd + r> iter ] if ; inline
-
-SYMBOL: cols
-
-: x-inc width 200000 zoom-fact * / ; inline
-: y-inc height 150000 zoom-fact * / ; inline
-
-: c ( i j -- c )
-    >r
-    x-inc * center real x-inc width 2 / * - + >float
-    r>
-    y-inc * center imaginary y-inc height 2 / * - + >float
-    rect> ; inline
+: color ( iterations -- color )
+    [ color-map [ length mod ] keep nth ] [ B{ 0 0 0 } ] if* ; inline
 
 : render ( -- )
-    height [
-        width swap [
-            c 0 nb-iter iter dup zero? [
-                drop "\0\0\0"
-            ] [
-                cols get [ length mod ] keep nth
-            ] if %
-        ] curry each
-    ] each ;
+    height iota [ width iota swap '[ _ c pixel color write ] each ] each ; inline
 
-: ppm-header ( w h -- )
-    "P6\n" % swap # " " % # "\n255\n" % ;
-
-: sbuf-size width height * 3 * 100 + ;
-
-: mandel ( -- string )
-    [
-        sbuf-size <sbuf> building set
-        width height ppm-header
-        nb-iter max-color min <color-map> cols set
-        render
-        building get >string
-    ] with-scope ;
+: ppm-header ( -- )
+    ascii encode-output
+    "P6\n" write width pprint " " write height pprint "\n255\n" write
+    binary encode-output ; inline
 
 : mandel-main ( -- )
-    "mandel.ppm" resource-path <file-writer>
-    [ mandel write ] with-stream ;
+    "mandel.ppm" temp-file binary [ ppm-header render ] with-file-writer ;
 
 MAIN: mandel-main

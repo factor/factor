@@ -1,0 +1,24 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Edit: <t:label t:name="title" /></t:title>
+
+	<t:form t:action="$wiki/submit" t:for="title">
+
+		<p>
+			<t:textarea t:name="content" t:rows="30" t:cols="80" />
+		</p>
+
+		<p>
+			Describe this revision:
+			<t:field t:name="description" t:size="60" />
+		</p>
+
+		<p>
+			<button type="submit">Save</button>
+		</p>
+
+	</t:form>
+
+</t:chloe>

@@ -1,42 +1,49 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.parser models sequences
-ui ui.gadgets ui.gadgets.frames
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders ui.render
-;
+USING: arrays kernel math math.functions math.parser models
+models.arrow models.range models.product sequences ui
+ui.gadgets ui.gadgets.tracks ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.sliders ui.pens.solid ui.render math.rectangles accessors
+ui.gadgets.grids colors ;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.
 
-: <color-slider> ( model -- gadget )
-    <x-slider> 1 over set-slider-line ;
-
-TUPLE: color-preview ;
+TUPLE: color-preview < gadget ;
 
 : <color-preview> ( model -- gadget )
-    <gadget> color-preview construct-control
-    { 100 100 } over set-rect-dim ;
+    color-preview new
+        swap >>model
+        { 100 100 } >>dim ;
 
 M: color-preview model-changed
-    swap model-value over set-gadget-interior relayout-1 ;
+    swap value>> >>interior relayout-1 ;
 
 : <color-model> ( model -- model )
-    [ [ 256 /f ] map 1 add <solid> ] <filter> ;
+    [ first3 [ 256 /f ] tri@ 1 <rgba> <solid> ] <arrow> ;
 
-: <color-sliders> ( -- model gadget )
-    3 [ drop 0 0 0 255 <range> ] map
-    dup [ range-model ] map <compose>
-    swap [ [ <color-slider> gadget, ] each ] make-filled-pile ;
+: <color-slider> ( model -- gadget )
+    horizontal <slider> 1 >>line ;
+
+: <color-sliders> ( -- gadget model )
+    3 [ 0 0 0 255 1 <range> ] replicate
+    [ <filled-pile> { 5 5 } >>gap [ <color-slider> add-gadget ] reduce ]
+    [ [ range-model ] map <product> ]
+    bi ;
 
 : <color-picker> ( -- gadget )
-    [
-        <color-sliders> @top frame,
-        dup <color-model> <color-preview> @center frame,
-        [ [ truncate number>string ] map " " join ] <filter>
-        <label-control> @bottom frame,
-    ] make-frame ;
+    vertical <track>
+        { 5 5 } >>gap
+        <color-sliders>
+        [ f track-add ]
+        [
+            [ <color-model> <color-preview> 1 track-add ]
+            [
+                [ [ truncate number>string ] map " " join ]
+                <arrow> <label-control>
+                f track-add
+            ] bi
+        ] bi* ;
 
-: color-picker-window ( -- )
-    [ <color-picker> "Color Picker" open-window ] with-ui ;
-
-MAIN: color-picker-window
+MAIN-WINDOW: color-picker-window { { title "Color Picker" } }
+    <color-picker> >>gadgets ;

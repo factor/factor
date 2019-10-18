@@ -1,92 +1,138 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: accessors combinators continuations destructors kernel
+math namespaces sequences ;
 IN: io
-USING: hashtables generic kernel math namespaces
-sequences strings continuations assocs io.styles sbufs ;
 
-GENERIC: stream-close ( stream -- )
-GENERIC: set-timeout ( n stream -- )
-GENERIC: stream-readln ( stream -- str )
-GENERIC: stream-read1 ( stream -- ch/f )
-GENERIC: stream-read ( n stream -- str/f )
-GENERIC: stream-read-until ( seps stream -- str/f sep/f )
-GENERIC: stream-read-partial ( max stream -- str/f )
-GENERIC: stream-write1 ( ch stream -- )
-GENERIC: stream-write ( str stream -- )
+SYMBOLS: +byte+ +character+ ;
+
+GENERIC: stream-element-type ( stream -- type )
+
+GENERIC: stream-read1 ( stream -- elt )
+GENERIC: stream-read ( n stream -- seq )
+GENERIC: stream-read-until ( seps stream -- seq sep/f )
+GENERIC: stream-read-partial ( n stream -- seq )
+GENERIC: stream-readln ( stream -- str/f )
+
+GENERIC: stream-write1 ( elt stream -- )
+GENERIC: stream-write ( seq stream -- )
 GENERIC: stream-flush ( stream -- )
 GENERIC: stream-nl ( stream -- )
-GENERIC: stream-format ( str style stream -- )
-GENERIC: make-span-stream ( style stream -- stream' )
-GENERIC: make-block-stream ( style stream -- stream' )
-GENERIC: make-cell-stream ( style stream -- stream' )
-GENERIC: stream-write-table ( table-cells style stream -- )
 
-: stream-print ( str stream -- )
-    [ stream-write ] keep stream-nl ;
+ERROR: bad-seek-type type ;
 
-: (stream-copy) ( in out -- )
-    64 1024 * pick stream-read-partial
-    [ over stream-write (stream-copy) ] [ 2drop ] if* ;
+SINGLETONS: seek-absolute seek-relative seek-end ;
 
-: stream-copy ( in out -- )
-    [ 2dup (stream-copy) ] [ stream-close stream-close ] [ ]
-    cleanup ;
+GENERIC: stream-tell ( stream -- n )
+GENERIC: stream-seek ( n seek-type stream -- )
 
-! Default stream
-SYMBOL: stdio
+<PRIVATE
 
-: close ( -- ) stdio get stream-close ;
+SLOT: i
 
-: readln ( -- str/f ) stdio get stream-readln ;
-: read1 ( -- ch/f ) stdio get stream-read1 ;
-: read ( n -- str/f ) stdio get stream-read ;
-: read-until ( seps -- str/f sep/f ) stdio get stream-read-until ;
+: (stream-seek) ( n seek-type stream -- )
+    swap {
+        { seek-absolute [ (>>i) ] }
+        { seek-relative [ [ + ] change-i drop ] }
+        { seek-end [ [ underlying>> length + ] [ (>>i) ] bi ] }
+        [ bad-seek-type ]
+    } case ;
 
-: write1 ( ch -- ) stdio get stream-write1 ;
-: write ( str -- ) stdio get stream-write ;
-: flush ( -- ) stdio get stream-flush ;
+PRIVATE>
 
-: nl ( -- ) stdio get stream-nl ;
-: format ( str style -- ) stdio get stream-format ;
+: stream-print ( str stream -- ) [ stream-write ] [ stream-nl ] bi ;
 
-: with-stream* ( stream quot -- )
-    stdio swap with-variable ; inline
+! Default streams
+SYMBOL: input-stream
+SYMBOL: output-stream
+SYMBOL: error-stream
 
-: with-stream ( stream quot -- )
-    swap [ [ close ] [ ] cleanup ] with-stream* ; inline
+: readln ( -- str/f ) input-stream get stream-readln ;
+: read1 ( -- elt ) input-stream get stream-read1 ;
+: read ( n -- seq ) input-stream get stream-read ;
+: read-until ( seps -- seq sep/f ) input-stream get stream-read-until ;
+: read-partial ( n -- seq ) input-stream get stream-read-partial ;
+: tell-input ( -- n ) input-stream get stream-tell ;
+: tell-output ( -- n ) output-stream get stream-tell ;
+: seek-input ( n seek-type -- ) input-stream get stream-seek ;
+: seek-output ( n seek-type -- ) output-stream get stream-seek ;
 
-: tabular-output ( style quot -- )
-    swap >r { } make r> stdio get stream-write-table ; inline
+: write1 ( elt -- ) output-stream get stream-write1 ;
+: write ( seq -- ) output-stream get stream-write ;
+: flush ( -- ) output-stream get stream-flush ;
 
-: with-row ( quot -- )
-    { } make , ; inline
+: nl ( -- ) output-stream get stream-nl ;
 
-: with-cell ( quot -- )
-    H{ } stdio get make-cell-stream
-    [ swap with-stream ] keep , ; inline
+: with-input-stream* ( stream quot -- )
+    input-stream swap with-variable ; inline
 
-: write-cell ( str -- )
-    [ write ] with-cell ; inline
+: with-input-stream ( stream quot -- )
+    [ with-input-stream* ] curry with-disposal ; inline
 
-: with-style ( style quot -- )
-    swap dup assoc-empty? [
-        drop call
-    ] [
-        stdio get make-span-stream swap with-stream
-    ] if ; inline
+: with-output-stream* ( stream quot -- )
+    output-stream swap with-variable ; inline
 
-: with-nesting ( style quot -- )
-    >r stdio get make-block-stream r> with-stream ; inline
+: with-output-stream ( stream quot -- )
+    [ with-output-stream* ] curry with-disposal ; inline
 
-: print ( string -- ) stdio get stream-print ;
+: with-streams* ( input output quot -- )
+    [ output-stream set input-stream set ] prepose with-scope ; inline
+
+: with-streams ( input output quot -- )
+    [ [ with-streams* ] 3curry ]
+    [ [ drop dispose dispose ] 3curry ] 3bi
+    [ ] cleanup ; inline
+
+: print ( str -- ) output-stream get stream-print ;
 
 : bl ( -- ) " " write ;
 
-: write-object ( str obj -- )
-    presented associate format ;
+: each-morsel ( handler: ( data -- ) reader: ( -- data ) -- )
+    [ dup ] compose swap while drop ; inline
 
-: lines ( stream -- seq )
-    [ [ readln dup ] [ ] [ drop ] unfold ] with-stream ;
+<PRIVATE
 
-: contents ( stream -- str )
-    2048 <sbuf> [ stream-copy ] keep >string ;
+: (stream-element-exemplar) ( type -- exemplar )
+    {
+        { +byte+ [ B{ } ] }
+        { +character+ [ "" ] }
+    } case ; inline
+
+: stream-element-exemplar ( stream -- exemplar )
+    stream-element-type (stream-element-exemplar) ; inline
+
+: element-exemplar ( -- exemplar )
+    input-stream get stream-element-exemplar ; inline
+
+PRIVATE>
+
+: each-stream-line ( stream quot -- )
+    swap [ stream-readln ] curry each-morsel ; inline
+
+: each-line ( quot -- )
+    input-stream get swap each-stream-line ; inline
+
+: stream-lines ( stream -- seq )
+    [ [ ] collector [ each-stream-line ] dip { } like ] with-disposal ;
+
+: lines ( -- seq )
+    input-stream get stream-lines ; inline
+
+: stream-contents ( stream -- seq )
+    [
+        [ [ 65536 swap stream-read-partial dup ] curry [ ] produce nip ]
+        [ stream-element-exemplar concat-as ] bi
+    ] with-disposal ;
+
+: contents ( -- seq )
+    input-stream get stream-contents ; inline
+
+: each-stream-block ( stream quot: ( block -- ) -- )
+    swap [ 8192 swap stream-read-partial ] curry each-morsel ; inline
+
+: each-block ( quot: ( block -- ) -- )
+    input-stream get swap each-stream-block ; inline
+
+: stream-copy ( in out -- )
+    [ [ [ write ] each-block ] with-output-stream ]
+    curry with-input-stream ;

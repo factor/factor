@@ -1,29 +1,42 @@
-USING: byte-arrays bit-arrays help.markup help.syntax
-kernel kernel.private prettyprint strings sbufs vectors
-quotations sequences.private ;
+USING: help.markup help.syntax
+kernel kernel.private prettyprint sequences.private sequences ;
 IN: arrays
 
+ARTICLE: "arrays-unsafe" "Unsafe array operations"
+"These two words are used internally by the Factor implementation. User code should never need to call them; instead use " { $link nth } " and " { $link set-nth } "."
+{ $subsections
+    array-nth
+    set-array-nth
+} ;
+
 ARTICLE: "arrays" "Arrays"
-"Arrays are fixed-size mutable sequences (" { $link "sequence-protocol" } "). The literal syntax is covered in " { $link "syntax-arrays" } ". Resizable arrays also exist and are called vectors; see " { $link "vectors" } "."
+"The " { $vocab-link "arrays" } " vocabulary implements fixed-size mutable sequences which support the " { $link "sequence-protocol" } "."
 $nl
-"Array words are in the " { $vocab-link "arrays" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "sequences.private" } " vocabulary."
+"The " { $vocab-link "arrays" } " vocabulary only includes words for creating new arrays. To access and modify array elements, use " { $link "sequences" } " in the " { $vocab-link "sequences" } " vocabulary."
+$nl
+"Array literal syntax is documented in " { $link "syntax-arrays" } ". Resizable arrays also exist and are known as " { $link "vectors" } "."
 $nl
 "Arrays form a class of objects:"
-{ $subsection array }
-{ $subsection array? }
+{ $subsections
+    array
+    array?
+}
 "Creating new arrays:"
-{ $subsection >array }
-{ $subsection <array> }
+{ $subsections
+    >array
+    <array>
+}
 "Creating an array from several elements on the stack:"
-{ $subsection 1array }
-{ $subsection 2array }
-{ $subsection 3array }
-{ $subsection 4array }
-"Arrays can be accessed without bounds checks in a pointer unsafe way."
-{ $subsection array-nth }
-{ $subsection set-array-nth }
+{ $subsections
+    1array
+    2array
+    3array
+    4array
+}
 "The class of two-element arrays:"
-{ $subsection pair } ;
+{ $subsections pair }
+"Arrays can be accessed without bounds checks in a pointer unsafe way."
+{ $subsections "arrays-unsafe" } ;
 
 ABOUT: "arrays"
 
@@ -34,15 +47,9 @@ HELP: <array> ( n elt -- array )
 { $values { "n" "a non-negative integer" } { "elt" "an initial element" } { "array" "a new array" } }
 { $description "Creates a new array with the given length and all elements initially set to " { $snippet "elt" } "." } ;
 
-{ <array> <quotation> <string> <sbuf> <vector> <byte-array> <bit-array> }
-related-words
-
 HELP: >array
 { $values { "seq" "a sequence" } { "array" array } }
 { $description "Outputs a freshly-allocated array with the same elements as a given sequence." } ;
-
-{ >array >quotation >string >sbuf >vector >byte-array >bit-array }
-related-words
 
 HELP: 1array
 { $values { "x" object } { "array" array } }

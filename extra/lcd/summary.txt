@@ -1,1 +1,1 @@
-7-segment numeric display demo
+7-segment LCD clock demo

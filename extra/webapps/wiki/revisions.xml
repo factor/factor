@@ -1,0 +1,38 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Revisions of <t:label t:name="title" /></t:title>
+
+	<h2>View Differences</h2>
+
+	<t:form t:action="$wiki/diff" t:method="get">
+		<table>
+			<tr>
+				<th class="field-label">Old revision:</th>
+				
+				<td>
+					<select name="old-id">
+						<t:bind-each t:name="revisions">
+							<option> <t:label t:name="id" /> </option>
+						</t:bind-each>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th class="field-label">New revision:</th>
+				
+				<td>
+					<select name="new-id">
+						<t:bind-each t:name="revisions">
+							<option> <t:label t:name="id" /> </option>
+						</t:bind-each>
+					</select>
+				</td>
+			</tr>
+		</table>
+
+		<button type="submit">View</button>
+	</t:form>
+
+</t:chloe>

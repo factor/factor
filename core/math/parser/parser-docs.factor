@@ -1,40 +1,40 @@
-USING: help.markup help.syntax math math.private prettyprint
-namespaces strings ;
+USING: help.markup help.syntax math math.parser.private prettyprint
+namespaces make strings ;
 IN: math.parser
 
 ARTICLE: "number-strings" "Converting between numbers and strings"
 "These words only convert between real numbers and strings. Complex numbers are constructed by the parser (" { $link "parser" } ") and printed by the prettyprinter (" { $link "prettyprint" } ")."
 $nl
-"Note that only integers can be converted to and from strings using a representation other than base 10. Calling a word such as " { $link >oct } " on a float will give a result in base 10."
+"Integers can be converted to and from arbitrary bases. Floating point numbers can only be converted to and from base 10 and 16."
 $nl
 "Converting numbers to strings:"
-{ $subsection number>string }
-{ $subsection >bin }
-{ $subsection >oct }
-{ $subsection >hex }
-{ $subsection >base }
+{ $subsections
+    number>string
+    >bin
+    >oct
+    >hex
+    >base
+}
 "Converting strings to numbers:"
-{ $subsection string>number }
-{ $subsection bin> }
-{ $subsection oct> }
-{ $subsection hex> }
-{ $subsection base> }
+{ $subsections
+    string>number
+    bin>
+    oct>
+    hex>
+    base>
+}
 "You can also input literal numbers in a different base (" { $link "syntax-integers" } ")."
 { $see-also "prettyprint-numbers" } ;
 
 ABOUT: "number-strings"
 
 HELP: digits>integer
-{ $values { "radix" "an integer between 2 and 36" } { "seq" "a sequence of integers" } { "n" integer } }
+{ $values { "seq" "a sequence of integers" } { "radix" "an integer between 2 and 16" } { "n/f" { $maybe integer } } }
 { $description "Converts a sequence of digits (with most significant digit first) into an integer." }
 { $notes "This is one of the factors of " { $link string>number } "." } ;
 
-HELP: valid-digits?
-{ $values { "radix" "an integer between 2 and 36" } { "seq" "a sequence of integers" } { "?" "a boolean" } }
-{ $description "Tests if this sequence of integers represents a valid integer in the given radix." } ;
-
 HELP: >digit
-{ $values { "n" "an integer between 0 and 35" } { "ch" "a character" } }
+{ $values { "n" "an integer between 0 and 15" } { "ch" "a character" } }
 { $description "Outputs a character representation of a digit." }
 { $notes "This is one of the factors of " { $link number>string } "." } ;
 
@@ -43,13 +43,8 @@ HELP: digit>
 { $description "Converts a character representation of a digit to an integer." }
 { $notes "This is one of the factors of " { $link string>number } "." } ;
 
-HELP: string>integer
-{ $values { "str" string } { "radix" "an integer between 2 and 36" } { "n/f" "an integer or " { $link f } } }
-{ $description "Creates an integer from a string representation." }
-{ $notes "The " { $link base> } " word is more general." } ;
-
 HELP: base>
-{ $values { "str" string } { "radix" "an integer between 2 and 36" } { "n/f" "a real number or " { $link f } } }
+{ $values { "str" string } { "radix" "an integer between 2 and 16" } { "n/f" "a real number or " { $link f } } }
 { $description "Creates a real number from a string representation with the given radix. The radix is ignored for floating point literals; they are always taken to be in base 10."
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
@@ -70,7 +65,7 @@ HELP: bin>
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
-{ bin> POSTPONE: BIN: bin> .b } related-words
+{ >bin POSTPONE: BIN: bin> .b } related-words
 
 HELP: oct>
 { $values { "str" string } { "n/f" "a real number or " { $link f } } }
@@ -78,7 +73,7 @@ HELP: oct>
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
-{ oct> POSTPONE: OCT: oct> .o } related-words
+{ >oct POSTPONE: OCT: oct> .o } related-words
 
 HELP: hex>
 { $values { "str" string } { "n/f" "a real number or " { $link f } } }
@@ -86,10 +81,10 @@ HELP: hex>
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
-{ hex> POSTPONE: HEX: hex> .h } related-words
+{ >hex POSTPONE: HEX: hex> .h } related-words
 
 HELP: >base
-{ $values { "n" real } { "radix" "an integer between 2 and 36" } { "str" string } }
+{ $values { "n" real } { "radix" "an integer between 2 and 16" } { "str" string } }
 { $description "Converts a real number into a string representation using the given radix. If the number is a float, the radix is ignored and the output is always in base 10." } ;
 
 HELP: >bin
@@ -102,16 +97,21 @@ HELP: >oct
 
 HELP: >hex
 { $values { "n" real } { "str" string } }
-{ $description "Outputs a string representation of a number using base 16." } ;
+{ $description "Outputs a string representation of a number using base 16." }
+{ $examples
+    { $example
+        "USING: math.parser prettyprint ;"
+        "3735928559 >hex ."
+        "\"deadbeef\""
+    }
+    { $example
+        "USING: math.parser prettyprint ;"
+        "-15.5 >hex ."
+        "\"-1.fp3\""
+    }
+} ;
 
-HELP: string>float ( str -- n/f )
-{ $values { "str" string } { "n/f" "a real number or " { $link f } } }
-{ $description "Primitive for creating a float from a string representation." }
-{ $notes "The " { $link string>number } " word is more general."
-$nl
-"Outputs " { $link f } " if the string does not represent a float." } ;
-
-HELP: float>string ( n -- str )
+HELP: float>string
 { $values { "n" real } { "str" string } }
 { $description "Primitive for getting a string representation of a float." }
 { $notes "The " { $link number>string } " word is more general." } ;

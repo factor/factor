@@ -1,112 +1,60 @@
-! From http://www.ffconsultancy.com/ocaml/bunny/index.html
-USING: alien alien.c-types arrays sequences math
-math.vectors math.matrices math.parser io io.files kernel opengl
-opengl.gl opengl.glu shuffle http.client vectors timers
-namespaces ui.gadgets ui.gadgets.canvas ui.render ui splitting
-combinators tools.time system combinators.lib ;
+USING: accessors arrays bunny.cel-shaded bunny.fixed-pipeline
+bunny.model bunny.outlined destructors kernel math opengl.demo-support
+opengl.gl sequences ui ui.gadgets ui.gadgets.worlds ui.gestures
+ui.render words ui.pixel-formats ;
 IN: bunny
 
-: numbers ( str -- seq )
-    " " split [ string>number ] map [ ] subset ;
+TUPLE: bunny-world < demo-world model-triangles geom draw-seq draw-n ;
 
-: (parse-model) ( vs is -- vs is )
-    readln [
-        numbers {
-            { [ dup length 5 = ] [ 3 head pick push ] }
-            { [ dup first 3 = ] [ 1 tail over push ] }
-            { [ t ] [ drop ] }
-        } cond (parse-model)
-    ] when* ;
+: get-draw ( gadget -- draw )
+    [ draw-n>> ] [ draw-seq>> ] bi nth ;
 
-: parse-model ( stream -- vs is )
-    [
-        100000 <vector> 100000 <vector> (parse-model)
-    ] with-stream
-    [
-        over length # " vertices, " %
-        dup length # " triangles" %
-    ] "" make print ;
+: next-draw ( gadget -- )
+    dup [ draw-seq>> ] [ draw-n>> ] bi
+    1 + swap length mod
+    >>draw-n relayout-1 ;
 
-: n ( vs triple -- n )
-    swap [ nth ] curry map
-    dup third over first v- >r dup second swap first v- r> cross
-    vneg normalize ;
+: make-draws ( gadget -- draw-seq )
+    [ <bunny-fixed-pipeline> ]
+    [ <bunny-cel-shaded> ]
+    [ <bunny-outlined> ] tri 3array
+    sift ;
 
-: normal ( ns vs triple -- )
-    [ n ] keep [ rot [ v+ ] change-nth ] each-with2 ;
-
-: normals ( vs is -- ns )
-    over length { 0.0 0.0 0.0 } <array> -rot
-    [ >r 2dup r> normal ] each drop
-    [ normalize ] map ;
-
-: read-model ( stream -- model )
-    "Reading model" print flush [
-        <file-reader> parse-model [ normals ] 2keep 3array
-    ] time ;
-
-: model-path "bun_zipper.ply" ;
-
-: model-url "http://factorcode.org/bun_zipper.ply" ;
-
-: maybe-download ( -- path )
-    model-path resource-path dup exists? [
-        "Downloading bunny from " write
-        model-url dup print flush
-        over download
-    ] unless ;
-
-: draw-triangle ( ns vs triple -- )
-    [ dup roll nth gl-normal swap nth gl-vertex ] each-with2 ;
-
-: draw-bunny ( ns vs is -- )
-    GL_TRIANGLES [ [ draw-triangle ] each-with2 ] do-state ;
-
-TUPLE: bunny-gadget model ;
-
-: <bunny-gadget> ( model -- gadget )
-    <canvas>
-    { set-bunny-gadget-model set-delegate }
-    bunny-gadget construct ;
-
-M: bunny-gadget graft* 10 10 add-timer ;
-
-M: bunny-gadget ungraft* dup delegate ungraft* remove-timer ;
-
-M: bunny-gadget tick relayout-1 ;
-
-: aspect ( gadget -- x ) rect-dim first2 /f ;
-
-M: bunny-gadget draw-gadget*
+M: bunny-world begin-world
     GL_DEPTH_TEST glEnable
-    GL_SCISSOR_TEST glDisable
-    1.0 glClearDepth
-    0.0 0.0 0.0 1.0 glClearColor
-    GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
-    GL_PROJECTION glMatrixMode
-    glLoadIdentity
-    45.0 over aspect 0.1 1.0 gluPerspective
-    0.0 0.12 -0.25  0.0 0.1 0.0  0.0 1.0 0.0 gluLookAt
-    GL_MODELVIEW glMatrixMode
-    glLoadIdentity
-    GL_LEQUAL glDepthFunc
-    GL_LIGHTING glEnable
-    GL_LIGHT0 glEnable
-    GL_COLOR_MATERIAL glEnable
-    GL_LIGHT0 GL_POSITION { 1.0 -1.0 1.0 1.0 } >c-float-array glLightfv
-    millis 24000 mod 0.015 * 0.0 1.0 0.0 glRotated
-    GL_FRONT_AND_BACK GL_SHININESS 100.0 glMaterialf
-    GL_FRONT_AND_BACK GL_SPECULAR glColorMaterial
-    GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE glColorMaterial
-    0.6 0.5 0.5 1.0 glColor4d
-    [ bunny-gadget-model first3 draw-bunny ] draw-canvas ;
+    0.0 0.0 0.375 set-demo-orientation
+    maybe-download read-model
+    [ >>model-triangles ] [ <bunny-geom> >>geom ] bi
+    dup make-draws >>draw-seq
+    0 >>draw-n
+    drop ;
 
-M: bunny-gadget pref-dim* drop { 400 300 } ;
+M: bunny-world end-world
+    dup find-gl-context
+    [ geom>> [ dispose ] when* ]
+    [ draw-seq>> [ [ dispose ] when* ] each ] bi ;
 
-: bunny-window ( -- )
-    [
-        maybe-download read-model <bunny-gadget>
-        "Bunny" open-window
-    ] with-ui ;
+M: bunny-world draw-world*
+    dup draw-seq>> empty? [ drop ] [
+        0.15 0.15 0.15 1.0 glClearColor
+        GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
+        dup demo-world-set-matrix
+        GL_MODELVIEW glMatrixMode
+        0.02 -0.105 0.0 glTranslatef
+        [ geom>> ] [ get-draw ] bi draw-bunny
+    ] if ;
 
-MAIN: bunny-window
+bunny-world H{
+    { T{ key-down f f "TAB" } [ next-draw ] }
+} set-gestures
+
+MAIN-WINDOW: bunny-window {
+        { world-class bunny-world }
+        { title "Bunny" }
+        { pixel-format-attributes {
+            windowed
+            double-buffered
+            T{ depth-bits { value 16 } }
+        } }
+        { pref-dim { 640 480 } }
+    } ;

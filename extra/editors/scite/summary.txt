@@ -1,1 +1,0 @@
-SciTE editor integration

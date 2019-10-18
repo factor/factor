@@ -1,0 +1,9 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Recover lost password: step 4 of 4</t:title>
+
+	<p>Your password has been reset. You may now <t:a t:href="$realm">proceed</t:a>.</p>
+
+</t:chloe>

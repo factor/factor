@@ -1,1 +1,0 @@
-Hand-coded optimization rules for primitives and low-level words

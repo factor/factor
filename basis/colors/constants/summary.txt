@@ -1,0 +1,1 @@
+A utility to look up colors in the X11 rgb.txt color database

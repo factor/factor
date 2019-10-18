@@ -1,0 +1,1 @@
+Constants and types for XAudio2. Corresponds to xaudio2fx.h.

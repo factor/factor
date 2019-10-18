@@ -1,0 +1,1 @@
+Deque implementation with constant-time insertion and removal at either end, and better space efficiency than a double-linked list

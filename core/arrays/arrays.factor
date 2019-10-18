@@ -1,34 +1,32 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private math math.private sequences
-sequences.private ;
+USING: accessors kernel kernel.private math math.private
+sequences sequences.private ;
 IN: arrays
 
-M: array clone (clone) ;
-M: array length array-capacity ;
-M: array nth-unsafe >r >fixnum r> array-nth ;
-M: array set-nth-unsafe >r >fixnum r> set-array-nth ;
-M: array resize resize-array ;
+M: array clone (clone) ; inline
+M: array length length>> ; inline
+M: array nth-unsafe [ >fixnum ] dip array-nth ; inline
+M: array set-nth-unsafe [ >fixnum ] dip set-array-nth ; inline
+M: array resize resize-array ; inline
 
 : >array ( seq -- array ) { } clone-like ;
 
-M: object new drop f <array> ;
+M: object new-sequence drop 0 <array> ; inline
 
-M: f new drop dup zero? [ drop f ] [ f <array> ] if ;
-
-M: array like drop dup array? [ >array ] unless ;
+M: f new-sequence drop [ f ] [ 0 <array> ] if-zero ; inline
 
 M: array equal?
     over array? [ sequence= ] [ 2drop f ] if ;
 
 INSTANCE: array sequence
 
-: 1array ( x -- array ) 1 swap <array> ; flushable
+: 1array ( x -- array ) 1 swap <array> ; inline
 
-: 2array ( x y -- array ) { } 2sequence ; flushable
+: 2array ( x y -- array ) { } 2sequence ; inline
 
-: 3array ( x y z -- array ) { } 3sequence ; flushable
+: 3array ( x y z -- array ) { } 3sequence ; inline
 
-: 4array ( w x y z -- array ) { } 4sequence ; flushable
+: 4array ( w x y z -- array ) { } 4sequence ; inline
 
-PREDICATE: array pair length 2 number= ;
+PREDICATE: pair < array length 2 number= ;

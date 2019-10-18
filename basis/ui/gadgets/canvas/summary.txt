@@ -1,0 +1,1 @@
+Canvas gadget for caching rendering to a display list

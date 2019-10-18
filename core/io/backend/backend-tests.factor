@@ -1,4 +1,4 @@
-IN: temporary
 USING: tools.test io.backend kernel ;
+IN: io.backend.tests
 
-[ ] [ "a" normalize-pathname drop ] unit-test
+[ ] [ "a" normalize-path drop ] unit-test

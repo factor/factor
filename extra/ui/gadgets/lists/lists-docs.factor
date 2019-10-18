@@ -14,7 +14,7 @@ HELP: list
 } ;
 
 HELP: <list>
-{ $values { "hook" "a quotation with stack effect " { $snippet "( list -- )" } } { "presenter" "a quotation with stack effect " { $snippet "( object -- label )" } } { "model" model } { "gadget" list } }
+{ $values { "hook" { $quotation "( list -- )" } } { "presenter" { $quotation "( object -- label )" } } { "model" model } { "gadget" list } }
 { $description "Creates a new " { $link list } "."
 $nl
 "The model value must be a sequence. The list displays presentations of elements with labels obtained by applying the " { $snippet "presenter" } " quotation to each object. The " { $snippet "hook" } " quotation is called when a presentation is selected." } ;
@@ -24,9 +24,11 @@ HELP: list-value
 { $description "Outputs the currently selected list value." } ;
 
 ARTICLE: "ui.gadgets.lists" "List gadgets"
-"A list displays a list of presentations."
-{ $subsection list }
-{ $subsection <list> }
-{ $subsection list-value } ;
+"The " { $vocab-link "ui.gadgets.lists" } " vocabulary implements lists, which displays a list of presentations (see " { $link "ui.gadgets.presentations" } ")."
+{ $subsections
+    list
+    <list>
+    list-value
+} ;
 
 ABOUT: "ui.gadgets.lists"

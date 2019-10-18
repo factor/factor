@@ -1,68 +1,98 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces sequences strings words assocs
-combinators ;
+USING: kernel math math.parser math.order namespaces make sequences strings
+words assocs combinators accessors arrays quotations ;
 IN: effects
 
-TUPLE: effect in out terminated? ;
+TUPLE: effect
+{ in array read-only }
+{ out array read-only }
+{ terminated? read-only } ;
 
 : <effect> ( in out -- effect )
-    dup { "*" } sequence= [ drop { } t ] [ f ] if
-    effect construct-boa ;
+    dup { "*" } = [ drop { } t ] [ f ] if
+    effect boa ;
 
 : effect-height ( effect -- n )
-    dup effect-out length swap effect-in length - ;
+    [ out>> length ] [ in>> length ] bi - ; inline
 
-: effect<= ( eff1 eff2 -- ? )
+: effect<= ( effect1 effect2 -- ? )
     {
-        { [ dup not ] [ t ] }
-        { [ over effect-terminated? ] [ t ] }
-        { [ dup effect-terminated? ] [ f ] }
-        { [ 2dup [ effect-in length ] 2apply > ] [ f ] }
-        { [ 2dup [ effect-height ] 2apply = not ] [ f ] }
-        { [ t ] [ t ] }
-    } cond 2nip ;
+        { [ over terminated?>> ] [ t ] }
+        { [ dup terminated?>> ] [ f ] }
+        { [ 2dup [ in>> length ] bi@ > ] [ f ] }
+        { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
+        [ t ]
+    } cond 2nip ; inline
 
-GENERIC: (stack-picture) ( obj -- str )
-M: string (stack-picture) ;
-M: word (stack-picture) word-name ;
-M: integer (stack-picture) drop "object" ;
+: effect= ( effect1 effect2 -- ? )
+    [ [ in>> length ] bi@ = ]
+    [ [ out>> length ] bi@ = ]
+    [ [ terminated?>> ] bi@ = ]
+    2tri and and ;
+
+GENERIC: effect>string ( obj -- str )
+M: string effect>string ;
+M: object effect>string drop "object" ;
+M: word effect>string name>> ;
+M: integer effect>string number>string ;
+M: pair effect>string first2 [ effect>string ] bi@ ": " glue ;
 
 : stack-picture ( seq -- string )
-    [ [ (stack-picture) % CHAR: \s , ] each ] "" make ;
+    [ [ effect>string % CHAR: \s , ] each ] "" make ;
 
-: effect>string ( effect -- string )
+M: effect effect>string ( effect -- string )
     [
         "( " %
-        dup effect-in stack-picture %
-        "-- " %
-        dup effect-out stack-picture %
-        effect-terminated? [ "* " % ] when
+        [ in>> stack-picture % "-- " % ]
+        [ out>> stack-picture % ]
+        [ terminated?>> [ "* " % ] when ]
+        tri
         ")" %
     ] "" make ;
 
-: stack-effect ( word -- effect/f )
-    dup symbol? [
-        drop 0 1 <effect>
-    ] [
-        { "declared-effect" "inferred-effect" }
-        swap word-props [ at ] curry map [ ] find nip
-    ] if ;
+GENERIC: effect>type ( obj -- type )
+M: object effect>type drop object ;
+M: word effect>type ;
+M: pair effect>type second effect>type ;
+
+: effect-in-types ( effect -- input-types )
+    in>> [ effect>type ] map ;
+
+: effect-out-types ( effect -- input-types )
+    out>> [ effect>type ] map ;
+
+GENERIC: stack-effect ( word -- effect/f )
+
+M: word stack-effect "declared-effect" word-prop ;
+
+M: deferred stack-effect call-next-method (( -- * )) or ;
 
 M: effect clone
-    [ effect-in clone ] keep effect-out clone <effect> ;
+    [ in>> clone ] [ out>> clone ] bi <effect> ;
+
+: stack-height ( word -- n )
+    stack-effect effect-height ;
 
 : split-shuffle ( stack shuffle -- stack1 stack2 )
-    effect-in length cut* ;
+    in>> length cut* ;
 
-: load-shuffle ( stack shuffle -- )
-    effect-in [ set ] 2each ;
-
-: shuffled-values ( shuffle -- values )
-    effect-out [ get ] map ;
-
-: shuffle* ( stack shuffle -- newstack )
-    [ [ load-shuffle ] keep shuffled-values ] with-scope ;
+: shuffle-mapping ( effect -- mapping )
+    [ out>> ] [ in>> ] bi [ index ] curry map ;
 
 : shuffle ( stack shuffle -- newstack )
-    [ split-shuffle ] keep shuffle* append ;
+    shuffle-mapping swap nths ;
+
+: add-effect-input ( effect -- effect' )
+    [ in>> "obj" suffix ] [ out>> ] [ terminated?>> ] tri effect boa ;
+
+: compose-effects ( effect1 effect2 -- effect' )
+    over terminated?>> [
+        drop
+    ] [
+        [ [ [ in>> length ] [ out>> length ] bi ] [ in>> length ] bi* swap [-] + ]
+        [ [ out>> length ] [ [ in>> length ] [ out>> length ] bi ] bi* [ [-] ] dip + ]
+        [ nip terminated?>> ] 2tri
+        [ [ "x" <array> ] bi@ ] dip
+        effect boa
+    ] if ; inline

@@ -1,0 +1,55 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Login</t:title>
+
+	<t:if t:value="description">
+		<p>You must log in to <t:label t:name="description" />.</p>
+	</t:if>
+
+	<t:if t:value="capabilities">
+		<p>Your user must have the following capabilities:</p>
+		<ul>
+			<t:each t:name="capabilities">
+				<li><t:label t:name="value" /></li>
+			</t:each>
+		</ul>
+	</t:if>
+
+	<t:form t:action="login">
+
+		<table>
+
+			<tr>
+				<th class="field-label">User name:</th>
+				<td><t:field t:name="username" /></td>
+			</tr>
+
+			<tr>
+				<th class="field-label">Password:</th>
+				<td><t:password t:name="password" /></td>
+			</tr>
+
+		</table>
+
+		<p>
+
+			<button type="submit">Log in</button>
+			<t:validation-errors />
+
+		</p>
+
+	</t:form>
+
+	<p>
+		<t:if t:code="furnace.auth.features.registration:allow-registration?">
+			<t:a t:href="register">Register</t:a>
+		</t:if>
+		|
+		<t:if t:code="furnace.auth.features.recover-password:allow-password-recovery?">
+			<t:a t:href="recover-password">Recover Password</t:a>
+		</t:if>
+	</p>
+
+</t:chloe>

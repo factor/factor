@@ -1,0 +1,1 @@
+Reads the UCD to get the script of a code point

@@ -1,155 +1,129 @@
-USING: arrays html.parser.utils hashtables io kernel
-namespaces prettyprint quotations
-sequences splitting state-parser strings ;
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors arrays hashtables sequences.parser
+html.parser.utils kernel namespaces sequences math
+unicode.case unicode.categories combinators.short-circuit
+quoting fry ;
 IN: html.parser
 
-TUPLE: tag name attributes text matched? closing? ;
+TUPLE: tag name attributes text closing? ;
 
-SYMBOL: text
-SYMBOL: dtd
-SYMBOL: comment
-SYMBOL: javascript
+SINGLETON: text
+SINGLETON: dtd
+SINGLETON: comment
+
+<PRIVATE
+
 SYMBOL: tagstack
 
 : push-tag ( tag -- )
     tagstack get push ;
 
 : closing-tag? ( string -- ? )
-    dup empty? [
-        drop f
-    ] [
-        dup first CHAR: / =
-        swap peek CHAR: / = or
-    ] if ;
+    [ f ]
+    [ { [ first CHAR: / = ] [ last CHAR: / = ] } 1|| ] if-empty ;
 
 : <tag> ( name attributes closing? -- tag )
-    { set-tag-name set-tag-attributes set-tag-closing? }
-    tag construct ;
+    tag new
+        swap >>closing?
+        swap >>attributes
+        swap >>name ;
 
-: make-tag ( str attribs -- tag )
-    >r [ closing-tag? ] keep "/" trim1 r> rot <tag> ;
+: make-tag ( string attribs -- tag )
+    [ [ closing-tag? ] keep "/" trim1 ] dip rot <tag> ;
 
-: make-text-tag ( str -- tag )
-    T{ tag f text } clone [ set-tag-text ] keep ;
+: new-tag ( text name -- tag )
+    tag new
+        swap >>name
+        swap >>text ; inline
 
-: make-comment-tag ( str -- tag )
-    T{ tag f comment } clone [ set-tag-text ] keep ;
+: (read-quote) ( sequence-parser ch -- string )
+    '[ [ current _ = ] take-until ] [ advance drop ] bi ;
 
-: make-dtd-tag ( str -- tag )
-    T{ tag f dtd } clone [ set-tag-text ] keep ;
+: read-single-quote ( sequence-parser -- string )
+    CHAR: ' (read-quote) ;
 
-: read-whitespace ( -- str )
-    [ get-char blank? not ] take-until ;
+: read-double-quote ( sequence-parser -- string )
+    CHAR: " (read-quote) ;
 
-: read-whitespace* ( -- )
-    read-whitespace drop ;
+: read-quote ( sequence-parser -- string )
+    dup get+increment CHAR: ' =
+    [ read-single-quote ] [ read-double-quote ] if ;
 
-: read-token ( -- str )
-    read-whitespace*
-    [ get-char blank? ] take-until ;
+: read-key ( sequence-parser -- string )
+    skip-whitespace
+    [ current { [ CHAR: = = ] [ blank? ] } 1|| ] take-until ;
 
-: read-single-quote ( -- str )
-    [ get-char CHAR: ' = ] take-until ;
+: read-token ( sequence-parser -- string )
+    [ current blank? ] take-until ;
 
-: read-double-quote ( -- str )
-    [ get-char CHAR: " = ] take-until ;
+: read-value ( sequence-parser -- string )
+    skip-whitespace
+    dup current quote? [ read-quote ] [ read-token ] if
+    [ blank? ] trim ;
 
-: read-quote ( -- str )
-    get-char next* CHAR: ' = [
-        read-single-quote
-    ] [
-        read-double-quote
-    ] if next* ;
+: read-comment ( sequence-parser -- )
+    [ "-->" take-until-sequence comment new-tag push-tag ]
+    [ '[ _ advance drop ] 3 swap times ] bi ;
 
-: read-key ( -- str )
-    read-whitespace*
-    [ get-char CHAR: = = get-char blank? or ] take-until ;
+: read-dtd ( sequence-parser -- )
+    [ ">" take-until-sequence dtd new-tag push-tag ]
+    [ advance drop ] bi ;
 
-: read-= ( -- )
-    read-whitespace*
-    [ get-char CHAR: = = ] take-until drop next* ;
+: read-bang ( sequence-parser -- )
+    advance dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&&
+    [ advance advance read-comment ] [ read-dtd ] if ;
 
-: read-value ( -- str )
-    read-whitespace*
-    get-char quote? [
-        read-quote
-    ] [
-        read-token
-    ] if ;
+: read-tag ( sequence-parser -- string )
+    [ [ current "><" member? ] take-until ]
+    [ dup current CHAR: < = [ advance ] unless drop ] bi ;
 
-: read-comment ( -- )
-    "-->" take-string* make-comment-tag push-tag ;
+: read-until-< ( sequence-parser -- string )
+    [ current CHAR: < = ] take-until ;
 
-: read-dtd ( -- )
-    ">" take-string* make-dtd-tag push-tag ;
+: parse-text ( sequence-parser -- )
+    read-until-< [ text new-tag push-tag ] unless-empty ;
 
-: read-bang ( -- )
-    next* get-char CHAR: - = get-next CHAR: - = and [
-        next* next*
-        read-comment
-    ] [
-        read-dtd
-    ] if ;
+: parse-key/value ( sequence-parser -- key value )
+    [ read-key >lower ]
+    [ skip-whitespace "=" take-sequence ]
+    [ swap [ read-value ] [ drop dup ] if ] tri ;
 
-: read-tag ( -- )
-    [ get-char CHAR: > = get-char CHAR: < = or ] take-until
-    get-char CHAR: < = [ next* ] unless ;
-
-: read-< ( -- str )
-    next* get-char CHAR: ! = [
-        read-bang f
-    ] [
-        read-tag
-    ] if ;
-
-: read-until-< ( -- str )
-    [ get-char CHAR: < = ] take-until ;
-
-: parse-text ( -- )
-    read-until-< dup empty? [
+: (parse-attributes) ( sequence-parser -- )
+    skip-whitespace
+    dup sequence-parse-end? [
         drop
     ] [
-        make-text-tag push-tag
+        [ parse-key/value swap set ] [ (parse-attributes) ] bi
     ] if ;
 
-: (parse-attributes) ( -- )
-    read-whitespace*
-    string-parse-end? [
-        read-key >lower read-= read-value
-        2array , (parse-attributes)
-    ] unless ;
+: parse-attributes ( sequence-parser -- hashtable )
+    [ (parse-attributes) ] H{ } make-assoc ;
 
-: parse-attributes ( -- hashtable )
-    [ (parse-attributes) ] { } make >hashtable ;
-
-: (parse-tag)
+: (parse-tag) ( string -- string' hashtable )
     [
-        read-token >lower
-        parse-attributes
-    ] string-parse ;
+        [ read-token >lower ] [ parse-attributes ] bi
+    ] parse-sequence ;
 
-: parse-tag ( -- )
-    read-< dup empty? [
-        drop
+: read-< ( sequence-parser -- string/f )
+    advance dup current [
+        CHAR: ! = [ read-bang f ] [ read-tag ] if
     ] [
-        (parse-tag) make-tag push-tag
-    ] if ;
+        drop f
+    ] if* ;
 
-: (parse-html) ( tag -- )
-    get-next [
-        parse-text
-        parse-tag
-        (parse-html)
-    ] when ;
+: parse-tag ( sequence-parser -- )
+    read-< [ (parse-tag) make-tag push-tag ] unless-empty ;
+
+: (parse-html) ( sequence-parser -- )
+    dup peek-next [
+        [ parse-text ] [ parse-tag ] [ (parse-html) ] tri
+    ] [ drop ] if ;
 
 : tag-parse ( quot -- vector )
-    [
-        V{ } clone tagstack set
-        string-parse
-    ] with-scope ;
+    V{ } clone tagstack [ parse-sequence ] with-variable ; inline
+
+PRIVATE>
 
 : parse-html ( string -- vector )
-    [
-        (parse-html)
-        tagstack get
-    ] tag-parse ;
+    [ (parse-html) tagstack get ] tag-parse ;

@@ -1,0 +1,434 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--	jEdit CLIPS syntax file
+	
+	written by	Orhan Alkan
+	version		1.0
+	created on	30 June 2007
+	last revised	01 July 2007
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE=";" />
+
+	<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
+	
+		<!-- Comments -->
+		<EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
+		
+		<!-- String literals -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		
+		<!-- List literals -->
+		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+		
+		<!-- Operators -->
+		<SEQ TYPE="OPERATOR">=></SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;-</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ> 
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">**</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">\</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">$</SEQ>
+		
+		<!-- Parentheses -->
+		<SEQ TYPE="MARKUP">(</SEQ>
+		<SEQ TYPE="MARKUP">)</SEQ>
+		<SEQ TYPE="MARKUP">[</SEQ>
+		<SEQ TYPE="MARKUP">]</SEQ>
+		<SEQ TYPE="NULL">{</SEQ>
+		<SEQ TYPE="NULL">}</SEQ>
+		
+		<KEYWORDS>
+		
+			<KEYWORD1>deffacts</KEYWORD1>
+			<KEYWORD1>deftemplate</KEYWORD1>
+			<KEYWORD1>defglobal</KEYWORD1>
+			<KEYWORD1>defrule</KEYWORD1>
+			<KEYWORD1>deffunction</KEYWORD1>
+			<KEYWORD1>defgeneric</KEYWORD1>
+			<KEYWORD1>defmethod</KEYWORD1>
+			<KEYWORD1>defclass</KEYWORD1>
+			<KEYWORD1>definstance</KEYWORD1>
+			<KEYWORD1>defmessage</KEYWORD1>
+			<KEYWORD1>defmodule</KEYWORD1>
+			<KEYWORD1>deffacts-module</KEYWORD1>
+			<KEYWORD1>deffunction-module</KEYWORD1>
+			<KEYWORD1>defgeneric-module</KEYWORD1>
+			<KEYWORD1>defglobal-module</KEYWORD1>
+			<KEYWORD1>definstances-module</KEYWORD1>
+			<KEYWORD1>slot</KEYWORD1>
+			<KEYWORD1>multislot</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>default-dynamic</KEYWORD1>
+			<KEYWORD1>declare</KEYWORD1>
+			<KEYWORD1>salience</KEYWORD1>
+			<KEYWORD1>auto-focus</KEYWORD1>
+			<KEYWORD1>object</KEYWORD1>
+			<KEYWORD1>is-a</KEYWORD1>
+			<KEYWORD1>pattern-match</KEYWORD1>
+			<KEYWORD1>single-slot</KEYWORD1>
+			<KEYWORD1>reactive</KEYWORD1>
+			<KEYWORD1>non-reactive</KEYWORD1>
+			<KEYWORD1>storage</KEYWORD1>
+			<KEYWORD1>local</KEYWORD1>
+			<KEYWORD1>shared</KEYWORD1>
+			<KEYWORD1>access</KEYWORD1>
+			<KEYWORD1>read-write</KEYWORD1>
+			<KEYWORD1>read-only</KEYWORD1>
+			<KEYWORD1>initialize-only</KEYWORD1>
+			<KEYWORD1>propagation</KEYWORD1>
+			<KEYWORD1>inherit</KEYWORD1>
+			<KEYWORD1>non-inherit</KEYWORD1>
+			<KEYWORD1>source</KEYWORD1>
+			<KEYWORD1>exclusive</KEYWORD1>
+			<KEYWORD1>composite</KEYWORD1>
+			<KEYWORD1>visibility</KEYWORD1>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>create-accessor</KEYWORD1>
+			<KEYWORD1>?NONE</KEYWORD1>
+			<KEYWORD1>read</KEYWORD1>
+			<KEYWORD1>write</KEYWORD1>
+			<KEYWORD1>?DEFAULT</KEYWORD1>
+			<KEYWORD1>primary</KEYWORD1>
+			<KEYWORD1>around</KEYWORD1>
+			<KEYWORD1>before</KEYWORD1>
+			<KEYWORD1>after</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+			<KEYWORD1>export</KEYWORD1>
+			<KEYWORD1>?ALL</KEYWORD1>
+			<KEYWORD1>type</KEYWORD1>
+			<KEYWORD1>allowed-symbols</KEYWORD1>
+			<KEYWORD1>allowed-strings</KEYWORD1>
+			<KEYWORD1>allowed-lexemes</KEYWORD1>
+			<KEYWORD1>allowed-integers</KEYWORD1>
+			<KEYWORD1>allowed-floats</KEYWORD1>
+			<KEYWORD1>allowed-numbers</KEYWORD1>
+			<KEYWORD1>allowed-instance-names</KEYWORD1>
+			<KEYWORD1>allowed-values</KEYWORD1>
+			<KEYWORD1>?VARIABLE</KEYWORD1>
+			
+			<KEYWORD2>if</KEYWORD2>
+			<KEYWORD2>while</KEYWORD2>
+			<KEYWORD2>then</KEYWORD2>
+			<KEYWORD2>else</KEYWORD2>
+			<KEYWORD2>or</KEYWORD2>
+			<KEYWORD2>and</KEYWORD2>
+			<KEYWORD2>eq</KEYWORD2>
+			<KEYWORD2>evenp</KEYWORD2>
+			<KEYWORD2>floatp</KEYWORD2>
+			<KEYWORD2>integerp</KEYWORD2>
+			<KEYWORD2>lexemep</KEYWORD2>
+			<KEYWORD2>multifieldp</KEYWORD2>
+			<KEYWORD2>neq</KEYWORD2>
+			<KEYWORD2>not</KEYWORD2>
+			<KEYWORD2>numberp</KEYWORD2>
+			<KEYWORD2>oddp</KEYWORD2>
+			<KEYWORD2>pointerp</KEYWORD2>
+			<KEYWORD2>stringp</KEYWORD2>
+			<KEYWORD2>symbolp</KEYWORD2>
+			<KEYWORD2>switch</KEYWORD2>
+			<KEYWORD2>while</KEYWORD2>
+			
+			<KEYWORD3>assert</KEYWORD3>
+			<KEYWORD3>bind</KEYWORD3>
+			<KEYWORD3>class-abstractp</KEYWORD3>
+			<KEYWORD3>class-existp</KEYWORD3>
+			<KEYWORD3>class-subclasses</KEYWORD3>
+			<KEYWORD3>class-superclasses</KEYWORD3>
+			<KEYWORD3>defclass-module</KEYWORD3>
+			<KEYWORD3>describe-classes</KEYWORD3>
+			<KEYWORD3>get-class-defaults-mode</KEYWORD3>
+			<KEYWORD3>get-defclass-list</KEYWORD3>
+			<KEYWORD3>agenda</KEYWORD3>
+			<KEYWORD3>list-defclasses</KEYWORD3>
+			<KEYWORD3>ppdefclass</KEYWORD3>
+			<KEYWORD3>set-class-defaults-mode</KEYWORD3>
+			<KEYWORD3>slot-allowed-values</KEYWORD3>
+			<KEYWORD3>slot-cardinality</KEYWORD3>
+			<KEYWORD3>slot-default-value</KEYWORD3>
+			<KEYWORD3>slot-direct-accessp</KEYWORD3>
+			<KEYWORD3>slot-existp</KEYWORD3>
+			<KEYWORD3>slot-facest</KEYWORD3>
+			<KEYWORD3>slot-initablep</KEYWORD3>
+			<KEYWORD3>slot-publicp</KEYWORD3>
+			<KEYWORD3>slot-range</KEYWORD3>
+			<KEYWORD3>slot-sources</KEYWORD3>
+			<KEYWORD3>slot-types</KEYWORD3>
+			<KEYWORD3>slot-writablep</KEYWORD3>
+			<KEYWORD3>subsclassp</KEYWORD3>
+			<KEYWORD3>undefclass</KEYWORD3>
+			<KEYWORD3>get-deffacts-list</KEYWORD3>
+			<KEYWORD3>list-deffacts</KEYWORD3>
+			<KEYWORD3>ppdeffacts</KEYWORD3>
+			<KEYWORD3>undeffacts</KEYWORD3>
+			<KEYWORD3>get-deffunction-list</KEYWORD3>
+			<KEYWORD3>list-deffunction</KEYWORD3>
+			<KEYWORD3>ppdeffunction</KEYWORD3>
+			<KEYWORD3>undeffunction</KEYWORD3>
+			<KEYWORD3>get-defgeneric-list</KEYWORD3>
+			<KEYWORD3>list-defgenerics</KEYWORD3>
+			<KEYWORD3>ppdefgeneric</KEYWORD3>
+			<KEYWORD3>preview-generic</KEYWORD3>
+			<KEYWORD3>type</KEYWORD3>
+			<KEYWORD3>undefgeneric</KEYWORD3>
+			<KEYWORD3>get-defglobal-list</KEYWORD3>
+			<KEYWORD3>get-reset-globals</KEYWORD3>
+			<KEYWORD3>list-defglobals</KEYWORD3>
+			<KEYWORD3>ppdefglobal</KEYWORD3>
+			<KEYWORD3>set-reset-globals</KEYWORD3>
+			<KEYWORD3>undefglobal</KEYWORD3>
+			<KEYWORD3>get-definstances-list</KEYWORD3>
+			<KEYWORD3>list-definstances</KEYWORD3>
+			<KEYWORD3>ppdefinstances</KEYWORD3>
+			<KEYWORD3>undefinstances</KEYWORD3>
+			<KEYWORD3>call-next-handler</KEYWORD3>
+			<KEYWORD3>get-defmessage-handler</KEYWORD3>
+			<KEYWORD3>list-defmessage-handlers</KEYWORD3>
+			<KEYWORD3>message-handler-existp</KEYWORD3>
+			<KEYWORD3>handler-type</KEYWORD3>
+			<KEYWORD3>next-handlerp</KEYWORD3>
+			<KEYWORD3>override-next-handler</KEYWORD3>
+			<KEYWORD3>ppdefmessage-handler</KEYWORD3>
+			<KEYWORD3>undefmessage-handler</KEYWORD3>
+			<KEYWORD3>call-next-method</KEYWORD3>
+			<KEYWORD3>call-specific-method</KEYWORD3>
+			<KEYWORD3>get-defmethod-list</KEYWORD3>
+			<KEYWORD3>get-method-restrictions</KEYWORD3>
+			<KEYWORD3>list-defmethods</KEYWORD3>
+			<KEYWORD3>next-methodp</KEYWORD3>
+			<KEYWORD3>override-next-method</KEYWORD3>
+			<KEYWORD3>undefmethod</KEYWORD3>
+			<KEYWORD3>preview-generic</KEYWORD3>
+			<KEYWORD3>get-current-module</KEYWORD3>
+			<KEYWORD3>get-defmodule-list</KEYWORD3>
+			<KEYWORD3>list-defmodules</KEYWORD3>
+			<KEYWORD3>ppdefmodules</KEYWORD3>
+			<KEYWORD3>set-current-module</KEYWORD3>
+			<KEYWORD3>defrule-module</KEYWORD3>
+			<KEYWORD3>get-defrule-list</KEYWORD3>
+			<KEYWORD3>get-incremental-reset</KEYWORD3>
+			<KEYWORD3>list-defrules</KEYWORD3>
+			<KEYWORD3>matches</KEYWORD3>
+			<KEYWORD3>ppdefrule</KEYWORD3>
+			<KEYWORD3>refresh</KEYWORD3>
+			<KEYWORD3>remove-break</KEYWORD3>
+			<KEYWORD3>set-break</KEYWORD3>
+			<KEYWORD3>set-incremental-reset</KEYWORD3>
+			<KEYWORD3>show-breaks</KEYWORD3>
+			<KEYWORD3>undefrule</KEYWORD3>
+			<KEYWORD3>deftemplate-module</KEYWORD3>
+			<KEYWORD3>get-deftemaplate-list</KEYWORD3>
+			<KEYWORD3>list-deftemplates</KEYWORD3>
+			<KEYWORD3>ppdeftemplate</KEYWORD3>
+			<KEYWORD3>undeftemplate</KEYWORD3>
+			<KEYWORD3>apropos</KEYWORD3>
+			<KEYWORD3>bacth</KEYWORD3>
+			<KEYWORD3>batch*</KEYWORD3>
+			<KEYWORD3>bload</KEYWORD3>
+			<KEYWORD3>bsave</KEYWORD3>
+			<KEYWORD3>clear</KEYWORD3>
+			<KEYWORD3>exit</KEYWORD3>
+			<KEYWORD3>get-auto-float-dividend</KEYWORD3>
+			<KEYWORD3>get-dynamic-constraints-checking</KEYWORD3>
+			<KEYWORD3>get-static-constraints-checking</KEYWORD3>
+			<KEYWORD3>load</KEYWORD3>
+			<KEYWORD3>load*</KEYWORD3>
+			<KEYWORD3>options</KEYWORD3>
+			<KEYWORD3>reset</KEYWORD3>
+			<KEYWORD3>save</KEYWORD3>
+			<KEYWORD3>set-auto-float-dividend</KEYWORD3>
+			<KEYWORD3>set-dynamic-constriants-checking</KEYWORD3>
+			<KEYWORD3>set-static-constriants-checking</KEYWORD3>
+			<KEYWORD3>system</KEYWORD3>
+			<KEYWORD3>assert-string</KEYWORD3>
+			<KEYWORD3>dependencies</KEYWORD3>
+			<KEYWORD3>dependents</KEYWORD3>
+			<KEYWORD3>duplicate</KEYWORD3>
+			<KEYWORD3>facts</KEYWORD3>
+			<KEYWORD3>fact-existp</KEYWORD3>
+			<KEYWORD3>fact-index</KEYWORD3>
+			<KEYWORD3>fact-relation</KEYWORD3>
+			<KEYWORD3>fact-slot-names</KEYWORD3>
+			<KEYWORD3>fact-slot-value</KEYWORD3>
+			<KEYWORD3>get-fact-duplication</KEYWORD3>
+			<KEYWORD3>get-fact-list</KEYWORD3>
+			<KEYWORD3>load-facts</KEYWORD3>
+			<KEYWORD3>modify</KEYWORD3>
+			<KEYWORD3>retract</KEYWORD3>
+			<KEYWORD3>save-facts</KEYWORD3>
+			<KEYWORD3>set-fact-duplication</KEYWORD3>
+			<KEYWORD3>any-instancep</KEYWORD3>
+			<KEYWORD3>class</KEYWORD3>
+			<KEYWORD3>delayed-do-for-all-instances</KEYWORD3>
+			<KEYWORD3>delete-instance</KEYWORD3>
+			<KEYWORD3>direct-slot-delete$</KEYWORD3>
+			<KEYWORD3>direct-slot-insert$</KEYWORD3>
+			<KEYWORD3>direct-slot-replace$</KEYWORD3>
+			<KEYWORD3>do-for-instance</KEYWORD3>
+			<KEYWORD3>do-for-all-instances</KEYWORD3>
+			<KEYWORD3>dynamic-get</KEYWORD3>
+			<KEYWORD3>dynamic-put</KEYWORD3>
+			<KEYWORD3>find-instance</KEYWORD3>
+			<KEYWORD3>find-all-instances</KEYWORD3>
+			<KEYWORD3>init-slot</KEYWORD3>
+			<KEYWORD3>instance-address</KEYWORD3>
+			<KEYWORD3>instance-addressp</KEYWORD3>
+			<KEYWORD3>instance-existp</KEYWORD3>
+			<KEYWORD3>instance-name</KEYWORD3>
+			<KEYWORD3>instance-namep</KEYWORD3>
+			<KEYWORD3>instance-name-to-symbol</KEYWORD3>
+			<KEYWORD3>instancep</KEYWORD3>
+			<KEYWORD3>instances</KEYWORD3>
+			<KEYWORD3>load-instances</KEYWORD3>
+			<KEYWORD3>make-intance</KEYWORD3>
+			<KEYWORD3>ppinstance</KEYWORD3>
+			<KEYWORD3>restore-instances</KEYWORD3>
+			<KEYWORD3>save-instances</KEYWORD3>
+			<KEYWORD3>send</KEYWORD3>
+			<KEYWORD3>slot-delete$</KEYWORD3>
+			<KEYWORD3>slot-insert$</KEYWORD3>
+			<KEYWORD3>slot-replace$</KEYWORD3>
+			<KEYWORD3>symbol-to-instance-name</KEYWORD3>
+			<KEYWORD3>unmake-instance</KEYWORD3>
+			<KEYWORD3>create$</KEYWORD3>
+			<KEYWORD3>delete$</KEYWORD3>
+			<KEYWORD3>delete-member$</KEYWORD3>
+			<KEYWORD3>explode$</KEYWORD3>
+			<KEYWORD3>first$</KEYWORD3>
+			<KEYWORD3>implode$</KEYWORD3>
+			<KEYWORD3>insert$</KEYWORD3>
+			<KEYWORD3>length$</KEYWORD3>
+			<KEYWORD3>member$</KEYWORD3>
+			<KEYWORD3>nth$</KEYWORD3>
+			<KEYWORD3>replace$</KEYWORD3>
+			<KEYWORD3>rest$</KEYWORD3>
+			<KEYWORD3>subseq$</KEYWORD3>
+			<KEYWORD3>subsetp</KEYWORD3>
+			<KEYWORD3>break</KEYWORD3>
+			<KEYWORD3>loop-for-count</KEYWORD3>
+			<KEYWORD3>progn</KEYWORD3>
+			<KEYWORD3>progn$</KEYWORD3>
+			<KEYWORD3>return</KEYWORD3>
+			<KEYWORD3>get-profile-percent-threshold</KEYWORD3>
+			<KEYWORD3>profile-contructs</KEYWORD3>
+			<KEYWORD3>profile-info</KEYWORD3>
+			<KEYWORD3>profile-reset</KEYWORD3>
+			<KEYWORD3>set-profile-percent-threshold</KEYWORD3>
+			<KEYWORD3>expand$</KEYWORD3>
+			<KEYWORD3>get-sequence-operator-recognition</KEYWORD3>
+			<KEYWORD3>aet-sequence-operator-recognition</KEYWORD3>
+			<KEYWORD3>build</KEYWORD3>
+			<KEYWORD3>check-syntax</KEYWORD3>
+			<KEYWORD3>eval</KEYWORD3>
+			<KEYWORD3>lowcase</KEYWORD3>
+			<KEYWORD3>str-cat</KEYWORD3>
+			<KEYWORD3>str-compare</KEYWORD3>
+			<KEYWORD3>str-index</KEYWORD3>
+			<KEYWORD3>str-length</KEYWORD3>
+			<KEYWORD3>string-to-field</KEYWORD3>
+			<KEYWORD3>sub-string</KEYWORD3>
+			<KEYWORD3>sym-cat</KEYWORD3>
+			<KEYWORD3>upcase</KEYWORD3>
+			<KEYWORD3>fetch</KEYWORD3>
+			<KEYWORD3>print-region</KEYWORD3>
+			<KEYWORD3>toss</KEYWORD3>
+			
+			<KEYWORD4>abs</KEYWORD4>
+			<KEYWORD4>div</KEYWORD4>
+			<KEYWORD4>float</KEYWORD4>
+			<KEYWORD4>integer</KEYWORD4>
+			<KEYWORD4>max</KEYWORD4>
+			<KEYWORD4>min</KEYWORD4>
+			<KEYWORD4>deg-grad</KEYWORD4>
+			<KEYWORD4>deg-rad</KEYWORD4>
+			<KEYWORD4>exp</KEYWORD4>
+			<KEYWORD4>grad-deg</KEYWORD4>
+			<KEYWORD4>log</KEYWORD4>
+			<KEYWORD4>log10</KEYWORD4>
+			<KEYWORD4>mod</KEYWORD4>
+			<KEYWORD4>pi</KEYWORD4>
+			<KEYWORD4>rad-deg</KEYWORD4>
+			<KEYWORD4>round</KEYWORD4>
+			<KEYWORD4>sqrt</KEYWORD4>
+			<KEYWORD4>close</KEYWORD4>
+			<KEYWORD4>format</KEYWORD4>
+			<KEYWORD4>open</KEYWORD4>
+			<KEYWORD4>printout</KEYWORD4>
+			<KEYWORD4>read</KEYWORD4>
+			<KEYWORD4>readline</KEYWORD4>
+			<KEYWORD4>remove</KEYWORD4>
+			<KEYWORD4>rename</KEYWORD4>
+			<KEYWORD4>conserve-mem</KEYWORD4>
+			<KEYWORD4>mem-used</KEYWORD4>
+			<KEYWORD4>mem-requests</KEYWORD4>
+			<KEYWORD4>release-mem</KEYWORD4>
+			<KEYWORD4>funcall</KEYWORD4>
+			<KEYWORD4>gensym</KEYWORD4>
+			<KEYWORD4>gemsym*</KEYWORD4>
+			<KEYWORD4>get-function-restriction</KEYWORD4>
+			<KEYWORD4>length</KEYWORD4>
+			<KEYWORD4>random</KEYWORD4>
+			<KEYWORD4>seed</KEYWORD4>
+			<KEYWORD4>setgen</KEYWORD4>
+			<KEYWORD4>sort</KEYWORD4>
+			<KEYWORD4>time</KEYWORD4>
+			<KEYWORD4>timer</KEYWORD4>
+			<KEYWORD4>acos</KEYWORD4>
+			<KEYWORD4>acosh</KEYWORD4>
+			<KEYWORD4>acot</KEYWORD4>
+			<KEYWORD4>acoth</KEYWORD4>
+			<KEYWORD4>acsc</KEYWORD4>
+			<KEYWORD4>acsch</KEYWORD4>
+			<KEYWORD4>asec</KEYWORD4>
+			<KEYWORD4>asin</KEYWORD4>
+			<KEYWORD4>asinh</KEYWORD4>
+			<KEYWORD4>atan</KEYWORD4>
+			<KEYWORD4>atanh</KEYWORD4>
+			<KEYWORD4>cos</KEYWORD4>
+			<KEYWORD4>cosh</KEYWORD4>
+			<KEYWORD4>cot</KEYWORD4>
+			<KEYWORD4>coth</KEYWORD4>
+			<KEYWORD4>csc</KEYWORD4>
+			<KEYWORD4>sec</KEYWORD4>
+			<KEYWORD4>sech</KEYWORD4>
+			<KEYWORD4>sin</KEYWORD4>
+			<KEYWORD4>sinh</KEYWORD4>
+			<KEYWORD4>tan</KEYWORD4>
+			<KEYWORD4>tanh</KEYWORD4>
+									
+		</KEYWORDS>
+		
+	</RULES>
+	
+</MODE>

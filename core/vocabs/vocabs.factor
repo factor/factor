@@ -1,21 +1,39 @@
-! Copyright (C) 2007 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs strings kernel sorting namespaces sequences
-definitions ;
+USING: accessors assocs strings kernel sorting namespaces
+sequences definitions ;
 IN: vocabs
 
 SYMBOL: dictionary
 
-TUPLE: vocab
-name root
-words
+TUPLE: vocab < identity-tuple
+name words
 main help
 source-loaded? docs-loaded? ;
 
+! sources-loaded? slot is one of these three
+SYMBOL: +parsing+
+SYMBOL: +running+
+SYMBOL: +done+
+
 : <vocab> ( name -- vocab )
-    H{ } clone
-    { set-vocab-name set-vocab-words }
-    \ vocab construct ;
+    \ vocab new
+        swap >>name
+        H{ } clone >>words ;
+
+TUPLE: vocab-link name ;
+
+C: <vocab-link> vocab-link
+
+UNION: vocab-spec vocab vocab-link ;
+
+GENERIC: vocab-name ( vocab-spec -- name )
+
+M: vocab vocab-name name>> ;
+
+M: vocab-link vocab-name name>> ;
+
+M: string vocab-name ;
 
 GENERIC: vocab ( vocab-spec -- vocab )
 
@@ -23,43 +41,54 @@ M: vocab vocab ;
 
 M: object vocab ( name -- vocab ) vocab-name dictionary get at ;
 
-M: string vocab-name ;
+GENERIC: vocab-words ( vocab-spec -- words )
+
+M: vocab vocab-words words>> ;
 
 M: object vocab-words vocab vocab-words ;
 
+M: f vocab-words ;
+
+GENERIC: vocab-help ( vocab-spec -- help )
+
+M: vocab vocab-help help>> ;
+
 M: object vocab-help vocab vocab-help ;
+
+M: f vocab-help ;
+
+GENERIC: vocab-main ( vocab-spec -- main )
+
+M: vocab vocab-main main>> ;
 
 M: object vocab-main vocab vocab-main ;
 
-M: object vocab-source-loaded?
-    vocab vocab-source-loaded? ;
+M: f vocab-main ;
 
-M: object set-vocab-source-loaded?
-    vocab set-vocab-source-loaded? ;
+SYMBOL: vocab-observers
 
-M: object vocab-docs-loaded?
-    vocab vocab-docs-loaded? ;
+GENERIC: vocabs-changed ( obj -- )
 
-M: object set-vocab-docs-loaded?
-    vocab set-vocab-docs-loaded? ;
+: add-vocab-observer ( obj -- )
+    vocab-observers get push ;
 
-M: f vocab-words ;
+: remove-vocab-observer ( obj -- )
+    vocab-observers get remove-eq! drop ;
 
-M: f vocab-source-loaded? ;
+: notify-vocab-observers ( -- )
+    vocab-observers get [ vocabs-changed ] each ;
 
-M: f set-vocab-source-loaded? 2drop ;
+ERROR: bad-vocab-name name ;
 
-M: f vocab-docs-loaded? ;
-
-M: f set-vocab-docs-loaded? 2drop ;
+: check-vocab-name ( name -- name )
+    dup string? [ bad-vocab-name ] unless ;
 
 : create-vocab ( name -- vocab )
+    check-vocab-name
     dictionary get [ <vocab> ] cache
-    t over set-vocab-source-loaded? ;
+    notify-vocab-observers ;
 
-SYMBOL: load-vocab-hook
-
-: load-vocab ( name -- vocab ) load-vocab-hook get call ;
+ERROR: no-vocab name ;
 
 : vocabs ( -- seq )
     dictionary get keys natural-sort ;
@@ -72,28 +101,34 @@ SYMBOL: load-vocab-hook
 
 : words-named ( str -- seq )
     dictionary get values
-    [ vocab-words at ] curry* map
-    [ ] subset ;
-
-: forget-vocab ( vocab -- )
-    dup vocab-words values forget-all
-    vocab-name dictionary get delete-at ;
+    [ vocab-words at ] with map
+    sift ;
 
 : child-vocab? ( prefix name -- ? )
     2dup = pick empty? or
-    [ 2drop t ] [ swap CHAR: . add head? ] if ;
+    [ 2drop t ] [ swap CHAR: . suffix head? ] if ;
 
 : child-vocabs ( vocab -- seq )
-    vocab-name vocabs [ child-vocab? ] curry* subset ;
+    vocab-name vocabs [ child-vocab? ] with filter ;
 
-TUPLE: vocab-link name root ;
+GENERIC: >vocab-link ( name -- vocab )
 
-M: vocab-link vocab-name vocab-link-name ;
+M: vocab-spec >vocab-link ;
 
-: >vocab-link ( name root -- vocab )
-    over vocab dup
-    [ 2nip ] [ drop \ vocab-link construct-boa ] if ;
+M: string >vocab-link dup vocab [ ] [ <vocab-link> ] ?if ;
 
-UNION: vocab-spec vocab vocab-link ;
+: forget-vocab ( vocab -- )
+    dup words forget-all
+    vocab-name dictionary get delete-at
+    notify-vocab-observers ;
 
-M: vocab-spec forget vocab-name forget-vocab ;
+M: vocab-spec forget* forget-vocab ;
+
+SYMBOL: load-vocab-hook ! ( name -- vocab )
+
+: load-vocab ( name -- vocab ) load-vocab-hook get call( name -- vocab ) ;
+
+PREDICATE: runnable-vocab < vocab
+    vocab-main >boolean ;
+
+INSTANCE: vocab-spec definition

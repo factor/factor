@@ -1,159 +1,98 @@
-USING: help.markup help.syntax io io.styles strings
-io.backend io.files.private ;
+USING: help.markup help.syntax io strings arrays io.backend
+io.files.private quotations sequences ;
 IN: io.files
 
-ARTICLE: "file-streams" "Reading and writing files"
-{ $subsection <file-reader> }
-{ $subsection <file-writer> }
-{ $subsection <file-appender> }
-"Pathname manipulation:"
-{ $subsection parent-directory }
-{ $subsection file-name }
-{ $subsection last-path-separator }
-{ $subsection path+ }
-"File system meta-data:"
-{ $subsection exists? }
-{ $subsection directory? }
-{ $subsection file-length }
-{ $subsection file-modified }
-{ $subsection stat }
-"Directory listing:"
-{ $subsection directory }
-"File management:"
-{ $subsection delete-file }
-{ $subsection make-directory }
-{ $subsection delete-directory }
-"Current and home directories:"
-{ $subsection home }
-{ $subsection cwd }
-{ $subsection cd }
-"Pathnames relative to the Factor install directory:"
-{ $subsection resource-path }
-{ $subsection ?resource-path }
-"Pathname presentations:"
-{ $subsection pathname }
-{ $subsection <pathname> }
-{ $see-also "os" } ;
+ARTICLE: "io.files.examples" "Examples of reading and writing files"
+"Sort the lines in a file and write them back to the same file:"
+{ $code
+    "USING: io io.encodings.utf8 io.files sequences sorting ;"
+    "\"lines.txt\" utf8 [ file-lines natural-sort ] 2keep set-file-lines"
+}
+"Read 1024 bytes from a file:"
+{ $code
+    "USING: io io.encodings.binary io.files ;"
+    "\"data.bin\" binary [ 1024 read ] with-file-reader"
+} ;
 
-ABOUT: "file-streams"
+ARTICLE: "io.files" "Reading and writing files"
+{ $subsections "io.files.examples" }
+"File streams:"
+{ $subsections
+    <file-reader>
+    <file-writer>
+    <file-appender>
+}
+"Reading and writing the entire contents of a file; this is only recommended for smaller files:"
+{ $subsections
+    file-contents
+    set-file-contents
+    file-lines
+    set-file-lines
+}
+"Utility combinators:"
+{ $subsections
+    with-file-reader
+    with-file-writer
+    with-file-appender
+} ;
+
+ABOUT: "io.files"
 
 HELP: <file-reader>
-{ $values { "path" "a pathname string" } { "stream" "an input stream" } }
-{ $description "Outputs an input stream for reading from the specified pathname." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "stream" "an input stream" } }
+{ $description "Outputs an input stream for reading from the specified pathname using the given encoding." }
+{ $notes "Most code should use " { $link with-file-reader } " instead, to ensure the stream is properly disposed of after." }
 { $errors "Throws an error if the file is unreadable." } ;
 
 HELP: <file-writer>
-{ $values { "path" "a pathname string" } { "stream" "an output stream" } }
-{ $description "Outputs an output stream for writing to the specified pathname. The file's length is truncated to zero." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "stream" "an output stream" } }
+{ $description "Outputs an output stream for writing to the specified pathname using the given encoding. The file's length is truncated to zero." }
+{ $notes "Most code should use " { $link with-file-writer } " instead, to ensure the stream is properly disposed of after." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: <file-appender>
-{ $values { "path" "a pathname string" } { "stream" "an output stream" } }
-{ $description "Outputs an output stream for writing to the specified pathname. The stream begins writing at the end of the file." }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "stream" "an output stream" } }
+{ $description "Outputs an output stream for writing to the specified pathname using the given encoding. The stream begins writing at the end of the file." }
+{ $notes "Most code should use " { $link with-file-appender } " instead, to ensure the stream is properly disposed of after." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
-HELP: cwd ( -- path )
-{ $values { "path" "a pathname string" } }
-{ $description "Outputs the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
+HELP: with-file-reader
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $description "Opens a file for reading and calls the quotation using " { $link with-input-stream } "." }
+{ $errors "Throws an error if the file is unreadable." } ;
 
-HELP: cd ( path -- )
-{ $values { "path" "a pathname string" } }
-{ $description "Changes the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." } ;
+HELP: with-file-writer
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $description "Opens a file for writing using the given encoding and calls the quotation using " { $link with-output-stream } "." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
 
-{ cd cwd } related-words
+HELP: with-file-appender
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $description "Opens a file for appending using the given encoding and calls the quotation using " { $link with-output-stream } "." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
 
-HELP: stat ( path -- directory? permissions length modified )
-{ $values { "path" "a pathname string" } { "directory?" "boolean indicating if the file is a directory" } { "permissions" "a Unix permission bitmap (0 on Windows)" } { "length" "the length in bytes as an integer" } { "modified" "the last modification time, as milliseconds since midnight, January 1st 1970 GMT" } }
-{ $description
-    "Queries the file system for file meta data. If the file does not exist, outputs " { $link f } " for all four values."
-} ;
+HELP: set-file-lines
+{ $values { "seq" "an array of strings" } { "path" "a pathname string" } { "encoding" "an encoding descriptor" } }
+{ $description "Sets the contents of a file to the strings with the given encoding." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
 
-{ stat exists? directory? file-length file-modified } related-words
+HELP: file-lines
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "seq" "an array of strings" } }
+{ $description "Opens the file at the given path using the given encoding, and returns a list of the lines in that file." }
+{ $errors "Throws an error if the file cannot be opened for reading." } ;
 
-HELP: path+
-{ $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
-{ $description "Concatenates two pathnames." } ;
+HELP: set-file-contents
+{ $values { "seq" sequence } { "path" "a pathname string" } { "encoding" "an encoding descriptor" } }
+{ $description "Sets the contents of a file to a sequence with the given encoding." }
+{ $errors "Throws an error if the file cannot be opened for writing." } ;
+
+HELP: file-contents
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "seq" sequence } }
+{ $description "Opens the file at the given path using the given encoding, and the contents of that file as a sequence." }
+{ $errors "Throws an error if the file cannot be opened for reading." } ;
+
+{ set-file-lines file-lines set-file-contents file-contents } related-words
 
 HELP: exists?
 { $values { "path" "a pathname string" } { "?" "a boolean" } }
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;
-
-HELP: directory?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "path" } " names a directory." } ;
-
-HELP: (directory)
-{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ name dir? }" } " pairs" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
-{ $notes "This is a low-level word, and user code should call " { $link directory } " instead." } ;
-
-HELP: directory
-{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ name dir? }" } " pairs" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
-
-HELP: file-length
-{ $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
-{ $description "Outputs the length of the file in bytes, or " { $link f } " if it does not exist." } ;
-
-HELP: file-modified
-{ $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
-{ $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
-
-HELP: parent-directory
-{ $values { "path" "a pathname string" } { "parent" "a pathname string" } }
-{ $description "Strips the last component off a pathname." }
-{ $examples { $example "USE: io.files" "\"/etc/passwd\" parent-directory print" "/etc/" } } ;
-
-HELP: file-name
-{ $values { "path" "a pathname string" } { "string" string } }
-{ $description "Outputs the last component of a pathname string." }
-{ $examples
-    { "\"/usr/bin/gcc\" file-name ." "\"gcc\"" }
-    { "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
-} ;
-
-HELP: resource-path
-{ $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
-{ $description "Resolve a path relative to the Factor source code location. This first checks if the " { $link resource-path } " variable is set to a path, and if not, uses the parent directory of the current image." } ;
-
-HELP: ?resource-path
-{ $values { "path" "a pathname string" } { "newpath" "a string" } }
-{ $description "If the path is prefixed with " { $snippet "\"resource:\"" } ", prepends the resource path." } ;
-
-{ resource-path ?resource-path } related-words
-
-HELP: pathname
-{ $class-description "Class of pathname presentations. Path name presentations can be created by calling " { $link <pathname> } ". Instances can be passed to " { $link write-object } " to output a clickable pathname." } ;
-
-HELP: normalize-directory
-{ $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
-{ $description "Called by the " { $link directory } " word to prepare a pathname before passing it to the " { $link (directory) } " primitive." } ;
-
-HELP: normalize-pathname
-{ $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
-{ $description "Called by the " { $link stat } " word, and possibly " { $link <file-reader> } " and " { $link <file-writer> } ", to prepare a pathname before passing it to underlying code." } ;
-
-HELP: <pathname> ( str -- pathname )
-{ $values { "str" "a pathname string" } { "pathname" pathname } }
-{ $description "Creates a new " { $link pathname } "." } ;
-
-HELP: home
-{ $values { "dir" string } }
-{ $description "Outputs the user's home directory." } ;
-
-HELP: delete-file
-{ $values { "path" "a pathname string" } }
-{ $description "Deletes a file." }
-{ $errors "Throws an error if the file could not be deleted." } ;
-
-HELP: make-directory
-{ $values { "path" "a pathname string" } }
-{ $description "Creates a directory." }
-{ $errors "Throws an error if the directory could not be created." } ;
-
-HELP: delete-directory
-{ $values { "path" "a pathname string" } }
-{ $description "Deletes a directory. The directory must be empty." }
-{ $errors "Throws an error if the directory could not be deleted." } ;

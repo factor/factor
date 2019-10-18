@@ -1,8 +1,11 @@
-USING: alien arrays definitions generic generic.standard
-generic.math assocs hashtables io kernel math namespaces parser
-prettyprint sequences strings tools.test vectors words
-quotations classes continuations layouts classes.union sorting ;
-IN: temporary
+USING: accessors alien arrays assocs classes classes.algebra
+classes.tuple classes.union compiler.units continuations
+definitions eval generic generic.math generic.standard
+hashtables io io.streams.string kernel layouts math math.order
+namespaces parser prettyprint quotations sequences sorting
+strings tools.test vectors words generic.single
+compiler.crossref ;
+IN: generic.tests
 
 GENERIC: foobar ( x -- y )
 M: object foobar drop "Hello world" ;
@@ -15,23 +18,10 @@ M: word   class-of drop "word"   ;
 
 [ "fixnum" ] [ 5 class-of ] unit-test
 [ "word" ] [ \ class-of class-of ] unit-test
-[ 3.4 class-of ] unit-test-fails
+[ 3.4 class-of ] must-fail
 
 [ "Hello world" ] [ 4 foobar foobar ] unit-test
 [ "Goodbye cruel world" ] [ 4 foobar ] unit-test
-
-GENERIC: bool>str ( x -- y )
-M: general-t bool>str drop "true" ;
-M: f bool>str drop "false" ;
-
-: str>bool
-    H{
-        { "true" t }
-        { "false" f }
-    } at ;
-
-[ t ] [ t bool>str str>bool ] unit-test
-[ f ] [ f bool>str str>bool ] unit-test
 
 ! Testing unions
 UNION: funnies quotation float complex ;
@@ -43,22 +33,12 @@ M: object funny drop 0 ;
 [ 2 ] [ [ { } ] funny ] unit-test
 [ 0 ] [ { } funny ] unit-test
 
-PREDICATE: funnies very-funny number? ;
+PREDICATE: very-funny < funnies number? ;
 
 GENERIC: gooey ( x -- y )
 M: very-funny gooey sq ;
 
 [ 0.25 ] [ 0.5 gooey ] unit-test
-
-DEFER: complement-test
-FORGET: complement-test
-GENERIC: complement-test ( x -- y )
-
-M: f         complement-test drop "f" ;
-M: general-t complement-test drop "general-t" ;
-
-[ "general-t" ] [ 5 complement-test ] unit-test
-[ "f" ] [ f complement-test ] unit-test
 
 GENERIC: empty-method-test ( x -- y )
 M: object empty-method-test ;
@@ -86,11 +66,11 @@ M: number union-containment drop 2 ;
 [ 2 ] [ 1.0 union-containment ] unit-test
 
 ! Testing recovery from bad method definitions
-"IN: temporary GENERIC: unhappy ( x -- x )" eval
+"IN: generic.tests GENERIC: unhappy ( x -- x )" eval( -- )
 [
-    "IN: temporary M: dictionary unhappy ;" eval
-] unit-test-fails
-[ ] [ "IN: temporary GENERIC: unhappy ( x -- x )" eval ] unit-test
+    "IN: generic.tests M: dictionary unhappy ;" eval( -- )
+] must-fail
+[ ] [ "IN: generic.tests GENERIC: unhappy ( x -- x )" eval( -- ) ] unit-test
 
 GENERIC# complex-combination 1 ( a b -- c )
 M: string complex-combination drop ;
@@ -113,26 +93,9 @@ M: ratio big-generic-test "ratio" ;
 M: string big-generic-test "string" ;
 M: shit big-generic-test "shit" ;
 
-TUPLE: delegating ;
-
 [ T{ shit f } "shit" ] [ T{ shit f } big-generic-test ] unit-test
-[ T{ shit f } "shit" ] [ T{ delegating T{ shit f } } big-generic-test ] unit-test
 
 [ t ] [ \ + math-generic? ] unit-test
-
-[ "SYMBOL: not-a-class C: not-a-class ;" parse ] unit-test-fails
-
-! Test math-combination
-[ [ [ >float ] dip ] ] [ \ real \ float math-upgrade ] unit-test
-[ [ >float ] ] [ \ float \ real math-upgrade ] unit-test
-[ [ [ >bignum ] dip ] ] [ \ fixnum \ bignum math-upgrade ] unit-test
-[ [ >float ] ] [ \ float \ integer math-upgrade ] unit-test
-[ number ] [ \ number \ float math-class-max ] unit-test
-[ float ] [ \ real \ float math-class-max ] unit-test
-[ fixnum ] [ \ fixnum \ null math-class-max ] unit-test
-
-[ t ] [ { hashtable equal? } method-spec? ] unit-test
-[ f ] [ { word = } method-spec? ] unit-test
 
 ! Regression
 TUPLE: first-one ;
@@ -146,19 +109,6 @@ M: tuple-class wii drop 5 ;
 M: integer wii drop 6 ;
 
 [ 3 ] [ T{ first-one } wii ] unit-test
-
-! Hooks
-SYMBOL: my-var
-HOOK: my-hook my-var ( -- x )
-
-M: integer my-hook "an integer" ;
-M: string my-hook "a string" ;
-
-[ "an integer" ] [ 3 my-var set my-hook ] unit-test
-[ "a string" ] [ my-hook my-var set my-hook ] unit-test
-[ T{ no-method f 1.0 my-hook } ] [
-    1.0 my-var set [ my-hook ] catch
-] unit-test
 
 GENERIC: tag-and-f ( x -- x x )
 
@@ -174,26 +124,91 @@ M: f tag-and-f 4 ;
 
 [ 3.4 3 ] [ 3.4 tag-and-f ] unit-test
 
-! define-class hashing issue
-TUPLE: debug-combination ;
+! Issues with forget
+GENERIC: generic-forget-test ( a -- b )
 
-M: debug-combination perform-combination
-    drop
-    order [ dup class-hashes ] { } map>assoc sort-keys
-    1quotation ;
+M: f generic-forget-test ;
 
-SYMBOL: redefinition-test-generic
+[ ] [ \ f \ generic-forget-test method "m" set ] unit-test
 
-redefinition-test-generic T{ debug-combination } define-generic
+[ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
 
-TUPLE: redefinition-test-tuple ;
+[ ] [ "IN: generic.tests M: f generic-forget-test ;" eval( -- ) ] unit-test
 
-"IN: temporary M: redefinition-test-tuple redefinition-test-generic ;" eval
+[ ] [ [ "m" get forget ] with-compilation-unit ] unit-test
+
+[ f ] [ f generic-forget-test ] unit-test
+
+! erg's regression
+[ ] [
+    """IN: compiler.tests
+
+    GENERIC: jeah ( a -- b )
+    TUPLE: boii ;
+    M: boii jeah ;
+    GENERIC: jeah* ( a -- b )
+    M: boii jeah* jeah ;""" eval( -- )
+
+    """IN: compiler.tests
+    FORGET: boii""" eval( -- )
+    
+    """IN: compiler.tests
+    TUPLE: boii ;
+    M: boii jeah ;""" eval( -- )
+] unit-test
+
+! call-next-method cache test
+GENERIC: c-n-m-cache ( a -- b )
+
+! Force it to be unoptimized
+M: fixnum c-n-m-cache { } [ ] like call( -- ) call-next-method ;
+M: integer c-n-m-cache 1 + ;
+M: number c-n-m-cache ;
+
+[ 3 ] [ 2 c-n-m-cache ] unit-test
+
+[ ] [ [ M\ integer c-n-m-cache forget ] with-compilation-unit ] unit-test
+
+[ 2 ] [ 2 c-n-m-cache ] unit-test
+
+! Moving a method from one vocab to another doesn't always work
+GENERIC: move-method-generic ( a -- b )
+
+[ ] [ "IN: generic.tests.a USE: strings USE: generic.tests M: string move-method-generic ;" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
+
+[ ] [ "IN: generic.tests.b USE: strings USE: generic.tests M: string move-method-generic ;" <string-reader> "move-method-test-2" parse-stream drop ] unit-test
+
+[ ] [ "IN: generic.tests.a" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
+
+[ { string } ] [ \ move-method-generic order ] unit-test
+
+GENERIC: foozul ( a -- b )
+M: reversed foozul ;
+M: integer foozul ;
+M: slice foozul ;
 
 [ t ] [
-    [
-        redefinition-test-generic ,
-        "IN: temporary TUPLE: redefinition-test-tuple ;" eval
-        redefinition-test-generic ,
-    ] { } make all-equal?
+    reversed \ foozul method-for-class
+    reversed \ foozul method
+    eq?
 ] unit-test
+
+[ t ] [
+    fixnum \ <=> method-for-class
+    real \ <=> method
+    eq?
+] unit-test
+
+! FORGET: on method wrappers
+GENERIC: forget-test ( a -- b )
+
+M: integer forget-test 3 + ;
+
+[ ] [ "IN: generic.tests USE: math FORGET: M\\ integer forget-test" eval( -- ) ] unit-test
+
+[ { } ] [
+    \ + effect-dependencies-of keys [ method? ] filter
+    [ "method-generic" word-prop \ forget-test eq? ] filter
+] unit-test
+
+[ 10 forget-test ] [ no-method? ] must-fail-with

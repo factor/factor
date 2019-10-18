@@ -1,131 +1,197 @@
-USING: sequences rss arrays concurrency kernel sorting
-html.elements io assocs namespaces math threads vocabs html
-furnace http.server.templating calendar math.parser splitting
-continuations debugger system http.server.responders
-xml.writer ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel accessors sequences sorting math math.order
+calendar alarms logging concurrency.combinators namespaces
+db.types db.tuples db fry locals hashtables
+syndication urls xml.writer validators
+html.forms
+html.components
+http.server
+http.server.dispatchers
+furnace
+furnace.actions
+furnace.redirection
+furnace.boilerplate
+furnace.auth.login
+furnace.auth
+furnace.syndication ;
 IN: webapps.planet
 
-: print-posting-summary ( posting -- )
-    <p "news" =class p>
-        <b> dup entry-title write </b> <br/>
-        <a entry-link =href "more" =class a>
-            "Read More..." write
-        </a>
-    </p> ;
+TUPLE: planet < dispatcher ;
 
-: print-posting-summaries ( postings -- )
-    [ print-posting-summary ] each ;
+SYMBOL: can-administer-planet?
 
-: print-blogroll ( blogroll -- )
-    <ul "description" =class ul>
+can-administer-planet? define-capability
+
+TUPLE: planet-admin < dispatcher ;
+
+TUPLE: blog id name www-url feed-url ;
+
+M: blog link-title name>> ;
+
+M: blog link-href www-url>> ;
+
+blog "BLOGS"
+{
+    { "id" "ID" INTEGER +db-assigned-id+ }
+    { "name" "NAME" { VARCHAR 256 } +not-null+ }
+    { "www-url" "WWWURL" URL +not-null+ }
+    { "feed-url" "FEEDURL" URL +not-null+ }
+} define-persistent
+
+TUPLE: posting < entry id ;
+
+posting "POSTINGS"
+{
+    { "id" "ID" INTEGER +db-assigned-id+ }
+    { "title" "TITLE" { VARCHAR 256 } +not-null+ }
+    { "url" "LINK" URL +not-null+ }
+    { "description" "DESCRIPTION" TEXT +not-null+ }
+    { "date" "DATE" TIMESTAMP +not-null+ }
+} define-persistent
+
+: <blog> ( id -- todo )
+    blog new
+        swap >>id ;
+
+: blogroll ( -- seq )
+    f <blog> select-tuples
+    [ name>> ] sort-with ;
+
+: postings ( -- seq )
+    posting new select-tuples
+    [ date>> ] inv-sort-with ;
+
+: <edit-blogroll-action> ( -- action )
+    <page-action>
+        [ blogroll "blogroll" set-value ] >>init
+        { planet "admin" } >>template ;
+
+: <planet-action> ( -- action )
+    <page-action>
         [
-            <li> <a dup third =href a> first write </a> </li>
-        ] each
-    </ul> ;
+            blogroll "blogroll" set-value
+            postings "postings" set-value
+        ] >>init
 
-: format-date ( date -- string )
-    rfc3339>timestamp timestamp>string ;
+        { planet "planet" } >>template ;
 
-: print-posting ( posting -- )
-    <h2 "posting-title" =class h2>
-        <a dup entry-link =href a>
-            dup entry-title write-html
-        </a>
-    </h2>
-    <p "posting-body" =class p>
-        dup entry-description write-html
-    </p>
-    <p "posting-date" =class p>
-        entry-pub-date format-date write
-    </p> ;
+: <planet-feed-action> ( -- action )
+    <feed-action>
+        [ "Planet Factor" ] >>title
+        [ URL" $planet" ] >>url
+        [ postings ] >>entries ;
 
-: print-postings ( postings -- )
-    [ print-posting ] each ;
+:: <posting> ( entry name -- entry' )
+    posting new
+        name ": " entry title>> 3append >>title
+        entry url>> >>url
+        entry description>> >>description
+        entry date>> >>date ;
 
-SYMBOL: default-blogroll
-SYMBOL: cached-postings
+: fetch-feed ( url -- feed )
+    download-feed entries>> ;
 
-: safe-head ( seq n -- seq' )
-    over length min head ;
-
-: mini-planet-factor ( -- )
-    cached-postings get 4 safe-head print-posting-summaries ;
-
-: planet-factor ( -- )
-    serving-html [ "planet" render-template ] with-html-stream ;
-
-\ planet-factor { } define-action
-
-: planet-feed ( -- feed )
-    "[ planet-factor ]"
-    "http://planet.factorcode.org"
-    cached-postings get 30 safe-head <feed> ;
-
-: feed.xml ( -- )
-    "text/xml" serving-content
-    planet-feed feed>xml write-xml ;
-
-\ feed.xml { } define-action
-
-: style.css ( -- )
-    "text/css" serving-content
-    "style.css" send-resource ;
-
-\ style.css { } define-action
-
-SYMBOL: last-update
-
-: diagnostic write print flush ;
-
-: fetch-feed ( triple -- feed )
-    second
-    dup "Fetching " diagnostic
-    dup download-feed feed-entries
-    swap "Done fetching " diagnostic ;
-
-: <posting> ( author entry -- entry' )
-    clone
-    [ ": " swap entry-title 3append ] keep
-    [ set-entry-title ] keep ;
-
-: ?fetch-feed ( triple -- feed/f )
-    [ fetch-feed ] [ error. drop f ] recover ;
+\ fetch-feed DEBUG add-error-logging
 
 : fetch-blogroll ( blogroll -- entries )
-    dup 0 <column>
-    swap [ ?fetch-feed ] parallel-map
-    [ [ <posting> ] curry* map ] 2map concat ;
+    [ [ feed-url>> fetch-feed ] parallel-map ] [ [ name>> ] map ] bi
+    [ '[ _ <posting> ] map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )
-    [ [ entry-pub-date ] compare ] sort <reversed> ;
+    [ date>> ] inv-sort-with ;
 
 : update-cached-postings ( -- )
-    default-blogroll get
-    fetch-blogroll sort-entries
-    cached-postings set-global ;
+    blogroll fetch-blogroll sort-entries 8 short head [
+        posting new delete-tuples
+        [ insert-tuple ] each
+    ] with-transaction ;
 
-: update-thread ( -- )
-    millis last-update set-global
-    [ update-cached-postings ] in-thread
-    10 60 * 1000 * sleep
-    update-thread ;
+: <update-action> ( -- action )
+    <action>
+        [
+            update-cached-postings
+            URL" $planet/admin" <redirect>
+        ] >>submit ;
 
-: start-update-thread ( -- )
-    [ update-thread ] in-thread ;
+: <delete-blog-action> ( -- action )
+    <action>
+        [ validate-integer-id ] >>validate
 
-"planet" "planet-factor" "extra/webapps/planet" web-app
+        [
+            "id" value <blog> delete-tuples
+            URL" $planet/admin" <redirect>
+        ] >>submit ;
 
-{
-    { "Berlin Brown" "http://factorlang-fornovices.blogspot.com/feeds/posts/default" "http://factorlang-fornovices.blogspot.com" }
-    { "Chris Double" "http://www.blogger.com/feeds/18561009/posts/full/-/factor" "http://www.bluishcoder.co.nz/" }
-    { "Elie Chaftari" "http://fun-factor.blogspot.com/feeds/posts/default" "http://fun-factor.blogspot.com/" }
-    { "Doug Coleman" "http://code-factor.blogspot.com/feeds/posts/default" "http://code-factor.blogspot.com/" }
-    { "Daniel Ehrenberg" "http://useless-factor.blogspot.com/feeds/posts/default" "http://useless-factor.blogspot.com/" }
-    { "Gavin Harrison" "http://gmh33.blogspot.com/feeds/posts/default" "http://gmh33.blogspot.com/" }
-    { "Kio M. Smallwood"
-    "http://sekenre.wordpress.com/feed/atom/"
-    "http://sekenre.wordpress.com/" }
-    { "Phil Dawes" "http://www.phildawes.net/blog/category/factor/feed/atom" "http://www.phildawes.net/blog/" }
-    { "Samuel Tardieu" "http://www.rfc1149.net/blog/tag/factor/feed/atom/" "http://www.rfc1149.net/blog/tag/factor/" }
-    { "Slava Pestov" "http://factor-language.blogspot.com/atom.xml" "http://factor-language.blogspot.com/" }
-} default-blogroll set-global
+: validate-blog ( -- )
+    {
+        { "name" [ v-one-line ] }
+        { "www-url" [ v-url ] }
+        { "feed-url" [ v-url ] }
+    } validate-params ;
+
+: deposit-blog-slots ( blog -- )
+    { "name" "www-url" "feed-url" } to-object ;
+
+: <new-blog-action> ( -- action )
+    <page-action>
+
+        { planet "new-blog" } >>template
+
+        [ validate-blog ] >>validate
+
+        [
+            f <blog>
+            [ deposit-blog-slots ]
+            [ insert-tuple ]
+            bi
+            URL" $planet/admin" <redirect>
+        ] >>submit ;
+
+: <edit-blog-action> ( -- action )
+    <page-action>
+
+        [
+            validate-integer-id
+            "id" value <blog> select-tuple from-object
+        ] >>init
+
+        { planet "edit-blog" } >>template
+
+        [
+            validate-integer-id
+            validate-blog
+        ] >>validate
+
+        [
+            f <blog>
+            [ deposit-blog-slots ]
+            [ "id" value >>id update-tuple ] bi
+
+            <url>
+                "$planet/admin" >>path
+                "id" value "id" set-query-param
+            <redirect>
+        ] >>submit ;
+
+: <planet-admin> ( -- responder )
+    planet-admin new-dispatcher
+        <edit-blogroll-action> "" add-responder
+        <update-action> "update" add-responder
+        <new-blog-action> "new-blog" add-responder
+        <edit-blog-action> "edit-blog" add-responder
+        <delete-blog-action> "delete-blog" add-responder
+    <protected>
+        "administer Planet Factor" >>description
+        { can-administer-planet? } >>capabilities ;
+
+: <planet> ( -- responder )
+    planet new-dispatcher
+        <planet-action> "" add-responder
+        <planet-feed-action> "feed.xml" add-responder
+        <planet-admin> "admin" add-responder
+    <boilerplate>
+        { planet "planet-common" } >>template ;
+
+: start-update-task ( db -- )
+    '[ _ [ update-cached-postings ] with-db ] 10 minutes every drop ;

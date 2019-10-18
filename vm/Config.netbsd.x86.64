@@ -1,0 +1,2 @@
+include vm/Config.netbsd
+include vm/Config.x86.64

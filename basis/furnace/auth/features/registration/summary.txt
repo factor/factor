@@ -1,0 +1,1 @@
+Allow new users to register from the login page

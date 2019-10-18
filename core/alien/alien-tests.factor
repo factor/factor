@@ -1,7 +1,7 @@
-IN: temporary
-USING: alien byte-arrays
-arrays kernel kernel.private namespaces tools.test sequences
-libc math system prettyprint ;
+USING: accessors alien alien.accessors alien.syntax byte-arrays arrays
+kernel kernel.private namespaces tools.test sequences libc math
+system prettyprint layouts alien.libraries sets ;
+IN: alien.tests
 
 [ t ] [ -1 <alien> alien-address 0 > ] unit-test
 
@@ -14,7 +14,7 @@ libc math system prettyprint ;
 ! Testing the various bignum accessor
 10 <byte-array> "dump" set
 
-[ "dump" get alien-address ] unit-test-fails
+[ "dump" get alien-address ] must-fail
 
 [ 123 ] [
     123 "dump" get 0 set-alien-signed-1
@@ -55,16 +55,32 @@ cell 8 = [
     ] unit-test
 ] when
 
-[ "ALIEN: 1234" ] [ 1234 <alien> unparse ] unit-test
+[ "ALIEN: 1234" ] [ HEX: 1234 <alien> unparse ] unit-test
 
 [ ] [ 0 B{ 1 2 3 } <displaced-alien> drop ] unit-test
-[ ] [ 0 F{ 1 2 3 } <displaced-alien> drop ] unit-test
-[ ] [ 0 ?{ t f t } <displaced-alien> drop ] unit-test
 
-[ 0 B{ 1 2 3 } <displaced-alien> alien-address ] unit-test-fails
+[ 0 B{ 1 2 3 } <displaced-alien> alien-address ] must-fail
 
-[ 1 1 <displaced-alien> ] unit-test-fails
+[ 1 1 <displaced-alien> ] must-fail
 
 [ f ] [ 0 B{ 1 2 3 } <displaced-alien> pinned-c-ptr? ] unit-test
 
+[ f ] [ 0 B{ 1 2 3 } <displaced-alien> 1 swap <displaced-alien> pinned-c-ptr? ] unit-test
+
+[ t ] [ 0 B{ 1 2 3 } <displaced-alien> 1 swap <displaced-alien> underlying>> byte-array? ] unit-test
+
 [ "( displaced alien )" ] [ 0 B{ 1 2 3 } <displaced-alien> unparse ] unit-test
+
+SYMBOL: initialize-test
+
+f initialize-test set-global
+
+[ 31337 ] [ initialize-test [ 31337 ] initialize-alien ] unit-test
+
+[ 31337 ] [ initialize-test [ 69 ] initialize-alien ] unit-test
+
+[ ] [ initialize-test get BAD-ALIEN >>alien drop ] unit-test
+
+[ 7575 ] [ initialize-test [ 7575 ] initialize-alien ] unit-test
+
+[ V{ BAD-ALIEN } ] [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } prune ] unit-test

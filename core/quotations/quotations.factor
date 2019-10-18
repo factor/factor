@@ -1,28 +1,42 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays sequences sequences.private
-kernel kernel.private math assocs quotations.private ;
+USING: accessors arrays sequences sequences.private
+kernel kernel.private math assocs quotations.private
+slots.private ;
 IN: quotations
 
-M: wrapper equal?
-    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
+<PRIVATE
 
-UNION: callable quotation curry ;
+: uncurry ( curry -- obj quot )
+    { curry } declare dup 2 slot swap 3 slot ; inline
+
+: uncompose ( compose -- quot quot2 )
+    { compose } declare dup 2 slot swap 3 slot ; inline
+
+PRIVATE>
+
+M: quotation call (call) ;
+
+M: curry call uncurry call ;
+
+M: compose call uncompose [ call ] dip call ;
+
+M: wrapper equal?
+    over wrapper? [ [ wrapped>> ] bi@ = ] [ 2drop f ] if ;
+
+UNION: callable quotation curry compose ;
 
 M: callable equal?
     over callable? [ sequence= ] [ 2drop f ] if ;
 
-: <quotation> ( n -- quot )
-    f <array> array>quotation ; inline
+M: quotation length array>> length ;
 
-M: quotation length quotation-array length ;
-
-M: quotation nth-unsafe quotation-array nth-unsafe ;
+M: quotation nth-unsafe array>> nth-unsafe ;
 
 : >quotation ( seq -- quot )
     >array array>quotation ; inline
 
-M: quotation like drop dup quotation? [ >quotation ] unless ;
+M: callable like drop dup quotation? [ >quotation ] unless ;
 
 INSTANCE: quotation immutable-sequence
 
@@ -34,15 +48,26 @@ M: object literalize ;
 
 M: wrapper literalize <wrapper> ;
 
-M: curry length curry-quot length 1+ ;
+M: curry length quot>> length 1 + ;
 
 M: curry nth
-    over zero? [
-        nip curry-obj literalize
-    ] [
-        >r 1- r> curry-quot nth
-    ] if ;
-
-M: curry like drop dup callable? [ >quotation ] unless ;
+    over 0 =
+    [ nip obj>> literalize ]
+    [ [ 1 - ] dip quot>> nth ]
+    if ;
 
 INSTANCE: curry immutable-sequence
+
+M: compose length
+    [ first>> length ] [ second>> length ] bi + ;
+
+M: compose virtual-exemplar first>> ;
+
+M: compose virtual@
+    2dup first>> length < [
+        first>>
+    ] [
+        [ first>> length - ] [ second>> ] bi
+    ] if ;
+
+INSTANCE: compose virtual-sequence

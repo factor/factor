@@ -1,10 +1,14 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays definitions generic
-hashtables kernel math namespaces parser sequences strings sbufs
-vectors words quotations io assocs splitting tuples
-generic.standard generic.math classes io.files vocabs
-float-arrays classes.union classes.mixin classes.predicate ;
+USING: accessors alien arrays byte-arrays byte-vectors definitions generic
+hashtables kernel math namespaces parser lexer sequences strings
+strings.parser sbufs vectors words words.symbol words.constant
+words.alias quotations io assocs splitting classes.tuple
+generic.standard generic.hook generic.math generic.parser classes
+io.pathnames vocabs vocabs.parser classes.parser classes.union
+classes.intersection classes.mixin classes.predicate
+classes.singleton classes.tuple.parser compiler.units
+combinators effects.parser slots ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -18,149 +22,236 @@ IN: bootstrap.syntax
 : define-delimiter ( name -- )
     "syntax" lookup t "delimiter" set-word-prop ;
 
-: define-syntax ( name quot -- )
-    >r "syntax" lookup dup r> define-compound
-    t "parsing" set-word-prop ;
+: define-core-syntax ( name quot -- )
+    [ dup "syntax" lookup [ ] [ no-word-error ] ?if ] dip
+    define-syntax ;
 
-{ "]" "}" ";" } [ define-delimiter ] each
+[
+    { "]" "}" ";" ">>" } [ define-delimiter ] each
 
-"PRIMITIVE:" [
-    "Primitive definition is not supported" throw
-] define-syntax
+    "PRIMITIVE:" [
+        "Primitive definition is not supported" throw
+    ] define-core-syntax
 
-"CS{" [
-    "Call stack literals are not supported" throw
-] define-syntax
+    "CS{" [
+        "Call stack literals are not supported" throw
+    ] define-core-syntax
 
-"!" [ lexer get next-line ] define-syntax
+    "!" [ lexer get next-line ] define-core-syntax
 
-"#!" [ POSTPONE: ! ] define-syntax
+    "#!" [ POSTPONE: ! ] define-core-syntax
 
-"IN:" [ scan set-in ] define-syntax
+    "IN:" [ scan set-current-vocab ] define-core-syntax
 
-"PRIVATE>" [ in get ".private" ?tail drop set-in ] define-syntax
+    "<PRIVATE" [ begin-private ] define-core-syntax
 
-"<PRIVATE" [
-    POSTPONE: PRIVATE> in get ".private" append set-in
-] define-syntax
+    "PRIVATE>" [ end-private ] define-core-syntax
 
-"USE:" [ scan use+ ] define-syntax
+    "USE:" [ scan use-vocab ] define-core-syntax
 
-"USE-IF:" [
-    scan-word scan swap execute [ use+ ] [ drop ] if
-] define-syntax
+    "UNUSE:" [ scan unuse-vocab ] define-core-syntax
 
-"USING:" [ ";" parse-tokens add-use ] define-syntax
+    "USING:" [ ";" parse-tokens [ use-vocab ] each ] define-core-syntax
 
-"HEX:" [ 16 parse-base ] define-syntax
-"OCT:" [ 8 parse-base ] define-syntax
-"BIN:" [ 2 parse-base ] define-syntax
+    "QUALIFIED:" [ scan dup add-qualified ] define-core-syntax
 
-"f" [ f parsed ] define-syntax
-"t" "syntax" lookup define-symbol
+    "QUALIFIED-WITH:" [ scan scan add-qualified ] define-core-syntax
 
-"CHAR:" [ 0 scan next-char nip parsed ] define-syntax
-"\"" [ parse-string parsed ] define-syntax
+    "FROM:" [
+        scan "=>" expect ";" parse-tokens add-words-from
+    ] define-core-syntax
 
-"SBUF\"" [
-    lexer get skip-blank parse-string >sbuf parsed
-] define-syntax
+    "EXCLUDE:" [
+        scan "=>" expect ";" parse-tokens add-words-excluding
+    ] define-core-syntax
 
-"P\"" [
-    lexer get skip-blank parse-string <pathname> parsed
-] define-syntax
+    "RENAME:" [
+        scan scan "=>" expect scan add-renamed-word
+    ] define-core-syntax
 
-"[" [ \ ] [ >quotation ] parse-literal ] define-syntax
-"{" [ \ } [ >array ] parse-literal ] define-syntax
-"V{" [ \ } [ >vector ] parse-literal ] define-syntax
-"B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
-"?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
-"F{" [ \ } [ >float-array ] parse-literal ] define-syntax
-"H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
-"T{" [ \ } [ >tuple ] parse-literal ] define-syntax
-"W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
+    "HEX:" [ 16 parse-base ] define-core-syntax
+    "OCT:" [ 8 parse-base ] define-core-syntax
+    "BIN:" [ 2 parse-base ] define-core-syntax
 
-"POSTPONE:" [ scan-word parsed ] define-syntax
-"\\" [ scan-word literalize parsed ] define-syntax
-"inline" [ word make-inline ] define-syntax
-"foldable" [ word make-foldable ] define-syntax
-"flushable" [ word make-flushable ] define-syntax
-"delimiter" [ word t "delimiter" set-word-prop ] define-syntax
-"parsing" [ word t "parsing" set-word-prop ] define-syntax
+    "NAN:" [ 16 scan-base <fp-nan> suffix! ] define-core-syntax
 
-"SYMBOL:" [
-    CREATE dup reset-generic define-symbol
-] define-syntax
+    "f" [ f suffix! ] define-core-syntax
+    "t" "syntax" lookup define-singleton-class
 
-"DEFER:" [
-    scan in get create
-    dup old-definitions get delete-at
-    set-word
-] define-syntax
+    "CHAR:" [
+        scan {
+            { [ dup length 1 = ] [ first ] }
+            { [ "\\" ?head ] [ next-escape >string "" assert= ] }
+            [ name>char-hook get call( name -- char ) ]
+        } cond suffix!
+    ] define-core-syntax
 
-":" [
-    CREATE dup reset-generic parse-definition define-compound
-] define-syntax
+    "\"" [ parse-multiline-string suffix! ] define-core-syntax
 
-"GENERIC:" [
-    CREATE dup reset-word
-    define-simple-generic
-] define-syntax
+    "SBUF\"" [
+        lexer get skip-blank parse-string >sbuf suffix!
+    ] define-core-syntax
 
-"GENERIC#" [
-    CREATE dup reset-word
-    scan-word <standard-combination> define-generic
-] define-syntax
+    "P\"" [
+        lexer get skip-blank parse-string <pathname> suffix!
+    ] define-core-syntax
 
-"MATH:" [
-    CREATE dup reset-word
-    T{ math-combination } define-generic
-] define-syntax
+    "[" [ parse-quotation suffix! ] define-core-syntax
+    "{" [ \ } [ >array ] parse-literal ] define-core-syntax
+    "V{" [ \ } [ >vector ] parse-literal ] define-core-syntax
+    "B{" [ \ } [ >byte-array ] parse-literal ] define-core-syntax
+    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-core-syntax
+    "H{" [ \ } [ >hashtable ] parse-literal ] define-core-syntax
+    "T{" [ parse-tuple-literal suffix! ] define-core-syntax
+    "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
 
-"HOOK:" [
-    CREATE dup reset-word scan-word
-    <hook-combination> define-generic
-] define-syntax
+    "POSTPONE:" [ scan-word suffix! ] define-core-syntax
+    "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
+    "M\\" [ scan-word scan-word method <wrapper> suffix! ] define-core-syntax
+    "inline" [ word make-inline ] define-core-syntax
+    "recursive" [ word make-recursive ] define-core-syntax
+    "foldable" [ word make-foldable ] define-core-syntax
+    "flushable" [ word make-flushable ] define-core-syntax
+    "delimiter" [ word t "delimiter" set-word-prop ] define-core-syntax
+    "deprecated" [ word make-deprecated ] define-core-syntax
 
-"M:" [
-    f set-word
-    location >r
-    scan-word bootstrap-word scan-word
-    [ parse-definition <method> -rot define-method ] 2keep
-    2array r> (save-location)
-] define-syntax
+    "SYNTAX:" [
+        CREATE-WORD parse-definition define-syntax
+    ] define-core-syntax
 
-"UNION:" [
-    CREATE-CLASS parse-definition define-union-class
-] define-syntax
+    "SYMBOL:" [
+        CREATE-WORD define-symbol
+    ] define-core-syntax
 
-"MIXIN:" [
-    CREATE-CLASS define-mixin-class
-] define-syntax
+    "SYMBOLS:" [
+        ";" parse-tokens
+        [ create-in dup reset-generic define-symbol ] each
+    ] define-core-syntax
 
-"INSTANCE:" [ scan-word scan-word add-mixin-instance ] define-syntax
+    "SINGLETONS:" [
+        ";" parse-tokens
+        [ create-class-in define-singleton-class ] each
+    ] define-core-syntax
 
-"PREDICATE:" [
-    scan-word
-    CREATE-CLASS
-    parse-definition define-predicate-class
-] define-syntax
+    "DEFER:" [
+        scan current-vocab create
+        [ fake-definition ] [ set-word ] [ undefined-def define ] tri
+    ] define-core-syntax
+    
+    "ALIAS:" [
+        CREATE-WORD scan-word define-alias
+    ] define-core-syntax
 
-"TUPLE:" [
-    CREATE-CLASS ";" parse-tokens define-tuple-class
-] define-syntax
+    "CONSTANT:" [
+        CREATE-WORD scan-object define-constant
+    ] define-core-syntax
 
-"C:" [
-    CREATE dup reset-generic
-    scan-word dup check-tuple
-    [ construct-boa ] curry define-inline
-] define-syntax
+    ":" [
+        (:) define-declared
+    ] define-core-syntax
 
-"FORGET:" [ scan use get assoc-stack forget ] define-syntax
+    "GENERIC:" [
+        [ simple-combination ] (GENERIC:)
+    ] define-core-syntax
 
-"(" [
-    parse-effect word
-    [ swap "declared-effect" set-word-prop ] [ drop ] if*
-] define-syntax
+    "GENERIC#" [
+        [ scan-word <standard-combination> ] (GENERIC:)
+    ] define-core-syntax
 
-"MAIN:" [ scan-word in get vocab set-vocab-main ] define-syntax
+    "MATH:" [
+        [ math-combination ] (GENERIC:)
+    ] define-core-syntax
+
+    "HOOK:" [
+        [ scan-word <hook-combination> ] (GENERIC:)
+    ] define-core-syntax
+
+    "M:" [
+        (M:) define
+    ] define-core-syntax
+
+    "UNION:" [
+        CREATE-CLASS parse-definition define-union-class
+    ] define-core-syntax
+
+    "INTERSECTION:" [
+        CREATE-CLASS parse-definition define-intersection-class
+    ] define-core-syntax
+
+    "MIXIN:" [
+        CREATE-CLASS define-mixin-class
+    ] define-core-syntax
+
+    "INSTANCE:" [
+        location [
+            scan-word scan-word 2dup add-mixin-instance
+            <mixin-instance>
+        ] dip remember-definition
+    ] define-core-syntax
+
+    "PREDICATE:" [
+        CREATE-CLASS
+        scan "<" assert=
+        scan-word
+        parse-definition define-predicate-class
+    ] define-core-syntax
+
+    "SINGLETON:" [
+        CREATE-CLASS define-singleton-class
+    ] define-core-syntax
+
+    "TUPLE:" [
+        parse-tuple-definition define-tuple-class
+    ] define-core-syntax
+
+    "SLOT:" [
+        scan define-protocol-slot
+    ] define-core-syntax
+
+    "C:" [
+        CREATE-WORD scan-word define-boa-word
+    ] define-core-syntax
+
+    "ERROR:" [
+        parse-tuple-definition
+        pick save-location
+        define-error-class
+    ] define-core-syntax
+
+    "FORGET:" [
+        scan-object forget
+    ] define-core-syntax
+
+    "(" [
+        ")" parse-effect drop
+    ] define-core-syntax
+
+    "((" [
+        "))" parse-effect suffix!
+    ] define-core-syntax
+
+    "MAIN:" [ scan-word current-vocab (>>main) ] define-core-syntax
+
+    "<<" [
+        [
+            \ >> parse-until >quotation
+        ] with-nested-compilation-unit call( -- )
+    ] define-core-syntax
+
+    "call-next-method" [
+        current-method get [
+            literalize suffix!
+            \ (call-next-method) suffix!
+        ] [
+            not-in-a-method-error
+        ] if*
+    ] define-core-syntax
+    
+    "initial:" "syntax" lookup define-symbol
+
+    "read-only" "syntax" lookup define-symbol
+
+    "call(" [ \ call-effect parse-call( ] define-core-syntax
+
+    "execute(" [ \ execute-effect parse-call( ] define-core-syntax
+] with-compilation-unit

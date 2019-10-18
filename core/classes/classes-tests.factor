@@ -1,179 +1,127 @@
-USING: alien arrays definitions generic assocs hashtables io
-kernel math namespaces parser prettyprint sequences strings
-tools.test vectors words quotations classes io.streams.string
+USING: alien arrays generic assocs hashtables io
+io.streams.string kernel math namespaces parser prettyprint
+sequences strings tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
-vectors ;
-IN: temporary
+classes.algebra definitions source-files compiler.units
+kernel.private sorting vocabs memory eval accessors sets ;
+IN: classes.tests
 
-H{ } "s" set
+[ t ] [ 3 object instance? ] unit-test
+[ t ] [ 3 fixnum instance? ] unit-test
+[ f ] [ 3 float instance? ] unit-test
+[ t ] [ 3 number instance? ] unit-test
+[ f ] [ 3 null instance? ] unit-test
 
-[ ] [ 1 2 "s" get push-at ] unit-test
-[ 1 ] [ 2 "s" get at first ] unit-test
-[ ] [ 1 2 "s" get pop-at ] unit-test
-[ t ] [ 2 "s" get at empty? ] unit-test
+! Regression
+GENERIC: method-forget-test ( obj -- obj )
+TUPLE: method-forget-class ;
+M: method-forget-class method-forget-test ;
 
-[ object ] [ object object class-and ] unit-test
-[ fixnum ] [ fixnum object class-and ] unit-test
-[ fixnum ] [ object fixnum class-and ] unit-test
-[ fixnum ] [ fixnum fixnum class-and ] unit-test
-[ fixnum ] [ fixnum integer class-and ] unit-test
-[ fixnum ] [ integer fixnum class-and ] unit-test
-[ null ] [ vector fixnum class-and ] unit-test
-[ number ] [ number object class-and ] unit-test
-[ number ] [ object number class-and ] unit-test
-[ null ] [ slice reversed class-and ] unit-test
+[ f ] [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
+[ ] [ [ \ method-forget-class forget ] with-compilation-unit ] unit-test
+[ t ] [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
 
-TUPLE: first-one ;
-TUPLE: second-one ;
-UNION: both first-one union-class ;
+[ { } { } ] [
+    all-words [ class? ] filter
+    implementors-map get keys
+    [ natural-sort ] bi@
+    [ diff ] [ swap diff ] 2bi
+] unit-test
 
-[ t ] [ both tuple classes-intersect? ] unit-test
+! Minor leak
+[ ] [ "IN: classes.tests TUPLE: forget-me ;" eval( -- ) ] unit-test
+[ ] [ f \ word set-global ] unit-test
+[ ] [ "IN: classes.tests USE: kernel USE: classes.algebra forget-me tuple class<= drop" eval( -- ) ] unit-test
+[ ] [ "IN: classes.tests FORGET: forget-me" eval( -- ) ] unit-test
+[ 0 ] [
+    [ word? ] instances
+    [ [ name>> "forget-me" = ] [ vocabulary>> "classes.tests" = ] bi and ] count
+] unit-test
 
-[ t ] [ \ fixnum \ integer class< ] unit-test
-[ t ] [ \ fixnum \ fixnum class< ] unit-test
-[ f ] [ \ integer \ fixnum class< ] unit-test
-[ t ] [ \ integer \ object class< ] unit-test
-[ f ] [ \ integer \ null class< ] unit-test
-[ t ] [ \ null \ object class< ] unit-test
+! Long-standing problem
+USE: multiline
 
-[ t ] [ \ generic \ compound class< ] unit-test
-[ f ] [ \ compound \ generic class< ] unit-test
+! So the user has some code...
+[ ] [
+    """IN: classes.test.a
+    GENERIC: g ( a -- b )
+    TUPLE: x ;
+    M: x g ;
+    TUPLE: z < x ;""" <string-reader>
+    "class-intersect-no-method-a" parse-stream drop
+] unit-test
 
-[ f ] [ \ reversed \ slice class< ] unit-test
-[ f ] [ \ slice \ reversed class< ] unit-test
+! Note that q inlines M: x g ;
+[ ] [
+    """IN: classes.test.b
+    USE: classes.test.a
+    USE: kernel
+    : q ( -- b ) z new g ;""" <string-reader>
+    "class-intersect-no-method-b" parse-stream drop
+] unit-test
 
-PREDICATE: word no-docs "documentation" word-prop not ;
+! Now, the user removes the z class and adds a method,
+[ ] [
+    """IN: classes.test.a
+    GENERIC: g ( a -- b )
+    TUPLE: x ;
+    M: x g ;
+    TUPLE: j ;
+    M: j g ;""" <string-reader>
+    "class-intersect-no-method-a" parse-stream drop
+] unit-test
 
-UNION: no-docs-union no-docs integer ;
+! And changes the definition of q
+[ ] [
+    """IN: classes.test.b
+    USE: classes.test.a
+    USE: kernel
+    : q ( -- b ) j new g ;""" <string-reader>
+    "class-intersect-no-method-b" parse-stream drop
+] unit-test
 
-[ t ] [ no-docs no-docs-union class< ] unit-test
-[ f ] [ no-docs-union no-docs class< ] unit-test
+! Similar problem, but with anonymous classes
+[ ] [
+    """IN: classes.test.c
+    USE: kernel
+    GENERIC: g ( a -- b )
+    M: object g ;
+    TUPLE: z ;""" <string-reader>
+    "class-intersect-no-method-c" parse-stream drop
+] unit-test
 
-TUPLE: a ;
-TUPLE: b ;
-UNION: c a b ;
+[ ] [
+    """IN: classes.test.d
+    USE: classes.test.c
+    USE: kernel
+    : q ( a -- b ) dup z? [ g ] unless ;""" <string-reader>
+    "class-intersect-no-method-d" parse-stream drop
+] unit-test
 
-[ t ] [ \ c \ tuple class< ] unit-test
-[ f ] [ \ tuple \ c class< ] unit-test
+! Now, the user removes the z class and adds a method,
+[ ] [
+    """IN: classes.test.c
+    USE: kernel
+    GENERIC: g ( a -- b )
+    M: object g ;
+    TUPLE: j ;
+    M: j g ;""" <string-reader>
+    "class-intersect-no-method-c" parse-stream drop
+] unit-test
 
-DEFER: bah
-FORGET: bah
-UNION: bah fixnum alien ;
-[ bah ] [ \ bah? "predicating" word-prop ] unit-test
+! Forget the above crap
+[
+    { "classes.test.a" "classes.test.b" "classes.test.c" "classes.test.d" }
+    [ forget-vocab ] each
+] with-compilation-unit
 
-! Test generic see and parsing
-[ "IN: temporary\nSYMBOL: bah\n\nUNION: bah fixnum alien ;\n" ]
-[ [ \ bah see ] string-out ] unit-test
+TUPLE: forgotten-predicate-test ;
 
-! Test redefinition of classes
-UNION: union-1 fixnum float ;
+[ ] [ [ \ forgotten-predicate-test forget ] with-compilation-unit ] unit-test
+[ f ] [ \ forgotten-predicate-test? predicate? ] unit-test
 
-GENERIC: generic-update-test ( x -- y )
+GENERIC: generic-predicate? ( a -- b )
 
-M: union-1 generic-update-test drop "union-1" ;
+[ ] [ "IN: classes.tests TUPLE: generic-predicate ;" eval( -- ) ] unit-test
 
-[ f ] [ bignum union-1 class< ] unit-test
-[ t ] [ union-1 number class< ] unit-test
-[ "union-1" ] [ 1.0 generic-update-test ] unit-test
-
-[ union-1 ] [ fixnum float class-or ] unit-test
-
-"IN: temporary UNION: union-1 rational array ;" eval
-
-do-parse-hook
-
-[ t ] [ bignum union-1 class< ] unit-test
-[ f ] [ union-1 number class< ] unit-test
-[ "union-1" ] [ { 1.0 } generic-update-test ] unit-test
-
-[ object ] [ fixnum float class-or ] unit-test
-
-"IN: temporary PREDICATE: integer union-1 even? ;" eval
-
-do-parse-hook
-
-[ f ] [ union-1 union-class? ] unit-test
-[ t ] [ union-1 predicate-class? ] unit-test
-[ "union-1" ] [ 8 generic-update-test ] unit-test
-[ -7 generic-update-test ] unit-test-fails
-
-! Test mixins
-MIXIN: sequence-mixin
-
-INSTANCE: array sequence-mixin
-INSTANCE: vector sequence-mixin
-INSTANCE: slice sequence-mixin
-
-MIXIN: assoc-mixin
-
-INSTANCE: hashtable assoc-mixin
-
-GENERIC: collection-size ( x -- y )
-
-M: sequence-mixin collection-size length ;
-
-M: assoc-mixin collection-size assoc-size ;
-
-[ t ] [ array sequence-mixin class< ] unit-test
-[ t ] [ { 1 2 3 } sequence-mixin? ] unit-test
-[ 3 ] [ { 1 2 3 } collection-size ] unit-test
-[ f ] [ H{ { 1 2 } { 2 3 } } sequence-mixin? ] unit-test
-[ t ] [ H{ { 1 2 } { 2 3 } } assoc-mixin? ] unit-test
-[ 2 ] [ H{ { 1 2 } { 2 3 } } collection-size ] unit-test
-
-! Test mixing in of new classes after the fact
-MIXIN: mx1
-
-INSTANCE: integer mx1
-
-[ t ] [ integer mx1 class< ] unit-test
-[ t ] [ mx1 integer class< ] unit-test
-[ t ] [ mx1 number class< ] unit-test
-
-"INSTANCE: array mx1" eval
-
-[ t ] [ array mx1 class< ] unit-test
-[ f ] [ mx1 number class< ] unit-test
-
-[ mx1 ] [ array integer class-or ] unit-test
-
-\ mx1 forget
-
-[ f ] [ array integer class-or mx1 = ] unit-test
-
-! Empty unions were causing problems
-GENERIC: empty-union-test
-
-UNION: empty-union-1 ;
-
-M: empty-union-1 empty-union-test ;
-
-UNION: empty-union-2 ;
-
-M: empty-union-2 empty-union-test ;
-
-! Redefining a class didn't update containing unions
-UNION: redefine-bug-1 fixnum ;
-
-UNION: redefine-bug-2 redefine-bug-1 quotation ;
-
-[ t ] [ fixnum redefine-bug-2 class< ] unit-test
-[ t ] [ quotation redefine-bug-2 class< ] unit-test
-[ redefine-bug-2 ] [ fixnum quotation class-or ] unit-test
-
-"IN: temporary UNION: redefine-bug-1 bignum ;" eval
-
-[ t ] [ bignum redefine-bug-1 class< ] unit-test
-[ f ] [ fixnum redefine-bug-2 class< ] unit-test
-[ t ] [ bignum redefine-bug-2 class< ] unit-test
-[ f ] [ fixnum quotation class-or redefine-bug-2 eq? ] unit-test
-[ redefine-bug-2 ] [ bignum quotation class-or ] unit-test
-
-! Another issue similar to the above
-UNION: forget-class-bug-1 integer ;
-UNION: forget-class-bug-2 forget-class-bug-1 dll ;
-
-FORGET: forget-class-bug-1
-FORGET: forget-class-bug-2
-
-[ t ] [ integer dll class-or interned? ] unit-test
+[ f ] [ \ generic-predicate? generic? ] unit-test

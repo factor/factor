@@ -1,10 +1,8 @@
-USING: io io.files sequences xml xml.utilities ;
+USING: io io.files sequences xml xml.traversal
+io.encodings.ascii kernel ;
 IN: msxml-to-csv
 
-: print-csv ( table -- ) [ "," join print ] each ;
-
 : (msxml>csv) ( xml -- table )
-    "Worksheet" tag-named
     "Table" tag-named
     "Row" tags-named [
         "Cell" tags-named [
@@ -12,7 +10,6 @@ IN: msxml-to-csv
         ] map
     ] map ;
 
-: msxml>csv ( infile outfile -- )
-    <file-writer> [
-        file>xml (msxml>csv) print-csv
-    ] with-stream ;
+: msxml>csv ( outfile infile -- )
+    file>xml (msxml>csv) [ "," join ] map
+    swap ascii set-file-lines ;

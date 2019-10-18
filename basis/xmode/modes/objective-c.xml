@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Extension of c.xml to handle Objective-C keywords. -->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="commentStart" VALUE="/*" />
+        <PROPERTY NAME="commentEnd" VALUE="*/" />
+        <PROPERTY NAME="lineComment" VALUE="//" />
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+
+	<!-- Auto indent -->
+	<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+	<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+	<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+	<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+	<PROPERTY NAME="indentNextLine"
+		VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+	<PROPERTY NAME="unindentThisLine"
+		VALUE="^.*(default:\s*|case.*:.*)$" />
+	<PROPERTY NAME="electricKeys" VALUE=":" />
+    </PROPS>
+
+    <RULES
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <EOL_SPAN TYPE="KEYWORD2" AT_WHITESPACE_END="TRUE" DELEGATE="CPP">#</EOL_SPAN>
+
+        <IMPORT DELEGATE="c::LEX"/>
+        <IMPORT DELEGATE="c::CORE"/>
+		<IMPORT DELEGATE="CORE"/>
+    </RULES>
+
+    <!-- Core language -->
+    <RULES SET="CORE"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <KEYWORDS>
+            <!-- Types (Objective C) -->
+            <KEYWORD3>id</KEYWORD3>
+            <KEYWORD3>Class</KEYWORD3>
+            <KEYWORD3>SEL</KEYWORD3>
+            <KEYWORD3>IMP</KEYWORD3>
+            <KEYWORD3>BOOL</KEYWORD3>
+
+            <!-- Keywords (Objective C) -->
+            <KEYWORD1>oneway</KEYWORD1>
+            <KEYWORD1>in</KEYWORD1>
+            <KEYWORD1>out</KEYWORD1>
+            <KEYWORD1>inout</KEYWORD1>
+            <KEYWORD1>bycopy</KEYWORD1>
+            <KEYWORD1>byref</KEYWORD1>
+            <KEYWORD1>self</KEYWORD1>
+            <KEYWORD1>super</KEYWORD1>
+
+            <!-- Preprocessor Directives (Objective C)-->
+            <KEYWORD1>@interface</KEYWORD1>
+            <KEYWORD1>@implementation</KEYWORD1>
+            <KEYWORD1>@protocol</KEYWORD1>
+            <KEYWORD1>@end</KEYWORD1>
+            <KEYWORD1>@private</KEYWORD1>
+            <KEYWORD1>@protected</KEYWORD1>
+            <KEYWORD1>@public</KEYWORD1>
+            <KEYWORD1>@class</KEYWORD1>
+            <KEYWORD1>@selector</KEYWORD1>
+            <KEYWORD1>@endcode</KEYWORD1>
+            <KEYWORD1>@defs</KEYWORD1>
+
+            <LITERAL2>TRUE</LITERAL2>
+            <LITERAL2>FALSE</LITERAL2>
+            <LITERAL2>YES</LITERAL2>
+            <LITERAL2>NO</LITERAL2>
+            <LITERAL2>NULL</LITERAL2>
+            <LITERAL2>nil</LITERAL2>
+            <LITERAL2>Nil</LITERAL2>
+        </KEYWORDS>
+    </RULES>
+
+    <!-- Preprocessor specific rules -->
+    <RULES SET="CPP"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+
+        <EOL_SPAN_REGEXP HASH_CHAR="include" TYPE="MARKUP" DELEGATE="c::INCLUDE">include\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="import" TYPE="MARKUP" DELEGATE="c::INCLUDE">import\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="define" TYPE="MARKUP" DELEGATE="DEFINE">define\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="endif" TYPE="MARKUP" DELEGATE="c::LEX">endif\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="elif" TYPE="MARKUP" DELEGATE="c::CONDITION">elif\b</EOL_SPAN_REGEXP>
+        <EOL_SPAN_REGEXP HASH_CHAR="if" TYPE="MARKUP" DELEGATE="c::CONDITION">if\b</EOL_SPAN_REGEXP>
+
+        <IMPORT DELEGATE="c::LEX"/>
+
+        <!-- Directives -->
+        <KEYWORDS>
+            <MARKUP>ifdef</MARKUP>
+            <MARKUP>ifndef</MARKUP>
+            <MARKUP>else</MARKUP>
+            <MARKUP>error</MARKUP>
+            <MARKUP>line</MARKUP>
+            <MARKUP>pragma</MARKUP>
+            <MARKUP>undef</MARKUP>
+            <MARKUP>warning</MARKUP>
+        </KEYWORDS>
+    </RULES>
+
+    <!-- After #define directive -->
+    <!-- Almost same as the normal code,
+        except two additional operators # and ##. -->
+    <RULES SET="DEFINE"
+        ESCAPE="\" IGNORE_CASE="FALSE"
+        HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[0-9][0-9a-zA-Z]*">
+        <SEQ TYPE="OPERATOR">#</SEQ>
+        <IMPORT DELEGATE="c::LEX"/>
+        <IMPORT DELEGATE="c::CORE"/>
+        <IMPORT DELEGATE="CORE"/>
+    </RULES>
+
+</MODE>

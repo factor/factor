@@ -1,0 +1,1 @@
+IRC Client and Chat object definitions

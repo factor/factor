@@ -1,19 +1,20 @@
-USING: splitting tools.test ;
-IN: temporary
-
-[ { 1 2 3 } 0 group ] unit-test-fails
-
-[ { "hell" "o wo" "rld" } ] [ "hello world" 4 group ] unit-test
+USING: splitting tools.test kernel sequences arrays strings ascii ;
+IN: splitting.tests
 
 [ "hello" "world ." ] [ "hello world ." " " split1 ] unit-test
 [ "hello" "world-+." ] [ "hello-+world-+." "-+" split1 ] unit-test
 [ "goodbye" f ] [ "goodbye" " " split1 ] unit-test
 [ "" "" ] [ "great" "great" split1 ] unit-test
 
-[ "hello world" "." ] [ "hello world ." " " last-split1 ] unit-test
-[ "hello-+world" "." ] [ "hello-+world-+." "-+" last-split1 ] unit-test
-[ "goodbye" f ] [ "goodbye" " " last-split1 ] unit-test
-[ "" "" ] [ "great" "great" last-split1 ] unit-test
+[ "hello world" "." ] [ "hello world ." " " split1-last ] unit-test
+[ "hello-+world" "." ] [ "hello-+world-+." "-+" split1-last ] unit-test
+[ "goodbye" f ] [ "goodbye" " " split1-last ] unit-test
+[ "" "" ] [ "great" "great" split1-last ] unit-test
+
+[ "hello world" "." ] [ "hello world ." " " split1-last-slice [ >string ] bi@ ] unit-test
+[ "hello-+world" "." ] [ "hello-+world-+." "-+" split1-last-slice [ >string ] bi@ ] unit-test
+[ "goodbye" f ] [ "goodbye" " " split1-last-slice [ >string ] dip ] unit-test
+[ "" f ] [ "great" "great" split1-last-slice [ >string ] dip ] unit-test
 
 [ "and end" t ] [ "Beginning and end" "Beginning " ?head ] unit-test
 [ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?head ] unit-test
@@ -56,3 +57,6 @@ unit-test
 [ { "hello" "hi" } ] [ "hello\nhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\rhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\r\nhi" string-lines ] unit-test
+
+[ { "hey" "world" "what's" "happening" } ]
+[ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test

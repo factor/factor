@@ -1,32 +1,71 @@
-USING: vocabs help.markup help.syntax words strings io ;
+USING: vocabs vocabs.loader.private help.markup help.syntax
+words strings io ;
 IN: vocabs.loader
 
-ARTICLE: "vocabs.loader" "Vocabulary loader"
-"The vocabulary loader is defined in the " { $vocab-link "vocabs.loader" } " vocabulary."
+ARTICLE: "add-vocab-roots" "Working with code outside of the Factor source tree"
+"You can work with code outside of the Factor source tree by adding additional directories to the list of vocabulary roots."
 $nl
-"Vocabulary names map directly to source files. When a vocabulary which has not been loaded is accessed, the vocabulary loader searches for it in one of the root directories:"
-{ $subsection vocab-roots }
-"A vocabulary named " { $snippet "foo.bar" } " must be defined in a " { $snippet "bar" } " directory nested inside a " { $snippet "foo" } " directory at the vocabulary root. Any level of vocabulary nesting is permitted."
+"There are three ways of doing this."
 $nl
-"The vocabulary directory - " { $snippet "bar" } " in our example - can contain the following files; the first is required while the rest are optional:"
+"The first way is to use an environment variable. Factor looks at the " { $snippet "FACTOR_ROOTS" } " environment variable for a list of " { $snippet ":" } "-separated paths (on Unix) or a list of " { $snippet ";" } "-separated paths (on Windows)."
+$nl
+"The second way is to create a configuration file. You can list additional vocabulary roots in a file that Factor reads at startup:"
+{ $subsections "factor-roots" }
+"Finally, you can add vocabulary roots dynamically using a word:"
+{ $subsections add-vocab-root } ;
+
+ARTICLE: "vocabs.roots" "Vocabulary roots"
+"The vocabulary loader searches for vocabularies in one of the root directories:"
+{ $subsections vocab-roots }
+"The default set of roots includes the following directories in the Factor source directory:"
 { $list
-    { { $snippet "foo/bar/bar.factor" } " - the source file, defines words in the " { $snippet "foo.bar" } " vocabulary" }
+    { { $snippet "core" } " - essential system vocabularies such as " { $vocab-link "parser" } " and " { $vocab-link "sequences" } ". The vocabularies in this root constitute the boot image; see " { $link "bootstrap.image" } "." }
+    { { $snippet "basis" } " - useful libraries and tools, such as " { $vocab-link "compiler" } ", " { $vocab-link "ui" } ", " { $vocab-link "calendar" } ", and so on." }
+    { { $snippet "extra" } " - additional contributed libraries." }
+    { { $snippet "work" } " - a root for vocabularies which are not intended to be contributed back to Factor." }
+}
+"You can store your own vocabularies in the " { $snippet "work" } " directory."
+{ $subsections "add-vocab-roots" } ;
+
+ARTICLE: "vocabs.loader" "Vocabulary loader"
+"The vocabulary loader combines the vocabulary system with " { $link "parser" } " in order to implement automatic loading of vocabulary source files. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."
+$nl
+"When an attempt is made to use a vocabulary that has not been loaded into the image, the vocabulary loader is asked to locate the vocabulary's source files, and load them."
+$nl
+"The vocabulary loader searches for vocabularies in a set of directories known as vocabulary roots."
+{ $subsections "vocabs.roots" }
+"Vocabulary names map directly to source files inside these roots. A vocabulary named " { $snippet "foo.bar" } " is defined in " { $snippet "foo/bar/bar.factor" } "; that is, a source file named " { $snippet "bar.factor" } " within a " { $snippet "bar" } " directory nested inside a " { $snippet "foo" } " directory of a vocabulary root. Any level of nesting, separated by dots, is permitted."
+$nl
+"The vocabulary directory - " { $snippet "bar" } " in our example - contains a source file:"
+{ $list
+  { { $snippet "foo/bar/bar.factor" } " - the source file must define words in the " { $snippet "foo.bar" } " vocabulary with an " { $snippet "IN: foo.bar" } " form" }
+}
+"Two other Factor source files, storing documentation and tests, respectively, may optionally be placed alongside the source file:"
+{ $list
     { { $snippet "foo/bar/bar-docs.factor" } " - documentation, see " { $link "writing-help" } }
     { { $snippet "foo/bar/bar-tests.factor" } " - unit tests, see " { $link "tools.test" } }
-    { { $snippet "foo/bar/summary.txt" } " - a one-line description" }
-    { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary" }
 }
-"While " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " load vocabularies which have not been loaded before adding them to the search path, it is also possible to load a vocabulary without adding it to the search path:"
-{ $subsection require }
-"Forcing a reload of a vocabulary, even if it has already been loaded:"
-{ $subsection reload-vocab }
+"Finally, optional three text files may contain meta-data:"
+{ $list
+    { { $snippet "foo/bar/authors.txt" } " - a series of lines, with one author name per line. These are listed under " { $link "vocab-authors" } }
+    { { $snippet "foo/bar/summary.txt" } " - a one-line description" }
+    { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can re-use" }
+}
+"The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies which have not been loaded yet, as needed."
+$nl
+"Vocabularies can also be loaded at run time, without altering the vocabulary search path. This is done by calling a word which loads a vocabulary if it is not in the image, doing nothing if it is:"
+{ $subsections require }
+"The above word will only ever load a vocabulary once in a given session. There is another word which unconditionally loads vocabulary from disk, regardless of whether or not is has already been loaded:"
+{ $subsections reload }
+"For interactive development in the listener, calling " { $link reload } " directly is usually not necessary, since a better facility exists for " { $link "vocabs.refresh" } "."
+$nl
 "Application vocabularies can define a main entry point, giving the user a convenient way to run the application:"
-{ $subsection POSTPONE: MAIN: }
-{ $subsection run }
-"Reloading source files changed on disk:"
-{ $subsection refresh }
-{ $subsection refresh-all }
-{ $see-also "vocabularies" "parser-files" "source-files" } ;
+{ $subsections
+    POSTPONE: MAIN:
+    run
+    runnable-vocab
+}
+{ $see-also "vocabularies" "parser" "source-files" } ;
 
 ABOUT: "vocabs.loader"
 
@@ -36,73 +75,46 @@ HELP: load-vocab
 { $error-description "Thrown by " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " when a given vocabulary does not exist. Vocabularies must be created by " { $link POSTPONE: IN: } " before being used." } ;
 
 HELP: vocab-main
-{ $values { "vocab" "a vocabulary specifier" } { "main" word } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "main" word } }
 { $description "Outputs the main entry point for a vocabulary. The entry point can be executed with " { $link run } " and set with " { $link POSTPONE: MAIN: } "." } ;
 
 HELP: vocab-roots
 { $var-description "A sequence of pathname strings to search for vocabularies." } ;
 
-HELP: vocab-source
-{ $values { "vocab" "a vocabulary specifier" } { "path" string } }
-{ $description "Outputs a pathname relative to a vocabulary root where the source code for " { $snippet "vocab" } " might be found." } ;
-
-{ vocab-source vocab-source-path } related-words
-
-HELP: vocab-docs
-{ $values { "vocab" "a vocabulary specifier" } { "path" string } }
-{ $description "Outputs a pathname relative to a vocabulary root where the documentation for " { $snippet "vocab" } " might be found." } ;
-
-{ vocab-docs vocab-docs-path } related-words
-
-HELP: vocab-tests
-{ $values { "vocab" "a vocabulary specifier" } { "path" string } }
-{ $description "Outputs a pathname relative to a vocabulary root where the unit tests for " { $snippet "vocab" } " might be found." } ;
-
-{ vocab-tests vocab-tests-path } related-words
+HELP: add-vocab-root
+{ $values { "root" "a pathname string" } }
+{ $description "Adds a directory pathname to the list of vocabulary roots." }
+{ $see-also "factor-roots" } ;
 
 HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }
 { $description "Searches for a vocabulary in the vocabulary roots." } ;
 
-{ vocab-root find-vocab-root } related-words
-
-HELP: vocab-files
-{ $values { "vocab" "a vocabulary specifier" } { "seq" "a sequence of pathname strings" } }
-{ $description "Outputs a sequence of files comprising this vocabulary, or " { $link f } " if the vocabulary does not have a directory on disk." } ;
-
 HELP: no-vocab
 { $values { "name" "a vocabulary name" } } 
 { $description "Throws a " { $link no-vocab } "." }
-{ $error-description "Thrown when a " { $link POSTPONE: USE: } ", " { $link POSTPONE: USING: } " or " { $link POSTPONE: USE-IF: } " form refers to a non-existent vocabulary." } ;
+{ $error-description "Thrown when a " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " form refers to a non-existent vocabulary." } ;
 
 HELP: load-help?
 { $var-description "If set to a true value, documentation will be automatically loaded when vocabularies are loaded. This variable is usually on, except when Factor has been bootstrapped without the help system." } ;
 
 HELP: load-source
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
-{ $description "Loads a vocabulary's source code from the specified vocabulary root." } ;
+{ $values { "vocab" "a vocabulary specifier" } }
+{ $description "Loads a vocabulary's source code." } ;
 
 HELP: load-docs
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
-{ $description "If " { $link load-help? } " is on, loads a vocabulary's documentation from the specified vocabulary root." } ;
+{ $values { "vocab" "a vocabulary specifier" } }
+{ $description "If " { $link load-help? } " is on, loads a vocabulary's documentation." } ;
 
-HELP: amend-vocab-from-root
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } { "vocab" vocab }  }
-{ $description "Loads a vocabulary's source code and documentation if they have not already been loaded, and outputs the vocabulary." } ;
-
-HELP: load-vocab-from-root
-{ $values { "root" "a pathname string" } { "name" "a vocabulary name" } }
-{ $description "Loads a vocabulary's source code and documentation." } ;
-
-HELP: reload-vocab
+HELP: reload
 { $values { "name" "a vocabulary name" } }
-{ $description "Loads it's source code and documentation." }
+{ $description "Reloads the source code and documentation for a vocabulary." }
 { $errors "Throws a " { $link no-vocab } " error if the vocabulary does not exist on disk." } ;
 
 HELP: require
 { $values { "vocab" "a vocabulary specifier" } }
 { $description "Loads a vocabulary if it has not already been loaded." }
-{ $notes "To unconditionally reload a vocabulary, use " { $link reload-vocab } ". To reload changed source files, use " { $link refresh } " or " { $link refresh-all } "." } ;
+{ $notes "To unconditionally reload a vocabulary, use " { $link reload } ". To reload changed source files only, use the words in " { $link "vocabs.refresh" } "." } ;
 
 HELP: run
 { $values { "vocab" "a vocabulary specifier" } }
@@ -115,24 +127,3 @@ HELP: vocab-source-path
 HELP: vocab-docs-path
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
 { $description "Outputs a pathname where the documentation for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
-
-HELP: vocab-tests-path
-{ $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
-{ $description "Outputs a pathname where the unit tests for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
-
-HELP: refresh
-{ $values { "prefix" string } }
-{ $description "Reloads source files and documentation belonging to loaded vocabularies whose names are prefixed by " { $snippet "prefix" } " which have been modified on disk." } ;
-
-HELP: refresh-all
-{ $description "Reloads source files and documentation for all loaded vocabularies which have been modified on disk." } ;
-
-{ refresh refresh-all } related-words
-
-HELP: vocab-file-contents
-{ $values { "vocab" "a vocabulary specifier" } { "name" string } { "seq" "a sequence of lines, or " { $link f } } }
-{ $description "Outputs the contents of the file named " { $snippet "name" } " from the vocabulary's directory, or " { $link f } " if the file does not exist." } ;
-
-HELP: set-vocab-file-contents
-{ $values { "seq" "a sequence of lines" } { "vocab" "a vocabulary specifier" } { "name" string } }
-{ $description "Stores a sequence of lines to the file named " { $snippet "name" } " from the vocabulary's directory." } ;

@@ -1,11 +1,14 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
-vocabs continuations ;
-IN: temporary
+vocabs continuations classes.tuple compiler.units
+io.streams.string accessors eval words.symbol grouping ;
+IN: words.tests
 
 [ 4 ] [
-    "poo" "scratchpad" create [ 2 2 + ] define-compound
-    "poo" "scratchpad" lookup execute
+    [
+        "poo" "words.tests" create [ 2 2 + ] (( -- n )) define-declared
+    ] with-compilation-unit
+    "poo" "words.tests" lookup execute
 ] unit-test
 
 [ t ] [ t vocabs [ words [ word? and ] each ] each ] unit-test
@@ -22,9 +25,8 @@ DEFER: plist-test
     \ plist-test "sample-property" word-prop
 ] unit-test
 
-[ f ] [ 5 compound? ] unit-test
+[ ] [ [ "create-test" "scratchpad" create { 1 2 } "testing" set-word-prop ] with-compilation-unit ] unit-test
 
-"create-test" "scratchpad" create { 1 2 } "testing" set-word-prop
 [ { 1 2 } ] [
     "create-test" "scratchpad" lookup "testing" word-prop
 ] unit-test
@@ -32,11 +34,11 @@ DEFER: plist-test
 [
     [ t ] [ \ array? "array?" "arrays" lookup = ] unit-test
 
-    "test-scope" "scratchpad" create drop
+    [ ] [ [ "test-scope" "scratchpad" create drop ] with-compilation-unit ] unit-test
 ] with-scope
 
 [ "test-scope" ] [
-    "test-scope" "scratchpad" lookup word-name
+    "test-scope" "scratchpad" lookup name>> 
 ] unit-test
 
 [ t ] [ vocabs array? ] unit-test
@@ -44,102 +46,92 @@ DEFER: plist-test
 
 [ f ] [ gensym gensym = ] unit-test
 
-[ f ] [ 123 compound? ] unit-test
-
-: colon-def ;
-[ t ] [ \ colon-def compound? ] unit-test
-
 SYMBOL: a-symbol
-[ f ] [ \ a-symbol compound? ] unit-test
 [ t ] [ \ a-symbol symbol? ] unit-test
 
 ! See if redefining a generic as a colon def clears some
 ! word props.
-GENERIC: testing
-"IN: temporary : testing ;" eval
+GENERIC: testing ( a -- b )
+"IN: words.tests : testing ( -- ) ;" eval( -- )
 
 [ f ] [ \ testing generic? ] unit-test
 
-[ f ] [ gensym interned? ] unit-test
-
-: forgotten ;
-: another-forgotten ;
-
-[ f ] [ \ forgotten interned? ] unit-test
+: forgotten ( -- ) ;
+: another-forgotten ( -- ) ;
 
 FORGET: forgotten
 
-[ f ] [ \ another-forgotten interned? ] unit-test
-
 FORGET: another-forgotten
-: another-forgotten ;
+: another-forgotten ( -- ) ;
 
-[ t ] [ \ + interned? ] unit-test
+! Make sure that undefined words throw proper errors
+DEFER: deferred
+[ deferred ] [ T{ undefined f deferred } = ] must-fail-with
 
-! I forgot remove-crossref calls!
-: fee ;
-: foe fee ;
-: fie foe ;
+[ "IN: words.tests DEFER: not-compiled << not-compiled >>" eval( -- ) ]
+[ error>> [ undefined? ] [ word>> name>> "not-compiled" = ] bi and ] must-fail-with
 
-[ t ] [ \ fee usage [ word? ] subset empty? ] unit-test
-[ t ] [ \ foe usage empty? ] unit-test
-[ f ] [ \ foe crossref get key? ] unit-test
+[ ] [ "IN: words.tests FORGET: not-compiled" eval( -- ) ] unit-test
 
-FORGET: foe
+[ ] [ [ "no-loc" "words.tests" create drop ] with-compilation-unit ] unit-test
+[ f ] [ "no-loc" "words.tests" lookup where ] unit-test
 
-! xref should not retain references to gensyms
-gensym [ * ] define-compound
+[ ] [ "IN: words.tests : no-loc-2 ( -- ) ;" eval( -- ) ] unit-test
+[ f ] [ "no-loc-2" "words.tests" lookup where ] unit-test
 
-[ t ] [
-    \ * usage [ word? ] subset [ interned? not ] subset empty?
+[ ] [ "IN: words.tests : test-last ( -- ) ;" eval( -- ) ] unit-test
+[ "test-last" ] [ word name>> ] unit-test
+
+"undef-test" "words.tests" lookup [
+    [ forget ] with-compilation-unit
+] when*
+
+[ "IN: words.tests : undef-test ( -- ) ; << undef-test >>" eval( -- ) ]
+[ error>> undefined? ] must-fail-with
+
+[ ] [
+    "IN: words.tests GENERIC: symbol-generic ( -- )" eval( -- )
 ] unit-test
 
-DEFER: calls-a-gensym
-\ calls-a-gensym gensym dup "x" set 1quotation define-compound
-[ f ] [ "x" get crossref get at ] unit-test
-
-! more xref buggery
-[ f ] [
-    GENERIC: xyzzle ( x -- x )
-    : a ; \ a
-    M: integer xyzzle a ;
-    FORGET: a
-    M: object xyzzle ;
-    crossref get at
+[ ] [
+    "IN: words.tests SYMBOL: symbol-generic" eval( -- )
 ] unit-test
 
-! regression
-GENERIC: freakish ( x -- y )
-: bar freakish ;
-M: array freakish ;
-[ t ] [ \ bar \ freakish usage member? ] unit-test
+[ t ] [ "symbol-generic" "words.tests" lookup symbol? ] unit-test
+[ f ] [ "symbol-generic" "words.tests" lookup generic? ] unit-test
 
-DEFER: x
-[ t ] [ [ x ] catch third \ x eq? ] unit-test
-
-[ ] [ "no-loc" "temporary" create drop ] unit-test
-[ f ] [ "no-loc" "temporary" lookup where ] unit-test
-
-[ ] [ "IN: temporary : no-loc-2 ;" eval ] unit-test
-[ f ] [ "no-loc-2" "temporary" lookup where ] unit-test
-
-[ ] [ "IN: temporary : test-last ( -- ) ;" eval ] unit-test
-[ "test-last" ] [ word word-name ] unit-test
-
-[ t ] [
-    changed-words get assoc-size
-    [ ] define-temp drop
-    changed-words get assoc-size =
+[ ] [
+    "IN: words.tests GENERIC: symbol-generic ( a -- b )" <string-reader>
+    "symbol-generic-test" parse-stream drop
 ] unit-test
 
-! regression
-SYMBOL: quot-uses-a
-SYMBOL: quot-uses-b
+[ ] [
+    "IN: words.tests TUPLE: symbol-generic ;" <string-reader>
+    "symbol-generic-test" parse-stream drop
+] unit-test
 
-quot-uses-a [ 2 3 + ] define-compound
+[ t ] [ "symbol-generic" "words.tests" lookup symbol? ] unit-test
+[ f ] [ "symbol-generic" "words.tests" lookup generic? ] unit-test
 
-[ { + } ] [ \ quot-uses-a uses ] unit-test
+! Regressions
+[ ] [ "IN: words.tests : decl-forget-test ( -- ) ; foldable" eval( -- ) ] unit-test
+[ t ] [ "decl-forget-test" "words.tests" lookup "foldable" word-prop ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ( -- ) ;" eval( -- ) ] unit-test
+[ f ] [ "decl-forget-test" "words.tests" lookup "foldable" word-prop ] unit-test
 
-quot-uses-b 2 [ 3 + ] curry define-compound
+[ ] [ "IN: words.tests : decl-forget-test ( -- ) ; flushable" eval( -- ) ] unit-test
+[ t ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
+[ ] [ "IN: words.tests : decl-forget-test ( -- ) ;" eval( -- ) ] unit-test
+[ f ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
 
-[ { + } ] [ \ quot-uses-b uses ] unit-test
+[ { } ]
+[
+    all-words [
+        [ "effect-dependencies" word-prop ]
+        [ "definition-dependencies" word-prop ]
+        [ "conditional-dependencies" word-prop ] tri
+        3append [ "forgotten" word-prop ] filter
+    ] map harvest
+] unit-test
+
+[ "hi" word-code ] must-fail

@@ -1,0 +1,1 @@
+Allow users to receive a new password

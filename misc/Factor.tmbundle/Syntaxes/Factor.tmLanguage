@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>fileTypes</key>
@@ -139,7 +139,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(^|(?&lt;=\s))(drop|2drop|3drop|keep|2keep|3keep|nip|2nip|dup|2dup|3dup|dupd|over|pick|tuck|swap|rot|-rot|slip|2swap|swapd|&gt;r|r&gt;)(\s|$)</string>
+			<string>(^|(?&lt;=\s))(drop|2drop|3drop|keep|2keep|3keep|nip|2nip|dup|2dup|3dup|dupd|over|pick|tuck|swap|rot|-rot|roll|-roll|slip|2swap|swapd|&gt;r|r&gt;)(\s|$)</string>
 			<key>name</key>
 			<string>keyword.control.stack.factor</string>
 		</dict>
@@ -241,6 +241,44 @@
 			</array>
 		</dict>
 		<dict>
+			<key>begin</key>
+			<string>&lt;"</string>
+			<key>end</key>
+			<string>"&gt;</string>
+			<key>name</key>
+			<string>string.quoted.double.multiline.factor</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>#escaped_characters</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(^|(?&lt;=\s))(STRING:)\s+(\S+)</string>
+			<key>captures</key>
+			<dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.colon.factor</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.heredoc.factor</string>
+				</dict>
+			</dict>
+			<key>contentName</key>
+			<string>string.unquoted.heredoc.factor</string>
+			<key>end</key>
+			<string>^;$</string>
+			<key>name</key>
+			<string>definition.word.heredoc.factor</string>
+		</dict>
+		<dict>
 			<key>match</key>
 			<string>inline|foldable</string>
 			<key>name</key>
@@ -254,9 +292,9 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>\(\s</string>
+			<string>\((?=\s)</string>
 			<key>end</key>
-			<string>\s\)</string>
+			<string>(^|(?&lt;=\s))\)</string>
 			<key>name</key>
 			<string>comment.parens.factor</string>
 		</dict>

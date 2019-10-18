@@ -1,47 +1,47 @@
-! Copyright (C) 2006, 2007 Alex Chapman
+! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences arrays math math.vectors namespaces
-opengl opengl.gl ui.render ui.gadgets tetris.game tetris.board
-tetris.piece tetris.tetromino ;
+USING: accessors arrays combinators kernel math math.vectors
+namespaces opengl opengl.gl sequences tetris.board tetris.game
+tetris.piece ui.render tetris.tetromino ui.gadgets colors ;
 IN: tetris.gl
 
 #! OpenGL rendering for tetris
 
 : draw-block ( block -- )
-    dup { 1 1 } v+ gl-fill-rect ;
+    { 1 1 } gl-fill-rect ;
 
 : draw-piece-blocks ( piece -- )
     piece-blocks [ draw-block ] each ;
 
 : draw-piece ( piece -- )
-    dup tetromino-colour gl-color draw-piece-blocks ;
+    dup tetromino>> colour>> gl-color draw-piece-blocks ;
 
 : draw-next-piece ( piece -- )
-    dup tetromino-colour clone 0.2 3 pick set-nth gl-color draw-piece-blocks ;
+    dup tetromino>> colour>>
+    >rgba-components drop 0.2 <rgba> gl-color draw-piece-blocks ;
 
 ! TODO: move implementation specific stuff into tetris-board
 : (draw-row) ( x y row -- )
-    >r over r> nth dup
+    [ over ] dip nth dup
     [ gl-color 2array draw-block ] [ 3drop ] if ;
 
 : draw-row ( y row -- )
-    dup length -rot [ (draw-row) ] 2curry each ;
+    [ length iota swap ] keep [ (draw-row) ] 2curry each ;
 
 : draw-board ( board -- )
-    board-rows dup length swap
+    rows>> [ length iota ] keep
     [ dupd nth draw-row ] curry each ;
 
-: scale-tetris ( width height tetris -- )
-    [ board-width swap ] keep board-height / -rot / swap 1 glScalef ;
-
-: (draw-tetris) ( width height tetris -- )
-    #! width and height are in pixels
-    GL_MODELVIEW [
-        [ scale-tetris ] keep
-        dup tetris-board draw-board
-        dup tetris-next-piece draw-next-piece
-        tetris-current-piece draw-piece
-    ] do-matrix ;
+: scale-board ( width height board -- )
+    [ width>> ] [ height>> ] bi swapd [ / ] dup 2bi* 1 glScalef ;
 
 : draw-tetris ( width height tetris -- )
-    origin get [ (draw-tetris) ] with-translation ;
+    #! width and height are in pixels
+    [
+        {
+            [ board>> scale-board ]
+            [ board>> draw-board ]
+            [ next-piece draw-next-piece ]
+            [ current-piece draw-piece ]
+        } cleave
+    ] do-matrix ;

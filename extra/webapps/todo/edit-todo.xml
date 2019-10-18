@@ -1,0 +1,21 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Edit Item</t:title>
+
+	<t:form t:action="$todo-list/edit" t:for="id">
+		<table>
+			<tr><th class="field-label">Summary: </th><td><t:field t:name="summary" /></td></tr>
+			<tr><th class="field-label">Priority: </th><td><t:field t:name="priority" /></td></tr>
+			<tr><th class="field-label big-field-label">Description:</th><td><t:textarea t:name="description" t:rows="20" t:cols="60" /></td></tr>
+		</table>
+
+		<input type="SUBMIT" value="Done" />
+	</t:form>
+
+	<t:a t:href="$todo-list/view" t:query="id">View</t:a>
+	|
+	<t:button t:action="$todo-list/delete" t:for="id" class="link-button link">Delete</t:button>
+
+</t:chloe>

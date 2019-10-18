@@ -1,12 +1,13 @@
 USING: tools.deploy.config ;
-V{
+H{
     { deploy-ui? t }
-    { deploy-io 1 }
-    { deploy-reflection 1 }
-    { deploy-compiler? t }
-    { deploy-math? t }
+    { deploy-threads? t }
     { deploy-word-props? f }
-    { deploy-c-types? f }
+    { deploy-reflection 1 }
     { "stop-after-last-window?" t }
+    { deploy-io 2 }
+    { deploy-math? t }
+    { deploy-word-defs? f }
+    { deploy-c-types? f }
     { deploy-name "Tetris" }
 }

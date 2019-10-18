@@ -1,121 +1,181 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel system combinators alien alien.syntax ;
+USING: 
+    alien
+    alien.c-types 
+    alien.libraries
+    alien.syntax 
+    classes.struct
+    combinators 
+    kernel 
+    ogg
+    system
+;
 IN: ogg.theora
 
-: load-theora-library ( -- )
-    "theora" {
-        { [ win32? ]  [ "libtheora.dll" ] }
-        { [ macosx? ] [ "libtheora.0.dylib" ] }
-        { [ unix? ]   [ "libtheora.so" ] }
-    } cond "cdecl" add-library ; parsing
+<<
+"theoradec" {
+    { [ os winnt? ]  [ "theoradec.dll" ] }
+    { [ os macosx? ] [ "libtheoradec.0.dylib" ] }
+    { [ os unix? ]   [ "libtheoradec.so" ] }
+} cond "cdecl" add-library
 
-load-theora-library
+"theoraenc" {
+    { [ os winnt? ]  [ "theoraenc.dll" ] }
+    { [ os macosx? ] [ "libtheoraenc.0.dylib" ] }
+    { [ os unix? ]   [ "libtheoraenc.so" ] }
+} cond "cdecl" add-library
+>>
 
-LIBRARY: theora
+CONSTANT: TH-EFAULT      -1
+CONSTANT: TH-EINVAL     -10
+CONSTANT: TH-EBADHEADER -20
+CONSTANT: TH-ENOTFORMAT -21
+CONSTANT: TH-EVERSION   -22
+CONSTANT: TH-EIMPL      -23
+CONSTANT: TH-EBADPACKET -24
+CONSTANT: TH-DUPFRAME     1
 
-C-STRUCT: yuv_buffer
-    { "int" "y_width" }
-    { "int" "y_height" }
-    { "int" "y_stride" }
-    { "int" "uv_width" }
-    { "int" "uv_height" }
-    { "int" "uv_stride" }
-    { "void*" "y" }
-    { "void*" "u" }
-    { "void*" "v" } ;
+TYPEDEF: int th-colorspace 
+CONSTANT: TH-CS-UNSPECIFIED   0
+CONSTANT: TH-CS-ITU-REC-470M  1
+CONSTANT: TH-CS-ITU-REC-470BG 2
+CONSTANT: TH-CS-NSPACES       3
 
-: OC_CS_UNSPECIFIED ( -- number ) 0 ; inline
-: OC_CS_ITU_REC_470M ( -- number ) 1 ; inline
-: OC_CS_ITU_REC_470BG ( -- number ) 2 ; inline
-: OC_CS_NSPACES ( -- number ) 3 ; inline
+TYPEDEF: int th-pixelformat
+CONSTANT: TH-PF-RSVD     0
+CONSTANT: TH-PF-422      1
+CONSTANT: TH-PF-444      2
+CONSTANT: TH-PF-NFORMATS 3
 
-TYPEDEF: int theora_colorspace 
+STRUCT: th-img-plane
+    { width int }
+    { height int }
+    { stride int }
+    { data uchar* }
+;
 
-: OC_PF_420 ( -- number ) 0 ; inline
-: OC_PF_RSVD ( -- number ) 1 ; inline
-: OC_PF_422 ( -- number ) 2 ; inline
-: OC_PF_444 ( -- number ) 3 ; inline
+TYPEDEF: th-img-plane[3] th-ycbcr-buffer
 
-TYPEDEF: int theora_pixelformat
+STRUCT: th-info
+    { version-major uchar }
+    { version-minor uchar }
+    { version-subminor uchar }
+    { frame-width uint }
+    { frame-height uint }
+    { pic-width uint }
+    { pic-height uint }
+    { pic-x uint }
+    { pic-y uint }
+    { fps-numerator uint }
+    { fps-denominator uint }
+    { aspect-numerator uint }
+    { aspect-denominator uint }
+    { colorspace th-colorspace }
+    { pixel-fmt th-pixelformat }
+    { target-bitrate int }
+    { quality int }
+    { keyframe-granule-shift int }
+;
 
-C-STRUCT: theora_info
-    { "uint" "width" }
-    { "uint" "height" }
-    { "uint" "frame_width" }
-    { "uint" "frame_height" }
-    { "uint" "offset_x" }
-    { "uint" "offset_y" }
-    { "uint" "fps_numerator" }
-    { "uint" "fps_denominator" }
-    { "uint" "aspect_numerator" }
-    { "uint" "aspect_denominator" }
-    { "theora_colorspace" "colorspace" }
-    { "int" "target_bitrate" }
-    { "int" "quality" }
-    { "int" "quick_p" }
-    { "uchar" "version_major" }
-    { "uchar" "version_minor" } 
-    { "uchar" "version_subminor" }
-    { "void*" "codec_setup" }
-    { "int" "dropframes_p" }
-    { "int" "keyframe_auto_p" }
-    { "uint" "keyframe_frequency" }
-    { "uint" "keyframe_frequency_force" }
-    { "uint" "keyframe_data_target_bitrate" }
-    { "int" "keyframe_auto_threshold" }
-    { "uint" "keyframe_mindistance" }
-    { "int" "noise_sensitivity" }
-    { "int" "sharpness" }
-    { "theora_pixelformat" "pixelformat" } ;
+STRUCT: th-comment
+    { user-comments char** }
+    { comment-lengths int* }
+    { comments int }
+    { vendor char* }
+;
 
-C-STRUCT: theora_state
-    { "theora_info*" "i" }
-    { "longlong" "granulepos" }
-    { "void*" "internal_encode" }
-    { "void*" "internal_decode" } ;
+TYPEDEF: uchar[64] th-quant-base
 
-C-STRUCT: theora_comment
-    { "char**" "user_comments" }
-    { "int*" "comment_lengths" }
-    { "int" "comments" }
-    { "char*" "vendor" } ;
+STRUCT: th-quant-ranges
+    { nranges int }
+    { sizes int* }
+    { base-matrices th-quant-base* }
+;
 
-: OC_FAULT ( -- number ) -1 ; inline
-: OC_EINVAL ( -- number ) -10 ; inline
-: OC_DISABLED ( -- number ) -11 ; inline
-: OC_BADHEADER ( -- number ) -20 ; inline
-: OC_NOTFORMAT ( -- number ) -21 ; inline
-: OC_VERSION ( -- number ) -22 ; inline
-: OC_IMPL ( -- number ) -23 ; inline
-: OC_BADPACKET ( -- number ) -24 ; inline
-: OC_NEWPACKET ( -- number ) -25 ; inline
-: OC_DUPFRAME ( -- number ) 1 ; inline
+STRUCT: th-quant-info
+    { dc-scale { short 64 } }
+    { ac-scale { short 64 } }
+    { loop-filter-limits { uchar 64 } }
+    { qi-ranges { th-quant-ranges 2 3 } }
+;
 
-FUNCTION: char* theora_version_string ( ) ;
-FUNCTION: uint theora_version_number ( ) ;
-FUNCTION: int theora_encode_init ( theora_state* th, theora_info* ti ) ;
-FUNCTION: int theora_encode_YUVin ( theora_state* t, yuv_buffer* yuv ) ;
-FUNCTION: int theora_encode_packetout ( theora_state* t, int last_p, ogg_packet* op ) ;
-FUNCTION: int theora_encode_header ( theora_state* t, ogg_packet* op ) ;
-FUNCTION: int theora_encode_comment ( theora_comment* tc, ogg_packet* op ) ;
-FUNCTION: int theora_encode_tables ( theora_state* t, ogg_packet* op ) ;
-FUNCTION: int theora_decode_header ( theora_info* ci, theora_comment* cc, ogg_packet* op ) ;
-FUNCTION: int theora_decode_init ( theora_state* th, theora_info* c ) ;
-FUNCTION: int theora_decode_packetin ( theora_state* th, ogg_packet* op ) ;
-FUNCTION: int theora_decode_YUVout ( theora_state* th, yuv_buffer* yuv ) ;
-FUNCTION: int theora_packet_isheader ( ogg_packet* op ) ;
-FUNCTION: int theora_packet_iskeyframe ( ogg_packet* op ) ;
-FUNCTION: int theora_granule_shift ( theora_info* ti ) ;
-FUNCTION: longlong theora_granule_frame ( theora_state* th, longlong granulepos ) ;
-FUNCTION: double theora_granule_time ( theora_state* th, longlong granulepos ) ;
-FUNCTION: void theora_info_init ( theora_info* c ) ;
-FUNCTION: void theora_info_clear ( theora_info* c ) ;
-FUNCTION: void theora_clear ( theora_state* t ) ;
-FUNCTION: void theora_comment_init ( theora_comment* tc ) ;
-FUNCTION: void theora_comment_add ( theora_comment* tc, char* comment ) ;
-FUNCTION: void theora_comment_add_tag ( theora_comment* tc, char* tag, char* value ) ;
-FUNCTION: char* theora_comment_query ( theora_comment* tc, char* tag, int count ) ;
-FUNCTION: int   theora_comment_query_count ( theora_comment* tc, char* tag ) ;
-FUNCTION: void  theora_comment_clear ( theora_comment* tc ) ;
+CONSTANT: TH-NHUFFMANE-TABLES 80
+CONSTANT: TH-NDCT-TOKENS 32
+
+STRUCT: th-huff-code
+    { pattern int }
+    { nbits int }
+;
+
+LIBRARY: theoradec
+FUNCTION: char* th_version_string ( ) ;
+FUNCTION: uint th_version_number ( ) ;
+FUNCTION: longlong th_granule_frame ( void* encdec, longlong granpos) ;
+FUNCTION: int th_packet_isheader ( ogg-packet* op ) ;
+FUNCTION: int th_packet_iskeyframe ( ogg-packet* op ) ;
+FUNCTION: void th_info_init ( th-info* info ) ;
+FUNCTION: void th_info_clear ( th-info* info ) ;
+FUNCTION: void th_comment_init ( th-comment* tc ) ;
+FUNCTION: void th_comment_add ( th-comment* tc, char* comment ) ;
+FUNCTION: void th_comment_add_tag ( th-comment* tc, char* tag, char* value ) ;
+FUNCTION: char* th_comment_query ( th-comment* tc, char* tag, int count ) ;
+FUNCTION: int   th_comment_query_count ( th-comment* tc, char* tag ) ;
+FUNCTION: void  th_comment_clear ( th-comment* tc ) ;
+
+CONSTANT: TH-ENCCTL-SET-HUFFMAN-CODES 0
+CONSTANT: TH-ENCCTL-SET-QUANT-PARAMS 2
+CONSTANT: TH-ENCCTL-SET-KEYFRAME-FREQUENCY-FORCE 4
+CONSTANT: TH-ENCCTL-SET-VP3-COMPATIBLE 10
+CONSTANT: TH-ENCCTL-GET-SPLEVEL-MAX 12
+CONSTANT: TH-ENCCTL-SET-SPLEVEL 14
+CONSTANT: TH-ENCCTL-SET-DUP-COUNT 18
+CONSTANT: TH-ENCCTL-SET-RATE-FLAGS 20
+CONSTANT: TH-ENCCTL-SET-RATE-BUFFER 22
+CONSTANT: TH-ENCCTL-2PASS-OUT 24
+CONSTANT: TH-ENCCTL-2PASS-IN 26
+CONSTANT: TH-ENCCTL-SET-QUALITY 28
+CONSTANT: TH-ENCCTL-SET-BITRATE 30
+
+CONSTANT: TH-RATECTL-DROP-FRAMES 1
+CONSTANT: TH-RATECTL-CAP-OVERFLOW 2
+CONSTANT: TH-RATECTL-CAP-UNDERFOW 4
+
+TYPEDEF: void* th-enc-ctx
+
+LIBRARY: theoraenc
+FUNCTION: th-enc-ctx* th_encode_alloc ( th-info* info ) ;
+FUNCTION: int th_encode_ctl ( th-enc-ctx* enc, int req, void* buf, int buf_sz ) ;
+FUNCTION: int th_encode_flushheader ( th-enc-ctx* enc, th-comment* comments, ogg-packet* op ) ;
+FUNCTION: int th_encode_ycbcr_in ( th-enc-ctx* enc, th-ycbcr-buffer ycbcr ) ;
+FUNCTION: int th_encode_packetout ( th-enc-ctx* enc, int last, ogg-packet* op ) ;
+FUNCTION: void th_encode_free ( th-enc-ctx* enc ) ;
+
+CONSTANT: TH-DECCTL-GET-PPLEVEL-MAX 1
+CONSTANT: TH-DECCTL-SET-PPLEVEL 3
+CONSTANT: TH-DECCTL-SET-GRANPOS 5
+CONSTANT: TH-DECCTL-SET-STRIPE-CB 7
+CONSTANT: TH-DECCTL-SET-TELEMETRY-MBMODE 9
+CONSTANT: TH-DECCTL-SET-TELEMETRY-MV 11
+CONSTANT: TH-DECCTL-SET-TELEMETRY-QI 13
+CONSTANT: TH-DECCTL-SET-TELEMETRY-BITS 15
+
+TYPEDEF: void* th-stripe-decoded-func
+
+STRUCT: th-stripe-callback
+    { ctx void* }
+    { stripe-decoded th-stripe-decoded-func }
+;
+
+TYPEDEF: void* th-dec-ctx
+TYPEDEF: void* th-setup-info
+
+LIBRARY: theoradec
+FUNCTION: int th_decode_headerin ( th-info* info, th-comment* tc, th-setup-info** setup, ogg-packet* op ) ;
+FUNCTION: th-dec-ctx* th_decode_alloc ( th-info* info, th-setup-info* setup ) ;
+FUNCTION: void th_setup_free ( th-setup-info* setup ) ;
+FUNCTION: int th_decode_ctl ( th-dec-ctx* dec, int req, void* buf, int buf_sz ) ;
+FUNCTION: int th_decode_packetin ( th-dec-ctx* dec, ogg-packet* op, longlong granpos ) ;
+FUNCTION: int th_decode_ycbcr_out ( th-dec-ctx* dec, th-ycbcr-buffer ycbcr ) ;
+FUNCTION: void th_decode_free ( th-dec-ctx* dec ) ;

@@ -1,0 +1,77 @@
+Look at the source to this page by clicking *Edit* to compare the farkup language with resulting output.
+
+= level 1 heading =
+
+== level 2 heading ==
+
+=== level 3 heading ===
+
+==== level 4 heading ====
+
+Here is a paragraph of text, with _emphasized_ and *strong* text, together with an inline %code snippet%. Did you know that E=mc^2^, and L~2~ spaces are cool? Of course, if you want to include \_ special \* characters \^ you \~ can \% do that, too.
+
+You can make [[Wiki Links]] just like that, as well as links to external sites: [[http://sbcl.sourceforge.net]]. [[Factor|Custom link text]] can be used [[http://www.apple.com|with both types of links]].
+
+Images can be embedded in the text:
+
+[[image:http://factorcode.org/graphics/logo.png]]
+
+Unordered lists:
+
+- a list
+- with three
+- items
+
+Ordered lists:
+
+# a list
+# with three
+# numbered items
+
+Horizontal lines:
+
+___
+
+Tables:
+
+|a table|with|four|columns|
+|and|two|rows|...|
+
+Here is some code:
+
+[{HAI
+CAN HAS STDIO?
+VISIBLE "HAI WORLD!"
+KTHXBYE}]
+
+There is syntax highlighting for various languages, too:
+
+[factor{PEG: parse-request-line ( string -- triple )
+    #! Triple is { method url version }
+    [ 
+        'space' ,
+        'http-method' ,
+        'space' ,
+        'url' ,
+        'space' ,
+        'http-version' ,
+        'space' ,
+    ] seq* just ;}]
+
+Some Java:
+
+[java{/**
+ * Returns the extension of the specified filename, or an empty
+ * string if there is none.
+ * @param path The path
+ */
+public static String getFileExtension(String path)
+{
+    int fsIndex = getLastSeparatorIndex(path);
+    int index = path.lastIndexOf('.');
+    // there could be a dot in the path and no file extension
+    if(index == -1 || index < fsIndex )
+        return "";
+    else
+        return path.substring(index);
+}}]

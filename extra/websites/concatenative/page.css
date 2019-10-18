@@ -1,0 +1,78 @@
+body, button {
+	font:9pt "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
+	color:#444;
+}
+
+.link-button {
+	padding: 0px;
+	background: none;
+	border: none;
+}
+
+a, .link {
+	color: #222;
+	border-bottom:1px dotted #666;
+	text-decoration:none;
+}
+
+a:hover, .link:hover {
+	border-bottom:1px solid #66a;
+}
+
+.error { color: #a00; }
+
+.errors li { color: #a00; }
+
+.field-label {
+	text-align: right;
+}
+
+.inline {
+	display: inline;
+}
+
+.navbar {
+	background-color: #eeeee0;
+	padding: 5px;
+	border: 1px solid #ccc;
+}
+
+.big-field-label {
+	vertical-align: top;
+}
+
+.description {
+	padding: 5px;
+	color: #000;
+}
+
+.description pre {
+	border: 1px dashed #ccc;
+	background-color: #f5f5f5;
+}
+
+.description p:first-child {
+	margin-top: 0px;
+}
+
+.description p:last-child {
+	margin-bottom: 0px;
+}
+
+.description table, .description td {
+    border-color: #666;
+    border-style: solid;
+}
+
+.description table {
+    border-width: 0 0 1px 1px;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.description td {
+    margin: 0;
+    padding: 4px;
+    border-width: 1px 1px 0 0;
+}
+

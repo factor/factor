@@ -1,31 +1,37 @@
-USING: help.markup help.syntax io math ;
+USING: help.markup help.syntax io math byte-arrays ;
 IN: io.binary
 
 ARTICLE: "stream-binary" "Working with binary data"
-"The core stream words read and write strings. Packed binary integers can be read and written by converting to and from sequences of bytes. Floating point numbers can be read and written by converting them into a their bitwise integer representation (" { $link "floats" } ")."
+"Stream words on binary streams only read and write byte arrays. Packed binary integers can be read and written by converting to and from sequences of bytes. Floating point numbers can be read and written by converting them into a their bitwise integer representation (" { $link "floats" } ")."
 $nl
 "There are two ways to order the bytes making up an integer; " { $emphasis "little endian" } " byte order outputs the least significant byte first, and the most significant byte last, whereas " { $emphasis "big endian" } " is the other way around."
 $nl
-"Consider the hexadecimal integer "{ $snippet "HEX: cafebabe" } ". Big endian byte order yields the following sequence of bytes:"
+"Consider the hexadecimal integer "{ $snippet "HEX: cafebabe" } ". Little endian byte order yields the following sequence of bytes:"
 { $table
     { "Byte:" "1" "2" "3" "4" }
     { "Value:" { $snippet "be" } { $snippet "ba" } { $snippet "fe" } { $snippet "ca" } }
 }
-"Compare this with little endian byte order:"
+"Compare this with big endian byte order:"
 { $table
     { "Byte:" "1" "2" "3" "4" }
     { "Value:" { $snippet "ca" } { $snippet "fe" } { $snippet "ba" } { $snippet "be" } }
 }
 "Two words convert a sequence of bytes into an integer:"
-{ $subsection be> }
-{ $subsection le> }
+{ $subsections
+    be>
+    le>
+}
 "Two words convert an integer into a sequence of bytes:"
-{ $subsection >be }
-{ $subsection >le }
+{ $subsections
+    >be
+    >le
+}
 "Words for taking larger integers apart into smaller integers:"
-{ $subsection d>w/w }
-{ $subsection w>h/h }
-{ $subsection h>b/b } ;
+{ $subsections
+    d>w/w
+    w>h/h
+    h>b/b
+} ;
 
 ABOUT: "stream-binary"
 
@@ -42,11 +48,11 @@ HELP: nth-byte
 { $description "Outputs the " { $snippet "n" } "th least significant byte of the sign-extended 2's complement representation of " { $snippet "x" } "." } ;
 
 HELP: >le
-{ $values { "x" integer } { "n" "a non-negative integer" } { "str" "a string" } }
+{ $values { "x" integer } { "n" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Converts an integer " { $snippet "x" } " into a string of " { $snippet "n" } " bytes in little endian order. Truncation will occur if the integer is not in the range " { $snippet "[-2^(8n),2^(8n))" } "." } ;
 
 HELP: >be
-{ $values { "x" integer } { "n" "a non-negative integer" } { "str" "a string" } }
+{ $values { "x" integer } { "n" "a non-negative integer" } { "byte-array" byte-array } }
 { $description "Converts an integer " { $snippet "x" } " into a string of " { $snippet "n" } " bytes in big endian order. Truncation will occur if the integer is not in the range " { $snippet "[-2^(8n),2^(8n))" } "." } ;
 
 HELP: mask-byte

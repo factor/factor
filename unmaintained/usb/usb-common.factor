@@ -1,3 +1,0 @@
-IN: usb
-
-: +packed+ ; parsing
