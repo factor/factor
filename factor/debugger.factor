@@ -41,7 +41,7 @@
     ] ifte print ;
 
 : break ( exception -- )
-    $global [
+    global [
         dup @error
 
         ! Called when the interpreter catches an exception.

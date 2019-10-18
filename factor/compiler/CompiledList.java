@@ -37,7 +37,7 @@ import org.objectweb.asm.*;
 public class CompiledList extends FlowObject implements Constants
 {
 	private Cons quotation;
-	private RecursiveState recursiveCheck;
+	protected RecursiveState recursiveCheck;
 
 	CompiledList(Cons quotation, FactorCompiler compiler,
 		RecursiveState recursiveCheck)
@@ -70,7 +70,8 @@ public class CompiledList extends FlowObject implements Constants
 	{
 		// important: this.recursiveCheck due to
 		// lexically-scoped recursion issues
-		compiler.getStackEffect(quotation,this.recursiveCheck);
+		compiler.getStackEffect(quotation,new RecursiveState(
+			this.recursiveCheck));
 	}
 
 	/**
@@ -83,7 +84,8 @@ public class CompiledList extends FlowObject implements Constants
 	{
 		// important: this.recursiveCheck due to
 		// lexically-scoped recursion issues
-		return compiler.compile(quotation,mw,this.recursiveCheck);
+		return compiler.compile(quotation,mw,new RecursiveState(
+			this.recursiveCheck));
 	}
 
 	public boolean equals(Object o)
@@ -93,6 +95,8 @@ public class CompiledList extends FlowObject implements Constants
 			CompiledList c = (CompiledList)o;
 			return FactorLib.objectsEqual(c.quotation,quotation);
 		}
+		else if(o instanceof Null)
+			return quotation == null;
 		else
 			return false;
 	}

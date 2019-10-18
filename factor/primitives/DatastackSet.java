@@ -33,7 +33,7 @@ import factor.compiler.*;
 import factor.*;
 import java.util.Set;
 
-public class DatastackSet extends FactorWordDefinition
+public class DatastackSet extends FactorPrimitiveDefinition
 {
 	//{{{ DatastackSet constructor
 	public DatastackSet(FactorWord word)

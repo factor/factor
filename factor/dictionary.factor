@@ -29,58 +29,16 @@
     ! Prints all word names that contain the given substring.
     words [ 2dup str-contains [ . ] [ drop ] ifte ] each drop ;
 
-: asm ( word -- )
-    ! Prints JVM bytecode disassembly of the given word.
-    intern [ $asm ] bind dup [
-        print
-    ] [
-        drop "Not a compiled word." print
-    ] ifte ;
-
-: balance ( code -- effect )
-    ! Push stack effect of the given code quotation.
-    no-name effect ;
-
-: compile* ( word -- )
-    $interpreter swap
-    [ "factor.FactorInterpreter" ] "factor.FactorWord" "compile"
-    jinvoke ;
-
-: compile ( word -- )
-    dup worddef compiled? [
-        drop
-    ] [
-        intern compile*
-    ] ifte ;
-
-: compile-all ( -- )
-    "Compiling..." write
-    words [ compile ] each
-    " done" print ;
-
-: compiled? ( obj -- boolean )
+: compiled? ( worddef -- boolean )
     "factor.compiler.CompiledDefinition" is ;
 
-: compound? ( obj -- boolean )
+: compound? ( worddef -- boolean )
     "factor.FactorCompoundDefinition" is ;
 
 : <compound> ( word def -- worddef )
     [ "factor.FactorWord" "factor.Cons" ]
     "factor.FactorCompoundDefinition"
     jnew ;
-
-: effect ( word -- effect )
-    ! Push stack effect of the given word.
-    worddef [ ] "factor.FactorWordDefinition"
-    "getStackEffect" jinvoke ;
-
-: effect>list ( effect -- effect )
-    [
-        [ "factor.compiler.StackEffect" "inD" jvar$ ]
-        [ "factor.compiler.StackEffect" "outD" jvar$ ]
-        [ "factor.compiler.StackEffect" "inR" jvar$ ]
-        [ "factor.compiler.StackEffect" "outR" jvar$ ]
-    ] interleave unit cons cons cons ;
 
 : gensym ( -- word )
     [ ] "factor.FactorWord" "gensym" jinvoke-static ;
@@ -93,48 +51,55 @@
     dup $ dup [
         nip
     ] [
-        drop dup $ tuck s@
+        drop dup <word> tuck s@
     ] ifte ;
 
 : intern ( "word" -- word )
     ! Returns the top of the stack if it already been interned.
     dup word? [ $dict [ intern* ] bind ] unless ;
 
-: missing>f ( word -- word/f )
-    ! Is it the missing word placeholder? Then push f.
-    dup undefined? [ drop f ] when ;
-
 : no-name ( list -- word )
     ! Generates an uninternalized word and gives it a compound
     ! definition created from the given list.
     [ gensym dup dup ] dip <compound> define ;
 
-: shuffle? ( obj -- boolean )
-    "factor.FactorShuffleDefinition" is ;
+: primitive? ( worddef -- boolean )
+    "factor.FactorPrimitiveDefinition" is ;
 
-: undefined? ( obj -- boolean )
-    "factor.FactorMissingDefinition" is ;
+: shuffle? ( worddef -- boolean )
+    "factor.FactorShuffleDefinition" is ;
 
 : word? ( obj -- boolean )
     "factor.FactorWord" is ;
 
-: word ( -- word )
-    ! Pushes most recently defined word.
-    $global [ $last ] bind ;
+: word-of-worddef ( worddef -- word )
+    "factor.FactorWordDefinition" "word" jvar$ ;
 
 : worddef? (obj -- boolean)
     "factor.FactorWordDefinition" is ;
 
 : worddef ( word -- worddef )
-    dup worddef? [ intern [ $def ] bind missing>f ] unless ;
+    dup worddef? [ intern dup [ [ $def ] bind ] when ] unless ;
 
 : worddef>list ( worddef -- list )
-    worddef
-    [ ] "factor.FactorWordDefinition" "toList" jinvoke ;
+    worddef dup word-of-worddef swap interpreter swap
+    [ "factor.FactorInterpreter" ] "factor.FactorWordDefinition"
+    "toList" jinvoke cons ;
 
 : words ( -- list )
     ! Pushes a list of all defined words.
-    $dict [ uvalues ] bind
-    [
-        cdr dup [ drop ] unless
-    ] map ;
+    $dict [ values ] bind [ worddef ] subset ;
+
+: words. (--)
+    ! Print all defined words.
+    words [ . ] each ;
+
+: usages. ( word -- )
+    intern
+    words [
+        2dup = [
+            drop
+        ] [
+            2dup worddef>list tree-contains [ . ] [ drop ] ifte
+        ] ifte
+    ] each drop ;

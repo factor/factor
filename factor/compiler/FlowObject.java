@@ -34,7 +34,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import org.objectweb.asm.*;
 
-public abstract class FlowObject
+public abstract class FlowObject implements FactorExternalizable
 {
 	protected FactorCompiler compiler;
 	protected RecursiveForm word;
@@ -92,7 +92,7 @@ public abstract class FlowObject
 	{
 		try
 		{
-			return FactorParser.unparse(getLiteral());
+			return FactorReader.unparseObject(getLiteral());
 		}
 		catch(Exception e)
 		{

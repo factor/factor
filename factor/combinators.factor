@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,59 +25,22 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-: 2apply (x y [ code ] --)
-    ! First applies the code to x, then to y.
+: 2apply ( x y [ code ] -- )
+    #! First applies the code to x, then to y.
+    #!
+    #! If the quotation compiles, this combinator compiles.
     2dup 2>r
         nip call
     2r>
     call ;
 
-~<< binrecP
-    ! Put P on top of the data stack, save everything on callstack.
-    P T R1 R2 -- P r:P r:T r:R1 r:R2 >>~
-
-~<< binrecT
-    ! Put T on top of the data stack, discard all saved objects from
-    ! callstack.
-    r:P r:T r:R1 r:R2 -- T >>~
-
-~<< binrecR1
-    ! Put R1 on top of the data stack, retaining all saved objects on the
-    ! callstack.
-    r:P r:T r:R1 r:R2 -- R1 r:P r:T r:R1 r:R2 >>~
-
-~<< binrec-left
-    ! Left recursion setup; put second value on callstack, put P, T, R1, R2
-    ! on data stack (and leave them on the callstack too).
-    Value2 r:P r:T r:R1 r:R2 -- P T R1 R2 r:Value2 r:P r:T r:R1 r:R2 >>~
-
-~<< binrec-right
-    ! Right recursion setup; put second value back on datastack, put
-    ! P, T, R1, R2 on data stack. All quotations except for R2 are
-    ! discarded from the callstack, since they're not needed anymore.
-    r:Value2 r:P r:T r:R1 r:R2 -- Value2 P T R1 R2 r:R2 >>~
-
-: binrec ( [ P ] [ T ] [ R1 ] [ R2 ] -- ... )
-    ! Evaluate P. If it evaluates to t, evaluate T. Otherwise, evaluate R1,
-    ! which is expected to produce two values, recurse on each value, and
-    ! evaluate R2.
-    binrecP call [
-        binrecT call
-    ] [
-        binrecR1 call
-        ! R1 has now produced two values on top of the data stack.
-        ! Recurse twice.
-        binrec-left  binrec
-        binrec-right binrec
-        ! Now call R2.
-        r> call
-    ] ifte ;
-
-: compare (x y [if x < y] [if x = y] [if x > y] --)
+: compare ( x y [ if x < y ] [ if x = y ] [ if x > y ] -- )
     >=< call ;
 
 : cleave (x [ code1 ] [ code2 ] --)
-    ! Executes each quotation, with x on top of the stack.
+    #! Executes each quotation, with x on top of the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
     >r
         over >r
             call
@@ -86,15 +49,24 @@
     call ;
 
 : cond ( x list -- )
-    ! The list is of this form:
-    ! [ [ condition 1 ] [ code 1 ]
-    !   [ condition 2 ] [ code 2 ]
-    !   ... ]
-    ! Each condition is evaluated in turn. If it returns true,
-    ! the code is evaluated. If it returns false, the next
-    ! condition is checked. Before evaluating each condition,
-    ! the top of the stack is duplicated. After the last
-    ! condition is evaluated, the top of the stack is popped.
+    #! The list is of this form:
+    #!
+    #! [ [ condition 1 ] [ code 1 ]
+    #!   [ condition 2 ] [ code 2 ]
+    #!   ... ]
+    #!
+    #! Each condition is evaluated in turn. If it returns true,
+    #! the code is evaluated. If it returns false, the next
+    #! condition is checked.
+    #!
+    #! Before evaluating each condition, the top of the stack is
+    #! duplicated. After the last condition is evaluated, the
+    #! top of the stack is popped.
+    #!
+    #! So each condition and code block must have stack effect:
+    #! ( X -- )
+    #!
+    #! This combinator will not compile.
     dup [
         uncons [ over [ call ] dip ] dip rot [
             car call
@@ -105,26 +77,32 @@
         2drop
     ] ifte ;
 
-: dip (a [ b ] -- b a)
-    ! Calls b as if b was not even present on the stack -- b has no way of
-    ! knowing that a even exists.
+: dip ( a [ b ] -- b a )
+    #! Call b as if b was not present on the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
     swap
     >r
         call
     r> ;
 
 : 2dip (a b [ c ] -- c a b)
-    ! Calls c as if a and b were not even present on the stack -- c has no way
-    ! of knowing that a and b even exist.
+    #! Call c as if a and b were not present on the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
     -rot
     2>r
         call
     2r> ;
 
-: each ( [ list ] [ code ] -- )
-    ! Applies the code to each element of the list.
+: each ( [ list ] [ quotation ] -- )
+    #! Push each element of a proper list in turn, and apply a
+    #! quotation to each element.
+    #!
+    #! In order to compile, the quotation must consume one more
+    #! value than it produces.
     over [
-        [ uncons ] dip tuck [ call ] 2dip each
+        >r uncons r> tuck 2>r call 2r> each
     ] [
         2drop
     ] ifte ;
@@ -135,86 +113,95 @@
 ~<< }2each
     r:D1 r:D2 r:C -- D1 D2 C >>~
 
-: 2each ( [ list ] [ list ] [ code ] -- )
-    ! Push each pair of elements from the 2 lists in turn, then
-    ! execute the code.
+: 2each ( [ list ] [ list ] [ quotation ] -- )
+    #! Push each pair of elements from 2 proper lists in turn,
+    #! applying a quotation each time.
     over [
         [ [ uncons ] 2apply ] dip 2each{ call }2each 2each
     ] [
         drop drop drop
     ] ifte ;
 
-: expand (list -- list)
-    ! Evaluates the list on a new stack, and pushes the reversed stack onto the
-    ! original stack. For example, "[ 0 1 2 dup * + ] expand" will evaluate to
-    ! [ 0 5 ].
+: expand ( list -- list )
+    #! Evaluates a quotation on a new stack, and pushes the
+    #! reversed stack onto the original stack.
+    #!
+    #! This combinator will not compile.
     unit
     restack
         call
     unstack ;
 
 : forever ( code -- )
-    ! The code is evaluated forever. Typically, a continuation
-    ! is used to escape the infinite loop.
+    #! The code is evaluated in an infinite loop. Typically, a
+    #! continuation is used to escape the infinite loop.
+    #!
+    #! This combinator will not compile.
     dup dip forever ;
 
-: ifte (cond [if true] [if false] --)
-    ? call ;
+: inject ( list code -- list )
+    #! Applies the code to each item, returns a list that
+    #! contains the result of each application.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
+    f transp [
+        ( accum code elem -- accum code )
+        transp over >r >r call r> cons r>
+    ] each drop nreverse ;
 
-: interleave ( X list -- ... )
-    ! Evaluate each element of the list with X on top of the
-    ! stack.
+: interleave ( X list -- )
+    #! Evaluate each element of the list with X on top of the
+    #! stack. When done, X is popped off the stack.
+    #!
+    #! To avoid unexpected results, each element of the list
+    #! must have stack effect ( X -- ).
+    #!
+    #! This combinator will not compile.
     dup [
         over [ unswons dip ] dip swap interleave
     ] [
         2drop
     ] ifte ;
 
-: linrec ( [ P ] [ T ] [ R1 ] [ R2 ] -- )
-    ! Evaluate P, if it pushes t, evaluate T. Otherwise, evaluate R1, recurse,
-    ! and evaluate R2. This combinator is similar to the linrec combinator in
-    ! Joy, except in Joy, P does not affect the stack.
-    >r >r >r dup >r call [
-        rdrop r> call
-        rdrop rdrop
-    ] [
-        r> r> r> dup >r swap >r swap >r call
-        r> r> r> r> dup >r linrec
-        r> call
-    ] ifte ;
-
-: map ( [ items ] [ code ] -- [ mapping ])
-    ! Applies the code to each item, returns a list that
-    ! contains the result of each application.
+: map ( [ items ] [ code ] -- [ mapping ] )
+    #! Applies the code to each item, returns a list that
+    #! contains the result of each application.
+    #!
+    #! This combinator will not compile.
     2list restack each unstack ;
 
 : 2map ( [ list ] [ list ] [ code ] -- [ mapping ] )
-    ! Applies the code to each pair of items, returns a list
-    ! that contains the result of each application.
+    #! Applies the code to each pair of items, returns a list
+    #! that contains the result of each application.
+    #!
+    #! This combinator will not compile.
     3list restack 2each unstack ;
 
-: subset ( list code -- list )
-    [ dupd call [ drop ] unless ] cons 2list
-    restack
-        each
-    unstack ;
+: subset-add ( car pred accum -- accum )
+    >r over >r call r> r> rot [ cons ] [ nip ] ifte ;
 
-: treerec ( list quot -- )
-    ! Apply quot to each element of the list; if an element is a
-    ! list, first quot is called with the list itself, then a
-    ! recursive call to listrec is made.
+: subset-iter ( accum list pred -- accum )
     over [
-        [ uncons ] dip tuck [
-            over list? [
-                2dup [ treerec ] 2dip
-            ] when call
-        ] 2dip treerec
-    ] [
+        >r unswons r> 2swap pick 2>r subset-add 2r> subset-iter
+	] [
         2drop
     ] ifte ;
 
+: subset ( list pred -- list )
+    #! Applies a quotation to each element of a list; all
+    #! elements for which the quotation returned a value other
+    #! than f are collected in a new list.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
+    f -rot subset-iter nreverse ;
+
 : times (n [ code ] --)
-    ! Evaluates code n times.
+    #! Evaluate a quotation n times.
+    #!
+    #! In order to compile, the code must produce as many values
+    #! as it consumes.
     [
         over 0 >
     ] [
@@ -222,8 +209,11 @@
     ] while 2drop ;
 
 : times* (n [ code ] --)
-    ! Evaluates code n times, each time the index is pushed onto the stack.
-    ! The index ranges from 0 to n-1.
+    #! Evaluate a quotation n times, pushing the index at each
+    #! iteration. The index ranges from 0 to n-1.
+    #!
+    #! In order to compile, the code must consume one more value
+    #! than it produces.
     0 rot
     [
         2dup <
@@ -232,24 +222,45 @@
     ] while
     drop drop drop ;
 
-: unless (cond [if false] --)
+: unless ( cond [ if false ] -- )
+    #! Execute a quotation only when the condition is f. The
+    #! condition is popped off the stack.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
     f swap ? call ;
 
-: unless* ( cond false -- )
-    ! If cond is f, pop it off the stack and evaluate false.
-    ! Otherwise, leave it on the stack.
+    : unless* ( cond [ if false ] -- )
+    #! If cond is f, pop it off the stack and evaluate the
+    #! quotation. Otherwise, leave cond on the stack.
+    #!
+    #! In order to compile, the quotation must consume one less
+    #! value than it produces.
     over [ drop ] [ nip call ] ifte ;
 
-: when (cond [if true] --)
+: when ( cond [ if true ] -- )
+    #! Execute a quotation only when the condition is not f. The
+    #! condition is popped off the stack.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
     f ? call ;
 
 : when* (cond [ code ] --)
-    ! If the condition is true, it is left on the stack, and the code is
-    ! evaluated. Otherwise, the condition is popped off the stack.
+    #! If the condition is true, it is left on the stack, and
+    #! the quotation is evaluated. Otherwise, the condition is
+    #! popped off the stack.
+    #!
+    #! In order to compile, the quotation must consume one more
+    #! value than it produces.
     dupd [ drop ] ifte ;
 
-: while ( [ P ] [ R ] -- ... )
-    ! Evaluates P. If it leaves t on the stack, evaluate R, and recurse.
+: while ( [ P ] [ R ] -- )
+    #! Evaluate P. If it leaves t on the stack, evaluate R, and
+    #! recurse.
+    #!
+    #! In order to compile, the stack effect of P * ( X -- ) * R
+    #! must consume as many values as it produces.
     >r dup >r call [
         rover r> call r> r> while
     ] [

@@ -33,7 +33,7 @@ import factor.compiler.*;
 import factor.*;
 import org.objectweb.asm.*;
 
-public class Choice extends FactorWordDefinition
+public class Choice extends FactorPrimitiveDefinition
 {
 	//{{{ Choice constructor
 	public Choice(FactorWord word)

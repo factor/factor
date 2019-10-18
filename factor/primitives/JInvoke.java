@@ -35,7 +35,7 @@ import java.lang.reflect.*;
 import java.util.Map;
 import org.objectweb.asm.*;
 
-public class JInvoke extends FactorWordDefinition
+public class JInvoke extends FactorPrimitiveDefinition
 {
 	//{{{ JInvoke constructor
 	public JInvoke(FactorWord word)
@@ -119,7 +119,7 @@ public class JInvoke extends FactorWordDefinition
 			compiler.pop(mw);
 			FactorJava.generateFromConversion(mw,cls);
 
-			compiler.generateArgs(mw,args.length,args);
+			compiler.generateArgs(mw,args.length,0,args);
 
 			int opcode;
 			if(cls.isInterface())

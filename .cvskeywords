@@ -1,80 +1,110 @@
-./factor/compiler/CompiledList.java: * $Id: CompiledList.java,v 1.5 2004/03/07 22:51:00 slava Exp $
-./factor/compiler/StackEffect.java: * $Id: StackEffect.java,v 1.12 2004/03/05 21:09:10 slava Exp $
+./factor/compiler/CompiledList.java: * $Id: CompiledList.java,v 1.7 2004/04/12 20:57:12 slava Exp $
+./factor/compiler/StackEffect.java: * $Id: StackEffect.java,v 1.14 2004/04/12 20:57:12 slava Exp $
 ./factor/compiler/Literal.java: * $Id: Literal.java,v 1.1 2004/02/28 19:51:53 slava Exp $
 ./factor/compiler/FactorCompilerException.java: * $Id: FactorCompilerException.java,v 1.1 2004/01/27 19:55:40 slava Exp $
-./factor/compiler/CompiledDefinition.java:* $Id: CompiledDefinition.java,v 1.8 2004/03/07 22:51:00 slava Exp $
-./factor/compiler/Result.java: * $Id: Result.java,v 1.1 2004/02/28 19:51:53 slava Exp $
+./factor/compiler/CompiledDefinition.java:* $Id: CompiledDefinition.java,v 1.11 2004/04/19 02:13:52 slava Exp $
+./factor/compiler/Result.java: * $Id: Result.java,v 1.2 2004/04/11 20:37:03 slava Exp $
 ./factor/compiler/ConstantPoolString.java: * $Id: ConstantPoolString.java,v 1.1 2004/02/28 19:51:53 slava Exp $
-./factor/compiler/Null.java: * $Id: Null.java,v 1.2 2004/03/01 02:37:01 slava Exp $
-./factor/compiler/RecursiveState.java: * $Id: RecursiveState.java,v 1.5 2004/03/28 21:25:13 slava Exp $
-./factor/compiler/FactorCompiler.java: * $Id: FactorCompiler.java,v 1.11 2004/03/24 02:50:28 slava Exp $
-./factor/compiler/RecursiveForm.java: * $Id: RecursiveForm.java,v 1.5 2004/03/04 23:33:42 slava Exp $
-./factor/compiler/CompiledChoice.java: * $Id: CompiledChoice.java,v 1.7 2004/03/28 21:25:13 slava Exp $
-./factor/compiler/FlowObject.java: * $Id: FlowObject.java,v 1.3 2004/03/28 21:25:13 slava Exp $
-./factor/prettyprint.factor:! $Id: prettyprint.factor,v 1.3 2004/03/26 05:06:36 slava Exp $
-./factor/random.factor:! $Id: random.factor,v 1.6 2004/02/18 00:48:47 slava Exp $
+./factor/compiler/Null.java: * $Id: Null.java,v 1.3 2004/04/12 20:57:12 slava Exp $
+./factor/compiler/RecursiveState.java: * $Id: RecursiveState.java,v 1.7 2004/04/17 21:11:38 slava Exp $
+./factor/compiler/CompiledListResult.java: * $Id: CompiledListResult.java,v 1.1 2004/04/12 20:57:12 slava Exp $
+./factor/compiler/FactorCompiler.java: * $Id: FactorCompiler.java,v 1.20 2004/05/07 21:07:53 slava Exp $
+./factor/compiler/RecursiveForm.java: * $Id: RecursiveForm.java,v 1.8 2004/04/17 21:11:38 slava Exp $
+./factor/compiler/CompiledChoice.java: * $Id: CompiledChoice.java,v 1.11 2004/04/15 19:59:16 slava Exp $
+./factor/compiler/AuxiliaryQuotation.java: * $Id: AuxiliaryQuotation.java,v 1.2 2004/04/12 20:57:12 slava Exp $
+./factor/compiler/FlowObject.java: * $Id: FlowObject.java,v 1.4 2004/04/11 20:37:03 slava Exp $
+./factor/prettyprint.factor:! $Id: prettyprint.factor,v 1.8 2004/04/29 22:41:08 slava Exp $
+./factor/FactorPrimitiveDefinition.java: * $Id: FactorMissingDefinition.java,v 1.8 2004/03/05 21:09:10 slava Exp $
+./factor/random.factor:! $Id: random.factor,v 1.7 2004/04/22 01:50:10 slava Exp $
 ./factor/FactorExternalizable.java: * $Id: FactorExternalizable.java,v 1.1 2004/01/25 19:55:39 slava Exp $
-./factor/FactorJava.java: * $Id: FactorJava.java,v 1.18 2004/03/28 21:25:13 slava Exp $
-./factor/combinators.factor:! $Id: combinators.factor,v 1.12 2004/03/24 02:50:28 slava Exp $
-./factor/inspector.factor:! $Id: inspector.factor,v 1.3 2004/03/28 21:25:13 slava Exp $
+./factor/FactorJava.java: * $Id: FactorJava.java,v 1.19 2004/04/12 20:57:12 slava Exp $
+./factor/combinators.factor:! $Id: combinators.factor,v 1.17 2004/04/22 01:50:09 slava Exp $
+./factor/inspector.factor:! $Id: inspector.factor,v 1.7 2004/04/22 01:50:09 slava Exp $
 ./factor/FactorDataStack.java: * $Id: FactorDataStack.java,v 1.3 2004/02/15 22:24:19 slava Exp $
-./factor/continuations.factor:! $Id: continuations.factor,v 1.3 2004/03/11 05:49:37 slava Exp $
-./factor/network.factor:! $Id: network.factor,v 1.2 2004/02/10 05:43:37 slava Exp $
+./factor/continuations.factor:! $Id: continuations.factor,v 1.4 2004/04/12 20:57:12 slava Exp $
+./factor/network.factor:! $Id: network.factor,v 1.5 2004/04/19 02:13:52 slava Exp $
+./factor/FactorDocComment.java: * $Id: FactorDocComment.java,v 1.3 2004/04/15 23:00:29 slava Exp $
 ./factor/FactorLib.java: * $Id: FactorLib.java,v 1.4 2004/02/15 22:24:19 slava Exp $
 ./factor/FactorRuntimeException.java: * $Id: FactorRuntimeException.java,v 1.1 2004/01/25 19:55:39 slava Exp $
-./factor/FactorRatio.java: * $Id: FactorRatio.java,v 1.1 2004/01/25 19:55:39 slava Exp $
-./factor/FactorCallStack.java: * $Id: FactorCallStack.java,v 1.2 2004/02/15 22:24:19 slava Exp $
+./factor/ReadTable.java: * $Id: ReadTable.java,v 1.1 2004/03/30 20:51:40 slava Exp $
+./factor/FactorRatio.java: * $Id: FactorRatio.java,v 1.2 2004/04/23 02:08:59 slava Exp $
+./factor/FactorReader.java: * $Id: FactorReader.java,v 1.9 2004/05/09 21:33:34 slava Exp $
+./factor/FactorCallStack.java: * $Id: FactorCallStack.java,v 1.3 2004/04/14 20:35:51 slava Exp $
 ./factor/FactorStackException.java: * $Id: FactorStackException.java,v 1.1 2004/01/25 19:55:39 slava Exp $
 ./factor/FactorUndefinedWordException.java: * $Id: FactorUndefinedWordException.java,v 1.1 2004/01/25 19:55:39 slava Exp $
-./factor/lists.factor:! $Id: lists.factor,v 1.17 2004/03/24 02:50:28 slava Exp $
+./factor/lists.factor:! $Id: lists.factor,v 1.26 2004/05/09 07:13:20 slava Exp $
 ./factor/FactorCallFrame.java: * $Id: FactorCallFrame.java,v 1.3 2004/02/05 04:47:05 slava Exp $
-./factor/debugger.factor:! $Id: debugger.factor,v 1.6 2004/03/28 21:25:13 slava Exp $
-./factor/FactorNamespace.java: * $Id: FactorNamespace.java,v 1.7 2004/02/24 18:55:09 slava Exp $
+./factor/FactorParsingDefinition.java: * $Id: FactorWordDefinition.java,v 1.24 2004/03/28 21:25:13 slava Exp $
+./factor/debugger.factor:! $Id: debugger.factor,v 1.7 2004/03/30 20:51:40 slava Exp $
+./factor/presentation.factor:! $Id: presentation.factor,v 1.2 2004/04/14 00:29:33 slava Exp $
+./factor/FactorNamespace.java: * $Id: FactorNamespace.java,v 1.8 2004/03/30 20:51:40 slava Exp $
 ./factor/PublicCloneable.java: * $Id: PublicCloneable.java,v 1.1 2004/01/25 19:55:39 slava Exp $
 ./factor/examples.factor:! $Id: examples.factor,v 1.2 2004/02/26 05:35:20 slava Exp $
-./factor/Cons.java: * $Id: Cons.java,v 1.8 2004/03/28 21:25:13 slava Exp $
-./factor/FactorCompoundDefinition.java:* $Id: FactorCompoundDefinition.java,v 1.21 2004/03/26 05:06:36 slava Exp $
+./factor/Cons.java: * $Id: Cons.java,v 1.9 2004/04/11 20:37:03 slava Exp $
+./factor/FactorCompoundDefinition.java:* $Id: FactorCompoundDefinition.java,v 1.30 2004/04/29 22:41:08 slava Exp $
+./factor/stack.factor:! $Id: prettyprint.factor,v 1.6 2004/04/14 00:29:33 slava Exp $
 ./factor/FactorObject.java: * $Id: FactorObject.java,v 1.1 2004/01/25 19:55:39 slava Exp $
-./factor/FactorParser.java: * $Id: FactorParser.java,v 1.6 2004/03/28 21:25:13 slava Exp $
-./factor/FactorMath.java: * $Id: FactorMath.java,v 1.4 2004/03/13 05:39:00 slava Exp $
-./factor/parser.factor:! $Id: parser.factor,v 1.6 2004/03/28 21:25:13 slava Exp $
-./factor/FactorMissingDefinition.java: * $Id: FactorMissingDefinition.java,v 1.8 2004/03/05 21:09:10 slava Exp $
-./factor/stream.factor:! $Id: stream.factor,v 1.6 2004/03/28 21:25:13 slava Exp $
-./factor/strings.factor:! $Id: strings.factor,v 1.18 2004/03/28 18:59:28 slava Exp $
-./factor/FactorInterpreter.java: * $Id: FactorInterpreter.java,v 1.14 2004/03/28 21:25:13 slava Exp $
+./factor/parser/StringLiteral.java: * $Id: StringLiteral.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/Def.java: * $Id: Def.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/F.java: * $Id: F.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/Shu.java: * $Id: Shu.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/CharLiteral.java: * $Id: CharLiteral.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/LineComment.java: * $Id: LineComment.java,v 1.4 2004/04/12 20:57:12 slava Exp $
+./factor/parser/T.java: * $Id: T.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/StackComment.java: * $Id: StackComment.java,v 1.4 2004/04/12 20:57:12 slava Exp $
+./factor/parser/Comma.java: * $Id: Comma.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/Dispatch.java: * $Id: Dispatch.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/Fle.java: * $Id: Fle.java,v 1.4 2004/04/15 22:16:11 slava Exp $
+./factor/parser/Ket.java: * $Id: Ket.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/Ine.java: * $Id: Ine.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/parser/Unreadable.java: * $Id: Unreadable.java,v 1.1 2004/04/11 20:37:03 slava Exp $
+./factor/parser/Prefix.java: * $Id: Prefix.java,v 1.4 2004/04/29 22:41:08 slava Exp $
+./factor/parser/Bra.java: * $Id: Bra.java,v 1.2 2004/04/03 22:53:12 slava Exp $
+./factor/compiler.factor:! $Id: compiler.factor,v 1.6 2004/04/29 22:41:08 slava Exp $
+./factor/FactorMath.java: * $Id: FactorMath.java,v 1.6 2004/05/08 20:39:45 slava Exp $
+./factor/listener/EvalListener.java: * $Id: EvalListener.java,v 1.1 2004/04/14 00:29:33 slava Exp $
+./factor/listener/FactorListener.java: * $Id: FactorListener.java,v 1.2 2004/04/28 03:08:11 slava Exp $
+./factor/listener/listener.factor:! $Id: listener.factor,v 1.2 2004/04/28 03:08:11 slava Exp $
+./factor/listener/FactorDesktop.java: * $Id: FactorDesktop.java,v 1.2 2004/04/28 03:08:11 slava Exp $
+./factor/format.factor:! $Id: format.factor,v 1.2 2004/05/03 01:42:58 slava Exp $
+./factor/parser.factor:! $Id: parser.factor,v 1.10 2004/04/19 02:13:52 slava Exp $
+./factor/stream.factor:! $Id: stream.factor,v 1.12 2004/04/19 02:13:52 slava Exp $
+./factor/strings.factor:! $Id: strings.factor,v 1.26 2004/04/23 02:08:59 slava Exp $
+./factor/FactorInterpreter.java: * $Id: FactorInterpreter.java,v 1.25 2004/05/07 21:07:53 slava Exp $
 ./factor/FactorDomainException.java: * $Id: FactorDomainException.java,v 1.1 2004/01/25 19:55:39 slava Exp $
-./factor/FactorWord.java: * $Id: FactorWord.java,v 1.14 2004/03/26 05:06:36 slava Exp $
-./factor/math.factor:! $Id: math.factor,v 1.11 2004/03/20 03:33:52 slava Exp $
-./factor/FactorWordDefinition.java: * $Id: FactorWordDefinition.java,v 1.24 2004/03/28 21:25:13 slava Exp $
-./factor/primitives/CallstackSet.java: * $Id: CallstackSet.java,v 1.2 2004/02/15 22:24:19 slava Exp $
-./factor/primitives/JInvokeStatic.java: * $Id: JInvokeStatic.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/Unwind.java: * $Id: Unwind.java,v 1.2 2004/02/15 22:24:20 slava Exp $
-./factor/primitives/JVarGetStatic.java: * $Id: JVarGetStatic.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/Unstack.java: * $Id: Unstack.java,v 1.2 2004/02/15 22:24:20 slava Exp $
-./factor/primitives/JInvoke.java: * $Id: JInvoke.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/Get.java: * $Id: Get.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/Define.java: * $Id: Define.java,v 1.5 2004/03/26 05:06:36 slava Exp $
-./factor/primitives/Clear.java: * $Id: Clear.java,v 1.2 2004/02/15 22:24:20 slava Exp $
-./factor/primitives/Bind.java: * $Id: Bind.java,v 1.5 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/Choice.java: * $Id: Choice.java,v 1.6 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/Execute.java: * $Id: Execute.java,v 1.1 2004/02/24 03:23:00 slava Exp $
-./factor/primitives/JNew.java: * $Id: JNew.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/Call.java: * $Id: Call.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/CallstackGet.java: * $Id: CallstackGet.java,v 1.2 2004/02/15 22:24:19 slava Exp $
-./factor/primitives/DatastackGet.java: * $Id: DatastackGet.java,v 1.2 2004/02/15 22:24:20 slava Exp $
-./factor/primitives/JVarSet.java: * $Id: JVarSet.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/Set.java: * $Id: Set.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/Restack.java: * $Id: Restack.java,v 1.2 2004/02/15 22:24:20 slava Exp $
-./factor/primitives/DatastackSet.java: * $Id: DatastackSet.java,v 1.2 2004/02/15 22:24:20 slava Exp $
-./factor/primitives/JVarSetStatic.java: * $Id: JVarSetStatic.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/primitives/JVarGet.java: * $Id: JVarGet.java,v 1.4 2004/02/28 19:51:53 slava Exp $
-./factor/httpd.factor:! $Id: httpd.factor,v 1.4 2004/03/24 02:50:28 slava Exp $
-./factor/interpreter.factor:! $Id: interpreter.factor,v 1.18 2004/03/28 21:25:13 slava Exp $
-./factor/miscellaneous.factor:! $Id: miscellaneous.factor,v 1.9 2004/03/28 21:25:13 slava Exp $
-./factor/FactorArrayStack.java: * $Id: FactorArrayStack.java,v 1.4 2004/03/28 21:25:13 slava Exp $
-./factor/boot.factor:! $Id: boot.factor,v 1.16 2004/03/26 05:06:36 slava Exp $
-./factor/FactorParseException.java: * $Id: FactorParseException.java,v 1.1 2004/01/25 19:55:39 slava Exp $
-./factor/namespaces.factor:! $Id: namespaces.factor,v 1.7 2004/03/16 23:30:54 slava Exp $
+./factor/FactorWord.java: * $Id: FactorWord.java,v 1.22 2004/04/29 22:41:08 slava Exp $
+./factor/math.factor:! $Id: math.factor,v 1.18 2004/05/08 20:39:45 slava Exp $
+./factor/FactorWordDefinition.java: * $Id: FactorWordDefinition.java,v 1.34 2004/04/29 22:41:08 slava Exp $
+./factor/primitives/CallstackSet.java: * $Id: CallstackSet.java,v 1.3 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/JInvokeStatic.java: * $Id: JInvokeStatic.java,v 1.6 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/Unwind.java: * $Id: Unwind.java,v 1.3 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/JVarGetStatic.java: * $Id: JVarGetStatic.java,v 1.5 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/Unstack.java: * $Id: Unstack.java,v 1.3 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/JInvoke.java: * $Id: JInvoke.java,v 1.6 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/Define.java: * $Id: Define.java,v 1.7 2004/04/19 02:13:52 slava Exp $
+./factor/primitives/Clear.java: * $Id: Clear.java,v 1.3 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/Bind.java: * $Id: Bind.java,v 1.6 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/Choice.java: * $Id: Choice.java,v 1.7 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/InterpreterGet.java: * $Id: InterpreterGet.java,v 1.2 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/Execute.java: * $Id: Execute.java,v 1.2 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/JNew.java: * $Id: JNew.java,v 1.6 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/Call.java: * $Id: Call.java,v 1.5 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/CallstackGet.java: * $Id: CallstackGet.java,v 1.3 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/DatastackGet.java: * $Id: DatastackGet.java,v 1.3 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/JVarSet.java: * $Id: JVarSet.java,v 1.5 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/Restack.java: * $Id: Restack.java,v 1.3 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/DatastackSet.java: * $Id: DatastackSet.java,v 1.3 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/JVarSetStatic.java: * $Id: JVarSetStatic.java,v 1.5 2004/04/15 19:59:16 slava Exp $
+./factor/primitives/JVarGet.java: * $Id: JVarGet.java,v 1.5 2004/04/15 19:59:16 slava Exp $
+./factor/httpd.factor:! $Id: httpd.factor,v 1.7 2004/04/19 02:13:51 slava Exp $
+./factor/interpreter.factor:! $Id: interpreter.factor,v 1.24 2004/05/09 06:06:02 slava Exp $
+./factor/trace.factor:! $Id: trace.factor,v 1.3 2004/04/12 20:57:12 slava Exp $
+./factor/miscellaneous.factor:! $Id: miscellaneous.factor,v 1.12 2004/04/19 02:13:52 slava Exp $
+./factor/FactorScanner.java: * $Id: FactorScanner.java,v 1.5 2004/05/09 21:33:34 slava Exp $
+./factor/FactorArrayStack.java: * $Id: FactorArrayStack.java,v 1.5 2004/04/12 20:57:12 slava Exp $
+./factor/boot.factor:! $Id: boot.factor,v 1.30 2004/05/02 21:03:45 slava Exp $
+./factor/FactorParseException.java: * $Id: FactorParseException.java,v 1.2 2004/04/03 19:19:51 slava Exp $
+./factor/namespaces.factor:! $Id: namespaces.factor,v 1.14 2004/04/29 22:41:08 slava Exp $
 ./factor/FactorException.java: * $Id: FactorException.java,v 1.1 2004/01/25 19:55:39 slava Exp $
-./factor/FactorShuffleDefinition.java: * $Id: FactorShuffleDefinition.java,v 1.15 2004/03/05 21:09:10 slava Exp $
-./factor/dictionary.factor:! $Id: dictionary.factor,v 1.16 2004/03/28 18:59:28 slava Exp $
+./factor/FactorShuffleDefinition.java: * $Id: FactorShuffleDefinition.java,v 1.18 2004/04/29 22:41:08 slava Exp $
+./factor/dictionary.factor:! $Id: dictionary.factor,v 1.27 2004/04/29 22:41:08 slava Exp $

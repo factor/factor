@@ -25,90 +25,147 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-!!! The stack operators are defined using shuffle notation. This saves several
-!!! hundred lines of code!
+! Minimum amount of words needed to be able to read other
+! resources.
 
-~<< drop              A --             >>~
-~<< 2drop           A B --             >>~
-~<< dup               A -- A A         >>~
-~<< 2dup            A B -- A B A B     >>~
-~<< dupd            A B -- A A B       >>~
-~<< 2dupd       A B C D -- A B A B C D >>~
-~<< nip             A B -- B           >>~
-~<< 2nip        A B C D -- C D         >>~
-~<< nop                 --             >>~ ! Does nothing!
-~<< over            A B -- A B A       >>~
-~<< 2over       A B C D -- A B C D A B >>~
-~<< pick          A B C -- A B C A     >>~ ! Not the Forth pick!
-~<< rot           A B C -- B C A       >>~
-~<< 2rot    A B C D E F -- C D E F A B >>~
-~<< -rot          A B C -- C A B       >>~
-~<< 2-rot   A B C D E F -- E F A B C D >>~
-~<< swap            A B -- B A         >>~
-~<< 2swap       A B C D -- C D A B     >>~
-~<< swapd         A B C -- B A C       >>~
-~<< 2swapd  A B C D E F -- C D A B E F >>~
-~<< transp        A B C -- C B A       >>~    
-~<< 2transp A B C D E F -- E F C D A B >>~
-~<< tuck            A B -- B A B       >>~
-~<< 2tuck       A B C D -- C D A B C D >>~
+~<< dup A -- A A >>~
 
-~<< rdrop   r:A --                 >>~
-~<< rover   r:A r:B -- r:A r:B r:A >>~
-~<< >r        A -- r:A             >>~
-~<< 2>r     A B -- r:A r:B         >>~
-~<< r>      r:A -- A               >>~
-~<< 2r> r:A r:B -- A B             >>~
+: <breader> ( reader -- breader )
+    #! Wrap a Reader in a BufferedReader.
+    [ "java.io.Reader" ] "java.io.BufferedReader" jnew ;
 
-!!! Minimum amount of I/O words needed to be able to read other resources.
-!!! Remaining I/O operations are defined in io.factor and parser.factor.
-: <breader> (reader -- breader)
-    [ |java.io.Reader ] |java.io.BufferedReader jnew ;
+: <ireader> ( inputstream -- breader )
+    #! Wrap a InputStream in an InputStreamReader.
+    [ "java.io.InputStream" ] "java.io.InputStreamReader" jnew ;
 
-: <ireader> (inputstream -- breader)
-    [ |java.io.InputStream ] |java.io.InputStreamReader jnew ;
-
-: <rreader> (path -- inputstream)
-    |factor.FactorInterpreter
-    [ |java.lang.String ] |java.lang.Class |getResourceAsStream jinvoke
+: <rreader> ( path -- inputstream )
+    #! Create a Reader for reading the specified resource from
+    #! the classpath.
+    "factor.FactorInterpreter"
+    [ "java.lang.String" ]
+    "java.lang.Class" "getResourceAsStream" jinvoke
     <ireader> <breader> ;
 
-: parse* (filename reader -- list)
-    $interpreter
-    [ |java.lang.String |java.io.Reader |factor.FactorInterpreter ]
-    |factor.FactorParser jnew
-    [ ] |factor.FactorParser |parse jinvoke ;
+: parse* ( filename reader -- list )
+    #! Reads until end-of-file from the reader, building a parse
+    #! tree. The filename is used for error reporting.
+    interpreter
+    [
+        "java.lang.String"
+        "java.io.Reader"
+        "factor.FactorInterpreter"
+    ]
+    "factor.FactorReader" jnew
+    [ ] "factor.FactorReader" "parse" jinvoke ;
 
-: runResource (path --)
-    dup <rreader> parse* call ;
+: parse-resource ( resource -- list )
+    dup <rreader> parse* ;
+
+: run-resource ( path -- )
+    #! Reads and runs a source file from a resource path.
+    parse-resource call ;
+
+: ifte ( cond [ if true ] [ if false ] -- )
+    #! Two-way branching. The condition is a generalized
+    #! boolean; a value of f is taken to be false, any other
+    #! value is taken to be true. The condition is popped off
+    #! before either branch is taken.
+    #!
+    #! In order to compile, the two branches must have the same
+    #! stack effect difference.
+    ? call ;
+
+: callframe ( -- callframe )
+    ! Push the current callframe.
+    interpreter "factor.FactorInterpreter" "callframe" jvar$ ;
+
+: global ( -- namespace )
+    interpreter "factor.FactorInterpreter" "global" jvar$ ;
+
+: namespace ( -- namespace )
+    ! Push the current namespace.
+    callframe "factor.FactorCallFrame" "namespace" jvar$ ;
+
+: $ ( variable -- value )
+    #! Pushes the value of a variable in the current namespace.
+    namespace [ "java.lang.String" ] "factor.FactorNamespace"
+    "getVariable" jinvoke ;
+
+: word ( -- word )
+    ! Pushes most recently defined word.
+    global [ $last ] bind ;
+
+: inline ( -- )
+    #! Marks the most recently defined word to be inlined.
+    t word "factor.FactorWord" "inline" jvar@ ;
+
 !!!
 
-!!! Load the standard library.
-"/version.factor" runResource
+! Load the standard library.
 
-"/factor/combinators.factor"   runResource
-"/factor/continuations.factor" runResource
-"/factor/debugger.factor"      runResource
-"/factor/dictionary.factor"    runResource
-"/factor/examples.factor"      runResource
-"/factor/httpd.factor"         runResource
-"/factor/inspector.factor"     runResource
-"/factor/interpreter.factor"   runResource
-"/factor/lists.factor"         runResource
-"/factor/math.factor"          runResource
-"/factor/miscellaneous.factor" runResource
-"/factor/namespaces.factor"    runResource
-"/factor/network.factor"       runResource
-"/factor/parser.factor"        runResource
-"/factor/stream.factor"        runResource
-"/factor/prettyprint.factor"   runResource
-"/factor/random.factor"        runResource
-"/factor/strings.factor"       runResource
-"/factor/test/test.factor"     runResource
+$fasl [
+    "/factor/boot.fasl" run-resource
+    t @compile
+] [
+    "/factor/combinators.factor"       run-resource
+    "/factor/compiler.factor"          run-resource
+    "/factor/continuations.factor"     run-resource
+    "/factor/debugger.factor"          run-resource
+    "/factor/dictionary.factor"        run-resource
+    "/factor/examples.factor"          run-resource
+    "/factor/format.factor"            run-resource
+    "/factor/httpd.factor"             run-resource
+    "/factor/inspector.factor"         run-resource
+    "/factor/interpreter.factor"       run-resource
+    "/factor/irc.factor"               run-resource
+    "/factor/lists.factor"             run-resource
+    "/factor/math.factor"              run-resource
+    "/factor/miscellaneous.factor"     run-resource
+    "/factor/namespaces.factor"        run-resource
+    "/factor/network.factor"           run-resource
+    "/factor/parser.factor"            run-resource
+    "/factor/presentation.factor"      run-resource
+    "/factor/prettyprint.factor"       run-resource
+    "/factor/random.factor"            run-resource
+    "/factor/stack.factor"             run-resource
+    "/factor/stream.factor"            run-resource
+    "/factor/strings.factor"           run-resource
+    "/factor/trace.factor"             run-resource
+    "/factor/listener/listener.factor" run-resource
+    "/factor/test/test.factor"         run-resource
+
+    ! Inline some words defined before 'inline' was defined
+    #=callframe [ t @inline ] bind
+    #=global    [ t @inline ] bind
+    #=namespace [ t @inline ] bind
+    #=$         [ t @inline ] bind
+] ifte
+
+"/version.factor" run-resource
+
+! Initialize constants.
+
+"java.lang.System" "in"  jvar-static$ <ireader> <breader> @stdin
+"java.lang.System" "out" jvar-static$ <owriter> @stdout
+$stdin $stdout <char-stream> @stdio
+
+2.7182818284590452354 @e
+3.14159265358979323846 @pi
+
+1.0 0.0 / @inf
+-1.0 0.0 / @-inf
+
+"user.home" system-property @~
+"file.separator" system-property @/
 
 t @user-init
 
+! Parse command line arguments.
+
 : cli-param ( param -- )
+    #! Handle a command-line argument starting with '-' by
+    #! setting that variable to t, or if the argument is
+    #! prefixed with 'no-', setting the variable to f.
     dup "no-" str-head? dup [
         f s@ drop
     ] [
@@ -116,14 +173,20 @@ t @user-init
     ] ifte ;
 
 : cli-arg ( argument -- boolean )
+    #! Handle a command-line argument.
     "-" str-head? [ cli-param ] when* ;
 
 $args [ cli-arg ] each
 
-! Compile all words now
-$compile [
-    compile-all
+! Auto-dump if specified in command line
+$fasl not $auto-dump and [
+    t @compile
+    dump-boot-image
+    "Auto dump complete" print
+    f @interactive
 ] when
+
+! Run user init file if it exists
 
 $~ $/ ".factor-rc" cat3 @init-path
 
@@ -131,7 +194,8 @@ $user-init [
     $init-path dup exists? [ run-file ] [ drop ] ifte
 ] when
 
-! If we're run stand-alone, start the interpreter in the current tty.
+! If we're run stand-alone, start the interpreter in the current
+! terminal.
 $interactive [
     [ @top-level-continuation ] callcc0
 

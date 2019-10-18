@@ -35,7 +35,7 @@ import java.lang.reflect.*;
 import java.util.Map;
 import org.objectweb.asm.*;
 
-public class JVarSet extends FactorWordDefinition
+public class JVarSet extends FactorPrimitiveDefinition
 {
 	//{{{ JVarSet constructor
 	public JVarSet(FactorWord word)

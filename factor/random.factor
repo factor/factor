@@ -61,7 +61,7 @@
     ! Returns a random subset of the given list. Each item is
     ! chosen with a 50%
     ! probability.
-    [ random-boolean [ drop ] when ] map ;
+    [ drop random-boolean ] subset ;
 
 : car+ ( list -- sum )
     ! Adds the car of each element of the given list.

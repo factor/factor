@@ -26,44 +26,52 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 : 0= (x -- boolean)
-    0 = ;
+    0 = ; inline
 
-: 0>f ( obj -- oj )
+: 0>f ( obj -- obj )
     ! If 0 a the top of the stack, turn it into f.
     dup 0 = [ drop f ] when ;
 
 : 1= (x -- boolean)
-    1 = ;
+    1 = ; inline
+
+: 2^ ( x -- 2^x )
+    1 swap [ 2 * ] times ;
 
 : number? (obj -- boolean)
-    "java.lang.Number" is ;
+    "java.lang.Number" is ; inline
 
 : fixnum? (obj -- boolean)
-    "java.lang.Integer" is ;
+    "java.lang.Integer" is ; inline
 
 : >fixnum (num -- fixnum)
-    [ ] "java.lang.Number" "intValue" jinvoke ;
+    [ ] "java.lang.Number" "intValue" jinvoke ; inline
 
 : bignum? (obj -- boolean)
-    "java.math.BigInteger" is ;
+    "java.math.BigInteger" is ; inline
 
 : >bignum (num -- bignum)
     [ ] "java.lang.Number" "longValue" jinvoke
-    [ "long" ] "java.math.BigInteger" "valueOf" jinvoke-static ;
+    [ "long" ] "java.math.BigInteger" "valueOf" jinvoke-static
+    ; inline
+
+: integer? ( obj -- ? )
+    dup fixnum? swap bignum? or ; inline
 
 : realnum? (obj -- boolean)
     dup  "java.lang.Float"  is
-    swap "java.lang.Double" is or ;
+    swap "java.lang.Double" is or ; inline
 
 : >realnum (num -- realnum)
-    [ ] "java.lang.Number" "doubleValue" jinvoke ;
+    [ ] "java.lang.Number" "doubleValue" jinvoke ; inline
 
 : ratio? (obj -- boolean)
-    "factor.FactorRatio" is ;
+    "factor.FactorRatio" is ; inline
 
 : + (a b -- a+b)
-    [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "add"
-    jinvoke-static ;
+    [ "java.lang.Number" "java.lang.Number" ]
+    "factor.FactorMath" "add"
+    jinvoke-static ; inline
 
 : v+ ( A B -- A+B )
     [ + ] 2map ;
@@ -72,19 +80,20 @@
     dup [ $ + ] dip @ ;
 
 : - (a b -- a-b)
-    [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "subtract"
-    jinvoke-static ;
+    [ "java.lang.Number" "java.lang.Number" ]
+    "factor.FactorMath" "subtract"
+    jinvoke-static ; inline
 
 : v- ( A B -- A-B )
     [ - ] 2map ;
-
 
 : -@ (num var --)
     dup [ $ swap - ] dip @ ;
 
 : * (a b -- a*b)
-    [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "multiply"
-    jinvoke-static ;
+    [ "java.lang.Number" "java.lang.Number" ]
+    "factor.FactorMath" "multiply"
+    jinvoke-static ; inline
 
 : v* ( A B -- A*B )
     [ * ] 2map ;
@@ -97,8 +106,9 @@
     dup [ $ * ] dip @ ;
 
 : / (a b -- a/b)
-    [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "divide"
-    jinvoke-static ;
+    [ "java.lang.Number" "java.lang.Number" ]
+    "factor.FactorMath" "divide"
+    jinvoke-static ; inline
 
 : v/ ( A B -- A/B )
     [ / ] 2map ;
@@ -107,27 +117,49 @@
     dup [ $ / ] dip @ ;
 
 : > (a b -- boolean)
-    [ "float" "float" ] "factor.FactorMath" "greater" jinvoke-static ;
+    [ "float" "float" ] "factor.FactorMath" "greater"
+    jinvoke-static ; inline
 
 : >= (a b -- boolean)
-    [ "float" "float" ] "factor.FactorMath" "greaterEqual" jinvoke-static ;
+    [ "float" "float" ] "factor.FactorMath" "greaterEqual"
+    jinvoke-static ; inline
 
 : < (a b -- boolean)
-    [ "float" "float" ] "factor.FactorMath" "less" jinvoke-static ;
+    [ "float" "float" ] "factor.FactorMath" "less"
+    jinvoke-static ; inline
 
 : <= (a b -- boolean)
-    [ "float" "float" ] "factor.FactorMath" "lessEqual" jinvoke-static ;
+    [ "float" "float" ] "factor.FactorMath" "lessEqual"
+    jinvoke-static ; inline
 
 : and (a b -- a&b)
-    f ? ;
+    f ? ; inline
+
+: break-if-not-integer ( x -- )
+    integer? [
+        "Not a rational: " swap cat2 error
+    ] unless ;
+
+: denominator ( x/y -- x )
+    dup ratio? [
+        "factor.FactorRatio" "denominator" jvar$
+    ] [
+        break-if-not-integer 1
+    ] ifte ;
 
 : gcd ( a b -- c )
     [ "java.lang.Number" "java.lang.Number" ]
     "factor.FactorMath" "gcd" jinvoke-static ;
 
-: mag2 (x y -- mag)
-    ! Returns the magnitude of the vector (x,y).
-    sq swap sq + sqrt ;
+: logand ( x y -- x&y )
+    #! Bitwise and.
+    [ "java.lang.Number" "java.lang.Number" ]
+    "factor.FactorMath" "and"
+    jinvoke-static ; inline
+
+: mag2 ( x y -- mag )
+    #! Returns the magnitude of the vector (x,y).
+    [ sq ] 2apply + sqrt ;
 
 : max ( x y -- z )
     2dup > -rot ? ;
@@ -136,48 +168,57 @@
     2dup < -rot ? ;
 
 : neg (x -- -x)
-    0 swap - ;
+    [ "java.lang.Number" ] "factor.FactorMath" "neg"
+    jinvoke-static ; inline
 
 : neg@ (var --)
     dup $ 0 swap - s@ ;
 
 : not (a -- a)
     ! Pushes f is the object is not f, t if the object is f.
-    f t ? ;
+    f t ? ; inline
 
 : not@ (boolean -- boolean)
     dup $ not s@ ;
 
+: numerator ( x/y -- x )
+    dup ratio? [
+        "factor.FactorRatio" "numerator" jvar$
+    ] [
+        dup break-if-not-integer
+    ] ifte ;
+
 : pow ( x y -- x^y )
-    [ "double" "double" ] "java.lang.Math" "pow" jinvoke-static ;
+    [ "double" "double" ] "java.lang.Math" "pow" jinvoke-static
+    ; inline
 
 : pred (n -- n-1)
-    1 - ;
+    1 - ; inline
 
 : succ (n -- nsucc)
-    1 + ;
+    1 + ; inline
 
 : pred@ (var --)
     dup $ pred s@ ;
 
 : or (a b -- a|b)
-    t swap ? ;
+    t swap ? ; inline
 
 : recip (x -- 1/x)
     1 swap / ;
 
 : rem ( x y -- remainder )
     [ "double" "double" ] "java.lang.Math" "IEEEremainder"
-    jinvoke-static ;
+    jinvoke-static ; inline
 
 : round ( x to -- y )
     dupd rem - ;
 
 : sq (x -- x^2)
-    dup * ;
+    dup * ; inline
 
 : sqrt (x -- sqrt x)
-    [ "double" ] "java.lang.Math" "sqrt" jinvoke-static ;
+    [ "double" ] "java.lang.Math" "sqrt" jinvoke-static ; inline
 
 : succ@ (var --)
     dup $ succ s@ ;
@@ -190,7 +231,11 @@
 
 : fib (n -- nth fibonacci number)
     ! This is the naive implementation, for benchmarking purposes.
-    [ dup 1 <= ] [ ] [ pred dup pred ] [ + ] binrec ;
+    dup 1 <= [
+        drop 1
+    ] [
+        pred dup fib swap pred fib +
+    ] ifte ;
 
 : fac (n -- n!)
     ! This is the naive implementation, for benchmarking purposes.
@@ -198,9 +243,3 @@
 
 : harmonic (n -- 1 + 1/2 + 1/3 + ... + 1/n)
     0 swap [ succ recip + ] times* ;
-
-2.7182818284590452354 @e
-3.14159265358979323846 @pi
-
-1.0 0.0 / @inf
--1.0 0.0 / @-inf

@@ -38,7 +38,7 @@ import org.objectweb.asm.*;
  */
 public abstract class FactorWordDefinition implements Constants
 {
-	protected FactorWord word;
+	public final FactorWord word;
 
 	public boolean compileFailed;
 
@@ -51,7 +51,7 @@ public abstract class FactorWordDefinition implements Constants
 		throws Exception;
 
 	//{{{ toList() method
-	public Cons toList()
+	public Cons toList(FactorInterpreter interp)
 	{
 		return new Cons(new FactorWord(getClass().getName()),null);
 	} //}}}
@@ -67,7 +67,7 @@ public abstract class FactorWordDefinition implements Constants
 		throws Exception
 	{
 		FactorCompiler compiler = new FactorCompiler();
-		recursiveCheck.add(word,new StackEffect());
+		recursiveCheck.add(word,new StackEffect(),null,null);
 		getStackEffect(recursiveCheck,compiler);
 		recursiveCheck.remove(word);
 		return compiler.getStackEffect();
@@ -95,80 +95,64 @@ public abstract class FactorWordDefinition implements Constants
 		RecursiveState recursiveCheck) throws Exception
 	{
 		// normal word
-		mw.visitVarInsn(ALOAD,0);
-
 		String defclass;
+		String defmethod;
 		StackEffect effect;
 
 		RecursiveForm rec = recursiveCheck.get(word);
-		if(rec != null && rec.active && compiler.word == word)
+		if(rec != null && rec.active)
 		{
-			// recursive call!
-			defclass = compiler.className;
-			effect = compiler.word.def.getStackEffect();
+			effect = StackEffect.decompose(rec.effect,rec.baseCase);
+
+			// are we recursing back on a form inside the current
+			// method?
+			RecursiveForm last = recursiveCheck.last();
+			if(rec.tail
+				&& last.className.equals(rec.className)
+				&& last.method.equals(rec.method))
+			{
+				// GOTO instad of INVOKEVIRTUAL; ie a loop!
+				int max = compiler.normalizeStacks(mw);
+				mw.visitJumpInsn(GOTO,rec.label);
+				compiler.apply(effect);
+				return max;
+			}
+
+			/* recursive method call! */
+			defclass = rec.className;
+			defmethod = rec.method;
 		}
+		// not a recursive call but we're still not compiled
+		// its a bug in the compiler.
 		else if(this instanceof FactorCompoundDefinition)
 		{
 			throw new FactorCompilerException("You are an idiot!");
 		}
+		// inlining?
+		else if(word.inline)
+		{
+			return compileImmediate(mw,compiler,recursiveCheck);
+		}
+		/* ordinary method call! */
 		else
 		{
 			defclass = getClass().getName()
 				.replace('.','/');
+			defmethod = "core";
 			effect = getStackEffect();
 		}
 
-		compiler.generateArgs(mw,effect.inD,null);
+		mw.visitVarInsn(ALOAD,0);
+
+		compiler.generateArgs(mw,effect.inD,effect.inR,null);
 
 		String signature = effect.getCorePrototype();
 
-		mw.visitMethodInsn(INVOKESTATIC,defclass,"core",signature);
+		mw.visitMethodInsn(INVOKESTATIC,defclass,defmethod,signature);
 
-		if(effect.outD == 0)
-		{
-			// do nothing
-		}
-		else if(effect.outD == 1)
-		{
-			compiler.push(mw);
-		}
-		else
-		{
-			// transfer from data stack to JVM locals
-			FactorDataStack datastack = compiler.datastack;
+		compiler.generateReturn(mw,effect.outD,effect.outR);
 
-			// allocate the appropriate number of locals
-			compiler.produce(compiler.datastack,effect.outD);
-
-			// store the datastack instance somewhere
-			mw.visitVarInsn(ALOAD,0);
-			mw.visitFieldInsn(GETFIELD,
-				"factor/FactorInterpreter",
-				"datastack",
-				"Lfactor/FactorDataStack;");
-			int datastackLocal = compiler.allocate();
-			mw.visitVarInsn(ASTORE,datastackLocal);
-
-			// put all elements from the real datastack
-			// into locals
-			for(int i = 0; i < effect.outD; i++)
-			{
-				mw.visitVarInsn(ALOAD,datastackLocal);
-				mw.visitMethodInsn(INVOKEVIRTUAL,
-					"factor/FactorDataStack",
-					"pop",
-					"()Ljava/lang/Object;");
-
-				Result destination = (Result)
-					datastack.stack[
-					datastack.top - i - 1];
-
-				mw.visitVarInsn(ASTORE,destination.getLocal());
-			}
-
-		}
-
-		return effect.inD + 1;
+		return effect.inD + effect.inR + 1;
 	} //}}}
 
 	//{{{ compileImmediate() method
@@ -178,7 +162,96 @@ public abstract class FactorWordDefinition implements Constants
 	public int compileImmediate(CodeVisitor mw, FactorCompiler compiler,
 		RecursiveState recursiveCheck) throws Exception
 	{
-		throw new FactorCompilerException("Cannot compile " + word + " in immediate mode");
+		Cons definition = toList(compiler.getInterpreter());
+
+		if(definition == null)
+			return 0;
+
+		Cons endOfDocs = definition;
+		while(endOfDocs != null
+			&& endOfDocs.car instanceof FactorDocComment)
+			endOfDocs = endOfDocs.next();
+
+		// determine stack effect of this instantiation, and if its
+		// recursive.
+
+		FactorDataStack savedDatastack = (FactorDataStack)
+			compiler.datastack.clone();
+		FactorCallStack savedCallstack = (FactorCallStack)
+			compiler.callstack.clone();
+		StackEffect savedEffect = compiler.getStackEffect();
+
+		RecursiveState _recursiveCheck = (RecursiveState)
+			recursiveCheck.clone();
+		_recursiveCheck.last().effect = compiler.getStackEffect();
+		getStackEffect(_recursiveCheck,compiler);
+
+		boolean recursive = (_recursiveCheck.last().baseCase != null);
+
+		StackEffect effect = compiler.getStackEffect();
+
+		StackEffect immediateEffect = StackEffect.decompose(
+			savedEffect,compiler.getStackEffect());
+
+		// restore previous state.
+
+		FactorDataStack afterDatastack = (FactorDataStack)
+			compiler.datastack.clone();
+		FactorCallStack afterCallstack = (FactorCallStack)
+			compiler.callstack.clone();
+
+		compiler.datastack = (FactorDataStack)savedDatastack.clone();
+		compiler.callstack = (FactorCallStack)savedCallstack.clone();
+		compiler.effect = savedEffect;
+
+		if(!recursive)
+		{
+			// not recursive; inline.
+			mw.visitLabel(recursiveCheck.last().label);
+			return compiler.compile(endOfDocs,mw,recursiveCheck);
+		}
+		else
+		{
+			// recursive; must generate auxiliary method.
+			String method = compiler.auxiliary(word.name,
+				endOfDocs,immediateEffect,recursiveCheck);
+
+			mw.visitVarInsn(ALOAD,0);
+
+			compiler.generateArgs(mw,immediateEffect.inD,
+				immediateEffect.inR,null);
+
+			String signature = immediateEffect.getCorePrototype();
+
+			mw.visitMethodInsn(INVOKESTATIC,compiler.className,
+				method,signature);
+
+			compiler.generateReturn(mw,
+				immediateEffect.outD,
+				immediateEffect.outR);
+
+			mergeStacks(savedDatastack,afterDatastack,compiler.datastack);
+			mergeStacks(savedCallstack,afterCallstack,compiler.callstack);
+
+			return immediateEffect.inD + immediateEffect.inR + 1;
+		}
+	} //}}}
+
+	//{{{ mergeStacks() method
+	private void mergeStacks(FactorArrayStack s1, FactorArrayStack s2,
+		FactorArrayStack into)
+	{
+		for(int i = 0; i < s2.top; i++)
+		{
+			if(s1.top <= i)
+				break;
+
+			if(FactorLib.objectsEqual(s1.stack[i],
+				s2.stack[i]))
+			{
+				into.stack[i] = s1.stack[i];
+			}
+		}
 	} //}}}
 
 	//{{{ toString() method

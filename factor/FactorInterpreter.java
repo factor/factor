@@ -29,10 +29,11 @@
 
 package factor;
 
+import factor.parser.*;
 import factor.primitives.*;
 import java.io.*;
 
-public class FactorInterpreter
+public class FactorInterpreter implements FactorObject
 {
 	// command line arguments are stored here.
 	public Cons args;
@@ -41,8 +42,10 @@ public class FactorInterpreter
 	public boolean interactive = true;
 	public boolean trace = false;
 	public boolean errorFlag = false;
-	public boolean compile = true;
+	public Throwable error;
 	public boolean dump = false;
+	public boolean verboseCompile = true;
+	public boolean fasl = true;
 
 	public FactorCallFrame callframe;
 	public FactorCallStack callstack = new FactorCallStack();
@@ -50,18 +53,23 @@ public class FactorInterpreter
 	public FactorNamespace dict;
 	public FactorWord last;
 	public FactorNamespace global;
+	private FactorNamespace interpNamespace;
+	private Cons compiledExceptions;
 
 	//{{{ main() method
 	public static void main(String[] args) throws Exception
 	{
 		FactorInterpreter interp = new FactorInterpreter();
 		interp.init(args,null);
-		System.exit(0);
 	} //}}}
 
 	//{{{ init() method
 	public void init(String[] args, Object root) throws Exception
 	{
+		// this must be set before boot.factor is finished loading.
+		if(args.length > 0 && args[0].equals("-no-fasl"))
+			fasl = false;
+
 		this.args = Cons.fromArray(args);
 
 		callstack.top = 0;
@@ -75,25 +83,69 @@ public class FactorInterpreter
 	//{{{ initDictionary() method
 	private void initDictionary() throws Exception
 	{
-		dict = new FactorNamespace(null,null);
+		dict = FactorNamespace.createConstrainedNamespace(
+			FactorWord.class);
+
+		// parsing words
+		FactorWord lineComment = intern("!");
+		lineComment.parsing = new LineComment(lineComment,false);
+		FactorWord stackComment = intern("(");
+		stackComment.parsing = new StackComment(stackComment);
+		FactorWord str = intern("\"");
+		str.parsing = new StringLiteral(str);
+		FactorWord t = intern("t");
+		t.parsing = new T(t);
+		FactorWord f = intern("f");
+		f.parsing = new F(f);
+		FactorWord bra = intern("[");
+		bra.parsing = new Bra(bra);
+		FactorWord ket = intern("]");
+		ket.parsing = new Ket(bra,ket);
+		FactorWord comma = intern(",");
+		comma.parsing = new Comma(comma);
+		FactorWord def = intern(":");
+		def.parsing = new Def(def);
+		def.getNamespace(this).setVariable("doc-comments",Boolean.TRUE);
+		FactorWord ine = intern(";");
+		ine.parsing = new Ine(def,ine);
+		FactorWord shu = intern("~<<");
+		shu.getNamespace(this).setVariable("doc-comments",Boolean.TRUE);
+		shu.parsing = new Shu(shu);
+		FactorWord fle = intern(">>~");
+		fle.parsing = new Fle(shu,fle);
+		FactorWord get = intern("$");
+		get.parsing = new Prefix(get,get);
+		FactorWord set = intern("@");
+		set.parsing = new Prefix(set,set);
+
+		// #X
+		FactorWord dispatch = intern("#");
+		dispatch.parsing = new Dispatch(dispatch);
+		FactorWord chr = intern("#\\");
+		chr.parsing = new CharLiteral(chr);
+		FactorWord intern = intern("#=");
+		intern.parsing = new Prefix(intern,intern("intern"));
+		FactorWord docComment = intern("#!");
+		docComment.parsing = new LineComment(docComment,true);
+		FactorWord unreadable = intern("#<");
+		unreadable.parsing = new Unreadable(unreadable);
+
+		FactorWord interpreterGet = intern("interpreter");
+		interpreterGet.def = new InterpreterGet(interpreterGet);
 
 		// data stack primitives
 		FactorWord datastackGet = intern("datastack$");
-		datastackGet.def = new DatastackGet(
-			datastackGet);
+		datastackGet.def = new DatastackGet(datastackGet);
 		FactorWord datastackSet = intern("datastack@");
-		datastackSet.def = new DatastackSet(
-			datastackSet);
+		datastackSet.def = new DatastackSet(datastackSet);
 		FactorWord clear = intern("clear");
 		clear.def = new Clear(clear);
 
 		// call stack primitives
 		FactorWord callstackGet = intern("callstack$");
-		callstackGet.def = new CallstackGet(
-			callstackGet);
+		callstackGet.def = new CallstackGet(callstackGet);
 		FactorWord callstackSet = intern("callstack@");
-		callstackSet.def = new CallstackSet(
-			callstackSet);
+		callstackSet.def = new CallstackSet(callstackSet);
 		FactorWord restack = intern("restack");
 		restack.def = new Restack(restack);
 		FactorWord unstack = intern("unstack");
@@ -105,26 +157,17 @@ public class FactorInterpreter
 		FactorWord jinvoke = intern("jinvoke");
 		jinvoke.def = new JInvoke(jinvoke);
 		FactorWord jinvokeStatic = intern("jinvoke-static");
-		jinvokeStatic.def = new JInvokeStatic(
-			jinvokeStatic);
+		jinvokeStatic.def = new JInvokeStatic(jinvokeStatic);
 		FactorWord jnew = intern("jnew");
 		jnew.def = new JNew(jnew);
 		FactorWord jvarGet = intern("jvar$");
 		jvarGet.def = new JVarGet(jvarGet);
 		FactorWord jvarGetStatic = intern("jvar-static$");
-		jvarGetStatic.def = new JVarGetStatic(
-			jvarGetStatic);
+		jvarGetStatic.def = new JVarGetStatic(jvarGetStatic);
 		FactorWord jvarSet = intern("jvar@");
 		jvarSet.def = new JVarSet(jvarSet);
 		FactorWord jvarSetStatic = intern("jvar-static@");
-		jvarSetStatic.def = new JVarSetStatic(
-			jvarSetStatic);
-
-		// namespaces
-		FactorWord get = intern("$");
-		get.def = new Get(get);
-		FactorWord set = intern("@");
-		set.def = new Set(set);
+		jvarSetStatic.def = new JVarSetStatic(jvarSetStatic);
 
 		// definition
 		FactorWord define = intern("define");
@@ -153,9 +196,14 @@ public class FactorInterpreter
 				getClass().getField("errorFlag"),
 				this));
 
-		String[] boundFields = { "compile", "dump",
+		global.setVariable("verbose-compile",
+			new FactorNamespace.VarBinding(
+				getClass().getField("verboseCompile"),
+				this));
+
+		String[] boundFields = { "dump",
 			"interactive", "trace",
-			"dict", "args", "global", "last" };
+			"dict", "args", "global", "last", "fasl" };
 		for(int i = 0; i < boundFields.length; i++)
 		{
 			global.setVariable(boundFields[i],
@@ -165,11 +213,22 @@ public class FactorInterpreter
 		}
 	} //}}}
 
+	//{{{ getNamespace() method
+	public FactorNamespace getNamespace(FactorInterpreter interp)
+		throws Exception
+	{
+		if(interpNamespace == null)
+			interpNamespace = new FactorNamespace(
+				interp.global,this);
+
+		return interpNamespace;
+	} //}}}
+
 	//{{{ runBootstrap() method
 	private void runBootstrap() throws Exception
 	{
 		final String initFile = "boot.factor";
-		FactorParser parser = new FactorParser(
+		FactorReader parser = new FactorReader(
 			initFile,
 			new InputStreamReader(
 			getClass().getResourceAsStream(
@@ -239,11 +298,12 @@ public class FactorInterpreter
 			System.err.println("Exception inside"
 				+ " error handler:");
 			e.printStackTrace();
-			System.err.println(
-				"Original exception:");
-			e.printStackTrace();
+			System.err.println("Original exception:");
+			error.printStackTrace();
+			System.err.println("Factor datastack:");
+			System.err.println(datastack.toList());
 			System.err.println("Factor callstack:");
-			System.err.println(callstack);
+			System.err.println(callstack.toList());
 
 			topLevel();
 
@@ -252,7 +312,8 @@ public class FactorInterpreter
 		else
 		{
 			errorFlag = true;
-			datastack.push(FactorJava.unwrapException(e));
+			error = FactorJava.unwrapException(e);
+			datastack.push(error);
 			try
 			{
 				eval(intern("break"));
@@ -270,6 +331,21 @@ public class FactorInterpreter
 				return true;
 			}
 		}
+	} //}}}
+
+	//{{{ compiledException() method
+	/**
+	 * Called by compiled words to give the user a meaningful call stack
+	 * trace in the case of an exception.
+	 */
+	public void compiledException(FactorWord word, Throwable t)
+	{
+		// XXX: change callframe.namespace to something more meaningful
+		FactorCallFrame compiledCallframe = new FactorCallFrame(
+			word,callframe.namespace,
+			new Cons(new FactorWord("#<compiled>"),null));
+		compiledExceptions = new Cons(compiledCallframe,
+			this.compiledExceptions);
 	} //}}}
 
 	//{{{ call() method
@@ -306,13 +382,12 @@ public class FactorInterpreter
 		{
 			if(trace)
 				System.err.println("-- TAIL CALL --");
-			newcf = getRecycledCallFrame(callstack.top);
+			newcf = new FactorCallFrame();
 			newcf.collapsed = true;
 		}
-		// try to get a recycled callframe from the stack
 		else
 		{
-			newcf = getRecycledCallFrame(callstack.top + 1);
+			newcf = new FactorCallFrame();
 			newcf.collapsed = false;
 			if(callframe != null)
 				callstack.push(callframe);
@@ -323,21 +398,6 @@ public class FactorInterpreter
 		newcf.ip = code;
 
 		callframe = newcf;
-	} //}}}
-
-	//{{{ getRecycledCallFrame() method
-	private FactorCallFrame getRecycledCallFrame(int next)
-	{
-		/* if(callstack.stack != null && next < callstack.stack.length)
-		{
-			Object o = callstack.stack[next];
-			if(o instanceof FactorCallFrame)
-				return (FactorCallFrame)o;
-			else
-				return new FactorCallFrame();
-		}
-		else */
-			return new FactorCallFrame();
 	} //}}}
 
 	//{{{ eval() method
@@ -351,7 +411,7 @@ public class FactorInterpreter
 			StringBuffer buf = new StringBuffer();
 			for(int i = 0; i < callstack.top; i++)
 				buf.append(' ');
-			buf.append(FactorParser.unparse(obj));
+			buf.append(FactorReader.unparseObject(obj));
 			System.err.println(buf);
 		}
 
@@ -359,7 +419,14 @@ public class FactorInterpreter
 		{
 			try
 			{
-				((FactorWord)obj).def.eval(this);
+				FactorWordDefinition d = ((FactorWord)obj).def;
+				if(d == null)
+				{
+					throw new FactorUndefinedWordException(
+						(FactorWord)obj);
+				}
+				else
+					d.eval(this);
 			}
 			catch(Exception e)
 			{
@@ -368,6 +435,12 @@ public class FactorInterpreter
 					(FactorWord)obj,
 					callframe.namespace,
 					null);
+				while(compiledExceptions != null)
+				{
+					callstack.push(compiledExceptions.car);
+					compiledExceptions = compiledExceptions
+						.next();
+				}
 				throw e;
 			}
 		}
@@ -390,6 +463,7 @@ public class FactorInterpreter
 		}
 		catch(Exception e)
 		{
+			System.err.println("Cannot internalize: " + name);
 			throw new RuntimeException(e);
 		}
 	} //}}}

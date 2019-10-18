@@ -71,6 +71,11 @@ public class Null extends FlowObject implements Constants
 
 	public boolean equals(Object o)
 	{
-		return (o instanceof Null);
+		if(o instanceof Null)
+			return true;
+		else if(o instanceof CompiledList)
+			return ((CompiledList)o).getLiteral() == null;
+		else
+			return false;
 	}
 }

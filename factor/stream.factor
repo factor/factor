@@ -25,21 +25,18 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"user.home" system-property @~
-"file.separator" system-property @/
-
 : <stream> ( -- stream )
-    ! Create a stream object. A stream is a namespace with the
-    ! following entries:
-    ! - fflush
-    ! - freadln -- you must provide an implementation!
-    ! - fwriteln
-    ! - fwrite -- you must provide an implementation!
-    ! - fclose
-    ! Note that you must extend this object and provide your own
-    ! implementations of all entries except for fwriteln, which
-    ! is defined to fwrite the string followed by the newline by
-    ! default.
+    #! Create a stream object. A stream is a namespace with the
+    #! following entries:
+    #! - fflush
+    #! - freadln -- you must provide an implementation!
+    #! - fwriteln
+    #! - fwrite -- you must provide an implementation!
+    #! - fclose
+    #! Note that you must extend this object and provide your own
+    #! implementations of all entries except for fwriteln, which
+    #! is defined to fwrite the string followed by the newline by
+    #! default.
     <namespace> [
         ( -- string )
         [ "freadln not implemented." break ] @freadln
@@ -52,114 +49,147 @@
         ( -- )
         [ ] @fclose
         ( string -- )
-        [ $namespace fwrite "\n" $namespace fwrite ] @fwriteln
+        [ this fwrite "\n" this fwrite ] @fwriteln
+    ] extend ;
+
+: <extend-stream> ( stream -- stream )
+    <stream> [
+        @stream
+        ( -- string )
+        [ $stream freadln ] @freadln
+        ( string -- )
+        [ $stream fwrite ] @fwrite
+        ( string -- )
+        [ $stream fedit ] @fedit
+        ( -- )
+        [ $stream fflush ] @fflush
+        ( -- )
+        [ $stream fclose ] @fclose
+        ( string -- )
+        [ $stream fwriteln ] @fwriteln
     ] extend ;
 
 ! These are in separate words so that they can be compiled.
 ! Do not call them directly.
 
-: <bytestream>/freadln ( -- string )
+: <byte-stream>/freadln ( -- string )
     $in [ "java.io.InputStream" ] "factor.FactorLib" "readLine"
     jinvoke-static ;
 
-: <bytestream>/fwrite ( string -- )
+: <byte-stream>/fwrite ( string -- )
     >bytes
     $out [ [ "byte" ] ]
     "java.io.OutputStream" "write" jinvoke ;
 
-: <bytestream>/fflush ( -- )
+: <byte-stream>/fflush ( -- )
     $out [ ] "java.io.OutputStream" "flush" jinvoke ;
 
-: <bytestream>/fclose ( -- )
-    $in  [ ] "java.io.InputStream"  "close" jinvoke
-    $out [ ] "java.io.OutputStream" "close" jinvoke ;
+: <byte-stream>/fclose ( -- )
+    $in  [ [ ] "java.io.InputStream"  "close" jinvoke ] when* 
+    $out [ [ ] "java.io.OutputStream" "close" jinvoke ] when* ;
 
-: <bytestream> ( in out -- stream )
-    ! Creates a new stream for reading from the
-    ! java.io.InputStream in, and writing to the
-    ! java.io.OutputStream out.
+: <byte-stream> ( in out -- stream )
+    #! Creates a new stream for reading from the
+    #! java.io.InputStream in, and writing to the
+    #! java.io.OutputStream out.
     <stream> [
         @out
         @in
         ( -- string )
-        [ <bytestream>/freadln ] @freadln
+        [ <byte-stream>/freadln ] @freadln
         ( string -- )
-        [ <bytestream>/fwrite  ] @fwrite
+        [ <byte-stream>/fwrite  ] @fwrite
         ( -- )
-        [ <bytestream>/fflush  ] @fflush
+        [ <byte-stream>/fflush  ] @fflush
         ( -- )
-        [ <bytestream>/fclose  ] @fclose
+        [ <byte-stream>/fclose  ] @fclose
     ] extend ;
 
-: <charstream>/freadln ( -- string )
+: <char-stream>/freadln ( -- string )
     $in [ ] "java.io.BufferedReader" "readLine"
     jinvoke ;
 
-: <charstream>/fwrite ( string -- )
+: <char-stream>/fwrite ( string -- )
     $out [ "java.lang.String" ] "java.io.Writer" "write"
     jinvoke ;
 
-: <charstream>/fflush ( -- )
+: <char-stream>/fflush ( -- )
     $out [ ] "java.io.Writer" "flush" jinvoke ;
 
-: <charstream>/fclose ( -- )
-    $in  [ ] "java.io.Reader" "close" jinvoke
-    $out [ ] "java.io.Writer" "close" jinvoke ;
+: <char-stream>/fclose ( -- )
+    $in  [ [ ] "java.io.Reader" "close" jinvoke ] when* 
+    $out [ [ ] "java.io.Writer" "close" jinvoke ] when* ;
 
-: <charstream> ( in out -- stream )
-    ! Creates a new stream for reading from the
-    ! java.io.BufferedReader in, and writing to the
-    ! java.io.Reader out.
+: <char-stream> ( in out -- stream )
+    #! Creates a new stream for reading from the
+    #! java.io.BufferedReader in, and writing to the
+    #! java.io.Reader out.
     <stream> [
         @out
         @in
         ( -- string )
-        [ <charstream>/freadln ] @freadln
+        [ <char-stream>/freadln ] @freadln
         ( string -- )
-        [ <charstream>/fwrite  ] @fwrite
+        [ <char-stream>/fwrite  ] @fwrite
         ( -- )
-        [ <charstream>/fflush  ] @fflush
+        [ <char-stream>/fflush  ] @fflush
         ( -- )
-        [ <charstream>/fclose  ] @fclose
+        [ <char-stream>/fclose  ] @fclose
     ] extend ;
 
+: <string-output-stream> ( -- stream )
+    #! Creates a new stream for writing to a string buffer.
+    <stream> [
+        <sbuf> @buf
+        ( string -- )
+        [ $buf sbuf-append drop ] @fwrite
+    ] extend ;
+
+: stream>str ( stream -- string )
+    #! Returns the string written to the given string output
+    #! stream.
+    [ $buf ] bind >str ;
+
 : <filecr> ( path -- stream )
-    [ |java.lang.String ] |java.io.FileReader jnew <breader>
+    [ "java.lang.String" ] "java.io.FileReader" jnew <breader>
     f
-    <charstream> ;
+    <char-stream> ;
 
 : <filecw> ( path -- stream )
-    f
-    [ |java.lang.String ] |java.io.FileWriter jnew <bwriter>
-    <charstream> ;
+    [ "java.lang.String" ] "java.io.FileWriter" jnew <bwriter>
+    f swap
+    <char-stream> ;
 
 : <filebr> ( path -- stream )
-    [ |java.lang.String ] |java.io.FileInputStream jnew
+    [ "java.lang.String" ] "java.io.FileInputStream" jnew
     f
-    <bytestream> ;
+    <byte-stream> ;
 
 : <filebw> ( path -- stream )
-    f
-    [ |java.lang.String ] |java.io.FileOutputStream jnew
-    <bytestream> ;
+    [ "java.lang.String" ] "java.io.FileOutputStream" jnew
+    f swap
+    <byte-stream> ;
 
 : <bwriter> (writer -- bwriter)
-    [ |java.io.Writer ] |java.io.BufferedWriter jnew ;
+    [ "java.io.Writer" ] "java.io.BufferedWriter" jnew ;
 
 : <owriter> (outputstream -- owriter)
-    [ |java.io.OutputStream ] |java.io.OutputStreamWriter jnew ;
+    [ "java.io.OutputStream" ] "java.io.OutputStreamWriter" jnew ;
 
 : read ( -- string )
     $stdio freadln ;
 
 : write ( string -- )
-    $stdio [ fwrite ] [ fflush ] cleave ;
+    $stdio fwrite ;
 
 : print ( string -- )
     $stdio [ fwriteln ] [ fflush ] cleave ;
 
 : fflush ( stream -- )
     [ $fflush call ] bind ;
+
+: flush ( -- )
+    $stdio fflush ;
 
 : freadln ( stream -- string )
     [ $freadln call ] bind ;
@@ -180,14 +210,14 @@
     [ $fclose call ] bind ;
 
 : fcopy ( from to -- )
-    ! Copy the contents of the bytestream 'from' to the bytestream 'to'.
+    ! Copy the contents of the byte-stream 'from' to the byte-stream 'to'.
     [ [ $in ] bind ] dip
     [ $out ] bind
     [ "java.io.InputStream" "java.io.OutputStream" ]
     "factor.FactorLib" "copy" jinvoke-static ;
 
 : <freader> ( file -- freader )
-    [ |java.lang.String ] |java.io.FileReader jnew <breader> ;
+    [ "java.lang.String" ] "java.io.FileReader" jnew <breader> ;
 
 : <file> (path -- file)
     dup "java.io.File" is not [
@@ -204,7 +234,7 @@
     <file> [ ] "java.io.File" "list" jinvoke
     array>list ;
 
-: rename ( from to -- )
+: frename ( from to -- )
     ! Rename file 'from' to 'to'. These can be paths or
     ! java.io.File instances.
     <file> swap <file>
@@ -212,7 +242,7 @@
     jinvoke ;
 
 : <sreader> (string -- reader)
-    [ |java.lang.String ] |java.io.StringReader jnew ;
+    [ "java.lang.String" ] "java.io.StringReader" jnew ;
 
 : close (stream --)
     dup "java.io.Reader" is [
@@ -237,6 +267,6 @@
 : print-numbered-list ( list -- )
     dup length pred swap print-numbered-list* ;
 
-"java.lang.System" "in"  jvar-static$ <ireader> <breader> @stdin
-"java.lang.System" "out" jvar-static$ <owriter> @stdout
-$stdin $stdout <charstream> @stdio
+: terpri ( -- )
+    #! Print a newline to standard output.
+    "\n" write ;

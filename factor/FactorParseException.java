@@ -33,6 +33,6 @@ public class FactorParseException extends FactorException
 {
 	public FactorParseException(String filename, int lineno, String str)
 	{
-		super(filename + ":" + lineno + ":" + str);
+		super(filename + ":" + lineno + ": " + str);
 	}
 }

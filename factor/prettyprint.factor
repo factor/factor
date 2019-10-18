@@ -25,152 +25,96 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-4 @indent
+: tab-size
+    #! Change this to suit your tastes.
+    4 ;
 
-: <prettyprint-token> ( string -- token )
-    dup <namespace> [
-        @name
-        t @prettyprint-token
-    ] extend tuck s@ ;
+: prettyprint-indent ( indent -- )
+    #! Print the given number of spaces.
+    spaces write ;
 
-: prettyprint-token? ( token -- token? )
-    dup has-namespace? [
-        [ $prettyprint-token ] bind
-    ] [
-        drop f
-    ] ifte ;
+: prettyprint-newline ( indent -- )
+    "\n" write prettyprint-indent ;
 
-: prettyprint-indent ( indent -- indent )
-    dup spaces write ;
+: prettyprint-space ( -- )
+    " " write ;
 
-: prettyprint-newline/space ( indent ? -- indent )
-    [ "\n" write prettyprint-indent ] [ " " write ] ifte ;
+: prettyprint-[ ( indent -- indent )
+    "[" write
+    tab-size + dup prettyprint-newline ;
 
-: prettyprint-indent-params ( indent obj -- indent ? ? name )
-    [
-        $indent+ [ $indent + ] when
-        $indent- [ $indent - ] when
-        $-indent [ $indent - t ] [ f ] ifte
-        $newline
-        $name
-    ] bind ;
+: prettyprint-] ( indent -- indent )
+    tab-size - dup prettyprint-newline
+    "]" write
+    prettyprint-space ;
 
-: prettyprint-token ( indent obj -- indent )
-    prettyprint-indent-params
-    [
-        [
-            "\n" write
-            prettyprint-indent
-        ] when
-    ] 2dip
-    write prettyprint-newline/space ;
+: prettyprint-[] ( indent list -- indent )
+    swap prettyprint-[ swap prettyprint-list prettyprint-] ;
 
-: prettyprint-unparsed ( indent unparse -- indent )
-    dup "\n" = [
-        drop "\n" write prettyprint-indent
-    ] [
-        write " " write
-    ] ifte ;
+: prettyprint-: ( indent -- indent )
+    ":" write prettyprint-space
+    tab-size + ;
 
-: [prettyprint-tty] ( indent obj -- indent )
-    dup prettyprint-token? [
-        prettyprint-token
-    ] [
-        unparse prettyprint-unparsed
-    ] ifte ;
+: prettyprint-; ( indent -- indent )
+    ";" write
+    tab-size - ;
 
-: prettyprint-html-unparse ( obj -- unparse )
-    dup unparse dup "\n" = [
-        nip
-    ] [
-        swap word? [
-            "<a href=\"see.lhtml?" swap "\">" over "</a>" cat5
+: prettyprint-inline ( worddef -- )
+    word-of-worddef [ $inline ] bind [
+        " inline" write
+    ] when ;
+
+: prettyprint-:; ( indent list -- indent )
+    swap prettyprint-: swap prettyprint-list prettyprint-; ;
+
+: prettyprint-~<< ( indent -- indent )
+    "~<<" write prettyprint-space
+    tab-size + ;
+
+: prettyprint->>~ ( indent -- indent )
+    ">>~" write
+    tab-size - dup prettyprint-newline ;
+
+: prettyprint-~<<>>~ ( indent list -- indent )
+    swap prettyprint-~<< swap prettyprint-list prettyprint->>~ ;
+
+: word-or-comment? ( obj -- ? )
+    [ word? ] [ comment? ] cleave or ;
+
+: prettyprint-object ( indent obj -- indent )
+    dup word-or-comment? [
+        dup >str ends-with-newline? [
+            write dup prettyprint-indent
         ] [
-            chars>entities
+            unparse. " " write
         ] ifte
-    ] ifte ;
-
-: [prettyprint-html] ( indent obj -- indent )
-    dup prettyprint-token? [
-        prettyprint-token
     ] [
-        prettyprint-html-unparse prettyprint-unparsed
+        unparse. " " write
     ] ifte ;
 
-: prettyprint-list* ( quot list -- )
-    ! Pretty-print a list, without [ and ].
-    [
-        over [
-            prettyprint*
-        ] dip
-    ] each
-    ! Drop the quotation
-    drop ;
+: prettyprint-list ( indent list -- indent )
+    #! Pretty-print a list, without [ and ].
+    [ prettyprint* ] each ;
 
-: prettyprint-list ( quot list before after -- )
-    ! Apply the quotation to 'before', call prettyprint* on
-    ! 'list', and apply the quotation to 'after'.
-    swapd [
-        [
-            swap dup [
-                call
-            ] dip
-        ] dip
-        swap dup [
-            swap prettyprint-list*
-        ] dip
-    ] dip
-    swap call ;
+: compound-or-compiled? ( worddef -- ? )
+    dup compiled? swap compound? or ;
 
-: prettyprint* ( quot obj -- )
+: prettyprint* ( indent obj -- indent )
     [
-        [ not       ] [ swap call ]
-        [ list?     ] [ $[ $] prettyprint-list ]
-        [ compound? ] [ worddef>list $: $; prettyprint-list ]
-        [ compiled? ] [ worddef>list $: $; prettyprint-list ]
-        [ shuffle?  ] [ worddef>list $~<< $>>~ prettyprint-list ]
-        [ drop t    ] [ swap call ]
+        [ not       ] [ prettyprint-object ]
+        [ list?     ] [ prettyprint-[] ]
+        [ compound-or-compiled? ] [
+            tuck worddef>list
+            prettyprint-:;
+            swap prettyprint-inline
+            dup prettyprint-newline
+        ]
+        [ shuffle?  ] [ worddef>list prettyprint-~<<>>~ ]
+        [ drop t    ] [ prettyprint-object ]
     ] cond ;
 
-: prettyprint-tty ( list -- )
-    0 [ [prettyprint-tty] ] rot prettyprint* drop ;
-
-: prettyprint-html ( list -- )
-    0 [ [prettyprint-html] ] rot prettyprint* drop ;
+: prettyprint ( list -- )
+    0 swap prettyprint* drop ;
 
 : see ( word -- )
-    worddef prettyprint-tty ;
-
-: see/html ( word -- )
-    "<pre>" print
-    worddef prettyprint-html
-    "</pre>" print ;
-
-!!!
-
-"["   <prettyprint-token> [
-    t @indent+
-    t @newline
-] bind
-
-"]"   <prettyprint-token> [
-    t @-indent
-] bind
-
-":"   <prettyprint-token> [
-    t @indent+
-] bind
-
-";"   <prettyprint-token> [
-    t @indent-
-    t @newline
-] bind
-
-"~<<" <prettyprint-token> [
-    t @indent+
-] bind
-
-">>~" <prettyprint-token> [
-    t @indent-
-    t @newline
-] bind
+    worddef prettyprint ;

@@ -35,7 +35,7 @@ import java.lang.reflect.*;
 import java.util.Map;
 import org.objectweb.asm.*;
 
-public class JInvokeStatic extends FactorWordDefinition
+public class JInvokeStatic extends FactorPrimitiveDefinition
 {
 	//{{{ JInvokeStatic constructor
 	public JInvokeStatic(FactorWord word)
@@ -114,7 +114,7 @@ public class JInvokeStatic extends FactorWordDefinition
 
 			FactorJava.generateToConversionPre(mw,returnType);
 
-			compiler.generateArgs(mw,args.length,args);
+			compiler.generateArgs(mw,args.length,0,args);
 
 			mw.visitMethodInsn(INVOKESTATIC,
 				clazz,

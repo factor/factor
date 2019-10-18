@@ -222,13 +222,14 @@ public class FactorRatio extends Number implements FactorExternalizable
 	//{{{ reduce() method
 	public static Number reduce(Number numerator, Number denominator)
 	{
-		/* if(FactorMath.sgn(denominator) == 0)
-			signal(new DivisionByZero()); */
-		/* if(FactorMath.sgn(denominator) == -1)
+		if(FactorMath.sgn(denominator) == 0)
+			throw new ArithmeticException("/ by zero");
+		if(FactorMath.sgn(denominator) == -1)
 		{
 			numerator = FactorMath.neg(numerator);
 			denominator = FactorMath.neg(denominator);
-		} */
+		}
+
 		Number gcd = FactorMath.gcd(numerator,denominator);
 		if(!FactorMath.is1(gcd))
 		{
@@ -240,6 +241,12 @@ public class FactorRatio extends Number implements FactorExternalizable
 			return numerator;
 		else
 			return new FactorRatio(numerator,denominator);
+	} //}}}
+
+	//{{{ neg() method
+	public FactorRatio neg()
+	{
+		return new FactorRatio(FactorMath.neg(numerator),denominator);
 	} //}}}
 
 	//{{{ intValue() method

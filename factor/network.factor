@@ -25,9 +25,15 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+: <client> ( server port -- stream )
+    #! Open a TCP/IP socket to a port on the given server.
+    [ "java.lang.String" "int" ] "java.net.Socket" jnew
+    <socketstream> ;
+
 : <server> ( port -- stream )
-    ! Starts listening on localhost:port. Returns a stream that you can close
-    ! with fclose. No other stream operations are supported.
+    #! Starts listening on localhost:port. Returns a stream that
+    #! you can close with fclose. No other stream operations are
+    #! supported.
     [ "int" ] "java.net.ServerSocket" jnew
     <stream> [
         @socket
@@ -39,15 +45,15 @@
     ] extend ;
 
 : <socketstream> ( socket -- stream )
-    ! Wraps a socket inside a bytestream.
+    #! Wraps a socket inside a byte-stream.
     dup
     [ [ ] "java.net.Socket" "getInputStream"  jinvoke ]
     [ [ ] "java.net.Socket" "getOutputStream" jinvoke ]
     cleave
-    <bytestream> [
+    <byte-stream> [
         @socket
 
-        ! We "extend" bytestream's fclose.
+        ! We "extend" byte-stream's fclose.
         ( -- )
         $fclose [
             $socket [ ] "java.net.Socket" "close" jinvoke
@@ -55,6 +61,6 @@
     ] extend ;
 
 : accept ( server -- client )
-    ! Accept a connection from a server socket.
+    #! Accept a connection from a server socket.
     [ $socket ] bind
     [ ] "java.net.ServerSocket" "accept" jinvoke <socketstream> ;

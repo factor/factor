@@ -35,7 +35,7 @@ import java.lang.reflect.*;
 import java.util.Map;
 import org.objectweb.asm.*;
 
-public class Bind extends FactorWordDefinition
+public class Bind extends FactorPrimitiveDefinition
 {
 	//{{{ Bind constructor
 	public Bind(FactorWord word)

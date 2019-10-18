@@ -33,7 +33,7 @@ import factor.compiler.*;
 import factor.*;
 import java.util.Set;
 
-public class Unwind extends FactorWordDefinition
+public class Unwind extends FactorPrimitiveDefinition
 {
 	//{{{ Unwind constructor
 	public Unwind(FactorWord word)

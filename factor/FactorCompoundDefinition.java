@@ -42,20 +42,30 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 {
 	private static int compileCount;
 
-	public Cons definition;
+	public final Cons definition;
+	private Cons endOfDocs;
 
 	//{{{ FactorCompiledDefinition constructor
 	public FactorCompoundDefinition(FactorWord word, Cons definition)
 	{
 		super(word);
 		this.definition = definition;
+		if(definition == null)
+			endOfDocs = null;
+		else
+		{
+			endOfDocs = definition;
+			while(endOfDocs != null
+				&& endOfDocs.car instanceof FactorDocComment)
+				endOfDocs = endOfDocs.next();
+		}
 	} //}}}
 
 	//{{{ eval() method
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		interp.call(word,definition);
+		interp.call(word,endOfDocs);
 	} //}}}
 
 	//{{{ getStackEffect() method
@@ -65,31 +75,22 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		RecursiveForm rec = recursiveCheck.get(word);
 		if(rec.active)
 		{
-			StackEffect se = rec.baseCase;
-			if(se == null)
+			if(rec.baseCase == null)
 				throw new FactorCompilerException("Indeterminate recursive call");
 
-			compiler.apply(StackEffect.decompose(rec.effect,se));
+			compiler.apply(StackEffect.decompose(rec.effect,rec.baseCase));
 		}
 		else
 		{
-			compiler.getStackEffect(definition,recursiveCheck);
+			compiler.getStackEffect(endOfDocs,recursiveCheck);
 		}
 	} //}}}
 
-	//{{{ getSanitizedName() method
-	private String getSanitizedName(String name)
+	//{{{ getClassName() method
+	private static String getClassName(String name)
 	{
-		StringBuffer sanitizedName = new StringBuffer();
-		for(int i = 0; i < name.length(); i++)
-		{
-			char ch = name.charAt(i);
-			if(!Character.isJavaIdentifierStart(ch))
-				sanitizedName.append("_");
-			else
-				sanitizedName.append(ch);
-		}
-		return "factor/compiler/gen/" + sanitizedName
+		return "factor/compiler/gen/"
+			+ FactorJava.getSanitizedName(name)
 			+ "_" + (compileCount++);
 	} //}}}
 
@@ -105,9 +106,7 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		if(effect.inR != 0 || effect.outR != 0)
 			throw new FactorCompilerException("Compiled code cannot manipulate call stack frames");
 
-		boolean multipleReturns = (effect.outD > 1);
-
-		String className = getSanitizedName(word.name);
+		String className = getClassName(word.name);
 
 		ClassWriter cw = new ClassWriter(false);
 		cw.visit(ACC_PUBLIC, className,
@@ -117,12 +116,18 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		compileConstructor(cw,className);
 
 		CompileResult result = compileEval(interp,cw,
-			className,effect,recursiveCheck,
-			multipleReturns);
+			className,effect,recursiveCheck);
+
+		// Generate auxiliary methods
+		String auxAsm = result.compiler.generateAuxiliary(cw);
 
 		// Generate fields for storing literals and
 		// word references
 		result.compiler.generateFields(cw);
+
+		compileToList(interp,result.compiler,cw);
+
+		compileGetStackEffect(cw,effect);
 
 		// gets the bytecode of the class, and loads it
 		// dynamically
@@ -136,27 +141,14 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 			fos.close();
 		}
 
+		// store disassembly for the 'asm' word.
+		word.asm = result.asm + auxAsm;
+
 		Class compiledWordClass = loader._defineClass(
 			className.replace('/','.'),
 			code, 0, code.length);
 
-		result.compiler.setFields(compiledWordClass);
-
-		Constructor constructor = compiledWordClass
-			.getConstructor(
-			new Class[] {
-			FactorWord.class, StackEffect.class, Cons.class
-			});
-
-		FactorWordDefinition compiledWord
-			= (FactorWordDefinition)
-			constructor.newInstance(
-			new Object[] { word, effect, definition });
-
-		// store disassembly for the 'asm' word.
-		word.asm = result.asm;
-
-		return compiledWord;
+		return CompiledDefinition.create(interp,word,compiledWordClass);
 	} //}}}
 
 	//{{{ compileConstructor() method
@@ -165,26 +157,59 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		// creates a MethodWriter for the constructor
 		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
 			"<init>",
-			"(Lfactor/FactorWord;"
-			+ "Lfactor/compiler/StackEffect;"
-			+ "Lfactor/Cons;)V",
+			"(Lfactor/FactorWord;)V",
 			null, null);
 		// pushes the 'this' variable
 		mw.visitVarInsn(ALOAD, 0);
 		// pushes the word parameter
 		mw.visitVarInsn(ALOAD, 1);
-		// pushes the stack effect parameter
-		mw.visitVarInsn(ALOAD, 2);
-		// pushes the definition parameter
-		mw.visitVarInsn(ALOAD, 3);
 		// invokes the super class constructor
 		mw.visitMethodInsn(INVOKESPECIAL,
 			"factor/compiler/CompiledDefinition", "<init>",
-			"(Lfactor/FactorWord;"
-			+ "Lfactor/compiler/StackEffect;"
-			+ "Lfactor/Cons;)V");
+			"(Lfactor/FactorWord;)V");
 		mw.visitInsn(RETURN);
-		mw.visitMaxs(4, 4);
+		mw.visitMaxs(2, 2);
+	} //}}}
+
+	//{{{ compileToList() method
+	private void compileToList(FactorInterpreter interp,
+		FactorCompiler compiler, ClassVisitor cw)
+	{
+		// creates a MethodWriter for the toList() method
+		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
+			"toList",
+			"(Lfactor/FactorInterpreter;)Lfactor/Cons;",
+			null, null);
+		// push unparsed string representation of this word and parse it
+		compiler.generateParse(mw,toList(interp),1);
+		mw.visitTypeInsn(CHECKCAST,"factor/Cons");
+		mw.visitInsn(ARETURN);
+		mw.visitMaxs(2, 2);
+	} //}}}
+
+	//{{{ compileGetStackEffect() method
+	private void compileGetStackEffect(ClassVisitor cw, StackEffect effect)
+	{
+		// creates a MethodWriter for the getStackEffect() method
+		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
+			"getStackEffect",
+			"(Lfactor/compiler/RecursiveState;"
+			+ "Lfactor/compiler/FactorCompiler;)V",
+			null, null);
+
+		mw.visitVarInsn(ALOAD,2);
+		mw.visitTypeInsn(NEW,"factor/compiler/StackEffect");
+		mw.visitInsn(DUP);
+		mw.visitLdcInsn(new Integer(effect.inD));
+		mw.visitLdcInsn(new Integer(effect.outD));
+		mw.visitLdcInsn(new Integer(effect.inR));
+		mw.visitLdcInsn(new Integer(effect.outR));
+		mw.visitMethodInsn(INVOKESPECIAL,"factor/compiler/StackEffect",
+			"<init>","(IIII)V");
+		mw.visitMethodInsn(INVOKEVIRTUAL,"factor/compiler/FactorCompiler",
+			"apply","(Lfactor/compiler/StackEffect;)V");
+		mw.visitInsn(RETURN);
+		mw.visitMaxs(7, 3);
 	} //}}}
 
 	//{{{ compileEval() method
@@ -207,7 +232,7 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	 */
 	protected CompileResult compileEval(FactorInterpreter interp,
 		ClassWriter cw, String className, StackEffect effect,
-		RecursiveState recursiveCheck, boolean multipleReturns)
+		RecursiveState recursiveCheck)
 		throws Exception
 	{
 		// creates a MethodWriter for the 'eval' method
@@ -230,9 +255,10 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 
 		// generate core
 		FactorCompiler compiler = new FactorCompiler(interp,word,
-			className,1,effect.inD);
-		String asm = compiler.compile(definition,cw,className,
-			"core",effect,recursiveCheck);
+			className);
+		compiler.init(1,effect.inD,effect.inR,"core");
+		String asm = compiler.compileCore(endOfDocs,cw,effect,
+			recursiveCheck);
 
 		return new CompileResult(compiler,asm);
 	} //}}}
@@ -307,41 +333,10 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		}
 	} //}}}
 
-	//{{{ compileImmediate() method
-	/**
-	 * Compile a call to this word. Returns maximum JVM stack use.
-	 */
-	public int compileImmediate(CodeVisitor mw, FactorCompiler compiler,
-		RecursiveState recursiveCheck) throws Exception
-	{
-		/* System.err.println("immediate call to " + word);
-		FactorDataStack savedDatastack = (FactorDataStack)
-			compiler.datastack.clone();
-		FactorCallStack savedCallstack = (FactorCallStack)
-			compiler.callstack.clone();
-		StackEffect savedEffect = compiler.getStackEffect();
-		compiler.effect = new StackEffect();
-
-		RecursiveState _recursiveCheck = new RecursiveState();
-		_recursiveCheck.add(word,null);
-		getStackEffect(_recursiveCheck,compiler);
-		_recursiveCheck.remove(word);
-		StackEffect effect = compiler.getStackEffect();
-
-		System.err.println("immediate effect is " + effect);
-
-		compiler.datastack = savedDatastack;
-		compiler.callstack = savedCallstack;
-		compiler.effect = savedEffect; */
-
-		return compiler.compile(definition,mw,recursiveCheck);
-	} //}}}
-
 	//{{{ toList() method
-	public Cons toList()
+	public Cons toList(FactorInterpreter interp)
 	{
-		return new Cons(word,new Cons(new FactorWord("\n"),
-			definition));
+		return definition;
 	} //}}}
 
 	private static SimpleClassLoader loader = new SimpleClassLoader();

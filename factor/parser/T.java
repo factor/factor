@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003, 2004 Slava Pestov.
+ * Copyright (C) 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,42 +27,20 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.primitives;
+package factor.parser;
 
-import factor.compiler.*;
 import factor.*;
-import java.util.Map;
 
-public class Get extends FactorWordDefinition
+public class T extends FactorParsingDefinition
 {
-	//{{{ Get constructor
-	public Get(FactorWord word)
+	public T(FactorWord word)
 	{
 		super(word);
-	} //}}}
+	}
 
-	//{{{ eval() method
-	public void eval(FactorInterpreter interp)
-		throws Exception
+	public void eval(FactorInterpreter interp, FactorReader reader)
+		throws FactorParseException
 	{
-		FactorDataStack datastack = interp.datastack;
-		datastack.push(core(interp,datastack.pop()));
-	} //}}}
-
-	//{{{ core() method
-	public static Object core(FactorInterpreter interp,
-		Object name) throws Exception
-	{
-		return interp.callframe.namespace.getVariable(
-			FactorJava.toString(name));
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws FactorStackException
-	{
-		state.ensure(state.datastack,1);
-		state.pop(null);
-		state.push(null);
-	} //}}}
+		reader.append(Boolean.TRUE);
+	}
 }

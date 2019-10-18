@@ -33,4 +33,8 @@
 [ 2 1         ] [ 1 2         ] [ 2>r r> r>            ] test-word
 [ 2 1         ] [ 1 2         ] [ >r >r 2r>            ] test-word
 
+[ [ 1 1 0 0 ] ] [ [ stack? ] ] [ balance>list ] test-word
+
+[ [ 1 1 0 0 ] ] [ [ stack>list ] ] [ balance>list ] test-word
+
 "Stack checks passed." print

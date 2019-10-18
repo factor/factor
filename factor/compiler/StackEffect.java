@@ -59,29 +59,11 @@ public class StackEffect implements PublicCloneable, FactorExternalizable
 		if(first == null || second == null)
 			return null;
 
-		int inD  = first.inD;
-		int inR  = first.inR;
-		int outD = first.outD;
-		int outR = first.outR;
+		int inD = first.inD + Math.max(0,second.inD - first.outD);
+		int outD = second.outD + Math.max(0,first.outD - second.inD);
 
-		if(second.inD <= outD)
-			outD -= second.inD;
-		else
-		{
-			inD += (second.inD - outD);
-			outD = 0;
-		}
-
-		if(second.inR <= outR)
-			outR -= second.inR;
-		else
-		{
-			inR += (second.inR - outR);
-			outR = 0;
-		}
-
-		outD += second.outD;
-		outR += second.outR;
+		int inR = first.inR + Math.max(0,second.inR - first.outR);
+		int outR = second.outR + Math.max(0,first.outR - second.inR);
 
 		return new StackEffect(inD,outD,inR,outR);
 	} //}}}
@@ -109,12 +91,10 @@ public class StackEffect implements PublicCloneable, FactorExternalizable
 		StringBuffer signatureBuf = new StringBuffer(
 			"(Lfactor/FactorInterpreter;");
 
-		for(int i = 0; i < inD; i++)
-		{
+		for(int i = 0; i < inD + inR; i++)
 			signatureBuf.append("Ljava/lang/Object;");
-		}
 
-		if(outD != 1)
+		if(outD + outR != 1)
 			signatureBuf.append(")V");
 		else
 			signatureBuf.append(")Ljava/lang/Object;");

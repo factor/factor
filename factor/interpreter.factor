@@ -25,20 +25,20 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-0 @history-count
-
 : exit (--)
-    $global [ t @quit-flag ] bind ;
+    global [ t @quit-flag ] bind ;
 
 : print-banner ( -- )
-    "Factor " $version cat2 print
+    "Factor " version cat2 print
     "Copyright (C) 2003, 2004 Slava Pestov" print
     "Enter ``help'' for help." print
     "Enter ``exit'' to exit." print ;
 
 : history+ ( cmd -- )
-    $history 2dup contains [ 2drop ] [ cons @history ] ifte
-    "history-count" succ@ ;
+    global [ "history" cons@ ] bind ;
+
+: history# ( -- number )
+    global [ $history length ] bind ;
 
 : history ( -- )
     "X redo    -- evaluate the expression with number X." print
@@ -55,26 +55,29 @@
     get-history edit ;
 
 : print-prompt ( prompt -- )
-    write $history-count write "] " write ;
+    write history# write "] " write flush ;
 
 : interpreter-loop ( prompt -- )
-    dup >r print-prompt read [
+    dup >r print-prompt read dup [
         [ history+ ] [ eval ] cleave
-        $global [ $quit-flag ] bind [
+        global [ $quit-flag ] bind [
             rdrop
-            $global [ f @quit-flag ] bind
+            global [ f @quit-flag ] bind
         ] [
             r> interpreter-loop
         ] ifte
-    ] when* ;
+    ] [
+        rdrop
+    ] ifte ;
 
-: initial-interpreter-loop (--)
-    ! Run the stand-alone interpreter
+: initial-interpreter-loop ( -- )
+    #! Run the stand-alone interpreter
     print-banner
     ! Used by :r
     [ @initial-interpreter-continuation ] callcc0
     ! Used by :s
-    ! We use the slightly redundant 'call' to push the current callframe.
+    ! We use the slightly redundant 'call' to push the current
+    ! callframe.
     [ callstack$ @initial-interpreter-callstack ] call
     "    " interpreter-loop ;
 
@@ -94,17 +97,17 @@
     ".s                 -- print datastack."
     ".                  -- print top of datastack."
     "" print
-    "values.            -- list all variables." print
-    "inspect            -- list all variables bound on object at top of stack." print
-    "$variable .        -- show value of variable." print
+    "global describe    -- list all global variables." print
+    "describe           -- describe object at top of stack." print
     "" print
     "words.             -- list all words." print
-    "\"str\" apropos      -- list all words whose name contains str." print
-    "\"word\" see         -- show definition of word." print
+    "\"word\" see         -- show definition of \"word\"." print
+    "\"str\" apropos      -- list all words whose name contains \"str\"." print
+    "\"word\" usages.     -- list all words that call \"word\"." print
     "" print
     "[ expr ] balance . -- show stack effect of expression." print
     "" print
-    "history            -- list previously entered expresions." print
+    "history            -- list previously entered expressions." print
     "X redo             -- redo expression number X from history list." print
     "" print
     "stats              -- interpreter statistics." print

@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,11 +36,12 @@ import java.lang.reflect.Modifier;
 import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
- * Manages the set of available words.
+ * A namespace is a list of name/value bindings. A namespace can optionally
+ * have a parent, and a bound object, in which case every public field of the
+ * object will be accessible through the namespace. Additionally, static fields
+ * from arbitrary classes can be imported into the namespace.
  */
 public class FactorNamespace implements PublicCloneable, FactorObject
 {
@@ -50,6 +51,19 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	public Object obj;
 	private FactorNamespace parent;
 	private Map words;
+	private Class constraint;
+
+	//{{{ createConstrainedNamespace() method
+	/**
+	 * Used for dictionary.
+	 */
+	public static FactorNamespace createConstrainedNamespace(
+		Class constraint) throws Exception
+	{
+		FactorNamespace namespace = new FactorNamespace(null,null,null);
+		namespace.constraint = constraint;
+		return namespace;
+	} //}}}
 
 	//{{{ FactorNamespace constructor
 	public FactorNamespace(FactorNamespace parent) throws Exception
@@ -88,21 +102,7 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 			}
 		}
 
-		try
-		{
-			setVariable("namespace",this);
-			setVariable("parent",parent);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-
-		if(obj != null)
-		{
-			this.obj = obj;
-			setVariable("this",obj);
-		}
+		this.obj = obj;
 	} //}}}
 
 	//{{{ getNamespace() method
@@ -115,6 +115,15 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	public FactorNamespace getParent()
 	{
 		return parent;
+	} //}}}
+
+	//{{{ getThis() method
+	/**
+	 * Returns the object bound to this namespace, or null.
+	 */
+	public Object getThis()
+	{
+		return obj;
 	} //}}}
 
 	//{{{ importVars() method
@@ -180,7 +189,20 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 		else if(value == null)
 			words.put(name,NULL);
 		else
+		{
+			if(constraint != null)
+			{
+				if(!constraint.isAssignableFrom(
+					value.getClass()))
+				{
+					throw new FactorRuntimeException(
+						"Can only store "
+						+ constraint
+						+ " in " + this);
+				}
+			}
 			words.put(name,value);
+		}
 	} //}}}
 
 	//{{{ lazyFieldInit() method
@@ -229,45 +251,11 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 		}
 	} //}}}
 
-	//{{{ toVarList() method
+	//{{{ toVarValueList() method
 	/**
-	 * Returns a list of variable and word names defined in this namespace.
+	 * Returns a list of pairs of variable names, and their values.
 	 */
-	public Cons toVarList()
-	{
-		initAllFields();
-
-		Cons first = null;
-		Cons last = null;
-		Iterator iter = words.entrySet().iterator();
-		while(iter.hasNext())
-		{
-			Map.Entry entry = (Map.Entry)iter.next();
-			Object value = entry.getValue();
-			if(value == CHECK_PARENT)
-				continue;
-			else if(value == NULL)
-				value = null;
-
-			String name = (String)entry.getKey();
-			Cons cons = new Cons(name,null);
-			if(first == null)
-				first = last = cons;
-			else
-			{
-				last.cdr = cons;
-				last = cons;
-			}
-		}
-
-		return first;
-	} //}}}
-
-	//{{{ toValueList() method
-	/**
-	 * Returns a list of pairs of variable and word names, and their values.
-	 */
-	public Cons toValueList()
+	public Cons toVarValueList()
 	{
 		initAllFields();
 

@@ -35,7 +35,7 @@ import java.lang.reflect.*;
 import java.util.Map;
 import org.objectweb.asm.*;
 
-public class Call extends FactorWordDefinition
+public class Call extends FactorPrimitiveDefinition
 {
 	//{{{ Call constructor
 	public Call(FactorWord word)

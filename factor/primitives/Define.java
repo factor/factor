@@ -33,7 +33,7 @@ import factor.compiler.*;
 import factor.*;
 import java.util.Map;
 
-public class Define extends FactorWordDefinition
+public class Define extends FactorPrimitiveDefinition
 {
 	//{{{ Define constructor
 	public Define(FactorWord word)
@@ -64,8 +64,15 @@ public class Define extends FactorWordDefinition
 
 		if(def instanceof Cons)
 		{
+			// old-style compound definition.
 			def = new FactorCompoundDefinition(
 				newWord,(Cons)def);
+		}
+		else if(def instanceof String)
+		{
+			// a class name...
+			def = CompiledDefinition.create(interp,newWord,
+				Class.forName((String)def));
 		}
 
 		newWord.define((FactorWordDefinition)def);

@@ -86,8 +86,6 @@ public class CompiledChoice extends FlowObject implements Constants
 	public void getStackEffect(RecursiveState recursiveCheck)
 		throws Exception
 	{
-		StackEffect onEntry = recursiveCheck.last().effect;
-
 		FactorDataStack datastackCopy = (FactorDataStack)
 			compiler.datastack.clone();
 		FactorCallStack callstackCopy = (FactorCallStack)
@@ -97,7 +95,6 @@ public class CompiledChoice extends FlowObject implements Constants
 
 		StackEffect te = compiler.getStackEffectOrNull(
 			t,recursiveCheck,false);
-		//System.err.println("te=" + te);
 
 		/** Other branch. */
 		FactorDataStack obDatastack = compiler.datastack;
@@ -112,9 +109,7 @@ public class CompiledChoice extends FlowObject implements Constants
 
 		StackEffect fe = compiler.getStackEffectOrNull(
 			f,recursiveCheck,false);
-		//System.err.println("fe=" + fe);
 
-		//System.err.println("rec=" + rec);
 		if(fe != null && te == null)
 		{
 			RecursiveForm rec = t.getWord();
@@ -131,7 +126,6 @@ public class CompiledChoice extends FlowObject implements Constants
 			t.getStackEffect(recursiveCheck);
 			te = compiler.getStackEffect();
 			//te = StackEffect.decompose(onEntry,te);
-			//System.err.println("te=" + te);
 		}
 		else if(fe == null && te != null)
 		{
@@ -149,7 +143,6 @@ public class CompiledChoice extends FlowObject implements Constants
 			f.getStackEffect(recursiveCheck);
 			fe = compiler.getStackEffect();
 			//fe = StackEffect.decompose(onEntry,te);
-			//System.err.println("fe=" + fe);
 		}
 
 		if(te == null || fe == null)
@@ -173,7 +166,7 @@ public class CompiledChoice extends FlowObject implements Constants
 		// branch and don't discard those.
 		int highestEqual = 0;
 
-		for(highestEqual = 0; highestEqual < fe.outD; highestEqual++)
+		/* for(highestEqual = 0; highestEqual < fe.outD; highestEqual++)
 		{
 			Object o1 = obDatastack.stack[
 				obDatastack.top - highestEqual - 1];
@@ -181,24 +174,20 @@ public class CompiledChoice extends FlowObject implements Constants
 				obDatastack.top - highestEqual - 1];
 			if(!o1.equals(o2))
 				break;
-		}
+		} */
 
 		// replace results from the f branch with
 		// dummy values so that subsequent code
 		// doesn't assume these values always
 		// result from this
-		compiler.datastack.top -= fe.outD;
-		compiler.produce(compiler.datastack,fe.outD - highestEqual);
-		compiler.datastack.top += highestEqual;
-		compiler.callstack.top -= fe.outR;
-		compiler.produce(compiler.callstack,fe.outR);
 
-		compiler.effect = new StackEffect(
-			Math.max(te.inD,fe.inD),
-			Math.max(te.outD,fe.outD),
-			Math.max(te.inR,fe.inR),
-			Math.max(te.outR,fe.outR)
-		);
+		int outD = Math.max(te.outD,fe.outD);
+		int outR = Math.max(te.outR,fe.outR);
+
+		compiler.consume(compiler.datastack,outD);
+		compiler.produce(compiler.datastack,outD);
+		compiler.consume(compiler.callstack,outR);
+		compiler.produce(compiler.callstack,outR);
 	} //}}}
 
 	//{{{ compileCallTo() method
@@ -255,7 +244,7 @@ public class CompiledChoice extends FlowObject implements Constants
 				t.compileCallTo(mw,recursiveCheck));
 
 			maxJVMStack = Math.max(maxJVMStack,
-				normalizeStacks(mw));
+				compiler.normalizeStacks(mw));
 
 			compiler.datastack = datastackCopy;
 			compiler.callstack = callstackCopy;
@@ -266,7 +255,7 @@ public class CompiledChoice extends FlowObject implements Constants
 				f.compileCallTo(mw,recursiveCheck));
 
 			maxJVMStack = Math.max(maxJVMStack,
-				normalizeStacks(mw));
+				compiler.normalizeStacks(mw));
 
 			mw.visitLabel(endl);
 		}
@@ -274,43 +263,12 @@ public class CompiledChoice extends FlowObject implements Constants
 		return maxJVMStack;
 	} //}}}
 
-	//{{{ normalizeStacks() method
-	private int normalizeStacks(CodeVisitor mw)
-	{
-		int datastackTop = compiler.datastack.top;
-		compiler.datastack.top = 0;
-		int callstackTop = compiler.callstack.top;
-		compiler.callstack.top = 0;
-
-		normalizeStack(compiler.datastack,datastackTop,mw);
-		normalizeStack(compiler.callstack,callstackTop,mw);
-		return Math.max(datastackTop,callstackTop);
-	} //}}}
-
-	//{{{ normalizeStack() method
-	private void normalizeStack(FactorArrayStack stack, int top,
-		CodeVisitor mw)
-	{
-		for(int i = top - 1; i >= 0; i--)
-		{
-			FlowObject obj = (FlowObject)stack.stack[i];
-			obj.generate(mw);
-		}
-
-		for(int i = 0; i < top; i++)
-		{
-			int local = compiler.allocate();
-			stack.push(new Result(local,compiler,null));
-			mw.visitVarInsn(ASTORE,local);
-		}
-	} //}}}
-
 	//{{{ toString() method
 	public String toString()
 	{
-		return FactorParser.unparse(f)
+		return FactorReader.unparseObject(f)
 			+ " "
-			+ FactorParser.unparse(t)
+			+ FactorReader.unparseObject(t)
 			+ " ? call";
 	} //}}}
 }

@@ -64,8 +64,15 @@ public class FactorCallStack extends FactorArrayStack implements PublicCloneable
 			return new FactorCallStack();
 		else
 		{
-			return new FactorCallStack(
-				FactorLib.deepCloneArray(stack),top);
+			Object[] newStack = new Object[stack.length];
+			for(int i = 0; i < top; i++)
+			{
+				Object obj = stack[i];
+				if(obj instanceof FactorCallFrame)
+					obj = ((FactorCallFrame)obj).clone();
+				newStack[i] = obj;
+			}
+			return new FactorCallStack(newStack,top);
 		}
 	} //}}}
 }

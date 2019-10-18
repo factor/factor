@@ -34,7 +34,7 @@ import factor.*;
 import java.util.Set;
 import org.objectweb.asm.*;
 
-public class CallstackGet extends FactorWordDefinition
+public class CallstackGet extends FactorPrimitiveDefinition
 {
 	//{{{ CallstackGet constructor
 	public CallstackGet(FactorWord word)

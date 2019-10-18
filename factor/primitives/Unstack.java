@@ -33,7 +33,7 @@ import factor.compiler.*;
 import factor.*;
 import java.util.Set;
 
-public class Unstack extends FactorWordDefinition
+public class Unstack extends FactorPrimitiveDefinition
 {
 	//{{{ Unstack constructor
 	public Unstack(FactorWord word)

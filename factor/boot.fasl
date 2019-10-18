@@ -1,0 +1,2064 @@
+! This is an automatically-generated fastload image.
+"$"
+"factor.compiler.gen.$_0"
+define
+inline
+"*"
+"factor.compiler.gen.__3"
+define
+inline
+"*@"
+"factor.compiler.gen.___4"
+define
+"+"
+"factor.compiler.gen.__7"
+define
+inline
+"+@"
+"factor.compiler.gen.___8"
+define
+"-"
+"factor.compiler.gen.__9"
+define
+inline
+"-@"
+"factor.compiler.gen.___10"
+define
+~<< -rot A B C -- C A B >>~
+: . ( expr -- )
+    unparse. terpri ;
+: .s ( -- )
+    datastack$ describe ;
+"/"
+"factor.compiler.gen.__11"
+define
+inline
+"/@"
+"factor.compiler.gen.___12"
+define
+"0="
+"factor.compiler.gen.___13"
+define
+inline
+"0>f"
+"factor.compiler.gen.__f_15"
+define
+"1="
+"factor.compiler.gen.___16"
+define
+inline
+~<< 2-rot A B C D E F -- E F A B C D >>~
+"2="
+"factor.compiler.gen.___17"
+define
+~<< 2>r A B -- r:A r:B >>~
+"2^"
+"factor.compiler.gen.___19"
+define
+: 2apply ( x y [ code ] -- )
+    #! First applies the code to x, then to y.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    2dup 2>r nip call 2r> call ;
+: 2dip ( a b [ c ] -- c a b )
+    #! Call c as if a and b were not present on the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    -rot 2>r call 2r> ;
+~<< 2drop A B -- >>~
+~<< 2dup A B -- A B A B >>~
+~<< 2dupd A B C D -- A B A B C D >>~
+: 2each ( [ list ] [ list ] [ quotation ] -- )
+    #! Push each pair of elements from 2 proper lists in turn,
+    #! applying a quotation each time.
+    over [
+        [
+            [
+                uncons 
+            ] 2apply 
+        ] dip 2each{ call }2each 2each 
+    ] [
+        drop drop drop 
+    ] ifte ;
+~<< 2each{ A B C D E -- A C E r:B r:D r:E >>~
+"2list"
+"factor.compiler.gen._list_22"
+define
+: 2map ( [ list ] [ list ] [ code ] -- [ mapping ] )
+    #! Applies the code to each pair of items, returns a list
+    #! that contains the result of each application.
+    #!
+    #! This combinator will not compile.
+    3list restack 2each unstack ;
+~<< 2nip A B C D -- C D >>~
+~<< 2over A B C D -- A B C D A B >>~
+~<< 2r> r:A r:B -- A B >>~
+"2rlist"
+"factor.compiler.gen._rlist_25"
+define
+~<< 2rot A B C D E F -- C D E F A B >>~
+~<< 2swap A B C D -- C D A B >>~
+~<< 2swapd A B C D E F -- C D A B E F >>~
+~<< 2transp A B C D E F -- E F C D A B >>~
+~<< 2tuck A B C D -- C D A B C D >>~
+~<< 3dup A B C -- A B C A B C >>~
+"3list"
+"factor.compiler.gen._list_26"
+define
+: :g ( -- )
+    return-from-error "error-continuation" $ call ;
+: :j ( -- )
+    "error" $ dup exception? [
+        print-stack-trace 
+    ] [
+        "Not an exception: " write . 
+    ] ifte ;
+: :r ( -- )
+    return-from-error "initial-interpreter-continuation" $ dup [
+        call 
+    ] [
+        suspend 
+    ] ifte ;
+: :s ( -- )
+    return-from-error "initial-interpreter-callstack" $ callstack@ ;
+: :w ( -- )
+    "error-callstack" $ [
+        callstack$ 
+    ] unless* describe ;
+"<"
+"factor.compiler.gen.__27"
+define
+inline
+"<="
+"factor.compiler.gen.___28"
+define
+inline
+"<breader>"
+"factor.compiler.gen._breader__29"
+define
+"<bwriter>"
+"factor.compiler.gen._bwriter__30"
+define
+"<byte-stream>"
+"factor.compiler.gen._byte_stream__31"
+define
+"<byte-stream>/fclose"
+"factor.compiler.gen._byte_stream__fclose_34"
+define
+"<byte-stream>/fflush"
+"factor.compiler.gen._byte_stream__fflush_35"
+define
+"<byte-stream>/freadln"
+"factor.compiler.gen._byte_stream__freadln_36"
+define
+"<byte-stream>/fwrite"
+"factor.compiler.gen._byte_stream__fwrite_37"
+define
+"<char-stream>"
+"factor.compiler.gen._char_stream__39"
+define
+"<char-stream>/fclose"
+"factor.compiler.gen._char_stream__fclose_40"
+define
+"<char-stream>/fflush"
+"factor.compiler.gen._char_stream__fflush_41"
+define
+"<char-stream>/freadln"
+"factor.compiler.gen._char_stream__freadln_42"
+define
+"<char-stream>/fwrite"
+"factor.compiler.gen._char_stream__fwrite_43"
+define
+"<client>"
+"factor.compiler.gen._client__44"
+define
+"<compound>"
+"factor.compiler.gen._compound__50"
+define
+"<extend-stream>"
+"factor.compiler.gen._extend_stream__51"
+define
+"<file>"
+"factor.compiler.gen._file__52"
+define
+"<filebr>"
+"factor.compiler.gen._filebr__55"
+define
+"<filebw>"
+"factor.compiler.gen._filebw__56"
+define
+"<filecr>"
+"factor.compiler.gen._filecr__57"
+define
+"<filecw>"
+"factor.compiler.gen._filecw__58"
+define
+"<freader>"
+"factor.compiler.gen._freader__59"
+define
+"<html-stream>"
+"factor.compiler.gen._html_stream__60"
+define
+: <html-stream>/fwrite-attr ( string attrs stream -- )
+    [
+        html-attr-string 
+    ] dip fwrite ;
+"<irc-stream>"
+"factor.compiler.gen._irc_stream__61"
+define
+"<ireader>"
+"factor.compiler.gen._ireader__63"
+define
+"<listener-stream>"
+"factor.compiler.gen._listener_stream__64"
+define
+"<listener-stream>/fedit"
+"factor.compiler.gen._listener_stream__fedit_65"
+define
+: <listener-stream>/freadln ( -- line )
+    [
+        "listener" $ [
+            "factor.Cons" 
+        ] "factor.listener.FactorListener" "readLine" jinvoke suspend 
+    ] callcc1 ;
+"<listener-stream>/fwrite-attr"
+"factor.compiler.gen._listener_stream__fwrite_attr_66"
+define
+"<matcher>"
+"factor.compiler.gen._matcher__74"
+define
+"<namespace>"
+"factor.compiler.gen._namespace__33"
+define
+"<objnamespace>"
+"factor.compiler.gen._objnamespace__75"
+define
+"<owriter>"
+"factor.compiler.gen._owriter__76"
+define
+"<regex>"
+"factor.compiler.gen._regex__77"
+define
+"<rreader>"
+"factor.compiler.gen._rreader__78"
+define
+"<sbuf>"
+"factor.compiler.gen._sbuf__62"
+define
+"<server>"
+"factor.compiler.gen._server__79"
+define
+"<socketstream>"
+"factor.compiler.gen._socketstream__45"
+define
+"<sreader>"
+"factor.compiler.gen._sreader__80"
+define
+"<stream>"
+"factor.compiler.gen._stream__32"
+define
+"<string-output-stream>"
+"factor.compiler.gen._string_output_stream__81"
+define
+"<word>"
+"factor.compiler.gen._word__82"
+define
+"="
+"factor.compiler.gen.__14"
+define
+"=-or-contains"
+"factor.compiler.gen.__or_contains_83"
+define
+">"
+"factor.compiler.gen.__20"
+define
+inline
+">="
+"factor.compiler.gen.___86"
+define
+inline
+">=<"
+"factor.compiler.gen.____87"
+define
+">bignum"
+"factor.compiler.gen._bignum_88"
+define
+inline
+">bytes"
+"factor.compiler.gen._bytes_38"
+define
+">fixnum"
+"factor.compiler.gen._fixnum_89"
+define
+inline
+">lower"
+"factor.compiler.gen._lower_90"
+define
+~<< >r A -- r:A >>~
+">realnum"
+"factor.compiler.gen._realnum_91"
+define
+inline
+">str"
+"factor.compiler.gen._str_73"
+define
+">title"
+"factor.compiler.gen._title_92"
+define
+">upper"
+"factor.compiler.gen._upper_98"
+define
+"@"
+"factor.compiler.gen.__5"
+define
+inline
+: TRACED ( -- )
+    ;
+: [re-matches] ( matcher code -- boolean )
+    [
+        dup re-matches* 
+    ] dip [
+        drop f 
+    ] ifte ;
+"[trace+]"
+"factor.compiler.gen._trace___100"
+define
+"[trace-]"
+"factor.compiler.gen._trace___104"
+define
+"accept"
+"factor.compiler.gen.accept_105"
+define
+"add"
+"factor.compiler.gen.add_106"
+define
+"add@"
+"factor.compiler.gen.add__107"
+define
+: all-tests ( -- )
+    "Running Factor test suite..." print [
+        "auxiliary" "combinators" "compiler" "dictionary" "list" "math" "miscellaneous" "namespaces" "random" "reader" "stack" "string" "tail" "reboot" 
+    ] [
+        test 
+    ] each "All tests passed." print ;
+"and"
+"factor.compiler.gen.and_18"
+define
+inline
+"append"
+"factor.compiler.gen.append_46"
+define
+"append@"
+"factor.compiler.gen.append__108"
+define
+: apropos ( substring -- )
+    words [
+        2dup str-contains [
+            . 
+        ] [
+            drop 
+        ] ifte 
+    ] each drop ;
+"array>list"
+"factor.compiler.gen.array_list_109"
+define
+: asm ( word -- )
+    #! Prints JVM bytecode disassembly of a compiled word.
+    intern [
+        "asm" $ 
+    ] bind dup [
+        print 
+    ] [
+        drop "Not a compiled word." print 
+    ] ifte ;
+: assert ( t -- )
+    [
+        "Assertion failed!" break 
+    ] unless ;
+: assert= ( x y -- )
+    = assert ;
+"assoc"
+"factor.compiler.gen.assoc_67"
+define
+"assoc$"
+"factor.compiler.gen.assoc$_110"
+define
+"balance"
+"factor.compiler.gen.balance_111"
+define
+: balance>list ( quotation -- list )
+    balance effect>list ;
+"bignum?"
+"factor.compiler.gen.bignum__117"
+define
+inline
+: break ( exception -- )
+    global [
+        dup "error" @ "break called." print "" print ":w prints the callstack." print ":j prints the Java stack." print ":r returns to top level." print ":s returns to top level, retaining the data stack." print ":g continues execution (but expect another error)." print "" print "ERROR: " write exception. "console" $ [
+            [
+                t "expanded" @ 
+            ] bind 
+        ] when* callstack$ "error-callstack" @ [
+            "error-continuation" @ "    DEBUG. " interpreter-loop :r 
+        ] callcc0 
+    ] bind ;
+: break-if-not-integer ( x -- )
+    integer? [
+        "Not a rational: " swap cat2 error 
+    ] unless ;
+"caar"
+"factor.compiler.gen.caar_118"
+define
+inline
+"cadr"
+"factor.compiler.gen.cadr_119"
+define
+inline
+: callcc ( [ code ] -- )
+    #! Calls the code with a special quotation at the top of the
+    #! stack. The quotation has stack effect:
+    #!
+    #! ( list -- ... )
+    #!
+    #! When called, the quotation restores execution state to
+    #! the point after the callcc call, and pushes each element
+    #! of the list onto the original data stack.
+    datastack$ callstack$ [
+        f continue 
+    ] cons cons swap call ;
+: callcc0 ( [ code ] -- )
+    #! Calls the code with a special quotation at the top of the
+    #! stack. The quotation has stack effect:
+    #!
+    #! ( -- ... )
+    #!
+    #! When called, the quotation restores execution state to
+    #! the point after the callcc0 call.
+    datastack$ callstack$ [
+        [
+            f 
+        ] continue 
+    ] cons cons swap call ;
+: callcc1 ( [ code ] -- )
+    #! Calls the code with a special quotation at the top of the
+    #! stack. The quotation has stack effect:
+    #!
+    #! ( X -- ... )
+    #!
+    #! When called, the quotation restores execution state to
+    #! the point after the callcc1 call, and places X at the top
+    #! of the original datastack.
+    datastack$ callstack$ [
+        [
+            unit 
+        ] continue 
+    ] cons cons swap call ;
+"callframe"
+"factor.compiler.gen.callframe_2"
+define
+inline
+"car"
+"factor.compiler.gen.car_48"
+define
+inline
+"car+"
+"factor.compiler.gen.car__120"
+define
+"cat"
+"factor.compiler.gen.cat_121"
+define
+"cat2"
+"factor.compiler.gen.cat__71"
+define
+"cat3"
+"factor.compiler.gen.cat__122"
+define
+"cat4"
+"factor.compiler.gen.cat__123"
+define
+"cat5"
+"factor.compiler.gen.cat__124"
+define
+"cdar"
+"factor.compiler.gen.cdar_125"
+define
+inline
+"cddr"
+"factor.compiler.gen.cddr_126"
+define
+inline
+"cdr"
+"factor.compiler.gen.cdr_49"
+define
+inline
+"chance"
+"factor.compiler.gen.chance_127"
+define
+"char?"
+"factor.compiler.gen.char__129"
+define
+: chars>entities ( str -- str )
+    #! Convert <, >, &, ' and " to HTML entities.
+    [
+        dup html-entities assoc dup rot ? 
+    ] str-map ;
+"class-of"
+"factor.compiler.gen.class_of_137"
+define
+: cleave ( x [ code1 ] [ code2 ] -- )
+    #! Executes each quotation, with x on top of the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    >r over >r call r> r> call ;
+"cli-arg"
+"factor.compiler.gen.cli_arg_138"
+define
+"cli-param"
+"factor.compiler.gen.cli_param_142"
+define
+"clone"
+"factor.compiler.gen.clone_143"
+define
+"clone-list"
+"factor.compiler.gen.clone_list_144"
+define
+"clone-list-iter"
+"factor.compiler.gen.clone_list_iter_145"
+define
+"cloneArray"
+"factor.compiler.gen.cloneArray_146"
+define
+"close"
+"factor.compiler.gen.close_147"
+define
+"comment?"
+"factor.compiler.gen.comment__148"
+define
+: compare ( x y [ if x < y ] [ if x = y ] [ if x > y ] -- )
+    >=< call ;
+"compile"
+"factor.compiler.gen.compile_149"
+define
+"compile*"
+"factor.compiler.gen.compile__151"
+define
+"compile-all"
+"factor.compiler.gen.compile_all_152"
+define
+: compile-call ( [ X ] -- X )
+    no-name dup compile execute ;
+"compile-maybe"
+"factor.compiler.gen.compile_maybe_157"
+define
+"compile-no-name"
+"factor.compiler.gen.compile_no_name_160"
+define
+"compiled?"
+"factor.compiler.gen.compiled__150"
+define
+"compound-or-compiled?"
+"factor.compiler.gen.compound_or_compiled__161"
+define
+"compound>list"
+"factor.compiler.gen.compound_list_164"
+define
+"compound?"
+"factor.compiler.gen.compound__162"
+define
+: cond ( x list -- )
+    #! The list is of this form:
+    #!
+    #! [ [ condition 1 ] [ code 1 ]
+    #!   [ condition 2 ] [ code 2 ]
+    #!   ... ]
+    #!
+    #! Each condition is evaluated in turn. If it returns true,
+    #! the code is evaluated. If it returns false, the next
+    #! condition is checked.
+    #!
+    #! Before evaluating each condition, the top of the stack is
+    #! duplicated. After the last condition is evaluated, the
+    #! top of the stack is popped.
+    #!
+    #! So each condition and code block must have stack effect:
+    #! ( X -- )
+    #!
+    #! This combinator will not compile.
+    dup [
+        uncons [
+            over [
+                call 
+            ] dip 
+        ] dip rot [
+            car call 
+        ] [
+            cdr cond 
+        ] ifte 
+    ] [
+        2drop 
+    ] ifte ;
+"cons"
+"factor.compiler.gen.cons_24"
+define
+inline
+"cons?"
+"factor.compiler.gen.cons__84"
+define
+inline
+"cons@"
+"factor.compiler.gen.cons__167"
+define
+"contains"
+"factor.compiler.gen.contains_168"
+define
+: continue ( datastack callstack push -- )
+    #! Do not call this directly. Used by callcc.
+    2dip callstack@ swap >r datastack@ drop r> call ;
+: count ( n -- [ 1 2 3 ... n ] )
+    #! If n <= 0, pushes the empty list.
+    [
+        f times* 
+    ] cons expand ;
+: decimal-places ( num count -- str )
+    #! Trims the number to a count of decimal places.
+    swap decimal-split [
+        rot decimal-tail cat2 
+    ] when* ;
+"decimal-split"
+"factor.compiler.gen.decimal_split_169"
+define
+"decimal-tail"
+"factor.compiler.gen.decimal_tail_172"
+define
+"deepCloneArray"
+"factor.compiler.gen.deepCloneArray_174"
+define
+"defined-word?"
+"factor.compiler.gen.defined_word__175"
+define
+"deg2rad"
+"factor.compiler.gen.deg_rad_176"
+define
+: denominator ( x/y -- x )
+    dup ratio? [
+        "factor.FactorRatio" "denominator" jvar$ 
+    ] [
+        break-if-not-integer 1 
+    ] ifte ;
+: describe ( obj -- )
+    [
+        [
+            worddef? 
+        ] [
+            see 
+        ] [
+            stack? 
+        ] [
+            stack>list print-numbered-list 
+        ] [
+            string? 
+        ] [
+            print 
+        ] [
+            drop t 
+        ] [
+            "OBJECT: " write dup . [
+                "CLASS : " write dup class-of print "--------" print inspecting vars-values. 
+            ] when* 
+        ] 
+    ] cond ;
+: describe-object-path ( string -- )
+    <namespace> [
+        dup "object-path" @ global-object-path describe 
+    ] bind ;
+: dip ( a [ b ] -- b a )
+    #! Call b as if b was not present on the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    swap >r call r> ;
+"directory"
+"factor.compiler.gen.directory_177"
+define
+"directory?"
+"factor.compiler.gen.directory__178"
+define
+: do-not-test-word ( output input word -- )
+    #! Flag for tests that are known not to work.
+    drop drop drop ;
+~<< drop A -- >>~
+: dump-boot-image ( -- )
+    t "dump" @ compile-all "factor/boot.fasl" dump-image-file "Now, restart Factor without the -no-fasl switch." print f "dump" @ ;
+: dump-image ( -- )
+    "! This is an automatically-generated fastload image." print words-not-primitives [
+        dup worddef dup compiled? [
+            swap >str . dup class-of . "define" print word-of-worddef [
+                "inline" $ 
+            ] bind [
+                "inline" print 
+            ] when 
+        ] [
+            drop see 
+        ] ifte 
+    ] each ;
+: dump-image-file ( file -- )
+    <namespace> [
+        <filecw> "stdio" @ dump-image "stdio" $ fclose 
+    ] bind ;
+~<< dup A -- A A >>~
+~<< dupd A B -- A A B >>~
+: each ( [ list ] [ quotation ] -- )
+    #! Push each element of a proper list in turn, and apply a
+    #! quotation to each element.
+    #!
+    #! In order to compile, the quotation must consume one more
+    #! value than it produces.
+    over [
+        >r uncons r> tuck 2>r call 2r> each 
+    ] [
+        2drop 
+    ] ifte ;
+: edit ( string -- )
+    "stdio" $ fedit ;
+"effect"
+"factor.compiler.gen.effect_114"
+define
+: effect>list ( effect -- effect )
+    [
+        [
+            "factor.compiler.StackEffect" "inD" jvar$ 
+        ] [
+            "factor.compiler.StackEffect" "outD" jvar$ 
+        ] [
+            "factor.compiler.StackEffect" "inR" jvar$ 
+        ] [
+            "factor.compiler.StackEffect" "outR" jvar$ 
+        ] 
+    ] interleave unit cons cons cons ;
+"ends-with-newline?"
+"factor.compiler.gen.ends_with_newline__180"
+define
+"error"
+"factor.compiler.gen.error_183"
+define
+: eval ( "X" -- X )
+    parse "compile-toplevel" $ [
+        compile-call 
+    ] [
+        call 
+    ] ifte ;
+: examples/httpd "Enter a port number: " write read >fixnum "Enter document root (eg, /home/www/): " write read httpd ;
+: examples/httpd* 8888 "/home/slava/ExampleHTTPD/" httpd ;
+: exception. ( exception -- )
+    dup "factor.FactorException" is [
+        f "java.lang.Throwable" "getMessage" jinvoke 
+    ] [
+        >str 
+    ] ifte print ;
+"exception?"
+"factor.compiler.gen.exception__184"
+define
+"exec"
+"factor.compiler.gen.exec_185"
+define
+"exists?"
+"factor.compiler.gen.exists__186"
+define
+"exit"
+"factor.compiler.gen.exit_187"
+define
+"exit*"
+"factor.compiler.gen.exit__188"
+define
+: expand ( list -- list )
+    #! Evaluates a quotation on a new stack, and pushes the
+    #! reversed stack onto the original stack.
+    #!
+    #! This combinator will not compile.
+    unit restack call unstack ;
+: extend ( object code -- object )
+    over [
+        bind 
+    ] dip ;
+"fac"
+"factor.compiler.gen.fac_189"
+define
+: fclose ( stream -- )
+    [
+        "fclose" $ call 
+    ] bind ;
+"fcopy"
+"factor.compiler.gen.fcopy_190"
+define
+: fedit ( string stream -- )
+    [
+        "fedit" $ call 
+    ] bind ;
+: fflush ( stream -- )
+    [
+        "fflush" $ call 
+    ] bind ;
+"fib"
+"factor.compiler.gen.fib_191"
+define
+"first"
+"factor.compiler.gen.first_192"
+define
+"fixnum?"
+"factor.compiler.gen.fixnum__193"
+define
+inline
+: flush ( -- )
+    "stdio" $ fflush ;
+: forever ( code -- )
+    #! The code is evaluated in an infinite loop. Typically, a
+    #! continuation is used to escape the infinite loop.
+    #!
+    #! This combinator will not compile.
+    dup dip forever ;
+: freadln ( stream -- string )
+    [
+        "freadln" $ call 
+    ] bind ;
+"frename"
+"factor.compiler.gen.frename_194"
+define
+: fwrite ( string stream -- )
+    [
+        "fwrite" $ call 
+    ] bind ;
+: fwrite-attr ( string attrs stream -- )
+    #! Write an attributed string to the given stream.
+    #! The attributes are an alist; supported keys depend
+    #! on the type of stream.
+    [
+        "fwrite-attr" $ [
+            drop "fwrite" $ 
+        ] unless* call 
+    ] bind ;
+: fwriteln ( string stream -- )
+    [
+        "fwriteln" $ call 
+    ] bind ;
+: gc ( -- )
+    f "java.lang.System" "gc" jinvoke-static ;
+"gcd"
+"factor.compiler.gen.gcd_196"
+define
+"gensym"
+"factor.compiler.gen.gensym_113"
+define
+"get"
+"factor.compiler.gen.get_197"
+define
+"get-history"
+"factor.compiler.gen.get_history_198"
+define
+"global"
+"factor.compiler.gen.global_159"
+define
+inline
+: global-object-path ( string -- object )
+    #! An object path based from the global namespace.
+    "'" split global [
+        object-path 
+    ] bind ;
+"group"
+"factor.compiler.gen.group_208"
+define
+"group-count"
+"factor.compiler.gen.group_count_209"
+define
+: group1 ( string regex -- string )
+    groups dup [
+        car 
+    ] when ;
+: groups ( input regex -- list )
+    <regex> <matcher> groups* ;
+: groups* ( matcher -- list )
+    [
+        [
+            dup group-count [
+                succ over group swap 
+            ] times* drop 
+        ] cons expand 
+    ] [re-matches] ;
+: groups/t ( string re -- groups )
+    dup t = [
+        nip 
+    ] [
+        groups 
+    ] ifte ;
+"harmonic"
+"factor.compiler.gen.harmonic_210"
+define
+"has-namespace?"
+"factor.compiler.gen.has_namespace__206"
+define
+inline
+: help "clear              -- clear datastack." ".s                 -- print datastack." ".                  -- print top of datastack." "" print "global describe    -- list all global variables." print "describe           -- describe object at top of stack." print "" print "words.             -- list all words." print "\"word\" see         -- show definition of \"word\"." print "\"str\" apropos      -- list all words whose name contains \"str\"." print "\"word\" usages.     -- list all words that call \"word\"." print "" print "[ expr ] balance . -- show stack effect of expression." print "" print "history            -- list previously entered expressions." print "X redo             -- redo expression number X from history list." print "" print "stats              -- interpreter statistics." print "exit               -- exit the interpreter." print "" print ;
+: history ( -- )
+    "X redo    -- evaluate the expression with number X." print "X re-edit -- edit the expression with number X." print "history" $ print-numbered-list ;
+"history#"
+"factor.compiler.gen.history__212"
+define
+"history+"
+"factor.compiler.gen.history__214"
+define
+: html-attr-string ( string attrs -- string )
+    "link" swap assoc dup string? [
+        html-link-string 
+    ] [
+        drop 
+    ] ifte ;
+: html-entities ( -- alist )
+    [
+        [ #\< , "&lt;" ] [ #\> , "&gt;" ] [ #\& , "&amp;" ] [ #\' , "&apos;" ] [ #\" , "&quot;" ] 
+    ] ;
+: html-link-string ( string link -- string )
+    "<a href=\"" swap object-path>link "\">" cat3 swap chars>entities "</a>" cat3 ;
+: httpd ( port docroot -- )
+    "httpd-doc-root" @ <server> httpd-loop ;
+: httpd-client ( socket -- )
+    <namespace> [
+        "stdio" $ "log" @ "stdio" @ httpd-client-log readln [
+            httpd-request 
+        ] when* 
+    ] bind ;
+: httpd-client-log ( -- )
+    "Accepted connection from " write "client" $ [
+        "socket" $ 
+    ] bind . ;
+: httpd-directory-header ( directory -- )
+    "200 Document follows" "text/html" httpd-response writeln ;
+: httpd-directory>html ( directory -- html )
+    directory [
+        httpd-file>html 
+    ] map cat ;
+: httpd-error ( error -- )
+    dup httpd-log-error [
+        "text/html" httpd-response 
+    ] [
+        httpd-error-body 
+    ] cleave cat2 writeln ;
+"httpd-error-body"
+"factor.compiler.gen.httpd_error_body_225"
+define
+: httpd-extensions ( -- alist )
+    [
+        [ "html" , "text/html" ] [ "txt" , "text/plain" ] [ "gif" , "image/gif" ] [ "png" , "image/png" ] [ "jpg" , "image/jpeg" ] [ "jpeg" , "image/jpeg" ] [ "jar" , "application/octet-stream" ] [ "zip" , "application/octet-stream" ] [ "tgz" , "application/octet-stream" ] [ "tar.gz" , "application/octet-stream" ] [ "gz" , "application/octet-stream" ] 
+    ] ;
+: httpd-file-extension ( filename -- extension )
+    ".*\\.(.*)" group1 ;
+: httpd-file-header ( filename -- header )
+    "200 Document follows" swap httpd-filetype httpd-response ;
+: httpd-file>html ( filename -- ... )
+    "<li><a href=\"" swap chars>entities "\">" over "</a></li>" ;
+: httpd-filetype ( filename -- mime-type )
+    httpd-file-extension httpd-extensions assoc [
+        "text/plain" 
+    ] unless* ;
+: httpd-get-path ( request -- file )
+    "GET (.*?)( HTTP.*|)" group1 ;
+: httpd-get-request ( url -- )
+    httpd-url>path [
+        httpd-serve-log 
+    ] [
+        httpd-parse-object-name httpd-serve-object 
+    ] cleave ;
+: httpd-get-secure-path ( path -- path )
+    dup [
+        httpd-get-path dup [
+            dup ".*\\.\\.*" re-matches [
+                drop f 
+            ] when 
+        ] [
+            drop f 
+        ] ifte 
+    ] [
+        drop f 
+    ] ifte ;
+: httpd-list-directory ( directory -- )
+    dup httpd-directory-header [
+        "<html><head><title>" swap "</title></head><body><h1>" over "</h1><ul>" over httpd-directory>html "</ul></body></html>" 
+    ] cons expand cat write ;
+: httpd-log-error ( error -- )
+    "Error: " swap cat2 "log" $ fwriteln ;
+: httpd-loop ( server -- )
+    [
+        "httpd-quit" $ not 
+    ] [
+        dup accept dup httpd-client fclose 
+    ] while ;
+: httpd-parse-object-name ( filename -- argument filename )
+    dup "(.*?)\\?(.*)" groups dup [
+        nip call 
+    ] when swap ;
+: httpd-request ( request -- )
+    httpd-get-secure-path dup [
+        httpd-get-request 
+    ] [
+        drop "400 Bad request" httpd-error 
+    ] ifte ;
+"httpd-response"
+"factor.compiler.gen.httpd_response_230"
+define
+: httpd-response-write ( msg content-type -- )
+    httpd-response writeln ;
+: httpd-serve-directory ( directory -- )
+    dup "/index.html" cat2 dup exists? [
+        nip httpd-serve-file 
+    ] [
+        drop httpd-list-directory 
+    ] ifte ;
+: httpd-serve-file ( filename -- )
+    dup httpd-file-header writeln <filebr> "client" $ fcopy ;
+: httpd-serve-log ( filename -- )
+    "Serving " write "log" $ fwriteln ;
+: httpd-serve-object ( argument filename -- )
+    dup ".*\\.lhtml" re-matches [
+        httpd-serve-script 
+    ] [
+        nip httpd-serve-static 
+    ] ifte ;
+: httpd-serve-script ( argument filename -- )
+    <namespace> [
+        swap "argument" @ run-file 
+    ] bind ;
+: httpd-serve-static ( filename -- )
+    dup exists? [
+        dup directory? [
+            httpd-serve-directory 
+        ] [
+            httpd-serve-file 
+        ] ifte 
+    ] [
+        drop "404 Not Found" httpd-error 
+    ] ifte ;
+: httpd-url>path ( uri -- path )
+    dup "http://.*?(/.*)" group1 dup [
+        nip 
+    ] [
+        drop 
+    ] ifte "httpd-doc-root" $ swap cat2 ;
+: httpd-write ( line -- )
+    "client" $ fwrite ;
+: ifte ( cond [ if true ] [ if false ] -- )
+    #! Two-way branching. The condition is a generalized
+    #! boolean; a value of f is taken to be false, any other
+    #! value is taken to be true. The condition is popped off
+    #! before either branch is taken.
+    #!
+    #! In order to compile, the two branches must have the same
+    #! stack effect difference.
+    ? call ;
+"import"
+"factor.compiler.gen.import_231"
+define
+"index-of"
+"factor.compiler.gen.index_of_170"
+define
+"index-of*"
+"factor.compiler.gen.index_of__171"
+define
+: initial-interpreter-loop ( -- )
+    #! Run the stand-alone interpreter
+    print-banner [
+        "initial-interpreter-continuation" @ 
+    ] callcc0 [
+        callstack$ "initial-interpreter-callstack" @ 
+    ] call "    " interpreter-loop ;
+: inject ( list code -- list )
+    #! Applies the code to each item, returns a list that
+    #! contains the result of each application.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
+    f transp [
+        transp over >r >r call r> cons r> 
+    ] each drop nreverse ;
+"inline"
+"factor.compiler.gen.inline_232"
+define
+: inspect ( obj -- )
+    #! Display the inspector for the object, and start a new
+    #! REPL bound to the object's namespace.
+    dup describe "--------" print "exit    - exit one level of inspector." print "suspend - return to top level." print dup inspecting [
+        "    " swap unparse " " cat3 interpreter-loop 
+    ] bind ;
+"inspecting"
+"factor.compiler.gen.inspecting_205"
+define
+"integer?"
+"factor.compiler.gen.integer__233"
+define
+inline
+: interleave ( X list -- )
+    #! Evaluate each element of the list with X on top of the
+    #! stack. When done, X is popped off the stack.
+    #!
+    #! To avoid unexpected results, each element of the list
+    #! must have stack effect ( X -- ).
+    #!
+    #! This combinator will not compile.
+    dup [
+        over [
+            unswons dip 
+        ] dip swap interleave 
+    ] [
+        2drop 
+    ] ifte ;
+"intern"
+"factor.compiler.gen.intern_101"
+define
+"intern*"
+"factor.compiler.gen.intern__103"
+define
+: interpreter-loop ( prompt -- )
+    dup >r print-prompt read dup [
+        [
+            history+ 
+        ] [
+            eval 
+        ] cleave global [
+            "quit-flag" $ 
+        ] bind [
+            rdrop global [
+                f "quit-flag" @ 
+            ] bind 
+        ] [
+            r> interpreter-loop 
+        ] ifte 
+    ] [
+        rdrop 
+    ] ifte ;
+: irc ( channels -- )
+    irc-register dup [
+        irc-join 
+    ] each [
+        "Hello everybody" swap irc-message 
+    ] each irc-loop ;
+: irc-action ( message recepients -- )
+    "ACTION " write write " :" write print ;
+: irc-eval ( line -- )
+    [
+        safe-eval 
+    ] keep-datastack drop ;
+: irc-fact ( key -- )
+    dup "facts" $ [
+        $ 
+    ] bind dup [
+        swap write " is " write print 
+    ] [
+        2drop 
+    ] ifte ;
+"irc-fact+"
+"factor.compiler.gen.irc_fact__234"
+define
+"irc-fact-"
+"factor.compiler.gen.irc_fact__235"
+define
+: irc-facts ( -- )
+    "facts" $ [
+        vars-values 
+    ] bind [
+        cdr 
+    ] subset . ;
+: irc-handle-join ( [ joined channel ] -- )
+    uncons car [
+        dup "nick" $ = [
+            "Hi " swap cat2 print 
+        ] unless 
+    ] with-irc-stream ;
+: irc-handle-privmsg ( [ recepient message ] -- )
+    uncons car swap [
+        [
+            [
+                "eval (.+)" car irc-eval 
+            ] [
+                "see (.+)" car see terpri 
+            ] [
+                "(facts)" drop irc-facts 
+            ] [
+                "(.+?) is (.+)" uncons car irc-fact+ 
+            ] [
+                "forget (.+)" car irc-fact- 
+            ] [
+                "insult (.+)" car " sucks" cat2 print 
+            ] [
+                "(.+)" car irc-fact 
+            ] [
+                t drop 
+            ] 
+        ] re-cond 
+    ] with-irc-stream ;
+: irc-input ( line -- )
+    #! Handle a line of IRC input.
+    dup ":.+?!.+? PRIVMSG (.+)?:(.+)" groups [
+        irc-handle-privmsg 
+    ] when* dup ":(.+)!.+ JOIN :(.+)" groups [
+        irc-handle-join 
+    ] when* global [
+        print 
+    ] bind ;
+: irc-join ( channel -- )
+    "JOIN " write print ;
+: irc-loop ( -- )
+    read [
+        irc-input irc-loop 
+    ] when* ;
+: irc-message ( message recepients -- )
+    "PRIVMSG " write write " :" write print ;
+: irc-register ( -- )
+    "USER " write "user" $ write " " write "host" $ write " " write "server" $ write " " write "realname" $ write " " print "NICK " write "nick" $ print ;
+: irc-test "factorbot" "user" @ "emu" "host" @ "irc.freenode.net" "server" @ "Factor" "realname" @ "factorbot" "nick" @ <namespace> "facts" @ "irc.freenode.net" 6667 <client> <namespace> [
+        "stdio" @ [
+            "#jedit" 
+        ] irc 
+    ] bind ;
+"is"
+"factor.compiler.gen.is_53"
+define
+"join"
+"factor.compiler.gen.join_236"
+define
+: keep-datastack ( quot -- )
+    datastack$ [
+        call 
+    ] dip datastack@ drop ;
+"last"
+"factor.compiler.gen.last_237"
+define
+"last*"
+"factor.compiler.gen.last__238"
+define
+: lazy ( var [ a ] -- value )
+    over $ [
+        drop $ 
+    ] [
+        dip dupd @ 
+    ] ifte ;
+"length"
+"factor.compiler.gen.length_213"
+define
+"list?"
+"factor.compiler.gen.list__239"
+define
+"logand"
+"factor.compiler.gen.logand_240"
+define
+inline
+"mag2"
+"factor.compiler.gen.mag__241"
+define
+: map ( [ items ] [ code ] -- [ mapping ] )
+    #! Applies the code to each item, returns a list that
+    #! contains the result of each application.
+    #!
+    #! This combinator will not compile.
+    2list restack each unstack ;
+"max"
+"factor.compiler.gen.max_244"
+define
+"max-str-length"
+"factor.compiler.gen.max_str_length_245"
+define
+"millis"
+"factor.compiler.gen.millis_246"
+define
+"min"
+"factor.compiler.gen.min_173"
+define
+: must-compile ( word -- )
+    "compile" $ [
+        "Checking if " write dup " was compiled" print dup compile worddef compiled? assert 
+    ] [
+        drop 
+    ] ifte ;
+"namespace"
+"factor.compiler.gen.namespace_1"
+define
+inline
+"namespace?"
+"factor.compiler.gen.namespace__247"
+define
+inline
+"nappend"
+"factor.compiler.gen.nappend_248"
+define
+"neg"
+"factor.compiler.gen.neg_249"
+define
+inline
+"neg@"
+"factor.compiler.gen.neg__250"
+define
+"new-listener"
+"factor.compiler.gen.new_listener_251"
+define
+: new-listener-hook ( listener -- )
+    #! Called when user opens a new listener in the desktop.
+    <namespace> [
+        <listener-stream> "stdio" @ initial-interpreter-loop 
+    ] bind ;
+"next"
+"factor.compiler.gen.next_252"
+define
+~<< nip A B -- B >>~
+"no-name"
+"factor.compiler.gen.no_name_112"
+define
+~<< nop -- >>~
+"not"
+"factor.compiler.gen.not_54"
+define
+inline
+"not="
+"factor.compiler.gen.not__253"
+define
+"not@"
+"factor.compiler.gen.not__254"
+define
+"nreverse"
+"factor.compiler.gen.nreverse_131"
+define
+"nreverse-iter"
+"factor.compiler.gen.nreverse_iter_132"
+define
+"num-sort"
+"factor.compiler.gen.num_sort_255"
+define
+"number?"
+"factor.compiler.gen.number__256"
+define
+inline
+: numerator ( x/y -- x )
+    dup ratio? [
+        "factor.FactorRatio" "numerator" jvar$ 
+    ] [
+        dup break-if-not-integer 
+    ] ifte ;
+"obj>listener-link"
+"factor.compiler.gen.obj_listener_link_68"
+define
+: object-path ( list -- object )
+    #! An object path is a list of strings. Each string is a
+    #! variable name in the object namespace at that level.
+    #! Returns f if any of the objects are not set.
+    dup [
+        unswons $ dup [
+            inspecting [
+                object-path 
+            ] bind 
+        ] [
+            2drop f 
+        ] ifte 
+    ] [
+        drop this 
+    ] ifte ;
+: object-path>link ( objpath -- string )
+    chars>entities "inspect.lhtml?" swap cat2 ;
+"or"
+"factor.compiler.gen.or_163"
+define
+inline
+~<< over A B -- A B A >>~
+"pad-string"
+"factor.compiler.gen.pad_string_261"
+define
+"parent"
+"factor.compiler.gen.parent_263"
+define
+"parse"
+"factor.compiler.gen.parse_264"
+define
+"parse*"
+"factor.compiler.gen.parse__265"
+define
+"parse-file"
+"factor.compiler.gen.parse_file_266"
+define
+"parse-number"
+"factor.compiler.gen.parse_number_267"
+define
+"parse-resource"
+"factor.compiler.gen.parse_resource_268"
+define
+: partition ( ref list combinator -- list1 list2 )
+    #! Compare each element in a proper list against a
+    #! reference element using a combinator. The combinator's
+    #! return value determines if the element is prepended to
+    #! the first or second list.
+    #! The combinator must have stack effect:
+    #! ( ref element -- ? )
+    f f 2swap partition-iter rot drop ;
+: partition-iter ( ref ret1 ret2 list combinator -- ref ret1 ret2 )
+    #! Helper word for 'partition'.
+    over [
+        >r uncons r> partition-iterI 2>r dup 2r> call [
+            partition-iterT{ cons }partition-iterT partition-iter 
+        ] [
+            partition-iterF{ cons }partition-iterF partition-iter 
+        ] ifte 
+    ] [
+        2drop 
+    ] ifte ;
+~<< partition-iterF{ r:A r:B r:C r:D r:E -- C B r:A r:B r:D r:E >>~
+~<< partition-iterI A B C D E -- C E r:A r:B r:C r:D r:E >>~
+~<< partition-iterT{ r:A r:B r:C r:D r:E -- C A r:A r:B r:D r:E >>~
+~<< pick A B C -- A B C A >>~
+"pow"
+"factor.compiler.gen.pow_269"
+define
+inline
+"pred"
+"factor.compiler.gen.pred_21"
+define
+inline
+"pred@"
+"factor.compiler.gen.pred__270"
+define
+: prettyprint ( list -- )
+    0 swap prettyprint* drop ;
+: prettyprint* ( indent obj -- indent )
+    [
+        [
+            not 
+        ] [
+            prettyprint-object 
+        ] [
+            list? 
+        ] [
+            prettyprint-[] 
+        ] [
+            compound-or-compiled? 
+        ] [
+            tuck worddef>list prettyprint-:; swap prettyprint-inline dup prettyprint-newline 
+        ] [
+            shuffle? 
+        ] [
+            worddef>list prettyprint-~<<>>~ 
+        ] [
+            drop t 
+        ] [
+            prettyprint-object 
+        ] 
+    ] cond ;
+: prettyprint-: ( indent -- indent )
+    ":" write prettyprint-space tab-size + ;
+: prettyprint-:; ( indent list -- indent )
+    swap prettyprint-: swap prettyprint-list prettyprint-; ;
+: prettyprint-; ( indent -- indent )
+    ";" write tab-size - ;
+: prettyprint->>~ ( indent -- indent )
+    ">>~" write tab-size - dup prettyprint-newline ;
+: prettyprint-[ ( indent -- indent )
+    "[" write tab-size + dup prettyprint-newline ;
+: prettyprint-[] ( indent list -- indent )
+    swap prettyprint-[ swap prettyprint-list prettyprint-] ;
+: prettyprint-] ( indent -- indent )
+    tab-size - dup prettyprint-newline "]" write prettyprint-space ;
+: prettyprint-indent ( indent -- )
+    #! Print the given number of spaces.
+    spaces write ;
+: prettyprint-inline ( worddef -- )
+    word-of-worddef [
+        "inline" $ 
+    ] bind [
+        " inline" write 
+    ] when ;
+: prettyprint-list ( indent list -- indent )
+    #! Pretty-print a list, without [ and ].
+    [
+        prettyprint* 
+    ] each ;
+: prettyprint-newline ( indent -- )
+    "\n" write prettyprint-indent ;
+: prettyprint-object ( indent obj -- indent )
+    dup word-or-comment? [
+        dup >str ends-with-newline? [
+            write dup prettyprint-indent 
+        ] [
+            unparse. " " write 
+        ] ifte 
+    ] [
+        unparse. " " write 
+    ] ifte ;
+: prettyprint-space ( -- )
+    " " write ;
+: prettyprint-~<< ( indent -- indent )
+    "~<<" write prettyprint-space tab-size + ;
+: prettyprint-~<<>>~ ( indent list -- indent )
+    swap prettyprint-~<< swap prettyprint-list prettyprint->>~ ;
+"primitive?"
+"factor.compiler.gen.primitive__271"
+define
+: print ( string -- )
+    "stdio" $ [
+        fwriteln 
+    ] [
+        fflush 
+    ] cleave ;
+: print-banner ( -- )
+    "Factor " version cat2 print "Copyright (C) 2003, 2004 Slava Pestov" print "Enter ``help'' for help." print "Enter ``exit'' to exit." print ;
+: print-numbered-list ( list -- )
+    dup length pred swap print-numbered-list* ;
+: print-numbered-list* ( number list -- )
+    dup [
+        uncons [
+            over pred 
+        ] dip print-numbered-list* ": " swap cat3 print 
+    ] [
+        2drop 
+    ] ifte ;
+: print-prompt ( prompt -- )
+    write history# write "] " write flush ;
+"print-stack-trace"
+"factor.compiler.gen.print_stack_trace_272"
+define
+~<< r> r:A -- A >>~
+"rad2deg"
+"factor.compiler.gen.rad_deg_273"
+define
+"random-angle"
+"factor.compiler.gen.random_angle_274"
+define
+"random-boolean"
+"factor.compiler.gen.random_boolean_275"
+define
+"random-digit"
+"factor.compiler.gen.random_digit_276"
+define
+"random-element"
+"factor.compiler.gen.random_element_277"
+define
+"random-element*"
+"factor.compiler.gen.random_element__278"
+define
+"random-element-iter"
+"factor.compiler.gen.random_element_iter_279"
+define
+"random-float"
+"factor.compiler.gen.random_float_280"
+define
+"random-int"
+"factor.compiler.gen.random_int_128"
+define
+"random-probability"
+"factor.compiler.gen.random_probability_281"
+define
+"random-subset"
+"factor.compiler.gen.random_subset_282"
+define
+"random-subset*"
+"factor.compiler.gen.random_subset__283"
+define
+"random-symmetric-int"
+"factor.compiler.gen.random_symmetric_int_284"
+define
+"ratio?"
+"factor.compiler.gen.ratio__285"
+define
+inline
+~<< rdrop r:A -- >>~
+: re-cond ( string alist -- )
+    dup [
+        unswons [
+            over 
+        ] dip uncons [
+            groups/t 
+        ] dip over [
+            2nip call 
+        ] [
+            2drop re-cond 
+        ] ifte 
+    ] [
+        2drop 
+    ] ifte ;
+: re-edit ( index -- )
+    get-history edit ;
+"re-matches"
+"factor.compiler.gen.re_matches_286"
+define
+"re-matches*"
+"factor.compiler.gen.re_matches__287"
+define
+"re-replace"
+"factor.compiler.gen.re_replace_288"
+define
+"re-replace*"
+"factor.compiler.gen.re_replace__289"
+define
+"re-split"
+"factor.compiler.gen.re_split_290"
+define
+: read ( -- string )
+    "stdio" $ freadln ;
+"realnum?"
+"factor.compiler.gen.realnum__291"
+define
+inline
+"recip"
+"factor.compiler.gen.recip_211"
+define
+: redo ( index -- )
+    get-history [
+        . 
+    ] [
+        eval 
+    ] cleave ;
+"relative>absolute-object-path"
+"factor.compiler.gen.relative_absolute_object_path_292"
+define
+"rem"
+"factor.compiler.gen.rem_293"
+define
+inline
+"remove"
+"factor.compiler.gen.remove_294"
+define
+"remove@"
+"factor.compiler.gen.remove__295"
+define
+: return-from-error ( -- )
+    "Returning from break." print f "error-callstack" @ f "error-flag" @ f "error" @ ;
+"reverse"
+"factor.compiler.gen.reverse_199"
+define
+~<< rot A B C -- B C A >>~
+"round"
+"factor.compiler.gen.round_296"
+define
+~<< rover r:A r:B -- r:A r:B r:A >>~
+"rplaca"
+"factor.compiler.gen.rplaca_297"
+define
+inline
+"rplacd"
+"factor.compiler.gen.rplacd_133"
+define
+inline
+: run-file ( path -- )
+    parse-file call ;
+: run-resource ( path -- )
+    #! Reads and runs a source file from a resource path.
+    parse-resource call ;
+"running-desktop?"
+"factor.compiler.gen.running_desktop__298"
+define
+"s@"
+"factor.compiler.gen.s__6"
+define
+inline
+: safe-call ( quot -- )
+    dup safe? [
+        call 
+    ] [
+        "Contains prohibited words" print 
+    ] ifte ;
+: safe-eval ( str -- )
+    parse safe-call ;
+"safe-word?"
+"factor.compiler.gen.safe_word__299"
+define
+"safe?"
+"factor.compiler.gen.safe__300"
+define
+"sbuf-append"
+"factor.compiler.gen.sbuf_append_72"
+define
+: see ( word -- )
+    worddef prettyprint ;
+"shuffle?"
+"factor.compiler.gen.shuffle__301"
+define
+: sort ( list comparator -- sorted )
+    #! Sort the elements in a proper list using a comparator.
+    #! The comparator must have stack effect:
+    #! ( x y -- ? )
+    #! To sort elements in descending order, return t if x < y.
+    #! To sort elements in ascending order, return t if x > y.
+    over [
+        dup >r >r uncons dupd r> partition r> tuck sort >r sort r> swapd cons nappend 
+    ] [
+        drop 
+    ] ifte ;
+"spaces"
+"factor.compiler.gen.spaces_262"
+define
+"split"
+"factor.compiler.gen.split_202"
+define
+"sq"
+"factor.compiler.gen.sq_242"
+define
+inline
+"sqrt"
+"factor.compiler.gen.sqrt_243"
+define
+inline
+"stack>list"
+"factor.compiler.gen.stack_list_302"
+define
+"stack?"
+"factor.compiler.gen.stack__303"
+define
+: stats ( -- )
+    "Cons:     " write "factor.Cons" "COUNT" jvar-static$ . "Words:    " write words length . "Compiled: " write words [
+        worddef compiled? 
+    ] subset length . ;
+"str->=<"
+"factor.compiler.gen.str_____304"
+define
+"str-contains"
+"factor.compiler.gen.str_contains_305"
+define
+: str-each ( str [ code ] -- )
+    over str-length [
+        -rot 2dup [
+            [
+                str-get 
+            ] dip call 
+        ] 2dip 
+    ] times* 2drop ;
+: str-expand ( [ code ] -- str )
+    expand cat ;
+"str-get"
+"factor.compiler.gen.str_get_135"
+define
+"str-head"
+"factor.compiler.gen.str_head_97"
+define
+"str-head?"
+"factor.compiler.gen.str_head__139"
+define
+"str-headcut"
+"factor.compiler.gen.str_headcut_141"
+define
+"str-length"
+"factor.compiler.gen.str_length_95"
+define
+"str-length<"
+"factor.compiler.gen.str_length__140"
+define
+"str-lexi>"
+"factor.compiler.gen.str_lexi__306"
+define
+: str-map ( str code -- str )
+    f transp [
+        transp over >r >r call r> cons r> 
+    ] str-each drop nreverse cat ;
+"str-sort"
+"factor.compiler.gen.str_sort_307"
+define
+"str-tail"
+"factor.compiler.gen.str_tail_94"
+define
+"str-tail?"
+"factor.compiler.gen.str_tail__181"
+define
+"str-tailcut"
+"factor.compiler.gen.str_tailcut_182"
+define
+"str/"
+"factor.compiler.gen.str__93"
+define
+"str//"
+"factor.compiler.gen.str___203"
+define
+"stream>str"
+"factor.compiler.gen.stream_str_308"
+define
+"string?"
+"factor.compiler.gen.string__69"
+define
+: subset ( list pred -- list )
+    #! Applies a quotation to each element of a list; all
+    #! elements for which the quotation returned a value other
+    #! than f are collected in a new list.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
+    f -rot subset-iter nreverse ;
+: subset-add ( car pred accum -- accum )
+    >r over >r call r> r> rot [
+        cons 
+    ] [
+        nip 
+    ] ifte ;
+: subset-iter ( accum list pred -- accum )
+    over [
+        >r unswons r> 2swap pick 2>r subset-add 2r> subset-iter 
+    ] [
+        2drop 
+    ] ifte ;
+"substring"
+"factor.compiler.gen.substring_96"
+define
+"succ"
+"factor.compiler.gen.succ_134"
+define
+inline
+"succ@"
+"factor.compiler.gen.succ__309"
+define
+: suspend ( -- )
+    "top-level-continuation" $ dup [
+        call 
+    ] [
+        clear unwind 
+    ] ifte ;
+~<< swap A B -- B A >>~
+~<< swapd A B C -- B A C >>~
+"swons"
+"factor.compiler.gen.swons_200"
+define
+inline
+"swons@"
+"factor.compiler.gen.swons__310"
+define
+"system-property"
+"factor.compiler.gen.system_property_311"
+define
+: tab-size #! Change this to suit your tastes.
+    4 ;
+: terpri ( -- )
+    #! Print a newline to standard output.
+    "\n" write ;
+: test ( name -- )
+    "/factor/test/" swap ".factor" cat3 run-resource ;
+: test-word ( output input word -- )
+    3dup 3list . append compile-no-name unit expand assert= ;
+"this"
+"factor.compiler.gen.this_207"
+define
+inline
+: time ( code -- )
+    millis >r call millis r> - . ;
+: times ( n [ code ] -- )
+    #! Evaluate a quotation n times.
+    #!
+    #! In order to compile, the code must produce as many values
+    #! as it consumes.
+    [
+        over 0 > 
+    ] [
+        tuck >r pred >r call r> r> 
+    ] while 2drop ;
+: times* ( n [ code ] -- )
+    #! Evaluate a quotation n times, pushing the index at each
+    #! iteration. The index ranges from 0 to n-1.
+    #!
+    #! In order to compile, the code must consume one more value
+    #! than it produces.
+    0 rot [
+        2dup < 
+    ] [
+        >r 2dup succ >r >r swap call r> r> r> 
+    ] while drop drop drop ;
+: trace+ ( word stack? -- )
+    over traced? [
+        "Already traced." print 2drop 
+    ] [
+        over worddef dup compound? [
+            compound>list [
+                dupd [trace+] 
+            ] dip append define 
+        ] [
+            "Cannot trace non-compound definition." print 
+        ] ifte 
+    ] ifte ;
+: trace- ( word -- )
+    dup traced? [
+        dup worddef compound>list [trace-] define 
+    ] [
+        drop "Not traced." print 
+    ] ifte ;
+"traced?"
+"factor.compiler.gen.traced__313"
+define
+~<< transp A B C -- C B A >>~
+"tree-contains"
+"factor.compiler.gen.tree_contains_85"
+define
+~<< tuck A B -- B A B >>~
+"uncons"
+"factor.compiler.gen.uncons_47"
+define
+inline
+"unique"
+"factor.compiler.gen.unique_314"
+define
+"unique@"
+"factor.compiler.gen.unique__315"
+define
+"unit"
+"factor.compiler.gen.unit_23"
+define
+inline
+: unless ( cond [ if false ] -- )
+    #! Execute a quotation only when the condition is f. The
+    #! condition is popped off the stack.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
+    f swap ? call ;
+: unless* ( cond [ if false ] -- )
+    #! If cond is f, pop it off the stack and evaluate the
+    #! quotation. Otherwise, leave cond on the stack.
+    #!
+    #! In order to compile, the quotation must consume one less
+    #! value than it produces.
+    over [
+        drop 
+    ] [
+        nip call 
+    ] ifte ;
+"unparse"
+"factor.compiler.gen.unparse_70"
+define
+: unparse. ( X -- "X" )
+    dup defined-word? [
+        "link" over word-link >str cons unit write-attr 
+    ] [
+        unparse write 
+    ] ifte ;
+"unswons"
+"factor.compiler.gen.unswons_156"
+define
+inline
+: usages. ( word -- )
+    intern words [
+        2dup = [
+            drop 
+        ] [
+            2dup worddef>list tree-contains [
+                . 
+            ] [
+                drop 
+            ] ifte 
+        ] ifte 
+    ] each drop ;
+: v* ( A B -- A*B )
+    [
+        * 
+    ] 2map ;
+: v+ ( A B -- A+B )
+    [
+        + 
+    ] 2map ;
+: v- ( A B -- A-B )
+    [
+        - 
+    ] 2map ;
+: v. ( A B -- A.B )
+    v* 0 swap [
+        + 
+    ] each ;
+: v/ ( A B -- A/B )
+    [
+        / 
+    ] 2map ;
+: value. ( max [ name , value ] -- )
+    dup [
+        car tuck pad-string write write 
+    ] dip ": " write var. terpri ;
+"values"
+"factor.compiler.gen.values_154"
+define
+: var. ( [ name , value ] -- )
+    uncons unparse swap relative>absolute-object-path "link" swap cons unit write-attr ;
+"vars"
+"factor.compiler.gen.vars_316"
+define
+"vars-values"
+"factor.compiler.gen.vars_values_155"
+define
+: vars-values. ( namespace -- )
+    #! Prints all name/value pairs defined in the current
+    #! namespace to standard output.
+    [
+        vars max-str-length vars-values 
+    ] bind [
+        dupd value. 
+    ] each drop ;
+: vars. ( -- )
+    vars [
+        print 
+    ] each ;
+: version "0.58" ;
+: when ( cond [ if true ] -- )
+    #! Execute a quotation only when the condition is not f. The
+    #! condition is popped off the stack.
+    #!
+    #! In order to compile, the quotation must consume as many
+    #! values as it produces.
+    f ? call ;
+: when* ( cond [ code ] -- )
+    #! If the condition is true, it is left on the stack, and
+    #! the quotation is evaluated. Otherwise, the condition is
+    #! popped off the stack.
+    #!
+    #! In order to compile, the quotation must consume one more
+    #! value than it produces.
+    dupd [
+        drop 
+    ] ifte ;
+: while ( [ P ] [ R ] -- )
+    #! Evaluate P. If it leaves t on the stack, evaluate R, and
+    #! recurse.
+    #!
+    #! In order to compile, the stack effect of P * ( X -- ) * R
+    #! must consume as many values as it produces.
+    >r dup >r call [
+        rover r> call r> r> while 
+    ] [
+        rdrop rdrop 
+    ] ifte ;
+: with-irc-stream ( recepient quot -- )
+    <namespace> [
+        [
+            "stdio" $ swap <irc-stream> "stdio" @ 
+        ] dip call 
+    ] bind ;
+"word"
+"factor.compiler.gen.word_158"
+define
+"word-link"
+"factor.compiler.gen.word_link_318"
+define
+"word-of-worddef"
+"factor.compiler.gen.word_of_worddef_166"
+define
+"word-or-comment?"
+"factor.compiler.gen.word_or_comment__319"
+define
+"word?"
+"factor.compiler.gen.word__102"
+define
+"worddef"
+"factor.compiler.gen.worddef_115"
+define
+"worddef>list"
+"factor.compiler.gen.worddef_list_165"
+define
+"worddef?"
+"factor.compiler.gen.worddef__116"
+define
+"words"
+"factor.compiler.gen.words_153"
+define
+"words-not-primitives"
+"factor.compiler.gen.words_not_primitives_320"
+define
+: words. ( -- )
+    words [
+        . 
+    ] each ;
+: write ( string -- )
+    "stdio" $ fwrite ;
+: write-attr ( attrs stream -- )
+    #! Write an attributed string to standard output.
+    "stdio" $ fwrite-attr ;
+~<< }2each r:A r:B r:C -- A B C >>~
+~<< }partition-iterF A r:B r:C r:D r:E -- B A D E >>~
+~<< }partition-iterT A r:B r:C r:D r:E -- A C D E >>~

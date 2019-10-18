@@ -25,16 +25,6 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-! Used by chars>entities
-[
-    [ #\< , "&lt;"   ]
-    [ #\> , "&gt;"   ]
-    [ #\& , "&amp;"  ]
-! Bad parser!
-!    [ #\' , "&apos;" ]
-!    [ #\" , "&quot;" ]
-] @entities
-
 : >bytes ( string -- array )
     ! Converts a string to an array of ASCII bytes. An exception
     ! is thrown if the string contains non-ASCII characters.
@@ -82,9 +72,22 @@
 : char? ( obj -- boolean )
     "java.lang.Character" is ;
 
+: ends-with-newline? ( string -- string )
+    #! Test if the string ends with a newline or not.
+    "\n" str-tail? ;
+
+: html-entities ( -- alist )
+    [
+        [ #\< , "&lt;"   ]
+        [ #\> , "&gt;"   ]
+        [ #\& , "&amp;"  ]
+        [ #\' , "&apos;" ]
+        [ #\" , "&quot;" ]
+    ] ;
+
 : chars>entities ( str -- str )
-    ! Convert <, >, &, ' and " to HTML entities.
-    [ dup $entities assoc dup rot ? ] str-map ;
+    #! Convert <, >, &, ' and " to HTML entities.
+    [ dup html-entities assoc dup rot ? ] str-map ;
 
 : group ( index match -- )
     [ "int" ] "java.util.regex.Matcher" "group"
@@ -123,6 +126,20 @@
 : index-of ( string substring -- index )
     0 -rot index-of* ;
 
+: join ( list separator -- string )
+    #! Returns a new string where each element of the list is
+    #! separated by the separator.
+    swap dup [
+        uncons
+        [ <sbuf> sbuf-append ] dip
+        [
+            [ dupd sbuf-append ] dip
+            swap sbuf-append
+        ] each >str nip
+    ] [
+        2drop ""
+    ] ifte ;
+
 : [re-matches] ( matcher code -- boolean )
     ! If the matcher's re-matches* function returns true,
     ! evaluate the code with the matcher at the top of the
@@ -134,6 +151,19 @@
     [ "java.lang.CharSequence" ]
     "java.util.regex.Pattern" "matcher"
     jinvoke ;
+
+: re-cond ( string alist -- )
+    dup [
+        unswons [ over ] dip ( string tail string head )
+        uncons [ groups/t ] dip ( string tail groups code )
+        over [
+            2nip call
+        ] [
+            2drop re-cond
+        ] ifte
+    ] [
+        2drop
+    ] ifte ;
 
 : re-matches* ( matcher -- boolean )
     [ ] "java.util.regex.Matcher" "matches"
@@ -169,7 +199,11 @@
 
 : split ( string split -- list )
     2dup index-of dup -1 = [
-        2drop unit
+        2drop dup str-length 0 = [
+            drop f
+        ] [
+            unit
+        ] ifte
     ] [
         swap [ str// ] dip split cons
     ] ifte ;
@@ -210,41 +244,65 @@
     [ "int" ] "java.lang.String" "charAt" jinvoke ;
 
 : str-head ( str index -- str )
-    ! Returns a new string, from the beginning of the string
-    ! until the given index.
+    #! Returns a new string, from the beginning of the string
+    #! until the given index.
     0 transp substring ;
 
 : str-headcut ( str begin -- str str )
     str-length str/ ;
 
 : str-head? ( str begin -- str )
-    ! If the string starts with begin, return the rest of the
-    ! string after begin. Otherwise, return f.
-    2dup str-length> [
+    #! If the string starts with begin, return the rest of the
+    #! string after begin. Otherwise, return f.
+    2dup str-length< [
+        2drop f
+    ] [
         tuck str-headcut
         [ = ] dip f ?
-    ] [
-        2drop f
     ] ifte ;
 
 : str-length ( str -- length )
     [ ] "java.lang.String" "length" jinvoke ;
 
-: str-length> ( str str -- boolean )
+: str-length< ( str str -- boolean )
     ! Compare string lengths.
-    [ str-length ] 2apply > ;
+    [ str-length ] 2apply < ;
 
-: str-map ( str [ code ] -- [ mapping ] )
-    2list restack str-each unstack cat ;
+: str-map ( str code -- str )
+    f transp [
+        ( accum code elem -- accum code )
+        transp over >r >r call r> cons r>
+    ] str-each drop nreverse cat ;
 
 : str-contains ( substr str -- ? )
     swap index-of -1 = not ;
 
 : str-tail ( str index -- str )
-    ! Returns a new string, from the given index until the end
-    ! of the string.
+    #! Returns a new string, from the given index until the end
+    #! of the string.
     over str-length rot substring ;
+
+: str-tailcut ( str end -- str str )
+    str-length [ dup str-length ] dip - str/ ;
+
+: str-tail? ( str end -- str )
+    #! If the string ends with end, return the start of the
+    #! string before end. Otherwise, return f.
+    2dup str-length< [
+        2drop f
+    ] [
+        tuck str-tailcut swap
+        [ = ] dip f ?
+    ] ifte ;
 
 : substring ( start end str -- str )
     [ "int" "int" ] "java.lang.String" "substring"
     jinvoke ;
+
+: max-str-length ( list -- len )
+    ! Returns the length of the longest string in the given
+    ! list.
+    0 swap [ str-length max ] each ;
+
+: pad-string ( len str -- str )
+    str-length - spaces ;

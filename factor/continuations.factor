@@ -26,40 +26,58 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 : continue (datastack callstack push --)
-    ! Do not call this directly. Used by callcc.
+    #! Do not call this directly. Used by callcc.
     ! Use a trick to carry the push parameter onto the new data stack.
     2dip
-    callstack@ (push` datastack)
-    swap (datastack push`)
-    >r (datastack)
-    datastack@ (... [ code ])
-    drop (...)
-    r> (... push`)
+    callstack@ ! push` datastack
+    swap ! datastack push`
+    >r ! datastack
+    datastack@ ! ... [ code ]
+    drop ! ...
+    r> ! ... push`
     call ;
 
-: callcc ([ code ] --)
-    ! Calls the code with a special object on the top of the stack. This object,
-    ! when called, restores execution state to just after the callcc call that
-    ! generated this object, and pushes each element of the list at the top of
-    ! the caller's data stack onto the original data stack.
+: callcc ( [ code ] -- )
+    #! Calls the code with a special quotation at the top of the
+    #! stack. The quotation has stack effect:
+    #!
+    #! ( list -- ... )
+    #!
+    #! When called, the quotation restores execution state to
+    #! the point after the callcc call, and pushes each element
+    #! of the list onto the original data stack.
 
-    ! We do a cdr since we don't want the [ code ] to be at the top of the
-    ! stack when execution is restored. Also note that $callstack's car is the
-    ! parent callframe, not the current callframe -- the current callframe is in
+    ! Slightly outdated implementation note:
+
+    ! We do a cdr since we don't want the [ code ] to be at the
+    ! top of the stack when execution is restored. Also note
+    ! that $callstack's car is the parent callframe, not the
+    ! current callframe -- the current callframe is in
     ! $callframe.
     datastack$ callstack$ [ [ ] continue ] cons cons
     swap call ;
 
 : callcc0 ([ code ] --)
+    #! Calls the code with a special quotation at the top of the
+    #! stack. The quotation has stack effect:
+    #!
+    #! ( -- ... )
+    #!
+    #! When called, the quotation restores execution state to
+    #! the point after the callcc0 call.
     ! Like callcc except no data is pushed onto the original datastack.
     datastack$ callstack$ [ [ f ] continue ] cons cons
     swap call ;
 
 : callcc1 ([ code ] --)
-    ! Like callcc except the continuation that is pushed onto the stack before
-    ! executing the given code takes the top of the caller's data stack and
-    ! pushes it onto the original datastack, instead of prepending it to the
-    ! original datastack as a list.
+    #! Calls the code with a special quotation at the top of the
+    #! stack. The quotation has stack effect:
+    #!
+    #! ( X -- ... )
+    #!
+    #! When called, the quotation restores execution state to
+    #! the point after the callcc1 call, and places X at the top
+    #! of the original datastack.
     datastack$ callstack$ [ [ unit ] continue ] cons cons
     swap call ;
 

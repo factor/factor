@@ -33,7 +33,7 @@ import factor.compiler.*;
 import factor.*;
 import java.util.Set;
 
-public class Restack extends FactorWordDefinition
+public class Restack extends FactorPrimitiveDefinition
 {
 	//{{{ Restack constructor
 	public Restack(FactorWord word)

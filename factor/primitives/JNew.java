@@ -35,7 +35,7 @@ import java.lang.reflect.*;
 import java.util.Map;
 import org.objectweb.asm.*;
 
-public class JNew extends FactorWordDefinition
+public class JNew extends FactorPrimitiveDefinition
 {
 	//{{{ JNew constructor
 	public JNew(FactorWord word)
@@ -106,7 +106,7 @@ public class JNew extends FactorWordDefinition
 			mw.visitTypeInsn(NEW,clazz);
 			mw.visitInsn(DUP);
 
-			compiler.generateArgs(mw,args.length,args);
+			compiler.generateArgs(mw,args.length,0,args);
 
 			mw.visitMethodInsn(INVOKESPECIAL,
 				clazz,

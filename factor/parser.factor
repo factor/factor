@@ -28,28 +28,18 @@
 : parse ( string -- list )
     f swap <sreader> parse* ;
 
+: parse-file ( file -- list )
+    dup <freader> parse* ;
+
 : compile-call ( [ X ] -- X )
     no-name dup compile execute ;
 
 : eval ( "X" -- X )
     parse $compile-toplevel [ compile-call ] [ call ] ifte ;
 
-: eval-compile ( "X" -- X )
-    parse no-name word compile word execute ;
-
-: runFile ( path -- )
-    dup <freader> parse* call ;
-
-: unparse ( X -- "X" )
-    [ |java.lang.Object ] |factor.FactorParser |unparse
-    jinvoke-static ;
-
-: . ( expr -- )
-    unparse print ;
+: run-file ( path -- )
+    parse-file call ;
 
 : parse-number ( str -- number )
-    parse dup length 1 = [
-        car dup number? [ drop f ] unless
-    ] [
-        drop f
-    ] ifte ;
+    [ "java.lang.String" ] "factor.FactorScanner" "parseNumber"
+    jinvoke-static ;

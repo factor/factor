@@ -31,7 +31,7 @@ package factor.compiler;
 
 import factor.*;
 
-public class RecursiveState
+public class RecursiveState implements PublicCloneable
 {
 	private Cons words;
 
@@ -43,20 +43,23 @@ public class RecursiveState
 	//{{{ RecursiveState constructor
 	public RecursiveState(RecursiveState clone)
 	{
-		words = clone.words;
+		if(clone.words != null)
+			words = clone.words;
 	} //}}}
 
 	//{{{ add() method
-	public void add(FactorWord word, StackEffect effect)
+	public void add(FactorWord word, StackEffect effect,
+		String className, String method)
 	{
-		//System.err.println(this + ": adding " + word);
-		//System.err.println(words);
+		//System.err.println(this + ": adding " + word + "," + effect);
 		if(get(word) != null)
 		{
 			//System.err.println("throwing exception");
 			throw new RuntimeException("Calling add() twice on " + word);
 		}
-		words = new Cons(new RecursiveForm(word,effect),words);
+		words = new Cons(new RecursiveForm(
+			word,effect,className,method),
+			words);
 	} //}}}
 
 	//{{{ remove() method
@@ -93,6 +96,12 @@ public class RecursiveState
 	//{{{ toString() method
 	public String toString()
 	{
-		return FactorParser.unparse(words);
+		return FactorReader.unparseObject(words);
+	} //}}}
+
+	//{{{ clone() method
+	public Object clone()
+	{
+		return new RecursiveState(this);
 	} //}}}
 }

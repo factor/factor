@@ -62,6 +62,6 @@ public class Result extends FlowObject implements Constants
 
 	public String toString()
 	{
-		return "( indeterminate )";
+		return "indeterminate:" + local;
 	}
 }

@@ -35,7 +35,7 @@ import java.lang.reflect.*;
 import java.util.Set;
 import org.objectweb.asm.*;
 
-public class Execute extends FactorWordDefinition
+public class Execute extends FactorPrimitiveDefinition
 {
 	//{{{ Execute constructor
 	public Execute(FactorWord word)

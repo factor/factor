@@ -134,6 +134,8 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	public int compileCallTo(CodeVisitor mw, FactorCompiler compiler,
 		RecursiveState recursiveCheck) throws FactorStackException
 	{
+		compiler.ensure(compiler.datastack,consumeD);
+		compiler.ensure(compiler.callstack,consumeR);
 		eval(compiler.datastack,compiler.callstack);
 		return 0;
 	} //}}}
@@ -212,10 +214,9 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	} //}}}
 
 	//{{{ toList() method
-	public Cons toList()
+	public Cons toList(FactorInterpreter interp)
 	{
-		return new Cons(word,new Cons(
-			new FactorWord(toString()),null));
+		return new Cons(new FactorWord(toString()),null);
 	} //}}}
 
 	//{{{ toString() method
@@ -232,7 +233,7 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 		for(int i = 0; i < consumeR; i++)
 		{
 			buf.append("r:");
-			buf.append((char)('A' + i));
+			buf.append((char)('A' + consumeD + i));
 			buf.append(' ');
 		}
 
@@ -244,7 +245,10 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 			{
 				int index = shuffleD[i];
 				if((index & FROM_R_MASK) == FROM_R_MASK)
+				{
 					index &= ~FROM_R_MASK;
+					index += consumeD;
+				}
 				buf.append(' ');
 				buf.append((char)('A' + index));
 			}
@@ -256,7 +260,10 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 			{
 				int index = shuffleR[i];
 				if((index & FROM_R_MASK) == FROM_R_MASK)
+				{
 					index &= ~FROM_R_MASK;
+					index += consumeD;
+				}
 				buf.append(" r:");
 				buf.append((char)('A' + index));
 			}

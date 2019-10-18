@@ -27,44 +27,19 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.primitives;
+package factor;
 
 import factor.compiler.*;
-import factor.*;
-import java.util.Map;
+import java.util.Set;
 
-public class Set extends FactorWordDefinition
+/**
+ * All primitive words extend this.
+ */
+public abstract class FactorPrimitiveDefinition extends FactorWordDefinition
 {
-	//{{{ Set constructor
-	public Set(FactorWord word)
+	//{{{ FactorPrimitiveDefinition constructor
+	public FactorPrimitiveDefinition(FactorWord word)
 	{
 		super(word);
-	} //}}}
-
-	//{{{ eval() method
-	public void eval(FactorInterpreter interp)
-		throws Exception
-	{
-		FactorDataStack datastack = interp.datastack;
-		Object name = datastack.pop();
-		Object value = datastack.pop();
-		core(interp,value,name);
-	} //}}}
-
-	//{{{ core() method
-	public static void core(FactorInterpreter interp,
-		Object value, Object name) throws Exception
-	{
-		interp.callframe.namespace.setVariable(
-			FactorJava.toString(name),value);
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws FactorStackException
-	{
-		state.ensure(state.datastack,2);
-		state.pop(null);
-		state.pop(null);
 	} //}}}
 }

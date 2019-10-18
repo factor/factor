@@ -45,6 +45,21 @@ public class FactorJava implements Constants
 {
 	public static final Class[] EMPTY_ARRAY = new Class[0];
 
+	//{{{ getSanitizedName() method
+	public static String getSanitizedName(String name)
+	{
+		StringBuffer sanitizedName = new StringBuffer();
+		for(int i = 0; i < name.length(); i++)
+		{
+			char ch = name.charAt(i);
+			if(!Character.isJavaIdentifierStart(ch))
+				sanitizedName.append("_");
+			else
+				sanitizedName.append(ch);
+		}
+		return sanitizedName.toString();
+	} //}}}
+
 	//{{{ classNameToClassList() method
 	public static Class[] classNameToClassList(Cons classes)
 		throws Exception

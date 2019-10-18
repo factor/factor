@@ -169,7 +169,7 @@ public class Cons implements PublicCloneable, FactorExternalizable
 			if(iter.car == this)
 				buf.append("<circular reference>");
 			else
-				buf.append(FactorParser.unparse(iter.car));
+				buf.append(FactorReader.unparseObject(iter.car));
 			if(iter.cdr instanceof Cons)
 			{
 				buf.append(' ');
@@ -181,7 +181,7 @@ public class Cons implements PublicCloneable, FactorExternalizable
 			else
 			{
 				buf.append(" , ");
-				buf.append(FactorParser.unparse(iter.cdr));
+				buf.append(FactorReader.unparseObject(iter.cdr));
 				iter = null;
 			}
 		}
@@ -266,7 +266,7 @@ public class Cons implements PublicCloneable, FactorExternalizable
 	} //}}}
 
 	//{{{ deepClone() method
-	public Object deepClone()
+	public Cons deepClone()
 	{
 		Object ccar;
 		if(car instanceof PublicCloneable)

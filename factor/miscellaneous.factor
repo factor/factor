@@ -31,7 +31,8 @@
     "factor.FactorLib" "equal" jinvoke-static ;
 
 : class-of ( obj -- class )
-    [ ] "java.lang.Object" "getClass" jinvoke ;
+    [ ] "java.lang.Object" "getClass" jinvoke
+    [ ] "java.lang.Class" "getName" jinvoke ;
 
 : clone (obj -- obj)
     [ ] "factor.PublicCloneable" "clone" jinvoke ;
@@ -40,6 +41,9 @@
     [ [ "java.lang.Object" ] ]
     "factor.FactorLib" "cloneArray"
     jinvoke-static ;
+
+: comment? ( obj -- ? )
+    "factor.FactorDocComment" is ;
 
 : deepCloneArray (obj -- obj)
     [ [ "java.lang.Object" ] ]
@@ -70,19 +74,12 @@
     [ "java.lang.String" ] "factor.FactorLib" "error" jinvoke-static ;
 
 : exit* (code --)
-    [ |int ] |java.lang.System |exit jinvoke-static ;
+    [ "int" ] "java.lang.System" "exit" jinvoke-static ;
 
 : millis (-- millis)
     ! Pushes the current time, in milliseconds.
-    [ ] |java.lang.System |currentTimeMillis jinvoke-static
+    [ ] "java.lang.System" "currentTimeMillis" jinvoke-static
     >bignum ;
-
-: stack? ( obj -- ? )
-    "factor.FactorArrayStack" is ;
-
-: stack>list (stack -- list)
-    ! Turns a callstack or datastack object into a list.
-    [ ] "factor.FactorArrayStack" "toList" jinvoke ;
 
 : system-property ( name -- value )
     [ "java.lang.String" ] "java.lang.System" "getProperty"

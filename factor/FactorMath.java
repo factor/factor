@@ -88,6 +88,40 @@ public class FactorMath
 			+ ((Number)y).doubleValue());
 	} //}}}
 
+	//{{{ and() method
+	public static Number and(Number x, Number y)
+	{
+		if(x instanceof BigInteger)
+		{
+			if(y instanceof BigInteger)
+				return ((BigInteger)x).and((BigInteger)y);
+			else
+			{
+				return ((BigInteger)x).and(BigInteger.valueOf(
+					y.longValue()));
+			}
+		}
+		else
+		{
+			if(y instanceof BigInteger)
+			{
+				return ((BigInteger)y).and(BigInteger.valueOf(
+					x.longValue()));
+			}
+			else
+			{
+				long and = x.longValue() & y.longValue();
+				if(and > Integer.MAX_VALUE
+					|| and < Integer.MIN_VALUE)
+				{
+					return BigInteger.valueOf(and);
+				}
+				else
+					return new Integer((int)and);
+			}
+		}
+	} //}}}
+
 	//{{{ _divide() method
 	/**
 	 * Truncating division.
@@ -258,6 +292,19 @@ public class FactorMath
 		return new Double(
 			((Number)x).doubleValue()
 			* ((Number)y).doubleValue());
+	} //}}}
+
+	//{{{ neg() method
+	public static Number neg(Number x)
+	{
+		if(x instanceof Integer)
+			return new Integer(-((Integer)x).intValue());
+		else if(x instanceof BigInteger)
+			return ((BigInteger)x).negate();
+		else if(x instanceof FactorRatio)
+			return ((FactorRatio)x).neg();
+		else
+			return new Double(-((Double)x).doubleValue());
 	} //}}}
 
 	//{{{ randomAngle() method

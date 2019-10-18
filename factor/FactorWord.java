@@ -44,9 +44,14 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public final String name;
 
 	/**
-	 * Always non-null.
+	 * Interpreted/compiled word definition.
 	 */
 	public FactorWordDefinition def;
+
+	/**
+	 * Parsing word definition.
+	 */
+	public FactorParsingDefinition parsing;
 
 	/**
 	 * Contains a string if this is compiled.
@@ -58,6 +63,11 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	 */
 	public boolean compileRef;
 
+	/**
+	 * Should this word be inlined when compiling?
+	 */
+	public boolean inline;
+
 	//{{{ FactorWord constructor
 	/**
 	 * Do not use this constructor unless you're writing a packages
@@ -67,7 +77,6 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public FactorWord(String name)
 	{
 		this.name = name;
-		def = new FactorMissingDefinition(this);
 	} //}}}
 
 	//{{{ getNamespace() method
@@ -86,7 +95,7 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	 */
 	public static FactorWord gensym()
 	{
-		return new FactorWord("( GENSYM:" + (gensymCount++) + " )");
+		return new FactorWord("#<GENSYM:" + (gensymCount++) + ">");
 	} //}}}
 
 	//{{{ define() method
@@ -99,7 +108,7 @@ public class FactorWord implements FactorExternalizable, FactorObject
 			System.err.println("WARNING: " + this
 				+ " is used in one or more compiled words; old definition will remain until full recompile");
 		}
-		else if(!(this.def instanceof FactorMissingDefinition))
+		else if(this.def != null)
 			System.err.println("WARNING: redefining " + this);
 
 		this.def = def;
@@ -109,7 +118,7 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public void compile(FactorInterpreter interp)
 	{
 		RecursiveState recursiveCheck = new RecursiveState();
-		recursiveCheck.add(this,null);
+		recursiveCheck.add(this,new StackEffect(),null,null);
 		compile(interp,recursiveCheck);
 		recursiveCheck.remove(this);
 	} //}}}
@@ -120,7 +129,8 @@ public class FactorWord implements FactorExternalizable, FactorObject
 		//if(def.compileFailed)
 		//	return;
 
-		//System.err.println("Compiling " + this);
+		if(interp.verboseCompile)
+			System.err.println("Compiling " + this);
 
 		try
 		{
@@ -129,16 +139,17 @@ public class FactorWord implements FactorExternalizable, FactorObject
 		catch(Throwable t)
 		{
 			def.compileFailed = true;
-			/*System.err.println("WARNING: cannot compile " + this
-				+ ": " + t.getMessage());
-			if(!(t instanceof FactorException))
-				t.printStackTrace();*/
+			if(interp.verboseCompile)
+			{
+				System.err.println("WARNING: cannot compile " + this);
+				t.printStackTrace();
+			}
 		}
 	} //}}}
 
 	//{{{ toString() method
 	public String toString()
 	{
-		return name;
+		return FactorReader.charsToEscapes(name);
 	} //}}}
 }

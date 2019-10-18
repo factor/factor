@@ -33,7 +33,7 @@ import factor.compiler.*;
 import factor.*;
 import java.util.Set;
 
-public class Clear extends FactorWordDefinition
+public class Clear extends FactorPrimitiveDefinition
 {
 	//{{{ Clear constructor
 	public Clear(FactorWord word)

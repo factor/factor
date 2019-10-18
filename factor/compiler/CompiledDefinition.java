@@ -40,30 +40,31 @@ import org.objectweb.asm.*;
 public abstract class CompiledDefinition
 	extends FactorWordDefinition
 {
-	private StackEffect effect;
-	private Cons definition;
-
 	//{{{ CompiledDefinition constructor
-	public CompiledDefinition(FactorWord word, StackEffect effect,
-		Cons definition)
+	public CompiledDefinition(FactorWord word)
 	{
 		super(word);
-		this.effect = effect;
-		this.definition = definition;
 	} //}}}
 
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler)
+	//{{{ create() method
+	public static CompiledDefinition create(FactorInterpreter interp,
+		FactorWord word, Class compiledWordClass)
+		throws Exception
 	{
-		compiler.apply(effect);
-	} //}}}
+		Method setFields = compiledWordClass.getMethod(
+			"setFields",
+			new Class[] {
+			FactorInterpreter.class
+			});
+		setFields.invoke(null,new Object[] { interp });
 
-	//{{{ toList() method
-	public Cons toList()
-	{
-		return new Cons(word,new Cons(effect,
-			new Cons(new FactorWord("\n"),
-			definition)));
+		Constructor constructor = compiledWordClass
+			.getConstructor(
+			new Class[] {
+			FactorWord.class
+			});
+
+		return (CompiledDefinition)constructor.newInstance(
+			new Object[] { word });
 	} //}}}
 }

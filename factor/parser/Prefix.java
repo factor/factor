@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003, 2004 Slava Pestov.
+ * Copyright (C) 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,39 +27,31 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor;
+package factor.parser;
 
-import factor.compiler.*;
-import java.util.Set;
+import factor.*;
+import java.io.IOException;
 
-/**
- * A placeholder for an undefined word.
- */
-public class FactorMissingDefinition extends FactorWordDefinition
+public class Prefix extends FactorParsingDefinition
 {
-	//{{{ FactorMissingDefinition constructor
-	public FactorMissingDefinition(FactorWord word)
+	private FactorWord expansion;
+
+	public Prefix(FactorWord word, FactorWord expansion)
 	{
 		super(word);
-	} //}}}
+		this.expansion = expansion;
+	}
 
-	//{{{ eval() method
-	public void eval(FactorInterpreter interp)
-		throws FactorUndefinedWordException
+	public void eval(FactorInterpreter interp, FactorReader reader)
+		throws FactorParseException, IOException
 	{
-		throw new FactorUndefinedWordException(word);
-	} //}}}
-
-	//{{{ toList() method
-	public Cons toList()
-	{
-		return new Cons(new FactorWord("( missing: " + word + " )"),
-			null);
-	} //}}}
-
-	//{{{ toString() method
-	public String toString()
-	{
-		return "undefined";
-	} //}}}
+		if(reader.getScanner().atEndOfWord())
+			reader.append(word);
+		else
+		{
+			Object next = reader.getScanner().next(false,false);
+			reader.append(((FactorWord)next).name);
+			reader.append(expansion);
+		}
+	}
 }

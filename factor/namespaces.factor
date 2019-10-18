@@ -26,10 +26,16 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 : s@ ( variable value -- )
-    swap @ ;
+    #! Sets the value of a variable in the current namespace.
+    namespace [ "java.lang.String" "java.lang.Object" ]
+    "factor.FactorNamespace"
+    "setVariable" jinvoke ; inline
+
+: @ ( value variable -- )
+    swap s@ ; inline
 
 : has-namespace? ( a -- boolean )
-    "factor.FactorObject" is ;
+    "factor.FactorObject" is ; inline
 
 : lazy ( var [ a ] -- value )
     ! If the value of the variable is f, set the value to the
@@ -37,14 +43,14 @@
     over $ [ drop $ ] [ dip dupd @ ] ifte ;
 
 : namespace? ( a -- boolean )
-    "factor.FactorNamespace" is ;
+    "factor.FactorNamespace" is ; inline
 
-: <namespace> (-- namespace)
-    $namespace [ |factor.FactorNamespace ] |factor.FactorNamespace
-    jnew ;
+: <namespace> ( -- namespace )
+    namespace
+    [ "factor.FactorNamespace" ] "factor.FactorNamespace" jnew ;
 
 : <objnamespace> ( object -- namespace )
-    $namespace swap
+    namespace swap
     [ "factor.FactorNamespace" "java.lang.Object" ]
     "factor.FactorNamespace" jnew ;
 
@@ -59,24 +65,46 @@
 : import ( class pairs -- )
     ! Import some static variables from a Java class into the
     ! current namespace.
-    $namespace [ |java.lang.String |factor.Cons ]
-    |factor.FactorNamespace |importVars
+    namespace [ "java.lang.String" "factor.Cons" ]
+    "factor.FactorNamespace" "importVars"
     jinvoke ;
+
+: parent ( -- namespace )
+    ! Push the parent of the current namespace.
+    namespace [ ] "factor.FactorNamespace" "getParent" jinvoke ;
+
+: this ( -- object )
+    ! Returns the object bound to the current namespace, or if
+    ! no object is bound, the namespace itself.
+    namespace dup
+    [ ] "factor.FactorNamespace" "getThis" jinvoke dup rot ?
+    ; inline
 
 : vars ( -- list )
-    $namespace [ ] |factor.FactorNamespace |toVarList jinvoke ;
+    vars-values [ car ] inject ;
 
-: values ( -- list )
-    $namespace [ ] |factor.FactorNamespace |toValueList
+: vars-values ( -- list )
+    namespace [ ] "factor.FactorNamespace" "toVarValueList"
     jinvoke ;
 
-: uvalues ( -- list )
-    values [ car uvar? ] subset ;
+: values ( -- list )
+    vars-values [ cdr ] inject ;
 
-: uvar? ( name -- )
-    [ "namespace" "parent" "this" ] contains not ;
+: vars. ( -- )
+    ! Print a list of defined variables.
+    vars [ print ] each ;
 
-: uvars ( -- list )
-    ! Does not include "namespace" and "parent" variables; ie,
-    ! all user-defined variables in given namespace.
-    vars [ uvar? ] subset ;
+: var. ( [ name , value ] -- )
+    uncons unparse swap relative>absolute-object-path
+    "link" swap cons unit write-attr ;
+
+: value. ( max [ name , value ] -- )
+    dup [ car tuck pad-string write write ] dip
+    ": " write
+    var. terpri ;
+
+: vars-values. ( namespace -- )
+    #! Prints all name/value pairs defined in the current
+    #! namespace to standard output.
+    [ vars max-str-length vars-values ] bind
+    [ dupd value. ] each drop ;

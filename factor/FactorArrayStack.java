@@ -41,11 +41,14 @@ public abstract class FactorArrayStack implements FactorExternalizable
 	//{{{ FactorArrayStack constructor
 	public FactorArrayStack()
 	{
+		stack = new Object[10];
 	} //}}}
 
 	//{{{ FactorArrayStack constructor
 	public FactorArrayStack(Cons list)
 	{
+		this();
+
 		if(list != null)
 		{
 			ensurePush(list.length());
@@ -114,9 +117,6 @@ public abstract class FactorArrayStack implements FactorExternalizable
 	//{{{ ensurePush() method
 	public void ensurePush(int amount)
 	{
-		if(stack == null)
-			stack = new Object[64];
-
 		if(top + amount > stack.length)
 		{
 			Object[] newStack = new Object[stack.length * 2 + 1];

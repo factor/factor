@@ -29,25 +29,80 @@
 
 package factor.compiler;
 
-import factor.FactorWord;
+import factor.*;
+import org.objectweb.asm.Label;
 
-public class RecursiveForm
+public class RecursiveForm implements PublicCloneable
 {
+	/**
+	 * Word represented by this form.
+	 */
 	public final FactorWord word;
+
+	/**
+	 * The effect on entry into this form.
+	 * (?) only for immediates
+	 */
 	public StackEffect effect;
+
+	/**
+	 * Base case of recursive form. This is left-composed with the
+	 * effect above.
+	 */
 	public StackEffect baseCase;
+
+	/**
+	 * Is the word being compiled right now?
+	 */
 	public boolean active;
 
-	public RecursiveForm(FactorWord word, StackEffect effect)
+	/**
+	 * Name of class to call to recurse.
+	 */
+	public String className;
+
+	/**
+	 * Name of method to call to recurse.
+	 */
+	public String method;
+
+	/**
+	 * Are we compiling the last factor in the word right now?
+	 */
+	public boolean tail;
+
+	/**
+	 * A label to jump to the beginning of the definition.
+	 */
+	public Label label = new Label();
+
+	public RecursiveForm(FactorWord word, StackEffect effect,
+		String className, String method)
 	{
 		this.word = word;
 		this.effect = effect;
+		this.className = className;
+		this.method = method;
+	}
+
+	public RecursiveForm(RecursiveForm form)
+	{
+		this.word = form.word;
+		this.effect = form.effect;
+		this.baseCase = form.baseCase;
+		this.effect = form.effect;
+		this.className = form.className;
+		this.method = form.method;
 	}
 
 	public String toString()
 	{
-		return word.toString() + (
-			baseCase == null
-			? "" : "-" + baseCase);
+		return word.toString() + "-" + baseCase + "-" + effect + "-"
+			+ active + "-" + className + "." + method;
+	}
+
+	public Object clone()
+	{
+		return new RecursiveForm(this);
 	}
 }
