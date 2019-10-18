@@ -10,3 +10,7 @@ test ;
 
 [ t ] [ cell integer? ] unit-test
 [ t ] [ bootstrap-cell integer? ] unit-test
+
+[ [ 3 ] ] [ 3 f curry ] unit-test
+[ [ \ + ] ] [ \ + f curry ] unit-test
+[ [ \ + = ] ] [ \ + [ = ] curry ] unit-test

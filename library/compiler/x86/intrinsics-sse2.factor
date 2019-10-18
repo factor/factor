@@ -4,7 +4,7 @@ USING: alien arrays assembler generic kernel kernel-internals
 math math-internals memory namespaces sequences words ;
 IN: compiler
 
-M: float-regs (%peek) ( vreg loc reg-class -- )
+M: float-regs (%peek)
     drop
     fp-scratch swap %move-int>int
     fp-scratch %move-int>float ;
@@ -32,7 +32,7 @@ M: float-regs (%peek) ( vreg loc reg-class -- )
         alloc-tmp-reg POP
     ] bind ; inline
 
-M: float-regs (%replace) ( vreg loc reg-class -- )
+M: float-regs (%replace)
     drop
     [ alloc-tmp-reg 8 [+] rot v>operand MOVSD ]
     [ v>operand alloc-tmp-reg MOV ] H{

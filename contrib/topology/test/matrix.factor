@@ -232,3 +232,14 @@ USING: kernel matrices test ;
         { 1 1 0 1 }
     } null/rank
 ] unit-test
+
+[
+    1 3
+] [
+    {
+        { 0 0 0 0 0 1 0 1 }
+        { 0 0 0 0 1 0 0 1 }
+        { 0 0 0 0 1 0 0 0 }
+        { 0 0 0 0 1 1 0 1 }
+    } null/rank
+] unit-test

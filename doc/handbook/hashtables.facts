@@ -50,7 +50,6 @@ ARTICLE: "hashtables-utilities" "Hashtable utilities"
 { $subsection hash-intersect }
 { $subsection hash-diff }
 { $subsection hash-union }
-{ $subsection hash-concat }
 { $subsection hash-update }
 { $subsection remove-all }
 "A combinator used to implement notions of nested scope. This includes various fundamental abstractions like variables, vocabulary search and cascading styles."

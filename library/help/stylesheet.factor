@@ -30,7 +30,7 @@ USING: styles ;
         { border-width 5 }
     } ;
 
-: where-style
+: doc-path-style
     H{ { font-size 10 } } ;
 
 : heading-style
@@ -42,6 +42,7 @@ USING: styles ;
 
 : subsection-style
     H{
+        { font "sans-serif" }
         { font-size 14 }
         { font-style bold }
     } ;
@@ -87,9 +88,9 @@ USING: styles ;
 
 : table-style
     H{
-        { table-gap { 5 5 0 } }
+        { table-gap { 5 5 } }
         { table-border { 0.8 0.8 0.8 1.0 } }
     } ;
 
 : list-style
-    H{ { table-gap { 10 2 0 } } } ;
+    H{ { table-gap { 10 2 } } } ;

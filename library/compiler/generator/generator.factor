@@ -2,10 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: arrays assembler errors generic hashtables inference
-kernel kernel-internals math namespaces queues sequences
-words ;
+kernel kernel-internals math namespaces sequences words ;
 
-GENERIC: stack-reserve*
+GENERIC: stack-reserve* ( node -- n )
 
 M: object stack-reserve* drop 0 ;
 
@@ -22,93 +21,63 @@ DEFER: #terminal?
 
 PREDICATE: #merge #terminal-merge node-successor #terminal? ;
 
+PREDICATE: #values #terminal-values node-successor #terminal? ;
+
 PREDICATE: #call #terminal-call
     dup node-successor #if?
     over node-successor node-successor #terminal? and
     swap if-intrinsic and ;
 
 UNION: #terminal
-    POSTPONE: f #return #values #terminal-merge ;
+    POSTPONE: f #return #terminal-values #terminal-merge ;
 
 : tail-call? ( -- ? )
     node-stack get [
         dup #terminal-call? swap node-successor #terminal? or
     ] all? ;
 
-: generate-code ( word node quot -- length | quot: node -- )
-    compiled-offset >r
-    compile-aligned
-    rot save-xt
-    over stack-reserve %prologue
-    call
-    compile-aligned
-    compiled-offset r> - ;
+: generate-code ( node quot -- )
+    over stack-reserve %prologue call ; inline
 
-: generate-reloc ( -- length )
-    relocation-table get
-    dup [ assemble-cell ] each
-    length cells ;
-
-SYMBOL: previous-offset
-
-: begin-generating ( -- code-len-fixup reloc-len-fixup )
-    compiled-offset previous-offset set
+: init-generator ( -- )
     V{ } clone relocation-table set
-    init-templates begin-assembly swap ;
+    V{ } clone literal-table set
+    V{ } clone label-table set 
+    V{ } clone word-table set ;
 
-: generate-1 ( word node quot -- | quot: node -- )
-    #! If generation fails, reset compiled offset.
-    [
-        begin-generating >r >r
-            generate-code
-            generate-reloc
-        r> set-compiled-cell
-        r> set-compiled-cell
-    ] [
-        previous-offset get set-compiled-offset rethrow
-    ] recover ;
-
-SYMBOL: generate-queue
-
-: generate-loop ( -- )
-    generate-queue get dup queue-empty? [
-        drop
-    ] [
-        deque first3 generate-1 generate-loop
-    ] if ;
-
-: generate-block ( word node quot -- | quot: node -- )
-    3array generate-queue get enque ;
-
+: generate-1 ( word node quot -- )
+    #! Generate the code, then dump three vectors to pass to
+    #! add-compiled-block.
+    pick f save-xt [
+        init-generator
+        init-templates
+        generate-code
+        generate-labels
+        relocation-table get
+        literal-table get
+        word-table get
+    ] V{ } make
+    code-format add-compiled-block save-xt ;
+! 
 GENERIC: generate-node ( node -- )
 
 : generate-nodes ( node -- )
     [ node@ generate-node ] iterate-nodes end-basic-block ;
 
-: generate-word ( node -- )
-    [ [ generate-nodes ] with-node-iterator ]
-    generate-block ;
-
 : generate ( word node -- )
-    [
-        <queue> generate-queue set
-        generate-word generate-loop 
-    ] with-scope ;
+    [ [ generate-nodes ] with-node-iterator ] generate-1 ;
 
 ! node
-M: node generate-node ( node -- next ) drop iterate-next ;
+M: node generate-node drop iterate-next ;
 
 ! #label
 : generate-call ( label -- next )
     end-basic-block
     tail-call? [ %jump f ] [ %call iterate-next ] if ;
 
-M: #label generate-node ( node -- next )
-    #! We remap the IR node's label to a new label object here,
-    #! to avoid problems with two IR #label nodes having the
-    #! same label in different lexical scopes.
+M: #label generate-node
     dup node-param dup generate-call >r
-    swap node-child generate-word r> ;
+    swap node-child generate r> ;
 
 ! #if
 : end-false-branch ( label -- )
@@ -117,10 +86,10 @@ M: #label generate-node ( node -- next )
 : generate-if ( node label -- next )
     <label> [
         >r >r node-children first2 generate-nodes
-        r> r> end-false-branch save-xt generate-nodes
-    ] keep save-xt iterate-next ;
+        r> r> end-false-branch resolve-label generate-nodes
+    ] keep resolve-label iterate-next ;
 
-M: #if generate-node ( node -- next )
+M: #if generate-node
     [
         end-basic-block
         <label> dup %jump-t
@@ -132,19 +101,19 @@ M: #if generate-node ( node -- next )
 : [with-template] ( quot template -- quot )
     2array >quotation [ with-template ] append ;
 
-: define-intrinsic ( word quot template -- | quot: -- )
+: define-intrinsic ( word quot template -- )
     [with-template] "intrinsic" set-word-prop ;
 
-: define-if-intrinsic ( word quot template -- | quot: label -- )
+: define-if-intrinsic ( word quot template -- )
     [with-template] "if-intrinsic" set-word-prop ;
 
 : if>boolean-intrinsic ( label -- )
-    <label> "end" set
+    "end" define-label
     f 0 <int-vreg> load-literal
     "end" get %jump-label
-    save-xt
+    resolve-label
     t 0 <int-vreg> load-literal
-    "end" get save-xt
+    "end" get resolve-label
     0 <int-vreg> phantom-d get phantom-push
     compute-free-vregs ;
 
@@ -156,7 +125,7 @@ M: #if generate-node ( node -- next )
         drop r> if>boolean-intrinsic iterate-next
     ] if ;
 
-M: #call generate-node ( node -- next )
+M: #call generate-node
     {
         { [ dup if-intrinsic ] [ do-if-intrinsic ] }
         { [ dup intrinsic ] [ intrinsic call iterate-next ] }
@@ -164,12 +133,10 @@ M: #call generate-node ( node -- next )
     } cond ;
 
 ! #call-label
-M: #call-label generate-node ( node -- next )
+M: #call-label generate-node
     node-param generate-call ;
 
 ! #dispatch
-: target-label ( label -- ) 0 assemble-cell absolute-cell ;
-
 : dispatch-head ( node -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
@@ -177,15 +144,15 @@ M: #call-label generate-node ( node -- next )
         { +input { { f "n" } } }
         { +scratch { { f "scratch" } } }
     } with-template
-    node-children [ <label> dup target-label 2array ] map ;
+    node-children [ <label> dup %target 2array ] map ;
 
 : dispatch-body ( label/node -- )
     <label> swap [
-        first2 save-xt generate-nodes end-basic-block
+        first2 resolve-label generate-nodes end-basic-block
         dup %jump-label
-    ] each save-xt ;
+    ] each resolve-label ;
 
-M: #dispatch generate-node ( node -- next )
+M: #dispatch generate-node
     #! The parameter is a list of nodes, each one is a branch to
     #! take in case the top of stack has that type.
     dispatch-head dispatch-body iterate-next ;
@@ -199,7 +166,7 @@ UNION: immediate fixnum POSTPONE: f ;
     [ f spec>vreg [ load-literal ] keep ] map
     phantom-d get phantom-append ;
 
-M: #push generate-node ( #push -- )
+M: #push generate-node
     generate-push iterate-next ;
 
 ! #shuffle
@@ -207,8 +174,8 @@ M: #push generate-node ( #push -- )
     2dup length <= [
         cut-phantom
     ] [
-        [ phantom-locs ] keep [ length swap head-slice* ] keep
-        [ append 0 ] keep set-length
+        [ phantom-locs ] keep [ length head-slice* ] keep
+        [ append ] keep delete-all
     ] if ;
 
 : phantom-shuffle-inputs ( shuffle -- locs locs )
@@ -228,15 +195,16 @@ M: #push generate-node ( #push -- )
     [ shuffle* ] keep adjust-shuffle
     (template-outputs) ;
 
-M: #shuffle generate-node ( #shuffle -- )
+M: #shuffle generate-node
     node-shuffle phantom-shuffle iterate-next ;
 
 ! #return
 M: #return generate-node drop end-basic-block %return f ;
 
-! These constants must match native/card.h
+! These constants must match vm/memory.h
 : card-bits 7 ;
 : card-mark HEX: 80 ;
 
+! These constants must match vm/layouts.h
 : float-offset 8 float-tag - ;
 : string-offset 3 cells object-tag - ;

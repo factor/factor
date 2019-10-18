@@ -1,20 +1,15 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: listener
 USING: errors hashtables io kernel math memory namespaces
 parser sequences strings styles vectors words ;
 
-SYMBOL: listener-prompt
 SYMBOL: quit-flag
-
 SYMBOL: listener-hook
-SYMBOL: datastack-hook
-
-"ok " listener-prompt set-global
 
 : bye ( -- ) quit-flag on ;
 
-: (read-multiline) ( quot depth -- quot ? )
+: (read-multiline) ( quot depth -- newquot ? )
     >r readln dup [
         (parse) depth r> dup >r <= [
             ( we're done ) r> drop t
@@ -30,20 +25,17 @@ SYMBOL: datastack-hook
         f depth (read-multiline) >r >quotation r> in get
     ] with-parser in set ;
 
-: listen ( -- )
-    listener-hook get call
-    listener-prompt get write flush
-    [ read-multiline [ call ] [ bye ] if ] try ;
+: prompt. ( -- )
+    in get H{ { background { 1 0.7 0.7 1 } } } format bl flush ;
 
-: (listener) ( -- )
-    quit-flag get [ quit-flag off ] [ listen (listener) ] if ;
+: listen ( -- )
+    prompt. [
+        listener-hook get call
+        read-multiline [ call ] [ drop bye ] if
+    ] try ;
 
 : listener ( -- )
-    [
-        use [ clone ] change
-        [ datastack ] datastack-hook set
-        (listener)
-    ] with-scope ;
+    quit-flag get [ quit-flag off ] [ listen listener ] if ;
 
 : print-banner ( -- )
     "Factor " write version write
@@ -51,4 +43,20 @@ SYMBOL: datastack-hook
 
 IN: shells
 
-: tty print-banner listener ;
+: tty ( -- )
+    [
+        use [ clone ] change
+        print-banner
+        listener
+    ] with-scope ;
+
+IN: listener
+
+: telnetd ( port -- ) \ telnetd [ tty ] with-server ;
+
+IN: shells
+
+: telnet "telnetd-port" get string>number telnetd ;
+
+! This is a string since we string>number it above.
+"9999" "telnetd-port" set-global

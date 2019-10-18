@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: errors generic kernel kernel-internals sequences
 sequences-internals ;
@@ -26,18 +26,27 @@ UNION: integer fixnum bignum ;
         >r 1 shift r> (next-power-of-2)
     ] if ;
 
-: next-power-of-2 ( n -- n ) 2 swap (next-power-of-2) ;
+: next-power-of-2 ( m -- n ) 2 swap (next-power-of-2) ;
+
+: d>w/w ( d -- w1 w2 )
+    dup HEX: ffffffff bitand
+    swap -32 shift HEX: ffffffff bitand ;
+
+: w>h/h ( w -- h1 h2 )
+    dup HEX: ffff bitand
+    swap -16 shift HEX: ffff bitand ;
 
 IN: math-internals
 
 : fraction> ( a b -- a/b )
     dup 1 number= [ drop ] [ (fraction>) ] if ; inline
 
-: division-by-zero ( x y -- ) "Division by zero" throw ;
+TUPLE: /0 ;
+: /0 ( -- * ) </0> throw ;
 
-M: integer / ( x y -- x/y )
+M: integer /
     dup zero? [
-        division-by-zero
+        /0
     ] [
         dup 0 < [ [ neg ] 2apply ] when
         2dup gcd nip tuck /i >r /i r> fraction>

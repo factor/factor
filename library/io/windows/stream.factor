@@ -49,11 +49,11 @@ SYMBOL: cutoff
 : maybe-flush-output ( -- )
     out-buffer get buffer-length 0 > [ flush-output ] when ;
 
-M: integer do-write ( int -- )
+M: integer do-write
     out-buffer get [ buffer-capacity zero? [ flush-output ] when ] keep
     >r ch>string r> >buffer ;
 
-M: string do-write ( str -- )
+M: string do-write
     dup length out-buffer get buffer-capacity <= [
         out-buffer get >buffer
     ] [
@@ -97,30 +97,30 @@ M: string do-write ( str -- )
 : peek-input ( -- str )
     1 in-buffer get buffer-first-n ;
 
-M: win32-stream stream-write ( str stream -- )
+M: win32-stream stream-write
     win32-stream-this [ do-write ] bind ;
 
-M: win32-stream stream-write1 ( char stream -- )
+M: win32-stream stream-write1
     win32-stream-this [ >fixnum do-write ] bind ;
 
-M: win32-stream stream-read ( count stream -- str )
+M: win32-stream stream-read
     win32-stream-this [ dup <sbuf> swap do-read-count ] bind ;
 
-M: win32-stream stream-read1 ( stream -- str )
+M: win32-stream stream-read1
     win32-stream-this [
         1 consume-input dup length zero? [ drop f ] when first 
     ] bind ;
 
-M: win32-stream stream-readln ( stream -- str )
+M: win32-stream stream-readln
     win32-stream-this [ readln ] bind ;
 
 M: win32-stream stream-terpri
     win32-stream-this [ CHAR: \n do-write ] bind ;
 
-M: win32-stream stream-flush ( stream -- )
+M: win32-stream stream-flush
     win32-stream-this [ maybe-flush-output ] bind ;
 
-M: win32-stream stream-close ( stream -- )
+M: win32-stream stream-close
     win32-stream-this [
         maybe-flush-output
         handle get CloseHandle drop 
@@ -128,21 +128,21 @@ M: win32-stream stream-close ( stream -- )
         out-buffer get buffer-free
     ] bind ;
 
-M: win32-stream stream-format ( string style stream -- )
+M: win32-stream stream-format
     win32-stream-this [ drop do-write ] bind ;
 
-M: win32-stream win32-stream-handle ( stream -- handle )
+M: win32-stream win32-stream-handle
     win32-stream-this [ handle get ] bind ;
 
-M: win32-stream set-timeout ( timeout stream -- )
+M: win32-stream set-timeout
     win32-stream-this [ timeout set ] bind ;
 
-M: win32-stream expire ( stream -- )
+M: win32-stream expire
     win32-stream-this [
         timeout get [ millis cutoff get > [ handle get CancelIo ] when ] when
     ] bind ;
 
-M: win32-stream with-nested-stream ( quot style stream -- )
+M: win32-stream with-nested-stream
     win32-stream-this [ drop stream get swap with-stream* ] bind ;
 
 C: win32-stream ( handle -- stream )

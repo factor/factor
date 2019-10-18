@@ -8,7 +8,7 @@ kernel-internals math namespaces sequences words ;
 
 : parameter-sizes ( types -- offsets )
     #! Compute stack frame locations.
-    0 [ parameter-size + ] accumulate ;
+    0 [ parameter-size + ] accumulate nip ;
 
 : stack-space ( parameters -- n )
     0 [ parameter-size + ] reduce ;
@@ -22,7 +22,7 @@ kernel-internals math namespaces sequences words ;
 : fastcall-param ( reg-class -- n reg-class )
     [ dup class get swap inc-reg-class ] keep ;
 
-: alloc-parameter ( parameter -- n reg reg-class )
+: alloc-parameter ( parameter -- reg reg-class )
     #! Allocate a register and stack frame location.
     #! n is a stack location, and the value of the class
     #! variable is a register number.
@@ -61,7 +61,7 @@ kernel-internals math namespaces sequences words ;
 : box-parameter ( stack# type -- node )
     c-type [ "reg-class" get "boxer" get call ] bind ;
 
-: if-void ( type true false -- | false: type -- )
+: if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
 : compile-gc ; ! "simple_gc" f %alien-invoke , ;

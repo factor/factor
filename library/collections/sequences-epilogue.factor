@@ -4,36 +4,36 @@ IN: sequences
 USING: arrays errors generic kernel kernel-internals math
 sequences-internals strings vectors words ;
 
-: first2 ( { x y } -- x y )
+: first2 ( seq -- first second )
     1 swap bounds-check nip first2-unsafe ;
 
-: first3 ( { x y z } -- x y z )
+: first3 ( seq -- first second third )
     2 swap bounds-check nip first3-unsafe ;
 
-: first4 ( { x y z w } -- x y z w )
+: first4 ( seq -- first second third fourth )
     3 swap bounds-check nip first4-unsafe ;
 
 M: object like drop ;
 
-: index   ( obj seq -- n )
+: index ( obj seq -- n )
     [ = ] find-with drop ;
 
-: index*  ( obj i seq -- n )
+: index* ( obj i seq -- n )
     [ = ] find-with* drop ;
 
-: last-index   ( obj seq -- n )
+: last-index ( obj seq -- n )
     [ = ] find-last-with drop ;
 
-: last-index*  ( obj i seq -- n )
+: last-index* ( obj i seq -- n )
     [ = ] find-last-with* drop ;
 
 : member? ( obj seq -- ? )
     [ = ] contains-with? ;
 
-: memq?   ( obj seq -- ? )
+: memq? ( obj seq -- ? )
     [ eq? ] contains-with? ;
 
-: remove  ( obj list -- list )
+: remove ( obj list -- list )
     [ = not ] subset-with ;
 
 : (subst) ( newseq oldseq elt -- new/elt )
@@ -43,14 +43,14 @@ M: object like drop ;
 : subst ( newseq oldseq seq -- )
     [ >r 2dup r> (subst) ] inject 2drop ;
 
-: move ( to from seq -- )
+: move ( m n seq -- )
     pick pick number=
     [ 3drop ] [ [ nth swap ] keep set-nth ] if ; inline
 
-: (delete) ( elt store scan seq -- )
+: (delete) ( elt store scan seq -- elt store scan seq )
     2dup length < [
         3dup move
-        >r pick over r> dup >r nth = r> swap
+        [ nth pick = ] 2keep rot
         [ >r >r 1+ r> r> ] unless >r 1+ r> (delete)
     ] when ;
 
@@ -58,63 +58,61 @@ M: object like drop ;
 
 : push-new ( elt seq -- ) [ delete ] 2keep push ;
 
-: prune ( seq -- seq )
+: prune ( seq -- newseq )
     [ V{ } clone swap [ over push-new ] each ] keep like ;
 
-: nappend ( to from -- )
+: nappend ( dest src -- )
     >r [ length ] keep r> copy-into ; inline
 
-: >resizable ( seq -- seq ) [ thaw dup ] keep nappend ;
+: >resizable ( seq -- newseq ) [ thaw dup ] keep nappend ;
 
-: immutable ( seq quot -- seq | quot: seq -- )
+: immutable ( seq quot -- newseq )
     swap [ >resizable [ swap call ] keep ] keep like ; inline
 
-: append ( s1 s2 -- s1+s2 )
+: append ( seq1 seq2 -- newseq )
     swap [ swap nappend ] immutable ;
 
-: add ( seq elt -- seq )
+: add ( seq elt -- newseq )
     swap [ push ] immutable ;
 
-: add* ( seq elt -- seq )
+: add* ( seq elt -- newseq )
     over >r
     over thaw [ push ] keep [ swap nappend ] keep
     r> like ;
 
-: diff ( seq1 seq2 -- seq2-seq1 )
+: diff ( seq1 seq2 -- newseq )
     [ swap member? not ] subset-with ;
 
-: append3 ( s1 s2 s3 -- s1+s2+s3 )
+: append3 ( seq1 seq2 seq3 -- newseq )
     rot [ [ rot nappend ] keep swap nappend ] immutable ;
 
-: peek ( sequence -- element ) dup length 1- swap nth ;
+: peek ( seq -- elt ) dup length 1- swap nth ;
 
-: pop* ( sequence -- )
-    [ length 1- ] keep
-    [ 0 -rot set-nth ] 2keep
-    set-length ;
+: pop* ( seq -- ) dup length 1- swap set-length ;
 
-: pop ( sequence -- element )
-    dup peek swap pop* ;
+: pop ( seq -- elt )
+    dup length 1- swap [ nth ] 2keep set-length ;
 
 : all-equal? ( seq -- ? ) [ = ] monotonic? ;
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
-: mismatch ( seq1 seq2 -- i )
-    2dup min-length
-    [ >r 2dup r> 2nth-unsafe = not ] find
-    swap >r 3drop r> ;
+: (mismatch) ( seq1 seq2 n -- i )
+    [ >r 2dup r> 2nth-unsafe = not ] find drop 2nip ; inline
 
-: flip ( seq -- seq )
+: mismatch ( seq1 seq2 -- i )
+    2dup min-length (mismatch) ;
+
+: flip ( matrix -- newmatrix )
     dup empty? [
         dup first [ length ] keep like
         [ swap [ nth ] map-with ] map-with
     ] unless ;
 
-: unpair ( seq -- firsts seconds )
+: unpair ( assoc -- keys values )
     flip dup empty? [ drop { } { } ] [ first2 ] if ;
 
-: exchange ( n n seq -- )
+: exchange ( m n seq -- )
     pick over bounds-check 2drop 2dup bounds-check 2drop
     exchange-unsafe ;
 
@@ -126,23 +124,25 @@ M: object like drop ;
 
 : last/first ( seq -- pair ) dup peek swap first 2array ;
 
-: sequence= ( seq seq -- ? )
-    2dup [ length ] 2apply number= [
-        dup length [ >r 2dup r> 2nth-unsafe = ] all? 2nip
-    ] [
-        2drop f
-    ] if ;
+: sequence= ( seq1 seq2 -- ? )
+    2dup [ length ] 2apply tuck number=
+    [ (mismatch) -1 number= ] [ 3drop f ] if ; inline
+
+M: array equal?
+    over array? [ sequence= ] [ 2drop f ] if ;
+
+M: quotation equal?
+    over quotation? [ sequence= ] [ 2drop f ] if ;
+
+M: sbuf equal?
+    over sbuf? [ sequence= ] [ 2drop f ] if ;
+
+M: vector equal?
+    over vector? [ sequence= ] [ 2drop f ] if ;
 
 UNION: sequence array string sbuf vector quotation ;
 
-M: sequence = ( obj seq -- ? )
-    2dup eq? [
-        2drop t
-    ] [
-        over type over type eq? [ sequence= ] [ 2drop f ] if
-    ] if ;
-
-M: sequence hashcode ( hash -- n )
+M: sequence hashcode
     dup empty? [ drop 0 ] [ first hashcode ] if ;
 
 IN: kernel
@@ -153,9 +153,11 @@ M: object <=>
 
 : depth ( -- n ) datastack length ;
 
-: no-cond "cond fall-through" throw ;
+TUPLE: no-cond ;
+: no-cond ( -- * ) <no-cond> throw ;
 
-: cond ( conditions -- )
+: cond ( assoc -- )
     [ first call ] find nip dup [ second call ] [ no-cond ] if ;
 
-: unix? os { "freebsd" "linux" "macosx" "solaris" } member? ;
+: unix? ( -- ? )
+    os { "freebsd" "linux" "macosx" "solaris" } member? ;

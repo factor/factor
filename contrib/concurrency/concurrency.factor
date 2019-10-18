@@ -23,8 +23,8 @@
 !
 ! Concurrency library for Factor based on Erlang/Termite style
 ! concurrency.
-USING: kernel generic threads io namespaces errors words 
-       math sequences hashtables strings vectors dlists ;
+USING: kernel generic threads io namespaces errors words arrays
+       math sequences hashtables strings vectors dlists serialize ;
 IN: concurrency
 
 #! Debug
@@ -136,27 +136,34 @@ TUPLE: mailbox threads data ;
 
 #! Processes run on nodes identified by a hostname and port.
 TUPLE: node hostname port ;
- 
-: localnode ( -- node )
-  #! Return the default node on the localhost
-  "localhost" 9000 <node> ;
 
+: localnode ( -- node )
+  #! Return the current node 
+  \ localnode get ;
+    
 #! Processes run in nodes. Each process has a mailbox that is
 #! used for receiving messages sent to that process.
-TUPLE: process node links pid mailbox ;
+TUPLE: process links pid mailbox ;
+TUPLE: remote-process node pid ;
+
+GENERIC: send ( message process -- )
+
+: random-64 ( -- id ) 
+    #! Generate a random id to use for pids
+    [ "ID" % 64 [ 9 random-int CHAR: 0 + , ] times ] "" make ;
 
 : make-process ( -- process )
   #! Return a process set to run on the local node. A process is 
   #! similar to a thread but can send and receive messages to and
   #! from other processes. It may also be linked to other processes so
   #! that it receives a message if that process terminates.
-  localnode [ ] gensym unparse make-mailbox <process> ;
+  [ ] random-64 make-mailbox <process> ;
 
 : make-linked-process ( process -- process )
   #! Return a process set to run on the local node. That process is
   #! linked to the process on the stack. It will receive a message if
   #! that process terminates.
-  localnode swap unit gensym unparse make-mailbox <process> ;
+  unit random-64 make-mailbox <process> ;
 
 : self ( -- process )
   #! Returns the contents of the 'self-process' variables which
@@ -177,9 +184,15 @@ init-main-process
   ] make-hash
   swap bind ;
 
+DEFER: register-process
+DEFER: unregister-process
+
+: (spawn) ( quot -- process )
+  [ in-thread ] make-process [ with-process ] over slip ;
+
 : spawn ( quot -- process )
   #! Start a process which runs the given quotation.
-  [ in-thread ] make-process [ with-process ] over slip ;
+  [ self dup process-pid swap register-process call self process-pid unregister-process ] curry (spawn) ;
 
 TUPLE: linked-exception error ;
 
@@ -189,9 +202,9 @@ TUPLE: linked-exception error ;
   #! ( -- ).
   >r self process-mailbox r> while-mailbox-empty ; inline
 
-: send ( message process -- )
+M: process send ( message process -- )
   #! Send the message to the process by placing it in the
-  #! processes mailbox. 
+  #! processes mailbox.   
   process-mailbox mailbox-put ;
 
 : receive ( -- message )
@@ -217,12 +230,15 @@ TUPLE: linked-exception error ;
   #! Rethrow the error to the linked process
   self process-links [ over <linked-exception> swap send ] each drop ;
 
+: (spawn-link) ( quot -- process )
+  [ in-thread ] self make-linked-process [ with-process ] over slip ;
+
 : spawn-link ( quot -- process )
   #! Same as spawn but if the quotation throws an error that
   #! is uncaught, that error gets propogated to the process
   #! performing the spawn-link.
   [ catch [ rethrow-linked ] when* ] curry
-  [ in-thread ] self make-linked-process [ with-process ] over slip ;
+  [ self dup process-pid swap register-process call self process-pid unregister-process ] curry (spawn-link) ;
 
 #! A common operation is to send a message to a process containing
 #! the sending process so the receiver can send a reply back. A 'tag'
@@ -265,7 +281,7 @@ TUPLE: tagged-message data from tag ;
 
 : tag-message ( message -- tagged-message )
   #! Given a message, wrap it with a tagged message.
-  self gensym <tagged-message> ;
+  self random-64 <tagged-message> ;
 
 : tag-match? ( message tag -- bool )
   #! Return true if the message is a tagged message and
@@ -289,7 +305,7 @@ TUPLE: tagged-message data from tag ;
   #! 'send-synchronous' call. It will send 'message' back to the process
   #! that originally sent the tagged message, and will have the same tag
   #! as that in 'tagged-message'.
-  swap >tagged-message< rot drop  ( message from tag )
+  swap >tagged-message< rot drop  ! message from tag
   swap >r >r self r> <tagged-message> r> send ;
 
 : forever ( quot -- )
@@ -337,11 +353,11 @@ SYMBOL: quit-cc
   #! The result of that call will be sent back to the 
   #! messages original caller with the same tag as the 
   #! original message.
-  >r >r >tagged-message< rot ( from tag data r: quot pred )
-  dup r> call [   ( from tag data r: quot )
-    r> call       ( from tag result )
-    self          ( from tag result self )
-    rot           ( from self tag result )
+  >r >r >tagged-message< rot ! from tag data r: quot pred )
+  dup r> call [   ! from tag data r: quot
+    r> call       ! from tag result
+    self          ! from tag result self
+    rot           ! from self tag result
     <tagged-message> swap send
   ] [
     r> drop 3drop
@@ -350,12 +366,12 @@ SYMBOL: quit-cc
 : maybe-send-reply ( message pred quot -- )
   #! Same as !result but if false is returned from
   #! quot then nothing is sent back to the caller.
-  >r >r >tagged-message< rot ( from tag data r: quot pred )
-  dup r> call [   ( from tag data r: quot )
-    r> call       ( from tag result )
+  >r >r >tagged-message< rot ! from tag data r: quot pred )
+  dup r> call [   ! from tag data r: quot
+    r> call       ! from tag result
     [
-      self          ( from tag result self )
-      rot           ( from self tag result )
+      self          ! from tag result self
+      rot           ! from self tag result
       <tagged-message> swap send
     ] [
       2drop
@@ -423,22 +439,88 @@ C: promise ( -- <promise> )
 ! ******************************
 ! Experimental code below
 ! ******************************
-SYMBOL: lazy-quot
+: (lazy) ( v -- )
+  receive over reply (lazy) ;
 
 : lazy ( quot -- lazy )
   #! Spawn a process that immediately blocks and return it. 
   #! When '?lazy' is called on the returned process, call the quotation
   #! and return the result. The quotation must have stack effect ( -- X ).
-  [
-    [
-      lazy-quot set      
-      [
-        [ tagged-message? [ [ drop t ] [ get call ] send-reply ] ]
-      ] recv
-    ] with-scope
-  ] curry spawn ;
+  [ receive >r call r> over reply (lazy) ] spawn nip ;
 
 : ?lazy ( lazy -- result )
   #! Given a process spawned using 'lazy', evaluate it and return the result.
-  lazy-quot swap send-synchronous ;
+  f swap send-synchronous ;
 
+! ******************************
+! Standard Processes
+! ******************************
+TUPLE: register-msg name process ;
+TUPLE: unregister-msg name ;
+TUPLE: get-msg name ;
+
+PREDICATE: tagged-message (get-msg) ( obj -- ? )
+  tagged-message-data get-msg? ;
+
+: handle-register-process ( register-msg table -- )
+  >r [ register-msg-process ] keep register-msg-name r> set-hash ;
+
+: handle-unregister-process ( unregister-msg table -- )
+  >r unregister-msg-name r> remove-hash ;
+
+: handle-get-process ( get-msg table -- )
+  over tagged-message-data get-msg-name swap hash reply ;
+
+: process-registry ( table -- )
+  receive {
+    { [ dup register-msg? ] [ over handle-register-process ] }
+    { [ dup unregister-msg? ] [ over handle-unregister-process ] }
+    { [ dup (get-msg)? ] [ over handle-get-process ] }
+  } cond process-registry ;
+
+: register-process ( name process -- )
+  <register-msg> \ process-registry get send ;
+
+: unregister-process ( name -- )
+  <unregister-msg> \ process-registry get send ;
+
+: get-process ( name -- )
+  <get-msg> \ process-registry get send-synchronous ;
+
+[ H{ } clone process-registry ] (spawn) \ process-registry set-global
+
+: handle-node-client ( stream -- )
+  [ [ deserialize ] with-serialized ] with-stream first2 get-process send ;
+
+: (node-server) ( server -- )
+  dup accept handle-node-client (node-server) ;
+
+: node-server ( port -- )
+  <server> (node-server) ;
+
+: send-to-node ( msg pid  host port -- )
+  <client> [ 2array [ serialize ] with-serialized ] with-stream ;
+
+: start-node ( hostname port -- )
+  [ node-server ] in-thread
+  <node> \ localnode set-global ;
+
+M: remote-process send ( message process -- )
+  #! Send the message via the inter-node protocol
+  [ remote-process-pid ] keep 
+  remote-process-node 
+  [ node-hostname ] keep
+  node-port send-to-node ;
+
+M: process serialize ( obj -- )
+  localnode swap process-pid <remote-process> serialize ;
+
+: (test-node1) 
+  receive "ack" reply (test-node1) ;
+
+: test-node1 ( -- )
+  [ (test-node1) ] spawn
+  "test1" swap register-process ;
+
+: test-node2 ( hostname port -- )
+  [ <node> "test1" <remote-process> "message" swap send-synchronous . ] spawn 2drop ;

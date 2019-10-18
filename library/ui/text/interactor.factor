@@ -1,19 +1,30 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets gadgets-controls gadgets-panes hashtables help io
-kernel namespaces prettyprint styles threads ;
+USING: arrays definitions gadgets gadgets-controls gadgets-panes
+generic hashtables help io kernel namespaces prettyprint styles
+threads sequences vectors definitions parser words strings ;
 
-TUPLE: interactor output continuation ;
+TUPLE: interactor history output continuation queue busy? ;
 
 C: interactor ( output -- gadget )
     [ set-interactor-output ] keep
     f <field> over set-gadget-delegate
+    V{ } clone over set-interactor-history
     dup dup set-control-self ;
 
-: interactor-eval ( string gadget -- )
-    interactor-continuation dup
-    [ [ continue-with ] in-thread ] when 2drop ;
+M: interactor graft*
+    f over set-interactor-busy? delegate graft* ;
+
+: (interactor-eval) ( string interactor -- )
+    dup interactor-busy? [
+        2drop
+    ] [
+        t over set-interactor-busy?
+        swap "\n" split <reversed> >vector
+        over set-interactor-queue
+        interactor-continuation schedule-thread
+    ] if ;
 
 SYMBOL: structured-input
 
@@ -23,26 +34,32 @@ SYMBOL: structured-input
     ] with-stream*
     >r structured-input set-global
     "\"structured-input\" \"gadgets-text\" lookup get-global call"
-    r> interactor-eval ;
+    r> (interactor-eval) ;
 
-: print-input ( string interactor -- )
-    interactor-output [
-        H{ { font-style bold } } [
-            dup <input> presented associate
-            [ write ] with-nesting terpri
-        ] with-style
+: interactor-input. ( string interactor -- )
+    interactor-output [ dup print-input ] with-stream* ;
+
+: interactor-eval ( string interactor -- )
+    dup control-model clear-doc
+    2dup interactor-history push-new
+    2dup interactor-input.
+    (interactor-eval) ;
+
+: interactor-commit ( interactor -- )
+    dup interactor-busy? [
+        drop
+    ] [
+        [ field-commit ] keep interactor-eval
+    ] if ;
+
+: interactor-history. ( -- )
+    stdio get dup duplex-stream-out [
+        duplex-stream-in interactor-history
+        [ dup print-input ] each
     ] with-stream* ;
 
-: interactor-commit ( gadget -- )
-    dup field-commit
-    over control-model clear-doc
-    swap 2dup print-input interactor-eval ;
-
-interactor H{
-    { T{ key-down f f "RETURN" } [ interactor-commit ] }
-    { T{ key-down f { C+ } "b" } [ interactor-output pane-clear ] }
-    { T{ key-down f { C+ } "d" } [ f swap interactor-eval ] }
-} set-gestures
-
-M: interactor stream-readln ( pane -- line )
-    [ over set-interactor-continuation stop ] callcc1 nip ;
+M: interactor stream-readln
+    dup interactor-queue empty? [
+        f over set-interactor-busy?
+        [ over set-interactor-continuation stop ] callcc0
+    ] when interactor-queue pop ;

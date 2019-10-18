@@ -4,6 +4,7 @@
 #import "Foundation/NSBundle.h"
 #import "Foundation/NSException.h"
 #import "Foundation/NSString.h"
+#import "Foundation/NSPathUtilities.h"
 
 static CELL error;
 
@@ -43,7 +44,12 @@ void early_init(void)
 const char *default_image_path(void)
 {
 	NSBundle *bundle = [NSBundle mainBundle];
-	NSString *image = [[bundle resourcePath] stringByAppendingString:@"/factor.image"];
+	NSString *path = [bundle bundlePath];
+	NSString *image;
+	if([path hasSuffix:@".app"] || [path hasSuffix:@".app/"])
+		image = [[path stringByDeletingLastPathComponent] stringByAppendingString:@"/factor.image"];
+	else
+		image = [path stringByAppendingString:@"/factor.image"];
 	return [image cString];
 }
 

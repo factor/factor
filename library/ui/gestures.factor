@@ -1,16 +1,11 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel math models namespaces queues
-sequences words ;
+USING: arrays generic hashtables kernel math models namespaces
+queues sequences words ;
 
-: (gestures) ( gadget -- )
-    [
-        dup delegate (gestures)
-        class "gestures" word-prop [ , ] when*
-    ] when* ;
-
-: gestures ( gadget -- seq ) [ (gestures) ] { } make ;
+: gestures ( gadget -- seq )
+    delegates [ class "gestures" word-prop ] map [ ] subset ;
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
@@ -30,8 +25,8 @@ sequences words ;
 ! Gesture objects
 TUPLE: motion ;
 TUPLE: drag # ;
-TUPLE: button-up # ;
-TUPLE: button-down # ;
+TUPLE: button-up mods # ;
+TUPLE: button-down mods # ;
 TUPLE: wheel-up ;
 TUPLE: wheel-down ;
 TUPLE: mouse-enter ;
@@ -49,11 +44,9 @@ TUPLE: select-all-action ;
 : handle-action ( gadget constructor -- )
     execute swap handle-gesture drop ; inline
 
-GENERIC: with-button ( button# tuple -- tuple )
-
-M: drag with-button drop <drag> ;
-M: button-up with-button drop <button-up> ;
-M: button-down with-button drop <button-down> ;
+: generalize-gesture ( gesture -- gesture )
+    #! Strip button number from drag/button-up/button-down.
+    tuple>array 1 head* >tuple ;
 
 ! Modifiers
 SYMBOL: C+
@@ -80,17 +73,15 @@ SYMBOL: hand-click-loc
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
 
-: button-gesture ( button gesture -- )
-    #! Send a gesture like T{ button-down f 2 }; if nobody
-    #! handles it, send T{ button-down }.
-    hand-clicked get-global
-    3dup >r with-button r> handle-gesture
-    [ handle-gesture 2drop ] [ 3drop ] if ;
+: button-gesture ( gesture -- )
+    hand-clicked get-global 2dup handle-gesture [
+        >r generalize-gesture r> handle-gesture drop
+    ] [
+        2drop
+    ] if ;
 
 : drag-gesture ( -- )
-    #! Send a gesture like T{ drag f 2 }; if nobody handles it,
-    #! send T{ drag }.
-    hand-buttons get-global first T{ drag } button-gesture ;
+    hand-buttons get-global first <drag> button-gesture ;
 
 : fire-motion ( -- )
     #! Fire a motion gesture to the gadget underneath the hand,
@@ -133,11 +124,12 @@ V{ } clone hand-buttons set-global
     focus-receiver r> focus-gestures ;
 
 : request-focus ( gadget -- )
-    dup focusable-child swap find-world request-focus* ;
+    dup focusable-child swap find-world
+    [ request-focus* ] [ drop ] if* ;
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] subset-with
-    [ first ] map f like ;
+    [ first ] map prune f like ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;
@@ -148,18 +140,6 @@ V{ } clone hand-buttons set-global
 : hand-click-rel ( gadget -- loc )
     hand-click-loc get-global relative-loc ;
 
-: relevant-help ( seq -- help )
-    [ gadget-help ] map [ ] find nip ;
-
-: show-message ( string/f world -- )
-    #! Show a message in the status bar.
-    world-status set-model* ;
-
-: update-help ( -- )
-    #! Update mouse-over help message.
-    hand-gadget get-global parents [ relevant-help ] keep
-    dup empty? [ 2drop ] [ peek show-message ] if ;
-
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
     #! the current gadget, with all parents in between.
@@ -168,22 +148,22 @@ V{ } clone hand-buttons set-global
 : move-hand ( loc world -- )
     under-hand >r over hand-loc set-global
     pick-up hand-gadget set-global
-    under-hand r> hand-gestures update-help ;
+    under-hand r> hand-gestures ;
 
-: update-clicked ( loc world -- )
-    move-hand
+: update-clicked ( -- )
     hand-gadget get-global hand-clicked set-global
     hand-loc get-global hand-click-loc set-global ;
 
-: send-button-down ( button# loc world -- )
-    update-clicked
-    dup hand-buttons get-global push
-    T{ button-down } button-gesture ;
-
-: send-button-up ( button# loc world -- )
+: send-button-down ( gesture loc world -- )
     move-hand
-    dup hand-buttons get-global delete
-    T{ button-up } button-gesture ;
+    update-clicked
+    dup button-down-# hand-buttons get-global push
+    button-gesture ;
+
+: send-button-up ( gesture loc world -- )
+    move-hand
+    dup button-up-# hand-buttons get-global delete
+    button-gesture ;
 
 : send-wheel ( up/down loc world -- )
     move-hand
@@ -192,10 +172,3 @@ V{ } clone hand-buttons set-global
 
 : send-action ( world gesture -- )
     swap world-focus handle-gesture drop ;
-
-world H{
-    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
-    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
-    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
-    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
-} set-gestures

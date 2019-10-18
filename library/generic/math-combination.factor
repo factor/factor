@@ -1,13 +1,15 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: generic
 USING: arrays errors generic hashtables kernel kernel-internals
 math namespaces sequences words ;
 
-! Math combination for generic dyadic upgrading arithmetic.
-
-: math-class? ( object -- ? )
-    dup word? [ number bootstrap-word class< ] [ drop f ] if ;
+PREDICATE: class math-class ( object -- ? )
+    dup null bootstrap-word eq? [
+        drop f
+    ] [
+        number bootstrap-word class<
+    ] if ;
 
 : math-class-compare ( class class -- n )
     [
@@ -25,7 +27,7 @@ math namespaces sequences words ;
         "coercer" word-prop [ [ ] ] unless*
     ] if ;
 
-: math-upgrade ( left right -- quot )
+: math-upgrade ( class1 class2 -- quot )
     [ math-class-max ] 2keep
     >r over r> (math-upgrade)
     >r (math-upgrade) dup empty? [ 1 make-dip ] unless
@@ -33,17 +35,17 @@ math namespaces sequences words ;
 
 TUPLE: no-math-method left right generic ;
 
-: no-math-method ( left right generic -- )
-    3dup <no-math-method> throw ;
+: no-math-method ( left right generic -- * )
+    <no-math-method> throw ;
 
 : applicable-method ( generic class -- quot )
-    over "methods" word-prop hash
+    over method method-def
     [ ] [ [ no-math-method ] curry ] ?if ;
 
 : object-method ( generic -- quot )
     object bootstrap-word applicable-method ;
 
-: math-method ( word left right -- quot )
+: math-method ( word class1 class2 -- quot )
     2dup and [
         2dup math-upgrade >r
         math-class-max over order min-class applicable-method

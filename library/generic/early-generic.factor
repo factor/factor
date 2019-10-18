@@ -7,12 +7,8 @@ DEFER: standard-combination
 
 DEFER: math-combination
 
-: delegate ( object -- delegate )
+: delegate ( obj -- delegate )
     dup tuple? [ 3 slot ] [ drop f ] if ;
 
-: set-delegate ( delegate tuple -- )
-    dup tuple? [
-        3 set-slot
-    ] [
-        "Only tuples can have delegates" throw
-    ] if ;
+GENERIC: set-delegate ( delegate tuple -- )
+M: tuple set-delegate 3 set-slot ;

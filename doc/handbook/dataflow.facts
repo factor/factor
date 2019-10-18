@@ -160,7 +160,7 @@ ARTICLE: "threads" "Multitasking"
 { $subsection idle-thread } ;
 
 ARTICLE: "continuations-internals" "Continuation implementation details"
-"A continuation is simply a tuple holding the contents of the four stacks:"
+"A continuation is simply a tuple holding the contents of the five stacks:"
 { $subsection continuation }
 "The five stacks can be read and written:"
 { $subsection datastack }

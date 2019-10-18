@@ -1,6 +1,6 @@
 USING: help sequences ;
 
-HELP: flatten "( seq -- seq)"
+HELP: flatten
 { $values { "obj" "an object" } { "seq" "a new sequence" } }
 { $description "Recursively descends into lists, arrays, vectors and wrappers. Leaf elements are collected into a new sequence which is output at the end of the traversal." }
 { $notes "This word does not descend into virtual sequences, or user-defined sequences." } ;

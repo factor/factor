@@ -1,12 +1,9 @@
+IN: calendar
 USING: arrays errors generic hashtables io kernel math
 namespaces sequences strings prettyprint inspector ;
-IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
 TUPLE: dt year month day hour minute second ;
-
-SYMBOL: gmt-offset
-7 gmt-offset set-global
 
 : month-names
     {
@@ -32,7 +29,7 @@ SYMBOL: gmt-offset
     #! length of average month in days
     30.41666666666667 ;
 
-: time>array ( dt -- vec ) tuple>array 2 swap tail ;
+: time>array ( dt -- vec ) tuple>array 2 tail ;
 
 : compare-timestamps ( tuple tuple -- n )
     [ time>array ] 2apply <=> ;
@@ -81,12 +78,12 @@ SYMBOL: m
     [ set-timestamp-minute ] keep
     set-timestamp-hour ;
 
-: date ( timestamp -- year month day )
+: >date< ( timestamp -- year month day )
     [ timestamp-year ] keep
     [ timestamp-month ] keep
     timestamp-day ;
 
-: time ( timestamp -- hour minute second )
+: >time< ( timestamp -- hour minute second )
     [ timestamp-hour ] keep
     [ timestamp-minute ] keep
     timestamp-second ;
@@ -121,7 +118,7 @@ GENERIC: +second ( timestamp x -- timestamp )
     dup 100 mod zero? 400 4 ? mod zero? ;
 
 : adjust-leap-year ( timestamp -- timestamp )
-    dup date 29 = swap 2 = and swap leap-year? not and [
+    dup >date< 29 = swap 2 = and swap leap-year? not and [
         dup >r timestamp-year 3 1 r> [ set-date ] keep
     ] when ;
 
@@ -140,8 +137,8 @@ M: real +month ( timestamp n -- timestamp )
 
 M: integer +day ( timestamp n -- timestamp )
     swap [
-        date julian-day-number + julian-day-number>timestamp
-    ] keep swap >r time r> [ set-time ] keep ;
+        >date< julian-day-number + julian-day-number>timestamp
+    ] keep swap >r >time< r> [ set-time ] keep ;
 M: real +day ( timestamp n -- timestamp )
     float>whole-part rot swap 24 * +hour swap +day ;
 
@@ -195,14 +192,20 @@ M: number +second ( timestamp n -- timestamp )
     over set-timestamp-gmt-offset ;
 
 : >local-time ( timestamp -- timestamp )
-    gmt-offset get convert-timezone ;
+    gmt-offset convert-timezone ;
 
 : >gmt ( timestamp -- timestamp )
     0 convert-timezone ;
 
+: unix-1970
+    1970 1 1 0 0 0 0 <timestamp> ;
+
+: unix>gmt ( n -- timestamp )
+    unix-1970 swap seconds +dt ; 
+
 : gmt ( -- timestamp )
     #! GMT time, right now
-    1970 1 1 0 0 0 0 <timestamp> millis 1000 /f seconds +dt ; 
+    unix-1970 millis 1000 /f seconds +dt ; 
 
 : timestamp- ( timestamp timestamp -- dt )
     [ >gmt time>array ] 2apply v- array>dt ;
@@ -239,10 +242,10 @@ M: number +second ( timestamp n -- timestamp )
 : day-of-year ( timestamp -- n )
     [
         [ timestamp-year leap-year? ] keep
-        [ date 3array ] keep timestamp-year 3 1 3array <=>
+        [ >date< 3array ] keep timestamp-year 3 1 3array <=>
         0 >= and 1 0 ?
     ] keep 
-    [ timestamp-month day-counts head-slice sum + ] keep
+    [ timestamp-month day-counts swap head-slice sum + ] keep
     timestamp-day + ;
 
 : print-day ( n -- )
@@ -272,5 +275,6 @@ M: number +second ( timestamp n -- timestamp )
         dup timestamp-year unparse write bl
         dup timestamp-hour unparse 2 CHAR: 0 pad-left write ":" write
         dup timestamp-minute unparse 2 CHAR: 0 pad-left write ":" write
-        dup timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write " GMT" write
+        timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write " GMT" write
     ] string-out ;
+

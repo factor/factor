@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays errors generic hashtables inference kernel
-math math-internals sequences words ;
+math math-internals sequences words parser ;
 
 ! A system for associating dataflow optimizers with words.
 
@@ -17,26 +17,20 @@ math math-internals sequences words ;
 
 : partial-eval? ( #call -- ? )
     dup node-param "foldable" word-prop [
-        dup node-in-d [
-            dup value?
-            [ 2drop t ] [ swap node-literals ?hash* nip ] if
-        ] all-with?
+        dup node-in-d [ node-literal? ] all-with?
     ] [
         drop f
     ] if ;
 
 : literal-in-d ( #call -- inputs )
-    dup node-in-d [
-        dup value?
-        [ nip value-literal ] [ swap node-literals ?hash ] if
-    ] map-with ;
+    dup node-in-d [ node-literal ] map-with ;
 
 : partial-eval ( #call -- node )
     dup literal-in-d over node-param
     [ with-datastack ] catch
     [ 3drop t ] [ inline-literals ] if ;
 
-: call>no-op ( not -- )
+: call>no-op ( not -- node/f )
     #! Note: cloning the vectors, since subst-values will modify
     #! them.
     [ node-in-d clone ] keep
@@ -62,9 +56,10 @@ math math-internals sequences words ;
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
 } define-optimizers
 
-: useless-coerce? ( node -- )
+: useless-coerce? ( node -- ? )
     dup 0 node-class#
-    swap node-param "infer-effect" word-prop second first eq? ;
+    swap node-param "infer-effect" word-prop effect-out first
+    eq? ;
 
 { >fixnum >bignum >float } [
     {
@@ -177,7 +172,7 @@ SYMBOL: @
     { { @ @ } [ 2drop t ] }
 } define-identities
 
-M: #call optimize-node* ( node -- node/t )
+M: #call optimize-node*
     {
         { [ dup partial-eval? ] [ partial-eval ] }
         { [ dup find-identity nip ] [ apply-identities ] }

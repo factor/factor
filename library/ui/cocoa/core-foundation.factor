@@ -75,7 +75,3 @@ FUNCTION: void CFRelease ( void* cf ) ;
     ] [
         "Cannot load bundled named " swap append throw
     ] ?if ;
-
-: running.app? ( -- ? )
-    #! Test if we're running Factor.app.
-    "Contents/Resources" image subseq? ;

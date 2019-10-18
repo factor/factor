@@ -2,23 +2,20 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
 USING: compiler errors generic hashtables inference inspector
-kernel namespaces sequences strings words ;
+kernel namespaces sequences strings words parser ;
 
 TUPLE: alien-callback return parameters quot xt ;
 C: alien-callback make-node ;
 
 TUPLE: alien-callback-error ;
 
-M: alien-callback-error summary ( error -- )
-    drop "Words calling ``alien-callback'' cannot run in the interpreter. Compile the caller word and try again." ;
-
-: alien-callback ( return parameters quot -- address )
+: alien-callback ( return parameters quot -- alien )
     <alien-callback-error> throw ;
 
 : callback-bottom ( node -- )
     alien-callback-xt [ word-xt <alien> ] curry infer-quot ;
 
-\ alien-callback [ [ string object quotation ] [ alien ] ]
+\ alien-callback [ string object quotation ] [ alien ] <effect>
 "infer-effect" set-word-prop
 
 \ alien-callback [
@@ -56,9 +53,9 @@ M: alien-callback-error summary ( error -- )
         %alien-callback
         unbox-return
         %return
-    ] generate-block ;
+    ] generate-1 ;
 
-M: alien-callback generate-node ( node -- )
+M: alien-callback generate-node
     end-basic-block compile-gc generate-callback iterate-next ;
 
 M: alien-callback stack-reserve*

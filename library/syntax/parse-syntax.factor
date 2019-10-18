@@ -7,24 +7,18 @@
 ! !syntax vocab to syntax, and removes the ! prefix from each
 ! word name.
 IN: !syntax
-USING: alien arrays compiler errors generic hashtables kernel
-math modules namespaces parser sequences strings vectors words ;
-
-: !(
-    CHAR: ) column [
-        line-text get index* dup -1 =
-        [ "Unterminated (" throw ] when 1+
-    ] change ; parsing
+USING: alien arrays compiler definitions errors generic
+hashtables kernel math modules namespaces parser sequences
+strings vectors words ;
 
 : !! line-text get length column set ; parsing
 : !#! POSTPONE: ! ; parsing
 : !IN: scan set-in ; parsing
 : !USE: scan use+ ; parsing
 : !USING: string-mode on [ string-mode off add-use ] f ; parsing
-: !(BASE) scan swap base> parsed ;
-: !HEX: 16 (BASE) ; parsing
-: !OCT: 8 (BASE) ; parsing
-: !BIN: 2 (BASE) ; parsing
+: !HEX: 16 parse-base ; parsing
+: !OCT: 8 parse-base ; parsing
+: !BIN: 2 parse-base ; parsing
 SYMBOL: !t
 : !f f parsed ; parsing
 : !CHAR: 0 scan next-char nip parsed ; parsing
@@ -48,18 +42,21 @@ SYMBOL: !t
 : !SYMBOL: CREATE dup reset-generic define-symbol ; parsing
 
 DEFER: !PRIMITIVE: parsing
-: !DEFER: CREATE reset-generic ; parsing
+: !DEFER: CREATE drop ; parsing
 : !: CREATE dup reset-generic [ define-compound ] f ; parsing
 : !GENERIC: CREATE dup reset-word define-generic ; parsing
 : !G: CREATE dup reset-word [ define-generic* ] f ; parsing
-: !M: scan-word scan-word [ -rot define-method ] f ; parsing
+: !M:
+    f set-word
+    scan-word scan-word
+    [ location <method> -rot define-method ] f ; parsing
 
-: !UNION: ( -- class predicate definition )
+: !UNION:
     CREATE dup intern-symbol dup predicate-word
     [ dupd unit "predicate" set-word-prop ] keep
     [ define-union ] f ; parsing
 
-: !PREDICATE: ( -- class predicate definition )
+: !PREDICATE:
     scan-word CREATE dup intern-symbol
     dup rot "superclass" set-word-prop dup predicate-word
     [ define-predicate-class ] f ; parsing
@@ -80,3 +77,10 @@ DEFER: !PRIMITIVE: parsing
 : !REQUIRES:
     string-mode on
     [ string-mode off [ (require) ] each ] f ; parsing
+
+: !(
+    parse-effect word [
+        swap "declared-effect" set-word-prop
+    ] [
+        drop
+    ] if* ; parsing

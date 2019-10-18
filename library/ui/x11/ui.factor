@@ -1,15 +1,15 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: x11
-USING: arrays errors freetype gadgets gadgets-launchpad
-gadgets-listener hashtables kernel kernel-internals math
+USING: arrays errors freetype gadgets gadgets-listener
+gadgets-workspace hashtables kernel kernel-internals math
 namespaces opengl sequences strings ;
 
 ! In the X11 backend, world-handle is a pair { window context }.
 ! The window is an X11 window ID, and the context is a
 ! GLX context pointer.
 
-M: world expose-event ( event world -- ) nip relayout ;
+M: world expose-event nip relayout ;
 
 : configured-loc ( event -- dim )
     dup XConfigureEvent-x swap XConfigureEvent-y 2array ;
@@ -17,31 +17,9 @@ M: world expose-event ( event world -- ) nip relayout ;
 : configured-dim ( event -- dim )
     dup XConfigureEvent-width swap XConfigureEvent-height 2array ;
 
-M: world configure-event ( event world -- )
+M: world configure-event
     over configured-loc over set-world-loc
     swap configured-dim swap set-gadget-dim ;
-
-: button&loc ( event -- button# loc )
-    dup XButtonEvent-button
-    over XButtonEvent-x
-    rot XButtonEvent-y 2array ;
-
-M: world button-down-event ( event world -- )
-    >r button&loc r> send-button-down ;
-
-M: world button-up-event ( event world -- )
-    >r button&loc r> send-button-up ;
-
-M: world wheel-event ( event world -- )
-    >r button&loc >r 4 = r> r> send-wheel ;
-
-M: world enter-event ( event world -- ) motion-event ;
-
-M: world leave-event ( event world -- ) 2drop forget-rollover ;
-
-M: world motion-event ( event world -- )
-    >r dup XMotionEvent-x swap XMotionEvent-y 2array r>
-    move-hand fire-motion ;
 
 : modifiers
     {
@@ -55,6 +33,7 @@ M: world motion-event ( event world -- )
         { HEX: FF08 "BACKSPACE" }
         { HEX: FF09 "TAB"       }
         { HEX: FF0D "RETURN"    }
+        { HEX: FF8D "ENTER"     }
         { HEX: FF1B "ESCAPE"    }
         { HEX: FFFF "DELETE"    }
         { HEX: FF50 "HOME"      }
@@ -66,6 +45,15 @@ M: world motion-event ( event world -- )
         { HEX: FF56 "PAGE_DOWN" }
         { HEX: FF57 "END"       }
         { HEX: FF58 "BEGIN"     }
+        { HEX: FFBE "F1"        }
+        { HEX: FFBF "F2"        }
+        { HEX: FFC0 "F3"        }
+        { HEX: FFC1 "F4"        }
+        { HEX: FFC2 "F5"        }
+        { HEX: FFC3 "F6"        }
+        { HEX: FFC4 "F7"        }
+        { HEX: FFC5 "F8"        }
+        { HEX: FFC6 "F9"        }
     } ;
 
 : ignored-key? ( keycode -- ? )
@@ -82,27 +70,61 @@ M: world motion-event ( event world -- )
         dup key-codes hash [ ] [ ch>string ] ?if
     ] if ;
 
-: event>gesture ( event quot -- gesture )
-    >r dup XKeyEvent-state modifiers modifier swap key-code
-    r> [ drop f ] if* ; inline
+: event-modifiers XKeyEvent-state modifiers modifier ;
 
-M: world key-down-event ( event world -- )
-    world-focus over [ <key-down> ] event>gesture [
+: key-event>gesture ( event -- modifiers gesture )
+    dup event-modifiers swap key-code ;
+
+: key-down-event>gesture ( event -- gesture )
+    key-event>gesture [ <key-down> ] [ drop f ] if* ;
+
+M: world key-down-event
+    world-focus over key-down-event>gesture [
         over handle-gesture
         [ swap lookup-string nip swap user-input ] [ 2drop ] if
     ] [
         2drop
     ] if* ;
 
-M: world key-up-event ( event world -- )
-    world-focus swap [ <key-up> ] event>gesture dup
-    [ swap handle-gesture drop ] [ 2drop ] if ;
+M: world key-up-event
+    world-focus swap key-event>gesture dup [
+        <key-up> dup [ swap handle-gesture drop ] [ 2drop ] if
+    ] [
+        3drop
+    ] if ;
 
-M: world focus-in-event ( event world -- ) nip focus-world ;
+: mouse-event-loc ( event -- loc )
+    dup XButtonEvent-x swap XButtonEvent-y 2array ;
 
-M: world focus-out-event ( event world -- ) nip unfocus-world ;
+: mouse-event>gesture ( event -- modifiers button loc )
+    dup event-modifiers over XButtonEvent-button
+    rot mouse-event-loc ;
 
-M: world selection-notify-event ( event world -- )
+M: world button-down-event
+    >r mouse-event>gesture >r <button-down> r> r>
+    send-button-down ;
+
+M: world button-up-event
+    >r mouse-event>gesture >r <button-up> r> r>
+    send-button-up ;
+
+M: world wheel-event
+    >r dup XButtonEvent-button 4 = swap mouse-event-loc r>
+    send-wheel ;
+
+M: world enter-event motion-event ;
+
+M: world leave-event 2drop forget-rollover ;
+
+M: world motion-event
+    >r dup XMotionEvent-x swap XMotionEvent-y 2array r>
+    move-hand fire-motion ;
+
+M: world focus-in-event nip focus-world ;
+
+M: world focus-out-event nip unfocus-world ;
+
+M: world selection-notify-event
     [ world-handle first selection-from-event ] keep
     world-focus user-input ;
 
@@ -110,7 +132,7 @@ M: world selection-notify-event ( event world -- )
     { "STRING" "UTF8_STRING" "TEXT" }
     [ x-atom = ] contains-with? ;
 
-M: world selection-request-event ( event world -- )
+M: world selection-request-event
     drop dup XSelectionRequestEvent-target {
         { [ dup supported-type? ] [ drop dup set-selection-prop send-notify-success ] }
         { [ dup "TARGETS" x-atom = ] [ drop dup set-targets-prop send-notify-success ] }
@@ -123,7 +145,7 @@ M: world selection-request-event ( event world -- )
     swap XClientMessageEvent-data0 "WM_DELETE_WINDOW" x-atom =
     and ;
 
-M: world client-event ( event world -- )
+M: world client-event
     swap close-box? [
         dup world-handle
         >r close-world
@@ -174,13 +196,13 @@ IN: shells
                 restore-windows
             ] [
                 init-ui
-                launchpad-window
-                listener-window
+                workspace-window
+                drop
             ] if
             event-loop
         ] with-x
     ] with-freetype ;
 
-IN: kernel
+IN: command-line
 
 : default-shell "DISPLAY" os-env empty? "tty" "ui" ? ;

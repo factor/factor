@@ -6,7 +6,7 @@ strings ;
 
 DEFER: base>
 
-: string>ratio ( "a/b" radix -- a/b )
+: string>ratio ( str radix -- a/b )
     >r "/" split1 r> tuck base> >r base> r>
     2dup and [ / ] [ 2drop f ] if ;
 
@@ -30,17 +30,17 @@ M: object digit> drop f ;
 : string>integer ( string radix -- n )
     swap "-" ?head >r (string>integer) dup r> and [ neg ] when ;
 
-: base> ( string radix -- n )
+: base> ( str radix -- n/f )
     {
         { [ CHAR: / pick member? ] [ string>ratio ] }
         { [ CHAR: . pick member? ] [ drop string>float ] }
         { [ t ] [ string>integer ] }
     } cond ;
 
-: string>number ( string -- num ) 10 base> ;
-: bin> ( string -- num ) 2 base> ;
-: oct> ( string -- num ) 8 base> ;
-: hex> ( string -- num ) 16 base> ;
+: string>number ( str -- n ) 10 base> ;
+: bin> ( str -- n ) 2 base> ;
+: oct> ( str -- n ) 8 base> ;
+: hex> ( str -- n ) 16 base> ;
 
 : >digit ( n -- ch )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ;
@@ -49,9 +49,9 @@ M: object digit> drop f ;
     dup >r /mod >digit , dup 0 >
     [ r> integer, ] [ r> 2drop ] if ;
 
-G: >base ( num radix -- string ) 1 standard-combination ;
+G: >base ( n radix -- str ) 1 standard-combination ;
 
-M: integer >base ( num radix -- string )
+M: integer >base
     [
         over 0 < [
             swap neg swap integer, CHAR: - ,
@@ -60,7 +60,7 @@ M: integer >base ( num radix -- string )
         ] if
     ] "" make reverse ;
 
-M: ratio >base ( num radix -- string )
+M: ratio >base
     [
         over numerator over >base %
         CHAR: / ,
@@ -70,7 +70,7 @@ M: ratio >base ( num radix -- string )
 : fix-float
     CHAR: . over member? [ ".0" append ] unless ;
 
-M: float >base ( num radix -- string )
+M: float >base
     drop {
         { [ dup 1.0/0.0 = ] [ drop "1.0/0.0" ] }
         { [ dup -1.0/0.0 = ] [ drop "-1.0/0.0" ] }
@@ -78,7 +78,7 @@ M: float >base ( num radix -- string )
         { [ t ] [ float>string fix-float ] }
     } cond ;
 
-: number>string ( num -- string ) 10 >base ;
+: number>string ( n -- str ) 10 >base ;
 : >bin ( num -- string ) 2 >base ;
 : >oct ( num -- string ) 8 >base ;
 : >hex ( num -- string ) 16 >base ;

@@ -6,10 +6,9 @@ memory namespaces parser prettyprint sequences strings words
 vectors ;
 
 TUPLE: assert got expect ;
+: assert ( got expect -- * ) <assert> throw ;
 
-M: assert summary drop "Assertion failed" ;
-
-: assert= ( a b -- ) 2dup = [ 2drop ] [ <assert> throw ] if ;
+: assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;
 
 : print-test ( input output -- )
     "----> Quotation: " write .
@@ -18,7 +17,7 @@ M: assert summary drop "Assertion failed" ;
 : benchmark ( quot -- gctime runtime )
     millis >r gc-time >r call gc-time r> - millis r> - ;
 
-: time ( code -- )
+: time ( quot -- )
     benchmark
     [ # " ms run / " % # " ms GC time" % ] "" make print flush ;
 
@@ -87,6 +86,7 @@ SYMBOL: failures
         "gadgets/document"
         "gadgets/rectangles"
         "gadgets/fields"
+        "gadgets/commands"
         "generic"
         "help/porter-stemmer"
         "help/topics"

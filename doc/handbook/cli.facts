@@ -7,7 +7,7 @@ $terpri
 $terpri
 "If any file names are specified at all, the first one must be the image name; otherwise, the default image file is used, which is usually a file named " { $snippet "factor.image" } " in the same directory as the runtime executable (on Windows and Mac OS X) or the current directory (on Unix)."
 $terpri
-"All file names other than the first one are source file names which will be run using " { $link try-run-file } " when Factor starts up."
+"All file names other than the first one are source file names which will be run using " { $link ?run-file } " when Factor starts up."
 $terpri
 "Finally, switches can take one of the following three forms:"
 { $list

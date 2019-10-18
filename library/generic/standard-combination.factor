@@ -12,7 +12,7 @@ IN: generic
 
 TUPLE: no-method object generic ;
 
-: no-method ( object generic -- ) <no-method> throw ;
+: no-method ( object generic -- * ) <no-method> throw ;
 
 : error-method ( dispatch# word -- method )
     >r picker r> [ no-method ] curry append ;
@@ -45,7 +45,7 @@ TUPLE: no-method object generic ;
         3dup >r 1+ r> nth first class< [
             >r 1+ r> (simplify-alist)
         ] [
-            [ nth second ] 2keep >r 1+ r> tail rot drop
+            [ nth second ] 2keep swap 1+ tail rot drop
         ] if
     ] if ;
 
@@ -55,11 +55,12 @@ TUPLE: no-method object generic ;
 : methods* ( dispatch# word -- assoc )
     #! Make a class->method association, together with a
     #! default delegating method at the end.
-    empty-method object bootstrap-word swap 2array 1array
-    swap methods append ;
+    [
+        empty-method object bootstrap-word swap 2array 1array
+    ] keep methods append ;
 
 : small-generic ( dispatch# word -- def )
-    2dup methods* object bootstrap-word swap simplify-alist
+    dupd methods* object bootstrap-word swap simplify-alist
     swapd class-predicates alist>quot ;
 
 : vtable-methods ( dispatch# alist-seq -- alist-seq )
@@ -71,13 +72,10 @@ TUPLE: no-method object generic ;
 
 : <vtable> ( dispatch# word n -- vtable )
     #! n is vtable size; either num-types or num-tags.
-    >r 2dup methods* r> sort-methods vtable-methods ;
+    >r dupd methods* r> sort-methods vtable-methods ;
 
 : big-generic ( dispatch# word n dispatcher -- def )
     [ >r pick picker % r> , <vtable> , \ dispatch , ] [ ] make ;
-
-: generic-tags ( word -- seq )
-    "methods" word-prop hash-keys [ types ] map concat prune ;
 
 : tag-generic? ( word -- ? )
     #! If all the types we dispatch upon can be identified

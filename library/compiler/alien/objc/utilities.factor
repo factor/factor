@@ -119,7 +119,8 @@ H{ } clone objc-methods set-global
 
 \ (send) [ pop-literal nip infer-send ] "infer" set-word-prop
 
-\ (send) [ [ object object ] [ ] ] "infer-effect" set-word-prop
+\ (send) [ object object ] [ ] <effect>
+"infer-effect" set-word-prop
 
 : send ( ... selector -- ... ) f (send) ; inline
 
@@ -218,7 +219,7 @@ H{
         2drop
     ] if* ;
 
-: register-objc-methods ( class -- seq )
+: register-objc-methods ( class -- )
     f <void*> (register-objc-methods) ;
 
 : class-exists? ( string -- class ) objc_getClass >boolean ;

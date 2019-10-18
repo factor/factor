@@ -1,4 +1,4 @@
-REQUIRES: dlists ;
+REQUIRES: dlists serialize ;
 
 PROVIDE: concurrency
 { "concurrency.factor" }

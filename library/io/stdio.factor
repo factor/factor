@@ -9,16 +9,16 @@ SYMBOL: stdio
 
 : close ( -- ) stdio get stream-close ;
 
-: readln ( -- string/f ) stdio get stream-readln ;
-: read1 ( -- char/f ) stdio get stream-read1 ;
-: read ( count -- string ) stdio get stream-read ;
+: readln ( -- str/f ) stdio get stream-readln ;
+: read1 ( -- ch/f ) stdio get stream-read1 ;
+: read ( n -- str/f ) stdio get stream-read ;
 
-: write1 ( char -- ) stdio get stream-write1 ;
-: write ( string -- ) stdio get stream-write ;
+: write1 ( ch -- ) stdio get stream-write1 ;
+: write ( str -- ) stdio get stream-write ;
 : flush ( -- ) stdio get stream-flush ;
 
 : terpri ( -- ) stdio get stream-terpri ;
-: format ( string style -- ) stdio get stream-format ;
+: format ( str style -- ) stdio get stream-format ;
 
 : with-nesting ( style quot -- )
     swap stdio get with-nested-stream ;
@@ -27,7 +27,8 @@ SYMBOL: stdio
     swap stdio get with-stream-table ;
 
 : with-style ( style quot -- )
-    swap stdio get with-stream-style ;
+    swap dup hash-empty?
+    [ drop call ] [ stdio get with-stream-style ] if ;
 
 : print ( string -- ) stdio get stream-print ;
 
@@ -39,8 +40,13 @@ SYMBOL: stdio
 
 : bl ( -- ) " " write ;
 
-: write-object ( string object -- )
+: write-object ( str obj -- )
     presented associate format ;
 
-: write-outliner ( string object content -- )
+: write-outliner ( str obj content -- )
     outline associate [ write-object ] with-nesting ;
+
+: print-input ( string input -- )
+    <input> presented associate
+    [ H{ { font-style bold } } format ] with-nesting
+    terpri ;

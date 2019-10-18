@@ -17,7 +17,7 @@ strings test ;
 TUPLE: document locs ;
 
 C: document ( -- document )
-    V{ "" } clone <history> over set-delegate
+    V{ "" } clone <model> over set-delegate
     V{ } clone over set-document-locs ;
 
 : add-loc document-locs push ;
@@ -25,7 +25,7 @@ C: document ( -- document )
 : remove-loc document-locs delete ;
 
 : update-locs ( loc document -- )
-    document-locs [ set-model ] each-with ;
+    document-locs [ set-model* ] each-with ;
 
 : doc-line ( line# document -- str ) model-value nth ;
 
@@ -53,7 +53,7 @@ C: document ( -- document )
     tuck >r >r document get -rot start-on-line r> r>
     document get -rot end-on-line ;
 
-: (doc-range) ( startloc endloc line# -- str )
+: (doc-range) ( startloc endloc line# -- )
     [ start/end-on-line ] keep document get doc-line <slice> , ;
 
 : doc-range ( startloc endloc document -- str )
@@ -70,14 +70,14 @@ C: document ( -- document )
         first swap length 1- + 0
     ] if r> peek length + 2array ;
 
-: prepend-first ( str seq -- seq )
-    0 [ append ] change-nth ;
+: prepend-first ( str seq -- )
+    0 swap [ append ] change-nth ;
 
-: append-last ( str seq -- seq )
-    dup length 1- [ swap append ] change-nth ;
+: append-last ( str seq -- )
+    [ length 1- ] keep [ swap append ] change-nth ;
 
-: loc-col/str ( loc document -- col str )
-    >r first2 swap r> nth ;
+: loc-col/str ( loc document -- str col )
+    >r first2 swap r> nth swap ;
 
 : prepare-insert ( newinput startloc endloc lines -- newinput )
     tuck loc-col/str tail-slice >r loc-col/str head-slice r>
@@ -127,14 +127,3 @@ C: document ( -- document )
 
 : clear-doc ( document -- )
     "" swap set-doc-text ;
-
-M: document (add-history) ( document vector -- )
-    >r model-value dup { "" } sequence=
-    [ r> 2drop ] [ r> push-new ] if ;
-
-M: document add-history ( document -- )
-    #! Add the new entry at the end of the history, and avoid
-    #! duplicates.
-    dup history-back dup
-    pick history-forward <reversed> nappend
-    (add-history) ;

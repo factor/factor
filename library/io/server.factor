@@ -6,12 +6,12 @@ threads ;
 
 SYMBOL: log-stream
 
-: log-message ( msg -- )
+: log-message ( str -- )
     log-stream get [ stream-print ] keep stream-flush ;
 
-: log-error ( error -- ) "Error: " swap append log-message ;
+: log-error ( str -- ) "Error: " swap append log-message ;
 
-: log-client ( client-stream -- )
+: log-client ( client -- )
     [
         "Accepted connection from " %
         dup client-stream-host %
@@ -19,7 +19,7 @@ SYMBOL: log-stream
         client-stream-port # 
     ] "" make log-message ;
 
-: with-log-file ( file quot -- )
+: with-log-file ( path quot -- )
     [ swap <file-writer> log-stream set call ] with-scope ;
 
 : with-logging ( quot -- )

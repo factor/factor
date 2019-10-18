@@ -1,3 +1,5 @@
+bool in_page(void *fault, void *i_area, CELL area_size, int offset);
+
 void *safe_malloc(size_t size);
 
 typedef struct {
@@ -82,7 +84,9 @@ INLINE void type_check(CELL type, CELL tagged)
 }
 
 CELL untagged_object_size(CELL pointer);
+CELL unaligned_object_size(CELL pointer);
 CELL object_size(CELL pointer);
+CELL binary_payload_start(CELL pointer);
 void primitive_room(void);
 void primitive_type(void);
 void primitive_tag(void);
@@ -90,7 +94,6 @@ void primitive_slot(void);
 void primitive_set_slot(void);
 void primitive_integer_slot(void);
 void primitive_set_integer_slot(void);
-void primitive_address(void);
 void primitive_size(void);
 CELL clone(CELL obj);
 void primitive_clone(void);

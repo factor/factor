@@ -1,27 +1,27 @@
 USING: help math ;
 
-HELP: exp "( x -- y )"
+HELP: exp
 { $values { "x" "a complex number" } { "y" "a complex number" } }
 { $description "Computes the exponential function." } ;
 
-HELP: log "( x -- y )"
+HELP: log
 { $values { "x" "a complex number" } { "y" "a complex number" } }
 { $description "Computes the natural logarithm function. Outputs negative infinity if " { $snippet "x" } " is 0." } ;
 
-HELP: sqrt "( x -- y )"
+HELP: sqrt
 { $values { "x" "a complex number" } { "y" "a complex number" } }
 { $description "Computes the square root function." } ;
 
-HELP: ^ "( x y -- z )"
+HELP: ^
 { $values { "x" "a complex number" } { "y" "a complex number" } { "z" "a complex number" } }
 { $description "Raises " { $snippet "x" } " to the power of " { $snippet "y" } ". If " { $snippet "y" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." }
 { $errors "Throws an error if " { $snippet "x" } " and " { $snippet "y" } " are both integer 0." } ;
 
-HELP: power-of-2? "( n -- ? )"
+HELP: power-of-2?
 { $values { "n" "an integer" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "n" } " is a power of 2." } ;
 
-HELP: log2 "( n -- b )"
+HELP: log2
 { $values { "n" "a positive integer" } { "b" "an integer" } }
 { $description "Computes the largest integer " { $snippet "b" } " such that " { $snippet "2^b" } " is less than " { $snippet "n" } "." }
 { $errors "Throws an error if " { $snippet "n" } " is zero or negative." } ;

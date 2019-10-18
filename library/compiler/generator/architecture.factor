@@ -2,6 +2,9 @@ IN: compiler
 USING: arrays generic kernel kernel-internals math memory
 namespaces sequences ;
 
+! Does the assembler emit bytes or cells?
+DEFER: code-format ( -- byte# )
+
 ! A scratch register for computations
 TUPLE: vreg n ;
 
@@ -53,6 +56,9 @@ DEFER: %jump-t ( label vreg -- )
 
 ! Jump table of addresses (one cell each) is right after this
 DEFER: %dispatch ( vreg -- )
+
+! Jump table entry
+DEFER: %target ( label -- )
 
 ! Return to caller
 DEFER: %return ( -- )
@@ -127,7 +133,7 @@ M: float-regs inc-reg-class
     dup (inc-reg-class)
     macosx? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
 
-GENERIC: v>operand
+GENERIC: v>operand ( obj -- operand )
 M: integer v>operand tag-bits shift ;
 M: vreg v>operand dup vreg-n swap vregs nth ;
-M: f v>operand address ;
+M: f v>operand drop object-tag ;

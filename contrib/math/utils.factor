@@ -13,7 +13,7 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
     foldable
 
-: each-bit ( n quot -- | quot: 0/1 -- )
+: each-bit ( n quot -- )
     over zero? pick -1 number= or [
         2drop
     ] [
@@ -58,14 +58,9 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     #! find the absolute values of the min and max of a seq in one pass
     minmax 2dup [ abs ] 2apply > [ swap ] when ;
 
-SYMBOL: almost=-precision .000001 almost=-precision set
+SYMBOL: almost=-precision .0001 almost=-precision set-global
 : almost= ( a b -- bool )
-    2dup - abs almost=-precision get < [
-            2drop t
-        ] [
-            2array absminmax dup almost=-precision get * >r - abs r>
-            dup 0 < [ >= ] [ <= ] if
-    ] if ;
+    - abs almost=-precision get < ;
 
 TUPLE: frange from step length ;
 
@@ -91,8 +86,8 @@ M: frange length ( frange -- n )
 : frange-range ( frange -- range )
     [ frange-step ] keep frange-length 1- * ;
 
-M: frange nth ( n frange -- obj ) [ frange-step * ] keep frange-from + ;
-M: frange nth-unsafe ( n frange -- obj ) nth ;
+M: frange nth ( n frange -- obj )
+    [ frange-step * ] keep frange-from + ;
 
 : nseq-swap ( a b seq -- seq )
     #! swap indices a,b in seq

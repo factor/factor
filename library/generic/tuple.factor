@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
-USING: arrays errors hashtables kernel kernel-internals
-math namespaces parser sequences sequences-internals strings
-vectors words ;
+USING: arrays definitions errors hashtables kernel
+kernel-internals math namespaces parser sequences
+sequences-internals strings vectors words ;
 
 IN: kernel-internals
 
-: tuple= ( tuple tuple -- ? )
+: tuple= ( tuple1 tuple2 -- ? )
     2dup [ array-capacity ] 2apply number= [
         dup array-capacity
         [ 2dup swap array-nth >r pick array-nth r> = ] all? 2nip
@@ -20,7 +20,7 @@ IN: generic
 : class ( object -- class )
     dup tuple? [ 2 slot ] [ type type>class ] if ; inline
 
-: tuple-predicate ( word -- )
+: tuple-predicate ( class -- )
     dup predicate-word [
         [ dup tuple? ] %
         [ [ 2 slot ] % over literalize , \ eq? , ] [ ] make ,
@@ -30,7 +30,7 @@ IN: generic
 : forget-tuple ( class -- )
     dup forget "predicate" word-prop first [ forget ] when* ;
 
-: check-shape ( word slots -- )
+: check-shape ( class slots -- )
     >r in get lookup dup [
         dup "tuple-size" word-prop r> length 2 + =
         [ drop ] [ forget-tuple ] if
@@ -40,33 +40,34 @@ IN: generic
 
 : delegate-slots { { 3 object delegate set-delegate } } ;
 
-: tuple-slots ( tuple slots -- )
+: tuple-slots ( class slots -- )
     2dup "slot-names" set-word-prop
     2dup length 2 + "tuple-size" set-word-prop
     dupd 4 simple-slots
     2dup delegate-slots swap append "slots" set-word-prop
     define-slots ;
 
-PREDICATE: word tuple-class "tuple-size" word-prop ;
+PREDICATE: class tuple-class "tuple-size" word-prop ;
 
-: check-tuple-class ( class -- )
-    tuple-class? [ "Not a tuple class" throw ] unless ;
+TUPLE: check-tuple class ;
+: check-tuple ( class -- class )
+    dup tuple-class? [ <check-tuple> throw ] unless ;
 
 : define-constructor ( word class def -- )
     pick reset-generic
-    swap dup check-tuple-class [
+    swap check-tuple [
         dup literalize ,
         "tuple-size" word-prop ,
         \ <tuple> , %
     ] [ ] make define-compound ;
 
-: default-constructor ( tuple -- )
-    [ create-constructor ] keep
-    dup "slots" word-prop unclip drop <reversed>
+: default-constructor ( class -- )
+    dup create-constructor 2dup "constructor" set-word-prop
+    swap dup "slots" word-prop unclip drop <reversed>
     [ [ tuck ] swap peek add ] map concat >quotation
     define-constructor ;
 
-: define-tuple ( tuple slots -- )
+: define-tuple ( class slots -- )
     2dup check-shape
     >r create-in
     dup intern-symbol
@@ -76,23 +77,27 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
     dup r> tuple-slots
     default-constructor ;
 
-M: tuple clone ( tuple -- tuple )
+M: tuple clone
     (clone) dup delegate clone over set-delegate ;
 
-M: tuple hashcode ( tuple -- n ) class hashcode ;
+M: tuple hashcode 2 slot hashcode ;
 
-M: tuple = ( obj tuple -- ? )
-    2dup eq?
-    [ 2drop t ] [ over tuple? [ tuple= ] [ 2drop f ] if ] if ;
+M: tuple equal?
+    over tuple? [ tuple= ] [ 2drop f ] if ;
 
-: is? ( obj pred -- ? | pred: obj -- ? )
-    over [
-        2dup >r >r call
-        [ r> r> 2drop t ] [ r> delegate r> is? ] if
-    ] [
-        2drop f 
-    ] if ; inline
+: (delegates) ( obj -- )
+    [ dup delegate (delegates) , ] when* ;
+
+: delegates ( obj -- seq )
+    [ (delegates) ] { } make ;
+
+: is? ( obj quot -- ? )
+    >r delegates r> contains? ; inline
 
 : >tuple ( seq -- tuple )
     >vector dup first "tuple-size" word-prop over set-length
     >array array>tuple ;
+
+! Definition protocol
+M: tuple-class forget
+    dup "constructor" word-prop forget forget-class ;

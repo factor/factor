@@ -27,7 +27,7 @@ USING: kernel math sequences ;
     #! max - min
     minmax swap - ;
 
-: var ( seq -- )
+: var ( seq -- x )
     #! variance, normalize by N-1
     dup length 1- dup 0 = [
         0 2nip
@@ -35,6 +35,6 @@ USING: kernel math sequences ;
         swap [ mean ] keep 0 [ pick - sq + ] reduce nip swap /
     ] if ;
 
-: std
+: std ( seq -- x )
     #! standard deviation, sqrt of variance
     var sqrt ;

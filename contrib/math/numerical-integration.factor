@@ -1,5 +1,4 @@
 IN: math-contrib
-
 USING: kernel sequences errors namespaces math vectors errors prettyprint io inspector ;
 
 : setup-range ( from to -- frange )
@@ -11,7 +10,7 @@ USING: kernel sequences errors namespaces math vectors errors prettyprint io ins
 
 : integrate-trap ( from to f -- x )
     >r setup-range r>
-    map 1 over tail >r >vector dup pop drop r>
+    map dup 1 tail >r >vector dup pop drop r>
     [ + 2 / step-size get * ] 2map sum ;
 
 

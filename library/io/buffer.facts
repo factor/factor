@@ -1,7 +1,7 @@
 USING: help io-internals ;
 
-HELP: buffer f
-{ $description "The class of I/O buffers, which are allocated in the system malloc arena, and thus have a fixed address, unlike garbage-collected heap objects which are moved around. Buffers must be de-allocated manually."
+HELP: buffer
+{ $class-description "The class of I/O buffers, which are allocated in the system malloc arena, and thus have a fixed address, unlike garbage-collected heap objects which are moved around. Buffers must be de-allocated manually."
 $terpri
 "Buffers have two internal pointers:"
 { $list
@@ -9,88 +9,92 @@ $terpri
     { "the position -- a read index where data is consumed; accessor: " { $link buffer-pos } }
 } } ;
 
-HELP: <buffer> "( n -- buffer )"
+HELP: <buffer>
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } }
 { $description "Creates a buffer with an initial capacity of " { $snippet "n" } " bytes." } ;
 
-HELP: buffer-free "( buffer -- )"
+HELP: buffer-free
 { $values { "buffer" "a buffer" } }
 { $description "De-allocates a buffer's underlying storage. The buffer may not be used after being freed." }
 { $warning "You " { $emphasis "must" } " free a buffer using this word, before letting the GC collect the buffer tuple instance." } ;
 
-HELP: buffer-contents "( buffer -- string )"
+HELP: buffer-contents
 { $values { "buffer" "a buffer" } { "string" "a string" } }
 { $description "Collects the entire contents of the buffer into a string." } ;
 
-HELP: buffer-reset "( n buffer -- )"
+HELP: buffer-reset
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } }
 { $description "Resets the fill pointer to 0 and the position to " { $snippet "count" } "." } ;
 
-HELP: buffer-consume "( n buffer -- )"
+HELP: buffer-consume
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } }
 { $description "Moves the position forward by " { $snippet "n" } " bytes. If it exceeds the fill pointer, both are reset to 0." } ;
 
-HELP: buffer@ "( buffer -- n )"
+HELP: buffer@
 { $values { "buffer" "a buffer" } { "n" "a non-negative integer" } }
 { $description "Outputs the memory address of the current buffer position." } ;
 
-HELP: buffer-end "( buffer -- n )"
+HELP: buffer-end
 { $values { "buffer" "a buffer" } { "n" "a non-negative integer" } }
 { $description "Outputs the memory address of the current fill-pointer." } ;
 
-HELP: buffer-first-n "( n buffer -- string )"
+HELP: buffer-first-n
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } }
 { $description "Outputs a string of the first " { $snippet "n" } " characters at the buffer's current position. If there are less than " { $snippet "n" } " characters available, the output is truncated." }
 { $see-also buffer> } ;
 
-HELP: buffer> "( n buffer -- string )"
+HELP: buffer>
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } { "string" "a string" } }
 { $description "Collects a string of " { $snippet "n" } " characters starting from the buffer's current position, and advances the position accordingly. If there are less than " { $snippet "n" } " characters available, the output is truncated." } ;
 
-HELP: buffer>> "( buffer -- string )"
+HELP: buffer>>
 { $values { "buffer" "a buffer" } { "string" "a string" } }
 { $description "Collects the contents of the buffer into a string, and resets the position and fill pointer to 0." } ;
 
-HELP: buffer-length "( buffer -- n )"
+HELP: buffer-length
 { $values { "buffer" "a buffer" } { "n" "a non-negative integer" } }
 { $description "Outputs the number of unconsumed bytes in the buffer." } ;
 
-HELP: buffer-capacity "( buffer -- n )"
+HELP: buffer-capacity
 { $values { "buffer" "a buffer" } { "n" "a non-negative integer" } }
 { $description "Outputs the buffer's maximum capacity before growing." } ;
 
-HELP: buffer-empty? "( buffer -- ? )"
+HELP: buffer-empty?
 { $values { "buffer" "a buffer" } { "?" "a boolean" } }
 { $description "Tests if the buffer contains no more data to be read." } ;
 
-HELP: extend-buffer "( n buffer -- )"
+HELP: extend-buffer
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } }
 { $description "Grows a buffer to fit " { $snippet "n" } " bytes of data." } ;
 
-HELP: check-overflow "( n buffer -- )"
+HELP: check-overflow
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } }
 { $description "Grows the buffer, if possible, so it can accomodate " { $snippet "n" } " bytes." }
 { $warning "I/O system implementations should call this word or one of the other words that calls this word, at the beginning of an I/O transaction, when the buffer is empty. Buffers cannot be resized if they contain data; one of the requirements of a buffer is to remain fixed in memory while I/O operations are in progress." }
 { $errors "Throws an error if the buffer contains unread data, and the new data does not fit." } ;
 
-HELP: >buffer "( string buffer -- )"
+HELP: >buffer
 { $values { "string" "a string" } { "buffer" "a buffer" } }
 { $description "Copies a string to the buffer's fill pointer, and advances it accordingly." } ;
 
-HELP: ch>buffer "( ch buffer -- )"
+HELP: ch>buffer
 { $values { "ch" "a character" } { "buffer" "a buffer" } }
 { $description "Appends a single byte to a buffer." } ;
 
-HELP: n>buffer "( n buffer -- )"
+HELP: buffer-bound
+{ $values { "buffer" "a buffer" } { "n" "a non-negative integer" } }
+{ $description "Outputs the address pointing to the end of the buffer." } ;
+
+HELP: n>buffer
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } }
 { $description "Advances the fill pointer by " { $snippet "n" } " bytes." }
 { $errors "Throws an error if the buffer does not contain " { $snippet "n" } " bytes of data." } ;
 
-HELP: buffer-peek "( buffer -- ch )"
+HELP: buffer-peek
 { $values { "buffer" "a buffer" } { "ch" "a character" } }
 { $description "Outputs the byte at the buffer position." }
 { $see-also buffer-pop } ;
 
-HELP: buffer-pop "( buffer -- ch )"
+HELP: buffer-pop
 { $values { "buffer" "a buffer" } { "ch" "a character" } }
 { $description "Outputs the byte at the buffer position and advances the position." } ;

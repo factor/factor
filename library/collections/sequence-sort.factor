@@ -21,28 +21,36 @@ C: sorter ( seq start end -- sorter )
 : >start> dup sorter-start 1+ swap set-sorter-start ; inline
 : <end< dup sorter-end 1- swap set-sorter-end ; inline
 
-: sort-up ( quot sorter -- quot sorter )
+: sort-up ( quot sorter -- )
     dup s*/e < [
         [ dup sorter-start compare 0 < ] 2keep rot
-        [ dup >start> sort-up ] when 
-    ] when ; inline
+        [ dup >start> sort-up ] [ 2drop ] if
+    ] [
+        2drop
+    ] if ; inline
 
-: sort-down ( quot sorter -- quot sorter )
+: sort-down ( quot sorter -- )
     dup s/e* < [
         [ dup sorter-end compare 0 > ] 2keep rot
-        [ dup <end< sort-down ] when
-    ] when ; inline
+        [ dup <end< sort-down ] [ 2drop ] if
+    ] [
+        2drop
+    ] if ; inline
 
-: sort-step ( quot sorter -- quot sorter )
+: sort-step ( quot sorter -- )
     dup s*/e* <= [
-        sort-up sort-down dup s*/e* <= [
+        2dup sort-up 2dup sort-down dup s*/e* <= [
             dup sorter-exchange dup >start> dup <end< sort-step
-        ] when
-    ] when ; inline
+        ] [
+            2drop
+        ] if
+    ] [
+        2drop
+    ] if ; inline
 
 : (nsort) ( quot seq start end -- )
     2dup < [
-        <sorter> sort-step
+        <sorter> 2dup sort-step
         [ dup sorter-seq swap s/e* (nsort) ] 2keep
         [ dup sorter-seq swap s*/e (nsort) ] 2keep
     ] [
@@ -50,8 +58,8 @@ C: sorter ( seq start end -- sorter )
     ] if 2drop ; inline
 
 : partition ( -1/1 seq -- seq )
-    dup midpoint@ swap rot 1 <
-    [ head-slice ] [ tail-slice ] if ; inline
+    dup midpoint@ rot 1 < [ head-slice ] [ tail-slice ] if ;
+    inline
 
 : (binsearch) ( elt quot seq -- i )
     dup length 1 <= [
@@ -73,19 +81,19 @@ C: sorter ( seq start end -- sorter )
 
 IN: sequences
 
-: nsort ( seq quot -- | quot: elt elt -- -1/0/1 )
+: nsort ( seq quot -- )
     swap dup length 1 <=
     [ 2drop ] [ 0 over length 1- (nsort) ] if ; inline
 
-: sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )
+: sort ( seq quot -- sortedseq )
     swap [ swap nsort ] immutable ; inline
 
-: natural-sort ( seq -- seq ) [ <=> ] sort ;
+: natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 
-: binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )
+: binsearch ( elt seq quot -- i )
     swap dup empty?
     [ 3drop -1 ] [ flatten-slice (binsearch) ] if ; inline
 
-: binsearch* ( elt seq quot -- elt | quot: elt elt -- -1/0/1 )
+: binsearch* ( elt seq quot -- result )
     over >r binsearch dup -1 = [ r> 2drop f ] [ r> nth ] if ;
     inline

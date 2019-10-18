@@ -10,6 +10,7 @@ USING: cocoa compiler io kernel objc sequences words ;
 {
     "NSApplication"
     "NSAutoreleasePool"
+    "NSBundle"
     "NSError"
     "NSEvent"
     "NSException"

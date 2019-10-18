@@ -2,28 +2,28 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-books
 USING: gadgets gadgets-controls gadgets-panes gadgets-scrolling
-kernel sequences ;
+kernel sequences models ;
 
-TUPLE: book page pages ;
+TUPLE: book pages ;
 
-: show-page ( n book -- )
-    dup book-page unparent
-    [ book-pages nth ] keep
-    [ set-book-page ] 2keep
-    add-gadget ;
+: get-page ( n book -- page ) book-pages nth ;
+
+M: book model-changed ( book -- )
+    [ control-model model-value ] keep
+    [ gadget-child unparent ] keep
+    [ get-page ] keep
+    [ control-self add-gadget ] keep
+    request-focus ;
 
 C: book ( pages -- book )
-    dup delegate>gadget
+    dup 0 <model> delegate>control
+    dup dup set-control-self
     [ set-book-pages ] keep
-    0 over show-page ;
+    dup model-changed ;
 
-: <book-control> ( model pages -- book )
-    <book> [ show-page ] <control> ;
+M: book pref-dim* gadget-child pref-dim ;
 
-M: book pref-dim* ( book -- dim ) book-page pref-dim ;
+M: book layout*
+    dup rect-dim swap gadget-child set-layout-dim ;
 
-M: book layout* ( book -- )
-    dup rect-dim swap book-page set-layout-dim ;
-
-: make-book ( model obj quots -- assoc )
-    [ make-pane <scroller> ] map-with <book-control> ;
+M: book focusable-child* gadget-child ;

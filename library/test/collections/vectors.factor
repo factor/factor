@@ -51,11 +51,11 @@ sequences sequences-internals strings test vectors ;
 [ f ] [ f concat ] unit-test
 [ V{ 1 2 3 4 } ] [ [ V{ 1 } [ 2 ] V{ 3 4 } ] concat ] unit-test
 
-[ V{ } ] [ 0 V{ } tail ] unit-test
-[ V{ } ] [ 2 V{ 1 2 } tail ] unit-test
-[ V{ 3 4 } ] [ 2 V{ 1 2 3 4 } tail ] unit-test
+[ V{ } ] [ V{ } 0 tail ] unit-test
+[ V{ } ] [ V{ 1 2 } 2 tail ] unit-test
+[ V{ 3 4 } ] [ V{ 1 2 3 4 } 2 tail ] unit-test
 
-[ V{ 3 } ] [ 1 V{ 1 2 3 } tail* ] unit-test
+[ V{ 3 } ] [ V{ 1 2 3 } 1 tail* ] unit-test
 
 0 <vector> "funny-stack" set
 

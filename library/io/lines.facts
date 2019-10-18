@@ -1,10 +1,10 @@
 USING: help io ;
 
-HELP: <line-reader> "( stream -- new-stream )"
+HELP: <line-reader>
 { $values { "stream" "an input stream" } { "new-stream" "an input stream" } }
 { $description "Wraps an input stream in a stream supporting the " { $link stream-readln } " generic word." }
 { $notes "Stream constructors should call this word to wrap streams that do not natively support reading lines. Unix (" { $snippet "\\n" } "), Windows (" { $snippet "\\r\\n" } ") and MacOS (" { $snippet "\\r" } ") line endings are supported." } ;
 
-HELP: lines "( stream -- seq )"
+HELP: lines
 { $values { "stream" "an input stream" } { "seq" "a sequence of strings" } }
 { $description "Reads lines of text until the stream is exhausted, collecting them in a sequence of strings." } ;

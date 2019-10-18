@@ -4,7 +4,7 @@ IN: alien
 USING: arrays assembler compiler compiler
 errors generic hashtables inference inspector
 io kernel kernel-internals math namespaces parser
-prettyprint sequences strings words ;
+prettyprint sequences strings words parser ;
 
 TUPLE: alien-invoke library function return parameters ;
 C: alien-invoke make-node ;
@@ -19,13 +19,10 @@ C: alien-invoke make-node ;
 
 TUPLE: alien-invoke-error library symbol ;
 
-M: alien-invoke-error summary ( error -- )
-    drop "Words calling ``alien-invoke'' cannot run in the interpreter. Compile the caller word and try again." ;
-
 : alien-invoke ( ... return library function parameters -- ... )
     pick pick <alien-invoke-error> throw ;
 
-\ alien-invoke [ [ string object string object ] [ ] ]
+\ alien-invoke [ string object string object ] [ ] <effect>
 "infer-effect" set-word-prop
 
 \ alien-invoke [
@@ -63,7 +60,7 @@ M: alien-invoke-error summary ( error -- )
         alien-invoke-parameters stack-space %cleanup
     ] if ;
 
-M: alien-invoke generate-node ( node -- )
+M: alien-invoke generate-node
     end-basic-block compile-gc
     dup alien-invoke-parameters objects>registers
     dup alien-invoke-dlsym %alien-invoke
@@ -73,26 +70,16 @@ M: alien-invoke generate-node ( node -- )
 M: alien-invoke stack-reserve*
     alien-invoke-parameters stack-space ;
 
-: parse-arglist ( return seq -- types stack-effect )
-    2 swap group unpair
-    rot dup "void" = [ drop { } ] [ 1array ] if 2array
-    effect>string ;
+: parse-arglist ( return seq -- types effect )
+    2 group unpair
+    rot dup "void" = [ drop { } ] [ 1array ] if <effect> ;
 
 : (define-c-word) ( type lib func types stack-effect -- )
     >r over create-in dup reset-generic >r 
     [ alien-invoke ] curry curry curry curry
     r> swap define-compound word r>
-    "stack-effect" set-word-prop ;
+    "declared-effect" set-word-prop ;
 
 : define-c-word ( return library function parameters -- )
     [ "()" subseq? not ] subset >r pick r> parse-arglist
     (define-c-word) ;
-
-M: compound unxref-word*
-    dup "infer" word-prop [
-        dup
-        { "infer-effect" "base-case" "no-effect" }
-        reset-props
-        dup word-def \ alien-invoke swap member?
-        [ dup update-xt ] unless
-    ] unless drop ;

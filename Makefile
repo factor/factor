@@ -3,8 +3,9 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-DISK_IMAGE_DIR = Factor-0.83
-DISK_IMAGE = Factor-0.83.dmg
+VERSION = 0.84
+DISK_IMAGE_DIR = Factor-$(VERSION)
+DISK_IMAGE = Factor-$(VERSION).dmg
 
 ifdef DEBUG
 	CFLAGS = -g
@@ -27,6 +28,7 @@ endif
 OBJS = $(PLAF_OBJS) \
 	vm/alien.o \
 	vm/bignum.o \
+	vm/compiler.o \
 	vm/debug.o \
 	vm/factor.o \
 	vm/ffi_test.o \
@@ -91,35 +93,33 @@ windows:
 macosx.app:
 	cp $(BINARY) $(BUNDLE)/Contents/MacOS/Factor
 
-	rm -rf $(BUNDLE)/Contents/Resources/
-	mkdir -p $(BUNDLE)/Contents/Resources/fonts/
+	install_name_tool \
+		-id @executable_path/../Frameworks/libfreetype.6.dylib \
+		Factor.app/Contents/Frameworks/libfreetype.6.dylib
+	install_name_tool \
+		-change /usr/X11R6/lib/libfreetype.6.dylib \
+		@executable_path/../Frameworks/libfreetype.6.dylib \
+		Factor.app/Contents/MacOS/Factor
 
+macosx.dmg:
+	rm -f $(DISK_IMAGE)
+	rm -rf $(DISK_IMAGE_DIR)
+	mkdir $(DISK_IMAGE_DIR)
+	mkdir -p $(DISK_IMAGE_DIR)/Factor/
+	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/Factor/$(BUNDLE)
 	chmod +x cp_dir
+	cp factor.image license.txt README.txt TODO.FACTOR.txt version.factor \
+		$(DISK_IMAGE_DIR)/Factor/
 	find doc library contrib examples fonts \( -name '*.factor' \
 		-o -name '*.facts' \
 		-o -name '*.txt' \
 		-o -name '*.html' \
 		-o -name '*.ttf' \
+		-o -name '*.el' \
+		-o -name '*.vim' \
+		-o -name '*.fgen' \
 		-o -name '*.js' \) \
-		-exec ./cp_dir {} $(BUNDLE)/Contents/Resources/{} \;
-
-	cp version.factor $(BUNDLE)/Contents/Resources/
-
-	cp $(IMAGE) $(BUNDLE)/Contents/Resources/factor.image
-
-	install_name_tool \
-		-id @executable_path/../Frameworks/libfreetype.6.dylib \
-		Factor.app/Contents/Frameworks/libfreetype.6.dylib
-	install_name_tool \
-		-change /usr/local/lib/libfreetype.6.dylib \
-		@executable_path/../Frameworks/libfreetype.6.dylib \
-		Factor.app/Contents/MacOS/Factor
-
-macosx.dmg:
-	rm $(DISK_IMAGE)
-	rm -rf $(DISK_IMAGE_DIR)
-	mkdir $(DISK_IMAGE_DIR)
-	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/$(BUNDLE)
+		-exec ./cp_dir {} $(DISK_IMAGE_DIR)/Factor/{} \;
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
 		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
 
@@ -127,7 +127,9 @@ f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
 
 clean:
-	rm -f $(OBJS) $(UNIX_OBJS) $(WINDOWS_OBJS) $(MACOSX_OBJS)
+	rm -f vm/*.o
+
+clean.app:
 	rm -rf $(BUNDLE)/Contents/Resources/
 	rm -f $(BUNDLE)/Contents/MacOS/Factor
 

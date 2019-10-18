@@ -24,39 +24,53 @@ threads unix-internals ;
 : socket-fd ( -- socket )
     PF_INET SOCK_STREAM 0 socket dup io-error dup init-handle ;
 
-: with-socket-fd ( quot -- fd | quot: socket -- n )
+: with-socket-fd ( quot -- fd )
     socket-fd [ swap call ] keep  swap 0 < [
         err_no EINPROGRESS = [ dup close (io-error) ] unless
     ] when ; inline
 
-: client-socket ( host port -- fd )
-    client-sockaddr [
-        swap "sockaddr-in" c-size connect
-    ] with-socket-fd ;
-
 : server-sockaddr ( port -- sockaddr )
     init-sockaddr  INADDR_ANY htonl over set-sockaddr-in-addr ;
 
-: sockopt ( fd level opt value -- )
+: sockopt ( fd level opt -- )
     1 <int> "int" c-size setsockopt io-error ;
 
 : server-socket ( port -- fd )
     server-sockaddr [
         dup SOL_SOCKET SO_REUSEADDR sockopt
         swap dupd "sockaddr-in" c-size bind
-        dup 0 >= [ drop 1 listen ] [ ( fd n - n) nip ] if
+        dup 0 >= [ drop 1 listen ] [ nip ] if
     ] with-socket-fd ;
 
+TUPLE: connect-task ;
+
+C: connect-task ( port -- task )
+    [ >r <io-task> r> set-delegate ] keep ;
+
+M: connect-task do-io-task
+    io-task-port dup port-handle 0 0 write
+    0 < [ defer-error ] [ drop t ] if ;
+
+M: connect-task task-container drop write-tasks get-global ;
+
+: client-socket ( host port -- fd )
+    client-sockaddr [
+        swap "sockaddr-in" c-size connect
+    ] with-socket-fd ;
+
+: wait-to-connect ( port -- )
+    [ swap <connect-task> add-io-task stop ] callcc0 drop ;
+
 IN: io
+
+: <client> ( host port -- stream )
+    client-socket dup <fd-stream>
+    dup duplex-stream-out dup wait-to-connect pending-error ;
 
 C: client-stream ( host port fd -- stream )
     [ >r dup <fd-stream> r> set-delegate ] keep
     [ set-client-stream-port ] keep
     [ set-client-stream-host ] keep ;
-
-: <client> ( host port -- stream )
-    #! Connect to a port number on a TCP/IP host.
-    client-socket dup <fd-stream> ;
 
 TUPLE: server client ;
 
@@ -90,7 +104,7 @@ C: accept-task ( port -- task )
         swap sockaddr-in-port ntohs
     ] keep <client-stream> swap set-server-client ;
 
-M: accept-task do-io-task ( task -- ? )
+M: accept-task do-io-task
     io-task-port "sockaddr-in" <c-object>
     over port-handle over "sockaddr-in" c-size <int> accept
     dup 0 >= [

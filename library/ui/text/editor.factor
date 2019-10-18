@@ -13,9 +13,6 @@ focused? ;
 
 TUPLE: loc-monitor editor ;
 
-M: loc-monitor model-changed ( obj -- )
-    loc-monitor-editor control-self relayout-1 ;
-
 : <loc> ( editor -- loc )
     <loc-monitor> { 0 0 } <model> [ add-connection ] keep ;
 
@@ -23,7 +20,7 @@ M: loc-monitor model-changed ( obj -- )
     dup <loc> over set-editor-caret
     dup <loc> swap set-editor-mark ;
 
-C: editor ( document -- editor )
+C: editor ( -- editor )
     dup <document> delegate>control
     dup dup set-control-self
     dup init-editor-locs
@@ -35,17 +32,17 @@ C: editor ( document -- editor )
 : deactivate-editor-model ( editor model -- )
     dup deactivate-model swap control-model remove-loc ;
 
-M: editor graft* ( editor -- )
+M: editor graft*
     dup dup editor-caret activate-editor-model
     dup dup editor-mark activate-editor-model
     dup control-self swap control-model add-connection ;
 
-M: editor ungraft* ( editor -- )
+M: editor ungraft*
     dup dup editor-caret deactivate-editor-model
     dup dup editor-mark deactivate-editor-model
     dup control-self swap control-model remove-connection ;
 
-M: editor model-changed ( editor -- )
+M: editor model-changed
     control-self dup control-model
     over editor-caret [ over validate-loc ] (change-model)
     over editor-mark [ over validate-loc ] (change-model)
@@ -55,13 +52,13 @@ M: editor model-changed ( editor -- )
 
 : editor-mark* editor-mark model-value ;
 
-: change-caret ( editor quot -- | quot: caret doc -- caret )
+: change-caret ( editor quot -- )
     over >r >r dup editor-caret* swap control-model r> call r>
     [ control-model validate-loc ] keep
-    editor-caret set-model ; inline
+    editor-caret set-model* ; inline
 
 : mark>caret ( editor -- )
-    dup editor-caret* swap editor-mark set-model ;
+    dup editor-caret* swap editor-mark set-model* ;
 
 : change-caret&mark ( editor quot -- )
     over >r change-caret r> mark>caret ; inline
@@ -79,7 +76,7 @@ M: editor model-changed ( editor -- )
 : run-char-widths ( str editor -- wlist )
     #! List of x co-ordinates of each character.
     editor-font* swap >array [ char-width ] map-with
-    dup 0 [ + ] accumulate swap 2 v/n v+ ;
+    dup 0 [ + ] accumulate nip swap 2 v/n v+ ;
 
 : x>offset ( x line# editor -- col# )
     [ editor-line ] keep
@@ -95,7 +92,7 @@ M: editor model-changed ( editor -- )
     ] keep swap 2array ;
 
 : click-loc ( editor model -- )
-    >r [ hand-rel ] keep point>loc r> set-model ;
+    >r [ hand-rel ] keep point>loc r> set-model* ;
 
 : focus-editor ( editor -- )
     t over set-editor-focused? relayout-1 ;
@@ -104,42 +101,55 @@ M: editor model-changed ( editor -- )
     f over set-editor-focused? relayout-1 ;
 
 : (offset>x) ( font col# str -- x )
-    head-slice string-width ;
+    swap head-slice string-width ;
 
 : offset>x ( col# line# editor -- x )
     [ editor-line ] keep editor-font* -rot (offset>x) ;
 
 : loc>x ( loc editor -- x ) >r first2 swap r> offset>x ;
 
-: (draw-caret) ( loc editor -- )
-    dup editor-caret-color gl-color
-    [ loc>x ] keep line-height dupd 2array >r 0 2array r>
-    gl-line ;
+: line>y ( lines# editor -- y )
+    line-height * ;
 
-: draw-caret ( n editor -- )
-    {
-        { [ dup editor-focused? not ] [ ] }
-        { [ 2dup editor-caret* first = not ] [ ] }
-        { [ t ] [ dup editor-caret* over (draw-caret) ] }
-    } cond 2drop ;
+: caret-loc ( editor -- loc )
+    [ editor-caret* ] keep 2dup loc>x
+    rot first rot line>y 2array ;
 
-: translate-lines ( n -- )
-    editor get line-height * 0.0 swap 0.0 glTranslated ;
+: caret-dim ( editor -- dim )
+    line-height 0 swap 2array ;
 
-: draw-line ( str n -- )
-    editor get draw-caret
-    editor get editor-color gl-color
-    >r editor get editor-font r> draw-string ;
+: caret-rect ( editor -- dim )
+    dup caret-loc swap caret-dim <rect> ;
+
+: scroll>caret ( editor -- )
+    dup caret-rect swap scroll>rect ;
+
+M: loc-monitor model-changed
+    loc-monitor-editor control-self scroll>caret ;
+
+: draw-caret ( -- )
+    editor get editor-focused? [
+        editor get
+        dup editor-caret-color gl-color
+        caret-rect rect-extent gl-line
+    ] when ;
+
+: translate-lines ( n editor -- )
+    line-height * 0.0 swap 0.0 glTranslated ;
+
+: draw-line ( editor str -- )
+    over editor-color gl-color
+    >r editor-font r> draw-string ;
 
 : with-editor ( editor quot -- )
     [
         swap dup control-model document set editor set call
     ] with-scope ; inline
 
-: draw-lines ( editor -- )
+: draw-lines ( -- )
     GL_MODELVIEW [
-        editor get editor-lines dup length
-        [ draw-line 1 translate-lines ] 2each
+        editor get dup editor-lines
+        [ over >r draw-line 1 r> translate-lines ] each-with
     ] do-matrix ;
 
 : selection-start/end ( editor -- start end )
@@ -157,7 +167,7 @@ M: editor model-changed ( editor -- )
     (draw-selection) ;
 
 : translate>selection-start ( start -- )
-    first translate-lines ;
+    first editor get translate-lines ;
 
 : draw-selection ( -- )
     GL_MODELVIEW [
@@ -166,15 +176,13 @@ M: editor model-changed ( editor -- )
         selection-start/end
         over translate>selection-start
         2dup [
-            >r 2dup r> draw-selected-line 1 translate-lines
+            >r 2dup r> draw-selected-line
+            1 editor get translate-lines
         ] each-line 2drop
     ] do-matrix ;
 
-M: editor draw-gadget* ( gadget -- )
-    [ draw-selection draw-lines ] with-editor ;
-
-: line>y ( lines# editor -- y )
-    line-height * ;
+M: editor draw-gadget*
+    [ draw-selection draw-lines draw-caret ] with-editor ;
 
 : editor-height ( editor -- n )
     [ editor-lines length ] keep line>y ;
@@ -183,20 +191,20 @@ M: editor draw-gadget* ( gadget -- )
     0 swap dup editor-font* swap editor-lines
     [ string-width max ] each-with ;
 
-M: editor pref-dim* ( editor -- dim )
+M: editor pref-dim*
     dup editor-width swap editor-height 2array ;
 
-: editor-selection? ( editor -- ? )
+M: editor gadget-selection?
     selection-start/end = not ;
 
-: editor-selection ( editor -- str )
+M: editor gadget-selection
     [ selection-start/end ] keep control-model doc-range ;
 
 : remove-editor-selection ( editor -- )
     [ selection-start/end ] keep control-model
     remove-doc-range ;
 
-M: editor user-input* ( str editor -- ? )
+M: editor user-input*
     [ selection-start/end ] keep control-model set-doc-range t ;
 
 : editor-text ( editor -- str )

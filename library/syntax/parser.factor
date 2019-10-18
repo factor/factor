@@ -1,17 +1,17 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: parser
-USING: arrays errors generic hashtables kernel math namespaces
-prettyprint sequences strings vectors words ;
+USING: arrays definitions errors generic hashtables kernel math
+namespaces prettyprint sequences strings vectors words ;
 
-: skip ( i seq quot -- n | quot: elt -- ? )
+: skip ( i seq quot -- n )
     over >r find* drop dup -1 =
     [ drop r> length ] [ r> drop ] if ; inline
 
 : skip-blank ( -- )
     column [ line-text get [ blank? not ] skip ] change ;
 
-: skip-word ( n line -- n )
+: skip-word ( m line -- n )
     2dup nth CHAR: " = [ drop 1+ ] [ [ blank? ] skip ] if ;
 
 : (scan) ( n line -- start end )
@@ -27,24 +27,24 @@ prettyprint sequences strings vectors words ;
 SYMBOL: string-mode
 
 : do-what-i-mean ( string -- restarts )
-    all-words [ word-name = ] subset-with natural-sort [
-        [ "Use the word " swap synopsis append ] keep 2array
+    words-named natural-sort [
+        [ "Use the word " swap summary append ] keep 2array
     ] map ;
 
-: word-not-found ( str -- word )
-    "No word named "
-    over
-    " found in current vocabulary search path" append3
-    swap do-what-i-mean condition ;
+TUPLE: no-word name ;
+
+: no-word ( name -- word )
+    dup <no-word> swap do-what-i-mean condition ;
+
+: search ( str -- word )
+    dup use get hash-stack [ ] [
+        no-word dup word-vocabulary use+
+    ] ?if ;
 
 : scan-word ( -- obj )
     scan dup [
         dup ";" = not string-mode get and [
-            dup use get hash-stack [ ] [
-                dup string>number [ ] [
-                    word-not-found dup word-vocabulary use+
-                ] ?if
-            ] ?if
+            dup string>number [ ] [ search ] ?if
         ] unless
     ] when ;
 
@@ -57,8 +57,11 @@ SYMBOL: string-mode
 
 : (parse) ( str -- ) line-text set 0 column set parse-loop ;
 
+TUPLE: bad-escape ;
+: bad-escape ( -- * ) <bad-escape> throw ;
+
 ! Parsing word utilities
-: escape ( ch -- esc )
+: escape ( escape -- ch )
     H{
         { CHAR: e  CHAR: \e }
         { CHAR: n  CHAR: \n }
@@ -69,7 +72,7 @@ SYMBOL: string-mode
         { CHAR: 0  CHAR: \0 }
         { CHAR: \\ CHAR: \\ }
         { CHAR: \" CHAR: \" }
-    } hash [ "Bad escape" throw ] unless* ;
+    } hash [ bad-escape ] unless* ;
 
 : next-escape ( n str -- n ch )
     2dup nth CHAR: u =
@@ -88,14 +91,27 @@ SYMBOL: string-mode
     column
     [ [ line-text get (parse-string) ] "" make swap ] change ;
 
+: (parse-effect) ( -- )
+    scan [
+        dup ")" = [ drop ] [ , (parse-effect) ] if
+    ] [
+        "Unexpected EOL" throw
+    ] if* ;
+
+: parse-effect ( -- effect )
+    [ (parse-effect) column get ] { } make swap column set
+    { "--" } split1 <effect> ;
+
+: parse-base ( parsed base -- parsed ) scan swap base> parsed ;
+
 global [
     {
-        "scratchpad" "syntax" "arrays" "compiler"
+        "scratchpad" "syntax" "arrays" "compiler" "definitions"
         "errors" "generic" "hashtables" "help" "inference"
-        "inspector" "io" "jedit" "kernel" "listener" "math"
+        "inspector" "io" "kernel" "listener" "math"
         "memory" "modules" "namespaces" "parser" "prettyprint"
         "sequences" "shells" "strings" "styles" "test"
-        "threads" "vectors" "walker" "words"
+        "threads" "vectors" "words"
     } set-use
     "scratchpad" set-in
 ] bind

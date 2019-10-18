@@ -79,7 +79,7 @@ IN: math-contrib
 IN: polynomials-internals
 
 : pop-front ( seq -- seq )
-    1 swap tail ;
+    1 tail ;
 
 : /-last ( seq seq -- a )
     #! divide the last two numbers in the sequences

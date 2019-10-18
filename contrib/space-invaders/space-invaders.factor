@@ -21,7 +21,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 USING: alien cpu-8080 errors generic io kernel kernel-internals
-lists math namespaces sequences styles threads gadgets gadgets-layouts opengl arrays 
+math namespaces sequences styles threads gadgets gadgets opengl arrays 
 concurrency ;
 IN: space-invaders
 
@@ -47,7 +47,7 @@ TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap ;
 
 : set-bitmap-pixel ( color point array -- )
   #! 'color' is a {r g b}. Point is {x y}.
-  [ bitmap-index ] dip ( color index array )
+  [ bitmap-index ] dip ! color index array
   [ [ first ] dipd set-uchar-nth ] 3keep
   [ [ second ] dipd [ 1 + ] dip set-uchar-nth ] 3keep
   [ third ] dipd [ 2 + ] dip set-uchar-nth ;
@@ -64,26 +64,82 @@ C: space-invaders ( cpu -- cpu )
   [ make-opengl-bitmap swap set-space-invaders-bitmap ] keep
   [ reset ] keep ;
 
+: read-port1 ( cpu -- byte )
+  #! Port 1 maps the keys for space invaders
+  #! Bit 0 = coin slot
+  #! Bit 1 = two players button
+  #! Bit 2 = one player button
+  #! Bit 4 = player one fire
+  #! Bit 5 = player one left
+  #! Bit 6 = player one right
+  [ space-invaders-port1 dup HEX: FE bitand ] keep 
+ set-space-invaders-port1 ;
+
+: read-port2 ( cpu -- byte )
+  #! Port 2 maps player 2 controls and dip switches
+  #! Bit 0,1 = number of ships
+  #! Bit 2   = mode (1=easy, 0=hard)
+  #! Bit 4   = player two fire
+  #! Bit 5   = player two left
+  #! Bit 6   = player two right
+  #! Bit 7   = show or hide coin info
+  [ space-invaders-port2i HEX: 8F bitand ] keep 
+  space-invaders-port1 HEX: 70 bitand bitor ;
+
+: read-port3 ( cpu -- byte )
+  #! Used to compute a special formula
+  [ space-invaders-port4hi 8 shift ] keep 
+  [ space-invaders-port4lo bitor ] keep 
+  space-invaders-port2o shift -8 shift HEX: FF bitand ;
+
 M: space-invaders read-port ( port cpu -- byte )
   #! Read a byte from the hardware port. 'port' should
   #! be an 8-bit value.
   {
-    { [ over 1 = ] [ nip [ space-invaders-port1 dup HEX: FE bitand ] keep set-space-invaders-port1 ] }
-    { [ over 2 = ] [ nip [ space-invaders-port2i HEX: 8F bitand ] keep space-invaders-port1 HEX: 70 bitand bitor ] }
-    { [ over 3 = ] [ nip [ space-invaders-port4hi 8 shift ] keep [ space-invaders-port4lo bitor ] keep space-invaders-port2o shift -8 shift HEX: FF bitand ] }
-    { [ t ] [ 2drop 0 ] }    
+    { [ over 1 = ] [ nip read-port1 ] }
+    { [ over 2 = ] [ nip read-port2 ] }
+    { [ over 3 = ] [ nip read-port3 ] }
+    { [ t ]        [ 2drop 0 ] }    
   } cond ;
+
+: write-port2 ( value cpu -- )
+  #! Setting this value affects the value read from port 3
+  set-space-invaders-port2o ;
+
+: write-port3 ( value cpu -- )
+  #! Connected to the sound hardware
+  #! Bit 0 = spaceship sound (looped)
+  #! Bit 1 = Shot 
+  #! Bit 2 = Your ship hit
+  #! Bit 3 = Invader hit
+  #! Bit 4 = Extended play sound
+  set-space-invaders-port3o ;
+
+: write-port4 ( value cpu -- )
+  #! Affects the value returned by reading port 3
+  [ space-invaders-port4hi ] keep 
+  [ set-space-invaders-port4lo ] keep 
+  set-space-invaders-port4hi ;
+
+: write-port5 ( value cpu -- )
+  #! Plays sounds
+  #! Bit 0 = invaders sound 1
+  #! Bit 1 = invaders sound 2
+  #! Bit 2 = invaders sound 3
+  #! Bit 3 = invaders sound 4
+  #! Bit 4 = spaceship hit 
+  #! Bit 5 = amplifier enabled/disabled
+  set-space-invaders-port5o ;
 
 M: space-invaders write-port ( value port cpu -- )
   #! Write a byte to the hardware port, where 'port' is
   #! an 8-bit value.  
   {
-    { [ over 2 = ] [ nip set-space-invaders-port2o ] }
-    { [ over 3 = ] [ nip set-space-invaders-port3o ] }
-    { [ over 4 = ] [ nip [ space-invaders-port4hi ] keep [ set-space-invaders-port4lo ] keep set-space-invaders-port4hi ] }
-    { [ over 5 = ] [ nip set-space-invaders-port5o ] }
-    { [ over 6 = ] [ 3drop ] }
-    { [ t ] [ 3drop "Invalid port write" throw ] }
+    { [ over 2 = ] [ nip write-port2 ] }
+    { [ over 3 = ] [ nip write-port3 ] }
+    { [ over 4 = ] [ nip write-port4 ] }
+    { [ over 5 = ] [ nip write-port5 ] }
+    { [ t ]        [ 3drop ] }
   } cond ;
 
 M: space-invaders reset ( cpu -- )
@@ -97,8 +153,7 @@ M: space-invaders reset ( cpu -- )
   0 swap set-space-invaders-port5o ;
 
 : gui-step ( cpu -- )
-!  0 sleep
-  [ read-instruction ] keep ( n cpu )
+  [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
   [ swap instructions dispatch ] keep  
   [ cpu-pc HEX: FFFF bitand ] keep 
@@ -107,7 +162,7 @@ M: space-invaders reset ( cpu -- )
 : gui-frame/2 ( cpu -- )
   [ gui-step ] keep
   [ cpu-cycles ] keep
-  over 16667 < [ ( cycles cpu )
+  over 16667 < [ ! cycles cpu
     nip gui-frame/2
   ] [
     [ >r 16667 - r> set-cpu-cycles ] keep
@@ -121,61 +176,67 @@ M: space-invaders reset ( cpu -- )
 : gui-frame ( cpu -- )
   dup gui-frame/2 gui-frame/2 ;
 
-TUPLE: invaders-gadget cpu process ;
+: coin-down ( cpu -- )
+  [ space-invaders-port1 1 bitor ] keep set-space-invaders-port1 ;
 
-TUPLE: coin-down-msg ;
-TUPLE: coin-up-msg ;
-TUPLE: player1-down-msg ;
-TUPLE: player1-up-msg ;
-TUPLE: player2-down-msg ;
-TUPLE: player2-up-msg ;
-TUPLE: fire-down-msg ;
-TUPLE: fire-up-msg ;
-TUPLE: left-down-msg ;
-TUPLE: left-up-msg ;
-TUPLE: right-down-msg ;
-TUPLE: right-up-msg ;
+: coin-up ( cpu --  )
+  [ space-invaders-port1 255 1 - bitand ] keep set-space-invaders-port1 ;
 
-: coin-key-pressed ( process -- )
-  #! Workaround lack of up event from gui.
-  <coin-down-msg> over send [ 10 sleep <coin-up-msg> swap send ] spawn drop  ;
+: player1-down ( cpu -- )
+  [ space-invaders-port1 4 bitor ] keep set-space-invaders-port1 ;
 
-: player1-key-pressed ( process -- )
-  #! Workaround lack of up event from gui.
-  <player1-down-msg> over send [ 10 sleep <player1-up-msg> swap send ] spawn drop ;
+: player1-up ( cpu -- )
+  [ space-invaders-port1 255 4 - bitand ] keep set-space-invaders-port1 ;
 
-: player2-key-pressed ( process -- )
-  #! Workaround lack of up event from gui.
-  <player2-down-msg> over send [ 10 sleep <player2-up-msg> swap send ] spawn drop ;
+: player2-down ( cpu -- )
+  [ space-invaders-port1 2 bitor ] keep set-space-invaders-port1 ;
 
-: fire-key-pressed ( process -- )
-  #! Workaround lack of up event from gui.
-  <fire-down-msg> over send [ 10 sleep <fire-up-msg> swap send ] spawn drop ;
+: player2-up ( cpu -- )
+  [ space-invaders-port1 255 2 - bitand ] keep set-space-invaders-port1 ;
 
-: left-key-pressed ( process -- )
-  #! Workaround lack of up event from gui.
-  <left-down-msg> over send [ 10 sleep <left-up-msg> swap send ] spawn drop ;
+: fire-down ( cpu -- )
+  [ space-invaders-port1 HEX: 10 bitor ] keep set-space-invaders-port1 ;
 
-: right-key-pressed ( process -- )
-  #! Workaround lack of up event from gui.
-  <right-down-msg> over send [ 10 sleep <right-up-msg> swap send ] spawn drop ;
+: fire-up ( cpu -- )
+  [ space-invaders-port1 255 HEX: 10 - bitand ] keep set-space-invaders-port1 ;
 
-: set-key-actions ( gadget -- )
-  H{
-    { [ "ESCAPE" ] [ invaders-gadget-process "stop" swap send ] }
-    { [ "BACKSPACE" ] [ invaders-gadget-process coin-key-pressed ] }
-    { [ "1" ] [ invaders-gadget-process player1-key-pressed ] }
-    { [ "2" ] [ invaders-gadget-process player2-key-pressed ] }
-    { [ "UP" ] [ invaders-gadget-process fire-key-pressed ] }
-    { [ "LEFT" ] [ invaders-gadget-process left-key-pressed ] }
-    { [ "RIGHT" ] [ invaders-gadget-process right-key-pressed ] }
-  } add-actions ;
+: left-down ( cpu -- )
+  [ space-invaders-port1 HEX: 20 bitor ] keep set-space-invaders-port1 ;
 
-C: invaders-gadget ( gadget -- )
-  dup delegate>gadget 
-  dup set-key-actions ;
+: left-up ( cpu -- )
+  [ space-invaders-port1 255 HEX: 20 - bitand ] keep set-space-invaders-port1 ;
 
-M: invaders-gadget pref-dim* drop { 224 256 0 0 } ;
+: right-down ( cpu -- )
+  [ space-invaders-port1 HEX: 40 bitor ] keep set-space-invaders-port1 ;
+
+: right-up ( cpu -- )
+  [ space-invaders-port1 255 HEX: 40 - bitand ] keep set-space-invaders-port1 ;
+
+
+TUPLE: invaders-gadget cpu quit? ;
+
+invaders-gadget H{
+    { T{ key-down f f "ESCAPE" }    [ t swap set-invaders-gadget-quit? ] }
+    { T{ key-down f f "BACKSPACE" } [ invaders-gadget-cpu coin-down ] }
+    { T{ key-up   f f "BACKSPACE" } [ invaders-gadget-cpu coin-up ] }
+    { T{ key-down f f "1" }         [ invaders-gadget-cpu player1-down ] }
+    { T{ key-up   f f "1" }         [ invaders-gadget-cpu player1-up ] }
+    { T{ key-down f f "2" }         [ invaders-gadget-cpu player2-down ] }
+    { T{ key-up   f f "2" }         [ invaders-gadget-cpu player2-up ] }
+    { T{ key-down f f "UP" }        [ invaders-gadget-cpu fire-down ] }
+    { T{ key-up   f f "UP" }        [ invaders-gadget-cpu fire-up ] }
+    { T{ key-down f f "LEFT" }      [ invaders-gadget-cpu left-down ] }
+    { T{ key-up   f f "LEFT" }      [ invaders-gadget-cpu left-up ] }
+    { T{ key-down f f "RIGHT" }     [ invaders-gadget-cpu right-down ] }
+    { T{ key-up   f f "RIGHT" }     [ invaders-gadget-cpu right-up ] }
+  } set-gestures 
+
+C: invaders-gadget ( cpu -- gadget ) 
+  [ set-invaders-gadget-cpu ] keep
+  [ f swap set-invaders-gadget-quit? ] keep
+  [ delegate>gadget ] keep ;
+
+M: invaders-gadget pref-dim* drop { 224 256 0 } ;
 
 M: invaders-gadget draw-gadget* ( gadget -- )
   0 0 glRasterPos2i
@@ -190,15 +251,15 @@ M: invaders-gadget draw-gadget* ( gadget -- )
 
 : addr>xy ( addr -- point )
   #! Convert video RAM address to base X Y value. point is a {x y}.
-  HEX: 2400 - ( n )
-  dup HEX: 1f bitand 8 * 255 swap - ( n y )
+  HEX: 2400 - ! n
+  dup HEX: 1f bitand 8 * 255 swap - ! n y
   swap -5 shift swap 2array ;
 
 : plot-bitmap-pixel ( bitmap point color -- )
   #! point is a {x y}. color is a {r g b}.
   swap rot set-bitmap-pixel ;
 
-: within ( n a b - bool )
+: within ( n a b -- bool )
   #! n >= a and n <= b
   rot tuck swap <= >r swap >= r> and ;
 
@@ -238,90 +299,29 @@ M: space-invaders update-video ( value addr cpu -- )
     3drop
   ] if ;
 
-GENERIC: handle-invaders-message ( gadget message -- quit? )
-
-! Any unknown message quits the process
-M: object handle-invaders-message ( gadget message -- quit? )
-  2drop t ;
-
-M: coin-down-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 1 bitor ] keep 
-  set-space-invaders-port1 f ;
-
-M: coin-up-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 255 1 - bitand ] keep 
-  set-space-invaders-port1 f ;
-
-M: player1-down-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 4 bitor ] keep 
-  set-space-invaders-port1 f ;
-
-M: player1-up-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 255 4 - bitand ] keep 
-  set-space-invaders-port1 f ;
-
-M: player2-down-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 2 bitor ] keep 
-  set-space-invaders-port1 f ;
-
-M: player2-up-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 255 2 - bitand ] keep 
-  set-space-invaders-port1 f ;
-
-M: fire-down-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 HEX: 10 bitor ] keep 
-  set-space-invaders-port1 f ;
-
-M: fire-up-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 255 HEX: 10 - bitand ] keep 
-  set-space-invaders-port1 f ;
-
-M: left-down-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 HEX: 20 bitor ] keep 
-  set-space-invaders-port1 f ;
-
-M: left-up-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 255 HEX: 20 - bitand ] keep 
-  set-space-invaders-port1 f ;
-
-M: right-down-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 HEX: 40 bitor ] keep 
-  set-space-invaders-port1 f ;
-
-M: right-up-msg handle-invaders-message ( gadget message -- quit? )
-  drop invaders-gadget-cpu 
-  [ space-invaders-port1 255 HEX: 40 - bitand ] keep 
-  set-space-invaders-port1 f ;
-
 : sync-frame ( millis -- millis )
   #! Sleep until the time for the next frame arrives.
-  1000 60 / >fixnum + millis - dup 0 > [ sleep ] [ drop ] if millis ;
+  1000 60 / >fixnum + millis - dup 0 >
+  [ sleep ] [ drop yield ] if millis ;
 
 : invaders-process ( millis gadget -- )
   #! Run a space invaders gadget inside a 
   #! concurrent process. Messages can be sent to
   #! signal key presses, etc.
-  [
+  dup invaders-gadget-quit? [
     [ sync-frame ] dip
-    dup invaders-gadget-cpu gui-frame
-    dup relayout-1
-  ] while-no-messages 
-  dup receive handle-invaders-message [ invaders-process ] unless ;
+    [ invaders-gadget-cpu gui-frame ] keep
+    [ relayout-1 ] keep
+    invaders-process 
+  ] unless ;
 
-: run ( -- process )  
-  <space-invaders> "invaders.rom" over load-rom
-  <invaders-gadget> [ set-invaders-gadget-cpu ] keep   
-  dup "Space Invaders" open-window 
-  dup [ millis swap invaders-process ] cons spawn 
-  swap dupd set-invaders-gadget-process ;
+M: invaders-gadget graft* ( gadget -- )
+ [ f swap set-invaders-gadget-quit? ] keep
+ [ millis swap invaders-process ] spawn 2drop ;
+
+M: invaders-gadget ungraft* ( gadget -- )
+ t swap set-invaders-gadget-quit? ;
+
+: run ( -- gadget )  
+  <space-invaders> "invaders.rom" over load-rom <invaders-gadget> 
+  [ "Space Invaders" open-titled-window ] keep ;

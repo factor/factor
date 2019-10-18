@@ -1,18 +1,26 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays generic hashtables interpreter kernel math
+USING: arrays generic hashtables kernel math
 namespaces parser sequences words ;
 
-! The dataflow IR is the first of the two intermediate
-! representations used by Factor. It annotates concatenative
-! code with stack flow information and types.
+SYMBOL: d-in
+SYMBOL: meta-d
+SYMBOL: meta-r
+
+: push-d meta-d get push ;
+: pop-d meta-d get pop ;
+: peek-d meta-d get peek ;
+
+: push-r meta-r get push ;
+: pop-r meta-r get pop ;
+: peek-r meta-r get peek ;
 
 TUPLE: node param shuffle
        classes literals history
        successor children ;
 
-M: node = eq? ;
+M: node equal? eq? ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
     [ >r swapd <shuffle> f f f f f <node> r> set-delegate ] keep ;
@@ -28,16 +36,16 @@ M: node = eq? ;
 : set-node-out-r node-shuffle set-shuffle-out-r ;
 
 : empty-node f { } { } { } { } ;
-: param-node ( label) { } { } { } { } ;
-: in-node ( inputs) >r f r> { } { } { } ;
-: out-node ( outputs) >r f { } r> { } { } ;
+: param-node { } { } { } { } ;
+: in-node >r f r> { } { } { } ;
+: out-node >r f { } r> { } { } ;
 : meta-d-node meta-d get clone in-node ;
 
-: d-tail ( n -- list )
-    dup zero? [ drop f ] [ meta-d get tail* ] if ;
+: d-tail ( n -- seq )
+    dup zero? [ drop f ] [ meta-d get swap tail* ] if ;
 
-: r-tail ( n -- list )
-    dup zero? [ drop f ] [ meta-r get tail* ] if ;
+: r-tail ( n -- seq )
+    dup zero? [ drop f ] [ meta-r get swap tail* ] if ;
 
 : node-child node-children first ;
 
@@ -74,17 +82,15 @@ C: #values make-node ;
 TUPLE: #return ;
 C: #return make-node ;
 : #return ( label -- node )
-    #! The parameter is the label we are returning from, or if
-    #! f, this is a top-level return.
     meta-d-node <#return> [ set-node-param ] keep ;
 
 TUPLE: #if ;
 C: #if make-node ;
-: #if ( in -- node ) peek-d 1array in-node <#if> ;
+: #if ( -- node ) peek-d 1array in-node <#if> ;
 
 TUPLE: #dispatch ;
 C: #dispatch make-node ;
-: #dispatch ( in -- node ) peek-d 1array in-node <#dispatch> ;
+: #dispatch ( -- node ) peek-d 1array in-node <#dispatch> ;
 
 TUPLE: #merge ;
 C: #merge make-node ;
@@ -108,16 +114,13 @@ C: #declare make-node ;
     >r r-tail r> set-node-out-r
     >r d-tail r> set-node-out-d ;
 
-! Variable holding dataflow graph being built.
 SYMBOL: dataflow-graph
-! The most recently added node.
 SYMBOL: current-node
 
 : node, ( node -- )
     dataflow-graph get [
         dup current-node [ set-node-successor ] change
     ] [
-        ! first node
         dup dataflow-graph set  current-node set
     ] if ;
 
@@ -144,7 +147,7 @@ SYMBOL: current-node
 : #drop ( n -- #shuffle )
     d-tail in-node <#shuffle> ;
 
-: each-node ( node quot -- | quot: node -- )
+: each-node ( node quot -- )
     over [
         [ call ] 2keep swap
         [ node-children [ swap each-node ] each-with ] 2keep
@@ -153,10 +156,10 @@ SYMBOL: current-node
         2drop
     ] if ; inline
 
-: each-node-with ( obj node quot -- | quot: obj node -- )
+: each-node-with ( obj node quot -- )
     swap [ with ] each-node 2drop ; inline
 
-: all-nodes? ( node quot -- ? | quot: node -- ? )
+: all-nodes? ( node quot -- ? )
     over [
         [ call ] 2keep rot [
             [
@@ -173,12 +176,10 @@ SYMBOL: current-node
         2drop t
     ] if ; inline
 
-: all-nodes-with? ( obj node quot -- ? | quot: obj node -- ? )
+: all-nodes-with? ( obj node quot -- ? )
     swap [ with rot ] all-nodes? 2nip ; inline
 
 : remember-node ( word node -- )
-    #! Annotate each node with the fact it was inlined from
-    #! 'word'.
     [
         dup #call?
         [ [ node-history ?push ] keep set-node-history ]
@@ -237,20 +238,20 @@ DEFER: (map-nodes)
         drop
     ] if* ; inline
 
-: (map-nodes) ( prev quot -- | quot: node -- node )
+: (map-nodes) ( prev quot -- )
     node@
     [ [ map-node ] keep map-next ]
     [ drop f swap ?set-node-successor ] if ; inline
 
-: map-first ( node quot -- node | quot: node -- node )
+: map-first ( node quot -- node )
     call node> drop dup >node ; inline
 
-: map-nodes ( node quot -- node | quot: node -- node )
+: map-nodes ( node quot -- node )
     over [
         over >node [ map-first ] keep map-next node>
     ] when drop ; inline
 
-: map-children ( quot -- | quot: node -- node )
+: map-children ( quot -- )
     node@ [ node-children [ swap map-nodes ] map-with ] keep
     set-node-children ; inline
 
@@ -265,6 +266,20 @@ DEFER: (map-nodes)
     ] each-node 2drop ;
 
 : subst-values ( new old node -- )
-    #! Mutates nodes.
-    1 node-stack get head-slice* swap add
+    node-stack get 1 head-slice* swap add
     [ >r 2dup r> node-successor (subst-values) ] each 2drop ;
+
+: node-literal? ( node value -- ? )
+    dup value?
+    [ 2drop t ] [ swap node-literals ?hash* nip ] if ;
+
+: node-literal ( node value -- obj )
+    dup value?
+    [ nip value-literal ] [ swap node-literals ?hash ] if ;
+
+: node-class ( node value -- class )
+    dup value? [
+        nip value-literal class
+    ] [
+        swap node-classes ?hash [ object ] unless*
+    ] if ;

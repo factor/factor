@@ -1,27 +1,27 @@
 IN: kernel
 USING: arrays help strings vectors ;
 
-HELP: quotation f
+HELP: quotation
 { $description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;
 
-HELP: <quotation> "( n -- quot )"
+HELP: <quotation> ( n -- quot )
 { $values { "n" "a non-negative integer" } { "quot" "a new quotation" } }
 { $description "Creates a new quotation with the given length and all elements initially set to " { $link f } "." }
 { $see-also <array> <string> <sbuf> <vector> } ;
 
-HELP: >quotation "( seq -- quot )"
+HELP: >quotation
 { $values { "seq" "a sequence" } { "quot" "a quotation" } }
 { $description "Outputs a freshly-allocated quotation with the same elements as a given sequence." }
 { $see-also >array >string >sbuf >vector } ;
 
-HELP: make-dip "( quot n -- newquot )"
+HELP: make-dip
 { $values { "quot" "a quotation" } { "n" "a non-negative integer" } { "newquot" "a new quotation" } }
 { $description "Constructs a quotation which retains the top " { $snippet "n" } " stack items, and applies " { $snippet "quot" } " to what is underneath." }
 { $examples
     { $example "[ 3 + ] 2 make-dip ." "[ >r >r 3 + r> r> ]" }
 } ;
 
-HELP: unit "( obj -- quot )"
+HELP: unit
 { $values { "obj" "an object" } { "quot" "a new quotation" } }
 { $description "Constructs a quotation holding one element." }
 { $notes
@@ -31,23 +31,23 @@ HELP: unit "( obj -- quot )"
 }
 { $see-also 1array } ;
 
-HELP: wrapper f
+HELP: wrapper
 { $description "The class of wrappers. See " { $link "syntax-words" } " for syntax." } ;
 
-HELP: <wrapper> "( obj -- wrapper )"
+HELP: <wrapper> ( obj -- wrapper )
 { $values { "obj" "an object" } { "wrapper" "a new wrapper" } }
 { $description "Creates an object which pushes " { $snippet "obj" } " on the stack when evaluated. User code should call " { $link literalize } " instead, since it avoids wrapping self-evaluating objects (which is redundant)." } ;
 
-HELP: literalize "( obj -- wrapped )"
+HELP: literalize
 { $values { "obj" "an object" } { "wrapped" "an object" } }
-{ $description "Outputs an object which evaluates to " { $snippet "obj" } ". If " { $snippet "obj" } " is not self-evaluating (for example, it is a word), then it will be wrapped." }
+{ $description "Outputs an object which evaluates to " { $snippet "obj" } " when placed in a quotation. If " { $snippet "obj" } " is not self-evaluating (for example, it is a word), then it will be wrapped." }
 { $examples
     { $example "5 literalize ." "5" }
     { $example "[ + ] [ litealize ] map ." "[ \\ + ]" }
 }
 { $see-also curry <wrapper> } ;
 
-HELP: curry "( obj quot -- newquot )"
+HELP: curry
 { $values { "obj" "an object" } { "quot" "a quotation" } { "newquot" "a quotation" } }
 { $description "Constructs a new quotation which first pushes " { $snippet "obj" } " and then calls " { $snippet "quot" } ". If " { $snippet "obj" } " is not self-evaluating, it will be wrapped." }
 { $examples
@@ -55,7 +55,7 @@ HELP: curry "( obj quot -- newquot )"
     { $example "\\ = [ see ] curry ." "[ \\ = see ]" }
 } ;
 
-HELP: alist>quot "( default assoc -- quot )"
+HELP: alist>quot
 { $values { "default" "a quotation" } { "assoc" "a sequence of quotation pairs" } { "quot" "a new quotation" } }
 { $description "Constructs a quotation which calls the first quotation in each pair of " { $snippet "assoc" } " until one of them outputs a true value, and then calls the second quotation in the corresponding pair. Quotations are called in reverse order, and if no quotation outputs a true value then " { $snippet "default" } " is called." }
 { $notes "This word is used to implement compile-time behavior for " { $link cond } ", and it is also used by the generic word system. Note that unlike " { $link cond } ", the constructed quotation performs the tests starting from the end and not the beginning." } ;

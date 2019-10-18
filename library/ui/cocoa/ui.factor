@@ -4,8 +4,8 @@ IN: objc-classes
 DEFER: FactorApplicationDelegate
 
 IN: cocoa
-USING: arrays gadgets gadgets-listener hashtables kernel memory
-namespaces objc sequences errors freetype ;
+USING: arrays gadgets gadgets-listener gadgets-workspace
+hashtables kernel memory namespaces objc sequences errors freetype ;
 
 : finder-run-files ( alien -- )
     #! We filter out the image name since that might be there on
@@ -62,6 +62,12 @@ IN: gadgets
 : flush-gl-context ( handle -- )
     first -> openGLContext -> flushBuffer ;
 
+: running.app? ( -- ? )
+    #! Test if we're running Factor.app.
+    "Factor.app"
+    NSBundle -> mainBundle -> bundlePath CF>string
+    subseq? ;
+
 IN: shells
 
 : ui
@@ -76,13 +82,14 @@ IN: shells
                 restore-windows
             ] [
                 init-ui
-                listener-window
+                workspace-window
+                drop
             ] if
             finish-launching
             event-loop
         ] with-cocoa
     ] with-freetype ;
 
-IN: kernel
+IN: command-line
 
 : default-shell running.app? "ui" "tty" ? ;

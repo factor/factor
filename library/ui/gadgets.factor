@@ -23,8 +23,11 @@ M: array rect-dim drop { 0 0 } ;
 
 : <extent-rect> ( loc ext -- rect ) dupd swap [v-] <rect> ;
 
+: offset-rect ( rect loc -- rect )
+    over rect-loc v+ swap rect-dim <rect> ;
+
 : >absolute ( rect -- rect )
-    rect-bounds >r origin get v+ r> <rect> ;
+    origin get offset-rect ;
 
 : (rect-intersect) ( rect rect -- array array )
     2rect-extent vmin >r vmax r> ;
@@ -47,9 +50,11 @@ pref-dim parent children orientation state
 visible? root? clipped? grafted?
 interior boundary ;
 
-M: gadget = eq? ;
+M: gadget equal? eq? ;
 
 : gadget-child gadget-children first ;
+
+: nth-gadget gadget-children nth ;
 
 C: gadget ( -- gadget )
     { 0 0 } dup <rect> over set-delegate
@@ -64,8 +69,7 @@ M: gadget user-input* 2drop t ;
 
 GENERIC: children-on ( rect/point gadget -- list )
 
-M: gadget children-on ( rect/point gadget -- list )
-    nip gadget-children ;
+M: gadget children-on nip gadget-children ;
 
 : inside? ( bounds gadget -- ? )
     dup gadget-visible?
@@ -74,8 +78,7 @@ M: gadget children-on ( rect/point gadget -- list )
 : pick-up-list ( rect/point gadget -- gadget/f )
     dupd children-on <reversed> [ inside? ] find-with nip ;
 
-: translate ( rect/point -- new-origin )
-    rect-loc origin [ v+ ] change ;
+: translate ( rect/point -- ) rect-loc origin [ v+ ] change ;
 
 : pick-up ( rect/point gadget -- gadget )
     [
@@ -96,11 +99,6 @@ M: gadget children-on ( rect/point gadget -- list )
 : set-gadget-delegate ( delegate gadget -- )
     dup pick [ set-gadget-parent ] each-child-with set-delegate ;
 
-! Pointer help protocol
-GENERIC: gadget-help
-
-M: gadget gadget-help drop f ;
-
 : with-gadget ( gadget quot -- )
     [ swap gadget set call ] with-scope ; inline
 
@@ -108,3 +106,12 @@ M: gadget gadget-help drop f ;
 GENERIC: gadget-title ( gadget -- string )
 
 M: gadget gadget-title drop "Factor" <model> ;
+
+! Selection protocol
+GENERIC: gadget-selection? ( gadget -- ? )
+
+M: gadget gadget-selection? drop f ;
+
+GENERIC: gadget-selection ( gadget -- string/f )
+
+M: gadget gadget-selection drop f ;

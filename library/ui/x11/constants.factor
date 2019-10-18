@@ -83,10 +83,10 @@ TYPEDEF: uchar KeyCode
 
 ! protocol families
 
-: FamilyInternet	0 ;	( IPv4 )
+: FamilyInternet	0 ;	! IPv4
 : FamilyDECnet		1 ;
 : FamilyChaos		2 ;
-: FamilyInternet6	6 ;	( IPv6 )
+: FamilyInternet6	6 ;	! IPv6
 
 ! authentication families not tied to a specific protocol
 : FamilyServerInterpreted 5 ;

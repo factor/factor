@@ -1,13 +1,13 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays graphs hashtables help io kernel math namespaces
-porter-stemmer prettyprint sequences strings words ;
+USING: arrays definitions graphs hashtables help io kernel math
+namespaces porter-stemmer prettyprint sequences strings words ;
 
 ! Right now this code is specific to the help. It will be
 ! generalized to an abstract full text search engine later.
 
-: ignored-word? ( str -- ? )
+: ignored-word? ( string -- ? )
     { "the" "of" "is" "to" "an" "and" "if" "in" "with" "this" "not" "are" "for" "by" "can" "be" "or" "from" "it" "does" "as" } member? ;
 
 : tokenize ( string -- seq )
@@ -17,12 +17,12 @@ porter-stemmer prettyprint sequences strings words ;
         dup ignored-word? over length 1 = or swap empty? or not
     ] subset ;
 
-: index-text ( article string -- )
+: index-text ( topic string -- )
     tokenize [ 1 -rot nest hash+ ] each-with ;
 
 SYMBOL: term-index
 
-: index-article ( article -- )
+: index-article ( topic -- )
     term-index get [
         [ dup [ help ] string-out index-text ] bind
     ] [
@@ -36,7 +36,7 @@ SYMBOL: term-index
         drop
     ] if* ;
 
-: discard-irrelevant ( results -- results )
+: discard-irrelevant ( results -- newresults )
     #! Discard results in the low 33%
     dup 0 [ second max ] reduce
     swap [ first2 rot / 2array ] map-with
@@ -67,9 +67,9 @@ SYMBOL: term-index
         dup articles get remove-hash
     ] when drop ;
 
-: add-article ( name title element -- )
-    pick remove-article
-    pick >r (add-article) r>
+: add-article ( name article -- )
+    over remove-article
+    over >r swap articles get set-hash r>
     dup xref-article index-article ;
 
 : remove-word-help ( word -- )
@@ -85,3 +85,8 @@ SYMBOL: term-index
 
 : search-help. ( phrase -- )
     search-help [ first ] map help-outliner ;
+
+! Definition protocol
+M: link forget link-name remove-article ;
+
+M: word-link forget f "help" set-word-prop ;

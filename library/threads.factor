@@ -11,20 +11,26 @@ namespaces queues sequences vectors ;
 
 : schedule-thread ( continuation -- ) run-queue enque ;
 
-: sleep-queue ( -- vec ) \ sleep-queue get-global ;
+: schedule-thread-with ( obj continuation -- )
+    2array schedule-thread ;
 
-: sleep-queue* ( -- vec )
+: sleep-queue ( -- vector ) \ sleep-queue get-global ;
+
+: sleep-queue* ( -- vector )
     sleep-queue dup [ [ first ] 2apply swap - ] nsort ;
 
-: sleep-time ( sorted-queue -- ms )
+: sleep-time ( vector -- ms )
     dup empty? [ drop 1000 ] [ peek first millis [-] ] if ;
 
-: stop ( -- ) run-queue deque continue ;
+: stop ( -- )
+    run-queue deque dup array?
+    [ first2 continue-with ] [ continue ] if ;
 
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
 : sleep ( ms -- )
-    millis + [ 2array sleep-queue push stop ] callcc0 drop ;
+    >fixnum millis +
+    [ 2array sleep-queue push stop ] callcc0 drop ;
 
 : in-thread ( quot -- )
     [

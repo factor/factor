@@ -16,7 +16,7 @@ IN: math-internals
 : 2>fraction ( a/b c/d -- a c b d )
     [ >fraction ] 2apply swapd ; inline
 
-M: ratio number= ( a/b c/d -- ? )
+M: ratio number=
     2>fraction number= [ number= ] [ 2drop f ] if ;
 
 : scale ( a/b c/d -- a*d b*c )
@@ -30,9 +30,9 @@ M: ratio <= scale <= ;
 M: ratio > scale > ;
 M: ratio >= scale >= ;
 
-M: ratio + ( x y -- x+y ) 2dup scale + -rot ratio+d / ;
-M: ratio - ( x y -- x-y ) 2dup scale - -rot ratio+d / ;
-M: ratio * ( x y -- x*y ) 2>fraction * >r * r> / ;
+M: ratio + 2dup scale + -rot ratio+d / ;
+M: ratio - 2dup scale - -rot ratio+d / ;
+M: ratio * 2>fraction * >r * r> / ;
 M: ratio / scale / ;
 M: ratio /i scale /i ;
 M: ratio mod 2dup >r >r /i r> r> rot * - ;

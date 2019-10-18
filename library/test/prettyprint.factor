@@ -1,5 +1,5 @@
-USING: alien io kernel math prettyprint sequences
-test words inference namespaces vectors ;
+USING: alien definitions inference io kernel math namespaces
+parser prettyprint sequences test vectors words ;
 IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -32,36 +32,31 @@ unit-test
 
 [ "SBUF\" hello world\"" ] [ SBUF" hello world" unparse ] unit-test
 
-: foo dup * ; inline
+: foo ( a -- b ) dup * ; inline
 
-[ "IN: temporary : foo dup * ; inline\n" ]
+[ "IN: temporary : foo ( a -- b ) dup * ; inline\n" ]
 [ [ \ foo see ] string-out ] unit-test
 
 : bar ( x -- y ) 2 + ;
 
-[ "IN: temporary : bar 2 + ;\n" ] [ [ \ bar see ] string-out ] unit-test
-
-: baz dup ;
+[ "IN: temporary : bar ( x -- y ) 2 + ;\n" ]
+[ [ \ bar see ] string-out ] unit-test
 
 [ "( a b -- c d )" ] [
-    { { "a" "b" } { "c" "d" } } effect>string
+    { "a" "b" } { "c" "d" } <effect> effect>string
 ] unit-test
 
 [ "( -- c d )" ] [
-    { { } { "c" "d" } } effect>string
+    { } { "c" "d" } <effect> effect>string
 ] unit-test
 
 [ "( a b -- )" ] [
-    { { "a" "b" } { } } effect>string
+    { "a" "b" } { } <effect> effect>string
 ] unit-test
 
 [ "( -- )" ] [
-    { { } { } } effect>string
+    { } { } <effect> effect>string
 ] unit-test
-
-[ ] [ [ baz ] infer drop ] unit-test
-[ "IN: temporary : baz dup ;\n" ]
-[ [ \ baz see ] string-out ] unit-test
 
 [ ] [ \ fixnum see ] unit-test
 
@@ -85,8 +80,8 @@ TUPLE: cat gender declawed? castrated? ;
     ] with-scope
 ] unit-test
 
-[ "[ 1 2 >> + << ]" ]
+[ "[ 1 2 DUP ]" ]
 [
-    [ 1 2 + ] dup hilite-quotation set 2 hilite-index set
+    [ 1 2 dup ] dup hilite-quotation set 2 hilite-index set
     [ pprint ] string-out
 ] unit-test

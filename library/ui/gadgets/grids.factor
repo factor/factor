@@ -23,15 +23,17 @@ C: grid ( children -- grid )
 : grid-remove ( grid i j -- )
     >r >r >r f r> r> r> grid-add ;
 
+: ?pref-dim ( gadget/f -- dim )
+    [ pref-dim ] [ { 0 0 } ] if* ;
+
 : pref-dim-grid ( -- dims )
-    grid get grid-children
-    [ [ [ pref-dim ] [ { 0 0 } ] if* ] map ] map ;
+    grid get grid-children [ [ ?pref-dim ] map ] map ;
 
 : compute-grid ( -- horiz vert )
     pref-dim-grid
     dup flip [ max-dim ] map swap [ max-dim ] map ;
 
-: with-grid ( grid quot -- | quot: horiz vert -- )
+: with-grid ( grid quot -- )
     [ >r grid set compute-grid r> call ] with-scope ; inline
 
 : gap grid get grid-gap ;
@@ -39,7 +41,7 @@ C: grid ( children -- grid )
 : (pair-up) ( horiz vert -- dim )
     >r first r> second 2array ;
 
-M: grid pref-dim* ( grid -- dim )
+M: grid pref-dim*
     [
         [ gap [ v+ gap v+ ] reduce ] 2apply (pair-up)
     ] with-grid ;
@@ -53,7 +55,7 @@ M: grid pref-dim* ( grid -- dim )
     [ swap [ swap (pair-up) ] map-with ] map-with ;
 
 : grid-positions ( dims -- locs )
-    gap [ v+ gap v+ ] accumulate ;
+    gap [ v+ gap v+ ] accumulate nip ;
 
 : position-grid ( horiz vert -- )
     [ grid-positions ] 2apply
@@ -65,11 +67,11 @@ M: grid pref-dim* ( grid -- dim )
 : grid-layout ( horiz vert -- )
     2dup position-grid resize-grid ;
 
-M: grid layout* ( frame -- dim )
+M: grid layout*
     [ grid-layout ] with-grid ;
 
 : build-grid ( grid specs -- )
     #! Specs is an array of quadruples { quot post setter loc }.
     #! The setter has stack effect ( new gadget -- ),
     #! the loc is @center, @top, etc.
-    swap [ [ [ grid-add ] add-spec ] each ] with-gadget ;
+    swap [ [ grid-add ] build-spec ] with-gadget ; inline

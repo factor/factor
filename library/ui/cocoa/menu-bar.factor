@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Kevin Reid.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cocoa compiler gadgets gadgets-browser gadgets-launchpad
-gadgets-listener gadgets-search kernel memory objc objc-classes
-sequences strings words ;
+USING: cocoa compiler gadgets gadgets-workspace gadgets-help
+gadgets-listener kernel memory objc objc-classes sequences
+strings words io help ;
 IN: cocoa
 
 ! -------------------------------------------------------------------------
@@ -10,12 +10,12 @@ IN: cocoa
 GENERIC: to-target-and-action ( spec -- target action )
 
 M: f to-target-and-action f swap ;
-M: string to-target-and-action sel_registerName f ;
+M: string to-target-and-action f ;
 M: word to-target-and-action unit to-target-and-action ;
 M: quotation to-target-and-action
-    <FactorCallback> "perform:" sel_registerName swap ;
+    <FactorCallback> "perform:" swap ;
 
-: <NSMenu> ( title -- )
+: <NSMenu> ( title -- menu )
     NSMenu -> alloc
     swap <NSString> -> initWithTitle:
     -> autorelease ;
@@ -81,7 +81,7 @@ DEFER: described-menu
 
 : described-menu ( { title items* } -- menu )
     [ first <NSMenu> ] keep
-    1 swap tail [ and-described-item ] each ;
+    1 tail [ and-described-item ] each ;
 
 : and-described-submenu ( menu { title items* } -- menu )
     described-menu dupd add-submenu ;
@@ -110,14 +110,8 @@ DEFER: described-menu
         } [ NSApp over -> setAppleMenu: ] }
         { {
             "File"
-            { "New Listener" listener-window "n" }
-            { "New Browser" browser-window "b" }
-            { "Apropos" apropos-window "r" }
-            { }
+            { "New Workspace" [ workspace-window drop ] "n" }
             { "Run..." menu-run-file "o" }
-            { }
-            { "Globals" globals-window "" }
-            { "Memory" memory-window "" }
             { }
             { "Save Image" save "s" }
         } }
@@ -144,7 +138,6 @@ DEFER: described-menu
         } [ NSApp over -> setWindowsMenu: ] }
         { {
             "Help"
-            { "Factor Documentation" handbook-window "?" }
-            { "Search" search-help-window "" }
+            { "Factor Documentation" [ "handbook" <link> help-gadget call-tool ] "?" }
         } }
     } described-menu set-main-menu ;

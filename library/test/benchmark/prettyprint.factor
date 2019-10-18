@@ -1,4 +1,5 @@
 IN: temporary
+USE: definitions
 USE: prettyprint
 USE: test
 USE: words

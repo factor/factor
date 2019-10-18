@@ -4,6 +4,8 @@ IN: compiler
 USING: alien assembler generic kernel kernel-internals math
 memory namespaces sequences words ;
 
+: code-format cell ; inline
+
 ! PowerPC register assignments
 ! r3-r10 integer vregs
 ! f0-f13 float vregs
@@ -23,18 +25,17 @@ M: float-regs vregs drop { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 : stack@ macosx? 24 8 ? + ;
 : lr@ macosx? 8 4 ? + ;
 
-GENERIC: loc>operand
+GENERIC: loc>operand ( loc -- reg n )
 
 M: ds-loc loc>operand ds-loc-n cells neg 14 swap ;
 M: cs-loc loc>operand cs-loc-n cells neg 15 swap ;
 
-M: immediate load-literal ( literal vreg -- )
+M: immediate load-literal
     [ v>operand ] 2apply LOAD ;
 
-M: object load-literal ( literal vreg -- )
-    v>operand swap
-    add-literal over
-    LOAD32 rel-2/2 rel-address
+M: object load-literal
+    v>operand
+    [ 0 swap LOAD32 rel-absolute-2/2 rel-literal ] keep
     dup 0 LWZ ;
 
 : stack-increment \ stack-reserve get 32 max stack@ 16 align ;
@@ -56,11 +57,11 @@ M: object load-literal ( literal vreg -- )
 
 : word-addr ( word -- )
     #! Load a word address into r3.
-    dup word-xt 3 LOAD32  rel-2/2 rel-word ;
+    0 3 LOAD32 rel-absolute-2/2 rel-word ;
 
 : %call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.
-    dup postpone-word
+    dup (compile)
     dup primitive? [ word-addr  3 MTLR  BLRL ] [ BL ] if ;
 
 : %jump-label ( label -- )
@@ -68,35 +69,36 @@ M: object load-literal ( literal vreg -- )
     dup primitive? [ word-addr  3 MTCTR  BCTR ] [ B ] if ;
 
 : %jump ( label -- )
-    %epilogue dup postpone-word %jump-label ;
+    %epilogue dup (compile) %jump-label ;
 
 : %jump-t ( label -- )
-    0 "flag" operand f address CMPI BNE ;
+    0 "flag" operand object-tag CMPI BNE ;
 
 : %dispatch ( -- )
+    #! The value 20 is a magic number. It is the length of the
+    #! instruction sequence that follows
     "n" operand dup 1 SRAWI
-    ! The value 24 is a magic number. It is the length of the
-    ! instruction sequence that follows to be generated.
-    compiled-offset 24 + "scratch" operand LOAD32
-    rel-2/2 rel-address
+    0 "scratch" operand LOAD32 rel-absolute-2/2 rel-here
     "n" operand dup "scratch" operand ADD
-    "n" operand dup 0 LWZ
+    "n" operand dup 20 LWZ
     "n" operand MTLR
     BLR ;
+
+: %target ( label -- ) 0 , rel-absolute-cell rel-label ;
 
 : %return ( -- ) %epilogue BLR ;
 
 : compile-dlsym ( symbol dll register -- )
-    >r 2dup dlsym r> LOAD32 rel-2/2 rel-dlsym ;
+    0 swap LOAD32 rel-absolute-2/2 rel-dlsym ;
 
-M: int-regs (%peek) ( vreg loc -- )
+M: int-regs (%peek)
     drop >r v>operand r> loc>operand LWZ ;
 
-M: float-regs (%peek) ( vreg loc -- )
+M: float-regs (%peek)
     drop fp-scratch v>operand swap loc>operand LWZ
     fp-scratch [ v>operand ] 2apply float-offset LFD ;
 
-M: int-regs (%replace) ( vreg loc -- )
+M: int-regs (%replace)
     drop >r v>operand r> loc>operand STW ;
 
 : %move-int>int ( dst src -- )
@@ -122,7 +124,7 @@ M: int-regs (%replace) ( vreg loc -- )
         r> call 12 12 \ size get call ADDI
     ] bind save-allot-ptr ; inline
 
-M: float-regs (%replace) ( vreg loc reg-class -- )
+M: float-regs (%replace)
     drop swap
     [ v>operand 12 8 STFD ]
     [ 11 swap loc>operand STW ] H{

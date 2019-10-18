@@ -35,7 +35,7 @@ SYMBOL: write-tasks
 ! Some general stuff
 : file-mode OCT: 0600 ;
 
-: (io-error) err_no strerror throw ;
+: (io-error) ( -- * ) err_no strerror throw ;
 
 : check-null ( n -- ) zero? [ (io-error) ] when ;
 
@@ -55,13 +55,8 @@ SYMBOL: closed
 
 TUPLE: port handle error timeout cutoff type sbuf eof? ;
 
-: check-port ( port expected -- )
-    >r port-type r> 2dup eq? [
-        [
-            "Cannot perform " % word-name %
-            " on " % word-name % " port" %
-        ] "" make throw
-    ] unless 2drop ;
+PREDICATE: port input-port port-type input eq? ;
+PREDICATE: port output-port port-type output eq? ;
 
 C: port ( handle buffer -- port )
     [ set-delegate ] keep
@@ -74,10 +69,10 @@ C: port ( handle buffer -- port )
     dup port-timeout dup zero?
     [ 2drop ] [ millis + swap set-port-cutoff ] if ;
 
-M: port set-timeout ( timeout port -- )
+M: port set-timeout
     [ set-port-timeout ] keep touch-port ;
 
-: buffered-port 8192 <buffer> <port> ;
+: buffered-port 32768 <buffer> <port> ;
 
 : >port< dup port-handle swap delegate ;
 
@@ -96,7 +91,7 @@ M: port set-timeout ( timeout port -- )
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
 TUPLE: io-task port callbacks ;
-C: io-task ( port -- )
+C: io-task ( port -- task )
     [ set-io-task-port ] keep
     V{ } clone over set-io-task-callbacks ;
 
@@ -137,7 +132,7 @@ GENERIC: task-container ( task -- vector )
         ] if
     ] hash-each-with ;
 
-: init-fdset ( fdset tasks -- )
+: init-fdset ( fdset tasks -- fdset )
     >r dup dup FD_SETSIZE clear-bits r>
     [ drop t swap rot set-bit-nth ] hash-each-with ;
 
@@ -151,7 +146,7 @@ GENERIC: task-container ( task -- vector )
     read-fdset/tasks init-fdset
     write-fdset/tasks init-fdset f ;
 
-: io-multiplex ( timeout -- )
+: io-multiplex ( ms -- )
     >r FD_SETSIZE init-fdsets r> make-timeval select io-error
     read-fdset/tasks handle-fdset
     write-fdset/tasks handle-fdset ;
@@ -172,7 +167,7 @@ GENERIC: task-container ( task -- vector )
 
 : refill ( port -- ? )
     #! Return f if there is a recoverable error
-    dup buffer-length zero? [
+    dup buffer-empty? [
         dup (refill)  dup 0 >= [
             swap n>buffer t
         ] [
@@ -182,9 +177,34 @@ GENERIC: task-container ( task -- vector )
         drop t
     ] if ;
 
+! Reading a single character
+TUPLE: read1-task ;
+
+C: read1-task ( port -- task )
+    [ >r <io-task> r> set-delegate ] keep ;
+
+M: read1-task do-io-task
+    io-task-port dup refill [
+        [
+            dup buffer-empty?
+            [ t over set-port-eof? ] when
+        ] when drop
+    ] keep ;
+
+M: read1-task task-container drop read-tasks get-global ;
+
+: wait-to-read1 ( port -- )
+    dup buffer-empty? [
+        [ swap <read1-task> add-io-task stop ] callcc0
+    ] when pending-error ;
+
+M: input-port stream-read1
+    dup wait-to-read1
+    dup port-eof? [ drop f ] [ buffer-pop ] if ;
+
 ! Reading character counts
 : read-step ( count reader -- ? )
-    dup port-sbuf -rot >r over length - ( remaining) r>
+    dup port-sbuf -rot >r over length - r>
     2dup buffer-length <= [
         buffer> nappend t
     ] [
@@ -192,7 +212,7 @@ GENERIC: task-container ( task -- vector )
     ] if ;
 
 : can-read-count? ( count reader -- ? )
-    dup pending-error 0 over port-sbuf set-length read-step ;
+    dup port-sbuf delete-all read-step ;
 
 TUPLE: read-task count ;
 
@@ -202,7 +222,7 @@ C: read-task ( count port -- task )
 
 : >read-task< dup read-task-count swap io-task-port ;
 
-M: read-task do-io-task ( task -- ? )
+M: read-task do-io-task
     >read-task< dup refill [
         dup buffer-empty? [
             reader-eof drop t
@@ -220,15 +240,10 @@ M: read-task task-container drop read-tasks get-global ;
         [ -rot <read-task> add-io-task stop ] callcc0
     ] unless pending-error drop ;
 
-M: port stream-read ( count stream -- string )
-    dup input check-port
+M: input-port stream-read
+    >r 0 max >fixnum r>
     [ wait-to-read ] keep dup port-eof?
     [ drop f ] [ port-sbuf >string ] if ;
-
-M: port stream-read1 ( stream -- char/f )
-    dup input check-port
-    1 over wait-to-read dup port-eof?
-    [ drop f ] [ port-sbuf first ] if ;
 
 ! Writers
 
@@ -249,7 +264,6 @@ M: port stream-read1 ( stream -- char/f )
 : can-write? ( len writer -- ? )
     #! If the buffer is empty and the string is too long,
     #! extend the buffer.
-    dup pending-error
     dup buffer-empty? [
         2drop t
     ] [
@@ -274,20 +288,19 @@ M: write-task task-container drop write-tasks get-global ;
 : port-flush ( port -- )
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
-M: port stream-flush ( stream -- )
-    dup output check-port port-flush ;
+M: output-port stream-flush
+    dup port-flush pending-error ;
 
 : wait-to-write ( len port -- )
-    tuck can-write? [ dup stream-flush ] unless pending-error ;
+    tuck can-write? [ drop ] [ stream-flush ] if ;
 
-M: port stream-write1 ( char writer -- )
-    dup output check-port 1 over wait-to-write ch>buffer ;
+M: output-port stream-write1
+    1 over wait-to-write ch>buffer ;
 
-M: port stream-write ( string writer -- )
-    dup output check-port
+M: output-port stream-write
     over length over wait-to-write >buffer ;
 
-M: port stream-close ( stream -- )
+M: port stream-close
     dup port-type closed eq? [
         dup port-type >r closed over set-port-type r>
         output eq? [ dup port-flush ] when dup port-handle close

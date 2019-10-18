@@ -1,10 +1,10 @@
 USING: generic help ;
 
-HELP: delegate "( obj -- delegate )"
+HELP: delegate
 { $values { "obj" "an object" } { "delegate" "an object" } }
 { $description "Returns an object's delegate, or " { $link f } " if no delegate is set." }
 { $notes "A direct consequence of this behavior is that an object may not have a delegate of " { $link f } "." } ;
 
-HELP: set-delegate "( delegate tuple -- )"
+HELP: set-delegate
 { $values { "delegate" "an object" } { "tuple" "a tuple" } }
 { $description "Sets a tuple's delegate. Method calls not handled by the tuple's class will now be passed on to the delegate." } ;

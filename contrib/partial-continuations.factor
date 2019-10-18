@@ -42,11 +42,11 @@ USING: kernel io math prettyprint inspector lists arrays sequences namespaces ;
   [ 1array swap keep first continue-with ] callcc1 nip ;
 
 : (bshift) ( v r k -- )
-  >r dup first -rot r> ( old-rc v r k )
-  [  ( old-rc v r k kstar  )
-    rot 0 swap set-nth ( old-rc v k )
+  >r dup first -rot r>
+  [
+    rot 0 swap set-nth
     continue-with  
-  ] callcc1 ( old-rc v r k v2 )
+  ] callcc1
   >r drop nip 0 swap set-nth r> ;
 
 : bshift ( r quot -- )
@@ -58,9 +58,9 @@ USING: kernel io math prettyprint inspector lists arrays sequences namespaces ;
   #! discards items on the stack, the stack will be restored to
   #! the way it was before it is called (which is true of callcc
   #! usage in general).
-  [ ( r quot k )
-    [ (bshift) ] cons pick  swons swap ( r bshift quot )
-    rot >r call ( v )
+  [ ! r quot k
+    [ (bshift) ] cons pick  swons swap
+    rot >r call
     r> first continue-with        
   ] callcc1 2nip ;
 

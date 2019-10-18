@@ -31,7 +31,7 @@ M: nested-style-stream stream-write1
     3array >quotation
     r> r> do-nested-style ;
 
-M: nested-style-stream with-stream-style ( quot style stream -- )
+M: nested-style-stream with-stream-style
     do-nested-style with-stream-style ;
 
 M: nested-style-stream with-nested-stream

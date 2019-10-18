@@ -86,10 +86,15 @@ USING: arrays gadgets kernel sequences styles ;
         { 0.5 0.5 0.5 1.0 }
     } } swap set-gadget-interior ;
 
-: reverse-video-theme ( gadget -- )
+: reverse-video-theme ( label -- )
+    { 1.0 1.0 1.0 1.0 } over set-label-color
     solid-black swap set-gadget-interior ;
 
 : label-theme ( gadget -- )
+    { 0.0 0.0 0.0 1.0 } over set-label-color
+    { "sans-serif" plain 12 } swap set-label-font ;
+
+: text-theme ( gadget -- )
     { 0.0 0.0 0.0 1.0 } over set-label-color
     { "monospace" plain 12 } swap set-label-font ;
 
@@ -98,13 +103,3 @@ USING: arrays gadgets kernel sequences styles ;
     { 1.0 0.0 0.0 1.0 } over set-editor-caret-color
     { 0.8 0.8 1.0 1.0 } over set-editor-selection-color
     { "monospace" plain 12 } swap set-editor-font ;
-
-: highlight-theme ( gadget -- )
-    T{ solid f { 0.8 0.8 0.8 1.0 } } swap set-gadget-interior ;
-
-: title-theme ( gadget -- )
-    { 1 0 } over set-gadget-orientation
-    T{ gradient f {
-        { 1.0 0.8 0.7 1.0 }
-        { 1.0 0.9 0.6 1.0 }
-    } } swap set-gadget-interior ;

@@ -43,11 +43,11 @@ C: pane ( -- pane )
 
 GENERIC: write-gadget ( gadget stream -- )
 
-M: pane write-gadget ( gadget pane -- )
+M: pane write-gadget
     #! Print a gadget to the given pane.
     pane-current add-gadget ;
 
-M: duplex-stream write-gadget ( gadget stream -- )
+M: duplex-stream write-gadget
     duplex-stream-out write-gadget ;
 
 : print-gadget ( gadget pane -- )
@@ -58,29 +58,29 @@ M: duplex-stream write-gadget ( gadget stream -- )
     stdio get print-gadget ;
 
 ! Panes are streams.
-M: pane stream-flush ( pane -- ) drop ;
+M: pane stream-flush drop ;
 
 : scroll-pane ( pane -- )
     dup pane-scrolls? [ scroll>bottom ] [ drop ] if ;
 
-M: pane stream-terpri ( pane -- )
+M: pane stream-terpri
     dup pane-current prepare-print
     over pane-output add-incremental
     dup prepare-line
     scroll-pane ;
 
-M: pane stream-write1 ( char pane -- )
+M: pane stream-write1
     [ pane-current stream-write1 ] keep scroll-pane ;
 
-M: pane stream-write ( string pane -- )
+M: pane stream-write
     [ swap "\n" split pane-write ] keep scroll-pane ;
 
-M: pane stream-format ( string style pane -- )
+M: pane stream-format
     [ rot "\n" split pane-format ] keep scroll-pane ;
 
-M: pane stream-close ( pane -- ) drop ;
+M: pane stream-close drop ;
 
-M: pane with-stream-style ( quot style pane -- )
+M: pane with-stream-style
     (with-stream-style) ;
 
 : ?terpri

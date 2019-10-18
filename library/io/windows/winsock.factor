@@ -9,10 +9,12 @@ USE: arrays
 
 : <wsadata> HEX: 190 <byte-array> ;
 
-: AF_INET 2 ;
-: SOCK_STREAM 1 ;
-: WSA_FLAG_OVERLAPPED 1 ;
-: INADDR_ANY 0 ;
+: AF_INET 2 ; inline
+: SOCK_STREAM 1 ; inline
+: WSA_FLAG_OVERLAPPED 1 ; inline
+: INADDR_ANY 0 ; inline
+
+: INVALID_SOCKET -1 ; inline
 
 BEGIN-STRUCT: sockaddr-in
     FIELD: short family

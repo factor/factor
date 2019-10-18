@@ -151,5 +151,5 @@ SYMBOL: html
     "size" "href" "class" "border" "rows" "cols" 
     "id" "onclick" "style" "valign" "accesskey"
     "src" "language" "colspan" "onchange" "rel"
-    "width" "selected"
+    "width" "selected" "onsubmit"
 ] [ define-attribute-word ] each 

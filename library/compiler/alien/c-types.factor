@@ -15,9 +15,11 @@ parser sequences strings words ;
 
 SYMBOL: c-types
 
+TUPLE: no-c-type name ;
+: no-c-type ( type -- * ) <no-c-type> throw ;
+
 : c-type ( name -- type )
-    dup c-types get hash
-    [ ] [ "No such C type: " swap append throw ] ?if ;
+    dup c-types get hash [ ] [ no-c-type ] ?if ;
 
 : c-size ( name -- size ) "width" swap c-type hash ;
 
@@ -31,15 +33,15 @@ SYMBOL: c-types
     >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
     inline
 
-: <c-array> ( size type -- c-ptr )
+: <c-array> ( n type -- array )
     global [ c-size * <byte-array> ] bind ;
 
-: <c-object> ( type -- c-ptr ) 1 swap <c-array> ;
+: <c-object> ( type -- array ) 1 swap <c-array> ;
 
-: <malloc-array> ( size type -- malloc-ptr )
+: <malloc-array> ( n type -- alien )
     global [ c-size calloc ] bind check-ptr ;
 
-: <malloc-object> ( type -- malloc-ptr ) 1 swap <malloc-array> ;
+: <malloc-object> ( type -- alien ) 1 swap <malloc-array> ;
 
 : <malloc-string> ( string -- alien )
     "\0" append dup length malloc check-ptr

@@ -4,60 +4,60 @@ IN: sequences
 USING: generic kernel kernel-internals math namespaces
 strings vectors ;
 
-: head-slice ( n seq -- slice ) 0 -rot <slice> ;
+: head-slice ( seq n -- slice ) 0 swap rot <slice> ;
 
-: tail-slice ( n seq -- slice ) [ length ] keep <slice> ;
+: tail-slice ( seq n -- slice ) over length rot <slice> ;
 
-: (slice*) [ length swap - ] keep ;
+: (slice*) >r dup length r> - ;
 
-: head-slice* ( n seq -- slice ) (slice*) head-slice ;
+: head-slice* ( seq n -- slice ) (slice*) head-slice ;
 
-: tail-slice* ( n seq -- slice ) (slice*) tail-slice ;
+: tail-slice* ( seq n -- slice ) (slice*) tail-slice ;
 
-: subseq ( from to seq -- seq ) [ <slice> ] keep like ;
+: subseq ( from to seq -- subseq ) [ <slice> ] keep like ;
 
-: head ( index seq -- seq ) [ head-slice ] keep like ;
+: head ( seq n -- headseq ) dupd head-slice swap like ;
 
-: head* ( n seq -- seq ) [ head-slice* ] keep like ;
+: head* ( seq n -- headseq ) dupd head-slice* swap like ;
 
-: tail ( index seq -- seq ) [ tail-slice ] keep like ;
+: tail ( seq n -- tailseq ) dupd tail-slice swap like ;
 
-: tail* ( n seq -- seq ) [ tail-slice* ] keep like ;
+: tail* ( seq n -- tailseq ) dupd tail-slice* swap like ;
 
 : head? ( seq begin -- ? )
     2dup [ length ] 2apply < [
         2drop f
     ] [
-        dup length rot head-slice sequence=
+        [ length head-slice ] keep sequence=
     ] if ;
 
-: ?head ( seq begin -- seq ? )
-    2dup head? [ length swap tail t ] [ drop f ] if ;
+: ?head ( seq begin -- newseq ? )
+    2dup head? [ length tail t ] [ drop f ] if ;
 
 : tail? ( seq end -- ? )
     2dup [ length ] 2apply < [
         2drop f
     ] [
-        dup length rot tail-slice* sequence=
+        [ length tail-slice* ] keep sequence=
     ] if ;
 
-: ?tail ( seq end -- seq ? )
-    2dup tail? [ length swap head* t ] [ drop f ] if ;
+: ?tail ( seq end -- newseq ? )
+    2dup tail? [ length head* t ] [ drop f ] if ;
 
-: replace-slice ( new from to seq -- seq )
-    tuck >r >r head-slice r> r> tail-slice swapd append3 ;
+: replace-slice ( new m n seq -- replaced )
+    tuck swap tail-slice >r swap head-slice swap r> append3 ;
 
-: remove-nth ( n seq -- seq )
-    [ head-slice ] 2keep >r 1+ r> tail-slice append ;
+: remove-nth ( n seq -- newseq )
+    >r f swap dup 1+ r> replace-slice ;
 
 : (cut) ( n seq -- before after )
-    [ head ] 2keep tail-slice ;
+    swap [ head ] 2keep tail-slice ;
 
 : cut ( n seq -- before after )
-    [ head ] 2keep tail ;
+    swap [ head ] 2keep tail ;
 
-: cut* ( seq1 seq2 -- seq seq )
-    [ head* ] 2keep tail* ;
+: cut* ( n seq -- before after )
+    swap [ head* ] 2keep tail* ;
 
 : (group) ( n seq -- )
     2dup length >= [
@@ -66,12 +66,12 @@ strings vectors ;
         dupd (cut) >r , r> (group)
     ] if ;
 
-: group ( n seq -- seq ) [ (group) ] { } make ;
+: group ( seq n -- groups ) [ swap (group) ] { } make ;
 
 : start-step ( subseq seq n -- subseq slice )
     pick length dupd + rot <slice> ;
 
-: start* ( subseq seq n -- n )
+: start* ( subseq seq i -- n )
     pick length pick length pick - > [
         3drop -1
     ] [
@@ -90,27 +90,27 @@ strings vectors ;
     dup pick start dup -1 = [
         2drop dup like f
     ] [
-        [ swap length + over tail ] keep rot head swap
+        [ >r over r> head -rot length ] keep + tail
     ] if ;
 
-: split,, building get peek push ;
+: split, building get peek push ;
 
 : split-next, V{ } clone , ;
 
-: (split) ( separator elt -- | separator: elt -- ? )
+: (split) ( quot elt -- )
     [ swap call ] keep swap
-    [ drop split-next, ] [ split,, ] if ; inline
+    [ drop split-next, ] [ split, ] if ; inline
 
-: split* ( seq separator -- split | separator: elt -- ? )
+: split* ( seq quot -- pieces )
     over >r
     [ split-next, swap [ (split) ] each-with ]
     { } make r> swap [ swap like ] map-with ; inline
 
-: split ( seq separators -- split )
+: split ( seq separators -- pieces )
     swap [ over member? ] split* nip ;
 
-: drop-prefix ( seq1 seq2 -- seq1 seq2 )
+: drop-prefix ( seq1 seq2 -- slice1 slice2 )
     2dup mismatch dup -1 = [ drop 2dup min-length ] when
-    tuck swap tail-slice >r swap tail-slice r> ;
+    tuck tail-slice >r tail-slice r> ;
 
-: unclip ( seq -- rest first ) 1 over tail swap first ;
+: unclip ( seq -- rest first ) dup 1 tail swap first ;

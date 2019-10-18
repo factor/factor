@@ -106,25 +106,20 @@ SYMBOL: cd
 : kat ( n -- katal ) { mol } { s } <dimensioned> ;
 
 ! Extensions to the SI
-: minutes ( n -- minute ) 60 * s ;
-: hours ( n -- hour ) 3600 * s ;
-: month 2629743.83 * s ;
-: day 86400 * s ;
-: year 31556926 * s ;
 : arc-deg pi 180 / * radian ;
 : arc-min pi 10800 / * radian ;
 : arc-sec pi 648000 / * radian ;
 : L ( n -- liter ) 1/1000 * m^3 ;
-: t ( n -- metric-ton ) 1000 * kg ;
+: tons ( n -- metric-ton ) 1000 * kg ;
 : Np ( n -- neper ) { } { } <dimensioned> ;
 : B ( n -- bel ) 1.151292546497023 * Np ;
 : eV ( n -- electronvolt ) 1.60218e-19 * J ;
 : u ( n -- unified-atomic-mass-unit ) 1.66054e-27 * kg ;
-: ua ( n -- astronomical-unit ) 149598000000 * m ;
+: au ( n -- astronomical-unit ) 149598000000 * m ;
 
-: nautical-mile 1852 * m ;
-: knot 1852/3600 * m/s ;
-: a ( n -- are )100 * m^2 ;
+: nautical-miles 1852 * m ;
+: knots 1852/3600 * m/s ;
+: a ( n -- are ) 100 * m^2 ;
 : ha ( n -- hectare ) 10000 * m^2 ;
 : bar ( n -- bar ) 100000 * Pa ;
 : angstrom .1 * nm ;

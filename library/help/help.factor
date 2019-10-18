@@ -1,10 +1,17 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays io kernel namespaces prettyprint sequences words ;
+USING: arrays io kernel namespaces parser prettyprint sequences
+words ;
 
 M: word article-title
-    dup word-name swap stack-effect [ " " swap append3 ] when* ;
+    dup parsing? [
+        word-name
+    ] [
+        dup word-name
+        swap stack-effect
+        [ effect>string " " swap append3 ] when*
+    ] if ;
 
 M: word article-content
     [
@@ -18,10 +25,10 @@ M: word article-content
         ] ?if
     ] { } make ;
 
-: $title ( article -- )
+: $title ( topic -- )
     title-style [
         title-style [
-            dup [ 1array $link ] ($block) $where
+            dup [ 1array $link ] ($block) $doc-path
         ] with-nesting
     ] with-style terpri ;
 
@@ -34,7 +41,7 @@ M: word article-content
 
 : handbook ( -- ) "handbook" help ;
 
-: $subtopic ( object -- )
+: $subtopic ( element -- )
     [
         subtopic-style [
             unclip f rot [ print-content ] curry write-outliner
@@ -46,13 +53,15 @@ M: word article-content
     dup [ (help) ] curry
     write-outliner ;
 
-: $subsection ( object -- )
+: $subsection ( element -- )
     [
         subsection-style [ first ($subsection) ] with-style
     ] ($block) ;
 
-: help-outliner ( seq  -- | quot: obj -- )
-    sort-articles [ ($subsection) terpri ] each ;
+: help-outliner ( seq quot -- )
+    subsection-style [
+        sort-articles [ ($subsection) terpri ] each
+    ] with-style ;
 
-: $outliner ( content -- )
-    subsection-style [ first call help-outliner ] with-style ;
+: $outliner ( element -- )
+    first call help-outliner ;

@@ -1,57 +1,57 @@
 USING: help math ;
 
-HELP: acosh "( x -- y )"
+HELP: acosh
 $values-x/y
 { $description "Inverse hyperbolic cosine." } ;
 
-HELP: asech "( x -- y )"
+HELP: asech
 $values-x/y
 { $description "Inverse hyperbolic secant." } ;
 
-HELP: asinh "( x -- y )"
+HELP: asinh
 $values-x/y
 { $description "Inverse hyperbolic sine." } ;
 
-HELP: asinh "( x -- y )"
+HELP: asinh
 $values-x/y
 { $description "Inverse hyperbolic sine." } ;
 
-HELP: acosech "( x -- y )"
+HELP: acosech
 $values-x/y
 { $description "Inverse hyperbolic cosecant." } ;
 
-HELP: atanh "( x -- y )"
+HELP: atanh
 $values-x/y
 { $description "Inverse hyperbolic tangent." } ;
 
-HELP: acoth "( x -- y )"
+HELP: acoth
 $values-x/y
 { $description "Inverse hyperbolic cotangent." } ;
 
-HELP: acos "( x -- y )"
+HELP: acos
 $values-x/y
 { $description "Inverse trigonometric cosine." } ;
 
-HELP: asec "( x -- y )"
+HELP: asec
 $values-x/y
 { $description "Inverse trigonometric secant." } ;
 
-HELP: asin "( x -- y )"
+HELP: asin
 $values-x/y
 { $description "Inverse trigonometric sine." } ;
 
-HELP: asin "( x -- y )"
+HELP: asin
 $values-x/y
 { $description "Inverse trigonometric sine." } ;
 
-HELP: acosec "( x -- y )"
+HELP: acosec
 $values-x/y
 { $description "Inverse trigonometric cosecant." } ;
 
-HELP: atan "( x -- y )"
+HELP: atan
 $values-x/y
 { $description "Inverse trigonometric tangent." } ;
 
-HELP: acot "( x -- y )"
+HELP: acot
 $values-x/y
 { $description "Inverse trigonometric cotangent." } ;

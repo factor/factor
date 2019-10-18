@@ -288,7 +288,7 @@ M: mismatched error.
 
 TUPLE: unclosed tags ;
 C: unclosed ( -- unclosed )
-    1 xml-stack get tail-slice [ first opener-name ] map
+    xml-stack get 1 tail-slice [ first opener-name ] map
     swap [ set-unclosed-tags  ] keep ;
 M: unclosed error.
     "Unclosed tags" print

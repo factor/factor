@@ -7,7 +7,7 @@ strings ;
 
 TUPLE: buffer size ptr fill pos ;
 
-C: buffer ( size -- buffer )
+C: buffer ( n -- buffer )
     2dup set-buffer-size
     [ >r malloc check-ptr alien-address r> set-buffer-ptr ] keep
     0 over set-buffer-fill
@@ -20,10 +20,10 @@ C: buffer ( size -- buffer )
     dup buffer-ptr over buffer-pos +
     over buffer-fill rot buffer-pos - memory>string ;
 
-: buffer-reset ( count buffer -- )
+: buffer-reset ( n buffer -- )
     [ set-buffer-fill ] keep 0 swap set-buffer-pos ;
 
-: buffer-consume ( count buffer -- )
+: buffer-consume ( n buffer -- )
     [ buffer-pos + ] keep
     [ buffer-fill min ] keep
     [ set-buffer-pos ] keep
@@ -32,33 +32,33 @@ C: buffer ( size -- buffer )
         0 over set-buffer-fill
     ] when drop ;
 
-: buffer@ ( buffer -- int ) dup buffer-ptr swap buffer-pos + ;
+: buffer@ ( buffer -- n ) dup buffer-ptr swap buffer-pos + ;
 
-: buffer-end ( buffer -- int ) dup buffer-ptr swap buffer-fill + ;
+: buffer-end ( buffer -- n ) dup buffer-ptr swap buffer-fill + ;
 
-: buffer-first-n ( count buffer -- string )
+: buffer-first-n ( n buffer -- string )
     [ dup buffer-fill swap buffer-pos - min ] keep
     buffer@ swap memory>string ;
 
-: buffer> ( count buffer -- string )
+: buffer> ( n buffer -- string )
     [ buffer-first-n ] 2keep buffer-consume ;
 
 : buffer>> ( buffer -- string )
     [ buffer-contents ] keep 0 swap buffer-reset ;
 
-: buffer-length ( buffer -- length )
+: buffer-length ( buffer -- n )
     dup buffer-fill swap buffer-pos - ;
 
-: buffer-capacity ( buffer -- int )
+: buffer-capacity ( buffer -- n )
     dup buffer-size swap buffer-fill - ;
 
 : buffer-empty? ( buffer -- ? ) buffer-fill zero? ;
 
-: extend-buffer ( length buffer -- )
+: extend-buffer ( n buffer -- )
     2dup buffer-ptr <alien> swap realloc check-ptr alien-address
     over set-buffer-ptr set-buffer-size ;
 
-: check-overflow ( length buffer -- )
+: check-overflow ( n buffer -- )
     2dup buffer-capacity > [ extend-buffer ] [ 2drop ] if ;
 
 : >buffer ( string buffer -- )
@@ -66,7 +66,7 @@ C: buffer ( size -- buffer )
     [ buffer-end string>memory ] 2keep
     [ buffer-fill swap length + ] keep set-buffer-fill ;
 
-: ch>buffer ( char buffer -- )
+: ch>buffer ( ch buffer -- )
     1 over check-overflow
     [ buffer-end f swap set-alien-unsigned-1 ] keep
     [ buffer-fill 1+ ] keep set-buffer-fill ;
@@ -74,13 +74,13 @@ C: buffer ( size -- buffer )
 : buffer-bound ( buffer -- n )
     dup buffer-ptr swap buffer-size + ;
 
-: n>buffer ( count buffer -- )
+: n>buffer ( n buffer -- )
     [ buffer-fill + ] keep 
     [ buffer-bound > [ "Buffer overflow" throw ] when ] 2keep
     set-buffer-fill ;
 
-: buffer-peek ( buffer -- char )
+: buffer-peek ( buffer -- ch )
     buffer@ f swap alien-unsigned-1 ;
 
-: buffer-pop ( buffer -- char )
+: buffer-pop ( buffer -- ch )
     [ buffer-peek  1 ] keep buffer-consume ;

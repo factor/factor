@@ -46,16 +46,16 @@ USE: prettyprint
   sqlite-close ;
 
 : find-person ( name -- )
-  test.db sqlite-open  ( name db )
-  dup "select * from test where name=?" sqlite-prepare ( name db stmt )
-  [ rot 1 swap sqlite-bind-text ] keep ( db stmt )
+  test.db sqlite-open  ! name db
+  dup "select * from test where name=?" sqlite-prepare ! name db stmt
+  [ rot 1 swap sqlite-bind-text ] keep ! db stmt
   [ [ 1 column-text . ] sqlite-each ] keep
   sqlite-finalize
   sqlite-close ;  
 
 : find-all ( -- )
-  test.db sqlite-open  ( db )
-  dup "select * from test" sqlite-prepare ( db stmt )
+  test.db sqlite-open  ! db
+  dup "select * from test" sqlite-prepare ! db stmt
   [ [ [ 0 column-text ] keep 1 column-text curry ] sqlite-map ] keep
   sqlite-finalize
   swap sqlite-close ;  

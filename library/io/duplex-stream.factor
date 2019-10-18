@@ -12,9 +12,10 @@ C: duplex-stream ( in out -- stream )
     [ set-duplex-stream-out ] keep
     [ set-duplex-stream-in ] keep ;
 
-: check-closed ( duplex -- )
-    duplex-stream-closed?
-    [ "Duplex stream closed" throw ] when ;
+TUPLE: check-closed ;
+
+: check-closed ( stream -- )
+    duplex-stream-closed? [ <check-closed> throw ] when ;
 
 : duplex-stream-in+ ( duplex -- stream )
     dup check-closed duplex-stream-in ;
@@ -61,10 +62,9 @@ M: duplex-stream stream-close
     #! buffer needs to be flushed before we close the fd.
     dup duplex-stream-closed? [
         t over set-duplex-stream-closed?
-        dup
-        duplex-stream-out stream-close
-        duplex-stream-in stream-close
-    ] unless ;
+        dup duplex-stream-out stream-close
+        dup duplex-stream-in stream-close
+    ] unless drop ;
 
 M: duplex-stream set-timeout
     2dup

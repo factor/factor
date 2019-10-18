@@ -1,6 +1,9 @@
-USING: errors generic kernel kernel-internals math parser
-sequences test words hashtables ;
+USING: errors definitions generic kernel kernel-internals math
+parser sequences test words hashtables namespaces ;
 IN: temporary
+
+[ t ] [ \ tuple-class \ class class< ] unit-test
+[ f ] [ \ class \ tuple-class class< ] unit-test
 
 TUPLE: rect x y w h ;
 C: rect
@@ -40,8 +43,6 @@ C: quuux-tuple-2
 ! Make sure we handle changing shapes!
 
 [
-    100
-] [
     FORGET: point
     FORGET: point?
     FORGET: point-x
@@ -54,7 +55,7 @@ C: quuux-tuple-2
     "IN: temporary TUPLE: point x y z ;" eval
     
     point-x
-] unit-test
+] unit-test-fails
 
 TUPLE: predicate-test ;
 : predicate-test drop f ;
@@ -116,3 +117,12 @@ GENERIC: <yo-momma>
 TUPLE: yo-momma ;
 
 [ f ] [ \ <yo-momma> generic? ] unit-test
+
+! Test forget
+[ t ] [ \ yo-momma class? ] unit-test
+[ ] [ \ yo-momma forget ] unit-test
+[ f ] [ \ yo-momma typemap get hash-values memq? ] unit-test
+
+[ f ] [ \ yo-momma interned? ] unit-test
+[ f ] [ \ yo-momma? interned? ] unit-test
+[ f ] [ \ <yo-momma> interned? ] unit-test

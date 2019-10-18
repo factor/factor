@@ -20,11 +20,11 @@ C: border ( child gap -- border )
     dup rect-dim over border-size 2 v*n v-
     swap gadget-child set-layout-dim ;
 
-M: border pref-dim* ( border -- dim )
+M: border pref-dim*
     [ border-size 2 v*n ] keep
     gadget-child pref-dim v+ ;
 
-M: border layout* ( border -- )
+M: border layout*
     dup layout-border-loc layout-border-dim ;
 
 : <spacing> ( -- gadget )

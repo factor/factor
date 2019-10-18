@@ -1,25 +1,74 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-presentations
-USING: arrays gadgets gadgets-borders gadgets-buttons
-gadgets-grids gadgets-labels gadgets-outliner gadgets-panes
-gadgets-paragraphs generic hashtables inspector io kernel
-prettyprint sequences strings styles words ;
+USING: arrays definitions gadgets gadgets-borders
+gadgets-buttons gadgets-grids gadgets-labels gadgets-outliner
+gadgets-panes gadgets-paragraphs gadgets-theme generic
+hashtables inspector io kernel prettyprint sequences strings
+styles words help math models namespaces ;
 
 ! Clickable objects
-TUPLE: object-button object ;
+TUPLE: presentation object commands ;
 
-GENERIC: show ( object -- )
+C: presentation ( button object commands -- button )
+    [ set-presentation-commands ] keep
+    [ set-presentation-object ] keep
+    [ set-gadget-delegate ] keep ;
 
-C: object-button ( gadget object -- button )
-    [ set-object-button-object ] keep
+: <object-presentation> ( gadget object -- button )
+    >r f <roll-button> r>
+    dup mouse-operations <presentation> ;
+
+: <command-presentation> ( target command -- button )
+    dup command-name f <bevel-button> -rot { f f } swap add*
+    <presentation> ;
+
+: invoke-presentation ( gadget button# -- )
+    1- over presentation-commands nth [
+        >r presentation-object r> invoke-command
+    ] [
+        drop
+    ] if* ;
+
+: show-mouse-help ( presentation -- )
+    dup find-world [ world-status set-model* ] [ drop ] if* ;
+
+: hide-mouse-help ( presentation -- )
+    find-world [ world-status f swap set-model* ] when* ;
+
+presentation H{
+    { T{ button-up f f 1 } [ [ 1 invoke-presentation ] if-clicked ] }
+    { T{ button-up f f 2 } [ [ 2 invoke-presentation ] if-clicked ] }
+    { T{ button-up f f 3 } [ [ 3 invoke-presentation ] if-clicked ] }
+    { T{ mouse-leave } [ dup hide-mouse-help button-update ] }
+    { T{ mouse-enter } [ dup show-mouse-help button-update ] }
+} set-gestures
+
+! Presentation help bar
+: <presentation-summary> ( model -- )
+    [ [ presentation-object summary ] [ "" ] if* ]
+    <filter> <label-control> ;
+
+: presentation-mouse-help ( presentation -- string )
     [
-        >r [ object-button-object show ] <roll-button>
-        r> set-gadget-delegate
-    ] keep ;
+        presentation-commands
+        dup length [ 2array ] 2map [ first ] subset
+        [ first2 "Button " % 1+ # ": " % command-name % ]
+        [ "  " % ] interleave
+    ] "" make ;
 
-M: object-button gadget-help ( button -- string )
-    object-button-object dup word? [ synopsis ] [ summary ] if ;
+: <presentation-mouse-help> ( model -- help )
+    [
+        [
+            presentation-mouse-help
+        ] [
+            "Press F1 for keyboard help"
+        ] if*
+    ] <filter> <label-control> dup reverse-video-theme ;
+
+: <presentation-help> ( model -- gadget )
+    dup <presentation-mouse-help> swap <presentation-summary>
+    2array make-pile 1 over set-pack-fill ;
 
 ! Character styles
 
@@ -40,15 +89,15 @@ M: object-button gadget-help ( button -- string )
 : apply-font-style ( style gadget -- style gadget )
     over specified-font over set-label-font ;
 
-: apply-browser-style ( style gadget -- style gadget )
-    presented [ <object-button> ] apply-style ;
+: apply-presentation-style ( style gadget -- style gadget )
+    presented [ <object-presentation> ] apply-style ;
 
-: <presentation> ( style text -- gadget )
+: <styled-label> ( style text -- gadget )
     <label>
     apply-foreground-style
     apply-background-style
     apply-font-style
-    apply-browser-style
+    apply-presentation-style
     nip ;
 
 ! Paragraph styles
@@ -80,7 +129,7 @@ M: object-button gadget-help ( button -- string )
     apply-border-width-style
     apply-border-color-style
     apply-page-color-style
-    apply-browser-style
+    apply-presentation-style
     apply-outliner-style
     nip ;
 
@@ -89,10 +138,10 @@ M: object-button gadget-help ( button -- string )
     >r <pane> dup r> swap <styled-paragraph>
     >r swap with-pane r> ; inline
 
-: apply-table-gap-style ( grid style -- grid style )
+: apply-table-gap-style ( style grid -- style grid )
     table-gap [ over set-grid-gap ] apply-style ;
 
-: apply-table-border-style ( grid style -- grid style )
+: apply-table-border-style ( style grid -- style grid )
     table-border [ <grid-lines> over set-gadget-boundary ]
     apply-style ;
 
@@ -107,26 +156,30 @@ M: object-button gadget-help ( button -- string )
         [ pick pick >r >r -rot styled-pane r> r> rot ] map
     ] map styled-grid nip ;
 
-M: pane with-stream-table ( grid quot style pane -- )
+M: pane with-stream-table
     >r rot <pane-grid> r> print-gadget ;
 
-M: pane with-nested-stream ( quot style stream -- )
+M: pane with-nested-stream
     >r styled-pane r> write-gadget ;
 
 ! Stream utilities
-M: pack stream-close ( stream -- ) drop ;
+M: pack stream-close drop ;
 
-M: paragraph stream-close ( stream -- ) drop ;
+M: paragraph stream-close drop ;
 
 : gadget-write ( string gadget -- )
-    over empty? [ 2drop ] [ >r <label> r> add-gadget ] if ;
+    over empty? [
+        2drop
+    ] [
+        >r <label> dup text-theme r> add-gadget
+    ] if ;
 
-M: pack stream-write ( string stream -- ) gadget-write ;
+M: pack stream-write gadget-write ;
 
 : gadget-bl ( style stream -- )
-    >r " " <presentation> <word-break-gadget> r> add-gadget ;
+    >r " " <styled-label> <word-break-gadget> r> add-gadget ;
 
-M: paragraph stream-write ( string stream -- )
+M: paragraph stream-write
     swap " " split
     [ over gadget-write ] [ H{ } over gadget-bl ] interleave
     drop ;
@@ -134,20 +187,20 @@ M: paragraph stream-write ( string stream -- )
 : gadget-write1 ( char gadget -- )
     >r ch>string r> stream-write ;
 
-M: pack stream-write1 ( char stream -- ) gadget-write1 ;
+M: pack stream-write1 gadget-write1 ;
 
-M: paragraph stream-write1 ( char stream -- )
+M: paragraph stream-write1
     over CHAR: \s =
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
 : gadget-format ( string style stream -- )
     pick empty?
-    [ 3drop ] [ >r swap <presentation> r> add-gadget ] if ;
+    [ 3drop ] [ >r swap <styled-label> r> add-gadget ] if ;
 
-M: pack stream-format ( string style stream -- )
+M: pack stream-format
     gadget-format ;
 
-M: paragraph stream-format ( string style stream -- )
+M: paragraph stream-format
     presented pick hash [
         gadget-format
     ] [

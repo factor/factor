@@ -1,15 +1,17 @@
-USING: errors help image inspector io kernel listener memory
-modules parser prettyprint sequences test walker words ;
+USING: definitions errors help image inspector io kernel
+listener memory modules parser prettyprint sequences test
+words shells ;
 
 ARTICLE: "tools" "Development tools"
 "This section covers words which are used during development, and not usually invoked directly by user code."
+$terpri
+"There are two useful development tools which are complex enough that separate sections are devoted to them; see " { $link "inference" } " and " { $link "compiler" } "."
 $terpri
 "Interactive development:"
 { $subsection "listener" }
 { $subsection "debugger" }
 { $subsection "word-introspection" }
 { $subsection "inspector" }
-{ $subsection "walker" }
 { $subsection "annotations" }
 "Working on a project:"
 { $subsection "sources" }
@@ -34,12 +36,10 @@ $terpri
 "Note that calls to " { $link .s } " can also be included inside words as a debugging aid, however a more convenient way to achieve this is to use the annotation facility. See " { $link "annotations" } "."
 $terpri
 "You can start a nested listener or exit a listener using the following words:"
-{ $subsection listener }
+{ $subsection tty }
 { $subsection bye }
 "The following variables can be rebound inside a nested scope to customize the behavior of a listener; this can be done to create a development tool with a custom interaction loop:"
-{ $subsection listener-prompt }
 { $subsection listener-hook }
-{ $subsection datastack-hook }
 "Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
 { $subsection read-multiline } ;
 
@@ -48,8 +48,8 @@ ARTICLE: "sources" "Source files"
 { $subsection run-file }
 "Another way to load a source file is to provide a path relative to the Factor installation directory:"
 { $subsection run-resource }
-"Words remember which source file defines them; this can be used to update word definitions during development:"
-{ $subsection reload }
+"Factor tracks which source files definitions were loaded from; see " { $link "definitions" } "."
+$terpri
 "Details on the Factor source parser itself can be found in " { $link "parser" } "."
 $terpri
 "User-contributed libraries in the " { $snippet "contrib/" } " directory of the Factor distribution should be loaded via the high-level module system instead of the above words (" { $link "modules" } ")." ;
@@ -85,8 +85,8 @@ ARTICLE: "debugger" "The debugger"
 { $subsection :r }
 { $subsection :c }
 { $subsection :get }
-{ $subsection :error }
-{ $subsection :cc }
+"You can get a more detailed explanation as most types of errors are documented:"
+{ $subsection :help }
 "If the error is recoverable, a list of restarts is also printed, and a numbered restart can be invoked:"
 { $subsection :res }
 "You can read more about error handling in " { $link "errors" } "." ;
@@ -99,7 +99,7 @@ ARTICLE: "inspector" "The inspector"
 { $subsection go }
 { $subsection up }
 { $subsection bye }
-"An one-time inspector-like display can be shown without starting the inspector:"
+"A one-time inspector-like display can be shown without starting the inspector:"
 { $subsection describe }
 "Word for getting very brief descriptions of words and general objects:"
 { $subsection synopsis }
@@ -114,36 +114,32 @@ ARTICLE: "memory" "Object memory"
 { $subsection instances } ;
 
 ARTICLE: "word-introspection" "Word introspection"
-"You can display a word's definition or documentation:"
-{ $subsection see }
-{ $subsection see-help }
-"Find words whose name contains a given string:"
+"Words support the definition protocol; see " { $link "definitions" } " for general tools that work with definitions. A few word-specific tools also exist:"
 { $subsection apropos }
-"List all vocabularies, and list words in a vocabulary:"
 { $subsection vocabs }
 { $subsection words }
-"Display callers of a given word:"
 { $subsection usage. } ;
 
-ARTICLE: "walker" "The single stepper"
-"The single stepper evaluates a quotation a word at a time, offering the ability to look at stacks at any stage."
+ARTICLE: "definitions" "Definitions"
+"A " { $emphasis "definition" } " is something read from a source file -- this includes words, methods, and help articles."
 $terpri
-"Single stepping is inititated by passing a quotation to a combinator:"
-{ $subsection walk }
-"The single stepper spawns a nested listener. You can exit the nested listener using " { $link bye } "; this resumes execution of the quotation."
+"Words that work with definition take " { $emphasis "definition specifiers" } " as input. A definition specifier is one of the following:"
+{ $list
+    "a word"
+    "a two-element array, holding a class name and a generic word name, naming a method"
+    { "a " { $link link } " instance holding a word or a help topic, naming a piece of documentation" }
+}
+"The following words all accept definition specifiers."
 $terpri
-"The following words advance the single stepper; the latter recursively descends into compound definitions:"
-{ $subsection step }
-{ $subsection into }
-"At any point you can look at stacks and variables in the single stepper execution context:"
-{ $subsection &s }
-{ $subsection &r }
-{ $subsection &c }
-{ $subsection &get }
-"You can annotate a word with a breakpoint, so that the single stepper is started every time the word is called. See " { $link "annotations" } "."
-$terpri
-"An example to try out in the single stepper:"
-{ $code "[ { 3 1 2 } reverse first3 * swap - ] walk" } ;
+"Obtaining information about definitions:"
+{ $subsection see }
+{ $subsection where }
+{ $subsection subdefs }
+"Editing definitions:"
+{ $subsection edit }
+{ $subsection reload }
+"Removing definitions:"
+{ $subsection forget } ;
 
 ARTICLE: "unit-test" "Unit testing code"
 "A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
@@ -169,8 +165,6 @@ ARTICLE: "timing" "Timing code"
 ARTICLE: "annotations" "Word annotations"
 "The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reload } " on the word in question."
 { $subsection watch }
-{ $subsection break }
-{ $subsection break-on }
 { $subsection profile }
 "All of the above words are implemented using a single combinator which applies a quotation to a word definition to yield a new definition:"
 { $subsection annotate } ;

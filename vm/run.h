@@ -29,7 +29,6 @@ CELL callframe_end;
 #define GEN_ENV           15 /* set to gen_count */
 #define IMAGE_ENV         16 /* image name */
 #define CELL_SIZE_ENV     17 /* sizeof(CELL) */
-#define COMPILED_BASE_ENV 18 /* base of code heap */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
@@ -93,30 +92,8 @@ void critical_error(char* msg, CELL tagged);
 void throw_error(CELL error, bool keep_stacks);
 void early_error(CELL error);
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks);
+void memory_protection_error(void *addr, int signal);
 void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
 void primitive_throw(void);
 void primitive_die(void);
-
-/* The compiled code heap is structured into blocks. */
-typedef struct
-{
-	CELL header; /* = COMPILED_HEADER */
-	CELL code_length;
-	CELL reloc_length; /* see relocate.h */
-} F_COMPILED;
-
-#define COMPILED_HEADER 0x01c3babe
-
-CELL literal_top;
-CELL literal_max;
-
-void init_compiler(CELL size);
-void primitive_compiled_offset(void);
-void primitive_set_compiled_offset(void);
-void primitive_add_literal(void);
-void collect_literals(void);
-
-CELL last_flush;
-
-void primitive_flush_icache(void);

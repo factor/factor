@@ -1,16 +1,14 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
-USING: arrays generic io kernel listener memory namespaces
+USING: arrays generic io kernel listener math memory namespaces
 prettyprint sequences words ;
 
 SYMBOL: inspector-slots
 
 : sheet-numbers ( sheet -- sheet )
-    dup empty? [
-        dup first length >array 1array swap append
-        dup peek inspector-slots set
-    ] unless ;
+    dup [ peek ] map inspector-slots set
+    dup length [ 1+ add* ] 2map ;
 
 SYMBOL: inspector-stack
 
@@ -21,35 +19,21 @@ SYMBOL: inspector-stack
     dup summary print
     sheet sheet-numbers sheet. ;
 
-: inspector-help ( -- )
-    terpri
-    "Object inspector." print
-    terpri
-    "inspecting ( -- obj ) push current object" print
-    "go ( n -- ) inspect nth slot" print
-    "up -- return to previous object" print
-    "bye -- exit inspector" print ;
-
-: inspector ( obj -- )
-    [
-        inspector-help
-        terpri
-        "inspector " listener-prompt set
-        V{ } clone inspector-stack set
-        (inspect)
-        listener
-    ] with-scope ;
-
-: inspect ( obj -- )
-    #! Start an inspector if its not already running.
-    inspector-stack get [ (inspect) ] [ inspector ] if ;
-
-: go ( n -- ) inspector-slots get nth (inspect) ;
+: go ( n -- ) 1- inspector-slots get nth (inspect) ;
 
 : up ( -- ) inspector-stack get dup pop* pop (inspect) ;
 
-! Another feature.
-IN: errors
+: inspector-help ( -- )
+    "Object inspector." print
+    "up -- return to previous object" [ up ] print-input
+    "inspecting ( -- obj ) push current object" [ inspecting ] print-input
+    "go ( n -- ) inspect nth slot" print
+    terpri ;
 
-: :error ( -- ) error get inspect ;
-: :cc ( -- ) error-continuation get inspect ;
+: inspector ( obj -- )
+    inspector-help
+    V{ } clone inspector-stack set
+    (inspect) ;
+
+: inspect ( obj -- )
+    inspector-stack get [ (inspect) ] [ inspector ] if ;

@@ -6,14 +6,14 @@ sequences-internals strings test vectors ;
 [ 3 ] [ 1 4 dup <slice> length ] unit-test
 [ 2 ] [ 1 3 { 1 2 3 4 } <slice> length ] unit-test
 [ V{ 2 3 } ] [ 1 3 { 1 2 3 4 } <slice> >vector ] unit-test
-[ V{ 4 5 } ] [ 2 { 1 2 3 4 5 } tail-slice* >vector ] unit-test
+[ V{ 4 5 } ] [ { 1 2 3 4 5 } 2 tail-slice* >vector ] unit-test
 [ V{ 3 4 } ] [ 2 4 1 10 dup <slice> subseq >vector ] unit-test
 [ V{ 3 4 } ] [ 0 2 2 4 1 10 dup <slice> <slice> subseq >vector ] unit-test
-[ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
+[ "cba" ] [ "abcdef" 3 head-slice reverse ] unit-test
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
 
-[ [ 1 1 2 6 24 120 720 ] ]
+[ 5040 [ 1 1 2 6 24 120 720 ] ]
 [ [ 1 2 3 4 5 6 7 ] 1 [ * ] accumulate ] unit-test
 
 [ -1 f ] [ [ ] [ ] find ] unit-test
@@ -90,11 +90,11 @@ unit-test
 [ [ 1 ]     ] [ [ 1 ]     reverse ] unit-test
 [ [ 3 2 1 ] ] [ [ 1 2 3 ] reverse ] unit-test
 
-[ f ] [ 0 f head ] unit-test
-[ [ ] ] [ 0 [ 1 ] head ] unit-test
-[ [ 1 2 3 ] ] [ 3 [ 1 2 3 4 ] head ] unit-test
-[ [ ] ] [ 3 [ 1 2 3 ] tail ] unit-test
-[ [ 3 ] ] [ 2 [ 1 2 3 ] tail ] unit-test
+[ f ] [ f 0 head ] unit-test
+[ [ ] ] [ [ 1 ] 0 head ] unit-test
+[ [ 1 2 3 ] ] [ [ 1 2 3 4 ] 3 head ] unit-test
+[ [ ] ] [ [ 1 2 3 ] 3 tail ] unit-test
+[ [ 3 ] ] [ [ 1 2 3 ] 2 tail ] unit-test
 
 [ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
 [ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
@@ -120,17 +120,17 @@ unit-test
 
 [ -1 ] [ [ - ] { 1 2 3 4 } seq-sorter 1 compare ] unit-test
 
-[ 1 ] [ [ - ] { -5 4 -3 5 } seq-sorter sort-up sorter-start nip ] unit-test
+[ 1 ] [ [ - ] { -5 4 -3 5 } seq-sorter 2dup sort-up sorter-start nip ] unit-test
 
-[ 3 ] [ [ - ] { -5 4 -3 -6 5 } seq-sorter sort-down sorter-end nip ] unit-test
+[ 3 ] [ [ - ] { -5 4 -3 -6 5 } seq-sorter 2dup sort-down sorter-end nip ] unit-test
 
 [ { 1 2 3 4 5 6 7 8 9 } ] [
-    [ - ] { 9 8 7 6 5 4 3 2 1 } clone seq-sorter sort-step
+    [ - ] { 9 8 7 6 5 4 3 2 1 } clone seq-sorter 2dup sort-step
     sorter-seq >array nip
 ] unit-test
 
 [ { 1 2 3 4 5 6 7 8 9 } ] [
-    [ - ] { 1 2 3 4 5 6 7 8 9 } clone seq-sorter sort-step
+    [ - ] { 1 2 3 4 5 6 7 8 9 } clone seq-sorter 2dup sort-step
     sorter-seq >array nip
 ] unit-test
 
@@ -202,7 +202,7 @@ unit-test
 
 [ 1 ] [ 1/2 { 1 2 3 } nth ] unit-test
 
-[ { } ] [ 0 { } group ] unit-test
+[ { } ] [ { } 0 group ] unit-test
 
 ! Pathological case
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test

@@ -15,9 +15,9 @@ IN: compiler
 
 \ type [
     #! Intrinstic version of type primitive.
-    <label> "header" set
-    <label> "f" set
-    <label> "end" set
+    "header" define-label
+    "f" define-label
+    "end" define-label
     ! Make a copy
     "x" operand "obj" operand MOV
     ! Get the tag
@@ -29,7 +29,7 @@ IN: compiler
     ! It doesn't store type info in its header
     "obj" operand tag-bits SHL
     "end" get JMP
-    "header" get save-xt
+    "header" get resolve-label
     ! It does store type info in its header
     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
     "x" operand object-tag CMP
@@ -39,10 +39,10 @@ IN: compiler
     ! Mask off header tag, making a fixnum.
     "obj" operand object-tag XOR
     "end" get JMP
-    "f" get save-xt
+    "f" get resolve-label
     ! The pointer is equal to 3. Load F_TYPE (9).
     "obj" operand f type tag-bits shift MOV
-    "end" get save-xt
+    "end" get resolve-label
 ] H{
     { +input { { f "obj" } } }
     { +scratch { { f "x" } { f "y" } } }
@@ -166,7 +166,7 @@ IN: compiler
     "z" operand "y" operand pick execute
     ! If the previous arithmetic operation overflowed, then we
     ! turn the result into a bignum and leave it in EAX.
-    <label> "end" set
+    "end" define-label
     "end" get JNO
     ! There was an overflow. Recompute the original operand.
     { "y" "x" } [ tag-bits SAR ] unique-operands
@@ -175,7 +175,7 @@ IN: compiler
     ! An untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
     "z" operand T{ int-regs } return-reg ?MOV
-    "end" get save-xt ; inline
+    "end" get resolve-label ; inline
 
 : simple-overflow-template ( word insn -- )
     [ simple-overflow ] curry H{
@@ -192,7 +192,7 @@ IN: compiler
     finalize-contents
     "y" operand tag-bits SAR
     "y" operand IMUL
-    <label> "end" set
+    "end" define-label
     "end" get JNO
     "s48_fixnum_pair_to_bignum" f
     "x" operand remainder-reg 2array compile-c-call*
@@ -202,7 +202,7 @@ IN: compiler
     "x" operand tag-bits neg 2array compile-c-call*
     ! an untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
-    "end" get save-xt
+    "end" get resolve-label
 ] H{
     { +input { { 0 "x" } { 1 "y" } } }
     { +output { "x" } }
@@ -212,7 +212,7 @@ IN: compiler
     #! The same code is used for fixnum/i and fixnum/mod.
     #! This has specific register
     #! ECX and EAX, and the result is in EDX.
-    <label> "end" set
+    "end" define-label
     prepare-division
     "y" operand IDIV
     ! Make a copy since following shift is destructive
@@ -235,7 +235,7 @@ IN: compiler
     stack-reg 16 cell - ADD
     ! the remainder is now in EDX
     remainder-reg POP
-    "end" get save-xt ;
+    "end" get resolve-label ;
 
 \ fixnum/i [ generate-fixnum/mod ] H{
     { +input { { 0 "x" } { 1 "y" } } }

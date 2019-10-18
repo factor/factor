@@ -4,7 +4,7 @@ IN: kernel
 USING: arrays generic kernel-internals math namespaces sequences
 sequences-internals words ;
 
-M: wrapper =
+M: wrapper equal?
     over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
 
 M: quotation clone (clone) ;
@@ -14,22 +14,23 @@ M: quotation set-nth bounds-check set-nth-unsafe ;
 M: quotation nth-unsafe >r >fixnum r> array-nth ;
 M: quotation set-nth-unsafe >r >fixnum r> set-array-nth ;
 
-: >quotation ( seq -- array )
+: >quotation ( seq -- quot )
     [ quotation? ] [ <quotation> ] >sequence ; inline
 
 M: quotation like drop dup quotation? [ >quotation ] unless ;
 
-: make-dip ( quot n -- quot )
+: make-dip ( quot n -- newquot )
     dup \ >r <array> -rot \ r> <array> append3 >quotation ;
 
-: unit ( a -- [ a ] ) 1array >quotation ;
+: unit ( obj -- quot ) 1array >quotation ;
 
-GENERIC: literalize ( obj -- obj )
+GENERIC: literalize ( obj -- newobj )
 M: object literalize ;
 M: word literalize <wrapper> ;
 M: wrapper literalize <wrapper> ;
 
-: curry ( obj quot -- quot ) swap literalize add* ;
+: curry ( obj quot -- newquot )
+    [ swap literalize , % ] [ ] make ;
 
-: alist>quot ( default alist -- quot )
+: alist>quot ( default assoc -- quot )
     [ [ first2 swap % , , \ if , ] [ ] make ] each ;

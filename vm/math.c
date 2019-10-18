@@ -203,7 +203,7 @@ void primitive_fixnum_not(void)
 #define INT_DEFBOX(name,type) \
 void name (type integer)                                                       \
 {                                                                              \
-	dpush(tag_integer(integer));                                           \
+	dpush(tag_fixnum(integer));                                            \
 }
 
 #define INT_DEFUNBOX(name,type) \
@@ -491,18 +491,6 @@ void primitive_from_fraction(void)
 	dpush(RETAG(ratio,RATIO_TYPE));
 }
 
-void fixup_ratio(F_RATIO* ratio)
-{
-	data_fixup(&ratio->numerator);
-	data_fixup(&ratio->denominator);
-}
-
-void collect_ratio(F_RATIO* ratio)
-{
-	copy_handle(&ratio->numerator);
-	copy_handle(&ratio->denominator);
-}
-
 /* Floats */
 
 double to_float(CELL tagged)
@@ -625,84 +613,6 @@ void primitive_float_greatereq(void)
 	box_boolean(x >= y);
 }
 
-void primitive_facos(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(acos(to_float(dpeek()))));
-}
-
-void primitive_fasin(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(asin(to_float(dpeek()))));
-}
-
-void primitive_fatan(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(atan(to_float(dpeek()))));
-}
-
-void primitive_fatan2(void)
-{
-	double x, y;
-	maybe_gc(sizeof(F_FLOAT));
-	y = to_float(dpop());
-	x = to_float(dpop());
-	dpush(tag_float(atan2(x,y)));
-}
-
-void primitive_fcos(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(cos(to_float(dpeek()))));
-}
-
-void primitive_fexp(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(exp(to_float(dpeek()))));
-}
-
-void primitive_fcosh(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(cosh(to_float(dpeek()))));
-}
-
-void primitive_flog(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(log(to_float(dpeek()))));
-}
-
-void primitive_fpow(void)
-{
-	double x, y;
-	maybe_gc(sizeof(F_FLOAT));
-	y = to_float(dpop());
-	x = to_float(dpop());
-	dpush(tag_float(pow(x,y)));
-}
-
-void primitive_fsin(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(sin(to_float(dpeek()))));
-}
-
-void primitive_fsinh(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(sinh(to_float(dpeek()))));
-}
-
-void primitive_fsqrt(void)
-{
-	maybe_gc(sizeof(F_FLOAT));
-	drepl(tag_float(sqrt(to_float(dpeek()))));
-}
-
 void primitive_float_bits(void)
 {
 	FLOAT_BITS b;
@@ -763,16 +673,4 @@ void primitive_from_rect(void)
 	complex->real = real;
 	complex->imaginary = imaginary;
 	dpush(RETAG(complex,COMPLEX_TYPE));
-}
-
-void fixup_complex(F_COMPLEX* complex)
-{
-	data_fixup(&complex->real);
-	data_fixup(&complex->imaginary);
-}
-
-void collect_complex(F_COMPLEX* complex)
-{
-	copy_handle(&complex->real);
-	copy_handle(&complex->imaginary);
 }

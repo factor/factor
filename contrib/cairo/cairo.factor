@@ -185,7 +185,7 @@ C-ENUM:
 : cairo_set_operator ( cairo_t cairo_operator_t -- )
 	"void" "cairo" "cairo_set_operator" [ "cairo_t*" "int" ] ;
 
-: cairo_image_surface_create_for_data ( data format width height stride -- cairo_surface_t)
+: cairo_image_surface_create_for_data ( data format width height stride -- cairo_surface_t )
 	"void*" "cairo" "cairo_image_surface_create_for_data" [ "void*" "uint" "int" "int" "int" ] alien-invoke ;
 	
 : cairo_set_source_rgb ( cairo_t red green blue -- )

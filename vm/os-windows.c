@@ -163,40 +163,40 @@ void primitive_cwd(void)
 void primitive_cd(void)
 {
 	maybe_gc(0);
-	SetCurrentDirectory(pop_char_string());
+	SetCurrentDirectory(unbox_char_string());
 }
 
 BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 {
-    SYSTEM_INFO si;
-    char *mem;
-    DWORD ignore;
+	SYSTEM_INFO si;
+	char *mem;
+	DWORD ignore;
 
-    GetSystemInfo(&si);
-    if((mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
-        fatal_error("VirtualAlloc() failed in alloc_bounded_block()",0);
+	GetSystemInfo(&si);
+	if((mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
+		fatal_error("VirtualAlloc() failed in alloc_bounded_block()",0);
 
-    if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
-        fatal_error("Cannot allocate low guard page", (CELL)mem);
+	if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
+		fatal_error("Cannot allocate low guard page", (CELL)mem);
 
-    if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
-        fatal_error("Cannot allocate high guard page", (CELL)mem);
+	if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
+		fatal_error("Cannot allocate high guard page", (CELL)mem);
 
-    BOUNDED_BLOCK *block = safe_malloc(sizeof(BOUNDED_BLOCK));
+	BOUNDED_BLOCK *block = safe_malloc(sizeof(BOUNDED_BLOCK));
 
-    block->start = (int)mem + si.dwPageSize;
-    block->size = size;
+	block->start = (int)mem + si.dwPageSize;
+	block->size = size;
 
-    return block;
+	return block;
 }
 
 void dealloc_bounded_block(BOUNDED_BLOCK *block)
 {
-    SYSTEM_INFO si;
-    GetSystemInfo(&si);
-    if(!VirtualFree((void*)(block->start - si.dwPageSize), 0, MEM_RELEASE))
-        fatal_error("VirtualFree() failed",0);
-    free(block);
+	SYSTEM_INFO si;
+	GetSystemInfo(&si);
+	if(!VirtualFree((void*)(block->start - si.dwPageSize), 0, MEM_RELEASE))
+		fatal_error("VirtualFree() failed",0);
+	free(block);
 }
 
 /* SEH support. Proceed with caution. */
@@ -218,14 +218,24 @@ void seh_call(void (*func)(), exception_handler_t *handler)
 	asm("mov %0, %%fs:0" : "=r" (record.next_handler));
 }
 
-static long exception_handler(void *rec, void *frame, void *ctx, void *dispatch)
+long getpagesize (void) {
+	static long g_pagesize = 0;
+	if (! g_pagesize) {
+		SYSTEM_INFO system_info;
+		GetSystemInfo (&system_info);
+		g_pagesize = system_info.dwPageSize;
+	}
+	return g_pagesize;
+}
+
+static void exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
-	signal_error(SIGSEGV);
+	memory_protection_error((void*)rec->ExceptionInformation[1], SIGSEGV);
 }
 
 void platform_run(void)
 {
-	seh_call(run_toplevel, exception_handler);
+	seh_call(run_toplevel, (exception_handler_t*) exception_handler);
 }
 
 const char *default_image_path(void)

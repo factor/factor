@@ -25,6 +25,7 @@
 #include "types.h"
 #include "io.h"
 #include "image.h"
+#include "compiler.h"
 #include "primitives.h"
 #include "stack.h"
 #include "alien.h"

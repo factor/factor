@@ -1,5 +1,5 @@
 USING: kernel io strings sequences namespaces math parser
-vectors hashtables kernel-internals math-contrib crypto ;
+vectors hashtables math-contrib crypto ;
 IN: crypto-internals
 
 ! Implemented according to RFC 3174.
@@ -130,7 +130,7 @@ SYMBOL: K
 IN: crypto
 : string>sha1 ( string -- sha1 )
     [
-        initialize-sha1 pad-string-sha1
+        initialize-sha1 t preprocess-plaintext
         dup length num-blocks [ reset-w 2dup get-block process-sha1-block ] repeat
         drop get-sha1
     ] with-scope ;

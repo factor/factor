@@ -30,7 +30,7 @@ IN: crypto-internals
     [ base64>ch ] map 0 4 [ pick nth swap 6 shift bitor ] each nip 3 >be ;
 
 : >base64-rem ( str -- str )
-    [ 3 0 pad-right encode3 ] keep length 1+ swap head 4 CHAR: = pad-right ;
+    [ 3 0 pad-right encode3 ] keep length 1+ head 4 CHAR: = pad-right ;
 
 IN: crypto
 : >base64 ( str -- str )
@@ -38,12 +38,12 @@ IN: crypto
     #! pad string with = when not enough bits
     dup length dup 3 mod - swap cut swap
     [
-        3 swap group [ encode3 % ] each dup empty? [ drop ] [ >base64-rem % ] if
+        3 group [ encode3 % ] each dup empty? [ drop ] [ >base64-rem % ] if
     ] "" make ;
 
 : base64> ( str -- str )
     #! input length must be a mulitple of 4
     [
-        [ 4 swap group [ decode4 % ] each ] keep CHAR: = swap count-end
+        [ 4 group [ decode4 % ] each ] keep CHAR: = swap count-end
     ] SBUF" " make swap [ dup pop* ] times >string ;
 

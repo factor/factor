@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-help
 USING: gadgets gadgets-borders gadgets-buttons gadgets-frames
-gadgets-panes gadgets-presentations gadgets-search
-gadgets-scrolling help kernel models namespaces sequences ;
+gadgets-panes gadgets-search gadgets-scrolling help kernel
+models namespaces sequences gadgets-tracks ;
 
-TUPLE: help-gadget history ;
+TUPLE: help-gadget history search ;
 
 : show-help ( link help -- )
     dup help-gadget-history add-history
@@ -13,38 +13,26 @@ TUPLE: help-gadget history ;
 
 : go-home ( help -- ) "handbook" swap show-help ;
 
-: find-help-gadget [ help-gadget? ] find-parent ;
+help-gadget {
+    {
+        "Help"
+        { "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
+        { "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
+        { "Home" T{ key-down f { C+ } "h" } [ go-home ] }
+    }
+} define-commands
 
-: history-action find-help-gadget help-gadget-history ;
-
-: <help-toolbar> ( -- gadget )
-    [
-        "Back" [ history-action go-back ] <bevel-button> ,
-        "Forward" [ history-action go-forward ] <bevel-button> ,
-        "Home" [ find-help-gadget go-home ] <bevel-button> ,
-        <spacing> ,
-        "Search" [ drop search-help-window ] <bevel-button> ,
-    ] make-toolbar ;
-
-: <help-pane> ( -- gadget )
+: <help-pane> ( history -- gadget )
     gadget get help-gadget-history [ help ] <pane-control> ;
 
+: init-history ( help-gadget -- )
+    T{ link f "handbook" } <history>
+    swap set-help-gadget-history ;
+
 C: help-gadget ( -- gadget )
-    f <history> over set-help-gadget-history {
-        { [ <help-toolbar> ] f f @top }
-        { [ <help-pane> <scroller> ] f f @center }
-    } make-frame* ;
+    dup init-history {
+        { [ <help-pane> ] f [ <scroller> ] 4/5 }
+        { [ [ search-help. ] <search-gadget> ] set-help-gadget-search f 1/5 }
+    } { 0 1 } make-track* ;
 
-M: help-gadget gadget-title
-    help-gadget-history
-    [ "Help - " swap article-title append ] <filter> ;
-
-M: help-gadget pref-dim*
-    drop { 500 600 } ;
-
-: help-tool
-    [ help-gadget? ]
-    [ <help-gadget> ]
-    [ show-help ] ;
-
-M: link show ( link -- ) help-tool call-tool ;
+M: help-gadget focusable-child* help-gadget-search ;

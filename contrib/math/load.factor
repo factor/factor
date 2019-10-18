@@ -7,4 +7,6 @@ PROVIDE: math {
     "matrices.factor"
     "statistics.factor"
     "numerical-integration.factor"
+} {
+    "test.factor"
 } ;

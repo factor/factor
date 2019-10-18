@@ -9,7 +9,7 @@ SYMBOL: vhosts
 SYMBOL: responders
 
 : print-header ( alist -- )
-    [ swap write ": " write url-encode print ] hash-each ;
+    [ swap write ": " write print ] hash-each ;
 
 : response ( header msg -- )
     "HTTP/1.0 " write print print-header ;

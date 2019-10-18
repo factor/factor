@@ -1,14 +1,17 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: kernel
-USING: errors hashtables io kernel-internals namespaces
+IN: command-line
+USING: errors hashtables io kernel kernel-internals namespaces
 parser sequences strings ;
 
-: run-user-init ( -- )
-    #! Run user init file if it exists
+: run-bootstrap-init ( -- )
     "user-init" get [
-        "~" get "/.factor-rc" append dup exists?
-        [ try-run-file ] [ drop ] if
+        "~" get "/.factor-boot-rc" append ?run-file
+    ] when ;
+
+: run-user-init ( -- )
+    "user-init" get [
+        "~" get "/.factor-rc" append ?run-file
     ] when ;
 
 : cli-var-param ( name value -- ) swap set-global ;
@@ -52,4 +55,4 @@ parser sequences strings ;
 
 : parse-command-line ( -- )
     cli-args [ cli-arg ] subset
-    ignore-cli-args? [ drop ] [ [ try-run-file ] each ] if ;
+    ignore-cli-args? [ drop ] [ [ ?run-file ] each ] if ;

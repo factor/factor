@@ -1,28 +1,29 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: interpreter
-USING: errors generic io kernel kernel-internals math
-namespaces prettyprint sequences strings vectors words ;
+USING: arrays errors generic io kernel kernel-internals math
+namespaces prettyprint sequences strings threads vectors words
+hashtables ;
 
-! A Factor interpreter written in Factor. It can transfer the
-! continuation to and from the primary interpreter. Used by
-! compiler for partial evaluation, also by the walker. 
+! Metacircular interpreter for single-stepping
+
+SYMBOL: meta-interp
 
 ! Meta-stacks;
-SYMBOL: meta-d
-: push-d meta-d get push ;
-: pop-d meta-d get pop ;
-: peek-d meta-d get peek ;
-SYMBOL: meta-r
-: push-r meta-r get push ;
-: pop-r meta-r get pop ;
-: peek-r meta-r get peek ;
-SYMBOL: meta-c
-: push-c meta-c get push ;
-: pop-c meta-c get pop ;
-: peek-c meta-c get peek ;
-SYMBOL: meta-name
-SYMBOL: meta-catch
+: meta-d meta-interp get continuation-data ;
+: push-d meta-d push ;
+: pop-d meta-d pop ;
+: peek-d meta-d peek ;
+
+: meta-r meta-interp get continuation-retain ;
+: push-r meta-r push ;
+: pop-r meta-r pop ;
+: peek-r meta-r peek ;
+
+: meta-c meta-interp get continuation-call ;
+: push-c meta-c push ;
+: pop-c meta-c pop ;
+: peek-c meta-c peek ;
 
 ! Call frame
 SYMBOL: callframe
@@ -32,74 +33,96 @@ SYMBOL: callframe-end
 : meta-callframe ( -- seq )
     { callframe callframe-scan callframe-end } [ get ] map ;
 
+: (meta-call) ( quot -- )
+    dup callframe set
+    length callframe-end set
+    0 callframe-scan set ;
+
 ! Callframe.
 : up ( -- )
     pop-c callframe-end set
     pop-c callframe-scan set
     pop-c callframe set ;
 
-: done? ( -- ? ) callframe-scan get callframe-end get >= ;
+: done-cf? ( -- ? ) callframe-scan get callframe-end get >= ;
 
-: next ( -- obj )
-    done? [
-        up next
-    ] [
-        callframe-scan get callframe get nth callframe-scan inc
-    ] if ;
+: done? ( -- ? ) done-cf? meta-c empty? and ;
 
-: meta-interp ( -- interp )
-    meta-d get meta-r get meta-c get
-    meta-name get meta-catch get <continuation> ;
+: (next)
+    callframe-scan get callframe get nth callframe-scan inc ;
 
-: set-meta-interp ( interp -- )
-    >continuation<
-    meta-catch set
-    meta-name set
-    meta-c set
-    meta-r set
-    meta-d set ;
+: next ( quot -- )
+    {
+        { [ done? ] [ drop [ ] (meta-call) ] }
+        { [ done-cf? ] [ drop up ] }
+        { [ t ] [ >r (next) r> call ] }
+    } cond ; inline
+
+: init-meta-interp ( -- )
+    <empty-continuation> meta-interp set ;
 
 : save-callframe ( -- )
-    callframe get push-c
-    callframe-scan get push-c
-    callframe-end get push-c ;
-
-: (meta-call) ( quot -- )
-    dup callframe set
-    length callframe-end set
-    0 callframe-scan set ;
+    done-cf? [
+        callframe get push-c
+        callframe-scan get push-c
+        callframe-end get push-c
+    ] unless ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
-    done? [ save-callframe ] unless (meta-call) ;
+    save-callframe (meta-call) ;
 
-: host-word ( word -- )
+: <callframe> ( quot -- seq )
+    0 over length 3array >vector ;
+
+: catch-harness ( continuation -- quot )
+    [ [ c> 2array ] % , \ continue-with , ] [ ] make ;
+
+: host-harness ( quot continuation -- quot )
+    tuck [
+        catch-harness , \ >c ,
+        %
+        [ c> drop continuation ] %
+        ,
+        \ continue-with ,
+    ] [ ] make ;
+
+: restore-harness ( obj -- )
+    #! Error handler
+    dup array? [
+        init-meta-interp [ ] (meta-call)
+        first2 schedule-thread-with
+    ] [
+        meta-interp set
+    ] if ;
+
+: host-quot ( quot -- )
     [
-        [
-            swap , \ continuation , , \ continue-with ,
-        ] [ ] make dup push-c 0 push-c length push-c
-        meta-interp continue
-    ] callcc1 set-meta-interp drop ;
+        host-harness <callframe> meta-c swap nappend
+        meta-interp get continue
+    ] callcc1 restore-harness drop ;
+
+: host-word ( word -- ) unit host-quot ;
 
 GENERIC: do-1 ( object -- )
 
-M: word do-1 ( word -- )
+M: word do-1
     dup "meta-word" word-prop [ call ] [ host-word ] ?if ;
 
-M: wrapper do-1 ( wrapper -- ) wrapped push-d ;
+M: wrapper do-1 wrapped push-d ;
 
-M: object do-1 ( object -- ) push-d ;
+M: object do-1 push-d ;
 
 GENERIC: do ( obj -- )
 
-M: word do ( word -- )
+M: word do
     dup "meta-word" word-prop [
         call
     ] [
         dup compound? [ word-def meta-call ] [ host-word ] if
     ] ?if ;
 
-M: object do ( object -- ) do-1 ;
+M: object do do-1 ;
 
 ! The interpreter loses object identity of the name and catch
 ! stacks -- they are copied after each step -- so we execute
@@ -113,3 +136,40 @@ M: object do ( object -- ) do-1 ;
 \ execute [ pop-d do ] "meta-word" set-word-prop
 \ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] "meta-word" set-word-prop
 \ dispatch [ pop-d pop-d swap nth meta-call ] "meta-word" set-word-prop
+
+! Time travel
+SYMBOL: meta-history
+
+: save-interp ( -- )
+    meta-history get [
+        [
+            callframe [ ] change
+            callframe-scan [ ] change
+            callframe-end [ ] change
+            meta-interp [ clone ] change
+        ] make-hash swap push
+    ] when* ;
+
+: restore-interp ( ns -- )
+    { callframe callframe-scan callframe-end }
+    [ dup pick hash swap set ] each
+    meta-interp swap hash clone meta-interp set ;
+
+: step ( -- ) save-interp [ do-1 ] next ;
+
+: step-in ( -- ) save-interp [ do ] next ;
+
+: step-out ( -- )
+    save-interp
+    callframe get callframe-scan get tail
+    host-quot [ ] (meta-call) ;
+
+: step-all ( -- )
+    save-callframe meta-interp get schedule-thread ;
+
+: step-back ( -- )
+    meta-history get dup empty? [
+        drop
+    ] [
+        pop restore-interp
+    ] if ;

@@ -13,10 +13,10 @@ USING: compiler kernel math sequences test ;
 
 : small-fac-benchmark
     #! This tests fixnum math.
-    1 swap [ 10 fac 10 [ 1+ / ] each max ] times ; compiled
+    1 swap [ 10 fac 10 [ 1+ / ] each max ] times ;
 
 : big-fac-benchmark
-    10000 fac 10000 [ 1+ / ] each ; compiled
+    10000 fac 10000 [ 1+ / ] each ;
 
 [ 1 ] [ big-fac-benchmark ] unit-test
 

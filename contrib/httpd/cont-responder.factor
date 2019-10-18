@@ -41,7 +41,7 @@ SYMBOL: current-show
     [ ( 0 1 -- )
       current-show set ( 0 -- )
       continue
-    ] callcc1 ( 0 [ ] == )
+    ] callcc1 ! 0 [ ] ==
     nip
     restore-request
     call

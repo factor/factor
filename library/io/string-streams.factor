@@ -3,7 +3,6 @@
 IN: io
 USING: io kernel math namespaces sequences strings ;
 
-! String buffers support the stream output protocol.
 M: sbuf stream-write1 push ;
 M: sbuf stream-write swap nappend ;
 M: sbuf stream-close drop ;
@@ -22,11 +21,11 @@ M: sbuf stream-flush drop ;
         [ swap CHAR: \s pad-right ] map-with
     ] unless ;
 
-: map-last ( seq quot -- seq | quot: elt last? )
+: map-last ( seq quot -- seq )
     swap dup length <reversed>
     [ zero? rot [ call ] keep swap ] 2map nip ; inline
 
-M: plain-writer with-stream-table ( grid quot style stream -- )
+M: plain-writer with-stream-table
     [
         drop swap
         [ [ swap string-out ] map-with ] map-with
@@ -35,11 +34,10 @@ M: plain-writer with-stream-table ( grid quot style stream -- )
         [ print ] each
     ] with-stream* ;
 
-! Reversed string buffers support the stream input protocol.
-M: sbuf stream-read1 ( sbuf -- char/f )
+M: sbuf stream-read1
     dup empty? [ drop f ] [ pop ] if ;
 
-M: sbuf stream-read ( count sbuf -- string )
+M: sbuf stream-read
     dup empty? [
         2drop f
     ] [
@@ -47,12 +45,11 @@ M: sbuf stream-read ( count sbuf -- string )
         [ [ drop pop ] inject-with ] keep
     ] if ;
 
-: <string-reader> ( string -- stream )
+: <string-reader> ( str -- stream )
     <reversed> >sbuf <line-reader> ;
 
 : string-in ( str quot -- )
     >r <string-reader> r> with-stream ; inline
 
-: contents ( stream -- string )
-    #! Read the entire stream into a string.
+: contents ( stream -- str )
     <string-writer> [ stream-copy ] keep >string ;

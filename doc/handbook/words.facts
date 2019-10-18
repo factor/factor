@@ -1,4 +1,4 @@
-USING: help kernel parser words ;
+USING: definitions help kernel parser words ;
 
 ARTICLE: "words" "Words"
 "Words are the fundamental unit of code in Factor, analogous to functions or procedures in other languages. Words are also objects, and this concept forms the basis for Factor's meta-programming facilities. A word consists of several parts:"
@@ -49,7 +49,8 @@ ARTICLE: "colon-definition" "Compound definitions"
 { $subsection POSTPONE: : }
 { $subsection define-compound }
 { $subsection compound? }
-{ $subsection compound } ;
+{ $subsection compound }
+"Colon definitions should declare their stack effect, unless the definition is completely trivial. See " { $link "effect-declaration" } "." ;
 
 ARTICLE: "symbols" "Symbols"
 { $subsection POSTPONE: SYMBOL: }
@@ -78,10 +79,10 @@ $terpri
 "The first declaration specifies the time when a word runs. It affects both interpreted and compiled definitions."
 { $subsection POSTPONE: parsing }
 "The remaining declarations only affect compiled definitions. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently."
-$terpri
 { $warning "If a generic word is declared " { $link POSTPONE: foldable } ", all methods must satisfy the contract, otherwise unpredicable behavior will occur." }
 { $subsection POSTPONE: inline }
-{ $subsection POSTPONE: foldable } ;
+{ $subsection POSTPONE: foldable }
+"Stack effect declarations are documented in " { $link "effect-declaration" } "." ;
 
 ARTICLE: "word-props" "Word properties"
 "Each word has a hashtable of properties."

@@ -1,15 +1,18 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays errors gadgets gadgets-frames gadgets-grids
-gadgets-labels gadgets-panes gadgets-theme gadgets-viewports
-generic hashtables io kernel math models namespaces prettyprint
-queues sequences threads ;
+USING: arrays errors gadgets gadgets-buttons gadgets-frames
+gadgets-grids gadgets-labels gadgets-panes gadgets-presentations
+gadgets-scrolling gadgets-theme gadgets-viewports generic
+hashtables io kernel math models namespaces prettyprint queues
+sequences test threads help sequences words ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
 
 : window ( handle -- world ) windows get-global assoc ;
+
+: window-focus ( handle -- gadget ) window world-focus ;
 
 : register-window ( world handle -- )
     swap 2array windows get-global push ;
@@ -44,15 +47,15 @@ SYMBOL: windows
     V{ } clone windows set-global ;
 
 : ui-step ( -- )
-    do-timers
-    [ layout-queued ] make-hash hash-values [
-        dup update-hand
-        dup world-handle [ dup draw-world ] when
-        drop
-    ] each
-    10 sleep ;
-
-: <status-bar> ( -- gadget ) "" <label> dup highlight-theme ;
+    [
+        do-timers
+        [ layout-queued ] make-hash hash-values [
+            dup update-hand
+            dup world-handle [ dup draw-world ] when
+            drop
+        ] each
+        10 sleep
+    ] assert-depth ;
 
 TUPLE: titled-gadget title ;
 
@@ -64,34 +67,16 @@ C: titled-gadget ( gadget title -- )
     [ set-titled-gadget-title ] keep
     { { f f f @center } } make-frame* ;
 
-: init-status ( world -- )
-    dup world-status <label-control> dup highlight-theme
-    swap @bottom grid-add ;
-
-: open-window ( gadget -- )
-    <world> dup init-status
+: open-window ( world -- )
     dup pref-dim over set-gadget-dim
-    dup open-window*
-    draw-world ;
+    dup open-window* draw-world ;
 
 : open-titled-window ( gadget title -- )
-    <model> <titled-gadget> open-window ;
+    <model> <titled-gadget> <world> open-window ;
 
 : find-window ( quot -- world )
     windows get [ second ] map
     [ world-gadget swap call ] find-last-with nip ; inline
-
-: open-tool ( arg cons setter -- )
-    >r call dup open-window r> call ; inline
-
-: call-tool ( arg pred cons setter -- )
-    rot find-window [
-        rot drop
-        dup raise-window
-        world-gadget swap call
-    ] [
-        open-tool
-    ] if* ; inline
 
 : start-world ( world -- )
     dup graft
@@ -127,19 +112,50 @@ C: titled-gadget ( gadget title -- )
     reset-world ;
 
 : restore-windows ( -- )
-    windows get [ second ] map
-    0 windows get set-length
+    windows get [ [ second ] map ] keep delete-all
     [ dup reset-world open-window* ] each
     forget-rollover ;
 
 : restore-windows? ( -- ? )
     windows get [ empty? not ] [ f ] if* ;
 
-: make-toolbar ( quot -- gadget )
-    { } make make-shelf dup highlight-theme ; inline
+: <toolbar> ( gadget -- toolbar )
+    dup commands [ <command-presentation> ] map-with
+    make-shelf ;
+
+: $gadget ( element -- ) first gadget. ;
+
+: command-description ( target command -- element )
+    [ <command-presentation> \ $gadget swap 2array ] keep
+    command-gesture gesture>string 2array ;
+
+: gadget-info ( gadget -- )
+    "Gadget: " write
+    [ class word-name ] keep write-object terpri ;
+
+: command-table. ( commands group -- )
+    $heading
+    [ first2 swap command-description ] map
+    { "Command" "Gesture" } add* $table ;
+
+: push-hash ( elt key hash -- )
+    [ hash ?push ] 2keep set-hash ;
+
+: group-commands ( commands -- seq )
+    H{ } clone swap
+    [ dup first command-group pick push-hash ] each
+    hash>alist [ [ first ] 2apply <=> ] sort ;
+
+: commands. ( gadget -- )
+    dup gadget-info terpri
+    all-commands [ first command-gesture key-down? ] subset
+    group-commands [ first2 swap command-table. ] each ;
+
+: pane-window ( quot title -- )
+    >r make-pane <scroller> r> open-titled-window ;
 
 : error-window ( error -- )
-    [ print-error ] make-pane "Error" open-titled-window ;
+    [ print-error ] "Error" pane-window ;
 
 : ui-try ( quot -- )
     [ error-window ] recover ;
@@ -150,7 +166,7 @@ C: world-error ( error world -- error )
     [ set-world-error-world ] keep
     [ set-delegate ] keep ;
 
-M: world-error error. ( world-error -- )
+M: world-error error.
     "An error occurred while drawing the world " write
     dup world-error-world pprint-short "." print
     "This world has been deactivated to prevent cascading errors." print

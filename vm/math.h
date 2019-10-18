@@ -112,8 +112,6 @@ DLLEXPORT void box_unsigned_8(u64 n);
 DLLEXPORT u64 unbox_unsigned_8(void);
 
 void primitive_from_fraction(void);
-void fixup_ratio(F_RATIO* ratio);
-void collect_ratio(F_RATIO* ratio);
 
 /* for punning */
 typedef union {
@@ -159,19 +157,6 @@ void primitive_float_lesseq(void);
 void primitive_float_greater(void);
 void primitive_float_greatereq(void);
 
-void primitive_facos(void);
-void primitive_fasin(void);
-void primitive_fatan(void);
-void primitive_fatan2(void);
-void primitive_fcos(void);
-void primitive_fexp(void);
-void primitive_fcosh(void);
-void primitive_flog(void);
-void primitive_fpow(void);
-void primitive_fsin(void);
-void primitive_fsinh(void);
-void primitive_fsqrt(void);
-
 void primitive_float_bits(void);
 void primitive_bits_float(void);
 void primitive_double_bits(void);
@@ -183,5 +168,3 @@ DLLEXPORT void box_double(double flo);
 DLLEXPORT double unbox_double(void);
 
 void primitive_from_rect(void);
-void fixup_complex(F_COMPLEX* complex);
-void collect_complex(F_COMPLEX* complex);

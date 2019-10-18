@@ -92,11 +92,11 @@ C: x-clipboard ( atom -- clipboard )
 : x-clipboard@ ( gadget clipboard -- prop win )
     x-clipboard-atom swap find-world world-handle first ;
 
-M: x-clipboard copy-clipboard ( string gadget clipboard -- )
+M: x-clipboard copy-clipboard
     [ x-clipboard@ own-selection ] keep
     set-x-clipboard-contents ;
 
-M: x-clipboard paste-clipboard ( gadget clipboard -- )
+M: x-clipboard paste-clipboard
     >r find-world world-handle first r> x-clipboard-atom
     convert-selection ;
 

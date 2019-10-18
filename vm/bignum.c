@@ -41,7 +41,6 @@ MIT in each case. */
  */
 
 /* Changes for Factor:
- *  - Add s48_ prefix to file names
  *  - Adapt s48_bignumint.h for Factor memory manager
  *  - Add more bignum <-> C type conversions
  */

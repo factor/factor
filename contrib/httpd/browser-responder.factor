@@ -1,8 +1,8 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: browser-responder
-USING: hashtables help html httpd io kernel memory namespaces
-prettyprint sequences words xml ;
+USING: definitions hashtables help html httpd io kernel memory
+namespaces prettyprint sequences words xml ;
 
 : option ( current text -- )
     #! Output the HTML option tag for the given text. If
@@ -56,7 +56,7 @@ prettyprint sequences words xml ;
 
 : browser-title ( -- str )
     current-word
-    [ synopsis ] [ "IN: " current-vocab append ] if* ;
+    [ summary ] [ "IN: " current-vocab append ] if* ;
 
 : browser-responder ( -- )
     #! Display a Smalltalk like browser for exploring words.

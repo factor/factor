@@ -38,6 +38,7 @@ button H{
 GENERIC: >label ( obj -- gadget )
 M: string >label <label> ;
 M: object >label ;
+M: f >label drop <gadget> ;
 
 C: button ( gadget quot -- button )
     rot >label <default-border> over set-gadget-delegate
@@ -70,7 +71,7 @@ C: repeat-button ( gadget quot -- button )
     #! the mouse is held down.
     [ >r <bevel-button> r> set-gadget-delegate ] keep ;
 
-M: repeat-button tick ( ms object -- ) nip button-clicked ;
+M: repeat-button tick nip button-clicked ;
 
 TUPLE: button-paint plain rollover pressed selected ;
 
@@ -82,14 +83,14 @@ TUPLE: button-paint plain rollover pressed selected ;
         { [ t ] [ button-paint-plain ] }
     } cond ;
 
-M: button-paint draw-interior ( button paint -- )
+M: button-paint draw-interior
     button-paint draw-interior ;
 
-M: button-paint draw-boundary ( button paint -- )
+M: button-paint draw-boundary
     button-paint draw-boundary ;
 
 : <radio-control> ( model value gadget -- gadget )
-    over [ swap control-model set-model ] curry <bevel-button>
+    over [ swap control-model set-model* ] curry <bevel-button>
     swap [ swap >r = r> set-button-selected? ] curry <control> ;
 
 : <radio-box> ( model assoc -- gadget )

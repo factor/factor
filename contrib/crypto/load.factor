@@ -1,7 +1,9 @@
 REQUIRES: math ;
 
 PROVIDE: crypto {
+
     "common.factor"
+    "timing.factor"
     "base64.factor"
     "barrett.factor"
     "montgomery.factor"

@@ -13,35 +13,44 @@ SYMBOL: line-number
 SYMBOL: line-text
 SYMBOL: column
 
+TUPLE: check-vocab name ;
 : check-vocab ( name -- vocab )
     dup vocab [ ] [
-        "No such vocabulary: " swap >string append throw
+        <check-vocab>
+        { { "Continue" f } } condition
     ] ?if ;
 
-: use+ ( string -- ) check-vocab use get push ;
+: use+ ( vocab -- ) check-vocab [ use get push ] when* ;
 
 : add-use ( seq -- ) [ use+ ] each ;
 
-: set-use ( seq -- ) [ check-vocab ] map >vector use set ;
+: set-use ( seq -- )
+    [ check-vocab ] map [ ] subset >vector use set ;
 
-: set-in ( name -- ) dup ensure-vocab dup in set use+ ;
+: set-in ( name -- )
+    dup string?
+    [ "Vocabulary name must be a string" throw ] unless
+    dup ensure-vocab dup in set use+ ;
 
-: parsing? ( word -- ? )
+: parsing? ( obj -- ? )
     dup word? [ "parsing" word-prop ] [ drop f ] if ;
 
-: save-location ( word -- )
-    dup set-word
-    dup line-number get "line" set-word-prop
-    file get "file" set-word-prop ;
+: location ( -- loc )
+    file get line-number get 2dup and
+    [ 2array ] [ 2drop f ] if ;
 
-: create-in in get create dup save-location ;
+: save-location ( word -- )
+    dup set-word location "loc" set-word-prop ;
+
+: create-in ( string -- word )
+    in get create dup save-location ;
 
 : create-constructor ( class -- word )
     word-name in get constructor-word dup save-location ;
 
 TUPLE: parse-error file line col text ;
 
-C: parse-error ( error -- error )
+C: parse-error ( msg -- error )
     file get over set-parse-error-file
     line-number get over set-parse-error-line
     column get over set-parse-error-col

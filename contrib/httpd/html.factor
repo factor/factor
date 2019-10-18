@@ -6,7 +6,7 @@ words xml ;
 IN: html
 
 : hex-color, ( triplet -- )
-    3 swap head
+    3 head-slice
     [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
 
 : fg-css, ( color -- )

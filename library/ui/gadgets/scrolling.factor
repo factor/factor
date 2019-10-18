@@ -9,7 +9,7 @@ gadgets-viewports generic kernel math namespaces sequences ;
 ! down on the next relayout.
 TUPLE: scroller viewport x y follows ;
 
-: scroller-origin ( scroller -- { x y } )
+: scroller-origin ( scroller -- point )
     dup scroller-x slider-value
     swap scroller-y slider-value
     2array ;
@@ -57,21 +57,42 @@ C: scroller ( gadget -- scroller )
     dupd over scroller-y update-slider
     position-viewport ;
 
+: (scroll>rect) ( rect scroller -- )
+    [ scroller-origin vneg offset-rect viewport-rect ] keep
+    [
+        scroller-viewport 2rect-extent
+        >r >r v- { 0 0 } vmin r> r> v- { 0 0 } vmax v+
+    ] keep dup scroller-origin rot v+ scroll ;
+
+: scroll>rect ( rect gadget -- )
+    find-scroller dup [
+        [ set-scroller-follows ] keep relayout
+    ] [
+        2drop
+    ] if ;
+
 : scroll>bottom ( gadget -- )
-    find-scroller [ t swap set-scroller-follows ] when* ;
+    t swap scroll>rect ;
+
+: (scroll>bottom) ( scroller -- )
+    dup scroller-viewport viewport-dim { 0 1 } v* scroll ;
 
 : update-scroller ( scroller -- )
-    dup dup scroller-follows [
-        f over set-scroller-follows
-        scroller-viewport viewport-dim { 0 1 } v*
+    dup scroller-follows [
+        dup scroller-follows t eq? [
+            dup (scroll>bottom)
+        ] [
+            dup scroller-follows over (scroll>rect)
+        ] if
+        f swap set-scroller-follows
     ] [
-        scroller-origin
-    ] if scroll ;
+        dup scroller-origin scroll
+    ] if ;
 
-M: scroller layout* ( scroller -- )
+M: scroller layout*
     dup delegate layout*
     dup layout-children
     update-scroller ;
 
-M: scroller focusable-child* ( scroller -- viewport )
+M: scroller focusable-child*
     scroller-viewport ;

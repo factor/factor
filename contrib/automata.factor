@@ -8,7 +8,7 @@ REQUIRES: math slate vars ;
 
 USING: parser kernel hashtables namespaces sequences math io
 math-contrib threads strings arrays prettyprint
-gadgets gadgets-editors gadgets-frames gadgets-buttons gadgets-grids
+gadgets gadgets-text gadgets-frames gadgets-buttons gadgets-grids
 vars slate ;
 
 IN: automata
@@ -85,7 +85,7 @@ dup last 1array swap dup first 1array append append ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: center-i ( -- i ) window-width dup 2 / >fixnum ;
+: center-i ( -- i ) window-width 2 / >fixnum ;
 
 : center-line ( -- line ) center-i window-width [ = [ 1 ] [ 0 ] if ] map-with ;
 
@@ -151,29 +151,32 @@ white set-clear-color black set-color clear-window ;
 ! automata-window
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: [bind] ( ns quot -- quot ) \ bind 3array >quotation ;
+
 : bind-button ( ns button -- )
 tuck button-quot \ bind 3array >quotation swap set-button-quot ;
 
-VARS: ns editor frame ;
+VARS: ns field frame ;
 
 : init-slate ( -- ) <slate> t over set-gadget-clipped? self set ;
 
-: init-editor ( -- ) "" <editor> >editor ;
+: init-field ( -- )
+f ns> [ editor-text string>number set-rule start-center ] [bind] <field>
+>field ;
 
-: set-editor-rule ( n -- ) number>string editor> set-editor-text ;
+: read-rule-field ( -- ) field> editor-text string>number set-rule ;
 
-: open-rule ( -- ) editor> editor-text string>number set-rule start-center ;
+: set-field-rule ( n -- ) number>string field> set-editor-text ;
 
 : automata-window ( -- )
 <frame> >frame
 [ ] make-hash >ns
-ns> [ init-rule init-slate init-editor ] bind
-ns> [ editor> ] bind 1array
+ns> [ init-rule init-slate init-field ] bind
+ns> [ field> ] bind 1array
 ns>
-{ { "Open"     [ open-rule ]  }
-  { "Center"   [ start-center ] }
-  { "Random"   [ start-random ] }
-  { "Continue" [ run-rule ] } }
+{ { "Center"   [ drop read-rule-field start-center ] }
+  { "Random"   [ drop read-rule-field start-random ] }
+  { "Continue" [ drop read-rule-field run-rule ] } }
 [ first2 <bevel-button> tuck bind-button ]
 map-with append make-pile 1 over set-pack-fill
 frame> @left grid-add
@@ -181,7 +184,7 @@ ns> [ self get ] bind
 frame> @center grid-add
 frame> "Cellular Automata" open-titled-window
 1000 sleep
-ns> [ interesting random-item set-editor-rule open-rule ] bind ;
+ns> [ interesting random-item dup set-field-rule set-rule start-center ] bind ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

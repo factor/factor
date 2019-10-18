@@ -4,13 +4,26 @@ IN: help
 DEFER: remove-word-help
 
 IN: words
-USING: arrays errors graphs hashtables kernel kernel-internals
-math namespaces sequences strings vectors ;
+USING: arrays definitions errors generic graphs hashtables
+kernel kernel-internals math namespaces sequences strings
+vectors ;
+
+! Used by the compiler
+SYMBOL: changed-words
+
+: word-changed? ( word -- ? )
+    changed-words get [ hash-member? ] [ drop f ] if* ;
+
+: changed-word ( word -- )
+    dup changed-words get [ set-hash ] [ 2drop ] if* ;
+
+: unchanged-word ( word -- )
+    changed-words get [ remove-hash ] [ drop ] if* ;
 
 M: word <=>
     [ dup word-name swap word-vocabulary 2array ] 2apply <=> ;
 
-GENERIC: definer ( word -- word )
+GENERIC: definer ( word -- definer )
 
 PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 M: undefined definer drop \ DEFER: ;
@@ -36,11 +49,11 @@ M: symbol definer drop \ SYMBOL: ;
     [ rot word-props set-hash ]
     [ nip remove-word-prop ] if ;
 
-GENERIC: word-xt
-M: word word-xt ( w -- xt ) 7 integer-slot ;
+GENERIC: word-xt ( word -- xt )
+M: word word-xt 7 integer-slot ;
 
-GENERIC: set-word-xt
-M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
+GENERIC: set-word-xt ( xt word -- )
+M: word set-word-xt 7 set-integer-slot ;
 
 SYMBOL: vocabularies
 
@@ -48,12 +61,12 @@ SYMBOL: vocabularies
 
 : lookup ( name vocab -- word ) vocab ?hash ;
 
-: target-word ( word -- word )
+: target-word ( word -- target )
     dup word-name swap word-vocabulary lookup ;
 
 : interned? ( word -- ? ) dup target-word eq? ;
 
-: uses ( word -- uses )
+: uses ( word -- seq )
     word-def flatten
     [ word? ] subset
     [ global [ interned? ] bind ] subset
@@ -70,15 +83,25 @@ SYMBOL: crossref
 
 : usage ( word -- seq ) crossref get in-edges ;
 
-GENERIC: unxref-word* ( word -- )
+: reset-props ( word seq -- ) [ remove-word-prop ] each-with ;
 
-M: word unxref-word* drop ;
+: unxref-word* ( word -- )
+    {
+        { [ dup compound? not ] [ drop ] }
+        { [ dup "infer" word-prop ] [ drop ] }
+        { [ t ] [
+            dup changed-word
+            { "infer-effect" "base-case" "no-effect" }
+            reset-props
+        ] }
+    } cond ;
 
 : unxref-word ( word -- )
     dup [ usage ] closure [ unxref-word* ] each
     [ uses ] crossref get remove-vertex ;
 
-: define ( word parameter primitive -- )
+: define ( word def primitive -- )
+    pick changed-word
     pick unxref-word
     pick set-word-primitive
     over set-word-def
@@ -92,10 +115,11 @@ M: word unxref-word* drop ;
 
 : define-compound ( word def -- ) 1 define ;
 
-: reset-props ( word seq -- ) [ remove-word-prop ] each-with ;
-
 : reset-word ( word -- )
-    { "parsing" "inline" "foldable" "predicating" } reset-props ;
+    {
+        "parsing" "inline" "foldable"
+        "predicating" "declared-effect"
+    } reset-props ;
 
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;
@@ -108,9 +132,6 @@ M: word unxref-word* drop ;
 : define-temp ( quot -- word )
     gensym [ swap define-compound ] keep ;
 
-: completions ( substring words -- seq )
-    [ word-name subseq? ] subset-with ;
-
 SYMBOL: bootstrapping?
 
 : word ( -- word ) \ word get-global ;
@@ -121,14 +142,14 @@ SYMBOL: bootstrapping?
 
 : ensure-vocab ( name -- ) vocabularies get [ nest drop ] bind ;
 
-: words ( vocab -- list ) vocab dup [ hash-values ] when ;
+: words ( vocab -- seq ) vocab dup [ hash-values ] when ;
 
-: all-words ( -- list ) vocabs [ words ] map concat ;
+: all-words ( -- seq ) vocabs [ words ] map concat ;
 
-: word-subset ( pred -- list )
+: word-subset ( quot -- seq )
     all-words swap subset ; inline
 
-: word-subset-with ( obj pred -- list | pred: obj word -- ? )
+: word-subset-with ( obj quot -- seq )
     all-words swap subset-with ; inline
 
 : xref-words ( -- )
@@ -139,31 +160,42 @@ SYMBOL: bootstrapping?
         dup word-name over word-vocabulary nest set-hash
     ] bind ;
 
-: check-create ( name vocab -- )
-    string? [ "Vocabulary name is not a string" throw ] unless
-    string? [ "Word name is not a string" throw ] unless ;
+TUPLE: check-create name vocab ;
+: check-create ( name vocab -- name vocab )
+    dup string? [ <check-create> throw ] unless
+    over string? [ <check-create> throw ] unless ;
 
 : create ( name vocab -- word )
-    2dup check-create 2dup lookup dup
+    check-create 2dup lookup dup
     [ 2nip ] [ drop <word> dup reveal ] if ;
 
-: constructor-word ( string vocab -- word )
+: constructor-word ( name vocab -- word )
     >r "<" swap ">" append3 r> create ;
-
-: forget ( word -- )
-    dup unxref-word
-    dup remove-word-help
-    dup "forget-hook" word-prop call
-    crossref get [ dupd remove-hash ] when*
-    dup word-name swap word-vocabulary vocab remove-hash ;
 
 : forget-vocab ( vocab -- )
     words [ forget ] each ;
 
-: bootstrap-word ( word -- word )
+: bootstrap-word ( word -- target )
     bootstrapping? get [
         dup word-name swap word-vocabulary
         dup "syntax" = [
             drop "!syntax" >r "!" swap append r>
         ] when lookup
     ] when ;
+
+: words-named ( str -- seq )
+    all-words [ word-name = ] subset-with ;
+
+! Definition protocol
+M: word where* "loc" word-prop ;
+
+M: word subdefs drop f ;
+
+: forget-word ( word -- )
+    dup unxref-word
+    dup remove-word-help
+    dup unchanged-word
+    crossref get [ dupd remove-hash ] when*
+    dup word-name swap word-vocabulary vocab remove-hash ;
+
+M: word forget forget-word ;

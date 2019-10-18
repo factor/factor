@@ -1,26 +1,26 @@
 IN: graphs
 USING: help ;
 
-HELP: add-vertex "( vertex edges graph -- )"
+HELP: add-vertex
 { $values { "vertex" "an object" } { "edges" "a quotation with stack effect " { $snippet "( vertex -- seq )" } } { "graph" "a hashtable mapping vertices to sequences of edges" } }
 { $description "Adds a vertex to a directed graph, using the " { $snippet "edges" } " quotation to generate a sequence of edges leaving the vertex." }
 { $side-effects "graph" } ;
 
-HELP: build-graph "( seq edges graph -- )"
+HELP: build-graph
 { $values { "seq" "a sequence" } { "edges" "a quotation with stack effect " { $snippet "( vertex -- seq )" } } { "graph" "a hashtable mapping vertices to sequences of edges" } }
 { $description "Removes all vertices from the graph, then reconstructs it using the given sequence of vertices and quotation to generate a sequence of edges leaving each vertex." }
 { $side-effects "graph" } ;
 
-HELP: remove-vertex "( vertex edges graph -- )"
+HELP: remove-vertex
 { $values { "vertex" "an object" } { "edges" "a quotation with stack effect " { $snippet "( vertex -- seq )" } } { "graph" "a hashtable mapping vertices to sequences of edges" } }
 { $description "Removes a vertex from a graph, using the quotation to generate a sequence of edges leaving the vertex." } 
 { $notes "The " { $snippet "edges" } " quotation must produce the same return value as it did when " { $link add-vertex } " was called, otherwise some vertices of the graph may continue to refer to the removed vertex." }
 { $side-effects "graph" } ;
 
-HELP: in-edges "( vertex graph -- seq )"
+HELP: in-edges
 { $values { "vertex" "an object" } { "graph" "a hashtable mapping vertices to sequences of edges" } { "seq" "a sequence of vertices" } }
 { $description "Outputs a sequence of vertices incident to an edge entering the given vertex." } ;
 
-HELP: closure "( vertex quot -- seq )"
-{ $values { "vertex" "an object" } { "quot" "a a quotation with stack effect " { $snippet "( vertex -- seq )" } } { "seq" "a sequence of vertices" } }
+HELP: closure
+{ $values { "obj" "an object" } { "quot" "a a quotation with stack effect " { $snippet "( obj -- seq )" } } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all vertices reachable from " { $snippet "vertex" } " via edges given by the quotation. This sequence always includes " { $snippet "vertex" } "." } ; 

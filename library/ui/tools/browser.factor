@@ -1,169 +1,106 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: arrays sequences kernel gadgets-panes definitions
+prettyprint gadgets-theme gadgets-borders gadgets
+generic gadgets-scrolling math io words models styles
+namespaces gadgets-tracks gadgets-presentations gadgets-grids
+gadgets-frames help gadgets-buttons gadgets-search ;
 IN: gadgets-browser
-USING: arrays gadgets gadgets-books gadgets-borders
-gadgets-buttons gadgets-frames gadgets-labels gadgets-panes
-gadgets-presentations gadgets-scrolling gadgets-search
-gadgets-theme gadgets-tiles gadgets-tracks generic hashtables
-help inspector kernel math models namespaces prettyprint
-sequences styles words ;
 
-TUPLE: asset-track showing builder closer ;
+TUPLE: browser navigator definitions search ;
 
-C: asset-track ( builder closer -- gadget )
-    { 0 1 } <track> over set-delegate
-    H{ } clone over set-asset-track-showing
-    [ set-asset-track-closer ] keep
-    [ set-asset-track-builder ] keep ;
+TUPLE: definitions showing ;
 
-: showing-asset? ( asset track -- ? )
-    asset-track-showing hash-member? ;
+: find-definitions ( gadget -- definitions )
+    [ definitions? ] find-parent ;
 
-: (show-asset) ( gadget asset track -- )
-    [ asset-track-showing set-hash ] 3keep nip track-add ;
+: definition-index ( definition definitions -- n )
+    definitions-showing index ;
 
-: show-asset ( asset track -- )
-    2dup showing-asset? [
-        2drop
-    ] [
-        [ asset-track-builder call ] 2keep (show-asset)
-    ] if ;
+: close-definition ( gadget definition -- )
+    over find-definitions definitions-showing delete
+    unparent ;
 
-: hide-asset ( asset track -- )
-    [ dup asset-track-closer call ] 2keep
-    [ asset-track-showing remove-hash* ] keep track-remove ;
+: close-definitions ( definitions -- )
+    dup clear-gadget definitions-showing delete-all ;
 
-TUPLE: browser track page ;
+C: definitions ( -- gadget )
+    <pile> over set-delegate
+    { 2 2 } over set-pack-gap
+    V{ } clone over set-definitions-showing ;
 
-TUPLE: browser-tracks vocabs words ;
+TUPLE: tile definition gadget ;
 
-: browser-vocab-track browser-track browser-tracks-vocabs ;
-
-: browser-word-track browser-track browser-tracks-words ;
-
-: find-browser [ browser? ] find-parent ;
+: find-tile [ tile? ] find-parent ;
 
 : close-tile ( tile -- )
-    dup gadget-parent [
-        asset-track-showing hash>alist rassoc
-    ] keep hide-asset ;
+    dup tile-definition over find-definitions
+    definitions-showing delete
+    unparent ;
 
-: <browser-tile> ( gadget title -- gadget )
-    [ close-tile ] <tile> ;
+: <tile-content> ( definition toolbar -- gadget )
+    >r [ see ] make-pane r> 2array
+    make-pile { 5 5 } over set-pack-gap
+    <default-border> dup faint-boundary ;
 
-: showing-word? ( word browser -- ? )
-    browser-word-track showing-asset? ;
+C: tile ( definition -- gadget )
+    2dup <toolbar> <tile-content> over set-gadget-delegate
+    [ set-tile-definition ] keep ;
 
-DEFER: show-vocab
+: show-definition ( definition definitions -- )
+    2dup definition-index dup 0 >= [
+        over nth-gadget swap scroll>rect drop
+    ] [
+        drop 2dup definitions-showing push
+        swap <tile> over add-gadget
+        scroll>bottom
+    ] if ;
 
-: browser-tabs
+: <list-control> ( model quot -- gadget )
+    [ map [ first2 write-object terpri ] each ] curry
+    <pane-control> ;
+
+TUPLE: navigator vocab ;
+
+: <vocab-list> ( -- gadget )
+    vocabs <model> [ dup <vocab-link> 2array ]
+    <list-control> ;
+
+: <word-list> ( model -- gadget )
+    gadget get navigator-vocab
+    [ words natural-sort ] <filter>
+    [ dup word-name swap 2array ]
+    <list-control> ;
+
+C: navigator ( -- gadget )
+    f <model> over set-navigator-vocab
     {
-        { "Documentation" [ help ] }
-        { "Definition"    [ see ] } 
-        { "Calls in"      [ usage. ] }
-        { "Properties"    [ word-props describe ] }
-    } ;
+        { [ <vocab-list> ] f [ <scroller> ] 1/2 }
+        { [ <word-list> ] f [ <scroller> ] 1/2 }
+    } { 1 0 } make-track* ;
 
-: <word-book> ( model word -- book )
-    browser-tabs [ second ] map make-book ;
+C: browser ( -- gadget )
+    {
+        { [ <navigator> ] set-browser-navigator f 1/5 }
+        { [ <definitions> ] set-browser-definitions [ <scroller> ] 3/5 }
+        { [ [ apropos ] <search-gadget> ] set-browser-search f 1/5 }
+    } { 0 1 } make-track* ;
 
-: <word-view> ( word browser -- gadget )
-    browser-page swap [ <word-book> ] keep
-    word-name <browser-tile> ;
+M: browser focusable-child* browser-search ;
+
+: show-vocab ( vocab browser -- )
+    browser-navigator navigator-vocab set-model* ;
 
 : show-word ( word browser -- )
     over word-vocabulary over show-vocab
-    browser-word-track show-asset ;
+    browser-definitions show-definition ;
 
-: hide-word ( word browser -- )
-    browser-word-track hide-asset ;
+: clear-browser ( browser -- )
+    browser-definitions close-definitions ;
 
-: toggle-word ( word browser -- )
-    2dup showing-word? [ hide-word ] [ show-word ] if ;
-
-: <word-button> ( word -- gadget )
-    dup word-name swap
-    [ swap find-browser toggle-word ] curry
-    <roll-button> ;
-
-: <vocab-view> ( vocab -- gadget )
-    [
-        words natural-sort
-        [ <word-button> ] map make-pile <scroller>
-    ] keep <browser-tile> ;
-
-: showing-vocab? ( vocab browser -- ? )
-    browser-vocab-track showing-asset? ;
-
-: show-vocab ( vocab browser -- )
-    over [ browser-vocab-track show-asset ] [ 2drop ] if ;
-
-: hide-vocab-words ( vocab browser -- )
-    [
-        browser-word-track asset-track-showing hash-keys
-        [ word-vocabulary = ] subset-with
-    ] keep swap [ swap hide-word ] each-with ;
-
-: hide-vocab ( vocab browser -- )
-    browser-vocab-track hide-asset ;
-
-: toggle-vocab ( word browser -- )
-    2dup showing-vocab? [ hide-vocab ] [ show-vocab ] if ;
-
-: <vocab-button> ( vocab -- gadget )
-    dup [ swap find-browser toggle-vocab ] curry
-    <roll-button> ;
-
-: <vocabs> ( -- gadget )
-    vocabs [ <vocab-button> ] map make-pile <scroller>
-    "Vocabularies" f <tile> ;
-
-: <vocab-track> ( -- track )
-    [ <vocab-view> ] [ find-browser hide-vocab-words ]
-    <asset-track> ;
-
-: <word-track> ( browser -- track )
-    [ <word-view> ] curry [ 2drop ] <asset-track> ;
-
-C: browser-tracks ( browser -- browser-track )
+browser {
     {
-        { [ <vocabs> ] f f 1/5 }
-        { [ <vocab-track> ] set-browser-tracks-vocabs f 1/5 }
-        { [ <word-track> ] set-browser-tracks-words f 3/5 }
-    } { 1 0 } make-track* ;
-
-: <browser-tabs> ( browser -- tabs )
-    browser-page
-    browser-tabs dup length [ swap first 2array ] 2map
-    <radio-box> ;
-
-: <browser-toolbar> ( browser -- toolbar )
-    [
-        <browser-tabs> ,
-        <spacing> ,
-        "Apropos" [ drop apropos-window ] <bevel-button> ,
-    ] make-toolbar ;
-
-C: browser ( -- browser )
-    0 <model> over set-browser-page
-    dup dup {
-        { [ <browser-toolbar> ] f f @top }
-        { [ <browser-tracks> ] set-browser-track f @center }
-    } make-frame* ;
-
-M: browser gadget-title drop "Browser" <model> ;
-
-: browser-window ( -- ) <browser> open-window ;
-
-: browse ( obj browser -- )
-    over vocab-link? [
-        >r vocab-link-name r> show-vocab
-    ] [
-        show-word
-    ] if ;
-
-: browser-tool [ browser? ] [ <browser> ] [ browse ] ;
-
-M: word show ( word -- ) browser-tool call-tool ;
-
-M: vocab-link show ( vocab -- ) browser-tool call-tool ;
+        "Browser"
+        { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
+    }
+} define-commands

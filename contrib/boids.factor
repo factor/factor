@@ -8,43 +8,13 @@
 ! results, increase the size of the window (larger than 400x400 is
 ! good). Then press the "Reset" button to start the demo over.
 
-REQUIRES: math slate vars ;
+REQUIRES: math slate vars action-field ;
 
 USING: generic threads namespaces math kernel sequences arrays gadgets
-       math-contrib slate vars ;
+       gadgets-labels gadgets-theme gadgets-text gadgets-buttons gadgets-frames
+       gadgets-grids math-contrib slate vars action-field ;
 
 IN: boids
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: separation-radius
-SYMBOL: alignment-radius
-SYMBOL: cohesion-radius
-
-SYMBOL: separation-view-angle
-SYMBOL: alignment-view-angle
-SYMBOL: cohesion-view-angle
-
-SYMBOL: separation-weight
-SYMBOL: alignment-weight
-SYMBOL: cohesion-weight
-
-: init-variables ( -- )
-25 separation-radius set
-50 alignment-radius set
-75 cohesion-radius set
-
-180 separation-view-angle set
-180 alignment-view-angle set
-180 cohesion-view-angle set
-
-1.0 separation-weight set
-1.0 alignment-weight set
-1.0 cohesion-weight set ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: world-size
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -52,7 +22,38 @@ TUPLE: boid pos vel ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+VAR: boids
+VAR: world-size
 VAR: time-slice
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: cohesion-weight
+VAR: alignment-weight
+VAR: separation-weight
+
+VAR: cohesion-view-angle
+VAR: alignment-view-angle
+VAR: separation-view-angle
+
+VAR: cohesion-radius
+VAR: alignment-radius
+VAR: separation-radius
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init-variables ( -- )
+1.0 >cohesion-weight
+1.0 >alignment-weight
+1.0 >separation-weight
+
+75 >cohesion-radius
+50 >alignment-radius
+25 >separation-radius
+
+180 >cohesion-view-angle
+180 >alignment-view-angle
+180 >separation-view-angle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! random-boid and random-boids
@@ -67,10 +68,6 @@ VAR: time-slice
 : random-boid ( -- boid ) random-pos random-vel <boid> ;
 
 : random-boids ( n -- boids ) [ drop random-boid ] map ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! draw-boid
@@ -114,14 +111,23 @@ over boid-vel -rot relative-position angle-between ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: subset-with ( obj seq quot -- seq ) [ dupd ] swap append subset ;
+: within-radius? ( self other radius -- ? ) >r distance r> <= ;
+
+: within-view-angle? ( self other angle -- ? ) >r relative-angle r> 2 / <= ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: within-radius? ( self other radius -- ? ) >r distance r> <= ;
+: within-cohesion-radius? ( self other -- ? )
+  cohesion-radius get within-radius? ;
 
-: within-view-angle? ( self other view-angle -- ? )
-  >r relative-angle r> 2 / <= ;
+: within-cohesion-view? ( self other -- ? )
+  cohesion-view-angle get within-view-angle? ;
+
+: within-cohesion-neighborhood? ( self other -- ? )
+  [ eq? not ] 2keep
+  [ within-cohesion-radius? ] 2keep
+  within-cohesion-view?
+  and and ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -153,59 +159,39 @@ over boid-vel -rot relative-position angle-between ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: within-cohesion-radius? ( self other -- ? )
-  cohesion-radius get within-radius? ;
-
-: within-cohesion-view? ( self other -- ? )
-  cohesion-view-angle get within-view-angle? ;
-
-: within-cohesion-neighborhood? ( self other -- ? )
-  [ eq? not ] 2keep
-  [ within-cohesion-radius? ] 2keep
-  within-cohesion-view?
-  and and ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: separation-force ( self -- force )
-  ! boids get [ within-separation-neighborhood? ] subset-with
-  boids get [ >r dup r> within-separation-neighborhood? ] subset
-  dup length 0 =
-  [ drop drop { 0 0 } ]
-  [ average-position
-    >r boid-pos r> v-
-    normalize
-    separation-weight get
-    v*n ]
-  if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: alignment-force ( self -- force )
-  ! boids get [ within-alignment-neighborhood? ] subset-with
-  boids get [ >r dup r> within-alignment-neighborhood? ] subset swap drop
-  dup length 0 =
-  [ drop { 0 0 } ]
-  [ average-velocity
-    normalize
-    alignment-weight get
-    v*n ]
-  if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: cohesion-neighborhood ( self -- boids )
+boids> [ within-cohesion-neighborhood? ] subset-with ;
 
 : cohesion-force ( self -- force )
-  ! boids get [ within-cohesion-neighborhood? ] subset-with
-  boids get [ >r dup r> within-cohesion-neighborhood? ] subset
-  dup length 0 =
-  [ drop drop { 0 0 } ]
-  [ average-position
-    swap ! avg-pos self
-    boid-pos v-
-    normalize
-    cohesion-weight get
-    v*n ]
-  if ;
+dup cohesion-neighborhood
+dup length 0 =
+[ 2drop { 0 0 } ]
+[ average-position swap boid-pos v- normalize cohesion-weight> v*n ]
+if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: separation-neighborhood ( self -- boids )
+boids> [ within-separation-neighborhood? ] subset-with ;
+
+: separation-force ( self -- force )
+dup separation-neighborhood
+dup length 0 =
+[ 2drop { 0 0 } ]
+[ average-position swap boid-pos swap v- normalize separation-weight> v*n ]
+if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: alignment-neighborhood ( self -- boids )
+boids> [ within-alignment-neighborhood? ] subset-with ;
+
+: alignment-force ( self -- force )
+alignment-neighborhood
+dup length 0 =
+[ drop { 0 0 } ]
+[ average-velocity normalize alignment-weight get v*n ]
+if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -250,26 +236,7 @@ cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : new-pos ( boid -- pos )
-!   dup >r   boid-pos   r> boid-vel time-slice get v*n   v+ ;
-
-! : new-vel ( boid -- vel )
-!   dup >r   boid-vel   r> acceleration time-slice get v*n   v+ ;
-
-! : new-vel ( boid -- vel )
-!   dup boid-vel swap acceleration time-slice get v*n   v+ ;
-
-! : wrap-x ( x -- x )
-!   dup   0 world-size get nth   >=   [ drop 0 ] when
-!   dup   0 < [ drop 0 world-size get nth   1 - ] when ;
-
-! : wrap-y ( y -- y )
-!   dup   1 world-size get nth   >=   [ drop 0 ] when
-!   dup   0 < [ drop 1 world-size get nth   1 - ] when ;
-
 : new-pos ( boid -- pos ) dup boid-vel time-slice> v*n swap boid-pos v+ ;
-
-! : new-vel ( boid -- vel ) dup acceleration time-slice> v*n swap boid-vel v+ ;
 
 : new-vel ( boid -- vel )
 dup acceleration time-slice> v*n swap boid-vel v+ normalize ;
@@ -280,7 +247,7 @@ dup acceleration time-slice> v*n swap boid-vel v+ normalize ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: iterate-boids ( -- ) boids get [ iterate-boid ] map boids set ;
+: iterate-boids ( -- ) boids> [ iterate-boid ] map >boids ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -292,7 +259,7 @@ boids get [ draw-boid ] each   flush-dlist flush-slate ;
 
 ! : run-boids ( -- ) iterate-boids clear-window draw-boids 1 sleep run-boids ;
 
-SYMBOL: stop?
+VAR: stop?
 
 : run-boids ( -- )
 self get rect-dim world-size set
@@ -315,109 +282,75 @@ f stop? set
 run-boids ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Boids ui
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USING: gadgets-frames gadgets-labels gadgets-theme gadgets-grids
-       gadgets-editors gadgets-buttons ;
-
-! USING: kernel arrays gadgets  gadgets-labels gadgets-editors vars ;
-
-TUPLE: field label editor quot ;
-
-VAR: field
-
-C: field ( label-text editor-text quot -- <field> )
-[ field ]
-[ field> set-field-quot
-  <editor> field> set-field-editor
-  <label> field> set-field-label
-  field> field-label field> field-editor 2array make-shelf
-  field> set-gadget-delegate
-  field> ]
-let ;
-
-M: field gadget-gestures
-drop H{ { T{ key-down f f "RETURN" } [ dup field-quot call ] } } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: [bind] ( ns quot -- quot ) \ bind 3array >quotation ;
-
+! boids-window
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 VARS: ns frame ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: control-panel-label ( string -- array )
+<label> dup reverse-video-theme ;
 
-: number-symbol-field ( label init symbol -- <field> )
-1array >quotation [ set ] append
-[ field-editor editor-text string>number ]
-swap append
-ns> swap [bind]
-<field> ;
+: control-panel-field ( label variable init -- shelf )
+rot <label> -rot
+swap number-field ns> over bind-action-field tuck set-editor-text
+2array make-shelf ;
+
+: control-panel-button ( string quot -- button ) ns> swap [bind] <bevel-button> ;
+
+: control-panel ( -- pile )
+{ [ "Weight" control-panel-label ]
+  [ "Alignment:  " alignment-weight "1" control-panel-field ]
+  [ "Cohesion:   " cohesion-weight  "1" control-panel-field ]
+  [ "Separation: " alignment-weight "1" control-panel-field ]
+  [ "Radius" control-panel-label ]
+  [ "Alignment:  " alignment-radius "1" control-panel-field ]
+  [ "Cohesion:   " cohesion-radius  "1" control-panel-field ]
+  [ "Separation: " alignment-radius "1" control-panel-field ]
+  [ "View Angle" control-panel-label ]
+  [ "Alignment:  " alignment-view-angle "1" control-panel-field ]
+  [ "Cohesion:   " cohesion-view-angle  "1" control-panel-field ]
+  [ "Separation: " alignment-view-angle "1" control-panel-field ]
+  [ "" control-panel-label ]
+  [ "Time slice: " time-slice "10" control-panel-field ]
+  [ "Stop"  [ drop t stop? set ]                         control-panel-button ]
+  [ "Start" [ drop f stop? set [ run-boids ] in-thread ] control-panel-button ]
+  [ "Reset" [ drop 50 random-boids boids set ]           control-panel-button ]
+} [ call ] map make-pile 1 over set-pack-fill ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : init-slate ( -- ) <slate> t over set-gadget-clipped? self set ;
 
-: boids-window ( -- )
+: boids-init ( -- )
+init-slate
+init-variables
+10 >time-slice
+100 capacity set
+{ 100 100 } >world-size
+50 random-boids >boids
+stop? off ;
+
+: boids-frame ( -- frame )
 <frame> >frame
 [ ] make-hash >ns
-
-ns> [ init-slate
-      init-variables
-      10 time-slice set
-      100 capacity set
-      { 100 100 } world-size set
-      50 random-boids boids set
-      f stop? set
-] bind
-
-"Weight" <label> dup title-theme 1array
-"Alignment:  " "1" alignment-weight  number-symbol-field
-"Cohesion:   " "1" cohesion-weight   number-symbol-field
-"Separation: " "1" separation-weight number-symbol-field
-3array append
-
-"Radius" <label> dup title-theme 1array
-"Alignment:  " "50" alignment-radius  number-symbol-field
-"Cohesion:   " "75" cohesion-radius   number-symbol-field
-"Separation: " "25" separation-radius number-symbol-field
-3array append
-
-"View angle" <label> dup title-theme 1array
-"Alignment:  " "180" alignment-view-angle  number-symbol-field
-"Cohesion:   " "180" cohesion-view-angle   number-symbol-field
-"Separation: " "180" separation-view-angle number-symbol-field
-3array append
-
-"" <label> dup title-theme 1array
-
-"Time slice: " "10" time-slice number-symbol-field 1array
-
-"Stop" ns> [ t stop? set ] [bind] <bevel-button>
-"Start" ns> [ f stop? set [ run-boids ] in-thread ] [bind] <bevel-button>
-"Reset" ns> [ 50 random-boids boids set ] [bind] <bevel-button>
-3array
-
-append append append append append
-make-pile 1 over set-pack-fill frame> @left grid-add
-
+ns> [ boids-init ] bind
+control-panel frame> @left grid-add
 ns> [ self get ] bind frame> @center grid-add
-frame> "Boids" open-titled-window
-ns> [ 1000 sleep [ run-boids ] in-thread ] bind
-;
+frame> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Comments from others:
+
+TUPLE: boids-gadget ;
+
+C: boids-gadget ( -- boids-gadget ) boids-frame over set-gadget-delegate ;
+
+M: boids-gadget pref-dim* { 400 300 } ;
+
+: boids-window ( -- )
+<boids-gadget> "Boids" open-titled-window
+ns> [ 1000 sleep [ run-boids ] in-thread ] bind ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! slava foo get blah foo set ==> foo [ blah ] change
-! slava dup >r blah r> ==> [ blah ] keep
-
-! : execute-with ( item [ word word ... ] -- results ... )
-!   [ over >r execute r> ] each drop ;
 
 PROVIDE: boids ;
 

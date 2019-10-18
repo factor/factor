@@ -156,7 +156,7 @@ SYMBOL: old-d
 IN: crypto
 : string>md5 ( string -- md5 )
     [
-        initialize-md5 pad-string-md5
+        initialize-md5 f preprocess-plaintext
         dup length num-blocks [ 2dup get-block process-md5-block ] repeat
         drop get-md5
     ] with-scope ;

@@ -6,24 +6,25 @@ USING: errors generic kernel math sequences-internals vectors ;
 ! A reversal of an underlying sequence.
 TUPLE: reversed seq ;
 
-: reversed@ reversed-seq [ length swap - 1- ] keep ; inline
+: reversed@ ( m reversed -- n seq )
+    reversed-seq [ length swap - 1- ] keep ; inline
 
-M: reversed length ( seq -- n ) reversed-seq length ;
+M: reversed length reversed-seq length ;
 
-M: reversed nth ( n seq -- elt ) reversed@ nth ;
+M: reversed nth reversed@ nth ;
 
-M: reversed nth-unsafe ( n seq -- elt ) reversed@ nth-unsafe ;
+M: reversed nth-unsafe reversed@ nth-unsafe ;
 
-M: reversed set-nth ( elt n seq -- ) reversed@ set-nth ;
+M: reversed set-nth reversed@ set-nth ;
 
-M: reversed set-nth-unsafe ( elt n seq -- )
+M: reversed set-nth-unsafe
     reversed@ set-nth-unsafe ;
 
-M: reversed like ( seq reversed -- seq ) reversed-seq like ;
+M: reversed like reversed-seq like ;
 
-M: reversed thaw ( seq -- seq ) reversed-seq thaw ;
+M: reversed thaw reversed-seq thaw ;
 
-: reverse ( seq -- seq ) [ <reversed> ] keep like ;
+: reverse ( seq -- newseq ) [ <reversed> ] keep like ;
 
 ! A slice of another sequence.
 TUPLE: slice seq from to ;
@@ -31,12 +32,15 @@ TUPLE: slice seq from to ;
 : collapse-slice ( from to slice -- from to seq )
     dup slice-from swap slice-seq >r tuck + >r + r> r> ;
 
-: check-slice ( from to seq -- )
-    pick 0 < [ "Slice begins before 0" throw ] when
-    length over < [ "Slice longer than sequence" throw ] when
-    > [ "Slice start is after slice end" throw ] when ;
+TUPLE: slice-error reason ;
+: slice-error ( str -- * ) <slice-error> throw ;
 
-C: slice ( from to seq -- seq )
+: check-slice ( from to seq -- )
+    pick 0 < [ "start < 0" slice-error ] when
+    length over < [ "end > sequence" slice-error ] when
+    > [ "start > end" slice-error ] when ;
+
+C: slice ( m n seq -- slice )
     #! A slice of a slice collapses.
     >r dup slice? [ collapse-slice ] when r>
     >r 3dup check-slice r>
@@ -44,20 +48,20 @@ C: slice ( from to seq -- seq )
     [ set-slice-to ] keep
     [ set-slice-from ] keep ;
 
-M: slice length ( range -- n )
+M: slice length
     dup slice-to swap slice-from - ;
 
-: slice@ ( n slice -- n seq )
+: slice@ ( m slice -- n seq )
     [ slice-from + ] keep slice-seq ; inline
 
-M: slice nth ( n slice -- obj ) slice@ nth ;
+M: slice nth slice@ nth ;
 
-M: slice nth-unsafe ( n slice -- obj ) slice@ nth-unsafe ;
+M: slice nth-unsafe slice@ nth-unsafe ;
 
-M: slice set-nth ( obj n slice -- ) slice@ set-nth ;
+M: slice set-nth slice@ set-nth ;
 
-M: slice set-nth-unsafe ( n slice -- obj ) slice@ set-nth-unsafe ;
+M: slice set-nth-unsafe slice@ set-nth-unsafe ;
 
-M: slice like ( seq slice -- seq ) slice-seq like ;
+M: slice like slice-seq like ;
 
-M: slice thaw ( seq -- seq ) slice-seq thaw ;
+M: slice thaw slice-seq thaw ;

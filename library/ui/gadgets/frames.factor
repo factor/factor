@@ -32,13 +32,13 @@ C: frame ( -- frame )
 : fill-center ( horiz vert dim -- )
     tuck (fill-center) (fill-center) ;
 
-M: frame layout* ( frame -- dim )
+M: frame layout*
     dup [
         [ rot rect-dim fill-center ] 2keep grid-layout
     ] with-grid ;
 
 : make-frame ( specs -- gadget )
-    <frame> [ swap build-grid ] keep ;
+    <frame> [ swap build-grid ] keep ; inline
 
 : make-frame* ( gadget specs -- gadget )
-    over [ delegate>frame build-grid ] keep ;
+    over [ delegate>frame build-grid ] keep ; inline

@@ -12,7 +12,11 @@ DEFER: relayout-1
 
 : invalid ( -- queue ) \ invalid get-global ;
 
-: add-invalid ( gadget -- ) invalid enque ;
+: add-invalid ( gadget -- )
+    #! When unit testing gadgets without the UI running, the
+    #! invalid queue is not initialized and we simply ignore
+    #! invalidation requests.
+    invalid [ enque ] [ drop ] if* ;
 
 DEFER: relayout
 
@@ -98,7 +102,7 @@ TUPLE: pack align fill gap ;
     2dup packed-dim-2 swap orient ;
 
 : gap-locs ( gap sizes -- seq )
-    { 0 0 } [ v+ over v+ ] accumulate nip ;
+    { 0 0 } [ v+ over v+ ] accumulate 2nip ;
 
 : aligned-locs ( gadget sizes -- seq )
     [ >r dup pack-align swap rect-dim r> v- n*v ] map-with ;
@@ -106,12 +110,14 @@ TUPLE: pack align fill gap ;
 : packed-locs ( gadget sizes -- seq )
     over pack-gap over gap-locs >r dupd aligned-locs r> orient ;
 
-: packed-layout ( gadget sizes -- )
-    over gadget-children
-    >r dupd packed-dims r> 2dup
-    [ >r [ ceiling >fixnum ] map r> set-layout-dim ] 2each
-    >r packed-locs r>
-    [ >r [ >fixnum ] map r> set-rect-loc ] 2each ;
+: round-dims ( seq -- newseq )
+    { 0 0 } swap
+    [ swap v- dup [ ceiling ] map [ swap v- ] keep ] map nip ;
+
+: pack-layout ( gadget sizes -- )
+    round-dims over gadget-children
+    >r dupd packed-dims r> 2dup [ set-layout-dim ] 2each
+    >r packed-locs r> [ set-rect-loc ] 2each ;
 
 C: pack ( vector -- pack )
     #! gap: between each child.
@@ -129,29 +135,32 @@ C: pack ( vector -- pack )
 
 : <shelf> ( -- pack ) { 1 0 } <pack> ;
 
+: dim-sum ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
+
 : gap-dims ( gap sizes -- seeq )
-    [ { 0 0 } [ v+ ] reduce ] keep
-    length 1 [-] rot n*v v+ ;
+    [ dim-sum ] keep length 1 [-] rot n*v v+ ;
 
-: pack-pref-dim ( children gadget -- dim )
-    [ >r [ max-dim ] keep r> pack-gap swap gap-dims ] keep
-    gadget-orientation set-axis ;
+: pack-pref-dim ( gadget sizes -- dim )
+    over pack-gap over gap-dims >r max-dim r>
+    rot gadget-orientation set-axis ;
 
-M: pack pref-dim* ( pack -- dim )
-    [ gadget-children pref-dims ] keep pack-pref-dim ;
+M: pack pref-dim*
+    dup gadget-children pref-dims pack-pref-dim ;
 
-M: pack layout* ( pack -- )
-    dup gadget-children pref-dims packed-layout ;
+M: pack layout*
+    dup gadget-children pref-dims pack-layout ;
 
 : fast-children-on ( dim axis gadgets -- i )
     swapd [ rect-loc v- over v. ] binsearch nip ;
 
-M: pack children-on ( rect pack -- list )
+M: pack children-on
     dup gadget-orientation swap gadget-children [
         3dup
-        >r >r dup rect-loc swap rect-dim v+ origin get v- r> r> fast-children-on 1+
+        >r >r dup rect-loc swap rect-dim v+ origin get v-
+        r> r> fast-children-on 1+
         >r
-        >r >r rect-loc origin get v- r> r> fast-children-on
+        >r >r rect-loc origin get v-
+        r> r> fast-children-on
         0 max
         r>
     ] keep <slice> ;

@@ -1,27 +1,27 @@
 USING: help kernel math ;
 
-HELP: number= "( x y -- ? )"
+HELP: number=
 { $values { "x" "a number" } { "y" "a number" } { "?" "a boolean" } }
 { $description "Tests if two numbers have the same numerical value." }
 { $notes "Do not call this word directly. Calling " { $link = } " has the same effect and is more concise." } ;
 
-HELP: < "( x y -- ? )"
+HELP: <
 { $values { "x" "a real number" } { "y" "a real number" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is less than " { $snippet "y" } "." } ;
 
-HELP: <= "( x y -- ? )"
+HELP: <=
 { $values { "x" "a real number" } { "y" "a real number" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is less than or equal to " { $snippet "y" } "." } ;
 
-HELP: > "( x y -- ? )"
+HELP: >
 { $values { "x" "a real number" } { "y" "a real number" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is greater than " { $snippet "y" } "." } ;
 
-HELP: >= "( x y -- ? )"
+HELP: >=
 { $values { "x" "a real number" } { "y" "a real number" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is greater than or equal to " { $snippet "y" } "." } ;
 
-HELP: + "( x y -- z )"
+HELP: +
 { $values { "x" "a number" } { "y" "a number" } { "z" "a number" } }
 { $description
     "Adds two numbers."
@@ -33,7 +33,7 @@ HELP: + "( x y -- z )"
     }
 } ;
 
-HELP: - "( x y -- z )"
+HELP: -
 { $values { "x" "a number" } { "y" "a number" } { "z" "a number" } }
 { $description
     "Subtracts " { $snippet "y" } " from " { $snippet "x" } "."
@@ -45,7 +45,7 @@ HELP: - "( x y -- z )"
     }
 } ;
 
-HELP: * "( x y -- z )"
+HELP: *
 { $values { "x" "a number" } { "y" "a number" } { "z" "a number" } }
 { $description
     "Multiplies two numbers."
@@ -57,7 +57,7 @@ HELP: * "( x y -- z )"
     }
 } ;
 
-HELP: / "( x y -- z )"
+HELP: /
 { $values { "x" "a number" } { "y" "a number" } { "z" "a number" } }
 { $description
     "Divides " { $snippet "x" } " by " { $snippet "y" } ", retaining as much precision as possible."
@@ -70,7 +70,7 @@ HELP: / "( x y -- z )"
 }
 { $errors "Throws an error if both inputs are integers, and the denominator is 0." } ;
 
-HELP: /i "( x y -- z )"
+HELP: /i
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a real number" } }
 { $description
     "Divides " { $snippet "x" } " by " { $snippet "y" } ", truncating the result to an integer."
@@ -83,7 +83,7 @@ HELP: /i "( x y -- z )"
 }
 { $errors "Throws an error if both inputs are integers, and the denominator is 0." } ;
 
-HELP: /f "( x y -- z )"
+HELP: /f
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a real number" } }
 { $description
     "Divides " { $snippet "x" } " by " { $snippet "y" } ", representing the result as a floating point number."
@@ -96,7 +96,7 @@ HELP: /f "( x y -- z )"
 }
 { $errors "Throws an error if both inputs are integers, and the denominator is 0." } ;
 
-HELP: mod "( x y -- z )"
+HELP: mod
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
@@ -108,7 +108,7 @@ HELP: mod "( x y -- z )"
 { $errors "Throws an error if the denominator is 0." }
 { $see-also rem } ;
 
-HELP: /mod "( x y -- z w )"
+HELP: /mod
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } { "w" "an integer" } }
 { $description
     "Computes the quotient " { $snippet "z" } " and remainder " { $snippet "w" } " of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
@@ -119,7 +119,7 @@ HELP: /mod "( x y -- z w )"
 }
 { $errors "Throws an error if the denominator is 0." } ;
 
-HELP: bitand "( x y -- z )"
+HELP: bitand
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in both inputs." }
 { $examples
@@ -127,7 +127,7 @@ HELP: bitand "( x y -- z )"
     { $example "BIN: 110 BIN: 10 bitand .b" "10" }
 } ;
 
-HELP: bitor "( x y -- z )"
+HELP: bitor
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in at least one of the inputs." }
 { $examples
@@ -135,7 +135,7 @@ HELP: bitor "( x y -- z )"
     { $example "BIN: 110 BIN: 10 bitor .b" "110" }
 } ;
 
-HELP: bitxor "( x y -- z )"
+HELP: bitxor
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in exactly one of the inputs." }
 { $examples
@@ -143,80 +143,80 @@ HELP: bitxor "( x y -- z )"
     { $example "BIN: 110 BIN: 10 bitxor .b" "100" }
 } ;
 
-HELP: shift "( x n -- y )"
+HELP: shift
 { $values { "x" "an integer" } { "n" "an integer" } { "y" "an integer" } }
 { $description "Shifts " { $snippet "x" } " to the left by " { $snippet "y" } " bits if " { $snippet "y" } " is positive, or " { $snippet "-y" } " bits to the right if " { $snippet "y" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits ``falling off'' the right hand side and being discarded." }
 { $examples { $example "BIN: 101 5 shift .b" "10100000" } { $example "BIN: 11111 -2 shift .b" "111" } } ;
 
-HELP: bitnot "( x -- y )"
+HELP: bitnot
 { $values { "x" "an integer" } { "y" "an integer" } }
 { $description "Computes the bitwise complement of the input; that is, each bit in the input number is flipped." }
 { $notes "Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1-" } } ;
 
-HELP: 1+ "( x -- y )"
+HELP: 1+
 { $values { "x" "a number" } { "y" "a number" } }
 { $description
     "Increments a number by 1. The following two lines are equivalent, but the first is more efficient:"
     { $code "1+" "1 +" }
 } ;
 
-HELP: 1- "( x -- y )"
+HELP: 1-
 { $values { "x" "a number" } { "y" "a number" } }
 { $description
     "Decrements a number by 1. The following two lines are equivalent, but the first is more efficient:"
     { $code "1-" "1 -" }
 } ;
 
-HELP: truncate "( x -- y )"
+HELP: truncate
 { $values { "x" "a real number" } { "y" "a whole real number" } }
 { $description "Outputs the number that results from subtracting the fractional component of " { $snippet "x" } "." }
 { $notes "The result is not necessarily an integer." } ;
 
-HELP: floor "( x -- y )"
+HELP: floor
 { $values { "x" "a real number" } { "y" "a whole real number" } }
 { $description "Outputs the greatest whole number smaller than or equal to " { $snippet "x" } "." }
 { $notes "The result is not necessarily an integer." } ;
 
-HELP: ceiling "( x -- y )"
+HELP: ceiling
 { $values { "x" "a real number" } { "y" "a whole real number" } }
 { $description "Outputs the least whole number greater than or equal to " { $snippet "x" } "." }
 { $notes "The result is not necessarily an integer." } ;
 
-HELP: abs "( x -- y )"
+HELP: abs
 { $values { "x" "a complex number" } { "y" "a non-negative real number" } }
 { $description "Computes the absolute value of a complex number." } ;
 
-HELP: absq "( x -- y )"
+HELP: absq
 { $values { "x" "a complex number" } { "y" "a non-negative real number" } }
 { $description "Computes the squared absolute value of a complex number. This is marginally more efficient than " { $link abs } "." } ;
 
-HELP: sq "( x -- y )"
+HELP: sq
 { $values { "x" "a number" } { "y" "a number" } }
 { $description "Multiplies a number by itself." } ;
 
-HELP: neg "( x -- -x )"
+HELP: neg
 { $values { "x" "a number" } { "-x" "a number" } }
 { $description "Computes a number's additive inverse." } ;
 
-HELP: recip "( x -- -x )"
-{ $values { "x" "a number" } { "-x" "a number" } }
+HELP: recip
+{ $values { "x" "a number" } { "y" "a number" } }
 { $description "Computes a number's multiplicative inverse." }
 { $errors "Throws an error if " { $snippet "x" } " is the integer 0." } ;
 
-HELP: max "( x y -- z )"
+HELP: max
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a real number" } }
 { $description "Outputs the greatest of two real numbers." } ;
 
-HELP: min "( x y -- z )"
+HELP: min
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a real number" } }
 { $description "Outputs the smallest of two real numbers." } ;
 
-HELP: between? "( x y z -- ? )"
+HELP: between?
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a real number" } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is in the interval " { $snippet "[y,z]" } "." }
 { $notes "As per the closed interval notation, the end-points are included in the interval." } ;
 
-HELP: rem "( x y -- z )"
+HELP: rem
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive."
@@ -228,7 +228,7 @@ HELP: rem "( x y -- z )"
 { $errors "Throws an error if the denominator is 0." }
 { $see-also mod } ;
 
-HELP: sgn "( x -- n )"
+HELP: sgn
 { $values { "x" "a real number" } { "n" "-1, 0 or 1" } }
 { $description
     "Outputs one of the following:"
@@ -239,12 +239,12 @@ HELP: sgn "( x -- n )"
     }
 } ;
 
-HELP: align "( m w -- n )"
+HELP: align
 { $values { "m" "an integer" } { "w" "a power of 2" } { "n" "an integer multiple of " { $snippet "w" } } }
 { $description "Outputs the least multiple of " { $snippet "w" } " greater than " { $snippet "m" } "." }
 { $notes "This word will give an incorrect result if " { $snippet "w" } " is not a power of 2." } ;
 
-HELP: number>string "( n -- str )"
+HELP: number>string
 { $values { "n" "a real number" } { "str" "a string" } }
 { $description "Converts a real number to a string." }
 { $notes "Printing complex numbers requires the more general prettyprinter facility (see " { $link "prettyprint" } ")." } ;

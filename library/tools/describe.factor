@@ -5,96 +5,59 @@ USING: arrays generic hashtables io kernel kernel-internals
 math namespaces prettyprint sequences strings styles vectors
 words ;
 
-GENERIC: summary ( object -- string )
+GENERIC: sheet ( object -- sheet )
 
-: sign-string ( n -- string )
-    0 > "a positive " "a negative " ? ;
+: slot-sheet ( object -- sheet )
+    dup class "slots" word-prop [
+        dup third -rot first slot 2array
+    ] map-with ;
 
-M: integer summary
-    dup zero? [
-        "a " "zero "
-    ] [
-        dup sign-string over 2 mod zero? "even " "odd " ?
-    ] if rot class word-name append3 ;
+M: object sheet slot-sheet ;
 
-M: real summary
-    dup sign-string swap class word-name append ;
-
-M: complex summary
-    "a complex number in the "
-    swap quadrant { "first" "second" "fourth" "third" } nth
-    " quadrant" append3 ;
-
-GENERIC: sheet ( obj -- sheet )
-
-M: object summary
-    "an instance of the " swap class word-name " class" append3 ;
-
-: slot-sheet ( obj -- sheet )
-    dup class "slots" word-prop
-    dup [ third ] map -rot
-    [ first slot ] map-with
-    2array ;
-
-M: object sheet ( obj -- sheet ) slot-sheet ;
+M: tuple sheet
+    dup slot-sheet swap delegate [ 1 tail ] unless ;
 
 M: sequence summary
     [ dup length # " element " % class word-name % ] "" make ;
 
-M: quotation sheet 1array ;
+: sequence-sheet [ 1array ] map ;
 
-M: vector sheet 1array ;
-
-M: array sheet 1array ;
+M: quotation sheet sequence-sheet ;
+M: vector sheet sequence-sheet ;
+M: array sheet sequence-sheet ;
 
 M: hashtable summary
     "a hashtable storing " swap hash-size number>string
     " keys" append3 ;
 
-M: hashtable sheet hash>alist flip ;
-
-M: word summary ( word -- )
-    dup word-vocabulary [
-        dup interned?
-        "a word in the " "a word orphaned from the " ?
-        swap word-vocabulary " vocabulary" append3
-    ] [
-        drop "a uniquely generated symbol"
-    ] if ;
-
-M: input summary ( input -- )
-    "Input: " swap input-string
-    dup string? [ unparse-short ] unless append ;
-
-M: vocab-link summary ( vocab-link -- )
-    [
-        vocab-link-name dup %
-        " vocabulary (" %
-        words length #
-        " words)" %
-    ] "" make ;
-
-DEFER: describe
+M: hashtable sheet hash>alist ;
 
 : sheet. ( sheet -- )
-    flip
-    H{ { table-gap { 10 0 0 } } }
-    [ dup unparse-short swap write-object ]
-    tabular-output ;
+    dup empty? [
+        drop
+    ] [
+        dup first length 1 =
+        { 0 0 } { 10 0 } ? table-gap associate
+        [ dup unparse-short swap write-object ]
+        tabular-output
+    ] if ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
-: stack. ( seq -- seq ) <reversed> >array sheet sheet. ;
+: stack. ( seq -- ) <reversed> >array sheet sheet. ;
 
-: .s datastack stack. ;
-: .r retainstack stack. ;
+: .s ( -- ) datastack stack. ;
+: .r ( -- ) retainstack stack. ;
 
 : callframe. ( seq pos -- )
     [
-        hilite-index set dup hilite-quotation set .
+        hilite-index set dup hilite-quotation set
+        1 nesting-limit set
+        pprint
+        terpri
     ] with-scope ;
 
-: callstack. ( seq -- seq )
-    3 swap group <reversed> [ first2 1- callframe. ] each ;
+: callstack. ( seq -- )
+    3 group <reversed> [ first2 1- callframe. ] each ;
 
-: .c callstack callstack. ;
+: .c ( -- ) callstack callstack. ;

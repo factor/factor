@@ -16,8 +16,7 @@ TUPLE: rsa e d n ;
     [
         2 /i generate-two-unique-primes [ q set p set ] 2keep [ * n set ] 2keep
         [ 1- ] 2apply * m set
-        m get next-miller-rabin-prime ee set
-        m get ee get find-relative-prime* ee set
+        65537 ee set
         m get ee get mod-inv m get + d set
         ee get d get n get <rsa>
     ] with-scope ;

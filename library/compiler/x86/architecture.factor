@@ -4,6 +4,8 @@ USING: alien arrays assembler generic kernel kernel-internals
 math memory namespaces sequences words ;
 IN: compiler
 
+: code-format 1 ; inline
+
 ! x86 register assignments
 ! EAX, ECX, EDX integer vregs
 ! XMM0 - XMM7 float vregs
@@ -24,8 +26,7 @@ IN: compiler
 M: ds-loc v>operand ds-loc-n ds-reg reg-stack ;
 M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 
-: %alien-invoke ( symbol dll -- )
-    2dup dlsym CALL rel-relative rel-dlsym ;
+: %alien-invoke ( symbol dll -- ) (CALL) rel-dlsym ;
 
 : with-aligned-stack ( n quot -- )
     #! On Linux, there is no requirement to align stack frames,
@@ -86,17 +87,17 @@ M: float-regs store-return-reg load/store-float-return FSTP ;
 
 : prepare-division CDQ ; inline
 
-M: immediate load-literal ( literal vreg -- )
+M: immediate load-literal
     v>operand swap v>operand MOV ;
 
 : load-indirect ( literal reg -- )
-    swap add-literal [] MOV rel-absolute-cell rel-address ;
+    0 [] MOV rel-absolute-cell rel-literal ;
 
-M: object load-literal ( literal vreg -- )
+M: object load-literal
     v>operand load-indirect ;
 
 : (%call) ( label -- label )
-    dup postpone-word dup primitive? [ address-operand ] when ;
+    dup (compile) dup primitive? [ address-operand ] when ;
 
 : %call ( label -- ) (%call) CALL ;
 
@@ -106,24 +107,30 @@ M: object load-literal ( literal vreg -- )
 
 : %jump-t ( label -- ) "flag" operand f v>operand CMP JNE ;
 
+: compile-aligned ( -- )
+    compiled-offset [ 8 align ] keep - 0 <array> % ;
+
 : %dispatch ( -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    <label> "end" set
     ! Untag and multiply to get a jump table offset
+    "end" define-label
     "n" operand fixnum>slot@
     ! Add to jump table base. We use a temporary register since
     ! on AMD64 we have to load a 64-bit immediate. On x86, this
     ! is redundant.
-    "scratch" operand HEX: ffffffff MOV "end" get absolute-cell
+    "scratch" operand HEX: ffffffff MOV
+    "end" get rel-absolute-cell rel-label
     "n" operand "scratch" operand ADD
     ! Jump to jump table entry
     "n" operand [] JMP
     ! Align for better performance
     compile-aligned
     ! Fix up jump table pointer
-    "end" get save-xt ;
+    "end" get resolve-label ;
+
+: %target ( label -- ) 0 cell, rel-absolute-cell rel-label ;
 
 : %return ( -- ) %epilogue RET ;
 
@@ -143,6 +150,6 @@ M: int-regs (%replace) drop swap %move-int>int ;
 
 : %inc-r ( n -- ) cs-reg (%inc) ;
 
-M: object %stack>freg ( n reg reg-class -- ) 3drop ;
+M: object %stack>freg 3drop ;
 
-M: object %freg>stack ( n reg reg-class -- ) 3drop ;
+M: object %freg>stack 3drop ;

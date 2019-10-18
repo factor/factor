@@ -37,7 +37,7 @@ C: phantom-stack ( -- stack )
     0 over set-phantom-stack-height
     V{ } clone over set-delegate ;
 
-GENERIC: finalize-height ( n stack -- )
+GENERIC: finalize-height ( stack -- )
 
 GENERIC: <loc> ( n stack -- loc )
 
@@ -87,7 +87,7 @@ M: phantom-callstack finalize-height
 
 GENERIC: cut-phantom ( n phantom -- seq )
 
-M: phantom-stack cut-phantom ( n phantom -- seq )
+M: phantom-stack cut-phantom
     [ delegate cut* swap ] keep set-delegate ;
 
 SYMBOL: phantom-d
@@ -106,9 +106,7 @@ SYMBOL: phantom-r
     over loc? over not or [ 2drop ] [ %replace ] if ;
 
 : vregs>stack ( phantom -- )
-    [
-        dup phantom-locs* [ vreg>stack ] 2each 0
-    ] keep set-length ;
+    [ dup phantom-locs* [ vreg>stack ] 2each ] keep delete-all ;
 
 : (live-locs) ( seq -- seq )
     dup phantom-locs* [ 2array ] 2map
@@ -242,7 +240,7 @@ SYMBOL: +clobber
 : requested-vregs ( template -- int# float# )
     dup length swap [ float eq? ] subset length [ - ] keep ;
 
-: (requests-class?) ( class template -- )
+: (requests-class?) ( class template -- ? )
     [ second reg-spec>class eq? ] contains-with? ;
 
 : requests-class? ( class -- ? )

@@ -17,6 +17,7 @@ H{ } clone c-types set
 "syntax" vocab
 
 H{ } clone vocabularies set
+H{ } clone class<map set
 
 vocabularies get [ "syntax" set ] bind
 
@@ -24,6 +25,7 @@ H{ } clone articles set
 parent-graph off
 term-index off
 crossref off
+changed-words off
 
 ! Call the quotation parsed from primitive-types.factor
 call
@@ -94,18 +96,6 @@ call
     { "float<=" "math-internals"            }
     { "float>" "math-internals"             }
     { "float>=" "math-internals"            }
-    { "facos" "math-internals"              }
-    { "fasin" "math-internals"              }
-    { "fatan" "math-internals"              }
-    { "fatan2" "math-internals"             }
-    { "fcos" "math-internals"               }
-    { "fexp" "math-internals"               }
-    { "fcosh" "math-internals"              }
-    { "flog" "math-internals"               }
-    { "fpow" "math-internals"               }
-    { "fsin" "math-internals"               }
-    { "fsinh" "math-internals"              }
-    { "fsqrt" "math-internals"              }
     { "(word)" "kernel-internals"           }
     { "update-xt" "words"                   }
     { "compiled?" "words"                   }
@@ -149,10 +139,7 @@ call
     { "tag" "kernel-internals"              }
     { "cwd" "io"                            }
     { "cd" "io"                             }
-    { "compiled-offset" "assembler"         }
-    { "set-compiled-offset" "assembler"     }
-    { "add-literal" "assembler"             }
-    { "address" "memory"                    }
+    { "add-compiled-block" "assembler"      }
     { "dlopen" "alien"                      }
     { "dlsym" "alien"                       }
     { "dlclose" "alien"                     }
@@ -206,7 +193,7 @@ call
     { "end-scan" "memory"                   }
     { "size" "memory"                       }
     { "die" "kernel"                        }
-    { "flush-icache" "assembler"            }
+    { "finalize-compile" "assembler"        }
     { "fopen"  "io-internals"               }
     { "fgetc" "io-internals"                }
     { "fwrite" "io-internals"               }
@@ -372,7 +359,7 @@ num-types f <array> builtins set
         f
     } {
         2
-        fixnum
+        object
         { "string-hashcode" "kernel-internals" }
         { "set-string-hashcode" "kernel-internals" }
     }

@@ -1,39 +1,48 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: errors hashtables inference io kernel math namespaces
-optimizer prettyprint sequences test threads words ;
+USING: errors generic hashtables inference io kernel math
+namespaces optimizer parser prettyprint sequences test threads
+words ;
+
+: word-dataflow ( word -- dataflow )
+    [
+        dup ?no-effect
+        dup dup add-recursive-state
+        dup specialized-def (dataflow)
+        swap current-effect check-effect
+    ] with-infer ;
 
 : (compile) ( word -- )
-    dup specialized-def dataflow optimize generate ;
-
-: inform-compile ( word -- ) "Compiling " write . flush ;
-
-: compile-postponed ( -- )
-    compile-words get dup empty? [
-        drop
+    dup compiling? not over compound? and [
+        "Compiling " write dup . flush
+        dup word-dataflow optimize generate
     ] [
-        pop dup inform-compile (compile) compile-postponed
+        drop
     ] if ;
 
 : compile ( word -- )
-    [ postpone-word compile-postponed ] with-compiler ;
-
-: compiled ( -- ) "compile" get [ word compile ] when ; parsing
+    [ (compile) ] with-compiler ;
 
 : try-compile ( word -- )
-    [ compile ] [ error. drop ] recover ;
+    [ compile ] [ error. update-xt ] recover ;
 
-: compile-vocabs ( vocabs -- )
+: compile-vocabs ( seq -- )
     [ words ] map concat
     dup [ f "no-effect" set-word-prop ] each
     [ try-compile ] each ;
 
-: compile-all ( -- ) vocabs compile-vocabs ;
-
-: recompile ( word -- ) dup update-xt compile ;
+: compile-all ( -- )
+    vocabs compile-vocabs changed-words get clear-hash ;
 
 : compile-quot ( quot -- word )
     define-temp "compile" get [ dup compile ] when ;
 
 : compile-1 ( quot -- ) compile-quot execute ;
+
+: recompile ( -- )
+    changed-words get [
+        dup hash-keys [ try-compile ] each clear-hash
+    ] when* ;
+
+[ recompile ] parse-hook set

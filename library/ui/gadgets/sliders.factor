@@ -23,7 +23,9 @@ TUPLE: slider elevator thumb value saved max page ;
 
 : thumb-dim ( slider -- h )
     dup slider-page over slider-max 1 max / 1 min
-    swap elevator-length * min-thumb-dim max ;
+    over elevator-length * min-thumb-dim max
+    over slider-elevator rect-dim
+    rot gadget-orientation v. min ;
 
 : slider-max* dup slider-max swap slider-page [-] ;
 
@@ -114,7 +116,7 @@ C: elevator ( vector -- elevator )
 : layout-thumb ( slider -- )
     dup layout-thumb-loc layout-thumb-dim ;
 
-M: elevator layout* ( elevator -- )
+M: elevator layout*
     find-slider layout-thumb ;
 
 : slide-by-line ( -1/1 slider -- ) >r 32 * r> slide-by ;

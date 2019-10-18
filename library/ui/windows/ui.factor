@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays errors freetype gadgets gadgets-launchpad
-       gadgets-listener hashtables io kernel math namespaces prettyprint
+USING: alien arrays errors freetype gadgets gadgets-listener
+       gadgets-workspace hashtables io kernel math namespaces prettyprint
        sequences strings vectors words win32-api win32-api-messages ;
 USING: inspector threads memory ;
 IN: win32
@@ -34,7 +34,8 @@ SYMBOL: class-name
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window dup rect-dim first2 [ 0 > ] 2apply and [ draw-world ] when ;
+    3drop window dup rect-dim first2 [ 0 > ] 2apply and
+    [ draw-world ] [ drop ] if ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array
@@ -57,6 +58,18 @@ SYMBOL: class-name
         { 40 "DOWN" }
         { 45 "INSERT" }
         { 46 "DELETE" }
+        { 112 "F1" }
+        { 113 "F2" }
+        { 114 "F3" }
+        { 115 "F4" }
+        { 116 "F5" }
+        { 117 "F6" }
+        { 118 "F7" }
+        { 119 "F8" }
+        { 120 "F9" }
+        { 121 "F10" }
+        { 122 "F11" }
+        { 123 "F12" }
     } ;
 
 : key-state-down?
@@ -81,10 +94,8 @@ SYMBOL: class-name
         alt? [ A+ , ] when
     ] { } make [ empty? not ] keep f ? ;
 
-: exclude-keys
+: exclude-keys-wm-keydown
     H{
-        ! { 8 "BACKSPACE" }
-        ! { 9 "TAB" }
         { 16 "SHIFT" }
         { 17 "CTRL" }
         { 18 "ALT" }
@@ -92,11 +103,21 @@ SYMBOL: class-name
         { 27 "ESCAPE" }
     } ;
 
-: exclude-key? ( n -- bool ) exclude-keys hash* nip ;
+: exclude-keys-wm-char
+    ! Values are ignored
+    H{
+        { 8 "BACKSPACE" }
+        { 9 "TAB" }
+        { 13 "RETURN" }
+    } ;
+
+: exclude-key-wm-keydown? ( n -- bool ) exclude-keys-wm-keydown hash* nip ;
+: exclude-key-wm-char? ( n -- bool ) exclude-keys-wm-char hash* nip ;
 : handle-key? ( n -- bool ) wm-keydown-codes hash* nip ;
  
 : keystroke>gesture ( n -- <key-down> )
-    dup wm-keydown-codes hash* [ nip ] [ drop ch>string lower-case? [ >lower ] when ] if
+    dup wm-keydown-codes hash*
+    [ nip ] [ drop ch>string lower-case? [ >lower ] when ] if
     key-modifiers swap ;
 
 SYMBOL: lParam
@@ -104,58 +125,61 @@ SYMBOL: wParam
 SYMBOL: uMsg
 SYMBOL: hWnd
 
-: get-focus ( hWnd -- gadget )
-    window world-focus ;
-
 : handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
-    wParam get exclude-key? [
+    wParam get exclude-key-wm-keydown? [
         wParam get keystroke>gesture <key-down>
-        hWnd get get-focus handle-gesture [
-            wParam get ch>string lower-case? [ >lower ] when
-            hWnd get get-focus user-input
-        ] when
+        hWnd get window-focus handle-gesture drop 
+    ] unless ;
+
+: handle-wm-char ( hWnd uMsg wParam lParam -- )
+    lParam set wParam set uMsg set hWnd set
+    wParam get exclude-key-wm-char? ctrl? or alt? or [
+        wParam get ch>string
+        hWnd get window-focus user-input
     ] unless ;
 
 : handle-wm-keyup ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
-    wParam get keystroke>gesture <key-up> hWnd get get-focus handle-gesture
+    wParam get keystroke>gesture <key-up>
+    hWnd get window-focus handle-gesture
     drop ;
 
 : cleanup-window ( handle -- )
     [ win-hRC wglDeleteContext win32-error=0 ] keep
     [ win-hWnd ] keep win-hDC ReleaseDC win32-error=0 ;
 
-: handle-wm-destroy ( hWnd uMsg wParam lParam -- )
+: handle-wm-close ( hWnd uMsg wParam lParam -- )
     3drop
     window [ world-handle ] keep
-    [ close-world ] keep
-    [ drop win-hWnd unregister-window ] 2keep
-    drop cleanup-window
-    0 PostQuitMessage ;
+    close-world
+    dup win-hWnd unregister-window
+    dup cleanup-window
+    win-hWnd DestroyWindow win32-error=0 ;
 
 : handle-wm-set-focus ( hWnd uMsg wParam lParam -- )
-    3drop window focus-world ;
+    3drop window [ focus-world ] when* ;
 
 : handle-wm-kill-focus ( hWnd uMsg wParam lParam -- )
-    3drop window unfocus-world ;
+    3drop window [ unfocus-world ] when* ;
 
-: mouse-button ( uMsg -- n )
+: mouse-coordinate ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
+: mouse-wheel ( lParam -- n ) hi-word 0 > ;
+
+: mouse-event>gesture ( uMsg -- button )
+    key-modifiers swap
     {
-        { [ dup WM_LBUTTONDOWN = ] [ drop 1 ] }
-        { [ dup WM_LBUTTONUP = ] [ drop 1 ] }
-        { [ dup WM_MBUTTONDOWN = ] [ drop 2 ] }
-        { [ dup WM_MBUTTONUP = ] [ drop 2 ] }
-        { [ dup WM_RBUTTONDOWN = ] [ drop 3 ] }
-        { [ dup WM_RBUTTONUP = ] [ drop 3 ] }
+        { [ dup WM_LBUTTONDOWN = ] [ drop 1 <button-down> ] }
+        { [ dup WM_LBUTTONUP = ] [ drop 1 <button-up> ] }
+        { [ dup WM_MBUTTONDOWN = ] [ drop 2 <button-down> ] }
+        { [ dup WM_MBUTTONUP = ] [ drop 2 <button-up> ] }
+        { [ dup WM_RBUTTONDOWN = ] [ drop 3 <button-down> ] }
+        { [ dup WM_RBUTTONUP = ] [ drop 3 <button-up> ] }
         { [ t ] [ "bad button" throw ] }
     } cond ;
 
-: mouse-coordinate ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
-: mouse-wheel ( lParam -- n ) hi-word 0 > 1 -1 ? ;
-
-: prepare-mouse ( hWnd uMsg wParam lParam -- world )
-    nip >r mouse-button r> mouse-coordinate rot window ;
+: prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
+    nip >r mouse-event>gesture r> mouse-coordinate rot window ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
     >r pick SetCapture drop r>
@@ -179,23 +203,25 @@ SYMBOL: hWnd
     >r >r 2dup r> r> 2swap >r >r 2dup r> r> 2swap ;
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
-: ui-wndproc ( hWnd uMsg wParam lParam -- lresult )
+: ui-wndproc ( -- object )
     "uint" { "void*" "uint" "long" "long" } [
         [
         pick
         ! "Message: " write dup get-windows-message-name write
             ! " " write dup unparse print flush
             {
-                { [ dup WM_DESTROY = ]    [ drop handle-wm-destroy 0 ] }
+                { [ dup WM_CLOSE = ]    [ drop handle-wm-close 0 ] }
                 { [ dup WM_PAINT = ]
                       [ drop 4dup handle-wm-paint DefWindowProc ] }
                 { [ dup WM_SIZE = ]      [ drop handle-wm-size 0 ] }
 
                 ! Keyboard events
                 { [ dup WM_KEYDOWN = over WM_SYSKEYDOWN = or ]
-                    [ drop handle-wm-keydown 0 ] }
+                    [ drop 4dup handle-wm-keydown DefWindowProc ] }
+                { [ dup WM_CHAR = over WM_SYSCHAR = or ]
+                    [ drop 4dup handle-wm-char DefWindowProc ] }
                 { [ dup WM_KEYUP = over WM_SYSKEYUP = or ]
-                    [ drop handle-wm-keyup 0 ] }
+                    [ drop 4dup handle-wm-keyup DefWindowProc ] }
 
                 { [ dup WM_SETFOCUS = ] [ drop handle-wm-set-focus 0 ] }
                 { [ dup WM_KILLFOCUS = ] [ drop handle-wm-kill-focus 0 ] }
@@ -213,7 +239,7 @@ SYMBOL: hWnd
 
                 { [ t ] [ drop DefWindowProc ] }
             } cond
-        ] [ error. 0 ] recover
+        ] ui-try
         ! "finished handling message" print .s flush
      ] alien-callback ;
 
@@ -226,7 +252,6 @@ SYMBOL: hWnd
     ] when ;
 
 : event-loop ( -- )
-    ! "MSG'D" print flush
     windows get empty? [
         [ do-events ui-step ] ui-try event-loop
     ] unless ;
@@ -310,16 +335,20 @@ IN: shells
     [
         [
             init-timers
-            ! init-clipboard
+            init-clipboard
             init-win32-ui
             restore-windows? [
                 restore-windows
             ] [
                 init-ui
-                launchpad-window
-                listener-window
+                workspace-window
+                drop
             ] if
             event-loop
         ] with-freetype
     ] [ cleanup-win32-ui ] cleanup ;
 
+IN: io-internals
+! Allows use of the ui without native i/o.
+! Overwritten when native i/o is loaded.
+: io-multiplex ( ms -- ) 0 SleepEx drop ;

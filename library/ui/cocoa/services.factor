@@ -4,10 +4,10 @@ IN: objc-classes
 DEFER: FactorServiceProvider
 
 IN: cocoa
-USING: alien gadgets-presentations io kernel namespaces objc
-parser prettyprint styles ;
+USING: alien io kernel namespaces objc
+parser prettyprint styles gadgets-listener gadgets-workspace ;
 
-: pasteboard-error ( error str -- f )
+: pasteboard-error ( error -- f )
     "Pasteboard does not hold a string" <NSString>
     0 swap rot set-void*-nth f ;
 
@@ -18,7 +18,7 @@ parser prettyprint styles ;
         nip pasteboard-error
     ] if ;
 
-: do-service ( pboard error quot -- | quot: str -- str/f )
+: do-service ( pboard error quot -- )
     pick >r >r
     ?pasteboard-string dup [ r> call ] [ r> 2drop f ] if
     dup [ r> set-pasteboard-string ] [ r> 2drop ] if ;
@@ -27,7 +27,12 @@ parser prettyprint styles ;
     {
         "evalInListener:userData:error:" "void"
         { "id" "SEL" "id" "id" "void*" }
-        [ nip [ <input> show f ] do-service 2drop ]
+        [
+            nip
+            [ <input> listener-gadget call-tool f ]
+            do-service
+            2drop
+        ]
     }
     {
         "evalToString:userData:error:" "void"

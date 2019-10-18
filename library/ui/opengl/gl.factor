@@ -1186,9 +1186,9 @@ FUNCTION: void glTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLin
 FUNCTION: void glCopyTexSubImage3D ( GLenum target, GLint level,
                                      GLint xoffset, GLint yoffset, GLint zoffset,
 				     GLint x, GLint y, GLsizei width, GLsizei height ) ;
-windows? [
-    { glDrawRangeElements glTexImage3D glTexSubImage3D glCopyTexSubImage3D } [ forget ] each
-] unless
+! windows? [
+!     { glDrawRangeElements glTexImage3D glTexSubImage3D glCopyTexSubImage3D } [ forget ] each
+! ] unless
 
 
 ! TODO: the rest. looks fiddly

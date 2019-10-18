@@ -6,7 +6,7 @@ sequences ;
 
 : NSStringPboardType "NSStringPboardType" ;
 
-: pasteboard-string? ( type id -- seq )
+: pasteboard-string? ( id -- ? )
     NSStringPboardType swap -> types CF>string-array member? ;
 
 : pasteboard-string ( id -- str )
@@ -23,10 +23,10 @@ sequences ;
 
 TUPLE: pasteboard handle ;
 
-M: pasteboard clipboard-contents ( pb -- str )
+M: pasteboard clipboard-contents
     pasteboard-handle pasteboard-string ;
 
-M: pasteboard set-clipboard-contents ( str pb -- )
+M: pasteboard set-clipboard-contents
     pasteboard-handle set-pasteboard-string ;
 
 : init-clipboard ( -- )

@@ -9,7 +9,7 @@ TUPLE: module name files tests ;
 : module-path ( name -- path )
     "/contrib/" swap append ;
 
-: module-paths ( name seq -- seq )
+: module-paths ( name seq -- newseq )
     >r module-path r> [ "/" swap append3 ] map-with ;
 
 C: module ( name files tests -- module )
@@ -28,17 +28,21 @@ H{ } clone modules set-global
 : module modules get hash ;
 
 : load-module ( name -- )
-    "Loading module " write dup write "..." print
-    [ dup module-def run-resource ] assert-depth drop ;
+    [
+        "Loading module " write dup write "..." print
+        [ dup module-def run-resource ] assert-depth drop
+    ] no-parse-hook ;
 
 : (require) ( name -- )
     dup module [ drop ] [ load-module ] if ;
 
-: require ( name -- ) (require) compile-all ;
+: require ( name -- ) (require) recompile ;
 
 : run-resources ( seq -- )
-    bootstrapping? get
-    [ parse-resource % ] [ run-resource ] ? each ;
+    [
+        bootstrapping? get
+        [ parse-resource % ] [ run-resource ] ? each
+    ] no-parse-hook ;
 
 : provide ( name files tests -- )
     <module> dup module-files run-resources

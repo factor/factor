@@ -32,17 +32,17 @@ C: track ( orientation -- track )
     [ [ over n*v , ] [ divider-size , ] interleave ] { } make
     nip ;
 
-M: track layout* ( track -- )
-    dup track-layout packed-layout ;
+M: track layout*
+    dup track-layout pack-layout ;
 
 : track-pref-dims ( dims sizes -- dims )
     [ [ dup zero? [ nip ] [ v/n ] if ] 2map max-dim ] keep
     divider-sizes v+ [ >fixnum ] map ;
 
-M: track pref-dim* ( track -- dim )
+M: track pref-dim*
     [
         dup gadget-children
-        2 swap group [ first ] map pref-dims
+        2 group [ first ] map pref-dims
         dup rot track-sizes track-pref-dims >r max-dim r>
     ] keep gadget-orientation set-axis ;
 
@@ -59,7 +59,7 @@ M: track pref-dim* ( track -- dim )
 
 : set-nth-0 ( n seq -- old ) 2dup nth >r 0 -rot set-nth r> ;
 
-: +nth ( delta n seq -- ) swap [ + ] change-nth ;
+: +nth ( delta n seq -- ) [ + ] change-nth ;
 
 : clamp-nth ( i j sizes -- ) [ set-nth-0 swap ] keep +nth ;
 
@@ -100,7 +100,7 @@ divider H{
 } set-gestures
 
 C: divider ( -- divider )
-    dup delegate>gadget dup reverse-video-theme ;
+    dup delegate>gadget ;
 
 : normalize-sizes ( sizes -- sizes )
     dup sum swap [ swap / ] map-with ;
@@ -115,8 +115,6 @@ C: divider ( -- divider )
 : track-add ( gadget track -- )
     dup add-divider [ add-gadget ] keep
     dup track-sizes track-add-size swap set-track-sizes ;
-
-: nth-gadget gadget-children nth ;
 
 : track-remove@ ( n track -- )
     #! Remove the divider if this is not the last child.
@@ -135,13 +133,11 @@ C: divider ( -- divider )
     #! Specs is an array of quadruples { quot post setter loc }.
     #! The setter has stack effect ( new gadget -- ),
     #! the loc is a ratio from 0 to 1.
-    swap [
-        [ [ [ drop track-add ] add-spec ] each ] keep
-        [ peek ] map gadget get set-track-sizes
-    ] with-gadget ;
+    [ swap [ [ drop track-add ] build-spec ] with-gadget ] 2keep
+    [ peek ] map swap set-track-sizes ; inline
 
 : make-track ( specs orientation -- gadget )
-    <track> [ swap build-track ] keep ;
+    <track> [ swap build-track ] keep ; inline
 
 : make-track* ( gadget specs orientation -- gadget )
-    <track> pick [ set-delegate build-track ] keep ;
+    <track> pick [ set-delegate build-track ] keep ; inline

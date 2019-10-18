@@ -1,23 +1,23 @@
 USING: help io strings ;
 
-HELP: <string-writer> "( -- stream )"
+HELP: <string-writer>
 { $values { "stream" "an output stream" } }
 { $description "Creates an output stream that collects text into a delegate string buffer. The contents of the buffer can be recovered by executing " { $link >string } ", and indeed all other sequence operations are permitted by virtue of the delegation." } ;
 
-HELP: string-out "( quot -- str )"
+HELP: string-out
 { $values { "quot" "a quotation" } { "str" "a string" } }
 { $description "Calls the quotation in a new dynamic scope with " { $link stdio } " rebound to a new string writer. The accumulated string is output when the quotation returns." } ;
 
-HELP: <string-reader> "( str -- stream )"
+HELP: <string-reader>
 { $values { "str" "a string" } { "stream" "an input stream" } }
 { $description "Creates a new stream for reading " { $snippet "str" } " from beginning to end." }
 { $notes "The implementation exploits the ability of string buffers to respond to the input stream protocol by reading characters from the end of the buffer." } ;
 
-HELP: string-in "( str quot -- )"
+HELP: string-in
 { $values { "str" "a string" } { "quot" "a quotation" } }
 { $description "Calls the quotation in a new dynamic scope with " { $link stdio } " rebound to an input stream reading " { $snippet "str" } " from beginning to end. The accumulated string is output when the quotation returns." } ;
 
-HELP: contents "( stream -- str )"
+HELP: contents
 { $values { "stream" "an input stream" } { "str" "a string" } }
 { $description "Reads the contents of a stream into a string." }
 $io-error ;

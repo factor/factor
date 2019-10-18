@@ -170,7 +170,7 @@ void primitive_os_env(void)
 
 	maybe_gc(0);
 
-	name = pop_char_string();
+	name = unbox_char_string();
 	value = getenv(name);
 	if(value == NULL)
 		dpush(F);
@@ -193,13 +193,13 @@ void primitive_millis(void)
 
 void fatal_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"Fatal error: %s %ld\n",msg,tagged);
+	fprintf(stderr,"Fatal error: %s %lx\n",msg,tagged);
 	exit(1);
 }
 
 void critical_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"Critical error: %s %ld\n",msg,tagged);
+	fprintf(stderr,"Critical error: %s %lx\n",msg,tagged);
 	factorbug();
 }
 
@@ -245,6 +245,24 @@ void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks)
 		tag_fixnum(error),arg1,arg2),keep_stacks);
 }
 
+void memory_protection_error(void *addr, int signal)
+{
+	if(in_page(addr, (void *) ds_bot, 0, -1))
+		general_error(ERROR_DS_UNDERFLOW,F,F,false);
+	else if(in_page(addr, (void *) ds_bot, ds_size, 0))
+		general_error(ERROR_DS_OVERFLOW,F,F,false);
+	else if(in_page(addr, (void *) rs_bot, 0, -1))
+		general_error(ERROR_RS_UNDERFLOW,F,F,false);
+	else if(in_page(addr, (void *) rs_bot, rs_size, 0))
+		general_error(ERROR_RS_OVERFLOW,F,F,false);
+	else if(in_page(addr, (void *) cs_bot, 0, -1))
+		general_error(ERROR_CS_UNDERFLOW,F,F,false);
+	else if(in_page(addr, (void *) cs_bot, cs_size, 0))
+		general_error(ERROR_CS_OVERFLOW,F,F,false);
+	else
+		signal_error(signal);
+}
+
 /* It is not safe to access 'ds' from a signal handler, so we just not
 touch it */
 void signal_error(int signal)
@@ -255,53 +273,4 @@ void signal_error(int signal)
 void type_error(CELL type, CELL tagged)
 {
 	general_error(ERROR_TYPE,tag_fixnum(type),tagged,true);
-}
-
-void init_compiler(CELL size)
-{
-	compiling.base = compiling.here = (CELL)(alloc_bounded_block(size)->start);
-	if(compiling.base == 0)
-		fatal_error("Cannot allocate code heap",size);
-	compiling.limit = compiling.base + size;
-	last_flush = compiling.base;
-}
-
-void primitive_compiled_offset(void)
-{
-	box_unsigned_cell(compiling.here);
-}
-
-void primitive_set_compiled_offset(void)
-{
-	CELL offset = unbox_unsigned_cell();
-	compiling.here = offset;
-	if(compiling.here >= compiling.limit)
-	{
-		fprintf(stderr,"Code space exhausted\n");
-		factorbug();
-	}
-}
-
-void primitive_add_literal(void)
-{
-	CELL object = dpeek();
-	CELL offset = literal_top;
-	put(literal_top,object);
-	literal_top += CELLS;
-	if(literal_top >= literal_max)
-		critical_error("Too many compiled literals",literal_top);
-	drepl(tag_cell(offset));
-}
-
-void primitive_flush_icache(void)
-{
-	flush_icache((void*)last_flush,compiling.here - last_flush);
-	last_flush = compiling.here;
-}
-
-void collect_literals(void)
-{
-	CELL i;
-	for(i = compiling.base; i < literal_top; i += CELLS)
-		copy_handle((CELL*)i);
 }

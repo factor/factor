@@ -29,9 +29,6 @@ opengl sequences ;
     #! Cocoa -> Factor UI button mapping
     -> buttonNumber H{ { 0 1 } { 2 2 } { 1 3 } } hash ;
 
-: button&loc ( view event -- button# loc )
-    dup button -rot mouse-location ;
-
 : modifiers
     {
         { S+ HEX: 20000 }
@@ -42,31 +39,46 @@ opengl sequences ;
 
 : key-codes
     H{
+        { 71 "CLEAR" }
         { 36 "RETURN" }
+        { 76 "ENTER" }
+        { 53 "ESCAPE" }
         { 48 "TAB" }
         { 51 "BACKSPACE" }
         { 115 "HOME" }
         { 117 "DELETE" }
         { 119 "END" }
+        { 122 "F1" }
+        { 120 "F2" }
+        { 99 "F3" }
+        { 118 "F4" }
+        { 96 "F5" }
+        { 97 "F6" }
+        { 98 "F8" }
         { 123 "LEFT" }
         { 124 "RIGHT" }
         { 125 "DOWN" }
         { 126 "UP" }
+        { 116 "PAGE_UP" }
+        { 121 "PAGE_DOWN" }
     } ;
 
 : key-code ( event -- string )
     dup -> keyCode key-codes hash
     [ ] [ -> charactersIgnoringModifiers CF>string ] ?if ;
 
-: event>gesture ( event -- modifiers keycode )
-    dup -> modifierFlags modifiers modifier swap key-code ;
+: event-modifiers ( event -- modifiers )
+    -> modifierFlags modifiers modifier ;
+
+: key-event>gesture ( event -- modifiers keycode )
+    dup event-modifiers swap key-code ;
 
 : send-key-event ( view event quot -- ? )
-    >r event>gesture r> call swap window world-focus
+    >r key-event>gesture r> call swap window-focus
     handle-gesture ; inline
 
 : send-user-input ( view event -- )
-    -> characters CF>string swap window world-focus user-input ;
+    -> characters CF>string swap window-focus user-input ;
 
 : send-key-down-event ( view event -- )
     2dup [ <key-down> ] send-key-event
@@ -75,11 +87,16 @@ opengl sequences ;
 : send-key-up-event ( view event -- )
     [ <key-up> ] send-key-event drop ;
 
+: mouse-event>gesture ( event -- modifiers button )
+    dup event-modifiers swap button ;
+
 : send-button-down$ ( view event -- )
-    over >r button&loc r> window send-button-down ;
+    [ mouse-event>gesture <button-down> ] 2keep
+    mouse-location rot window send-button-down ;
 
 : send-button-up$ ( view event -- )
-    over >r button&loc r> window send-button-up ;
+    [ mouse-event>gesture <button-up> ] 2keep
+    mouse-location rot window send-button-up ;
 
 : send-wheel$ ( view event -- )
     [ -> deltaY 0 > ] 2keep mouse-location
@@ -93,7 +110,18 @@ opengl sequences ;
     "NSViewFrameDidChangeNotification" <NSString>
     r> add-observer ;
 
+: string-or-nil? ( NSString -- ? )
+    [ CF>string NSStringPboardType = ] [ t ] if* ;
+
+: valid-service? ( gadget send-type return-type -- ? )
+    over string-or-nil? over string-or-nil? and [
+        drop [ gadget-selection? ] [ drop t ] if
+    ] [
+        3drop f
+    ] if ;
+
 "NSOpenGLView" "FactorView" {
+    ! Events
     { "acceptsFirstMouse:" "bool" { "id" "SEL" "id" }
         [ 3drop 1 ]
     }
@@ -176,6 +204,39 @@ opengl sequences ;
 
     { "selectAll:" "id" { "id" "SEL" "id" }
         [ [ nip T{ select-all-action } send-action$ ] ui-try ]
+    }
+
+    ! Services
+    { "validRequestorForSendType:returnType:" "id" { "id" "SEL" "id" "id" }
+        [
+            ! We return either self or nil
+            >r >r over window-focus r> r>
+            valid-service? [ drop ] [ 2drop f ] if
+        ]
+    }
+
+    { "writeSelectionToPasteboard:types:" "bool" { "id" "SEL" "id" "id" }
+        [
+            CF>string-array NSStringPboardType swap member? [
+                >r drop window-focus gadget-selection dup [
+                    r> set-pasteboard-string t
+                ] [
+                    r> 2drop f
+                ] if
+            ] [
+                3drop f
+            ] if
+        ]
+    }
+
+    { "readSelectionFromPasteboard:" "bool" { "id" "SEL" "id" }
+        [
+            pasteboard-string dup [
+                >r drop window-focus r> swap user-input t
+            ] [
+                3drop f
+            ] if
+        ]
     }
 
     { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }

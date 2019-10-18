@@ -46,13 +46,6 @@ void *unbox_alien(void)
 	return alien_offset(dpop());
 }
 
-/* pop ( alien n ) from datastack, return alien's address plus n */
-INLINE void *alien_pointer(void)
-{
-	F_FIXNUM offset = unbox_signed_cell();
-	return unbox_alien() + offset;
-}
-
 /* make an alien */
 ALIEN *make_alien(CELL delegate, CELL displacement)
 {
@@ -95,17 +88,17 @@ void primitive_alien_address(void)
 /* image loading */
 void fixup_alien(ALIEN *d)
 {
-	data_fixup(&d->alien);
 	d->expired = true;
 }
 
-/* GC */
-void collect_alien(ALIEN *d)
+/* pop ( alien n ) from datastack, return alien's address plus n */
+INLINE void *alien_pointer(void)
 {
-	copy_handle(&d->alien);
+	F_FIXNUM offset = unbox_signed_cell();
+	return unbox_alien() + offset;
 }
 
-/* define words to read/write numericals values at an alien address */
+/* define words to read/write values at an alien address */
 #define DEF_ALIEN_SLOT(name,type,boxer) \
 void primitive_alien_##name (void) \
 { \
@@ -146,7 +139,7 @@ void box_value_struct(void *src, CELL size)
 }
 
 /* for FFI calls returning an 8-byte struct. This only
-happends on Intel Mac OS X */
+happens on Intel Mac OS X */
 void box_value_pair(CELL x, CELL y)
 {
 	F_ARRAY *array = byte_array(8);
@@ -196,15 +189,4 @@ void primitive_dlsym(void)
 void primitive_dlclose(void)
 {
 	ffi_dlclose(untag_dll(dpop()));
-}
-
-void fixup_dll(DLL* dll)
-{
-	data_fixup(&dll->path);
-	ffi_dlopen(dll,false);
-}
-
-void collect_dll(DLL* dll)
-{
-	copy_handle(&dll->path);
 }

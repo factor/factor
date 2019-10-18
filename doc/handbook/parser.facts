@@ -70,8 +70,8 @@ ARTICLE: "reading-ahead" "Reading ahead"
 "Parsing words can consume input from the current line to implement various forms of custom syntax."
 { $subsection scan }
 { $subsection scan-word }
-"For example, the " { $link POSTPONE: HEX: } " word, for reading hexadecimal literals, uses this facility. It is defined in terms of a lower-level " { $link (BASE) } " word that takes the numerical base on the data stack, but reads the number from the parser and then adds it to the parse tree:"
-{ $see (BASE) }
+"For example, the " { $link POSTPONE: HEX: } " word, for reading hexadecimal literals, uses this facility. It is defined in terms of a lower-level " { $link parse-base } " word that takes the numerical base on the data stack, but reads the number from the parser and then adds it to the parse tree:"
+{ $see parse-base }
 { $see POSTPONE: HEX: }
 "Another simple example is the " { $link POSTPONE: \ } " word:"
 { $see POSTPONE: \ } ;
