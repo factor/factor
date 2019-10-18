@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Created-By: 1.4.2-p6-slava_18_jan_2004_13_00 (Sun Microsystems Inc.)
+Ant-Version: Apache Ant 1.5.4 
+Main-Class: factor.FactorInterpreter
+
