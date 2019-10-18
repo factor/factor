@@ -13,7 +13,7 @@ kernel-internals ;
 ! if it is somewhat 'implementation detail', is in the
 ! public 'hashtables' vocabulary.
 
-: bucket-count ( hash -- n ) hash-array length ;
+: bucket-count ( hash -- n ) hash-array array-capacity ;
 
 IN: kernel-internals
 

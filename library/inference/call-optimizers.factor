@@ -37,11 +37,21 @@ sequences vectors words ;
         [ 3drop t ] [ inline-literals ] ifte
     ] catch ;
 
-: flip-branches ( #ifte -- )
+: flip-subst ( not -- )
+    #! Note: cloning the vectors, since subst-values will modify
+    #! them.
+    [ node-in-d clone ] keep
+    [ node-out-d clone ] keep
+    subst-values ;
+
+: flip-branches ( not -- #ifte )
+    #! If a not is followed by an #ifte, flip branches and
+    #! remove the note.
+    dup flip-subst node-successor dup
     dup node-children first2 swap 2vector swap set-node-children ;
 
 \ not {
-    { [ dup node-successor #ifte? ] [ node-successor dup flip-branches ] }
+    { [ dup node-successor #ifte? ] [ flip-branches ] }
 } define-optimizers
 
 : disjoint-eq? ( node -- ? )

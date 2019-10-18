@@ -1,21 +1,21 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
-USING: alien math memory kernel hashtables namespaces ;
+USING: alien compiler-backend math memory kernel hashtables
+namespaces ;
 
 SYMBOL: interned-literals
 
-: cell 4 ; inline
 : compiled-header HEX: 01c3babe ; inline
 
 : compiled-byte ( a -- n )
-    <alien> 0 alien-signed-1 ; inline
+    f swap alien-signed-1 ; inline
 : set-compiled-byte ( n a -- )
-    <alien> 0 set-alien-signed-1 ; inline
+    f swap set-alien-signed-1 ; inline
 : compiled-cell ( a -- n )
-    <alien> 0 alien-signed-cell ; inline
+    f swap alien-signed-cell ; inline
 : set-compiled-cell ( n a -- )
-    <alien> 0 set-alien-signed-cell ; inline
+    f swap set-alien-signed-cell ; inline
 
 : compile-aligned ( n -- )
     compiled-offset cell 2 * align set-compiled-offset ; inline

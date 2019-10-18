@@ -82,7 +82,6 @@ sequences io vectors words ;
         "/library/generic/math-combination.factor"
         "/library/generic/predicate.factor"
         "/library/generic/union.factor"
-        "/library/generic/complement.factor"
         "/library/generic/tuple.factor"
 
         "/library/syntax/generic.factor"
@@ -113,6 +112,9 @@ sequences io vectors words ;
 
         "/library/bootstrap/image.factor"
 
+        "/library/compiler/architecture.factor"
+
+        "/library/inference/shuffle.factor"
         "/library/inference/dataflow.factor"
         "/library/inference/inference.factor"
         "/library/inference/branches.factor"
@@ -124,14 +126,16 @@ sequences io vectors words ;
         "/library/inference/optimizer.factor"
         "/library/inference/inline-methods.factor"
         "/library/inference/known-words.factor"
+        "/library/inference/stack.factor"
         "/library/inference/call-optimizers.factor"
         "/library/inference/print-dataflow.factor"
-        
+
         "/library/compiler/assembler.factor"
         "/library/compiler/relocate.factor"
         "/library/compiler/xt.factor"
         "/library/compiler/vops.factor"
         "/library/compiler/linearizer.factor"
+        "/library/compiler/stack.factor"
         "/library/compiler/intrinsics.factor"
         "/library/compiler/simplifier.factor"
         "/library/compiler/generator.factor"

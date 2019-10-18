@@ -1,0 +1,2 @@
+#!/bin/sh
+makeindex -s $1.ist -t $1.glg -o $1.gls $1.glo

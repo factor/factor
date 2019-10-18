@@ -6,21 +6,14 @@ kernel lists math namespaces prettyprint sequences words ;
 : supported-cpu? ( -- ? )
     cpu "unknown" = not ;
 
-: check-architecture ( -- )
-    supported-cpu? [
-        "Unsupported CPU; compiler disabled" throw
-    ] unless ;
-
-: compiling ( word -- word parameter )
-    check-architecture "Compiling " write dup . dup word-def ;
-
 GENERIC: (compile) ( word -- )
 
 M: word (compile) drop ;
 
 M: compound (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
-    compiling dataflow optimize linearize simplify generate ;
+    "Compiling " write dup .
+    dup word-def dataflow optimize linearize simplify generate ;
 
 : precompile ( word -- )
     #! Print linear IR of word.
@@ -40,30 +33,18 @@ M: compound (compile) ( word -- )
     #! Compile the most recently defined word.
     "compile" get [ word compile ] when ; parsing
 
-: cannot-compile ( word error -- )
-    "Cannot compile " write swap . print-error ;
-
 : try-compile ( word -- )
-    [ compile ] [ [ cannot-compile ] when* ] catch ;
+    [ compile ] [ error. ] catch ;
 
 : compile-all ( -- ) [ try-compile ] each-word ;
 
 : recompile ( word -- )
     dup update-xt compile ;
 
-: compile-1 ( quot -- word )
-    #! Compute a quotation into an uninterned word, for testing
-    #! purposes.
-    gensym [ swap define-compound ] keep dup compile execute ;
-
-\ dataflow profile
-\ optimize profile
-\ linearize profile
-\ simplify profile
-\ generate profile
-\ kill-node profile
-\ partial-eval profile
-\ inline-method profile
-\ apply-identities profile
-\ subst-values profile
-\ split-branch profile
+: compile-1 ( quot -- )
+    #! Compute and call a quotation.
+    "compile" get [
+        gensym [ swap define-compound ] keep dup compile execute
+    ] [
+        call
+    ] ifte ;

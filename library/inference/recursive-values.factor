@@ -24,7 +24,7 @@ M: node solve-recursion* ( node -- ) drop ;
 
 M: #label solve-recursion* ( node -- )
     dup node-param over collect-recursion >r
-    node-children first dup node-in-d r> swap
+    node-child dup node-in-d r> swap
     join-values rot subst-values ;
 
 : solve-recursion ( node -- )

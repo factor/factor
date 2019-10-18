@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic hashtables inference kernel lists
-matrices namespaces sequences vectors ;
+USING: compiler-backend generic hashtables inference kernel
+lists math matrices namespaces sequences vectors ;
 
 ! We use the recursive-state variable here, to track nested
 ! label scopes, to prevent infinite loops when inlining
@@ -54,9 +54,23 @@ M: node optimize-node* ( node -- t )
 M: #push optimize-node* ( node -- node/t )
     [ node-out-d empty? ] prune-if ;
 
-! #drop
-M: #drop optimize-node*  ( node -- node/t )
-    [ node-in-d empty? ] prune-if ;
+! #shuffle
+: compose-shuffle-nodes ( #shuffle #shuffle -- #shuffle/t )
+    [ >r node-shuffle r> node-shuffle compose-shuffle ] keep
+    over shuffle-in-d length pick shuffle-in-r length + vregs > [
+        2drop t
+    ] [
+        [ set-node-shuffle ] keep
+    ] ifte ;
+
+M: #shuffle optimize-node*  ( node -- node/t )
+    dup node-successor dup #shuffle? [
+        compose-shuffle-nodes
+    ] [
+        drop [
+            dup node-in-d empty? swap node-in-r empty? and
+        ] prune-if
+    ] ifte ;
 
 ! #ifte
 : static-branch? ( node -- lit ? )
@@ -80,15 +94,3 @@ M: #values optimize-node* ( node -- node/t )
 ! #return
 M: #return optimize-node* ( node -- node/t )
     optimize-fold ;
-
-! M: #label optimize-node* ( node -- node/t )
-!     dup node-param over node-children first calls-label? [
-!         drop t
-!     ] [
-!         dup node-children first dup node-successor [
-!             dup penultimate-node rot
-!             node-successor swap set-node-successor
-!         ] [
-!             drop node-successor
-!         ] ifte
-!     ] ifte ;

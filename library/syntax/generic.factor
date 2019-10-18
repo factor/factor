@@ -14,12 +14,6 @@ words ;
     #! G: word combination ;
     CREATE dup reset-word [ define-generic* ] [ ] ; parsing
 
-: COMPLEMENT: ( -- )
-    #! Followed by a class name, then a complemented class.
-    CREATE
-    dup intern-symbol
-    scan-word define-complement ; parsing
-
 : UNION: ( -- class predicate definition )
     #! Followed by a class name, then a list of union members.
     CREATE

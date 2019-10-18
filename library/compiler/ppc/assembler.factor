@@ -70,7 +70,7 @@ USING: compiler errors generic kernel math memory words ;
 
 : (DIVW) 491 xo-form 31 insn ;
 : DIVW 0 0 (DIVW) ;  : DIVW. 0 1 (DIVW) ;
-: DIVWO 1 0 (DIVW) ; : DIVWO 1 1 (DIVW) ;
+: DIVWO 1 0 (DIVW) ; : DIVWO. 1 1 (DIVW) ;
 
 : (DIVWU) 459 xo-form 31 insn ;
 : DIVWU 0 0 (DIVWU) ;  : DIVWU. 0 1 (DIVWU) ;

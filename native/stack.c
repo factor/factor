@@ -37,17 +37,98 @@ void primitive_drop(void)
 	dpop();
 }
 
+void primitive_2drop(void)
+{
+	ds -= 2 * CELLS;
+}
+
+void primitive_3drop(void)
+{
+	ds -= 3 * CELLS;
+}
+
 void primitive_dup(void)
 {
 	dpush(dpeek());
 }
 
-void primitive_swap(void)
+void primitive_2dup(void)
+{
+	CELL top = dpeek();
+	CELL next = get(ds - CELLS);
+	ds += CELLS * 2;
+	put(ds - CELLS,next);
+	put(ds,top);
+}
+
+void primitive_3dup(void)
+{
+	CELL c1 = dpeek();
+	CELL c2 = get(ds - CELLS);
+	CELL c3 = get(ds - CELLS * 2);
+	ds += CELLS * 3;
+	put (ds,c1);
+	put (ds - CELLS,c2);
+	put (ds - CELLS * 2,c3);
+}
+
+void primitive_rot(void)
+{
+	CELL c1 = dpeek();
+	CELL c2 = get(ds - CELLS);
+	CELL c3 = get(ds - CELLS * 2);
+	put(ds,c3);
+	put(ds - CELLS,c1);
+	put(ds - CELLS * 2,c2);
+}
+
+void primitive__rot(void)
+{
+	CELL c1 = dpeek();
+	CELL c2 = get(ds - CELLS);
+	CELL c3 = get(ds - CELLS * 2);
+	put(ds,c2);
+	put(ds - CELLS,c3);
+	put(ds - CELLS * 2,c1);
+}
+
+void primitive_dupd(void)
+{
+	CELL top = dpeek();
+	CELL next = get(ds - CELLS);
+	put(ds,next);
+	put(ds - CELLS,next);
+	dpush(top);
+}
+
+void primitive_swapd(void)
+{
+	CELL top = get(ds - CELLS);
+	CELL next = get(ds - CELLS * 2);
+	put(ds - CELLS,next);
+	put(ds - CELLS * 2,top);
+}
+
+void primitive_nip(void)
+{
+	CELL top = dpop();
+	drepl(top);
+}
+
+void primitive_2nip(void)
+{
+	CELL top = dpeek();
+	ds -= CELLS * 2;
+	drepl(top);
+}
+
+void primitive_tuck(void)
 {
 	CELL top = dpeek();
 	CELL next = get(ds - CELLS);
 	put(ds,next);
 	put(ds - CELLS,top);
+	dpush(top);
 }
 
 void primitive_over(void)
@@ -58,6 +139,14 @@ void primitive_over(void)
 void primitive_pick(void)
 {
 	dpush(get(ds - CELLS * 2));
+}
+
+void primitive_swap(void)
+{
+	CELL top = dpeek();
+	CELL next = get(ds - CELLS);
+	put(ds,next);
+	put(ds - CELLS,top);
 }
 
 void primitive_to_r(void)

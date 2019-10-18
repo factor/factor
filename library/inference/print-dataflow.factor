@@ -16,28 +16,23 @@ M: comment pprint* ( ann -- )
 : comment, ( ? node text -- )
     rot [ <comment> , ] [ 2drop ] ifte ;
 
-: value-str ( classes values -- str )
-    [ swap hash [ object ] unless* ] map-with
-    [ word-name ] map
-    " " join ;
+: value-str ( prefix values -- str )
+    [ value-uid word-name append ] map-with concat ;
 
 : effect-str ( node -- str )
     [
-        dup node-classes swap
-        2dup node-in-d value-str %
-        "--" %
-        node-out-d value-str %
-    ] "" make ;
+        " " over node-in-d value-str %
+        " r: " over node-in-r value-str %
+        " --" %
+        " " over node-out-d value-str %
+        " r: " swap node-out-r value-str %
+    ] "" make 1 swap tail ;
 
 M: #push node>quot ( ? node -- )
     node-out-d [ literal-value literalize ] map % drop ;
 
-M: #drop node>quot ( ? node -- )
-    node-in-d length dup 3 > [
-        \ drop <repeated>
-    ] [
-        { f [ drop ] [ 2drop ] [ 3drop ] } nth
-    ] ifte % drop ;
+M: #shuffle node>quot ( ? node -- )
+    >r drop t r> dup effect-str "#shuffle: " swap append comment, ;
 
 DEFER: dataflow>quot
 
@@ -51,7 +46,7 @@ M: #call-label node>quot ( ? node -- ) #call>quot ;
 
 M: #label node>quot ( ? node -- )
     [ "#label: " over node-param word-name append comment, ] 2keep
-    node-children first swap dataflow>quot , \ call ,  ;
+    node-child swap dataflow>quot , \ call ,  ;
 
 M: #ifte node>quot ( ? node -- )
     [ "#ifte" comment, ] 2keep

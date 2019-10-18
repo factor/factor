@@ -1,16 +1,7 @@
 IN: temporary
-USING: generic kernel-internals strings vectors ;
-USE: test
-USE: assembler
-USE: compiler
-USE: compiler-frontend
-USE: inference
-USE: words
-USE: math
-USE: kernel
-USE: lists
-USE: sequences
-USE: prettyprint
+USING: assembler compiler compiler-backend generic inference
+kernel kernel-internals lists math prettyprint sequences strings
+test vectors words ;
 
 ! Some dataflow tests
 ! [ 3 ] [ 1 2 3 (subst-value) ] unit-test
@@ -36,11 +27,6 @@ USE: prettyprint
 [ { [ 1 ] [ 2 ] } ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
 
 [ { [ 1 ] [ 2 ] } ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
-
-[ [ t t f ] ] [
-    [ 1 2 3 ] [ <literal> ] map
-    [ [ literal-value 2 <= ] subset ] keep in-d-node <#drop> kill-mask
-] unit-test
 
 : literal-kill-test-1 4 compiled-offset cell 2 * - ; compiled
 
@@ -171,3 +157,9 @@ TUPLE: pred-test ;
 : fixnum-declarations >fixnum 24 shift 1234 bitxor ; compiled
 
 [ ] [ 1000000 fixnum-declarations . ] unit-test
+
+! regression
+
+: literal-not-branch 0 not [ ] [ ] ifte ; compiled
+
+[ ] [ literal-not-branch ] unit-test

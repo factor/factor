@@ -38,33 +38,54 @@ M: %fixnum- generate-node ( vop -- )
     \ ADD \ SUBF simple-overflow ;
 
 M: %fixnum* generate-node ( vop -- )
-    dup >3-vop< dup dup tag-bits SRAWI
+    #! Note that this assumes the output will be in r3.
+    >3-vop< dup dup tag-bits SRAWI
     0 MTXER
-    [ >r >r drop 4 r> r> MULLWO. 3 ] 2keep
+    [ >r >r drop 6 r> r> MULLWO. 3 ] 2keep
     <label> "end" set
     "end" get BNO
     MULHW
+    4 6 MR
     "s48_long_long_to_bignum" f compile-c-call
     ! now we have to shift it by three bits to remove the second
     ! tag
     tag-bits neg 4 LI
     "s48_bignum_arithmetic_shift" f compile-c-call
     ! An untagged pointer to the bignum is now in r3; tag it
-    3 4 bignum-tag ORI
+    3 6 bignum-tag ORI
     "end" get save-xt
-    vop-out-1 v>operand 4 MR ;
+    3 6 MR ;
+
+: first-bignum ( -- n )
+    1 cell 8 * tag-bits - 1 - shift ; inline
+
+: most-positive-fixnum ( -- n )
+    first-bignum 1 - >fixnum ; inline
+
+: most-negative-fixnum ( -- n )
+    first-bignum neg >fixnum ; inline
 
 M: %fixnum/i generate-node ( vop -- )
-    dup >3-vop< swap DIVW
-    vop-out-1 v>operand dup tag-fixnum ;
+    #! This has specific vreg requirements.
+    <label> "end" set
+    drop
+    5 3 4 DIVW
+    most-positive-fixnum 4 LOAD
+    5 3 tag-fixnum
+    5 0 4 CMP
+    "end" get BLE
+    most-negative-fixnum neg 3 LOAD
+    "s48_long_to_bignum" f compile-c-call
+    3 3 bignum-tag ORI
+    "end" get save-xt ;
 
 : generate-fixnum/mod ( -- )
     #! The same code is used for %fixnum/i and %fixnum/mod.
     #! mdest is vreg where to put the modulus. Note this has
     #! precise vreg requirements.
-    20 17 18 DIVW  ! divide in2 by in1, store result in out1
-    21 20 18 MULLW ! multiply out1 by in1, store result in in1
-    19 21 17 SUBF  ! subtract in2 from in1, store result in out1.
+    6 3 4 DIVW  ! divide in2 by in1, store result in out1
+    7 6 4 MULLW ! multiply out1 by in1, store result in in1
+    5 7 3 SUBF  ! subtract in2 from in1, store result in out1.
     ;
 
 M: %fixnum-mod generate-node ( vop -- )
@@ -74,8 +95,8 @@ M: %fixnum-mod generate-node ( vop -- )
 M: %fixnum/mod generate-node ( vop -- )
     #! This has specific vreg requirements.
     drop generate-fixnum/mod
-    17 20 MR
-    17 17 tag-fixnum ;
+    3 6 MR
+    3 3 tag-fixnum ;
 
 M: %fixnum-bitand generate-node ( vop -- )
     >3-vop< AND ;
@@ -95,22 +116,23 @@ M: %fixnum<< generate-node ( vop -- )
     <label> "end" set
     vop-in-1
     ! check for potential overflow
-    dup shift-add dup 19 LOAD
-    18 17 19 ADD
-    0 18 rot 2 * 1 - CMPLI
+    dup shift-add dup 5 LOAD
+    4 3 5 ADD
+    2 * 1 - 5 LOAD
+    5 0 4 CMPL
     ! is there going to be an overflow?
     "no-overflow" get BGE
     ! there is going to be an overflow, make a bignum
-    3 17 tag-bits SRAWI
+    3 3 tag-bits SRAWI
     "s48_long_to_bignum" f compile-c-call
     dup 4 LI
     "s48_bignum_arithmetic_shift" f compile-c-call
     ! tag the result
-    3 17 bignum-tag ORI
+    3 3 bignum-tag ORI
     "end" get B
     ! there is not going to be an overflow
     "no-overflow" get save-xt
-    17 17 rot SLWI
+    3 3 rot SLWI.
     "end" get save-xt ;
 
 M: %fixnum>> generate-node ( vop -- )
@@ -118,9 +140,6 @@ M: %fixnum>> generate-node ( vop -- )
 
 M: %fixnum-sgn generate-node ( vop -- )
     dest/src dupd 31 SRAWI dup untag ;
-
-: MULLW 0 0 (MULLW) ;
-: MULLW. 0 1 (MULLW) ;
 
 : compare ( vop -- )
     dup vop-in-2 v>operand swap vop-in-1 dup integer? [
