@@ -1,34 +1,6 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2003, 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-IN: lists
-USE: generic
-USE: kernel
-USE: kernel-internals
+! Copyright (C) 2003, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
+IN: lists USING: generic kernel kernel-internals ;
 
 ! This file contains vital list-related words that everything
 ! else depends on, and is loaded early in bootstrap.
@@ -36,15 +8,15 @@ USE: kernel-internals
 
 BUILTIN: cons 2
 
-: car ( [ car | cdr ] -- car ) >cons 0 slot ; inline
-: cdr ( [ car | cdr ] -- cdr ) >cons 1 slot ; inline
+: car ( [[ car cdr ]] -- car ) >cons 0 slot ; inline
+: cdr ( [[ car cdr ]] -- cdr ) >cons 1 slot ; inline
 
-: swons ( cdr car -- [ car | cdr ] )
+: swons ( cdr car -- [[ car cdr ]] )
     #! Push a new cons cell. If the cdr is f or a proper list,
     #! has the effect of prepending the car to the cdr.
     swap cons ; inline
 
-: uncons ( [ car | cdr ] -- car cdr )
+: uncons ( [[ car cdr ]] -- car cdr )
     #! Push both the head and tail of a list.
     dup car swap cdr ; inline
 
@@ -52,7 +24,7 @@ BUILTIN: cons 2
     #! Construct a proper list of one element.
     f cons ; inline
 
-: unswons ( [ car | cdr ] -- cdr car )
+: unswons ( [[ car cdr ]] -- cdr car )
     #! Push both the head and tail of a list.
     dup cdr swap car ; inline
 
@@ -80,6 +52,10 @@ PREDICATE: general-list list ( list -- ? )
     #! cell whose cdr is a proper list.
     dup [ last* cdr ] when not ;
 
+: with ( obj quot elt -- obj quot )
+    #! Utility word for each-with, map-with.
+    pick pick >r >r swap call r> r> ; inline
+
 : all? ( list pred -- ? )
     #! Push if the predicate returns true for each element of
     #! the list.
@@ -93,6 +69,9 @@ PREDICATE: general-list list ( list -- ? )
         2drop t
     ] ifte ; inline
 
+: all-with? ( obj list pred -- ? )
+    swap [ with rot ] all? 2nip ; inline
+
 : (each) ( list quot -- list quot )
     >r uncons r> tuck 2slip ; inline
 
@@ -100,10 +79,6 @@ PREDICATE: general-list list ( list -- ? )
     #! Push each element of a proper list in turn, and apply a
     #! quotation with effect ( elt -- ) to each element.
     over [ (each) each ] [ 2drop ] ifte ; inline
-
-: with ( obj quot elt -- obj quot )
-    #! Utility word for each-with, map-with.
-    pick pick >r >r swap call r> r> ;
 
 : each-with ( obj list quot -- )
     #! Push each element of a proper list in turn, and apply a
@@ -121,3 +96,26 @@ PREDICATE: general-list list ( list -- ? )
     ] [
         drop
     ] ifte ; inline
+
+: subset-with ( obj list quot -- list )
+    swap [ with rot ] subset 2nip ; inline
+
+: some? ( list pred -- ? )
+    #! Apply predicate with stack effect ( elt -- ? ) to each
+    #! element, return remainder of list from first occurrence
+    #! where it is true, or return f.
+    over [
+        dup >r over >r >r car r> call [
+            r> r> drop
+        ] [
+            r> cdr r> some?
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ; inline
+
+: some-with? ( obj list pred -- ? )
+    #! Apply predicate with stack effect ( obj elt -- ? ) to
+    #! each element, return remainder of list from first
+    #! occurrence where it is true, or return f.
+    swap [ with rot ] some? 2nip ; inline

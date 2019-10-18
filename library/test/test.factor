@@ -1,20 +1,8 @@
 ! Factor test suite.
 
-! Some of these words should be moved to the standard library.
-
 IN: test
-USE: errors
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: parser
-USE: prettyprint
-USE: stdio
-USE: strings
-USE: words
-USE: vectors
-USE: unparser
+USING: errors kernel lists math memory namespaces parser
+prettyprint stdio strings words vectors unparser ;
 
 : assert ( t -- )
     [ "Assertion failed!" throw ] unless ;
@@ -45,14 +33,6 @@ USE: unparser
     #! Assert that the quotation throws an error.
     [ [ not ] catch ] cons [ f ] swap unit-test ;
 
-: test-word ( output input word -- )
-    #! Old-style test.
-    append unit-test ;
-
-: do-not-test-word ( output input word -- )
-    #! Flag for tests that are known not to work.
-    3drop ;
-
 : test ( name -- )
     ! Run the given test.
     depth 1 - >r
@@ -77,6 +57,7 @@ USE: unparser
         "strings"
         "namespaces"
         "generic"
+        "tuple"
         "files"
         "parser"
         "parse-number"
@@ -111,10 +92,19 @@ USE: unparser
         "interpreter"
         "hsv"
         "alien"
+        "line-editor"
+        "gadgets"
+        "memory"
     ] [
         test
     ] each
-    
+
+    os "win32" = [
+        [
+            "buffer"
+        ] [ test ] each
+    ] when    
+
     cpu "x86" = [
         [
             "compiler/optimizer"
@@ -124,6 +114,7 @@ USE: unparser
             "compiler/ifte"
             "compiler/generic"
             "compiler/bail-out"
+            "compiler/linearizer"
         ] [
             test
         ] each

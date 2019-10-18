@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
 	userenv[ARGS_ENV] = args;
 
-	run();
+	platform_run();
 
 	return 0;
 }

@@ -41,7 +41,7 @@ USE: strings
 ! parse-stream
 
 : next-line ( -- str )
-    "parse-stream" get freadln
+    "parse-stream" get stream-readln
     "line-number" [ 1 + ] change ;
 
 : (read-lines) ( quot -- )
@@ -57,7 +57,7 @@ USE: strings
     swap [
         "parse-stream" set 0 "line-number" set (read-lines)
     ] [
-        "parse-stream" get fclose rethrow
+        "parse-stream" get stream-close rethrow
     ] catch ;
 
 : file-vocabs ( -- )
@@ -75,7 +75,7 @@ USE: strings
     [ file-vocabs (parse-stream) ] with-scope ;
 
 : parse-file ( file -- quot )
-    dup <filecr> parse-stream ;
+    dup <file-reader> parse-stream ;
 
 : run-file ( file -- )
     #! Run a file. The file is read with the default IN:/USE:
@@ -83,7 +83,7 @@ USE: strings
     parse-file call ;
 
 : (parse-file) ( file -- quot )
-    dup <filecr> (parse-stream) ;
+    dup <file-reader> (parse-stream) ;
 
 : (run-file) ( file -- )
     #! Run a file. The file is read with the same IN:/USE: as

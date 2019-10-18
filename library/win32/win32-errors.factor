@@ -37,12 +37,13 @@ USE: alien
 USE: words
 
 : CONSTANT: CREATE 
-    [ [ [ parsed ] each ] cons define-compound POSTPONE: parsing ] 
+    [ [ [ swons ] each ] cons define-compound POSTPONE: parsing ] 
     [ ] ; parsing
 
 CONSTANT: ERROR_SUCCESS 0 ;
 CONSTANT: ERROR_HANDLE_EOF 38 ;
 CONSTANT: ERROR_IO_PENDING 997 ;
+CONSTANT: WAIT_TIMEOUT 258 ;
 
 : FORMAT_MESSAGE_ALLOCATE_BUFFER HEX: 00000100 ;
 : FORMAT_MESSAGE_IGNORE_INSERTS  HEX: 00000200 ;

@@ -35,11 +35,11 @@ USE: lists
 
 : get-live-updater-js* ( stream -- string )
   #! Read all lines from the stream, creating a string of the result.
-  dup freadln dup [ , "\n" , get-live-updater-js* ] [ drop fclose ] ifte ;
+  dup stream-readln dup [ , "\n" , get-live-updater-js* ] [ drop stream-close ] ifte ;
 
 : get-live-updater-js ( filename -- string )
   #! Return the liveUpdater javascript code as a string.
-  <filecr> [ get-live-updater-js* ] make-string ;
+  <file-reader> [ get-live-updater-js* ] make-string ;
 
 : live-updater-url ( -- url )
   #! Generate an URL to the liveUpdater.js code.
@@ -47,7 +47,7 @@ USE: lists
     [
       "js/liveUpdater.js" get-live-updater-js write
     ] show        
-  ] register-continuation ;
+  ] register-continuation id>url ;
 
 : include-live-updater-js ( -- )
   #! Write out the HTML script to include the live updater
@@ -96,7 +96,7 @@ USE: lists
     "document.getElementById('" write
     write
     "').onclick=liveUpdaterUri('" write
-    register-live-anchor-quot write
+    register-live-anchor-quot id>url write
     "');" write
   </script> ;
   
@@ -153,7 +153,7 @@ USE: lists
     "liveSearch('" write
     write
     "', '" write
-    register-live-search-quot write
+    register-live-search-quot id>url write
     "');" write
   </script> ;
 

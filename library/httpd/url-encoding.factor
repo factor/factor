@@ -30,6 +30,7 @@ USE: errors
 USE: kernel
 USE: lists
 USE: math
+USE: namespaces
 USE: parser
 USE: strings
 USE: unparser

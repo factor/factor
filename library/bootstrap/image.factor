@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,7 @@
 IN: image
 USE: errors
 USE: generic
+USE: kernel-internals
 USE: hashtables
 USE: kernel
 USE: lists
@@ -82,36 +83,28 @@ SYMBOL: boot-quot
 : tag ( cell -- tag ) tag-mask bitand ;
 
 : fixnum-tag  BIN: 000 ; inline
-: word-tag    BIN: 001 ; inline
+: bignum-tag  BIN: 001 ; inline
 : cons-tag    BIN: 010 ; inline
 : object-tag  BIN: 011 ; inline
-: ratio-tag   BIN: 100 ; inline
-: complex-tag BIN: 101 ; inline
-: header-tag  BIN: 110 ; inline
 
-: f-type      6  ; inline
-: t-type      7  ; inline
-: array-type  8  ; inline
-: bignum-type 9  ; inline
-: float-type  10 ; inline
-: vector-type 11 ; inline
-: string-type 12 ; inline
-: sbuf-type   13 ; inline
-: port-type   14 ; inline
-: dll-type    15 ; inline
-: alien-type  16 ; inline
+: t-type         7  ; inline
+: array-type     8  ; inline
+: hashtable-type 10 ; inline
+: vector-type    11 ; inline
+: string-type    12 ; inline
+: word-type      17 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
-: >header ( id -- tagged ) header-tag immediate ;
+: >header ( id -- tagged ) object-tag immediate ;
 
 ( Image header )
 
 : base
     #! We relocate the image to after the header, and leaving
-    #! two empty cells. This lets us differentiate an F pointer
+    #! some empty cells. This lets us differentiate an F pointer
     #! (0/tag 3) from a pointer to the first object in the
     #! image.
-    2 cell * ;
+    64 cell * ;
 
 : header ( -- )
     image-magic emit
@@ -150,19 +143,21 @@ GENERIC: ' ( obj -- ptr )
 
 ( Fixnums )
 
+: emit-fixnum ( n -- ) fixnum-tag immediate emit ;
+
 M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
 
 M: bignum ' ( bignum -- tagged )
     #! This can only emit 0, -1 and 1.
-    object-tag here-as >r
-    bignum-type >header emit
+    bignum-tag here-as >r
+    bignum-tag >header emit
     [
-        [ 0  | [ 1 0   ] ]
-        [ -1 | [ 2 1 1 ] ]
-        [ 1  | [ 2 0 1 ] ]
-    ] assoc [ emit ] each align-here r> ;
+        [[ 0  [ 1 0   ] ]]
+        [[ -1 [ 2 1 1 ] ]]
+        [[ 1  [ 2 0 1 ] ]]
+    ] assoc unswons emit-fixnum [ emit ] each align-here r> ;
 
 ( Special objects )
 
@@ -183,7 +178,7 @@ M: f ' ( obj -- ptr )
 : -1, -1 >bignum ' drop ;
 
 ( Beginning of the image )
-! The image proper begins with the header, then T,
+! The image begins with the header, then T,
 ! and the bignums 0, 1, and -1.
 
 : begin ( -- ) header t, 0, 1, -1, ;
@@ -192,16 +187,16 @@ M: f ' ( obj -- ptr )
 
 : word, ( word -- )
     [
-        word-tag >header ,
+        word-type >header ,
         dup hashcode fixnum-tag immediate ,
         0 ,
         dup word-primitive ,
         dup word-parameter ' ,
-        dup word-plist ' ,
+        dup word-props ' ,
         0 ,
         0 ,
     ] make-list
-    swap word-tag here-as pool-object
+    swap object-tag here-as pool-object
     [ emit ] each ;
 
 : word-error ( word msg -- )
@@ -215,18 +210,10 @@ M: f ' ( obj -- ptr )
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.
     dup dup word-name swap word-vocabulary unit search
-    dup [
-        nip
-    ] [
-        drop "Missing DEFER: " word-error
-    ] ifte ;
+    [ dup "Missing DEFER: " word-error ] ?unless ;
 
 : fixup-word ( word -- offset )
-    dup pooled-object dup [
-        nip
-    ] [
-        drop "Not in image: " word-error
-    ] ifte ;
+    dup pooled-object [ "Not in image: " word-error ] ?unless ;
 
 : fixup-words ( -- )
     image get [
@@ -265,18 +252,16 @@ M: cons ' ( c -- tagged )
     object-tag here-as swap
     string-type >header emit
     dup str-length emit
-    dup hashcode fixnum-tag immediate emit
-    pack-string
+    dup hashcode emit-fixnum
+    "\0" cat2 pack-string
     align-here ;
 
 M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
     #! to the image
-    dup pooled-object dup [
-        nip
-    ] [
-        drop dup emit-string dup >r pool-object r>
-    ] ifte ;
+    dup pooled-object [
+        dup emit-string dup >r pool-object r>
+    ] ?unless ;
 
 ( Arrays and vectors )
 
@@ -284,7 +269,7 @@ M: string ' ( string -- pointer )
     [ ' ] map
     object-tag here-as >r
     array-type >header emit
-    dup length emit
+    dup length emit-fixnum
     ( elements -- ) [ emit ] each
     align-here r> ;
 
@@ -292,37 +277,40 @@ M: string ' ( string -- pointer )
     dup vector>list emit-array swap vector-length
     object-tag here-as >r
     vector-type >header emit
-    emit ( length )
+    emit-fixnum ( length )
     emit ( array ptr )
     align-here r> ;
 
 M: vector ' ( vector -- pointer )
     emit-vector ;
 
-: rehash ( hashtable -- )
-    ! Now make a rehashing boot quotation
-    dup hash>alist [
-        >r dup vector-length [
-            f swap pick set-vector-nth
-        ] times* r>
-        [ unswons rot set-hash ] each-with
-    ] cons cons
-    boot-quot [ append ] change ;
+! : rehash ( hashtable -- )
+!     ! Now make a rehashing boot quotation
+!     dup hash>alist [
+!         over hash-clear
+!         [ unswons rot set-hash ] each-with
+!     ] cons cons
+!     boot-quot [ append ] change ;
+
+: emit-hashtable ( hash -- pointer )
+    dup buckets>list emit-array swap hash>alist length
+    object-tag here-as >r
+    hashtable-type >header emit
+    emit-fixnum ( length )
+    emit ( array ptr )
+    align-here r> ;
 
 M: hashtable ' ( hashtable -- pointer )
     #! Only hashtables are pooled, not vectors!
-    dup pooled-object dup [
-        nip
-    ] [
-        drop [ dup emit-vector [ pool-object ] keep ] keep
-        rehash
-    ] ifte ;
+    dup pooled-object [
+        dup emit-hashtable [ pool-object ] keep
+    ] ?unless ;
 
 ( End of the image )
 
 : vocabularies, ( vocabularies -- )
     [
-        cdr dup vector? [
+        cdr dup hashtable? [
             [
                 cdr dup word? [ word, ] [ drop ] ifte
             ] hash-each
@@ -364,16 +352,15 @@ M: hashtable ' ( hashtable -- pointer )
     ] ifte ;
 
 : write-image ( image file -- )
-    <filebw> [ [ write-word ] vector-each ] with-stream ;
+    <file-writer> [ [ write-word ] vector-each ] with-stream ;
 
 : with-minimal-image ( quot -- image )
     [
         300000 <vector> image set
-        521 <hashtable> "objects" set
+        <namespace> "objects" set
         ! Note that this is a vector that we can side-effect,
         ! since ; ends up using this variable from nested
         ! parser namespaces.
-        1000 <vector> "word-fixups" set
         call
         image get
     ] with-scope ;

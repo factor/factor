@@ -14,9 +14,9 @@ USE: inference
 : alien-inference-1
     "void" "foobar" "boo" [ "short" "short" ] alien-invoke ;
 
-[ [ 2 | 0 ] ] [ [ alien-inference-1 ] infer old-effect ] unit-test
+[ [[ 2 0 ]] ] [ [ alien-inference-1 ] infer old-effect ] unit-test
 
 : alien-inference-2
     "int" "foobar" "boo" [ "short" "short" ] alien-invoke ;
 
-[ [ 2 | 1 ] ] [ [ alien-inference-2 ] infer old-effect ] unit-test
+[ [[ 2 1 ]] ] [ [ alien-inference-2 ] infer old-effect ] unit-test

@@ -36,19 +36,18 @@ USE: strings
 USE: unparser
 
 : log ( msg -- )
-    "log" get dup [ tuck fprint fflush ] [ 2drop ] ifte ;
+    "log" get dup [ tuck stream-print stream-flush ] [ 2drop ] ifte ;
 
 : log-error ( error -- )
     "Error: " swap cat2 log ;
 
-: log-client ( -- )
-    "client" get [
-        "Accepted connection from " swap
-        "client" swap hash cat2 log
+: log-client ( client-stream -- )
+    client-stream-host [
+        "Accepted connection from " swap cat2 log
     ] when* ;
 
 : with-logging ( quot -- )
     [ stdio get "log" set call ] with-scope ;
 
 : with-log-file ( file quot -- )
-    [ swap <filecr> "log" set call ] with-scope ;
+    [ swap <file-reader> "log" set call ] with-scope ;

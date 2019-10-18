@@ -1,41 +1,10 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2003 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: words
-USE: generic
-USE: hashtables
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: math
-USE: namespaces
-USE: strings
+USING: generic hashtables kernel kernel-internals lists math
+namespaces strings ;
 
-BUILTIN: word 1
+BUILTIN: word 17
 
 M: word hashcode 1 slot %fixnum ;
 
@@ -49,8 +18,8 @@ M: word hashcode 1 slot %fixnum ;
 : word-parameter     ( w -- obj ) >word 4 slot ; inline
 : set-word-parameter ( obj w -- ) >word 4 set-slot ; inline
 
-: word-plist     ( w -- obj ) >word 5 slot ; inline
-: set-word-plist ( obj w -- ) >word 5 set-slot ; inline
+: word-props     ( w -- obj ) >word 5 slot ; inline
+: set-word-props ( obj w -- ) >word 5 set-slot ; inline
 
 : call-count     ( w -- n ) >word 6 integer-slot ; inline
 : set-call-count ( n w -- ) >word 6 set-integer-slot ; inline
@@ -61,17 +30,24 @@ M: word hashcode 1 slot %fixnum ;
 SYMBOL: vocabularies
 
 : word-property ( word pname -- pvalue )
-    swap word-plist assoc ; inline
+    swap word-props hash ; inline
 
 : set-word-property ( word pvalue pname -- )
-    pick word-plist
-    pick [ set-assoc ] [ remove-assoc nip ] ifte
-    swap set-word-plist ; inline
+    rot word-props set-hash ; inline
 
 PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
 PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;
 PREDICATE: word symbol    ( obj -- ? ) word-primitive 2 = ;
 PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
+
+! These should really be somewhere in library/generic/, but
+! during bootstrap, we cannot execute parsing words after they
+! are defined by code loaded into the target image.
+PREDICATE: compound generic ( word -- ? )
+    "combination" word-property ;
+
+PREDICATE: compound promise ( obj -- ? )
+    "promise" word-property ;
 
 : define ( word primitive parameter -- )
     pick set-word-parameter
@@ -90,5 +66,3 @@ PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
     "name" word-property >string ;
 
 : word-vocabulary ( word -- str ) "vocabulary" word-property ;
-: stack-effect    ( word -- str ) "stack-effect" word-property ;
-: documentation   ( word -- str ) "documentation" word-property ;

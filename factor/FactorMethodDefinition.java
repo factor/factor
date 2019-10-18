@@ -32,15 +32,16 @@ package factor;
 /**
  * M: type generic ... ;M
  */
-public class FactorMethodDefinition extends FactorWordDefinition
+public class FactorMethodDefinition
 {
 	private FactorWord type;
+	private FactorWord generic;
 	private Cons def;
 
 	public FactorMethodDefinition(FactorWord type,
 		FactorWord generic, Cons def)
 	{
-		super(generic);
+		this.generic = generic;
 		this.type = type;
 		this.def = def;
 	}

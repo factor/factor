@@ -1,45 +1,10 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USE: syntax
-
-USE: errors
-USE: hashtables
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: parser
-USE: strings
-USE: words
-USE: vectors
-USE: unparser
+USING: syntax errors generic hashtables kernel lists
+math namespaces parser strings words vectors unparse ;
 
 : parsing ( -- )
     #! Mark the most recently defined word to execute at parse
@@ -55,29 +20,36 @@ USE: unparser
 ! ( and #! then add "stack-effect" and "documentation"
 ! properties to the current word if it is set.
 
-! Constants
-: t t parsed ; parsing
-: f f parsed ; parsing
+! Booleans
+: t t swons ; parsing
+: f f swons ; parsing
 
 ! Lists
 : [ f ; parsing
-: ] reverse parsed ; parsing
+: ] reverse swons ; parsing
 
-: | ( syntax: | cdr ] )
-    #! See the word 'parsed'. We push a special sentinel, and
-    #! 'parsed' acts accordingly.
-    "|" ; parsing
+! Conses (whose cdr might not be a list)
+: [[ f ; parsing
+: ]] 2unlist swons swons ; parsing
 
 ! Vectors
 : { f ; parsing
-: } reverse list>vector parsed ; parsing
+: } reverse list>vector swons ; parsing
 
 ! Hashtables
 : {{ f ; parsing
-: }} alist>hash parsed ; parsing
+: }} alist>hash swons ; parsing
+
+! Tuples.
+: << f ; parsing
+: >> reverse literal-tuple swons ; parsing
+
+! Complex numbers
+: #{ f ; parsing
+: }# 2unlist swap rect> swons ; parsing
 
 ! Do not execute parsing word
-: POSTPONE: ( -- ) scan-word parsed ; parsing
+: POSTPONE: ( -- ) scan-word swons ; parsing
 
 : :
     #! Begin a word definition. Word name follows.
@@ -95,43 +67,45 @@ USE: unparser
 : \
     #! Parsed as a piece of code that pushes a word on the stack
     #! \ foo ==> [ foo ] car
-    scan-word unit parsed  \ car parsed ; parsing
+    scan-word unit swons  \ car swons ; parsing
 
 ! Vocabularies
 : DEFER:
     #! Create a word with no definition. Used for mutually
     #! recursive words.
     CREATE drop ; parsing
+
 : FORGET: scan-word forget ; parsing
 
 : USE:
     #! Add vocabulary to search path.
     scan "use" cons@ ; parsing
+
+: USING:
+    #! A list of vocabularies terminated with ;
+    string-mode on
+    [ string-mode off [ "use" cons@ ] each ]
+    f ; parsing
+
 : IN:
     #! Set vocabulary for new definitions.
     scan dup "use" cons@ "in" set ; parsing
 
 ! Char literal
-: CHAR: ( -- ) next-word-ch parse-ch parsed ; parsing
+: CHAR: ( -- ) 0 scan next-char drop swons ; parsing
 
 ! String literal
-: parse-string ( -- )
-    next-ch dup CHAR: " = [
-        drop
+: parse-string ( n str -- n )
+    2dup str-nth CHAR: " = [
+        drop 1 +
     ] [
-        parse-ch , parse-string
+        [ next-char swap , ] keep parse-string
     ] ifte ;
 
 : "
-    #! Note the ugly hack to carry the new value of 'pos' from
-    #! the make-string scope up to the original scope.
-    [ parse-string "col" get ] make-string
-    swap "col" set parsed ; parsing
-
-: #{
-    #! Complex literal - #{ real imaginary #}
-    scan str>number scan str>number rect> "}" expect parsed ;
-    parsing
+    "col" [
+        "line" get [ parse-string ] make-string swap
+    ] change swons ; parsing
 
 ! Comments
 : (
@@ -148,11 +122,11 @@ USE: unparser
 
 ! Reading numbers in other bases
 
-: BASE: ( base -- )
+: (BASE) ( base -- )
     #! Read a number in a specific base.
-    scan swap base> parsed ;
+    scan swap base> swons ;
 
-: HEX: 16 BASE: ; parsing
-: DEC: 10 BASE: ; parsing
-: OCT: 8 BASE: ; parsing
-: BIN: 2 BASE: ; parsing
+: HEX: 16 (BASE) ; parsing
+: DEC: 10 (BASE) ; parsing
+: OCT: 8 (BASE) ; parsing
+: BIN: 2 (BASE) ; parsing

@@ -279,6 +279,10 @@ void primitive_close(void)
 	F_PORT* port = untag_port(dpop());
 	close(port->fd);
 	port->closed = true;
+	port->buffer = F;
+	port->buf_fill = 0;
+	port->buf_pos = 0;
+	port->line = F;
 }
 
 void collect_io_tasks(void)

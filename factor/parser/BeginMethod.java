@@ -33,12 +33,9 @@ import factor.*;
 
 public class BeginMethod extends FactorParsingDefinition
 {
-	private FactorWord colon;
-
-	public BeginMethod(FactorWord word, FactorWord colon)
+	public BeginMethod(FactorWord word)
 	{
 		super(word);
-		this.colon = colon;
 	}
 
 	public void eval(FactorReader reader)
@@ -48,10 +45,10 @@ public class BeginMethod extends FactorParsingDefinition
 		if(type == null)
 			return;
 
-		FactorWord generic = reader.nextWord(false);
-		if(generic == null)
+		FactorWord newWord = reader.nextWord(false);
+		if(newWord == null)
 			return;
 
-		reader.pushExclusiveState(colon,generic);
+		reader.pushExclusiveState(word,newWord);
 	}
 }

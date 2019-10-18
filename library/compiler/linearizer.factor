@@ -34,6 +34,8 @@ USE: namespaces
 USE: words
 USE: strings
 USE: errors
+USE: prettyprint
+USE: kernel-internals
 
 ! The linear IR is close to assembly language. It also resembles
 ! Forth code in some sense. It exists so that pattern matching
@@ -51,10 +53,13 @@ SYMBOL: #jump ( tail-call )
 SYMBOL: #jump-label ( tail-call )
 SYMBOL: #return-to ( push addr on C stack )
 
-! #dispatch is linearized as #dispatch followed by a #target
-! for each dispatch table entry. The linearizer ensures the
-! correct number of #targets is emitted.
+! dispatch is linearized as dispatch followed by a #target or
+! #target-label for each dispatch table entry. The dispatch
+! table terminates with #end-dispatch. The linearizer ensures
+! the correct number of #targets is emitted.
 SYMBOL: #target ( part of jump table )
+SYMBOL: #target-label
+SYMBOL: #end-dispatch
 
 : linear, ( node -- )
     #! Add a node to the linear IR.
@@ -127,8 +132,7 @@ SYMBOL: #target ( part of jump table )
 : linearize-ifte ( param -- )
     #! The parameter is a list of two lists, each one a dataflow
     #! IR.
-    uncons car
-    <label> [
+    2unlist  <label> [
         #jump-t swons ,
         (linearize) ( false branch )
         <label> dup #jump-label swons ,
@@ -136,34 +140,28 @@ SYMBOL: #target ( part of jump table )
     swap (linearize) ( true branch )
     label, ( branch target of false branch end ) ;
 
-#ifte [
+\ ifte [
     [ node-param get ] bind linearize-ifte
 ] "linearizer" set-word-property
 
 : dispatch-head ( vtable -- end label/code )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    [ #dispatch ] ,
+    [ dispatch ] ,
     <label> ( end label ) swap
-    [ <label> dup #target swons ,  cons ] map ;
+    [ <label> dup #target-label swons ,  cons ] map
+    [ #end-dispatch ] , ;
 
 : dispatch-body ( end label/param -- )
     #! Output each branch, with a jump to the end label.
-    [
-        uncons label, (linearize) #jump-label swons ,
-    ] each-with ;
-
-: check-dispatch ( vtable -- )
-    length num-types = [
-        "Dispatch must have " num-types " entries" cat3 throw
-    ] unless ;
+    [ uncons label, (linearize) #jump-label swons , ] each-with ;
 
 : linearize-dispatch ( vtable -- )
     #! The parameter is a list of lists, each one is a branch to
     #! take in case the top of stack has that type.
-    dup check-dispatch dispatch-head dupd dispatch-body label, ;
+    dispatch-head dupd dispatch-body label, ;
 
-#dispatch [
+\ dispatch [
     [ node-param get ] bind linearize-dispatch
 ] "linearizer" set-word-property
 

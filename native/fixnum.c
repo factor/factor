@@ -7,7 +7,7 @@ F_FIXNUM to_fixnum(CELL tagged)
 	F_ARRAY* y;
 	F_FLOAT* f;
 
-	switch(type_of(tagged))
+	switch(TAG(tagged))
 	{
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(tagged);
@@ -17,7 +17,7 @@ F_FIXNUM to_fixnum(CELL tagged)
 		r = (F_RATIO*)UNTAG(tagged);
 		x = to_bignum(r->numerator);
 		y = to_bignum(r->denominator);
-		return to_fixnum(tag_object(s48_bignum_quotient(x,y)));
+		return to_fixnum(tag_bignum(s48_bignum_quotient(x,y)));
 	case FLOAT_TYPE:
 		f = (F_FLOAT*)UNTAG(tagged);
 		return (F_FIXNUM)f->n;
@@ -72,7 +72,7 @@ void primitive_fixnum_multiply(void)
 			box_integer(prod);
 		else
 		{
-			dpush(tag_object(
+			dpush(tag_bignum(
 				s48_bignum_multiply(
 					s48_long_to_bignum(x),
 					s48_long_to_bignum(y))));
@@ -91,7 +91,7 @@ void primitive_fixnum_divfloat(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());
 	F_FIXNUM x = untag_fixnum_fast(dpop());
-	dpush(tag_object(make_float((double)x / (double)y)));
+	dpush(tag_float((double)x / (double)y));
 }
 
 void primitive_fixnum_divmod(void)
@@ -166,7 +166,7 @@ void primitive_fixnum_shift(void)
 		}
 	}
 
-	dpush(tag_object(s48_bignum_arithmetic_shift(
+	dpush(tag_bignum(s48_bignum_arithmetic_shift(
 		s48_long_to_bignum(x),y)));
 }
 
@@ -203,26 +203,24 @@ void primitive_fixnum_not(void)
 	drepl(tag_fixnum(~untag_fixnum_fast(dpeek())));
 }
 
-/* FFI calls this */
-void box_signed_1(signed char integer)
-{
-	dpush(tag_integer(integer));
+#define DEFBOX(name,type)                                                      \
+void name (type integer)                                                       \
+{                                                                              \
+	dpush(tag_integer(integer));                                               \
 }
 
-/* FFI calls this */
-void box_signed_2(signed short integer)
-{
-	dpush(tag_integer(integer));
+#define DEFUNBOX(name,type)                                                    \
+type name(void)                                                                \
+{                                                                              \
+	return to_fixnum(dpop());                                                  \
 }
 
-/* FFI calls this */
-signed char unbox_signed_1(void)
-{
-	return to_integer(dpop());
-}
+DEFBOX(box_signed_1, signed char)
+DEFBOX(box_signed_2, signed short)
+DEFBOX(box_unsigned_1, unsigned char)
+DEFBOX(box_unsigned_2, unsigned short)
+DEFUNBOX(unbox_signed_1, signed char)
+DEFUNBOX(unbox_signed_2, signed short)
+DEFUNBOX(unbox_unsigned_1, unsigned char)
+DEFUNBOX(unbox_unsigned_2, unsigned short) 
 
-/* FFI calls this */
-signed short unbox_signed_2(void)
-{
-	return to_integer(dpop());
-}

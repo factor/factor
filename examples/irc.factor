@@ -17,8 +17,10 @@ SYMBOL: channels
 SYMBOL: channel
 SYMBOL: nickname
 
-: irc-write ( s -- ) irc-stream get fwrite ;
-: irc-print ( s -- ) irc-stream get fprint irc-stream get fflush ;
+: irc-write ( s -- ) irc-stream get stream-write ;
+: irc-print ( s -- )
+    irc-stream get stream-print
+    irc-stream get stream-flush ;
 
 : nick ( nick -- )
     dup nickname set  "NICK " irc-write irc-print ;
@@ -32,13 +34,13 @@ SYMBOL: nickname
 
 : write-highlighted ( line -- )
     dup nickname get index-of -1 =
-    f [ [ "ansi-fg" | "3" ] ] ? write-attr ;
+    f [ [[ "ansi-fg" "3" ]] ] ? write-attr ;
 
 : extract-nick ( line -- nick )
     "!" split1 drop ;
 
 : write-nick ( line -- )
-    "!" split1 drop [ [ "bold" | t ] ] write-attr ;
+    "!" split1 drop [ [[ "bold" t ]] ] write-attr ;
 
 GENERIC: irc-display
 PREDICATE: string privmsg "PRIVMSG" index-of -1 > ;
@@ -58,10 +60,10 @@ M: privmsg irc-display ( line -- )
 !     write-highlighted terpri flush ;
 
 : in-loop ( -- )
-    irc-stream get freadln [ irc-display in-loop ] when* ;
+    irc-stream get stream-readln [ irc-display in-loop ] when* ;
 
 : input-thread ( -- ) [ in-loop ] in-thread ;
-: disconnect ( -- ) irc-stream get fclose ;
+: disconnect ( -- ) irc-stream get stream-close ;
 
 : command ( line -- )
     #! IRC /commands are just words.

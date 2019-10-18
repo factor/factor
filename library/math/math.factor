@@ -1,34 +1,7 @@
-! :folding=indent:collapseFolds=0:
-
-! $Id$
-!
-! Copyright (C) 2003, 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2003, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: math
-USE: generic
-USE: kernel
-USE: math-internals
+USING: generic kernel math-internals ;
 
 ! Math operations
 2GENERIC: number= ( x y -- ? )
@@ -58,16 +31,16 @@ GENERIC: bitnot ( n -- n )
 
 ! Math types
 BUILTIN: fixnum 0
-BUILTIN: bignum 9
+BUILTIN: bignum 1
 UNION: integer fixnum bignum ;
 
 BUILTIN: ratio 4
 UNION: rational integer ratio ;
 
-BUILTIN: float 10
+BUILTIN: float 5
 UNION: real rational float ;
 
-BUILTIN: complex 5
+BUILTIN: complex 6
 UNION: number real complex ;
 
 M: real hashcode ( n -- n ) >fixnum ;
@@ -98,10 +71,6 @@ M: number = ( n n -- ? ) number= ;
     #! Push the sign of a real number.
     dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ;
 
-: mag2 ( x y -- mag )
-    #! Returns the magnitude of the vector (x,y).
-    swap sq swap sq + fsqrt ;
-
 GENERIC: abs ( z -- |z| )
 M: real abs dup 0 < [ neg ] when ;
 
@@ -114,3 +83,19 @@ M: real abs dup 0 < [ neg ] when ;
 
 : align ( offset width -- offset )
     2dup mod dup 0 number= [ 2drop ] [ - + ] ifte ;
+
+: (repeat) ( i n quot -- )
+    pick pick >= [
+        3drop
+    ] [
+        [ swap >r call 1 + r> ] keep (repeat)
+    ] ifte ; inline
+
+: repeat ( n quot -- )
+    #! Execute a quotation n times. The loop counter is kept on
+    #! the stack, and ranges from 0 to n-1.
+    0 -rot (repeat) ; inline
+
+: times ( n quot -- )
+    #! Evaluate a quotation n times.
+    swap [ >r dup slip r> ] repeat drop ; inline

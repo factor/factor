@@ -60,7 +60,7 @@ void primitive_stat(void)
 	else 
 	{
 		CELL dirp = tag_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
-		CELL size = tag_object(s48_long_long_to_bignum(
+		CELL size = tag_bignum(s48_long_long_to_bignum(
 			(int64_t)st.nFileSizeLow | (int64_t)st.nFileSizeHigh << 32));
 		CELL mtime = tag_integer((int)
 			((*(int64_t*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));

@@ -1,10 +1,14 @@
 CC = gcc
-DEFAULT_CFLAGS = -Wall -g $(SITE_CFLAGS)
+DEFAULT_CFLAGS = -Wall -Os -fomit-frame-pointer $(SITE_CFLAGS)
 DEFAULT_LIBS = -lm
 
 STRIP = strip
 
-OBJS = native/arithmetic.o native/array.o native/bignum.o \
+UNIX_OBJS = native/unix/file.o native/unix/io.o native/unix/socket.o \
+	native/unix/signal.o native/unix/read.o native/unix/write.o \
+	native/unix/ffi.o native/unix/run.o
+
+OBJS = $(UNIX_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/s48_bignum.o \
 	native/complex.o native/cons.o native/error.o \
 	native/factor.o native/fixnum.o \
@@ -17,14 +21,8 @@ OBJS = native/arithmetic.o native/array.o native/bignum.o \
 	native/string.o native/types.o native/vector.o \
 	native/word.o native/compiler.o \
 	native/ffi.o native/boolean.o \
-	native/unix/file.o \
-	native/unix/io.o \
-	native/unix/socket.o \
-	native/unix/signal.o \
-	native/unix/read.o \
-	native/unix/write.o \
-	native/unix/ffi.o \
-	native/debug.o
+	native/debug.o \
+	native/hashtable.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
@@ -34,6 +32,7 @@ default:
 	@echo "linux"
 	@echo "macosx"
 	@echo "solaris"
+	@echo "windows"
 	@echo ""
 	@echo "Also, you might want to set the SITE_CFLAGS environment"
 	@echo "variable to enable some CPU-specific optimizations; this"
@@ -54,12 +53,12 @@ bsd-nopthread:
 macosx:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI" \
-		LIBS="$(DEFAULT_LIBS)"
+		LIBS="$(DEFAULT_LIBS)" 
 
 linux:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
-		LIBS="$(DEFAULT_LIBS) -ldl"
+		LIBS="$(DEFAULT_LIBS) -ldl" 
 
 solaris:
 	$(MAKE) f \
@@ -68,7 +67,7 @@ solaris:
 
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@ $(OBJS)
-	#$(STRIP) $@
+	$(STRIP) $@
 
 clean:
 	rm -f $(OBJS)

@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003, 2004 Slava Pestov.
+ * Copyright (C) 2003, 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@
 package factor;
 
 /**
- * Used to build up linked lists.
+ * Used to build up linked lists in Factor style.
  */
 public class Cons implements FactorExternalizable
 {
@@ -50,39 +50,51 @@ public class Cons implements FactorExternalizable
 		return (Cons)cdr;
 	} //}}}
 
-	//{{{ contains() method
-	public boolean contains(Object obj)
+	//{{{ isList() method
+	public static boolean isList(Object list)
 	{
-		Cons iter = this;
-		while(iter != null)
-		{
-			if(FactorLib.objectsEqual(obj,iter.car))
-				return true;
-			iter = iter.next();
-		}
-		return false;
+		if(list == null)
+			return true;
+		else if(list instanceof Cons)
+			return isList(((Cons)list).cdr);
+		else
+			return false;
 	} //}}}
 
 	//{{{ contains() method
 	public static boolean contains(Cons list, Object obj)
 	{
-		if(list == null)
-			return false;
-		else
-			return list.contains(obj);
+		while(list != null)
+		{
+			if(FactorLib.objectsEqual(obj,list.car))
+				return true;
+			list = list.next();
+		}
+		return false;
 	} //}}}
 
 	//{{{ length() method
-	public int length()
+	public static int length(Cons list)
 	{
 		int size = 0;
-		Cons iter = this;
-		while(iter != null)
+		while(list != null)
 		{
-			iter = (Cons)iter.cdr;
 			size++;
+			list = list.next();
 		}
 		return size;
+	} //}}}
+
+	//{{{ reverse() method
+	public static Cons reverse(Cons list)
+	{
+		Cons reversed = null;
+		while(list != null)
+		{
+			reversed = new Cons(list.car,reversed);
+			list = list.next();
+		}
+		return reversed;
 	} //}}}
 
 	//{{{ elementsToString() method
@@ -97,20 +109,8 @@ public class Cons implements FactorExternalizable
 		while(iter != null)
 		{
 			buf.append(FactorReader.unparseObject(iter.car));
-			if(iter.cdr instanceof Cons)
-			{
-				buf.append(' ');
-				iter = (Cons)iter.cdr;
-				continue;
-			}
-			else if(iter.cdr == null)
-				break;
-			else
-			{
-				buf.append(" | ");
-				buf.append(FactorReader.unparseObject(iter.cdr));
-				iter = null;
-			}
+			buf.append(' ');
+			iter = iter.next();
 		}
 
 		return buf.toString();
@@ -122,7 +122,14 @@ public class Cons implements FactorExternalizable
 	 */
 	public String toString()
 	{
-		return "[ " + elementsToString() + " ]";
+		if(isList(this))
+			return "[ " + elementsToString() + " ]";
+		else
+		{
+			return "[[ " + FactorReader.unparseObject(car)
+				+ " " + FactorReader.unparseObject(cdr)
+				+ " ]]";
+		}
 	} //}}}
 
 	//{{{ toArray() method

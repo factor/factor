@@ -91,22 +91,22 @@ USE: hashtables
 
 : store-todo ( <todo> filename -- )
   #! store the todo list in the given file.
-  <filecw> [ write-todo ] with-stream ;
+  <file-writer> [ write-todo ] with-stream ;
 
 : read-todo ( -- <todo> )
   #! Read a todo list from the current input stream.
-  read url-decode read url-decode <todo> 
-  read str>number [
+  read-line url-decode read-line url-decode <todo> 
+  read-line str>number [
     dup
     <namespace> [
-      read url-decode "yes" = "complete?" set
-      read url-decode "priority" set
-      read url-decode "description" set
+      read-line url-decode "yes" = "complete?" set
+      read-line url-decode "priority" set
+      read-line url-decode "description" set
     ] extend add-todo-item
   ] times ;
 
 : load-todo ( filename -- <todo> )
-  <filecr> [ read-todo ] with-stream ;  
+  <file-reader> [ read-todo ] with-stream ;  
 
 : password-matches? ( password <todo> -- <todo> )
   #! Returns the <todo> if the password matches otherwise

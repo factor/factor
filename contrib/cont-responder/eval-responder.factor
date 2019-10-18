@@ -26,7 +26,6 @@
 IN: eval-responder
 USE: html
 USE: cont-responder
-USE: cont-utils
 USE: kernel
 USE: stdio
 USE: namespaces
@@ -73,7 +72,7 @@ USE: logging
 : escape-quotes ( string -- string )
   #! Replace occurrences of single quotes with
   #! backslash quote.
-  [ dup [ [ CHAR: ' | "\\'" ] [ CHAR: " | "\\\"" ] ] assoc dup rot ? ] str-map ;
+  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] str-map ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
@@ -110,7 +109,7 @@ USE: logging
   #! of the given word.
   dup dup
   <namespace> [
-    "responder" "inspect" put
+    "responder" "browser" put
     <table border= "1" table> 
       <tr> <th colspan= "2" th> "Source" write </th> </tr>
       <tr> <td colspan= "2" td> [ [ parse ] [ [ "No such word" write ] [ car see ] ifte ] catch ] with-simple-html-output </td> </tr>
@@ -186,8 +185,8 @@ USE: logging
   #! All output should go to a string which is returned on the
   #! callstack along with the resulting datastack as a list.
   <namespace> [ 
-    "inspect" "responder" set
-    1024 <string-output-stream> dup >r <html-stream> [
+    "browser" "responder" set
+    1024 <string-output> dup >r <html-stream> [
       do-eval 
     ] with-stream r> stream>str 
   ] bind ;

@@ -33,6 +33,7 @@ import factor.*;
 import java.io.*;
 import java.util.*;
 import org.gjt.sp.jedit.gui.*;
+import org.gjt.sp.jedit.syntax.*;
 import org.gjt.sp.jedit.textarea.*;
 import org.gjt.sp.jedit.*;
 import org.gjt.sp.util.Log;
@@ -129,6 +130,10 @@ public class FactorPlugin extends EditPlugin
 					.getParentOfPath(imagePath)));
 
 				external = new ExternalFactor(PORT);
+
+				process.getOutputStream().close();
+				process.getInputStream().close();
+				process.getErrorStream().close();
 			}
 			catch(Exception e)
 			{
@@ -154,7 +159,8 @@ public class FactorPlugin extends EditPlugin
 	 */
 	public static void stopExternalInstance()
 	{
-		getFactorShell().closeStreams();
+		if(getFactorShell() != null)
+			getFactorShell().closeStreams();
 
 		if(external != null)
 		{
@@ -193,6 +199,16 @@ public class FactorPlugin extends EditPlugin
 			"sidekick.SideKickParser","factor");
 	} //}}}
 	
+	//{{{ getParsedData() method
+	public static FactorParsedData getParsedData(View view)
+	{
+		SideKickParsedData data = SideKickParsedData.getParsedData(view);
+		if(data instanceof FactorParsedData)
+			return (FactorParsedData)data;
+		else
+			return null;
+	} //}}}
+
 	//{{{ evalInListener() method
 	public static void evalInListener(View view, String cmd)
 	{
@@ -214,14 +230,11 @@ public class FactorPlugin extends EditPlugin
 	 */
 	public static FactorWord lookupWord(View view, String word)
 	{
-		SideKickParsedData data = SideKickParsedData.getParsedData(view);
-		if(data instanceof FactorParsedData)
-		{
-			FactorParsedData fdata = (FactorParsedData)data;
-			return getExternalInstance().searchVocabulary(fdata.use,word);
-		}
-		else
+		FactorParsedData fdata = getParsedData(view);
+		if(fdata == null)
 			return null;
+		else
+			return getExternalInstance().searchVocabulary(fdata.use,word);
 	} //}}}
 
 	//{{{ factorWord() method
@@ -230,18 +243,14 @@ public class FactorPlugin extends EditPlugin
 	 */
 	public static String factorWord(View view, String word)
 	{
-		SideKickParsedData data = SideKickParsedData
-			.getParsedData(view);
-		if(data instanceof FactorParsedData)
-		{
-			FactorParsedData fdata = (FactorParsedData)data;
-			return "\""
-				+ FactorReader.charsToEscapes(word)
-				+ "\" " + FactorReader.unparseObject(fdata.use)
-				+ " search";
-		}
-		else
+		FactorParsedData fdata = getParsedData(view);
+		if(fdata == null)
 			return null;
+
+		return "\""
+			+ FactorReader.charsToEscapes(word)
+			+ "\" " + FactorReader.unparseObject(fdata.use)
+			+ " search";
 	} //}}}
 
 	//{{{ factorWord() method
@@ -295,6 +304,22 @@ public class FactorPlugin extends EditPlugin
 			evalInWire(word + " " + op);
 	} //}}}
 
+	//{{{ factorWordPopupOp() method
+	/**
+	 * Apply a Factor word to the selected word.
+	 */
+	public static void factorWordPopupOp(View view, String op) throws IOException
+	{
+		String word = factorWord(view);
+		if(word == null)
+			view.getToolkit().beep();
+		else
+		{
+			new TextAreaPopup(view.getTextArea(),
+				evalInWire(word + " " + op).trim());
+		}
+	} //}}}
+
 	//{{{ toWordArray() method
 	public static FactorWord[] toWordArray(Set completions)
 	{
@@ -305,24 +330,46 @@ public class FactorPlugin extends EditPlugin
 		return w;
 	} //}}}
 	
-	//{{{ getCompletions() method
+	//{{{ getWordCompletions() method
 	/**
-	 * Returns all words in all vocabularies.
+	 * Returns all words in all vocabularies whose name starts with
+	 * <code>word</code>.
 	 *
 	 * @param anywhere If true, matches anywhere in the word name are
 	 * returned; otherwise, only matches from beginning.
 	 */
-	public static Set getCompletions(String word, boolean anywhere)
+	public static Set getWordCompletions(String word, boolean anywhere)
 	{
 		try
 		{
 			Set completions = new HashSet();
-			getExternalInstance().getCompletions(
+			getExternalInstance().getWordCompletions(
 				getExternalInstance().getVocabularies(),
 				word,
 				anywhere,
 				completions);
 			return completions;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	} //}}}
+	
+	//{{{ getVocabCompletions() method
+	/**
+	 * Returns all vocabularies whose name starts with
+	 * <code>vocab</code>.
+	 *
+	 * @param anywhere If true, matches anywhere in the word name are
+	 * returned; otherwise, only matches from beginning.
+	 */
+	public static String[] getVocabCompletions(String vocab, boolean anywhere)
+	{
+		try
+		{
+			return getExternalInstance().getVocabCompletions(
+				vocab,anywhere);
 		}
 		catch(Exception e)
 		{
@@ -403,16 +450,14 @@ public class FactorPlugin extends EditPlugin
 	//{{{ isUsed() method
 	public static boolean isUsed(View view, String vocab)
 	{
-		SideKickParsedData data = SideKickParsedData
-			.getParsedData(view);
-		if(data instanceof FactorParsedData)
+		FactorParsedData fdata = getParsedData(view);
+		if(fdata == null)
+			return false;
+		else
 		{
-			FactorParsedData fdata = (FactorParsedData)data;
 			Cons use = fdata.use;
 			return Cons.contains(use,vocab);
 		}
-		else
-			return false;
 	} //}}}
 
 	//{{{ findAllWordsNamed() method
@@ -455,6 +500,109 @@ public class FactorPlugin extends EditPlugin
 		}
 	} //}}}
 
+	//{{{ findUse() method
+	/**
+	 * Find an existing USING: declaration.
+	 */
+	private static int findUse(Buffer buffer)
+	{
+		for(int i = 0; i < buffer.getLineCount(); i++)
+		{
+			String text = buffer.getLineText(i);
+			int index = text.indexOf("USING:");
+			if(index != -1)
+				return buffer.getLineStartOffset(i) + index;
+		}
+		
+		return -1;
+	} //}}}
+
+	//{{{ createUse() method
+	/**
+	 * No USING: declaration exists, so add a new one.
+	 */
+	private static void createUse(Buffer buffer, String vocab)
+	{
+		String decl = "USING: " + vocab + " ;";
+
+		int offset = 0;
+		boolean leadingNewline = false;
+		boolean trailingNewline = true;
+
+		for(int i = 0; i < buffer.getLineCount(); i++)
+		{
+			String text = buffer.getLineText(i).trim();
+			if(text.startsWith("IN:"))
+			{
+				offset = buffer.getLineEndOffset(i) - 1;
+				leadingNewline = true;
+			}
+			else if(text.startsWith("!"))
+			{
+				offset = buffer.getLineEndOffset(i) - 1;
+				leadingNewline = true;
+			}
+			else if(text.length() == 0)
+			{
+				if(i == 0)
+					offset = 0;
+				else
+					offset = buffer.getLineEndOffset(i - 1) - 1;
+				leadingNewline = true;
+				trailingNewline = false;
+			}
+			else
+				break;
+		}
+
+		decl = (leadingNewline ? "\n" : "") + decl
+			+ (trailingNewline ? "\n" : "");
+		
+		buffer.insert(offset,decl);
+	} //}}}
+
+	//{{{ updateUse() method
+	private static void updateUse(Buffer buffer, String vocab, int offset)
+	{
+		String text = buffer.getText(0,buffer.getLength());
+		int end = text.indexOf(";",offset);
+		if(end == -1)
+			end = buffer.getLength();
+
+		String decl = text.substring(offset + "USING:".length(),end);
+		
+		List declList = new ArrayList();
+		StringTokenizer st = new StringTokenizer(decl);
+		while(st.hasMoreTokens())
+			declList.add(st.nextToken());
+		declList.add(vocab);
+		Collections.sort(declList);
+		
+		StringBuffer buf = new StringBuffer("USING: ");
+		Iterator iter = declList.iterator();
+		while(iter.hasNext())
+		{
+			buf.append(iter.next());
+			buf.append(' ');
+		}
+
+		/* format() strips trailing whitespace */
+		decl = TextUtilities.format(buf.toString(),
+			buffer.getIntegerProperty("maxLineLen",64),
+			buffer.getTabSize()) + " ";
+
+		try
+		{
+			buffer.beginCompoundEdit();
+			buffer.remove(offset,end - offset);
+			buffer.insert(offset,decl);
+		}
+		finally
+		{
+			buffer.endCompoundEdit();
+		}
+	} //}}}
+	
 	//{{{ insertUse() method
 	public static void insertUse(View view, String vocab)
 	{
@@ -465,44 +613,14 @@ public class FactorPlugin extends EditPlugin
 		}
 
 		Buffer buffer = view.getBuffer();
-		int lastUseOffset = 0;
-		boolean leadingNewline = false;
-		boolean seenUse = false;
+		int offset = findUse(buffer);
 
-		for(int i = 0; i < buffer.getLineCount(); i++)
-		{
-			String text = buffer.getLineText(i).trim();
-			if(text.startsWith("IN:") || text.startsWith("USE:"))
-			{
-				lastUseOffset = buffer.getLineEndOffset(i) - 1;
-				leadingNewline = true;
-				seenUse = true;
-			}
-			else if(text.startsWith("!") && !seenUse)
-			{
-				lastUseOffset = buffer.getLineEndOffset(i) - 1;
-				leadingNewline = true;
-			}
-			else if(text.length() == 0 && !seenUse)
-			{
-				if(i == 0)
-					lastUseOffset = 0;
-				else
-					lastUseOffset  = buffer.getLineEndOffset(i - 1) - 1;
-			}
-			else
-			{
-				break;
-			}
-		}
+		if(offset == -1)
+			createUse(buffer,vocab);
+		else
+			updateUse(buffer,vocab,offset);
 
-		String decl = "USE: " + vocab;
-		if(leadingNewline)
-			decl = "\n" + decl;
-		if(lastUseOffset == 0)
-			decl = decl + "\n";
-		buffer.insert(lastUseOffset,decl);
-		showStatus(view,"inserted-use",decl);
+		showStatus(view,"inserted-use",vocab);
 	} //}}}
 
 	//{{{ extractWord() method
@@ -514,9 +632,8 @@ public class FactorPlugin extends EditPlugin
 		if(selection == null)
 			selection = "";
 
-		SideKickParsedData data = SideKickParsedData
-			.getParsedData(view);
-		if(!(data instanceof FactorParsedData))
+		FactorParsedData data = getParsedData(view);
+		if(data == null)
 		{
 			view.getToolkit().beep();
 			return;
@@ -552,13 +669,44 @@ public class FactorPlugin extends EditPlugin
 		try
 		{
 			buffer.beginCompoundEdit();
-			
+
+			int firstLine = buffer.getLineOfOffset(start);
+
 			buffer.insert(start,newDef);
+			
+			int lastLine = buffer.getLineOfOffset(start
+				+ newDef.length());
+			
+			buffer.indentLines(firstLine,lastLine);
+			
 			textArea.setSelectedText(newWord);
 		}
 		finally
 		{
 			buffer.endCompoundEdit();
 		}
+	} //}}}
+
+	//{{{ getRulesetAtOffset() method
+	public static String getRulesetAtOffset(JEditTextArea textArea, int caret)
+	{
+		int line = textArea.getLineOfOffset(caret);
+
+		DefaultTokenHandler h = new DefaultTokenHandler();
+		textArea.getBuffer().markTokens(line,h);
+		Token tokens = h.getTokens();
+
+		int offset = caret - textArea.getLineStartOffset(line);
+
+		int len = textArea.getLineLength(line);
+		if(len == 0)
+			return null;
+
+		if(offset == len)
+			offset--;
+
+		Token token = TextUtilities.getTokenAtOffset(tokens,offset);
+		
+		return token.rules.getName();
 	} //}}}
 }

@@ -203,7 +203,11 @@ public class FactorShell extends Shell
 			output.print(console.getInfoColor(),
 				jEdit.getProperty("factor.shell.opening"));
 
-			stream = FactorPlugin.getExternalInstance().openStream();
+			stream = null;
+			ExternalFactor external = FactorPlugin.getExternalInstance();
+			if(external != null)
+				stream = external.openStream();
+
 			if(stream == null)
 			{
 				output.print(console.getInfoColor(),

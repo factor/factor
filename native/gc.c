@@ -69,7 +69,11 @@ INLINE void collect_object(CELL scan)
 		collect_word((F_WORD*)scan);
 		break;
 	case ARRAY_TYPE:
+	case TUPLE_TYPE:
 		collect_array((F_ARRAY*)scan);
+		break;
+	case HASHTABLE_TYPE:
+		collect_hashtable((F_HASHTABLE*)scan);
 		break;
 	case VECTOR_TYPE:
 		collect_vector((F_VECTOR*)scan);
@@ -94,18 +98,17 @@ INLINE CELL collect_next(CELL scan)
 	CELL size;
 	gc_debug("collect_next",scan);
 	gc_debug("collect_next header",get(scan));
-	switch(TAG(get(scan)))
+	if(headerp(get(scan)))
 	{
-	case HEADER_TYPE:
 		size = untagged_object_size(scan);
 		collect_object(scan);
-		break;
-	default:
+	}
+	else
+	{
 		size = CELLS;
 		copy_object((CELL*)scan);
-		break;
 	}
-	
+
 	return scan + size;
 }
 
@@ -114,13 +117,20 @@ void primitive_gc(void)
 	int64_t start = current_millis();
 	CELL scan;
 
+	if(heap_scan)
+	{
+		fprintf(stderr,"GC disabled\n");
+		fflush(stderr);
+		return;
+	}
+
 	gc_in_progress = true;
 
 	fprintf(stderr,"GC\n");
 	fflush(stderr);
 
 	flip_zones();
-	scan = active.here = active.base;
+	scan = active.base;
 	collect_roots();
 	collect_io_tasks();
 	/* collect literal objects referenced from compiled code */
@@ -149,5 +159,5 @@ void maybe_garbage_collection(void)
 void primitive_gc_time(void)
 {
 	maybe_garbage_collection();
-	dpush(tag_object(s48_long_long_to_bignum(gc_time)));
+	dpush(tag_bignum(s48_long_long_to_bignum(gc_time)));
 }

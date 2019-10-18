@@ -49,27 +49,12 @@ SYMBOL: #call ( non-tail call )
 SYMBOL: #call-label
 SYMBOL: #push ( literal )
 
-SYMBOL: #ifte
-SYMBOL: #dispatch
-
 ! This is purely a marker for values we retain after a
 ! conditional. It does not generate code, but merely alerts the
 ! dataflow optimizer to the fact these values must be retained.
 SYMBOL: #values
 
 SYMBOL: #return
-
-SYMBOL: #drop
-SYMBOL: #dup
-SYMBOL: #swap
-SYMBOL: #over
-SYMBOL: #pick
-
-SYMBOL: #>r
-SYMBOL: #r>
-
-SYMBOL: #slot
-SYMBOL: #set-slot
 
 SYMBOL: node-consume-d
 SYMBOL: node-produce-d
@@ -118,7 +103,7 @@ SYMBOL: node-param
 : dataflow-drop, ( -- )
     #! Remove the top stack element and add a dataflow node
     #! noting this.
-    f #drop dataflow, [ 1 0 node-inputs ] bind ;
+    f \ drop dataflow, [ 1 0 node-inputs ] bind ;
 
 : apply-dataflow ( dataflow name default -- )
     #! For the dataflow node, look up named word property,

@@ -6,6 +6,7 @@ USE: kernel
 USE: words
 USE: kernel
 USE: math-internals
+USE: memory
 
 : no-op ; compiled
 

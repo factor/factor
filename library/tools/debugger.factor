@@ -1,43 +1,7 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or wxithout
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-IN: errors
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: namespaces
-USE: prettyprint
-USE: stdio
-USE: strings
-USE: unparser
-USE: vectors
-USE: words
-USE: math
-USE: generic
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
+IN: errors USING: kernel kernel-internals lists namespaces
+prettyprint stdio strings unparser vectors words math generic ;
 
 : expired-error ( obj -- )
     "Object did not survive image save/load: " write . ;
@@ -62,8 +26,8 @@ USE: generic
 : type-check-error ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
-    "Object type: " write class .
-    "Expected type: " write builtin-type . ;
+    "Object type: " write class prettyprint-word terpri
+    "Expected type: " write builtin-type prettyprint-word terpri ;
 
 : range-error ( list -- )
     "Range check error" print
@@ -93,6 +57,9 @@ USE: generic
 : port-closed-error ( obj -- )
     "Port closed: " write . ;
 
+: heap-scan-error ( obj -- )
+    "Cannot do next-object outside begin/end-scan" write drop ;
+
 GENERIC: error. ( error -- )
 
 PREDICATE: cons kernel-error ( obj -- ? )
@@ -115,6 +82,7 @@ M: kernel-error error. ( error -- )
         ffi-disabled-error
         ffi-error
         port-closed-error
+        heap-scan-error
     } vector-nth execute ;
 
 M: string error. ( error -- )
@@ -133,7 +101,7 @@ M: object error. ( error -- )
         "error-line-number" get [ 1 ] unless* unparse ,
     ] make-string print
     
-    "error-line" get print
+    "error-line" get dup string? [ print ] [ drop ] ifte
     
     [ "error-col" get " " fill , "^" , ] make-string print ;
 
@@ -145,9 +113,9 @@ M: object error. ( error -- )
 : :get ( var -- value ) "error-namestack" get (get) ;
 
 : debug-help ( -- )
-    [ :s :r :n :c ] [ prettyprint-1 " " write ] each
+    [ :s :r :n :c ] [ prettyprint-word " " write ] each
     "show stacks at time of error." print
-    \ :get prettyprint-1
+    \ :get prettyprint-word
     " ( var -- value ) inspects the error namestack." print ;
 
 : flush-error-handler ( error -- )
@@ -157,9 +125,7 @@ M: object error. ( error -- )
 : print-error ( error -- )
     #! Print the error.
     [
-        "! " [
-            in-parser? [ parse-dump ] when error.
-        ] with-prefix
+        in-parser? [ parse-dump ] when error.
     ] [
         flush-error-handler
     ] catch ;
@@ -174,6 +140,16 @@ M: object error. ( error -- )
     [ print-error 1 exit* ] >c
     [ dup save-error rethrow ] 5 setenv ( kernel calls on error )
     kernel-error 12 setenv ;
+
+: undefined-method ( object generic -- )
+    #! We 2dup here to leave both values on the stack, for
+    #! post-mortem inspection.
+    2dup [
+        "The generic word " ,
+        unparse ,
+        " does not have a suitable method for " ,
+        unparse ,
+    ] make-string throw ;
 
 ! So that stage 2 boot gives a useful error message if something
 ! fails after this file is loaded.

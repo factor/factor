@@ -21,12 +21,9 @@ void run(void)
 	/* Error handling. */
 #ifdef WIN32
 	setjmp(toplevel);
-	__try
-	{
 #else
 	sigsetjmp(toplevel, 1);
 #endif
-
 	if(thrown_error != F)
 	{
 		if(thrown_keep_stacks)
@@ -56,33 +53,24 @@ void run(void)
 		next = get(callframe);
 		callframe = get(callframe + CELLS);
 
-		if(TAG(next) == WORD_TYPE)
+		if(type_of(next) == WORD_TYPE)
 			execute(untag_word_fast(next));
 		else
 			dpush(next);
 	}
-
-#ifdef WIN32
-	}
-	__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ?
-		EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-	{
-		signal_error(SIGSEGV);
-	}
-#endif
 }
 
 /* XT of deferred words */
 void undefined(F_WORD* word)
 {
-	general_error(ERROR_UNDEFINED_WORD,tag_word(word));
+	general_error(ERROR_UNDEFINED_WORD,tag_object(word));
 }
 
 /* XT of compound definitions */
 void docol(F_WORD* word)
 {
 	call(word->parameter);
-	executing = tag_word(word);
+	executing = tag_object(word);
 }
 
 /* pushes word parameter */

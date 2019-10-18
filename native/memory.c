@@ -58,6 +58,7 @@ void init_arena(CELL size)
 	init_zone(&compiling,size);
 	allot_profiling = false;
 	gc_in_progress = false;
+	heap_scan = false;
 	gc_time = 0;
 }
 
@@ -73,7 +74,7 @@ void allot_profile_step(CELL a)
 	for(i = profile_depth; i < depth; i++)
 	{
 		obj = get(cs_bot + i * CELLS);
-		if(TAG(obj) == WORD_TYPE)
+		if(type_of(obj) == WORD_TYPE)
 			untag_word(obj)->allot_count += a;
 	}
 
@@ -87,6 +88,7 @@ void flip_zones()
 	ZONE z = active;
 	active = prior;
 	prior = z;
+	active.here = active.base;
 }
 
 bool in_zone(ZONE* z, CELL pointer)
@@ -116,51 +118,57 @@ void primitive_allot_profiling(void)
 
 void primitive_address(void)
 {
-	dpush(tag_object(s48_ulong_to_bignum(dpop())));
+	drepl(tag_bignum(s48_ulong_to_bignum(dpeek())));
 }
 
-void primitive_heap_stats(void)
+void primitive_size(void)
 {
-	int instances[TYPE_COUNT], bytes[TYPE_COUNT];
-	int i;
-	CELL ptr;
-	CELL list = F;
+	drepl(tag_fixnum(object_size(dpeek())));
+}
 
-	for(i = 0; i < TYPE_COUNT; i++)
-		instances[i] = 0;
+void primitive_begin_scan(void)
+{
+	primitive_gc();
+	heap_scan_ptr = active.base;
+	heap_scan_end = active.here;
+	heap_scan = true;
+}
 
-	for(i = 0; i < TYPE_COUNT; i++)
-		bytes[i] = 0;
+void primitive_next_object(void)
+{
+	CELL value = get(heap_scan_ptr);
+	CELL obj = heap_scan_ptr;
+	CELL size, type;
 
-	ptr = active.base;
-	while(ptr < active.here)
+	if(!heap_scan)
+		general_error(ERROR_HEAP_SCAN,F);
+
+	if(heap_scan_ptr >= heap_scan_end)
 	{
-		CELL value = get(ptr);
-		CELL size;
-		CELL type;
-
-		if(TAG(value) == HEADER_TYPE)
-		{
-			size = align8(untagged_object_size(ptr));
-			type = untag_header(value);
-		}
-		else
-		{
-			size = CELLS * 2;
-			type = CONS_TYPE;
-		}
-
-		instances[type]++;
-		bytes[type] += size;
-		ptr += size;
+		dpush(F);
+		return;
+	}
+	
+	if(headerp(value))
+	{
+		size = align8(untagged_object_size(heap_scan_ptr));
+		type = untag_header(value);
+	}
+	else
+	{
+		size = CELLS * 2;
+		type = CONS_TYPE;
 	}
 
-	for(i = TYPE_COUNT - 1; i >= 0; i--)
-	{
-		list = cons(
-			cons(tag_fixnum(instances[i]),tag_fixnum(bytes[i])),
-			list);
-	}
+	heap_scan_ptr += size;
 
-	dpush(list);
+	if(type < HEADER_TYPE)
+		dpush(RETAG(obj,type));
+	else
+		dpush(RETAG(obj,OBJECT_TYPE));
+}
+
+void primitive_end_scan(void)
+{
+	heap_scan = false;
 }

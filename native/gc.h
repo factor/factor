@@ -1,4 +1,8 @@
 bool gc_in_progress;
+
+/* GC is off during heap walking */
+bool heap_scan;
+
 int64_t gc_time;
 
 /* Given a pointer to oldspace, copy it to newspace. */
@@ -26,6 +30,9 @@ INLINE void copy_object(CELL* handle)
 
 	if(tag == FIXNUM_TYPE)
 		return;
+
+	if(headerp(pointer))
+		critical_error("Asked to copy header",pointer);
 
 	header = get(UNTAG(pointer));
 	if(TAG(header) == GC_COLLECTED)

@@ -9,6 +9,8 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 		fprintf(stderr,"active.here  = %ld\n",active.here);
 		fprintf(stderr,"active.limit = %ld\n",active.limit);
 		fflush(stderr);
+		flip_zones();
+		dump_stacks();
 		exit(1);
 	}
 	else
@@ -29,7 +31,7 @@ void call_profiling_step(int signal, siginfo_t* siginfo, void* uap)
 	for(i = profile_depth; i < depth; i++)
 	{
 		obj = get(cs_bot + i * CELLS);
-		if(TAG(obj) == WORD_TYPE)
+		if(type_of(obj) == WORD_TYPE)
 			untag_word(obj)->call_count++;
 	}
 
@@ -58,7 +60,7 @@ void init_signals(void)
 	sigaction(SIGQUIT,&dump_sigaction,NULL);
 }
 
-void primitive_call_profiling(void)
+void primitive_call_profiling(F_WORD *word)
 {
 	CELL d = dpop();
 	if(d == F)

@@ -46,7 +46,7 @@ USE: strings
 ! - raw-query -- raw query string
 ! - query -- an alist of query parameters, eg
 !            foo.bar?a=b&c=d becomes
-!            [ [ "a" | "b" ] [ "c" | "d" ] ]
+!            [ [[ "a" "b" ]] [[ "c" "d" ]] ]
 ! - header -- an alist of headers from the user's client
 ! - response -- an alist of the POST request response
 

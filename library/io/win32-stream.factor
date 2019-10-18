@@ -1,8 +1,6 @@
-! :folding=indent:collapseFolds=1:
-
 ! $Id$
 !
-! Copyright (C) 2004 Mackenzie Straight.
+! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -26,23 +24,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-stream
-USE: alien
-USE: continuations
-USE: generic
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: math
-USE: namespaces
-USE: prettyprint
-USE: stdio
-USE: streams
-USE: strings
-USE: threads
-USE: win32-api
-USE: win32-io-internals
+USING: alien continuations generic kernel kernel-internals lists math
+       namespaces prettyprint stdio streams strings threads win32-api
+       win32-io-internals ;
 
-TRAITS: win32-stream
+TUPLE: win32-stream this ; ! FIXME: rewrite using tuples
 GENERIC: win32-stream-handle
 GENERIC: do-write
 
@@ -51,6 +37,9 @@ SYMBOL: in-buffer
 SYMBOL: out-buffer
 SYMBOL: fileptr
 SYMBOL: file-size
+
+: pending-error ( len/status -- len/status )
+    dup [ win32-throw-error ] unless ;
 
 : init-overlapped ( overlapped -- overlapped )
     0 over set-overlapped-ext-internal
@@ -65,9 +54,9 @@ SYMBOL: file-size
 : flush-output ( -- ) 
     [
         alloc-io-task init-overlapped >r
-        handle get out-buffer get [ buffer-pos ] keep buffer-length
+        handle get out-buffer get [ buffer-pos+ptr ] keep buffer-length
         NULL r> WriteFile [ handle-io-error ] unless (yield)
-    ] callcc1
+    ] callcc1 pending-error
 
     dup update-file-pointer
     out-buffer get [ buffer-consume ] keep 
@@ -92,13 +81,13 @@ M: string do-write ( str -- )
 : fill-input ( -- ) 
     [
         alloc-io-task init-overlapped >r
-        handle get in-buffer get [ buffer-pos ] keep 
+        handle get in-buffer get [ buffer-pos+ptr ] keep 
         buffer-capacity file-size get [ fileptr get - min ] when*
         NULL r>
         ReadFile [ handle-io-error ] unless (yield)
-    ] callcc1
+    ] callcc1 pending-error
 
-    dup in-buffer get buffer-fill update-file-pointer ;
+    dup in-buffer get buffer-inc-fill update-file-pointer ;
 
 : consume-input ( count -- str ) 
     in-buffer get buffer-length 0 = [ fill-input ] when
@@ -139,23 +128,23 @@ M: string do-write ( str -- )
         ] ifte
     ] ifte ;
 
-M: win32-stream fwrite-attr ( str style stream -- )
-    nip [ do-write ] bind ;
+M: win32-stream stream-write-attr ( str style stream -- )
+    win32-stream-this nip [ do-write ] bind ;
 
-M: win32-stream freadln ( stream -- str )
-    [ 80 <sbuf> do-read-line ] bind ;
+M: win32-stream stream-readln ( stream -- str )
+    win32-stream-this [ 80 <sbuf> do-read-line ] bind ;
 
-M: win32-stream fread# ( count stream -- str )
-    [ dup <sbuf> swap do-read-count ] bind ;
+M: win32-stream stream-read ( count stream -- str )
+    win32-stream-this [ dup <sbuf> swap do-read-count ] bind ;
 
-M: win32-stream fflush ( stream -- )
-    [ maybe-flush-output ] bind ;
+M: win32-stream stream-flush ( stream -- )
+    win32-stream-this [ maybe-flush-output ] bind ;
 
-M: win32-stream fauto-flush ( stream -- )
+M: win32-stream stream-auto-flush ( stream -- )
     drop ;
 
-M: win32-stream fclose ( stream -- )
-    [
+M: win32-stream stream-close ( stream -- )
+    win32-stream-this [
         maybe-flush-output
         handle get CloseHandle drop 
         in-buffer get buffer-free 
@@ -163,10 +152,10 @@ M: win32-stream fclose ( stream -- )
     ] bind ;
 
 M: win32-stream win32-stream-handle ( stream -- handle )
-    [ handle get ] bind ;
+    win32-stream-this [ handle get ] bind ;
 
 C: win32-stream ( handle -- stream )
-    [
+    swap <namespace> [
         dup NULL GetFileSize dup -1 = not [
             file-size set
         ] [ drop f file-size set ] ifte
@@ -174,12 +163,12 @@ C: win32-stream ( handle -- stream )
         4096 <buffer> in-buffer set 
         4096 <buffer> out-buffer set
         0 fileptr set 
-    ] extend ;
+    ] extend over set-win32-stream-this ;
 
-: <win32-filecr> ( path -- stream )
+: <win32-file-reader> ( path -- stream )
     t f win32-open-file <win32-stream> ;
 
-: <win32-filecw> ( path -- stream )
+: <win32-file-writer> ( path -- stream )
     f t win32-open-file <win32-stream> ;
 
 

@@ -1,36 +1,6 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2003, 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-IN: strings
-USE: generic
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: math
+! Copyright (C) 2003, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
+IN: strings USING: generic kernel kernel-internals lists math ;
 
 ! Define methods bound to primitives
 BUILTIN: string 12
@@ -134,12 +104,20 @@ UNION: text string integer ;
         rot str-head swap
     ] ifte ;
 
-: str-each ( str [ code ] -- )
-    #! Execute the code, with each character of the string
+: (str>list) ( i str -- list )
+    2dup str-length >= [
+        2drop [ ]
+    ] [
+        2dup str-nth >r >r 1 + r> (str>list) r> swons
+    ] ifte ;
+
+: str>list ( str -- list )
+    0 swap (str>list) ;
+
+: str-each ( str quot -- )
+    #! Execute the quotation with each character of the string
     #! pushed onto the stack.
-    over str-length [
-        -rot 2dup >r >r >r str-nth r> call r> r>
-    ] times* 2drop ; inline
+    >r str>list r> each ; inline
 
 PREDICATE: integer blank     " \t\n\r" str-contains? ;
 PREDICATE: integer letter    CHAR: a CHAR: z between? ;

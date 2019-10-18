@@ -49,8 +49,16 @@ public interface VocabularyLookup
 	 * returned; otherwise, only matches from beginning.
 	 * @param completions Set to add completions to
 	 */
-	public void getCompletions(Cons use, String word, boolean anywhere,
+	public void getWordCompletions(Cons use, String word, boolean anywhere,
 		Set completions) throws Exception;
+
+	/**
+	 * @param vocab A string to complete
+	 * @param anywhere If true, matches anywhere in the vocab name are
+	 * returned; otherwise, only matches from beginning.
+	 */
+	public String[] getVocabCompletions(String vocab, boolean anywhere)
+		throws Exception;
 
 	/**
 	 * @param vocab The vocabulary name
@@ -59,7 +67,7 @@ public interface VocabularyLookup
 	 * the beginning of the name.
 	 * @param completions Set to add completions to
 	 */
-	public void getCompletions(String vocab, String word, boolean anywhere,
+	public void getWordCompletions(String vocab, String word, boolean anywhere,
 		Set completions) throws Exception;
 
 	public Cons getVocabularies() throws Exception;

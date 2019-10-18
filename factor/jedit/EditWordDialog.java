@@ -118,7 +118,7 @@ public class EditWordDialog extends WordListDialog
 	private void updateList()
 	{
 		FactorWord[] completions = FactorPlugin.toWordArray(
-			FactorPlugin.getCompletions(
+			FactorPlugin.getWordCompletions(
 			field.getText(),true));
 		list.setListData(completions);
 		if(completions.length != 0)

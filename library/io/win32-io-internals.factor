@@ -1,8 +1,6 @@
-! :folding=indent:collapseFolds=1:
-
 ! $Id$
 !
-! Copyright (C) 2004 Mackenzie Straight.
+! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -26,38 +24,24 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-io-internals
-USE: alien
-USE: errors
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: math
-USE: namespaces
-USE: prettyprint
-USE: vectors
-USE: win32-api
+USING: alien errors kernel kernel-internals lists math namespaces threads 
+       vectors win32-api stdio streams generic ;
 
 SYMBOL: completion-port
 SYMBOL: io-queue
 SYMBOL: free-list
 SYMBOL: callbacks
 
-: handle-io-error ( -- )
-    #! If a write or read call fails unexpectedly, throw an error.
-    GetLastError [ 
-        ERROR_IO_PENDING ERROR_HANDLE_EOF ERROR_SUCCESS 
-    ] contains? [ 
-        win32-throw-error 
-    ] unless ;
+: expected-error? ( -- bool )
+    [ 
+        ERROR_IO_PENDING ERROR_HANDLE_EOF ERROR_SUCCESS WAIT_TIMEOUT 
+    ] contains? ;
 
-: win32-init-stdio ( -- )
-    INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
-    completion-port set 
-    
-    <namespace> [
-        32 <vector> callbacks set
-        f free-list set
-    ] extend io-queue set ;
+: handle-io-error ( -- )
+    GetLastError expected-error? [ win32-throw-error ] unless ;
+
+: queue-error ( len/status -- len/status )
+    GetLastError expected-error? [ drop f ] unless ;
 
 : add-completion ( handle -- )
     completion-port get NULL 1 CreateIoCompletionPort drop ;
@@ -125,10 +109,53 @@ END-STRUCT
         callbacks get vector-nth cdr
     ] bind ;
 
-: win32-next-io-task ( -- quot )
-    completion-port get <indirect-pointer> dup >r <indirect-pointer> 
-    <indirect-pointer> dup >r INFINITE GetQueuedCompletionStatus
-    [ handle-io-error ] unless
-    r> r> indirect-pointer-value swap indirect-pointer-value <alien> 
-    overlapped-ext-user-data get-io-callback call ;
+: (wait-for-io) ( timeout -- error overlapped len )
+    >r completion-port get 
+    <indirect-pointer> [ 0 swap set-indirect-pointer-value ] keep 
+    <indirect-pointer> 
+    <indirect-pointer>
+    pick over r> -rot >r >r GetQueuedCompletionStatus r> r> ;
+
+: overlapped>callback ( overlapped -- callback )
+    indirect-pointer-value dup 0 = [
+        drop f
+    ] [
+        <alien> overlapped-ext-user-data get-io-callback
+    ] ifte ;
+
+: wait-for-io ( timeout -- callback len )
+    (wait-for-io) overlapped>callback swap indirect-pointer-value 
+    rot [ queue-error ] unless ;
+
+: win32-next-io-task ( -- )
+    INFINITE wait-for-io swap call ;
+
+: win32-io-thread ( -- )
+    10 wait-for-io swap [
+        [ schedule-thread call ] callcc0 2drop
+    ] [
+        drop yield
+    ] ifte* 
+    win32-io-thread ;
+
+TUPLE: null-stream ;
+M: null-stream stream-flush drop ;
+M: null-stream stream-auto-flush drop ;
+M: null-stream stream-read 2drop f ;
+M: null-stream stream-readln drop f ;
+M: null-stream stream-write-attr 3drop ;
+M: null-stream stream-close drop ;
+
+: win32-init-stdio ( -- )
+    INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
+    completion-port set 
+    
+    << null-stream >> stdio set
+
+    <namespace> [
+        32 <vector> callbacks set
+        f free-list set
+    ] extend io-queue set 
+    
+    [ win32-io-thread ] in-thread ;
 

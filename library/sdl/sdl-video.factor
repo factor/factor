@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -58,6 +58,13 @@ BEGIN-STRUCT: rect
     FIELD: short y
     FIELD: ushort w
     FIELD: ushort h
+END-STRUCT
+
+BEGIN-STRUCT: color
+    FIELD: uchar r
+    FIELD: uchar g
+    FIELD: uchar b
+    FIELD: uchar unused
 END-STRUCT
 
 BEGIN-STRUCT: format
@@ -148,10 +155,9 @@ END-STRUCT
 
 ! SDL_SetGamma: float types
 
-: SDL_FillRect ( surface rect color -- n )
-    #! If rect is null, fills entire surface.
-    "bool" "sdl" "SDL_FillRect"
-    [ "surface*" "rect*" "uint" ] alien-invoke ;
+: SDL_MapRGB ( surface r g b -- rgb )
+    "uint" "sdl" "SDL_MapRGB"
+    [ "surface*" "uchar" "uchar" "uchar" ] alien-invoke ;
 
 : SDL_LockSurface ( surface -- ? )
     "bool" "sdl" "SDL_LockSurface" [ "surface*" ] alien-invoke ;
@@ -159,9 +165,21 @@ END-STRUCT
 : SDL_UnlockSurface ( surface -- )
     "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-invoke ;
 
-: SDL_MapRGB ( surface r g b -- rgb )
-    "uint" "sdl" "SDL_MapRGB"
-    [ "surface*" "uchar" "uchar" "uchar" ] alien-invoke ;
+: SDL_FreeSurface ( surface -- )
+    "void" "sdl" "SDL_FreeSurface" [ "surface*" ] alien-invoke ;
+
+: SDL_UpperBlit ( src srcrect dst dstrect -- )
+    #! The blit function should not be called on a locked
+    #! surface.
+    "int" "sdl" "SDL_UpperBlit" [
+        "surface*" "rect*"
+        "surface*" "rect*"
+    ] alien-invoke ;
+
+: SDL_FillRect ( surface rect color -- n )
+    #! If rect is null, fills entire surface.
+    "bool" "sdl" "SDL_FillRect"
+    [ "surface*" "rect*" "uint" ] alien-invoke ;
 
 : SDL_WM_SetCaption ( title icon -- )
     "void" "sdl" "SDL_WM_SetCaption"

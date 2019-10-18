@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,12 +25,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: compiler
-USE: alien
-USE: math
-USE: kernel
-USE: hashtables
-USE: namespaces
+IN: assembler
+USING: alien math memory kernel hashtables namespaces ;
 
 SYMBOL: interned-literals
 
@@ -47,16 +43,14 @@ SYMBOL: interned-literals
     compiled-offset cell 2 * align set-compiled-offset ; inline
 
 : intern-literal ( obj -- lit# )
-    dup interned-literals get hash dup [
-        nip
-    ] [
-        drop [
+    dup interned-literals get hash [
+        [
             address
             literal-top set-compiled-cell
             literal-top dup cell + set-literal-top
             dup
         ] keep interned-literals get set-hash
-    ] ifte ;
+    ] ?unless ;
 
 : compile-byte ( n -- )
     compiled-offset set-compiled-byte
@@ -71,4 +65,5 @@ SYMBOL: interned-literals
     compiled-offset 0 compile-cell
     compiled-offset 0 compile-cell ;
 
-global [ <namespace> interned-literals set ] bind
+: init-assembler ( -- )
+    global [ <namespace> interned-literals set ] bind ;

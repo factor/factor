@@ -3,6 +3,7 @@ USE: kernel
 USE: math
 USE: test
 USE: lists
+USE: namespaces
 USE: compiler
 
 ! http://inferno.bell-labs.com/cm/cs/who/bwk/interps/pap.html
@@ -20,4 +21,4 @@ USE: compiler
 : string-benchmark ( n -- )
     "abcdef" 10 [ 2dup string-step ] times 2drop ; compiled
 
-[ ] [ 1000000 string-benchmark ] unit-test
+[ ] [ 400000 string-benchmark ] unit-test

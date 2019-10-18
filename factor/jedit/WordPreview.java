@@ -91,25 +91,10 @@ public class WordPreview implements ActionListener, CaretListener
 	private FactorWord getWordAtCaret(FactorParsedData fdata)
 		throws IOException
 	{
-		int line = textArea.getCaretLine();
-		int caret = textArea.getCaretPosition();
-
-		DefaultTokenHandler h = new DefaultTokenHandler();
-		textArea.getBuffer().markTokens(line,h);
-		Token tokens = h.getTokens();
-
-		int offset = caret - textArea.getLineStartOffset(line);
-
-		int len = textArea.getLineLength(line);
-		if(len == 0)
+		String name = FactorPlugin.getRulesetAtOffset(textArea,
+			textArea.getCaretPosition());
+		if(name == null)
 			return null;
-
-		if(offset == len)
-			offset--;
-
-		Token token = TextUtilities.getTokenAtOffset(tokens,offset);
-
-		String name = token.rules.getName();
 
 		for(int i = 0; i < IGNORED_RULESETS.length; i++)
 		{
@@ -134,10 +119,13 @@ public class WordPreview implements ActionListener, CaretListener
 		if(SideKickPlugin.isParsingBuffer(view.getBuffer()))
 			return;
 
-		SideKickParsedData data = SideKickParsedData.getParsedData(view);
-		if(data instanceof FactorParsedData)
+		if(!view.getBuffer().isLoaded())
+			return;
+
+		FactorParsedData data = FactorPlugin.getParsedData(view);
+		if(data != null)
 		{
-			FactorWord w = getWordAtCaret((FactorParsedData)data);
+			FactorWord w = getWordAtCaret(data);
 			if(w != null)
 			{
 				view.getStatus().setMessageAndClear(

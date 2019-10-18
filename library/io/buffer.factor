@@ -1,8 +1,6 @@
-! :folding=indent:collapseFolds=1:
-
 ! $Id$
 !
-! Copyright (C) 2004 Mackenzie Straight.
+! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -26,20 +24,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: kernel-internals
+USING: alien errors generic kernel kernel-internals math namespaces strings
+       win32-api ;
 
-USE: alien
-USE: errors
-USE: kernel
-USE: kernel-internals
-USE: math
-USE: namespaces
-USE: strings
-USE: win32-api
-
-SYMBOL: buf-size
-SYMBOL: buf-ptr
-SYMBOL: buf-fill
-SYMBOL: buf-pos
+TUPLE: buffer size ptr fill pos ;
 
 : imalloc ( size -- address )
     "int" "libc" "malloc" [ "int" ] alien-invoke ;
@@ -50,97 +38,69 @@ SYMBOL: buf-pos
 : irealloc ( address size -- address )
     "int" "libc" "realloc" [ "int" "int" ] alien-invoke ;
 
-: <buffer> ( size -- buffer )
-    #! Allocates and returns a new buffer.
-    <namespace> [
-        dup buf-size set
-        imalloc buf-ptr set
-        0 buf-fill set
-        0 buf-pos set
-    ] extend ;
+C: buffer ( size -- buffer )
+    2dup set-buffer-size
+    swap imalloc swap [ set-buffer-ptr ] keep
+    0 swap [ set-buffer-fill ] keep
+    0 swap [ set-buffer-pos ] keep ;
 
 : buffer-free ( buffer -- )
     #! Frees the C memory associated with the buffer.
-    [ buf-ptr get ifree ] bind ;
+    buffer-ptr ifree ;
 
 : buffer-contents ( buffer -- string )
     #! Returns the current contents of the buffer.
-    [
-        buf-ptr get buf-pos get + 
-        buf-fill get buf-pos get - 
-        memory>string 
-    ] bind ;
+    dup buffer-ptr over buffer-pos +
+    over buffer-fill pick buffer-pos -
+    memory>string nip ;
 
 : buffer-first-n ( count buffer -- string )
-    [
-        buf-fill get buf-pos get - min
-        buf-ptr get buf-pos get +
-        swap memory>string
-    ] bind ;
+    [ dup buffer-fill swap buffer-pos - min ] keep
+    dup buffer-ptr swap buffer-pos + swap memory>string ;
 
 : buffer-reset ( count buffer -- )
     #! Reset the position to 0 and the fill pointer to count.
-    [ 0 buf-pos set buf-fill set ] bind ;
+    [ set-buffer-fill ] keep 0 swap set-buffer-pos ;
 
 : buffer-consume ( count buffer -- )
     #! Consume count characters from the beginning of the buffer.
-    [
-        buf-pos [ + buf-fill get min ] change 
-        buf-pos get buf-fill get = [ 
-            0 buf-pos set 0 buf-fill set 
-        ] when
-    ] bind ;
+    [ buffer-pos + ] keep [ buffer-fill min ] keep [ set-buffer-pos ] keep
+    dup buffer-pos over buffer-fill = [
+        [ 0 swap set-buffer-pos ] keep [ 0 swap set-buffer-fill ] keep
+    ] when drop ;
 
 : buffer-length ( buffer -- length )
     #! Returns the amount of unconsumed input in the buffer.
-    [ buf-fill get buf-pos get - 0 max ] bind ;
-
-: buffer-size ( buffer -- size )
-    [ buf-size get ] bind ;
+    dup buffer-fill swap buffer-pos - 0 max ;
 
 : buffer-capacity ( buffer -- int )
     #! Returns the amount of data that may be added to the buffer.
-    [ buf-size get buf-fill get - ] bind ;
+    dup buffer-size swap buffer-fill - ;
 
 : buffer-set ( string buffer -- )
-    #! Set the contents of a buffer to string.
-    [ 
-        dup buf-ptr get string>memory
-        str-length namespace buffer-reset
-    ] bind ;
+    2dup buffer-ptr string>memory >r str-length r> buffer-reset ;
+
+: (check-overflow) ( string buffer -- )
+    buffer-capacity swap str-length < [ "Buffer overflow" throw ] when ;
 
 : buffer-append ( string buffer -- )
-    #! Appends a string to the end of the buffer. If it doesn't fit,
-    #! an error is thrown.
-    [ 
-        dup buf-size get buf-fill get - swap str-length < [
-            "Buffer overflow" throw
-        ] when
-        dup buf-ptr get buf-fill get + string>memory
-        buf-fill [ swap str-length + ] change
-    ] bind ;
+    2dup (check-overflow)
+    [ dup buffer-ptr swap buffer-fill + string>memory ] 2keep
+    [ buffer-fill swap str-length + ] keep set-buffer-fill ;
 
 : buffer-append-char ( int buffer -- )
-    #! Append a single character to a buffer.
-    [
-        buf-ptr get buf-fill get + <alien> 0 set-alien-1
-        buf-fill [ 1 + ] change
-    ] bind ;
+    #! Append a single character to a buffer
+    [ dup buffer-ptr swap buffer-fill + <alien> 0 set-alien-1 ] keep
+    [ buffer-fill 1 + ] keep set-buffer-fill ;
 
 : buffer-extend ( length buffer -- )
     #! Increases the size of the buffer by length.
-    [
-        buf-size get + dup buf-ptr get swap irealloc 
-        buf-ptr set buf-size set
-    ] bind ;
+    [ buffer-size + dup ] keep [ buffer-ptr swap ] keep >r irealloc r>
+    [ set-buffer-ptr ] keep set-buffer-size ;
 
-: buffer-fill ( count buffer -- )
+: buffer-inc-fill ( count buffer -- )
     #! Increases the fill pointer by count.
-    [ buf-fill [ + ] change ] bind ;
+    [ buffer-fill + ] keep set-buffer-fill ;
 
-: buffer-ptr ( buffer -- pointer )
-    #! Returns the memory address of the buffer area.
-    [ buf-ptr get ] bind ;
-
-: buffer-pos ( buffer -- int )
-    [ buf-ptr get buf-pos get + ] bind ;
+: buffer-pos+ptr ( buffer -- int )
+    [ buffer-ptr ] keep buffer-pos + ;

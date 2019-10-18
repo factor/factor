@@ -44,7 +44,7 @@ int64_t current_millis(void)
 void primitive_millis(void)
 {
 	maybe_garbage_collection();
-	dpush(tag_object(s48_long_long_to_bignum(current_millis())));
+	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
 }
 
 void primitive_init_random(void)
@@ -55,7 +55,7 @@ void primitive_init_random(void)
 void primitive_random_int(void)
 {
 	maybe_garbage_collection();
-	dpush(tag_object(s48_long_to_bignum(rand())));
+	dpush(tag_bignum(s48_long_to_bignum(rand())));
 }
 
 #ifdef WIN32

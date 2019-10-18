@@ -1,39 +1,8 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USE: errors
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: strings
-USE: words
-USE: unparser
+USING: errors kernel lists math namespaces strings words
+unparser ;
 
 ! The parser uses a number of variables:
 ! line - the line being parsed
@@ -46,27 +15,7 @@ USE: unparser
 ! immediately. Otherwise it is appended to the parse tree.
 
 : parsing? ( word -- ? )
-    dup word? [
-        "parsing" word-property
-    ] [
-        drop f
-    ] ifte ;
-
-: end? ( -- ? )
-    "col" get "line" get str-length >= ;
-
-: (with-parser) ( quot -- )
-    end? [ drop ] [ [ call ] keep (with-parser) ] ifte ;
-
-: with-parser ( text quot -- )
-    #! Keep calling the quotation until we reach the end of the
-    #! input.
-    swap "line" set 0 "col" set
-    (with-parser)
-    "line" off "col" off ;
-
-: ch ( -- ch ) "col" get "line" get str-nth ;
-: advance ( -- ) "col" [ 1 + ] change ;
+    dup word? [ "parsing" word-property ] [ drop f ] ifte ;
 
 : skip ( n line quot -- n )
     #! Find the next character that satisfies the quotation,
@@ -84,9 +33,6 @@ USE: unparser
 : skip-blank ( n line -- n )
     [ blank? not ] skip ;
 
-: skip-word ( n line -- n )
-    [ blank? ] skip ;
-
 : denotation? ( ch -- ? )
     #! Hard-coded for now. Make this customizable later.
     #! A 'denotation' is a character that is treated as its
@@ -97,55 +43,42 @@ USE: unparser
     #! Will call the parsing word ".
     "\"" str-contains? ;
 
-: (scan) ( n line -- start end )
-    dup >r skip-blank dup r>
-    2dup str-length < [
-        2dup str-nth denotation? [
-            drop 1 +
-        ] [
-            skip-word
-        ] ifte
+: skip-word ( n line -- n )
+    2dup str-nth denotation? [
+        drop 1 +
     ] [
-        drop
+        [ blank? ] skip
     ] ifte ;
+
+: (scan) ( n line -- start end )
+    [ skip-blank dup ] keep
+    2dup str-length < [ skip-word ] [ drop ] ifte ;
 
 : scan ( -- token )
     "col" get "line" get dup >r (scan) dup "col" set
-    2dup = [
-        r> 3drop f
-    ] [
-        r> substring
-    ] ifte ;
+    2dup = [ r> 3drop f ] [ r> substring ] ifte ;
+
+! If this variable is on, the parser does not internalize words;
+! it just appends strings to the parse tree as they are read.
+SYMBOL: string-mode
+global [ string-mode off ] bind
 
 : scan-word ( -- obj )
     scan dup [
-        dup "use" get search dup [
-            nip
-        ] [
-            drop str>number
-        ] ifte
+        dup ";" = not string-mode get and [
+            dup "use" get search [ str>number ] ?unless
+        ] unless
     ] when ;
 
-: parsed| ( parsed parsed obj -- parsed )
-    #! Some ugly ugly code to handle [ a | b ] expressions.
-    >r unswons r> cons swap [ swons ] each swons ;
-
-: expect ( word -- )
-    dup scan = not [
-        "Expected " swap cat2 throw
-    ] [
-        drop
-    ] ifte ;
-
-: parsed ( obj -- )
-    over "|" = [ nip parsed| "]" expect ] [ swons ] ifte ;
+: parse-loop ( -- )
+    scan-word [
+        dup parsing? [ execute ] [ swons ] ifte  parse-loop
+    ] when* ;
 
 : (parse) ( str -- )
-    [
-        scan-word [
-            dup parsing? [ execute ] [ parsed ] ifte
-        ] when*
-    ] with-parser ;
+    "line" set 0 "col" set
+    parse-loop
+    "line" off "col" off ;
 
 : parse ( str -- code )
     #! Parse the string into a parse tree that can be executed.
@@ -173,60 +106,51 @@ USE: unparser
     #! the parser is already line-tokenized.
     (until-eol) (until) ;
 
-: next-ch ( -- ch )
-    end? [ "Unexpected EOF" throw ] [ ch advance ] ifte ;
+: save-location ( word -- )
+    #! Remember where this word was defined.
+    dup set-word
+    dup "line-number" get "line" set-word-property
+    dup "col" get "col"  set-word-property
+    "file" get "file" set-word-property ;
 
-: next-word-ch ( -- ch )
-    "col" get "line" get skip-blank "col" set next-ch ;
+: create-in "in" get create ;
 
 : CREATE ( -- word )
-    scan "in" get create dup set-word
-    dup f "documentation" set-word-property
-    dup f "stack-effect" set-word-property
-    dup "line-number" get "line" set-word-property
-    dup "col"         get "col"  set-word-property
-    dup "file"        get "file" set-word-property ;
-
-! \x
-: unicode-escape>ch ( -- esc )
-    #! Read \u....
-    next-ch digit> 16 *
-    next-ch digit> + 16 *
-    next-ch digit> + 16 *
-    next-ch digit> + ;
-
-: ascii-escape>ch ( ch -- esc )
-    [
-        [ CHAR: e | CHAR: \e ]
-        [ CHAR: n | CHAR: \n ]
-        [ CHAR: r | CHAR: \r ]
-        [ CHAR: t | CHAR: \t ]
-        [ CHAR: s | CHAR: \s ]
-        [ CHAR: \s | CHAR: \s ]
-        [ CHAR: 0 | CHAR: \0 ]
-        [ CHAR: \\ | CHAR: \\ ]
-        [ CHAR: \" | CHAR: \" ]
-    ] assoc ;
+    scan create-in dup save-location ;
 
 : escape ( ch -- esc )
-    dup CHAR: u = [
-        drop unicode-escape>ch
+    [
+        [[ CHAR: e  CHAR: \e ]]
+        [[ CHAR: n  CHAR: \n ]]
+        [[ CHAR: r  CHAR: \r ]]
+        [[ CHAR: t  CHAR: \t ]]
+        [[ CHAR: s  CHAR: \s ]]
+        [[ CHAR: \s CHAR: \s ]]
+        [[ CHAR: 0  CHAR: \0 ]]
+        [[ CHAR: \\ CHAR: \\ ]]
+        [[ CHAR: \" CHAR: \" ]]
+    ] assoc dup [ "Bad escape" throw ] unless ;
+
+: next-escape ( n str -- ch n )
+    2dup str-nth CHAR: u = [
+        swap 1 + dup 4 + [ rot substring hex> ] keep
     ] [
-        ascii-escape>ch
+        over 1 + >r str-nth escape r>
     ] ifte ;
 
-: parse-escape ( -- )
-    next-ch escape dup [ drop "Bad escape" throw ] unless ;
-
-: parse-ch ( ch -- ch )
-    dup CHAR: \\ = [ drop parse-escape ] when ;
+: next-char ( n str -- ch n )
+    2dup str-nth CHAR: \\ = [
+        >r 1 + r> next-escape
+    ] [
+        over 1 + >r str-nth r>
+    ] ifte ;
 
 : doc-comment-here? ( parsed -- ? )
     not "in-definition" get and ;
 
 : parsed-stack-effect ( parsed str -- parsed )
     over doc-comment-here? [
-        word stack-effect [
+        word "stack-effect" word-property [
             drop
         ] [
             word swap "stack-effect" set-word-property

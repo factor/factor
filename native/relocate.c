@@ -8,7 +8,11 @@ void relocate_object(CELL relocating)
 		fixup_word((F_WORD*)relocating);
 		break;
 	case ARRAY_TYPE:
+	case TUPLE_TYPE:
 		fixup_array((F_ARRAY*)relocating);
+		break;
+	case HASHTABLE_TYPE:
+		fixup_hashtable((F_HASHTABLE*)relocating);
 		break;
 	case VECTOR_TYPE:
 		fixup_vector((F_VECTOR*)relocating);
@@ -34,21 +38,15 @@ void relocate_object(CELL relocating)
 INLINE CELL relocate_data_next(CELL relocating)
 {
 	CELL size = CELLS;
+	CELL cell = get(relocating);
 
-	switch(TAG(get(relocating)))
+	if(headerp(cell))
 	{
-	case HEADER_TYPE:
 		size = untagged_object_size(relocating);
 		relocate_object(relocating);
-		break;
-	case OBJECT_TYPE:
-		if(get(relocating) == F)
-			break;
-		/* fall thru */
-	default:
-		data_fixup((CELL*)relocating);
-		break;
 	}
+	else if(cell != F)
+		data_fixup((CELL*)relocating);
 
 	return relocating + size;
 }

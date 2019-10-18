@@ -33,7 +33,7 @@ USE: kernel
 ] unit-test
 
 [ { "Hey" "there" } ] [
-    [ [ "Hey" | "there" ] uncons ] test-interpreter
+    [ [[ "Hey" "there" ]] uncons ] test-interpreter
 ] unit-test
 
 [ { t } ] [
@@ -44,8 +44,8 @@ USE: kernel
     [ "XYZ" "XuZ" = ] test-interpreter
 ] unit-test
 
-[ { #{ 1 1.5 } { } #{ 1 1.5 } { } } ] [
-    [ #{ 1 1.5 } { } 2dup ] test-interpreter
+[ { #{ 1 1.5 }# { } #{ 1 1.5 }# { } } ] [
+    [ #{ 1 1.5 }# { } 2dup ] test-interpreter
 ] unit-test
 
 [ { 4 } ] [

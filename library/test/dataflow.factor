@@ -15,19 +15,19 @@ USE: generic
 
 : dataflow-contains-op? ( object list -- ? )
     #! Check if some dataflow node contains a given operation.
-    [ dupd node-op swap hash = ] some? nip ;
+    [ node-op swap hash = ] some-with? ;
 
 : dataflow-contains-param? ( object list -- ? )
     #! Check if some dataflow node contains a given operation.
     [
-        dupd [
+        [
             node-op get #label = [
                 node-param get dataflow-contains-param?
             ] [
                 node-param get =
             ] ifte
         ] bind
-    ] some? nip ;
+    ] some-with? ;
 
 [ t ] [
     \ + [ 2 2 + ] dataflow dataflow-contains-param? >boolean
@@ -41,7 +41,7 @@ USE: generic
 ! ] unit-test
 
 [ t ] [
-    #ifte [ [ drop ] [ + ] ifte ] dataflow dataflow-contains-op? >boolean
+    \ ifte [ [ drop ] [ + ] ifte ] dataflow dataflow-contains-op? >boolean
 ] unit-test
 
 : dataflow-consume-d-len ( object -- n )
@@ -55,16 +55,16 @@ USE: generic
 [ t ] [ [ 2 ] dataflow car dataflow-produce-d-len 1 = ] unit-test
 
 : dataflow-ifte-node-consume-d ( list -- node )
-    #ifte swap dataflow-contains-op? car [ node-consume-d get ] bind ;
+    \ ifte swap dataflow-contains-op? car [ node-consume-d get ] bind ;
 
 [ t ] [
-    [ 2 [ swap ] [ nip "hi" ] ifte ] dataflow
+    [ [ swap ] [ nip "hi" ] ifte ] dataflow
     dataflow-ifte-node-consume-d length 1 =
 ] unit-test
 
 ! [ t ] [
 !     [ { [ drop ] [ undefined-method ] [ drop ] [ undefined-method ] } generic ] dataflow
-!     #dispatch swap dataflow-contains-op? car [
+!     \ dispatch swap dataflow-contains-op? car [
 !         node-param get [
 !             [ [ node-param get \ undefined-method = ] bind ] some?
 !         ] some?
@@ -77,8 +77,8 @@ SYMBOL: #test
 
 [ 6 ] [
     {{
-        [ node-op | #test ]
-        [ node-param | 5 ]
+        [[ node-op #test ]]
+        [[ node-param 5 ]]
     }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
 ] unit-test
 
@@ -86,14 +86,14 @@ SYMBOL: #test
 
 [ 25 ] [
     {{
-        [ node-op | #test ]
-        [ node-param | 5 ]
+        [[ node-op #test ]]
+        [[ node-param 5 ]]
     }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
 ] unit-test
 
 ! Somebody (cough) got the order of ifte nodes wrong.
 
 [ t ] [
-    #ifte [ [ 1 ] [ 2 ] ifte ] dataflow dataflow-contains-op? car
+    \ ifte [ [ 1 ] [ 2 ] ifte ] dataflow dataflow-contains-op? car
     [ node-param get ] bind car car [ node-param get ] bind 1 =
 ] unit-test

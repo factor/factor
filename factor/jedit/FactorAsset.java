@@ -30,7 +30,6 @@
 package factor.jedit;
 
 import factor.FactorWord;
-import factor.FactorWordDefinition;
 import javax.swing.Icon;
 import javax.swing.text.Position;
 import org.gjt.sp.jedit.Buffer;

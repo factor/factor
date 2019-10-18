@@ -8,14 +8,14 @@ its drawbacks -- namely, its not portable.
 All FFI words are in the "alien" vocabulary.
 
 The basic principle is generating machine stubs from C function
-prototypes. The main entry point is the 'alien-call' word, which is
+prototypes. The main entry point is the 'alien-invoke' word, which is
 defined as simply throwing an error. However, it is given special
 compilation behavior. This means it can only be used in compiled words.
 
 Here is an example from sdl-video.factor:
 
 : SDL_LockSurface ( surface -- )
-    "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
+    "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-invoke ;
 
 The parameters are:
 

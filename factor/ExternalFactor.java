@@ -63,8 +63,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		}
 
 		Log.log(Log.ERROR,this,"Cannot connect to Factor on port " + port);
-		if(in != null && out != null)
-			close();
+		close();
 	} //}}}
 
 	//{{{ openWireSocket() method
@@ -104,7 +103,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			byte[] discard = new byte[2048];
 			int len = in.read(discard,0,discard.length);
 			discardStr = new String(discard,0,len);
-			Log.log(Log.DEBUG,this,"Waiting for ACK: " + discardStr);
+			// Log.log(Log.DEBUG,this,"Waiting for ACK: " + discardStr);
 		}
 	} //}}}
 	
@@ -123,6 +122,9 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public synchronized String eval(String cmd) throws IOException
 	{
+		if(isClosed())
+			throw new IOException("ExternalFactor stream closed");
+
 		try
 		{
 			waitForAck();
@@ -236,11 +238,11 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		}
 	} //}}}
 
-	//{{{ getCompletions() method
-	public synchronized void getCompletions(Cons use, String word,
+	//{{{ getWordCompletions() method
+	public synchronized void getWordCompletions(Cons use, String word,
 		boolean anywhere, Set completions) throws Exception
 	{
-		super.getCompletions(use,word,anywhere,completions);
+		super.getWordCompletions(use,word,anywhere,completions);
 
 		if(closed)
 			return;
@@ -277,21 +279,26 @@ public class ExternalFactor extends DefaultVocabularyLookup
 
 		closed = true;
 
-		try
+		if(out != null)
 		{
-			/* don't care about response */
-			sendEval("0 exit*");
-		}
-		catch(Exception e)
-		{
-			// We don't care...
-			Log.log(Log.DEBUG,this,e);
+			try
+			{
+				/* don't care about response */
+				sendEval("0 exit*");
+			}
+			catch(Exception e)
+			{
+				// We don't care...
+				Log.log(Log.DEBUG,this,e);
+			}
 		}
 		
 		try
 		{
-			in.close();
-			out.close();
+			if(in != null)
+				in.close();
+			if(out != null)
+				out.close();
 		}
 		catch(Exception e)
 		{

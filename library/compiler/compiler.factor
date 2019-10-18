@@ -102,3 +102,9 @@ M: compound (compile) ( word -- )
     ] [
         "Unsupported CPU" print
     ] ifte ;
+
+: decompile ( word -- )
+    [ word-primitive ] keep set-word-primitive ;
+
+: recompile ( word -- )
+    dup decompile compile ;

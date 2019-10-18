@@ -4,7 +4,12 @@
 F_STRING* allot_string(CELL capacity)
 {
 	F_STRING* string = allot_object(STRING_TYPE,
-		sizeof(F_STRING) + capacity * CHARS);
+		sizeof(F_STRING) + (capacity + 1) * CHARS);
+	/* strings are null-terminated in memory, even though they also
+	have a length field. The null termination allows us to add
+	the sizeof(F_STRING) to a Factor string to get a C-style
+	UTF16 string for C library calls. */
+	cput(SREF(string,capacity),(uint16_t)'\0');
 	string->capacity = capacity;
 	return string;
 }
@@ -136,6 +141,13 @@ BYTE* unbox_c_string(void)
 	return to_c_string(untag_string(dpop()));
 }
 
+/* FFI calls this */
+uint16_t* unbox_utf16_string(void)
+{
+	/* Return pointer to first character */
+	return (uint16_t*)(untag_string(dpop()) + 1);
+}
+
 void primitive_string_nth(void)
 {
 	F_STRING* string = untag_string(dpop());
@@ -183,22 +195,20 @@ void primitive_string_compare(void)
 	dpush(tag_fixnum(string_compare(s1,s2)));
 }
 
-bool string_eq(F_STRING* s1, F_STRING* s2)
-{
-	if(s1 == s2)
-		return true;
-	else if(s1->hashcode != s2->hashcode)
-		return false;
-	else
-		return (string_compare(s1,s2) == 0);
-}
-
 void primitive_string_eq(void)
 {
 	F_STRING* s1 = untag_string(dpop());
 	CELL with = dpop();
 	if(type_of(with) == STRING_TYPE)
-		dpush(tag_boolean(string_eq(s1,(F_STRING*)UNTAG(with))));
+	{
+		F_STRING* s2 = (F_STRING*)UNTAG(with);
+		if(s1->hashcode != s2->hashcode)
+			dpush(F);
+		else if(s1 == s2)
+			dpush(T);
+		else
+			dpush(tag_boolean((string_compare(s1,s2) == 0)));
+	}
 	else
 		dpush(F);
 }
@@ -273,10 +283,10 @@ INLINE F_STRING* substring(CELL start, CELL end, F_STRING* string)
 	F_STRING* result;
 
 	if(start < 0)
-		range_error(tag_object(string),0,to_fixnum(start),string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(start),string->capacity);
 
 	if(end < start || end > string->capacity)
-		range_error(tag_object(string),0,to_fixnum(end),string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(end),string->capacity);
 
 	result = allot_string(end - start);
 	memcpy(result + 1,

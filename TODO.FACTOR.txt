@@ -1,56 +1,63 @@
-+ compiler:
+72/73:
 
+- update plugin docs
+- word preview for remote words
+- faster completion
+
+- [ [ dup call ] dup call ] infer hangs
+- type inference fails with some assembler words;
+  displaced, register and other predicates need to inherit from list
+  not cons, and need stronger branch partial eval
+- print warning on null class
 - optimize away dispatch
-- getenv/setenv: if literal arg, compile as a load/store
-- assembler opcodes dispatch on operand types
 
-+ oop:
+- move tuple to generic vocab
 
-- make see work with union, builtin, predicate
-- doc comments of generics
+- vectors: ensure its ok with bignum indices
+- code gc
+- ppc register decls
 
-+ ffi:
+- #jump-f #jump-f-label
+- extract word inside M:, C:, and structure browsing for these
+- fix checkbox alignment
+- each-slot combinator
+- references primitive
+- resize window: world not updated until mouse moved
+- x>offset
+- fix completion invoke in middle of word
+- don't hardcode so many colors
+- ffi unicode strings: null char security hole
+- utf16 string boxing
+- sdl console crash
+- UI: don't roll over if mouse button is down
+- more accurate types for various words
+- optimize out >array, >tuple, >hashtable etc
+- write read: write should flush
 
-- figure out how to load an image referring to missing libraries
++ compiler/ffi:
+
+- value type structs
+- out parameters
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
 - SDL_Rect** type
 - struct membres that are not *
 - FFI float types
 
-+ listener/plugin:
++ i/o:
 
-- WordPreview calls markTokens() -> NPE
 - stream server can hang because of exception handler limitations
-- listener should be multithreaded
-- compile all, infer all commands
-- faster completion
-- errors don't always disappear
-- NPE in ErrorHighlight
-- maple-like: press enter at old commands to evaluate there
-- completion in the listener
-- special completion for USE:/IN:
+- better i/o scheduler
+- nicer way to combine two paths
+- add a socket timeout
+- unix ffi i/o
 
 + kernel:
 
-- do partial objects cause problems?
-- better i/o scheduler
-- remove sbufs
 - cat, reverse-cat primitives
-- first-class hashtables
-- add a socket timeout
-
-+ misc:
-
-- perhaps /i should work with all numbers
-- unit test weirdness: 2 lines appears at end
-- jedit ==> jedit-word, jedit takes a file name
-- nicer way to combine two paths
-- browser responder for word links in HTTPd
+- generational gc
+- make see work with union, builtin, predicate
+- doc comments of generics
+- proper ordering for classes
+- make-vector and make-string should not need a reverse step
 - worddef props
-- prettyprint: when unparse called due to recursion, write a link
-
-+ httpd:
-
-- log with date
-- file responder; last-modified field

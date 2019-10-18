@@ -8,58 +8,7 @@ USE: math
 USE: words
 USE: lists
 USE: vectors
-
-TRAITS: test-traits
-C: test-traits ;
-
-[ t ] [ <test-traits> test-traits? ] unit-test
-[ f ] [ "hello" test-traits? ] unit-test
-[ f ] [ <namespace> test-traits? ] unit-test
-
-GENERIC: foo
-
-M: test-traits foo drop 12 ;
-
-TRAITS: another-test
-C: another-test ;
-
-M: another-test foo drop 13 ;
-
-[ 12 ] [ <test-traits> foo ] unit-test
-[ 13 ] [ <another-test> foo ] unit-test
-
-TRAITS: quux
-C: quux ;
-
-M: quux foo "foo" swap hash ;
-
-[
-    "Hi"
-] [
-    <quux> [
-        "Hi" "foo" set
-    ] extend foo
-] unit-test
-
-TRAITS: ctr-test
-C: ctr-test [ 5 "x" set ] extend ;
-
-[
-    5
-] [
-    <ctr-test> [ "x" get ] bind
-] unit-test
-
-TRAITS: del1
-C: del1 ;
-
-GENERIC: super
-M: del1 super drop 5 ;
-
-TRAITS: del2
-C: del2 ( delegate -- del2 ) [ delegate set ] extend ;
-
-[ 5 ] [ <del1> <del2> super ] unit-test
+USE: alien
 
 GENERIC: class-of
 
@@ -85,8 +34,8 @@ M: f bool>str drop "false" ;
 
 : str>bool
     [
-        [ "true" | t ]
-        [ "false" | f ]
+        [[ "true" t ]]
+        [[ "false" f ]]
     ] assoc ;
 
 [ t ] [ t bool>str str>bool ] unit-test
@@ -98,7 +47,7 @@ GENERIC: funny-length
 M: cons funny-length drop 0 ;
 M: nonempty-list funny-length length ;
 
-[ 0 ] [ [ 1 2 | 3 ] funny-length ] unit-test
+[ 0 ] [ [[ 1 [[ 2 3 ]] ]] funny-length ] unit-test
 [ 3 ] [ [ 1 2 3 ] funny-length ] unit-test
 [ "hello" funny-length ] unit-test-fails
 
@@ -132,16 +81,29 @@ M: very-funny gooey sq ;
 [ fixnum ] [ fixnum fixnum class-and ] unit-test
 [ fixnum ] [ fixnum integer class-and ] unit-test
 [ fixnum ] [ integer fixnum class-and ] unit-test
-[ vector fixnum class-and ] unit-test-fails
+[ null ] [ vector fixnum class-and ] unit-test
 [ integer ] [ fixnum bignum class-or ] unit-test
 [ integer ] [ fixnum integer class-or ] unit-test
 [ rational ] [ ratio integer class-or ] unit-test
 [ number ] [ number object class-and ] unit-test
 [ number ] [ object number class-and ] unit-test
 
-[ t ] [ del1 builtin-supertypes [ integer? ] all? ] unit-test
-
 [ cons ] [ [ 1 2 ] class ] unit-test
 
 [ t ] [ \ generic \ compound class< ] unit-test
 [ f ] [ \ compound \ generic class< ] unit-test
+
+DEFER: bah
+FORGET: bah
+UNION: bah fixnum alien ;
+[ bah ] [ fixnum alien class-or ] unit-test
+
+DEFER: complement-test
+FORGET: complement-test
+GENERIC: complement-test
+
+M: f         complement-test drop "f" ;
+M: general-t complement-test drop "general-t" ;
+
+[ "general-t" ] [ 5 complement-test ] unit-test
+[ "f" ] [ f complement-test ] unit-test

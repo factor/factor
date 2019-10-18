@@ -43,9 +43,10 @@ public class Def extends FactorParsingDefinition
 	{
 		FactorWord newWord = reader.nextWord(true);
 
-		if(newWord == null)
-			return;
-
-		reader.pushExclusiveState(word,newWord);
+		if(newWord != null)
+		{
+			newWord.setDefiner(word);
+			reader.pushExclusiveState(word,newWord);
+		}
 	}
 }

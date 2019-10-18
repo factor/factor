@@ -50,7 +50,7 @@ USE: url-encoding
 
 : error-head ( error -- )
     dup log-error
-    [ [ "Content-Type" | "text/html" ] ] over response ;
+    [ [[ "Content-Type" "text/html" ]] ] over response ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request
@@ -65,11 +65,11 @@ USE: url-encoding
     ] with-scope ;
 
 : serving-html ( -- )
-    [ [ "Content-Type" | "text/html" ] ]
+    [ [[ "Content-Type" "text/html" ]] ]
     "200 Document follows" response terpri ;
 
 : serving-text ( -- )
-    [ [ "Content-Type" | "text/plain" ] ]
+    [ [[ "Content-Type" "text/plain" ]] ]
     "200 Document follows" response terpri ;
 
 : redirect ( to -- )
@@ -86,7 +86,7 @@ USE: url-encoding
     ": " split1 dup [ cons swons ] [ 2drop ] ifte ;
 
 : (read-header) ( alist -- alist )
-    read dup
+    read-line dup
     f-or-"" [ drop ] [ header-line (read-header) ] ifte ;
 
 : read-header ( -- alist )
@@ -105,7 +105,7 @@ USE: url-encoding
     ] when ;
 
 : read-post-request ( header -- alist )
-    content-length dup [ read# query>alist ] when ;
+    content-length dup [ read query>alist ] when ;
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [

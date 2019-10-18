@@ -53,7 +53,7 @@ public class FactorArray implements FactorExternalizable
 	//{{{ FactorArray constructor
 	public FactorArray(Cons list)
 	{
-		this(list == null ? 0 : list.length());
+		this(Cons.length(list));
 
 		int i = 0;
 		while(list != null)

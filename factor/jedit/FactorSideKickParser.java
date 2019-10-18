@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2004, 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -130,12 +130,12 @@ public class FactorSideKickParser extends SideKickParser
 				errorSource);
 			r = new FactorReader(scanner,false,FactorPlugin.getExternalInstance());
 
-			Cons parsed = r.parse();
+			r.parse();
 
 			d.in = r.getIn();
 			d.use = r.getUse();
 
-			addWordDefNodes(d,parsed,buffer);
+			addWordDefNodes(d,r.getDefinedWords(),buffer);
 		}
 		catch(FactorParseException pe)
 		{
@@ -172,38 +172,31 @@ public class FactorSideKickParser extends SideKickParser
 	} //}}}
 
 	//{{{ addWordDefNodes() method
-	private void addWordDefNodes(FactorParsedData d, Cons parsed, Buffer buffer)
+	private void addWordDefNodes(FactorParsedData d, Cons words, Buffer buffer)
 	{
 		FactorAsset last = null;
 
-		while(parsed != null)
+		while(words != null)
 		{
-			if(parsed.car instanceof FactorWordDefinition)
-			{
-				FactorWordDefinition def
-					= (FactorWordDefinition)
-					parsed.car;
+			FactorWord word = (FactorWord)words.car;
 
-				FactorWord word = def.word;
+			/* word lines are indexed from 1 */
+			int startLine = Math.max(0,Math.min(
+				buffer.getLineCount() - 1,
+				word.line - 1));
+			int startLineLength = buffer.getLineLength(startLine);
+			int startCol = Math.min(word.col,startLineLength);
 
-				/* word lines are indexed from 1 */
-				int startLine = Math.max(0,Math.min(
-					buffer.getLineCount() - 1,
-					word.line - 1));
-				int startLineLength = buffer.getLineLength(startLine);
-				int startCol = Math.min(word.col,startLineLength);
+			int start = buffer.getLineStartOffset(startLine)
+				+ startCol;
 
-				int start = buffer.getLineStartOffset(startLine)
-					+ startCol;
+			if(last != null)
+				last.end = buffer.createPosition(Math.max(0,start - 1));
 
-				if(last != null)
-					last.end = buffer.createPosition(Math.max(0,start - 1));
+			last = new FactorAsset(word,buffer.createPosition(start));
+			d.root.add(new DefaultMutableTreeNode(last));
 
-				last = new FactorAsset(word,buffer.createPosition(start));
-				d.root.add(new DefaultMutableTreeNode(last));
-			}
-
-			parsed = parsed.next();
+			words = words.next();
 		}
 
 		if(last != null)
@@ -252,11 +245,16 @@ public class FactorSideKickParser extends SideKickParser
 	 */
 	public SideKickCompletion complete(EditPane editPane, int caret)
 	{
-		SideKickParsedData _data = SideKickParsedData
-			.getParsedData(editPane.getView());
-		if(!(_data instanceof FactorParsedData))
+		FactorParsedData data = FactorPlugin.getParsedData(
+			editPane.getView());
+		if(data == null)
 			return null;
-		FactorParsedData data = (FactorParsedData)_data;
+
+		String ruleset = FactorPlugin.getRulesetAtOffset(
+			editPane.getTextArea(),caret);
+
+		if(ruleset == null)
+			return null;
 
 		Buffer buffer = editPane.getBuffer();
 
@@ -291,14 +289,40 @@ public class FactorSideKickParser extends SideKickParser
 		if(word.length() == 0)
 			return null;
 
-		FactorWord[] completions = FactorPlugin.toWordArray(
-			FactorPlugin.getCompletions(word,false));
+		if(ruleset.equals("factor::USING"))
+			return vocabComplete(editPane,data,word,caret);
+		else
+			return wordComplete(editPane,data,word,caret);
+	} //}}}
+	
+	//{{{ vocabComplete() method
+	private SideKickCompletion vocabComplete(EditPane editPane,
+		FactorParsedData data, String vocab, int caret)
+	{
+		String[] completions = FactorPlugin.getVocabCompletions(
+			vocab,false);
 
 		if(completions.length == 0)
 			return null;
 		else
 		{
-			return new FactorCompletion(editPane.getView(),
+			return new FactorVocabCompletion(editPane.getView(),
+				completions,vocab,data);
+		}
+	} //}}}
+	
+	//{{{ wordComplete() method
+	private SideKickCompletion wordComplete(EditPane editPane,
+		FactorParsedData data, String word, int caret)
+	{
+		FactorWord[] completions = FactorPlugin.toWordArray(
+			FactorPlugin.getWordCompletions(word,false));
+
+		if(completions.length == 0)
+			return null;
+		else
+		{
+			return new FactorWordCompletion(editPane.getView(),
 				completions,word,data);
 		}
 	} //}}}

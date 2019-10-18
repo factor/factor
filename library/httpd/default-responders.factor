@@ -36,6 +36,8 @@ USE: inspect-responder
 USE: quit-responder
 USE: file-responder
 USE: resource-responder
+USE: cont-responder
+USE: browser-responder
 
 #! Remove all existing responders, and create a blank
 #! responder table.
@@ -67,5 +69,7 @@ global [ <namespace> "httpd-responders" set ] bind
     "resource" "responder" set
     [ resource-responder ] "get" set
 ] extend add-responder
+
+"browser" [ f browser-responder ] install-cont-responder
 
 "file" set-default-responder

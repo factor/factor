@@ -19,18 +19,26 @@ typedef unsigned long int CELL;
 CELL ds_bot;
 
 /* raw pointer to datastack top */
-DLLEXPORT CELL ds;
+#ifdef FACTOR_X86
+	register CELL ds asm("esi");
+#else
+	CELL ds;
+#endif
 
 /* raw pointer to callstack bottom */
 CELL cs_bot;
 
 /* raw pointer to callstack top */
-CELL cs;
+DLLEXPORT CELL cs;
+
+/* TAGGED currently executing quotation */
+CELL callframe;
 
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
+#include <stdbool.h>
 #include <setjmp.h>
 #include <signal.h>
 #include <stdio.h>
@@ -57,33 +65,11 @@ CELL cs;
 	#include <netdb.h>
 #endif
 
-#if defined(_MSC_VER)
-	#pragma warning(disable:4312)
-	#pragma warning(disable:4311)
-	typedef enum { false, true } _Bool;
-	typedef enum _Bool bool;
-	typedef unsigned char uint8_t;
-	typedef unsigned short uint16_t;
-	typedef unsigned int uint32_t;
-	typedef unsigned __int64 uint64_t;
-	typedef signed char int8_t;
-	typedef signed short int16_t;
-	typedef signed int int32_t;
-	typedef signed __int64 int64_t;
-	#define snprintf _snprintf
-#else
-	#include <stdbool.h>
-#endif
-
 #if defined(FFI) && !defined(WIN32)
 #include <dlfcn.h>
 #endif /* FFI */
 
-#if defined(_MSC_VER)
-	#define INLINE static __inline
-#else
-	#define INLINE inline static
-#endif
+#define INLINE inline static
 
 #define FIXNUM_MAX (LONG_MAX >> TAG_BITS)
 #define FIXNUM_MIN (LONG_MIN >> TAG_BITS)
@@ -101,8 +87,8 @@ CELL cs;
 typedef unsigned char BYTE;
 
 /* Memory areas */
-#define DEFAULT_ARENA (64 * 1024 * 1024)
-#define COMPILE_ZONE_SIZE (64 * 1024 * 1024)
+#define DEFAULT_ARENA (16 * 1024 * 1024)
+#define COMPILE_ZONE_SIZE (8 * 1024 * 1024)
 #define STACK_SIZE (2 * 1024 * 1024)
 
 #include "memory.h"
@@ -135,6 +121,7 @@ typedef unsigned char BYTE;
 #include "image.h"
 #include "primitives.h"
 #include "vector.h"
+#include "hashtable.h"
 #include "stack.h"
 #include "compiler.h"
 #include "relocate.h"

@@ -2,7 +2,7 @@
 plugin.factor.jedit.FactorPlugin.activate=startup
 
 plugin.factor.jedit.FactorPlugin.name=Factor
-plugin.factor.jedit.FactorPlugin.version=0.71
+plugin.factor.jedit.FactorPlugin.version=0.72
 plugin.factor.jedit.FactorPlugin.author=Slava Pestov
 plugin.factor.jedit.FactorPlugin.docs=/doc/jedit/index.html
 
@@ -29,6 +29,12 @@ plugin.factor.jedit.FactorPlugin.menu=factor-listener \
 	- \
 	factor-extract-word \
 	- \
+	factor-infer-effect \
+	factor-infer-effects \
+	- \
+	factor-compile \
+	factor-compile-all \
+	- \
 	factor-restart
 
 factor-listener.label=Listener
@@ -41,6 +47,10 @@ factor-edit.label=Edit word at caret
 factor-edit-dialog.label=Edit word...
 factor-usages.label=Word usages at caret
 factor-extract-word.label=Extract word...
+factor-infer-effect.label=Infer word at caret
+factor-infer-effects.label=Infer all words in buffer
+factor-compile.label=Compile word at caret
+factor-compile-all.label=Compile all words in buffer
 factor-restart.label=Restart Factor
 
 # SideKick stuff
@@ -48,15 +58,12 @@ sidekick.parser.factor.label=Factor
 mode.factor.sidekick.parser=factor
 
 factor.completion.in=<font color="#a0a0a0">IN: {0}</font>\ 
-factor.completion.colon=: <b>{0}</b>
-factor.completion.defer=DEFER: <b>{0}</b>
-factor.completion.parsing=PARSING: <b>{0}</b>
-factor.completion.symbol=SYMBOL: <b>{0}</b>
+factor.completion.def={0} <b>{1}</b>
 factor.completion.stack={0} ( {1})
 
 # Dialog boxes
-factor.status.inserted-use=Inserted {0}
-factor.status.already-used=Already used {0}
+factor.status.inserted-use=Using {0}
+factor.status.already-used=Already using {0}
 
 factor.insert-use.title=Insert USE: Declaration
 factor.insert-use.caption=There are multiple words named "{0}". Select the one to use:

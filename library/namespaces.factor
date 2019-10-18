@@ -1,45 +1,19 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2003, 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2003, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: namespaces
-USE: hashtables
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: vectors
+USING: hashtables kernel kernel-internals lists strings vectors
+math ;
 
 ! Other languages have classes, objects, variables, etc.
 ! Factor has similar concepts.
 !
-!   5 "x" set
-!   "x" get 2 + .
+!   SYMBOL: x
+!
+!   5 x set
+!   x get 2 + .
 ! 7
-!   7 "x" set
-!   "x" get 2 + .
+!   7 x set
+!   x get 2 + .
 ! 9
 !
 ! get ( name -- value ) and set ( value name -- ) search in
@@ -60,7 +34,7 @@ USE: vectors
 
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the namespace stack.
-    >vector namestack cons set-namestack ; inline
+    >hashtable namestack cons set-namestack ; inline
 
 : n> ( n:namespace -- namespace )
     #! Pop the top of the namespace stack.
@@ -79,11 +53,11 @@ USE: vectors
 : (get) ( var ns -- value )
     #! Internal word for searching the namestack.
     dup [
-        2dup car hash* dup [
-            nip nip cdr ( found )
+        2dup car hash* [
+            nip cdr ( found )
         ] [
-            drop cdr (get) ( keep looking )
-        ] ifte
+            cdr (get) ( keep looking )
+        ] ?ifte
     ] [
         2drop f
     ] ifte ;
@@ -99,11 +73,7 @@ USE: vectors
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
     #! its value, otherwise set its value to a new namespace.
-    dup namespace hash dup [
-        nip
-    ] [
-        drop >r <namespace> dup r> set
-    ] ifte ;
+    dup namespace hash [ >r <namespace> dup r> set ] ?unless ;
 
 : change ( var quot -- )
     #! Execute the quotation with the variable value on the
@@ -130,3 +100,61 @@ USE: vectors
 
 : on ( var -- ) t put ;
 : off ( var -- ) f put ;
+: inc ( var -- ) [ 1 + ] change ;
+: dec ( var -- ) [ 1 - ] change ;
+
+: cons@ ( x var -- )
+    #! Prepend x to the list stored in var.
+    [ cons ] change ;
+
+: unique@ ( elem var -- )
+    #! Prepend an element to the proper list stored in a
+    #! variable if it is not already contained in the list.
+    [ unique ] change ;
+
+SYMBOL: list-buffer
+
+: make-rlist ( quot -- list )
+    #! Call a quotation. The quotation can call , to prepend
+    #! objects to the list that is returned when the quotation
+    #! is done.
+    [ list-buffer off call list-buffer get ] with-scope ;
+    inline
+
+: make-list ( quot -- list )
+    #! Return a list whose entries are in the same order that ,
+    #! was called.
+    make-rlist reverse ; inline
+
+: make-string ( quot -- string )
+    #! Call a quotation. The quotation can call , to prepend
+    #! objects to the list that is returned when the quotation
+    #! is done.
+    make-list cat ; inline
+
+: make-rstring ( quot -- string )
+    #! Return a string whose entries are in the same order that ,
+    #! was called.
+    make-rlist cat ; inline
+
+: make-vector ( quot -- list )
+    #! Return a vector whose entries are in the same order that
+    #! , was called.
+    make-list list>vector ; inline
+
+: , ( obj -- )
+    #! Append an object to the currently constructing list.
+    list-buffer cons@ ;
+
+: unique, ( obj -- )
+    #! Append an object to the currently constructing list, only
+    #! if the object does not already occur in the list.
+    list-buffer unique@ ;
+
+: append, ( list -- )
+    [ , ] each ;
+
+: literal, ( word -- )
+    #! Append some code that pushes the word on the stack. Used
+    #! when building quotations.
+    unit , \ car , ;

@@ -31,7 +31,6 @@ USE: html
 USE: words
 USE: stdio
 USE: kernel
-USE: cont-utils
 USE: cont-responder
 USE: prettyprint
 
@@ -39,7 +38,7 @@ USE: prettyprint
   #! Given a string that is a factor word, show the
   #! aporpos of that word.
   <namespace> [
-    "responder" "inspect" put
+    "responder" "browser" put
     <pre> 
         stdio get <html-stream> [   
           apropos.

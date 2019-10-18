@@ -9,8 +9,6 @@ void* primitives[] = {
 	primitive_ifte,
 	primitive_cons,
 	primitive_vector,
-	primitive_vector_nth,
-	primitive_set_vector_nth,
 	primitive_string_nth,
 	primitive_string_compare,
 	primitive_string_eq,
@@ -160,7 +158,6 @@ void* primitives[] = {
 	primitive_set_alien_2,
 	primitive_alien_1,
 	primitive_set_alien_1,
-	primitive_heap_stats,
 	primitive_throw,
 	primitive_string_to_memory,
 	primitive_memory_to_string,
@@ -170,11 +167,21 @@ void* primitives[] = {
 	primitive_to_vector,
 	primitive_to_string,
 	primitive_to_word,
+	primitive_to_hashtable,
 	primitive_slot,
 	primitive_set_slot,
 	primitive_integer_slot,
 	primitive_set_integer_slot,
-	primitive_grow_array
+	primitive_grow_array,
+	primitive_hashtable,
+	primitive_array,
+	primitive_tuple,
+	primitive_to_array,
+	primitive_to_tuple,
+	primitive_begin_scan,
+	primitive_next_object,
+	primitive_end_scan,
+	primitive_size
 };
 
 CELL primitive_to_xt(CELL primitive)

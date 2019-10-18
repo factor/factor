@@ -9,7 +9,7 @@ USE: test
 [ 0.25 ] [ 2 -2 fpow ] unit-test
 
 [ 4.0 ] [ 16 sqrt ] unit-test
-[ #{ 0 4.0 } ] [ -16 sqrt ] unit-test
+[ #{ 0 4.0 }# ] [ -16 sqrt ] unit-test
 
 [ 4.0 ] [ 2 2 ^ ] unit-test
 [ 0.25 ] [ 2 -2 ^ ] unit-test

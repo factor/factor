@@ -1,8 +1,6 @@
-! :folding=indent:collapseFolds=1:
-
 ! $Id$
 !
-! Copyright (C) 2004 Mackenzie Straight.
+! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -26,24 +24,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-stream
-USE: alien
-USE: errors
-USE: generic
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: math
-USE: namespaces
-USE: prettyprint
-USE: stdio
-USE: streams
-USE: strings
-USE: threads
-USE: unparser
-USE: win32-api
-USE: win32-io-internals
+USING: alien errors generic kernel kernel-internals lists math namespaces
+       prettyprint stdio streams strings threads unparser win32-api
+       win32-io-internals ;
 
-TRAITS: win32-server
+TUPLE: win32-server this ;
+TUPLE: win32-client-stream delegate host ;
 SYMBOL: winsock
 SYMBOL: socket
 
@@ -76,33 +62,39 @@ SYMBOL: socket
 : listen-socket ( socket -- )
     20 wsa-listen 0 = [ handle-socket-error ] unless ;
 
-: <win32-client-stream> ( buf stream -- stream )
-    [ 
-        buffer-ptr <alien> 0 32 32 
-        <sockaddr-in> dup >r <indirect-pointer> <sockaddr-in> dup >r 
-        <indirect-pointer> GetAcceptExSockaddrs r> r> drop
-        dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa
-        [ , ":" , unparse , ] make-string "client" set
-    ] extend ;
+: sockaddr>string ( sockaddr -- string )
+    dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa
+    [ , ":" , unparse , ] make-string ;
+
+: extract-remote-host ( buffer -- host )
+    buffer-ptr <alien> 0 32 32 <indirect-pointer> <indirect-pointer> 
+                               <indirect-pointer> dup >r <indirect-pointer> 
+    GetAcceptExSockaddrs r> indirect-pointer-value <alien> sockaddr>string ;
+
+C: win32-client-stream ( buf stream -- stream )
+    [ set-win32-client-stream-delegate extract-remote-host ] keep
+    [ set-win32-client-stream-host ] keep ;
+
+M: win32-client-stream client-stream-host win32-client-stream-host ;
 
 C: win32-server ( port -- server )
-    [ 
+    swap <namespace> [ 
         maybe-init-winsock new-socket swap over bind-socket dup listen-socket 
         dup add-completion
         socket set
-    ] extend ;
+    ] extend over set-win32-server-this ;
 
-M: win32-server fclose ( server -- )
-    [ socket get CloseHandle drop ] bind ;
+M: win32-server stream-close ( server -- )
+    win32-server-this [ socket get CloseHandle drop ] bind ;
 
 M: win32-server accept ( server -- client )
-    [
+    win32-server-this [
         new-socket 64 <buffer>
         [
             alloc-io-task init-overlapped >r >r >r socket get r> r> 
             buffer-ptr <alien> 0 32 32 NULL r> AcceptEx
             [ handle-socket-error ] unless (yield)
-        ] callcc0
+        ] callcc1 pending-error drop
         swap dup add-completion <win32-stream> dupd <win32-client-stream>
         swap buffer-free
     ] bind ;

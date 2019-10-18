@@ -1,47 +1,15 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2003, 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2003, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USE: generic
-USE: kernel
-USE: lists
-USE: math
-USE: stdio
-USE: strings
-USE: presentation
-USE: unparser
-USE: words
+USING: generic kernel lists math namespaces stdio strings
+presentation unparser words ;
 
 ! Prettyprinting words
 : vocab-actions ( search -- list )
     [
-        [ "Words"   | "words."        ]
-        [ "Use"     | "\"use\" cons@" ]
-        [ "In"      | "\"in\" set" ]
+        [[ "Words"   "words."        ]]
+        [[ "Use"     "\"use\" cons@" ]]
+        [[ "In"      "\"in\" set"    ]]
     ] ;
 
 : vocab-attrs ( vocab -- attrs )
@@ -53,20 +21,20 @@ USE: words
     dup vocab-attrs write-attr ;
 
 : prettyprint-IN: ( word -- )
-    \ IN: prettyprint* " " write
+    \ IN: prettyprint-word " " write
     word-vocabulary prettyprint-vocab " " write ;
 
 : prettyprint-: ( indent -- indent )
-    \ : prettyprint* " " write
-    tab-size + ;
+    \ : prettyprint-word " " write
+    tab-size get + ;
 
 : prettyprint-; ( indent -- indent )
-    \ ; prettyprint*
-    tab-size - ;
+    \ ; prettyprint-word
+    tab-size get - ;
 
 : prettyprint-prop ( word prop -- )
     tuck word-name word-property [
-        " " write prettyprint-1
+        " " write prettyprint-word
     ] [
         drop
     ] ifte ;
@@ -76,19 +44,35 @@ USE: words
     \ parsing prettyprint-prop
     \ inline prettyprint-prop ;
 
-: prettyprint-comment ( comment -- )
-    "comments" style write-attr ;
+: comment. ( comment -- ) "comments" style write-attr ;
 
-: stack-effect. ( word -- )
-    stack-effect [
+: infer-effect. ( indent effect -- indent )
+    " " write
+    [
+        "(" ,
+        2unlist >r [ " " , unparse , ] each r>
+        " --" ,
+        [ " " , unparse , ] each
+        " )" ,
+    ] make-string comment. ;
+
+: stack-effect. ( indent word -- indent )
+    dup "stack-effect" word-property [
         " " write
-        [ CHAR: ( , , CHAR: ) , ] make-string prettyprint-comment
-    ] when* ;
+        [ CHAR: ( , , CHAR: ) , ] make-string
+        comment.
+    ] [
+        "infer-effect" word-property dup [
+            infer-effect.
+        ] [
+            drop
+        ] ifte
+    ] ?ifte ;
 
 : documentation. ( indent word -- indent )
-    documentation [
+    "documentation" word-property [
         "\n" split [
-            "#!" swap cat2 prettyprint-comment
+            "#!" swap cat2 comment.
             dup prettyprint-newline
         ] each
     ] when* ;
@@ -99,42 +83,46 @@ USE: words
     ] keep documentation. ;
 
 : prettyprint-M: ( indent -- indent )
-    \ M: prettyprint-1 " " write tab-size + ;
+    \ M: prettyprint-word " " write tab-size get + ;
 
 GENERIC: see ( word -- )
 
 M: compound see ( word -- )
     dup prettyprint-IN:
     0 prettyprint-: swap
-    [ prettyprint-1 ] keep
+    [ prettyprint-word ] keep
     [ prettyprint-docs ] keep
-    [ word-parameter prettyprint-list prettyprint-; ] keep
+    [
+        word-parameter prettyprint-elements
+        prettyprint-;
+    ] keep
     prettyprint-plist prettyprint-newline ;
 
 : see-method ( indent word class method -- indent )
     >r >r >r prettyprint-M:
-    r> r> prettyprint-1 " " write
-    prettyprint-1 " " write
+    r> r> prettyprint-word " " write
+    prettyprint-word " " write
     dup prettyprint-newline
-    r> prettyprint-list
+    r> prettyprint-elements
     prettyprint-;
     terpri ;
 
 M: generic see ( word -- )
     dup prettyprint-IN:
     0 swap
-    dup "definer" word-property prettyprint-1 " " write
-    dup prettyprint-1 terpri
+    dup "definer" word-property prettyprint-word " " write
+    dup prettyprint-word terpri
     dup methods [ over >r uncons see-method r> ] each 2drop ;
 
 M: primitive see ( word -- )
     dup prettyprint-IN:
-    "PRIMITIVE: " write dup prettyprint-1 stack-effect. terpri ;
+    "PRIMITIVE: " write dup prettyprint-word stack-effect.
+    terpri ;
 
 M: symbol see ( word -- )
     dup prettyprint-IN:
-    \ SYMBOL: prettyprint-1 " " write . ;
+    \ SYMBOL: prettyprint-word " " write . ;
 
 M: undefined see ( word -- )
     dup prettyprint-IN:
-    \ DEFER: prettyprint-1 " " write . ;
+    \ DEFER: prettyprint-word " " write . ;

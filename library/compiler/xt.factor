@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
+USE: assembler
 USE: inference
 USE: errors
 USE: hashtables
@@ -63,7 +64,7 @@ SYMBOL: compiled-xts
     compiled-xts off ;
 
 : compiled-xt ( word -- xt )
-    dup compiled-xts get assoc [ nip ] [ word-xt ] ifte* ;
+    dup compiled-xts get assoc [ word-xt ] ?unless ;
 
 ! "deferred-xts" is a list of [ where word relative ] pairs; the
 ! xt of word when its done compiling will be written to the

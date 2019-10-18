@@ -20,16 +20,16 @@ USE: lists
 
 [
     [
-        [ "X-Spyware-Requested" | "yes" ]
-        [ "User-Agent" | "Internet Explorer 0.4alpha" ]
+        [[ "X-Spyware-Requested" "yes" ]]
+        [[ "User-Agent" "Internet Explorer 0.4alpha" ]]
     ]
 ]
 [
-    [ [ "User-Agent" | "Internet Explorer 0.4alpha" ] ]
+    [ [[ "User-Agent" "Internet Explorer 0.4alpha" ]] ]
     "X-Spyware-Requested: yes" header-line
 ] unit-test
 
-[ ] [ "404 not found" ] [ httpd-error ] test-word
+[ ] [ "404 not found" httpd-error ] unit-test
 
 [ "arg" ] [
     [
@@ -67,12 +67,12 @@ USE: lists
 [ ] [ "GET ../index.html" parse-request ] unit-test
 [ ] [ "POO" parse-request ] unit-test
 
-[ [ [ "Foo" | "Bar" ] ] ] [ "Foo=Bar" query>alist ] unit-test
+[ [ [[ "Foo" "Bar" ]] ] ] [ "Foo=Bar" query>alist ] unit-test
 
-[ [ [ "Foo" | "Bar" ] [ "Baz" | "Quux" ] ] ]
+[ [ [[ "Foo" "Bar" ]] [[ "Baz" "Quux" ]] ] ]
 [ "Foo=Bar&Baz=Quux" query>alist ] unit-test
 
-[ [ [ "Baz" | " " ] ] ]
+[ [ [[ "Baz" " " ]] ] ]
 [ "Baz=%20" query>alist ] unit-test
 
 [ [ [ "Foo" ] ] ] [ "Foo" query>alist ] unit-test

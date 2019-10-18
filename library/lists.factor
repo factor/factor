@@ -1,34 +1,6 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2003, 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-IN: lists
-USE: generic
-USE: kernel
-USE: math
+! Copyright (C) 2003, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
+IN: lists USING: generic kernel math ;
 
 : 2list ( a b -- [ a b ] )
     unit cons ;
@@ -39,25 +11,19 @@ USE: math
 : 3list ( a b c -- [ a b c ] )
     2list cons ;
 
+: 3unlist ( [ a b c ] -- a b c )
+    uncons uncons car ;
+
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
-: some? ( list pred -- ? )
-    #! Apply predicate to each element ,return remainder of list
-    #! from first occurrence where it is true, or return f.
-    over [
-        dup >r over >r >r car r> call [
-            r> r> drop
-        ] [
-            r> cdr r> some?
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ; inline
+: contains? ( obj list -- ? )
+    #! Test if a list contains an element equal to an object.
+    [ = ] some-with? >boolean ;
 
-: contains? ( element list -- ? )
-    #! Test if a list contains an element.
-    [ over = ] some? >boolean nip ;
+: memq? ( obj list -- ? )
+    #! Test if a list contains an object.
+    [ eq? ] some-with? >boolean ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
     rot [ swapd cons ] [ >r cons r> ] ifte ;
@@ -124,15 +90,20 @@ DEFER: tree-contains?
     #! ( X -- Y ) to each element into a new list.
     over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
 
-: map-with ( obj list quot -- )
+: map-with ( obj list quot -- list )
     #! Push each element of a proper list in turn, and collect
     #! return values of applying a quotation with effect
     #! ( obj elt -- obj ) to each element into a new list.
-    swap [ with rot ] map nip nip ; inline
+    swap [ with rot ] map 2nip ; inline
 
 : remove ( obj list -- list )
+    #! Remove all occurrences of objects equal to this one from
+    #! the list.
+    [ = not ] subset-with ;
+
+: remq ( obj list -- list )
     #! Remove all occurrences of the object from the list.
-    [ dupd = not ] subset nip ;
+    [ eq? not ] subset-with ;
 
 : length ( list -- length )
     0 swap [ drop 1 + ] each ;
@@ -172,31 +143,19 @@ M: cons = ( obj cons -- ? )
         ] ifte
     ] ifte ;
 
-: cons-hashcode ( cons count -- hash )
-    dup 0 number= [
-        2drop 0
-    ] [
-        over cons? [
-            1 - >r uncons r> tuck
-            cons-hashcode >r
-            cons-hashcode r>
-            bitxor
-        ] [
-            drop hashcode
-        ] ifte
-    ] ifte ;
+M: cons hashcode ( cons -- hash ) car hashcode ;
 
-M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
-
-: project ( n quot -- list )
-    #! Execute the quotation n times, passing the loop counter
-    #! the quotation as it ranges from 0..n-1. Collect results
-    #! in a new list.
-    [ ] rot [ -rot over >r >r call r> cons r> swap ] times*
-    nip reverse ; inline
+: (count) ( i n -- list )
+    2dup >= [ 2drop [ ] ] [ >r dup 1 + r> (count) cons ] ifte ;
 
 : count ( n -- [ 0 ... n-1 ] )
-    [ ] project ;
+    0 swap (count) ;
+
+: project ( n quot -- list )
+    >r count r> map ; inline
+
+: project-with ( elt n quot -- list )
+    swap [ with rot ] project 2nip ; inline
 
 : head ( list n -- list )
     #! Return the first n elements of the list.
@@ -209,3 +168,8 @@ M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
 : intersection ( list list -- list )
     #! Make a list of elements that occur in both lists.
     [ over contains? ] subset nip ;
+
+: difference ( list1 list2 -- list )
+    #! Make a list of elements that occur in list2 but not
+    #! list1.
+    [ over contains? not ] subset nip ;

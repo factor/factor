@@ -6,12 +6,14 @@ USE: test
 USE: vectors
 USE: strings
 USE: namespaces
+USE: kernel-internals
 
 [ [ t f t ] vector-length ] unit-test-fails
 [ 3 ] [ { t f t } vector-length ] unit-test
 
+[ -3 { } vector-nth ] unit-test-fails
 [ 3 { } vector-nth ] unit-test-fails
-[ 3 #{ 1 2 } vector-nth ] unit-test-fails
+[ 3 #{ 1 2 }# vector-nth ] unit-test-fails
 
 [ "hey" [ 1 2 ] set-vector-length ] unit-test-fails
 [ "hey" { 1 2 } set-vector-length ] unit-test-fails
@@ -35,14 +37,11 @@ USE: namespaces
 [ f ] [ [ 1 2 ] { 1 2 3 } = ] unit-test
 [ f ] [ { 1 2 } [ 1 2 3 ] = ] unit-test
 
-[ [ 1 4 9 16 ] ] [ [ 1 2 3 4 ] ]
-[ list>vector [ dup * ] vector-map vector>list ] test-word
-[ t ] [ [ 1 2 3 4 ] ]
-[ list>vector [ number? ] vector-all? ] test-word
-[ f ] [ [ 1 2 3 4 ] ]
-[ list>vector [ 3 > ] vector-all? ] test-word
-[ t ] [ [ ] ]
-[ list>vector [ 3 > ] vector-all? ] test-word
+[ [ 1 4 9 16 ] ]
+[
+    [ 1 2 3 4 ]
+    list>vector [ dup * ] vector-map vector>list
+] unit-test
 
 [ t ] [ { } hashcode { } hashcode = ] unit-test
 [ t ] [ { 1 2 3 } hashcode { 1 2 3 } hashcode = ] unit-test
@@ -50,18 +49,10 @@ USE: namespaces
 [ t ] [ { } hashcode { } hashcode = ] unit-test
 
 [ { 1 2 3 4 5 6 } ]
-[ { 1 2 3 } vector-clone dup { 4 5 6 } vector-append ] unit-test
+[ { 1 2 3 } { 4 5 6 } vector-append ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
 [ 4 [ CHAR: a fill ] vector-project ]
-unit-test
-
-[ { 6 8 10 12 } ]
-[ { 1 2 3 4 } { 5 6 7 8 } vector-zip [ uncons + ] vector-map ]
-unit-test
-
-[ { [ 1 | 5 ] [ 2 | 6 ] [ 3 | 7 ] [ 4 | 8 ] } ]
-[ { 1 2 3 4 } { 5 6 7 8 } vector-zip ]
 unit-test
 
 [ [ ] ] [ 0 { } vector-tail ] unit-test
@@ -82,3 +73,14 @@ unit-test
 [ "funny-stack" get vector-pop ] unit-test-fails
 [ ] [ "funky" "funny-stack" get vector-push ] unit-test
 [ "funky" ] [ "funny-stack" get vector-pop ] unit-test
+
+[ t ] [
+    { 1 2 3 4 } dup vector-array array-capacity
+    >r clone vector-array array-capacity r>
+    =
+] unit-test
+
+[ f ] [
+    { 1 2 3 4 } dup clone
+    swap vector-array swap vector-array eq?
+] unit-test

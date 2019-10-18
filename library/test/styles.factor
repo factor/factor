@@ -10,7 +10,7 @@ USE: test
 ] unit-test
 [ "Sans-Serif" ] [
     [
-        [ "font" | "Sans-Serif" ]
+        [[ "font" "Sans-Serif" ]]
     ] "fooquux" set-style
     "font" "fooquux" style assoc
 ] unit-test

@@ -25,4 +25,4 @@ USE: stdio
 
 [ [ "2 car" ] parse ] [ print-error ] catch
 
-[ [ "\"\" { } vector-nth" ] parse ] [ type-check-error ] catch
+! [ [ "\"\" { } vector-nth" ] parse ] [ type-check-error ] catch

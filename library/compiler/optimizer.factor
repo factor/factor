@@ -32,6 +32,8 @@ USE: kernel
 USE: inference
 USE: words
 USE: prettyprint
+USE: kernel-internals
+USE: vectors
 
 ! The optimizer transforms dataflow IR to dataflow IR. Currently
 ! it removes literals that are eventually dropped, and never
@@ -58,7 +60,7 @@ USE: prettyprint
 : mentions-literal? ( literal list -- ? )
     #! Does the given list of result objects refer to this
     #! literal?
-    [ dupd value= ] some? nip ;
+    [ value= ] some-with? ;
 
 : consumes-literal? ( literal node -- ? )
     #! Does the dataflow node consume the literal?
@@ -88,12 +90,24 @@ USE: prettyprint
     #! Push a list of literals that may be killed in the IR.
     dup scan-literals [ over can-kill? ] subset nip ;
 
+SYMBOL: branch-returns
+
 : can-kill-branches? ( literal node -- ? )
-    #! Check if the literal appears in either branch.
+    #! Check if the literal appears in either branch. This
+    #! assumes that the last element of each branch is a #values
+    #! node.
     2dup consumes-literal? [
         2drop f
     ] [
-        [ node-param get ] bind [ dupd can-kill? ] all? nip
+        [ node-param get ] bind
+        [
+            dup [
+                last [ node-consume-d get list>vector ] bind
+            ] map
+            unify-stacks vector>list
+            branch-returns set
+            [ dupd can-kill? ] all? nip
+        ] with-scope
     ] ifte ;
 
 : kill-node ( literals node -- )
@@ -134,9 +148,7 @@ USE: prettyprint
 ] "calls-label" set-word-property
 
 : calls-label? ( label list -- ? )
-    [
-        dupd "calls-label" [ 2drop f ] apply-dataflow
-    ] some? nip ;
+    [ "calls-label" [ 2drop f ] apply-dataflow ] some-with? ;
 
 #label [
     [ node-param get ] bind calls-label?
@@ -147,13 +159,13 @@ USE: prettyprint
 ] "calls-label" set-word-property
 
 : branches-call-label? ( label list -- ? )
-    [ dupd calls-label? ] some? nip ;
+    [ calls-label? ] some-with? ;
 
-#ifte [
+\ ifte [
     [ node-param get ] bind branches-call-label?
 ] "calls-label" set-word-property
 
-#dispatch [
+\ dispatch [
     [ node-param get ] bind branches-call-label?
 ] "calls-label" set-word-property
 
@@ -169,23 +181,31 @@ USE: prettyprint
     ] extend ,
 ] "kill-node" set-word-property
 
-#ifte [ scan-branches ] "scan-literal" set-word-property
-#ifte [ can-kill-branches? ] "can-kill" set-word-property
-#ifte [ kill-branches ] "kill-node" set-word-property
+#values [
+    dupd consumes-literal? [
+        branch-returns get mentions-literal?
+    ] [
+        drop t
+    ] ifte
+] "can-kill" set-word-property
 
-#dispatch [ scan-branches ] "scan-literal" set-word-property
-#dispatch [ can-kill-branches? ] "can-kill" set-word-property
-#dispatch [ kill-branches ] "kill-node" set-word-property
+\ ifte [ scan-branches ] "scan-literal" set-word-property
+\ ifte [ can-kill-branches? ] "can-kill" set-word-property
+\ ifte [ kill-branches ] "kill-node" set-word-property
+
+\ dispatch [ scan-branches ] "scan-literal" set-word-property
+\ dispatch [ can-kill-branches? ] "can-kill" set-word-property
+\ dispatch [ kill-branches ] "kill-node" set-word-property
 
 ! Don't care about inputs to recursive combinator calls
 #call-label [ 2drop t ] "can-kill" set-word-property
 
-#drop [ 2drop t ] "can-kill" set-word-property
-#drop [ kill-node ] "kill-node" set-word-property
-#dup [ 2drop t ] "can-kill" set-word-property
-#dup [ kill-node ] "kill-node" set-word-property
-#swap [ 2drop t ] "can-kill" set-word-property
-#swap [ kill-node ] "kill-node" set-word-property
+\ drop [ 2drop t ] "can-kill" set-word-property
+\ drop [ kill-node ] "kill-node" set-word-property
+\ dup [ 2drop t ] "can-kill" set-word-property
+\ dup [ kill-node ] "kill-node" set-word-property
+\ swap [ 2drop t ] "can-kill" set-word-property
+\ swap [ kill-node ] "kill-node" set-word-property
 
 : kill-mask ( killing inputs -- mask )
     [ over [ over value= ] some? >boolean nip ] map nip ;
@@ -199,25 +219,25 @@ USE: prettyprint
     ] keep
     over [ [ node-op set ] extend , ] [ 2drop ] ifte ;
 
-#over [ 2drop t ] "can-kill" set-word-property
-#over [
+\ over [ 2drop t ] "can-kill" set-word-property
+\ over [
     [
-        [ [ f f ] | #over ]
-        [ [ f t ] | #dup ]
+        [[ [ f f ] over ]]
+        [[ [ f t ] dup  ]]
     ] reduce-stack-op
 ] "kill-node" set-word-property
 
-#pick [ 2drop t ] "can-kill" set-word-property
-#pick [
+\ pick [ 2drop t ] "can-kill" set-word-property
+\ pick [
     [
-        [ [ f f f ] | #pick ]
-        [ [ f f t ] | #over ]
-        [ [ f t f ] | #over ]
-        [ [ f t t ] | #dup ]
+        [[ [ f f f ] pick ]]
+        [[ [ f f t ] over ]]
+        [[ [ f t f ] over ]]
+        [[ [ f t t ] dup  ]]
     ] reduce-stack-op
 ] "kill-node" set-word-property
 
-#>r [ 2drop t ] "can-kill" set-word-property
-#>r [ kill-node ] "kill-node" set-word-property
-#r> [ 2drop t ] "can-kill" set-word-property
-#r> [ kill-node ] "kill-node" set-word-property
+\ >r [ 2drop t ] "can-kill" set-word-property
+\ >r [ kill-node ] "kill-node" set-word-property
+\ r> [ 2drop t ] "can-kill" set-word-property
+\ r> [ kill-node ] "kill-node" set-word-property

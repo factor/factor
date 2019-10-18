@@ -39,7 +39,7 @@
 ! eg.
 ! <cont-test-state> [ test-cont-responder ] test-cont-function
 !   => HTTP/1.1 302 Document Moved
-!      Location: 8506502852110820
+!      Location: ?id=8506502852110820
 !      Content-Length: 0
 !      Content-Type: text/plain
 !
@@ -48,12 +48,12 @@
 !      Content-Type: text/html
 !
 !      <html><head><title>Page one</title></head><body>
-!      <h1>Page one</h1><a href='5431597582800278'>Next</a>
+!      <h1>Page one</h1><a href='?id=5431597582800278'>Next</a>
 !      </body></html>
 !
 ! "5431597582800278" f test-cont-click
 !   => HTTP/1.1 302 Document Moved
-!      Location: 7944183606904129
+!      Location: ?id=7944183606904129
 !      Content-Length: 0
 !      Content-Type: text/plain
 !
@@ -63,14 +63,14 @@
 !
 !      <html><head><title>Enter your name</title></head>
 !      <body><h1>Enter your name</h1>
-!      <form method='post'action='8503790719833723'>
-!      Name: <input type='text'name='name'size='20'>
-!      <input type='submit'value='Ok'>
+!      <form method='post' action='?id=8503790719833723'>
+!      Name: <input type='text' name='name'size='20'>
+!      <input type='submit' value='Ok'>
 !      </form></body></html>
 !
-! "8503790719833723" [ [ "name" | "Chris" ] ] alist>hash test-cont-click
+! "8503790719833723" [ [[ "name" "Chris" ]] ] alist>hash test-cont-click
 !   => HTTP/1.1 302 Document Moved
-!      Location: 8879727708050260
+!      Location: ?id=8879727708050260
 !      Content-Length: 0
 !      Content-Type: text/plain
 !
@@ -80,7 +80,7 @@
 !
 !      <html><head><title>Hello Chris</title></head>
 !      <body><h1>Hello Chris</h1>
-!      <a href='0937854264503953'>Next</a>
+!      <a href='?id=0937854264503953'>Next</a>
 !      </body></html>
 ! 
 ! etc.

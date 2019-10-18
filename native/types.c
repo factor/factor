@@ -1,16 +1,5 @@
 #include "factor.h"
 
-/*
- * It is up to the caller to fill in the object's fields in a meaningful
- * fashion!
- */
-void* allot_object(CELL type, CELL length)
-{
-	CELL* object = allot(length);
-	*object = tag_header(type);
-	return object;
-}
-
 CELL object_size(CELL pointer)
 {
 	CELL size;
@@ -20,14 +9,17 @@ CELL object_size(CELL pointer)
 	case FIXNUM_TYPE:
 		size = 0;
 		break;
+	case BIGNUM_TYPE:
+		size = ASIZE(UNTAG(pointer));
+		break;
 	case CONS_TYPE:
 		size = sizeof(F_CONS);
 		break;
-	case WORD_TYPE:
-		size = sizeof(F_WORD);
-		break;
 	case RATIO_TYPE:
 		size = sizeof(F_RATIO);
+		break;
+	case FLOAT_TYPE:
+		size = sizeof(F_FLOAT);
 		break;
 	case COMPLEX_TYPE:
 		size = sizeof(F_COMPLEX);
@@ -61,7 +53,11 @@ CELL untagged_object_size(CELL pointer)
 		break;
 	case ARRAY_TYPE:
 	case BIGNUM_TYPE:
+	case TUPLE_TYPE:
 		size = ASIZE(pointer);
+		break;
+	case HASHTABLE_TYPE:
+		size = sizeof(F_HASHTABLE);
 		break;
 	case VECTOR_TYPE:
 		size = sizeof(F_VECTOR);
@@ -126,6 +122,6 @@ void primitive_set_integer_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
 	CELL obj = dpop();
-	F_FIXNUM value = to_integer(dpop());
+	F_FIXNUM value = to_fixnum(dpop());
 	put(SLOT(obj,slot),value);
 }

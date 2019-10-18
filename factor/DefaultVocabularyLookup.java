@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2004, 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -68,15 +68,19 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		FactorWord f = define("syntax","f");
 		f.parsing = new F(f);
 		FactorWord complex = define("syntax","#{");
-		complex.parsing = new ComplexLiteral(complex,"}");
+		complex.parsing = new ComplexLiteral(complex,"}#");
 
 		/* lists */
 		FactorWord bra = define("syntax","[");
 		bra.parsing = new Bra(bra);
 		FactorWord ket = define("syntax","]");
 		ket.parsing = new Ket(bra,ket);
-		FactorWord bar = define("syntax","|");
-		bar.parsing = new Bar(bar);
+
+		/* conses */
+		FactorWord beginCons = define("syntax","[[");
+		beginCons.parsing = new BeginCons(beginCons);
+		FactorWord endCons = define("syntax","]]");
+		endCons.parsing = new EndCons(beginCons,endCons);
 
 		/* vectors */
 		FactorWord beginVector = define("syntax","{");
@@ -89,9 +93,9 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		def.parsing = new Def(def);
 		def.docComment = true;
 		FactorWord ine = define("syntax",";");
-		ine.parsing = new Ine(def,ine);
+		ine.parsing = new Ine(ine);
 		FactorWord symbol = define("syntax","SYMBOL:");
-		symbol.parsing = new Symbol(symbol);
+		symbol.parsing = new Definer(symbol);
 
 		/* reading numbers with another base */
 		FactorWord bin = define("syntax","BIN:");
@@ -105,24 +109,32 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		FactorWord noParsing = define("syntax","POSTPONE:");
 		noParsing.parsing = new NoParsing(noParsing);
 		FactorWord defer = define("syntax","DEFER:");
-		defer.parsing = new Defer(defer);
+		defer.parsing = new Definer(defer);
 		FactorWord in = define("syntax","IN:");
 		in.parsing = new In(in);
 		FactorWord use = define("syntax","USE:");
 		use.parsing = new Use(use);
+		FactorWord using = define("syntax","USING:");
+		using.parsing = new Using(using);
 
 		FactorWord pushWord = define("syntax","\\");
 		pushWord.parsing = new PushWord(pushWord);
 
 		/* OOP */
 		FactorWord generic = define("generic","GENERIC:");
-		generic.parsing = new Generic(generic);
+		generic.parsing = new Definer(generic);
 		FactorWord traits = define("generic","TRAITS:");
-		traits.parsing = new Traits(traits);
+		traits.parsing = new Definer(traits);
 		FactorWord beginMethod = define("generic","M:");
-		beginMethod.parsing = new BeginMethod(beginMethod,def);
+		beginMethod.parsing = new BeginMethod(beginMethod);
 		FactorWord beginConstructor = define("generic","C:");
-		beginConstructor.parsing = new BeginConstructor(beginConstructor,def);
+		beginConstructor.parsing = new BeginConstructor(beginConstructor);
+		FactorWord beginPredicate = define("generic","PREDICATE:");
+		beginPredicate.parsing = new BeginPredicate(beginPredicate);
+		FactorWord beginUnion = define("generic","UNION:");
+		beginUnion.parsing = new BeginUnion(beginUnion);
+		FactorWord tuple = define("generic","TUPLE:");
+		tuple.parsing = new Tuple(tuple);
 	} //}}}
 
 	//{{{ getVocabulary() method
@@ -206,7 +218,7 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		return vocabs;
 	} //}}}
 
-	//{{{ getCompletions() method
+	//{{{ getWordCompletions() method
 	/**
 	 * @param use A list of vocabularies.
 	 * @param word A substring of the word name to complete
@@ -214,19 +226,36 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 	 * returned; otherwise, only matches from beginning.
 	 * @param completions Set to add completions to
 	 */
-	public void getCompletions(Cons use, String word, boolean anywhere,
+	public void getWordCompletions(Cons use, String word, boolean anywhere,
 		Set completions) throws Exception
 	{
 		while(use != null)
 		{
 			String vocab = (String)use.car;
-			getCompletions(vocab,word,anywhere,completions);
+			getWordCompletions(vocab,word,anywhere,completions);
 			use = use.next();
 		}
 	} //}}}
 
-	//{{{ getCompletions() method
-	public void getCompletions(String vocab, String word, boolean anywhere,
+	//{{{ isCompletion() method
+	public boolean isCompletion(String match, String against, boolean anywhere)
+	{
+		if(anywhere)
+		{
+			if(against.indexOf(match) != -1)
+				return true;
+		}
+		else
+		{
+			if(against.startsWith(match))
+				return true;
+		}
+		
+		return false;
+	} //}}}
+	
+	//{{{ getWordCompletions() method
+	public void getWordCompletions(String vocab, String word, boolean anywhere,
 		Set completions) throws Exception
 	{
 		Map v = (Map)vocabularies.get(vocab);
@@ -242,19 +271,33 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 			{
 				if(!completions.contains(w))
 				{
-					if(anywhere)
-					{
-						if(w.name.indexOf(word) != -1)
-							completions.add(w);
-					}
-					else
-					{
-						if(w.name.startsWith(word))
-							completions.add(w);
-					}
+					if(isCompletion(word,w.name,anywhere))
+						completions.add(w);
 				}
 			}
 		}
+	} //}}}
+
+	//{{{ getVocabCompletions() method
+	/**
+	 * @param vocab A string to complete
+	 * @param anywhere If true, matches anywhere in the vocab name are
+	 * returned; otherwise, only matches from beginning.
+	 */
+	public String[] getVocabCompletions(String vocab, boolean anywhere)
+		throws Exception
+	{
+		List completions = new ArrayList();
+		Cons vocabs = getVocabularies();
+		while(vocabs != null)
+		{
+			String v = (String)vocabs.car;
+			if(isCompletion(vocab,v,anywhere))
+				completions.add(v);
+			vocabs = vocabs.next();
+		}
+
+		return (String[])completions.toArray(new String[completions.size()]);
 	} //}}}
 
 	//{{{ parseObject() method

@@ -42,5 +42,5 @@ USE: streams
     "quit-prohibited" get [
         quit-prohibited
     ] [
-        "http-server" get fclose
+        "http-server" get stream-close
     ] ifte ;

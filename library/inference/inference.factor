@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -39,9 +39,13 @@ USE: hashtables
 USE: generic
 USE: prettyprint
 
-! If this symbol is on, partial evalution of conditionals is
-! disabled.
+: max-recursion 0 ;
+
+! This variable takes a value from 0 up to max-recursion.
 SYMBOL: inferring-base-case
+
+: branches-can-fail? ( -- ? )
+    inferring-base-case get max-recursion > ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -56,56 +60,43 @@ SYMBOL: d-in
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
 
-GENERIC: literal-value ( value -- obj )
 GENERIC: value= ( literal value -- ? )
-GENERIC: value-class ( value -- class )
 GENERIC: value-class-and ( class value -- )
-GENERIC: set-value-class ( class value -- )
 
-! A value has the following slots in addition to those relating
-! to generics above:
+TUPLE: value class type-prop recursion ;
 
-! An association list mapping values to [ value | class ] pairs
-SYMBOL: type-propagations
+C: value ( recursion -- value )
+    [ set-value-recursion ] keep ;
 
-TRAITS: computed
+TUPLE: computed delegate ;
+
 C: computed ( class -- value )
-    [
-        \ value-class set
-        gensym \ literal-value set
-        type-propagations off
-    ] extend ;
-M: computed literal-value ( value -- obj )
-    "Cannot use a computed value literally." throw ;
+    swap recursive-state get <value> [ set-value-class ] keep
+    over set-computed-delegate ;
+
 M: computed value= ( literal value -- ? )
     2drop f ;
-M: computed value-class ( value -- class )
-    [ \ value-class get ] bind ;
-M: computed value-class-and ( class value -- )
-    [ \ value-class [ class-and ] change ] bind ;
-M: computed set-value-class ( class value -- )
-    [ \ value-class set ] bind ;
 
-TRAITS: literal
+M: computed value-class-and ( class value -- )
+    [ value-class class-and ] keep set-value-class ;
+
+TUPLE: literal value delegate ;
+
 C: literal ( obj rstate -- value )
     [
-        recursive-state set
-        \ literal-value set
-        type-propagations off
-    ] extend ;
-M: literal literal-value ( value -- obj )
-    [ \ literal-value get ] bind ;
+        >r <value> [ >r dup class r> set-value-class ] keep
+        r> set-literal-delegate
+    ] keep
+    [ set-literal-value ] keep ;
+
 M: literal value= ( literal value -- ? )
     literal-value = ;
-M: literal value-class ( value -- class )
-    literal-value class ;
+
 M: literal value-class-and ( class value -- )
     value-class class-and drop ;
+
 M: literal set-value-class ( class value -- )
     2drop ;
-
-: value-recursion ( value -- rstate )
-    [ recursive-state get ] bind ;
 
 : (ensure-types) ( typelist n stack -- )
     pick [
@@ -130,7 +121,7 @@ M: literal set-value-class ( class value -- )
     ] ifte ;
 
 : vector-prepend ( values stack -- stack )
-    >r list>vector dup r> vector-append ;
+    >r list>vector r> vector-append ;
 
 : ensure-d ( typelist -- )
     dup meta-d get ensure-types
@@ -138,17 +129,26 @@ M: literal set-value-class ( class value -- )
     meta-d [ vector-prepend ] change
     d-in [ vector-prepend ] change ;
 
-: effect ( -- [ in-types out-types ] )
+: (present-effect) ( vector -- list )
+    [ value-class ] vector-map vector>list ;
+
+: present-effect ( [[ d-in meta-d ]] -- [ in-types out-types ] )
     #! After inference is finished, collect information.
-    d-in get [ value-class ] vector-map vector>list
-    meta-d get [ value-class ] vector-map vector>list 2list ;
+    uncons >r (present-effect) r> (present-effect) 2list ;
+
+: simple-effect ( [[ d-in meta-d ]] -- [[ in# out# ]] )
+    #! After inference is finished, collect information.
+    uncons vector-length >r vector-length r> cons ;
+
+: effect ( -- [[ d-in meta-d ]] )
+    d-in get meta-d get cons ;
 
 : init-inference ( recursive-state -- )
     init-interpreter
     0 <vector> d-in set
     recursive-state set
     dataflow-graph off
-    inferring-base-case off ;
+    0 inferring-base-case set ;
 
 DEFER: apply-word
 
@@ -162,10 +162,31 @@ DEFER: apply-word
     #! Apply the object's stack effect to the inferencer state.
     dup word? [ apply-word ] [ apply-literal ] ifte ;
 
+: active? ( -- ? )
+    #! Is this branch not terminated?
+    d-in get meta-d get and ;
+
+: terminate ( -- )
+    #! Ignore this branch's stack effect.
+    meta-d off meta-r off d-in off ;
+
+: terminator? ( obj -- ? )
+    #! Does it throw an error?
+    dup word? [ "terminator" word-property ] [ drop f ] ifte ;
+
+: handle-terminator ( quot -- )
+    #! If the quotation throws an error, do not count its stack
+    #! effect.
+    [ terminator? ] some? [ terminate ] when ;
+
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [ apply-object ] each ;
+    active? [
+        [ unswons apply-object infer-quot ] when*
+    ] [
+        drop
+    ] ifte ;
 
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
@@ -184,13 +205,9 @@ DEFER: apply-word
     infer-quot
     #return values-node check-return ;
 
-: infer ( quot -- [ in | out ] )
+: infer ( quot -- [[ in out ]] )
     #! Stack effect of a quotation.
-    [ (infer) effect ] with-scope ;
-
-: try-infer ( quot -- effect/f )
-    #! Push f if inference fails.
-    [ infer ] [ [ drop f ] when ] catch ;
+    [ (infer) effect present-effect ] with-scope ;
 
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.

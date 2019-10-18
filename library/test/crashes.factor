@@ -1,18 +1,10 @@
 IN: scratchpad
-USE: errors
-USE: kernel
-USE: math
-USE: namespaces
-USE: parser
-USE: strings
-USE: test
-USE: vectors
-USE: lists
-USE: words
 
 ! Various things that broke CFactor at various times.
 ! This should run without issue (and tests nothing useful)
 ! in Java Factor
+USING: errors kernel lists math memory namespaces parser
+prettyprint strings test vectors words ;
 
 "20 <sbuf> \"foo\" set" eval
 "garbage-collection" eval
@@ -24,7 +16,7 @@ USE: words
 
 10 <vector> "x" set
 [ -2 "x" get set-vector-length ] [ drop ] catch
-[ "x" get vector-clone drop ] [ drop ] catch
+[ "x" get clone drop ] [ drop ] catch
 
 10 [ [ -1000000 <vector> ] [ drop ] catch ] times
 
@@ -56,9 +48,12 @@ USE: words
 : callstack-overflow callstack-overflow f ;
 [ callstack-overflow ] unit-test-fails
 
-[ [ cdr cons ] word-plist ] unit-test-fails
+[ [ cdr cons ] word-props ] unit-test-fails
 
 ! Forgot to tag out of bounds index
 [ 1 { } vector-nth ] [ garbage-collection drop ] catch
 [ -1 { } set-vector-length ] [ garbage-collection drop ] catch
 [ 1 "" str-nth ] [ garbage-collection drop ] catch
+
+! ... and again
+[ "" 10 str/ ] [ . ] catch
