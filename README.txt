@@ -16,7 +16,6 @@ implementation. It is not an introduction to the language itself.
 - Command line usage
 - Source organization
 - Community
-- Credits
 
 * Platform support
 
@@ -72,8 +71,8 @@ hack on the runtime sources.
 Compilation may print a handful of warnings about singled/unsigned
 comparisons. They may safely be ignored.
 
-Compilation will yield an executable named 'f' on Unix and 'f.exe' on
-Windows.
+Compilation will yield an executable named 'factor' on Unix and
+'factor.exe' on Windows.
 
 * Bootstrapping the Factor image
 
@@ -88,7 +87,7 @@ system using the image that corresponds to your CPU architecture.
 Once you download the right image, bootstrap the system with the
 following command line:
 
-./f -i=boot.image.<foo>
+./factor -i=boot.image.<foo>
 
 Bootstrap can take a while, depending on your system. When the process
 completes, a 'factor.image' file will be generated. Note that this image
@@ -103,11 +102,11 @@ a terminal listener.
 If your DISPLAY environment variable is set, the UI will start
 automatically:
 
-  ./f
+  ./factor
 
 To run an interactive terminal listener:
 
-  ./f -shell=tty
+  ./factor -shell=tty
 
 If you're inside a terminal session, you can start the UI with one of
 the following two commands:
@@ -123,17 +122,12 @@ On Mac OS X 10.4 and later, a Cocoa UI is available in addition to the
 terminal listener. If you are using Mac OS X 10.3, you can only run the
 X11 UI, as documented in the next section.
 
-The 'f' executable runs the terminal listener:
+The 'factor' executable runs the terminal listener:
 
-  ./f
+  ./factor
 
-The Cocoa UI requires that after bootstrapping you build the Factor.app
-application bundle:
-
-  make macosx.app
-
-This copies the runtime executable into Factor.app. Note that Factor.app
-is not self-contained, and must be run from the same directory which
+The 'Factor.app' bundle runs the Cocoa UI. Note that this is not a
+self-contained bundle, it must be run from the same directory which
 contains factor.image and the library sources.
 
 * Running Factor on Mac OS X - X11 UI
@@ -148,22 +142,22 @@ When compiling Factor, pass the X11=1 parameter:
 
 Then bootstrap with the following pair of switches:
 
-  ./f -i=boot.image.ppc -no-cocoa -x11
+  ./factor -i=boot.image.ppc -no-cocoa -x11
 
-Now if $DISPLAY is set, running ./f will start the UI.
+Now if $DISPLAY is set, running ./factor will start the UI.
 
 * Running Factor on Windows
 
 If you did not download the binary package, you can bootstrap Factor in
 the command prompt:
 
-  f.exe -i=boot.image.pentium4 (or boot.image.x86)
+  factor.exe -i=boot.image.pentium4 (or boot.image.x86)
 
 Once bootstrapped, double-clicking f.exe starts the Factor UI.
 
 To run the listener in the command prompt:
 
-  f.exe -shell=tty
+  factor.exe -shell=tty
 
 * Command line usage
 
@@ -183,9 +177,11 @@ the documentation for details:
   apps/ - user-contributed applications
   libs/ - user-contributed libraries
   demos/ - small examples illustrating various language features
+  extras/ - editor modes, icons, etc
   core/ - sources for the library, written in Factor
-  fonts/ - TrueType fonts used by UI
   vm/ - sources for the Factor runtime, written in C
+  fonts/ - TrueType fonts used by UI
+  unmaintained/ - unmaintained contributions, please help!
 
 * Community
 

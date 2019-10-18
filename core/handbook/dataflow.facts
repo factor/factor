@@ -1,4 +1,4 @@
-USING: errors help kernel namespaces threads words ;
+USING: errors help kernel namespaces threads words quotations ;
 
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "shuffle-words" }
@@ -10,7 +10,7 @@ ARTICLE: "dataflow" "Data and control flow"
 
 ARTICLE: "shuffle-words" "Shuffle words"
 "Shuffle words rearrange items at the top of the data stack. They control the flow of data between words that perform actions."
-$terpri
+$nl
 "Removing stack elements:"
 { $subsection drop }
 { $subsection 2drop }
@@ -46,13 +46,13 @@ $terpri
 
 ARTICLE: "quotations" "Quotations"
 "Conceptually, a quotation is a snippet of code which can be passed around and called. Concretely, a quotation is a sequence of objects, some of which may be words. When evaluating a quotation, the interpreter looks at each element in turn, and executes words while pushing other types of objects on the stack. Details can be found in " { $link "interpreter" } "."
-$terpri
+$nl
 "Quotation literal syntax is documented in " { $link "syntax-quots" } "."
-$terpri
+$nl
 "Quotations implement the sequence protocol (" { $link "sequences" } "), and existing sequences can be converted into quotations:"
 { $subsection >quotation }
 "Much of Factor's expressive power comes from being able to build new quotations at run time. This can be done with sequence words, or the following quotation-specific words:"
-{ $subsection unit }
+{ $subsection 1quotation }
 { $subsection curry }
 { $subsection alist>quot }
 { $subsection make-dip } ;
@@ -67,7 +67,7 @@ ARTICLE: "combinators" "Combinators"
     "    over >r call r> ; inline"
 }
 "Word inlining is documented in " { $link "declarations" } "."
-$terpri
+$nl
 "There are some words that combine shuffle words with " { $link call } ". They are useful for implementing higher-level combinators."
 { $subsection slip }
 { $subsection 2slip }
@@ -78,13 +78,12 @@ $terpri
 "A pair of utility words built from " { $link 2apply } ":"
 { $subsection both? }
 { $subsection either? }
-"Some combinators which save and restore the entire data stack:"
-{ $subsection keep-datastack }
+"A combinator which saves and restores the entire data stack:"
 { $subsection with-datastack } ;
 
 ARTICLE: "conditionals" "Conditionals and boolean logic"
 "In Factor, any object that is not " { $link f } " has a true boolean value, and " { $link f } " has a false boolean value."
-$terpri
+$nl
 "The basic conditionals:"
 { $subsection if }
 { $subsection when }
@@ -124,9 +123,9 @@ ARTICLE: "interpreter" "The interpreter"
     }
 }
 "At each stage, the instruction pointer is advanced by one position."
-$terpri
+$nl
 "If the instruction pointer is at the end of a quotation when a nested quotation is called, the quotation which just finished executing is not pushed on the call stack. Therefore the last call in a quotation does not grow the call stack, and tail recursion executes in bounded space."
-$terpri
+$nl
 "The compiler generates machine code which perform the steps in a more efficient manner than the interpreter, however the observable semantics remain the same." ;
 
 ARTICLE: "continuations" "Continuations"
@@ -143,7 +142,7 @@ ARTICLE: "continuations" "Continuations"
 
 ARTICLE: "errors" "Error handling"
 "Support for handling exceptional situations such as bad user input, implementation bugs, and input/output errors is provided by a set of words built using continuations."
-$terpri
+$nl
 "Two words raise an error in the innermost error handler for the current dynamic extent:"
 { $subsection throw }
 { $subsection rethrow }
@@ -159,10 +158,11 @@ $terpri
 "Information relating to the most recently thrown error is stored in a pair of global variables:"
 { $subsection error }
 { $subsection error-continuation }
-"Support for recoverable errors is built on top of the basic error handling facility. The following word signals a recoverable error:"
-{ $subsection condition }
+"Support for recoverable errors is built on top of the basic error handling facility. The following words signals recoverable errors:"
+{ $subsection throw-restarts }
+{ $subsection rethrow-restarts }
 "Unhandled errors are reported in the listener and can be debugged using various tools. See " { $link "debugger" } "."
-$terpri
+$nl
 "Some words to make assertions easier to enforce:"
 { $subsection assert }
 { $subsection assert= }

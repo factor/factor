@@ -1,9 +1,77 @@
 USING: errors gadgets gadgets-tracks gadgets-labels
 gadgets-sliders generic hashtables help io kernel math memory
 sequences words compiler parser modules definitions tools alien
-inference math-internals ;
+inference math-internals quotations assocs ;
 
 ARTICLE: "changes" "Changes in the latest release"
+{ $heading "Factor 0.89" }
+{ $subheading "Core" }
+{ $list
+    "New Factor icon (Elie Chaftari)"
+    "Preliminary Windows CE support; native I/O and the UI are still missing"
+    { "UDP/IP is now supported on Unix; see " { $link "network-udp" } ". Windows support will be added in the next release" }
+    { "There is now a generic protocol for associative collections, see " { $link "assocs" } " (Daniel Ehrenberg)" }
+    { "Preliminary API for embedding Factor in C applications. See " { $snippet "vm/factor.h" } }
+    "UTF8/UTF16 encoding and decoding words added; not integrated with streams yet (Daniel Ehrenberg)"
+    { "New " { $link POSTPONE: HOOK: } " word for defining generic words that dispatch on a variable value" }
+    "Redefining a tuple class now reshapes all existing instances"
+    { "The " { $link case } " combinator now supports having a default case" }
+    { "Tabular output is now handled differently; see " { $link stream-write-table } }
+    "Factor now runs on OpenBSD/AMD64"
+    "Overhauled parser is more flexible and reports errors better"
+}
+{ $subheading "Tools" }
+{ $list
+    { "The parser now prints notes when a " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " results in word names being shadowed" }
+    "Usages information for top-level forms is now recorded"
+    "Inspector can now edit objects; in the UI this can be done graphically"
+    { "The " { $link see } " word now prints " { $link POSTPONE: USING: } " lists" }
+    "Improved unit test tool retains tracebacks for failed tests"
+    "The prettyprinter's layout logic is now more intelligent"
+    "Tuple getter and setter words now have automatically-generated help"
+}
+{ $subheading "UI" }
+{ $list
+    "Unicode copy and paste, window titles now supported on all platforms"
+    "Partial support for input methods on X11 and Cocoa"
+    "The UI inspector can now edit objects"
+    { "The walker now has an " { $strong "Abandon" } " button which stops single-stepping" }
+}
+{ $subheading "Compiler" }
+{ $list
+    "Improved ARM backend"
+    "The compiler now employs interval inference to convert generic arithmetic to machine arithmetic in some situations"
+	"Allocation of constant size tuples and arrays is now inlined"
+    { "The C library interface now fully supports the " { $snippet "longlong" } " type" }
+}
+{ $subheading "New non-core modules" }
+{ $list
+    { { $module-link "apps/article-manager" } " (Chris Double)" }
+    { { $module-link "apps/isequences" } " (Robbert van Dalen)" }
+    { { $module-link "apps/lisp" } " (Eduardo Cavazos)" }
+    { { $module-link "apps/ogg-player" } " (Chris Double)" }
+    { { $module-link "libs/graphics" } " (Doug Coleman)" }
+    { { $module-link "libs/id3" } " (Adam Wendt)" }
+    { { $module-link "libs/io" } " (Doug Coleman)" }
+    { { $module-link "libs/locals" } " (Slava Pestov)" }
+    { { $module-link "libs/mad" } " (Adam Wendt)" }
+    { { $module-link "libs/ogg" } " (Chris Double)" }
+    { { $module-link "libs/oracle" } " (Elie Chaftari)" }
+    { { $module-link "libs/state-machine" } " (Daniel Ehrenberg)" }
+    { { $module-link "libs/theora" } " (Chris Double)" }
+    { { $module-link "libs/visitor" } " (Daniel Ehrenberg)" }
+    { { $module-link "libs/vorbis" } " (Chris Double)" }
+    { "Various modules using " { $module-link "libs/vocabs" } " are new" }
+}
+{ $subheading "Updated non-core modules" }
+{ $list
+    { { $module-link "libs/calendar" } " (Doug Coleman)" }
+    { { $module-link "libs/mysql" } " (Berlin Brown)" }
+    { { $module-link "libs/shuffle" } " (Doug Coleman)" }
+    { { $module-link "libs/textmate" } " (Benjamin Pollack)" }
+    { { $module-link "libs/vocabs" } " (Eduardo Cavazos)" }
+    { "Various modules using " { $module-link "libs/vocabs" } " were updated" }
+}
 { $heading "Factor 0.88" }
 { $subheading "Core" }
 { $list
@@ -30,7 +98,7 @@ ARTICLE: "changes" "Changes in the latest release"
     "Stack frames are not set up for leaf words"
 }
 
-{ $subheading "New non-core libraries" }
+{ $subheading "New non-core modules" }
 { $list
     { { $module-link "apps/automata" } " (Eduardo Cavazos)" }
     { { $module-link "apps/balloon-bomber" } " (Chris Double)" }
@@ -134,7 +202,7 @@ ARTICLE: "changes" "Changes in the latest release"
         { $list
             "Stack effect for the word at the caret is now shown in the status bar"
             "Errors are now shown in a popup supporting keyboard invocation of restarts"
-            { "Better support for multi-line expressions -- pressing " { $snippet "RETURN" } " now inserts a newline of the expression is incomplete" }
+            { "Better support for multi-line expressions -- pressing " { $snippet "RET" } " now inserts a newline of the expression is incomplete" }
             "If a parse error occurs, the cursor is positioned to the location of the error and the input text is not cleared"
             "Circular structure and deep nesting sentinels output by the prettyprinter are now clickable presentations"
         }
@@ -231,7 +299,7 @@ ARTICLE: "changes" "Changes in the latest release"
 { $subheading "UI" }
 { $list
     "Right-clicking on a presentation now shows a popup menu of operations"
-    { "Pressing " { $snippet "C+e" } " in the UI listener displays a file name completion popup; selecting a file and pressing " { $snippet "RETURN" } " opens it in the default editor using " { $link edit-file } }
+    { "Pressing " { $snippet "C+e" } " in the UI listener displays a file name completion popup; selecting a file and pressing " { $snippet "RET" } " opens it in the default editor using " { $link edit } }
     { "Pressing " { $snippet "TAB" } " or " { $snippet "C+u" } " in the UI listener displays a word or vocabulary name completion popup, respectively. Selecting a word inserts its name in the input area, selecting a vocabulary adds it to the search path." }
     { "New dataflow visualizer tool. Enter a piece of code in the listener, and press " { $snippet "C+A+d" } }
     "The single stepper tool now properly handles code which uses continuations and exceptions"
@@ -325,7 +393,7 @@ ARTICLE: "changes" "Changes in the latest release"
 { $list
     "Support for cons cells and linked lists has been removed from the core language."
     "Quotations are now a first-class array-like type with the same literal syntax that linked lists used to have."
-    { "A few quotation construction words such as " { $link curry } ", " { $link unit } " and " { $link alist>quot } " have been moved to the " { $snippet "kernel" } " vocabulary." }
+    { "A few quotation construction words such as " { $link curry } ", " { $snippet "unit" } " and " { $link alist>quot } " have been moved to the " { $snippet "kernel" } " vocabulary." }
 }
 
 { $subheading "UI" }
@@ -363,10 +431,10 @@ ARTICLE: "changes" "Changes in the latest release"
 { $list
     { "The " { $snippet "reverse-slice" } " word has been removed; call " { $link <reversed> } " instead." }
     { "The " { $link sum } " and " { $link product } " words have been moved into the core." }
-    { "New " { $link remove-hash* } " word removes the former value." }
+    { "New " { $link delete-at* } " word removes the former value." }
     { "C library interface now features full support for " { $snippet "ushort*" } " UCS-2 strings." }
     { "Restartable errors are now supported; throw them using " { $link condition } ", and invoke restarts in the listener using " { $link :res } "." }
-    { { $link with-stream-table } " word for tabular formatting." }
+    { { $snippet "with-stream-table" } " word for tabular formatting." }
     { "Style stack and associated words such as " { $snippet "format*" } " have been removed in favor of a better abstraction, " { $link with-style } " and " { $link with-stream-style } "." }
 }
 

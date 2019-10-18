@@ -1,23 +1,29 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: arrays errors gadgets gadgets-buttons
 gadgets-labels gadgets-panes gadgets-presentations
 gadgets-scrolling gadgets-theme gadgets-viewports gadgets-lists
-generic hashtables io kernel math models namespaces prettyprint
+generic assocs io kernel math models namespaces prettyprint
 queues sequences test threads sequences words timers ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
     [ hand-loc get-global swap move-hand ] [ drop ] if ;
 
-: post-layout ( gadget -- )
-    find-world [ dup world-handle set ] when* ;
+: post-layout ( hash gadget -- )
+    dup find-world dup [
+        rot [
+            >r screen-rect r> [ rect-union ] when*
+        ] change-at
+    ] [
+        3drop
+    ] if ;
 
 : layout-queued ( -- hash )
-    [
-        invalid [ dup layout post-layout ] queue-each
-    ] make-hash ;
+    H{ } clone invalid [
+        dup layout dupd post-layout
+    ] queue-each ;
 
 SYMBOL: ui-hook
 
@@ -33,17 +39,12 @@ SYMBOL: ui-hook
         init-ui ui-hook get-global call
     ] if ;
 
-: ui-step ( -- )
-    [
-        do-timers
-        layout-queued [
-            nip
-            dup update-hand
-            dup world-handle [ dup draw-world ] when
-            drop
-        ] hash-each
-        10 sleep
-    ] assert-depth ;
+: draw-world? ( world -- ? )
+    #! We don't draw deactivated worlds, or those with 0 size.
+    #! On Windows, the latter case results in GL errors.
+    dup world-active?
+    over world-handle
+    rot rect-dim [ zero? not ] all? and and ;
 
 TUPLE: world-error world ;
 
@@ -57,22 +58,31 @@ M: world-error error.
     "This world has been deactivated to prevent cascading errors." print
     delegate error. ;
 
-: draw-world? ( world -- ? )
-    #! We don't draw deactivated worlds, or those with 0 size.
-    #! On Windows, the latter case results in GL errors.
-    dup world-active? swap rect-dim [ zero? not ] all? and ;
-
-: draw-world ( world -- )
+: draw-world ( rect world -- )
     dup draw-world? [
         [
             dup world set [
-                dup (draw-world)
+                (draw-world)
             ] [
                 over <world-error> debugger-window
-                f over set-world-active?
+                f swap set-world-active?
+                drop
             ] recover
         ] with-scope
-    ] when drop ;
+    ] [
+        2drop
+    ] if ;
+
+: redraw-worlds ( hash -- )
+    [
+        swap dup update-hand
+        dup world-handle [ draw-world ] [ 2drop ] if
+    ] assoc-each ;
+
+: ui-step ( -- )
+    [
+        do-timers layout-queued redraw-worlds 10 sleep
+    ] assert-depth ;
 
 IN: shells
 

@@ -65,11 +65,10 @@ TUPLE: entry title link description pub-date ;
 
 : feed ( xml -- feed )
     dup name-tag {
-        { [ dup "RDF" = ] [ drop rss1.0 ] }
-        { [ dup "rss" = ] [ drop rss2.0 ] }
-        { [ "feed" = ] [ atom1.0 ] }
-        { [ t ] [ "Invalid newsfeed" throw ] }
-    } cond ;
+        { "RDF" [ rss1.0 ] }
+        { "rss" [ rss2.0 ] }
+        { "feed" [ atom1.0 ] }
+    } case ;
 
 : read-feed ( string -- feed )
     ! &>&amp; ! this will be uncommented when parser-combinators are fixed

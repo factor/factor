@@ -13,14 +13,15 @@ GENERIC: stream-read-until ( seps stream -- str/f sep/f )
 GENERIC: stream-write1 ( ch stream -- )
 GENERIC: stream-write ( str stream -- )
 GENERIC: stream-flush ( stream -- )
-GENERIC: stream-terpri ( stream -- )
+GENERIC: stream-nl ( stream -- )
 GENERIC: stream-format ( str style stream -- )
 GENERIC: with-nested-stream ( quot style stream -- )
-GENERIC: with-stream-table ( grid quot style stream -- )
 GENERIC: with-stream-style ( quot style stream -- )
+GENERIC: stream-write-table ( table-cells style stream -- )
+GENERIC: make-table-cell ( quot style stream -- table-cell )
 
 : stream-print ( str stream -- )
-    [ stream-write ] keep stream-terpri ;
+    [ stream-write ] keep stream-nl ;
 
 : (stream-copy) ( in out -- )
     64 1024 * pick stream-read

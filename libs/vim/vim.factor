@@ -1,11 +1,11 @@
 IN: vim
-USING: definitions io kernel namespaces parser prettyprint
-process sequences tools ;
+USING: definitions io kernel math namespaces parser
+prettyprint process sequences tools ;
 
 SYMBOL: vim-path
 SYMBOL: vim-detach
 
-"vim" vim-path set-global
+"gvim" vim-path set-global
 
 : vim-command ( file line -- string )
     [ "\"" % vim-path get % "\" \"" % swap % "\" +" % # ] "" make ;

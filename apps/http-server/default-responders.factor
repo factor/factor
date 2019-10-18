@@ -1,7 +1,8 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: httpd
-USING: callback-responder file-responder io kernel namespaces ;
+USING: callback-responder file-responder io kernel namespaces
+hashtables ;
 
 #! Remove all existing responders, and create a blank
 #! responder table.
@@ -30,5 +31,5 @@ global [
     ! The root directory is served by...
     "file" set-default-responder
 
-    vhosts nest [ H{ } clone "default" set ] bind
+    H{ } clone "default" associate vhosts set
 ] bind

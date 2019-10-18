@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 /* Certain special objects in the image are known to the runtime */
 void init_objects(F_HEADER *h)
@@ -51,10 +51,10 @@ INLINE void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 /* This function also initializes the data and code heaps */
 void load_image(F_PARAMETERS *p)
 {
-	FILE *file = fopen(p->image,"rb");
+	FILE *file = OPEN_READ(p->image);
 	if(file == NULL)
 	{
-		fprintf(stderr,"Cannot open image file: %s\n",p->image);
+		FPRINTF(stderr,"Cannot open image file: %s\n",p->image);
 		fprintf(stderr,"%s\n",strerror(errno));
 		exit(1);
 	}
@@ -79,18 +79,18 @@ void load_image(F_PARAMETERS *p)
 	relocate_code();
 
 	/* Store image path name */
-	userenv[IMAGE_ENV] = tag_object(from_char_string(p->image));
+	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image));
 }
 
 /* Save the current image to disk */
-bool save_image(const char* filename)
+bool save_image(const F_CHAR *filename)
 {
 	FILE* file;
 	F_HEADER h;
 
-	fprintf(stderr,"*** Saving %s...\n",filename);
+	FPRINTF(stderr,"*** Saving %s...\n",filename);
 
-	file = fopen(filename,"wb");
+	file = OPEN_WRITE(filename);
 	if(file == NULL)
 		fatal_error("Cannot open image for writing",errno);
 
@@ -122,8 +122,7 @@ void primitive_save_image(void)
 	/* do a full GC to push everything into tenured space */
 	primitive_code_gc();
 
-	F_STRING* filename = untag_string(dpop());
-	save_image(to_char_string(filename,true));
+	save_image(unbox_native_string());
 }
 
 /* Initialize an object in a newly-loaded image */
@@ -145,9 +144,6 @@ void relocate_object(CELL relocating)
 	{
 	case WORD_TYPE:
 		fixup_word((F_WORD*)relocating);
-		break;
-	case STRING_TYPE:
-		rehash_string((F_STRING*)relocating);
 		break;
 	case DLL_TYPE:
 		ffi_dlopen((F_DLL*)relocating,false);

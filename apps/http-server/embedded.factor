@@ -2,24 +2,66 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: embedded
-USING: sequences kernel parser namespaces io html errors ;
+USING: sequences kernel parser namespaces io html errors
+math quotations generic strings ;
 
 ! See apps/http-server/test/ or libs/furnace/ for embedded usage
-! examples!
+! examples
 
-: process-html ( parse-tree string -- parse-tree )
-    dup empty? [ drop ] [ parsed \ write-html parsed ] if ;
+! We use a custom lexer so that %> ends a token even if not
+! followed by whitespace
+TUPLE: embedded-lexer ;
 
-: process-embedded ( parse-tree string -- string parse-tree )
-    "<%" split1-slice >r process-html r> "%>" split1-slice 
-    >r string-lines [ (parse) ] each r> ;
+C: embedded-lexer ( lines -- lexer )
+    swap <lexer> over set-delegate ;
 
-: (parse-embedded) ( parse-tree string -- parse-tree )
-    dup empty?
-    [ drop ] [ process-embedded (parse-embedded) ] if ;
+M: embedded-lexer skip-word
+    [
+        {
+            { [ 2dup nth CHAR: " = ] [ drop 1+ ] }
+            { [ 2dup swap tail-slice "%>" head? ] [ drop 2 + ] }
+            { [ t ] [ [ blank? ] skip ] }
+        } cond
+    ] change-column ;
+
+DEFER: <% delimiter
+
+: check-<% ( lexer -- col )
+    "<%" over line-text rot lexer-column start* ;
+
+: found-<% ( accum lexer col -- accum )
+    [
+        over line-text >r >r lexer-column r> r> subseq parsed
+        \ write-html parsed
+    ] 2keep 2 + swap set-lexer-column ;
+
+: still-looking ( accum lexer -- accum )
+    [
+        dup line-text swap lexer-column tail
+        parsed \ print-html parsed
+    ] keep next-line ;
+
+: parse-%> ( accum lexer -- accum )
+    dup still-parsing? [
+        dup check-<%
+        [ found-<% ] [ [ still-looking ] keep parse-%> ] if*
+    ] [
+        drop
+    ] if ;
+
+: %> lexer get parse-%> ; parsing
+
+: parse-embedded-lines ( lines -- quot )
+    <embedded-lexer> [
+        V{ } clone lexer get parse-%> f (parse-until)
+    ] with-parser ;
 
 : parse-embedded ( string -- quot )
-    [ f swap (parse-embedded) >quotation ] with-parser ;
+    [
+        use [ clone ] change
+        "embedded" use+
+        string-lines parse-embedded-lines
+    ] with-scope ;
 
 : eval-embedded ( string -- ) parse-embedded call ;
 
@@ -27,6 +69,8 @@ USING: sequences kernel parser namespaces io html errors ;
     [
         [
             file-vocabs
+            check-shadowing off
+            "embedded" use+
             dup file set ! so that reload works properly
             [ <file-reader> contents eval-embedded ] keep
         ] with-scope

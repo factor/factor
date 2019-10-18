@@ -1,16 +1,18 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays generic hashtables kernel math models namespaces
-queues sequences words ;
+USING: arrays generic assocs kernel math models namespaces
+queues sequences words strings timers ;
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
 GENERIC: handle-gesture* ( gadget gesture delegate -- ? )
 
-M: object handle-gesture*
-    class "gestures" word-prop ?hash dup
+: default-gesture-handler ( gadget gesture delegate -- ? )
+    class "gestures" word-prop at dup
     [ call f ] [ 2drop t ] if ;
+
+M: object handle-gesture* default-gesture-handler ;
 
 : handle-gesture ( gesture gadget -- ? )
     tuck delegates [ >r 2dup r> handle-gesture* ] all? 2nip ;
@@ -19,7 +21,9 @@ M: object handle-gesture*
     [ dupd handle-gesture ] each-parent nip ;
 
 : user-input ( str gadget -- )
-    [ dupd user-input* ] each-parent 2drop ;
+    over empty?
+    [ [ dupd user-input* ] each-parent ] unless
+    2drop ;
 
 ! Gesture objects
 TUPLE: motion ;
@@ -49,7 +53,20 @@ SYMBOL: M+
 SYMBOL: S+
 
 TUPLE: key-down mods sym ;
+
+: prepare-key-gesture [ S+ rot remove swap ] unless ;
+
+C: key-down ( mods sym action? -- key-down )
+    >r prepare-key-gesture r>
+    [ set-key-down-sym ] keep
+    [ set-key-down-mods ] keep ;
+
 TUPLE: key-up mods sym ;
+
+C: key-up ( mods sym action? -- key-up )
+    >r prepare-key-gesture r>
+    [ set-key-up-sym ] keep
+    [ set-key-up-mods ] keep ;
 
 ! Hand state
 
@@ -89,6 +106,22 @@ SYMBOL: double-click-timeout
 : drag-gesture ( -- )
     hand-buttons get-global first <drag> button-gesture ;
 
+TUPLE: drag-timer ;
+
+M: drag-timer tick drop drag-gesture ;
+
+<drag-timer> drag-timer set-global
+
+: start-drag-timer ( -- )
+    hand-buttons get-global empty? [
+        drag-timer get-global 100 100 add-timer
+    ] when ;
+
+: stop-drag-timer ( -- )
+    hand-buttons get-global empty? [
+        drag-timer get-global remove-timer
+    ] when ;
+
 : fire-motion ( -- )
     hand-buttons get-global empty? [
         T{ motion } hand-gadget get-global send-gesture drop
@@ -110,22 +143,37 @@ SYMBOL: double-click-timeout
     f hand-gadget set-global
     f r> parents hand-gestures ;
 
-: focus-gestures ( new old -- )
-    drop-prefix <reversed>
-    T{ lose-focus } swap each-gesture
-    T{ gain-focus } swap each-gesture ;
+: send-lose-focus ( gadget -- )
+    T{ lose-focus } swap handle-gesture drop ;
 
-: focus-receiver ( world -- seq )
-    dup world-focused? [ focused-ancestors ] [ drop f ] if ;
+: send-gain-focus ( gadget -- )
+    T{ gain-focus } swap handle-gesture drop ;
 
-: request-focus* ( gadget world -- )
-    dup focused-ancestors >r
-    [ set-world-focus ] keep
-    focus-receiver r> focus-gestures ;
+: focus-child ( child gadget ? -- )
+    [
+        dup gadget-focus [
+            dup send-lose-focus
+            f swap t focus-child
+        ] when*
+        dupd set-gadget-focus [
+            send-gain-focus
+        ] when*
+    ] [
+        set-gadget-focus
+    ] if ;
+
+: (request-focus) ( child gadget ? -- )
+    pick gadget-parent pick eq? [
+        >r >r dup gadget-parent dup r> r>
+        [ (request-focus) ] keep
+    ] unless focus-child ;
 
 : request-focus ( gadget -- )
-    dup focusable-child swap find-world
-    [ request-focus* ] [ drop ] if* ;
+    dup focusable-child swap find-world {
+        { [ dup not ] [ 2drop ] }
+        { [ 2dup eq? ] [ 2drop ] }
+        { [ t ] [ dup world-focused? (request-focus) ] }
+    } cond ;
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] subset-with
@@ -146,17 +194,19 @@ SYMBOL: double-click-timeout
 
 : update-click# ( button -- )
     global [
-        multi-click? [
+        dup multi-click? [
             hand-click# inc
         ] [
             1 hand-click# set
         ] if
+        hand-last-button set
+        millis hand-last-time set
     ] bind ;
 
 : update-clicked ( -- )
     hand-gadget get-global hand-clicked set-global
     hand-loc get-global hand-click-loc set-global ;
- 
+
 : under-hand ( -- seq )
     hand-gadget get-global parents <reversed> ;
 
@@ -168,17 +218,16 @@ SYMBOL: double-click-timeout
 
 : send-button-down ( gesture loc world -- )
     move-hand
+    start-drag-timer
     dup button-down-#
-    dup update-click#
-    dup hand-last-button set-global
-    millis hand-last-time set-global
+    dup update-click# hand-buttons get-global push
     update-clicked
-    hand-buttons get-global push
     button-gesture ;
 
 : send-button-up ( gesture loc world -- )
     move-hand
     dup button-up-# hand-buttons get-global delete
+    stop-drag-timer
     button-gesture ;
 
 : send-wheel ( direction loc world -- )
@@ -186,6 +235,9 @@ SYMBOL: double-click-timeout
     scroll-direction set-global
     T{ mouse-scroll } hand-gadget get-global send-gesture
     drop ;
+
+: world-focus ( world -- gadget )
+    dup gadget-focus [ world-focus ] [ ] ?if ;
 
 : send-action ( world gesture -- )
     swap world-focus send-gesture drop ;
@@ -195,6 +247,31 @@ SYMBOL: double-click-timeout
 
 : resend-button-up  ( gesture world -- )
     hand-loc get-global swap send-button-up ;
+
+GENERIC: gesture>string ( gesture -- string/f )
+
+: modifiers>string ( modifiers -- string )
+    [ word-name ] map concat >string ;
+
+M: key-down gesture>string
+    dup key-down-mods modifiers>string
+    swap key-down-sym append ;
+
+M: button-up gesture>string
+    [
+        dup button-up-mods modifiers>string %
+        "Click Button" %
+        button-up-# [ " " % # ] when*
+    ] "" make ;
+
+M: button-down gesture>string
+    [
+        dup button-down-mods modifiers>string %
+        "Press Button" %
+        button-down-# [ " " % # ] when*
+    ] "" make ;
+
+M: object gesture>string drop f ;
 
 world H{
     { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }

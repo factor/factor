@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences sequences-internals namespaces
-words io ;
+words io quotations ;
 IN: crc32
 
 : crc32-polynomial HEX: edb88320 ; inline
@@ -9,7 +9,7 @@ IN: crc32
 ! Generate the table at load time and define a new word with it,
 ! instead of using a variable, so that the compiler can inline
 ! the call to nth-unsafe
-SYMBOL: crc32-table inline
+DEFER: crc32-table inline
 
 \ crc32-table
 256 [
@@ -18,11 +18,11 @@ SYMBOL: crc32-table inline
         [ crc32-polynomial bitxor ] unless
     ] times
 ] map
-unit define-compound
+1quotation define-compound
 
 : (crc32) ( crc ch -- crc )
     dupd bitxor
-    HEX: ff bitand crc32-table nth-unsafe
+    mask-byte crc32-table nth-unsafe
     swap -8 shift bitxor ;
 
 : crc32 ( seq -- n )

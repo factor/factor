@@ -8,59 +8,54 @@ USING: kernel alien ;
 
 LIBRARY: usb
 
-BEGIN-STRUCT: usb_bus
-  FIELD: void*      next
-  FIELD: void*      prev	
-  FIELD: char[261] dirname
-  FIELD: void*      devices
-  FIELD: uint       location
-  FIELD: void*      root_dev
-END-STRUCT
+C-STRUCT: usb_bus
+    { "void*" "next" }
+    { "void*" "prev" }
+    { { "char" 261 } "dirname" }
+    { "void*" "devices" }
+    { "uint" "location" }
+    { "void*" "root_dev" } ;
 
-! __attribute__ ((packed))
-BEGIN-STRUCT: usb_device_descriptor
-  PACKED-FIELD: uchar bLength
-  PACKED-FIELD: uchar bDescriptorType
-  PACKED-FIELD: ushort bcdUSB
-  PACKED-FIELD: uchar  bDeviceClass
-  PACKED-FIELD: uchar  bDeviceSubClass
-  PACKED-FIELD: uchar  bDeviceProtocol
-  PACKED-FIELD: uchar  bMaxPacketSize0
-  PACKED-FIELD: ushort idVendor
-  PACKED-FIELD: ushort idProduct
-  PACKED-FIELD: ushort bcdDevice;
-  PACKED-FIELD: uchar  iManufacturer
-  PACKED-FIELD: uchar  iProduct
-  PACKED-FIELD: uchar  iSerialNumber
-  PACKED-FIELD: uchar  bNumConfigurations
-END-STRUCT
+C-STRUCT: usb_device_descriptor
+    { +packed+ "uchar" "bLength" }
+    { +packed+ "uchar" "bDescriptorType" }
+    { +packed+ "ushort" "bcdUSB" }
+    { +packed+ "uchar" "bDeviceClass" }
+    { +packed+ "uchar" "bDeviceSubClass" }
+    { +packed+ "uchar" "bDeviceProtocol" }
+    { +packed+ "uchar" "bMaxPacketSize0" }
+    { +packed+ "ushort" "idVendor" }
+    { +packed+ "ushort" "idProduct" }
+    { +packed+ "ushort" "bcdDevice;" }
+    { +packed+ "uchar" "iManufacturer" }
+    { +packed+ "uchar" "iProduct" }
+    { +packed+ "uchar" "iSerialNumber" }
+    { +packed+ "uchar" "bNumConfigurations" } ;
 
-BEGIN-STRUCT: usb_config_descriptor
-  PACKED-FIELD: uchar  bLength ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  bDescriptorType ! __attribute__ ((packed))
-  PACKED-FIELD: ushort wTotalLength ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  bNumInterfaces !  __attribute__ ((packed))
-  PACKED-FIELD: uchar  bConfigurationValue ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  iConfiguration ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  bmAttributes ! __attribute__ ((packed))
-  PACKED-FIELD: uchar  MaxPower ! __attribute__ ((packed))
+C-STRUCT: usb_config_descriptor
+    { +packed+ "uchar" "bLength" }
+    { +packed+ "uchar" "bDescriptorType" }
+    { +packed+ "ushort" "wTotalLength" }
+    { +packed+ "uchar" "bNumInterfaces" }
+    { +packed+ "uchar" "bConfigurationValue" }
+    { +packed+ "uchar" "iConfiguration" }
+    { +packed+ "uchar" "bmAttributes" }
+    { +packed+ "uchar" "MaxPower" }
+    
+    { "void*" "interface" }
+    
+    { "uchar*" "extra" }
+    { "int" "extralen" } ;
 
-  FIELD: void*  interface
-
-  FIELD: uchar* extra
-  FIELD: int extralen
-END-STRUCT
-
-BEGIN-STRUCT: usb_device
-  FIELD: void* next
-  FIELD: void* prev
-  FIELD: char[261] filename
-  FIELD: usb_bus* bus
-  FIELD: usb_device_descriptor descriptor
-  FIELD: usb_config_descriptor* config
-  FIELD: void* dev
-  FIELD: uchar devnum
-  FIELD: uchar num_children
-  FIELD: void* children
-END-STRUCT
+C-STRUCT: usb_device
+     { "void*" "next" }
+     { "void*" "prev" }
+     { { "char"  261 } "filename" }
+     { "usb_bus*" "bus" }
+     { "usb_device_descriptor" "descriptor" }
+     { "usb_config_descriptor*" "config" }
+     { "void*" "dev" }
+     { "uchar" "devnum" }
+     { "uchar" "num_children" }
+     { "void*" "children" } ;
 

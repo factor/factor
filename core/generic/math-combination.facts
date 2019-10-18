@@ -22,9 +22,9 @@ HELP: math-class
 HELP: math-combination
 { $values { "word" "a generic word" } { "quot" "a quotation" } }
 { $description "Generates a double-dispatching word definition. Only methods defined on numerical classes and " { $link object } " take effect in the math combination. Methods defined on numerical classes are guaranteed to have their two inputs upgraded to the highest priority type of the two."
-$terpri
+$nl
 "The math method combination is used for binary operators such as " { $link + } " and " { $link * } "."
-$terpri
+$nl
 "A method can only be added to a generic word using the math combination if the method specializes on one of the below classes, or a union defined over one or more of the below classes:"
 { $code
     "fixnum"
@@ -37,5 +37,4 @@ $terpri
 "The math combination performs numerical upgrading as described in " { $link "number-protocol" } "." } ;
 
 HELP: 2generic
-{ $class-description "The class of generic words using " { $link math-combination } "." }
-{ $see-also POSTPONE: G: } ;
+{ $class-description "The class of generic words using " { $link math-combination } "." } ;

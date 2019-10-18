@@ -12,8 +12,9 @@ HELP: module-def
 { $notes "This file is loaded by " { $link require } ", and should contain the necessary " { $link POSTPONE: REQUIRES: } " and " { $link POSTPONE: PROVIDE: } " declarations for the module." } ;
 
 HELP: modules
-{ $var-description "Sequence of " { $link module } " instances." }
-{ $see-also require load-module } ;
+{ $var-description "Sequence of " { $link module } " instances." } ;
+
+{ modules require load-module } related-words
 
 HELP: load-module
 { $values { "name" "a module name string" } }
@@ -23,10 +24,10 @@ HELP: load-module
 HELP: require
 { $values { "name" "a module name string" } }
 { $description "Ensures that a module has been loaded, along with all its dependencies, and compiles all new words."
-$terpri
+$nl
 "If this module is already listed in the " { $link modules } " hashtable, this word does nothing. Otherwise, it calls " { $link load-module } "." }
 { $notes "This word is only for interactive use in the listener, and user-interface code."
-$terpri
+$nl
 "In a source file or module definition, modules should instead be loaded with the " { $link POSTPONE: REQUIRES: } " parsing word. This is because the parser parses an entire file before evaluating top-level forms." } ;
 
 HELP: provide
@@ -34,18 +35,17 @@ HELP: provide
 { $description "Registers a module definition and loads its source files. The possible hashtable keys are documented in the " { $link POSTPONE: PROVIDE: } " word. Usually instead of calling this word, module definitions use the parsing word " { $link POSTPONE: PROVIDE: } " instead." } ;
 
 HELP: reload-module
-{ $values { "module" "a " { $link module } " instance" } }
+{ $values { "name" "a module name string" } }
 { $description "Reloads any source files making up a module if they have been modified on disk since last being loaded. Most of the time " { $link reload-modules } " should be called instead." } ;
 
 HELP: reload-modules
-{ $values { "seq" "a sequence of " { $link module } " instances" } }
-{ $description "Reloads all source files in all specified modules which have been modified on disk since last being loaded." }
-{ $see-also reload-core reload-libs reset-checksums } ;
+{ $values { "seq" "a sequence of module name strings" } }
+{ $description "Reloads all source files in all specified modules which have been modified on disk since last being loaded." } ;
+
+{ reload-modules reload-core reload-libs reset-checksums } related-words
 
 HELP: reload-core
-{ $description "Reloads all source files from core modules which have been modified on disk since last being loaded." }
-{ $see-also reload-modules reload-libs reset-checksums } ;
+{ $description "Reloads all source files from core modules which have been modified on disk since last being loaded." } ;
 
 HELP: reload-libs
-{ $description "Reloads all source files from non-core modules which have been modified on disk since last being loaded." }
-{ $see-also reload-modules reload-core reset-checksums } ;
+{ $description "Reloads all source files from non-core modules which have been modified on disk since last being loaded." } ;

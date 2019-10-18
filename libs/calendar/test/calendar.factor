@@ -135,3 +135,8 @@ USING: arrays calendar errors kernel math sequences test ;
 
 [ 1 ] [ 2005 1 1 12 30 0 0 make-timestamp
         2004 1 1 13 30 0 0 make-timestamp compare-timestamps ] unit-test
+
+[ t ] [ now timestamp>unix-time millis 1000 /f - 10 < ] unit-test
+[ t ] [ 0 unix-time>timestamp unix-1970 = ] unit-test
+[ t ] [ 123456789 [ unix-time>timestamp timestamp>unix-time ] keep = ] unit-test
+[ t ] [ 123456789123456789 [ unix-time>timestamp timestamp>unix-time ] keep = ] unit-test

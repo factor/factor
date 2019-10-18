@@ -1,5 +1,5 @@
 IN: opengl
-USING: help io kernel math ;
+USING: help io kernel math quotations ;
 
 HELP: gl-color
 { $values { "color" "a color specifier" } }
@@ -49,8 +49,8 @@ HELP: gl-poly
 { $description "Draws the outline of a polygon." } ;
 
 HELP: gl-gradient
-{ $values { "direction" "one of " { $snippet "{ 0 1 }" } " or " { $snippet "{ 1 0 }" } } { "colors" "a sequence of color specifiers" } { "dim" "a pair of integers" } }
-{ $description "Draws a rectangle with top-left corner " { $snippet "{ 0 0 }" } " and dimensions " { $snippet "dim" } ", filled wit ha smoothly shaded transition between the colors in " { $snippet "colors" } "." } ;
+{ $values { "direction" "an orientation specifier" } { "colors" "a sequence of color specifiers" } { "dim" "a pair of integers" } }
+{ $description "Draws a rectangle with top-left corner " { $snippet "{ 0 0 }" } " and dimensions " { $snippet "dim" } ", filled with a smoothly shaded transition between the colors in " { $snippet "colors" } "." } ;
 
 HELP: gen-texture
 { $values { "id" integer } }

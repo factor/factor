@@ -10,4 +10,4 @@ M: alien pprint*
         \ ALIEN: pprint-word alien-address number>string text
     ] if ;
 
-M: dll pprint* dll-path "DLL\" " pprint-string ;
+M: dll pprint* dll-path dup "DLL\" " pprint-string ;

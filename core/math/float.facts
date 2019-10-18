@@ -9,23 +9,21 @@ HELP: >float ( x -- y )
 
 HELP: bits>double ( n -- x )
 { $values { "n" "a 64-bit integer representing an 754 double-precision float" } { "x" "a float" } }
-{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." }
-{ $see-also bits>float double>bits float>bits } ;
+{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
+
+{ bits>double bits>float double>bits float>bits } related-words
 
 HELP: bits>float ( n -- x )
 { $values { "n" "a 32-bit integer representing an 754 single-precision float" } { "x" "a float" } }
-{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." }
-{ $see-also bits>double double>bits float>bits } ;
+{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
 
 HELP: double>bits ( x -- n )
 { $values { "x" "a float" } { "n" "a 64-bit integer representing an 754 double-precision float" } }
-{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." }
-{ $see-also bits>double bits>float float>bits } ;
+{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
 
 HELP: float>bits ( x -- n )
 { $values { "x" "a float" } { "n" "a 32-bit integer representing an 754 single-precision float" } }
-{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." }
-{ $see-also bits>double bits>float double>bits } ;
+{ $description "Creates a " { $link float } " object from a binary representation. This word is usually used to reconstruct floats read from streams." } ;
 
 ! Unsafe primitives
 HELP: float+ ( x y -- z )

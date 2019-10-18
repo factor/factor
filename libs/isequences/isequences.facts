@@ -1,0 +1,17 @@
+USING: help isequences ;
+
+HELP: @@ 
+{ $values { "s" "an isequence" } { "n" "an isequence" } { "v" "the element at the " { $snippet "n" } "th index" } }
+{ $contract "Outputs the " { $snippet "n" } "th element of an isequence." } ;
+
+HELP: --
+{ $values { "s" "an isequence" } { "-s" "a negated isequence" } }
+{ $contract "Outputs the negated version of " { $snippet "s"} " with its size and indices negated." } ;
+
+HELP: ##
+{ $values { "s" "an isequence" } { "n" "an integer size" } }
+{ $contract "Outputs the size of " { $snippet "s"} " which can be negative for a negated isequence." } ;
+
+HELP: ++
+{ $values { "s1" "an isequence" } { "s2" "an isequence" } { "s" "the concatenated result of " { $snippet "s1" } " and " { $snippet "s2" } } }
+{ $contract "Outputs the freshly concatened isequence with size = size(s1) + size(s2)." } ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2005 Slava Pestov
 IN: http
-USING: errors hashtables io kernel math namespaces parser
+USING: errors hashtables io kernel math namespaces parser assocs
 sequences strings ;
 
 : header-line ( line -- )
@@ -11,7 +11,7 @@ sequences strings ;
     empty? [ drop ] [ header-line (read-header) ] if ;
 
 : read-header ( -- hash )
-    [ (read-header) ] make-hash ;
+    [ (read-header) ] H{ } make-assoc ;
 
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
@@ -61,10 +61,10 @@ sequences strings ;
 
 : build-url ( path query-params -- str )
     [
-        swap % dup hash-empty? [
-            "?" %
-            dup hash>alist
-            [ [ url-encode ] map "=" join ] map "&" join %
+        swap % dup assoc-empty? [
+            "?" % dup
+            [ [ url-encode ] 2apply "=" swap 3append ] { } assoc>map
+            "&" join %
         ] unless drop
     ] "" make ;
 

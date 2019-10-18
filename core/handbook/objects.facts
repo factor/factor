@@ -20,12 +20,14 @@ ARTICLE: "equality" "Equality and comparison testing"
 
 ARTICLE: "generic" "Generic words and methods"
 "A generic word consists of zero or more methods, where each method associates a class with a definition; when executed, the generic word picks the method most appropriate for the object at the top of the stack."
-$terpri
+$nl
 "A generic word behaves roughly like a long series of class predicate conditionals in a " { $link cond } " form, however methods can be defined in independent source files, reducing coupling and increasing extensibility."
-$terpri
+$nl
 "The most straightforward way to define generic words and methods is to use a pair of parsing words:"
 { $subsection POSTPONE: GENERIC: }
 { $subsection POSTPONE: M: }
+"A slight variation on the theme is the idea of a hook word:"
+{ $subsection POSTPONE: HOOK: }
 "Generic words must declare their stack effect in order to compile. See " { $link "effect-declaration" } "."
 { $subsection "method-order" }
 "The generic word system supports meta-programming:"
@@ -34,7 +36,7 @@ $terpri
 
 ARTICLE: "method-order" "Method ordering"
 "It is possible that two classes have a non-empty intersection and neither is a subclass of the other. This means there is no canonical linear ordering of classes."
-$terpri
+$nl
 "Consider the following set of definitions:"
 { $code
     "GENERIC: explain"
@@ -45,7 +47,7 @@ $terpri
 "Neither " { $link general-t } " nor " { $link immediate } " are subclasses of each other, yet their intersection is the non-empty " { $link POSTPONE: f } " class. So the generic word system will place " { $link object } " first in the method order, however either " { $link general-t } " or " { $link immediate } " may come next, and it is pretty much a random choice that depends on hashing:"
 { $example "\\ bar order ."  "{ object general-list general-t }" }
 "Therefore, the outcome of calling " { $snippet "bar" } " with " { $link f } " on the stack is undefined."
-$terpri
+$nl
 "As you can see above, the " { $link order } " word can be useful to clarify method dispatch."
 { $subsection order } ;
 
@@ -56,11 +58,13 @@ ARTICLE: "method-combination" "Method combination"
     "which methods out of the set of applicable methods are called"
 }
 "The " { $link POSTPONE: GENERIC: } " parsing word creates a generic word using the " { $emphasis "simple method combination" } ". Most generic words that come up in practice use this method combination:"
-{ $subsection standard-combination }
-"The " { $link POSTPONE: G: } " parsing word allows a different method combination to be specified:"
-{ $subsection POSTPONE: G: }
+{ $subsection simple-combination }
 "The simple method combination is a special case of the standard method combination:"
 { $subsection standard-combination }
+"The " { $link POSTPONE: HOOK: } " parsing word creates a generic word using the " { $emphasis "hook method combination" } ":"
+{ $subsection hook-combination }
+"The " { $link POSTPONE: G: } " parsing word allows a different method combination to be specified:"
+{ $subsection POSTPONE: G: }
 "Another combination for arithmetic operators:"
 { $subsection math-combination }
 "If nothing else will do:"
@@ -68,9 +72,9 @@ ARTICLE: "method-combination" "Method combination"
 
 ARTICLE: "custom-combination" "Custom method combination"
 "Developing a custom method combination requires a good understanding of higher-order programming (code that writes code) and Factor internals. Custom method combination has not been fully explored at this stage of Factor development, and this section can only give a brief sketch of what is involved."
-$terpri
+$nl
 "A method combination quotation has stack effect " { $snippet "( word -- quot )" } "."
-$terpri
+$nl
 "Generic word generation utilities:"
 { $subsection class-predicates }
 { $subsection simplify-alist }
@@ -79,9 +83,9 @@ $terpri
 { $see-also "quotations" "generic-introspection" } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"
-"In most cases, generic words and methods are defined at parse time with " { $link POSTPONE: GENERIC: } ", " { $link POSTPONE: G: } " and " { $link POSTPONE: M: } ". However various advanced techniques can be implemented by defining generic words at runtime, with computed definitions:"
+"In most cases, generic words and methods are defined at parse time with " { $link POSTPONE: GENERIC: } ", " { $link POSTPONE: HOOK: } ", " { $link POSTPONE: G: } " and " { $link POSTPONE: M: } ". However various advanced designs can be implemented by defining generic words at runtime, with computed definitions:"
 { $subsection define-generic }
-{ $subsection define-generic* }
+{ $subsection define-simple-generic }
 "Methods can be added to existing generic words at runtime:"
 { $subsection define-method }
 "A utility word to define a generic word with a single method at runtime:"
@@ -92,7 +96,7 @@ ARTICLE: "generic-introspection" "Generic word introspection"
 
 ARTICLE: "classes" "Classes"
 "A class is a set of objects on which generic words can specialize methods. Classes are organized into a general partial order, and an object may be an instance of more than one class."
-$terpri
+$nl
 "You can ask an object for its class:"
 { $subsection class }
 "Each class has a membership predicate named after the class with a \"?\" suffix, with the following two exceptions:"
@@ -112,7 +116,7 @@ $terpri
 
 ARTICLE: "builtin-classes" "Built-in classes"
 "Every object is an instance of to exactly one canonical " { $emphasis "built-in class" } " which defines its layout in memory and basic behavior; see " { $link "type-index" } " for a list."
-$terpri
+$nl
 "There is a class of built-in classes:"
 { $subsection builtin-class } ;
 
@@ -130,10 +134,10 @@ ARTICLE: "predicates" "Predicate classes"
 
 ARTICLE: "class-operations" "Class operations"
 { $subsection class< }
-{ $subsection class-compare }
 { $subsection class-and }
 { $subsection class-or }
-{ $subsection types } ;
+{ $subsection types }
+{ $subsection sort-classes } ;
 
 ARTICLE: "tuples" "Tuples"
 "Tuples are user-defined classes composed of named slots. A new tuple class can be defined as follows:"
@@ -158,9 +162,9 @@ ARTICLE: "tuple-constructors" "Constructors and slots"
 "New instances of tuple classes are created by calling a constructor word, whose name is the tuple's name surrounded by angle brackets:"
 { $code "TUPLE: point x y z ;\n1 2 3 <point>" }
 "The default constructor stores stack elements into consecutive slots, with the top of the stack going into the rightmost slot."
-$terpri
+$nl
 "After construction, slots are read and written using various automatically-defined words with names of the form " { $snippet { $emphasis "class-slot" } } " and " { $snippet "set-" { $emphasis "class-slot" } } "."
-$terpri
+$nl
 "Custom constructors can be defined:"
 { $subsection POSTPONE: C: } ;
 
@@ -169,9 +173,9 @@ ARTICLE: "tuple-delegation" "Delegation"
 { $subsection delegate }
 { $subsection set-delegate }
 "A tuple's delegate should either be another tuple, or " { $link f } ", indicating no delegate is set. Delegation from a tuple to an object of some other type is not fully supported and should be used with caution."
-$terpri
+$nl
 "Factor uses delegation in place of implementation inheritance, but it is not a direct substitute; in particular, the semantics differ in that a delegated method call receives the delegate on the stack, not the original object."
-$terpri
+$nl
 "A pair of words examine delegation chains:"
 { $subsection delegates }
 { $subsection is? }

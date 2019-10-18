@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic hashtables help html httpd
+USING: generic assocs help html httpd
 io kernel math namespaces prettyprint sequences store strings ;
 IN: wee-url-responder
 
@@ -27,16 +27,16 @@ H{ } clone wee-shortcuts wee-store get store-variable
 
 : random-url ( -- string )
     6 random 1+ [ drop random-letter ] map >string
-    dup wee-shortcuts get hash-member? [ drop random-url ] when ;
+    dup wee-shortcuts get key? [ drop random-url ] when ;
 
 : prepare-wee-url ( url -- url )
     CHAR: : over member? [ "http://" swap append ] unless ;
 
 : set-symmetric-hash ( obj1 obj2 hash -- )
-    3dup set-hash swapd set-hash ;
+    3dup set-at swapd set-at ;
 
 : add-shortcut ( url-long -- url-short )
-    dup wee-shortcuts get hash* [
+    dup wee-shortcuts get at* [
         nip
     ] [
         drop
@@ -56,11 +56,11 @@ H{ } clone wee-shortcuts wee-store get store-variable
 
 : url-submitted ( url-long url-short -- )
     "URL Submitted" [
-        "URL: " write write terpri
+        "URL: " write write nl
         "wee-url: " write
-        <a dup wee-url =href a> wee-url write </a> terpri
+        <a dup wee-url =href a> wee-url write </a> nl
         "Back to " write
-        <a responder-url =href a> "wee-url" write </a> terpri
+        <a responder-url =href a> "wee-url" write </a> nl
     ] simple-html-document ;
 
 : url-submit ( url -- )
@@ -80,7 +80,7 @@ H{ } clone wee-shortcuts wee-store get store-variable
         dup empty? [
             drop url-prompt
         ] [
-            wee-shortcuts get hash*
+            wee-shortcuts get at*
             [ permanent-redirect ] [ drop url-error ] if
         ] if
     ] if* ;

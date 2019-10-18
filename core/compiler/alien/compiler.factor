@@ -24,24 +24,40 @@ GENERIC: alien-node-abi ( node -- str )
 : alien-node-return* ( node -- ctype )
     alien-node-return dup large-struct? [ drop "void" ] when ;
 
-: parameter-size stack-size cell align ;
+: parameter-align ( n type -- n delta )
+    over >r
+    dup c-type-stack-align? [ c-type-align ] [ drop cell ] if
+    align
+    dup r> - ;
 
-: parameter-sizes ( types -- offsets )
+: parameter-sizes ( types -- total offsets )
     #! Compute stack frame locations.
-    0 [ parameter-size + ] accumulate nip ;
+    [
+        0 [
+            [ parameter-align drop dup , ] keep stack-size +
+        ] reduce cell align
+    ] { } make ;
 
 : return-size ( ctype -- n )
     #! Amount of space we reserve for a return value.
     dup large-struct? [ heap-size ] [ drop 0 ] if ;
 
 : alien-stack-frame ( node -- n )
-    alien-node-parameters* 0 [ parameter-size + ] reduce ;
+    alien-node-parameters* parameter-sizes drop ;
 
 : alien-invoke-frame ( node -- n )
     #! One cell is temporary storage, temp@
     dup alien-node-return return-size
     swap alien-stack-frame +
     cell + ;
+
+: set-stack-frame ( n -- )
+    dup [ frame-required ] when* \ stack-frame set ;
+
+: with-stack-frame ( n quot -- )
+    swap set-stack-frame
+    call
+    f set-stack-frame ; inline
 
 : reg-class-full? ( class -- ? )
     dup class get swap param-regs length >= ;
@@ -57,19 +73,25 @@ GENERIC: alien-node-abi ( node -- str )
     [ spill-param ] [ fastcall-param ] if
     [ param-reg ] keep ;
 
+: (flatten-int-type) ( size -- ) cell /i "void*" <array> % ;
+
+: flatten-int-type ( n type -- n )
+    [ parameter-align (flatten-int-type) ] keep
+    stack-size cell align dup (flatten-int-type) + ;
+
+: flatten-value-type ( n type -- n )
+    dup c-type c-type-reg-class T{ int-regs } =
+    [ flatten-int-type ] [ , ] if ;
+
 : flatten-value-types ( params -- params )
     #! Convert value type structs to consecutive void*s.
-    [
-        dup c-struct?
-        [ stack-size cell / "void*" <array> ] [ 1array ] if
-    ] map concat ;
+    [ 0 [ flatten-value-type ] reduce drop ] { } make ;
 
 : each-parameter ( parameters quot -- )
-    >r [ parameter-sizes ] keep r> 2each ; inline
+    >r [ parameter-sizes nip ] keep r> 2each ; inline
 
 : reverse-each-parameter ( parameters quot -- )
-    >r [ parameter-sizes ] keep
-    [ <reversed> ] 2apply r> 2each ; inline
+    >r [ parameter-sizes nip ] keep r> 2reverse-each ; inline
 
 : reset-freg-counts ( -- )
     0 { int-regs float-regs stack-params } [ set ] each-with ;

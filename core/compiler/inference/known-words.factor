@@ -1,10 +1,11 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays byte-arrays alien generator errors generic
-hashtables hashtables-internals io io-internals c-streams kernel
-kernel-internals math math-internals memory parser sequences
-strings sbufs vectors words prettyprint namespaces ;
+USING: arrays bit-arrays byte-arrays alien generator errors
+generic hashtables hashtables-internals io io-internals
+c-streams kernel kernel-internals math math-internals memory
+parser sequences strings sbufs vectors words prettyprint
+namespaces quotations ;
 
 \ declare [
     1 ensure-values
@@ -34,12 +35,19 @@ strings sbufs vectors words prettyprint namespaces ;
 ! Primitive combinators
 \ call [
     1 ensure-values
-    pop-literal infer-quot-value
+    pop-literal
+    dup quotation? over not or [
+        "call must be given a quotation or f" inference-error
+    ] unless infer-quot-value
 ] "infer" set-word-prop
 
 \ execute [
     1 ensure-values
-    pop-literal nip apply-word
+    pop-literal nip
+    dup word? [
+        "execute must be given a word" inference-error
+    ] unless
+    apply-object
 ] "infer" set-word-prop
 
 \ if [
@@ -122,6 +130,9 @@ t over set-effect-terminated?
 
 \ fixnum* { fixnum fixnum } { integer } <effect> "inferred-effect" set-word-prop
 \ fixnum* t "foldable" set-word-prop
+
+\ fixnum*fast { fixnum fixnum } { fixnum } <effect> "inferred-effect" set-word-prop
+\ fixnum*fast t "foldable" set-word-prop
 
 \ fixnum/i { fixnum fixnum } { integer } <effect> "inferred-effect" set-word-prop
 \ fixnum/i t "foldable" set-word-prop
@@ -230,7 +241,7 @@ t over set-effect-terminated?
 
 \ getenv { fixnum } { object } <effect> "inferred-effect" set-word-prop
 \ setenv { object fixnum } { } <effect> "inferred-effect" set-word-prop
-\ stat { string } { object object object object } <effect> "inferred-effect" set-word-prop
+\ (stat) { string } { object object object object } <effect> "inferred-effect" set-word-prop
 \ (directory) { string } { array } <effect> "inferred-effect" set-word-prop
 \ data-gc { } { } <effect> "inferred-effect" set-word-prop
 
@@ -256,50 +267,62 @@ t over set-effect-terminated?
 \ cd { string } { } <effect> "inferred-effect" set-word-prop
 
 \ dlopen { string } { dll } <effect> "inferred-effect" set-word-prop
-\ dlsym { string object } { integer } <effect> "inferred-effect" set-word-prop
+\ dlsym { string object } { c-ptr } <effect> "inferred-effect" set-word-prop
 \ dlclose { dll } { } <effect> "inferred-effect" set-word-prop
 
 \ <byte-array> { integer } { byte-array } <effect> "inferred-effect" set-word-prop
+
+\ <bit-array> { integer } { bit-array } <effect> "inferred-effect" set-word-prop
 
 \ <displaced-alien> { integer c-ptr } { c-ptr } <effect> "inferred-effect" set-word-prop
 
 \ alien-signed-cell { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-signed-cell { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+
 \ alien-unsigned-cell { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-unsigned-cell { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+
 \ alien-signed-8 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-signed-8 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+
 \ alien-unsigned-8 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-unsigned-8 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+
 \ alien-signed-4 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-signed-4 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+
 \ alien-unsigned-4 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-unsigned-4 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
-\ alien-signed-2 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+
+\ alien-signed-2 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-signed-2 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
-\ alien-unsigned-2 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+
+\ alien-unsigned-2 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-unsigned-2 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
-\ alien-signed-1 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+
+\ alien-signed-1 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-signed-1 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
-\ alien-unsigned-1 { c-ptr integer } { integer } <effect> "inferred-effect" set-word-prop
+
+\ alien-unsigned-1 { c-ptr integer } { fixnum } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-unsigned-1 { integer c-ptr integer } { } <effect> "inferred-effect" set-word-prop
+
 \ alien-float { c-ptr integer } { float } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-float { float c-ptr integer } { } <effect> "inferred-effect" set-word-prop
-\ alien-float { c-ptr integer } { float } <effect> "inferred-effect" set-word-prop
+
+\ alien-double { c-ptr integer } { float } <effect> "inferred-effect" set-word-prop
 
 \ set-alien-double { float c-ptr integer } { } <effect> "inferred-effect" set-word-prop
-\ alien-double { c-ptr integer } { float } <effect> "inferred-effect" set-word-prop
 
 \ alien>char-string { c-ptr } { string } <effect> "inferred-effect" set-word-prop
 
@@ -347,8 +370,6 @@ t over set-effect-terminated?
 
 \ (clone) { object } { object } <effect> "inferred-effect" set-word-prop
 
-\ become { object fixnum } { object } <effect> "inferred-effect" set-word-prop
-
 \ array>vector { array } { vector } <effect> "inferred-effect" set-word-prop
 
 \ finalize-compile { array } { } <effect> "inferred-effect" set-word-prop
@@ -356,6 +377,12 @@ t over set-effect-terminated?
 \ <string> { integer integer } { string } <effect> "inferred-effect" set-word-prop
 
 \ <quotation> { integer } { quotation } <effect> "inferred-effect" set-word-prop
+
+\ <tuple> { word integer } { quotation } <effect> "inferred-effect" set-word-prop
+
+\ (>tuple) { array } { tuple } <effect> "inferred-effect" set-word-prop
+
+\ tuple>array { tuple } { array } <effect> "inferred-effect" set-word-prop
 
 \ xt-map { } { array } <effect> "inferred-effect" set-word-prop
 

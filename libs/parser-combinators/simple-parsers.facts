@@ -9,7 +9,8 @@ HELP: 'any-char'
     "Return a parser that consumes a single value "
     "from the input string. The value consumed is the "  
     "result of the parse." }
-{ $example "\"foo\" 'any-char' parse car parse-result-parsed ." "102" }
+{ $examples
+{ $example "USING: lazy-lists parser-combinators ;" "\"foo\" 'any-char' parse car parse-result-parsed ." "102" } }
 { $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
 
 HELP: 'digit'
@@ -19,7 +20,8 @@ HELP: 'digit'
     "Return a parser that consumes a single digit from "
     "the input string. The numeric value of the digit "
     " consumed is the result of the parse." }
-{ $example "\"123\" 'digit' parse car parse-result-parsed ." "1" }
+{ $examples
+{ $example "USING: lazy-lists parser-combinators ;" "\"123\" 'digit' parse car parse-result-parsed ." "1" } }
 { $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
 
 HELP: 'integer'
@@ -29,7 +31,8 @@ HELP: 'integer'
     "Return a parser that consumes an integer from "
     "the input string. The numeric value of the integer "
     " consumed is the result of the parse." }
-{ $example "\"123\" 'integer' parse car parse-result-parsed ." "123" }
+{ $examples
+{ $example "USING: lazy-lists parser-combinators ;" "\"123\" 'integer' parse car parse-result-parsed ." "123" } }
 { $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
 
 HELP: 'string'
@@ -39,7 +42,8 @@ HELP: 'string'
     "Return a parser that consumes a string enclosed in "
     "quotations from the input string. The string value "
     " consumed is the result of the parse." }
-{ $example "\"\\\"foo\\\"\" 'string' parse car parse-result-parsed ." "foo" }
+{ $examples
+{ $example "USING: lazy-lists parser-combinators ;" "\"\\\"foo\\\"\" 'string' parse car parse-result-parsed ." "\"foo\"" } }
 { $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
 
 HELP: 'bold'
@@ -50,8 +54,8 @@ HELP: 'bold'
     "the '*' character from the input string. This is "
     "commonly used in markup languages to indicate bold "
     "faced text." }
-{ $example "\"*foo*\" 'bold' parse car parse-result-parsed ." "foo" }
-{ $example "\"*foo*\" 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@ parse car parse-result-parsed ." "<strong>foo</strong>" }
+{ $example "USE: parser-combinators" "\"*foo*\" 'bold' parse car parse-result-parsed ." "\"foo\"" }
+{ $example "USE: parser-combinators" "\"*foo*\" 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@ parse car parse-result-parsed ." "\"<strong>foo</strong>\"" }
 { $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
 
 HELP: 'italic'
@@ -62,8 +66,9 @@ HELP: 'italic'
     "the '_' character from the input string. This is "
     "commonly used in markup languages to indicate italic "
     "faced text." }
-{ $example "\"_foo_\" 'italic' parse car parse-result-parsed ." "foo" }
-{ $example "\"_foo_\" 'italic' [ \"<emphasis>\" swap \"</emphasis>\" 3append ] <@ parse car parse-result-parsed ." "<emphasis>foo</emphasis>" }
+{ $examples
+{ $example "USING: lazy-lists parser-combinators ;" "\"_foo_\" 'italic' parse car parse-result-parsed ." "\"foo\"" }
+{ $example "USING: lazy-lists parser-combinators ;" "\"_foo_\" 'italic' [ \"<emphasis>\" swap \"</emphasis>\" 3append ] <@ parse car parse-result-parsed ." "\"<emphasis>foo</emphasis>\"" } }
 { $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;
 
 HELP: comma-list
@@ -73,5 +78,6 @@ HELP: comma-list
     "Return a parser that parses comma separated lists of elements. "
     "'element' should be a parser that can parse the elements. The "
     "result of the parser is a sequence of the parsed elements." }
-{ $example "\"1,2,3,4\" 'integer' comma-list parse car parse-result-parsed ." "{ 1 2 3 4 }" }
+{ $examples
+{ $example "USING: lazy-lists parser-combinators ;" "\"1,2,3,4\" 'integer' comma-list parse car parse-result-parsed ." "{ 1 2 3 4 }" } }
 { $see-also 'any-char' 'digit' 'integer' 'string' 'bold' 'italic' comma-list } ;

@@ -3,19 +3,35 @@
 IN: alien
 USING: arrays generator errors generic hashtables
 inference io kernel kernel-internals math namespaces parser
-prettyprint sequences strings words ;
+prettyprint sequences strings words quotations
+inspector ;
 
 TUPLE: alien-invoke library function return parameters ;
 
 M: alien-invoke alien-node-parameters alien-invoke-parameters ;
 M: alien-invoke alien-node-return alien-invoke-return ;
-M: alien-invoke alien-node-abi alien-invoke-library library-abi ;
+
+M: alien-invoke alien-node-abi
+    alien-invoke-library library
+    [ library-abi ] [ "cdecl" ] if* ;
 
 C: alien-invoke make-node ;
 
+: stdcall-mangle ( symbol node -- symbol )
+    "@"
+    swap alien-node-parameters parameter-sizes drop
+    number>string 3append ;
+
+: (alien-invoke-dlsym) ( node -- symbol dll )
+    dup alien-invoke-function
+    swap alien-invoke-library load-library ;
+
 : alien-invoke-dlsym ( node -- symbol dll )
-    dup alien-invoke-function swap alien-invoke-library
-    load-library ;
+    dup (alien-invoke-dlsym) 2dup dlsym [
+        >r over stdcall-mangle r> 2dup dlsym [
+            "No such symbol" inference-error
+        ] unless
+    ] unless rot drop ;
 
 TUPLE: alien-invoke-error library symbol ;
 
@@ -24,10 +40,6 @@ M: alien-invoke-error summary
 
 : alien-invoke ( ... return library function parameters -- ... )
     pick pick <alien-invoke-error> throw ;
-
-: ensure-dlsym ( node -- )
-    [ alien-invoke-dlsym dlsym drop ]
-    [ inference-warning ] recover ;
 
 \ alien-invoke [
     ! Four literals
@@ -41,7 +53,7 @@ M: alien-invoke-error summary
     ! Quotation which coerces parameters to required types
     dup make-prep-quot infer-quot
     ! If symbol doesn't resolve, no stack effect, no compile
-    dup ensure-dlsym
+    dup alien-invoke-dlsym 2drop
     ! Add node to IR
     dup node,
     ! Magic #: consume exactly the number of inputs
@@ -49,25 +61,24 @@ M: alien-invoke-error summary
 ] "infer" set-word-prop
 
 M: alien-invoke generate-node
-    end-basic-block
-    dup objects>registers
-    dup alien-invoke-dlsym %alien-invoke
-    dup %cleanup
-    box-return*
-    iterate-next ;
-
-M: alien-invoke stack-frame-size* alien-invoke-frame ;
+    dup alien-invoke-frame [
+        end-basic-block
+        dup objects>registers
+        dup alien-invoke-dlsym %alien-invoke
+        dup %cleanup
+        box-return*
+        iterate-next
+    ] with-stack-frame ;
 
 : parse-arglist ( return seq -- types effect )
     2 <groups> unpair
     rot dup "void" = [ drop { } ] [ 1array ] if <effect> ;
 
-: (define-c-word) ( type lib func types stack-effect -- )
-    >r over create-in dup reset-generic >r 
-    [ alien-invoke ] curry curry curry curry
-    r> swap define-compound word r>
-    "declared-effect" set-word-prop ;
+: function-quot ( type lib func types -- quot )
+    [ alien-invoke ] curry curry curry curry ;
 
-: define-c-word ( return library function parameters -- )
-    [ "()" subseq? not ] subset >r pick r> parse-arglist
-    (define-c-word) ;
+: define-function ( return library function parameters -- )
+    >r pick r> parse-arglist
+    pick create-in dup reset-generic
+    >r >r function-quot r> r> 
+    -rot define-declared ;

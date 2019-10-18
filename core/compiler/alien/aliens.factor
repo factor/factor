@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: byte-arrays hashtables io kernel math namespaces parser
-sequences ;
+USING: bit-arrays byte-arrays assocs io kernel math
+namespaces parser sequences generic ;
 
 : <alien> ( address -- alien ) f <displaced-alien> ; inline
 
@@ -12,8 +12,6 @@ sequences ;
 
 : dll-path ( dll -- string )
     (dll-path) alien>native-string ;
-
-UNION: c-ptr byte-array alien POSTPONE: f ;
 
 M: alien equal?
     over alien? [
@@ -26,23 +24,27 @@ M: alien equal?
         2drop f
     ] if ;
 
-global [ "libraries" nest drop ] bind
+SYMBOL: libraries
 
-: library ( name -- library ) "libraries" get hash ;
+H{ } clone libraries set-global
+
+TUPLE: library path abi dll ;
+
+C: library ( path abi -- library )
+    [ set-library-abi ] keep [ set-library-path ] keep ;
+
+: library ( name -- library ) libraries get at ;
 
 : load-library ( name -- dll )
     library dup [
-        [
-            "dll" get dup [
-                drop "name" get dlopen dup "dll" set
-            ] unless
-        ] bind
+        dup library-dll [ ] [
+            dup library-path dup [
+                dlopen dup rot set-library-dll
+            ] [
+                2drop f
+            ] if
+        ] ?if
     ] when ;
 
 : add-library ( name path abi -- )
-    "libraries" get [
-        [ "abi" set "name" set ] make-hash swap set
-    ] bind ;
-
-: library-abi ( library -- abi )
-    library "abi" swap ?hash [ "cdecl" ] unless* ;
+    <library> swap libraries get set-at ;

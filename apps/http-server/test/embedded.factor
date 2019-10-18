@@ -16,3 +16,5 @@ USING: io embedded kernel test sequences ;
 [ t ] [ "example" test-embedded ] unit-test
 [ t ] [ "bug" test-embedded ] unit-test
 [ t ] [ "stack" test-embedded ] unit-test
+
+[ ] [ "<%\n%>" parse-embedded drop ] unit-test

@@ -6,7 +6,7 @@ INLINE CELL array_size(CELL size)
 
 INLINE CELL string_capacity(F_STRING* str)
 {
-	return str->length >> TAG_BITS;
+	return untag_fixnum_fast(str->length);
 }
 
 INLINE CELL string_size(CELL size)
@@ -14,14 +14,24 @@ INLINE CELL string_size(CELL size)
 	return sizeof(F_STRING) + (size + 1) * CHARS;
 }
 
-INLINE CELL byte_array_capacity(F_BYTE_ARRAY* array)
+INLINE CELL byte_array_capacity(F_BYTE_ARRAY *array)
 {
-	return array->capacity >> TAG_BITS;
+	return untag_fixnum_fast(array->capacity);
 }
 
 INLINE CELL byte_array_size(CELL size)
 {
 	return sizeof(F_BYTE_ARRAY) + size;
+}
+
+INLINE CELL bit_array_capacity(F_BIT_ARRAY *array)
+{
+	return untag_fixnum_fast(array->capacity);
+}
+
+INLINE CELL bit_array_size(CELL size)
+{
+	return sizeof(F_BIT_ARRAY) + (size + 7) / 8;
 }
 
 INLINE CELL tag_boolean(CELL untagged)
@@ -90,6 +100,11 @@ INLINE F_BYTE_ARRAY* untag_byte_array_fast(CELL tagged)
 	return (F_BYTE_ARRAY*)UNTAG(tagged);
 }
 
+INLINE F_BIT_ARRAY* untag_bit_array_fast(CELL tagged)
+{
+	return (F_BIT_ARRAY*)UNTAG(tagged);
+}
+
 INLINE F_WORD *untag_word_fast(CELL tagged)
 {
 	return (F_WORD*)UNTAG(tagged);
@@ -127,24 +142,24 @@ F_BYTE_ARRAY *allot_byte_array(CELL size);
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 
 void primitive_array(void);
+void primitive_quotation(void);
+void primitive_tuple(void);
 void primitive_byte_array(void);
+void primitive_bit_array(void);
+void primitive_clone(void);
+void primitive_tuple_to_array(void);
+void primitive_to_tuple(void);
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill);
 void primitive_resize_array(void);
 
-void primitive_become(void);
-
 void primitive_array_to_vector(void);
 
 F_STRING* allot_string_internal(CELL capacity);
-void rehash_string(F_STRING* str);
-void primitive_rehash_string(void);
 F_STRING* allot_string(CELL capacity, CELL fill);
 void primitive_string(void);
 F_STRING *reallot_string(F_STRING *string, CELL capacity, u16 fill);
 void primitive_resize_string(void);
-
-bool check_string(F_STRING *s, CELL max);
 
 F_STRING *memory_to_char_string(const char *string, CELL length);
 void primitive_memory_to_char_string(void);

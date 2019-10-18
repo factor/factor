@@ -1,6 +1,7 @@
-IN: scratchpad
+IN: temporary
 USING: arrays byte-arrays kernel kernel-internals math memory
-namespaces sequences test errors math-internals ;
+namespaces sequences test errors math-internals
+quotations ;
 
 [ 0 ] [ f size ] unit-test
 [ t ] [ [ \ = \ = ] all-equal? ] unit-test
@@ -32,8 +33,8 @@ namespaces sequences test errors math-internals ;
 [ { kernel-error 14 f f } ]
 [ [ overflow-r ] catch ] unit-test
 
-[ { kernel-error 15 f f } ]
-[ [ V{ } set-callstack ] catch ] unit-test
+! [ { kernel-error 15 f f } ]
+! [ [ V{ } set-callstack ] catch ] unit-test
 
 : overflow-c overflow-c 3 ;
 

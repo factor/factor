@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences strings math hashtables parser-combinators lazy-lists errors ;
+USING: kernel namespaces sequences strings math assocs parser-combinators lazy-lists errors ;
 IN: json
 
 ! Grammar for JSON from RFC 4627
@@ -70,7 +70,7 @@ LAZY: 'member' ( -- parser )
 
 : object>hashtable ( object -- hashtable )
   #! Convert json object to hashtable
-  H{ } clone dup rot [ dup second swap first rot set-hash ] each-with ;
+  H{ } clone dup rot [ dup second swap first rot set-at ] each-with ;
 
 USE: prettyprint 
 LAZY: 'object' ( -- parser )

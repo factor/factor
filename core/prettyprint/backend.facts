@@ -3,8 +3,7 @@ USING: help io kernel prettyprint prettyprint-internals words ;
 HELP: pprint*
 { $values { "obj" "an object" } }
 { $contract "Adds sections to the current block corresponding to the prettyprinted representation of the object." }
-$prettyprinting-note
-{ $see-also text newline <inset block> } ;
+$prettyprinting-note ;
 
 HELP: pprint-word
 { $values { "word" "a word" } }

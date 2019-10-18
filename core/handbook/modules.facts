@@ -13,7 +13,7 @@ ARTICLE: "module-organization" "Module organization"
 "A module named " { $snippet "libs/frob" } " must be defined in a file whose name takes one of the following two forms:"
 { $code "libs/frob.factor" "libs/frob/load.factor" }
 "The former should only be used for very small modules; if your module needs unit tests, documentation or more than one source file (as most do), you need to create a new directory with a " { $snippet "load.factor" } " file in it."
-$terpri
+$nl
 "When a module takes the latter form, the directory containing the load file is termed the " { $emphasis "module directory" } "." ;
 
 ARTICLE: "using-modules" "Using modules"
@@ -26,7 +26,7 @@ ARTICLE: "using-modules" "Using modules"
 
 ARTICLE: "developing-modules" "Developing modules"
 "To create a new module, you must first decide if the module is a single-file module or a directory with a load file; see " { $link "module-organization" } "."
-$terpri
+$nl
 "If the module depends on other modules, the load file must first load them:"
 { $subsection POSTPONE: REQUIRES: }
 "Then, it must define the module itself:"
@@ -63,21 +63,21 @@ $terpri
 
 ARTICLE: "testing-modules" "Unit testing modules"
 "A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
-$terpri
+$nl
 "For example, if you were developing a word for computing symbolic derivatives, your unit tests would apply the word to certain input functions, comparing the results against the correct values. While the passing of these tests would not guarantee the algorithm is correct, it would at least ensure that what used to work keeps working, in that as soon as something breaks due to a change in another part of your program, failing tests will let you know."
-$terpri
+$nl
 "Unit tests are placed in test harness files, separate from the rest of your source code. If the test harness needs to define words, they should be placed in the " { $snippet "temporary" } " vocabulary so that they can be forgotten after the tests have been run. Test harness files mainly consist of calls to the following two words:"
 { $subsection unit-test }
 { $subsection unit-test-fails }
 "Any non-trivial module should ship with unit tests in the " { $snippet "tests" } " subdirectory of the module directory. Unit test files should be listed in the " { $link +tests+ } " key of the " { $link POSTPONE: PROVIDE: } " form."
-$terpri
+$nl
 "The following words run test harness files:"
 { $subsection test-module }
 { $subsection test-modules } ;
 
 ARTICLE: "documenting-modules" "Documenting modules"
 "Any non-trivial module should ship with documentation. Documentation " { $snippet ".facts" } " files should be listed along with your module's source files in the " { $link +files+ } " key passed to " { $link POSTPONE: PROVIDE: } ", and the main article should be referenced from the " { $link +help+ } " key."
-$terpri
+$nl
 "Help markup is described in " { $link "writing-help" } ". Since help articles describing the core library have string names, a convention to avoid clashes is to name module help articles by arrays, where the first element is a string identifying the module, and the second identifies the article itself. For example, " { $snippet "{ \"concurrency\" \"processes\" }" } "." ;
 
 ARTICLE: "submitting-modules" "Submitting modules"

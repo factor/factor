@@ -4,7 +4,8 @@
 ! Updated by Matthew Willis, July 2006
 ! Updated by Chris Double, September 2006
 !
-USING: kernel sequences math vectors arrays namespaces generic errors ;
+USING: kernel sequences math vectors arrays namespaces
+quotations generic errors ;
 IN: lazy-lists
 
 ! Lazy List Protocol
@@ -109,10 +110,10 @@ TUPLE: list ;
   [ nil ] lazy-cons ;
 
 : 2lazy-list ( a b -- lazy-cons )
-  1lazy-list unit lazy-cons ;
+  1lazy-list 1quotation lazy-cons ;
 
 : 3lazy-list ( a b c -- lazy-cons )
-  2lazy-list unit lazy-cons ;
+  2lazy-list 1quotation lazy-cons ;
 
 : lnth ( n list -- elt ) 
   swap [ cdr ] times car ;

@@ -1,12 +1,9 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: objc-classes
-DEFER: FactorApplicationDelegate
-
-IN: cocoa
-USING: arrays gadgets gadgets-listener gadgets-help
+IN: cocoa-ui
+USING: arrays cocoa gadgets gadgets-listener gadgets-help
 gadgets-workspace hashtables kernel memory namespaces objc
-sequences errors freetype help timers ;
+objc-classes sequences errors freetype help timers ;
 
 : finder-run-files ( alien -- )
     CF>string-array listener-run-files
@@ -20,53 +17,67 @@ sequences errors freetype help timers ;
     image save-panel [ save-image ] when* ;
 
 ! Handle Open events from the Finder
-"NSObject" "FactorApplicationDelegate" {
-    { "application:openFiles:" "void" { "id" "SEL" "id" "id" }
-        [ >r 3drop r> finder-run-files ]
-    }
+CLASS: {
+    { +superclass+ "NSObject" }
+    { +name+ "FactorApplicationDelegate" }
+}
 
-    { "newFactorWorkspace:" "id" { "id" "SEL" "id" }
-        [ 3drop workspace-window f ]
-    }
+{ "application:openFiles:" "void" { "id" "SEL" "id" "id" }
+    [ >r 3drop r> finder-run-files ]
+}
 
-    { "runFactorFile:" "id" { "id" "SEL" "id" }
-        [ 3drop menu-run-files f ]
-    }
+{ "newFactorWorkspace:" "id" { "id" "SEL" "id" }
+    [ 3drop workspace-window f ]
+}
 
-    { "saveFactorImage:" "id" { "id" "SEL" "id" }
-        [ 3drop save f ]
-    }
+{ "runFactorFile:" "id" { "id" "SEL" "id" }
+    [ 3drop menu-run-files f ]
+}
 
-    { "saveFactorImageAs:" "id" { "id" "SEL" "id" }
-        [ 3drop menu-save-image f ]
-    }
+{ "saveFactorImage:" "id" { "id" "SEL" "id" }
+    [ 3drop save f ]
+}
 
-    { "showFactorHelp:" "id" { "id" "SEL" "id" }
-        [ 3drop "handbook" <link> help-gadget call-tool f ]
-    }
-} define-objc-class
+{ "saveFactorImageAs:" "id" { "id" "SEL" "id" }
+    [ 3drop menu-save-image f ]
+}
+
+{ "showFactorHelp:" "id" { "id" "SEL" "id" }
+    [ 3drop "handbook" <link> help-gadget call-tool f ]
+} ;
 
 : install-app-delegate ( -- )
     NSApp FactorApplicationDelegate install-delegate ;
 
-: load-nib ( -- )
-    NSBundle
-    "Factor.nib" <NSString> NSApp -> loadNibNamed:owner:
-    drop ;
+: event-loop ( -- )
+    [ [ NSApp do-events ui-step ] ui-try ] with-autorelease-pool
+    event-loop ;
+
+TUPLE: pasteboard handle ;
+
+M: pasteboard clipboard-contents
+    pasteboard-handle pasteboard-string ;
+
+M: pasteboard set-clipboard-contents
+    pasteboard-handle set-pasteboard-string ;
+
+: init-clipboard ( -- )
+    NSPasteboard -> generalPasteboard <pasteboard>
+    clipboard set-global ;
 
 : init-cocoa ( -- )
-    load-nib
+    "Factor.nib" load-nib
     install-app-delegate
     register-services
     init-clipboard ;
 
-: rect>NSRect
+: world>NSRect ( world -- NSRect )
     dup world-loc first2 rot rect-dim first2 <NSRect> ;
 
 : gadget-window ( world -- )
     [
         dup <FactorView>
-        dup rot rect>NSRect <ViewWindow>
+        dup rot world>NSRect <ViewWindow>
         dup install-window-delegate
         over -> release
         2array
@@ -91,8 +102,10 @@ IN: gadgets
     world-handle second f -> makeKeyAndOrderFront: ;
 
 : raise-window ( world -- )
-    world-handle second dup f -> orderFront: -> makeKeyWindow
-    NSApp 1 -> activateIgnoringOtherApps: ;
+    world-handle [
+        second dup f -> orderFront: -> makeKeyWindow
+        NSApp 1 -> activateIgnoringOtherApps:
+    ] when* ;
 
 : select-gl-context ( handle -- )
     first -> openGLContext -> makeCurrentContext ;

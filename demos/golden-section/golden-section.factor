@@ -38,10 +38,10 @@ glPopMatrix ;
 : color ( i -- color ) 360.0 / dup 0.25 1 4array ;
 
 : rim ( quadric i -- )
-black first4 glColor4f dup radius 1.5 * swap center disk ;
+black gl-color dup radius 1.5 * swap center disk ;
 
 : inner ( quadric i -- )
-dup color first4 glColor4f dup radius swap center disk ;
+dup color gl-color dup radius swap center disk ;
 
 : dot ( quadric i -- ) 2dup rim inner ;
 

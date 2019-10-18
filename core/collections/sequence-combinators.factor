@@ -11,7 +11,7 @@ USING: arrays generic kernel kernel-internals math sequences ;
     [ [ -rot (collect) ] 3keep ] repeat nip ;
     inline
 
-: (each) ( seq quot i -- i )
+: (each) ( seq quot i -- seq quot i )
     [ rot nth-unsafe swap call ] 3keep ; inline
 
 : (2each) ( quot seq seq i -- quot seq seq i )
@@ -21,16 +21,9 @@ USING: arrays generic kernel kernel-internals math sequences ;
     2dup 1+ swap nth-unsafe >r swap nth-unsafe r> rot call ;
     inline
 
-: (interleave) ( n -- array )
-    dup zero? [
-        drop { }
-    ] [
-        t <array> f 0 pick set-nth-unsafe
-    ] if ;
-
 : find-step [ >r nth-unsafe r> call ] 3keep roll ; inline
 
-: find-fails [ 3drop -1 f ] if ; inline
+: find-fails [ 3drop f f ] if ; inline
 
 : if-bounds+ >r pick pick length < r> find-fails ; inline
 
@@ -85,7 +78,7 @@ IN: sequences
 : change-nth ( i seq quot -- )
     [ >r nth r> call ] 3keep drop set-nth ; inline
 
-: inject ( seq quot -- )
+: change-each ( seq quot -- )
     over length
     [ [ -rot change-nth-unsafe ] 3keep ] repeat 2drop ;
     inline
@@ -96,6 +89,9 @@ IN: sequences
 
 : 2each ( seq1 seq2 quot -- )
     -rot 2dup min-length [ (2each) ] repeat 3drop ; inline
+
+: 2reverse-each ( seq1 seq2 quot -- )
+    >r [ <reversed> ] 2apply r> 2each ; inline
 
 : 2reduce ( seq seq identity quot -- result )
     >r -rot r> 2each ; inline
@@ -142,10 +138,10 @@ IN: sequences
     [ = ] find-last-with* drop ;
 
 : contains? ( seq quot -- ? )
-    find drop -1 > ; inline
+    find drop >boolean ; inline
 
 : contains-with? ( obj seq quot -- ? )
-    find-with drop -1 > ; inline
+    find-with drop >boolean ; inline
 
 : member? ( obj seq -- ? )
     [ = ] contains-with? ;
@@ -178,12 +174,13 @@ IN: sequences
         [ (monotonic) ] 3keep drop rot
     ] all? 2nip ; inline
 
-: interleave ( seq quot between -- )
-    rot dup length (interleave) [
-        [ -rot [ -rot 2slip call ] 2keep ]
-        [ -rot [ drop call ] 2keep ]
-        if
-    ] 2each 2drop ; inline
+: (interleave) ( between quot elt first? -- )
+    [ rot drop ] [ 2slip ] if swap call ; inline
+
+: interleave ( seq between quot -- )
+    rot dup length
+    [ 2swap [ 2swap zero? (interleave) ] 2keep ] 2each
+    2drop ; inline
 
 : cache-nth ( i seq quot -- elt )
     pick pick ?nth dup [
@@ -200,4 +197,4 @@ IN: sequences
 
 : sequence= ( seq1 seq2 -- ? )
     2dup [ length ] 2apply tuck number=
-    [ (mismatch) -1 number= ] [ 3drop f ] if ; inline
+    [ (mismatch) not ] [ 3drop f ] if ; inline

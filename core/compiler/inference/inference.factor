@@ -3,7 +3,7 @@
 IN: inference
 USING: arrays errors generic io kernel
 math namespaces parser prettyprint sequences strings
-vectors words tools ;
+vectors words quotations ;
 
 TUPLE: inference-error rstate major? ;
 
@@ -31,7 +31,7 @@ M: object value-literal
 
 : add-inputs ( seq stack -- n stack )
     tuck [ length ] compare dup 0 >
-    [ dup value-vector [ swapd nappend ] keep ]
+    [ dup value-vector [ swapd push-all ] keep ]
     [ drop 0 swap ] if ;
 
 : ensure-values ( seq -- )
@@ -66,10 +66,6 @@ GENERIC: apply-object ( obj -- )
 M: object apply-object apply-literal ;
 
 M: wrapper apply-object wrapped apply-literal ;
-
-GENERIC: apply-word ( word -- )
-
-M: word apply-object apply-word ;
 
 : terminate ( -- )
     terminated? on #terminate node, ;
@@ -120,7 +116,7 @@ TUPLE: too-many-r> ;
         ] recover
     ] with-scope ;
 
-: infer ( quot -- effect infer-vars )
+: infer ( quot -- infer-vars effect )
     [ infer-quot inferred-vars get current-effect ] with-infer ;
 
 : vars. ( seq str -- )

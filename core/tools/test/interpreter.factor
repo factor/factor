@@ -65,7 +65,7 @@ unit-test
     [ 5 6 number= ] test-interpreter
 ] unit-test
 
-[ V{ -1 } ] [
+[ V{ f } ] [
     [ "XYZ" "XYZ" 3 (mismatch) ] test-interpreter
 ] unit-test
 

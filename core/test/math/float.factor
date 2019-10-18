@@ -1,7 +1,5 @@
 IN: temporary
-USE: kernel
-USE: math
-USE: test
+USING: kernel math test sequences ;
 
 [ t ] [ 0.0 float? ] unit-test
 [ t ] [ 3.1415 number? ] unit-test
@@ -76,3 +74,5 @@ unit-test
 ! [ t ] [ 0.0/0.0 0.0/0.0 = ] unit-test
 
 [ 0 ] [ 1/0. >bignum ] unit-test
+
+[ t ] [ 64 [ 2^ 0.5 * ] map [ < ] monotonic? ] unit-test

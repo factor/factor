@@ -1,350 +1,229 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets
-USING: definitions gadgets gadgets-browser gadgets-help
+IN: operations
+USING: arrays definitions gadgets gadgets-browser gadgets-help
 gadgets-listener gadgets-search gadgets-text gadgets-interactor
 gadgets-workspace hashtables help inference kernel namespaces
 parser prettyprint scratchpad sequences strings styles syntax
-test tools words generic models io modules errors ;
+test tools words generic models io modules errors quotations
+inspector gadgets-traceback ;
 
 V{ } clone operations set-global
 
-SYMBOL: +name+
-SYMBOL: +quot+
-SYMBOL: +listener+
-SYMBOL: +keyboard+
-SYMBOL: +primary+
-SYMBOL: +secondary+
-
-: (command) ( -- command )
-    +name+ get +keyboard+ get +quot+ get <command> ;
-
-C: operation ( predicate hash -- operation )
-    swap [
-        (command) over set-delegate
-        +primary+ get over set-operation-primary?
-        +secondary+ get over set-operation-secondary?
-        +listener+ get over set-operation-listener?
-    ] bind
-    [ set-operation-predicate ] keep ;
-
-M: operation invoke-command
-    [ operation-hook call ] keep
-    dup command-quot swap operation-listener?
-    [ curry call-listener ] [ call ] if ;
-
-: define-operation ( class props -- )
-    <operation> operations get push ;
-
-: modify-command ( quot command -- command )
-    clone
-    [ command-quot append ] keep
-    [ set-command-quot ] keep ;
-
-: modify-commands ( commands quot -- commands )
-    swap [ modify-command ] map-with ;
-
-: listener-operation ( hook quot operation -- operation )
-    modify-command
-    tuck set-operation-hook
-    t over set-operation-listener? ;
-
-: listener-operations ( operations hook quot -- operations )
-    rot [ >r 2dup r> listener-operation ] map 2nip ;
-
 ! Objects
-[ drop t ] H{
+[ drop t ] \ inspect H{
     { +primary+ t }
-    { +name+ "Inspect" }
-    { +quot+ [ inspect ] }
     { +listener+ t }
 } define-operation
 
-[ drop t ] H{
-    { +name+ "Prettyprint" }
-    { +quot+ [ . ] }
+: com-prettyprint . ;
+
+[ drop t ] \ com-prettyprint H{
     { +listener+ t }
 } define-operation
 
-[ drop t ] H{
-    { +name+ "Push" }
-    { +quot+ [ ] }
+: com-push ;
+
+[ drop t ] \ com-push H{
     { +listener+ t }
 } define-operation
 
-[ drop t ] H{
-    { +name+ "Edit object" }
-    { +quot+ [ unparse <input> listener-gadget call-tool ] }
-} define-operation
+: com-unparse unparse listener-input ;
+
+[ drop t ] \ com-unparse H{ } define-operation
 
 ! Input
-[ input? ] H{
+
+: com-input input-string listener-input ;
+
+[ input? ] \ com-input H{
     { +primary+ t }
     { +secondary+ t }
-    { +name+ "Input" }
-    { +quot+ [ listener-gadget call-tool ] }
 } define-operation
 
 ! Restart
-[ restart? ] H{
+[ restart? ] \ restart H{
     { +primary+ t }
     { +secondary+ t }
-    { +name+ "Restart" }
-    { +quot+ [ restart ] }
     { +listener+ t }
+} define-operation
+
+! Continuation
+[ continuation? ] \ traceback-window H{
+    { +primary+ t }
+    { +secondary+ t }
 } define-operation
 
 ! Pathnames
-[ pathname? ] H{
+: edit-file edit ;
+
+[ pathname? ] \ edit-file H{
+    { +keyboard+ T{ key-down f { C+ } "E" } }
     { +primary+ t }
     { +secondary+ t }
-    { +name+ "Edit" }
-    { +quot+ [ pathname-string edit-file ] }
 } define-operation
 
-[ pathname? ] H{
-    { +name+ "Run file" }
-    { +keyboard+ T{ key-down f { A+ } "r" } }
-    { +quot+ [ pathname-string run-file ] }
+: com-browse browser call-tool ;
+
+[ dup word? swap method-spec? or ] \ com-browse H{
+    { +primary+ t }
+    { +keyboard+ T{ key-down f { C+ } "B" } }
+} define-operation
+
+: definition? dup word? over method-spec? or swap link? or ;
+
+[ dup definition? swap module? or ] \ edit H{
+    { +keyboard+ T{ key-down f { C+ } "E" } }
+} define-operation
+
+[ dup definition? swap pathname? or ] \ reload H{
+    { +keyboard+ T{ key-down f { C+ } "R" } }
     { +listener+ t }
 } define-operation
 
-: definition-operations ( pred -- )
-    {
-        H{
-            { +primary+ t }
-            { +name+ "Browse" }
-            { +keyboard+ T{ key-down f { A+ } "b" } }
-            { +quot+ [ browser call-tool ] }
-        } H{
-            { +name+ "Edit" }
-            { +keyboard+ T{ key-down f { A+ } "e" } }
-            { +quot+ [ edit ] }
-        } H{
-            { +name+ "Reload" }
-            { +keyboard+ T{ key-down f { A+ } "r" } }
-            { +quot+ [ reload ] }
-            { +listener+ t }
-        } H{
-            { +name+ "Forget" }
-            { +quot+ [ forget ] }
-        }
-    } [ define-operation ] each-with ;
+[ definition? ] \ forget H{ } define-operation
 
 ! Words
-[ word? ] definition-operations
-
-: word-completion-string ( word listener -- string )
-    >r dup word-name swap word-vocabulary dup vocab r>
-    listener-gadget-input interactor-use memq?
-    [ drop ] [ [ "USE: " % % " " % % ] "" make ] if ;
-
-: insert-word ( word -- )
-    get-listener [ word-completion-string ] keep
-    listener-gadget-input user-input ;
-
-[ word? ] H{
+[ word? ] \ insert-word H{
     { +secondary+ t }
-    { +name+ "Insert" }
-    { +quot+ [ insert-word ] }
 } define-operation
 
-[ word? ] H{
-    { +name+ "Documentation" }
-    { +keyboard+ T{ key-down f { A+ } "h" } }
-    { +quot+ [ help-gadget call-tool ] }
+: com-word-help help-gadget call-tool ;
+
+[ word? ] \ com-word-help H{
+    { +keyboard+ T{ key-down f { C+ } "H" } }
 } define-operation
 
-[ word? ] H{
-    { +name+ "Usage" }
-    { +keyboard+ T{ key-down f { A+ } "u" } }
-    { +quot+ [ usage. ] }
+: com-usage ( word -- )
+    get-workspace swap show-word-usage ;
+
+[ word? ] \ com-usage H{
+    { +keyboard+ T{ key-down f { C+ } "U" } }
+} define-operation
+
+[ word? ] \ fix H{
+    { +keyboard+ T{ key-down f { C+ } "F" } }
     { +listener+ t }
 } define-operation
 
-[ word? ] H{
-    { +name+ "Watch" }
-    { +quot+ [ watch ] }
-} define-operation
+[ word? ] \ watch H{ } define-operation
 
-[ compound? ] H{
-    { +name+ "Word stack effect" }
-    { +quot+ [ word-def infer. ] }
+[ word? ] \ breakpoint H{ } define-operation
+
+GENERIC: com-stack-effect ( obj -- )
+
+M: quotation com-stack-effect infer. ;
+
+M: word com-stack-effect word-def com-stack-effect ;
+
+[ compound? ] \ com-stack-effect H{
     { +listener+ t }
 } define-operation
-
-! Methods
-[ method-spec? ] definition-operations
 
 ! Vocabularies
-[ vocab-link? ] H{
+: com-browse-vocabulary
+    vocab-link-name get-workspace swap show-vocab-words ;
+
+[ vocab-link? ] \ com-browse-vocabulary H{
     { +primary+ t }
-    { +name+ "Browse" }
-    { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ vocab-link-name get-workspace swap show-vocab-words ] }
+    { +keyboard+ T{ key-down f { C+ } "B" } }
 } define-operation
 
-[ vocab-link? ] H{
-    { +name+ "Enter in" }
-    { +keyboard+ T{ key-down f { A+ } "i" } }
-    { +quot+ [ vocab-link-name set-in ] }
+: com-enter-in vocab-link-name set-in ;
+
+[ vocab-link? ] \ com-enter-in H{
+    { +keyboard+ T{ key-down f { C+ } "I" } }
     { +listener+ t }
 } define-operation
 
-[ vocab-link? ] H{
+: com-use-vocabulary vocab-link-name use+ ;
+
+[ vocab-link? ] \ com-use-vocabulary H{
     { +secondary+ t }
-    { +name+ "Use" }
-    { +quot+ [ vocab-link-name use+ ] }
     { +listener+ t }
 } define-operation
 
-[ vocab-link? ] H{
-    { +name+ "Forget" }
-    { +quot+ [ vocab-link-name forget-vocab ] }
-} define-operation
+: com-forget-vocabulary vocab-link-name forget-vocab ;
+
+[ vocab-link? ] \ com-forget-vocabulary H{ } define-operation
 
 ! Modules
-[ module? ] H{
+: com-run-module module-name run-module ;
+
+[ dup module? swap module-link? or ] \ com-run-module H{
     { +secondary+ t }
-    { +name+ "Run" }
-    { +quot+ [ module-name run-module ] }
     { +listener+ t }
 } define-operation
 
-[ module? ] H{
-    { +name+ "Load" }
-    { +quot+ [ module-name require ] }
+: com-load-module module-name require ;
+
+[ dup module? swap module-link? or ] \ com-load-module H{
     { +listener+ t }
 } define-operation
 
-[ module? ] H{
-    { +name+ "Documentation" }
-    { +keyboard+ T{ key-down f { A+ } "h" } }
-    { +quot+ [ module-help [ help-gadget call-tool ] when* ] }
-} define-operation
+: com-module-help module-help [ help-gadget call-tool ] when* ;
 
-[ module? ] H{
-    { +name+ "Edit" }
-    { +keyboard+ T{ key-down f { A+ } "e" } }
-    { +quot+ [ edit ] }
+[ module? ] \ com-module-help H{
+    { +keyboard+ T{ key-down f { C+ } "H" } }
 } define-operation
 
 : browse-module ( module -- )
-    get-workspace swap show-module-files ;
+    module-name dup require
+    get-workspace swap module show-module-files ;
 
-[ module? ] H{
+[ dup module? swap module-link? or ] \ browse-module H{
     { +primary+ t }
-    { +name+ "Browse" }
-    { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ browse-module ] }
+    { +keyboard+ T{ key-down f { C+ } "B" } }
 } define-operation
 
-[ module? ] H{
-    { +name+ "See" }
-    { +quot+ [ browser call-tool ] }
-} define-operation
+: com-test-module module-name test-module ;
 
-[ module? ] H{
-    { +name+ "Test" }
-    { +quot+ [ module-name test-module ] }
-    { +keyboard+ T{ key-down f { A+ } "t" } }
-    { +listener+ t }
-} define-operation
-
-! Module links
-[ module-link? ] H{
-    { +secondary+ t }
-    { +name+ "Run" }
-    { +quot+ [ module-name run-module ] }
-    { +listener+ t }
-} define-operation
-
-[ module-link? ] H{
-    { +name+ "Load" }
-    { +quot+ [ module-name require ] }
-    { +listener+ t }
-} define-operation
-
-[ module-link? ] H{
-    { +primary+ t }
-    { +name+ "Browse" }
-    { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ module-name dup require module browse-module ] }
+[ module? ] \ com-test-module H{
+    { +keyboard+ T{ key-down f { C+ } "T" } }
     { +listener+ t }
 } define-operation
 
 ! Link
-[ link? ] H{
+[ link? ] \ com-follow H{
     { +primary+ t }
     { +secondary+ t }
-    { +name+ "Follow" }
-    { +quot+ [ help-gadget call-tool ] }
 } define-operation
 
-[ link? ] H{
-    { +name+ "Edit" }
-    { +keyboard+ T{ key-down f { A+ } "e" } }
-    { +quot+ [ edit ] }
-} define-operation
+: com-definition link-name com-browse ;
 
-[ link? ] H{
-    { +name+ "Reload" }
-    { +keyboard+ T{ key-down f { A+ } "r" } }
-    { +quot+ [ reload ] }
-} define-operation
-
-[ word-link? ] H{
-    { +name+ "Definition" }
-    { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ link-name browser call-tool ] }
+[ word-link? ] \ com-definition H{
+    { +keyboard+ T{ key-down f { C+ } "B" } }
 } define-operation
 
 ! Quotations
-[ quotation? ] H{
-    { +name+ "Quotation stack effect" }
+[ quotation? ] \ com-stack-effect H{
     { +keyboard+ T{ key-down f { C+ } "i" } }
-    { +quot+ [ infer. ] }
     { +listener+ t }
 } define-operation
 
-[ quotation? ] H{
-    { +name+ "Walk" }
+[ quotation? ] \ walk H{
     { +keyboard+ T{ key-down f { C+ } "w" } }
-    { +quot+ [ walk ] }
     { +listener+ t }
 } define-operation
 
-[ quotation? ] H{
-    { +name+ "Time" }
+[ quotation? ] \ time H{
     { +keyboard+ T{ key-down f { C+ } "t" } }
-    { +quot+ [ time ] }
     { +listener+ t }
 } define-operation
 
-! Define commands in terms of operations
+! Operations -> commands
+source-editor
+"word"
+"These commands operate on the Factor word named by the token at the caret position."
+\ selected-word
+[ selected-word ]
+[ search ] 
+define-operation-map
 
-! Interactor commands
-: quot-action ( interactor -- quot )
-    dup editor-string swap
-    2dup add-interactor-history
-    select-all ;
-
-interactor "words"
-{ word compound } [ class-operations ] map concat
-[ selected-word ] [ search ] listener-operations
-define-commands
-
-interactor "quotations"
-quotation class-operations
-[ quot-action ] [ parse ] listener-operations
-define-commands
-
-help-gadget "toolbar" {
-    { "Back" T{ key-down f { C+ } "b" } [ help-gadget-history go-back ] }
-    { "Forward" T{ key-down f { C+ } "f" } [ help-gadget-history go-forward ] }
-    { "Home" T{ key-down f { C+ } "1" } [ go-home ] }
-}
-link class-operations [ help-action ] modify-commands
-[ command-name "Follow" = not ] subset
-append
-define-commands
+interactor
+"quotation"
+"These commands operate on the entire contents of the input area."
+[ ]
+[ quot-action ]
+[ parse ]
+define-operation-map

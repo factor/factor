@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 void default_parameters(F_PARAMETERS *p)
 {
@@ -13,16 +13,19 @@ void default_parameters(F_PARAMETERS *p)
 	p->secure_gc = false;
 }
 
-void init_environment(void)
-{
-	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
-	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
-	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
-}
-
 /* Get things started */
 void init_factor(F_PARAMETERS *p)
 {
+	/* Kilobytes */
+	p->ds_size = align_page(p->ds_size << 10);
+	p->rs_size = align_page(p->rs_size << 10);
+	p->cs_size = align_page(p->cs_size << 10);
+
+	/* Megabytes */
+	p->young_size <<= 20;
+	p->aging_size <<= 20;
+	p->code_size <<= 20;
+
 	gc_off = true;
 
 	early_init();
@@ -37,10 +40,13 @@ void init_factor(F_PARAMETERS *p)
 	load_image(p);
 	init_c_io();
 	init_signals();
-	init_environment();
-	nest_stacks();
-	call(userenv[BOOT_ENV]);
-	
+
+	stack_chain = NULL;
+
+	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
+	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
+	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
+
 	gc_off = false;
 }
 
@@ -56,10 +62,12 @@ INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
 		return false;
 }
 
-void init_factor_from_args(int argc, char **argv)
+void init_factor_from_args(F_CHAR *image, int argc, char **argv, bool embedded)
 {
 	F_PARAMETERS p;
 	default_parameters(&p);
+
+	if(image) p.image = image;
 
 	CELL i;
 
@@ -75,18 +83,8 @@ void init_factor_from_args(int argc, char **argv)
 		else if(strcmp(argv[i],"-securegc") == 0)
 			p.secure_gc = true;
 		else if(strncmp(argv[i],"-i=",3) == 0)
-			p.image = argv[i] + 3;
+			p.image = char_to_F_CHAR((char*)argv[i] + 3);
 	}
-
-	/* Kilobytes */
-	p.ds_size = align_page(p.ds_size << 10);
-	p.rs_size = align_page(p.rs_size << 10);
-	p.cs_size = align_page(p.cs_size << 10);
-
-	/* Megabytes */
-	p.young_size <<= 20;
-	p.aging_size <<= 20;
-	p.code_size <<= 20;
 
 	init_factor(&p);
 
@@ -102,11 +100,27 @@ void init_factor_from_args(int argc, char **argv)
 
 	userenv[ARGS_ENV] = tag_object(args);
 	userenv[EXECUTABLE_ENV] = tag_object(from_char_string(argv[0]));
+	userenv[EMBEDDED_ENV] = (embedded ? T : F);
+
+	nest_stacks();
+	call(userenv[BOOT_ENV]);
+	run_toplevel();
+	unnest_stacks();
 }
 
-int main(int argc, char **argv)
+char *factor_eval_string(char *string)
 {
-	init_factor_from_args(argc,argv);
-	run_toplevel();
-	return 0;
+	char* (*callback)(char*) = alien_offset(userenv[EVAL_CALLBACK_ENV]);
+	return callback(string);
+}
+
+void factor_eval_free(char *result)
+{
+	free(result);
+}
+
+void factor_yield(void)
+{
+	void (*callback)() = alien_offset(userenv[YIELD_CALLBACK_ENV]);
+	callback();
 }

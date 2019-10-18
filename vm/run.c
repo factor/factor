@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 void init_interpreter(void)
 {
@@ -6,6 +6,7 @@ void init_interpreter(void)
 	callframe.scan = 0;
 	callframe.end = 0;
 	thrown_error = F;
+	profiling = false;
 }
 
 INLINE void push_callframe(void)
@@ -61,21 +62,16 @@ void handle_error(void)
 
 void interpreter_loop(void)
 {
+	F_INTERP_FRAME *bot = cs_bot;
+
 	for(;;)
 	{
 		/* done current quotation? */
 		if(callframe.scan == callframe.end)
 		{
 			/* done with the whole stack? */
-			if(cs_bot == cs)
-			{
-				/* if we don't have a callback to return to,
-				throw an error */
-				if(stack_chain->next)
-					return;
-				else
-					simple_error(ERROR_CS_UNDERFLOW,F,F);
-			}
+			if(bot == cs)
+				return;
 			/* return to caller quotation */
 			else
 				callframe = *(--cs);
@@ -84,13 +80,17 @@ void interpreter_loop(void)
 		{
 			/* look at current object */
 			CELL next = get(callframe.scan);
+			F_WORD *next_word;
 			callframe.scan += CELLS;
 
 			/* execute words, push literals on data stack */
 			switch(TAG(next))
 			{
 			case WORD_TYPE:
-				execute(untag_word_fast(next));
+				next_word = untag_word_fast(next);
+				if(profiling)
+					next_word->counter += tag_fixnum(1);
+				execute(next_word);
 				break;
 			case WRAPPER_TYPE:
 				dpush(untag_wrapper_fast(next)->object);
@@ -172,6 +172,11 @@ void primitive_setenv(void)
 	userenv[e] = value;
 }
 
+void primitive_profiling(void)
+{
+	profiling = to_boolean(dpop());
+}
+
 void primitive_exit(void)
 {
 	exit(to_fixnum(dpop()));
@@ -222,15 +227,6 @@ void primitive_set_slot(void)
 	CELL obj = UNTAG(dpop());
 	CELL value = dpop();
 	set_slot(obj,slot,value);
-}
-
-void primitive_clone(void)
-{
-	CELL size = object_size(dpeek());
-	void *new_obj = allot(size);
-	CELL tag = TAG(dpeek());
-	memcpy(new_obj,(void*)UNTAG(dpeek()),size);
-	drepl(RETAG(new_obj,tag));
 }
 
 void fatal_error(char* msg, CELL tagged)
@@ -346,7 +342,7 @@ bool in_page(CELL fault, CELL area, CELL area_size, int offset)
 	return fault >= area && fault <= area + pagesize;
 }
 
-void memory_protection_error(CELL addr, int signal, F_COMPILED_FRAME *native_stack)
+void memory_protection_error(CELL addr, F_COMPILED_FRAME *native_stack)
 {
 	gc_off = true;
 
@@ -369,7 +365,7 @@ void memory_protection_error(CELL addr, int signal, F_COMPILED_FRAME *native_sta
 	else if(in_page(addr, extra_roots_region->end, 0, 0))
 		critical_error("local root overflow",0);
 	else
-		signal_error(signal,native_stack);
+		general_error(ERROR_MEMORY,allot_cell(addr),F,false,native_stack);
 }
 
 void signal_error(int signal, F_COMPILED_FRAME *native_stack)
@@ -388,7 +384,7 @@ void divide_by_zero_error(void)
 	simple_error(ERROR_DIVIDE_BY_ZERO,F,F);
 }
 
-void memory_error(void)
+void primitive_error(void)
 {
-	simple_error(ERROR_MEMORY,F,F);
+	simple_error(ERROR_PRIMITIVE,F,F);
 }

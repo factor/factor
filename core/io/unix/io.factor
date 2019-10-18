@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien bit-arrays errors generic hashtables io
+USING: alien bit-arrays errors generic assocs io
 kernel kernel-internals math nonblocking-io sequences strings
 sbufs threads unix-internals vectors buffers ;
 IN: io-internals
@@ -16,7 +16,7 @@ SYMBOL: write-fdset
 SYMBOL: write-tasks
 
 ! Some general stuff
-: file-mode OCT: 0600 ;
+: file-mode OCT: 0666 ;
 
 : (io-error) ( -- * ) err_no strerror throw ;
 
@@ -30,9 +30,6 @@ M: integer init-handle ( fd -- )
     #! when running the Factor.app (presumably because fd 0 and
     #! 1 are closed).
     F_SETFL O_NONBLOCK fcntl drop ;
-
-: pending-error ( port -- )
-    dup port-error f rot set-port-error [ throw ] when* ;
 
 : report-error ( error port -- )
     [ "Error on fd " % dup port-handle # ": " % swap % ] "" make
@@ -53,6 +50,8 @@ C: io-task ( port -- task )
     [ set-io-task-port ] keep
     V{ } clone over set-io-task-callbacks ;
 
+: delegate>io-task >r <io-task> r> set-delegate ;
+
 ! Multiplexer
 GENERIC: do-io-task ( task -- ? )
 GENERIC: task-container ( task -- vector )
@@ -61,12 +60,12 @@ GENERIC: task-container ( task -- vector )
 
 : add-io-task ( callback task -- )
     [ io-task-callbacks push ] keep
-    dup io-task-fd over task-container 2dup hash [
+    dup io-task-fd over task-container 2dup at [
         "Cannot perform multiple reads from the same port" throw
-    ] when set-hash ;
+    ] when set-at ;
 
 : remove-io-task ( task -- )
-    dup io-task-fd swap task-container remove-hash ;
+    dup io-task-fd swap task-container delete-at ;
 
 : pop-callbacks ( task -- )
     dup io-task-callbacks swap remove-io-task
@@ -85,12 +84,11 @@ GENERIC: task-container ( task -- vector )
             tuck io-task-fd swap nth
             [ handle-fd ] [ drop ] if
         ] if
-    ] hash-each-with ;
+    ] assoc-each-with ;
 
-: init-fdset ( fdset tasks -- fdset )
-    >r dup dup clear-bits r>
-    [ drop t swap rot set-nth ] hash-each-with
-    bit-array-store ;
+: init-fdset ( fdset tasks -- )
+    >r dup clear-bits r>
+    [ drop t swap rot set-nth ] assoc-each-with ;
 
 : read-fdset/tasks
     read-fdset get-global read-tasks get-global ;
@@ -99,8 +97,8 @@ GENERIC: task-container ( task -- vector )
     write-fdset get-global write-tasks get-global ;
 
 : init-fdsets ( -- read write except )
-    read-fdset/tasks init-fdset
-    write-fdset/tasks init-fdset
+    read-fdset/tasks dupd init-fdset
+    write-fdset/tasks dupd init-fdset
     f ;
 
 : (io-multiplex) ( ms -- )
@@ -163,8 +161,7 @@ M: input-port (wait-to-read)
 
 TUPLE: write-task ;
 
-C: write-task ( port -- task )
-    [ >r <io-task> r> set-delegate ] keep ;
+C: write-task ( port -- task ) [ delegate>io-task ] keep ;
 
 M: write-task do-io-task
     io-task-port dup buffer-length zero? over port-error or
@@ -173,7 +170,7 @@ M: write-task do-io-task
 M: write-task task-container drop write-tasks get-global ;
 
 : add-write-io-task ( callback task -- )
-    dup io-task-fd write-tasks get-global hash
+    dup io-task-fd write-tasks get-global at
     [ io-task-callbacks push ] [ add-io-task ] ?if ;
 
 : (wait-to-write) ( port -- )
@@ -210,5 +207,7 @@ USE: io
         FD_SETSIZE 8 * <bit-array> read-fdset set
         H{ } clone write-tasks set
         FD_SETSIZE 8 * <bit-array> write-fdset set
-        0 1 <fd-stream> stdio set
     ] bind ;
+
+: init-stdio ( -- )
+    0 1 <fd-stream> stdio set ;

@@ -46,14 +46,21 @@ M: c-stream stream-close
     >r f <c-stream> <line-reader> f r> <c-stream> <plain-writer>
     <duplex-stream> ;
 
-: init-c-io ( -- )
+: init-c-stdio ( -- )
     13 getenv 14 getenv <duplex-c-stream> stdio set ;
+
+TUPLE: c-stream-error ;
+: c-stream-error ( -- * ) <c-stream-error> throw ;
 
 IN: io-internals
 
-: init-io init-c-io ;
+: init-io ;
+
+: init-stdio init-c-stdio ;
 
 : io-multiplex ( ms -- ) drop ;
+
+: directory-fixup ( seq -- seq ) ;
 
 IN: io
 
@@ -63,11 +70,15 @@ IN: io
 : <file-writer> ( path -- stream )
     "wb" fopen f swap <c-stream> <plain-writer> ;
 
-TUPLE: client-stream host port ;
+IN: network
 
-TUPLE: c-stream-error ;
-: c-stream-error ( -- * ) <c-stream-error> throw ;
+TUPLE: client-stream host port ;
 
 : <client> ( host port -- stream ) c-stream-error ;
 : <server> ( port -- server ) c-stream-error ;
 : accept ( server -- stream ) c-stream-error ;
+
+: <datagram> ( port -- datagram ) c-stream-error ;
+
+: receive ( datagram -- packet host port ) c-stream-error ;
+: send ( packet host port datagram -- ) c-stream-error ;

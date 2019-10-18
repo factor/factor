@@ -2,16 +2,18 @@ USING: help io prettyprint prettyprint-internals ;
 
 ARTICLE: "prettyprint" "The prettyprinter"
 "One of Factor's key features is the ability to print almost any object as a valid source literal expression. This greatly aids debugging and provides the building blocks for light-weight object serialization facilities."
-$terpri
+$nl
 "Prettyprinter words are found in the " { $vocab-link "prettyprint" } " vocabulary."
-$terpri
+$nl
 "The key words to print an object to the " { $link stdio } " stream; the first two emit a trailing newline, the second two do not:"
 { $subsection . }
 { $subsection short. }
 { $subsection pprint }
 { $subsection pprint-short }
+{ $subsection pprint-use }
 "The string representation of an object can be requested:"
 { $subsection unparse }
+{ $subsection unparse-use }
 "Advanced topics:"
 { $subsection "prettyprint-limitations" }
 { $subsection "prettyprint-variables" }
@@ -19,11 +21,14 @@ $terpri
 ;
 
 ARTICLE: "prettyprint-limitations" "Prettyprinter limitations"
-"The prettyprinter has some limitations; namely, the following objects may not print in a readable form:"
+"When using the prettyprinter as a serialization mechanism, keep the following points in mind:"
 { $list
-    { "When printing words, no " { $link POSTPONE: USE: } " declarations are output, hence the result may not be immediately readable without prefixing appropriate declarations." }
+    { "When printing words, " { $link POSTPONE: USING: } " declarations are only output if the " { $link pprint-use } " or " { $link unparse-use } "  words are used." }
+    { "Long output will be truncated if certain " { $link "prettyprint-variables" } " are set." }
     "Shared structure is not reflected in the printed output; if the output is parsed back in, fresh objects are created for all literal denotations."
-    { "Circular structure is not printed in a readable way. Circular references print as " { $snippet "#" } "." }
+    { "Circular structure is not printed in a readable way. For example, try this:"
+        { $code "{ f } dup 0 over set-nth ." }
+    }
     "Floating point numbers might not equal themselves after being printed and read, since a decimal representation of a float is inexact."
 }
 "On a final note, the " { $link short. } " and " { $link pprint-short } " words restrict the length and nesting of printed sequences, their output will very likely not be valid syntax. They are only intended for interactive use." ;
@@ -39,26 +44,33 @@ ARTICLE: "prettyprint-variables" "Prettyprint control variables"
 "Note that the " { $link short. } " and " { $link pprint-short } " variables override some of these variables."
 {
     $warning "Treat the global variables as essentially being constants. Only ever rebind them in a nested scope."
-    $terpri
+    $nl
     "Some of the globals are safe to change, like the tab size and wrap margin. However setting limits globally could break code which uses the prettyprinter as a serialization mechanism."
 } ;
 
 ARTICLE: "prettyprint-extension" "Extending the prettyprinter"
 "It is possible to define literal syntax for a new class using the " { $link "parser" } ", and then define a corresponding prettyprint method for the class which reproduces the literal syntax."
-$terpri
+$nl
 "The prettyprinter maintains some internal state while prettyprinting. First, the object graph is traversed and a tree of " { $emphasis "sections" } " is produced. A section is either a text node or a " { $emphasis "block" } " which itself consists of sections."
-$terpri
+$nl
 "Once the output is divided into sections, the tree is traversed and intelligent decisions are made about indentation and line breaks. If a block does not fit on the remainder of the current line, a newline is output before and after the block, and additional indentation is used when printing the block."
-$terpri
+$nl
 "The following generic word is called to output a prettyprinting section for an object:"
 { $subsection pprint* }
+"New methods can be defined. These methods do not use I/O operations directly, instead they call prettyprinter words to construct sections of output."
+{ $subsection section }
 "Two types of leaf sections:"
 { $subsection text }
-{ $subsection newline }
+{ $subsection break }
 "Nesting and denesting is done using a set words:"
+{ $subsection <block }
 { $subsection <inset }
 { $subsection <flow }
-{ $subsection <narrow }
-{ $subsection <defblock }
+{ $subsection <colon }
 { $subsection block> }
-"Recall that since " { $link text } " sections take style hashtables as input, any type of formatted text can be output, including presentations. See " { $link "styles" } " to explore the possibility." ;
+"Recall that since " { $link text } " sections take style hashtables as input, any type of formatted text can be output, including presentations. See " { $link "styles" } " to explore the possibility."
+$nl
+"The prettyprinter first builds up a tree of sections, then calculates line wrapping and indent, and produces output."
+$nl
+"Another way to use the prettyprinter:"
+{ $subsection with-pprint } ;

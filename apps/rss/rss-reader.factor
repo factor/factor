@@ -9,7 +9,8 @@
 !   > [eof]
 !
 IN: rss
-USING: kernel html cont-responder namespaces sequences io hashtables sqlite errors tuple-db ;
+USING: kernel html cont-responder namespaces sequences io
+quotations assocs sqlite errors tuple-db ;
    
 TUPLE: reader-feed url title link ;
 TUPLE: reader-entry url link title description pubdate ;
@@ -50,7 +51,7 @@ SYMBOL: db
         </form>
       </body>
     </html>
-  ] show "url" swap hash ;
+  ] show "url" swap at ;
 
 : get-entries ( url -- entries )
   f f f f <reader-entry> db get swap find-tuples ;

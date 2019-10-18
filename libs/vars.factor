@@ -2,7 +2,7 @@
 
 ! Thanks to Mackenzie Straight for the idea
 
-USING: kernel parser words namespaces sequences ;
+USING: kernel parser words namespaces sequences quotations ;
 
 IN: vars
 
@@ -23,9 +23,6 @@ dup define-var-symbol dup define-var-getter define-var-setter ;
 : define-vars ( seq -- ) [ define-var ] each ;
 
 : VARS: ! vars ...
-string-mode on [ string-mode off define-vars ] f ; parsing
-
-: let ( vars body -- result )
-[ >r <reversed> [ set ] each r> call ] with-scope ;
+";" parse-tokens define-vars ; parsing
 
 PROVIDE: libs/vars ;

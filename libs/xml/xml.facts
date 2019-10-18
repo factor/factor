@@ -156,7 +156,7 @@ HELP: <instruction> ( text -- instruction )
 HELP: names-match?
 { $values { "name1" "a name" } { "name2" "a name" } { "?" "t or f" } }
 { $description "checks to see if the two names match, that is, if all fields are equal, ignoring fields whose value is f in either name." }
-{ $example "T{ name f \"rpc\" \"methodCall\" f } T{ name f f \"methodCall\" \"http://www.xmlrpc.org/\" } names-match? ! => t" }
+{ $example "USE: xml-data" "T{ name f \"rpc\" \"methodCall\" f } T{ name f f \"methodCall\" \"http://www.xmlrpc.org/\" } names-match? ." "t" }
 { $see-also name } ;
 
 HELP: xml-chunk
@@ -348,7 +348,7 @@ HELP: file>xml
 
 ARTICLE: { "xml" "intro" } "XML"
     "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress."
-    $terpri
+    $nl
     "The XML module was implemented by Daniel Ehrenberg, with contributions from the Factor community"
     { $subsection { "xml" "basic" } }
     { $subsection { "xml" "classes" } }
@@ -361,7 +361,7 @@ ARTICLE: { "xml" "intro" } "XML"
 
 ARTICLE: { "xml" "basic" } "Basic words for XML processing"
     "These are the most basic words needed for processing an XML document"
-    $terpri
+    $nl
     "Parsing XML:"
     { $subsection string>xml }
     { $subsection read-xml }
@@ -398,7 +398,7 @@ ARTICLE: { "xml" "construct" } "XML data constructors"
 
 ARTICLE: { "xml" "utils" } "XML processing utilities"
     "Utilities for processing XML include..."
-    $terpri
+    $nl
     "System sfor creating words which dispatch on XML tags:"
     { $subsection POSTPONE: PROCESS: }
     { $subsection POSTPONE: TAG: }
@@ -408,7 +408,7 @@ ARTICLE: { "xml" "utils" } "XML processing utilities"
     { $subsection xml-subset }
     { $subsection xml-find }
     "Getting parts of an XML document or tag:"
-    $terpri
+    $nl
     "Note: the difference between tag-named* and tag-named is that the former searches recursively among all children and children of children of the tag, while the latter only looks at the direct children, and is therefore more efficient."
     { $subsection tag-named }
     { $subsection tags-named }
@@ -459,7 +459,7 @@ ARTICLE: { "xml" "errors" } "XML parsing errors"
     { $subsection no-entity }
     { $subsection pre/post-content }
     "Additionally, most of these errors delegate to " { $link parsing-error } " in order to provide more information"
-    $terpri
+    $nl
     "Note that, in parsing an XML document, only the first error is reported." ;
 
 ARTICLE: { "xml" "entities" } "XML entities"

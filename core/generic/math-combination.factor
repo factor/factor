@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
 USING: arrays errors generic hashtables kernel kernel-internals
-math namespaces sequences words ;
+math namespaces sequences words quotations ;
 
 PREDICATE: class math-class ( object -- ? )
     dup null bootstrap-word eq? [
@@ -19,7 +19,7 @@ PREDICATE: class math-class ( object -- ? )
     } cond ;
     
 : math-class-max ( class class -- class )
-    [ [ math-precedence ] compare 0 > ] 2keep ? ;
+    [ [ math-precedence ] compare 0 > ] most ;
 
 : (math-upgrade) ( max class -- quot )
     dupd = [
@@ -63,7 +63,7 @@ TUPLE: no-math-method left right generic ;
     ] [ ] make ; inline
 
 : math-vtable ( picker quot -- quot )
-    num-tags swap math-vtable* ; inline
+    num-tags get swap math-vtable* ; inline
 
 : math-combination ( word -- quot )
     \ over [

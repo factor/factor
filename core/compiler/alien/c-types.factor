@@ -1,25 +1,52 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: byte-arrays arrays generator errors generic hashtables
+USING: byte-arrays arrays generator errors generic assocs
 kernel kernel-internals libc math namespaces parser sequences
-strings words ;
+strings words assocs ;
 
 TUPLE: c-type
 boxer prep unboxer
 getter setter
-reg-class size align ;
+reg-class size align stack-align? ;
 
-C: c-type ( -- type )
-    T{ int-regs f } over set-c-type-reg-class ;
+C: c-type ( -- type ) T{ int-regs } over set-c-type-reg-class ;
 
 SYMBOL: c-types
 
 TUPLE: no-c-type name ;
+
 : no-c-type ( type -- * ) <no-c-type> throw ;
 
-: c-type ( name -- type )
-    dup c-types get hash [ ] [ no-c-type ] ?if ;
+: (c-type) ( name -- type/f )
+    c-types get at dup [
+        dup string? [ (c-type) ] when
+    ] when ;
+
+GENERIC: c-type ( name -- type )
+
+: resolve-pointer-type ( name -- name )
+    c-types get at dup string?
+    [ "*" append ] [ drop "void*" ] if
+    c-type ;
+
+: resolve-typedef ( name -- type )
+    dup string? [ c-type ] when ;
+
+: parse-array-type ( name -- array )
+    "[" split unclip
+    >r [ "]" ?tail drop string>number ] map r> add* ;
+
+M: string c-type ( name -- type )
+    CHAR: ] over member? [
+        parse-array-type
+    ] [
+        dup c-types get at [
+            resolve-typedef
+        ] [
+            "*" ?tail [ resolve-pointer-type ] [ no-c-type ] if
+        ] ?if
+    ] if ;
 
 : c-type-box ( n type -- )
     dup c-type-reg-class
@@ -30,6 +57,10 @@ TUPLE: no-c-type name ;
     dup c-type-reg-class
     swap c-type-unboxer [ "No unboxer" throw ] unless*
     %unbox ;
+
+M: string c-type-align c-type c-type-align ;
+
+M: string c-type-stack-align? c-type c-type-stack-align? ;
 
 GENERIC: box-parameter ( n ctype -- )
 
@@ -55,7 +86,11 @@ M: c-type unbox-return f swap c-type-unbox ;
 
 M: string unbox-return c-type unbox-return ;
 
-: heap-size ( name -- size ) c-type c-type-size ;
+GENERIC: heap-size ( type -- size )
+
+M: string heap-size c-type heap-size ;
+
+M: c-type heap-size ( name -- size ) c-type-size ;
 
 GENERIC: stack-size ( name -- size )
 
@@ -83,7 +118,7 @@ M: c-type stack-size c-type-size ;
 
 : malloc-object ( type -- alien ) 1 swap malloc-array ;
 
-: malloc-byte-array ( string array -- alien )
+: malloc-byte-array ( byte-array len -- alien )
     dup malloc check-ptr [ -rot memcpy ] keep ;
 
 : malloc-char-string ( string -- alien )
@@ -92,16 +127,12 @@ M: c-type stack-size c-type-size ;
 : malloc-u16-string ( string -- alien )
     dup string>u16-alien swap length 1 + 2 * malloc-byte-array ;
 
-: (typedef) ( old new -- ) c-types get [ >r get r> set ] bind ;
-
-: define-pointer ( type -- ) "*" append "void*" swap (typedef) ;
-
 : define-deref ( name vocab -- )
-    >r dup "*" swap append r> create
-    swap c-getter 0 add* define-compound ;
+    >r dup CHAR: * add* r> create
+    swap c-getter 0 add* define-inline ;
 
 : (define-nth) ( word type quot -- )
-    >r heap-size [ rot * ] swap add* r> append define-compound ;
+    >r heap-size [ rot * ] swap add* r> append define-inline ;
 
 : define-nth ( name vocab -- )
     >r dup "-nth" append r> create
@@ -115,9 +146,6 @@ M: c-type stack-size c-type-size ;
     over [ <c-object> tuck 0 ] over c-setter append swap
     >r >r constructor-word r> r> add* define-compound ;
 
-: init-c-type ( name vocab -- )
-    over define-pointer define-nth ;
-
 : <primitive-type> ( getter setter width boxer unboxer -- type )
     <c-type>
     [ set-c-type-unboxer ] keep
@@ -127,21 +155,29 @@ M: c-type stack-size c-type-size ;
     [ set-c-type-setter ] keep
     [ set-c-type-getter ] keep ;
 
-: define-c-type ( type name vocab -- )
-    >r [ c-types get set-hash ] keep r>
-    over define-pointer
-    define-nth ;
+: typedef ( old new -- ) c-types get set-at ;
 
-: define-primitive-type ( getter setter width boxer unboxer name -- )
-    >r <primitive-type> r> "alien"
+: define-c-type ( type name vocab -- )
+    >r tuck typedef r> [ define-nth ] 2keep define-set-nth ;
+
+: define-primitive-type ( type name -- )
+    "alien"
     [ define-c-type ] 2keep
     [ define-deref ] 2keep
-    [ define-set-nth ] 2keep
     define-out ;
 
-: typedef ( old new -- )
-    over "*" append over "*" append (typedef) (typedef) ;
+TUPLE: long-long-type ;
 
-: >int-array ( seq -- <int-array> )
-    dup length dup "int" <c-array> -rot
-    [ pick set-int-nth ] 2each ;
+C: long-long-type ( type -- type ) [ set-delegate ] keep ;
+
+M: long-long-type unbox-parameter ( n type -- )
+    c-type-unboxer %unbox-long-long ;
+
+M: long-long-type unbox-return ( type -- )
+    f swap unbox-parameter ;
+
+M: long-long-type box-parameter ( n type -- )
+    c-type-boxer %box-long-long ;
+
+M: long-long-type box-return ( type -- )
+    f swap box-parameter ;

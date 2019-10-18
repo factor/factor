@@ -83,7 +83,7 @@ C: document ( -- document )
     tuck loc-col/str tail-slice >r loc-col/str head-slice r>
     pick append-last over prepend-first ;
 
-: (set-doc-range) ( newlines from to lines -- newlines )
+: (set-doc-range) ( newlines from to lines -- )
     [ prepare-insert ] 3keep
     >r [ first ] 2apply 1+ r>
     replace-slice ;
@@ -91,7 +91,7 @@ C: document ( -- document )
 : set-doc-range ( string from to document -- )
     [
         >r >r >r string-lines r> [ text+loc ] 2keep r> r>
-        [ (set-doc-range) ] change-model
+        [ [ (set-doc-range) ] keep ] change-model
     ] keep update-locs ;
 
 : remove-doc-range ( from to document -- )
@@ -106,10 +106,6 @@ C: document ( -- document )
 : validate-col ( col line document -- col )
     doc-line length min 0 max ;
 
-: validate-loc ( loc document -- newloc )
-    >r first2 swap r> [ validate-line ] keep
-    >r tuck r> validate-col 2array ;
-
 : line-end ( line# document -- loc )
     dupd doc-line length 2array ;
 
@@ -119,11 +115,22 @@ C: document ( -- document )
 : doc-end ( document -- loc )
     [ last-line# ] keep line-end ;
 
+: validate-loc ( loc document -- newloc )
+    over first over model-value length >= [
+        nip doc-end
+    ] [
+        over first 0 < [
+            2drop { 0 0 }
+        ] [
+            >r first2 swap tuck r> validate-col 2array
+        ] if
+    ] if ;
+
 : doc-string ( document -- str )
     model-value "\n" join ;
 
 : set-doc-string ( string document -- )
-    >r string-lines r> [ set-model ] keep
+    >r string-lines V{ } like r> [ set-model ] keep
     dup doc-end swap update-locs ;
 
 : clear-doc ( document -- )

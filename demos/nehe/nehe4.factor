@@ -13,7 +13,7 @@ C: nehe4-gadget (  -- gadget )
   [ delegate>gadget ] keep ;
 
 M: nehe4-gadget pref-dim* ( gadget -- dim )
-  drop width height 0 3array ;
+  drop width height 2array ;
 
 M: nehe4-gadget draw-gadget* ( gadget -- )
   GL_PROJECTION glMatrixMode
@@ -39,7 +39,7 @@ M: nehe4-gadget draw-gadget* ( gadget -- )
     -1.0 -1.0 0.0 glVertex3f
     0.0 0.0 1.0 glColor3f
     1.0 -1.0 0.0 glVertex3f
-  ] with-gl
+  ] do-state
 
   glLoadIdentity
 
@@ -51,7 +51,7 @@ M: nehe4-gadget draw-gadget* ( gadget -- )
     1.0 1.0 0.0 glVertex3f
     1.0 -1.0 0.0 glVertex3f
     -1.0 -1.0 0.0 glVertex3f
-  ] with-gl 
+  ] do-state 
   dup nehe4-gadget-rtri 0.2 + over set-nehe4-gadget-rtri
   dup nehe4-gadget-rquad 0.15 - swap set-nehe4-gadget-rquad ;
   

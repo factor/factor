@@ -2,7 +2,7 @@ USING: kernel math sequences namespaces io strings hashtables ;
 IN: base64-internals
 
 : count-end ( seq quot -- count )
-    >r [ length ] keep r> find-last drop dup -1 = [ 2drop 0 ] [ - 1- ] if ;
+    >r [ length ] keep r> find-last drop dup [ - 1- ] [ 2drop 0 ] if ;
 
 : ch>base64 ( ch -- ch )
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;

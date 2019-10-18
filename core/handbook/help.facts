@@ -6,14 +6,12 @@ ARTICLE: "help" "Help system"
 { $subsection "writing-help" } ;
 
 ARTICLE: "browsing-help" "Browsing documentation"
-"The easiest way to browse the help is from the help browser tool in the UI, however you can also display help topics in the listener."
-{ $subsection handbook }
-"Help topics are identified by article name strings, or words. You can request a specific help topic:"
+"The easiest way to browse the help is from the help browser tool in the UI, however you can also display help topics in the listener. Help topics are identified by article name strings, or words. You can request a specific help topic:"
 { $subsection help } ;
 
 ARTICLE: "writing-help" "Writing documentation"
 "By convention, documentation is written in files with the " { $snippet ".facts" } " filename extension. Module documentation should follow a few conventions documented in " { $link "documenting-modules" } "."
-$terpri
+$nl
 "A pair of parsing words are used to define free-standing articles and to associate documentation with words:"
 { $subsection POSTPONE: ARTICLE: }
 { $subsection POSTPONE: HELP: }
@@ -25,7 +23,9 @@ $terpri
 }
 "Markup elements are therefore effectively just Factor objects, written using Factor syntax."
 { $subsection "printing-elements" }
-{ $subsection "element-types" } ;
+{ $subsection "element-types" }
+"Related words can be cross-referenced:"
+{ $subsection related-words } ;
 
 ARTICLE: "printing-elements" "Printing markup elements"
 "When writing documentation, it is useful to be able to print markup elements for testing purposes. Markup elements which are strings or arrays of elements are printed in the obvious way. Markup elements of the form " { $snippet "{ $directive content... }" } " are printed by executing the " { $snippet "$directive" } " word with the element content on the stack."

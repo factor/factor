@@ -63,7 +63,7 @@ IN: lambda
     var-node-name "a" append <var-node> ;
 
 : ALIENPRED ( node -- node )
-    var-node-name dup length 1 - swap remove-nth <var-node> ;
+    var-node-name 1 tail <var-node> ;
 
 : ALIENISZERO ( node -- node )
     ;

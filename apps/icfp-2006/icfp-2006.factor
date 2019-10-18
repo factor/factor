@@ -3,7 +3,7 @@
 
 IN: universal-machine
 USING: arrays errors io kernel kernel-internals math
-namespaces sequences vectors ;
+namespaces quotations sequences vectors ;
 
 SYMBOL: regs
 SYMBOL: arrays

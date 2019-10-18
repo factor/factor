@@ -1,7 +1,7 @@
 USING: arrays compiler generic
 hashtables inference kernel kernel-internals math
 optimizer prettyprint sequences sbufs strings test vectors words
-sequences-internals ;
+sequences-internals quotations ;
 IN: temporary
 
 ! Test method inlining
@@ -11,31 +11,31 @@ IN: temporary
     \ string
     [ integer string array reversed sbuf
     slice vector quotation ]
-    [ class-compare ] sort min-class
+    sort-classes min-class
 ] unit-test
 
 [ fixnum ] [
     \ fixnum
     [ fixnum integer object ]
-    [ class-compare ] sort min-class
+    sort-classes min-class
 ] unit-test
 
 [ integer ] [
     \ fixnum
     [ integer float object ]
-    [ class-compare ] sort min-class
+    sort-classes min-class
 ] unit-test
 
 [ object ] [
     \ word
     [ integer float object ]
-    [ class-compare ] sort min-class
+    sort-classes min-class
 ] unit-test
 
 [ reversed ] [
     \ reversed
     [ integer reversed slice ]
-    [ class-compare ] sort min-class
+    sort-classes min-class
 ] unit-test
 
 FORGET: xyz

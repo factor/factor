@@ -1,6 +1,6 @@
 IN: temporary
 USING: gadgets gadgets-scrolling namespaces test kernel
-models gadgets-viewports math ;
+models gadgets-viewports math arrays ;
 
 [ ] [
     <gadget> "g" set
@@ -16,8 +16,12 @@ models gadgets-viewports math ;
 [ t ] [ "s" get scroller-follows ] unit-test
 
 [ ] [
-    <gadget> dup "g" set { 10 20 } <model> <viewport> "v" set 
+    <gadget> dup "g" set
+    10 1 0 100 <range> 20 1 0 100 <range> 2array <compose>
+    <viewport> "v" set 
 ] unit-test
+
+[ { 10 20 } ] [ "v" get control-model range-value ] unit-test
 
 [ { 10 20 } ] [ "g" get rect-loc vneg { 3 3 } v+ ] unit-test
 
@@ -26,9 +30,27 @@ models gadgets-viewports math ;
     dup "g" set <scroller> "s" set
 ] unit-test
 
+[ ] [ { 50 50 } "s" get set-rect-dim ] unit-test
+
+[ ] [ "s" get layout ] unit-test
+
 [ ] [ "s" get graft ] unit-test
 
-[ ] [ "s" get { 10 20 } scroll ] unit-test
+[ { 34 34 } ] [ "s" get scroller-viewport rect-dim ] unit-test
+
+[ { 106 106 } ] [ "s" get scroller-viewport viewport-dim ] unit-test
+
+[ ] [ { 0 0 } "s" get scroll ] unit-test
+
+[ { 0 0 } ] [ "s" get control-model range-min-value ] unit-test
+
+[ { 106 106 } ] [ "s" get control-model range-max-value ] unit-test
+
+[ ] [ { 10 20 } "s" get scroll ] unit-test
+
+[ { 10 20 } ] [ "s" get control-model range-value ] unit-test
+
+[ { 10 20 } ] [ "s" get scroller-viewport control-model range-value ] unit-test
 
 [ { 10 20 } ] [ "g" get rect-loc vneg { 3 3 } v+ ] unit-test
 

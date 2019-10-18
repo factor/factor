@@ -8,8 +8,9 @@ HELP: method-spec
 HELP: method
 { $values { "class" "a class word" } { "generic" "a generic word" } { "method/f" "a " { $link method } " or " { $link f } } }
 { $description "Looks up a method definition." }
-{ $class-description "Instances of this class are methods. A method consists of a quotation together with a source location where it was defined." }
-{ $see-also method-def method-loc define-method POSTPONE: M: } ;
+{ $class-description "Instances of this class are methods. A method consists of a quotation together with a source location where it was defined." } ;
+
+{ method method-def method-loc define-method POSTPONE: M: } related-words
 
 HELP: <method> ( def loc -- method )
 { $values { "def" "a quotation" } { "loc" "a file/line pair or " { $link f } } { "method" "a new method definition" } }
@@ -35,8 +36,7 @@ $low-level-note ;
 
 HELP: define-method
 { $values { "method" "an instance of " { $link method } } { "class" "a class word" } { "generic" "a generic word" } }
-{ $description "Defines a method. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
-{ $see-also <method> } ;
+{ $description "Defines a method. This is the runtime equivalent of " { $link POSTPONE: M: } "." } ;
 
 HELP: implementors
 { $values { "class" "a class word" } { "seq" "a sequence of generic words" } }

@@ -2,7 +2,42 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays io kernel namespaces parser prettyprint sequences
-words hashtables definitions errors generic ;
+words assocs definitions errors generic quotations ;
+
+: make-element ( word markup -- element )
+    swap 2array 1array ;
+
+: word-help ( word -- content )
+    {
+        {
+            [ dup "help" word-prop ]
+            [ "help" word-prop ]
+        } {
+            [ dup "predicating" word-prop ]
+            [ \ $predicate make-element ]
+        } {
+            [ dup "reading" word-prop ]
+            [ \ $reader make-element ]
+        } {
+            [ dup "writing" word-prop ]
+            [ \ $writer make-element ]
+        } {
+            [ t ] [ drop f ]
+        }
+    } cond ;
+
+: all-articles ( -- seq )
+    articles get keys
+    all-words [ word-help ] subset append ;
+
+: xref-help ( -- )
+    all-articles [ xref-article ] each ;
+
+: error? ( word -- ? )
+    \ $error-description swap word-help elements empty? not ;
+
+: all-errors ( -- seq )
+    all-words [ error? ] subset sort-articles ;
 
 M: word article-name word-name ;
 
@@ -18,13 +53,8 @@ M: word article-title
 M: word article-content
     [
         \ $vocabulary over 2array ,
-        dup word-help [
-            %
-        ] [
-            dup "predicating" word-prop [
-                \ $predicate swap 2array ,
-            ] when*
-        ] if*
+        dup word-help %
+        \ $related over 2array ,
         \ $definition swap 2array ,
     ] { } make ;
 
@@ -35,42 +65,38 @@ M: word article-content
                 dup article-title swap >link write-object
             ] ($block) $doc-path
         ] with-nesting
-    ] with-style terpri ;
+    ] with-style nl ;
 
-: (help) ( topic -- ) article-content print-content ;
-
-: help ( topic -- ) dup $title (help) terpri ;
-
-: handbook ( -- ) "handbook" help ;
+: help ( topic -- )
+    last-element off dup $title
+    article-content print-content nl ;
 
 : ($subsection) ( object -- )
-    [ article-title ] keep >link
-    dup [ (help) ] curry
-    write-outliner ;
+    [ article-title ] keep >link write-object ;
 
 : $subsection ( element -- )
     [
         subsection-style get [ first ($subsection) ] with-style
     ] ($block) ;
 
-: help-outliner ( seq quot -- )
+: ($index) ( seq quot -- )
     subsection-style get [
-        sort-articles [ ($subsection) ] [ terpri ] interleave
+        sort-articles [ nl ] [ ($subsection) ] interleave
     ] with-style ;
 
-: $outliner ( element -- )
+: $index ( element -- )
     first call dup empty?
-    [ drop ] [ [ help-outliner ] ($block) ] if ;
+    [ drop ] [ [ ($index) ] ($block) ] if ;
 
 : remove-article ( name -- )
-    dup articles get hash-member? [
+    dup articles get key? [
         dup unxref-article
-        dup articles get remove-hash
+        dup articles get delete-at
     ] when drop ;
 
 : add-article ( article name -- )
     [ remove-article ] keep
-    [ articles get set-hash ] keep
+    [ articles get set-at ] keep
     xref-article ;
 
 : remove-word-help ( word -- )

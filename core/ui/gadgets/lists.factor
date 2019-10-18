@@ -11,11 +11,10 @@ TUPLE: list index presenter color hook ;
     { 0.8 0.8 1.0 1.0 } swap set-list-color ;
 
 C: list ( hook presenter model -- gadget )
-    [ swap <pile> delegate>control ] keep
+    [ swap <filled-pile> delegate>control ] keep
     [ set-list-presenter ] keep
     [ set-list-hook ] keep
     0 over set-list-index
-    1 over set-pack-fill
     dup list-theme ;
 
 : bound-index ( list -- )
@@ -75,22 +74,22 @@ M: list focusable-child* drop t ;
         scroll>selected
     ] if ;
 
-: select-prev ( list -- )
+: select-previous ( list -- )
     dup list-index 1- swap select-index ;
 
 : select-next ( list -- )
     dup list-index 1+ swap select-index ;
 
-: list-action ( list -- )
+: invoke-value-action ( list -- )
     dup list-empty? [
         dup list-hook call
     ] [
         dup list-index swap nth-gadget invoke-secondary
     ] if ; inline
 
-list "commands" {
-    { "Request focus" T{ button-down } [ request-focus ] }
-    { "Select previous value" T{ key-down f f "UP" } [ select-prev ] }
-    { "Select next value" T{ key-down f f "DOWN" } [ select-next ] }
-    { "Invoke value action" T{ key-down f f "RETURN" } [ list-action ] }
-} define-commands
+list "keyboard-navigation" "Lists can be navigated from the keyboard." {
+    { T{ button-down } request-focus }
+    { T{ key-down f f "UP" } select-previous }
+    { T{ key-down f f "DOWN" } select-next }
+    { T{ key-down f f "RET" } invoke-value-action }
+} define-command-map

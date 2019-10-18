@@ -3,34 +3,33 @@
 USING: kernel sequences math errors generic ;
 IN: sequences-internals
 
-: keep-copying? pick over < ; inline
-: read-src >r >r 2dup nth-unsafe r> r> ; inline
-: write-dest 2dup >r >r set-nth-unsafe r> r> ; inline
-: inc-counters >r 1+ >r >r 1+ r> r> r> ; inline
-: return-dest drop >r 3drop r> ; inline
+: ((copy)) ( dst i src j n -- dst i src j n )
+    dup -roll [
+        + swap nth-unsafe -roll [
+            + swap set-nth-unsafe
+        ] 3keep drop
+    ] 3keep ; inline
 
-: (copy) ( i src j dest n -- dest )
-    keep-copying?
-    [ >r read-src write-dest inc-counters r> (copy) ]
-    [ return-dest ] if ; inline
+: (copy) ( dst i src j n -- dst )
+    dup 0 <= [ 2drop 2drop ] [ 1- ((copy)) (copy) ] if ; inline
 
-: check-copy ( src start dest -- )
+: prepare-subseq ( from to seq -- dst i src j n )
+    [ >r swap - r> new 0 ] 3keep -rot over - ; inline
+
+: check-copy ( src n dst -- )
     over 0 < [ bounds-error ] when
     >r swap length + r> lengthen ;
-
-: prepare-subseq ( from to seq -- i src j dest n )
-    swap pick - 2dup swap new swap 0 -rot ; inline
 
 IN: sequences
 
 : subseq ( from to seq -- subseq )
     3dup check-slice prepare-subseq (copy) ;
 
-: copy ( src n dest -- )
-    pick length pick + >r 3dup check-copy 0 -roll r>
+: copy ( src n dst -- )
+    pick length >r 3dup check-copy swap rot 0 r>
     (copy) drop ; inline
 
-: nappend ( src dest -- ) [ length ] keep copy ;
+: push-all ( src dest -- ) [ length ] keep copy ;
 
 : ((append)) ( seq1 seq2 accum -- accum )
     [ >r over length r> copy ] keep
@@ -53,11 +52,7 @@ IN: sequences
 : 3append ( seq1 seq2 seq3 -- newseq ) pick (3append) ;
 
 : clone-like ( seq exemplar -- newseq )
-    over type over type eq? [
-        drop clone
-    ] [
-        >r dup length 0 swap r> new [ copy ] keep
-    ] if ; inline
+    >r dup length r> new [ 0 swap copy ] keep ; inline
 
 TUPLE: groups seq n ;
 

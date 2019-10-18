@@ -1,11 +1,12 @@
 IN: temporary
-USING: assembler-arm math test namespaces sequences kernel ;
+USING: assembler-arm math test namespaces sequences kernel
+quotations ;
 
 : test-opcode [ { } make first ] curry unit-test ;
 
 [ HEX: ea000000 ] [ 0 B ] test-opcode
 [ HEX: eb000000 ] [ 0 BL ] test-opcode
-[ HEX: e12fff30 ] [ R0 BLX ] test-opcode
+! [ HEX: e12fff30 ] [ R0 BLX ] test-opcode
 
 [ HEX: e24cc004 ] [ IP IP 4 SUB ] test-opcode
 [ HEX: e24cb004 ] [ FP IP 4 SUB ] test-opcode
@@ -32,3 +33,13 @@ USING: assembler-arm math test namespaces sequences kernel ;
 
 [ HEX: e7910002 ] [ R0 R1 R2 <+> LDR ] test-opcode
 [ HEX: e7910102 ] [ R0 R1 R2 2 <LSL> <+> LDR ] test-opcode
+
+[ HEX: e1d310bc ] [ R1 R3 12 <+> LDRH ] test-opcode
+[ HEX: e1d310fc ] [ R1 R3 12 <+> LDRSH ] test-opcode
+[ HEX: e1d310dc ] [ R1 R3 12 <+> LDRSB ] test-opcode
+[ HEX: e1c310bc ] [ R1 R3 12 <+> STRH ] test-opcode
+[ HEX: e19310b4 ] [ R1 R3 R4 <+> LDRH ] test-opcode
+[ HEX: e1f310fc ] [ R1 R3 12 <!+> LDRSH ] test-opcode
+[ HEX: e1b310d4 ] [ R1 R3 R4 <!+> LDRSB ] test-opcode
+[ HEX: e0c317bb ] [ R1 R3 123 <+!> STRH ] test-opcode
+[ HEX: e08310b4 ] [ R1 R3 R4 <+!> STRH ] test-opcode

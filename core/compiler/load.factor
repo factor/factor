@@ -1,64 +1,14 @@
+REQUIRES: core/compiler/inference core/compiler/optimizer
+core/compiler/generator core/compiler/alien ;
+
 PROVIDE: core/compiler
 { +files+ {
-    "inference/shuffle.factor"
-    "inference/dataflow.factor"
-    "inference/variables.factor"
-    "inference/inference.factor"
-    "inference/branches.factor"
-    "inference/words.factor"
-    "inference/stack.factor"
-    "inference/known-words.factor"
-    "inference/transforms.factor"
-    "inference/errors.factor"
-
-    "optimizer/specializers.factor"
-    "optimizer/pattern-match.factor"
-    "optimizer/class-infer.factor"
-    "optimizer/def-use.factor"
-    "optimizer/optimizer.factor"
-    "optimizer/known-words.factor"
-
-    "generator/architecture.factor"
-    "generator/stack-frame.factor"
-    "generator/registers.factor"
-    "generator/phantom-stacks.factor"
-    "generator/register-alloc.factor"
-    "generator/xt.factor"
-    "generator/generator.factor"
-
     "compiler.factor"
-
-    "alien/c-types.factor"
-    "alien/structs.factor"
-    "alien/compiler.factor"
-    "alien/alien-invoke.factor"
-    "alien/alien-callback.factor"
-    "alien/alien-indirect.factor"
-    "alien/prettyprint.factor"
-    "alien/syntax.factor"
-
-    "alien/alien-callback.facts"
-    "alien/alien-indirect.facts"
-    "alien/alien-invoke.facts"
-    "alien/aliens.facts"
-    "alien/c-types.facts"
-    "alien/structs.facts"
-    "alien/syntax.facts"
-    "inference/branches.facts"
-    "inference/dataflow.facts"
-    "inference/inference.facts"
-    "inference/shuffle.facts"
-    "inference/stack.facts"
-    "inference/words.facts"
     "compiler.facts"
 } }
 { +tests+ {
-    "test/inference.factor"
-    "test/transforms.factor"
-    "test/alien-objects.factor"
     "test/templates-early.factor"
     "test/def-use.factor"
-    "test/stack-frame.factor"
     "test/simple.factor"
     "test/templates.factor"
     "test/stack.factor"
@@ -70,8 +20,6 @@ PROVIDE: core/compiler
     "test/class-infer.factor"
     "test/identities.factor"
     "test/optimizer.factor"
-    "test/alien.factor"
-    "test/callbacks.factor"
     "test/stack-trace.factor"
     "test/redefine.factor"
 } } ;

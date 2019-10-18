@@ -13,16 +13,11 @@ HELP: schedule-thread-with
 { $description "Adds a runnable thread to the end of the run queue. When the thread runs the object is passed to the continuation using " { $link continue-with } "." } ;
 
 HELP: sleep-queue
-{ $values { "vector" "a vector" } }
-{ $description "Outputs the sleeping thread queue. This is not actually a queue, but a vector of cons cells, where each cons cell consists of a wakeup time and a continuation." } ;
-
-HELP: sleep-queue*
-{ $values { "vector" "a vector" } }
-{ $description "Outputs the sleeping thread queue, sorted by wakeup time." } ;
+{ $var-description "Sleeping thread queue. This is not actually a queue, but an array of pairs of the shape " { $snippet "{ time continuation }" } "." } ;
 
 HELP: sleep-time
-{ $values { "vector" "a sorted sleep queue" } { "ms" "a non-negative integer" } }
-{ $description "Outputs the time until the next sleeping thread is scheduled to wake up, or -1 if there are no sleeping threads. The input must be a sorted sleep queue output by " { $link sleep-queue* } "." } ;
+{ $values { "ms" "a non-negative integer" } }
+{ $description "Outputs the time until the next sleeping thread is scheduled to wake up, or a default sleep time if there are no sleeping threads." } ;
 
 HELP: stop
 { $description "Stops the current thread." } ;
@@ -37,7 +32,7 @@ HELP: sleep
 HELP: in-thread
 { $values { "quot" "a quotation" } }
 { $description "Spawns a new thread. The new thread begins running immediately."
-$terpri
+$nl
 "The new thread inherits the current data stack and name stack. The call stack initially contains the new quotation only, so when the quotation returns the thread stops. The catch stack contains a default handler which logs errors to the " { $link stdio } " stream." }
 { $examples
     { $code "1 2 [ + . ] in-thread" }

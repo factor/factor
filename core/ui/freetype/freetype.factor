@@ -3,14 +3,10 @@
 USING: alien kernel ;
 IN: freetype
 
-windows? [
-    "freetype" "freetype6.dll" "cdecl" add-library
-] when
-
 LIBRARY: freetype
 
 TYPEDEF: uchar FT_Byte
-TYPEDEF: uchar* FT_Bytes
+TYPEDEF: void* FT_Bytes
 TYPEDEF: char FT_Char
 TYPEDEF: int FT_Int
 TYPEDEF: int FT_Int32
@@ -38,123 +34,120 @@ FUNCTION: FT_Error FT_Init_FreeType ( void* library ) ;
 TYPEDEF: void face
 TYPEDEF: void glyph
 
-BEGIN-STRUCT: glyph
-    FIELD: void*    library
-    FIELD: face*    face
-    FIELD: glyph*   next
-    FIELD: FT_UInt  reserved
-    FIELD: void*    generic
-    FIELD: void*    generic
+C-STRUCT: glyph
+    { "void*" "library" }
+    { "face*" "face" }
+    { "glyph*" "next" }
+    { "FT_UInt" "reserved" }
+    { "void*" "generic" }
+    { "void*" "generic" }
 
-    FIELD: FT_Pos   width
-    FIELD: FT_Pos   height
+    { "FT_Pos" "width" }
+    { "FT_Pos" "height" }
                   
-    FIELD: FT_Pos   hori-bearing-x
-    FIELD: FT_Pos   hori-bearing-y
-    FIELD: FT_Pos   hori-advance
+    { "FT_Pos" "hori-bearing-x" }
+    { "FT_Pos" "hori-bearing-y" }
+    { "FT_Pos" "hori-advance" }
                   
-    FIELD: FT_Pos   vert-bearing-x
-    FIELD: FT_Pos   vert-bearing-y
-    FIELD: FT_Pos   vert-advance
+    { "FT_Pos" "vert-bearing-x" }
+    { "FT_Pos" "vert-bearing-y" }
+    { "FT_Pos" "vert-advance" }
 
-    FIELD: FT_Fixed linear-hori-advance
-    FIELD: FT_Fixed linear-vert-advance
-    FIELD: FT_Pos   advance-x
-    FIELD: FT_Pos   advance-y
+    { "FT_Fixed" "linear-hori-advance" }
+    { "FT_Fixed" "linear-vert-advance" }
+    { "FT_Pos" "advance-x" }
+    { "FT_Pos" "advance-y" }
                     
-    FIELD: long     format
+    { "long" "format" }
                     
-    FIELD: int      bitmap-rows
-    FIELD: int      bitmap-width
-    FIELD: int      bitmap-pitch
-    FIELD: uchar*   bitmap-buffer
-    FIELD: short    bitmap-num-grays
-    FIELD: char     bitmap-pixel-mode
-    FIELD: char     bitmap-palette-mode
-    FIELD: void*    bitmap-palette
+    { "int" "bitmap-rows" }
+    { "int" "bitmap-width" }
+    { "int" "bitmap-pitch" }
+    { "void*" "bitmap-buffer" }
+    { "short" "bitmap-num-grays" }
+    { "char" "bitmap-pixel-mode" }
+    { "char" "bitmap-palette-mode" }
+    { "void*" "bitmap-palette" }
 
-    FIELD: FT_Int   bitmap-left
-    FIELD: FT_Int   bitmap-top
+    { "FT_Int" "bitmap-left" }
+    { "FT_Int" "bitmap-top" }
 
-    FIELD: short    n-contours
-    FIELD: short    n-points
+    { "short" "n-contours" }
+    { "short" "n-points" }
 
-    FIELD: void*    points
-    FIELD: char*    tags
-    FIELD: short*   contours
+    { "void*" "points" }
+    { "char*" "tags" }
+    { "short*" "contours" }
 
-    FIELD: int      outline-flags
+    { "int" "outline-flags" }
                     
-    FIELD: FT_UInt  num_subglyphs
-    FIELD: void*    subglyphs
+    { "FT_UInt" "num_subglyphs" }
+    { "void*" "subglyphs" }
                     
-    FIELD: void*    control-data
-    FIELD: long     control-len
+    { "void*" "control-data" }
+    { "long" "control-len" }
                     
-    FIELD: FT_Pos   lsb-delta
-    FIELD: FT_Pos   rsb-delta
+    { "FT_Pos" "lsb-delta" }
+    { "FT_Pos" "rsb-delta" }
                     
-    FIELD: void*    other
-END-STRUCT
+    { "void*" "other" } ;
 
-BEGIN-STRUCT: face-size
-    FIELD: face*     face
-    FIELD: void*     generic
-    FIELD: void*     generic
+C-STRUCT: face-size
+    { "face*" "face" }
+    { "void*" "generic" }
+    { "void*" "generic" }
 
-    FIELD: FT_UShort x-ppem
-    FIELD: FT_UShort y-ppem
+    { "FT_UShort" "x-ppem" }
+    { "FT_UShort" "y-ppem" }
                      
-    FIELD: FT_Fixed  x-scale
-    FIELD: FT_Fixed  y-scale
+    { "FT_Fixed" "x-scale" }
+    { "FT_Fixed" "y-scale" }
                      
-    FIELD: FT_Pos    ascender
-    FIELD: FT_Pos    descender
-    FIELD: FT_Pos    height
-    FIELD: FT_Pos    max-advance
-END-STRUCT
+    { "FT_Pos" "ascender" }
+    { "FT_Pos" "descender" }
+    { "FT_Pos" "height" }
+    { "FT_Pos" "max-advance" } ;
 
-BEGIN-STRUCT: face
-    FIELD: FT_Long    num-faces
-    FIELD: FT_Long    index
+C-STRUCT: face
+    { "FT_Long" "num-faces" }
+    { "FT_Long" "index" }
                       
-    FIELD: FT_Long    flags
-    FIELD: FT_Long    style-flags
+    { "FT_Long" "flags" }
+    { "FT_Long" "style-flags" }
                       
-    FIELD: FT_Long    num-glyphs
+    { "FT_Long" "num-glyphs" }
                       
-    FIELD: FT_Char*   family-name
-    FIELD: FT_Char*   style-name
+    { "FT_Char*" "family-name" }
+    { "FT_Char*" "style-name" }
                       
-    FIELD: FT_Int     num-fixed-sizes
-    FIELD: void*      available-sizes
+    { "FT_Int" "num-fixed-sizes" }
+    { "void*" "available-sizes" }
                       
-    FIELD: FT_Int     num-charmaps
-    FIELD: void*      charmaps
+    { "FT_Int" "num-charmaps" }
+    { "void*" "charmaps" }
                       
-    FIELD: void*      generic
-    FIELD: void*      generic
+    { "void*" "generic" }
+    { "void*" "generic" }
                       
-    FIELD: FT_Pos     x-min
-    FIELD: FT_Pos     y-min
-    FIELD: FT_Pos     x-max
-    FIELD: FT_Pos     y-max
+    { "FT_Pos" "x-min" }
+    { "FT_Pos" "y-min" }
+    { "FT_Pos" "x-max" }
+    { "FT_Pos" "y-max" }
                       
-    FIELD: FT_UShort  units-per-em
-    FIELD: FT_Short   ascender
-    FIELD: FT_Short   descender
-    FIELD: FT_Short   height
+    { "FT_UShort" "units-per-em" }
+    { "FT_Short" "ascender" }
+    { "FT_Short" "descender" }
+    { "FT_Short" "height" }
                       
-    FIELD: FT_Short   max-advance-width
-    FIELD: FT_Short   max-advance-height
+    { "FT_Short" "max-advance-width" }
+    { "FT_Short" "max-advance-height" }
                       
-    FIELD: FT_Short   underline-position
-    FIELD: FT_Short   underline-thickness
+    { "FT_Short" "underline-position" }
+    { "FT_Short" "underline-thickness" }
                       
-    FIELD: glyph*     glyph
-    FIELD: face-size* size
-    FIELD: void*      charmap
-END-STRUCT
+    { "glyph*" "glyph" }
+    { "face-size*" "size" }
+    { "void*" "charmap" } ;
 
 FUNCTION: FT_Error FT_New_Face ( void* library, FT_Char* font, FT_Long index, face* face ) ;
 
@@ -167,8 +160,7 @@ C-ENUM:
     FT_RENDER_MODE_LIGHT
     FT_RENDER_MODE_MONO
     FT_RENDER_MODE_LCD
-    FT_RENDER_MODE_LCD_V
-;
+    FT_RENDER_MODE_LCD_V ;
 
 FUNCTION: int FT_Render_Glyph ( glyph* slot, int render_mode ) ;
 

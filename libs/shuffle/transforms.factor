@@ -12,63 +12,63 @@ IN: shuffle
 
 : [npick] ( n -- quot )
     {
-        { [ dup 1 = ] [ drop [ dup ] ] }
-        { [ dup 2 = ] [ drop [ over ] ] }
-        { [ dup 3 = ] [ drop [ pick ] ] }
-        { [ t ] [ 
+        { 1 [ [ dup ] ] }
+        { 2 [ [ over ] ] }
+        { 3 [ [ pick ] ] }
+        [ 
             [ 
                 1 - dup 
                 [ \ >r , ] times 
                 \ dup , 
                 [ [ r> swap ] % ] times 
             ] [ ] make 
-          ] }
-    } cond ;
+        ]
+    } case ;
 
 : npick ( quot n -- a ) [npick] call ;  
 \ npick 1 [ [npick] ] define-transform
   
 : [ndup] ( n -- quot )
     {
-        { [ dup 1 = ] [ drop [ dup ] ] }
-        { [ dup 2 = ] [ drop [ 2dup ] ] }
-        { [ dup 3 = ] [ drop [ 3dup ] ] }
-        { [ t ] [ [ dup [ dup , \ npick , ] times drop ] [ ] make ] }
-    } cond ;
+        { 1 [ [ dup ] ] }
+        { 2 [ [ 2dup ] ] }
+        { 3 [ [ 3dup ] ] }
+        [ [ dup [ dup , \ npick , ] times drop ] [ ] make ]
+    } case ;
 
 : ndup ( n -- ) [ndup] call ;
 \ ndup 1 [ [ndup] ] define-transform
 
 : [nrot] ( n -- quot )
     {
-        { [ dup 1 = ] [ drop [ ] ] }
-        { [ dup 2 = ] [ drop [ swap ] ] }
-        { [ dup 3 = ] [ drop [ rot ] ] }
-        { [ t ] [ 
-              [
-                  \ >r ,
-                  1- [nrot] %
-                  [ r> swap ] % 
-              ] [ ] make 
-          ] } 
-    } cond ;
+        { 1 [ [ ] ] }
+        { 2 [ [ swap ] ] }
+        { 3 [ [ rot ] ] }
+        [ 
+            [
+                \ >r ,
+                1- [nrot] %
+                [ r> swap ] % 
+            ] [ ] make 
+        ]
+    } case ;
 
 : nrot ( n -- ) [nrot] call ;
 \ nrot 1 [ [nrot] ] define-transform
 
 : [-nrot] ( n -- quot )
     {
-        { [ dup 1 = ] [ drop [ ] ] }
-        { [ dup 2 = ] [ drop [ swap ] ] }
-        { [ dup 3 = ] [ drop [ -rot ] ] }
-        { [ t ] [ 
-              [
-                  [ swap >r ] %
-                  1- [-nrot] %
-                  \ r> , 
-              ] [ ] make 
-          ] } 
-    } cond ;
+        { 1 [ [ ] ] }
+        { 2 [ [ swap ] ] }
+        { 3 [ [ -rot ] ] }
+        [ 
+            [
+                [ swap >r ] %
+                1- [-nrot] %
+                \ r> , 
+            ] [ ] make 
+        ]
+    } case ;
 
 : -nrot ( n -- ) [-nrot] call ;
 \ -nrot 1 [ [-nrot] ] define-transform
@@ -97,31 +97,31 @@ IN: shuffle
 
 : [nnip] ( n -- quot )
     {
-        { [ dup 1 = ] [ drop [ nip ] ] }
-        { [ dup 2 = ] [ drop [ 2nip ] ] }
-        { [ t ] [ 
+        { 1 [ [ nip ] ] }
+        { 2 [ [ 2nip ] ] }
+        [ 
             [ 
                 1 - [nnip] %
                 \ nip ,
             ] [ ] make 
-          ] }
-    } cond ;
+        ]
+    } case ;
 
 : nnip ( quot n -- ) [nnip] call ; 
 \ nnip 1 [ [nnip] ] define-transform
 
 : [ndrop] ( n -- quot )
     {
-        { [ dup 1 = ] [ drop [ drop ] ] }
-        { [ dup 2 = ] [ drop [ 2drop ] ] }
-        { [ dup 3 = ] [ drop [ 3drop ] ] }
-        { [ t ] [ 
+        { 1 [ [ drop ] ] }
+        { 2 [ [ 2drop ] ] }
+        { 3 [ [ 3drop ] ] }
+        [ 
             [ 
                 1 - [ndrop] %
                 \ drop ,
             ] [ ] make 
-          ] }
-    } cond ;
+        ]
+    } case ;
 
 : ndrop ( quot n -- ) [ndrop] call ; 
 \ ndrop 1 [ [ndrop] ] define-transform
@@ -167,3 +167,29 @@ IN: shuffle
 
 : each-withn ( seq quot n -- ) [each-withn] call ; 
 \ each-withn 1 [ [each-withn] ] define-transform
+
+: [ntuck] ( n -- quot )
+    {
+        { 1 [ [ tuck ] ] }
+        [
+            [
+                \ dup ,
+                2 + ,
+                \ -nrot ,
+            ] [ ] make
+        ]
+    } case ;
+
+: ntuck ( x y -- y... x y ) [ntuck] call ;
+\ ntuck 1 [ [ntuck] ] define-transform
+
+: [napply] ( n -- quot )
+    [
+        dup 1-
+        [ - [ 1- , \ ntuck , ] keep , \ nslip , ] each-with
+        \ call ,
+    ] [ ] make ;
+
+: napply ( quot n -- ) [napply] call ;
+\ napply 1 [ [napply] ] define-transform
+

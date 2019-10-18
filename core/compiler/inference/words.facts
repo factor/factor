@@ -17,9 +17,9 @@ HELP: collect-recursion
 HELP: inline-closure
 { $values { "word" "a word" } }
 { $description "Called during inference to infer stack effects of inline words."
-$terpri
+$nl
 "If the inline word is recursive, a new " { $link #label } " node is added to the dataflow graph, and the word has to be inferred twice, to determine which literals survive the recursion (eg, quotations) and which don't (loop indices, etc)."
-$terpri
+$nl
 "If the inline word is not recursive, the resulting nodes are spliced into the dataflow graph, and no " { $link #label } " node is created." } ;
 
 HELP: effect-error

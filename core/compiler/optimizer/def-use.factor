@@ -1,20 +1,20 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
-USING: namespaces hashtables sequences inference kernel
-generic ;
+USING: namespaces assocs sequences inference kernel
+generic assocs ;
 
 SYMBOL: def-use
 
-: used-by ( value -- seq ) def-use get hash ;
+: used-by ( value -- seq ) def-use get at ;
 
 : uses-values ( node seq -- )
-    [ def-use get [ ?push ] change-hash ] each-with ;
+    [ def-use get [ ?push ] change-at ] each-with ;
 
 : defs-values ( seq -- )
     #! If there is no value, set it to a new empty vector,
     #! otherwise do nothing.
-    [ def-use get [ V{ } like ] change-hash ] each ;
+    [ def-use get [ V{ } like ] change-at ] each ;
 
 GENERIC: node-def-use ( node -- )
 
@@ -65,7 +65,7 @@ M: #branch node-def-use
     dup branch-def-use (node-def-use) ;
 
 : dead-literals ( -- values )
-    def-use get [ >r value? r> empty? and ] hash-subset ;
+    def-use get [ >r value? r> empty? and ] assoc-subset ;
 
 : kill-node* ( values node -- )
     2dup [ node-in-d remove-all ] keep set-node-in-d
@@ -74,7 +74,7 @@ M: #branch node-def-use
     [ node-out-r remove-all ] keep set-node-out-r ;
 
 : kill-node ( values node -- )
-    over hash-empty?
+    over assoc-empty?
     [ 2drop ] [ [ kill-node* ] each-node-with ] if ;
 
 : kill-values ( node -- )

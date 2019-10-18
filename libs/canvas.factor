@@ -7,7 +7,7 @@ TUPLE: canvas dlist ;
 
 C: canvas ( -- canvas )
     dup delegate>gadget
-    black <solid> over set-gadget-interior ;
+    dup black solid-interior ;
 
 : delegate>canvas ( gadget -- )
     <canvas> swap set-delegate ;

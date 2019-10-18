@@ -4,7 +4,7 @@ USING: kernel ;
 
 PROVIDE: libs/usb
 { +files+ {
-	"usb-common.factor" 
+	"usb-common.factor"
 	{ "usb-unix.factor" [ unix? ] }
 	{ "usb-win32.factor" [ win32? ] }
 	{ "usb-macosx.factor" [ macosx? ] }

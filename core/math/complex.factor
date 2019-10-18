@@ -64,4 +64,4 @@ M: complex / complex/ tuck / >r / r> (rect>) ;
 
 M: complex abs absq >float fsqrt ;
 
-M: complex hashcode >rect >fixnum swap >fixnum bitxor ;
+M: complex hashcode* nip >rect >fixnum swap >fixnum bitxor ;

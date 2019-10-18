@@ -14,7 +14,6 @@ PROVIDE: libs/crypto
     "blum-blum-shub.factor"
 
 ! Hash
-    "crc32.factor"
     "md5.factor"
     "sha1.factor"
     "sha2.factor"
@@ -39,7 +38,6 @@ PROVIDE: libs/crypto
     "test/sha2.factor"
     "test/hmac.factor"
     "test/miller-rabin.factor"
-    "test/crc32.factor"
     "test/rsa.factor"
     "test/barrett.factor"
     "test/montgomery.factor"

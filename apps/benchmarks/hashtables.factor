@@ -1,13 +1,13 @@
 IN: temporary
 USING: compiler hashtables kernel math memory namespaces
-sequences strings test ;
+sequences strings test assocs ;
 
 : hash-bench-step ( hash elt -- )
     3 random {
-        { [ dup 0 = ] [ drop dup rot set-hash ] }
-        { [ dup 1 = ] [ drop swap remove-hash ] }
-        { [ dup 2 = ] [ drop swap hash drop ] }
-    } cond ;
+        { 0 [ dup rot set-at ] }
+        { 1 [ swap delete-at ] }
+        { 2 [ swap at drop ] }
+    } case ;
 
 : hashtable-benchmark ( seq -- )
     10000 <hashtable> swap 10 [

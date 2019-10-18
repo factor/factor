@@ -1,6 +1,7 @@
 ! Copyright (C) 2006, 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel generic arrays tetromino math sequences lazy-lists ;
+USING: kernel generic arrays tetromino math sequences
+quotations lazy-lists ;
 IN: tetris-piece
 
 #! A piece adds state to the tetromino that is the piece's delegate. The

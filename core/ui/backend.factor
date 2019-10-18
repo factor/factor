@@ -5,8 +5,6 @@ USING: generic kernel namespaces opengl ;
 
 DEFER: set-title ( string world -- )
 
-DEFER: draw-world ! defined in world.factor
-
 DEFER: open-window* ( world title -- )
 
 DEFER: raise-window ( world -- )

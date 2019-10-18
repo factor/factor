@@ -14,9 +14,9 @@ HELP: unbalanced-branches-error
 { $description "Throws an " { $link unbalanced-branches-error } "." }
 { $error-description "Thrown when inference encounters an " { $link if } ", " { $link dispatch } " or " { $link cond } " where the branches do not all exit with the same stack height." }
 { $notes "Conditionals with variable stack effects are considered to be bad style and should be avoided since they do not compile."
-$terpri
+$nl
 "If this error comes up when inferring the stack effect of a recursive word, check the word's stack effect declaration; it might be wrong." } ;
 
 HELP: unify-effect
-{ $values { "in" "a sequence of integers" } { "out" "a sequence of stacks" } { "newin" "a sequence of integers" } { "newout" "a sequence of stacks" } }
+{ $values { "quots" "a sequence of quotations" } { "in" "a sequence of integers" } { "out" "a sequence of stacks" } { "newin" "a sequence of integers" } { "newout" "a sequence of stacks" } }
 { $description "Unifies the stack effects of a number of branches, and outputs new values for " { $link d-in } " and " { $link meta-d } "." } ;

@@ -3,4 +3,4 @@ USING: help ;
 
 HELP: c-struct?
 { $values { "type" "a string" } { "?" "a boolean" } }
-{ $description "Tests if a C type is a structure defined by " { $link POSTPONE: BEGIN-STRUCT: } "." } ;
+{ $description "Tests if a C type is a structure defined by " { $link POSTPONE: C-STRUCT: } "." } ;

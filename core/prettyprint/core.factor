@@ -1,8 +1,8 @@
-! Copyright (C) 2003, 2006 Slava Pestov.
+! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
-USING: alien arrays generic hashtables io kernel math
-namespaces parser sequences strings styles vectors words ;
+USING: alien arrays generic assocs io kernel math
+namespaces sequences strings styles vectors words ;
 
 ! Configuration
 SYMBOL: tab-size
@@ -15,18 +15,25 @@ SYMBOL: string-limit
 ! Special trick to highlight a word in a quotation
 SYMBOL: hilite-quotation
 SYMBOL: hilite-index
-SYMBOL: hilite-next?
 
 IN: prettyprint-internals
 
 ! State
 SYMBOL: position
-SYMBOL: last-newline
 SYMBOL: recursion-check
+SYMBOL: pprinter-stack
+
+SYMBOL: last-newline
 SYMBOL: line-count
 SYMBOL: end-printing
 SYMBOL: indent
-SYMBOL: pprinter-stack
+
+! We record vocabs of all words
+SYMBOL: pprinter-in
+SYMBOL: pprinter-use
+
+: record-vocab ( word -- )
+    word-vocabulary [ dup pprinter-use get set-at ] when* ;
 
 ! Utility words
 : line-limit? ( -- ? )
@@ -41,18 +48,15 @@ SYMBOL: pprinter-stack
         last-newline set
         line-limit? [ "..." write end-printing get continue ] when
         line-count inc
-        terpri do-indent
+        nl do-indent
     ] if ;
 
 : text-fits? ( len -- ? )
-    indent get + margin get <= ;
+    margin get dup zero?
+    [ 2drop t ] [ >r indent get + r> <= ] if ;
 
 global [
     4 tab-size set
     64 margin set
-    0 position set
-    0 indent set
-    0 last-newline set
-    1 line-count set
     string-limit off
 ] bind

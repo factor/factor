@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: httpd
-USING: errors hashtables kernel namespaces io strings 
+USING: errors assocs kernel namespaces io strings 
 threads http sequences prettyprint server ;
 
 : (url>path) ( uri -- path )
@@ -24,11 +24,11 @@ threads http sequences prettyprint server ;
         { "GET" "get" }
         { "POST" "post" }
         { "HEAD" "head" }
-    } hash [ "bad" ] unless* ;
+    } at [ "bad" ] unless* ;
 
 : host ( -- string )
     #! The host the current responder was called from.
-    "Host" "header" get hash ":" split1 drop ;
+    "Host" "header" get at ":" split1 drop ;
 
 : (handle-request) ( arg cmd -- method path host )
     request-method dup "method" set swap

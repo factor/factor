@@ -1,61 +1,10 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel concurrency threads vectors arrays sequences namespaces 
-test errors dlists strings math words match ;
+USING: kernel concurrency threads vectors arrays sequences
+namespaces test errors dlists strings math words match
+quotations ;
 IN: temporary
-
-[ "junk" ] [ 
-  <dlist> 
-  5 over dlist-push-end 
-  "junk" over dlist-push-end 
-  20 over dlist-push-end 
-  [ string? ] swap dlist-remove 
-] unit-test
-
-[ 5 20 ] [ 
-  <dlist> 
-  5 over dlist-push-end 
-  "junk" over dlist-push-end 
-  20 over dlist-push-end 
-  [ string? ] over dlist-remove drop
-  [ ] dlist-each
-] unit-test
-
-[ "junk" ] [ 
-  <dlist> 
-  5 over dlist-push-end 
-  "junk" over dlist-push-end 
-  20 over dlist-push-end 
-  [ integer? ] over dlist-remove drop
-  [ integer? ] over dlist-remove drop
-  [ ] dlist-each
-] unit-test
-
-[ t ] [ 
-  <dlist> 
-  5 over dlist-push-end 
-  "junk" over dlist-push-end 
-  20 over dlist-push-end 
-  [ string? ] swap dlist-contains?
-] unit-test
-
-[ t ] [ 
-  <dlist> 
-  5 over dlist-push-end 
-  "junk" over dlist-push-end 
-  20 over dlist-push-end 
-  [ integer? ] swap dlist-contains?
-] unit-test
-
-[ f ] [ 
-  <dlist> 
-  5 over dlist-push-end 
-  "junk" over dlist-push-end 
-  20 over dlist-push-end 
-  [ string? ] over dlist-remove drop
-  [ string? ] swap dlist-contains?
-] unit-test
 
 [ V{ 1 2 3 } ] [
   0 <vector>

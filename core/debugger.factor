@@ -1,18 +1,14 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic hashtables tools io
-kernel math namespaces parser prettyprint sequences
+USING: arrays definitions generic hashtables inspector io
+kernel math namespaces parser prettyprint sequences assocs
 sequences-internals strings styles vectors words errors ;
 IN: kernel-internals
 
-: save-error ( error trace -- )
-    error-stack-trace set-global
-    error set-global
-    error get compute-restarts restarts set-global ;
-
 : error-handler ( error trace -- )
-    save-error
+    error-stack-trace set-global
     continuation error-continuation set-global
+    save-error
     error get rethrow ;
 
 : init-error-handler ( -- )
@@ -55,7 +51,7 @@ M: string error. print ;
     symbolic-stack-trace <reversed> stack. ;
 
 : :get ( variable -- value )
-    error-continuation get continuation-name hash-stack ;
+    error-continuation get continuation-name assoc-stack ;
 
 : :res ( n -- )
     restarts get-global nth f restarts set-global restart ;
@@ -67,16 +63,16 @@ M: string error. print ;
     restarts get dup empty? [
         drop
     ] [
-        terpri
+        nl
         "The following restarts are available:" print
-        terpri
+        nl
         dup length [ restart. ] 2each
     ] if ;
 
 : debug-help ( -- )
-    terpri
+    nl
     "Debugger commands:" print
-    terpri
+    nl
     ":help - documentation for this error" print
     ":s    - data stack at exception time" print
     ":r    - retain stack at exception time" print

@@ -1,8 +1,8 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: kernel generic errors sequences prettyprint io words
-arrays ;
+arrays inspector ;
 
 M: inference-error error.
     dup inference-error-rstate 0 <column> >array
@@ -13,9 +13,10 @@ M: inference-error error-help drop f ;
 
 M: unbalanced-branches-error error.
     "Unbalanced branches:" print
-    dup unbalanced-branches-error-out
-    swap unbalanced-branches-error-in
-    [ pprint bl length . ] 2each ;
+    dup unbalanced-branches-error-quots
+    over unbalanced-branches-error-in
+    rot unbalanced-branches-error-out [ length ] map
+    3array flip [ [ bl ] [ pprint ] interleave nl ] each ;
 
 M: literal-expected summary
     drop "Literal value expected" ;

@@ -2,8 +2,8 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: callback-responder
-USING: hashtables html http httpd io kernel math namespaces
-sequences ;
+USING: html http httpd io kernel math namespaces
+sequences assocs ;
 
 #! Name of the variable holding the continuation used to exit
 #! back to the httpd responder.
@@ -90,8 +90,8 @@ C: item ( quot expire? request id -- item )
     #! if they are 'timeout-seconds' old (ie. were added
     #! more than 'timeout-seconds' ago.
     callback-table clone [
-        expired? [ callback-table remove-hash ] [ drop ] if
-    ] hash-each ;
+        expired? [ callback-table delete-at ] [ drop ] if
+    ] assoc-each ;
 
 : id>url ( id -- string )
     #! Convert the continuation id to an URL suitable for
@@ -103,7 +103,7 @@ C: item ( quot expire? request id -- item )
     #! a random id. That continuation will be expired after
     #! a certain period of time if 'expire?' is true.  
     request get get-random-id [ <item> ] keep
-    [ callback-table set-hash ] keep
+    [ callback-table set-at ] keep
     id>url ;
 
 : register-html-callback ( quot expire? -- url )
@@ -111,7 +111,7 @@ C: item ( quot expire? request id -- item )
 
 : callback-responder ( -- )   
     expire-callbacks
-    "id" query-param callback-table hash [
+    "id" query-param callback-table at [
         [
   	  dup item-request [
             <request> update-request

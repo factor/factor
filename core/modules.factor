@@ -39,23 +39,26 @@ TUPLE: module name loc directory files tests help main ;
         dup loading-module module-def bootstrap-file
     ] no-parse-hook ;
 
-: reload-module ( module -- )
-    dup module-name module-def source-modified? [
-        module-name load-module
+: reload-module ( name -- )
+    dup module-def source-modified? [
+        load-module
     ] [
-        module-files* [ source-modified? ] subset run-files
+        module module-files*
+        [ source-modified? ] subset
+        run-files
     ] if ;
 
 : reload-modules ( seq -- )
     [ reload-module ] each do-parse-hook ;
 
+: module-names ( -- seq )
+    modules get [ module-name ] map ;
+
 : reload-core ( -- )
-    modules get [ module-name "core" head? ] subset
-    reload-modules ;
+    module-names [ "core" head? ] subset reload-modules ;
 
 : reload-libs ( -- )
-    modules get [ module-name "core" head? not ] subset
-    reload-modules ;
+    module-names [ "core" head? not ] subset reload-modules ;
 
 : require ( name -- )
     dup module [ drop ] [ load-module ] if do-parse-hook ;
@@ -64,7 +67,7 @@ TUPLE: module name loc directory files tests help main ;
     module [ modules get delete ] when* ;
 
 : alist>module ( name loc hash -- module )
-    alist>hash [
+    >hashtable [
         +directory+ get [ over ] unless*
         +files+ get
         +tests+ get
@@ -79,11 +82,16 @@ TUPLE: module name loc directory files tests help main ;
         +help+ swap module-help 2array ,
     ] { } make ;
 
+: add-module ( module name -- )
+    modules get
+    [ module-name = ] find-with drop
+    [ modules get set-nth ] [ modules get push ] if* ;
+
 : provide ( name loc hash -- )
-    pick remove-module
+    pick >r
     alist>module
     [ module-files* bootstrap-files ] keep
-    modules get push ;
+    r> add-module ;
 
 ! For presentations
 TUPLE: module-link name ;

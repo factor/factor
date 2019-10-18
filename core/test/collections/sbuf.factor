@@ -5,9 +5,9 @@ USING: kernel math namespaces sequences sbufs strings test ;
 
 [ "Hello" ] [
     100 <sbuf> "buf" set
-    "Hello" "buf" get nappend
+    "Hello" "buf" get push-all
     "buf" get clone "buf-clone" set
-    "World" "buf-clone" get nappend
+    "World" "buf-clone" get push-all
     "buf" get >string
 ] unit-test
 

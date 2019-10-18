@@ -1,26 +1,44 @@
 CC = gcc
 
-BINARY = f
+EXECUTABLE = factor
+
 IMAGE = factor.image
 BUNDLE = Factor.app
-VERSION = 0.88
+VERSION = 0.89
 DISK_IMAGE_DIR = Factor-$(VERSION)
 DISK_IMAGE = Factor-$(VERSION).dmg
 LIBPATH = -L/usr/X11R6/lib
+CFLAGS = -Wall
 
 ifdef DEBUG
-	CFLAGS = -g -Wall
-	STRIP = touch
+	CFLAGS += -g
 else
-	CFLAGS = -O3 -Wall $(SITE_CFLAGS)
-	STRIP = strip
+	CFLAGS += -O3 $(SITE_CFLAGS)
 endif
 
 ifdef CONFIG
 	include $(CONFIG)
 endif
 
-OBJS = $(PLAF_OBJS) \
+ifdef BOOT
+	BOOT_CMD = $@$(EXE_SUFFIX)
+	
+	ifdef X11
+		BOOT_FLAGS += -no-cocoa -x11
+	endif
+else
+	BOOT_CMD = echo
+endif
+
+BOOT_IMAGE = boot.image.$(BOOT_ARCH)
+
+ifdef IMAGES
+	IMAGES_CMD = wget -N http://factorcode.org/images/$(IMAGES)/$(BOOT_IMAGE)
+endif
+
+ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)
+
+DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/alien.o \
 	vm/bignum.o \
 	vm/compiler.o \
@@ -37,6 +55,8 @@ OBJS = $(PLAF_OBJS) \
 	vm/stack.o \
 	vm/types.o
 
+EXE_OBJS = $(PLAF_EXE_OBJS) vm/main.o
+
 default:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
@@ -50,69 +70,66 @@ default:
 	@echo "solaris-amd64"
 	@echo "macosx-x86"
 	@echo "macosx-ppc"
-	@echo "windows"
+	@echo "windows-nt-x86"
+	@echo "windows-ce-arm"
+	@echo "windows-ce-x86"
 	@echo ""
-	@echo "On Unix, pass NO_UI=1 if you don't want to link with the"
-	@echo "X11 and OpenGL libraries."
+	@echo "Additional modifiers:"
 	@echo ""
-	@echo "On Mac OS X, pass X11=1 if you want to link with the"
-	@echo "X11 library instead of Cocoa. You will also need to bootstrap"
-	@echo "Factor with the -no-cocoa -x11 switches."
-	@echo
-	@echo "Also, you might want to set the SITE_CFLAGS environment"
-	@echo "variable to enable some CPU-specific optimizations; this"
-	@echo "can make a huge difference. Eg:"
-	@echo ""
-	@echo "export SITE_CFLAGS=\"-march=pentium4 -ffast-math\""
+	@echo "IMAGES=<version>|latest  automatically download boot image from http://factorcode.org/images/<version>"
+	@echo "BOOT=1  automatically bootstrap using current boot image"
+	@echo "BOOT_FLAGS=... flags to pass to bootstrap"
+	@echo "DEBUG=1  compile VM with debugging information"
+	@echo "SITE_CFLAGS=...  additional optimization flags"
+	@echo "NO_UI=1  don't link with X11 libraries (ignored on Mac OS X)"
+	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
 bsd-x86:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.bsd.x86
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.bsd.x86
 
 bsd-amd64:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.bsd.amd64
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.bsd.amd64
 
 macosx-freetype:
 	ln -sf libfreetype.6.dylib \
 		Factor.app/Contents/Frameworks/libfreetype.dylib
 
 macosx-ppc: macosx-freetype
-	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.ppc
+	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.ppc
 
 macosx-x86: macosx-freetype
-	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.x86
+	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86
 
 linux-x86:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.x86
-	$(STRIP) $(BINARY)
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.x86
 
 linux-amd64:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.amd64
-	$(STRIP) $(BINARY)
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.amd64
 
 linux-ppc:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.ppc
-	$(STRIP) $(BINARY)
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.ppc
 
 linux-arm:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.arm
-	$(STRIP) $(BINARY)
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.arm
 
 solaris-x86:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.solaris.x86
-	$(STRIP) $(BINARY)
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86
 
 solaris-amd64:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.solaris.amd64
-	$(STRIP) $(BINARY)
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.amd64
 
-windows:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.windows
+windows-nt-x86:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86
 
-windows-arm:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.windows.arm
+windows-ce-arm:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.arm
 
-macosx.app:
-	cp $(BINARY) $(BUNDLE)/Contents/MacOS/Factor
+windows-ce-x86:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.x86
+
+macosx.app: factor
+	cp $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/Factor
+	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
 
 	install_name_tool \
 		-id @executable_path/../Frameworks/libfreetype.6.dylib \
@@ -120,6 +137,10 @@ macosx.app:
 	install_name_tool \
 		-change /usr/X11R6/lib/libfreetype.6.dylib \
 		@executable_path/../Frameworks/libfreetype.6.dylib \
+		Factor.app/Contents/MacOS/Factor
+	install_name_tool \
+		-change libfactor.dylib \
+		@executable_path/../Frameworks/libfactor.dylib \
 		Factor.app/Contents/MacOS/Factor
 
 macosx.dmg:
@@ -131,22 +152,26 @@ macosx.dmg:
 	chmod +x cp_dir
 	cp factor.image license.txt README.txt TODO.txt \
 		$(DISK_IMAGE_DIR)/Factor/
-	find core apps libs demos unmaintained fonts -type f \
+	find core apps libs demos unmaintained fonts extras -type f \
 		-exec ./cp_dir {} $(DISK_IMAGE_DIR)/Factor/{} \;
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
 		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
 
-tags:
-	ctags-exuberant vm/*.[chm]
+factor: $(DLL_OBJS) $(EXE_OBJS)
+	$(LINKER) $(ENGINE) $(DLL_OBJS)
+	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+		$(CFLAGS) -o $@$(EXE_SUFFIX) $(EXE_OBJS)
+	$(IMAGES_CMD)
+	$(BOOT_CMD) -i=$(BOOT_IMAGE) $(BOOT_FLAGS)
 
-f: $(OBJS)
-	$(CC) $(LIBS) $(LIBPATH) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
+pull:
+	darcs pull http://factorcode.org/repos/
 
 clean:
 	rm -f vm/*.o
 
-clean.app:
-	rm -f $(BUNDLE)/Contents/MacOS/Factor
+vm/resources.o:
+	windres vm/factor.rs vm/resources.o
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
@@ -156,3 +181,5 @@ clean.app:
 
 .m.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
+	
+.PHONY: factor

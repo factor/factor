@@ -37,36 +37,38 @@ HELP: c-setter
 HELP: <c-array>
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "array" "a byte array" } }
 { $description "Creates a byte array large enough to hold " { $snippet "n" } " values of a C type." }
-{ $errors "Throws an error if the type does not exist or the requested size is negative." } 
-{ $see-also malloc-array } ;
+{ $errors "Throws an error if the type does not exist or the requested size is negative." } ;
+
+{ <c-array> malloc-array } related-words
 
 HELP: <c-object>
 { $values { "type" "a string" } { "array" "a byte array" } }
 { $description "Creates a byte array suitable for holding a value with the given C type." }
-{ $errors "Throws an error if the type does not exist." }
-{ $see-also malloc-object } ;
+{ $errors "Throws an error if the type does not exist." } ;
+
+{ <c-object> malloc-object } related-words
 
 HELP: string>char-alien ( string -- array )
 { $values { "string" "a string" } { "array" "a byte array" } }
 { $description "Copies the string to a new byte array, converting it to 8-bit ASCII and adding a trailing null byte." }
-{ $errors "Throws an error if the string contains null characters, or characters beyond the 8-bit range." } 
-{ $see-also alien>char-string malloc-char-string } ;
+{ $errors "Throws an error if the string contains null characters, or characters beyond the 8-bit range." } ;
+
+{ string>char-alien alien>char-string malloc-char-string } related-words
 
 HELP: alien>char-string ( c-ptr -- string )
 { $values { "c-ptr" "an alien, byte array or " { $link f } } { "string" "a string" } }
-{ $description "Reads a null-terminated 8-bit C string from the specified address." }
-{ $see-also string>char-alien } ;
+{ $description "Reads a null-terminated 8-bit C string from the specified address." } ;
 
 HELP: string>u16-alien ( string -- array )
 { $values { "string" "a string" } { "array" "a byte array" } }
 { $description "Copies the string to a new byte array in UCS-2 format with a trailing null byte." }
-{ $errors "Throws an error if the string contains null characters." }
-{ $see-also alien>u16-string malloc-u16-string } ;
+{ $errors "Throws an error if the string contains null characters." } ;
+
+{ string>u16-alien alien>u16-string malloc-u16-string } related-words
 
 HELP: alien>u16-string ( c-ptr -- string )
 { $values { "c-ptr" "an alien, byte array or " { $link f } } { "string" "a string" } }
-{ $description "Reads a null-terminated UCS-2 string from the specified address." }
-{ $see-also string>u16-alien } ;
+{ $description "Reads a null-terminated UCS-2 string from the specified address." } ;
 
 HELP: memory>string ( base len -- string )
 { $values { "base" "an integer address" } { "len" "a non-negative integer" } { "string" "a string" } }
@@ -81,40 +83,27 @@ HELP: malloc-array
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
-{ $errors "Throws an error if the type does not exist, if the requested size is negative, or if memory allocation fails." }
-{ $see-also <c-array> } ;
+{ $errors "Throws an error if the type does not exist, if the requested size is negative, or if memory allocation fails." } ;
 
 HELP: malloc-object
 { $values { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold a value of a C type." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
-{ $errors "Throws an error if the type does not exist or if memory allocation fails." } 
-{ $see-also <c-object> } ;
+{ $errors "Throws an error if the type does not exist or if memory allocation fails." } ;
 
 HELP: malloc-char-string
 { $values { "string" "a string" } { "alien" "an alien address" } }
 { $description "Copies a string to an unmanaged memory block large enough to hold a copy of the string in 8-bit ASCII encoding, with a trailing null byte." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
-{ $errors "Throws an error if memory allocation fails." }
-{ $see-also string>char-alien } ;
+{ $errors "Throws an error if memory allocation fails." } ;
 
 HELP: malloc-u16-string
 { $values { "string" "a string" } { "alien" "an alien address" } }
 { $description "Copies a string to an unmanaged memory block large enough to hold a copy of the string in UCS2 encoding, with a trailing null character." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
-{ $errors "Throws an error if memory allocation fails." }
-{ $see-also string>u16-alien } ;
+{ $errors "Throws an error if memory allocation fails." } ;
 
-HELP: (typedef)
-{ $values { "old" "a string" } { "new" "a string" } }
-{ $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
-{ $notes "You should use the higher-level " { $link POSTPONE: TYPEDEF: } " word instead." }
-{ $see-also typedef POSTPONE: TYPEDEF: }  ;
-
-HELP: define-pointer
-{ $values { "type" "a string" } }
-{ $description "Aliases the C type " { $snippet "type*" } " to " { $snippet "void*" } "." }
-{ $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
+{ typedef POSTPONE: TYPEDEF: } related-words
 
 HELP: define-deref
 { $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
@@ -138,6 +127,5 @@ HELP: define-out
 
 HELP: typedef
 { $values { "old" "a string" } { "new" "a string" } }
-{ $description "Alises the C types " { $snippet "old" } " and " { $snippet "old*" } " under the names " { $snippet "new" } " and " { $snippet "new*" } ", respectively." }
-{ $notes "You should use the higher-level " { $link POSTPONE: TYPEDEF: } " word instead." }
-{ $see-also (typedef) POSTPONE: TYPEDEF: } ;
+{ $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
+{ $notes "Using this word in the same source file which defines C bindings can cause problems, because words are compiled before top-level forms are run. Use the " { $link POSTPONE: TYPEDEF: } " word instead." } ;

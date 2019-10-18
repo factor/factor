@@ -27,12 +27,11 @@ USING: alien kernel kernel-internals ;
 : F_SETFL 4 ;    ! set file status flags
 : O_NONBLOCK HEX: 80 ; ! no delay
 
-BEGIN-STRUCT: sockaddr-in
-    FIELD: ushort family
-    FIELD: ushort port
-    FIELD: in_addr_t addr
-    FIELD: longlong unused
-END-STRUCT
+C-STRUCT: sockaddr-in
+    { "ushort" "family" }
+    { "ushort" "port" }
+    { "in_addr_t" "addr" }
+    { "longlong" "unused" } ;
 
 : EINTR HEX: 4 ;
 : EAGAIN 11 ;

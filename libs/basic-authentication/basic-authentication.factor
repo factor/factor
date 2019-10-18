@@ -1,6 +1,7 @@
 ! Copyright (c) 2007 Chris Double.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: kernel base64 namespaces hashtables sequences io httpd math sha2 ;
+USING: kernel base64 namespaces assocs hashtables sequences
+quotations io httpd math sha2 ;
 IN: basic-authentication
 
 ! 'realms' is a hashtable mapping a realm (a string) to 
@@ -21,13 +22,13 @@ SYMBOL: realms
   #! Add the named realm to the realms table.
   #! 'data' should be a hashtable or a quotation.
   realms get [ H{ } clone dup realms set ] unless* 
-  set-hash ;
+  set-at ;
 
 : user-authorized? ( username password realm -- bool )
   realms get dup [
-    hash {
+    at {
       { [ dup quotation? ] [ call ] }
-      { [ dup hashtable? ] [ swapd hash = ] }
+      { [ dup hashtable? ] [ swapd at = ] }
       { [ t ] [ 3drop f ] }
     } cond 
   ] [
@@ -52,11 +53,11 @@ SYMBOL: realms
   #! Check if the user is authenticated in the given realm
   #! to run the specified quotation. If not, use Basic
   #! Authentication to ask for authorization details.
-  over "Authorization" "header" get hash authorization-ok? [
+  over "Authorization" "header" get at authorization-ok? [
     nip call
   ] [
     drop "Basic realm=\"" swap "\"" 3append "WWW-Authenticate" associate 
-    "401 Unauthorized" response terpri 
+    "401 Unauthorized" response nl 
     "<html><body>Username or Password is invalid</body></html>" write 
   ] if ;
 

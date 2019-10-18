@@ -8,8 +8,6 @@ prettyprint gadgets-buttons io kernel ;
 
 [ "+" ] [
     [
-        \ +
-        "Test" f [ pprint ] <command> <command-button>
-        dup button-quot call
+        \ + f \ pprint <command-button> dup button-quot call
     ] string-out
 ] unit-test

@@ -1,7 +1,7 @@
-#if defined(FACTOR_X86) && !defined(STDCALL)
-	#define STDCALL __attribute__((stdcall))
-#elif !defined(STDCALL)
-	#define STDCALL
+#if defined(FACTOR_X86)
+	#define F_STDCALL __attribute__((stdcall))
+#else
+	#define F_STDCALL
 #endif
 
 DLLEXPORT void ffi_test_0(void);
@@ -26,8 +26,11 @@ struct bar { long x, y, z; };
 DLLEXPORT struct bar ffi_test_16(long x, long y, long z);
 struct tiny { int x; };
 DLLEXPORT struct tiny ffi_test_17(int x);
-DLLEXPORT STDCALL int ffi_test_18(int x, int y, int z, int t);
-DLLEXPORT STDCALL struct bar ffi_test_19(long x, long y, long z);
+DLLEXPORT F_STDCALL int ffi_test_18(int x, int y, int z, int t);
+DLLEXPORT F_STDCALL struct bar ffi_test_19(long x, long y, long z);
 DLLEXPORT void ffi_test_20(double x1, double x2, double x3,
 	double y1, double y2, double y3,
 	double z1, double z2, double z3);
+DLLEXPORT long long ffi_test_21(long x, long y);
+DLLEXPORT long ffi_test_22(long x, long long y, long long z);
+DLLEXPORT float ffi_test_23(float x[3], float y[3]);

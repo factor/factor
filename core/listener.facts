@@ -19,7 +19,7 @@ HELP: print-banner
 { $description "Print Factor version, operating system, and CPU architecture." } ;
 
 HELP: listener
-{ $description "Prompts for expressions on the " { $link stdio } " stream and evaluates them until end of file is reached. This is an internal word; call " { $link tty } " instead." } ;
+{ $description "Prompts for expressions on the " { $link stdio } " stream and evaluates them until end of file is reached." } ;
 
 HELP: tty
 { $description "Starts a listener prompting for expressions on the " { $link stdio } " stream." } ;

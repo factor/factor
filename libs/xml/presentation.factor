@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: errors hashtables io kernel math namespaces prettyprint sequences
+USING: errors io kernel math namespaces prettyprint sequences
     arrays generic strings vectors char-classes xml-data xml-errors
-    state-parser xml-tokenize xml-writer xml-utils ;
+    state-parser xml-tokenize xml-writer xml-utils assocs ;
 IN: xml
 
 !   -- Overall parser with data tree
@@ -34,10 +34,10 @@ SYMBOL: namespace-stack
                 [ "" set ] [ drop ] if
             ] if
         ] each
-    ] make-hash ;
+    ] H{ } make-assoc ;
 
 : add-ns2name ( name -- )
-    dup name-space dup namespace-stack get hash-stack
+    dup name-space dup namespace-stack get assoc-stack
     [ nip ] [ <nonexist-ns> throw ] if* swap set-name-url ;
 
 : push-ns-stack ( hash -- )
@@ -118,7 +118,7 @@ M: closer process
 
 : assure-tags ( seq -- seq )
     ! this does *not* affect the contents of the stack
-    dup -1 = [ <notags> throw ] when ;
+    [ <notags> throw ] unless* ;
 
 : make-xml-doc ( prolog seq -- xml-doc )
     dup [ tag? ] find

@@ -1,4 +1,4 @@
-USING: help kernel math ;
+USING: help kernel math sequences quotations ;
 
 HELP: number=
 { $values { "x" "a number" } { "y" "a number" } { "?" "a boolean" } }
@@ -154,7 +154,7 @@ HELP: bitnot
 { $values { "x" "an integer" } { "y" "an integer" } }
 { $description "Computes the bitwise complement of the input; that is, each bit in the input number is flipped." }
 { $notes "This word implements bitwise not, so applying it to booleans will throw an error. Boolean not is the " { $link not } " word."
-$terpri
+$nl
 "Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1-" } } ;
 
 HELP: 1+
@@ -184,6 +184,11 @@ HELP: floor
 HELP: ceiling
 { $values { "x" "a real number" } { "y" "a whole real number" } }
 { $description "Outputs the least whole number greater than or equal to " { $snippet "x" } "." }
+{ $notes "The result is not necessarily an integer." } ;
+
+HELP: round
+{ $values { "x" "a real number" } { "y" "a whole real number" } }
+{ $description "Outputs the whole number closest to " { $snippet "x" } "." }
 { $notes "The result is not necessarily an integer." } ;
 
 HELP: abs
@@ -220,6 +225,10 @@ HELP: between?
 { $description "Tests if " { $snippet "x" } " is in the interval " { $snippet "[y,z]" } "." }
 { $notes "As per the closed interval notation, the end-points are included in the interval." } ;
 
+HELP: power-of-2?
+{ $values { "n" "an integer" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "n" } " is a power of 2." } ;
+
 HELP: rem
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
 { $description
@@ -247,7 +256,25 @@ HELP: align
 { $description "Outputs the least multiple of " { $snippet "w" } " greater than " { $snippet "m" } "." }
 { $notes "This word will give an incorrect result if " { $snippet "w" } " is not a power of 2." } ;
 
-HELP: number>string
-{ $values { "n" "a real number" } { "str" "a string" } }
-{ $description "Converts a real number to a string." }
-{ $notes "Printing complex numbers requires the more general prettyprinter facility (see " { $link "prettyprint" } ")." } ;
+HELP: 2/
+{ $values { "x" integer } { "y" integer } }
+{ $description "Shifts " { $snippet "x" } " to the right by one bit." }
+{ $examples
+    { $example "14 2/ ." "7" }
+    { $example "17 2/ ." "8" }
+    { $example "-17 2/ ." "-9" }
+}
+{ $notes "This word is not equivalent to " { $snippet "2 /" } " or " { $snippet "2 /i" } "; the name is historic and originates from the Forth programming language." } ;
+
+HELP: 2^
+{ $values { "n" "a positive integer" } { "2^n" "a positive integer" } }
+{ $description "Computes two to the power of " { $snippet "n" } ". This word will only give correct results if " { $snippet "n" } " is greater than zero; for the general case, use " { $snippet  "2 swap ^" } "." } ;
+
+HELP: zero?
+{ $values { "n" number } { "?" "a boolean" } }
+{ $description "Tests if the number is equal to zero." } ;
+
+HELP: times
+{ $values { "n" integer } { "quot" quotation } }
+{ $description "Calls the quotation " { $snippet "n" } " times." }
+{ $notes "If you need to pass the current index to the quotation, use " { $link each } "." } ;

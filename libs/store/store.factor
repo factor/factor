@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io namespaces serialize kernel hashtables ;
+USING: io namespaces serialize kernel assocs ;
 IN: store
 
 TUPLE: store path data ;
@@ -8,7 +8,7 @@ TUPLE: store path data ;
     [ store-data ] keep store-path <file-writer> [
         [
             dup
-            [ drop [ get ] keep rot set-hash ] hash-each-with
+            [ drop [ get ] keep rot set-at ] assoc-each-with
         ] keep [ serialize ] with-serialized
     ] with-stream ;
 
@@ -22,9 +22,9 @@ TUPLE: store path data ;
     ] if <store> ;
 
 : store-variable ( default variable store -- )
-    store-data 2dup hash* [
+    store-data 2dup at* [
         rot set-global 2drop
     ] [
-        drop >r 2dup set-global r> set-hash
+        drop >r 2dup set-global r> set-at
     ] if ;
 

@@ -30,5 +30,7 @@ M: label draw-gadget*
     dup label-color gl-color
     dup label-font swap label-text origin get draw-text ;
 
+M: label gadget-text* label-string % ;
+
 : <label-control> ( model -- gadget )
     "" <label> [ set-label-string ] <control> ;

@@ -18,6 +18,8 @@ M: object like drop ;
 
 : empty? ( seq -- ? ) length zero? ; inline
 
+: midpoint@ length 2/ ; inline
+
 : delete-all ( seq -- ) 0 swap set-length ;
 
 : lengthen ( n seq -- )
@@ -45,6 +47,20 @@ TUPLE: bounds-error index seq ;
 
 IN: sequences-internals
 
+DEFER: max-array-capacity
+
+PREDICATE: fixnum array-capacity
+    0 max-array-capacity between? ;
+
+: array-capacity ( array -- n )
+    1 slot { array-capacity } declare ; inline
+
+: array-nth ( n array -- elt )
+    swap 2 fixnum+fast slot ; inline
+
+: set-array-nth ( elt n array -- )
+    swap 2 fixnum+fast set-slot ; inline
+
 GENERIC: resize ( n seq -- newseq )
 
 ! Unsafe sequence protocol for inner loops
@@ -60,7 +76,7 @@ M: object set-nth-unsafe set-nth ;
 ! The f object supports the sequence protocol trivially
 M: f length drop 0 ;
 M: f nth bounds-error ;
-! M: f nth-unsafe nip ;
+M: f nth-unsafe nip ;
 M: f like drop dup empty? [ drop f ] when ;
 M: f new drop dup zero? [ drop f ] [ f <array> ] if ;
 
@@ -83,6 +99,9 @@ M: integer nth-unsafe drop ;
     >r >r set-nth-unsafe r> r> set-nth-unsafe ; inline
 
 IN: sequences
+
+: singleton ( obj exemplar -- seq )
+    1 swap new [ 0 swap set-nth-unsafe ] keep ; inline
 
 : first2 ( seq -- first second )
     1 swap bounds-check nip first2-unsafe ;

@@ -3,8 +3,8 @@ USING: arrays kernel sequences errors namespaces math ;
 
 : <range> ( from to -- seq ) dup <slice> ; inline
 : (0..n] ( n -- (0..n] ) 1+ 1 swap <range> ; inline
-: [k..n] ( k n -- [k..n] ) 1+ <range> ; inline
-: (k..n] ( k n -- (k..n] ) [ 1+ ] 2apply <range> ; inline
+: [m..n] ( k n -- [k..n] ) 1+ <range> ; inline
+: (m..n] ( k n -- (k..n] ) [ 1+ ] 2apply <range> ; inline
 
 : Z:(-inf,0]? ( n -- bool )
     #! nonpositive integer
@@ -14,7 +14,7 @@ USING: arrays kernel sequences errors namespaces math ;
 
 : factorial-part ( k! k n -- n! )
     #! calculate n! given n, k, k!
-    (k..n] product * ;
+    (m..n] product * ;
 
 : nCk ( n k -- nCk )
     #! uses the results from min(k!,(n-k)!) to compute max(k!,(n-k)!)

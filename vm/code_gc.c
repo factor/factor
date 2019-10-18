@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 /* This malloc-style heap code is reasonably generic. Maybe in the future, it
 will be used for the data heap too, if we ever get incremental

@@ -2,20 +2,21 @@ USING: help io styles strings ;
 
 HELP: cwd ( -- path )
 { $values { "path" "a path name string" } }
-{ $description "Outputs the current working directory of the Factor process." }
-{ $see-also cd } ;
+{ $description "Outputs the current working directory of the Factor process." } ;
 
 HELP: cd ( path -- )
 { $values { "path" "a path name string" } }
-{ $description "Changes the current working directory of the Factor process." }
-{ $see-also cwd } ;
+{ $description "Changes the current working directory of the Factor process." } ;
 
-HELP: stat ( path -- directory? length permissions modified )
-{ $values { "path" "a path name string" } { "directory?" "boolean indicating if the file is a directory" } { "length" "the length in bytes as an integer" } { "permissions" "a Unix permission bitmap (0 on Windows" } { "modified" "the last modification time, as milliseconds since midnight, January 1st 1970 GMT" } }
+{ cd cwd } related-words
+
+HELP: stat ( path -- directory? permissions length modified )
+{ $values { "path" "a path name string" } { "directory?" "boolean indicating if the file is a directory" } { "permissions" "a Unix permission bitmap (0 on Windows)" } { "length" "the length in bytes as an integer" } { "modified" "the last modification time, as milliseconds since midnight, January 1st 1970 GMT" } }
 { $description
     "Queries the file system for file meta data. If the file does not exist, outputs " { $link f } " for all four values."
-}
-{ $see-also exists? directory? file-length file-modified } ;
+} ;
+
+{ stat exists? directory? file-length file-modified } related-words
 
 HELP: path+
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
@@ -48,8 +49,9 @@ HELP: resource-path
 
 HELP: ?resource-path
 { $values { "path" "a string" } { "newpath" "a string" } }
-{ $description "If the path is prefixed with " { $snippet "\"resource:\"" } ", prepends the resource path." }
-{ $see-also resource-path } ;
+{ $description "If the path is prefixed with " { $snippet "\"resource:\"" } ", prepends the resource path." } ;
+
+{ resource-path ?resource-path } related-words
 
 HELP: pathname
 { $class-description "Class of path name presentations. Instances can be used passed to " { $link write-object } " to output a clickable path name." } ;

@@ -146,7 +146,7 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
 ] unit-test
   
 : instruction-parse-test ( args type instruction -- )
-  >r patterns hash replace-patterns unit r> 
+  >r patterns hash replace-patterns 1quotation r> 
   [ instruction-quotations ] cons unit-test ;
 
 { } "NOP" "NOP" instruction-parse-test

@@ -26,10 +26,10 @@ H{ { font-style bold } } strong-style set-global
 SYMBOL: title-style
 H{
     { font "sans-serif" }
-    { font-size 16 }
+    { font-size 18 }
     { font-style bold }
     { wrap-margin 500 }
-    { page-color { 0.8 0.8 1 1 } }
+    { page-color { 0.8 0.8 0.8 1 } }
     { border-width 5 }
 } title-style set-global
 
@@ -39,7 +39,7 @@ H{ { font-size 10 } } help-path-style set-global
 SYMBOL: heading-style
 H{
     { font "sans-serif" }
-    { font-size 14 }
+    { font-size 16 }
     { font-style bold }
 } heading-style set-global
 

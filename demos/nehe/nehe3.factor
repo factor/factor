@@ -10,7 +10,7 @@ C: nehe3-gadget (  -- gadget )
   [ delegate>gadget ] keep ;
 
 M: nehe3-gadget pref-dim* ( gadget -- dim )
-  drop width height 0 3array ;
+  drop width height 2array ;
 
 M: nehe3-gadget draw-gadget* ( gadget -- )
   drop
@@ -35,7 +35,7 @@ M: nehe3-gadget draw-gadget* ( gadget -- )
     -1.0 -1.0 0.0 glVertex3f
     0.0 0.0 1.0 glColor3f
     1.0 -1.0 0.0 glVertex3f
-  ] with-gl
+  ] do-state
   3.0 0.0 0.0 glTranslatef
   0.5 0.5 1.0 glColor3f
   GL_QUADS [
@@ -43,7 +43,7 @@ M: nehe3-gadget draw-gadget* ( gadget -- )
     1.0 1.0 0.0 glVertex3f
     1.0 -1.0 0.0 glVertex3f
     -1.0 -1.0 0.0 glVertex3f
-  ] with-gl ;
+  ] do-state ;
 
 : run3 ( -- )
   <nehe3-gadget> "NeHe Tutorial 3" open-window ;

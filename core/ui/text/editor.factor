@@ -27,6 +27,13 @@ C: editor ( -- editor )
 : delegate>editor ( tuple -- )
     <editor> (delegate>control) ;
 
+TUPLE: source-editor ;
+
+C: source-editor dup delegate>editor ;
+
+: delegate>source-editor ( tuple -- )
+    <source-editor> (delegate>control) ;
+
 : activate-editor-model ( editor model -- )
     dup activate-model swap control-model add-loc ;
 
@@ -77,8 +84,8 @@ M: editor model-changed
 
 : x>offset ( x line# editor -- col# )
     [ editor-line ] keep
-    over >r run-char-widths [ <= ] find-with drop dup -1 =
-    [ drop r> length ] [ r> drop ] if ;
+    over >r run-char-widths [ <= ] find-with drop
+    [ r> drop ] [ r> length ] if* ;
 
 : y>line ( y editor -- line# )
     [ line-height / >fixnum ] keep control-model validate-line ;
@@ -130,7 +137,8 @@ M: loc-monitor model-changed
         editor get
         dup editor-caret-color gl-color
         dup caret-loc origin get v+
-        swap caret-dim over v+ gl-line
+        swap caret-dim over v+
+        [ { 0.5 -0.5 } v+ ] 2apply gl-line
     ] when ;
 
 : line-translation ( n -- loc )
@@ -212,7 +220,7 @@ M: editor gadget-selection?
 M: editor gadget-selection
     [ selection-start/end ] keep control-model doc-range ;
 
-: remove-editor-selection ( editor -- )
+: remove-selection ( editor -- )
     [ selection-start/end ] keep control-model remove-doc-range ;
 
 M: editor user-input*
@@ -224,9 +232,4 @@ M: editor user-input*
 : set-editor-string ( string editor -- )
     control-model set-doc-string ;
 
-! Editors support the stream output protocol
-M: editor stream-write1 >r 1string r> stream-write ;
-
-M: editor stream-write control-self user-input ;
-
-M: editor stream-close drop ;
+M: editor gadget-text* editor-string % ;

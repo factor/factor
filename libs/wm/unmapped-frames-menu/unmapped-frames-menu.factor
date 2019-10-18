@@ -1,5 +1,5 @@
 
-USING: kernel namespaces generic sequences arrays hashtables x11
+USING: kernel namespaces generic sequences quotations arrays assocs x11
        vars x.geometry x x.widgets x.widgets.keymenu wm.frame wm.menu ;
 
 IN: wm.unmapped-frames-menu
@@ -17,7 +17,7 @@ dup add-to-window-table
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : unmapped-frames ( -- seq )
-window-table> hash-values [ frame? ] subset [ mapped? not ] subset ;
+window-table> values [ frame? ] subset [ mapped? not ] subset ;
 
 : frame-name ( frame -- name ) frame-child fetch-name ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: server
 USING: errors io kernel math namespaces parser sequences strings
-threads ;
+threads network ;
 
 SYMBOL: log-stream
 

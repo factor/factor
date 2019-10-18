@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml-utils
-USING: kernel namespaces sequences words io errors hashtables
-    strings parser arrays generic xml-data xml-writer ;
+USING: kernel namespaces sequences words io errors assocs
+quotations strings parser arrays generic xml-data xml-writer ;
 
 ! * System for words specialized on tag names
 
@@ -15,7 +15,7 @@ M: process-missing error.
 
 : run-process ( tag word -- )
     2dup "xtable" word-prop
-    >r dup name-tag r> hash* [ 2nip call ] [
+    >r dup name-tag r> at* [ 2nip call ] [
         drop <process-missing> throw
     ] if ;
 
@@ -25,10 +25,11 @@ M: process-missing error.
     dup [ run-process ] curry define-compound ; parsing
 
 : TAG:
-    scan scan-word [
-        swap "xtable" word-prop
-        rot "/" split [ >r 2dup r> swap set-hash ] each 2drop
-    ] f ; parsing
+    scan scan-word
+    parse-definition
+    swap "xtable" word-prop
+    rot "/" split [ >r 2dup r> swap set-at ] each 2drop ;
+    parsing
 
 
 ! * Common utility functions
@@ -110,7 +111,7 @@ M: tag (xml-inject)
     tag-children [
         swap [ call ] keep
         swap [ (xml-inject) ] keep
-    ] inject ;
+    ] change-each ;
 M: object (xml-inject) 2drop ;
 M: xml (xml-inject) delegate (xml-inject) ;
 : xml-inject ( tag quot -- ) ! quot: tag -- tag

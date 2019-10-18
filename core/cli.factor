@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2006 Slava Pestov.
+! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: command-line
 USING: errors hashtables io kernel kernel-internals namespaces
@@ -32,20 +32,27 @@ parser sequences strings ;
 : default-shell ( -- shell ) "tty" ;
 
 : default-cli-args
+    "quiet" off
+    "script" off
     "e" off
     "user-init" on
     "compile" on
     "native-io" on
-    "quiet" off
+    embedded? "quiet" set
     macosx? "cocoa" set
     unix? macosx? not and "x11" set
-    default-shell "shell" set ;
+    embedded? "remote-control" default-shell ? "shell" set ;
 
 : ignore-cli-args? ( -- ? )
     macosx? "shell" get "ui" = and ;
 
+: script-mode ( -- )
+    t "quiet" set-global
+    "none" "shell" set-global ;
+
 : parse-command-line ( -- )
     cli-args [ cli-arg ] subset
+    "script" get [ script-mode ] when
     ignore-cli-args? [ drop ] [ [ run-file ] each ] if
     "e" get [ eval ] when* ;
 

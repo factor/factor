@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: furnace:help
 USING: furnace help httpd html kernel sequences words strings
-io ;
+quotations io ;
 
 : show-help ( topic -- )
     serving-html

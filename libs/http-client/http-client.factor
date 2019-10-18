@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: http-client
-USING: errors hashtables http kernel math namespaces parser
-sequences io strings ;
+USING: errors assocs http kernel math namespaces parser
+sequences io strings network ;
 
 : parse-host ( url -- host port )
     #! Extract the host name and port number from an HTTP URL.
@@ -38,14 +38,18 @@ DEFER: http-get
     #! Should this support Location: headers that are
     #! relative URLs?
     pick 100 /i 3 = [
-        drop "Location" swap hash nip http-get
+        drop "Location" swap at nip http-get
     ] when ;
+
+: http-get* ( url -- code headers stream )
+    #! Opens a stream for reading from an HTTP URL.
+    parse-url over parse-host <client> [
+        get-request read-response stdio get 
+    ] with-stream* do-redirect ;
 
 : http-get ( url -- code headers string )
     #! Opens a stream for reading from an HTTP URL.
-    parse-url over parse-host <client> [
-        get-request read-response stdio get contents
-    ] with-stream do-redirect ;
+    http-get* [ stdio get contents ] with-stream ;
 
 : download ( url file -- )
     #! Downloads the contents of a URL to a file.

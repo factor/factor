@@ -7,10 +7,8 @@ HELP: bit-array
 
 HELP: <bit-array> ( n -- bit-array )
 { $values { "n" "a non-negative integer" } { "bit-array" "a new " { $link bit-array } } }
-{ $description "Creates a new bit array with the given length and all elements initially set to " { $link f } "." }
-{ $see-also <array> <quotation> <string> <sbuf> <vector> } ;
+{ $description "Creates a new bit array with the given length and all elements initially set to " { $link f } "." } ;
 
 HELP: >bit-array
 { $values { "seq" "a sequence" } { "bit-array" bit-array } }
-{ $description "Outputs a freshly-allocated bit array whose elements have the same boolean values as a given sequence." }
-{ $see-also >array >string >sbuf >vector >quotation } ;
+{ $description "Outputs a freshly-allocated bit array whose elements have the same boolean values as a given sequence." } ;

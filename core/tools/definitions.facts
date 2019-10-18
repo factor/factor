@@ -21,8 +21,7 @@ $prettyprinting-note ;
 HELP: synopsis
 { $values { "defspec" "a definition specifier" } }
 { $contract "Prettyprints the prologue of a definition." }
-$prettyprinting-note
-{ $see-also summary } ;
+$prettyprinting-note ;
 
 HELP: comment.
 { $values { "string" "a string" } }

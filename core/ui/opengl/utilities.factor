@@ -26,10 +26,10 @@ sequences ;
 : gl-line ( a b -- )
     GL_LINES [ gl-vertex gl-vertex ] do-state ;
 
-: gl-fill-rect ( loc dim -- )
+: gl-fill-rect ( loc ext -- )
     [ first2 ] 2apply glRectd ;
 
-: gl-rect ( loc dim -- )
+: gl-rect ( loc ext -- )
     GL_FRONT_AND_BACK GL_LINE glPolygonMode
     >r { 0.5 0.5 } v+ r> { 0.5 0.5 } v- gl-fill-rect
     GL_FRONT_AND_BACK GL_FILL glPolygonMode ;

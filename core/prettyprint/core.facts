@@ -38,3 +38,20 @@ HELP: line-limit
 
 HELP: string-limit
 { $var-description "Toggles whenever printed strings are truncated to the margin." } ;
+
+HELP: line-limit?
+{ $values { "?" "a boolean" } }
+{ $description "Tests if the line number limit has been reached, and thus if prettyprinting should stop." } ;
+
+HELP: hilite-quotation
+{ $var-description "If set, printing this quotation will highlight the element with index " { $link hilite-index } " in an output stream-specific manner." } ;
+
+HELP: hilite-index
+{ $var-description "If set, printing the quotation stored in " { $link hilite-quotation } " will highlight the element with this index in an output stream-specific manner." } ;
+
+HELP: do-indent
+{ $description "Outputs the current indent nesting to the " { $link stdio } " stream." } ;
+
+HELP: fresh-line
+{ $values { "n" "the current column position" } }
+{ $description "Advances the prettyprinter by one line unless the current line is empty. If the line limit is exceeded, escapes the prettyprinter by restoring a continuation captured in " { $link do-pprint } "." } ;

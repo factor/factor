@@ -1,21 +1,15 @@
-! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
+! Copyright (C) 2005, 2007 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-IN: x11
-USING: arrays errors freetype gadgets gadgets-listener
-gadgets-workspace hashtables kernel kernel-internals math
-namespaces opengl sequences strings timers ;
+IN: x11-ui
+USING: alien arrays errors freetype gadgets gadgets-listener
+gadgets-workspace assocs kernel kernel-internals math
+namespaces opengl sequences strings timers x11 utf8 ;
 
-! In the X11 backend, world-handle is a pair { window context }.
-! The window is an X11 window ID, and the context is a
-! GLX context pointer.
+: XA_NET_WM_NAME "_NET_WM_NAME" x-atom ;
+
+TUPLE: x11-handle window glx xic ;
 
 M: world expose-event nip relayout ;
-
-: configured-loc ( event -- dim )
-    dup XConfigureEvent-x swap XConfigureEvent-y 2array ;
-
-: configured-dim ( event -- dim )
-    dup XConfigureEvent-width swap XConfigureEvent-height 2array ;
 
 M: world configure-event
     over configured-loc over set-world-loc
@@ -32,9 +26,9 @@ M: world configure-event
     H{
         { HEX: FF08 "BACKSPACE" }
         { HEX: FF09 "TAB"       }
-        { HEX: FF0D "RETURN"    }
+        { HEX: FF0D "RET"       }
         { HEX: FF8D "ENTER"     }
-        { HEX: FF1B "ESCAPE"    }
+        { HEX: FF1B "ESC"       }
         { HEX: FFFF "DELETE"    }
         { HEX: FF50 "HOME"      }
         { HEX: FF51 "LEFT"      }
@@ -56,45 +50,26 @@ M: world configure-event
         { HEX: FFC6 "F9"        }
     } ;
 
-: ignored-key? ( keycode -- ? )
-    {
-        HEX: FFE1 HEX: FFE2 HEX: FFE3 HEX: FFE4 HEX: FFE5
-        HEX: FFE6 HEX: FFE7 HEX: FFE8 HEX: FFE9 HEX: FFEA
-        HEX: FFEB HEX: FFEC HEX: FFED HEX: FFEE
-    } member? ;
+: key-code ( keysym -- keycode action? )
+    dup key-codes at [ t ] [ 1string f ] ?if ;
 
-: key-code ( event -- keycode )
-    lookup-string drop dup ignored-key? [
-        drop f
-    ] [
-        dup key-codes hash [ ] [ 1string ] ?if
-    ] if ;
+: event-modifiers ( event -- seq )
+    XKeyEvent-state modifiers modifier ;
 
-: event-modifiers XKeyEvent-state modifiers modifier ;
-
-: key-event>gesture ( event -- modifiers gesture )
-    dup event-modifiers swap key-code ;
-
-: key-down-event>gesture ( event -- gesture )
-    key-event>gesture [ <key-down> ] [ drop f ] if* ;
+: key-down-event>gesture ( event world -- string gesture )
+    dupd
+    world-handle x11-handle-xic lookup-string
+    >r swap event-modifiers r> key-code <key-down> ;
 
 M: world key-down-event
-    world-focus over key-down-event>gesture [
-        over send-gesture
-        [ swap lookup-string nip swap user-input ] [ 2drop ] if
-    ] [
-        2drop
-    ] if* ;
+    [ key-down-event>gesture ] keep world-focus
+    [ send-gesture ] keep swap [ user-input ] [ 2drop ] if ;
+
+: key-up-event>gesture ( event -- gesture )
+    dup event-modifiers swap 0 XLookupKeysym key-code <key-up> ;
 
 M: world key-up-event
-    world-focus swap key-event>gesture dup [
-        <key-up> dup [ swap send-gesture drop ] [ 2drop ] if
-    ] [
-        3drop
-    ] if ;
-
-: mouse-event-loc ( event -- loc )
-    dup XButtonEvent-x swap XButtonEvent-y 2array ;
+    >r key-up-event>gesture r> world-focus send-gesture drop ;
 
 : mouse-event>gesture ( event -- modifiers button loc )
     dup event-modifiers over XButtonEvent-button
@@ -108,10 +83,6 @@ M: world button-up-event
     >r mouse-event>gesture >r <button-up> r> r>
     send-button-up ;
 
-: mouse-event>scroll-direction ( event -- pair )
-    #! Reminder for myself: 4 is up, 5 is down
-    XButtonEvent-button 5 = 1 -1 ? 0 swap 2array ;
-
 M: world wheel-event
     >r dup mouse-event>scroll-direction swap mouse-event-loc r>
     send-wheel ;
@@ -124,17 +95,43 @@ M: world motion-event
     >r dup XMotionEvent-x swap XMotionEvent-y 2array r>
     move-hand fire-motion ;
 
-M: world focus-in-event nip focus-world ;
+M: world focus-in-event
+    nip
+    dup world-handle x11-handle-xic XSetICFocus focus-world ;
 
-M: world focus-out-event nip unfocus-world ;
+M: world focus-out-event
+    nip
+    dup world-handle x11-handle-xic XUnsetICFocus unfocus-world ;
 
 M: world selection-notify-event
-    [ world-handle first selection-from-event ] keep
+    [ world-handle x11-handle-window selection-from-event ] keep
     world-focus user-input ;
 
 : supported-type? ( atom -- ? )
-    { "STRING" "UTF8_STRING" "TEXT" }
+    { "UTF8_STRING" "STRING" "TEXT" }
     [ x-atom = ] contains-with? ;
+
+: clipboard-for-atom ( atom -- clipboard )
+    {
+        { [ dup XA_PRIMARY = ] [ drop selection get ] }
+        { [ dup XA_CLIPBOARD = ] [ drop clipboard get ] }
+        { [ t ] [ drop <clipboard> ] }
+    } cond ;
+
+: encode-clipboard ( string type -- bytes )
+    XSelectionRequestEvent-target XA_UTF8_STRING =
+    [ encode-utf8 ] [ string>char-alien ] if ;
+
+: set-selection-prop ( evt -- )
+    dpy get swap
+    [ XSelectionRequestEvent-requestor ] keep
+    [ XSelectionRequestEvent-property ] keep
+    [ XSelectionRequestEvent-target ] keep
+    >r 8 PropModeReplace r>
+    [
+        XSelectionRequestEvent-selection
+        clipboard-for-atom x-clipboard-contents
+    ] keep encode-clipboard dup length XChangeProperty drop ;
 
 M: world selection-request-event
     drop dup XSelectionRequestEvent-target {
@@ -144,59 +141,100 @@ M: world selection-request-event
         { [ t ] [ drop send-notify-failure ] }
     } cond ;
 
-: close-box? ( event -- ? )
-    dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =
-    swap XClientMessageEvent-data0 "WM_DELETE_WINDOW" x-atom =
-    and ;
+: close-window ( handle -- )
+    dup x11-handle-xic XDestroyIC
+    dup x11-handle-glx destroy-glx
+    x11-handle-window dup unregister-window
+    destroy-window ;
 
 M: world client-event
     swap close-box? [
-        dup world-handle
-        >r stop-world
-        r> first2 destroy-window*
+        dup world-handle >r stop-world r> close-window
     ] [
         drop
     ] if ;
 
 : gadget-window ( world -- )
-    [
-        dup world-loc over rect-dim glx-window >r
-        [ register-window ] keep r> 2array
-    ] keep set-world-handle ;
+    dup world-loc over rect-dim glx-window
+    over "Factor" create-xic <x11-handle>
+    2dup x11-handle-window register-window
+    swap set-world-handle ;
+
+: wait-event ( -- event )
+    QueuedAfterFlush events-queued 0 > [
+        next-event dup
+        None XFilterEvent zero? [ drop wait-event ] unless
+    ] [
+        ui-step wait-event
+    ] if ;
+
+: do-events ( -- )
+    wait-event dup XAnyEvent-window window dup
+    [ [ 2dup handle-event ] assert-depth ] when 2drop ;
 
 : event-loop ( -- )
     windows get empty? [
         [ do-events ] ui-try event-loop
     ] unless ;
 
+: x-clipboard@ ( gadget clipboard -- prop win )
+    x-clipboard-atom swap
+    find-world world-handle x11-handle-window ;
+
+M: x-clipboard copy-clipboard
+    [ x-clipboard@ own-selection ] keep
+    set-x-clipboard-contents ;
+
+M: x-clipboard paste-clipboard
+    >r find-world world-handle x11-handle-window
+    r> x-clipboard-atom convert-selection ;
+
+: init-clipboard ( -- )
+    XA_PRIMARY <x-clipboard> selection set-global
+    XA_CLIPBOARD <x-clipboard> clipboard set-global ;
+
+: set-title-old ( dpy window string -- )
+    dup [ 127 <= ] all? [ XStoreName drop ] [ 3drop ] if ;
+
+: set-title-new ( dpy window string -- )
+    >r
+    XA_NET_WM_NAME XA_UTF8_STRING 8 PropModeReplace
+    r> encode-utf8 dup length XChangeProperty drop ;
+
 IN: gadgets
 
 : set-title ( string world -- )
-    world-handle first dpy get -rot swap XStoreName drop ;
+    world-handle x11-handle-window swap dpy get -rot
+    3dup set-title-old set-title-new ;
 
 : open-window* ( world -- )
     dup gadget-window
     dup start-world
-    world-handle first dup set-closable map-window ;
+    world-handle x11-handle-window dup set-closable map-window ;
 
 : raise-window ( world -- )
-    dpy get swap world-handle first XRaiseWindow drop ;
+    world-handle [
+        dpy get swap x11-handle-window XRaiseWindow drop
+    ] when* ;
 
 : select-gl-context ( handle -- )
-    dpy get swap first2 glXMakeCurrent
+    dpy get swap
+    dup x11-handle-window swap x11-handle-glx glXMakeCurrent
     [ "Failed to set current GLX context" throw ] unless ;
 
 : flush-gl-context ( handle -- )
-    dpy get swap first glXSwapBuffers ;
+    dpy get swap x11-handle-window glXSwapBuffers ;
 
 IN: shells
 
 : ui ( -- )
     [
         f [
-            init-clipboard
-            start-ui
-            event-loop
+            [
+                init-clipboard
+                start-ui
+                event-loop
+            ] with-xim
         ] with-x
     ] with-freetype ;
 

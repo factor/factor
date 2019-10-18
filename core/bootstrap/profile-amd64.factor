@@ -1,4 +1,4 @@
-USING: image kernel-internals namespaces ;
+USING: image kernel namespaces ;
 
 ! Do not load this file into a running image, ever.
 

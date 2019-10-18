@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays errors generic hashtables kernel
+USING: arrays errors generic assocs hashtables kernel
 math math-internals namespaces parser prettyprint sequences
-strings vectors words ;
+strings vectors words assocs ;
 IN: inference
 
 : (consume-values) ( n -- )
@@ -16,10 +16,10 @@ IN: inference
 
 : produce-values ( seq node -- )
     >r [ drop <computed> ] map dup r> set-node-out-d
-    meta-d get nappend ;
+    meta-d get push-all ;
 
 : recursing? ( word -- label/f )
-    recursive-state get <reversed> assoc ;
+    recursive-state get at ;
 
 : if-inline ( word true false -- )
     >r >r dup "inline" word-prop r> r> if ; inline
@@ -49,7 +49,7 @@ TUPLE: no-effect word ;
     dataflow-graph get 1array over set-node-children ;
 
 : add-recursive-state ( word label -- )
-    2array recursive-state [ swap add ] change ;
+    2array recursive-state [ swap add* ] change ;
 
 : inline-block ( word -- node-block data )
     [
@@ -57,11 +57,11 @@ TUPLE: no-effect word ;
         gensym 2dup add-recursive-state
         over >r #label r> word-def infer-quot
         unnest-node
-    ] make-hash ;
+    ] H{ } make-assoc ;
 
 : apply-infer ( hash -- )
     { meta-d meta-r d-in }
-    [ [ swap hash ] keep set ] each-with ;
+    [ [ swap at ] keep set ] each-with ;
 
 GENERIC: collect-recursion* ( label node -- )
 
@@ -142,7 +142,7 @@ M: compound infer-word
     over "inferred-vars" word-prop
     apply-effect/vars ;
 
-: default-apply-word ( word -- )
+: apply-word ( word -- )
     {
         { [ dup "infer" word-prop ] [ custom-infer ] }
         { [ dup "no-effect" word-prop ] [ no-effect ] }
@@ -150,9 +150,9 @@ M: compound infer-word
         { [ t ] [ dup infer-word apply-effect/vars ] }
     } cond ;
 
-M: word apply-word default-apply-word ;
+M: word apply-object apply-word ;
 
-M: symbol apply-word apply-literal ;
+M: symbol apply-object apply-literal ;
 
 TUPLE: recursive-declare-error word ;
 
@@ -163,18 +163,13 @@ TUPLE: recursive-declare-error word ;
         <recursive-declare-error> inference-error
     ] if* ;
 
-: recursive-inline? ( word -- ? )
-    recursive-state get dup empty?
-    [ 2drop f ] [ peek first eq? ] if ;
-
-: apply-inline ( word -- )
-    dup recursive-inline?
-    [ declared-infer ] [ inline-closure ] if ;
-
-: apply-compound ( word -- )
-    dup recursing?
-    [ declared-infer ] [ default-apply-word ] if ;
-
-M: compound apply-word
+M: compound apply-object
     dup "infer-vars" word-prop call
-    [ apply-inline ] [ apply-compound ] if-inline ;
+    dup recursing? [
+        declared-infer
+    ] [
+        [ inline-closure ] [ apply-word ] if-inline
+    ] if ;
+
+M: undefined apply-object
+    drop [ "Undefined" throw ] infer-quot ;

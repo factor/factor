@@ -1,0 +1,142 @@
+IN: interpreter
+USING: help kernel generic math hashtables quotations ;
+
+HELP: meta-interp
+{ $var-description "Variable holding a " { $link continuation } " instance for the single-stepper." } ;
+
+HELP: meta-d
+{ $values { "seq" "a sequence" } }
+{ $description "Pushes the data stack from the single stepper." } ;
+
+HELP: push-d
+{ $values { "obj" object } }
+{ $description "Pushes an object on the single stepper's data stack." } ;
+
+HELP: pop-d
+{ $values { "obj" object } }
+{ $description "Pops an object from the single stepper's data stack." }
+{ $errors "Throws an error if the single stepper's data stack is empty." } ;
+
+HELP: peek-d
+{ $values { "obj" object } }
+{ $description "Outputs the object at the top of the single stepper's data stack." }
+{ $errors "Throws an error if the single stepper's data stack is empty." } ;
+
+HELP: meta-r
+{ $values { "seq" "a sequence" } }
+{ $description "Pushes the retain stack from the single stepper." } ;
+
+HELP: push-r
+{ $values { "obj" object } }
+{ $description "Pushes an object on the single stepper's retain stack." } ;
+
+HELP: pop-r
+{ $values { "obj" object } }
+{ $description "Pops an object from the single stepper's retain stack." }
+{ $errors "Throws an error if the single stepper's retain stack is empty." } ;
+
+HELP: peek-r
+{ $values { "obj" object } }
+{ $description "Outputs the object at the top of the single stepper's retain stack." }
+{ $errors "Throws an error if the single stepper's retain stack is empty." } ;
+
+HELP: meta-c
+{ $values { "seq" "a sequence" } }
+{ $description "Pushes the call stack from the single stepper." } ;
+
+HELP: push-c
+{ $values { "obj" object } }
+{ $description "Pushes an object on the single stepper's call stack." } ;
+
+HELP: pop-c
+{ $values { "obj" object } }
+{ $description "Pops an object from the single stepper's call stack." }
+{ $errors "Throws an error if the single stepper's call stack is empty." } ;
+
+HELP: peek-c
+{ $values { "obj" object } }
+{ $description "Outputs the object at the top of the single stepper's call stack." }
+{ $errors "Throws an error if the single stepper's call stack is empty." } ;
+
+HELP: break-hook
+{ $var-description "A quotation called by the " { $link break } " word. The default value invokes the " { $link "ui-walker" } "." } ;
+
+HELP: callframe
+{ $var-description "The quotation currently being stepped through by the single stepper." } ;
+
+HELP: callframe-scan
+{ $var-description "The index of the next object to be evaluated by the single stepper." } ;
+
+HELP: break
+{ $description "Suspends execution of the current thread and starts the single stepper by calling " { $link break-hook } "." } ;
+
+HELP: up
+{ $description "Returns from the current quotation in the single stepper." } ;
+
+HELP: done-cf?
+{ $description "Outputs whenever the current quotation has finished evaluating in the single stepper." } ;
+
+HELP: done?
+{ $description "Outputs whenever the current continuation has finished evaluating in the single stepper." }
+;
+
+HELP: reset-interpreter
+{ $description "Resets the single stepper, discarding any prior state." } ;
+
+HELP: save-callframe
+{ $description "Saves the currently evaluating quotation on the single stepper's call stack." } ;
+
+HELP: meta-call
+{ $description "Begins evaluating a quotation in the single stepper, performing tail call optimization if the prior quotation has finished evaluating." } ;
+
+HELP: step-to
+{ $values { "n" integer } }
+{ $description "Evaluates the single stepper's continuation until the " { $snippet "n" } "th index in the current quotation." } ;
+
+HELP: meta-history
+{ $var-description "A sequence of continuations, captured at every stage of single-stepping. Used by " { $link step-back } " to implement backwards time travel." } ;
+
+HELP: save-interp
+{ $description "Snapshots the single stepper state and saves it in " { $link meta-history } "." } ;
+
+HELP: restore-interp
+{ $values { "ns" hashtable } }
+{ $description "Restores the single stepper to a former state, which must have been saved by a call to " { $link save-interp } "." } ;
+
+HELP: next
+{ $values { "quot" quotation } }
+{ $description "Applies the quotation to the next object evaluated by the single stepper. If the single stepper's current quotation has finished evaluating, this will return to the caller quotation." }
+{ $notes "This word is used to implement " { $link step } " and " { $link step-in } "." } ;
+
+HELP: step
+{ $values { "obj" object } }
+{ $description "Evaluates the object in the single stepper using Factor evaluation semantics:"
+    { $list
+        { "If the object is a " { $link wrapper } ", then the wrapped object is pushed on the single stepper's data stack" }
+        { "If the object is a word, then the word is executed in the single stepper's continuation atomically" }
+        { "Otherwise, the object is pushed on the single stepper's data stack" }
+    }
+} ;
+
+HELP: step-in
+{ $values { "obj" object } }
+{ $description "Evaluates the object in the single stepper using Factor evaluation semantics:"
+    { $list
+        { "If the object is a " { $link wrapper } ", then the wrapped object is pushed on the single stepper's data stack" }
+        { "If the object is a compound word, then the single stepper enters the word definition" }
+        { "If the object is a primitive word or a word with special single stepper behavior, it is executed in the single stepper's continuation atomically" }
+        { "Otherwise, the object is pushed on the single stepper's data stack" }
+    }
+} ;
+
+HELP: step-out
+{ $description "Evaluates the remainder of the current quotation in the single stepper." } ;
+
+HELP: step-back
+{ $description "Steps back to the most recently saved snapshot of the single stepper continuation in " { $link meta-history } "." } ;
+
+HELP: step-all
+{ $description "Executes the remainder of the single stepper's continuation. This effectively ends single stepping unless the continuation invokes " { $link break } " at a later point in time." } ;
+
+HELP: abandon
+{ $description "Raises an error in the single stepper's continuation then executes the remainder of the continuation starting from the error handler." } ;

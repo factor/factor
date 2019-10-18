@@ -2,12 +2,17 @@ IN: gadgets
 USING: help arrays ;
 
 HELP: grid
-{ $class-description "A grid gadget lays out its children so that all gadgets in a column have equal width and all gadgets in a row have equal height. The " { $link grid-gap } " slot stores a pair of integers, the horizontal and vertical gap between children, respectively."
-$terpri
+{ $class-description "A grid gadget lays out its children so that all gadgets in a column have equal width and all gadgets in a row have equal height."
+$nl
+"The " { $link grid-gap } " slot stores a pair of integers, the horizontal and vertical gap between children, respectively."
+$nl
+"The " { $link grid-fill? } " slot stores a boolean, indicating if grid cells should assume their preferred size, or if they should fill the dimensions of the cell. The default is " { $link t } "."
+$nl
 "Grids are created by calling " { $link <grid> } " and children are managed with " { $link grid-add } " and " { $link grid-remove } "."
-$terpri
-"The " { $link add-gadget } ", " { $link unparent } " and " { $link clear-gadget } " words should not be used to manage child gadgets of grids." }
-{ $see-also frame } ;
+$nl
+"The " { $link add-gadget } ", " { $link unparent } " and " { $link clear-gadget } " words should not be used to manage child gadgets of grids." } ;
+
+{ grid frame } related-words
 
 HELP: <grid>
 { $values { "children" "a sequence of sequences of gadgets" } { "grid" "a new " { $link grid } } }
@@ -28,14 +33,6 @@ HELP: grid-remove
 { $description "Removes a child gadget from the specified location." }
 { $side-effects "grid" } ;
 
-HELP: build-grid
-{ $values { "grid" grid } { "specs" array } }
-{ $description "Constructs gadgets and adds them to the grid by interpreting " { $snippet "spec" } ", which is an array of quadruples of the form " { $snippet "{ quot setter post loc }" } ". The quadruples break down as follows:"
-    { $list
-        { { $snippet "quot" } " - a quotation which pushes a new gadget on the stack. The quotation is permitted to consume values from the stack, and it is up to the caller of " { $link build-grid } " to provide the correct amount." }
-        { { $snippet "setter" } " - a word with stack effect " { $snippet "( gadget grid -- )" } ". If " { $snippet "grid" } " is a tuple delegating to a " { $link grid } ", this can be used to store the new gadget in a tuple slot." }
-        { { $snippet "post" } " - a quotation with stack effect " { $snippet "( gadget -- newgadget )" } ", applied to the gadget before it is added to the grid" }
-        { { $snippet "loc" } " - a word with stack effect " { $snippet "( -- i j )" } " which pushes the grid location where to add the new gadget, for example " { $link @center } "." }
-    }
-}
-{ $see-also make-frame make-frame* } ;
+HELP: grid,
+{ $values { "gadget" gadget } { "i" "non-negative integer" } { "j" "non-negative integer" } }
+{ $description "Adds a child gadget at the specified location. This word can only be called inside the quotation passed to " { $link make-frame } " or " { $link build-frame } "." } ;

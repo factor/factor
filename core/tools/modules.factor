@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: modules
 USING: hashtables io kernel namespaces parser sequences
@@ -30,9 +30,9 @@ words strings arrays math help errors prettyprint-internals styles test definiti
 
 M: module synopsis*
     \ PROVIDE: pprint-word
-    [ module-name ] keep presentation-text ;
+    [ module-name ] keep present-text ;
 
-M: module definition module>alist t ;
+M: module definition module>alist ;
 
 M: module where module-loc ;
 
@@ -43,9 +43,9 @@ M: module where module-loc ;
     dup resource-path directory [ path+ ] map-with ;
 
 : (available-modules) ( path -- )
+    dup module-dir? [ dup , ] when
     resource-directory
     [ resource-path directory? ] subset
-    dup [ module-dir? ] subset %
     [ (available-modules) ] each ;
 
 : small-modules ( path -- seq )
@@ -70,4 +70,4 @@ M: module where module-loc ;
 
 : modules. ( -- )
     available-modules
-    [ [ module-string ] keep write-object terpri ] each ;
+    [ [ module-string ] keep write-object nl ] each ;

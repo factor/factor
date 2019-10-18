@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: arrays generic hashtables kernel models math
-namespaces sequences styles timers ;
+namespaces sequences styles timers quotations ;
 
 SYMBOL: origin
 
@@ -38,12 +38,20 @@ M: array rect-dim drop { 0 0 } ;
 : intersects? ( rect/point rect -- ? )
     (rect-intersect) [v-] { 0 0 } = ;
 
+: (rect-union) ( rect rect -- array array )
+    2rect-extent vmax >r vmin r> ;
+
+: rect-union ( rect1 rect2 -- newrect )
+    (rect-union) <extent-rect> ;
+
 TUPLE: gadget
-pref-dim parent children orientation state
+pref-dim parent children orientation state focus
 visible? root? clipped? grafted?
 interior boundary ;
 
 M: gadget equal? 2drop f ;
+
+M: gadget hashcode* drop gadget hashcode* ;
 
 : gadget-child ( gadget -- child ) gadget-children first ;
 
@@ -80,7 +88,7 @@ M: gadget children-on nip gadget-children ;
     [ >absolute intersects? ] [ 2drop f ] if ;
 
 : (pick-up) ( point gadget -- gadget/f )
-    dupd children-on <reversed> [ inside? ] find-with nip ;
+    dupd children-on [ inside? ] find-last-with nip ;
 
 : translate ( rect/point -- ) rect-loc origin [ v+ ] change ;
 
@@ -104,9 +112,6 @@ M: gadget children-on nip gadget-children ;
     over [ dup pick [ set-gadget-parent ] each-child-with ] when
     set-delegate ;
 
-: with-gadget ( gadget quot -- )
-    [ swap gadget set call ] with-scope ; inline
-
 ! Selection protocol
 GENERIC: gadget-selection? ( gadget -- ? )
 
@@ -116,20 +121,33 @@ GENERIC: gadget-selection ( gadget -- string/f )
 
 M: gadget gadget-selection drop f ;
 
-! Re-firing gestures while mouse held down, etc. Used by
-! slider gadgets
-TUPLE: timer-gadget quot ;
+: gadget-copy ( gadget clipboard -- )
+    over gadget-selection? [
+        >r [ gadget-selection ] keep r> copy-clipboard
+    ] [
+        2drop
+    ] if ;
 
-C: timer-gadget ( gadget -- newgadget )
-    [ set-gadget-delegate ] keep ;
+: com-copy clipboard get gadget-copy ;
 
-M: timer-gadget tick timer-gadget-quot call ;
+: com-copy-selection selection get gadget-copy ;
 
-: start-timer-gadget ( gadget quot -- )
-    2dup call
-    over >r curry r>
-    [ set-timer-gadget-quot ] keep
-    100 200 add-timer ; inline
+! Text protocol
+GENERIC: gadget-text* ( gadget -- )
 
-: stop-timer-gadget ( gadget -- )
-    dup remove-timer f swap set-timer-gadget-quot ;
+GENERIC: gadget-text-separator ( gadget -- str )
+
+M: gadget gadget-text-separator
+    gadget-orientation { 0 1 } = "\n" "" ? ;
+
+: gadget-seq-text ( seq gadget -- )
+    gadget-text-separator swap
+    [ dup % ] [ gadget-text* ] interleave drop ;
+
+M: gadget gadget-text*
+    dup gadget-children swap gadget-seq-text ;
+
+M: array gadget-text*
+    [ gadget-text* ] each ;
+
+: gadget-text ( gadget -- string ) [ gadget-text* ] "" make ;

@@ -13,33 +13,39 @@ IN: win32
 : enum-clipboard ( -- seq )
     [ 0 (enum-clipboard) ] { } make nip ;
 
+: with-clipboard ( quot -- )
+    f OpenClipboard win32-error=0/f
+    call
+    CloseClipboard win32-error=0/f ; inline
+    
+
 : paste ( -- str )
-    f OpenClipboard drop
-    CF_TEXT IsClipboardFormatAvailable 0 = [
+    [
+        CF_UNICODETEXT IsClipboardFormatAvailable 0 = [
             ! nothing to paste
             ""
         ] [
-            CF_TEXT GetClipboardData
-            dup GlobalLock swap
-            GlobalUnlock drop
-            alien>char-string
-    ] if
-    CloseClipboard drop
+            CF_UNICODETEXT GetClipboardData dup win32-error=0/f
+            dup GlobalLock dup win32-error=0/f
+            GlobalUnlock win32-error=0/f
+            alien>u16-string
+        ] if
+    ] with-clipboard
     crlf>lf ;
 
 : copy ( str -- )
-    lf>crlf
-    f OpenClipboard drop
-    EmptyClipboard drop
-    GMEM_MOVEABLE over length 1+ GlobalAlloc dup 0 = [
-        "unable to allocate memory" throw
-    ] when
-
-    dup GlobalLock
-    rot [ string>char-alien ] keep length memcpy
-    dup GlobalUnlock drop
-    CF_TEXT swap SetClipboardData 0 = [ win32-error ] when
-    CloseClipboard drop ;
+    lf>crlf [
+        string>u16-alien
+        f OpenClipboard win32-error=0/f
+        EmptyClipboard win32-error=0/f
+        GMEM_MOVEABLE over length 1+ GlobalAlloc
+            dup win32-error=0/f
+    
+        dup GlobalLock dup win32-error=0/f
+        rot dup length memcpy
+        dup GlobalUnlock win32-error=0/f
+        CF_UNICODETEXT swap SetClipboardData win32-error=0/f
+    ] with-clipboard ;
 
 TUPLE: pasteboard ;
 M: pasteboard clipboard-contents drop paste ;

@@ -3,7 +3,7 @@
 IN: generator
 USING: alien assembler-ppc compiler generic kernel
 kernel-internals math memory namespaces sequences words
-hashtables ;
+assocs ;
 
 : code-format 4 ; inline
 
@@ -20,7 +20,7 @@ hashtables ;
     os H{
         { "linux" 8 }
         { "macosx" 24 }
-    } hash + ; inline
+    } at + ; inline
 
 : local@ param@ 32 + ; inline
 
@@ -28,7 +28,9 @@ hashtables ;
     os H{
         { "linux" 4 }
         { "macosx" 8 }
-    } hash + ; inline
+    } at + ; inline
+
+M: temp-reg v>operand drop 11 ;
 
 M: int-regs return-reg drop 3 ;
 M: int-regs param-regs drop { 3 4 5 6 7 8 9 10 } ;
@@ -40,7 +42,7 @@ M: float-regs param-regs
     drop os H{
         { "macosx" { 1 2 3 4 5 6 7 8 9 10 11 12 13 } }
         { "linux" { 1 2 3 4 5 6 7 8 } }
-    } hash ;
+    } at ;
 
 M: float-regs vregs drop { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 
@@ -52,31 +54,25 @@ M: rs-loc loc>operand rs-loc-n cells neg 15 swap ;
 M: immediate load-literal
     [ v>operand ] 2apply LOAD ;
 
-M: object load-literal
-    v>operand
+: load-indirect ( obj reg -- )
     [ 0 swap LOAD32 rc-absolute-ppc-2/2 rel-literal ] keep
     dup 0 LWZ ;
 
-: stack-increment
-    \ stack-frame-size get local@ 16 align ;
+: stack-frame ( n -- i ) local@ 16 align ;
 
-: %prologue ( -- )
-    [
-        1 1 stack-increment neg STWU
-        0 MFLR
-        0 1 stack-increment lr@ STW
-    ] if-stack-frame ;
+: %prologue ( n -- )
+    1 1 pick stack-frame neg STWU
+    0 MFLR
+    0 1 rot stack-frame lr@ STW ;
 
-: %epilogue ( -- )
+: %epilogue ( n -- )
     #! At the end of each word that calls a subroutine, we store
     #! the previous link register value in r0 by popping it off
     #! the stack, set the link register to the contents of r0,
     #! and jump to the link register.
-    [
-        0 1 stack-increment lr@ LWZ
-        1 1 stack-increment ADDI
-        0 MTLR
-    ] if-stack-frame ;
+    0 1 pick stack-frame lr@ LWZ
+    1 1 rot stack-frame ADDI
+    0 MTLR ;
 
 : primitive-addr ( word -- )
     #! Load a word address into r3.
@@ -84,7 +80,6 @@ M: object load-literal
 
 : %call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.
-    dup (compile)
     dup primitive? [ primitive-addr  3 MTLR  BLRL ] [ BL ] if ;
 
 : %jump-label ( label -- )
@@ -92,11 +87,8 @@ M: object load-literal
     #! WARNING: don't clobber LR here!
     dup primitive? [ primitive-addr  3 MTCTR  BCTR ] [ B ] if ;
 
-: %jump ( label -- )
-    %epilogue dup (compile) %jump-label ;
-
 : %jump-t ( label -- )
-    0 "flag" operand object-tag CMPI BNE ;
+    0 "flag" operand object tag-number CMPI BNE ;
 
 : (%dispatch) ( word-table# -- )
     "n" operand dup 1 SRAWI
@@ -114,9 +106,9 @@ M: object load-literal
     [ MTLR BLRL ] dispatch-template ;
 
 : %jump-dispatch ( word-table# -- )
-    [ %epilogue MTCTR BCTR ] dispatch-template ;
+    [ %epilogue-later MTCTR BCTR ] dispatch-template ;
 
-: %return ( -- ) %epilogue BLR ;
+: %return ( -- ) %epilogue-later BLR ;
 
 : compile-dlsym ( symbol dll register -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
@@ -161,7 +153,7 @@ M: stack-params %save-param-reg ( stack reg reg-class -- )
     #! Funky. Read the parameter from the caller's stack frame.
     #! This word is used in callbacks
     drop
-    0 1 rot param@ stack-increment + LWZ
+    0 1 rot param@ stack-frame* + LWZ
     0 1 rot local@ STW ;
 
 : %prepare-unbox ( -- )
@@ -175,6 +167,16 @@ M: stack-params %save-param-reg ( stack reg reg-class -- )
     f %alien-invoke
     ! Store the return value on the C stack
     over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
+
+: %unbox-long-long ( n func -- )
+    ! Value must be in r3:r4
+    ! Call the unboxer
+    f %alien-invoke
+    ! Store the return value on the C stack
+    [
+        3 1 pick local@ STW
+        4 1 rot cell + local@ STW
+    ] when* ;
 
 : %unbox-large-struct ( n size -- )
     ! Value must be in r3
@@ -193,7 +195,13 @@ M: stack-params %save-param-reg ( stack reg reg-class -- )
     over [ 0 over param-reg swap %load-param-reg ] [ 2drop ] if
     r> f %alien-invoke ;
 
-: temp@ stack-increment swap - ;
+: %box-long-long ( n func -- )
+    >r [
+        3 1 pick local@ LWZ
+        4 1 rot cell + local@ LWZ
+    ] when* r> f %alien-invoke ;
+
+: temp@ stack-frame* swap - ;
 
 : struct-return@ ( size n -- n ) [ local@ ] [ temp@ ] ?if ;
 
@@ -239,16 +247,18 @@ M: stack-params %save-param-reg ( stack reg reg-class -- )
 
 : %cleanup ( alien-node -- ) drop ;
 
-: %untag ( src dest -- ) 0 0 31 tag-bits - RLWINM ;
+: %untag ( src dest -- ) 0 0 31 tag-bits get - RLWINM ;
 
-: %tag-fixnum ( src dest -- ) tag-bits SLWI ;
+: %tag-fixnum ( src dest -- ) tag-bits get SLWI ;
 
-: %untag-fixnum ( src dest -- ) tag-bits SRAWI ;
+: %untag-fixnum ( src dest -- ) tag-bits get SRAWI ;
 
 : value-structs?
     #! On Linux/PPC, value structs are passed in the same way
     #! as reference structs, we just have to make a copy first.
     os "linux" = not ;
+
+: fp-shadows-int? ( -- ? ) macosx? ;
 
 : small-enough? ( n -- ? ) -32768 32767 between? ;
 

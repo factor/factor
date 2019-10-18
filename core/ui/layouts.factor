@@ -122,6 +122,8 @@ C: pack ( orientation -- pack )
 
 : <pile> ( -- pack ) { 0 1 } <pack> ;
 
+: <filled-pile> ( -- pack ) <pile> 1 over set-pack-fill ;
+
 : <shelf> ( -- pack ) { 1 0 } <pack> ;
 
 : dim-sum ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
@@ -145,11 +147,11 @@ M: pack layout*
 : fast-children-on ( rect axis children -- from to )
     3dup
     >r >r dup rect-loc swap rect-dim v+ origin get v-
-    r> r> (fast-children-on) 1+
+    r> r> (fast-children-on) [ 1+ ] [ 0 ] if*
     >r
     >r >r rect-loc origin get v-
     r> r> (fast-children-on)
-    0 max
+    [ 0 ] unless*
     r> ;
 
 M: pack children-on ( rect gadget -- seq )

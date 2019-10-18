@@ -83,7 +83,9 @@ FUNCTION: BOOL CloseHandle ( HANDLE h ) ;
 ! FUNCTION: CreateDirectoryA
 ! FUNCTION: CreateDirectoryExA
 ! FUNCTION: CreateDirectoryExW
-! FUNCTION: CreateDirectoryW
+FUNCTION: BOOL CreateDirectoryW ( LPCTSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttribytes ) ;
+: CreateDirectory CreateDirectoryW ;
+
 ! FUNCTION: CreateEventA
 ! FUNCTION: CreateEventW
 ! FUNCTION: CreateFiber
@@ -93,13 +95,13 @@ FUNCTION: BOOL CloseHandle ( HANDLE h ) ;
 FUNCTION: HANDLE CreateFileW ( LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttribures, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile ) ;
 : CreateFile CreateFileW ; inline
 
-! FUNCTION: HANDLE  CreateFileMappingA ( HANDLE hFile,
-                                       ! LPSECURITY_ATTRIBUTES lpAttributes,
-                                       ! DWORD flProtect,
-                                       ! DWORD dwMaximumSizeHigh,
-                                       ! DWORD dwMaximumSizeLow,
-                                       ! LPCTSTR lpName ) ;
-! : CreateFileMapping CreateFileMappingA ;
+FUNCTION: HANDLE  CreateFileMappingW ( HANDLE hFile,
+                                       LPSECURITY_ATTRIBUTES lpAttributes,
+                                       DWORD flProtect,
+                                       DWORD dwMaximumSizeHigh,
+                                       DWORD dwMaximumSizeLow,
+                                       LPCTSTR lpName ) ;
+: CreateFileMapping CreateFileMappingW ;
 
 ! FUNCTION: CreateHardLinkA
 ! FUNCTION: CreateHardLinkW
@@ -116,7 +118,7 @@ FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCo
 ! FUNCTION: CreateNamedPipeA
 ! FUNCTION: CreateNamedPipeW
 ! FUNCTION: CreateNlsSecurityDescriptor
-! FUNCTION: CreatePipe
+FUNCTION: BOOL CreatePipe ( PHANDLE hReadPipe, PHANDLE hWritePipe, LPSECURITY_ATTRIBUTES lpPipeAttributes, DWORD nSize ) ;
 FUNCTION: BOOL CreateProcessW ( LPCTSTR lpApplicationname,
                                 LPTSTR lpCommandLine,
                                 LPSECURITY_ATTRIBUTES lpProcessAttributes,
@@ -131,7 +133,13 @@ FUNCTION: BOOL CreateProcessW ( LPCTSTR lpApplicationname,
 ! FUNCTION: CreateProcessInternalA
 ! FUNCTION: CreateProcessInternalW
 ! FUNCTION: CreateProcessInternalWSecure
-! FUNCTION: CreateRemoteThread
+FUNCTION: HANDLE CreateRemoteThread ( HANDLE hProcess,
+                                      LPSECURITY_ATTRIBUTES lpThreadAttributes,
+                                      SIZE_T dwStackSize,
+                                      LPVOID lpStartAddress,
+                                      LPVOID lpParameter,
+                                      DWORD dwCreationFlags,
+                                      LPDWORD lpThreadId ) ; 
 ! FUNCTION: CreateSemaphoreA
 ! FUNCTION: CreateSemaphoreW
 ! FUNCTION: CreateSocketHandle
@@ -158,7 +166,8 @@ FUNCTION: BOOL CreateProcessW ( LPCTSTR lpApplicationname,
 ! FUNCTION: DeleteCriticalSection
 ! FUNCTION: DeleteFiber
 ! FUNCTION: DeleteFileA
-! FUNCTION: DeleteFileW
+FUNCTION: BOOL DeleteFileW ( LPCTSTR lpFileName ) ;
+: DeleteFile DeleteFileW ;
 ! FUNCTION: DeleteTimerQueue
 ! FUNCTION: DeleteTimerQueueEx
 ! FUNCTION: DeleteTimerQueueTimer
@@ -232,21 +241,23 @@ FUNCTION: BOOL CreateProcessW ( LPCTSTR lpApplicationname,
 ! FUNCTION: FindActCtxSectionStringW
 ! FUNCTION: FindAtomA
 ! FUNCTION: FindAtomW
-! FUNCTION: FindClose
+FUNCTION: BOOL FindClose ( HANDLE hFindFile ) ;
 ! FUNCTION: FindCloseChangeNotification
 ! FUNCTION: FindFirstChangeNotificationA
 ! FUNCTION: FindFirstChangeNotificationW
 ! FUNCTION: FindFirstFileA
 ! FUNCTION: FindFirstFileExA
 ! FUNCTION: FindFirstFileExW
-! FUNCTION: FindFirstFileW
+FUNCTION: HANDLE FindFirstFileW ( LPCTSTR lpFileName, LPWIN32_FIND_DATA lpFindFileData ) ;
+: FindFirstFile FindFirstFileW ;
 ! FUNCTION: FindFirstVolumeA
 ! FUNCTION: FindFirstVolumeMountPointA
 ! FUNCTION: FindFirstVolumeMountPointW
 ! FUNCTION: FindFirstVolumeW
 ! FUNCTION: FindNextChangeNotification
 ! FUNCTION: FindNextFileA
-! FUNCTION: FindNextFileW
+FUNCTION: BOOL FindNextFileW ( HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData ) ;
+: FindNextFile FindNextFileW ;
 ! FUNCTION: FindNextVolumeA
 ! FUNCTION: FindNextVolumeMountPointA
 ! FUNCTION: FindNextVolumeMountPointW
@@ -343,9 +354,9 @@ FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 ! FUNCTION: GetCurrentConsoleFont
 ! FUNCTION: GetCurrentDirectoryA
 ! FUNCTION: GetCurrentDirectoryW
-! FUNCTION: GetCurrentProcess
+FUNCTION: HANDLE GetCurrentProcess ( ) ;
 ! FUNCTION: GetCurrentProcessId
-! FUNCTION: GetCurrentThread
+FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetCurrentThreadId
 ! FUNCTION: GetDateFormatA
 ! FUNCTION: GetDateFormatW
@@ -371,10 +382,17 @@ FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 ! FUNCTION: GetExpandedNameA
 ! FUNCTION: GetExpandedNameW
 ! FUNCTION: GetFileAttributesA
+FUNCTION: DWORD GetFileAttributesW ( LPCTSTR lpFileName ) ;
 ! FUNCTION: GetFileAttributesExA
-! FUNCTION: GetFileAttributesExW
-! FUNCTION: GetFileAttributesW
-! FUNCTION: GetFileInformationByHandle
+
+: GetFileExInfoStandard 0 ; inline
+
+
+FUNCTION: BOOL GetFileAttributesExW ( LPCTSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId, LPVOID lpFileInformation ) ;
+
+: GetFileAttributesEx GetFileAttributesExW ;
+
+FUNCTION: BOOL GetFileInformationByHandle ( HANDLE hFile, LPBY_HANDLE_FILE_INFORMATION lpFileInformation ) ;
 FUNCTION: DWORD GetFileSize ( HANDLE hFile, LPDWORD lpFileSizeHigh ) ;
 ! FUNCTION: GetFileSizeEx
 FUNCTION: BOOL GetFileTime ( HANDLE hFile, LPFILETIME lpCreationTime, LPFILETIME lpLastAccessTime, LPFILETIME lpLastWriteTime ) ;
@@ -382,7 +400,11 @@ FUNCTION: DWORD GetFileType ( HANDLE hFile ) ;
 ! FUNCTION: GetFirmwareEnvironmentVariableA
 ! FUNCTION: GetFirmwareEnvironmentVariableW
 ! FUNCTION: GetFullPathNameA
-! FUNCTION: GetFullPathNameW
+FUNCTION: DWORD GetFullPathNameW ( LPCTSTR lpFileName, DWORD nBufferLength, LPTSTR lpBuffer, LPTSTR* lpFilePart ) ;
+: GetFullPathName GetFullPathNameW ;
+
+!  clear "license.txt" 32768 "char[32768]" <c-object> f over >r GetFullPathName r> swap 2 * head >string .
+
 ! FUNCTION: GetGeoInfoA
 ! FUNCTION: GetGeoInfoW
 ! FUNCTION: GetHandleContext
@@ -435,7 +457,7 @@ FUNCTION: BOOL GetOverlappedResult ( HANDLE hFile, LPOVERLAPPED lpOverlapped, LP
 ! FUNCTION: GetPrivateProfileStringW
 ! FUNCTION: GetPrivateProfileStructA
 ! FUNCTION: GetPrivateProfileStructW
-! FUNCTION: GetProcAddress
+FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, char* lpProcName ) ;
 ! FUNCTION: GetProcessAffinityMask
 ! FUNCTION: GetProcessHandleCount
 ! FUNCTION: GetProcessHeap
@@ -473,7 +495,7 @@ FUNCTION: void GetSystemInfo ( LPSYSTEM_INFO lpSystemInfo ) ;
 ! FUNCTION: GetSystemRegistryQuota
 FUNCTION: void GetSystemTime ( LPSYSTEMTIME lpSystemTime ) ;
 ! FUNCTION: GetSystemTimeAdjustment
-! FUNCTION: GetSystemTimeAsFileTime
+FUNCTION: void GetSystemTimeAsFileTime ( LPFILETIME lpSystemTimeAsFileTime ) ;
 ! FUNCTION: GetSystemTimes
 ! FUNCTION: GetSystemWindowsDirectoryA
 ! FUNCTION: GetSystemWindowsDirectoryW
@@ -665,7 +687,8 @@ FUNCTION: LPVOID MapViewOfFileEx ( HANDLE hFileMappingObject,
 ! FUNCTION: MoveFileA
 ! FUNCTION: MoveFileExA
 ! FUNCTION: MoveFileExW
-! FUNCTION: MoveFileW
+FUNCTION: BOOL MoveFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName ) ;
+: MoveFile MoveFileW ;
 ! FUNCTION: MoveFileWithProgressA
 ! FUNCTION: MoveFileWithProgressW
 ! FUNCTION: MulDiv
@@ -678,7 +701,8 @@ FUNCTION: LPVOID MapViewOfFileEx ( HANDLE hFileMappingObject,
 ! FUNCTION: OpenDataFile
 ! FUNCTION: OpenEventA
 ! FUNCTION: OpenEventW
-! FUNCTION: OpenFile
+! WARNING: OpenFile is limited to paths of 128 chars in length.  Do not use!
+! FUNCTION: HFILE OpenFile ( LPCTSTR lpFileName, LPOFSTRUCT lpReOpenBuff, UINT uStyle ) ;
 FUNCTION: HANDLE OpenFileMappingW ( DWORD dwDesiredAccess,
                                     BOOL bInheritHandle,
                                     LPCTSTR lpName ) ;
@@ -751,7 +775,8 @@ FUNCTION: BOOL ReadProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* l
 ! FUNCTION: ReleaseMutex
 ! FUNCTION: ReleaseSemaphore
 ! FUNCTION: RemoveDirectoryA
-! FUNCTION: RemoveDirectoryW
+FUNCTION: BOOL RemoveDirectoryW ( LPCTSTR lpPathName ) ;
+: RemoveDirectory RemoveDirectoryW ;
 ! FUNCTION: RemoveLocalAlternateComputerNameA
 ! FUNCTION: RemoveLocalAlternateComputerNameW
 ! FUNCTION: RemoveVectoredExceptionHandler
@@ -825,7 +850,7 @@ FUNCTION: BOOL SetConsoleTitleW ( LPCWSTR lpConsoleTitle ) ;
 ! FUNCTION: SetDefaultCommConfigW
 ! FUNCTION: SetDllDirectoryA
 ! FUNCTION: SetDllDirectoryW
-! FUNCTION: SetEndOfFile
+FUNCTION: BOOL SetEndOfFile ( HANDLE hFile ) ;
 ! FUNCTION: SetEnvironmentVariableA
 ! FUNCTION: SetEnvironmentVariableW
 ! FUNCTION: SetErrorMode
@@ -834,8 +859,8 @@ FUNCTION: BOOL SetConsoleTitleW ( LPCWSTR lpConsoleTitle ) ;
 ! FUNCTION: SetFileApisToOEM
 ! FUNCTION: SetFileAttributesA
 ! FUNCTION: SetFileAttributesW
-! FUNCTION: SetFilePointer
-! FUNCTION: SetFilePointerEx
+FUNCTION: DWORD SetFilePointer ( HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod ) ;
+FUNCTION: DWORD SetFilePointerEx ( HANDLE hFile, LARGE_INTEGER lDistanceToMove, PLARGE_INTEGER lpDistanceToMoveHigh, DWORD dwMoveMethod ) ;
 ! FUNCTION: SetFileShortNameA
 ! FUNCTION: SetFileShortNameW
 FUNCTION: BOOL SetFileTime ( HANDLE hFile, FILETIME* lpCreationTime, FILETIME* lpLastAccessTime, FILETIME* lpLastWriteTime ) ;
@@ -916,7 +941,7 @@ FUNCTION: BOOL SystemTimeToFileTime ( SYSTEMTIME* lpSystemTime, LPFILETIME lpFil
 ! FUNCTION: UnhandledExceptionFilter
 ! FUNCTION: UnlockFile
 ! FUNCTION: UnlockFileEx
-! FUNCTION: UnmapViewOfFile
+FUNCTION: BOOL UnmapViewOfFile ( LPCVOID lpBaseAddress ) ;
 ! FUNCTION: UnregisterConsoleIME
 ! FUNCTION: UnregisterWait
 ! FUNCTION: UnregisterWaitEx
@@ -943,7 +968,7 @@ FUNCTION: BOOL VirtualFreeEx ( HANDLE hProcess, void* lpAddress, long dwSize, DW
 ! FUNCTION: VirtualProtect
 ! FUNCTION: VirtualProtectEx
 ! FUNCTION: VirtualQuery
-! FUNCTION: VirtualQueryEx
+FUNCTION: BOOL VirtualQueryEx ( HANDLE hProcess, void* lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, SIZE_T dwLength ) ;
 ! FUNCTION: VirtualUnlock
 ! FUNCTION: WaitCommEvent
 ! FUNCTION: WaitForDebugEvent

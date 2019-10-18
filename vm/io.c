@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 /* Simple wrappers for ANSI C I/O functions, used for bootstrapping.
 The Factor library provides platform-specific code for Unix and Windows

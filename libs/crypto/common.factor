@@ -31,7 +31,7 @@ IN: crypto-internals
         dup length HEX: 3f bitand
         calculate-pad-length 0 <string> %
         length 3 shift 8 rot [ >be ] [ >le ] if %
-    ] "" make over nappend ;
+    ] "" make over push-all ;
 
 SYMBOL: bytes-read
 SYMBOL: big-endian?

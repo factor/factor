@@ -19,7 +19,7 @@ USING: sequences arrays bit-arrays kernel test math ;
 [
     { t f t } { f t f }
 ] [
-    { t f t } >bit-array dup clone dup [ not ] inject
+    { t f t } >bit-array dup clone dup [ not ] change-each
     [ >array ] 2apply
 ] unit-test
 
@@ -34,4 +34,8 @@ USING: sequences arrays bit-arrays kernel test math ;
         drop 100 [ drop 2 random zero? ] map
         dup >bit-array >array =
     ] all?
+] unit-test
+
+[ ?{ f } ] [
+    1 2 { t f t f } <slice> >bit-array
 ] unit-test

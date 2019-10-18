@@ -5,7 +5,7 @@ TUPLE: test-tuple m n ;
 
 [ H{ { "m" 3 } { "n" 2 } } ]
 [
-    [ T{ test-tuple f 3 2 } explode-tuple ] make-hash
+    [ T{ test-tuple f 3 2 } explode-tuple ] H{ } make-assoc
 ] unit-test
 
 [

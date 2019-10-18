@@ -4,16 +4,15 @@ gadgets-sliders generic models kernel ;
 
 HELP: control
 { $class-description "A control is a " { $link gadget } " linked to a " { $link model } " stored in the " { $link control-model } " slot. Changes to the model are reflected in the appearance and behavior of the control, and the control may in turn change the value of the model in response to user input."
-$terpri
+$nl
 "Controls are created by calling " { $link <control> } " and " { $link delegate>control } ". Other words which create controls include:"
 { $list
     { $link <label-control> }
     { $link <radio-control> }
     { $link <pane-control> }
 }
-$terpri
-"Objects may delegate to " { $link control } " instances, in which case the " { $link control-self } " slot must be set to the frontmost object in the delegation chain. This ensures that the correct object receives notification of model changes." }
-{ $see-also control-value set-control-value } ;
+$nl
+"Objects may delegate to " { $link control } " instances, in which case the " { $link control-self } " slot must be set to the frontmost object in the delegation chain. This ensures that the correct object receives notification of model changes." } ;
 
 HELP: <control>
 { $values { "model" model } { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( value control -- )" } } }
@@ -29,8 +28,9 @@ HELP: <control>
         "gadget."
     }
     "The " { $module-link "demos/color-picker" } " module extends this example into an elaborate color chooser where " { $link slider } " gadgets modify the red/green/blue components of a gadget's fill color."
-}
-{ $see-also delegate>control control-value set-control-value } ;
+} ;
+
+{ <control> delegate>control control-value set-control-value } related-words
 
 HELP: control-value
 { $values { "control" control } { "value" object } }
@@ -43,5 +43,4 @@ HELP: set-control-value
 HELP: delegate>control
 { $values { "tuple" tuple } { "model" model } { "underlying" gadget } }
 { $description "Creates a new " { $link control } " and creates a delegation chain where " { $snippet "tuple" } " at the front delegates to the new " { $link control } " which delegates to " { $snippet "underlying" } ". The " { $link model-changed } " word is called on " { $snippet "tuple" } " when the model changes." }
-{ $side-effects "tuple" }
-{ $see-also <control> } ;
+{ $side-effects "tuple" } ;

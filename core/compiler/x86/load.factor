@@ -4,4 +4,7 @@ PROVIDE: core/compiler/x86
     "architecture.factor"
     "allot.factor"
     "intrinsics.factor"
+} }
+{ +tests+ {
+    "test.factor"
 } } ;

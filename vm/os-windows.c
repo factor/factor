@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 F_STRING *get_error_message()
 {
@@ -15,7 +15,7 @@ F_CHAR *error_message(DWORD id)
 	F_CHAR *buffer;
 	int index;
 
-	FormatMessage(
+	DWORD ret = FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL,
@@ -23,6 +23,8 @@ F_CHAR *error_message(DWORD id)
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR)(void *) &buffer,
 		0, NULL);
+	if(ret == 0)
+		return error_message(GetLastError());
 
 	/* strip whitespace from end */
 	index = wcslen(buffer) - 1;
@@ -32,17 +34,18 @@ F_CHAR *error_message(DWORD id)
 	return buffer;
 }
 
-s64 current_millis(void)
+HMODULE hFactorDll;
+
+void init_ffi()
 {
-	FILETIME t;
-	GetSystemTimeAsFileTime(&t);
-	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32)
-		- EPOCH_OFFSET) / 10000;
+	hFactorDll = GetModuleHandle(L"factor.dll");
+	if(!hFactorDll)
+		fatal_error("GetModuleHandle(\"factor.dll\") failed", 0);
 }
 
 void ffi_dlopen (F_DLL *dll, bool error)
 {
-	HMODULE module = LoadLibrary(alien_offset(dll->path));
+	HMODULE module = LoadLibraryEx(alien_offset(dll->path), NULL, 0);
 
 	if (!module)
 	{
@@ -57,23 +60,9 @@ void ffi_dlopen (F_DLL *dll, bool error)
 	dll->dll = module;
 }
 
-void *ffi_dlsym (F_DLL *dll, F_SYMBOL *symbol, bool error)
+void *ffi_dlsym (F_DLL *dll, F_SYMBOL *symbol)
 {
-	void *sym = GetProcAddress(
-		dll ? (HMODULE)dll->dll : GetModuleHandle(NULL),
-		symbol);
-
-	if (!sym)
-	{
-		if(error)
-			simple_error(ERROR_FFI,
-				tag_object(from_symbol_string(symbol)),
-				tag_object(get_error_message()));
-		else
-			return NULL;
-	}
-
-	return sym;
+	return GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
 }
 
 void ffi_dlclose(F_DLL *dll)
@@ -82,14 +71,48 @@ void ffi_dlclose(F_DLL *dll)
 	dll->dll = NULL;
 }
 
+static F_CHAR *image_path = 0;
+
+const F_CHAR *default_image_path(void)
+{
+	F_CHAR path_temp[MAX_UNICODE_PATH];
+	if(!image_path)
+	{
+		int ret;
+		if(!(ret = GetModuleFileName(GetModuleHandle(NULL),
+			path_temp,MAX_UNICODE_PATH)))
+			return 0;
+
+		F_CHAR *ptr;
+		ptr = wcsrchr(path_temp, '\\');
+		if(!ptr)
+			return 0;
+
+		snwprintf(ptr, MAX_UNICODE_PATH - (ptr - path_temp),
+			L"\\factor.image");
+		image_path = _wcsdup(path_temp);
+		if(!image_path)
+			fatal_error("Out of memory in default_image_path",0);
+	}
+	return image_path;
+}
+
+F_CHAR *char_to_F_CHAR(char *ptr)
+{
+	F_CHAR buffer[MAX_UNICODE_PATH];
+	mbstowcs(buffer, ptr, MAX_UNICODE_PATH-2);
+	return _wcsdup(buffer);
+}
+
 void primitive_stat(void)
 {
-	WIN32_FILE_ATTRIBUTE_DATA st;
+	WIN32_FIND_DATA st;
+	HANDLE h;
 
-	if(!GetFileAttributesEx(
-		unbox_u16_string(),
-		GetFileExInfoStandard,
-		&st))
+	F_CHAR *path = unbox_u16_string();
+	if(INVALID_HANDLE_VALUE == (h = FindFirstFile(
+		path,
+		&st)))
 	{
 		dpush(F);
 		dpush(F);
@@ -101,9 +124,10 @@ void primitive_stat(void)
 		box_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 		box_signed_4(0);
 		box_unsigned_8(
-			(s64)st.nFileSizeLow | (s64)st.nFileSizeHigh << 32);
-		box_unsigned_8((int)
-			((*(s64*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));
+			(u64)st.nFileSizeLow | (u64)st.nFileSizeHigh << 32);
+		box_unsigned_8(
+			((*(u64*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));
+		FindClose(h);
 	}
 }
 
@@ -111,9 +135,7 @@ void primitive_read_dir(void)
 {
 	HANDLE dir;
 	WIN32_FIND_DATA find_data;
-	F_CHAR path[MAX_PATH + 4];
-
-	snwprintf(path, MAX_PATH + 4, STR_FORMAT "\\*", unbox_u16_string());
+	F_CHAR *path = unbox_u16_string();
 
 	GROWABLE_ARRAY(result);
 
@@ -134,21 +156,6 @@ void primitive_read_dir(void)
 	GROWABLE_TRIM(result);
 
 	dpush(tag_object(result));
-}
-
-void primitive_cwd(void)
-{
-	F_CHAR buf[MAX_PATH];
-
-	if(!GetCurrentDirectory(MAX_PATH, buf))
-		io_error();
-
-	box_u16_string(buf);
-}
-
-void primitive_cd(void)
-{
-	SetCurrentDirectory(unbox_u16_string());
 }
 
 F_SEGMENT *alloc_segment(CELL size)
@@ -197,44 +204,7 @@ long getpagesize(void)
 	return g_pagesize;
 }
 
-const char *default_image_path(void)
-{
-	return "factor.image";
-}
-
-/* SEH support. Proceed with caution. */
-typedef long exception_handler_t(
-	PEXCEPTION_RECORD rec, void *frame, void *context, void *dispatch);
-
-typedef struct exception_record
-{
-	struct exception_record *next_handler;
-	void *handler_func;
-} exception_record_t;
-
-void seh_call(void (*func)(), exception_handler_t *handler)
-{
-	exception_record_t record;
-	asm volatile("mov %%fs:0, %0" : "=r" (record.next_handler));
-	asm volatile("mov %0, %%fs:0" : : "r" (&record));
-	record.handler_func = handler;
-	func();
-	asm volatile("mov %0, %%fs:0" : "=r" (record.next_handler));
-}
-
-static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
-{
-	memory_protection_error(rec->ExceptionInformation[1],
-		SIGSEGV,native_stack_pointer());
-	return -1; /* unreachable */
-}
-
 void run(void)
 {
 	interpreter();
-}
-
-void run_toplevel(void)
-{
-	seh_call(run, exception_handler);
 }

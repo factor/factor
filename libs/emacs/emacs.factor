@@ -6,7 +6,7 @@ namespaces tools ;
 IN: emacs
 
 : emacsclient ( file line -- )
-[ "emacsclient --no-wait +" % # " " % % ] "" make system drop ;
+[ "emacsclient --no-wait +" % # " " % % ] "" make run-process ;
 
 : emacs ( word -- )
 where first2 emacsclient ;

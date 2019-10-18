@@ -2,17 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
 USING: alien arrays byte-arrays generic hashtables
-hashtables-internals help io kernel kernel-internals math
-modules namespaces parser sequences strings vectors words ;
+hashtables-internals help io kernel-internals kernel math
+modules namespaces parser sequences strings vectors words
+quotations assocs ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
 
 "Creating primitives and basic runtime structures..." print flush
-
-H{ } clone c-types set
-
-"resource:/core/compiler/alien/primitive-types.factor" parse-file
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
@@ -22,15 +19,15 @@ H{ } clone vocabularies set
 H{ } clone class<map set
 V{ } clone modules set
 
-vocabularies get [ "syntax" set ] bind
+vocabularies get [
+    "syntax" set
+    H{ } clone "scratchpad" set
+] bind
 
 H{ } clone articles set
 help-tree off
 crossref off
 changed-words off
-
-! Call the quotation parsed from primitive-types.factor
-call
 
 : make-primitive ( word vocab n -- ) >r create f r> define ;
 
@@ -39,7 +36,6 @@ call
     { "call" "kernel"                       }
     { "if" "kernel"                         }
     { "dispatch" "kernel-internals"         }
-    { "rehash-string" "kernel-internals"    }
     { "string>sbuf" "sbufs"                 }
     { "bignum>fixnum" "math-internals"      }
     { "float>fixnum" "math-internals"       }
@@ -60,6 +56,7 @@ call
     { "fixnum-" "math-internals"            }
     { "fixnum-fast" "math-internals"        }
     { "fixnum*" "math-internals"            }
+    { "fixnum*fast" "math-internals"        }
     { "fixnum/i" "math-internals"           }
     { "fixnum-mod" "math-internals"         }
     { "fixnum/mod" "math-internals"         }
@@ -121,7 +118,7 @@ call
     { "eq?" "kernel"                        }
     { "getenv" "kernel-internals"           }
     { "setenv" "kernel-internals"           }
-    { "stat" "io"                           }
+    { "(stat)" "io"                         }
     { "(directory)" "io"                    }
     { "data-gc" "memory"                    }
     { "code-gc" "memory"                    }
@@ -147,6 +144,7 @@ call
     { "dlsym" "alien"                       }
     { "dlclose" "alien"                     }
     { "<byte-array>" "byte-arrays"          }
+    { "<bit-array>" "bit-arrays"            }
     { "<displaced-alien>" "alien"           }
     { "alien-signed-cell" "alien"           }
     { "set-alien-signed-cell" "alien"       }
@@ -203,10 +201,15 @@ call
     { "expired?" "alien"                    }
     { "<wrapper>" "kernel"                  }
     { "(clone)" "kernel-internals"          }
-    { "become" "kernel-internals"           }
     { "array>vector" "vectors"              }
     { "<string>" "strings"                  }
     { "xt-map" "kernel-internals"           }
+    { "(>tuple)" "kernel-internals"         }
+    { "<quotation>" "quotations"            }
+    { "<tuple>" "kernel-internals"          }
+    { "tuple>array" "generic"               }
+    { "profiling" "profiler"                }
+    { "become" "kernel-internals"           }
 }
 dup length [ 3 + ] map
 [ >r first2 r> make-primitive ] 2each
@@ -218,11 +221,17 @@ FORGET: make-primitive
 : builtin-predicate ( class predicate -- )
     [
         over "type" word-prop dup
-        tag-mask < \ tag \ type ? , , \ eq? ,
+        \ tag-mask get < \ tag \ type ? , , \ eq? ,
     ] [ ] make define-predicate ;
 
 : register-builtin ( class -- )
     dup "type" word-prop builtins get set-nth ;
+
+: intern-slots ( spec -- spec )
+    [
+        [ dup array? [ first2 create ] when ] map
+        { slot-spec f } swap append >tuple
+    ] map ;
 
 : define-builtin ( symbol type# predicate slotspec -- )
     >r >r >r
@@ -234,179 +243,235 @@ FORGET: make-primitive
     register-builtin ;
 
 H{ } clone typemap set
-num-types f <array> builtins set
+num-types get f <array> builtins set
 
 ! These symbols are needed by the code that executes below
-"object" "generic" create drop
-"null" "generic" create drop
+{
+    { "object" "generic" }
+    { "null" "generic" }
+} [ create drop ] assoc-each
 
-"fixnum?" "math" create t "inline" set-word-prop
+"fixnum?" "math" create (inline)
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
-"fixnum" "math" create ">fixnum" "math" create unit "coercer" set-word-prop
+"fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
 
-"bignum?" "math" create t "inline" set-word-prop
+"bignum?" "math" create (inline)
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
-"bignum" "math" create ">bignum" "math" create unit "coercer" set-word-prop
+"bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
-"word?" "words" create t "inline" set-word-prop
+"word?" "words" create (inline)
 "word" "words" create 2 "word?" "words" create
 {
-    { 1 fixnum { "hashcode" "kernel" } f }
     {
+        { "object" "generic" }
+        "name"
         2
-        object
         { "word-name" "words" }
         { "set-word-name" "words" }
     }
     {
+        { "object" "generic" }
+        "vocabulary"
         3
-        object
         { "word-vocabulary" "words" }
         { "set-word-vocabulary" "words" }
     }
     {
+        { "fixnum" "math" }
+        "primitive"
         4
-        object
-        { "word-primitive" "words" }
-        { "set-word-primitive" "words" }
+        { "word-primitive" "kernel-internals" }
+        { "set-word-primitive" "kernel-internals" }
     }
     {
+        { "object" "generic" }
+        "def"
         5
-        object
         { "word-def" "words" }
         { "set-word-def" "words" }
     }
     {
+        { "object" "generic" }
+        "props"
         6
-        object
         { "word-props" "words" }
         { "set-word-props" "words" }
     }
     {
+        { "object" "generic" }
+        "?"
         7
-        object
         { "compiled?" "words" }
+        f
+    }
+    {
+        { "fixnum" "math" }
+        "counter"
+        8
+        { "profile-counter" "profiler" }
+        { "set-profile-counter" "profiler" }
+    }
+} define-builtin
+
+"ratio?" "math" create (inline)
+"ratio" "math" create 4 "ratio?" "math" create
+{
+    {
+        { "integer" "math" }
+        "numerator"
+        1
+        { "numerator" "math" }
+        f
+    }
+    {
+        { "integer" "math" }
+        "denominator"
+        2
+        { "denominator" "math" }
         f
     }
 } define-builtin
 
-"ratio?" "math" create t "inline" set-word-prop
-"ratio" "math" create 4 "ratio?" "math" create
-{
-    { 1 integer { "numerator" "math" } f }
-    { 2 integer { "denominator" "math" } f }
-} define-builtin
-
-"float?" "math" create t "inline" set-word-prop
+"float?" "math" create (inline)
 "float" "math" create 5 "float?" "math" create { } define-builtin
-"float" "math" create ">float" "math" create unit "coercer" set-word-prop
+"float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
 
-"complex?" "math" create t "inline" set-word-prop
+"complex?" "math" create (inline)
 "complex" "math" create 6 "complex?" "math" create
 {
-    { 1 real { "real" "math" } f }
-    { 2 real { "imaginary" "math" } f }
+    {
+        { "real" "math" }
+        "real"
+        1
+        { "real" "math" }
+        f
+    }
+    {
+        { "real" "math" }
+        "imaginary"
+        2
+        { "imaginary" "math" }
+        f
+    }
 } define-builtin
 
-"wrapper?" "kernel" create t "inline" set-word-prop
+"wrapper?" "kernel" create (inline)
 "wrapper" "kernel" create 7 "wrapper?" "kernel" create
-{ { 1 object { "wrapped" "kernel" } f } } define-builtin
+{
+    {
+        { "object" "generic" }
+        "wrapped"
+        1
+        { "wrapped" "kernel" }
+        f
+    }
+} define-builtin
 
-"array?" "arrays" create t "inline" set-word-prop
+"array?" "arrays" create (inline)
 "array" "arrays" create 8 "array?" "arrays" create
 { } define-builtin
 
 "!f" "!syntax" create 9 "not" "kernel" create
 { } define-builtin
 
-"hashtable?" "hashtables" create t "inline" set-word-prop
+"hashtable?" "hashtables" create (inline)
 "hashtable" "hashtables" create 10 "hashtable?" "hashtables" create
 {
     {
+        { "array-capacity" "sequences-internals" }
+        "count"
         1
-        fixnum
         { "hash-count" "hashtables-internals" }
         { "set-hash-count" "hashtables-internals" }
     } {
+        { "array-capacity" "sequences-internals" }
+        "deleted"
         2
-        fixnum
         { "hash-deleted" "hashtables-internals" }
         { "set-hash-deleted" "hashtables-internals" }
     } {
+        { "array" "arrays" }
+        "array"
         3
-        array
         { "hash-array" "hashtables-internals" }
         { "set-hash-array" "hashtables-internals" }
     }
 } define-builtin
 
-"vector?" "vectors" create t "inline" set-word-prop
+"vector?" "vectors" create (inline)
 "vector" "vectors" create 11 "vector?" "vectors" create
 {
     {
+        { "array-capacity" "sequences-internals" }
+        "fill"
         1
-        fixnum
         { "length" "sequences" }
         { "set-fill" "sequences-internals" }
     } {
+        { "array" "arrays" }
+        "underlying"
         2
-        array
         { "underlying" "sequences-internals" }
         { "set-underlying" "sequences-internals" }
     }
 } define-builtin
 
-"string?" "strings" create t "inline" set-word-prop
+"string?" "strings" create (inline)
 "string" "strings" create 12 "string?" "strings" create
 {
     {
+        { "array-capacity" "sequences-internals" }
+        "length"
         1
-        fixnum
         { "length" "sequences" }
         f
-    } {
-        2
-        object
-        { "string-hashcode" "kernel-internals" }
-        { "set-string-hashcode" "kernel-internals" }
     }
 } define-builtin
 
-"sbuf?" "sbufs" create t "inline" set-word-prop 
+"sbuf?" "sbufs" create (inline) 
 "sbuf" "sbufs" create 13 "sbuf?" "sbufs" create
 {
     {
+        { "array-capacity" "sequences-internals" }
+        "length"
         1
-        fixnum
         { "length" "sequences" }
         { "set-fill" "sequences-internals" }
     }
     {
+        { "string" "strings" }
+        "underlying"
         2
-        string
         { "underlying" "sequences-internals" }
         { "set-underlying" "sequences-internals" }
     }
 } define-builtin
 
-"quotation?" "kernel" create t "inline" set-word-prop
-"quotation" "kernel" create 14 "quotation?" "kernel" create
+"quotation?" "quotations" create (inline)
+"quotation" "quotations" create 14 "quotation?" "quotations" create
 { } define-builtin
 
-"dll?" "alien" create t "inline" set-word-prop
+"dll?" "alien" create (inline)
 "dll" "alien" create 15 "dll?" "alien" create
-{ { 1 byte-array { "(dll-path)" "alien" } f } } define-builtin
+{ { byte-array "path" 1 { "(dll-path)" "alien" } f } }
+define-builtin
 
 "alien" "alien" create 16 "alien?" "alien" create
-{ { 1 c-ptr { "underlying-alien" "alien" } f } } define-builtin
+{ { c-ptr "alien" 1 { "underlying-alien" "alien" } f } }
+define-builtin
 
-"tuple?" "kernel" create t "inline" set-word-prop
+"tuple?" "kernel" create (inline)
 "tuple" "kernel" create 17 "tuple?" "kernel" create
 { } define-builtin
 
-"byte-array?" "byte-arrays" create t "inline" set-word-prop
+"byte-array?" "byte-arrays" create (inline)
 "byte-array" "byte-arrays" create 18
 "byte-array?" "byte-arrays" create
+{ } define-builtin
+
+"bit-array?" "bit-arrays" create (inline) 
+"bit-array" "bit-arrays" create 19
+"bit-array?" "bit-arrays" create
 { } define-builtin
 
 ! Define general-t type, which is any object that is not f.
@@ -424,22 +489,29 @@ builtins get [ ] subset (define-union-class)
 "null" "generic" create { } (define-union-class)
 
 ! Create special tombstone values
-"hashtables-internals" in set
-
-"tombstone" f define-tuple-class
+"tombstone" "hashtables-internals" create { } define-tuple-class
 
 "((empty))" "hashtables-internals" create
-T{ tombstone f } unit define-compound
+T{ tombstone f } 1quotation define-compound
 
 "((empty))" "hashtables-internals" lookup
-t "inline" set-word-prop
+(inline)
 
 "((tombstone))" "hashtables-internals" create
-T{ tombstone t } unit define-compound
+T{ tombstone t } 1quotation define-compound
 
 "((tombstone))" "hashtables-internals" lookup
-t "inline" set-word-prop
+(inline)
+
+"c-ptr" "alien" create
+{
+    { "bit-array" "bit-arrays" }
+    { "byte-array" "byte-arrays" }
+    { "alien" "alien" }
+    { "!f" "!syntax" }
+} [ lookup ] { } assoc>map define-union-class
 
 FORGET: builtin-predicate
 FORGET: register-builtin
 FORGET: define-builtin
+FORGET: intern-slots

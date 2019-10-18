@@ -47,7 +47,7 @@ MIT in each case. */
  *  - Add local variable GC root recording
  */
 
-#include "factor.h"
+#include "master.h"
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>        /* abort */
@@ -342,7 +342,7 @@ s48_bignum_remainder(bignum_type numerator, bignum_type denominator)
     /* Special cases win when these small constants are cached. */     \
     if (n == 0) return (BIGNUM_ZERO ());                               \
     if (n == 1) return (BIGNUM_ONE (0));                               \
-    if (n == -1) return (BIGNUM_ONE (1));                              \
+    if (n < 0 && n == -1) return (BIGNUM_ONE (1));                     \
     {                                                                  \
       utype accumulator = ((negative_p = (n < 0)) ? (-n) : n);         \
       do                                                               \
@@ -362,7 +362,7 @@ s48_bignum_remainder(bignum_type numerator, bignum_type denominator)
       return (result);                                                 \
     }                                                                  \
   }
-
+  
 /* all below allocate memory */
 FOO_TO_BIGNUM(cell,CELL,CELL)
 FOO_TO_BIGNUM(fixnum,F_FIXNUM,CELL)

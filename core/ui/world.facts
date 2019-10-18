@@ -1,6 +1,6 @@
 IN: gadgets
 USING: help models gadgets-presentations prettyprint
-freetype opengl ;
+freetype opengl inspector ;
 
 HELP: world
 { $class-description "A gadget which appears at the top of the gadget hieararchy, and in turn may be displayed in a native window. Worlds delegate to " { $link gadget } " instances and have the following slots:"
@@ -28,5 +28,6 @@ HELP: find-world
 
 HELP: show-mouse-help
 { $values { "presentation" presentation } }
-{ $description "Displays a " { $link summary } " of the " { $link presentation-object } "in the status bar of the " { $link world } " containing this presentation. This word is executed when the mouse enters the presentation." }
-{ $see-also show-status show-summary hide-status } ;
+{ $description "Displays a " { $link summary } " of the " { $link presentation-object } "in the status bar of the " { $link world } " containing this presentation. This word is executed when the mouse enters the presentation." } ;
+
+{ <status-bar> show-mouse-help show-status show-summary hide-status } related-words

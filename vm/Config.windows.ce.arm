@@ -1,0 +1,3 @@
+CC = arm-wince-mingw32ce-gcc
+PLAF_DLL_OBJS += vm/os-windows-ce-arm.o
+include vm/Config.windows.ce vm/Config.arm

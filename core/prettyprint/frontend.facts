@@ -37,6 +37,20 @@ HELP: .h
 { $values { "n" "an integer" } }
 { $description "Outputs an integer in hexadecimal." } ;
 
-HELP: summary
-{ $values { "object" "an object" } { "string" "a string" } }
-{ $contract "Outputs a brief description of the object." } ;
+HELP: stack.
+{ $values { "seq" "a sequence" } }
+{ $description "Prints a the elements of the sequence, one per line." }
+{ $notes "This word is used in the implementation of " { $link .s } " and " { $link .r } "." } ;
+
+HELP: callstack.
+{ $values { "seq" "a sequence" } }
+{ $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame." } ;
+
+HELP: .c
+{ $description "Displays the contents of the call stack, with the top of the stack printed first." } ;
+
+HELP: .r
+{ $description "Displays the contents of the retain stack, with the top of the stack printed first." } ;
+
+HELP: .s
+{ $description "Displays the contents of the data stack, with the top of the stack printed first." } ;

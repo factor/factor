@@ -1,55 +1,75 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: tools
-USING: arrays definitions hashtables help tools io kernel
+USING: arrays definitions assocs help tools io kernel
 math namespaces prettyprint sequences strings styles words
-generic completion ;
+generic completion quotations parser interpreter inspector ;
 
-: word-outliner ( seq -- )
-    natural-sort [
-        [ synopsis ] keep dup [ see ] curry
-        write-outliner terpri
-    ] each ;
+: definitions. ( seq -- )
+    [ [ synopsis ] keep write-object nl ] each ;
 
 : method-usage ( word generic -- methods )
     tuck methods
-    [ second quot-uses memq? ] subset-with
+    [ second quot-uses key? ] subset-with
     0 <column>
     [ swap 2array ] map-with ;
 
-: usage. ( word -- )
-    dup usage dup
-    [ generic? not ] subset
-    "Words calling " write pick pprint ":" print
-    word-outliner
-    "Methods calling " write over pprint ":" print
-    [ generic? ] subset
-    [ method-usage word-outliner ] each-with ;
+: source-usage ( word -- pathnames )
+    source-files get
+    [ nip source-file-uses key? ]
+    assoc-subset-with keys natural-sort ;
+
+: smart-usage ( word -- definitions )
+    [
+        dup dup usage natural-sort
+        dup [ generic? not ] subset %
+        [ generic? ] subset [ method-usage % ] each-with
+        source-usage [ <pathname> ] map %
+    ] { } make ;
+
+: usage. ( word -- ) smart-usage definitions. ;
+
+: source-usage. ( word -- )
+    smart-usage
+    [ where ] map [ ] subset
+    [ first <pathname> ] map
+    prune natural-sort
+    definitions. ;
+
+: fix ( word -- )
+    "Fixing " write dup pprint " and all usages..." print nl
+    dup smart-usage swap add* [
+        "Editing " write dup .
+        "RETURN moves on to the next usage, C+d stops." print
+        flush
+        edit
+        readln
+    ] all? drop ;
 
 : annotate ( word quot -- )
-    over >r >r dup word-def r> call r> swap define-compound ;
+    over >r >r word-def r> call r>
+    swap define-compound do-parse-hook ;
     inline
 
-: watch-msg ( word prefix -- ) write word-name print .s flush ;
+: entering ( str -- ) "! Entering: " write print .s flush ;
 
-: (watch) ( word def -- def )
-    [
-        swap literalize
-        dup , "===> Entering: " , \ watch-msg ,
-        swap %
-        , "===> Leaving:  " , \ watch-msg ,
-    ] [ ] make ;
+: leaving ( str -- ) "! Leaving: " write print .s flush ;
 
-: watch ( word -- ) [ (watch) ] annotate ;
+: (watch) ( str def -- def )
+    over [ entering ] curry
+    rot [ leaving ] curry
+    swapd 3append ;
 
-: profile ( word -- )
-    [
-        swap [ global [ inc ] bind ] curry swap append
-    ] annotate ;
+: watch ( word -- )
+    dup word-name swap [ (watch) ] annotate ;
 
-: word-completions ( str words limited? -- seq )
-    >r [ word-name ] swap completions r>
-    over length 1000 > and [ drop f ] when ;
+: breakpoint ( word -- )
+    [ \ break add* ] annotate ;
 
-: apropos ( str -- )
-    all-words t word-completions [ summary print ] each ;
+: breakpoint-if ( quot word -- )
+    [ [ [ break ] when ] swap 3append ] annotate ;
+
+: words-matching ( str -- seq )
+    all-words [ dup word-name ] { } map>assoc completions ;
+
+: apropos ( str -- ) words-matching definitions. ;

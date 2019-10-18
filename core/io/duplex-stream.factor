@@ -44,8 +44,8 @@ M: duplex-stream stream-write1
 M: duplex-stream stream-write
     duplex-stream-out+ stream-write ;
 
-M: duplex-stream stream-terpri
-    duplex-stream-out+ stream-terpri ;
+M: duplex-stream stream-nl
+    duplex-stream-out+ stream-nl ;
 
 M: duplex-stream stream-format
     duplex-stream-out+ stream-format ;
@@ -56,8 +56,11 @@ M: duplex-stream with-stream-style
 M: duplex-stream with-nested-stream
     duplex-stream-out+ with-nested-stream ;
 
-M: duplex-stream with-stream-table
-    duplex-stream-out+ with-stream-table ;
+M: duplex-stream stream-write-table
+    duplex-stream-out+ stream-write-table ;
+
+M: duplex-stream make-table-cell
+    duplex-stream-out+ make-table-cell ;
 
 M: duplex-stream stream-close
     #! The output stream is closed first, in case both streams

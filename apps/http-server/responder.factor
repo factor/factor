@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: httpd
-USING: arrays hashtables html http io kernel math namespaces
+USING: arrays assocs hashtables html http io kernel math namespaces
 parser sequences strings server errors ;
 
 ! Variables
@@ -9,7 +9,7 @@ SYMBOL: vhosts
 SYMBOL: responders
 
 : print-header ( alist -- )
-    [ swap write ": " write print ] hash-each ;
+    [ swap write ": " write print ] assoc-each ;
 
 : response ( header msg -- )
     "HTTP/1.0 " write print print-header ;
@@ -24,7 +24,7 @@ SYMBOL: responders
 : httpd-error ( error -- )
     #! This must be run from handle-request
     error-head
-    "head" "method" get = [ drop ] [ terpri error-body ] if ;
+    "head" "method" get = [ drop ] [ nl error-body ] if ;
 
 : bad-request ( -- )
     [
@@ -35,14 +35,14 @@ SYMBOL: responders
 
 : serving-content ( mime -- )
     "Content-Type" associate
-    "200 Document follows" response terpri ;
+    "200 Document follows" response nl ;
 
 : serving-html "text/html" serving-content ;
 
 : serving-text "text/plain" serving-content ;
 
 : (redirect) ( to response -- )
-    >r "Location" associate r> response terpri ;
+    >r "Location" associate r> response nl ;
 
 : permanent-redirect ( to -- )
     "301 Moved Permanently" (redirect) ;
@@ -61,14 +61,14 @@ SYMBOL: responders
         "&" split [
             "=" split1 [ dup [ url-decode ] when ] 2apply 2array
         ] map
-    ] when alist>hash ;
+    ] when >hashtable ;
 
 SYMBOL: max-post-request
 
 1024 256 * max-post-request set-global
 
 : content-length ( header -- n )
-    "Content-Length" swap hash string>number dup [
+    "Content-Length" swap at string>number dup [
         dup max-post-request get > [
             "Content-Length > max-post-request" throw
         ] when
@@ -80,7 +80,7 @@ SYMBOL: max-post-request
 : log-headers ( hash -- )
     [
         drop { "User-Agent" "X-Forwarded-For" "Host" } member?
-    ] hash-subset [ ": " swap 3append log-message ] hash-each ;
+    ] assoc-subset [ ": " swap 3append log-message ] assoc-each ;
 
 : prepare-url ( url -- url )
     #! This is executed in the with-request namespace.
@@ -108,17 +108,17 @@ SYMBOL: max-post-request
 ! - response -- a hashtable of the POST request response
 ! - raw-response -- raw POST request response
 
-: query-param ( key -- value ) "query" get hash ;
+: query-param ( key -- value ) "query" get at ;
 
 : add-responder ( responder -- )
     #! Add a responder object to the list.
-    "responder" over hash  responders get set-hash ;
+    "responder" over at  responders get set-at ;
 
 : add-simple-responder ( name quot -- )
     [
         [ drop ] swap append dup "get" set "post" set
         "responder" set
-    ] make-hash add-responder ;
+    ] H{ } make-assoc add-responder ;
 
 : make-responder ( quot -- responder )
     #! quot has stack effect ( url -- )
@@ -137,16 +137,16 @@ SYMBOL: max-post-request
         ] "bad" set
         
         call
-    ] make-hash add-responder ;
+    ] H{ } make-assoc add-responder ;
 
 : vhost ( name -- vhost )
-    vhosts get hash [ "default" vhost ] unless* ;
+    vhosts get at [ "default" vhost ] unless* ;
 
 : responder ( name -- responder )
-    responders get hash [ "404" responder ] unless* ;
+    responders get at [ "404" responder ] unless* ;
 
 : set-default-responder ( name -- )
-    responder "default" responders get set-hash ;
+    responder "default" responders get set-at ;
 
 : call-responder ( method argument responder -- )
     over "argument" set [ swap get call ] bind ;

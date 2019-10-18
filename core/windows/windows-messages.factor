@@ -1,20 +1,20 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables kernel math namespaces parser prettyprint words ;
+USING: assocs hashtables kernel math namespaces parser prettyprint words ;
 IN: win32-api-messages
 
 SYMBOL: windows-messages
 
 : maybe-create-windows-messages
-    windows-messages get hashtable? 
-    [ H{ } clone global [ windows-messages set ] bind ] unless ;
+  global [ windows-messages
+  [ ?<hashtable> ] change ] bind ;
 
 : add-windows-message ( -- )
     word [ word-name ] keep execute maybe-create-windows-messages
-    windows-messages get set-hash ; parsing
+    windows-messages get set-at ; parsing
 
 : get-windows-message-name ( n -- name )
-    windows-messages get hash* [ drop "unknown message" ] unless ;
+    windows-messages get at* [ drop "unknown message" ] unless ;
 
 : WM_NULL HEX: 0000 ; inline add-windows-message
 : WM_CREATE HEX: 0001 ; inline add-windows-message

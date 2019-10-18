@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 static void *_primitives[] = {
 	undefined,
@@ -8,7 +8,6 @@ static void *_primitives[] = {
 	primitive_call,
 	primitive_ifte,
 	primitive_dispatch,
-	primitive_rehash_string,
 	primitive_string_to_sbuf,
 	primitive_bignum_to_fixnum,
 	primitive_float_to_fixnum,
@@ -29,6 +28,7 @@ static void *_primitives[] = {
 	primitive_fixnum_subtract,
 	primitive_fixnum_subtract_fast,
 	primitive_fixnum_multiply,
+	primitive_fixnum_multiply_fast,
 	primitive_fixnum_divint,
 	primitive_fixnum_mod,
 	primitive_fixnum_divmod,
@@ -116,6 +116,7 @@ static void *_primitives[] = {
 	primitive_dlsym,
 	primitive_dlclose,
 	primitive_byte_array,
+	primitive_bit_array,
 	primitive_displaced_alien,
 	primitive_alien_signed_cell,
 	primitive_set_alien_signed_cell,
@@ -172,10 +173,15 @@ static void *_primitives[] = {
 	primitive_expired,
 	primitive_wrapper,
 	primitive_clone,
-	primitive_become,
 	primitive_array_to_vector,
 	primitive_string,
-	primitive_xt_map
+	primitive_xt_map,
+	primitive_to_tuple,
+	primitive_quotation,
+	primitive_tuple,
+	primitive_tuple_to_array,
+	primitive_profiling,
+	primitive_become
 };
 
 void init_primitives(void)

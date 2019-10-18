@@ -3,7 +3,7 @@
 IN: xml-rpc
 USING: kernel xml arrays math errors errors generic http-client
     hashtables namespaces io base64 sequences strings calendar
-    xml-data xml-writer xml-utils ;
+    xml-data xml-writer xml-utils assocs ;
 
 ! * Sending RPC requests
 ! TODO: time
@@ -35,7 +35,7 @@ M: string item>xml ! This should change < and &
     2array "member" build-tag* ;
 
 M: hashtable item>xml
-    [ [ struct-member , ] hash-each ] { } make
+    [ [ struct-member , ] assoc-each ] { } make
     "struct" build-tag* ;
 
 M: array item>xml
@@ -59,7 +59,7 @@ M: base64 item>xml
     params "methodResponse" build-tag build-xml ;
 
 : return-fault ( fault-code fault-string -- xml )
-    [ "faultString" set "faultCode" set ] make-hash item>xml
+    [ "faultString" set "faultCode" set ] H{ } make-assoc item>xml
     "value" build-tag "fault" build-tag "methodResponse" build-tag
     build-xml ;
 
@@ -107,7 +107,7 @@ TAG: boolean xml>item
 TAG: struct xml>item
     [
         children-tags [ unstruct-member ] each
-    ] make-hash ;
+    ] H{ } make-assoc ;
 
 TAG: base64 xml>item
     children>string base64> <base64> ;

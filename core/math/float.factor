@@ -14,7 +14,7 @@ UNION: real rational float ;
 M: real abs dup 0 < [ neg ] when ;
 M: real absq sq ;
 
-M: real hashcode >fixnum ;
+M: real hashcode* nip >fixnum ;
 M: real <=> - ;
 
 : fp-nan? ( float -- ? )

@@ -24,9 +24,6 @@ kernel math ;
     ] unit-test
     
     [ t ] [ 1 <int-vreg> T{ int-regs } free-vregs member? ] unit-test
-    
-    [ 0 ] [ ?shuffle-reserve ] unit-test
-
 ] with-scope
 
 [
@@ -39,8 +36,6 @@ kernel math ;
     [ ] [ T{ effect f 2 { 1 0 } f } phantom-shuffle ] unit-test
     
     [ 2 ] [ live-locs length ] unit-test
-    
-    [ 1 ] [ ?shuffle-reserve ] unit-test
 ] with-scope
 
 [
@@ -60,8 +55,8 @@ kernel math ;
     
     H{
         { +input+ { { f "x" } } }
-    } fix-spec [
-        [ 1 0 ] [ guess-vregs ] unit-test
+    } clone [
+        [ 1 0 ] [ +input+ get { } { } guess-vregs ] unit-test
         [ ] [ 1 0 ensure-vregs ] unit-test
         [ t ] [ +input+ get phantom-d get compatible? ] unit-test
         [ ] [ finalize-contents ] unit-test

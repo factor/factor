@@ -1,4 +1,4 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
 ! Some low-level code used by vectors and string buffers.
@@ -16,9 +16,9 @@ GENERIC: set-fill ( n seq -- )
     [ underlying resize ] keep set-underlying ; inline
 
 : contract ( len seq -- )
-    dup length pick - [
-        [ swap >r + 0 swap r> set-nth-unsafe ] 3keep
-    ] repeat 2drop ;
+    swap over length [
+        0 pick pick swap set-nth-unsafe
+    ] (repeat) drop ;
 
 : new-size ( old -- new ) 1+ 3 * ; inline
 
@@ -30,7 +30,7 @@ GENERIC: set-fill ( n seq -- )
     ] when 2drop ; inline
 
 : growable-check ( n seq -- n seq )
-    over 0 < [ bounds-error ] when ; inline
+    >r >fixnum r> over 0 fixnum< [ bounds-error ] when ; inline
 
 : grow-length ( n seq -- )
     growable-check

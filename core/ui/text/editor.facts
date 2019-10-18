@@ -3,7 +3,7 @@ USING: help gadgets gadgets-scrolling models strings ;
 
 HELP: editor
 { $class-description "An editor is a " { $link control } " for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
-$terpri
+$nl
 "Editors have the following slots:"
 { $list
     { { $link editor-font } " - a font specifier." }
@@ -24,38 +24,35 @@ HELP: <editor>
 
 HELP: editor-caret ( editor -- model )
 { $values { "editor" editor } { "model" model } }
-{ $description "Outputs a " { $link model } " holding the current caret location." }
-{ $see-also editor-caret editor-mark editor-mark* } ;
+{ $description "Outputs a " { $link model } " holding the current caret location." } ;
+
+{ editor-caret editor-caret* editor-mark editor-mark* } related-words
 
 HELP: editor-caret*
 { $values { "editor" editor } { "loc" "a pair of integers" } }
-{ $description "Outputs the current caret location as a line/column number pair." }
-{ $see-also editor-caret editor-mark editor-mark* } ;
+{ $description "Outputs the current caret location as a line/column number pair." } ;
 
 HELP: editor-mark ( editor -- model )
 { $values { "editor" editor } { "model" model } }
-{ $description "Outputs a " { $link model } " holding the current mark location." }
-{ $see-also editor-caret editor-caret* editor-mark* } ;
+{ $description "Outputs a " { $link model } " holding the current mark location." } ;
 
 HELP: editor-mark*
 { $values { "editor" editor } { "loc" "a pair of integers" } }
-{ $description "Outputs the current mark location as a line/column number pair." }
-{ $see-also editor-caret editor-mark editor-mark* } ;
+{ $description "Outputs the current mark location as a line/column number pair." } ;
 
 HELP: change-caret
 { $values { "editor" editor } { "quot" "a quotation with stack effect " { $snippet "( loc -- newloc )" } } }
-{ $description "Applies a quotation to the current caret location and moves the caret to the location output by the quotation." }
-{ $see-also mark>caret change-caret&mark } ;
+{ $description "Applies a quotation to the current caret location and moves the caret to the location output by the quotation." } ;
+
+{ change-caret change-caret&mark mark>caret } related-words
 
 HELP: mark>caret
 { $values { "editor" editor } }
-{ $description "Moves the mark to the caret location, effectively deselecting any selected text." }
-{ $see-also editor-caret editor-mark change-caret change-caret&mark } ;
+{ $description "Moves the mark to the caret location, effectively deselecting any selected text." } ;
 
 HELP: change-caret&mark
 { $values { "editor" editor } { "quot" "a quotation with stack effect " { $snippet "( loc -- newloc )" } } }
-{ $description "Applies a quotation to the current caret location and moves the caret and the mark to the location output by the quotation." }
-{ $see-also mark>caret change-caret } ;
+{ $description "Applies a quotation to the current caret location and moves the caret and the mark to the location output by the quotation." } ;
 
 HELP: run-char-widths
 { $values { "string" string } { "editor" editor } { "widths" "a sequence of integers" } }
@@ -70,7 +67,7 @@ HELP: scroll>caret
 { $values { "editor" editor } }
 { $description "Ensures that the caret becomes visible in a " { $link scroller } " containing the editor. Does nothing if no parent of " { $snippet "gadget" } " is a " { $link scroller } "." } ;
 
-HELP: remove-editor-selection
+HELP: remove-selection
 { $values { "editor" editor } }
 { $description "Removes currently selected text from the editor's " { $link document } "." } ;
 

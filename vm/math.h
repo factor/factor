@@ -3,16 +3,6 @@
 #define FIXNUM_MIN (-((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)))
 #define ARRAY_SIZE_MAX ((CELL)1 << (WORD_SIZE - TAG_BITS - 2))
 
-INLINE F_FIXNUM untag_fixnum_fast(CELL tagged)
-{
-	return ((F_FIXNUM)tagged) >> TAG_BITS;
-}
-
-INLINE CELL tag_fixnum(F_FIXNUM untagged)
-{
-	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
-}
-
 INLINE F_FIXNUM bignum_to_fixnum(CELL tagged)
 {
 	return (F_FIXNUM)s48_bignum_to_fixnum(untag_array_fast(tagged));
@@ -29,6 +19,7 @@ void primitive_fixnum_subtract(void);
 void primitive_fixnum_add_fast(void);
 void primitive_fixnum_subtract_fast(void);
 void primitive_fixnum_multiply(void);
+void primitive_fixnum_multiply_fast(void);
 void primitive_fixnum_divint(void);
 void primitive_fixnum_divmod(void);
 void primitive_fixnum_mod(void);
@@ -90,7 +81,7 @@ INLINE CELL allot_integer(F_FIXNUM x)
 
 INLINE CELL allot_cell(CELL x)
 {
-	if(x > FIXNUM_MAX)
+	if(x > (CELL)FIXNUM_MAX)
 		return tag_bignum(s48_cell_to_bignum(x));
 	else
 		return tag_fixnum(x);

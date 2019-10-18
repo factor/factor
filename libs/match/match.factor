@@ -18,9 +18,7 @@ USE: prettyprint
     [ define-match-var ] each ;
 
 : MATCH-VARS: ! vars ...
-    string-mode on [
-        string-mode off define-match-vars
-    ] f ; parsing
+    ";" parse-tokens define-match-vars ; parsing
 
 : match-var? ( symbol -- bool )
     dup word? [
@@ -60,7 +58,7 @@ USE: prettyprint
     } cond ;
 
 : match ( seq1 seq2 -- bindings )
-    [ (match) ] make-hash swap [ drop f ] unless ;
+    [ (match) ] H{ } make-assoc swap [ drop f ] unless ;
 
 SYMBOL: result
 

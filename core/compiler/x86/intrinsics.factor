@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays assembler-x86 kernel kernel-internals math
-math-internals namespaces sequences words ;
+math-internals namespaces quotations sequences words generic ;
 IN: generator
 
 ! Type checks
 \ tag [
-    "in" operand tag-mask AND
-    "in" operand tag-bits SHL
+    "in" operand tag-mask get AND
+    "in" operand tag-bits get SHL
 ] H{
     { +input+ { { f "in" } } }
     { +output+ { "in" } }
@@ -21,27 +21,27 @@ IN: generator
     ! Make a copy
     "x" operand "obj" operand MOV
     ! Get the tag
-    "obj" operand tag-mask AND
+    "obj" operand tag-mask get AND
     ! Compare with object tag number (3).
-    "obj" operand object-tag CMP
+    "obj" operand object tag-number CMP
     ! Jump if the object doesn't store type info in its header
     "header" get JE
     ! It doesn't store type info in its header
-    "obj" operand tag-bits SHL
+    "obj" operand tag-bits get SHL
     "end" get JMP
     "header" resolve-label
     ! It does store type info in its header
     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
-    "x" operand object-tag CMP
+    "x" operand object tag-number CMP
     "f" get JE
     ! The pointer is not equal to 3. Load the object header.
-    "obj" operand "x" operand object-tag neg [+] MOV
+    "obj" operand "x" operand object tag-number neg [+] MOV
     ! Mask off header tag, making a fixnum.
-    "obj" operand object-tag XOR
+    "obj" operand object tag-number XOR
     "end" get JMP
     "f" resolve-label
     ! The pointer is equal to 3. Load F_TYPE (9).
-    "obj" operand f type tag-bits shift MOV
+    "obj" operand f type v>operand MOV
     "end" resolve-label
 ] H{
     { +input+ { { f "obj" } } }
@@ -50,9 +50,6 @@ IN: generator
 } define-intrinsic
 
 ! Slots
-: %untag ( reg -- ) tag-mask bitnot AND ;
-
-: %untag-fixnum ( reg -- ) tag-bits SAR ;
 
 \ slot {
     ! Slot number is literal
@@ -62,9 +59,9 @@ IN: generator
             ! load slot value
             "obj" operand dup "n" get cells [+] MOV
         ] H{
-            { +input+ { { f "obj" } { [ cells ] "n" } } }
+            { +input+ { { f "obj" } { [ small-slot? ] "n" } } }
             { +output+ { "obj" } }
-            { +clobber+ { "obj" "n" } }
+            { +clobber+ { "obj"} }
         }
     }
     ! Slot number in a register
@@ -101,7 +98,7 @@ IN: generator
             "obj" operand "n" get cells [+] "val" operand MOV
             generate-write-barrier
         ] H{
-            { +input+ { { f "val" } { f "obj" } { [ cells ] "n" } } }
+            { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
             { +scratch+ { { f "scratch" } } }
             { +clobber+ { "obj" } }
         }
@@ -114,10 +111,11 @@ IN: generator
             "obj" operand %untag
             ! store new slot value
             "obj" operand "n" operand [+] "val" operand MOV
+            ! reuse register
+            "n" get "scratch" set
             generate-write-barrier
         ] H{
             { +input+ { { f "val" } { f "obj" } { f "n" } } }
-            { +scratch+ { { f "scratch" } } }
             { +clobber+ { "obj" "n" } }
         }
     }
@@ -132,7 +130,7 @@ IN: generator
     char-reg dup XOR
     "obj" operand "n" operand ADD
     char-reg-16 "obj" operand string-offset [+] MOV
-    char-reg tag-bits SHL
+    char-reg tag-bits get SHL
     "obj" operand char-reg MOV
     char-reg POP
 ] H{
@@ -143,7 +141,7 @@ IN: generator
 
 \ set-char-slot [
     char-reg PUSH
-    "val" operand tag-bits SHR
+    "val" operand tag-bits get SHR
     "slot" operand 2 SHR
     "obj" operand "slot" operand ADD
     char-reg "val" operand MOV
@@ -160,7 +158,7 @@ IN: generator
 
 : fixnum-value-op ( op -- pair )
     H{
-        { +input+ { { f "x" } { [ v>operand ] "y" } } }
+        { +input+ { { f "x" } { [ small-tagged? ] "y" } } }
         { +output+ { "x" } }
     } fixnum-op ;
 
@@ -186,7 +184,7 @@ IN: generator
 
 \ fixnum-bitnot [
     "x" operand NOT
-    "x" operand tag-mask XOR
+    "x" operand tag-mask get XOR
 ] H{
     { +input+ { { f "x" } } }
     { +output+ { "x" } }
@@ -203,10 +201,40 @@ IN: generator
     { +output+ { "out" } }
 } define-intrinsic
 
+\ fixnum*fast {
+    {
+        [
+            "x" operand "y" get IMUL2
+        ] H{
+            { +input+ { { f "x" } { [ small-tagged? ] "y" } } }
+            { +output+ { "x" } }
+        }
+    } {
+        [
+            "out" operand "x" operand MOV
+            "out" operand %untag-fixnum
+            "y" operand "out" operand IMUL2
+        ] H{
+            { +input+ { { f "x" } { f "y" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    }
+} define-intrinsics
+
+\ fixnum-shift [
+    "x" operand "y" get neg SAR
+    ! Mask off low bits
+    "x" operand %untag
+] H{
+    { +input+ { { f "x" } { [ -31 0 between? ] "y" } } }
+    { +output+ { "x" } }
+} define-intrinsic
+
 : %untag-fixnums ( seq -- )
     [ %untag-fixnum ] unique-operands ;
 
-: simple-overflow ( word -- )
+: overflow-check ( word -- )
     "end" define-label
     "z" operand "x" operand MOV
     "z" operand "y" operand pick execute
@@ -219,22 +247,22 @@ IN: generator
     "z" operand "x" operand %allot-bignum-signed-1
     "end" resolve-label ; inline
 
-: simple-overflow-template ( word insn -- )
-    [ simple-overflow ] curry H{
+: overflow-template ( word insn -- )
+    [ overflow-check ] curry H{
         { +input+ { { f "x" } { f "y" } } }
         { +scratch+ { { f "z" } } }
         { +output+ { "z" } }
         { +clobber+ { "x" "y" } }
     } define-intrinsic ;
 
-\ fixnum+ \ ADD simple-overflow-template
-\ fixnum- \ SUB simple-overflow-template
+\ fixnum+ \ ADD overflow-template
+\ fixnum- \ SUB overflow-template
 
 : %tag-overflow ( -- )
     #! Tag a cell-size value, where the tagging might posibly
     #! overflow BUT IT MUST NOT EXCEED cell-2 BITS
     "y" operand "x" operand MOV ! Make a copy
-    "x" operand 1 tag-bits shift IMUL2 ! Tag it
+    "x" operand 1 v>operand IMUL2 ! Tag it
     "end" get JNO ! Overflow?
     "x" operand "y" operand %allot-bignum-signed-1 ! Yes, box bignum
     ;
@@ -267,7 +295,7 @@ IN: generator
     >r [ "x" operand "y" operand CMP ] swap add r> 2array ;
 
 : fixnum-value-jump ( op -- pair )
-    { { f "x" } { [ v>operand ] "y" } } fixnum-jump ;
+    { { f "x" } { [ small-tagged? ] "y" } } fixnum-jump ;
 
 : fixnum-register-jump ( op -- pair )
     { { f "x" } { f "y" } } fixnum-jump ;
@@ -287,16 +315,8 @@ IN: generator
 ] each
 
 \ fixnum>bignum [
-    "nonzero" define-label
-    "end" define-label
-    "x" operand 0 CMP ! is it zero?
-    "nonzero" get JNE
-    0 >bignum "x" get load-literal ! this is our result
-    "end" get JMP
-    "nonzero" resolve-label
     "x" operand %untag-fixnum
-    "x" operand dup %allot-bignum-signed-1 ! copy it to a bignum
-    "end" resolve-label
+    "x" operand dup %allot-bignum-signed-1
 ] H{
     { +input+ { { f "x" } } }
     { +output+ { "x" } }
@@ -310,7 +330,7 @@ IN: generator
     "y" operand "x" operand cell [+] MOV
      ! if the length is 1, its just the sign and nothing else,
      ! so output 0
-    "y" operand 1 tag-bits shift CMP
+    "y" operand 1 v>operand CMP
     "nonzero" get JNE
     "y" operand 0 MOV
     "end" get JMP
@@ -354,4 +374,20 @@ IN: generator
     { +input+ { { f "val" } { f "n" } } }
     { +scratch+ { { f "x" } } }
     { +clobber+ { "n" } }
+} define-intrinsic
+
+\ <tuple> [
+    "tuple" operand "class" operand "n" get %allot-tuple
+] H{
+    { +input+ { { f "class" } { [ inline-array? ] "n" } } }
+    { +scratch+ { { f "tuple" } } }
+    { +output+ { "tuple" } }
+} define-intrinsic
+
+\ <array> [
+    "array" operand "initial" operand "n" get %allot-array
+] H{
+    { +input+ { { [ inline-array? ] "n" } { f "initial" } } }
+    { +scratch+ { { f "array" } } }
+    { +output+ { "array" } }
 } define-intrinsic

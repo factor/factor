@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: kernel sequences hashtables kernel-internals words
+USING: kernel sequences assocs kernel-internals words
 namespaces generic vectors namespaces ;
 
 ! Name stack and variable binding simulation
@@ -26,7 +26,7 @@ TUPLE: inferred-vars reads writes reads-globals writes-globals ;
     ] change ;
     
 : apply-var-read ( symbol -- )
-    dup meta-n get [ hash-member? ] contains-with? [
+    dup meta-n get [ key? ] contains-with? [
         drop
     ] [
         inferred-vars get 2dup inferred-vars-writes member? [
@@ -40,7 +40,7 @@ TUPLE: inferred-vars reads writes reads-globals writes-globals ;
     meta-n get empty? [
         inferred-vars get inferred-vars-writes push-new
     ] [
-        dup peek-n set-hash
+        dup peek-n set-at
     ] if ;
 
 : apply-global-read ( symbol -- )

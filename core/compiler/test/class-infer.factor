@@ -1,7 +1,11 @@
 IN: temporary
 USING: arrays math-internals kernel math compiler inference
 optimizer test kernel-internals generic sequences words
-class-inference ;
+class-inference quotations alien strings sbufs ;
+
+! Make sure these compile even though this is invalid code
+[ ] [ [ 10 mod 3.0 /i ] dataflow optimize drop ] unit-test
+[ ] [ [ 10 mod 3.0 shift ] dataflow optimize drop ] unit-test
 
 ! Ensure type inference works as it is supposed to by checking
 ! if various methods get inlined
@@ -75,31 +79,7 @@ M: object xyz ;
 ] unit-test
 
 [ t ] [
-    [ dupd fixnum< [ small? ] when ] \ small? inlined?
-] unit-test
-
-[ f ] [
-    [ dup fixnum? [ small? ] when ] \ small? inlined?
-] unit-test
-
-[ t ] [
-    [ dupd fixnum>= [ 1 + ] unless ] \ fixnum+ inlined?
-] unit-test
-
-[ t ] [
-    [ dupd fixnum< [ 1 + 1 + ] when ] \ + inlined?
-] unit-test
-
-[ f ] [
-    [ dupd fixnum< [ 1 + 1 + 1 + ] when ] \ + inlined?
-] unit-test
-
-[ t ] [
-    [ dupd fixnum>= [ 1 + 1 + ] unless ] \ + inlined?
-] unit-test
-
-[ f ] [
-    [ dupd fixnum>= [ 1 + 1 + 1 + ] unless ] \ + inlined?
+    [ { fixnum } declare dup 100 >= [ 1 + ] unless ] \ fixnum+ inlined?
 ] unit-test
 
 [ t ] [
@@ -113,7 +93,7 @@ M: object xyz ;
 ] unit-test
 
 [ t ] [
-    [ { fixnum } declare [ ] repeat ] \ <= inlined?
+    [ { fixnum } declare [ ] repeat ] \ >= inlined?
 ] unit-test
 
 [ t ] [
@@ -157,4 +137,39 @@ M: object xyz ;
 [ t ] [
     [ dup V{ } eq? [ foo ] when ] dup second dup push
     compile-quot word?
+] unit-test
+
+GENERIC: detect-fx ( n -- n )
+
+M: fixnum detect-fx ;
+
+[ t ] [
+    [
+        [ uchar-nth ] 2keep [ uchar-nth ] 2keep uchar-nth
+        >r >r 298 * r> 100 * - r> 208 * - 128 + -8 shift
+        255 min 0 max detect-fx
+    ] \ detect-fx inlined?
+] unit-test
+
+[ f ] [
+    [
+        1000000000000000000000000000000000 [ ] repeat
+    ] \ 1+ inlined?
+] unit-test
+
+
+[ t ] [
+    [ { string sbuf } declare push-all ] \ push-all inlined?
+] unit-test
+
+[ t ] [
+    [ { string sbuf } declare push-all ] \ + inlined?
+] unit-test
+
+[ t ] [
+    [ { string sbuf } declare push-all ] \ fixnum+ inlined?
+] unit-test
+
+[ t ] [
+    [ { string sbuf } declare push-all ] \ >fixnum inlined?
 ] unit-test

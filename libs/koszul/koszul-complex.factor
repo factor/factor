@@ -1,13 +1,12 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays errors hashtables io kernel math matrices
+USING: arrays errors assocs hashtables assocs io kernel math matrices
 namespaces parser prettyprint sequences words ;
 IN: koszul
 
 ! Utilities
 : SYMBOLS:
-    string-mode on
-    [ string-mode off [ create-in define-symbol ] each ] f ;
+    ";" parse-tokens [ create-in define-symbol ] each ;
     parsing
 
 : -1^ odd? -1 1 ? ;
@@ -22,7 +21,7 @@ IN: koszul
     } cond ;
 
 : canonicalize
-    [ nip zero? not ] hash-subset ;
+    [ nip zero? not ] assoc-subset ;
 
 SYMBOL: terms
 
@@ -55,11 +54,11 @@ SYMBOL: terms
         [ first2 ((alt.)) ] map concat " + " ?head drop print
     ] if ;
 
-: alt. ( vec -- ) hash>alist (alt.) ;
+: alt. ( vec -- ) { } >alist (alt.) ;
 
 ! Addition
 : (alt+) ( x -- )
-    terms get [ [ swap +@ ] hash-each ] bind ;
+    terms get [ [ swap +@ ] assoc-each ] bind ;
 
 : alt+ ( x y -- x+y )
     [ >alt ] 2apply [ (alt+) (alt+) ] with-terms ;
@@ -69,8 +68,7 @@ SYMBOL: terms
     dup zero? [
         2drop H{ }
     ] [
-        swap
-        hash>alist [ first2 rot * 2array ] map-with alist>hash
+        swap [ rot * ] assoc-map-with 
     ] if ;
 
 : permutation ( seq -- perm )
@@ -102,17 +100,17 @@ SYMBOL: terms
                 2swap [
                     swapd * -rot (wedge) +@
                 ] 2keep
-            ] hash-each 2drop
-        ] hash-each-with
-    ] make-hash canonicalize ;
+            ] assoc-each 2drop
+        ] assoc-each-with
+    ] H{ } make-assoc canonicalize ;
 
 ! Differential
 SYMBOL: boundaries
 
 : d= ( value basis -- )
-    boundaries [ ?set-hash ] change ;
+    boundaries [ ?set-at ] change ;
 
-: ((d)) ( basis -- value ) boundaries get ?hash ;
+: ((d)) ( basis -- value ) boundaries get at ;
 
 : dx.y ( x y -- vec ) >r ((d)) r> wedge ;
 
@@ -128,7 +126,7 @@ DEFER: (d)
 	[
         swap [
             >r swap call r> alt*n (alt+)
-        ] hash-each-with
+        ] assoc-each-with
     ] with-terms ; inline
 
 : d ( x -- dx )
@@ -136,10 +134,10 @@ DEFER: (d)
 
 ! Interior product
 : (interior) ( y basis-elt -- i_y[basis-elt] )
-    2dup index dup -1 = [
-        3drop 0
-    ] [
+    2dup index dup [
         -rot remove associate
+    ] [
+        3drop 0
     ] if ;
 
 : interior ( x y -- i_y[x] )
@@ -170,7 +168,7 @@ DEFER: (d)
 
 ! Computing cohomology
 : (op-matrix) ( range quot basis-elt -- row )
-    swap call swap [ swap hash [ 0 ] unless* ] map-with ; inline
+    swap call swap [ swap at [ 0 ] unless* ] map-with ; inline
 
 : op-matrix ( domain range quot -- matrix )
     rot [ >r 2dup r> (op-matrix) ] map 2nip ; inline

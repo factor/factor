@@ -1,7 +1,7 @@
 /* This file is linked into the runtime for the sole purpose
  * of testing FFI code. */
 #include <stdio.h>
-#include "factor.h"
+#include "master.h"
 #include "ffi_test.h"
 
 void ffi_test_0(void)
@@ -117,13 +117,13 @@ struct tiny ffi_test_17(int x)
 	return r;
 }
 
-STDCALL int ffi_test_18(int x, int y, int z, int t)
+F_STDCALL int ffi_test_18(int x, int y, int z, int t)
 {
 	printf("ffi_test_18(%d,%d,%d,%d)\n",x,y,z,t);
 	return x + y + z * t;
 }
 
-STDCALL struct bar ffi_test_19(long x, long y, long z)
+F_STDCALL struct bar ffi_test_19(long x, long y, long z)
 {
 	struct bar r;
 	r.x = x; r.y = y; r.z = z;
@@ -136,4 +136,20 @@ void ffi_test_20(double x1, double x2, double x3,
 {
 	printf("ffi_test_20(%f,%f,%f,%f,%f,%f,%f,%f,%f)\n",
 		x1, x2, x3, y1, y2, y3, z1, z2, z3);
+}
+
+long long ffi_test_21(long x, long y)
+{
+	return (long long)x * (long long)y;
+}
+
+long ffi_test_22(long x, long long y, long long z)
+{
+	printf("ffi_test_22(%ld,%lld,%lld)\n",x,y,z);
+	return x + y / z;
+}
+
+float ffi_test_23(float x[3], float y[3])
+{
+	return x[0] * y[0] + x[1] * y[1] + x[2] * y[2];
 }

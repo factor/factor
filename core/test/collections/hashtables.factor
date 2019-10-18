@@ -10,15 +10,16 @@ USE: hashtables
 USE: io
 USE: prettyprint
 USE: errors
+USE: assocs
 
-[ "hi" V{ 1 2 3 } hash ] unit-test-fails
+[ f ] [ "hi" V{ 1 2 3 } at ] unit-test
 
-[ H{ } ] [ { } [ dup ] map>hash ] unit-test
+[ H{ } ] [ { } [ dup ] H{ } map>assoc ] unit-test
 
-[ ] [ 1000 [ dup sq ] map>hash "testhash" set ] unit-test
+[ ] [ 1000 [ dup sq ] H{ } map>assoc "testhash" set ] unit-test
 
 [ V{ } ]
-[ 1000 [ dup sq swap "testhash" get hash = not ] subset ]
+[ 1000 [ dup sq swap "testhash" get at = not ] subset ]
 unit-test
 
 [ t ]
@@ -42,41 +43,41 @@ unit-test
 
 16 <hashtable> "testhash" set
 
-t C{ 2 3 } "testhash" get set-hash
-f 100000000000000000000000000 "testhash" get set-hash
-{ } { [ { } ] } "testhash" get set-hash
+t C{ 2 3 } "testhash" get set-at
+f 100000000000000000000000000 "testhash" get set-at
+{ } { [ { } ] } "testhash" get set-at
 
-[ t ] [ C{ 2 3 } "testhash" get hash ] unit-test
-[ f ] [ 100000000000000000000000000 "testhash" get hash* drop ] unit-test
-[ { } ] [ { [ { } ] } clone "testhash" get hash* drop ] unit-test
+[ t ] [ C{ 2 3 } "testhash" get at ] unit-test
+[ f ] [ 100000000000000000000000000 "testhash" get at* drop ] unit-test
+[ { } ] [ { [ { } ] } clone "testhash" get at* drop ] unit-test
 
 ! Regression
 3 <hashtable> "broken-remove" set
-1 W{ \ + } dup "x" set "broken-remove" get set-hash
-2 W{ \ = } dup "y" set "broken-remove" get set-hash
-"x" get "broken-remove" get remove-hash
-2 "y" get "broken-remove" get set-hash
-[ 1 ] [ "broken-remove" get hash-keys length ] unit-test
+1 W{ \ + } dup "x" set "broken-remove" get set-at
+2 W{ \ = } dup "y" set "broken-remove" get set-at
+"x" get "broken-remove" get delete-at
+2 "y" get "broken-remove" get set-at
+[ 1 ] [ "broken-remove" get keys length ] unit-test
 
 {
     { "salmon" "fish" }
     { "crocodile" "reptile" }
     { "cow" "mammal" }
     { "visual basic" "language" }
-} alist>hash "testhash" set
+} >hashtable "testhash" set
 
 [ f f ] [
-    "visual basic" "testhash" get remove-hash
-    "visual basic" "testhash" get hash*
+    "visual basic" "testhash" get delete-at
+    "visual basic" "testhash" get at*
 ] unit-test
 
-[ t ] [ H{ } dup subhash? ] unit-test
-[ f ] [ H{ { 1 3 } } H{ } subhash? ] unit-test
-[ t ] [ H{ } H{ { 1 3 } } subhash? ] unit-test
-[ t ] [ H{ { 1 3 } } H{ { 1 3 } } subhash? ] unit-test
-[ f ] [ H{ { 1 3 } } H{ { 1 "hey" } } subhash? ] unit-test
-[ f ] [ H{ { 1 f } } H{ } subhash? ] unit-test
-[ t ] [ H{ { 1 f } } H{ { 1 f } } subhash? ] unit-test
+[ t ] [ H{ } dup subassoc? ] unit-test
+[ f ] [ H{ { 1 3 } } H{ } subassoc? ] unit-test
+[ t ] [ H{ } H{ { 1 3 } } subassoc? ] unit-test
+[ t ] [ H{ { 1 3 } } H{ { 1 3 } } subassoc? ] unit-test
+[ f ] [ H{ { 1 3 } } H{ { 1 "hey" } } subassoc? ] unit-test
+[ f ] [ H{ { 1 f } } H{ } subassoc? ] unit-test
+[ t ] [ H{ { 1 f } } H{ { 1 f } } subassoc? ] unit-test
 
 [ t ] [ H{ } dup = ] unit-test
 [ f ] [ "xyz" H{ } = ] unit-test
@@ -95,52 +96,52 @@ f 100000000000000000000000000 "testhash" get set-hash
             { 1 2 }
             { 3 4 }
             { 5 6 }
-        } [ * + , ] hash-each-with
+        } [ * + , ] assoc-each-with
     ] { } make
 ] unit-test
 
-[ t ] [ H{ } [ 2drop f ] hash-all? ] unit-test
-[ t ] [ H{ { 1 1 } } [ = ] hash-all? ] unit-test
-[ f ] [ H{ { 1 2 } } [ = ] hash-all? ] unit-test
-[ t ] [ H{ { 1 1 } { 2 2 } } [ = ] hash-all? ] unit-test
-[ f ] [ H{ { 1 2 } { 2 2 } } [ = ] hash-all? ] unit-test
+[ t ] [ H{ } [ 2drop f ] assoc-all? ] unit-test
+[ t ] [ H{ { 1 1 } } [ = ] assoc-all? ] unit-test
+[ f ] [ H{ { 1 2 } } [ = ] assoc-all? ] unit-test
+[ t ] [ H{ { 1 1 } { 2 2 } } [ = ] assoc-all? ] unit-test
+[ f ] [ H{ { 1 2 } { 2 2 } } [ = ] assoc-all? ] unit-test
 
-[ H{ } ] [ H{ { t f } { f t } } [ 2drop f ] hash-subset ] unit-test
+[ H{ } ] [ H{ { t f } { f t } } [ 2drop f ] assoc-subset ] unit-test
 [ H{ { 3 4 } { 4 5 } { 6 7 } } ] [
     3 H{ { 1 2 } { 2 3 } { 3 4 } { 4 5 } { 6 7 } }
-    [ drop <= ] hash-subset-with
+    [ drop <= ] assoc-subset-with
 ] unit-test
 
 ! Testing the hash element counting
 
 H{ } clone "counting" set
-"value" "key" "counting" get set-hash
-[ 1 ] [ "counting" get hash-size ] unit-test
-"value" "key" "counting" get set-hash
-[ 1 ] [ "counting" get hash-size ] unit-test
-"key" "counting" get remove-hash
-[ 0 ] [ "counting" get hash-size ] unit-test
-"key" "counting" get remove-hash
-[ 0 ] [ "counting" get hash-size ] unit-test
+"value" "key" "counting" get set-at
+[ 1 ] [ "counting" get assoc-size ] unit-test
+"value" "key" "counting" get set-at
+[ 1 ] [ "counting" get assoc-size ] unit-test
+"key" "counting" get delete-at
+[ 0 ] [ "counting" get assoc-size ] unit-test
+"key" "counting" get delete-at
+[ 0 ] [ "counting" get assoc-size ] unit-test
 
 ! Test rehashing
 
 2 <hashtable> "rehash" set
 
-1 1 "rehash" get set-hash
-2 2 "rehash" get set-hash
-3 3 "rehash" get set-hash
-4 4 "rehash" get set-hash
-5 5 "rehash" get set-hash
-6 6 "rehash" get set-hash
+1 1 "rehash" get set-at
+2 2 "rehash" get set-at
+3 3 "rehash" get set-at
+4 4 "rehash" get set-at
+5 5 "rehash" get set-at
+6 6 "rehash" get set-at
 
-[ 6 ] [ "rehash" get hash-size ] unit-test
+[ 6 ] [ "rehash" get assoc-size ] unit-test
 
-[ 6 ] [ "rehash" get clone hash-size ] unit-test
+[ 6 ] [ "rehash" get clone assoc-size ] unit-test
 
-"rehash" get clear-hash
+"rehash" get clear-assoc
 
-[ 0 ] [ "rehash" get hash-size ] unit-test
+[ 0 ] [ "rehash" get assoc-size ] unit-test
 
 [
     3
@@ -148,15 +149,15 @@ H{ } clone "counting" set
     2 H{
         { 1 2 }
         { 2 3 }
-    } clone hash
+    } clone at
 ] unit-test
 
 ! There was an assoc in place of assoc* somewhere
 3 <hashtable> "f-hash-test" set
 
-10 [ f f "f-hash-test" get set-hash ] times
+10 [ f f "f-hash-test" get set-at ] times
 
-[ 1 ] [ "f-hash-test" get hash-size ] unit-test
+[ 1 ] [ "f-hash-test" get assoc-size ] unit-test
 
 [ 21 ] [
     0 H{
@@ -165,7 +166,7 @@ H{ } clone "counting" set
         { 5 6 }
     } [
         + +
-    ] hash-each
+    ] assoc-each
 ] unit-test
 
 H{ } clone "cache-test" set
@@ -180,21 +181,21 @@ H{ } clone "cache-test" set
 ] [
     H{ { "factor" "rocks" } { "dup" "sq" } { 3 4 } }
     H{ { "factor" "rocks" } { 1 2 } { 2 3 } { 3 4 } }
-    hash-intersect
+    intersect
 ] unit-test
 
 [
     H{ { 1 2 } { 2 3 } { 6 5 } }
 ] [
     H{ { 2 4 } { 6 5 } } H{ { 1 2 } { 2 3 } }
-    hash-union
+    union
 ] unit-test
 
 [ { 1 3 } ] [ H{ { 2 2 } } { 1 2 3 } remove-all ] unit-test
 
 ! Resource leak...
 H{ } "x" set
-100 [ drop "x" get clear-hash ] each
+100 [ drop "x" get clear-assoc ] each
 
 ! Crash discovered by erg
 [ t ] [ 3/4 <hashtable> dup clone = ] unit-test
@@ -202,13 +203,31 @@ H{ } "x" set
 ! Another crash discovered by erg
 [ ] [
     H{ } clone
-    [ 1 swap set-hash ] catch drop
-    [ 2 swap set-hash ] catch drop
-    [ 3 swap set-hash ] catch drop
+    [ 1 swap set-at ] catch drop
+    [ 2 swap set-at ] catch drop
+    [ 3 swap set-at ] catch drop
     drop
 ] unit-test
 
 [ H{ { -1 4 } { -3 16 } { -5 36 } } ] [
     H{ { 1 2 } { 3 4 } { 5 6 } }
-    [ >r neg r> sq ] hash-map
+    [ >r neg r> sq ] assoc-map
+] unit-test
+
+! Bug discovered by littledan
+[ { 5 5 5 5 } ] [
+    [
+        H{
+            { 1 2 }
+            { 2 3 }
+            { 3 4 }
+            { 4 5 }
+            { 5 6 }
+        } clone
+        dup keys length ,
+        dup assoc-size ,
+        dup rehash
+        dup keys length ,
+        assoc-size ,
+    ] { } make
 ] unit-test

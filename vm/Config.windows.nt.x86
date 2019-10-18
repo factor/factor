@@ -1,0 +1,5 @@
+LIBS = -lm
+PLAF_SUFFIX = .exe
+PLAF_DLL_OBJS += vm/os-windows-nt.o
+PLAF_EXE_OBJS += vm/resources.o
+include vm/Config.windows.x86 vm/Config.windows

@@ -12,8 +12,13 @@ namespaces sequences vectors words strings ;
     object add* swapd [ swap 2array ] map-with object
     method-alist>quot ;
 
-: dispatch-specializer ( quot dispatch# n dispatcher -- quot )
-    [ rot picker % , swap <array> , \ dispatch , ] [ ] make ;
+: dispatch-specializer ( quot dispatch# symbol dispatcher -- quot )
+    [
+        rot picker %
+        ,
+        get swap <array> ,
+        \ dispatch ,
+    ] [ ] make ;
 
 : tag-specializer ( quot dispatch# -- quot )
     num-tags \ tag dispatch-specializer ;

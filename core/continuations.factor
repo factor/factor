@@ -39,7 +39,7 @@ DEFER: continue-with
 
 : set-walker-hook 2 setenv ; inline
 
-: get-walker-hook 2 getenv f set-walker-hook ; inline
+: walker-hook 2 getenv f set-walker-hook ; inline
 
 : (continue) ( continuation -- )
     >continuation<
@@ -61,11 +61,11 @@ DEFER: continue-with
     9 getenv swap ; inline
 
 : continue ( continuation -- )
-    get-walker-hook [ (continue-with) ] [ (continue) ] if* ;
+    walker-hook [ (continue-with) ] [ (continue) ] if* ;
     inline
 
 : continue-with ( obj continuation -- )
-    get-walker-hook [ >r 2array r> ] when* (continue-with) ;
+    walker-hook [ >r 2array r> ] when* (continue-with) ;
     inline
 
 M: continuation clone

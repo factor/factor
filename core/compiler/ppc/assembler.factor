@@ -131,7 +131,10 @@ words ;
 : (RLWINM) a-form 21 insn ;
 : RLWINM 0 (RLWINM) ;  : RLWINM. 1 (RLWINM) ;
 
-: SLWI 0 31 pick - RLWINM ;  : SLWI. 0 31 pick - RLWINM. ;
+: (SLWI) 0 31 pick - ;
+: SLWI (SLWI) RLWINM ;  : SLWI. (SLWI) RLWINM. ;
+: (SRWI) 32 over - swap 31 ;
+: SRWI (SRWI) RLWINM ;  : SRWI. (SRWI) RLWINM. ;
 
 : LBZ d-form 34 insn ;  : LBZU d-form 35 insn ;
 : LHA d-form 42 insn ;  : LHAU d-form 43 insn ;
@@ -145,14 +148,14 @@ words ;
 G: (B) ( dest aa lk -- ) 2 standard-combination ;
 M: integer (B) i-form 18 insn ;
 M: word (B) 0 -rot (B) rc-relative-ppc-3 rel-word ;
-M: label (B) 0 -rot (B) rc-relative-ppc-3 rel-label ;
+M: label (B) 0 -rot (B) rc-relative-ppc-3 label-fixup ;
 
 : B 0 0 (B) ; : BL 0 1 (B) ;
 
 GENERIC: BC ( a b c -- )
 M: integer BC 0 0 b-form 16 insn ;
 M: word BC >r 0 BC r> rc-relative-ppc-2 rel-word ;
-M: label BC >r 0 BC r> rc-relative-ppc-2 rel-label ;
+M: label BC >r 0 BC r> rc-relative-ppc-2 label-fixup ;
 
 : BLT 12 0 rot BC ;  : BGE 4 0 rot BC ;
 : BGT 12 1 rot BC ;  : BLE 4 1 rot BC ;

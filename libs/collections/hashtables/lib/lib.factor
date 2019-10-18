@@ -5,6 +5,8 @@ IN: hashtables.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: ref-hash ( table key -- value ) swap hash ;
+
 ! set-hash with alternative stack effects
 
 : put-hash* ( table key value -- ) swap rot set-hash ;

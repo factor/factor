@@ -5,7 +5,7 @@ USING: kernel sequences math bit-arrays words namespaces
 memoize ;
 
 : set-range-true ( seq {start,end} -- )
-    first2 1+ rot <slice> [ drop t ] inject ;
+    first2 1+ rot <slice> [ drop t ] change-each ;
 
 : ranges>bit-array ( ranges max -- bit-array )
     <bit-array>

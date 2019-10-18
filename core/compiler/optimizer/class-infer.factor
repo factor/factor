@@ -1,66 +1,37 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: arrays generic assocs hashtables inference kernel
+math namespaces sequences words parser intervals ;
 IN: class-inference
-USING: arrays generic hashtables inference kernel
-math namespaces sequences words parser ;
-
-! A constraint is a statement about a value.
-
-! We need a notion of equality which doesn't recurse so cannot
-! infinite loop on circular data
-GENERIC: eql? ( obj1 obj2 -- ? )
-M: object eql? eq? ;
-M: number eql? number= ;
-
-! Maps constraints to constraints
-SYMBOL: constraints
-
-TUPLE: literal-constraint literal value ;
-
-M: literal-constraint equal?
-    over literal-constraint? [
-        2dup
-        [ literal-constraint-literal ] 2apply eql? >r
-        [ literal-constraint-value ] 2apply = r> and
-    ] [
-        2drop f
-    ] if ;
-
-TUPLE: class-constraint class value ;
-
-GENERIC: apply-constraint ( constraint -- )
-GENERIC: constraint-satisfied? ( constraint -- ? )
-
-: `input pick node-in-d nth ;
-: `output pick node-out-d nth ;
-: class, <class-constraint> , ;
-: literal, <literal-constraint> , ;
-
-M: f apply-constraint drop ;
-
-: make-constraints ( node quot -- constraint )
-    { } make nip ; inline
-
-: set-constraints ( node quot -- )
-    make-constraints
-    unclip [ 2array ] reduce
-    apply-constraint ; inline
-
-: node-class# ( node n -- class )
-    over node-in-d <reversed> ?nth node-class ;
 
 ! Variables used by the class inferencer
-
-! Current value --> class mapping
-SYMBOL: value-classes
 
 ! Current value --> literal mapping
 SYMBOL: value-literals
 
+! Current value --> interval mapping
+SYMBOL: value-intervals
+
+! Current value --> class mapping
+SYMBOL: value-classes
+
+: set-value-interval* ( interval value -- )
+    value-intervals get set-at ;
+
+M: interval-constraint apply-constraint
+    dup interval-constraint-interval
+    swap interval-constraint-value set-value-interval* ;
+
+: set-class-interval ( class value -- )
+    >r "interval" word-prop dup
+    [ r> set-value-interval* ] [ r> 2drop ] if ;
+
 : set-value-class* ( class value -- )
-    2dup <class-constraint> constraints get hash
-    [ apply-constraint ] when*
-    value-classes get set-hash ;
+    over [
+        2dup set-class-interval
+        2dup <class-constraint> assume
+    ] when
+    value-classes get set-at ;
 
 M: class-constraint apply-constraint
     dup class-constraint-class
@@ -68,9 +39,9 @@ M: class-constraint apply-constraint
 
 : set-value-literal* ( literal value -- )
     over class over set-value-class*
-    2dup <literal-constraint> constraints get hash
-    [ apply-constraint ] when*
-    value-literals get set-hash ;
+    over real? [ over [a,a] over set-value-interval* ] when
+    2dup <literal-constraint> assume
+    value-literals get set-at ;
 
 M: literal-constraint apply-constraint
     dup literal-constraint-literal
@@ -85,69 +56,85 @@ GENERIC: infer-classes-around ( node -- )
 
 M: node infer-classes-before drop ;
 
-M: node child-constraints node-children length f <array> ;
-
-: value-class* ( value -- class )
-    value-classes get hash [ object ] unless* ;
-
-M: class-constraint constraint-satisfied?
-    dup class-constraint-value value-class*
-    swap class-constraint-class class< ;
+M: node child-constraints
+    node-children length dup zero? [ drop f ] [ f <array> ] if ;
 
 : value-literal* ( value -- obj ? )
-    value-literals get hash* ;
+    value-literals get at* ;
 
 M: literal-constraint constraint-satisfied?
     dup literal-constraint-value value-literal*
     [ swap literal-constraint-literal eql? ] [ 2drop f ] if ;
 
+: value-class* ( value -- class )
+    value-classes get at [ object ] unless* ;
+
+M: class-constraint constraint-satisfied?
+    dup class-constraint-value value-class*
+    swap class-constraint-class class< ;
+
+: value-interval* ( value -- interval/f )
+    value-intervals get at ;
+
 M: pair apply-constraint
-    first2 2dup constraints get set-hash
+    first2 2dup constraints get set-at
     constraint-satisfied? [ apply-constraint ] [ drop ] if ;
 
 M: pair constraint-satisfied?
     first constraint-satisfied? ;
 
+: extract-keys ( seq assoc -- newassoc )
+    [ drop swap memq? ] assoc-subset-with f assoc-like ;
+
 : annotate-node ( node -- )
     #! Annotate the node with the currently-inferred set of
     #! value classes.
     dup node-values
-    [ dup value-class* ] map>hash swap set-node-classes ;
+    dup value-intervals get extract-keys pick set-node-intervals
+    dup value-classes get extract-keys pick set-node-classes
+    dup value-literals get extract-keys pick set-node-literals
+    2drop ;
 
 : intersect-classes ( classes values -- )
+    [ [ value-class* class-and ] keep set-value-class* ] 2each ;
+
+: intersect-intervals ( intervals values -- )
     [
-        [ value-class* class-and ] keep set-value-class*
+        [ value-interval* interval-intersect ] keep
+        set-value-interval*
     ] 2each ;
 
-: predicate-constraints ( #call class -- )
+: predicate-constraints ( class #call -- )
     [
         0 `input class,
         general-t 0 `output class,
     ] set-constraints ;
 
 : compute-constraints ( #call -- )
-    dup node-param "constraints" word-prop dup [
+    dup node-param "constraints" word-prop [
         call
     ] [
-        drop dup node-param "predicating" word-prop dup [
-            predicate-constraints
-        ] [
-            2drop
-        ] if
-    ] if ;
-
-: output-classes ( node -- seq )
-    dup node-param "output-classes" word-prop [
-        call
-    ] [
-        node-param "inferred-effect" word-prop effect-out
-        dup [ word? ] all? [ drop f ] unless
+        dup node-param "predicating" word-prop dup
+        [ swap predicate-constraints ] [ 2drop ] if
     ] if* ;
+
+: default-output-classes ( word -- classes )
+    "inferred-effect" word-prop effect-out
+    dup [ class? ] all? [ drop f ] unless ;
+
+: compute-output-classes ( node word -- classes intervals )
+    dup node-param "output-classes" word-prop dup
+    [ call ] [ 2drop f f ] if ;
+
+: output-classes ( node -- classes intervals )
+    dup compute-output-classes
+    >r [ ] [ node-param default-output-classes ] ?if r> ;
 
 M: #call infer-classes-before
     dup compute-constraints
-    dup output-classes
-    [ swap node-out-d intersect-classes ] [ drop ] if* ;
+    dup node-out-d swap output-classes
+    >r over intersect-classes
+    r> swap intersect-intervals ;
 
 M: #push infer-classes-before
     node-out-d
@@ -160,8 +147,8 @@ M: #if child-constraints
     ] make-constraints ;
 
 M: #dispatch child-constraints
-    [
-        dup node-children length [
+    dup [
+        node-children length [
             0 `input literal,
         ] each
     ] make-constraints ;
@@ -176,19 +163,30 @@ DEFER: (infer-classes)
         [
             value-classes [ clone ] change
             value-literals [ clone ] change
+            value-intervals [ clone ] change
             constraints [ clone ] change
             apply-constraint
             (infer-classes)
         ] with-scope
     ] 2each ;
 
-: merge-value-class ( n nodes -- class )
-    null [ pick node-class# class-or ] reduce nip ;
+: pad-all ( seqs elt -- seq )
+    >r dup [ length ] map supremum r> rot
+    [ pick pick pad-left ] map 2nip ;
+
+: merge-classes ( nodes -- seq )
+    [ dup node-in-d [ node-class ] map-with ] map
+    null pad-all flip [ null [ class-or ] reduce ] map ;
+
+: merge-intervals ( nodes -- seq )
+    [ dup node-in-d
+    [ node-interval ] map-with ] map
+    f pad-all flip [ dup first [ interval-union ] reduce ] map ;
 
 : annotate-merge ( nodes #merge/#entry -- )
-    node-out-d <reversed> dup length
-    [ pick merge-value-class swap set-value-class* ] 2each
-    drop ;
+    node-out-d
+    over merge-classes over [ set-value-class* ] 2reverse-each
+    swap merge-intervals swap [ set-value-interval* ] 2reverse-each ;
 
 : active-children ( node -- seq )
     node-children
@@ -204,7 +202,8 @@ DEFER: (infer-classes)
     ] if ;
 
 : annotate-entry ( nodes #label -- )
-    node-child annotate-merge ;
+    >r merge-classes r> node-child node-out-d
+    [ set-value-class* ] 2reverse-each ;
 
 M: #label infer-classes-before ( #label -- )
     #! First, infer types under the hypothesis which hold on
@@ -234,10 +233,9 @@ M: object infer-classes-around
         node-successor (infer-classes)
     ] when* ;
 
-: ?<hashtable> [ H{ } clone ] unless* ;
-
-: infer-classes-with ( node classes literals -- )
+: infer-classes-with ( node classes literals intervals -- )
     [
+        ?<hashtable> value-intervals set
         ?<hashtable> value-literals set
         ?<hashtable> value-classes set
         H{ } clone constraints set
@@ -245,9 +243,12 @@ M: object infer-classes-around
     ] with-scope ;
 
 : infer-classes ( node -- )
-    f f infer-classes-with ;
+    f f f infer-classes-with ;
 
-: infer-classes/node ( existing node -- )
+: infer-classes/node ( node existing -- )
     #! Infer classes, using the existing node's class info as a
     #! starting point.
-    over node-classes rot node-literals infer-classes-with ;
+    dup node-classes
+    over node-literals
+    rot node-intervals
+    infer-classes-with ;

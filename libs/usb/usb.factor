@@ -73,10 +73,10 @@ FUNCTION: usb_bus* usb_get_busses ( ) ;
 : display-devices ( -- )
   #! Example function to list all usb devices on system
   usb_get_busses [
-    dup usb_bus-dirname write " - " write 
+    dup usb_bus-dirname alien>char-string write " - " write 
     usb_bus-devices [
-      terpri "  " write
-      dup usb_device-filename write 
+      nl "  " write
+      dup usb_device-filename alien>char-string write 
       " - " write 
       dup usb_device-descriptor usb_device_descriptor-bLength number>string write 
       " - " write 
@@ -84,5 +84,5 @@ FUNCTION: usb_bus* usb_get_busses ( ) ;
       " - " write 
       usb_device-descriptor usb_device_descriptor-idProduct >hex write
     ] device-each
-    terpri
+    nl
   ] bus-each ;

@@ -53,7 +53,7 @@ HELP: post-rpc
 
 ARTICLE: { "xml-rpc" "intro" } "XML-RPC"
     "This is the XML-RPC library. XML-RPC is used instead of SOAP because it is far simpler and easier to use for most tasks. The library was implemented by Daniel Ehrenberg."
-    $terpri
+    $nl
     "The most important words that this library implements are:"
     { $subsection send-rpc }
     { $subsection receive-rpc } 

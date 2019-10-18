@@ -1,0 +1,179 @@
+! Copyright (C) 2007 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
+USING: help assocs generic sequences sequences-internals namespaces ;
+
+HELP: clear-assoc
+{ $values { "assoc" "an assoc" } }
+{ $description "Removes all entries from the assoc."  }
+{ $side-effects "assoc" } ;
+
+HELP: assoc-size
+{ $values { "assoc" "an assoc" } { "n" "a non-negative integer" } }
+{ $description "Outputs the number of entries stored in the assoc." } ;
+
+HELP: assoc-empty?
+{ $values { "assoc" "an assoc" } { "?" "a boolean" } }
+{ $description "Tests if the assoc does not contain any entries." } ;
+
+HELP: at*
+{ $values { "key" "an object to look up in the assoc" } { "assoc" "an assoc" } { "value" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } { "?" "a boolean indicating if the key was present" } }
+{ $description "Looks up the value associated with a key. The boolean flag can decide between the case of a missing value, and a value of " { $link f } "." } ;
+
+{ at* key? } related-words
+
+HELP: key?
+{ $values { "key" "an object to look up in the assoc" } { "assoc" "an assoc" } { "?" "a boolean" } }
+{ $description "Tests if the assoc contains a key/value pair whose key is equal to the given key." } ;
+
+HELP: at
+{ $values { "key" "an object to look up in the assoc" } { "assoc" "an assoc" } { "value" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } }
+{ $description "Looks up the value associated with a key. No distinction is made between a missing value and a value set to " { $link f } "." } ;
+
+HELP: value-at
+{ $values { "value" "an object to look up in the assoc" } { "assoc" "an assoc" } { "key" "the key associated to the value, or " { $link f } " if the value is not present in the assoc" } }
+{ $description "Looks up the key associated with a value. No distinction is made between a missing key and a key set to " { $link f } "." } ;
+
+HELP: delete-at
+{ $values { "key" "a key" } { "assoc" "an assoc" } }
+{ $description "Removes an entry from the assoc." }
+{ $side-effects "assoc" } ;
+
+HELP: delete-at*
+{ $values { "key" "a key" } { "assoc" "an assoc" } { "old" "the previous value or " { $link f } } }
+{ $description "Stores an entry into the assoc." }
+{ $side-effects "assoc" } ;
+
+HELP: set-at
+{ $values { "value" "a value" } { "key" "a key to add" } { "assoc" "an assoc" } }
+{ $description "Stores the key/value pair into the assoc." }
+{ $side-effects "assoc" } ;
+
+HELP: keys
+{ $values { "assoc" "an assoc" } { "seq" "an array of keys" } }
+{ $description "Outputs an array of all keys in the assoc." } ;
+
+{ keys values } related-words
+
+HELP: values
+{ $values { "assoc" "an assoc" } { "seq" "an array of values" } }
+{ $description "Outputs an array of all values in the assoc." } ;
+
+HELP: >alist
+{ $values { "assoc" "an assoc" } { "alist" "an array of key/value pairs" } }
+{ $description "Outputs an array of all key/value pairs in the assoc." } ;
+
+HELP: >valist
+{ $values { "assoc" "an assoc" } { "alist" "an array of key/value pairs" } }
+{ $description "Outputs a vector of all key/value pairs in the assoc, forming a resizable assoc." } ;
+
+{ >alist >valist } related-words
+
+HELP: assoc-each
+{ $values { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( key value -- )" } } }
+{ $description "Applies a quotation to each key/value pair in the assoc." }
+{ $examples
+    { $example
+        "H{ { \"bananas\" 5 } { \"apples\" 42 } { \"pears\" 17 } }"
+        "0 swap [ nip + ] assoc-each ."
+        "64"
+    }
+} ;
+
+
+HELP: assoc-subset
+{ $values { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "subassoc" "a new assoc" } }
+{ $description "Constructs an assoc consisting of all key/value pairs for which the predicate quotation yields true." } ;
+
+HELP: assoc-subset-with
+{ $values { "obj" "an object" } { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( obj key value -- ? )" } } { "subassoc" "a new assoc" } }
+{ $description "Variant of " { $link assoc-subset } " which pushes a retained object on each invocation of the quotation." } ;
+
+HELP: assoc-map
+{ $values { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( key value -- newkey newvalue )" } } { "newassoc" "a new assoc" } }
+{ $description "Applies the quotation to each key/value pair in the input assoc and outputs a new assoc containing the results." }
+{ $examples
+    { $unchecked-example
+        " : discount ( n prices -- newprices )"
+        "    [ rot - ] assoc-each-with ;"
+        "2"
+        "H{ { \"bananas\" 5 } { \"apples\" 42 } { \"pears\" 17 } }"
+        "discount ."
+        "H{ { \"bananas\" 3 } { \"apples\" 39 } { \"pears\" 15 } }"
+    }
+} ;
+
+HELP: assoc-map-with
+{ $values { "obj" "an object" } { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( obj key value -- newkey newvalue )" } } { "newassoc" "a new assoc" } }
+{ $description "Applies the quotation to each key/value pair in the input assoc and outputs a new assoc containing the results. For invocation of the quotation, a retained value is pushed." } ;
+
+HELP: assoc-each-with
+{ $values { "obj" "an object" } { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( obj key value -- )" } } }
+{ $description "Variant of " { $link assoc-each } " which pushes a retained object on each invocation of the quotation." } ;
+
+HELP: assoc-find
+{ $values { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" "a boolean" } }
+{ $description "Applies a predicate quotation to each key/value pair in the assoc. Returns the key or value that the quotation succeeds on, or f for both if the quotation fails. It also returns a boolean describing whether there was anything found. assoc-find must be implemented by all classes following the assoc protocol, which uses it as the basis for traversal." } ;
+
+HELP: assoc-all?
+{ $values { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "?" "a boolean" } }
+{ $description "Applies a predicate quotation to each key/value pair in the assoc. Outputs true if the assoc is empty or the quotation yields true for each entry." } ;
+
+HELP: assoc-all-with?
+{ $values { "obj" "an object" } { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( obj key value -- ? )" } } { "?" "a boolean" } }
+{ $description "Variant of " { $link assoc-all? } " which pushes a retained object on each invocation of the quotation." } ;
+
+HELP: subassoc?
+{ $values { "assoc1" "an assoc" } { "assoc2" "an assoc" } { "?" "a new assoc" } }
+{ $description "Tests if " { $snippet "assoc2" } " contains all key/value pairs of " { $snippet "assoc1" } "." } ;
+
+HELP: assoc-stack
+{ $values { "key" "a key" } { "seq" "a sequence of assocs" } { "value" "a value or " { $link f } } }
+{ $description "Looks up the key in every assoc in the sequence, search from back to front. If the key could not be found, outputs " { $link f } ". This word is used to implement abstractions such as nested scopes; if the sequence is a stack represented by a vector, then the most recently pushed assoc -- the innermost scope -- will be searched first." } ;
+
+HELP: intersect
+{ $values { "assoc1" "an assoc" } { "assoc2" "an assoc" } { "intersection" "a new assoc" } }
+{ $description "Constructs an assoc consisting of all key/value pairs from " { $snippet "assoc2" } " such that the key is also present in " { $snippet "assoc1" } "." }
+{ $notes "The values of the keys in " { $snippet "assoc1" } " are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." } ;
+
+HELP: update
+{ $values { "assoc1" "an assoc" } { "assoc2" "an assoc" } }
+{ $description "Adds all key/value pairs from " { $snippet "assoc2" } " to " { $snippet "assoc1" } "." }
+{ $side-effects "assoc1" } ;
+
+HELP: union
+{ $values { "assoc1" "an assoc" } { "assoc2" "an assoc" } { "union" "a new assoc" } }
+{ $description "Constructs a assocstable consisting of all key/value pairs from " { $snippet "assoc1" } " and " { $snippet "assoc2" } ", with entries from " { $snippet "assoc2" } " taking precedence." }
+{ $notes "The values of the keys in " { $snippet "assoc1" } " are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." } ;
+
+HELP: remove-all
+{ $values { "assoc" "an assoc" } { "seq" "a sequence" } { "subseq" "a new sequence" } }
+{ $description "Constructs a sequence consisting of all elements from the sequence that appear as keys in the assoc." }
+{ $notes "The values of the keys in the assoc are disregarded, so this word is usually used for set-theoretic calculations where the assoc in question either has dummy sentinels as values, or the values equal the keys." }
+{ $side-effects "assoc" } ;
+
+HELP: cache
+{ $values { "key" "a key" } { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( key -- value )" } } { "value" "a previously-retained or freshly-computed value" } }
+{ $description "If the key is present in the assoc, outputs the associated value, otherwise calls the quotation to produce a value and stores the key/value pair into the assoc." }
+{ $side-effects "assoc" } ;
+
+HELP: map>assoc
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- key value )" } } { "exemplar" "an exemplar for an assoc" } { "assoc" "an assoc" } }
+{ $description "Applies the quotation to each element of the sequence to produce a key and value and constructs a new assoc from these key/value pairs. The return type is specified by the exemplar." } ;
+
+HELP: assoc>map
+{ $values { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( key value -- elt )" } } { "exemplar" "an exemplar for a sequence" } { "seq" "a sequence" } }
+{ $description "Applies the quotation to each key/value pair of the assoc to produce a sequence of all of the results. The return type is specified by the exemplar." } ;
+
+HELP: change-at
+{ $values { "key" object } { "assoc" "an assoc" } { "quot" "a quotation with stack effect " { $snippet "( value -- newvalue )" } } }
+{ $description "Applies the quotation to the value associated with " { $snippet "key" } ", storing the new value back in the assoc." }
+{ $side-effects "assoc" } ;
+
+{ change-at change-nth change-nth-unsafe change } related-words
+
+HELP: alist
+{ $class-description "A union class of sequence types which may be treated as assocs. This includes " { $snippet "f" } ", " { $snippet "array" } "s and " { $snippet "vector" } "s. For more information, see " { $link "assocs-alists" } "." } ;
+
+HELP: alist? ( object -- ? )
+{ $values { "object" "an object" } { "?" "a boolean" } }
+{ $description "Tests whether an object is usable as an alist, that is, if it is a vector, array or f." } ;

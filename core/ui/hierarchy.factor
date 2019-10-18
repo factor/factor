@@ -1,7 +1,6 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic hashtables inference kernel math namespaces
-sequences vectors words parser ;
+USING: generic hashtables kernel math namespaces sequences vectors words ;
 IN: gadgets
 
 GENERIC: graft* ( gadget -- )
@@ -29,18 +28,26 @@ M: gadget ungraft* drop ;
     dup forget-pref-dim
     f swap set-gadget-parent ;
 
+: unfocus-gadget ( child gadget -- )
+    tuck gadget-focus eq?
+    [ f swap set-gadget-focus ] [ drop ] if ;
+
 : unparent ( gadget -- )
     [
         dup gadget-parent dup [
             over (unparent)
-            [ gadget-children delete ] keep relayout
+            [ unfocus-gadget ] 2keep
+            [ gadget-children delete ] keep
+            relayout
         ] [
             2drop
         ] if
     ] when* ;
 
 : (clear-gadget) ( gadget -- )
-    dup [ (unparent) ] each-child f swap set-gadget-children ;
+    dup [ (unparent) ] each-child
+    f over set-gadget-focus
+    f swap set-gadget-children ;
 
 : clear-gadget ( gadget -- )
     dup (clear-gadget) relayout ;
@@ -60,25 +67,6 @@ M: gadget ungraft* drop ;
 : add-gadgets ( seq parent -- )
     swap [ over (add-gadget) ] each relayout ;
 
-: add-spec ( quot spec -- )
-    dup first %
-    dup second [ [ dup gadget get ] % , ] when*
-    dup third %
-    [ gadget get ] %
-    fourth ,
-    % ;
-
-: (build-spec) ( quot spec -- quot )
-    [ [ add-spec ] each-with ] [ ] make ;
-
-: build-spec ( spec quot -- )
-    swap (build-spec) call ;
-
-\ build-spec [
-    2 ensure-values
-    pop-literal pop-literal nip (build-spec) infer-quot-value
-] "infer" set-word-prop
-
 : (parents) ( gadget -- )
     [ dup , gadget-parent (parents) ] when* ;
 
@@ -93,6 +81,17 @@ M: gadget ungraft* drop ;
 
 : screen-loc ( gadget -- loc )
     parents { 0 0 } [ rect-loc v+ ] reduce ;
+
+: (screen-rect) ( gadget -- loc ext )
+    dup gadget-parent [
+        >r rect-extent r> (screen-rect)
+        >r tuck v+ r> vmin >r v+ r>
+    ] [
+        rect-extent
+    ] if* ;
+
+: screen-rect ( gadget -- rect )
+    (screen-rect) <extent-rect> ;
 
 : child? ( parent child -- ? )
     {
@@ -109,9 +108,31 @@ M: gadget focusable-child* drop t ;
     dup focusable-child*
     dup t eq? [ drop ] [ nip focusable-child ] if ;
 
-: make-pile ( children -- pack ) <pile> [ add-gadgets ] keep ;
+: make-gadget ( quot gadget -- gadget )
+    [ dup \ make-gadget set slip ] with-scope ; inline
 
-: make-filled-pile ( children -- pack )
-    make-pile 1 over set-pack-fill ;
+: gadget, ( gadget -- ) \ make-gadget get add-gadget ;
 
-: make-shelf ( children -- pack ) <shelf> [ add-gadgets ] keep ;
+: make-pile ( quot -- pack )
+    <pile> make-gadget ; inline
+
+: make-filled-pile ( quot -- pack )
+    <filled-pile> make-gadget ; inline
+
+: make-shelf ( quot -- pack )
+    <shelf> make-gadget ; inline
+
+: with-gadget ( gadget quot -- )
+    [ swap gadget set call ] with-scope ; inline
+
+: g ( -- gadget ) gadget get ;
+
+: g-> ( x -- x x gadget ) dup g ;
+
+: with-gadget ( gadget quot -- )
+    [
+        swap dup \ make-gadget set gadget set call
+    ] with-scope ; inline
+
+: build-gadget ( tuple quot gadget -- tuple )
+    pick set-gadget-delegate over >r with-gadget r> ; inline

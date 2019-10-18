@@ -3,7 +3,7 @@
 IN: jedit
 USING: arrays definitions errors io kernel listener math
 namespaces parser prettyprint sequences strings words shells
-tools ;
+tools network ;
 
 : jedit-server-info ( -- port auth )
     home "/.jedit/server" path+ <file-reader> [

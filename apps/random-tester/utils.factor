@@ -1,11 +1,8 @@
 USING: generic kernel math sequences namespaces errors
-hashtables words arrays parser compiler syntax io
-optimizer inference shuffle tools prettyprint ;
+assocs words arrays parser compiler syntax io
+quotations optimizer inference shuffle tools prettyprint ;
 IN: random-tester
 
-: pick-one ( seq -- elt )
-    [ length random ] keep nth ;
-    
 : word-input-count ( word -- n )
     [ stack-effect effect-in length ] [ 2drop 0 ] recover ;
     
@@ -15,10 +12,10 @@ IN: random-tester
 
 ! HASHTABLES
 : random-hash-entry ( hash -- key value )
-    [ hash-keys pick-one dup ] keep hash ;
+    [ keys random dup ] keep at ;
 
 : coin-flip ( -- bool ) 2 random zero? ;
-: do-one ( seq -- ) pick-one call ; inline
+: do-one ( seq -- ) random call ; inline
 
 : nzero-array ( seq -- )
     dup length >r 0 r> [ pick set-nth ] each-with drop ;

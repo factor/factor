@@ -1,27 +1,26 @@
-USING: help gadgets-text gadgets-tracks ;
+USING: help gadgets-text gadgets-tracks quotations generic
+kernel ;
 IN: gadgets
 
 HELP: graft*
 { $values { "gadget" gadget } }
-{ $contract "Called to notify the gadget it has become visible on the screen. This should set up timers and threads, and acquire any resources used by the gadget." }
-{ $see-also ungraft* } ;
+{ $contract "Called to notify the gadget it has become visible on the screen. This should set up timers and threads, and acquire any resources used by the gadget." } ;
+
+{ graft graft* ungraft ungraft* } related-words
 
 HELP: ungraft*
 { $values { "gadget" gadget } }
-{ $contract "Called to notify the gadget it is no longer visible on the screen. This should stop timers and threads, and release any resources used by the gadget." }
-{ $see-also graft* } ;
+{ $contract "Called to notify the gadget it is no longer visible on the screen. This should stop timers and threads, and release any resources used by the gadget." } ;
 
 HELP: graft
 { $values { "gadget" gadget } }
 { $description "Calls " { $link graft* } " on the gadget and all children." }
-{ $notes "This word should never be called directly." }
-{ $see-also graft* ungraft } ;
+{ $notes "This word should never be called directly." } ;
 
 HELP: ungraft
 { $values { "gadget" gadget } }
 { $description "If the gadget is grafted, calls " { $link ungraft* } " on the gadget and all children." }
-{ $notes "This word should never be called directly." }
-{ $see-also ungraft* graft } ;
+{ $notes "This word should never be called directly." } ;
 
 HELP: unparent
 { $values { "gadget" gadget } }
@@ -79,14 +78,51 @@ HELP: focusable-child
 { $values { "gadget" gadget } { "child" gadget } }
 { $description "Outputs the child of the gadget which would prefer to receive keyboard focus." } ;
 
+HELP: gadget,
+{ $values { "gadget" gadget } }
+{ $description "Adds a new child to the gadget being constructed. This word can only be used from a quotation passed to " { $link make-gadget } " or " { $link build-gadget } "." } ;
+
+HELP: make-gadget
+{ $values { "quot" quotation } { "gadget" gadget } }
+{ $description "Calls the quotation in a new scope with the gadget stored in the " { $link make-gadget } " variable." }
+{ $notes "This word is used to implement " { $link make-pile } ", " { $link make-shelf } ", " { $link make-track } " and " { $link make-frame } "." } ;
+
+HELP: build-gadget
+{ $values { "tuple" tuple } { "quot" quotation } { "gadget" gadget } }
+{ $description "Delegates the tuple to the gadget, and calls the quotation in a new scope with the tuple stored in the " { $link make-gadget } " and " { $link gadget } " variables." }
+{ $notes "This word is used to implement " { $link build-track } " and " { $link build-frame } "." } ;
+
 HELP: make-pile
-{ $values { "children" "a sequence of gadgets" } { "pack" "a new " { $link pack } } }
-{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets vertically." } ;
+{ $values { "quot" quotation } { "pack" "a new " { $link pack } } }
+{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets vertically. The quotation can add children by calling the " { $link gadget, } " word." } ;
 
 HELP: make-filled-pile
-{ $values { "children" "a sequence of gadgets" } { "pack" "a new " { $link pack } } }
-{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets vertically, such that all gadgets have the same width." } ;
+{ $values { "quot" quotation } { "pack" "a new " { $link pack } } }
+{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets vertically, such that all gadgets have the same width. The quotation can add children by calling the " { $link gadget, } " word." } ;
 
 HELP: make-shelf
-{ $values { "children" "a sequence of gadgets" } { "pack" "a new " { $link pack } } }
-{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets horizontally." } ;
+{ $values { "quot" quotation } { "pack" "a new " { $link pack } } }
+{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets horizontally. The quotation can add children by calling the " { $link gadget, } " word." } ;
+
+HELP: with-gadget
+{ $values { "gadget" gadget } { "quot" quotation } } 
+{ $description "Calls the quotation in a new scope with the " { $link gadget } " and " { $link make-gadget } " variables set to " { $snippet "gadget" } ". The quotation can call " { $link g } " and " { $link g-> } " to access the gadget." } ;
+
+HELP: g
+{ $values { "gadget" gadget } }
+{ $description "Outputs the gadget being built. Can only be used inside a quotation passed to " { $link build-gadget } "." } ;
+
+HELP: g->
+{ $values { "x" object } { "gadget" gadget } }
+{ $description "Duplicates the top of the stack and outputs the gadget being built. Can only be used inside a quotation passed to " { $link build-gadget } "." }
+{ $examples
+    "The following constructor creates two label gadgets, stores them in tuple slots, and adds them to a " { $link track } " which the tuple will delegate to:"
+    { $code
+        "TUPLE: greeter hello bye ;"
+        "C: greeter ( -- gadget )"
+        "["
+        "    \"Hello\" <label> g-> set-greeter-hello 1/4 track,"
+        "    \"Goodbye\" <label> g-> set-greeter-bye 3/4 track,"
+        "] { 0 1 } build-track ;"
+    }
+} ;

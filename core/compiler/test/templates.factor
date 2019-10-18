@@ -1,7 +1,8 @@
 ! Black box testing of templater optimization
 
 USING: arrays compiler kernel kernel-internals math
-math-internals namespaces sequences sequences-internals test ;
+hashtables-internals math-internals namespaces sequences
+sequences-internals test ;
 IN: temporary
 
 ! Oops!
@@ -158,4 +159,33 @@ unit-test
 
 [ t ] [
     10000000 [ drop try-breaking-dispatch-2 ] all?
+] unit-test
+
+! Regression
+: (broken) ( x -- y ) ;
+
+[ 2.0 { 2.0 0.0 } ] [
+    2.0 1.0
+    [ float/f 0.0 [ drop (broken) ] 2keep 2array ] compile-1
+] unit-test
+
+! Regression
+: hellish-bug-1 2drop ;
+
+: hellish-bug-2 ( i array x -- x ) 
+    2dup 1 slot eq? [ 2drop ] [ 
+        2dup array-nth tombstone? [ 
+            [
+                [ array-nth ] 2keep >r 1 fixnum+fast r> array-nth
+                pick 2dup hellish-bug-1 3drop
+            ] 2keep
+        ] unless >r 2 fixnum+fast r> hellish-bug-2
+    ] if ; inline
+
+: hellish-bug-3 ( hash array -- ) 
+    0 swap hellish-bug-2 drop ;
+
+[ ] [
+    H{ { 1 2 } { 3 4 } } dup hash-array
+    [ 0 swap hellish-bug-2 drop ] compile-1
 ] unit-test

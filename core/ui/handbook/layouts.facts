@@ -1,8 +1,10 @@
-USING: help gadgets gadgets-books gadgets-tracks gadgets-panes ;
+USING: help gadgets gadgets-books gadgets-tracks gadgets-panes
+namespaces ;
 
 ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 "A layout gadget is a gadget whose sole purpose is to contain other gadgets. Layout gadgets position and resize children according to a certain policy, taking the preferred size of the children into account. Gadget hierarchies are constructed by building up nested layouts."
 { $subsection "ui-layout-basics" }
+{ $subsection "ui-layout-combinators" }
 "Common layout gadgets:"
 { $subsection "ui-pack-layout" }
 { $subsection "ui-track-layout" }
@@ -17,7 +19,7 @@ ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 
 ARTICLE: "ui-layout-basics" "Layout basics"
 "Gadgets are arranged in a hierarchy, and all visible gadgets except for instances of " { $link world } " are contained in a parent gadget."
-$terpri
+$nl
 "Managing the gadget hierarchy:"
 { $subsection add-gadget }
 { $subsection unparent }
@@ -40,6 +42,25 @@ $terpri
 { $subsection pref-dim* }
 "To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim  } ",  which caches the result." ;
 
+ARTICLE: "ui-layout-combinators" "Creating layouts using combinators"
+"The " { $link make } " combinator provides a convenient way of constructing sequences by keeping the intermediate sequence off the stack until construction is done. The " { $link , } " and " { $link % } " words operate on this implicit sequence, reducing stack noise."
+$nl
+"Similar tools exist for constructing complex gadget hierarchies. Different words are used for different types of gadgets; see " { $link "ui-pack-layout" } ", " { $link "ui-track-layout" } " and " { $link "ui-frame-layout" } " for specifics. This section documents their common factors."
+$nl
+"Gadget construction combinators whose names are prefixed with " { $snippet "make-" } " construct new gadgets and push them on the stack. The primitive combinator used to define all combinators of this form:"
+{ $subsection make-gadget }
+"Words such as " { $link gadget, } " and " { $link track, } " access the gadget through the " { $link make-gadget } " variable."
+$nl
+"Combinators whose names are prefixed with " { $snippet "build-" } " take a tuple as input, and construct a new gadget which the tuple will delegate to. The primitive combinator used to define all combinators of this form:"
+{ $subsection build-gadget }
+"In this case, the new gadget is stored in both the " { $link make-gadget } " and " { $link gadget } " variables."
+$nl
+"A combinator which stores a gadget in the " { $link gadget } " variable; it is used by " { $link build-gadget } ":"
+{ $subsection with-gadget }
+"The following words access the " { $link gadget } " variable; they can be used from " { $link with-gadget } " and " { $link build-gadget } " to store child gadgets in tuple slots:"
+{ $subsection g }
+{ $subsection g-> } ;
+
 ARTICLE: "ui-pack-layout" "Pack layouts"
 "Pack gadgets layout their children along a single axis."
 { $subsection pack }
@@ -47,10 +68,11 @@ ARTICLE: "ui-pack-layout" "Pack layouts"
 { $subsection <pack> }
 { $subsection <pile> }
 { $subsection <shelf> }
-"Creating packs from a sequence of gadgets:"
+"Creating packs using a combinator:"
 { $subsection make-pile }
 { $subsection make-filled-pile }
 { $subsection make-shelf }
+{ $subsection gadget, }
 "New gadgets can be defined which delegate to packs for layout:"
 { $subsection delegate>pack }
 "For even more control, custom layouts can reuse portions of pack layout logic:"
@@ -62,12 +84,14 @@ ARTICLE: "ui-track-layout" "Track layouts"
 { $subsection track }
 "Creating empty tracks:"
 { $subsection <track> }
-"Creating new tracks from a declarative description:"
-{ $subsection make-track }
 "Adding children:"
 { $subsection track-add }
+"Creating new tracks using a combinator:"
+{ $subsection make-track }
+{ $subsection build-track }
+{ $subsection track, }
 "New gadgets can be defined which delegate to tracks for layout:"
-{ $subsection make-track* } ;
+{ $subsection build-track } ;
 
 ARTICLE: "ui-grid-layout" "Grid layouts"
 "Grid gadgets layout their children in a rectangular grid."
@@ -80,16 +104,18 @@ ARTICLE: "ui-grid-layout" "Grid layouts"
 { $subsection grid-child } ;
 
 ARTICLE: "ui-frame-layout" "Frame layouts"
-"Frames resemble " { $link "ui-grid-layout" } " except the size of grid is fixed at 3x3, and the center gadget fills up any available space."
+"Frames resemble " { $link "ui-grid-layout" } " except the size of grid is fixed at 3x3, and the center gadget fills up any available space. Because frames delegate to grids, grid layout words can be used to add and remove children."
 { $subsection frame }
 "Creating empty frames:"
 { $subsection <frame> }
-"Creating new frames from a declarative description:"
+"Creating new frames using a combinator:"
 { $subsection make-frame }
+{ $subsection build-frame }
+{ $subsection grid, }
 "New gadgets can be defined which delegate to frames for layout:"
 { $subsection delegate>frame }
-{ $subsection make-frame* }
-"A set of mnemonic words for the positions on a frame's 3x3 grid:"
+{ $subsection build-frame }
+"A set of mnemonic words for the positions on a frame's 3x3 grid; these words push values which may be passed to " { $link grid-add } " or " { $link grid, } ":"
 { $subsection @center }
 { $subsection @left }
 { $subsection @right }
@@ -112,11 +138,11 @@ ARTICLE: "ui-null-layout" "Manual layouts"
 
 ARTICLE: "ui-incremental-layout" "Incremental layouts"
 "Incremental layout gadgets are like " { $link "ui-pack-layout" } " except the relayout operation after adding a new child can be done in constant time."
-$terpri
+$nl
 "With all layouts, relayout requests from consecutive additions and removals are of children are coalesced and result in only one relayout operation being performed, however the run time of the relayout operation itself depends on the number of children."
-$terpri
+$nl
 "Incremental layout is used by " { $link pane } " gadgets to ensure that new lines of output does not take longer to display when the pane already has previous output."
-$terpri
+$nl
 "Incremental layouts are not a general replacement for " { $link "ui-pack-layout" } " and there are some limitations to be aware of."
 { $subsection incremental }
 { $subsection <incremental> }
@@ -139,6 +165,6 @@ ARTICLE: "ui-layout-impl" "Implementing layout gadgets"
 { $subsection dim-sum }
 { $warning
     "When implementing the " { $link layout* } " generic word for a gadget which intends to delegate to another layout, the " { $link children-on } " word might have to be re-implemented as well."
-    $terpri
+    $nl
     "For example, suppose you want a " { $link grid } " layout which also displays a popup gadget on top. The implementation of " { $link children-on } " for the " { $link grid } " class determines which children of the grid are visible at one time, and this will never include your popup, so it will not be rendered, nor will it respond to gestures. The solution is to re-implement " { $link children-on } " on your class."
 } ;

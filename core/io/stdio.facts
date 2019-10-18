@@ -1,4 +1,4 @@
-USING: help io ;
+USING: help io quotations strings ;
 
 HELP: stdio
 { $var-description "Holds a stream, used for various implicit stream operations. Rebound using " { $link with-stream } " and " { $link with-stream* } "." } ;
@@ -41,7 +41,7 @@ HELP: flush
 { $contract "Waits for any pending output to the " { $link stdio } " stream to complete." }
 $io-error ;
 
-HELP: terpri
+HELP: nl
 { $contract "Writes a line terminator to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
@@ -58,9 +58,33 @@ HELP: with-nesting
 $io-error ;
 
 HELP: tabular-output
-{ $values { "grid" "a sequence of equal-length sequences" } { "style" "a hashtable" } { "quot" "a quotation" } }
-{ $description "Calls the quotation with each element of the grid in turn, each time in a new dynamic scope with " { $link stdio } " rebound to a new stream. The results are laid out in a tabular fashion on the " { $link stdio } " stream." }
-{ $notes "Details are in the documentation for " { $link with-stream-table } "." }
+{ $values { "style" "a hashtable" } { "quot" quotation } }
+{ $description "Calls a quotation which emits a series of equal-length table rows using " { $link with-row } ". The results are laid out in a tabular fashion on the " { $link stdio } " stream."
+$nl
+"The " { $snippet "style" } " hashtable holds table style information. See " { $link "table-styles" } "." }
+{ $examples
+    { $code
+        "{ { 1 2 } { 3 4 } }"
+        "H{ { table-gap { 10 10 } } } ["
+        "    [ [ [ [ . ] with-cell ] each ] with-row ] each"
+        "] tabular-output"
+    }
+}
+$io-error ;
+
+HELP: with-row
+{ $values { "quot" quotation } }
+{ $description "Calls a quotation which emits a series of table cells using " { $link with-cell } ". This word can only be called inside the quotation given to " { $link tabular-output } "." }
+$io-error ;
+
+HELP: with-cell
+{ $values { "quot" quotation } }
+{ $description "Calls a quotation in a new scope with the " { $link stdio } " stream rebound. Output performed by the quotation is displayed in a table cell. This word can only be called inside the quotation given to " { $link with-row } "." }
+$io-error ;
+
+HELP: write-cell
+{ $values { "str" string } }
+{ $description "Outputs a table cell containing a single string. This word can only be called inside the quotation given to " { $link with-row } "." }
 $io-error ;
 
 HELP: with-style
@@ -76,14 +100,14 @@ $io-error ;
 
 HELP: with-stream
 { $values { "stream" "an input or output stream" } { "quot" "a quotation" } }
-{ $description "Calls the quotation in a new dynamic scope, with the " { $link stdio } " variable rebound to  " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } 
-{ $see-also with-stream* } ;
+{ $description "Calls the quotation in a new dynamic scope, with the " { $link stdio } " variable rebound to  " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;
+
+{ with-stream with-stream* } related-words
 
 HELP: with-stream*
 { $values { "stream" "an input or output stream" } { "quot" "a quotation" } }
 { $description "Calls the quotation in a new dynamic scope, with the " { $link stdio } " variable rebound to  " { $snippet "stream" } "." }
-{ $notes "This word differs from " { $link with-stream } " in that if an error is thrown while the quotation is executing, the stream is " { $emphasis "not" } " closed." }
-{ $see-also with-stream } ;
+{ $notes "This word does not close the stream. Compare with " { $link with-stream } "." } ;
 
 HELP: bl
 { $description "Outputs a space character (" { $snippet "\" \"" } ")." }
@@ -92,9 +116,4 @@ $io-error ;
 HELP: write-object
 { $values { "str" "a string" } { "obj" "an object" } }
 { $description "Writes a string to the " { $link stdio } " stream, associating it with the object. If formatted output is supported, the string will become a clickable presentation of the object, otherwise this word behaves like a call to " { $link write } "." }
-$io-error ;
-
-HELP: write-outliner
-{ $values { "str" "a string" } { "obj" "an object" } { "content" "a quotation" } }
-{ $description "Writes an outliner to the " { $link stdio } " stream. The outliner's caption is a the string " { $snippet "str" } " with an associated presentation of " { $snippet "obj" } ". Expanding the outliner calls " { $snippet "content" } " in a new dynamic scope with " { $link stdio } " rebound to the body of the outliner. If the stream does not support formatted output, this simply writes " { $snippet "str" } " and ignores everything else." }
 $io-error ;

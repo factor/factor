@@ -38,5 +38,5 @@ HELP: server-stream
 HELP: with-server
 { $values { "port" "an integer from 0 to 65535" } { "ident" "a symbol" } { "quot" "a quotation" } }
 { $description "Starts a TCP/IP server. The quotation is called in a new thread for each client connection, with the client connection being the " { $link stdio } " stream. Client connections are logged to the " { $link stdio } " stream at the time the server was started."
-$terpri
+$nl
 "The socket server is stored in the " { $snippet "ident" } " variable. If " { $link with-server } " was called inside a new thread, this allows other threads to stop the server by passing the variable value to " { $link stream-close } "." } ;

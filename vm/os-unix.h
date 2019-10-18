@@ -5,23 +5,30 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <dlfcn.h>
+#include <signal.h>
 
 typedef char F_CHAR;
 typedef char F_SYMBOL;
 
+#define from_native_string from_char_string
+#define unbox_native_string unbox_char_string
+#define string_to_native_alien(string) string_to_char_alien(string,true)
 #define unbox_symbol_string unbox_char_string
-#define primitive_string_to_native_alien primitive_string_to_char_alien
+#define char_to_F_CHAR(string) string
 
-#define STR_FORMAT "%s"
+#define STR_FORMAT(string) string
 
-#define DLLEXPORT
 #define SETJMP(jmpbuf) sigsetjmp(jmpbuf,1)
 #define LONGJMP siglongjmp
 #define JMP_BUF sigjmp_buf
 
+#define OPEN_READ(path) fopen(path,"rb")
+#define OPEN_WRITE(path) fopen(path,"wb")
+#define FPRINTF(stream,format,arg) fprintf(stream,format,arg)
+
 void init_ffi(void);
 void ffi_dlopen(F_DLL *dll, bool error);
-void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol, bool error);
+void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 
 void unix_init_signals(void);

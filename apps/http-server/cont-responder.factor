@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: http httpd math namespaces io strings kernel html hashtables
-       parser generic sequences callback-responder ;
+quotations parser generic sequences callback-responder ;
 IN: cont-responder
 
 #! Used inside the session state of responders to indicate whether the

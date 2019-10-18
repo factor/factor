@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: arrays generic assocs hashtables inference io kernel math
+namespaces prettyprint sequences vectors words errors
+quotations ;
 IN: generator
-USING: arrays generic hashtables inference io kernel math
-namespaces prettyprint sequences vectors words errors ;
 
 ! Computing free registers and initializing allocator
 : maybe-gc ( n -- )
@@ -11,7 +12,7 @@ namespaces prettyprint sequences vectors words errors ;
 
 : free-vregs ( reg-class -- seq )
     #! Free vregs in a given register class
-    \ free-vregs get hash ;
+    \ free-vregs get at ;
 
 : (compute-free-vregs) ( used class -- vector )
     #! Find all vregs in 'class' which are not in 'used'.
@@ -22,7 +23,7 @@ namespaces prettyprint sequences vectors words errors ;
     #! Create a new hashtable for thee free-vregs variable.
     live-vregs
     { T{ int-regs } T{ float-regs f 8 } }
-    [ 2dup (compute-free-vregs) ] map>hash \ free-vregs set
+    [ 2dup (compute-free-vregs) ] H{ } map>assoc \ free-vregs set
     drop ;
 
 : init-templates ( -- )
@@ -55,83 +56,107 @@ namespaces prettyprint sequences vectors words errors ;
         reg-spec>class free-vregs pop
     ] if ;
 
-: shuffle-reserve ( -- vreg )
-    "shuffle-reserve" get [
-        f alloc-vreg dup "shuffle-reserve" set
-    ] unless* ;
+: vreg>vreg ( vreg spec -- vreg )
+    alloc-vreg dup rot %move ;
+
+: value>int-vreg ( value spec -- vreg )
+    alloc-vreg [ >r value-literal  r> load-literal ] keep ;
+
+: value>float-vreg ( value spec -- vreg )
+    alloc-vreg [
+        >r value-literal temp-reg load-literal r> temp-reg %move
+    ] keep ;
+
+: loc>vreg ( loc spec -- vreg )
+    alloc-vreg [ swap %peek ] keep ;
+
+: value-literal* ( value spec -- obj ) drop value-literal ;
+
+: transfer-ops
+    H{
+        { { int-regs f } { 0 f } }
+        { { int-regs integer } { [ swap vreg-n = 0 f ? ] f } }
+        { { int-regs float } { T{ float-regs 8 } vreg>vreg } }
+        { { float-regs f } { T{ int-regs } vreg>vreg } }
+        { { float-regs integer } { f f } }
+        { { float-regs float } { 0 f } }
+        { { value f } { T{ int-regs } value>int-vreg } }
+        { { value integer } { T{ int-regs } value>int-vreg } }
+        { { value float } { T{ float-regs 8 } value>float-vreg } }
+        { { value quotation } { 0 value-literal* } }
+        { { loc f } { T{ int-regs } loc>vreg } }
+        { { loc integer } { T{ int-regs } loc>vreg } }
+        { { loc float } { T{ float-regs 8 } loc>vreg } }
+    } ;
+
+GENERIC: template-lhs ( obj -- lhs )
+
+M: int-regs template-lhs class ;
+M: float-regs template-lhs class ;
+M: ds-loc template-lhs drop loc ;
+M: rs-loc template-lhs drop loc ;
+M: f template-lhs drop loc ;
+M: value template-lhs class ;
+
+GENERIC: template-rhs ( obj -- rhs )
+
+M: integer template-rhs drop integer ;
+M: quotation template-rhs drop quotation ;
+M: object template-rhs ;
+
+: transfer-op ( value spec -- seq )
+    swap template-lhs swap template-rhs 2array
+    transfer-ops at ;
+
+: (lazy-load) ( value spec -- value )
+    2dup transfer-op second dup [ execute ] [ 2drop ] if ;
+
+: test-compatibility ( obj1 obj2 -- n/f )
+    2dup transfer-op first dup quotation? [ call ] [ 2nip ] if ;
 
 : loc>loc ( fromloc toloc -- )
     #! Move a value from a stack location to another stack
     #! location.
-    shuffle-reserve rot %peek
-    shuffle-reserve swap %replace ;
-
-: value>loc ( literal toloc -- )
-    #! Move a literal to a stack location.
-    >r value-literal shuffle-reserve load-literal
-    shuffle-reserve r> %replace ;
+    temp-reg rot %peek
+    temp-reg swap %replace ;
 
 : lazy-store ( src dest -- )
     #! Don't store a location to itself.
     2dup = [
         2drop
     ] [
-        >r \ live-locs get hash dup vreg?
+        >r \ live-locs get at dup vreg?
         [ r> %replace ] [ r> loc>loc ] if
     ] if ;
 
-: do-shuffle ( seq quot -- )
-    #! quot has stack effect ( locs -- hash ). Hash maps locs
-    #! to vregs or other locs.
-    over empty? [
-        2drop
+: do-shuffle ( hash -- )
+    dup assoc-empty? [
+        drop
     ] [
-        map>hash \ live-locs set
+        \ live-locs set
         [ over loc? [ lazy-store ] [ 2drop ] if ] each-loc
-    ] if ; inline
-
-GENERIC: (lazy-load) ( spec value -- value )
-
-M: loc (lazy-load) swap alloc-vreg [ swap %peek ] keep ;
-
-: load-literal* ( obj vreg -- )
-    dup delegate class {
-        { float-regs
-            [
-                >r shuffle-reserve load-literal
-                r> shuffle-reserve %move
-            ]
-        }
-        { int-regs [ load-literal ] }
-    } case ;
-
-M: value (lazy-load)
-    value-literal
-    swap dup quotation?
-    [ drop ] [ alloc-vreg [ load-literal* ] keep ] if ;
-
-M: vreg (lazy-load)
-    dup reg-class>spec pick eq?
-    [ nip ] [ >r alloc-vreg dup r> %move ] if ;
+    ] if ;
 
 : fast-shuffle ( locs -- )
     #! We have enough free registers to load all shuffle inputs
     #! at once
-    [ f over (lazy-load) ] do-shuffle ;
+    [ dup f (lazy-load) ] H{ } map>assoc do-shuffle ;
 
 : find-tmp-loc ( -- n )
     #! Find an area of the data stack which is not referenced
     #! from the phantom stacks. We can clobber there all we want
-    [
-        0 [ dup ds-loc? [ ds-loc-n min ] [ drop ] if ] reduce
-    ] each-phantom min 1- ;
+    [ minimal-ds-loc ] each-phantom min 1- ;
+
+: slow-shuffle-mapping ( locs tmp -- pairs )
+    over length [ - <ds-loc> ] map-with 2array flip ;
 
 : slow-shuffle ( locs -- )
     #! We don't have enough free registers to load all shuffle
     #! inputs, so we use a single temporary register, together
     #! with the area of the data stack above the stack pointer
-    find-tmp-loc over length [ - ] map-with 2array flip
-    [ first2 <ds-loc> 2dup loc>loc ] do-shuffle ;
+    find-tmp-loc slow-shuffle-mapping
+    [ [ loc>loc ] assoc-each ] keep
+    >hashtable do-shuffle ;
 
 : fast-shuffle? ( live-locs -- ? )
     #! Test if we have enough free registers to load all
@@ -142,6 +167,11 @@ M: vreg (lazy-load)
     #! Perform any deferred stack shuffling.
     live-locs dup fast-shuffle?
     [ fast-shuffle ] [ slow-shuffle ] if ;
+
+: value>loc ( literal toloc -- )
+    #! Move a literal to a stack location.
+    >r value-literal temp-reg load-literal
+    temp-reg r> %replace ;
 
 : finalize-values ( -- )
     #! Store any deferred literals to their final stack
@@ -155,7 +185,7 @@ M: vreg (lazy-load)
 : reusing-vregs ( quot -- )
     #! Any vregs allocated by quot are released again.
     [
-        \ free-vregs [ [ clone ] hash-map ] change
+        \ free-vregs [ [ clone ] assoc-map ] change
         call
     ] with-scope ; inline
 
@@ -165,17 +195,8 @@ M: vreg (lazy-load)
     finalize-vregs
     [ delete-all ] each-phantom ;
 
-: (%gc) ( -- ) "simple_gc" f %alien-invoke ;
-
 : %gc ( -- )
-    \ stack-frame-size get no-stack-frame = [
-        [
-            0 \ stack-frame-size set
-            %prologue (%gc) %epilogue
-        ] with-scope
-    ] [
-        (%gc)
-    ] if ;
+    0 frame-required "simple_gc" f %alien-invoke ;
 
 : end-basic-block ( -- )
     #! Commit all deferred stacking shuffling, and ensure the
@@ -185,51 +206,40 @@ M: vreg (lazy-load)
     \ maybe-gc get dup empty? swap delete-all [ %gc ] unless ;
 
 ! Loading stacks to vregs
-: additional-vregs ( seq seq -- n )
-    2array phantoms 2array [ [ length ] map ] 2apply v-
-    [ 0 max ] map sum ;
-
-: ?shuffle-reserve ( -- n )
-    #! If the phantom stacks contain unloaded locs and literals,
-    #! we reserve one vreg for shuffling them
-    [ [ pseudo? ] contains? ] each-phantom or 1 0 ? ;
-
 : free-vregs# ( -- int# float# )
-    T{ int-regs } free-vregs length ?shuffle-reserve -
-    T{ float-regs f 8 } free-vregs length ;
+    T{ int-regs } T{ float-regs f 8 } 
+    [ free-vregs length ] 2apply ;
+
+: free-vregs? ( int# float# -- ? )
+    free-vregs# swapd <= >r <= r> and ;
 
 : ensure-vregs ( int# float# -- )
-    compute-free-vregs free-vregs# swapd <= >r <= r> and
+    compute-free-vregs free-vregs?
     [ finalize-contents compute-free-vregs ] unless ;
 
-: lazy-load ( values template -- )
-    #! Set operand vars here.
-    dup length neg phantom-d get adjust-phantom
-    [ first2 >r swap (lazy-load) r> set ] 2each ;
+: phantom&spec ( phantom spec -- phantom' spec' )
+    0 <column>
+    [ length f pad-left ] keep
+    [ <reversed> ] 2apply ; inline
 
-: (compatible?) ( value spec -- ? )
-    #! Almost everything is compatible, except if the template
-    #! requests that a stack value be stored in a specific
-    #! integer vreg (this is done on x86).
-    {
-        { [ dup integer? not ] [ 2drop t ] }
-        { [ over [ float-regs? ] is? ] [ 2drop f ] }
-        { [ over pseudo? ] [ 2drop t ] }
-        { [ t ] [ swap vreg-n = ] }
-    } cond ;
+: phantom&spec-agree? ( phantom spec quot -- ? )
+    >r phantom&spec r> 2map [ ] all? ; inline
 
-: compatible? ( template phantom -- ? )
-    [ <reversed> ] 2apply
-    [ swap first 2array ] 2map
-    [ first2 (compatible?) ] all? ;
+: compatible? ( phantom spec -- ? )
+    [ test-compatibility ] phantom&spec-agree? ;
 
 : split-template ( template -- slow fast )
-    phantom-d get 2dup compatible? [
+    phantom-d get 2dup swap compatible? [
         2dup [ length ] 2apply <=
         [ drop { } swap ] [ length swap cut* ] if
     ] [
         drop { }
     ] if ;
+
+: lazy-load ( values template -- )
+    #! Set operand vars here.
+    dup length neg phantom-d get adjust-phantom
+    [ first2 >r (lazy-load) r> set ] 2each ;
 
 : fast-input ( template -- )
     dup empty? [
@@ -243,14 +253,6 @@ SYMBOL: +input+
 SYMBOL: +output+
 SYMBOL: +scratch+
 SYMBOL: +clobber+
-
-: fix-spec ( spec -- spec )
-    H{
-        { +input+ { } }
-        { +output+ { } }
-        { +scratch+ { } }
-        { +clobber+ { } }
-    } swap hash-union ;
 
 : output-vregs ( -- seq seq )
     +output+ +clobber+ [ get [ get ] map ] 2apply ;
@@ -272,23 +274,34 @@ SYMBOL: +clobber+
         [ length phantom-d get phantom-locs ] keep lazy-load
     ] if ;
 
-: requested-vregs ( template -- int# float# )
-    H{ { f 0 } { float 0 } } clone [
-        [ first inc ] each
-        f get float get
+: input-vregs# ( phantom spec -- )
+    phantom&spec [ test-compatibility inc ] 2each ;
+
+: scratch-regs# ( spec -- )
+    [ first reg-spec>class inc ] each ;
+
+: guess-vregs ( dinput rinput scratch -- int# float# )
+    H{
+        { T{ int-regs } 0 }
+        { T{ float-regs 8 } 0 }
+        { 0 0 }
+    } clone [
+        scratch-regs#
+        phantom-r get swap input-vregs#
+        phantom-d get swap input-vregs#
+        T{ int-regs } get T{ float-regs 8 } get
     ] bind ;
 
-: guess-vregs ( -- int# float# )
-    +input+ get { } additional-vregs
-    +scratch+ get requested-vregs >r + r> ;
-
 : alloc-scratch ( -- )
-    +scratch+ get [ first2 >r alloc-vreg r> set ] each ;
+    +scratch+ get [ >r alloc-vreg r> set ] assoc-each ;
+
+: guess-template-vregs ( -- int# float# )
+    +input+ get { } +scratch+ get guess-vregs ;
 
 : template-inputs ( -- )
     ! Ensure we have enough to hold any new stack elements we
     ! will read (if any), and scratch.
-    guess-vregs ensure-vregs
+    guess-template-vregs ensure-vregs
     ! Split the template into available (fast) parts and those
     ! that require allocating registers and reading the stack
     +input+ get split-template fast-input slow-input
@@ -299,8 +312,9 @@ SYMBOL: +clobber+
     +output+ get [ get ] map phantom-d get phantom-append ;
 
 : with-template ( quot hash -- )
-    fix-spec [ template-inputs call template-outputs ] bind
-    compute-free-vregs ; inline
+    clone [ template-inputs call template-outputs ] bind
+    compute-free-vregs ;
+    inline
 
 : value-matches? ( value spec -- ? )
     #! If the spec is a quotation and the value is a literal
@@ -309,28 +323,25 @@ SYMBOL: +clobber+
     #! spec is not a quotation, its a reg-class, in which case
     #! the value is always good.
     dup quotation? [
-        over value? [
-            >r value-literal dup fixnum? [
-                r> call small-enough?
-            ] [
-                r> 2drop f
-            ] if
-        ] [
-            2drop f
-        ] if
+        over value?
+        [ >r value-literal r> call ] [ 2drop f ] if
     ] [
         2drop t
     ] if ;
 
-: template-matches? ( hash -- ? )
-    ! Pad phantom stack with f's on the left if necessary
-    phantom-d get +input+ rot hash [ length f pad-left ] keep
-    ! Build a sequence of value/template pairs
-    [ <reversed> ] 2apply [ first 2array ] 2map
-    ! See if the phantom stack is suitable for this template
-    [ first2 value-matches? ] all? ;
+: template-matches? ( spec -- ? )
+    clone [
+        phantom-d get +input+ get
+        [ value-matches? ] phantom&spec-agree?
+        [ guess-template-vregs free-vregs? ] [ f ] if
+    ] bind ;
 
-: apply-template ( templates -- )
-    #! Templates is a sequence of { quot hash }
-    dup [ second template-matches? ] find nip
-    [ ] [ peek ] ?if first2 with-template ;
+: (find-template) ( templates -- pair/f )
+    [ second template-matches? ] find nip ;
+
+: find-template ( templates -- pair/f )
+    #! Pair has shape { quot hash }
+    compute-free-vregs
+    dup (find-template) [ ] [
+        finalize-contents (find-template)
+    ] ?if ;

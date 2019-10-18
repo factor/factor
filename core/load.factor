@@ -8,10 +8,6 @@ PROVIDE: core
 
     "math/math.factor"
     "math/integer.factor"
-    "math/ratio.factor"
-    "math/libm.factor"
-    "math/float.factor"
-    "math/complex.factor"
 
     "collections/sequences.factor"
     "collections/growable.factor"
@@ -25,15 +21,20 @@ PROVIDE: core
     "collections/byte-arrays.factor"
     "collections/bit-arrays.factor"
     "collections/sequences-epilogue.factor"
+    "collections/quotations.factor"
+    "collections/assocs.factor"
     "collections/hashtables.factor"
     "collections/namespaces.factor"
     "collections/slicing.factor"
     "collections/sequence-sort.factor"
+    "collections/binsearch.factor"
     "collections/queues.factor"
     "collections/graphs.factor"
 
-    "quotations.factor"
-
+    "math/ratio.factor"
+    "math/libm.factor"
+    "math/float.factor"
+    "math/complex.factor"
     "math/random.factor"
     "math/constants.factor"
     "math/pow.factor"
@@ -42,6 +43,7 @@ PROVIDE: core
     "math/vectors.factor"
     "math/parse-numbers.factor"
     "math/bitfields.factor"
+    "math/intervals.factor"
 
     "definitions.factor"
     "words.factor"
@@ -49,7 +51,21 @@ PROVIDE: core
     "continuations.factor"
     "errors.factor"
     "malloc.factor"
+    "memory.factor"
     
+    "layouts.factor"
+    "bootstrap/layouts.factor"
+
+    "generic/classes.factor"
+    "generic/generic.factor"
+    "generic/methods.factor"
+    "generic/standard-combination.factor"
+    "generic/slots.factor"
+    "generic/math-combination.factor"
+    "generic/tuple.factor"
+
+    "structure.factor"
+
     "io/styles.factor"
     "io/stream.factor"
     "io/duplex-stream.factor"
@@ -64,37 +80,31 @@ PROVIDE: core
     "io/crc32.factor"
     "io/buffers.factor"
     "io/nonblocking.factor"
+    "io/encodings.factor"
+    "io/utf8.factor"
+    "io/utf16.factor"
 
-    "syntax/early-parser.factor"
-
-    "generic/classes.factor"
-    "generic/generic.factor"
-    "generic/methods.factor"
-    "generic/standard-combination.factor"
-    "generic/slots.factor"
-    "generic/math-combination.factor"
-    "generic/tuple.factor"
-    
-    "compiler/alien/aliens.factor"
-    
     "prettyprint/core.factor"
     "prettyprint/sections.factor"
     "prettyprint/backend.factor"
     "prettyprint/frontend.factor"
-    "prettyprint/describe.factor"
+    "prettyprint/inspector.factor"
 
+    "syntax/lexer.factor"
     "syntax/parser.factor"
     "syntax/parse-stream.factor"
 
-    "debugger.factor"
-    "listener.factor"
-    "threads.factor"
-
-    "cli.factor"
     "modules.factor"
+
     "syntax/parse-syntax.factor"
 
+    "debugger.factor"
+    "threads.factor"
+    "cli.factor"
+
     "bootstrap/init.factor"
+
+    "listener.factor"
 
 } }
 { +tests+ {
@@ -109,13 +119,18 @@ PROVIDE: core
     "test/collections/bit-arrays.factor"
     "test/combinators.factor"
     "test/continuations.factor"
+    "test/crc32.factor"
     "test/errors.factor"
     "test/generic.factor"
     "test/init.factor"
+    "test/inspector.factor"
     "test/io/io.factor"
     "test/io/nested-style.factor"
     "test/io/buffers.factor"
+    "test/io/utf8.factor"
+    "test/io/utf16.factor"
     "test/kernel.factor"
+    "test/listener.factor"
     "test/math/bitops.factor"
     "test/math/complex.factor"
     "test/math/float.factor"
@@ -125,6 +140,8 @@ PROVIDE: core
     "test/math/random.factor"
     "test/math/rational.factor"
     "test/math/bitfields.factor"
+    "test/math/intervals.factor"
+    "test/modules/modules.factor"
     "test/parse-number.factor"
     "test/parser.factor"
     "test/parsing-word.factor"

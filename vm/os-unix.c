@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 static void *null_dll;
 
@@ -34,22 +34,10 @@ void ffi_dlopen(F_DLL *dll, bool error)
 	dll->dll = dllptr;
 }
 
-void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol, bool error)
+void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
-	void *sym = dlsym(handle,symbol);
-	if(sym == NULL)
-	{
-		if(error)
-		{
-			simple_error(ERROR_FFI,
-				tag_object(from_char_string(symbol)),
-				tag_object(from_char_string(dlerror())));
-		}
-
-		return NULL;
-	}
-	return sym;
+	return dlsym(handle,symbol);
 }
 
 void ffi_dlclose(F_DLL *dll)
@@ -170,7 +158,7 @@ INLINE F_COMPILED_FRAME *uap_stack_pointer(void *uap)
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	memory_protection_error((CELL)siginfo->si_addr,signal,
+	memory_protection_error((CELL)siginfo->si_addr,
 		uap_stack_pointer(uap));
 }
 

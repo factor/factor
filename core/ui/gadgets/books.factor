@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-books
 USING: gadgets gadgets-panes gadgets-scrolling
@@ -14,11 +14,10 @@ TUPLE: book ;
 M: book model-changed ( book -- )
     dup hide-all
     dup current-page show-gadget
-    dup relayout
-    request-focus ;
+    relayout ;
 
-C: book ( pages -- book )
-    dup 0 <model> <gadget> delegate>control
+C: book ( pages model -- book )
+    dup rot <gadget> delegate>control
     [ add-gadgets ] keep
     dup model-changed ;
 

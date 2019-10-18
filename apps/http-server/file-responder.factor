@@ -1,14 +1,14 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar embedded errors html httpd io kernel math
-namespaces parser sequences strings hashtables ;
+namespaces parser sequences strings assocs hashtables ;
 IN: file-responder
 
 : serving-path ( filename -- filename )
     [ "" ] unless* "doc-root" get swap path+ ;
 
 : file-http-date ( filename -- string )
-    file-modified unix>gmt timestamp>http-string ;
+    file-modified unix-time>timestamp timestamp>http-string ;
 
 : file-response ( filename mime-type -- )
     [
@@ -16,16 +16,16 @@ IN: file-responder
         dup file-length number>string "Content-Length" set
         file-http-date "Last-Modified" set
         now timestamp>http-string "Date" set
-    ] make-hash "200 OK" response terpri ;
+    ] H{ } make-assoc "200 OK" response nl ;
 
 : last-modified-matches? ( filename -- bool )
     file-http-date dup [
-        "If-Modified-Since" "header" get hash = 
+        "If-Modified-Since" "header" get at = 
     ] when ;
 
 : not-modified-response ( -- )
     now timestamp>http-string "Date" associate
-    "304 Not Modified" response terpri ;  
+    "304 Not Modified" response nl ;  
 
 : serve-static ( filename mime-type -- )
     over last-modified-matches? [
@@ -56,7 +56,7 @@ SYMBOL: page
 : file. ( path name -- )
     tuck path+
     directory? "[DIR] " "      " ? write
-    write-pathname terpri ;
+    dup <pathname> write-object nl ;
 
 : directory. ( path -- )
     dup directory natural-sort [ file. ] each-with ;

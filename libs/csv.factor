@@ -1,3 +1,4 @@
+REQUIRES: libs/state-parser ;
 IN: csv
 USING: kernel sequences state-parser namespaces io ;
 
@@ -52,7 +53,7 @@ USING: kernel sequences state-parser namespaces io ;
     [ write-string ] [ write ] if ;
 
 : write-csv-line ( array -- )
-    [ write-field ] [ CHAR: , write1 ] interleave terpri ;
+    [ CHAR: , write1 ] [ write-field ] interleave nl ;
 
 : write-csv ( csv -- )
     [ write-csv-line ] each ;

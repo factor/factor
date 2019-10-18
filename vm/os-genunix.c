@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 void run(void)
 {

@@ -1,4 +1,5 @@
 #!/bin/sh
 
-mkdir -p `dirname $2`
-cp $1 $2
+echo $1
+mkdir -p "`dirname \"$2\"`"
+cp "$1" "$2"

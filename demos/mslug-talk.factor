@@ -54,7 +54,7 @@ IN: mslug
         mslug-stylesheet clone [
             [ print-element ] with-default-style
         ] bind
-    ] make-pane
+    ] H{ } make-pane
     dup page-theme ;
 
 : $slide ( element -- )
@@ -199,8 +199,8 @@ IN: mslug
 { $slide "Models continued"
     "Layout:"
     { $code "{"
-    "    { [ <label-control> ] f f @top }"
-    "    { [ <scroller> ] f f @center }"
+    "    <label-control> @top grid,"
+    "    <scroller> @center grid,"
     "} make-frame"
     }
     "Window:"
@@ -266,7 +266,7 @@ IN: mslug
 TUPLE: mslug ;
 
 C: mslug ( -- gadget )
-    slides [ <page> ] map <book>
+    slides [ <page> ] map 0 <model> <book>
     over set-gadget-delegate ;
 
 : change-page ( book n -- )

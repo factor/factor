@@ -7,7 +7,7 @@ TUPLE: grid-lines color ;
 
 SYMBOL: grid-dim
 
-: half-gap gap 2 v/n ; inline
+: half-gap grid get grid-gap [ 2/ ] map ; inline
 
 : grid-line-from/to ( orientation point -- from to )
     half-gap v-
@@ -15,15 +15,18 @@ SYMBOL: grid-dim
     grid-dim get swap rot set-axis ;
 
 : draw-grid-lines ( gaps orientation -- )
-    swap grid-positions grid get rect-dim add
-    [ grid-line-from/to { 0.5 0.5 } v+ gl-line ] each-with ;
+    grid get rot grid-positions grid get rect-dim add [
+        grid-line-from/to gl-line
+    ] each-with ;
 
 M: grid-lines draw-boundary
     origin get [
         -0.5 -0.5 0.0 glTranslated
         grid-lines-color gl-color [
-            grid get rect-dim half-gap v- grid-dim set
+            dup grid set
+            dup rect-dim half-gap v- grid-dim set
+            compute-grid
             { 0 1 } draw-grid-lines
             { 1 0 } draw-grid-lines
-        ] with-grid
+        ] with-scope
     ] with-translation ;

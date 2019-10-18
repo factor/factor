@@ -1,157 +1,176 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-workspace
 USING: help arrays compiler gadgets gadgets-books
-gadgets-browser gadgets-buttons gadgets-help
-gadgets-listener gadgets-presentations gadgets-walker generic
-kernel math modules scratchpad sequences syntax words io
-namespaces hashtables gadgets-scrolling gadgets-panes
-gadgets-messages gadgets-theme errors models ;
+gadgets-browser gadgets-buttons gadgets-help gadgets-listener
+gadgets-presentations gadgets-walker generic kernel math modules
+scratchpad sequences syntax words inspector io namespaces
+hashtables gadgets-scrolling gadgets-panes gadgets-tracks
+gadgets-inspector gadgets-theme errors models quotations
+listener shells threads prettyprint assocs ;
+IN: gadgets-workspace
 
-C: tool ( gadget -- tool )
-    {
-        {
-            [ dup dup class tool 2array <toolbar> ]
-            f
-            f
-            @top
-        }
-        {
-            f
-            set-tool-gadget
-            f
-            @center
-        }
-    } make-frame* ;
+TUPLE: stack-display ;
 
-M: tool focusable-child* tool-gadget ;
+C: stack-display ( -- gadget )
+    g workspace-listener swap [
+        dup <toolbar> f track,
+        listener-gadget-stack [ stack. ]
+        "Data stack" <labelled-pane> 1 track,
+    ] { 0 1 } build-track ;
 
-M: tool call-tool* tool-gadget call-tool* ;
-
-M: tool tool-scroller tool-gadget tool-scroller ;
-
-M: tool tool-help tool-gadget tool-help ;
-
-: help-window ( topic -- )
-    [ [ help ] make-pane <scroller> ] keep
-    article-title open-window ;
-
-: tool-help-window ( tool -- )
-    tool-help [ help-window ] when* ;
-
-tool "toolbar" {
-    { "Tool help" T{ key-down f f "F1" } [ tool-help-window ] }
-} define-commands
+M: stack-display tool-scroller
+    find-workspace workspace-listener tool-scroller ;
 
 : workspace-tabs
     {
-        { "Listener" <listener-gadget> }
-        { "Messages" <messages> }
-        { "Definitions" <browser> } 
+        { "Listener" <stack-display> }
+        { "Definitions" <browser> }
         { "Documentation" <help-gadget> }
+        { "Inspector" <inspector-gadget> }
         { "Walker" <walker-gadget> }
     } ;
 
-: <workspace-tabs> ( workspace -- tabs )
-    workspace-book control-model
-    workspace-tabs dup length [ swap first 2array ] 2map
+: <workspace-tabs> ( -- tabs )
+    g control-model
+    "tool-switching" workspace command-map
+    [ command-string ] { } assoc>map
+    [ length ] keep 2array flip
     <radio-box> ;
 
 : <workspace-book> ( -- gadget )
-    workspace-tabs 1 <column> [ execute <tool> ] map <book> ;
+    workspace-tabs 1 <column> [ execute ] map
+    g control-model <book> ;
 
-M: workspace pref-dim* drop { 550 650 } ;
+M: workspace pref-dim* drop { 600 750 } ;
 
-: hide-popup ( workspace -- )
-    dup workspace-popup unparent
-    f over set-workspace-popup
-    request-focus ;
-
-: show-popup ( gadget workspace -- )
-    dup hide-popup
-    2dup set-workspace-popup
-    dupd add-gadget
-    dup popup-theme
-    request-focus ;
-
-: show-titled-popup ( workspace gadget title -- )
-    [ find-workspace hide-popup ] <closable-gadget>
-    swap show-popup ;
-
-: popup-dim ( workspace -- dim )
-    rect-dim first2 4 /i 2array ;
-
-: popup-loc ( workspace -- loc )
-    dup rect-dim
-    over popup-dim v-
-    swap rect-loc v+ ;
-
-: layout-popup ( workspace gadget -- )
-    over popup-dim over set-gadget-dim
-    swap popup-loc swap set-rect-loc ;
-
-: debugger-popup ( error workspace -- )
-    swap dup compute-restarts
-    [ find-workspace hide-popup ] <debugger>
-    "Error" show-titled-popup ;
+: init-workspace ( workspace -- )
+    dup 0 <model> { 0 1 } <track> delegate>control [
+        <listener-gadget> g set-workspace-listener
+        <workspace-book> g set-workspace-book
+    ] with-gadget ;
 
 C: workspace ( -- workspace )
-    [ debugger-popup ] over set-workspace-error-hook
-    {
-        { [ <workspace-book> ] set-workspace-book f @center }
-        { [ gadget get <workspace-tabs> ] f f @top }
-        { [ gadget get { workspace } <toolbar> ] f f @bottom }
-    } make-frame* ;
+    dup init-workspace dup [
+        <workspace-tabs> f track,
+        g workspace-book 1/5 track,
+        g workspace-listener 4/5 track,
+        toolbar,
+    ] with-gadget ;
 
-M: workspace layout*
-    dup delegate layout*
-    dup workspace-book swap workspace-popup dup
-    [ layout-popup ] [ 2drop ] if ;
+: resize-workspace ( workspace -- )
+    dup track-sizes over control-value zero? [
+        1/5 1 pick set-nth
+        4/5 2 rot set-nth
+    ] [
+        1/2 1 pick set-nth
+        1/2 2 rot set-nth
+    ] if relayout ;
 
-M: workspace children-on nip gadget-children ;
+M: workspace model-changed
+    dup workspace-listener listener-gadget-output scroll>bottom
+    dup resize-workspace
+    request-focus ;
 
 M: workspace focusable-child*
-    dup workspace-popup [ ] [ workspace-book ] ?if ;
+    dup workspace-popup [ ] [ workspace-listener ] ?if ;
+
+: ui-listener-hook ( listener -- )
+    >r datastack r> listener-gadget-stack set-model ;
+
+: ui-error-hook ( error listener -- )
+    find-workspace debugger-popup ;
+
+: ui-inspector-hook ( obj listener -- )
+    find-workspace inspector-gadget swap show-tool inspect ;
+
+: listener-thread ( listener -- )
+    dup listener-stream [
+        dup [ ui-listener-hook ] curry listener-hook set
+        dup [ ui-error-hook ] curry error-hook set
+        dup [ ui-inspector-hook ] curry inspector-hook set
+        [ yield ] compiler-hook set
+        drop
+        welcome.
+        tty
+    ] with-stream* ;
+
+: restart-listener ( listener -- )
+    [ >r clear r> init-namespaces listener-thread ] in-thread
+    drop ;
 
 : workspace-window ( -- workspace )
     <workspace> dup "Factor workspace" open-window
-    listener-gadget get-tool start-listener ;
+    dup workspace-listener restart-listener ;
 
-: tool-window ( class -- ) workspace-window show-tool 2drop ;
+: workspace-page ( workspace -- gadget )
+    workspace-book current-page ;
 
 M: workspace tool-scroller ( workspace -- scroller )
-    workspace-book current-page tool-scroller ;
+    workspace-page tool-scroller ;
 
-: tool-scroll-up ( workspace -- )
+: com-scroll-up ( workspace -- )
     tool-scroller [ scroll-up-page ] when* ;
 
-: tool-scroll-down ( workspace -- )
+: com-scroll-down ( workspace -- )
     tool-scroller [ scroll-down-page ] when* ;
 
 [ workspace-window drop ] ui-hook set-global
 
-workspace "scrolling" {
-    { "Scroll up" T{ key-down f { C+ } "PAGE_UP" } [ tool-scroll-up ] }
-    { "Scroll down" T{ key-down f { C+ } "PAGE_DOWN" } [ tool-scroll-down ] }
-} define-commands
+workspace "scrolling"
+"The current tool's scroll pane can be scrolled from the keyboard."
+{
+    { T{ key-down f { C+ } "PAGE_UP" } com-scroll-up }
+    { T{ key-down f { C+ } "PAGE_DOWN" } com-scroll-down }
+} define-command-map
 
-workspace "tool-switch" {
-    { "Hide popup" T{ key-down f f "ESCAPE" } [ hide-popup ] }
-    { "Listener" T{ key-down f f "F2" } [ listener-gadget select-tool ] }
-    { "Messages" T{ key-down f f "F3" } [ messages select-tool ] }
-    { "Definitions" T{ key-down f f "F4" } [ browser select-tool ] }
-    { "Documentation" T{ key-down f f "F5" } [ help-gadget select-tool ] }
-    { "Walker" T{ key-down f f "F6" } [ walker-gadget select-tool ] }
-} define-commands
+: com-listener stack-display select-tool ;
 
-workspace "tool-window" {
-    { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window ] }
-    { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window ] }
-    { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window ] }
-} define-commands
+: com-definitions browser select-tool ;
 
-workspace "workflow" {
-    { "Reload contributed sources" T{ key-down f f "F8" } [ drop [ reload-libs ] call-listener ] }
-    { "Reload core sources" T{ key-down f { A+ } "F8" } [ drop [ reload-core ] call-listener ] }
-    { "Recompile changed words" T{ key-down f { S+ } "F8" } [ drop [ recompile ] call-listener ] }
-} define-commands
+: com-documentation help-gadget select-tool ;
+
+: com-inspector inspector-gadget select-tool ;
+
+: com-walker walker-gadget select-tool ;
+
+workspace "tool-switching" f {
+    { T{ key-down f f "F2" } com-listener }
+    { T{ key-down f f "F3" } com-definitions }
+    { T{ key-down f f "F4" } com-documentation }
+    { T{ key-down f f "F5" } com-inspector }
+    { T{ key-down f f "F6" } com-walker }
+} define-command-map
+
+: new-workspace-window workspace-window drop ;
+
+\ new-workspace-window
+H{ { +nullary+ t } } define-command
+
+\ reload-libs
+H{ { +nullary+ t } { +listener+ t } } define-command
+
+\ reload-core
+H{ { +nullary+ t } { +listener+ t } } define-command
+
+workspace "workflow" f {
+    { T{ key-down f { C+ } "n" } new-workspace-window }
+    { T{ key-down f f "ESC" } hide-popup }
+    { T{ key-down f f "F8" } reload-libs }
+    { T{ key-down f { A+ } "F8" } reload-core }
+} define-command-map
+
+: listener-help "ui-listener" help-window ;
+
+\ listener-help H{ { +nullary+ t } } define-command
+
+listener-gadget "toolbar" f {
+    { f restart-listener }
+    { T{ key-down f f "CLEAR" } clear-output }
+    { T{ key-down f { C+ } "CLEAR" } clear-stack }
+    { T{ key-down f { C+ } "d" } com-EOF }
+    { T{ key-down f f "F1" } listener-help }
+} define-command-map
+
+M: listener-gadget handle-gesture* ( gadget gesture delegate -- ? )
+    3dup drop swap find-workspace workspace-page handle-gesture
+    [ default-gesture-handler ] [ 3drop f ] if ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generator
 USING: arrays generic hashtables inference io kernel math
-namespaces prettyprint sequences vectors words ;
+namespaces prettyprint sequences vectors words assocs ;
 
 SYMBOL: phantom-d
 SYMBOL: phantom-r
@@ -80,7 +80,7 @@ M: phantom-retainstack finalize-height
     1 over adjust-phantom push ;
 
 : phantom-append ( seq stack -- )
-    over length over adjust-phantom nappend ;
+    over length over adjust-phantom push-all ;
 
 GENERIC: cut-phantom ( n phantom -- seq )
 
@@ -104,9 +104,16 @@ UNION: pseudo loc value ;
 
 : (live-locs) ( phantom -- seq )
     #! Discard locs which haven't moved
-    dup phantom-locs* [ 2array ] 2map
-    [ first2 live-loc? ] subset
+    dup phantom-locs* 2array flip
+    [ live-loc? ] assoc-subset
     0 <column> ;
 
 : live-locs ( -- seq )
     [ (live-locs) ] each-phantom append prune ;
+
+: minimal-ds-loc ( phantom -- n )
+    #! When shuffling more values than can fit in registers, we
+    #! need to find an area on the data stack which isn't in
+    #! use.
+    dup phantom-stack-height neg
+    [ dup ds-loc? [ ds-loc-n min ] [ drop ] if ] reduce ;

@@ -3,7 +3,7 @@
 IN: errors
 USING: generic help tools io kernel math math-internals parser
 prettyprint queues sequences sequences-internals strings test
-words definitions libc ;
+words definitions libc inspector c-streams ;
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
@@ -62,7 +62,10 @@ DEFER: objc-error. ( alien -- )
 : callstack-overflow. "Call" stack-overflow. ;
 
 : memory-error.
-    drop "Data heap allocation request failed" print ;
+    "Memory protection fault at address " write third .h ;
+
+: primitive-error.
+    "Unimplemented primitive" print drop ;
 
 : kernel-error ( error -- word )
     #! Kernel errors are indexed by integers.
@@ -86,6 +89,7 @@ DEFER: objc-error. ( alien -- )
         callstack-overflow.
         memory-error.
         objc-error.
+        primitive-error.
     } nth ;
 
 M: kernel-error error. dup kernel-error execute ;
@@ -144,16 +148,36 @@ M: slice-error error.
 M: no-word summary
     drop "Word not found in current vocabulary search path" ;
 
+GENERIC: expected>string ( obj -- str )
+
+M: f expected>string drop "end of input" ;
+M: word expected>string word-name ;
+M: string expected>string ;
+
+M: unexpected error.
+    "Expected " write
+    dup unexpected-want expected>string write
+    " but got " write
+    unexpected-got expected>string print ;
+
+M: bad-escape summary
+    drop "Bad escape code" ;
+
+M: bad-number summary
+    drop "Bad number literal" ;
+
 : parse-dump ( error -- )
     "Parsing " write
     dup parse-error-file
-    [ "<interactive>" ] unless*
-    write-pathname
-    ":" write
-    dup parse-error-line [ 1 ] unless* number>string print
-    
+    [
+        <pathname> .
+        "Line " write dup parse-error-line [ 1 ] unless* .
+    ] [
+        "interactive input:" print
+    ] if*
+
     dup parse-error-text dup string? [ print ] [ drop ] if
-    
+
     parse-error-col [ 0 ] unless*
     CHAR: \s <string> write "^" print ;
 

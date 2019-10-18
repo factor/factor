@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 /* If memory allocation fails, bail out */
 void *safe_malloc(size_t size)
@@ -148,6 +148,9 @@ CELL unaligned_object_size(CELL pointer)
 	case BYTE_ARRAY_TYPE:
 		return byte_array_size(
 			byte_array_capacity((F_BYTE_ARRAY*)pointer));
+	case BIT_ARRAY_TYPE:
+		return bit_array_size(
+			bit_array_capacity((F_BIT_ARRAY*)pointer));
 	case HASHTABLE_TYPE:
 		return sizeof(F_HASHTABLE);
 	case VECTOR_TYPE:
@@ -374,14 +377,17 @@ INLINE void *copy_untagged_object(void *pointer, CELL size)
 	return newpointer;
 }
 
+INLINE void forward_object(CELL pointer, CELL newpointer)
+{
+	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
+}
+
 INLINE CELL copy_object_impl(CELL pointer)
 {
-	CELL newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
+	CELL newpointer = (CELL)copy_untagged_object(
+		(void*)UNTAG(pointer),
 		object_size(pointer));
-
-	/* install forwarding pointer */
-	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
-
+	forward_object(pointer,newpointer);
 	return newpointer;
 }
 
@@ -437,6 +443,7 @@ CELL binary_payload_start(CELL pointer)
 	case STRING_TYPE:
 	case FLOAT_TYPE:
 	case BYTE_ARRAY_TYPE:
+	case BIT_ARRAY_TYPE:
 	case BIGNUM_TYPE:
 		return 0;
 	/* these objects have some binary data at the end */
@@ -666,4 +673,25 @@ void primitive_gc_time(void)
 void simple_gc(void)
 {
 	maybe_gc(0);
+}
+
+void primitive_become(void)
+{
+	F_VECTOR *new_object_vector = untag_vector(dpop());
+	F_ARRAY *new_objects = untag_array_fast(new_object_vector->array);
+	F_VECTOR *old_object_vector = untag_vector(dpop());
+	F_ARRAY *old_objects = untag_array_fast(old_object_vector->array);
+
+	CELL capacity = untag_fixnum_fast(new_object_vector->top);
+	CELL i;
+	
+	for(i = 0; i < capacity; i++)
+	{
+		CELL old_obj = get(AREF(old_objects,i));
+		CELL new_obj = get(AREF(new_objects,i));
+
+		forward_object(old_obj,new_obj);
+	}
+	
+	primitive_data_gc();
 }

@@ -1,11 +1,11 @@
 
-USING: kernel namespaces sequences ;
+USING: kernel quotations namespaces sequences namespaces.lib ;
 
 IN: rewrite-closures
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: make* ( seq -- seq ) [ dup quotation? [ call ] [ ] if ] map ;
+! : make* ( seq -- seq ) [ dup quotation? [ call ] [ ] if ] map ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

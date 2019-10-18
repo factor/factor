@@ -1,5 +1,6 @@
 USING: errors definitions generic kernel kernel-internals math
-parser sequences test words hashtables namespaces ;
+parser sequences test words assocs namespaces quotations
+sequences-internals ;
 IN: temporary
 
 [ t ] [ \ tuple-class \ class class< ] unit-test
@@ -41,21 +42,24 @@ C: quuux-tuple-2
 [ 4 ] [ <quux-tuple-2> <quuux-tuple-2> delegation-test-2 ] unit-test
 
 ! Make sure we handle changing shapes!
+TUPLE: point x y ;
 
-[
-    FORGET: point
-    FORGET: point?
-    FORGET: point-x
-    TUPLE: point x y ;
-    C: point [ set-point-y ] keep [ set-point-x ] keep ;
-    
-    100 200 <point>
-    
-    ! Use eval to sequence parsing explicitly
-    "IN: temporary TUPLE: point x y z ;" eval
-    
-    point-x
-] unit-test-fails
+100 200 <point> "p" set
+
+! Use eval to sequence parsing explicitly
+"IN: temporary TUPLE: point x y z ; do-parse-hook" eval
+
+[ 100 ] [ "p" get point-x ] unit-test
+[ 200 ] [ "p" get point-y ] unit-test
+[ f ] [ "p" get "point-z" "temporary" lookup execute ] unit-test
+
+300 "p" get "set-point-z" "temporary" lookup execute
+
+"IN: temporary TUPLE: point z y ; do-parse-hook" eval
+
+[ "p" get point-x ] unit-test-fails
+[ 200 ] [ "p" get point-y ] unit-test
+[ 300 ] [ "p" get "point-z" "temporary" lookup execute ] unit-test
 
 TUPLE: predicate-test ;
 : predicate-test drop f ;
@@ -98,15 +102,6 @@ FORGET: empty
 [ "<constructor-test>" ]
 [ "TUPLE: constructor-test ; C: constructor-test ;" eval word word-name ] unit-test
 
-! There was a typo in check-shape; it would unintern the wrong
-! words!
-[ "temporary-1" ]
-[
-    "IN: temporary-1 SYMBOL: foobar IN: temporary TUPLE: foobar ;" eval
-    "foobar" { "temporary" "temporary-1" } [ vocab ] map
-    hash-stack word-vocabulary
-] unit-test
-
 TUPLE: size-test a b c d ;
 
 [ t ] [
@@ -123,7 +118,7 @@ TUPLE: yo-momma ;
 ! Test forget
 [ t ] [ \ yo-momma class? ] unit-test
 [ ] [ \ yo-momma forget ] unit-test
-[ f ] [ \ yo-momma typemap get hash-values memq? ] unit-test
+[ f ] [ \ yo-momma typemap get values memq? ] unit-test
 
 [ f ] [ \ yo-momma interned? ] unit-test
 [ f ] [ \ yo-momma? interned? ] unit-test
@@ -137,11 +132,13 @@ TUPLE: yo-momma ;
 TUPLE: loc-recording ;
 
 [ f ] [ \ loc-recording where not ] unit-test
-[ f ] [ \ <loc-recording> where not ] unit-test
-[ f ] [ \ loc-recording? where not ] unit-test
 
 ! Ensure C: puts the word in the right vocabulary
 [ f ] [
     "IN: temporary TUPLE: xyz ; IN: temporary2 C: xyz ;" eval
     "<xyz>" "temporary2" lookup
 ] unit-test
+
+[ t ] [ "<xyz>" "temporary" lookup constructor? ] unit-test
+[ ] [ "IN: temporary : <xyz> 3 throw ;" eval ] unit-test
+[ f ] [ "<xyz>" "temporary" lookup constructor? ] unit-test

@@ -1,94 +1,40 @@
 USING: hashtables hashtables-internals help io-internals kernel
-kernel-internals namespaces queues ;
+kernel-internals namespaces queues math ;
 
 ARTICLE: "hashtables" "Hashtables"
 "A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made. The literal syntax is covered in " { $link "syntax-hashtables" } "."
-$terpri
+$nl
 "Hashtable words are in the " { $vocab-link "hashtables" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "hashtables-internals" } " vocabulary."
-$terpri
+$nl
+"Hashtables form an implementation of the " { $link "assocs-protocol" } "."
+$nl
 "Hashtables form a class of objects."
-{ $subsection hashcode }
+{ $subsection hashtable }
 { $subsection hashtable? }
-"There is a small number of primitive operations on hashtables, and many utilities built on top."
-{ $subsection "hashtables-cons" }
-{ $subsection "hashtables-lookup" }
-{ $subsection "hashtables-mutation" }
-{ $subsection "hashtables-query" }
-{ $subsection "hashtables-combinators" }
-{ $subsection "hashtables-sets" }
-{ $subsection "hashtables-assoc" }
-{ $subsection "hashtables-internals" } ;
-
-ARTICLE: "hashtables-cons" "Constructing hashtables"
 "You can create a new hashtable with an initial capacity."
 { $subsection <hashtable> }
 "If you don't care about initial capacity, a more elegant way to create a new hashtable is to write:"
 { $code "H{ } clone" }
 "Another way is to create a new hashtable with a single key/value pair:"
-{ $subsection associate } ;
-
-ARTICLE: "hashtables-lookup" "Looking up keys in hashtables"
-{ $subsection hash }
-{ $subsection hash* }
-{ $subsection ?hash }
-{ $subsection ?hash* }
-{ $subsection hash-member? } ;
-
-ARTICLE: "hashtables-mutation" "Storing keys in hashtables"
-{ $subsection set-hash }
-{ $subsection remove-hash }
-{ $subsection remove-hash* }
-{ $subsection clear-hash } ;
-
-ARTICLE: "hashtables-query" "Querying hashtables"
-{ $subsection hash-empty? }
-{ $subsection hash-size }
-{ $subsection hash-keys }
-{ $subsection hash-values } ;
-
-ARTICLE: "hashtables-combinators" "Hashtable combinators"
-"We have the standard functional programming idioms."
-{ $subsection hash-each }
-{ $subsection hash-map }
-{ $subsection hash-all? }
-{ $subsection hash-subset }
-"There are curried forms of the above."
-{ $subsection hash-each-with }
-{ $subsection hash-all-with? }
-{ $subsection hash-subset-with }
-"Two oddball combinators."
-{ $subsection cache }
-{ $subsection map>hash }
-"A combinator used to implement notions of nested scope. This includes various fundamental abstractions like variables, vocabulary search and cascading styles."
-{ $subsection hash-stack } ;
-
-ARTICLE: "hashtables-sets" "Set-theoretic operations on hashtables"
-"Set-theoretic operations exploit the expected constant lookup time of a hashtable."
-{ $subsection hash-intersect }
-{ $subsection hash-union }
-{ $subsection hash-update }
-{ $subsection remove-all } ;
-
-ARTICLE: "hashtables-assoc" "Hashtables and association lists"
-"Hashtables can be converted to " { $link "sequences-assoc" } ", and vice versa:"
-{ $subsection hash>alist }
-{ $subsection alist>hash } ;
+{ $subsection associate }
+"To convert an assoc to a hashtable:"
+{ $subsection >hashtable }
+{ $subsection "hashtables-internals" } ;
 
 ARTICLE: "hashtables-internals" "Hashtable implementation details"
 "This hashtable implementation uses only one auxilliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses linear probing to resolve collisions."
-{ $terpri }
+$nl
 "There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
-{ $terpri }
+$nl
 "The " { $link hash-count } " slot is the number of entries including deleted entries, and " { $link hash-deleted } " is the number of deleted entries."
 { $subsection <hash-array> }
 { $subsection nth-pair }
 { $subsection set-nth-pair }
-{ $subsection each-pair }
-{ $subsection all-pairs? } ;
+{ $subsection find-pair } ;
 
 ARTICLE: "namespaces" "Variables and namespaces"
 "A variable is an entry in a hashtable of bindings, with the hashtable being implicit rather than passed on the stack. These hashtables are termed " { $emphasis "namespaces" } ". Nesting of scopes is implemented with a search order on namespaces, defined by a " { $emphasis "namestack" } ". Since namespaces are just hashtables, any object can be used as a variable, however by convention, variables are keyed by symbols (see " { $link "symbols" } ")."
-$terpri
+$nl
 "The " { $snippet "get" } " and " { $snippet "set" } " words read and write variable values. The " { $snippet "get" } " word searches up the chain of nested namespaces, while " { $snippet "set" } " always sets variable values in the current namespace only. Namespaces are dynamically scoped; when a quotation is called from a nested scope, any words called by the quotation also execute in that scope."
 { $subsection get }
 { $subsection set }
@@ -102,7 +48,7 @@ $terpri
 { $subsection "namespaces-internals" } ;
 
 ARTICLE: "namespaces-combinators" "Namespace combinators"
-{ $subsection make-hash }
+{ $subsection make-assoc }
 { $subsection with-scope }
 { $subsection bind } ;
 
@@ -115,7 +61,6 @@ ARTICLE: "namespaces-change" "Ways to change variable values"
 
 ARTICLE: "namespaces-utilities" "Namespace utilities"
 { $subsection namespace }
-{ $subsection nest }
 { $subsection global }
 { $subsection set-global } ;
 

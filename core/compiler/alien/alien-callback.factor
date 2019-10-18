@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: generator errors generic hashtables inference
+USING: generator errors generic assocs inference
 kernel namespaces sequences strings words parser prettyprint
-kernel-internals threads libc math ;
+kernel-internals threads libc math quotations inspector ;
 
 ! Callbacks are registered in a global hashtable. If you clear
 ! this hashtable, they will all be blown away by code GC, beware
@@ -11,7 +11,7 @@ SYMBOL: callbacks
 
 H{ } clone callbacks set-global
 
-: register-callback ( word -- ) dup callbacks get set-hash ;
+: register-callback ( word -- ) dup callbacks get set-at ;
 
 TUPLE: alien-callback return parameters abi quot xt ;
 
@@ -102,13 +102,13 @@ TUPLE: callback-context ;
 
 : generate-callback ( node -- )
     dup alien-callback-xt dup rot [
-        init-templates
-        dup registers>objects
-        dup wrap-callback-quot %alien-callback
-        %callback-return
+        dup alien-stack-frame [
+            init-templates
+            dup registers>objects
+            dup wrap-callback-quot %alien-callback
+            %callback-return
+        ] with-stack-frame
     ] generate-1 ;
 
 M: alien-callback generate-node
     end-basic-block generate-callback iterate-next ;
-
-M: alien-callback stack-frame-size* alien-stack-frame ;

@@ -103,12 +103,12 @@ C: space-invaders ( -- cpu )
 M: space-invaders read-port ( port cpu -- byte )
   #! Read a byte from the hardware port. 'port' should
   #! be an 8-bit value.
-  {
-    { [ over 1 = ] [ nip read-port1 ] }
-    { [ over 2 = ] [ nip read-port2 ] }
-    { [ over 3 = ] [ nip read-port3 ] }
-    { [ t ]        [ 2drop 0 ] }    
-  } cond ;
+  swap {
+    { 1 [ read-port1 ] }
+    { 2 [ read-port2 ] }
+    { 3 [ read-port3 ] }
+    [ 2drop 0 ]
+  } case ;
 
 : write-port2 ( value cpu -- )
   #! Setting this value affects the value read from port 3
@@ -174,13 +174,13 @@ M: space-invaders read-port ( port cpu -- byte )
 M: space-invaders write-port ( value port cpu -- )
   #! Write a byte to the hardware port, where 'port' is
   #! an 8-bit value.  
-  {
-    { [ over 2 = ] [ nip write-port2 ] }
-    { [ over 3 = ] [ nip write-port3 ] }
-    { [ over 4 = ] [ nip write-port4 ] }
-    { [ over 5 = ] [ nip write-port5 ] }
-    { [ t ]        [ 3drop ] }
-  } cond ;
+  swap {
+    { 2 [ write-port2 ] }
+    { 3 [ write-port3 ] }
+    { 4 [ write-port4 ] }
+    { 5 [ write-port5 ] }
+    [ 3drop ]
+  } case ;
 
 M: space-invaders reset ( cpu -- )
   [ delegate reset ] keep
@@ -256,7 +256,7 @@ M: space-invaders reset ( cpu -- )
 TUPLE: invaders-gadget cpu quit? ;
 
 invaders-gadget H{
-    { T{ key-down f f "ESCAPE" }    [ t swap set-invaders-gadget-quit? ] }
+    { T{ key-down f f "ESC" }    [ t swap set-invaders-gadget-quit? ] }
     { T{ key-down f f "BACKSPACE" } [ invaders-gadget-cpu coin-down ] }
     { T{ key-up   f f "BACKSPACE" } [ invaders-gadget-cpu coin-up ] }
     { T{ key-down f f "1" }         [ invaders-gadget-cpu player1-down ] }

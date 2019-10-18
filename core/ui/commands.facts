@@ -1,42 +1,94 @@
 IN: gadgets
 USING: help strings gadgets-presentations gadgets-buttons
-generic kernel hashtables ;
+generic kernel hashtables quotations words operations ;
 
-HELP: command
-{ $class-description "A command is a named piece of code associated to an input gesture. Commands have the following slots:"
-{ $list
-    { { $link command-name } " - a string naming the command" }
-    { { $link command-gesture } " - a gesture or " { $link f } }
-    { { $link command-quot } " - a quotation with stack effect " { $snippet "( target -- )" } }
-}
-"Classes delegating to " { $link command } " can re-implement the " { $link invoke-command } " generic word." }
-{ $see-also operation <command-button> invoke-command define-commands } ;
+HELP: +nullary+
+{ $description "A key which may be set in the hashtable passed to " { $link define-command } ". If set to a true value, the command does not take any inputs, and the value passed to " { $link invoke-command } " will be ignored. Otherwise, it takes one input." } ;
+
+HELP: +listener+
+{ $description "A key which may be set in the hashtable passed to " { $link define-command } ". If set to a true value, " { $link invoke-command } " will run the command in the listener. Otherwise it will run in the event loop." } ;
+
+HELP: +description+
+{ $description "A key which may be set in the hashtable passed to " { $link define-command } ". The value is a string displayed as part of the command's documentation by " { $link $command-map } "." } ;
+
+HELP: in-listener?
+{ $values { "command" "a command" } }
+{ $description "Outputs if the command runs in the listener." } ;
+
+{ in-listener? +listener+ } related-words
 
 HELP: invoke-command
-{ $values { "target" object } { "command" command } }
-{ $contract "Invokes the command on the given target. The default implementation calls " { $link command-quot } "." } ;
+{ $values { "target" object } { "command" "a command" } }
+{ $description "Invokes a command on the given target object." } ;
 
-HELP: gesture>string
-{ $values { "gesture" "a gesture" } { "string/f" "a " { $link string } " or " { $link f } } }
-{ $contract "Creates a human-readable string from a gesture object, returning " { $link f } " if the gesture does not have a human-readable form." }
+{ invoke-command +nullary+ } related-words
+
+HELP: command-name
+{ $values { "command" "a command" } { "str" "a string" } }
+{ $description "Outputs a human-readable name for the command." }
 { $examples
-    { $example "USE: gadgets" "T{ key-down f { C+ } \"x\" } gesture>string print" "C+x" }
+    { $example
+        ": com-my-command ;"
+        "\\ com-my-command command-name write"
+        "My command"
+    }
 } ;
+
+HELP: command-description
+{ $values { "command" "a command" } { "str/f" "a string or " { $link f } } }
+{ $description "Outputs the command's description." } ;
+
+{ command-description +description+ } related-words
+
+HELP: command-word
+{ $values { "command" "a command" } { "word" word } }
+{ $description "Outputs the word that will be executed by " { $link invoke-command } ". This is only used for documentation purposes. Commands are words, so given a command this word does nothing; given an operation it outputs the value of the operation's " { $link operation-command } " slot." } ;
+
+HELP: command-map
+{ $class-description "A command map stores a group of related commands. Instances of this class delegate to arrays so behave like sequences; additionally the " { $link command-map-blurb } " slot stores a string description of the command group, or " { $link f } "."
+$nl
+"Command maps are created by calling " { $link <command-map> } " or " { $link define-command-map } "." } ;
 
 HELP: commands
 { $values { "class" "a class word" } { "hash" hashtable } }
-{ $description "Outputs a hashtable mapping command group strings to sequences of commands for the given gadget class." }
-{ $see-also define-commands } ;
+{ $description "Outputs a hashtable mapping command map names to " { $link command-map } " instances." } ;
 
-HELP: define-commands
-{ $values { "class" "a class word" } { "group" string } { "specs" "a sequence of command specifiers" } }
+HELP: command-map
+{ $values { "class" "a class word" } { "command-map" "a " { $link command-map } " or " { $link f } } }
+{ $description "Outputs a named command map defined on a class." } ;
+
+HELP: define-command-map
+{ $values { "class" "a class word" } { "group" string } { "blurb" "a " { $link string } " or " { $link f } } { "specs" "a sequence of gesture/word pairs" } }
 { $description
-    "Defines a group of commands for the specified gadget class. The " { $snippet "specs" } " parameter is a sequence of triples " { $snippet "{ name gesture quot }" } ", where " { $snippet "name" } " is a string, " { $snippet "gesture" } " is a gesture, and " { $snippet "quot" } " is a " { $link quotation } "."
+    "Defines a command map on the specified gadget class. The " { $snippet "specs" } " parameter is a sequence of pairs " { $snippet "{ gesture word }" } ". The words must be valid commands; see " { $link define-command } "."
 }
-{ $notes "Only one of " { $link define-commands } " and " { $link set-gestures } " can be used on a given gadget class, since each word will overwrite the other word's definitions." }
-{ $see-also commands $commands } ;
+{ $notes "Only one of " { $link define-command-map } " and " { $link set-gestures } " can be used on a given gadget class, since each word will overwrite the other word's definitions." } ;
 
-HELP: $commands
-{ $values { "element" "a pair" } }
-{ $description "Prints a table of commands, where the first element of the pair is a class word and the second is a command group name." }
-{ $see-also commands define-commands } ;
+HELP: $command-map
+{ $values { "element" "a pair " { $snippet "{ class map }" } } }
+{ $description "Prints a command map, where the first element of the pair is a class word and the second is a command map name." } ;
+
+HELP: $command
+{ $values { "element" "a triple " { $snippet "{ class map command }" } } }
+{ $description "Prints the keyboard shortcut associated with " { $snippet "command" } " in the command map named " { $snippet "map" } " on the class " { $snippet "class" } "." } ;
+
+HELP: define-command
+{ $values { "word" word } { "hash" hashtable } } 
+{ $description "Defines a command. The hashtable can contain the following keys:"
+    { $list
+        { { $link +nullary+ } " - if set to a true value, the word must have stack effect " { $snippet "( -- )" } "; otherwise it must have stack effect " { $snippet "( target -- )" } }
+        { { $link +listener+ } " - if set to a true value, the command will run in the listener" }
+        { { $link +description+ } " - can be set to a string description of the command" }
+    }
+} ;
+
+HELP: command-string
+{ $values { "gesture" "a gesture" } { "command" "a command" } }
+{ $description "Outputs a string containing the command name followed by the gesture." }
+{ $examples
+    { $example
+        ": com-my-command ;"
+        "T{ key-down f { C+ } \"s\" } \\ com-my-command command-string write"
+        "My command (C+s)"
+    }
+} ;

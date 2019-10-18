@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays errors hashtables io kernel
-libc math namespaces opengl prettyprint
-sequences styles ;
+USING: alien arrays errors assocs io kernel
+libc math namespaces opengl prettyprint assocs
+sequences styles generic ;
 IN: freetype
 
 SYMBOL: freetype
@@ -22,11 +22,13 @@ TUPLE: font ascent descent height handle widths ;
 
 M: font equal? 2drop f ;
 
+M: font hashcode* drop font hashcode* ;
+
 : close-font ( font -- ) font-handle FT_Done_Face ;
 
 : close-freetype ( -- )
     global [
-        open-fonts [ hash-values [ close-font ] each f ] change
+        open-fonts [ values [ close-font ] each f ] change
         freetype [ FT_Done_FreeType f ] change
     ] bind ;
 
@@ -51,7 +53,7 @@ M: font equal? 2drop f ;
         { { "serif" bold             } "VeraSeBd" }
         { { "serif" bold-italic      } "VeraBI"   }
         { { "serif" italic           } "VeraIt"   }
-    } hash ;
+    } at ;
 
 : ttf-path ( name -- string )
     "/fonts/" swap ".ttf" 3append resource-path ;

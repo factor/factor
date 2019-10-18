@@ -61,9 +61,14 @@ TYPEDEF: longlong    LONGLONG
 TYPEDEF: ulonglong   ULONGLONG
 TYPEDEF: longlong    LONG64
 TYPEDEF: ulonglong   DWORD64
+TYPEDEF: longlong    LARGE_INTEGER
+TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 
-TYPEDEF: uchar       TBYTE
-TYPEDEF: char        TCHAR
+TYPEDEF: WCHAR       TCHAR
+TYPEDEF: TCHAR       TBYTE
+TYPEDEF: uchar*  LPCSTR
+TYPEDEF: ushort*  LPWSTR
+
 
 
 TYPEDEF: WORD                ATOM
@@ -188,108 +193,105 @@ TYPEDEF: void* PWNDCLASS
 TYPEDEF: void* PWNDCLASSEX
 TYPEDEF: void* LPWNDCLASS
 TYPEDEF: void* LPWNDCLASSEX
+TYPEDEF: void* MSGBOXPARAMSA
+TYPEDEF: void* MSGBOXPARAMSW
+
 
 TYPEDEF: void* WNDPROC
 
 ! typedef LRESULT (CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 
-BEGIN-STRUCT: WNDCLASS
-    FIELD: UINT style
-    FIELD: WNDPROC lpfnWndProc
-    FIELD: int cbClsExtra
-    FIELD: int cbWndExtra
-    FIELD: HINSTANCE hInstance
-    FIELD: HICON hIcon
-    FIELD: HCURSOR hCursor
-    FIELD: HBRUSH hbrBackground
-    FIELD: LPCTSTR lpszMenuName
-    FIELD: LPCTSTR lpszClassName
-END-STRUCT
+C-STRUCT: WNDCLASS
+    { "UINT" "style" }
+    { "WNDPROC" "lpfnWndProc" }
+    { "int" "cbClsExtra" }
+    { "int" "cbWndExtra" }
+    { "HINSTANCE" "hInstance" }
+    { "HICON" "hIcon" }
+    { "HCURSOR" "hCursor" }
+    { "HBRUSH" "hbrBackground" }
+    { "LPCTSTR" "lpszMenuName" }
+    { "LPCTSTR" "lpszClassName" } ;
 
-BEGIN-STRUCT: WNDCLASSEX
-    FIELD: UINT cbSize
-    FIELD: UINT style
-    FIELD: WNDPROC lpfnWndProc
-    FIELD: int cbClsExtra
-    FIELD: int cbWndExtra
-    FIELD: HINSTANCE hInstance
-    FIELD: HICON hIcon
-    FIELD: HCURSOR hCursor
-    FIELD: HBRUSH hbrBackground
-    FIELD: LPCTSTR lpszMenuName
-    FIELD: LPCTSTR lpszClassName
-    FIELD: HICON hIconSm
-END-STRUCT
+C-STRUCT: WNDCLASSEX
+    { "UINT" "cbSize" }
+    { "UINT" "style" }
+    { "WNDPROC" "lpfnWndProc" }
+    { "int" "cbClsExtra" }
+    { "int" "cbWndExtra" }
+    { "HINSTANCE" "hInstance" }
+    { "HICON" "hIcon" }
+    { "HCURSOR" "hCursor" }
+    { "HBRUSH" "hbrBackground" }
+    { "LPCTSTR" "lpszMenuName" }
+    { "LPCTSTR" "lpszClassName" }
+    { "HICON" "hIconSm" } ;
 
-BEGIN-STRUCT: RECT
-    FIELD: LONG left
-    FIELD: LONG top
-    FIELD: LONG right
-    FIELD: LONG bottom
-END-STRUCT
+C-STRUCT: RECT
+    { "LONG" "left" }
+    { "LONG" "top" }
+    { "LONG" "right" }
+    { "LONG" "bottom" } ;
 
-! BEGIN-STRUCT: PAINTSTRUCT
-    ! FIELD: HDC  hdc
-    ! FIELD: BOOL fErase
-    ! FIELD: RECT rcPaint
-    ! FIELD: BOOL fRestore
-    ! FIELD: BOOL fIncUpdate
-    ! FIELD: BYTE[32] rgbReserved
-! END-STRUCT
+! C-STRUCT: PAINTSTRUCT
+    ! { "HDC" " hdc" }
+    ! { "BOOL" "fErase" }
+    ! { "RECT" "rcPaint" }
+    ! { "BOOL" "fRestore" }
+    ! { "BOOL" "fIncUpdate" }
+    ! { "BYTE[32]" "rgbReserved" }
+! ;
 
 TYPEDEF: void* LPPAINTSTRUCT
 TYPEDEF: void* PAINTSTRUCT
 
-BEGIN-STRUCT: POINT
-    FIELD: LONG x
-    FIELD: LONG y
-END-STRUCT 
+C-STRUCT: POINT
+    { "LONG" "x" }
+    { "LONG" "y" } ; 
 
-BEGIN-STRUCT: MSG
-    FIELD: HWND        hWnd
-    FIELD: UINT        message
-    FIELD: WPARAM      wParam
-    FIELD: LPARAM      lParam
-    FIELD: DWORD       time
-    FIELD: POINT       pt
-END-STRUCT
+C-STRUCT: MSG
+    { "HWND" "hWnd" }
+    { "UINT" "message" }
+    { "WPARAM" "wParam" }
+    { "LPARAM" "lParam" }
+    { "DWORD" "time" }
+    { "POINT" "pt" } ;
+
 TYPEDEF: MSG*                LPMSG
 
-BEGIN-STRUCT: PIXELFORMATDESCRIPTOR
-  FIELD: WORD  nSize
-  FIELD: WORD  nVersion
-  FIELD: DWORD dwFlags 
-  FIELD: BYTE  iPixelType
-  FIELD: BYTE  cColorBits
-  FIELD: BYTE  cRedBits
-  FIELD: BYTE  cRedShift
-  FIELD: BYTE  cGreenBits
-  FIELD: BYTE  cGreenShift
-  FIELD: BYTE  cBlueBits
-  FIELD: BYTE  cBlueShift
-  FIELD: BYTE  cAlphaBits
-  FIELD: BYTE  cAlphaShift
-  FIELD: BYTE  cAccumBits
-  FIELD: BYTE  cAccumRedBits
-  FIELD: BYTE  cAccumGreenBits
-  FIELD: BYTE  cAccumBlueBits
-  FIELD: BYTE  cAccumAlphaBits
-  FIELD: BYTE  cDepthBits
-  FIELD: BYTE  cStencilBits
-  FIELD: BYTE  cAuxBuffers
-  FIELD: BYTE  iLayerType
-  FIELD: BYTE  bReserved
-  FIELD: DWORD dwLayerMask
-  FIELD: DWORD dwVisibleMask
-  FIELD: DWORD dwDamageMask
-END-STRUCT
+C-STRUCT: PIXELFORMATDESCRIPTOR
+    { "WORD" "nSize" }
+    { "WORD" "nVersion" }
+    { "DWORD" "dwFlags" }
+    { "BYTE" "iPixelType" }
+    { "BYTE" "cColorBits" }
+    { "BYTE" "cRedBits" }
+    { "BYTE" "cRedShift" }
+    { "BYTE" "cGreenBits" }
+    { "BYTE" "cGreenShift" }
+    { "BYTE" "cBlueBits" }
+    { "BYTE" "cBlueShift" }
+    { "BYTE" "cAlphaBits" }
+    { "BYTE" "cAlphaShift" }
+    { "BYTE" "cAccumBits" }
+    { "BYTE" "cAccumRedBits" }
+    { "BYTE" "cAccumGreenBits" }
+    { "BYTE" "cAccumBlueBits" }
+    { "BYTE" "cAccumAlphaBits" }
+    { "BYTE" "cDepthBits" }
+    { "BYTE" "cStencilBits" }
+    { "BYTE" "cAuxBuffers" }
+    { "BYTE" "iLayerType" }
+    { "BYTE" "bReserved" }
+    { "DWORD" "dwLayerMask" }
+    { "DWORD" "dwVisibleMask" }
+    { "DWORD" "dwDamageMask" } ;
 
-BEGIN-STRUCT: RECT
-    FIELD: LONG left
-    FIELD: LONG top
-    FIELD: LONG right
-    FIELD: LONG bottom
-END-STRUCT
+C-STRUCT: RECT
+    { "LONG" "left" }
+    { "LONG" "top" }
+    { "LONG" "right" }
+    { "LONG" "bottom" } ;
 
 TYPEDEF: RECT* PRECT
 TYPEDEF: RECT* LPRECT
@@ -298,28 +300,26 @@ TYPEDEF: PFD* LPPFD
 TYPEDEF: HANDLE HGLRC
 TYPEDEF: HANDLE HRGN
 
-BEGIN-STRUCT: LVITEM
-  FIELD: uint mask
-  FIELD: int  iItem
-  FIELD: int  iSubItem
-  FIELD: uint state
-  FIELD: uint stateMask
-  FIELD: void* pszText
-  FIELD: int cchTextMax
-  FIELD: int iImage
-  FIELD: long lParam
-  FIELD: int iIndent
-  FIELD: int iGroupId
-  FIELD: uint cColumns
-  FIELD: uint* puColumns
-  FIELD: int* piColFmt
-  FIELD: int iGroup
-END-STRUCT
+C-STRUCT: LVITEM
+    { "uint" "mask" }
+    { "int" "iItem" }
+    { "int" "iSubItem" }
+    { "uint" "state" }
+    { "uint" "stateMask" }
+    { "void*" "pszText" }
+    { "int" "cchTextMax" }
+    { "int" "iImage" }
+    { "long" "lParam" }
+    { "int" "iIndent" }
+    { "int" "iGroupId" }
+    { "uint" "cColumns" }
+    { "uint*" "puColumns" }
+    { "int*" "piColFmt" }
+    { "int" "iGroup" } ;
 
-BEGIN-STRUCT: LVFINDINFO
-  FIELD: uint flags
-  FIELD: char* psz
-  FIELD: long lParam
-  FIELD: POINT pt
-  FIELD: uint vkDirection
-END-STRUCT
+C-STRUCT: LVFINDINFO
+    { "uint" "flags" }
+    { "char*" "psz" }
+    { "long" "lParam" }
+    { "POINT" "pt" }
+    { "uint" "vkDirection" } ;

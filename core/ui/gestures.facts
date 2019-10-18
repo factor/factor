@@ -4,24 +4,24 @@ USING: help hashtables strings kernel ;
 HELP: set-gestures
 { $values { "class" "a class word" } { "hash" hashtable } }
 { $description "Sets the gestures a gadget class responds to. The hashtable maps gestures to quotations with stack effect " { $snippet "( gadget -- )" } "." }
-{ $notes "Only one of " { $link define-commands } " and " { $link set-gestures } " can be used on a given gadget class, since each word will overwrite the other word's definitions." } ;
+{ $notes "Only one of " { $link define-command-map } " and " { $link set-gestures } " can be used on a given gadget class, since each word will overwrite the other word's definitions." } ;
 
 HELP: handle-gesture*
 { $values { "gadget" "the receiver of the gesture" } { "gesture" "a gesture" } { "delegate" "an object" } { "?" "a boolean" } }
 { $contract "Handles a gesture sent to a gadget. As the delegation chain is traversed, this generic word is called with every delegate of the gadget at the top of the stack, however the front-most delegate remains fixed as the " { $snippet "gadget" } " parameter."
-$terpri
+$nl
 "Outputs " { $link f } " if the gesture was handled, and " { $link t } " if the gesture should be passed on to the gadget's delegate." }
-{ $notes "Methods should be defined on this word if you desire to handle an arbitrary set of gestures. To define handlers for a fixed set, it is easier to use " { $link set-gestures } " or " { $link define-commands } "." } ;
+{ $notes "Methods should be defined on this word if you desire to handle an arbitrary set of gestures. To define handlers for a fixed set, it is easier to use " { $link set-gestures } " or " { $link define-command-map } "." } ;
 
 HELP: handle-gesture
 { $values { "gesture" "a gesture" } { "gadget" gadget } { "?" "a boolean" } }
-{ $description "Calls " { $link handle-gesture* } " on every delegate of " { $snippet "gadget" } ". Outputs " { $link f } " if some delegate handled the gesture, else outputs " { $link t } "." }
-{ $see-also set-gestures define-commands } ;
+{ $description "Calls " { $link handle-gesture* } " on every delegate of " { $snippet "gadget" } ". Outputs " { $link f } " if some delegate handled the gesture, else outputs " { $link t } "." } ;
+
+{ send-gesture handle-gesture handle-gesture* set-gestures } related-words
 
 HELP: send-gesture
 { $values { "gesture" "a gesture" } { "gadget" gadget } { "?" "a boolean" } }
-{ $description "Calls " { $link send-gesture } " on every parent of " { $snippet "gadget" } ". Outputs " { $link f } " if some parent handled the gesture, else outputs " { $link t } "." }
-{ $see-also set-gestures define-commands } ;
+{ $description "Calls " { $link send-gesture } " on every parent of " { $snippet "gadget" } ". Outputs " { $link f } " if some parent handled the gesture, else outputs " { $link t } "." } ;
 
 HELP: user-input
 { $values { "str" string } { "gadget" gadget } }
@@ -133,15 +133,17 @@ HELP: hand-world
 { $var-description "Global variable. The " { $link world } " containing the gadget at the mouse location." } ;
 
 HELP: hand-loc
-{ $var-description "Global variable. The mouse location relative to the top-left corner of the " { $link hand-world } "." } 
-{ $see-also hand-rel } ;
+{ $var-description "Global variable. The mouse location relative to the top-left corner of the " { $link hand-world } "." } ;
+
+{ hand-loc hand-rel } related-words
 
 HELP: hand-clicked
 { $var-description "Global variable. The gadget at the location of the most recent click." } ;
 
 HELP: hand-click-loc
-{ $var-description "Global variable. The mouse location at the time of the most recent click relative to the top-left corner of the " { $link hand-world } "." } 
-{ $see-also hand-click-loc } ;
+{ $var-description "Global variable. The mouse location at the time of the most recent click relative to the top-left corner of the " { $link hand-world } "." } ;
+
+{ hand-clicked hand-click-loc } related-words
 
 HELP: hand-click#
 { $var-description "Global variable. The number of times the mouse was clicked in short succession. This counter is reset when " { $link double-click-timeout } " expires." } ;
@@ -171,7 +173,7 @@ HELP: fire-motion
 HELP: forget-rollover
 { $description "Sends " { $link mouse-leave } " gestures to all gadgets containing the gadget under the mouse, and resets the " { $link hand-gadget } " variable." } ;
 
-HELP: focus-receiver
+HELP: focus-path
 { $values { "world" world } { "seq" "a new sequence" } }
 { $description "If the top-level window containing the world has focus, outputs a sequence of parents of the currently focused gadget, otherwise outputs " { $link f } "." }
 { $notes "This word is used to avoid sending " { $link gain-focus } " gestures to a gadget which requests focus on an unfocused top-level window, so that, for instance, a text editing caret does not appear in this case." } ;
@@ -186,8 +188,7 @@ HELP: drag-loc
 
 HELP: hand-rel
 { $values { "gadget" gadget } { "loc" "a pair of integers" } }
-{ $description "Outputs the location of the mouse relative to the top-left corner of the gadget. Only meaningful inside a " { $link button-down } ", " { $link button-up } ", " { $link motion } " or " { $link drag } " gesture handler, where the gadget is contained in the same world as the gadget receiving the gesture." }
-{ $see-also hand-loc } ;
+{ $description "Outputs the location of the mouse relative to the top-left corner of the gadget. Only meaningful inside a " { $link button-down } ", " { $link button-up } ", " { $link motion } " or " { $link drag } " gesture handler, where the gadget is contained in the same world as the gadget receiving the gesture." } ;
 
 HELP: hand-click-rel
 { $values { "gadget" gadget } { "loc" "a pair of integers" } }
@@ -196,3 +197,10 @@ HELP: hand-click-rel
 HELP: under-hand
 { $values { "seq" "a new sequence" } }
 { $description "Outputs a sequence where the first element is the " { $link hand-world } " and the last is the " { $link hand-gadget } ", with all parents in between." } ;
+
+HELP: gesture>string
+{ $values { "gesture" "a gesture" } { "string/f" "a " { $link string } " or " { $link f } } }
+{ $contract "Creates a human-readable string from a gesture object, returning " { $link f } " if the gesture does not have a human-readable form." }
+{ $examples
+    { $example "USE: gadgets" "T{ key-down f { C+ } \"x\" } gesture>string print" "C+x" }
+} ;

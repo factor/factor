@@ -1,3 +1,5 @@
+#define INLINE inline static
+
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -24,19 +26,11 @@ typedef signed long long s64;
 #define HALF_WORD_SIZE (CELLS*4)
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
 
-typedef struct {
-	const char* image;
-	CELL ds_size, rs_size, cs_size;
-	CELL gen_count, young_size, aging_size;
-	CELL code_size;
-	bool secure_gc;
-} F_PARAMETERS;
-
 #define TAG_MASK 7
 #define TAG_BITS 3
 #define TAG(cell) ((CELL)(cell) & TAG_MASK)
-#define RETAG(cell,tag) ((CELL)(cell) | (tag))
 #define UNTAG(cell) ((CELL)(cell) & ~TAG_MASK)
+#define RETAG(cell,tag) (UNTAG(cell) | (tag))
 
 /*** Tags ***/
 #define FIXNUM_TYPE 0
@@ -67,14 +61,29 @@ typedef struct {
 #define ALIEN_TYPE 16
 #define TUPLE_TYPE 17
 #define BYTE_ARRAY_TYPE 18
+#define BIT_ARRAY_TYPE 19
 
-#define TYPE_COUNT 19
+#define TYPE_COUNT 20
+
+INLINE F_FIXNUM untag_fixnum_fast(CELL tagged)
+{
+	return ((F_FIXNUM)tagged) >> TAG_BITS;
+}
+
+INLINE CELL tag_fixnum(F_FIXNUM untagged)
+{
+	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
+}
 
 typedef struct {
 	CELL header;
 	/* tagged */
 	CELL capacity;
 } F_ARRAY;
+
+typedef F_ARRAY F_BYTE_ARRAY;
+
+typedef F_ARRAY F_BIT_ARRAY;
 
 typedef struct {
 	/* always tag_header(VECTOR_TYPE) */
@@ -137,6 +146,8 @@ typedef struct {
 	CELL props;
 	/* TAGGED t or f, depending on if the word is compiled or not */
 	CELL compiledp;
+	/* TAGGED call count for profiling */
+	CELL counter;
 	/* UNTAGGED execution token: jump here to execute word */
 	XT xt;
 } F_WORD;
@@ -184,12 +195,6 @@ typedef struct {
 	/* OS-specific handle */
 	void* dll;
 } F_DLL;
-
-typedef struct {
-	CELL header;
-	/* tagged */
-	CELL capacity;
-} F_BYTE_ARRAY;
 
 typedef struct {
 	CELL quot;

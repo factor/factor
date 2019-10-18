@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math namespaces sequences strings
-    io generic xml-data errors ;
+    io generic xml-data errors assocs ;
 IN: xml-writer
 
 : write-entities
@@ -15,7 +15,7 @@ IN: xml-writer
 
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
-    [ [ dup write-entities hash [ % ] [ , ] ?if ] each ] "" make ;
+    [ [ dup write-entities at [ % ] [ , ] ?if ] each ] "" make ;
 
 : print-name ( name -- )
     dup name-space dup "" = [ drop ]
@@ -76,7 +76,7 @@ M: instruction write-item
     xml-after write-chunk ;
 
 : print-xml ( xml -- )
-    write-xml terpri ;
+    write-xml nl ;
 
 : xml>string ( xml -- string )
     [ write-xml ] string-out ;

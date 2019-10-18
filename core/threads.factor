@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: threads
@@ -14,16 +14,14 @@ namespaces queues sequences vectors ;
 : schedule-thread-with ( obj continuation -- )
     2array schedule-thread ;
 
-: sleep-queue ( -- vector ) \ sleep-queue get-global ;
+SYMBOL: sleep-queue
 
-: sleep-queue* ( -- vector )
-    sleep-queue dup [ [ first ] compare neg ] nsort ;
-
-: sleep-time ( vector -- ms )
-    dup empty? [ drop 1000 ] [ peek first millis [-] ] if ;
+: sleep-time ( -- ms )
+    sleep-queue get-global
+    dup empty? [ drop 1000 ] [ first first millis [-] ] if ;
 
 : stop ( -- )
-    get-walker-hook [
+    walker-hook [
         f swap continue-with
     ] [
         run-queue deque dup array?
@@ -32,9 +30,18 @@ namespaces queues sequences vectors ;
 
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
+: (sleep) ( ms continuation -- )
+    2array global [
+        sleep-queue [ swap add sort-keys ] change
+    ] bind ;
+
+: wake-up ( -- continuation )
+    global [
+        sleep-queue [ unclip second swap ] change
+    ] bind ;
+
 : sleep ( ms -- )
-    >fixnum millis +
-    [ 2array sleep-queue push stop ] callcc0 drop ;
+    >fixnum millis + [ (sleep) stop ] callcc0 drop ;
 
 : in-thread ( quot -- )
     [
@@ -49,9 +56,9 @@ namespaces queues sequences vectors ;
 IN: kernel-internals
 
 : (idle-thread) ( slow? -- )
-    sleep-queue* dup sleep-time dup zero?
-    [ drop pop second schedule-thread drop ]
-    [ nip 0 ? io-multiplex ] if ;
+    sleep-time dup zero?
+    [ wake-up schedule-thread 2drop ]
+    [ 0 ? io-multiplex ] if ;
 
 : idle-thread ( -- )
     #! This thread is always running.
@@ -60,5 +67,5 @@ IN: kernel-internals
 
 : init-threads ( -- )
     <queue> \ run-queue set-global
-    V{ } clone \ sleep-queue set-global
+    f sleep-queue set-global
     [ idle-thread ] in-thread ;

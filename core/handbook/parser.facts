@@ -2,108 +2,101 @@ USING: help io parser sequences words ;
 
 ARTICLE: "parser" "The parser"
 "This section concerns itself with reflective access and extension of the Factor parser. The parser algorithm and standard syntax is described in " { $link "syntax" } "."
-$terpri
+$nl
 "The set of words making up the parser are found in the " { $vocab-link "parser" } " and " { $vocab-link "syntax" } " vocabularies."
-$terpri
+$nl
 "As documented in " { $link "vocabulary-search" } ", the parser looks up words in the vocabulary search path. New word definitions are added to the current vocabulary. These two parameters are stored in a pair of variables:"
 { $subsection use }
 { $subsection in }
 "There are two simple ways to call the parser which use the vocabulary search path currently in scope, which is usually the default listener search path:"
 { $subsection parse }
 { $subsection eval }
-"The parser can also take input from a stream (" { $link "streams" } "):"
+"The parser can also take input from a sequence of lines, or a stream:"
+{ $subsection parse-lines }
 { $subsection parse-stream }
-"By convention, words for parsing input from streams use a certain default vocabulary search path:"
-{ $subsection file-vocabs }
-"More details on working with source files can be found in " { $link "sources" } "."
-$terpri
+"Note that the above words are low-level and are not the canonical way to read code from a source file. To learn about loading source files, see " { $link "sources" } "."
+$nl
 "The parser can be extended with new parsing word definitions."
-{ $subsection "parsing-words" } ;
+{ $subsection "parsing-words" }
+"The next level of customization above writing parsing words is extending the lexer:"
+{ $subsection "parser-lexer" } ;
 
 ARTICLE: "parsing-words" "Parsing words"
-"Parsing words execute at parse time, and therefore can access and modify the state of the parser, as well as add objects to the parse tree. Parsing words are a difficult concept to grasp, so this section has several examples and explains the workings of some of the parsing words provided in the library."
-$terpri
-"Parsing words are marked by suffixing the definition with a " { $link POSTPONE: parsing } " declaration; see " { $link "declarations" } " for more details."
-$terpri
+"The Factor parser is follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
+$nl
+"Parsing words are marked by suffixing the definition with a " { $link POSTPONE: parsing } " declaration."
+$nl
+"Parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser. Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
+$nl
 "Tools for implementing parsing words:"
-{ $subsection "parsing-word-nest" }
 { $subsection "reading-ahead" }
+{ $subsection "parsing-word-nest" }
 { $subsection "defining-words" }
-{ $subsection "string-mode" }
-{ $subsection "parser-internals" } ;
-
-ARTICLE: "parsing-word-nest" "Nested structure"
-"The first thing to look at is how the parse tree is built. When parsing begins, " { $link f } " is pushed on the data stack; when a new object is parsed, " { $link ?push } " is called to add it to the parse tree. The first call to " { $link ?push } " creates a new one-element vector, and subsequent calls add elements to the end of this vector. When parsing is complete, the vector is converted into a quotation."
-$terpri
-"Lets look at a simple example; the parsing of " { $snippet "1 2 3" } ":"
-{ $table
-    { "Action" "Stack" }
-    { "Initial stack after parsing begins" { $snippet "f" } }
-    { { "Token: " { $snippet "1" } } { $snippet "V{ 1 }" } }
-    { { "Token: " { $snippet "2" } } { $snippet "V{ 1 2 }" } }
-    { { "Token: " { $snippet "3" } } { $snippet "V{ 1 2 3 }" } }
-    { "Final stack upon completion:" { $snippet "[ 1 2 3 ]" } }
-}
-"Nested structure is a bit more involved. The basic idea is that parsing words can push " { $link f } " on the stack to begin a new level of nesting, then all subsequent objects are pushed onto this sequence, until another parsing word adds this sequence to the vector underneath."
-$terpri
-"The parsing words that delimit the beginning and the end of a quotation illustrate the idiom:"
-{ $see POSTPONE: [ }
-{ $see POSTPONE: ] }
-"Let us ponder, then, how one particular string will parse:"
-{ $snippet "\"1 [ 2 3 ] 4\"" }
-{ $table
-    { "Action" "Stack" }
-    { "Initial stack after parsing begins" { $snippet "f" } }
-    { { "Token: " { $snippet "1" } } { $snippet "V{ 1 }" } }
-    { { "Token: " { $snippet "[" } } { $snippet "V{ 1 } f" } }
-    { { "Token: " { $snippet "2" } } { $snippet "V{ 1 } V{ 2 }" } }
-    { { "Token: " { $snippet "3" } } { $snippet "V{ 1 } V{ 2 3 }" } }
-    { { "Token: " { $snippet "]" } } { $snippet "V{ 1 [ 2 3 ] }" } }
-    { { "Token: " { $snippet "4" } } { $snippet "V{ 1 [ 2 3 ] 4 }" } }
-    { "Final stack upon completion" { $snippet "[ 1 [ 2 3 ] 4 ]" } }
-}
-"Notice how in the definition of the quotation parsing words, the final word " { $link POSTPONE: ] } " does all the work. A closely related set of parsing words for reading various other literal types implements another useful idiom."
-$terpri
-"The word set in question consists of various start delimiters, such a " { $link POSTPONE: { } " for arrays and " { $link POSTPONE: H{ } " for hashtables, together with one end delimiter " { $link POSTPONE: } } ". The start words push a quotation in addition to pushing " { $link f } "; the end word applies the quotation to the newly-parsed vector; the quotation converts it to the appropriate type of literal."
-{ $see-also POSTPONE: { POSTPONE: H{ POSTPONE: V{ POSTPONE: W{ POSTPONE: T{ POSTPONE: } } ;
+{ $subsection "parsing-tokens" } ;
 
 ARTICLE: "reading-ahead" "Reading ahead"
-"Parsing words can consume input from the current line to implement various forms of custom syntax."
+"Parsing words can consume input:"
 { $subsection scan }
 { $subsection scan-word }
-"For example, the " { $link POSTPONE: HEX: } " word, for reading hexadecimal literals, uses this facility. It is defined in terms of a lower-level " { $link parse-base } " word that takes the numerical base on the data stack, but reads the number from the parser and then adds it to the parse tree:"
-{ $see parse-base }
+"For example, the " { $link POSTPONE: HEX: } " word uses this feature to read hexadecimal literals:"
 { $see POSTPONE: HEX: }
+"It is defined in terms of a lower-level word that takes the numerical base on the data stack, but reads the number from the parser and then adds it to the parse tree:"
+{ $see parse-base }
 "Another simple example is the " { $link POSTPONE: \ } " word:"
 { $see POSTPONE: \ } ;
 
+ARTICLE: "parsing-word-nest" "Nested structure"
+"Recall that the parser loop calls parsing words with an accumulator vector on the stack. The parser loop can be invoked recursively with a new, empty accumulator; the result can then be added to the original accumulator. This is how parsing words for object literals are implemented; object literals can nest arbitrarily deep."
+$nl
+"A simple example is the parsing word that reads a quotation:"
+{ $see POSTPONE: [ }
+"This word uses a utility word which recursively invokes the parser, reading objects into a new accumulator until an occurrence of " { $link POSTPONE: ] } ":"
+{ $subsection parse-literal }
+"There is another, lower-level word for reading nested structure, which is also useful when called directly:"
+{ $subsection parse-until }
+"Note that " { $link POSTPONE: ] } " is just a dummy word; declaring it as a " { $link POSTPONE: delimiter } " causes it to throw an error when an unpaired occurrence is encountered:"
+{ $see POSTPONE: ] }
+{ $see-also POSTPONE: { POSTPONE: H{ POSTPONE: V{ POSTPONE: W{ POSTPONE: T{ POSTPONE: } } ;
+
 ARTICLE: "defining-words" "Defining words"
 "Defining words add definitions to the dictionary without modifying the parse tree. The simplest example is the " { $link POSTPONE: SYMBOL: } " word."
-$terpri
+{ $see POSTPONE: SYMBOL: }
 "The key factor in the definition of " { $link POSTPONE: SYMBOL: } " is " { $link CREATE } ", which reads a token from the input and creates a word with that name. This word is then passed to " { $link define-symbol } "."
 { $subsection CREATE }
-"Colon definitions are defined in a more elaborate way. The  definition of " { $link POSTPONE: : } " introduces the next idiom, and that is building a quotation and then adding a definition using " { $link POSTPONE: ; } "."
-$terpri
-"Recall the colon definition syntax. When the " { $link POSTPONE: : } " word executes, it reads ahead from the input and defines a word. Then, it places a quotation and " { $link f } " on the data stack. The parser builds up a parse tree, and the quotation pushed by " { $link POSTPONE: : } " is called by " { $link POSTPONE: ; } "."
-{ $see POSTPONE: : }
+"Colon definitions are defined in a more elaborate way:"
+{ $subsection POSTPONE: : }
+"The " { $subsection POSTPONE: : } " word first calls " { $link CREATE } ", and then reads input until reaching " { $link POSTPONE: ; } " using a utility word:"
+{ $subsection parse-definition }
+"The " { $link POSTPONE: ; } " word is just a delimiter; an unpaired occurrence throws a parse error:"
 { $see POSTPONE: ; }
-"There are additional parsing words whose syntax is delimited by  " { $link POSTPONE: ; } ", and they are all implemented in the same way -- first they read some input, then they leave a quotation followed by an empty list on the stack."
-{ $see-also POSTPONE: C: POSTPONE: G: POSTPONE: M: POSTPONE: PREDICATE: POSTPONE: TUPLE: POSTPONE: UNION: POSTPONE: USING: } ;
+"There are additional parsing words whose syntax is delimited by  " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } "."
+{ $see-also POSTPONE: C: POSTPONE: G: POSTPONE: M: POSTPONE: PREDICATE: POSTPONE: UNION: } ;
 
-ARTICLE: "string-mode" "String mode"
-"String mode allows custom parsing of tokenized input. For even more esoteric situations, the input text can be accessed directly."
-$terpri
-"String mode is controlled by a boolean variable in the parser scope:"
-{ $subsection string-mode }
-"An illustration of this idiom is found in the " { $link POSTPONE: USING: } " parsing word. It reads a list of vocabularies, terminated by " { $link POSTPONE: ; } ". However, the vocabulary names do not name words, except by coincidence; so string mode is used to read them."
-{ $see POSTPONE: USING: }
-"Make note of the quotation that is left in position for " { $link POSTPONE: ; } " to call. It switches off string mode, so that normal parsing can resume, then adds the given vocabularies to the search path." ;
+ARTICLE: "parsing-tokens" "Parsing raw tokens"
+"So far we have seen how to read individual tokens, or read a sequence of parsed objects until a delimiter. It is also possible to read raw tokens from the input and perform custom processing."
+$nl
+"One example is the " { $link POSTPONE: USING: } " parsing word."
+{ $see POSTPONE: USING: } 
+"It reads a list of vocabularies terminated by " { $link POSTPONE: ; } ". However, the vocabulary names do not name words, except by coincidence; so " { $link parse-until } " cannot be used here. Instead, a lower-level word is called:"
+{ $subsection parse-tokens } ;
 
-ARTICLE: "parser-internals" "Parser internals"
-"Some variables that encapsulate internal parser state:"
+ARTICLE: "parser-lexer" "The lexer"
+"Two variables that encapsulate internal parser state:"
 { $subsection file }
-{ $subsection line-number }
+{ $subsection lexer }
+"Creating a default lexer:"
+{ $subsection <lexer> }
+"A word to test of the end of input has been reached:"
+{ $subsection still-parsing? }
+"A word to get the text of the current line:"
 { $subsection line-text }
-{ $subsection column }
+"A word to advance the lexer to the next line:"
+{ $subsection next-line }
+"Two generic words to override the lexer's token boundary detection:"
+{ $subsection skip-blank }
+{ $subsection skip-word }
 "A utility used when parsing string literals:"
-{ $subsection parse-string } ;
+{ $subsection parse-string }
+"The parser can be invoked with a custom lexer:"
+{ $subsection (parse-lines) }
+{ $subsection with-parser } ;

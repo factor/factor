@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
-USING: arrays generic hashtables inference io kernel math
-namespaces sequences vectors class-inference words errors ;
+USING: arrays generic assocs inference io kernel math
+namespaces sequences vectors class-inference words errors
+quotations ;
 
 SYMBOL: optimizer-changed
 
@@ -61,14 +62,14 @@ M: #values optimize-node*
         >r node-in-d r> node-out-d 2array unify-lengths first2
     ] keep subst-values ;
 
-: ?hash-union ( hash/f hash -- hash )
-    over [ hash-union ] [ nip ] if ;
+: ?union ( hash/f hash -- hash )
+    over [ union ] [ nip ] if ;
 
 : add-node-literals ( hash node -- )
-    [ node-literals ?hash-union ] keep set-node-literals ;
+    [ node-literals ?union ] keep set-node-literals ;
 
 : add-node-classes ( hash node -- )
-    [ node-classes ?hash-union ] keep set-node-classes ;
+    [ node-classes ?union ] keep set-node-classes ;
 
 : (subst-classes) ( literals classes node -- )
     dup [
@@ -104,7 +105,7 @@ M: node remember-method*
     #! the rest of the IR will also remember the method
     pick node-in-d dataflow-with
     [ remember-method ] keep
-    [ infer-classes/node ] 2keep
+    [ swap infer-classes/node ] 2keep
     [ subst-node ] keep ;
 
 : splice-quot ( #call quot -- node ) f swap (splice-method) ;
@@ -160,7 +161,8 @@ M: #dispatch optimize-node*
 
 : specific-method ( class word -- class ) order min-class ;
 
-: dispatch# ( word -- n ) "combination" word-prop first ;
+: node-class# ( node n -- class )
+    over node-in-d <reversed> ?nth node-class ;
 
 : dispatching-class ( node word -- class )
     [ dispatch# node-class# ] keep specific-method ;
@@ -187,7 +189,7 @@ M: #dispatch optimize-node*
     [ [ 3array ] 3keep math-method ] [ 3drop t t ] if ;
 
 : inline-math-method ( #call word -- node )
-    over 1 node-class# pick 0 node-class#
+    over dup node-in-d [ node-class ] map-with first2
     will-inline-math-method splice-method ;
 
 : inline-method ( #call -- node )
@@ -205,7 +207,7 @@ M: #dispatch optimize-node*
 
 : optimize-predicate? ( #call -- ? )
     dup node-param "predicating" word-prop dup [
-        >r 0 node-class# r> comparable?
+        >r node-class-first r> comparable?
     ] [
         2drop f
     ] if ;
@@ -222,16 +224,19 @@ M: #dispatch optimize-node*
 
 : optimize-predicate ( #call -- node )
     dup node-param "predicating" word-prop >r
-    dup 0 node-class# r> class< 1array inline-literals ;
+    dup node-class-first r> class< 1array inline-literals ;
 
 : optimizer-hooks ( node -- conditions )
     node-param "optimizer-hooks" word-prop ;
 
-: optimize-hooks ( node -- node/t )
-    dup optimizer-hooks cond ;
+: optimizer-hook ( node -- pair/f )
+    dup optimizer-hooks [ first call ] find 2nip ;
+
+: optimize-hook ( node -- )
+    dup optimizer-hook second call ;
 
 : define-optimizers ( word optimizers -- )
-    { [ t ] [ drop t ] } add "optimizer-hooks" set-word-prop ;
+    "optimizer-hooks" set-word-prop ;
 
 : partial-eval? ( #call -- ? )
     dup node-param "foldable" word-prop [
@@ -244,7 +249,7 @@ M: #dispatch optimize-node*
     dup node-in-d [ node-literal ] map-with ;
 
 : partial-eval ( #call -- node )
-    dup literal-in-d over node-param
+    dup literal-in-d over node-param 1quotation
     [ with-datastack ] catch
     [ 3drop t ] [ inline-literals ] if ;
 
@@ -253,7 +258,7 @@ M: #dispatch optimize-node*
 
 : find-identity ( node -- quot )
     dup node-param "identities" word-prop
-    [ first in-d-match? ] assoc* ;
+    [ first in-d-match? ] find-with nip dup [ second ] when ;
 
 : apply-identities ( node -- node/f )
     dup find-identity dup [ splice-quot ] [ 2drop f ] if ;
@@ -274,7 +279,7 @@ M: #call optimize-node*
     {
         { [ dup partial-eval? ] [ partial-eval ] }
         { [ dup find-identity ] [ apply-identities ] }
-        { [ dup optimizer-hooks ] [ optimize-hooks ] }
+        { [ dup optimizer-hook ] [ optimize-hook ] }
         { [ dup optimize-predicate? ] [ optimize-predicate ] }
         { [ dup optimistic-inline? ] [ optimistic-inline ] }
         { [ t ] [ inline-method ] }

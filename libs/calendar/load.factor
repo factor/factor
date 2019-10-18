@@ -2,8 +2,14 @@ USE: kernel
 
 PROVIDE: libs/calendar
 { +files+ {
-    { "os-unix.factor" [ unix? ] }
-    { "os-win32.factor" [ windows? ] }
     "calendar.factor"
+    { "os-unix.factor" [ unix? ] }
+    { "os-winnt.factor" [ winnt? ] }
+    { "os-wince.factor" [ wince? ] }
 } }
-{ +tests+ { "test/calendar.factor" } } ;
+{ +tests+ {
+    "test/calendar.factor"
+    { "test/os-winnt.factor" [ winnt? ] }
+    { "test/os-wince.factor" [ wince? ] }
+    { "test/os-unix.factor" [ unix? ] }
+} } ;

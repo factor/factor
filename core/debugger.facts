@@ -25,8 +25,9 @@ HELP: error.
 
 HELP: error-help
 { $values { "error" "an error" } { "topic" "an article name or word" } }
-{ $contract "Outputs a help article which explains the error." }
-{ $see-also :help } ;
+{ $contract "Outputs a help article which explains the error." } ;
+
+{ error-help :help } related-words
 
 HELP: print-error
 { $values { "error" "an error" } }

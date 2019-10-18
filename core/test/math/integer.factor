@@ -138,10 +138,3 @@ unit-test
 ! as long as it doesn't crash
 [ ] [ [ 0 0 /i ] catch clear ] unit-test
 [ ] [ [ 100000000000000000 0 /i ] catch clear ] unit-test
-
-[ f ] [ most-positive-fixnum >fixnum small? ] unit-test
-[ t ] [ most-positive-fixnum 1- >fixnum small? ] unit-test
-[ t ] [ 134 small? ] unit-test
-[ t ] [ most-negative-fixnum >fixnum small? ] unit-test
-[ t ] [ most-negative-fixnum 1+ >fixnum small? ] unit-test
-[ t ] [ -134 small? ] unit-test

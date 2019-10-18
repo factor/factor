@@ -5,87 +5,82 @@ kernel kernel-internals listener math memory modules namespaces
 optimizer parser sequences sequences-internals words prettyprint 
 ;
 
-! Wrap everything in a scope where we disable print-warnings,
-! so that people don't get confused thinking bootstrap failed
-! because the compiler prints stuff
+! Wrap everything in a catch which starts a listener so
+! you can see what went wrong, instead of dealing with a
+! fep
 [
-    print-warnings off
+    "Cross-referencing..." print flush
+    H{ } clone changed-words set-global
+    H{ } clone crossref set-global xref-words
+    xref-sources
 
-    ! Wrap everything in a catch which starts a listener so
-    ! you can see what went wrong, instead of dealing with a
-    ! fep
-    [
-        "Cross-referencing..." print flush
-        H{ } clone changed-words set-global
-        H{ } clone crossref set-global xref-words
+    cpu "x86" = [
+        "core/compiler/x86/cpuid" require
+    ] when
 
-        cpu "x86" = [
-            "core/compiler/x86/cpuid" require
+    windows? [ "core/windows" require ] when
+
+    "compile" get [
+        \ number= compile
+        \ + compile
+        \ nth compile
+        \ set-nth compile
+        \ = compile
+
+        ! Load UI backend
+        "cocoa" get [ "core/ui/cocoa" require ] when
+        "x11" get [ "core/ui/x11" require ] when
+        winnt? [ "core/ui/windows" require ] when
+
+        ! Load native I/O code
+        "native-io" get [
+            unix? [ "core/io/unix" require ] when
+            windows? [ "core/io/windows" require ] when
         ] when
 
-        windows? [ "core/windows/dlls" require ] when
+        parse-command-line
 
-        "compile" get [
-            \ number= compile
-            \ + compile
-            \ nth compile
-            \ set-nth compile
-            \ = compile
+        compile-all
 
-            ! Load UI backend
-            "cocoa" get [ "core/ui/cocoa" require ] when
-            "x11" get [ "core/ui/x11" require ] when
-            windows? [ "core/ui/windows" require ] when
-
-            ! Load native I/O code
-            "native-io" get [
-                unix? [ "core/io/unix" require ] when
-                windows? [ "core/io/windows" require ] when
-            ] when
-
-            parse-command-line
-
-            compile-all
-
+        "native-io" get [
             "Initializing native I/O..." print flush
-            "native-io" get [ init-io ] when
-
-            [ recompile ] parse-hook set-global
+            init-io
         ] when
 
-        [
-            boot
-            [ run-user-init ] try
-            [ "shell" get "shells" lookup execute ] try
-            flush
-            0 exit
-        ] set-boot
+        [ recompile ] parse-hook set-global
+    ] when
 
-        "Building online help search index..." print
-        flush
-        H{ } clone help-tree set-global xref-help
+    [
+        boot
+        [ run-user-init ] try
+        [ "shell" get "shells" lookup execute ] try
+        stdio get [ stream-flush ] when*
+    ] set-boot
 
-        [ run-bootstrap-init ] try
+    "Building online help search index..." print
+    flush
+    H{ } clone help-tree set-global xref-help
 
-        f error set-global
-        f error-continuation set-global
+    run-bootstrap-init
 
-        : count-words all-words swap subset length pprint ;
+    f error set-global
+    f error-continuation set-global
 
-        [ compiled? ] count-words " compiled words" print
-        [ symbol? ] count-words " symbol words" print
-        [ ] count-words " words total" print
+    : count-words all-words swap subset length pprint ;
 
-        FORGET: count-words
+    [ compiled? ] count-words " compiled words" print
+    [ symbol? ] count-words " symbol words" print
+    [ ] count-words " words total" print
 
-        "Total bootstrap GC time: " write gc-time
-        number>string write " ms" print
+    FORGET: count-words
 
-        "Bootstrapping is complete." print
-        "Now, you can run ./f -i=factor.image" print flush
+    "Total bootstrap GC time: " write gc-time
+    number>string write " ms" print
 
-        "factor.image" resource-path save-image
-    ] [ print-error :c ] recover
-] with-scope
+    "Bootstrapping is complete." print
+    "Now, you can run ./factor -i=factor.image" print flush
+
+    "factor.image" resource-path save-image
+] [ error-hook get call listener ] recover
 
 0 exit

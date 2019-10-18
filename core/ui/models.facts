@@ -19,19 +19,20 @@ HELP: <model>
 HELP: add-dependency
 { $values { "dep" model } { "model" model } }
 { $description "Registers a dependency. When " { $snippet "model" } " is activated, it will be added to " { $snippet "dep" } "'s connections and notified when " { $snippet "dep" } " changes." }
-{ $notes "This word should not be called directly unless you are implementing your own model class." }
-{ $see-also remove-dependency activate-model deactivate-model } ;
+{ $notes "This word should not be called directly unless you are implementing your own model class." } ;
+
+{ add-dependency remove-dependency activate-model deactivate-model } related-words
 
 HELP: remove-dependency
 { $values { "dep" model } { "model" model } }
 { $description "Unregisters a dependency." }
-{ $notes "This word should not be called directly unless you are implementing your own model class." }
-{ $see-also add-dependency activate-model deactivate-model } ;
+{ $notes "This word should not be called directly unless you are implementing your own model class." } ;
 
 HELP: model-activated
 { $values { "model" model } }
-{ $contract "Called after a model has been activated." }
-{ $see-also activate-model deactivate-model } ;
+{ $contract "Called after a model has been activated." } ;
+
+{ model-activated activate-model deactivate-model } related-words
 
 HELP: activate-model
 { $values { "model" model } }
@@ -45,40 +46,37 @@ HELP: deactivate-model
 
 HELP: model-changed
 { $values { "observer" object } }
-{ $contract "Called to notify observers of a model that the model value has changed as a result of a call to " { $link set-model } ". Observers can be registered with " { $link add-connection } "." }
-{ $see-also remove-connection } ;
+{ $contract "Called to notify observers of a model that the model value has changed as a result of a call to " { $link set-model } ". Observers can be registered with " { $link add-connection } "." } ;
+
+{ add-connection remove-connection model-changed } related-words
 
 HELP: add-connection
 { $values { "observer" object } { "model" model } }
-{ $contract "Registers an object interested in being notified of changes to the model's value. When the value is changed as a result of a call to " { $link set-model } ", the " { $link model-changed } " word is called on the observer." }
-{ $see-also remove-connection add-dependency } ;
+{ $contract "Registers an object interested in being notified of changes to the model's value. When the value is changed as a result of a call to " { $link set-model } ", the " { $link model-changed } " word is called on the observer." } ;
 
 HELP: remove-connection
 { $values { "observer" object } { "model" model } }
-{ $contract "Unregisters an object no longer interested in being notified of changes to the model's value." }
-{ $see-also add-connection remove-dependency } ;
+{ $contract "Unregisters an object no longer interested in being notified of changes to the model's value." } ;
 
 HELP: set-model
 { $values { "value" object } { "model" model } }
-{ $description "Changes the value of a model and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." }
-{ $see-also change-model } ;
+{ $description "Changes the value of a model and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
+
+{ set-model set-model-value change-model (change-model) } related-words
 
 HELP: set-model-value ( value model -- )
 { $values { "value" object } { "model" model } }
 { $description "Changes the value of a model without notifying any observers registered with " { $link add-connection } "." }
-{ $notes "There are very few reasons for user code to call this word. Instead, call " { $link set-model } ", which notifies observers." }
-{ $see-also change-model } ;
+{ $notes "There are very few reasons for user code to call this word. Instead, call " { $link set-model } ", which notifies observers." } ;
 
 HELP: change-model
 { $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } }
-{ $description "Applies the quotation to the current value of the model to yield a new value, then changes the value of the model to the new value, and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." }
-{ $see-also set-model } ;
+{ $description "Applies the quotation to the current value of the model to yield a new value, then changes the value of the model to the new value, and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
 
 HELP: (change-model)
 { $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } }
 { $description "Applies the quotation to the current value of the model to yield a new value, then changes the value of the model to the new value without notifying any observers registered with " { $link add-connection } "." }
-{ $notes "There are very few reasons for user code to call this word. Instead, call " { $link change-model } ", which notifies observers." }
-{ $see-also set-model } ;
+{ $notes "There are very few reasons for user code to call this word. Instead, call " { $link change-model } ", which notifies observers." } ;
 
 HELP: delegate>model
 { $values { "tuple" tuple } }
@@ -104,7 +102,9 @@ HELP: <filter>
 { $examples "See the example in the documentation for " { $link filter } "." } ;
 
 HELP: compose
-{ $class-description "Composed model values are computed by collecting the values from a sequence of underlying models into a new sequence. Compose models are automatically updated when underlying models change. Compose models are constructed by " { $link <compose> } "." }
+{ $class-description "Composed model values are computed by collecting the values from a sequence of underlying models into a new sequence. Composed models are automatically updated when underlying models change. Composed models are constructed by " { $link <compose> } "."
+$nl
+"A composed model whose children are all " { $link "models-range" } " conforms to the " { $link "range-model-protocol" } " and represents a point in n-dimensional space which is bounded by a rectangle." }
 { $examples
     "The following code displays a pair of sliders, and an updating label showing their current values:"
     { $code
@@ -127,18 +127,17 @@ HELP: history
 
 HELP: <history>
 { $values { "value" object } { "history" "a new " { $link history } } }
-{ $description "Creates a new history model with an initial value." }
-{ $see-also add-history go-back go-forward } ;
+{ $description "Creates a new history model with an initial value." } ;
+
+{ <history> add-history go-back go-forward } related-words
 
 HELP: go-back
 { $values { "history" history } }
-{ $description "Restores the previous value and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." }
-{ $see-also add-history go-forward } ;
+{ $description "Restores the previous value and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
 
 HELP: go-forward
 { $values { "history" history } }
-{ $description "Restores the value set prior to the last call to " { $link go-back } " and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." }
-{ $see-also add-history go-back } ;
+{ $description "Restores the value set prior to the last call to " { $link go-back } " and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
 
 HELP: add-history
 { $values { "history" history } }
@@ -150,7 +149,8 @@ HELP: delay
     "The following code displays a sliders and a label which is updated half a second after the slider stops changing:"
     { $code
         "USING: models gadgets-labels gadgets-sliders gadgets-panes ;"
-        ": <funny-slider> <x-slider> 500 over set-slider-max ;"
+        ": <funny-slider>"
+        "    0 0 0 100 <range> <x-slider> 500 over set-slider-max ;"
         "<funny-slider> dup gadget."
         "control-model 500 <delay> [ number>string ] <filter>"
         "<label-control> gadget."
@@ -161,3 +161,77 @@ HELP: <delay>
 { $values { "model" model } { "timeout" "a positive integer" } { "delay" delay } }
 { $description "Creates a new instance of " { $link delay } ". A timer of " { $snippet "timeout" } " milliseconds must elapse from the time the underlying model last changed to when the delay model value is changed and its connections are notified." }
 { $examples "See the example in the documentation for " { $link delay } "." } ;
+
+HELP: range-value
+{ $values { "model" model } { "value" object } }
+{ $contract "Outputs the current value of a range model." } ;
+
+HELP: range-page-value
+{ $values { "model" model } { "value" object } }
+{ $contract "Outputs the page size of a range model." } ;
+
+HELP: range-min-value
+{ $values { "model" model } { "value" object } }
+{ $contract "Outputs the minimum value of a range model." } ;
+
+HELP: range-max-value
+{ $values { "model" model } { "value" object } }
+{ $contract "Outputs the maximum value of a range model." } ;
+
+HELP: range-max-value*
+{ $values { "model" model } { "value" object } }
+{ $contract "Outputs the slider position for a range model. Since the bottom of the slider cannot exceed the maximum value, this is equal to the maximum value minus the page size." } ;
+
+HELP: set-range-value
+{ $values { "value" object } { "model" model } }
+{ $description "Sets the current value of a range model." } 
+{ $side-effects "model" } ;
+
+HELP: set-range-page-value
+{ $values { "value" object } { "model" model } }
+{ $description "Sets the page size of a range model." } 
+{ $side-effects "model" } ;
+
+HELP: set-range-min-value
+{ $values { "value" object } { "model" model } }
+{ $description "Sets the minimum value of a range model." } 
+{ $side-effects "model" } ;
+
+HELP: set-range-max-value
+{ $values { "value" object } { "model" model } }
+{ $description "Sets the maximum value of a range model." }
+{ $side-effects "model" } ;
+
+HELP: range
+{ $class-description "Range models implement the " { $link "range-model-protocol" } " with real numbers as the minimum, current, maximum, and page size. Range models are created with " { $link <range> } "." }
+{ $notes { $link "gadgets-sliders" } " use range models." } ;
+
+HELP: range-model
+{ $values { "range" range } { "model" model } }
+{ $description "Outputs a model holding a range model's current value." }
+{ $notes "This word is not part of the " { $link "range-model-protocol" } ", and can only be used on direct instances of " { $link range } "." } ;
+
+HELP: range-min
+{ $values { "range" range } { "model" model } }
+{ $description "Outputs a model holding a range model's minimum value." }
+{ $notes "This word is not part of the " { $link "range-model-protocol" } ", and can only be used on direct instances of " { $link range } "." } ;
+
+HELP: range-max
+{ $values { "range" range } { "model" model } }
+{ $description "Outputs a model holding a range model's maximum value." }
+{ $notes "This word is not part of the " { $link "range-model-protocol" } ", and can only be used on direct instances of " { $link range } "." } ;
+
+HELP: range-page
+{ $values { "range" range } { "model" model } }
+{ $description "Outputs a model holding a range model's page size." }
+{ $notes "This word is not part of the " { $link "range-model-protocol" } ", and can only be used on direct instances of " { $link range } "." } ;
+
+HELP: move-by
+{ $values { "amount" real } { "range" range } }
+{ $description "Adds a number to a range model's current value." }
+{ $side-effects "range" } ;
+
+HELP: move-by-page
+{ $values { "amount" real } { "range" range } }
+{ $description "Adds a multiple of the page size to a range model's current value." }
+{ $side-effects "range" } ;

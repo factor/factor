@@ -1,10 +1,6 @@
-#include "factor.h"
+#import <Cocoa/Cocoa.h>
 
-#import "Foundation/NSAutoreleasePool.h"
-#import "Foundation/NSBundle.h"
-#import "Foundation/NSException.h"
-#import "Foundation/NSString.h"
-#import "Foundation/NSPathUtilities.h"
+#include "master.h"
 
 static CELL error;
 
@@ -63,4 +59,13 @@ void init_signals(void)
 {
 	unix_init_signals();
 	mach_initialize();
+}
+
+/* Amateurs at Apple: implement this function, properly! */
+Protocol *objc_getProtocol(char *name)
+{
+	if(strcmp(name,"NSTextInput") == 0)
+		return @protocol(NSTextInput);
+	else
+		return nil;
 }

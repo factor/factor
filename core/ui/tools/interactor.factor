@@ -2,20 +2,23 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-interactor
 USING: arrays definitions gadgets gadgets-panes gadgets-text
-generic hashtables help io kernel namespaces prettyprint styles
-threads sequences vectors definitions parser words strings
-math listener models errors ;
+gadgets-workspace generic assocs help io kernel namespaces
+prettyprint styles threads sequences vectors definitions parser
+words strings math listener models errors quotations hashtables ;
 
 TUPLE: interactor
 history output
 continuation quot busy?
-use in error-hook
+vars
 help ;
+
+: interactor-use ( interactor -- seq )
+    use swap interactor-vars at ;
 
 : word-at-loc ( loc interactor -- word )
     over [
         [ control-model T{ one-word-elt } elt-string ] keep
-        interactor-use hash-stack
+        interactor-use assoc-stack
     ] [
         2drop f
     ] if ;
@@ -23,7 +26,7 @@ help ;
 TUPLE: caret-help model gadget ;
 
 C: caret-help ( interactor -- caret-help )
-    over editor-caret 200 <delay>
+    over editor-caret 100 <delay>
     over 2dup set-caret-help-model swap add-connection
     [ set-caret-help-gadget ] keep ;
 
@@ -40,7 +43,7 @@ M: caret-help model-changed
 
 C: interactor ( output -- gadget )
     [ set-interactor-output ] keep
-    dup delegate>editor
+    dup delegate>source-editor
     dup init-interactor-history
     dup init-caret-help ;
 
@@ -59,7 +62,7 @@ M: interactor ungraft*
 
 : interactor-input. ( string interactor -- )
     interactor-output [
-        dup string? [ dup write-input terpri ] [ short. ] if
+        dup string? [ dup write-input nl ] [ short. ] if
     ] with-stream* ;
 
 : add-interactor-history ( str interactor -- )
@@ -84,7 +87,7 @@ M: interactor ungraft*
 : interactor-eof ( interactor -- )
     f swap interactor-continue ;
 
-: interactor-commit ( interactor -- )
+: evaluate-input ( interactor -- )
     dup interactor-busy? [ drop ] [ interactor-eval ] if ;
 
 : interactor-yield ( interactor quot -- )
@@ -102,34 +105,30 @@ M: interactor stream-read
     swap dup zero?
     [ 2drop "" ] [ >r stream-readln r> head ] if ;
 
-: save-in/use ( interactor -- )
-    use get over set-interactor-use
-    in get over set-interactor-in
-    error-hook get swap set-interactor-error-hook ;
+: save-vars ( interactor -- )
+    { use in stdio lexer-factory } [ dup get ] H{ } map>assoc
+    swap set-interactor-vars ;
 
-: restore-in/use ( interactor -- )
-    dup interactor-use use set
-    dup interactor-in in set
-    interactor-error-hook error-hook set ;
+: restore-vars ( interactor -- )
+    namespace swap interactor-vars update ;
 
 : go-to-error ( interactor error -- )
     dup parse-error-line 1- swap parse-error-col 2array
-    over editor-caret set-model mark>caret ;
+    over [ control-model validate-loc ] keep
+    editor-caret set-model
+    mark>caret ;
 
 : handle-parse-error ( interactor error -- )
     dup parse-error? [ 2dup go-to-error delegate ] when
-    swap interactor-error-hook call ;
+    swap find-workspace debugger-popup ;
 
 : try-parse ( str interactor -- quot/error/f )
     [
         [
-            [
-                restore-in/use
-                1array \ parse with-datastack dup length 1 =
-                [ first ] [ drop f ] if
-            ] keep save-in/use
+            [ restore-vars parse ] keep save-vars
         ] [
             >r f swap set-interactor-busy? drop r>
+            dup [ unexpected-eof? ] is? [ drop f ] when
         ] recover
     ] with-scope ;
 
@@ -141,11 +140,16 @@ M: interactor stream-read
     } cond ;
 
 M: interactor parse-interactive
-    [ save-in/use ] keep
+    [ save-vars ] keep
     [ [ handle-interactive ] interactor-yield ] keep
-    restore-in/use ;
+    restore-vars ;
 
-interactor "interactor" {
-    { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
-    { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
-} define-commands
+M: interactor pref-dim*
+    0 over line-height 4 * 2array swap delegate pref-dim* vmax ;
+
+: clear-input control-model clear-doc ;
+
+interactor "interactor" f {
+    { T{ key-down f f "RET" } evaluate-input }
+    { T{ key-down f { C+ } "k" } clear-input }
+} define-command-map

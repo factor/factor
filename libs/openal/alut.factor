@@ -4,15 +4,6 @@
 IN: openal
 USING: kernel alien ;
 
-: load-alut-library ( -- )
-  "alut" {
-    { [ win32? ]  [ "alut.dll" ] }
-    { [ macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
-    { [ unix?  ]  [ "libalut.so" ] }
-  } cond "cdecl" add-library ;
-
-load-alut-library
-
 LIBRARY: alut
 
 : ALUT_API_MAJOR_VERSION ( -- number ) 1 ; inline

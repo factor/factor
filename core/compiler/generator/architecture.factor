@@ -26,14 +26,22 @@ GENERIC: vregs ( register-class -- regs )
 ! Load a literal (immediate or indirect)
 G: load-literal ( obj vreg -- ) 1 standard-combination ;
 
+DEFER: load-indirect ( obj reg -- )
+
+DEFER: stack-frame ( frame-size -- n )
+
+: stack-frame* ( -- n )
+    \ stack-frame get stack-frame ;
+
 ! Set up caller stack frame
-DEFER: %prologue ( -- )
+DEFER: %prologue ( n -- )
+
+: %prologue-later \ %prologue-later , ;
 
 ! Tear down stack frame
 DEFER: %epilogue ( -- )
 
-! Tail call another word
-DEFER: %jump ( label -- )
+: %epilogue-later \ %epilogue-later , ;
 
 ! Call another word
 DEFER: %call ( label -- )
@@ -41,8 +49,11 @@ DEFER: %call ( label -- )
 ! Local jump for branches
 DEFER: %jump-label ( label -- )
 
+! Tail call another word
+: %jump ( label -- ) %epilogue-later %jump-label ;
+
 ! Test if vreg is 'f' or not
-DEFER: %jump-t ( label vreg -- )
+DEFER: %jump-t ( label -- )
 
 ! We pass the offset of the jump table start in the world table
 DEFER: %call-dispatch ( word-table# -- )
@@ -83,15 +94,22 @@ DEFER: struct-small-enough? ( size -- ? )
 ! Do we pass explode value structs?
 DEFER: value-structs? ( -- ? )
 
+! If t, fp parameters are shadowed by dummy int parameters
+: fp-shadows-int? ( -- ? ) f ;
+
 DEFER: %prepare-unbox ( -- )
 
 DEFER: %unbox ( n reg-class func -- )
+
+DEFER: %unbox-long-long ( n func -- )
 
 DEFER: %unbox-small-struct ( size -- )
 
 DEFER: %unbox-large-struct ( n size -- )
 
 DEFER: %box ( n reg-class func -- )
+
+DEFER: %box-long-long ( n func -- )
 
 DEFER: %prepare-box-struct ( size -- )
 
@@ -121,8 +139,18 @@ DEFER: %alien-indirect ( -- )
 M: stack-params param-reg drop ;
 
 GENERIC: v>operand ( obj -- operand )
-M: integer v>operand tag-bits shift ;
-M: f v>operand drop object-tag ;
+
+M: integer v>operand tag-bits get shift ;
+
+M: f v>operand drop object tag-number ;
+
+M: object load-literal v>operand load-indirect ;
+
+PREDICATE: integer small-slot cells small-enough? ;
+
+PREDICATE: integer small-tagged v>operand small-enough? ;
+
+PREDICATE: integer inline-array 32 < ;
 
 : if-small-struct ( n size true false -- ? )
     >r >r over not over struct-small-enough? and

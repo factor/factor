@@ -3,7 +3,7 @@
 IN: alien
 USING: generator errors generic hashtables inference
 kernel namespaces sequences strings words parser prettyprint
-kernel-internals math ;
+kernel-internals math quotations inspector ;
 
 TUPLE: alien-indirect return parameters abi ;
 C: alien-indirect make-node ;
@@ -37,14 +37,15 @@ M: alien-indirect-error summary
 ] "infer" set-word-prop
 
 M: alien-indirect generate-node
-    end-basic-block
-    ! Save alien at top of stack to temporary storage
-    %prepare-alien-indirect
-    dup objects>registers
-    ! Call alien in temporary storage
-    %alien-indirect
-    dup %cleanup
-    box-return*
-    iterate-next ;
-
-M: alien-indirect stack-frame-size* alien-invoke-frame ;
+    dup alien-invoke-frame [
+        ! Flush registers
+        end-basic-block
+        ! Save alien at top of stack to temporary storage
+        %prepare-alien-indirect
+        dup objects>registers
+        ! Call alien in temporary storage
+        %alien-indirect
+        dup %cleanup
+        box-return*
+        iterate-next
+    ] with-stack-frame ;

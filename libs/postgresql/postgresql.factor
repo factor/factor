@@ -4,7 +4,8 @@
 ! tested on debian linux with postgresql 7.4.7
 
 IN: postgresql
-USING: kernel alien errors io prettyprint sequences namespaces arrays math ;
+USING: kernel alien errors io prettyprint sequences
+namespaces quotations arrays math ;
 
 SYMBOL: db
 SYMBOL: query-res
@@ -43,10 +44,10 @@ SYMBOL: query-res
     ] when* drop ;
 
 : do-command ( str -- )
-    unit \ (do-command) add db get swap call ;
+    1quotation \ (do-command) add db get swap call ;
 
 : prepare ( str quot word -- conn quot )
-    rot unit swap append swap append db get swap ;
+    rot 1quotation swap append swap append db get swap ;
 
 : do-query ( str quot -- )
     [ (do-query) query-res set ] prepare catch

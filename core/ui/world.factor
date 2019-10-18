@@ -1,35 +1,39 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays errors freetype generic hashtables
-kernel math models namespaces opengl sequences prettyprint ;
+USING: arrays errors freetype generic assocs
+kernel math models namespaces opengl sequences prettyprint
+inspector ;
 
 TUPLE: world
-active?
+active? focused?
 gadget glass
 title status
-focus focused?
 fonts handle
 loc ;
 
 : free-fonts ( world -- )
     dup world-handle select-gl-context
-    world-fonts hash-values [ second free-sprites ] each ;
+    world-fonts values [ second free-sprites ] each ;
 
 DEFER: request-focus
 
 C: world ( gadget status status-model title -- world )
     [ set-world-title ] keep
     [ set-world-status ] keep
-    {
-        { f f f @bottom }
-        { f set-world-gadget f @center }
-    } make-frame*
+    [
+        @bottom grid,
+        g-> set-world-gadget @center grid,
+    ] build-frame
     t over set-gadget-root?
     t over set-world-active?
     H{ } clone over set-world-fonts
     { 0 0 } over set-world-loc
     dup world-gadget request-focus ;
+
+M: world equal? 2drop f ;
+
+M: world hashcode* drop world hashcode* ;
 
 : find-world [ world? ] find-parent ;
 
@@ -44,8 +48,11 @@ C: world ( gadget status status-model title -- world )
 M: world pref-dim*
     delegate pref-dim* [ >fixnum ] map { 1024 768 } vmin ;
 
-: focused-ancestors ( world -- seq )
-    world-focus parents <reversed> ;
+: (focus-path) ( gadget -- )
+    [ dup , gadget-focus (focus-path) ] when* ;
+
+: focus-path ( world -- seq )
+    [ (focus-path) ] { } make ;
 
 M: world layout*
     dup delegate layout*

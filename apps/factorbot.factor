@@ -4,7 +4,7 @@ REQUIRES: apps/http-server ;
 
 USING: errors generic hashtables help html http io kernel math
 memory namespaces parser prettyprint sequences strings threads
-words ;
+words inspector network ;
 IN: factorbot
 
 SYMBOL: irc-stream

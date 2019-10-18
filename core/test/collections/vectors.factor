@@ -48,7 +48,6 @@ sequences sequences-internals strings test vectors ;
 [ V{ 1 2 3 } V{ 1 2 3 4 5 6 } ]
 [ V{ 1 2 3 } dup V{ 4 5 6 } append ] unit-test
 
-[ f ] [ f concat ] unit-test
 [ V{ 1 2 3 4 } ] [ [ V{ 1 } [ 2 ] V{ 3 4 } ] concat ] unit-test
 
 [ V{ } ] [ V{ } 0 tail ] unit-test
@@ -87,7 +86,7 @@ sequences sequences-internals strings test vectors ;
     ] with-scope
 ] unit-test
 
-[ -1 ] [ 5 V{ } index ] unit-test
+[ f ] [ 5 V{ } index ] unit-test
 [ 4 ] [ 5 V{ 1 2 3 4 5 } index ] unit-test
 
 [ t ] [

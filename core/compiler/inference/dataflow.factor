@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays generic hashtables kernel math
-namespaces parser sequences words vectors ;
+USING: arrays generic assocs kernel math
+namespaces parser sequences words vectors intervals ;
 
 SYMBOL: d-in
 SYMBOL: meta-d
@@ -18,16 +18,25 @@ SYMBOL: meta-r
 
 TUPLE: node param
 in-d out-d in-r out-r
-classes literals history
-successor children ;
+classes literals intervals
+history successor children ;
+
+C: node ( param in-d out-d in-r out-r -- node )
+    [ set-node-out-r ] keep
+    [ set-node-in-r ] keep
+    [ set-node-out-d ] keep
+    [ set-node-in-d ] keep
+    [ set-node-param ] keep ;
 
 M: node equal? 2drop f ;
+
+M: node hashcode* drop node hashcode* ;
 
 : node-shuffle ( node -- shuffle )
     dup node-in-d swap node-out-d <effect> ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
-    [ >r f f f f f <node> r> set-delegate ] keep ;
+    [ >r <node> r> set-delegate ] keep ;
 
 : empty-node f { } { } { } { } ;
 : param-node { } { } { } { } ;
@@ -267,19 +276,17 @@ DEFER: (map-nodes)
     [ >r 2dup r> node-successor (subst-values) ] each 2drop ;
 
 : node-literal? ( node value -- ? )
-    {
-        { [ dup value? ] [ 2drop t ] }
-        { [ over node-literals not ] [ 2drop f ] }
-        { [ swap node-literals hash-member? ] [ t ] }
-    } cond ;
+    dup value? >r swap node-literals key? r> or ;
 
 : node-literal ( node value -- obj )
     dup value?
-    [ nip value-literal ] [ swap node-literals ?hash ] if ;
+    [ nip value-literal ] [ swap node-literals at ] if ;
+
+: node-interval ( node value -- interval )
+    swap node-intervals at ;
 
 : node-class ( node value -- class )
-    dup value? [
-        nip value-literal class
-    ] [
-        swap node-classes ?hash [ object ] unless*
-    ] if ;
+    swap node-classes at [ object ] unless* ;
+
+: node-class-first ( node -- class )
+    dup node-in-d first node-class ;

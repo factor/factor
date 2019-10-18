@@ -24,31 +24,27 @@ IN: sequences
 : head* ( seq n -- headseq ) from-end head ;
 : tail* ( seq n -- tailseq ) from-end tail ;
 
+: shorter? ( seq1 seq2 -- ? ) >r length r> length < ;
+
 : head? ( seq begin -- ? )
-    2dup [ length ] 2apply < [
+    2dup shorter? [
         2drop f
     ] [
-        [ length head-slice ] keep sequence=
+        tuck length head-slice sequence=
     ] if ;
 
 : ?head ( seq begin -- newseq ? )
     2dup head? [ length tail t ] [ drop f ] if ;
 
 : tail? ( seq end -- ? )
-    2dup [ length ] 2apply < [
+    2dup shorter? [
         2drop f
     ] [
-        [ length tail-slice* ] keep sequence=
+        tuck length tail-slice* sequence=
     ] if ;
 
 : ?tail ( seq end -- newseq ? )
     2dup tail? [ length head* t ] [ drop f ] if ;
-
-: replace-slice ( new m n seq -- replaced )
-    tuck swap tail-slice >r swap head-slice swap r> 3append ;
-
-: remove-nth ( n seq -- newseq )
-    >r f swap dup 1+ r> replace-slice ;
 
 : cut-slice ( n seq -- before after )
     swap [ head ] 2keep tail-slice ;
@@ -66,36 +62,29 @@ IN: sequences
 
 : start ( subseq seq -- i ) 0 start* ; inline
 
-: subseq? ( subseq seq -- ? ) start -1 > ;
-
-: split1-slice ( seq subseq -- before after )
-    dup pick start dup -1 = [
-        2drop dup like f
-    ] [
-        [ >r over r> head -rot length ] keep + tail-slice
-    ] if ;
+: subseq? ( subseq seq -- ? ) start >boolean ;
 
 : split1 ( seq subseq -- before after )
-    over >r split1-slice dup [ r> like ] [ r> drop ] if ;
+    dup pick start dup [
+        [ >r over r> head -rot length ] keep + tail
+    ] [
+        2drop f
+    ] if ;
 
-: split, building get peek push ;
+: last-split1 ( seq subseq -- before after )
+    >r <reversed> r> split1 [ reverse ] 2apply swap ;
 
-: split-next, V{ } clone , ;
+: (split) ( separators n seq -- )
+    [ [ swap member? ] find-with* drop ] 3keep roll
+    [ [ swap subseq , ] 2keep 1+ swap (split) ]
+    [ swap dup zero? [ drop ] [ tail ] if , drop ] if* ;
 
-: (split) ( quot elt -- )
-    swap keep swap
-    [ drop split-next, ] [ split, ] if ; inline
+: split, ( seq separators -- ) 0 rot (split) ;
 
-: split* ( seq quot -- pieces )
-    over >r
-    [ split-next, swap [ (split) ] each-with ]
-    { } make r> swap [ swap like ] map-with ; inline
-
-: split ( seq separators -- pieces )
-    swap [ over member? ] split* nip ;
+: split ( seq separators -- pieces ) [ split, ] { } make ;
 
 : drop-prefix ( seq1 seq2 -- slice1 slice2 )
-    2dup mismatch dup -1 = [ drop 2dup min-length ] when
+    2dup mismatch [ 2dup min-length ] unless*
     tuck tail-slice >r tail-slice r> ;
 
 : unclip ( seq -- rest first ) dup 1 tail swap first ;

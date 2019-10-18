@@ -4,7 +4,7 @@ IN: io
 USING: io kernel math namespaces sequences sbufs strings ;
 
 M: sbuf stream-write1 push ;
-M: sbuf stream-write nappend ;
+M: sbuf stream-write push-all ;
 M: sbuf stream-close drop ;
 M: sbuf stream-flush drop ;
 
@@ -25,29 +25,29 @@ M: sbuf stream-flush drop ;
     swap dup length <reversed>
     [ zero? rot [ call ] keep swap ] 2map nip ; inline
 
-M: plain-writer with-stream-table
-    [
-        drop swap
-        [ [ swap string-out ] map-with ] map-with
-        flip [ format-column ] map-last
-        flip [ " " join ] map
-        [ print ] each
-    ] with-stream* ;
+: format-table ( table -- seq )
+    flip [ format-column ] map-last
+    flip [ " " join ] map ;
+
+M: plain-writer stream-write-table
+    [ drop format-table [ print ] each ] with-stream* ;
+
+M: plain-writer make-table-cell 2drop string-out ;
 
 M: sbuf stream-read1 dup empty? [ drop f ] [ pop ] if ;
 
 : sbuf-read-until ( sbuf n -- str )
-    tail-slice >string dup nreverse ;
+    tail-slice >string dup reverse-here ;
 
 : find-last-sep [ swap memq? ] find-last-with drop ;
 
 M: sbuf stream-read-until
-    [ find-last-sep ] keep over -1 = [
-        [ swap 1+ sbuf-read-until f like f ] keep
-        delete-all
-    ] [
+    [ find-last-sep ] keep over [
         [ swap 1+ sbuf-read-until ] 2keep [ nth ] 2keep
         set-length
+    ] [
+        [ swap drop 0 sbuf-read-until f like f ] keep
+        delete-all
     ] if ;
 
 M: sbuf stream-read
@@ -60,13 +60,10 @@ M: sbuf stream-read
     ] if ;
 
 : <string-reader> ( str -- stream )
-    >sbuf dup nreverse <line-reader> ;
+    >sbuf dup reverse-here <line-reader> ;
 
 : string-in ( str quot -- )
     >r <string-reader> r> with-stream ; inline
 
 : contents ( stream -- str )
     <string-writer> [ stream-copy ] keep >string ;
-
-: string-lines ( string -- seq )
-    "\r\n" append <string-reader> [ (lines) ] with-stream* ;

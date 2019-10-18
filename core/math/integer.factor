@@ -4,8 +4,6 @@ IN: math
 USING: errors generic kernel kernel-internals sequences
 sequences-internals ;
 
-PREDICATE: fixnum small 1+ fixnum? ;
-
 UNION: integer fixnum bignum ;
 
 : even? ( n -- ? ) 1 bitand zero? ;
@@ -38,6 +36,10 @@ UNION: integer fixnum bignum ;
 : w>h/h ( w -- h1 h2 )
     dup HEX: ffff bitand
     swap -16 shift HEX: ffff bitand ;
+
+: h>b/b ( h -- b1 b2 )
+    dup HEX: ff bitand
+    swap -8 shift HEX: ff bitand ;
 
 IN: math-internals
 

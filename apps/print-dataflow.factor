@@ -14,7 +14,7 @@ TUPLE: comment node text ;
 
 M: comment pprint*
     "( " over comment-text " )" 3append
-    swap comment-node presentation-text ;
+    swap comment-node present-text ;
 
 : comment, ( ? node text -- )
     rot [ <comment> , ] [ 2drop ] if ;

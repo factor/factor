@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel math sequences errors vectors prettyprint io
-namespaces arrays words parser hashtables lazy-lists
-kernel-internals parser-combinators strings tools ;
+namespaces arrays words parser assocs lazy-lists
+kernel-internals parser-combinators strings tools
+quotations ;
 IN: cpu-8080
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;
@@ -474,7 +475,7 @@ SYMBOL: rom-root
   #! file path shoul dbe relative to the '/roms' resource path.
   rom-root get [
     cpu-ram swap [
-      first2 rom-root get swap append <file-reader> [      
+      first2 rom-root get swap path+ <file-reader> [      
         swap (load-rom)
       ] with-stream
     ] each-with 
@@ -541,7 +542,7 @@ SYMBOL: rom-root
   [ " SP: " write cpu-sp 16 >base 4 CHAR: \s pad-left write ] keep 
   [ " cycles: " write cpu-cycles number>string 5 CHAR: \s pad-left write ] keep 
   [ " " write peek-instruction word-name write " " write ] keep
-  terpri drop ;
+  nl drop ;
 
 : cpu*. ( cpu -- )
   [ " PC: " write cpu-pc 16 >base 4 CHAR: \s pad-left write ] keep 
@@ -555,7 +556,7 @@ SYMBOL: rom-root
   [ " A: " write cpu-a 16 >base 2 CHAR: \s pad-left write ] keep 
   [ " SP: " write cpu-sp 16 >base 4 CHAR: \s pad-left write ] keep 
   [ " cycles: " write cpu-cycles number>string 5 CHAR: \s pad-left write ] keep 
-  terpri drop ;
+  nl drop ;
 
 : test-step ( cpu -- cpu )
   [ step ] keep dup cpu. ;
@@ -586,7 +587,7 @@ SYMBOL: rom-root
     { "DE" { cpu-de set-cpu-de } }
     { "HL" { cpu-hl set-cpu-hl } }
     { "SP" { cpu-sp set-cpu-sp } }
-  } hash ;
+  } at ;
 
 
 : flag-lookup ( string -- vector )
@@ -601,7 +602,7 @@ SYMBOL: rom-root
     { "C"  { flag-c? } }
     { "P"  { flag-p?  } }
     { "M" { flag-m?  } }
-  } hash ;
+  } at ;
 
 SYMBOL: $1
 SYMBOL: $2
@@ -615,7 +616,7 @@ SYMBOL: $4
   dup quotation? over [ ] = not and [ ! vector tree
     dup first swap 1 tail ! vector car cdr
     >r dupd replace-patterns ! vector v R: cdr
-    swap r> replace-patterns >r unit r> append
+    swap r> replace-patterns >r 1quotation r> append
   ] [ ! vector value
     dup $1 = [ drop 0 over nth  ] when 
     dup $2 = [ drop 1 over nth  ] when 
@@ -844,7 +845,7 @@ SYMBOL: $4
 : generate-instruction ( vector string -- quot )
   #! Generate the quotation for an instruction, given the instruction in 
   #! the 'string' and a vector containing the arguments for that instruction.
-  patterns hash replace-patterns ;
+  patterns at replace-patterns ;
 
 : simple-instruction ( token -- parser )
   #! Return a parser for then instruction identified by the token. 
@@ -1335,19 +1336,19 @@ SYMBOL: last-opcode
   #! up an 8080 instruction, and output a quotation
   #! that would implement that instruction.
   dup " " join instruction-quotations
-  >r "_" join [ "emulate-" % % ] "" make create-in dup last-instruction global set-hash  
+  >r "_" join [ "emulate-" % % ] "" make create-in dup last-instruction global set-at  
   r> define-compound ;
 
-: INSTRUCTION: string-mode on [ string-mode off parse-instructions ] f ; parsing
+: INSTRUCTION: ";" parse-tokens parse-instructions ; parsing
 
 : cycles ( -- )
   #! Set the number of cycles for the last instruction that was defined. 
-  scan string>number last-opcode global hash instruction-cycles set-nth ; parsing
+  scan string>number last-opcode global at instruction-cycles set-nth ; parsing
 
 : opcode ( -- )
   #! Set the opcode number for the last instruction that was defined.
-  last-instruction global hash unit scan 16 base>
-  dup last-opcode global set-hash instructions set-nth ; parsing
+  last-instruction global at 1quotation scan 16 base>
+  dup last-opcode global set-at instructions set-nth ; parsing
 
 INSTRUCTION: NOP          ; opcode 00 cycles 04 
 INSTRUCTION: LD   BC,nn   ; opcode 01 cycles 10 
@@ -1616,7 +1617,7 @@ INSTRUCTION: RST  38H     ; opcode FF cycles 11
             " 1 1 1" write
           ] if
         ] each-8bit
-      ] repeat terpri
+      ] repeat nl
     ] repeat
   ] with-stream ;
 

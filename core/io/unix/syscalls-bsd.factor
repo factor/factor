@@ -24,13 +24,12 @@ USING: alien ;
 : F_SETFL 4 ;
 : O_NONBLOCK 4 ;
 
-BEGIN-STRUCT: sockaddr-in
-    FIELD: uchar len
-    FIELD: uchar family
-    FIELD: ushort port
-    FIELD: in_addr_t addr
-    FIELD: longlong unused
-END-STRUCT
+C-STRUCT: sockaddr-in
+    { "uchar" "len" }
+    { "uchar" "family" }
+    { "ushort" "port" }
+    { "in_addr_t" "addr" }
+    { "longlong" "unused" } ;
 
 : EINTR HEX: 4 ;
 : EAGAIN HEX: 23 ;
@@ -39,3 +38,4 @@ END-STRUCT
 : AF_INET 2 ;
 : PF_INET AF_INET ;
 : SOCK_STREAM 1 ;
+: SOCK_DGRAM 2 ;

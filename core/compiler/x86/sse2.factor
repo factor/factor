@@ -6,19 +6,12 @@ kernel-internals math math-internals memory namespaces sequences
 words errors ;
 IN: generator
 
-M: word v>operand
-    dup \ allot-tmp-reg eq? [
-        drop allot-tmp-reg
-    ] [
-        "Invalid input to v>operand" throw
-    ] if ;
-
 M: float-regs (%peek)
     drop
-    allot-tmp-reg PUSH
-    \ allot-tmp-reg swap %move-int>int
-    \ allot-tmp-reg %move-int>float
-    allot-tmp-reg POP ;
+    temp-reg v>operand PUSH
+    temp-reg swap %move-int>int
+    temp-reg %move-int>float
+    temp-reg v>operand POP ;
 
 M: float-regs (%replace) drop swap %move-float>int ;
 
@@ -53,7 +46,7 @@ M: float-regs (%replace) drop swap %move-float>int ;
 
 \ float>fixnum [
     "out" operand "in" operand CVTTSD2SI
-    "out" operand tag-bits SHL
+    "out" operand tag-bits get SHL
 ] H{
     { +input+ { { float "in" } } }
     { +scratch+ { { f "out" } } }

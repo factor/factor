@@ -1,5 +1,5 @@
 ! From http://www.ffconsultancy.com/ocaml/bunny/index.html
-USING: alien-contrib arrays sequences math io kernel
+USING: alien arrays sequences math io kernel
 matrices opengl shuffle gadgets http-client tools
 vectors timers namespaces canvas generic ;
 IN: bunny

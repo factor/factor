@@ -6,7 +6,9 @@ USING: kernel math sequences strings ;
 : be> ( seq -- x ) 0 [ swap 8 shift bitor ] reduce ;
 : le> ( seq -- x ) <reversed> be> ;
 
-: nth-byte ( x n -- b ) -8 * shift HEX: ff bitand ;
+: mask-byte ( x -- y ) HEX: ff bitand ; inline
+
+: nth-byte ( x n -- b ) -8 * shift mask-byte ;
 
 : >le ( x n -- str ) [ nth-byte ] map-with >string ;
-: >be ( x n -- str ) >le dup nreverse ;
+: >be ( x n -- str ) >le dup reverse-here ;

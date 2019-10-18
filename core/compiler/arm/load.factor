@@ -2,6 +2,7 @@ PROVIDE: core/compiler/arm
 { +files+ {
     "assembler.factor"
     "architecture.factor"
+    "allot.factor"
     "intrinsics.factor"
 } }
 { +tests+ {
@@ -9,7 +10,22 @@ PROVIDE: core/compiler/arm
 } } ;
 
 ! EABI passes floats in integer registers.
-USING: alien generator ;
+USING: alien generator kernel math ;
 
-T{ int-regs } "double" c-type set-c-type-reg-class
-T{ int-regs } "float" c-type set-c-type-reg-class
+[ alien-float ]
+[ >r >r >float r> r> set-alien-float ]
+4
+"box_float"
+"to_float" <primitive-type>
+"float" define-primitive-type
+
+[ >float ] "float" c-type set-c-type-prep
+
+[ alien-double ]
+[ >r >r >float r> r> set-alien-double ]
+8
+"box_double"
+"to_double" <primitive-type> <long-long-type>
+"double" define-primitive-type
+
+[ >float ] "double" c-type set-c-type-prep

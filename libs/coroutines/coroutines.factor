@@ -22,7 +22,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 IN: coroutines
-USING: kernel generic ;
+USING: kernel generic quotations ;
 
 TUPLE: coroutine resumecc exitcc ;
 

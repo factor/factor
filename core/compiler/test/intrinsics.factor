@@ -1,6 +1,7 @@
 IN: temporary
 USING: arrays compiler kernel kernel-internals math
-math-internals sequences strings test words errors ;
+math-internals sequences strings test words errors
+sequences-internals ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ 1 ] [ { 1 2 } [ 2 slot ] compile-1 ] unit-test
@@ -137,6 +138,13 @@ math-internals sequences strings test words errors ;
 [ 4 ] [ [ 1 3 fixnum+fast ] compile-1 ] unit-test
 
 [ 30001 ] [ 1 [ 30000 fixnum+fast ] compile-1 ] unit-test
+
+[ 6 ] [ 2 3 [ fixnum*fast ] compile-1 ] unit-test
+[ 6 ] [ 2 [ 3 fixnum*fast ] compile-1 ] unit-test
+[ 6 ] [ [ 2 3 fixnum*fast ] compile-1 ] unit-test
+[ -6 ] [ 2 -3 [ fixnum*fast ] compile-1 ] unit-test
+[ -6 ] [ 2 [ -3 fixnum*fast ] compile-1 ] unit-test
+[ -6 ] [ [ 2 -3 fixnum*fast ] compile-1 ] unit-test
 
 [ 6 ] [ 2 3 [ fixnum* ] compile-1 ] unit-test
 [ 6 ] [ 2 [ 3 fixnum* ] compile-1 ] unit-test
@@ -281,4 +289,9 @@ cell 8 = [
     [ [ fixnum- ] compile-1 [ bignum>fixnum ] compile-1 ] 2keep
     [ fixnum- >fixnum ] compile-1
     =
+] unit-test
+
+! Test inline allocators
+[ { 1 1 1 } ] [
+    [ 3 1 <array> ] compile-1
 ] unit-test

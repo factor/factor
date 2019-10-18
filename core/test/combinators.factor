@@ -53,10 +53,3 @@ USE: namespaces
         { [ t ] [ drop "neither" ] }
     } cond
 ] unit-test
-
-[ ] [
-    [
-        [ drop ] catch drop
-        [ drop ] catch drop
-    ] keep-datastack
-] unit-test

@@ -1,18 +1,24 @@
-#define INLINE inline static
-
-#if defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
+#if defined(__arm__)
+	#define FACTOR_ARM
+#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
 	#define FACTOR_X86
 #elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
 	#define FACTOR_PPC
 #elif defined(__amd64__) || defined(__x86_64__)
 	#define FACTOR_AMD64
-#elif defined(__arm__)
-	#define FACTOR_ARM
 #else
 	#error "Unsupported architecture"
 #endif
 
-#ifdef WINDOWS
+#if defined(WINDOWS)
+	#if defined(WINCE)
+		#include "os-windows-ce.h"
+	#elif defined (__i386)
+		#include "os-windows-nt.h"
+	#else
+		#error "Unsupported Windows flavor"
+	#endif
+
 	#include "os-windows.h"
 #else
 	#include "os-unix.h"
@@ -27,7 +33,7 @@
 		#elif defined(FACTOR_PPC)
 			#include "os-macosx-ppc.h"
 		#else
-			#error "Unsupported architecture"
+			#error "Unsupported Mac OS X flavor"
 		#endif
 	#else
 		#include "os-genunix.h"
@@ -40,12 +46,13 @@
 
 			#ifdef FACTOR_X86
 				#include "os-openbsd-x86.h"
+			#elif defined(FACTOR_AMD64)
+				#include "os-openbsd-amd64.h"
 			#else
-				#error "Unsupported architecture"
+				#error "Unsupported OpenBSD flavor"
 			#endif
 		#elif defined(linux)
 			#define FACTOR_OS_STRING "linux"
-
 			#include "os-unix-ucontext.h"
 
 			#if defined(FACTOR_PPC)

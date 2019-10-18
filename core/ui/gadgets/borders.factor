@@ -11,8 +11,6 @@ C: border ( child gap -- border )
     [ >r dup 2array r> set-border-size ] keep
     [ add-gadget ] keep ;
 
-: <default-border> ( child -- border ) 5 <border> ;
-
 : layout-border-loc ( border -- )
     dup rect-dim swap gadget-child
     [ pref-dim v- 2 v/n [ >fixnum ] map ] keep set-rect-loc ;
@@ -23,3 +21,6 @@ M: border pref-dim*
 
 M: border layout*
     dup layout-border-loc gadget-child prefer ;
+
+M: border focusable-child*
+    gadget-child ;

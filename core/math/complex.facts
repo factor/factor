@@ -6,7 +6,7 @@ HELP: complex
 HELP: real ( z -- x )
 { $values { "z" "a complex number" } { "x" "a real number" } }
 { $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
-{ $notes "This word also acts as the class word for the class of real numbers, which is a disjoint union of rationals and floats." } ;
+{ $class-description "The class of real numbers, which is a disjoint union of rationals and floats." } ;
 
 HELP: imaginary ( z -- y )
 { $values { "z" "a complex number" } { "y" "a real number" } }
@@ -42,8 +42,9 @@ HELP: >polar
 
 HELP: cis
 { $values { "arg" "a real number" } { "z" "a complex number on the unit circle" } }
-{ $description "Computes a point on the unit circle using Euler's formula for " { $snippet "exp(arg*i)" } "." }
-{ $see-also exp } ;
+{ $description "Computes a point on the unit circle using Euler's formula for " { $snippet "exp(arg*i)" } "." } ;
+
+{ cis exp } related-words
 
 HELP: polar>
 { $values { "z" "a complex number" } { "abs" "a non-negative real number" } { "arg" "a real number" } }

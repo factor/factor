@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generator
 USING: alien arrays assembler-ppc kernel kernel-internals math
-math-internals namespaces sequences words ;
+math-internals namespaces sequences words generic quotations ;
 
 : generate-slot ( size quot -- )
     >r >r
     ! turn tagged fixnum slot # into an offset, multiple of 4
-    "n" operand dup tag-bits r> - SRAWI
+    "n" operand dup tag-bits get r> - SRAWI
     ! compute slot address
     "out" operand dup "n" operand ADD
     ! load slot value
@@ -20,7 +20,7 @@ math-internals namespaces sequences words ;
             "obj" operand "out" operand %untag
             "out" operand dup "n" get cells LWZ
         ] H{
-            { +input+ { { f "obj" } { [ cells ] "n" } } }
+            { +input+ { { f "obj" } { [ small-slot? ] "n" } } }
             { +scratch+ { { f "out" } } }
             { +output+ { "out" } }
         }
@@ -53,7 +53,7 @@ math-internals namespaces sequences words ;
 : generate-set-slot ( size quot -- )
     >r >r
     ! turn tagged fixnum slot # into an offset, multiple of 4
-    "slot" operand dup tag-bits r> - SRAWI
+    "slot" operand dup tag-bits get r> - SRAWI
     ! compute slot address in 1st input
     "slot" operand dup "obj" operand ADD
     ! store new slot value
@@ -63,7 +63,7 @@ math-internals namespaces sequences words ;
     "cards_offset" f pick compile-dlsym  dup 0 LWZ ;
 
 : generate-write-barrier ( -- )
-    "obj" operand dup card-bits SRAWI
+    "obj" operand dup card-bits SRWI
     "x" operand load-cards-offset
     "obj" operand dup "x" operand ADD
     "x" operand "obj" operand 0 LBZ
@@ -78,7 +78,7 @@ math-internals namespaces sequences words ;
             "val" operand "obj" operand "n" get cells STW
             generate-write-barrier
         ] H{
-            { +input+ { { f "val" } { f "obj" } { [ cells ] "n" } } }
+            { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
             { +scratch+ { { f "x" } } }
             { +clobber+ { "obj" } }
         }
@@ -116,7 +116,7 @@ math-internals namespaces sequences words ;
 
 : fixnum-value-op ( op -- pair )
     [ "out" operand "x" operand "y" operand ] swap add H{
-        { +input+ { { f "x" } { [ v>operand ] "y" } } }
+        { +input+ { { f "x" } { [ small-tagged? ] "y" } } }
         { +scratch+ { { f "out" } } }
         { +output+ { "out" } }
     } 2array ;
@@ -134,6 +134,37 @@ math-internals namespaces sequences words ;
 } [
     first3 define-fixnum-op
 ] each
+
+\ fixnum*fast {
+    {
+        [
+            "out" operand "x" operand "y" get MULLI
+        ] H{
+            { +input+ { { f "x" } { [ small-tagged? ] "y" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    } {
+        [
+            "out" operand "x" operand %untag-fixnum
+            "out" operand "y" operand "out" operand MULLW
+        ] H{
+            { +input+ { { f "x" } { f "y" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    }
+} define-intrinsics
+
+\ fixnum-shift [
+    "out" operand "x" operand "y" get neg SRAWI
+    ! Mask off low bits
+    "out" operand dup %untag
+] H{
+    { +input+ { { f "x" } { [ -31 0 between? ] "y" } } }
+    { +scratch+ { { f "out" } } }
+    { +output+ { "out" } }
+} define-intrinsic
 
 : generate-fixnum-mod
     #! PowerPC doesn't have a MOD instruction; so we compute
@@ -165,7 +196,7 @@ math-internals namespaces sequences words ;
 
 : fixnum-value-jump ( op -- pair )
     [ 0 "x" operand "y" operand CMPI ] swap add
-    { { f "x" } { [ v>operand ] "y" } } 2array ;
+    { { f "x" } { [ small-tagged? ] "y" } } 2array ;
 
 : define-fixnum-jump ( word op -- )
     [ fixnum-value-jump ] keep fixnum-register-jump
@@ -181,7 +212,10 @@ math-internals namespaces sequences words ;
     first2 define-fixnum-jump
 ] each
 
-: simple-overflow ( insn1 insn2 -- )
+: %untag-fixnums ( seq -- )
+    [ dup %untag-fixnum ] unique-operands ;
+
+: overflow-check ( insn1 insn2 -- )
     [
         >r 0 0 LI
         0 MTXER
@@ -189,29 +223,22 @@ math-internals namespaces sequences words ;
         >r
         "end" define-label
         "end" get BNO
-        { "x" "y" } [ dup %untag-fixnum ] unique-operands
+        { "x" "y" } %untag-fixnums
         "r" operand "y" operand "x" operand r> execute
         "r" operand %allot-bignum-signed-1
         "end" resolve-label
     ] with-scope ; inline
 
-\ fixnum+ [
-    \ ADD \ ADDO. simple-overflow
-] H{
-    { +input+ { { f "x" } { f "y" } } }
-    { +scratch+ { { f "r" } } }
-    { +output+ { "r" } }
-    { +clobber+ { "x" "y" } }
-} define-intrinsic
+: overflow-template ( word insn1 insn2 -- )
+    [ overflow-check ] curry curry H{
+        { +input+ { { f "x" } { f "y" } } }
+        { +scratch+ { { f "r" } } }
+        { +output+ { "r" } }
+        { +clobber+ { "x" "y" } }
+    } define-intrinsic ;
 
-\ fixnum- [
-    \ SUBF \ SUBFO. simple-overflow
-] H{
-    { +input+ { { f "x" } { f "y" } } }
-    { +scratch+ { { f "r" } } }
-    { +output+ { "r" } }
-    { +clobber+ { "x" "y" } }
-} define-intrinsic
+\ fixnum+ \ ADD \ ADDO. overflow-template
+\ fixnum- \ SUBF \ SUBFO. overflow-template
 
 : generate-fixnum/i
     #! This VOP is funny. If there is an overflow, it falls
@@ -259,16 +286,8 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 \ fixnum>bignum [
-    "nonzero" define-label
-    "end" define-label
-    0 "x" operand 0 CMPI ! is it zero?
-    "nonzero" get BNE
-    0 >bignum "x" get load-literal
-    "end" get B
-    "nonzero" resolve-label
     "x" operand dup %untag-fixnum
     "x" operand %allot-bignum-signed-1
-    "end" resolve-label
 ] H{
     { +input+ { { f "x" } } }
     { +output+ { "x" } }
@@ -282,7 +301,7 @@ math-internals namespaces sequences words ;
     "y" operand "x" operand cell LWZ
      ! if the length is 1, its just the sign and nothing else,
      ! so output 0
-    0 "y" operand 1 tag-bits shift CMPI
+    0 "y" operand 1 v>operand CMPI
     "nonzero" get BNE
     0 "y" operand LI
     "end" get B
@@ -346,7 +365,7 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 \ tag [
-    "out" operand "in" operand tag-mask ANDI
+    "out" operand "in" operand tag-mask get ANDI
     "out" operand dup %tag-fixnum
 ] H{
     { +input+ { { f "in" } } }
@@ -358,24 +377,24 @@ math-internals namespaces sequences words ;
     "f" define-label
     "end" define-label
     ! Get the tag
-    "y" operand "obj" operand tag-mask ANDI
+    "y" operand "obj" operand tag-mask get ANDI
     ! Tag the tag
     "y" operand "x" operand %tag-fixnum
     ! Compare with object tag number (3).
-    0 "y" operand object-tag CMPI
+    0 "y" operand object tag-number CMPI
     ! Jump if the object doesn't store type info in its header
     "end" get BNE
     ! It does store type info in its header
     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
-    0 "obj" operand object-tag CMPI
+    0 "obj" operand object tag-number CMPI
     "f" get BEQ
     ! The pointer is not equal to 3. Load the object header.
-    "x" operand "obj" operand object-tag neg LWZ
+    "x" operand "obj" operand object tag-number neg LWZ
     "x" operand dup %untag
     "end" get B
     "f" resolve-label
     ! The pointer is equal to 3. Load F_TYPE (9).
-    f type tag-bits shift "x" operand LI
+    f type v>operand "x" operand LI
     "end" resolve-label
 ] H{
     { +input+ { { f "obj" } } }
@@ -408,4 +427,20 @@ math-internals namespaces sequences words ;
     { +input+ { { f "val" } { f "n" } } }
     { +scratch+ { { f "x" } } }
     { +clobber+ { "n" } }
+} define-intrinsic
+
+\ <tuple> [
+    "tuple" operand "class" operand "n" get %allot-tuple
+] H{
+    { +input+ { { f "class" } { [ inline-array? ] "n" } } }
+    { +scratch+ { { f "tuple" } } }
+    { +output+ { "tuple" } }
+} define-intrinsic
+
+\ <array> [
+    "array" operand "initial" operand "n" get %allot-array
+] H{
+    { +input+ { { [ inline-array? ] "n" } { f "initial" } } }
+    { +scratch+ { { f "array" } } }
+    { +output+ { "array" } }
 } define-intrinsic

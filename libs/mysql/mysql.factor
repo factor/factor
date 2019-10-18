@@ -8,7 +8,8 @@
 ! Tested with MySQL version - 5.0.24a
 
 IN: mysql
-USING: kernel alien errors io prettyprint sequences namespaces arrays math tools ;
+USING: kernel alien errors io prettyprint 
+    sequences namespaces arrays math tools generic ;
 
 SYMBOL: my-conn
 
@@ -68,25 +69,30 @@ C: mysql-connection ( host user password db port -- mysql-connection )
 
 : (mysql-num-cols) ( mysql-connection -- n )
     mysql-connection-resulthandle mysql_num_fields ;
-
-: (mysql-row>seq) ( object n -- seq )
-    [ swap char*-nth ] map-with ;
+   
+: mysql-char*-nth ( index object -- str )
+    #! Utility based on 'char*-nth' to perform an additional sanity check on the value
+    #! extracted from the array of strings.
+    void*-nth [ alien>char-string ] [ "" ] if* ;
+        
+: mysql-row>seq ( object n -- seq )
+    [ swap mysql-char*-nth ] map-with ;
     
 : (mysql-result>seq) ( seq -- seq )
     my-conn get (mysql-row) dup [       
-        my-conn get (mysql-num-cols) (mysql-row>seq)
+        my-conn get (mysql-num-cols) mysql-row>seq
         over push
         (mysql-result>seq)
-    ] [
-        drop
-    ] if ;
-        
-: (mysql-close) ( mysql-connection -- )
-    mysql-connection-mysqlconn mysql_close ;
-
+    ] [ drop ] if 
+    ! Perform needed cleanup on fetched results
+    my-conn get (mysql-free-result) ;
+            
 ! =========================================================
 !  Public Word Definitions
 ! =========================================================
+
+: mysql-close ( mysql-connection -- )
+    mysql-connection-mysqlconn mysql_close ;
 
 : mysql-print-table ( seq -- )
     [ [ write bl ] each "\n" write ] each ;
@@ -110,9 +116,9 @@ C: mysql-connection ( host user password db port -- mysql-connection )
     [ 
         >r <mysql-connection> my-conn set 
             my-conn get mysql-connect drop r> 
-        [ my-conn get (mysql-close) ] cleanup
+        [ my-conn get mysql-close ] cleanup
     ] with-scope ; inline
     
 : with-mysql-catch ( host user password db port quot -- )
     [ with-mysql ] catch [ "Caught: " write print ] when* ;
-
+    

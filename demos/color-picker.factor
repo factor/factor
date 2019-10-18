@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: color-picker
 USING: gadgets-sliders gadgets-labels gadgets models arrays
@@ -6,10 +6,8 @@ namespaces kernel math prettyprint sequences ;
 
 ! Simple example demonstrating the use of models.
 
-: <color-slider> ( -- gadget )
-    <x-slider>
-    1 over set-slider-line
-    255 over set-slider-max ;
+: <color-slider> ( model -- gadget )
+    <x-slider> 1 over set-slider-line ;
 
 : <color-preview> ( model -- gadget )
     <gadget> { 100 100 } over set-rect-dim
@@ -19,19 +17,16 @@ namespaces kernel math prettyprint sequences ;
     [ [ 256 /f ] map 1 add <solid> ] <filter> ;
 
 : <color-sliders> ( -- model gadget )
-    [
-        <color-slider> dup , control-model
-        <color-slider> dup , control-model
-        <color-slider> dup , control-model
-        3array <compose>
-    ] { } make make-pile 1 over set-pack-fill ;
+    3 [ drop 0 0 0 255 <range> ] map
+    dup [ range-model ] map <compose>
+    swap [ [ <color-slider> gadget, ] each ] make-filled-pile ;
 
 : <color-picker> ( -- gadget )
-    {
-        { [ <color-sliders> ] f f @top }
-        { [ dup <color-model> <color-preview> ] f f @center }
-        { [ [ unparse ] <filter> <label-control> ] f f @bottom }
-    } make-frame ;
+    [
+        <color-sliders> @top grid,
+        dup <color-model> <color-preview> @center grid,
+        [ unparse ] <filter> <label-control> @bottom grid,
+    ] make-frame ;
 
 PROVIDE: demos/color-picker ;
 

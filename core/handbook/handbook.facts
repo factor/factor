@@ -1,7 +1,7 @@
 USING: alien errors generic hashtables help inference tools
 io-internals io libc math-internals modules namespaces parser
 prettyprint queues sequences sequences-internals test words 
-kernel generic ;
+kernel generic assocs ;
 
 ARTICLE: "handbook" "Factor documentation"
 { $subsection "changes" }
@@ -34,7 +34,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "new-gadgets" }
 { $subsection "ui-backend" }
 { $heading "Currently-loaded modules:" }
-{ $outliner [ modules-help ] }
+{ $index [ modules-help ] }
 { $heading "Index:" }
 { $subsection "article-index" }
 { $subsection "error-index" }
@@ -43,16 +43,16 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "primitive-index" } ;
 
 ARTICLE: "article-index" "Article index"
-{ $outliner [ articles get hash-keys ] } ;
+{ $index [ articles get keys ] } ;
 
 ARTICLE: "primitive-index" "Primitive index"
-{ $outliner [ all-words [ primitive? ] subset ] } ;
+{ $index [ all-words [ primitive? ] subset ] } ;
 
 ARTICLE: "error-index" "Error index"
-{ $outliner [ all-errors ] } ;
+{ $index [ all-errors ] } ;
 
 ARTICLE: "type-index" "Type index"
-{ $outliner [ builtins get [ ] subset ] } ;
+{ $index [ builtins get [ ] subset ] } ;
 
 ARTICLE: "class-index" "Class index"
-{ $outliner [ classes ] } ;
+{ $index [ classes ] } ;

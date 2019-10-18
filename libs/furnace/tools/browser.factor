@@ -2,8 +2,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: furnace:browser
-USING: definitions hashtables help html httpd io kernel memory
-namespaces prettyprint sequences words xml furnace arrays ;
+USING: definitions assocs help html httpd io kernel memory
+namespaces prettyprint sequences words xml furnace arrays
+quotations inspector ;
 
 TUPLE: list current options name ;
 
@@ -14,7 +15,7 @@ TUPLE: list current options name ;
 
 : word-list ( word vocab -- )
     [ lookup [ word-name ] [ f ] if* ] keep
-    vocab hash-keys natural-sort "word" list ;
+    vocab keys natural-sort "word" list ;
 
 : browser-title ( word vocab -- str )
     2dup lookup dup

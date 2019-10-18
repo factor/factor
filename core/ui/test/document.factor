@@ -6,7 +6,7 @@ USING: gadgets-text namespaces test ;
 [ { 10 4 } ] [ { "a" } { 10 3 } text+loc ] unit-test
 [ { 10 4 } ] [ { "a" } { 10 3 } text+loc ] unit-test
 
-[ { 2 0 } ] [
+[ { 2 9 } ] [
     <document> "doc" set
     "Hello world,\nhow are you?\nMore text"
     "doc" get set-doc-string

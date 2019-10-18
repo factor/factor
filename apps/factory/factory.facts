@@ -18,7 +18,7 @@ ARTICLE: "factory" "Factory"
 ! " and "
 ! { $module-link "libs/vocabs" }
 ! " into your image and save."
-! $terpri
+! $nl
 ! "From the shell:"
 ! 
 ! { $code "$ ./f -e='\"libs/process\" require save 0 exit'"

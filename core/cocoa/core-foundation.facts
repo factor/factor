@@ -1,0 +1,38 @@
+IN: cocoa
+USING: alien strings arrays help ;
+
+HELP: CF>array
+{ $values { "alien" "a " { $snippet "CFArray" } } { "array" "an array of " { $link alien } " instances" } }
+{ $description "Creates a Factor array from a Core Foundation array." } ;
+
+HELP: <CFArray>
+{ $values { "array" "an array of " { $link alien } " instances" } { "alien" "a " { $snippet "CFArray" } } }
+{ $description "Creates a Core Foundation array from a Factor array." } ;
+
+HELP: <CFString>
+{ $values { "string" string } { "alien" "a " { $snippet "CFString" } } }
+{ $description "Creates a Core Foundation string from a Factor string." } ;
+
+HELP: CF>string
+{ $values { "alien" "a " { $snippet "CFString" } } { "string" string } }
+{ $description "Creates a Factor string from a Core Foundation string." } ;
+
+HELP: CF>string-array
+{ $values { "alien" "a " { $snippet "CFArray" } " of " { $snippet "CFString" } " instances" } { "seq" string } }
+{ $description "Creates an array of Factor strings from a " { $snippet "CFArray" } " of " { $snippet "CFString" } "s." } ;
+
+HELP: <CFFileSystemURL>
+{ $values { "string" "a pathname string" } { "dir?" "a boolean indicating if the pathname is a directory" } { "url" "a " { $snippet "CFURL" } } }
+{ $description "Creates a new " { $snippet "CFURL" } " pointing to the given local pathname." } ;
+
+HELP: <CFURL>
+{ $values { "string" "a URL string" } { "url" "a " { $snippet "CFURL" } } }
+{ $description "Creates a new " { $snippet "CFURL" } "." } ;
+
+HELP: <CFBundle>
+{ $values { "string" "a pathname string" } { "url" "a " { $snippet "CFURL" } } }
+{ $description "Creates a new " { $snippet "CFBundle" } "." } ;
+
+HELP: load-framework
+{ $values { "string" "a pathname string" } }
+{ $description "Loads a Core Foundation framework." } ;

@@ -16,7 +16,9 @@ M: word-break-gadget draw-gadget* drop ;
 TUPLE: paragraph margin ;
 
 C: paragraph ( margin -- gadget )
-    [ set-paragraph-margin ] keep dup delegate>gadget ;
+    dup delegate>gadget
+    { 1 0 } over set-gadget-orientation
+    [ set-paragraph-margin ] keep ;
 
 SYMBOL: x SYMBOL: max-x
 
@@ -26,7 +28,7 @@ SYMBOL: line-height
 
 SYMBOL: margin
 
-: overrun? ( width -- ? ) x get + margin get >= ;
+: overrun? ( width -- ? ) x get + margin get > ;
 
 : wrap-line ( -- )
     line-height get y +@

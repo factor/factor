@@ -10,30 +10,26 @@ USING: kernel vectors sequences hashtables errors ;
     3 getenv { vector } declare ; inline
 
 : >n ( namespace -- )
-    dup hashtable? [ <namespace-error> throw ] unless
     namestack* push ;
 
 : n> ( -- namespace ) namestack* pop ;
 
 IN: namespaces
-USING: arrays kernel-internals math strings words ;
+USING: arrays kernel-internals math strings words assocs ;
 
 : namespace ( -- namespace )
-    namestack* peek { hashtable } declare ;
+    namestack* peek ;
 
 : namestack ( -- namestack ) namestack* clone ; inline
 : set-namestack ( namestack -- ) >vector 3 setenv ; inline
 : ndrop ( -- ) namestack* pop* ;
 : global ( -- g ) 4 getenv { hashtable } declare ; inline
-: get ( variable -- value ) namestack* hash-stack ;
-: set ( value variable -- ) namespace set-hash ;
+: get ( variable -- value ) namestack* assoc-stack ;
+: set ( value variable -- ) namespace set-at ;
 : on ( variable -- ) t swap set ; inline
 : off ( variable -- ) f swap set ; inline
-: get-global ( variable -- value ) global hash ; inline
-: set-global ( value variable -- ) global set-hash ; inline
-
-: nest ( variable -- namespace )
-    dup namespace hash [ ] [ >r H{ } clone dup r> set ] ?if ;
+: get-global ( variable -- value ) global at ; inline
+: set-global ( value variable -- ) global set-at ; inline
 
 : change ( variable quot -- )
     >r dup get r> rot slip set ; inline
@@ -48,7 +44,7 @@ USING: arrays kernel-internals math strings words ;
 
 : counter ( variable -- n ) global [ dup inc get ] bind ;
 
-: make-hash ( quot -- hash ) H{ } clone >n call n> ; inline
+: make-assoc ( quot exemplar -- hash ) 20 swap new-assoc >n call n> ; inline
 
 : with-scope ( quot -- ) H{ } clone >n call ndrop ; inline
 
@@ -66,18 +62,18 @@ SYMBOL: building
 
 : , ( elt -- ) building get push ;
 
-: % ( seq -- ) building get nappend ;
+: % ( seq -- ) building get push-all ;
 
 : init-namespaces ( -- ) global 1array set-namestack ;
 
 IN: sequences
 
 : join ( seq glue -- newseq )
-    [ swap [ % ] [ dup % ] interleave drop ] over make ;
+    [ swap [ dup % ] [ % ] interleave drop ] over make ;
 
 : (prune) ( hash vec elt -- )
-    rot 2dup hash-member?
-    [ 3drop ] [ dupd dupd set-hash swap push ] if ; inline
+    rot 2dup key?
+    [ 3drop ] [ dupd dupd set-at swap push ] if ; inline
 
 : prune ( seq -- newseq )
     dup length <hashtable> over length <vector>

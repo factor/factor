@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays errors freetype gadgets gadgets-listener
-       gadgets-workspace hashtables io kernel math namespaces
+USING: alien arrays assocs errors freetype gadgets gadgets-listener
+       gadgets-workspace io kernel math namespaces
        prettyprint sequences strings vectors words win32-api
        win32-api-messages tools threads memory timers ;
 IN: win32
@@ -11,9 +11,7 @@ TUPLE: win hWnd hDC hRC world ;
 
 SYMBOL: msg-obj
 SYMBOL: class-name
-SYMBOL: track-mouse-state
-
-: random-class-name "Factor" (random) number>string append ;
+SYMBOL: mouse-captured
 
 : style ( -- n ) WS_OVERLAPPEDWINDOW ; inline
 : ex-style ( -- n ) WS_EX_APPWINDOW WS_EX_WINDOWEDGE bitor ; inline
@@ -37,8 +35,7 @@ SYMBOL: track-mouse-state
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window dup rect-dim [ 0 > ] all?
-    [ draw-world ] [ drop ] if ;
+    3drop window dup draw-world ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array
@@ -49,8 +46,8 @@ SYMBOL: track-mouse-state
     H{
         { 8 "BACKSPACE" }
         { 9 "TAB" }
-        { 13 "RETURN" }
-        { 27 "ESCAPE" }
+        { 13 "RET" }
+        { 27 "ESC" }
         { 33 "PAGE_UP" }
         { 34 "PAGE_DOWN" }
         { 35 "END" }
@@ -88,9 +85,10 @@ SYMBOL: track-mouse-state
 : ctrl? ( -- ? ) left-ctrl? right-ctrl? or ;
 : alt? ( -- ? ) left-alt? right-alt? or ;
 : caps-lock? ( -- ? ) VK_CAPITAL GetKeyState zero? not ;
-: lower-case? ( -- ? ) shift? caps-lock? and caps-lock? not shift? not and or ;
+: switch-case ( seq -- seq ) dup first CHAR: a >= [ >upper ] [ >lower ] if ;
+: switch-case? ( -- ? ) shift? caps-lock? xor not ;
 
-: key-modifiers ( -- list )
+: key-modifiers ( -- seq )
     [
         shift? [ S+ , ] when
         ctrl? [ C+ , ] when
@@ -110,17 +108,27 @@ SYMBOL: track-mouse-state
     H{
         { 8 "BACKSPACE" }
         { 9 "TAB" }
-        { 13 "RETURN" }
-        { 27 "ESCAPE" }
+        { 13 "RET" }
+        { 27 "ESC" }
     } ;
 
-: exclude-key-wm-keydown? ( n -- bool ) exclude-keys-wm-keydown hash* nip ;
-: exclude-key-wm-char? ( n -- bool ) exclude-keys-wm-char hash* nip ;
- 
-: keystroke>gesture ( n -- sym mods )
-    dup wm-keydown-codes hash*
-    [ nip ] [ drop 1string lower-case? [ >lower ] when ] if
-    key-modifiers swap ;
+: exclude-key-wm-keydown? ( n -- bool )
+    exclude-keys-wm-keydown key? ;
+
+: exclude-key-wm-char? ( n -- bool )
+    exclude-keys-wm-char key? ;
+
+: keystroke>gesture ( n -- mods sym ? )
+    dup wm-keydown-codes at* [
+        nip >r key-modifiers r> t
+    ] [
+        drop 1string >r key-modifiers r>
+        C+ pick member? >r A+ pick member? r> or [
+            shift? [ >lower ] unless f
+        ] [
+            switch-case? [ switch-case ] when t
+        ] if
+    ] if ;
 
 SYMBOL: lParam
 SYMBOL: wParam
@@ -185,30 +193,43 @@ SYMBOL: hWnd
         { [ t ] [ "bad button" throw ] }
     } cond ;
 
+: mouse-buttons ( -- seq ) WM_LBUTTONDOWN WM_RBUTTONDOWN 2array ;
+
 : capture-mouse? ( umsg -- ? )
-    { WM_LBUTTONDOWN WM_RBUTTONDOWN } member? ;
+    mouse-buttons member? ;
 
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
     nip >r mouse-event>gesture r> >lo-hi rot window ;
 
+: mouse-captured? ( -- ? )
+    mouse-captured get ;
+
+: set-capture ( hwnd -- )
+    mouse-captured get [
+        drop
+    ] [
+        [ SetCapture drop ] keep mouse-captured set
+    ] if ;
+
+: release-capture ( -- )
+    ReleaseCapture win32-error=0/f
+    mouse-captured off ;
+
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
-    >r over capture-mouse? [ pick SetCapture drop ] when r>
+    >r over capture-mouse? [ pick set-capture ] when r>
     prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
-    pick capture-mouse? [ ReleaseCapture drop ] when
+    mouse-captured? [ release-capture ] when
     prepare-mouse send-button-up ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
     2nip
-    track-mouse-state get [
-        over "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
-        "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize
-        TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
-        0 over set-TRACKMOUSEEVENT-dwHoverTime
-        TrackMouseEvent drop
-        track-mouse-state on
-    ] unless
+    over "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
+    "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize
+    TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
+    0 over set-TRACKMOUSEEVENT-dwHoverTime
+    TrackMouseEvent drop
     >lo-hi swap window move-hand fire-motion ;
 
 : handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
@@ -217,11 +238,11 @@ SYMBOL: hWnd
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
-    3drop drop ReleaseCapture drop ;
+    3drop drop release-capture ;
 
 : handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
     #! message sent if mouse leaves main application 
-    3drop drop forget-rollover track-mouse-state off ;
+    3drop drop forget-rollover ;
 
 : 4dup ( a b c d -- a b c d a b c d )
     >r >r 2dup r> r> 2swap >r >r 2dup r> r> 2swap ;
@@ -281,18 +302,25 @@ SYMBOL: hWnd
         [ do-events ui-step ] ui-try event-loop
     ] unless ;
 
-: register-wndclassex ( classname wndproc -- class )
+: register-wndclassex ( -- class )
     "WNDCLASSEX" <c-object>
-    "WNDCLASSEX" heap-size over set-WNDCLASSEX-cbSize
-    CS_HREDRAW CS_VREDRAW bitor CS_OWNDC bitor over set-WNDCLASSEX-style
-    [ set-WNDCLASSEX-lpfnWndProc ] keep
-    0 over set-WNDCLASSEX-cbClsExtra
-    0 over set-WNDCLASSEX-cbWndExtra
-    f GetModuleHandle over set-WNDCLASSEX-hInstance
-    f IDI_APPLICATION LoadIcon over set-WNDCLASSEX-hIcon
-    f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
-    [ set-WNDCLASSEX-lpszClassName ] keep
-    RegisterClassEx dup win32-error=0/f ;
+    f GetModuleHandle
+    class-name get malloc-u16-string
+    pick GetClassInfoEx 0 =
+    [
+      "WNDCLASSEX" heap-size over set-WNDCLASSEX-cbSize
+      CS_HREDRAW CS_VREDRAW bitor CS_OWNDC bitor over set-WNDCLASSEX-style
+      ui-wndproc over set-WNDCLASSEX-lpfnWndProc
+      0 over set-WNDCLASSEX-cbClsExtra
+      0 over set-WNDCLASSEX-cbWndExtra
+      f GetModuleHandle over set-WNDCLASSEX-hInstance
+      f GetModuleHandle "fraptor" string>u16-alien LoadIcon over set-WNDCLASSEX-hIcon
+      f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
+
+      class-name get malloc-u16-string over set-WNDCLASSEX-lpszClassName
+
+      RegisterClassEx dup win32-error=0/f
+    ] when ;
 
 : create-window ( width height -- hwnd )
     make-adjusted-RECT
@@ -310,8 +338,7 @@ SYMBOL: hWnd
 
 : init-win32-ui
     "MSG" <c-object> msg-obj set
-    random-class-name class-name set
-    class-name get malloc-u16-string ui-wndproc
+    "Factor-window" class-name set
     register-wndclassex win32-error=0/f
     GetDoubleClickTime double-click-timeout set-global ;
 
@@ -350,7 +377,9 @@ IN: gadgets
 
 ! Move window to front
 : raise-window ( world -- )
-    world-handle win-hWnd SetFocus drop ReleaseCapture drop ;
+    world-handle [
+        win-hWnd SetFocus drop release-capture
+    ] when* ;
 
 : set-title ( string world -- )
     world-handle win-hWnd

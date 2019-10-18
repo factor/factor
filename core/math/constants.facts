@@ -1,4 +1,4 @@
-USING: help kernel-internals math ;
+USING: help kernel math ;
 
 HELP: cells
 { $values { "m" "an integer" } { "n" "an integer" } }

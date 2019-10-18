@@ -1,5 +1,5 @@
 IN: templating
-USING: kernel xml sequences hashtables tools io arrays namespaces
+USING: kernel xml sequences assocs tools io arrays namespaces
     xml-data xml-utils xml-writer test generic ;
 
 : sub-tag
@@ -10,12 +10,12 @@ SYMBOL: ref-table
 GENERIC: (r-ref) ( xml -- )
 M: tag (r-ref)
     dup sub-tag tag-attr [
-        ref-table get hash
+        ref-table get at
         swap set-tag-children
     ] [ drop ] if* ;
 M: object (r-ref) drop ;
 
-: template ( xml -- xml )
+: template ( xml -- )
     [ (r-ref) ] xml-each ;
 
 ! Example

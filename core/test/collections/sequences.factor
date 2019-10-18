@@ -1,6 +1,7 @@
 IN: temporary
 USING: arrays kernel math namespaces sequences kernel-internals
-sequences-internals strings sbufs test vectors ;
+sequences-internals strings sbufs test vectors bit-arrays
+generic ;
 
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
 [ 3 ] [ 1 4 dup <slice> length ] unit-test
@@ -16,11 +17,11 @@ sequences-internals strings sbufs test vectors ;
 [ 5040 [ 1 1 2 6 24 120 720 ] ]
 [ [ 1 2 3 4 5 6 7 ] 1 [ * ] accumulate ] unit-test
 
-[ -1 f ] [ [ ] [ ] find ] unit-test
+[ f f ] [ [ ] [ ] find ] unit-test
 [ 0 1 ] [ [ 1 ] [ ] find ] unit-test
 [ 1 "world" ] [ [ "hello" "world" ] [ "world" = ] find ] unit-test
 [ 2 3 ] [ [ 1 2 3 ] [ 2 > ] find ] unit-test
-[ -1 f ] [ [ 1 2 3 ] [ 10 > ] find ] unit-test
+[ f f ] [ [ 1 2 3 ] [ 10 > ] find ] unit-test
 
 [ 1 CHAR: e ]
 [ "aeiou" "hello world" [ swap member? ] find-with ] unit-test
@@ -38,9 +39,9 @@ sequences-internals strings sbufs test vectors ;
 
 [ 4 ] [ CHAR: x "tuvwxyz" >vector index ] unit-test 
 
-[ -1 ] [ CHAR: x 5 "tuvwxyz" >vector index* ] unit-test 
+[ f ] [ CHAR: x 5 "tuvwxyz" >vector index* ] unit-test 
 
-[ -1 ] [ CHAR: a 0 "tuvwxyz" >vector index* ] unit-test
+[ f ] [ CHAR: a 0 "tuvwxyz" >vector index* ] unit-test
 
 [ f ] [ [ "Hello" { } 4/3 ] [ string? ] all? ] unit-test
 [ t ] [ [ ] [ ] all? ] unit-test
@@ -108,7 +109,7 @@ unit-test
 
 [ 3 ] [ { 1 2 3 4 } midpoint ] unit-test
 
-[ -1 ] [ 3 { } [ - ] binsearch ] unit-test
+[ f ] [ 3 { } [ - ] binsearch ] unit-test
 [ 0 ] [ 3 { 3 } [ - ] binsearch ] unit-test
 [ 1 ] [ 2 { 1 2 3 } [ - ] binsearch ] unit-test
 [ 3 ] [ 4 { 1 2 3 4 5 6 } [ - ] binsearch ] unit-test
@@ -116,28 +117,11 @@ unit-test
 [ 3 ] [ 5.5 { 1 2 3 4 5 6 7 8 } [ - ] binsearch ] unit-test
 [ 10 ] [ 10 20 >vector [ - ] binsearch ] unit-test
 
-: seq-sorter 0 over length 1- <sorter> ;
-
-[ { 4 2 3 1 } ]
-[ { 1 2 3 4 } clone dup seq-sorter sorter-exchange ] unit-test
-
-[ -1 ] [ [ - ] { 1 2 3 4 } seq-sorter 1 sorter-compare ] unit-test
-
-[ 1 ] [ [ - ] { -5 4 -3 5 } seq-sorter 2dup sort-up sorter-start nip ] unit-test
-
-[ 3 ] [ [ - ] { -5 4 -3 -6 5 } seq-sorter 2dup sort-down sorter-end nip ] unit-test
-
-[ { 1 2 3 4 5 6 7 8 9 } ] [
-    [ - ] { 9 8 7 6 5 4 3 2 1 } clone seq-sorter 2dup sort-step
-    sorter-seq >array nip
-] unit-test
-
-[ { 1 2 3 4 5 6 7 8 9 } ] [
-    [ - ] { 1 2 3 4 5 6 7 8 9 } clone seq-sorter 2dup sort-step
-    sorter-seq >array nip
-] unit-test
-
 [ [ ] ] [ [ ] natural-sort ] unit-test
+
+[ { 270000000 270000001 } ]
+[ T{ slice f 270000002 270000000 270000002 } natural-sort ]
+unit-test
 
 [ t ] [
     100 [
@@ -156,7 +140,37 @@ unit-test
 [ V{ "x" } ] [ "f" V{ "f" "x" "f" } clone [ delete ] keep ] unit-test
 [ V{ "y" "x" } ] [ "f" V{ "y" "f" "x" "f" } clone [ delete ] keep ] unit-test
 
-[ { 1 4 9 } ] [ { 1 2 3 } clone dup [ sq ] inject ] unit-test
+[ V{ 0 1 4 5 } ] [ 6 >vector 2 4 pick delete-slice ] unit-test
+
+[ 6 >vector 2 8 pick delete-slice ] unit-test-fails
+
+[ V{ } ] [ 6 >vector 0 6 pick delete-slice ] unit-test
+
+[ V{ 1 2 "a" "b" 5 6 7 } ] [
+    { "a" "b" } 2 4 V{ 1 2 3 4 5 6 7 } clone
+    [ replace-slice ] keep
+] unit-test
+
+[ V{ 1 2 "a" "b" 6 7 } ] [
+    { "a" "b" } 2 5 V{ 1 2 3 4 5 6 7 } clone
+    [ replace-slice ] keep
+] unit-test
+
+[ V{ 1 2 "a" "b" 4 5 6 7 } ] [
+    { "a" "b" } 2 3 V{ 1 2 3 4 5 6 7 } clone
+    [ replace-slice ] keep
+] unit-test
+
+[ V{ 1 2 3 4 5 6 7 "a" "b" } ] [
+    { "a" "b" } 7 7 V{ 1 2 3 4 5 6 7 } clone
+    [ replace-slice ] keep
+] unit-test
+
+[ V{ "a" 3 } ] [
+    { "a" } 0 2 V{ 1 2 3 } clone [ replace-slice ] keep
+] unit-test
+
+[ { 1 4 9 } ] [ { 1 2 3 } clone dup [ sq ] change-each ] unit-test
 
 [ { "one" "two" "three" 4 5 6 } ]
 [
@@ -170,17 +184,19 @@ unit-test
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
 [ 5 ] [ 1 >bignum "\u0001\u0005\u0007" nth-unsafe ] unit-test
 
-[ "before&after" ] [ "&" 6 11 "before and after" replace-slice ] unit-test
+[ SBUF" before&after" ] [
+    "&" 6 11 SBUF" before and after" [ replace-slice ] keep
+] unit-test
 
 [ 3 "a" ] [ { "a" "b" "c" "a" "d" } [ "a" = ] find-last ] unit-test
 
-[ -1 f ] [ -1 { 1 2 3 } [ 1 = ] find* ] unit-test
+[ f f ] [ -1 { 1 2 3 } [ 1 = ] find* ] unit-test
 
 [ 0 ] [ { "a" "b" "c" } { "A" "B" "C" } mismatch ] unit-test
 
 [ 1 ] [ { "a" "b" "c" } { "a" "B" "C" } mismatch ] unit-test
 
-[ -1 ] [ { "a" "b" "c" } { "a" "b" "c" } mismatch ] unit-test
+[ f ] [ { "a" "b" "c" } { "a" "b" "c" } mismatch ] unit-test
 
 [ V{ } V{ } ] [ { "a" "b" } { "a" "b" } drop-prefix [ >vector ] 2apply ] unit-test
 
@@ -211,7 +227,9 @@ unit-test
 [ -10 "hi" "bye" copy ] unit-test-fails
 [ 10 "hi" "bye" copy ] unit-test-fails
 
-[ { 1 2 3 5 6 } ] [ 3 { 1 2 3 4 5 6 } remove-nth ] unit-test
+[ V{ 1 2 3 5 6 } ] [
+    3 V{ 1 2 3 4 5 6 } clone [ delete-nth ] keep
+] unit-test
 
 [ V{ 1 2 3 } ]
 [ 3 V{ 1 2 } clone [ push-new ] keep ] unit-test
@@ -223,14 +241,14 @@ unit-test
 { { 1 2 3 } { 4 5 6 } { 7 8 9 } } [ clone ] map "seq" set
 
 [ { 1 4 7 } ] [ "seq" get 0 <column> >array ] unit-test
-[ ] [ "seq" get 1 <column> [ sq ] inject ] unit-test
+[ ] [ "seq" get 1 <column> [ sq ] change-each ] unit-test
 [ { 4 25 64 } ] [ "seq" get 1 <column> >array ] unit-test
 
 [ { 1 2 3 } 0 group ] unit-test-fails
 
 ! erg's random tester found this one
 [ SBUF" 12341234" ] [
-    9 <sbuf> dup "1234" swap nappend dup dup swap nappend
+    9 <sbuf> dup "1234" swap push-all dup dup swap push-all
 ] unit-test
 
 [ f ] [ f V{ } like f V{ } like eq? ] unit-test
@@ -249,3 +267,10 @@ unit-test
 
 [ -1 f <array> ] unit-test-fails
 [ cell-bits cell log2 - 2^ f <array> ] unit-test-fails
+
+[ -1./0. 0 delete-nth ] unit-test-fails
+
+! erg found this one
+[ fixnum ] [
+    2 >bignum V{ } [ set-length ] keep length class
+] unit-test

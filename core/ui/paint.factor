@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays freetype generic hashtables io kernel
 math namespaces opengl sequences strings styles
@@ -7,15 +7,24 @@ IN: gadgets
 
 SYMBOL: clip
 
-: init-gl ( dim -- )
+: clip-x/y ( loc dim -- x y )
+    >r [ first ] keep r> [ second ] 2apply +
+    world get rect-dim second swap - [ >fixnum ] 2apply ;
+
+: gl-set-clip ( loc dim -- )
+    [ clip-x/y ] keep first2 [ >fixnum ] 2apply glScissor ;
+
+: do-clip ( -- ) clip get rect-bounds gl-set-clip ;
+
+: init-gl ( clip-rect dim -- )
     GL_PROJECTION glMatrixMode
     glLoadIdentity
     GL_MODELVIEW glMatrixMode
     glLoadIdentity
-    { 0 0 } over <rect> clip set
-    dup first2 0 0 2swap glViewport
-    0 over first2 0 gluOrtho2D
-    first2 0 0 2swap glScissor
+    0 0 pick first2 glViewport
+    0 swap first2 0 gluOrtho2D
+    clip set
+    do-clip
     GL_SMOOTH glShadeModel
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
@@ -47,15 +56,6 @@ DEFER: draw-gadget
 : change-clip ( gadget -- )
     >absolute clip [ rect-intersect ] change ;
 
-: clip-x/y ( loc dim -- x y )
-    >r [ first ] keep r> [ second ] 2apply +
-    world get rect-dim second swap - ;
-
-: gl-set-clip ( loc dim -- )
-    [ clip-x/y ] keep first2 glScissor ;
-
-: do-clip ( -- ) clip get rect-bounds gl-set-clip ;
-
 : with-clipping ( gadget quot -- )
     clip get >r
     over change-clip do-clip call
@@ -68,9 +68,9 @@ DEFER: draw-gadget
         { [ t ] [ [ (draw-gadget) ] with-clipping ] }
     } cond ;
 
-: (draw-world) ( world -- )
+: (draw-world) ( rect world -- )
     dup world-handle [
-        dup rect-dim init-gl draw-gadget
+        [ rect-dim init-gl ] keep draw-gadget
     ] with-gl-context ;
 
 ! Pen paint properties

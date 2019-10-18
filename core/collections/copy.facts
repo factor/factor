@@ -4,9 +4,10 @@ USING: help arrays ;
 HELP: copy
 { $values { "src" "a sequence" } { "n" "an index in " { $snippet "dest" } } { "dest" "a mutable sequence" } }
 { $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "n" } ". Grows " { $snippet "to" } " first if necessary." }
+{ $side-effects "dest" }
 { $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
 
-HELP: nappend
+HELP: push-all
 { $values { "src" "a sequence" } { "dest" "a resizable mutable sequence" } }
 { $description "Appends " { $snippet "src" } " to the end of " { $snippet "dest" } "." }
 { $side-effects "dest" }

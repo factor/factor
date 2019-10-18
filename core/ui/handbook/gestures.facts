@@ -1,8 +1,8 @@
-USING: help gadgets gadgets-buttons ;
+USING: help gadgets gadgets-buttons operations ;
 
 ARTICLE: "ui-gestures" "UI gestures"
 "User actions such as keyboard input and mouse button clicks deliver " { $emphasis "gestures" } " to gadgets. If the direct receiver of the gesture does not handle it, the gesture is passed on to the receiver's parent, and this way it travels up the gadget hierarchy. Gestures which are not handled at some point are ignored."
-$terpri
+$nl
 "There are two ways to define gesture handling logic. The simplest way is to associate a fixed set of gestures with a class:"
 { $subsection set-gestures }
 "Another way is to define a generic word on a class which handles all gestures sent to gadgets of that class:"
@@ -16,8 +16,9 @@ $terpri
 { $subsection "ui-user-input" }
 "Mouse input:"
 { $subsection "mouse-gestures" }
-"An abstraction built on top of gestures:"
-{ $subsection "ui-commands" } ;
+"Abstractions built on top of gestures:"
+{ $subsection "ui-commands" }
+{ $subsection "ui-operations" } ;
 
 ARTICLE: "ui-focus" "Keyboard focus"
 "The gadget with keyboard focus is the current receiver of keyboard gestures and user input. Gadgets that wish to receive keyboard input should request focus when clicked:"
@@ -47,9 +48,9 @@ ARTICLE: "keyboard-gestures" "Keyboard gestures"
 "A key symbol is either a single-character string denoting literal input, or one of the following strings:"
 { $list
   { $snippet "CLEAR" }
-  { $snippet "RETURN" }
+  { $snippet "RET" }
   { $snippet "ENTER" }
-  { $snippet "ESCAPE" }
+  { $snippet "ESC" }
   { $snippet "TAB" }
   { $snippet "BACKSPACE" }
   { $snippet "HOME" }
@@ -70,7 +71,9 @@ ARTICLE: "keyboard-gestures" "Keyboard gestures"
   { $snippet "PAGE_UP" }
   { $snippet "PAGE_DOWN" }
 }
-"Note that " { $snippet "RETURN" } ", " { $snippet "TAB" } " and " { $snippet "SPACE" } " are never delivered in their literal form, as " { $snippet "\"\\n\"" } ", " { $snippet "\"\\t\"" } " or "  { $snippet "\" \"" } "." ;
+"The " { $link S+ } " modifier is only ever used with the above action keys; alphanumeric input input with the shift key is delivered without the " { $link S+ } " modifier set, instead the input itself is upper case. For example, the gesture corresponding to " { $snippet "s" } " with the Control and Shift keys pressed is presented as "
+{ $code "T{ key-down f { C+ } \"S\" }" }
+"The " { $snippet "RET" } ", " { $snippet "TAB" } " and " { $snippet "SPACE" } " keys are never delivered in their literal form (" { $snippet "\"\\n\"" } ", " { $snippet "\"\\t\"" } " or "  { $snippet "\" \"" } ")." ;
 
 ARTICLE: "ui-user-input" "Free-form keyboard input"
 "Whereas keyboard gestures are intended to be used for keyboard shortcuts, certain gadgets such as text fields need to accept free-form keyboard input. This can be done by implementing a generic word:"
@@ -83,7 +86,7 @@ ARTICLE: "mouse-gestures" "Mouse gestures"
 "When a mouse button is pressed or released, two gestures are sent. The first gesture indicates the specific button number, and if this gesture is not handled, the second has a button number set to " { $link f } ":"
 { $code "T{ button-down f 1 }" "T{ button-down f f }" }
 "Because tuple literals fill unspecified slots with " { $link f } ", the last gesture can be written as " { $snippet "T{ button-down }" } "."
-$terpri
+$nl
 "Gestures to indicate mouse motion, depending on whenever a button is held down or not:"
 { $subsection motion }
 { $subsection drag }
@@ -125,15 +128,28 @@ ARTICLE: "action-gestures" "Action gestures"
 "Action gestures should be used in place of the above keyboard gestures if possible. For example, on Mac OS X, the standard " { $strong "Edit" } " menu items send action gestures." ;
 
 ARTICLE: "ui-commands" "Commands"
-"Commands are layered on top of gestures. Their main advantage is that they are named by strings and can be organized into groups. This allows easy construction of buttons and tool bars for invoking commands."
-{ $subsection command }
+"Commands are an abstraction layered on top of gestures. Their main advantage is that they are identified by words and can be organized into " { $emphasis "command maps" } ". This allows easy construction of buttons and tool bars for invoking commands."
+{ $subsection define-command }
 "Command groups are defined on gadget classes:"
-{ $subsection define-commands }
+{ $subsection define-command-map }
 "Commands can be introspected and invoked:"
 { $subsection commands }
+{ $subsection command-map }
 { $subsection invoke-command }
 "Gadgets for invoking commands:"
 { $subsection <command-button> }
 { $subsection <toolbar> }
-"When writing gadget documentation, a table of command names and keyboard shortcuts can be inserted with a markup element:"
-{ $subsection $commands } ;
+"When documenting gadgets, command documentation can be automatically generated:"
+{ $subsection $command-map }
+{ $subsection $command } ;
+
+ARTICLE: "ui-operations" "Operations"
+"Operations are commands performed on presentations."
+{ $subsection operation }
+{ $subsection define-operation }
+{ $subsection primary-operation }
+{ $subsection secondary-operation }
+{ $subsection define-operation-map }
+"When documenting gadgets, operation documentation can be automatically generated:"
+{ $subsection $operations }
+{ $subsection $operation } ;

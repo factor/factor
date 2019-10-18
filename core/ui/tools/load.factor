@@ -3,11 +3,13 @@ REQUIRES: core/ui ;
 PROVIDE: core/ui/tools
 { +files+ {
     "tools.factor"
-    "messages.factor"
     "interactor.factor"
     "listener.factor"
-    "walker.factor"
+    "traceback.factor"
+    "tiles.factor"
     "browser.factor"
+    "inspector.factor"
+    "walker.factor"
     "help.factor"
     "workspace.factor"
     "search.factor"
@@ -16,5 +18,7 @@ PROVIDE: core/ui/tools
 } }
 { +tests+ {
     "test/listener.factor"
+    "test/walker.factor"
+    "test/search.factor"
     "test/workspace.factor"
 } } ;

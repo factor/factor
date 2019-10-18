@@ -1,7 +1,7 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: models
-USING: generic kernel math sequences timers ;
+USING: generic kernel math sequences timers arrays ;
 
 TUPLE: model value connections dependencies ref ;
 
@@ -12,6 +12,8 @@ C: model ( value -- model )
     0 over set-model-ref ;
 
 M: model equal? 2drop f ;
+
+M: model hashcode* drop model hashcode* ;
 
 : add-dependency ( dep model -- )
     model-dependencies push ;
@@ -99,21 +101,26 @@ C: compose ( models -- compose )
     dup delegate>model
     swap clone over set-model-dependencies ;
 
+: composed-value >r model-dependencies r> map ; inline
+
+: set-composed-value >r model-dependencies r> 2each ; inline
+
 M: compose model-changed
-    dup model-dependencies [ model-value ] map
-    swap delegate set-model ;
+    dup [ model-value ] composed-value swap delegate set-model ;
 
 M: compose model-activated model-changed ;
 
-M: compose set-model
-    model-dependencies [ set-model ] 2each ;
+M: compose set-model [ set-model ] set-composed-value ;
 
 TUPLE: history back forward ;
 
+: reset-history ( history -- )
+    V{ } clone over set-history-back
+    V{ } clone swap set-history-forward ;
+
 C: history ( value -- history )
     [ >r <model> r> set-delegate ] keep
-    V{ } clone over set-history-back
-    V{ } clone over set-history-forward ;
+    [ reset-history ] keep ;
 
 : (add-history)
     swap model-value dup [ swap push ] [ 2drop ] if ;
@@ -150,3 +157,83 @@ M: delay model-changed 0 over delay-timeout add-timer ;
 M: delay model-activated update-delay-model ;
 
 M: delay tick dup remove-timer update-delay-model ;
+
+GENERIC: range-value ( model -- value )
+GENERIC: range-page-value ( model -- value )
+GENERIC: range-min-value ( model -- value )
+GENERIC: range-max-value ( model -- value )
+GENERIC: range-max-value* ( model -- value )
+GENERIC: set-range-value ( value model -- )
+GENERIC: set-range-page-value ( value model -- )
+GENERIC: set-range-min-value ( value model -- )
+GENERIC: set-range-max-value ( value model -- )
+
+TUPLE: range ;
+
+C: range ( value min max page -- range )
+    [
+        >r 4array [ <model> ] map <compose> r> set-delegate
+    ] keep ;
+
+: range-model ( range -- model ) model-dependencies first ;
+: range-page ( range -- model ) model-dependencies second ;
+: range-min ( range -- model ) model-dependencies third ;
+: range-max ( range -- model ) model-dependencies fourth ;
+
+: clamp-value ( value range -- newvalue )
+    [ range-min-value max ] keep
+    range-max-value* min ;
+
+M: range range-value
+    [ range-model model-value ] keep clamp-value ;
+
+M: range range-page-value range-page model-value ;
+
+M: range range-min-value range-min model-value ;
+
+M: range range-max-value range-max model-value ;
+
+M: range range-max-value*
+    dup range-max-value swap range-page-value [-] ;
+
+M: range set-range-value range-model set-model ;
+
+M: range set-range-page-value range-page set-model ;
+
+M: range set-range-min-value range-min set-model ;
+
+M: range set-range-max-value range-max set-model ;
+
+M: compose range-value
+    [ range-value ] composed-value ;
+
+M: compose range-page-value
+    [ range-page-value ] composed-value ;
+
+M: compose range-min-value
+    [ range-min-value ] composed-value ;
+
+M: compose range-max-value
+    [ range-max-value ] composed-value ;
+
+M: compose range-max-value*
+    [ range-max-value* ] composed-value ;
+
+M: compose set-range-value
+    [ clamp-value ] keep
+    [ set-range-value ] set-composed-value ;
+
+M: compose set-range-page-value
+    [ set-range-page-value ] set-composed-value ;
+
+M: compose set-range-min-value
+    [ set-range-min-value ] set-composed-value ;
+
+M: compose set-range-max-value
+    [ set-range-max-value ] set-composed-value ;
+
+: move-by ( amount range -- )
+    [ range-value + ] keep set-range-value ;
+
+: move-by-page ( amount range -- )
+    [ range-page-value * ] keep move-by ;

@@ -4,15 +4,13 @@ USING: alien help ;
 HELP: DLL"
 { $syntax "DLL\" path\"" }
 { $values { "path" "a path name string" } }
-{ $description "Constructs a DLL handle at parse time." }
-{ $see-also dlopen } ;
+{ $description "Constructs a DLL handle at parse time." } ;
 
 HELP: ALIEN:
 { $syntax "ALIEN: address" }
 { $values { "address" "a non-negative integer" } }
 { $description "Creates an alien object at parse time." }
-{ $notes "Alien objects are invalidated between image saves and loads." }
-{ $see-also <alien> } ;
+{ $notes "Alien objects are invalidated between image saves and loads." } ;
 
 HELP: LIBRARY:
 { $syntax "LIBRARY: name" }
@@ -23,7 +21,7 @@ HELP: FUNCTION:
 { $syntax "FUNCTION: return name ( parameters )" }
 { $values { "return" "a C return type" } { "name" "a C function name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
 { $description "Defines a new word " { $snippet "name" } " which calls a C library function with the same name, in the logical library given by the most recent " { $link POSTPONE: LIBRARY: } " declaration."
-$terpri
+$nl
 "The new word must be compiled before being executed." }
 { $examples
 "For example, suppose the " { $snippet "foo" } " library exports the following function:"
@@ -49,27 +47,20 @@ $terpri
 HELP: TYPEDEF:
 { $syntax "TYPEDEF: old new" }
 { $values { "old" "a C type" } { "new" "a C type" } }
-{ $description "Alises the C types " { $snippet "old" } " and " { $snippet "old*" } " under the names " { $snippet "new" } " and " { $snippet "new*" } ", respectively." }
-{ $see-also (typedef) typedef } ;
+{ $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
+{ $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
 
-HELP: BEGIN-STRUCT:
-{ $syntax "BEGIN-STRUCT: name" }
-{ $values { "name" "a new C type name" } }
-{ $description "Begins reading a C struct definition. This word must be followed by one or more " { $link POSTPONE: FIELD: } " declarations, terminating in " { $link POSTPONE: END-STRUCT } "." } ;
-
-HELP: FIELD:
-{ $syntax "FIELD: type name" }
-{ $values { "type" "a C type" } { "name" "a field name" } }
-{ $description "Adds a field to the C structure currently being read. This word can only be used inside a " { $link POSTPONE: BEGIN-STRUCT: } "/" { $link POSTPONE: END-STRUCT } " pair." } ;
-
-HELP: END-STRUCT
-{ $syntax "END-STRUCT" }
-{ $description "Ends a structure definition. Only valid after a " { $link POSTPONE: BEGIN-STRUCT: } "." } ;
+HELP: C-STRUCT:
+{ $syntax "C-STRUCT: name pairs... ;" }
+{ $values { "name" "a new C type name" } { "pairs" "C type / field name string pairs" } }
+{ $description "Defines a C struct layout and accessor words." }
+{ $notes "C type names are documented in " { $link "c-types-specs" } "." } ;
 
 HELP: C-UNION:
 { $syntax "C-UNION: name members... ;" }
 { $values { "name" "a new C type name" } { "members" "a sequence of C types" } }
 { $description "Defines a new C type sized to fit its largest member." }
+{ $notes "C type names are documented in " { $link "c-types-specs" } "." }
 { $examples { $code "C-UNION: event  active-event keyboard-event mouse-event ;" } } ;
 
 HELP: C-ENUM:

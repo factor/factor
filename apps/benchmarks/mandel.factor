@@ -91,4 +91,4 @@ SYMBOL: cols
     "Generating " write dup write "..." print
     <file-writer> [ run write ] with-stream ;
 
-[ "mandel.ppm" run>file ] time
+[ "mandel.ppm" resource-path run>file ] time

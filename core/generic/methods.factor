@@ -1,8 +1,8 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
-USING: arrays definitions errors hashtables help kernel
-sequences words namespaces ;
+USING: arrays definitions errors assocs help kernel
+sequences words namespaces quotations ;
 
 TUPLE: method loc def ;
 
@@ -12,18 +12,18 @@ M: quotation method-def ;
 M: quotation method-loc drop f ;
 
 : method ( class generic -- method/f )
-    "methods" word-prop hash ;
+    "methods" word-prop at ;
 
 PREDICATE: pair method-spec
     first2 dup generic? [ method >boolean ] [ 2drop f ] if ;
 
-: methods ( generic -- assoc )
-    "methods" word-prop hash>alist
-    [ [ first ] 2apply class-compare ] sort
-    [ first2 method-def 2array ] map ;
-
 : order ( generic -- seq )
-    "methods" word-prop hash-keys [ class-compare ] sort ;
+    "methods" word-prop keys sort-classes ;
+
+: methods ( generic -- assoc )
+    dup "methods" word-prop swap order [
+        dup rot at method-def 2array
+    ] map-with ;
 
 TUPLE: check-method class generic ;
 
@@ -37,27 +37,34 @@ TUPLE: check-method class generic ;
 
 : define-method ( method class generic -- )
     >r bootstrap-word r> check-method
-    [ set-hash ] with-methods ;
+    [ set-at ] with-methods ;
+
+! Definition protocol
+M: method-spec where
+    dup first2 method method-loc [ ] [ second where ] ?if ;
+
+M: method-spec forget
+    first2 [ delete-at ] with-methods ;
+
+M: method-spec definer drop \ M: \ ; ;
+
+M: method-spec definition first2 method method-def ;
 
 : implementors ( class -- seq )
     all-words
     [ generic? ] subset
-    [ "methods" word-prop hash-member? ] subset-with ;
+    [ "methods" word-prop key? ] subset-with ;
 
-M: method-spec where
-    dup first2 method method-loc [ ] [ second where ] ?if ;
+: forget-methods ( class -- )
+    dup implementors [ 2array forget ] each-with ;
 
-M: method-spec subdefs drop f ;
+: forget-predicate ( class -- )
+    "predicate" word-prop [ forget ] each ;
 
-M: generic subdefs
-    dup "methods" word-prop hash-keys natural-sort
-    [ swap 2array ] map-with ;
+: forget-class ( class -- )
+    dup forget-methods
+    dup forget-predicate
+    dup uncache-class
+    forget-word ;
 
-M: class subdefs
-    [
-        dup "constructor" word-prop [ , ] when*
-        dup implementors natural-sort [ 2array , ] each-with
-    ] { } make ;
-
-M: method-spec forget
-    first2 [ remove-hash ] with-methods ;
+M: class forget forget-class ;

@@ -1,40 +1,38 @@
-! Copyright (C) 2005, 2006 Slava Pestov, Alex Chapman.
+! Copyright (C) 2005, 2007 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: !syntax
 USING: alien compiler kernel math namespaces parser
-sequences syntax words ;
+sequences syntax words quotations ;
 
 : !DLL" skip-blank parse-string dlopen parsed ; parsing
 
-: !ALIEN: scan-word <alien> parsed ; parsing
+: !ALIEN: scan string>number <alien> parsed ; parsing
 
 : !LIBRARY: scan "c-library" set ; parsing
 
 : !FUNCTION:
-    scan "c-library" get scan string-mode on
-    [ string-mode off define-c-word ] f ; parsing
+    scan "c-library" get scan ";" parse-tokens
+    [ "()" subseq? not ] subset
+    define-function ; parsing
 
-: !TYPEDEF: scan scan typedef ; parsing
+: !TYPEDEF:
+    scan scan [ typedef ] curry curry in-target ; parsing
 
-: !BEGIN-STRUCT: ( -- offset )
-    scan "struct-name" set  0 ; parsing
-
-: !FIELD: ( offset -- offset )
-    scan scan define-field ; parsing
-
-: !END-STRUCT ( length -- )
-    define-struct-type ; parsing
+: !C-STRUCT:
+    scan in get
+    parse-definition
+    >r 2dup r> define-struct-early
+    [ define-struct ] curry curry curry
+    in-target ; parsing
 
 : !C-UNION:
-    scan "struct-name" set
-    string-mode on [
-        string-mode off
-        0 [ define-member ] reduce define-struct-type
-    ] f ; parsing
+    scan in get
+    ";" parse-tokens
+    [ define-union ] curry curry curry
+    in-target ; parsing
 
 : !C-ENUM:
-    string-mode on [
-        string-mode off 0 [
-            create-in swap [ unit define-compound ] keep 1+
-        ] reduce drop
-    ] f ; parsing
+    ";" parse-tokens
+    dup length
+    [ >r create-in r> 1quotation define-compound ] 2each ;
+    parsing

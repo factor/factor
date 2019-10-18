@@ -5,7 +5,6 @@ USING: kernel sequences inference namespaces generic ;
 
 ! Funny pattern matching
 SYMBOL: @
-SYMBOL: @literal
 
 : match-@ ( value -- ? )
     #! All @ must be eq
@@ -16,7 +15,6 @@ SYMBOL: @literal
 
 : value-match? ( value spec -- ? )
     {
-        { [ dup @literal eq? ] [ drop value? ] }
         { [ dup @ eq? ] [ drop match-@ ] }
         { [ dup class? ] [ match-class ] }
         { [ over value? not ] [ 2drop f ] }

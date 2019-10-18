@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic hashtables io kernel
+USING: arrays definitions generic io kernel assocs hashtables
 namespaces parser prettyprint sequences strings styles vectors
 words modules ;
 IN: help
@@ -33,7 +33,7 @@ SYMBOL: table
 : last-block? last-element get block eq? ;
 
 : ($span) ( quot -- )
-    last-block? [ terpri ] when
+    last-block? [ nl ] when
     span last-element set
     call ; inline
 
@@ -55,11 +55,10 @@ M: f print-element drop ;
     ] with-style ; inline
 
 : print-content ( element -- )
-    last-element off
     [ print-element ] with-default-style ;
 
 : ($block) ( quot -- )
-    last-element get { f table } member? [ terpri ] unless
+    last-element get { f table } member? [ nl ] unless
     span last-element set
     call
     block last-element set ; inline
@@ -74,11 +73,11 @@ M: f print-element drop ;
 
 : $url [ url-style get print-element* ] ($span) ;
 
-: $terpri terpri terpri drop ;
+: $nl nl nl drop ;
 
 ! Some blocks
 : ($heading)
-    last-element get [ terpri ] when ($block) ; inline
+    last-element get [ nl ] when ($block) ; inline
 
 : $heading ( element -- )
     [ heading-style get print-element* ] ($heading) ;
@@ -87,7 +86,7 @@ M: f print-element drop ;
     [ strong-style get print-element* ] ($heading) ;
 
 : ($code-style) ( presentation -- hash )
-    presented associate code-style get hash-union ;
+    presented associate code-style get union ;
 
 : ($code) ( presentation quot -- )
     [
@@ -122,7 +121,7 @@ M: f print-element drop ;
 
 : $example ( element -- )
     1 swap cut* swap "\n" join dup <input> [
-        input-style get format terpri print-element
+        input-style get format nl print-element
     ] ($code) ;
 
 : $unchecked-example ( element -- )
@@ -148,7 +147,8 @@ M: f print-element drop ;
     link-style get [ write-object ] with-style ;
 
 : ($link) ( article -- )
-    dup article-name swap >link write-link ;
+    dup article-name swap >link write-link
+    span last-element set ;
 
 : $link ( element -- )
     first ($link) ;
@@ -161,17 +161,20 @@ M: f print-element drop ;
 
 : $vocabulary ( element -- )
     [ word-vocabulary ] map
-    [ "Vocabulary" $heading terpri $vocab-link ] when* ;
+    [ "Vocabulary" $heading nl $vocab-link ] when* ;
 
 : textual-list ( seq quot -- )
-    last-element off
-    [ ", " print-element ] interleave ; inline
+    [ ", " print-element ] swap interleave ; inline
 
 : $links ( topics -- )
     [ [ ($link) ] textual-list ] ($span) ;
 
 : $see-also ( topics -- )
     "See also" $heading $links ;
+
+: $related ( element -- )
+    first dup "related" word-prop remove dup empty?
+    [ drop ] [ $see-also ] if ;
 
 : $doc-path ( article -- )
     help-path dup empty? [
@@ -184,18 +187,31 @@ M: f print-element drop ;
         ] ($block)
     ] if ;
 
-: $grid ( content style -- )
+: ($grid) ( style quot -- )
     [
         table-content-style get [
-            [ last-element off print-element ] tabular-output
+            swap [ last-element off call ] tabular-output
         ] with-style
-    ] ($block) table last-element set ;
+    ] ($block) table last-element set ; inline
 
 : $list ( element -- )
-    [ bullet get swap 2array ] map list-style get $grid ;
+    list-style get [
+        [
+            [
+                bullet get write-cell
+                [ print-element ] with-cell
+            ] with-row
+        ] each
+    ] ($grid) ;
 
 : $table ( element -- )
-    table-style get $grid ;
+    table-style get [
+        [
+            [
+                [ [ print-element ] with-cell ] each
+            ] with-row
+        ] each
+    ] ($grid) ;
 
 : a/an ( str -- str )
     first "aeiou" member? "an" "a" ? ;
@@ -211,20 +227,63 @@ M: f print-element drop ;
     "Inputs and outputs" $heading
     [ values-row ] map $table ;
 
-: $predicate ( element -- )
-    { { "object" "an object" } } $values
-    [
-        "Tests if the object is an instance of the " ,
-        { $link } swap append ,
-        " class." ,
-    ] { } make $description ;
-
-: $errors ( element -- )
-    "Errors" $heading print-element ;
-
 : $side-effects ( element -- )
     "Side effects" $heading "Modifies " print-element
     [ $snippet ] textual-list ;
+
+: $predicate ( element -- )
+    { { "object" "an object" } { "?" "a boolean" } } $values
+    [
+        "Tests if the object is an instance of the " ,
+        first "predicating" word-prop \ $link swap 2array ,
+        " class." ,
+    ] { } make $description ;
+
+: reader-slot-spec ( reader -- slot-spec class )
+    dup "reading" word-prop [ slot-of-reader ] keep ;
+
+: $reader-values ( slot-spec class -- )
+    [
+        dup word-name swap 2array ,
+        dup slot-spec-name swap slot-spec-decl 2array ,
+    ] { } make $values ;
+
+: $reader-description ( slot-spec class -- )
+    "Outputs the value stored in the " print-element
+    swap slot-spec-name $snippet
+    " slot of a " print-element
+    ($link)
+    " instance." print-element ;
+
+: $reader ( element -- )
+    first reader-slot-spec 2dup
+    $reader-values
+    $reader-description ;
+
+: writer-slot-spec ( reader -- slot-spec class )
+    dup "writing" word-prop [ slot-of-writer ] keep ;
+
+: $writer-values ( slot-spec class -- )
+    swap [
+        dup slot-spec-name swap slot-spec-decl 2array ,
+        dup word-name swap 2array ,
+    ] { } make $values ;
+
+: $writer-description ( slot-spec class -- )
+    "Stores a value to the " print-element
+    swap slot-spec-name $snippet
+    " slot of a " print-element
+    ($link)
+    " instance." print-element ;
+
+: $writer ( element -- )
+    first writer-slot-spec
+    2dup $writer-values
+    2dup $writer-description
+    nip word-name 1array $side-effects ;
+
+: $errors ( element -- )
+    "Errors" $heading print-element ;
 
 : $notes ( element -- )
     "Notes" $heading print-element ;
@@ -246,7 +305,7 @@ M: f print-element drop ;
 
 : $references ( element -- )
     "References" $heading
-    unclip print-element [ \ $link swap 2array ] map $list ;
+    unclip print-element [ \ $link swap ] { } map>assoc $list ;
 
 : $shuffle ( element -- )
     drop
@@ -271,10 +330,4 @@ M: f print-element drop ;
     } $notes ;
 
 : sort-articles ( seq -- newseq )
-    [ dup article-title 2array ] map sort-values 0 <column> ;
-
-: error? ( word -- ? )
-    \ $error-description swap word-help elements empty? not ;
-
-: all-errors ( -- seq )
-    all-words [ error? ] subset sort-articles ;
+    [ dup article-title ] { } map>assoc sort-values 0 <column> ;

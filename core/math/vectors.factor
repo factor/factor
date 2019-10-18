@@ -30,4 +30,4 @@ USING: arrays generic kernel sequences ;
 : product ( seq -- n ) 1 [ * ] reduce ;
 
 : infimum ( seq -- n ) dup first [ min ] reduce ;
-: supremum ( seq -- n ) dup second [ max ] reduce ;
+: supremum ( seq -- n ) dup first [ max ] reduce ;

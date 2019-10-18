@@ -1,7 +1,7 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: kernel-internals
-USING: arrays generic namespaces sequences math ;
+USING: arrays generic namespaces sequences math assocs ;
 
 : >c ( continuation -- ) catchstack* push ;
 : c> ( -- continuation ) catchstack* pop ;
@@ -14,12 +14,18 @@ SYMBOL: error-continuation
 SYMBOL: error-stack-trace
 SYMBOL: restarts
 
+GENERIC: compute-restarts ( error -- seq )
+
+: save-error ( error -- )
+    dup error set-global
+    compute-restarts restarts set-global ;
+
 : catch ( try -- error/f )
     [ >c call f c> drop f ] callcc1 nip ; inline
 
 : rethrow ( error -- )
     catchstack* empty?
-    [ die ] [ dup error set-global c> continue-with ] if ;
+    [ die ] [ dup save-error c> continue-with ] if ;
 
 : cleanup ( try cleanup -- )
     [ >c >r call c> drop r> call ]
@@ -37,15 +43,16 @@ C: condition ( error restarts cc -- condition )
     [ set-condition-restarts ] keep
     [ set-delegate ] keep ;
 
-: condition ( error restarts -- restart )
+: throw-restarts ( error restarts -- restart )
     [ <condition> throw ] callcc1 2nip ;
+
+: rethrow-restarts ( error restarts -- restart )
+    [ <condition> rethrow ] callcc1 2nip ;
 
 TUPLE: restart name obj continuation ;
 
 : restart ( restart -- )
     dup restart-obj swap restart-continuation continue-with ;
-
-GENERIC: compute-restarts ( error -- seq )
 
 M: object compute-restarts drop { } ;
 
@@ -61,7 +68,7 @@ PREDICATE: array kernel-error ( obj -- ? )
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first \ kernel-error eq? not ] [ drop f ] }
-        { [ t ] [ second 0 18 between? ] }
+        { [ t ] [ second 0 19 between? ] }
     } cond ;
 
 TUPLE: assert got expect ;

@@ -7,7 +7,7 @@ HELP: tuple=
 
 HELP: tuple
 { $class-description "The class of tuples. This class is further partitioned into disjoint subclasses; each tuple shape defined by " { $link POSTPONE: TUPLE: } " is a new class."
-$terpri
+$nl
 "Tuple classes have additional word properties:"
 { $list
     { { $snippet "\"slot-names\"" } " - a sequence of strings naming the tuple's slots" }
@@ -27,14 +27,15 @@ $low-level-note ;
 HELP: check-shape
 { $values { "class" "a tuple class word" } { "slots" "a sequence of strings" } }
 { $description "If the new slot list does not have the same length as the current slot list for " { $snippet "class" } ", removes the class word from the dictionary. This allows a new class to be defined, and instances of the old class and the new class can co-exist, with new instances having a different number of slots. This prevents memory corruption if old accessors are called on new instances, or vice versa."
-$terpri
+$nl
 "If " { $snippet "class" } " is not a tuple class word, or if no slots are being added or removed, this word does nothing. In this case, it is safe to redefine the class, and have the same set of accessor words operate on old and new instances." }
 $low-level-note ;
 
 HELP: tuple-slots
 { $values { "tuple" tuple } { "seq" "a sequence" } }
-{ $description "Pushes a sequence of tuple slot values, not including the tuple class word and delegate." }
-{ $see-also tuple>array } ;
+{ $description "Pushes a sequence of tuple slot values, not including the tuple class word and delegate." } ;
+
+{ tuple-slots tuple>array } related-words
 
 HELP: define-tuple-slots
 { $values { "class" "a tuple class word" } { "slots" "a sequence of strings" } }
@@ -47,8 +48,9 @@ HELP: tuple-class
 
 HELP: define-constructor
 { $values { "word" "a constructor word" } { "class" "a tuple class word" } { "def" "a quotation" } }
-{ $description "Define a constructor word for a tuple class. The constructor definition receives a new instance of the class on the stack, with all slots initially set to " { $link f } "." }
-{ $see-also POSTPONE: C: } ;
+{ $description "Define a constructor word for a tuple class. The constructor definition receives a new instance of the class on the stack, with all slots initially set to " { $link f } "." } ;
+
+{ define-constructor POSTPONE: C: } related-words
 
 HELP: check-tuple
 { $values { "class" "a class" } }
@@ -62,8 +64,9 @@ HELP: default-constructor
 
 HELP: define-tuple-class
 { $values { "class" "a new word" } { "slots" "a sequence of strings" } }
-{ $description "Defines a tuple class with slots named by " { $snippet "slots" } "." }
-{ $see-also POSTPONE: TUPLE: } ;
+{ $description "Defines a tuple class with slots named by " { $snippet "slots" } "." } ;
+
+{ tuple-class define-tuple-class POSTPONE: TUPLE: } related-words
 
 HELP: delegates
 { $values { "obj" "an object" } { "seq" "a sequence" } }
@@ -72,13 +75,13 @@ HELP: delegates
 HELP: is?
 { $values { "obj" "an object" } { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the object or one of its delegates satisfies the predicate quotation."
-$terpri
+$nl
 "Class membership test predicates only test if an object is a direct instance of that class. Sometimes, you need to check delegates, since this gives a clearer picture of what operations the object supports." } ;
 
 HELP: >tuple
 { $values { "seq" "a sequence" } { "tuple" "a new tuple" } }
 { $description "Creates a tuple with slot values taken from a sequence. The first element of the sequence must be a tuple class word, the second a delegate, and the remainder the declared slots."
-$terpri
+$nl
 "If the sequence has too many elements, they are ignored, and if it has too few, the remaining slots in the tuple are set to " { $link f } "." }
 { $errors "Throws an error if the first element of the sequence is not a tuple class word." } ;
 
@@ -89,3 +92,10 @@ HELP: tuple>array ( tuple -- array )
 HELP: <tuple>
 { $values { "class" "a class word" } { "n" "a non-negative integer" } { "tuple" "a new tuple" } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use the constructor word which is defined for each tuple. See " { $link "tuples" } "." } ;
+
+HELP: create-constructor
+{ $values { "class" "a word" } { "word" "a new word" } }
+{ $description "Creates a new word in the current vocabulary, named by surrounding " { $snippet "class" } " with angle brackets." }
+{ $examples
+    { $example "SYMBOL: foo" "foo create-constructor ." "<foo>" }
+} ;

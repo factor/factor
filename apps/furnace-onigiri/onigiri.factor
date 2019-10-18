@@ -3,7 +3,7 @@
 !
 
 USING: httpd threads kernel namespaces furnace sequences 
-html strings math hashtables crypto io file-responder calendar 
+html strings math assocs crypto io file-responder calendar 
 prettyprint parser errors sha2 basic-authentication arrays
 serialize ;
 
@@ -30,7 +30,7 @@ C: user ( name password -- user )
     tuck set-user-name ;
 
 : base-url ( -- url )
-    "http://" "Host" "header" get hash append ;
+    "http://" "Host" "header" get at append ;
 
 : action>url ( action -- url )
     "responder-url" get swap append ;

@@ -15,7 +15,7 @@ MANGLE(execute):
 	push %ebx
 	push %ebp
 	push %eax
-	call *32(%eax)
+	call *36(%eax)
 	pop %eax
 	pop %ebp
 	pop %ebx

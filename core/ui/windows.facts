@@ -2,19 +2,18 @@ IN: gadgets
 USING: help strings models gadgets-presentations ;
 
 HELP: windows
-{ $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." }
-{ $see-also open-window find-window } ;
+{ $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." } ;
+
+{ windows open-window find-window } related-words
 
 HELP: <status-bar>
 { $values { "model" model } { "gadget" "a new " { $link gadget } } }
 { $description "Creates a new " { $link gadget } " displaying the model value, which must be a string or " { $link f } "." }
-{ $notes "If the " { $snippet "model" } " is " { $link world-status } ", this gadget will display " { $link presentation } " mouse over help." }
-{ $see-also show-status show-summary } ; 
+{ $notes "If the " { $snippet "model" } " is " { $link world-status } ", this gadget will display " { $link presentation } " mouse over help." } ;
 
 HELP: open-window
 { $values { "gadget" gadget } { "title" string } }
-{ $description "Opens a native window with the specified title bar string." }
-{ $see-also open-window } ;
+{ $description "Opens a native window with the specified title bar string." } ;
 
 HELP: find-window
 { $values { "quot" "a quotation with stack effect " { $snippet "( world -- ? )" } } { "world" "a " { $link world } " or " { $link f } } }

@@ -9,6 +9,7 @@ PROVIDE: core/handbook
     "cookbook.facts"
     "dataflow.facts"
     "handbook.facts"
+    "assocs.facts"
     "hashtables.facts"
     "help.facts"
     "inference.facts"

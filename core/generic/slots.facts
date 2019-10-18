@@ -1,10 +1,11 @@
-USING: generic help kernel-internals parser words ;
+USING: generic help kernel-internals parser words kernel
+quotations ;
 
 HELP: define-typecheck
-{ $values { "class" "a class word" } { "generic" "a generic word" } { "quot" "a quotation" } }
+{ $values { "class" "a class word" } { "generic" "a generic word" } { "quot" quotation } { "effect" effect } }
 { $description
     "Defines a generic word with the " { $link standard-combination } " using dispatch position 0, and having one method on " { $snippet "class" } "."
-    $terpri
+    $nl
     "This creates a definition analogous to the following code:"
     { $code
         "GENERIC: generic"
@@ -15,7 +16,7 @@ HELP: define-typecheck
 { $notes "This word is used internally to wrap low-level code that does not do type-checking in safe user-visible words." } ;
 
 HELP: define-slot-word
-{ $values { "class" "a class word" } { "slot" "a positive integer" } { "word" "a new word" } { "quot" "a quotation" } }
+{ $values { "class" "a class word" } { "slot" "a positive integer" } { "word" word } { "quot" quotation } { "effect" effect } }
 { $description "Defines " { $snippet "word" } " to be a simple type-checking generic word that receives the slot number on the stack as a fixnum." }
 $low-level-note ;
 
@@ -42,7 +43,7 @@ HELP: define-slots
 { $values { "class" "a class word" } { "spec" "a sequence of triples" } }
 { $description
     "Defines a set of slot accessor/mutator words."
-    $terpri
+    $nl
     "Each entry in the " { $snippet "spec" } " sequence is a three-element sequence with the following elements:"
     { $list
         "a slot number"

@@ -1,7 +1,7 @@
 
 USING: kernel namespaces math arrays hashtables sequences threads
        opengl gadgets gadgets-labels gadgets-buttons
-       opengl.colors hashtables.lib vars slate handler
+       opengl.colors namespaces.lib hashtables.lib vars slate handler
        rewrite-closures automata ;
 
 IN: automata.ui

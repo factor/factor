@@ -1,12 +1,13 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
-USING: arrays errors generic hashtables io kernel
-kernel-internals math memory modules namespaces parser
+USING: arrays errors generic hashtables io assocs
+kernel-internals kernel math memory modules namespaces parser
 prettyprint sequences vectors words ;
 
 "Bootstrap stage 1..." print flush
 
+"resource:/core/bootstrap/layouts.factor" run-file
 "resource:/core/bootstrap/primitives.factor" run-file
 
 ! Create a boot quotation
@@ -44,7 +45,7 @@ vocabularies get [
     "!syntax" get [
         "syntax" over set-word-vocabulary
         >r "!" ?head drop r> 2dup set-word-name
-    ] hash-map "syntax" set
+    ] assoc-map "syntax" set
 ] bind
 
-"!syntax" vocabularies get remove-hash
+"!syntax" vocabularies get delete-at

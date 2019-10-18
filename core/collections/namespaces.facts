@@ -1,6 +1,9 @@
 IN: namespaces
 USING: help kernel kernel-internals sequences words ;
 
+HELP: namespace-error
+{ $error-description "Thrown by " { $link bind } " if the given namespace parameter is not a hashtable." } ;
+
 HELP: get
 { $values { "variable" "a variable, by convention a symbol" } { "value" "the value, or " { $link f } } }
 { $description "Searches the namestack for a namespace containing the variable, and outputs the associated value. If no such namespace is found, outputs " { $link f } "." } ;
@@ -53,9 +56,9 @@ HELP: with-scope
 { $values { "quot" "a quotation" } }
 { $description "Calls the quotation in a new namespace. Any variables set by the quotation are discarded when it returns." } ;
 
-HELP: make-hash
-{ $values { "quot" "a quotation" } { "hash" "a new hashtable" } }
-{ $description "Calls the quotation in a new namespace, and outputs this namespace when the quotation returns. Useful for quickly building hashtables." } ;
+HELP: make-assoc
+{ $values { "quot" "a quotation" } { "exemplar" "an assoc exemplar" } { "hash" "a new hashtable" } }
+{ $description "Calls the quotation in a new namespace, and outputs this namespace when the quotation returns. Useful for quickly building assocs." } ;
 
 HELP: bind
 { $values { "ns" "a hashtable" } { "quot" "a quotation" } }
@@ -72,11 +75,6 @@ HELP: global
 HELP: set-global
 { $values { "value" "the new value" } { "variable" "a variable, by convention a symbol" } }
 { $description "Assigns a value to the variable in the global namespace." }
-{ $side-effects "variable" } ;
-
-HELP: nest
-{ $values { "variable" "a variable, by convention a symbol" } { "namespace" "a hashtable" } }
-{ $description "If the variable is not set in the current namespace, sets it to a new hashtable, and outputs this hashtable. Otherwise, outputs the existing value (which should probably be a hashtable)." }
 { $side-effects "variable" } ;
 
 HELP: namestack*
@@ -122,8 +120,9 @@ HELP: init-namespaces
 HELP: join
 { $values { "seq" "a sequence" } { "glue" "a sequence" } { "newseq" "a sequence" } }
 { $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
-{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." }
-{ $see-also concat } ;
+{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." } ;
+
+{ join concat } related-words
 
 HELP: prune
 { $values { "seq" "a sequence" } { "newseq" "a sequence" } }

@@ -1,6 +1,6 @@
 USING: kernel math math-internals memory sequences namespaces errors
-hashtables words  arrays parser compiler syntax io
-tools prettyprint optimizer inference ;
+assocs words  arrays parser compiler syntax io
+quotations tools prettyprint optimizer inference ;
 IN: random-tester
 
 ! n-foo>bar -- list of words of type 'foo' that take n parameters
@@ -174,10 +174,10 @@ SYMBOL: second-arg
 
 
 ! RANDOM QUOTATIONS TO TEST
-: random-1-integer>x-quot ( -- quot ) 1-integer>x pick-one unit ;
-: random-1-ratio>x-quot ( -- quot ) 1-ratio>x pick-one unit ;
-: random-1-float>x-quot ( -- quot ) 1-float>x pick-one unit ;
-: random-1-complex>x-quot ( -- quot ) 1-complex>x pick-one unit ;
+: random-1-integer>x-quot ( -- quot ) 1-integer>x random 1quotation ;
+: random-1-ratio>x-quot ( -- quot ) 1-ratio>x random 1quotation ;
+: random-1-float>x-quot ( -- quot ) 1-float>x random 1quotation ;
+: random-1-complex>x-quot ( -- quot ) 1-complex>x random 1quotation ;
 
 : test-1-integer>x ( -- )
     random-integer random-1-integer>x-quot 1-interpreted-vs-compiled-check ;
@@ -189,18 +189,18 @@ SYMBOL: second-arg
     random-complex random-1-complex>x-quot 1-interpreted-vs-compiled-check ;
 
 
-: random-1-float>float-quot ( -- obj ) 1-float>float pick-one unit ;
-: random-2-float>float-quot ( -- obj ) 2-float>float pick-one unit ;
+: random-1-float>float-quot ( -- obj ) 1-float>float random 1quotation ;
+: random-2-float>float-quot ( -- obj ) 2-float>float random 1quotation ;
 : nrandom-2-float>float-quot ( -- obj )
     [
         5
         [
             {
-                [ 2-float>float pick-one , random-float , ]
-                [ 1-float>float pick-one ,  ]
+                [ 2-float>float random , random-float , ]
+                [ 1-float>float random ,  ]
             } do-one
         ] times 
-        2-float>float pick-one ,
+        2-float>float random ,
     ] [ ] make ;
 
 : test-1-float>float ( -- )
@@ -216,8 +216,8 @@ SYMBOL: second-arg
 : test-1-integer>x-runtime ( -- )
     random-integer random-1-integer>x-quot 1-runtime-check ;
 
-: random-1-integer>x-throws-quot ( -- obj ) 1-integer>x-throws pick-one unit ;
-: random-1-ratio>x-throws-quot ( -- obj ) 1-ratio>x-throws pick-one unit ;
+: random-1-integer>x-throws-quot ( -- obj ) 1-integer>x-throws random 1quotation ;
+: random-1-ratio>x-throws-quot ( -- obj ) 1-ratio>x-throws random 1quotation ;
 : test-1-integer>x-throws ( -- obj )
     random-integer random-1-integer>x-throws-quot
     1-interpreted-vs-compiled-check-catch ;
@@ -230,7 +230,7 @@ SYMBOL: second-arg
 : test-2-integer>x-throws ( -- )
     [
         random-integer , random-integer ,
-        2-x>y-throws pick-one ,
+        2-x>y-throws random ,
     ] [ ] make 2-interpreted-vs-compiled-check-catch ;
 
 ! : test-^-ratio ( -- )
@@ -240,34 +240,34 @@ SYMBOL: second-arg
 
 : test-0-float?-when
     [
-        random-number , \ dup , \ float? , 1-float>x pick-one unit , \ when ,
+        random-number , \ dup , \ float? , 1-float>x random 1quotation , \ when ,
     ] [ ] make 0-runtime-check ;
 
 : test-1-integer?-when
     random-integer [
-        \ dup , \ integer? , 1-integer>x pick-one unit , \ when ,
+        \ dup , \ integer? , 1-integer>x random 1quotation , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
 
 : test-1-ratio?-when
     random-ratio [
-        \ dup , \ ratio? , 1-ratio>x pick-one unit , \ when ,
+        \ dup , \ ratio? , 1-ratio>x random 1quotation , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
 
 : test-1-float?-when
     random-float [
-        \ dup , \ float? , 1-float>x pick-one unit , \ when ,
+        \ dup , \ float? , 1-float>x random 1quotation , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
 
 : test-1-complex?-when
     random-complex [
-        \ dup , \ complex? , 1-complex>x pick-one unit , \ when ,
+        \ dup , \ complex? , 1-complex>x random 1quotation , \ when ,
     ] [ ] make 1-interpreted-vs-compiled-check ;
 
 
 : many-word-test ( -- )
     #! defines words a1000 down to a0, which does a trivial addition
-    "random-tester-scratchpad" vocabularies get remove-hash
-    "random-tester-scratchpad" [ ensure-vocab ] keep use+
+    "random-tester-scratchpad" vocabularies get delete-at
+    "random-tester-scratchpad" set-in
     "a0" "random-tester-scratchpad" create [ 1 1 + ] define-compound
     100 [
         [ 1+ "a" swap unparse append "random-tester-scratchpad" create ] keep
@@ -297,5 +297,5 @@ SYMBOL: second-arg
         test-1-complex?-when
         ! full-gc
         ! code-gc
-    } pick-one dup . execute terpri ;
+    } random dup . execute nl ;
 

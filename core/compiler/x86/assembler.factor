@@ -109,7 +109,7 @@ M: indirect extended? indirect-base extended? ;
 : canonicalize-ESP
     #! { ESP } ==> { ESP ESP }
     dup indirect-base { ESP RSP R12 } memq? [
-        dup indirect-base swap set-indirect-index
+        ESP swap set-indirect-index
     ] [
         drop
     ] if ;
@@ -207,13 +207,17 @@ UNION: operand register indirect ;
         register-64?
     ] if ;
 
-: rex.w? ( rex.w reg mod-r/m -- ? )
-    [ operand-64? ] [ operand-64? ] ?if and ;
+: rex.w? ( rex.w reg r/m -- ? )
+    {
+        { [ dup register-128? ] [ drop operand-64? ] }
+        { [ dup not ] [ drop operand-64? ] }
+        { [ t ] [ nip operand-64? ] }
+    } cond and ;
 
-: lhs-prefix
+: rex.r
     extended? [ BIN: 00000100 bitor ] when ;
 
-: rhs-prefix
+: rex.b
     [ extended? [ BIN: 00000001 bitor ] when ] keep
     dup indirect? [
         indirect-index extended?
@@ -225,7 +229,7 @@ UNION: operand register indirect ;
 : rex-prefix ( reg r/m rex.w -- )
     #! Compile an AMD64 REX prefix.
     pick pick rex.w? BIN: 01001000 BIN: 01000000 ?
-    swap lhs-prefix swap rhs-prefix
+    swap rex.r swap rex.b
     dup BIN: 01000000 = [ drop ] [ , ] if ;
 
 : 16-prefix ( reg r/m -- )
@@ -262,8 +266,9 @@ UNION: operand register indirect ;
 : 2-operand ( dst src op -- )
     #! Sets the opcode's direction bit. It is set if the
     #! destination is a direct register operand.
-    pick register? [ BIN: 10 bitor swapd ] when
-    >r 2dup t prefix r> , reg-code swap addressing ;
+    >r 2dup t prefix r>
+    pick register? [ BIN: 10 bitor swapd ] when ,
+    reg-code swap addressing ;
 
 ! Moving stuff
 GENERIC: PUSH ( op -- )
@@ -293,19 +298,19 @@ M: operand MOV HEX: 89 2-operand ;
 GENERIC: JMP ( op -- )
 : (JMP) HEX: e9 , 0 4, rc-relative ;
 M: callable JMP (JMP) rel-word ;
-M: label JMP (JMP) rel-label ;
+M: label JMP (JMP) label-fixup ;
 M: operand JMP BIN: 100 t HEX: ff 1-operand ;
 
 GENERIC: CALL ( op -- )
 : (CALL) HEX: e8 , 0 4, rc-relative ;
 M: callable CALL (CALL) rel-word ;
-M: label CALL (CALL) rel-label ;
+M: label CALL (CALL) label-fixup ;
 M: operand CALL BIN: 010 t HEX: ff 1-operand ;
 
 G: JUMPcc ( addr opcode -- ) 1 standard-combination ;
 : (JUMPcc) HEX: 0f , , 0 4, rc-relative ;
 M: callable JUMPcc (JUMPcc) rel-word ;
-M: label JUMPcc (JUMPcc) rel-label ;
+M: label JUMPcc (JUMPcc) label-fixup ;
 
 : JO  HEX: 80 JUMPcc ;
 : JNO HEX: 81 JUMPcc ;
@@ -373,7 +378,13 @@ M: operand CMP OCT: 071 2-operand ;
 : IDIV ( src -- ) BIN: 111 t HEX: f7 1-operand ;
 
 GENERIC: IMUL2 ( dst src -- )
+
 M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
+
+M: operand IMUL2
+    2dup t prefix
+    OCT: 017 , OCT: 257 ,
+    reg-code swap addressing ;
 
 : CDQ HEX: 99 , ;
 : CQO HEX: 48 , CDQ ;
@@ -405,22 +416,22 @@ M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
     , reg-code swap addressing ;
 
 : 2-operand-sse ( dst src op1 op2 -- )
-    swap , pick register-128? [ swapd ] [ 1 bitor ] if
+    , pick register-128? [ swapd ] [ 1 bitor ] if
     (2-operand-sse) ;
+
+: MOVSS   ( dest src -- ) HEX: 10 HEX: f3 2-operand-sse ;
+: MOVSD   ( dest src -- ) HEX: 10 HEX: f2 2-operand-sse ;
+: ADDSD   ( dest src -- ) HEX: 58 HEX: f2 2-operand-sse ;
+: MULSD   ( dest src -- ) HEX: 59 HEX: f2 2-operand-sse ;
+: SUBSD   ( dest src -- ) HEX: 5c HEX: f2 2-operand-sse ;
+: DIVSD   ( dest src -- ) HEX: 5e HEX: f2 2-operand-sse ;
+: SQRTSD  ( dest src -- ) HEX: 51 HEX: f2 2-operand-sse ;
+: UCOMISD ( dest src -- ) HEX: 2e HEX: 66 2-operand-sse ;
+: COMISD  ( dest src -- ) HEX: 2f HEX: 66 2-operand-sse ;
 
 : 2-operand-int/sse ( dst src op1 op2 -- )
-    swap , over register-128? [ swapd ] [ 1 bitor ] if
-    (2-operand-sse) ;
+    , swapd (2-operand-sse) ;
 
-: MOVSS ( dest src -- ) HEX: f3 HEX: 10 2-operand-sse ;
-: MOVSD ( dest src -- ) HEX: f2 HEX: 10 2-operand-sse ;
-: ADDSD ( dest src -- ) HEX: f2 HEX: 58 2-operand-sse ;
-: MULSD ( dest src -- ) HEX: f2 HEX: 59 2-operand-sse ;
-: SUBSD ( dest src -- ) HEX: f2 HEX: 5c 2-operand-sse ;
-: DIVSD ( dest src -- ) HEX: f2 HEX: 5e 2-operand-sse ;
-: SQRTSD ( dest src -- ) HEX: f2 HEX: 51 2-operand-sse ;
-: UCOMISD ( dest src -- ) HEX: 66 HEX: 2e 2-operand-sse ;
-: COMISD ( dest src -- ) HEX: 66 HEX: 2f 2-operand-sse ;
-: CVTSI2SD ( dest src -- ) HEX: f2 HEX: 2a 2-operand-sse ;
-: CVTSD2SI ( dest src -- ) HEX: f2 HEX: 2d 2-operand-int/sse ;
-: CVTTSD2SI ( dest src -- ) HEX: f2 HEX: 2c 2-operand-int/sse ;
+: CVTSI2SD  ( dest src -- ) HEX: 2a HEX: f2 2-operand-int/sse ;
+: CVTSD2SI  ( dest src -- ) HEX: 2d HEX: f2 2-operand-int/sse ;
+: CVTTSD2SI ( dest src -- ) HEX: 2c HEX: f2 2-operand-int/sse ;

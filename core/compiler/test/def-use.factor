@@ -1,14 +1,14 @@
 IN: temporary
-USING: inference optimizer namespaces hashtables kernel
+USING: inference optimizer namespaces assocs kernel
 sequences math test ;
 
 [ 3 { 1 1 1 } ] [
     [ 1 2 3 ] dataflow compute-def-use
-    def-use get hash-values dup length swap [ length ] map
+    def-use get values dup length swap [ length ] map
 ] unit-test
 
 : kill-set ( quot -- seq )
-    dataflow compute-def-use dead-literals hash-keys
+    dataflow compute-def-use dead-literals keys
     [ value-literal ] map ;
 
 : subset? swap [ swap member? ] all-with? ;

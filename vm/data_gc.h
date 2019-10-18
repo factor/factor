@@ -299,3 +299,4 @@ void primitive_data_gc(void);
 void primitive_gc_time(void);
 
 DLLEXPORT void simple_gc(void);
+void primitive_become(void);

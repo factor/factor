@@ -1,5 +1,6 @@
 USING: httpd html namespaces kernel sequences prettyprint 
-parser words arrays generic kernel-internals math help ;
+parser words arrays generic kernel-internals math help
+quotations ;
 
 IN: furnace
 
@@ -7,7 +8,7 @@ TUPLE: furnace-model model ;
 HELP: furnace-model "This definition exists to circumvent a limitation in furnace with regard to sending arbitrary objects as models to .furnace templates." ;
 
 : crud-create ( class string -- word )
-    swap unparse "-" rot 3append create-in ;
+    swap unparse "-" rot 3append in get create ;
 HELP: crud-create "A CRUD utility function - creates a new action word for a given class and suffix string" ;
 
 : crud-word ( class string -- word )
@@ -68,12 +69,12 @@ HELP: crud-lookup* "A CRUD utility function - same as crud-lookup, but always re
     ] curry dupd define-compound ;
 
 : define-lookup ( class -- )
-    dup "crud-index" word-prop ">" pick unparse 3append create-in
+    dup "crud-index" word-prop ">" pick unparse 3append in get create
     swap [ crud-lookup ] curry define-compound ;
 
 : define-lookup* ( class -- )
     dup "crud-index" word-prop ">" pick unparse "*" append 3append 
-    create-in swap [ crud-lookup* ] curry define-compound ;
+    in get create swap [ crud-lookup* ] curry define-compound ;
 
 : scaffold-params ( class -- array )
     "crud-index" word-prop 1array 1array ;

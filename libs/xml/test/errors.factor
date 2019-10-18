@@ -1,4 +1,4 @@
-USING: xml xml-errors test kernel arrays errors xml-data state-parser ;
+USING: xml xml-errors test kernel arrays errors xml-data state-parser quotations ;
 
 : xml-error-test ( expected-error xml-string -- )
     swap 1array >quotation swap [ [ string>xml ] catch nip ] curry unit-test ;

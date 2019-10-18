@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: arrays kernel sequences words inference namespaces math
-parser ;
+quotations parser ;
 IN: lazy-lists
 
 : stack-effect-in ( quot word -- n )
@@ -18,4 +18,6 @@ IN: lazy-lists
   ] [ ] make ;
 
 : LAZY: ( -- object object object )
-  CREATE dup reset-generic [ dupd make-lazy-quot define-compound ] f ; parsing
+  CREATE dup reset-generic
+  dup parse-definition
+  make-lazy-quot define-compound ; parsing

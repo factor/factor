@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
-USING: errors generic io kernel math namespaces sequences
+USING: arrays errors generic io kernel math namespaces sequences
 vectors ;
 
 TUPLE: line-reader cr ;
@@ -39,6 +39,16 @@ M: line-reader stream-read
 
 : lines-loop ( -- ) readln [ , lines-loop ] when* ;
 
-: (lines) ( -- seq ) [ lines-loop ] { } make ;
+: lines ( stream -- seq )
+    [ [ lines-loop ] { } make ] with-stream ;
 
-: lines ( stream -- seq ) [ (lines) ] with-stream ;
+: string-lines ( str -- seq )
+    dup [ "\r\n" member? not ] all? [
+        1array
+    ] [
+        [
+            "\n" split dup 1 head-slice* [
+                "\r" ?tail drop "\r" split %
+            ] each peek "\r" split %
+        ] { } make
+    ] if ;

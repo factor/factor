@@ -1,10 +1,10 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
 gadgets-buttons gadgets-labels gadgets-theme
 generic hashtables tools io kernel prettyprint sequences strings
-styles words help math models namespaces ;
+styles words help math models namespaces quotations operations ;
 
 TUPLE: presentation object hook ;
 
@@ -33,12 +33,13 @@ M: presentation ungraft*
     dup hand-gadget get-global child? [ dup hide-status ] when
     delegate ungraft* ;
 
+: <operations-menu> ( presentation -- menu )
+    dup dup presentation-hook curry
+    swap presentation-object
+    dup object-operations <commands-menu> ;
+
 : operations-menu ( presentation -- )
-    dup
-    dup presentation-hook curry
-    over presentation-object
-    dup object-operations <commands-menu>
-    swap show-menu ;
+    dup <operations-menu> swap show-menu ;
 
 presentation H{
     { T{ button-down f f 3 } [ operations-menu ] }

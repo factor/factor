@@ -1,5 +1,5 @@
-USING: errors generic hashtables kernel namespaces
-sequences vectors ;
+USING: errors generic kernel namespaces
+sequences vectors assocs ;
 IN: tables
 
 TUPLE: table rows columns ;
@@ -11,29 +11,29 @@ C: table ( -- obj )
 	H{ } clone over set-table-columns ;
 
 : (add-row) ( row-key table -- row )
-	2dup table-rows hash* [
+	2dup table-rows at* [
         2nip
 	] [
-		drop H{ } clone [ -rot table-rows set-hash ] keep
+		drop H{ } clone [ -rot table-rows set-at ] keep
 	] if ;
 
 : add-row ( row-key table -- )
     (add-row) drop ;
 
 : add-column ( column-key table -- )
-	t -rot table-columns set-hash ;
+	t -rot table-columns set-at ;
 
 : set-row ( row row-key table -- )
-	table-rows set-hash ;
+	table-rows set-at ;
 
 : lookup-row ( row-key table -- row/f ? )
-    table-rows hash* ;
+    table-rows at* ;
 
 : row-exists? ( row-key table -- ? )
     lookup-row nip ;
 
 : lookup-column ( column-key table -- column/f ? )
-    table-columns hash* ;
+    table-columns at* ;
 
 : column-exists? ( column-key table -- ? )
     lookup-column nip ;
@@ -57,7 +57,7 @@ TUPLE: no-column key ;
 
 : get-value ( row-key column-key table -- obj ? )
     swapd lookup-row [
-        hash*
+        at*
     ] [
         2drop f f
     ] if ;
@@ -68,7 +68,7 @@ TUPLE: no-column key ;
     >r [ entry-value ] keep entry-column-key r> ;
 
 : set-value ( entry table -- )
-    (set-value) set-hash ;
+    (set-value) set-at ;
     
 : swap-rows ( row-key1 row-key2 table -- )
 	[ tuck get-row >r get-row r> ] 3keep
@@ -81,12 +81,12 @@ TUPLE: no-column key ;
     swapd 2dup lookup-column 2drop 
     [
         table-rows [
-            pick swap hash* [ 
+            pick swap at* [ 
                 >r pick r> member?* [ , ] [ drop ] if
             ] [ 
                 2drop
             ] if 
-        ] hash-each
+        ] assoc-each
     ] { } make 2nip ;
 
     
@@ -95,15 +95,15 @@ C: vector-table ( -- obj )
     <table> over set-delegate ;
 
 : add-hash-vector ( value key hash -- )
-    2dup hash* [
+    2dup at* [
         dup vector? [
             2nip push
         ] [
             V{ } clone [ push ] keep
-            -rot >r >r [ push ] keep r> r> set-hash
+            -rot >r >r [ push ] keep r> r> set-at
         ] if
     ] [
-        drop set-hash
+        drop set-at
     ] if ;
  
 M: vector-table add-value ( entry table -- )

@@ -1,28 +1,14 @@
 USING: compiler errors inference interpreter io kernel math
 memory namespaces prettyprint random-tester sequences tools
-words arrays definitions generic graphs hashtables byte-arrays ;
+quotations words arrays definitions generic graphs
+hashtables byte-arrays assocs network ;
 IN: random-tester2
 
-SYMBOL: wordbank
-: w1
+: dangerous-words ( -- array )
     {
         die
         set-walker-hook exit
-
-        xref-words
-
-        times repeat (repeat)
-        supremum infimum assoc norm-sq
-        product sum curry remove-all member? subseq?
-
-        (next-power-of-2) (^) d>w/w w>h/h millis
-        (random) ^n integer, first-bignum
-        most-positive-fixnum ^ init-random next-power-of-2
-        most-negative-fixnum
-
-        clear-hash build-graph
-
-        >r r>
+        >r r> ndrop
 
         set-callstack set-word set-word-prop
         set-catchstack set-namestack set-retainstack
@@ -34,9 +20,11 @@ SYMBOL: wordbank
         set-check-create-name
         set-pathname-string
         set-check-create-vocab
+        set-check-method-generic
         <check-create> check-create?
         reset-generic forget-class
-        create forget-word forget-vocab forget forget-tuple
+        create forget-word forget-vocab forget
+        forget-methods forget-predicate
         remove-word-prop empty-method
         continue-with <continuation>
 
@@ -44,65 +32,100 @@ SYMBOL: wordbank
         define-method define-predicate-class
         define-tuple-class define-temp define-tuple-slots
         define-writer define-predicate define-generic
+        (define-union-class)
+        define-declared define-class
+        define-union-class define-inline
         ?make-generic define-reader define-slot define-slots
         define-typecheck define-slot-word define-union-class
-        define-generic* with-methods define-constructor
+        define-simple-generic with-methods define-constructor
         predicate-word condition-continuation define-symbol
-
-        ndrop
-
-        set-word-def set-word-name
-        set-word-props set-word-primitive
+        tuple-predicate (sort-classes)
 
         stdio
         close readln read1 read read-until
-        stream-read stream-readln stream-read1 lines (lines)
+        stream-read stream-readln stream-read1 lines
         contents stream-copy stream-flush
         lines-loop
         stream-format set-line-reader-cr
+        <client-stream> <server> <client>
+        <duplex-stream> <file-writer> <file-reader> <file-r/w>
+        <style-stream> style-stream default-constructor
+        init-namespaces plain-writer
+        
+        with-datastack <quotation> datastack-underflow.
+        (delegates) simple-slot , # %
+        <continuation> continue-with set-delegate
+        callcc0 callcc1
+
+        :r :s :c
+
+        (next-power-of-2) (^) d>w/w w>h/h millis
+        (random) ^n integer, first-bignum
+        most-positive-fixnum ^ init-random next-power-of-2
+        most-negative-fixnum
+
+        clear-assoc build-graph
+
+        set-word-def set-word-name
+        set-word-props
+        set set-axis set-delegate set-global set-restart-obj
+
+
+
+        gensym random
 
         double>bits float>bits >bignum
 
-        intern-slots class-predicates delete (delete) prune memq?
+        class-predicates delete (delete) memq?
+        prune join concat group at+
         normalize norm vneg vmax vmin v- v+ [v-]
+        times repeat (repeat)
+        supremum infimum at norm-sq
+        product sum curry remove-all member? subseq?
 
-        bin> oct> le> be> hex> string>number
-
-        gensym random counter <byte-array>
-        <word> <client-stream> <server> <client>
-        <duplex-stream> <file-writer> <file-reader> ! <file-r/w>
-        init-namespaces unxref-word set-global set off on
-        nest
-        set-restart-obj
-        +@ inc dec
-
-        changed-words changed-word
-
-        callstack namespace namestack global vocabularies
-
-        path+ parent-dir
-
-        .s . 
-
-        with-datastack <quotation>
-        (delegates) simple-slot , # % split-next,
-        <continuation> continue-with set-delegate
-
-        closure
+        ! O(n) on bignums
+        (add-vertex) (mismatch) (prune) (split) (string>integer)
+        (subst) ?head ?tail add-vertex all? base> closure
+        drop-prefix
+        find-last-sep format-column head? index index*
+        last-index mismatch push-new remove-vertex reset-props
+        seq-quot-uses sequence= split split, split1 start
+        start* string-lines string>integer tail? v.
         
-        tabular-output simple-slots set-axis
+        stack-picture
+        
+        ! allot crashes
+        at+ natural-sort
 
-        join concat group
-        hash+
-    }
-    { "arrays" "errors" "generic" "graphs" "hashtables" "io"
-    "kernel" "math" "namespaces"
-    "queues" "strings" "sequences" "vectors" "words" }
-    [ words ] map concat diff ;
+        # % (delegates) +@ , . .s <continuation>
+        <quotation> <word> be> bin> callstack changed-word
+        changed-words continue-with counter dec
+        global
+        hex> inc le> namespace namestack nest oct> off
+        on parent-dir path+ 
+        simple-slot simple-slots string>number tabular-output
+        unxref-word xref-word xref-words vocabularies
+        with-datastack
 
-w1 wordbank set-global
+        bind if-graph ! 0 >n ! GCs
 
-: databank
+        move-backward move-forward open-slice (open-slice) ! infinite loop
+        (assoc-stack) ! infinite loop
+
+        case ! 100000000000 t case ! takes a long time
+    } ;
+
+: safe-words ( -- array )
+    dangerous-words {
+        "arrays" "assocs" "bit-arrays" "byte-arrays"
+        "errors" "generic" "graphs" "hashtables" "io"
+        "kernel" "math" "namespaces" "quotations" "sbufs"
+        "queues" "strings" "sequences" "vectors" "words"
+    } [ words ] map concat diff natural-sort ;
+    
+safe-words \ safe-words set-global
+
+: databank ( -- array )
     {
         ! V{ } H{ } V{ 3 } { 3 } { } "" "asdf"
         pi 1/0. -1/0. 0/0. [ ]
@@ -112,8 +135,8 @@ w1 wordbank set-global
 
 : setup-test ( #data #code -- data... quot )
     #! variable stack effect
-    >r [ databank pick-one ] times r>
-    [ drop wordbank get pick-one ] map >quotation ;
+    >r [ databank random ] times r>
+    [ drop \ safe-words get random ] map >quotation ;
 
 SYMBOL: before
 SYMBOL: after
@@ -137,27 +160,25 @@ err off
             2drop
         ] [
             [ . ] each
-            "--" print
-            [ . ] each quot get .
+            "--" print [ . ] each quot get .
             "not =" throw
         ] if
     ] unless
     clear ;
 
-: random-test ( #data #code -- )
+: random-test* ( #data #code -- )
     setup-test do-test ;
 
 : run-random-tester2
-    100000000000000 [ 6 3 random-test ] times ;
+    100000000000000 [ 6 3 random-test* ] times ;
 
 
 ! A worthwhile test that has not been run extensively
-1000 [ drop gensym ] map "syms" set
 
-: pick-one [ length random ] keep nth ;
+1000 [ drop gensym ] map "syms" set-global
 
 : fooify-test
-    "syms" get pick-one
+    "syms" get-global random
     2000 random >quotation
     over set-word-def
     100 random zero? [ code-gc ] when

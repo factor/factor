@@ -3,8 +3,7 @@ vectors strings sbufs kernel ;
 
 HELP: <vector>
 { $values { "n" "a positive integer specifying initial capacity" } { "vector" "a new vector" } }
-{ $description "Creates a new vector that can hold " { $snippet "n" } " elements before resizing." }
-{ $see-also <array> <string> <sbuf> <bit-array> } ;
+{ $description "Creates a new vector that can hold " { $snippet "n" } " elements before resizing." } ;
 
 HELP: length
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } }
@@ -25,7 +24,7 @@ HELP: set-nth
 { $values { "elt" "an object" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $contract "Sets the " { $snippet "n" } "th element of the sequence. Storing beyond the end of a resizable sequence such as a vector or string buffer grows the sequence." }
 { $errors "Throws an error if the index is negative, or if the sequence is not resizable and the index is greater than or equal to the length of the sequence."
-$terpri
+$nl
 "Throws an error if the sequence cannot hold elements of the given type." }
 { $side-effects "seq" } ;
 
@@ -36,7 +35,7 @@ HELP: new
 HELP: like
 { $values { "seq" "a sequence" } { "exemplar" "a sequence" } { "newseq" "a new sequence" } }
 { $contract "Outputs a sequence with the same elements as " { $snippet "seq" } ", but " { $emphasis "like" } " the template sequence, in the sense that it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence."
-$terpri
+$nl
 "The default implementation does nothing." }
 { $notes "Unlike " { $link clone-like } ", the output sequence might share storage with the input sequence." } ;
 
@@ -79,8 +78,7 @@ HELP: push
 { $values { "elt" "an object" } { "seq" "a resizable mutable sequence" } }
 { $description "Adds an element at the end of the sequence. The sequence length is adjusted accordingly." }
 { $errors "Throws an error if " { $snippet "seq" } " is not resizable, or if the type of " { $snippet "elt" } " is not permitted in " { $snippet "seq" } "." }
-{ $side-effects "seq" }
-{ $see-also pop push-new } ;
+{ $side-effects "seq" } ;
 
 HELP: ?push
 { $values { "elt" "an object" } { "seq/f" "a resizable mutable sequence, or " { $link f } } { "seq" "a resizable mutable sequence" } }
@@ -143,3 +141,18 @@ HELP: first4
 { $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } { "fourth" "the fourth element" } }
 { $description "Pushes the first four elements of a sequence." }
 { $errors "Throws an error if the sequence has less than four elements." } ;
+
+HELP: array-capacity
+{ $values { "array" "an array" } { "n" "a non-negative fixnum" } }
+{ $description "Low-level array length accessor." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
+
+HELP: array-nth
+{ $values { "n" "a non-negative fixnum" } { "array" "an array" }  { "elt" "an object" } }
+{ $description "Low-level array element accessor." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+
+HELP: set-array-nth
+{ $values { "elt" "an object" } { "n" "a non-negative fixnum" } { "array" "an array" }  }
+{ $description "Low-level array element mutator." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;

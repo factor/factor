@@ -1,23 +1,26 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assembler-arm compiler kernel kernel-internals math
-namespaces words generic ;
+USING: alien arrays assembler-arm compiler kernel
+kernel-internals math namespaces words generic ;
 IN: generator
 
 : code-format 4 ; inline
 
 ! ARM register assignments:
-! R0, R1, R2, R3, R12 integer vregs
+! R0, R1, R2, R3 integer vregs
+! R12 temporary
 ! R5 data stack
 ! R6 retain stack
-! R7 cards_offset
+! R7 primitives
 
 : ds-reg R5 ; inline
 : rs-reg R6 ; inline
 
+M: temp-reg v>operand drop R12 ;
+
 M: int-regs return-reg drop R0 ;
 M: int-regs param-regs drop { R0 R1 R2 R3 } ;
-M: int-regs vregs drop { R0 R1 R2 R3 R12 } ;
+M: int-regs vregs drop { R0 R1 R2 R3 } ;
 
 ! No FPU support yet
 M: float-regs param-regs drop { } ;
@@ -39,21 +42,15 @@ M: immediate load-literal
         v>operand load-indirect
     ] if ;
 
-M: object load-literal v>operand load-indirect ;
+: stack-frame ( n -- i ) 4 + 8 align ;
 
-: stack-increment \ stack-frame-size get 4 + 8 align ;
+: %prologue ( n -- )
+    LR SP 4 <-> STR
+    SP SP rot stack-frame SUB ;
 
-: %prologue ( -- )
-    [
-        LR SP 4 <-> STR
-        SP SP stack-increment SUB
-    ] if-stack-frame ;
-
-: %epilogue ( -- )
-    [
-        SP SP stack-increment ADD
-        LR SP 4 <-> LDR
-    ] if-stack-frame ;
+: %epilogue ( n -- )
+    SP SP rot stack-frame ADD
+    LR SP 4 <-> LDR ;
 
 : primitive-addr ( word dst -- )
     #! Load a word address into dst.
@@ -61,7 +58,6 @@ M: object load-literal v>operand load-indirect ;
 
 : %call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.
-    dup (compile)
     dup primitive? [ R0 primitive-addr R0 BLX ] [ BL ] if ;
 
 : %jump-label ( label -- )
@@ -69,11 +65,8 @@ M: object load-literal v>operand load-indirect ;
     #! WARNING: don't clobber LR here!
     dup primitive? [ PC primitive-addr ] [ B ] if ;
 
-: %jump ( label -- )
-    %epilogue dup (compile) %jump-label ;
-
 : %jump-t ( label -- )
-    "flag" operand object-tag CMP NE B ;
+    "flag" operand object tag-number CMP NE B ;
 
 : (%dispatch) ( word-table# reg -- )
     #! Load jump table target address into reg.
@@ -93,20 +86,14 @@ M: object load-literal v>operand load-indirect ;
 
 : %jump-dispatch ( word-table# -- )
     [
-        %epilogue
+        %epilogue-later
         PC (%dispatch)
     ] H{
         { +input+ { { f "n" } } }
         { +clobber+ { "n" } }
     } with-template ;
 
-: %return ( -- )
-    \ stack-frame-size get no-stack-frame = [
-        PC LR MOV
-    ] [
-        SP SP stack-increment ADD
-        PC SP 4 <-> LDR
-    ] if ;
+: %return ( -- ) %epilogue-later PC LR MOV ;
 
 : (%peek/replace)
     >r drop >r v>operand r> loc>operand r> execute ;
@@ -130,7 +117,7 @@ M: int-regs %load-param-reg drop swap stack@ LDR ;
 
 M: stack-params %save-param-reg
     drop
-    R12 swap stack-increment + stack@ LDR
+    R12 swap stack-frame* + stack@ LDR
     R12 swap stack@ STR ;
 
 M: stack-params %load-param-reg
@@ -148,6 +135,16 @@ M: stack-params %load-param-reg
     f %alien-invoke
     ! Store the return value on the C stack
     over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
+
+: %unbox-long-long ( n func -- )
+    ! Value must be in R0:R1.
+    ! Call the unboxer
+    f %alien-invoke
+    ! Store the return value on the C stack
+    [
+        R0 over stack@ STR
+        R1 swap cell + stack@ STR
+    ] when* ;
 
 : %unbox-small-struct ( size -- )
     #! Alien must be in R0.
@@ -172,15 +169,21 @@ M: stack-params %load-param-reg
     over [ 0 over param-reg swap %load-param-reg ] [ 2drop ] if
     r> f %alien-invoke ;
 
+: %box-long-long ( n func -- )
+    >r [
+        R0 over stack@ LDR
+        R1 swap cell + stack@ LDR
+    ] when* r> f %alien-invoke ;
+
 : %box-small-struct ( size -- )
     #! Box a 4-byte struct returned in R0.
     drop "box_struct_1" f %alien-invoke ;
 
 : struct-return@ ( size n -- n )
     [
-        stack-increment +
+        stack-frame* +
     ] [
-        stack-increment swap - cell -
+        stack-frame* swap - cell -
     ] ?if ;
 
 : %prepare-box-struct ( size -- )
@@ -197,7 +200,8 @@ M: stack-params %load-param-reg
     ! Copy the struct from the C stack
     "box_value_struct" f %alien-invoke ;
 
-: struct-small-enough? ( size -- ? ) 4 <= ;
+: struct-small-enough? ( size -- ? )
+    wince? [ drop f ] [ 4 <= ] if ;
 
 : %alien-invoke ( symbol dll -- )
     ! Load target address
@@ -209,7 +213,20 @@ M: stack-params %load-param-reg
     ! The target address
     0 , rc-absolute rel-dlsym ;
 
-: temp@ SP stack-increment 2 cells - <+> ;
+: %alien-global ( symbol dll reg -- )
+    [
+        "end" define-label
+        ! Load target address
+        PC 0 <+> LDR
+        ! Skip an instruction
+        "end" get B
+        ! The target address
+        0 , rc-absolute rel-dlsym
+        ! Continue here
+        "end" resolve-label
+    ] with-scope ;
+
+: temp@ SP stack-frame* 2 cells - <+> ;
 
 : %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
@@ -238,10 +255,12 @@ M: stack-params %load-param-reg
 
 : %untag ( dest src -- ) BIN: 111 BIC ;
 
-: %untag-fixnum ( dest src -- ) 3 <ASR> MOV ;
+: %untag-fixnum ( dest src -- ) tag-bits get <ASR> MOV ;
 
-: %tag-fixnum ( dest src -- ) 3 <LSL> MOV ;
+: %tag-fixnum ( dest src -- ) tag-bits get <LSL> MOV ;
 
 : value-structs? t ;
 
 : small-enough? ( n -- ? ) 0 255 between? ;
+
+M: long-long-type c-type-stack-align? drop wince? not ;

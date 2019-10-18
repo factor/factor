@@ -1,24 +1,23 @@
-USING: arrays gadgets hashtables help io kernel-internals
-namespaces sequences ;
+USING: arrays gadgets help io kernel-internals
+namespaces sequences assocs ;
 
 ARTICLE: "conventions" "Conventions"
 "Various conventions are used throughout the Factor documentation and source code."
 { $heading "Documentation conventions" }
 "Factor documentation consists of two distinct bodies of text. There is a hierarchy of articles, much like this one, and there is word documentation. Help articles reference word documentation, and vice versa, but not every documented word is referenced from some help article."
-$terpri
+$nl
 "Every article has links to parent articles at the top. These can be persued if the article is too specific."
-$terpri
+$nl
 "Some generic words have " { $strong "Description" } " headings, and others have " { $strong "Generic word contract" } " headings. A distinction is made between words which are not intended to be extended with user-defined methods, and those that are."
 { $heading "Word naming conventions" }
 "These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
 { $table
     { "General form" "Description" "Examples" }
     { { $snippet { $emphasis "foo" } "?" } "outputs a boolean" { { $link empty? } } }
-    { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth ?hash } } }
+    { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth } } }
     { { $snippet "<" { $emphasis "foo" } ">" } { "creates a new " { $snippet "foo" } } { { $link <array> } } }
-    { { $snippet { $emphasis "foo" } "*" } { "alternative form of " { $snippet "foo" } ", or a generic word called by " { $snippet "foo" } } { { $links hash* draw-gadget* } } }
+    { { $snippet { $emphasis "foo" } "*" } { "alternative form of " { $snippet "foo" } ", or a generic word called by " { $snippet "foo" } } { { $links at* draw-gadget* } } }
     { { $snippet "(" { $emphasis "foo" } ")" } { "implementation detail word used by " { $snippet "foo" } } { { $link (clone) } } }
-    { { $snippet "n" { $emphasis "foo" } } { "(sequence words only) performs " { $snippet "foo" } " but modifies an input sequence instead of creating a new sequence" } { { $links nappend nsort } } }
     { { $snippet "set-" { $emphasis "foo" } } { "sets " { $snippet "foo" } " to a new value" } { $links set-length } }
     { { $snippet { $emphasis "foo" } "-" { $emphasis "bar" } } { "(tuple accessors) outputs the value of the " { $snippet "bar" } " slot of the " { $snippet "foo" } " at the top of the stack" } { } }
     { { $snippet "set-" { $emphasis "foo" } "-" { $emphasis "bar" } } { "(tuple mutators) sets the value of the " { $snippet "bar" } " slot of the " { $snippet "foo" } " at the top of the stack" } { } }
@@ -27,5 +26,5 @@ $terpri
 }
 { $heading "Vocabulary naming conventions" }
 "A vocabulary name ending in " { $snippet "-internals" } " contains words which are either implementation detail, unsafe, or both. For example, the " { $snippet "sequence-internals" } " vocabulary contains words which access sequence elements without bounds checking (" { $link "sequences-unsafe" } ")."
-$terpri
+$nl
 "You should should avoid using internal words from the Factor library unless absolutely necessary. Similarly, your own code can place words in internal vocabularies if you do not want other people to use them unless they have a good reason." ;

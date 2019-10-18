@@ -2,8 +2,9 @@ IN: generic
 USING: help ;
 
 HELP: generic
-{ $class-description "The class of generic words." }
-{ $see-also "generic" POSTPONE: GENERIC: POSTPONE: G: } ;
+{ $class-description "The class of generic words, documented in " { $link "generic" } "." } ;
+
+{ generic define-generic define-simple-generic POSTPONE: GENERIC: POSTPONE: HOOK: POSTPONE: G: } related-words
 
 HELP: make-generic
 { $values { "word" "a generic word" } }
@@ -19,7 +20,6 @@ HELP: init-methods
 { $values { "word" "a word" } }
 { $description "Prepare to define a generic word." } ;
 
-HELP: define-generic*
+HELP: define-generic
 { $values { "word" "a word" } { "combination" "a quotation with stack effect " { $snippet "( word -- quot )" } } }
-{ $description "Defines a generic word with the specified method combination. If the word is already a generic word, existing methods are retained." }
-{ $see-also POSTPONE: G: define-generic } ;
+{ $description "Defines a generic word with the specified method combination. If the word is already a generic word, existing methods are retained." } ;

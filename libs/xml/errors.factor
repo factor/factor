@@ -99,7 +99,7 @@ C: bad-prolog ( prolog -- bad-prolog )
 M: bad-prolog error.
     dup parsing-error.
     "Misplaced XML prolog" print
-    bad-prolog-prolog xml-preamble terpri ;
+    bad-prolog-prolog xml-preamble nl ;
 
 TUPLE: capitalized-prolog name ;
 C: capitalized-prolog ( name -- capitalized-prolog )
@@ -133,7 +133,7 @@ C: bad-instruction ( instruction -- bad-instruction )
 M: bad-instruction error.
     dup parsing-error.
     "Misplaced processor instruction:" print
-    bad-instruction-inst write-item terpri ;
+    bad-instruction-inst write-item nl ;
 
 TUPLE: bad-directive dir ;
 C: bad-directive ( directive -- bad-directive )
@@ -142,7 +142,7 @@ C: bad-directive ( directive -- bad-directive )
 M: bad-directive error.
     dup parsing-error.
     "Misplaced directive:" print
-    bad-directive-dir write-item terpri ;
+    bad-directive-dir write-item nl ;
 
 UNION: xml-parse-error multitags notags extra-attrs nonexist-ns
        not-yes/no unclosed mismatched xml-string-error expected no-entity

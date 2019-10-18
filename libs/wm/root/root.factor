@@ -17,10 +17,10 @@ root over set-delegate dup add-to-window-table wm-root-mask over select-input ;
 ! Event handlers
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USING: hashtables sequences x wm.child ;
+USING: assocs sequences x wm.child ;
 
 : managed? ( id -- ? )
-window-table> hash-values [ child? ] subset [ window-id ] map member? ;
+window-table> values [ child? ] subset [ window-id ] map member? ;
 
 ! The USING: sequences above is needed to get subset. However, it
 ! shadows the x.geometry move so we get it back here:

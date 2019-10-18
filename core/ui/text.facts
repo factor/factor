@@ -1,13 +1,16 @@
-USING: help freetype strings kernel styles alien opengl ;
+USING: help freetype strings kernel styles alien opengl
+quotations ;
 IN: gadgets
 
 HELP: freetype
-{ $var-description "Global variable. Holds a native handle used by the FreeType library." }
-{ $see-also with-freetype } ;
+{ $var-description "Global variable. Holds a native handle used by the FreeType library." } ;
+
+{ freetype with-freetype } related-words
 
 HELP: open-fonts
-{ $var-description "Global variable. Hashtable mapping font descriptors to " { $link font } " instances." }
-{ $see-also open-font } ;
+{ $var-description "Global variable. Hashtable mapping font descriptors to " { $link font } " instances." } ;
+
+{ font open-fonts open-font char-width string-width text-dim draw-string draw-text } related-words
 
 HELP: init-freetype
 { $description "Initializes the FreeType library." }
@@ -20,8 +23,7 @@ HELP: font
         { { $link font-handle } " - alien pointer to an " { $snippet "FT_Face" } "." }
         { { $link font-widths } " - sequence of character widths. Use " { $link char-width } " and " { $link string-width } " to compute string widths instead of reading this sequence directly." }
     }
-}
-{ $see-also open-font char-width string-width text-dim draw-string draw-text } ;
+} ;
 
 HELP: close-freetype
 { $description "Closes the FreeType library." }
@@ -58,25 +60,20 @@ HELP: (draw-string)
 
 HELP: string-width
 { $values { "open-font" "an instance of " { $link font } } { "string" string } { "w" "a positive integer" } }
-{ $description "Outputs the width of a string." }
-{ $see-also open-font char-width text-dim } ;
+{ $description "Outputs the width of a string." } ;
 
 HELP: string-width
 { $values { "open-font" "an instance of " { $link font } } { "ch" "a character" } { "w" "a positive integer" } }
-{ $description "Outputs the width of a single character." }
-{ $see-also open-font string-width text-dim } ;
+{ $description "Outputs the width of a single character." } ;
 
 HELP: text-dim
 { $values { "open-font" "an instance of " { $link font } } { "text" "a string or an array of strings" } { "dim" "a pair of integers" } }
-{ $description "Outputs the dimensions of a piece of text, which is either a single-line string or an array of lines." }
-{ $see-also open-font char-width string-width } ;
+{ $description "Outputs the dimensions of a piece of text, which is either a single-line string or an array of lines." } ;
 
 HELP: draw-string
 { $values { "font" "a font specifier" } { "string" string } { "loc" "a pair of integers" } }
-{ $description "Draws a line of text." }
-{ $see-also open-font draw-text } ;
+{ $description "Draws a line of text." } ;
 
 HELP: draw-text
 { $values { "font" "a font specifier" } { "text" "a string or an array of strings" } { "loc" "a pair of integers" } }
-{ $description "Draws text. Text is either a single-line string or an array of lines." }
-{ $see-also open-font draw-text } ;
+{ $description "Draws text. Text is either a single-line string or an array of lines." } ;

@@ -2,7 +2,6 @@ USE: kernel
 
 PROVIDE: core/io/windows
 { +files+ {
-    "io.factor"
-    "sockets.factor"
-    "files.factor"
+    { "nt/load.factor" [ winnt? ] }
+    { "ce/load.factor" [ wince? ] }
 } } ;

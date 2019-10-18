@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: queues
 USING: errors kernel ;
@@ -13,11 +13,11 @@ C: queue ( -- queue ) ;
 
 : queue-empty? ( queue -- ? ) queue-head not ;
 
-: clear-queue ( queue -- )
-    f over set-queue-head f swap set-queue-tail ;
-
 : (enque) ( entry queue -- )
     [ set-queue-head ] 2keep set-queue-tail ;
+
+: clear-queue ( queue -- )
+    f swap (enque) ;
 
 : enque ( elt queue -- )
     >r <entry> r> dup queue-empty? [
@@ -26,11 +26,15 @@ C: queue ( -- queue ) ;
         [ queue-tail set-entry-next ] 2keep set-queue-tail
     ] if ;
 
+: clear-entry ( entry -- )
+    f over set-entry-obj f swap set-entry-next ;
+
 : (deque) ( queue -- )
     dup queue-head over queue-tail eq? [
         clear-queue
     ] [
-        dup queue-head entry-next swap set-queue-head
+        dup queue-head dup entry-next rot set-queue-head
+        clear-entry
     ] if ;
 
 TUPLE: empty-queue ;

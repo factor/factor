@@ -12,7 +12,8 @@ IN: generator
 : code-format 1 ; inline
 
 ! x86 register assignments
-! EAX, ECX, EDX, EBX, EBP integer vregs
+! EAX, ECX, EDX, EBX integer vregs
+! EBP temporary
 ! XMM0 - XMM7 float vregs
 ! ESI data stack
 ! EDI retain stack
@@ -21,9 +22,10 @@ IN: generator
 
 : ds-reg ESI ; inline
 : rs-reg EDI ; inline
-: allot-tmp-reg EDI ; inline
 : stack-reg ESP ; inline
 : stack@ stack-reg swap [+] ;
+
+M: temp-reg v>operand drop EBP ;
 
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 
@@ -39,7 +41,7 @@ GENERIC: store-return-reg ( stack@ reg-class -- )
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
 M: int-regs param-regs drop { } ;
-M: int-regs vregs drop { EAX ECX EDX EBX EBP } ;
+M: int-regs vregs drop { EAX ECX EDX EBX } ;
 M: int-regs %save-param-reg drop >r stack@ r> MOV ;
 M: int-regs %load-param-reg drop swap stack@ MOV ;
 M: int-regs push-return-reg return-reg PUSH ;
@@ -80,25 +82,20 @@ M: immediate load-literal
 : load-indirect ( literal reg -- )
     0 [] MOV rc-absolute-cell rel-literal ;
 
-M: object load-literal
-    v>operand load-indirect ;
+: stack-frame ( n -- i ) 16 align 16 + cell - ;
 
-: stack-increment \ stack-frame-size get 16 align 16 + cell - ;
+: %prologue ( n -- )
+    stack-reg swap stack-frame SUB ;
 
-: %prologue ( -- )
-    [ stack-reg stack-increment SUB ] if-stack-frame ;
-
-: %epilogue ( -- )
-    [ stack-reg stack-increment ADD ] if-stack-frame ;
+: %epilogue ( n -- )
+    stack-reg swap stack-frame ADD ;
 
 : (%call) ( label -- label )
-    dup (compile) dup primitive? [ address-operand ] when ;
+    dup primitive? [ address-operand ] when ;
 
 : %call ( label -- ) (%call) CALL ;
 
-: %jump ( label -- ) %epilogue (%call) JMP ;
-
-: %jump-label ( label -- ) JMP ;
+: %jump-label ( label -- ) (%call) JMP ;
 
 : %jump-t ( label -- ) "flag" operand f v>operand CMP JNE ;
 
@@ -123,9 +120,7 @@ M: object load-literal
     [ CALL ] dispatch-template ;
 
 : %jump-dispatch ( word-table# -- )
-    [ %epilogue JMP ] dispatch-template ;
-
-: %return ( -- ) %epilogue 0 RET ;
+    [ %epilogue-later JMP ] dispatch-template ;
 
 : %move-int>int ( dst src -- )
     [ v>operand ] 2apply MOV ;
@@ -161,10 +156,39 @@ M: object %save-param-reg 3drop ;
 : with-aligned-stack ( n quot -- )
     swap dup align-sub slip align-add ; inline
 
+: %untag ( reg -- ) tag-mask get bitnot AND ;
+
+: %untag-fixnum ( reg -- ) tag-bits get SAR ;
+
 : %prepare-unbox ( -- )
     #! Move top of data stack to EAX.
     EAX ESI [] MOV
     ESI 4 SUB ;
+
+: (%unbox) ( func -- )
+    4 [
+        ! Push parameter
+        EAX PUSH
+        ! Call the unboxer
+        f %alien-invoke
+    ] with-aligned-stack ;
+
+: %unbox ( n reg-class func -- )
+    #! The value being unboxed must already be in EAX.
+    #! If n is f, we're unboxing a return value about to be
+    #! returned by the callback. Otherwise, we're unboxing
+    #! a parameter to a C function about to be called.
+    (%unbox)
+    ! Store the return value on the C stack
+    over [ store-return-reg ] [ 2drop ] if ;
+
+: %unbox-long-long ( n func -- )
+    (%unbox)
+    ! Store the return value on the C stack
+    [
+        dup stack@ EAX MOV
+        cell + stack@ EDX MOV
+    ] when* ;
 
 : %unbox-struct-1 ( -- )
     #! Alien must be in EAX.
@@ -211,20 +235,6 @@ M: object %save-param-reg 3drop ;
 : struct-small-enough? ( size -- ? )
     8 <= os "linux" = not and ;
 
-: %unbox ( n reg-class func -- )
-    #! The value being unboxed must already be in EAX.
-    #! If n is f, we're unboxing a return value about to be
-    #! returned by the callback. Otherwise, we're unboxing
-    #! a parameter to a C function about to be called.
-    4 [
-        ! Push parameter
-        EAX PUSH
-        ! Call the unboxer
-        f %alien-invoke
-    ] with-aligned-stack
-    ! Store the return value on the C stack
-    over [ store-return-reg ] [ 2drop ] if ;
-
 : %box-struct-1 ( -- )
     #! Box a 4-byte struct returned in EAX. OS X only.
     4 [
@@ -248,9 +258,9 @@ M: object %save-param-reg 3drop ;
 
 : struct-return@ ( size n -- n )
     [
-        stack-increment cell + +
+        stack-frame* cell + +
     ] [
-        stack-increment swap -
+        stack-frame* swap -
     ] ?if ;
 
 : %box-large-struct ( n size -- )
@@ -279,7 +289,7 @@ M: object %save-param-reg 3drop ;
     #! frame, since %box sets one up to call the one-arg boxer
     #! function. The size of this stack frame so far depends on
     #! the reg-class of the boxer's arg.
-    reg-size neg + stack-increment + 20 + ;
+    reg-size neg + stack-frame* + 20 + ;
 
 : (%box) ( n reg-class -- )
     #! If n is f, push the return register onto the stack; we
@@ -294,12 +304,30 @@ M: object %save-param-reg 3drop ;
         >r (%box) r> f %alien-invoke
     ] with-aligned-stack ;
 
+: (%box-long-long)
+    #! If n is f, push the return registers onto the stack; we
+    #! are boxing a return value of a C function. If n is an
+    #! integer, push [ESP+n]:[ESP+n+4] on the stack; we are
+    #! boxing a parameter being passed to a callback from C.
+    [
+        T{ int-regs } box@
+        EDX over stack@ MOV
+        EAX swap cell - stack@ MOV 
+    ] when*
+    EDX PUSH
+    EAX PUSH ;
+
+: %box-long-long ( n func -- )
+    8 [
+        >r (%box-long-long) r> f %alien-invoke
+    ] with-aligned-stack ;
+
 : %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    ESP stack-increment cell - [+] EAX MOV ;
+    ESP stack-frame* cell - [+] EAX MOV ;
 
 : %alien-indirect ( -- )
-    ESP stack-increment cell - [+] CALL ;
+    ESP stack-frame* cell - [+] CALL ;
 
 : %alien-callback ( quot -- )
     4 [
@@ -323,7 +351,9 @@ M: object %save-param-reg 3drop ;
     ! Unbox EAX
     unbox-return ;
 
-: %unwind ( n -- ) %epilogue RET ;
+: %unwind ( n -- ) %epilogue-later RET ;
+
+: %return ( -- ) 0 %unwind ;
 
 : %cleanup ( alien-node -- )
     #! a) If we just called an stdcall function in Windows, it

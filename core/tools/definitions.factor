@@ -1,51 +1,43 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: definitions
-USING: arrays errors generic hashtables io kernel math
+USING: arrays errors generic assocs io kernel math
 namespaces parser prettyprint prettyprint-internals sequences
-styles words help ;
+styles words help inspector ;
 
 : reload ( defspec -- )
     where first [ run-file ] when* ;
 
-: write-vocab ( vocab -- )
-    dup <vocab-link> presentation-text ;
-
-: in. ( word -- )
-    word-vocabulary [
-        <flow \ IN: pprint-word write-vocab block>
-    ] when* ;
-
 : comment. ( string -- )
     [ H{ { font-style italic } } styled-text ] when* ;
 
-M: word synopsis*
-    dup in.
-    dup definer pprint-word
-    dup pprint-word
+: word-synopsis ( word name -- )
+    dup word-vocabulary pprinter-in set
+    over definer drop pprint-word
+    pprint-word
     dup parsing? not swap stack-effect and
     [ effect>string comment. ] when* ;
 
+M: word synopsis*
+    dup word-synopsis ;
+
+M: constructor synopsis*
+    dup "constructing" word-prop word-synopsis ;
+
 M: method-spec synopsis*
-    \ M: pprint-word [ pprint-word ] each ;
+    dup definer drop pprint-word
+    [ pprint-word ] each ;
+
+M: pathname synopsis* pprint* ;
 
 : synopsis ( defspec -- str )
     [
         0 margin set
-        [ synopsis* ] with-pprint
+        1 line-limit set
+        [ synopsis* ] with-in
     ] string-out ;
 
 M: word summary synopsis ;
-
-GENERIC: definition ( spec -- quot ? )
-
-M: word definition drop f f ;
-
-M: compound definition word-def t ;
-
-M: generic definition "combination" word-prop t ;
-
-M: method-spec definition first2 method method-def t ;
 
 GENERIC: declarations. ( obj -- )
 
@@ -57,6 +49,7 @@ M: object declarations. drop ;
 M: word declarations.
     {
         POSTPONE: parsing
+        POSTPONE: delimiter
         POSTPONE: inline
         POSTPONE: foldable
     } [ declaration. ] each-with ;
@@ -65,15 +58,11 @@ M: word declarations.
 
 : (see) ( spec -- )
     [
-        dup synopsis*
-        dup definition [
-            <defblock
-            pprint-elements pprint-; declarations.
-            block>
-        ] [
-            2drop
-        ] if
-    ] with-pprint terpri ;
+        <colon dup synopsis*
+        <block dup definition pprint-elements block>
+        dup definer nip [ pprint-word ] when* declarations.
+        block>
+    ] with-use nl ;
 
 M: object see (see) ;
 
@@ -88,7 +77,7 @@ M: predicate-class see-class*
     \ PREDICATE: pprint-word
     dup superclass pprint-word
     dup pprint-word
-    <defblock
+    <colon
     "definition" word-prop pprint-elements
     pprint-; block> ;
 
@@ -100,16 +89,35 @@ M: tuple-class see-class*
 
 M: word see-class* drop ;
 
-: see-class ( word -- )
-    dup class? over builtin-class? not and [
-        terpri [ see-class* ] with-pprint terpri
+M: builtin-class see-class*
+    drop "! Built-in class" comment. ;
+
+: see-all ( seq -- ) [ nl see ] each ;
+
+: see-constructor ( class -- )
+    "constructor" word-prop [ nl see ] when* ;
+
+: see-implementors ( class -- )
+    dup implementors natural-sort [ 2array ] map-with see-all ;
+
+: see-class ( class -- )
+    dup class? [
+        nl
+        [ dup see-class* ] with-pprint nl
+        dup see-constructor
+        see-implementors
     ] [
         drop
     ] if ;
 
-: see-subdefs ( word -- ) subdefs [ terpri see ] each ;
+: see-methods ( generic -- )
+    dup "methods" word-prop keys natural-sort
+    [ swap 2array ] map-with see-all ;
 
-M: word see dup (see) dup see-class see-subdefs ;
+M: word see
+    dup (see)
+    dup see-class
+    dup generic? [ see-methods ] [ drop ] if ;
 
 M: link where link-name article article-loc ;
 
@@ -118,7 +126,7 @@ M: link synopsis*
     dup link-name pprint*
     article-title pprint* ;
 
-M: link definition article-content t ;
+M: link definition article-content ;
 
 M: link see (see) ;
 
@@ -131,8 +139,7 @@ M: word-link synopsis*
     link-name dup pprint-word
     stack-effect effect>string comment. ;
 
-M: word-link definition
-    link-name "help" word-prop t ;
+M: word-link definition link-name "help" word-prop ;
 
 M: link forget link-name remove-article ;
 

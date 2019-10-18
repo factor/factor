@@ -4,9 +4,9 @@ generic models ;
 
 HELP: button
 { $class-description "A button is a " { $link gadget } " which responds to mouse clicks by invoking a quotation."
-$terpri
+$nl
 "A button's appearance can vary depending on the state of the mouse button if the " { $link gadget-interior } " or " { $link gadget-boundary } " slots are set to instances of " { $link button-paint } "."
-$terpri
+$nl
 "A button can be selected, which is distinct from being pressed. This state is held in the " { $link button-selected? } " slot, and is used by the " { $link <radio-box> } " word to construct a row of buttons for choosing among several alternatives." } ;
 
 HELP: >label
@@ -15,23 +15,21 @@ HELP: >label
 
 HELP: <button>
 { $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" "a new " { $link button } } }
-{ $description "Creates a new " { $link button } " which calls the quotation when clicked. The given gadget becomes the button's delegate." }
-{ $see-also <bevel-button> <command-button> <roll-button> <presentation> } ;
+{ $description "Creates a new " { $link button } " which calls the quotation when clicked. The given gadget becomes the button's delegate." } ;
+
+{ <button> <bevel-button> <command-button> <roll-button> <presentation> } related-words
 
 HELP: <roll-button>
 { $values { "label" "a label specifier" } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } }
-{ $description "Creates a new " { $link button } " which is displayed with a solid border when it is under the mouse, informing the user that the gadget is clickable." }
-{ $see-also <button> <bevel-button> <command-button> <roll-button> <presentation> } ;
+{ $description "Creates a new " { $link button } " which is displayed with a solid border when it is under the mouse, informing the user that the gadget is clickable." } ;
 
 HELP: <bevel-button>
 { $values { "label" "a label specifier" } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } }
-{ $description "Creates a new " { $link button } " with a shaded border which is always visible. The button appearance changes in response to mouse gestures using a " { $link button-paint } "." }
-{ $see-also <button> <roll-button> <command-button> <repeat-button> <presentation> } ;
+{ $description "Creates a new " { $link button } " with a shaded border which is always visible. The button appearance changes in response to mouse gestures using a " { $link button-paint } "." } ;
 
 HELP: <repeat-button>
 { $values { "label" object } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } }
-{ $description "Creates a new " { $link button } " derived from a " { $link <bevel-button> } " which calls the quotation every 100 milliseconds as long as the mouse button is held down." }
-{ $see-also <button> <bevel-button> } ;
+{ $description "Creates a new " { $link button } " derived from a " { $link <bevel-button> } " which calls the quotation every 100 milliseconds as long as the mouse button is held down." } ;
 
 HELP: button-paint
 { $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " gneeric words by delegating to an object in one of four slots which depend on the state of the button being drawn:"
@@ -55,16 +53,15 @@ HELP: <radio-box>
 { $description "Creates a row of labelled " { $link <radio-control> } " gadgets which change the value of the model." } ;
 
 HELP: <command-button>
-{ $values { "target" object } { "command" command } { "button" "a new " { $link button } } }
-{ $description "Creates a " { $link <bevel-button> } " which invokes the command on " { $snippet "target" } " when clicked." }
-{ $see-also <button> <roll-button> <presentation> } ;
+{ $values { "target" object } { "command" "a command" } { "button" "a new " { $link button } } }
+{ $description "Creates a " { $link <bevel-button> } " which invokes the command on " { $snippet "target" } " when clicked." } ;
 
 HELP: <toolbar>
-{ $values { "target" object } { "classes" "a sequence of class words" } }
-{ $description "Creates a row of " { $link <command-button> } " gadgets invoking commands on " { $snippet "target" } ". The commands are taken from the " { $snippet "\"toolbar\"" } " command group of each class in " { $snippet "classes" } "." }
-{ $see-also define-commands } ;
+{ $values { "target" object } { "toolbar" gadget } }
+{ $description "Creates a row of " { $link <command-button> } " gadgets invoking commands on " { $snippet "target" } ". The commands are taken from the " { $snippet "\"toolbar\"" } " command group of each class in " { $snippet "classes" } "." } ;
 
 HELP: <commands-menu>
-{ $values { "hook" "a quotation with stack effect " { $snippet "( button -- )" } } { "target" object } { "commands" "a sequence of " { $link command } " instances" } { "gadget" "a new " { $link gadget } } }
-{ $description "Creates a popup menu of commands which are to be invoked on " { $snippet "target" } ". The " { $snippet "hook" } " quotation is run before a command is invoked." }
-{ $see-also <toolbar> operations-menu show-menu } ;
+{ $values { "hook" "a quotation with stack effect " { $snippet "( button -- )" } } { "target" object } { "commands" "a sequence of commands" } { "gadget" "a new " { $link gadget } } }
+{ $description "Creates a popup menu of commands which are to be invoked on " { $snippet "target" } ". The " { $snippet "hook" } " quotation is run before a command is invoked." } ;
+
+{ <commands-menu> <toolbar> operations-menu show-menu } related-words

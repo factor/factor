@@ -1,5 +1,5 @@
 #define IMAGE_MAGIC 0x0f0e0d0c
-#define IMAGE_VERSION 2
+#define IMAGE_VERSION 3
 
 typedef struct {
 	CELL magic;
@@ -27,9 +27,17 @@ typedef struct {
 	CELL code_relocation_base;
 } F_HEADER;
 
+typedef struct {
+	const F_CHAR* image;
+	CELL ds_size, rs_size, cs_size;
+	CELL gen_count, young_size, aging_size;
+	CELL code_size;
+	bool secure_gc;
+} F_PARAMETERS;
+
 void load_image(F_PARAMETERS *p);
 void init_objects(F_HEADER *h);
-bool save_image(const char* file);
+bool save_image(const F_CHAR *file);
 void primitive_save_image(void);
 
 /* relocation base of currently loaded image's data heap */

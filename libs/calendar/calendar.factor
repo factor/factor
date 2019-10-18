@@ -4,6 +4,7 @@ namespaces sequences strings prettyprint tools ;
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
 TUPLE: dt year month day hour minute second ;
+DEFER: gmt-offset
 
 : month-names
     {
@@ -11,7 +12,7 @@ TUPLE: dt year month day hour minute second ;
         "July" "August" "September" "October" "November" "December"
     } ;
 
-: months-abbreviations
+: month-abbreviations
     {
         "Not a month"
         "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
@@ -192,21 +193,27 @@ M: number +second ( timestamp n -- timestamp )
 : >gmt ( timestamp -- timestamp )
     0 convert-timezone ;
 
+: compare-timestamps ( tuple tuple -- n )
+    [ >gmt tuple-slots ] compare ;
+
+: timestamp- ( timestamp timestamp -- seconds )
+    #! Exact calendar-time difference
+    [ >gmt ] 2apply
+    [ [ >date< julian-day-number ] 2apply - 86400 * ] 2keep
+    [ >time< >r >r 3600 * r> 60 * r> + + ] 2apply - + ;
+
 : unix-1970
     1970 1 1 0 0 0 0 <timestamp> ;
 
-: unix>gmt ( n -- timestamp )
-    unix-1970 swap seconds +dt ; 
+: unix-time>timestamp ( n -- timestamp )
+    >r unix-1970 r> seconds +dt ; 
+
+: timestamp>unix-time ( timestamp -- n )
+    unix-1970 timestamp- >bignum ;
 
 : gmt ( -- timestamp )
     #! GMT time, right now
     unix-1970 millis 1000 /f seconds +dt ; 
-
-: compare-timestamps ( tuple tuple -- n )
-    [ >gmt tuple-slots ] compare ;
-
-: timestamp- ( timestamp timestamp -- dt )
-    [ >gmt tuple-slots ] 2apply v- array>dt ;
 
 : now ( -- timestamp ) gmt >local-time ;
 : before ( dt -- -dt ) tuple-slots [ neg ] map array>dt ;
@@ -256,16 +263,16 @@ M: number +second ( timestamp n -- timestamp )
     over "   " <array> concat write
     [
         [ 1+ print-day ] keep
-        1+ + 7 mod zero? [ terpri ] [ bl ] if
-    ] each-with terpri ;
+        1+ + 7 mod zero? [ nl ] [ bl ] if
+    ] each-with nl ;
 
 : print-year ( year -- )
-    12 [ 1+ print-month terpri ] each-with ;
+    12 [ 1+ print-month nl ] each-with ;
 
 : (timestamp>string) ( timestamp -- )
     dup day-of-week day-abbreviations3 nth write ", " write
     dup timestamp-day unparse write bl
-    dup timestamp-month months-abbreviations nth write bl
+    dup timestamp-month month-abbreviations nth write bl
     dup timestamp-year unparse write bl
     dup timestamp-hour unparse 2 CHAR: 0 pad-left write ":" write
     dup timestamp-minute unparse 2 CHAR: 0 pad-left write ":" write
@@ -293,6 +300,20 @@ M: number +second ( timestamp n -- timestamp )
     timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write CHAR: Z write1 ;
 
 : timestamp>rfc3339 ( timestamp -- str )
-    >gmt [ 
+    >gmt [
         (timestamp>rfc3339)
      ] string-out ;
+
+: file-time-string ( timestamp -- string )
+    [
+        [ timestamp-month month-abbreviations nth write ] keep " " write
+        [ timestamp-day unparse 2 32 pad-left write ] keep " " write
+        dup now [ timestamp-year ] 2apply = [
+            [ timestamp-hour unparse 2 CHAR: 0 pad-left write ] keep
+            ":" write
+            timestamp-minute unparse 2 CHAR: 0 pad-left write
+        ] [
+            timestamp-year unparse 5 32 pad-left write
+        ] if
+    ] string-out ;
+

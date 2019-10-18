@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays errors hashtables kernel kernel-internals
-math namespaces sequences vectors words ;
+USING: arrays errors assocs kernel kernel-internals
+math namespaces sequences vectors words quotations
+definitions ;
 IN: generic
 
 : pickers { [ dup ] [ over ] [ pick ] } ; inline
@@ -57,17 +58,12 @@ TUPLE: no-method object generic ;
 : default-method ( dispatch# word -- pair )
     empty-method object bootstrap-word swap 2array ;
 
-: methods* ( dispatch# word -- assoc )
-    #! Make a class->method association, together with a
-    #! default delegating method at the end.
-    dup methods -rot default-method add* ;
-
 : method-alist>quot ( dispatch# alist base-class -- quot )
     bootstrap-word swap simplify-alist
     swapd class-predicates alist>quot ;
 
-: small-generic ( dispatch# word -- def )
-    dupd methods* object method-alist>quot ;
+: small-generic ( dispatch# methods -- def )
+    object method-alist>quot ;
 
 : build-type-vtable ( dispatch# alist-seq -- alist-seq )
     dup length [
@@ -76,35 +72,76 @@ TUPLE: no-method object generic ;
         >r over r> class-predicates alist>quot
     ] 2map nip ;
 
-: <type-vtable> ( dispatch# word n -- vtable )
+: <type-vtable> ( dispatch# methods n -- vtable )
     #! n is vtable size; either num-types or num-tags.
-    >r dupd methods* r> sort-methods build-type-vtable ;
+    sort-methods build-type-vtable ;
 
-: type-generic ( dispatch# word n dispatcher -- quot )
+: type-generic ( dispatch# methods symbol dispatcher -- quot )
     [
-        >r pick picker % r> , <type-vtable> , \ dispatch ,
+        >r pick picker % r> , get <type-vtable> , \ dispatch ,
     ] [ ] make ;
 
 : tag-generic? ( word -- ? )
     #! If all the types we dispatch upon can be identified
     #! based on tag alone, we change the dispatcher primitive
     #! from 'type' to 'tag'.
-    generic-tags [ tag-mask < ] all? ;
+    generic-tags [ tag-mask get < ] all? ;
 
-: small-generic? ( word -- ? ) generic-tags length 3 <= ;
+: small-generic? ( word -- ? )
+    dup generic-tags length swap
+    "methods" word-prop assoc-size min 3 <= ;
 
-: empty-generic? ( word -- ? ) "methods" word-prop hash-empty? ;
+: empty-generic? ( word -- ? )
+    "methods" word-prop assoc-empty? ;
 
-: standard-combination ( word dispatch# -- quot )
-    swap {
-        { [ dup empty-generic? ] [ empty-method ] }
-        { [ dup tag-generic? ] [ num-tags \ tag type-generic ] }
-        { [ dup small-generic? ] [ small-generic ] }
-        { [ t ] [ num-types \ type type-generic ] }
+: single-combination ( dispatch# methods word -- quot )
+    {
+        { [ dup empty-generic? ] [ drop small-generic ] }
+        { [ dup tag-generic? ] [ drop num-tags \ tag type-generic ] }
+        { [ dup small-generic? ] [ drop small-generic ] }
+        { [ t ] [ drop num-types \ type type-generic ] }
     } cond ;
 
-: define-generic ( word -- )
-    [ 0 standard-combination ] define-generic* ;
+: standard-methods ( dispatch# word -- methods )
+    #! Make a class->method association, together with a
+    #! default delegating method at the end.
+    dup methods -rot default-method add* ;
+
+: standard-combination ( word dispatch# -- quot )
+    swap 2dup standard-methods swap single-combination ;
+
+: simple-combination ( word -- quot )
+    0 standard-combination ;
+
+: default-hook-method ( word variable -- pair )
+    [ get ] curry 0 rot error-method append
+    object bootstrap-word swap 2array ;
+
+: hook-methods ( word variable -- methods )
+    over methods [ [ drop ] swap append ] assoc-map
+    -rot default-hook-method add* ;
+
+: hook-combination ( word variable -- quot )
+    dup [ get ] curry -rot
+    over >r hook-methods 0 swap r> single-combination append ;
+
+: define-simple-generic ( word -- )
+    [ simple-combination ] define-generic ;
 
 PREDICATE: generic standard-generic
-    "combination" word-prop [ standard-combination ] tail? ;
+    "combination" word-prop
+    dup [ simple-combination ] =
+    swap [ standard-combination ] tail? or ;
+
+PREDICATE: standard-generic simple-generic
+    "combination" word-prop [ simple-combination ] = ;
+
+GENERIC: dispatch# ( word -- n )
+
+M: simple-generic dispatch# drop 0 ;
+
+M: standard-generic dispatch# "combination" word-prop first ;
+
+M: simple-generic definer drop \ GENERIC: f ;
+
+M: simple-generic definition drop f ;

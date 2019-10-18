@@ -25,12 +25,11 @@ USING: alien ;
 : F_SETFL 4 ;    ! set file status flags
 : O_NONBLOCK HEX: 800 ; ! no delay
 
-BEGIN-STRUCT: sockaddr-in
-    FIELD: ushort family
-    FIELD: ushort port
-    FIELD: in_addr_t addr
-    FIELD: longlong unused
-END-STRUCT
+C-STRUCT: sockaddr-in
+    { "ushort" "family" }
+    { "ushort" "port" }
+    { "in_addr_t" "addr" }
+    { "longlong" "unused" } ;
 
 : EINTR HEX: 4 ;
 : EAGAIN HEX: b ;
@@ -39,3 +38,4 @@ END-STRUCT
 : AF_INET 2 ;
 : PF_INET AF_INET ;
 : SOCK_STREAM 1 ;
+: SOCK_DGRAM 2 ;

@@ -1,5 +1,5 @@
 IN: temporary
-USING: compiler kernel math sequences test ;
+USING: compiler kernel math math-internals sequences test ;
 
 : (fac) ( n! i -- n! )
     dup zero? [
@@ -21,3 +21,29 @@ USING: compiler kernel math sequences test ;
 [ 1 ] [ big-fac-benchmark ] unit-test
 
 [ 1 ] [ 1000000 small-fac-benchmark ] unit-test
+
+[ ] [ 1000000 [ 10 fac drop ] times ] unit-test
+
+: (fast-fixnum-fac) ( n! i -- n! )
+    dup zero? [
+        drop
+    ] [
+        [ fixnum*fast ] keep 1 fixnum-fast (fast-fixnum-fac)
+    ] if ;
+
+: fast-fixnum-fac ( n -- n! )
+    1 swap (fast-fixnum-fac) ;
+
+[ ] [ 1000000 [ 10 fast-fixnum-fac drop ] times ] unit-test
+
+: (fixnum-fac) ( n! i -- n! )
+    dup zero? [
+        drop
+    ] [
+        [ fixnum* ] keep 1 fixnum- (fixnum-fac)
+    ] if ;
+
+: fixnum-fac ( n -- n! )
+    1 swap (fixnum-fac) ;
+
+[ ] [ 1000000 [ 10 fixnum-fac drop ] times ] unit-test

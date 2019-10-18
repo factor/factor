@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 /* References to undefined symbols are patched up to call this function on
 image load */
@@ -18,9 +18,8 @@ INLINE CELL get_literal(CELL literal_start, CELL num)
 void *get_rel_symbol(F_REL *rel, CELL literal_start)
 {
 	CELL arg = REL_ARGUMENT(rel);
-	F_ARRAY *pair = untag_array(get_literal(literal_start,arg));
-	F_SYMBOL *symbol = alien_offset(get(AREF(pair,0)));
-	CELL library = get(AREF(pair,1));
+	F_SYMBOL *symbol = alien_offset(get_literal(literal_start,arg));
+	CELL library = get_literal(literal_start,arg + 1);
 	F_DLL *dll = (library == F ? NULL : untag_dll(library));
 
 	if(dll != NULL && !dll->dll)
@@ -29,7 +28,7 @@ void *get_rel_symbol(F_REL *rel, CELL literal_start)
 	if(!symbol)
 		return undefined_symbol;
 
-	void *sym = ffi_dlsym(dll,symbol,false);
+	void *sym = ffi_dlsym(dll,symbol);
 
 	if(sym)
 		return sym;
@@ -77,15 +76,11 @@ INLINE void reloc_set_masked(CELL cell, F_FIXNUM value, CELL mask, F_FIXNUM shif
 }
 
 /* Perform a fixup on a code block */
-void apply_relocation(F_REL *rel,
-	CELL code_start, CELL literal_start, CELL words_start)
+void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 {
-	CELL offset = rel->offset + code_start;
-	F_FIXNUM absolute_value = compute_code_rel(rel,
-		code_start,literal_start,words_start);
 	F_FIXNUM relative_value = absolute_value - offset;
 
-	switch(REL_CLASS(rel))
+	switch(class)
 	{
 	case RC_ABSOLUTE_CELL:
 		put(offset,absolute_value);
@@ -118,8 +113,8 @@ void apply_relocation(F_REL *rel,
 			REL_INDIRECT_ARM_MASK,0);
 		break;
 	default:
-		critical_error("Bad rel class",REL_CLASS(rel));
-		return;
+		critical_error("Bad rel class",class);
+		break;
 	}
 }
 
@@ -131,7 +126,34 @@ void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	F_REL *rel_end = (F_REL *)literal_start;
 
 	while(rel < rel_end)
-		apply_relocation(rel++,code_start,literal_start,words_start);
+	{
+		CELL offset = rel->offset + code_start;
+
+		F_FIXNUM absolute_value = compute_code_rel(rel,
+			code_start,literal_start,words_start);
+
+		apply_relocation(REL_CLASS(rel),offset,absolute_value);
+
+		rel++;
+	}
+}
+
+/* Fixup labels. This is done at compile time, not image load time */
+void fixup_labels(F_ARRAY *labels, CELL code_format, CELL code_start)
+{
+	CELL i;
+	CELL size = array_capacity(labels);
+
+	for(i = 0; i < size; i += 3)
+	{
+		CELL class = to_fixnum(get(AREF(labels,i)));
+		CELL offset = to_fixnum(get(AREF(labels,i + 1)));
+		CELL target = to_fixnum(get(AREF(labels,i + 2)));
+
+		apply_relocation(class,
+			offset + code_start,
+			target + code_start);
+	}
 }
 
 /* After compiling a batch of words, we replace all mutual word references with
@@ -184,40 +206,50 @@ void deposit_objects(CELL here, F_VECTOR *vector, CELL literal_length)
 }
 
 #define FROB \
-	CELL code_format = to_cell(get(ds)); \
-	F_VECTOR *code = untag_vector(get(ds - CELLS)); \
-	F_VECTOR *words = untag_vector(get(ds - CELLS * 2)); \
-	F_VECTOR *literals = untag_vector(get(ds - CELLS * 3)); \
-	F_VECTOR *rel = untag_vector(get(ds - CELLS * 4)); \
-	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format); \
-	CELL rel_length = untag_fixnum_fast(rel->top) * sizeof(unsigned int); \
-	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS; \
-	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
+	code_format = to_cell(get(ds)); \
+	code = untag_vector(get(ds - CELLS)); \
+	labels = untag_array(get(ds - CELLS * 2)); \
+	rel = untag_vector(get(ds - CELLS * 3)); \
+	words = untag_vector(get(ds - CELLS * 4)); \
+	literals = untag_vector(get(ds - CELLS * 5)); \
+	code_length = align8(untag_fixnum_fast(code->top) * code_format); \
+	rel_length = untag_fixnum_fast(rel->top) * sizeof(unsigned int); \
+	literal_length = untag_fixnum_fast(literals->top) * CELLS; \
+	words_length = untag_fixnum_fast(words->top) * CELLS;
 
 void primitive_add_compiled_block(void)
 {
 	CELL start;
 
+	CELL code_format;
+	F_VECTOR *code;
+	F_ARRAY *labels;
+	F_VECTOR *rel;
+	F_VECTOR *words;
+	F_VECTOR *literals;
+	CELL code_length;
+	CELL rel_length;
+	CELL literal_length;
+	CELL words_length;
+
+	/* Read parameters from stack, leaving them on the stack */
+	FROB
+
+	/* Try allocating a new code block */
+	CELL total_length = sizeof(F_COMPILED) + code_length
+		+ rel_length + literal_length + words_length;
+
+	start = heap_allot(&code_heap,total_length);
+
+	/* If allocation failed, do a code GC */
+	if(start == 0)
 	{
-		/* Read parameters from stack, leaving them on the stack */
-		FROB
-
-		/* Try allocating a new code block */
-		CELL total_length = sizeof(F_COMPILED) + code_length
-			+ rel_length + literal_length + words_length;
-
+		primitive_code_gc();
 		start = heap_allot(&code_heap,total_length);
 
-		/* If allocation failed, do a code GC */
+		/* Insufficient room even after code GC, give up */
 		if(start == 0)
-		{
-			primitive_code_gc();
-			start = heap_allot(&code_heap,total_length);
-
-			/* Insufficient room even after code GC, give up */
-			if(start == 0)
-				critical_error("Out of memory in add-compiled-block",0);
-		}
+			critical_error("Out of memory in add-compiled-block",0);
 	}
 
 	/* we have to read the parameters again, since we may have called
@@ -225,7 +257,10 @@ void primitive_add_compiled_block(void)
 	FROB
 
 	/* now we can pop the parameters from the stack */
-	ds -= CELLS * 5;
+	ds -= CELLS * 6;
+
+	/* compute the XT */
+	XT xt = (XT)(start + sizeof(F_COMPILED));
 
 	/* begin depositing the code block's contents */
 	CELL here = start;
@@ -257,9 +292,12 @@ void primitive_add_compiled_block(void)
 	deposit_objects(here,words,words_length);
 	here += words_length;
 
+	/* fixup labels */
+	fixup_labels(labels,code_format,(CELL)xt);
+
 	/* push the XT of the new word on the stack */
 	F_WORD *word = allot_word(F,F);
-	word->xt = (XT)(start + sizeof(F_COMPILED));
+	word->xt = xt;
 	word->compiledp = T;
 	dpush(tag_word(word));
 }

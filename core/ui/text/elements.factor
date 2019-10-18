@@ -42,11 +42,11 @@ M: char-elt next-elt
 : ((word-elt)) [ ?nth blank? ] 2keep ;
 
 : (prev-word) ( ? col str -- col )
-    [ blank? xor ] find-last-with* drop 1+ ;
+    [ blank? xor ] find-last-with* drop [ 1+ ] [ 0 ] if* ;
 
 : (next-word) ( ? col str -- col )
     [ [ blank? xor ] find-with* drop ] keep
-    over -1 = [ nip length ] [ drop ] if ;
+    over not [ nip length ] [ drop ] if ;
 
 TUPLE: one-word-elt ;
 

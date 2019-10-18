@@ -1,5 +1,4 @@
-CFLAGS += -DWINDOWS
+CFLAGS += -DWINCE
 LIBS = -lm
 PLAF_SUFFIX = .exe
-PLAF_OBJS = vm/os-windows-arm.o
-include vm/Config.arm
+include vm/Config.windows vm/Config.arm

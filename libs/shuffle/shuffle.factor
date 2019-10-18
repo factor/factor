@@ -33,3 +33,10 @@ IN: shuffle
 
 : dipd ( x y quot -- y )
     2 ndip ; inline
+
+: tuckd ( x y z -- z x y z )
+    2 ntuck ; inline
+
+: 3apply ( obj obj obj quot -- )
+    3 napply ; inline
+

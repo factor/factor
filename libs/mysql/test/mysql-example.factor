@@ -6,7 +6,7 @@ IN: mysql-example
 REQUIRES: libs/mysql ;
 USING: sequences mysql modules prettyprint kernel io math tools namespaces test ;
 
-"Testing..." print terpri
+"Testing..." print nl
 
 : get-drop-table ( -- s )
        "DROP TABLE if exists DISCUSSION_FORUM" ;
@@ -14,7 +14,7 @@ USING: sequences mysql modules prettyprint kernel io math tools namespaces test 
 : get-insert-table ( -- s )
     {
         "INSERT INTO DISCUSSION_FORUM(category, full_name, email, title, main_url, keywords, message) "
-        "VALUES('none', 'John Doe', 'johndoe@test.com', 'The Message', 'http://johndoe.com', 'none', 'Testing')"
+        "VALUES('none', 'John Doe', 'johndoe@test.com', 'The Message', NULL, NULL, 'Testing')"
     } "" join ;
 
 : get-update-table ( -- s )
@@ -27,7 +27,7 @@ USING: sequences mysql modules prettyprint kernel io math tools namespaces test 
     {
         "create table DISCUSSION_FORUM("
         "id                     int(11) NOT NULL auto_increment,"
-        "category               varchar(128) NOT NULL,"
+        "category               varchar(128),"
         "full_name              varchar(128) NOT NULL,"
         "email                  varchar(128) NOT NULL,"
         "title                  varchar(255) NOT NULL,"

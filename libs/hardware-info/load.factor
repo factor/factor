@@ -3,10 +3,12 @@ USING: kernel ;
 
 PROVIDE: libs/hardware-info
 { +files+ {
-    { "os-windows.factor" [ windows? ] }
+    { "os-winnt.factor" [ winnt? ] }
     { "os-unix.factor" [ unix? ] }
     "cpuinfo.factor"
 } }
 { +tests+ {
+    { "os-winnt.factor" [ winnt? ] }
+    { "os-unix.factor" [ unix? ] }
 } } ;
 

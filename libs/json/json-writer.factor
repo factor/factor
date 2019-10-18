@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel strings namespaces math arrays sequences generic words hashtables kernel-internals io ;
+USING: kernel strings namespaces math arrays sequences generic words kernel-internals io assocs hashtables ;
 IN: json
 
 #! Writes the object out to a stream in JSON format
@@ -25,7 +25,7 @@ M: sequence json-print ( array -- string )
 : (jsvar-encode) ( char -- char )
   #! Convert the given character to a character usable in
   #! javascript variable names.
-  dup H{ { CHAR: - CHAR: _ } } hash dup [ nip ] [ drop ] if ;
+  dup H{ { CHAR: - CHAR: _ } } at dup [ nip ] [ drop ] if ;
 
 : jsvar-encode ( string -- string )
   #! Convert the string so that it contains characters usable within
@@ -34,7 +34,7 @@ M: sequence json-print ( array -- string )
   
 : >tuple< ( object -- array )
   #! Return an array holding the value of the slots of the tuple
-  dup class "slots" word-prop [ first slot ] map-with ;
+  dup class "slots" word-prop [ slot-spec-# slot ] map-with ;
 
 : slots ( object -- values names )
   #! Given an object return an array of slots names and a sequence of slot values
@@ -52,11 +52,9 @@ M: sequence json-print ( array -- string )
 M: object json-print ( object -- string )
   CHAR: { write1 slots slots>fields "," join write CHAR: } write1 ;
 
-: hash-map ( hashtable quot -- array )
-  >r hash>alist r> [ dup first swap second ] swap append map ;
-
 M: hashtable json-print ( hashtable -- string )
   CHAR: { write1 
-  [ [ swap jsvar-encode >json % CHAR: : , >json % ] "" make ] hash-map "," join write 
+  [ [ swap jsvar-encode >json % CHAR: : , >json % ] "" make ]
+  { } assoc>map "," join write 
   CHAR: } write1 ;
   

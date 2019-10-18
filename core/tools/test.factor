@@ -1,51 +1,59 @@
-! Copyright (C) 2003, 2006 Slava Pestov.
+! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: errors namespaces arrays prettyprint io sequences kernel
+vectors quotations words parser tools assocs ;
 IN: test
-USING: arrays errors hashtables tools io kernel math
-memory namespaces parser prettyprint sequences strings words
-vectors ;
-
-: print-test ( input output -- )
-    "----> Quotation: " write .
-    "Expected output: " write . flush ;
-
-: unit-test ( output input -- )
-    [
-        [
-            2dup print-test
-            swap >r >r clear r> call
-            datastack r> >vector assert=
-        ] keep-datastack 2drop
-    ] time ;
-
-: unit-test-fails ( quot -- )
-    [ f ] swap [ [ call t ] [ 2drop f ] recover ]
-    curry unit-test ;
 
 SYMBOL: failures
 
-: failure failures [ ?push ] change ;
+: <failure> ( error what -- triple )
+    error-continuation get 3array ;
 
-: test-handler ( name quot -- ? )
-    "temporary" forget-vocab
-    catch [ dup error. 2array failure f ] [ t ] if* ;
+SYMBOL: this-test
 
-: run-test ( path -- ? )
-    [
-        "=====> " write dup write "..." print flush
+: (unit-test) ( what quot -- )
+    swap dup . flush this-test set
+    [ time ] curry failures get [
         [
-            [ [ run-file ] with-scope ] keep
-        ] assert-depth drop
-    ] test-handler ;
+            this-test get <failure> failures get push
+        ] recover
+    ] [
+        call
+    ] if ;
 
-: passed.
-    "Tests passed:" print . ;
+: unit-test ( output input -- )
+    [ 2array ] 2keep [
+        V{ } swap with-datastack swap >vector assert=
+    ] curry curry (unit-test) ;
 
-: failed.
-    "Tests failed:" print
-    failures get [
-        first2 swap write-pathname ": " write error.
-    ] each ;
+TUPLE: expected-error ;
+
+: unit-test-fails ( quot -- )
+    [ f ] append [ [ drop t ] recover ] curry
+    [ t ] swap unit-test ;
+
+: run-test ( path -- failures )
+    [
+        "temporary" forget-vocab
+        V{ } clone failures set
+        [ run-file { } ] [ swap <failure> 1array ] recover
+        failures get append
+    ] with-scope ;
+
+: failure. ( triple -- )
+    dup second .
+    dup first error.
+    "Traceback" swap third write-object ;
+
+: failures. ( path failures -- )
+    "Failing tests in " write swap <pathname> .
+    [ nl failure. nl ] each ;
 
 : run-tests ( seq -- )
-    failures off [ run-test ] subset terpri passed. failed. ;
+    [ dup run-test ] { } map>assoc
+    [ second empty? not ] subset
+    dup empty? [ drop ] [
+        nl
+        "==== FAILING TESTS:" print
+        [ nl failures. ] assoc-each
+    ] if ;

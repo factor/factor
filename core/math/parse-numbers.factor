@@ -86,6 +86,4 @@ M: float >base
 : >oct ( num -- string ) 8 >base ;
 : >hex ( num -- string ) 16 >base ;
 
-IN: namespaces
-
 : # ( n -- ) number>string % ;

@@ -1,8 +1,19 @@
 REQUIRES: libs/vars ;
 
-USING: kernel parser words io errors namespaces sequences vars ;
+USING: kernel parser words io errors namespaces sequences assocs
+       arrays test vars ;
 
 IN: vocabs
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! TODO
+! 
+! foo vocab directory:
+! 
+! foo/source.factor
+! foo/help.factor
+! foo/tests.factor
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -51,6 +62,10 @@ vocabulary-file vocabulary-roots> [ "/" rot 3append resource-path ] map-with
 vocabulary-facts vocabulary-roots> [ "/" rot 3append resource-path ] map-with
 [ exists? ] find nip ;
 
+: find-tests ( vocab -- file )
+vocabulary-tests vocabulary-roots> [ "/" rot 3append resource-path ] map-with
+[ exists? ] find nip ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : import-vocabulary ( vocab -- )
@@ -63,8 +78,44 @@ dup find-facts dup [ run-file ] [ drop ] if
 : check-vocab* ( name -- vocab )
 { { [ dup vocab ] [ vocab ] }
   { [ dup find-vocabulary ] [ import-vocabulary ] }
-  { [ t ] [ <check-vocab> { { "Continue" f } } condition ] }
+  { [ t ] [ <check-vocab> { { "Continue" f } } throw-restarts ] }
 } cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: test-vocab ( name -- ) find-tests 1array run-tests ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: vocabulary-articles
+
+: init-vocabulary-articles ( -- ) H{ } clone vocabulary-articles set-global ;
+
+: set-vocabulary-article ( vocab article -- )
+swap vocabulary-articles> set-at ;
+
+! handbook.facts has this line in it to include the module articles:
+! 
+! { $outliner [ modules-help ] }
+! 
+! It should be replaced with something like this:
+! 
+! { $outliner [ vocabulary-articles> hash-values ] }
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: vocabulary-mains
+
+: init-vocabulary-mains ( -- ) H{ } clone vocabulary-mains set-global ;
+
+: set-vocabulary-main ( vocab quot -- ) swap vocabulary-mains> set-at ;
+
+: run-vocab ( vocab -- ) vocabulary-mains> at call ;
+
+! It would be nice for the ui to show a list of "runnable vocabularies".
+! This list is easy to get:
+! 
+!	vocabulary-mains> keys
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

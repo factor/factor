@@ -1,4 +1,4 @@
-USING: help io ;
+USING: help io quotations hashtables generic ;
 
 HELP: stream-close
 { $values { "stream" "a stream" } }
@@ -47,7 +47,7 @@ HELP: stream-flush
 { $notes "With many output streams, written output is buffered and not sent to the underlying resource until either the buffer is full, or this word is called." }
 $io-error ;
 
-HELP: stream-terpri
+HELP: stream-nl
 { $values { "stream" "an output stream" } }
 { $contract "Writes a line terminator. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
 $io-error ;
@@ -55,30 +55,37 @@ $io-error ;
 HELP: stream-format
 { $values { "str" "a string" } { "style" "a hashtable" } { "stream" "an output stream" } }
 { $contract "Writes formatted text to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output."
-$terpri
+$nl
 "The " { $snippet "style" } " hashtable holds character style information. See " { $link "character-styles" } "." }
 $io-error ;
 
 HELP: with-nested-stream
 { $values { "quot" "a quotation" } { "style" "a hashtable" } { "stream" "an output stream" } }
 { $contract "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied."
-$terpri
+$nl
 "Unlike " { $link with-stream-style } ", this creates a new paragraph block in the output."
-$terpri
+$nl
 "The " { $snippet "style" } " hashtable holds paragraph style information. See " { $link "paragraph-styles" } "." }
 $io-error ;
 
-HELP: with-stream-table
-{ $values { "grid" "a sequence of equal-length sequences" } { "quot" "a quotation" } { "style" "a hashtable" } { "stream" "an output stream" } }
-{ $description "Calls the quotation with each element of the grid in turn, each time in a new dynamic scope with " { $link stdio } " rebound to a new stream. The results are laid out in a tabular fashion on " { $snippet "stream" } "."
-$terpri
+HELP: stream-write-table
+{ $values { "grid" "a sequence of sequences of table cells" } { "style" "a hashtable" } { "stream" "an output stream" } }
+{ $contract "Prints a table of cells produced by " { $link make-table-cell } "."
+$nl
 "The " { $snippet "style" } " hashtable holds table style information. See " { $link "table-styles" } "." }
+{ $notes "Instead of calling this word directly, use " { $link tabular-output } "." }
+$io-error ;
+
+HELP: make-table-cell
+{ $values { "quot" quotation } { "style" hashtable } { "stream" "an output stream" } { "table-cell" object } }
+{ $contract "Creates a table cell by calling the quotation in a new scope with a rebound " { $link stdio } " stream. Callers should not make any assumptions about the type of this word's output value; it should be treated like an opaque handle passed to " { $link stream-write-table } "." }
+{ $notes "Instead of calling this word directly, use " { $link tabular-output } "." }
 $io-error ;
 
 HELP: with-stream-style
 { $values { "style" "a hashtable" } { "quot" "a quotation" } { "stream" "an output stream" } }
-{ $description "Calls the quotation in a new dynamic scope where calls to " { $link write } ", " { $link format } " and other stream output words automatically inherit style settings from " { $snippet "style" } "."
-$terpri
+{ $contract "Calls the quotation in a new dynamic scope where calls to " { $link write } ", " { $link format } " and other stream output words automatically inherit style settings from " { $snippet "style" } "."
+$nl
 "Unlike " { $link with-nested-stream } ", the quotation's output is inline, and not nested in a paragraph block." }
 $io-error ;
 

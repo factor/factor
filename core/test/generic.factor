@@ -1,6 +1,6 @@
-USING: alien arrays definitions generic hashtables io kernel
+USING: alien arrays definitions generic assocs hashtables io kernel
 math namespaces parser prettyprint sequences strings test
-vectors words ;
+vectors words quotations errors ;
 IN: temporary
 
 GENERIC: class-of
@@ -27,7 +27,7 @@ M: f bool>str drop "false" ;
     H{
         { "true" t }
         { "false" f }
-    } hash ;
+    } at ;
 
 [ t ] [ t bool>str str>bool ] unit-test
 [ f ] [ f bool>str str>bool ] unit-test
@@ -127,7 +127,7 @@ TUPLE: another-one ;
 [ T{ another-one f } ] [ <another-one> empty-method-test ] unit-test
 
 ! Test generic see and parsing
-[ "IN: temporary SYMBOL: bah\n\nUNION: bah fixnum alien ;\n" ]
+[ "IN: temporary\nSYMBOL: bah\n\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] string-out ] unit-test
 
 ! Weird bug
@@ -189,10 +189,10 @@ TUPLE: delegating ;
 [ fixnum ] [ \ fixnum \ null math-class-max ] unit-test
 
 TUPLE: forget-class-test ;
-[ t ] [ forget-class-test tuple class<map get hash hash-member? ] unit-test
+[ t ] [ forget-class-test tuple class<map get at key? ] unit-test
 [ ] [ forget-class-test forget ] unit-test
-[ f ] [ forget-class-test class<map get hash-member? ] unit-test
-[ f ] [ forget-class-test tuple class<map get hash hash-member? ] unit-test
+[ f ] [ forget-class-test class<map get key? ] unit-test
+[ f ] [ forget-class-test tuple class<map get at key? ] unit-test
 
 [ t ] [ { hashtable equal? } method-spec? ] unit-test
 [ f ] [ { word = } method-spec? ] unit-test
@@ -206,3 +206,16 @@ M: tuple-class wii drop 5 ;
 M: integer wii drop 6 ;
 
 [ 3 ] [ T{ first-one } wii ] unit-test
+
+! Hooks
+SYMBOL: my-var
+HOOK: my-hook my-var
+
+M: integer my-hook "an integer" ;
+M: string my-hook "a string" ;
+
+[ "an integer" ] [ 3 my-var set my-hook ] unit-test
+[ "a string" ] [ my-hook my-var set my-hook ] unit-test
+[ T{ no-method f 1.0 my-hook } ] [
+    1.0 my-var set [ my-hook ] catch
+] unit-test

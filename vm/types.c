@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 /* FFI calls this */
 void box_boolean(bool value)
@@ -28,8 +28,13 @@ F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill)
 	REGISTER_ROOT(fill);
 	F_ARRAY* array = allot_array_internal(type, capacity);
 	UNREGISTER_ROOT(fill);
-	for(i = 0; i < capacity; i++)
-		set_array_nth(array,i,fill);
+	if(fill == 0)
+		memset((void*)AREF(array,0),'\0',capacity * CELLS);
+	else
+	{
+		for(i = 0; i < capacity; i++)
+			set_array_nth(array,i,fill);
+	}
 	return array;
 }
 
@@ -43,6 +48,16 @@ F_BYTE_ARRAY *allot_byte_array(CELL size)
 	return array;
 }
 
+/* size is in bits */
+F_BIT_ARRAY *allot_bit_array(CELL size)
+{
+	F_BIT_ARRAY *array = allot_object(BIT_ARRAY_TYPE,
+		bit_array_size(size));
+	array->capacity = tag_fixnum(size);
+	memset(array + 1,0,(size + 31) / 32 * 4);
+	return array;
+}
+
 /* push a new array on the stack */
 void primitive_array(void)
 {
@@ -51,11 +66,56 @@ void primitive_array(void)
 	dpush(tag_object(allot_array(ARRAY_TYPE,size,initial)));
 }
 
-/* push a new byte on the stack */
+/* push a new quotation on the stack */
+void primitive_quotation(void)
+{
+	CELL size = unbox_array_size();
+	dpush(tag_object(allot_array(QUOTATION_TYPE,size,F)));
+}
+
+/* push a new tuple on the stack */
+void primitive_tuple(void)
+{
+	CELL size = unbox_array_size();
+	F_ARRAY *array = allot_array(TUPLE_TYPE,size,F);
+	set_array_nth(array,0,dpop());
+	dpush(tag_object(array));
+}
+
+/* push a new byte array on the stack */
 void primitive_byte_array(void)
 {
 	CELL size = unbox_array_size();
 	dpush(tag_object(allot_byte_array(size)));
+}
+
+/* push a new bit array on the stack */
+void primitive_bit_array(void)
+{
+	CELL size = unbox_array_size();
+	dpush(tag_object(allot_bit_array(size)));
+}
+
+void primitive_clone(void)
+{
+	CELL size = object_size(dpeek());
+	void *new_obj = allot(size);
+	CELL tag = TAG(dpeek());
+	memcpy(new_obj,(void*)UNTAG(dpeek()),size);
+	drepl(RETAG(new_obj,tag));
+}
+
+void primitive_tuple_to_array(void)
+{
+	type_check(TUPLE_TYPE,dpeek());
+	primitive_clone();
+	set_slot(UNTAG(dpeek()),0,tag_header(ARRAY_TYPE));
+}
+
+void primitive_to_tuple(void)
+{
+	primitive_clone();
+	set_slot(UNTAG(dpeek()),0,tag_header(TUPLE_TYPE));
 }
 
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
@@ -108,13 +168,6 @@ void primitive_resize_array(void)
 	dpush(tag_object(reallot_array(array,capacity,F)));
 }
 
-void primitive_become(void)
-{
-	CELL type = to_fixnum(dpop());
-	CELL obj = dpeek();
-	put(SLOT(UNTAG(obj),0),tag_header(type));
-}
-
 void primitive_array_to_vector(void)
 {
 	F_VECTOR *vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
@@ -140,22 +193,6 @@ F_STRING* allot_string_internal(CELL capacity)
 	return string;
 }
 
-/* call this after constructing a string */
-void rehash_string(F_STRING* str)
-{
-	s32 hash = 0;
-	CELL i;
-	CELL capacity = string_capacity(str);
-	for(i = 0; i < capacity; i++)
-		hash = (31*hash + string_nth(str,i));
-	str->hashcode = (s32)tag_fixnum(hash);
-}
-
-void primitive_rehash_string(void)
-{
-	rehash_string(untag_string(dpop()));
-}
-
 /* untagged */
 F_STRING *allot_string(CELL capacity, CELL fill)
 {
@@ -163,10 +200,13 @@ F_STRING *allot_string(CELL capacity, CELL fill)
 
 	F_STRING* string = allot_string_internal(capacity);
 
-	for(i = 0; i < capacity; i++)
-		cput(SREF(string,i),fill);
-
-	rehash_string(string);
+	if(fill == 0)
+		memset((void*)SREF(string,0),'\0',capacity * CHARS);
+	else
+	{
+		for(i = 0; i < capacity; i++)
+			cput(SREF(string,i),fill);
+	}
 
 	return string;
 }
@@ -222,7 +262,6 @@ void primitive_resize_string(void)
 			cput(SREF(s,i),(utype)*string); \
 			string++; \
 		} \
-		rehash_string(s); \
 		return s; \
 	} \
 	void primitive_memory_to_##type##_string(void) \
@@ -376,6 +415,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->primitive = tag_fixnum(0);
 	word->def = F;
 	word->props = F;
+	word->counter = tag_fixnum(0);
 	update_xt(word);
 	return word;
 }

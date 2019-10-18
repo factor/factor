@@ -93,8 +93,8 @@ USE: sequences
     drop         
     "Counter: " over unparse append [ 
       dup <h2> unparse write </h2>
-      "++" over unit [ f ] swap append [ 1 + counter-example ] append quot-href
-      "--" over unit [ f ] swap append [ 1 - counter-example ] append quot-href
+      "++" over 1quotation [ f ] swap append [ 1 + counter-example ] append quot-href
+      "--" over 1quotation [ f ] swap append [ 1 - counter-example ] append quot-href
       drop
     ] html-document 
   ] show drop ;

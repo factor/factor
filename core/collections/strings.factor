@@ -1,10 +1,20 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: strings
-USING: generic kernel kernel-internals math sequences
-sequences-internals ;
+IN: kernel-internals
+USING: kernel math-internals sequences ;
+
+: string-hashcode 2 slot ; inline
+
+: set-string-hashcode 2 set-slot ; inline
 
 : reset-string-hashcode f swap set-string-hashcode ; inline
+
+: rehash-string ( str -- )
+    dup 0 [ swap 31 fixnum*fast fixnum+fast ] reduce
+    swap set-string-hashcode ; inline
+
+IN: strings
+USING: generic kernel-internals math sequences-internals ;
 
 M: string equal?
     over string? [
@@ -14,10 +24,9 @@ M: string equal?
         2drop f
     ] if ;
 
-M: string hashcode
-    dup string-hashcode [ ] [
-        dup rehash-string string-hashcode
-    ] ?if ;
+M: string hashcode*
+    nip dup string-hashcode [ ]
+    [ dup rehash-string string-hashcode ] ?if ;
 
 M: string nth bounds-check nth-unsafe ;
 
@@ -60,7 +69,7 @@ M: string resize resize-string ;
 
 : >upper ( str -- upper ) [ ch>upper ] map ;
 
-: 1string ( ch -- str ) 1 swap <string> ;
+: 1string ( ch -- str ) "" singleton ;
 
 : >string ( seq -- str ) "" clone-like ; inline
 

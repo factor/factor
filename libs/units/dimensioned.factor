@@ -12,33 +12,37 @@ C: dimensioned
     over number? [ "dimensioned must be a number" throw ] unless
     [ set-dimensioned-value ] keep ;
 
+: remove-nth ( seq n -- newseq )
+    2dup 1+ tail-slice >r head-slice r> append ;
+
 : remove-one ( obj seq -- seq )
-    tuck index dup -1 = [ drop ] [ swap remove-nth ] if ;
+    tuck index [ remove-nth ] when* ;
 
 : dimensions ( dimensioned -- top bot )
-    dup >r dimensioned-top r> dimensioned-bot ;
+    [ dimensioned-top ] keep dimensioned-bot ;
 
 : 2remove-one ( obj seq seq -- seq seq )
     pick swap remove-one >r remove-one r> ;
 
 : symbolic-reduce ( seq seq -- seq seq )
     [ seq-intersect ] 2keep rot dup empty? [
-            drop
-        ] [
-            first -rot 2remove-one symbolic-reduce
+        drop
+    ] [
+        first -rot 2remove-one symbolic-reduce
     ] if ;
 
 : reduce-units ( dimensioned -- )
-    dup dimensions symbolic-reduce pick set-dimensioned-bot swap set-dimensioned-top ;
+    dup dimensions symbolic-reduce
+    pick set-dimensioned-bot swap set-dimensioned-top ;
 
 : 2reduce-units ( d d -- d d )
-    >r dup reduce-units r> dup reduce-units ;
+    [ dup reduce-units ] 2apply ;
 
 : 2value ( d d -- n n )
     [ dimensioned-value ] 2apply ;
 
 : =units?
-    >r dimensions 2array r> dimensions 2array = ;
+    [ dimensions 2array ] 2apply = ;
     
 
 : d+ ( d d -- d )

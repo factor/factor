@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: arrays generic kernel math namespaces sequences words ;
@@ -32,12 +32,12 @@ C: frame ( -- frame )
     tuck (fill-center) (fill-center) ;
 
 M: frame layout*
-    dup [
-        [ rot rect-dim fill-center ] 2keep grid-layout
-    ] with-grid ;
+    dup compute-grid
+    [ rot rect-dim fill-center ] 3keep
+    grid-layout ;
 
-: make-frame ( specs -- frame )
-    <frame> [ swap build-grid ] keep ; inline
+: make-frame ( quot -- track )
+    <frame> make-gadget ; inline
 
-: make-frame* ( tuple specs -- gadget )
-    over [ delegate>frame build-grid ] keep ; inline
+: build-frame ( tuple quot -- tuple )
+    <frame> build-gadget ; inline

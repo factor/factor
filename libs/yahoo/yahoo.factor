@@ -1,6 +1,7 @@
 ! Copyright (C) 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: http-client xml xml-utils kernel sequences namespaces http errors help ;
+USING: http-client xml xml-utils kernel sequences
+math namespaces http errors help ;
 IN: yahoo
 
 TUPLE: result title url summary ;

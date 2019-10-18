@@ -90,12 +90,12 @@ unit-test
     file-vocabs
     "errors" use+
 
-    [ [ + 1 2 3 4 ] ]
+    [ [ \ + 1 2 3 4 ] ]
     [
         [
             "cont" set
             [
-                "\ + 1 2 3 4" 
+                "\\ + 1 2 3 4" 
                 <string-reader>
                 parse-interactive "cont" get continue-with
             ] catch
@@ -104,7 +104,26 @@ unit-test
     ] unit-test
 ] with-scope
 
-! These should throw numbers
+! These should throw errors
 [ "HEX: zzz" parse ] unit-test-fails
 [ "OCT: 999" parse ] unit-test-fails
 [ "BIN: --0" parse ] unit-test-fails
+
+[ f ] [
+    "IN: temporary FUNCTION: int foo ; TUPLE: foo ;" parse drop
+    "foo" "temporary" lookup symbol?
+] unit-test
+
+! Another funny bug
+[ t ] [
+    [
+        "scratchpad" in set
+        { "scratchpad" "arrays" } set-use
+        [
+            ! This shouldn't modify in/use in the outer scope!
+            file-vocabs
+        ] with-scope
+        
+        use get { "scratchpad" "arrays" } set-use use get =
+    ] with-scope
+] unit-test

@@ -29,6 +29,11 @@ M: viewport focusable-child*
 
 M: viewport pref-dim* viewport-dim ;
 
+: scroller-value ( scroller -- loc )
+    control-model range-value [ >fixnum ] map ;
+
 M: viewport model-changed
-    dup control-value vneg viewport-gap v+
+    dup relayout-1
+    dup scroller-value
+    vneg viewport-gap v+
     swap gadget-child set-rect-loc ;

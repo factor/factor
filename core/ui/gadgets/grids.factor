@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays kernel math namespaces sequences words ;
+USING: arrays kernel math namespaces sequences words io ;
 
-TUPLE: grid children gap ;
+TUPLE: grid children gap fill? ;
 
 : set-grid-children* ( children grid -- )
     [ set-grid-children ] 2keep >r concat r> add-gadgets ;
@@ -11,7 +11,8 @@ TUPLE: grid children gap ;
 C: grid ( children -- grid )
     dup delegate>gadget
     [ set-grid-children* ] keep
-    { 0 0 } over set-grid-gap ;
+    { 0 0 } over set-grid-gap
+    t over set-grid-fill? ;
 
 : grid-child ( grid i j -- gadget ) rot grid-children nth nth ;
 
@@ -19,54 +20,60 @@ C: grid ( children -- grid )
     >r >r 2dup add-gadget r> r>
     3dup grid-child unparent rot grid-children nth set-nth ;
 
+: grid, ( gadget i j -- )
+    \ make-gadget get -rot grid-add ;
+
 : grid-remove ( grid i j -- )
     >r >r >r <gadget> r> r> r> grid-add ;
 
-: pref-dim-grid ( -- dims )
-    grid get grid-children [ [ pref-dim ] map ] map ;
+: pref-dim-grid ( grid -- dims )
+    grid-children [ [ pref-dim ] map ] map ;
 
-: compute-grid ( -- horiz vert )
-    pref-dim-grid
-    dup flip [ max-dim ] map swap [ max-dim ] map ;
+: (compute-grid) [ max-dim ] map ;
 
-: with-grid ( grid quot -- )
-    [ >r grid set compute-grid r> call ] with-scope ; inline
+: compute-grid ( grid -- horiz vert )
+    pref-dim-grid dup flip (compute-grid) swap (compute-grid) ;
 
-: gap grid get grid-gap ;
-
-: (pair-up) ( horiz vert -- dim ) >r first r> second 2array ;
-
-M: grid pref-dim*
-    [
-        [ gap [ v+ gap v+ ] reduce ] 2apply (pair-up)
-    ] with-grid ;
-
-: do-grid ( dims quot -- )
-    swap grid get grid-children
-    [ [ pick call ] 2each ] 2each
-    drop ; inline
+: (pair-up) ( horiz vert -- dim )
+    >r first r> second 2array ;
 
 : pair-up ( horiz vert -- dims )
     [ swap [ swap (pair-up) ] map-with ] map-with ;
 
-: grid-positions ( dims -- locs )
-    gap [ v+ gap v+ ] accumulate nip ;
+: add-gaps ( gap seq -- newseq )
+    [ v+ ] map-with ;
 
-: position-grid ( horiz vert -- )
-    [ grid-positions ] 2apply
-    pair-up [ set-rect-loc ] do-grid ;
+: gap-sum ( gap seq -- newseq )
+    dupd add-gaps dim-sum v+ ;
 
-: resize-grid ( horiz vert -- )
-    pair-up [ set-layout-dim ] do-grid ;
+M: grid pref-dim*
+    dup grid-gap swap compute-grid >r over r>
+    gap-sum >r gap-sum r> (pair-up) ;
 
-: grid-layout ( horiz vert -- )
-    2dup position-grid resize-grid ;
+: do-grid ( dims grid quot -- )
+    -rot grid-children
+    [ [ pick call ] 2each ] 2each
+    drop ; inline
 
-M: grid layout*
-    [ grid-layout ] with-grid ;
+: grid-positions ( grid dims -- locs )
+    >r grid-gap dup r> add-gaps swap [ v+ ] accumulate nip ;
 
-: build-grid ( grid specs -- )
-    swap [ [ grid-add ] build-spec ] with-gadget ; inline
+: position-grid ( grid horiz vert -- )
+    pick >r
+    >r over r> grid-positions >r grid-positions r>
+    pair-up r> [ set-rect-loc ] do-grid ;
+
+: resize-grid ( grid horiz vert -- )
+    pick grid-fill? [
+        pair-up swap [ set-layout-dim ] do-grid
+    ] [
+        2drop grid-children [ [ prefer ] each ] each
+    ] if ;
+
+: grid-layout ( grid horiz vert -- )
+    [ position-grid ] 3keep resize-grid ;
+
+M: grid layout* dup compute-grid grid-layout ;
 
 M: grid children-on ( rect gadget -- seq )
     dup gadget-children empty? [
@@ -76,3 +83,8 @@ M: grid children-on ( rect gadget -- seq )
         [ 0 <column> fast-children-on ] keep
         <slice> concat
     ] if ;
+
+M: grid gadget-text*
+    grid-children
+    [ [ gadget-text ] map ] map format-table
+    [ CHAR: \n , ] [ % ] interleave ;

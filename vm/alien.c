@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 /* test if alien is no longer valid (it survived an image save/load) */
 void primitive_expired(void)
@@ -19,12 +19,16 @@ void *alien_offset(CELL object)
 {
 	F_ALIEN *alien;
 	F_BYTE_ARRAY *byte_array;
+	F_BIT_ARRAY *bit_array;
 
 	switch(type_of(object))
 	{
 	case BYTE_ARRAY_TYPE:
 		byte_array = untag_byte_array_fast(object);
 		return byte_array + 1;
+	case BIT_ARRAY_TYPE:
+		bit_array = untag_bit_array_fast(object);
+		return bit_array + 1;
 	case ALIEN_TYPE:
 		alien = untag_alien_fast(object);
 		if(alien->expired)
@@ -81,10 +85,16 @@ if the object is a byte array, as a sanity check. */
 void primitive_alien_address(void)
 {
 	CELL object = dpop();
-	if(type_of(object) == BYTE_ARRAY_TYPE)
-		type_error(ALIEN_TYPE,object);
-	else
+	switch(type_of(object))
+	{
+	case ALIEN_TYPE:
+	case F_TYPE:
 		box_unsigned_cell((CELL)alien_offset(object));
+		break;
+	default:
+		type_error(ALIEN_TYPE,object);
+		break;
+	}
 }
 
 /* image loading */
@@ -159,9 +169,12 @@ void box_struct_2(CELL x, CELL y)
 /* open a native library and push a handle */
 void primitive_dlopen(void)
 {
-	primitive_string_to_native_alien();
+	CELL path = tag_object(string_to_native_alien(
+		untag_string(dpop())));
+	REGISTER_ROOT(path);
 	F_DLL* dll = allot_object(DLL_TYPE,sizeof(F_DLL));
-	dll->path = dpop();
+	UNREGISTER_ROOT(path);
+	dll->path = path;
 	ffi_dlopen(dll,true);
 	dpush(tag_object(dll));
 }
@@ -185,7 +198,7 @@ void primitive_dlsym(void)
 			simple_error(ERROR_EXPIRED,dll,F);
 	}
 
-	box_alien(ffi_dlsym(d,sym,true));
+	box_alien(ffi_dlsym(d,sym));
 }
 
 /* close a native library handle */

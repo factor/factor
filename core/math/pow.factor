@@ -35,20 +35,13 @@ M: number (^)
 
 : ^n ( z w -- z^w )
     {
-        { [ dup zero? ] [ 2drop 1 ] }
-        { [ dup 1 number= ] [ drop ] }
-        { [ t ] [ over sq over 2 /i ^n -rot 2 mod ^n * ] }
-    } cond ; inline
+        { 0 [ drop 1 ] }
+        { 1 [ ] }
+        [ over sq over 2/ ^n -rot 1 bitand ^n * ]
+    } case ; inline
 
 M: integer (^)
     dup 0 < [ neg ^n recip ] [ ^n ] if ;
-
-: power-of-2? ( n -- ? )
-    dup 0 > [
-        dup dup neg bitand number=
-    ] [
-        drop f
-    ] if ; foldable
 
 : log2 ( n -- b )
     {

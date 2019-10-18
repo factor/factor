@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 /* Fixnums */
 
@@ -36,7 +36,7 @@ void primitive_float_to_fixnum(void)
 	F_FIXNUM x = untag_fixnum_fast(dpop());
 
 /* The fixnum arithmetic operations defined in C are relatively slow.
-The Factor compiler has optimized assembly intrinsics for all these
+The Factor compiler has optimized assembly intrinsics for some of these
 operations. */
 void primitive_fixnum_add(void)
 {
@@ -85,6 +85,12 @@ void primitive_fixnum_multiply(void)
 			dpush(tag_bignum(s48_bignum_multiply(bx,by)));
 		}
 	}
+}
+
+void primitive_fixnum_multiply_fast(void)
+{
+	POP_FIXNUMS(x,y)
+	dpush(tag_fixnum(x * y));
 }
 
 void primitive_fixnum_divint(void)
@@ -451,19 +457,13 @@ void primitive_str_to_float(void)
 	F_STRING *str = untag_string(dpeek());
 	CELL capacity = string_capacity(str);
 
-	/* if the string has nulls or chars > 255, its definitely not a float */
-	if(!check_string(str,sizeof(char)))
+	c_str = to_char_string(str,false);
+	end = c_str;
+	f = strtod(c_str,&end);
+	if(end != c_str + capacity)
 		drepl(F);
 	else
-	{
-		c_str = to_char_string(str,false);
-		end = c_str;
-		f = strtod(c_str,&end);
-		if(end != c_str + capacity)
-			drepl(F);
-		else
-			drepl(allot_float(f));
-	}
+		drepl(allot_float(f));
 }
 
 void primitive_float_to_str(void)

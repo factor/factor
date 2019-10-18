@@ -1,6 +1,8 @@
 USING: kernel namespaces ;
 PROVIDE: core/windows
 { +files+ { 
+    { "nt/dlls.factor" [ winnt? ] }
+    { "ce/dlls.factor" [ wince? ] }
     "windows-messages.factor"
     "types.factor"
     "advapi32.factor"
@@ -17,7 +19,7 @@ PROVIDE: core/windows
     "winsock.factor"
     "opengl32.factor"
     "utils.factor"
-    { "io.factor" [ "native-io" get not ] }
+    "io.factor"
 } } ;
 
 IN: command-line

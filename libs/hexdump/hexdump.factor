@@ -3,7 +3,7 @@ strings ;
 IN: hexdump-internals
 	
 : header. ( len -- )
-    "Length: " write dup unparse write ", " write >hex write "h" write terpri ;
+    "Length: " write dup unparse write ", " write >hex write "h" write nl ;
 
 : offset. ( lineno -- ) 16 * >hex 8 CHAR: 0 pad-left write "h: " write ;
 : h-pad. ( digit -- ) >hex 2 CHAR: 0 pad-left write ;
@@ -11,7 +11,7 @@ IN: hexdump-internals
     offset. [ [ h-pad. " " write ] each ] keep
     16 over length - "   " <array> concat write
     [ dup printable? [ drop CHAR: . ] unless 1string write ] each
-    terpri ;
+    nl ;
 
 IN: hexdump
 : hexdump ( str -- str )

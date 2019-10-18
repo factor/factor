@@ -1,56 +1,95 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
 IN: generic
 USING: arrays kernel kernel-internals math namespaces
-parser sequences strings words ;
+sequences strings words errors ;
 
-: define-typecheck ( class generic quot -- )
-    over define-generic -rot define-method ;
+TUPLE: slot-spec decl name # reader writer ;
 
-: define-slot-word ( class slot word quot -- )
-    rot >fixnum add* define-typecheck ;
+: define-typecheck ( class generic quot effect -- )
+    pick swap "declared-effect" set-word-prop
+    over define-simple-generic
+    -rot define-method ;
 
-: reader-effect ( -- effect ) 1 1 <effect> ; inline
+: define-slot-word ( class slot word quot effect -- )
+    >r rot >fixnum add* r> define-typecheck ;
 
-: define-reader ( class slot decl reader -- )
-    dup [
-        dup reader-effect "declared-effect" set-word-prop
-        [ slot ] rot dup object eq?
-        [ drop ] [ 1array [ declare ] swap add* append ] if
-        define-slot-word
+: reader-effect ( class spec -- effect )
+    >r word-name 1array r> slot-spec-name 1array <effect> ;
+
+: reader-quot ( decl -- quot )
+    [
+        \ slot ,
+        dup object eq? [ drop ] [ 1array , \ declare , ] if
+    ] [ ] make ;
+
+: save-reader ( class spec -- )
+    slot-spec-reader swap "reading" set-word-prop ;
+
+: define-reader ( class spec -- )
+    dup slot-spec-reader [
+        [ save-reader ] 2keep
+        [
+            dup slot-spec-#
+            over slot-spec-reader
+            rot slot-spec-decl reader-quot
+        ] 2keep reader-effect define-slot-word
     ] [
-        2drop 2drop
+        2drop
     ] if ;
 
-: writer-effect ( -- effect ) 2 0 <effect> ; inline
+: writer-effect ( class spec -- effect )
+    slot-spec-name swap word-name 2array 0 <effect> ;
 
-: define-writer ( class slot writer -- )
-    dup [
-        dup writer-effect "declared-effect" set-word-prop
-        [ set-slot ] define-slot-word
+: save-writer ( class spec -- )
+    slot-spec-writer swap "writing" set-word-prop ;
+
+: define-writer ( class spec -- )
+    dup slot-spec-writer [
+        [ save-writer ] 2keep
+        [
+            dup slot-spec-#
+            swap slot-spec-writer
+            [ set-slot ]
+        ] 2keep writer-effect define-slot-word
     ] [
-        3drop
+        2drop
     ] if ;
 
-: define-slot ( class slot decl reader writer -- )
-    >r >r >r 2dup r> r> define-reader r> define-writer ;
+: define-slot ( class spec -- )
+    2dup define-reader define-writer ;
 
-: intern-slots ( spec -- spec )
-    [ [ dup array? [ first2 create ] when ] map ] map ;
+: define-slots ( class specs -- )
+    [ define-slot ] each-with ;
 
-: define-slots ( class spec -- )
-    [ first4 define-slot ] each-with ;
+: reader-word ( class name vocab -- word )
+    >r >r "-" r> 3append r> create ;
 
-: reader-word ( class name -- word )
-    >r word-name "-" r> 3append in get 2array ;
+: writer-word ( class name vocab -- word )
+    >r [ swap "set-" % % "-" % % ] "" make r> create ;
 
-: writer-word ( class name -- word )
-    [ swap "set-" % word-name % "-" % % ] "" make in get 2array ;
+: (simple-slot-word) ( class name -- class name vocab )
+    over word-vocabulary >r >r word-name r> r> ;
 
-: simple-slot ( class name -- )
-    2dup reader-word , writer-word , ;
+: tuple-reader-word ( class name -- word )
+    (simple-slot-word) reader-word ;
 
-: simple-slots ( class slots base -- spec )
+: tuple-writer-word ( class name -- word )
+    (simple-slot-word) writer-word ;
+
+: simple-slot ( class name # -- spec )
+    >r object over r> f f <slot-spec>
+    pick pick tuple-reader-word over set-slot-spec-reader
+    rot rot tuple-writer-word over set-slot-spec-writer ;
+
+: simple-slots ( class slots base -- specs )
     over length [ + ] map-with
-    [ [ , object , dupd simple-slot ] { } make ] 2map nip intern-slots ;
+    [ >r >r dup r> r> simple-slot ] 2map nip ;
+
+: slot-of-reader ( reader class -- slotspec/f )
+    "slots" word-prop [ slot-spec-reader eq? ] find-with nip
+    [ "No such slot" throw ] unless* ;
+
+: slot-of-writer ( writer class -- slotspec/f )
+    "slots" word-prop [ slot-spec-writer eq? ] find-with nip
+    [ "No such slot" throw ] unless* ;

@@ -2,9 +2,9 @@ USING: help parser shells modules ;
 
 ARTICLE: "cli" "Command line usage"
 "Unless the " { $snippet "-no-user-init" } " command line switch is specified, The startup routine runs the " { $snippet ".factor-rc" } " file in the user's home directory, if it exists. This file can contain initialization and customization for your development environment."
-$terpri
+$nl
 "Zero or more command line arguments may be passed to the Factor runtime. Command line arguments starting with a dash (" { $snippet "-" } ") is interpreted as a switch. All other arguments are taken to be file names to be run by " { $link run-file } "."
-$terpri
+$nl
 "Finally, switches can take one of the following three forms:"
 { $list
     { { $snippet "-" { $emphasis "foo" } } " - sets the global variable " { $snippet "\"" { $emphasis "foo" } "\"" } " to " { $link t } }

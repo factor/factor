@@ -37,19 +37,18 @@ HELP: set-word-def ( obj word -- )
 $low-level-note ;
 
 HELP: undefined
-{ $class-description "The class of undefined words created by " { $link POSTPONE: DEFER: } "." }
-{ $see-also POSTPONE: DEFER: } ;
+{ $class-description "The class of undefined words created by " { $link POSTPONE: DEFER: } "." } ;
+
+{ undefined POSTPONE: DEFER: } related-words
 
 HELP: compound
-{ $description "The class of compound words created by " { $link POSTPONE: : } "." }
-{ $see-also POSTPONE: : define-compound } ;
+{ $description "The class of compound words created by " { $link POSTPONE: : } "." } ;
 
 HELP: primitive
 { $description "The class of primitive words." } ;
 
 HELP: symbol
-{ $description "The class of symbols created by " { $link POSTPONE: SYMBOL: } "." }
-{ $see-also POSTPONE: SYMBOL: define-symbol intern-symbol } ;
+{ $description "The class of symbols created by " { $link POSTPONE: SYMBOL: } "." } ;
 
 HELP: word-prop
 { $values { "word" "a word" } { "name" "a property name" } { "value" "a property value" } }
@@ -70,12 +69,10 @@ HELP: word-xt
 HELP: uses
 { $values { "word" "a word" } { "seq" "a sequence of words" } }
 { $description "Outputs a sequence of words directory called by the given word." }
-{ $notes "The sequence will include the word itself if it is recursive." }
-{ $see-also uses } ;
+{ $notes "The sequence will include the word itself if it is recursive." } ;
 
 HELP: crossref
-{ $var-description "A graph whose vertices are words and edges are usages. See " { $link "graphs" } "." }
-{ $see-also usage xref-words } ;
+{ $var-description "A graph whose vertices are words and edges are usages. See " { $link "graphs" } "." } ;
 
 HELP: xref-word
 { $values { "word" "a word" } }
@@ -85,8 +82,7 @@ $low-level-note ;
 HELP: usage
 { $values { "word" "a word" } { "seq" "a sequence of words" } }
 { $description "Outputs a sequence of words that directly call the given word." }
-{ $notes "The sequence will include the word itself if it is recursive." }
-{ $see-also usage } ;
+{ $notes "The sequence will include the word itself if it is recursive." } ;
 
 HELP: unxref-word*
 { $values { "word" "a word" } }
@@ -146,11 +142,11 @@ HELP: define-temp
 } ;
 
 HELP: definer
-{ $values { "word" "a word" } { "definer" "a word" } }
-{ $description "Outputs the parsing word that defines the given word." }
+{ $values { "word" "a word" } { "start" "a word" } { "end" "a word or " { $link f } } }
+{ $description "Outputs the parsing word which delimit the definition of the given word." }
 { $examples
-    { $example ": foo ; \\ foo definer ." "POSTPONE: :" }
-    { $example "SYMBOL: foo \\ foo definer ." "POSTPONE: SYMBOL:" }
+    { $example ": foo ; \\ foo definer . ." ";\nPOSTPONE: :" }
+    { $example "SYMBOL: foo \\ foo definer . ." "f\nPOSTPONE: SYMBOL:" }
 } ;
 
 HELP: bootstrapping?
@@ -161,13 +157,13 @@ HELP: vocabularies
 
 HELP: word
 { $values { "word" "a word" } }
-{ $description "Outputs the most recently defined word." }
-{ $see-also save-location } ;
+{ $description "Outputs the most recently defined word." } ;
+
+{ word set-word save-location } related-words
 
 HELP: set-word
 { $values { "word" "a word" } }
-{ $description "Sets the recently defined word. Usually you would call " { $link save-location } " on a newly-defined word instead, which will in turn call this word." }
-{ $see-also word } ;
+{ $description "Sets the recently defined word. Usually you would call " { $link save-location } " on a newly-defined word instead, which will in turn call this word." } ;
 
 HELP: vocabs
 { $values { "seq" "a sequence of strings" } }
@@ -176,10 +172,6 @@ HELP: vocabs
 HELP: vocab
 { $values { "name" "a string" } { "vocab" "a hashtable" } }
 { $description "Outputs a named vocabulary, or " { $link f } " if no vocabulary with this name exists." } ;
-
-HELP: ensure-vocab
-{ $values { "name" "a string" } }
-{ $description "Creates a vocabulary if it does not already exist." } ;
 
 HELP: words
 { $values { "vocab" "a string" } { "seq" "a sequence of words" } }
@@ -198,8 +190,7 @@ HELP: lookup
 
 HELP: reveal
 { $values { "word" "a word" } }
-{ $description "Adds a newly-created word to the dictionary. Usually this word does not need to be called directly." }
-{ $see-also create } ;
+{ $description "Adds a newly-created word to the dictionary. Usually this word does not need to be called directly, and is only called as part of " { $link create } "." } ;
 
 HELP: check-create
 { $values { "name" "a string" } { "vocab" "a string" } }
@@ -217,13 +208,13 @@ HELP: constructor-word
 
 HELP: forget-word
 { $values { "word" "a word" } }
-{ $description "Removes a word from its vocabulary. User code should call " { $link forget } " instead, since it also does the right thing when forgetting class words." }
-{ $see-also POSTPONE: FORGET: forget-vocab forget } ;
+{ $description "Removes a word from its vocabulary. User code should call " { $link forget } " instead, since it also does the right thing when forgetting class words." } ;
+
+{ POSTPONE: FORGET: forget forget-word forget-vocab } related-words
 
 HELP: forget-vocab
 { $values { "vocab" "a string" } }
-{ $description "Removes a vocabulary. All words in the vocabulary become uninterned." }
-{ $see-also forget } ;
+{ $description "Removes a vocabulary. All words in the vocabulary become uninterned." } ;
 
 HELP: target-word
 { $values { "word" "a word" } { "target" "a word" } }
@@ -243,3 +234,8 @@ HELP: update-xt ( word -- )
 
 HELP: changed-words
 { $var-description "Global variable holding words which need to be recompiled. Implemented as a hashtable where a key equals its value. This hashtable is updated by " { $link define } " when words are redefined, and inspected and cleared by " { $link recompile } "." } ;
+
+HELP: parsing?
+{ $values { "obj" "an object" } { "?" "a boolean" } }
+{ $description "Tests if an object is a parsing word." }
+{ $notes "Outputs " { $link f } " if the object is not a word." } ;

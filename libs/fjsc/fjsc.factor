@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel lazy-lists parser-combinators strings math sequences namespaces io words arrays hashtables ;
+USING: kernel lazy-lists parser-combinators strings math sequences
+namespaces quotations io words arrays hashtables assocs ;
 IN: fjsc
 
 TUPLE: ast-number value ;
@@ -201,7 +202,7 @@ M: ast-quotation (compile)
 
 M: ast-array (literal)   
   "[" ,  
-  ast-array-elements [ (literal) ] [ "," , ] interleave
+  ast-array-elements [ "," , ] [ (literal) ] interleave
   "]" , ;
 
 M: ast-array (compile)   
@@ -209,7 +210,7 @@ M: ast-array (compile)
 
 M: ast-hashtable (literal)   
   "new Hashtable().fromAlist([" ,  
-  ast-hashtable-elements [ (literal) ] [ "," , ] interleave
+  ast-hashtable-elements [ "," , ] [ (literal) ] interleave
   "])" , ;
 
 M: ast-hashtable (compile)   
@@ -259,9 +260,9 @@ M: ast-in (compile)
 M: ast-using (compile) 
   "factor.using([" ,
   ast-using-names [
-    "\"" , , "\"" ,
-  ] [
     "," ,
+  ] [
+    "\"" , , "\"" ,
   ] interleave
   "]," , ;
 
@@ -290,7 +291,7 @@ M: array (parse-factor-quotation) ( object -- ast )
   ] { } make <ast-array> ;
 
 M: hashtable (parse-factor-quotation) ( object -- ast )
-  hash>alist [ 
+  >alist [ 
     [ (parse-factor-quotation) , ] each
   ] { } make <ast-hashtable> ;
 

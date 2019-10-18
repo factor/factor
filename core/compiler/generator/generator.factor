@@ -1,37 +1,52 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: compiler
+DEFER: (compile)
+
 IN: generator
-USING: arrays errors generic hashtables inference
-kernel kernel-internals math namespaces sequences words ;
+USING: arrays errors generic assocs hashtables inference
+kernel kernel-internals math namespaces sequences words
+quotations compiler ;
+
+SYMBOL: compiled-xts
+
+: save-xt ( word xt -- )
+    swap dup unchanged-word compiled-xts get set-at ;
+
+: compiling? ( word -- ? )
+    {
+        { [ dup compiled-xts get key? ] [ drop t ] }
+        { [ dup word-changed? ] [ drop f ] }
+        { [ t ] [ compiled? ] }
+    } cond ;
+
+: with-compiler ( quot -- )
+    [
+        H{ } clone compiled-xts set
+        call
+        compiled-xts get >alist finalize-compile
+    ] with-scope ;
 
 ! The word being compiled
 SYMBOL: compiling
 
-: generate-code ( node quot -- )
-    over stack-frame-size \ stack-frame-size set
-    %prologue call ; inline
-
 : init-generator ( word -- )
     #! The first entry in the literal table is the word itself,
     #! this is for compiled call traces
-    dup compiling set
-    V{ } clone relocation-table set
-    V{ } clone literal-table set
-    V{ } clone label-table set 
+    V{ } clone literal-table set 
     V{ } clone word-table set
-    literal-table get push ;
+    dup compiling set literal-table get push ;
 
 : generate-1 ( word label node quot -- )
     #! Generate the code, then dump three vectors to pass to
     #! add-compiled-block.
     pick f save-xt [
         roll init-generator
-        generate-code
-        generate-labels
-        relocation-table get
+        %prologue-later
+        call
         literal-table get
         word-table get
-    ] V{ } make code-format add-compiled-block save-xt ;
+    ] V{ } make fixup code-format add-compiled-block save-xt ;
 
 GENERIC: generate-node ( node -- next )
 
@@ -44,13 +59,45 @@ GENERIC: generate-node ( node -- next )
         [ generate-nodes ] with-node-iterator
     ] generate-1 ;
 
+: intrinsics ( #call -- quot )
+    node-param "intrinsics" word-prop ;
+
+: if-intrinsics ( #call -- quot )
+    node-param "if-intrinsics" word-prop ;
+
+DEFER: #terminal?
+
+PREDICATE: #merge #terminal-merge node-successor #terminal? ;
+
+PREDICATE: #values #terminal-values node-successor #terminal? ;
+
+PREDICATE: #call #terminal-call
+    dup node-successor #if?
+    over node-successor node-successor #terminal? and
+    swap if-intrinsics and ;
+
+UNION: #terminal
+    POSTPONE: f #return #terminal-values #terminal-merge ;
+
+: tail-call? ( -- ? )
+    node-stack get [
+        dup #terminal-call? swap node-successor #terminal? or
+    ] all? ;
+
 ! node
 M: node generate-node drop iterate-next ;
 
 ! #label
 : generate-call ( label -- next )
+    dup (compile)
     end-basic-block
-    tail-call? [ %jump f ] [ %call iterate-next ] if ;
+    tail-call? [
+        %jump f
+    ] [
+        0 frame-required
+        %call
+        iterate-next
+    ] if ;
 
 M: #label generate-node
     dup node-param generate-call >r
@@ -90,10 +137,15 @@ M: #if generate-node
 : dispatch-branches ( node -- syms )
     node-children
     [ compiling get dispatch-branch ] map
-    word-table get nappend ;
+    word-table get push-all ;
 
 : %dispatch ( word-table# -- )
-    tail-call? [ %jump-dispatch ] [ %call-dispatch ] if ;
+    tail-call? [
+        %jump-dispatch
+    ] [
+        0 frame-required
+        %call-dispatch
+    ] if ;
 
 M: #dispatch generate-node
     #! The parameter is a list of nodes, each one is a branch to
@@ -122,40 +174,53 @@ M: #dispatch generate-node
     "true" resolve-label
     t "if-scratch" get load-literal
     "end" resolve-label
-    "if-scratch" get phantom-d get phantom-push
-    compute-free-vregs ; inline
+    "if-scratch" get phantom-d get phantom-push ; inline
 
 : define-if>boolean-intrinsics ( word intrinsics -- )
     #! intrinsics is a sequence of { hash quot }
     [
         first2
         >r [ if>boolean-intrinsic ] curry r>
-        { { f "if-scratch" } } +scratch+ associate hash-union
+        { { f "if-scratch" } } +scratch+ associate union
         2array
     ] map "intrinsics" set-word-prop ;
 
 : define-if-intrinsics ( word intrinsics -- )
     #! intrinsics is a sequence of { quot inputs }
-    [ first2 +input+ associate 2array ] map
+    [ +input+ associate ] assoc-map
     2dup define-if>branch-intrinsics
     define-if>boolean-intrinsics ;
 
 : define-if-intrinsic ( word quot inputs -- )
     2array 1array define-if-intrinsics ;
 
-: do-if-intrinsic ( #call -- next )
-    dup node-successor
-    <label> [ rot if-intrinsics apply-template ] keep
-    generate-if node-successor ;
+: do-intrinsic ( pair -- ) first2 with-template ;
 
-: do-intrinsic ( #call -- ) intrinsics apply-template ;
+: do-if-intrinsic ( #call pair -- next )
+    <label> [ swap do-intrinsic ] keep
+    >r node-successor r> generate-if
+    node-successor ;
+
+: find-intrinsic ( #call -- pair/f )
+    intrinsics find-template ;
+
+: find-if-intrinsic ( #call -- pair/f )
+    dup node-successor #if? [
+        if-intrinsics find-template
+    ] [
+        drop f
+    ] if ;
 
 M: #call generate-node
-    {
-        { [ dup do-if-intrinsic? ] [ do-if-intrinsic ] }
-        { [ dup intrinsics ] [ do-intrinsic iterate-next ] }
-        { [ t ] [ node-param generate-call ] }
-    } cond ;
+    dup find-if-intrinsic [
+        do-if-intrinsic
+    ] [
+        dup find-intrinsic [
+            do-intrinsic iterate-next
+        ] [
+            node-param generate-call
+        ] ?if
+    ] if* ;
 
 ! #call-label
 M: #call-label generate-node node-param generate-call ;
@@ -179,7 +244,6 @@ M: #push generate-node
     effect-in length neg phantom-d get adjust-phantom ;
 
 : phantom-shuffle ( shuffle -- )
-    dup effect-in 0 additional-vregs 0 ensure-vregs
     [
         effect-in length phantom-d get phantom-shuffle-input
     ] keep
@@ -189,21 +253,23 @@ M: #push generate-node
 M: #shuffle generate-node
     node-shuffle phantom-shuffle iterate-next ;
 
+: generate->r/r>
+    { } guess-vregs ensure-vregs
+    1 over phantom-shuffle-input
+    -1 rot adjust-phantom
+    swap phantom-append ;
+
 M: #>r generate-node
     node-in-d empty? [
-        1 0 additional-vregs 0 ensure-vregs
-        1 phantom-d get phantom-shuffle-input
-        -1 phantom-d get adjust-phantom
-        phantom-r get phantom-append
+        phantom-r get phantom-d get { { f } } { }
+        generate->r/r>
     ] unless
     iterate-next ;
 
 M: #r> generate-node
     node-out-d empty? [
-        0 1 additional-vregs 0 ensure-vregs
-        1 phantom-r get phantom-shuffle-input
-        -1 phantom-r get adjust-phantom
-        phantom-d get phantom-append
+        phantom-d get phantom-r get { } { { f } }
+        generate->r/r>
     ] unless
     iterate-next ;
 
@@ -215,5 +281,5 @@ M: #return generate-node drop end-basic-block %return f ;
 : card-mark HEX: 80 ;
 
 ! These constants must match vm/layouts.h
-: float-offset 8 float-tag - ;
-: string-offset 3 cells object-tag - ;
+: float-offset 8 float tag-number - ;
+: string-offset 3 cells object tag-number - ;

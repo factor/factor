@@ -1,8 +1,9 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: help-lint
 USING: sequences parser kernel errors help words modules strings
-namespaces io prettyprint tools definitions generic ;
+namespaces io prettyprint tools definitions generic arrays
+vectors ;
+IN: help-lint
 
 ! A quick and dirty tool to check documentation in an automated
 ! fashion.
@@ -17,8 +18,10 @@ namespaces io prettyprint tools definitions generic ;
 !   links, improper nesting, etc)
 
 : check-example ( element -- )
-    1 tail
-    [ 1 head* "\n" join eval>string "\n" ?tail drop ] keep
+    1 tail [
+        1 head* "\n" join 1array >vector
+        [ eval>string ] with-datastack peek "\n" ?tail drop
+    ] keep
     peek assert= ;
 
 : check-examples ( word element -- )
@@ -79,6 +82,7 @@ DEFER: check-help
     check-help ;
 
 : check-1 ( word -- )
+    dup . flush
     [
         dup word-help [
             2dup check-examples
@@ -88,7 +92,7 @@ DEFER: check-help
             2dup check-rendering
         ] assert-depth 2drop
     ] [
-        <word-help-error> throw
+        <word-help-error> rethrow
     ] recover ;
 
 : check-help ( -- )

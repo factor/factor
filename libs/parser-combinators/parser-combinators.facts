@@ -11,6 +11,6 @@ HELP: list-of
     "'items' is a parser that can parse the individual elements. 'separator' "
     "is a parser for the symbol that separatest them. The result tree of " 
     "the resulting parser is an array of the parsed elements." }
-{ $example "\"1,2,3,4\" 'integer' \",\" token list-of parse car parse-result-parsed ." "{ 1 2 3 4 }" }
+{ $example "USE: parser-combinators" "\"1,2,3,4\" 'integer' \",\" token list-of parse car parse-result-parsed ." "{ 1 2 3 4 }" }
 { $see-also list-of } ;
 

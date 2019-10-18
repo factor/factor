@@ -19,7 +19,7 @@ M: array like drop dup array? [ >array ] unless ;
 M: array equal?
     over array? [ sequence= ] [ 2drop f ] if ;
 
-: 1array ( x -- array ) 1 swap <array> ;
+: 1array ( x -- array ) { } singleton ;
 
 : 2array ( x y -- array )
     2 swap <array> [ 0 swap set-array-nth ] keep ;

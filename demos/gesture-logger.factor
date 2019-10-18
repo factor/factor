@@ -10,7 +10,7 @@ C: gesture-logger ( stream -- gadget )
     [ set-gesture-logger-stream ] keep
     dup delegate>gadget
     { 100 100 } over set-rect-dim
-    black <solid> over set-gadget-interior ;
+    dup black solid-interior ;
 
 M: gesture-logger handle-gesture*
     drop

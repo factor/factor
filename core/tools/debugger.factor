@@ -13,7 +13,7 @@ IN: errors
 
 : (:help-multi)
     "This error has multiple delegates:" print
-    help-outliner terpri ;
+    ($index) nl ;
 
 : (:help-none)
     drop "No help for this error. " print ;

@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: furnace
 USING: embedded generic arrays namespaces prettyprint io
-sequences words kernel httpd html errors hashtables http
-callback-responder vectors strings math basic-authentication ;
+sequences words kernel httpd html errors assocs http
+quotations callback-responder vectors strings math
+basic-authentication hashtables ;
 
 SYMBOL: default-action
 
@@ -29,7 +30,7 @@ SYMBOL: template-path
     ] when ;
 
 : truncate-url ( url -- action-name )
-  CHAR: / over index dup 0 > [ head ] [ drop ] if ;
+  CHAR: / over index [ head ] when* ;
 
 : current-action ( url -- word/f )
     dup empty? [ drop default-action get ] when
@@ -38,8 +39,8 @@ SYMBOL: template-path
 PREDICATE: word action "action" word-prop ;
 
 : quot>query ( seq action -- hash )
-    "action-params" word-prop
-    [ first swap 2array ] 2map alist>hash ;
+    >r >array r> "action-params" word-prop
+    [ first swap 2array ] 2map >hashtable ;
 
 : action-link ( query action -- url )
     [
@@ -65,7 +66,7 @@ PREDICATE: word action "action" word-prop ;
     <a swap quot-link =href a> write </a> ;
 
 : action-param ( params paramspec -- obj error/f )
-    unclip rot hash swap >quotation apply-validators ;
+    unclip rot at swap >quotation apply-validators ;
 
 : query>quot ( params action -- seq )
     "action-params" word-prop [ action-param drop ] map-with ;
@@ -74,7 +75,7 @@ SYMBOL: request-params
 
 : perform-redirect ( action -- )
     "action-redirect" word-prop
-    [ dup string? [ request-params get hash ] when ] map
+    [ dup string? [ request-params get at ] when ] map
     [ quot-link permanent-redirect ] when* ;
 
 : (call-action) ( params action -- )
@@ -117,6 +118,12 @@ SYMBOL: model
     [
         [ render-template ] [ f rot render-template ] html-document* 
     ] serve-html ;
+
+: render-titled-page* ( model body-template head-template title -- )
+    [ 
+        [ render-template ] swap [ <title> write </title> f rot render-template ] curry html-document* 
+    ] serve-html ;
+
 
 : render-page ( model template title -- )
     [

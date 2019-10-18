@@ -4,15 +4,6 @@
 IN: openal
 USING: kernel alien ;
 
-: load-openal-library ( -- )
-  "openal" {
-    { [ win32? ]  [ "OpenAL32.dll" ] }
-    { [ macosx? ] [ "/System/Library/Frameworks/OpenAL.framework/OpenAL" ] }
-    { [ unix?  ]  [ "libopenal.so" ] }
-  } cond "cdecl" add-library ;
-
-load-openal-library
-
 LIBRARY: openal
 
 TYPEDEF: char ALboolean 

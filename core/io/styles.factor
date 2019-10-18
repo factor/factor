@@ -13,7 +13,11 @@ SYMBOL: background
 SYMBOL: font
 SYMBOL: font-size
 SYMBOL: font-style
+
+! Presentation
 SYMBOL: presented
+SYMBOL: presented-path
+SYMBOL: presented-printer
 
 ! Only for plain-stream
 SYMBOL: highlight
@@ -23,7 +27,6 @@ SYMBOL: page-color
 SYMBOL: border-color
 SYMBOL: border-width
 SYMBOL: wrap-margin
-SYMBOL: outline
 
 ! Table styles
 SYMBOL: table-gap

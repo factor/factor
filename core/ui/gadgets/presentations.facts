@@ -1,33 +1,31 @@
 IN: gadgets-presentations
 USING: help gadgets gadgets-buttons gadgets-lists prettyprint
-generic models ;
+generic models operations ;
 
 HELP: presentation
 { $class-description "A presentation is a " { $link button } " which represents an object. Left-clicking a presentation invokes the default " { $link operation } ", and right-clicking displays a menu of possible operations output by " { $link object-operations } "."
-$terpri
+$nl
 "Presentations are created by calling " { $link <presentation> } "."
-$terpri
+$nl
 "Presentations have two slots:"
 { $list
     { { $link presentation-object } " - the object being presented." }
     { { $link presentation-hook } " - a quotation with stack effect " { $snippet "( presentation -- )" } ". The default value is " { $snippet "[ drop ]" } "." }
-} }
-{ $see-also "presentations" <command-button> } ;
+} } ;
 
 HELP: invoke-presentation
-{ $values { "presentation" presentation } { "command" command } }
-{ $description "Calls the " { $link presentation-hook } " and then invokes the command on the " { $link presentation-object } "." }
-{ $see-also invoke-primary invoke-secondary } ;
+{ $values { "presentation" presentation } { "operation" operation } }
+{ $description "Calls the " { $link presentation-hook } " and then invokes the operation on the " { $link presentation-object } "." } ;
+
+{ invoke-presentation invoke-primary invoke-secondary } related-words
 
 HELP: invoke-primary
 { $values { "presentation" presentation } } 
-{ $description "Invokes the " { $link primary-operation } " associated to the " { $link presentation-object } ". This word is executed when the presentation is clicked with the left mouse button." }
-{ $see-also invoke-secondary } ;
+{ $description "Invokes the " { $link primary-operation } " associated to the " { $link presentation-object } ". This word is executed when the presentation is clicked with the left mouse button." } ;
 
 HELP: invoke-secondary
 { $values { "presentation" presentation } } 
-{ $description "Invokes the " { $link secondary-operation } " associated to the " { $link presentation-object } ". This word is executed when a " { $link list } " receives a " { $snippet "RETURN" } " key press." }
-{ $see-also invoke-primary } ;
+{ $description "Invokes the " { $link secondary-operation } " associated to the " { $link presentation-object } ". This word is executed when a " { $link list } " receives a " { $snippet "RET" } " key press." } ;
 
 HELP: <presentation>
 { $values { "label" "a label" } { "object" object } { "button" "a new " { $link button } } }

@@ -1,5 +1,5 @@
 
-USING: kernel kernel-internals namespaces sequences hashtables.lib ;
+USING: kernel kernel-internals quotations namespaces sequences hashtables.lib ;
 
 IN: namespaces.lib
 

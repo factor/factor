@@ -16,7 +16,7 @@ HELP: odbc-connect
   "Connects to the database identified by the ODBC data source name (DSN). " 
   "The environment handle is usually obtained by a call to " { $link odbc-init } ". The result is the ODBC connection handle which can be used in other ODBC calls. When finished with the connection handle " { $link odbc-disconnect } " must be called on it."
 } 
-{ $example "dbc get \"DSN=mydsn\" odbc-connect" }
+{ $examples { $code "dbc get \"DSN=mydsn\" odbc-connect" } }
 { $see-also odbc-init odbc-connect odbc-disconnect odbc-prepare odbc-free-statement odbc-execute odbc-next-row odbc-number-of-columns odbc-describe-column odbc-get-field odbc-get-row-fields odbc-get-all-rows odbc-query } ;
 
 HELP: odbc-disconnect 

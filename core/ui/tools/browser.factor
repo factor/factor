@@ -1,81 +1,39 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays sequences kernel gadgets-panes definitions
-prettyprint gadgets-theme gadgets-borders gadgets
-generic gadgets-scrolling math io words models styles
-namespaces gadgets-tracks gadgets-presentations
-gadgets-workspace help gadgets-buttons tools ;
+USING: gadgets-workspace gadgets-scrolling gadgets-tiles
+gadgets-tracks gadgets-workspace gadgets kernel sequences math
+definitions ;
 IN: gadgets-browser
 
 TUPLE: browser definitions ;
 
-TUPLE: definitions showing ;
+C: browser ( -- gadget )
+    [
+        toolbar,
+        <pile> { 2 2 } over set-pack-gap
+        g-> set-browser-definitions
+        <scroller> 1 track,
+    ] { 0 1 } build-track ;
 
-: find-definitions ( gadget -- definitions )
-    [ definitions? ] find-parent ;
+: definition-index ( defspec objects -- n )
+    gadget-children [ tile-object ] map [ = ] find-with drop ;
+    inline
 
-: definition-index ( definition definitions -- n )
-    definitions-showing index ;
-
-: close-definition ( gadget definition -- )
-    over find-definitions definitions-showing delete
-    unparent ;
-
-: close-definitions ( definitions -- )
-    dup clear-gadget definitions-showing delete-all ;
-
-C: definitions ( -- gadget )
-    <pile> over set-delegate
-    { 2 2 } over set-pack-gap
-    V{ } clone over set-definitions-showing ;
-
-TUPLE: tile definition gadget ;
-
-: find-tile [ tile? ] find-parent ;
-
-: close-tile ( tile -- )
-    dup tile-definition over find-definitions
-    definitions-showing delete
-    unparent ;
-
-: <tile-content> ( definition -- gadget )
-    [ [ see ] make-pane <default-border> ] keep
-    unparse [ find-tile close-tile ] <closable-gadget>
-    dup faint-boundary ;
-
-C: tile ( definition -- gadget )
-    over <tile-content> over set-gadget-delegate
-    [ set-tile-definition ] keep ;
-
-: show-definition ( definition definitions -- )
-    2dup definition-index dup 0 >= [
+M: browser call-tool* ( defspec browser -- )
+    browser-definitions 2dup definition-index
+    [
         over nth-gadget swap scroll>rect drop
     ] [
-        drop 2dup definitions-showing push
-        swap <tile> over add-gadget
-        scroll>bottom
-    ] if ;
+        swap [ see ] <tile> over add-gadget scroll>bottom
+    ] if* ;
 
-C: browser ( -- gadget )
-    {
-        {
-            [ <definitions> ]
-            set-browser-definitions
-            [ <scroller> ]
-            @center
-        }
-    } make-frame* ;
+: clear ( browser -- ) browser-definitions clear-gadget ;
 
-: clear-browser ( browser -- )
-    browser-definitions close-definitions ;
+: browser-help "ui-browser" help-window ;
 
-browser "toolbar" {
-    { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
-} define-commands
+\ browser-help H{ { +nullary+ t } } define-command
 
-M: browser call-tool*
-    browser-definitions show-definition ;
-
-M: browser tool-scroller browser-definitions find-scroller ;
-
-M: browser tool-help drop "ui-browser" ;
+browser "toolbar" f {
+    { T{ key-down f f "CLEAR" } clear }
+    { T{ key-down f f "F1" } browser-help }
+} define-command-map

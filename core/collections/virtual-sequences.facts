@@ -1,8 +1,7 @@
 USING: help sequences ;
 
 HELP: reversed
-{ $class-description "A virtual sequence which presents a reversed view of an underlying sequence." }
-{ $see-also <reversed> reverse } ;
+{ $class-description "A virtual sequence which presents a reversed view of an underlying sequence. New instances can be created by calling " { $link <reversed> } "." } ;
 
 HELP: reversed@
 { $values { "m" "a non-negative integer" } { "reversed" "an instance of " { $link reversed } } { "n" "a non-negative integer" } { "seq" "a sequence" } }
@@ -11,6 +10,8 @@ HELP: reversed@
 HELP: reverse
 { $values { "seq" "a sequence" } { "newseq" "a new sequence" } }
 { $description "Outputs a new sequence having the same elements as " { $snippet "seq" } " but in reverse order." } ;
+
+{ reverse <reversed> } related-words
 
 HELP: <reversed> ( seq -- reversed )
 { $values { "seq" "a sequence" } { "reversed" "a new sequence" } }
@@ -28,21 +29,21 @@ HELP: slice-error
 } ;
 
 HELP: slice
-{ $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence." }
-{ $see-also <slice> subseq } ;
+{ $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence. New instances can be created by calling " { $link <slice> } "." } ;
 
 HELP: <slice>
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a sequence" } { "slice" "a slice" } }
 { $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
 { $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." } ;
 
+{ <slice> subseq } related-words
+
 HELP: slice@
 { $values { "m" "a non-negative integer" } { "slice" "an instance of " { $link slice } } { "n" "a non-negative integer" } { "seq" "a sequence" } }
 { $description "Indexes into a slice. Helper word used to implement " { $link "sequence-protocol" } " methods for the " { $link reversed } " class." } ;
 
 HELP: column
-{ $class-description "A virtual sequence which presents a fixed column of a matrix represented as a sequence of rows." }
-{ $see-also <column> } ;
+{ $class-description "A virtual sequence which presents a fixed column of a matrix represented as a sequence of rows. New instances can be created by calling " { $link <column> } "." } ;
 
 HELP: <column> ( seq n -- column )
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } }

@@ -1,4 +1,5 @@
 USING: sequences kernel math io ;
+IN: lcd
 
 : lcd-digit ( digit row -- str )
     {
@@ -11,7 +12,7 @@ USING: sequences kernel math io ;
     swap [ CHAR: 0 - swap lcd-digit write ] each-with ;
 
 : lcd ( digit-str -- )
-    3 [ lcd-row terpri ] each-with ;
+    3 [ lcd-row nl ] each-with ;
 
 PROVIDE: demos/lcd ;
 

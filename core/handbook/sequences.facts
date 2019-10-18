@@ -15,15 +15,15 @@ ARTICLE: "sequence-implementations" "Sequence implementations"
 "Integers support the sequence protocol:"
 { $subsection "sequences-integers" }
 "Virtual sequences wrap an underlying sequence, and changes to the underlying sequence are reflected in the virtual sequence. Virtual sequences implemented in the core are " { $link <reversed> } ", " { $link <slice> } " and " { $link <column> } "."
-$terpri
+$nl
 "Quotations are special sequences which hold code; see "
 { $link "quotations" } "."
-$terpri
+$nl
 "The " { $link f } " object also supports the sequence protocol. It responds with a length of zero, and instead of throwing an out of bounds error, outputs " { $link f } " when an element is accessed. This can simplify code that would like a dummy sequence behaving as if it has arbitrary length." ;
 
 ARTICLE: "sequences-integers" "Integer sequences and counted loops"
 "Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
-$terpri
+$nl
 "For example, the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
 { $example "3 [ . ] each" "0\n1\n2" }
 "A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link 2each } ":"
@@ -106,7 +106,6 @@ ARTICLE: "sequences-join-split" "Joining and splitting sequences"
 { $subsection 3append }
 { $subsection concat }
 { $subsection join }
-{ $subsection replace-slice }
 "Slicing sequences:"
 { $subsection subseq }
 { $subsection head }
@@ -136,7 +135,6 @@ ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 { $subsection add* }
 "Removing elements:"
 { $subsection remove }
-{ $subsection remove-nth }
 { $subsection diff }
 { $subsection prune } ;
 
@@ -146,27 +144,33 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 { $subsection group }
 { $subsection flip }
 { $subsection <column> }
+{ $subsection unpair }
 { $subsection subst } ;
 
 ARTICLE: "sequences-destructive" "Destructive operations"
 "These words modify their input, instead of creating a new sequence."
-$terpri
+$nl
 "In-place variant of " { $link reverse } ":"
-{ $subsection nreverse }
+{ $subsection reverse-here }
 "In-place variant of " { $link append } ":"
-{ $subsection nappend }
+{ $subsection push-all }
 "In-place variant of " { $link remove } ":"
 { $subsection delete }
 "In-place variant of " { $link map } ":"
-{ $subsection inject }
+{ $subsection change-each }
 "Changing elements:"
 { $subsection change-nth }
 { $subsection cache-nth }
+"Deleting elements:"
+{ $subsection delete-nth }
+{ $subsection delete-slice }
+{ $subsection delete-all }
 "Other destructive words:"
+{ $subsection move }
 { $subsection exchange }
 { $subsection push-new }
-{ $subsection delete-all }
 { $subsection copy }
+{ $subsection replace-slice }
 { $see-also set-nth push pop "sequences-stacks" } ;
 
 ARTICLE: "sequences-stacks" "Treating sequences as stacks"
@@ -185,12 +189,6 @@ ARTICLE: "sequences-comparing" "Comparing sequences"
 { $subsection mismatch }
 "The " { $link <=> } " generic word performs lexicographic comparison when applied to sequences." ;
 
-ARTICLE: "sequences-assoc" "Association lists"
-"An " { $emphasis "association list" } " is a sequence of pairs. Association lists come up from time to time; for example, the " { $link cond } " combinator takes an association list of quotations as input. You can perform lookups and take association lists apart:"
-{ $subsection assoc }
-{ $subsection unpair }
-"An association list is slower to search than a hashtable. The main advantage of an association list is that the elements are ordered; also sometimes it is more convenient to construct an association list with sequence words than to construct a hashtable with hashtable words. Most of the time, hashtables are more appropriate. See " { $link "hashtables" } " and " { $link "hashtables-assoc" } "." ;
-
 ARTICLE: "sequence-protocol" "Sequence protocol"
 "All sequences must know their length, and provide a way to access elements:"
 { $subsection length }
@@ -206,9 +204,9 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 
 ARTICLE: "arrays" "Arrays"
 "An array is a fixed-size mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in " { $link "syntax-arrays" } ". Sometimes you need a resizable array -- this is called a vector, and vectors are documented in " { $link "vectors" } "."
-$terpri
+$nl
 "Array words are in the " { $vocab-link "arrays" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "kernel-internals" } " vocabulary."
-$terpri
+$nl
 "Arrays form a class of objects."
 { $subsection array }
 { $subsection array? }
@@ -225,7 +223,7 @@ $terpri
 
 ARTICLE: "strings" "Strings"
 "A string is a fixed-size mutable sequence of characters. The literal syntax is covered in " { $link "syntax-strings" } "."
-$terpri
+$nl
 "String words are found in the " { $vocab-link "strings" } " vocabulary."
 { $subsection string? }
 { $subsection >string }
@@ -246,9 +244,11 @@ $terpri
 
 ARTICLE: "byte-arrays" "Byte arrays"
 "A byte array is a fixed-size mutable sequence whose elements are integers in the range 0-255, inclusive. Each element only uses one byte of storage, hence the name. The literal syntax is covered in " { $link "syntax-byte-arrays" } "."
-$terpri
+$nl
 "Byte array words are in the " { $vocab-link "byte-arrays" } " vocabulary."
-$terpri
+$nl
+"Byte arrays play a special role in the C library interface; they can be used to pass binary data back and forth between Factor and C. See " { $link "c-byte-arrays" } "."
+$nl
 "Byte arrays form a class of objects."
 { $subsection byte-array }
 { $subsection byte-array? }
@@ -258,9 +258,9 @@ $terpri
 
 ARTICLE: "bit-arrays" "Bit arrays"
 "A bit array is a fixed-size mutable sequence whose elements are either " { $link t } " or " { $link f } ". Each element only uses one bit of storage, hence the name. The literal syntax is covered in " { $link "syntax-bit-arrays" } "."
-$terpri
+$nl
 "Bit array words are in the " { $vocab-link "bit-arrays" } " vocabulary."
-$terpri
+$nl
 "Bit arrays form a class of objects."
 { $subsection bit-array }
 { $subsection bit-array? }
@@ -270,9 +270,9 @@ $terpri
 
 ARTICLE: "sbufs" "String buffers"
 "A string buffer is a resizable mutable sequence of characters. The literal syntax is covered in " { $link "syntax-sbufs" } "."
-$terpri
+$nl
 "String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words are more convenient to use in most cases (see " { $link "namespaces-make" } ")."
-$terpri
+$nl
 "String buffer words are found in the " { $vocab-link "sbufs" } " vocabulary."
 { $subsection sbuf? }
 "Words for creating string buffers:"
@@ -297,11 +297,9 @@ ARTICLE: "sequences-sorting" "Sorting and binary search"
     { "zero - indicates that " { $snippet "elt1" } " is ordered equivalently to " { $snippet "elt2" } }
     { "negative - indicates that " { $snippet "elt1" } " precedes " { $snippet "elt2" } }
 }
-"In-place sorting with a custom comparator:"
-{ $subsection nsort }
-"Creating a new sorted sequence with a custom comparator:"
+"Sorting a sequence with a custom comparator:"
 { $subsection sort }
-"Creating a new sorted sequence with common comparators:"
+"Sorting a sequence with common comparators:"
 { $subsection natural-sort }
 { $subsection sort-keys }
 { $subsection sort-values }
@@ -314,16 +312,16 @@ ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 { $subsection nth-unsafe }
 { $subsection set-nth-unsafe }
 "These words assume the sequence index given is within bounds; if it is not, memory corruption can occur. Please think twice before using them; first, make sure the code in question is actually a bottleneck; next, try improving the algorithm first. If all else fails, then use these words and test your code very carefully."
-$terpri
+$nl
 "There is a very important invariant these word must preserve: if at some point in time, the length of a sequence was " { $snippet "n" } ", then any future lookups of elements with indices below " { $snippet "n" } " must not crash the runtime, even if the sequence length is now less than " { $snippet "n" } ". For example, vectors preserve this invariant by never shrinking the underlying storage, only growing it as necessary."
-$terpri
+$nl
 "The justification for this is that the runtime should not crash if a resizable sequence is resized during the execution of an iteration combinator."
-$terpri
+$nl
 "Indeed, iteration combinators are the primary use-case for these words; if the iteration index is already guarded by a loop test which ensures it is within bounds, then additional bounds checks are redundant. For example, see the implementation of " { $link each } "." ;
 
 ARTICLE: "sequences-resizable" "Resizable sequence implementation"
 "Resizable sequences are implementing by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."
-$terpri
+$nl
 "There is a resizable sequence protocol:"
 { $subsection underlying }
 { $subsection set-underlying }
@@ -334,12 +332,12 @@ $terpri
 { $subsection grow-length }
 { $subsection clone-resizable }
 "This protocol and the above words are unsafe; they do not perform bounds checks for performance reasons, and thus a mistake can lead to memory corruption due to an underlying sequence being shorter than the fill pointer."
-$terpri
+$nl
 "Vectors and string buffers are implemented using the resizable sequence facility (and they perform full bounds-checks and thus are safe)." ;
 
 ARTICLE: "sequences" "Sequences"
 "A sequence is a finite, linearly-ordered collection of elements."
-$terpri
+$nl
 "Sequence utility words can operate on any object whose class implements the sequence protocol."
 { $subsection "sequence-protocol" }
 "There are a number of implementations of sequences in the core library, and you can write new implementations yourself."
@@ -357,8 +355,7 @@ $terpri
 { $subsection "sequences-destructive" }
 "Sequences are also used to implement other data structures:"
 { $subsection "sequences-stacks" }
-{ $subsection "sequences-assoc" }
 "Some implementation details which your code should probably not care about:"
 { $subsection "sequences-unsafe" }
 { $subsection "sequences-resizable" }
-{ $see-also "namespaces-make" } ;
+{ $see-also "namespaces-make" "assocs-alists" } ;

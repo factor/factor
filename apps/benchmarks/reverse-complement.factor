@@ -1,5 +1,5 @@
-REQUIRES: libs/memoize ;
-USING: io kernel sequences strings vectors words memoize tools ;
+USING: io kernel sequences sequences-internals kernel-internals
+strings vectors words tools ;
 IN: reverse-complement
 
 MEMO: trans-map ( -- str )
@@ -7,12 +7,13 @@ MEMO: trans-map ( -- str )
     "TGCAAKYRMBDHV" "ACGTUMRYKVHDB"
     [ pick set-nth ] 2each ;
 
-: do-trans-map ( str -- ) [ ch>upper trans-map nth ] inject ;
+: do-trans-map ( str -- )
+    [ ch>upper trans-map nth ] change-each ;
 
 \ do-trans-map { string } "specializer" set-word-prop
 
 : translate-seq ( seq -- str )
-    concat dup nreverse dup do-trans-map ;
+    concat dup reverse-here dup do-trans-map ;
 
 : show-seq ( seq -- )
     translate-seq 60 <groups> [ print ] each ;

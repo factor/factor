@@ -3,7 +3,7 @@
 IN: gadgets-buttons
 USING: gadgets gadgets-borders gadgets-labels
 gadgets-theme generic io kernel math models namespaces sequences
-strings styles threads words hashtables ;
+strings styles threads words hashtables quotations assocs ;
 
 TUPLE: button pressed? selected? quot ;
 
@@ -11,7 +11,7 @@ TUPLE: button pressed? selected? quot ;
     hand-buttons get-global empty? not ;
 
 : button-rollover? ( button -- ? )
-    hand-gadget get parents [ [ button? ] is? ] find nip eq? ;
+    hand-gadget get-global child? ;
 
 : mouse-clicked? ( gadget -- ? )
     hand-clicked get-global child? ;
@@ -50,22 +50,19 @@ C: button ( gadget quot -- button )
     <button> dup roll-button-theme ;
 
 : <bevel-button> ( label quot -- button )
-    >r >label <default-border> r>
+    >r >label 5 <border> r>
     <button> dup bevel-button-theme ;
 
 TUPLE: repeat-button ;
 
 repeat-button H{
-    { T{ button-down } [ [ button-clicked ] start-timer-gadget ] }
-    { T{ button-up } [ dup stop-timer-gadget button-update ] }
+    { T{ drag } [ button-clicked ] }
 } set-gestures
 
 C: repeat-button ( label quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
-    [
-        >r <bevel-button> <timer-gadget> r> set-gadget-delegate
-    ] keep ;
+    [ >r <bevel-button> r> set-gadget-delegate ] keep ;
 
 TUPLE: button-paint plain rollover pressed selected ;
 
@@ -88,26 +85,32 @@ M: button-paint draw-boundary
     swap [ swap >r = r> set-button-selected? ] curry <control> ;
 
 : <radio-box> ( model assoc -- gadget )
-    [ first2 <radio-control> ] map-with make-shelf ;
+    [
+        [ <radio-control> gadget, ] assoc-each-with
+    ] make-shelf ;
 
-: (command-button) ( target command -- label quot )
-    dup command-name -rot
+: command-button-quot ( target command -- quot )
     [ invoke-command drop ] curry curry ;
 
-: <command-button> ( target command -- button )
-    (command-button) <bevel-button> ;
+: <command-button> ( target gesture command -- button )
+    [ command-string ] keep
+    swapd
+    command-button-quot
+    <bevel-button> ;
 
-: <toolbar> ( target classes -- toolbar )
-    [ commands "toolbar" swap hash ] map concat
-    [ <command-button> ] map-with
-    make-shelf ;
+: <toolbar> ( target -- toolbar )
+    [
+        "toolbar" over class command-map
+        [ <command-button> gadget, ] assoc-each-with
+    ] make-shelf ;
 
 : <menu-item> ( hook target command -- button )
-    rot >r
-    (command-button) [ hand-clicked get find-world hide-glass ]
-    r> 3append <roll-button> ;
+    dup command-name -rot command-button-quot
+    swapd
+    [ hand-clicked get find-world hide-glass ]
+    3append <roll-button> ;
 
 : <commands-menu> ( hook target commands -- gadget )
-    [ >r 2dup r> <menu-item> ] map 2nip make-filled-pile
-    <default-border>
-    dup menu-theme ;
+    [
+        [ >r 2dup r> <menu-item> gadget, ] each 2drop
+    ] make-filled-pile 5 <border> dup menu-theme ;

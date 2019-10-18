@@ -39,14 +39,22 @@ M: object zero? drop f ;
 
 : 1+ ( x -- y ) 1 + ; foldable
 : 1- ( x -- y ) 1 - ; foldable
+: 2/ ( x -- y ) -1 shift ; foldable
 : sq ( x -- y ) dup * ; foldable
 : neg ( x -- -x ) 0 swap - ; foldable
 : recip ( x -- y ) 1 swap / ; foldable
-: max ( x y -- z ) [ > ] 2keep ? ; foldable
-: min ( x y -- z ) [ < ] 2keep ? ; foldable
+
+: most ( x y quot -- z )
+    >r 2dup r> call [ drop ] [ nip ] if ; inline
+
+: max ( x y -- z ) [ > ] most ; foldable
+: min ( x y -- z ) [ < ] most ; foldable
 
 : between? ( x y z -- ? )
     pick >= [ >= ] [ 2drop f ] if ; foldable
+
+: power-of-2? ( n -- ? )
+    dup 0 < [ drop f ] [ dup 1- bitand zero? ] if ; foldable
 
 : rem ( x y -- z ) tuck mod over + swap mod ; foldable
 : sgn ( x -- n ) dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
@@ -64,7 +72,7 @@ M: object zero? drop f ;
 
 : 2^ ( n -- 2^n ) 1 swap shift ; inline
 
-: (repeat) ( i n quot -- )
+: (repeat) ( from to quot -- )
     pick pick >= [
         3drop
     ] [

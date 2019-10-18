@@ -1,20 +1,17 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays byte-arrays errors generic hashtables
-hashtables-internals help io kernel kernel-internals math
-namespaces parser prettyprint sequences sequences-internals
-strings sbufs vectors words modules ;
+USING: alien arrays bit-arrays byte-arrays errors generic
+assocs hashtables assocs hashtables-internals help io kernel kernel-internals
+math namespaces parser prettyprint sequences sequences-internals
+strings sbufs vectors words modules quotations assocs ;
 IN: image
 
 ! Constants
 
 : image-magic HEX: 0f0e0d0c ; inline
-: image-version 2 ; inline
+: image-version 3 ; inline
 
-: char bootstrap-cell 2 /i ; inline
-
-: untag ( cell -- cell ) tag-mask bitnot bitand ; inline
-: tag ( cell -- tag ) tag-mask bitand ; inline
+: char bootstrap-cell 2/ ; inline
 
 : data-base 1024 ; inline
 
@@ -53,7 +50,7 @@ SYMBOL: boot-quot
         d>w/w big-endian get [ swap ] unless emit emit
     ] if ;
 
-: emit-seq ( seq -- ) image get nappend ;
+: emit-seq ( seq -- ) image get push-all ;
 
 : fixup ( value offset -- ) image get set-nth ;
 
@@ -67,7 +64,7 @@ SYMBOL: boot-quot
 : align-here ( -- )
     here 8 mod 4 = [ 0 emit ] when ;
 
-: emit-fixnum ( n -- ) fixnum-tag tag-address emit ;
+: emit-fixnum ( n -- ) fixnum tag-number tag-address emit ;
 
 : emit-object ( header tag quot -- addr )
     swap here-as >r swap tag-header emit call align-here r> ;
@@ -78,16 +75,16 @@ SYMBOL: boot-quot
 : header ( -- )
     image-magic emit
     image-version emit
-     data-base emit ! relocation base at end of header
-     0 emit ! bootstrap quotation set later
-     0 emit ! global namespace set later
-     0 emit ! pointer to t object
-     0 emit ! pointer to bignum 0
-     0 emit ! pointer to bignum 1
-     0 emit ! pointer to bignum -1
-     0 emit ! size of data heap set later
-     0 emit ! size of code heap is 0
-     0 emit ; ! reloc base of code heap is 0
+    data-base emit ! relocation base at end of header
+    0 emit ! bootstrap quotation set later
+    0 emit ! global namespace set later
+    0 emit ! pointer to t object
+    0 emit ! pointer to bignum 0
+    0 emit ! pointer to bignum 1
+    0 emit ! pointer to bignum -1
+    0 emit ! size of data heap set later
+    0 emit ! size of code heap is 0
+    0 emit ; ! reloc base of code heap is 0
 
 GENERIC: ' ( obj -- ptr )
 #! Write an object to the image.
@@ -116,8 +113,7 @@ GENERIC: ' ( obj -- ptr )
     swap emit emit-seq ;
 
 M: bignum '
-    #! This can only emit 0, -1 and 1.
-    bignum-tag bignum-tag [ emit-bignum ] emit-object ;
+    bignum tag-number dup [ emit-bignum ] emit-object ;
 
 ! Fixnums
 
@@ -125,12 +121,12 @@ M: fixnum '
     #! When generating a 32-bit image on a 64-bit system,
     #! some fixnums should be bignums.
     dup most-negative-fixnum most-positive-fixnum between?
-    [ fixnum-tag tag-address ] [ >bignum ' ] if ;
+    [ fixnum tag-number tag-address ] [ >bignum ' ] if ;
 
 ! Floats
 
 M: float '
-    float-tag float-tag [
+    float tag-number dup [
         align-here double>bits emit-64
     ] emit-object ;
 
@@ -142,7 +138,7 @@ M: float '
 
 M: f '
     #! f is #define F RETAG(0,OBJECT_TYPE)
-    drop object-tag ;
+    drop object tag-number ;
 
 :  0,  0 >bignum '  0-offset fixup ;
 :  1,  1 >bignum '  1-offset fixup ;
@@ -166,9 +162,10 @@ M: f '
         dup word-props ' ,
         f ' ,
         0 ,
+        0 ,
     ] { } make
-    word-tag word-tag [ emit-seq ] emit-object
-    swap objects get set-hash ;
+    \ word tag-number dup [ emit-seq ] emit-object
+    swap objects get set-at ;
 
 : word-error ( word msg -- * )
     [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
@@ -177,18 +174,18 @@ M: f '
     dup target-word [ ] [ "Missing DEFER: " word-error ] ?if ;
 
 : fixup-word ( word -- offset )
-    transfer-word dup objects get hash
+    transfer-word dup objects get at
     [ ] [ "Not in image: " word-error ] ?if ;
 
 : fixup-words ( -- )
-    image get [ dup word? [ fixup-word ] when ] inject ;
+    image get [ dup word? [ fixup-word ] when ] change-each ;
 
 M: word ' ;
 
 ! Wrappers
 
 M: wrapper '
-    wrapped ' wrapper-tag wrapper-tag [ emit ] emit-object ;
+    wrapped ' wrapper tag-number dup [ emit ] emit-object ;
 
 ! Ratios and complexes
 
@@ -196,10 +193,10 @@ M: wrapper '
     [ [ emit ] 2apply ] emit-object ;
 
 M: ratio '
-    >fraction [ ' ] 2apply ratio-tag ratio-tag emit-pair ;
+    >fraction [ ' ] 2apply ratio tag-number dup emit-pair ;
 
 M: complex '
-    >rect [ ' ] 2apply complex-tag complex-tag emit-pair ;
+    >rect [ ' ] 2apply complex tag-number dup emit-pair ;
 
 ! Strings
 
@@ -215,9 +212,9 @@ M: complex '
     dup length 1+ char align 0 pad-right ;
 
 : emit-string ( string -- ptr )
-    string-type object-tag [
+    string type-number object tag-number [
         dup length emit-fixnum
-        dup hashcode emit-fixnum
+        f ' emit
         pack-string emit-chars
     ] emit-object ;
 
@@ -237,7 +234,7 @@ M: string '
     dup length cell align 0 pad-right ;
 
 : emit-byte-array ( string -- ptr )
-    byte-array-type object-tag [
+    byte-array type-number object tag-number [
         dup length emit-fixnum
         pack-bytes emit-bytes
     ] emit-object ;
@@ -245,10 +242,22 @@ M: string '
 M: byte-array '
     objects get [ emit-byte-array ] cache ;
 
+! Bit arrays
+: emit-bit-array ( string -- ptr )
+    bit-array type-number object tag-number [
+        dup length emit-fixnum
+        empty? [
+            "Cannot serialize non-empty bit array" throw
+        ] unless
+    ] emit-object ;
+
+M: bit-array '
+    objects get [ emit-bit-array ] cache ;
+
 ! Arrays and vectors
 
 : emit-array ( list type -- pointer )
-    >r [ ' ] map r> object-tag [
+    >r [ ' ] map r> object tag-number [
         dup length emit-fixnum
         emit-seq
     ] emit-object ;
@@ -260,7 +269,9 @@ M: byte-array '
 
 M: tuple '
     transfer-tuple
-    objects get [ tuple>array tuple-type emit-array ] cache ;
+    objects get [
+        tuple>array tuple type-number emit-array
+    ] cache ;
 
 M: method '
     [
@@ -268,33 +279,24 @@ M: method '
         f ,
         dup method-loc ,
         method-def ,
-    ] { } make tuple-type emit-array ;
-
-M: source-file '
-    [
-        \ source-file transfer-word ,
-        f ,
-        dup source-file-path ,
-        dup source-file-modified ,
-        source-file-checksum ,
-    ] { } make tuple-type emit-array ;
+    ] { } make tuple type-number emit-array ;
 
 M: array '
-    array-type emit-array ;
+    array type-number emit-array ;
 
 M: quotation '
-    quotation-type emit-array ;
+    quotation type-number emit-array ;
 
 M: vector '
     dup underlying ' swap length
-    vector-type object-tag [
+    vector type-number object tag-number [
         emit-fixnum ! length
         emit ! array ptr
     ] emit-object ;
 
 M: sbuf '
     dup underlying ' swap length
-    sbuf-type object-tag [
+    sbuf type-number object tag-number [
         emit-fixnum ! length
         emit ! array ptr
     ] emit-object ;
@@ -303,7 +305,7 @@ M: sbuf '
 
 M: hashtable '
     [ hash-array ' ] keep
-    hashtable-type object-tag [
+    hashtable type-number object tag-number [
         dup hash-count emit-fixnum
         hash-deleted emit-fixnum
         emit ! array ptr
@@ -317,11 +319,11 @@ M: hashtable '
 : global, ( -- )
     [
         {
-            vocabularies typemap builtins c-types crossref
+            vocabularies typemap builtins crossref
             articles help-tree changed-words
             modules class<map source-files
         } [ dup get swap bootstrap-word set ] each
-    ] make-hash '
+    ] H{ } make-assoc '
     global-offset fixup ;
 
 : boot, ( -- ) boot-quot get ' boot-quot-offset fixup ;
@@ -339,8 +341,8 @@ M: hashtable '
     fixup-words
     heap-size data-heap-size-offset fixup
     "Image length: " write image get length .
-    "Object cache size: " write objects get hash-size .
-    \ word global remove-hash ;
+    "Object cache size: " write objects get assoc-size .
+    \ word global delete-at ;
 
 ! Image output
 

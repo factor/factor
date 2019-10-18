@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays definitions errors generic hashtables
+USING: arrays definitions errors generic assocs
 io kernel namespaces prettyprint prettyprint-internals
-sequences words ;
+sequences words inspector ;
 
 ! Help articles
 SYMBOL: articles
@@ -18,7 +18,7 @@ TUPLE: no-article name ;
 : no-article ( name -- * ) <no-article> throw ;
 
 : article ( name -- article )
-    dup articles get hash [ ] [ no-article ] ?if ;
+    dup articles get at [ ] [ no-article ] ?if ;
 
 M: object article-name article article-name ;
 M: object article-title article article-title ;
@@ -41,11 +41,8 @@ M: f article-name drop \ f article-name ;
 M: f article-title drop \ f article-title ;
 M: f article-content drop \ f article-content ;
 
-: word-help ( word -- content ) "help" word-prop ;
-
-: all-articles ( -- seq )
-    articles get hash-keys
-    all-words [ word-help ] subset append ;
+: related-words ( seq -- )
+    dup [ swap "related" set-word-prop ] each-with ;
 
 GENERIC: elements* ( elt-type element -- )
 
@@ -58,7 +55,7 @@ GENERIC: elements* ( elt-type element -- )
                 1 tail [ dup set ] each
             ] each
         ] each-with
-    ] make-hash hash-keys ;
+    ] H{ } make-assoc keys ;
 
 SYMBOL: help-tree
 
@@ -68,7 +65,7 @@ DEFER: $subsection
     article-content { $subsection } collect-elements ;
 
 : parent ( topic -- topic )
-    dup link? [ link-name ] when help-tree get hash ;
+    dup link? [ link-name ] when help-tree get at ;
 
 : (help-path) ( topic -- )
     parent [ dup , (help-path) ] when* ;
@@ -81,13 +78,10 @@ DEFER: $subsection
 
 : xref-article ( topic -- )
     [
-        dup children [ help-tree get set-hash ] each-with
+        dup children [ help-tree get set-at ] each-with
     ] if-help-tree ;
 
 : unxref-article ( topic -- )
     [
-        children [ help-tree get remove-hash ] each
+        children [ help-tree get delete-at ] each
     ] if-help-tree ;
-
-: xref-help ( -- )
-    all-articles [ xref-article ] each ;

@@ -6,5 +6,6 @@ HELP: viewport
 
 HELP: <viewport>
 { $values { "content" gadget } { "model" model } { "viewport" "a new " { $link viewport } } }
-{ $description "Creates a new " { $link viewport } " containing " { $snippet "content" } "." }
-{ $see-also <scroller> } ;
+{ $description "Creates a new " { $link viewport } " containing " { $snippet "content" } "." } ;
+
+{ <viewport> <scroller> } related-words

@@ -1,5 +1,5 @@
 
-USING: kernel namespaces generic math arrays vars x11
+USING: kernel namespaces generic math quotations arrays vars x11
        x.geometry x x.gc x.draw-string x.widgets wm.child ;
 
 IN: wm.frame

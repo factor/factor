@@ -35,8 +35,9 @@ HELP: collect-elements
 { $notes "Used to implement " { $link children } "." } ;
 
 HELP: help-tree
-{ $var-description "A " { $link hashtable } " mapping help topics to their parents." }
-{ $see-also children parent xref-help } ;
+{ $var-description "A " { $link hashtable } " mapping help topics to their parents." } ;
+
+{ help-tree children parent xref-help } related-words
 
 HELP: children
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
@@ -63,8 +64,9 @@ HELP: unxref-article
 { $description "Removes an article from the " { $link help-tree } "." }
 $low-level-note ;
 
-HELP: xref-help
-{ $description "Update the " { $link help-tree } ". Usually this is done automatically." } ;
-
 HELP: link
 { $class-description "Class of help article presentations. Instances can be passed to " { $link write-object } " to output a clickable hyperlink. Also, instances of this class are valid definition specifiers; see " { $link "definitions" } "." } ;
+
+HELP: related-words
+{ $values { "seq" "a sequence of words" } }
+{ $description "Defines a set of related words. Each word's documentation will contain links to all other words in the set." } ;

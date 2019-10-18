@@ -1,4 +1,4 @@
-USING: arrays errors generic hashtables io kernel math
+USING: arrays errors generic assocs io kernel math
 memoize namespaces kernel sequences strings tables
 vectors ;
 USE: interpreter
@@ -61,7 +61,7 @@ SYMBOL: rparen
     final-state t rot find-by-column first ;
 
 : final-state? ( row table -- ? )
-    get-row final-state swap hash* nip ;
+    get-row final-state swap key? ;
 
 : switch-rows ( r1 r2 -- )
     [ 2array [ trans-table get get-row ] each ] 2keep
@@ -71,11 +71,11 @@ SYMBOL: rparen
     pick over add-column table-rows
     [
         pick rot member? [
-            pick t swap rot set-hash
+            pick t swap rot set-at
         ] [
             drop
         ] if
-    ] hash-each 2drop ;
+    ] assoc-each 2drop ;
 
 : add-numbers ( n obj -- obj )
     dup sequence? [ 
@@ -86,7 +86,7 @@ SYMBOL: rparen
 
 : increment-cols ( n row -- )
     ! n row
-    dup [ >r pick r> add-numbers swap pick set-hash ] hash-each 2drop ;
+    dup [ >r pick r> add-numbers swap pick set-at ] assoc-each 2drop ;
 
 : complex-count ( c -- ci-cr+1 )
     >rect swap - 1+ ;
@@ -94,8 +94,8 @@ SYMBOL: rparen
 : copy-rows ( c1 -- )
     #! copy rows to the bottom with a new row-name c1_range higher
     [ complex-count ] keep trans-table get table-rows ! 2 C{ 0 1 } rows
-    [ drop [ over real >= ] keep pick imaginary <= and ] hash-subset nip
-    [ clone [ >r over r> increment-cols ] keep swap pick + trans-table get set-row ] hash-each ! 2
+    [ drop [ over real >= ] keep pick imaginary <= and ] assoc-subset nip
+    [ clone [ >r over r> increment-cols ] keep swap pick + trans-table get set-row ] assoc-each ! 2
     currentstate get 1+ dup pick + 1- rect> push-stack
     currentstate [ + ] change ;
 
@@ -280,7 +280,7 @@ SYMBOL: posix
         { [ dup CHAR: ) = ]
             [
                 drop dec-paren-count lparen apply-til-last
-                stack get nappend
+                stack get push-all
             ] } ! apply
 
 
@@ -323,7 +323,7 @@ SYMBOL: posix
     ! (parse-regexp)
     eot parse-token ;
 
-: nappend-diff ( seq seq -- diff ) [ swap diff ] 2keep nappend ;
+: push-all-diff ( seq seq -- diff ) [ swap diff ] 2keep push-all ;
 : prune-sort ( vec -- vec ) prune natural-sort >vector ;
 
 SYMBOL: ttable
@@ -342,11 +342,11 @@ SYMBOL: result
 : (find-next-state) ( -- )
     check-list get [
         [
-            ttable get get-row transition get swap hash*
+            ttable get get-row transition get swap at*
                 [ dup sequence? [ % ] [ , ] if ] [ drop ] if
         ] each
     ] { } make
-    result get nappend-diff
+    result get push-all-diff
     check-list set
     result get prune-sort result set ;
 
@@ -364,8 +364,8 @@ SYMBOL: result
 
 : filter-cols ( vec -- vec )
     #! remove info columns state-state, eps, final
-    clone start-state over remove-hash eps over remove-hash
-    final-state over remove-hash ;
+    clone start-state over delete-at eps over delete-at
+    final-state over delete-at ;
 
 SYMBOL: old-table
 SYMBOL: new-table
@@ -374,7 +374,7 @@ SYMBOL: transitions
 
 : init-nfa>dfa ( table -- )
     <vector-table> new-table set
-    [ table-columns clone filter-cols hash-keys transitions set ] keep
+    [ table-columns clone filter-cols keys transitions set ] keep
     dup [ find-start-state ] keep find-epsilon-closure
     V{ } clone [ push ] keep todo-states set
     old-table set ;
@@ -414,14 +414,14 @@ TUPLE: partial-match index row count ;
 
 : save-partial-match ( index row -- )
     1 <partial-match> dup partial-match-index
-    \ partial-matches get set-hash ;
+    \ partial-matches get set-at ;
 
 : inc-partial-match ( partial-match -- )
     [ partial-match-count 1+ ] keep set-partial-match-count ;
 
 : check-final-state ( partial-match -- )
     dup partial-match-row regexp get final-state? [
-        clone dup partial-match-index matches get set-hash
+        clone dup partial-match-index matches get set-at
     ] [
         drop
     ] if ;
@@ -429,32 +429,32 @@ TUPLE: partial-match index row count ;
 : check-trivial-match ( row regexp -- )
     dupd final-state? [
         >r 0 r> 0 <partial-match>
-        0 matches get set-hash
+        0 matches get set-at
     ] [
         drop
     ] if ;
 
 : update-partial-match ( char partial-match -- )
-    tuck partial-match-row regexp get get-row hash* [
+    tuck partial-match-row regexp get get-row at* [
         over set-partial-match-row
         inc-partial-match
     ] [
         drop
-        partial-match-index partial-matches get remove-hash
+        partial-match-index partial-matches get delete-at
     ] if ;
 
 : regexp-step ( index char start-state -- )
     ! check partial-matches
     over \ partial-matches get
-    [ nip update-partial-match ] hash-each-with
+    [ nip update-partial-match ] assoc-each-with
 
     ! check new match
-    hash* [
+    at* [
         save-partial-match
     ] [
         2drop
     ] if
-    partial-matches get hash-values [ check-final-state ] each ;
+    partial-matches get values [ check-final-state ] each ;
 
 : regexp-match ( text regexp -- seq )
     #! text is the haystack
@@ -468,7 +468,7 @@ TUPLE: partial-match index row count ;
     get-row
     swap [ length ] keep
     [ pick regexp-step ] 2each drop
-    matches get hash-values [
+    matches get values [
         [ partial-match-index ] keep
         partial-match-count dupd + text get <slice>
     ] map ;

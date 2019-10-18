@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: callback-responder generic hashtables help http tools
-io kernel math namespaces prototype-js sequences strings styles
-words xml-writer httpd ;
+USING: callback-responder generic assocs help http tools
+io kernel math namespaces prototype-js quotations assocs
+sequences strings styles words xml-writer httpd ;
 IN: html
 
 : hex-color, ( triplet -- )
@@ -35,8 +35,8 @@ IN: html
     #! corresponding quotation, the value is popped off the
     #! stack.
     swap [
-        swap rot hash dup [ call ] [ 2drop ] if
-    ] hash-each-with ;
+        swap rot at dup [ call ] [ 2drop ] if
+    ] assoc-each-with ;
 
 : span-css-style ( style -- str )
     [
@@ -82,7 +82,7 @@ IN: html
     ] if ;
 
 : do-escaping ( string style -- string )
-    html swap hash [ chars>entities ] unless ;
+    html swap at [ chars>entities ] unless ;
 
 GENERIC: browser-link-href ( presented -- href )
 
@@ -91,7 +91,7 @@ M: object browser-link-href drop f ;
 M: pathname browser-link-href pathname-string url-encode ;
 
 : object-link-tag ( style quot -- )
-    presented pick hash browser-link-href
+    presented pick at browser-link-href
     [ <a =href a> call </a> ] [ call ] if* ;
 
 TUPLE: nested-stream ;
@@ -125,30 +125,13 @@ M: html-stream stream-format ( str style stream -- )
 : with-html-stream ( quot -- )
     stdio get <html-stream> swap with-stream* ;
 
-: make-outliner-quot
-    [
-        <div "padding-left: 20px; " =style div>
-            with-html-stream
-        </div>
-    ] curry ;
-            
-: html-outliner ( caption contents -- )
-    "+ " get-random-id dup >r
-    rot make-outliner-quot updating-anchor call
-    <span r> =id "display: none; " =style span> </span> ;
-
-: outliner-tag ( style quot -- )
-    outline pick hash [ html-outliner ] [ call ] if* ;
-
 M: html-stream with-nested-stream ( quot style stream -- )
     [
         [
             [
-                [
-                    stdio get <nested-stream> swap with-stream*
-                ] div-tag
-            ] object-link-tag
-        ] outliner-tag
+                stdio get <nested-stream> swap with-stream*
+            ] div-tag
+        ] object-link-tag
     ] with-stream* ;
 
 : border-spacing-css,
@@ -165,18 +148,21 @@ M: html-stream with-nested-stream ( quot style stream -- )
 : table-attrs ( style -- )
     table-style " border-collapse: collapse;" append =style ;
 
-M: html-stream with-stream-table ( grid quot style stream -- )
+M: html-stream stream-write-table ( grid style stream -- )
     [
-        <table dup table-attrs table> rot [
+        <table dup table-attrs table> swap [
             <tr> [
-                <td "top" =valign over table-style =style td>
-                    pick H{ } swap with-nesting
+                <td "top" =valign swap table-style =style td>
+                    write-html
                 </td>
-            ] each </tr>
-        ] each 2drop </table>
+            ] each-with </tr>
+        ] each-with </table>
     ] with-stream* ;
 
-M: html-stream stream-terpri [ <br/> ] with-stream* ;
+M: html-stream make-table-cell ( quot style stream -- table-cell )
+    2drop [ with-html-stream ] string-out ;
+
+M: html-stream stream-nl [ <br/> ] with-stream* ;
 
 : default-css ( -- )
     <link
@@ -203,7 +189,6 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
     swap [
         <title> write </title>
         default-css
-        include-prototype-js
     ] html-document* ;
 
 : simple-html-document ( title quot -- )

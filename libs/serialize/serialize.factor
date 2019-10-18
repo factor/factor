@@ -9,7 +9,7 @@
 IN: serialize
 USING: kernel kernel-internals math hashtables namespaces 
 io sbufs strings sequences generic words errors arrays 
-vectors alien byte-arrays ;
+quotations vectors alien byte-arrays assocs ;
 
 ! Variable holding a sequence of objects already serialized
 SYMBOL: serialized
@@ -110,7 +110,7 @@ M: hashtable serialize ( obj -- )
   [
     "h" write
     dup add-object serialize
-    hash>alist serialize
+    >alist serialize
   ] serialize-shared ;
 
 M: word serialize ( obj -- )
@@ -179,7 +179,7 @@ DEFER: deserialize ( -- obj )
 
 : deserialize-hashtable ( -- array )
   deserialize 
-  deserialize alist>hash    
+  deserialize >hashtable    
   [ intern-object ] keep ;
 
 : deserialize-tuple ( -- array )
@@ -210,7 +210,7 @@ DEFER: deserialize ( -- obj )
      { "A" deserialize-byte-array }
      { "o" deserialize-unknown }
   }
-  hash dup [ "Unknown typecode" throw ] unless nip execute ;
+  at dup [ "Unknown typecode" throw ] unless nip execute ;
 
 : with-serialized ( quot -- )
   [ V{ } clone serialized set call ] with-scope ; inline 

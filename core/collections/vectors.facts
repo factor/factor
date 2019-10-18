@@ -1,23 +1,23 @@
 IN: vectors
-USING: arrays byte-arrays bit-arrays help kernel sbufs strings ;
+USING: arrays byte-arrays bit-arrays help kernel sbufs strings
+quotations ;
 
 HELP: vector
 { $description "The class of resizable vectors. See " { $link "syntax-vectors" } " for syntax and " { $link "vectors" } " for general information." } ;
 
 HELP: >vector
 { $values { "seq" "a sequence" } { "vector" "a new vector" } }
-{ $description "Outputs a freshly-allocated vector with the same elements as a given sequence." }
-{ $see-also >array >string >sbuf >quotation >byte-array >bit-array } ;
+{ $description "Outputs a freshly-allocated vector with the same elements as a given sequence." } ;
 
 HELP: array>vector ( array -- vector )
 { $values { "array" "an array" } { "vector" "a new vector" } }
 { $description "Creates a new vector using the array for underlying storage. The vector's initial length is the same as that of the array."
-$terpri
+$nl
 "This word can be marginally more efficient than " { $link >vector } ", but the sharing of storage can lead to unexpected results." } ;
 
 HELP: with-datastack
-{ $values { "stack" "a sequence" } { "word" "a word" } { "newstack" "a sequence" } }
-{ $description "Executes " { $snippet "word" } " with the given data stack contents, and outputs the new data stack after the word returns. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
+{ $values { "stack" "a sequence" } { "quotation" quotation } { "newstack" "a sequence" } }
+{ $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
 { $examples
-    { $example "{ 3 7 } \\ + with-datastack ." "V{ 10 }" }
+    { $example "{ 3 7 } [ + ] with-datastack ." "V{ 10 }" }
 } ;

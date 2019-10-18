@@ -4,13 +4,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 IN: html
-USE: prettyprint
-USE: strings
-USE: kernel
-USE: io
-USE: namespaces
-USE: words
-USE: sequences
+USING: io kernel namespaces prettyprint quotations
+sequences strings words ;
 
 ! These words are used to provide a means of writing
 ! formatted HTML to standard output with a familiar 'html' look
@@ -55,6 +50,9 @@ SYMBOL: html
 
 : write-html ( str -- )
     H{ { html t } } format ;
+
+: print-html ( str -- )
+    write-html "\n" write-html ;
 
 : html-word ( name def -- )
     #! Define 'word creating' word to allow

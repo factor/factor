@@ -14,7 +14,7 @@ C: value ( obj -- value )
     recursive-state get over set-value-recursion
     [ set-value-literal ] keep ;
 
-M: value hashcode value-uid ;
+M: value hashcode* nip value-uid ;
 
 M: value equal? 2drop f ;
 

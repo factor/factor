@@ -14,11 +14,11 @@ HELP: run-user-init
 HELP: cli-param
 { $values { "param" string } }
 { $description "Process a command-line switch."
-$terpri
+$nl
 "If the parameter contains " { $snippet "=" } ", the global variable named by the string before the equals sign is set to the string after the equals sign."
-$terpri
+$nl
 "If the parameter begins with " { $snippet "no-" } ", sets the global variable named by the parameter with the prefix removed to " { $link f } "."
-$terpri
+$nl
 "Otherwise, sets the global variable named by the parameter to " { $link t } "." } ;
 
 HELP: cli-args

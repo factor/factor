@@ -1,5 +1,5 @@
-REQUIRES: libs/shuffle libs/matrices libs/alien
-libs/http-client libs/canvas ;
+REQUIRES: libs/shuffle libs/matrices libs/http-client
+libs/canvas ;
 
 PROVIDE: demos/bunny { +files+ { "bunny.factor" } } ;
 

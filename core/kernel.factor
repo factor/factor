@@ -11,10 +11,14 @@ USING: generic kernel-internals math math-internals ;
 
 : clear ( -- ) V{ } set-datastack ;
 
-GENERIC: hashcode ( obj -- n )
-M: object hashcode drop 0 ;
+GENERIC: hashcode* ( n obj -- code )
+
+M: object hashcode* 2drop 0 ;
+
+: hashcode ( obj -- code ) 3 swap hashcode* ; inline
 
 GENERIC: equal? ( obj1 obj2 -- ? )
+
 M: object equal? 2drop f ;
 
 : = ( obj1 obj2 -- ? )
@@ -29,11 +33,6 @@ M: object clone ;
 
 : ? ( cond true false -- true/false )
     rot [ drop ] [ nip ] if ; inline
-
-: cpu ( -- cpu ) 7 getenv ; foldable
-: os ( -- os ) 11 getenv ; foldable
-: windows? ( -- ? ) os "windows" = ; foldable
-: macosx? ( -- ? ) os "macosx" = ; foldable
 
 : slip ( quot x -- x ) >r call r> ; inline
 
@@ -82,59 +81,21 @@ M: object clone ;
 : with ( obj quot elt -- obj quot )
     [ swap call ] 3keep drop ; inline
 
-: keep-datastack ( quot -- )
-    datastack slip set-datastack drop ; inline
+: cell ( -- n ) 1 getenv ; foldable
+: cpu ( -- cpu ) 7 getenv ; foldable
+: os ( -- os ) 11 getenv ; foldable
+: image ( -- path ) 16 getenv ;
+: vm ( -- path ) 17 getenv ;
+: windows? ( -- ? ) os [ "windows" = ] keep "wince" = or ; foldable
+: wince? ( -- ? ) os "wince" = ; foldable
+: win32? ( -- ? ) wince? not windows? cell 4 = and f ? ; foldable
+: win64? ( -- ? ) windows? cell 8 = and ; foldable
+: winnt? windows? wince? not and ; foldable
+: macosx? ( -- ? ) os "macosx" = ; foldable
+
+: embedded? ( -- ? ) 19 getenv ;
 
 IN: kernel-internals
 
 ! These words are unsafe. Don't use them.
 : declare ( spec -- ) drop ;
-
-: array-capacity ( array -- n )
-    1 slot { fixnum } declare ; inline
-
-: array-nth ( n array -- elt )
-    swap 2 fixnum+fast slot ; inline
-
-: set-array-nth ( elt n array -- )
-    swap 2 fixnum+fast set-slot ; inline
-
-! Some runtime implementation details
-: num-types ( -- n ) 19 ; inline
-: tag-mask BIN: 111 ; inline
-: num-tags 8 ; inline
-: tag-bits 3 ; inline
-
-: cell ( -- n ) 1 getenv ; foldable
-
-: fixnum-tag  BIN: 000 ; inline
-: bignum-tag  BIN: 001 ; inline
-: word-tag    BIN: 010 ; inline
-: object-tag  BIN: 011 ; inline
-: ratio-tag   BIN: 100 ; inline
-: float-tag   BIN: 101 ; inline
-: complex-tag BIN: 110 ; inline
-: wrapper-tag BIN: 111 ; inline
-
-: array-type      8  ; inline
-: hashtable-type  10 ; inline
-: vector-type     11 ; inline
-: string-type     12 ; inline
-: sbuf-type       13 ; inline
-: quotation-type  14 ; inline
-: dll-type        15 ; inline
-: alien-type      16 ; inline
-: tuple-type      17 ; inline
-: byte-array-type 18 ; inline
-
-IN: kernel
-
-: win32? ( -- ? ) windows? cell 4 = and ; foldable
-: win64? ( -- ? ) windows? cell 8 = and ; foldable
-
-: image ( -- path ) 16 getenv ;
-: vm ( -- path ) 17 getenv ;
-
-IN: memory
-
-: save ( -- ) image save-image ;

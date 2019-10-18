@@ -1,4 +1,5 @@
-USING: help io io-internals threads c-streams ;
+USING: help io io-internals threads c-streams network strings
+byte-arrays ;
 
 HELP: io-multiplex
 { $values { "ms" "a non-negative integer" } }
@@ -16,14 +17,14 @@ HELP: <file-writer>
 { $errors "Throws an error if the file is unreadable." } ;
 
 HELP: <client>
-{ $values { "host" "a string" } { "port" "an integer between 0 and 65535" } { "stream" "a bidirectional stream" } }
-{ $description "Connects to TCP/IP port number " { $snippet "port" } " on the host named by " { $snippet "host" } ", and outputs a bidirectional stream." }
+{ $values { "host" string } { "port" "an integer between 0 and 65535" } { "stream" "a bidirectional stream" } }
+{ $description "Opens a TCP/IP connection to port number " { $snippet "port" } " on the host named by " { $snippet "host" } ", and outputs a bidirectional stream." }
 { $errors "Throws an error if domain name lookup fails, or if the connection cannot be established." } ;
 
 HELP: <server>
 { $values  { "port" "an integer between 0 and 65535" } { "server" "a handle" } }
 { $description
-    "Begins listening for connections to " { $snippet "port" } " on all network interfaces. The returned object responds to two generic words:"
+    "Begins listening for TCP/IP connections to " { $snippet "port" } " on all network interfaces. The returned object responds to two words:"
     { $list
         { { $link stream-close } " - stops listening on the port and frees all associated resources" }
         { { $link accept } " - blocks until there is a connection" }
@@ -34,10 +35,31 @@ HELP: <server>
 HELP: accept
 { $values { "server" "a handle" } { "client" "a bidirectional stream" } }
 { $description "Waits for a connection to a server socket created by " { $link <server> } ", and outputs a bidirectional stream when the connection has been established."
-$terpri
+$nl
 "The new stream supports two accessor words to get the host name and port number of the incoming connection:"
 { $list { $link client-stream-host } { $link client-stream-port } } }
 { $errors "Throws an error if the server socket is closed or otherwise is unavailable." } ;
+
+HELP: <datagram>
+{ $values { "port" "an integer between 0 and 65535" } { "datagram" "a handle" } }
+{ $description "Creates a UDP/IP socket listening on " { $snippet "port" } ". The returned object responds to three words:"
+    { $list
+        { { $link stream-close } " - stops listening on the port and frees all associated resources" }
+        { { $link receive } " - waits for a UDP/IP packet" }
+        { { $link send } " - sends a UDP/IP packet" }
+    }
+}
+{ $errors "Throws an error if the port is already in use, or if the OS forbids access." } ;
+
+HELP: receive
+{ $values { "datagram" "a datagram socket" } { "packet" byte-array } { "host" string } { "port" "an integer between 0 and 65535" } }
+{ $description "Waits for an incoming UDP/IP packet on the given datagram socket. Outputs the packet data, as well as the sender's host name and port number." }
+{ $errors "Throws an error if the packet could not be received." } ;
+
+HELP: send
+{ $values { "packet" byte-array } { "host" string } { "port" "an integer between 0 and 65535" } { "datagram" "a datagram socket" } }
+{ $description "Sends a UDP/IP packet to the given datagram socket." }
+{ $errors "Throws an error if the packet could not be sent." } ;
 
 HELP: <c-stream> ( in out -- stream )
 { $values { "in" "a C FILE* handle" } { "out" "a C FILE* handle" } }

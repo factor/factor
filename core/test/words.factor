@@ -1,6 +1,6 @@
 IN: temporary
-USING: arrays errors generic hashtables kernel math namespaces
-sequences test words definitions parser ;
+USING: arrays errors generic assocs kernel math namespaces
+sequences test words definitions parser quotations ;
 
 [ 4 ] [
     "poo" "scratchpad" create [ 2 2 + ] define-compound
@@ -80,8 +80,8 @@ FORGET: another-forgotten
 : foe fee ;
 : fie foe ;
 
-[ 0 ] [ \ fee crossref get hash hash-size ] unit-test
-[ t ] [ \ foe crossref get hash not ] unit-test
+[ 0 ] [ \ fee crossref get at assoc-size ] unit-test
+[ t ] [ \ foe crossref get at not ] unit-test
 
 FORGET: foe
 
@@ -90,8 +90,8 @@ gensym [ * ] define-compound
 [ t ] [ \ * usage [ interned? not ] subset empty? ] unit-test
 
 DEFER: calls-a-gensym
-\ calls-a-gensym gensym dup "x" set unit define-compound
-[ f ] [ "x" get crossref get hash ] unit-test
+\ calls-a-gensym gensym dup "x" set 1quotation define-compound
+[ f ] [ "x" get crossref get at ] unit-test
 
 ! more xref buggery
 [ f ] [
@@ -100,7 +100,7 @@ DEFER: calls-a-gensym
     M: integer xyzzle a ;
     FORGET: a
     M: object xyzzle ;
-    crossref get hash
+    crossref get at
 ] unit-test
 
 ! regression

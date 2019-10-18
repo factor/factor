@@ -1,4 +1,4 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-buttons
 DEFER: <button-paint>
@@ -13,18 +13,24 @@ DEFER: set-editor-caret-color
 DEFER: set-editor-selection-color
 DEFER: set-editor-font
 
+IN: gadgets-panes
+DEFER: set-pane-selection-color
+
 IN: gadgets-theme
 USING: arrays gadgets kernel sequences styles ;
 
 : black { 0.0 0.0 0.0 1.0 } ;
 : white { 1.0 1.0 1.0 1.0 } ;
 : gray { 0.6 0.6 0.6 1.0 } ;
+: red { 1.0 0.0 0.0 1.0 } ;
+: light-purple { 0.8 0.8 1.0 1.0 } ;
+: light-gray { 0.95 0.95 0.95 0.95 } ;
 
-: solid-interior white <solid> swap set-gadget-interior ;
+: solid-interior <solid> swap set-gadget-interior ;
 
-: solid-boundary black <solid> swap set-gadget-boundary ;
+: solid-boundary <solid> swap set-gadget-boundary ;
 
-: faint-boundary gray <solid> swap set-gadget-boundary ;
+: faint-boundary gray solid-boundary ;
 
 : plain-gradient
     T{ gradient f {
@@ -73,9 +79,6 @@ USING: arrays gadgets kernel sequences styles ;
     f black <solid> dup f <button-paint>
     swap set-gadget-boundary ;
 
-: caret-theme ( caret -- )
-    T{ solid f { 1.0 0.0 0.0 1.0 } } swap set-gadget-interior ;
-
 : elevator-theme ( elevator -- )
     T{ gradient f {
         { 0.37 0.37 0.37 1.0 }
@@ -85,7 +88,7 @@ USING: arrays gadgets kernel sequences styles ;
 
 : reverse-video-theme ( label -- )
     white over set-label-color
-    black <solid> swap set-gadget-interior ;
+    black solid-interior ;
 
 : label-theme ( gadget -- )
     black over set-label-color
@@ -97,18 +100,16 @@ USING: arrays gadgets kernel sequences styles ;
 
 : editor-theme ( editor -- )
     black over set-editor-color
-    { 1.0 0.0 0.0 1.0 } over set-editor-caret-color
-    { 0.8 0.8 1.0 1.0 } over set-editor-selection-color
+    red over set-editor-caret-color
+    light-purple over set-editor-selection-color
     { "monospace" plain 12 } swap set-editor-font ;
 
-: popup-theme ( gadget -- )
-    T{ solid f { 0.95 0.95 0.95 0.95 } }
-    swap set-gadget-interior ;
+: pane-theme ( editor -- )
+    light-purple swap set-pane-selection-color ;
 
 : menu-theme ( gadget -- )
-    T{ solid f { 0.95 0.95 0.95 0.95 } }
-    over set-gadget-interior
-    gray <solid> swap set-gadget-boundary ;
+    dup light-gray solid-interior
+    faint-boundary ;
 
 : title-theme ( gadget -- )
     { 1 0 } over set-gadget-orientation

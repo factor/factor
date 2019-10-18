@@ -1,77 +1,100 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-panes
 USING: arrays gadgets gadgets-borders gadgets-buttons
 gadgets-labels gadgets-scrolling gadgets-paragraphs
-gadgets-theme gadgets-presentations gadgets-outliners
-generic hashtables io kernel namespaces sequences styles
-strings ;
+gadgets-traverse gadgets-theme generic hashtables io kernel
+namespaces sequences styles strings quotations math opengl ;
+IN: gadgets-panes
 
-TUPLE: pane output current prototype scrolls? ;
+TUPLE: pane output current prototype scrolls?
+selection-color caret mark selecting? ;
+
+: clear-selection ( pane -- )
+    f over set-pane-caret
+    f swap set-pane-mark ;
 
 : add-output 2dup set-pane-output add-gadget ;
 
 : add-current 2dup set-pane-current add-gadget ;
 
 : prepare-line ( pane -- )
+    dup clear-selection
     dup pane-prototype clone swap add-current ;
 
+: pane-caret&mark ( pane -- caret mark )
+    dup pane-caret swap pane-mark ;
+
+: selected-children ( pane -- seq )
+    [ pane-caret&mark 2dup <=> 0 > [ swap ] when ] keep
+    gadget-subtree ;
+
+M: pane gadget-selection? pane-caret&mark = not ;
+
+M: pane gadget-selection
+    selected-children gadget-text ;
+
 : pane-clear ( pane -- )
-    dup
-    pane-output clear-incremental
+    dup clear-selection
+    dup pane-output clear-incremental
     pane-current clear-gadget ;
 
 C: pane ( -- pane )
     <pile> over set-delegate
     <shelf> over set-pane-prototype
     <pile> <incremental> over add-output
-    dup prepare-line ;
+    dup prepare-line
+    dup pane-theme ;
+
+GENERIC: draw-selection ( loc obj -- )
+
+: if-fits ( rect quot -- )
+    >r clip get over intersects? r> [ drop ] if ; inline
+
+M: gadget draw-selection ( loc gadget -- )
+    swap offset-rect [ rect-extent gl-fill-rect ] if-fits ;
+
+M: node draw-selection ( loc node -- )
+    2dup node-value swap offset-rect [
+        drop 2dup
+        [ node-value rect-loc v+ ] keep
+        node-children [ draw-selection ] each-with
+    ] if-fits 2drop ;
+
+M: pane draw-gadget*
+    dup gadget-selection? [
+        dup pane-selection-color gl-color
+        origin get over rect-loc v- swap selected-children
+        [ draw-selection ] each-with
+    ] [
+        drop
+    ] if ;
 
 : scroll-pane ( pane -- )
     dup pane-scrolls? [ scroll>bottom ] [ drop ] if ;
 
 TUPLE: pane-stream pane ;
 
-: prepare-print ( current -- gadget )
+: smash-line ( current -- gadget )
     dup gadget-children {
         { [ dup empty? ] [ 2drop "" <label> ] }
         { [ dup length 1 = ] [ nip first ] }
         { [ t ] [ drop ] }
     } cond ;
 
-: pane-terpri ( pane -- )
-    dup pane-current dup unparent prepare-print
+: pane-nl ( pane -- )
+    dup pane-current dup unparent smash-line
     over pane-output add-incremental
     prepare-line ;
 
 : pane-write ( pane seq -- )
+    [ dup pane-nl ]
     [ over pane-current stream-write ]
-    [ dup pane-terpri ] interleave drop ;
+    interleave drop ;
 
 : pane-format ( style pane seq -- )
+    [ dup pane-nl ]
     [ pick pick pane-current stream-format ]
-    [ dup pane-terpri ] interleave 2drop ;
-
-: do-pane-stream ( pane-stream quot -- )
-    >r pane-stream-pane r> keep scroll-pane ; inline
-
-M: pane-stream stream-terpri
-    [ pane-terpri ] do-pane-stream ;
-
-M: pane-stream stream-write1
-    [ pane-current stream-write1 ] do-pane-stream ;
-
-M: pane-stream stream-write
-    [ swap string-lines pane-write ] do-pane-stream ;
-
-M: pane-stream stream-format
-    [ rot string-lines pane-format ] do-pane-stream ;
-
-M: pane-stream stream-close drop ;
-
-M: pane-stream stream-flush drop ;
-
-M: pane-stream with-stream-style (with-stream-style) ;
+    interleave 2drop ;
 
 GENERIC: write-gadget ( gadget stream -- )
 
@@ -82,22 +105,19 @@ M: duplex-stream write-gadget
     duplex-stream-out write-gadget ;
 
 : print-gadget ( gadget stream -- )
-    tuck write-gadget stream-terpri ;
+    tuck write-gadget stream-nl ;
 
 : gadget. ( gadget -- )
     stdio get print-gadget ;
 
-: ?terpri ( stream -- )
+: ?nl ( stream -- )
     dup pane-stream-pane pane-current gadget-children empty?
-    [ dup stream-terpri ] unless drop ;
+    [ dup stream-nl ] unless drop ;
 
 : with-pane ( pane quot -- )
     over scroll>top
     over pane-clear >r <pane-stream> r>
-    over >r with-stream r> ?terpri ; inline
-
-: make-pane ( quot -- pane )
-    <pane> [ swap with-pane ] keep ; inline
+    over >r with-stream r> ?nl ; inline
 
 : <scrolling-pane> ( -- pane )
     <pane> t over set-pane-scrolls? ;
@@ -105,142 +125,38 @@ M: duplex-stream write-gadget
 : <pane-control> ( model quot -- pane )
     [ with-pane ] curry <pane> swap <control> ;
 
-! Character styles
+: caret>mark ( pane -- )
+    dup pane-caret over set-pane-mark relayout-1 ;
 
-: apply-style ( style gadget key quot -- style gadget )
-    >r pick hash r> when* ; inline
-
-: apply-foreground-style ( style gadget -- style gadget )
-    foreground [ over set-label-color ] apply-style ;
-
-: apply-background-style ( style gadget -- style gadget )
-    background [ <solid> over set-gadget-interior ] apply-style ;
-
-: specified-font ( style -- font )
-    [ font swap hash [ "monospace" ] unless* ] keep
-    [ font-style swap hash [ plain ] unless* ] keep
-    font-size swap hash [ 12 ] unless* 3array ;
-
-: apply-font-style ( style gadget -- style gadget )
-    over specified-font over set-label-font ;
-
-: apply-presentation-style ( style gadget -- style gadget )
-    presented [ <presentation> ] apply-style ;
-
-: <styled-label> ( style text -- gadget )
-    <label>
-    apply-foreground-style
-    apply-background-style
-    apply-font-style
-    apply-presentation-style
-    nip ;
-
-! Paragraph styles
-
-: apply-wrap-style ( style pane -- style pane )
-    wrap-margin [
-        2dup <paragraph> swap set-pane-prototype
-        <paragraph> over set-pane-current
-    ] apply-style ;
-
-: apply-border-width-style ( style gadget -- style gadget )
-    border-width [ <border> ] apply-style ;
-
-: apply-border-color-style ( style gadget -- style gadget )
-    border-color [
-        <solid> over set-gadget-boundary
-    ] apply-style ;
-
-: apply-page-color-style ( style gadget -- style gadget )
-    page-color [
-        <solid> over set-gadget-interior
-    ] apply-style ;
-
-: apply-outliner-style ( style gadget -- style gadget )
-    outline [ [ make-pane ] curry <outliner> ] apply-style ;
-
-: <styled-paragraph> ( style pane -- gadget )
-    apply-wrap-style
-    apply-border-width-style
-    apply-border-color-style
-    apply-page-color-style
-    apply-presentation-style
-    apply-outliner-style
-    nip ;
-
-: styled-pane ( quot style -- gadget )
-    #! Create a pane, call the quotation to fill it out.
-    >r <pane> dup r> swap <styled-paragraph>
-    >r swap with-pane r> ; inline
-
-: apply-table-gap-style ( style grid -- style grid )
-    table-gap [ over set-grid-gap ] apply-style ;
-
-: apply-table-border-style ( style grid -- style grid )
-    table-border [ <grid-lines> over set-gadget-boundary ]
-    apply-style ;
-
-: styled-grid ( style grid -- grid )
-    <grid>
-    apply-table-gap-style
-    apply-table-border-style
-    nip ;
-
-: <pane-grid> ( quot style grid -- gadget )
-    [
-        [ pick pick >r >r -rot styled-pane r> r> rot ] map
-    ] map styled-grid nip ;
-
-M: pane-stream with-stream-table
-    >r rot <pane-grid> r> print-gadget ;
-
-M: pane-stream with-nested-stream
-    >r styled-pane r> write-gadget ;
-
-! Stream utilities
-M: pack stream-close drop ;
-
-M: paragraph stream-close drop ;
-
-: gadget-write ( string gadget -- )
-    over empty? [
-        2drop
+: start-selection ( pane -- )
+    dup gadget-parent hand-rel over pick-up dup [
+        dup scroll>gadget
+        dupd gadget-path over set-pane-caret relayout-1
     ] [
-        >r <label> dup text-theme r> add-gadget
-    ] if ;
-
-M: pack stream-write gadget-write ;
-
-: gadget-bl ( style stream -- )
-    >r " " <styled-label> <word-break-gadget> r> add-gadget ;
-
-M: paragraph stream-write
-    swap " " split
-    [ over gadget-write ] [ H{ } over gadget-bl ] interleave
-    drop ;
-
-: gadget-write1 ( char gadget -- )
-    >r 1string r> stream-write ;
-
-M: pack stream-write1 gadget-write1 ;
-
-M: paragraph stream-write1
-    over CHAR: \s =
-    [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
-
-: gadget-format ( string style stream -- )
-    pick empty?
-    [ 3drop ] [ >r swap <styled-label> r> add-gadget ] if ;
-
-M: pack stream-format
-    gadget-format ;
-
-M: paragraph stream-format
-    presented pick hash [
-        gadget-format
-    ] [
-        rot " " split
-        [ pick pick gadget-format ]
-        [ 2dup gadget-bl ] interleave
         2drop
     ] if ;
+
+: extend-selection ( pane -- )
+    dup pane-selecting? [ start-selection ] [ drop ] if ;
+
+: finish-selection ( pane -- )
+    f over set-pane-selecting?
+    dup gadget-selection? [
+        dup request-focus
+    ] [
+        com-copy-selection
+    ] if ;
+
+: position-caret ( pane -- )
+    t over set-pane-selecting?
+    dup start-selection
+    dup caret>mark
+    relayout-1 ;
+
+pane H{
+    { T{ button-down f { S+ } 1 } [ dup request-focus start-selection ] }
+    { T{ button-up } [ finish-selection ] }
+    { T{ button-down } [ position-caret ] }
+    { T{ drag } [ extend-selection ] }
+    { T{ copy-action } [ com-copy ] }
+} set-gestures

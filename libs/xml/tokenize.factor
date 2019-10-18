@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml-errors xml-data kernel state-parser kernel namespaces xml-utils
-    errors strings math sequences hashtables char-classes arrays entities ;
+    errors strings math sequences assocs char-classes arrays entities ;
 IN: xml-tokenize
 
 ! -- Parsing names
@@ -31,10 +31,10 @@ IN: xml-tokenize
 !   -- Parsing strings
 
 : (parse-entity) ( string -- )
-    dup entities hash [ , ] [ 
+    dup entities at [ , ] [ 
         prolog-data get prolog-standalone
         [ <no-entity> throw ] [
-            dup extra-entities get ?hash
+            dup extra-entities get at
             [ , ] [ <no-entity> throw ] ?if
         ] if
     ] ?if ;
@@ -105,10 +105,10 @@ IN: xml-tokenize
 
 : direct ( -- object )
     get-char {
-        { [ dup CHAR: - = ] [ drop skip-comment ] }
-        { [ CHAR: [ = ] [ cdata ] }
-        { [ t ] [ CHAR: > take-char <directive> next ] }
-    } cond ;
+        { CHAR: - [ skip-comment ] }
+        { CHAR: [ [ cdata ] }
+        [ drop CHAR: > take-char <directive> next ]
+    } case ;
 
 : yes/no>bool ( string -- t/f )
     dup "yes" = [ drop t ] [

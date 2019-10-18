@@ -1,3 +1,5 @@
+! Copyright (C) 2005, 2007 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: tools
 USING: parser errors kernel namespaces sequences definitions
 io ;
@@ -10,11 +12,5 @@ SYMBOL: edit-hook
     >r ?resource-path r>
     edit-hook get [ call ] [ <no-edit-hook> throw ] if* ;
 
-: edit-file ( file -- ) ?resource-path 0 edit-location ;
-
 : edit ( defspec -- )
-    where [
-        first2 edit-location
-    ] [
-        "Not from a source file" throw
-    ] if* ;
+    where [ first2 edit-location ] when* ;

@@ -4,7 +4,7 @@
 ! 'persistent' holds the numeric rowid for that tuple in its table.
 IN: tuple-db
 USING: io kernel kernel-internals sequences namespaces
-hashtables sqlite errors math words generic ;
+assocs sqlite errors math words generic ;
 
 ! Each slot in a tuple that is storable in the database has
 ! an instance of a db-field object the gives the name of the 
@@ -22,13 +22,12 @@ TUPLE: mapping tuple table fields one-to-one one-to-many   ;
 : tuple-fields ( class -- seq )
   #! Given a tuple class return a list of the fields
   #! within that tuple. Ignores the delegate field.
-  [ word-name length 1+ ] keep
   "slots" word-prop 1 tail [
-    [ third word-name swap tail sanitize dup ":" swap append ] keep    
-    first
+    [ slot-spec-name sanitize dup ":" swap append ] keep
+    slot-spec-#
     "text"
     <db-field>
-  ] map-with ;
+  ] map ;
 
 : default-mapping ( class -- mapping )  
   #! Given a tuple class, create a default mappings object. It assumes
@@ -49,11 +48,11 @@ SYMBOL: mappings
 : set-mapping ( mapping -- )
   #! Store a database mapping so that the persistence system 
   #! knows how to store instances of the relevant tuple in the database.
-  dup mapping-tuple get-mappings set-hash ;
+  dup mapping-tuple get-mappings set-at ;
 
 : get-mapping ( class -- mapping )
   #! Return the database mapping for the given tuple class.
-  get-mappings hash ;
+  get-mappings at ;
 
 ! The 'persistent' tuple will be set to the delegate of any tuple
 ! instance stored in the database. It contains the database key

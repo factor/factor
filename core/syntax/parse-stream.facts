@@ -6,15 +6,6 @@ HELP: reset-checksums
 HELP: file-vocabs
 { $description "Installs the initial the vocabulary search path for parsing a file." } ;
 
-HELP: parse-lines
-{ $values { "lines" "a sequence of strings" } { "quot" "a new quotation" } }
-{ $description "Parses the Factor source code which has been tokenized into lines. The vocabulary search path is taken from the current scope." }
-{ $errors "Throws a parse error if the input is malformed." } ;
-
-HELP: with-parser
-{ $values { "quot" "a quotation" } }
-{ $description "Calls a quotation, wrapping any errors thrown inside parse errors." } ;
-
 HELP: parse
 { $values { "str" "a string" } { "quot" "a new quotation" } }
 { $description "Parses Factor source code from a string. The current vocabulary search path is used." }
@@ -26,8 +17,9 @@ HELP: eval
 { $errors "Throws an error if the input is malformed, or if the quotation throws an error." } ;
 
 HELP: parse-hook
-{ $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value recompiles new word definitions; see " { $link "recompile" } " for details." }
-{ $see-also no-parse-hook } ;
+{ $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value recompiles new word definitions; see " { $link "recompile" } " for details." } ;
+
+{ parse-hook no-parse-hook } related-words
 
 HELP: no-parse-hook
 { $values { "quot" "a quotation" } }
@@ -36,7 +28,7 @@ HELP: no-parse-hook
 HELP: run-files
 { $values { "seq" "a sequence of strings" } }
 { $description "Load a collection of source files."
-$terpri
+$nl
 "If bootstrapping, this word appends the top-level forms to the currently constructing quotation instead." } ;
 
 HELP: parse-stream

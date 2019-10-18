@@ -1,4 +1,4 @@
-USING: shuffle kernel math test compiler words ;
+USING: arrays shuffle kernel math test compiler words ;
 
 [ { 910 911 912 } ] [ 10 900 3 [ + + ] map-with2 ] unit-test
 [ 8 ] [ 5 6 7 8 3nip ] unit-test
@@ -34,3 +34,10 @@ USING: shuffle kernel math test compiler words ;
 { 13 } [ 1 2 { 3 4 } [ + + ] 2 each-withn + ] unit-test
 { t } [ [ 1 2 3 4 4 ndrop ] compile-quot compiled? ] unit-test
 { 0 } [ 0 1 2 3 4 4 ndrop ] unit-test
+[ 3 1 2 3 ] [ 1 2 3 tuckd ] unit-test
+[ 1 1 2 2 3 3 ] [ 1 2 3 [ dup ] 3apply ] unit-test
+[ 1 4 9 ] [ 1 2 3 [ sq ] 3apply ] unit-test
+[ t ] [ [ [ sq ] 3apply ] compile-quot compiled? ] unit-test
+[ { 1 2 } { 2 4 } { 3 8 } { 4 16 } { 5 32 } ] [ 1 2 3 4 5 [ dup 2^ 2array ] 5 napply ] unit-test
+[ t ] [ [ [ dup 2^ 2array ] 5 napply ] compile-quot compiled? ] unit-test
+

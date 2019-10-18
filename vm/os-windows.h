@@ -1,23 +1,28 @@
-#define UNICODE
-
 #include <windows.h>
 #include <ctype.h>
 
 typedef wchar_t F_CHAR;
-typedef char F_SYMBOL;
 
-#define unbox_symbol_string unbox_char_string
-#define from_symbol_string from_char_string
-#define primitive_string_to_native_alien primitive_string_to_u16_alien
+#define from_native_string from_u16_string
+#define unbox_native_string unbox_u16_string
+#define string_to_native_alien(string) string_to_u16_alien(string,true)
 
-#define STR_FORMAT L"%ls"
+#define STR_FORMAT(string) L##string
 
-#define FACTOR_OS_STRING "windows"
-
+#define MAX_UNICODE_PATH 32768
 #define DLLEXPORT __declspec(dllexport)
 #define SETJMP setjmp
 #define LONGJMP longjmp
 #define JMP_BUF jmp_buf
+
+#define OPEN_READ(path) _wfopen(path,L"rb")
+#define OPEN_WRITE(path) _wfopen(path,L"wb")
+#define FPRINTF(stream,format,arg) fwprintf(stream,L##format,arg)
+
+#ifndef wcslen
+  // for cygwin
+  #include <wchar.h>
+#endif
 
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
@@ -25,9 +30,9 @@ typedef char F_SYMBOL;
 F_STRING *get_error_message(void);
 DLLEXPORT F_CHAR *error_message(DWORD id);
 
-INLINE void init_ffi(void) {}
+void init_ffi(void);
 void ffi_dlopen(F_DLL *dll, bool error);
-void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol, bool error);
+void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 
 void primitive_open_file(void);
@@ -38,9 +43,22 @@ void primitive_cd(void);
 
 INLINE void init_signals(void) {}
 INLINE void early_init(void) {}
-const char *default_image_path(void);
+F_CHAR *char_to_F_CHAR(char *ptr);
+const F_CHAR *default_image_path(void);
 long getpagesize (void);
 
 s64 current_millis(void);
 
 INLINE void reset_stdio(void) {}
+
+/* SEH support. Proceed with caution. */
+typedef long exception_handler_t(
+	PEXCEPTION_RECORD rec, void *frame, void *context, void *dispatch);
+
+typedef struct exception_record
+{
+	struct exception_record *next_handler;
+	void *handler_func;
+} exception_record_t;
+
+long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch);

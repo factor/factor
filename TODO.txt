@@ -1,111 +1,22 @@
-+ 0.89:
-
-= fixes:
-
-- load primitive-types in the target not the host
-- test factor with compiz
-- memory leak on os x
-- ffi_test_18 on windows
-- compiled call traces do not work if the runtime is built with
-  -fomit-frame-pointer on ppc (and amd64?)
-- cocoa: international keys don't work
-- >bit-array doesn't work for tuples
-- %allot-bignum-signed-1 doesn't work for zero or numbers which don't
-  fit in 30 bits
-- parsing word print demo doesn't work in ui listener
-- error popup obscures input area
-- poorly documented vocabs:
-  - alien
-  - cocoa
-  - compiler
-  - completion
-  - image
-  - interpreter
-  - objc
-  - optimizer
-- crc32: unicode
-
-= performance:
-
-- do relative label relocations ahead of time
-  - do we ever have absolute label relocations?
-- float-mod intrinsic
-- hashed generic dispatch
-- if a loc appears multiple times on the phantom-stack, then we read
-  it more than once as each occurrence is vreg-ified
-- see if these are still Too Slow:
-  - "factor.image" run-file  should fail quicker!
-  - 10000 [ dup number>string ] map>hash describe in the UI
-  - apropos
-  - available-modules
-  - md5, crc32
-  - 100000 [ "\"hello\" not" eval drop ] times
-  - compilation
-  - make-image
-
-= features:
-
-- replace $see-also with a better system
-- add full support for long longs to ffi
-- double args in arm ffi
-- integrate libs/unicode/
-- single stepper: abadon feature which throws exception & continues
-- overhaul parser
-- variable width word wrap
-- if we're printing a block on multiple lines, break at some words like
-  set off on % # , ... and assembler opcodes
-- don't end lines with literals, shuffle words or symbols?
-- see should try to not show ; on a line by itself
-- IN: on its own line if the entire 'see' form doesn't fit
-- command buttons: indicate shortcuts
-- how do we refer to command shortcuts in the docs?
-
-+ 0.90:
-
-= fixes:
-
-- models: don't do redundant work
-- auto-update browser and help when sources reload
-- new windows don't always have focus, eg focus follows mouse
-- should be possible to load multiple i/o backends, compiler backends,
-  ui backends etc without problems
-
-= performance:
-
-- float arrays
-- work on making spectral norm fast
-- permgen
-- inline allocators for constant size tuples and arrays
-- no write barrier for stores of immediates
-- more arm intrinsics: fixnum<>bignum conversions, (set-)char-slot,
-  overflowing fixnum+ fixnum-, set-slot
-- compiled continuations
-- continue overflow check removal work: nappend
-- memcspn is ugly, remove it and get a Factor inner loop to be as fast
-- no need to generate dead code after a tail call
-- why is every fp reg shadowed by an int reg?
-- can def-use get the other case of fixnum-compare + conditional?
-- >r >r fixnum< r> r> rot [ ... ] [ ... ] if -- use an if-intrinsic here
-- cross-word type inference
-
-= features:
-
-- better tuple constructors
-- case: support constant words
-- new module system
-- graphical crossref tool
-- inspector where slot values can be changed
-- some kind of declarative wiring framework for ui
-- tuple shape changes
-- UI unit test tool
-- copying pane output
-- right-click menu for words and links: show both word and link commands
-
-+ 0.91:
-
 = fixes:
 
 - [ [ dup call ] dup call ] infer hangs
+- copying pane output
+  - reverse traversal
+  - better hit tester
+- forgetting a word should erase it from source-files-uses
+- memory leak on os x
+- <viewport>, smart-usage, infer-children prettyprinted ugly
+- should be possible to load multiple i/o backends, compiler backends,
+  ui backends etc without problems
+- crc32: unicode
+- bignum allocators don't work for numbers which don't fit in 30 bits
+- compiled call traces do not work if the runtime is built with
+  -fomit-frame-pointer on ppc (and amd64?)
+- models: don't do redundant work
+- auto-update browser and help when sources reload
+- implementation of math functions needs work; uses overly naive
+  formulas
 - fix conditions and restarts to work like CL
 - amd64 structs-by-value bug
 - float= doesn't consider nans equal
@@ -114,31 +25,69 @@
   won't be thrown until the next word accesses the stack
 - should be possible to reload any source file in library
 - slice: if sequence or seq start is changed, abstraction violation
-- callstack overflow when compiling mutually recursive inline words
+- compiled call stack overflows shouldn't crash so hard
+- finish cocoa input methods
+- tuple shape changes interact in funny ways with compiler
 
 = performance:
 
-- see if its possible to only repaint dirty regions
+- long strings slow down redisplay
+- if a loc appears multiple times on the phantom-stack, then we read
+  it more than once as each occurrence is vreg-ified
+- optimize:
+  - all-words [ synopsis ] map drop
+  - yuv>rgb
+  - "factor.image" run-file  should fail quicker!
+  - 10000 [ dup number>string ] map>hash describe in the UI
+  - apropos
+  - available-modules
+  - md5, crc32
+  - 100000 [ "\"hello\" not" eval drop ] times
+  - compilation
+  - make-image
+  - natural-sort
+  - spectral norm
+- float arrays
+- permgen
+- no write barrier for stores of immediates
+- compiled continuations
+- memcspn is ugly, remove it and get a Factor inner loop to be as fast
+- no need to generate dead code after a tail call
+- cross-word type inference
+- hashed generic dispatch
 - minor GC takes too long now, we should card mark code heap
 - incremental GC
 - prettyprinter: don't build entire tree to print first
 - ui inspector should work with very large objects
+- intrinsics for (hashtable), <word>, <wrapper>, string>sbuf,
+  (fraction>), word-xt, <complex>, array>vector, <displaced-alien>,
+  (clone) of known size object
 
 = features:
 
+- it would be nice if ctrl-p, ctrl-m, ctrl-e etc could use pageup pagedown
+- windows unicode input methods
+- variable width word wrap
+- ui crossref tool
+- auto-generated docs for alien accessors
+- unicode text rendering
+- profiler:
+  - sampling instead of counting
+  - profile compiled code too
+  - ui tool
+- evaluating code in the walker, somehow
+- record $links as usage?
+- better tuple constructors
+- integrate libs/unicode/
+- new module system
+- compiler implementation documentation
 - compiling 'curry'
-- editor:
-  - autoscroll
-  - transpose char/word/line
-  - more efficient multi-line inserts
-- automatic help/effects for slot accessors
-
-+ before 1.0:
-
 - building minimal images
 - cross compiling
-- UDP
-- factor should be an embeddable DLL
-- profiler
+- UDP for Windows and Solaris
 - ipv6
-- structure editor
+- unicode file paths on unix
+- DLL interface:
+  - document DLL interface
+  - multiple Factor instances per DLL, with clean unloading
+  - better exported C API

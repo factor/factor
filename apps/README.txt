@@ -7,6 +7,7 @@ Modules can be loaded from the listener:
 
 Available applications:
 
+- article-manager -- Web-based content management system (Chris Double)
 - automata -- Graphics demo for the UI (Eduardo Cavazos)
 - benchmarks -- Various performance benchmarks (Slava Pestov)
 - boids -- Graphics demo for the UI (Eduardo Cavazos)
@@ -19,6 +20,7 @@ Available applications:
 - http-server -- HTTP server (Slava Pestov, Chris Double)
 - lindenmayer -- L-systems tool (Eduardo Cavazos)
 - lisppaste -- Lisppaste XML-RPC demo (Slava Pestov)
+- ogg-player -- Ogg Vorbis (audio) and Theora (video) player (Chris Double)
 - print-dataflow -- Code to print compiler dataflow IR to the console, or show it in the UI (Slava Pestov)
 - random-tester -- Random compiler tester (Doug Coleman)
 - rss -- An RSS1, RSS2 and Atom parser and aggregator (Chris Double, Daniel Ehrenberg)

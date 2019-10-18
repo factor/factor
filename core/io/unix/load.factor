@@ -12,4 +12,5 @@ PROVIDE: core/io/unix
     "io.factor"
     "sockets.factor"
     "files.factor"
-} } ;
+} }
+{ +tests+ { "test.factor" } } ;

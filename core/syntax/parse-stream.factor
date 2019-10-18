@@ -1,12 +1,12 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: parser
-USING: arrays errors generic hashtables io kernel math
-namespaces sequences words crc32 ;
+USING: arrays errors generic assocs io kernel math
+namespaces sequences words crc32 prettyprint ;
 
 SYMBOL: source-files
 
-TUPLE: source-file path modified checksum ;
+TUPLE: source-file path modified checksum form uses ;
 
 : file-modified* ( source-file -- n )
     file-modified [ 0 ] unless* ;
@@ -19,7 +19,7 @@ C: source-file ( path -- source-file )
     [ swap file-crc32 number= not ] [ 2drop f ] if ;
 
 : source-modified? ( file -- ? )
-    dup source-files get hash [
+    dup source-files get at [
         dup source-file-path ?resource-path
         over source-file-modified
         rot source-file-checksum
@@ -29,13 +29,10 @@ C: source-file ( path -- source-file )
     ] ?if ;
 
 : file-vocabs ( -- )
-    "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
+    "scratchpad" in set { "syntax" "scratchpad" } set-use ;
 
-: with-parser ( quot -- )
-    0 line-number set [ <parse-error> rethrow ] recover ;
-
-: parse-lines ( lines -- quot )
-    [ f [ (parse) ] reduce >quotation ] with-parser ;
+: parse-fresh ( lines -- )
+    [ file-vocabs parse-lines ] with-scope ;
 
 SYMBOL: parse-hook
 
@@ -45,26 +42,40 @@ SYMBOL: parse-hook
     "quiet" get [
         drop
     ] [
-        "Loading " write write-pathname terpri flush
+        "Loading " write <pathname> . flush
     ] if ;
 
-: record-checksum ( contents path source-file -- )
-    swap ?resource-path file-modified*
-    over set-source-file-modified
-    swap crc32 swap set-source-file-checksum ;
+: record-modified ( path source-file -- )
+    >r ?resource-path file-modified* r>
+    set-source-file-modified ;
 
-: record-file ( contents path -- )
-    [ dup <source-file> [ record-checksum ] keep ] keep
-    source-files get set-hash ;
+: record-checksum ( contents source-file -- )
+    >r crc32 r> set-source-file-checksum ;
+
+: xref-source ( source-file -- )
+    dup source-file-form quot-uses
+    swap set-source-file-uses ;
+
+: xref-sources ( -- )
+    source-files get [ nip xref-source ] assoc-each ;
+
+: record-form ( form source-file -- )
+    [ set-source-file-form ] keep xref-source ;
+
+: record-file ( form contents path -- )
+    [
+        dup <source-file>
+        [ record-modified ] keep
+        [ record-checksum ] keep
+        [ record-form ] keep
+    ] keep source-files get set-at ;
 
 : parse-stream ( stream name -- quot )
     [
-        file-vocabs [
-            file set
-            contents [
-                string-lines parse-lines do-parse-hook
-            ] keep
-        ] keep record-file
+        file set
+        contents dup \ contents set
+        string-lines parse-fresh do-parse-hook
+        dup \ contents get file get record-file
     ] with-scope ;
 
 : parse-file-restarts ( file -- restarts )
@@ -76,7 +87,8 @@ SYMBOL: parse-hook
         [ ?resource-path <file-reader> ] keep
         parse-stream
     ] [
-        over parse-file-restarts condition drop parse-file
+        over parse-file-restarts rethrow-restarts
+        drop parse-file
     ] recover ;
 
 : run-file ( file -- )
@@ -86,7 +98,7 @@ SYMBOL: parse-hook
     [ parse-hook off call ] with-scope ; inline
 
 : bootstrap-file ( path -- )
-    bootstrapping? get [ parse-file % ] [ run-file ] if ;
+    [ parse-file % ] [ run-file ] if-bootstrapping ;
 
 : bootstrap-files ( seq -- )
     [ [ bootstrap-file ] each ] no-parse-hook ;
@@ -102,11 +114,14 @@ SYMBOL: parse-hook
         ] [
             drop
         ] if
-    ] hash-each ;
+    ] assoc-each ;
 
 : parse ( str -- quot ) string-lines parse-lines ;
 
 : eval ( str -- ) parse call ;
 
 : eval>string ( str -- str )
-    [ [ [ eval ] keep ] try drop ] string-out ;
+    [
+        check-shadowing off
+        [ [ eval ] keep ] try drop
+    ] string-out ;

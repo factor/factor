@@ -1,6 +1,6 @@
 IN: temporary
 USING: definitions help kernel sequences test words parser
-namespaces hashtables ;
+namespaces assocs ;
 
 ! Test help cross-referencing
 
@@ -31,6 +31,6 @@ SYMBOL: foo
 ] unit-test
 
 [ { "testfile" 1 } ]
-[ { "test" 1 } articles get hash article-loc ] unit-test
+[ { "test" 1 } articles get at article-loc ] unit-test
 
 [ ] [ { "test" 1 } remove-article ] unit-test

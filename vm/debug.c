@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "master.h"
 
 void print_word(F_WORD* word, CELL nesting)
 {
@@ -256,7 +256,7 @@ void factorbug(void)
 		else if(strcmp(cmd,"x") == 0)
 			exit(1);
 		else if(strcmp(cmd,"im") == 0)
-			save_image("fep.image");
+			save_image(STR_FORMAT("fep.image"));
 		else if(strcmp(cmd,"code") == 0)
 			dump_heap(&code_heap);
 		else

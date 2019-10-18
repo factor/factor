@@ -1,28 +1,47 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: arrays byte-arrays bit-arrays generic hashtables io assocs
+kernel math namespaces sequences strings sbufs styles
+vectors words prettyprint quotations io ;
 IN: prettyprint-internals
-USING: arrays byte-arrays bit-arrays generic hashtables io
-kernel math namespaces parser sequences strings sbufs styles
-vectors words prettyprint ;
 
 GENERIC: pprint* ( obj -- )
+
+: ?effect-height ( word -- n )
+    stack-effect [ effect-height ] [ 0 ] if* ;
+
+: ?start-group ( word -- )
+    ?effect-height 0 > [ start-group ] when ;
+
+: ?end-group ( word -- )
+    ?effect-height 0 < [ end-group ] when ;
+
+\ >r hard "break-before" set-word-prop
+\ r> hard "break-after" set-word-prop
 
 ! Atoms
 : word-style ( word -- style )
     [
         dup presented set
-        parsing? [ bold font-style set ] when
-    ] make-hash ;
+        dup parsing? over delimiter? rot t eq? or or
+        [ bold font-style set ] when
+    ] H{ } make-assoc ;
+
+: word-name* ( word -- str )
+    word-name [ "( no name )" ] unless* ;
 
 : pprint-word ( word -- )
-    dup word-name [ "( no name )" ] unless*
-    swap word-style styled-text ;
+    dup record-vocab
+    dup word-name* over word-style styled-text
+    dup ?start-group ?end-group ;
 
 M: word pprint*
     dup parsing? [
-        <flow \ POSTPONE: pprint-word pprint-word block>
+        <block \ POSTPONE: pprint-word pprint-word block>
     ] [
-        pprint-word
+        dup "break-before" word-prop break
+        dup pprint-word
+        "break-after" word-prop break
     ] if ;
 
 M: real pprint* number>string text ;
@@ -39,7 +58,7 @@ M: f pprint* drop \ f pprint-word ;
         { CHAR: \0 "\\0"  }
         { CHAR: \\ "\\\\" }
         { CHAR: \" "\\\"" }
-    } hash ;
+    } at ;
 
 : ch>unicode-escape ( ch -- str )
     >hex 4 CHAR: 0 pad-left "\\u" swap append ;
@@ -58,31 +77,39 @@ M: f pprint* drop \ f pprint-word ;
         ] when
     ] when ;
 
-: string-style
-    H{ { foreground { 0.3 0.3 0.3 1.0 } } } ;
+: string-style ( obj -- hash )
+    [
+        presented set
+        { 0.3 0.3 0.3 1.0 } foreground set
+    ] H{ } make-assoc ;
 
-: pprint-string ( str prefix -- )
-    >r do-string-limit r>
-    [ % [ unparse-ch ] each CHAR: " , ] "" make
-    string-style styled-text ;
+: unparse-string ( str prefix -- str )
+    [
+        % do-string-limit [ unparse-ch ] each CHAR: " ,
+    ] "" make ;
 
-M: string pprint* "\"" pprint-string ;
+: pprint-string ( obj str prefix -- )
+    unparse-string swap string-style styled-text ;
 
-M: sbuf pprint* "SBUF\" " pprint-string ;
+M: string pprint* dup "\"" pprint-string ;
+
+M: sbuf pprint* dup "SBUF\" " pprint-string ;
+
+M: pathname pprint* dup pathname-string "P\" " pprint-string ;
 
 ! Sequences
 : nesting-limit? ( -- ? )
     nesting-limit get dup [ pprinter-stack get length < ] when ;
 
-: presentation-text ( str obj -- )
+: present-text ( str obj -- )
     presented associate styled-text ;
 
 : check-recursion ( obj quot -- )
     nesting-limit? [
-        drop "#" swap presentation-text
+        drop "( ... )" swap present-text
     ] [
         over recursion-check get memq? [
-            drop "&" swap presentation-text
+            drop "( circularity )" swap present-text
         ] [
             over recursion-check get push
             call
@@ -95,16 +122,12 @@ M: sbuf pprint* "SBUF\" " pprint-string ;
     [ over length over > [ head t ] [ drop f ] if ]
     [ drop f ] if ;
 
-: pprint-hilite ( object n -- )
-    hilite-index get = [
-        <hilite pprint* block>
-    ] [
-        pprint*
-    ] if ;
+: pprint-hilite ( n object -- )
+    pprint* hilite-index get = [ hilite ] when ;
 
 : pprint-elements ( seq -- )
     length-limit? >r dup hilite-quotation get eq? [
-        dup length [ pprint-hilite ] 2each
+        [ length ] keep [ pprint-hilite ] 2each
     ] [
         [ pprint* ] each
     ] if r> [ "..." text ] when ;
@@ -127,7 +150,7 @@ M: object >pprint-sequence ;
 
 M: bit-array >pprint-sequence ;
 M: complex >pprint-sequence >rect 2array ;
-M: hashtable >pprint-sequence hash>alist ;
+M: hashtable >pprint-sequence >alist ;
 M: tuple >pprint-sequence tuple>array ;
 M: wrapper >pprint-sequence wrapped 1array ;
 
@@ -144,7 +167,7 @@ M: tuple pprint-narrow? drop t ;
     [
         <flow
         dup pprint-delims >r pprint-word
-        dup pprint-narrow? [ <narrow ] [ <inset ] if
+        dup pprint-narrow? <inset
         >pprint-sequence pprint-elements
         block> r> pprint-word block>
     ] check-recursion ;
@@ -153,7 +176,7 @@ M: object pprint* pprint-object ;
 
 M: wrapper pprint*
     dup wrapped word? [
-        <flow \ \ pprint-word wrapped pprint-word block>
+        <block \ \ pprint-word wrapped pprint-word block>
     ] [
         pprint-object
     ] if ;

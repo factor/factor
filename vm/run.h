@@ -1,3 +1,6 @@
+/* Is profiling on? */
+bool profiling;
+
 /* Callstack top pointer */
 F_INTERP_FRAME *cs;
 
@@ -22,9 +25,11 @@ typedef enum {
 	ERROR_ENV,              /* a marker consed onto kernel errors */
 	IN_ENV,                 
 	OUT_ENV,                
-	UNUSED_ENV,
+	EVAL_CALLBACK_ENV,      /* used when Factor is embedded in a C app */
 	IMAGE_ENV,              /* image path name */
-	EXECUTABLE_ENV		/* runtime executable path name */
+	EXECUTABLE_ENV,		/* runtime executable path name */
+	YIELD_CALLBACK_ENV,     /* used when Factor is embedded in a C app */
+	EMBEDDED_ENV,		/* are we embedded in another app? */
 } F_ENVTYPE;
 
 /* TAGGED user environment data; see getenv/setenv prims */
@@ -124,7 +129,7 @@ void handle_error();
 void interpreter_loop(void);
 void interpreter(void);
 void run(void);
-void run_toplevel(void);
+DLLEXPORT void run_toplevel(void);
 void undefined(F_WORD *word);
 void docol(F_WORD *word);
 void dosym(F_WORD *word);
@@ -132,6 +137,7 @@ void primitive_execute(void);
 void primitive_call(void);
 void primitive_ifte(void);
 void primitive_dispatch(void);
+void primitive_profiling(void);
 void primitive_getenv(void);
 void primitive_setenv(void);
 void primitive_exit(void);
@@ -142,7 +148,6 @@ void primitive_type(void);
 void primitive_tag(void);
 void primitive_slot(void);
 void primitive_set_slot(void);
-void primitive_clone(void);
 
 DLLEXPORT void run_callback(CELL quot);
 
@@ -167,7 +172,8 @@ typedef enum
 	ERROR_CS_UNDERFLOW,
 	ERROR_CS_OVERFLOW,
 	ERROR_MEMORY,
-	ERROR_OBJECTIVE_C
+	ERROR_OBJECTIVE_C,
+	ERROR_PRIMITIVE
 } F_ERRORTYPE;
 
 /* Are we throwing an error? */
@@ -190,11 +196,11 @@ void early_error(CELL error);
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2,
 	bool keep_stacks, F_COMPILED_FRAME *native_stack);
 void simple_error(F_ERRORTYPE error, CELL arg1, CELL arg2);
-void memory_protection_error(CELL addr, int signal, F_COMPILED_FRAME *native_stacks);
+void memory_protection_error(CELL addr, F_COMPILED_FRAME *native_stacks);
 void signal_error(int signal, F_COMPILED_FRAME *native_stack);
 void type_error(CELL type, CELL tagged);
 void divide_by_zero_error(void);
-void memory_error(void);
+void primitive_error(void);
 void primitive_throw(void);
 void primitive_die(void);
 

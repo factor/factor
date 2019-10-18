@@ -1,6 +1,6 @@
 USING: arrays errors generic hashtables io kernel lazy-lists math
-memory modules namespaces null-stream 
-prettyprint random-tester2 sequences strings
+memory modules namespaces null-stream prettyprint random-tester2
+quotations sequences strings
 tools vectors words ;
 IN: random-tester
 
@@ -16,6 +16,7 @@ TUPLE: inert-object ;
         3/4
             -1000000000000000000000000/111111111111111111
         -3.14 1/0. 0.0 -1/0. 3.14 0/0.
+        20102101010100110110
         C{ 1 -1 }
         W{ 55 }
         { }
@@ -33,6 +34,8 @@ TUPLE: inert-object ;
         V{ 1 0 65536 } clone ,
         V{ } clone ,
         SBUF" " clone ,
+        B{ } clone ,
+        ?{ } clone ,
     ] { } make append ;
 
 TUPLE: success quot inputs outputs input-types output-types ;
@@ -47,7 +50,7 @@ t silent set-global
 
 : test-quot ( input quot -- success/f )
     ! 2dup swap . . flush
-! dup [ set-datastack ] = [ 2dup . . flush ] when
+    ! dup [ hash+ ] = [ 2dup . . flush ] when
     err off
     quot set input set
     silent get [
@@ -74,7 +77,7 @@ t silent set-global
 : test-inputs ( word -- seq )
     [
         [ word-input-count inputs swap ] keep
-        unit [
+        1quotation [
             test-quot [ , ] when*
         ] curry each-permutation
     ] { } make ;
@@ -161,7 +164,7 @@ TUPLE: typed quot inputs outputs ;
     [ word>type-check ] catch nip ;
 
 : find-words ( quot -- seq )
-    wordbank get
+    \ safe-words get
     [
         word-input-count 3 <=
     ] subset swap subset ;
@@ -171,7 +174,7 @@ TUPLE: typed quot inputs outputs ;
 : find-buggy ( -- seq ) [ buggy? ] find-words ;
 
 : test-word ( output input word -- ? )
-    unit test-quot dup [
+    1quotation test-quot dup [
         success-outputs sequence=
     ] [
         nip
@@ -190,7 +193,7 @@ TUPLE: typed quot inputs outputs ;
 
 : enumeration-test ( -- seq )
     [
-        wordbank get
+        \ safe-words get
         f silent set
         (enumeration-test)
     ] with-scope ;

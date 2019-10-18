@@ -1,12 +1,9 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-messages
-DEFER: messages
-
 IN: gadgets-workspace
-USING: gadgets gadgets-books gadgets-workspace
-generic kernel models scratchpad sequences syntax
-gadgets-messages ;
+USING: gadgets gadgets-books gadgets-workspace gadgets-panes
+gadgets-scrolling gadgets-tracks generic kernel models
+scratchpad sequences errors syntax help ;
 
 DEFER: workspace-window
 
@@ -16,19 +13,14 @@ GENERIC: tool-scroller ( tool -- scroller )
 
 M: gadget tool-scroller drop f ;
 
-GENERIC: tool-help ( tool -- topic )
-
-M: gadget tool-help drop f ;
-
-TUPLE: workspace book popup error-hook ;
+TUPLE: workspace book listener popup ;
 
 : find-workspace [ workspace? ] find-parent ;
 
 TUPLE: tool gadget ;
 
 : find-tool ( class workspace -- index tool )
-    workspace-book gadget-children
-    [ tool-gadget class eq? ] find-with ;
+    workspace-book gadget-children [ class eq? ] find-with ;
 
 : show-tool ( class workspace -- tool )
     [ find-tool swap ] keep workspace-book control-model
@@ -47,6 +39,28 @@ TUPLE: tool gadget ;
     get-workspace show-tool call-tool* ;
 
 : get-tool ( class -- gadget )
-    get-workspace find-tool nip tool-gadget ;
+    get-workspace find-tool nip ;
 
-: find-messages ( -- gadget ) messages get-tool ;
+: help-window ( topic -- )
+    [ [ help ] H{ } make-pane <scroller> ] keep
+    article-title open-window ;
+
+: hide-popup ( workspace -- )
+    dup workspace-popup over track-remove
+    f over set-workspace-popup
+    request-focus ;
+
+: show-popup ( gadget workspace -- )
+    dup hide-popup
+    2dup set-workspace-popup
+    dupd f track-add
+    request-focus ;
+
+: show-titled-popup ( workspace gadget title -- )
+    [ find-workspace hide-popup ] <closable-gadget>
+    swap show-popup ;
+
+: debugger-popup ( error workspace -- )
+    swap dup compute-restarts
+    [ find-workspace hide-popup ] <debugger>
+    "Error" show-titled-popup ;

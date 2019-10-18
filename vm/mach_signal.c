@@ -8,7 +8,7 @@ Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
 
 see http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html */
 
-#include "factor.h"
+#include "master.h"
 
 /* The following sources were used as a *reference* for this exception handling
    code:
@@ -24,7 +24,7 @@ static mach_port_t our_exception_port;
 static void
 memory_protection_handler (void *fault_addr)
 {
-  memory_protection_error((CELL)fault_addr,SIGSEGV,native_stack_pointer());
+  memory_protection_error((CELL)fault_addr,native_stack_pointer());
   abort ();
 }
 

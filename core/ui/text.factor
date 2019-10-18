@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays errors freetype generic hashtables
+USING: arrays errors freetype generic hashtables assocs
 kernel math models namespaces opengl sequences strings ;
 
 : string-width ( open-font string -- w )

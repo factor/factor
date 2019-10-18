@@ -1,20 +1,24 @@
 USING: generic help kernel math modules parser words ;
 
+HELP: delimiter
+{ $syntax ": foo ... ; delimiter" }
+{ $description "Declares the most recently defined word as a delimiter. Delimiters are words which are only ever valid as the end of a nested block to be read by " { $link parse-until } ". An unpaired occurrence of a delimiter is a parse error." } ;
+
 HELP: parsing
-{ $syntax "parsing" }
+{ $syntax ": foo ... ; parsing" }
 { $description "Declares the most recently defined word as a parsing word." }
 { $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example ": hello \"Hello parser!\" print ; parsing\n: world hello ;" "Hello parser!" } } ;
 
 HELP: inline
-{ $syntax "inline" }
+{ $syntax ": foo ... ; inline" }
 { $description
     "Declares the most recently defined word as an inline word."
-    $terpri
+    $nl
     "Combinators must be inlined in order to compile - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization. Inlining does not affect the execution of the word in the interpreter."
 } ;
 
 HELP: foldable
-{ $syntax "foldable " }
+{ $syntax ": foo ... ; foldable" }
 { $description
     "Declares that the most recently defined word may be evaluated at compile-time if all inputs are literal. Foldable words must satisfy a very strong contract:"
     { $list
@@ -40,18 +44,23 @@ HELP: f
 HELP: [
 { $syntax "[ elements... ]" }
 { $description "Marks the beginning of a literal quotation." }
-{ $examples { $code "[ 1 2 3 ]" } }
-{ $see-also POSTPONE: ] } ;
+{ $examples { $code "[ 1 2 3 ]" } } ;
+
+{ POSTPONE: [ POSTPONE: ] } related-words
 
 HELP: ]
 { $syntax "]" }
-{ $description "Marks the end of a literal quotation." }
-{ $see-also POSTPONE: [ } ;
+{ $description "Marks the end of a literal quotation."
+$nl
+"Parsing words can use this word as a generic end delimiter." } ;
 
 HELP: }
 { $syntax "}" }
-{ $description "Marks the end of an array, vector, hashtable, complex number, tuple, or wrapper." }
-{ $see-also POSTPONE: { POSTPONE: V{ POSTPONE: H{ POSTPONE: C{ POSTPONE: T{ POSTPONE: W{ } ;
+{ $description "Marks the end of an array, vector, hashtable, complex number, tuple, or wrapper."
+$nl
+"Parsing words can use this word as a generic end delimiter." } ;
+
+{ POSTPONE: { POSTPONE: V{ POSTPONE: H{ POSTPONE: C{ POSTPONE: T{ POSTPONE: W{ POSTPONE: } } related-words
 
 HELP: {
 { $syntax "{ elements... }" }
@@ -86,14 +95,13 @@ HELP: T{
 { $syntax "T{ class delegate slots... }" }
 { $values { "class" "a tuple class word" } { "delegate" "a delegate" } { "slots" "list of objects" } }
 { $description "Marks the beginning of a literal tuple. Literal tuples are terminated by " { $link POSTPONE: } } "."
-$terpri
+$nl
 "The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, they are ignored." } ;
 
 HELP: W{
 { $syntax "W{ object }" }
 { $values { "object" "an object" } }
-{ $description "Marks the beginning of a literal wrapper. Literal wrappers are terminated by " { $link POSTPONE: } } "." } 
-{ $see-also POSTPONE: \ <wrapper> literalize } ;
+{ $description "Marks the beginning of a literal wrapper. Literal wrappers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: POSTPONE:
 { $syntax "POSTPONE: word" }
@@ -106,23 +114,25 @@ HELP: :
 { $syntax ": word definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
 { $description "Defines a compound word in the current vocabulary." }
-{ $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )    \"Greetings, \" write print ;\n: friend ( -- )    ask-name greet ;" } }
-{ $see-also POSTPONE: ; define-compound } ;
+{ $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )    \"Greetings, \" write print ;\n: friend ( -- )    ask-name greet ;" } } ;
+
+{ POSTPONE: : POSTPONE: ; define-compound } related-words
 
 HELP: ;
 { $syntax ";" }
 { $description
     "Marks the end of a definition."
-    $terpri
-    "Parsing words can use this word as a generic end delimiter. It has parse-time stack effect " { $snippet "( definer parsed -- )" } "; when parsed, it reverses the " { $snippet "parsed" } " quotation, and passes it as input to the " { $snippet "definer" } " quotation."
-}
-{ $see-also POSTPONE: : POSTPONE: G: POSTPONE: M: POSTPONE: C: POSTPONE: UNION: POSTPONE: PREDICATE: POSTPONE: USING: } ;
+    $nl
+    "Parsing words can use this word as a generic end delimiter."
+} ;
 
 HELP: SYMBOL:
 { $syntax "SYMBOL: word" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
 { $examples { $example "SYMBOL: foo\nfoo ." "foo" } } ;
+
+{ define-symbol POSTPONE: SYMBOL: } related-words
 
 HELP: \
 { $syntax "\\ word" }
@@ -185,14 +195,14 @@ HELP: (
 HELP: !
 { $syntax "! comment..." }
 { $values { "comment" "characters" } }
-{ $description "Discards all input until the end of the line." }
-{ $see-also POSTPONE: #! } ;
+{ $description "Discards all input until the end of the line." } ;
+
+{ POSTPONE: ! POSTPONE: #! } related-words
 
 HELP: #!
 { $syntax "#! comment..." }
 { $values { "comment" "characters" } }
-{ $description "Discards all input until the end of the line." }
-{ $see-also POSTPONE: ! } ;
+{ $description "Discards all input until the end of the line." } ;
 
 HELP: HEX:
 { $syntax "HEX: integer" }
@@ -218,60 +228,78 @@ HELP: GENERIC:
 { $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "A " { $link "method-combination" } " facility exists for customizing method dispatch behavior."
-    $terpri
+    $nl
     "This parsing word is equivalent to the following usage of the more general " { $link POSTPONE: G: } " word:"
-    { $code "G: word 0 standard-combination ;" }
+    { $code "G: word simple-combination ;" }
+} ;
+
+HELP: HOOK:
+{ $syntax "HOOK: word variable" }
+{ $values { "word" "a new word to define" } { "variable" word } }
+{ $description "Defines a new hook word in the current vocabulary. Hook words are generic words which dispatch on the value of a variable, so methods are defined with " { $link POSTPONE: M: } ". Hook words differ from other generic words in that the dispatch value is removed from the stack before the chosen method is called." }
+{ $examples
+    { $example
+        "SYMBOL: transport"
+        "TUPLE: land-transport ;"
+        "TUPLE: air-transport ;"
+        "HOOK: deliver transport ( destination -- )"
+        "M: land-transport deliver \"Land delivery to \" write print ;"
+        "M: air-transport deliver \"Air delivery to \"  write print ;"
+        "T{ air-transport } transport set"
+        "\"New York City\" deliver"
+        "Air delivery to New York City"
+    }
 }
-{ $see-also define-generic } ;
+{ $notes
+    "Hook words are really just generic words with a custom method combination (see " { $link "method-combination" } ")."
+    $nl
+    "The " { $link POSTPONE: HOOK: } " parsing word is equivalent to the following usage of the more general " { $link POSTPONE: G: } " word:"
+    { $code "G: word \\ variable hook-combination ;" }
+} ;
 
 HELP: G:
 { $syntax "G: word combination... ;" }
 { $values { "word" "a new word to define" } { "combination" "a method combination definition with stack effect " { $snippet "( word -- quot )" } } }
 { $description "Defines a generic word using the long-form. A method combination is a quotation that is given the generic word on the stack, and outputs a quotation " { $emphasis "that becomes the definition of the word" } "." }
-{ $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." }
-{ $see-also define-generic* } ;
+{ $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." } ;
 
 HELP: M:
 { $syntax "M: class generic definition... ;" }
 { $values { "class" "a class word" } { "generic" "a generic word" } { "definition" "a method definition" } }
-{ $description "Defines a method, that is, a behavior for the generic word specialized on instances of the class." }
-{ $see-also define-method } ;
+{ $description "Defines a method, that is, a behavior for the generic word specialized on instances of the class." } ;
 
 HELP: UNION:
 { $syntax "UNION: class members... ;" }
 { $values { "class" "a new class word to define" } { "members" "a list of class words separated by whitespace" } }
 { $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." }
-{ $notes "Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates." }
-{ $see-also define-union-class } ;
+{ $notes "Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates." } ;
 
 HELP: PREDICATE:
 { $syntax "PREDICATE: superclass class predicate... ;" }
 { $values { "superclass" "an existing class word" } { "class" "a new class word to define" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
 { $description
     "Defines a predicate class deriving from " { $snippet "superclass" } "."
-    $terpri
+    $nl
     "An object is an instance of a predicate class if two conditions hold:"
     { $list
         "it is an instance of the predicate's superclass,"
         "it satisfies the predicate"
     }
     "Each predicate must be defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be exhaustively tested during method dispatch."
-}
-{ $see-also define-predicate-class } ;
+} ;
 
 HELP: TUPLE:
 { $syntax "TUPLE: class slots... ;" }
 { $values { "class" "a new class word to define" } { "slots" "a list of slot names" } }
 { $description "Defines a new tuple class with membership predicate " { $snippet "name?" } " and constructor " { $snippet "<name>" } "."
-$terpri
-"Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." }
-{ $see-also define-tuple-class } ;
+$nl
+"Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
 
 HELP: C:
 { $syntax "C: class definition... ;" }
 { $values { "class" "a class word" } { "definition" "a constructor definition" } }
 { $description "Define a constructor word for a tuple class. The constructor definition receives a new instance of the class on the stack, with all slots initially set to " { $link f } "."
-$terpri
+$nl
 "Constructors are named after the tuple class surrounded in angle brackets: " { $snippet "<" } " and " { $snippet ">" } ". Constructor words are defined in the same vocabulary as the tuple class, and the current value of the " { $link in } " variable has no effect."  }
 { $examples
   { $code
@@ -281,8 +309,7 @@ $terpri
   }
 }
 { $contract "The definition must only have one output, the new tuple itself." }
-{ $notes "Each tuple class defines a default constructor that reads slot values from the stack. This parsing word redefines the default constructor." }
-{ $see-also define-constructor } ;
+{ $notes "Each tuple class defines a default constructor that reads slot values from the stack. This parsing word redefines the default constructor." } ;
 
 HELP: REQUIRES:
 { $syntax "REQUIRES: modules... ;" }
@@ -293,7 +320,7 @@ HELP: PROVIDE:
 { $syntax "PROVIDE: name pairs... ;" }
 { $values { "name" "a string" } { "pairs" "a sequence of pairs, with keys described below" } }
 { $description "Registers a module definition and loads its source files by calling " { $link provide } "."
-$terpri
+$nl
 "The module name is followed by key/value pairs, where the keys are drawn from the following set:"
 { $list
     { { $link +files+ } " - the value is a sequence of source file names" }
@@ -301,7 +328,7 @@ $terpri
     { { $link +help+ } " - the value is a help topic" }
 }
 "All keys are optional, and path names are relative to the main module directory."
-$terpri
+$nl
 "Elements of path name lists can optionally be pairs, where the first element is a source file which is conditionally loaded if the quotation in the second element yields a true value." }
 { $examples
 "An example where the conditional load feature is used to load platform-specific code:"

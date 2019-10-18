@@ -1,4 +1,4 @@
-USING: koszul test kernel sequences hashtables namespaces ;
+USING: koszul test kernel sequences assocs namespaces ;
 IN: temporary
 
 [
@@ -21,7 +21,7 @@ x3 x4 wedge z2 d=
 [ z1 z2 wedge d ] unit-test
 
 ! Unimodular example
-boundaries get clear-hash
+boundaries get clear-assoc
 
 SYMBOLS: x y z ;
 
@@ -32,14 +32,14 @@ z x wedge y d=
 [ { 1 0 0 1 } ] [ { x y z } graded-betti ] unit-test
 
 ! Solvable example
-boundaries get clear-hash
+boundaries get clear-assoc
 
 x y wedge y d=
 
 [ { 1 1 0 } ] [ { x y } graded-betti ] unit-test
 
 ! Nilpotent example
-boundaries get clear-hash
+boundaries get clear-assoc
 
 x1 x2 wedge x3 x4 wedge alt+ z d=
 
@@ -50,7 +50,7 @@ x1 x2 wedge x3 x4 wedge alt+ z d=
 [ { x1 x2 x3 x4 } { z } bigraded-betti ] unit-test
 
 ! Free 2-step on 4 generators
-boundaries get clear-hash
+boundaries get clear-assoc
 
 SYMBOLS: e12 e13 e14 e23 e24 e34 ;
 

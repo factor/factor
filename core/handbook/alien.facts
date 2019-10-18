@@ -1,8 +1,10 @@
 IN: alien
 USING: byte-arrays arrays errors help libc math words
-definitions kernel-internals ;
+definitions kernel-internals compiler ;
 
-ARTICLE: "c-types-numeric" "Integer and floating point C types"
+ARTICLE: "c-types-specs" "C type specifiers"
+"C types are identified by strings, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words, as well as " { $link POSTPONE: C-STRUCT: } ", " { $link POSTPONE: C-UNION: } " and " { $link POSTPONE: TYPEDEF: } "."
+$nl
 "The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
 { $table
     { "C type" "Notes" }
@@ -19,7 +21,15 @@ ARTICLE: "c-types-numeric" "Integer and floating point C types"
     { { $snippet "float" } { } }
     { { $snippet "double" } { "same format as " { $link float } " objects" } }
 }
-"When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision." ;
+"When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision."
+$nl
+"Pointer types are specified by suffixing a C type with " { $snippet "*" } ", for example " { $snippet "float*" } ". One special case is " { $snippet "void*" } ", which denotes a generic pointer; " { $snippet "void" } " by itself is not a valid C type specifier. With the exception of strings (see " { $link "c-strings" } "), all pointer types are identical to " { $snippet "void*" } " as far as the C library interface is concerned."
+$nl
+"Fixed-size array types are supported; the syntax consists of a C type name followed by dimension sizes in brackets; the following denotes a 3 by 4 array of integers:"
+{ $code "int[3][4]" }
+"Fixed-size arrays differ from pointers in that they are allocated inside structures and unions; however when used as function parameters they behave exactly like pointers and thus the dimensions only serve as documentation."
+$nl
+"Structure and union types are specified by the name of the structure or union." ;
 
 ARTICLE: "aliens" "Alien addresses"
 "Instances of the " { $link alien } " class represent pointers to C data outside the Factor heap:"
@@ -28,24 +38,25 @@ ARTICLE: "aliens" "Alien addresses"
 { $subsection alien-address }
 { $subsection expired? }
 "Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
-$terpri
-"C " { $snippet "void*" } " values returned by functions are wrapped inside fresh " { $link alien } " objects." ;
+$nl
+"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details. See " { $link "c-types-specs" } "." ;
 
-ARTICLE: "byte-arrays" "Byte arrays"
+ARTICLE: "c-byte-arrays" "Passing data in byte arrays"
 "Instances of the " { $link byte-array } " class store arbitrary binary data which can be passed to C functions."
-$terpri
+$nl
 "Byte arrays can be allocated directly with a byte count:"
 { $subsection <byte-array> }
 "However in most cases, instead of computing a size in bytes directly, it is easier to use a higher-level word which expects C type and outputs a byte array large enough to hold that type:"
 { $subsection <c-object> }
 { $warning
 "The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the function does not store a pointer to the byte array in some global structure, or retain it in any way after returning."
-$terpri
-"Long-lived data for use by C libraries can be allocated manually, just as when programming in C. See " { $link "malloc" } "." } ;
+$nl
+"Long-lived data for use by C libraries can be allocated manually, just as when programming in C. See " { $link "malloc" } "." }
+{ $see-also "c-arrays" } ;
 
 ARTICLE: "malloc" "Manual memory management"
-"Sometimes data passed to C functions must be allocated at a fixed address, and so garbage collector managed byte arrays cannot be used. See the warning at the bottom of " { $link "byte-arrays" } " for a description of when this is the case."
-$terpri
+"Sometimes data passed to C functions must be allocated at a fixed address, and so garbage collector managed byte arrays cannot be used. See the warning at the bottom of " { $link "c-byte-arrays" } " for a description of when this is the case."
+$nl
 "Allocating a C datum with a fixed address:"
 { $subsection malloc-object }
 "There is a set of words in the " { $vocab-link "libc" } " vocabulary which directly call C standard library memory management functions:"
@@ -75,7 +86,7 @@ ARTICLE: "c-strings" "C strings"
 { $subsection malloc-char-string }
 { $subsection malloc-u16-string }
 "The first two allocate " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } "."
-$terpri
+$nl
 "Finally, a set of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings at arbitrary addresses:"
 { $subsection alien>char-string }
 { $subsection alien>u16-string }
@@ -84,43 +95,37 @@ $terpri
 
 ARTICLE: "c-structs" "C structure types"
 "A " { $snippet "struct" } " in C is essentially a block of memory with the value of each structure field stored at a fixed offset from the start of the block. The C library interface provides some utilities to define words which read and write structure fields given a base address."
-{ $subsection POSTPONE: BEGIN-STRUCT: }
-{ $subsection POSTPONE: FIELD: }
-{ $subsection POSTPONE: END-STRUCT }
+{ $subsection POSTPONE: C-STRUCT: }
 "Great care must be taken when working with C structures since no type or bounds checking is possible."
-$terpri
+$nl
 "An example:"
 { $code
-    "BEGIN-STRUCT: surface"
-    "    FIELD: uint    flags"
-    "    FIELD: format* format"
-    "    FIELD: int     w"
-    "    FIELD: int     h"
-    "    FIELD: ushort  pitch"
-    "    FIELD: void*   pixels"
-    "    FIELD: int     offset"
-    "    FIELD: void*   hwdata"
-    "    FIELD: short   clip-x"
-    "    FIELD: short   clip-y"
-    "    FIELD: ushort  clip-w"
-    "    FIELD: ushort  clip-h"
-    "    FIELD: uint    unused1"
-    "    FIELD: uint    locked"
-    "    FIELD: int     map"
-    "    FIELD: uint    format_version"
-    "    FIELD: int     refcount"
-    "END-STRUCT"
+    "C-STRUCT: XVisualInfo"
+    "    { \"Visual*\" \"visual\" }"
+    "    { \"VisualID\" \"visualid\" }"
+    "    { \"int\" \"screen\" }"
+    "    { \"uint\" \"depth\" }"
+    "    { \"int\" \"class\" }"
+    "    { \"ulong\" \"red_mask\" }"
+    "    { \"ulong\" \"green_mask\" }"
+    "    { \"ulong\" \"blue_mask\" }"
+    "    { \"int\" \"colormap_size\" }"
+    "    { \"int\" \"bits_per_rgb\" } ;"
 }
 "C structure objects can be allocated by calling " { $link <c-object> } " or " { $link malloc-object } "."
-{ $see-also <c-array> malloc-array } ;
+$nl
+"Arrays of C structures can be created by calling " { $link <c-array> } " or " { $link malloc-array } ". Elements can be read and written using words named " { $snippet { $emphasis "type" } "-nth" } " and " { $snippet "set-" { $emphasis "type" } "-nth" } "; these words are automatically generated by " { $link POSTPONE: C-STRUCT: } "." ;
 
 ARTICLE: "c-unions" "C unions"
 "A " { $snippet "union" } " in C defines a type large enough to hold its largest member. This is usually used to allocate a block of memory which can hold one of several types of values."
-{ $subsection POSTPONE: C-UNION: } ;
+{ $subsection POSTPONE: C-UNION: }
+"C structure objects can be allocated by calling " { $link <c-object> } " or " { $link malloc-object } "."
+$nl
+"Arrays of C unions can be created by calling " { $link <c-array> } " or " { $link malloc-array } ". Elements can be read and written using words named " { $snippet { $emphasis "type" } "-nth" } " and " { $snippet "set-" { $emphasis "type" } "-nth" } "; these words are automatically generated by " { $link POSTPONE: C-UNION: } "." ;
 
 ARTICLE: "c-out-params" "Output parameters in C"
 "A frequently-occurring idiom in C code is the \"out parameter\". If a C function returns more than one value, the caller passes pointers of the correct type, and the C function writes its return values to those locations."
-$terpri
+$nl
 "Each numerical C type, together with " { $snippet "void*" } ", has an associated " { $emphasis "out parameter constructor" } " word which takes a Factor object as input, constructs a byte array of the correct size, and converts the Factor object to a C value stored into the byte array:"
 { $subsection <char> }
 { $subsection <uchar> }
@@ -158,7 +163,9 @@ ARTICLE: "c-arrays" "C arrays"
 { $subsection <c-array> }
 { $subsection malloc-array }
 "The first one allocates " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } "."
-$terpri
+$nl
+"C type specifiers for array types are documented in " { $link "c-types-specs" } "."
+$nl
 "Each C type has a pair of words, " { $snippet { $emphasis "type" } "-nth" } " and " { $snippet "set-" { $emphasis "type" } "-nth" } ", for reading and writing values of this type stored in an array. This set of words includes but is not limited to:"
 { $subsection char-nth }
 { $subsection set-char-nth }
@@ -218,13 +225,11 @@ ARTICLE: "reading-writing-memory" "Reading and writing memory directly"
 { $subsection set-alien-double } ;
 
 ARTICLE: "c-data" "Passing data between Factor and C"
-"Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. The C library interface defines its own set of data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers. Also Factor's garbage collector can move objects in memory, which means that special support has to be provided for passing blocks of memory, such as structures and unions, to C code."
-$terpri
-"C types are identified by strings, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words."
+"Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers. Also Factor's garbage collector can move objects in memory, which means that special support has to be provided for passing blocks of memory, such as structures and unions, to C code."
+{ $subsection "c-types-specs" }
 { $subsection "aliens" }
-{ $subsection "byte-arrays" }
+{ $subsection "c-byte-arrays" }
 { $subsection "malloc" }
-{ $subsection "c-types-numeric" }
 { $subsection "c-out-params" }
 { $subsection "c-strings" }
 { $subsection "c-arrays" }
@@ -239,9 +244,9 @@ $terpri
 
 ARTICLE: "alien" "C library interface"
 "Factor can directly call C functions in native libraries. It is also possible to compile callbacks which run Factor code, and pass them to native libraries as function pointers."
-$terpri
+$nl
 "The C library interface is entirely self-contained; there is no C code which one must write in order to wrap a library."
-$terpri
+$nl
 "C library interface words are found in the " { $vocab-link "alien" } " vocabulary."
 { $warning "Since C does not retain runtime type information or do any kind of runtime type checking, any C library interface is not pointer safe. Improper use of C functions can crash the runtime or corrupt memory in unpredictible ways." }
 { $subsection "loading-libs" }
@@ -260,13 +265,13 @@ ARTICLE: "alien-invoke" "Calling C from Factor"
 "The easiest way to call into a C library is to define bindings using a pair of parsing words:"
 { $subsection POSTPONE: LIBRARY: }
 { $subsection POSTPONE: FUNCTION: }
-"Don't forget to compile your binding word after defining it; C library calls cannot be made from an interpreted definition."
-$terpri
 "The above parsing words create word definitions which call a lower-level word; you can use it directly, too:"
 { $subsection alien-invoke }
 "Sometimes it is necessary to invoke a C function pointer, rather than a named C function:"
 { $subsection alien-indirect }
-"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "." ;
+"There are some details concerning the conversion of Factor objects to C values, and vice versa. See " { $link "c-data" } "."
+$nl
+"Don't forget to compile your binding word after defining it; C library calls cannot be made from an interpreted definition. Words defined in source files are automatically compiled when the source file is loaded, but words defined in the listener are not; when interactively testing C libraries, use " { $link compile } " or " { $link recompile } " to compile binding words." ;
 
 ARTICLE: "alien-callback" "Calling Factor from C"
 "Callbacks can be defined and passed to C code as function pointers; the C code can then invoke the callback and run Factor code:"
@@ -276,14 +281,14 @@ ARTICLE: "alien-callback" "Calling Factor from C"
 
 ARTICLE: "alien-callback-gc" "Callbacks and code GC"
 "A callback consits of two parts; the callback word, which pushes the address of the callback on the stack when executed, and the callback body itself. If the callback word is redefined, removed from the dictionary using " { $link forget } ", or recompiled, the callback body will not be reclaimed by the garbage collector, since potentially C code may be holding a reference to the callback body."
-$terpri
+$nl
 "This is the safest approach, however it can lead to code heap leaks when repeatedly reloading code which defines callbacks. If you are " { $emphasis "completely sure" } " that no running C code is holding a reference to any callbacks, you can blow them all away:"
 { $code "USE: alien callbacks get clear-hash code-gc" }
 "This will reclaim all callback bodies which are otherwise unreachable from the dictionary (that is, their associated callback words have since been redefined, recompiled or forgotten)." ;
 
 ARTICLE: "dll-internals" "DLL handles"
 "DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging prinouts; see " { $link "syntax-aliens" } "."
-$terpri
+$nl
 "Usually one never has to deal with DLL handles directly; the C library interface creates them as required. However if direct access to these operating system facilities is required, the following primitives can be used:"
 { $subsection dlopen }
 { $subsection dlsym }

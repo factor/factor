@@ -4,8 +4,8 @@
 ! Concurrency library for Factor based on Erlang/Termite style
 ! concurrency.
 USING: kernel generic threads io namespaces errors words arrays
-       math sequences hashtables strings vectors dlists serialize
-       match ;
+       math sequences assocs strings vectors dlists serialize
+       quotations match network ;
 IN: concurrency
 
 #! Debug
@@ -86,7 +86,7 @@ GENERIC: send ( message process -- )
     #! Return a process set to run on the local node. That process is
     #! linked to the process on the stack. It will receive a message if
     #! that process terminates.
-    unit random-64 make-mailbox <process> ;
+    1quotation random-64 make-mailbox <process> ;
 
 : self ( -- process )
     \ self get  ;
@@ -102,7 +102,7 @@ init-main-process
     #! to the given process.
     [
         \ self set
-    ] make-hash swap bind ;
+    ] H{ } make-assoc swap bind ;
 
 DEFER: register-process
 DEFER: unregister-process
@@ -321,11 +321,11 @@ SYMBOL: unregister
 : process-registry ( table -- )
     receive {
         { { register ?name ?process }
-            [ ?process ?name pick set-hash ] }
+            [ ?process ?name pick set-at ] }
         { { unregister ?name }
-            [ ?name over remove-hash ] }
+            [ ?name over delete-at ] }
         { { ?from ?tag { process ?name } }
-            [ ?tag ?name pick hash 2array ?from send ] }
+            [ ?tag ?name pick at 2array ?from send ] }
     } match-cond process-registry ;
 
 : register-process ( name process -- )

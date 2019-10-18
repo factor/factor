@@ -7,7 +7,7 @@ HELP: bus-each
 { $values { "usb_bus" "an alien pointing to a usb_bus structure" } { "quot" "A quotation with stack effect " { $snippet "( usb_bus -- )" } } }
 { $description "Starting with the given usb_bus, traverse the linked list of busses calling the quotation on each one." } 
 { $examples
-  { $example "usb_get_busses [ display-devices ]" }
+  { $code "usb_get_busses [ display-devices ]" }
 }
 { $see-also device-each find-devices } ;
 
@@ -15,7 +15,7 @@ HELP: device-each
 { $values { "usb_device" "an alien pointing to a usb_device structure" } { "quot" "A quotation with stack effect " { $snippet "( usb_device -- )" } } }
 { $description "Starting with the given usb_device, traverse the linked list of devices calling the quotation on each one." } 
 { $examples
-  { $example "usb_get_busses [\n  usb_bus-devices [ display-device ]\n] bus-each" }
+  { $code "usb_get_busses [\n  usb_bus-devices [ display-device ]\n] bus-each" }
 }
 { $see-also bus-each find-devices } ;
 
@@ -38,7 +38,7 @@ HELP: find-devices
 { $values { "vendor-id" "the integer vendor id for the device to find" } { "product-id" "the integer product id for the device to find" } { "seq" "a sequence containing the usb_devices found" } }
 { $description "Traverse the devices on all USB busses looking for a device with the given vendor and product id's. Return a sequence containing all the usb_device structures found matcing the vendor and product id's." } 
 { $examples
-  { $example "HEX: 10D6 HEX: 1100 find-devices" }
+  { $code "HEX: 10D6 HEX: 1100 find-devices" }
 }
 { $see-also bus-each device-each } ;
 

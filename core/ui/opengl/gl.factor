@@ -6,11 +6,6 @@
 IN: opengl 
 USING: alien kernel sequences words ;
 
-windows? [
-    "gl" "opengl32.dll" "stdcall" add-library
-    "glu" "glu32.dll" "stdcall" add-library
-] when
-
 TYPEDEF: uint    GLenum
 TYPEDEF: uchar   GLboolean
 TYPEDEF: uint    GLbitfield

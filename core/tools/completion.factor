@@ -2,16 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: completion
 USING: kernel arrays sequences math namespaces strings io
-vectors ;
-
-! Simple fuzzy search.
+vectors words assocs ;
 
 : (fuzzy) ( accum ch i full -- accum i ? )
-    index* dup 0 < [
-        2drop f -1 f
-    ] [
+    index* 
+    [
         [ swap push ] 2keep 1+ t
-    ] if ;
+    ] [
+        drop f -1 f
+    ] if* ;
 
 : fuzzy ( full short -- indices )
     dup length <vector> 0 2swap
@@ -26,7 +25,7 @@ vectors ;
         ] keep pick peek push
     ] each ;
 
-: runs ( seq -- seq )
+: runs ( seq -- newseq )
     V{ V{ } } [ clone ] map over first rot (runs) drop ;
 
 : score-1 ( i full -- n )
@@ -50,29 +49,28 @@ vectors ;
     ] if ;
 
 : rank-completions ( results -- newresults )
-    #! Discard results in the low 33%
     sort-keys <reversed>
     [ 0 [ first max ] reduce 3 / ] keep
     [ first < ] subset-with
     [ second ] map ;
 
 : complete ( full short -- score )
-    #! Match forwards and backwards, see which one has the
-    #! highest score.
     [ dupd fuzzy score ] 2keep
     [ <reversed> ] 2apply
     dupd fuzzy score max ;
 
-: completion ( str quot obj -- pair )
-    #! pair is { score obj }
-    [ swap call swap complete ] keep 2array ; inline
+: completion ( short candidate -- result )
+    [ second swap complete ] keep first 2array ;
 
-: completions ( str quot candidates -- seq )
-    pick empty? [
-        2nip
+: completions ( short candidates -- seq )
+    over empty? [
+        nip [ first ] map
     ] [
-        [ >r 2dup r> completion ] map 2nip rank-completions
-    ] if ; inline
+        >r >lower r> [ completion ] map-with rank-completions
+    ] if ;
 
-: string-completions ( str strs -- seq )
-    f swap completions ;
+: string-completions ( short strs -- seq )
+    [ dup ] { } map>assoc completions ;
+
+: limited-completions ( short candidates -- seq )
+    completions dup length 1000 > [ drop f ] when ;

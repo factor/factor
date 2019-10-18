@@ -1,6 +1,6 @@
 IN: inference
 USING: arrays generic kernel math namespaces
-sequences words parser words ;
+sequences words parser words quotations assocs ;
 
 : infer-shuffle-inputs ( shuffle node -- )
     >r effect-in length 0 r> node-inputs ;
@@ -38,7 +38,7 @@ sequences words parser words ;
     { over  T{ effect f 2 { 0 1 0       } } }
     { pick  T{ effect f 3 { 0 1 2 0     } } }
     { swap  T{ effect f 2 { 1 0         } } }
-} [ first2 define-shuffle ] each
+} [ define-shuffle ] assoc-each
 
 \ >r [
     1 ensure-values

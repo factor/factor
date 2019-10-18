@@ -1,60 +1,52 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: memory
-USING: arrays errors generic hashtables io kernel
+USING: arrays errors generic assocs io kernel
 kernel-internals math namespaces parser prettyprint sequences
 strings styles vectors words ;
 
 ! Printing an overview of heap usage.
 
-: total/used/free, ( free total str -- )
+: write-total/used/free ( free total str -- )
     [
-        ,
-        dup number>string ,
-        over - number>string ,
-        number>string ,
-    ] { } make , ;
+        write-cell
+        dup number>string write-cell
+        over - number>string write-cell
+        number>string write-cell
+    ] with-row ;
 
-: total, ( n str -- )
-    [ , number>string , "" , "" , ] { } make , ;
+: write-total ( n str -- )
+    [
+        write-cell
+        number>string write-cell
+        [ ] with-cell
+        [ ] with-cell
+    ] with-row ;
 
-: simple-table ( table -- )
-    H{ { table-gap { 10 0 } } }
-    [ dup string? [ write ] [ pprint ] if ]
-    tabular-output ;
+: write-headings ( seq -- )
+    [ [ write-cell ] each ] with-row ;
+
+: (data-room.) ( -- )
+    data-room 2 <groups> 0 [
+        "Generation " pick number>string append
+        >r first2 r> write-total/used/free 1+
+    ] reduce drop ;
+
+: (code-room.) ( -- )
+    code-room "Code space" write-total/used/free ;
 
 : room. ( -- )
-    [
-        { "" "Total" "Used" "Free" } ,
-        data-room 2 <groups> 0 [
-            "Generation " pick number>string append
-            >r first2 r> total/used/free, 1+
-        ] reduce drop
-        "Semi-space" total,
-        "Cards" total,
-        code-room "Code space" total/used/free,
-    ] { } make simple-table ;
-
-! Some words for iterating through the heap.
-
-: (each-object) ( quot -- )
-    next-object dup
-    [ swap [ call ] keep (each-object) ] [ 2drop ] if ; inline
-
-: each-object ( quot -- )
-    begin-scan (each-object) end-scan ; inline
-
-: (instances) ( obj quot seq -- )
-    >r over >r call [ r> r> push ] [ r> r> 2drop ] if ; inline
-
-: instances ( quot -- seq )
-    10000 <vector> [
-        -rot [ (instances) ] 2keep
-    ] each-object nip ; inline
+    H{ { table-gap { 10 0 } } } [
+        { "" "Total" "Used" "Free" } write-headings
+        (data-room.)
+        "Semi-space" write-total
+        "Cards" write-total
+        (code-room.)
+    ] tabular-output ;
 
 : heap-stat-step ( counts sizes obj -- )
-    [ dup size swap class rot hash+ ] keep
-    1 swap class rot hash+ ;
+    [ dup size swap class rot at+ ] keep
+    1 swap class rot at+ ;
 
 : heap-stats ( -- counts sizes )
     #! Return a list of instance count/total size pairs.
@@ -62,9 +54,15 @@ strings styles vectors words ;
     [ >r 2dup r> heap-stat-step ] each-object ;
 
 : heap-stats. ( -- )
-    heap-stats dup hash-keys natural-sort [
-        { "Class" "Bytes" "Instances" } ,
+    heap-stats dup keys natural-sort  H{ } [
+        { "Class" "Bytes" "Instances" } write-headings
         [
-            [ dup , dup pick hash , pick hash , ] { } make ,
+            [
+                dup pprint-cell
+                dup pick at pprint-cell
+                pick at pprint-cell
+            ] with-row
         ] each 2drop
-    ] { } make simple-table ;
+    ] tabular-output ;
+
+: save ( -- ) image save-image ;

@@ -10,7 +10,7 @@ ARTICLE: { "sqlite" "tuple-db-loading" } "Loading"
 
 ARTICLE: { "sqlite" "tuple-db-usage" } "Basic Usage"
 "This library can be used for storing simple Factor tuples in a sqlite database. In its current form the tuples must not contain references to other tuples and should not have a delegate set."
-$terpri
+$nl
 "This document will use the following tuple for demonstration purposes:"
 { $code "TUPLE: person name surname phone ;" }
 "The sqlite database to store tuples must be created, or an existing one opened. This is done using the " { $link sqlite-open } " word. If the database does not exist then it is created. The examples in this document store the database pointer in a variable called 'db':"
@@ -18,7 +18,7 @@ $terpri
 
 ARTICLE: { "sqlite" "tuple-db-mappings" } "Tuple Mappings"
 "Each tuple has a 'mapping' tuple associated with it. The 'mapping' stores information about what table the tuple will be stored in, the datatypes of the tuple slots, etc. A mapping must be created before a tuple can be stored in a database. A default mapping is easily created using " { $link default-mapping } ". Given the tuple class, this will use reflection to get the slots of it, assume that all slots are of database type 'text', and store the tuple objects in a table with the same name as the tuple."
-$terpri
+$nl
 "The following shows how to create the default mapping for the 'person' tuple, and how to register that mapping so the 'tuple-db' system can know how to handle 'person' instances:"
 { $code "person default-mapping set-mapping" } ;
 
@@ -34,7 +34,7 @@ ARTICLE: { "sqlite" "tuple-db-insert" } "Inserting instances"
 { $link insert-tuple } " internally uses the " { $link insert-sql } " word to produce the SQL used to store the tuple. Like " { $link create-sql } ", it is a generic word specialized on the mapping object. You can call it directly to see what SQL is generated:"
 { $code "person get-mapping insert-sql .\n => \"insert into person values(:name,:surname,:phone);\"" }
 "Notice that the SQL uses named parameters. These parameters are bound to the values stored in the tuple object when the SQL is compiled. This helps prevent SQL injection techniques."
-$terpri
+$nl
 "When " { $link insert-sql } " is run, it adds a delegate to the tuple being stored. The delegate is of type 'persistent' and holds the row id of the tuple in its 'key' slot. This way the exact record can be updated or retrieved later. The following demonstates this fact:"
 { $code "\"Mandy\" \"Jones\" \"987-654-321\" <person> dup .\n  => T{ person f \"Mandy\" \"Jones\" \"987-654-321\" }\ndb get over insert-tuple .\n  => T{ person T{ persistent ... 2 } \"Mandy\" \"Jones\" \"987-654-321\" }" }
 "The '2' in the above example is the row id of the record inserted. We can go into the 'sqlite' command and view this record:"
@@ -65,7 +65,7 @@ ARTICLE: { "sqlite" "tuple-db-closing" } "Closing the database"
 
 ARTICLE: { "sqlite" "tuple-db" } "Tuple Database Library"
 "The version of sqlite required by this library is version 3 or greater. This library allows storing Factor tuples in a sqlite database. It provides words to create, read update and delete these entries as well as simple searching."\
-$terpri
+$nl
 "The library is in a very early state and is likely to change quite a bit in the near future. Its most notable omission is it cannot currently handle relationships between tuples." 
 { $subsection { "sqlite" "tuple-db-loading" } } 
 { $subsection { "sqlite" "tuple-db-usage" } } 

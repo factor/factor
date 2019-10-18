@@ -1,107 +1,57 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences-internals
-USING: arrays generic kernel math sequences ;
+USING: arrays generic kernel math sequences vectors ;
 
-: midpoint@ length 2 /i ; inline
+: <iterator> 0 tail-slice ; inline
 
-: midpoint [ midpoint@ ] keep nth-unsafe ; inline
+: this ( slice -- obj )
+    dup slice-from swap slice-seq nth-unsafe ; inline
 
-TUPLE: sorter seq start end mid ;
+: next ( iterator -- )
+    dup slice-from 1+ swap set-slice-from ; inline
 
-C: sorter ( seq start end -- sorter )
-    [ >r 1+ rot <slice> r> set-sorter-seq ] keep
-    dup sorter-seq midpoint over set-sorter-mid
-    dup sorter-seq length 1- over set-sorter-end
-    0 over set-sorter-start ; inline
+: smallest ( iter1 iter2 quot -- elt )
+    >r over this over this r> call 0 <
+    -rot ? [ this ] keep next ; inline
 
-: s*/e* dup sorter-start swap sorter-end ; inline
-: s*/e dup sorter-start swap sorter-seq length 1- ; inline
-: s/e* 0 swap sorter-end ; inline
-
-: sorter-exchange
-    dup s*/e* rot sorter-seq exchange-unsafe ; inline
-
-: sorter-compare
-    over sorter-seq nth-unsafe swap sorter-mid rot call ; inline
-
-: >start> dup sorter-start 1+ swap set-sorter-start ; inline
-: <end< dup sorter-end 1- swap set-sorter-end ; inline
-
-: sort-up ( quot sorter -- )
-    dup s*/e < [
-        [ dup sorter-start sorter-compare 0 < ] 2keep rot
-        [ dup >start> sort-up ] [ 2drop ] if
+: (merge) ( iter1 iter2 quot accum -- )
+    >r pick empty? [
+        drop nip r> push-all
     ] [
-        2drop
-    ] if ; inline
-
-: sort-down ( quot sorter -- )
-    dup s/e* < [
-        [ dup sorter-end sorter-compare 0 > ] 2keep rot
-        [ dup <end< sort-down ] [ 2drop ] if
-    ] [
-        2drop
-    ] if ; inline
-
-: sort-step ( quot sorter -- )
-    dup s*/e* <= [
-        2dup sort-up 2dup sort-down dup s*/e* <= [
-            dup sorter-exchange dup >start> dup <end< sort-step
+        over empty? [
+            2drop r> push-all
         ] [
-            2drop
+            3dup smallest r> [ push ] keep (merge)
         ] if
-    ] [
-        2drop
     ] if ; inline
 
-: (nsort) ( quot seq start end -- )
-    2dup < [
-        <sorter> 2dup sort-step
-        [ dup sorter-seq swap s/e* (nsort) ] 2keep
-        [ dup sorter-seq swap s*/e (nsort) ] 2keep
-    ] [
-        2drop
-    ] if 2drop ; inline
+: merge ( sorted1 sorted2 quot -- result )
+    >r [ [ <iterator> ] 2apply ] 2keep r>
+    rot length rot length + <vector>
+    [ (merge) ] keep { } like ; inline
 
-: partition ( seq -1/1 -- seq )
-    >r dup midpoint@ r> 1 < [ head-slice ] [ tail-slice ] if ;
-    inline
-
-: (binsearch) ( elt quot seq -- elt quot i )
-    dup length 1 <= [
-        slice-from
-    ] [
-        [ midpoint swap call ] 3keep roll dup zero?
-        [ drop dup slice-from swap midpoint@ + ]
-        [ partition (binsearch) ] if
-    ] if ; inline
-
-: flatten-slice ( seq -- slice )
-    #! Binsearch returns an index relative to the sequence
-    #! being sliced, so if we are given a slice as input,
-    #! unexpected behavior will result.
-    dup slice? [ >array ] when 0 over length rot <slice> ;
-    inline
+: divide ( seq -- first second )
+    dup midpoint@ [ head-slice ] 2keep tail-slice ;
 
 IN: sequences
 
-: nsort ( seq quot -- )
-    swap dup length 1 <=
-    [ 2drop ] [ 0 over length 1- (nsort) ] if ; inline
+DEFER: sort
 
-: sort ( seq quot -- sortedseq )
-    swap [ >array [ swap nsort ] keep ] keep like ; inline
+IN: sequences-internals
+
+: conquer ( first second quot -- result )
+    [ tuck >r >r sort r> r> sort ] keep merge ; inline
+
+IN: sequences
+
+: sort ( seq quot -- result )
+    over length 1 <=
+    [ drop ] [ over >r >r divide r> conquer r> like ] if ;
+    inline
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 
 : sort-keys ( alist -- alist ) [ [ first ] compare ] sort ;
 
 : sort-values ( alist -- alist ) [ [ second ] compare ] sort ;
-
-: binsearch ( elt seq quot -- i )
-    swap dup empty?
-    [ 3drop -1 ] [ flatten-slice (binsearch) 2nip ] if ; inline
-
-: binsearch* ( elt seq quot -- result )
-    over >r binsearch r> ?nth ; inline

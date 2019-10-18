@@ -30,9 +30,9 @@ HELP: $heading
 
 HELP: $subheading
 { $values { "element" "a markup element of the form " { $snippet "{ title content }" } } }
-{ $description "Prints an expandable outliner with the given title containing an arbitrary markup element." }
+{ $description "Prints a markup element, usually a string, as a block with the " { $link strong-style } "." }
 { $examples
-    { $markup-example { $heading "Developers, developers, developers! - or how I learned to stop worrying and love Steve Ballmer" } }
+    { $markup-example { $subheading "Developers, developers, developers!" } }
 } ;
 
 HELP: $code
@@ -40,7 +40,7 @@ HELP: $code
 { $description "Prints code examples, as seen in many help articles. The markup element must be an array of strings." }
 { $notes
     "The code becomes clickable if the output stream supports it, and clicking it opens a listener window with the text inserted at the input prompt."
-    $terpri
+    $nl
     "If you want to show code along with sample output, use the " { $link $example } " element."
 }
 { $examples
@@ -123,6 +123,8 @@ HELP: $see-also
 { $examples
     { $markup-example { $see-also "graphs" "queues" } }
 } ;
+
+{ $see-also $related related-words } related-words
 
 HELP: $table
 { $values { "element" "an array of arrays of markup elements" } }
@@ -208,3 +210,6 @@ HELP: $references
 HELP: sort-articles
 { $values { "seq" "a sequence of help article names and words" } { "assoc" "a new sequence of pairs" } }
 { $description "Constructs a key-sorted association list mapping article titles to help topics." } ;
+
+HELP: xref-help
+{ $description "Update the " { $link help-tree } ". Usually this is done automatically." } ;

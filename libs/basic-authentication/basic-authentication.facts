@@ -7,9 +7,9 @@ HELP: realms
    "A hashtable mapping a basic authentication realm (a string) "
    "to either a quotation or a hashtable. The quotation has "
    "stack effect ( username sha-256-string -- bool ). It "
-   "is expected to perform the user authentication when called." $terpri
+   "is expected to perform the user authentication when called." $nl
    "If the realm maps to a hashtable then the hashtable should be a "
-   "mapping of usernames to sha-256 hashed passwords." $terpri
+   "mapping of usernames to sha-256 hashed passwords." $nl
    "If the 'realms' variable does not exist in the current scope then "
    "authentication will always fail." }
 { $see-also add-realm with-basic-authentication } ;
@@ -22,8 +22,8 @@ HELP: add-realm
    "a quotation with stack effect ( username sha-256-string -- bool ) or "
    "a hashtable mapping username strings to sha-256-string passwords." }
 { $examples
-  { $example "H{ { \"admin\" \"...\" } { \"user\" \"...\" } } \"my-realm\" add-realm" }
-  { $example "[ \"...\" = swap \"admin\" = and ] \"my-realm\" add-realm" }
+  { $code "H{ { \"admin\" \"...\" } { \"user\" \"...\" } } \"my-realm\" add-realm" }
+  { $code "[ \"...\" = swap \"admin\" = and ] \"my-realm\" add-realm" }
 }
 { $see-also with-basic-authentication realms } ;
 
@@ -35,7 +35,8 @@ HELP: with-basic-authentication
    "for basic authentication within the named realm. If the headers "
    "are not present then a '401' HTTP response results from the "
    "request, otherwise the quotation is called." }
-{ $example "\"my-realm\" [\n  serving-html \"<html><body>Success!</body></html>\" write\n] with-basic-authentication" }
+{ $examples
+{ $code "\"my-realm\" [\n  serving-html \"<html><body>Success!</body></html>\" write\n] with-basic-authentication" } }
 { $see-also add-realm realms }
  ;
 
@@ -44,20 +45,20 @@ ARTICLE: { "http-authentication" "basic-authentication" } "Basic Authentication"
 "authentication method to web applications. When the browser requests "
 "a resource protected with basic authentication the server responds with "
 "a '401' response code which means the user is unauthorized."
-$terpri
+$nl
 "When the browser receives this it prompts the user for a username and " 
 "password. This is sent back to the server in a special HTTP header. The "
 "server then checks this against its authentication information and either "
 "accepts or rejects the users request."
-$terpri
+$nl
 "Authentication is split up into " { $link realms } ". Each realm can have "
 "a different database of username and password information. A responder can "
 "require basic authentication by using the " { $link with-basic-authentication } " word."
-$terpri
+$nl
 "Username and password information can be maintained using " { $link realms } " and " { $link add-realm } "."
-$terpri
+$nl
 "All passwords on the server should be stored as sha-256 strings generated with the " { $link string>sha-256-string } " word."
-$terpri
+$nl
 "Note that Basic Authentication itself is insecure in that it "
 "sends the username and password as clear text (although it is "
 "base64 encoded this is not much help). To prevent eavesdropping "

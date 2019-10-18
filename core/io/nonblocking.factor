@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 IN: nonblocking-io
-USING: math kernel io sequences buffers generic sbufs ;
+USING: math kernel io sequences buffers generic sbufs
+errors ;
 
 : default-buffer-size 64 1024 * ; inline
 
@@ -40,6 +41,9 @@ C: port ( handle buffer -- port )
 : timeout? ( port -- ? )
     port-cutoff dup zero? not swap millis < and ;
 
+: pending-error ( port -- )
+    dup port-error f rot set-port-error [ throw ] when* ;
+
 M: port set-timeout
     [ set-port-timeout ] keep touch-port ;
 
@@ -65,7 +69,7 @@ M: input-port stream-read1
 : read-loop ( count port sbuf -- )
     pick over length - dup 0 > [
         pick read-step dup [
-            over nappend read-loop
+            over push-all read-loop
         ] [
             2drop 2drop
         ] if
@@ -78,7 +82,7 @@ M: input-port stream-read
     2dup read-step dup [
         pick over length > [
             pick <sbuf>
-            [ nappend ] keep
+            [ push-all ] keep
             [ read-loop ] keep
             "" like
         ] [
@@ -103,7 +107,7 @@ M: input-port stream-read
     #! Keep reading until either we hit a separator, or EOF.
     #! Append results to the sbuf.
     pick pick read-until-step over [
-        >r over nappend r> dup [
+        >r over push-all r> dup [
             >r 3drop r>
         ] [
             drop read-until-loop
@@ -142,3 +146,4 @@ M: output-port stream-write1
 
 M: output-port stream-write
     over length over wait-to-write >buffer ;
+

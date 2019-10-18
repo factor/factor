@@ -2,7 +2,7 @@ USING: help buffers ;
 
 HELP: buffer
 { $class-description "The class of I/O buffers, which are allocated in the system malloc arena, and thus have a fixed address, unlike garbage-collected heap objects which are moved around. Buffers must be de-allocated manually."
-$terpri
+$nl
 "Buffers have two internal pointers:"
 { $list
     { "the fill pointer -- a write index where new data is added; accessor: " { $link buffer-fill } }
@@ -40,8 +40,7 @@ HELP: buffer-end
 
 HELP: (buffer>)
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } }
-{ $description "Outputs a string of the first " { $snippet "n" } " characters at the buffer's current position. If there are less than " { $snippet "n" } " characters available, the output is truncated." }
-{ $see-also buffer> } ;
+{ $description "Outputs a string of the first " { $snippet "n" } " characters at the buffer's current position. If there are less than " { $snippet "n" } " characters available, the output is truncated." } ;
 
 HELP: buffer>
 { $values { "n" "a non-negative integer" } { "buffer" "a buffer" } { "string" "a string" } }
@@ -92,8 +91,7 @@ HELP: n>buffer
 
 HELP: buffer-peek
 { $values { "buffer" "a buffer" } { "ch" "a character" } }
-{ $description "Outputs the byte at the buffer position." }
-{ $see-also buffer-pop } ;
+{ $description "Outputs the byte at the buffer position." } ;
 
 HELP: buffer-pop
 { $values { "buffer" "a buffer" } { "ch" "a character" } }

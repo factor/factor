@@ -1,12 +1,13 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
-USING: arrays generic hashtables kernel namespaces strings ;
+USING: arrays generic assocs kernel namespaces strings
+quotations ;
 
 TUPLE: style-stream style ;
 
 : do-nested-style ( style stream -- style delegate )
-    [ style-stream-style swap hash-union ] keep
+    [ style-stream-style swap union ] keep
     delegate ;
 
 : collapse-nested-style ( style stream -- style steam )
@@ -41,5 +42,5 @@ M: style-stream with-stream-style
 M: style-stream with-nested-stream
     do-nested-quot with-nested-stream ;
 
-M: style-stream with-stream-table
-    do-nested-quot with-stream-table ;
+M: style-stream make-table-cell
+    do-nested-quot make-table-cell ;

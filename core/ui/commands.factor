@@ -1,90 +1,103 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions kernel gadgets sequences strings math
-words generic namespaces hashtables help ;
+USING: arrays definitions kernel sequences strings math assocs
+words generic namespaces assocs help quotations ;
 IN: gadgets
 
-TUPLE: command name gesture quot ;
+SYMBOL: +nullary+
+SYMBOL: +listener+
+SYMBOL: +description+
 
-M: command equal? 2drop f ;
+GENERIC: in-listener? ( command -- ? )
 
 GENERIC: invoke-command ( target command -- )
 
-M: f invoke-command ( target command -- ) 2drop ;
+GENERIC: command-name ( command -- str )
 
-M: command invoke-command ( target command -- )
-    command-quot call ;
+TUPLE: command-map blurb ;
 
-GENERIC: gesture>string ( gesture -- string/f )
+GENERIC: command-description ( command -- str/f )
 
-: modifiers>string ( modifiers -- string )
-    [ word-name ] map concat >string ;
+GENERIC: command-word ( command -- word )
 
-M: key-down gesture>string
-    dup key-down-mods modifiers>string
-    swap key-down-sym append ;
-
-M: button-up gesture>string
-    [
-        dup button-up-mods modifiers>string %
-        "Click Button" %
-        button-up-# [ " " % # ] when*
-    ] "" make ;
-
-M: button-down gesture>string
-    [
-        dup button-down-mods modifiers>string %
-        "Press Button" %
-        button-down-# [ " " % # ] when*
-    ] "" make ;
-
-M: object gesture>string drop f ;
+C: command-map ( blurb commands -- command-map )
+    swap { } like over set-delegate
+    [ set-command-map-blurb ] keep ;
 
 : commands ( class -- hash )
     dup "commands" word-prop [ ] [
         H{ } clone [ "commands" set-word-prop ] keep
     ] ?if ;
 
-: commands>gestures ( class -- hash )
-    commands hash-values concat
-    [ command-gesture ] subset
-    [ dup command-gesture swap [ invoke-command ] curry ]
-    map>hash ;
+: command-map ( group class -- command-map )
+    commands at ;
 
-: define-commands ( class group specs -- )
-    [ dup array? [ first3 <command> ] when ] map
-    swap pick commands set-hash
-    dup commands>gestures "gestures" set-word-prop ;
+: command-gestures ( class -- hash )
+    commands values [
+        [
+            [ first ] subset
+            [ [ invoke-command ] curry swap set ] assoc-each
+        ] each
+    ] H{ } make-assoc ;
 
-: command-description ( command -- element )
-    dup command-name swap command-gesture gesture>string
-    2array ;
+: update-gestures ( class -- )
+    dup command-gestures "gestures" set-word-prop ;
 
-: commands. ( commands -- )
-    [ command-gesture key-down? ] subset
-    [ command-description ] map
-    { { $strong "Command" } { $strong "Shortcut" } } add*
+: define-command-map ( class group blurb pairs -- )
+    <command-map>
+    swap pick commands set-at
+    update-gestures ;
+
+: (command-name) ( string -- newstring )
+    "-" split " " join unclip ch>upper add* ;
+
+M: word command-name ( word -- str )
+    word-name
+    "com-" ?head drop
+    dup first Letter? [ 1 tail ] unless
+    (command-name) ;
+
+M: word command-description ( word -- str )
+    +description+ word-prop ;
+
+: command-map-row
+    [
+        dup first gesture>string ,
+        second dup command-name ,
+        dup command-word \ $link swap 2array ,
+        command-description ,
+    ] [ ] make ;
+
+: command-map. ( command-map -- )
+    [ command-map-row ] map
+    { "Shortcut" "Command" "Word" "Notes" }
+    [ \ $strong swap ] { } map>assoc add*
     $table ;
 
-: $commands ( element -- )
-    first2 swap commands hash commands. ;
+: $command-map ( element -- )
+    first2
+    dup (command-name) " commands" append $heading
+    swap command-map
+    dup command-map-blurb print-element command-map. ;
 
-TUPLE: operation predicate primary? secondary? listener? hook ;
+: $command ( element -- )
+    reverse first3 command-map value-at gesture>string $snippet ;
 
-SYMBOL: operations
+: define-command ( word hash -- )
+    >r word-props r> update ;
 
-: object-operations ( obj -- operations )
-    operations get [ operation-predicate call ] subset-with ;
+: command-quot ( target command -- quot )
+    dup 1quotation swap +nullary+ word-prop
+    [ nip ] [ curry ] if ;
 
-: class-operations ( class -- operations )
-    "predicate" word-prop
-    operations get [ operation-predicate = ] subset-with ;
+M: word in-listener? +listener+ word-prop ;
 
-: primary-operation ( obj -- command )
-    object-operations [ operation-primary? ] find-last nip ;
+M: word command-word ;
 
-: secondary-operation ( obj -- command )
-    object-operations [ operation-secondary? ] find-last nip ;
+M: f invoke-command ( target command -- ) 2drop ;
 
-: $operations ( element -- )
-    [ class-operations ] map concat commands. ;
+: command-string ( gesture command -- string )
+    [
+        command-name %
+        gesture>string [ " (" % % ")" % ] when*
+    ] "" make ;

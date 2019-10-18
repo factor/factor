@@ -1,4 +1,4 @@
-USING: help io ;
+USING: help io strings ;
 
 HELP: <line-reader>
 { $values { "stream" "an input stream" } { "new-stream" "an input stream" } }
@@ -8,3 +8,10 @@ HELP: <line-reader>
 HELP: lines
 { $values { "stream" "an input stream" } { "seq" "a sequence of strings" } }
 { $description "Reads lines of text until the stream is exhausted, collecting them in a sequence of strings." } ;
+
+HELP: string-lines
+{ $values { "str" string } { "seq" "a sequence of strings" } }
+{ $description "Splits a string along line breaks." }
+{ $examples
+    { $example "\"Hello\\r\\nworld\\n\" string-lines ." "{ \"Hello\" \"world\" \"\" }" }
+} ;

@@ -27,12 +27,12 @@ VAR: current-workspace
 
 ! This should go somewhere else
 
-USING: kernel kernel-internals sequences hashtables ;
+USING: kernel kernel-internals sequences assocs ;
 
-: set-hash-stack ( value key seq -- )
-dupd [ hash-member? ] find-last-with nip set-hash ;
+: set-assoc-stack ( value key seq -- )
+dupd [ key? ] find-last-with nip set-at ;
 
-: set* ( val var -- ) namestack* set-hash-stack ;
+: set* ( val var -- ) namestack* set-assoc-stack ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -9,5 +9,5 @@ HELP: alien-indirect
 { $description
     "Invokes a C function pointer passed on the data stack. Input parameters are taken from the data stack following the function pointer, and the return value is pushed on the data stack after the function returns. A return type of " { $snippet "\"void\"" } " indicates that no value is to be expected."
 }
-{ $errors "Throws an " { $link alien-indirect-error } " if the word calling " { $link alien-indirect } " is not compiled." }
-{ $see-also alien-invoke alien-callback } ;
+{ $notes "C type names are documented in " { $link "c-types-specs" } "." }
+{ $errors "Throws an " { $link alien-indirect-error } " if the word calling " { $link alien-indirect } " is not compiled." } ;

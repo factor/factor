@@ -98,5 +98,6 @@ LIBRARY: gl
 FUNCTION: HGLRC wglCreateContext ( HDC hDC ) ;
 FUNCTION: BOOL wglDeleteContext ( HGLRC hRC ) ;
 FUNCTION: BOOL wglMakeCurrent ( HDC hDC, HGLRC hglrc ) ;
+FUNCTION: void* wglGetProcAddress ( char* name ) ;
 
 

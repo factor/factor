@@ -1,12 +1,13 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: arrays kernel math namespaces sequences ;
+USING: arrays kernel math namespaces sequences assocs parser ;
 
 IN: splay-trees
 
-TUPLE: splay-tree r ;
+TUPLE: splay-tree r count ;
 
-C: splay-tree ;
+C: splay-tree
+    0 over set-splay-tree-count ;
 
 IN: splay-trees-internals
 
@@ -99,63 +100,77 @@ DEFER: (splay)
 
 : (remove-splay) ( key tree -- )
     tuck (get-splay) nip [
+        dup splay-tree-count 1- over set-splay-tree-count
         dup splay-node-r swap splay-node-l splay-join
         swap set-splay-tree-r
     ] [ drop ] if* ;
 
 : (set-splay) ( value key tree -- )
     2dup (get-splay) [ 2nip set-splay-node-v ] [
-       drop 2dup splay-split rot
+       drop dup splay-tree-count 1+ over set-splay-tree-count
+       2dup splay-split rot
        >r <splay-node> r> set-splay-tree-r
     ] if ;
 
 : new-root ( value key tree -- )
+    [ 1 swap set-splay-tree-count ] keep
     >r f f <splay-node> r> set-splay-tree-r ;
 
 : splay-call ( splay-node call -- )
     >r [ splay-node-k ] keep splay-node-v r> call ; inline
     
-: (splay-tree-traverse) ( splay-node quot -- )
-    over [
-        [ >r splay-node-l r> (splay-tree-traverse) ] 2keep
-        [ splay-call ] 2keep
-        >r splay-node-r r> (splay-tree-traverse)
-    ] [
-        2drop
-    ] if ;
+: (splay-tree-traverse) ( splay-node quot -- key value ? )
+    {
+        { [ over not ] [ 2drop f f f ] }
+        { [ [
+              >r splay-node-l r> (splay-tree-traverse)
+            ] 2keep rot ]
+          [ 2drop t ] }
+        { [ >r 2nip r> [ splay-call ] 2keep rot ]
+          [ drop [ splay-node-k ] keep splay-node-v t ] }
+        { [ t ] [ >r splay-node-r r> (splay-tree-traverse) ] }
+    } cond ; inline
 
 IN: splay-trees
 
-: splay-tree-traverse ( splay-tree quot -- )
-    #! quot: ( k v -- )
+M: splay-tree assoc-find ( splay-tree quot -- key value ? )
+    #! quot: ( k v -- ? )
     #! Not tail recursive so will fail on large splay trees.
     >r splay-tree-r r> (splay-tree-traverse) ;
 
-: set-splay ( value key tree -- )
+M: splay-tree set-at ( value key tree -- )
     dup splay-tree-r [ (set-splay) ] [ new-root ] if ;
 
-: get-splay* ( key tree -- value ? )
+M: splay-tree at* ( key tree -- value ? )
     dup splay-tree-r [
         (get-splay) >r dup [ splay-node-v ] when r>
     ] [
         2drop f f
     ] if ;
-    
-: get-splay ( key tree -- value ) get-splay* drop ;
 
-: splay? ( key tree -- ? ) get-splay* nip ;
-
-: remove-splay ( key tree -- )
+M: splay-tree delete-at ( key tree -- )
     dup splay-tree-r [ (remove-splay) ] [ 2drop ] if ;
 
-: splay-values ( tree -- seq )
-    [ [ nip , ] splay-tree-traverse ] { } make ;
+M: splay-tree new-assoc
+    2drop <splay-tree> ;
 
-: splay-keys ( tree -- seq )
-    [ [ drop , ] splay-tree-traverse ] { } make ;
+: >splay-tree ( assoc -- splay-tree )
+    T{ splay-tree f f 0 } assoc-clone-like ;
 
-: splay>assoc ( tree -- seq )
-    [ [ 2array , ] splay-tree-traverse ] { } make ;
+: S{
+    \ } [ >splay-tree ] parse-literal ; parsing
 
-: assoc>splay ( assoc -- tree )
-    >r <splay-tree> r> [ first2 swap pick set-splay ] each ;
+M: splay-tree assoc-like
+    drop dup splay-tree? [ >splay-tree ] unless ;
+
+M: splay-tree clear-assoc
+    0 over set-splay-tree-count
+    f swap set-splay-tree-r ;
+
+M: splay-tree assoc-size
+    splay-tree-count ;
+
+USE: prettyprint-internals
+M: splay-tree pprint-delims drop \ S{ \ } ;
+M: splay-tree >pprint-sequence >alist ;
+M: splay-tree pprint-narrow? drop t ;

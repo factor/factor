@@ -1,14 +1,14 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: httpd
-USING: io hashtables kernel sequences math namespaces ;
+USING: io assocs kernel sequences math namespaces ;
 
 : file-extension ( filename -- extension )
     "." split dup length 1 <= [ drop f ] [ peek ] if ;
 
 : mime-type ( filename -- mime-type )
     file-extension "mime-types" get
-    hash [ "text/plain" ] unless* ;
+    at [ "text/plain" ] unless* ;
 
 H{
     { "html"   "text/html"                        }

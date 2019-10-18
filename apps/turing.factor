@@ -1,5 +1,5 @@
 IN: turing
-USING: arrays hashtables io kernel math namespaces
+USING: arrays assocs io kernel math namespaces
 prettyprint sequences strings vectors words ;
 
 ! A turing machine simulator.
@@ -50,7 +50,7 @@ SYMBOL: tape
 
 : next-state ( -- state )
     #! Look up the next state/symbol/direction triplet.
-    state get sym 2array states get hash ;
+    state get sym 2array states get at ;
 
 : turing-step ( -- )
     #! Do one step of the turing machine.

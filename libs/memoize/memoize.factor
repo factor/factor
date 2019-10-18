@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: memoize
 USING: kernel hashtables sequences arrays words namespaces
-parser errors math ;
+parser errors math assocs ;
 
 : packer ( n -- quot )
     { [ f ] [ ] [ 2array ] [ 3array ] [ 4array ] } nth ;
@@ -39,4 +39,4 @@ parser errors math ;
     over make-memoizer define-compound ;
 
 : MEMO:
-    CREATE dup reset-generic [ define-memoized ] f ; parsing
+    CREATE dup reset-generic parse-definition define-memoized ; parsing

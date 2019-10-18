@@ -1,4 +1,4 @@
-USING: compiler definitions generic hashtables inference math
+USING: compiler definitions generic assocs inference math
 namespaces parser test words kernel sequences arrays io ;
 IN: temporary
 
@@ -15,21 +15,21 @@ parse-hook get [
     [   ] [ \ bar [ foo foo ] define-compound ] unit-test
     [   ] [ \ bar compile                     ] unit-test
     [   ] [ \ foo [ 1 2 3 ] define-compound   ] unit-test
-    [ t ] [ \ bar changed-words get hash-member?  ] unit-test
+    [ t ] [ \ bar changed-words get key?  ] unit-test
     [   ] [ recompile ] unit-test
     [ { 0 3 } ] [ [ foo ] infer short-effect ] unit-test
-    [ f ] [ \ bar changed-words get hash-member?  ] unit-test
+    [ f ] [ \ bar changed-words get key?  ] unit-test
     [   ] [ \ bar [ 1 2 ] define-compound     ] unit-test
-    [ t ] [ \ bar changed-words get hash-member?  ] unit-test
+    [ t ] [ \ bar changed-words get key?  ] unit-test
     [   ] [ recompile ] unit-test
     [ { 0 2 } ] [ [ bar ] infer short-effect ] unit-test
-    [ f ] [ \ bar changed-words get hash-member?  ] unit-test
+    [ f ] [ \ bar changed-words get key?  ] unit-test
     [   ] [ \ foo [ 1 2 3 ] define-compound   ] unit-test
-    [ f ] [ \ bar changed-words get hash-member?  ] unit-test
+    [ f ] [ \ bar changed-words get key?  ] unit-test
     [   ] [ \ bar [ 1 2 3 ] define-compound   ] unit-test
-    [ t ] [ \ bar changed-words get hash-member?  ] unit-test
+    [ t ] [ \ bar changed-words get key?  ] unit-test
     [   ] [ \ bar forget ] unit-test
-    [ f ] [ \ bar changed-words get hash-member?  ] unit-test
+    [ f ] [ \ bar changed-words get key?  ] unit-test
 
     : xy ;
     : yx xy ;

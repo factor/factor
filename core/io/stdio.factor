@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
-USING: errors generic hashtables kernel namespaces sequences
-strings styles ;
+USING: errors generic assocs kernel namespaces sequences
+strings styles structure hashtables ;
 
 ! Default stream
 SYMBOL: stdio
@@ -18,17 +18,23 @@ SYMBOL: stdio
 : write ( str -- ) stdio get stream-write ;
 : flush ( -- ) stdio get stream-flush ;
 
-: terpri ( -- ) stdio get stream-terpri ;
+: nl ( -- ) stdio get stream-nl ;
 : format ( str style -- ) stdio get stream-format ;
 
 : with-nesting ( style quot -- )
     swap stdio get with-nested-stream ;
 
-: tabular-output ( grid style quot -- )
-    swap stdio get with-stream-table ;
+: tabular-output ( style quot -- )
+    swap >r { } make r> stdio get stream-write-table ;
+
+: with-row ( quot -- ) { } make , ;
+
+: with-cell ( quot -- ) H{ } stdio get make-table-cell , ;
+
+: write-cell ( str -- ) [ write ] with-cell ;
 
 : with-style ( style quot -- )
-    swap dup hash-empty?
+    swap dup assoc-empty?
     [ drop call ] [ stdio get with-stream-style ] if ;
 
 : print ( string -- ) stdio get stream-print ;
@@ -44,5 +50,6 @@ SYMBOL: stdio
 : write-object ( str obj -- )
     presented associate format ;
 
-: write-outliner ( str obj content -- )
-    outline associate [ write-object ] with-nesting ;
+: write-editable-object ( path printer -- )
+    [ 2dup presented-printer set presented-path set ] H{ } make-assoc
+    [ >r field-path r> call ] with-nesting ;

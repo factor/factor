@@ -1,7 +1,7 @@
 USING: arrays calendar concurrency errors generic hashtables
 help html http io kernel match math memory namespaces
-parser prettyprint sequences sequences-contrib
-splay-trees strings threads words ;
+parser prettyprint quotations sequences sequences-contrib
+splay-trees strings threads words network ;
 IN: irc
 
 ! "setup" objects

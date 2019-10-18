@@ -78,7 +78,7 @@ HELP: equal?
 { $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
 { $contract
     "Tests if two objects are equal."
-    $terpri
+    $nl
     "Method definitions should ensure that this is an equality relation:"
     { $list
         { $snippet "a = a" }
@@ -96,7 +96,7 @@ HELP: <=>
 { $values { "obj1" "an object" } { "obj2" "an object" } { "n" "an integer" } }
 { $contract
     "Compares two objects using an intrinsic partial order, for example, the natural order for real numbers and lexicographic order for strings."
-    $terpri
+    $nl
     "The output value is one of the following:"
     { $list
         { "positive - indicating that " { $snippet "str1" } " follows " { $snippet "str2" } }
@@ -104,8 +104,9 @@ HELP: <=>
         { "negative - indicating that " { $snippet "str1" } " precedes " { $snippet "str2" } }
     }
     "The default implementation treats the two objects as sequences, and recursively compares their elements. So no extra work is required to compare sequences lexicographically."
-}
-{ $see-also natural-sort } ;
+} ;
+
+{ <=> compare natural-sort sort-keys sort-values } related-words
 
 HELP: compare
 { $values { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "x" "an object" } { "y" "an object" } { "n" "an integer" } }
@@ -126,12 +127,11 @@ HELP: num-types
 { $values { "n" "a positive integer" } }
 { $description "Outputs one more than the maximum value from the " { $link type } " primitive." } ;
 
-DEFER: type ( object -- n )
-
-HELP: type
+HELP: type ( object -- n )
 { $values { "object" "an object" } { "n" "a type number" } }
-{ $description "Outputs an object's type number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." }
-{ $see-also type>class tag } ;
+{ $description "Outputs an object's type number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
+
+{ type tag type>class } related-words
 
 HELP: ?
 { $values { "cond" "a generalized boolean" } { "true" "an object" } { "false" "an object" } { "true/false" "one two input objects" } }
@@ -252,58 +252,54 @@ HELP: 2apply
 HELP: if ( cond true false -- )
 { $values { "cond" "a generalized boolean" } { "true" "a quotation" } { "false" "a quotation" } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation. Otherwise calls the " { $snippet "true" } " quotation."
-$terpri
+$nl
 "The " { $snippet "cond" } " value is removed from the stack before either quotation is called." } ;
 
 HELP: when
 { $values { "cond" "a generalized boolean" } { "true" "a quotation" } }
 { $description "If " { $snippet "cond" } " is not " { $link f } ", calls the " { $snippet "true" } " quotation."
-$terpri
+$nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: unless
 { $values { "cond" "a generalized boolean" } { "false" "a quotation" } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation."
-$terpri
+$nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: if*
 { $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation" } }
 { $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
-$terpri
+$nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
-$terpri
+$nl
 "The following two lines are equivalent:"
 { $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
 
 HELP: when*
 { $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } }
 { $description "Variant of " { $link if* } " with no false quotation."
-$terpri
+$nl
 "The following two lines are equivalent:"
 { $code "X [ Y ] when*" "X dup [ Y ] [ drop ] if" } } ;
 
 HELP: unless*
 { $values { "cond" "a generalized boolean" } { "false" "a quotation " } }
 { $description "Variant of " { $link if* } " with no true quotation."
-$terpri
+$nl
 "The following two lines are equivalent:"
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if
 { $values { "default" "an object" } { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation with stack effect " { $snippet "( default -- )" } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack."
-$terpri
+$nl
 "The following two lines are equivalent:"
 { $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" } } ;
 
 HELP: with
 { $values { "obj" "an object" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- )" } } { "elt" "an object" } }
 { $description "Utility word used to implement curried combinators such as " { $link each-with } " and " { $link map-with } "." } ;
-
-HELP: keep-datastack
-{ $values { "quot" "a quotation" } }
-{ $description "Calls a quotation, saving the data stack before calling it and restoring it after it returns." } ;
 
 HELP: die
 { $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." } ;
@@ -344,15 +340,6 @@ HELP: vm
 { $values { "path" "a path name string" } }
 { $description "Outputs the path name of the currently running Factor VM." } ;
 
-IN: memory
-
-HELP: save-image ( path -- )
-{ $values { "path" "a path name string" } }
-{ $description "Saves a snapshot of the heap to the given file, overwriting the file if it already exists." } ;
-
-HELP: save
-{ $description "Saves a snapshot of the heap to the current image file." } ;
-
 IN: kernel-internals
 
 HELP: (clone) ( obj -- newobj )
@@ -370,25 +357,9 @@ HELP: declare
     { $code "{ float } declare 2 + 10 *" }
 } ;
 
-HELP: array-capacity
-{ $values { "array" "an array" } { "n" "a non-negative fixnum" } }
-{ $description "Low-level array length accessor." }
-{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
-
-HELP: array-nth
-{ $values { "n" "a non-negative fixnum" } { "array" "an array" }  { "elt" "an object" } }
-{ $description "Low-level array element accessor." }
-{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
-
-HELP: set-array-nth
-{ $values { "elt" "an object" } { "n" "a non-negative fixnum" } { "array" "an array" }  }
-{ $description "Low-level array element mutator." }
-{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
-
 HELP: tag ( object -- n )
 { $values { "object" "an object" } { "n" "a tag number" } }
-{ $description "Outputs an object's tag number, between zero and one less than " { $link num-tags } ". This is implementation detail and user code should call " { $link class } " instead." }
-{ $see-also type } ;
+{ $description "Outputs an object's tag number, between zero and one less than " { $link num-tags } ". This is implementation detail and user code should call " { $link class } " instead." } ;
 
 HELP: dispatch ( n array -- )
 { $values { "n" "a fixnum" } { "array" "an array of quotations" } }

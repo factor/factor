@@ -4,21 +4,21 @@ USING: help ;
 HELP: malloc ( size -- alien )
 { $values { "size" "a non-negative integer" } { "alien" "an alien address" } }
 { $description "Allocates a block of " { $snippet "size" } " bytes from the operating system. The contents of the block are undefined."
-$terpri
+$nl
 "Outputs " { $link f } " if memory allocation failed, so calls to this word should be followed by a call to " { $link check-ptr } "." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." } ;
 
 HELP: calloc ( count size -- alien )
 { $values { "count" "a non-negative integer" } { "size" "a non-negative integer" } { "alien" "an alien address" } }
 { $description "Allocates a block of " { $snippet "count * size" } " bytes from the operating system. The contents of the block are initially zero."
-$terpri
+$nl
 "Outputs " { $link f } " if memory allocation failed, so calls to this word should be followed by a call to " { $link check-ptr } "." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." } ;
 
 HELP: realloc ( alien size -- newalien )
 { $values { "alien" "an alien address" } { "size" "a non-negative integer" } { "newalien" "an alien address" } }
 { $description "Allocates a new block of " { $snippet "size" } " bytes from the operating system. The contents of " { $snippet "alien" } ", which itself must be a block previously returned by " { $link malloc } " or " { $link realloc } ", are copied into the new block, and the old block is freed."
-$terpri
+$nl
 "Outputs " { $link f } " if memory allocation failed, so calls to this word should be followed by a call to " { $link check-ptr } "." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." } ;
 

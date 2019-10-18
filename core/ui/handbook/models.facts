@@ -18,6 +18,7 @@ ARTICLE: "models" "Models"
 { $subsection "models-compose" }
 { $subsection "models-history" }
 { $subsection "models-delay" }
+{ $subsection "models-range" }
 { $subsection "models-impl" } ;
 
 ARTICLE: "models-filter" "Filter models"
@@ -45,9 +46,28 @@ ARTICLE: "models-delay" "Delay models"
 { $subsection delay }
 { $subsection <delay> } ;
 
+ARTICLE: "models-range" "Range models"
+"Range models ensure their value is a real number within a fixed range."
+{ $subsection range }
+{ $subsection <range> }
+"Range models conform to a protocol for getting and setting the current value, as well as the endpoints of the range."
+{ $subsection "range-model-protocol" } ;
+
+ARTICLE: "range-model-protocol" "Range model protocol"
+"The range model protocol is implemented by the " { $link range } " and " { $link compose } " classes. User-defined models may implement it too."
+{ $subsection range-value          }
+{ $subsection range-page-value     } 
+{ $subsection range-min-value      } 
+{ $subsection range-max-value      } 
+{ $subsection range-max-value*     } 
+{ $subsection set-range-value      } 
+{ $subsection set-range-page-value } 
+{ $subsection set-range-min-value  } 
+{ $subsection set-range-max-value  } ;
+
 ARTICLE: "models-impl" "Implementing models"
 "New types of models can be defined, along the lines of " { $link filter } " and such."
-$terpri
+$nl
 "Tuples can delegate to models:"
 { $subsection delegate>model }
 "Models can execute hooks when activated:"
