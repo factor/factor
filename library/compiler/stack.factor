@@ -88,7 +88,5 @@ M: #shuffle linearize* ( #shuffle -- )
         0 vreg-allocator set
         dup node-in-d over node-out-d live-stores live-d set
         dup node-in-r over node-out-r live-stores live-r set
-        dup stacks>vregs
-        dup shuffle-height
-        vregs>stacks
-    ] with-scope linearize-next ;
+        dup stacks>vregs shuffle-height vregs>stacks
+    ] with-scope iterate-next ;

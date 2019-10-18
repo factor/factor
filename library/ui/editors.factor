@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-editors
 USING: arrays freetype gadgets gadgets-labels gadgets-layouts
-gadgets-menus gadgets-scrolling gadgets-theme generic kernel
+gadgets-scrolling gadgets-theme generic kernel
 lists math namespaces sequences strings styles threads ;
 
 ! A blinking caret
@@ -68,25 +68,27 @@ TUPLE: editor line caret font color ;
     ] with-editor ;
 
 : click-editor ( editor -- )
-    dup hand get relative first over set-caret-x request-focus ;
+    dup hand-click-rel first over set-caret-x request-focus ;
 
 : popup-location ( editor -- loc )
     dup screen-loc swap editor-caret rect-extent nip v+ ;
 
 : <completion-item> ( completion editor -- menu-item )
-    dupd [ [ complete ] with-editor drop ] curry curry cons ;
+    dupd [ [ complete ] with-editor drop ] curry curry 2array ;
 
-: <completion-menu> ( editor completions -- menu )
-    [ swap <completion-item> ] map-with <menu> ;
+! : <completion-menu> ( editor completions -- menu )
+!     [ swap <completion-item> ] map-with <menu> ;
 
 : completion-menu ( editor completions -- )
-    over >r <completion-menu> r> popup-location show-menu ;
+    2drop ;
+!    over popup-location -rot
+!    over >r <completion-menu> r> show-menu ;
 
 : do-completion-1 ( editor completions -- )
     swap [ first complete ] with-editor ;
 
 : do-completion ( editor -- )
-    dup [ completions ] with-editor {
+    dup [ line-completions ] with-editor {
         { [ dup empty? ] [ 2drop ] }
         { [ dup length 1 = ] [ do-completion-1 ] }
         { [ t ] [ completion-menu ] }
@@ -131,8 +133,8 @@ C: editor ( text -- )
 : caret-dim ( editor -- w h )
     rect-dim { 0 1 1 } v* { 1 0 0 } v+ ;
 
-M: editor user-input* ( ch editor -- ? )
-    [ insert-char ] with-editor f ;
+M: editor user-input* ( str editor -- ? )
+    [ insert-string ] with-editor f ;
 
 M: editor pref-dim* ( editor -- dim )
     label-size { 1 0 0 } v+ ;

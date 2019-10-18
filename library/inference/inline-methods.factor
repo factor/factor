@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays generic hashtables inference kernel lists math
 namespaces sequences words ;
@@ -10,7 +10,9 @@ GENERIC: dispatching-values ( node word -- seq )
 
 M: object dispatching-values 2drop { } ;
 
-M: simple-generic dispatching-values drop node-in-d peek 1array ;
+M: standard-generic dispatching-values
+    "combination" word-prop first swap
+    node-in-d reverse-slice nth 1array ;
 
 M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
@@ -52,6 +54,22 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 : method-dataflow ( node -- dataflow )
     dup will-inline swap node-in-d dataflow-with ;
 
+: post-inline ( #return/#values #call/#merge -- )
+    dup [
+        [
+            >r node-in-d r> node-out-d
+            2array unify-lengths first2
+        ] keep subst-values
+    ] [
+        2drop
+    ] if ;
+
+: subst-node ( old new -- )
+    #! The last node of 'new' becomes 'old', then values are
+    #! substituted. A subsequent optimizer phase kills the
+    #! last node of 'new' and the first node of 'old'.
+    last-node 2dup swap post-inline set-node-successor ;
+
 : inline-method ( node -- node )
     #! We set the #call node's param to f so that it gets killed
     #! later.
@@ -70,6 +88,13 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     ] [
         2drop f
     ] if ;
+
+: inline-literals ( node literals -- node )
+    #! Make #push -> #return -> successor
+    over drop-inputs [
+        >r >list [ literalize ] map dataflow [ subst-node ] keep
+        r> set-node-successor
+    ] keep ;
 
 : optimize-predicate ( #call -- node )
     dup node-param "predicating" word-prop >r

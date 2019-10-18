@@ -158,7 +158,7 @@ USING: compiler errors generic kernel math memory words ;
 : STH d-form 44 insn ;  : STHU d-form 45 insn ;
 : STW d-form 36 insn ;  : STWU d-form 37 insn ;
 
-G: (B) ( dest aa lk -- ) [ pick ] standard-combination ;
+G: (B) ( dest aa lk -- ) 2 standard-combination ;
 M: integer (B) i-form 18 insn ;
 M: word (B) 0 -rot (B) relative-3 ;
 

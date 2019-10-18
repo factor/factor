@@ -1,9 +1,14 @@
 ! Ed Cavazos - wayo.cavazos@gmail.com
 
-IN: automata
+! Load, compile and then save your image:
+!   "load.factor" run-file save
+! To run the program:
+!   USE: automata setup-window random-gallery
 
 USING: parser kernel hashtables namespaces sequences lists math io
-       threads strings arrays prettyprint xlib x ;
+math-contrib threads strings arrays prettyprint xlib x ;
+
+IN: automata
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! set-rule
@@ -11,11 +16,11 @@ USING: parser kernel hashtables namespaces sequences lists math io
 
 SYMBOL: rule
 
-8 <hashtable> rule set
+8 <hashtable> rule set-global
 
 SYMBOL: char-0
 
-48 char-0 set
+48 char-0 set-global
 
 : rule-keys ( -- { ... } )
   { { 0 0 0 }
@@ -58,7 +63,7 @@ SYMBOL: char-0
 ! SYMBOL: win
 
 : setup-window
-  ":0.0" initialize-x
+  f initialize-x
   create-window win set
   { 400 400 } resize-window
   map-window
@@ -98,7 +103,7 @@ SYMBOL: char-0
 
 : random-gallery
   255 random-int 1 +
-  dup unparse print
+  dup unparse print flush
   set-rule
   run-rule
   5000 sleep

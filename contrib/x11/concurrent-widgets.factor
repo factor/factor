@@ -1,7 +1,7 @@
+USING: io namespaces kernel hashtables math generic threads concurrency
+lists sequences arrays xlib x ;
 
 IN: concurrent-widgets
-USING: io namespaces kernel hashtables math generic threads concurrency
-       lists sequences arrays xlib x ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -23,10 +23,15 @@ TUPLE: window display id ;
 
 SYMBOL: window-table
 
-10 <hashtable> window-table set
+10 <hashtable> window-table set-global
 
 : add-to-window-table ( <window> -- )
 dup window-id window-table get set-hash ;
+
+: clean-window-table ( -- )
+window-table get
+[ drop dup valid-window?+ [ drop ] [ window-table get remove-hash ] if ]
+hash-each ;
 
 ! The window-table is keyed on window ids. If support is added for
 ! multiple displays, then perhaps there should be a window table for
@@ -67,32 +72,32 @@ GENERIC: handle-property-event
     { [ dup ConfigureRequest = ]	[ drop handle-configure-request-event ] }
     { [ dup UnmapNotify = ]		[ drop handle-unmap-event ] }
     { [ dup PropertyNotify = ]		[ drop handle-property-event ] }
-    { [ t ]                     	[ "handle-event ignoring event" print 3drop ] } }
+    { [ t ]                [ "handle-event ignoring event" print flush 3drop ] } }
   cond ;
 
 M: window handle-configure-event ( event obj -- )
-  "Basic handle-configure-event called" print drop drop ;
+  "Basic handle-configure-event called" print flush drop drop ;
 
 M: window handle-destroy-window-event ( event obj -- )
-  "Basic handle-destroy-window-event called" print drop drop ;
+  "Basic handle-destroy-window-event called" print flush drop drop ;
 
 M: window handle-map-event ( event obj -- )
-  "Basic handle-map-event called" print drop drop ;
+  "Basic handle-map-event called" print flush drop drop ;
 
 M: window handle-expose-event ( event obj -- )
-  "Basic handle-expose-event called" print drop drop ;
+  "Basic handle-expose-event called" print flush drop drop ;
 
 M: window handle-button-release-event ( event obj -- )
-  "Basic handle-button-release-event called" print drop drop ;
+  "Basic handle-button-release-event called" print flush drop drop ;
 
 M: window handle-unmap-event ( event obj -- )
-  "Basic handle-unmap-event called" print drop drop ;
+  "Basic handle-unmap-event called" print flush drop drop ;
 
 M: window handle-key-press-event ( event obj -- )
-  "Basic handle-key-press-event called" print drop drop ;
+  "Basic handle-key-press-event called" print flush drop drop ;
 
 M: window handle-key-release-event ( event obj -- )
-  "Basic handle-key-release-event called" print drop drop ;
+  "Basic handle-key-release-event called" print flush drop drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! <label>

@@ -1,12 +1,14 @@
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays kernel namespaces prettyprint sequences words ;
 
-M: word article-title "The " swap word-name " word" append3 ;
+M: word article-title word-name ;
 
-M: word article-name word-name ;
+: word-article ( word -- article ) "help" word-prop ;
 
 : word-help ( word -- )
-    dup "help" word-prop [
+    dup word-article [
         % drop
     ] [
         "predicating" word-prop [

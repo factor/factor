@@ -1,6 +1,5 @@
-USING: kernel math parser namespaces sequences strings
-prettyprint errors lists hashtables vectors io generic
-words ;
+USING: arrays errors generic hashtables io kernel lists math
+namespaces parser prettyprint sequences strings vectors words ;
 IN: xml
 
 ! * Simple SAX-ish parser
@@ -195,9 +194,9 @@ M: xml-string-error error.
         "Attribute lacks quote" <xml-string-error> throw
     ] if ;
 
-: parse-prop ( -- [[ name value ]] )
+: parse-prop ( -- { name value } )
     parse-name pass-blank CHAR: = expect pass-blank
-    parse-prop-value cons pass-blank ;
+    parse-prop-value 2array pass-blank ;
 
 TUPLE: opener name props ;
 TUPLE: closer name ;
@@ -368,8 +367,11 @@ M: comment (xml>string)
     comment-text %
     "-->" % ;
 
+: xml-preamble
+    "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" ;
+
 : xml>string ( xml -- string )
-    [ (xml>string) ] "" make ;
+    [ xml-preamble % (xml>string) ] "" make ;
 
 : xml-reprint ( string -- string )
     xml xml>string ;
@@ -386,6 +388,8 @@ M: comment (xml>string)
     slip
     <closer> process ; inline
 
+: text-tag ( content name attr-quot -- ) [ text ] tag ; inline
+
 : comment ( string -- )
     <comment> push-datum ;
 
@@ -395,7 +399,7 @@ M: comment (xml>string)
         initialize-xml-stack
         call
         xml-stack get
-        first cdr second
+        first cdr first
     ] with-scope ; inline
 
 ! * System for words specialized on tag names

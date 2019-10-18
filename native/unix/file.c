@@ -66,6 +66,6 @@ void primitive_cwd(void)
 void primitive_cd(void)
 {
 	maybe_gc(0);
-	chdir(unbox_c_string());
+	chdir(pop_c_string());
 }
 

@@ -1,32 +1,19 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
-USING: arrays compiler gadgets gadgets-editors gadgets-labels
+USING: arrays gadgets gadgets-editors gadgets-labels
 gadgets-layouts gadgets-panes gadgets-scrolling
 gadgets-splitters gadgets-theme generic hashtables
-inference inspector io jedit kernel listener lists math
-namespaces parser prettyprint sequences shells threads words
-help ;
+io jedit kernel listener lists math
+namespaces parser prettyprint sequences threads words ;
 
-SYMBOL: stack-bar
-SYMBOL: browser-pane
-
-: reveal-in-split ( gadget n -- )
-    >r find-splitter dup splitter-split r> - abs 1/16 <
-    [ 1/3 over set-splitter-split dup relayout ] when drop ;
-
-: in-browser ( quot -- )
-    browser-pane get dup 0 reveal-in-split swap with-pane ; inline
-
-: in-listener ( quot -- )
-    pane get dup 1 reveal-in-split pane-call ; inline
+TUPLE: listener-gadget pane stack ;
 
 : usable-words ( -- words )
     use get hash-concat hash-values ;
 
-: word-completion ( -- )
-    usable-words [ word-name ] map
-    pane get pane-input set-possibilities ;
+: word-completion ( pane -- )
+    usable-words swap pane-input set-possibilities ;
 
 : show-stack ( seq pack -- )
     dup clear-gadget [
@@ -38,46 +25,36 @@ SYMBOL: browser-pane
         ] if
     ] with-stream* ;
 
-: ui-listener-hook ( -- )
-    datastack-hook get call stack-bar get show-stack
-    word-completion ;
+: ui-listener-hook ( listener -- )
+    [
+        >r datastack-hook get call r>
+        listener-gadget-stack show-stack
+    ] keep
+    listener-gadget-pane word-completion ;
 
-: help-button
-    "Please read the " write { "handbook" } $link "." print ;
-
-: listener-thread
-    pane get [
-        [ ui-listener-hook ] listener-hook set
-        help-button
-        listener
+: listener-thread ( listener -- )
+    dup listener-gadget-pane [
+        [ ui-listener-hook ] curry listener-hook set
+        print-banner listener
     ] with-stream* ;
 
-M: label set-message ( string/f status -- )
-    set-label-text* ;
+: <stack-bar> ( -- gadget ) <shelf> dup highlight-theme ;
 
-: <status-bar> ( -- gadget ) "" <label> dup status-theme ;
+: start-listener ( listener -- )
+    [ >r clear r> listener-thread ] in-thread ;
 
-: <bottom-bar> ( -- gadget )
-    <status-bar> dup world get set-world-status
-    <shelf> dup stack-bar set-global
-    2array make-pile 1 over set-pack-fill ;
+C: listener-gadget ( -- gadget )
+    dup delegate>frame
+    <input-pane> dup pick set-listener-gadget-pane
+    <scroller> over @center frame-add
+    <stack-bar> dup pick set-listener-gadget-stack
+    over @top frame-add
+    dup start-listener ;
 
-: <browser-scroller> ( -- gadget )
-    <pane> dup browser-pane set-global <scroller> ;
+M: listener-gadget pref-dim* drop { 600 600 0 } ;
 
-: <listener-scroller> ( -- gadget )
-    <input-pane> dup pane set-global <scroller> ;
+M: listener-gadget focusable-child* ( listener -- gadget )
+    listener-gadget-pane ;
 
-: <listener> ( -- gadget )
-    <frame> dup solid-interior
-    <browser-scroller> <listener-scroller>
-    0 <x-splitter> over @center frame-add
-    <bottom-bar> over @bottom frame-add ;
-
-: set-application ( gadget -- )
-    world get dup clear-gadget add-gadget ;
-
-: listener-application ( -- )
-    <listener> set-application
-    [ clear listener-thread ] in-thread
-    pane get request-focus ;
+: listener-window ( -- )
+    <listener-gadget> "Listener" open-window ;

@@ -1,7 +1,9 @@
-USING: kernel sequences namespaces math threads io opengl concurrency
-x xlib x11 gl concurrent-widgets ;
+USING: kernel sequences namespaces math hashtables threads io opengl
+concurrency x xlib x11 gl concurrent-widgets ;
 
-SYMBOL: loop-action [ ] loop-action set
+SYMBOL: loop-action
+
+! [ ] loop-action set
 
 SYMBOL: spin 0.0 spin set
 
@@ -35,11 +37,16 @@ GL_MODELVIEW glMatrixMode glLoadIdentity ;
 
 : loop ( -- ) loop-action get call 10 sleep loop ;
 
+! : loop ( -- ) loop-action global hash call 10 sleep loop ;
+
+! The following line wasn't needed in 0.79
+! USE: hashtables 10 <hashtable> window-table set
+
 f initialize-x
 
 create-pwindow
 [ drop reshape ] over set-pwindow-resize-action
-[ drop mouse ] over set-pwindow-button-action 
+[ "button pressed" print drop mouse ] over set-pwindow-button-action 
 window-id win set
 StructureNotifyMask ButtonPressMask bitor select-input
 { 250 250 } resize-window { 100 100 } move-window map-window

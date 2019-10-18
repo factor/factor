@@ -49,7 +49,7 @@ M: object digit> not-a-number ;
     dup >r /mod >digit , dup 0 >
     [ r> integer, ] [ r> 2drop ] if ;
 
-G: >base ( num radix -- string ) [ over ] standard-combination ;
+G: >base ( num radix -- string ) 1 standard-combination ;
 
 M: integer >base ( num radix -- string )
     [

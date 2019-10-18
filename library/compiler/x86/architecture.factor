@@ -1,6 +1,6 @@
 IN: compiler-backend
-USING: alien arrays assembler compiler compiler-backend kernel
-kernel-internals sequences ;
+USING: alien arrays assembler compiler compiler-backend generic
+kernel kernel-internals sequences words ;
 
 ! x86 register assignments
 ! EAX, ECX, EDX vregs
@@ -31,8 +31,6 @@ M: int-regs fastcall-regs drop { } ;
 
 M: float-regs fastcall-regs drop { } ;
 
-: dual-fp/int-regs? f ;
-
 : address-operand ( address -- operand )
     #! On x86, we can always use an address as an operand
     #! directly.
@@ -47,4 +45,4 @@ M: float-regs fastcall-regs drop { } ;
 : compile-epilogue ; inline
 
 : load-indirect ( dest literal -- )
-    add-literal 1array MOV rel-absolute-cell rel-address ; inline
+    add-literal [] MOV rel-absolute-cell rel-address ; inline

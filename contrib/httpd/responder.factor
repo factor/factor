@@ -62,10 +62,10 @@ SYMBOL: responders
     "Content-Length" swap hash dup
     [ string>number read query>hash ] when ;
 
-: log-user-agent ( hash -- )
-    "User-Agent" swap hash [
-        [ "User Agent: " % ": " % % ] "" make log-message
-    ] when* ;
+: log-headers ( hash -- )
+    [
+        drop { "User-Agent" "X-Forwarded-For" "Host" } member?
+    ] hash-subset [ ": " swap append3 log-message ] hash-each ;
 
 : prepare-url ( url -- url )
     #! This is executed in the with-request namespace.
@@ -75,7 +75,7 @@ SYMBOL: responders
 
 : prepare-header ( -- )
     read-header dup "header" set
-    dup log-user-agent
+    dup log-headers
     read-post-request "response" set ;
 
 ! Responders are called in a new namespace with these
@@ -126,11 +126,8 @@ SYMBOL: responders
 : set-default-responder ( name -- )
     responder "default" responders get set-hash ;
 
-: responder-argument ( argument -- argument )
-    dup empty? [ drop "default-argument" get ] when ;
-
 : call-responder ( method argument responder -- )
-    [ responder-argument swap get call ] bind ;
+    over "argument" set [ swap get call ] bind ;
 
 : serve-default-responder ( method url -- )
     "default" responder call-responder ;

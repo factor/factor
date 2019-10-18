@@ -1,5 +1,13 @@
 #include "factor.h"
 
+void *safe_malloc(size_t size)
+{
+	void *ptr = malloc(size);
+	if(ptr == 0)
+		fatal_error("malloc() failed", 0);
+	return ptr;
+}
+
 void primitive_exit(void)
 {
 	exit(to_fixnum(dpop()));
@@ -11,7 +19,7 @@ void primitive_os_env(void)
 
 	maybe_gc(0);
 
-	name = unbox_c_string();
+	name = pop_c_string();
 	value = getenv(name);
 	if(value == NULL)
 		dpush(F);

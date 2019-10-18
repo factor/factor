@@ -17,6 +17,9 @@ M: %call generate-node ( vop -- )
 M: %jump generate-node ( vop -- )
     drop compile-epilogue (%call) JMP ;
 
+M: %jump-label generate-node ( vop -- )
+    drop label JMP ;
+
 M: %jump-t generate-node ( vop -- )
     drop
     ! Compare input with f
@@ -41,7 +44,7 @@ M: %dispatch generate-node ( vop -- )
     0 scratch HEX: ffffffff MOV "end" get absolute-cell
     0 input-operand 0 scratch ADD
     ! Jump to jump table entry
-    0 input-operand 1array JMP
+    0 input-operand [] JMP
     ! Align for better performance
     compile-aligned
     ! Fix up jump table pointer
@@ -70,7 +73,7 @@ M: %type generate-node ( vop -- )
     0 scratch object-tag CMP
     "f" get JE
     ! The pointer is not equal to 3. Load the object header.
-    0 output-operand ECX object-tag neg 2array MOV
+    0 output-operand ECX object-tag neg [+] MOV
     ! Mask off header tag, making a fixnum.
     0 output-operand object-tag XOR
     "end" get JMP

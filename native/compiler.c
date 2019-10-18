@@ -2,7 +2,7 @@
 
 void init_compiler(CELL size)
 {
-	compiling.base = compiling.here = (CELL)alloc_guarded(size);
+	compiling.base = compiling.here = (CELL)(alloc_bounded_block(size)->start);
 	if(compiling.base == 0)
 		fatal_error("Cannot allocate code heap",size);
 	compiling.limit = compiling.base + size;
@@ -18,6 +18,11 @@ void primitive_set_compiled_offset(void)
 {
 	CELL offset = unbox_unsigned_cell();
 	compiling.here = offset;
+	if(compiling.here >= compiling.limit)
+	{
+		fprintf(stderr,"Code space exhausted\n");
+		factorbug();
+	}
 }
 
 void primitive_literal_top(void)

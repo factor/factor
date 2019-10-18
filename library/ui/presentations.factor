@@ -1,9 +1,9 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-presentations
-USING: arrays gadgets gadgets-borders gadgets-labels
-gadgets-layouts gadgets-outliner gadgets-panes hashtables io
-kernel sequences strings styles ;
+USING: arrays gadgets gadgets-borders gadgets-browser
+gadgets-labels gadgets-layouts gadgets-outliner gadgets-panes
+hashtables io kernel sequences strings styles ;
 
 ! Character styles
 
@@ -24,15 +24,15 @@ kernel sequences strings styles ;
 : apply-font-style ( style gadget -- style gadget )
     over specified-font over set-label-font ;
 
-: apply-command-style ( style gadget -- style gadget )
-    presented [ <command-button> ] apply-style ;
+: apply-browser-style ( style gadget -- style gadget )
+    presented [ <browser-button> ] apply-style ;
 
 : <presentation> ( style text -- gadget )
     <label>
     apply-foreground-style
     apply-background-style
     apply-font-style
-    apply-command-style
+    apply-browser-style
     nip ;
 
 ! Paragraph styles
@@ -64,7 +64,7 @@ kernel sequences strings styles ;
     apply-border-width-style
     apply-border-color-style
     apply-page-color-style
-    apply-command-style
+    apply-browser-style
     apply-outliner-style
     nip ;
 

@@ -63,6 +63,14 @@ CELL cs_bot;
 	CELL cs;
 #endif
 
+#if defined(FACTOR_PPC)
+	register CELL cards_offset asm("r16");
+#elif defined(FACTOR_AMD64)
+	register CELL cards_offset asm("r13");
+#else
+	CELL cards_offset;
+#endif
+
 /* TAGGED currently executing quotation */
 CELL callframe;
 
@@ -80,10 +88,6 @@ CELL executing;
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-#ifdef FACTOR_SDL
-#include "SDL/SDL.h"
-#endif
 
 #include <sys/param.h>
 
@@ -103,6 +107,7 @@ CELL executing;
     #include <dlfcn.h>
 #endif
 
+#include "debug.h"
 #include "error.h"
 #include "cards.h"
 #include "memory.h"
@@ -135,6 +140,11 @@ CELL executing;
 #include "alien.h"
 #include "dll.h"
 #include "wrapper.h"
-#include "debug.h"
+
+void usage(void);
+
+void early_init(void);
+
+const char *default_image_path(void);
 
 #endif /* __FACTOR_H__ */

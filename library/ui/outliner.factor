@@ -3,7 +3,18 @@
 IN: gadgets-outliner
 USING: arrays gadgets gadgets-borders gadgets-buttons
 gadgets-labels gadgets-layouts gadgets-panes gadgets-theme
-generic io kernel lists sequences styles ;
+generic io kernel lists math opengl sequences styles ;
+
+! Vertical line.
+TUPLE: guide color ;
+
+M: guide draw-interior ( gadget interior -- )
+    guide-color gl-color
+    rect-dim dup { 0.5 0 0 } v* swap { 0.5 1 0 } v* gl-line ;
+
+: <guide-gadget> ( -- gadget )
+    <gadget>
+    T{ guide f { 0.5 0.5 0.5 1.0 } } over set-gadget-interior ;
 
 ! Outliner gadget.
 TUPLE: outliner quot ;
@@ -12,14 +23,6 @@ TUPLE: outliner quot ;
     #! If the outliner is expanded, it has a center gadget.
     @center frame-child >boolean ;
 
-DEFER: <expand-button>
-
-: set-outliner-expanded? ( expanded? outliner -- )
-    #! Call the expander quotation if expanding.
-    over not <expand-button> over @top-left frame-add
-    swap [ dup outliner-quot make-pane ] [ f ] if
-    swap @center frame-add ;
-
 : find-outliner ( gadget -- outliner )
     [ outliner? ] find-parent ;
 
@@ -27,11 +30,26 @@ DEFER: <expand-button>
     arrow-right arrow-down ? { 0.5 0.5 0.5 1.0 } swap
     <polygon-gadget> <default-border> ;
 
+DEFER: set-outliner-expanded?
+
 : <expand-button> ( ? -- gadget )
     #! If true, the button expands, otherwise it collapses.
     dup [ swap find-outliner set-outliner-expanded? ] curry
-    >r <expand-arrow> r>
-    <highlight-button> ;
+    >r <expand-arrow> r> <highlight-button> ;
+
+: setup-expand ( expanded? outliner -- )
+    >r not <expand-button> r> @top-left frame-add ;
+
+: setup-center ( expanded? outliner -- )
+    [ swap [ outliner-quot make-pane ] [ drop f ] if ] keep
+    @center frame-add ;
+
+: setup-guide ( expanded? outliner -- )
+    >r [ <guide-gadget> ] [ f ] if r> @left frame-add ;
+
+: set-outliner-expanded? ( expanded? outliner -- )
+    #! Call the expander quotation if expanding.
+    2dup setup-expand 2dup setup-center setup-guide ;
 
 C: outliner ( gadget quot -- gadget )
     #! The quotation generates child gadgets.

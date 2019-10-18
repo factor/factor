@@ -10,6 +10,9 @@ USING: generic kernel-internals math-internals ;
 GENERIC: hashcode ( obj -- n ) flushable
 M: object hashcode drop 0 ;
 
+GENERIC: hashcode* ( n obj -- n ) flushable
+M: object hashcode* nip hashcode ;
+
 GENERIC: = ( obj obj -- ? ) flushable
 M: object = eq? ;
 
@@ -20,7 +23,7 @@ M: object clone ;
 
 : set-boot ( quot -- ) 8 setenv ;
 
-: num-types ( -- n ) 20 ; inline
+: num-types ( -- n ) 19 ; inline
 
 : ? ( cond t f -- t/f ) rot [ drop ] [ nip ] if ; inline
 
@@ -28,8 +31,10 @@ M: object clone ;
 : and ( a b -- a&b ) f ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
 
-: cpu ( -- arch ) 7 getenv ;
-: os ( -- os ) 11 getenv ;
+: cpu ( -- arch ) 7 getenv ; foldable
+: os ( -- os ) 11 getenv ; foldable
+: windows? ( -- ? ) os "windows" = ; inline
+: macosx? os "macosx" = ; inline
 
 : slip >r call r> ; inline
 
@@ -95,3 +100,16 @@ IN: kernel-internals
 : complex-tag BIN: 110 ; inline
 
 : cell 17 getenv ; foldable
+
+IN: kernel
+
+: win32? windows? cell 4 = and ; inline
+: win64? windows? cell 8 = and ; inline
+
+IN: memory
+
+: generations ( -- n ) 15 getenv ;
+
+: image ( -- path ) 16 getenv ;
+
+: save ( -- ) image save-image ;

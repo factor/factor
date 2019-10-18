@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: arrays generic hashtables interpreter kernel lists math
 namespaces parser sequences words ;
@@ -63,7 +63,7 @@ C: #label make-node ;
 
 TUPLE: #entry ;
 C: #entry make-node ;
-: #entry ( -- node ) f param-node <#entry> ;
+: #entry ( -- node ) meta-d get clone in-node <#entry> ;
 
 TUPLE: #call ;
 C: #call make-node ;
@@ -189,14 +189,6 @@ SYMBOL: current-node
 : all-nodes-with? ( obj node quot -- ? | quot: obj node -- ? )
     swap [ with rot ] all-nodes? 2nip ; inline
 
-: (subst-values) ( new old node -- )
-    [ node-in-d subst ] 3keep [ node-in-r subst ] 3keep
-    [ node-out-d subst ] 3keep node-out-r subst ;
-
-: subst-values ( new old node -- )
-    #! Mutates the node.
-    [ >r 2dup r> (subst-values) ] each-node 2drop ;
-
 : remember-node ( word node -- )
     #! Annotate each node with the fact it was inlined from
     #! 'word'.
@@ -205,16 +197,6 @@ SYMBOL: current-node
         [ [ node-history ?push ] keep set-node-history ]
         [ 2drop ] if
     ] each-node-with ;
-
-: (clone-node) ( node -- node )
-    clone dup node-shuffle clone over set-node-shuffle ;
-
-: clone-node ( node -- node )
-    dup [
-        (clone-node)
-        dup node-children [ clone-node ] map over set-node-children
-        dup node-successor clone-node over set-node-successor
-    ] when ;
 
 GENERIC: calls-label* ( label node -- ? )
 
@@ -227,3 +209,75 @@ M: #call-label calls-label* node-param eq? ;
 
 : recursive-label? ( node -- ? )
     dup node-param swap calls-label? ;
+
+SYMBOL: node-stack
+
+: >node node-stack get push ;
+: node> node-stack get pop ;
+: node@ node-stack get peek ;
+
+DEFER: iterate-nodes
+
+: iterate-children ( quot -- )
+    node@ node-children [ swap iterate-nodes ] each-with ;
+    inline
+
+: iterate-next ( -- node ) node@ node-successor ;
+
+: iterate-nodes ( node quot -- )
+    over [
+        [ swap >node call node> drop ] keep
+        over [ iterate-nodes ] [ 2drop ] if
+    ] [
+        2drop
+    ] if ; inline
+
+: ?set-node-successor ( next prev -- )
+    [ set-node-successor ] [ drop ] if* ;
+
+: map-node ( prev quot -- )
+    swap >r node@ swap call dup r> ?set-node-successor
+    node> drop >node ; inline
+
+DEFER: map-children
+DEFER: (map-nodes)
+
+: map-next ( quot -- )
+    node@ [
+        swap [ map-children ] keep
+        node> node-successor >node (map-nodes)
+    ] [
+        drop
+    ] if* ; inline
+
+: (map-nodes) ( prev quot -- | quot: node -- node )
+    node@
+    [ [ map-node ] keep map-next ]
+    [ drop f swap ?set-node-successor ] if ; inline
+
+: map-first ( node quot -- node | quot: node -- node )
+    call node> drop dup >node ; inline
+
+: map-nodes ( node quot -- node | quot: node -- node )
+    over [
+        over >node [ map-first ] keep map-next node>
+    ] when drop ; inline
+
+: map-children ( quot -- | quot: node -- node )
+    node@ [ node-children [ swap map-nodes ] map-with ] keep
+    set-node-children ; inline
+
+: with-node-iterator ( quot -- )
+    [ V{ } clone node-stack set call ] with-scope ; inline
+
+: (subst-values) ( new old node -- )
+    [
+        [ node-in-d subst ] 3keep [ node-in-r subst ] 3keep
+        [ node-out-d subst ] 3keep [ node-out-r subst ] 3keep
+        drop
+    ] each-node 2drop ;
+
+: subst-values ( new old node -- )
+    #! Mutates nodes.
+    1 node-stack get head* swap add
+    [ >r 2dup r> node-successor (subst-values) ] each 2drop ;

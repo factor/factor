@@ -22,9 +22,6 @@
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
 
-/* Error handlers restore this */
-JMP_BUF toplevel;
-
 INLINE CELL dpop(void)
 {
 	CELL value = get(ds);
@@ -78,7 +75,10 @@ INLINE void call(CELL quot)
 	callframe = quot;
 }
 
+void handle_error();
 void run(void);
+void run_toplevel(void);
+DLLEXPORT void run_callback(CELL quot);
 void platform_run(void);
 void undefined(F_WORD *word);
 void docol(F_WORD *word);

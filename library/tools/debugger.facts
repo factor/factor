@@ -18,6 +18,14 @@ HELP: :get "( variable -- value )"
 { $values { "variable" "an object" } { "value" "the value, or f" } }
 { $description "Looks up the value of a variable at the time of the most recent error." } ;
 
+HELP: error. "( error -- )"
+{ $values { "error" "an error" } }
+{ $contract "Print an error to the default stream." } ;
+
+HELP: print-error "( error -- )"
+{ $values { "error" "an error" } }
+{ $description "Print an error to the default stream. This word gets called by the listener and other tools which report caught errors to the user. You can define methods on this generic word for custom error reporting." } ;
+
 HELP: try "( quot -- )"
 { $values { "quot" "a quotation" } }
 { $description "Calls the quotation. If it throws an error, logs the error to the default stream and restores the datastack." } ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: line-editor
-USING: kernel math namespaces sequences strings vectors ;
+USING: kernel math namespaces sequences strings vectors words ;
 
 SYMBOL: history
 SYMBOL: history-index
@@ -103,9 +103,9 @@ M: document-elt prev-elt* 3drop 0 ;
 : delete-prev-elt ( element -- )
     prev-elt@ line-remove ;
 
-: insert-char ( ch -- )
+: insert-string ( str -- )
     #! Call this in the line editor scope.
-    ch>string caret-pos dup line-replace ;
+    caret-pos dup line-replace ;
 
 : commit-history ( -- )
     #! Call this in the line editor scope. Adds the currently
@@ -140,12 +140,12 @@ M: document-elt prev-elt* 3drop 0 ;
     history-index get dup 1+ history-length >=
     [ drop ] [ 1+ goto-history ] if ;
 
-: completions ( -- seq )
+: line-completions ( -- seq )
     T{ word-elt } prev-elt@ 2dup = [
         2drop f
     ] [
-        line-text get subseq possibilities get
-        [ [ swap head? ] completion? ] subset-with
+        line-text get subseq possibilities get completions
+        [ word-name ] map
     ] if ;
 
 : complete ( completion -- )

@@ -136,7 +136,7 @@ ARTICLE: "word-crossref" "Cross-referencing"
 { $subsection usage }
 { $subsection usages }
 "In most cases the cross-reference database is maintained automatically, but if you do something unusual you might need to update it manually."
-{ $subsection recrossref } ;
+{ $subsection xref-words } ;
 
 ARTICLE: "word-internals" "Word implementation details"
 "The behavior of a word when executed depends on the values of two slots:"

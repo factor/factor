@@ -67,7 +67,7 @@ USING: kernel math namespaces prettyprint test ;
 [ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
 unit-test
 
-[ 0.0/0.0 ] [ 0 0 ^ ] unit-test
+[ t ] [ 0 0 ^ fp-nan? ] unit-test
 [ 1 ] [ 10 0 ^ ] unit-test
 [ 1/8 ] [ 1/2 3 ^ ] unit-test
 [ 1/8 ] [ 2 -3 ^ ] unit-test
@@ -83,8 +83,8 @@ unit-test
 [ 0 ] [ -7/8 ceiling ] unit-test
 [ -1 ] [ -3/2 ceiling ] unit-test
 
-[ 1 ] [ 0 next-power-of-2 ] unit-test
-[ 1 ] [ 1 next-power-of-2 ] unit-test
+[ 2 ] [ 0 next-power-of-2 ] unit-test
+[ 2 ] [ 1 next-power-of-2 ] unit-test
 [ 2 ] [ 2 next-power-of-2 ] unit-test
 [ 4 ] [ 3 next-power-of-2 ] unit-test
 [ 16 ] [ 13 next-power-of-2 ] unit-test

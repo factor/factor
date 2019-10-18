@@ -48,8 +48,23 @@ SYMBOL: error-continuation
 : user-interrupt. ( obj -- )
     "User interrupt" print drop ;
 
+: datastack-underflow. ( obj -- )
+    "Data stack underflow" print drop ;
+
+: datastack-overflow. ( obj -- )
+    "Data stack overflow" print drop ;
+
+: callstack-underflow. ( obj -- )
+    "Return stack underflow" print drop ;
+
+: callstack-overflow. ( obj -- )
+    "Return stack overflow" print drop ;
+
+! Hook for library/cocoa/
+DEFER: objc-error. ( alien -- )
+
 PREDICATE: cons kernel-error ( obj -- ? )
-    dup first kernel-error = swap second 0 11 between? and ;
+    dup first kernel-error = swap second 0 16 between? and ;
 
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
@@ -66,6 +81,11 @@ M: kernel-error error. ( error -- )
         [ heap-scan-error. ]
         [ undefined-symbol-error. ]
         [ user-interrupt. ]
+        [ datastack-underflow. ]
+        [ datastack-overflow. ]
+        [ callstack-underflow. ]
+        [ callstack-overflow. ]
+        [ objc-error. ]
     } dispatch ;
 
 M: no-method summary drop "No suitable method" ;

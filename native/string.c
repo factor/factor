@@ -6,7 +6,7 @@ F_STRING* allot_string(F_FIXNUM capacity)
 	F_STRING* string;
 
 	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity));
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_integer(capacity),true);
 
 	string = allot_object(STRING_TYPE,
 		sizeof(F_STRING) + (capacity + 1) * CHARS);
@@ -133,7 +133,7 @@ F_ARRAY *string_to_alien(F_STRING *s, bool check)
 		{
 			u16 ch = string_nth(s,i);
 			if(ch == '\0' || ch > 255)
-				general_error(ERROR_C_STRING,tag_object(s));
+				general_error(ERROR_C_STRING,tag_object(s),true);
 		}
 	}
 
@@ -166,7 +166,7 @@ void primitive_string_to_memory(void)
 }
 
 /* FFI calls this */
-char* unbox_c_string(void)
+char *unbox_c_string(void)
 {
 	CELL str = dpop();
 	if(type_of(str) == STRING_TYPE)
@@ -175,15 +175,53 @@ char* unbox_c_string(void)
 		return (char*)alien_offset(str);
 }
 
+/* this function is used when we really want only Factor strings as input, not
+aliens. In particular, certian primitives crash if given a null pointer (f), so
+we protect against this by using this function instead of unbox_c_string() */
+char *pop_c_string(void)
+{
+	return to_c_string(untag_string(dpop()),true);
+}
+
 /* FFI calls this */
-u16* unbox_utf16_string(void)
+u16 *unbox_utf16_string(void)
 {
 	/* Return pointer to first character */
-	CELL str = dpop();
-	if(type_of(str) == STRING_TYPE)
-		return (u16*)(untag_string(str) + 1);
+	CELL obj = dpop();
+
+	if(type_of(obj) == STRING_TYPE)
+	{
+		F_STRING* str = untag_string(obj);
+		u16 *unboxed = (u16*)(str + 1);
+
+		CELL length = string_capacity(str);
+		CELL i;
+
+		for(i = 0; i < length; i++)
+		{
+			if(unboxed[i] == 0)
+				general_error(ERROR_C_STRING,obj,true);
+		}
+
+		return unboxed;
+	}
 	else
-		return (u16*)alien_offset(str);
+		return (u16*)alien_offset(obj);
+}
+
+/* FFI calls this */
+void box_utf16_string(u16 *unboxed)
+{
+	CELL length = 0;
+	u16 *scan = unboxed;
+	F_STRING *str;
+
+	while(*scan++) length++;
+
+	str = allot_string(length);
+	memcpy((u16*)(str + 1),unboxed,length * sizeof(u16));
+	rehash_string(str);
+	dpush(tag_object(str));
 }
 
 void primitive_char_slot(void)

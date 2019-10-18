@@ -25,8 +25,9 @@ INLINE CELL array_size(CELL size)
 	return align8(sizeof(F_ARRAY) + size * CELLS);
 }
 
-F_ARRAY* allot_array(CELL type, F_FIXNUM capacity);
-F_ARRAY* array(CELL type, F_FIXNUM capacity, CELL fill);
+F_ARRAY *allot_array(CELL type, F_FIXNUM capacity);
+F_ARRAY *array(CELL type, F_FIXNUM capacity, CELL fill);
+F_ARRAY *byte_array(F_FIXNUM size);
 
 void primitive_array(void);
 void primitive_tuple(void);

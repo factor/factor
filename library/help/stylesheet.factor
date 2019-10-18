@@ -1,3 +1,5 @@
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: styles ;
 
@@ -16,10 +18,17 @@ USING: styles ;
 
 : heading-style H{ { font "serif" } { font-size 16 } } ;
 
-: subheading-style H{ { font "serif" } { font-style bold } } ;
+: subheading-style H{ { font "sans-serif" } { font-style bold } } ;
 
 : subsection-style
-    H{ { font "serif" } { font-size 14 } { font-style bold } } ;
+    H{
+        { font "sans-serif" }
+        { font-size 14 }
+        { font-style bold }
+    } ;
+
+: subtopic-style
+    H{ { font-style bold } } ;
 
 : snippet-style
     H{

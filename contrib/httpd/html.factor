@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: html
 USING: cont-responder generic hashtables help http inspector io
 kernel lists prototype-js math namespaces sequences strings
 styles words xml ;
+IN: html
 
 : hex-color, ( triplet -- )
     3 swap head
@@ -61,7 +61,8 @@ styles words xml ;
 
 : padding-css, ( padding -- ) "padding: " % # "px; " % ;
 
-: pre-css, ( -- ) "white-space: pre; font-family:monospace; " % ;
+: pre-css, ( -- )
+    "white-space: pre; font-family:monospace; " % ;
 
 : div-css-style ( style -- str )
     [
@@ -152,23 +153,17 @@ M: html-stream stream-format ( str style stream -- )
 : with-html-stream ( quot -- )
     stdio get <html-stream> swap with-stream* ;
 
+: make-outliner-quot
+    [
+        <div "padding-left:10px;" =style div>
+            with-html-stream
+        </div>
+    ] curry [ , \ show-final , ] [ ] make ;
+            
 : html-outliner ( caption contents -- )
-    <table "display: inline; " =style table>
-        <tr>
-            <td>
-                "+" get-random-id dup >r rot [
-                    with-html-stream
-                ] curry [ , \ show-final , ] [ ] make updating-anchor
-            </td>
-            <td>
-                call
-            </td>
-        </tr>
-        <tr>
-            <td> </td>
-            <td> <div r> =id div> </td>
-        </tr>
-    </table> ;
+    "+ " get-random-id dup >r
+    rot make-outliner-quot updating-anchor call
+    <span r> =id span> </span> ;
 
 : outliner-tag ( style quot -- )
     outline pick hash [ html-outliner ] [ call ] if* ;
@@ -187,7 +182,7 @@ M: html-stream with-nested-stream ( quot style stream -- )
 M: html-stream stream-terpri [ <br/> ] with-stream* ;
 
 : default-css ( -- )
-  <style>
+  <style "text/css" =type style>
     "A:link { text-decoration: none; color: black; }" print
     "A:visited { text-decoration: none; color: black; }" print
     "A:active { text-decoration: none; color: black; }" print
@@ -195,7 +190,7 @@ M: html-stream stream-terpri [ <br/> ] with-stream* ;
   </style> ;
 
 : xhtml-preamble
-    "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" print
+    xml-preamble print
     "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" print ;
 
 : html-document ( title quot -- )

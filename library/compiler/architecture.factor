@@ -7,8 +7,4 @@ DEFER: fixnum-imm? ( -- ? )
 
 DEFER: vregs ( -- regs )
 
-DEFER: dual-fp/int-regs? ( -- ? )
-#! Should fp parameters to fastcalls be loaded in integer
-#! registers too? Only for PowerPC.
-
 DEFER: compile-c-call ( library function -- )

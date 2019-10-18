@@ -1,9 +1,9 @@
-./library/win32/win32-io-internals.factor:! $Id: win32-io-internals.factor,v 1.15 2006/01/28 20:49:31 spestov Exp $
-./library/win32/win32-io.factor:! $Id: win32-io.factor,v 1.4 2005/07/23 06:11:07 eiz Exp $
-./library/win32/win32-stream.factor:! $Id: win32-stream.factor,v 1.16 2006/01/28 20:49:31 spestov Exp $
-./library/win32/win32-errors.factor:! $Id: win32-errors.factor,v 1.11 2005/12/22 02:30:00 erg Exp $
-./library/win32/win32-server.factor:! $Id: win32-server.factor,v 1.13 2006/01/28 20:49:31 spestov Exp $
-./library/win32/winsock.factor:! $Id: winsock.factor,v 1.8 2005/09/12 15:10:33 erg Exp $
+./library/windows/win32-io-internals.factor:! $Id: win32-io-internals.factor,v 1.15 2006/01/28 20:49:31 spestov Exp $
+./library/windows/win32-io.factor:! $Id: win32-io.factor,v 1.4 2005/07/23 06:11:07 eiz Exp $
+./library/windows/win32-stream.factor:! $Id: win32-stream.factor,v 1.16 2006/01/28 20:49:31 spestov Exp $
+./library/windows/win32-errors.factor:! $Id: win32-errors.factor,v 1.11 2005/12/22 02:30:00 erg Exp $
+./library/windows/win32-server.factor:! $Id: win32-server.factor,v 1.13 2006/01/28 20:49:31 spestov Exp $
+./library/windows/winsock.factor:! $Id: winsock.factor,v 1.8 2005/09/12 15:10:33 erg Exp $
 ./library/bootstrap/win32-io.factor:! $Id: win32-io.factor,v 1.10 2005/09/29 19:26:32 eiz Exp $
 ./native/s48_bignum.c:$Id: s48_bignum.c,v 1.12 2005/12/21 02:36:52 spestov Exp $
 ./native/s48_bignumint.h:$Id: s48_bignumint.h,v 1.14 2005/12/21 02:36:52 spestov Exp $

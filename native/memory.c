@@ -75,9 +75,6 @@ CELL untagged_object_size(CELL pointer)
 	case ALIEN_TYPE:
 		size = sizeof(ALIEN);
 		break;
-	case DISPLACED_ALIEN_TYPE:
-		size = sizeof(DISPLACED_ALIEN);
-		break;
 	case WRAPPER_TYPE:
 		size = sizeof(F_WRAPPER);
 		break;
@@ -187,7 +184,7 @@ void primitive_next_object(void)
 	CELL size, type;
 
 	if(!heap_scan)
-		general_error(ERROR_HEAP_SCAN,F);
+		general_error(ERROR_HEAP_SCAN,F,true);
 
 	if(heap_scan_ptr >= tenured.here)
 	{

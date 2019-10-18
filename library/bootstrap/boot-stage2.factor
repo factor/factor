@@ -1,8 +1,12 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
-USING: compiler compiler-backend io io-internals kernel
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: compiler compiler-backend help io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
+
+"Cross-referencing..." print
+xref-words
+xref-articles
 
 "compile" get [
     "native-io" get [
@@ -10,10 +14,12 @@ sequences sequences-internals words ;
             "/library/unix/load.factor" run-resource
         ] when
 
-        os "win32" = [
-            "/library/win32/load.factor" run-resource
-        ] when
     ] when
+    windows? [
+        "/library/windows/load.factor" run-resource
+    ] when
+    
+    parse-command-line
 
     "Compiling base..." print flush
 
@@ -21,7 +27,7 @@ sequences sequences-internals words ;
         uncons 1+ 1- + <= > >= mod length
         nth-unsafe set-nth-unsafe
         = string>number number>string scan
-        kill-set kill-node (generate)
+        kill-values (generate)
     } [ compile ] each
 
     "Compiling system..." print flush
@@ -34,6 +40,20 @@ sequences sequences-internals words ;
     
     "Initializing native I/O..." print flush
     "native-io" get [ init-io ] when
+    
+    "cocoa" get [
+        "/library/cocoa/load.factor" run-resource
+    ] when
+    
+    "x11" get [
+        "/library/x11/load.factor" run-resource
+    ] when
+
+    windows? "native-io" get and [
+        "/library/windows/ui.factor" run-resource
+        "/library/windows/clipboard.factor" run-resource
+        compile-all
+    ] when
 ] when
 
 [
@@ -42,10 +62,6 @@ sequences sequences-internals words ;
     "shell" get "shells" lookup execute
     0 exit
 ] set-boot
-
-"Building cross-referencing database..." print
-H{ } clone crossref set
-recrossref
 
 [ compiled? ] word-subset length
 number>string write " compiled words" print

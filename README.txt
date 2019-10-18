@@ -10,8 +10,9 @@ Factor is fully supported on the following platforms:
 
   Linux/x86
   Linux/AMD64
-  Microsoft Windows 2000 or later
   Mac OS X/PowerPC
+  Solaris/x86
+  Microsoft Windows 2000 or later
 
 The following platforms should work, but are not tested on a
 regular basis:
@@ -19,6 +20,7 @@ regular basis:
   FreeBSD/x86
   FreeBSD/AMD64
   Linux/PowerPC
+  Solaris/AMD64
 
 Other platforms are not supported.
 
@@ -37,11 +39,8 @@ parameters to build the Factor runtime:
   linux
   linux-ppc
   macosx
-  macosx-sdl
+  solaris
   windows
-
-Note: If you wish to use the Factor UI on Mac OS X, you must build with
-the macosx-sdl target.
 
 The following options can be given to make:
 
@@ -124,6 +123,7 @@ as, and issue a command similar to the following to bootstrap Factor:
   library/ - sources for the library, written in Factor
     alien/ - C library interface
     bootstrap/ - code for generating boot images
+    cocoa/ - Mac OS X Cocoa API and Objective-C runtime binding
     collections/ - data types including but not limited to lists,
       vectors, hashtables, and operations on them
     compiler/ - optimizing native compiler
@@ -135,7 +135,6 @@ as, and issue a command similar to the following to bootstrap Factor:
     io/ - input and output streams
     math/ - integers, ratios, floats, complex numbers, vectors, matrices
     opengl/ - OpenGL graphics library binding
-    sdl/ - SDL binding
     syntax/ - parser and object prettyprinter
     test/ - unit test framework and test suite
     tools/ - interactive development tools

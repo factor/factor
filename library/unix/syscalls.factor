@@ -46,10 +46,6 @@ END-STRUCT
 : gethostbyname ( name -- hostent )
     "hostent*" "libc" "gethostbyname" [ "char*" ] alien-invoke ;
 
-: AF_INET 2 ;
-: PF_INET AF_INET ;
-: SOCK_STREAM 1 ;
-
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
 FUNCTION: int setsockopt ( int s, int level, int optname, void* optval, socklen_t optlen ) ;
 FUNCTION: int connect ( int s, sockaddr-in* name, socklen_t namelen ) ;

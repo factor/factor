@@ -1,35 +1,85 @@
+should fix in 0.82:
+
+- amd64 %box-struct
+- get factor running on mac intel
+- when generating a 32-bit image on a 64-bit system, large numbers which should
+  be bignums become fixnums
+- httpd fep
+- defining methods returning structs in objc
+- expired aliens in view hash
+- clicks sent twice
+- speed up ideas:
+  - only do clipping for certain gadgets
+  - use glRect
+- remove <char*>, <ushort*>, set-char*-nth, set-ushort*-nth since they
+  have incorrect semantics
+- cocoa: global menu bar with useful commands
+
++ portability:
+
+- win64 port
+- amd64 %unbox-struct
+
++ io:
+
+- stream server can hang because of exception handler limitations
+- better i/o scheduler
+- yield in a loop starves i/o
+- "localhost" 50 <client> won't fail
+
++ ui/help:
+
+- help search
+- reimplement clicking input
+- reimplement tab completion
+- x11 input methods
+- x11 title bars are funny
+- cocoa:
+  - don't multiplex in the event loop if there is no pending i/o
+  - horizontal scrolling
+- fix mouse-overs...
+- display lists
+- saving the image should save window configuration
+- make the UI look better, something like this:
+  http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
 - fix remaining HTML stream issues
-- help cross-referencing
-- UI browser pane needs 'back' button
-- runtime primitives like fopen: check for null input
-- amd64 alien calls
-- port ffi to win64
-- intrinsic char-slot set-char-slot for x86
 - fix up the min thumb size hack
-- the invalid recursion form case needs to be fixed, for inlines too
-- code walker & exceptions
-- signal handler should not lose stack pointers
+- automatically update help graph when adding/removing articles/words
+- document conventions
+- new turtle graphics tutorial
+- better line spacing in ui and html
+- tabular formatting - for inspector, changes and $values in help
+- grid layout
+- variable width word wrap
+- fix top level window positioning
+- changing window titles
+
++ compiler/ffi:
+
+- core foundation should use unicode strings
+- alien>utf16-string, utf16-string>alien words
+- can <void*> only be called with an alien?
+- improve callback efficiency
+- float intrinsics
+- complex float type
+- complex float intrinsics
+- out of memory from overflow check
+- remove literal table
+- C functions returning structs by value
 - FIELD: char key_vector[32];
 - FIELD: union { char b[20]; short s[10]; long l[5]; } data;
 - MEMBER: long pad[24];
-- C structs, enums, unions: use new-style string mode parsing
-- ffi unicode strings: null char security hole
-- utf16 string boxing
+- C structs: use new-style string mode parsing
 - [ [ dup call ] dup call ] infer hangs
-- slice: if sequence or seq start is changed, abstraction violation
-- out of memory error when printing global namespace
-- delegating generic words with a non-standard picker
+- the invalid recursion form case needs to be fixed, for inlines too
 - code gc
-- stream server can hang because of exception handler limitations
-- better i/o scheduler
-- if two tasks write to a unix stream, the buffer can overflow
-- font problem: http://iarc1.ece.utexas.edu/~erg/font-bug.JPG
+- compiled gc check slows things down
+
++ misc:
+
+- code walker & exceptions
+- slice: if sequence or seq start is changed, abstraction violation
 - make 3.4 bits>double an error
-
-- 2220.446049250313 [ dup float? [ tanh ] when ] 
-  - call and compile-1 give  C{ 0.0/0.0 0.0/0.0 }  0.0/0.0
-- 2.718281828459045e+19 [ dup float? [ sech ] when ]
-  - call/compile-1:  C{ 0.0/0.0 0.0/0.0 }  0.0
-- 0.0/0.0 next-power-of-2 never terminates -- comparison always returns false
-- 0.0/0.0 >fixnum .  -> 0    0.0/0.0 >bignum .  -> 0
-
+- colorcoded prettyprinting for vocabularies
+- signal handler should not lose stack pointers
+- code walker and callbacks is broken?

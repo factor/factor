@@ -59,11 +59,9 @@ C: gadget ( -- gadget )
 
 : delegate>gadget ( tuple -- ) <gadget> swap set-delegate ;
 
-GENERIC: user-input* ( ch gadget -- ? )
+GENERIC: user-input* ( str gadget -- ? )
 
 M: gadget user-input* 2drop t ;
-
-DEFER: add-invalid
 
 GENERIC: children-on ( rect/point gadget -- list )
 

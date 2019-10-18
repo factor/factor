@@ -24,7 +24,7 @@ M: inference-error error. ( error -- )
     "Recursive state:" print
     inference-error-rstate describe ;
 
-M: integer value-literal ( value -- )
+M: object value-literal ( value -- )
     {
         "A literal value was expected where a computed value was found.\n"
         "This means the word you are inferring applies 'call' or 'execute'\n"
@@ -48,14 +48,12 @@ SYMBOL: d-in
 
 : value-vector ( n -- vector ) [ drop <computed> ] map >vector ;
 
-: required-inputs ( n stack -- n ) length - 0 max ;
-
 : add-inputs ( n stack -- stack )
-    tuck required-inputs dup 0 >
+    tuck length - dup 0 >
     [ value-vector swap append ] [ drop ] if ;
 
 : ensure-values ( n -- )
-    dup meta-d get required-inputs d-in [ + ] change
+    dup meta-d get length - 0 max d-in [ + ] change
     meta-d [ add-inputs ] change ;
 
 : effect ( -- { in# out# } )

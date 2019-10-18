@@ -197,7 +197,7 @@ HELP: GENERIC: "word"
     "A " { $link "method-combination" } " facility exists for customizing method dispatch behavior."
     $terpri
     "This parsing word is equivalent to the following usage of the more general " { $link POSTPONE: G: } " word:"
-    { $code "G: word simple-combination ;" }
+    { $code "G: word 0 standard-combination ;" }
 }
 { $see-also define-generic } ;
 

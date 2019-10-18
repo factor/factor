@@ -26,9 +26,7 @@ threads unix-internals ;
 
 : with-socket-fd ( quot -- fd | quot: socket -- n )
     socket-fd [ swap call ] keep  swap 0 < [
-        err_no EINPROGRESS = [
-            dup close -1 io-error
-        ] unless
+        err_no EINPROGRESS = [ dup close (io-error) ] unless
     ] when ; inline
 
 : client-socket ( host port -- fd )
@@ -64,7 +62,7 @@ TUPLE: server client ;
 
 C: server ( port -- server )
     #! Starts listening for TCP connections on localhost:port.
-    [ >r server-socket 0 <port> r> set-delegate ] keep
+    [ >r server-socket f <port> r> set-delegate ] keep
     server over set-port-type ;
 
 IN: io-internals

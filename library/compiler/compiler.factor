@@ -1,13 +1,18 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: compiler-backend compiler-frontend errors hashtables
 inference io kernel lists math namespaces optimizer prettyprint
-sequences words ;
+sequences test words ;
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
     dup word-def dataflow optimize linearize
     [ split-blocks simplify generate ] hash-each ;
+
+: benchmark-compile
+    [ [ (compile) ] keep ] benchmark nip
+    "compile-time" set-word-prop ;
 
 : inform-compile ( word -- ) "Compiling " write . flush ;
 
@@ -15,37 +20,29 @@ sequences words ;
     compile-words get dup empty? [
         dup pop
         dup inform-compile
-        (compile)
+        benchmark-compile
         compile-postponed
     ] unless drop ;
 
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;
 
-: compiled ( -- )
-    #! Compile the most recently defined word.
-    "compile" get [ word compile ] when ; parsing
+: compiled ( -- ) "compile" get [ word compile ] when ; parsing
 
 : try-compile ( word -- )
     [ compile ] [ error. drop ] recover ;
 
-: compile-all ( -- )
-    [ f "no-effect" set-word-prop ] each-word
-    [ try-compile ] each-word ;
+: compile-vocabs ( vocabs -- )
+    [ words ] map concat
+    dup [ f "no-effect" set-word-prop ] each
+    [ try-compile ] each ;
+
+: compile-all ( -- ) vocabs compile-vocabs ;
 
 : recompile ( word -- ) dup update-xt compile ;
 
-: compile-1 ( quot -- )
-    #! Compute and call a quotation.
-    "compile" get [
-        gensym [ swap define-compound ] keep dup compile execute
-    ] [
-        call
-    ] if ;
+: compile-quot ( quot -- word )
+    gensym [ swap define-compound ] keep
+    "compile" get [ dup compile ] when ;
 
-\ dataflow profile
-\ optimize profile
-\ linearize profile
-\ split-blocks profile
-\ simplify profile
-\ generate profile
+: compile-1 ( quot -- ) compile-quot execute ;

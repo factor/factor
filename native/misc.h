@@ -1,3 +1,4 @@
+void *safe_malloc(size_t size);
 void primitive_exit(void);
 void primitive_os_env(void);
 void primitive_eq(void);

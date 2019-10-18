@@ -12,24 +12,84 @@ void reset_callstack(void)
 
 void fix_stacks(void)
 {
-	if(STACK_UNDERFLOW(ds,ds_bot))
+	if(STACK_UNDERFLOW(ds,stack_chain->data_region))
 		reset_datastack();
-	else if(STACK_OVERFLOW(ds,ds_bot,ds_size))
+	else if(STACK_OVERFLOW(ds,stack_chain->data_region))
 		reset_datastack();
-	else if(STACK_UNDERFLOW(cs,cs_bot))
+	else if(STACK_UNDERFLOW(cs,stack_chain->call_region))
 		reset_callstack();
-	else if(STACK_OVERFLOW(cs,cs_bot,cs_size))
+	else if(STACK_OVERFLOW(cs,stack_chain->call_region))
 		reset_callstack();
 }
 
+/* called before entry into foreign C code. Note that ds and cs are stored
+in registers, so callbacks must save and restore the correct values */
+void save_stacks(void)
+{
+	stack_chain->data = ds;
+	stack_chain->call = cs;
+}
+
+/* called on entry into a compiled callback */
+void nest_stacks(void)
+{
+	STACKS *new_stacks = safe_malloc(sizeof(STACKS));
+	
+	/* note that these register values are not necessarily valid stack
+	pointers. they are merely saved non-volatile registers, and are
+	restored in unnest_stacks(). consider this scenario:
+	- factor code calls C function
+	- C function saves ds/cs registers (since they're non-volatile)
+	- C function clobbers them
+	- C function calls Factor callback
+	- Factor callback returns
+	- C function restores registers
+	- C function returns to Factor code */
+	new_stacks->data_save = ds;
+	new_stacks->call_save = cs;
+	new_stacks->cards_offset = cards_offset;
+
+	new_stacks->callframe = callframe;
+	new_stacks->catch_save = userenv[CATCHSTACK_ENV];
+
+	new_stacks->data_region = alloc_bounded_block(ds_size);
+	new_stacks->call_region = alloc_bounded_block(cs_size);
+	new_stacks->next = stack_chain;
+	stack_chain = new_stacks;
+
+	callframe = F;
+	reset_datastack();
+	reset_callstack();
+	update_cards_offset();
+}
+
+/* called when leaving a compiled callback */
+void unnest_stacks(void)
+{
+	STACKS *old_stacks = stack_chain;
+
+	dealloc_bounded_block(stack_chain->data_region);
+	dealloc_bounded_block(stack_chain->call_region);
+
+	ds = old_stacks->data_save;
+	cs = old_stacks->call_save;
+	cards_offset = old_stacks->cards_offset;
+
+	callframe = old_stacks->callframe;
+	userenv[CATCHSTACK_ENV] = old_stacks->catch_save;
+
+	stack_chain = old_stacks->next;
+	
+	free(old_stacks);
+}
+
+/* called on startup */
 void init_stacks(CELL ds_size_, CELL cs_size_)
 {
 	ds_size = ds_size_;
 	cs_size = cs_size_;
-	ds_bot = (CELL)alloc_guarded(ds_size);
-	reset_datastack();
-	cs_bot = (CELL)alloc_guarded(cs_size);
-	reset_callstack();
+	stack_chain = NULL;
+	nest_stacks();
 }
 
 void primitive_drop(void)
@@ -181,7 +241,7 @@ void primitive_callstack(void)
 	dpush(tag_object(stack_to_vector(cs_bot,cs)));
 }
 
-/* Returns top of stack */
+/* returns pointer to top of stack */
 CELL vector_to_stack(F_VECTOR* vector, CELL bottom)
 {
 	CELL start = bottom;

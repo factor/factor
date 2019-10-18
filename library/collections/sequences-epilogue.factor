@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
-USING: errors generic kernel kernel-internals lists math
+USING: errors generic kernel kernel-internals math
 sequences-internals strings vectors words ;
 
 : first2 ( { x y } -- x y )
@@ -15,22 +15,26 @@ sequences-internals strings vectors words ;
 
 M: object like drop ;
 
-M: object empty? ( seq -- ? ) length zero? ;
+: index   ( obj seq -- n )
+    [ = ] find-with drop ; flushable
 
-: (>list) ( n i seq -- list )
-    pick pick <= [
-        3drop [ ]
-    ] [
-        2dup nth >r >r 1+ r> (>list) r> swons
-    ] if ;
+: index*  ( obj i seq -- n )
+    [ = ] find-with* drop ; flushable
 
-M: object >list ( seq -- list ) dup length 0 rot (>list) ;
+: last-index   ( obj seq -- n )
+    [ = ] find-last-with drop ; flushable
 
-: index   ( obj seq -- n )     [ = ] find-with drop ; flushable
-: index*  ( obj i seq -- n )   [ = ] find-with* drop ; flushable
-: member? ( obj seq -- ? )     [ = ] contains-with? ; flushable
-: memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
-: remove  ( obj list -- list ) [ = not ] subset-with ; flushable
+: last-index*  ( obj i seq -- n )
+    [ = ] find-last-with* drop ; flushable
+
+: member? ( obj seq -- ? )
+    [ = ] contains-with? ; flushable
+
+: memq?   ( obj seq -- ? )
+    [ eq? ] contains-with? ; flushable
+
+: remove  ( obj list -- list )
+    [ = not ] subset-with ; flushable
 
 : (subst) ( newseq oldseq elt -- new/elt )
     [ swap index ] keep
@@ -84,8 +88,7 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
     rot [ [ rot nappend ] keep swap nappend ] immutable ; flushable
 
-M: object peek ( sequence -- element )
-    dup length 1- swap nth ;
+: peek ( sequence -- element ) dup length 1- swap nth ;
 
 : pop* ( sequence -- )
     [ length 1- ] keep
@@ -114,6 +117,13 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
         [ swap [ nth ] map-with ] map-with
     ] unless ; flushable
 
+: exchange ( n n seq -- )
+    pick over bounds-check 2drop 2dup bounds-check 2drop
+    exchange-unsafe ;
+
+: assoc ( key assoc -- value ) 
+    [ first = ] find-with nip second ;
+
 IN: kernel
 
 M: object <=>
@@ -136,6 +146,4 @@ M: object <=>
     datastack >r >r set-datastack r> execute
     datastack r> [ push ] keep set-datastack 2nip ;
 
-: win32? ( -- ? ) os "win32" = ;
-
-: unix? ( -- ? ) os { "freebsd" "linux" "macosx" } member? ;
+: unix? os { "freebsd" "linux" "macosx" "solaris" } member? ;

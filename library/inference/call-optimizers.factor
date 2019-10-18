@@ -45,9 +45,9 @@ math math-internals sequences words ;
 
 : flip-branches ( not -- #if )
     #! If a not is followed by an #if, flip branches and
-    #! remove the note.
+    #! remove the not.
     dup flip-subst node-successor dup
-    dup node-children first2 swap 2array swap set-node-children ;
+    dup node-children reverse swap set-node-children ;
 
 \ not {
     { [ dup node-successor #if? ] [ flip-branches ] }

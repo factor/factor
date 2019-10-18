@@ -115,7 +115,8 @@ $terpri
 { $subsection "syntax-booleans" }
 { $subsection "syntax-strings" }
 { $subsection "syntax-sbufs" }
-{ $subsection "syntax-lists" } ;
+{ $subsection "syntax-lists" }
+{ $subsection "syntax-aliens" } ;
 
 GLOSSARY: "number" "an instance of the " { $link number } " class" ;
 
@@ -255,3 +256,9 @@ ARTICLE: "syntax-lists" "Quotation syntax"
 { $subsection POSTPONE: [ }
 { $subsection POSTPONE: ] }
 "Quotations are documented in " { $link "quotations" } "." ;
+
+ARTICLE: "syntax-aliens" "Alien interface objects"
+"These literal forms mainly exist for print-outs, and should not be input unless you know what you are doing."
+{ $subsection POSTPONE: DLL" }
+{ $subsection POSTPONE: ALIEN: }
+"The alien interface is documented in " { $link "alien" } "." ;

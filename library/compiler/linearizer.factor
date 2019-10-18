@@ -1,14 +1,33 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: arrays compiler-backend generic hashtables inference
+kernel math namespaces sequences words ;
 IN: compiler-frontend
-USING: arrays compiler-backend errors generic hashtables
-inference kernel lists math namespaces prettyprint sequences
-strings words ;
 
-: in-1 0 0 %peek-d , ;
-: in-2 0 1 %peek-d ,  1 0 %peek-d , ;
-: in-3 0 2 %peek-d ,  1 1 %peek-d ,  2 0 %peek-d , ;
-: out-1 T{ vreg f 0 } 0 %replace-d , ;
+! On PowerPC and AMD64, we use a stack discipline whereby
+! stack frames are used to hold parameters. We need to compute
+! the stack frame size to compile the prologue on entry to a
+! word.
+GENERIC: stack-reserve*
+
+M: object stack-reserve* drop 0 ;
+
+: stack-reserve ( node -- )
+    0 swap [ stack-reserve* max ] each-node ;
+
+DEFER: #terminal?
+
+PREDICATE: #merge #terminal-merge node-successor #terminal? ;
+
+UNION: #terminal POSTPONE: f #return #values #terminal-merge ;
+
+: tail-call? ( -- ? )
+    node-stack get [ node-successor ] map [ #terminal? ] all? ;
+
+GENERIC: linearize* ( node -- next )
+
+: linearize-child ( node -- )
+    [ node@ linearize* ] iterate-nodes ;
 
 ! A map from words to linear IR.
 SYMBOL: linearized
@@ -17,20 +36,15 @@ SYMBOL: linearized
 ! name in different scopes.
 SYMBOL: renamed-labels
 
-: rename-label ( label -- label )
-    <label> dup rot renamed-labels get set-hash ;
+: make-linear ( word quot -- )
+    [
+        swap >r { } make r> linearized get set-hash
+    ] with-node-iterator ; inline
 
-: renamed-label ( label -- label )
-    renamed-labels get hash ;
-
-GENERIC: linearize* ( node -- )
-
-: linearize-1 ( word dataflow -- )
-    #! Transform dataflow IR into linear IR. This strips out
-    #! stack flow information, and flattens conditionals into
-    #! jumps and labels.
-    [ %prologue , linearize* ] { } make
-    swap linearized get set-hash ;
+: linearize-1 ( word node -- )
+    swap [
+        dup stack-reserve %prologue , linearize-child
+    ] make-linear ;
 
 : init-linearizer ( -- )
     H{ } clone linearized set
@@ -41,25 +55,36 @@ GENERIC: linearize* ( node -- )
     #! respective linear IR.
     init-linearizer linearize-1 linearized get ;
 
-: linearize-next node-successor linearize* ;
+M: node linearize* ( node -- next ) drop iterate-next ;
 
-M: f linearize* ( f -- ) drop ;
+: linearize-call ( label -- next )
+    tail-call? [
+        %jump , f
+    ] [
+        %call , iterate-next
+    ] if ;
 
-M: node linearize* ( node -- ) linearize-next ;
+: rename-label ( label -- label )
+    <label> dup rot renamed-labels get set-hash ;
 
-: linearize-call ( node label -- )
-    over node-successor #return?
-    [ %jump , drop ] [ %call , linearize-next ] if ;
+: renamed-label ( label -- label )
+    renamed-labels get hash ;
 
-: linearize-call-label ( node -- )
-    dup node-param rename-label linearize-call ;
+: linearize-call-label ( label -- next )
+    rename-label linearize-call ;
 
-M: #label linearize* ( node -- )
+M: #label linearize* ( node -- next )
     #! We remap the IR node's label to a new label object here,
     #! to avoid problems with two IR #label nodes having the
     #! same label in different lexical scopes.
-    dup linearize-call-label dup node-param renamed-label
-    swap node-child linearize-1 ;
+    dup node-param dup linearize-call-label >r
+    renamed-label swap node-child linearize-1
+    r> ;
+
+: in-1 0 0 %peek-d , ;
+: in-2 0 1 %peek-d ,  1 0 %peek-d , ;
+: in-3 0 2 %peek-d ,  1 1 %peek-d ,  2 0 %peek-d , ;
+: out-1 T{ vreg f 0 } 0 %replace-d , ;
 
 : intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
 
@@ -67,45 +92,49 @@ M: #label linearize* ( node -- )
     dup node-successor #if?
     [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
 
-: linearize-if ( node label -- )
-    #! Assume the quotation emits a VOP that jumps to the label
-    #! if some condition holds; we linearize the false branch,
-    #! then the label, then the true branch.
-    >r node-children first2 linearize* r> %label , linearize* ;
+: linearize-if ( node label -- next )
+    <label> dup >r >r >r node-children first2 linearize-child
+    r> r> %jump-label , %label , linearize-child r> %label ,
+    iterate-next ;
 
-M: #call linearize* ( node -- )
+M: #call linearize* ( node -- next )
     dup if-intrinsic [
         >r <label> 2dup r> call
-        >r node-successor r> linearize-if
+        >r node-successor r> linearize-if node-successor
     ] [
-        dup intrinsic [
-            dupd call linearize-next
-        ] [
-            dup node-param linearize-call
-        ] if*
+        dup intrinsic
+        [ call iterate-next ] [ node-param linearize-call ] if*
     ] if* ;
 
-M: #call-label linearize* ( node -- )
-    dup node-param renamed-label linearize-call ;
+M: #call-label linearize* ( node -- next )
+    node-param renamed-label linearize-call ;
 
-M: #if linearize* ( node -- )
-    <label> dup in-1  -1 %inc-d , 0 %jump-t , linearize-if ;
+: ?static-branch ( node -- n )
+    node-in-d first dup value?
+    [ value-literal 0 1 ? ] [ drop f ] if ;
 
-: dispatch-head ( vtable -- label/code )
+M: #if linearize* ( node -- next )
+    dup ?static-branch [
+        -1 %inc-d ,
+        swap node-children nth linearize-child iterate-next
+    ] [
+        in-1 -1 %inc-d , <label> dup 0 %jump-t , linearize-if
+    ] if* ;
+
+: dispatch-head ( vtable -- label/node )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    in-1
-    -1 %inc-d ,
-    0 %dispatch ,
-    [ <label> dup %target-label ,  cons ] map ;
+    in-1 -1 %inc-d , 0 %dispatch ,
+    [ <label> dup %target-label ,  2array ] map ;
 
-: dispatch-body ( label/param -- )
-    [ uncons %label , linearize* ] each ;
+: dispatch-body ( label/node -- )
+    <label> swap [
+        first2 %label , linearize-child dup %jump-label ,
+    ] each %label , ;
 
-M: #dispatch linearize* ( vtable -- )
+M: #dispatch linearize* ( node -- next )
     #! The parameter is a list of nodes, each one is a branch to
     #! take in case the top of stack has that type.
-    node-children dispatch-head dispatch-body ;
+    node-children dispatch-head dispatch-body iterate-next ;
 
-M: #return linearize* ( node -- )
-    drop %return , ;
+M: #return linearize* drop %return , f ;

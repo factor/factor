@@ -5,13 +5,9 @@ INLINE void execute(F_WORD* word)
 	((XT)(word->xt))(word);
 }
 
-void run(void)
+/* Called from platform_run() */
+void handle_error(void)
 {
-	CELL next;
-
-	/* Error handling. */
-	SETJMP(toplevel);
-
 	if(throwing)
 	{
 		if(thrown_keep_stacks)
@@ -33,11 +29,19 @@ void run(void)
 		call(userenv[BREAK_ENV]);
 		throwing = false;
 	}
+}
+
+void run(void)
+{
+	CELL next;
 
 	for(;;)
 	{
 		if(callframe == F)
 		{
+			if(cs_bot - cs == CELLS)
+				return;
+
 			callframe = cpop();
 			executing = cpop();
 			continue;
@@ -62,10 +66,24 @@ void run(void)
 	}
 }
 
+void run_toplevel(void)
+{
+	SETJMP(stack_chain->toplevel);
+	handle_error();
+	run();
+}
+
+/* Called by compiled callbacks after nest_stacks() and boxing registers */
+void run_callback(CELL quot)
+{
+	call(quot);
+	platform_run();
+}
+
 /* XT of deferred words */
 void undefined(F_WORD* word)
 {
-	general_error(ERROR_UNDEFINED_WORD,tag_object(word));
+	general_error(ERROR_UNDEFINED_WORD,tag_object(word),true);
 }
 
 /* XT of compound definitions */

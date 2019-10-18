@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: hashtables kernel math sequences ;
+USING: hashtables kernel math namespaces sequences ;
 
 TUPLE: timer object delay last ;
 
@@ -14,7 +14,7 @@ C: timer ( object delay -- timer )
 
 GENERIC: tick ( ms object -- )
 
-DEFER: timers
+: timers \ timers get-global ;
 
 : add-timer ( object delay -- )
     over >r <timer> r> timers set-hash ;

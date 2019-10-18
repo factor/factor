@@ -78,8 +78,12 @@ M: word summary ( word -- )
 DEFER: describe
 
 : sheet. ( sheet -- )
-    dup format-sheet swap peek
-    [ dup [ describe ] curry simple-outliner terpri ] 2each ;
+    dup empty? [
+        drop
+    ] [
+        dup format-sheet swap peek
+        [ dup [ describe ] curry simple-outliner terpri ] 2each
+    ] if ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
@@ -92,20 +96,13 @@ DEFER: describe
 : words. ( vocab -- )
     words natural-sort [ (help) ] sequence-outliner ;
 
-: vocabs. ( -- )
-    #! Outlining word browser.
-    vocabs [ words. ] sequence-outliner ;
+: vocabs. ( -- ) vocabs [ words. ] sequence-outliner ;
 
-: usage. ( word -- )
-    #! Outlining usages browser.
-    usage [ usage. ] sequence-outliner ;
+: usage. ( word -- ) usage [ usage. ] sequence-outliner ;
 
-: uses. ( word -- )
-    #! Outlining call hierarchy browser.
-    uses [ uses. ] sequence-outliner ;
+: uses. ( word -- ) uses [ uses. ] sequence-outliner ;
 
-: stack. ( seq -- seq )
-    reverse-slice >array describe ;
+: stack. ( seq -- seq ) reverse-slice >array describe ;
 
 : .s datastack stack. ;
 : .r callstack stack. ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 ! This library allows one to generate a new set of bootstrap
-! images (boot.image.{le32,le64,be32,be64}.
+! images.
 !
 ! It does this by parsing the set of source files needed to
 ! generate the minimal image, and writing the cons cells, words,
@@ -59,8 +59,8 @@ SYMBOL: architecture
 : string-type    12 ; inline
 : sbuf-type      13 ; inline
 : wrapper-type   14 ; inline
-: word-type      17 ; inline
-: tuple-type     18 ; inline
+: word-type      16 ; inline
+: tuple-type     17 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) object-tag immediate ;
@@ -112,7 +112,7 @@ M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
 
-: bignum-bits cell-bits 2 - ;
+: bignum-bits bootstrap-cell-bits 2 - ;
 
 : bignum-radix bignum-bits 1 swap shift 1- ;
 
@@ -303,7 +303,7 @@ M: hashtable ' ( hashtable -- pointer )
     [
         {
             vocabularies typemap builtins c-types crossref
-            articles terms
+            articles terms help-graph
         }
         [ [ ] change ] each
     ] make-hash '
@@ -352,8 +352,6 @@ M: hashtable ' ( hashtable -- pointer )
     800000 <vector> image set 20000 <hashtable> objects set ;
 
 : make-image ( architecture -- )
-    #! Make a bootstrap image for the given architecture
-    #! (x86, ppc, or amd64).
     [
         prepare-image
         begin-image
@@ -363,4 +361,4 @@ M: hashtable ' ( hashtable -- pointer )
     ] with-scope ;
 
 : make-images ( -- )
-    "x86" make-image "ppc" make-image "amd64" make-image ;
+    { "x86" "ppc" "amd64" } [ make-image ] each ;

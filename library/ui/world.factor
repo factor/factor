@@ -1,120 +1,47 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: alien arrays errors freetype gadgets-layouts generic io
-kernel lists math memory namespaces opengl prettyprint sdl
-sequences sequences strings styles threads ;
+USING: errors freetype gadgets-layouts generic hashtables kernel
+math namespaces opengl sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
-! gadgets are contained in. The current world is stored in the
-! world variable. The invalid slot is a list of gadgets that
-! need to be layout.
-TUPLE: world running? glass status invalid timers ;
+! gadgets are contained in.
 
-: timers ( -- hash ) world get world-timers ;
+! fonts: mapping font tuples to sprite vectors
+! handle: native resource
+TUPLE: world status focus fonts handle ;
 
-: add-layer ( gadget -- )
-    world get add-gadget ;
+: free-fonts ( world -- )
+    dup world-handle select-gl-context
+    world-fonts dup hash-values [ free-sprites ] each
+    clear-hash ;
 
-C: world ( -- world )
-    <stack> over set-delegate
+: font-sprites ( font world -- sprites )
+    world-fonts [ drop V{ } clone ] cache ;
+
+: add-status ( status world -- )
+    [ set-world-status ] 2keep @bottom frame-add ;
+
+DEFER: request-focus
+
+C: world ( gadget status -- world )
+    dup delegate>frame
     t over set-gadget-root?
-    H{ } clone over set-world-timers ;
+    H{ } clone over set-world-fonts
+    [ add-status ] keep
+    [ @center frame-add ] 2keep
+    swap request-focus ;
 
-: add-invalid ( gadget -- )
-    world get [ world-invalid cons ] keep set-world-invalid ;
+GENERIC: find-world ( gadget -- world )
 
-: pop-invalid ( -- list )
-    world get [ world-invalid f ] keep set-world-invalid ;
+M: f find-world ;
 
-: layout-world ( -- )
-    world get world-invalid
-    [ pop-invalid [ layout ] each layout-world ] when ;
+M: gadget find-world gadget-parent find-world ;
 
-: hide-glass ( -- )
-    f world get dup world-glass unparent set-world-glass ;
+M: world find-world ;
 
-: show-glass ( gadget -- )
-    hide-glass
-    <gadget> dup add-layer dup world get set-world-glass
-    dupd add-gadget prefer ;
+M: world pref-dim* ( world -- dim )
+    delegate pref-dim* { 1024 768 0 } vmin ;
 
-: world-clip ( -- )
-    { 0 0 0 } width get height get 0 3array <rect> clip set ;
-
-: draw-world ( -- )
-    [ world-clip world get draw-gadget ] with-gl-surface ;
-
-! Status bar protocol
-GENERIC: set-message ( string/f status -- )
-
-M: f set-message 2drop ;
-
-: show-message ( string/f -- )
-    #! Show a message in the status bar.
-    world get world-status set-message ;
-
-: relevant-help ( -- string )
-    hand get hand-gadget
-    parents [ gadget-help ] map [ ] find nip ;
-
-: update-help ( -- )
-    #! Update mouse-over help message.
-    relevant-help show-message ;
-
-: under-hand ( -- seq )
-    #! A sequence whose first element is the world and last is
-    #! the current gadget, with all parents in between.
-    hand get hand-gadget parents reverse-slice ;
-
-: hand-grab ( -- gadget )
-    hand get rect-loc world get pick-up ;
-
-: update-hand-gadget ( -- )
-    hand-grab hand get set-hand-gadget ;
-
-: move-hand ( loc -- )
-    under-hand >r hand get set-rect-loc
-    update-hand-gadget
-    under-hand r> hand-gestures update-help ;
-
-: update-clicked ( -- )
-    hand get
-    dup hand-gadget over set-hand-clicked
-    dup screen-loc over set-hand-click-loc
-    dup hand-gadget over relative swap set-hand-click-rel ;
-
-: update-hand ( -- )
-    #! Called when a gadget is removed or added.
-    hand get rect-loc move-hand ;
-
-: stop-world ( -- )
-    f world get set-world-running? ;
-
-: ui-title
-    [ "Factor " % version % " - " % image % ] "" make ;
-
-: start-world ( -- )
-    ui-title dup SDL_WM_SetCaption
-    world get dup relayout t swap set-world-running? ;
-
-: world-step ( -- )
-    world get world-invalid >r layout-world r>
-    [ update-hand draw-world ] when ;
-
-: next-event ( -- event ? ) "event" <c-object> dup SDL_PollEvent ;
-
-GENERIC: handle-event ( event -- )
-
-: world-loop ( -- )
-    #! Keep polling for events until there are no more events in
-    #! the queue; then block for the next event.
-    next-event [
-        handle-event world-loop
-    ] [
-        drop world-step do-timers
-        world get world-running? [ 10 sleep world-loop ] when
-    ] if ;
-
-: run-world ( -- )
-    [ start-world world-loop ] [ stop-world ] cleanup ;
+: focused-ancestors ( world -- seq )
+    world-focus parents reverse-slice ;

@@ -300,7 +300,11 @@ M: wrapper pprint* ( wrapper -- )
 
 : pprint ( object -- ) [ pprint* ] with-pprint ;
 
-: . ( obj -- ) pprint terpri ;
+: . ( obj -- )
+    H{
+       { length-limit 1000 }
+       { nesting-limit 10 }
+    } clone [ pprint ] bind terpri ;
 
 : unparse ( object -- str ) [ pprint ] string-out ;
 

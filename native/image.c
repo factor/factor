@@ -14,17 +14,22 @@ void init_objects(HEADER *h)
 	bignum_neg_one = h->bignum_neg_one;
 }
 
-void load_image(char* filename, int literal_table)
+void load_image(const char* filename, int literal_table)
 {
 	FILE* file;
 	HEADER h;
 	HEADER_2 ext_h;
 
-	printf("Loading %s...",filename);
-
 	file = fopen(filename,"rb");
 	if(file == NULL)
-		fatal_error("Cannot open image for reading",errno);
+	{
+		fprintf(stderr,"Cannot open image file: %s\n",filename);
+		fprintf(stderr,"%s\n",strerror(errno));
+		usage();
+		exit(1);
+	}
+
+	printf("Loading %s...",filename);
 
 	/* read header */
 	{
@@ -90,7 +95,7 @@ void load_image(char* filename, int literal_table)
 	fflush(stdout);
 }
 
-bool save_image(char* filename)
+bool save_image(const char* filename)
 {
 	FILE* file;
 	HEADER h;

@@ -24,12 +24,13 @@ H{ } clone c-types set
 "syntax" vocab
 
 H{ } clone vocabularies set
-H{ } clone articles set
-H{ } clone terms set
-
 crossref off
 
 vocabularies get [ "syntax" set [ reveal ] each ] bind
+
+H{ } clone articles set
+H{ } clone terms set
+help-graph off
 
 ! Call the quotation parsed from primitive-types.factor
 call
@@ -160,7 +161,6 @@ call
     { "dlopen" "alien"                      }
     { "dlsym" "alien"                       }
     { "dlclose" "alien"                     }
-    { "<alien>" "alien"                     }
     { "<byte-array>" "arrays"               }
     { "<displaced-alien>" "alien"           }
     { "alien-signed-cell" "alien"           }
@@ -283,7 +283,8 @@ num-types f <array> builtins set
 { { 0 { "real" "math" } f } { 1 { "imaginary" "math" } f } } define-builtin
 "complex" "math" create 4 "math-priority" set-word-prop
 
-"displaced-alien" "alien" create 7 "displaced-alien?" "alien" create { } define-builtin
+"alien" "alien" create 7 "alien?" "alien" create
+{ { 1 { "underlying-alien" "alien" } f } } define-builtin
 
 "array?" "arrays" create t "inline" set-word-prop
 "array" "arrays" create 8 "array?" "arrays" create
@@ -329,11 +330,8 @@ num-types f <array> builtins set
 "dll" "alien" create 15 "dll?" "alien" create
 { { 1 { "dll-path" "alien" } f } } define-builtin
 
-"alien?" "alien" create t "inline" set-word-prop
-"alien" "alien" create 16 "alien?" "alien" create { } define-builtin
-
 "word?" "words" create t "inline" set-word-prop
-"word" "words" create 17 "word?" "words" create
+"word" "words" create 16 "word?" "words" create
 {
     { 1 { "hashcode" "kernel" } f }
     { 2 { "word-name" "words" } f }
@@ -344,11 +342,11 @@ num-types f <array> builtins set
 } define-builtin
 
 "tuple?" "kernel" create t "inline" set-word-prop
-"tuple" "kernel" create 18 "tuple?" "kernel" create
+"tuple" "kernel" create 17 "tuple?" "kernel" create
 { } define-builtin
 
 "byte-array?" "arrays" create t "inline" set-word-prop
-"byte-array" "arrays" create 19
+"byte-array" "arrays" create 18
 "byte-array?" "arrays" create
 { } define-builtin
 

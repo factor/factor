@@ -16,9 +16,6 @@ IN: ray
 
 : size 200 ; inline
 
-! kludge
-: INF inf swons ; parsing
-
 : delta 1.4901161193847656E-8 ; inline
 
 TUPLE: ray orig dir ;
@@ -40,11 +37,11 @@ TUPLE: sphere center radius ;
 : -+ ( x y -- x-y x+y ) [ - ] 2keep + ;
 
 : sphere-b/d ( b d -- t )
-    -+ dup 0.0 < [ 2drop inf ] [ >r [ 0.0 > ] keep r> ? ] if ;
+    -+ dup 0.0 < [ 2drop 1.0/0.0 ] [ >r [ 0.0 > ] keep r> ? ] if ;
 
 : ray-sphere ( sphere ray -- t )
     2dup sphere-v tuck sphere-b [ sphere-disc ] keep
-    over 0.0 < [ 2drop inf ] [ swap sqrt sphere-b/d ] if ;
+    over 0.0 < [ 2drop 1.0/0.0 ] [ swap sqrt sphere-b/d ] if ;
 
 : sphere-n ( ray sphere l -- n )
     pick ray-dir n*v swap sphere-center v- swap ray-orig v+ ;
@@ -72,7 +69,7 @@ M: group intersect-scene ( hit ray group -- hit )
         drop
     ] if-ray-sphere ;
 
-: initial-hit T{ hit f { 0.0 0.0 0.0 } INF } ;
+: initial-hit T{ hit f { 0.0 0.0 0.0 } 1.0/0.0 } ;
 
 : initial-intersect ( ray scene -- hit )
     initial-hit -rot intersect-scene ;
@@ -88,10 +85,10 @@ M: group intersect-scene ( hit ray group -- hit )
 : ray-g ( hit -- g ) hit-normal light v. ;
 
 : cast-ray ( ray scene -- g )
-    2dup initial-intersect dup hit-lambda inf = [
+    2dup initial-intersect dup hit-lambda 1.0/0.0 = [
         3drop 0.0
     ] [
-        dup ray-g >r sray-intersect hit-lambda inf =
+        dup ray-g >r sray-intersect hit-lambda 1.0/0.0 =
         [ r> neg ] [ r> drop 0.0 ] if
     ] if ;
 

@@ -14,10 +14,11 @@ M: assert summary drop "Assertion failed" ;
 : print-test ( input output -- )
     "--> " write 2array . flush ;
 
+: benchmark ( quot -- gctime runtime )
+    millis >r gc-time >r call gc-time r> - millis r> - ;
+
 : time ( code -- )
-    #! Evaluates the given code and prints the time taken to
-    #! execute it.
-    millis >r gc-time >r call gc-time r> - millis r> -
+    benchmark
     [ # " ms run / " % # " ms GC time" % ] "" make print flush ;
 
 : unit-test ( output input -- )
@@ -30,12 +31,10 @@ M: assert summary drop "Assertion failed" ;
     ] time ;
 
 : unit-test-fails ( quot -- )
-    #! Assert that the quotation throws an error.
     [ f ] swap [ [ call t ] [ 2drop f ] recover ]
     curry unit-test ;
 
-: assert-depth ( quot -- )
-    depth slip depth assert= ;
+: assert-depth ( quot -- ) depth slip depth assert= ;
 
 SYMBOL: failures
 
@@ -83,7 +82,7 @@ SYMBOL: failures
         "words" "prettyprint" "random" "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"
         "math/complex" "math/irrational"
-        "math/integer" "threads" "parsing-word"
+        "math/integer" "math/random" "threads" "parsing-word"
         "inference" "interpreter" "alien"
         "gadgets/line-editor" "gadgets/rectangles"
         "gadgets/frames" "memory"
@@ -109,5 +108,5 @@ SYMBOL: failures
         "compiler/generic" "compiler/bail-out"
         "compiler/linearizer" "compiler/intrinsics"
         "compiler/identities" "compiler/optimizer"
-        "compiler/alien"
+        "compiler/alien" "compiler/callbacks"
     } run-tests ;

@@ -29,9 +29,6 @@ void relocate_object(CELL relocating)
 	case ALIEN_TYPE:
 		fixup_alien((ALIEN*)relocating);
 		break;
-	case DISPLACED_ALIEN_TYPE:
-		fixup_displaced_alien((DISPLACED_ALIEN*)relocating);
-		break;
 	case WRAPPER_TYPE:
 		fixup_wrapper((F_WRAPPER*)relocating);
 		break;
@@ -87,7 +84,7 @@ void relocate_data()
 
 void undefined_symbol(void)
 {
-	general_error(ERROR_UNDEFINED_SYMBOL,F);
+	general_error(ERROR_UNDEFINED_SYMBOL,F,true);
 }
 
 CELL get_rel_symbol(F_REL* rel)

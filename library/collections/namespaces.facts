@@ -96,10 +96,6 @@ HELP: , "( elt -- )"
 { $values { "elt" "an object" } }
 { $description "Adds an element to the end of the sequence being constructed by " { $link make } "." } ;
 
-HELP: ?, "( elt ? -- )"
-{ $values { "elt" "an object" } { ">" "a boolean indicating of the element should be added or not" } }
-{ $description "Conditionally adds an element to the end of the sequence being constructed by " { $link make } "." } ;
-
 HELP: % "( seq -- )"
 { $values { "seq" "a sequence" } }
 { $description "Appends a sequence to the end of the sequence being constructed by " { $link make } "." } ;

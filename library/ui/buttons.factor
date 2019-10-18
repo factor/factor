@@ -5,31 +5,31 @@ USING: gadgets gadgets-borders gadgets-layouts gadgets-theme
 generic io kernel lists math namespaces sequences sequences
 styles threads ;
 
-TUPLE: button rollover? pressed? ;
+TUPLE: button rollover? pressed? quot ;
 
-: button-down? ( -- ? ) hand get hand-buttons empty? not ;
+: button-down? ( -- ? )
+    hand-buttons get-global empty? not ;
 
-: mouse-over? ( gadget -- ? ) hand get hand-gadget child? ;
+: mouse-over? ( gadget -- ? )
+    hand-gadget get-global child? ;
 
-: mouse-clicked? ( gadget -- ? ) hand get hand-clicked child? ;
+: mouse-clicked? ( gadget -- ? )
+    hand-clicked get-global child? ;
 
 : button-update ( button -- )
     dup mouse-over? over set-button-rollover?
-    dup button-rollover? button-down? and
-    over mouse-clicked? and over set-button-pressed?
+    dup mouse-clicked? button-down? and
+    over button-rollover? and over set-button-pressed?
     relayout-1 ;
 
-: button-clicked ( button -- )
-    #! If the mouse is released while still inside the button,
-    #! fire an action gesture.
-    dup button-update dup button-rollover?
-    [ [ action ] swap handle-gesture ] when drop ;
+: if-clicked ( button quot -- )
+    >r dup button-update dup button-rollover? r> [ drop ] if ;
 
-: button-action ( action -- quot )
-    [ [ swap handle-gesture drop ] cons ] [ [ drop ] ] if* ;
+: button-clicked ( button -- )
+    dup button-quot if-clicked ;
 
 : button-gestures ( button quot -- )
-    dupd [ action ] set-action
+    over set-button-quot
     dup [ button-clicked ] [ button-up ] set-action
     dup [ button-update ] [ button-down ] set-action
     dup [ button-update ] [ mouse-leave ] set-action

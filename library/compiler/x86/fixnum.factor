@@ -25,7 +25,8 @@ math math-internals memory namespaces words ;
     ! Compute a result, this time it will fit.
     r> execute
     ! Create a bignum.
-    "s48_long_to_bignum" f 0 output-operand 1array compile-c-call*
+    "s48_long_to_bignum" f 0 output-operand
+    1array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
     "end" get save-xt ; inline

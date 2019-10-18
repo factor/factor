@@ -62,7 +62,7 @@ ARTICLE: "method-combination" "Method combination"
     "which methods out of the set of applicable methods are called"
 }
 "The " { $link POSTPONE: GENERIC: } " parsing word creates a generic word using the " { $emphasis "simple method combination" } ". Most generic words that come up in practice use this method combination:"
-{ $subsection simple-combination }
+{ $subsection standard-combination }
 "The " { $link POSTPONE: G: } " parsing word allows a different method combination to be specified:"
 { $subsection POSTPONE: G: }
 "The simple method combination is a special case of the standard method combination:"
@@ -179,7 +179,7 @@ GLOSSARY: "delegate" "an object acting as a sink for unhandled method calls on b
 ARTICLE: "tuple-delegation" "Delegation"
 "Each tuple can have an optional delegate tuple. Most generic words called on the tuple that do not have a method for the tuple's class will be passed on to the delegate."
 $terpri
-"More precisely, any generic word using " { $link simple-combination } " delegates, and this includes all generic words defined via the " { $link POSTPONE: GENERIC: } " parsing word."
+"More precisely, any generic word using " { $link standard-combination } " delegates, and this includes all generic words defined via the " { $link POSTPONE: GENERIC: } " parsing word."
 $terpri
 "Factor uses delegation in place of implementation inheritance, but it is not a direct substitute; in particular, the semantics differ in that a delegated method call receives the delegate on the stack, not the original object."
 { $warning "Delegation to objects that are not tuples is not fully supported. Generic words support delegation to arbitrary types, as do slot accessors which are built from generic words. However, type-specific primitives do not." }

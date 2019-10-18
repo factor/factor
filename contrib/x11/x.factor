@@ -1,5 +1,6 @@
 
-IN: x USING: namespaces kernel math arrays strings alien sequences xlib ;
+USING: namespaces kernel math arrays strings alien sequences xlib rectangle ;
+IN: x 
 
 SYMBOL: dpy
 SYMBOL: scr
@@ -148,6 +149,23 @@ DEFER: with-win
   r> XColor-pixel ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 7 - Graphics Context Functions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: create-gc ( -- GC ) dpy get win get 0 0 <alien> XCreateGC ;
+
+: set-foreground ( foreground -- )
+dpy get gcontext get rot XSetForeground drop ;
+
+: set-background ( background -- )
+dpy get gcontext get rot XSetBackground drop ;
+
+: set-function ( function -- ) dpy get gcontext get rot XSetFunction drop ;
+
+: set-subwindow-mode ( subwindow-mode -- )
+dpy get gcontext get rot XSetSubwindowMode drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 8 - Graphics Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -158,6 +176,21 @@ DEFER: with-win
 
 : draw-line ( { x1 y1 } { x2 y2 } -- )
   >r >r dpy get win get gcontext get r> [ ] each r> [ ] each XDrawLine drop ;
+
+: 2nth ( i seq -- item-i item-i+1 ) 2dup nth -rot swap 1 + swap nth ;
+
+: draw-lines ( seq -- )
+dup length 1 - [ swap 2nth draw-line ] each-with ;
+
+: 4array 3array swap 1array swap append ;
+
+: 5array 4array swap 1array swap append ;
+
+: draw-rect ( rect -- )
+[ top-left ] keep [ top-right ] keep [ bottom-right ] keep
+[ bottom-left ] keep top-left 5array draw-lines ;
+
+: draw-rect+ [ draw-rect ] with-win ;
 
 ! 8.5 - Font Metrics
 
@@ -197,7 +230,8 @@ DEFER: with-win
 
 : sync-dpy ( discard -- ) >r dpy get r> XSync ;
 
-: next-event ( -- event ) dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
+: next-event ( -- event )
+dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
 
 : mask-event ( mask -- event )
   >r dpy get r> "XEvent" <c-object> dup >r XMaskEvent drop r> ;
@@ -217,6 +251,9 @@ DEFER: with-win
 
 : ungrab-pointer ( time -- )
   >r dpy get r> XUngrabPointer drop ;
+
+: grab-key ( keycode modifiers owner-events pointer-mode keyboard-mode -- )
+>r >r >r >r >r dpy get r> r> win get r> r> r> XGrabKey drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 14 - Inter-Client Communication Functions
@@ -252,6 +289,9 @@ DEFER: with-win
 
 : with-dpy ( dpy quot -- ) [ swap dpy set call ] with-scope ; inline
 : with-win ( win quot -- ) [ swap win set call ] with-scope ; inline
+
+: with-gcontext ( gcontext quot -- )
+[ swap gcontext set call ] with-scope ; inline
 
 : initialize-x ( display-string -- )
   XOpenDisplay dpy set
@@ -295,7 +335,9 @@ DEFER: with-win
   drop drop ;
 
 : valid-window? ( -- ? )
-  dpy get win get "XWindowAttributes" <c-object> XGetWindowAttributes 0 = not ;
+dpy get win get "XWindowAttributes" <c-object> XGetWindowAttributes 0 = not ;
+
+: valid-window?+		[ valid-window? ] with-win ;
 
 : mouse-sensor ( -- { root-x root-y } )
   dpy get win get 0 <Window> 0 <Window> 0 <int> 0 <int> 2dup >r >r

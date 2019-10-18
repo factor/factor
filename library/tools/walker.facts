@@ -1,0 +1,31 @@
+IN: walker
+USING: help inspector ;
+
+HELP: &s "( -- )"
+{ $description "Prints the single stepper data stack." }
+{ $notes "This is analogous to " { $link .s } "." } ;
+
+HELP: &r "( -- )"
+{ $description "Prints the single stepper return stack and the currently executing quotation." }
+{ $notes "This is analogous to " { $link .r } "." } ;
+
+HELP: &get "( var -- value )"
+{ $values { "var" "an object" } { "value" "an object" } }
+{ $description "Looks up a variable value in the single stepper name stack." } ;
+
+HELP: report "( -- )"
+{ $description "Print the quotation currently executing in the single stepper." } ;
+
+HELP: step "( -- )"
+{ $description "Run one iteration of the single stepper, without stepping into compound definitions." }
+{ $see-also into } ;
+
+HELP: into "( -- )"
+{ $description "Run one iteration of the single stepper; if the current word is a compound definition, the single stepper begins stepping through the word's definition." }
+{ $see-also step } ;
+
+HELP: end-walk "( -- )"
+{ $description "Continue normal execution of the single-stepped quotation." } ;
+
+HELP: walk "( quot -- )"
+{ $description "Spawn a new listener, customized for single-stepping through a quotation using the " { $link step } " and " { $link into } " words. The state of the single stepper stacks can be displayed using " { $link &s } " and " { $link &r } ", while variable values can be inspected with " { $link &get  } "." } ;

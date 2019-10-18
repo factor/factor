@@ -1,11 +1,12 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-backend
-USING: alien arrays assembler compiler compiler-backend kernel
+USING: alien arrays assembler compiler compiler-frontend kernel
 kernel-internals math namespaces sequences ;
 
 ! AMD64 register assignments
 ! RAX RCX RDX RSI RDI R8 R9 R10 R11 vregs
+! R13 cards_offset
 ! R14 datastack
 ! R15 callstack
 
@@ -36,8 +37,6 @@ M: float-regs return-reg drop XMM0 ;
 M: float-regs fastcall-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-: dual-fp/int-regs? f ;
-
 : address-operand ( address -- operand )
     #! On AMD64, we have to load 64-bit addresses into a
     #! scratch register first. The usage of R11 here is a hack.
@@ -52,7 +51,7 @@ M: float-regs fastcall-regs
 : load-indirect ( dest literal -- )
     #! We use RIP-relative addressing. The '3' is a hardcoded
     #! instruction length.
-    add-literal from 3 - 1array MOV ; inline
+    add-literal from 3 - [] MOV ; inline
 
 : stack-increment \ stack-reserve get 16 align 8 + ;
 

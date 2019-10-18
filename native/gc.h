@@ -92,6 +92,12 @@ INLINE void *allot_zone(ZONE *z, CELL a)
 {
 	CELL h = z->here;
 	z->here = h + align8(a);
+	if(z->here > z->limit)
+	{
+		fprintf(stderr,"Nursery space exhausted\n");
+		factorbug();
+	}
+
 	allot_barrier(h);
 	return (void*)h;
 }
@@ -112,8 +118,10 @@ INLINE void* allot_object(CELL type, CELL length)
 	return object;
 }
 
+void update_cards_offset(void);
 CELL collect_next(CELL scan);
 void garbage_collection(CELL gen);
 void primitive_gc(void);
 void maybe_gc(CELL size);
+DLLEXPORT void simple_gc(void);
 void primitive_gc_time(void);

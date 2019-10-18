@@ -1,53 +1,20 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: opengl
-USING: alien errors io kernel math namespaces opengl sdl
+USING: alien errors io kernel math namespaces opengl
 sequences ;
 
 : gl-color ( { r g b a } -- ) first4 glColor4d ; inline
-
-: init-gl ( -- )
-    0.0 0.0 0.0 0.0 glClearColor 
-    { 1.0 0.0 0.0 0.0 } gl-color
-    GL_COLOR_BUFFER_BIT glClear
-    GL_PROJECTION glMatrixMode
-    glLoadIdentity
-    GL_MODELVIEW glMatrixMode
-    glLoadIdentity
-    0 0 width get height get glViewport
-    0 width get height get 0 gluOrtho2D
-    GL_SMOOTH glShadeModel
-    GL_BLEND glEnable
-    GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
-    GL_SCISSOR_TEST glEnable
-    GL_MODELVIEW glMatrixMode ;
-
-: gl-flags
-    SDL_OPENGL
-    SDL_RESIZABLE bitor
-    SDL_HWSURFACE bitor
-    SDL_DOUBLEBUF bitor ;
-
-: gl-resize ( event -- )
-    #! Acts on an SDL resize event.
-    dup resize-event-w swap resize-event-h 0 gl-flags
-    init-surface ;
-
-: with-gl-screen ( width height quot -- )
-    >r 0 gl-flags r> with-screen ; inline
 
 : gl-error ( -- )
     glGetError dup zero?
     [ drop ] [ "GL error: " write gluErrorString print ] if ;
 
-: with-gl-surface ( quot -- )
-    #! Execute a quotation, locking the current surface if it
-    #! is required (eg, hardware surface).
-    [ init-gl call gl-error ] [ SDL_GL_SwapBuffers ] cleanup ;
-    inline
-
 : do-state ( what quot -- )
     swap glBegin call glEnd ; inline
+
+: do-enabled ( what quot -- )
+    over glEnable swap slip glDisable ; inline
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
@@ -65,6 +32,9 @@ sequences ;
 
 : four-sides ( dim -- )
     dup top-left dup top-right dup bottom-right bottom-left ;
+
+: gl-line ( a b -- )
+    GL_LINES [ gl-vertex gl-vertex ] do-state ;
 
 : gl-fill-rect ( dim -- )
     #! Draws a two-dimensional box.
@@ -86,11 +56,6 @@ sequences ;
 : gl-poly ( points -- )
     #! Draw a polygon.
     GL_LINE_LOOP (gl-poly) ;
-
-: gl-set-clip ( loc dim -- )
-    dup first2 1+ >r >r
-    over second swap second + height get swap - >r
-    first r> r> r> glScissor ;
 
 : prepare-gradient ( direction dim -- v1 v2 )
     tuck v* [ v- ] keep ;
@@ -167,3 +132,9 @@ C: sprite ( loc dim dim2 -- )
 : init-sprite ( texture sprite -- )
     [ set-sprite-texture ] keep
     [ make-sprite-dlist ] keep set-sprite-dlist ;
+
+: free-sprite ( sprite -- )
+    dup sprite-dlist 1 glDeleteLists
+    sprite-texture <uint> 1 swap glDeleteTextures ;
+
+: free-sprites ( sprites -- ) [ [ free-sprite ] when* ] each ;

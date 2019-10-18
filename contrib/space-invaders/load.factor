@@ -2,6 +2,7 @@ IN: scratchpad
 USING: kernel parser compiler words sequences io ;
 
 "/contrib/parser-combinators/load.factor" run-resource
+"/contrib/concurrency/load.factor" run-resource
 
 {
     "cpu-8080"

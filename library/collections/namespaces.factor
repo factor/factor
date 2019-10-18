@@ -15,6 +15,7 @@ sequences strings vectors words ;
 : set ( value variable -- ) namespace set-hash ;
 : on ( var -- ) t swap set ; inline
 : off ( var -- ) f swap set ; inline
+: get-global ( var -- value ) global hash ; inline
 : set-global ( value var -- ) global set-hash ; inline
 
 : nest ( variable -- hash )
@@ -47,38 +48,19 @@ SYMBOL: building
 
 : , ( obj -- ) building get push ;
 
-: ?, ( obj ? -- ) [ , ] [ drop ] if ;
-
 : % ( seq -- ) building get swap nappend ;
 
 : # ( n -- ) number>string % ;
-
-SYMBOL: hash-buffer
-
-: closure, ( value key -- old )
-    hash-buffer get [ hash swap ] 2keep set-hash ;
-
-: (closure) ( key hash -- )
-    tuck hash dup [
-        [
-            drop dup dup closure,
-            [ 2drop ] [ swap (closure) ] if
-        ] hash-each-with
-    ] [
-        2drop
-    ] if ;
-
-: closure ( key hash -- list )
-    [
-        H{ } clone hash-buffer set
-        (closure)
-        hash-buffer get hash-keys
-    ] with-scope ;
 
 IN: lists
 
 : alist>quot ( default alist -- quot )
     [ [ first2 swap % , , \ if , ] [ ] make ] each ;
+
+IN: sequences
+
+: prune ( seq -- seq )
+    [ [ dup set ] each ] make-hash hash-keys ;
 
 IN: kernel-internals
 

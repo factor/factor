@@ -1,9 +1,8 @@
+USING: kernel alien compiler namespaces generic math sequences hashtables io
+arrays words prettyprint lists concurrency
+process rectangle xlib x concurrent-widgets ;
 
 IN: factory
-
-USING: kernel namespaces generic math sequences hashtables io arrays words
-       prettyprint lists concurrency
-       xlib x concurrent-widgets simple-error-handler ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -14,6 +13,8 @@ DEFER: window-list
 DEFER: refresh-window-list
 DEFER: layout-frame
 DEFER: mapped-windows
+DEFER: workspace-1 DEFER: workspace-2 DEFER: workspace-3 DEFER: workspace-4
+DEFER: switch-to
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -28,13 +29,21 @@ SYMBOL: root-menu
 : setup-root-menu ( -- )
   create-menu root-menu set
   "black" lookup-color root-menu get set-window-background%
-  "xterm"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "xlogo"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "xclock" [ "launch program..." print ] root-menu get add-popup-menu-item
-  "xload"  [ "launch program..." print ] root-menu get add-popup-menu-item
-  "emacs"  [ "launch program..." print ] root-menu get add-popup-menu-item
+  "Terminal" [ "gnome-terminal &" system ] root-menu get add-popup-menu-item
+  "Emacs"    [ "emacs &" system ]          root-menu get add-popup-menu-item
+  "Firefox"  [ "firefox &" system ]        root-menu get add-popup-menu-item
   "Workspaces"
     [ workspace-menu get popup-window% ] root-menu get add-popup-menu-item ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: drag-gc
+
+: make-drag-gc ( -- GC )
+create-gc dup
+[ IncludeInferiors set-subwindow-mode
+  GXxor set-function
+  white-pixel get set-foreground ] with-gcontext ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -43,33 +52,55 @@ SYMBOL: root-menu
     ButtonReleaseMask
     PointerMotionMask ] 0 [ execute bitor ] reduce ;
 
-: drag-mouse-loop ( position -- )
-  MouseMask mask-event XAnyEvent-type			! position type
-  { { [ dup MotionNotify = ]
-      [ drop drag-mouse-loop ] }
-    { [ dup ButtonRelease = ]
-      [ drop						! position
-        mouse-sensor					! push release
-        ungrab-server
-        CurrentTime ungrab-pointer
-        flush-dpy ] }
-    { [ t ] [ drop "drag-mouse-loop ignoring event" print drag-mouse-loop ] } }
-  cond ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-mouse ( -- )
-  MouseMask grab-pointer grab-server mouse-sensor drag-mouse-loop ;
+: drag-mouse-loop ( push last quot -- push release )
+MouseMask mask-event XAnyEvent-type		! push last quot type
+{ { [ dup MotionNotify = ]
+    [ drop 3dup call nip mouse-sensor swap drag-mouse-loop ] }
+{ [ dup ButtonRelease = ]
+  [ drop 3dup nip f swap call 2drop
+    mouse-sensor ungrab-server CurrentTime ungrab-pointer flush-dpy ] }
+{ [ t ]
+  [ drop "drag-mouse-loop ignoring event" print flush drag-mouse-loop ] }
+} cond ;
+
+: drag-mouse ( quot -- push release )
+MouseMask grab-pointer grab-server mouse-sensor f rot drag-mouse-loop ;
 
 : drag-mouse% [ drag-mouse ] with-window-object ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-move-window ( -- ) drag-mouse swap v- window-position v+ move-window ;
+: ((draw-move-outline)) ( a b - )
+swap v- window-position v+ window-size <rect> root get draw-rect+ ;
 
-: drag-move-window% [ drag-move-window ] with-window-object ;
+: (draw-move-outline) ( push last -- )
+dupd dup [ ((draw-move-outline)) ] [ 2drop ] if
+mouse-sensor ((draw-move-outline)) flush-dpy ;
+
+: draw-move-outline ( push last -- )
+drag-gc get [ (draw-move-outline) ] with-gcontext ;
+
+: drag-move-window ( -- )
+[ draw-move-outline ] drag-mouse swap v- window-position v+ move-window ;
+
+: drag-move-window% [ drag-move-window raise-window ] with-window-object ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-resize-window ( -- ) drag-mouse nip window-position v- resize-window ;
+: ((draw-resize-outline)) ( bottom-right -- )
+window-position v- window-position swap <rect> root get draw-rect+ ;
+
+: (draw-resize-outline) ( push last -- )
+nip dup [ ((draw-resize-outline)) ] [ drop ] if
+mouse-sensor ((draw-resize-outline)) flush-dpy ;
+
+: draw-resize-outline ( push last -- )
+drag-gc get [ (draw-resize-outline) ] with-gcontext ;
+
+: drag-resize-window ( -- )
+[ draw-resize-outline ] drag-mouse nip window-position v- resize-window ;
 
 : drag-resize-window% [ drag-resize-window ] with-window-object ;
 
@@ -126,11 +157,11 @@ M: wm-root handle-map-request-event ( event <wm-root> -- )
       [ map-window% ] }
 
     { [ dup valid-window?% not ]
-      [ "Not a valid window." print drop ] }
+      [ "Not a valid window." print flush drop ] }
 
     { [ dup window-override-redirect% 1 = ]
-      [ "Not reparenting: " print
-        "new window has override_redirect attribute set." print
+      [ "Not reparenting: " print 
+        "new window has override_redirect attribute set." print flush
         drop ] }
 
     { [ t ] [ window-id manage-window ] } }
@@ -236,7 +267,9 @@ M: wm-root handle-button-press-event ( event wm-root -- )
           window-list get refresh-window-list
           window-list get map-window% ]
         [ window-list get unmap-window% ]
-        if ] } }
+        if ] }
+
+    { [ t ] [ "Button has no function on root window." print flush drop ] } }
 
   cond ;
 
@@ -244,31 +277,24 @@ M: wm-root handle-button-press-event ( event wm-root -- )
 ! M: wm-root handle-key-press-event
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! M: wm-root handle-key-press-event ( event wm-root -- )
-!   drop
-!   { { [ dup XKeyEvent-keycode 67 = ]
-!       [ workspace-1 get switch-to-workspace ] }
-!     { [ dup XKeyEvent-keycode 68 = ]
-!       [ workspace-2 get switch-to-workspace ] }
-!     { [ dup XKeyEvent-keycode 69 = ]
-!       [ workspace-3 get switch-to-workspace ] }
-!     { [ dup XKeyEvent-keycode 70 = ]
-!       [ workspace-4 get switch-to-workspace ] } }
-!   cond ;
+SYMBOL: f1-keycode   67 f1-keycode set-global
+SYMBOL: f2-keycode   68 f2-keycode set-global
+SYMBOL: f3-keycode   69 f3-keycode set-global
+SYMBOL: f4-keycode   70 f4-keycode set-global
+
+: grab-keys ( -- )
+f1-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key
+f2-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key
+f3-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key
+f4-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key ;
 
 M: wm-root handle-key-press-event ( event wm-root -- )
-  drop
-  { { [ dup XKeyEvent-keycode 67 = ]
-      [ "Switch to workspace 1" print drop ] }
-    { [ dup XKeyEvent-keycode 68 = ]
-      [ "Switch to workspace 2" print drop ] }
-    { [ dup XKeyEvent-keycode 69 = ]
-      [ "Switch to workspace 3" print drop ] }
-    { [ dup XKeyEvent-keycode 70 = ]
-      [ "Switch to workspace 4" print drop ] }
-    { [ t ]
-      [ "wm-root ignoring key press" print drop ] } }
-  cond ;
+drop
+{ { [ dup XKeyEvent-keycode f1-keycode get = ] [ workspace-1 get switch-to ] }
+  { [ dup XKeyEvent-keycode f2-keycode get = ] [ workspace-2 get switch-to ] }
+  { [ dup XKeyEvent-keycode f3-keycode get = ] [ workspace-3 get switch-to ] }
+  { [ dup XKeyEvent-keycode f4-keycode get = ] [ workspace-4 get switch-to ] }
+  { [ t ] [ "wm-root ignoring key press" print drop ] } } cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -280,7 +306,7 @@ TUPLE: wm-child ;
   [ add-to-window-table ] keep ;
 
 M: wm-child handle-property-event ( child event -- )
-  "A <wm-child> received a property event" print drop drop ;
+  "A <wm-child> received a property event" print flush drop drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -452,7 +478,7 @@ M: wm-frame handle-enter-window-event ( event frame )
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 M: wm-frame handle-property-event ( event frame )
-  "Inside handle-property-event" print drop drop ;
+  "Inside handle-property-event" print flush drop drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -480,19 +506,19 @@ M: workspace switch-to ( workspace -- )
   mapped-windows dup current-workspace get set-workspace-windows
   [ unmap-window+ ] each
   dup workspace-windows [ map-window+ ] each
-  current-workspace set ;
+  current-workspace set-global ;
 
 SYMBOL: workspace-1
 SYMBOL: workspace-2
 SYMBOL: workspace-3
 SYMBOL: workspace-4
 
-create-workspace workspace-1 set
-create-workspace workspace-2 set
-create-workspace workspace-3 set
-create-workspace workspace-4 set
+create-workspace workspace-1 set-global
+create-workspace workspace-2 set-global
+create-workspace workspace-3 set-global
+create-workspace workspace-4 set-global
 
-workspace-1 get current-workspace set
+workspace-1 get current-workspace set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -511,13 +537,22 @@ SYMBOL: workspace-menu
     [ workspace-4 get switch-to ] workspace-menu get add-popup-menu-item ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: invalid-frame? ( <wm-frame> -- ? )
+wm-frame-child window-id valid-window?+ not ;
+
+: remove-invalid-frames ( -- )
+window-table get hash-values [ wm-frame? ] subset [ invalid-frame? ] subset
+[ window-id window-table get remove-hash ] each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! window-list
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: window-list
 
 : setup-window-list ( -- )
-  create-menu window-list set
+  create-menu window-list set-global
   "black" lookup-color window-list get set-window-background% ;
 
 : not-transient? ( frame -- ? ) wm-frame-child get-transient-for-hint% not ;
@@ -536,7 +571,8 @@ SYMBOL: window-list
 
 : refresh-window-list ( window-list -- )
   dup window-children% [ destroy-window+ ] each
-  ! clean-window-table
+  clean-window-table
+  remove-invalid-frames
   window-table get hash-values [ wm-frame? ] subset
   [ not-transient? ] subset
   [ add-window-to-list ] each
@@ -555,10 +591,20 @@ SYMBOL: window-list
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: xlib-error-handler ( -- xt ) "void" { "Display*" "XErrorEvent*" }
+[ "X11 : error-handler called" print flush ] alien-callback ; compiled
+
+: install-error-handler ( -- ) xlib-error-handler XSetErrorHandler drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : start-factory ( dpy-string -- )
   initialize-x
-  SetSimpleErrorHandler
+  install-error-handler
+  root get [ make-drag-gc ] with-win drag-gc set
+  root get [ black-pixel get set-window-background clear-window ] with-win
   root get create-wm-root
+  root get [ grab-keys ] with-win
   setup-root-menu
   setup-window-list
   setup-workspace-menu

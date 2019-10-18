@@ -37,7 +37,7 @@ TUPLE: rstate label base-case? ;
     r> current-node set ;
 
 : with-recursive-state ( word label base-case quot -- )
-    >r <rstate> cons recursive-state [ cons ] change r>
+    >r <rstate> 2array recursive-state [ cons ] change r>
     nest-node 2slip unnest-node ; inline
 
 : inline-block ( word base-case -- node-block variables )
@@ -97,7 +97,7 @@ M: #call-label collect-recursion* ( label node -- )
     dup f inline-block over recursive-label? [
         meta-d get >r
         drop join-values f inline-block apply-infer
-        r> over node-child set-node-in-d node,
+        r> over set-node-in-d node,
     ] [
         apply-infer node-child node-successor splice-node drop
     ] if ;

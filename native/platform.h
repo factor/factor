@@ -23,14 +23,16 @@
 	#define FACTOR_CPU_STRING "unknown"
 #endif
 
-#ifdef WIN32
-	#define FACTOR_OS_STRING "win32"
+#ifdef WINDOWS
+	#define FACTOR_OS_STRING "windows"
 #elif defined(__FreeBSD__)
 	#define FACTOR_OS_STRING "freebsd"
 #elif defined(linux)
 	#define FACTOR_OS_STRING "linux"
 #elif defined(__APPLE__)
 	#define FACTOR_OS_STRING "macosx"
+#elif defined(__sun)
+	#define FACTOR_OS_STRING "solaris"
 #else
 	#define FACTOR_OS_STRING "unix"
 #endif

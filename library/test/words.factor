@@ -90,3 +90,7 @@ FORGET: foe
 word word-name "last-word-test" set
 
 [ "test-last" ] [ "last-word-test" get ] unit-test
+
+! xref should not retain references to gensyms
+gensym [ * ] define-compound
+[ t ] [ \ * usage [ interned? not ] subset empty? ] unit-test

@@ -4,19 +4,12 @@
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
 IN: opengl 
-USING: alien kernel ;
+USING: alien kernel sequences words ;
 
-{
-    { [ os "macosx" = ] [ ] }
-    { [ os "win32" = ] [
-            "gl" "opengl32.dll" "stdcall" add-library
-            "glu" "glu32.dll" "stdcall" add-library
-    ] }
-    { [ t ] [
-            "gl" "libGL.so.1" "cdecl" add-library
-            "glu" "libGLU.so.1" "cdecl" add-library
-    ] }
-} cond
+windows? [
+    "gl" "opengl32.dll" "stdcall" add-library
+    "glu" "glu32.dll" "stdcall" add-library
+] when
 
 TYPEDEF: uint    GLenum
 TYPEDEF: uchar   GLboolean
@@ -1178,6 +1171,7 @@ FUNCTION: void glPopName ( ) ;
 : GL_ALIASED_POINT_SIZE_RANGE       HEX: 846D ; inline
 : GL_ALIASED_LINE_WIDTH_RANGE       HEX: 846E ; inline
 
+
 FUNCTION: void glDrawRangeElements ( GLenum mode, GLuint start, GLuint end,
                                      GLsizei count, GLenum type, GLvoid* indices ) ;
 
@@ -1192,6 +1186,9 @@ FUNCTION: void glTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLin
 FUNCTION: void glCopyTexSubImage3D ( GLenum target, GLint level,
                                      GLint xoffset, GLint yoffset, GLint zoffset,
 				     GLint x, GLint y, GLsizei width, GLsizei height ) ;
+windows? [
+    { glDrawRangeElements glTexImage3D glTexSubImage3D glCopyTexSubImage3D } [ forget ] each
+] unless
 
 
 ! TODO: the rest. looks fiddly

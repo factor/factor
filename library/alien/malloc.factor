@@ -1,13 +1,13 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: kernel-internals
+IN: libc
 USING: alien errors kernel math ;
 
 LIBRARY: libc
-FUNCTION: ulong malloc ( ulong size ) ;
-FUNCTION: ulong calloc ( ulong count, ulong size ) ;
-FUNCTION: void free ( ulong ptr ) ;
-FUNCTION: ulong realloc ( ulong ptr, ulong size ) ;
-FUNCTION: void memcpy ( ulong dst, ulong src, ulong size ) ;
+FUNCTION: void* malloc ( ulong size ) ;
+FUNCTION: void* calloc ( ulong count, ulong size ) ;
+FUNCTION: void free ( void* ptr ) ;
+FUNCTION: void* realloc ( void* ptr, ulong size ) ;
+FUNCTION: void memcpy ( void* dst, void* src, ulong size ) ;
 
-: check-ptr dup zero? [ "Out of memory" throw ] when ;
+: check-ptr [ "Out of memory" throw ] unless* ;

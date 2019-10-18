@@ -1,3 +1,13 @@
+typedef struct {
+    CELL start;
+    CELL size;
+} BOUNDED_BLOCK;
+
+/* set up guard pages to check for under/overflow.
+size must be a multiple of the page size */
+BOUNDED_BLOCK *alloc_bounded_block(CELL size);
+void dealloc_bounded_block(BOUNDED_BLOCK *block);
+
 /* macros for reading/writing memory, useful when working around
 C's type system */
 INLINE CELL get(CELL where)
@@ -54,8 +64,7 @@ INLINE CELL align8(CELL a)
 
 /*** Header types ***/
 
-#define DISPLACED_ALIEN_TYPE 7
-
+#define ALIEN_TYPE 7
 #define ARRAY_TYPE 8
 
 /* Canonical F object */
@@ -68,12 +77,11 @@ INLINE CELL align8(CELL a)
 #define SBUF_TYPE 13
 #define WRAPPER_TYPE 14
 #define DLL_TYPE 15
-#define ALIEN_TYPE 16
-#define WORD_TYPE 17
-#define TUPLE_TYPE 18
-#define BYTE_ARRAY_TYPE 19
+#define WORD_TYPE 16
+#define TUPLE_TYPE 17
+#define BYTE_ARRAY_TYPE 18
 
-#define TYPE_COUNT 20
+#define TYPE_COUNT 19
 
 /* Canonical T object. It's just a word */
 CELL T;
@@ -151,7 +159,3 @@ void primitive_clone(void);
 void primitive_begin_scan(void);
 void primitive_next_object(void);
 void primitive_end_scan(void);
-
-/* set up guard pages to check for under/overflow.
-size must be a multiple of the page size */
-void* alloc_guarded(CELL size);

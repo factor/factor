@@ -1,21 +1,11 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: memory
 USING: arrays errors generic hashtables io kernel
 kernel-internals lists math namespaces parser prettyprint
 sequences strings vectors words ;
 
-: generations ( -- n ) 15 getenv ;
-
 : full-gc ( -- ) generations 1 - gc ;
-
-: image ( -- path )
-    #! Current image name.
-    16 getenv ;
-
-: save
-    #! Save the current image.
-    image save-image ;
 
 ! Printing an overview of heap usage.
 
@@ -47,7 +37,6 @@ sequences strings vectors words ;
     [ swap [ call ] keep (each-object) ] [ 2drop ] if ; inline
 
 : each-object ( quot -- )
-    #! Applies the quotation to each object in the image.
     [ begin-scan [ (each-object) ] keep ]
     [ end-scan ] cleanup drop ; inline
 
@@ -55,14 +44,12 @@ sequences strings vectors words ;
     >r over >r call [ r> r> push ] [ r> r> 2drop ] if ; inline
 
 : instances ( quot -- seq )
-    #! Return a vector of all objects that return true when the
-    #! quotation is applied to them.
     10000 <vector> [
         -rot [ (instances) ] 2keep
     ] each-object nip ; inline
 
 G: each-slot ( obj quot -- )
-    [ over ] standard-combination ; inline
+    1 standard-combination ; inline
 
 M: array each-slot ( array quot -- ) each ;
 
@@ -75,30 +62,27 @@ M: object each-slot ( obj quot -- )
     f swap [ pick eq? or ] each-slot nip ;
 
 : references ( obj -- list )
-    #! Return a list of all objects that refer to a given object
-    #! in the image. If only one reference exists, find
-    #! something referencing that, and so on.
     [ dupd refers? ] instances nip ;
 
-: seq+ ( n index vector -- )
-    [ nth + ] 2keep set-nth ;
+: hash+ ( n key hash -- )
+    [ hash [ 0 ] unless* + ] 2keep set-hash ;
 
 : heap-stat-step ( counts sizes obj -- )
-    [ dup size swap type rot seq+ ] keep
-    1 swap type rot seq+ ;
+    [ dup size swap class rot hash+ ] keep
+    1 swap class rot hash+ ;
 
 : heap-stats ( -- counts sizes )
     #! Return a list of instance count/total size pairs.
-    num-types 0 <array> num-types 0 <array>
+    H{ } clone H{ } clone
     [ >r 2dup r> heap-stat-step ] each-object ;
 
-: heap-stat. ( { instances bytes type } -- )
-    dup first zero? [
-        dup third type>class pprint ": " write
-        dup second pprint " bytes, " write
-        dup first pprint " instances" print
-    ] unless drop ;
+: heap-stat. ( instances bytes class -- )
+    pprint ": " write
+    pprint " bytes, " write
+    pprint " instances" print ;
 
 : heap-stats. ( -- )
-    #! Print heap allocation breakdown.
-    heap-stats dup length 3array flip [ heap-stat. ] each ;
+    heap-stats dup hash-keys natural-sort [
+        ( hash hash key -- )
+        [ [ pick hash ] keep pick hash ] keep heap-stat.
+    ] each 2drop ;

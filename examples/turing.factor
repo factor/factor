@@ -14,12 +14,12 @@ SYMBOL: halt
 
 ! This is a simple program that outputs 5 1's
 H{
-    [[ [[ 1 0 ]] T{ state f 1 1 2 } ]]
-    [[ [[ 2 0 ]] T{ state f 1 1 3 } ]]
-    [[ [[ 3 0 ]] T{ state f 1 -1 1 } ]]
-    [[ [[ 1 1 ]] T{ state f 1 -1 2 } ]]
-    [[ [[ 2 1 ]] T{ state f 1 -1 3 } ]]
-    [[ [[ 3 1 ]] T{ state f 1 -1 halt } ]]
+    { [[ 1 0 ]] T{ state f 1  1 2    } }
+    { [[ 2 0 ]] T{ state f 1  1 3    } }
+    { [[ 3 0 ]] T{ state f 1 -1 1    } }
+    { [[ 1 1 ]] T{ state f 1 -1 2    } }
+    { [[ 2 1 ]] T{ state f 1 -1 3    } }
+    { [[ 3 1 ]] T{ state f 1 -1 halt } }
 } states set
 
 ! Current state

@@ -1,9 +1,29 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays freetype gadgets-layouts generic hashtables
-io kernel lists math namespaces opengl sdl sequences strings
+io kernel lists math namespaces opengl sequences strings
 styles vectors ;
 IN: gadgets
+
+SYMBOL: clip
+
+: init-gl ( dim -- )
+    { 1.0 0.0 0.0 1.0 } gl-color
+    GL_PROJECTION glMatrixMode
+    glLoadIdentity
+    GL_MODELVIEW glMatrixMode
+    glLoadIdentity
+    { 0 0 0 } over <rect> clip set
+    dup first2 0 0 2swap glViewport
+    0 over first2 0 gluOrtho2D
+    first2 0 0 2swap glScissor
+    GL_SMOOTH glShadeModel
+    GL_BLEND glEnable
+    GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
+    GL_SCISSOR_TEST glEnable
+    GL_MODELVIEW glMatrixMode
+    1.0 1.0 1.0 1.0 glClearColor
+    GL_COLOR_BUFFER_BIT glClear ;
 
 GENERIC: draw-gadget* ( gadget -- )
 
@@ -12,8 +32,6 @@ M: gadget draw-gadget* ( gadget -- ) drop ;
 GENERIC: draw-interior ( gadget interior -- )
 
 GENERIC: draw-boundary ( gadget boundary -- )
-
-SYMBOL: clip
 
 : visible-children ( gadget -- seq ) clip get swap children-on ;
 
@@ -27,6 +45,11 @@ DEFER: draw-gadget
         draw-gadget*
     ] keep vneg gl-translate ;
 
+: gl-set-clip ( loc dim -- )
+    dup first2 1+ >r >r
+    over second swap second + world get rect-dim second
+    swap - >r first r> r> r> glScissor ;
+
 : do-clip ( gadget -- )
     >absolute clip [ rect-intersect dup ] change
     dup rect-loc swap rect-dim gl-set-clip ;
@@ -39,6 +62,13 @@ DEFER: draw-gadget
             dup visible-children [ draw-gadget ] each
         ] with-scope
     ] when drop ;
+
+: draw-world ( world -- )
+    [
+        dup world-handle [
+            dup rect-dim init-gl dup world set draw-gadget
+        ] with-gl-context
+    ] with-scope ;
 
 ! Pen paint properties
 M: f draw-interior 2drop ;

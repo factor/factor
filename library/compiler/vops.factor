@@ -25,24 +25,39 @@ TUPLE: vreg n ;
 TUPLE: int-regs ;
 TUPLE: float-regs size ;
 
+! A pseudo-register class for parameters spilled on the stack
+TUPLE: stack-params ;
+
 GENERIC: return-reg ( register-class -- reg )
 
 GENERIC: fastcall-regs ( register-class -- regs )
 
+M: stack-params fastcall-regs drop 0 ;
+
 GENERIC: reg-size ( register-class -- n )
+
+GENERIC: inc-reg-class ( register-class -- )
 
 M: int-regs reg-size drop cell ;
 
+: (inc-reg-class)
+    dup class inc
+    macosx? [ reg-size stack-params +@ ] [ drop ] if ;
+
+M: int-regs inc-reg-class
+    (inc-reg-class) ;
+
 M: float-regs reg-size float-regs-size ;
+
+M: float-regs inc-reg-class
+    dup (inc-reg-class)
+    macosx? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
 
 ! A data stack location.
 TUPLE: ds-loc n ;
 
 ! A call stack location.
 TUPLE: cs-loc n ;
-
-! A pseudo-register class for parameters spilled on the stack
-TUPLE: stack-params ;
 
 GENERIC: v>operand
 
@@ -65,9 +80,7 @@ TUPLE: vop inputs outputs label ;
     \ scratch get nth ;
 
 : with-vop ( vop quot -- )
-    [
-        swap vop set (scratch) \ scratch set call
-    ] with-scope ; inline
+    swap vop set (scratch) \ scratch set call ; inline
 
 : input ( n -- obj ) vop get vop-inputs nth ;
 : input-operand ( n -- n ) input v>operand ;
@@ -80,12 +93,6 @@ M: vop basic-block? drop f ;
 
 ! simplifies some code
 M: f basic-block? drop f ;
-
-! Only on PowerPC. The %parameters node needs to reserve space
-! in the stack frame.
-GENERIC: stack-reserve
-
-M: vop stack-reserve drop 0 ;
 
 : make-vop ( inputs outputs label vop -- vop )
     [ >r <vop> r> set-delegate ] keep ;
@@ -105,7 +112,7 @@ M: vop stack-reserve drop 0 ;
 ! miscellanea
 TUPLE: %prologue ;
 C: %prologue make-vop ;
-: %prologue empty-vop <%prologue> ;
+: %prologue src-vop <%prologue> ;
 
 TUPLE: %label ;
 C: %label make-vop ;
@@ -121,6 +128,10 @@ C: %return make-vop ;
 TUPLE: %jump ;
 C: %jump make-vop ;
 : %jump label-vop <%jump> ;
+
+TUPLE: %jump-label ;
+C: %jump-label make-vop ;
+: %jump-label label-vop <%jump-label> ;
 
 TUPLE: %call ;
 C: %call make-vop ;
@@ -145,22 +156,22 @@ C: %peek make-vop ;
 
 M: %peek basic-block? drop t ;
 
-: %peek-d ( vreg n -- vop )
-    <ds-loc> swap <vreg> src/dest-vop <%peek> ;
+: %peek swap <vreg> src/dest-vop <%peek> ;
 
-: %peek-r ( vreg n -- vop )
-    <cs-loc> swap <vreg> src/dest-vop <%peek> ;
+: %peek-d ( vreg n -- vop ) <ds-loc> %peek ;
+
+: %peek-r ( vreg n -- vop ) <cs-loc> %peek ;
 
 TUPLE: %replace ;
 C: %replace make-vop ;
 
 M: %replace basic-block? drop t ;
 
-: %replace-d ( vreg n -- vop )
-    <ds-loc> src/dest-vop <%replace> ;
+: %replace ( vreg loc -- vop ) src/dest-vop <%replace> ;
 
-: %replace-r ( vreg n -- vop )
-    <cs-loc> src/dest-vop <%replace> ;
+: %replace-d ( vreg n -- vop ) <ds-loc> %replace ;
+
+: %replace-r ( vreg n -- vop ) <cs-loc> %replace ;
 
 TUPLE: %inc-d ;
 C: %inc-d make-vop ;
@@ -339,15 +350,13 @@ TUPLE: %setenv ;
 C: %setenv make-vop ;
 : %setenv 2-in-vop <%setenv> ;
 
-! alien operations
-TUPLE: %parameters ;
-C: %parameters make-vop ;
-M: %parameters stack-reserve vop-inputs first ;
-: %parameters ( n -- vop ) src-vop <%parameters> ;
+TUPLE: %stack>freg ;
+C: %stack>freg make-vop ;
+: %stack>freg ( n reg reg-class -- vop ) 3-in-vop <%stack>freg> ;
 
-TUPLE: %parameter ;
-C: %parameter make-vop ;
-: %parameter ( n reg reg-class -- vop ) 3-in-vop <%parameter> ;
+TUPLE: %freg>stack ;
+C: %freg>stack make-vop ;
+: %freg>stack ( n reg reg-class -- vop ) 3-in-vop <%freg>stack> ;
 
 TUPLE: %cleanup ;
 C: %cleanup make-vop ;
@@ -355,12 +364,31 @@ C: %cleanup make-vop ;
 
 TUPLE: %unbox ;
 C: %unbox make-vop ;
-: %unbox ( n func reg-class -- vop ) 3-in-vop <%unbox> ;
+: %unbox ( n reg-class func -- vop ) 3-in-vop <%unbox> ;
+
+TUPLE: %unbox-struct ;
+C: %unbox-struct make-vop ;
+: %unbox-struct ( n reg-class size -- vop )
+    3-in-vop <%unbox-struct> ;
 
 TUPLE: %box ;
 C: %box make-vop ;
-: %box ( func reg-class -- vop ) 2-in-vop <%box> ;
+: %box ( n reg-class func -- vop ) 3-in-vop <%box> ;
+
+TUPLE: %box-struct ;
+C: %box-struct make-vop ;
+: %box-struct ( n reg-class size -- vop )
+    3-in-vop <%box-struct> ;
 
 TUPLE: %alien-invoke ;
 C: %alien-invoke make-vop ;
 : %alien-invoke ( func lib -- vop ) 2-in-vop <%alien-invoke> ;
+
+TUPLE: %alien-callback ;
+C: %alien-callback make-vop ;
+: %alien-callback ( quot -- vop ) src-vop <%alien-callback> ;
+
+TUPLE: %callback-value ;
+C: %callback-value make-vop ;
+: %callback-value ( reg-class func -- vop )
+    2-in-vop <%callback-value> ;

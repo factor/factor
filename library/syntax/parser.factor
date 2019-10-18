@@ -84,12 +84,6 @@ SYMBOL: string-mode
 : (parse) ( str -- ) line-text set 0 column set parse-loop ;
 
 ! Parsing word utilities
-: ch-search ( ch -- index ) column get line-text get index* ;
-
-: until ( index -- ) 1+ column set ;
-
-: until-eol ( -- ) line-text get length until ;
-
 : escape ( ch -- esc )
     H{
         { CHAR: e  CHAR: \e }

@@ -3,6 +3,9 @@
 IN: kernel-internals
 USING: arrays errors hashtables kernel lists math namespaces parser sequences sequences-internals strings vectors words ;
 
+: class-tuple ( object -- class )
+    dup tuple? [ 2 slot ] [ drop f ] if ; inline
+
 : tuple= ( tuple tuple -- ? )
     2dup [ array-capacity ] 2apply number= [
         dup array-capacity
@@ -11,13 +14,14 @@ USING: arrays errors hashtables kernel lists math namespaces parser sequences se
         2drop f
     ] if ; inline
 
+: tuple-hashcode ( n tuple -- n )
+    dup class-tuple hashcode >r >r 1- r>
+    4 slot hashcode* r> bitxor ;
+
 IN: generic
 
 : class ( object -- class )
     dup tuple? [ 2 slot ] [ type type>class ] if ; inline
-
-: class-tuple ( object -- class )
-    dup tuple? [ 2 slot ] [ drop f ] if ; inline
 
 : tuple-predicate ( word -- )
     dup predicate-word
@@ -73,7 +77,14 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
 M: tuple clone ( tuple -- tuple )
     (clone) dup delegate clone over set-delegate ;
 
-M: tuple hashcode ( vec -- n ) array-capacity ;
+M: tuple hashcode* ( n tuple -- n )
+    {
+        { [ over 0 <= ] [ 2drop 0 ] }
+        { [ dup array-capacity 2 <= ] [ nip class-tuple hashcode ] }
+        { [ t ] [ tuple-hashcode ] }
+    } cond ;
+
+M: tuple hashcode ( tuple -- n ) 2 swap hashcode* ;
 
 M: tuple = ( obj tuple -- ? )
     2dup eq?

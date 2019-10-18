@@ -78,10 +78,10 @@ M: gadget remove-notify* drop ;
     #! { 1 1 0 } - bottom right corner
     >r dup screen-loc swap rect-dim r> v* v+ ;
 
-: relative ( g1 g2 -- g2-g1 ) screen-loc swap screen-loc v- ;
+: relative-loc ( g1 point -- point-g1 ) swap screen-loc v- ;
 
 : relative-rect ( g1 g2 -- rect )
-    [ relative ] keep rect-dim <rect> ;
+    [ screen-loc relative-loc ] keep rect-dim <rect> ;
 
 : child? ( parent child -- ? ) parents memq? ;
 
@@ -91,12 +91,10 @@ M: gadget focusable-child* drop t ;
 
 : focusable-child ( gadget -- gadget )
     dup focusable-child*
-    dup t = [ drop ] [ nip focusable-child ] if ;
+    dup t eq? [ drop ] [ nip focusable-child ] if ;
 
 IN: gadgets-layouts
 
 : make-pile ( children -- pack ) <pile> [ add-gadgets ] keep ;
 
 : make-shelf ( children -- pack ) <shelf> [ add-gadgets ] keep ;
-
-: make-stack ( children -- pack ) <stack> [ add-gadgets ] keep ;

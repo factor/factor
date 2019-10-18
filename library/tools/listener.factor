@@ -12,12 +12,9 @@ SYMBOL: datastack-hook
 
 "  " listener-prompt set-global
 
-: bye ( -- )
-    #! Exit the current listener.
-    quit-flag on ;
+: bye ( -- ) quit-flag on ;
 
 : (read-multiline) ( quot depth -- quot ? )
-    #! Flag indicates EOF.
     >r readln dup [
         (parse) depth r> dup >r <= [
             ( we're done ) r> drop t
@@ -29,12 +26,9 @@ SYMBOL: datastack-hook
     ] if ;
 
 : read-multiline ( -- quot ? )
-    #! Keep parsing until the end is reached. Flag indicates
-    #! EOF.
     [ f depth (read-multiline) >r reverse r> ] with-parser ;
 
 : listen ( -- )
-    #! Wait for user input, and execute.
     listener-hook get call
     listener-prompt get write flush
     [ read-multiline [ call ] [ bye ] if ] try ;
@@ -43,9 +37,6 @@ SYMBOL: datastack-hook
     quit-flag get [ quit-flag off ] [ listen (listener) ] if ;
 
 : listener ( -- )
-    #! Run a listener loop that executes user input. We start
-    #! the listener in a new scope and copy the vocabulary
-    #! search path.
     [
         use [ clone ] change
         [ datastack ] datastack-hook set

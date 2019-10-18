@@ -1,24 +1,29 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: arrays hashtables io kernel lists math namespaces parser sequences ;
+USING: arrays hashtables io kernel lists math namespaces parser
+sequences ;
 
-UNION: c-ptr byte-array alien displaced-alien ;
+: <alien> ( address -- alien ) f <displaced-alien> ; inline
 
-M: alien hashcode ( obj -- n )
-    alien-address >fixnum ;
+UNION: c-ptr byte-array alien ;
 
 M: alien = ( obj obj -- ? )
     over alien? [
-        alien-address swap alien-address =
+        2dup [ expired? ] 2apply 2dup or [
+            2swap 2drop
+        ] [
+            2drop [ alien-address ] 2apply
+        ] if =
     ] [
         2drop f
     ] if ;
 
+global [ "libraries" nest drop ] bind
+
 : library ( name -- object ) "libraries" get hash ;
 
 : load-library ( name -- dll )
-    #! Higher level wrapper around dlopen primitive.
     library dup [
         [
             "dll" get dup [
@@ -33,8 +38,8 @@ M: alien = ( obj obj -- ? )
     ] bind ;
 
 : add-simple-library ( name file -- ) 
-    win32? ".dll" ".so" ? append
-    win32? "stdcall" "cdecl" ? add-library ;
+    windows? ".dll" ".so" ? append
+    windows? "stdcall" "cdecl" ? add-library ;
 
 : library-abi ( library -- abi )
     library "abi" swap ?hash [ "cdecl" ] unless* ;

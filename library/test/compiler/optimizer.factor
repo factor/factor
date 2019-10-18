@@ -1,8 +1,8 @@
+IN: temporary
 USING: arrays assembler compiler compiler-backend generic
 hashtables inference kernel kernel-internals lists math
 optimizer prettyprint sequences strings test vectors words
 sequences-internals ;
-IN: temporary
 
 : kill-1
     [ 1 2 3 ] [ + ] over drop drop ; compiled
@@ -38,9 +38,10 @@ IN: temporary
 
 : set= 2dup subset? >r swap subset? r> and ;
 
+: kill-set dup live-values swap literals hash-diff ;
+
 : kill-set=
-    dataflow dup split-node
-    kill-set hash-keys [ value-literal ] map set= ;
+    dataflow kill-set hash-keys [ value-literal ] map set= ;
 
 : foo 1 2 3 ;
 
@@ -49,6 +50,7 @@ IN: temporary
 [ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
 
 [ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
+
 
 : literal-kill-test-1 4 compiled-offset 2 cells - ; compiled
 
@@ -62,29 +64,17 @@ IN: temporary
 
 [ 3 ] [ literal-kill-test-3 ] unit-test
 
-[ t ] [ [ [ 3 ] [ dup ] 3 ] [ [ 3 ] [ dup ] if drop ] kill-set= ] unit-test
-
 : literal-kill-test-4
     5 swap [ 3 ] [ dup ] if 2drop ; compiled
 
 [ ] [ t literal-kill-test-4 ] unit-test
 [ ] [ f literal-kill-test-4 ] unit-test
 
-[ t ] [
-    [ 5 [ 3 ] [ dup ] 3 ]
-    \ literal-kill-test-4 word-def kill-set=
-] unit-test
-
 : literal-kill-test-5
     5 swap [ 5 ] [ dup ] if 2drop ; compiled
 
 [ ] [ t literal-kill-test-5 ] unit-test
 [ ] [ f literal-kill-test-5 ] unit-test
-
-[ t ] [
-    [ 5 [ 5 ] [ dup ] 5 ]
-    \ literal-kill-test-5 word-def kill-set=
-] unit-test
 
 : literal-kill-test-6
     5 swap [ dup ] [ dup ] if 2drop ; compiled
@@ -106,7 +96,7 @@ IN: temporary
 
 [ t ] [
     [ [ ] swap literal-kill-test-8 ] dataflow
-    dup split-node live-values hash-values [ value? ] subset empty?
+    live-values hash-values [ value? ] subset empty?
 ] unit-test
 
 ! Test method inlining
@@ -247,3 +237,10 @@ GENERIC: void-generic
 : breakage "hi" void-generic ;
 [ ] [ \ breakage compile ] unit-test
 [ breakage ] unit-test-fails
+
+! regression
+: test-0 dup 0 = [ drop ] [ 1- test-0 ] if ; inline
+: test-1 t [ test-0 ] [ delegate dup [ test-1 ] [ drop ] if ] if ; inline
+: test-2 5 test-1 ; compiled
+
+[ f ] [ f test-2 ] unit-test

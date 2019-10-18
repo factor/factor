@@ -10,6 +10,14 @@ CELL init_zone(ZONE *z, CELL size, CELL base)
 	return z->limit;
 }
 
+/* update this global variable. since it is stored in a non-volatile register,
+we need to save its contents and re-initialize it when entering a callback,
+and restore its contents when leaving the callback. see stack.c */
+void update_cards_offset(void)
+{
+	cards_offset = (CELL)cards - (heap_start >> CARD_BITS);
+}
+
 /* input parameters must be 8 byte aligned */
 /* the heap layout is important:
 - two semispaces: tenured and prior
@@ -28,22 +36,16 @@ void init_arena(CELL gens, CELL young_size, CELL aging_size)
 	CELL cards_size = total_size / CARD_SIZE;
 
 	gen_count = gens;
-	generations = malloc(sizeof(ZONE) * gen_count);
+	generations = safe_malloc(sizeof(ZONE) * gen_count);
 
-	if(generations == 0)
-		fatal_error("Cannot allocate zone head array",0);
-
-	heap_start = (CELL)alloc_guarded(total_size);
+	heap_start = (CELL)(alloc_bounded_block(total_size)->start);
 	heap_end = heap_start + total_size;
 
-	cards = alloc_guarded(cards_size);
+	cards = safe_malloc(cards_size);
 	cards_end = cards + cards_size;
-	cards_offset = (CELL)cards - (heap_start >> CARD_BITS);
+	update_cards_offset();
 
 	alloter = heap_start;
-
-	if(heap_start == 0)
-		fatal_error("Cannot allocate data heap",0);
 
 	alloter = init_zone(&tenured,aging_size,alloter);
 	alloter = init_zone(&prior,aging_size,alloter);
@@ -66,21 +68,37 @@ void collect_roots(void)
 {
 	int i;
 	CELL ptr;
+	STACKS *stacks;
 
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
-	/* we can't use & here since these two are in
-	registers on PowerPC */
-	COPY_OBJECT(callframe);
-	COPY_OBJECT(executing);
+	copy_handle(&executing);
+	copy_handle(&callframe);
 
-	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
-		copy_handle((CELL*)ptr);
+	save_stacks();
+	stacks = stack_chain;
 
-	for(ptr = cs_bot; ptr <= cs; ptr += CELLS)
-		copy_handle((CELL*)ptr);
+	while(stacks)
+	{
+		CELL bottom = stacks->data_region->start;
+		CELL top = stacks->data;
+		
+		for(ptr = bottom; ptr <= top; ptr += CELLS)
+			copy_handle((CELL*)ptr);
+	
+		bottom = stacks->call_region->start;
+		top = stacks->call;
+		
+		for(ptr = bottom; ptr <= top; ptr += CELLS)
+			copy_handle((CELL*)ptr);
+
+		copy_handle(&stacks->callframe);
+		copy_handle(&stacks->catch_save);
+
+		stacks = stacks->next;
+	}
 
 	for(i = 0; i < USER_ENV; i++)
 		copy_handle(&userenv[i]);
@@ -176,8 +194,8 @@ INLINE void collect_object(CELL scan)
 	case DLL_TYPE:
 		collect_dll((DLL*)scan);
 		break;
-	case DISPLACED_ALIEN_TYPE:
-		collect_displaced_alien((DISPLACED_ALIEN*)scan);
+	case ALIEN_TYPE:
+		collect_alien((ALIEN*)scan);
 		break;
 	case WRAPPER_TYPE:
 		collect_wrapper((F_WRAPPER*)scan);
@@ -344,8 +362,13 @@ void maybe_gc(CELL size)
 	}
 }
 
-void primitive_gc_time(void)
+void simple_gc(void)
 {
 	maybe_gc(0);
+}
+
+void primitive_gc_time(void)
+{
+	simple_gc();
 	dpush(tag_bignum(s48_long_long_to_bignum(gc_time)));
 }

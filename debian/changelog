@@ -1,3 +1,9 @@
+factor (0.80) unstable; urgency=low
+
+  * New stable release.
+
+ -- Trent Buck <trentbuck@gmail.com>  Tue, 31 Jan 2006 21:11:15 +1100
+
 factor (0.79+cvs20060120-1) unstable; urgency=low
 
   * Refactored wrapper scripts and reduced build time.

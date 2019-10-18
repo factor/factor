@@ -1,0 +1,27 @@
+IN: test
+USING: help kernel ;
+
+HELP: benchmark "( quot -- gctime runtime )"
+{ $values { "quot" "a quotation" } { "gctime" "an integer denoting milliseconds" } { "runtime" "an integer denoting milliseconds" } }
+{ $description "Runs a quotation, measuring the total wall clock time and the total time spent in the garbage collector." }
+{ $notes "A nicer word for interactive use is " { $link time } "." } ;
+
+HELP: time "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Runs a quotation and then prints the total run time and time spent in the garbage collector." }
+{ $examples
+    { $example "[ 1000000 0 [ + ] reduce drop ] time" "1116 ms run / 6 ms GC time" }
+} ;
+
+HELP: unit-test "( output input -- )"
+{ $values { "output" "a sequence of expected stack elements" } { "input" "a quotation run with an empty stack" } }
+{ $description "Runs a quotation with an empty stack, comparing the resulting stack with " { $snippet "output" } ". Elements are compared using " { $link = } ". Throws an error if the expected stack does not match the resulting stack." } ;
+
+HELP: unit-test-fails "( quot -- )"
+{ $values { "quot" "a quotation run with an empty stack" } }
+{ $description "Runs a quotation with an empty stack, expecting it to throw an error. If the quotation throws an error, this word returns normally. If the quotation does not throw an error, this word " { $emphasis "does" } " raise an error." }
+{ $notes "This word is used to test boundary conditions and fail-fast behavior." } ;
+
+HELP: assert-depth "( quot -- )"
+{ $values { "quot" "a quotation" } }
+{ $description "Runs a quotation. Throws an error if the total number of elements on the stack is not the same before and after the quotation runs." } ;

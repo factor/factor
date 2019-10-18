@@ -35,8 +35,8 @@ sequences strings vectors words prettyprint ;
     dup "infer-effect" word-prop consume/produce
     [ [ t ] [ f ] if ] infer-quot ;
 
-{ fixnum<= fixnum< fixnum>= fixnum> eq? }
-[ dup [ manual-branch ] curry "infer" set-word-prop ] each
+! { fixnum<= fixnum< fixnum>= fixnum> eq? }
+! [ dup [ manual-branch ] curry "infer" set-word-prop ] each
 
 ! Primitive combinators
 \ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop
@@ -381,13 +381,10 @@ sequences strings vectors words prettyprint ;
 \ dlsym [ [ string object ] [ integer ] ] "infer-effect" set-word-prop
 \ dlclose [ [ dll ] [ ] ] "infer-effect" set-word-prop
 
-\ <alien> [ [ integer ] [ alien ] ] "infer-effect" set-word-prop
-\ <alien> t "flushable" set-word-prop
-
 \ <byte-array> [ [ integer ] [ byte-array ] ] "infer-effect" set-word-prop
 \ <byte-array> t "flushable" set-word-prop
 
-\ <displaced-alien> [ [ integer c-ptr ] [ displaced-alien ] ] "infer-effect" set-word-prop
+\ <displaced-alien> [ [ integer c-ptr ] [ c-ptr ] ] "infer-effect" set-word-prop
 \ <displaced-alien> t "flushable" set-word-prop
 
 \ alien-signed-cell [ [ c-ptr integer ] [ integer ] ] "infer-effect" set-word-prop

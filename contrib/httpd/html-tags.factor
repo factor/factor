@@ -73,20 +73,8 @@ USE: sequences
 ! <input "text" =type "name" =name "20" =size input/>
 
 SYMBOL: html
-SYMBOL: attrs
 
 : write-html H{ { html t } } format ;
-
-: attrs>string ( alist -- string )
-    #! Convert the attrs alist to a string
-    #! suitable for embedding in an html tag.
-    [ [ " " % dup car % "='" % cdr % "'" % ] each ] "" make ;
-
-: write-attributes ( n: namespace -- )    
-    #! With the attribute namespace on the stack, get the attributes
-    #! and write them to standard output. If no attributes exist, write
-    #! nothing.
-    attrs get attrs>string write-html ;
 
 : html-word ( name def -- )
     #! Define 'word creating' word to allow
@@ -95,32 +83,25 @@ SYMBOL: attrs
  
 : <foo> "<" swap ">" append3 ;
 
-: do-<foo> <foo> write-html ;
-
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
     #! word.
-    dup <foo> swap [ do-<foo> ] cons html-word define-open ;
+    dup <foo> swap [ <foo> write-html ] cons html-word
+    define-open ;
 
 : <foo "<" swap append ;
-
-: do-<foo write-html H{ } clone >n V{ } clone attrs set ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
     #! word.
-    <foo dup [ do-<foo ] cons html-word drop ;
+    <foo dup [ write-html ] cons html-word drop ;
 
 : foo> ">" append ;
-
-: do-foo> write-attributes n> drop ">" write-html ;
-
-: do-foo/> write-attributes n> drop "/>" write-html ;
 
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
     #! word.
-    foo> [ do-foo> ] html-word define-open ;
+    foo> [ ">" write-html ] html-word define-open ;
 
 : </foo> [ "</" % % ">" % ] "" make ;
 
@@ -131,19 +112,17 @@ SYMBOL: attrs
 
 : <foo/> [ "<" % % "/>" % ] "" make ;
 
-: do-<foo/> <foo/> write-html ;
-
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    dup <foo/> swap [ do-<foo/> ] cons html-word drop ;
+    dup <foo/> swap [ <foo/> write-html ] cons html-word drop ;
 
 : foo/> "/>" append ;
 
 : def-for-html-word-foo/> ( name -- )
     #! Return the name and code for the foo/> patterned
     #! word.    
-    foo/> [ do-foo/> ] html-word define-close ;
+    foo/> [ "/>" write-html ] html-word define-close ;
 
 : define-closed-html-word ( name -- ) 
     #! Given an HTML tag name, define the words for
@@ -160,10 +139,16 @@ SYMBOL: attrs
     dup def-for-html-word-<foo
     def-for-html-word-foo/> ;
 
+: write-attr ( value name -- )
+    " " write-html
+    write-html
+    "='" write-html
+    write
+    "'" write-html ;
+
 : define-attribute-word ( name -- )
-    dup "=" swap append swap [
-        , [ swons attrs get push ] %
-    ] [ ] make html-word drop ;
+    dup "=" swap append swap
+    [ , [ write-attr ] % ] [ ] make html-word drop ;
 
 ! Define some closed HTML tags
 [

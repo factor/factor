@@ -116,27 +116,40 @@ TUPLE: link name ;
 
 M: link article-title link-name article-title ;
 
-M: link article-name link-name article-name ;
-
 M: link article-content link-name article-content ;
 
 DEFER: help
 
+: ($subsection) ( quot object -- )
+    subsection-style [
+        [ swap curry ] keep dup article-title swap <link>
+        rot simple-outliner
+    ] with-style ;
+
 : $subsection ( object -- )
+    [ first [ (help) ] swap ($subsection) ] ($block) ;
+
+: ($subtopic) ( element -- quot )
     [
-        subsection-style [
-            first dup article-title swap <link>
-            dup [ link-name (help) ] curry
-            simple-outliner
-        ] with-style
+        default-style
+        [ last-block on print-element ] with-nesting*
+    ] curry ;
+
+: $subtopic ( object -- )
+    [
+        uncons* ($subtopic) [
+            subtopic-style [ print-element ] with-style
+        ] write-outliner
     ] ($block) ;
+
+: >link ( obj -- obj ) dup string? [ <link> ] when ;
 
 : $link ( article -- )
     last-block off first dup word? [
         pprint
     ] [
         link-style [
-            dup article-name swap <link> simple-object
+            dup article-title swap >link simple-object
         ] with-style
     ] if ;
 

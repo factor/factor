@@ -45,7 +45,9 @@ F_STRING* from_c_string(const char* c_string);
 F_STRING* memory_to_string(const BYTE* string, CELL length);
 void primitive_memory_to_string(void);
 DLLEXPORT char* unbox_c_string(void);
+char *pop_c_string(void);
 DLLEXPORT u16* unbox_utf16_string(void);
+DLLEXPORT void box_utf16_string(u16 *unboxed);
 
 /* untagged & unchecked */
 INLINE CELL string_nth(F_STRING* string, CELL index)

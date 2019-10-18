@@ -2,8 +2,8 @@
 
 ! Load the HTTP server first (contrib/httpd/load.factor).
 
-USING: errors generic hashtables html http io kernel math
-namespaces parser prettyprint sequences strings words ;
+USING: errors generic hashtables html http io kernel math memory
+namespaces parser prettyprint sequences strings threads words ;
 IN: factorbot
 
 SYMBOL: irc-stream
@@ -63,20 +63,16 @@ M: ping handle-irc ( line -- )
     receiver get nickname get = speaker receiver ? get say ;
 
 : irc-loop ( -- )
-    [
-        irc-stream get stream-readln
-        [ dup print flush parse-irc irc-loop ] when*
-    ] [
-        irc-stream get stream-close
-    ] cleanup ;
+    irc-stream get stream-readln
+    [ dup print flush parse-irc irc-loop ] when* ;
 
 : factorbot
     "irc.freenode.net" connect
     "factorbot" login
     "#concatenative" join
-    irc-loop ;
+    [ irc-loop ] [ irc-stream get stream-close ] cleanup ;
 
-: factorbot-loop [ factorbot ] try factorbot-loop ;
+: factorbot-loop [ factorbot ] try 30000 sleep factorbot-loop ;
 
 : multiline-respond ( string -- )
     <string-reader> lines [ respond ] each ;

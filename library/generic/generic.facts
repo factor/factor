@@ -43,7 +43,7 @@ HELP: members "( class -- seq )"
 { $values { "class" "a class word" } { "seq" "a sequence of union members, or " { $link f } } }
 { $description "If " { $snippet "class" } " is a union class, outputs a sequence of members, otherwise outputs " { $link f } "." } ;
 
-HELP: flatten "( class -- seq )"
+HELP: flatten-class "( class -- seq )"
 { $values { "class" "a class word" } { "seq" "a sequence of classes" } }
 { $description "Outputs a sequence of classes whose union is the given class. Unless the given class is a union class, the output is just a singleton sequence consisting of the given class." } ;
 

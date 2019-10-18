@@ -1,7 +1,13 @@
 #include "../factor.h"
 
-void platform_run()
+void platform_run(void)
 {
-	run();
+	run_toplevel();
 }
 
+void early_init(void) {}
+
+const char *default_image_path(void)
+{
+	return "factor.image";
+}

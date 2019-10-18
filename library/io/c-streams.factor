@@ -27,10 +27,12 @@ M: c-stream stream-close ( stream -- )
     dup c-stream-in [ fclose ] when*
     c-stream-out [ fclose ] when* ;
 
+: <duplex-c-stream> ( in out -- stream )
+    >r f <c-stream> <line-reader> f r> <c-stream> <plain-writer>
+    <duplex-stream> ;
+
 : init-io ( -- )
-    13 getenv f <c-stream> <line-reader>
-    f 14 getenv <c-stream> <plain-writer>
-    <duplex-stream> stdio set ;
+    13 getenv 14 getenv <duplex-c-stream> stdio set ;
 
 : io-multiplex ( ms -- ) drop ;
 

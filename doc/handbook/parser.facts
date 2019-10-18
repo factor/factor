@@ -114,8 +114,5 @@ $terpri
 { $subsection line-number }
 { $subsection line-text }
 { $subsection column }
-"Some utilities used when parsing comments:"
-{ $subsection until }
-{ $subsection until-eol }
 "A utility used when parsing string literals:"
 { $subsection parse-string } ;

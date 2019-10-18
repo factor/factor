@@ -7,11 +7,11 @@ namespaces queues sequences vectors ;
 
 ! Co-operative multitasker.
 
-: run-queue ( -- queue ) \ run-queue global hash ;
+: run-queue ( -- queue ) \ run-queue get-global ;
 
 : schedule-thread ( continuation -- ) run-queue enque ;
 
-: sleep-queue ( -- vec ) \ sleep-queue global hash ;
+: sleep-queue ( -- vec ) \ sleep-queue get-global ;
 
 : sleep-queue* ( -- vec )
     sleep-queue dup [ 2car swap - ] nsort ;

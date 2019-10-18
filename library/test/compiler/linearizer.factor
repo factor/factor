@@ -5,11 +5,12 @@ USE: compiler
 USE: compiler-frontend
 USE: inference
 USE: words
+USE: sequences
 
 : fie [ ] [ ] if ;
 
 [ ] [ \ fie dup word-def dataflow linearize drop ] unit-test
 
-: foo [ drop ] each-word ;
+: foo all-words [ drop ] each ;
 
 [ ] [ \ foo dup word-def dataflow linearize drop ] unit-test

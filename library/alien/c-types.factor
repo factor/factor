@@ -1,16 +1,16 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: arrays assembler compiler compiler-backend errors generic
-hashtables kernel kernel-internals lists math namespaces parser
-sequences sequences-internals strings words ;
+USING: arrays compiler compiler-backend errors generic
+hashtables kernel kernel-internals libc lists math namespaces
+parser sequences strings words ;
 
 : <c-type> ( -- type )
     H{
-        { "setter" [ "No setter" throw ] }
-        { "getter" [ "No getter" throw ] }
-        { "boxer" "no boxer" }
-        { "unboxer" "no unboxer" }
+        { "setter" [ "Cannot read struct fields with type" throw ] }
+        { "getter" [ "Cannot write struct fields with type" throw ] }
+        { "boxer" [ "boxer-function" get %box ] }
+        { "unboxer" [ "unboxer-function" get %unbox ] }
         { "reg-class" T{ int-regs f } }
         { "width" 0 }
     } clone ;
@@ -23,6 +23,8 @@ SYMBOL: c-types
 
 : c-size ( name -- size ) "width" swap c-type hash ;
 
+: c-align ( name -- align ) "align" swap c-type hash ;
+
 : c-getter ( name -- quot ) "getter" swap c-type hash ;
 
 : c-setter ( name -- quot ) "setter" swap c-type hash ;
@@ -31,32 +33,40 @@ SYMBOL: c-types
     >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
     inline
 
-: <c-object> ( type -- c-ptr ) c-size <byte-array> ;
+: <c-array> ( size type -- c-ptr )
+    global [ c-size * <byte-array> ] bind ;
 
-: <c-array> ( size type -- c-ptr ) c-size * <byte-array> ;
+: <c-object> ( type -- c-ptr ) 1 swap <c-array> ;
 
-: define-pointer ( type -- )
-    "void*" c-type swap "*" append c-types get set-hash ;
+: <malloc-array> ( size type -- malloc-ptr )
+    global [ c-size calloc ] bind check-ptr ;
+
+: <malloc-object> ( type -- malloc-ptr ) 1 swap <malloc-array> ;
+
+: <malloc-string> ( string -- alien )
+    "\0" append dup length malloc check-ptr
+    [ alien-address string>memory ] keep ;
+
+: (typedef) ( old new -- ) c-types get [ >r get r> set ] bind ;
+
+: define-pointer ( type -- ) "*" append "void*" swap (typedef) ;
 
 : define-deref ( name vocab -- )
     >r dup "*" swap append r> create
     swap c-getter 0 swons define-compound ;
 
 : (define-nth) ( word type quot -- )
-    >r c-size [ rot * ] cons r> append define-compound ;
+    >r c-size [ rot * ] curry r> append define-compound ;
 
 : define-nth ( name vocab -- )
-    #! Make a word foo-nth ( n alien -- displaced-alien ).
     >r dup "-nth" append r> create
     swap dup c-getter (define-nth) ;
 
 : define-set-nth ( name vocab -- )
-    #! Make a word set-foo-nth ( value n alien -- ).
     >r "set-" over "-nth" append3 r> create
     swap dup c-setter (define-nth) ;
 
 : define-out ( name vocab -- )
-    #! Out parameter constructor for integral types.
     over [ <c-object> tuck 0 ] over c-setter append
     >r >r constructor-word r> r> cons define-compound ;
 
@@ -69,8 +79,6 @@ SYMBOL: c-types
     2dup define-deref
     2dup define-set-nth
     define-out ;
-
-: (typedef) c-types get [ >r get r> set ] bind ;
 
 : typedef ( old new -- )
     over "*" append over "*" append (typedef) (typedef) ;

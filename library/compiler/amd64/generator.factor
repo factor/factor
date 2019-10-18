@@ -1,7 +1,9 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler-backend
-USING: assembler kernel math namespaces ;
+USING: assembler compiler-frontend kernel math namespaces ;
 
 M: %prologue generate-node ( vop -- )
-    drop RSP stack-increment SUB ;
+    drop
+    0 input \ stack-reserve set
+    RSP stack-increment SUB ;

@@ -69,10 +69,12 @@ M: node child-ties ( node -- seq )
         [ value-class* class-and ] keep set-value-class*
     ] 2each ;
 
+: set-tie ( tie tie -- ) ties get set-hash ;
+
 : type/tag-ties ( node n -- )
     over node-out-d first over [ <literal-tie> ] map-with
     >r swap node-in-d first swap [ type>class <class-tie> ] map-with r>
-    [ ties get set-hash ] 2each ;
+    [ set-tie ] 2each ;
 
 \ type [ num-types type/tag-ties ] "create-ties" set-word-prop
 
@@ -82,7 +84,7 @@ M: node child-ties ( node -- seq )
     dup node-in-d second value? [
         dup node-in-d first2 value-literal* <literal-tie>
         over node-out-d first general-t <class-tie>
-        ties get set-hash
+        set-tie
     ] when drop
 ] "create-ties" set-word-prop
 
@@ -95,7 +97,7 @@ M: node child-ties ( node -- seq )
         drop dup node-param "predicating" word-prop dup [
             >r dup node-in-d first r> <class-tie>
             swap node-out-d first general-t <class-tie>
-            ties get set-hash
+            set-tie
         ] [
             2drop
         ] if

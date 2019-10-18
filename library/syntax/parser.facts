@@ -87,8 +87,8 @@ HELP: save-location "( word -- )"
 { $description "Sets the " { $snippet "\"file\"" } " and " {  $snippet "\"line\"" } " word properties to the current parser location." }
 $parsing-note ;
 
-HELP: create-in "( word -- )"
-{ $values { "word" "a word name" } }
+HELP: create-in "( string -- word )"
+{ $values { "string" "a word name" } { "word" "a new word" } }
 { $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
 $parsing-note ;
 
@@ -114,23 +114,6 @@ HELP: scan-word "( -- obj )"
 { $description "Reads the next token from the line currently being parsed. First tries to look up the word in the dictionary, and if the lookup fails, attempts to convert the token to a number." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 $parsing-note ;
-
-HELP: ch-search "( ch -- index )"
-{ $values { "ch" "a character" } { "index" "an index in the current line" } }
-{ $description "Searches the current line, starting from the parser column, for an occurrence of " { $snippet "ch" } ". If the character does not occur in the line, outputs -1." }
-$parsing-note
-{ $see-also POSTPONE: ( } ;
-
-HELP: until "( index -- )"
-{ $values { "index" "an index in the current line" } }
-{ $description "Advances the parser column to immediately after the index." }
-$parsing-note
-{ $see-also POSTPONE: ( } ;
-
-HELP: until-eol "( -- )"
-{ $description "Discards all input until the end of the line." }
-$parsing-note
-{ $see-also POSTPONE: ! POSTPONE: #! } ;
 
 HELP: escape "( escape -- ch )"
 { $values { "escape" "a single-character escape" } { "ch" "a character" } }

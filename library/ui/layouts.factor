@@ -1,14 +1,18 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-layouts
 USING: errors gadgets generic hashtables kernel lists math
-namespaces sequences ;
+namespaces queues sequences ;
+IN: gadgets-layouts
 
 : invalidate ( gadget -- ) t swap set-gadget-relayout? ;
 
 : forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
 
 : invalidate* ( gadget -- ) dup invalidate forget-pref-dim ;
+
+: invalid ( -- queue ) \ invalid get-global ;
+
+: add-invalid ( gadget -- ) invalid enque ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
@@ -19,8 +23,7 @@ namespaces sequences ;
     ] [
         dup invalidate*
         dup gadget-root?
-        [ add-invalid ]
-        [ gadget-parent [ relayout ] when* ] if
+        [ add-invalid ] [ gadget-parent [ relayout ] when* ] if
     ] if ;
 
 : relayout-1 ( gadget -- )
@@ -44,10 +47,9 @@ namespaces sequences ;
 GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
-    pref-dim* ;
-    ! dup gadget-pref-dim [ ] [
-    !     dup pref-dim* dup rot set-gadget-pref-dim
-    ! ] ?if ;
+    dup gadget-pref-dim [ ] [
+        dup pref-dim* dup rot set-gadget-pref-dim
+    ] ?if ;
 
 M: gadget pref-dim* rect-dim ;
 
@@ -140,12 +142,3 @@ M: pack children-on ( rect pack -- list )
         >r >r rect-loc r> r> fast-children-on 0 max
         r>
     ] keep <slice> ;
-
-TUPLE: stack ;
-
-C: stack ( -- gadget )
-    #! A stack lays out all its children on top of each other.
-    { 0 0 1 } over delegate>pack 1 over set-pack-fill ;
-
-M: stack children-on ( point stack -- gadget )
-    nip gadget-children ;
