@@ -14,6 +14,7 @@ M: object = eq? ;
 
 GENERIC: clone ( obj -- obj )
 M: object clone ;
+
 : set-boot ( quot -- )
     #! Set the boot quotation.
     8 setenv ;
@@ -26,13 +27,14 @@ M: object clone ;
     #! Push t if cond is true, otherwise push f.
     rot [ drop ] [ nip ] ifte ; inline
 
-: >boolean t f ? ; inline
-: not ( a -- ~a ) f t ? ; inline
+! defined in parse-syntax.factor
+DEFER: not
+DEFER: t?
 
+: >boolean t f ? ; inline
 : and ( a b -- a&b ) f ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
 : xor ( a b -- a^b ) dup not swap ? ; inline
-: implies ( a b -- a->b ) t ? ; inline
 
 : cpu ( -- arch ) 7 getenv ;
 : os ( -- os ) 11 getenv ;
@@ -41,3 +43,11 @@ M: object clone ;
     os "freebsd" =
     os "linux" = or
     os "macosx" = or ;
+
+: tag-mask BIN: 111 ; inline
+: tag-bits 3 ; inline
+
+: fixnum-tag  BIN: 000 ; inline
+: bignum-tag  BIN: 001 ; inline
+: cons-tag    BIN: 010 ; inline
+: object-tag  BIN: 011 ; inline

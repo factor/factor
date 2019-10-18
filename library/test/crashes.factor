@@ -6,7 +6,7 @@ prettyprint sequences strings test vectors words ;
 
 [ ] [
     "20 <sbuf> \"foo\" set" eval
-    "garbage-collection" eval
+    "full-gc" eval
 ] unit-test
 
 [ ] [
@@ -26,6 +26,6 @@ prettyprint sequences strings test vectors words ;
 ! Weird PowerPC bug.
 [ ] [
     [ "4" throw ] [ drop ] catch
-    garbage-collection
-    garbage-collection
+    full-gc
+    full-gc
 ] unit-test

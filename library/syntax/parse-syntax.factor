@@ -23,14 +23,15 @@ words ;
 
 ! Booleans
 
-! The canonical t is a heap-allocated dummy object. It is always
-! the first in the image.
-BUILTIN: t 7 ;  : t t swons ; parsing
+! The canonical t is a heap-allocated dummy object.
+BUILTIN: t 7 t? ;
+: t t swons ; parsing
 
 ! In the runtime, the canonical f is represented as a null
 ! pointer with tag 3. So
 ! f address . ==> 3
-BUILTIN: f 9 ;  : f f swons ; parsing
+BUILTIN: f 9 not ;
+: f f swons ; parsing
 
 ! Lists
 : [ f ; parsing
@@ -72,7 +73,11 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 : \
     #! Parsed as a piece of code that pushes a word on the stack
     #! \ foo ==> [ foo ] car
-    scan-word unit swons  \ car swons ; parsing
+    scan-word dup word? [
+        unit swons  \ car swons
+    ] [
+        swons
+    ] ifte ; parsing
 
 ! Vocabularies
 : PRIMITIVE:
@@ -109,7 +114,7 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 
 ! String literal
 : (parse-string) ( n str -- n )
-    2dup string-nth CHAR: " = [
+    2dup nth CHAR: " = [
         drop 1 +
     ] [
         [ next-char swap , ] keep (parse-string)
@@ -129,7 +134,7 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 ! Comments
 : (
     #! Stack comment.
-    ")" until parsed-stack-effect ; parsing
+    CHAR: ) until parsed-stack-effect ; parsing
 
 : !
     #! EOL comment.

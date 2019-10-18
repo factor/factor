@@ -1,30 +1,5 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
 ! Copyright (C) 2005 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! See http://factor.sf.net/license.txt for BSD license.
 USE: compiler
 IN: assembler
 USE: words
@@ -125,10 +100,10 @@ PREDICATE: cons displaced
         drop f
     ] ifte ;
 
-M: displaced modifier cdr car byte? BIN: 01 BIN: 10 ? ;
+M: displaced modifier second byte? BIN: 01 BIN: 10 ? ;
 M: displaced register car register ;
 M: displaced displacement
-    cdr car dup byte? [ compile-byte ] [ compile-cell ] ifte ;
+    second dup byte? [ compile-byte ] [ compile-cell ] ifte ;
 
 ( Displacement-only operands -- eg, [ 1234 ]                   )
 PREDICATE: cons disp-only
@@ -181,11 +156,6 @@ UNION: operand register indirect displaced disp-only ;
     #! Relative to after next 32-bit immediate.
     compiled-offset - 4 - ;
 
-: patch ( addr where -- )
-    #! Encode a relative offset to addr from where at where.
-    #! Add 4 because addr is relative to *after* insn.
-    dup >r 4 + - r> set-compiled-cell ;
-
 ( Moving stuff                                                 )
 GENERIC: PUSH ( op -- )
 M: register PUSH HEX: 50 1-operand-short ;
@@ -210,30 +180,35 @@ M: operand MOV HEX: 89 2-operand ;
 GENERIC: JMP ( op -- )
 M: integer JMP HEX: e9 compile-byte from compile-cell ;
 M: operand JMP HEX: ff compile-byte BIN: 100 1-operand ;
+M: word JMP 0 JMP relative ;
 
 GENERIC: CALL ( op -- )
 M: integer CALL HEX: e8 compile-byte from compile-cell ;
 M: operand CALL HEX: ff compile-byte BIN: 010 1-operand ;
+M: word CALL 0 CALL relative ;
 
-: JUMPcc ( addr opcode -- )
-    HEX: 0f compile-byte  compile-byte  from compile-cell ;
+GENERIC: JUMPcc ( opcode addr -- )
+M: integer JUMPcc ( opcode addr -- )
+    HEX: 0f compile-byte  swap compile-byte  from compile-cell ;
+M: word JUMPcc ( opcode addr -- )
+    >r 0 JUMPcc r> relative ;
 
-: JO  HEX: 80 JUMPcc ;
-: JNO HEX: 81 JUMPcc ;
-: JB  HEX: 82 JUMPcc ;
-: JAE HEX: 83 JUMPcc ;
-: JE  HEX: 84 JUMPcc ;
-: JNE HEX: 85 JUMPcc ;
-: JBE HEX: 86 JUMPcc ;
-: JA  HEX: 87 JUMPcc ;
-: JS  HEX: 88 JUMPcc ;
-: JNS HEX: 89 JUMPcc ;
-: JP  HEX: 8a JUMPcc ;
-: JNP HEX: 8b JUMPcc ;
-: JL  HEX: 8c JUMPcc ;
-: JGE HEX: 8d JUMPcc ;
-: JLE HEX: 8e JUMPcc ;
-: JG  HEX: 8f JUMPcc ;
+: JO  HEX: 80 swap JUMPcc ;
+: JNO HEX: 81 swap JUMPcc ;
+: JB  HEX: 82 swap JUMPcc ;
+: JAE HEX: 83 swap JUMPcc ;
+: JE  HEX: 84 swap JUMPcc ; ! aka JZ
+: JNE HEX: 85 swap JUMPcc ;
+: JBE HEX: 86 swap JUMPcc ;
+: JA  HEX: 87 swap JUMPcc ;
+: JS  HEX: 88 swap JUMPcc ;
+: JNS HEX: 89 swap JUMPcc ;
+: JP  HEX: 8a swap JUMPcc ;
+: JNP HEX: 8b swap JUMPcc ;
+: JL  HEX: 8c swap JUMPcc ;
+: JGE HEX: 8d swap JUMPcc ;
+: JLE HEX: 8e swap JUMPcc ;
+: JG  HEX: 8f swap JUMPcc ;
 
 : RET ( -- ) HEX: c3 compile-byte ;
 
@@ -241,34 +216,62 @@ M: operand CALL HEX: ff compile-byte BIN: 010 1-operand ;
 
 GENERIC: ADD ( dst src -- )
 M: integer ADD HEX: 81 BIN: 000 immediate-8/32 ;
-M: operand ADD HEX: 01 2-operand ;
+M: operand ADD OCT: 001 2-operand ;
 
-GENERIC: SUB ( dst src -- )
-M: integer SUB HEX: 81 BIN: 101 immediate-8/32 ;
-M: operand SUB HEX: 29 2-operand ;
+GENERIC: OR ( dst src -- )
+M: integer OR HEX: 81 BIN: 001 immediate-8/32 ;
+M: operand OR OCT: 011 2-operand ;
+
+GENERIC: ADC ( dst src -- )
+M: integer ADC HEX: 81 BIN: 010 immediate-8/32 ;
+M: operand ADC OCT: 021 2-operand ;
+
+GENERIC: SBB ( dst src -- )
+M: integer SBB HEX: 81 BIN: 011 immediate-8/32 ;
+M: operand SBB OCT: 031 2-operand ;
 
 GENERIC: AND ( dst src -- )
 M: integer AND HEX: 81 BIN: 100 immediate-8/32 ;
-M: operand AND HEX: 21 2-operand ;
+M: operand AND OCT: 041 2-operand ;
 
-: IMUL ( dst src -- )
-    HEX: 0f compile-byte HEX: af 2-operand ;
+GENERIC: SUB ( dst src -- )
+M: integer SUB HEX: 81 BIN: 101 immediate-8/32 ;
+M: operand SUB OCT: 051 2-operand ;
 
-: IDIV ( src -- )
-    #! IDIV is weird on x86. Only the divisor is given as an
-    #! explicit operand. The quotient is stored in EAX, the
-    #! remainder in EDX.
-    HEX: f7 compile-byte BIN: 111 1-operand ;
-
-: CDQ HEX: 99 compile-byte ;
-
-: SHL ( dst src -- ) HEX: c1 BIN: 100 immediate-8 ;
-
-: SHR ( dst src -- ) HEX: c1 BIN: 101 immediate-8 ;
+GENERIC: XOR ( dst src -- )
+M: integer XOR HEX: 81 BIN: 110 immediate-8/32 ;
+M: operand XOR OCT: 061 2-operand ;
 
 GENERIC: CMP ( dst src -- )
 M: integer CMP HEX: 81 BIN: 111 immediate-8/32 ;
-M: operand CMP HEX: 39 2-operand ;
+M: operand CMP OCT: 071 2-operand ;
+
+: NOT ( dst -- ) HEX: f7 compile-byte BIN: 010 1-operand ;
+: NEG ( dst -- ) HEX: f7 compile-byte BIN: 011 1-operand ;
+: MUL ( dst -- ) HEX: f7 compile-byte BIN: 100 1-operand ;
+: IMUL ( src -- ) HEX: f7 compile-byte BIN: 101 1-operand ;
+: DIV ( dst -- ) HEX: f7 compile-byte BIN: 110 1-operand ;
+: IDIV ( src -- ) HEX: f7 compile-byte BIN: 111 1-operand ;
+
+: CDQ HEX: 99 compile-byte ;
+
+: ROL ( dst n -- ) HEX: c1 BIN: 000 immediate-8 ;
+: ROR ( dst n -- ) HEX: c1 BIN: 001 immediate-8 ;
+: RCL ( dst n -- ) HEX: c1 BIN: 010 immediate-8 ;
+: RCR ( dst n -- ) HEX: c1 BIN: 011 immediate-8 ;
+: SHL ( dst n -- ) HEX: c1 BIN: 100 immediate-8 ;
+: SHR ( dst n -- ) HEX: c1 BIN: 101 immediate-8 ;
+: SAR ( dst n -- ) HEX: c1 BIN: 111 immediate-8 ;
 
 : LEA ( dst src -- )
     HEX: 8d compile-byte swap register 1-operand ;
+
+( x87 Floating Point Unit )
+
+: FSTPS ( operand -- )
+    HEX: d9 compile-byte HEX: 1c compile-byte
+    BIN: 100 1-operand ;
+
+: FSTPL ( operand -- )
+    HEX: dd compile-byte HEX: 1c compile-byte
+    BIN: 100 1-operand ;

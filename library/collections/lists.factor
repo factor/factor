@@ -3,7 +3,8 @@
 IN: lists USING: errors generic kernel math sequences ;
 
 ! Sequence protocol
-M: general-list length 0 swap [ drop 1 + ] each ;
+M: f length drop 0 ;
+M: cons length cdr length 1 + ;
 
 M: f empty? drop t ;
 M: cons empty? drop f ;
@@ -20,7 +21,7 @@ M: cons empty? drop f ;
 : 3unlist ( [ a b c ] -- a b c )
     uncons uncons car ;
 
-: contains? ( obj list -- ? )
+M: general-list contains? ( obj list -- ? )
     #! Test if a list contains an element equal to an object.
     [ = ] some-with? >boolean ;
 
@@ -65,17 +66,10 @@ M: cons empty? drop f ;
 M: general-list reverse ( list -- list )
     [ ] swap [ swons ] each ;
 
-: map ( list quot -- list )
-    #! Push each element of a proper list in turn, and collect
-    #! return values of applying a quotation with effect
-    #! ( X -- Y ) to each element into a new list.
-    over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
+M: f map ( list quot -- list ) drop ;
 
-: map-with ( obj list quot -- list )
-    #! Push each element of a proper list in turn, and collect
-    #! return values of applying a quotation with effect
-    #! ( obj elt -- obj ) to each element into a new list.
-    swap [ with rot ] map 2nip ; inline
+M: cons map ( list quot -- list | quot: elt -- elt )
+    (each) rot >r map r> swons ;
 
 : remove ( obj list -- list )
     #! Remove all occurrences of objects equal to this one from
@@ -90,9 +84,10 @@ M: general-list reverse ( list -- list )
     #! Remove duplicate elements.
     dup [ uncons prune unique ] when ;
 
-: all=? ( list -- ? )
-    #! Check if all elements of a list are equal.
-    [ uncons [ = ] all-with? ] [ t ] ifte* ;
+: fiber? ( list quot -- ? | quot: elt elt -- ? )
+    #! Check if all elements in the list are equivalent under
+    #! the relation.
+    over [ >r uncons r> all-with? ] [ 2drop t ] ifte ; inline
 
 M: cons = ( obj cons -- ? )
     2dup eq? [
@@ -109,11 +104,8 @@ M: f = ( obj f -- ? ) eq? ;
 
 M: cons hashcode ( cons -- hash ) car hashcode ;
 
-: (count) ( i n -- list )
-    2dup >= [ 2drop [ ] ] [ >r dup 1 + r> (count) cons ] ifte ;
-
 : count ( n -- [ 0 ... n-1 ] )
-    0 swap (count) ;
+    0 swap <range> >list ;
 
 : project ( n quot -- list )
     >r count r> map ; inline
@@ -121,29 +113,41 @@ M: cons hashcode ( cons -- hash ) car hashcode ;
 : project-with ( elt n quot -- list )
     swap [ with rot ] project 2nip ; inline
 
-: head ( list n -- list )
+M: general-list head ( n list -- list )
     #! Return the first n elements of the list.
-    dup 0 > [ >r uncons r> 1 - head cons ] [ 2drop f ] ifte ;
+    over 0 > [
+        unswons >r >r 1 - r> head r> swons
+    ] [
+        2drop f
+    ] ifte ;
 
-: tail ( list n -- tail )
+M: general-list tail ( n list -- tail )
     #! Return the rest of the list, from the nth index onward.
-    [ cdr ] times ;
+    swap [ cdr ] times ;
 
-M: cons nth ( n list -- element )
-    over 0 = [ nip car ] [ >r 1 - r> cdr nth ] ifte ;
+M: general-list nth ( n list -- element )
+    over 0 number= [ nip car ] [ >r 1 - r> cdr nth ] ifte ;
 
 : intersection ( list list -- list )
     #! Make a list of elements that occur in both lists.
-    [ over contains? ] subset nip ;
+    [ swap contains? ] subset-with ;
 
 : difference ( list1 list2 -- list )
     #! Make a list of elements that occur in list2 but not
     #! list1.
-    [ over contains? not ] subset nip ;
+    [ swap contains? not ] subset-with ;
+
+: diffq ( list1 list2 -- list )
+    #! Make a list of elements that occur in list2 but not
+    #! list1.
+    [ swap memq? not ] subset-with ;
 
 : contained? ( list1 list2 -- ? )
     #! Is every element of list1 in list2?
     swap [ swap contains? ] all-with? ;
+
+: unpair ( list -- list1 list2 )
+    [ uncons uncons unpair rot swons >r cons r> ] [ f f ] ifte* ;
 
 : <queue> ( -- queue )
     #! Make a new functional queue.

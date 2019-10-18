@@ -5,7 +5,7 @@ void primitive_stat(void)
 	F_STRING *path;
 	WIN32_FILE_ATTRIBUTE_DATA st;
 
-	maybe_garbage_collection();
+	maybe_gc(0);
 	path = untag_string(dpop());
 
 	if(!GetFileAttributesEx(to_c_string(path), GetFileExInfoStandard, &st)) 
@@ -34,7 +34,7 @@ void primitive_read_dir(void)
 	WIN32_FIND_DATA find_data;
 	CELL result = F;
 
-	maybe_garbage_collection();
+	maybe_gc(0);
 
 	path = untag_string(dpop());
 	if (INVALID_HANDLE_VALUE != (dir = FindFirstFile(".\\*", &find_data)))
@@ -55,7 +55,7 @@ void primitive_cwd(void)
 {
 	char buf[MAX_PATH];
 
-	maybe_garbage_collection();
+	maybe_gc(0);
 	if(!GetCurrentDirectory(MAX_PATH, buf))
 		io_error();
 
@@ -64,6 +64,6 @@ void primitive_cwd(void)
 
 void primitive_cd(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	SetCurrentDirectory(unbox_c_string());
 }

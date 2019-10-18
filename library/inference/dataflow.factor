@@ -1,118 +1,117 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USE: interpreter
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: words
-USE: vectors
-USE: sequences
+USING: generic interpreter kernel lists namespaces parser
+sequences vectors words ;
 
-! We build a dataflow graph for the compiler.
+! The dataflow IR is the first of the two intermediate
+! representations used by Factor. It annotates concatenative
+! code with stack flow information and types.
+
+TUPLE: node effect param in-d out-d in-r out-r
+       successor children ;
+
+: make-node ( effect param in-d out-d in-r out-r node -- node )
+    [ >r f <node> r> set-delegate ] keep ;
+
+: empty-node f f f f f f f f f ;
+: param-node ( label) f swap f f f f f ;
+: in-d-node ( inputs) >r f f r> f f f f ;
+: out-d-node ( outputs) >r f f f r> f f f ;
+
+: d-tail ( n -- list ) meta-d get tail* >list ;
+: r-tail ( n -- list ) meta-r get tail* >list ;
+
+TUPLE: #label ;
+C: #label make-node ;
+: #label ( label -- node ) param-node <#label> ;
+
+TUPLE: #call ;
+C: #call make-node ;
+: #call ( word -- node ) param-node <#call> ;
+
+TUPLE: #call-label ;
+C: #call-label make-node ;
+: #call-label ( label -- node ) param-node <#call-label> ;
+
+TUPLE: #push ;
+C: #push make-node ;
+: #push ( outputs -- node ) d-tail out-d-node <#push> ;
+
+TUPLE: #drop ;
+C: #drop make-node ;
+: #drop ( inputs -- node ) d-tail in-d-node <#drop> ;
+
+TUPLE: #values ;
+C: #values make-node ;
+: #values ( -- node ) meta-d get >list in-d-node <#values> ;
+
+TUPLE: #return ;
+C: #return make-node ;
+: #return ( -- node ) meta-d get >list in-d-node <#return> ;
+
+TUPLE: #ifte ;
+C: #ifte make-node ;
+: #ifte ( in -- node ) 1 d-tail in-d-node <#ifte> ;
+
+TUPLE: #dispatch ;
+C: #dispatch make-node ;
+: #dispatch ( in -- node ) 1 d-tail in-d-node <#dispatch> ;
+
+: node-inputs ( d-count r-count node -- )
+    tuck
+    >r r-tail r> set-node-in-r
+    >r d-tail r> set-node-in-d ;
+
+: node-outputs ( d-count r-count node -- )
+    tuck
+    >r r-tail r> set-node-out-r
+    >r d-tail r> set-node-out-d ;
+
+! Variable holding dataflow graph being built.
 SYMBOL: dataflow-graph
+! The most recently added node.
+SYMBOL: current-node
 
-! Label nodes have the node-label variable set.
-SYMBOL: #label
-
-! A label that is not called recursively at all, or only tail
-! recursively. The optimizer changes some #labels to
-! #simple-labels.
-SYMBOL: #simple-label
-
-SYMBOL: #call ( non-tail call )
-SYMBOL: #call-label
-SYMBOL: #push ( literal )
-
-! This is purely a marker for values we retain after a
-! conditional. It does not generate code, but merely alerts the
-! dataflow optimizer to the fact these values must be retained.
-SYMBOL: #values
-
-SYMBOL: #return
-
-SYMBOL: node-consume-d
-SYMBOL: node-produce-d
-SYMBOL: node-consume-r
-SYMBOL: node-produce-r
-SYMBOL: node-op
-SYMBOL: node-label
-
-! #push nodes have this field set to the value being pushed.
-! #call nodes have this as the word being called
-SYMBOL: node-param
-
-: <dataflow-node> ( param op -- node )
-    <namespace> [
-        node-op set
-        node-param set
-        [ ] node-consume-d set
-        [ ] node-produce-d set
-        [ ] node-consume-r set
-        [ ] node-produce-r set
-    ] extend ;
-
-: node-inputs ( d-count r-count -- )
-    #! Execute in the node's namespace.
-    meta-r get vector-tail* node-consume-r set
-    meta-d get vector-tail* node-consume-d set ;
-
-: dataflow-inputs ( in node -- )
-    [ length 0 node-inputs ] bind ;
-
-: node-outputs ( d-count r-count -- )
-    #! Execute in the node's namespace.
-    meta-r get vector-tail* node-produce-r set
-    meta-d get vector-tail* node-produce-d set ;
-
-: dataflow-outputs ( out node -- )
-    [ length 0 node-outputs ] bind ;
-
-: get-dataflow ( -- IR )
-    dataflow-graph get reverse ;
-
-: dataflow, ( param op -- node )
-    #! Add a node to the dataflow IR.
-    <dataflow-node> dup dataflow-graph [ cons ] change ;
-
-: dataflow-drop, ( -- )
-    #! Remove the top stack element and add a dataflow node
-    #! noting this.
-    f \ drop dataflow, [ 1 0 node-inputs ] bind ;
-
-: apply-dataflow ( dataflow name default -- )
-    #! For the dataflow node, look up named word property,
-    #! if its not defined, apply default quotation to
-    #! ( node ) otherwise apply property quotation to
-    #! ( node ).
-    >r >r dup [ node-op get ] bind r> word-prop dup [
-        call r> drop
+: node, ( node -- )
+    dataflow-graph get [
+        dup current-node [ set-node-successor ] change
     ] [
-        drop r> call
+        ! first node
+        dup dataflow-graph set  current-node set
     ] ifte ;
+
+: nest-node ( -- dataflow current )
+    dataflow-graph get  dataflow-graph off
+    current-node get    current-node off ;
+
+: unnest-node ( new-node dataflow current -- new-node )
+    >r >r dataflow-graph get unit over set-node-children
+    r> dataflow-graph set
+    r> current-node set ;
+
+: with-nesting ( quot -- new-node | quot: -- new-node )
+    nest-node 2slip unnest-node ; inline
+
+: copy-effect ( from to -- )
+    over node-in-d over set-node-in-d
+    over node-in-r over set-node-in-r
+    over node-out-d over set-node-out-d
+    swap node-out-r swap set-node-out-r ;
+
+: node-effect ( node -- [[ d-in meta-d ]] )
+    dup node-in-d swap node-out-d cons ;
+
+: consumes-literal? ( literal node -- ? )
+    #! Does the dataflow node consume the literal?
+    2dup node-in-d memq? >r node-in-r memq? r> or ;
+
+: produces-literal? ( literal node -- ? )
+    #! Does the dataflow node produce the literal?
+    2dup node-out-d memq? >r node-out-r memq? r> or ;
+
+: last-node ( node -- last )
+    dup node-successor [ last-node ] [ ] ?ifte ;
+
+! Recursive state. An alist, mapping words to labels.
+SYMBOL: recursive-state

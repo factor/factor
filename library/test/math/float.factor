@@ -29,3 +29,6 @@ USE: test
 
 [ t ] [ pi 3 > ] unit-test
 [ f ] [ e 2 <= ] unit-test
+
+[ t ] [ pi double>bits bits>double pi = ] unit-test
+[ t ] [ e double>bits bits>double e = ] unit-test

@@ -1,155 +1,198 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
 ! Copyright (C) 2005 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! See http://factor.sf.net/license.txt for BSD license.
+IN: compiler-backend
+USING: assembler compiler errors kernel math math-internals
+memory namespaces words ;
 
-IN: compiler
-USE: assembler
-USE: inference
-USE: math
-USE: words
-USE: kernel
-USE: alien
-USE: lists
-USE: math-internals
+: literal-overflow
+    #! If the src operand is a literal.
+    ! Untag the operand.
+    over tag-bits SAR
+    tag-bits neg shift ;
 
-! This file provides compiling definitions for fixnum words
-! that are faster than what C gives us. There is a lot of
-! code repetition here. It will be factored out at the same
-! time as rewriting the code to use registers for intermediate
-! values happends. At this point in time, this is just a
-! prototype to test the assembler.
+: computed-overflow
+    #! If the src operand is a register.
+    ! Untag both operands.
+    2dup  tag-bits SAR  tag-bits SAR ;
 
-: self ( word -- )
-    f swap dup "infer-effect" word-prop (consume/produce) ;
+: simple-overflow ( dest src inv word -- )
+    #! If the previous arithmetic operation overflowed, then we
+    #! turn the result into a bignum and leave it in EAX.
+    >r >r
+    <label> "end" set
+    "end" get JNO
+    ! There was an overflow. Recompute the original operand.
+    2dup r> execute
+    dup integer? [
+        literal-overflow
+    ] [
+        computed-overflow
+    ] ifte
+    ! Compute a result, this time it will fit.
+    dupd r> execute
+    ! Create a bignum.
+    PUSH
+    "s48_long_to_bignum" f compile-c-call
+    ! An untagged pointer to the bignum is now in EAX; tag it
+    EAX bignum-tag OR
+    ESP 4 ADD
+    "end" get save-xt ; inline
 
-: fixnum-insn ( overflow opcode -- )
-    #! This needs to be factored.
-    EAX [ ESI -4 ] MOV
-    EAX [ ESI ] rot execute
-    0 JNO just-compiled
-    swap compile-call
-    0 JMP just-compiled >r
-    compiled-offset swap patch
-    ESI 4 SUB
-    [ ESI ] EAX MOV
-    r> compiled-offset swap patch ;
+M: %fixnum+ generate-node ( vop -- )
+    dest/src 2dup ADD  \ SUB \ ADD simple-overflow ;
 
-\ fixnum+ [
-    drop \ fixnum+ \ ADD fixnum-insn
-] "generator" set-word-prop
+M: %fixnum- generate-node ( vop -- )
+    dest/src 2dup SUB  \ ADD \ SUB simple-overflow ;
 
-\ fixnum+ [ \ fixnum+ self ] "infer" set-word-prop
-
-\ fixnum- [
-    drop \ fixnum- \ SUB fixnum-insn
-] "generator" set-word-prop
-
-\ fixnum- [ \ fixnum- self ] "infer" set-word-prop
-
-\ fixnum* [
+M: %fixnum* generate-node ( vop -- )
     drop
-    EAX [ ESI -4 ] MOV
-    EAX 3 SHR
-    EAX [ ESI ] IMUL
-    0 JNO just-compiled
-    \ fixnum* compile-call
-    0 JMP just-compiled >r
-    compiled-offset swap patch
-    ESI 4 SUB
-    [ ESI ] EAX MOV
-    r> compiled-offset swap patch
-] "generator" set-word-prop
+    ! both inputs are tagged, so one of them needs to have its
+    ! tag removed.
+    EAX tag-bits SAR
+    ECX IMUL
+    <label> "end" set
+    "end" get JNO
+    EDX PUSH
+    EAX PUSH
+    "s48_long_long_to_bignum" f compile-c-call
+    ESP 8 ADD
+    ! now we have to shift it by three bits to remove the second
+    ! tag
+    tag-bits neg PUSH
+    EAX PUSH
+    "s48_bignum_arithmetic_shift" f compile-c-call
+    ! an untagged pointer to the bignum is now in EAX; tag it
+    EAX bignum-tag OR
+    ESP 8 ADD
+    "end" get save-xt ;
 
-\ fixnum* [ \ fixnum* self ] "infer" set-word-prop
-
-\ fixnum/i [
+M: %fixnum-mod generate-node ( vop -- )
+    #! This has specific register requirements. Inputs are in
+    #! EAX and ECX, and the result is in EDX.
     drop
-    EAX [ ESI -4 ] MOV
     CDQ
-    [ ESI ] IDIV
-    EAX 3 SHL
-    0 JNO just-compiled
-    \ fixnum/i compile-call
-    0 JMP just-compiled >r
-    compiled-offset swap patch
-    ESI 4 SUB
-    [ ESI ] EAX MOV
-    r> compiled-offset swap patch
-] "generator" set-word-prop
+    ECX IDIV ;
 
-\ fixnum/i [ \ fixnum/i self ] "infer" set-word-prop
-
-\ fixnum-mod [
+: generate-fixnum/mod
+    #! The same code is used for %fixnum/i and %fixnum/mod.
+    #! This has specific register requirements. Inputs are in
+    #! EAX and ECX, and the result is in EDX.
+    <label> "end" set
     drop
-    EAX [ ESI -4 ] MOV
     CDQ
-    [ ESI ] IDIV
-    EAX 3 SHL
-    0 JNO just-compiled
-    \ fixnum/i compile-call
-    0 JMP just-compiled >r
-    compiled-offset swap patch
-    ESI 4 SUB
-    [ ESI ] EDX MOV
-    r> compiled-offset swap patch
-] "generator" set-word-prop
+    ECX IDIV
+    ! Make a copy since following shift is destructive
+    ECX EAX MOV
+    ! Tag the value, since division cancelled tags from both
+    ! inputs
+    EAX tag-bits SHL
+    ! Did it overflow?
+    "end" get JNO
+    ! There was an overflow, so make ECX into a bignum. we must
+    ! save EDX since its volatile.
+    EDX PUSH
+    ECX PUSH
+    "s48_long_to_bignum" f compile-c-call
+    ! An untagged pointer to the bignum is now in EAX; tag it
+    EAX bignum-tag OR
+    ESP cell ADD
+    ! the remainder is now in EDX
+    EDX POP
+    "end" get save-xt ;
 
-\ fixnum-mod [ \ fixnum-mod self ] "infer" set-word-prop
+M: %fixnum/i generate-node generate-fixnum/mod ;
 
-\ fixnum/mod [
-    drop
-    EAX [ ESI -4 ] MOV
+M: %fixnum/mod generate-node generate-fixnum/mod ;
+
+M: %fixnum-bitand generate-node ( vop -- ) dest/src AND ;
+
+M: %fixnum-bitor generate-node ( vop -- ) dest/src OR ;
+
+M: %fixnum-bitxor generate-node ( vop -- ) dest/src XOR ;
+
+M: %fixnum-bitnot generate-node ( vop -- )
+    ! Negate the bits of the operand
+    vop-out-1 v>operand dup NOT
+    ! Mask off the low 3 bits to give a fixnum tag
+    tag-mask XOR ;
+
+M: %fixnum<< generate-node
+    ! This has specific register requirements.
+    <label> "no-overflow" set
+    <label> "end" set
+    ! make a copy
+    ECX EAX MOV
+    vop-in-1
+    ! check for potential overflow
+    dup shift-add ECX over ADD
+    2 * 1 - ECX swap CMP
+    ! is there going to be an overflow?
+    "no-overflow" get JBE
+    ! there is going to be an overflow, make a bignum
+    EAX tag-bits SAR
+    dup ( n) PUSH
+    EAX PUSH
+    "s48_long_to_bignum" f compile-c-call
+    EDX POP
+    EAX PUSH
+    "s48_bignum_arithmetic_shift" f compile-c-call
+    ! tag the result
+    EAX bignum-tag OR
+    ESP cell 2 * ADD
+    "end" get JMP
+    ! there is not going to be an overflow
+    "no-overflow" get save-xt
+    EAX swap SHL
+    "end" get save-xt ;
+
+M: %fixnum>> generate-node
+    ! shift register
+    dup vop-out-1 v>operand dup rot vop-in-1 SAR
+    ! give it a fixnum tag
+    tag-mask bitnot AND ;
+
+M: %fixnum-sgn generate-node
+    ! store 0 in EDX if EAX is >=0, otherwise store -1.
     CDQ
-    [ ESI ] IDIV
-    EAX 3 SHL
-    0 JNO just-compiled
-    \ fixnum/mod compile-call
-    0 JMP just-compiled >r
-    compiled-offset swap patch
-    [ ESI -4 ] EAX MOV
-    [ ESI ] EDX MOV
-    r> compiled-offset swap patch
-] "generator" set-word-prop
+    ! give it a fixnum tag.
+    vop-out-1 v>operand tag-bits SHL ;
 
-\ fixnum/mod [ \ fixnum/mod self ] "infer" set-word-prop
+: load-boolean ( dest cond -- )
+    #! Compile this after a conditional jump to store f or t
+    #! in dest depending on the jump being taken or not.
+    <label> "true" set
+    <label> "end" set
+    "true" get swap execute
+    dup f address MOV
+    "end" get JMP
+    "true" get save-xt
+    t load-indirect
+    "end" get save-xt ; inline
 
-\ arithmetic-type [
-    drop
-    EAX [ ESI -4 ] MOV
-    EAX BIN: 111 AND
-    EDX [ ESI ] MOV
-    EDX BIN: 111 AND
-    EAX EDX CMP
-    0 JE just-compiled >r
-    \ arithmetic-type compile-call
-    0 JMP just-compiled
-    compiled-offset r> patch
-    EAX 3 SHL
-    PUSH-DS
-    compiled-offset swap patch
-] "generator" set-word-prop
+: fixnum-compare ( vop -- dest )
+    dup vop-out-1 v>operand dup rot vop-in-1 v>operand CMP ;
 
-\ arithmetic-type [ \ arithmetic-type self ] "infer" set-word-prop
+M: %fixnum< generate-node ( vop -- )
+    fixnum-compare  \ JL  load-boolean ;
+
+M: %fixnum<= generate-node ( vop -- )
+    fixnum-compare  \ JLE  load-boolean ;
+
+M: %fixnum> generate-node ( vop -- )
+    fixnum-compare  \ JG  load-boolean ;
+
+M: %fixnum>= generate-node ( vop -- )
+    fixnum-compare  \ JGE  load-boolean ;
+
+M: %eq? generate-node ( vop -- )
+    fixnum-compare  \ JE  load-boolean ;
+
+: fixnum-jump ( vop -- label )
+    dup vop-in-2 v>operand over vop-in-1 v>operand CMP
+    vop-label ;
+
+M: %jump-fixnum<  generate-node ( vop -- ) fixnum-jump JL ;
+M: %jump-fixnum<= generate-node ( vop -- ) fixnum-jump JLE ;
+M: %jump-fixnum>  generate-node ( vop -- ) fixnum-jump JG ;
+M: %jump-fixnum>= generate-node ( vop -- ) fixnum-jump JGE ;
+M: %jump-eq?      generate-node ( vop -- ) fixnum-jump JE ;

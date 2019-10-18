@@ -7,7 +7,7 @@ streams strings ;
 SYMBOL: fonts
 
 : <font> ( name ptsize -- font )
-    >r resource-path swap cat2 r> TTF_OpenFont ;
+    >r resource-path swap append r> TTF_OpenFont ;
 
 SYMBOL: logical-fonts
 
@@ -51,30 +51,19 @@ global [
     ] when drop ;
 
 : filter-nulls ( str -- str )
-    "\0" over string-contains? [
-        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] seq-map
+    0 over contains? [
+        [ dup 0 = [ drop CHAR: \s ] when ] map
     ] when ;
 
 : size-string ( font text -- w h )
     >r lookup-font r> filter-nulls dup empty? [
         drop TTF_FontHeight 0 swap
     ] [
-        <int-box> <int-box> [ TTF_SizeUNICODE drop ] 2keep
-        swap int-box-i swap int-box-i
+        0 <int> 0 <int> [ TTF_SizeUNICODE drop ] 2keep
+        swap *int swap *int
     ] ifte ;
 
-global [ <namespace> fonts set ] bind
-
-M: string shape-x drop 0 ;
-M: string shape-y drop 0 ;
-M: string shape-w
-    font get swap size-string ( h -) drop ;
-
-M: string shape-h ( text -- h )
-    #! This is just the height of the current font.
-    drop font get lookup-font TTF_FontHeight ;
-
-M: string draw-shape ( text -- )
+: draw-string ( text -- )
     dup empty? [
         drop
     ] [
@@ -85,3 +74,5 @@ M: string draw-shape ( text -- )
         [ >r x get y get r> draw-surface ] keep
         SDL_FreeSurface
     ] ifte ;
+
+global [ <namespace> fonts set ] bind

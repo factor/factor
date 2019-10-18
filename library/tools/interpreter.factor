@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: interpreter
-USING: errors kernel lists math namespaces prettyprint sequences
-stdio strings vectors words ;
+USING: errors kernel kernel-internals lists math namespaces
+prettyprint sequences stdio strings vectors words ;
 
 ! A Factor interpreter written in Factor. Used by compiler for
 ! partial evaluation, also by the walker.
@@ -29,7 +29,7 @@ SYMBOL: meta-executing
     10 <vector> meta-r set
     10 <vector> meta-d set
     namestack meta-n set
-    f meta-c set
+    catchstack meta-c set
     f meta-cf set
     f meta-executing set ;
 
@@ -46,13 +46,19 @@ SYMBOL: meta-executing
 : next ( -- obj )
     meta-cf get [ meta-cf [ uncons ] change ] [ up next ] ifte ;
 
+: meta-interp ( -- interp )
+    meta-d get meta-r get meta-n get meta-c get <interp> ;
+
+: set-meta-interp ( interp -- )
+    >interp< meta-c set meta-n set meta-r set meta-d set ;
+
 : host-word ( word -- )
-    #! Swap in the meta-interpreter's stacks, execute the word,
-    #! swap in the old stacks. This is so messy.
-    push-d datastack push-d
-    meta-d get set-datastack
-    >r execute datastack r> tuck push
-    set-datastack meta-d set ;
+    [
+        \ call push-r  interp [
+            interp over interp-data push
+            set-interp
+        ] cons cons push-r  meta-interp set-interp
+    ] call  set-meta-interp  pop-d 2drop ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
@@ -82,16 +88,13 @@ SYMBOL: meta-executing
 
 \ datastack [ meta-d get clone push-d ] set-meta-word
 \ set-datastack [ pop-d clone meta-d set ] set-meta-word
-\ >r   [ pop-d push-r ] set-meta-word
-\ r>   [ pop-r push-d ] set-meta-word
+\ >r [ pop-d push-r ] set-meta-word
+\ r> [ pop-r push-d ] set-meta-word
 \ callstack [ meta-r get clone push-d ] set-meta-word
 \ set-callstack [ pop-d clone meta-r set ] set-meta-word
-\ namestack [ meta-n get push-d ] set-meta-word
-\ set-namestack [ pop-d meta-n set ] set-meta-word
-\ catchstack [ meta-c get push-d ] set-meta-word
-\ set-catchstack [ pop-d meta-c set ] set-meta-word
 \ call [ pop-d meta-call ] set-meta-word
 \ execute [ pop-d meta-word ] set-meta-word
 \ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
+\ dispatch [ pop-d pop-d swap nth meta-call ] set-meta-word
 
 \ set-meta-word forget

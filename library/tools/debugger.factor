@@ -20,13 +20,6 @@ vectors words ;
     "Object type: " write class word. terpri
     "Expected type: " write builtin-type word. terpri ;
 
-: range-error. ( list -- )
-    "Range check error" print
-    unswons [ "Object: " write . ] when*
-    unswons "Minimum index: " write .
-    unswons "Requested index: " write .
-    car "Maximum index: " write . ;
-
 : float-format-error. ( list -- )
     "Invalid floating point literal format: " write . ;
 
@@ -55,7 +48,6 @@ M: kernel-error error. ( error -- )
         io-error.
         undefined-word-error.
         type-check-error.
-        range-error.
         float-format-error.
         signal-error.
         negative-array-size-error.
@@ -65,23 +57,19 @@ M: kernel-error error. ( error -- )
     } nth execute ;
 
 M: no-method error. ( error -- )
-    [
-        "The generic word " ,
-        dup no-method-generic unparse ,
-        " does not have a suitable method for " ,
-        no-method-object unparse ,
-    ] make-string print ;
+    "No suitable method." print
+    "Generic word: " write dup no-method-generic .
+    "Object: " write no-method-object . ;
 
 : parse-dump ( error -- )
-    [
-        "Parsing " %
-        dup parse-error-file [ "<interactive>" ] unless* % ":" %
-        dup parse-error-line [ 1 ] unless* unparse ,
-    ] make-string print
+    "Parsing " write
+    dup parse-error-file [ "<interactive>" ] unless* write
+    ":" write
+    dup parse-error-line [ 1 ] unless* unparse print
     
     dup parse-error-text dup string? [ print ] [ drop ] ifte
     
-    [ parse-error-col CHAR: \s fill % "^" % ] make-string print ;
+    parse-error-col [ 0 ] unless* CHAR: \s fill write "^" print ;
 
 M: parse-error error. ( error -- )
     dup parse-dump  delegate error. ;

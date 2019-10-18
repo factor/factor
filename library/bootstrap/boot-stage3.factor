@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: alien assembler command-line compiler io-internals kernel
-lists namespaces parser sequences stdio unparser words ;
+USING: alien assembler command-line compiler compiler-backend
+compiler-frontend io-internals kernel lists math namespaces
+parser sequences stdio unparser words ;
 
-"Bootstrap stage 3..." print
+"Compiling base..." print
 
 unix? [
     "sdl"      "libSDL.so"     "cdecl"    add-library
@@ -27,21 +28,29 @@ default-cli-args
 parse-command-line
 init-assembler
 
-"/library/io/buffer.factor" run-resource
-
 : compile? "compile" get supported-cpu? and ;
 
 compile? [
     \ car compile
-    \ = compile
+    \ * compile
     \ length compile
+    \ = compile
     \ unparse compile
     \ scan compile
+    \ optimize compile
+    \ (generate) compile
 ] when
 
+"Loading more library code..." print
+
+
 t [
+    "/library/alien/malloc.factor"
+    "/library/io/buffer.factor"
+
     "/library/math/constants.factor"
     "/library/math/pow.factor"
+    "/library/math/more-matrices.factor"
     "/library/math/trig-hyp.factor"
     "/library/math/arc-trig-hyp.factor"
     "/library/math/random.factor"
@@ -49,7 +58,7 @@ t [
     "/library/in-thread.factor"
 
     "/library/io/directories.factor"
-    "/library/io/stdio-binary.factor"
+    "/library/io/binary.factor"
     
     "/library/eval-catch.factor"
     "/library/tools/listener.factor"
@@ -58,10 +67,8 @@ t [
     "/library/syntax/see.factor"
     "/library/test/test.factor"
     "/library/inference/test.factor"
-    "/library/tools/profiler.factor"
     "/library/tools/walker.factor"
     "/library/tools/annotations.factor"
-    "/library/tools/dump.factor"
     "/library/bootstrap/image.factor"
     
     "/library/io/logging.factor"
@@ -70,66 +77,16 @@ t [
     "/library/tools/jedit-wire.factor"
     "/library/tools/jedit.factor"
 
-    "/library/httpd/http-common.factor"
-    "/library/httpd/mime.factor"
-    "/library/httpd/html-tags.factor"
-    "/library/httpd/html.factor"
-    "/library/httpd/responder.factor"
-    "/library/httpd/httpd.factor"
-    "/library/httpd/file-responder.factor"
-    "/library/httpd/test-responder.factor"
-    "/library/httpd/resource-responder.factor"
-    "/library/httpd/cont-responder.factor"
-    "/library/httpd/browser-responder.factor"
-    "/library/httpd/default-responders.factor"
-    "/library/httpd/http-client.factor"
-
-    "/library/sdl/sdl.factor"
-    "/library/sdl/sdl-video.factor"
-    "/library/sdl/sdl-event.factor"
-    "/library/sdl/sdl-gfx.factor"
-    "/library/sdl/sdl-keysym.factor"
-    "/library/sdl/sdl-keyboard.factor"
-    "/library/sdl/sdl-ttf.factor"
-    "/library/sdl/sdl-utils.factor"
-
-    "/library/ui/shapes.factor"
-    "/library/ui/points.factor"
-    "/library/ui/rectangles.factor"
-    "/library/ui/lines.factor"
-    "/library/ui/ellipses.factor"
-    "/library/ui/gadgets.factor"
-    "/library/ui/hierarchy.factor"
-    "/library/ui/paint.factor"
-    "/library/ui/text.factor"
-    "/library/ui/gestures.factor"
-    "/library/ui/hand.factor"
-    "/library/ui/layouts.factor"
-    "/library/ui/piles.factor"
-    "/library/ui/shelves.factor"
-    "/library/ui/borders.factor"
-    "/library/ui/stacks.factor"
-    "/library/ui/frames.factor"
-    "/library/ui/world.factor"
-    "/library/ui/labels.factor"
-    "/library/ui/buttons.factor"
-    "/library/ui/checkboxes.factor"
-    "/library/ui/line-editor.factor"
-    "/library/ui/events.factor"
-    "/library/ui/scrolling.factor"
-    "/library/ui/editors.factor"
-    "/library/ui/menus.factor"
-    "/library/ui/presentations.factor"
-    "/library/ui/tiles.factor"
-    "/library/ui/panes.factor"
-    "/library/ui/dialogs.factor"
-    "/library/ui/inspector.factor"
-    "/library/ui/init-world.factor"
-    "/library/ui/tool-menus.factor"
-    "/library/ui/ui.factor"
+    "/library/httpd/load.factor"
+    "/library/sdl/load.factor"
+    "/library/ui/load.factor"
 ] pull-in
 
 compile? [
+    unix? [
+        "/library/unix/types.factor"
+    ] pull-in
+
     os "freebsd" = [
         "/library/unix/syscalls-freebsd.factor"
     ] pull-in
@@ -144,9 +101,6 @@ compile? [
     
     unix? [
         "/library/unix/syscalls.factor"
-    ] pull-in
-
-    unix? [
         "/library/unix/io.factor"
         "/library/unix/sockets.factor"
         "/library/unix/files.factor"

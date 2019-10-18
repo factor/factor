@@ -1,33 +1,73 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: errors generic hashtables kernel lists math
-sequences streams strings threads unix-internals vectors ;
+USING: alien assembler errors generic hashtables kernel
+kernel-internals lists math sequences streams strings threads
+unix-internals vectors ;
 
 ! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
 USING: namespaces ;
 
+! This will go elsewhere soon
+: byte-bit ( n alien -- byte bit )
+    over -5 shift alien-unsigned-4 swap 31 bitand ;
+
+: <bit-array> ( n -- array )
+    cell / ceiling <byte-array> ;
+
+: bit-nth ( n alien -- ? )
+    byte-bit 1 swap shift bitand 0 > ;
+
+: set-bit ( ? byte bit -- byte )
+    1 swap shift rot [ bitor ] [ bitnot bitand ] ifte ;
+
+: set-bit-nth ( ? n alien -- )
+    [ byte-bit set-bit ] 2keep
+    swap -5 shift set-alien-unsigned-4 ;
+
+! Global variables
+SYMBOL: read-fdset
+SYMBOL: read-tasks
+SYMBOL: write-fdset
+SYMBOL: write-tasks
+
 ! Some general stuff
 : file-mode OCT: 0600 ;
 
-: io-error ( n -- ) 0 < [ errno strerror throw ] when ;
+: (io-error) err_no strerror throw ;
 
-: init-handle ( fd -- )
-    F_SETFL O_NONBLOCK fcntl io-error ;
+: check-null ( n -- ) 0 = [ (io-error) ] when ;
+
+: io-error ( n -- ) 0 < [ (io-error) ] when ;
+
+: init-handle ( fd -- ) F_SETFL O_NONBLOCK fcntl io-error ;
 
 ! Common delegate of native stream readers and writers
-TUPLE: port handle buffer error ;
+TUPLE: port handle buffer error timeout cutoff ;
+
+: make-buffer ( n -- buffer/f )
+    dup 0 > [ <buffer> ] [ drop f ] ifte ;
 
 C: port ( handle buffer -- port )
-    [
-        >r dup 0 > [ <buffer> ] [ drop f ] ifte r> set-delegate
-    ] keep
+    [ 0 swap set-port-timeout ] keep
+    [ 0 swap set-port-cutoff ] keep
+    [ >r make-buffer r> set-delegate ] keep
     [ >r dup init-handle r> set-port-handle ] keep ;
 
 M: port stream-close ( port -- )
     dup port-handle close
     delegate [ buffer-free ] when* ;
+
+: touch-port ( port -- )
+    dup port-timeout dup 0 = [
+        2drop
+    ] [
+        millis + swap set-port-cutoff
+    ] ifte ;
+
+M: port set-timeout ( timeout port -- )
+    [ set-port-timeout ] keep touch-port ;
 
 : buffered-port 8192 <port> ;
 
@@ -36,7 +76,7 @@ M: port stream-close ( port -- )
 : pending-error ( reader -- ) port-error throw ;
 
 : postpone-error ( reader -- )
-    errno strerror swap set-port-error ;
+    err_no strerror swap set-port-error ;
 
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
@@ -45,24 +85,18 @@ C: io-task ( port -- ) [ set-io-task-port ] keep ;
 
 ! Multiplexer
 GENERIC: do-io-task ( task -- ? )
-GENERIC: io-task-events ( task -- events )
-
-! A hashtable in the global namespace mapping fd numbers to
-! io-tasks. This is not a vector, since we need a quick way
-! to find the number of elements, and a hashtable gives us
-! this with the hash-size call.
-SYMBOL: io-tasks
+GENERIC: task-container ( task -- vector )
 
 : io-task-fd io-task-port port-handle ;
 
 : add-io-task ( callback task -- )
     [ >r unit r> set-io-task-callbacks ] keep
-    dup io-task-fd io-tasks get 2dup hash [
+    dup io-task-fd over task-container 2dup hash [
         "Cannot perform multiple I/O ops on the same port" throw
     ] when set-hash ;
 
 : remove-io-task ( task -- )
-    io-task-fd io-tasks get remove-hash ;
+    dup io-task-fd swap task-container remove-hash ;
 
 : pop-callback ( task -- callback )
     dup io-task-callbacks uncons dup [
@@ -71,40 +105,42 @@ SYMBOL: io-tasks
         drop swap remove-io-task
     ] ifte ;
 
-: handle-fd ( fd -- quot )
-    io-tasks get hash dup do-io-task [
-        pop-callback
+: handle-fd ( task -- )
+    dup do-io-task [
+        dup io-task-port touch-port pop-callback [ call ] when*
     ] [
-        drop f
+        drop
     ] ifte ;
 
-: do-io-tasks ( pollfds n -- )
+: timeout? ( port -- ? )
+    port-cutoff dup 0 = not swap millis < and ;
+
+: handle-fd? ( fdset task -- ? )
+    dup io-task-port timeout?
     [
-        dup pick pollfd-nth dup pollfd-revents 0 = [
-            drop
-        ] [
-            pollfd-fd handle-fd [ call ] when*
-        ] ifte
-    ] repeat drop ;
+        2drop t
+    ] [
+        io-task-fd swap 2dup bit-nth
+        >r f -rot set-bit-nth r>
+    ] ifte ;
 
-: init-pollfd ( task pollfd -- )
-    over io-task-fd over set-pollfd-fd
-    swap io-task-events swap set-pollfd-events ;
+: handle-fdset ( fdset tasks -- )
+    [
+        cdr tuck handle-fd? [ handle-fd ] [ drop ] ifte
+    ] hash-each-with ;
 
-: make-pollfds ( -- pollfds n )
-    io-tasks get dup hash-size [
-        swap >r <pollfd-array> 0 swap r> hash-values [
-            ( n pollfds iotask )
-            pick pick pollfd-nth init-pollfd >r 1 + r>
-        ] each nip
-    ] keep ;
+: init-fdset ( fdset tasks -- )
+    [ car t swap rot set-bit-nth ] hash-each-with ;
+
+: init-fdsets ( -- read write except )
+    read-fdset get [ read-tasks get init-fdset ] keep
+    write-fdset get [ write-tasks get init-fdset ] keep
+    NULL ;
 
 : io-multiplex ( timeout -- )
-    >r make-pollfds 2dup r> poll drop do-io-tasks ;
-
-: pending-io? ( -- ? )
-    #! Output if there are waiting I/O requests.
-    io-tasks get hash-size 0 > ;
+    >r FD_SETSIZE init-fdsets r> make-timeval select drop
+    read-fdset get read-tasks get handle-fdset
+    write-fdset get write-tasks get handle-fdset ;
 
 ! Readers
 
@@ -119,7 +155,7 @@ C: reader ( handle -- reader )
     [ >r buffered-port r> set-delegate ] keep ;
 
 : pop-line ( reader -- str )
-    dup reader-line dup [ sbuf>string ] when >r
+    dup reader-line dup [ >string ] when >r
     f over set-reader-line
     f swap set-reader-ready? r> ;
 
@@ -197,8 +233,7 @@ M: read-line-task do-io-task ( task -- ? )
         read-line-step
     ] ifte ;
 
-M: read-line-task io-task-events ( task -- events )
-    drop POLLIN ;
+M: read-line-task task-container drop read-tasks get ;
 
 : wait-to-read-line ( port -- )
     dup can-read-line? [
@@ -260,8 +295,7 @@ M: read-task do-io-task ( task -- ? )
         read-step
     ] ifte ;
 
-M: read-task io-task-events ( task -- events )
-    drop POLLIN ;
+M: read-task task-container drop read-tasks get ;
 
 : wait-to-read ( count port -- )
     2dup can-read-count? [
@@ -311,18 +345,16 @@ M: write-task do-io-task
         >port< write-step f
     ] ifte ;
 
-M: write-task io-task-events ( task -- events )
-    drop POLLOUT ;
+M: write-task task-container drop write-tasks get ;
 
 : write-fin ( str writer -- )
     dup pending-error >buffer ;
 
 : add-write-io-task ( callback task -- )
-    dup io-task-fd io-tasks get hash [
+    dup io-task-fd write-tasks get hash [
         dup write-task? [
-            [
-                nip io-task-callbacks cons
-            ] keep set-io-task-callbacks
+            [ nip io-task-callbacks cons ] keep
+            set-io-task-callbacks
         ] [
             drop add-io-task
         ] ifte
@@ -331,9 +363,7 @@ M: write-task io-task-events ( task -- events )
     ] ifte* ;
 
 M: writer stream-flush ( stream -- )
-    [
-        swap <write-task> add-write-io-task stop
-    ] callcc0 drop ;
+    [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
 M: writer stream-auto-flush ( stream -- ) drop ;
 
@@ -363,7 +393,10 @@ USE: stdio
     #! Should only be called on startup. Calling this at any
     #! other time can have unintended consequences.
     global [
-        <namespace> io-tasks set
+        <namespace> read-tasks set
+        FD_SETSIZE <bit-array> read-fdset set
+        <namespace> write-tasks set
+        FD_SETSIZE <bit-array> write-fdset set
         0 1 t <fd-stream> stdio set
     ] bind
     [ idle-io-task ] in-thread ;

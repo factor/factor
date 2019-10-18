@@ -1,5 +1,6 @@
 IN: temporary
-USING: generic kernel lists math memory words prettyprint test ;
+USING: generic kernel lists math memory words prettyprint 
+sequences test ;
 
 [ ] [
     num-types [

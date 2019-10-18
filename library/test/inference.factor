@@ -2,24 +2,6 @@ IN: temporary
 USING: generic inference kernel lists math math-internals
 namespaces parser sequences test vectors ;
 
-! [ [ [ object object ] f ] ]
-! [ [ [ object ] [ object object ] ] [ [ object ] f ] decompose ]
-! unit-test
-! 
-! [ [ [ cons vector cons integer object cons ] [ cons vector cons ] ] ]
-! [
-!     [ [ vector ] [ cons vector cons integer object cons ] ]
-!     [ [ vector ] [ cons vector cons ] ]
-!     decompose
-! ] unit-test
-! 
-! [ [ [ object ] [ object ] ] ]
-! [
-!     [ [ object number ] [ object ] ]
-!     [ [ object number ] [ object ] ]
-!     decompose
-! ] unit-test
-
 : old-effect ( [ in-types out-types ] -- [[ in out ]] )
     uncons car length >r length r> cons ;
 
@@ -30,7 +12,6 @@ namespaces parser sequences test vectors ;
 [ [ call ] infer old-effect ] unit-test-fails
 
 [ [[ 2 4 ]] ] [ [ 2dup ] infer old-effect ] unit-test
-[ [[ 2 0 ]] ] [ [ push ] infer old-effect ] unit-test
 
 [ [[ 1 0 ]] ] [ [ [ ] [ ] ifte ] infer old-effect ] unit-test
 [ [ ifte ] infer old-effect ] unit-test-fails
@@ -65,7 +46,7 @@ namespaces parser sequences test vectors ;
 
 : infinite-loop infinite-loop ;
 
-[ [ infinite-loop ] infer old-effect ] unit-test-fails
+! [ [ infinite-loop ] infer old-effect ] unit-test-fails
 
 : simple-recursion-1
     dup [ simple-recursion-1 ] [ ] ifte ;
@@ -147,24 +128,17 @@ SYMBOL: sym-test
 
 [ [[ 0 1 ]] ] [ [ sym-test ] infer old-effect ] unit-test
 
-
-[ [[ 2 0 ]] ] [ [ set-length ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ 2list ] infer old-effect ] unit-test
 [ [[ 3 1 ]] ] [ [ 3list ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ append ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ swons ] infer old-effect ] unit-test
 [ [[ 1 2 ]] ] [ [ uncons ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ unit ] infer old-effect ] unit-test
 [ [[ 1 2 ]] ] [ [ unswons ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ last ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ peek ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ list? ] infer old-effect ] unit-test
 
-[ [[ 1 1 ]] ] [ [ length ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ reverse ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ contains? ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ remove ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ prune ] infer old-effect ] unit-test
+[ [[ 1 0 ]] ] [ [ >n ] infer old-effect ] unit-test
+[ [[ 0 1 ]] ] [ [ n> ] infer old-effect ] unit-test
 
 [ [[ 2 1 ]] ] [ [ bitor ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ bitand ] infer old-effect ] unit-test
@@ -183,13 +157,6 @@ SYMBOL: sym-test
 [ [[ 2 1 ]] ] [ [ >= ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ number= ] infer old-effect ] unit-test
 
-[ [[ 2 1 ]] ] [ [ = ] infer old-effect ] unit-test
-
-[ [[ 1 0 ]] ] [ [ >n ] infer old-effect ] unit-test
-[ [[ 0 1 ]] ] [ [ n> ] infer old-effect ] unit-test
-
-[ [[ 1 1 ]] ] [ [ get ] infer old-effect ] unit-test
-
 : terminator-branch
     dup [
         car
@@ -199,15 +166,13 @@ SYMBOL: sym-test
 
 [ [[ 1 1 ]] ] [ [ terminator-branch ] infer old-effect ] unit-test
 
-[ [[ 1 1 ]] ] [ [ str>number ] infer old-effect ] unit-test
-
 ! Type inference
 
-[ [ [ object ] [ ] ] ] [ [ drop ] infer ] unit-test
-[ [ [ object ] [ object object ] ] ] [ [ dup ] infer ] unit-test
-[ [ [ object object ] [ cons ] ] ] [ [ cons ] infer ] unit-test
-[ [ [ object ] [ general-t ] ] ] [ [ dup [ drop t ] unless ] infer ] unit-test
-[ [ [ general-list ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
+! [ [ [ object ] [ ] ] ] [ [ drop ] infer ] unit-test
+! [ [ [ object ] [ object object ] ] ] [ [ dup ] infer ] unit-test
+! [ [ [ object object ] [ cons ] ] ] [ [ cons ] infer ] unit-test
+! [ [ [ object ] [ boolean ] ] ] [ [ dup [ drop t ] unless ] infer ] unit-test
+! [ [ [ general-list ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
 
 ! [ [ 5 car ] infer ] unit-test-fails
 
@@ -223,8 +188,9 @@ M: fixnum potential-hang dup [ potential-hang ] when ;
 ! [ [ [ ] [ POSTPONE: t ] ] ] [ [ f not ] infer ] unit-test
 ! [ [ [ ] [ POSTPONE: f ] ] ] [ [ t not ] infer ] unit-test
 ! [ [ [ ] [ POSTPONE: f ] ] ] [ [ 5 not ] infer ] unit-test
-! 
 ! [ [ [ object ] [ general-t ] ] ] [ [ dup [ not ] unless ] infer ] unit-test
+
+! [ [ [ object ] [ cons ] ] ] [ [ dup cons? [ drop [[ 1 2 ]] ] unless ] infer ] unit-test
 
 TUPLE: funny-cons car cdr ;
 GENERIC: iterate
@@ -233,3 +199,24 @@ M: f iterate drop ;
 M: real iterate drop ;
 
 [ [[ 1 0 ]] ] [ [ iterate ] infer old-effect ] unit-test
+
+[ [[ 1 1 ]] ] [ [ str>number ] infer old-effect ] unit-test
+[ [[ 2 1 ]] ] [ [ = ] infer old-effect ] unit-test
+[ [[ 1 1 ]] ] [ [ get ] infer old-effect ] unit-test
+
+[ [[ 2 0 ]] ] [ [ push ] infer old-effect ] unit-test
+[ [[ 2 0 ]] ] [ [ set-length ] infer old-effect ] unit-test
+[ [[ 2 1 ]] ] [ [ append ] infer old-effect ] unit-test
+[ [[ 1 1 ]] ] [ [ peek ] infer old-effect ] unit-test
+
+[ [[ 1 1 ]] ] [ [ length ] infer old-effect ] unit-test
+[ [[ 1 1 ]] ] [ [ reverse ] infer old-effect ] unit-test
+[ [[ 2 1 ]] ] [ [ contains? ] infer old-effect ] unit-test
+[ [[ 2 1 ]] ] [ [ remove ] infer old-effect ] unit-test
+[ [[ 1 1 ]] ] [ [ prune ] infer old-effect ] unit-test
+
+[ [ callstack ] infer ] unit-test-fails
+
+: no-base-case dup [ no-base-case ] [ no-base-case ] ifte ;
+
+[ [ no-base-case ] infer ] unit-test-fails

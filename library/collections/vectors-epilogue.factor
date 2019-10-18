@@ -5,30 +5,23 @@ math-internals sequences ;
 
 IN: vectors
 
+: empty-vector ( len -- vec )
+    #! Creates a vector with 'len' elements set to f. Unlike
+    #! <vector>, which gives an empty vector with a certain
+    #! capacity.
+    dup <vector> [ set-length ] keep ;
+
 : >vector ( list -- vector )
     dup length <vector> [ swap nappend ] keep ;
 
-: vector-project ( n quot -- vector )
-    #! Execute the quotation n times, passing the loop counter
-    #! the quotation as it ranges from 0..n-1. Collect results
-    #! in a new vector.
-    project >vector ; inline
+M: vector clone ( vector -- vector )
+    >vector ;
 
 : zero-vector ( n -- vector )
-    [ drop 0 ] vector-project ;
-
-: vector-tail ( n vector -- list )
-    #! Return a new list with all elements from the nth
-    #! index upwards.
-    2dup length swap - [
-        pick + over nth
-    ] project 2nip ;
-
-: vector-tail* ( n vector -- list )
-    #! Unlike vector-tail, n is an index from the end of the
-    #! vector. For example, if n=1, this returns a vector of
-    #! one element.
-    [ length swap - ] keep vector-tail ;
+    0 <repeated> >vector ;
 
 M: general-list thaw >vector ;
-M: general-list freeze drop >list ;
+
+M: general-list like drop >list ;
+
+M: vector like drop >vector ;

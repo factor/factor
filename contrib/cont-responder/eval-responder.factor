@@ -73,7 +73,9 @@ USE: sequences
 : escape-quotes ( string -- string )
   #! Replace occurrences of single quotes with
   #! backslash quote.
-  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] seq-map ;
+  [
+    [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ , ] [ , ] ?ifte ] each
+  ] make-string ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
@@ -194,7 +196,7 @@ USE: sequences
     "browser" "responder" set
     1024 <sbuf> dup >r <html-stream> [
       do-eval
-    ] with-stream r> sbuf>string
+    ] with-stream r> >string
   ] with-scope ;
 
 : forever ( quot -- )

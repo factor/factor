@@ -4,13 +4,8 @@ IN: inference
 USING: errors generic interpreter kernel lists math namespaces
 prettyprint sequences strings unparser vectors words ;
 
-: max-recursion 0 ;
-
-! This variable takes a value from 0 up to max-recursion.
+! This variable takes a boolean value.
 SYMBOL: inferring-base-case
-
-: branches-can-fail? ( -- ? )
-    inferring-base-case get max-recursion > ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -22,65 +17,8 @@ SYMBOL: inferring-base-case
 ! inputs.
 SYMBOL: d-in
 
-! Recursive state. An alist, mapping words to labels.
-SYMBOL: recursive-state
-
-GENERIC: value= ( literal value -- ? )
-GENERIC: value-class-and ( class value -- )
-
-TUPLE: value class recursion class-ties literal-ties ;
-
-C: value ( recursion -- value )
-    [ set-value-recursion ] keep ;
-
-TUPLE: computed ;
-
-C: computed ( class -- value )
-    swap recursive-state get <value> [ set-value-class ] keep
-    over set-delegate ;
-
-M: computed value= ( literal value -- ? )
-    2drop f ;
-
-: failing-class-and ( class class -- class )
-    2dup class-and dup null = [
-        -rot [
-            word-name , " and " , word-name ,
-            " do not intersect" ,
-        ] make-string inference-warning
-    ] [
-        2nip
-    ] ifte ;
-
-M: computed value-class-and ( class value -- )
-    [
-        value-class  failing-class-and
-    ] keep set-value-class ;
-
-TUPLE: literal value ;
-
-C: literal ( obj rstate -- value )
-    [
-        >r <value> [ >r dup class r> set-value-class ] keep
-        r> set-delegate
-    ] keep
-    [ set-literal-value ] keep ;
-
-M: literal value= ( literal value -- ? )
-    literal-value = ;
-
-M: literal value-class-and ( class value -- )
-    value-class class-and drop ;
-
-M: literal set-value-class ( class value -- )
-    2drop ;
-
-M: computed literal-value ( value -- )
-    "A literal value was expected where a computed value was"
-    " found: " rot unparse cat3 inference-error ;
-
-: pop-literal ( -- obj )
-    dataflow-drop, pop-d literal-value ;
+: pop-literal ( -- rstate obj )
+    1 #drop node, pop-d >literal< ;
 
 : (ensure-types) ( typelist n stack -- )
     pick [
@@ -92,14 +30,14 @@ M: computed literal-value ( value -- )
 
 : ensure-types ( typelist stack -- )
     dup length pick length - dup 0 < [
-        swap >r neg tail 0 r>
+        swap >r neg swap tail 0 r>
     ] [
         swap
     ] ifte (ensure-types) ;
 
 : required-inputs ( typelist stack -- values )
     >r dup length r> length - dup 0 > [
-        head [ <computed> ] map
+        swap head [ <computed> ] map
     ] [
         2drop f
     ] ifte ;
@@ -109,6 +47,12 @@ M: computed literal-value ( value -- )
     meta-d get required-inputs >vector dup
     meta-d [ append ] change
     d-in [ append ] change ;
+
+: hairy-node ( node effect quot -- )
+    over car ensure-d
+    -rot 2dup car length 0 rot node-inputs
+    2slip
+    second length 0 rot node-outputs ; inline
 
 : (present-effect) ( vector -- list )
     >list [ value-class ] map ;
@@ -126,26 +70,20 @@ M: computed literal-value ( value -- )
     0 <vector> d-in set
     recursive-state set
     dataflow-graph off
-    0 inferring-base-case set ;
+    current-node off ;
 
 GENERIC: apply-object
 
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    dup recursive-state get <literal> push-d
-    #push dataflow, [ 1 0 node-outputs ] bind ;
+    recursive-state get <literal> push-d  1 #push node, ;
 
 M: object apply-object apply-literal ;
 
 : active? ( -- ? )
     #! Is this branch not terminated?
     d-in get meta-d get and ;
-
-: check-active ( -- )
-    active? [
-         "Provable runtime error" inference-error
-    ] unless ;
 
 : effect ( -- [[ d-in meta-d ]] )
     d-in get meta-d get cons ;
@@ -172,28 +110,34 @@ M: object apply-object apply-literal ;
         drop
     ] ifte ;
 
+: infer-quot-value ( rstate quot -- )
+    recursive-state get >r
+    swap recursive-state set
+    dup infer-quot handle-terminator
+    r> recursive-state set ;
+
+: check-active ( -- )
+    active? [ "Provable runtime error" inference-error ] unless ;
+
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
-    meta-r get length 0 = [
+    meta-r get empty? [
         "Word leaves elements on return stack" inference-error
     ] unless ;
 
-: values-node ( op -- )
-    #! Add a #values or #return node to the graph.
-    f swap dataflow, [
-        meta-d get >list node-consume-d set
-    ] bind ;
+: with-infer ( quot -- )
+    [
+        inferring-base-case off
+        f init-inference
+        call
+        check-active
+        check-return
+    ] with-scope ;
 
-: (infer) ( quot -- )
-    f init-inference
-    infer-quot
-    check-active
-    #return values-node check-return ;
-
-: infer ( quot -- [[ in out ]] )
+: infer ( quot -- effect )
     #! Stack effect of a quotation.
-    [ (infer) effect present-effect ] with-scope ;
+    [ infer-quot effect present-effect ] with-infer ;
 
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.
-    [ (infer) get-dataflow ] with-scope ;
+    [ infer-quot #return node, dataflow-graph get ] with-infer ;

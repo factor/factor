@@ -70,11 +70,10 @@ TUPLE: tile original ;
 C: tile ( child caption -- tile )
     [ f line-border swap set-delegate ] keep
     [ >r tile-content r> add-gadget ] keep
-    [ tile-actions ] keep
-    dup delegate pref-size pick resize-gadget ;
+    [ tile-actions ] keep ;
 
 M: tile pref-size shape-size ;
 
 : tile ( gadget title -- )
     #! Show the gadget in a new tile.
-    <tile> world get add-gadget ;
+    <tile> [ world get add-gadget ] keep prefer ;

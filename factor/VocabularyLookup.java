@@ -82,6 +82,12 @@ public class VocabularyLookup
 		FactorWord ket = define("syntax","]");
 		ket.parsing = new Ket(bra,ket);
 
+		/* tuples */
+		FactorWord beginTuple = define("syntax","<<");
+		beginTuple.parsing = new Bra(beginTuple);
+		FactorWord endTuple = define("syntax",">>");
+		endTuple.parsing = new Ket(beginTuple,endTuple);
+
 		/* conses */
 		FactorWord beginCons = define("syntax","[[");
 		beginCons.parsing = new BeginCons(beginCons);

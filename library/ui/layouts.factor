@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: errors generic hashtables kernel lists math namespaces
-sdl ;
+sdl sequences ;
 
 : layout ( gadget -- )
     #! Set the gadget's width and height to its preferred width

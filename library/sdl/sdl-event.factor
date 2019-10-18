@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: sdl USING: alien generic kernel ;
+IN: sdl USING: alien generic kernel kernel-internals ;
 
 BEGIN-ENUM: 0
     ENUM: SDL_NOEVENT         ! Unused (do not remove)

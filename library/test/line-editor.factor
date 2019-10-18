@@ -28,7 +28,7 @@ USING: kernel line-editor namespaces sequences strings test ;
 ] unit-test
 
 [ "Hello, crazy" ] [
-    "editor" get [ caret get line-text get string-head ] bind
+    "editor" get [ caret get line-text get head ] bind
 ] unit-test
 
 [ 0 ]

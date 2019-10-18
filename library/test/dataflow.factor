@@ -19,7 +19,7 @@ sequences test words ;
     ] some-with? ;
 
 [ t ] [
-    \ + [ 2 2 + ] dataflow dataflow-contains-param? >boolean
+    \ + [ 2 + ] dataflow dataflow-contains-param? >boolean
 ] unit-test
 
 : inline-test
@@ -78,11 +78,4 @@ SYMBOL: #test
         [[ node-op #test ]]
         [[ node-param 5 ]]
     }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
-] unit-test
-
-! Somebody (cough) got the order of ifte nodes wrong.
-
-[ t ] [
-    \ ifte [ [ 1 ] [ 2 ] ifte ] dataflow dataflow-contains-op? car
-    [ node-param get ] bind car car [ node-param get ] bind 1 =
 ] unit-test

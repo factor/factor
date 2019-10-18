@@ -10,9 +10,9 @@ vectors ;
 ! defined tuples that respond to the sequence protocol.
 UNION: sequence array string sbuf vector ;
 
-M: object ensure-capacity 2drop ;
 M: object thaw clone ;
-M: object freeze drop ;
+
+M: object like drop ;
 
 M: object empty? ( seq -- ? ) length 0 = ;
 
@@ -24,40 +24,18 @@ M: object empty? ( seq -- ? ) length 0 = ;
     ] ifte ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
-M: general-list >list ( list -- list ) ;
 
 : 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ;
 
 ! Combinators
-GENERIC: (seq-each) ( quot seq -- ) inline
-
-M: object (seq-each) ( quot seq -- )
-    dup length [
-        3dup >r >r >r swap nth swap call r> r> r>
+M: object each ( quot seq -- )
+    swap dup length [
+        [ swap nth swap call ] 3keep
     ] repeat 2drop ;
 
-M: general-list (seq-each) ( quot seq -- )
-    swap each ;
+M: object tree-each call ;
 
-: seq-each ( seq quot -- ) swap (seq-each) ; inline
-
-: seq-each-with ( obj seq quot -- )
-    swap [ with ] seq-each 2drop ; inline
-
-GENERIC: (tree-each) ( quot obj -- ) inline
-
-M: object (tree-each) swap call ;
-
-M: cons (tree-each) [ car (tree-each) ] 2keep cdr (tree-each) ;
-
-M: f (tree-each) swap call ;
-
-M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
-
-: tree-each swap (tree-each) ; inline
-
-: tree-each-with ( obj vector quot -- )
-    swap [ with ] tree-each 2drop ; inline
+M: sequence tree-each swap [ swap tree-each ] each-with ;
 
 : change-nth ( seq i quot -- )
     pick pick >r >r >r swap nth r> call r> r> swap set-nth ;
@@ -67,7 +45,7 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
     pick length pick <= [
         3drop
     ] [
-        3dup >r >r >r change-nth r> r> 1 + r> (nmap)
+        [ change-nth ] 3keep >r 1 + r> (nmap)
     ] ifte ; inline
 
 : nmap ( seq quot -- | quot: elt -- elt )
@@ -75,13 +53,10 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
     0 swap (nmap) ; inline
 
 : immutable ( seq quot -- seq | quot: seq -- )
-    swap [ thaw ] keep >r dup >r swap call r> r> freeze ; inline
+    swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
-: seq-map ( seq quot -- seq | quot: elt -- elt )
-    swap [ swap nmap ] immutable ; inline
-
-: seq-map-with ( obj list quot -- list )
-    swap [ with rot ] seq-map 2nip ; inline
+M: object map ( seq quot -- seq | quot: elt -- elt )
+    swap [ swap nmap ] immutable ;
 
 : (2nmap) ( seq1 seq2 i quot -- elt3 )
     pick pick >r >r >r 2nth r> call r> r> swap set-nth ; inline
@@ -92,21 +67,25 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
         [ >r 3dup r> swap (2nmap) ] keep
     ] repeat 3drop ; inline
 
-: seq-2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
-    swap [ swap 2nmap ] immutable ; inline
+M: object 2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
+    swap [ swap 2nmap ] immutable ;
 
 ! Operations
-: index* ( obj i seq -- n )
+: index* ( obj seq i -- n )
     #! The index of the object in the sequence, starting from i.
-    2dup length >= [
+    over length over <= [
         3drop -1
     ] [
-        3dup nth = [ drop nip ] [ >r 1 + r> index* ] ifte
+        3dup swap nth = [ 2nip ] [ 1 + index* ] ifte
     ] ifte ;
 
 : index ( obj seq -- n )
     #! The index of the object in the sequence.
-    0 swap index* ;
+    0 index* ;
+
+M: object contains? ( obj seq -- ? )
+    #! Tests for membership using =.
+    index -1 > ;
 
 : push ( element sequence -- )
     #! Push a value on the end of a sequence.
@@ -114,8 +93,7 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
 
 : nappend ( s1 s2 -- )
     #! Destructively append s2 to s1.
-   ! over length over ensure-capacity
-    [ over push ] seq-each drop ;
+    [ over push ] each drop ;
 
 : append ( s1 s2 -- s1+s2 )
     #! Return a new sequence of the same type as s1.
@@ -125,11 +103,13 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
     #! Return a new sequence of the same type as s1.
     rot [ [ rot nappend ] keep swap nappend ] immutable ;
 
-: concat ( seq -- seq )
-    #! Append together a sequence of sequences.
-    dup empty? [
-        unswons [ swap [ nappend ] seq-each-with ] immutable
-    ] unless ;
+M: f concat ;
+
+M: cons concat
+    unswons [ swap [ nappend ] each-with ] immutable ;
+
+M: object concat
+    >list concat ;
 
 M: object peek ( sequence -- element )
     #! Get value at end of sequence.
@@ -146,8 +126,7 @@ M: object peek ( sequence -- element )
 
 : exchange ( seq i j -- )
     #! Exchange seq[i] and seq[j].
-    3dup >r >r >r (exchange) r> r> r>
-    swap (exchange) set-nth set-nth ;
+    [ (exchange) ] 3keep swap (exchange) set-nth set-nth ;
 
 : (nreverse) ( seq i -- )
     #! Swap seq[i] with seq[length-i-1].
@@ -176,7 +155,11 @@ M: object reverse ( seq -- seq ) [ nreverse ] immutable ;
 : sequence= ( seq seq -- ? )
     #! Check if two sequences have the same length and elements,
     #! but not necessarily the same class.
-    2dup length= [ 0 (sequence=) ] [ 2drop f ] ifte ;
+    over general-list? over general-list? or [
+        swap >list swap >list =
+    ] [
+        2dup length= [ 0 (sequence=) ] [ 2drop f ] ifte
+    ] ifte ;
 
 M: sequence = ( obj seq -- ? )
     2dup eq? [

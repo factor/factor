@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math namespaces ;
+USING: generic hashtables kernel lists math namespaces
+sequences ;
 
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
@@ -28,9 +29,8 @@ C: gadget ( shape -- gadget )
     ] ifte ;
 
 : relayout ( gadget -- )
-    #! Relayout a gadget before the next iteration of the event
-    #! loop. Since relayout also implies the visual
-    #! representation changed, we redraw the gadget too.
+    #! Relayout and redraw a gadget and its parent before the
+    #! next iteration of the event loop.
     dup gadget-relayout? [
         drop
     ] [
@@ -38,6 +38,10 @@ C: gadget ( shape -- gadget )
         t over set-gadget-relayout?
         gadget-parent [ relayout ] when*
     ] ifte ;
+
+: relayout* ( gadget -- )
+    #! Relayout a gadget and its children.
+    dup relayout gadget-children [ relayout* ] each ;
 
 : ?move ( x y gadget quot -- )
     >r 3dup shape-pos >r rect> r> = [
@@ -53,10 +57,18 @@ C: gadget ( shape -- gadget )
     ] r> ifte ; inline
 
 : resize-gadget ( w h gadget -- )
-    [ [ resize-shape ] keep relayout ] ?resize ;
+    [ [ resize-shape ] keep relayout* ] ?resize ;
 
 : paint-prop ( gadget key -- value )
-    swap gadget-paint hash ;
+    over [
+        dup pick gadget-paint hash* dup [
+            2nip cdr
+        ] [
+            drop >r gadget-parent r> paint-prop
+        ] ?ifte
+    ] [
+        2drop f
+    ] ifte ;
 
 : set-paint-prop ( gadget value key -- )
     rot gadget-paint set-hash ;

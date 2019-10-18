@@ -49,7 +49,7 @@ TUPLE: relative word where to ;
 : just-compiled compiled-offset 4 - ;
 
 C: relative ( word -- )
-    over t rel-word
+    over 1 0 rel-word
     [ set-relative-word ] keep
     [ just-compiled swap set-relative-where ] keep
     [ compiled-offset swap set-relative-to ] keep ;
@@ -71,7 +71,7 @@ C: absolute ( word -- )
     [ just-compiled swap set-absolute-where ] keep ;
 
 : absolute ( word -- )
-    dup f rel-word <absolute> deferred-xt ;
+    dup 0 0 rel-word <absolute> deferred-xt ;
 
 : >absolute dup absolute-word compiled-xt swap absolute-where ;
 
@@ -115,7 +115,8 @@ C: absolute-16/16 ( word -- )
 
 M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
 
-: absolute-16/16 ( word -- ) <absolute-16/16> deferred-xt ;
+: absolute-16/16 ( word -- )
+    <absolute-16/16> deferred-xt 0 1 rel-address ;
 
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
@@ -134,7 +135,13 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
     deferred-xts get [ fixup ] each  deferred-xts off ;
 
 : with-compiler ( quot -- )
-    [ call  fixup-xts  commit-xts ] with-scope ;
+    [
+        deferred-xts off
+        compiled-xts off
+        call
+        fixup-xts
+        commit-xts
+    ] with-scope ;
 
 : postpone-word ( word -- )
     dup compiling? [

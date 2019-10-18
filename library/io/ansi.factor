@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: ansi
 USING: lists kernel namespaces stdio streams strings
-presentation generic ;
+presentation generic sequences ;
 
 ! <ansi-stream> raps the given stream in an ANSI stream. ANSI
 ! streams support the following character attributes:
@@ -32,11 +32,11 @@ C: ansi-stream ( stream -- stream ) [ set-delegate ] keep ;
 
 : fg ( color -- code )
     #! Set foreground color.
-    "\e[3" swap "m" cat3 ; inline
+    "\e[3" swap "m" append3 ; inline
 
 : bg ( color -- code )
     #! Set foreground color.
-    "\e[4" swap "m" cat3 ; inline
+    "\e[4" swap "m" append3 ; inline
 
 : ansi-attrs ( style -- )
     "bold"    over assoc [ bold , ] when

@@ -9,16 +9,15 @@ USING: kernel lists namespaces sequences streams strings ;
 
 : (parse-stream) ( name stream -- quot )
     #! Uses the current namespace for temporary variables.
-    >r file set f ( initial parse tree ) r>
-    [ (parse) ] read-lines reverse
-    file off
-    line-number off ;
+    [
+        >r file set f ( initial parse tree ) r>
+        [ (parse) ] read-lines reverse
+        file off
+        line-number off
+    ] with-parser ;
 
 : parse-stream ( name stream -- quot )
-    [
-        file-vocabs
-        [ (parse-stream) ] with-parser
-    ] with-scope ;
+    [ file-vocabs (parse-stream) ] with-scope ;
 
 : parse-file ( file -- quot )
     dup <file-reader> parse-stream ;
@@ -43,7 +42,7 @@ USING: kernel lists namespaces sequences streams strings ;
     #! resource:. This allows words that operate on source
     #! files, like "jedit", to use a different resource path
     #! at run time than was used at parse time.
-    "resource:" over cat2 swap <resource-stream> parse-stream ;
+    "resource:" over append swap <resource-stream> parse-stream ;
 
 : run-resource ( file -- )
     parse-resource call ;

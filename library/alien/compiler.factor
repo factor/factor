@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler errors generic inference kernel lists math
-namespaces sequences stdio strings unparser words ;
+USING: assembler compiler compiler-backend compiler-frontend
+errors generic hashtables inference kernel lists math namespaces
+sequences stdio strings unparser words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -41,136 +42,111 @@ M: alien-error error. ( error -- )
         " symbol." %
     ] make-string print ;
 
-: alien-invoke ( ... returns library function parameters -- ... )
+: alien-invoke ( ... return library function parameters -- ... )
     #! Call a C library function.
-    #! 'returns' is a type spec, and 'parameters' is a list of
+    #! 'return' is a type spec, and 'parameters' is a list of
     #! type specs. 'library' is an entry in the "libraries"
     #! namespace.
     drop <alien-error> throw ;
 
-: alien-global ( type library name -- value )
-    #! Fetch the value of C global variable.
-    #! 'type' is a type spec. 'library' is an entry in the
-    #! "libraries" namespace.
-    <alien-error> throw ;
+TUPLE: alien-node return parameters ;
+C: alien-node make-node ;
 
-! Linear IR nodes
-
-SYMBOL: #cleanup ( unwind stack by parameter )
-
-SYMBOL: #unbox ( move top of datastack to C stack )
-
-! for register parameter passing; move top of C stack to a
-! register. no-op on x86, generates code on PowerPC.
-SYMBOL: #parameter
-
-! for increasing stack space on PowerPC; unused on x86.
-SYMBOL: #parameters
-
-SYMBOL: #box ( move EAX to datastack )
-
-! These are set in the alien-invoke dataflow IR node.
-SYMBOL: alien-returns
-SYMBOL: alien-parameters
-
-: set-alien-returns ( returns node -- )
-    [ dup alien-returns set ] bind
-    "void" = [
-        [ object ] produce-d 1 0 node-outputs
-    ] unless ;
+: set-alien-return ( return node -- )
+    2dup set-alien-node-return
+    swap "void" = [
+        drop
+    ] [
+        [ object ] produce-d 1 0 rot node-outputs
+    ] ifte ;
 
 : set-alien-parameters ( parameters node -- )
-    [ dup alien-parameters set ] bind
-    [ drop object ] map dup dup ensure-d
-    length 0 node-inputs consume-d ;
+    2dup set-alien-node-parameters
+    >r [ drop object ] map dup dup ensure-d
+    length 0 r> node-inputs consume-d ;
 
-: ensure-dlsym ( symbol library -- ) load-dll dlsym drop ;
+: ensure-dlsym ( symbol library -- ) load-library dlsym drop ;
 
-: alien-invoke-node ( returns params function library -- )
+: alien-node ( return params function library -- )
     #! We should fail if the library does not exist, so that
     #! compilation does not keep trying to compile FFI words
     #! over and over again if the library is not loaded.
     2dup ensure-dlsym
-    cons \ alien-invoke dataflow,
+    cons param-node <alien-node>
     [ set-alien-parameters ] keep
-    set-alien-returns ;
+    [ set-alien-return ] keep
+    node, ;
 
-DEFER: alien-invoke
+: parameters alien-node-parameters reverse ;
 
-: infer-alien-invoke ( -- )
-    \ alien-invoke "infer-effect" word-prop car ensure-d
-    pop-literal
-    pop-literal >r
-    pop-literal
-    pop-literal -rot
-    r> swap alien-invoke-node ;
-
-: alien-global-node ( type name library -- )
-    2dup ensure-dlsym
-    cons \ alien-global dataflow,
-    set-alien-returns ;
-
-DEFER: alien-global
-
-: infer-alien-global ( -- )
-    \ alien-global "infer-effect" word-prop car ensure-d
-    pop-literal
-    pop-literal
-    pop-literal -rot
-    alien-global-node ;
-
-: parameters [ alien-parameters get reverse ] bind ;
+: c-aligned c-size cell align ;
 
 : stack-space ( parameters -- n )
-    0 swap [ c-size cell align + ] each ;
+    0 swap [ c-aligned + ] each ;
 
-: unbox-parameter ( n parameter -- )
-    c-type [ "unboxer" get ] bind cons #unbox swons , ;
+: unbox-parameter ( n parameter -- node )
+    c-type [ "unboxer" get "reg-class" get ] bind %unbox ;
 
-: linearize-parameters ( node -- count )
+: unbox-parameters ( params -- )
+    [ stack-space ] keep
+    [ [ c-aligned - dup ] keep unbox-parameter ] map nip % ;
+
+: incr-param ( reg-class -- )
+    #! OS X is so ugly.
+    dup class [ 1 + ] change  dup float-regs? [
+        os "macosx" = [
+            int-regs [ swap float-regs-size 4 / + ] change
+        ] [
+            drop
+        ] ifte
+    ] [
+        drop
+    ] ifte ;
+
+: load-parameter ( n parameter -- node )
+    c-type "reg-class" swap hash
+    [ [ class get ] keep  incr-param ] keep  %parameter ;
+
+: load-parameters ( params -- )
+    [
+        0 int-regs set
+        0 float-regs set
+        reverse 0 swap
+        [ 2dup load-parameter >r c-aligned + r> ] map nip
+    ] with-scope % ;
+
+: linearize-parameters ( parameters -- )
     #! Generate code for boxing a list of C types, then generate
     #! code for moving these parameters to register on
     #! architectures where parameters are passed in registers
     #! (PowerPC).
-    #!
-    #! Return amount stack must be unwound by.
-    parameters
-    dup stack-space
-    dup #parameters swons , >r
-    dup dup length swap [ >r 1 - dup r> unbox-parameter ] each drop
-    length [ #parameter swons ] project % r> ;
+    dup stack-space %parameters ,
+    dup unbox-parameters load-parameters ;
 
-: linearize-returns ( returns -- )
-    [ alien-returns get ] bind dup "void" = [
+: linearize-return ( return -- )
+    alien-node-return dup "void" = [
         drop
     ] [
-        c-type [ "boxer" get ] bind #box swons ,
+        c-type [ "boxer" get "reg-class" get ] bind %box ,
     ] ifte ;
 
-: linearize-alien-invoke ( node -- )
-    dup linearize-parameters >r
-    dup [ node-param get ] bind \ alien-invoke swons ,
-    dup [ node-param get cdr library-abi "stdcall" = ] bind
-    r> swap [ drop ] [ #cleanup swons , ] ifte
-    linearize-returns ;
+M: alien-node linearize-node* ( node -- )
+    dup parameters linearize-parameters
+    dup node-param dup uncons %alien-invoke ,
+    cdr library-abi "stdcall" =
+    [ dup parameters stack-space %cleanup , ] unless
+    linearize-return ;
 
-\ alien-invoke [ linearize-alien-invoke ] "linearizer" set-word-prop
-
-: linearize-alien-global ( node -- )
-    dup [ node-param get ] bind \ alien-global swons ,
-    linearize-returns ;
-
-\ alien-global [ linearize-alien-global ] "linearizer" set-word-prop
-
-\ alien-invoke [ [ string string string general-list ] [ ] ]
+\ alien-invoke [ [ string object string general-list ] [ ] ]
 "infer-effect" set-word-prop
 
-\ alien-invoke [ infer-alien-invoke ] "infer" set-word-prop
-
-\ alien-global [ [ string string string ] [ object ] ]
-"infer-effect" set-word-prop
-
-\ alien-global [ infer-alien-global ] "infer" set-word-prop
+\ alien-invoke [
+    pop-literal nip
+    pop-literal nip >r
+    pop-literal nip
+    pop-literal nip -rot
+    r> swap alien-node
+] "infer" set-word-prop
 
 global [
     "libraries" get [ <namespace> "libraries" set ] unless

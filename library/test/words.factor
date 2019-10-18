@@ -1,5 +1,5 @@
 IN: temporary
-USING: generic kernel lists math namespaces test words ;
+USING: generic kernel lists math namespaces test words sequences ;
 
 [ 4 ] [
     "poo" "scratchpad" create [ 2 2 + ] define-compound

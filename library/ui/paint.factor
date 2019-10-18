@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables kernel lists math namespaces sdl
-stdio strings ;
+stdio strings sequences ;
 
 ! Clipping
 
@@ -53,7 +53,7 @@ SYMBOL: clip
 : with-clip ( shape quot -- )
     #! All drawing done inside the quotation is clipped to the
     #! shape's bounds. The quotation is called with a boolean
-    #! that is set to false if 
+    #! that is set to false if the gadget is entirely clipped.
     [
         >r screen-bounds clip [ intersect dup ] change set-clip
         r> call

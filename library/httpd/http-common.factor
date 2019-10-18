@@ -19,9 +19,9 @@ stdio streams strings unparser ;
             dup url-quotable? [
                 ,
             ] [
-                CHAR: % , >hex 2 CHAR: 0 pad %
+                CHAR: % , >hex 2 CHAR: 0 pad-left %
             ] ifte
-        ] seq-each
+        ] each
     ] make-string ;
 
 : catch-hex> ( str -- n )
@@ -32,7 +32,7 @@ stdio streams strings unparser ;
     2dup length 2 - >= [
         2drop
     ] [
-        >r 1 + dup 2 + r> substring  catch-hex> [ , ] when*
+        >r 1 + dup 2 + r> subseq  catch-hex> [ , ] when*
     ] ifte ;
 
 : url-decode-% ( index str -- index str )

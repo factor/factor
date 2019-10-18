@@ -34,10 +34,11 @@
 				<include name="factor/**/*.bsh"/>
 				<include name="factor/**/*.txt"/>
 				<include name="*.xml"/>
-				<include name="doc/**/*.html"/>
-				<include name="doc/**/*.png"/>
+				<include name="*.keymap"/>
 				<include name="library/**/*.png"/>
 				<include name="doc/*.html"/>
+				<include name="doc/jedit/*.html"/>
+				<include name="doc/jedit/*.png"/>
 			</fileset>
 		</jar>
 	</target>

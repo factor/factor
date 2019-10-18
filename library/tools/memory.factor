@@ -2,16 +2,20 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
 USING: errors generic hashtables kernel kernel-internals lists
-math namespaces prettyprint sequences stdio unparser vectors
-words ;
+math namespaces prettyprint sequences stdio strings unparser
+vectors words ;
+
+: generations 15 getenv ;
+
+: full-gc generations 1 - gc ;
 
 : save
     #! Save the current image.
     "image" get save-image ;
-    
+
 ! Printing an overview of heap usage.
 
-: kb. 1024 /i unparse write " KB" write ;
+: kb. 1024 /i unparse 6 CHAR: \s pad-left  write " KB" write ;
 
 : (room.) ( free total -- )
     2dup swap - swap ( free used total )
@@ -21,8 +25,13 @@ words ;
 
 : room. ( -- )
     room
-    "Data space: " write (room.)
-    "Code space: " write (room.) ;
+    0 swap [
+        "Generation " write over unparse write ":" write
+        uncons (room.) 1 +
+    ] each drop
+    "Semi-space:  " write kb. terpri
+    "Cards:       " write kb. terpri
+    "Code space:  " write (room.) ;
 
 ! Some words for iterating through the heap.
 
@@ -100,7 +109,7 @@ M: object (each-slot) ( quot obj -- )
 : orphan? ( word -- ? )
     #! Test if the word is not a member of its vocabulary.
     dup dup word-name swap word-vocabulary dup [
-        vocab hash eq? not
+        vocab dup [ hash eq? not ] [ 3drop t ] ifte
     ] [
         3drop t
     ] ifte ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: streams
-USING: kernel namespaces stdio strings unparser ;
+USING: kernel namespaces stdio sequences strings unparser ;
 
 ! A simple logging framework.
 SYMBOL: log-stream
@@ -14,7 +14,7 @@ SYMBOL: log-stream
         print flush
     ] ifte* ;
 
-: log-error ( error -- ) "Error: " swap cat2 log ;
+: log-error ( error -- ) "Error: " swap append log ;
 
 : log-client ( client-stream -- )
     [

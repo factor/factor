@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2004, 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -47,26 +47,63 @@ public class FactorOptionPane extends AbstractOptionPane
 	//{{{ _init() method
 	protected void _init()
 	{
+		ButtonGroup grp = new ButtonGroup();
+		RadioAction h = new RadioAction();
+
+		addComponent(jEdit.getProperty("options.factor.port"),
+			port = new JTextField(jEdit.getProperty("factor.external.port")));
+		
+		addComponent(programType = new JRadioButton(jEdit.getProperty(
+			"options.factor.type.program")));
+		programType.addActionListener(h);
+		grp.add(programType);
+		
 		addComponent(jEdit.getProperty("options.factor.program"),
 			createProgramField(jEdit.getProperty("factor.external.program")));
 		addComponent(jEdit.getProperty("options.factor.image"),
 			createImageField(jEdit.getProperty("factor.external.image")));
 		addComponent(jEdit.getProperty("options.factor.args"),
 			createArgsField(jEdit.getProperty("factor.external.args")));
+		
+		addComponent(remoteType = new JRadioButton(jEdit.getProperty(
+			"options.factor.type.remote")));
+		remoteType.addActionListener(h);
+		grp.add(remoteType);
+		
+		addComponent(jEdit.getProperty("options.factor.host"),
+			host = new JTextField(jEdit.getProperty("factor.external.host")));
+		
+		String type = jEdit.getProperty("factor.external.type");
+		if("program".equals(type))
+			programType.setSelected(true);
+		else
+			remoteType.setSelected(true);
+		
+		updateEnabled();
 	} //}}}
 	
 	//{{{ _save() method
 	protected void _save()
 	{
+		if(programType.isSelected())
+			jEdit.setProperty("factor.external.type","program");
+		else
+			jEdit.setProperty("factor.external.type","remote");
 		jEdit.setProperty("factor.external.program",program.getText());
 		jEdit.setProperty("factor.external.image",image.getText());
 		jEdit.setProperty("factor.external.args",args.getText());
+		jEdit.setProperty("factor.external.host",host.getText());
+		jEdit.setProperty("factor.external.port",port.getText());
 	} //}}}
 	
 	//{{{ Private members
+	private JTextField port;
+	private JRadioButton programType;
 	private JTextField program;
 	private JTextField image;
 	private JTextField args;
+	private JRadioButton remoteType;
+	private JTextField host;
 
 	//{{{ createProgramField() metnod
 	private JComponent createProgramField(String text)
@@ -106,18 +143,30 @@ public class FactorOptionPane extends AbstractOptionPane
 		JButton button = new RolloverButton(
 			GUIUtilities.loadIcon("Open.png"));
 		button.setToolTipText(jEdit.getProperty("options.factor.choose"));
-		button.addActionListener(new ActionHandler(field));
+		button.addActionListener(new ChooseFileAction(field));
 
 		h.add(button);
 		return h;
 	} //}}}
 
-	//{{{ ActionHandler class
-	class ActionHandler implements ActionListener
+	//{{{ updateEnabled() method
+	private void updateEnabled()
+	{
+		boolean b = programType.isSelected();
+		program.setEnabled(b);
+		image.setEnabled(b);
+		args.setEnabled(b);
+		host.setEnabled(!b);
+	} //}}}
+
+	//}}}
+	
+	//{{{ ChooseFileAction class
+	class ChooseFileAction implements ActionListener
 	{
 		private JTextField field;
 		
-		ActionHandler(JTextField field)
+		ChooseFileAction(JTextField field)
 		{
 			this.field = field;
 		}
@@ -132,6 +181,15 @@ public class FactorOptionPane extends AbstractOptionPane
 			if(paths == null)
 				return;
 			field.setText(paths[0]);
+		}
+	} //}}}
+	
+	//{{{ RadioAction class
+	class RadioAction implements ActionListener
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			updateEnabled();
 		}
 	} //}}}
 }

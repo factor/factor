@@ -106,7 +106,13 @@ SYMBOL: building
 
 : , ( obj -- )
     #! Add to the sequence being built with make-seq.
-    building get dup sbuf? [ sbuf-append ] [ push ] ifte ;
+    ! The behavior where a string can be passed is deprecated;
+    ! use % instead!
+    building get dup sbuf? [
+        over string? [ swap nappend ] [ push ] ifte
+    ] [
+        push
+    ] ifte ;
 
 : literal, ( word -- )
     #! Append some code that pushes the word on the stack. Used
@@ -132,10 +138,10 @@ SYMBOL: building
     100 <sbuf> make-seq ; inline
 
 : make-string ( quot -- string )
-    make-sbuf sbuf>string ; inline
+    make-sbuf >string ; inline
 
 : make-rstring ( quot -- string )
-    make-sbuf dup nreverse sbuf>string ; inline
+    make-sbuf dup nreverse >string ; inline
 
 ! Building hashtables, and computing a transitive closure.
 SYMBOL: hash-buffer

@@ -10,7 +10,7 @@ TUPLE: no-method object generic ;
 : no-method ( object generic -- )
     #! We 2dup here to leave both values on the stack, for
     #! post-mortem inspection.
-    2dup <no-method> throw ;
+    <no-method> throw ;
 
 ! This is a very lightweight exception handling system.
 

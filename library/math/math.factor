@@ -4,28 +4,28 @@ IN: math
 USING: errors generic kernel math-internals ;
 
 ! Math operations
-2GENERIC: number= ( x y -- ? )
+G: number= ( x y -- ? ) [ ] [ arithmetic-type ] ;
 M: object number= 2drop f ;
 
-2GENERIC: <  ( x y -- ? )
-2GENERIC: <= ( x y -- ? )
-2GENERIC: >  ( x y -- ? )
-2GENERIC: >= ( x y -- ? )
+G: <  ( x y -- ? ) [ ] [ arithmetic-type ] ;
+G: <= ( x y -- ? ) [ ] [ arithmetic-type ] ;
+G: >  ( x y -- ? ) [ ] [ arithmetic-type ] ;
+G: >= ( x y -- ? ) [ ] [ arithmetic-type ] ;
 
-2GENERIC: +   ( x y -- x+y )
-2GENERIC: -   ( x y -- x-y )
-2GENERIC: *   ( x y -- x*y )
-2GENERIC: /   ( x y -- x/y )
-2GENERIC: /i  ( x y -- x/y )
-2GENERIC: /f  ( x y -- x/y )
-2GENERIC: mod ( x y -- x%y )
+G: +   ( x y -- x+y ) [ ] [ arithmetic-type ] ;
+G: -   ( x y -- x-y ) [ ] [ arithmetic-type ] ;
+G: *   ( x y -- x*y ) [ ] [ arithmetic-type ] ;
+G: /   ( x y -- x/y ) [ ] [ arithmetic-type ] ;
+G: /i  ( x y -- x/y ) [ ] [ arithmetic-type ] ;
+G: /f  ( x y -- x/y ) [ ] [ arithmetic-type ] ;
+G: mod ( x y -- x%y ) [ ] [ arithmetic-type ] ;
 
-2GENERIC: /mod ( x y -- x/y x%y )
+G: /mod ( x y -- x/y x%y ) [ ] [ arithmetic-type ] ;
 
-2GENERIC: bitand ( x y -- z )
-2GENERIC: bitor  ( x y -- z )
-2GENERIC: bitxor ( x y -- z )
-2GENERIC: shift  ( x n -- y )
+G: bitand ( x y -- z ) [ ] [ arithmetic-type ] ;
+G: bitor  ( x y -- z ) [ ] [ arithmetic-type ] ;
+G: bitxor ( x y -- z ) [ ] [ arithmetic-type ] ;
+G: shift  ( x n -- y ) [ ] [ arithmetic-type ] ;
 
 GENERIC: bitnot ( n -- n )
 
@@ -33,19 +33,18 @@ GENERIC: truncate ( n -- n )
 GENERIC: floor    ( n -- n )
 GENERIC: ceiling  ( n -- n )
 
-: max ( x y -- z ) [ > ] 2keep ? ;
-
-: min ( x y -- z ) [ < ] 2keep ? ;
+: max ( x y -- z ) [ > ] 2keep ? ; inline
+: min ( x y -- z ) [ < ] 2keep ? ; inline
 
 : between? ( x min max -- ? )
     #! Push if min <= x <= max. Handles case where min > max
     #! by swapping them.
     2dup > [ swap ] when  >r dupd max r> min = ;
 
-: sq dup * ;
+: sq dup * ; inline
 
-: neg 0 swap - ;
-: recip 1 swap / ;
+: neg 0 swap - ; inline
+: recip 1 swap / ; inline
 
 : rem ( x y -- x%y )
     #! Like modulus, but always gives a positive result.
@@ -75,3 +74,23 @@ GENERIC: abs ( z -- |z| )
 : times ( n quot -- )
     #! Evaluate a quotation n times.
     swap [ >r dup slip r> ] repeat drop ; inline
+
+: 2repeat ( i j quot -- | quot: i j -- i j )
+    rot [
+        rot [ [ rot dup slip -rot ] repeat ] keep -rot
+    ] repeat 2drop ; inline
+
+: power-of-2? ( n -- ? )
+    dup 0 > [
+        dup dup neg bitand =
+    ] [
+        drop f
+    ] ifte ;
+
+: log2 ( n -- b )
+    #! Log base two for integers.
+    dup 0 <= [
+        "Input must be positive" throw
+    ] [
+        dup 1 = [ drop 0 ] [ 2 /i log2 1 + ] ifte
+    ] ifte ;

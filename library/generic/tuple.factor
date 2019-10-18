@@ -16,30 +16,14 @@ hashtables errors sequences vectors ;
     #! Internal allocation function. Do not call it directly,
     #! since you can fool the runtime and corrupt memory by
     #! specifying an incorrect size.
-    <tuple> [ 0 swap set-array-nth ] keep ;
+    <tuple> [ 2 set-slot ] keep ;
 
 : class-tuple 2 slot ; inline
 
-! A sequence of all slots in a tuple, used for equality testing.
-TUPLE: tuple-seq tuple ;
-
-M: tuple-seq nth ( n tuple-seq -- elt )
-    tuple-seq-tuple array-nth ;
-
-M: tuple-seq length ( tuple-seq -- len )
-    tuple-seq-tuple array-capacity ;
-
 IN: generic
 
-BUILTIN: tuple 18 [ 1 length f ] ;
-
-! So far, only tuples can have delegates, which also must be
-! tuples (the UI uses numbers as delegates in a couple of places
-! but this is Unsupported(tm)).
-GENERIC: delegate
-GENERIC: set-delegate
-
-M: object delegate drop f ;
+DEFER: tuple?
+BUILTIN: tuple 18 tuple? ;
 
 M: tuple delegate 3 slot ;
 M: tuple set-delegate 3 set-slot ;
@@ -68,15 +52,23 @@ UNION: arrayed array tuple ;
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
-    dup predicate-word swap [ swap class eq? ] cons
-    define-compound ;
+    dup predicate-word 2dup unit "predicate" set-word-prop
+    swap [
+        [ dup tuple? ] %
+        [ \ class-tuple , literal, \ eq? , ] make-list ,
+        [ drop f ] ,
+        \ ifte ,
+    ] make-list define-compound ;
+
+: forget-tuple ( class -- )
+    dup forget "predicate" word-prop car [ forget ] when* ;
 
 : check-shape ( word slots -- )
     #! If the new list of slots is different from the previous,
     #! forget the old definition.
     >r "use" get search dup [
         dup "tuple-size" word-prop r> length 2 + =
-        [ drop ] [ forget ] ifte
+        [ drop ] [ forget-tuple ] ifte
     ] [
         r> 2drop
     ] ifte ;
@@ -86,11 +78,8 @@ UNION: arrayed array tuple ;
     2dup length 2 + "tuple-size" set-word-prop
     4 -rot simple-slots ;
 
-: constructor-word ( string -- word )
-    "<" swap ">" append3 create-in ;
-
 : define-constructor ( word def -- )
-    >r [ word-name constructor-word ] keep [
+    >r [ word-name "in" get constructor-word ] keep [
         dup literal, "tuple-size" word-prop , \ make-tuple ,
     ] make-list r> append define-compound ;
 
@@ -103,7 +92,6 @@ UNION: arrayed array tuple ;
 : define-tuple ( tuple slots -- )
     2dup check-shape
     >r create-in
-    dup save-location
     dup intern-symbol
     dup tuple-predicate
     dup tuple "metaclass" set-word-prop
@@ -133,7 +121,7 @@ UNION: arrayed array tuple ;
     #! Turn a hash  table that maps values to quotations into a
     #! quotation that executes a quotation depending on the
     #! value on the stack.
-    dup hash-size 4 <= [
+    ( dup hash-size 4 <= ) t [
         hash>alist alist>quot
     ] [
         (hash>quot)
@@ -149,10 +137,7 @@ UNION: arrayed array tuple ;
         drop object over hash* dup [
             2nip cdr
         ] [
-            2drop [ dup delegate ] swap
-            dup unit swap
-            unit [ car ] cons [ no-method ] append
-            \ ?ifte 3list append
+            2drop empty-method
         ] ifte
     ] ifte ;
 
@@ -164,24 +149,39 @@ UNION: arrayed array tuple ;
     #! Generate a quotation that performs tuple class dispatch
     #! for methods defined on the given generic.
     dup default-tuple-method \ drop swons
-    swap tuple-methods hash>quot
-    [ dup class-tuple ] swap append ;
+    over tuple-methods hash>quot
+    >r "picker" word-prop [ class-tuple ] r> append3 ;
 
 : add-tuple-dispatch ( word vtable -- )
     >r tuple-dispatch-quot tuple r> set-vtable ;
 
-: tuple>list ( tuple -- list )
-    #! We have to type check here, since <tuple-seq> is unsafe.
-    dup tuple? [
-        <tuple-seq> >list
+! A sequence of all slots in a tuple, used for equality testing.
+TUPLE: mirror tuple ;
+
+C: mirror ( tuple -- mirror )
+    over tuple? [
+        [ set-mirror-tuple ] keep
     ] [
         "Not a tuple" throw
     ] ifte ;
 
+M: mirror nth ( n mirror -- elt )
+    bounds-check mirror-tuple array-nth ;
+
+M: mirror set-nth ( n mirror -- elt )
+    bounds-check mirror-tuple set-array-nth ;
+
+M: mirror length ( mirror -- len )
+    mirror-tuple array-capacity ;
+
+: tuple>list ( tuple -- list )
+    #! We have to type check here, since <mirror> is unsafe.
+    <mirror> >list ;
+
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
     #! delegate.
-    dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
+    [ array-capacity <tuple> dup ] keep copy-array ;
 
 M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.
@@ -190,10 +190,10 @@ M: tuple clone ( tuple -- tuple )
 M: tuple hashcode ( vec -- n )
     #! If the capacity is two, then all we have is the class
     #! slot and delegate.
-    dup length 2 number= [
+    dup array-capacity 2 number= [
         drop 0
     ] [
-        2 swap nth hashcode
+        2 swap array-nth hashcode
     ] ifte ;
 
 M: tuple = ( obj tuple -- ? )
@@ -201,7 +201,7 @@ M: tuple = ( obj tuple -- ? )
         2drop t
     ] [
         over tuple? [
-            swap <tuple-seq> swap <tuple-seq> sequence=
+            swap <mirror> swap <mirror> sequence=
         ] [
             2drop f
         ] ifte

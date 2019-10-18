@@ -2,13 +2,13 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words
 USING: files generic inspector lists kernel namespaces
-prettyprint stdio streams strings unparser math hashtables
-parser ;
+prettyprint stdio streams strings sequences unparser math
+hashtables parser ;
 
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
     #! contain a string.
-    words [ word-name dupd string-contains? ] subset nip ;
+    words [ word-name dupd subseq? ] subset nip ;
 
 : vocab-apropos. ( substring vocab -- )
     #! List all words in a vocabulary that contain a string.
@@ -24,7 +24,7 @@ parser ;
 
 : word-file ( word -- file )
     "file" word-prop dup [
-        "resource:/" ?string-head [
+        "resource:/" ?head [
             resource-path swap path+
         ] when
     ] when ;

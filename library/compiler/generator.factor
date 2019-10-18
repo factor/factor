@@ -1,24 +1,11 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: assembler
+IN: compiler-backend
+USING: assembler compiler errors inference kernel lists math
+namespaces sequences strings vectors words ;
 
-DEFER: compile-call-label ( label -- )
-DEFER: compile-jump-label ( label -- )
-
-DEFER: compile-jump-t ( label -- )
-DEFER: compile-jump-f ( label -- )
-
-IN: compiler
-USING: assembler errors inference kernel lists math namespaces
-sequences strings vectors words ;
-
-: generate-node ( [[ op params ]] -- )
-    #! Generate machine code for a node.
-    unswons dup "generator" word-prop [
-        call
-    ] [
-        "No generator" throw
-    ] ?ifte ;
+! Compile a VOP.
+GENERIC: generate-node ( vop -- )
 
 : generate-code ( word linear -- length )
     compiled-offset >r
@@ -30,7 +17,7 @@ sequences strings vectors words ;
 
 : generate-reloc ( -- length )
     relocation-table get
-    dup [ compile-cell ] seq-each
+    dup [ compile-cell ] each
     length cell * ;
 
 : (generate) ( word linear -- )
@@ -56,38 +43,29 @@ SYMBOL: previous-offset
         ] when*
     ] catch ;
 
-#label [ save-xt ] "generator" set-word-prop
+! A few VOPs have trivial generators.
 
-#end-dispatch [ drop ] "generator" set-word-prop
+M: %label generate-node ( vop -- )
+    vop-label save-xt ;
 
-: type-tag ( type -- tag )
-    #! Given a type number, return the tag number.
-    dup 6 > [ drop 3 ] when ;
-
-: compile-call ( word -- ) dup postpone-word compile-call-label ;
-
-#call [
-    compile-call
-] "generator" set-word-prop
-
-#jump-label [
-    compile-jump-label
-] "generator" set-word-prop
-
-#jump-t-label [ compile-jump-t ] "generator" set-word-prop
-#jump-t [ compile-jump-t ] "generator" set-word-prop
-
-#jump-f-label [ compile-jump-f ] "generator" set-word-prop
-#jump-f [ compile-jump-f ] "generator" set-word-prop
+M: %end-dispatch generate-node ( vop -- ) drop ;
 
 : compile-target ( word -- ) 0 compile-cell absolute ;
 
-#target-label [
-    #! Jump table entries are absolute addresses.
-    compile-target
-] "generator" set-word-prop
+M: %target-label generate-node vop-label compile-target ;
 
-#target [
-    #! Jump table entries are absolute addresses.
-    dup postpone-word  compile-target
-] "generator" set-word-prop
+M: %target generate-node
+    vop-label dup postpone-word  compile-target ;
+
+GENERIC: v>operand
+
+: dest/src ( vop -- dest src )
+    dup vop-out-1 v>operand swap vop-in-1 v>operand ;
+
+! These constants must match native/card.h
+: card-bits 7 ;
+: card-mark HEX: 80 ;
+
+: shift-add ( by -- n )
+    #! Used in fixnum-shift overflow check.
+    1 swap cell 8 * swap 1 - - shift ;

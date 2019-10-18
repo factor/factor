@@ -3,19 +3,20 @@
 IN: alien
 USING: hashtables kernel lists math namespaces parser stdio ;
 
-BUILTIN: dll   15 [ 1 "dll-path" f ] ;
-BUILTIN: alien 16 ;
-BUILTIN: byte-array 19 ;
-BUILTIN: displaced-alien 20 ;
+DEFER: dll?
+BUILTIN: dll 15 dll? [ 1 "dll-path" f ] ;
+
+DEFER: alien?
+BUILTIN: alien 16 alien? ;
+
+DEFER: displaced-alien?
+BUILTIN: displaced-alien 20 displaced-alien? ;
 
 : NULL ( -- null )
     #! C null value.
     0 <alien> ;
 
-: null? ( alien -- ? ) dup [ alien-address 0 = ] when ;
-
-: null>f ( alien -- alien/f )
-    dup alien-address 0 = [ drop f ] when ;
+: null? ( alien -- ? ) dup alien? [ alien-address 0 = ] when ;
 
 M: alien hashcode ( obj -- n )
     alien-address >fixnum ;
@@ -27,14 +28,10 @@ M: alien = ( obj obj -- ? )
         2drop f
     ] ifte ;
 
-: ALIEN: scan-word <alien> swons ; parsing
-
-: DLL" skip-blank parse-string dlopen swons ; parsing
-
 : library ( name -- object )
     dup [ "libraries" get hash ] when ;
 
-: load-dll ( name -- dll )
+: load-library ( name -- dll )
     #! Higher level wrapper around dlopen primitive.
     library dup [
         [
@@ -54,3 +51,5 @@ M: alien = ( obj obj -- ? )
 
 : library-abi ( library -- abi )
     library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
+
+: ALIEN: scan-word <alien> swons ; parsing

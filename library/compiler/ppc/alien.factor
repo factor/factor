@@ -1,33 +1,46 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: assembler
-USING: alien compiler inference kernel kernel-internals lists
-math memory namespaces words ;
+IN: compiler-backend
+USING: alien assembler kernel math ;
 
-\ alien-invoke [
-    uncons load-dll 2dup rel-dlsym-16/16 dlsym compile-call-far
-] "generator" set-word-prop
+M: %alien-invoke generate-node ( vop -- )
+    dup vop-in-1 swap vop-in-2 load-library compile-c-call ;
 
-: stack-size 8 + 16 align ;
-: stack@ 3 + cell * ;
+: stack-reserve 8 + 16 align ;
+: stack@ 12 + ;
 
-#parameters [
-    dup 0 = [ drop ] [ stack-size 1 1 rot SUBI ] ifte
-] "generator" set-word-prop
+M: %parameters generate-node ( vop -- )
+    vop-in-1 dup 0 =
+    [ drop ] [ stack-reserve 1 1 rot SUBI ] ifte ;
 
-#unbox [
-    uncons f 2dup rel-dlsym-16/16 dlsym compile-call-far
-    3 1 rot stack@ STW
-] "generator" set-word-prop
+GENERIC: store-insn
+GENERIC: load-insn
+GENERIC: return-reg
 
-#parameter [
-    dup 3 + 1 rot stack@ LWZ
-] "generator" set-word-prop
+M: int-regs store-insn drop STW ;
+M: int-regs return-reg drop 3 ;
+M: int-regs load-insn drop 3 + 1 rot LWZ ;
 
-#box [
-    f 2dup rel-dlsym-16/16 dlsym compile-call-far
-] "generator" set-word-prop
+M: float-regs store-insn
+    float-regs-size 4 = [ STFS ] [ STFD ] ifte ;
+M: float-regs return-reg drop 1 ;
+M: float-regs load-insn
+    >r 1 + 1 rot r> float-regs-size 4 = [ LFS ] [ LFD ] ifte ;
 
-#cleanup [
-    dup 0 = [ drop ] [ stack-size 1 1 rot ADDI ] ifte
-] "generator" set-word-prop
+M: %unbox generate-node ( vop -- )
+    [ vop-in-2 f compile-c-call ] keep
+    [ vop-in-3 return-reg 1 ] keep
+    [ vop-in-1 stack@ ] keep
+    vop-in-3 store-insn ; 
+
+M: %parameter generate-node ( vop -- )
+    dup vop-in-1 stack@
+    over vop-in-2
+    rot vop-in-3 load-insn ;
+
+M: %box generate-node ( vop -- )
+    vop-in-1 f compile-c-call ;
+
+M: %cleanup generate-node ( vop -- )
+    vop-in-1 dup 0 =
+    [ drop ] [ stack-reserve 1 1 rot ADDI ] ifte ;

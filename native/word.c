@@ -13,7 +13,7 @@ void primitive_word(void)
 {
 	F_WORD* word;
 
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_WORD));
 
 	word = allot_object(WORD_TYPE,sizeof(F_WORD));
 	word->hashcode = tag_fixnum((CELL)word); /* initial address */
@@ -21,8 +21,6 @@ void primitive_word(void)
 	word->primitive = 0;
 	word->def = F;
 	word->props = F;
-	word->call_count = 0;
-	word->allot_count = 0;
 	dpush(tag_object(word));
 }
 
@@ -54,6 +52,6 @@ void fixup_word(F_WORD* word)
 
 void collect_word(F_WORD* word)
 {
-	COPY_OBJECT(word->def);
-	COPY_OBJECT(word->props);
+	copy_handle(&word->def);
+	copy_handle(&word->props);
 }

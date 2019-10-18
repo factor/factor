@@ -1,13 +1,11 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: lists USING: kernel ;
-
-! An association list is a list of conses where the car of each
-! cons is a key, and the cdr is a value. See the Factor
-! Developer's Guide for details.
+IN: lists USING: kernel sequences ;
 
 : assoc? ( list -- ? )
-    #! Push if the list appears to be an alist.
+    #! Push if the list appears to be an alist. An association
+    #! list is a list of conses where the car of each cons is a
+    #! key, and the cdr is a value.
     dup list? [ [ cons? ] all? ] [ drop f ] ifte ;
 
 : assoc* ( key alist -- [[ key value ]] )

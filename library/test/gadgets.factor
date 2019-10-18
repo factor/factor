@@ -1,5 +1,5 @@
 IN: temporary
-USING: gadgets kernel lists math namespaces test ;
+USING: gadgets kernel lists math namespaces test sequences ;
 
 [ t ] [
     [

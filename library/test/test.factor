@@ -4,8 +4,14 @@ IN: test
 USING: errors kernel lists math memory namespaces parser
 prettyprint sequences stdio strings unparser vectors words ;
 
-: assert ( t -- )
-    [ "Assertion failed!" throw ] unless ;
+TUPLE: assert got expect ;
+M: assert error.
+    "Assertion failed" print
+    "Expected: " write dup assert-expect .
+    "Got: " write assert-got . ;
+
+: assert= ( a b -- )
+    2dup = [ 2drop ] [ <assert> throw ] ifte ;
 
 : print-test ( input output -- )
     "--> " write 2list . flush ;
@@ -25,7 +31,7 @@ prettyprint sequences stdio strings unparser vectors words ;
         [
             2dup print-test
             swap >r >r clear r> call
-            datastack >list r> = assert
+            datastack >list r> assert=
         ] keep-datastack 2drop
     ] time ;
 
@@ -34,9 +40,7 @@ prettyprint sequences stdio strings unparser vectors words ;
     [ [ not ] catch ] cons [ f ] swap unit-test ;
 
 : assert-depth ( quot -- )
-    depth slip depth = [
-        "Unequal before/after depth" throw
-    ] unless ;
+    depth slip depth assert= ;
 
 SYMBOL: failures
 
@@ -46,7 +50,7 @@ SYMBOL: failures
     [ [ dup error. cons failure f ] [ t ] ifte* ] catch ;
 
 : test-path ( name -- path )
-    "/library/test/" swap ".factor" cat3 ;
+    "/library/test/" swap ".factor" append3 ;
 
 : test ( name -- ? )
     [
@@ -58,50 +62,6 @@ SYMBOL: failures
     failures off
     vocabularies get [ "temporary" off ] bind ;
 
-: eligible-tests ( -- list )
-    [
-        [
-            "lists/cons" "lists/lists" "lists/assoc"
-            "lists/namespaces" "lists/combinators" "combinators"
-            "continuations" "errors" "hashtables" "strings"
-            "namespaces" "generic" "tuple" "files" "parser"
-            "parse-number" "prettyprint" "image" "init" "io/io"
-            "listener" "vectors" "words" "unparser" "random"
-            "stream" "math/bitops"
-            "math/math-combinators" "math/rational" "math/float"
-            "math/complex" "math/irrational" "math/integer"
-            "math/matrices"
-            "httpd/url-encoding" "httpd/html" "httpd/httpd"
-            "httpd/http-client"
-            "crashes" "sbuf" "threads" "parsing-word"
-            "inference" "dataflow" "interpreter" "alien"
-            "line-editor" "gadgets" "memory" "redefine"
-            "annotate"
-        ] %
-        
-        os "win32" = [
-            "buffer" ,
-        ] when
-        
-        cpu "unknown" = [
-            [
-                "io/buffer" "compiler/optimizer"
-                "compiler/simplifier" "compiler/simple"
-                "compiler/stack" "compiler/ifte"
-                "compiler/generic" "compiler/bail-out"
-                "compiler/linearizer"
-            ] %
-        ] unless
-        
-        [
-            "benchmark/empty-loop" "benchmark/fac"
-            "benchmark/fib" "benchmark/sort"
-            "benchmark/continuations" "benchmark/ack"
-            "benchmark/hashtables" "benchmark/strings"
-            "benchmark/vectors"
-        ] %
-    ] make-list ;
-
 : passed.
     "Tests passed:" print . ;
 
@@ -109,6 +69,46 @@ SYMBOL: failures
     "Tests failed:" print
     failures get [ unswons write ": " write error. ] each ;
 
-: all-tests ( -- )
-    prepare-tests eligible-tests [ test ] subset
-    terpri passed. failed. ;
+: run-tests ( list -- )
+    prepare-tests [ test ] subset terpri passed. failed. ;
+
+: tests
+    [
+        "lists/cons" "lists/lists" "lists/assoc"
+        "lists/namespaces" "lists/combinators" "combinators"
+        "continuations" "errors" "hashtables" "strings"
+        "namespaces" "generic" "tuple" "files" "parser"
+        "parse-number" "image" "init" "io/io"
+        "listener" "vectors" "words" "unparser" "random"
+        "stream" "math/bitops"
+        "math/math-combinators" "math/rational" "math/float"
+        "math/complex" "math/irrational" "math/integer"
+        "math/matrices"
+        "httpd/url-encoding" "httpd/html" "httpd/httpd"
+        "httpd/http-client"
+        "crashes" "sbuf" "threads" "parsing-word"
+        "inference" "interpreter"
+        "alien"
+        "line-editor" "gadgets" "memory" "redefine"
+        "annotate" "sequences" "binary"
+    ] run-tests ;
+
+: benchmarks
+    [
+        "benchmark/empty-loop" "benchmark/fac"
+        "benchmark/fib" "benchmark/sort"
+        "benchmark/continuations" "benchmark/ack"
+        "benchmark/hashtables" "benchmark/strings"
+        "benchmark/vectors" "benchmark/prettyprint"
+    ] run-tests ;
+
+: compiler-tests
+    [
+        "io/buffer" "compiler/optimizer"
+        "compiler/simple"
+        "compiler/stack" "compiler/ifte"
+        "compiler/generic" "compiler/bail-out"
+        "compiler/linearizer" "compiler/intrinsics"
+    ] run-tests ;
+
+: all-tests tests compiler-tests benchmarks ;

@@ -1,102 +1,144 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: assembler
-USING: compiler inference kernel kernel-internals lists math
-words ;
+IN: compiler-backend
+USING: alien assembler compiler inference kernel
+kernel-internals lists math memory namespaces words ;
 
-! At the start of each word that calls a subroutine, we store
-! the link register in r0, then push r0 on the C stack.
-#prologue [
+! PowerPC register assignments
+! r14 data stack
+! r15 call stack
+! r16-r30 vregs
+
+: compile-c-call ( symbol dll -- )
+    2dup dlsym  19 LOAD32  0 1 rel-dlsym  19 MTLR  BLRL ;
+
+M: integer v>operand tag-bits shift ;
+M: vreg v>operand vreg-n 17 + ;
+
+M: %prologue generate-node ( vop -- )
     drop
     1 1 -16 STWU
     0 MFLR
-    0 1 20 STW
-] "generator" set-word-prop
+    0 1 20 STW ;
 
-! At the end of each word that calls a subroutine, we store
-! the previous link register value in r0 by popping it off the
-! stack, set the link register to the contents of r0, and jump
-! to the link register.
 : compile-epilogue
+    #! At the end of each word that calls a subroutine, we store
+    #! the previous link register value in r0 by popping it off
+    #! the stack, set the link register to the contents of r0,
+    #! and jump to the link register.
     0 1 20 LWZ
     1 1 16 ADDI
     0 MTLR ;
 
-\ slot [
-    PEEK-DS
-    2unlist type-tag >r cell * r> - >r 18 18 r> LWZ
-    REPL-DS
-] "generator" set-word-prop
-
-#return-to [
-    0 18 LOAD32  absolute-16/16
+M: %call-label generate-node ( vop -- )
+    #! Near calling convention for inlined recursive combinators
+    #! Note: length of instruction sequence is hard-coded.
+    vop-label
+    0 1 rel-address  compiled-offset 20 + 18 LOAD32
     1 1 -16 STWU
     18 1 20 STW
-] "generator" set-word-prop
+    B ;
 
-#return [ drop compile-epilogue BLR ] "generator" set-word-prop
+: word-addr ( word -- )
+    dup word-xt 19 LOAD32  0 1 rel-word ;
 
-! Far calls are made to addresses already known when the
-! IR node is being generated. No forward reference far
-! calls are possible.
-: compile-call-far ( word -- )
-    19 LOAD32
-    19 MTLR
-    BLRL ;
+: compile-call ( label -- )
+    #! Far C call for primitives, near C call for compiled defs.
+    dup primitive? [ word-addr  19 MTLR  BLRL ] [ BL ] ifte ;
 
-: compile-call-label ( label -- )
-    dup primitive? [
-        dup rel-primitive-16/16 word-xt compile-call-far
-    ] [
-        0 BL relative-24
-    ] ifte ;
+M: %call generate-node ( vop -- )
+    vop-label dup postpone-word compile-call ;
 
-#call-label [
-    ! Hack: length of instruction sequence that follows
-    rel-address-16/16  compiled-offset 20 + 18 LOAD32
+: compile-jump ( label -- )
+    #! For tail calls. IP not saved on C stack.
+    dup primitive? [ word-addr  19 MTCTR  BCTR ] [ B ] ifte ;
+
+M: %jump generate-node ( vop -- )
+    vop-label dup postpone-word  compile-epilogue compile-jump ;
+
+M: %jump-label generate-node ( vop -- )
+    vop-label B ;
+
+: conditional ( vop -- label )
+    dup vop-in-1 v>operand 0 swap f address CMPI vop-label ;
+
+M: %jump-f generate-node ( vop -- )
+    conditional BEQ ;
+
+M: %jump-t generate-node ( vop -- )
+    conditional BNE ;
+
+M: %return-to generate-node ( vop -- )
+    vop-label 0 18 LOAD32  absolute-16/16
     1 1 -16 STWU
-    18 1 20 STW
-    0 B relative-24
-] "generator" set-word-prop
+    18 1 20 STW ;
 
-: compile-jump-far ( word -- )
-    19 LOAD32
-    19 MTCTR
-    BCTR ;
+M: %return generate-node ( vop -- )
+    drop compile-epilogue BLR ;
 
-: compile-jump-label ( label -- )
-    dup primitive? [
-        dup rel-primitive-16/16 word-xt compile-jump-far
-    ] [
-        0 B relative-24
-    ] ifte ;
+: untag ( dest src -- ) 0 0 31 tag-bits - RLWINM ;
 
-#jump [
-    dup postpone-word  compile-epilogue  compile-jump-label
-] "generator" set-word-prop
+M: %untag generate-node ( vop -- )
+    dest/src untag ;
 
-: compile-jump-t ( label -- )
-    POP-DS
-    0 18 3 CMPI
-    0 BNE  relative-14 ;
+M: %untag-fixnum generate-node ( vop -- )
+    dest/src tag-bits SRAWI ;
 
-: compile-jump-f ( label -- )
-    POP-DS
-    0 18 3 CMPI
-    0 BEQ  relative-14 ;
+: tag-fixnum ( dest src -- ) tag-bits SLWI ;
 
-\ dispatch [
-    ! Compile a piece of code that jumps to an offset in a
-    ! jump table indexed by the fixnum at the top of the stack.
-    ! The jump table must immediately follow this macro.
-    drop
-    POP-DS
-    18 18 1 SRAWI
+M: %tag-fixnum generate-node ( vop -- )
+    ! todo: formalize scratch register usage
+    dest/src tag-fixnum ;
+
+M: %dispatch generate-node ( vop -- )
+    0 <vreg> check-src
+    17 17 2 SLWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    rel-address-16/16  compiled-offset 24 + 19 LOAD32
-    18 18 19 ADD
-    18 18 0 LWZ
-    18 MTLR
-    BLR
-] "generator" set-word-prop
+    0 1 rel-address  compiled-offset 24 + 18 LOAD32
+    17 17 18 ADD
+    17 17 0 LWZ
+    17 MTLR
+    BLR ;
+
+M: %type generate-node ( vop -- )
+    0 <vreg> check-src
+    <label> "f" set
+    <label> "end" set
+    ! Get the tag
+    17 18 tag-mask ANDI
+    ! Compare with object tag number (3).
+    0 18 object-tag CMPI
+    ! Jump if the object doesn't store type info in its header
+    "end" get BNE
+    ! It does store type info in its header
+    ! Is the pointer itself equal to 3? Then its F_TYPE (9).
+    0 17 object-tag CMPI
+    "f" get BEQ
+    ! The pointer is not equal to 3. Load the object header.
+    18 17 object-tag neg LWZ
+    18 18 3 SRAWI
+    "end" get B
+    "f" get save-xt
+    ! The pointer is equal to 3. Load F_TYPE (9).
+    f type 18 LI
+    "end" get save-xt
+    17 18 MR ;
+
+M: %arithmetic-type generate-node ( vop -- )
+    0 <vreg> check-dest
+    <label> "end" set
+    ! Load top two stack values
+    3 14 -4 LWZ
+    4 14 0 LWZ
+    ! Compute their tags
+    3 3 tag-mask ANDI
+    4 4 tag-mask ANDI
+    ! Are the tags equal?
+    0 3 4 CMPL
+    "end" get BEQ
+    ! No, they are not equal. Call a runtime function to
+    ! coerce the integers to a higher type.
+    "arithmetic_type" f compile-c-call
+    "end" get save-xt
+    17 3 MR ;

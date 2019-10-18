@@ -1,5 +1,8 @@
 IN: temporary
-USING: kernel lists matrices namespaces test ;
+USING: kernel lists math matrices namespaces sequences test ;
+
+[ [ [ 1 4 ] [ 2 5 ] [ 3 6 ] ] ]
+[ M[ [ 1 4 ] [ 2 5 ] [ 3 6 ] ]M row-list ] unit-test
 
 [
     M[ [ 0 ] [ 0 ] [ 0 ] ]M
@@ -10,7 +13,7 @@ USING: kernel lists matrices namespaces test ;
 [
     M[ [ 1 ] [ 2 ] [ 3 ] ]M
 ] [
-    { 1 2 3 } <col-vector>
+    { 1 2 3 } <col-matrix>
 ] unit-test
 
 [
@@ -97,4 +100,39 @@ USING: kernel lists matrices namespaces test ;
     { 3 4 }
 
     m.v
+] unit-test
+
+[ { 0 0 1 } ] [ { 1 0 0 } { 0 1 0 } cross ] unit-test
+[ { 1 0 0 } ] [ { 0 1 0 } { 0 0 1 } cross ] unit-test
+[ { 0 1 0 } ] [ { 0 0 1 } { 1 0 0 } cross ] unit-test
+
+[ M[ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]M ]
+[ M[ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]M transpose transpose ]
+unit-test
+
+[ M[ [ 1 3 5 ] [ 2 4 6 ] ]M ]
+[ M[ [ 1 3 5 ] [ 2 4 6 ] ]M transpose transpose ]
+unit-test
+
+[ M[ [ 1 3 5 ] [ 2 4 6 ] ]M ]
+[ M[ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]M transpose ]
+unit-test
+
+[
+    M[ [ 28 ] ]M
+] [
+    M[ [ 2 4 6 ] ]M
+
+    M[ [ 1 ]
+       [ 2 ]
+       [ 3 ] ]M
+    
+    m.
+] unit-test
+
+[
+    [ [ 7 ] [ 4 8 ] [ 1 5 9 ] [ 2 6 ] [ 3 ] ]
+] [
+    M[ [ 1 2 3 ] [ 4 5 6 ] [ 7 8 9 ] ]M
+    5 [ 2 - swap <diagonal> ] project-with [ >list ] map
 ] unit-test

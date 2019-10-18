@@ -25,7 +25,7 @@ sequences strings test vectors ;
 [ { 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
 [ t ] [
-    100 empty-vector [ drop 0 100 random-int ] seq-map
+    100 empty-vector [ drop 0 100 random-int ] map
     dup >list >vector =
 ] unit-test
 
@@ -37,7 +37,7 @@ sequences strings test vectors ;
 [ [ 1 4 9 16 ] ]
 [
     [ 1 2 3 4 ]
-    >vector [ dup * ] seq-map >list
+    >vector [ dup * ] map >list
 ] unit-test
 
 [ t ] [ { } hashcode { } hashcode = ] unit-test
@@ -52,15 +52,14 @@ sequences strings test vectors ;
 [ { 1 2 3 4 } ] [ [ { 1 } [ 2 ] { 3 4 } ] concat ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
-[ 4 [ CHAR: a fill ] vector-project ]
+[ 4 [ CHAR: a fill ] project >vector ]
 unit-test
 
-[ [ ] ] [ 0 { } vector-tail ] unit-test
-[ [ ] ] [ 2 { 1 2 } vector-tail ] unit-test
-[ [ 3 4 ] ] [ 2 { 1 2 3 4 } vector-tail ] unit-test
-[ 2 3 vector-tail ] unit-test-fails
+[ { } ] [ 0 { } tail ] unit-test
+[ { } ] [ 2 { 1 2 } tail ] unit-test
+[ { 3 4 } ] [ 2 { 1 2 3 4 } tail ] unit-test
 
-[ [ 3 ] ] [ 1 { 1 2 3 } vector-tail* ] unit-test
+[ { 3 } ] [ 1 { 1 2 3 } tail* ] unit-test
 
 0 <vector> "funny-stack" set
 
@@ -75,14 +74,14 @@ unit-test
 [ "funky" ] [ "funny-stack" get pop ] unit-test
 
 [ t ] [
-    { 1 2 3 4 } dup vector-array length
-    >r clone vector-array length r>
+    { 1 2 3 4 } dup underlying length
+    >r clone underlying length r>
     =
 ] unit-test
 
 [ f ] [
     { 1 2 3 4 } dup clone
-    swap vector-array swap vector-array eq?
+    swap underlying swap underlying eq?
 ] unit-test
 
 [ 0 ] [

@@ -53,7 +53,7 @@ M: ratio unparse ( num -- str )
 : fix-float ( str -- str )
     #! This is terrible. Will go away when we do our own float
     #! output.
-    "." over string-contains? [ ".0" cat2 ] unless ;
+    CHAR: . over contains? [ ".0" append ] unless ;
 
 M: float unparse ( float -- str )
     (unparse-float) fix-float ;
@@ -80,14 +80,14 @@ M: complex unparse ( num -- str )
     ] assoc ;
 
 : ch>unicode-escape ( ch -- esc )
-    >hex 4 CHAR: 0 pad "\\u" swap cat2 ;
+    >hex 4 CHAR: 0 pad-left "\\u" swap append ;
 
 : unparse-ch ( ch -- ch/str )
     dup quotable? [
         dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?ifte
     ] unless ;
 
-: unparse-string [ unparse-ch , ] seq-each ;
+: unparse-string [ unparse-ch , ] each ;
 
 M: string unparse ( str -- str )
     [ CHAR: " , unparse-string CHAR: " , ] make-string ;

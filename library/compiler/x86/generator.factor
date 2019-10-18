@@ -1,56 +1,113 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: assembler
-USING: alien compiler inference kernel kernel-internals lists
-math memory namespaces words ;
+IN: compiler-backend
+USING: alien assembler compiler inference kernel
+kernel-internals lists math memory namespaces sequences words ;
+
+M: integer v>operand tag-bits shift ;
+M: vreg v>operand vreg-n { EAX ECX EDX } nth ;
 
 ! Not used on x86
-#prologue [ drop ] "generator" set-word-prop
+M: %prologue generate-node drop ;
 
-\ slot [
-    PEEK-DS
-    2unlist type-tag >r cell * r> - EAX swap 2list EAX swap MOV
-    [ ESI ] EAX MOV
-] "generator" set-word-prop
+: compile-c-call ( symbol dll -- )
+    2dup dlsym CALL 1 0 rel-dlsym ;
 
-: compile-call-label ( label -- ) 0 CALL relative ;
-: compile-jump-label ( label -- ) 0 JMP relative ;
+M: %call generate-node ( vop -- )
+    vop-label dup postpone-word CALL ;
 
-#call-label [
-    compile-call-label
-] "generator" set-word-prop
+M: %call-label generate-node ( vop -- )
+    vop-label CALL ;
 
-#jump [
-    dup postpone-word  compile-jump-label
-] "generator" set-word-prop
+M: %jump generate-node ( vop -- )
+    vop-label dup postpone-word JMP ;
 
-: compile-jump-t ( word -- )
-    POP-DS
-    ! condition is now in EAX
-    EAX f address CMP
-    ! jump w/ address added later
-    0 JNE relative ;
+M: %jump-label generate-node ( vop -- )
+    vop-label JMP ;
 
-: compile-jump-f ( word -- )
-    POP-DS
-    ! condition is now in EAX
-    EAX f address CMP
-    ! jump w/ address added later
-    0 JE relative ;
+: conditional ( vop -- label )
+    dup vop-in-1 v>operand f address CMP vop-label ;
 
-#return-to [ 0 PUSH absolute ] "generator" set-word-prop
+M: %jump-f generate-node ( vop -- )
+    conditional JE ;
 
-#return [ drop RET ] "generator" set-word-prop
+M: %jump-t generate-node ( vop -- )
+    conditional JNE ;
 
-\ dispatch [
+M: %return-to generate-node ( vop -- )
+    0 PUSH vop-label absolute ;
+
+M: %return generate-node ( vop -- )
+    drop RET ;
+
+M: %untag generate-node ( vop -- )
+    vop-out-1 v>operand BIN: 111 bitnot AND ;
+
+M: %tag-fixnum generate-node ( vop -- )
+    vop-out-1 v>operand 3 SHL ;
+
+M: %untag-fixnum generate-node ( vop -- )
+    vop-out-1 v>operand 3 SHR ;
+
+M: %dispatch generate-node ( vop -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    drop
-    POP-DS
-    EAX 1 SHR
-    EAX HEX: ffff ADD  just-compiled f rel-address
-    [ EAX ] JMP
+    vop-in-1 v>operand
+    ! Multiply by 4 to get a jump table offset
+    dup 2 SHL
+    ! Add to jump table base
+    dup HEX: ffff ADD  just-compiled >r 0 0 rel-address
+    ! Jump to jump table entry
+    unit JMP
+    ! Align for better performance
     compile-aligned
-    compiled-offset swap set-compiled-cell ( fixup -- )
-] "generator" set-word-prop
+    ! Fix up jump table pointer
+    compiled-offset r> set-compiled-cell ( fixup -- ) ;
+
+M: %type generate-node ( vop -- )
+    #! Intrinstic version of type primitive. It outputs an
+    #! UNBOXED value in vop-out-1.
+    <label> "f" set
+    <label> "end" set
+    vop-out-1 v>operand
+    ! Make a copy
+    ECX over MOV
+    ! Get the tag
+    dup tag-mask AND
+    ! Compare with object tag number (3).
+    dup object-tag CMP
+    ! Jump if the object doesn't store type info in its header
+    "end" get JNE
+    ! It doesn't store type info in its header
+    ! It does store type info in its header
+    ! Is the pointer itself equal to 3? Then its F_TYPE (9).
+    ECX object-tag CMP
+    "f" get JE
+    ! The pointer is not equal to 3. Load the object header.
+    dup ECX object-tag neg 2list MOV
+    dup 3 SHR
+    "end" get JMP
+    "f" get save-xt
+    ! The pointer is equal to 3. Load F_TYPE (9).
+    f type MOV
+    "end" get save-xt ;
+
+M: %arithmetic-type generate-node ( vop -- )
+    #! This one works directly with the stack. It outputs an
+    #! UNBOXED value in vop-out-1.
+    0 <vreg> check-dest
+    <label> "end" set
+    ! Load top two stack values
+    EAX [ ESI -4 ] MOV
+    ECX [ ESI ] MOV
+    ! Compute their tags
+    EAX tag-mask AND
+    ECX tag-mask AND
+    ! Are the tags equal?
+    EAX ECX CMP
+    "end" get JE
+    ! No, they are not equal. Call a runtime function to
+    ! coerce the integers to a higher type.
+    "arithmetic_type" f compile-c-call
+    "end" get save-xt ;

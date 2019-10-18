@@ -2,30 +2,12 @@
 
 CELL to_cell(CELL x)
 {
-	F_FIXNUM fixnum;
-	F_ARRAY* bignum;
-
 	switch(type_of(x))
 	{
 	case FIXNUM_TYPE:
-		fixnum = untag_fixnum_fast(x);
-		if(fixnum < 0)
-		{
-			range_error(F,0,tag_fixnum(fixnum),FIXNUM_MAX);
-			return -1;
-		}
-		else
-			return (CELL)fixnum;
-		break;
+		return untag_fixnum_fast(x);
 	case BIGNUM_TYPE:
-		bignum = to_bignum(x);
-		if(BIGNUM_NEGATIVE_P(bignum))
-		{
-			range_error(F,0,tag_bignum(bignum),FIXNUM_MAX);
-			return -1;
-		}
-		else
-			return s48_bignum_to_long(untag_bignum_fast(x));
+		return s48_bignum_to_long(untag_bignum_fast(x));
 	default:
 		type_error(BIGNUM_TYPE,x);
 		return 0;
@@ -61,13 +43,13 @@ F_ARRAY* to_bignum(CELL tagged)
 
 void primitive_to_bignum(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	drepl(tag_bignum(to_bignum(dpeek())));
 }
 
 #define GC_AND_POP_BIGNUMS(x,y) \
 	F_ARRAY *x, *y; \
-	maybe_garbage_collection(); \
+	maybe_gc(0); \
 	y = untag_bignum_fast(dpop()); \
 	x = untag_bignum_fast(dpop());
 
@@ -146,7 +128,7 @@ void primitive_bignum_shift(void)
 {
 	F_FIXNUM y;
         F_ARRAY* x;
-	maybe_garbage_collection();
+	maybe_gc(0);
 	y = to_fixnum(dpop());
 	x = to_bignum(dpop());
 	dpush(tag_bignum(s48_bignum_arithmetic_shift(x,y)));
@@ -202,16 +184,9 @@ void primitive_bignum_greatereq(void)
 
 void primitive_bignum_not(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	drepl(tag_bignum(s48_bignum_bitwise_not(
 		untag_bignum_fast(dpeek()))));
-}
-
-void copy_bignum_constants(void)
-{
-	COPY_OBJECT(bignum_zero);
-	COPY_OBJECT(bignum_pos_one);
-	COPY_OBJECT(bignum_neg_one);
 }
 
 void box_signed_cell(F_FIXNUM integer)
@@ -261,15 +236,15 @@ void box_signed_8(s64 n)
 
 s64 unbox_signed_8(void)
 {
-	return 0; /* s48_bignum_to_long_long(to_bignum(dpop())); */
+	return s48_bignum_to_long_long(to_bignum(dpop()));
 }
 
 void box_unsigned_8(u64 n)
 {
-	dpush(tag_bignum(s48_long_long_to_bignum(n)));
+	dpush(tag_bignum(s48_ulong_long_to_bignum(n)));
 }
 
 u64 unbox_unsigned_8(void)
 {
-	return 0; /* s48_bignum_to_long_long(to_bignum(dpop())); */
+	return s48_bignum_to_ulong_long(to_bignum(dpop()));
 }

@@ -1,36 +1,32 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: inference kernel lists math namespaces prettyprint
-strings words ;
+IN: compiler-backend
+USING: generic inference kernel lists math namespaces
+prettyprint sequences strings words ;
+
+! A peephole optimizer operating on the linear IR.
 
 ! The linear IR being simplified is stored in this variable.
 SYMBOL: simplifying
 
-: simplifiers ( linear -- list )
-    #! A list of quotations with stack effect
-    #! ( linear -- linear ? ) that can simplify the first node
-    #! in the linear IR.
-    car car "simplifiers" word-prop ;
+GENERIC: simplify-node ( linear vop -- linear ? )
 
-: simplify-node ( linear list -- linear ? )
-    dup [
-        uncons >r call [
-            r> drop t
-        ] [
-            r> simplify-node
-        ] ifte
-    ] when ;
+! The next node following this node in terms of control flow, or
+! f if this is a conditional.
+GENERIC: next-logical ( linear vop -- linear )
 
-: simplify-1 ( linear -- linear ? )
+! No delegation.
+M: tuple simplify-node drop f ;
+
+: simplify-1 ( list -- list ? )
     #! Return a new linear IR.
-    dup [
-        dup simplifiers simplify-node
-        [ uncons simplify-1 drop cons t ]
-        [ uncons simplify-1 >r cons r> ] ifte
-    ] [
-        f
-    ] ifte ;
+     dup [
+         dup car simplify-node
+         [ uncons simplify-1 drop cons t ]
+         [ uncons simplify-1 >r cons r> ] ifte
+     ] [
+         f
+     ] ifte ;
 
 : simplify ( linear -- linear )
     #! Keep simplifying until simplify-1 returns f.
@@ -38,97 +34,200 @@ SYMBOL: simplifying
         dup simplifying set  simplify-1
     ] with-scope  [ simplify ] when ;
 
-: label-called? ( label linear -- ? )
-    [ uncons pick = swap #label = not and ] some? nip ;
+: label-called? ( label -- ? )
+    simplifying get [ calls-label? ] some-with? ;
 
-#label [
-    [
-        dup car cdr simplifying get label-called?
-        [ f ] [ cdr t ] ifte
-    ]
-] "simplifiers" set-word-prop
+M: %label simplify-node ( linear vop -- linear ? )
+    vop-label label-called? [ f ] [ cdr t ] ifte ;
 
-: next-physical? ( op linear -- ? )
-    cdr dup [ car car = ] [ 2drop f ] ifte ;
-
-: cancel ( linear op -- linear param ? )
-    #! If the following op is as given, remove it, and return
-    #! its param.
-    over next-physical? [ cdr unswons cdr t ] [ f f ] ifte ;
-
-\ >r [ [ \ r> cancel nip ] ] "simplifiers" set-word-prop
-\ r> [ [ \ >r cancel nip ] ] "simplifiers" set-word-prop
-\ dup [ [ \ drop cancel nip ] ] "simplifiers" set-word-prop
-\ swap [ [ \ swap cancel nip ] ] "simplifiers" set-word-prop
-
-\ drop [
-    [
-        #push-immediate cancel [
-            #replace-immediate swons swons t
-        ] when
+: next-physical? ( linear class -- vop ? )
+    #! If the following op has given class, remove it and
+    #! return it.
+    over cdr dup [
+        car class = [ second t ] [ f ] ifte
     ] [
-        #push-indirect cancel [
-            #replace-indirect swons swons t
-        ] when
-    ]
-] "simplifiers" set-word-prop
-
-: find-label ( label -- rest )
-    simplifying get [
-        uncons pick = swap #label = and
-    ] some? nip ;
-
-: next-logical ( linear -- linear )
-    dup car car "next-logical" word-prop call ;
-
-#label [
-    cdr next-logical
-] "next-logical" set-word-prop
-
-#jump-label [
-    car cdr find-label cdr
-] "next-logical" set-word-prop
-
-#target-label [
-    car cdr find-label cdr
-] "next-logical" set-word-prop
-
-: next-logical? ( op linear -- ? )
-    next-logical dup [ car car = ] [ 2drop f ] ifte ;
-
-: reduce ( linear op new -- linear ? )
-    >r over cdr next-logical? [
-        unswons cdr r> swons swons t
-    ] [
-        r> drop f
+        3drop f f
     ] ifte ;
 
-#call [
-    [ #return #jump reduce ]
-] "simplifiers" set-word-prop
+M: %inc-d simplify-node ( linear vop -- linear ? )
+    #! %inc-d cancels a following %inc-d.
+    dup vop-in-1 0 = [
+        drop cdr t
+    ] [
+        >r dup \ %inc-d next-physical? [
+            vop-in-1 r> vop-in-1 + 
+            %inc-d >r cdr cdr r> swons t
+        ] [
+            r> 2drop f
+        ] ifte
+    ] ifte ;
 
-#call-label [
-    [ #return #jump-label reduce ]
-] "simplifiers" set-word-prop
+: operands= ( vop vop -- ? )
+    over vop-inputs over vop-inputs =
+    >r swap vop-outputs swap vop-outputs = r> and ;
 
-: double-jump ( linear op1 op2 -- linear ? )
-    #! A jump to a jump is just a jump. If the next logical node
-    #! is a jump of type op1, replace the jump at the car of the
-    #! list with a jump of type op2.
-    swap pick next-logical? [
-        over next-logical car cdr cons swap cdr cons t
+: cancel ( linear class -- linear ? )
+    dupd next-physical?
+    [ over first operands= [ cdr cdr t ] [ f ] ifte ]
+    [ drop f ] ifte ;
+
+M: %tag-fixnum simplify-node ( linear vop -- linear ? )
+    drop \ %untag-fixnum cancel ;
+
+: basic-block ( linear quot -- | quot: vop -- ? )
+    #! Keep applying the quotation to each VOP until either a
+    #! VOP answering f to basic-block?, or the quotation answers
+    #! f.
+    over car basic-block? [
+        >r uncons r> tuck >r >r call [
+            r> r> basic-block
+        ] [
+            r> r> 2drop
+        ] ifte
+    ] [
+        2drop
+    ] ifte ; inline
+
+: reads-vreg? ( vreg linear -- ? )
+    #! Tests if the vreg is read before being written in the
+    #! current basic block. Outputs a true value if the vreg
+    #! is not read or written before the end of the basic block.
+    [
+        2dup vop-inputs contains? [
+            ! we are reading the vreg
+            2drop t f
+        ] [
+            2dup vop-outputs contains? [
+                ! we are writing the vreg
+                2drop f f
+            ] [
+                ! keep checking
+                drop t
+            ] ifte
+        ] ifte
+    ] basic-block ;
+
+: dead-load ( vreg linear -- linear ? )
+    #! If the vreg is not read before being written, drop
+    #! the current VOP.
+    tuck cdr reads-vreg? [ f ] [ cdr t ] ifte ;
+
+M: %peek-d simplify-node ( linear vop -- linear ? )
+    vop-out-1 swap dead-load ;
+
+M: %immediate simplify-node ( linear vop -- linear ? )
+    vop-out-1 swap dead-load ;
+
+M: %indirect simplify-node ( linear vop -- linear ? )
+    vop-out-1 swap dead-load ;
+
+: dead-peek? ( linear vop -- ? )
+    #! Is the %replace-d followed by a %peek-d of the same
+    #! stack slot and vreg?
+    swap second dup %peek-d? [
+        over vop-in-2 over vop-out-1 = >r
+        swap vop-in-1 swap vop-in-1 = r> and
+    ] [
+        2drop f
+    ] ifte ;
+
+: dead-replace? ( linear n -- ? )
+    #! Is the %replace-d followed by a %dec-d, so the stored
+    #! value is lost?
+    swap \ %inc-d next-physical? [
+        vop-in-1 + 0 <
+    ] [
+        2drop f
+    ] ifte ;
+
+M: %replace-d simplify-node ( linear vop -- linear ? )
+    2dup dead-peek? [
+        drop uncons cdr cons t
+    ] [
+        dupd vop-in-1 dead-replace? [ cdr t ] [ f ] ifte
+    ] ifte ;
+
+: pop? ( vop -- ? ) dup %inc-d? swap vop-in-1 -1 = and ;
+
+: can-fast-branch? ( linear -- ? )
+    unswons class fast-branch [
+        unswons pop? [ car %jump-t? ] [ drop f ] ifte
     ] [
         drop f
     ] ifte ;
 
+: fast-branch-params ( linear -- src dest label linear )
+    uncons >r dup vop-in-1 swap vop-out-1 r> cdr
+    uncons >r vop-label r> ;
+
+: make-fast-branch ( linear op -- linear ? )
+    >r dup can-fast-branch? [
+        fast-branch-params r> swap >r
+        execute >r -1 %inc-d r>
+        r> cons cons t
+    ] [
+        r> drop f
+    ] ifte ;
+
+M: fast-branch simplify-node ( linear vop -- linear ? )
+    class fast-branch make-fast-branch ;
+
+: find-label ( label -- rest )
+    simplifying get [
+        dup %label? [ vop-label = ] [ 2drop f ] ifte
+    ] some-with? ;
+
+M: %label next-logical ( linear vop -- linear )
+    drop cdr dup car next-logical ;
+
+M: %jump-label next-logical ( linear vop -- linear )
+    nip vop-label find-label cdr ;
+
+M: %target-label next-logical ( linear vop -- linear )
+    nip vop-label find-label cdr ;
+
+M: object next-logical ( linear vop -- linear )
+    drop ;
+
+: next-logical? ( op linear -- ? )
+    dup car next-logical dup [ car class = ] [ 2drop f ] ifte ;
+
+: reduce ( linear op new -- linear ? )
+    >r over cdr next-logical? [
+        dup car vop-label
+        r> execute swap cdr cons t
+    ] [
+        r> drop f
+    ] ifte ; inline
+
+M: %call simplify-node ( linear vop -- ? )
+    #! Tail call optimization.
+    drop \ %return \ %jump reduce ;
+
+M: %call-label simplify-node ( linear vop -- ? )
+    #! Tail call optimization.
+    drop \ %return \ %jump-label reduce ;
+
+: double-jump ( linear op2 op1 -- linear ? )
+    #! A jump to a jump is just a jump. If the next logical node
+    #! is a jump of type op1, replace the jump at the car of the
+    #! list with a jump of type op2.
+    pick next-logical? [
+        >r dup dup car next-logical car vop-label
+        r> execute swap cdr cons t
+    ] [
+        drop f
+    ] ifte ; inline
+
 : useless-jump ( linear -- linear ? )
     #! A jump to a label immediately following is not needed.
-    dup car cdr find-label over cdr eq? [ cdr t ] [ f ] ifte ;
+    dup car vop-label find-label find-label
+    over cdr eq? [ cdr t ] [ f ] ifte ;
 
 : (dead-code) ( linear -- linear ? )
     #! Remove all nodes until the next #label.
     dup [
-        dup car car #label = [
+        dup car %label? [
             f
         ] [
             cdr (dead-code) t or
@@ -140,19 +239,36 @@ SYMBOL: simplifying
 : dead-code ( linear -- linear ? )
     uncons (dead-code) >r cons r> ;
 
-#jump-label [
-    [ #return #return double-jump ]
-    [ #jump-label #jump-label double-jump ]
-    [ #jump #jump double-jump ]
-    [ useless-jump ]
-    [ dead-code ]
-] "simplifiers" set-word-prop
+M: %jump-label simplify-node ( linear vop -- linear ? )
+    drop
+    \ %return dup double-jump [
+        t
+    ] [
+        \ %jump-label dup double-jump [
+            t
+        ] [
+            \ %jump dup double-jump
+            [
+                t
+            ] [
+                useless-jump [
+                    t
+                ] [
+                    dead-code
+                ] ifte
+            ] ifte
+        ] ifte
+    ] ifte ;
 
-#target-label [
-    [ #jump-label #target-label double-jump ]
-!   [ #jump #target double-jump ]
-] "simplifiers" set-word-prop
+M: %target-label simplify-node ( linear vop -- linear ? )
+    drop
+    \ %target-label \ %jump-label double-jump ;
 
-#jump [ [ dead-code ] ] "simplifiers" set-word-prop
-#return [ [ dead-code ] ] "simplifiers" set-word-prop
-#end-dispatch [ [ dead-code ] ] "simplifiers" set-word-prop
+M: %jump simplify-node ( linear vop -- linear ? )
+    drop dead-code ;
+
+M: %return simplify-node ( linear vop -- linear ? )
+    drop dead-code ;
+
+M: %end-dispatch simplify-node ( linear vop -- linear ? )
+    drop dead-code ;

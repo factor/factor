@@ -32,6 +32,9 @@ void primitive_to_fixnum(void)
 	drepl(tag_fixnum(to_fixnum(dpeek())));
 }
 
+/* The fixnum arithmetic operations defined in C are relatively slow.
+The Factor compiler has optimized assembly intrinsics for all these
+operations. */
 void primitive_fixnum_add(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());

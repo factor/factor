@@ -116,7 +116,7 @@ USE: http
 : user-exists? ( db-path name password -- <todo> )
   #! Returns a <todo> if a user with the given name exists
   #! otherwise returns false.
-  -rot ".todo" cat3 dup exists? [ 
+  -rot ".todo" append3 dup exists? [ 
     load-todo password-matches?
   ] [
     2drop f 

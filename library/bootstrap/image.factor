@@ -15,9 +15,9 @@
 ! run platform/native/boot-stage2.factor.
 
 IN: image
-USING: errors generic hashtables kernel lists math namespaces
-parser prettyprint sequences sequences stdio streams strings
-vectors words ;
+USING: errors generic hashtables kernel lists
+math namespaces parser prettyprint sequences sequences stdio
+streams strings vectors words ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -37,16 +37,8 @@ SYMBOL: boot-quot
 : cell "64-bits" get 8 4 ? ;
 : char "64-bits" get 4 2 ? ;
 
-: tag-mask BIN: 111 ; inline
-: tag-bits 3 ; inline
-
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
-
-: fixnum-tag  BIN: 000 ; inline
-: bignum-tag  BIN: 001 ; inline
-: cons-tag    BIN: 010 ; inline
-: object-tag  BIN: 011 ; inline
 
 : t-type         7  ; inline
 : array-type     8  ; inline
@@ -54,6 +46,7 @@ SYMBOL: boot-quot
 : vector-type    11 ; inline
 : string-type    12 ; inline
 : word-type      17 ; inline
+: tuple-type     18 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) object-tag immediate ;
@@ -73,12 +66,20 @@ SYMBOL: boot-quot
     ( relocation base at end of header ) base emit
     ( bootstrap quotation set later ) 0 emit
     ( global namespace set later ) 0 emit
+    ( pointer to t object ) 0 emit
+    ( pointer to bignum 0 ) 0 emit
+    ( pointer to bignum 1 ) 0 emit
+    ( pointer to bignum -1 ) 0 emit
     ( size of heap set later ) 0 emit ;
 
 : boot-quot-offset 3 ;
 : global-offset    4 ;
-: heap-size-offset 5 ;
-: header-size      6 ;
+: t-offset         5 ;
+: 0-offset         6 ;
+: 1-offset         7 ;
+: -1-offset        8 ;
+: heap-size-offset 9 ;
+: header-size      10 ;
 
 GENERIC: ' ( obj -- ptr )
 #! Write an object to the image.
@@ -125,7 +126,8 @@ M: bignum ' ( bignum -- tagged )
 ! Padded with fixnums for 8-byte alignment
 
 : t,
-    object-tag here-as "t" set
+    object-tag here-as
+    dup t-offset fixup "t" set
     t-type >header emit
     0 ' emit ;
 
@@ -134,9 +136,9 @@ M: f ' ( obj -- ptr )
     #! f is #define F RETAG(0,OBJECT_TYPE)
     drop object-tag ;
 
-:  0,  0 >bignum ' drop ;
-:  1,  1 >bignum ' drop ;
-: -1, -1 >bignum ' drop ;
+:  0,  0 >bignum '  0-offset fixup ;
+:  1,  1 >bignum '  1-offset fixup ;
+: -1, -1 >bignum ' -1-offset fixup ;
 
 ( Beginning of the image )
 ! The image begins with the header, then T,
@@ -154,8 +156,6 @@ M: f ' ( obj -- ptr )
         dup word-primitive ,
         dup word-def ' ,
         dup word-props ' ,
-        0 ,
-        0 ,
     ] make-list
     swap object-tag here-as pool-object
     [ emit ] each ;
@@ -179,7 +179,7 @@ M: f ' ( obj -- ptr )
 : fixup-words ( -- )
     image get [
         dup word? [ fixup-word ] when
-    ] seq-map image set ;
+    ] map image set ;
 
 M: word ' ( word -- pointer )
     transfer-word dup pooled-object dup [ nip ] [ drop ] ifte ;
@@ -194,7 +194,7 @@ M: cons ' ( c -- tagged )
 ( Strings )
 
 : align-string ( n str -- )
-    tuck length - CHAR: \0 fill cat2 ;
+    tuck length - CHAR: \0 fill append ;
 
 : emit-chars ( str -- )
     >list "big-endian" get [ reverse ] unless
@@ -208,14 +208,14 @@ M: cons ' ( c -- tagged )
     ] each drop ;
 
 : pack-string ( string -- )
-    char tuck swap split-n (pack-string) ;
+    char tuck swap group (pack-string) ;
 
 : emit-string ( string -- )
     object-tag here-as swap
     string-type >header emit
     dup length emit-fixnum
     dup hashcode emit-fixnum
-    "\0" cat2 pack-string
+    "\0" append pack-string
     align-here ;
 
 M: string ' ( string -- pointer )
@@ -227,16 +227,19 @@ M: string ' ( string -- pointer )
 
 ( Arrays and vectors )
 
-: emit-array ( list -- pointer )
-    [ ' ] map
+: emit-array ( list type -- pointer )
+    >r [ ' ] map r>
     object-tag here-as >r
-    array-type >header emit
+    >header emit
     dup length emit-fixnum
     ( elements -- ) [ emit ] each
     align-here r> ;
 
+M: tuple ' ( tuple -- pointer )
+    <mirror> >list tuple-type emit-array ;
+
 : emit-vector ( vector -- pointer )
-    dup >list emit-array swap length
+    dup >list array-type emit-array swap length
     object-tag here-as >r
     vector-type >header emit
     emit-fixnum ( length )
@@ -247,7 +250,8 @@ M: vector ' ( vector -- pointer )
     emit-vector ;
 
 : emit-hashtable ( hash -- pointer )
-    dup buckets>list emit-array swap hash>alist length
+    dup buckets>list array-type emit-array
+    swap hash>alist length
     object-tag here-as >r
     hashtable-type >header emit
     emit-fixnum ( length )
@@ -262,16 +266,15 @@ M: hashtable ' ( hashtable -- pointer )
 
 ( End of the image )
 
+: vocabulary, ( hash -- )
+    dup hashtable? [
+        [ cdr dup word? [ word, ] [ drop ] ifte ] hash-each
+    ] [
+        drop
+    ] ifte ;
+
 : vocabularies, ( vocabularies -- )
-    [
-        cdr dup hashtable? [
-            [
-                cdr dup word? [ word, ] [ drop ] ifte
-            ] hash-each
-        ] [
-            drop
-        ] ifte
-    ] hash-each ;
+    [ cdr vocabulary, ] hash-each ;
 
 : global, ( -- )
     vocabularies get
@@ -280,6 +283,7 @@ M: hashtable ' ( hashtable -- pointer )
         vocabularies set
         typemap [ ] change
         builtins [ ] change
+        crossref [ ] change
     ] extend '
     global-offset fixup ;
 
@@ -294,23 +298,15 @@ M: hashtable ' ( hashtable -- pointer )
 
 ( Image output )
 
-: write-word ( word -- )
-    "64-bits" get [
-        "big-endian" get [
-            write-big-endian-64
-        ] [
-            write-little-endian-64
-        ] ifte
+: (write-image) ( image -- )
+    "64-bits" get 8 4 ? swap "big-endian" get [
+        [ swap >be write ] each-with
     ] [
-         "big-endian" get [
-            write-big-endian-32
-        ] [
-            write-little-endian-32
-        ] ifte
+        [ swap >le write ] each-with
     ] ifte ;
 
 : write-image ( image file -- )
-    <file-writer> [ [ write-word ] seq-each ] with-stream ;
+    <file-writer> [ (write-image) ] with-stream ;
 
 : with-minimal-image ( quot -- image )
     [

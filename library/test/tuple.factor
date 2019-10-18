@@ -41,13 +41,43 @@ C: quuux-tuple-2
 [
     100
 ] [
+    FORGET: point
+    FORGET: point?
+    FORGET: point-x
     TUPLE: point x y ;
     C: point [ set-point-y ] keep [ set-point-x ] keep ;
     
     100 200 <point>
     
     ! Use eval to sequence parsing explicitly
-    "TUPLE: point x y z ;" eval
+    "IN: temporary TUPLE: point x y z ;" eval
     
     point-x
 ] unit-test
+
+TUPLE: predicate-test ;
+: predicate-test drop f ;
+
+[ t ] [ <predicate-test> predicate-test? ] unit-test
+
+PREDICATE: tuple silly-pred
+    class \ rect = ;
+
+GENERIC: area
+M: silly-pred area dup rect-w swap rect-h * ;
+
+TUPLE: circle radius ;
+M: circle area circle-radius sq pi * ;
+
+[ 200 ] [ << rect f 0 0 10 20 >> area ] unit-test
+
+[ ] [ "IN: temporary  SYMBOL: #x  TUPLE: #x ;" eval ] unit-test
+
+! Hashcode breakage
+TUPLE: empty ;
+[ t ] [ <empty> hashcode fixnum? ] unit-test
+
+TUPLE: delegate-clone ;
+
+[ << delegate-clone << empty f >> >> ]
+[ << delegate-clone << empty f >> >> clone ] unit-test

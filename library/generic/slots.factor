@@ -11,8 +11,7 @@ sequences strings words ;
     #! Just like:
     #! GENERIC: generic
     #! M: class generic def ;
-    over [ single-combination ] swap
-    define-generic define-method ;
+    over define-generic define-method ;
 
 : define-slot-word ( class slot word quot -- )
     over [
@@ -47,7 +46,7 @@ sequences strings words ;
     [ 3unlist define-slot ] each-with ;
 
 : reader-word ( class name -- word )
-    [ swap word-name , "-" , , ] make-string create-in ;
+    >r word-name "-" r> append3 create-in ;
 
 : writer-word ( class name -- word )
     [ swap "set-" , word-name , "-" , , ] make-string create-in ;

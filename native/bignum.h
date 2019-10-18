@@ -32,7 +32,6 @@ void primitive_bignum_lesseq(void);
 void primitive_bignum_greater(void);
 void primitive_bignum_greatereq(void);
 void primitive_bignum_not(void);
-void copy_bignum_constants(void);
 
 INLINE CELL tag_integer(F_FIXNUM x)
 {

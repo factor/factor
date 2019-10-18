@@ -36,18 +36,10 @@ CELL cs_bot;
 #endif
 
 /* TAGGED currently executing quotation */
-#if defined(FACTOR_PPC)
-	register CELL callframe asm("r16");
-#else
-	CELL callframe;
-#endif
+CELL callframe;
 
 /* TAGGED pointer to currently executing word */
-#if defined(FACTOR_PPC)
-	register CELL executing asm("r17");
-#else
-	CELL executing;
-#endif
+CELL executing;
 
 #include <errno.h>
 #include <fcntl.h>
@@ -70,6 +62,8 @@ typedef signed short s16;
 typedef signed int s32; 	 
 typedef signed long long s64;
 
+#include <sys/param.h>
+
 #ifdef WIN32
 	#include <windows.h>
 
@@ -78,7 +72,6 @@ typedef signed long long s64;
 #else
 	#include <dirent.h>
 	#include <sys/mman.h>
-	#include <sys/param.h>
 	#include <sys/types.h>
 	#include <sys/stat.h>
 	#include <unistd.h>
@@ -106,9 +99,9 @@ typedef signed long long s64;
 /* must always be 8 bits */
 typedef unsigned char BYTE;
 
-#include "memory.h"
 #include "error.h"
-#include "types.h"
+#include "cards.h"
+#include "memory.h"
 #include "gc.h"
 #include "boolean.h"
 #include "word.h"

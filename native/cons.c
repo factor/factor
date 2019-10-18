@@ -11,7 +11,7 @@ CELL cons(CELL car, CELL cdr)
 void primitive_cons(void)
 {
 	CELL car, cdr;
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_CONS));
 	cdr = dpop();
 	car = dpop();
 	dpush(cons(car,cdr));

@@ -109,8 +109,8 @@ SYMBOL: history-index
     #! Call this in the line editor scope.
     reset-history
     2dup caret-insert
-    line-text get swap string/
-    swapd cat3 line-text set ;
+    line-text get cut
+    swapd append3 line-text set ;
 
 : insert-char ( ch -- )
     #! Call this in the line editor scope.
@@ -132,8 +132,8 @@ SYMBOL: history-index
     #! Call this in the line editor scope.
     reset-history
     2dup caret-remove
-    dupd + line-text get string-tail
-    >r line-text get string-head r> cat2
+    dupd + line-text get tail
+    >r line-text get head r> append
     line-text set ;
 
 : backspace ( -- )

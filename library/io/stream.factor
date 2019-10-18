@@ -1,12 +1,12 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: files
-USING: kernel strings ;
+USING: kernel strings sequences ;
 
 ! We need this early during bootstrap.
 : path+ ( path path -- path )
     #! Combine two paths. This will be implemented later.
-    "/" swap cat3 ;
+    "/" swap append3 ;
 
 IN: stdio
 DEFER: stdio
@@ -21,10 +21,10 @@ GENERIC: stream-readln     ( stream -- string )
 GENERIC: stream-read       ( count stream -- string )
 GENERIC: stream-write-attr ( string style stream -- )
 GENERIC: stream-close      ( stream -- )
+GENERIC: set-timeout       ( timeout stream -- )
 
 : stream-read1 ( stream -- char/f )
-    1 swap stream-read
-    dup empty? [ drop f ] [ 0 swap string-nth ] ifte ;
+    1 swap stream-read dup empty? [ drop f ] [ first ] ifte ;
 
 : stream-write ( string stream -- )
     f swap stream-write-attr ;
@@ -87,6 +87,11 @@ M: duplex-stream stream-write-attr
 
 M: duplex-stream stream-close
     duplex-stream-out stream-close ;
+
+M: duplex-stream set-timeout
+    2dup
+    duplex-stream-in set-timeout
+    duplex-stream-out set-timeout ;
 
 ! Reading lines and counting line numbers.
 SYMBOL: line-number

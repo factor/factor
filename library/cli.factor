@@ -22,7 +22,7 @@ sequences strings ;
 
 : cli-var-param ( name value -- ) swap ":" split set-path ;
 
-: cli-bool-param ( name -- ) "no-" ?string-head not swap set ;
+: cli-bool-param ( name -- ) "no-" ?head not swap set ;
 
 : cli-param ( param -- )
     #! Handle a command-line argument starting with '-' by
@@ -38,8 +38,8 @@ sequences strings ;
     #! consumed, returns f. Otherwise returns the argument.
     #! Parameters that start with + are runtime parameters.
     dup empty? [
-        "-" ?string-head [ cli-param f ] when
-        dup [ "+" ?string-head [ drop f ] when ] when
+        "-" ?head [ cli-param f ] when
+        dup [ "+" ?head [ drop f ] when ] when
     ] unless ;
 
 : parse-switches ( args -- args )

@@ -1,14 +1,5 @@
 #include "factor.h"
 
-void clear_environment(void)
-{
-	int i;
-	for(i = 0; i < USER_ENV; i++)
-		userenv[i] = F;
-	profile_depth = 0;
-	executing = F;
-}
-
 INLINE void execute(F_WORD* word)
 {
 	((XT)(word->xt))(word);
@@ -101,6 +92,13 @@ void primitive_ifte(void)
 	CELL t = dpop();
 	CELL cond = dpop();
 	call(cond == F ? f : t);
+}
+
+void primitive_dispatch(void)
+{
+	F_VECTOR *v = (F_VECTOR*)UNTAG(dpop());
+	F_FIXNUM n = untag_fixnum_fast(dpop());
+	call(get(AREF(untag_array_fast(v->array),n)));
 }
 
 void primitive_getenv(void)

@@ -1,118 +1,131 @@
 #include "factor.h"
 
-/* set up guard pages to check for under/overflow.
-size must be a multiple of the page size */
-
-#ifdef WIN32
-void *alloc_guarded(CELL size)
+CELL object_size(CELL pointer)
 {
-       SYSTEM_INFO si;
-       char *mem;
-       DWORD ignore;
+	CELL size;
 
-       GetSystemInfo(&si);
-       mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-
-       if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
-	       fatal_error("Cannot allocate low guard page", (CELL)mem);
-
-       if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
-	       fatal_error("Cannot allocate high guard page", (CELL)mem);
-
-       return mem + si.dwPageSize;
-}
-#else
-void* alloc_guarded(CELL size)
-{
-	int pagesize = getpagesize();
-
-	char* array = mmap((void*)0,pagesize + size + pagesize,
-		PROT_READ | PROT_WRITE | PROT_EXEC,
-		MAP_ANON | MAP_PRIVATE,-1,0);
-
-	if(mprotect(array,pagesize,PROT_NONE) == -1)
-		fatal_error("Cannot allocate low guard page",(CELL)array);
-
-	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
-		fatal_error("Cannot allocate high guard page",(CELL)array);
-
-	/* return bottom of actual array */
-	return array + pagesize;
-}
-#endif
-
-void init_zone(ZONE* z, CELL size)
-{
-	z->base = z->here = align8((CELL)alloc_guarded(size));
-	if(z->base == 0)
-		fatal_error("Cannot allocate zone",size);
-	z->limit = z->base + size;
-	z->alarm = z->base + (size * 3) / 4;
-	z->base = align8(z->base);
-}
-
-void init_arena(CELL size)
-{
-	init_zone(&active,size);
-	init_zone(&prior,size);
-	allot_profiling = false;
-	gc_in_progress = false;
-	heap_scan = false;
-	gc_time = 0;
-}
-
-void allot_profile_step(CELL a)
-{
-	CELL depth = (cs - cs_bot) / CELLS;
-	int i;
-	CELL obj;
-
-	if(gc_in_progress)
-		return;
-
-	for(i = profile_depth; i < depth; i++)
+	switch(TAG(pointer))
 	{
-		obj = get(cs_bot + i * CELLS);
-		if(type_of(obj) == WORD_TYPE)
-			untag_word(obj)->allot_count += a;
+	case FIXNUM_TYPE:
+		size = 0;
+		break;
+	case BIGNUM_TYPE:
+		size = untagged_object_size(UNTAG(pointer));
+		break;
+	case CONS_TYPE:
+		size = sizeof(F_CONS);
+		break;
+	case RATIO_TYPE:
+		size = sizeof(F_RATIO);
+		break;
+	case FLOAT_TYPE:
+		size = sizeof(F_FLOAT);
+		break;
+	case COMPLEX_TYPE:
+		size = sizeof(F_CONS);
+		break;
+	case OBJECT_TYPE:
+		size = untagged_object_size(UNTAG(pointer));
+		break;
+	default:
+		critical_error("Cannot determine object_size",pointer);
+		size = 0; /* Can't happen */
+		break;
 	}
 
-	if(in_zone(&prior,executing))
-		critical_error("executing in prior zone",executing);
-	untag_word_fast(executing)->allot_count += a;
+	return align8(size);
 }
 
-void flip_zones()
+CELL untagged_object_size(CELL pointer)
 {
-	ZONE z = active;
-	active = prior;
-	prior = z;
-	active.here = active.base;
-}
+	CELL size;
 
-bool in_zone(ZONE* z, CELL pointer)
-{
-	return pointer >= z->base && pointer < z->limit;
-}
+	if(pointer == F)
+		return 0;
 
-void primitive_room(void)
-{
-	box_signed_cell(compiling.limit - compiling.here);
-	box_signed_cell(compiling.limit - compiling.base);
-	box_signed_cell(active.limit - active.here);
-	box_signed_cell(active.limit - active.base);
-}
-
-void primitive_allot_profiling(void)
-{
-	CELL d = dpop();
-	if(d == F)
-		allot_profiling = false;
-	else
+	switch(untag_header(get(pointer)))
 	{
-		allot_profiling = true;
-		profile_depth = to_fixnum(d);
+	case WORD_TYPE:
+		size = sizeof(F_WORD);
+		break;
+	case T_TYPE:
+		size = CELLS * 2;
+		break;
+	case ARRAY_TYPE:
+	case TUPLE_TYPE:
+	case BIGNUM_TYPE:
+	case BYTE_ARRAY_TYPE:
+		size = array_size(array_capacity((F_ARRAY*)(pointer)));
+		break;
+	case HASHTABLE_TYPE:
+		size = sizeof(F_HASHTABLE);
+		break;
+	case VECTOR_TYPE:
+		size = sizeof(F_VECTOR);
+		break;
+	case STRING_TYPE:
+		size = string_size(string_capacity((F_STRING*)(pointer)));
+		break;
+	case SBUF_TYPE:
+		size = sizeof(F_SBUF);
+		break;
+	case FLOAT_TYPE:
+		size = sizeof(F_FLOAT);
+		break;
+	case DLL_TYPE:
+		size = sizeof(DLL);
+		break;
+	case ALIEN_TYPE:
+		size = sizeof(ALIEN);
+		break;
+	case DISPLACED_ALIEN_TYPE:
+		size = sizeof(DISPLACED_ALIEN);
+		break;
+	default:
+		critical_error("Cannot determine untagged_object_size",pointer);
+		size = -1;/* can't happen */
+		break;
 	}
+
+	return align8(size);
+}
+
+void primitive_type(void)
+{
+	drepl(tag_fixnum(type_of(dpeek())));
+}
+
+#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
+
+void primitive_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	dpush(get(SLOT(obj,slot)));
+}
+
+void primitive_set_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	CELL value = dpop();
+	put(SLOT(obj,slot),value);
+	write_barrier(obj);
+}
+
+void primitive_integer_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	dpush(tag_integer(get(SLOT(obj,slot))));
+}
+
+void primitive_set_integer_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	F_FIXNUM value = to_fixnum(dpop());
+	put(SLOT(obj,slot),value);
 }
 
 void primitive_address(void)
@@ -125,11 +138,29 @@ void primitive_size(void)
 	drepl(tag_fixnum(object_size(dpeek())));
 }
 
+void primitive_room(void)
+{
+	CELL list = F;
+	int gen;
+	box_signed_cell(compiling.limit - compiling.here);
+	box_signed_cell(compiling.limit - compiling.base);
+	box_signed_cell(cards_end - cards);
+	box_signed_cell(prior.limit - prior.base);
+	for(gen = GC_GENERATIONS - 1; gen >= 0; gen--)
+	{
+		ZONE *z = &generations[gen];
+		list = cons(cons(
+			tag_fixnum(z->limit - z->here),
+			tag_fixnum(z->limit - z->base)),
+			list);
+	}
+	dpush(list);
+}
+
 void primitive_begin_scan(void)
 {
-	primitive_gc();
-	heap_scan_ptr = active.base;
-	heap_scan_end = active.here;
+	garbage_collection(TENURED);
+	heap_scan_ptr = tenured.base;
 	heap_scan = true;
 }
 
@@ -142,7 +173,7 @@ void primitive_next_object(void)
 	if(!heap_scan)
 		general_error(ERROR_HEAP_SCAN,F);
 
-	if(heap_scan_ptr >= heap_scan_end)
+	if(heap_scan_ptr >= tenured.here)
 	{
 		dpush(F);
 		return;

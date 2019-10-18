@@ -1,16 +1,25 @@
 CC = gcc
-DEFAULT_CFLAGS = -Wall -O3 -fomit-frame-pointer $(SITE_CFLAGS)
-#DEFAULT_CFLAGS = -g $(SITE_CFLAGS)
+ifdef DEBUG
+	DEFAULT_CFLAGS = -g
+	STRIP = touch
+else
+	DEFAULT_CFLAGS = -Wall -O3 -fomit-frame-pointer $(SITE_CFLAGS)
+	STRIP = strip
+endif
+
 DEFAULT_LIBS = -lm
 
-STRIP = strip
+UNIX_OBJS = native/unix/file.o \
+	native/unix/signal.o \
+	native/unix/ffi.o \
+	native/unix/run.o \
+	native/unix/memory.o
 
-UNIX_OBJS = native/unix/file.o native/unix/signal.o \
-	native/unix/ffi.o native/unix/run.o
-
-WIN32_OBJS = native/win32/ffi.o native/win32/file.o \
+WIN32_OBJS = native/win32/ffi.o \
+	native/win32/file.o \
 	native/win32/misc.o \
-	native/win32/run.o
+	native/win32/run.o \
+	native/win32/memory.o
 
 ifdef WIN32
 	PLAF_OBJS = $(WIN32_OBJS)
@@ -29,7 +38,7 @@ OBJS = $(PLAF_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/ratio.o native/relocate.o \
 	native/run.o \
 	native/sbuf.o native/stack.o \
-	native/string.o native/types.o native/vector.o \
+	native/string.o native/cards.o native/vector.o \
 	native/word.o native/compiler.o \
 	native/alien.o native/dll.o \
 	native/boolean.o \
@@ -46,6 +55,7 @@ default:
 	@echo "linux"
 	@echo "linux-ppc - to compile Factor on Linux/PowerPC"
 	@echo "macosx"
+	@echo "windows"
 	@echo ""
 	@echo "Also, you might want to set the SITE_CFLAGS environment"
 	@echo "variable to enable some CPU-specific optimizations; this"

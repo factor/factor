@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sdl
-USING: alien lists namespaces kernel math hashtables ;
+USING: alien lists namespaces kernel math hashtables
+sequences ;
 
 : SDL_EnableUNICODE ( enable -- )
     "int" "sdl" "SDL_EnableUNICODE" [ "int" ] alien-invoke ;

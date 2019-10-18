@@ -6,7 +6,8 @@ namespaces sequences strings vectors ;
 
 ! The basic word type. Words can be named and compared using
 ! identity. They hold a property map.
-BUILTIN: word 17
+DEFER: word?
+BUILTIN: word 17 word?
     [ 1 hashcode f ]
     [ 4 "word-def" "set-word-def" ]
     [ 5 "word-props" "set-word-props" ] ;
@@ -30,17 +31,6 @@ GENERIC: set-word-primitive
 M: word set-word-primitive ( n w -- )
     [ 3 set-integer-slot ] keep update-xt ;
 
-! For the profiler
-GENERIC: call-count
-M: word call-count ( w -- n ) 6 integer-slot ;
-GENERIC: set-call-count
-M: word set-call-count ( n w -- ) 6 set-integer-slot ;
-
-GENERIC: allot-count
-M: word allot-count ( w -- n ) 7 integer-slot ;
-GENERIC: set-allot-count
-M: word set-allot-count ( n w -- ) 7 set-integer-slot ;
-
 : word-sort ( list -- list )
     #! Sort a list of words by name.
     [ swap word-name swap word-name string> ] sort ;
@@ -48,8 +38,6 @@ M: word set-allot-count ( n w -- ) 7 set-integer-slot ;
 ! The cross-referencer keeps track of word dependencies, so that
 ! words can be recompiled when redefined.
 SYMBOL: crossref
-
-global [ <namespace> crossref set ] bind
 
 : (add-crossref)
     dup word? [
@@ -130,5 +118,6 @@ M: compound definer drop \ : ;
     #! If the word is a generic word, clear the properties 
     #! involved so that 'see' can work properly.
     over f "methods" set-word-prop
-    over f "combination" set-word-prop
+    over f "picker" set-word-prop
+    over f "dispatcher" set-word-prop
     (define-compound) ;

@@ -10,8 +10,6 @@ typedef struct
 
 ZONE compiling;
 
-#define LITERAL_TABLE 4096
-
 CELL literal_top;
 CELL literal_max;
 

@@ -5,11 +5,17 @@ IN: kernel
 : slip ( quot x -- x | quot: -- )
     >r call r> ; inline
 
+: 2slip ( quot x y -- x y | quot: -- )
+    >r >r call r> r> ; inline
+
 : keep ( x quot -- x | quot: x -- )
     over >r call r> ; inline
 
 : 2keep ( x y quot -- x y | quot: x y -- )
     over >r pick >r call r> r> ; inline
+
+: 3keep ( x y z quot -- x y z | quot: x y z -- )
+    >r 3dup r> swap >r swap >r swap >r call r> r> r> ; inline
 
 : while ( quot generator -- )
     #! Keep applying the quotation to the value produced by
@@ -52,3 +58,7 @@ IN: kernel
     #! the quotation is evaluated. Otherwise, the condition is
     #! popped off the stack.
     dupd [ drop ] ifte ; inline
+
+: with ( obj quot elt -- obj quot )
+    #! Utility word for each-with, map-with.
+    pick pick >r >r swap call r> r> ; inline

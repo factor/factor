@@ -50,7 +50,7 @@ GENERIC: ptail
 M: string ptail ( object -- tail )
   #! Polymorphic tail. Return the tail of the object.
   #! For a string this is everything but the first character.
-  1 swap string-tail ;
+  1 swap tail ;
 
 M: list ptail ( object -- tail )
   #! Polymorphic tail. Return the tail of the object.
@@ -96,7 +96,7 @@ M: list pempty? ( object -- bool )
   dup length pick < [
     2drop ""
   ] [
-    string-head
+    head
   ] ifte ;
 
 : (list-take) ( n list accum -- list )
@@ -131,7 +131,7 @@ M: list ptake ( n object -- object )
   dup length pick < [
     2drop "" 
   ] [
-    string-tail 
+    tail 
   ] ifte ;
 
 : list-drop ( n list -- list )

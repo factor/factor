@@ -65,11 +65,14 @@ s48_bignum_divide(bignum_type numerator, bignum_type denominator,
 		  bignum_type * quotient, bignum_type * remainder);
 bignum_type s48_bignum_quotient(bignum_type, bignum_type);
 bignum_type s48_bignum_remainder(bignum_type, bignum_type);
-bignum_type s48_long_to_bignum(long);
-bignum_type s48_long_long_to_bignum(s64 n);
-bignum_type s48_ulong_to_bignum(unsigned long);
+DLLEXPORT bignum_type s48_long_to_bignum(long);
+DLLEXPORT bignum_type s48_long_long_to_bignum(s64 n);
+DLLEXPORT bignum_type s48_ulong_long_to_bignum(u64 n);
+DLLEXPORT bignum_type s48_ulong_to_bignum(unsigned long);
 long s48_bignum_to_long(bignum_type);
 unsigned long s48_bignum_to_ulong(bignum_type);
+s64 s48_bignum_to_long_long(bignum_type);
+u64 s48_bignum_to_ulong_long(bignum_type);
 bignum_type s48_double_to_bignum(double);
 double s48_bignum_to_double(bignum_type);
 int s48_bignum_fits_in_word_p(bignum_type, long word_length,
@@ -86,7 +89,7 @@ long s48_bignum_max_digit_stream_radix(void);
 
 /* Added bitwise operators. */
 
-bignum_type s48_bignum_bitwise_not(bignum_type),
+DLLEXPORT bignum_type s48_bignum_bitwise_not(bignum_type),
                    s48_bignum_arithmetic_shift(bignum_type, long),
                    s48_bignum_bitwise_and(bignum_type, bignum_type),
                    s48_bignum_bitwise_ior(bignum_type, bignum_type),

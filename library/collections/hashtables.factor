@@ -11,7 +11,8 @@ USING: generic kernel lists math sequences vectors ;
 
 ! We put hash-size in the hashtables vocabulary, and
 ! the other words in kernel-internals.
-BUILTIN: hashtable 10
+DEFER: hashtable?
+BUILTIN: hashtable 10 hashtable?
     [ 1 "hash-size" set-hash-size ]
     [ 2 hash-array set-hash-array ] ;
 
@@ -23,6 +24,8 @@ BUILTIN: hashtable 10
 ! The unsafe words go in kernel internals. Everything else, even
 ! if it is somewhat 'implementation detail', is in the
 ! public 'hashtables' vocabulary.
+
+: bucket-count ( hash -- n ) hash-array length ;
 
 IN: kernel-internals
 
@@ -37,6 +40,10 @@ IN: kernel-internals
     [ array-nth swap call ] 2keep
     set-array-nth ; inline
 
+: each-bucket ( hash quot -- | quot: n hash -- )
+    over bucket-count [ [ -rot call ] 3keep ] repeat 2drop ;
+    inline
+
 : hash-size+ ( hash -- ) dup hash-size 1 + swap set-hash-size ;
 : hash-size- ( hash -- ) dup hash-size 1 - swap set-hash-size ;
 
@@ -48,8 +55,6 @@ IN: kernel-internals
     >r <array> r> set-hash-array ;
     
 IN: hashtables
-
-: bucket-count ( hash -- n ) hash-array length ;
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.
@@ -75,17 +80,9 @@ IN: hashtables
 : grow-hash? ( hash -- ? )
     dup bucket-count 3 * 2 /i swap hash-size < ;
 
-: (hash>alist) ( alist n hash -- alist )
-    2dup bucket-count >= [
-        2drop
-    ] [
-        [ hash-bucket [ swons ] each ] 2keep
-        >r 1 + r> (hash>alist)
-    ] ifte ;
-
 : hash>alist ( hash -- alist )
     #! Push a list of key/value pairs in a hashtable.
-    [ ] 0 rot (hash>alist) ;
+    [ ] swap [ hash-bucket [ swons ] each ] each-bucket ;
 
 : (set-hash) ( value key hash -- )
     dup hash-size+ [ set-assoc ] set-hash* ;
@@ -114,14 +111,9 @@ IN: hashtables
     [ remove-assoc ] set-hash* ;
 
 : hash-clear ( hash -- )
-    #! Remove all entries from a hashtable.
-    0 over set-hash-size
-    dup bucket-count [
-        [ f swap pick set-hash-bucket ] keep
-    ] repeat drop ;
+    0 over set-hash-size [ f -rot set-hash-bucket ] each-bucket ;
 
 : buckets>list ( hash -- list )
-    #! Push a list of key/value pairs in a hashtable.
     hash-array >list ;
 
 : alist>hash ( alist -- hash )
@@ -129,35 +121,32 @@ IN: hashtables
     [ unswons pick set-hash ] each ;
 
 : hash-keys ( hash -- list )
-    #! Push a list of keys in a hashtable.
     hash>alist [ car ] map ;
 
 : hash-values ( hash -- alist )
-    #! Push a list of values in a hashtable.
     hash>alist [ cdr ] map ;
 
-: hash-each ( hash code -- )
-    #! Apply the code to each key/value pair of the hashtable.
-    >r hash>alist r> each ; inline
+: hash-each ( hash quot -- )
+    swap hash-array [ swap each ] each-with ; inline
+
+: hash-each-with ( obj hash quot -- | quot: obj elt -- )
+    swap [ with ] hash-each 2drop ; inline
 
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
     >r hash>alist r> subset alist>hash ;
 
 M: hashtable clone ( hash -- hash )
     dup bucket-count <hashtable>
-    over hash-size over set-hash-size [
-        hash-array swap hash-array dup length copy-array
-    ] keep ;
-
-: hash-contained? ( subset of -- ? )
-    hash>alist [ uncons >r swap hash r> = ] all-with? ;
+    over hash-size over set-hash-size
+    [ hash-array swap hash-array copy-array ] keep ;
 
 M: hashtable = ( obj hash -- ? )
     2dup eq? [
         2drop t
     ] [
         over hashtable? [
-            2dup hash-contained? >r swap hash-contained? r> and
+            swap hash>alist swap hash>alist 2dup
+            contained? >r swap contained? r> and
         ] [
             2drop f
         ] ifte

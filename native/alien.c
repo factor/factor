@@ -52,7 +52,7 @@ void box_alien(void* ptr)
 void primitive_alien(void)
 {
 	void* ptr = (void*)unbox_signed_cell();
-	maybe_garbage_collection();
+	maybe_gc(sizeof(ALIEN));
 	box_alien(ptr);
 }
 
@@ -61,7 +61,7 @@ void primitive_displaced_alien(void)
 	CELL alien;
 	CELL displacement;
 	DISPLACED_ALIEN* d;
-	maybe_garbage_collection();
+	maybe_gc(sizeof(DISPLACED_ALIEN));
 	alien = dpop();
 	displacement = unbox_unsigned_cell();
 	d = allot_object(DISPLACED_ALIEN_TYPE,sizeof(DISPLACED_ALIEN));
@@ -87,7 +87,7 @@ void fixup_displaced_alien(DISPLACED_ALIEN* d)
 
 void collect_displaced_alien(DISPLACED_ALIEN* d)
 {
-	COPY_OBJECT(d->alien);
+	copy_handle(&d->alien);
 }
 
 #define DEF_ALIEN_SLOT(name,type,boxer) \
@@ -112,8 +112,6 @@ DEF_ALIEN_SLOT(signed_2,s16,signed_2)
 DEF_ALIEN_SLOT(unsigned_2,u16,unsigned_2)
 DEF_ALIEN_SLOT(signed_1,BYTE,signed_1)
 DEF_ALIEN_SLOT(unsigned_1,BYTE,unsigned_1)
-
-void primitive_alien_value_string(void)
-{
-	box_c_string(alien_pointer());
-}
+DEF_ALIEN_SLOT(float,float,float)
+DEF_ALIEN_SLOT(double,double,double)
+DEF_ALIEN_SLOT(c_string,char*,c_string)

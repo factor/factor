@@ -1,37 +1,23 @@
 #include "factor.h"
 
 void init_factor(char* image, CELL ds_size, CELL cs_size,
-	CELL data_size, CELL code_size)
+	CELL young_size, CELL aging_size,
+	CELL code_size, CELL literal_size)
 {
+	/* initialize random number generator */
+	srand((unsigned)time(NULL));
 	init_ffi();
-	init_arena(data_size);
+	init_arena(young_size,aging_size);
 	init_compiler(code_size);
-	load_image(image);
+	load_image(image,literal_size);
 	init_stacks(ds_size,cs_size);
 	init_c_io();
 	init_signals();
-
 	init_errors();
-
-#if defined(FACTOR_X86)
-	userenv[CPU_ENV] = tag_object(from_c_string("x86"));
-#elif defined(FACTOR_PPC)
-	userenv[CPU_ENV] = tag_object(from_c_string("ppc"));
-#else
-	userenv[CPU_ENV] = tag_object(from_c_string("unknown"));
-#endif
-
-#ifdef WIN32
-	userenv[OS_ENV] = tag_object(from_c_string("win32"));
-#elif defined(__FreeBSD__)
-	userenv[OS_ENV] = tag_object(from_c_string("freebsd"));
-#elif defined(linux)
-	userenv[OS_ENV] = tag_object(from_c_string("linux"));
-#elif defined(__APPLE__)
-	userenv[OS_ENV] = tag_object(from_c_string("macosx"));
-#else
-	userenv[OS_ENV] = tag_object(from_c_string("unix"));
-#endif
+	userenv[CPU_ENV] = tag_object(from_c_string(FACTOR_CPU_STRING));
+	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
+	userenv[GEN_ENV] = tag_fixnum(GC_GENERATIONS);
+	userenv[CARD_OFF_ENV] = tag_cell(cards_offset);
 }
 
 INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
@@ -50,8 +36,10 @@ int main(int argc, char** argv)
 {
 	CELL ds_size = 2048;
 	CELL cs_size = 2048;
-	CELL data_size = 16;
+	CELL young_size = 8;
+	CELL aging_size = 16;
 	CELL code_size = 2;
+	CELL literal_size = 64;
 	CELL args;
 	CELL i;
 
@@ -61,8 +49,11 @@ int main(int argc, char** argv)
 		printf("Runtime options -- n is a number:\n");
 		printf(" +Dn   Data stack size, kilobytes\n");
 		printf(" +Cn   Call stack size, kilobytes\n");
-		printf(" +Mn   Data heap size, megabytes\n");
+		printf(" +Yn   Size of %d youngest generations, megabytes\n",
+			GC_GENERATIONS-1);
+		printf(" +An   Size of tenured and semi-spaces, megabytes\n");
 		printf(" +Xn   Code heap size, megabytes\n");
+		printf(" +Ln   Literal table size, kilobytes. Only for bootstrapping\n");
 		printf("Other options are handled by the Factor library.\n");
 		printf("See the documentation for details.\n");
 		printf("Send bug reports to Slava Pestov <slava@jedit.org>.\n");
@@ -73,8 +64,10 @@ int main(int argc, char** argv)
 	{
 		if(factor_arg(argv[i],"+D%d",&ds_size)) continue;
 		if(factor_arg(argv[i],"+C%d",&cs_size)) continue;
-		if(factor_arg(argv[i],"+M%d",&data_size)) continue;
+		if(factor_arg(argv[i],"+Y%d",&young_size)) continue;
+		if(factor_arg(argv[i],"+A%d",&aging_size)) continue;
 		if(factor_arg(argv[i],"+X%d",&code_size)) continue;
+		if(factor_arg(argv[i],"+L%d",&literal_size)) continue;
 
 		if(strncmp(argv[i],"+",1) == 0)
 		{
@@ -86,8 +79,10 @@ int main(int argc, char** argv)
 	init_factor(argv[1],
 		ds_size * 1024,
 		cs_size * 1024,
-		data_size * 1024 * 1024,
-		code_size * 1024 * 1024);
+		young_size * 1024 * 1024,
+		aging_size * 1024 * 1024,
+		code_size * 1024 * 1024,
+		literal_size * 1024);
 
 	args = F;
 	while(--argc != 0)

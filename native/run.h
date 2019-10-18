@@ -1,8 +1,7 @@
 #define USER_ENV 16
 
-#define STDIN_ENV      0
-#define STDOUT_ENV     1
-#define STDERR_ENV     2
+#define CARD_OFF_ENV   1 /* for compiling set-slot */
+#define UNUSED_ENV     2
 #define NAMESTACK_ENV  3 /* used by library only */
 #define GLOBAL_ENV     4
 #define BREAK_ENV      5
@@ -15,6 +14,10 @@
 #define ERROR_ENV      12 /* a marker consed onto kernel errors */
 #define IN_ENV         13
 #define OUT_ENV        14
+#define GEN_ENV        15 /* set to GC_GENERATIONS constant */
+
+/* TAGGED user environment data; see getenv/setenv prims */
+DLLEXPORT CELL userenv[USER_ENV];
 
 /* Profiling timer */
 #ifndef WIN32
@@ -27,9 +30,6 @@ jmp_buf toplevel;
 #else
 sigjmp_buf toplevel;
 #endif
-
-/* TAGGED user environment data; see getenv/setenv prims */
-CELL userenv[USER_ENV];
 
 /* Call stack depth to start profile counter from */
 /* This ensures that words in the user's interpreter do not count */
@@ -56,6 +56,11 @@ INLINE void dpush(CELL top)
 INLINE CELL dpeek(void)
 {
 	return get(ds);
+}
+
+INLINE CELL dpeek2(void)
+{
+	return get(ds - CELLS);
 }
 
 INLINE CELL cpop(void)
@@ -85,8 +90,6 @@ INLINE void call(CELL quot)
 	callframe = quot;
 }
 
-void clear_environment(void);
-
 void run(void);
 void platform_run(void);
 void undefined(F_WORD* word);
@@ -95,5 +98,6 @@ void dosym(F_WORD* word);
 void primitive_execute(void);
 void primitive_call(void);
 void primitive_ifte(void);
+void primitive_dispatch(void);
 void primitive_getenv(void);
 void primitive_setenv(void);

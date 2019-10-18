@@ -51,34 +51,23 @@ INLINE CELL relocate_data_next(CELL relocating)
 	return relocating + size;
 }
 
-INLINE CELL init_object(CELL relocating, CELL* handle, CELL type)
-{
-	if(untag_header(get(relocating)) != type)
-		fatal_error("init_object() failed",get(relocating));
-	*handle = tag_object((CELL*)relocating);
-	return relocate_data_next(relocating);
-}
-
 void relocate_data()
 {
-	CELL relocating = active.base;
+	CELL relocating = tenured.base;
 
 	data_fixup(&userenv[BOOT_ENV]);
 	data_fixup(&userenv[GLOBAL_ENV]);
-
-	/* The first object in the image must always T */
-	relocating = init_object(relocating,&T,T_TYPE);
-
-	/* The next three must be bignum 0, 1, -1  */
-	relocating = init_object(relocating,&bignum_zero,BIGNUM_TYPE);
-	relocating = init_object(relocating,&bignum_pos_one,BIGNUM_TYPE);
-	relocating = init_object(relocating,&bignum_neg_one,BIGNUM_TYPE);
+	data_fixup(&T);
+	data_fixup(&bignum_zero);
+	data_fixup(&bignum_pos_one);
+	data_fixup(&bignum_neg_one);
 
 	for(;;)
 	{
-		if(relocating >= active.here)
+		if(relocating >= tenured.here)
 			break;
 
+		allot_barrier(relocating);
 		relocating = relocate_data_next(relocating);
 	}
 
@@ -93,14 +82,6 @@ void relocate_data()
 	}
 }
 
-void relocate_primitive(F_REL* rel, bool relative)
-{
-	/* this is intended for x86, so the address is relative to after
-	the insn, ie offset + CELLS. */
-	put(rel->offset,primitive_to_xt(rel->argument)
-		- (relative ? rel->offset + CELLS : 0));
-}
-
 CELL get_rel_symbol(F_REL* rel)
 {
 	F_CONS* cons = untag_cons(get(rel->argument));
@@ -109,27 +90,25 @@ CELL get_rel_symbol(F_REL* rel)
 	return (CELL)ffi_dlsym(dll,symbol);
 }
 
-void relocate_dlsym(F_REL* rel, bool relative)
+INLINE CELL compute_code_rel(F_REL *rel, CELL original)
 {
-	CELL addr = get_rel_symbol(rel);
-	put(rel->offset,addr - (relative ? rel->offset + CELLS : 0));
-}
-
-/* PowerPC-specific relocations */
-void relocate_primitive_16_16(F_REL* rel)
-{
-	reloc_set_16_16((CELL*)rel->offset,primitive_to_xt(rel->argument));
-}
-
-void relocate_dlsym_16_16(F_REL* rel)
-{
-	reloc_set_16_16((CELL*)rel->offset,get_rel_symbol(rel));
-}
-
-INLINE void code_fixup_16_16(CELL* cell)
-{
-	CELL difference = (compiling.base - code_relocation_base);
-	reloc_set_16_16(cell,reloc_get_16_16(cell) + difference);
+	switch(REL_TYPE(rel))
+	{
+	case F_PRIMITIVE:
+		return primitive_to_xt(rel->argument);
+	case F_DLSYM:
+		code_fixup(&rel->argument);
+		return get_rel_symbol(rel);
+	case F_ABSOLUTE:
+		return original + (compiling.base - code_relocation_base);
+	case F_USERENV:
+		return (CELL)&userenv[rel->argument];
+	case F_CARDS:
+		return cards_offset;
+	default:
+		critical_error("Unsupported rel",rel->type);
+		return -1;
+	}
 }
 
 INLINE CELL relocate_code_next(CELL relocating)
@@ -146,48 +125,31 @@ INLINE CELL relocate_code_next(CELL relocating)
 		+ compiled->reloc_length);
 
 	if(compiled->header != COMPILED_HEADER)
-		fatal_error("Wrong compiled header",relocating);
+		critical_error("Wrong compiled header",relocating);
 
 	while(rel < rel_end)
 	{
-		/* to_c_string can fill up the heap */
-		maybe_garbage_collection();
+		CELL original;
+		CELL new_value;
 
 		code_fixup(&rel->offset);
+		
+		if(REL_16_16(rel))
+			original = reloc_get_16_16(rel->offset);
+		else
+			original = get(rel->offset);
 
-		switch(rel->type)
-		{
-		case F_RELATIVE_PRIMITIVE:
-			relocate_primitive(rel,true);
-			break;
-		case F_ABSOLUTE_PRIMITIVE:
-			relocate_primitive(rel,false);
-			break;
-		case F_RELATIVE_DLSYM:
-			code_fixup(&rel->argument);
-			relocate_dlsym(rel,true);
-			break;
-		case F_ABSOLUTE_DLSYM:
-			code_fixup(&rel->argument);
-			relocate_dlsym(rel,false);
-			break;
-		case F_ABSOLUTE:
-			code_fixup((CELL*)rel->offset);
-			break;
-		case F_ABSOLUTE_PRIMITIVE_16_16:
-			relocate_primitive_16_16(rel);
-			break;
-		case F_ABSOLUTE_DLSYM_16_16:
-			code_fixup(&rel->argument);
-			relocate_dlsym_16_16(rel);
-			break;
-		case F_ABSOLUTE_16_16:
-			code_fixup_16_16((CELL*)rel->offset);
-			break;
-		default:
-			fatal_error("Unsupported rel",rel->type);
-			break;
-		}
+		/* to_c_string can fill up the heap */
+		maybe_gc(0);
+		new_value = compute_code_rel(rel,original);
+
+		if(REL_RELATIVE(rel))
+			new_value -= (rel->offset + CELLS);
+
+		if(REL_16_16(rel))
+			reloc_set_16_16(rel->offset,new_value);
+		else
+			put(rel->offset,new_value);
 
 		rel++;
 	}

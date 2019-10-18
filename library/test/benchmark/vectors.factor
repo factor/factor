@@ -1,9 +1,4 @@
-USE: vectors
-USE: kernel
-USE: math
-USE: compiler
-USE: test
-USE: sequences
+USING: compiler kernel math sequences test vectors ;
 
 ! http://inferno.bell-labs.com/cm/cs/who/bwk/interps/pap.html
 

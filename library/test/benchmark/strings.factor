@@ -5,8 +5,8 @@ USING: compiler kernel math namespaces sequences strings test ;
 : string-step ( n str -- )
     2dup length > [
         dup [ "123" , , "456" , , "789" , ] make-string
-        dup dup length 2 /i 0 swap rot substring
-        swap dup length 2 /i 1 + 1 swap rot substring append
+        dup dup length 2 /i 0 swap rot subseq
+        swap dup length 2 /i 1 + 1 swap rot subseq append
         string-step
     ] [
         2drop

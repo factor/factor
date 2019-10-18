@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: gadgets generic kernel lists math namespaces sdl words ;
+USING: gadgets generic kernel lists math namespaces sdl
+sequences words ;
 
 ! A frame arranges left/right/top/bottom gadgets around a
 ! center gadget, which gets any leftover space.

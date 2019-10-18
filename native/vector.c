@@ -13,8 +13,9 @@ F_VECTOR* vector(F_FIXNUM capacity)
 
 void primitive_vector(void)
 {
-	maybe_garbage_collection();
-	drepl(tag_object(vector(to_fixnum(dpeek()))));
+	CELL size = to_fixnum(dpeek());
+	maybe_gc(array_size(size) + sizeof(F_VECTOR));
+	drepl(tag_object(vector(size)));
 }
 
 void fixup_vector(F_VECTOR* vector)
@@ -24,5 +25,5 @@ void fixup_vector(F_VECTOR* vector)
 
 void collect_vector(F_VECTOR* vector)
 {
-	COPY_OBJECT(vector->array);
+	copy_handle(&vector->array);
 }
