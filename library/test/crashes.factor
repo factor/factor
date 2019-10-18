@@ -8,6 +8,7 @@ USE: strings
 USE: test
 USE: vectors
 USE: lists
+USE: words
 
 ! Various things that broke CFactor at various times.
 ! This should run without issue (and tests nothing useful)
@@ -56,3 +57,8 @@ USE: lists
 [ callstack-overflow ] unit-test-fails
 
 [ [ cdr cons ] word-plist ] unit-test-fails
+
+! Forgot to tag out of bounds index
+[ 1 { } vector-nth ] [ garbage-collection drop ] catch
+[ -1 { } set-vector-length ] [ garbage-collection drop ] catch
+[ 1 "" str-nth ] [ garbage-collection drop ] catch

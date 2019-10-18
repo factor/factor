@@ -42,6 +42,9 @@ public class Traits extends FactorParsingDefinition
 		throws Exception
 	{
 		FactorWord w = reader.nextWord(true);
+		if(w == null)
+			return;
+
 		w.def = new FactorTraitsDefinition(w);
 		reader.intern("<" + w.name + ">",true);
 		reader.intern(w.name + "?",true);

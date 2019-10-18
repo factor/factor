@@ -126,6 +126,8 @@ public class EditWordDialog extends WordListDialog
 			list.setSelectedIndex(0);
 			list.ensureIndexIsVisible(0);
 		}
+
+		updatePreview();
 	} //}}}
 	
 	//{{{ UpdateTimer class

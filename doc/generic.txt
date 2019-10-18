@@ -1,0 +1,272 @@
+THE FACTOR GENERIC WORD SYSTEM
+
+Factor's generic word system is a very abstract generalization of
+"object oriented" features found in other programming languges.
+
+To use the generic word system, you must put the following near the
+beginning of your source file:
+
+USE: generic
+
+The key motivation is that sometimes, you want to write a word that has
+differing behavior depending on the class of its argument. For example,
+in a game, a 'draw' word could take different action if given a ship, a
+weapon, a planet, etc.
+
+Duplicating 'type case' logic is undesirable and also results in
+unnecessary coupling -- adding support for a new type of graphical
+object would require modifying the original definition of 'draw', for
+example.
+
+* Types
+
+In Factor, the idea of a 'type' refers to a very concrete concept. The
+type of an object is its representation in runtime object memory. Types
+include fixnums, bignums, cons cells, vectors, strings, and so on. The
+set of available types is fixed; adding a new type requires modifying
+the runtime source written in C.
+
+* Classes
+
+In Factor, a 'class' is just a predicate that categorizes objects as
+being a member of the class or not. To be useful, it must be consistent
+-- for a given object, it must always return the same truth value.
+
+Examples of classes might include:
+
+- Cons cells where both elements are integers
+
+- Floating point numbers between -1 and 1
+
+- Hash tables holding a certain key
+
+- Any object that occurs as a member of a certain global variable
+holding a list.
+
+- ... and so on.
+
+As you can see, a class of objects does not need to be a subset or a
+superset of a type of objects.
+
+Classes, unlike types, can be defined by the user.
+
+* Generic words
+
+A generic word is a word whose behavior depends on the class of the
+object at the top of the stack.
+
+Generic words are defined using the following syntax:
+
+GENERIC: draw ( actor -- )
+#! Draw the actor.
+
+A stack effect comment, as above, is not required but recommended.
+
+* Methods
+
+A method associates behavior to a generic word. Methods are defined by
+writing M:, followed by a class name, followed by the name of a
+previously-defined generic word.
+
+One of the main benefits of generic words is that each method definition
+can potentially occur in a different source file. Generic word
+definitions also hide conditionals.
+
+Here are two methods for the generic 'draw' word:
+
+M: ship draw ( actor -- )
+    [
+        surface get screen-xy radius get color get
+        filledCircleColor
+    ] bind ;
+
+M: plasma draw ( actor -- )
+    [
+        surface get screen-xy dup len get + color get
+        vlineColor
+    ] bind ;
+
+Here, 'ship' and 'class' are user-defined classes.
+
+* Metaclasses
+
+To understand what classes already exist, and how to define your own
+classes, the concept of a 'metaclass' must be grasped first. Roughly
+speaking, a metaclass is a class of classes.
+
+New metaclasses can be defined by the user, but its an involved process
+that requires a deeper understanding of the generic word systsem than
+can be given here.
+
+** The object class
+
+Every object is a member of the object class. The object class is also a
+metaclass, and it is the one and only instance of itself.
+
+Confusing? The idea is pretty simple. If you define a method on
+'object', it will be called when no more specific method is available:
+
+GENERIC: describe
+M: number describe "The number " write . ;
+M: object describe "I don't know anything about " write . ;
+
+Since the only instance of the object metaclass is itself, you cannot
+define new classes in the object metaclass.
+
+** The builtin metaclass
+
+The builtin metaclass contains precisely the following classes; each
+class corresponds to a runtime type:
+
+alien
+array
+bignum
+complex
+cons
+dll
+f
+fixnum
+float
+port
+ratio
+sbuf
+string
+t
+vector
+word
+
+Each builtin class has a corresponding membership test predicate, named
+after the builtin class suffixed with '?'. For example, cons?, word?,
+etc.
+
+Adding new classes to the builtin metaclass requires modifications to
+the C code comprising Factor's runtime.
+
+** The union metaclass
+
+The union metaclass contains classes whose members are defined to be the
+aggregate of the members of a list of existing classes.
+
+For example, the Factor library defines some unions over numeric types:
+
+UNION: integer fixnum bignum ;
+UNION: rational integer ratio ;
+UNION: real rational float ;
+UNION: number real complex ;
+
+Now, the absolute value function can be defined in an efficient manner
+for real numbers, and in a more general fashion for complex numbers:
+
+GENERIC: abs ( z -- |z| )
+M: real abs dup 0 < [ neg ] when ;
+M: complex abs >rect mag2 ;
+
+New unions can be defined by you, and the numerical types example above
+gives the syntax: you write UNION: followed by the name of the union,
+followed by its members. The list of members is terminated with a
+semi-colon.
+
+A predicate named after the union followed by '?' is
+automatically-defined. For example, the following definition of 'real?'
+was automatically created:
+
+: real?
+    dup rational? [
+        drop t 
+    ] [
+        dup float? [
+            drop t 
+        ] [
+            drop f 
+        ] ifte 
+    ] ifte ;
+
+** The predicate metaclass
+
+The predicate metaclass contains classes whose membership test is an
+arbitrary expression. To speed up dispatch, each predicate must be
+defined as a subclass of some other class. That way predicates
+subclassing from disjoint builtin classes do not need to be
+simultaenously tested.
+
+The library/strings.factor module defines some subclasses of integer,
+classifying the different types of ASCII characters:
+
+PREDICATE: integer blank     " \t\n\r" str-contains? ;
+PREDICATE: integer letter    CHAR: a CHAR: z between? ;
+PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
+PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
+PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
+
+Each predicate defines a corresponding predicate word whose name is
+suffixed with '?'; for example, a 'digit?' word is automatically
+defined:
+
+: digit?
+    dup integer? [
+        CHAR: 0 CHAR: 9 between?
+    ] [
+        drop f
+    ] ifte ;
+
+For obvious reasons, the predicate definition must consume and produce
+exactly one value on the stack.
+
+** The traits metaclass
+
+(The name for this metaclass is wrong and will change eventually. The
+original idea was to allow an object to inherit any number of 'traits',
+thus they would behave like mixins. This never materialized.)
+
+The traits metaclass allows one to associate more fine-grained behavior,
+specifically with hashtables.
+
+New classes can be defined like so:
+
+TRAITS: plasma
+
+In terms of behavior, this is actually identical to the following:
+
+PREDICATE: hashtable plasma \ traits swap hash plasma = ;
+
+However, it is far more efficient (and less verbose).
+
+You can define methods as usual:
+
+GENERIC: collide ( actor1 actor2 -- )
+
+M: plasma collide ( actor1 actor2 -- )
+    #! Remove the other actor.
+    deactivate deactivate ;
+
+How does one actually get an object that plasma? responds with t to? You
+define a constructor word by writing C: followed by the class name:
+
+C: plasma ( actor dy -- plasma )
+    [
+        velocity set
+        actor-xy
+        blue color set
+        10 len set
+        5 radius set
+        active on
+    ] extend ;
+
+The constructor word is named after the class, surrounded in angle
+brackets (< and >). For example, the above actually creates a word named
+<plasma>.
+
+The constructor's definition begins with the parameters given by the
+user, underneath a blank plasma object.
+
+That is, a dummy constructor just returns a blank hashtable that
+responds t to the corresponding membership predicate:
+
+TRAITS: foo
+C: foo ;
+
+<foo> foo? .
+==> t
+
+"hello" foo? .
+==> f

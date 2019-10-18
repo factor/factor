@@ -64,7 +64,7 @@ USE: math
 
 : usages. ( word -- )
     #! List all usages of a word in all vocabularies.
-    vocabs [ dupd usages-in-vocab. ] each drop ;
+    vocabs [ usages-in-vocab. ] each-with ;
 
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
@@ -82,11 +82,11 @@ USE: math
 : vocab-completions ( substring vocab -- list )
     #! Used by jEdit plugin. Like vocab-apropos, but only
     #! matches at the start of a word name are considered.
-    words [ word-name over str-head? ] subset nip ;
+    words [ word-name over ?str-head nip ] subset nip ;
 
 : apropos. ( substring -- )
     #! List all words that contain a string.
-    vocabs [ dupd vocab-apropos. ] each drop ;
+    vocabs [ vocab-apropos. ] each-with ;
 
 : in. ( -- )
     #! Print the vocabulary where new words are added in
@@ -102,28 +102,3 @@ USE: math
 
 : words. ( vocab -- )
     words . ;
-
-: usage+ ( key -- )
-    dup "usages" word-property
-    [ succ ] [ 1 ] ifte*
-    "usages" set-word-property ;
-
-GENERIC: count-usages ( quot -- )
-M: object count-usages drop ;
-M: word count-usages usage+ ;
-M: cons count-usages unswons count-usages count-usages ;
-
-: tally-usages ( -- )
-    [ f "usages" set-word-property ] each-word
-    [ word-parameter count-usages ] each-word ;
-
-: auto-inline ( count -- )
-    #! Automatically inline all words called less than a count
-    #! number of times.
-    [
-        2dup "usages" word-property dup 0 ? >= [
-            t "inline" set-word-property
-        ] [
-            drop
-        ] ifte
-    ] each-word drop ;

@@ -36,7 +36,6 @@ USE: unparser
 : <actions> ( path alist -- alist )
     #! For each element of the alist, change the value to
     #! path " " value
-    >r unparse r>
     [ uncons >r over " " r> cat3 cons ] map nip ;
 
 ! A style is an alist whose key/value pairs hold

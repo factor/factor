@@ -25,45 +25,76 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: format
+IN: errors
+DEFER: throw
+
+IN: math-internals
+USE: generic
 USE: kernel
 USE: math
-USE: namespaces
-USE: strings
 
-: decimal-split ( string -- string string )
-    #! Split a string before and after the decimal point.
-    dup "." index-of dup -1 = [ drop f ] [ str// ] ifte ;
-
-: decimal-tail ( count str -- string )
-    #! Given a decimal, trims all but a count of decimal places.
-    [ str-length min ] keep str-head ;
-
-: decimal-cat ( before after -- string )
-    #! If after is of zero length, return before, otherwise
-    #! return "before.after".
-    dup str-length 0 = [
+: fraction> ( a b -- a/b )
+    dup 1 number= [
         drop
     ] [
-        "." swap cat3
-    ] ifte ;
+        (fraction>)
+    ] ifte ; inline
 
-: decimal-places ( num count -- string )
-    #! Trims the number to a count of decimal places.
-    >r decimal-split dup [
-        r> swap decimal-tail decimal-cat
+: division-by-zero ( x y -- )
+    "Division by zero" throw drop ;
+
+: integer/ ( x y -- x/y )
+    dup 0 number= [
+        division-by-zero
     ] [
-        r> 2drop
-    ] ifte ;
+        dup 0 < [
+            swap neg swap neg
+        ] when
+        2dup gcd tuck /i >r /i r> fraction>
+    ] ifte ; inline
 
-: digits ( string count -- string )
-    #! Make sure string has at least count digits, padding it
-    #! with zeroes on the left if needed.
-    over str-length - dup 0 <= [
-        drop
-    ] [
-        "0" fill swap cat2
-    ] ifte ;
+M: fixnum number= fixnum= ;
+M: fixnum < fixnum< ;
+M: fixnum <= fixnum<= ;
+M: fixnum > fixnum> ;
+M: fixnum >= fixnum>= ;
 
-: pad-string ( len str -- str )
-    str-length - " " fill ;
+M: fixnum + fixnum+ ;
+M: fixnum - fixnum- ;
+M: fixnum * fixnum* ;
+M: fixnum / integer/ ;
+M: fixnum /i fixnum/i ;
+M: fixnum /f fixnum/f ;
+M: fixnum mod fixnum-mod ;
+
+M: fixnum /mod fixnum/mod ;
+
+M: fixnum bitand fixnum-bitand ;
+M: fixnum bitor fixnum-bitor ;
+M: fixnum bitxor fixnum-bitxor ;
+M: fixnum shift fixnum-shift ;
+
+M: fixnum bitnot fixnum-bitnot ;
+
+M: bignum number= bignum= ;
+M: bignum < bignum< ;
+M: bignum <= bignum<= ;
+M: bignum > bignum> ;
+M: bignum >= bignum>= ;
+
+M: bignum + bignum+ ;
+M: bignum - bignum- ;
+M: bignum * bignum* ;
+M: bignum / integer/ ;
+M: bignum /i bignum/i ;
+M: bignum /f bignum/f ;
+M: bignum mod bignum-mod ;
+
+M: bignum /mod bignum/mod ;
+
+M: bignum bitand bignum-bitand ;
+M: bignum bitor bignum-bitor ;
+M: bignum bitxor bignum-bitxor ;
+M: bignum shift bignum-shift ;
+
+M: bignum bitnot bignum-bitnot ;

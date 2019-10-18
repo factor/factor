@@ -1,8 +1,8 @@
-! :folding=indent:collapseFolds=0:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2003, 2004 Mackenzie Straight.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,16 +25,37 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: inspect-responder
-USE: html
-USE: inspector
-USE: namespaces
+IN: threads
+USE: compiler
+USE: io-internals
 USE: kernel
+USE: win32-io-internals
+USE: win32-api
 
-USE: httpd
-USE: httpd-responder
+: (yield) ( -- )
+    next-thread [ 
+        call
+    ] [
+        next-io-task [
+            call
+        ] [ 
+            win32-next-io-task 
+        ] ifte*
+    ] ifte* ;
 
-: inspect-responder ( argument -- )
-    serving-html dup [
-        describe-path
-    ] simple-html-document ;
+IN: streams
+USE: compiler
+USE: namespaces
+USE: stdio
+USE: kernel
+USE: win32-io-internals
+USE: win32-stream
+USE: win32-api
+
+: <filecr> <win32-filecr> ;
+: <filecw> <win32-filecw> ;
+: <server> <win32-server> ;
+
+: init-stdio ( -- )
+    win32-init-stdio ;
+

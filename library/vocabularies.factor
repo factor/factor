@@ -50,7 +50,7 @@ USE: strings
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
     #! Filter empty slots.
-    vocab hash-values [ ] subset word-sort ;
+    vocab dup [ hash-values [ ] subset word-sort ] when ;
 
 : each-word ( quot -- )
     #! Apply a quotation to each word in the image.
@@ -77,14 +77,14 @@ USE: strings
 
 : (create) ( name vocab -- word )
     #! Create an undefined word without adding to a vocabulary.
-    <plist> 0 f rot <word> ;
+    <plist> <word> [ set-word-plist ] keep ;
 
 : reveal ( word -- )
     #! Add a new word to its vocabulary.
     vocabularies get [
-        dup word-vocabulary
-        over word-name
-        2list set-object-path
+        dup word-vocabulary nest [
+            dup word-name set
+        ] bind
     ] bind ;
 
 : create ( name vocab -- word )
@@ -100,22 +100,18 @@ USE: strings
 : init-search-path ( -- )
     ! For files
     "scratchpad" "file-in" set
-    [ "builtins" "syntax" "scratchpad" ] "file-use" set
+    [ "syntax" "scratchpad" ] "file-use" set
     ! For interactive
     "scratchpad" "in" set
     [
-        "user"
-        "arithmetic"
-        "builtins"
         "compiler"
         "debugger"
         "errors"
         "files"
+        "generic"
         "hashtables"
         "inference"
-        "inferior"
         "interpreter"
-        "inspector"
         "jedit"
         "kernel"
         "listener"
@@ -126,7 +122,6 @@ USE: strings
         "prettyprint"
         "processes"
         "profiler"
-        "stack"
         "streams"
         "stdio"
         "strings"
@@ -135,7 +130,6 @@ USE: strings
         "threads"
         "unparser"
         "vectors"
-        "vocabularies"
         "words"
         "scratchpad"
     ] "use" set ;

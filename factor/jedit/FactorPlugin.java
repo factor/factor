@@ -42,6 +42,8 @@ import sidekick.*;
 public class FactorPlugin extends EditPlugin
 {
 	private static ExternalFactor external;
+	private static Process process;
+	private static int PORT = 9999;
 
 	//{{{ getPluginPath() method
 	private String getPluginPath()
@@ -73,8 +75,25 @@ public class FactorPlugin extends EditPlugin
 	public void stop()
 	{
 		stopExternalInstance();
+
+		Buffer buffer = jEdit.getFirstBuffer();
+		while(buffer != null)
+		{
+			buffer.setProperty(FactorSideKickParser.WORDS_PROPERTY,null);
+			buffer = buffer.getNext();
+		}
 	} //}}}
-	
+
+	//{{{ addNonEmpty() method
+	private static void addNonEmpty(String[] input, List output)
+	{
+		for(int i = 0; i < input.length; i++)
+		{
+			if(input[i].length() != 0)
+				output.add(input[i]);
+		}
+	} //}}}
+
 	//{{{ getExternalInstance() method
 	/**
 	 * Returns the object representing a connection to an external Factor instance.
@@ -84,33 +103,40 @@ public class FactorPlugin extends EditPlugin
 	{
 		if(external == null)
 		{
-			Process p = null;
 			InputStream in = null;
 			OutputStream out = null;
 
 			try
 			{
-				String[] args = jEdit.getProperty("factor.external.args","-jedit")
+				String exePath = jEdit.getProperty(
+					"factor.external.program");
+				String imagePath = jEdit.getProperty(
+					"factor.external.image");
+				List args = new ArrayList();
+				args.add(exePath);
+				args.add(imagePath);
+				args.add("-shell=telnet");
+				args.add("-telnetd-port=" + PORT);
+				String[] extraArgs = jEdit.getProperty(
+					"factor.external.args")
 					.split(" ");
-				String[] nargs = new String[args.length + 3];
-				nargs[0] = jEdit.getProperty("factor.external.program");
-				nargs[1] = jEdit.getProperty("factor.external.image");
-				nargs[2] = "-no-ansi";
-				System.arraycopy(args,0,nargs,3,args.length);
-				p = Runtime.getRuntime().exec(nargs);
-				p.getErrorStream().close();
+				addNonEmpty(extraArgs,args);
+				process = Runtime.getRuntime().exec(
+					(String[])args.toArray(
+					new String[args.size()]),
+					null,
+					new File(MiscUtilities
+					.getParentOfPath(imagePath)));
 
-				in = p.getInputStream();
-				out = p.getOutputStream();
+				external = new ExternalFactor(PORT);
 			}
-			catch(IOException io)
+			catch(Exception e)
 			{
 				Log.log(Log.ERROR,FactorPlugin.class,
 					"Cannot start external Factor:");
-				Log.log(Log.ERROR,FactorPlugin.class,io);
+				Log.log(Log.ERROR,FactorPlugin.class,e);
+				process = null;
 			}
-
-			external = new ExternalFactor(p,in,out);
 		}
 
 		return external;
@@ -133,7 +159,19 @@ public class FactorPlugin extends EditPlugin
 		if(external != null)
 		{
 			external.close();
+			try
+			{
+				process.getErrorStream().close();
+				process.getInputStream().close();
+				process.getOutputStream().close();
+				process.waitFor();
+			}
+			catch(Exception e)
+			{
+				Log.log(Log.DEBUG,FactorPlugin.class,e);
+			}
 			external = null;
+			process = null;
 		}
 	} //}}}
 	
@@ -165,9 +203,9 @@ public class FactorPlugin extends EditPlugin
 	} //}}}
 
 	//{{{ evalInWire() method
-	public static void evalInWire(String cmd) throws IOException
+	public static String evalInWire(String cmd) throws IOException
 	{
-		getExternalInstance().eval(cmd);
+		return getExternalInstance().eval(cmd);
 	} //}}}
 
 	//{{{ lookupWord() method
@@ -278,34 +316,12 @@ public class FactorPlugin extends EditPlugin
 	{
 		try
 		{
-			return getCompletions(getExternalInstance().getVocabularies(),word,
-				anywhere);
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-	} //}}}
-	
-	//{{{ getCompletions() method
-	/**
-	 * @param anywhere If true, matches anywhere in the word name are
-	 * returned; otherwise, only matches from beginning.
-	 */
-	public static Set getCompletions(Cons use, String word, boolean anywhere)
-	{
-		try
-		{
 			Set completions = new HashSet();
-	
-			while(use != null)
-			{
-				String vocab = (String)use.car;
-				getExternalInstance().getCompletions(
-					vocab,word,completions,anywhere);
-				use = use.next();
-			}
-
+			getExternalInstance().getCompletions(
+				getExternalInstance().getVocabularies(),
+				word,
+				anywhere,
+				completions);
 			return completions;
 		}
 		catch(Exception e)
@@ -314,6 +330,26 @@ public class FactorPlugin extends EditPlugin
 		}
 	} //}}}
 	
+	//{{{ getWordStartIndex() method
+	public static int getWordStartOffset(String line, int caret)
+	{
+		ReadTable readtable = ReadTable.DEFAULT_READTABLE;
+
+		int start = caret;
+		while(start > 0)
+		{
+			if(readtable.getCharacterType(line.charAt(start - 1))
+				== ReadTable.WHITESPACE)
+			{
+				break;
+			}
+			else
+				start--;
+		}
+		
+		return start;
+	} //}}}
+
 	//{{{ getWordAtCaret() method
 	public static String getWordAtCaret(JEditTextArea textArea)
 	{
@@ -338,17 +374,7 @@ public class FactorPlugin extends EditPlugin
 			return null;
 		}
 
-		int start = caret;
-		while(start > 0)
-		{
-			if(readtable.getCharacterType(line.charAt(start - 1))
-				== ReadTable.WHITESPACE)
-			{
-				break;
-			}
-			else
-				start--;
-		}
+		int start = getWordStartOffset(line,caret);
 
 		int end = caret;
 		do
@@ -375,7 +401,7 @@ public class FactorPlugin extends EditPlugin
 	} //}}}
 	
 	//{{{ isUsed() method
-	private static boolean isUsed(View view, String vocab)
+	public static boolean isUsed(View view, String vocab)
 	{
 		SideKickParsedData data = SideKickParsedData
 			.getParsedData(view);

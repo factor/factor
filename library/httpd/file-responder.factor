@@ -42,7 +42,7 @@ USE: strings
 USE: unparser
 
 : serving-path ( filename -- filename )
-    f>"" "doc-root" get swap cat2 ;
+    [ "" ] unless* "doc-root" get swap cat2 ;
 
 : file-response ( mime-type length -- )
     [

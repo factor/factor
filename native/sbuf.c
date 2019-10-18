@@ -2,7 +2,10 @@
 
 F_SBUF* sbuf(F_FIXNUM capacity)
 {
-	F_SBUF* sbuf = allot_object(SBUF_TYPE,sizeof(F_SBUF));
+	F_SBUF* sbuf;
+	if(capacity < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
+	sbuf = allot_object(SBUF_TYPE,sizeof(F_SBUF));
 	sbuf->top = 0;
 	sbuf->string = tag_object(string(capacity,'\0'));
 	return sbuf;
@@ -31,7 +34,7 @@ void primitive_set_sbuf_length(void)
 	str = untag_string(sbuf->string);
 	length = to_fixnum(dpop());
 	if(length < 0)
-		range_error(tag_object(sbuf),length,sbuf->top);
+		range_error(tag_object(sbuf),0,to_fixnum(length),sbuf->top);
 	sbuf->top = length;
 	if(length > str->capacity)
 		sbuf->string = tag_object(grow_string(str,length,F));
@@ -43,7 +46,7 @@ void primitive_sbuf_nth(void)
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= sbuf->top)
-		range_error(tag_object(sbuf),index,sbuf->top);
+		range_error(tag_object(sbuf),0,tag_fixnum(index),sbuf->top);
 	dpush(string_nth(untag_string(sbuf->string),index));
 }
 
@@ -59,7 +62,7 @@ void sbuf_ensure_capacity(F_SBUF* sbuf, F_FIXNUM top)
 void set_sbuf_nth(F_SBUF* sbuf, CELL index, uint16_t value)
 {
 	if(index < 0)
-		range_error(tag_object(sbuf),index,sbuf->top);
+		range_error(tag_object(sbuf),0,tag_fixnum(index),sbuf->top);
 	else if(index >= sbuf->top)
 		sbuf_ensure_capacity(sbuf,index + 1);
 
@@ -113,7 +116,7 @@ void primitive_sbuf_append(void)
 		sbuf_append_string(sbuf,untag_string(object));
 		break;
 	default:
-		type_error(TEXT_TYPE,object);
+		type_error(STRING_TYPE,object);
 		break;
 	}
 }
@@ -168,7 +171,7 @@ void primitive_sbuf_eq(void)
 {
 	F_SBUF* s1 = untag_sbuf(dpop());
 	CELL with = dpop();
-	if(typep(SBUF_TYPE,with))
+	if(type_of(with) == SBUF_TYPE)
 		dpush(tag_boolean(sbuf_eq(s1,(F_SBUF*)UNTAG(with))));
 	else
 		dpush(F);
@@ -182,7 +185,7 @@ void primitive_sbuf_hashcode(void)
 
 void fixup_sbuf(F_SBUF* sbuf)
 {
-	fixup(&sbuf->string);
+	data_fixup(&sbuf->string);
 }
 
 void collect_sbuf(F_SBUF* sbuf)

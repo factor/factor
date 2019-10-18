@@ -40,39 +40,55 @@ import org.gjt.sp.util.Log;
 public class ExternalFactor extends DefaultVocabularyLookup
 {
 	//{{{ ExternalFactor constructor
-	/**
-	 * We are given two streams that point to a bare REPL.
-	 */
-	public ExternalFactor(Process proc, InputStream in, OutputStream out)
+	public ExternalFactor(int port)
 	{
-		if(proc == null || in == null || out == null)
-			closed = true;
-		else
-		{
-			this.proc = proc;
+		/* Start stream server */;
+		streamServer = port;
 
+		for(int i = 1; i < 6; i++)
+		{
+			Log.log(Log.DEBUG,this,"Factor connection, try #" + i);
 			try
 			{
-				this.in = new DataInputStream(in);
-				this.out = new DataOutputStream(out);
-
-				out.write("USE: jedit wire-server\n".getBytes("ASCII"));
-				out.flush();
-
-				waitForAck();
-
-				/* Start stream server */
-				streamServer = 9999;
-				eval("USE: telnetd [ 9999 telnetd ] in-thread");
-
-				/* Ensure we're ready for a connection immediately */
-				eval("nop");
+				Thread.sleep(1000);
+				openWire();
+				Log.log(Log.DEBUG,this,"Connection established");
+				return;
 			}
 			catch(Exception e)
 			{
-				close();
+				Log.log(Log.ERROR,this,e);
 			}
+			
 		}
+
+		Log.log(Log.ERROR,this,"Cannot connect to Factor on port " + port);
+		if(in != null && out != null)
+			close();
+	} //}}}
+
+	//{{{ openWireSocket() method
+	/**
+	 * Return a listener stream.
+	 */
+	public Socket openWireSocket() throws IOException
+	{
+		if(closed)
+			throw new IOException("Socket closed");
+		return new Socket("localhost",streamServer);
+	} //}}}
+
+	//{{{ openWire() method
+	private void openWire() throws Exception
+	{
+		Socket client = openWireSocket();
+		in = new DataInputStream(new BufferedInputStream(
+			client.getInputStream()));
+		out = new DataOutputStream(new BufferedOutputStream(
+			client.getOutputStream()));
+		out.write("USE: jedit wire-server\n".getBytes("ASCII"));
+		out.flush();
+		waitForAck();
 	} //}}}
 
 	//{{{ waitForAck() method
@@ -88,6 +104,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			byte[] discard = new byte[2048];
 			int len = in.read(discard,0,discard.length);
 			discardStr = new String(discard,0,len);
+			Log.log(Log.DEBUG,this,"Waiting for ACK: " + discardStr);
 		}
 	} //}}}
 	
@@ -132,22 +149,16 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public FactorStream openStream()
 	{
-		if(closed)
-			return null;
-		else
+		try
 		{
-			try
-			{
-				Socket client = new Socket("localhost",streamServer);
-				return new FactorStream(client);
-			}
-			catch(Exception e)
-			{
-				Log.log(Log.ERROR,this,"Cannot open stream connection to "
-					+ "external Factor:");
-				Log.log(Log.ERROR,this,e);
-				return null;
-			}
+			return new FactorStream(openWireSocket());
+		}
+		catch(Exception e)
+		{
+			Log.log(Log.ERROR,this,"Cannot open stream connection to "
+				+ "external Factor:");
+			Log.log(Log.ERROR,this,e);
+			return null;
 		}
 	} //}}}
 
@@ -178,6 +189,21 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		return vocabs;
 	} //}}}
 
+	//{{{ makeWord() method
+	/**
+	 * Make a word from an info list returned by Factor.
+	 */
+	public synchronized FactorWord makeWord(Cons info)
+	{
+		String vocabulary = (String)info.car;
+		String name = (String)info.next().car;
+		FactorWord w = super.searchVocabulary(new Cons(vocabulary,null),name);
+		if(w == null)
+			w = new FactorWord(vocabulary,name);
+		w.stackEffect = (String)info.next().next().car;
+		return w;
+	} //}}}
+
 	//{{{ searchVocabulary() method
 	/**
 	 * Search through the given vocabulary list for the given word.
@@ -185,71 +211,58 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	public synchronized FactorWord searchVocabulary(Cons vocabulary, String name)
 	{
 		FactorWord w = super.searchVocabulary(vocabulary,name);
+
 		if(w != null)
 			return w;
 
+		if(closed)
+			return define("#<unknown>",name);
+
 		try
 		{
-			if(!closed)
-			{
-				Cons result = parseObject(eval(FactorReader.unparseObject(name)
-					+ " "
-					+ FactorReader.unparseObject(vocabulary)
-					+ " jedit-lookup ."));
-				if(result.car == null)
-					return null;
-	
-				result = (Cons)result.car;
-				w = new FactorWord(
-					(String)result.car,
-					(String)result.next().car);
-				w.stackEffect = (String)result.next().next().car;
-				return w;
-			}
+			Cons result = parseObject(eval(FactorReader.unparseObject(name)
+				+ " "
+				+ FactorReader.unparseObject(vocabulary)
+				+ " search jedit-lookup ."));
+			if(result.car == null)
+				return null;
+
+			return makeWord((Cons)result.car);
 		}
 		catch(Exception e)
 		{
 			Log.log(Log.ERROR,this,e);
+			return null;
 		}
-
-		return new FactorWord("unknown",name);
 	} //}}}
 
 	//{{{ getCompletions() method
-	public synchronized void getCompletions(String vocab, String word, Set completions,
-		boolean anywhere)
+	public synchronized void getCompletions(Cons use, String word,
+		boolean anywhere, Set completions) throws Exception
 	{
-		super.getCompletions(vocab,word,completions,anywhere);
+		super.getCompletions(use,word,anywhere,completions);
 
 		if(closed)
 			return;
 
-		try
-		{
-			/* We can't send words across the socket at this point in
-			human history, because of USE: issues. so we send name/vocab
-			pairs. */
-			Cons moreCompletions = (Cons)parseObject(eval(
-				FactorReader.unparseObject(word)
-				+ " "
-				+ FactorReader.unparseObject(vocab)
-				+ " "
-				+ (anywhere ? "vocab-apropos" : "vocab-completions")
-				+ " [ dup word-name swap word-vocabulary 2list ] map .")).car;
+		/* We can't send words across the socket at this point in
+		human history, because of USE: issues. so we send name/vocab
+		pairs. */
+		Cons moreCompletions = (Cons)parseObject(eval(
+			FactorReader.unparseObject(word)
+			+ " "
+			+ FactorReader.unparseObject(Boolean.valueOf(anywhere))
+			+ " "
+			+ FactorReader.unparseObject(use)
+			+ " completions .")).car;
 
-			while(moreCompletions != null)
-			{
-				Cons completion = (Cons)moreCompletions.car;
-				FactorWord w = searchVocabulary(completion.next(),
-					(String)completion.car);
-				if(w != null)
-					completions.add(w);
-				moreCompletions = moreCompletions.next();
-			}
-		}
-		catch(Exception e)
+		while(moreCompletions != null)
 		{
-			Log.log(Log.ERROR,this,e);
+			Cons completion = (Cons)moreCompletions.car;
+			FactorWord w = makeWord(completion);
+			if(w != null)
+				completions.add(w);
+			moreCompletions = moreCompletions.next();
 		}
 	} //}}}
 
@@ -277,7 +290,6 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		
 		try
 		{
-			proc.waitFor();
 			in.close();
 			out.close();
 		}
@@ -287,7 +299,6 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			Log.log(Log.DEBUG,this,e);
 		}
 
-		proc = null;
 		in = null;
 		out = null;
 	} //}}}
@@ -301,7 +312,6 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	//{{{ Private members
 	private boolean closed;
 
-	private Process proc;
 	private DataInputStream in;
 	private DataOutputStream out;
 	

@@ -1,0 +1,124 @@
+THE BOOTSTRAP PROCESS
+
+* Why bother?
+
+Factor cannot be built entirely from source. That is, certain parts -- such as the parser itself -- are written in entirely in Factor, thus to build a new Factor system, one needs to be running an existing Factor system.
+
+The Factor runtime, coded in C, knows nothing of the syntax of Factor source files, or even the organization of words into vocabularies. Most conventional languages fall into two implementation styles:
+
+- A single monolithic executable is shipped, with most of the language written in low level code. This includes Python, Perl, and so on. This approach has the disadvantage that the language is less flexible, due to the large native substrate.
+
+- A smaller interpreter/compiler is shipped, that reads bytecode or source files from disk, and constructs the standard library on startup. This has the disadvantage of slow startup time. This includes Java.
+
+* How does it work?
+
+Factor takes a superior approach, used by Lisp and Smalltalk implementations, where initialization consists of loading a memory image. Execution then begins immediately. New images can be generated in one of two ways:
+
+- Saving the current memory heap to disk as a new image file.
+
+This is easily done and easily implemented:
+
+  "foo.image" save-image
+
+Since this simply saves a copy of the entire heap to a file, no more will be said about it here.
+
+- Generating a new image from sources.
+
+If the former was the only way to save code changes to an image, things would be out of hand. For example, if the runtime's object format has to change, one would have to write a tool to read an image, convert each object, and write it out again. Or if new primitives were added, or the major parts of the library needed a reorganization... things would get messy.
+
+Generating a new image from source is called 'bootstrapping'. Bootstrapping is the topic of the remainder of this document.
+
+Some terminology: the current running Factor image, the one generating the bootstrap image, is a 'host' image; the bootstrap image being generated is a 'target' image.
+
+* General overview of the bootstrap process
+
+While Factor cannot be built entirely from source, bootstrapping allows one to use an existing Factor implementation, that is up to date with respect to the sources one is bootstrapping from, to build a new image in a reasonably clean and controlled manner.
+
+Bootstrapping proceeds in two stages:
+
+- In first stage, the make-image word is used to generate a stage 1 image. The make-image word is defined in /library/bootstrap, and is called like so:
+
+  "foo.image" make-image
+
+Unlike save-image, make-image actually writes out each object 'manually', without dumping memory; this allows the object format to be changed, by modifying /library/bootstrap/image.factor.
+
+- In the second stage, one runs the Factor interpreter, passing the stage 1 image on the command line. The stage 1 image then proceeds to load remaining source files from disk, finally producing a completed image, that can in turn make new images, etc.
+
+Now, lets look at each stage in detail.
+
+* Stage 1 bootstrap
+
+The first stage is by far the most interesting.
+
+Take a careful look at the words for searching vocabularies in /library/vocabularies.factor.
+
+They all access the vocabulary hash by accessing the 'vocabulary' variable in the current namespace; so if one calls these words in a dynamic scope where this variable is set to something other than the global vocabulary hash, interesting things can happen.
+
+(Note there is little risk of accidental capture here; you can name a variable 'vocabularies', and it won't clash unless you actually define it as a symbol in the 'words' vocabulary, which you won't do.)
+
+** Setting up the target environment
+
+After initializing some internal objects, make-image runs the file /library/bootstrap/boot.factor. Bootstrapping is performed in new dynamic scope, so that vocabularies can be overriden.
+
+The first file run by bootstrapping is /library/bootstrap/primitives.factor.
+
+This file sets up an initially empty target image vocabulary hash; then, it copies 'syntax' and 'generic' vocabularies from the host vocabulary hash to the target vocabulary hash. Then, it adds new words, one for each primitive, to the target vocabulary hash.
+
+Files are run after being fully parsed; since the host vocabulary hash is in scope when primitives.factor is parsed, primitives.factor can still make use of host words. However, after primitives.factor is run, the bootstrap vocabulary is very bare; containing syntax parsing and primitives only.
+
+** Bootstrapping the core library
+
+Bootstrapping then continues, and loads various source files into the target vocabulary hash. Each file loaded must only refer to primitive words, and words loaded from previous files. So by reading through each file referenced by boot.factor, you can see the entire construction of the core of Factor, from the bottom up!
+
+After most files being loaded, there is still a problem; the 'syntax' and 'generic' vocabularies in the target image were copied from the host image, and not loaded from source. The generic vocabulary is overwritten near the end of bootstrap, by loading in the relevant source files.
+
+(The reason 'generic' words have to be copied first, and not loaded in order, is that the parsing words in this vocabulary are used to define dispatch classes. This will be documented separately.)
+
+** Bootstrapping syntax parsing words
+
+So much for 'generic'. Bootstrapping the syntax words is a slightly tougher problem. Since the syntax vocabulary parses source files itself, a delicate trick must be performed.
+
+Take a look at the start of /library/syntax/parse-syntax.factor:
+
+IN: !syntax
+USE: syntax
+
+This file defines parsing words such as [ ] : ; and so on. As you can see, the file itself is parsed using the host image 'syntax' vocabulary, but the new parsing words are defined in a '!syntax' vocabulary.
+
+After loading parse-syntax.factor, boot.factor then flips the two vocabularies, and renames each word in '!syntax':
+
+vocabularies get [
+    "!syntax" get "syntax" set
+
+    "syntax" get [
+        cdr dup word? [
+            "syntax" "vocabulary" set-word-property
+        ] [
+            drop
+        ] ifte
+    ] hash-each
+] bind
+
+"!syntax" vocabularies get remove-hash
+
+The reason parse-syntax.factor can't do IN: syntax is that because about half way through parsing it, its own words would start executing. But we can *never* execute target image words in the host image -- for example, the target image might have a different set of primitives, different runtime layout, and so on.
+
+* Saving the stage 1 image
+
+Once /library/bootstrap/boot.factor completes executing, make-image resumes, and it now has a nice, shiny new vocabularies hash ready to save to a target image. It then outputs this hash to a file, along with various auxilliary objects, using the precise object format required by the runtime.
+
+It also outputs a 'boot quotation'. The boot quotation is executed by the interpreter as soon as the target image is loaded, and leads us to stage 2; but first, a little hack.
+
+** The transfer hack
+
+Some parsing words generate code in the target image vocabulary. However, since the host image parsing words are actually executing during bootstrap, the generated code refers to host image words. The bootstrapping code performs a 'transfer' where each host image word that is referred to in the target image is replaced with the identically-named target image word.
+
+* On to stage 2
+
+The boot quotation left behind from stage 1 simply runs the /library/bootstrap/boot-stage2.factor file.
+
+This file begins by reloading each source file loaded in stage 1. This is for convinience; after changing some core library files, it is faster for the developer to just redo stage 2, and get an up to date image, instead of doing the whole stage 1 process again.
+
+After stage 1 has been redone, stage 2 proceeds to load more library files. Basically, stage 1 only has barely enough to begin parsing source files from disk; stage 2 loads everything else, like development tools, the compiler, HTTP server. etc.
+
+Stage 2 finishes by running /library/bootstrap/init-stage2.factor, which infers stack effects and performs various cleanup tasks. Then, it uses the 'save-image' word to save a memory dump, which becomes a shiny new 'factor.image', ready for hacking, and ready for bootstrapping more new images!

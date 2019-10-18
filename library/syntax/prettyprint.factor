@@ -27,7 +27,6 @@
 
 IN: prettyprint
 USE: errors
-USE: format
 USE: generic
 USE: kernel
 USE: lists
@@ -41,6 +40,8 @@ USE: vectors
 USE: words
 USE: hashtables
 
+SYMBOL: prettyprint-limit
+
 GENERIC: prettyprint* ( indent obj -- indent )
 
 M: object prettyprint* ( indent obj -- indent )
@@ -50,31 +51,24 @@ M: object prettyprint* ( indent obj -- indent )
     #! Change this to suit your tastes.
     4 ;
 
-: prettyprint-limit ( -- limit )
-    #! Avoid infinite loops -- maximum indent, 10 levels.
-    "prettyprint-limit" get [ 40 ] unless* ;
-
-: prettyprint-indent ( indent -- )
+: indent ( indent -- )
     #! Print the given number of spaces.
     " " fill write ;
 
 : prettyprint-newline ( indent -- )
-    "\n" write prettyprint-indent ;
-
-: prettyprint-space ( -- )
-    " " write ;
+    "\n" write indent ;
 
 : prettyprint-element ( indent obj -- indent )
-    over prettyprint-limit >= [
+    over prettyprint-limit get >= [
         unparse write
     ] [
         prettyprint*
-    ] ifte prettyprint-space ;
+    ] ifte " " write ;
 
 : <prettyprint ( indent -- indent )
     tab-size +
     "prettyprint-single-line" get [
-        prettyprint-space
+        " " write
     ] [
         dup prettyprint-newline
     ] ifte ;
@@ -87,29 +81,26 @@ M: object prettyprint* ( indent obj -- indent )
 
 : word-link ( word -- link )
     [
-        "vocabularies'" ,
-        dup word-vocabulary ,
-        "'" ,
-        word-name ,
+        dup word-name unparse ,
+        " [ " ,
+        word-vocabulary unparse ,
+        " ] search" ,
     ] make-string ;
 
-: word-actions ( -- list )
+: word-actions ( search -- list )
     [
-        [ "Describe" | "describe-path"  ]
-        [ "Push"     | "lookup"         ]
-        [ "Execute"  | "lookup execute" ]
-        [ "jEdit"    | "lookup jedit"   ]
-        [ "Usages"   | "lookup usages." ]
+        [ "See"     | "see"     ]
+        [ "Push"    | ""        ]
+        [ "Execute" | "execute" ]
+        [ "jEdit"   | "jedit"   ]
+        [ "Usages"  | "usages." ]
     ] ;
 
 : word-attrs ( word -- attrs )
     #! Words without a vocabulary do not get a link or an action
     #! popup.
     dup word-vocabulary [
-        word-link [ "object-link" swons ] keep
-        word-actions <actions> "actions" swons
-        t "underline" swons
-        3list
+        word-link word-actions <actions> "actions" swons unit
     ] [
         drop [ ]
     ] ifte ;
@@ -134,7 +125,7 @@ M: word prettyprint* ( indent word -- indent )
         ] [
             [
                 \ | prettyprint*
-                prettyprint-space prettyprint-element
+                " " write prettyprint-element
             ] when*
         ] ifte
     ] when* ;
@@ -156,7 +147,7 @@ M: vector prettyprint* ( indent vector -- indent )
     dup vector-length 0 = [
         drop
         \ { prettyprint*
-        prettyprint-space
+        " " write
         \ } prettyprint*
     ] [
         swap prettyprint-{ swap prettyprint-vector prettyprint-}
@@ -172,7 +163,7 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
     hash>alist dup length 0 = [
         drop
         \ {{ prettyprint*
-        prettyprint-space 
+        " " write 
         \ }} prettyprint*
     ] [
         swap prettyprint-{{ swap prettyprint-list prettyprint-}}
@@ -190,7 +181,7 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 : . ( obj -- )
     [
         "prettyprint-single-line" on
-        tab-size 4 * "prettyprint-limit" set
+        16 prettyprint-limit set
         prettyprint
     ] with-scope ;
 
@@ -211,3 +202,5 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 : .b >bin print ;
 : .o >oct print ;
 : .h >hex print ;
+
+global [ 40 prettyprint-limit set ] bind

@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: kernel
-USE: vectors
 
 : 2drop ( x x -- ) drop drop ; inline
 : 3drop ( x x x -- ) drop drop drop ; inline
@@ -44,7 +43,3 @@ USE: vectors
     #! this from a word definition will clobber any values left
     #! on the data stack by the caller.
     { } set-datastack ;
-
-: depth ( -- n )
-    #! Push the number of elements on the datastack.
-    datastack vector-length ;

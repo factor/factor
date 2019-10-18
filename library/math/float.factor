@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,36 +25,19 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: math
+IN: math-internals
+USE: generic
 USE: kernel
+USE: math
 
-: integer? dup fixnum? swap bignum? or ;
-: rational? dup integer? swap ratio? or ;
-: real? dup number? swap complex? not and ;
+M: float number= float= ;
+M: float < float< ;
+M: float <= float<= ;
+M: float > float> ;
+M: float >= float>= ;
 
-: max ( x y -- z )
-    2dup > [ drop ] [ nip ] ifte ;
-
-: min ( x y -- z )
-    2dup < [ drop ] [ nip ] ifte ;
-
-: between? ( x min max -- ? )
-    #! Push if min <= x <= max. Handles case where min > max
-    #! by swapping them.
-    2dup > [ swap ] when  >r dupd max r> min = ;
-
-: sq dup * ; inline
-
-: pred 1 - ; inline
-: succ 1 + ; inline
-
-: neg 0 swap - ; inline
-: recip 1 swap / ; inline
-
-: rem ( x y -- x%y )
-    #! Like modulus, but always gives a positive result.
-    [ mod ] keep  over 0 < [ + ] [ drop ] ifte ;
-
-: sgn ( n -- -1/0/1 )
-    #! Push the sign of a real number.
-    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ;
+M: float + float+ ;
+M: float - float- ;
+M: float * float* ;
+M: float / float/f ;
+M: float /f float/f ;

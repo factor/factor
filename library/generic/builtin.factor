@@ -39,31 +39,48 @@ USE: vectors
 ! Builtin metaclass for builtin types: fixnum, word, cons, etc.
 SYMBOL: builtin
 
-: builtin-method ( type generic definition -- )
-    -rot "vtable" word-property add-method ;
-
-builtin [ builtin-method ] "define-method" set-word-property
-
 builtin [
     "builtin-type" word-property unit
 ] "builtin-supertypes" set-word-property
 
-: builtin-predicate ( type# symbol -- word )
-    predicate-word [
-        swap [ swap type eq? ] cons define-compound
-    ] keep ;
+builtin [
+    ( generic vtable definition class -- )
+    rot set-vtable drop
+] "add-method" set-word-property
 
-: builtin-class ( number type -- )
-    dup undefined? [ dup define-symbol ] when
+builtin 50 "priority" set-word-property
+
+! All builtin types are equivalent in ordering
+builtin [ 2drop t ] "class<" set-word-property
+
+: builtin-predicate ( type# symbol -- )
+    over f type = [
+        nip [ not ] "predicate" set-word-property
+    ] [
+        over t type = [
+            nip [ ] "predicate" set-word-property
+        ] [
+            dup predicate-word
+            [ rot [ swap type eq? ] cons define-compound ] keep
+            unit "predicate" set-word-property
+        ] ifte
+    ] ifte ;
+
+: builtin-class ( type# symbol -- )
+    dup intern-symbol
     2dup builtin-predicate
-    dupd "predicate" set-word-property
-    dup builtin "metaclass" set-word-property
-    swap "builtin-type" set-word-property ;
+    [ swap "builtin-type" set-word-property ] keep
+    builtin define-class ;
 
 : BUILTIN:
     #! Followed by type name and type number. Define a built-in
     #! type predicate with this number.
     CREATE scan-word swap builtin-class ; parsing
 
-: builtin-type ( symbol -- n )
-    "builtin-type" word-property ;
+: builtin-type ( n -- symbol )
+    unit classes get hash ;
+
+: class ( obj -- class )
+    #! Analogous to the type primitive. Pushes the builtin
+    #! class of an object.
+    type builtin-type ;

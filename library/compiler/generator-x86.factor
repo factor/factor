@@ -31,39 +31,72 @@ USE: inference
 USE: kernel
 USE: namespaces
 USE: words
+USE: lists
+USE: math
 
-: DS ( -- address ) "ds" dlsym-self ;
+: DS ( -- address ) "ds" f dlsym ;
+
+: absolute-ds ( -- )
+    #! Add an entry to the relocation table for the 32-bit
+    #! immediate just compiled.
+    "ds" f f rel-dlsym ;
+
+: PEEK-DS ( -- )
+    #! Peek datastack to EAX.
+    DS ECX [I]>R  absolute-ds
+    ECX EAX [R]>R ;
 
 : POP-DS ( -- )
     #! Pop datastack to EAX.
-    DS ECX [I]>R
-    ECX EAX [R]>R
+    PEEK-DS
     4 ECX R-I
-    ECX DS R>[I] ;
+    ECX DS R>[I]  absolute-ds ;
 
 #push-immediate [
-    DS ECX [I]>R
+    DS ECX [I]>R  absolute-ds
     4 ECX R+I
     address  ECX I>[R]
-    ECX DS R>[I]
+    ECX DS R>[I]  absolute-ds
 ] "generator" set-word-property
 
 #push-indirect [
-    DS ECX [I]>R
+    DS ECX [I]>R  absolute-ds
     4 ECX R+I
-    intern-literal EAX [I]>R
+    intern-literal EAX [I]>R  rel-address
     EAX ECX R>[R]
-    ECX DS R>[I]
+    ECX DS R>[I]  absolute-ds
+] "generator" set-word-property
+
+#replace-immediate [
+    DS ECX [I]>R  absolute-ds
+    address  ECX I>[R]
+    ECX DS R>[I]  absolute-ds
+] "generator" set-word-property
+
+#replace-indirect [
+    DS ECX [I]>R  absolute-ds
+    intern-literal EAX [I]>R  rel-address
+    EAX ECX R>[R]
+    ECX DS R>[I]  absolute-ds
+] "generator" set-word-property
+
+#slot [
+    PEEK-DS
+    2unlist type-tag >r cell * r> - EAX EAX D[R]>R
+    DS ECX [I]>R  absolute-ds
+    EAX ECX R>[R]
 ] "generator" set-word-property
 
 #call [
-    dup postpone-word
+    dup dup postpone-word
     CALL compiled-offset defer-xt
+    t rel-word
 ] "generator" set-word-property
 
 #jump [
-    dup postpone-word
+    dup dup postpone-word
     JUMP compiled-offset defer-xt
+    t rel-word
 ] "generator" set-word-property
 
 #call-label [
@@ -83,7 +116,7 @@ USE: words
 ] "generator" set-word-property
 
 #return-to [
-    PUSH-I/PARTIAL 0 defer-xt
+    PUSH-I/PARTIAL 0 defer-xt rel-address
 ] "generator" set-word-property
 
 #return [ drop RET ] "generator" set-word-property
@@ -94,31 +127,49 @@ USE: words
     #! The jump table must immediately follow this macro.
     drop
     POP-DS
-    1 EAX R>>I ( -- fixup )
-    EAX+/PARTIAL
+    1 EAX R>>I
+    EAX+/PARTIAL ( -- fixup ) rel-address
     EAX JUMP-[R]
-    cell compile-aligned
+    compile-aligned
     compiled-offset swap set-compiled-cell ( fixup -- )
 ] "generator" set-word-property
 
 #target [
     #! Jump table entries are absolute addresses.
-    compiled-offset 0 compile-cell 0 defer-xt
+    compiled-offset 0 compile-cell 0 defer-xt rel-address
 ] "generator" set-word-property
 
-#c-call [ CALL JUMP-FIXUP ] "generator" set-word-property
+#c-call [
+    uncons load-dll 2dup dlsym CALL JUMP-FIXUP t rel-dlsym
+] "generator" set-word-property
 
 #unbox [
-    CALL JUMP-FIXUP
+    dup f dlsym CALL JUMP-FIXUP f t rel-dlsym
     EAX PUSH-R
 ] "generator" set-word-property
 
 #box [
     EAX PUSH-R
-    CALL JUMP-FIXUP
+    dup f dlsym CALL JUMP-FIXUP f t rel-dlsym
     4 ESP R+I
 ] "generator" set-word-property
 
 #cleanup [
     dup 0 = [ drop ] [ ESP R+I ] ifte
 ] "generator" set-word-property
+
+[
+    [ #drop drop ]
+    [ #dup  dup  ]
+    [ #swap swap ]
+    [ #over over ]
+    [ #pick pick ]
+    [ #>r   >r   ]
+    [ #r>   r>   ]
+] [
+    uncons
+    [
+        car dup CALL compiled-offset defer-xt t rel-word drop
+    ] cons
+    "generator" set-word-property
+] each

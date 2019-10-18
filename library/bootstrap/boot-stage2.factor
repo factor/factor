@@ -30,28 +30,36 @@ USE: kernel
 USE: lists
 USE: parser
 USE: stdio
+USE: words
+USE: namespaces
 
 "Cold boot in progress..." print
+
+! vocabularies get [
+!     "generic" off
+! ] bind
 
 [
     "/library/generic/generic.factor"
     "/library/generic/object.factor"
     "/library/generic/builtin.factor"
     "/library/generic/predicate.factor"
+    "/library/generic/union.factor"
     "/library/generic/traits.factor"
 
     "/version.factor"
     "/library/stack.factor"
     "/library/combinators.factor"
     "/library/kernel.factor"
-    "/library/logic.factor"
     "/library/cons.factor"
     "/library/assoc.factor"
-    "/library/math/generic.factor"
-    "/library/words.factor"
-    "/library/math/arithmetic.factor"
-    "/library/math/math-combinators.factor"
     "/library/math/math.factor"
+    "/library/math/integer.factor"
+    "/library/math/ratio.factor"
+    "/library/math/float.factor"
+    "/library/math/complex.factor"
+    "/library/words.factor"
+    "/library/math/math-combinators.factor"
     "/library/lists.factor"
     "/library/vectors.factor"
     "/library/strings.factor"
@@ -70,10 +78,7 @@ USE: stdio
     "/library/syntax/parse-numbers.factor"
     "/library/syntax/parser.factor"
     "/library/syntax/parse-stream.factor"
-    "/library/bootstrap/init.factor"
-!    "/library/syntax/parse-syntax.factor"
 
-    "/library/format.factor"
     "/library/syntax/unparser.factor"
     "/library/io/presentation.factor"
     "/library/io/vocabulary-style.factor"
@@ -94,7 +99,6 @@ USE: stdio
     "/library/io/files.factor"
     "/library/eval-catch.factor"
     "/library/tools/listener.factor"
-    "/library/tools/inspector.factor"
     "/library/tools/word-tools.factor"
     "/library/test/test.factor"
     "/library/io/ansi.factor"
@@ -110,9 +114,10 @@ USE: stdio
 
     "/library/inference/dataflow.factor"
     "/library/inference/inference.factor"
-    "/library/inference/words.factor"
     "/library/inference/branches.factor"
+    "/library/inference/words.factor"
     "/library/inference/stack.factor"
+    "/library/inference/types.factor"
 
     "/library/compiler/assembler.factor"
     "/library/compiler/xt.factor"
@@ -129,8 +134,10 @@ USE: stdio
     "/library/sdl/sdl-event.factor"
     "/library/sdl/sdl-gfx.factor"
     "/library/sdl/sdl-keysym.factor"
+    "/library/sdl/sdl-keyboard.factor"
     "/library/sdl/sdl-utils.factor"
     "/library/sdl/hsv.factor"
+    "/library/sdl/console.factor"
 
     "/library/bootstrap/image.factor"
 
@@ -141,7 +148,6 @@ USE: stdio
     "/library/httpd/responder.factor"
     "/library/httpd/httpd.factor"
     "/library/httpd/file-responder.factor"
-    "/library/httpd/inspect-responder.factor"
     "/library/httpd/test-responder.factor"
     "/library/httpd/quit-responder.factor"
     "/library/httpd/resource-responder.factor"
@@ -154,6 +160,22 @@ USE: stdio
     dup print
     run-resource
 ] each
+
+os "win32" = [
+    [
+        "/library/io/buffer.factor"
+        "/library/win32/win32-io.factor"
+        "/library/win32/win32-errors.factor"
+        "/library/win32/winsock.factor"
+        "/library/io/win32-io-internals.factor"
+        "/library/io/win32-stream.factor"
+        "/library/io/win32-server.factor"
+        "/library/io/win32-console.factor"
+    ] [
+        dup print
+        run-resource
+    ] each
+] when
 
 cpu "x86" = [
     [

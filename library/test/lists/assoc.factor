@@ -45,3 +45,6 @@ USE: test
 [ [ [ "one" + ] [ "four" * ] ] ] [
     "three" "quot-alist" get remove-assoc
 ] unit-test
+
+[ [ "one" "three" "four" ] [ [ + ] [ - ] [ * ] ] ]
+[ "quot-alist" get unzip ] unit-test

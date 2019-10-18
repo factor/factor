@@ -31,6 +31,7 @@ USE: kernel
 USE: namespaces
 USE: strings
 USE: generic
+USE: lists
 
 GENERIC: fflush      ( stream -- )
 GENERIC: fauto-flush ( stream -- )
@@ -39,14 +40,17 @@ GENERIC: fread#      ( count stream -- string )
 GENERIC: fwrite-attr ( string style stream -- )
 GENERIC: fclose      ( stream -- )
 
-: fread1 ( stream -- string )
-    1 swap fread# dup f-or-"" [ 0 swap str-nth ] unless ;
+: fread1 ( stream -- char/f )
+    1 swap fread#
+    dup f-or-"" [ drop f ] [ 0 swap str-nth ] ifte ;
 
 : fwrite ( string stream -- )
     f swap fwrite-attr ;
 
 : fprint ( string stream -- )
-    tuck fwrite "\n" over fwrite fauto-flush ;
+    [ fwrite ] keep
+    [ "\n" swap fwrite ] keep
+    fauto-flush ;
 
 TRAITS: string-output-stream
 
@@ -70,3 +74,24 @@ M: string-output-stream fauto-flush ( stream -- )
 C: string-output-stream ( size -- stream )
     #! Creates a new stream for writing to a string buffer.
     [ <sbuf> "buf" set ] extend ;
+
+! Prefix stream prefixes each line with a given string.
+TRAITS: prefix-stream
+SYMBOL: prefix
+SYMBOL: last-newline
+
+M: prefix-stream fwrite-attr ( string style stream -- )
+    [
+        last-newline get [
+            prefix get delegate get fwrite last-newline off
+        ] when
+
+        dupd delegate get fwrite-attr
+
+        "\n" str-tail? [
+            last-newline on
+        ] when
+    ] bind ;
+
+C: prefix-stream ( prefix stream -- stream )
+    [ last-newline on delegate set prefix set ] extend ;

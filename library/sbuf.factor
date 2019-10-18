@@ -48,6 +48,13 @@ USE: strings
     #! repeated.
     [ swap [ dup , ] times drop ] make-string ;
 
+: pad ( string count char -- string )
+    >r over str-length - dup 0 <= [
+        r> 2drop
+    ] [
+        r> fill swap cat2
+    ] ifte ;
+
 : str-map ( str code -- str )
     #! Apply a quotation to each character in the string, and
     #! push a new string constructed from return values.

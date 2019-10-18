@@ -86,7 +86,7 @@
 ! etc.
 IN: cont-responder
 USE: namespaces
-USE: stack
+USE: kernel
 USE: combinators
 USE: stdio
 

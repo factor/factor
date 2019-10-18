@@ -40,14 +40,12 @@ import sidekick.*;
 
 public class FactorSideKickParser extends SideKickParser
 {
-	private Map previewMap;
-
 	/**
-	 * When we parse a file, we store the <word,worddef> pairs in this
-	 * map, so that completion popups show the latest stack effects,
-	 * and not whatever they were the last time the source was run-file'd.
+	 * We store the file's parse tree in this property.
 	 */
-	private Map worddefs;
+	public static String WORDS_PROPERTY = "factor-parsed";
+
+	private Map previewMap;
 
 	//{{{ FactorSideKickParser constructor
 	public FactorSideKickParser()
@@ -100,6 +98,10 @@ public class FactorSideKickParser extends SideKickParser
 	public SideKickParsedData parse(Buffer buffer,
 		DefaultErrorSource errorSource)
 	{
+		Object words = buffer.getProperty(WORDS_PROPERTY);
+		if(words instanceof Cons)
+			forgetWords((Cons)words);
+
 		FactorParsedData d = new FactorParsedData(
 			this,buffer.getPath());
 
@@ -116,6 +118,8 @@ public class FactorSideKickParser extends SideKickParser
 			buffer.readUnlock();
 		}
 
+		FactorReader r = null;
+
 		try
 		{
 			/* of course wrapping a string reader in a buffered
@@ -124,14 +128,13 @@ public class FactorSideKickParser extends SideKickParser
 				buffer.getPath(),
 				new BufferedReader(new StringReader(text)),
 				errorSource);
-			FactorReader r = new FactorReader(scanner,
-				false,FactorPlugin.getExternalInstance());
-	
+			r = new FactorReader(scanner,false,FactorPlugin.getExternalInstance());
+
 			Cons parsed = r.parse();
-	
+
 			d.in = r.getIn();
 			d.use = r.getUse();
-	
+
 			addWordDefNodes(d,parsed,buffer);
 		}
 		catch(FactorParseException pe)
@@ -148,12 +151,28 @@ public class FactorSideKickParser extends SideKickParser
 			Log.log(Log.DEBUG,this,e);
 		}
 
+		if(r != null)
+			buffer.setProperty(WORDS_PROPERTY,r.getDefinedWords());
+
 		return d;
 	} //}}}
 
+	//{{{ forgetWords() method
+	private void forgetWords(Cons words)
+	{
+		while(words != null)
+		{
+			FactorWord word = (FactorWord)words.car;
+			// We're not allowed to forget parsing words.
+			if(word.parsing != null)
+				return;
+			FactorPlugin.getExternalInstance().forget(word);
+			words = words.next();
+		}
+	} //}}}
+
 	//{{{ addWordDefNodes() method
-	private void addWordDefNodes(SideKickParsedData d, Cons parsed,
-		Buffer buffer)
+	private void addWordDefNodes(FactorParsedData d, Cons parsed, Buffer buffer)
 	{
 		FactorAsset last = null;
 
@@ -168,19 +187,17 @@ public class FactorSideKickParser extends SideKickParser
 				FactorWord word = def.word;
 
 				/* word lines are indexed from 1 */
-				int startLine = Math.min(
+				int startLine = Math.max(0,Math.min(
 					buffer.getLineCount() - 1,
-					word.line - 1);
-				int startLineLength = buffer.getLineLength(
-					startLine);
-				int startCol = Math.min(word.col,
-					startLineLength);
+					word.line - 1));
+				int startLineLength = buffer.getLineLength(startLine);
+				int startCol = Math.min(word.col,startLineLength);
 
 				int start = buffer.getLineStartOffset(startLine)
 					+ startCol;
 
 				if(last != null)
-					last.end = buffer.createPosition(start - 1);
+					last.end = buffer.createPosition(Math.max(0,start - 1));
 
 				last = new FactorAsset(word,buffer.createPosition(start));
 				d.root.add(new DefaultMutableTreeNode(last));
@@ -275,8 +292,7 @@ public class FactorSideKickParser extends SideKickParser
 			return null;
 
 		FactorWord[] completions = FactorPlugin.toWordArray(
-			FactorPlugin.getCompletions(
-			data.use,word,false));
+			FactorPlugin.getCompletions(word,false));
 
 		if(completions.length == 0)
 			return null;

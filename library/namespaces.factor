@@ -28,8 +28,8 @@
 IN: namespaces
 USE: hashtables
 USE: kernel
+USE: kernel-internals
 USE: lists
-USE: strings
 USE: vectors
 
 ! Other languages have classes, objects, variables, etc.
@@ -51,8 +51,8 @@ USE: vectors
 ! bind ( namespace quot -- ) executes a quotation with a
 ! namespace pushed on the namespace stack.
 
-: namestack ( -- ns ) 3 getenv ;
-: set-namestack ( ns -- ) 3 setenv ;
+: namestack ( -- ns ) 3 getenv ; inline
+: set-namestack ( ns -- ) 3 setenv ; inline
 
 : namespace ( -- namespace )
     #! Push the current namespace.
@@ -60,7 +60,7 @@ USE: vectors
 
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the namespace stack.
-    namestack cons set-namestack ; inline
+    >vector namestack cons set-namestack ; inline
 
 : n> ( n:namespace -- namespace )
     #! Pop the top of the namespace stack.
@@ -72,11 +72,9 @@ USE: vectors
 : init-namespaces ( -- )
     global >n ;
 
-: namespace-buckets 23 ;
-
 : <namespace> ( -- n )
     #! Create a new namespace.
-    namespace-buckets <hashtable> ;
+    23 <hashtable> ;
 
 : (get) ( var ns -- value )
     #! Internal word for searching the namestack.
@@ -97,6 +95,15 @@ USE: vectors
 
 : set ( value variable -- ) namespace set-hash ;
 : put ( variable value -- ) swap set ;
+
+: nest ( variable -- hash )
+    #! If the variable is set in the current namespace, return
+    #! its value, otherwise set its value to a new namespace.
+    dup namespace hash dup [
+        nip
+    ] [
+        drop >r <namespace> dup r> set
+    ] ifte ;
 
 : change ( var quot -- )
     #! Execute the quotation with the variable value on the
@@ -120,32 +127,6 @@ USE: vectors
     #!          ....
     #!      ] extend ;
     over >r bind r> ; inline
-
-: traverse-path ( name object -- object )
-    dup hashtable? [ hash ] [ 2drop f ] ifte ;
-
-: (object-path) ( object list -- object )
-    [ uncons >r swap traverse-path r> (object-path) ] when* ;
-
-: object-path ( list -- object )
-    #! An object path is a list of strings. Each string is a
-    #! variable name in the object namespace at that level.
-    #! Returns f if any of the objects are not set.
-    namespace swap (object-path) ;
-
-: (set-object-path) ( name -- namespace )
-    dup namespace hash dup [
-        nip
-    ] [
-        drop <namespace> tuck put
-    ] ifte ;
-
-: set-object-path ( value list -- )
-    unswons over [
-        (set-object-path) [ set-object-path ] bind
-    ] [
-        nip set
-    ] ifte ;
 
 : on ( var -- ) t put ;
 : off ( var -- ) f put ;

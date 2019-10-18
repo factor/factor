@@ -33,14 +33,14 @@ USE: kernel
     #!
     #! In order to compile, the code must produce as many values
     #! as it consumes.
-    tuck >r dup 0 <= [ r> 3drop ] [ pred slip r> times ] ifte ;
+    tuck >r dup 0 <= [ r> 3drop ] [ 1 - slip r> times ] ifte ;
     inline
 
 : (times) ( limit n quot -- )
     pick pick <= [
         3drop
     ] [
-        rot pick succ pick 3slip (times)
+        rot pick 1 + pick 3slip (times)
     ] ifte ; inline
 
 : times* ( n quot -- )
@@ -51,26 +51,41 @@ USE: kernel
     #! than it produces.
     0 swap (times) ; inline
 
+: fac ( n -- n! )
+    1 swap [ 1 + * ] times* ;
+
 : 2times-succ ( #{ a b } #{ c d } -- z )
     #! Lexicographically add #{ 0 1 } to a complex number.
     #! If d + 1 == b, return #{ c+1 0 }. Otherwise, #{ c d+1 }.
-    2dup imaginary succ swap imaginary = [
-        nip real succ
+    2dup imaginary 1 + swap imaginary = [
+        nip real 1 +
     ] [
-        nip >rect succ rect>
-    ] ifte ;
+        nip >rect 1 + rect>
+    ] ifte ; inline
 
 : 2times<= ( #{ a b } #{ c d } -- ? )
-    swap real swap real <= ;
+    swap real swap real <= ; inline
 
 : (2times) ( limit n quot -- )
     pick pick 2times<= [
         3drop
     ] [
         rot pick dupd 2times-succ pick 3slip (2times)
-    ] ifte ;
+    ] ifte ; inline
 
 : 2times* ( #{ w h } quot -- )
     #! Apply a quotation to each pair of complex numbers
     #! #{ a b } such that a < w, b < h.
-    0 swap (2times) ;
+    0 swap (2times) ; inline
+
+: (repeat) ( i n quot -- )
+    pick pick >= [
+        3drop
+    ] [
+        [ swap >r call 1 + r> ] keep (repeat)
+    ] ifte ;
+
+: repeat ( n quot -- )
+    #! Execute a quotation n times. The loop counter is kept on
+    #! the stack, and ranges from 0 to n-1.
+    0 -rot (repeat) ;

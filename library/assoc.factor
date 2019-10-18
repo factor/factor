@@ -70,9 +70,26 @@ USE: kernel
     #! corresponding quotation, the value is popped off the
     #! stack.
     swap [
-        over >r unswons rot assoc* dup [
+        unswons rot assoc* dup [
             cdr call
         ] [
             2drop
-        ] ifte r>
-    ] each drop ;
+        ] ifte
+    ] each-with ;
+
+: 2cons ( car1 car2 cdr1 cdr2 -- cons1 cons2 )
+    rot swons >r cons r> ;
+
+: zip ( list list -- list )
+    #! Make a new list containing pairs of corresponding
+    #! elements from the two given lists.
+    dup [
+        2uncons zip >r cons r> cons
+    ] [
+        2drop [ ]
+    ] ifte ;
+
+: unzip ( assoc -- keys values )
+    #! Split an association list into two lists of keys and
+    #! values.
+    [ uncons >r uncons r> unzip 2cons ] [ [ ] [ ] ] ifte* ;

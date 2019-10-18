@@ -53,7 +53,7 @@ USE: words
     scan str>number ; parsing
 
 : ENUM:
-    dup CREATE swap unit define-compound succ ; parsing
+    dup CREATE swap unit define-compound 1 + ; parsing
 
 : END-ENUM
     drop ; parsing
@@ -75,12 +75,15 @@ USE: words
         dup "c-types" get hash dup [
             nip
         ] [
-            drop "No such C type: " swap cat2 throw
+            drop "No such C type: " swap cat2 throw f
         ] ifte
     ] bind ;
 
+: size ( name -- size )
+    c-type [ "width" get ] bind ;
+
 : define-c-type ( quot name -- )
-    c-types [ >r <c-type> swap extend r> set ] bind ;
+    c-types [ >r <c-type> swap extend r> set ] bind ; inline
 
 : define-getter ( offset type name -- )
     #! Define a word with stack effect ( alien -- obj ) in the

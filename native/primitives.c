@@ -1,6 +1,6 @@
 #include "factor.h"
 
-XT primitives[] = {
+void* primitives[] = {
 	undefined,
 	docol,
 	dosym,
@@ -8,18 +8,12 @@ XT primitives[] = {
 	primitive_call,
 	primitive_ifte,
 	primitive_cons,
-	primitive_car,
-	primitive_cdr,
 	primitive_vector,
-	primitive_vector_length,
-	primitive_set_vector_length,
 	primitive_vector_nth,
 	primitive_set_vector_nth,
-	primitive_string_length,
 	primitive_string_nth,
 	primitive_string_compare,
 	primitive_string_eq,
-	primitive_string_hashcode,
 	primitive_index_of,
 	primitive_substring,
 	primitive_string_reverse,
@@ -35,18 +29,12 @@ XT primitives[] = {
 	primitive_sbuf_eq,
 	primitive_sbuf_hashcode,
 	primitive_arithmetic_type,
-	primitive_numberp,
 	primitive_to_fixnum,
 	primitive_to_bignum,
 	primitive_to_float,
-	primitive_numerator,
-	primitive_denominator,
 	primitive_from_fraction,
 	primitive_str_to_float,
 	primitive_float_to_str,
-	primitive_float_to_bits,
-	primitive_real,
-	primitive_imaginary,
 	primitive_from_rect,
 	primitive_fixnum_eq,
 	primitive_fixnum_add,
@@ -104,21 +92,9 @@ XT primitives[] = {
         primitive_fsinh,
         primitive_fsqrt,
 	primitive_word,
-	primitive_word_hashcode,
-	primitive_word_xt,
-	primitive_set_word_xt,
-	primitive_word_primitive,
-	primitive_set_word_primitive,
-	primitive_word_parameter,
-	primitive_set_word_parameter,
-	primitive_word_plist,
-	primitive_set_word_plist,
+	primitive_update_xt,
 	primitive_call_profiling,
-	primitive_word_call_count,
-	primitive_set_word_call_count,
 	primitive_allot_profiling,
-	primitive_word_allot_count,
-	primitive_set_word_allot_count,
 	primitive_word_compiledp,
 	primitive_drop,
 	primitive_dup,
@@ -164,19 +140,15 @@ XT primitives[] = {
 	primitive_init_random,
 	primitive_random_int,
 	primitive_type,
-	primitive_size,
 	primitive_cwd,
 	primitive_cd,
 	primitive_compiled_offset,
 	primitive_set_compiled_offset,
-	primitive_set_compiled_cell,
-	primitive_set_compiled_byte,
 	primitive_literal_top,
 	primitive_set_literal_top,
 	primitive_address,
 	primitive_dlopen,
 	primitive_dlsym,
-	primitive_dlsym_self,
 	primitive_dlclose,
 	primitive_alien,
 	primitive_local_alien,
@@ -189,13 +161,26 @@ XT primitives[] = {
 	primitive_alien_1,
 	primitive_set_alien_1,
 	primitive_heap_stats,
-	primitive_throw
+	primitive_throw,
+	primitive_string_to_memory,
+	primitive_memory_to_string,
+	primitive_local_alienp,
+	primitive_alien_address,
+	primitive_to_cons,
+	primitive_to_vector,
+	primitive_to_string,
+	primitive_to_word,
+	primitive_slot,
+	primitive_set_slot,
+	primitive_integer_slot,
+	primitive_set_integer_slot,
+	primitive_grow_array
 };
 
 CELL primitive_to_xt(CELL primitive)
 {
 	if(primitive < 0 || primitive >= PRIMITIVE_COUNT)
-		general_error(ERROR_BAD_PRIMITIVE,tag_fixnum(primitive));
-
-	return (CELL)primitives[primitive];
+		return (CELL)undefined;
+	else
+		return (CELL)primitives[primitive];
 }

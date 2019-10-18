@@ -1,9 +1,7 @@
-typedef void (*XT)(void);
-
 typedef struct {
 	/* TAGGED header */
 	CELL header;
-	/* untagged hashcode */
+	/* TAGGED hashcode */
 	CELL hashcode;
 	/* untagged execution token: jump here to execute word */
 	CELL xt;
@@ -19,10 +17,17 @@ typedef struct {
 	CELL allot_count;
 } F_WORD;
 
+typedef void (*XT)(F_WORD* word);
+
+INLINE F_WORD* untag_word_fast(CELL tagged)
+{
+	return (F_WORD*)UNTAG(tagged);
+}
+
 INLINE F_WORD* untag_word(CELL tagged)
 {
 	type_check(WORD_TYPE,tagged);
-	return (F_WORD*)UNTAG(tagged);
+	return untag_word_fast(tagged);
 }
 
 INLINE CELL tag_word(F_WORD* word)
@@ -30,22 +35,10 @@ INLINE CELL tag_word(F_WORD* word)
 	return RETAG(word,WORD_TYPE);
 }
 
-F_WORD* word(CELL primitive, CELL parameter, CELL plist);
 void update_xt(F_WORD* word);
 void primitive_word(void);
-void primitive_word_hashcode(void);
-void primitive_word_primitive(void);
-void primitive_set_word_primitive(void);
-void primitive_word_xt(void);
-void primitive_set_word_xt(void);
-void primitive_word_parameter(void);
-void primitive_set_word_parameter(void);
-void primitive_word_plist(void);
-void primitive_set_word_plist(void);
-void primitive_word_call_count(void);
-void primitive_set_word_call_count(void);
-void primitive_word_allot_count(void);
-void primitive_set_word_allot_count(void);
+void primitive_update_xt(void);
 void primitive_word_compiledp(void);
+void primitive_to_word(void);
 void fixup_word(F_WORD* word);
 void collect_word(F_WORD* word);

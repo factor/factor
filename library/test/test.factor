@@ -55,7 +55,7 @@ USE: unparser
 
 : test ( name -- )
     ! Run the given test.
-    depth pred >r
+    depth 1 - >r
     "Testing " write dup write "..." print
     "/library/test/" swap ".factor" cat3 run-resource
     "Checking before/after depth..." print
@@ -78,13 +78,11 @@ USE: unparser
         "namespaces"
         "generic"
         "files"
-        "format"
         "parser"
         "parse-number"
         "prettyprint"
         "image"
         "init"
-        "inspector"
         "io/io"
         "listener"
         "vectors"
@@ -112,6 +110,7 @@ USE: unparser
         "dataflow"
         "interpreter"
         "hsv"
+        "alien"
     ] [
         test
     ] each

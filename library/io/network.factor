@@ -37,6 +37,7 @@ USE: unparser
 USE: generic
 
 TRAITS: server
+GENERIC: accept
 
 M: server fclose ( stream -- )
     [ "socket" get close-port ] bind ;
@@ -54,6 +55,7 @@ C: server ( port -- stream )
     #! fflush yields until connection is established.
     2dup client-socket <client-stream> dup fflush ;
 
-: accept ( server -- client )
+M: server accept ( server -- client )
     #! Accept a connection from a server socket.
     "socket" swap hash blocking-accept <client-stream> ;
+

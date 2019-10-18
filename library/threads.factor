@@ -28,7 +28,9 @@
 IN: threads
 USE: io-internals
 USE: kernel
+USE: kernel-internals
 USE: lists
+USE: namespaces
 
 ! Core of the multitasker. Used by io-internals.factor and
 ! in-thread.factor.

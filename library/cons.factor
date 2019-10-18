@@ -28,12 +28,16 @@
 IN: lists
 USE: generic
 USE: kernel
+USE: kernel-internals
 
 ! This file contains vital list-related words that everything
 ! else depends on, and is loaded early in bootstrap.
 ! lists.factor has everything else.
 
 BUILTIN: cons 2
+
+: car ( [ car | cdr ] -- car ) >cons 0 slot ; inline
+: cdr ( [ car | cdr ] -- cdr ) >cons 1 slot ; inline
 
 : swons ( cdr car -- [ car | cdr ] )
     #! Push a new cons cell. If the cdr is f or a proper list,
@@ -58,6 +62,9 @@ BUILTIN: cons 2
 : 2cdr ( cons cons -- car car )
     swap cdr swap cdr ;
 
+: 2uncons ( cons1 cons2 -- car1 car2 cdr1 cdr2 )
+    [ 2car ] 2keep 2cdr ;
+
 : last* ( list -- last )
     #! Last cons of a list.
     dup cdr cons? [ cdr last* ] when ;
@@ -66,14 +73,12 @@ BUILTIN: cons 2
     #! Last element of a list.
     last* car ;
 
-: tail ( list -- tail )
-    #! Return the cdr of the last cons cell, or f.
-    dup [ last* cdr ] when ;
+UNION: general-list f cons ;
 
-: list? ( list -- ? )
+PREDICATE: general-list list ( list -- ? )
     #! Proper list test. A proper list is either f, or a cons
     #! cell whose cdr is a proper list.
-    dup cons? [ tail ] when not ;
+    dup [ last* cdr ] when not ;
 
 : all? ( list pred -- ? )
     #! Push if the predicate returns true for each element of
@@ -93,8 +98,17 @@ BUILTIN: cons 2
 
 : each ( list quot -- )
     #! Push each element of a proper list in turn, and apply a
-    #! quotation with effect ( X -- ) to each element.
+    #! quotation with effect ( elt -- ) to each element.
     over [ (each) each ] [ 2drop ] ifte ; inline
+
+: with ( obj quot elt -- obj quot )
+    #! Utility word for each-with, map-with.
+    pick pick >r >r swap call r> r> ;
+
+: each-with ( obj list quot -- )
+    #! Push each element of a proper list in turn, and apply a
+    #! quotation with effect ( obj elt -- ) to each element.
+    swap [ with ] each 2drop ; inline
 
 : subset ( list quot -- list )
     #! Applies a quotation with effect ( X -- ? ) to each

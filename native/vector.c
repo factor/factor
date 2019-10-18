@@ -2,7 +2,10 @@
 
 F_VECTOR* vector(F_FIXNUM capacity)
 {
-	F_VECTOR* vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
+	F_VECTOR* vector;
+	if(capacity < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
+	vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
 	vector->top = 0;
 	vector->array = tag_object(array(capacity,F));
 	return vector;
@@ -14,28 +17,9 @@ void primitive_vector(void)
 	drepl(tag_object(vector(to_fixnum(dpeek()))));
 }
 
-void primitive_vector_length(void)
+void primitive_to_vector(void)
 {
-	drepl(tag_fixnum(untag_vector(dpeek())->top));
-}
-
-void primitive_set_vector_length(void)
-{
-	F_VECTOR* vector;
-	F_FIXNUM length;
-	F_ARRAY* array;
-
-	maybe_garbage_collection();
-
-	vector = untag_vector(dpop());
-	length = to_fixnum(dpop());
-	array = untag_array(vector->array);
-
-	if(length < 0)
-		range_error(tag_object(vector),length,vector->top);
-	vector->top = length;
-	if(length > array->capacity)
-		vector->array = tag_object(grow_array(array,length,F));
+	type_check(VECTOR_TYPE,dpeek());
 }
 
 void primitive_vector_nth(void)
@@ -44,7 +28,7 @@ void primitive_vector_nth(void)
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= vector->top)
-		range_error(tag_object(vector),index,vector->top);
+		range_error(tag_object(vector),0,tag_fixnum(index),vector->top);
 	dpush(array_nth(untag_array(vector->array),index));
 }
 
@@ -71,7 +55,7 @@ void primitive_set_vector_nth(void)
 	value = dpop();
 
 	if(index < 0)
-		range_error(tag_object(vector),index,vector->top);
+		range_error(tag_object(vector),0,tag_fixnum(index),vector->top);
 	else if(index >= vector->top)
 		vector_ensure_capacity(vector,index);
 
@@ -81,7 +65,7 @@ void primitive_set_vector_nth(void)
 
 void fixup_vector(F_VECTOR* vector)
 {
-	fixup(&vector->array);
+	data_fixup(&vector->array);
 }
 
 void collect_vector(F_VECTOR* vector)

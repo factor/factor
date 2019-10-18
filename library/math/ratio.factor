@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,30 +25,44 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel
+IN: math
+USE: generic
+USE: kernel
+USE: kernel-internals
+USE: math
+USE: math-internals
 
-: ? ( cond t f -- t/f )
-    #! Push t if cond is true, otherwise push f.
-    rot [ drop ] [ nip ] ifte ; inline
+GENERIC: numerator ( a/b -- a )
+M: integer numerator ;
+M: ratio numerator 0 slot %integer ;
 
-: and ( a b -- a&b )
-    #! Logical and.
-    f ? ; inline
+GENERIC: denominator ( a/b -- b )
+M: integer denominator drop 1 ;
+M: ratio denominator 1 slot %integer ;
 
-: not ( a -- a )
-    #! Pushes f is the object is not f, t if the object is f.
-    f t ? ; inline
+IN: math-internals
 
-: or ( a b -- a|b) 
-    #! Logical or.
-    t swap ? ; inline
+: 2>fraction ( a/b c/d -- a c b d )
+    [ swap numerator swap numerator ] 2keep
+    swap denominator swap denominator ; inline
 
-: xor ( a b -- a^b )
-    #! Logical exclusive or.
-    dup not swap ? ; inline
+M: ratio number= ( a/b c/d -- ? )
+    2>fraction number= [ number= ] [ 2drop f ] ifte ;
 
-: >boolean t f ? ; inline
+: scale ( a/b c/d -- a*d b*c )
+    2>fraction >r * swap r> * swap ; inline
 
-: replace ( obj old new -- obj/new )
-    #! If obj is equal to old, drop it and push new.
-    >r dupd = [ drop r> ] [ r> drop ] ifte ;
+: ratio+d ( a/b c/d -- b*d )
+    denominator swap denominator * ; inline
+
+M: ratio < scale < ;
+M: ratio <= scale <= ;
+M: ratio > scale > ;
+M: ratio >= scale >= ;
+
+M: ratio + ( x y -- x+y ) 2dup scale + -rot ratio+d integer/ ;
+M: ratio - ( x y -- x-y ) 2dup scale - -rot ratio+d integer/ ;
+M: ratio * ( x y -- x*y ) 2>fraction * >r * r> integer/ ;
+M: ratio / scale integer/ ;
+M: ratio /i scale /i ;
+M: ratio /f scale /f ;

@@ -6,9 +6,13 @@ void clear_environment(void)
 	for(i = 0; i < USER_ENV; i++)
 		userenv[i] = F;
 	profile_depth = 0;
+	executing = F;
 }
 
-#define EXECUTE(w) ((XT)(w->xt))()
+INLINE void execute(F_WORD* word)
+{
+	((XT)(word->xt))(word);
+}
 
 void run(void)
 {
@@ -44,7 +48,7 @@ void run(void)
 		if(callframe == F)
 		{
 			callframe = cpop();
-			cpop();
+			executing = cpop();
 			continue;
 		}
 
@@ -53,10 +57,7 @@ void run(void)
 		callframe = get(callframe + CELLS);
 
 		if(TAG(next) == WORD_TYPE)
-		{
-			executing = (F_WORD*)UNTAG(next);
-			EXECUTE(executing);
-		}
+			execute(untag_word_fast(next));
 		else
 			dpush(next);
 	}
@@ -72,27 +73,27 @@ void run(void)
 }
 
 /* XT of deferred words */
-void undefined()
+void undefined(F_WORD* word)
 {
-	general_error(ERROR_UNDEFINED_WORD,tag_word(executing));
+	general_error(ERROR_UNDEFINED_WORD,tag_word(word));
 }
 
 /* XT of compound definitions */
-void docol(void)
+void docol(F_WORD* word)
 {
-	call(executing->parameter);
+	call(word->parameter);
+	executing = tag_word(word);
 }
 
 /* pushes word parameter */
-void dosym(void)
+void dosym(F_WORD* word)
 {
-	dpush(executing->parameter);
+	dpush(word->parameter);
 }
 
 void primitive_execute(void)
 {
-	executing = untag_word(dpop());
-	EXECUTE(executing);
+	execute(untag_word(dpop()));
 }
 
 void primitive_call(void)
@@ -112,7 +113,7 @@ void primitive_getenv(void)
 {
 	F_FIXNUM e = to_fixnum(dpeek());
 	if(e < 0 || e >= USER_ENV)
-		range_error(F,e,USER_ENV);
+		range_error(F,0,tag_fixnum(e),USER_ENV);
 	drepl(userenv[e]);
 }
 
@@ -121,6 +122,6 @@ void primitive_setenv(void)
 	F_FIXNUM e = to_fixnum(dpop());
 	CELL value = dpop();
 	if(e < 0 || e >= USER_ENV)
-		range_error(F,e,USER_ENV);
+		range_error(F,0,tag_fixnum(e),USER_ENV);
 	userenv[e] = value;
 }

@@ -28,7 +28,6 @@
 IN: unparser
 USE: generic
 USE: kernel
-USE: format
 USE: lists
 USE: math
 USE: namespaces
@@ -37,40 +36,12 @@ USE: stdio
 USE: strings
 USE: words
 
-: type-name ( n -- str )
-    [
-        [ 0 | "fixnum" ]
-        [ 1 | "word" ]
-        [ 2 | "cons" ]
-        [ 3 | "object" ]
-        [ 4 | "ratio" ]
-        [ 5 | "complex" ]
-        [ 6 | "f" ]
-        [ 7 | "t" ]
-        [ 8 | "array" ]
-        [ 9 | "bignum" ]
-        [ 10 | "float" ]
-        [ 11 | "vector" ]
-        [ 12 | "string" ]
-        [ 13 | "sbuf" ]
-        [ 14 | "port" ]
-        [ 15 | "dll" ]
-        [ 16 | "alien" ]
-        ! These values are only used by the kernel for error
-        ! reporting.
-        [ 100 | "fixnum/bignum" ]
-        [ 101 | "fixnum/bignum/ratio" ]
-        [ 102 | "fixnum/bignum/ratio/float" ]
-        [ 103 | "fixnum/bignum/ratio/float/complex" ]
-        [ 104 | "fixnum/string" ]
-    ] assoc ;
-
 GENERIC: unparse ( obj -- str )
 
 M: object unparse ( obj -- str )
     [
         "#<" ,
-        dup type type-name ,
+        dup class unparse ,
         " @ " , 
         address unparse ,
         ">" ,
@@ -80,10 +51,10 @@ M: object unparse ( obj -- str )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
 
 : integer, ( num radix -- )
-    tuck /mod >digit , dup 0 > [
-        swap integer,
+    dup >r /mod >digit , dup 0 > [
+        r> integer,
     ] [
-        2drop
+        r> 2drop
     ] ifte ;
 
 : >base ( num radix -- string )
@@ -142,7 +113,7 @@ M: complex unparse ( num -- str )
     ] assoc ;
 
 : ch>unicode-escape ( ch -- esc )
-    >hex 4 digits "\\u" swap cat2 ;
+    >hex 4 "0" pad "\\u" swap cat2 ;
 
 : unparse-ch ( ch -- ch/str )
     dup quotable? [

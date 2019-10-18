@@ -36,11 +36,11 @@ USE: math-internals
 ! Inverse hyperbolic functions:
 !    acosh asech asinh acosech atanh acoth
 
-: acosh dup sq pred sqrt + log ;
+: acosh dup sq 1 - sqrt + log ;
 : asech recip acosh ;
-: asinh dup sq succ sqrt + log ;
+: asinh dup sq 1 + sqrt + log ;
 : acosech recip asinh ;
-: atanh dup succ swap pred neg / log 2 / ;
+: atanh dup 1 + swap 1 - neg / log 2 / ;
 : acoth recip atanh ;
 : <=1 ( x -- ? ) dup complex? [ drop f ] [ abs 1 <= ] ifte ;
 : asin dup <=1 [ fasin ] [ i * asinh -i * ] ifte ;

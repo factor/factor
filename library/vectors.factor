@@ -25,13 +25,40 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: vectors
 USE: generic
 USE: kernel
 USE: lists
 USE: math
 
-BUILTIN: vector  11
+IN: errors
+DEFER: throw
+
+IN: kernel-internals
+
+BUILTIN: array 8
+
+! UNSAFE!
+: array-capacity   ( array -- n )   1 integer-slot ; inline
+: vector-array     ( vec -- array ) 2 slot ; inline
+: set-vector-array ( array vec -- ) 2 set-slot ; inline
+
+: grow-vector-array ( len vec -- )
+    [ vector-array grow-array ] keep set-vector-array ; inline
+
+: (set-vector-length) ( len vec -- ) 1 set-integer-slot ; inline
+
+IN: vectors
+
+BUILTIN: vector 11
+
+: vector-length ( vec -- len ) >vector 1 integer-slot ; inline
+
+: set-vector-length ( len vec -- )
+    >vector over 0 < [
+        "Vector length must be positive" throw 2drop
+    ] [
+        2dup (set-vector-length) grow-vector-array
+    ] ifte ; inline
 
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike
@@ -46,9 +73,13 @@ BUILTIN: vector  11
     #! Push a value on the end of a vector.
     dup vector-length swap set-vector-nth ;
 
+: vector-peek ( vector -- obj )
+    #! Get value at end of vector.
+    dup vector-length 1 - swap vector-nth ;
+
 : vector-pop ( vector -- obj )
     #! Get value at end of vector and remove it.
-    dup vector-length pred ( vector top )
+    dup vector-length 1 - ( vector top )
     2dup swap vector-nth >r swap set-vector-length r> ;
 
 : >pop> ( stack -- stack )
@@ -95,15 +126,6 @@ BUILTIN: vector  11
         pick pick >r over >r vector-nth r> r> vector-nth cons
     ] vector-project nip nip ;
 
-: vector-2map ( v1 v2 quot -- v )
-    #! Apply a quotation with stack effect ( obj obj -- obj ) to
-    #! each pair of elements from v1 and v2, collecting them
-    #! into a new list. Behavior is undefined if vector lengths
-    #! differ.
-    -rot vector-zip [
-        swap dup >r >r uncons r> call r> swap
-    ] vector-map nip ; inline
-
 : vector-clone ( vector -- vector )
     #! Shallow copy of a vector.
     [ ] vector-map ;
@@ -120,7 +142,7 @@ BUILTIN: vector  11
 : vector-length= ( vec vec -- ? )
     vector-length swap vector-length number= ;
 
-: vector= ( obj vec -- ? )
+M: vector = ( obj vec -- ? )
     #! Check if two vectors are equal. Two vectors are
     #! considered equal if they have the same length and contain
     #! equal elements.
@@ -129,7 +151,7 @@ BUILTIN: vector  11
     ] [
         over vector? [
             2dup vector-length= [
-                swap vector>list swap vector>list =
+                swap stack>list swap stack>list =
             ] [
                 2drop f
             ] ifte
@@ -141,7 +163,7 @@ BUILTIN: vector  11
 : ?vector-nth ( n vec -- obj/f )
     2dup vector-length >= [ 2drop f ] [ vector-nth ] ifte ;
 
-: vector-hashcode ( vec -- n )
+M: vector hashcode ( vec -- n )
     0 swap 4 [
         over ?vector-nth hashcode rot bitxor swap
     ] times* drop ;
@@ -158,3 +180,10 @@ BUILTIN: vector  11
     #! vector. For example, if n=1, this returns a vector of
     #! one element.
     [ vector-length swap - ] keep vector-tail ;
+
+! Find a better place for this
+IN: kernel
+
+: depth ( -- n )
+    #! Push the number of elements on the datastack.
+    datastack vector-length ;

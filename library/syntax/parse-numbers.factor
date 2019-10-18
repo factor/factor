@@ -40,13 +40,11 @@ USE: unparser
 
 : not-a-number "Not a number" throw ;
 
-: digit> ( ch -- n )
-    [
-        [ digit? ] [ CHAR: 0 - ]
-        [ letter? ] [ CHAR: a - 10 + ]
-        [ LETTER? ] [ CHAR: A - 10 + ]
-        [ drop t ] [ not-a-number ]
-    ] cond ;
+GENERIC: digit> ( ch -- n )
+M: digit  digit> CHAR: 0 - ;
+M: letter digit> CHAR: a - 10 + ;
+M: LETTER digit> CHAR: A - 10 + ;
+M: object digit> not-a-number ;
 
 : digit+ ( num digit base -- num )
     2dup < [ rot * + ] [ not-a-number ] ifte ;
@@ -63,8 +61,6 @@ USE: unparser
     #! conversion fails.
     swap "-" ?str-head [ (base>) neg ] [ (base>) ] ifte ;
 
-DEFER: str>number
-FORGET: str>number
 GENERIC: str>number ( str -- num )
 
 M: string str>number 10 base> ;

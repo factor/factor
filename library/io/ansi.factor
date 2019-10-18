@@ -28,7 +28,6 @@
 IN: ansi
 USE: lists
 USE: kernel
-USE: format
 USE: namespaces
 USE: stdio
 USE: streams
@@ -91,3 +90,8 @@ C: ansi-stream ( stream -- stream )
     #! ansi-fg - foreground color
     #! ansi-bg - background color
     [ delegate set ] extend ;
+
+IN: shells
+
+: ansi
+    stdio [ <ansi-stream> ] change tty ;

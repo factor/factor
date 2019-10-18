@@ -9,7 +9,7 @@ USE: test
 : callcc1-test ( x -- list )
     [
         "test-cc" set [ ] [
-            swap pred tuck swons
+            swap 1 - tuck swons
             over 0 = [ "test-cc" get call ] when
         ] forever
     ] callcc1 nip ;

@@ -54,3 +54,9 @@ USE: strings
 [ [ ]         ] [ 0   count ] unit-test
 [ [ ]         ] [ -10 count ] unit-test
 [ [ 0 1 2 3 ] ] [ 4   count ] unit-test
+
+[ f ] [ f 0 head ] unit-test
+[ f ] [ [ 1 ] 0 head ] unit-test
+[ [ 1 ] ] [ [ 1 ] 1 head ] unit-test
+[ [ 1 ] 2 head ] unit-test-fails
+[ [ 1 2 3 ] ] [ [ 1 2 3 4 ] 3 head ] unit-test

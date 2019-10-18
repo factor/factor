@@ -10,6 +10,7 @@ USE: namespaces
 USE: prettyprint
 USE: words
 USE: kernel
+USE: kernel-internals
 USE: generic
 
 : dataflow-contains-op? ( object list -- ? )
@@ -35,9 +36,9 @@ USE: generic
 : inline-test
     car car ; inline
 
-[ t ] [
-    \ car [ inline-test ] dataflow dataflow-contains-param? >boolean
-] unit-test
+! [ t ] [
+!     \ slot [ inline-test ] dataflow dataflow-contains-param? >boolean
+! ] unit-test
 
 [ t ] [
     #ifte [ [ drop ] [ + ] ifte ] dataflow dataflow-contains-op? >boolean
@@ -78,7 +79,7 @@ SYMBOL: #test
     {{
         [ node-op | #test ]
         [ node-param | 5 ]
-    }} "foobar" [ [ node-param get ] bind succ ] apply-dataflow
+    }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
 ] unit-test
 
 #test [ [ node-param get ] bind sq ] "foobar" set-word-property
@@ -87,7 +88,7 @@ SYMBOL: #test
     {{
         [ node-op | #test ]
         [ node-param | 5 ]
-    }} "foobar" [ [ node-param get ] bind succ ] apply-dataflow
+    }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
 ] unit-test
 
 ! Somebody (cough) got the order of ifte nodes wrong.

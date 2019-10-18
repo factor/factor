@@ -34,6 +34,7 @@ USE: namespaces
 USE: stdio
 USE: streams
 USE: threads
+USE: parser
 
 : telnet-client ( socket -- )
     dup [
@@ -52,3 +53,10 @@ USE: threads
     [
         <server> [ telnetd-loop ] [ swap fclose rethrow ] catch
     ] with-logging ;
+
+IN: shells
+
+: telnet
+    "telnetd-port" get str>number telnetd ;
+
+global [ 9999 "telnetd-port" set ] bind

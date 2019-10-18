@@ -71,11 +71,7 @@ USE: words
     ] ifte ;
 
 : simplify-node ( node rest -- rest ? )
-    over car "simplify" word-property [
-        call
-    ] [
-        swap , f
-    ] ifte* ;
+    over car "simplify" [ swap , f ] singleton ;
 
 : find-label ( label linear -- rest )
     [ cdr over = ] some? cdr nip ;
@@ -87,11 +83,7 @@ USE: words
     purge-labels [ (simplify) ] make-list ;
 
 : follow ( linear -- linear )
-    dup car car "follow" word-property dup [
-        call
-    ] [
-        drop
-    ] ifte ;
+    dup car car "follow" [ ] singleton ;
 
 #label [
     cdr follow
@@ -104,17 +96,34 @@ USE: words
 : follows? ( op linear -- ? )
     follow dup [ car car = ] [ 2drop f ] ifte ;
 
-GENERIC: call-simplifier ( node rest -- rest ? )
-M: cons call-simplifier ( node rest -- ? )
+GENERIC: simplify-call ( node rest -- rest ? )
+M: cons simplify-call ( node rest -- rest ? )
     swap , f ;
 
 PREDICATE: cons return-follows #return swap follows? ;
-M: return-follows call-simplifier ( node rest -- rest ? )
+M: return-follows simplify-call ( node rest -- rest ? )
     >r
     unswons [
         [ #call | #jump ]
         [ #call-label | #jump-label ]
     ] assoc swons , r> t ;
 
-#call [ call-simplifier ] "simplify" set-word-property
-#call-label [ call-simplifier ] "simplify" set-word-property
+#call [ simplify-call ] "simplify" set-word-property
+#call-label [ simplify-call ] "simplify" set-word-property
+
+GENERIC: simplify-drop ( node rest -- rest ? )
+M: cons simplify-drop ( node rest -- rest ? )
+    swap , f ;
+
+PREDICATE: cons push-next ( list -- ? )
+    dup [
+        car car [ #push-immediate #push-indirect ] contains?
+    ] when ;
+
+M: push-next simplify-drop ( node rest -- rest ? )
+    nip uncons >r unswons [
+        [ #push-immediate | #replace-immediate ]
+        [ #push-indirect | #replace-indirect ]
+    ] assoc swons , r> t ;
+
+#drop [ simplify-drop ] "simplify" set-word-property

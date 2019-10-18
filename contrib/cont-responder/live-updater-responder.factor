@@ -30,7 +30,6 @@ USE: namespaces
 USE: html
 USE: words
 USE: stdio
-USE: stack
 USE: kernel
 USE: cont-utils
 USE: cont-responder
@@ -42,7 +41,7 @@ USE: prettyprint
   <namespace> [
     "responder" "inspect" put
     <pre> 
-        "stdio" get <html-stream> [   
+        stdio get <html-stream> [   
           apropos.
         ] with-stream              
     </pre>

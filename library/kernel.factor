@@ -1,4 +1,4 @@
-! :folding=none:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -25,31 +25,23 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: syntax
+IN: kernel-internals
 USE: generic
-BUILTIN: f 6 FORGET: f?
-BUILTIN: t 7 FORGET: t?
+USE: kernel
+USE: vectors
 
-IN: vectors
-DEFER: vector=
-DEFER: vector-hashcode
-
-IN: lists
-DEFER: cons=
-DEFER: cons-hashcode
-
-IN: math
-DEFER: >rect
-DEFER: bitxor
+: dispatch ( n vtable -- )
+    #! This word is unsafe in compiled code since n is not
+    #! bounds-checked. Do not call it directly.
+    vector-nth call ;
 
 IN: kernel
-USE: lists
-USE: math
-USE: math-internals
-USE: strings
-USE: vectors
-USE: words
-USE: vectors
+
+GENERIC: hashcode ( obj -- n )
+M: object hashcode drop 0 ;
+
+GENERIC: = ( obj obj -- ? )
+M: object = eq? ;
 
 : cpu ( -- arch )
     #! Returns one of "x86" or "unknown".
@@ -59,65 +51,6 @@ USE: vectors
     #! Returns one of "unix" or "win32".
     11 getenv ;
 
-! The 'fake vtable' used here speeds things up a lot.
-! It is quite clumsy, however. A higher-level CLOS-style
-! 'generic words' system will be built later.
-
-: dispatch ( n vtable -- )
-    vector-nth call ;
-
-: generic ( obj vtable -- )
-    >r dup type r> dispatch ; inline
-
-: 2generic ( n n vtable -- )
-    >r 2dup arithmetic-type r> dispatch ; inline
-
-: hashcode ( obj -- hash )
-    #! If two objects are =, they must have equal hashcodes.
-    {
-        [               ] ! 0
-        [ word-hashcode     ] ! 1
-        [ cons-hashcode     ] ! 2
-        [ drop 0  ] ! 3
-        [ >fixnum           ] ! 4
-        [ >rect >fixnum swap >fixnum bitxor           ] ! 5
-        [ drop 0  ] ! 6
-        [ drop 0  ] ! 7
-        [ drop 0  ] ! 8
-        [ >fixnum           ] ! 9 
-        [ >fixnum           ] ! 10
-        [ vector-hashcode   ] ! 11
-        [ str-hashcode      ] ! 12
-        [ sbuf-hashcode     ] ! 13
-        [ drop 0  ] ! 14
-        [ drop 0  ] ! 15
-        [ drop 0  ] ! 16
-    } generic ;
-
-IN: math DEFER: number= ( defined later... )
-IN: kernel
-: = ( obj obj -- ? )
-    #! Push t if a is isomorphic to b.
-    {
-        [ number= ] ! 0
-        [ eq?     ] ! 1
-        [ cons=   ] ! 2
-        [ eq?     ] ! 3
-        [ number= ] ! 4
-        [ number= ] ! 5
-        [ eq?     ] ! 6
-        [ eq?     ] ! 7
-        [ eq?     ] ! 8
-        [ number= ] ! 9 
-        [ number= ] ! 10
-        [ vector= ] ! 11
-        [ str=    ] ! 12
-        [ sbuf=   ] ! 13
-        [ eq?     ] ! 14
-        [ eq?     ] ! 15 
-        [ eq?     ] ! 16
-    } generic ; 
-
 : set-boot ( quot -- )
     #! Set the boot quotation.
     8 setenv ;
@@ -125,3 +58,21 @@ IN: kernel
 : num-types ( -- n )
     #! One more than the maximum value from type primitive.
     17 ;
+
+: ? ( cond t f -- t/f )
+    #! Push t if cond is true, otherwise push f.
+    rot [ drop ] [ nip ] ifte ; inline
+
+: >boolean t f ? ; inline
+
+: and ( a b -- a&b ) f ? ; inline
+: not ( a -- ~a ) f t ? ; inline
+: or ( a b -- a|b) t swap ? ; inline
+: xor ( a b -- a^b ) dup not swap ? ; inline
+
+IN: syntax
+BUILTIN: f 6
+BUILTIN: t 7
+
+IN: kernel
+UNION: boolean f t ;

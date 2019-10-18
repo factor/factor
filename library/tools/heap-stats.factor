@@ -35,16 +35,17 @@ USE: stdio
 USE: words
 USE: vectors
 USE: unparser
+USE: generic
 
 : heap-stat. ( type instances bytes -- )
     dup 0 = [
         3drop
     ] [
-        rot type-name write ": " write
+        rot builtin-type word-name write ": " write
         unparse write " bytes, " write
         unparse write " instances" print
     ] ifte ;
 
 : heap-stats. ( -- )
     #! Print heap allocation breakdown.
-    0 heap-stats [ dupd uncons heap-stat. succ ] each drop ;
+    0 heap-stats [ dupd uncons heap-stat. 1 + ] each drop ;

@@ -42,6 +42,6 @@ USE: lists
         ! Clear stacks since we never go up from this point
         [ ] set-catchstack
         { } set-callstack
-        print-error
+        try
         (yield)
     ] callcc0 drop ;

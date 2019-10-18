@@ -27,6 +27,7 @@
 
 IN: errors
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: namespaces
 USE: prettyprint
@@ -36,6 +37,7 @@ USE: unparser
 USE: vectors
 USE: words
 USE: math
+USE: generic
 
 : expired-error ( obj -- )
     "Object did not survive image save/load: " write . ;
@@ -60,14 +62,15 @@ USE: math
 : type-check-error ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
-    "Object type: " write type type-name print
-    "Expected type: " write type-name print ;
+    "Object type: " write class .
+    "Expected type: " write builtin-type . ;
 
-: array-range-error ( list -- )
-    "Array range check error" print
-    unswons "Object: " write .
-    uncons car "Maximum index: " write .
-    "Requested index: " write . ;
+: range-error ( list -- )
+    "Range check error" print
+    unswons [ "Object: " write . ] when*
+    unswons "Minimum index: " write .
+    unswons "Requested index: " write .
+    car "Maximum index: " write . ;
 
 : float-format-error ( list -- )
     "Invalid floating point literal format: " write . ;
@@ -77,9 +80,6 @@ USE: math
 
 : negative-array-size-error ( obj -- )
     "Cannot allocate array with negative size " write . ;
-
-: bad-primitive-error ( obj -- )
-    "Bad primitive number: " write . ;
 
 : c-string-error ( obj -- )
     "Cannot convert to C string: " write . ;
@@ -93,8 +93,13 @@ USE: math
 : port-closed-error ( obj -- )
     "Port closed: " write . ;
 
-: kernel-error. ( obj n -- str )
-    {
+GENERIC: error. ( error -- )
+
+PREDICATE: cons kernel-error ( obj -- ? )
+    car kernel-error = ;
+
+M: kernel-error error. ( error -- )
+    cdr uncons car swap {
         expired-error
         io-task-twice-error
         no-io-tasks-error
@@ -102,43 +107,35 @@ USE: math
         io-error
         undefined-word-error
         type-check-error
-        array-range-error
+        range-error
         float-format-error
         signal-error
         negative-array-size-error
-        bad-primitive-error
         c-string-error
         ffi-disabled-error
         ffi-error
         port-closed-error
     } vector-nth execute ;
 
-: kernel-error? ( obj -- ? )
-    dup cons? [ uncons cons? swap fixnum? and ] [ drop f ] ifte ;
+M: string error. ( error -- )
+    print ;
 
-: error. ( error -- str )
-    dup kernel-error? [
-        uncons car swap kernel-error.
-    ] [
-        dup string? [ print ] [ . ] ifte
-    ] ifte ;
+M: object error. ( error -- )
+    . ;
 
-: standard-dump ( error -- )
-    "ERROR: " write error. ;
+: in-parser? ( -- ? )
+    "error-line" get "error-col" get and ;
 
-: parse-dump ( error -- )
+: parse-dump ( -- )
     [
+        "Parsing " ,
         "error-file" get [ "<interactive>" ] unless* , ":" ,
-        "error-line-number" get [ 1 ] unless* unparse , ": " ,
-    ] make-string write
-    error.
+        "error-line-number" get [ 1 ] unless* unparse ,
+    ] make-string print
     
     "error-line" get print
     
     [ "error-col" get " " fill , "^" , ] make-string print ;
-
-: in-parser? ( -- ? )
-    "error-line" get "error-col" get and ;
 
 : :s ( -- ) "error-datastack"  get {.} ;
 : :r ( -- ) "error-callstack"  get {.} ;
@@ -147,32 +144,36 @@ USE: math
 
 : :get ( var -- value ) "error-namestack" get (get) ;
 
+: debug-help ( -- )
+    [ :s :r :n :c ] [ prettyprint-1 " " write ] each
+    "show stacks at time of error." print
+    \ :get prettyprint-1
+    " ( var -- value ) inspects the error namestack." print ;
+
 : flush-error-handler ( error -- )
     #! Last resort.
     [ "Error in default error handler!" print drop ] when ;
 
-: default-error-handler ( error -- )
+: print-error ( error -- )
     #! Print the error.
     [
-        in-parser? [ parse-dump ] [ standard-dump ] ifte
-
-        [ :s :r :n :c ] [ prettyprint-1 " " write ] each
-        "show stacks at time of error." print
-        \ :get prettyprint-1
-        " ( var -- value ) inspects the error namestack." print
+        "! " [
+            in-parser? [ parse-dump ] when error.
+        ] with-prefix
     ] [
         flush-error-handler
     ] catch ;
 
-: print-error ( quot -- )
+: try ( quot -- )
     #! Execute a quotation, and if it throws an error, print it
     #! and return to the caller.
-    [ [ default-error-handler ] when* ] catch ;
+    [ [ print-error debug-help ] when* ] catch ;
 
 : init-error-handler ( -- )
     [ 1 exit* ] >c ( last resort )
-    [ default-error-handler 1 exit* ] >c
-    [ dup save-error rethrow ] 5 setenv ( kernel calls on error ) ;
+    [ print-error 1 exit* ] >c
+    [ dup save-error rethrow ] 5 setenv ( kernel calls on error )
+    kernel-error 12 setenv ;
 
 ! So that stage 2 boot gives a useful error message if something
 ! fails after this file is loaded.

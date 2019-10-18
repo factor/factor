@@ -38,6 +38,7 @@ USE: presentation
 USE: words
 USE: unparser
 USE: vectors
+USE: ansi
 
 SYMBOL: cont-prompt
 SYMBOL: listener-prompt
@@ -62,7 +63,7 @@ global [
 : (read-multiline) ( quot depth -- quot ? )
     #! Flag indicates EOF.
     >r read dup [
-        (parse) depth r> dup >r = [
+        (parse) depth r> dup >r <= [
             ( we're done ) r> drop t
         ] [
             ( more input needed ) r> cont-prompt get prompt.
@@ -80,7 +81,7 @@ global [
 : listen ( -- )
     #! Wait for user input, and execute.
     listener-prompt get prompt.
-    [ read-multiline [ call ] [ exit ] ifte ] print-error ;
+    [ read-multiline [ call ] [ exit ] ifte ] try ;
 
 : listener ( -- )
     #! Run a listener loop that executes user input.
@@ -104,9 +105,9 @@ global [
     " (OS: " write os write
     " CPU: " write cpu write
     ")" print
-    "Copyright (C) 2003, 2004 Slava Pestov" print
-    "Copyright (C) 2004 Chris Double" print
-    "Copyright (C) 2004 Mackenzie Straight" print
+    "Copyright (C) 2003, 2005 Slava Pestov" print
+    "Copyright (C) 2004, 2005 Chris Double" print
+    "Copyright (C) 2004, 2005 Mackenzie Straight" print
     "Type ``exit'' to exit, ``help'' for help." print
     terpri
     room.
@@ -143,3 +144,8 @@ global [
     terpri
     "HTTP SERVER:             USE: httpd 8888 httpd" print
     "TELNET SERVER:           USE: telnetd 9999 telnetd" print ;
+
+IN: shells
+
+: tty
+    print-banner listener ;

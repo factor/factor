@@ -26,12 +26,15 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
+USE: generic
 USE: kernel
 USE: math
-USE: vectors
 
 : 2list ( a b -- [ a b ] )
     unit cons ;
+
+: 2unlist ( [ a b ] -- a b )
+    uncons car ;
 
 : 3list ( a b c -- [ a b c ] )
     2list cons ;
@@ -121,12 +124,18 @@ DEFER: tree-contains?
     #! ( X -- Y ) to each element into a new list.
     over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
 
+: map-with ( obj list quot -- )
+    #! Push each element of a proper list in turn, and collect
+    #! return values of applying a quotation with effect
+    #! ( obj elt -- obj ) to each element into a new list.
+    swap [ with rot ] map nip nip ; inline
+
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.
     [ dupd = not ] subset nip ;
 
 : length ( list -- length )
-    0 swap [ drop succ ] each ;
+    0 swap [ drop 1 + ] each ;
 
 : prune ( list -- list )
     #! Remove duplicate elements.
@@ -152,7 +161,7 @@ DEFER: tree-contains?
     #! partial order with stack effect ( o1 o2 -- ? ).
     swap [ pick >r maximize r> swap ] (top) nip ; inline
 
-: cons= ( obj cons -- ? )
+M: cons = ( obj cons -- ? )
     2dup eq? [
         2drop t
     ] [
@@ -163,22 +172,21 @@ DEFER: tree-contains?
         ] ifte
     ] ifte ;
 
-: (cons-hashcode) ( cons count -- hash )
-    dup 0 = [
+: cons-hashcode ( cons count -- hash )
+    dup 0 number= [
         2drop 0
     ] [
         over cons? [
-            pred >r uncons r> tuck
-            (cons-hashcode) >r
-            (cons-hashcode) r>
+            1 - >r uncons r> tuck
+            cons-hashcode >r
+            cons-hashcode r>
             bitxor
         ] [
             drop hashcode
         ] ifte
     ] ifte ;
 
-: cons-hashcode ( cons -- hash )
-    4 (cons-hashcode) ;
+M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
 
 : project ( n quot -- list )
     #! Execute the quotation n times, passing the loop counter
@@ -189,3 +197,15 @@ DEFER: tree-contains?
 
 : count ( n -- [ 0 ... n-1 ] )
     [ ] project ;
+
+: head ( list n -- list )
+    #! Return the first n elements of the list.
+    dup 0 > [ >r uncons r> 1 - head cons ] [ 2drop f ] ifte ;
+
+: tail ( list n -- tail )
+    #! Return the rest of the list, from the nth index onward.
+    [ cdr ] times ;
+
+: intersection ( list list -- list )
+    #! Make a list of elements that occur in both lists.
+    [ over contains? ] subset nip ;

@@ -38,19 +38,56 @@ USE: namespaces
 USE: parser
 USE: words
 USE: hashtables
+USE: strings
+
+! Command line parameters specify libraries to load.
+!
+! -library:<foo>:name=<soname> -- define a library <foo>, to be
+! loaded from the <soname> DLL.
+!
+! -library:<foo>:abi=stdcall -- define a library using the
+! stdcall ABI. This ABI is usually used on Win32. Any other abi
+! parameter, or a missing abi parameter indicates the cdecl ABI
+! should be used, which is common on Unix.
 
 BUILTIN: dll   15
 BUILTIN: alien 16
 
-: (library) ( name -- object )
-    "libraries" get hash ;
+M: alien hashcode ( obj -- n )
+    alien-address >fixnum ;
 
-: load-dll ( library -- dll )
-    "dll" get dup [
-        drop "name" get dlopen dup "dll" set
-    ] unless ;
+M: alien = ( obj obj -- ? )
+    over alien? [
+        over local-alien? over local-alien? or [
+            eq?
+        ] [
+            alien-address swap alien-address =
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
 
-SYMBOL: #c-invoke ( C ABI -- Unix and most Windows libs )
+: library ( name -- object )
+    dup [ "libraries" get hash ] when ;
+
+: load-dll ( name -- dll )
+    #! Higher level wrapper around dlopen primitive.
+    library dup [
+        [
+            "dll" get dup [
+                drop "name" get dlopen dup "dll" set
+            ] unless
+        ] bind
+    ] when ;
+
+: add-library ( library name abi -- )
+    "libraries" get [
+        <namespace> [
+          "abi" set
+          "name" set
+        ] extend put
+    ] bind ;
+    
 SYMBOL: #cleanup ( unwind stack by parameter )
 
 SYMBOL: #c-call ( jump to raw address )
@@ -58,76 +95,81 @@ SYMBOL: #c-call ( jump to raw address )
 SYMBOL: #unbox ( move top of datastack to C stack )
 SYMBOL: #box ( move EAX to datastack )
 
-SYMBOL: #std-invoke ( stdcall ABI -- Win32 )
+: library-abi ( library -- abi )
+    library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
 
-: abi ( -- abi )
-    "abi" get "stdcall" = #std-invoke #c-invoke ? ;
+SYMBOL: #alien-invoke
 
-: alien-function ( function library -- address abi )
-    [
-        (library) [ load-dll dlsym abi ] bind
-    ] [
-        dlsym-self #c-invoke
-    ] ifte* ;
-
-! These are set in the #c-invoke and #std-invoke dataflow IR
-! nodes.
+! These are set in the #alien-invoke dataflow IR node.
 SYMBOL: alien-returns
 SYMBOL: alien-parameters
 
-: infer-alien ( -- )
-    4 ensure-d
-    dataflow-drop, pop-d car
-    dataflow-drop, pop-d car
-    dataflow-drop, pop-d car alien-function >r
-    dataflow-drop, pop-d car swap
-    r> dataflow, [
-        alien-returns set
-        alien-parameters set
-    ] bind ;
+: set-alien-returns ( returns node -- )
+    [ dup alien-returns set ] bind
+    "void" = [
+        [ object ] produce-d 1 0 node-outputs
+    ] unless ;
 
-: unbox-parameter ( function -- )
-    dlsym-self #unbox swons , ;
+: set-alien-parameters ( parameters node -- )
+    [ dup alien-parameters set ] bind
+    [ drop object ] map dup dup ensure-d
+    length 0 node-inputs consume-d ;
+
+: alien-node ( returns params function library -- )
+    cons #alien-invoke dataflow,
+    [ set-alien-parameters ] keep
+    set-alien-returns ;
+
+: infer-alien ( -- )
+    [ object object object object ] ensure-d
+    dataflow-drop, pop-d literal-value
+    dataflow-drop, pop-d literal-value >r
+    dataflow-drop, pop-d literal-value
+    dataflow-drop, pop-d literal-value -rot
+    r> swap alien-node ;
+
+: box-parameter
+    c-type [
+        "width" get cell align
+        "unboxer" get
+    ] bind #unbox swons , ;
 
 : linearize-parameters ( params -- count )
     #! Generate code for boxing a list of C types.
     #! Return amount stack must be unwound by.
     [ alien-parameters get reverse ] bind 0 swap [
-        c-type [
-            "width" get cell align +
-            "unboxer" get
-        ] bind unbox-parameter
+        box-parameter +
     ] each ;
-
-: box-parameter ( function -- )
-    dlsym-self #box swons , ;
 
 : linearize-returns ( returns -- )
     [ alien-returns get ] bind dup "void" = [
         drop
     ] [
-        c-type [ "boxer" get ] bind box-parameter
+        c-type [ "boxer" get ] bind #box swons ,
     ] ifte ;
 
 : linearize-alien ( node -- )
     dup linearize-parameters >r
     dup [ node-param get ] bind #c-call swons ,
-    dup [ node-op get #c-invoke = ] bind
-    r> swap [ #cleanup swons , ] [ drop ] ifte
+    dup [ node-param get cdr library-abi "stdcall" = ] bind
+    r> swap [ drop ] [ #cleanup swons , ] ifte
     linearize-returns ;
 
-#c-invoke [ linearize-alien ] "linearizer" set-word-property
-
-#std-invoke [ linearize-alien ] "linearizer" set-word-property
+#alien-invoke [ linearize-alien ] "linearizer" set-word-property
 
 : alien-invoke ( ... returns library function parameters -- ... )
     #! Call a C library function.
     #! 'returns' is a type spec, and 'parameters' is a list of
     #! type specs. 'library' is an entry in the "libraries"
     #! namespace.
-    "alien-invoke cannot be interpreted." throw ;
+    [
+        "alien-invoke cannot be interpreted. " ,
+        "Either the compiler is disabled, " ,
+        "or the ``" , rot , "'' library is missing. " ,
+    ] make-string throw ;
 
-\ alien-invoke [ 4 | 0 ] "infer-effect" set-word-property
+\ alien-invoke [ [ object object object object ] [ ] ]
+"infer-effect" set-word-property
 
 \ alien-invoke [ infer-alien ] "infer" set-word-property
 

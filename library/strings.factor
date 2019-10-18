@@ -28,17 +28,25 @@
 IN: strings
 USE: generic
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: math
 
+! Define methods bound to primitives
 BUILTIN: string 12
-BUILTIN: sbuf   13
+M: string hashcode 2 slot %fixnum ;
+M: string = str= ;
+
+: str-length ( str -- len ) >string 1 integer-slot ; inline
+
+BUILTIN: sbuf 13
+M: sbuf hashcode sbuf-hashcode ;
+M: sbuf = sbuf= ;
+
+UNION: text string integer ;
 
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
-
-: f>"" ( str/f -- str )
-    [ "" ] unless* ;
 
 : str-length< ( str str -- boolean )
     #! Compare string lengths.
@@ -88,33 +96,35 @@ BUILTIN: sbuf   13
     #! Returns 2 strings, that when concatenated yield the
     #! original string, without the character at the given
     #! index.
-    [ swap str-head ] 2keep succ swap str-tail ;
+    [ swap str-head ] 2keep 1 + swap str-tail ;
 
-: str-headcut ( str begin -- str str )
-    str-length str/ ;
-
-: =? ( x y z -- z/f )
-    #! Push z if x = y, otherwise f.
-    >r = r> f ? ;
-
-: str-head? ( str begin -- str )
-    #! If the string starts with begin, return the rest of the
-    #! string after begin. Otherwise, return f.
-    2dup str-length< [ 2drop f ] [ tuck str-headcut =? ] ifte ;
+: str-head? ( str begin -- ? )
+    2dup str-length< [
+        2drop f
+    ] [
+        dup str-length rot str-head =
+    ] ifte ;
 
 : ?str-head ( str begin -- str ? )
-    dupd str-head? dup [ nip t ] [ drop f ] ifte ;
+    2dup str-head? [
+        str-length swap str-tail t
+    ] [
+        drop f
+    ] ifte ;
 
-: str-tailcut ( str end -- str str )
-    str-length >r dup str-length r> - str/ swap ;
+: str-tail? ( str end -- ? )
+    2dup str-length< [
+        2drop f
+    ] [
+        dup str-length pick str-length swap - rot str-tail =
+    ] ifte ;
 
-: str-tail? ( str end -- str )
-    #! If the string ends with end, return the start of the
-    #! string before end. Otherwise, return f.
-    2dup str-length< [ 2drop f ] [ tuck str-tailcut =? ] ifte ;
-
-: ?str-tail ( str end -- str ? )
-    dupd str-tail? dup [ nip t ] [ drop f ] ifte ;
+: ?str-tail ( str end -- ? )
+    2dup str-tail? [
+        str-length swap [ str-length swap - ] keep str-head t
+    ] [
+        drop f
+    ] ifte ;
 
 : split1 ( string split -- before after )
     2dup index-of dup -1 = [
@@ -124,11 +134,6 @@ BUILTIN: sbuf   13
         rot str-head swap
     ] ifte ;
 
-: max-str-length ( list -- len )
-    #! Returns the length of the longest string in the given
-    #! list.
-    0 swap [ str-length max ] each ;
-
 : str-each ( str [ code ] -- )
     #! Execute the code, with each character of the string
     #! pushed onto the stack.
@@ -136,11 +141,11 @@ BUILTIN: sbuf   13
         -rot 2dup >r >r >r str-nth r> call r> r>
     ] times* 2drop ; inline
 
-: blank? ( ch -- ? ) " \t\n\r" str-contains? ;
-: letter? ( ch -- ? ) CHAR: a CHAR: z between? ;
-: LETTER? ( ch -- ? ) CHAR: A CHAR: Z between? ;
-: digit? ( ch -- ? ) CHAR: 0 CHAR: 9 between? ;
-: printable? ( ch -- ? ) CHAR: \s CHAR: ~ between? ;
+PREDICATE: integer blank     " \t\n\r" str-contains? ;
+PREDICATE: integer letter    CHAR: a CHAR: z between? ;
+PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
+PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
+PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 
 : quotable? ( ch -- ? )
     #! In a string literal, can this character be used without

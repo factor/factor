@@ -40,6 +40,7 @@ USE: stdio
 USE: streams
 USE: strings
 USE: words
+USE: kernel-internals
 
 ! This file is run as the last stage of boot.factor; it relies
 ! on all other words already being defined.
@@ -54,8 +55,12 @@ USE: words
         ?run-file
     ] when ;
 
-: cli-var-param ( name value -- )
-    swap ":" split set-object-path ;
+: set-path ( value list -- )
+    unswons over [ nest [ set-path ] bind ] [ nip set ] ifte ;
+
+: cli-var-param ( name value -- ) swap ":" split set-path ;
+
+: cli-bool-param ( name -- ) "no-" ?str-head not put ;
 
 : cli-param ( param -- )
     #! Handle a command-line argument starting with '-' by
@@ -64,26 +69,12 @@ USE: words
     #!
     #! Arguments containing = are handled differently; they
     #! set the object path.
-    "=" split1 dup [
-        cli-var-param
-    ] [
-        drop dup "no-" str-head? dup [
-            f put drop
-        ] [
-            drop t put
-        ] ifte
-    ] ifte ;
+    "=" split1 [ cli-var-param ] [ cli-bool-param ] ifte* ;
 
 : cli-arg ( argument -- argument )
     #! Handle a command-line argument. If the argument was
     #! consumed, returns f. Otherwise returns the argument.
-    dup f-or-"" [
-        dup "-" str-head? dup [
-            cli-param drop f
-        ] [
-            drop
-        ] ifte
-    ] unless ;
+    dup f-or-"" [ "-" ?str-head [ cli-param f ] when ] unless ;
 
 : parse-switches ( args -- args )
     [ cli-arg ] map ;
@@ -91,6 +82,9 @@ USE: words
 : run-files ( args -- )
     [ [ run-file ] when* ] each ;
 
-: parse-command-line ( args -- )
+: cli-args ( -- args ) 10 getenv ;
+
+: parse-command-line ( -- )
     #! Parse command line arguments.
-    parse-switches run-files ;
+    #! The first CLI arg is the image name.
+    cli-args unswons "image" set parse-switches run-files ;

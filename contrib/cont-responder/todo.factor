@@ -26,7 +26,6 @@
 ! complete. 
 IN: todo
 USE: parser
-USE: stack
 USE: strings
 USE: streams
 USE: namespaces
@@ -37,9 +36,7 @@ USE: kernel
 USE: prettyprint
 USE: unparser
 USE: url-encoding
-USE: combinators
 USE: files
-USE: logic
 USE: hashtables
 
 : <todo> ( user password -- <todo> )

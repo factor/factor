@@ -36,6 +36,12 @@ USE: strings
 USE: vectors
 USE: words
 USE: hashtables
+USE: generic
+USE: prettyprint
+
+! If this symbol is on, partial evalution of conditionals is
+! disabled.
+SYMBOL: inferring-base-case
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -43,75 +49,113 @@ USE: hashtables
 ! - infer - quotation with custom inference behavior; ifte uses
 ! this. Word is passed on the stack.
 
-! Amount of results we had to add to the datastack
+! Vector of results we had to add to the datastack. Ie, the
+! inputs.
 SYMBOL: d-in
 
-! Recursive state. Alist maps words to hashmaps...
+! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
-! ... with keys:
-SYMBOL: base-case
-SYMBOL: entry-effect
-! When a call to a combinator is compiled, recursion cannot
-! simply jump to the definition of the combinator. Instead, it
-! makes a local jump to this label.
-SYMBOL: recursive-label
 
-! When inferring stack effects of mutually recursive words, we
-! don't want to save the fact that one word does not have a
-! stack effect before the base case of its mutual pair is
-! inferred.
-SYMBOL: save-effect
+GENERIC: literal-value ( value -- obj )
+GENERIC: value= ( literal value -- ? )
+GENERIC: value-class ( value -- class )
+GENERIC: value-class-and ( class value -- )
+GENERIC: set-value-class ( class value -- )
 
-: gensym-vector ( n --  vector )
-    dup <vector> swap [ gensym over vector-push ] times ;
+! A value has the following slots in addition to those relating
+! to generics above:
 
-: add-inputs ( count stack -- stack )
-    #! Add this many inputs to the given stack.
-    >r gensym-vector dup r> vector-append ;
+! An association list mapping values to [ value | class ] pairs
+SYMBOL: type-propagations
 
-: ensure ( count stack -- count stack )
-    #! Ensure stack has this many elements. Return number of
-    #! elements added.
-    2dup vector-length > [
-        [ vector-length - dup ] keep add-inputs
+TRAITS: computed
+C: computed ( class -- value )
+    [
+        \ value-class set
+        gensym \ literal-value set
+        type-propagations off
+    ] extend ;
+M: computed literal-value ( value -- obj )
+    "Cannot use a computed value literally." throw ;
+M: computed value= ( literal value -- ? )
+    2drop f ;
+M: computed value-class ( value -- class )
+    [ \ value-class get ] bind ;
+M: computed value-class-and ( class value -- )
+    [ \ value-class [ class-and ] change ] bind ;
+M: computed set-value-class ( class value -- )
+    [ \ value-class set ] bind ;
+
+TRAITS: literal
+C: literal ( obj rstate -- value )
+    [
+        recursive-state set
+        \ literal-value set
+        type-propagations off
+    ] extend ;
+M: literal literal-value ( value -- obj )
+    [ \ literal-value get ] bind ;
+M: literal value= ( literal value -- ? )
+    literal-value = ;
+M: literal value-class ( value -- class )
+    literal-value class ;
+M: literal value-class-and ( class value -- )
+    value-class class-and drop ;
+M: literal set-value-class ( class value -- )
+    2drop ;
+
+: value-recursion ( value -- rstate )
+    [ recursive-state get ] bind ;
+
+: (ensure-types) ( typelist n stack -- )
+    pick [
+        3dup >r >r car r> r> vector-nth value-class-and
+        >r >r cdr r> 1 + r> (ensure-types)
     ] [
-        >r drop 0 r>
+        3drop
     ] ifte ;
 
-: ensure-d ( count -- )
-    #! Ensure count of unknown results are on the stack.
-    meta-d [ ensure ] change d-in [ + ] change ;
+: ensure-types ( typelist stack -- )
+    dup vector-length pick length - dup 0 < [
+        swap >r neg tail 0 r>
+    ] [
+        swap
+    ] ifte (ensure-types) ;
 
-: consume-d ( count -- )
-    #! Remove count of elements.
-    [ pop-d drop ] times ;
+: required-inputs ( typelist stack -- values )
+    >r dup length r> vector-length - dup 0 > [
+        head [ <computed> ] map
+    ] [
+        2drop f
+    ] ifte ;
 
-: produce-d ( count -- )
-    #! Push count of unknown results.
-    [ gensym push-d ] times ;
+: vector-prepend ( values stack -- stack )
+    >r list>vector dup r> vector-append ;
 
-: effect ( -- [ in | out ] )
+: ensure-d ( typelist -- )
+    dup meta-d get ensure-types
+    meta-d get required-inputs dup
+    meta-d [ vector-prepend ] change
+    d-in [ vector-prepend ] change ;
+
+: effect ( -- [ in-types out-types ] )
     #! After inference is finished, collect information.
-    d-in get  meta-d get vector-length cons ;
-
-: <recursive-state> ( -- state )
-    <namespace> [
-        base-case off  effect entry-effect set
-    ] extend ;
+    d-in get [ value-class ] vector-map vector>list
+    meta-d get [ value-class ] vector-map vector>list 2list ;
 
 : init-inference ( recursive-state -- )
     init-interpreter
-    0 d-in set
+    0 <vector> d-in set
     recursive-state set
     dataflow-graph off
-    save-effect on ;
+    inferring-base-case off ;
 
 DEFER: apply-word
 
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    dup recursive-state get cons push-d
+    dup recursive-state get <literal> push-d
     #push dataflow, [ 1 0 node-outputs ] bind ;
 
 : apply-object ( obj -- )
@@ -122,30 +166,6 @@ DEFER: apply-word
     #! Recursive calls to this word are made for nested
     #! quotations.
     [ apply-object ] each ;
-
-: compose ( first second -- total )
-    #! Stack effect composition.
-    >r uncons r> uncons >r -
-    dup 0 < [ neg + r> cons ] [ r> + cons ] ifte ;
-
-: raise ( [ in | out ] -- [ in | out ] )
-    uncons 2dup min tuck - >r - r> cons ;
-
-: decompose ( first second -- solution )
-    #! Return a stack effect such that first*solution = second.
-    2dup 2car
-    2dup > [ "No solution to decomposition" throw ] when
-    swap - -rot 2cdr >r + r> cons raise ;
-
-: set-base ( [ in | out ] rstate -- )
-    #! Set the base case of the current word.
-    dup [
-        car cdr [
-            entry-effect get swap decompose base-case set
-        ] bind
-    ] [
-        2drop
-    ] ifte ;
 
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.

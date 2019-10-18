@@ -82,6 +82,7 @@ public class FactorShell extends Shell
 		try
 		{
 			state = getConsoleState(console);
+			state.openStream();
 			state.packetLoop(output);
 		}
 		catch(Exception e)
@@ -210,14 +211,14 @@ public class FactorShell extends Shell
 			}
 			else
 			{
-				/* try
+				try
 				{
 					packetLoop(output);
 				}
 				catch(Exception e)
 				{
 					Log.log(Log.ERROR,this,e);
-				} */
+				}
 			}
 		}
 
@@ -247,19 +248,22 @@ public class FactorShell extends Shell
 			Cons pair = FactorPlugin.getExternalInstance()
 				.parseObject(w.getText());
 
-			String write = (String)pair.car;
-			AttributeSet attrs = new ListenerAttributeSet(
-				(Cons)pair.next().car);
-
-			output.writeAttrs(attrs,write);
+			if(pair.car instanceof String)
+			{
+				String write = (String)pair.car;
+				AttributeSet attrs = new ListenerAttributeSet(
+					(Cons)pair.next().car);
+	
+				output.writeAttrs(attrs,write);
+			}
+			else
+				Log.log(Log.ERROR,this,"Malformed write packet: " + pair);
 		}
 		
 		void packetLoop(Output output) throws Exception
 		{
 			if(waitingForInput)
 				return;
-
-			openStream();
 
 			if(stream == null)
 				return;

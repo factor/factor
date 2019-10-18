@@ -28,6 +28,7 @@
 IN: compiler
 USE: inference
 USE: errors
+USE: generic
 USE: hashtables
 USE: kernel
 USE: lists
@@ -40,6 +41,7 @@ USE: strings
 USE: unparser
 USE: vectors
 USE: words
+USE: test
 
 : supported-cpu? ( -- ? )
     cpu "unknown" = not ;
@@ -49,14 +51,18 @@ USE: words
         "Unsupported CPU; compiler disabled" throw
     ] unless ;
 
-: compiling ( word -- definition )
+: compiling ( word -- word parameter )
     check-architecture
     "verbose-compile" get [
         "Compiling " write dup . flush
     ] when
-    cell compile-aligned dup save-xt word-parameter ;
+    dup word-parameter ;
 
-: (compile) ( word -- )
+GENERIC: (compile) ( word -- )
+
+M: word (compile) drop ;
+
+M: compound (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
     compiling dataflow optimize linearize simplify generate ;
 
@@ -78,16 +84,21 @@ USE: words
     #! Compile the most recently defined word.
     "compile" get [ word compile ] when ; parsing
 
-: cannot-compile ( word -- )
+: cannot-compile ( word error -- )
     "verbose-compile" get [
-        "Cannot compile " write .
+        "Cannot compile " write swap .
+        print-error
     ] [
-        drop
+        2drop
     ] ifte ;
 
 : try-compile ( word -- )
-    [ compile ] [ [ cannot-compile ] when ] catch ;
+    [ compile ] [ [ cannot-compile ] when* ] catch ;
 
 : compile-all ( -- )
     #! Compile all words.
-    [ try-compile ] each-word ;
+    supported-cpu? [
+        [ [ try-compile ] each-word ] time
+    ] [
+        "Unsupported CPU" print
+    ] ifte ;

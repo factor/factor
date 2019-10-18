@@ -48,7 +48,7 @@ USE: url-encoding
 
 : url>path ( uri -- path )
     url-decode "http://" ?str-head [
-        "/" split1 f "" replace nip
+        "/" split1 dup "" ? nip
     ] when ;
 
 : secure-path ( path -- path )
@@ -86,7 +86,7 @@ USE: url-encoding
             stdio get "client" set log-client
             read [ parse-request ] when*
         ] with-stream
-    ] print-error ;
+    ] try ;
 
 : httpd-connection ( socket -- )
     "http-server" get accept [ httpd-client ] in-thread drop ;

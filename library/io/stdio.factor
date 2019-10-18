@@ -70,3 +70,10 @@ M: stdio-stream fclose ( -- )
 
 C: stdio-stream ( delegate -- stream )
     [ delegate set ] extend ;
+
+: with-prefix ( prefix quot -- )
+    #! Each line of output from the given quotation is prefixed
+    #! with a string.
+    swap stdio get <prefix-stream> [
+        stdio set call
+    ] with-scope ; inline

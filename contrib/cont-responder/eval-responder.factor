@@ -27,7 +27,7 @@ IN: eval-responder
 USE: html
 USE: cont-responder
 USE: cont-utils
-USE: stack
+USE: kernel
 USE: stdio
 USE: namespaces
 USE: streams
@@ -36,7 +36,6 @@ USE: lists
 USE: errors
 USE: strings
 USE: logic
-USE: combinators
 USE: live-updater
 USE: prettyprint
 USE: unparser

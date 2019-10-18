@@ -7,6 +7,7 @@ USE: kernel
 USE: math
 USE: words
 USE: lists
+USE: vectors
 
 TRAITS: test-traits
 C: test-traits ;
@@ -100,3 +101,47 @@ M: nonempty-list funny-length length ;
 [ 0 ] [ [ 1 2 | 3 ] funny-length ] unit-test
 [ 3 ] [ [ 1 2 3 ] funny-length ] unit-test
 [ "hello" funny-length ] unit-test-fails
+
+! Testing method sorting
+GENERIC: sorting-test
+M: fixnum sorting-test drop "fixnum" ;
+M: object sorting-test drop "object" ;
+[ "fixnum" ] [ 3 sorting-test ] unit-test
+[ "object" ] [ f sorting-test ] unit-test
+
+! Testing unions
+UNION: funnies cons ratio complex ;
+
+GENERIC: funny
+M: funnies funny drop 2 ;
+M: object funny drop 0 ;
+
+[ 2 ] [ [ { } ] funny ] unit-test
+[ 0 ] [ { } funny ] unit-test
+
+PREDICATE: funnies very-funny number? ;
+
+GENERIC: gooey
+M: very-funny gooey sq ;
+
+[ 1/4 ] [ 1/2 gooey ] unit-test
+
+[ object ] [ object object class-and ] unit-test
+[ fixnum ] [ fixnum object class-and ] unit-test
+[ fixnum ] [ object fixnum class-and ] unit-test
+[ fixnum ] [ fixnum fixnum class-and ] unit-test
+[ fixnum ] [ fixnum integer class-and ] unit-test
+[ fixnum ] [ integer fixnum class-and ] unit-test
+[ vector fixnum class-and ] unit-test-fails
+[ integer ] [ fixnum bignum class-or ] unit-test
+[ integer ] [ fixnum integer class-or ] unit-test
+[ rational ] [ ratio integer class-or ] unit-test
+[ number ] [ number object class-and ] unit-test
+[ number ] [ object number class-and ] unit-test
+
+[ t ] [ del1 builtin-supertypes [ integer? ] all? ] unit-test
+
+[ cons ] [ [ 1 2 ] class ] unit-test
+
+[ t ] [ \ generic \ compound class< ] unit-test
+[ f ] [ \ compound \ generic class< ] unit-test

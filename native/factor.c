@@ -8,9 +8,7 @@ void init_factor(char* image)
 	init_io();
 	init_signals();
 
-	init_compiler();
 	init_errors();
-	gc_time = 0;
 
 #ifdef FACTOR_X86
 	userenv[CPU_ENV] = tag_object(from_c_string("x86"));

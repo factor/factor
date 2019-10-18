@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: kernel
-USE: lists
 
 : slip ( quot x -- x )
     >r call r> ; inline
@@ -50,36 +49,6 @@ USE: lists
 : apply ( code input -- code output )
     #! Apply code to input.
     swap dup >r call r> swap ; inline
-
-IN: lists DEFER: uncons IN: kernel
-: cond ( x list -- )
-    #! The list is of this form:
-    #!
-    #! [ [ condition 1 ] [ code 1 ]
-    #!   [ condition 2 ] [ code 2 ]
-    #!   ... ]
-    #!
-    #! Each condition is evaluated in turn. If it returns true,
-    #! the code is evaluated. If it returns false, the next
-    #! condition is checked.
-    #!
-    #! Before evaluating each condition, the top of the stack is
-    #! duplicated. After the last condition is evaluated, the
-    #! top of the stack is popped.
-    #!
-    #! So each condition and code block must have stack effect:
-    #! ( X -- )
-    #!
-    #! This combinator will not compile.
-    dup [
-        uncons >r over >r call r> r> rot [
-            car call
-        ] [
-            cdr cond
-        ] ifte
-    ] [
-        2drop
-    ] ifte ;
 
 : ifte* ( cond true false -- )
     #! If the condition is not f, execute the 'true' quotation,

@@ -33,6 +33,7 @@ USE: namespaces
 USE: presentation
 USE: stdio
 USE: strings
+USE: unparser
 
 : exists? ( file -- ? )
     stat >boolean ;
@@ -78,9 +79,8 @@ USE: strings
 
 : file-link. ( dir name -- )
     tuck "/" swap cat3 dup "file-link" swons swap
-    file-actions <actions> "actions" swons
-    t "underline" swons
-    3list write-attr ;
+    unparse file-actions <actions> "actions" swons
+    2list write-attr ;
 
 : file. ( dir name -- )
     #! If "doc-root" set, create links relative to it.
@@ -90,11 +90,11 @@ USE: strings
     #! If "doc-root" set, create links relative to it.
     dup directory [
         dup [ "." ".." ] contains? [
-            drop
+            2drop
         ] [
-            dupd file.
+            file.
         ] ifte
-    ] each drop ;
+    ] each-with ;
 
 : pwd cwd print ;
 : dir. cwd directory. ;

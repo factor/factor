@@ -21,6 +21,7 @@ void collect_roots(void)
 	/* the bignum 0 1 -1 constants must be the next three */
 	copy_bignum_constants();
 	copy_object(&callframe);
+	copy_object(&executing);
 
 	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
 		copy_object((void*)ptr);
@@ -79,6 +80,12 @@ INLINE void collect_object(CELL scan)
 	case PORT_TYPE:
 		collect_port((F_PORT*)scan);
 		break;
+	case ALIEN_TYPE:
+		collect_alien((ALIEN*)scan);
+		break;
+	case DLL_TYPE:
+		collect_dll((DLL*)scan);
+		break;
 	}
 }
 
@@ -108,6 +115,9 @@ void primitive_gc(void)
 	CELL scan;
 
 	gc_in_progress = true;
+
+	fprintf(stderr,"GC\n");
+	fflush(stderr);
 
 	flip_zones();
 	scan = active.here = active.base;

@@ -83,13 +83,13 @@ PREDICATE: vector hashtable ( obj -- ? )
 
 : hash-each ( hash code -- )
     #! Apply the code to each key/value pair of the hashtable.
-    swap [ swap dup >r each r> ] vector-each drop ;
+    swap [ swap dup >r each r> ] vector-each drop ; inline
 
 : hash-subset ( hash code -- hash )
     #! Return a new hashtable containing all key/value pairs
     #! for which the predicate yielded a true value. The
     #! predicate must have stack effect ( obj -- ? ).
-    swap [ swap dup >r subset r> swap ] vector-map nip ;
+    swap [ swap dup >r subset r> swap ] vector-map nip ; inline
 
 : hash-keys ( hash -- list )
     #! Push a list of keys in a hashtable.
@@ -105,3 +105,22 @@ PREDICATE: vector hashtable ( obj -- ? )
 
 : alist>hash ( alist -- hash )
     37 <hashtable> swap [ unswons pick set-hash ] each ;
+
+! In case I break hashing:
+
+! : hash* ( key table -- value )
+!     hash>alist assoc* ;
+! 
+! : set-hash ( value key table -- )
+!     dup vector-length [
+!         ( value key table index )
+!         >r 3dup r>
+!         ( value key table value key table index )
+!         [
+!             swap vector-nth
+!             ( value key table value key alist )
+!             set-assoc
+!         ] keep
+!         ( value key table new-assoc index )
+!         pick set-vector-nth
+!     ] times* 3drop ;

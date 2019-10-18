@@ -9,7 +9,7 @@ F_FIXNUM to_integer(CELL x)
 	case BIGNUM_TYPE:
 		return s48_bignum_to_long(untag_bignum(x));
 	default:
-		type_error(INTEGER_TYPE,x);
+		type_error(BIGNUM_TYPE,x);
 		return 0;
 	}
 }
@@ -32,10 +32,42 @@ F_FIXNUM unbox_integer(void)
 	return to_integer(dpop());
 }
 
+CELL to_cell(CELL x)
+{
+	F_FIXNUM fixnum;
+	F_ARRAY* bignum;
+
+	switch(type_of(x))
+	{
+	case FIXNUM_TYPE:
+		fixnum = untag_fixnum_fast(x);
+		if(fixnum < 0)
+		{
+			range_error(F,0,tag_fixnum(fixnum),FIXNUM_MAX);
+			return -1;
+		}
+		else
+			return (CELL)fixnum;
+		break;
+	case BIGNUM_TYPE:
+		bignum = to_bignum(x);
+		if(BIGNUM_NEGATIVE_P(bignum))
+		{
+			range_error(F,0,tag_object(bignum),FIXNUM_MAX);
+			return -1;
+		}
+		else
+			return s48_bignum_to_long(untag_bignum(x));
+	default:
+		type_error(BIGNUM_TYPE,x);
+		return 0;
+	}
+}
+
 /* FFI calls this */
 CELL unbox_cell(void)
 {
-	return to_integer(dpop());
+	return to_cell(dpop());
 }
 
 F_ARRAY* to_bignum(CELL tagged)
@@ -81,8 +113,8 @@ void primitive_bignum_eq(void)
 #define GC_AND_POP_BIGNUMS(x,y) \
 	F_ARRAY *x, *y; \
 	maybe_garbage_collection(); \
-	y = to_bignum(dpop()); \
-	x = to_bignum(dpop());
+	y = untag_bignum_fast(dpop()); \
+	x = untag_bignum_fast(dpop());
 
 void primitive_bignum_add(void)
 {

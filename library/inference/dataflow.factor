@@ -68,6 +68,9 @@ SYMBOL: #pick
 SYMBOL: #>r
 SYMBOL: #r>
 
+SYMBOL: #slot
+SYMBOL: #set-slot
+
 SYMBOL: node-consume-d
 SYMBOL: node-produce-d
 SYMBOL: node-consume-r
@@ -94,16 +97,16 @@ SYMBOL: node-param
     meta-r get vector-tail* node-consume-r set
     meta-d get vector-tail* node-consume-d set ;
 
-: dataflow-inputs ( [ in | out ] node -- )
-    [ car 0 node-inputs ] bind ;
+: dataflow-inputs ( in node -- )
+    [ length 0 node-inputs ] bind ;
 
 : node-outputs ( d-count r-count -- )
     #! Execute in the node's namespace.
     meta-r get vector-tail* node-produce-r set
     meta-d get vector-tail* node-produce-d set ;
 
-: dataflow-outputs ( [ in | out ] node -- )
-    [ cdr 0 node-outputs ] bind ;
+: dataflow-outputs ( out node -- )
+    [ length 0 node-outputs ] bind ;
 
 : get-dataflow ( -- IR )
     dataflow-graph get reverse ;

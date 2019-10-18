@@ -32,18 +32,15 @@ USE: html
 USE: cont-utils
 USE: html
 USE: stdio
-USE: stack
 USE: strings
 USE: namespaces
 USE: inspector
 USE: lists
-USE: combinators
 USE: cont-examples
 USE: regexp
 USE: prettyprint
 USE: todo
 USE: math
-USE: logic
 USE: kernel
  
 : todo-stylesheet ( -- string )
@@ -191,12 +188,19 @@ USE: kernel
 
 : valid-username-char ( ch -- b ) 
   #! Return true if the character is valid to appear in a username.
-  [ 
-    [ letter? ] [ drop t ] 
-    [ LETTER? ] [ drop t ] 
-    [ digit?  ] [ drop t ] 
-    [         ] [ drop f ] 
-  ] cond ;
+  dup letter? [
+    drop t
+  ] [
+    dup LETTER? [
+      drop t
+    ] [
+      digit? [
+        t
+      ] [
+        f
+      ] ifte
+    ] ifte
+  ] ifte ;
 
 : replace-invalid-username-chars ( str -- str ) 
   #! Return a string with invalid username characters mapped to underscores.

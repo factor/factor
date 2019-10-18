@@ -52,12 +52,6 @@ global [ <namespace> "httpd-responders" set ] bind
 ] extend add-responder
 
 <responder> [
-    "inspect" "responder" set
-    [ inspect-responder ] "get" set
-    "global" "default-argument" set
-] extend add-responder
-
-<responder> [
     "quit" "responder" set
     [ quit-responder ] "get" set
 ] extend add-responder

@@ -37,7 +37,7 @@ public class FactorParsedData extends SideKickParsedData
 	public FactorSideKickParser parser;
 	public String in;
 	public Cons use;
-	
+
 	FactorParsedData(FactorSideKickParser parser, String fileName)
 	{
 		super(fileName);

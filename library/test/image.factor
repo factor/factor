@@ -2,6 +2,10 @@ USE: test
 USE: image
 USE: namespaces
 USE: stdio
+USE: parser
+USE: kernel
+USE: generic
+USE: math
 
 [ "ab\0\0" ] [ 4 "ab" align-string ] unit-test
 
@@ -21,3 +25,10 @@ USE: stdio
 [
     [ image-magic write-big-endian-64 ] with-string
 ] unit-test
+
+[
+    boot-quot off
+    "/library/bootstrap/boot.factor" run-resource
+] with-image drop
+
+[ fixnum ] [ 4 class ] unit-test

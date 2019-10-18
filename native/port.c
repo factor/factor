@@ -48,11 +48,11 @@ void init_line_buffer(F_PORT* port, F_FIXNUM count)
 void fixup_port(F_PORT* port)
 {
 	port->fd = (F_FIXNUM)INVALID_HANDLE_VALUE;
-	fixup(&port->buffer);
-	fixup(&port->line);
-	fixup(&port->client_host);
-	fixup(&port->client_port);
-	fixup(&port->io_error);
+	data_fixup(&port->buffer);
+	data_fixup(&port->line);
+	data_fixup(&port->client_host);
+	data_fixup(&port->client_port);
+	data_fixup(&port->io_error);
 }
 
 void collect_port(F_PORT* port)

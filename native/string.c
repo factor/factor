@@ -1,12 +1,9 @@
 #include "factor.h"
 
 /* untagged */
-F_STRING* allot_string(F_FIXNUM capacity)
+F_STRING* allot_string(CELL capacity)
 {
-	F_STRING* string;
-	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
-	string = allot_object(STRING_TYPE,
+	F_STRING* string = allot_object(STRING_TYPE,
 		sizeof(F_STRING) + capacity * CHARS);
 	string->capacity = capacity;
 	return string;
@@ -15,7 +12,7 @@ F_STRING* allot_string(F_FIXNUM capacity)
 /* call this after constructing a string */
 /* uses same algorithm as java.lang.String for compatibility with
 images generated from Java Factor. */
-F_FIXNUM hash_string(F_STRING* str, F_FIXNUM len)
+F_FIXNUM hash_string(F_STRING* str, CELL len)
 {
 	F_FIXNUM hash = 0;
 	CELL i;
@@ -26,11 +23,11 @@ F_FIXNUM hash_string(F_STRING* str, F_FIXNUM len)
 
 void rehash_string(F_STRING* str)
 {
-	str->hashcode = hash_string(str,str->capacity);
+	str->hashcode = tag_fixnum(hash_string(str,str->capacity));
 }
 
 /* untagged */
-F_STRING* string(F_FIXNUM capacity, CELL fill)
+F_STRING* string(CELL capacity, CELL fill)
 {
 	CELL i;
 
@@ -59,22 +56,33 @@ F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, uint16_t fill)
 	return new_string;
 }
 
-/* untagged */
-F_STRING* from_c_string(const BYTE* c_string)
+INLINE F_STRING* memory_to_string(const BYTE* string, CELL length)
 {
-	CELL length = strlen(c_string);
 	F_STRING* s = allot_string(length);
 	CELL i;
 
 	for(i = 0; i < length; i++)
 	{
-		cput(SREF(s,i),*c_string);
-		c_string++;
+		cput(SREF(s,i),*string);
+		string++;
 	}
 
 	rehash_string(s);
 	
 	return s;
+}
+
+void primitive_memory_to_string(void)
+{
+	CELL length = unbox_cell();
+	BYTE* string = (BYTE*)unbox_cell();
+	dpush(tag_object(memory_to_string(string,length)));
+}
+
+/* untagged */
+F_STRING* from_c_string(const BYTE* c_string)
+{
+	return memory_to_string(c_string,strlen(c_string));
 }
 
 /* FFI calls this */
@@ -98,19 +106,27 @@ BYTE* to_c_string(F_STRING* s)
 	return to_c_string_unchecked(s);
 }
 
+INLINE void string_to_memory(F_STRING* s, BYTE* string)
+{
+	CELL i;
+	for(i = 0; i < s->capacity; i++)
+		string[i] = string_nth(s,i);
+}
+
+void primitive_string_to_memory(void)
+{
+	BYTE* address = (BYTE*)unbox_cell();
+	F_STRING* str = untag_string(dpop());
+	string_to_memory(str,address);
+}
+
 /* untagged */
 BYTE* to_c_string_unchecked(F_STRING* s)
 {
 	F_STRING* _c_str = allot_string(s->capacity / CHARS + 1);
-	CELL i;
-
 	BYTE* c_str = (BYTE*)(_c_str + 1);
-	
-	for(i = 0; i < s->capacity; i++)
-		c_str[i] = string_nth(s,i);
-
+	string_to_memory(s,c_str);
 	c_str[s->capacity] = '\0';
-
 	return c_str;
 }
 
@@ -120,18 +136,13 @@ BYTE* unbox_c_string(void)
 	return to_c_string(untag_string(dpop()));
 }
 
-void primitive_string_length(void)
-{
-	drepl(tag_fixnum(untag_string(dpeek())->capacity));
-}
-
 void primitive_string_nth(void)
 {
 	F_STRING* string = untag_string(dpop());
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= string->capacity)
-		range_error(tag_object(string),index,string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(index),string->capacity);
 	dpush(tag_fixnum(string_nth(string,index)));
 }
 
@@ -186,15 +197,10 @@ void primitive_string_eq(void)
 {
 	F_STRING* s1 = untag_string(dpop());
 	CELL with = dpop();
-	if(typep(STRING_TYPE,with))
+	if(type_of(with) == STRING_TYPE)
 		dpush(tag_boolean(string_eq(s1,(F_STRING*)UNTAG(with))));
 	else
 		dpush(F);
-}
-
-void primitive_string_hashcode(void)
-{
-	drepl(tag_fixnum(untag_string(dpeek())->hashcode));
 }
 
 CELL index_of_ch(CELL index, F_STRING* string, CELL ch)
@@ -252,7 +258,7 @@ void primitive_index_of(void)
 	index = to_fixnum(dpop());
 	if(index < 0 || index > string->capacity)
 	{
-		range_error(tag_object(string),index,string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(index),string->capacity);
 		result = -1; /* can't happen */
 	}
 	else if(TAG(ch) == FIXNUM_TYPE)
@@ -267,10 +273,10 @@ INLINE F_STRING* substring(CELL start, CELL end, F_STRING* string)
 	F_STRING* result;
 
 	if(start < 0)
-		range_error(tag_object(string),start,string->capacity);
+		range_error(tag_object(string),0,to_fixnum(start),string->capacity);
 
 	if(end < start || end > string->capacity)
-		range_error(tag_object(string),end,string->capacity);
+		range_error(tag_object(string),0,to_fixnum(end),string->capacity);
 
 	result = allot_string(end - start);
 	memcpy(result + 1,
@@ -329,4 +335,9 @@ void primitive_string_reverse(void)
 	string_reverse(s,s->capacity);
 	rehash_string(s);
 	drepl(tag_object(s));
+}
+
+void primitive_to_string(void)
+{
+	type_check(STRING_TYPE,dpeek());
 }

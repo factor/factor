@@ -14,9 +14,9 @@ USE: namespaces
 USE: vectors
 
 : f_ ( h s v i -- f ) >r swap rot >r 2dup r> 6 * r> - ;
-: p ( v s x -- v p x ) >r dupd neg succ * r> ;
-: q ( v s f -- q ) * neg succ * ;
-: t_ ( v s f -- t_ ) neg succ * neg succ * ;
+: p ( v s x -- v p x ) >r dupd neg 1 + * r> ;
+: q ( v s f -- q ) * neg 1 + * ;
+: t_ ( v s f -- t_ ) neg 1 + * neg 1 + * ;
 
 : mod-cond ( p vector -- )
     #! Call p mod q'th entry of the vector of quotations, where

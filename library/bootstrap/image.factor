@@ -137,7 +137,7 @@ GENERIC: ' ( obj -- ptr )
 : here-as ( tag -- pointer )
     here swap bitor ;
 
-: pad ( -- )
+: align-here ( -- )
     here 8 mod 4 = [ 0 emit ] when ;
 
 ( Remember what objects we've compiled )
@@ -162,7 +162,7 @@ M: bignum ' ( bignum -- tagged )
         [ 0  | [ 1 0   ] ]
         [ -1 | [ 2 1 1 ] ]
         [ 1  | [ 2 0 1 ] ]
-    ] assoc [ emit ] each pad r> ;
+    ] assoc [ emit ] each align-here r> ;
 
 ( Special objects )
 
@@ -190,21 +190,14 @@ M: f ' ( obj -- ptr )
 
 ( Words )
 
-: make-plist ( word -- plist )
-    [
-        dup word-name "name" swons ,
-        dup word-vocabulary "vocabulary" swons ,
-        parsing? [ t "parsing" swons , ] when
-    ] make-list ;
-
 : word, ( word -- )
     [
         word-tag >header ,
-        dup hashcode ,
+        dup hashcode fixnum-tag immediate ,
         0 ,
         dup word-primitive ,
         dup word-parameter ' ,
-        dup make-plist ' ,
+        dup word-plist ' ,
         0 ,
         0 ,
     ] make-list
@@ -272,9 +265,9 @@ M: cons ' ( c -- tagged )
     object-tag here-as swap
     string-type >header emit
     dup str-length emit
-    dup hashcode emit
+    dup hashcode fixnum-tag immediate emit
     pack-string
-    pad ;
+    align-here ;
 
 M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
@@ -293,15 +286,37 @@ M: string ' ( string -- pointer )
     array-type >header emit
     dup length emit
     ( elements -- ) [ emit ] each
-    pad r> ;
+    align-here r> ;
 
-M: vector ' ( vector -- pointer )
+: emit-vector ( vector -- pointer )
     dup vector>list emit-array swap vector-length
     object-tag here-as >r
     vector-type >header emit
     emit ( length )
     emit ( array ptr )
-    pad r> ;
+    align-here r> ;
+
+M: vector ' ( vector -- pointer )
+    emit-vector ;
+
+: rehash ( hashtable -- )
+    ! Now make a rehashing boot quotation
+    dup hash>alist [
+        >r dup vector-length [
+            f swap pick set-vector-nth
+        ] times* r>
+        [ unswons rot set-hash ] each-with
+    ] cons cons
+    boot-quot [ append ] change ;
+
+M: hashtable ' ( hashtable -- pointer )
+    #! Only hashtables are pooled, not vectors!
+    dup pooled-object dup [
+        nip
+    ] [
+        drop [ dup emit-vector [ pool-object ] keep ] keep
+        rehash
+    ] ifte ;
 
 ( End of the image )
 
@@ -323,11 +338,11 @@ M: vector ' ( vector -- pointer )
     global-offset fixup ;
 
 : boot, ( quot -- )
-    boot-quot get ' boot-quot-offset fixup ;
+    boot-quot get swap append ' boot-quot-offset fixup ;
 
-: end ( -- )
-    boot,
+: end ( quot -- )
     global,
+    boot,
     fixup-words
     here base - heap-size-offset fixup ;
 
@@ -364,6 +379,7 @@ M: vector ' ( vector -- pointer )
     ] with-scope ;
 
 : with-image ( quot -- image )
+    #! The quotation leaves a boot quotation on the stack.
     [ begin call end ] with-minimal-image ;
 
 : test-image ( quot -- ) with-image vector>list . ;
@@ -371,8 +387,8 @@ M: vector ' ( vector -- pointer )
 : make-image ( name -- )
     #! Make an image for the C interpreter.
     [
+        boot-quot off
         "/library/bootstrap/boot.factor" run-resource
-        boot-quot set
     ] with-image
 
     swap write-image ;
