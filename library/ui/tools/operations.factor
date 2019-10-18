@@ -5,7 +5,7 @@ USING: definitions gadgets gadgets-browser gadgets-dataflow
 gadgets-help gadgets-listener gadgets-text gadgets-workspace
 hashtables help inference kernel namespaces parser prettyprint
 scratchpad sequences strings styles syntax test tools words
-generic models io ;
+generic models io modules ;
 
 V{ } clone operations set-global
 
@@ -28,6 +28,12 @@ M: operation invoke-command ( target operation -- )
     { +default+ t }
     { +name+ "Inspect" }
     { +quot+ [ inspect ] }
+    { +listener+ t }
+} define-operation
+
+[ drop t ] H{
+    { +name+ "Prettyprint" }
+    { +quot+ [ . ] }
     { +listener+ t }
 } define-operation
 
@@ -77,6 +83,11 @@ M: operation invoke-command ( target operation -- )
 } define-operation
 
 [ word? ] H{
+    { +name+ "Edit documentation" }
+    { +quot+ [ <link> edit ] }
+} define-operation
+
+[ word? ] H{
     { +name+ "Usage" }
     { +keyboard+ T{ key-down f { A+ } "u" } }
     { +quot+ [ usage. ] }
@@ -93,6 +104,18 @@ M: operation invoke-command ( target operation -- )
 [ word? ] H{
     { +name+ "Watch" }
     { +quot+ [ watch ] }
+    { +listener+ t }
+} define-operation
+
+[ word? ] H{
+    { +name+ "Forget" }
+    { +quot+ [ forget ] }
+} define-operation
+
+[ word? ] H{
+    { +name+ "Word stack effect" }
+    { +keyboard+ T{ key-down f { A+ } "i" } }
+    { +quot+ [ word-def infer. ] }
     { +listener+ t }
 } define-operation
 
@@ -119,6 +142,40 @@ M: operation invoke-command ( target operation -- )
     { +quot+ [ vocab-link-name [ use+ ] curry call-listener ] }
 } define-operation
 
+[ vocab-link? ] H{
+    { +name+ "Forget" }
+    { +quot+ [ vocab-link-name forget-vocab ] }
+} define-operation
+
+! Modules
+[ module? ] H{
+    { +name+ "Run" }
+    { +quot+ [ module-name run-module ] }
+    { +listener+ t }
+} define-operation
+
+[ module? ] H{
+    { +name+ "Documentation" }
+    { +quot+ [ module-help [ help-gadget call-tool ] when* ] }
+} define-operation
+
+[ module? ] H{
+    { +name+ "Edit" }
+    { +quot+ [ edit ] }
+} define-operation
+
+[ module? ] H{
+    { +name+ "Reload" }
+    { +quot+ [ reload-module ] }
+    { +listener+ t }
+} define-operation
+
+[ module? ] H{
+    { +name+ "See" }
+    { +quot+ [ see ] }
+    { +listener+ t }
+} define-operation
+
 ! Link
 [ link? ] H{
     { +default+ t }
@@ -143,9 +200,9 @@ M: operation invoke-command ( target operation -- )
 
 ! Quotations
 [ quotation? ] H{
-    { +name+ "Infer" }
+    { +name+ "Quotation stack effect" }
     { +keyboard+ T{ key-down f { C+ A+ } "i" } }
-    { +quot+ [ infer . ] }
+    { +quot+ [ infer. ] }
     { +listener+ t }
 } define-operation
 

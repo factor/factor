@@ -72,9 +72,3 @@ IN: crypto
     HEX: 0F HEX: 8F HEX: 4F HEX: CF HEX: 2F HEX: AF HEX: 6F HEX: EF HEX: 1F HEX: 9F HEX: 5F HEX: DF HEX: 3F HEX: BF HEX: 7F HEX: FF
 } ; inline
 
-: modular-exp ( a b n -- d )
-    n set b set a set 0 c set 1 d set
-    [
-        [ ] each-bit
-    ] with-scope ;
-

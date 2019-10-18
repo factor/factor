@@ -17,7 +17,7 @@ TUPLE: io-callback overlapped quotation stream ;
     ] member? ;
 
 : handle-io-error ( -- )
-    GetLastError expected-error? [ win32-throw-error ] unless ;
+    GetLastError expected-error? [ win32-error ] unless ;
 
 : queue-error ( len/status -- len/status )
     GetLastError expected-error? [ drop f ] unless ;
@@ -44,7 +44,8 @@ TUPLE: io-callback overlapped quotation stream ;
     [ 
         2array "file-mode" set
         get-access get-sharemode f get-create FILE_FLAG_OVERLAPPED f 
-        CreateFile dup INVALID_HANDLE_VALUE = [ win32-throw-error ] when
+        CreateFile dup INVALID_HANDLE_VALUE =
+        [ win32-error ] when
         dup add-completion
     ] with-scope ;
 
@@ -98,6 +99,6 @@ IN: win32-io-internals
 
 : win32-init-stdio ( -- )
     INVALID_HANDLE_VALUE f f 1 CreateIoCompletionPort
-    completion-port set 
-    <io-queue> io-queue set ;
+    completion-port set-global
+    <io-queue> io-queue set-global ;
 

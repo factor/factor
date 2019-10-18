@@ -35,14 +35,14 @@ C: track ( orientation -- track )
 M: track layout*
     dup track-layout pack-layout ;
 
-: track-pref-dims ( dims sizes -- dims )
-    [ [ dup zero? [ nip ] [ v/n ] if ] 2map max-dim ] keep
+: track-pref-dims ( dims sizes -- dim )
+    [ [ dup zero? [ drop ] [ v/n ] if ] 2map max-dim ] keep
     divider-sizes v+ [ >fixnum ] map ;
 
 M: track pref-dim*
     [
         dup gadget-children
-        2 group [ first ] map pref-dims
+        2 group 0 <column> pref-dims
         dup rot track-sizes track-pref-dims >r max-dim r>
     ] keep gadget-orientation set-axis ;
 

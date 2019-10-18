@@ -6,10 +6,16 @@ inference io kernel kernel-internals math namespaces parser
 prettyprint sequences strings words ;
 
 TUPLE: alien-invoke library function return parameters ;
+
+GENERIC: alien-invoke-abi ( node -- string )
+
+M: alien-invoke alien-invoke-abi
+    alien-invoke-library library-abi ;
+
 C: alien-invoke make-node ;
 
 : alien-invoke-stack ( node -- )
-    dup alien-invoke-parameters length over consume-values
+    dup alien-invoke-parameters over consume-values
     dup alien-invoke-return "void" = 0 1 ? swap produce-values ;
 
 : alien-invoke-dlsym ( node -- symbol dll )
@@ -29,23 +35,22 @@ M: alien-invoke-error summary
     [ inference-warning ] recover ;
 
 \ alien-invoke [ string object string object ] [ ] <effect>
-"infer-effect" set-word-prop
+"inferred-effect" set-word-prop
 
 \ alien-invoke [
-    empty-node <alien-invoke> dup node,
+    empty-node <alien-invoke>
     pop-literal nip over set-alien-invoke-parameters
     pop-literal nip over set-alien-invoke-function
     pop-literal nip over set-alien-invoke-library
     pop-literal nip over set-alien-invoke-return
+    dup alien-invoke-parameters make-prep-quot infer-quot
     dup ensure-dlsym
+    dup node,
     alien-invoke-stack
 ] "infer" set-word-prop
 
-: unbox-parameter ( stack# type -- )
-    c-type [ "reg-class" get "unboxer" get call ] bind ;
-
 : unbox-parameters ( parameters -- )
-    [ unbox-parameter ] reverse-each-parameter ;
+    [ c-type c-type-unbox ] reverse-each-parameter ;
 
 : objects>registers ( parameters -- )
     #! Generate code for boxing a list of C types, then generate
@@ -57,17 +62,17 @@ M: alien-invoke-error summary
     \ %stack>freg move-parameters ;
 
 : box-return ( ctype -- )
-    [ ] [ f swap box-parameter ] if-void ;
+    [ ] [ f swap c-type c-type-box ] if-void ;
 
 : generate-invoke-cleanup ( node -- )
-    dup alien-invoke-library library-abi "stdcall" = [
+    dup alien-invoke-abi "stdcall" = [
         drop
     ] [
         alien-invoke-parameters stack-space %cleanup
     ] if ;
 
 M: alien-invoke generate-node
-    end-basic-block compile-gc
+    end-basic-block
     dup alien-invoke-parameters objects>registers
     dup alien-invoke-dlsym %alien-invoke
     dup generate-invoke-cleanup

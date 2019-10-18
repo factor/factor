@@ -11,7 +11,7 @@ define-objc-class
 
 : test-foo
     Foo -> alloc -> init
-    dup 1 2 101 102 <NSRect> -> foo:
+    dup 1.0 2.0 101.0 102.0 <NSRect> -> foo:
     -> release ;
 
 test-foo

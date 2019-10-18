@@ -1,33 +1,33 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: kernel math math-internals ;
 
 : cos ( x -- y )
-    >rect 2dup
+    >float-rect 2dup
     fcosh swap fcos * -rot
-    fsinh swap fsin neg * rect> ; inline
+    fsinh swap fsin neg * rect> ; foldable
 
 : sec ( x -- y ) cos recip ; inline
 
 : cosh ( x -- y )
-    >rect 2dup
+    >float-rect 2dup
     fcos swap fcosh * -rot
-    fsin swap fsinh * rect> ; inline
+    fsin swap fsinh * rect> ; foldable
 
 : sech ( x -- y ) cosh recip ; inline
 
 : sin ( x -- y )
-    >rect 2dup
+    >float-rect 2dup
     fcosh swap fsin * -rot
-    fsinh swap fcos * rect> ; inline
+    fsinh swap fcos * rect> ; foldable
 
 : cosec ( x -- y ) sin recip ; inline
 
 : sinh ( x -- y )
-    >rect 2dup
+    >float-rect 2dup
     fcos swap fsinh * -rot
-    fsin swap fcosh * rect> ; inline
+    fsin swap fcosh * rect> ; foldable
 
 : cosech ( x -- y ) sinh recip ; inline
 

@@ -15,7 +15,7 @@ C: x-clipboard ( atom -- clipboard )
 : selection-property ( -- n )
     "org.factorcode.Factor.SELECTION" x-atom ;
 
-: convert-selection ( win selection -- n )
+: convert-selection ( win selection -- )
     swap >r >r dpy get r> XA_STRING selection-property r>
     CurrentTime XConvertSelection drop ;
 
@@ -52,7 +52,7 @@ C: x-clipboard ( atom -- clipboard )
     >r XA_STRING 8 PropModeReplace r>
     XSelectionRequestEvent-selection
     clipboard-for-atom x-clipboard-contents
-    dup length XChangeProperty drop ;
+    dup string>char-alien swap length XChangeProperty drop ;
 
 : set-targets-prop ( evt -- )
     dpy get swap

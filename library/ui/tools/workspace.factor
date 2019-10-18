@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-workspace
 USING: help arrays compiler gadgets gadgets-books
-gadgets-browser gadgets-buttons
-gadgets-dataflow gadgets-frames gadgets-grids gadgets-help
+gadgets-browser gadgets-buttons gadgets-dataflow gadgets-help
 gadgets-listener gadgets-presentations gadgets-walker
 gadgets-workspace generic kernel math modules scratchpad
 sequences syntax words io namespaces hashtables
@@ -55,7 +54,7 @@ tool "toolbar" {
     } ;
 
 C: workspace ( -- workspace )
-    workspace-tabs [ second execute <tool> ] map <book>
+    workspace-tabs 1 <column> [ execute <tool> ] map <book>
     over set-gadget-delegate dup dup set-control-self ;
 
 M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
@@ -78,7 +77,7 @@ M: workspace pref-dim* delegate pref-dim* { 550 650 } vmax ;
     open-window
     listener-gadget get-tool start-listener ;
 
-: tool-window ( class -- ) workspace-window show-tool drop ;
+: tool-window ( class -- ) workspace-window show-tool 2drop ;
 
 : tool-scroll-up ( workspace -- )
     current-page tool-scroller [ scroll-up-page ] when* ;
@@ -101,9 +100,9 @@ workspace "tool-switch" {
 } define-commands
 
 workspace "tool-window" {
-    { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window drop ] }
-    { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window drop ] }
-    { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window drop ] }
+    { "New listener" T{ key-down f { S+ } "F2" } [ listener-gadget tool-window ] }
+    { "New definitions" T{ key-down f { S+ } "F3" } [ browser tool-window ] }
+    { "New documentation" T{ key-down f { S+ } "F4" } [ help-gadget tool-window ] }
 } define-commands
 
 workspace "workflow" {

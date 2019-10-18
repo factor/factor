@@ -11,7 +11,7 @@ namespaces parser prettyprint sequences strings words shells ;
         readln string>number
     ] with-stream ;
 
-: make-jedit-request ( files params -- code )
+: make-jedit-request ( files -- code )
     [
         "EditServer.handleClient(false,false,false," write
         cwd pprint

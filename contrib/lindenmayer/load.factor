@@ -1,1 +1,2 @@
-PROVIDE: contrib/lindenmayer { "lindenmayer.factor" } ;
+PROVIDE: contrib/lindenmayer
+{ +files+ { "lindenmayer.factor" } } ;

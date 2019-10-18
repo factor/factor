@@ -19,7 +19,7 @@ M: slate draw-gadget* ( slate -- ) dup slate-ns swap slate-action bind ;
 
 VAR: slate
 
-: action> ( -- ) slate> slate-action ;
+: action> ( -- quot ) slate> slate-action ;
 
 : >action ( quot -- ) slate> set-slate-action ;
 

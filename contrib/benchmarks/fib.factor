@@ -10,7 +10,7 @@ USE: words
 ! Five fibonacci implementations, each one slower than the
 ! previous.
 
-: fast-fixnum-fib ( n -- nth fibonacci number )
+: fast-fixnum-fib ( m -- n )
     dup 1 fixnum<= [
         drop 1
     ] [
@@ -20,7 +20,7 @@ USE: words
 
 [ 9227465 ] [ 34 fast-fixnum-fib ] unit-test
 
-: fixnum-fib ( n -- nth fibonacci number )
+: fixnum-fib ( m -- n )
     dup 1 fixnum<= [
         drop 1
     ] [
@@ -29,14 +29,14 @@ USE: words
 
 [ 9227465 ] [ 34 fixnum-fib ] unit-test
 
-: fib ( n -- nth fibonacci number )
+: fib ( m -- n )
     dup 1 <= [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
 
 [ 9227465 ] [ 34 fib ] unit-test
 
 TUPLE: box i ;
 
-: tuple-fib ( n -- n )
+: tuple-fib ( m -- n )
     dup box-i 1 <= [
         drop 1 <box>
     ] [
@@ -51,7 +51,7 @@ TUPLE: box i ;
 [ T{ box f 9227465 } ] [ T{ box f 34 } tuple-fib ] unit-test
 
 SYMBOL: n
-: namespace-fib ( n -- n )
+: namespace-fib ( m -- n )
     [
         n set
         n get 1 <= [

@@ -97,6 +97,7 @@ M: duplex-stream write-gadget
 : with-pane ( pane quot -- )
     #! Clear the pane and run the quotation in a scope with
     #! stdio set to the pane.
+    over scroll>top
     over pane-clear >r <pane-stream> r>
     over >r with-stream r> ?terpri ; inline
 

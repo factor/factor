@@ -199,7 +199,7 @@ M: gb set-nth-unsafe ( elt n seq -- ) gb@ set-nth-unsafe ;
 
 ! ------- editing operations ---------------
 
-G: insert* 2 standard-combination ;
+G: insert* ( seq position gb -- ) 2 standard-combination ;
 
 : prepare-insert ( seq position gb -- seq gb )
     tuck move-gap over length over ensure-room ;

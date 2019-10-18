@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 
-PROVIDE: contrib/lazy-lists { 
+PROVIDE: contrib/lazy-lists
+{ +files+ {
     "lists.factor"
     "lists.facts"
     "lazy.factor"
@@ -9,6 +10,7 @@ PROVIDE: contrib/lazy-lists {
     "lazy-io.factor"
     "lazy-io.facts"
     "examples.factor"
-} {
+} }
+{ +tests+ {
     "test/lists.factor"
-} ;
+} } ;

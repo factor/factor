@@ -41,12 +41,14 @@ call
     { "call" "kernel"                       }
     { "if" "kernel"                         }
     { "dispatch" "kernel-internals"         }
-    { "<vector>" "vectors"                  }
     { "rehash-string" "strings"             }
-    { "<sbuf>" "strings"                    }
-    { ">fixnum" "math"                      }
-    { ">bignum" "math"                      }
-    { ">float" "math"                       }
+    { "string>sbuf" "strings"               }
+    { "bignum>fixnum" "math-internals"      }
+    { "float>fixnum" "math-internals"       }
+    { "fixnum>bignum" "math-internals"      }
+    { "float>bignum" "math-internals"       }
+    { "fixnum>float" "math-internals"       }
+    { "bignum>float" "math-internals"       }
     { "(fraction>)" "math-internals"        }
     { "string>float" "math-internals"       }
     { "float>string" "math-internals"       }
@@ -61,7 +63,6 @@ call
     { "fixnum-fast" "math-internals"        }
     { "fixnum*" "math-internals"            }
     { "fixnum/i" "math-internals"           }
-    { "fixnum/f" "math-internals"           }
     { "fixnum-mod" "math-internals"         }
     { "fixnum/mod" "math-internals"         }
     { "fixnum-bitand" "math-internals"      }
@@ -78,7 +79,6 @@ call
     { "bignum-" "math-internals"            }
     { "bignum*" "math-internals"            }
     { "bignum/i" "math-internals"           }
-    { "bignum/f" "math-internals"           }
     { "bignum-mod" "math-internals"         }
     { "bignum/mod" "math-internals"         }
     { "bignum-bitand" "math-internals"      }
@@ -190,7 +190,6 @@ call
     { "resize-string" "strings"             }
     { "(hashtable)" "hashtables-internals"  }
     { "<array>" "arrays"                    }
-    { "<tuple>" "kernel-internals"          }
     { "begin-scan" "memory"                 }
     { "next-object" "memory"                }
     { "end-scan" "memory"                   }
@@ -205,11 +204,9 @@ call
     { "expired?" "alien"                    }
     { "<wrapper>" "kernel"                  }
     { "(clone)" "kernel-internals"          }
-    { "array>tuple" "kernel-internals"      }
-    { "tuple>array" "generic"               }
+    { "become" "kernel-internals"           }
     { "array>vector" "vectors"              }
     { "<string>" "strings"                  }
-    { "<quotation>" "kernel"                }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
 FORGET: make-primitive
@@ -244,11 +241,11 @@ num-types f <array> builtins set
 
 "fixnum?" "math" create t "inline" set-word-prop
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
-"fixnum" "math" create ">fixnum" "math" lookup unit "coercer" set-word-prop
+"fixnum" "math" create ">fixnum" "math" create unit "coercer" set-word-prop
 
 "bignum?" "math" create t "inline" set-word-prop
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
-"bignum" "math" create ">bignum" "math" lookup unit "coercer" set-word-prop
+"bignum" "math" create ">bignum" "math" create unit "coercer" set-word-prop
 
 "word?" "words" create t "inline" set-word-prop
 "word" "words" create 2 "word?" "words" create
@@ -301,7 +298,7 @@ num-types f <array> builtins set
 
 "float?" "math" create t "inline" set-word-prop
 "float" "math" create 5 "float?" "math" create { } define-builtin
-"float" "math" create ">float" "math" lookup unit "coercer" set-word-prop
+"float" "math" create ">float" "math" create unit "coercer" set-word-prop
 
 "complex?" "math" create t "inline" set-word-prop
 "complex" "math" create 6 "complex?" "math" create
@@ -397,10 +394,10 @@ num-types f <array> builtins set
 
 "dll?" "alien" create t "inline" set-word-prop
 "dll" "alien" create 15 "dll?" "alien" create
-{ { 1 object { "dll-path" "alien" } f } } define-builtin
+{ { 1 byte-array { "dll-path" "alien" } f } } define-builtin
 
 "alien" "alien" create 16 "alien?" "alien" create
-{ { 1 object { "underlying-alien" "alien" } f } } define-builtin
+{ { 1 c-ptr { "underlying-alien" "alien" } f } } define-builtin
 
 "tuple?" "kernel" create t "inline" set-word-prop
 "tuple" "kernel" create 17 "tuple?" "kernel" create

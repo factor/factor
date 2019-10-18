@@ -118,13 +118,12 @@ void dump_memory(CELL from, CELL to)
 		dump_cell(from);
 }
 
-void dump_generation(ZONE *z)
+void dump_generation(F_ZONE *z)
 {
-	fprintf(stderr,"base=%lx, size=%lx, here=%lx, alarm=%lx\n",
+	fprintf(stderr,"base=%lx, size=%lx, here=%lx\n",
 		z->base,
 		z->limit - z->base,
-		z->here - z->base,
-		z->alarm - z->base);
+		z->here - z->base);
 }
 
 void dump_generations(void)

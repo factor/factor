@@ -18,7 +18,7 @@ sequences words parser words ;
     infer-shuffle-outputs ;
 
 : define-shuffle ( word shuffle -- )
-    [ "infer-effect" set-word-prop ] 2keep
+    [ "inferred-effect" set-word-prop ] 2keep
     [ infer-shuffle ] curry "infer" set-word-prop ;
 
 {
@@ -47,7 +47,7 @@ sequences words parser words ;
     0 1 rot node-outputs
 ] "infer" set-word-prop
 
-\ >r { object } { } <effect> "infer-effect" set-word-prop
+\ >r { object } { } <effect> "inferred-effect" set-word-prop
 
 \ r> [
     check-r>
@@ -57,4 +57,4 @@ sequences words parser words ;
     1 0 rot node-outputs
 ] "infer" set-word-prop
 
-\ r> { } { object } <effect> "infer-effect" set-word-prop
+\ r> { } { object } <effect> "inferred-effect" set-word-prop

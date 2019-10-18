@@ -87,7 +87,7 @@ SYMBOL: request-params
 : service-post ( url -- ) "response" get swap service-request ;
 
 : explode-tuple ( tuple -- )
-    dup tuple>array 2 tail swap class "slot-names" word-prop
+    dup tuple-slots swap class "slot-names" word-prop
     [ set ] 2each ;
 
 SYMBOL: model
@@ -102,7 +102,7 @@ SYMBOL: model
     template-path get swap path+ call-template ;
 
 : render-page ( model template title -- )
-    [
+    serving-html [
         [
             render-template
         ] html-document

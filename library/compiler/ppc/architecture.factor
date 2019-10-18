@@ -77,12 +77,17 @@ M: object load-literal
 : %dispatch ( -- )
     #! The value 20 is a magic number. It is the length of the
     #! instruction sequence that follows
-    "n" operand dup 1 SRAWI
-    0 "scratch" operand LOAD32 rel-absolute-2/2 rel-here
-    "n" operand dup "scratch" operand ADD
-    "n" operand dup 20 LWZ
-    "n" operand MTLR
-    BLR ;
+    [
+        "n" operand dup 1 SRAWI
+        0 "scratch" operand LOAD32 rel-absolute-2/2 rel-here
+        "n" operand dup "scratch" operand ADD
+        "n" operand dup 20 LWZ
+        "n" operand MTLR
+        BLR
+    ] H{
+        { +input+ { { f "n" } } }
+        { +scratch+ { { f "scratch" } } }
+    } with-template ;
 
 : %target ( label -- ) 0 , rel-absolute-cell rel-label ;
 
@@ -106,32 +111,6 @@ M: int-regs (%replace)
 
 : %move-int>float ( dst src -- )
     [ v>operand ] 2apply float-offset LFD ;
-
-: load-zone-ptr ( reg -- )
-    "generations" f pick compile-dlsym dup 0 LWZ ;
-
-: load-allot-ptr ( -- )
-    12 load-zone-ptr 12 12 cell LWZ ;
-
-: save-allot-ptr ( -- )
-    11 [ load-zone-ptr 12 ] keep cell STW ;
-
-: with-inline-alloc ( prequot postquot spec -- )
-    load-allot-ptr [
-        \ tag-header get call tag-header 11 LI
-        11 12 0 STW
-        >r call 12 11 \ tag get call ORI
-        r> call 12 12 \ size get call ADDI
-    ] bind save-allot-ptr ; inline
-
-M: float-regs (%replace)
-    drop swap
-    [ v>operand 12 8 STFD ]
-    [ 11 swap loc>operand STW ] H{
-        { tag-header [ float-tag ] }
-        { tag [ float-tag ] }
-        { size [ 16 ] }
-    } with-inline-alloc ;
 
 : %inc-d ( n -- ) 14 14 rot cells ADDI ;
 
@@ -219,3 +198,9 @@ M: stack-params %freg>stack
     load-return ;
 
 : %cleanup ( n -- ) drop ;
+
+: %untag ( dest src -- ) 0 0 31 tag-bits - RLWINM ;
+
+: %tag-fixnum ( src dest -- ) tag-bits SLWI ;
+
+: %untag-fixnum ( src dest -- ) tag-bits SRAWI ;

@@ -123,5 +123,3 @@ unit-test
         ] collect 2nip
     ] compile-1 first
 ] unit-test
-
-[ 3.5 ] [ 1 >bignum 2 >bignum [ bignum/f 3 + ] compile-1 ] unit-test

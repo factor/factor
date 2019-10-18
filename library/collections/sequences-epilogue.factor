@@ -105,8 +105,8 @@ M: object like drop ;
 
 : flip ( matrix -- newmatrix )
     dup empty? [
-        dup first [ length ] keep like
-        [ swap [ nth ] map-with ] map-with
+        dup first [ length [ <column> dup like ] map-with ] keep
+        like
     ] unless ;
 
 : unpair ( assoc -- keys values )

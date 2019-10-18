@@ -1,4 +1,5 @@
-PROVIDE: doc/handbook {
+PROVIDE: doc/handbook
+{ +files+ {
     "alien.facts"
     "changes.facts"
     "cli.facts"
@@ -9,7 +10,6 @@ PROVIDE: doc/handbook {
     "dataflow.facts"
     "handbook.facts"
     "hashtables.facts"
-    "help.facts"
     "inference.facts"
     "math.facts"
     "objects.facts"
@@ -18,7 +18,9 @@ PROVIDE: doc/handbook {
     "sequences.facts"
     "streams.facts"
     "syntax.facts"
+    "modules.facts"
+    "help.facts"
     "tools.facts"
     "words.facts"
     "ui/tools.facts"
-} ;
+} } ;

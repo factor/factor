@@ -58,18 +58,6 @@ math math-internals sequences words parser ;
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
 } define-optimizers
 
-: useless-coerce? ( node -- ? )
-    dup 0 node-class#
-    swap node-param "infer-effect" word-prop effect-out first
-    eq? ;
-
-! >fixnum on a fixnum, etc is a no-op
-{ >fixnum >bignum >float } [
-    {
-        { [ dup useless-coerce? ] [ call>no-op ] }
-    } define-optimizers
-] each
-
 ! type applied to an object of a known type can be folded
 : known-type? ( node -- ? )
     0 node-class# types length 1 number= ;
@@ -128,7 +116,7 @@ SYMBOL: @
     { { -1 @ } [ nip 0 swap - ]  }
 } define-identities
 
-[ / fixnum/i fixnum/f bignum/i bignum/f float/f ] {
+[ / fixnum/i bignum/i float/f ] {
     { { @ 1 }  [ drop ]          }
     { { @ -1 } [ drop 0 swap - ] }
 } define-identities

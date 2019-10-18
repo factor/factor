@@ -1,5 +1,6 @@
 IN: temporary
-USING: alien arrays kernel kernel-internals namespaces test ;
+USING: alien arrays kernel kernel-internals namespaces test
+errors sequences ;
 
 [ t ] [ 0 <alien> 0 <alien> = ] unit-test
 [ f ] [ 0 <alien> 1024 <alien> = ] unit-test
@@ -9,6 +10,8 @@ USING: alien arrays kernel kernel-internals namespaces test ;
 
 ! Testing the various bignum accessor
 10 <byte-array> "dump" set
+
+[ "dump" get alien-address ] unit-test-fails
 
 [ 123 ] [
     123 "dump" get 0 set-alien-signed-1
@@ -62,3 +65,5 @@ unit-test
 unit-test
 
 [ t ] [ f expired? ] unit-test
+
+[ "fdasfds" ] [ [ "fdasfds" f dlsym ] catch third ] unit-test

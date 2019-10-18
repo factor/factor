@@ -6,7 +6,7 @@ DEFER: FactorApplicationDelegate
 IN: cocoa
 USING: arrays gadgets gadgets-listener gadgets-help
 gadgets-workspace hashtables kernel memory namespaces objc
-sequences errors freetype help ;
+sequences errors freetype help timers ;
 
 : finder-run-files ( alien -- )
     #! We filter out the image name since that might be there on
@@ -85,7 +85,8 @@ IN: gadgets
     world-handle second f -> makeKeyAndOrderFront: ;
 
 : raise-window ( world -- )
-    world-handle second dup f -> orderFront: -> makeKeyWindow ;
+    world-handle second dup f -> orderFront: -> makeKeyWindow
+    NSApp 1 -> activateIgnoringOtherApps: ;
 
 : select-gl-context ( handle -- )
     first -> openGLContext -> makeCurrentContext ;

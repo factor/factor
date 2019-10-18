@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
-USING: compiler arrays gadgets gadgets-frames gadgets-labels
+USING: compiler arrays gadgets gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-lists
 gadgets-search gadgets-theme gadgets-tracks gadgets-workspace
 generic hashtables tools io kernel listener math models
@@ -76,14 +76,25 @@ M: listener-gadget tool-scroller
 M: listener-gadget tool-help
     drop "ui-listener" ;
 
+: workspace-busy? ( workspace -- ? )
+    listener-gadget swap find-tool nip tool-gadget
+    listener-gadget-input interactor-busy? ;
+
 : find-listener ( -- listener )
-    listener-gadget find-workspace show-tool tool-gadget ;
+    listener-gadget
+    [ workspace-busy? not ] find-workspace*
+    show-tool tool-gadget ;
 
 : (call-listener) ( quot listener -- )
     listener-gadget-input interactor-call ;
 
 : call-listener ( quot -- )
     find-listener (call-listener) ;
+
+: eval-listener ( string -- )
+    find-listener
+    listener-gadget-input [ set-editor-text ] keep
+    interactor-commit ;
 
 : listener-run-files ( seq -- )
     dup empty? [
@@ -113,26 +124,26 @@ M: listener-gadget tool-help
     [ set-listener-gadget-minibuffer ] 2keep
     dupd track-add request-focus ;
 
+: show-titled-minibuffer ( listener gadget title -- )
+    <labelled-gadget> swap show-minibuffer ;
+
 : minibuffer-action ( quot -- quot )
     [ find-listener hide-minibuffer ] swap append ;
 
 : show-word-search ( listener action -- )
     minibuffer-action
     >r dup listener-gadget-input selected-word r>
-    <word-search> "Word search" <labelled-gadget>
-    swap show-minibuffer ;
+    <word-search> "Word search" show-titled-minibuffer ;
 
 : show-source-files-search ( listener action -- )
     minibuffer-action
     "" swap <source-files-search>
-    "Source file search" <labelled-gadget>
-    swap show-minibuffer ;
+    "Source file search" show-titled-minibuffer ;
 
 : show-vocabs-search ( listener action -- )
     minibuffer-action
     >r dup listener-gadget-input selected-word r>
-    <vocabs-search> "Vocabulary search" <labelled-gadget>
-    swap show-minibuffer ;
+    <vocabs-search> "Vocabulary search" show-titled-minibuffer ;
 
 : listener-history ( listener -- seq )
     listener-gadget-input interactor-history <reversed> ;
@@ -140,14 +151,10 @@ M: listener-gadget tool-help
 : history-action ( string -- )
     find-listener listener-gadget-input set-editor-text ;
 
-: <history-gadget> ( listener -- gadget )
-    listener-history <model>
-    [ [ dup print-input ] make-pane ]
-    [ history-action ] minibuffer-action
-    <list> <scroller> "History" <labelled-gadget> ;
-
 : show-history ( listener -- )
-    [ <history-gadget> ] keep show-minibuffer ;
+    dup listener-gadget-input editor-text
+    over listener-history [ history-action ] minibuffer-action
+    <history-search> "History search" show-titled-minibuffer ;
 
 : completion-string ( word listener -- string )
     >r dup word-name swap word-vocabulary dup vocab r>

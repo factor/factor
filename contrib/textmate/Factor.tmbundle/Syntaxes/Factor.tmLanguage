@@ -20,7 +20,84 @@
 		<dict>
 			<key>captures</key>
 			<dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.colon.factor</string>
+				</dict>
 				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.function.factor</string>
+				</dict>
+				<key>4</key>
+				<dict>
+					<key>name</key>
+					<string>comment.stack-effect.factor</string>
+				</dict>
+			</dict>
+			<key>match</key>
+			<string>(^|(?&lt;=\s))(:)\s+([^\s]+)\s+(\(\s.*\))?</string>
+			<key>name</key>
+			<string>definition.word.factor</string>
+		</dict>
+		<dict>
+			<key>captures</key>
+			<dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.colon.factor</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.method.factor</string>
+				</dict>
+				<key>4</key>
+				<dict>
+					<key>name</key>
+					<string>comment.stack-effect.factor</string>
+				</dict>
+			</dict>
+			<key>match</key>
+			<string>(^|(?&lt;=\s))(C:)\s+([^\s]+)\s+(\(\s.*\))?</string>
+			<key>name</key>
+			<string>definition.word.class.factor</string>
+		</dict>
+		<dict>
+			<key>captures</key>
+			<dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.colon.factor</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.class.factor</string>
+				</dict>
+				<key>4</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.method.factor</string>
+				</dict>
+				<key>5</key>
+				<dict>
+					<key>name</key>
+					<string>comment.stack-effect.factor</string>
+				</dict>
+			</dict>
+			<key>match</key>
+			<string>(^|(?&lt;=\s))(M:)\s+([^\s]+)\s+([^\s]+)\s+(\(\s.*\))?</string>
+			<key>name</key>
+			<string>definition.word.method.factor</string>
+		</dict>
+		<dict>
+			<key>captures</key>
+			<dict>
+				<key>2</key>
 				<dict>
 					<key>name</key>
 					<string>keyword.colon.factor</string>
@@ -28,68 +105,123 @@
 				<key>4</key>
 				<dict>
 					<key>name</key>
-					<string>keyword.colon.factor</string>
+					<string>entity.name.generic.factor</string>
 				</dict>
 				<key>5</key>
-				<dict>
-					<key>name</key>
-					<string>keyword.colon.factor</string>
-				</dict>
-				<key>6</key>
-				<dict>
-					<key>name</key>
-					<string>entity.name.class.factor</string>
-				</dict>
-				<key>7</key>
 				<dict>
 					<key>name</key>
 					<string>comment.stack-effect.factor</string>
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>^(((M:)\s+[^\s]+)|(:)|(C:))\s*([^\s]+)\s*(\(\s.*\))?</string>
+			<string>(^|(?&lt;=\s))(G(ENERIC)?:)\s+([^\s]+)\s+(\(\s.*\))?</string>
 			<key>name</key>
-			<string>definition.word.factor</string>
+			<string>definition.word.generic.factor</string>
+		</dict>
+		<dict>
+			<key>captures</key>
+			<dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>storage.type.factor</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.class.factor</string>
+				</dict>
+			</dict>
+			<key>match</key>
+			<string>(^|(?&lt;=\s))(TUPLE:)\s+([^\s]+)\s+(([^\s]+)+)</string>
+			<key>name</key>
+			<string>meta.class.factor</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(drop|2drop|3drop|nip|2nip|dup|2dup|3dup|dupd|over|pick|tuck|swap|rot|-rot|2swap|swapd|&gt;r|r&gt;)\b</string>
+			<string>(^|(?&lt;=\s))(drop|2drop|3drop|keep|2keep|3keep|nip|2nip|dup|2dup|3dup|dupd|over|pick|tuck|swap|rot|-rot|slip|2swap|swapd|&gt;r|r&gt;)(\s|$)</string>
 			<key>name</key>
 			<string>keyword.control.stack.factor</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(if|when|unless)\*?\s+</string>
+			<string>(^|(?&lt;=\s))(get|set)(\s|$)</string>
+			<key>name</key>
+			<string>keyword.control.variable.factor</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>(^|(?&lt;=\s))(if|when|unless|if*|unless*|when*)\*?(\s|$)</string>
 			<key>name</key>
 			<string>keyword.control.flow.factor</string>
 		</dict>
 		<dict>
+			<key>begin</key>
+			<string>(^|(?&lt;=\s))(USING:)</string>
+			<key>end</key>
+			<string>(?&lt;=\s);(\s|$)</string>
+			<key>name</key>
+			<string>keyword.control.using.factor</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>(^|(?&lt;=\s))[^\s]+(\s|$)</string>
+					<key>name</key>
+					<string>constant.namespace.factor</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(^|(?&lt;=\s))(REQUIRES:)</string>
+			<key>end</key>
+			<string>(?&lt;=\s);(\s|$)</string>
+			<key>name</key>
+			<string>keyword.control.requires.factor</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>(^|(?&lt;=\s))[^\s]+(\s|$)</string>
+					<key>name</key>
+					<string>constant.namespace.factor</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
 			<key>match</key>
-			<string>\b(f|t)\s+</string>
+			<string>(^|(?&lt;=\s))(f|t)(\s|$)</string>
 			<key>name</key>
 			<string>constant.language.factor</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\bCHAR:\s+[^\s]+\s</string>
+			<string>(^|(?&lt;=\s))CHAR:\s+[^\s]+(\s|$)</string>
 			<key>name</key>
 			<string>constant.character.factor</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(BIN:|HEX:|OCT:)?\s+-?\d+\s+</string>
+			<string>(^|(?&lt;=\s))((BIN:|OCT:)\s+)?-?\d+(\s|$)</string>
 			<key>name</key>
 			<string>constant.numeric.integer.factor</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b-?+\d+\.\d+(E(\+|-)\d+)?\s+</string>
+			<string>(^|(?&lt;=\s))HEX:\s+-?[\dA-Fa-f]+(\s|$)</string>
+			<key>name</key>
+			<string>constant.numeric.hexadecimal.integer.factor</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>(^|(?&lt;=\s))-?+\d+\.\d+(E(\+|-)\d+)?(\s|$)</string>
 			<key>name</key>
 			<string>constant.numeric.float.factor</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b-?\d+/-?\d+\s+</string>
+			<string>(^|(?&lt;=\s))-?\d+/-?\d+(\s|$)</string>
 			<key>name</key>
 			<string>constant.numeric.rational.factor</string>
 		</dict>
@@ -110,7 +242,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>inline</string>
+			<string>inline|foldable</string>
 			<key>name</key>
 			<string>storage.modifier.factor</string>
 		</dict>
@@ -124,9 +256,9 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>\(\s+</string>
+			<string>\(\s</string>
 			<key>end</key>
-			<string>\s+\)</string>
+			<string>\s\)</string>
 			<key>name</key>
 			<string>comment.parens.factor</string>
 		</dict>
@@ -134,7 +266,7 @@
 			<key>match</key>
 			<string>\b[A-Z]+:\s+[^\s]+(\s|$)</string>
 			<key>name</key>
-			<string>meta.postpone.factor</string>
+			<string>keyword.control.postpone.factor</string>
 		</dict>
 	</array>
 	<key>repository</key>

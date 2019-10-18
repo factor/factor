@@ -12,8 +12,8 @@ CELL callframe_end;
 
 #define USER_ENV 32
 
-#define CARD_OFF_ENV      1 /* for compiling set-slot */
-#define NLX_VECTOR_ENV    2 /* non-local exit hook */
+#define CELL_SIZE_ENV     1 /* sizeof(CELL) */
+#define NLX_VECTOR_ENV    2 /* non-local exit hook, used by library only */
 #define NAMESTACK_ENV     3 /* used by library only */
 #define GLOBAL_ENV        4
 #define BREAK_ENV         5
@@ -28,7 +28,6 @@ CELL callframe_end;
 #define OUT_ENV           14
 #define GEN_ENV           15 /* set to gen_count */
 #define IMAGE_ENV         16 /* image name */
-#define CELL_SIZE_ENV     17 /* sizeof(CELL) */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
@@ -63,8 +62,6 @@ INLINE CELL align8(CELL a)
 /* Canonical T object. It's just a word */
 CELL T;
 
-#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
-
 INLINE CELL tag_header(CELL cell)
 {
 	return RETAG(cell << TAG_BITS,OBJECT_TYPE);
@@ -98,6 +95,30 @@ INLINE CELL type_of(CELL tagged)
 		return object_type(tagged);
 }
 
+#define DEFPUSHPOP(prefix,ptr) \
+	INLINE CELL prefix##pop(void) \
+	{ \
+		CELL value = get(ptr); \
+		ptr -= CELLS; \
+		return value; \
+	} \
+	INLINE void prefix##push(CELL tagged) \
+	{ \
+		ptr += CELLS; \
+		put(ptr,tagged); \
+	} \
+	INLINE void prefix##repl(CELL tagged) \
+	{ \
+		put(ptr,tagged); \
+	} \
+	INLINE CELL prefix##peek() \
+	{ \
+		return get(ptr); \
+	}
+
+DEFPUSHPOP(d,ds)
+DEFPUSHPOP(r,rs)
+
 void call(CELL quot);
 
 void handle_error();
@@ -123,7 +144,6 @@ void primitive_type(void);
 void primitive_tag(void);
 void primitive_slot(void);
 void primitive_set_slot(void);
-CELL clone(CELL obj);
 void primitive_clone(void);
 
 /* Runtime errors */
@@ -150,7 +170,9 @@ typedef enum
 } F_ERRORTYPE;
 
 /* Are we throwing an error? */
-bool throwing;
+/* XXX Why is this volatile? The resulting executable crashes when compiled
+under gcc on windows otherwise. Proper fix pending */
+volatile bool throwing;
 /* When throw_error throws an error, it sets this global and
 longjmps back to the top-level. */
 CELL thrown_error;
@@ -164,7 +186,7 @@ void critical_error(char* msg, CELL tagged);
 void throw_error(CELL error, bool keep_stacks);
 void early_error(CELL error);
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks);
-void memory_protection_error(void *addr, int signal);
+void memory_protection_error(CELL addr, int signal);
 void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
 void primitive_throw(void);

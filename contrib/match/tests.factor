@@ -40,3 +40,17 @@ MATCH-VARS: ?a ?b ;
     { _       [ f ] }
   } match-cond
 ] unit-test
+
+TUPLE: foo a b ;
+
+{ 1 2 } [
+  1 2 <foo> T{ foo f ?a ?b } match [
+    ?a ?b
+  ] bind
+] unit-test
+
+{ 1 2 } [
+  1 2 <foo> \ ?a \ ?b <foo> match [
+    ?a ?b
+  ] bind
+] unit-test

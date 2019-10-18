@@ -14,9 +14,9 @@ void init_ffi(void)
 	null_dll = dlopen(NULL,RTLD_LAZY);
 }
 
-void ffi_dlopen(DLL *dll, bool error)
+void ffi_dlopen(F_DLL *dll, bool error)
 {
-	void *dllptr = dlopen(to_char_string(untag_string(dll->path),true), RTLD_LAZY);
+	void *dllptr = dlopen(alien_offset(dll->path), RTLD_LAZY);
 
 	if(dllptr == NULL)
 	{
@@ -34,15 +34,16 @@ void ffi_dlopen(DLL *dll, bool error)
 	dll->dll = dllptr;
 }
 
-void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
+void *ffi_dlsym(F_DLL *dll, char *symbol, bool error)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
-	void *sym = dlsym(handle,to_char_string(symbol,true));
+	void *sym = dlsym(handle,symbol);
 	if(sym == NULL)
 	{
 		if(error)
 		{
-			general_error(ERROR_FFI,tag_object(symbol),
+			general_error(ERROR_FFI,
+				tag_object(from_char_string(symbol)),
 				tag_object(from_char_string(dlerror())),true);
 		}
 
@@ -51,7 +52,7 @@ void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
 	return sym;
 }
 
-void ffi_dlclose(DLL *dll)
+void ffi_dlclose(F_DLL *dll)
 {
 	if(dlclose(dll->dll))
 	{
@@ -64,57 +65,53 @@ void ffi_dlclose(DLL *dll)
 void primitive_stat(void)
 {
 	struct stat sb;
-	F_STRING* path;
 
-	maybe_gc(0);
-
-	path = untag_string(dpop());
-	if(stat(to_char_string(path,true),&sb) < 0)
+	if(stat(unbox_char_string(),&sb) < 0)
+	{
 		dpush(F);
+		dpush(F);
+		dpush(F);
+		dpush(F);
+	}
 	else
 	{
-		CELL dirp = tag_boolean(S_ISDIR(sb.st_mode));
-		CELL mode = tag_fixnum(sb.st_mode & ~S_IFMT);
-		CELL size = tag_bignum(s48_long_long_to_bignum(sb.st_size));
-		CELL mtime = tag_integer(sb.st_mtime);
-		dpush(make_array_4(dirp,mode,size,mtime));
+		box_boolean(S_ISDIR(sb.st_mode));
+		box_signed_4(sb.st_mode & ~S_IFMT);
+		box_unsigned_8(sb.st_size);
+		box_unsigned_8(sb.st_mtime);
 	}
 }
 
 void primitive_read_dir(void)
 {
-	F_STRING *path;
-	DIR* dir;
-	F_ARRAY *result;
+	DIR* dir = opendir(unbox_char_string());
 	CELL result_count = 0;
+	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F);
 
-	maybe_gc(0);
-
-	result = array(ARRAY_TYPE,100,F);
-
-	path = untag_string(dpop());
-	dir = opendir(to_char_string(path,true));
 	if(dir != NULL)
 	{
 		struct dirent* file;
 
 		while((file = readdir(dir)) != NULL)
 		{
-			CELL name = tag_object(from_char_string(file->d_name));
 			if(result_count == array_capacity(result))
 			{
-				result = resize_array(result,
+				result = reallot_array(result,
 					result_count * 2,F);
 			}
-			
-			put(AREF(result,result_count),name);
+
+			REGISTER_ARRAY(result);
+			CELL name = tag_object(from_char_string(file->d_name));
+			UNREGISTER_ARRAY(result);
+
+			set_array_nth(result,result_count,name);
 			result_count++;
 		}
 
 		closedir(dir);
 	}
 
-	result = resize_array(result,result_count,F);
+	result = reallot_array(result,result_count,F);
 
 	dpush(tag_object(result));
 }
@@ -122,7 +119,6 @@ void primitive_read_dir(void)
 void primitive_cwd(void)
 {
 	char wd[MAXPATHLEN];
-	maybe_gc(0);
 	if(getcwd(wd,MAXPATHLEN) == NULL)
 		io_error();
 	box_char_string(wd);
@@ -130,11 +126,10 @@ void primitive_cwd(void)
 
 void primitive_cd(void)
 {
-	maybe_gc(0);
 	chdir(unbox_char_string());
 }
 
-BOUNDED_BLOCK *alloc_bounded_block(CELL size)
+F_SEGMENT *alloc_segment(CELL size)
 {
 	int pagesize = getpagesize();
 
@@ -151,7 +146,7 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect high guard page",(CELL)array);
 
-	BOUNDED_BLOCK *retval = safe_malloc(sizeof(BOUNDED_BLOCK));
+	F_SEGMENT *retval = safe_malloc(sizeof(F_SEGMENT));
 	
 	retval->start = (CELL)(array + pagesize);
 	retval->size = size;
@@ -159,7 +154,7 @@ BOUNDED_BLOCK *alloc_bounded_block(CELL size)
 	return retval;
 }
 
-void dealloc_bounded_block(BOUNDED_BLOCK *block)
+void dealloc_segment(F_SEGMENT *block)
 {
 	int pagesize = getpagesize();
 
@@ -174,7 +169,7 @@ void dealloc_bounded_block(BOUNDED_BLOCK *block)
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
-	memory_protection_error(siginfo->si_addr, signal);
+	memory_protection_error((CELL)siginfo->si_addr, signal);
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)

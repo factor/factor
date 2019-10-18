@@ -242,7 +242,7 @@ M: f print-element drop ;
     drop
     "Throws an error if the I/O operation fails." $errors ;
 
-: sort-articles ( seq -- assoc )
+: sort-articles ( seq -- newseq )
     [ [ article-title ] keep 2array ] map
     [ [ first ] 2apply <=> ] sort
-    [ second ] map ;
+    1 <column> ;

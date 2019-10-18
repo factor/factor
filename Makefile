@@ -3,12 +3,13 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-VERSION = 0.85
+VERSION = 0.86
 DISK_IMAGE_DIR = Factor-$(VERSION)
 DISK_IMAGE = Factor-$(VERSION).dmg
+LIBPATH = -L/usr/X11R6/lib
 
 ifdef DEBUG
-	CFLAGS = -g
+	CFLAGS = -pg -O1
 	STRIP = touch
 else
 	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
@@ -74,8 +75,12 @@ macosx-ppc: macosx-freetype
 macosx-x86: macosx-freetype
 	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx
 
-linux-x86 linux-amd64:
+linux-x86:
 	$(MAKE) $(BINARY) CONFIG=vm/Config.linux
+	$(STRIP) $(BINARY)
+
+linux-amd64:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.amd64
 	$(STRIP) $(BINARY)
 
 linux-ppc:
@@ -118,13 +123,18 @@ macosx.dmg:
 		-o -name '*.vim' \
 		-o -name '*.fgen' \
 		-o -name '*.tex' \
+		-o -name '*.fhtml' \
+		-o -name '*.xml' \
 		-o -name '*.js' \) \
 		-exec ./cp_dir {} $(DISK_IMAGE_DIR)/Factor/{} \;
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
 		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
 
+tags:
+	ctags-exuberant vm/*.[chm]
+
 f: $(OBJS)
-	$(CC) $(LIBS) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
+	$(CC) $(LIBS) $(LIBPATH) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
 
 clean:
 	rm -f vm/*.o

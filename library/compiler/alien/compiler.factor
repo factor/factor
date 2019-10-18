@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
 USING: arrays compiler generic hashtables kernel
-kernel-internals math namespaces sequences words ;
+kernel-internals math namespaces sequences words
+inference ;
 
 : parameter-size c-size cell align ;
 
@@ -23,7 +24,7 @@ kernel-internals math namespaces sequences words ;
     [ dup class get swap inc-reg-class ] keep ;
 
 : alloc-parameter ( parameter -- reg reg-class )
-    c-type "reg-class" swap hash dup reg-class-full?
+    c-type c-type-reg-class dup reg-class-full?
     [ spill-param ] [ fastcall-param ] if
     [ fastcall-regs nth ] keep ;
 
@@ -55,10 +56,16 @@ kernel-internals math namespaces sequences words ;
         drop
     ] with-scope ; inline
 
-: box-parameter ( stack# type -- node )
-    c-type [ "reg-class" get "boxer" get call ] bind ;
-
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
-: compile-gc ; ! "simple_gc" f %alien-invoke , ;
+: (make-prep-quot) ( parameters -- )
+    dup empty? [
+        drop
+    ] [
+        unclip c-type c-type-prep %
+        \ >r , (make-prep-quot) \ r> ,
+    ] if ;
+
+: make-prep-quot ( parameters -- quot )
+    [ <reversed> (make-prep-quot) ] [ ] make ;

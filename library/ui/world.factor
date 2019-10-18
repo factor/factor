@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays errors freetype gadgets-frames generic hashtables
+USING: arrays errors freetype generic hashtables
 kernel math models namespaces opengl sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
@@ -75,6 +75,8 @@ M: world layout*
         >r dup rect-dim r> set-layout-dim
     ] when* drop ;
 
+M: world children-on nip gadget-children ;
+
 : hide-glass ( world -- )
     f menu-mode? set-global
     dup world-glass [ unparent ] when*
@@ -83,4 +85,5 @@ M: world layout*
 : show-glass ( gadget world -- )
     [ hide-glass ] keep
     [ add-gadget ] 2keep
-    set-world-glass ;
+    set-world-glass
+    t menu-mode? set-global ;

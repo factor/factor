@@ -32,7 +32,7 @@ SYMBOL: receiver
 : join ( chan -- )
     "JOIN " irc-write irc-print ;
 
-GENERIC: handle-irc
+GENERIC: handle-irc ( line -- )
 PREDICATE: string privmsg " " split1 nip "PRIVMSG" head? ;
 PREDICATE: string ping "PING" head? ;
 
@@ -112,3 +112,5 @@ IN: factorbot-commands
     drop speaker get "slava" = [ disconnect ] when ;
 
 PROVIDE: examples/factorbot ;
+
+MAIN: examples/factorbot factorbot ;

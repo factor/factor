@@ -1,4 +1,6 @@
-PROVIDE: library/windows {
+USING: kernel namespaces ;
+PROVIDE: library/windows
+{ +files+ { 
     "windows-messages.factor"
     "types.factor"
     "gdi32-constants.factor"
@@ -14,7 +16,8 @@ PROVIDE: library/windows {
     "winsock.factor"
     "opengl32.factor"
     "utils.factor"
-} ;
+    { "io.factor" [ "native-io" get not ] }
+} } ;
 
 IN: command-line
 : default-shell "tty" ;

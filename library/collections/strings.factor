@@ -55,4 +55,12 @@ UNION: alpha Letter digit ;
 
 M: string thaw drop SBUF" " clone ;
 
-M: string like drop dup string? [ >string ] unless ;
+M: string like
+    drop dup string? [
+        dup sbuf? [
+            dup length over underlying length number=
+            [ underlying ] [ >string ] if
+        ] [
+            >string
+        ] if
+    ] unless ;

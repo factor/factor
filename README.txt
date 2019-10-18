@@ -137,9 +137,6 @@ application bundle:
 This copies the runtime executable, factor.image (which must exist at
 this point), and the library source into a self-contained Factor.app.
 
-Factor.app runs the UI when double-clicked and can be transported
-between PowerPC Macs.
-
 * Running Factor on Mac OS X - X11 UI
 
 The X11 UI is available on Mac OS X, however its use is not recommended

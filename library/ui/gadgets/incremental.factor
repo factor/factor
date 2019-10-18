@@ -28,7 +28,7 @@ M: incremental pref-dim*
     [
         swap rect-dim swap incremental-cursor
         2dup v+ >r vmax r>
-    ] keep  gadget-orientation set-axis ;
+    ] keep gadget-orientation set-axis ;
 
 : update-cursor ( gadget incremental -- )
     [ next-cursor ] keep set-incremental-cursor ;

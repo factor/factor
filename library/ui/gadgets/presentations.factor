@@ -5,7 +5,7 @@ DEFER: call-listener
 
 IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
-gadgets-buttons gadgets-grids gadgets-labels gadgets-outliner
+gadgets-buttons gadgets-labels gadgets-outliner
 gadgets-panes gadgets-paragraphs gadgets-theme
 generic hashtables tools io kernel prettyprint sequences strings
 styles words help math models namespaces ;
@@ -40,7 +40,7 @@ C: presentation ( gadget object -- button )
     [ <command-button> ] map-with
     make-pile 1 over set-pack-fill ;
 
-: operations-menu ( presentation -- gadget )
+: operations-menu ( presentation -- )
     dup presentation-object
     dup object-operations <commands-menu>
     swap show-menu ;
@@ -58,7 +58,7 @@ presentation H{
     ] <filter> <label-control> dup reverse-video-theme ;
 
 : <listener-button> ( gadget quot -- button )
-    [ call-listener ] curry <roll-button> ;
+    [ call-listener drop ] curry <roll-button> ;
 
 ! Character styles
 

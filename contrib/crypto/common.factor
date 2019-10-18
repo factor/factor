@@ -6,7 +6,7 @@ IN: crypto
 : >64-bit ( n -- n ) HEX: ffffffffffffffff bitand ; inline
 
 IN: crypto-internals
-: w+ ( int -- int ) + >32-bit ; inline
+: w+ ( int int -- int ) + >32-bit ; inline
 : nth-int ( string n -- int ) 2 shift dup 4 + rot <slice> le> ; inline
 : nth-int-be ( string n -- int ) 2 shift dup 4 + rot <slice> be> ; inline
 : update ( num var -- ) [ w+ ] change ; inline

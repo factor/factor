@@ -7,11 +7,6 @@ USE: io
 USE: test
 USE: strings
 
-[ "HTTP/1.0 200 OK\nContent-Length: 12\nContent-Type: text/html\n\n" ]
-[
-    [ "text/html" 12 file-response ] string-out
-] unit-test
-
 [ ] [ "404 not found" httpd-error ] unit-test
 
 [ "inspect/global" ] [ "/inspect/global" trim-/ ] unit-test

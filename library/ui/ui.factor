@@ -1,11 +1,11 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays errors gadgets gadgets-buttons gadgets-frames
-gadgets-grids gadgets-labels gadgets-panes gadgets-presentations
+USING: arrays errors gadgets gadgets-buttons
+gadgets-labels gadgets-panes gadgets-presentations
 gadgets-scrolling gadgets-theme gadgets-viewports generic
 hashtables io kernel math models namespaces prettyprint queues
-sequences test threads help sequences words ;
+sequences test threads help sequences words timers ;
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
@@ -57,15 +57,15 @@ SYMBOL: windows
         10 sleep
     ] assert-depth ;
 
-TUPLE: titled-gadget title ;
+TUPLE: titled-gadget title child ;
 
 M: titled-gadget gadget-title titled-gadget-title ;
 
-M: titled-gadget focusable-child* gadget-child ;
+M: titled-gadget focusable-child* titled-gadget-child ;
 
 C: titled-gadget ( gadget title -- )
     [ set-titled-gadget-title ] keep
-    { { f f f @center } } make-frame* ;
+    { { f set-titled-gadget-child f @center } } make-frame* ;
 
 : open-window ( world -- )
     dup pref-dim over set-gadget-dim
@@ -75,7 +75,7 @@ C: titled-gadget ( gadget title -- )
     <model> <titled-gadget> <world> open-window ;
 
 : find-window ( quot -- world )
-    windows get [ second ] map
+    windows get 1 <column>
     [ world-gadget swap call ] find-last-with nip ; inline
 
 : start-world ( world -- )
@@ -112,7 +112,7 @@ C: titled-gadget ( gadget title -- )
     reset-world ;
 
 : restore-windows ( -- )
-    windows get [ [ second ] map ] keep delete-all
+    windows get [ 1 <column> >array ] keep delete-all
     [ dup reset-world open-window* ] each
     forget-rollover ;
 

@@ -5,8 +5,11 @@ kernel kernel-internals listener math memory modules namespaces
 optimizer parser sequences sequences-internals words ;
 
 [
-    ! Wrap everything in a catch which starts a listener so you
-    ! can see what went wrong, instead of dealing with a fep
+    print-warnings off
+
+    ! Wrap everything in a catch which starts a listener so
+    ! you can see what went wrong, instead of dealing with a
+    ! fep
     [
         "Cross-referencing..." print flush
         H{ } clone changed-words set-global
@@ -21,7 +24,8 @@ optimizer parser sequences sequences-internals words ;
 
         "compile" get [
             windows? [
-                "resource:/library/windows/dlls.factor" run-file
+                "resource:/library/windows/dlls.factor"
+                run-file
             ] when
 
             \ number= compile
@@ -60,42 +64,47 @@ optimizer parser sequences sequences-internals words ;
             "Initializing native I/O..." print flush
             "native-io" get [ init-io ] when
 
-            ! We only do this if we are compiled, otherwise it
-            ! takes too long.
-            "Building online help search index..." print flush
+            ! We only do this if we are compiled, otherwise
+            ! it takes too long.
+            "Building online help search index..." print
+            flush
             H{ } clone parent-graph set-global xref-help
             H{ } clone term-index set-global index-help
         ] when
-    ] no-parse-hook
 
-    run-bootstrap-init
+        [
+            boot
+            run-user-init
+            "shell" get "shells" lookup execute
+            0 exit
+        ] set-boot
 
-    [
-        boot
-        run-user-init
-        "shell" get "shells" lookup execute
-        0 exit
-    ] set-boot
+        "compile" get [ 
+            [ recompile ] parse-hook set-global
+        ] when
 
-    f error set-global
-    f error-continuation set-global
+        run-bootstrap-init
 
-    [ compiled? ] word-subset length
-    number>string write " compiled words" print
+        f error set-global
+        f error-continuation set-global
 
-    [ symbol? ] word-subset length
-    number>string write " symbol words" print
+        [ compiled? ] word-subset length
+        number>string write " compiled words" print
 
-    all-words length
-    number>string write " words total" print
+        [ symbol? ] word-subset length
+        number>string write " symbol words" print
 
-    "Total bootstrap GC time: " write gc-time
-    number>string write " ms" print
+        all-words length
+        number>string write " words total" print
 
-    "Bootstrapping is complete." print
-    "Now, you can run ./f factor.image" print flush
+        "Total bootstrap GC time: " write gc-time
+        number>string write " ms" print
 
-    "factor.image" resource-path save-image
-] [ print-error :c ] recover
+        "Bootstrapping is complete." print
+        "Now, you can run ./f factor.image" print flush
+
+        "factor.image" resource-path save-image
+    ] [ print-error :c ] recover
+] with-scope
 
 0 exit

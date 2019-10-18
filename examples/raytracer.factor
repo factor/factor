@@ -161,6 +161,6 @@ DEFER: create ( level c r -- scene )
     "Generating " write dup write "..." print
     <file-writer> [ run write ] with-stream ;
 
-[ "raytracer.pnm" run>file ] time
-
 PROVIDE: examples/raytracer ;
+
+MAIN: examples/raytracer [ "raytracer.pnm" run>file ] time ;

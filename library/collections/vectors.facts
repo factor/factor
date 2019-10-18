@@ -4,11 +4,6 @@ USING: arrays help kernel strings ;
 HELP: vector
 { $description "The class of resizable vectors. See " { $link "syntax-vectors" } " for syntax and " { $link "vectors" } " for general information." } ;
 
-HELP: <vector> ( n -- vector )
-{ $values { "n" "a positive integer specifying initial capacity" } { "vector" "a new vector" } }
-{ $description "Creates a new vector that can hold " { $snippet "n" } " elements before resizing." }
-{ $see-also <array> <string> <sbuf> } ;
-
 HELP: >vector
 { $values { "seq" "a sequence" } { "vector" "a new vector" } }
 { $description "Outputs a freshly-allocated vector with the same elements as a given sequence." } ;

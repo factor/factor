@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-! An interface to the sqlite database. Tested against sqlite v3.0.8.
+! An interface to the sqlite database. Tested against sqlite v3.1.3.
 ! Remeber to pass the following to factor:
 !  -libraries:sqlite=libsqlite3.so
 !

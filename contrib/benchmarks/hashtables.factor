@@ -14,7 +14,6 @@ sequences strings test ;
         drop
         [
             [
-                ( hash elt -- )
                 hash-bench-step
             ] each-with
         ] 2keep

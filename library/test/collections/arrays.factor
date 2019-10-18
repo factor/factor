@@ -11,7 +11,7 @@ USING: arrays kernel sequences sequences-internals test vectors ;
 [ f ] [ { "a" "b" "c" } dup >array eq? ] unit-test
 [ t ] [ { "a" "b" "c" } dup { } like eq? ] unit-test
 [ t ] [ { "a" "b" "c" } dup array>vector underlying eq? ] unit-test
-[ V{ "a" "b" "c" } ] [ { "a" "b" "c" } array>vector ] unit-test
+[ V{ "a" "b" "c" } ] [ { "a" "b" "c" } V{ } like ] unit-test
 [ { "a" "b" "c" } ] [ { "a" } { "b" "c" } append ] unit-test
 [ { "a" "b" "c" "d" "e" } ]
 [ { "a" } { "b" "c" } { "d" "e" } append3 ] unit-test

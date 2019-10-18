@@ -4,7 +4,7 @@ Loading factory
 
 Putting factory into your image is as simple as this:
 
-  "factory" require save
+  "contrib/factory" require save
 
 ----------------------------------------------------------------------
 Running factory in Xnest
@@ -17,7 +17,7 @@ can use 2 or greater.
 
 Start factor and launch factory on the appropriate display:
 
-  USE: factory ":2" start-factory
+  "contrib/factory" run-module
 
 In a terminal, start an application on the appropriate display:
 

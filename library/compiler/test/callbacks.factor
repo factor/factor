@@ -1,10 +1,10 @@
 IN: temporary
 USING: alien compiler errors inference io kernel
-kernel-internals math memory namespaces test threads ;
+kernel-internals math memory namespaces test threads words ;
 
 : callback-1 "void" { } [ ] alien-callback ;
 
-[ { 0 1 } ] [ [ callback-1 ] infer ] unit-test
+[ 0 1 ] [ [ callback-1 ] infer nip dup effect-in swap effect-out ] unit-test
 
 [ t ] [ callback-1 alien? ] unit-test
 
@@ -49,13 +49,14 @@ kernel-internals math memory namespaces test threads ;
 [ 1 2 3 ] [ callback-6 callback_test_1 1 2 3 ] unit-test
 
 : callback-7
-    "void" { } [ yield "hi" print flush yield ] alien-callback ;
+    "void" { } [ 1000 sleep ] alien-callback ;
 
 [ 1 2 3 ] [ callback-7 callback_test_1 1 2 3 ] unit-test
 
+[ f ] [ namespace global eq? ] unit-test
+
 : callback-8
     "void" { "int" "int" } [ / "x" set ] alien-callback ;
-   
 
 : callback_test_2
     "void" { "int" "int" } "cdecl" alien-indirect ;
@@ -75,7 +76,7 @@ kernel-internals math memory namespaces test threads ;
 
 [ 27.0 ] [
     [
-        "x" off 3 4 5 callback-9 callback_test_3 "x" get
+        "x" off 3 4.0 5 callback-9 callback_test_3 "x" get
     ] with-scope
 ] unit-test
 

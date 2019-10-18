@@ -3,17 +3,17 @@
 USING: help match namespaces ;
 
 HELP: match 
-{ $values { "seq1" "A sequence" } { "seq2" "A sequence" } { "bindings" "A hashtable" }
+{ $values { "value1" "an object" } { "value2" "an object" } { "bindings" "A hashtable" }
 }
-{ $description "Pattern match seq1 against seq2. The sequences can contain pattern variables, which are symbols that begin with '?'. The result is a hashtable of the bindings, mapping the pattern variables from one sequence to the equivalent value in the other sequence. The '_' symbol can be used to ignore the value at that point in the pattern for the match. " } 
+{ $description "Pattern match value1 against value2. These values can be any Factor value, including sequences and tuples. The values can contain pattern variables, which are symbols that begin with '?'. The result is a hashtable of the bindings, mapping the pattern variables from one sequence to the equivalent value in the other sequence. The '_' symbol can be used to ignore the value at that point in the pattern for the match. " } 
 { $examples 
     { $example "MATCH-VARS: ?a ?b ;\n{ ?a { 2 ?b } 5 } { 1 { 2 3 } _ } match\n => H{ { ?a 1 } { ?b 3 } }" }
 }
 { $see-also match-cond POSTPONE: MATCH-VARS: } ;
 
 HELP: match-cond
-{ $values { "seq" "A sequence" } { "assoc" "A sequence of quotation pairs" } }
-{ $description "Calls the second quotation in the first pair whose first sequence yields a successful " { $link match } " against seq. The second quotation, when called, has the hashtable returned from the " { $link match } " call bound as the top namespace so " { $link get } " can be used to retrieve the values. To have a fallthrough match clause use the '_' match variable." } 
+{ $values { "value" "an object" } { "assoc" "A sequence of quotation pairs" } }
+{ $description "Calls the second quotation in the first pair whose first sequence yields a successful " { $link match } " against 'value'. The second quotation, when called, has the hashtable returned from the " { $link match } " call bound as the top namespace so " { $link get } " can be used to retrieve the values. To have a fallthrough match clause use the '_' match variable." } 
 { $examples 
     { $example "MATCH-VARS: ?value ;\n{ increment ?value } {\n  { { increment ?value } [ ?value do-something ] }\n  { { decrement ?value } [ ?value do-something-else ] }\n  { _ [ no-match-found ] }\n} match-cond" }
 }
@@ -28,5 +28,3 @@ HELP: MATCH-VARS:
     { $example "MATCH-VARS: ?value ;\n{ increment ?value } {\n  { { increment ?value } [ ?value do-something ] }\n  { { decrement ?value } [ ?value do-something-else ] }\n  { _ [ no-match-found ] }\n} match-cond" }
 }
 { $see-also match match-cond } ;
-
-

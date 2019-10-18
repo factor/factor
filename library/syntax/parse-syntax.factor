@@ -11,7 +11,7 @@ USING: alien arrays definitions errors generic
 hashtables kernel math modules namespaces parser sequences
 strings vectors words ;
 
-: !! line-text get length column set ; parsing
+: !! line-text get length column-number set ; parsing
 : !#! POSTPONE: ! ; parsing
 : !IN: scan set-in ; parsing
 : !USE: scan use+ ; parsing
@@ -48,8 +48,8 @@ DEFER: !PRIMITIVE: parsing
 : !G: CREATE dup reset-word [ define-generic* ] f ; parsing
 : !M:
     f set-word
-    scan-word scan-word
-    [ location <method> -rot define-method ] f ; parsing
+    scan-word scan-word location
+    [ <method> -rot define-method ] f ; parsing
 
 : !UNION:
     CREATE dup intern-symbol dup predicate-word
@@ -72,8 +72,7 @@ DEFER: !PRIMITIVE: parsing
 
 : !FORGET: scan use get hash-stack [ forget ] when* ; parsing
 
-: !PROVIDE:
-    scan [ { { } { } } append first2 provide ] f ; parsing
+: !PROVIDE: scan location [ provide ] f ; parsing
 
 : !REQUIRES:
     string-mode on [
@@ -81,9 +80,16 @@ DEFER: !PRIMITIVE: parsing
         [ [ require ] each ] no-parse-hook
     ] f ; parsing
 
+: !MAIN:
+    scan [ swap module set-module-main ] f ; parsing
+
 : !(
     parse-effect word [
         swap "declared-effect" set-word-prop
     ] [
         drop
     ] if* ; parsing
+
+SYMBOL: !+files+
+SYMBOL: !+tests+
+SYMBOL: !+help+

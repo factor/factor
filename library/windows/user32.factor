@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien parser namespaces kernel syntax words math io prettyprint ;
 IN: win32-api
 
@@ -822,7 +822,7 @@ FUNCTION: HDC GetDCEx ( HWND hWnd, HRGN hrgnClip, DWORD flags ) ;
 ! FUNCTION: GetDlgItemInt
 ! FUNCTION: GetDlgItemTextA
 ! FUNCTION: GetDlgItemTextW
-! FUNCTION: GetDoubleClickTime
+FUNCTION: uint GetDoubleClickTime ( ) ;
 FUNCTION: HWND GetFocus ( ) ;
 ! FUNCTION: GetForegroundWindow
 ! FUNCTION: GetGuiResources

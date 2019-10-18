@@ -3,7 +3,7 @@
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
 IN: match
-USING: kernel words sequences namespaces hashtables parser ;
+USING: kernel words sequences namespaces hashtables parser generic ;
 
 SYMBOL: _
 USE: prettyprint
@@ -32,6 +32,7 @@ USE: prettyprint
     { [ dup match-var? ] [ set t ] }
     { [ over match-var? ] [ swap set t ] }
     { [ over sequence? over sequence? and [ over first over first (match) ] [ f ] if ] [ >r 1 tail r> 1 tail (match) ] }
+    { [ over tuple? over tuple? and ] [ >r tuple>array r> tuple>array (match) ] }
     { [ t ] [ 2drop f ] }
   } cond ;
 

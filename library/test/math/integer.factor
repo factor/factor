@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel math namespaces prettyprint test ;
+USING: kernel math namespaces prettyprint test math-internals ;
 
 [ "-8" ] [ -8 unparse ] unit-test
 
@@ -54,8 +54,8 @@ USING: kernel math namespaces prettyprint test ;
     gcd nip
 ] unit-test
 
-: verify-gcd ( x y )
-    2dup swap gcd ( a d )
+: verify-gcd
+    2dup swap gcd
     >r rot * swap rem r> = ; 
 
 [ t ] [ 123 124 verify-gcd ] unit-test
@@ -103,3 +103,12 @@ unit-test
 [ t ] [ 0 zero? ] unit-test
 [ f ] [ 30 zero? ] unit-test
 [ t ] [ 0 >bignum zero? ] unit-test
+
+[ 4294967280 ] [ 268435455 >fixnum 16 fixnum* ] unit-test
+
+[ 23603949310011464311086123800853779733506160743636399259558684142844552151041 ]
+[
+    1957739506503920732625800353008742584087090810400921800808997218266517557963281171906190947801528098188887586755474449585677502695226712388326288208691204
+    79562815144503850065234921197651376510595262628033069372760833939060637564931
+    bignum-mod
+] unit-test

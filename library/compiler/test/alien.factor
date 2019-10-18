@@ -1,5 +1,8 @@
 IN: temporary
-USING: alien compiler kernel namespaces namespaces test ;
+USING: alien compiler kernel namespaces namespaces test
+sequences inference errors ;
+
+[ t ] [ [ [ alien-indirect ] infer ] catch inference-error? ] unit-test
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -32,7 +35,7 @@ FUNCTION: int ffi_test_9 int a int b int c int d int e int f int g ;
 [ 28 ] [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
 
 FUNCTION: int ffi_test_10 int a int b double c int d float e int f int g int h ;
-[ -34 ] [ 1 2 3 4 5 6 7 8 ffi_test_10 ] unit-test
+[ -34 ] [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] unit-test
 
 BEGIN-STRUCT: foo
     FIELD: int x
@@ -62,7 +65,7 @@ END-STRUCT
 
 FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ;
 
-[ 45 ] [ 1 2 3 4 5 6 <rect> 7 8 9 ffi_test_12 ] unit-test
+[ 45 ] [ 1 2 3.0 4.0 5.0 6.0 <rect> 7 8 9 ffi_test_12 ] unit-test
 
 FUNCTION: int ffi_test_13 int a int b int c int d int e int f int g int h int i int j int k ;
 
@@ -77,11 +80,16 @@ cpu "x86" = macosx? and [
 : indirect-test-1
     "int" { } "cdecl" alien-indirect ;
 
-[ 3 ] [ "ffi_test_1" f dlsym <alien> indirect-test-1 ] unit-test
+[ 3 ] [ "ffi_test_1" f dlsym indirect-test-1 ] unit-test
 
 : indirect-test-2
     "int" { "int" "int" } "cdecl" alien-indirect ;
 
 [ 5 ]
-[ 2 3 "ffi_test_2" f dlsym <alien> indirect-test-2 ]
+[ 2 3 "ffi_test_2" f dlsym indirect-test-2 ]
 unit-test
+
+FUNCTION: char* ffi_test_15 char* x char* y ;
+
+[ "foo" ] [ "xy" "zt" ffi_test_15 ] unit-test
+[ "bar" ] [ "xy" "xy" ffi_test_15 ] unit-test

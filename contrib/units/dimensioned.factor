@@ -13,12 +13,7 @@ C: dimensioned
     [ set-dimensioned-value ] keep ;
 
 : remove-one ( obj seq -- seq )
-    [ index ] keep over -1 = [
-        2drop
-    ] [
-        [ 0 -rot <slice> ] 2keep
-        >r 1+ r> [ length ] keep <slice> append 
-    ] if ;
+    [ index ] keep over -1 = [ 2drop ] [ remove-nth ] if ;
 
 : dimensions ( dimensioned -- top bot )
     dup >r dimensioned-top r> dimensioned-bot ;
@@ -36,24 +31,24 @@ C: dimensioned
 : reduce-units ( dimensioned -- )
     dup dimensions symbolic-reduce pick set-dimensioned-bot swap set-dimensioned-top ;
 
-: 2reduce-units ( d d -- )
+: 2reduce-units ( d d -- d d )
     >r dup reduce-units r> dup reduce-units ;
 
-: 2value ( d d -- )
+: 2value ( d d -- n n )
     [ dimensioned-value ] 2apply ;
 
 : =units?
     >r dimensions 2array r> dimensions 2array = ;
     
 
-: d+ ( d d -- )
+: d+ ( d d -- d )
     2dup =units? [
         "d+: dimensions must be the same" throw
     ] unless
     dup dimensions
     >r >r 2value + r> r> <dimensioned> ;
 
-: d- ( d d -- )
+: d- ( d d -- d )
     2dup =units? [
         "d-: dimensions must be the same" throw
     ] unless
@@ -66,13 +61,13 @@ C: dimensioned
 : (d*)
     >r add-dimensions r> over set-dimensioned-value dup reduce-units ;
 
-: d* ( d d -- )
+: d* ( d d -- d )
     2dup 2value * (d*) ;
 
 : swap-dimensions ( d -- d )
     dup dimensions rot [ set-dimensioned-top ] keep [ set-dimensioned-bot ] keep ;
 
-: d/ ( d d -- )
+: d/ ( d d -- d )
     swap-dimensions 2dup 2value / (d*) ;
 
 : d-inv ( d -- d )

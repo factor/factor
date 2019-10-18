@@ -31,7 +31,7 @@ NS_DURING
 		interpreter_loop();
 		NS_VOIDRETURN;
 NS_HANDLER
-		error = tag_object(make_alien(F,(CELL)localException));
+		error = allot_alien(F,(CELL)localException);
 NS_ENDHANDLER
 	}
 }

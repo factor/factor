@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-walker
-USING: arrays errors gadgets gadgets-buttons gadgets-frames
+USING: arrays errors gadgets gadgets-buttons
 gadgets-listener gadgets-panes gadgets-scrolling gadgets-text
 gadgets-tracks gadgets-workspace generic hashtables tools
 interpreter io kernel kernel-internals listener math models

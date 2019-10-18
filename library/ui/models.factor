@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: models
-USING: generic kernel math sequences ;
+USING: generic kernel math sequences timers ;
 
 TUPLE: model connections value dependencies ref ;
 
@@ -126,3 +126,19 @@ C: history ( value -- history )
 : add-history
     dup history-forward delete-all
     dup history-back (add-history) ;
+
+TUPLE: delay model timeout ;
+
+C: delay ( model timeout -- filter )
+    dup delegate>model
+    [ set-delay-timeout ] keep
+    [ set-delay-model ] 2keep
+    [ add-dependency ] keep
+    dup model-changed ;
+
+M: delay model-changed
+    0 over delay-timeout add-timer ;
+
+M: delay tick
+    dup remove-timer
+    dup delay-model model-value swap set-model ;

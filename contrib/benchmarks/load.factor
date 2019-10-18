@@ -1,4 +1,5 @@
-PROVIDE: contrib/benchmark { } {
+PROVIDE: contrib/benchmarks
+{ +tests+ {
     "empty-loop.factor"
     "fac.factor"
     "fib.factor"
@@ -10,4 +11,4 @@ PROVIDE: contrib/benchmark { } {
     "vectors.factor"
     "prettyprint.factor"
     "iteration.factor"
-} ;
+} } ;

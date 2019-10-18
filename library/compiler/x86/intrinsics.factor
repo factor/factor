@@ -9,8 +9,8 @@ IN: compiler
     "in" operand tag-mask AND
     "in" operand tag-bits SHL
 ] H{
-    { +input { { f "in" } } }
-    { +output { "in" } }
+    { +input+ { { f "in" } } }
+    { +output+ { "in" } }
 } define-intrinsic
 
 \ type [
@@ -29,7 +29,7 @@ IN: compiler
     ! It doesn't store type info in its header
     "obj" operand tag-bits SHL
     "end" get JMP
-    "header" get resolve-label
+    "header" resolve-label
     ! It does store type info in its header
     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
     "x" operand object-tag CMP
@@ -39,21 +39,21 @@ IN: compiler
     ! Mask off header tag, making a fixnum.
     "obj" operand object-tag XOR
     "end" get JMP
-    "f" get resolve-label
+    "f" resolve-label
     ! The pointer is equal to 3. Load F_TYPE (9).
     "obj" operand f type tag-bits shift MOV
-    "end" get resolve-label
+    "end" resolve-label
 ] H{
-    { +input { { f "obj" } } }
-    { +scratch { { f "x" } { f "y" } } }
-    { +output { "obj" } }
+    { +input+ { { f "obj" } } }
+    { +scratch+ { { f "x" } { f "y" } } }
+    { +output+ { "obj" } }
 } define-intrinsic
 
 ! Slots
-: untag ( reg -- ) tag-mask bitnot AND ;
+: %untag ( reg -- ) tag-mask bitnot AND ;
 
 \ slot [
-    "obj" operand untag
+    "obj" operand %untag
     ! turn tagged fixnum slot # into an offset, multiple of 4
     "n" operand fixnum>slot@
     ! compute slot address
@@ -61,21 +61,19 @@ IN: compiler
     ! load slot value
     "obj" operand dup [] MOV
 ] H{
-    { +input { { f "obj" } { f "n" } } }
-    { +output { "obj" } }
-    { +clobber { "n" } }
+    { +input+ { { f "obj" } { f "n" } } }
+    { +output+ { "obj" } }
+    { +clobber+ { "n" } }
 } define-intrinsic
-
-: card-offset 1 getenv ; inline
 
 : generate-write-barrier ( -- )
     #! Mark the card pointed to by vreg.
     "obj" operand card-bits SHR
-    "obj" operand card-offset ADD rel-absolute-cell rel-cards
+    "obj" operand HEX: ffff ADD rel-absolute-cell rel-cards
     "obj" operand [] card-mark OR ;
 
 \ set-slot [
-    "obj" operand untag
+    "obj" operand %untag
     ! turn tagged fixnum slot # into an offset
     "slot" operand fixnum>slot@
     ! compute slot address
@@ -84,8 +82,8 @@ IN: compiler
     "slot" operand [] "val" operand MOV
     generate-write-barrier
 ] H{
-    { +input { { f "val" } { f "obj" } { f "slot" } } }
-    { +clobber { "obj" "slot" } }
+    { +input+ { { f "val" } { f "obj" } { f "slot" } } }
+    { +clobber+ { "obj" "slot" } }
 } define-intrinsic
 
 : char-reg cell 8 = RBX EBX ? ; inline
@@ -101,9 +99,9 @@ IN: compiler
     "obj" operand char-reg MOV
     char-reg POP
 ] H{
-    { +input { { f "n" } { f "obj" } } }
-    { +output { "obj" } }
-    { +clobber { "n" } }
+    { +input+ { { f "n" } { f "obj" } } }
+    { +output+ { "obj" } }
+    { +clobber+ { "n" } }
 } define-intrinsic
 
 \ set-char-slot [
@@ -115,15 +113,15 @@ IN: compiler
     "obj" operand string-offset [+] char-reg-16 MOV
     char-reg POP
 ] H{
-    { +input { { f "val" } { f "slot" } { f "obj" } } }
-    { +clobber { "val" "slot" "obj" } }
+    { +input+ { { f "val" } { f "slot" } { f "obj" } } }
+    { +clobber+ { "val" "slot" "obj" } }
 } define-intrinsic
 
 ! Fixnums
 : define-fixnum-op ( word op -- )
     [ [ "x" operand "y" operand ] % , ] [ ] make H{
-        { +input { { f "x" } { f "y" } } }
-        { +output { "x" } }
+        { +input+ { { f "x" } { f "y" } } }
+        { +output+ { "x" } }
     } define-intrinsic ;
 
 {
@@ -140,8 +138,8 @@ IN: compiler
     "x" operand NOT
     "x" operand tag-mask XOR
 ] H{
-    { +input { { f "x" } } }
-    { +output { "x" } }
+    { +input+ { { f "x" } } }
+    { +output+ { "x" } }
 } define-intrinsic
 
 ! This has specific register requirements. Inputs are in
@@ -150,63 +148,65 @@ IN: compiler
     prepare-division
     "y" operand IDIV
 ] H{
-    { +input { { 0 "x" } { 1 "y" } } }
-    { +scratch { { 2 "out" } } }
-    { +output { "out" } }
+    { +input+ { { 0 "x" } { 1 "y" } } }
+    { +scratch+ { { 2 "out" } } }
+    { +output+ { "out" } }
 } define-intrinsic
 
-: ?MOV ( dst src -- ) 2dup = [ 2drop ] [ MOV ] if ;
-
-: unique-operands ( operands quot -- )
-    >r [ operand ] map prune r> each ; inline
+: %untag-fixnums ( seq -- )
+    [ tag-bits SAR ] unique-operands ;
 
 : simple-overflow ( word -- )
-    finalize-contents
+    "end" define-label
     "z" operand "x" operand MOV
     "z" operand "y" operand pick execute
     ! If the previous arithmetic operation overflowed, then we
     ! turn the result into a bignum and leave it in EAX.
-    "end" define-label
     "end" get JNO
     ! There was an overflow. Recompute the original operand.
-    { "y" "x" } [ tag-bits SAR ] unique-operands
+    { "y" "x" } %untag-fixnums
     "x" operand "y" operand rot execute
-    "s48_long_to_bignum" f "x" operand 1array compile-c-call*
-    ! An untagged pointer to the bignum is now in EAX; tag it
-    T{ int-regs } return-reg bignum-tag OR
-    "z" operand T{ int-regs } return-reg ?MOV
-    "end" get resolve-label ; inline
+    "z" operand "x" operand %allot-bignum-signed-1
+    "end" resolve-label ; inline
 
 : simple-overflow-template ( word insn -- )
     [ simple-overflow ] curry H{
-        { +input { { f "x" } { f "y" } } }
-        { +scratch { { f "z" } } }
-        { +output { "z" } }
-        { +clobber { "x" "y" } }
+        { +input+ { { f "x" } { f "y" } } }
+        { +scratch+ { { f "z" } } }
+        { +output+ { "z" } }
+        { +clobber+ { "x" "y" } }
     } define-intrinsic ;
 
 \ fixnum+ \ ADD simple-overflow-template
 \ fixnum- \ SUB simple-overflow-template
 
-\ fixnum* [
-    finalize-contents
-    "y" operand tag-bits SAR
-    "y" operand IMUL
-    "end" define-label
-    "end" get JNO
-    "s48_fixnum_pair_to_bignum" f
-    "x" operand remainder-reg 2array compile-c-call*
-    ! now we have to shift it by three bits to remove the second
-    ! tag
-    "s48_bignum_arithmetic_shift" f
-    "x" operand tag-bits neg 2array compile-c-call*
-    ! an untagged pointer to the bignum is now in EAX; tag it
-    T{ int-regs } return-reg bignum-tag OR
-    "end" get resolve-label
-] H{
-    { +input { { 0 "x" } { 1 "y" } } }
-    { +output { "x" } }
-} define-intrinsic
+: %tag-overflow ( -- )
+    #! Tag a cell-size value, where the tagging might posibly
+    #! overflow BUT IT MUST NOT EXCEED cell-2 BITS
+    "y" operand "x" operand MOV ! Make a copy
+    "x" operand 1 tag-bits shift IMUL2 ! Tag it
+    "end" get JNO ! Overflow?
+    "x" operand "y" operand %allot-bignum-signed-1 ! Yes, box bignum
+    ;
+
+! \ fixnum* [
+!     "overflow-1" define-label
+!     "overflow-2" define-label
+!     "end" define-label
+!     { "y" "x" } %untag-fixnums
+!     "y" operand IMUL
+!     "overflow-1" get JNO
+!     "x" operand "r" operand %allot-bignum-signed-2
+!     "end" get JMP
+!     "overflow-1" resolve-label
+!     %tag-overflow
+!     "end" resolve-label
+! ] H{
+!     { +input+ { { 0 "x" } { 1 "y" } } }
+!     { +output+ { "x" } }
+!     { +scratch+ { { 2 "r" } } }
+!     { +clobber+ { "y" } }
+! } define-intrinsic
 
 : generate-fixnum/mod
     #! The same code is used for fixnum/i and fixnum/mod.
@@ -215,45 +215,26 @@ IN: compiler
     "end" define-label
     prepare-division
     "y" operand IDIV
-    ! Make a copy since following shift is destructive
-    "y" operand "x" operand MOV
-    ! Tag the value, since division cancelled tags from both
-    ! inputs
-    "x" operand 1 tag-bits shift IMUL2
-    ! Did it overflow?
-    "end" get JNO
-    ! There was an overflow, so make ECX into a bignum. we must
-    ! save EDX since its volatile.
-    remainder-reg PUSH
-    ! Align the stack -- only needed on Mac OS X
-    stack-reg 16 cell - SUB
-    "s48_long_to_bignum" f
-    "y" operand 1array compile-c-call*
-    ! An untagged pointer to the bignum is now in EAX; tag it
-    T{ int-regs } return-reg bignum-tag OR
-    ! Align the stack -- only needed on Mac OS X
-    stack-reg 16 cell - ADD
-    ! the remainder is now in EDX
-    remainder-reg POP
-    "end" get resolve-label ;
+    %tag-overflow
+    "end" resolve-label ;
 
 \ fixnum/i [ generate-fixnum/mod ] H{
-    { +input { { 0 "x" } { 1 "y" } } }
-    { +scratch { { 2 "out" } } }
-    { +output { "x" } }
-    { +clobber { "x" "y" } }
+    { +input+ { { 0 "x" } { 1 "y" } } }
+    { +scratch+ { { 2 "r" } } }
+    { +output+ { "x" } }
+    { +clobber+ { "x" "y" } }
 } define-intrinsic
 
 \ fixnum/mod [ generate-fixnum/mod ] H{
-    { +input { { 0 "x" } { 1 "y" } } }
-    { +scratch { { 2 "out" } } }
-    { +output { "x" "out" } }
-    { +clobber { "x" "y" } }
+    { +input+ { { 0 "x" } { 1 "y" } } }
+    { +scratch+ { { 2 "r" } } }
+    { +output+ { "x" "r" } }
+    { +clobber+ { "x" "y" } }
 } define-intrinsic
 
 : define-fixnum-jump ( word op -- )
-    [ end-basic-block "x" operand "y" operand CMP ] swap add
-    H{ { +input { { f "x" } { f "y" } } } } define-if-intrinsic ;
+    [ "x" operand "y" operand CMP ] swap add
+    { { f "x" } { f "y" } } define-if-intrinsic ;
 
 {
     { fixnum< JL }
@@ -265,25 +246,72 @@ IN: compiler
     first2 define-fixnum-jump
 ] each
 
+\ fixnum>bignum [
+    "nonzero" define-label
+    "end" define-label
+    "x" operand 0 CMP ! is it zero?
+    "nonzero" get JNE
+    0 >bignum "x" get load-literal
+    "end" get JMP
+    "nonzero" resolve-label
+    "x" operand tag-bits SAR
+    "x" operand dup %allot-bignum-signed-1
+    "end" resolve-label
+] H{
+    { +input+ { { f "x" } } }
+    { +output+ { "x" } }
+} define-intrinsic
+
+\ bignum>fixnum [
+    "nonzero" define-label
+    "positive" define-label
+    "end" define-label
+    "x" operand %untag
+    "y" operand "x" operand cell [+] MOV
+     ! if the length is 1, its just the sign and nothing else,
+     ! so output 0
+    "y" operand 1 tag-bits shift CMP
+    "nonzero" get JNE
+    "y" operand 0 MOV
+    "end" get JMP
+    "nonzero" resolve-label
+    ! load the value
+    "y" operand "x" operand 3 cells [+] MOV
+    ! load the sign
+    "x" operand "x" operand 2 cells [+] MOV
+    ! is the sign negative?
+    "x" operand 0 CMP
+    "positive" get JE
+    "y" operand -1 IMUL2
+    "positive" resolve-label
+    "y" operand 3 SHL
+    "end" resolve-label
+] H{
+    { +input+ { { f "x" } } }
+    { +scratch+ { { f "y" } } }
+    { +clobber+ { "x" } }
+    { +output+ { "y" } }
+} define-intrinsic
+
 ! User environment
 : %userenv ( -- )
-    "x" operand "userenv" f [ dlsym MOV ] 2keep
-    rel-absolute-cell rel-dlsym
+    "x" operand 0 MOV
+    "userenv" f rel-absolute-cell rel-dlsym
     "n" operand fixnum>slot@
     "n" operand "x" operand ADD ;
 
 \ getenv [
     %userenv  "n" operand dup [] MOV
 ] H{
-    { +input { { f "n" } } }
-    { +scratch { { f "x" } } }
-    { +output { "n" } }
+    { +input+ { { f "n" } } }
+    { +scratch+ { { f "x" } } }
+    { +output+ { "n" } }
 } define-intrinsic
 
 \ setenv [
     %userenv  "n" operand [] "val" operand MOV
 ] H{
-    { +input { { f "val" } { f "n" } } }
-    { +scratch { { f "x" } } }
-    { +clobber { "n" } }
+    { +input+ { { f "val" } { f "n" } } }
+    { +scratch+ { { f "x" } } }
+    { +clobber+ { "n" } }
 } define-intrinsic

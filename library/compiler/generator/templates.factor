@@ -4,6 +4,9 @@ IN: compiler
 USING: arrays generic hashtables inference io kernel math
 namespaces prettyprint sequences vectors words ;
 
+! Set this to t so that end-basic-block compiles a GC check
+: maybe-gc ( n -- ) \ maybe-gc get push ;
+
 ! Register allocation
 
 ! Hash mapping reg-classes to mutable vectors
@@ -95,10 +98,6 @@ SYMBOL: phantom-r
 
 : phantoms ( -- phantom phantom ) phantom-d get phantom-r get ;
 
-: init-templates ( -- )
-    <phantom-datastack> phantom-d set
-    <phantom-callstack> phantom-r set ;
-
 : finalize-heights ( -- )
     phantoms [ finalize-height ] 2apply ;
 
@@ -111,7 +110,7 @@ SYMBOL: phantom-r
 : (live-locs) ( seq -- seq )
     dup phantom-locs* [ 2array ] 2map
     [ first2 over loc? >r = not r> and ] subset
-    [ first ] map ;
+    0 <column> ;
 
 : stack>new-vreg ( loc spec -- vreg )
     spec>vreg [ swap %peek ] keep ;
@@ -135,7 +134,14 @@ SYMBOL: phantom-r
 : finalize-contents ( -- )
     phantoms 2dup flush-locs [ vregs>stack ] 2apply ;
 
-: end-basic-block ( -- ) finalize-contents finalize-heights ;
+: end-basic-block ( -- )
+    finalize-contents finalize-heights
+    \ maybe-gc get dup empty? [
+        drop
+    ] [
+        delete-all
+        "simple_gc" f %alien-invoke
+    ] if ;
 
 : used-vregs ( -- seq ) phantoms append [ vreg? ] subset ;
 
@@ -148,6 +154,21 @@ SYMBOL: phantom-r
     { T{ int-regs } T{ float-regs f 8 } }
     [ 2dup (compute-free-vregs) ] map>hash \ free-vregs set
     drop ;
+
+: init-templates ( -- )
+    V{ } clone \ maybe-gc set
+    <phantom-datastack> phantom-d set
+    <phantom-callstack> phantom-r set
+    compute-free-vregs ;
+
+: keep-templates ( quot -- )
+    [
+        V{ } clone \ maybe-gc set
+        phantom-d [ clone ] change
+        phantom-r [ clone ] change
+        compute-free-vregs
+        call
+    ] with-scope ; inline
 
 : additional-vregs ( seq seq -- n )
     2array phantoms 2array [ [ length ] map ] 2apply v-
@@ -206,21 +227,21 @@ SYMBOL: phantom-r
 : phantom-append ( seq stack -- )
     over length over adjust-phantom swap nappend ;
 
-SYMBOL: +input
-SYMBOL: +output
-SYMBOL: +scratch
-SYMBOL: +clobber
+SYMBOL: +input+
+SYMBOL: +output+
+SYMBOL: +scratch+
+SYMBOL: +clobber+
 
 : fix-spec ( spec -- spec )
     H{
-        { +input { } }
-        { +output { } }
-        { +scratch { } }
-        { +clobber { } }
+        { +input+ { } }
+        { +output+ { } }
+        { +scratch+ { } }
+        { +clobber+ { } }
     } swap hash-union ;
 
 : output-vregs ( -- seq seq )
-    +output +clobber [ get [ get ] map ] 2apply ;
+    +output+ +clobber+ [ get [ get ] map ] 2apply ;
 
 : outputs-clash? ( -- ? )
     output-vregs append phantoms append
@@ -241,8 +262,8 @@ SYMBOL: +clobber
     [ second reg-spec>class eq? ] contains-with? ;
 
 : requests-class? ( class -- ? )
-    dup +input get (requests-class?) swap
-    +scratch get (requests-class?) or ;
+    dup +input+ get (requests-class?) swap
+    +scratch+ get (requests-class?) or ;
 
 : ?fp-scratch ( -- n )
     T{ float-regs f 8 } requests-class? 1 0 ? ;
@@ -253,11 +274,11 @@ SYMBOL: +clobber
     ] unless* ;
 
 : guess-vregs ( -- int# float# )
-    +input get { } additional-vregs ?fp-scratch +
-    +scratch get [ first ] map requested-vregs >r + r> ;
+    +input+ get { } additional-vregs ?fp-scratch +
+    +scratch+ get 0 <column> requested-vregs >r + r> ;
 
 : alloc-scratch ( -- )
-    +scratch get [ first2 >r spec>vreg r> set ] each ;
+    +scratch+ get [ first2 >r spec>vreg r> set ] each ;
 
 : template-inputs ( -- )
     ! Ensure we have enough to hold any new stack elements we
@@ -265,15 +286,18 @@ SYMBOL: +clobber
     guess-vregs ensure-vregs
     ! Split the template into available (fast) parts and those
     ! that require allocating registers and reading the stack
-    +input get match-template fast-input slow-input
+    +input+ get match-template fast-input slow-input
     ! Finally allocate scratch registers
     alloc-scratch ;
 
 : template-outputs ( -- )
-    +output get [ get ] map phantom-d get phantom-append ;
+    +output+ get [ get ] map phantom-d get phantom-append ;
 
 : with-template ( quot spec -- )
     fix-spec [ template-inputs call template-outputs ] bind
     compute-free-vregs ; inline
 
 : operand ( var -- op ) get v>operand ; inline
+
+: unique-operands ( operands quot -- )
+    >r [ operand ] map prune r> each ; inline

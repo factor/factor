@@ -69,12 +69,20 @@ SYMBOL: hand-loc
 
 SYMBOL: hand-clicked
 SYMBOL: hand-click-loc
+SYMBOL: hand-click#
+SYMBOL: hand-last-button
+SYMBOL: hand-last-time
+0 hand-last-button set-global
+0 hand-last-time set-global
 
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
 
 SYMBOL: scroll-direction
 { 0 0 } scroll-direction set-global
+
+SYMBOL: double-click-timeout
+300 double-click-timeout set-global
 
 : button-gesture ( gesture -- )
     hand-clicked get-global 2dup handle-gesture [
@@ -134,7 +142,7 @@ SYMBOL: scroll-direction
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] subset-with
-    [ first ] map prune f like ;
+    0 <column> prune f like ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;
@@ -145,14 +153,27 @@ SYMBOL: scroll-direction
 : hand-click-rel ( gadget -- loc )
     hand-click-loc get-global relative-loc ;
 
-: under-hand ( -- seq )
-    #! A sequence whose first element is the world and last is
-    #! the current gadget, with all parents in between.
-    hand-gadget get-global parents <reversed> ;
+: multi-click? ( button -- ? )
+    millis hand-last-time get - double-click-timeout get <=
+    swap hand-last-button get = and ;
+
+: update-click# ( button -- )
+    global [
+        multi-click? [
+            hand-click# inc
+        ] [
+            1 hand-click# set
+        ] if
+    ] bind ;
 
 : update-clicked ( -- )
     hand-gadget get-global hand-clicked set-global
     hand-loc get-global hand-click-loc set-global ;
+ 
+: under-hand ( -- seq )
+    #! A sequence whose first element is the world and last is
+    #! the current gadget, with all parents in between.
+    hand-gadget get-global parents <reversed> ;
 
 : move-hand ( loc world -- )
     dup hand-world set-global
@@ -163,8 +184,12 @@ SYMBOL: scroll-direction
 
 : send-button-down ( gesture loc world -- )
     move-hand
+    dup button-down-#
+    dup update-click#
+    dup hand-last-button set-global
+    millis hand-last-time set-global
     update-clicked
-    dup button-down-# hand-buttons get-global push
+    hand-buttons get-global push
     button-gesture ;
 
 : send-button-up ( gesture loc world -- )

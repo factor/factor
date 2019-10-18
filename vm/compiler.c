@@ -1,5 +1,7 @@
 #include "factor.h"
 
+/* References to undefined symbols are patched up to call this function on
+image load */
 void undefined_symbol(void)
 {
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,true);
@@ -12,13 +14,14 @@ INLINE CELL get_literal(CELL literal_start, CELL num)
 	return get(CREF(literal_start,num));
 }
 
+/* Look up an external library symbol referenced by a compiled code block */
 CELL get_rel_symbol(F_REL *rel, CELL literal_start)
 {
 	CELL arg = REL_ARGUMENT(rel);
 	F_ARRAY *pair = untag_array(get_literal(literal_start,arg));
-	F_STRING *symbol = untag_string(get(AREF(pair,0)));
+	char *symbol = alien_offset(get(AREF(pair,0)));
 	CELL library = get(AREF(pair,1));
-	DLL *dll = (library == F ? NULL : untag_dll(library));
+	F_DLL *dll = (library == F ? NULL : untag_dll(library));
 
 	if(dll != NULL && !dll->dll)
 		return (CELL)undefined_symbol;
@@ -31,6 +34,7 @@ CELL get_rel_symbol(F_REL *rel, CELL literal_start)
 	return sym;
 }
 
+/* Compute an address to store at a relocation */
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literal_start, CELL words_start)
 {
@@ -58,12 +62,14 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	}
 }
 
+/* Store a 32-bit value into two consecutive PowerPC LI/LIS instructions */
 INLINE void reloc_set_2_2(CELL cell, CELL value)
 {
 	put(cell - CELLS,((get(cell - CELLS) & ~0xffff) | ((value >> 16) & 0xffff)));
 	put(cell,((get(cell) & ~0xffff) | (value & 0xffff)));
 }
 
+/* Store a value into a bitfield of a PowerPC instruction */
 INLINE void reloc_set_masked(CELL cell, CELL value, CELL mask)
 {
 	u32 original = *(u32*)cell;
@@ -71,6 +77,7 @@ INLINE void reloc_set_masked(CELL cell, CELL value, CELL mask)
 	*(u32*)cell = (original | (value & mask));
 }
 
+/* Perform a fixup on a code block */
 void apply_relocation(F_REL *rel,
 	CELL code_start, CELL literal_start, CELL words_start)
 {
@@ -111,17 +118,19 @@ void apply_relocation(F_REL *rel,
 	}
 }
 
+/* Perform all fixups on a code block */
 void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
 {
 	F_REL *rel = (F_REL *)reloc_start;
 	F_REL *rel_end = (F_REL *)literal_start;
 
-	/* apply relocations */
 	while(rel < rel_end)
 		apply_relocation(rel++,code_start,literal_start,words_start);
 }
 
+/* After compiling a batch of words, we replace all mutual word references with
+direct XT references, and perform fixups */
 void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
 {
@@ -138,74 +147,32 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 	flush_icache(code_start,reloc_start - code_start);
 }
 
+/* Write a sequence of integers to memory, with 'format' bytes per integer */
 void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
 {
 	CELL count = untag_fixnum_fast(vector->top);
 	F_ARRAY *array = untag_array_fast(vector->array);
 	CELL i;
 
-	if(format == 1)
+	for(i = 0; i < count; i++)
 	{
-		for(i = 0; i < count; i++)
-			cput(here + i,to_fixnum(get(AREF(array,i))));
+		F_FIXNUM value = to_fixnum(get(AREF(array,i)));
+		if(format == 1)
+			cput(here + i,value);
+		else if(format == sizeof(unsigned int))
+			*(unsigned int *)(here + format * i) = value;
+		else if(format == CELLS)
+			put(CREF(here,i),value);
+		else
+			critical_error("Bad format in deposit_integers()",format);
 	}
-	else if(format == CELLS)
-	{
-		for(i = 0; i < count; i++)
-			put(CREF(here,i),to_fixnum(get(AREF(array,i))));
-	}
-	else
-		critical_error("Bad format param to deposit_vector()",format);
 }
 
+/* Write a sequence of tagged pointers to memory */
 void deposit_objects(CELL here, F_VECTOR *vector, CELL literal_length)
 {
 	F_ARRAY *array = untag_array_fast(vector->array);
 	memcpy((void*)here,array + 1,literal_length);
-}
-
-CELL add_compiled_block(CELL code_format, F_VECTOR *code,
-	F_VECTOR *literals, F_VECTOR *words, F_VECTOR *rel)
-{
-	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format);
-	CELL rel_length = untag_fixnum_fast(rel->top) * CELLS;
-	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS;
-	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
-
-	CELL total_length = sizeof(F_COMPILED) + code_length + rel_length
-		+ literal_length + words_length;
-
-	CELL start = heap_allot(&compiling,total_length);
-	CELL here = start;
-
-	/* compiled header */
-	F_COMPILED header;
-	header.code_length = code_length;
-	header.reloc_length = rel_length;
-	header.literal_length = literal_length;
-	header.words_length = words_length;
-	header.finalized = false;
-
-	memcpy((void*)here,&header,sizeof(F_COMPILED));
-	here += sizeof(F_COMPILED);
-
-	/* code */
-	deposit_integers(here,code,code_format);
-	here += code_length;
-
-	/* relation info */
-	deposit_integers(here,rel,CELLS);
-	here += rel_length;
-
-	/* literals */
-	deposit_objects(here,literals,literal_length);
-	here += literal_length;
-
-	/* words */
-	deposit_objects(here,words,words_length);
-	here += words_length;
-
-	return start + sizeof(F_COMPILED);
 }
 
 #define FROB \
@@ -215,7 +182,7 @@ CELL add_compiled_block(CELL code_format, F_VECTOR *code,
 	F_VECTOR *literals = untag_vector(get(ds - CELLS * 3)); \
 	F_VECTOR *rel = untag_vector(get(ds - CELLS * 4)); \
 	CELL code_length = align8(untag_fixnum_fast(code->top) * code_format); \
-	CELL rel_length = untag_fixnum_fast(rel->top) * CELLS; \
+	CELL rel_length = untag_fixnum_fast(rel->top) * sizeof(unsigned int); \
 	CELL literal_length = untag_fixnum_fast(literals->top) * CELLS; \
 	CELL words_length = untag_fixnum_fast(words->top) * CELLS;
 
@@ -224,29 +191,31 @@ void primitive_add_compiled_block(void)
 	CELL start;
 
 	{
-		/* read parameters from stack, leaving them on the stack */
+		/* Read parameters from stack, leaving them on the stack */
 		FROB
+		if(code->header != tag_header(VECTOR_TYPE))
+			critical_error("FUCKUP 1",0);
 
-		/* try allocating a new code block */
+		/* Try allocating a new code block */
 		CELL total_length = sizeof(F_COMPILED) + code_length
 			+ rel_length + literal_length + words_length;
 
 		start = heap_allot(&compiling,total_length);
 
-		/* if allocation failed, do a code GC */
+		/* If allocation failed, do a code GC */
 		if(start == 0)
 		{
 			garbage_collection(TENURED,true);
 			start = heap_allot(&compiling,total_length);
 
-			/* insufficient room even after code GC, give up */
+			/* Insufficient room even after code GC, give up */
 			if(start == 0)
-				critical_error("code heap exhausted",0);
+				critical_error("Out of memory in add-compiled-block",0);
 		}
 	}
 
 	/* we have to read the parameters again, since we may have called
-	code GC in which case the data heap semi-spaces will have switched */
+	GC above in which case the data heap semi-spaces will have switched */
 	FROB
 
 	/* now we can pop the parameters from the stack */
@@ -271,7 +240,7 @@ void primitive_add_compiled_block(void)
 	here += code_length;
 
 	/* relation info */
-	deposit_integers(here,rel,CELLS);
+	deposit_integers(here,rel,sizeof(unsigned int));
 	here += rel_length;
 
 	/* literals */
@@ -288,6 +257,8 @@ void primitive_add_compiled_block(void)
 
 #undef FROB
 
+/* After batch compiling a bunch of words, perform various fixups to make them
+executable */
 void primitive_finalize_compile(void)
 {
 	F_ARRAY *array = untag_array(dpop());

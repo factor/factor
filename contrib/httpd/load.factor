@@ -2,7 +2,8 @@ USING: io ;
 
 REQUIRES: contrib/calendar contrib/http contrib/xml ;
 
-PROVIDE: contrib/httpd { 
+PROVIDE: contrib/httpd
+{ +files+ {
     "mime.factor"
     "html-tags.factor"
     "responder.factor"
@@ -14,14 +15,13 @@ PROVIDE: contrib/httpd {
     "embedded.factor"
     "file-responder.factor"
     "default-responders.factor"
-} {
+} }
+{ +tests+ {
     "test/html.factor"
     "test/http-client.factor"
     "test/httpd.factor"
     "test/url-encoding.factor"
-} ;
+} } ;
 
-"To start the HTTP server, issue the following command in the listener:" print
-"  USE: httpd" print
-"  [ 8888 httpd ] in-thread" print
-"Replacing '8888' with whatever port number you desire." print
+USE: httpd
+MAIN: contrib/httpd 8888 httpd ;

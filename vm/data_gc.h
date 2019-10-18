@@ -1,16 +1,19 @@
-bool in_page(void *fault, void *i_area, CELL area_size, int offset);
+/* Set by the -S command line argument */
+bool secure_gc;
+
+bool in_page(CELL fault, CELL area, CELL area_size, int offset);
 
 void *safe_malloc(size_t size);
 
 typedef struct {
-    CELL start;
-    CELL size;
-} BOUNDED_BLOCK;
+	CELL start;
+	CELL size;
+} F_SEGMENT;
 
 /* set up guard pages to check for under/overflow.
 size must be a multiple of the page size */
-BOUNDED_BLOCK *alloc_bounded_block(CELL size);
-void dealloc_bounded_block(BOUNDED_BLOCK *block);
+F_SEGMENT *alloc_segment(CELL size);
+void dealloc_segment(F_SEGMENT *block);
 
 CELL untagged_object_size(CELL pointer);
 CELL unaligned_object_size(CELL pointer);
@@ -35,10 +38,10 @@ the offset of the first object is set by the allocator.
 */
 #define CARD_MARK_MASK 0x80
 #define CARD_BASE_MASK 0x7f
-typedef u8 CARD;
+typedef u8 F_CARD;
 
-CARD *cards;
-CARD *cards_end;
+F_CARD *cards;
+F_CARD *cards_end;
 
 /* A card is 16 bytes (128 bits), 5 address bits per card.
 it is important that 7 bits is sufficient to represent every
@@ -47,27 +50,27 @@ offset within the card */
 #define CARD_BITS 7
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
-INLINE CARD card_marked(CARD c)
+INLINE F_CARD card_marked(F_CARD c)
 {
 	return c & CARD_MARK_MASK;
 }
 
-INLINE void unmark_card(CARD *c)
+INLINE void unmark_card(F_CARD *c)
 {
 	*c &= CARD_BASE_MASK;
 }
 
-INLINE void clear_card(CARD *c)
+INLINE void clear_card(F_CARD *c)
 {
 	*c = CARD_BASE_MASK; /* invalid value */
 }
 
-INLINE u8 card_base(CARD c)
+INLINE u8 card_base(F_CARD c)
 {
 	return c & CARD_BASE_MASK;
 }
 
-#define ADDR_TO_CARD(a) (CARD*)(((CELL)a >> CARD_BITS) + cards_offset)
+#define ADDR_TO_CARD(a) (F_CARD*)(((CELL)a >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)c - cards_offset)<<CARD_BITS)
 
 /* this is an inefficient write barrier. compiled definitions use a more
@@ -76,15 +79,23 @@ any time we are potentially storing a pointer from an older generation
 to a younger one */
 INLINE void write_barrier(CELL address)
 {
-	CARD *c = ADDR_TO_CARD(address);
+	F_CARD *c = ADDR_TO_CARD(address);
 	*c |= CARD_MARK_MASK;
+}
+
+#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
+
+INLINE void set_slot(CELL obj, CELL slot, CELL value)
+{
+	put(SLOT(obj,slot),value);
+	write_barrier(obj);
 }
 
 /* we need to remember the first object allocated in the card */
 INLINE void allot_barrier(CELL address)
 {
-	CARD *ptr = ADDR_TO_CARD(address);
-	CARD c = *ptr;
+	F_CARD *ptr = ADDR_TO_CARD(address);
+	F_CARD c = *ptr;
 	CELL b = card_base(c);
 	CELL a = (address & ADDR_CARD_MASK);
 	*ptr = (card_marked(c) | ((b < a) ? b : a));
@@ -100,11 +111,9 @@ typedef struct {
 	CELL base;
 	/* allocation pointer */
 	CELL here;
-	/* only for nursery: when it gets this full, call GC */
-	CELL alarm;
 	/* end of zone */
 	CELL limit;
-} ZONE;
+} F_ZONE;
 
 /* total number of generations. */
 CELL gen_count;
@@ -114,25 +123,28 @@ CELL gen_count;
 /* the oldest generation */
 #define TENURED (gen_count-1)
 
-DLLEXPORT ZONE *generations;
+DLLEXPORT F_ZONE *generations;
 
 /* used during garbage collection only */
-ZONE *newspace;
+F_ZONE *newspace;
 
 #define tenured generations[TENURED]
 #define nursery generations[NURSERY]
 
 /* spare semi-space; rotates with tenured. */
-ZONE prior;
+F_ZONE prior;
 
-INLINE bool in_zone(ZONE* z, CELL pointer)
+INLINE bool in_zone(F_ZONE *z, CELL pointer)
 {
 	return pointer >= z->base && pointer < z->limit;
 }
 
-CELL init_zone(ZONE *z, CELL size, CELL base);
+CELL init_zone(F_ZONE *z, CELL size, CELL base);
 
-void init_data_heap(CELL gen_count, CELL young_size, CELL aging_size);
+void init_data_heap(CELL gens,
+	CELL young_size,
+	CELL aging_size,
+	bool secure_gc_);
 
 /* statistics */
 s64 gc_time;
@@ -175,24 +187,76 @@ references to an object for debugging purposes. */
 CELL heap_scan_ptr;
 
 /* GC is off during heap walking */
-bool heap_scan;
+bool gc_off;
 
-INLINE void *allot_zone(ZONE *z, CELL a)
+void garbage_collection(CELL gen, bool code_gc);
+
+/* If a runtime function needs to call another function which potentially
+allocates memory, it must store any local variable references to Factor
+objects on the root stack */
+F_SEGMENT *extra_roots_region;
+CELL extra_roots;
+
+DEFPUSHPOP(root_,extra_roots)
+
+#define REGISTER_ROOT(obj) root_push(obj)
+#define UNREGISTER_ROOT(obj) obj = root_pop()
+
+#define REGISTER_ARRAY(obj) root_push(tag_object(obj))
+#define UNREGISTER_ARRAY(obj) obj = untag_array_fast(root_pop())
+
+#define REGISTER_STRING(obj) root_push(tag_object(obj))
+#define UNREGISTER_STRING(obj) obj = untag_string_fast(root_pop())
+
+/* We ignore strings which point outside the data heap, but we might be given
+a char* which points inside the data heap, in which case it is a root, for
+example if we call unbox_char_string() the result is placed in a byte array */
+INLINE bool root_push_alien(const void *ptr)
+{
+	if((CELL)ptr > data_heap_start && (CELL)ptr < data_heap_end)
+	{
+		F_ARRAY *objptr = ((F_ARRAY *)ptr) - 1;
+		if(objptr->header == tag_header(BYTE_ARRAY_TYPE))
+		{
+			root_push(tag_object(objptr));
+			return true;
+		}
+	}
+
+	return false;
+}
+
+#define REGISTER_C_STRING(obj) \
+	bool obj##_root = root_push_alien(obj)
+#define UNREGISTER_C_STRING(obj) \
+	if(obj##_root) obj = alien_offset(root_pop())
+
+#define REGISTER_BIGNUM(obj) if(obj) root_push(tag_bignum(obj))
+#define UNREGISTER_BIGNUM(obj) if(obj) obj = (untag_bignum_fast(root_pop()))
+
+INLINE void *allot_zone(F_ZONE *z, CELL a)
 {
 	CELL h = z->here;
 	z->here = h + align8(a);
-	if(z->here > z->limit)
-	{
-		fprintf(stderr,"Nursery space exhausted\n");
-		factorbug();
-	}
 
 	allot_barrier(h);
 	return (void*)h;
 }
 
+/* We leave this many bytes free at the top of the nursery so that inline
+allocation (which does not call GC because of possible roots in volatile
+registers) does not run out of memory */
+#define ALLOT_BUFFER_ZONE 1024
+
+INLINE void maybe_gc(CELL a)
+{
+	if(nursery.here + a + ALLOT_BUFFER_ZONE > nursery.limit)
+		garbage_collection(NURSERY,false);
+}
+
 INLINE void *allot(CELL a)
 {
+	maybe_gc(a);
 	return allot_zone(&nursery,a);
 }
 
@@ -209,8 +273,6 @@ INLINE void* allot_object(CELL type, CELL length)
 
 void update_cards_offset(void);
 CELL collect_next(CELL scan);
-void garbage_collection(CELL gen, bool code_gc);
 void primitive_data_gc(void);
-void maybe_gc(CELL size);
-DLLEXPORT void simple_gc(void);
 void primitive_gc_time(void);
+DLLEXPORT void simple_gc(void);

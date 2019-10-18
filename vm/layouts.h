@@ -165,12 +165,12 @@ typedef struct {
 	CELL displacement;
 	/* untagged */
 	bool expired;
-} ALIEN;
+} F_ALIEN;
 
 typedef struct {
 	CELL header;
-	/* tagged string */
+	/* tagged byte array holding a C string */
 	CELL path;
 	/* OS-specific handle */
 	void* dll;
-} DLL;
+} F_DLL;

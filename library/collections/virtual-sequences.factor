@@ -1,5 +1,5 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
 USING: errors generic kernel math sequences-internals vectors ;
 
@@ -65,3 +65,18 @@ M: slice set-nth-unsafe slice@ set-nth-unsafe ;
 M: slice like slice-seq like ;
 
 M: slice thaw slice-seq thaw ;
+
+TUPLE: column seq col ;
+
+: column@ ( m column -- n seq )
+    dup column-col -rot column-seq nth ;
+
+M: column length column-seq length ;
+
+M: column nth column@ nth ;
+
+M: column set-nth column@ set-nth ;
+
+M: column like column-seq like ;
+
+M: column thaw column-seq thaw ;

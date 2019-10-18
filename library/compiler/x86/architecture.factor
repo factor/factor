@@ -16,8 +16,7 @@ IN: compiler
 
 : ds-reg ESI ; inline
 : cs-reg EDI ; inline
-: remainder-reg EDX ; inline
-: alloc-tmp-reg EBX ; inline
+: allot-tmp-reg EBX ; inline
 : stack-reg ESP ; inline
 : stack@ stack-reg swap [+] ;
 
@@ -38,16 +37,6 @@ M: cs-loc v>operand cs-loc-n cs-reg reg-stack ;
 
 : %alien-indirect ( -- )
     [ CALL ] alien-temp ;
-
-: with-aligned-stack ( n quot -- )
-    #! On Linux, there is no requirement to align stack frames,
-    #! so this is mostly a no-op.
-    swap slip stack-reg swap ADD ; inline
-
-: compile-c-call* ( symbol dll args -- )
-    dup length cells [
-        <reversed> [ PUSH ] each %alien-invoke
-    ] with-aligned-stack ;
 
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: pop-return-reg ( reg-class -- )
@@ -125,21 +114,26 @@ M: object load-literal
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    ! Untag and multiply to get a jump table offset
-    "end" define-label
-    "n" operand fixnum>slot@
-    ! Add to jump table base. We use a temporary register since
-    ! on AMD64 we have to load a 64-bit immediate. On x86, this
-    ! is redundant.
-    "scratch" operand HEX: ffffffff MOV
-    "end" get rel-absolute-cell rel-label
-    "n" operand "scratch" operand ADD
-    ! Jump to jump table entry
-    "n" operand [] JMP
-    ! Align for better performance
-    compile-aligned
-    ! Fix up jump table pointer
-    "end" get resolve-label ;
+    [
+        ! Untag and multiply to get a jump table offset
+        "end" define-label
+        "n" operand fixnum>slot@
+        ! Add to jump table base. We use a temporary register
+        ! since on AMD64 we have to load a 64-bit immediate. On
+        ! x86, this is redundant.
+        "scratch" operand HEX: ffffffff MOV
+        "end" get rel-absolute-cell rel-label
+        "n" operand "scratch" operand ADD
+        ! Jump to jump table entry
+        "n" operand [] JMP
+        ! Align for better performance
+        compile-aligned
+        ! Fix up jump table pointer
+        "end" resolve-label
+    ] H{
+        { +input+ { { f "n" } } }
+        { +scratch+ { { f "scratch" } } }
+    } with-template ;
 
 : %target ( label -- ) 0 cell, rel-absolute-cell rel-label ;
 

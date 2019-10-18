@@ -1,5 +1,4 @@
-REQUIRES: contrib/httpd contrib/process ;
-PROVIDE: contrib/vim {
-    "vim.factor"
-} ;
-
+REQUIRES: contrib/process ;
+PROVIDE: contrib/vim
+{ +files+ { "vim.factor" "vim.facts" } }
+{ +help+ { "vim" "vim" } } ;

@@ -6,9 +6,9 @@ sequences-internals ;
 
 UNION: integer fixnum bignum ;
 
-: even? ( n -- ? ) 1 bitand 0 = ;
+: even? ( n -- ? ) 1 bitand zero? ;
 
-: odd? ( n -- ? ) 1 bitand 1 = ;
+: odd? ( n -- ? ) 1 bitand 1 number= ;
 
 : (gcd) ( b a y x -- a d )
     dup zero? [
@@ -17,7 +17,8 @@ UNION: integer fixnum bignum ;
         tuck /mod >r pick * swap >r swapd - r> r> (gcd)
     ] if ; inline
 
-: gcd ( x y -- a d ) 0 1 2swap (gcd) abs ; foldable
+: gcd ( x y -- a d )
+    0 1 2swap (gcd) dup 0 < [ neg ] when ; foldable
 
 : (next-power-of-2) ( i n -- n )
     2dup >= [
@@ -52,6 +53,10 @@ M: integer /
         2dup gcd nip tuck /i >r /i r> fraction>
     ] if ;
 
+M: fixnum >fixnum ;
+M: fixnum >bignum fixnum>bignum ;
+M: fixnum >float fixnum>float ;
+
 M: fixnum number= eq? ;
 
 M: fixnum < fixnum< ;
@@ -63,7 +68,6 @@ M: fixnum + fixnum+ ;
 M: fixnum - fixnum- ;
 M: fixnum * fixnum* ;
 M: fixnum /i fixnum/i ;
-M: fixnum /f fixnum/f ;
 M: fixnum mod fixnum-mod ;
 
 M: fixnum /mod fixnum/mod ;
@@ -71,9 +75,13 @@ M: fixnum /mod fixnum/mod ;
 M: fixnum bitand fixnum-bitand ;
 M: fixnum bitor fixnum-bitor ;
 M: fixnum bitxor fixnum-bitxor ;
-M: fixnum shift fixnum-shift ;
+M: fixnum shift >fixnum fixnum-shift ;
 
 M: fixnum bitnot fixnum-bitnot ;
+
+M: bignum >fixnum bignum>fixnum ;
+M: bignum >bignum ;
+M: bignum >float bignum>float ;
 
 M: bignum number= bignum= ;
 M: bignum < bignum< ;
@@ -85,7 +93,6 @@ M: bignum + bignum+ ;
 M: bignum - bignum- ;
 M: bignum * bignum* ;
 M: bignum /i bignum/i ;
-M: bignum /f bignum/f ;
 M: bignum mod bignum-mod ;
 
 M: bignum /mod bignum/mod ;
@@ -93,7 +100,7 @@ M: bignum /mod bignum/mod ;
 M: bignum bitand bignum-bitand ;
 M: bignum bitor bignum-bitor ;
 M: bignum bitxor bignum-bitxor ;
-M: bignum shift bignum-shift ;
+M: bignum shift >fixnum bignum-shift ;
 
 M: bignum bitnot bignum-bitnot ;
 

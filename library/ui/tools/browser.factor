@@ -3,8 +3,8 @@
 USING: arrays sequences kernel gadgets-panes definitions
 prettyprint gadgets-theme gadgets-borders gadgets
 generic gadgets-scrolling math io words models styles
-namespaces gadgets-tracks gadgets-presentations gadgets-grids
-gadgets-workspace gadgets-frames help gadgets-buttons
+namespaces gadgets-tracks gadgets-presentations
+gadgets-workspace help gadgets-buttons
 gadgets-search tools ;
 IN: gadgets-browser
 

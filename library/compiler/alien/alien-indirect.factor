@@ -7,6 +7,10 @@ kernel namespaces sequences strings words parser prettyprint ;
 TUPLE: alien-indirect return parameters abi ;
 C: alien-indirect make-node ;
 
+M: alien-indirect alien-invoke-parameters alien-indirect-parameters ;
+M: alien-indirect alien-invoke-return alien-indirect-return ;
+M: alien-indirect alien-invoke-abi alien-indirect-abi ;
+
 TUPLE: alien-indirect-error ;
 
 : alien-indirect ( funcptr args... return parameters abi -- )
@@ -16,28 +20,29 @@ M: alien-indirect-error summary
     drop "Words calling ``alien-indirect'' cannot run in the interpreter. Compile the caller word and try again." ;
 
 \ alien-indirect [ string object string ] [ ] <effect>
-"infer-effect" set-word-prop
+"inferred-effect" set-word-prop
+
+: alien-indirect-stack ( node -- )
+    1 over consume-values
+    alien-invoke-stack ;
 
 \ alien-indirect [
-    empty-node <alien-indirect> dup node,
+    empty-node <alien-indirect>
     pop-literal nip over set-alien-indirect-abi
     pop-literal nip over set-alien-indirect-parameters
-    pop-literal nip swap set-alien-indirect-return
+    pop-literal nip over set-alien-indirect-return
+    dup alien-indirect-parameters
+    make-prep-quot 1 make-dip infer-quot
+    dup node,
+    alien-indirect-stack
 ] "infer" set-word-prop
 
-: generate-indirect-cleanup ( node -- )
-    dup alien-indirect-abi "stdcall" = [
-        drop
-    ] [
-        alien-indirect-parameters stack-space %cleanup
-    ] if ;
-
 M: alien-indirect generate-node
-    end-basic-block compile-gc
+    end-basic-block
     %prepare-alien-indirect
     dup alien-indirect-parameters objects>registers
     %alien-indirect
-    dup generate-indirect-cleanup
+    dup generate-invoke-cleanup
     alien-indirect-return box-return
     iterate-next ;
 

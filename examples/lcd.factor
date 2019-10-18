@@ -13,6 +13,6 @@ USING: sequences kernel math io ;
 : lcd ( digit-str -- )
     3 [ 2dup lcd-row terpri ] repeat drop ;
 
-"31337" lcd
-
 PROVIDE: examples/lcd ;
+
+MAIN: examples/lcd "31337" lcd ;

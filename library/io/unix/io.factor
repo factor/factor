@@ -82,9 +82,12 @@ M: port set-timeout
     [ "Error on fd " % dup port-handle # ": " % swap % ] "" make
     swap set-port-error ;
 
+: ignorable-error? ( n -- ? )
+    dup EAGAIN number= swap EINTR number= or ;
+
 : defer-error ( port -- ? )
     #! Return t if it is an unrecoverable error.
-    err_no dup EAGAIN = over EINTR = or
+    err_no dup ignorable-error?
     [ 2drop f ] [ strerror swap report-error t ] if ;
 
 ! Associates a port with a list of continuations waiting on the
@@ -145,8 +148,15 @@ GENERIC: task-container ( task -- vector )
     read-fdset/tasks init-fdset
     write-fdset/tasks init-fdset f ;
 
+: (io-multiplex) ( ms -- )
+    [ FD_SETSIZE init-fdsets ] keep make-timeval select 0 < [
+        err_no ignorable-error? [ (io-multiplex) ] [ drop ] if
+    ] [
+        drop
+    ] if ;
+
 : io-multiplex ( ms -- )
-    >r FD_SETSIZE init-fdsets r> make-timeval select io-error
+    (io-multiplex)
     read-fdset/tasks handle-fdset
     write-fdset/tasks handle-fdset ;
 
@@ -237,10 +247,6 @@ M: read-task task-container drop read-tasks get-global ;
         2drop 2drop
     ] if ;
 
-: fast>string ( sbuf -- string )
-    dup length over underlying length number=
-    [ underlying ] [ >string ] if ; inline
-
 M: input-port stream-read
     >r 0 max >fixnum r>
     2dup stream-read-part dup [
@@ -248,7 +254,7 @@ M: input-port stream-read
             pick <sbuf>
             [ swap nappend ] keep
             [ stream-read-loop ] keep
-            fast>string
+            "" like
         ] [
             2nip
         ] if

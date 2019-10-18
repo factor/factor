@@ -1,5 +1,6 @@
 REQUIRES: contrib/sequences ;
-PROVIDE: contrib/math { 
+PROVIDE: contrib/math
+{ +files+ {
     "utils.factor"
     "combinatorics.factor"
     "analysis.factor"
@@ -8,6 +9,7 @@ PROVIDE: contrib/math {
     "matrices.factor"
     "statistics.factor"
     "numerical-integration.factor"
-} {
+} }
+{ +tests+ {
     "test.factor"
-} ;
+} } ;

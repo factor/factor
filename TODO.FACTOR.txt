@@ -1,43 +1,59 @@
-- live search: timer delay would be nice
-- hashed generic method dispatch
-- fix this:
-  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
-[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
-]
-- prettier printing of hashtable literals, alists, cond, ...
++ 0.87:
 
-+ ui:
-
+- fix search unit test
+- these things are "Too Slow":
+  - all-words
+  - make-image
+  - workspace-window
 - menu should stay up if mouse button released
-- completion is not ideal: eg, search for "buttons"
-- some way of intercepting all gestures
+- roundoff is still not quite right with tracks
+- grid displays quickly now, but constructing large amounts of gadgets
+  is slow: eg, 10000 [ dup number>string ] map describe
+- completion is not ideal: eg, C+e "buttons"
 - slider needs to be modelized
 - better help result ranking
 - help search looks funny
-- menus should not require mouse to be held
 - variable width word wrap
 - graphical module manager tool
+- graphical crossref tool
 - ui browser: show currently selected vocab & words
 - auto-update browser and help when sources reload
+- amd64 structs-by-value bug
+- intrinsic fixnum>float float>fixnum
+- mac intel: struct returns from objc methods
+- faster apropos
+- compiled call traces
+- workspace window takes too long to come up
+- new windows don't always have focus, eg focus follows mouse
+- dataflow for [ ] map [ ] subset looks weird (wrong?)
+- listener commands from a menu should not include 'hide-glass' etc
+- bogus compile errors?
+- recompile get/set/>n/n>/ndrop if needed
+- cross-word type inference
+- callback scheduling issue
+- windows crash
+- ui docs
+- some kind of declarative wiring framework for ui
+- overhaul models, set-model* is crap
+- allow rebinding styles
+- fix windows gcc issue
+- robustify stepper -- see if step back past a throw works
+- empty callstack: should throw an exception instead of being a critical error
+
++ ui:
+
+- some way of intercepting all gestures
 - how do we refer to command shortcuts in the docs?
-- roundoff is still not quite right with tracks
 - fix top level window positioning
-- services do not launch if factor not running
 - editor:
-  - double/triple click
   - autoscroll
   - transpose char/word/line
   - more efficient multi-line inserts
-  - write "foo| " and put caret at | then select word element: selects
-    space
-- grid slows down with 2000 lines
 - see if its possible to only repaint dirty regions
 - structure editor
 
 + module system:
 
-- convention for main entry point of a module
-- convention for main help article of a module
 - track a list of assets loaded from each module's file
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
@@ -48,36 +64,41 @@
 
 + compiler/ffi:
 
-- more compact relocation info
-- relocation should not cons at all
-- stdcall callbacks
+- %allot-bignum-signed-2 is broken on both platforms
+- we may be able to remove the dlsym primitive
 - [ [ dup call ] dup call ] infer hangs
+- stdcall callbacks
 - callstack overflow when compiling mutually recursive inline words
 - test what is done in the case of an invalid declaration on an inline
   recursive
 - ppc64 backend
 - arm backend
-- mac intel: struct returns from objc methods
-- fix compiled gc check
-  - there was a performance hit, investigate
-  - float boxing and overflow checks need a gc check too
 - float= doesn't consider nans equal
-- intrinsic fixnum>float float>fixnum
 - C functions returning structs by value
-- infer which variables are read, written in a quotation
 - compiled continuations
-- compiled call traces
+
++ prettyprinter:
+
+- clean it up
+- if we're printing a block on multiple lines, break at some words like
+  set off on % # , ... and assembler opcodes
+- don't end lines with literals, shuffle words or symbols?
+- see should try to not show ; on a line by itself
+- IN: on its own line if the entire 'see' form doesn't fit
+- don't build entire tree to print first
 
 + misc:
 
+- should be possible to reload any source file in library
+- growable data heap
 - minor GC takes too long now, we should card mark code heap
 - buffer-ptr should be an alien
 - swap nappend ==> nappend
-- gdb triggers 'mutliple i/o ops on port' error
-- growable data heap
+- gdb triggers 'multiple i/o ops on port' error
 - incremental GC
 - UDP
 - slice: if sequence or seq start is changed, abstraction violation
+- hashed generic method dispatch
 
 + httpd:
 

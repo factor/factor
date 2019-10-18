@@ -16,14 +16,7 @@ USING: alien errors io-internals kernel math parser sequences words ;
 : FORMAT_MESSAGE_ARGUMENT_ARRAY  HEX: 00002000 ; inline
 : FORMAT_MESSAGE_MAX_WIDTH_MASK  HEX: 000000FF ; inline
 
-: MAKELANGID ( primary sub -- lang )
-    10 shift bitor ;
+: MAKELANGID ( primary sub -- lang ) 10 shift bitor ;
 
 : LANG_NEUTRAL 0 ; inline
 : SUBLANG_DEFAULT 1 ; inline
-
-FUNCTION: char* error_message ( DWORD id ) ;
-
-: win32-throw-error ( -- * )
-    GetLastError error_message throw ;
-

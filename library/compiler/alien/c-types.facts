@@ -1,9 +1,9 @@
 IN: alien
-USING: help libc ;
+USING: help libc kernel-internals ;
 
 HELP: <c-type>
 { $values { "type" "a hashtable" } }
-{ $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-types" } "." } ;
+{ $description "Creates a prototypical C type. User code should use higher-level facilities to define C types; see " { $link "c-data" } "." } ;
 
 HELP: no-c-type
 { $values { "type" "a string" } }
@@ -22,11 +22,6 @@ HELP: c-size
     "On a 32-bit system, you will get the following output:"
     { $example "USE: alien\n\"void*\" c-size ." "4" }
 }
-{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
-
-HELP: c-align
-{ $values { "name" "a string" } { "align" "an integer" } }
-{ $description "Outputs alignment at which values of this C type are padded in C structures." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: c-getter
@@ -72,6 +67,15 @@ HELP: alien>u16-string ( c-ptr -- string )
 { $values { "c-ptr" "an alien, byte array or " { $link f } } { "string" "a string" } }
 { $description "Reads a null-terminated UTF16 string from the specified address." }
 { $see-also string>u16-alien } ;
+
+HELP: memory>string ( base len -- string )
+{ $values { "base" "an integer address" } { "len" "a non-negative integer" } { "string" "a string" } }
+{ $description "Reads " { $snippet "len" } " bytes starting from " { $snippet "base" } " and stores them in a new Factor string." } ;
+
+HELP: string>memory ( string base -- )
+{ $values { "string" "a string" } { "base" "an integer address" } }
+{ $description "Writes the string to memory starting from the " { $snippet "base" } " address." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. Improper use can corrupt memory." } ;
 
 HELP: <malloc-array>
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "alien" "an alien address" } }

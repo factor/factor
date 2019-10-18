@@ -60,8 +60,9 @@ M: word article-content
 
 : help-outliner ( seq quot -- )
     subsection-style [
-        sort-articles [ ($subsection) terpri ] each
+        sort-articles [ ($subsection) ] [ terpri ] interleave
     ] with-style ;
 
 : $outliner ( element -- )
-    first call help-outliner ;
+    first call dup empty?
+    [ drop ] [ [ help-outliner ] ($block) ] if ;

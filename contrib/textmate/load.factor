@@ -1,1 +1,2 @@
-PROVIDE: contrib/textmate { "textmate.factor" } { } ;
+REQUIRES: contrib/process ;
+PROVIDE: contrib/textmate { +files+ { "textmate.factor" } } ;

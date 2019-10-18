@@ -25,3 +25,5 @@ USING: kernel math parser io ;
 : numbers-game number-to-guess numbers-game-loop ;
 
 PROVIDE: examples/numbers-game ;
+
+MAIN: examples/numbers-game numbers-game ;

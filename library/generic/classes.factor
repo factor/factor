@@ -11,6 +11,8 @@ SYMBOL: typemap
 SYMBOL: class<map
 SYMBOL: builtins
 
+PREDICATE: word builtin ( obj -- ? ) builtins get memq? ;
+
 : classes ( -- seq ) class<map get hash-keys ;
 
 : type>class ( n -- class ) builtins get nth ;

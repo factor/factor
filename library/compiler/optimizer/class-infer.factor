@@ -119,7 +119,7 @@ M: node child-ties
     dup node-param "output-classes" word-prop [
         call
     ] [
-        node-param "infer-effect" word-prop effect-out
+        node-param "inferred-effect" word-prop effect-out
         dup [ word? ] all? [ drop f ] unless
     ] if* ;
 
@@ -163,14 +163,17 @@ DEFER: (infer-classes)
     [ pick merge-value-class swap set-value-class* ] 2each
     drop ;
 
+: active-children ( node -- seq )
+    node-children
+    [ last-node ] map
+    [ #terminate? not ] subset ;
+
 : merge-children ( node -- )
     dup node-successor dup #merge? [
-        over node-children empty? [
+        swap active-children dup empty? [
             2drop
         ] [
-            node-out-d <reversed>
-            >r node-children [ last-node ] map r>
-            annotate-merge
+            swap node-out-d <reversed> annotate-merge
         ] if
     ] [
         2drop

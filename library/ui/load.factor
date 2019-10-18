@@ -1,9 +1,10 @@
 REQUIRES: library/ui/opengl library/ui/freetype ;
 
-PROVIDE: library/ui {
+PROVIDE: library/ui
+{ +files+ {
+    "timers.factor"
     "models.factor"
     "backend.factor"
-    "timers.factor"
     "gadgets.factor"
     "layouts.factor"
     "hierarchy.factor"
@@ -48,7 +49,8 @@ PROVIDE: library/ui {
     "tools/workspace.factor"
     "tools/operations.factor"
     "text/editor.facts"
-} {
+} }
+{ +tests+ {
     "test/editor.factor"
     "test/gadgets.factor"
     "test/models.factor"
@@ -62,4 +64,5 @@ PROVIDE: library/ui {
     "test/search.factor"
     "test/sliders.factor"
     "test/tracks.factor"
-} ;
+    "test/titled-gadget.factor"
+} } ;

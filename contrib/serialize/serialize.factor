@@ -193,7 +193,7 @@ DEFER: deserialize ( -- obj )
 
 : deserialize-tuple ( -- array )
   deserialize 
-  deserialize array>tuple
+  deserialize >tuple
   [ intern-object ] keep ;
 
 : deserialize-byte-array ( -- byte-array )

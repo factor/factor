@@ -1,12 +1,15 @@
 #include "factor.h"
 
+/* Get things started */
 void init_factor(const char* image,
 	CELL ds_size, CELL rs_size, CELL cs_size,
-	CELL gen_count, CELL young_size, CELL aging_size, CELL code_size)
+	CELL gen_count, CELL young_size, CELL aging_size,
+	CELL code_size,
+	bool secure_gc)
 {
 	srand(current_millis());
 	init_ffi();
-	init_data_heap(gen_count,young_size,aging_size);
+	init_data_heap(gen_count,young_size,aging_size,secure_gc);
 	init_code_heap(code_size);
 	init_stacks(ds_size,rs_size,cs_size);
 	/* callframe must be valid in case load_image() does GC */
@@ -20,7 +23,6 @@ void init_factor(const char* image,
 	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
 	userenv[GEN_ENV] = tag_fixnum(gen_count);
-	userenv[CARD_OFF_ENV] = tag_cell(cards_offset);
 	userenv[IMAGE_ENV] = tag_object(from_char_string(image));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
 }
@@ -51,6 +53,7 @@ int main(int argc, char** argv)
 	CELL arg_count;
 	CELL i;
 	bool image_given = true;
+	bool secure_gc = false;
 
 	early_init();
 
@@ -63,6 +66,7 @@ int main(int argc, char** argv)
 		if(factor_arg(argv[i],"-Y=%d",&young_size)) continue;
 		if(factor_arg(argv[i],"-A=%d",&aging_size)) continue;
 		if(factor_arg(argv[i],"-X=%d",&code_size)) continue;
+		if(strcmp(argv[i],"-S") == 0) { secure_gc = true; continue; }
 
 		if(strncmp(argv[i],"-",1) != 0 && image == NULL)
 			image = argv[1];
@@ -81,14 +85,19 @@ int main(int argc, char** argv)
 		generations,
 		young_size * 1024 * 1024,
 		aging_size * 1024 * 1024,
-		code_size * 1024 * 1024);
+		code_size * 1024 * 1024,
+		secure_gc);
 
 	arg_count = (image_given ? 2 : 1);
-	args = array(ARRAY_TYPE,argc,F);
-	while(arg_count < argc)
+
+	args = allot_array(ARRAY_TYPE,argc,F);
+
+	for(i = arg_count; i < argc; i++)
 	{
-		put(AREF(args,arg_count),tag_object(from_char_string(argv[arg_count])));
-		arg_count++;
+		REGISTER_ARRAY(args);
+		CELL arg = tag_object(from_char_string(argv[i]));
+		UNREGISTER_ARRAY(args);
+		set_array_nth(args,i,arg);
 	}
 
 	userenv[ARGS_ENV] = tag_object(args);

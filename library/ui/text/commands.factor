@@ -1,15 +1,11 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: gadgets kernel models namespaces sequences ;
+USING: gadgets kernel models namespaces sequences arrays ;
 
 : editor-extend-selection ( editor -- )
     dup request-focus
     dup editor-caret click-loc ;
-
-: editor-mouse-down ( editor -- )
-    dup editor-extend-selection
-    dup editor-mark click-loc ;
 
 : editor-mouse-drag ( editor -- )
     dup editor-caret click-loc ;
@@ -67,8 +63,20 @@ USING: gadgets kernel models namespaces sequences ;
 
 : selected-word ( editor -- string )
     dup gadget-selection?
-    [ dup T{ word-elt } select-elt ] unless
+    [ dup T{ one-word-elt } select-elt ] unless
     gadget-selection ;
+
+: position-caret ( editor -- )
+    dup editor-extend-selection
+    dup editor-mark click-loc ;
+
+: editor-mouse-down ( editor -- )
+    hand-click# get {
+        [ ]
+        [ dup position-caret ]
+        [ dup T{ one-word-elt } select-elt ]
+        [ dup T{ one-line-elt } select-elt ]
+    } ?nth call drop ;
 
 editor "editing" {
     { "Insert newline" T{ key-down f f "RETURN" } [ "\n" swap user-input ] }
@@ -114,7 +122,7 @@ editor "selection" {
     { "Clear" T{ delete-action } [ remove-editor-selection ] }
     { "Select all" T{ select-all-action } [ T{ doc-elt } select-elt ] }
     { "Select line" T{ key-down f { C+ } "l" } [ T{ one-line-elt } select-elt ] }
-    { "Select word" T{ key-down f { C+ } "w" } [ T{ word-elt } select-elt ] }
+    { "Select word" T{ key-down f { C+ } "w" } [ T{ one-word-elt } select-elt ] }
     { "Select previous character" T{ key-down f { S+ } "LEFT" } [ T{ char-elt } editor-select-prev ] }
     { "Select next character" T{ key-down f { S+ } "RIGHT" } [ T{ char-elt } editor-select-next ] }
     { "Select previous line" T{ key-down f { S+ } "UP" } [ T{ line-elt } editor-select-prev ] }

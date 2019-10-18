@@ -31,7 +31,7 @@ ARTICLE: "searching-help-impl" "Full-text search implementation"
 { $subsection index-text } ;
 
 ARTICLE: "writing-help" "Writing documentation"
-"By convention, documentation is written in files with the " { $snippet ".facts" } " filename extension."
+"By convention, documentation is written in files with the " { $snippet ".facts" } " filename extension. Module documentation should follow a few conventions documented in " { $link "documenting-modules" } "."
 $terpri
 "A pair of parsing words are used to define free-standing articles and to associate documentation with words:"
 { $subsection POSTPONE: ARTICLE: }

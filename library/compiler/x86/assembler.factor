@@ -1,5 +1,5 @@
 ! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays compiler errors generic io kernel kernel-internals
 math namespaces parser sequences words ;
 IN: assembler
@@ -115,7 +115,8 @@ M: indirect extended? indirect-base extended? ;
 : canonicalize ( indirect -- )
     #! Modify the indirect to work around certain addressing mode
     #! quirks.
-    dup canonicalize-EBP canonicalize-ESP ;
+    dup canonicalize-EBP
+    canonicalize-ESP ;
 
 C: indirect ( base index scale displacement -- indirect )
     [ set-indirect-displacement ] keep
@@ -128,7 +129,10 @@ C: indirect ( base index scale displacement -- indirect )
     dup integer? [ >r f f f r> ] [ f f f ] if <indirect> ;
 
 : [+] ( reg displacement -- indirect )
-    dup integer? [ >r f f r> ] [ f f ] if <indirect> ;
+    dup integer?
+    [ dup zero? [ drop f ] when >r f f r> ]
+    [ f f ] if
+    <indirect> ;
 
 : reg-code "register" word-prop 7 bitand ;
 

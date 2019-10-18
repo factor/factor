@@ -261,7 +261,7 @@ FUNCTION: char* XGetAtomName ( Display* display, Atom atom ) ;
 
 FUNCTION: int XGetWindowProperty ( Display* display, Window w, Atom property, long long_offset, long long_length, Bool delete, Atom req_type, Atom* actual_type_return, int* actual_format_return, ulong* nitems_return, ulong* bytes_after_return, char** prop_return ) ;
 
-FUNCTION: int XChangeProperty ( Display* display, Window w, Atom property, Atom type, int format, int mode, char* data, int nelements ) ;
+FUNCTION: int XChangeProperty ( Display* display, Window w, Atom property, Atom type, int format, int mode, void* data, int nelements ) ;
 
 ! 4.5 Selections
 

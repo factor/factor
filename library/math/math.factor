@@ -3,6 +3,10 @@
 IN: math
 USING: errors generic kernel math-internals ;
 
+GENERIC: >fixnum ( x -- y ) foldable
+GENERIC: >bignum ( x -- y ) foldable
+GENERIC: >float ( x -- y ) foldable
+
 G: number= ( x y -- ? ) math-combination ; foldable
 M: object number= 2drop f ;
 
@@ -16,7 +20,6 @@ G: -   ( x y -- z ) math-combination ; foldable
 G: *   ( x y -- z ) math-combination ; foldable
 G: /   ( x y -- z ) math-combination ; foldable
 G: /i  ( x y -- z ) math-combination ; foldable
-G: /f  ( x y -- z ) math-combination ; foldable
 G: mod ( x y -- z ) math-combination ; foldable
 
 G: /mod ( x y -- z w ) math-combination ; foldable
@@ -24,7 +27,7 @@ G: /mod ( x y -- z w ) math-combination ; foldable
 G: bitand ( x y -- z ) math-combination ; foldable
 G: bitor  ( x y -- z ) math-combination ; foldable
 G: bitxor ( x y -- z ) math-combination ; foldable
-G: shift  ( x n -- y ) math-combination ; foldable
+G: shift  ( x n -- y ) 1 standard-combination ; foldable
 
 GENERIC: bitnot ( x -- y ) foldable
 

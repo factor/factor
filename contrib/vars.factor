@@ -17,7 +17,8 @@ dup ">" append create-in swap in get lookup [ get ] curry define-compound ;
 : define-var ( str -- )
 dup define-var-symbol dup define-var-getter define-var-setter ;
 
-: VAR: ( variable -- ) scan define-var ; parsing
+: VAR: ! var
+    scan define-var ; parsing
 
 : define-vars ( seq -- ) [ define-var ] each ;
 

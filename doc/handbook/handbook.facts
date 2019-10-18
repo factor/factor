@@ -13,6 +13,9 @@ ARTICLE: "handbook" "Factor documentation"
     { $code "\"hello-world.factor\" run-file" } }
     { { "You can load modules from " { $snippet "contrib/" } " and " { $snippet "examples/" } " with " { $link require } ":" }
     { $code "\"contrib/httpd\" require" } }
+    { { "Some modules have a defined main entry point, and can be run just like applications in an operating system:" }
+        { $code "\"contrib/tetris\" run-module" }
+    }
     { { $link .s } " prints the contents of the stack." }
     { { $link . } " prints the object at the top of the stack." }
     { "If you are reading this from the Factor UI, take a look at " { $link "ui-tools" } "." }
@@ -41,11 +44,14 @@ ARTICLE: "handbook" "Factor documentation"
 { $heading "Environment reference" }
 { $subsection "cli" }
 { $subsection "tools" }
+{ $subsection "modules" }
 { $subsection "help" }
 { $subsection "inference" }
 { $subsection "compiler" }
 { $heading "Graphical user interface" }
 { $subsection "ui-tools" }
+{ $heading "Currently-loaded contributed modules" }
+{ $outliner [ modules-help ] }
 { $heading "Index" }
 { $subsection "article-index" }
 { $subsection "primitive-index" }

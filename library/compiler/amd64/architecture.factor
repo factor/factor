@@ -13,8 +13,7 @@ math namespaces sequences ;
 
 : ds-reg R14 ; inline
 : cs-reg R15 ; inline
-: remainder-reg RDX ; inline
-: alloc-tmp-reg RBX ; inline
+: allot-tmp-reg RBX ; inline
 : stack-reg RSP ; inline
 
 M: int-regs return-reg drop RAX ;
@@ -34,10 +33,6 @@ M: float-regs fastcall-regs vregs ;
 
 : compile-c-call ( symbol dll -- )
     0 address-operand >r rel-absolute-cell rel-dlsym r> CALL ;
-
-: compile-c-call* ( symbol dll args -- )
-    T{ int-regs } fastcall-regs
-    swap [ MOV ] 2each compile-c-call ;
 
 : fixnum>slot@ drop ; inline
 

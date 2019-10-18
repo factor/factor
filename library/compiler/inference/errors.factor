@@ -1,8 +1,11 @@
+! Copyright (C) 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: kernel generic errors sequences prettyprint io words ;
+USING: kernel generic errors sequences prettyprint io words
+arrays ;
 
 M: inference-error error.
-    dup inference-error-rstate [ first ] map
+    dup inference-error-rstate 0 <column> >array
     dup empty? [ "Word: " write dup peek . ] unless
     swap delegate error. "Nesting: " write . ;
 
@@ -24,6 +27,14 @@ M: too-many->r summary
 M: too-many-r> summary
     drop
     "Quotation pops retain stack elements which it did not push" ;
+
+M: too-many-n> summary
+    drop
+    "Quotation pops name stack elements which it did not push" ;
+
+M: unbalanced-namestacks error.
+    "Unbalanced name stack usage." print
+    "Make sure occurrences of >n/n> are consistent across branches." print ;
 
 M: no-effect error.
     "The word " write

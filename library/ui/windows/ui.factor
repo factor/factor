@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays errors freetype gadgets gadgets-listener
-       gadgets-workspace hashtables io kernel math namespaces prettyprint
-       sequences strings vectors words win32-api win32-api-messages ;
-USING: tools threads memory ;
+       gadgets-workspace hashtables io kernel math namespaces
+       prettyprint sequences strings vectors words win32-api
+       win32-api-messages tools threads memory timers ;
 IN: win32
 
 ! world-handle is a <win>
@@ -13,7 +13,7 @@ SYMBOL: msg-obj
 SYMBOL: class-name
 SYMBOL: track-mouse-state
 
-: random-class-name "Factor" 100000000 random-int unparse append ;
+: random-class-name "Factor" (random-int) number>string append ;
 
 : style ( -- n ) WS_OVERLAPPEDWINDOW ; inline
 : ex-style ( -- n ) WS_EX_APPWINDOW WS_EX_WINDOWEDGE bitor ; inline
@@ -40,7 +40,7 @@ SYMBOL: track-mouse-state
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array
     2nip
-    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
+    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ui-step ] if ;
 
 : wm-keydown-codes ( -- key )
     H{
@@ -303,7 +303,8 @@ SYMBOL: hWnd
     "MSG" <c-object> msg-obj set
     random-class-name class-name set
     class-name get <malloc-string> ui-wndproc
-    register-wndclassex win32-error=0 ;
+    register-wndclassex win32-error=0
+    GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
     class-name get <malloc-string> f UnregisterClass drop ;
@@ -364,7 +365,3 @@ IN: shells
         ] with-freetype
     ] [ cleanup-win32-ui ] cleanup ;
 
-IN: io-internals
-! Allows use of the ui without native i/o.
-! Overwritten when native i/o is loaded.
-: io-multiplex ( ms -- ) 0 SleepEx drop ;

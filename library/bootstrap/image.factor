@@ -19,17 +19,6 @@ IN: image
 : untag ( cell -- cell ) tag-mask bitnot bitand ; inline
 : tag ( cell -- tag ) tag-mask bitand ; inline
 
-: array-type      8  ; inline
-: hashtable-type  10 ; inline
-: vector-type     11 ; inline
-: string-type     12 ; inline
-: sbuf-type       13 ; inline
-: quotation-type  14 ; inline
-: dll-type        15 ; inline
-: alien-type      16 ; inline
-: tuple-type      17 ; inline
-: byte-array-type 18 ; inline
-
 : data-base 1024 ; inline
 
 : boot-quot-offset      3 ; inline
@@ -80,6 +69,7 @@ SYMBOL: architecture
 
 : emit-object ( header tag quot -- addr )
     swap here-as >r swap tag-header emit call align-here r> ;
+    inline
 
 ! Image header
 
@@ -235,7 +225,7 @@ M: string '
 : emit-array ( list type -- pointer )
     >r [ ' ] map r> object-tag [
         dup length emit-fixnum
-        ( elements -- ) emit-seq
+        emit-seq
     ] emit-object ;
 
 : transfer-tuple ( tuple -- tuple )
@@ -247,6 +237,14 @@ M: tuple '
     transfer-tuple
     objects get [ tuple>array tuple-type emit-array ] cache ;
 
+M: method '
+    [
+        \ method transfer-word ,
+        f ,
+        dup method-loc ,
+        method-def ,
+    ] { } make tuple-type emit-array ;
+
 M: array '
     array-type emit-array ;
 
@@ -256,15 +254,15 @@ M: quotation '
 M: vector '
     dup underlying ' swap length
     vector-type object-tag [
-        emit-fixnum ( length )
-        emit ( array ptr )
+        emit-fixnum ! length
+        emit ! array ptr
     ] emit-object ;
 
 M: sbuf '
     dup underlying ' swap length
     sbuf-type object-tag [
-        emit-fixnum ( length )
-        emit ( array ptr )
+        emit-fixnum ! length
+        emit ! array ptr
     ] emit-object ;
 
 ! Hashes
@@ -274,7 +272,7 @@ M: hashtable '
     hashtable-type object-tag [
         dup hash-count emit-fixnum
         hash-deleted emit-fixnum
-        emit ( array ptr )
+        emit ! array ptr
     ] emit-object ;
 
 ! End of the image

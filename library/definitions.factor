@@ -9,6 +9,4 @@ GENERIC: where* ( defspec -- loc )
 
 GENERIC: subdefs ( defspec -- seq )
 
-: see-subdefs ( word -- ) subdefs [ see ] each ;
-
 GENERIC: forget ( defspec -- )

@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien namespaces kernel words ;
 IN: win32-api
 
@@ -137,15 +137,19 @@ TYPEDEF: LONG_PTR            LPARAM
 TYPEDEF: BOOL*               LPBOOL
 TYPEDEF: BYTE*               LPBYTE
 TYPEDEF: DWORD*              LPCOLORREF
-! TYPEDEF: CHAR*               LPCSTR
-TYPEDEF: VOID*               LPCSTR
 TYPEDEF: WCHAR*              LPCWSTR
 TYPEDEF: WCHAR*              LPWSTR
 
-TYPEDEF: LPCWSTR     LPCTSTR
-TYPEDEF: LPWSTR      LPTSTR
-TYPEDEF: LPCWSTR     PCTSTR
-TYPEDEF: LPWSTR      PTSTR
+! TYPEDEF: LPCWSTR     LPCTSTR
+! TYPEDEF: LPWSTR      LPTSTR
+! TYPEDEF: LPCWSTR     PCTSTR
+! TYPEDEF: LPWSTR      PTSTR
+
+TYPEDEF: WCHAR*              LPWSTR
+TYPEDEF: CHAR*               LPSTR
+! TYPEDEF: CHAR*               LPCSTR
+TYPEDEF: VOID*               LPCSTR
+
 TYPEDEF: LPCSTR      LPCTSTR
 TYPEDEF: LPSTR       LPTSTR
 TYPEDEF: LPCSTR      PCTSTR
@@ -153,9 +157,7 @@ TYPEDEF: LPSTR       PTSTR
 
 TYPEDEF: DWORD*              LPDWORD
 TYPEDEF: HANDLE*             LPHANDLE
-TYPEDEF: CHAR*               LPSTR
 TYPEDEF: WORD*               LPWORD
-TYPEDEF: WCHAR*              LPWSTR
 TYPEDEF: LONG_PTR            LRESULT
 TYPEDEF: BOOL*               PBOOL
 TYPEDEF: BOOLEAN*            PBOOLEAN

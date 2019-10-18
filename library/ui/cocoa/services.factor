@@ -27,12 +27,7 @@ parser prettyprint styles gadgets-listener gadgets-workspace ;
     {
         "evalInListener:userData:error:" "void"
         { "id" "SEL" "id" "id" "void*" }
-        [
-            nip
-            [ call-listener f ]
-            do-service
-            2drop
-        ]
+        [ nip [ eval-listener f ] do-service 2drop ]
     }
     {
         "evalToString:userData:error:" "void"
@@ -45,3 +40,5 @@ parser prettyprint styles gadgets-listener gadgets-workspace ;
     NSApp
     FactorServiceProvider -> alloc -> init
     -> setServicesProvider: ;
+
+FUNCTION: void NSUpdateDynamicServices ;

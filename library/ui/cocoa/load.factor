@@ -2,7 +2,8 @@ USING: compiler io parser sequences words ;
 
 REQUIRES: library/compiler/alien/objc ;
 
-PROVIDE: library/ui/cocoa {
+PROVIDE: library/ui/cocoa
+{ +files+ { 
     "core-foundation.factor"
     "types.factor"
     "init-cocoa.factor"
@@ -13,9 +14,10 @@ PROVIDE: library/ui/cocoa {
     "dialogs.factor"
     "services.factor"
     "ui.factor"
-} {
+} }
+{ +tests+ {
     "test/cocoa.factor"
-} ;
+} } ;
 
 "Compiling Cocoa bindings..." print
 { "cocoa" "objc" "objc-classes" "gadgets" } compile-vocabs

@@ -70,3 +70,84 @@ BEGIN-STRUCT: FILETIME
     FIELD: DWORD dwHighDateTime
 END-STRUCT
 
+BEGIN-STRUCT: STARTUPINFO
+    FIELD: DWORD cb
+    FIELD: LPTSTR lpReserved
+    FIELD: LPTSTR lpDesktop
+    FIELD: LPTSTR lpTitle
+    FIELD: DWORD dwX
+    FIELD: DWORD dwY
+    FIELD: DWORD dwXSize
+    FIELD: DWORD dwYSize
+    FIELD: DWORD dwXCountChars
+    FIELD: DWORD dwYCountChars
+    FIELD: DWORD dwFillAttribute
+    FIELD: DWORD dwFlags
+    FIELD: WORD wShowWindow
+    FIELD: WORD cbReserved2
+    FIELD: LPBYTE lpReserved2
+    FIELD: HANDLE hStdInput
+    FIELD: HANDLE hStdOutput
+    FIELD: HANDLE hStdError
+END-STRUCT
+
+TYPEDEF: void* LPSTARTUPINFO
+
+BEGIN-STRUCT: PROCESS_INFORMATION
+    FIELD: HANDLE hProcess
+    FIELD: HANDLE hThread
+    FIELD: DWORD dwProcessId
+    FIELD: DWORD dwThreadId
+END-STRUCT
+
+BEGIN-STRUCT: SYSTEM_INFO
+    FIELD: DWORD dwOemId
+    ! FIELD: WORD wProcessorArchitecture
+    ! FIELD: WORD wReserved
+    FIELD: DWORD dwPageSize
+    FIELD: LPVOID lpMinimumApplicationAddress
+    FIELD: LPVOID lpMaximumApplicationAddress
+    FIELD: DWORD_PTR dwActiveProcessorMask
+    FIELD: DWORD dwNumberOfProcessors
+    FIELD: DWORD dwProcessorType
+    FIELD: DWORD dwAllocationGranularity
+    FIELD: WORD wProcessorLevel
+    FIELD: WORD wProcessorRevision
+END-STRUCT
+
+TYPEDEF: void* LPSYSTEM_INFO
+
+BEGIN-STRUCT: MEMORYSTATUS
+    FIELD: DWORD dwLength
+    FIELD: DWORD dwMemoryLoad
+    FIELD: SIZE_T dwTotalPhys
+    FIELD: SIZE_T dwAvailPhys
+    FIELD: SIZE_T dwTotalPageFile
+    FIELD: SIZE_T dwAvailPageFile
+    FIELD: SIZE_T dwTotalVirtual
+    FIELD: SIZE_T dwAvailVirtual
+END-STRUCT
+TYPEDEF: void* LPMEMORYSTATUS
+
+BEGIN-STRUCT: MEMORYSTATUSEX
+    FIELD: DWORD dwLength
+    FIELD: DWORD dwMemoryLoad
+    FIELD: DWORDLONG ullTotalPhys
+    FIELD: DWORDLONG ullAvailPhys
+    FIELD: DWORDLONG ullTotalPageFile
+    FIELD: DWORDLONG ullAvailPageFile
+    FIELD: DWORDLONG ullTotalVirtual
+    FIELD: DWORDLONG ullAvailVirtual
+    FIELD: DWORDLONG ullAvailExtendedVirtual
+END-STRUCT
+TYPEDEF: void* LPMEMORYSTATUSEX
+
+BEGIN-STRUCT: OSVERSIONINFO
+    FIELD: DWORD dwOSVersionInfoSize
+    FIELD: DWORD dwMajorVersion
+    FIELD: DWORD dwMinorVersion
+    FIELD: DWORD dwBuildNumber
+    FIELD: DWORD dwPlatformId
+    ! FIELD: char[128] szCSDVersion
+END-STRUCT
+TYPEDEF: void* LPOSVERSIONINFO

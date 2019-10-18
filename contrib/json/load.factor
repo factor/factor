@@ -22,9 +22,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 REQUIRES: contrib/parser-combinators ;
-PROVIDE: contrib/json { 
+PROVIDE: contrib/json
+{ +files+ {
     "json-reader.factor"
     "json-writer.factor"
     "json.facts"
-} {
-} ;
+} } ;

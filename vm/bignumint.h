@@ -45,28 +45,8 @@ MIT in each case. */
 typedef F_FIXNUM bignum_digit_type;
 typedef F_FIXNUM bignum_length_type;
 
-/* BIGNUM_ALLOCATE allocates a (length + 1)-element array of
-   `bignum_digit_type'; deallocation is the responsibility of the
-   user (in Factor, the garbage collector handles this). */
-#define BIGNUM_ALLOCATE(length_in_digits) \
-	allot_array(BIGNUM_TYPE,length_in_digits + 1)
-
 /* BIGNUM_TO_POINTER casts a bignum object to a digit array pointer. */
 #define BIGNUM_TO_POINTER(bignum) ((CELL*)AREF(bignum,0))
-
-/* BIGNUM_REDUCE_LENGTH allows the memory system to reclaim some
-   space when a bignum's length is reduced from its original value. */
-#define BIGNUM_REDUCE_LENGTH(target, source, length)            \
-     target = resize_array(source, length + 1,0)
-
-/* BIGNUM_DEALLOCATE is called when disposing of bignums which are
-   created as intermediate temporaries; Scheme doesn't need this. */
-#define BIGNUM_DEALLOCATE(bignum)
-
-/* If BIGNUM_FORCE_NEW_RESULTS is defined, all bignum-valued operations
-   return freshly-allocated results.  This is useful for some kinds of
-   memory deallocation strategies. */
-/* #define BIGNUM_FORCE_NEW_RESULTS */
 
 /* BIGNUM_EXCEPTION is invoked to handle assertion violations. */
 #define BIGNUM_EXCEPTION abort
@@ -93,19 +73,11 @@ typedef F_FIXNUM bignum_length_type;
 #define BIGNUM_REF(bignum, index)					\
   (* ((BIGNUM_START_PTR (bignum)) + (index)))
 
-#ifdef BIGNUM_FORCE_NEW_RESULTS
-#define BIGNUM_MAYBE_COPY bignum_copy
-#else
-#define BIGNUM_MAYBE_COPY(bignum) bignum
-#endif
-
 /* These definitions are here to facilitate caching of the constants
    0, 1, and -1. */
-#define BIGNUM_ZERO() (F_ARRAY*)UNTAG(bignum_zero)
+#define BIGNUM_ZERO() untag_array_fast(bignum_zero)
 #define BIGNUM_ONE(neg_p) \
-   (F_ARRAY*)UNTAG(neg_p ? bignum_neg_one : bignum_pos_one)
-
-#define BIGNUM_ONE_P(bignum,negative_p) ((bignum) == BIGNUM_ONE(negative_p))
+   untag_array_fast(neg_p ? bignum_neg_one : bignum_pos_one)
 
 #define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
 #define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)

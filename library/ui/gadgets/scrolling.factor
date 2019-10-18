@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: arrays gadgets gadgets-frames gadgets-theme
-gadgets-viewports generic kernel math namespaces sequences ;
+USING: arrays gadgets gadgets-theme gadgets-viewports generic
+kernel math namespaces sequences ;
 
 ! A scroller combines a viewport with two x and y sliders.
 ! The follows slot is a boolean, if true scroller will scroll
@@ -86,6 +86,9 @@ C: scroller ( gadget -- scroller )
 
 : (scroll>bottom) ( scroller -- )
     dup scroller-viewport viewport-dim { 0 1 } v* scroll ;
+
+: scroll>top ( gadget -- )
+    <zero-rect> swap scroll>rect ;
 
 : update-scroller ( scroller -- )
     dup scroller-follows [

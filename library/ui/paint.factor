@@ -48,8 +48,8 @@ DEFER: draw-gadget
     >absolute clip [ rect-intersect ] change ;
 
 : clip-x/y ( loc dim -- x y )
-    >r [ first ] keep r>
-    [ second ] 2apply + world get rect-dim second swap - ;
+    >r [ first ] keep r> [ second ] 2apply +
+    world get rect-dim second swap - ;
 
 : gl-set-clip ( loc dim -- )
     [ clip-x/y ] keep first2 glScissor ;

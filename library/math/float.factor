@@ -18,10 +18,15 @@ M: real hashcode >fixnum ;
 M: real <=> - ;
 
 : fp-nan? ( float -- ? )
-    double>bits -51 shift BIN: 111111111111 [ bitand ] keep = ;
+    double>bits -51 shift BIN: 111111111111 [ bitand ] keep
+    number= ;
 
 M: float zero?
     dup 0.0 float= swap -0.0 float= or ;
+
+M: float >fixnum float>fixnum ;
+M: float >bignum float>bignum ;
+M: float >float ;
 
 M: float < float< ;
 M: float <= float<= ;
@@ -33,5 +38,8 @@ M: float + float+ ;
 M: float - float- ;
 M: float * float* ;
 M: float / float/f ;
-M: float /f float/f ;
 M: float mod float-mod ;
+
+: /f  ( x y -- z ) >r >float r> >float float/f ; inline
+
+M: ratio >float >fraction /f ;

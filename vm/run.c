@@ -7,10 +7,13 @@ INLINE void execute(F_WORD* word)
 
 INLINE void push_callframe(void)
 {
+	put(cs + CELLS,callframe);
+	put(cs + CELLS * 2,callframe_scan);
+	put(cs + CELLS * 3,callframe_end);
+
+	/* update the pointer last, so that if we have a memory protection error
+	above, we don't have garbage stored as live data */
 	cs += CELLS * 3;
-	put(cs - CELLS * 2,callframe);
-	put(cs - CELLS,callframe_scan);
-	put(cs,callframe_end);
 }
 
 INLINE void set_callframe(CELL quot)
@@ -39,6 +42,8 @@ void handle_error(void)
 {
 	if(throwing)
 	{
+		extra_roots = stack_chain->extra_roots;
+
 		if(thrown_keep_stacks)
 		{
 			ds = thrown_ds;
@@ -161,21 +166,17 @@ void primitive_setenv(void)
 
 void primitive_exit(void)
 {
-	exit(to_fixnum(dpop()));
+	exit(unbox_signed_cell());
 }
 
 void primitive_os_env(void)
 {
-	char *name, *value;
-
-	maybe_gc(0);
-
-	name = unbox_char_string();
-	value = getenv(name);
+	char *name = unbox_char_string();
+	char *value = getenv(name);
 	if(value == NULL)
 		dpush(F);
 	else
-		box_char_string(getenv(name));
+		box_char_string(value);
 }
 
 void primitive_eq(void)
@@ -187,8 +188,7 @@ void primitive_eq(void)
 
 void primitive_millis(void)
 {
-	maybe_gc(0);
-	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
+	box_unsigned_8(current_millis());
 }
 
 void primitive_type(void)
@@ -213,22 +213,16 @@ void primitive_set_slot(void)
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
 	CELL obj = UNTAG(dpop());
 	CELL value = dpop();
-	put(SLOT(obj,slot),value);
-	write_barrier(obj);
-}
-
-CELL clone(CELL obj)
-{
-	CELL size = object_size(obj);
-	CELL tag = TAG(obj);
-	void *new_obj = allot(size);
-	return RETAG(memcpy(new_obj,(void*)UNTAG(obj),size),tag);
+	set_slot(obj,slot,value);
 }
 
 void primitive_clone(void)
 {
-	maybe_gc(0);
-	drepl(clone(dpeek()));
+	CELL size = object_size(dpeek());
+	void *new_obj = allot(size);
+	CELL tag = TAG(dpeek());
+	memcpy(new_obj,(void*)UNTAG(dpeek()),size);
+	drepl(RETAG(new_obj,tag));
 }
 
 void fatal_error(char* msg, CELL tagged)
@@ -281,25 +275,30 @@ void primitive_die(void)
 
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks)
 {
-	throw_error(make_array_4(userenv[ERROR_ENV],
+	throw_error(allot_array_4(userenv[ERROR_ENV],
 		tag_fixnum(error),arg1,arg2),keep_stacks);
 }
 
-void memory_protection_error(void *addr, int signal)
+void memory_protection_error(CELL addr, int signal)
 {
-	if(in_page(addr, (void *) ds_bot, 0, -1))
+	/* this is here to catch GC bugs; see the comment in push_callframe()
+	above */
+	garbage_collection(NURSERY,false);
+
+	if(in_page(addr, ds_bot, 0, -1))
 		general_error(ERROR_DS_UNDERFLOW,F,F,false);
-	else if(in_page(addr, (void *) ds_bot, ds_size, 0))
+	else if(in_page(addr, ds_bot, ds_size, 0))
 		general_error(ERROR_DS_OVERFLOW,F,F,false);
-	else if(in_page(addr, (void *) rs_bot, 0, -1))
+	else if(in_page(addr, rs_bot, 0, -1))
 		general_error(ERROR_RS_UNDERFLOW,F,F,false);
-	else if(in_page(addr, (void *) rs_bot, rs_size, 0))
+	else if(in_page(addr, rs_bot, rs_size, 0))
 		general_error(ERROR_RS_OVERFLOW,F,F,false);
-	else if(in_page(addr, (void *) cs_bot, 0, -1))
+	else if(in_page(addr, cs_bot, 0, -1))
 		general_error(ERROR_CS_UNDERFLOW,F,F,false);
-	else if(in_page(addr, (void *) cs_bot, cs_size, 0))
+	else if(in_page(addr, cs_bot, cs_size, 0))
 		general_error(ERROR_CS_OVERFLOW,F,F,false);
-	else
+	else if(in_page(addr, nursery.limit, 0, 0))
+		critical_error("Out of memory in allot",0);
 		signal_error(signal);
 }
 

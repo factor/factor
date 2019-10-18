@@ -14,8 +14,6 @@ SYMBOL: root
 
 : flush-dpy ( -- ) dpy get XFlush drop ;
 
-: sync-dpy ( discard -- ) >r dpy get r> XSync ;
-
 : x-atom ( string -- atom ) dpy get swap 0 XInternAtom ;
 
 : check-display

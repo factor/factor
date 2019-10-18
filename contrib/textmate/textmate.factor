@@ -1,11 +1,8 @@
-REQUIRES: contrib/embedded contrib/process ;
-
-USING: definitions embedded io kernel parser prettyprint process
-sequences namespaces ;
+USING: definitions kernel parser process namespaces prettyprint ;
 
 IN: textmate
 
 : textmate-location ( file line -- )
-    [ "mate -a \"" % over % "\" -l " % # ] "" make system drop ;
+    [ "mate -a -l " % # " " % unparse % ] "" make run-process ;
 
 [ textmate-location ] edit-hook set-global

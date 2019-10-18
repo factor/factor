@@ -15,6 +15,9 @@ IN: kernel-internals
         2drop f
     ] if ;
 
+: <tuple> ( class n -- tuple )
+    f <array> [ 2 set-slot ] keep tuple-type become ;
+
 IN: generic
 
 : class ( object -- class )
@@ -30,9 +33,11 @@ IN: generic
 : forget-tuple ( class -- )
     dup forget "predicate" word-prop first [ forget ] when* ;
 
+: tuple-size ( class -- size ) "tuple-size" word-prop ;
+
 : check-shape ( class slots -- )
     >r in get lookup dup [
-        dup "tuple-size" word-prop r> length 2 + =
+        dup tuple-size r> length 2 + =
         [ drop ] [ forget-tuple ] if
     ] [
         r> 2drop
@@ -40,14 +45,14 @@ IN: generic
 
 : delegate-slots { { 3 object delegate set-delegate } } ;
 
-: tuple-slots ( class slots -- )
+: define-tuple-slots ( class slots -- )
     2dup "slot-names" set-word-prop
     2dup length 2 + "tuple-size" set-word-prop
     dupd 4 simple-slots
     2dup delegate-slots swap append "slots" set-word-prop
     define-slots ;
 
-PREDICATE: class tuple-class "tuple-size" word-prop ;
+PREDICATE: class tuple-class tuple-size ;
 
 TUPLE: check-tuple class ;
 : check-tuple ( class -- class )
@@ -56,7 +61,7 @@ TUPLE: check-tuple class ;
 : define-constructor ( word class def -- )
     swap check-tuple [
         dup literalize ,
-        "tuple-size" word-prop ,
+        tuple-size ,
         \ <tuple> , %
     ] [ ] make define-compound ;
 
@@ -75,7 +80,7 @@ TUPLE: check-tuple class ;
     dup tuple-predicate
     dup \ tuple bootstrap-word "superclass" set-word-prop
     dup define-class
-    dup r> tuple-slots
+    dup r> define-tuple-slots
     default-constructor ;
 
 M: tuple clone
@@ -89,15 +94,19 @@ M: tuple equal?
 : (delegates) ( obj -- )
     [ dup delegate (delegates) , ] when* ;
 
-: delegates ( obj -- seq )
-    [ (delegates) ] { } make ;
+: delegates ( obj -- seq ) [ (delegates) ] { } make ;
 
-: is? ( obj quot -- ? )
-    >r delegates r> contains? ; inline
+: is? ( obj quot -- ? ) >r delegates r> contains? ; inline
 
 : >tuple ( seq -- tuple )
-    >vector dup first "tuple-size" word-prop over set-length
-    >array array>tuple ;
+    >vector dup first tuple-size over set-length
+    >array tuple-type become ;
+
+GENERIC: tuple>array ( tuple -- array )
+
+M: tuple tuple>array (clone) array-type become ;
+
+: tuple-slots ( tuple -- seq ) tuple>array 2 tail ;
 
 ! Definition protocol
 M: tuple-class forget

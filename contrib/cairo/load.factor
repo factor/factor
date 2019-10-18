@@ -1,3 +1,1 @@
-USING: alien ;
-
-PROVIDE: contrib/cairo { "cairo.factor" } ;
+PROVIDE: contrib/cairo { +files+ { "cairo.factor" } } ;

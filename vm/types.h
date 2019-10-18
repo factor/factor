@@ -17,39 +17,37 @@ INLINE F_ARRAY* untag_array(CELL tagged)
 	return untag_array_fast(tagged);
 }
 
-INLINE F_ARRAY* untag_byte_array_fast(CELL tagged)
-{
-	return (F_ARRAY*)UNTAG(tagged);
-}
-
 INLINE CELL array_size(CELL size)
 {
 	return sizeof(F_ARRAY) + size * CELLS;
 }
 
-F_ARRAY *allot_array(CELL type, F_FIXNUM capacity);
-F_ARRAY *array(CELL type, F_FIXNUM capacity, CELL fill);
-F_ARRAY *byte_array(F_FIXNUM size);
+F_ARRAY *allot_array_internal(CELL type, F_FIXNUM capacity);
+F_ARRAY *allot_array(CELL type, F_FIXNUM capacity, CELL fill);
+F_ARRAY *allot_byte_array(F_FIXNUM size);
 
-CELL make_array_2(CELL v1, CELL v2);
-CELL make_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
+CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 
 void primitive_array(void);
-void primitive_tuple(void);
 void primitive_byte_array(void);
-void primitive_quotation(void);
 
-F_ARRAY *resize_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill);
+F_ARRAY *reallot_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill);
 void primitive_resize_array(void);
-void primitive_array_to_tuple(void);
-void primitive_tuple_to_array(void);
+
+void primitive_become(void);
 
 #define AREF(array,index) ((CELL)(array) + sizeof(F_ARRAY) + (index) * CELLS)
 #define UNAREF(array,ptr) (((CELL)(ptr)-(CELL)(array)-sizeof(F_ARRAY)) / CELLS)
 
+INLINE void set_array_nth(F_ARRAY *array, CELL slot, CELL value)
+{
+	put(AREF(array,slot),value);
+	write_barrier((CELL)array);
+}
+
 INLINE CELL array_capacity(F_ARRAY* array)
 {
-	return untag_fixnum_fast(array->capacity);
+	return array->capacity >> TAG_BITS;
 }
 
 INLINE F_VECTOR* untag_vector(CELL tagged)
@@ -60,7 +58,6 @@ INLINE F_VECTOR* untag_vector(CELL tagged)
 
 F_VECTOR* vector(F_FIXNUM capacity);
 
-void primitive_vector(void);
 void primitive_array_to_vector(void);
 
 #define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index * CHARS)
@@ -78,7 +75,7 @@ INLINE F_STRING* untag_string(CELL tagged)
 
 INLINE CELL string_capacity(F_STRING* str)
 {
-	return untag_fixnum_fast(str->length);
+	return str->length >> TAG_BITS;
 }
 
 INLINE CELL string_size(CELL size)
@@ -86,13 +83,15 @@ INLINE CELL string_size(CELL size)
 	return sizeof(F_STRING) + (size + 1) * CHARS;
 }
 
-F_STRING* allot_string(F_FIXNUM capacity);
+F_STRING* allot_string_internal(F_FIXNUM capacity);
 void rehash_string(F_STRING* str);
 void primitive_rehash_string(void);
-F_STRING* string(F_FIXNUM capacity, CELL fill);
+F_STRING* allot_string(F_FIXNUM capacity, CELL fill);
 void primitive_string(void);
-F_STRING *resize_string(F_STRING *string, F_FIXNUM capacity, u16 fill);
+F_STRING *reallot_string(F_STRING *string, F_FIXNUM capacity, u16 fill);
 void primitive_resize_string(void);
+
+bool check_string(F_STRING *s, CELL max);
 
 F_STRING *memory_to_char_string(const char *string, CELL length);
 void primitive_memory_to_char_string(void);
@@ -135,8 +134,7 @@ INLINE void set_string_nth(F_STRING* string, CELL index, u16 value)
 void primitive_char_slot(void);
 void primitive_set_char_slot(void);
 
-F_SBUF* sbuf(F_FIXNUM capacity);
-void primitive_sbuf(void);
+void primitive_string_to_sbuf(void);
 
 void primitive_hashtable(void);
 

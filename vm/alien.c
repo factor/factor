@@ -7,7 +7,7 @@ void primitive_expired(void)
 
 	if(type_of(object) == ALIEN_TYPE)
 	{
-		ALIEN *alien = untag_alien_fast(object);
+		F_ALIEN *alien = untag_alien_fast(object);
 		drepl(tag_boolean(alien->expired));
 	}
 	else if(object == F)
@@ -19,13 +19,13 @@ void primitive_expired(void)
 /* gets the address of an object representing a C pointer */
 void *alien_offset(CELL object)
 {
-	ALIEN *alien;
+	F_ALIEN *alien;
 	F_ARRAY *array;
 
 	switch(type_of(object))
 	{
 	case BYTE_ARRAY_TYPE:
-		array = untag_byte_array_fast(object);
+		array = untag_array_fast(object);
 		return array + 1;
 	case ALIEN_TYPE:
 		alien = untag_alien_fast(object);
@@ -47,46 +47,50 @@ void *unbox_alien(void)
 }
 
 /* make an alien */
-ALIEN *make_alien(CELL delegate, CELL displacement)
+CELL allot_alien(CELL delegate, CELL displacement)
 {
-	ALIEN *alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
+	REGISTER_ROOT(delegate);
+	F_ALIEN *alien = allot_object(ALIEN_TYPE,sizeof(F_ALIEN));
+	UNREGISTER_ROOT(delegate);
 	alien->alien = delegate;
 	alien->displacement = displacement;
 	alien->expired = false;
-	return alien;
+	return tag_object(alien);
 }
 
 /* make an alien and push */
-void box_alien(CELL ptr)
+void box_alien(void* ptr)
 {
-	if(ptr == 0)
+	if(ptr == NULL)
 		dpush(F);
 	else
-		dpush(tag_object(make_alien(F,ptr)));
+		dpush(allot_alien(F,(CELL)ptr));
 }
 
 /* make an alien pointing at an offset of another alien */
 void primitive_displaced_alien(void)
 {
-	CELL alien;
-	CELL displacement;
-	maybe_gc(sizeof(ALIEN));
-	alien = dpop();
-	displacement = unbox_unsigned_cell();
+	CELL alien = dpop();
+	CELL displacement = unbox_unsigned_cell();
 	if(alien == F && displacement == 0)
 		dpush(F);
 	else
-		dpush(tag_object(make_alien(alien,displacement)));
+		dpush(allot_alien(alien,displacement));
 }
 
-/* address of an object representing a C pointer */
+/* address of an object representing a C pointer. Explicitly throw an error
+if the object is a byte array, as a sanity check. */
 void primitive_alien_address(void)
 {
-	box_unsigned_cell((CELL)alien_offset(dpop()));
+	CELL object = dpop();
+	if(type_of(object) == BYTE_ARRAY_TYPE)
+		type_error(ALIEN_TYPE,object);
+	else
+		box_unsigned_cell((CELL)alien_offset(object));
 }
 
 /* image loading */
-void fixup_alien(ALIEN *d)
+void fixup_alien(F_ALIEN *d)
 {
 	d->expired = true;
 }
@@ -133,7 +137,7 @@ void unbox_value_struct(void *dest, CELL size)
 /* for FFI callbacks receiving structs by value */
 void box_value_struct(void *src, CELL size)
 {
-	F_ARRAY *array = byte_array(size);
+	F_ARRAY *array = allot_byte_array(size);
 	memcpy(array + 1,src,size);
 	dpush(tag_object(array));
 }
@@ -142,38 +146,32 @@ void box_value_struct(void *src, CELL size)
 happens on Intel Mac OS X */
 void box_value_pair(CELL x, CELL y)
 {
-	F_ARRAY *array = byte_array(8);
-	put(AREF(array,0),x);
-	put(AREF(array,1),y);
+	F_ARRAY *array = allot_byte_array(2 * sizeof(CELL));
+	set_array_nth(array,0,x);
+	set_array_nth(array,1,y);
 	dpush(tag_object(array));
 }
 
+/* open a native library and push a handle */
 void primitive_dlopen(void)
 {
-	DLL* dll;
-	F_STRING* path;
-
-	maybe_gc(sizeof(DLL));
-
-	path = untag_string(dpop());
-	dll = allot_object(DLL_TYPE,sizeof(DLL));
-	dll->path = tag_object(path);
+	primitive_string_to_char_alien();
+	F_DLL* dll = allot_object(DLL_TYPE,sizeof(F_DLL));
+	dll->path = dpop();
 	ffi_dlopen(dll,true);
-
 	dpush(tag_object(dll));
 }
 
+/* look up a symbol in a native library */
 void primitive_dlsym(void)
 {
-	CELL dll;
-	F_STRING *sym;
-	DLL *d;
+	CELL dll = dpop();
+	REGISTER_ROOT(dll);
+	char *sym = unbox_char_string();
+	UNREGISTER_ROOT(dll);
 
-	maybe_gc(0);
+	F_DLL *d;
 
-	dll = dpop();
-	sym = untag_string(dpop());
-	
 	if(dll == F)
 		d = NULL;
 	else
@@ -183,9 +181,10 @@ void primitive_dlsym(void)
 			general_error(ERROR_EXPIRED,dll,F,true);
 	}
 
-	dpush(tag_cell((CELL)ffi_dlsym(d,sym,true)));
+	box_alien(ffi_dlsym(d,sym,true));
 }
 
+/* close a native library handle */
 void primitive_dlclose(void)
 {
 	ffi_dlclose(untag_dll(dpop()));

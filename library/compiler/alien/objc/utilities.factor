@@ -98,11 +98,12 @@ H{ } clone objc-methods set-global
         cache-selector , \ selector ,
     ] [ ] make r> make-dip ;
 
-: block>byte-array ( block type -- byte-array )
-    dup <c-object> -rot c-size >r 2dup r> memcpy free ;
+: block>byte-array ( block size -- byte-array )
+    dup <byte-array> -rot >r 2dup r> memcpy free ;
 
 : stret-epilog ( type -- )
-    dup use-stret? [ , \ block>byte-array , ] [ drop ] if ;
+    dup use-stret?
+    [ c-size , \ block>byte-array , ] [ drop ] if ;
 
 : make-objc-send ( selector super? -- quot )
     [
@@ -120,7 +121,7 @@ H{ } clone objc-methods set-global
 \ (send) [ pop-literal nip infer-send ] "infer" set-word-prop
 
 \ (send) [ object object ] [ ] <effect>
-"infer-effect" set-word-prop
+"inferred-effect" set-word-prop
 
 : send ( ... selector -- ... ) f (send) ; inline
 

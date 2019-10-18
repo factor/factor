@@ -110,7 +110,9 @@ M: or-parser (parse) ( input parser1 -- list )
 : ltrim-slice ( string -- string )
   #! Return a new string without any leading whitespace
   #! from the original string.
-  dup first blank? [ 1 tail-slice ltrim-slice ] when ;
+  dup empty? [
+    dup first blank? [ 1 tail-slice ltrim-slice ] when 
+  ] unless ;
 
 TUPLE: sp-parser p1 ;
 

@@ -100,7 +100,7 @@ over boid-vel -rot relative-position angle-between ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: vsum ( vector-of-vectors --- vec ) { 0 0 } [ v+ ] reduce ;
+: vsum ( vector-of-vectors -- vec ) { 0 0 } [ v+ ] reduce ;
 
 : vaverage ( seq-of-vectors -- seq ) dup vsum swap length v/n ;
 
@@ -274,3 +274,5 @@ slate> "Boids" open-titled-window ;
 : init-world-size ( -- ) { 100 100 } >world-size ;
 
 : init ( -- ) init-slate init-variables init-world-size init-boids stop? off ;
+
+PROVIDE: contrib/boids ;

@@ -5,7 +5,7 @@ IN: camera-slate
 
 TUPLE: camera-slate ;
 
-C: camera-slate ( -- ) <slate> over set-delegate ;
+C: camera-slate ( -- slate ) <slate> over set-delegate ;
 
 VAR: camera
 

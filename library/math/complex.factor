@@ -24,12 +24,16 @@ M: number equal? number= ;
 
 : >rect ( z -- x y ) dup real swap imaginary ; inline
 
+: >float-rect ( z -- x y )
+    >rect swap >float swap >float ; inline
+
 : conjugate ( z -- z* ) >rect neg rect> ; inline
 
-: arg ( z -- arg ) >rect swap fatan2 ; inline
+: arg ( z -- arg ) >float-rect swap fatan2 ; inline
 
 : >polar ( z -- abs arg )
-    dup abs swap >rect swap fatan2 ; inline
+    >float-rect [ [ sq ] 2apply + fsqrt ] 2keep swap fatan2 ;
+    inline
 
 : cis ( arg -- z ) dup fcos swap fsin rect> ; inline
 
@@ -57,9 +61,8 @@ M: complex * 2dup *re - -rot *im + (rect>) ;
     dup absq >r 2dup *re + -rot *im - r> ; inline
 
 M: complex / complex/ tuck / >r / r> (rect>) ;
-M: complex /f complex/ tuck /f >r /f r> (rect>) ;
 
-M: complex abs absq fsqrt ;
+M: complex abs absq >float fsqrt ;
 
 M: complex hashcode
     >rect >fixnum swap >fixnum bitxor ;

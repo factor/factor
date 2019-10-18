@@ -2,7 +2,8 @@ USE: kernel
 
 REQUIRES: library/io/buffer ;
 
-PROVIDE: library/io/unix {
+PROVIDE: library/io/unix
+{ +files+ {
     "types.factor"
     { "syscalls-freebsd.factor" [ os "freebsd" = ] }
     { "syscalls-linux.factor" [ os "linux" = ] }
@@ -12,4 +13,4 @@ PROVIDE: library/io/unix {
     "io.factor"
     "sockets.factor"
     "files.factor"
-} ;
+} } ;

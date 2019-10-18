@@ -3,7 +3,7 @@
 IN: x11
 USING: arrays errors freetype gadgets gadgets-listener
 gadgets-workspace hashtables kernel kernel-internals math
-namespaces opengl sequences strings ;
+namespaces opengl sequences strings timers ;
 
 ! In the X11 backend, world-handle is a pair { window context }.
 ! The window is an X11 window ID, and the context is a
@@ -109,7 +109,8 @@ M: world button-up-event
     send-button-up ;
 
 : mouse-event>scroll-direction ( event -- pair )
-    XButtonEvent-button 4 = 1 -1 ? 0 swap 2array ;
+    #! Reminder for myself: 4 is up, 5 is down
+    XButtonEvent-button 5 = 1 -1 ? 0 swap 2array ;
 
 M: world wheel-event
     >r dup mouse-event>scroll-direction swap mouse-event-loc r>

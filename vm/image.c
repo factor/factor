@@ -1,6 +1,7 @@
 #include "factor.h"
 
-void init_objects(HEADER *h)
+/* Certain special objects in the image are known to the runtime */
+void init_objects(F_HEADER *h)
 {
 	int i;
 	for(i = 0; i < USER_ENV; i++)
@@ -13,10 +14,11 @@ void init_objects(HEADER *h)
 	bignum_neg_one = h->bignum_neg_one;
 }
 
+/* Read an image file from disk, only done once during startup */
 void load_image(const char* filename)
 {
 	FILE* file;
-	HEADER h;
+	F_HEADER h;
 
 	file = fopen(filename,"rb");
 	if(file == NULL)
@@ -27,24 +29,24 @@ void load_image(const char* filename)
 	}
 
 	printf("Loading %s...",filename);
+	fflush(stdout);
 
 	/* read it in native byte order */
-	fread(&h,sizeof(HEADER)/sizeof(CELL),sizeof(CELL),file);
+	fread(&h,sizeof(F_HEADER)/sizeof(CELL),sizeof(CELL),file);
 
 	if(h.magic != IMAGE_MAGIC)
 		fatal_error("Bad magic number",h.magic);
 
 	if(h.version != IMAGE_VERSION)
 		fatal_error("Bad version number",h.version);
-
+	
 	/* read data heap */
 	{
-		CELL size = h.data_size / CELLS;
+		CELL size = h.data_size;
 		if(size + tenured.base >= tenured.limit)
 			fatal_error("Data heap too large",h.code_size);
 
-		if(size != fread((void*)tenured.base,sizeof(CELL),size,file))
-			fatal_error("Wrong data heap length",h.data_size);
+		fread((void*)tenured.base,size,1,file);
 
 		tenured.here = tenured.base + h.data_size;
 		data_relocation_base = h.data_relocation_base;
@@ -56,9 +58,7 @@ void load_image(const char* filename)
 		if(size + compiling.base > compiling.limit)
 			fatal_error("Code heap too large",h.code_size);
 
-		if(h.version == IMAGE_VERSION
-			&& size != fread((void*)compiling.base,1,size,file))
-			fatal_error("Wrong code heap length",h.code_size);
+		fread((void*)compiling.base,size,1,file);
 
 		code_relocation_base = h.code_relocation_base;
 
@@ -79,10 +79,11 @@ void load_image(const char* filename)
 	fflush(stdout);
 }
 
+/* Save the current image to disk */
 bool save_image(const char* filename)
 {
 	FILE* file;
-	HEADER h;
+	F_HEADER h;
 
 	fprintf(stderr,"Saving %s...\n",filename);
 
@@ -100,9 +101,10 @@ bool save_image(const char* filename)
 	h.bignum_zero = bignum_zero;
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
+	
 	h.code_size = heap_size(&compiling);
 	h.code_relocation_base = compiling.base;
-	fwrite(&h,sizeof(HEADER),1,file);
+	fwrite(&h,sizeof(F_HEADER),1,file);
 
 	fwrite((void*)tenured.base,h.data_size,1,file);
 	fwrite((void*)compiling.base,h.code_size,1,file);
@@ -121,6 +123,7 @@ void primitive_save_image(void)
 	save_image(to_char_string(filename,true));
 }
 
+/* Initialize an object in a newly-loaded image */
 void relocate_object(CELL relocating)
 {
 	CELL scan = relocating;
@@ -144,14 +147,16 @@ void relocate_object(CELL relocating)
 		rehash_string((F_STRING*)relocating);
 		break;
 	case DLL_TYPE:
-		ffi_dlopen((DLL*)relocating,false);
+		ffi_dlopen((F_DLL*)relocating,false);
 		break;
 	case ALIEN_TYPE:
-		fixup_alien((ALIEN*)relocating);
+		fixup_alien((F_ALIEN*)relocating);
 		break;
 	}
 }
 
+/* Since the image might have been saved with a different base address than
+where it is loaded, we need to fix up pointers in the image. */
 void relocate_data()
 {
 	CELL relocating;
