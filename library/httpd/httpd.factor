@@ -1,16 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: errors httpd-responder kernel lists logging namespaces
-stdio streams strings threads url-encoding ;
-
-: httpd-log-stream ( -- stream )
-    #! Set httpd-log-file to save httpd log to a file.
-    "httpd-log-file" get dup [
-        <file-reader>
-    ] [
-        drop stdio get
-    ] ifte ;
+USING: errors kernel lists namespaces
+stdio streams strings threads http ;
 
 : (url>path) ( uri -- path )
     url-decode "http://" ?string-head [
@@ -55,8 +47,8 @@ stdio streams strings threads url-encoding ;
 
 : httpd-client ( socket -- )
     [
-        [
-            stdio get log-client read-line [ parse-request ] when*
+        dup log-client [
+            read-line [ parse-request ] when*
         ] with-stream
     ] try ;
 
@@ -65,12 +57,15 @@ stdio streams strings threads url-encoding ;
 
 : httpd-loop ( -- ) httpd-connection httpd-loop ;
 
-: (httpd) ( port -- )
-    <server> "http-server" set [
-        httpd-loop
-    ] [
-        "http-server" get stream-close rethrow
-    ] catch ;
-
 : httpd ( port -- )
-    [ httpd-log-stream "log" set (httpd) ] with-scope ;
+    <server> "http-server" set [
+        [
+            httpd-loop
+        ] [
+            "http-server" get stream-close rethrow
+        ] catch
+    ] with-logging ;
+
+: stop-httpd ( -- )
+    #! Stop the server.
+    "http-server" get stream-close ;

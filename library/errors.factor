@@ -30,3 +30,5 @@ TUPLE: no-method object generic ;
     #! Use rethrow when passing an error on from a catch block.
     #! For convinience, this word is a no-op if error is f.
     [ c> call ] when* ;
+
+GENERIC: error. ( error -- )

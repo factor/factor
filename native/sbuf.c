@@ -47,7 +47,7 @@ void primitive_sbuf_nth(void)
 
 	if(index < 0 || index >= sbuf->top)
 		range_error(tag_object(sbuf),0,tag_fixnum(index),sbuf->top);
-	dpush(string_nth(untag_string(sbuf->string),index));
+	dpush(tag_fixnum(string_nth(untag_string(sbuf->string),index)));
 }
 
 void sbuf_ensure_capacity(F_SBUF* sbuf, F_FIXNUM top)
@@ -79,7 +79,7 @@ void primitive_set_sbuf_nth(void)
 
 	sbuf = untag_sbuf(dpop());
 	index = to_fixnum(dpop());
-	value = dpop();
+	value = to_fixnum(dpop());
 
 	set_sbuf_nth(sbuf,index,value);
 }

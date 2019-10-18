@@ -56,7 +56,7 @@ F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 	return new_string;
 }
 
-INLINE F_STRING* memory_to_string(const BYTE* string, CELL length)
+F_STRING* memory_to_string(const BYTE* string, CELL length)
 {
 	F_STRING* s = allot_string(length);
 	CELL i;
@@ -74,8 +74,8 @@ INLINE F_STRING* memory_to_string(const BYTE* string, CELL length)
 
 void primitive_memory_to_string(void)
 {
-	CELL length = unbox_cell();
-	BYTE* string = (BYTE*)unbox_cell();
+	CELL length = unbox_unsigned_cell();
+	BYTE* string = (BYTE*)unbox_unsigned_cell();
 	dpush(tag_object(memory_to_string(string,length)));
 }
 
@@ -106,7 +106,7 @@ char* to_c_string(F_STRING* s)
 	return to_c_string_unchecked(s);
 }
 
-INLINE void string_to_memory(F_STRING* s, BYTE* string)
+void string_to_memory(F_STRING* s, BYTE* string)
 {
 	CELL i;
 	CELL capacity = string_capacity(s);
@@ -116,7 +116,7 @@ INLINE void string_to_memory(F_STRING* s, BYTE* string)
 
 void primitive_string_to_memory(void)
 {
-	BYTE* address = (BYTE*)unbox_cell();
+	BYTE* address = (BYTE*)unbox_unsigned_cell();
 	F_STRING* str = untag_string(dpop());
 	string_to_memory(str,address);
 }

@@ -5,13 +5,13 @@
 ! implement tuples, as well as builtin types.
 IN: generic
 USING: kernel kernel-internals lists math namespaces parser
-strings words ;
+sequences strings words ;
 
 : simple-generic ( class generic def -- )
     #! Just like:
     #! GENERIC: generic
     #! M: class generic def ;
-    over >r [ single-combination ] \ GENERIC: r>
+    over [ single-combination ] swap
     define-generic define-method ;
 
 : define-slot-word ( class slot word quot -- )

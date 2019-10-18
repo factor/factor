@@ -10,8 +10,8 @@ sdl ;
     #! Note that nothing is done if the gadget does not need to
     #! be laid out.
     dup gadget-relayout? [
+        f over set-gadget-relayout?
         dup gadget-paint [
-            f over set-gadget-relayout?
             dup layout*
             gadget-children [ layout ] each
         ] bind

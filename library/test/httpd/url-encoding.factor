@@ -1,5 +1,5 @@
-IN: scratchpad
-USE: url-encoding
+IN: temporary
+USE: http
 USE: test
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test

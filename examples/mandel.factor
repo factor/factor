@@ -27,6 +27,7 @@ USE: sdl-gfx
 USE: sdl-video
 USE: vectors
 USE: prettyprint
+USE: sequences
 USE: stdio
 USE: test
 
@@ -39,7 +40,7 @@ USE: test
     #! Call p mod q'th entry of the vector of quotations, where
     #! q is the length of the vector. The value q remains on the
     #! stack.
-    [ dupd vector-length mod ] keep vector-nth call ;
+    [ dupd length mod ] keep nth call ;
 
 : hsv>rgb ( h s v -- r g b )
     pick 6 * >fixnum {
@@ -128,7 +129,7 @@ SYMBOL: center
         c 0 nb-iter get iter dup 0 = [
             drop 0
         ] [
-            cols get [ vector-length mod ] keep vector-nth
+            cols get [ length mod ] keep nth
         ] ifte
     ] with-pixels ; compiled
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: unparser
-USING: generic kernel lists math namespaces parser stdio strings
-words memory ;
+USING: alien generic kernel lists math memory namespaces parser
+sequences sequences stdio strings words ;
 
 GENERIC: unparse ( obj -- str )
 
@@ -40,8 +40,7 @@ M: object unparse ( obj -- str )
 : >oct ( num -- string ) 8 >base ;
 : >hex ( num -- string ) 16 >base ;
 
-M: fixnum unparse ( obj -- str ) >dec ;
-M: bignum unparse ( obj -- str ) >dec ;
+M: integer unparse ( obj -- str ) >dec ;
 
 M: ratio unparse ( num -- str )
     [
@@ -81,20 +80,25 @@ M: complex unparse ( num -- str )
     ] assoc ;
 
 : ch>unicode-escape ( ch -- esc )
-    >hex 4 "0" pad "\\u" swap cat2 ;
+    >hex 4 CHAR: 0 pad "\\u" swap cat2 ;
 
 : unparse-ch ( ch -- ch/str )
     dup quotable? [
         dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?ifte
     ] unless ;
 
-M: string unparse ( str -- str )
-    [
-        CHAR: " , [ unparse-ch , ] string-each CHAR: " ,
-    ] make-string ;
+: unparse-string [ unparse-ch , ] seq-each ;
 
-M: word unparse ( obj -- str )
-    word-name dup "#<unnamed>" ? ;
+M: string unparse ( str -- str )
+    [ CHAR: " , unparse-string CHAR: " , ] make-string ;
+
+M: sbuf unparse ( str -- str )
+    [ "SBUF\" " , unparse-string CHAR: " , ] make-string ;
+
+M: word unparse ( obj -- str ) word-name dup "#<unnamed>" ? ;
 
 M: t unparse drop "t" ;
 M: f unparse drop "f" ;
+
+M: dll unparse ( obj -- str )
+    [ "DLL\" " , dll-path unparse-string CHAR: " , ] make-string ;

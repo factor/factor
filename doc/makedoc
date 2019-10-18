@@ -1,0 +1,8 @@
+#!/bin/sh
+cd doc/
+pdflatex handbook
+./makeglos handbook
+makeindex handbook
+pdflatex handbook
+pdflatex handbook
+pdflatex handbook

@@ -51,6 +51,7 @@ public class Tuple extends FactorParsingDefinition
 		String tupleName = (String)next;
 		reader.intern(tupleName,true);
 		reader.intern("<" + tupleName + ">",true);
+		reader.intern(tupleName + "?",true);
 
 		for(;;)
 		{

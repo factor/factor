@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
 USING: generic kernel listener lists namespaces parser
-prettyprint stdio streams strings words ;
+prettyprint sequences stdio streams strings words ;
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:
@@ -14,7 +14,7 @@ prettyprint stdio streams strings words ;
 ! captured with with-string.
 
 : write-packet ( string -- )
-    dup string-length write-big-endian-32 write flush ;
+    dup length write-big-endian-32 write flush ;
 
 : read-packet ( -- string )
     read-big-endian-32 read ;
@@ -40,21 +40,21 @@ prettyprint stdio streams strings words ;
 : jedit-write-attr ( str style -- )
     CHAR: w write
     [ swap . . ] with-string
-    dup string-length write-big-endian-32
+    dup length write-big-endian-32
     write ;
 
 TUPLE: jedit-stream ;
 
 M: jedit-stream stream-readln ( stream -- str )
-    wrapper-stream-scope
-    [ CHAR: r write flush read-big-endian-32 read ] bind ;
+    [
+        CHAR: r write flush read-big-endian-32 read
+    ] with-wrapper ;
 
 M: jedit-stream stream-write-attr ( str style stream -- )
-    wrapper-stream-scope [ jedit-write-attr ] bind ;
+    [ jedit-write-attr ] with-wrapper ;
 
 M: jedit-stream stream-flush ( stream -- )
-    wrapper-stream-scope
-    [ CHAR: f write flush ] bind ;
+    [ CHAR: f write flush ] with-wrapper ;
 
 C: jedit-stream ( stream -- stream )
     [ >r <wrapper-stream> r> set-delegate ] keep ;
@@ -72,19 +72,11 @@ C: jedit-stream ( stream -- stream )
             "name"
             "stack-effect"
         ] [
-            word-prop
-        ] map-with
+            dupd word-prop
+        ] map >r definer r> cons
     ] when ;
 
-: completions ( str anywhere vocabs -- list )
+: completions ( str pred -- list | pred: str word -- ? )
     #! Make a list of completions. Each element of the list is
-    #! a name/vocabulary pair.
-    [
-        [
-            >r 2dup r> swap [
-                vocab-apropos
-            ] [
-                vocab-completions
-            ] ifte [ jedit-lookup , ] each
-        ] each
-    ] make-list ;
+    #! a vocabulary/name/stack-effect triplet list.
+    word-subset-with [ jedit-lookup ] map ;

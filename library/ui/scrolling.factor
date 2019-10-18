@@ -95,7 +95,7 @@ C: slider ( viewport -- slider )
 : thumb-y ( slider -- y )
     dup slider-viewport viewport-y neg >thumb ;
 
-M: slider pref-size drop slider-size 100 ;
+M: slider pref-size drop slider-size dup ;
 
 M: slider layout* ( slider -- )
     dup shape-w over thumb-height pick slider-thumb resize-gadget

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: errors
 USE: kernel
 USE: namespaces
@@ -25,4 +25,5 @@ USE: stdio
 
 [ [ "2 car" ] parse ] [ print-error ] catch
 
-! [ [ "\"\" { } vector-nth" ] parse ] [ type-check-error ] catch
+! This should not raise an error
+[ 1 2 3 ] [ 1 2 3 f throw ] unit-test

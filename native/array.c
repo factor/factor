@@ -1,8 +1,15 @@
 #include "factor.h"
 
+/* the array is full of undefined data, and must be correctly filled before the
+next GC. */
 F_ARRAY* allot_array(CELL type, CELL capacity)
 {
-	F_ARRAY* array = allot_object(type,sizeof(F_ARRAY) + capacity * CELLS);
+	F_ARRAY *array;
+
+	if(capacity < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
+
+	array = allot_object(type,sizeof(F_ARRAY) + capacity * CELLS);
 	array->capacity = tag_fixnum(capacity);
 	return array;
 }
@@ -17,20 +24,20 @@ F_ARRAY* array(CELL type, CELL capacity, CELL fill)
 
 void primitive_array(void)
 {
-	F_FIXNUM capacity = to_fixnum(dpop());
-	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	maybe_garbage_collection();
-	dpush(tag_object(array(ARRAY_TYPE,capacity,F)));
+	dpush(tag_object(array(ARRAY_TYPE,to_fixnum(dpop()),F)));
 }
 
 void primitive_tuple(void)
 {
-	F_FIXNUM capacity = to_fixnum(dpop());
-	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	maybe_garbage_collection();
-	dpush(tag_object(array(TUPLE_TYPE,capacity,F)));
+	dpush(tag_object(array(TUPLE_TYPE,to_fixnum(dpop()),F)));
+}
+
+void primitive_byte_array(void)
+{
+	maybe_garbage_collection();
+	dpush(tag_object(array(BYTE_ARRAY_TYPE,to_fixnum(dpop()),0)));
 }
 
 F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill)
@@ -51,7 +58,7 @@ void primitive_grow_array(void)
 {
 	F_ARRAY* array; CELL capacity;
 	maybe_garbage_collection();
-	array = untag_array(dpop());
+	array = untag_array_fast(dpop());
 	capacity = to_fixnum(dpop());
 	dpush(tag_object(grow_array(array,capacity,F)));
 }

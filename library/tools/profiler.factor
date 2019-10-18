@@ -31,6 +31,7 @@ USE: lists
 USE: math
 USE: namespaces
 USE: prettyprint
+USE: sequences
 USE: words
 USE: vectors
 
@@ -56,7 +57,7 @@ SYMBOL: only-top
     [ [ call-count, ] each-word ] make-list counts. ;
 
 : profile-depth ( -- n )
-    only-top get [ -1 ] [ callstack vector-length ] ifte ;
+    only-top get [ -1 ] [ callstack length ] ifte ;
 
 : (call-profile) ( quot -- )
     reset-counts

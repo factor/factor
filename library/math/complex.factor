@@ -1,10 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: errors
-DEFER: throw
-
 IN: math-internals
-USING: generic kernel kernel-internals math ;
+USING: errors generic kernel kernel-internals math ;
 
 : (rect>) ( xr xi -- x )
     #! Does not perform a check that the arguments are reals.

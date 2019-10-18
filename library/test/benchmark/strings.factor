@@ -1,18 +1,12 @@
-USE: strings
-USE: kernel
-USE: math
-USE: test
-USE: lists
-USE: namespaces
-USE: compiler
+USING: compiler kernel math namespaces sequences strings test ;
 
 ! http://inferno.bell-labs.com/cm/cs/who/bwk/interps/pap.html
 
 : string-step ( n str -- )
-    2dup string-length > [
+    2dup length > [
         dup [ "123" , , "456" , , "789" , ] make-string
-        dup dup string-length 2 /i 0 swap rot substring
-        swap dup string-length 2 /i 1 + 1 swap rot substring cat2
+        dup dup length 2 /i 0 swap rot substring
+        swap dup length 2 /i 1 + 1 swap rot substring append
         string-step
     ] [
         2drop

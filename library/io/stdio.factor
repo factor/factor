@@ -13,6 +13,8 @@ SYMBOL: stdio
 : write-attr ( string style -- ) stdio get stream-write-attr ;
 : print      ( string -- )       stdio get stream-print ;
 : terpri     ( -- )              "\n" write ;
+: crlf       ( -- )              "\r\n" write ;
+: bl         ( -- )              " " write ;
 : close      ( -- )              stdio get stream-close ;
 
 : write-icon ( resource -- )
@@ -20,14 +22,20 @@ SYMBOL: stdio
     "icon" swons unit "" swap write-attr ;
 
 : with-stream ( stream quot -- )
+    #! Close the stream no matter what happends.
     [ swap stdio set  [ close rethrow ] catch ] with-scope ;
+
+: with-stream* ( stream quot -- )
+    #! Close the stream if there is an error.
+    [
+        swap stdio set
+        [ [ close rethrow ] when* ] catch
+    ] with-scope ;
 
 : with-string ( quot -- str )
     #! Execute a quotation, and push a string containing all
     #! text printed by the quotation.
-    1024 <string-output> [
-        call stdio get stream>str
-    ] with-stream ;
+    1024 <sbuf> [ call stdio get sbuf>string ] with-stream ;
 
 TUPLE: stdio-stream ;
 C: stdio-stream ( stream -- stream ) [ set-delegate ] keep ;

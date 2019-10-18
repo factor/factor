@@ -2,7 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
 USING: errors hashtables kernel kernel-internals lists
-namespaces parser strings words vectors math math-internals ;
+namespaces parser sequences strings words vectors math
+math-internals ;
 
 ! A simple single-dispatch generic word system.
 
@@ -29,7 +30,7 @@ namespaces parser strings words vectors math math-internals ;
     dup metaclass "builtin-supertypes" word-prop call ;
 
 : set-vtable ( definition class vtable -- )
-    >r "builtin-type" word-prop r> set-vector-nth ;
+    >r "builtin-type" word-prop r> set-nth ;
 
 : class-ord ( class -- n ) metaclass "priority" word-prop ;
 
@@ -43,6 +44,9 @@ namespaces parser strings words vectors math math-internals ;
 
 : methods ( generic -- alist )
     "methods" word-prop hash>alist [ 2car class< ] sort ;
+
+: order ( generic -- list )
+    "methods" word-prop hash-keys [ class< ] sort ;
 
 : add-method ( generic vtable definition class -- )
     #! Add the method entry to the vtable. Unlike define-method,
@@ -63,15 +67,18 @@ namespaces parser strings words vectors math math-internals ;
         >r 2dup r> unswons add-method
     ] each nip ;
 
-: make-generic ( word vtable -- )
+: make-generic ( word -- )
     #! (define-compound) is used to avoid resetting generic
     #! word properties.
-    over "combination" word-prop cons (define-compound) ;
+    dup <vtable> over "combination" word-prop cons
+    (define-compound) ;
 
 : define-method ( class generic definition -- )
     -rot
-    [ "methods" word-prop set-hash ] keep dup <vtable>
-    make-generic ;
+    over metaclass word? [
+        word-name " is not a class" append throw
+    ] unless
+    [ "methods" word-prop set-hash ] keep make-generic ;
 
 : init-methods ( word -- )
      dup "methods" word-prop [
@@ -81,20 +88,22 @@ namespaces parser strings words vectors math math-internals ;
      ] ifte ;
 
 ! Defining generic words
-: define-generic ( combination definer word -- )
+: define-generic ( combination word -- )
     #! Takes a combination parameter. A combination is a
     #! quotation that takes some objects and a vtable from the
     #! stack, and calls the appropriate row of the vtable.
-    [ swap "definer" set-word-prop ] keep
     [ swap "combination" set-word-prop ] keep
-    dup init-methods
-    dup <vtable> make-generic ;
+    dup init-methods make-generic ;
 
 : single-combination ( obj vtable -- )
     >r dup type r> dispatch ; inline
 
 PREDICATE: compound generic ( word -- ? )
     "combination" word-prop [ single-combination ] = ;
+M: generic definer drop \ GENERIC: ;
+
+: single-combination ( obj vtable -- )
+    >r dup type r> dispatch ; inline
 
 : arithmetic-combination ( n n vtable -- )
     #! Note that the numbers remain on the stack, possibly after
@@ -103,9 +112,10 @@ PREDICATE: compound generic ( word -- ? )
 
 PREDICATE: compound 2generic ( word -- ? )
     "combination" word-prop [ arithmetic-combination ] = ;
+M: 2generic definer drop \ 2GENERIC: ;
 
 ! Maps lists of builtin type numbers to class objects.
-SYMBOL: classes
+SYMBOL: typemap
 
 SYMBOL: object
 
@@ -113,7 +123,7 @@ SYMBOL: object
     append prune ;
 
 : lookup-union ( typelist -- class )
-    [ > ] sort classes get hash [ object ] unless* ;
+    [ > ] sort typemap get hash [ object ] unless* ;
 
 : class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
@@ -137,6 +147,6 @@ SYMBOL: object
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop
     dup builtin-supertypes [ > ] sort
-    classes get set-hash ;
+    typemap get set-hash ;
 
-classes get [ <namespace> classes set ] unless
+typemap get [ <namespace> typemap set ] unless

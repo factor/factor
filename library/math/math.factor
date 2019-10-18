@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: math
-USING: generic kernel math-internals ;
+USING: errors generic kernel math-internals ;
 
 ! Math operations
 2GENERIC: number= ( x y -- ? )
@@ -29,11 +29,13 @@ M: object number= 2drop f ;
 
 GENERIC: bitnot ( n -- n )
 
-: max ( x y -- z )
-    2dup > [ drop ] [ nip ] ifte ;
+GENERIC: truncate ( n -- n )
+GENERIC: floor    ( n -- n )
+GENERIC: ceiling  ( n -- n )
 
-: min ( x y -- z )
-    2dup < [ drop ] [ nip ] ifte ;
+: max ( x y -- z ) [ > ] 2keep ? ;
+
+: min ( x y -- z ) [ < ] 2keep ? ;
 
 : between? ( x min max -- ? )
     #! Push if min <= x <= max. Handles case where min > max
@@ -54,13 +56,6 @@ GENERIC: bitnot ( n -- n )
     dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ;
 
 GENERIC: abs ( z -- |z| )
-
-: (gcd) ( x y -- z )
-    dup 0 number= [ drop ] [ tuck mod (gcd) ] ifte ;
-
-: gcd ( x y -- z )
-    #! Greatest common divisor.
-    abs swap abs 2dup < [ swap ] when (gcd) ;
 
 : align ( offset width -- offset )
     2dup mod dup 0 number= [ 2drop ] [ - + ] ifte ;

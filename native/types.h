@@ -31,13 +31,14 @@ CELL T;
 #define VECTOR_TYPE 11
 #define STRING_TYPE 12
 #define SBUF_TYPE 13
-#define PORT_TYPE 14
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
 #define WORD_TYPE 17
 #define TUPLE_TYPE 18
+#define BYTE_ARRAY_TYPE 19
+#define DISPLACED_ALIEN_TYPE 20
 
-#define TYPE_COUNT 19
+#define TYPE_COUNT 21
 
 INLINE bool headerp(CELL cell)
 {

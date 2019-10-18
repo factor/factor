@@ -26,8 +26,9 @@
 !
 IN: browser-responder
 USING: html cont-responder kernel stdio namespaces words lists
-streams strings inspector kernel prettyprint words html parser
-errors unparser logging listener url-encoding hashtables memory ;
+streams strings inspector kernel prettyprint words http parser
+errors unparser listener hashtables memory
+sequences ;
 
 : <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser
@@ -69,16 +70,16 @@ errors unparser logging listener url-encoding hashtables memory ;
 : write-editable-word-source ( vocab word -- )
   #! Write the source in a manner allowing it to be edited.
   <textarea name= "eval" rows= "30" cols= "80" textarea> 
-    1024 <string-output> dup >r [
+    [
       >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
-    ] with-stream r> stream>str chars>entities write
+    ] with-string chars>entities write
   </textarea> <br/>
   "Accept" button ;
 
 : write-word-source ( vocab word -- )
   #! Write the source for the given word from the vocab as HTML.
   <namespace> [
-    "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
+    "allow-edit?" get [ "Edit" [ "edit-state" on ] quot-href <br/> ] when
     "edit-state" get [
       write-editable-word-source 
     ] [ 
@@ -131,10 +132,10 @@ errors unparser logging listener url-encoding hashtables memory ;
   #! Return a list of vocabularies that all words in a vocabulary
   #! uses.
   <namespace> [
-    "result" f put
+    "result" off
     words [
       word-uses [
-        "result" unique@
+        "result" [ unique ] change
       ] each
     ] each 
     "result" get
@@ -202,7 +203,7 @@ errors unparser logging listener url-encoding hashtables memory ;
       ] show [
         "allow-edit?" get [ 
           "eval" get [ 
-             "eval" f put
+             "eval" off
              "Editing has been disabled." show-message-page 
           ] when
         ] unless

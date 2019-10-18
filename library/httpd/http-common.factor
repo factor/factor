@@ -1,124 +1,56 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2003, 2004 Slava Pestov.
-! Copyright (C) 2004 Chris Double.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-IN: httpd
-USE: kernel
-USE: lists
-USE: logging
-USE: namespaces
-USE: parser
-USE: stdio
-USE: streams
-USE: strings
-USE: unparser
-
-USE: url-encoding
-
-: print-header ( alist -- )
-    [ unswons write ": " write url-encode print ] each ;
-
-: response ( header msg -- )
-    "HTTP/1.0 " write print print-header ;
-
-: error-body ( error -- body )
-    "<html><body><h1>" swap "</h1></body></html>" cat3 print ;
-
-: error-head ( error -- )
-    dup log-error
-    [ [[ "Content-Type" "text/html" ]] ] over response ;
-
-: httpd-error ( error -- )
-    #! This must be run from handle-request
-    error-head
-    "head" "method" get = [ terpri error-body ] unless ;
-
-: bad-request ( -- )
-    [
-        ! Make httpd-error print a body
-        "get" "method" set
-        "400 Bad request" httpd-error
-    ] with-scope ;
-
-: serving-html ( -- )
-    [ [[ "Content-Type" "text/html" ]] ]
-    "200 Document follows" response terpri ;
-
-: serving-text ( -- )
-    [ [[ "Content-Type" "text/plain" ]] ]
-    "200 Document follows" response terpri ;
-
-: redirect ( to -- )
-    "Location" swons unit
-    "301 Moved Permanently" response terpri ;
-
-: directory-no/ ( -- )
-    [
-        "request" get , CHAR: / ,
-        "raw-query" get [ CHAR: ? , , ] when*
-    ] make-string redirect ;
+! Copyright (C) 2003, 2005 Slava Pestov
+IN: http
+USING: errors kernel lists math namespaces parser sequences
+stdio streams strings unparser ;
 
 : header-line ( alist line -- alist )
     ": " split1 dup [ cons swons ] [ 2drop ] ifte ;
 
 : (read-header) ( alist -- alist )
     read-line dup
-    f-or-"" [ drop ] [ header-line (read-header) ] ifte ;
+    empty? [ drop ] [ header-line (read-header) ] ifte ;
 
 : read-header ( -- alist )
     [ ] (read-header) ;
 
-: content-length ( alist -- length )
-    "Content-Length" swap assoc parse-number ;
+: url-encode ( str -- str )
+    [
+        [
+            dup url-quotable? [
+                ,
+            ] [
+                CHAR: % , >hex 2 CHAR: 0 pad %
+            ] ifte
+        ] seq-each
+    ] make-string ;
 
-: query>alist ( query -- alist )
-    dup [
-        "&" split [
-            "=" split1
-            dup [ url-decode ] when swap
-            dup [ url-decode ] when swap cons
-        ] map
-    ] when ;
+: catch-hex> ( str -- n )
+    #! Push f if string is not a valid hex literal.
+    [ hex> ] [ [ drop f ] when ] catch ;
 
-: read-post-request ( header -- alist )
-    content-length dup [ read query>alist ] when ;
+: url-decode-hex ( index str -- )
+    2dup length 2 - >= [
+        2drop
+    ] [
+        >r 1 + dup 2 + r> substring  catch-hex> [ , ] when*
+    ] ifte ;
 
-: log-user-agent ( alist -- )
-    "User-Agent" swap assoc* [
-        unswons [ , ": " , , ] make-string log
-    ] when* ;
+: url-decode-% ( index str -- index str )
+    2dup url-decode-hex >r 3 + r> ;
 
-: prepare-url ( url -- url )
-    #! This is executed in the with-request namespace.
-    "?" split1
-    dup "raw-query" set query>alist "query" set
-    dup "request" set ;
+: url-decode-+-or-other ( index str ch -- index str )
+    dup CHAR: + = [ drop CHAR: \s ] when , >r 1 + r> ;
 
-: prepare-header ( -- )
-    read-header dup "header" set
-    dup log-user-agent
-    read-post-request "response" set ;
+: url-decode-iter ( index str -- )
+    2dup length >= [
+        2drop
+    ] [
+        2dup nth dup CHAR: % = [
+            drop url-decode-%
+        ] [
+            url-decode-+-or-other
+        ] ifte url-decode-iter
+    ] ifte ;
+
+: url-decode ( str -- str )
+    [ 0 swap url-decode-iter ] make-string ;

@@ -1,14 +1,14 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: generic kernel lists math namespaces stdio strings
-presentation streams unparser words ;
+USING: generic hashtables kernel lists math namespaces
+presentation stdio streams strings unparser words ;
 
 ! Prettyprinting words
 : vocab-actions ( search -- list )
     [
-        [[ "Words"   "words."        ]]
-        [[ "Use"     "\"use\" cons@" ]]
+        [[ "Words"   "words ."       ]]
+        [[ "Use"     "use+" ]]
         [[ "In"      "\"in\" set"    ]]
     ] ;
 
@@ -17,24 +17,14 @@ presentation streams unparser words ;
     #! popup.
     unparse vocab-actions <actions> "actions" swons unit ;
 
-: prettyprint-vocab ( vocab -- )
-    dup vocab-attrs write-attr ;
+: vocab. ( vocab -- ) dup vocab-attrs write-attr ;
 
 : prettyprint-IN: ( word -- )
-    \ IN: prettyprint-word " " write
-    word-vocabulary prettyprint-vocab " " write ;
-
-: prettyprint-: ( indent -- indent )
-    \ : prettyprint-word " " write
-    tab-size get + ;
-
-: prettyprint-; ( indent -- indent )
-    \ ; prettyprint-word
-    tab-size get - ;
+    \ IN: word. bl word-vocabulary vocab. terpri ;
 
 : prettyprint-prop ( word prop -- )
     tuck word-name word-prop [
-        " " write prettyprint-word
+        bl word.
     ] [
         drop
     ] ifte ;
@@ -54,8 +44,7 @@ presentation streams unparser words ;
 
 : comment. ( comment -- ) comment-style write-attr ;
 
-: infer-effect. ( indent effect -- indent )
-    " " write
+: infer-effect. ( effect -- )
     [
         "(" ,
         2unlist >r [ " " , unparse , ] each r>
@@ -64,9 +53,8 @@ presentation streams unparser words ;
         " )" ,
     ] make-string comment. ;
 
-: stack-effect. ( indent word -- indent )
+: stack-effect. ( word -- )
     dup "stack-effect" word-prop [
-        " " write
         [ CHAR: ( , , CHAR: ) , ] make-string
         comment.
     ] [
@@ -85,55 +73,78 @@ presentation streams unparser words ;
         ] each
     ] when* ;
 
-: prettyprint-docs ( indent word -- indent )
-    [
-        stack-effect. dup prettyprint-newline
-    ] keep documentation. ;
+: definer. ( word -- ) dup definer word. bl word. bl ;
 
-: prettyprint-M: ( indent -- indent )
-    \ M: prettyprint-word " " write tab-size get + ;
+GENERIC: (see) ( word -- )
 
-GENERIC: see ( word -- )
+M: compound (see) ( word -- )
+    tab-size get dup indent swap
+    [ documentation. ] keep
+    [ word-def prettyprint-elements \ ; word. ] keep
+    prettyprint-plist terpri drop ;
 
-M: compound see ( word -- )
-    dup prettyprint-IN:
-    0 prettyprint-: swap
-    [ prettyprint-word ] keep
-    [ prettyprint-docs ] keep
-    [ word-def prettyprint-elements prettyprint-; ] keep
-    prettyprint-plist prettyprint-newline ;
+: prettyprint-M: ( -- indent )
+    \ M: word. bl tab-size get ;
 
-: see-method ( indent word class method -- indent )
-    >r >r >r prettyprint-M:
-    r> r> prettyprint-word " " write
-    prettyprint-word " " write
-    dup prettyprint-newline
-    r> prettyprint-elements
-    prettyprint-;
-    terpri ;
+: prettyprint-; \ ; word. terpri ;
 
-: see-generic ( word definer -- )
-    >r dup prettyprint-IN:
-    0 swap
-    r> prettyprint-word " " write
-    dup prettyprint-word terpri
-    dup methods [ over >r uncons see-method r> ] each 2drop ;
+: method. ( word [[ class method ]] -- )
+    uncons >r >r >r prettyprint-M: r> r> word. bl word. bl
+    dup prettyprint-newline r> prettyprint-elements
+    prettyprint-; drop ;
 
-M: generic see ( word -- )
-    \ GENERIC: see-generic ;
+: generic. ( word -- ) dup methods [ method. ] each-with ;
 
-M: 2generic see ( word -- )
-    \ 2GENERIC: see-generic ;
+M: generic (see) ( word -- ) generic. ;
 
-M: primitive see ( word -- )
-    dup prettyprint-IN:
-    "PRIMITIVE: " write dup prettyprint-word stack-effect.
-    terpri ;
+M: 2generic (see) ( word -- ) generic. ;
 
-M: symbol see ( word -- )
-    dup prettyprint-IN:
-    \ SYMBOL: prettyprint-word " " write . ;
+M: word (see) drop ;
 
-M: undefined see ( word -- )
-    dup prettyprint-IN:
-    \ DEFER: prettyprint-word " " write . ;
+GENERIC: class.
+
+M: union class.
+    \ UNION: word. bl
+    dup word. bl
+    0 swap "members" word-prop prettyprint-elements drop
+    prettyprint-; ;
+
+M: complement class.
+    \ COMPLEMENT: word. bl
+    dup word. bl
+    "complement" word-prop word. terpri ;
+
+M: builtin class.
+    \ BUILTIN: word. bl
+    dup word. bl
+    dup "builtin-type" word-prop unparse write bl
+    0 swap "slots" word-prop prettyprint-elements drop
+    prettyprint-; ;
+
+M: predicate class.
+    \ PREDICATE: word. bl
+    dup "superclass" word-prop word. bl
+    dup word. bl
+    tab-size get dup prettyprint-newline swap
+    "definition" word-prop prettyprint-elements drop
+    prettyprint-; ;
+
+M: tuple-class class.
+    \ TUPLE: word. bl
+    dup word. bl
+    "slot-names" word-prop [ write bl ] each
+    prettyprint-; ;
+
+M: word class. drop ;
+
+: see ( word -- )
+    dup prettyprint-IN: dup definer.
+    dup stack-effect. terpri dup (see) class. ;
+
+: methods. ( class -- )
+    #! List all methods implemented for this class.
+    dup class.
+    dup implementors [
+        dup prettyprint-IN:
+        [ "methods" word-prop hash* ] keep swap method.
+    ] each-with ;

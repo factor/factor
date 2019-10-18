@@ -36,14 +36,14 @@ void primitive_fixnum_add(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());
 	F_FIXNUM x = untag_fixnum_fast(dpop());
-	box_integer(x + y);
+	box_signed_cell(x + y);
 }
 
 void primitive_fixnum_subtract(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());
 	F_FIXNUM x = untag_fixnum_fast(dpop());
-	box_integer(x - y);
+	box_signed_cell(x - y);
 }
 
 /**
@@ -62,7 +62,7 @@ void primitive_fixnum_multiply(void)
 		F_FIXNUM prod = x * y;
 		/* if this is not equal, we have overflow */
 		if(prod / x == y)
-			box_integer(prod);
+			box_signed_cell(prod);
 		else
 		{
 			dpush(tag_bignum(
@@ -77,7 +77,7 @@ void primitive_fixnum_divint(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());
 	F_FIXNUM x = untag_fixnum_fast(dpop());
-	box_integer(x / y);
+	box_signed_cell(x / y);
 }
 
 void primitive_fixnum_divfloat(void)
@@ -91,8 +91,8 @@ void primitive_fixnum_divmod(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());
 	F_FIXNUM x = untag_fixnum_fast(dpop());
-	box_integer(x / y);
-	box_integer(x % y);
+	box_signed_cell(x / y);
+	box_signed_cell(x % y);
 }
 
 void primitive_fixnum_mod(void)
@@ -216,4 +216,3 @@ DEFUNBOX(unbox_signed_1, signed char)
 DEFUNBOX(unbox_signed_2, signed short)
 DEFUNBOX(unbox_unsigned_1, unsigned char)
 DEFUNBOX(unbox_unsigned_2, unsigned short) 
-

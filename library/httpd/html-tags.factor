@@ -30,6 +30,7 @@ USE: kernel
 USE: stdio
 USE: namespaces
 USE: words
+USE: sequences
 
 ! These words are used to provide a means of writing
 ! formatted HTML to standard output with a familiar 'html' look
@@ -83,7 +84,7 @@ USE: words
     #! With the attribute namespace on the stack, get the attributes
     #! and write them to standard output. If no attributes exist, write
     #! nothing.
-    "attrs" get [ " " write attrs>string write ] when* ;
+    "attrs" get [ bl attrs>string write ] when* ;
 
 : store-prev-attribute ( n: tag value -- )     
     #! Assumes an attribute namespace is on the stack.
@@ -91,7 +92,7 @@ USE: words
     #! and sets it's value to the current value on the stack.
     #! If there is no previous attribute, no value is expected
     #! on the stack.
-    "current-attribute" get [ swons "attrs" cons@ ] when* ;
+    "current-attribute" get [ swons "attrs" [ cons ] change ] when* ;
 
 ! HTML tag words
 ! 

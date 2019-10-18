@@ -30,6 +30,7 @@ USE: namespaces
 USE: strings
 USE: kernel
 USE: math
+USE: sequences
 USE: vectors
 
 SYMBOL: line-text
@@ -41,7 +42,7 @@ SYMBOL: history-index
 
 : history-length ( -- n )
     #! Call this in the line editor scope.
-    history get vector-length ;
+    history get length ;
 
 : reset-history ( -- )
     #! Call this in the line editor scope. After user input,
@@ -54,18 +55,18 @@ SYMBOL: history-index
     line-text get dup "" = [
         drop
     ] [
-        history-index get history get set-vector-nth
+        history-index get history get set-nth
         reset-history
     ] ifte ;
 
 : set-line-text ( text -- )
     #! Call this in the line editor scope.
-    dup line-text set string-length caret set ;
+    dup line-text set length caret set ;
 
 : goto-history ( n -- )
     #! Call this in the line editor scope.
     dup history-index set
-    history get vector-nth set-line-text ;
+    history get nth set-line-text ;
 
 : history-prev ( -- )
     #! Call this in the line editor scope.
@@ -99,7 +100,7 @@ SYMBOL: history-index
 : caret-insert ( str offset -- )
     #! Call this in the line editor scope.
     caret get <= [
-        string-length caret [ + ] change
+        length caret [ + ] change
     ] [
         drop
     ] ifte ;
@@ -145,4 +146,4 @@ SYMBOL: history-index
 
 : right ( -- )
     #! Call this in the line editor scope.
-    caret [ 1 + line-text get string-length min ] change ;
+    caret [ 1 + line-text get length min ] change ;

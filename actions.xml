@@ -65,7 +65,7 @@
 	</ACTION>
 	<ACTION NAME="factor-usages">
 		<CODE>
-			FactorPlugin.factorWordOutputOp(view,"usages.");
+			FactorPlugin.factorWordOutputOp(view,"usages .");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-insert-use">

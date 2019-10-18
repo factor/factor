@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: alien assembler inference kernel kernel-internals lists
+IN: assembler
+USING: alien compiler inference kernel kernel-internals lists
 math memory namespaces words ;
 
 ! Not used on x86
@@ -53,23 +53,4 @@ math memory namespaces words ;
     [ EAX ] JMP
     compile-aligned
     compiled-offset swap set-compiled-cell ( fixup -- )
-] "generator" set-word-prop
-
-#c-call [
-    uncons load-dll 2dup dlsym CALL t rel-dlsym
-] "generator" set-word-prop
-
-#unbox [
-    dup f dlsym CALL f t rel-dlsym
-    EAX PUSH
-] "generator" set-word-prop
-
-#box [
-    EAX PUSH
-    dup f dlsym CALL f t rel-dlsym
-    ESP 4 ADD
-] "generator" set-word-prop
-
-#cleanup [
-    dup 0 = [ drop ] [ ESP swap ADD ] ifte
 ] "generator" set-word-prop

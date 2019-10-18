@@ -4,32 +4,38 @@ IN: image
 USING: kernel lists math memory namespaces parser words vectors
 hashtables generic alien assembler compiler errors files generic
 io-internals kernel kernel-internals lists math math-internals
-parser profiler random strings unparser vectors words
+parser profiler strings unparser vectors words
 hashtables ;
+
+! This symbol needs the same hashcode in the target as in the
+! host.
+vocabularies
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab clone
 "generic" vocab clone
 
-! These symbol needs the same hashcode in the target as in the
-! host.
-vocabularies
-classes
-
 <namespace> vocabularies set
-<namespace> classes set
+<namespace> typemap set
+num-types <vector> builtins set
+<namespace> crossref set
 
 vocabularies get [
-    reveal
-    reveal
     "generic" set
     "syntax" set
+    reveal
 ] bind
 
-! We cannot simply copy the delegate generic with all its
-! methods. Rather we must create a new empty generic.
-"delegate" [ "generic" ] search forget
-[ single-combination ] \ GENERIC: "delegate" "generic" create define-generic
+: set-stack-effect ( [ vocab word effect ] -- )
+    3unlist >r unit search r> dup string? [
+        "stack-effect" set-word-prop
+    ] [
+        "infer-effect" set-word-prop
+    ] ifte ;
+
+: make-primitive ( n [ vocab word effect ] -- n )
+    [ 2unlist create >r 1 + r> over f define ] keep
+    set-stack-effect ;
 
 2 [
     [ "execute" "words"                       " word -- " ]
@@ -128,7 +134,6 @@ vocabularies get [
     [ "eq?" "kernel"                          [ [ object object ] [ boolean ] ] ]
     [ "getenv" "kernel-internals"             [ [ fixnum ] [ object ] ] ]
     [ "setenv" "kernel-internals"             [ [ object fixnum ] [ ] ] ]
-    [ "open-file" "io-internals"              [ [ string object object ] [ port ] ] ]
     [ "stat" "files"                          [ [ string ] [ general-list ] ] ]
     [ "(directory)" "files"                   [ [ string ] [ general-list ] ] ]
     [ "garbage-collection" "memory"           [ [ ] [ ] ] ]
@@ -139,28 +144,11 @@ vocabularies get [
     [ "set-datastack" "kernel"                " ds -- "          ]
     [ "set-callstack" "kernel"                " cs -- "          ]
     [ "exit" "kernel"                         [ [ integer ] [ ] ] ]
-    [ "client-socket" "io-internals"          [ [ string integer ] [ port port ] ] ]
-    [ "server-socket" "io-internals"          [ [ integer ] [ port ] ] ]
-    [ "close-port" "io-internals"             [ [ port ] [ ] ] ]
-    [ "add-accept-io-task" "io-internals"     [ [ port general-list ] [ ] ] ]
-    [ "accept-fd" "io-internals"              [ [ port ] [ string integer port port ] ] ]
-    [ "can-read-line?" "io-internals"         [ [ port ] [ boolean ] ] ]
-    [ "add-read-line-io-task" "io-internals"  [ [ port general-list ] [ ] ] ]
-    [ "read-line-fd-8" "io-internals"         [ [ port ] [ sbuf ] ] ]
-    [ "can-read-count?" "io-internals"        [ [ integer port ] [ boolean ] ] ]
-    [ "add-read-count-io-task" "io-internals" [ [ integer port general-list ] [ ] ] ]
-    [ "read-count-fd-8" "io-internals"        [ [ integer port ] [ sbuf ] ] ]
-    [ "can-write?" "io-internals"             [ [ integer port ] [ boolean ] ] ]
-    [ "add-write-io-task" "io-internals"      [ [ port general-list ] [ ] ] ]
-    [ "write-fd-8" "io-internals"             [ [ text port ] [ ] ] ]
-    [ "add-copy-io-task" "io-internals"       [ [ port port general-list ] [ ] ] ]
-    [ "pending-io-error" "io-internals"       [ [ ] [ ] ] ]
-    [ "next-io-task" "io-internals"           [ [ ] [ general-list ] ] ]
     [ "room" "memory"                         [ [ ] [ integer integer integer integer ] ] ]
     [ "os-env" "kernel"                       [ [ string ] [ object ] ] ]
     [ "millis" "kernel"                       [ [ ] [ integer ] ] ]
-    [ "init-random" "random"                  [ [ ] [ ] ] ]
-    [ "(random-int)" "random"                 [ [ ] [ integer ] ] ]
+    [ "init-random" "math"                    [ [ ] [ ] ] ]
+    [ "(random-int)" "math"                   [ [ ] [ integer ] ] ]
     [ "type" "kernel"                         [ [ object ] [ fixnum ] ] ]
     [ "cwd" "files"                           [ [ ] [ string ] ] ]
     [ "cd" "files"                            [ [ string ] [ ] ] ]
@@ -173,19 +161,32 @@ vocabularies get [
     [ "dlsym" "alien"                         [ [ string object ] [ integer ] ] ]
     [ "dlclose" "alien"                       [ [ dll ] [ ] ] ]
     [ "<alien>" "alien"                       [ [ integer ] [ alien ] ] ]
-    [ "<local-alien>" "alien"                 [ [ integer ] [ alien ] ] ]
-    [ "alien-cell" "alien"                    [ [ alien integer ] [ integer ] ] ]
-    [ "set-alien-cell" "alien"                [ [ integer alien integer ] [ ] ] ]
-    [ "alien-4" "alien"                       [ [ alien integer ] [ integer ] ] ]
-    [ "set-alien-4" "alien"                   [ [ integer alien integer ] [ ] ] ]
-    [ "alien-2" "alien"                       [ [ alien integer ] [ fixnum ] ] ]
-    [ "set-alien-2" "alien"                   [ [ integer alien integer ] [ ] ] ]
-    [ "alien-1" "alien"                       [ [ alien integer ] [ fixnum ] ] ]
-    [ "set-alien-1" "alien"                   [ [ integer alien integer ] [ ] ] ]
+    [ "<byte-array>" "alien"                  [ [ integer ] [ byte-array ] ] ]
+    [ "<displaced-alien>" "alien"             [ [ integer object ] [ displaced-alien ] ] ]
+    [ "alien-signed-cell" "alien"             [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-cell" "alien"         [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-cell" "alien"           [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-cell" "alien"       [ [ integer alien integer ] [ ] ] ]
+    [ "alien-signed-8" "alien"                [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-8" "alien"            [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-8" "alien"              [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-8" "alien"          [ [ integer alien integer ] [ ] ] ]
+    [ "alien-signed-4" "alien"                [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-4" "alien"            [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-4" "alien"              [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-4" "alien"          [ [ integer alien integer ] [ ] ] ]
+    [ "alien-signed-2" "alien"                [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-2" "alien"            [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-2" "alien"              [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-2" "alien"          [ [ integer alien integer ] [ ] ] ]
+    [ "alien-signed-1" "alien"                [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-1" "alien"            [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-1" "alien"              [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-1" "alien"          [ [ integer alien integer ] [ ] ] ]
+    [ "alien-value-string" "alien"            [ [ alien integer ] [ string ] ] ]
     [ "throw" "errors"                        [ [ object ] [ ] ] ]
     [ "string>memory" "kernel-internals"      [ [ string integer ] [ ] ] ]
     [ "memory>string" "kernel-internals"      [ [ integer integer ] [ string ] ] ]
-    [ "local-alien?" "alien"                  [ [ alien ] [ object ] ] ]
     [ "alien-address" "alien"                 [ [ alien ] [ integer ] ] ]
     [ "slot" "kernel-internals"               [ [ object fixnum ] [ object ] ] ]
     [ "set-slot" "kernel-internals"           [ [ object object fixnum ] [ ] ] ]
@@ -201,11 +202,27 @@ vocabularies get [
     [ "size" "memory"                         [ [ object ] [ fixnum ] ] ]
     [ "die" "kernel"                          [ [ ] [ ] ] ]
     [ "flush-icache" "assembler"              f ]
+    [ "fopen"  "io-internals"                 [ [ string string ] [ alien ] ] ]
+    [ "fgets" "io-internals"                  [ [ alien ] [ string ] ] ]
+    [ "fwrite" "io-internals"                 [ [ string alien ] [ ] ] ]
+    [ "fflush" "io-internals"                 [ [ alien ] [ ] ] ]
+    [ "fclose" "io-internals"                 [ [ alien ] [ ] ] ]
 ] [
-    3unlist >r create >r 1 + r> 2dup swap f define r>
-    dup string? [
-        "stack-effect" set-word-prop
-    ] [
-        "infer-effect" set-word-prop
-    ] ifte
+    make-primitive
 ] each drop
+
+! These need a more descriptive comment.
+[
+    [ "drop" "kernel" " x -- " ]
+    [ "dup" "kernel"  " x -- x x " ]
+    [ "swap" "kernel" " x y -- y x " ]
+    [ "over" "kernel" " x y -- x y x " ]
+    [ "pick" "kernel" " x y z -- x y z x " ]
+    [ ">r" "kernel"   " x -- r: x " ]
+    [ "r>" "kernel"   " r: x -- x " ]
+] [
+    set-stack-effect
+] each
+
+FORGET: make-primitive
+FORGET: set-stack-effect

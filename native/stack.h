@@ -1,10 +1,12 @@
+CELL ds_size, cs_size;
+
 #define STACK_UNDERFLOW(stack,bot) ((stack) + CELLS < UNTAG(bot))
-#define STACK_OVERFLOW(stack,bot) ((stack) + CELLS >= UNTAG(bot) + STACK_SIZE)
+#define STACK_OVERFLOW(stack,bot,top) ((stack) + CELLS >= UNTAG(bot) + top)
 
 void reset_datastack(void);
 void reset_callstack(void);
 void fix_stacks(void);
-void init_stacks(void);
+void init_stacks(CELL ds_size, CELL cs_size);
 
 void primitive_drop(void);
 void primitive_dup(void);

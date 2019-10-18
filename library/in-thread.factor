@@ -1,6 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: threads USING: errors io-internals kernel lists ;
+IN: threads
+USING: errors kernel lists namespaces sequences ;
 
 : in-thread ( quot -- )
     #! Execute a quotation in a co-operative thread. The
@@ -14,5 +15,5 @@ IN: threads USING: errors io-internals kernel lists ;
         [ ] set-catchstack
         { } set-callstack
         try
-        (yield)
+        stop
     ] callcc0 drop ;

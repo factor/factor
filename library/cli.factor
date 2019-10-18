@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2004 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: command-line
-USING: files kernel lists namespaces parser strings
-kernel-internals ;
+USING: files kernel kernel-internals lists namespaces parser
+sequences strings ;
 
 ! This file is run as the last stage of boot.factor; it relies
 ! on all other words already being defined.
@@ -22,7 +22,7 @@ kernel-internals ;
 
 : cli-var-param ( name value -- ) swap ":" split set-path ;
 
-: cli-bool-param ( name -- ) "no-" ?string-head not put ;
+: cli-bool-param ( name -- ) "no-" ?string-head not swap set ;
 
 : cli-param ( param -- )
     #! Handle a command-line argument starting with '-' by
@@ -36,7 +36,11 @@ kernel-internals ;
 : cli-arg ( argument -- argument )
     #! Handle a command-line argument. If the argument was
     #! consumed, returns f. Otherwise returns the argument.
-    dup f-or-"" [ "-" ?string-head [ cli-param f ] when ] unless ;
+    #! Parameters that start with + are runtime parameters.
+    dup empty? [
+        "-" ?string-head [ cli-param f ] when
+        dup [ "+" ?string-head [ drop f ] when ] when
+    ] unless ;
 
 : parse-switches ( args -- args )
     [ cli-arg ] map ;

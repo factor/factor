@@ -10,7 +10,7 @@ CELL object_size(CELL pointer)
 		size = 0;
 		break;
 	case BIGNUM_TYPE:
-		size = ASIZE(UNTAG(pointer));
+		size = untagged_object_size(UNTAG(pointer));
 		break;
 	case CONS_TYPE:
 		size = sizeof(F_CONS);
@@ -22,7 +22,7 @@ CELL object_size(CELL pointer)
 		size = sizeof(F_FLOAT);
 		break;
 	case COMPLEX_TYPE:
-		size = sizeof(F_COMPLEX);
+		size = sizeof(F_CONS);
 		break;
 	case OBJECT_TYPE:
 		size = untagged_object_size(UNTAG(pointer));
@@ -52,9 +52,11 @@ CELL untagged_object_size(CELL pointer)
 		size = CELLS * 2;
 		break;
 	case ARRAY_TYPE:
-	case BIGNUM_TYPE:
 	case TUPLE_TYPE:
-		size = ASIZE(pointer);
+	case BIGNUM_TYPE:
+	case BYTE_ARRAY_TYPE:
+		size = align8(sizeof(F_ARRAY) +
+			array_capacity((F_ARRAY*)(pointer)) * CELLS);
 		break;
 	case HASHTABLE_TYPE:
 		size = sizeof(F_HASHTABLE);
@@ -71,14 +73,14 @@ CELL untagged_object_size(CELL pointer)
 	case FLOAT_TYPE:
 		size = sizeof(F_FLOAT);
 		break;
-	case PORT_TYPE:
-		size = sizeof(F_PORT);
-		break;
 	case DLL_TYPE:
 		size = sizeof(DLL);
 		break;
 	case ALIEN_TYPE:
 		size = sizeof(ALIEN);
+		break;
+	case DISPLACED_ALIEN_TYPE:
+		size = sizeof(DISPLACED_ALIEN);
 		break;
 	default:
 		critical_error("Cannot determine size",pointer);

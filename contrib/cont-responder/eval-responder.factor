@@ -41,6 +41,7 @@ USE: unparser
 USE: words
 USE: vectors
 USE: logging
+USE: sequences
 
 : <evaluator> ( stack msg history -- )
   #! Create an 'evaluator' object that holds
@@ -72,7 +73,7 @@ USE: logging
 : escape-quotes ( string -- string )
   #! Replace occurrences of single quotes with
   #! backslash quote.
-  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] string-map ;
+  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] seq-map ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
@@ -87,7 +88,7 @@ USE: logging
   #! Write out html to display the stack.
   <table border= "1" table> 
     <tr> <th> "Callstack" write </th> </tr>
-    [ <tr> <td> [ unparse write ] with-string-stream write-eval-link </td> </tr> ] each
+    [ <tr> <td> [ unparse write ] with-string write-eval-link </td> </tr> ] each
   </table> ;
 
 : display-clear-history-link ( -- )
@@ -104,12 +105,17 @@ USE: logging
     [ <tr> <td> write-eval-link </td> </tr> ] each
   </table> ;
 
+: usages. ( word -- )
+  #! Write to output the words that use the given word, one
+  #! per line.
+  usages [ . ] each ;
+
 : html-for-word-source ( word-string -- )
   #! Return an html fragment dispaying the source
   #! of the given word.
   dup dup
   <namespace> [
-    "responder" "browser" put
+    "browser" "responder" set
     <table border= "1" table> 
       <tr> <th colspan= "2" th> "Source" write </th> </tr>
       <tr> <td colspan= "2" td> [ [ parse ] [ [ "No such word" write ] [ car see ] ifte ] catch ] with-simple-html-output </td> </tr>
@@ -171,9 +177,9 @@ USE: logging
   #! Call the quotation using 'list' as the datastack
   #! return the result datastack as a list.
   datastack >r    
-  swap list>vector tuck vector-push 
-  set-datastack call datastack vector>list
-  r> >pop> >pop> tuck vector-push set-datastack ;
+  swap >vector tuck push 
+  set-datastack call datastack >list
+  r> >pop> >pop> tuck push set-datastack ;
 
 : do-eval ( list string -- list )
   #! Evaluate the expression in 'string' using 'list' as
@@ -184,12 +190,12 @@ USE: logging
   #! Evaluate expression using 'list' as the current callstack.
   #! All output should go to a string which is returned on the
   #! callstack along with the resulting datastack as a list.
-  <namespace> [ 
+  [
     "browser" "responder" set
-    1024 <string-output> dup >r <html-stream> [
-      do-eval 
-    ] with-stream r> stream>str 
-  ] bind ;
+    1024 <sbuf> dup >r <html-stream> [
+      do-eval
+    ] with-stream r> sbuf>string
+  ] with-scope ;
 
 : forever ( quot -- )
   #! The code is evaluated in an infinite loop. Typically, a
@@ -197,6 +203,12 @@ USE: logging
   #!
   #! This combinator will not compile.
   dup slip forever ;
+
+: cons@ ( value name -- )
+  #! Get the value of the variable named by 'name'
+  #! from the current namespace and cons 'value' to its
+  #! current value.
+  dup get rot swons swap set ;
 
 : run-eval-requester ( evaluator -- )
   #! Enter a loop request an expression to

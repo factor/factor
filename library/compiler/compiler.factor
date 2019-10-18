@@ -48,16 +48,20 @@ M: compound (compile) ( word -- )
 : try-compile ( word -- )
     [ compile ] [ [ cannot-compile ] when* ] catch ;
 
-: compile-all ( -- )
-    #! Compile all words.
-    supported-cpu? [
-        [ try-compile ] each-word
-    ] [
-        "Unsupported CPU" print
-    ] ifte ;
+: compile-all ( -- ) [ try-compile ] each-word ;
 
 : decompile ( word -- )
-    [ word-primitive ] keep set-word-primitive ;
+    dup compiled? [
+        "Decompiling " write dup . flush
+        [ word-primitive ] keep set-word-primitive
+    ] [
+        drop
+    ] ifte ;
+
+M: compound (uncrossref)
+    dup f "infer-effect" set-word-prop
+    dup f "no-effect" set-word-prop
+    decompile ;
 
 : recompile ( word -- )
     dup decompile compile ;

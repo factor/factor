@@ -214,7 +214,7 @@ public class FactorSideKickParser extends SideKickParser
 	} //}}}
 
 	//{{{ isWhitespace() method
-	private boolean isWhitespace(char ch)
+	private static boolean isWhitespace(char ch)
 	{
 		return (ReadTable.DEFAULT_READTABLE.getCharacterType(ch)
 			== ReadTable.WHITESPACE);
@@ -231,6 +231,28 @@ public class FactorSideKickParser extends SideKickParser
 	public boolean canCompleteAnywhere()
 	{
 		return false;
+	} //}}}
+
+	//{{{ getCompletionWord() method
+	public static String getCompletionWord(EditPane editPane, int caret)
+	{
+		Buffer buffer = editPane.getBuffer();
+		int caretLine = buffer.getLineOfOffset(caret);
+		int lineStart = buffer.getLineStartOffset(caretLine);
+		String text = buffer.getText(lineStart,caret - lineStart);
+
+		int wordStart = 0;
+		for(int i = text.length() - 1; i >= 0; i--)
+		{
+			char ch = text.charAt(i);
+			if(isWhitespace(ch))
+			{
+				wordStart = i + 1;
+				break;
+			}
+		}
+
+		return text.substring(wordStart);
 	} //}}}
 
 	//{{{ complete() method
@@ -255,74 +277,17 @@ public class FactorSideKickParser extends SideKickParser
 		if(ruleset == null)
 			return null;
 
-		Buffer buffer = editPane.getBuffer();
-
-		// first, we get the word before the caret
-		int caretLine = buffer.getLineOfOffset(caret);
-		int lineStart = buffer.getLineStartOffset(caretLine);
-		String text = buffer.getText(lineStart,caret - lineStart);
-
-		/* Don't complete in the middle of a word */
-		/* int lineEnd = buffer.getLineEndOffset(caretLine) - 1;
-		if(caret != lineEnd)
-		{
-			String end = buffer.getText(caret,lineEnd - caret);
-			if(!isWhitespace(end.charAt(0)))
-				return null;
-		} */
-
-		int wordStart = 0;
-		for(int i = text.length() - 1; i >= 0; i--)
-		{
-			char ch = text.charAt(i);
-			if(isWhitespace(ch))
-			{
-				wordStart = i + 1;
-				break;
-			}
-		}
-
-		String word = text.substring(wordStart);
+		String word = getCompletionWord(editPane,caret);
 
 		/* Don't complete empty string */
 		if(word.length() == 0)
 			return null;
 
+		View view = editPane.getView();
+
 		if(ruleset.equals("factor::USING"))
-			return vocabComplete(editPane,data,word,caret);
+			return new FactorVocabCompletion(view,word,data);
 		else
-			return wordComplete(editPane,data,word,caret);
-	} //}}}
-	
-	//{{{ vocabComplete() method
-	private SideKickCompletion vocabComplete(EditPane editPane,
-		FactorParsedData data, String vocab, int caret)
-	{
-		String[] completions = FactorPlugin.getVocabCompletions(
-			vocab,false);
-
-		if(completions.length == 0)
-			return null;
-		else
-		{
-			return new FactorVocabCompletion(editPane.getView(),
-				completions,vocab,data);
-		}
-	} //}}}
-	
-	//{{{ wordComplete() method
-	private SideKickCompletion wordComplete(EditPane editPane,
-		FactorParsedData data, String word, int caret)
-	{
-		FactorWord[] completions = FactorPlugin.toWordArray(
-			FactorPlugin.getWordCompletions(word,false));
-
-		if(completions.length == 0)
-			return null;
-		else
-		{
-			return new FactorWordCompletion(editPane.getView(),
-				completions,word,data);
-		}
+			return new FactorWordCompletion(view,word,data);
 	} //}}}
 }

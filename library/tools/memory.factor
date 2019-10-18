@@ -1,9 +1,14 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
-USING: kernel-internals errors generic kernel lists math
-namespaces prettyprint stdio unparser vectors words ;
+USING: errors generic hashtables kernel kernel-internals lists
+math namespaces prettyprint sequences stdio unparser vectors
+words ;
 
+: save
+    #! Save the current image.
+    "image" get save-image ;
+    
 ! Printing an overview of heap usage.
 
 : kb. 1024 /i unparse write " KB" write ;
@@ -22,13 +27,12 @@ namespaces prettyprint stdio unparser vectors words ;
 ! Some words for iterating through the heap.
 
 : each-object ( quot -- )
-    #! Applies the quotation to each object in the image.
-    [
-        begin-scan
-        [ next-object ] while
-    ] [
-        end-scan rethrow
-    ] catch ;
+    #! Applies the quotation to each object in the image. We
+    #! use the lower-level >c and c> words here to avoid
+    #! copying the stacks.
+    [ end-scan rethrow ] >c
+    begin-scan [ next-object ] while
+    f c> call ;
 
 : instances ( quot -- list )
     #! Return a list of all object that return true when the
@@ -63,24 +67,22 @@ M: object (each-slot) ( quot obj -- )
 
 : references ( obj -- list )
     #! Return a list of all objects that refer to a given object
-    #! in the image.
+    #! in the image. If only one reference exists, find
+    #! something referencing that, and so on.
     [ dupd refers? ] instances nip ;
 
-: vector+ ( n index vector -- )
-    [ vector-nth + ] 2keep set-vector-nth ;
+: seq+ ( n index vector -- )
+    [ nth + ] 2keep set-nth ;
 
 : heap-stat-step ( counts sizes obj -- )
-    [ dup size swap type rot vector+ ] keep
-    1 swap type rot vector+ ;
-
-: zero-vector ( n -- vector )
-    [ drop 0 ] vector-project ;
+    [ dup size swap type rot seq+ ] keep
+    1 swap type rot seq+ ;
 
 : heap-stats ( -- stats )
     #! Return a list of instance count/total size pairs.
     num-types zero-vector num-types zero-vector
     [ >r 2dup r> heap-stat-step ] each-object
-    swap vector>list swap vector>list zip ;
+    swap >list swap >list zip ;
 
 : heap-stat. ( type instances bytes -- )
     dup 0 = [
@@ -94,3 +96,15 @@ M: object (each-slot) ( quot obj -- )
 : heap-stats. ( -- )
     #! Print heap allocation breakdown.
     0 heap-stats [ dupd uncons heap-stat. 1 + ] each drop ;
+
+: orphan? ( word -- ? )
+    #! Test if the word is not a member of its vocabulary.
+    dup dup word-name swap word-vocabulary dup [
+        vocab hash eq? not
+    ] [
+        3drop t
+    ] ifte ;
+
+: orphans ( word -- list )
+    #! Orphans are forgotten but still referenced.
+    [ word? ] instances [ orphan? ] subset ;

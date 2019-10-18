@@ -1,12 +1,10 @@
-IN: scratchpad
+IN: temporary
 USE: file-responder
+USE: http
 USE: httpd
-USE: httpd-responder
-USE: logging
 USE: namespaces
 USE: stdio
 USE: test
-USE: url-encoding
 USE: strings
 USE: lists
 
@@ -41,9 +39,7 @@ USE: lists
 [ "inspect/global" ] [ "/inspect/global" trim-/ ] unit-test
 
 [ ] [
-    [
-        "unit/test" log-responder
-    ] with-logging
+    "unit/test" log-responder
 ] unit-test
 
 [ "index.html" ]

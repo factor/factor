@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USING: generic kernel lists math namespaces test words ;
 
 [ 4 ] [

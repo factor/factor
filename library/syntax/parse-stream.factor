@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: kernel lists namespaces streams strings ;
+USING: kernel lists namespaces sequences streams strings ;
 
 : file-vocabs ( -- )
     "file-in" get "in" set
@@ -15,7 +15,10 @@ USING: kernel lists namespaces streams strings ;
     line-number off ;
 
 : parse-stream ( name stream -- quot )
-    [ file-vocabs (parse-stream) ] with-scope ;
+    [
+        file-vocabs
+        [ (parse-stream) ] with-parser
+    ] with-scope ;
 
 : parse-file ( file -- quot )
     dup <file-reader> parse-stream ;

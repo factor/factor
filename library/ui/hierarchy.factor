@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math namespaces ;
+USING: generic hashtables kernel lists math namespaces
+sequences ;
 
 : remove-gadget ( gadget box -- )
     [ 2dup gadget-children remq swap set-gadget-children ] keep

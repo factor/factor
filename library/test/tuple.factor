@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USING: generic kernel test math parser ;
 
 TUPLE: rect x y w h ;

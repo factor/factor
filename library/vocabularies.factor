@@ -2,6 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words USING: hashtables kernel lists namespaces strings ;
 
+SYMBOL: vocabularies
+
 : word ( -- word ) global [ "last-word" get ] bind ;
 : set-word ( word -- ) global [ "last-word" set ] bind ;
 
@@ -13,19 +15,29 @@ IN: words USING: hashtables kernel lists namespaces strings ;
     #! Get a vocabulary.
     vocabularies get hash ;
 
-: word-sort ( list -- list )
-    #! Sort a list of words by name.
-    [ swap word-name swap word-name string> ] sort ;
-
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
     #! Filter empty slots.
     vocab dup [ hash-values [ ] subset word-sort ] when ;
 
+: all-words ( -- list )
+    [ vocabs [ words % ] each ] make-list ;
+
 : each-word ( quot -- )
     #! Apply a quotation to each word in the image.
-    vocabs [ words [ swap dup >r call r> ] each ] each drop ;
-    inline
+    all-words swap each ; inline
+
+: word-subset ( pred -- list | pred: word -- ? )
+    #! A list of words matching the predicate.
+    all-words swap subset word-sort ; inline
+
+: word-subset-with ( obj pred -- list | pred: obj word -- ? )
+    all-words swap subset-with ; inline
+
+: recrossref ( -- )
+    #! Update word cross referencing information.
+    [ f "usages" set-word-prop ] each-word
+    [ add-crossref ] each-word ;
 
 : (search) ( name vocab -- word )
     vocab dup [ hash ] [ 2drop f ] ifte ;
@@ -67,6 +79,7 @@ IN: words USING: hashtables kernel lists namespaces strings ;
 
 : forget ( word -- )
     #! Remove a word definition.
+    dup uncrossref
     dup word-vocabulary vocab [ word-name off ] bind ;
 
 : init-search-path ( -- )
@@ -79,7 +92,7 @@ IN: words USING: hashtables kernel lists namespaces strings ;
         "compiler" "debugger" "errors" "files" "generic"
         "hashtables" "inference" "interpreter" "jedit" "kernel"
         "listener" "lists" "math" "memory" "namespaces" "parser"
-        "prettyprint" "processes" "profiler" "streams" "stdio"
-        "strings" "syntax" "test" "threads" "unparser" "vectors"
-        "words" "scratchpad"
+        "prettyprint" "processes" "profiler" "sequences"
+        "streams" "stdio" "strings" "syntax" "test" "threads"
+        "unparser" "vectors" "words" "scratchpad"
     ] "use" set ;

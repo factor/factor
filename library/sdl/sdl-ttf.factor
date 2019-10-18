@@ -9,7 +9,7 @@ USE: alien
 : TTF_ByteSwappedUNICODE ( swapped -- )
     "void" "sdl-ttf" "TTF_ByteSwappedUNICODE" [ "int" ] alien-invoke ;
 
-: TTF_Init ( swapped -- )
+: TTF_Init ( -- )
     "void" "sdl-ttf" "TTF_Init" [ ] alien-invoke ;
 
 : TTF_OpenFont ( file ptsize -- font )
@@ -52,10 +52,6 @@ USE: alien
 
 : TTF_FontFaceStyleName ( font -- n )
     "char*" "sdl-ttf" "TTF_FontFaceStyleName" [ "void*" ] alien-invoke ;
-
-BEGIN-STRUCT: int-box
-    FIELD: int i
-END-STRUCT
 
 : TTF_SizeUNICODE ( font text w h -- ? )
     "bool" "sdl-ttf" "TTF_SizeUNICODE" [ "void*" "ushort*" "int-box*" "int-box*" ] alien-invoke ;

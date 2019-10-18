@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors generic interpreter kernel lists math namespaces
-prettyprint strings unparser vectors words ;
+prettyprint sequences strings unparser vectors words ;
 
 : max-recursion 0 ;
 
@@ -79,39 +79,39 @@ M: computed literal-value ( value -- )
     "A literal value was expected where a computed value was"
     " found: " rot unparse cat3 inference-error ;
 
+: pop-literal ( -- obj )
+    dataflow-drop, pop-d literal-value ;
+
 : (ensure-types) ( typelist n stack -- )
     pick [
-        3dup >r >r car r> r> vector-nth value-class-and
+        3dup >r >r car r> r> nth value-class-and
         >r >r cdr r> 1 + r> (ensure-types)
     ] [
         3drop
     ] ifte ;
 
 : ensure-types ( typelist stack -- )
-    dup vector-length pick length - dup 0 < [
+    dup length pick length - dup 0 < [
         swap >r neg tail 0 r>
     ] [
         swap
     ] ifte (ensure-types) ;
 
 : required-inputs ( typelist stack -- values )
-    >r dup length r> vector-length - dup 0 > [
+    >r dup length r> length - dup 0 > [
         head [ <computed> ] map
     ] [
         2drop f
     ] ifte ;
 
-: vector-prepend ( values stack -- stack )
-    >r list>vector r> vector-append ;
-
 : ensure-d ( typelist -- )
     dup meta-d get ensure-types
-    meta-d get required-inputs dup
-    meta-d [ vector-prepend ] change
-    d-in [ vector-prepend ] change ;
+    meta-d get required-inputs >vector dup
+    meta-d [ append ] change
+    d-in [ append ] change ;
 
 : (present-effect) ( vector -- list )
-    vector>list [ value-class ] map ;
+    >list [ value-class ] map ;
 
 : present-effect ( [[ d-in meta-d ]] -- [ in-types out-types ] )
     #! After inference is finished, collect information.
@@ -119,7 +119,7 @@ M: computed literal-value ( value -- )
 
 : simple-effect ( [[ d-in meta-d ]] -- [[ in# out# ]] )
     #! After inference is finished, collect information.
-    uncons vector-length >r vector-length r> cons ;
+    uncons length >r length r> cons ;
 
 : init-inference ( recursive-state -- )
     init-interpreter
@@ -174,14 +174,14 @@ M: object apply-object apply-literal ;
 
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
-    meta-r get vector-length 0 = [
+    meta-r get length 0 = [
         "Word leaves elements on return stack" inference-error
     ] unless ;
 
 : values-node ( op -- )
     #! Add a #values or #return node to the graph.
     f swap dataflow, [
-        meta-d get vector>list node-consume-d set
+        meta-d get >list node-consume-d set
     ] bind ;
 
 : (infer) ( quot -- )

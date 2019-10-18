@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: math
 USE: parser
 USE: strings

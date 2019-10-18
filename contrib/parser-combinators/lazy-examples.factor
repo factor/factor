@@ -28,17 +28,21 @@ USE: lists
 USE: combinators
 USE: kernel
 USE: logic
+USE: sequences
+USE: namespaces
 
 : lfrom ( n -- llist )
   #! Return a lazy list of increasing numbers starting
   #! from the initial value 'n'.
-  dup [ succ lfrom ] curry1 lcons ;
-
+  dup unit delay swap
+  [ 1 + lfrom ] cons delay lcons ;
+  
 : lfrom-by ( n quot -- llist )
   #! Return a lazy list of values starting from n, with
   #! each successive value being the result of applying quot to
   #! n.
-  dupd [ dup [ call ] dip lfrom-by ] curry2 lcons ;
+  swap dup unit delay -rot 
+  [ , dup , \ call , , \ lfrom-by , ] make-list delay lcons ;
 
 : lnaturals 0 lfrom ;
 : lpositves 1 lfrom ;
@@ -56,8 +60,9 @@ USE: logic
 : sieve ( llist - llist )
   #! Given a lazy list of numbers, use the sieve of eratosthenes
   #! algorithm to return a lazy list of primes.
-  luncons over [ divisible-by? not ] curry1 lsubset [ sieve ] curry1 lcons ;
+  luncons over [ divisible-by? not ] 
+  cons lsubset [ sieve ] cons delay >r unit delay r> lcons ;
 
 : lprimes 2 lfrom sieve ;
 
-: first-ten-primes 10 lprimes ltake ;
+: first-ten-primes 10 lprimes ltake llist>list ;

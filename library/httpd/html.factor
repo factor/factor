@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
-USING: lists kernel namespaces stdio streams strings unparser
-url-encoding presentation generic ;
+USING: generic kernel lists namespaces presentation sequences
+stdio streams strings unparser http ;
 
 : html-entities ( -- alist )
     [
@@ -18,10 +18,14 @@ url-encoding presentation generic ;
 
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
-    [ dup html-entities assoc dup rot ? ] string-map ;
+    [
+        [
+            dup html-entities assoc [ % ] [ , ] ?ifte
+        ] seq-each
+    ] make-string ;
 
 : >hex-color ( triplet -- hex )
-    [ >hex 2 "0" pad ] map "#" swons cat ;
+    [ CHAR: # , [ >hex 2 CHAR: 0 pad % ] each ] make-string ;
 
 : fg-css, ( color -- )
     "color: " , >hex-color , "; " , ;
@@ -71,20 +75,19 @@ url-encoding presentation generic ;
     [ "/" , resolve-file-link url-encode , ] make-string ;
 
 : file-link-tag ( style quot -- )
-    over "file-link" swap assoc [
+    over "file" swap assoc [
         <a href= file-link-href a> call </a>
     ] [
         call
     ] ifte* ;
 
 : browser-link-href ( style -- href )
-    dup "browser-link-word" swap assoc url-encode
-    swap "browser-link-vocab" swap assoc url-encode
-    "responder" get url-encode
-    [ "/responder/" , , "/?vocab=" , , "&word=" , , ] make-string ;
+    dup "word" swap assoc url-encode
+    swap "vocab" swap assoc url-encode
+    [ "/responder/browser/?vocab=" , , "&word=" , , ] make-string ;
 
 : browser-link-tag ( style quot -- style )
-    over "browser-link-word" swap assoc [
+    over "word" swap assoc [
         <a href= over browser-link-href a> call </a>
     ] [
         call
@@ -103,7 +106,7 @@ url-encoding presentation generic ;
 TUPLE: html-stream ;
 
 M: html-stream stream-write-attr ( str style stream -- )
-    wrapper-stream-scope [
+    [
         [
             [
                 [
@@ -111,7 +114,7 @@ M: html-stream stream-write-attr ( str style stream -- )
                 ] file-link-tag
             ] icon-tag
         ] browser-link-tag
-    ] bind ;
+    ] with-wrapper ;
 
 C: html-stream ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream
@@ -119,14 +122,16 @@ C: html-stream ( stream -- stream )
     #! written, and supports writing attributed strings with
     #! the following attributes:
     #!
-    #! link - an object path
     #! fg - an rgb triplet in a list
     #! bg - an rgb triplet in a list
     #! bold
     #! italics
     #! underline
     #! size
-    #! link - an object path
+    #! icon
+    #! file
+    #! word
+    #! vocab
     [ >r <wrapper-stream> r> set-delegate ] keep ;
 
 : with-html-stream ( quot -- )

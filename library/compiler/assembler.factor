@@ -8,10 +8,14 @@ SYMBOL: interned-literals
 : cell 4 ; inline
 : compiled-header HEX: 01c3babe ; inline
 
-: compiled-byte ( a -- n ) <alien> 0 alien-1 ; inline
-: set-compiled-byte ( n a -- ) <alien> 0 set-alien-1 ; inline
-: compiled-cell ( a -- n ) <alien> 0 alien-cell ; inline
-: set-compiled-cell ( n a -- ) <alien> 0 set-alien-cell ; inline
+: compiled-byte ( a -- n )
+    <alien> 0 alien-signed-1 ; inline
+: set-compiled-byte ( n a -- )
+    <alien> 0 set-alien-signed-1 ; inline
+: compiled-cell ( a -- n )
+    <alien> 0 alien-signed-cell ; inline
+: set-compiled-cell ( n a -- )
+    <alien> 0 set-alien-signed-cell ; inline
 
 : compile-aligned ( n -- )
     compiled-offset cell 2 * align set-compiled-offset ; inline

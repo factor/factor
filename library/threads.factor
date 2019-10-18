@@ -2,7 +2,7 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: threads
-USING: io-internals kernel kernel-internals lists namespaces ;
+USING: errors kernel kernel-internals lists namespaces ;
  
 ! Core of the multitasker. Used by io-internals.factor and
 ! in-thread.factor.
@@ -18,25 +18,16 @@ USING: io-internals kernel kernel-internals lists namespaces ;
         deque set-run-queue
     ] ifte ;
 
-: schedule-thread ( quot -- ) run-queue enque set-run-queue ;
+: schedule-thread ( quot -- )
+    run-queue enque set-run-queue ;
 
-: (yield) ( -- )
-    #! If there is a quotation in the run queue, call it,
-    #! otherwise wait for I/O. The currently executing
-    #! continuation is suspended. Use yield instead.
-    next-thread [
-        call
-    ] [
-        next-io-task [
-            call
-        ] [
-            (yield)
-        ] ifte*
-    ] ifte* ;
+: stop ( -- )
+    #! Stop the current thread and begin executing the next one.
+    next-thread [ call ] [ "No more tasks" throw ] ifte* ;
 
 : yield ( -- )
     #! Add the current continuation to the run queue, and yield
     #! to the next quotation. The current continuation will
-    #! eventually be restored by a future call to (yield) or
+    #! eventually be restored by a future call to stop or
     #! yield.
-    [ schedule-thread (yield) ] callcc0 ;
+    [ schedule-thread stop ] callcc0 ;

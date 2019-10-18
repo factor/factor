@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel-internals
 USING: words parser kernel namespaces lists strings math
-hashtables errors vectors ;
+hashtables errors sequences vectors ;
 
 ! Tuples are really arrays in the runtime, but with a different
 ! type number. The layout is as follows:
@@ -18,11 +18,20 @@ hashtables errors vectors ;
     #! specifying an incorrect size.
     <tuple> [ 0 swap set-array-nth ] keep ;
 
-: tuple-class 2 slot ; inline
+: class-tuple 2 slot ; inline
+
+! A sequence of all slots in a tuple, used for equality testing.
+TUPLE: tuple-seq tuple ;
+
+M: tuple-seq nth ( n tuple-seq -- elt )
+    tuple-seq-tuple array-nth ;
+
+M: tuple-seq length ( tuple-seq -- len )
+    tuple-seq-tuple array-capacity ;
 
 IN: generic
 
-BUILTIN: tuple 18 [ 1 array-capacity f ] ;
+BUILTIN: tuple 18 [ 1 length f ] ;
 
 ! So far, only tuples can have delegates, which also must be
 ! tuples (the UI uses numbers as delegates in a couple of places
@@ -31,18 +40,16 @@ GENERIC: delegate
 GENERIC: set-delegate
 
 M: object delegate drop f ;
-M: tuple delegate 3 slot ;
 
-M: object set-delegate 2drop ;
+M: tuple delegate 3 slot ;
 M: tuple set-delegate 3 set-slot ;
 
-#! arrayed objects can be passed to array-capacity,
-#! array-nth, and set-array-nth.
+#! arrayed objects can be passed to array-nth, and set-array-nth
 UNION: arrayed array tuple ;
 
 : class ( obj -- class )
     #! The class of an object.
-    dup tuple? [ tuple-class ] [ type builtin-type ] ifte ;
+    dup tuple? [ class-tuple ] [ type builtin-type ] ifte ;
 
 : (literal-tuple) ( list size -- tuple )
     dup <tuple> swap [
@@ -75,21 +82,22 @@ UNION: arrayed array tuple ;
     ] ifte ;
 
 : tuple-slots ( tuple slots -- )
+    2dup "slot-names" set-word-prop
     2dup length 2 + "tuple-size" set-word-prop
     4 -rot simple-slots ;
 
-: constructor-word ( word -- word )
-    word-name "<" swap ">" cat3 create-in ;
+: constructor-word ( string -- word )
+    "<" swap ">" append3 create-in ;
 
 : define-constructor ( word def -- )
-    >r [ constructor-word ] keep [
+    >r [ word-name constructor-word ] keep [
         dup literal, "tuple-size" word-prop , \ make-tuple ,
     ] make-list r> append define-compound ;
 
 : default-constructor ( tuple -- )
     dup [
         "slots" word-prop
-        reverse [ last unit , \ keep , ] each
+        reverse [ peek unit , \ keep , ] each
     ] make-list define-constructor ;
 
 : define-tuple ( tuple slots -- )
@@ -117,7 +125,7 @@ UNION: arrayed array tuple ;
 : (hash>quot) ( default hash -- quot )
     [
         \ dup , \ hashcode , dup bucket-count , \ rem ,
-        buckets>list [ alist>quot ] map-with list>vector ,
+        buckets>list [ alist>quot ] map-with >vector ,
         \ dispatch ,
     ] make-list ;
 
@@ -148,15 +156,27 @@ UNION: arrayed array tuple ;
         ] ifte
     ] ifte ;
 
+: tuple-methods ( generic -- hash )
+    #! A hashtable of methods on tuples.
+    "methods" word-prop [ car metaclass tuple = ] hash-subset ;
+
 : tuple-dispatch-quot ( generic -- quot )
     #! Generate a quotation that performs tuple class dispatch
     #! for methods defined on the given generic.
     dup default-tuple-method \ drop swons
-    swap "methods" word-prop hash>quot
-    [ dup tuple-class ] swap append ;
+    swap tuple-methods hash>quot
+    [ dup class-tuple ] swap append ;
 
 : add-tuple-dispatch ( word vtable -- )
     >r tuple-dispatch-quot tuple r> set-vtable ;
+
+: tuple>list ( tuple -- list )
+    #! We have to type check here, since <tuple-seq> is unsafe.
+    dup tuple? [
+        <tuple-seq> >list
+    ] [
+        "Not a tuple" throw
+    ] ifte ;
 
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
@@ -167,27 +187,24 @@ M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.
     clone-tuple dup delegate clone over set-delegate ;
 
-: tuple>list ( tuple -- list )
-    dup array-capacity swap array>list ;
-
-M: tuple = ( obj tuple -- ? )
-    over tuple? [
-        over class over class = [
-            swap tuple>list swap tuple>list =
-        ] [
-            2drop f
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
 M: tuple hashcode ( vec -- n )
     #! If the capacity is two, then all we have is the class
     #! slot and delegate.
-    dup array-capacity 2 number= [
+    dup length 2 number= [
         drop 0
     ] [
-        2 swap array-nth hashcode
+        2 swap nth hashcode
+    ] ifte ;
+
+M: tuple = ( obj tuple -- ? )
+    2dup eq? [
+        2drop t
+    ] [
+        over tuple? [
+            swap <tuple-seq> swap <tuple-seq> sequence=
+        ] [
+            2drop f
+        ] ifte
     ] ifte ;
 
 tuple [
@@ -202,3 +219,5 @@ tuple [
 tuple 10 "priority" set-word-prop
 
 tuple [ 2drop t ] "class<" set-word-prop
+
+PREDICATE: word tuple-class metaclass tuple = ;

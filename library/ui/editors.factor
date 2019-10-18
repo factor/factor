@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math namespaces sdl line-editor
-strings ;
+USING: generic kernel line-editor lists math namespaces sdl
+sequences strings ;
 
 ! An editor gadget wraps a line editor object and passes
 ! gestures to the line editor.
@@ -28,7 +28,7 @@ TUPLE: editor line caret ;
 
 : run-char-widths ( str -- wlist )
     #! List of x co-ordinates of each character.
-    0 swap string>list
+    0 swap >list
     [ ch>string shape-w [ + dup ] keep 2 /i - ] map nip ;
 
 : (x>offset) ( n x wlist -- offset )
@@ -70,7 +70,7 @@ TUPLE: editor line caret ;
     dup red background set-paint-prop ;
 
 C: editor ( text -- )
-    0 0 0 0 <line> <gadget> over set-delegate
+    <empty-gadget> over set-delegate
     [ <line-editor> swap set-editor-line ] keep
     [ <caret> swap set-editor-caret ] keep
     [ set-editor-text ] keep
@@ -85,18 +85,16 @@ C: editor ( text -- )
 : caret-size ( editor -- w h )
     1 swap shape-h ;
 
-M: editor user-input* ( ch field -- ? )
+M: editor user-input* ( ch editor -- ? )
     [ [ insert-char ] with-editor ] keep
     scroll>bottom  t ;
 
-M: editor layout* ( field -- )
-    dup [ editor-text shape-size ] keep resize-gadget
+M: editor pref-size ( editor -- w h )
+    editor-text shape-size >r 1 + r> ;
+
+M: editor layout* ( editor -- )
     dup editor-caret over caret-size rot resize-gadget
     dup editor-caret swap caret-pos rot move-gadget ;
 
-M: editor draw-shape ( label -- )
+M: editor draw-shape ( editor -- )
     dup [ editor-text draw-shape ] with-trans ;
-
-: <field> ( text -- field )
-    #! A field is just a stand-alone editor with a border.
-    <editor> line-border ;

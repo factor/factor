@@ -3,8 +3,9 @@
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USING: syntax errors generic hashtables kernel lists
-math namespaces parser strings words vectors unparse ;
+USING: alien errors generic hashtables kernel lists math
+namespaces parser sequences strings syntax unparse vectors
+words ;
 
 : parsing ( -- )
     #! Mark the most recently defined word to execute at parse
@@ -41,7 +42,7 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 
 ! Vectors
 : { f ; parsing
-: } reverse list>vector swons ; parsing
+: } reverse >vector swons ; parsing
 
 ! Hashtables
 : {{ f ; parsing
@@ -51,13 +52,10 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 : << f ; parsing
 : >> reverse literal-tuple swons ; parsing
 
-! Complex numbers
-: #{ f ; parsing
-: }# 2unlist swap rect> swons ; parsing
-
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word swons ; parsing
 
+! Word definitions
 : :
     #! Begin a word definition. Word name follows.
     CREATE [ define-compound ] [ ] "in-definition" on ; parsing
@@ -77,42 +75,56 @@ BUILTIN: f 9 ;  : f f swons ; parsing
     scan-word unit swons  \ car swons ; parsing
 
 ! Vocabularies
+: PRIMITIVE:
+    #! This is just for show. All flash no substance.
+    "You cannot define primitives in Factor" throw ; parsing
+
 : DEFER:
     #! Create a word with no definition. Used for mutually
     #! recursive words.
     CREATE drop ; parsing
 
-: FORGET: scan-word forget ; parsing
+: FORGET:
+    #! Followed by a word name. The word is removed from its
+    #! vocabulary. Note that specifying an undefined word is a
+    #! no-op.
+    scan "use" get search [ forget ] when* ; parsing
 
 : USE:
     #! Add vocabulary to search path.
-    scan "use" cons@ ; parsing
+    scan use+ ; parsing
 
 : USING:
     #! A list of vocabularies terminated with ;
     string-mode on
-    [ string-mode off [ "use" cons@ ] each ]
+    [ string-mode off [ use+ ] each ]
     f ; parsing
 
 : IN:
     #! Set vocabulary for new definitions.
-    scan dup "use" cons@ "in" set ; parsing
+    scan dup use+ "in" set ; parsing
 
 ! Char literal
 : CHAR: ( -- ) 0 scan next-char drop swons ; parsing
 
 ! String literal
-: parse-string ( n str -- n )
+: (parse-string) ( n str -- n )
     2dup string-nth CHAR: " = [
         drop 1 +
     ] [
-        [ next-char swap , ] keep parse-string
+        [ next-char swap , ] keep (parse-string)
     ] ifte ;
 
-: "
+: parse-string ( -- str )
+    #! Read a string from the input stream, until it is
+    #! terminated by a ".
     "col" [
-        "line" get [ parse-string ] make-string swap
-    ] change swons ; parsing
+        [ "line" get (parse-string) ] make-string swap
+    ] change ;
+
+: " parse-string swons ; parsing
+
+: SBUF" skip-blank parse-string >sbuf swons ; parsing
 
 ! Comments
 : (
@@ -126,14 +138,3 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 : #!
     #! Documentation comment.
     until-eol parsed-documentation ; parsing
-
-! Reading numbers in other bases
-
-: (BASE) ( base -- )
-    #! Read a number in a specific base.
-    scan swap base> swons ;
-
-: HEX: 16 (BASE) ; parsing
-: DEC: 10 (BASE) ; parsing
-: OCT: 8 (BASE) ; parsing
-: BIN: 2 (BASE) ; parsing

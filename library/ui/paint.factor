@@ -9,7 +9,7 @@ stdio strings ;
 SYMBOL: clip
 
 : intersect* ( gadget rect quot -- t1 t2 )
-    call >r >r max r> r> min 2dup > [ drop dup ] when ;
+    call >r >r max r> r> min 2dup > [ drop dup ] when ; inline
 
 : intersect-x ( gadget rect -- x1 x2 )
     [
@@ -63,6 +63,7 @@ SYMBOL: clip
     #! All drawing done inside draw-shape is done with the
     #! gadget's paint. If the gadget does not have any custom
     #! paint, just call the quotation.
+    f over set-gadget-redraw?
     dup gadget-paint [
         dup [
             [

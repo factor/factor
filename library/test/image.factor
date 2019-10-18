@@ -28,7 +28,7 @@ USE: math
 
 [
     boot-quot off
-    "/library/bootstrap/boot.factor" run-resource
+    "/library/bootstrap/boot-stage1.factor" run-resource
 ] with-image drop
 
 [ fixnum ] [ 4 class ] unit-test

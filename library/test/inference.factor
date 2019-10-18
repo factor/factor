@@ -1,15 +1,6 @@
-IN: scratchpad
-USE: test
-USE: inference
-USE: math
-USE: vectors
-USE: kernel
-USE: lists
-USE: namespaces
-USE: parser
-USE: kernel
-USE: math-internals
-USE: generic
+IN: temporary
+USING: generic inference kernel lists math math-internals
+namespaces parser sequences test vectors ;
 
 ! [ [ [ object object ] f ] ]
 ! [ [ [ object ] [ object object ] ] [ [ object ] f ] decompose ]
@@ -39,7 +30,7 @@ USE: generic
 [ [ call ] infer old-effect ] unit-test-fails
 
 [ [[ 2 4 ]] ] [ [ 2dup ] infer old-effect ] unit-test
-[ [[ 2 0 ]] ] [ [ vector-push ] infer old-effect ] unit-test
+[ [[ 2 0 ]] ] [ [ push ] infer old-effect ] unit-test
 
 [ [[ 1 0 ]] ] [ [ [ ] [ ] ifte ] infer old-effect ] unit-test
 [ [ ifte ] infer old-effect ] unit-test-fails
@@ -157,7 +148,7 @@ SYMBOL: sym-test
 [ [[ 0 1 ]] ] [ [ sym-test ] infer old-effect ] unit-test
 
 
-[ [[ 2 0 ]] ] [ [ set-vector-length ] infer old-effect ] unit-test
+[ [[ 2 0 ]] ] [ [ set-length ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ 2list ] infer old-effect ] unit-test
 [ [[ 3 1 ]] ] [ [ 3list ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ append ] infer old-effect ] unit-test
@@ -165,14 +156,13 @@ SYMBOL: sym-test
 [ [[ 1 2 ]] ] [ [ uncons ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ unit ] infer old-effect ] unit-test
 [ [[ 1 2 ]] ] [ [ unswons ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ last* ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ last ] infer old-effect ] unit-test
+[ [[ 1 1 ]] ] [ [ peek ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ list? ] infer old-effect ] unit-test
 
 [ [[ 1 1 ]] ] [ [ length ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ reverse ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ contains? ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ tree-contains? ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ remove ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ prune ] infer old-effect ] unit-test
 

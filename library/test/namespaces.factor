@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: kernel
 USE: namespaces
 USE: test

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USING: kernel lists test ;
 
 [ [ 1 2 3 4 5 ] ] [

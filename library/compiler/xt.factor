@@ -2,40 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
 USING: assembler errors generic kernel lists math namespaces
-prettyprint strings vectors words ;
-
-! To support saving compiled code to disk, generator words
-! append relocation instructions to this vector.
-SYMBOL: relocation-table
-
-: rel, ( n -- ) relocation-table get vector-push ;
-
-: relocating compiled-offset cell - rel, ;
-
-: rel-primitive ( word rel/abs -- )
-    #! If flag is true; relative.
-    0 1 ? rel, relocating word-primitive rel, ;
-
-: rel-dlsym ( name dll rel/abs -- )
-    #! If flag is true; relative.
-    2 3 ? rel, relocating cons intern-literal rel, ;
-
-: rel-address ( rel/abs -- )
-    #! Relocate address just compiled. If flag is true,
-    #! relative, and there is nothing to do.
-    [ 4 rel, relocating 0 rel, ] unless ;
-
-: rel-word ( word rel/abs -- )
-    #! If flag is true; relative.
-    over primitive? [ rel-primitive ] [ nip rel-address ] ifte ;
-
-! PowerPC relocations
-
-: rel-primitive-16/16 ( word -- )
-    5 rel, relocating word-primitive rel, ;
-
-: rel-address-16/16 ( -- )
-    6 rel, relocating 0 rel, ;
+prettyprint sequences strings vectors words ;
 
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word
@@ -87,7 +54,9 @@ C: relative ( word -- )
     [ just-compiled swap set-relative-where ] keep
     [ compiled-offset swap set-relative-to ] keep ;
 
-: relative ( word -- ) <relative> deferred-xts cons@ ;
+: deferred-xt deferred-xts [ cons ] change ;
+
+: relative ( word -- ) <relative> deferred-xt ;
 
 : relative-fixup ( relative -- addr )
     dup relative-word compiled-xt swap relative-to - ;
@@ -102,7 +71,7 @@ C: absolute ( word -- )
     [ just-compiled swap set-absolute-where ] keep ;
 
 : absolute ( word -- )
-    dup f rel-word <absolute> deferred-xts cons@ ;
+    dup f rel-word <absolute> deferred-xt ;
 
 : >absolute dup absolute-word compiled-xt swap absolute-where ;
 
@@ -120,11 +89,11 @@ C: relative-bitfld ( word mask -- )
 
 : relative-24 ( word -- )
     BIN: 11111111111111111111111100 <relative-bitfld>
-    deferred-xts cons@ ;
+    deferred-xt ;
 
 : relative-14 ( word -- )
     BIN: 1111111111111100 <relative-bitfld>
-    deferred-xts cons@ ;
+    deferred-xt ;
 
 : or-compiled ( n off -- )
     [ compiled-cell bitor ] keep set-compiled-cell ;
@@ -146,8 +115,7 @@ C: absolute-16/16 ( word -- )
 
 M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
 
-: absolute-16/16 ( word -- )
-    <absolute-16/16> deferred-xts cons@ ;
+: absolute-16/16 ( word -- ) <absolute-16/16> deferred-xt ;
 
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
@@ -169,4 +137,8 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
     [ call  fixup-xts  commit-xts ] with-scope ;
 
 : postpone-word ( word -- )
-    dup compiling? [ drop ] [ compile-words unique@ ] ifte ;
+    dup compiling? [
+        drop
+    ] [
+        compile-words [ unique ] change
+    ] ifte ;

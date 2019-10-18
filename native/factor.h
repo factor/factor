@@ -80,18 +80,14 @@ typedef signed long long s64;
 	#include <sys/mman.h>
 	#include <sys/param.h>
 	#include <sys/types.h>
-	#include <sys/socket.h>
 	#include <sys/stat.h>
-	#include <netinet/in.h>
-	#include <arpa/inet.h>
 	#include <unistd.h>
 	#include <sys/time.h>
-	#include <netdb.h>
 #endif
 
-#if defined(FFI) && !defined(WIN32)
+#if !defined(WIN32)
 #include <dlfcn.h>
-#endif /* FFI */
+#endif
 
 #define INLINE inline static
 
@@ -109,11 +105,6 @@ typedef signed long long s64;
 
 /* must always be 8 bits */
 typedef unsigned char BYTE;
-
-/* Memory areas */
-#define DEFAULT_ARENA (16 * 1024 * 1024)
-#define COMPILE_ZONE_SIZE (8 * 1024 * 1024)
-#define STACK_SIZE (2 * 1024 * 1024)
 
 #include "memory.h"
 #include "error.h"
@@ -136,12 +127,8 @@ typedef unsigned char BYTE;
 #include "string.h"
 #include "misc.h"
 #include "sbuf.h"
-#include "port.h"
 #include "io.h"
-#include "read.h"
-#include "write.h"
 #include "file.h"
-#include "socket.h"
 #include "image.h"
 #include "primitives.h"
 #include "vector.h"
@@ -149,7 +136,8 @@ typedef unsigned char BYTE;
 #include "stack.h"
 #include "compiler.h"
 #include "relocate.h"
-#include "ffi.h"
+#include "alien.h"
+#include "dll.h"
 #include "debug.h"
 
 #endif /* __FACTOR_H__ */

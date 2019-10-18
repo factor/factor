@@ -6,7 +6,7 @@ USING: generic kernel math namespaces ;
 ! A tile is a gadget with a caption. Dragging the caption
 ! moves the gadget. The title bar also has buttons for
 ! performing various actions.
-TUPLE: tile original ( size ) ;
+TUPLE: tile original ;
 
 : click-rel ( gadget -- point )
     screen-pos
@@ -33,7 +33,7 @@ TUPLE: tile original ( size ) ;
 : close-tile [ close-tile ] swap handle-gesture drop ;
 
 : <close-box> ( -- gadget )
-    <check> line-border dup [ close-tile ] button-actions ;
+    <check> line-border dup [ close-tile ] button-gestures ;
 
 : caption-content ( text -- gadget )
     1/2 10 0 <shelf>
@@ -74,3 +74,7 @@ C: tile ( child caption -- tile )
     dup delegate pref-size pick resize-gadget ;
 
 M: tile pref-size shape-size ;
+
+: tile ( gadget title -- )
+    #! Show the gadget in a new tile.
+    <tile> world get add-gadget ;

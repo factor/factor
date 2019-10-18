@@ -2,7 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors generic interpreter kernel kernel-internals
-lists math namespaces strings vectors words stdio prettyprint ;
+lists math namespaces strings vectors words sequences
+stdio prettyprint ;
 
 : fast-slot? ( -- ? )
     #! If the slot number is literal and the object's type is
@@ -12,7 +13,7 @@ lists math namespaces strings vectors words stdio prettyprint ;
     peek-next-d value-class builtin-supertypes length 1 = and ;
 
 : fast-slot ( -- )
-    dataflow-drop, pop-d literal-value
+    pop-literal
     peek-d value-class builtin-supertypes cons
     \ slot [ [ object ] [ object ] ] (consume/produce) ;
 

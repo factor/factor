@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: listener
-USING: errors kernel lists math memory namespaces parser stdio
-strings presentation words unparser vectors ansi ;
+USING: errors kernel lists math memory namespaces parser
+sequences stdio strings presentation words unparser vectors ansi ;
 
 SYMBOL: cont-prompt
 SYMBOL: listener-prompt
@@ -18,7 +18,7 @@ global [
     ! Print the space without a style, to workaround a bug in
     ! the GUI listener where the style from the prompt carries
     ! over to the input
-    " " write flush ;
+    bl flush ;
 
 : bye ( -- )
     #! Exit the current listener.
@@ -40,7 +40,7 @@ global [
 : read-multiline ( -- quot ? )
     #! Keep parsing until the end is reached. Flag indicates
     #! EOF.
-    f depth (read-multiline) >r reverse r> ;
+    [ f depth (read-multiline) >r reverse r> ] with-parser ;
 
 : listen ( -- )
     #! Wait for user input, and execute.

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
-USING: errors hashtables kernel lists namespaces parser strings
-words vectors ;
+USING: errors hashtables kernel lists namespaces parser
+sequences strings words vectors ;
 
 ! Union metaclass for dispatch on multiple classes.
 SYMBOL: union
@@ -18,15 +18,17 @@ union [
     "members" word-prop [ >r 3dup r> add-method ] each 3drop
 ] "add-method" set-word-prop
 
-union 30 "priority" set-word-prop
+union 55 "priority" set-word-prop
 
-union [ 2drop t ] "class<" set-word-prop
+union [
+    swap builtin-supertypes swap builtin-supertypes contained?
+] "class<" set-word-prop
 
 : union-predicate ( definition -- list )
     [
         [
             \ dup ,
-            unswons "predicate" word-prop append,
+            unswons "predicate" word-prop %
             [ drop t ] ,
             union-predicate ,
             \ ifte ,
@@ -48,3 +50,5 @@ union [ 2drop t ] "class<" set-word-prop
     [ union-predicate define-compound ] keep
     dupd "members" set-word-prop
     union define-class ;
+
+PREDICATE: word union metaclass union = ;

@@ -19,5 +19,5 @@ DEFER: inspect
     [ button-down 1 ] set-action ;
 
 : <presentation> ( obj -- gadget )
-    dup unparse [ drop ] <roll-button>
+    dup unparse f <roll-button>
     [ swap  presentation-actions ] keep ;

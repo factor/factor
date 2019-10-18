@@ -51,7 +51,7 @@ CELL copy_object_impl(CELL pointer)
 	gc_debug("copy_object",pointer);
 	newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
 		object_size(pointer));
-	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
+	put(UNTAG(pointer),RETAG(newpointer,OBJECT_TYPE));
 
 	return newpointer;
 }
@@ -76,14 +76,11 @@ INLINE void collect_object(CELL scan)
 	case SBUF_TYPE:
 		collect_sbuf((F_SBUF*)scan);
 		break;
-	case PORT_TYPE:
-		collect_port((F_PORT*)scan);
-		break;
-	case ALIEN_TYPE:
-		collect_alien((ALIEN*)scan);
-		break;
 	case DLL_TYPE:
 		collect_dll((DLL*)scan);
+		break;
+	case DISPLACED_ALIEN_TYPE:
+		collect_displaced_alien((DISPLACED_ALIEN*)scan);
 		break;
 	}
 }
@@ -124,7 +121,6 @@ void primitive_gc(void)
 	flip_zones();
 	scan = active.base;
 	collect_roots();
-	collect_io_tasks();
 	/* collect literal objects referenced from compiled code */
 	collect_literals();
 	

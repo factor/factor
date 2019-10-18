@@ -110,7 +110,6 @@ public class FactorReader
 	//{{{ unparseObject() method
 	public static String unparseObject(Object obj)
 	{
-		// this is for string representations of lists and stacks
 		if(obj == null || obj.equals(Boolean.FALSE))
 			return "f";
 		else if(obj.equals(Boolean.TRUE))
@@ -123,8 +122,9 @@ public class FactorReader
 		}
 		else if(obj instanceof String)
 			return '"' + charsToEscapes((String)obj) + '"';
-		else if(obj instanceof Number
-			|| obj instanceof FactorExternalizable)
+		else if(obj instanceof StringBuffer)
+			return "SBUF\" " + charsToEscapes(obj.toString()) + '"';
+		else if(obj instanceof Number || obj instanceof FactorExternalizable)
 			return obj.toString();
 		else if(obj instanceof Character)
 		{
@@ -167,8 +167,8 @@ public class FactorReader
 		pushState(toplevel,null);
 		topState = (ParseState)states.car;
 		this.alwaysDocComments = alwaysDocComments;
-		this.in = DefaultVocabularyLookup.DEFAULT_IN;
-		this.use = DefaultVocabularyLookup.DEFAULT_USE;
+		this.in = VocabularyLookup.DEFAULT_IN;
+		this.use = VocabularyLookup.DEFAULT_USE;
 	} //}}}
 
 	//{{{ getScanner() method

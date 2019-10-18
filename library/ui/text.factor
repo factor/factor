@@ -1,8 +1,8 @@
 ! Strings are shapes too. This is somewhat of a hack and strings
 ! do not have x/y co-ordinates.
 IN: gadgets
-USING: alien hashtables kernel lists namespaces sdl streams
-strings ;
+USING: alien hashtables kernel lists namespaces sdl sequences
+streams strings ;
 
 SYMBOL: fonts
 
@@ -52,11 +52,11 @@ global [
 
 : filter-nulls ( str -- str )
     "\0" over string-contains? [
-        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] string-map
+        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] seq-map
     ] when ;
 
 : size-string ( font text -- w h )
-    >r lookup-font r> filter-nulls dup string-length 0 = [
+    >r lookup-font r> filter-nulls dup empty? [
         drop TTF_FontHeight 0 swap
     ] [
         <int-box> <int-box> [ TTF_SizeUNICODE drop ] 2keep
@@ -75,7 +75,7 @@ M: string shape-h ( text -- h )
     drop font get lookup-font TTF_FontHeight ;
 
 M: string draw-shape ( text -- )
-    dup string-length 0 = [
+    dup empty? [
         drop
     ] [
         filter-nulls font get lookup-font swap

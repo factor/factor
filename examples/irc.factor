@@ -1,16 +1,8 @@
 ! A simple IRC client written in Factor.
 
 IN: irc
-USE: generic
-USE: stdio
-USE: namespaces
-USE: streams
-USE: kernel
-USE: threads
-USE: lists
-USE: strings
-USE: words
-USE: math
+USING: kernel lists math namespaces stdio streams strings
+threads words ;
 
 SYMBOL: irc-stream
 SYMBOL: channels
@@ -78,7 +70,7 @@ M: privmsg irc-display ( line -- )
     channel get [ (msg) ] [ "No channel." print ] ifte* ;
 
 : talk ( input -- ) "/" ?string-head [ command ] [ say ] ifte ;
-: talk-loop ( -- ) read [ talk talk-loop ] when* ;
+: talk-loop ( -- ) read-line [ talk talk-loop ] when* ;
 
 : irc ( nick server -- )
     [

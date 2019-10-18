@@ -1,10 +1,11 @@
-IN: scratchpad
+IN: temporary
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
 USE: test
 USE: strings
+USE: sequences
 
 [ [ [ 3 2 1 ] [ 5 4 3 ] [ 6 ] ] ]
 [ [ 1 2 3 ] [ 3 4 5 ] [ 6 ] 3list [ reverse ] map ] unit-test
@@ -27,12 +28,6 @@ USE: strings
 [ t ] [ [ ] all=? ] unit-test
 [ t ] [ [ 1/2 ] all=? ] unit-test
 [ t ] [ [ 1.0 10/10 1 ] all=? ] unit-test
-
-[ 5 ] [ [ 5 ] [ < ] top ] unit-test
-[ 5 ] [ [ 5 6 ] [ < ] top ] unit-test
-[ 6 ] [ [ 5 6 ] [ > ] top ] unit-test
-[ 99 ] [ 100 count [ > ] top ] unit-test
-[ 0 ] [ 100 count [ < ] top ] unit-test
 
 [ f ] [ [ ] [ ] some? ] unit-test
 [ t ] [ [ 1 ] [ ] some? >boolean ] unit-test

@@ -14,37 +14,30 @@ M: object = eq? ;
 
 GENERIC: clone ( obj -- obj )
 M: object clone ;
-
-: cpu ( -- arch )
-    #! Returns one of "x86", "ppc", or "unknown".
-    7 getenv ;
-
-: os ( -- arch )
-    #! Returns one of "unix" or "win32".
-    11 getenv ;
-
 : set-boot ( quot -- )
     #! Set the boot quotation.
     8 setenv ;
 
 : num-types ( -- n )
     #! One more than the maximum value from type primitive.
-    19 ;
+    21 ;
 
 : ? ( cond t f -- t/f )
     #! Push t if cond is true, otherwise push f.
     rot [ drop ] [ nip ] ifte ; inline
 
 : >boolean t f ? ; inline
+: not ( a -- ~a ) f t ? ; inline
 
 : and ( a b -- a&b ) f ? ; inline
-: not ( a -- ~a ) f t ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
 : xor ( a b -- a^b ) dup not swap ? ; inline
+: implies ( a b -- a->b ) t ? ; inline
 
-IN: alien
-
-! See compiler/alien.factor for the rest; this needs to be here
-! since primitive stack effects involve alien inputs/outputs.
-BUILTIN: dll   15 ;
-BUILTIN: alien 16 ;
+: cpu ( -- arch ) 7 getenv ;
+: os ( -- os ) 11 getenv ;
+: win32? ( -- ? ) os "win32" = ;
+: unix? ( -- ? )
+    os "freebsd" =
+    os "linux" = or
+    os "macosx" = or ;

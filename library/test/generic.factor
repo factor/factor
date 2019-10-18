@@ -1,4 +1,6 @@
-IN: scratchpad
+IN: temporary
+USING: parser prettyprint sequences stdio unparser ;
+
 USE: hashtables
 USE: namespaces
 USE: generic
@@ -118,3 +120,40 @@ TUPLE: another-one ;
 
 [ "Hi" ] [ <for-arguments-sake> empty-method-test empty-method-test ] unit-test
 [ << another-one f >> ] [ <another-one> empty-method-test ] unit-test
+
+! Test generic see and parsing
+[ "IN: temporary\nSYMBOL: bah \nUNION: bah fixnum alien ;\n" ]
+[ [ \ bah see ] with-string ] unit-test
+
+[ t ] [
+    DEFER: not-fixnum
+    "IN: temporary\nSYMBOL: not-fixnum \nCOMPLEMENT: not-fixnum fixnum\n"
+    dup eval
+    [ \ not-fixnum see ] with-string =
+] unit-test
+
+! Weird bug
+GENERIC: stack-underflow
+M: object stack-underflow 2drop ;
+M: word stack-underflow 2drop ;
+
+GENERIC: testing
+M: cons testing 2 ;
+M: f testing 3 ;
+M: sequence testing 4 ;
+[ [ 1 2 ] 2 ] [ [ 1 2 ] testing ] unit-test
+
+! Bootstrap hashing
+[ f ] [ \ f \ unparse "methods" word-prop hash not ] unit-test
+
+GENERIC: union-containment
+M: integer union-containment drop 1 ;
+M: number union-containment drop 2 ;
+
+[ 1 ] [ 1 union-containment ] unit-test
+[ 2 ] [ 1.0 union-containment ] unit-test
+
+! Testing recovery from bad method definitions
+"GENERIC: unhappy" eval
+[ "M: vocabularies unhappy ;" eval ] unit-test-fails
+[ ] [ "GENERIC: unhappy" eval ] unit-test

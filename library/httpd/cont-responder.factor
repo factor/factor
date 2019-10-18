@@ -21,9 +21,9 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: cont-responder
-USING: stdio httpd httpd-responder math random namespaces streams
-       lists strings kernel html url-encoding unparser hashtables
-       parser generic ;
+USING: stdio http httpd math random namespaces streams
+       lists strings kernel html unparser hashtables
+       parser generic sequences ;
 
 #! Used inside the session state of responders to indicate whether the
 #! next request should use the post-refresh-get pattern. It is set to
@@ -40,7 +40,7 @@ SYMBOL: post-refresh-get?
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  [ 32 [ random-digit unparse , ] times ] make-string str>number 36 >base ;
+  [ 32 [ 0 9 random-int unparse , ] times ] make-string str>number 36 >base ;
 
 #! Name of variable holding the table of continuations.
 SYMBOL: table 
@@ -109,15 +109,10 @@ TUPLE: item expire? quot id time-added ;
   #! a certain period of time if 'expire?' is true.  
   get-random-id -rot pick continuation-item over continuation-table set-hash ;
   
-: append* ( lists -- list )
-  #! Given a list of lists, append the lists together
-  #! and return the concatenated list.
-  f swap [ append ] each ;
-  
 : register-continuation* ( expire? quots -- id ) 
   #! Like register-continuation but registers a quotation 
   #! that will call all quotations in the list, in the order given.
-  append* register-continuation ;
+  concat register-continuation ;
 
 : get-continuation-item ( id -- <item> )
   #! Get the continuation item associated with the id.
@@ -199,11 +194,6 @@ SYMBOL: callback-cc
     store-callback-cc
   ] callcc0 ;
 
-: with-string-stream ( quot -- string ) 
-  #! Call the quotation with standard output bound to a string output
-  #! stream. Return the string on exit.
-  1024 <string-output> dup >r swap with-stream r> stream>str ;
-
 : forward-to-url ( url -- )
   #! When executed inside a 'show' call, this will force a
   #! HTTP 302 to occur to instruct the browser to forward to
@@ -242,7 +232,7 @@ SYMBOL: callback-cc
   store-callback-cc  redirect-to-here 
   [ 
     expirable register-continuation id>url swap 
-    \ serving-html swons with-string-stream call-exit-continuation
+    \ serving-html swons with-string call-exit-continuation
   ] callcc1 
   nip ;
 
@@ -254,7 +244,7 @@ SYMBOL: callback-cc
   #! use is an optimisation to save having to generate and save a continuation
   #! in that special case.
   store-callback-cc  redirect-to-here 
-  \ serving-html swons with-string-stream call-exit-continuation ;
+  \ serving-html swons with-string call-exit-continuation ;
 
 #! Name of variable for holding initial continuation id that starts
 #! the responder.

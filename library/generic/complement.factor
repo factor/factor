@@ -3,7 +3,7 @@
 
 IN: generic
 USING: errors hashtables kernel lists math parser strings
-vectors words ;
+sequences vectors words ;
 
 ! Complement metaclass, contains all objects not in a certain class.
 SYMBOL: complement
@@ -39,3 +39,5 @@ complement [
     2dup "complement" set-word-prop
     dupd complement-predicate "predicate" set-word-prop
     complement define-class ;
+
+PREDICATE: word complement metaclass complement = ;

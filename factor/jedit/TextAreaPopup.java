@@ -72,7 +72,7 @@ public class TextAreaPopup extends JWindow
 		int caret = textArea.getCaretPosition()
 			- textArea.getLineStartOffset(line);
 		int start = FactorPlugin.getWordStartOffset(lineText,caret);
-		Point loc = textArea.offsetToXY(line,start);
+		Point loc = textArea.offsetToXY(line,start,new Point(0,0));
 		loc.y += textArea.getPainter().getFontMetrics().getHeight();
 		SwingUtilities.convertPointToScreen(loc,textArea.getPainter());
 		setLocation(loc);

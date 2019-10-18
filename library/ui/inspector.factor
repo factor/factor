@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: errors gadgets generic hashtables kernel kernel-internals
-lists namespaces strings unparser vectors words ;
+lists namespaces sequences strings unparser vectors words ;
 
 : label-box ( list -- gadget )
     0 0 0 <pile> swap [ <presentation> over add-gadget ] each ;
@@ -51,10 +51,10 @@ M: list custom-sheet ( list -- gadget )
     [ length count ] keep zip alist>sheet "Elements:" <titled> ;
 
 M: array custom-sheet ( array -- gadget )
-    [ array-capacity ] keep array>list custom-sheet ;
+    >list custom-sheet ;
 
 M: vector custom-sheet ( array -- gadget )
-    vector>list custom-sheet ;
+    >list custom-sheet ;
 
 M: hashtable custom-sheet ( array -- gadget )
     hash>alist sort-sheet alist>sheet "Entries:" <titled> ;

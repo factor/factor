@@ -1,16 +1,14 @@
-IN: scratchpad
+IN: temporary
 USE: errors
 USE: kernel
 USE: math
 USE: namespaces
 USE: strings
 USE: test
+USE: sequences
+USE: lists
 
-[ f ] [ "A string." f-or-"" ] unit-test
-[ t ] [ "" f-or-"" ] unit-test
-[ t ] [ f f-or-"" ] unit-test
-
-[ "abc" ] [ [ "a" "b" "c" ] cat ] unit-test
+[ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] make-string ] unit-test
 
 [ "abc" ] [ "ab" "c" cat2 ] unit-test
 [ "abc" ] [ "a" "b" "c" cat3 ] unit-test
@@ -31,6 +29,8 @@ USE: test
 [ f ] [ "actore" "Factor" string-contains? ] unit-test
 
 [ "end" ] [ 14 "Beginning and end" string-tail ] unit-test
+
+[ "" 10 string/ ] unit-test-fails
 
 [ "Beginning" " and end" ] [ "Beginning and end" 9 string/ ] unit-test
 
@@ -80,15 +80,17 @@ unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"
-    [ LETTER? [ 1 + ] when ] string-each
+    [ LETTER? [ 1 + ] when ] seq-each
 ] unit-test
 
 [ "Replacing+spaces+with+plus" ]
 [
     "Replacing spaces with plus"
-    [ dup CHAR: \s = [ drop CHAR: + ] when ] string-map
+    [ dup CHAR: \s = [ drop CHAR: + ] when ] seq-map
 ]
 unit-test
 
-[ "05" ] [ "5" 2 "0" pad ] unit-test
-[ "666" ] [ "666" 2 "0" pad ] unit-test
+[ "05" ] [ "5" 2 CHAR: 0 pad ] unit-test
+[ "666" ] [ "666" 2 CHAR: 0 pad ] unit-test
+
+[ 1 "" nth ] unit-test-fails

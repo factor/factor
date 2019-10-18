@@ -46,6 +46,7 @@ public class EndCons extends FactorParsingDefinition
 		Cons list = reader.popState(start,word).first;
 		if(Cons.length(list) != 2)
 			reader.getScanner().error("Exactly two objects must be between [[ and ]]");
-		reader.append(new Cons(list.car,list.next().car));
+		else
+			reader.append(new Cons(list.car,list.next().car));
 	}
 }

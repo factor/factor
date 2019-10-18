@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: errors generic hashtables kernel lists math namespaces
-sdl ;
+sdl sequences ;
 
 ! A shelf is a box that lays out its contents horizontally.
 TUPLE: shelf gap align fill ;

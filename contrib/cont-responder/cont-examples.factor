@@ -34,6 +34,7 @@ USE: math
 USE: namespaces
 USE: prettyprint
 USE: unparser
+USE: sequences
 
 : display-page ( title -- ) 
   #! Display a page with some text to test the cont-responder.
@@ -66,7 +67,7 @@ USE: unparser
 
 : test-cont-responder2 ( - )
   #! Test the cont-responder responder by displaying a few pages in a loop.
-  [ "one" "two" "three" "four" ] [ display-page [ .s ] with-string-stream display-page ]  each 
+  [ "one" "two" "three" "four" ] [ display-page [ .s ] with-string display-page ]  each 
   "Done!" display-page  ;
 
 : test-cont-responder3 ( - )
@@ -78,7 +79,7 @@ USE: unparser
     "Menu" [ 
       <ol> 
         <li> "Test responder1" [ test-cont-responder ] quot-href </li>
-        <li> "Test responder2" [ [ .s ] with-string-stream display-page test-cont-responder2 [ .s ] with-string-stream display-page ] quot-href </li>
+        <li> "Test responder2" [ [ .s ] with-string display-page test-cont-responder2 [ .s ] with-string display-page ] quot-href </li>
       </ol>
     ] html-document 
   ] show drop ;

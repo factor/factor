@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: files kernel lists namespaces parser streams stdio
-strings unparser words ;
+USING: files kernel lists namespaces parser sequences stdio
+streams strings unparser words ;
 
 : jedit-server-file ( -- path )
     "jedit-server-file" get
@@ -26,7 +26,7 @@ strings unparser words ;
 : send-jedit-request ( request -- )
     jedit-server-info swap "localhost" swap <client> [
         write-big-endian-32
-        dup string-length write-big-endian-16
+        dup length write-big-endian-16
         write flush
     ] with-stream ;
 

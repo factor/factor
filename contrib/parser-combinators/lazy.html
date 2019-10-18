@@ -9,14 +9,22 @@
     ability to describe infinite structures, and to delay execution of
     expressions until they are actually used.</p>
 <p>Lazy lists, like normal lists, are composed of a head and tail. In
-    a lazy list the tail is something called a 'promise'. To convert a
+    a lazy list the head and tail are something called a 'promise'. 
+    To convert a
     'promise' into its actual value a word called 'force' is used. To
     convert a value into a 'promise' the word to use is 'delay'.</p>
+<table border="1">
+<tr><td><a href="#delay">delay</a></td></tr>
+<tr><td><a href="#force">force</a></td></tr>
+</table>
+
 <p>Many of the lazy list words are named similar to the standard list
     words but with an 'l' suffixed to it. Here are the commonly used
     words and their equivalent list operation:</p>
 <table border="1">
 <tr><th>Lazy List</th><th>Normal List</th></tr>
+<tr><td><a href="#lnil">lnil</a></td><td>[ ]</td></tr>
+<tr><td><a href="#lnilp">lnil?</a></td><td>Test for nil value</td></tr>
 <tr><td><a href="#lcons">lcons</a></td><td>cons</td></tr>
 <tr><td><a href="#lunit">lunit</a></td><td>unit</td></tr>
 <tr><td><a href="#lcar">lcar</a></td><td>car</td></tr>
@@ -38,47 +46,122 @@ list.</td></tr>
 <tr><td><a href="#list>llist">list>llist</a></td><td>Given a normal list, return a lazy list
 that contains the same elements as the normal list.</td></tr>
 </table>
-<p>A couple of helper functions are also provided by the lazy
-vocabulary.</p>
-<table border="1">
-<tr><td>curry1</td><td>Given a value and a quotation, returns a new
-quotation that when called will have the value on the stack.</td></tr>
-<tr><td>curry2</td><td>Given two values and a quotation, returns a new
-quotation that when called will have the two values on the
-stack.</td></tr>
-</table>
 <h2>Reference</h2>
+<!-- delay description -->
+<a name="delay">
+<h3>delay ( quot -- &lt;promise&gt; )</h3>
+<p>'delay' is used to convert a value or expression into a promise.
+   The word 'force' is used to convert that promise back to its
+   value, or to force evaluation of the expression to return a value.
+</p>
+<p>The value on the stack that 'delay' expects must be quoted. This is
+   a requirement to prevent it from being evaluated.
+</p>
+<pre class="code">
+  ( 1 ) [ 42 ] <a href="#delay">delay</a> dup .
+       => &lt;&lt; promise [ ] [ 42 ] [ ] [ ] &gt;&gt;
+  ( 2 ) <a href="#force">force</a> .
+       => 42
+</pre>
+
+<!-- force description -->
+<a name="force">
+<h3>force ( &lt;promise&gt; -- value )</h3>
+<p>'force' will evaluate a promises original expression
+   and leave the value of that expression on the stack.
+</p>
+<p>A promise can be forced multiple times but the expression
+   is only evaluated once. Future calls of 'force' on the promise
+   will returned the cached value of the original force. If the
+   expression contains side effects, such as i/o, then that i/o
+   will only occur on the first 'force'. See below for an example
+   (steps 3-5).
+</p>
+<p>If a promise is itself delayed, a force will evaluate all promises
+   until a value is returned. Due to this behaviour it is generally not
+   possible to delay a promise. The example below shows what happens
+   in this case.
+</p>
+<pre class="code">       
+  ( 1 ) [ 42 ] <a href="#delay">delay</a> dup .
+       => &lt;&lt; promise [ ] [ 42 ] [ ] [ ] &gt;&gt;
+  ( 2 ) <a href="#force">force</a> .
+       => 42
+       
+        #! Multiple forces on a promise returns cached value
+  ( 3 ) [ "hello" print 42 ] <a href="#delay">delay</a> dup .
+       => << promise [ ] [ "hello" print 42 ] [ ] [ ] >>
+  ( 4 ) dup <a href="#force">force</a> .
+       => hello
+          42
+  ( 5 ) <a href="#force">force</a> .
+       => 42
+
+        #! Forcing a delayed promise cascades up to return
+        #! original value, rather than the promise.
+  ( 6 ) [ [ 42 ] <a href="#delay">delay</a> ] <a href="#delay">delay</a> dup .
+       => << promise [ ] [ [ 42 ] delay ] [ ] [ ] >>
+  ( 7 ) <a href="#force">force</a> .
+       => 42
+</pre>
+
+<!-- lnil description -->
+<a name="lnil">
+<h3>lnil ( -- lcons )</h3>
+<p>Returns a value representing the empty lazy list.</p>
+<pre class="code">
+  ( 1 ) <a href="#lnil">lnil</a> .
+       => << promise [ ] [ [ ] ] t [ ] >>
+</pre>
+
+<!-- lnil description -->
+<a name="lnilp">
+<h3>lnil? ( lcons -- bool )</h3>
+<p>Returns true if the given lazy cons is the value representing 
+   the empty lazy list.</p>
+<pre class="code">
+  ( 1 ) <a href="#lnil">lnil</a> <a href="#lnilp">lnil?</a> .
+       => t
+  ( 2 ) [ 1 ] <a href="#list2llist">list&gt;llist</a> dup <a href="#lnilp">lnil?</a> .
+       => [ ]
+  ( 3 ) <a href="#lcdr">lcdr</a> <a href="#lnilp">lnil?</a> .
+       => t
+</pre>
+
 <!-- lcons description -->
 <a name="lcons">
-<h3>lcons ( value promise -- lcons )</h3>
-<p>Provides the same effect as 'cons' does for normal lists. It
-creates a cons cell where the first element is the value given and the
-second element is a promise.</p>
-<a name="promise">
-<p>A promise is either a value that has had 'force' called on it, or
-a quotation that when 'call' is applied to it, returns the actual
-value.</p>
+<h3>lcons ( car-promise cdr-promise -- lcons )</h3>
+<p>Provides the same effect as 'cons' does for normal lists. 
+   Both values provided must be promises (ie. expressions that have
+   had <a href="#delay">delay</a> called on them).
+</p>
+<p>As the car and cdr passed on the stack are promises, they are not
+   evaluated until <a href="#lcar">lcar</a> or <a href="#lcdr">lcdr</a>
+   are called on the lazy cons.</p>
 <pre class="code">
-  ( 1 ) 5 6 delay <a href="#lcons">lcons</a> dup .
-       => [ 5 6 ]
+  ( 1 ) [ "car" ] <a href="#delay">delay</a> [ "cdr" ] <a href="#delay">delay</a> <a href="#lcons">lcons</a> dup .
+       => &lt;&lt; promise ... &gt;&gt;
   ( 2 ) dup <a href="#lcar">lcar</a> .
-       => 5
+       => "car"
   ( 3 ) dup <a href="#lcdr">lcdr</a> .
-       => 6
+       => "cdr"
 </pre>
   
 <!-- lunit description -->
 <a name="lunit">
-<h3>lunit ( value -- llist )</h3>
+<h3>lunit ( value-promise -- llist )</h3>
 <p>Provides the same effect as 'unit' does for normal lists. It
 creates a lazy list where the first element is the value given.</p>
+<p>Like <a href="#lcons">lcons</a>, the value on the stack must be
+   a promise and is not evaluated until the <a href="#lcar">lcar</a>
+   of the list is requested.</a>
 <pre class="code">
-  ( 1 ) 42 <a href="#lunit">lunit</a> dup .
-       => [ 42 f ]
+  ( 1 ) [ 42 ] <a href="#delay">delay</a> <a href="#lunit">lunit</a> dup .
+       => &lt;&lt; promise ... &gt;&gt;
   ( 2 ) dup <a href="#lcar">lcar</a> .
        => 42
-  ( 3 ) dup <a href="#lcdr">lcdr</a> .
-       => f
+  ( 3 ) dup <a href="#lcdr">lcdr</a> <a href="#lnilp">lnil?</a> .
+       => t
   ( 4 ) [ . ] <a href="#leach">leach</a>
        => 42
 </pre>
@@ -87,10 +170,11 @@ creates a lazy list where the first element is the value given.</p>
 <a name="lcar">
 <h3>lcar ( lcons -- value )</h3>
 <p>Provides the same effect as 'car' does for normal lists. It
-returns the first element in a lazy cons cell.</p>
+returns the first element in a lazy cons cell. This will force
+the evaluation of that element.</p>
 <pre class="code">
-  ( 1 ) 42 <a href="#lunit">lunit</a> dup .
-       => [ 42 f ]
+  ( 1 ) [ 42 ] <a href="#delay">delay</a> <a href="#lunit">lunit</a> dup .
+       => &lt;&lt; promise ... &gt;&gt;
   ( 2 ) <a href="#lcar">lcar</a> .
        => 42
 </pre>
@@ -102,15 +186,15 @@ returns the first element in a lazy cons cell.</p>
 returns the second element in a lazy cons cell and forces it. This
 causes that element to be evaluated immediately.</p>
 <pre class="code">
-  ( 1 ) 5 [ 5 6 + ] <a href="#lcons">lcons</a> dup .
-       => [ 5 5 6 + ]
+  ( 1 ) [ 1 ] <a href="#delay">delay</a> [ 5 6 + ] <a href="#delay">delay</a> <a href="#lcons">lcons</a> dup .
+       => &lt;&lt; promise ... &gt;&gt;
   ( 2 ) <a href="#lcdr">lcdr</a> .
        => 11
 </pre>
 
 <pre class="code">
-  ( 1 ) 5 lfrom dup .
-       => [ 5 5 succ lfrom ]
+  ( 1 ) 5 <a href="#lfrom">lfrom</a> dup .
+       => &lt;&lt; promise ... &gt;&gt;
   ( 2 ) <a href="#lcdr">lcdr</a> dup <a href="#lcar">lcar</a> .
        => 6
   ( 3 ) <a href="#lcdr">lcdr</a> dup <a href="#lcar">lcar</a> .
@@ -126,8 +210,8 @@ causes that element to be evaluated immediately.</p>
 returns the nth value in the lazy list. It causes all the values up to
 'n' to be evaluated.</p>
 <pre class="code">
-  ( 1 ) 1 lfrom 
-       => [ 1 1 succ lfrom ]
+  ( 1 ) 1 <a href="#lfrom">lfrom</a> dup .
+       => &lt;&lt; promise ... &gt;&gt;
   ( 2 ) 5 swap <a href="#lnth">lnth</a> .
        => 6
 </pre>
@@ -136,32 +220,31 @@ returns the nth value in the lazy list. It causes all the values up to
 <a name="luncons">
 <h3>luncons ( lcons -- car cdr )</h3>
 <p>Provides the same effect as 'uncons' does for normal lists. It
-returns the car and cdr of the lazy list. Note that cdr is forced
-resulting in it being evaluated.</p>
+returns the car and cdr of the lazy list.</p>
 <pre class="code">
-  ( 1 ) 5 [ 6 ] <a href="#lcons">lcons</a> dup .
-       => [ 5 6 ]
-  ( 2 ) <a href="#luncons">luncons</a> .s
-       => { 5 6 }
+  ( 1 ) [ 5 ] <a href="#delay">delay</a> [ 6 ] <a  href="#delay">delay</a> <a href="#lcons">lcons</a> dup .
+       => &lt;&lt; promise ... &gt;&gt;
+  ( 2 ) <a href="#luncons">luncons</a> . .
+       => 6
+          5
 </pre>
 
 <!-- lmap description -->
 <a name="lmap">
 <h3>lmap ( llist quot -- llist )</h3>
-<p>Provides the same effect as 'map' does for normal lists. It
-lazily maps over a lazy list applying the quotation to each element.
+<p>Lazily maps over a lazy list applying the quotation to each element.
 A new lazy list is returned which contains the results of the
 quotation.</p>
-<p>When initially called <a href="#lmap">lmap</a> will only call quot on the first element
-of the list. It then constructs a lazy list that performs the
-next '<a href="#lmap">lmap</a>' operation on the next element when it is evaluated. This
-allows mapping over infinite lists.</p>
+<p>When intially called nothing in the original lazy list is
+evaluated. Only when <a href="#lcar">lcar</a> is called will the item
+in the list be evaluated and applied to the quotation. Ditto with <a
+href="#lcdr">lcdr</a>, thus allowing infinite lists to be mapped over.</p>
 <pre class="code">
-  ( 1 ) 1 lfrom 
+  ( 1 ) 1 <a href="#lfrom">lfrom</a>
        => < infinite list of incrementing numbers >
   ( 2 ) [ 2 * ] <a href="#lmap">lmap</a>
        => < infinite list of numbers incrementing by 2 >
-  ( 3 ) 5 swap <a href="#ltake">ltake</a> .
+  ( 3 ) 5 swap <a href="#ltake">ltake</a> <a  href="#llist2list">llist&gt;list</a> .
        => [ 2 4 6 8 10 ]
 </pre>
 
@@ -174,17 +257,15 @@ element. If that quotation returns true, the element will be included
 in the resulting lazy list. If it is false, the element will be skipped.
 A new lazy list is returned which contains  all elements where the
 predicate returned true.</p>
-<p>When initially called <a href="#lsubset">lsubset</a> will only call
-the predicate quotation on the first element
-of the list. It then constructs a lazy list that performs the
-next '<a href="#lsubset">lsubset</a>' operation on the next element when it is evaluated. This
-allows subsetting over infinite lists.</p>
+<p>Like <a href="#lmap">lmap</a>, when initially called no evaluation
+will occur. A lazy list is returned that when values are retrieved
+from in then items are evaluated and checked against the predicate.</p>
 <pre class="code">
-  ( 1 ) 1 lfrom 
+  ( 1 ) 1 <a href="#lfrom">lfrom</a>
        => < infinite list of incrementing numbers >
-  ( 2 ) [ prime? ] <a href="#lsubset">lsubset</a>
+  ( 2 ) [ <a href="#primep">prime?</a> ] <a href="#lsubset">lsubset</a>
        => < infinite list of prime numbers >
-  ( 3 ) 5 swap <a href="#ltake">ltake</a> .
+  ( 3 ) 5 swap <a href="#ltake">ltake</a> <a  href="#llist2list">llist&gt;list</a> .
        => [ 2 3 5 7 11 ]
 </pre>
 
@@ -196,7 +277,7 @@ lazily iterates over a lazy list applying the quotation to each
 element. If this operation is applied to an infinite list it will
 never return unless the quotation escapes out by calling a continuation.</p>
 <pre class="code">
-  ( 1 ) 1 lfrom 
+  ( 1 ) 1 <a href="#lfrom">lfrom</a>
        => < infinite list of incrementing numbers >
   ( 2 ) [ 2 mod 1 = ] <a href="#lsubset">lsubset</a>
        => < infinite list of odd numbers >
@@ -210,13 +291,13 @@ never return unless the quotation escapes out by calling a continuation.</p>
 
 <!-- ltake description -->
 <a name="ltake">
-<h3>ltake ( n llist -- list )</h3>
+<h3>ltake ( n llist -- llist )</h3>
 <p>Iterates over the lazy list 'n' times, appending each element to a
-normal list. The normal list is returned. This provides a convenient
-way of getting elements out of a lazy list.</p>
+lazy list. This provides a convenient way of getting elements out of
+an infinite lazy list.</p>
 <pre class="code">
-  ( 1 ) : ones 1 [ ones ] <a href="#lcons">lcons</a> ;
-  ( 2 ) 5 ones <a href="#ltake">ltake</a>
+  ( 1 ) : ones [ 1 ] delay [ ones ] delay <a href="#lcons">lcons</a> ;
+  ( 2 ) 5 ones <a href="#ltake">ltake</a> <a  href="#llist2list">llist&gt;list</a> .
        => [ 1 1 1 1 1  ]
 </pre>
 
@@ -227,7 +308,7 @@ way of getting elements out of a lazy list.</p>
 lazily on iteration rather than immediately so it works very fast no
 matter how large the list.</p>
 <pre class="code">
-  ( 1 ) [ 1 2 3 ] <a href="#list>llist">list>llist</a> [ 4 5 6 ] <a href="#list>llist">list>llist</a> <a href="#lappend">lappend</a>
+  ( 1 ) [ 1 2 3 ] <a href="#list2llist">list&gt;llist</a> [ 4 5 6 ] <a href="#list2llist">list&gt;llist</a> <a href="#lappend">lappend</a>
   ( 2 ) [ . ] <a href="#leach">leach</a>
        => 1
           2
@@ -244,10 +325,10 @@ matter how large the list.</p>
 lazy fashion. The actual appending is done lazily on iteration rather
 than immediately so it works very fast no matter how large the lists.</p>
 <pre class="code">
-  ( 1 ) [ 1 2 3 ] <a href="#list>llist">list>llist</a> 
-  ( 2 ) [ 4 5 6 ] <a href="#list>llist">list>llist</a> 
-  ( 3 ) [ 7 8 9 ] <a href="#list>llist">list>llist</a>
-  ( 4 ) 3list <a href="#list>llist">list>llist</a> <a href="#lappendstar">lappend*</a>
+  ( 1 ) [ 1 2 3 ] <a href="#list2>llist">list&gt;llist</a> 
+  ( 2 ) [ 4 5 6 ] <a href="#list2llist">list&gt;llist</a> 
+  ( 3 ) [ 7 8 9 ] <a href="#list2llist">list&gt;llist</a>
+  ( 4 ) 3list <a href="#list2llist">list&gt;llist</a> <a href="#lappendstar">lappend*</a>
   ( 5 ) [ . ] <a href="#leach">leach</a>
        => 1
           2
@@ -261,12 +342,12 @@ than immediately so it works very fast no matter how large the lists.</p>
 </pre>
 
 <!-- list>llist description -->
-<a name="list>llist">
-<h3>list>llist ( list  -- llist )</h3>
+<a name="list2llist">
+<h3>list&gt;llist ( list  -- llist )</h3>
 <p>Converts a normal list into a lazy list. This is done lazily so the
 initial list is not iterated through immediately.</p>
 <pre class="code">
-  ( 1 ) [ 1 2 3 ] <a href="#list>llist">list>llist</a> 
+  ( 1 ) [ 1 2 3 ] <a href="#list2llist">list&gt;llist</a> 
   ( 2 ) [ . ] <a href="#leach">leach</a>
        => 1
           2

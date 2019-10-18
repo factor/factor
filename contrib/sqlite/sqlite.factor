@@ -35,6 +35,7 @@ USE: compiler
 USE: errors
 USE: strings
 USE: namespaces
+USE: sequences
 
 BEGIN-STRUCT: sqlite3
 END-STRUCT
@@ -172,7 +173,7 @@ END-STRUCT
   #! Prepare a SQL statement. Returns the statement which
   #! can have values bound to parameters or simply executed.
   #! TODO: Support multiple statements in the SQL string.
-  dup string-length <sqlite3-stmt-indirect> dup >r 
+  dup length <sqlite3-stmt-indirect> dup >r 
   <char*-indirect> sqlite3_prepare sqlite-check-result
   r> sqlite3-stmt-indirect-pointer ;
     
@@ -218,7 +219,7 @@ END-STRUCT
   over sqlite3_step step-complete? [ 
     2drop
   ] [
-    2dup 2slip sqlite-each
+    [ call ] 2keep sqlite-each
   ] ifte ;
 
 ! For comparison, here is the linrec implementation of sqlite-each

@@ -2,18 +2,17 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors generic interpreter kernel lists math namespaces
-strings vectors words hashtables prettyprint ;
+sequences strings vectors words hashtables prettyprint ;
 
 : longest-vector ( list -- length )
-    [ vector-length ] map [ > ] top ;
+    0 swap [ length max ] each ;
 
 : computed-value-vector ( n -- vector )
     [ drop object <computed> ] vector-project ;
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
-    [ vector-length - computed-value-vector ] keep
-    vector-append ;
+    [ length - computed-value-vector ] keep append ;
 
 : unify-lengths ( list -- list )
     #! Pad all vectors to the same length. If one vector is
@@ -31,19 +30,19 @@ strings vectors words hashtables prettyprint ;
 
 : vector-transpose ( list -- vector )
     #! Turn a list of same-length vectors into a vector of lists.
-    dup car vector-length [
-        over [ vector-nth ] map-with
+    dup car length [
+        over [ nth ] map-with
     ] vector-project nip ;
 
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths vector-transpose [ unify-results ] vector-map ; 
+    unify-lengths vector-transpose [ unify-results ] seq-map ; 
 
 : balanced? ( list -- ? )
     #! Check if a list of [[ instack outstack ]] pairs is
     #! balanced.
-    [ uncons vector-length swap vector-length - ] map all=? ;
+    [ uncons length swap length - ] map all=? ;
 
 : unify-effect ( list -- in out )
     #! Unify a list of [[ instack outstack ]] pairs.
@@ -83,17 +82,17 @@ SYMBOL: cloned
         dup clone [ swap cloned [ acons ] change ] keep
     ] ?ifte ;
 
-: deep-clone-vector ( vector -- vector )
-    #! Clone a vector of vectors.
-    [ deep-clone ] vector-map ;
+: deep-clone-seq ( seq -- seq )
+    #! Clone a sequence and each object it contains.
+    [ deep-clone ] seq-map ;
 
 : copy-inference ( -- )
     #! We avoid cloning the same object more than once in order
     #! to preserve identity structure.
     cloned off
-    meta-r [ deep-clone-vector ] change
-    meta-d [ deep-clone-vector ] change
-    d-in [ deep-clone-vector ] change
+    meta-r [ deep-clone-seq ] change
+    meta-d [ deep-clone-seq ] change
+    d-in [ deep-clone-seq ] change
     dataflow-graph off ;
 
 : infer-branch ( value -- namespace )
@@ -156,7 +155,7 @@ SYMBOL: cloned
     over [
         >r
         dupd cons
-        recursive-state cons@
+        recursive-state [ cons ] change
         r> call
     ] (with-block) ;
 
@@ -213,7 +212,7 @@ SYMBOL: cloned
 \ ifte [ infer-ifte ] "infer" set-word-prop
 
 : vtable>list ( value -- list )
-    dup value-recursion swap literal-value vector>list
+    dup value-recursion swap literal-value >list
     [ over <literal> ] map nip ;
 
 : <dispatch-index> ( value -- value )
@@ -227,9 +226,9 @@ SYMBOL: cloned
 USE: kernel-internals
 
 : static-dispatch ( vtable -- )
-    >r dataflow-drop, pop-d literal-value r>
+    >r pop-literal r>
     dup literal-value swap value-recursion
-    >r vector-nth r> <literal> infer-quot-value ;
+    >r nth r> <literal> infer-quot-value ;
 
 : dynamic-dispatch ( vtable -- )
     >r 1 meta-d get vector-tail* \ dispatch r>

@@ -1,8 +1,9 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: errors generic hashtables kernel lists math namespaces
-parser presentation stdio streams strings unparser vectors words ;
+USING: alien errors generic hashtables kernel lists math
+matrices memory namespaces parser presentation sequences stdio
+streams strings unparser vectors words ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line
@@ -24,18 +25,19 @@ M: object prettyprint* ( indent obj -- indent )
 
 : word-actions ( -- list )
     [
-        [[ "See"     "see"     ]]
-        [[ "Push"    ""        ]]
-        [[ "Execute" "execute" ]]
-        [[ "jEdit"   "jedit"   ]]
-        [[ "Usages"  "usages." ]]
+        [[ "See"        "see"          ]]
+        [[ "Push"       ""             ]]
+        [[ "Execute"    "execute"      ]]
+        [[ "jEdit"      "jedit"        ]]
+        [[ "Usages"     "usages ."     ]]
+        [[ "Implements" "implements ." ]]
     ] ;
 
 : browser-attrs ( word -- style )
     #! Return the style values for the HTML word browser
     dup word-vocabulary [ 
-        swap word-name "browser-link-word" swons 
-        swap "browser-link-vocab" swons 
+        swap word-name "word" swons 
+        swap "vocab" swons 
         2list
     ] [
         drop [ ]  
@@ -51,31 +53,47 @@ M: object prettyprint* ( indent obj -- indent )
         drop [ ]
     ] ifte ;
 
-: prettyprint-word ( word -- )
-    dup word-name swap word-attrs write-attr ;
+: word. ( word -- ) dup word-name swap word-attrs write-attr ;
 
 M: word prettyprint* ( indent word -- indent )
-    dup parsing? [
-        \ POSTPONE: prettyprint-word " " write
-    ] when
-    prettyprint-word ;
+    dup parsing? [ \ POSTPONE: word. bl ] when word. ;
 
 : indent ( indent -- )
     #! Print the given number of spaces.
-    " " fill write ;
+    CHAR: \s fill write ;
 
 : prettyprint-newline ( indent -- )
     "\n" write indent ;
 
+: \? ( list -- ? )
+    #! Is the head of the list a [ foo ] car?
+    dup car dup cons? [
+        cdr [ drop f ] [ cdr car \ car = ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
 : prettyprint-elements ( indent list -- indent )
-    [ prettyprint* " " write ] each ;
+    [
+        dup \? [
+            \ \ word. bl
+            uncons >r car prettyprint* bl
+            r> cdr prettyprint-elements
+        ] [
+            uncons >r prettyprint* bl
+            r> prettyprint-elements
+        ] ifte
+    ] when* ;
+
+: ?prettyprint-newline ( indent -- )
+    one-line get [
+        bl drop
+    ] [
+        prettyprint-newline
+    ] ifte ;
 
 : <prettyprint ( indent -- indent )
-    tab-size get + one-line get [
-        " " write
-    ] [
-        dup prettyprint-newline
-    ] ifte ;
+    tab-size get + dup ?prettyprint-newline ;
 
 : prettyprint> ( indent -- indent )
     tab-size get - one-line get
@@ -100,14 +118,11 @@ M: word prettyprint* ( indent word -- indent )
     #! or { }, or << >>. The body of the list is indented,
     #! unless the list is empty.
     over [
-        >r
-        >r prettyprint-word <prettyprint
+        >r >r word. <prettyprint
         r> prettyprint-elements
-        prettyprint> r> prettyprint-word
+        prettyprint> r> word.
     ] [
-        >r >r prettyprint-word " " write
-        r> drop
-        r> prettyprint-word
+        >r >r word. bl r> drop r> word.
     ] ifte ;
 
 M: list prettyprint* ( indent list -- indent )
@@ -123,7 +138,7 @@ M: cons prettyprint* ( indent cons -- indent )
 
 M: vector prettyprint* ( indent vector -- indent )
     [
-        \ { swap vector>list \ } prettyprint-sequence
+        \ { swap >list \ } prettyprint-sequence
     ] check-recursion ;
 
 M: hashtable prettyprint* ( indent hashtable -- indent )
@@ -135,6 +150,18 @@ M: tuple prettyprint* ( indent tuple -- indent )
     [
         \ << swap tuple>list \ >> prettyprint-sequence
     ] check-recursion ;
+
+M: alien prettyprint* ( alien -- str )
+    \ ALIEN: word. bl alien-address unparse write ;
+
+: matrix-rows. ( indent list -- indent )
+    uncons >r [ one-line on prettyprint* ] with-scope r>
+    [ over ?prettyprint-newline matrix-rows. ] when* ;
+
+M: matrix prettyprint* ( indent obj -- indent )
+    \ M[ word. >r <prettyprint r>
+    row-list matrix-rows.
+    bl \ ]M word. prettyprint> ;
 
 : prettyprint ( obj -- )
     [
@@ -152,18 +179,14 @@ M: tuple prettyprint* ( indent tuple -- indent )
         prettyprint
     ] with-scope ;
 
-: [.] ( list -- )
+: [.] ( sequence -- )
     #! Unparse each element on its own line.
-    [ . ] each ;
+    [ . ] seq-each ;
 
-: {.} ( vector -- )
-    #! Unparse each element on its own line.
-    vector>list reverse [ . ] each ;
-
-: .s datastack  {.} ;
-: .r callstack  {.} ;
-: .n namestack  [.] ;
-: .c catchstack [.] ;
+: .s datastack  reverse [.] flush ;
+: .r callstack  reverse [.] flush ;
+: .n namestack  [.] flush ;
+: .c catchstack [.] flush ;
 
 ! For integers only
 : .b >bin print ;
