@@ -321,13 +321,13 @@ ERROR: bad-small-ifd-type n ;
     {
         { 1 [ ] } ! blank
         { 2 [ ] } ! read c strings here
-        { 3 [ 2 <sliced-groups> [ endian> ] map ] }
-        { 4 [ 4 <sliced-groups> [ endian> ] map ] }
-        { 5 [ 8 <sliced-groups> [ "II" unpack first2 / ] map ] }
+        { 3 [ 2 <groups> [ endian> ] map ] }
+        { 4 [ 4 <groups> [ endian> ] map ] }
+        { 5 [ 8 <groups> [ "II" unpack first2 / ] map ] }
         { 6 [ [ 8 >signed ] map ] }
         { 7 [ ] } ! blank
-        { 8 [ 2 <sliced-groups> [ endian> 16 >signed ] map ] }
-        { 9 [ 4 <sliced-groups> [ endian> 32 >signed ] map ] }
+        { 8 [ 2 <groups> [ endian> 16 >signed ] map ] }
+        { 9 [ 4 <groups> [ endian> 32 >signed ] map ] }
         { 10 [ 8 group [ "ii" unpack first2 / ] map ] }
         { 11 [ 4 group [ "f" unpack ] map ] }
         { 12 [ 8 group [ "d" unpack ] map ] }
@@ -560,7 +560,7 @@ ERROR: unknown-component-order ifd ;
     [ process-tif-ifds ] with-tiff-endianness ;
 
 ! tiff files can store several images -- we just take the first for now
-M: tiff-image stream>image ( stream tiff-image -- image )
+M: tiff-image stream>image* ( stream tiff-image -- image )
     drop [ [ load-tiff tiff>image ] throw-on-eof ] with-input-stream ;
 
 { "tif" "tiff" } [ tiff-image register-image-class ] each

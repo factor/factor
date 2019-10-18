@@ -169,9 +169,6 @@ M: windows-ui-backend (pixel-format-attribute)
 
 PRIVATE>
 
-: lo-word ( wparam -- lo ) c:short <ref> c:short deref ; inline
-: hi-word ( wparam -- hi ) -16 shift lo-word ; inline
-: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 : GET_APPCOMMAND_LPARAM ( lParam -- appCommand )
     hi-word FAPPCOMMAND_MASK lo-word bitnot bitand ; inline
 
@@ -536,7 +533,7 @@ SYMBOL: nc-buttons
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    wParam mouse-scroll hand-loc get hWnd window send-scroll ;
+    wParam mouse-scroll hand-loc get-global hWnd window send-scroll ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
@@ -860,6 +857,10 @@ M: windows-ui-backend (fullscreen?) ( world -- ? )
     handle>> hWnd>>
     [ hwnd>RECT ] [ fullscreen-RECT ] bi
     [ get-RECT-dimensions 2array 2nip ] same? ;
+
+M: windows-ui-backend resize-window ( world dim -- )
+  [ handle>> hWnd>> dup hwnd>RECT get-RECT-top-left ]
+  [ first2 FALSE ] bi* MoveWindow win32-error=0/f ;
 
 M: windows-ui-backend ui-backend-available?
     t ;

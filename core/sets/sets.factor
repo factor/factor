@@ -7,6 +7,7 @@ IN: sets
 ! Set protocol
 MIXIN: set
 GENERIC: adjoin ( elt set -- )
+GENERIC: ?adjoin ( elt set -- ? )
 GENERIC: in? ( elt set -- ? )
 GENERIC: delete ( elt set -- )
 GENERIC: set-like ( set exemplar -- set' )
@@ -22,20 +23,40 @@ GENERIC: duplicates ( set -- seq )
 GENERIC: all-unique? ( set -- ? )
 GENERIC: null? ( set -- ? )
 GENERIC: cardinality ( set -- n )
+GENERIC: clear-set ( set -- )
+
+M: f members drop f ;
 
 M: f cardinality drop 0 ;
 
+M: f delete 2drop ;
+
+M: f clear-set drop ; inline
+
 ! Defaults for some methods.
 ! Override them for efficiency
+
+M: set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
 
 M: set null? members null? ; inline
 
 M: set cardinality members length ;
 
+M: set clear-set [ members ] keep [ delete ] curry each ;
+
 M: set set-like drop ; inline
 
-M: set union
-    [ [ members ] bi@ append ] keep set-like ;
+<PRIVATE
+
+: ?members ( set -- seq )
+    dup sequence? [ members ] unless ; inline
+
+: (union) ( set1 set2 -- seq )
+    [ ?members ] bi@ append ; inline
+
+PRIVATE>
+
+M: set union [ (union) ] keep set-like ;
 
 <PRIVATE
 
@@ -46,15 +67,19 @@ M: set union
     [ members ] [ tester ] bi* ; inline
 
 : small/large ( set1 set2 -- set1' set2' )
-    2dup [ cardinality ] bi@ > [ swap ] when ;
+    2dup [ cardinality ] bi@ > [ swap ] when ; inline
+
+: (intersect) ( set1 set2 -- seq )
+    small/large sequence/tester filter ; inline
+
+: (diff) ( set1 set2 -- seq )
+    sequence/tester [ not ] compose filter ; inline
 
 PRIVATE>
 
-M: set intersect
-    [ small/large sequence/tester filter ] keep set-like ;
+M: set intersect [ (intersect) ] keep set-like ;
 
-M: set diff
-    [ sequence/tester [ not ] compose filter ] keep set-like ;
+M: set diff [ (diff) ] keep set-like ;
 
 M: set intersects?
     small/large sequence/tester any? ;
@@ -80,10 +105,8 @@ M: set all-unique? drop t ;
 
 <PRIVATE
 
-: (pruned) ( elt hash vec -- )
-    3dup drop in? [ 3drop ] [
-        [ drop adjoin ] [ nip push ] 3bi
-    ] if ; inline
+: (pruned) ( elt set accum -- )
+    2over ?adjoin [ nip push ] [ 3drop ] if ; inline
 
 : pruned ( seq -- newseq )
     [ f fast-set ] [ length <vector> ] bi
@@ -113,12 +136,18 @@ M: sequence null?
     empty? ; inline
 
 M: sequence cardinality
-    pruned length ;
+    fast-set cardinality ;
+
+M: sequence clear-set
+    delete-all ; inline
 
 : combine ( sets -- set/f )
     [ f ]
-    [ [ [ members ] map concat ] [ first ] bi set-like ]
+    [ [ [ ?members ] map concat ] [ first ] bi set-like ]
     if-empty ;
+
+: intersection ( sets -- set/f )
+    [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
 
 : gather ( ... seq quot: ( ... elt -- ... elt' ) -- ... newseq )
     map concat members ; inline
@@ -132,8 +161,19 @@ M: sequence cardinality
 : without ( seq set -- subseq )
     tester [ not ] compose filter ;
 
-: ?adjoin ( elt set -- ? )
-    2dup in? [ 2drop f ] [ adjoin t ] if ; inline
+: adjoin-all ( seq set -- )
+    [ adjoin ] curry each ;
+
+: union! ( set1 set2 -- set1 )
+    ?members over adjoin-all ;
+
+: diff! ( set1 set2 -- set1 )
+    dupd sequence/tester [ dup ] prepose pick
+    [ delete ] curry [ [ drop ] if ] curry compose each ;
+
+: intersect! ( set1 set2 -- set1 )
+    dupd sequence/tester [ dup ] prepose [ not ] compose pick
+    [ delete ] curry [ [ drop ] if ] curry compose each ;
 
 ! Temporarily for compatibility
 

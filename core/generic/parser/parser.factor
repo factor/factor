@@ -12,7 +12,7 @@ ERROR: not-in-a-method-error ;
     [ scan-new-generic ] dip call scan-effect define-generic ; inline
 
 : create-method-in ( class generic -- method )
-    create-method dup set-word dup save-location ;
+    create-method dup set-last-word dup save-location ;
 
 : define-inline-method ( class generic quot -- )
     [ create-method-in ] dip [ define ] [ drop make-inline ] 2bi ;
@@ -38,7 +38,7 @@ SYMBOL: current-method
 ERROR: bad-method-effect ;
 
 : check-method-effect ( effect -- )
-    word generic-effect method-effect= [ bad-method-effect ] unless ;
+    last-word generic-effect method-effect= [ bad-method-effect ] unless ;
 
 : ?execute-parsing ( word/number -- seq )
     dup parsing-word?
@@ -54,4 +54,6 @@ ERROR: bad-method-effect ;
 PRIVATE>
 
 : (M:) ( -- method def )
-    scan-new-method [ parse-method-definition ] with-method-definition ;
+    [
+        scan-new-method [ parse-method-definition ] with-method-definition
+    ] with-definition ;

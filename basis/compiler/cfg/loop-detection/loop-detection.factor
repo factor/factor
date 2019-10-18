@@ -12,49 +12,44 @@ SYMBOL: loops
 <PRIVATE
 
 : <natural-loop> ( header index -- loop )
-    H{ } clone H{ } clone natural-loop boa ;
+    HS{ } clone HS{ } clone natural-loop boa ;
 
 : lookup-header ( header -- loop )
-    loops get [
-        loops get assoc-size <natural-loop>
-    ] cache ;
+    loops get dup '[ _ assoc-size <natural-loop> ] cache ;
 
 SYMBOLS: visited active ;
 
 : record-back-edge ( from to -- )
-    lookup-header ends>> conjoin ;
+    lookup-header ends>> adjoin ;
 
 DEFER: find-loop-headers
 
-: visit-edge ( from to -- )
-    dup active get key?
+: visit-edge ( from to active -- )
+    dupd in?
     [ record-back-edge ]
     [ nip find-loop-headers ]
     if ;
 
 : find-loop-headers ( bb -- )
-    dup visited get key? [ drop ] [
-        {
-            [ visited get conjoin ]
-            [ active get conjoin ]
-            [ dup successors>> [ visit-edge ] with each ]
-            [ active get delete-at ]
-        } cleave
-    ] if ;
+    dup visited get ?adjoin [
+        active get
+        [ adjoin ]
+        [ [ dup successors>> ] dip '[ _ visit-edge ] with each ]
+        [ delete ]
+        2tri
+    ] [ drop ] if ;
 
 SYMBOL: work-list
 
 : process-loop-block ( bb loop -- )
-    2dup blocks>> key? [ 2drop ] [
-        [ blocks>> conjoin ] [
-            2dup header>> eq? [ 2drop ] [
-                drop predecessors>> work-list get push-all-front
-            ] if
-        ] 2bi
-    ] if ;
+    2dup blocks>> ?adjoin [
+        2dup header>> eq? [ 2drop ] [
+            drop predecessors>> work-list get push-all-front
+        ] if
+    ] [ 2drop ] if ;
 
 : process-loop-ends ( loop -- )
-    [ ends>> keys <dlist> [ push-all-front ] [ work-list set ] [ ] tri ] keep
+    [ ends>> members <dlist> [ push-all-front ] [ work-list set ] [ ] tri ] keep
     '[ _ process-loop-block ] slurp-deque ;
 
 : process-loop-headers ( -- )
@@ -64,14 +59,14 @@ SYMBOL: loop-nesting
 
 : compute-loop-nesting ( -- )
     loops get H{ } clone [
-        [ values ] dip '[ blocks>> values [ _ inc-at ] each ] each
+        [ values ] dip '[ blocks>> members [ _ inc-at ] each ] each
     ] keep loop-nesting set ;
 
 : detect-loops ( cfg -- cfg' )
     needs-predecessors
     H{ } clone loops set
-    H{ } clone visited set
-    H{ } clone active set
+    HS{ } clone visited set
+    HS{ } clone active set
     H{ } clone loop-nesting set
     dup entry>> find-loop-headers process-loop-headers compute-loop-nesting ;
 

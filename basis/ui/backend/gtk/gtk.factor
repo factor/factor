@@ -42,9 +42,13 @@ M: gtk-clipboard clipboard-contents
         [ &g_free utf8 alien>string ] [ f ] if*
     ] with-destructors ;
 
+: save-global-clipboard ( -- )
+    clipboard get-global handle>> gtk_clipboard_store ;
+
 M: gtk-clipboard set-clipboard-contents
     swap [ handle>> ] [ utf8 string>alien ] bi*
-    -1 gtk_clipboard_set_text ;
+    -1 gtk_clipboard_set_text
+    save-global-clipboard ;
 
 : init-clipboard ( -- )
     selection "PRIMARY"
@@ -113,6 +117,7 @@ CONSTANT: action-key-codes
     H{
         { $ GDK_KEY_BackSpace "BACKSPACE" }
         { $ GDK_KEY_Tab "TAB" }
+        { $ GDK_KEY_ISO_Left_Tab "TAB" }
         { $ GDK_KEY_Return "RET" }
         { $ GDK_KEY_KP_Enter "ENTER" }
         { $ GDK_KEY_Escape "ESC" }
@@ -473,6 +478,8 @@ M:: gtk-ui-backend (open-window) ( world -- )
 M: gtk-ui-backend (close-window) ( handle -- )
     window>> [ gtk_widget_destroy ] [ unregister-window ] bi
     event-loop? [ gtk_main_quit ] unless ;
+
+M: gtk-ui-backend resize-window [ handle>> window>> ] [ first2 ] bi* gtk_window_resize ;
 
 M: gtk-ui-backend set-title
     swap [ handle>> window>> ] [ utf8 string>alien ] bi*

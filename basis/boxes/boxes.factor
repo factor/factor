@@ -18,11 +18,18 @@ ERROR: box-empty box ;
 : check-box ( box -- box )
     dup occupied>> [ box-empty ] unless ; inline
 
+<PRIVATE
+
+: box-unsafe> ( box -- value )
+    [ f ] change-value f >>occupied drop ; inline
+
+PRIVATE>
+
 : box> ( box -- value )
-    check-box [ f ] change-value f >>occupied drop ; inline
+    check-box box-unsafe> ; inline
 
 : ?box ( box -- value/f ? )
-    dup occupied>> [ box> t ] [ drop f f ] if ; inline
+    dup occupied>> [ box-unsafe> t ] [ drop f f ] if ; inline
 
 : if-box? ( box quot -- )
     [ ?box ] dip [ drop ] if ; inline

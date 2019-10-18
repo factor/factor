@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2010 Slava Pestov.
+! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces words
 math math.order layouts classes.union compiler.units alien
@@ -118,6 +118,10 @@ FOLDABLE-INSN: ##copy
 def: dst
 use: src
 literal: rep ;
+
+! Only used by compiler.cfg.cssa
+FLUSHABLE-INSN: ##parallel-copy
+literal: values ;
 
 FOLDABLE-INSN: ##tagged>integer
 def: dst/int-rep

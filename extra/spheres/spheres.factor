@@ -248,7 +248,7 @@ M: spheres-world end-world
 
 : (draw-reflection-texture) ( gadget -- )
     dup reflection-framebuffer>> [ {
-        [ drop 0 0 (reflection-dim) glViewport ]
+        [ drop { 0 0 } (reflection-dim) 2array gl-viewport ]
         [
             GL_PROJECTION glMatrixMode
             glPushMatrix glLoadIdentity
@@ -275,7 +275,7 @@ M: spheres-world end-world
           glPopMatrix 90.0 1.0 0.0 0.0 glRotatef ]
         [ sphere-scene ]
         [
-            [ 0 0 ] dip dim>> first2 glViewport
+            [ { 0 0 } ] dip dim>> gl-viewport
             GL_PROJECTION glMatrixMode
             glPopMatrix
         ]

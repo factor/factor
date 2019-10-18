@@ -24,6 +24,10 @@ ARTICLE: "set-operations" "Operations on sets"
 { $subsections
     adjoin
     delete
+    clear-set
+    union!
+    diff!
+    intersect!
 }
 "To test if a set is the empty set:"
 { $subsections null? }
@@ -97,6 +101,11 @@ HELP: delete
 { $description "Destructively removes " { $snippet "elt" } " from " { $snippet "set" } ". If the element is not present, this does nothing." $nl "Each mutable set type is expected to implement a method on this generic word." }
 { $side-effects "set" } ;
 
+HELP: clear-set
+{ $values { "set" set } }
+{ $contract "Removes all entries from the set." }
+{ $side-effects "set" } ;
+
 HELP: members
 { $values { "set" set } { "seq" sequence } }
 { $description "Creates a sequence with a single copy of each member of the set." $nl "Each set type is expected to implement a method on this generic word." } ;
@@ -128,8 +137,7 @@ HELP: all-unique?
 
 HELP: diff
 { $values { "set1" set } { "set2" set } { "set" set } }
-{ $description "Outputs a set consisting of elements present in " { $snippet "set1" } " but not " { $snippet "set2" } ", comparing elements for equality." 
-"This word has a default definition which works for all sets, but set implementations may override the default for efficiency."
+{ $description "Outputs a set consisting of elements present in " { $snippet "set1" } " but not " { $snippet "set2" } ", comparing elements for equality." $nl "This word has a default definition which works for all sets, but set implementations may override the default for efficiency."
 } { $examples
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } diff ." "{ 1 }" }
 } ;
@@ -142,15 +150,33 @@ HELP: intersect
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } intersect ." "{ 2 3 }" }
 } ;
 
+HELP: intersection
+{ $values { "sets" sequence } { "set/f" "a " { $link set } " or " { $link f } } }
+{ $description "Outputs the intersection of all the sets of the sequence " { $snippet "sets" } ", or " { $link f } " if " { $snippet "sets" } " is empty." } ;
+
 HELP: union
 { $values { "set1" set } { "set2" set } { "set" set } }
-{ $description "Outputs a set consisting of elements present in either " { $snippet "set1" } " or " { $snippet "set2" } " which does not contain duplicate values."
-"This word has a default definition which works for all sets, but set implementations may override the default for efficiency." }
+{ $description "Outputs a set consisting of elements present in either " { $snippet "set1" } " or " { $snippet "set2" } " which does not contain duplicate values." $nl "This word has a default definition which works for all sets, but set implementations may override the default for efficiency." }
 { $examples
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } union ." "{ 1 2 3 4 }" }
 } ;
 
 { diff intersect union } related-words
+
+HELP: union!
+{ $values { "set1" set } { "set2" set } }
+{ $description "Adds all members from " { $snippet "set2" } " to " { $snippet "set1" } "." }
+{ $side-effects "set1" } ;
+
+HELP: diff!
+{ $values { "set1" set } { "set2" set } }
+{ $description "Removes all members from " { $snippet "set1" } " contained in " { $snippet "set2" } "." }
+{ $side-effects "set1" } ;
+
+HELP: intersect!
+{ $values { "set1" set } { "set2" set } }
+{ $description "Removes all members from " { $snippet "set1" } " not contained in " { $snippet "set2" } "." }
+{ $side-effects "set1" } ;
 
 HELP: intersects?
 { $values { "set1" set } { "set2" set } { "?" "a boolean" } }
@@ -174,8 +200,7 @@ HELP: gather
 
 HELP: set-like
 { $values { "set" set } { "exemplar" set } { "set'" set } }
-{ $description "If the conversion is defined for the exemplar, converts the set into a set of the exemplar's class. This is not guaranteed to create a new set, for example if the input set and exemplar are of the same class." $nl
-"Set implementations may optionally implement a method on this generic word. The default implementation returns its input set." }
+{ $description "If the conversion is defined for the exemplar, converts the set into a set of the exemplar's class. This is not guaranteed to create a new set, for example if the input set and exemplar are of the same class." $nl "Set implementations may optionally implement a method on this generic word. The default implementation returns its input set." }
 { $examples
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } HS{ } set-like ." "HS{ 1 2 3 }" }
 } ;

@@ -411,9 +411,9 @@ M: ptx-target (write-ptx-element)
 M: ptx-variable (write-ptx-element)
     dup extern?>> [ ".extern " write ] when
     dup visible?>> [ ".visible " write ] when
-    dup align>> [ ".align " write number>string write " " write ] when*
-    dup storage-space>> (write-ptx-element) " " write
-    dup type>> (write-ptx-element) " " write
+    dup align>> [ ".align " write number>string write bl ] when*
+    dup storage-space>> (write-ptx-element) bl
+    dup type>> (write-ptx-element) bl
     dup name>> write
     dup parameter>> [ "<" write number>string write ">" write ] when*
     dup dim>> [ write-ptx-dim ] when*
@@ -432,7 +432,7 @@ M: ptx-variable (write-ptx-element)
 
 : write-entry ( entry -- )
     dup name>> write
-    dup params>> [  " " write write-params ] when* nl
+    dup params>> [  bl write-params ] when* nl
     dup directives>> [ (write-ptx-element) nl ] each
     dup body>> write-body
     drop ;
@@ -467,11 +467,11 @@ M: ptx-instruction ptx-element-label
 
 : write-insn ( insn name -- insn )
     over predicate>>
-    [ "@" write write-ptx-operand " " write ] when*
+    [ "@" write write-ptx-operand bl ] when*
     write ;
 
 : write-2op ( insn -- )
-    dup type>> (write-ptx-element) " " write
+    dup type>> (write-ptx-element) bl
     dup dest>> write-ptx-operand ", " write
     dup a>> write-ptx-operand
     drop ;
@@ -586,7 +586,7 @@ M: bfind (write-ptx-element)
     write-2op ;
 M: bra (write-ptx-element)
     "bra" write-insn
-    dup write-uni " " write
+    dup write-uni bl
     target>> write ;
 M: brev (write-ptx-element)
     "brev" write-insn
@@ -595,7 +595,7 @@ M: brkpt (write-ptx-element)
     "brkpt" write-insn drop ;
 M: call (write-ptx-element)
     "call" write-insn
-    dup write-uni " " write
+    dup write-uni bl
     dup return>> [ "(" write write-ptx-operand "), " write ] when*
     dup target>> write
     dup params>> [ ", (" write [ ", " write ] [ write-ptx-operand ] interleave ")" write ] unless-empty
@@ -641,7 +641,7 @@ M: fma (write-ptx-element)
 M: isspacep (write-ptx-element)
     "isspacep" write-insn
     dup storage-space>> (write-ptx-element)
-    " " write
+    bl
     dup dest>> write-ptx-operand ", " write a>> write-ptx-operand ;
 M: ld (write-ptx-element)
     "ld" write-insn
@@ -694,7 +694,7 @@ M: or (write-ptx-element)
     "or" write-insn
     write-3op ;
 M: pmevent (write-ptx-element)
-    "pmevent" write-insn " " write a>> write ;
+    "pmevent" write-insn bl a>> write ;
 M: popc (write-ptx-element)
     "popc" write-insn
     write-2op ;
@@ -702,15 +702,15 @@ M: prefetch (write-ptx-element)
     "prefetch" write-insn
     dup storage-space>> (write-ptx-element)
     dup level>> (write-ptx-element)
-    " " write a>> write-ptx-operand ;
+    bl a>> write-ptx-operand ;
 M: prefetchu (write-ptx-element)
     "prefetchu" write-insn
     dup level>> (write-ptx-element)
-    " " write a>> write-ptx-operand ;
+    bl a>> write-ptx-operand ;
 M: prmt (write-ptx-element)
     "prmt" write-insn
     dup type>> (write-ptx-element)
-    dup mode>> (write-ptx-element) " " write
+    dup mode>> (write-ptx-element) bl
     dup dest>> write-ptx-operand ", " write
     dup a>> write-ptx-operand ", " write
     dup b>> write-ptx-operand ", " write
@@ -749,7 +749,7 @@ M: set (write-ptx-element)
 M: setp (write-ptx-element)
     "setp" write-insn
     dup write-set
-    dup type>> (write-ptx-element) " " write
+    dup type>> (write-ptx-element) bl
     dup dest>> write-ptx-operand
     dup |dest>> [ "|" write write-ptx-operand ] when* ", " write
     dup a>> write-ptx-operand ", " write

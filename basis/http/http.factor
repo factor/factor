@@ -222,5 +222,5 @@ TUPLE: post-data data params content-type content-encoding ;
 
 : parse-content-type ( content-type -- type encoding )
     ";" split1
-    parse-content-type-attributes "charset" swap at
+    parse-content-type-attributes "charset" of 
     [ dup mime-type-encoding encoding>name ] unless* ;

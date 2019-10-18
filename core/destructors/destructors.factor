@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors continuations kernel namespaces make
-sequences vectors sets assocs init math ;
+USING: accessors assocs continuations init kernel make
+namespaces sequences sets ;
 FROM: namespaces => set ;
 IN: destructors
 
@@ -17,10 +17,10 @@ SLOT: continuation
 
 : register-disposable ( obj -- )
     debug-leaks? get-global [ current-continuation >>continuation ] when
-    disposables get conjoin ;
+    disposables get adjoin ;
 
 : unregister-disposable ( obj -- )
-    disposables get 2dup key? [ delete-at ] [ drop already-unregistered ] if ;
+    disposables get 2dup in? [ delete ] [ drop already-unregistered ] if ;
 
 PRIVATE>
 
@@ -52,10 +52,12 @@ M: disposable dispose
         bi
     ] unless-disposed ;
 
+: dispose, ( obj -- )
+    [ dispose ] curry [ , ] recover ; inline
+
 : dispose-each ( seq -- )
-    [
-        [ [ dispose ] curry [ , ] recover ] each
-    ] { } make [ last rethrow ] unless-empty ;
+    [ [ dispose, ] each ] { } make
+    [ last rethrow ] unless-empty ;
 
 : with-disposal ( object quot -- )
     over [ dispose ] curry [ ] cleanup ; inline
@@ -90,7 +92,7 @@ PRIVATE>
     ] with-scope ; inline
 
 [
-    H{ } clone disposables set-global
+    HS{ } clone disposables set-global
     V{ } clone always-destructors set-global
     V{ } clone error-destructors set-global
 ] "destructors" add-startup-hook

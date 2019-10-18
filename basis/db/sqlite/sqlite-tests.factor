@@ -1,10 +1,10 @@
 USING: io io.files io.files.temp io.directories io.launcher
 kernel namespaces prettyprint tools.test db.sqlite db sequences
 continuations db.types db.tuples unicode.case accessors arrays
-sorting ;
+sorting layouts math.parser ;
 IN: db.sqlite.tests
 
-: db-path ( -- path ) "test.db" temp-file ;
+: db-path ( -- path ) "test-" cell number>string ".db" 3append temp-file ;
 : test.db ( -- sqlite-db ) db-path <sqlite-db> ;
 
 [ ] [ [ db-path delete-file ] ignore-errors ] unit-test
@@ -160,5 +160,15 @@ watch "WATCH" {
         watch boa insert-tuple
         watch new select-tuple
         user>> f user boa select-tuple
+    ] with-db
+] unit-test
+
+{ } [
+    test.db [ [
+            user ensure-table [
+                "mew" "foo" user boa insert-tuple
+                "denny" "kitty" user boa insert-tuple
+            ] with-transaction
+        ] with-transaction
     ] with-db
 ] unit-test

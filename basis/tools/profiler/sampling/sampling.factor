@@ -58,10 +58,13 @@ PRIVATE>
 
 : total-time ( -- n )
     most-recent-profile-data total-time* ;
+
 : gc-time ( -- n )
     most-recent-profile-data gc-time* ;
+
 : foreign-time ( -- n )
     most-recent-profile-data foreign-time* ;
+
 : foreign-thread-time ( -- n )
     most-recent-profile-data foreign-thread-time* ;
 
@@ -98,7 +101,7 @@ CONSTANT: zero-counts { 0 0 0 0 0 }
     ] [ f ] if ; inline
 
 :: collect-tops ( samples max-depth depth -- node )
-    samples [ unclip-callstack ] collect-pairs [
+    samples [ drop unclip-callstack ] collect-by [
         [ sum-counts ]
         [ max-depth depth [ max-depth depth 1 + collect-tops ] (collect-subtrees) ] bi
         depth <profile-node>
@@ -127,7 +130,7 @@ PRIVATE>
     most-recent-profile-data top-down-max-depth* ;
 
 : top-down* ( profile-data -- tree )
-    most-positive-fixnum top-down-max-depth* ;
+    [ most-positive-fixnum ] dip top-down-max-depth* ;
 
 : top-down ( -- tree )
     most-positive-fixnum top-down-max-depth ;
@@ -140,7 +143,7 @@ PRIVATE>
 :: collect-flat ( samples -- flat )
     IH{ } clone :> per-word-samples
     samples [| sample |
-        sample sample-callstack unique keys [ ignore-word? not ] filter [
+        sample sample-callstack members [ ignore-word? not ] filter [
             per-word-samples sample counts+at
         ] each
     ] each
@@ -205,12 +208,12 @@ DEFER: (profile.)
 
 :: times. ( node -- )
     node {
-        [ depth>> number>string 4 CHAR: \s pad-head write " " write ]
-        [ total-time>> duration. " " write ]
-        [ [ gc-time>> ] [ total-time>> ] bi percentage. " " write ]
-        [ [ jit-time>> ] [ total-time>> ] bi percentage. " " write ]
-        [ [ foreign-time>> ] [ total-time>> ] bi percentage. " " write ]
-        [ [ foreign-thread-time>> ] [ total-time>> ] bi percentage. " " write ]
+        [ depth>> number>string 4 CHAR: \s pad-head write bl ]
+        [ total-time>> duration. bl ]
+        [ [ gc-time>> ] [ total-time>> ] bi percentage. bl ]
+        [ [ jit-time>> ] [ total-time>> ] bi percentage. bl ]
+        [ [ foreign-time>> ] [ total-time>> ] bi percentage. bl ]
+        [ [ foreign-thread-time>> ] [ total-time>> ] bi percentage. bl ]
     } cleave ;
 
 :: (profile-node.) ( word node depth -- )

@@ -3,6 +3,10 @@
 USING: kernel ;
 IN: math
 
+BUILTIN: fixnum ;
+BUILTIN: bignum ;
+BUILTIN: float ;
+
 GENERIC: >fixnum ( x -- n ) foldable
 GENERIC: >bignum ( x -- n ) foldable
 GENERIC: >integer ( x -- n ) foldable
@@ -69,7 +73,6 @@ ERROR: log2-expects-positive x ;
 : 2/ ( x -- y ) -1 shift ; inline
 : sq ( x -- y ) dup * ; inline
 : neg ( x -- -x ) -1 * ; inline
-: recip ( x -- y ) 1 swap / ; inline
 : sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
 : ?1+ ( x -- y ) [ 1 + ] [ 0 ] if* ; inline
 : rem ( x y -- z ) abs [ mod ] [ + ] [ mod ] tri ; foldable
@@ -99,6 +102,10 @@ UNION: real rational float ;
 TUPLE: complex { real real read-only } { imaginary real read-only } ;
 
 UNION: number real complex ;
+
+GENERIC: recip ( x -- y )
+
+M: number recip 1 swap / ; inline
 
 : fp-bitwise= ( x y -- ? ) [ double>bits ] same? ; inline
 
@@ -141,6 +148,9 @@ GENERIC: prev-float ( m -- n )
     #! Apply quot to i, keep i and quot, hide n.
     [ nip call ] 3keep ; inline
 
+: iterate-rot ( ? i n quot -- i n quot ? )
+    [ rot ] dip swap ; inline
+
 : iterate-next ( i n quot -- i' n quot ) [ 1 + ] 2dip ; inline
 
 PRIVATE>
@@ -149,18 +159,16 @@ PRIVATE>
     [ iterate-step iterate-next (each-integer) ]
     [ 3drop ] if-iterate? ; inline recursive
 
-: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i )
+: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
     [
-        iterate-step
-        [ [ ] ] 2dip
-        [ iterate-next (find-integer) ] 2curry bi-curry if
+        iterate-step iterate-rot
+        [ 2drop ] [ iterate-next (find-integer) ] if
     ] [ 3drop f ] if-iterate? ; inline recursive
 
 : (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
     [
-        iterate-step
-        [ iterate-next (all-integers?) ] 3curry
-        [ f ] if
+        iterate-step iterate-rot
+        [ iterate-next (all-integers?) ] [ 3drop f ] if
     ] [ 3drop t ] if-iterate? ; inline recursive
 
 : each-integer ( ... n quot: ( ... i -- ... ) -- ... )

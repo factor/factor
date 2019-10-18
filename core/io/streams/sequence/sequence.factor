@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io io.streams.plain kernel accessors math math.order
-growable destructors combinators sequences.private io.private ;
+USING: accessors combinators destructors growable io io.private
+io.streams.plain kernel math math.order sequences
+sequences.private ;
 IN: io.streams.sequence
 
 ! Readers
@@ -17,7 +18,7 @@ SLOT: i
 : (sequence-read-length) ( n buf stream -- buf count )
     [ underlying>> length ] [ i>> ] bi - rot min ; inline
 
-: <sequence-copy> ( dest n i src -- n copy )
+: <sequence-copy> ( dst n i src -- n copy )
     [ 0 ] 3curry dip <copy> ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )

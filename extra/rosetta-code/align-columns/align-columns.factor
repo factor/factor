@@ -45,11 +45,11 @@ justified,$right$justified,$or$center$justified$within$its$column."
 
 : split-and-pad ( text -- lines )
     "\n" split [ "$" split harvest ] map
-    dup [ length ] [ max ] map-reduce
+    dup longest length
     '[ _ "" pad-tail ] map ;
 
 : column-widths ( columns -- widths )
-    [ [ length ] [ max ] map-reduce ] map ;
+    [ longest length ] map ;
 
 SINGLETONS: +left+ +middle+ +right+ ;
 
@@ -71,6 +71,6 @@ M: +middle+ align-string
 
 : print-aligned ( text alignment -- )
     [ split-and-pad flip ] dip align-columns flip
-    [ [ write " " write ] each nl ] each ;
+    [ [ write bl ] each nl ] each ;
 
 ! USAGE: example-text +left+ print-aligned

@@ -97,7 +97,7 @@ M:: input-port stream-read-unsafe ( n dst port -- count )
             drop read-until-loop
         ] if
     ] [
-        [ 2drop 2drop ] dip
+        [ 4drop ] dip
     ] if ;
 
 M: input-port stream-read-until ( seps port -- str/f sep/f )
@@ -126,7 +126,7 @@ M: output-port stream-write1
 
 : write-in-groups ( byte-array port -- )
     [ binary-object uchar <c-direct-array> ] dip
-    [ buffer>> size>> <sliced-groups> ] [ '[ _ stream-write ] ] bi
+    [ buffer>> size>> <groups> ] [ '[ _ stream-write ] ] bi
     each ;
 
 M: output-port stream-write
@@ -202,7 +202,10 @@ M: output-port dispose*
     ] with-destructors ;
 
 M: buffered-port dispose*
-    [ call-next-method ] [ buffer>> dispose ] bi ;
+    [
+        [ buffer>> &dispose drop ]
+        [ call-next-method ] bi
+    ] with-destructors ;
 
 M: port cancel-operation handle>> cancel-operation ;
 
@@ -227,9 +230,7 @@ M: object underlying-handle underlying-port handle>> ;
 
 ! Fast-path optimization
 
-HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii } ;
-
-HINTS: decoder-readln { input-port utf8 } { input-port ascii } ;
+HINTS: (decode-until) { string input-port object } ;
 
 HINTS: M\ input-port stream-read-partial-unsafe
     { fixnum byte-array input-port }

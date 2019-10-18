@@ -102,3 +102,16 @@ M: fnv1a-1024 checksum-bytes ( bytes checksum -- value )
     drop
     fnv1-1024-basis swap
     [ bitxor fnv1-1024-prime * fnv1-1024-mod bitand ] each ;
+
+INSTANCE: fnv1-32 checksum
+INSTANCE: fnv1a-32 checksum
+INSTANCE: fnv1-64 checksum
+INSTANCE: fnv1a-64 checksum
+INSTANCE: fnv1-128 checksum
+INSTANCE: fnv1a-128 checksum
+INSTANCE: fnv1-256 checksum
+INSTANCE: fnv1a-256 checksum
+INSTANCE: fnv1-512 checksum
+INSTANCE: fnv1a-512 checksum
+INSTANCE: fnv1-1024 checksum
+INSTANCE: fnv1a-1024 checksum

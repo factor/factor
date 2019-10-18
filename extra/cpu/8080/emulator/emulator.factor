@@ -499,13 +499,15 @@ SYMBOL: rom-root
   [ over 1 + swap pc<< ] keep
   read-byte ;
 
+ERROR: undefined-8080-opcode n ;
+
 : get-cycles ( n -- opcode )
   #! Returns the cycles for the given instruction value.
   #! If the opcode is not defined throw an error.
   dup instruction-cycles nth [ 
     nip  
   ] [
-    [ "Undefined 8080 opcode: " % number>string % ] "" make throw
+    undefined-8080-opcode
   ] if* ;
 
 : process-interrupts ( cpu -- )
@@ -539,7 +541,7 @@ SYMBOL: rom-root
   [ " A: " write a>> >hex 2 CHAR: \s pad-head write ] keep
   [ " SP: " write sp>> >hex 4 CHAR: \s pad-head write ] keep
   [ " cycles: " write cycles>> number>string 5 CHAR: \s pad-head write ] keep
-  [ " " write peek-instruction name>> write " " write ] keep
+  [ bl peek-instruction name>> write bl ] keep
   nl drop ;
 
 : cpu*. ( cpu -- )

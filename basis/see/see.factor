@@ -91,6 +91,19 @@ M: mixin-instance synopsis*
 
 M: pathname synopsis* pprint* ;
 
+M: alias summary
+    [
+        0 margin set 1 line-limit set
+        [
+            {
+                [ seeing-word ]
+                [ definer. ]
+                [ pprint-word ]
+                [ stack-effect pprint-effect ]
+            } cleave
+        ] with-in
+    ] with-string-writer ;
+
 M: word summary synopsis ;
 
 GENERIC: declarations. ( obj -- )
@@ -204,9 +217,8 @@ M: tuple-class see-class*
 M: word see-class* drop ;
 
 M: builtin-class see-class*
-    "! Built-in class" comment.
     <block
-    \ PRIMITIVE: pprint-word
+    \ BUILTIN: pprint-word
     [ pprint-word ]
     [ <block "slots" word-prop [ pprint-slot ] each pprint-; block> ] bi
     block> ;

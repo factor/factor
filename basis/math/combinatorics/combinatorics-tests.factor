@@ -79,6 +79,8 @@ IN: math.combinatorics.tests
     { 2 1 1 } { 2 1 2 } { 2 2 1 } { 2 2 2 } } ]
 [ { 1 2 } 3 selections ] unit-test
 
+{ { "aa" "ab" "ac" "ba" "bb" "bc" "ca" "cb" "cc" } }
+[ "abc" 2 selections ] unit-test
 
 { V{ { 1 2 } { 1 3 } } }
 [ { 1 2 3 } 2 [ { 1 } head? ] filter-combinations ] unit-test

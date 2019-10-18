@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! Copyright (C) 2008, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private sequences sequences.private math
-math.private math.order combinators ;
+USING: combinators kernel kernel.private math math.order
+math.private ;
 IN: math.integers.private
 
 : fixnum-min ( x y -- z ) [ fixnum< ] most ; foldable
@@ -52,14 +52,17 @@ M: fixnum shift integer>fixnum fixnum-shift ; inline
 M: fixnum bitnot fixnum-bitnot ; inline
 
 : fixnum-bit? ( n m -- b )
-    neg shift 1 bitand 0 > ; inline
+    neg shift 1 bitand zero? not ; inline
 
 M: fixnum bit? fixnum-bit? ; inline
 
 : fixnum-log2 ( x -- n )
-    0 swap [ dup 1 eq? ] [ [ 1 + ] [ 2/ ] bi* ] until drop ;
+    { fixnum } declare
+    0 swap [ dup 1 eq? ] [
+        [ 1 fixnum+fast ] [ 2/ ] bi*
+    ] until drop ;
 
-M: fixnum (log2) fixnum-log2 ; inline
+M: fixnum (log2) fixnum-log2 { fixnum } declare ; inline
 
 M: bignum >fixnum bignum>fixnum ; inline
 M: bignum >bignum ; inline

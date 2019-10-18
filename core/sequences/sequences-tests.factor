@@ -1,7 +1,7 @@
 USING: arrays byte-arrays kernel math math.order math.parser
 namespaces sequences kernel.private sequences.private strings
 sbufs tools.test vectors assocs generic vocabs.loader
-generic.single ;
+generic.single math.vectors math.functions ;
 IN: sequences.tests
 
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -84,10 +84,14 @@ IN: sequences.tests
 [ V{ 3 } ] [ V{ 1 2 3 } clone 2 [ swap < ] curry filter! ] unit-test
 
 [ "hello world how are you" ]
-[ { "hello" "world" "how" "are" "you" } " " join ]
-unit-test
+[ { "hello" "world" "how" "are" "you" } " " join ] unit-test
+
+[ "hello world how are you" ]
+[ { "hello" "world" "how" "are" "you" } " " "" join-as ] unit-test
 
 [ "" ] [ { } "" join ] unit-test
+
+[ "" ] [ { } "" "" join-as ] unit-test
 
 [ { } ] [ { } flip ] unit-test
 
@@ -309,7 +313,8 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 [ V{ 0 3 } ] [ "A" { "A" "B" "C" "A" "D" } indices ] unit-test
 
 [ "asdf" iota ] must-fail
-[ T{ iota { n 10 } } ] [ 10 iota ] unit-test
+[ -1 iota ] must-fail
+[ T{ iota-tuple { n 10 } } ] [ 10 iota ] unit-test
 [ 0 ] [ 10 iota first ] unit-test
 
 [ "hi" 3 ] [
@@ -347,3 +352,28 @@ USE: make
 [ { } { } [ [ string>digits product ] bi@ + ] [ + ] 2map-reduce ] must-infer
 [ { } { } [ + ] [ + ] 2map-reduce ] must-fail
 [ 24 ] [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test
+
+[ 4 ] [ 5 iota [ ] supremum-by ] unit-test
+[ 0 ] [ 5 iota [ ] infimum-by ] unit-test
+{ "bar" } [ { "bar" "baz" "qux" } [ length ] supremum-by ] unit-test
+{ "bar" } [ { "bar" "baz" "qux" } [ length ] infimum-by ] unit-test
+[ { "foo" } ] [ { { "foo" } { "bar" } } [ first ] supremum-by ] unit-test
+[ { "bar" } ] [ { { "foo" } { "bar" } } [ first ] infimum-by ] unit-test
+{ -2 1 } [ -2 { 1 2 3 } [ over ^ ] supremum-by ] unit-test
+{ -2 3 } [ -2 { 1 2 3 } [ over ^ ] infimum-by ] unit-test
+
+[ { 0 0 255 } ] [
+    {
+        { 0 0 0 }
+        { 95 255 95 }
+        { 215 95 95 }
+        { 95 135 255 }
+        { 135 95 135 }
+        { 135 255 255 }
+        { 0 0 255 }
+        { 0 95 95 }
+        { 0 255 215 }
+        { 135 0 95 }
+        { 255 0 175 }
+    } [ { 0 0 255 } distance ] infimum-by
+] unit-test

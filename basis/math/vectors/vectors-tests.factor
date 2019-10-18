@@ -34,3 +34,16 @@ SPECIALIZED-ARRAY: int
 [ -1 ] [ { C{ 0 1 } } dup v. ] unit-test
 
 [ 1 ] [ { C{ 0 1 } } dup h. ] unit-test
+
+
+{ { 1 2 3 } } [
+    { t t t } [ { 1 2 3 } ] [ { 4 5 6 } ] vif
+] unit-test
+
+{ { 4 5 6 } } [
+    { f f f } [ { 1 2 3 } ] [ { 4 5 6 } ] vif
+] unit-test
+
+{ { 1 5 3 } } [
+    { t f t } [ { 1 2 3 } ] [ { 4 5 6 } ] vif
+] unit-test

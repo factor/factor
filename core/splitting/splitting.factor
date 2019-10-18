@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel make math sequences sets strings ;
+USING: arrays kernel math sequences strings sbufs ;
 IN: splitting
 
 <PRIVATE
@@ -26,7 +26,7 @@ PRIVATE>
 
 <PRIVATE
 
-: (split1) ( seq subseq quot -- before after )
+: (split1) ( seq subseq snip-quot -- before after )
     [
         swap [
             [ drop length ] [ start dup ] 2bi
@@ -44,8 +44,28 @@ PRIVATE>
 : split1-slice ( seq subseq -- before-slice after-slice )
     [ snip-slice ] (split1) ;
 
+: split-subseq ( seq subseq -- seqs )
+    dup empty? [
+        drop 1array
+    ] [
+        [ dup ] swap [ split1-slice swap ] curry produce nip
+    ] if ;
+
+: replace ( seq old new -- new-seq )
+    pick [ [ split-subseq ] dip ] dip join-as ;
+
+<PRIVATE
+
+: (split1-when) ( ... seq quot: ( ... elt -- ... ? ) snip-quot -- ... before-slice after-slice )
+    [ dupd find drop ] dip [ swap [ dup 1 + ] dip ] prepose [ f ] if* ; inline
+
+PRIVATE>
+
 : split1-when ( ... seq quot: ( ... elt -- ... ? ) -- ... before after )
-    dupd find drop [ swap [ dup 1 + ] dip snip ] [ f ] if* ; inline
+    [ snip ] (split1-when) ; inline
+
+: split1-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... before-slice after-slice )
+    [ snip-slice ] (split1-when) ; inline
 
 : split1-last ( seq subseq -- before after )
     [ <reversed> ] bi@ split1 [ reverse ] bi@
@@ -57,39 +77,28 @@ PRIVATE>
 
 <PRIVATE
 
-: (split) ( n seq quot: ( ... elt -- ... ? ) -- )
-    [ find-from drop ]
-    [ [ [ 3dup swapd subseq , ] dip [ drop 1 + ] 2dip (split) ] 3curry ]
-    [ drop [ swap [ tail ] unless-zero , ] 2curry ]
-    3tri if* ; inline recursive
-
-: split, ( ... seq quot: ( ... elt -- ... ? ) -- ... ) [ 0 ] 2dip (split) ; inline
+: (split) ( n seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
+    pick [
+        swap curry [ keep 1 + swap ] curry [
+            [ find-from drop dup ] 2curry [ keep -rot ] curry
+        ] dip produce nip
+    ] 2keep swap [
+        [ length swapd ] keep
+    ] dip 2curry call suffix ; inline
 
 PRIVATE>
-
-: split ( seq separators -- pieces )
-    [ [ member? ] curry split, ] { } make ; inline
 
 : split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ split, ] { } make ; inline
+    [ 0 ] 2dip [ subseq ] (split) ; inline
 
-<PRIVATE
+: split-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
+    [ 0 ] 2dip [ <slice> ] (split) ; inline
 
-: (split*) ( n seq quot: ( ... elt -- ... ? ) -- )
-    [ find-from ]
-    [ [ [ 1 + ] 3dip [ 3dup swapd subseq , ] dip [ drop ] 2dip (split*) ] 3curry ]
-    [ drop [ [ drop ] 2dip 2dup length < [ swap [ tail ] unless-zero , ] [ 2drop ] if ] 2curry ]
-    3tri if ; inline recursive
+: split ( seq separators -- pieces )
+    [ member? ] curry split-when ; inline
 
-: split*, ( ... seq quot: ( ... elt -- ... ? ) -- ... ) [ 0 ] 2dip (split*) ; inline
-
-PRIVATE>
-
-: split* ( seq separators -- pieces )
-    [ [ member? ] curry split*, ] { } make ; inline
-
-: split*-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ split*, ] { } make ; inline
+: split-slice ( seq separators -- pieces )
+    [ member? ] curry split-when-slice ; inline
 
 GENERIC: string-lines ( str -- seq )
 
@@ -110,3 +119,5 @@ M: string string-lines
     ] [
         1array
     ] if ;
+
+M: sbuf string-lines "" like string-lines ;

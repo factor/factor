@@ -11,7 +11,7 @@ $nl
 "Presentations have two slots:"
 { $list
     { { $snippet "object" } " - the object being presented." }
-    { { $snippet "hook" } " - a quotation with stack effect " { $snippet "( presentation -- )" } ". The default value is " { $snippet "[ drop ]" } "." }
+    { { $snippet "hook" } " - " { $quotation "( presentation -- )" } ". The default value is " { $snippet "[ drop ]" } "." }
 } } ;
 
 HELP: invoke-presentation

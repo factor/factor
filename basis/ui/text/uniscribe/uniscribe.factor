@@ -11,10 +11,10 @@ M: uniscribe-renderer string-dim
     [ cached-script-string size>> ] if-empty ;
 
 M: uniscribe-renderer flush-layout-cache
-    cached-script-strings get purge-cache ;
+    cached-script-strings get-global purge-cache ;
 
 M: uniscribe-renderer string>image ( font string -- image loc )
-    cached-script-string image>> { 0 0 } ;
+    cached-script-string script-string>image { 0 0 } ;
 
 M: uniscribe-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [

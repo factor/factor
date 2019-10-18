@@ -3,6 +3,10 @@
 USING: kernel.private slots.private math.private ;
 IN: kernel
 
+BUILTIN: callstack ;
+BUILTIN: tuple ;
+BUILTIN: wrapper { wrapped read-only } ;
+
 DEFER: dip
 DEFER: 2dip
 DEFER: 3dip
@@ -72,6 +76,9 @@ DEFER: if
 
 : 3keep ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x y z )
     [ 3dup ] dip 3dip ; inline
+
+: 4keep ( ..a w x y z quot: ( ..a w x y z -- ..b ) -- ..b w x y z )
+    [ 4dup ] dip 4dip ; inline
 
 ! Cleavers
 : bi ( x p q -- )

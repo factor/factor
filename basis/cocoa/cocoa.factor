@@ -4,6 +4,7 @@ USING: compiler io kernel cocoa.runtime cocoa.subclassing
 cocoa.messages cocoa.types sequences words vocabs parser
 core-foundation.bundles namespaces assocs hashtables
 compiler.units lexer init ;
+FROM: cocoa.messages => selector ;
 IN: cocoa
 
 : (remember-send) ( selector variable -- )
@@ -15,6 +16,17 @@ SYMBOL: sent-messages
     sent-messages (remember-send) ;
 
 SYNTAX: -> scan-token dup remember-send suffix! \ send suffix! ;
+
+SYNTAX: SEL:
+    scan-token
+    [ remember-send ]
+    [ <selector> suffix! \ selector suffix! ] bi ;
+
+SYNTAX: SEND:
+    scan-token
+    [ remember-send ]
+    [ <selector> suffix! \ selector suffix! ]
+    [ suffix! \ lookup-sender suffix! ] tri ;
 
 SYMBOL: super-sent-messages
 

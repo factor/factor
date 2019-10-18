@@ -1,15 +1,15 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays byte-arrays byte-vectors definitions generic
-hashtables kernel math namespaces parser lexer sequences strings
-strings.parser sbufs vectors words words.symbol words.constant
-words.alias quotations io assocs splitting classes.tuple
-generic.standard generic.hook generic.math generic.parser classes
-io.pathnames vocabs vocabs.parser classes.parser classes.union
-classes.intersection classes.mixin classes.predicate
-classes.singleton classes.tuple.parser compiler.units classes.maybe
-combinators effects.parser slots hash-sets source-files
-classes.algebra.private ;
+USING: accessors arrays byte-arrays byte-vectors
+classes.algebra.private classes.builtin classes.intersection
+classes.maybe classes.mixin classes.parser classes.predicate
+classes.singleton classes.tuple classes.tuple.parser
+classes.union combinators compiler.units definitions
+effects.parser generic generic.hook generic.math generic.parser
+generic.standard hash-sets hashtables io.pathnames kernel lexer
+math namespaces parser quotations sbufs sequences slots
+source-files splitting strings strings.parser vectors
+vocabs.parser words words.alias words.constant words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -97,7 +97,7 @@ IN: bootstrap.syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-core-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-core-syntax
     "BV{" [ \ } [ >byte-vector ] parse-literal ] define-core-syntax
-    "H{" [ \ } [ >hashtable ] parse-literal ] define-core-syntax
+    "H{" [ \ } [ parse-hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
     "HS{" [ \ } [ >hash-set ] parse-literal ] define-core-syntax
@@ -105,15 +105,21 @@ IN: bootstrap.syntax
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
     "M\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
-    "inline" [ word make-inline ] define-core-syntax
-    "recursive" [ word make-recursive ] define-core-syntax
-    "foldable" [ word make-foldable ] define-core-syntax
-    "flushable" [ word make-flushable ] define-core-syntax
-    "delimiter" [ word t "delimiter" set-word-prop ] define-core-syntax
-    "deprecated" [ word make-deprecated ] define-core-syntax
+    "inline" [ last-word make-inline ] define-core-syntax
+    "recursive" [ last-word make-recursive ] define-core-syntax
+    "foldable" [ last-word make-foldable ] define-core-syntax
+    "flushable" [ last-word make-flushable ] define-core-syntax
+    "delimiter" [ last-word t "delimiter" set-word-prop ] define-core-syntax
+    "deprecated" [ last-word make-deprecated ] define-core-syntax
 
     "SYNTAX:" [
         scan-new-word parse-definition define-syntax
+    ] define-core-syntax
+
+    "BUILTIN:" [
+        scan-word-name
+        current-vocab lookup-word
+        (parse-tuple-definition) 2drop check-builtin
     ] define-core-syntax
 
     "SYMBOL:" [
@@ -130,7 +136,7 @@ IN: bootstrap.syntax
 
     "DEFER:" [
         scan-token current-vocab create
-        [ fake-definition ] [ set-word ] [ undefined-def define ] tri
+        [ fake-definition ] [ set-last-word ] [ undefined-def define ] tri
     ] define-core-syntax
     
     "ALIAS:" [
@@ -200,7 +206,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "final" [
-        word make-final
+        last-word make-final
     ] define-core-syntax
 
     "SLOT:" [

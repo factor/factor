@@ -19,7 +19,7 @@ SYMBOL: indentation
 
 : indent-string ( -- string )
     xml-pprint? get
-    [ indentation get indenter get <repetition> "" join ]
+    [ indentation get indenter get <repetition> "" concat-as ]
     [ "" ] if ;
 
 : ?indent ( -- )
@@ -142,8 +142,8 @@ M: public-id write-xml
 
 M: doctype-decl write-xml
     ?indent "<!DOCTYPE " write
-    [ name>> write " " write ]
-    [ external-id>> [ write-xml " " write ] when* ]
+    [ name>> write bl ]
+    [ external-id>> [ write-xml bl ] when* ]
     [ internal-subset>> write-internal-subset ">" write ] tri ;
 
 M: directive write-xml

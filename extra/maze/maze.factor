@@ -1,7 +1,7 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
-USING: sequences namespaces math math.vectors opengl opengl.gl
-arrays kernel random ui ui.gadgets ui.gadgets.canvas ui.render
-math.order math.rectangles accessors ;
+USING: accessors arrays fry kernel math math.order math.vectors
+namespaces opengl.gl random sequences ui ui.gadgets
+ui.gadgets.canvas ui.render ;
 IN: maze
 
 CONSTANT: line-width 8
@@ -9,9 +9,6 @@ CONSTANT: line-width 8
 SYMBOL: visited
 
 : unvisited? ( cell -- ? ) first2 visited get ?nth ?nth ;
-
-: ?set-nth ( elt i seq -- )
-    2dup bounds-check? [ set-nth ] [ 3drop ] if ;
 
 : visit ( cell -- ) f swap first2 visited get ?nth ?set-nth ;
 
@@ -44,7 +41,7 @@ SYMBOL: visited
     line-width 2 - glLineWidth
     line-width 2 - glPointSize
     1.0 1.0 1.0 1.0 glColor4d
-    dup iota [ drop t <array> ] with map visited set
+    dup '[ _ t <array> ] replicate visited set
     GL_LINE_STRIP glBegin
     { 0 0 } dup vertex (draw-maze)
     glEnd ;

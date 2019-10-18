@@ -85,10 +85,8 @@ SYMBOL: worklist
 SYMBOL: visited
 
 : add-to-worklist ( bb -- )
-    dup visited get in? [ drop ] [
-        [ visited get adjoin ]
-        [ worklist get push-front ] bi
-    ] if ;
+    dup visited get ?adjoin
+    [ worklist get push-front ] [ drop ] if ;
 
 : init-worklist ( cfg -- )
     <dlist> worklist set

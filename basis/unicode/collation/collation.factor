@@ -31,7 +31,7 @@ TUPLE: weight primary secondary tertiary ignorable? ;
 : help-one ( assoc key -- )
     ! Need to be more general? Not for DUCET, apparently
     2 head 2dup swap key? [ 2drop ] [
-        [ [ 1string swap at ] with { } map-as concat ]
+        [ [ 1string of ] with { } map-as concat ]
         [ swap set-at ] 2bi
     ] if ;
 

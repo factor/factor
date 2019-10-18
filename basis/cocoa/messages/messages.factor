@@ -37,9 +37,9 @@ super-message-senders [ H{ } clone ] initialize
     [ ] [ object_getClass class_getSuperclass ] bi
     objc-super <struct-boa> ;
 
-TUPLE: selector name object ;
+TUPLE: selector-tuple name object ;
 
-MEMO: <selector> ( name -- sel ) f \ selector boa ;
+MEMO: <selector> ( name -- sel ) f \ selector-tuple boa ;
 
 : selector ( selector -- alien )
     dup object>> expired? [
@@ -49,18 +49,27 @@ MEMO: <selector> ( name -- sel ) f \ selector boa ;
         object>>
     ] if ;
 
+: lookup-selector ( name -- alien )
+    <selector> selector ;
+
 SYMBOL: objc-methods
 
 objc-methods [ H{ } clone ] initialize
 
+ERROR: no-objc-method name ;
+
+: ?lookup-method ( selector -- method/f )
+    objc-methods get at ;
+
 : lookup-method ( selector -- method )
-    dup objc-methods get at
-    [ ] [ "No such method: " prepend throw ] ?if ;
+    dup ?lookup-method [ ] [ no-objc-method ] ?if ;
+
+: lookup-sender ( name -- method )
+    lookup-method message-senders get at ;
 
 MEMO: make-prepare-send ( selector method super? -- quot )
     [
-        [ \ <super> , ] when
-        swap <selector> , \ selector ,
+        [ \ <super> , ] when swap <selector> , \ selector ,
     ] [ ] make
     swap second length 2 - '[ _ _ ndip ] ;
 

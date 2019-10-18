@@ -1,9 +1,10 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings alien.syntax arrays
-byte-arrays kernel literals math sequences windows.types
-windows.kernel32 windows.errors math.bitwise io.encodings.utf16n
-classes.struct windows.com.syntax init ;
+USING: accessors alien alien.c-types alien.data alien.strings
+alien.syntax arrays byte-arrays classes.struct grouping init
+io.encodings.utf16n kernel literals math math.bitwise
+math.parser sequences windows.com.syntax windows.errors
+windows.kernel32 windows.types ;
 FROM: alien.c-types => short ;
 IN: windows.winsock
 
@@ -144,6 +145,14 @@ STRUCT: addrinfo
 STRUCT: timeval
     { sec long }
     { usec long } ;
+
+GENERIC: sockaddr>ip ( sockaddr -- string )
+
+M: sockaddr-in sockaddr>ip ( sockaddr -- string )
+    addr>> uint <ref> [ number>string ] { } map-as "." join ;
+
+M: sockaddr-in6 sockaddr>ip ( uchar-array -- string )
+    addr>> [ >hex ] { } map-as 2 group [ concat ] map ":" join ;
 
 C-TYPE: fd_set
 

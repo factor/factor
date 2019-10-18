@@ -72,7 +72,7 @@ M: broadcast (consult-method-quot)
     [ second [ [ dip ] curry ] times ] [ first ] bi
     (consult-method-quot) ;
 
-: consult-method ( word consultation -- )
+: define-consult-method ( word consultation -- )
     [ create-consult-method ]
     [ swap consult-method-quot ] 2bi
     define ;
@@ -85,7 +85,7 @@ M: broadcast (consult-method-quot)
     '[ [ _ _ ] dip ?set-at ] change-word-prop ;
 
 : consult-methods ( consultation -- )
-    [ consult-method ] each-generic ;
+    [ define-consult-method ] each-generic ;
 
 : unregister-consult ( consultation -- )
     [ class>> ] [ group>> ] bi
@@ -142,7 +142,7 @@ M: consultation forget*
 
 : add-new-definitions ( protocol wordlist -- )
     [ drop protocol-consult values ] [ added-words ] 2bi
-    [ swap consult-method ] cartesian-each ;
+    [ swap define-consult-method ] cartesian-each ;
 
 : initialize-protocol-props ( protocol wordlist -- )
     [

@@ -62,8 +62,11 @@ M: word-completion (word-at-caret)
         '[ _ _ search-manifest ] [ drop f ] recover
     ] [ 2drop f ] if ;
 
-M: char-completion (word-at-caret)
-    2drop f ;
+M: char-completion (word-at-caret) 2drop f ;
+
+M: path-completion (word-at-caret) 2drop f ;
+
+M: color-completion (word-at-caret) 2drop f ;
 
 : word-at-caret ( token interactor -- obj )
     completion-mode (word-at-caret) ;

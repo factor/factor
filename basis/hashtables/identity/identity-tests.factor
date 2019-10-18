@@ -11,7 +11,7 @@ CONSTANT: will
     }
 
 : please-stand-up ( assoc key -- value )
-    swap at ;
+    of ;
 
 [ t ] [ will the-real-slim-shady please-stand-up ] unit-test
 [ t ] [ will clone the-real-slim-shady please-stand-up ] unit-test

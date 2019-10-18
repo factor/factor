@@ -1,13 +1,13 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays assocs cocoa kernel math cocoa.messages cocoa.subclassing
-cocoa.classes cocoa.views cocoa.application cocoa.pasteboard
-cocoa.runtime cocoa.types cocoa.windows sequences
-io.encodings.utf8 locals ui ui.private ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures
-core-foundation.strings core-graphics core-graphics.types
-threads combinators math.rectangles ;
+arrays assocs cocoa cocoa.application cocoa.classes
+cocoa.messages cocoa.pasteboard cocoa.runtime cocoa.subclassing
+cocoa.types cocoa.views combinators core-foundation.strings
+core-graphics core-graphics.types core-text io.encodings.utf8
+kernel locals math math.rectangles namespaces opengl sequences
+threads ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.private ;
 IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -148,6 +148,23 @@ CONSTANT: selector>action H{
 
 CLASS: FactorView < NSOpenGLView NSTextInput
 [
+
+    METHOD: void prepareOpenGL [
+
+        self SEL: setWantsBestResolutionOpenGLSurface:
+        -> respondsToSelector: c-bool> [
+
+            self SEND: setWantsBestResolutionOpenGLSurface:
+            1 swap execute( x x x -- )
+
+            self SEND: backingScaleFactor execute( x x -- x )
+            dup 1.0 > [
+                gl-scale-factor set-global t retina? set-global
+            ] [ drop ] if
+
+        ] when
+    ]
+
     ! Rendering
     METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ]
 

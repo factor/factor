@@ -460,3 +460,11 @@ HELP: get-slot-named
 HELP: set-slot-named
 { $values { "value" object } { "name" string } { "tuple" tuple } }
 { $description "Stores the " { $snippet "value" } " into a tuple slot accessed by " { $snippet "name" } "." } ;
+
+HELP: set-slots
+{ $values { "assoc" assoc } { "tuple" tuple } }
+{ $description "For each " { $snippet "{ key value }" } " pair in " { $snippet "assoc" } ", sets the " { $snippet "key" } " slot in " { $snippet "obj" } " to " { $snippet "value" } "." } ;
+
+HELP: from-slots
+{ $values { "assoc" assoc } { "class" tuple-class } { "tuple" tuple } }
+{ $description "Creates a new instance of " { $snippet "class" } " with slot values specified by " { $snippet "assoc" } "." } ;

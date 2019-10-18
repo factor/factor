@@ -65,10 +65,11 @@ io.sockets.secure.debug ;
 
 [ ] [
     [
-        "127.0.0.1" 0 <inet4> ascii <server> [
-            dup addr>> port>> "port" get fulfill
-            accept drop 1 minutes sleep dispose
-        ] with-disposal
+        [
+            "127.0.0.1" 0 <inet4> ascii <server> &dispose 
+                dup addr>> port>> "port" get fulfill
+                accept drop &dispose 1 minutes sleep
+        ] with-destructors
     ] "Silly server" spawn drop
 ] unit-test
 
@@ -83,18 +84,22 @@ io.sockets.secure.debug ;
 
 [ ] [
     [
-        "127.0.0.1" "port" get ?promise
-        <inet4> ascii <client> drop 1 minutes sleep dispose
+        [
+            "127.0.0.1" "port" get ?promise
+            <inet4> ascii <client> drop &dispose 1 minutes sleep
+        ] with-destructors
     ] "Silly client" spawn drop
 ] unit-test
 
 [
     1 seconds secure-socket-timeout [
         [
-            "127.0.0.1" 0 <inet4> <secure> ascii <server> [
-                dup addr>> addrspec>> port>> "port" get fulfill
-                accept drop dup stream-read1 drop dispose
-            ] with-disposal
+            [
+                "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+                    dup addr>> addrspec>> port>> "port" get fulfill
+                    accept drop &dispose dup stream-read1 drop
+                ] with-disposal
+            ] with-destructors
         ] with-test-context
     ] with-variable
 ] [ io-timeout? ] must-fail-with
@@ -108,11 +113,13 @@ io.sockets.secure.debug ;
     [ ] [
         [
             [
-                "127.0.0.1" 0 <inet4> <secure> ascii <server> [
-                    dup addr>> addrspec>> port>> "port" get fulfill
-                    accept drop 1 minutes sleep dispose
-                ] with-disposal
-            ] with-test-context
+                [
+                    "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+                        dup addr>> addrspec>> port>> "port" get fulfill
+                        accept drop &dispose 1 minutes sleep
+                    ] with-disposal
+                ] with-test-context
+            ] with-destructors
         ] "Silly server" spawn drop
     ] unit-test
     
@@ -131,20 +138,24 @@ io.sockets.secure.debug ;
     [ ] [
         [
             [
-                "127.0.0.1" "port" get ?promise
-                <inet4> <secure> ascii <client> drop 1 minutes sleep dispose
-            ] with-test-context
+                [
+                    "127.0.0.1" "port" get ?promise
+                    <inet4> <secure> ascii <client> drop &dispose 1 minutes sleep
+                ] with-test-context
+            ] with-destructors
         ] "Silly client" spawn drop
     ] unit-test
     
     [
-        1 seconds secure-socket-timeout [
-            [
-                "127.0.0.1" 0 <inet4> <secure> ascii <server> [
-                    dup addr>> addrspec>> port>> "port" get fulfill
-                    accept drop dispose
-                ] with-disposal
-            ] with-test-context
-        ] with-variable
+        [
+            1 seconds secure-socket-timeout [
+                [
+                    "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+                        dup addr>> addrspec>> port>> "port" get fulfill
+                        accept drop &dispose
+                    ] with-disposal
+                ] with-test-context
+            ] with-variable
+        ] with-destructors
     ] [ io-timeout? ] must-fail-with
 ] drop

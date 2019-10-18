@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words assocs definitions io io.pathnames io.styles kernel
-prettyprint sorting see sets sequences arrays hashtables help
-help.crossref help.topics help.markup quotations accessors
-source-files namespaces graphs vocabs generic generic.single
-threads compiler.units init combinators.smart ;
+USING: accessors arrays assocs combinators.smart compiler.units
+generic generic.single graphs hash-sets.identity hashtables help
+help.crossref help.markup help.topics init io io.pathnames
+io.styles kernel namespaces quotations see sequences sets
+sorting source-files threads vocabs words ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -15,23 +15,21 @@ GENERIC: uses ( defspec -- seq )
 
 SYMBOL: visited
 
-GENERIC# quot-uses 1 ( obj assoc -- )
+GENERIC# quot-uses 1 ( obj set -- )
 
 M: object quot-uses 2drop ;
 
-M: word quot-uses over crossref? [ conjoin ] [ 2drop ] if ;
+M: word quot-uses over crossref? [ adjoin ] [ 2drop ] if ;
 
-: seq-uses ( seq assoc -- )
-    over visited get member-eq? [ 2drop ] [
-        over visited get push
+: seq-uses ( seq set -- )
+    over visited get ?adjoin [
         [ quot-uses ] curry each
-    ] if ;
+    ] [ 2drop ] if ; inline
 
-: assoc-uses ( assoc' assoc -- )
-    over visited get member-eq? [ 2drop ] [
-        over visited get push
+: assoc-uses ( assoc' set -- )
+    over visited get ?adjoin [
         [ quot-uses ] curry [ bi@ ] curry assoc-each
-    ] if ;
+    ] [ 2drop ] if ; inline
 
 M: array quot-uses seq-uses ;
 
@@ -41,9 +39,9 @@ M: callable quot-uses seq-uses ;
 
 M: wrapper quot-uses [ wrapped>> ] dip quot-uses ;
 
-M: callable uses ( quot -- assoc )
-    V{ } clone visited [
-        H{ } clone [ quot-uses ] keep keys
+M: callable uses ( quot -- seq )
+    IHS{ } clone visited [
+        HS{ } clone [ quot-uses ] keep members
     ] with-variable ;
 
 M: word uses def>> uses ;
@@ -56,7 +54,7 @@ M: link uses
 M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
 
 ! To make UI browser happy
-M: vocab uses drop f ;
+M: object uses drop f ;
 
 : crossref-def ( defspec -- )
     dup uses crossref get-global add-vertex ;

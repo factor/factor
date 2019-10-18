@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words accessors sequences kernel assocs combinators
-classes classes.private classes.algebra classes.algebra.private
-classes.builtin namespaces arrays math quotations make ;
+USING: accessors assocs classes classes.algebra
+classes.algebra.private classes.builtin classes.private
+combinators kernel make sequences words ;
 IN: classes.intersection
 
 PREDICATE: intersection-class < class

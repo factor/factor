@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math sequences.private sequences
-strings growable strings.private ;
+USING: accessors growable kernel math sequences
+sequences.private strings strings.private ;
 IN: sbufs
 
 TUPLE: sbuf
@@ -18,6 +18,8 @@ M: sbuf new-sequence
     drop [ 0 <string> ] [ integer>fixnum ] bi sbuf boa ; inline
 
 : >sbuf ( seq -- sbuf ) SBUF" " clone-like ; inline
+
+M: sbuf contract 2drop ; inline
 
 M: sbuf like
     drop dup sbuf? [

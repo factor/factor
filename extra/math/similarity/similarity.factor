@@ -9,7 +9,7 @@ IN: math.similarity
     v- norm 1 + recip ;
 
 : pearson-similarity ( a b -- n )
-    over length 3 < [ 2drop 1.0 ] [ full-corr 0.5 * 0.5 + ] if ;
+    over length 3 < [ 2drop 1.0 ] [ population-corr 0.5 * 0.5 + ] if ;
 
 : cosine-similarity ( a b -- n )
     [ v* sum ] [ [ norm ] bi@ * ] 2bi / 0.5 * 0.5 + ;

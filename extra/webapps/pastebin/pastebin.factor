@@ -52,16 +52,16 @@ M: entity feed-entry-date date>> ;
 
 M: entity feed-entry-url entity-url ;
 
-TUPLE: paste < entity annotations ;
+TUPLE: paste-state < entity annotations ;
 
-\ paste "PASTES" { } define-persistent
+\ paste-state "PASTES" { } define-persistent
 
-: <paste> ( id -- paste )
-    \ paste new
+: <paste-state> ( id -- paste )
+    \ paste-state new
         swap >>id ;
 
 : pastes ( -- pastes )
-    f <paste> select-tuples
+    f <paste-state> select-tuples
     [ date>> ] sort-with
     reverse ;
 
@@ -81,7 +81,7 @@ TUPLE: annotation < entity parent ;
     [ f ] dip <annotation> select-tuple ;
 
 : paste ( id -- paste )
-    [ <paste> select-tuple ]
+    [ <paste-state> select-tuple ]
     [ f <annotation> select-tuples ]
     bi >>annotations ;
 
@@ -94,7 +94,7 @@ CONSTANT: pastebin-url URL" $pastebin/"
 : paste-url ( id -- url )
     "$pastebin/paste" >url swap "id" set-query-param ;
 
-M: paste entity-url
+M: paste-state entity-url
     id>> paste-url ;
 
 : annotation-url ( parent id -- url )
@@ -180,7 +180,7 @@ M: annotation entity-url
         ] >>validate
 
         [
-            f <paste>
+            f <paste-state>
             [ deposit-entity-slots ]
             [ insert-tuple ]
             [ id>> paste-url <redirect> ]
@@ -194,7 +194,7 @@ M: annotation entity-url
 
         [
             [
-                "id" value <paste> delete-tuples
+                "id" value <paste-state> delete-tuples
                 "id" value f <annotation> delete-tuples
             ] with-transaction
             pastebin-url <redirect>

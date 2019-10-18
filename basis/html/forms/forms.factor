@@ -80,9 +80,9 @@ SYMBOL: nested-forms
         ] with-scope
     ] dip set-value ; inline
 
-TUPLE: validation-error value message ;
+TUPLE: validation-error-state value message ;
 
-C: <validation-error> validation-error
+C: <validation-error-state> validation-error-state
 
 : validation-error ( message -- )
     form get
@@ -96,11 +96,11 @@ C: <validation-error> validation-error
     >hashtable "validators" set-word-prop ;
 
 : validate ( value quot -- result )
-    '[ _ call( value -- validated ) ] [ <validation-error> ] recover ;
+    '[ _ call( value -- validated ) ] [ <validation-error-state> ] recover ;
 
 : validate-value ( name value quot -- )
     validate
-    dup validation-error? [ form get t >>validation-failed drop ] when
+    dup validation-error-state? [ form get t >>validation-failed drop ] when
     swap set-value ;
 
 : validate-values ( assoc validators -- )

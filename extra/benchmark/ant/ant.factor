@@ -35,7 +35,7 @@ C: <point> point
     [ x>> ] [ y>> ] bi [ sum-digits ] bi@ + 25 <= ; inline
 
 :: ant-benchmark ( -- )
-    200000 <hashtable> hash-set boa :> seen
+    200000 <hash-set> :> seen
     100000 <vector> :> stack
     0 :> total!
 
@@ -43,8 +43,7 @@ C: <point> point
 
     [ stack empty? ] [
         stack pop :> p
-        p seen in? [
-            p seen adjoin
+        p seen ?adjoin [
             p walkable? [
                 total 1 + total!
                 p clone [ 1 + ] change-x stack push
@@ -52,7 +51,7 @@ C: <point> point
                 p clone [ 1 + ] change-y stack push
                 p clone [ 1 - ] change-y stack push
             ] when
-        ] unless
+        ] when
     ] until total 148848 assert= ;
 
 MAIN: ant-benchmark

@@ -32,7 +32,7 @@ SYMBOL: changed-vocabs
     [ unchanged-vocab ] each ;
 
 : changed-vocab? ( vocab -- ? )
-    changed-vocabs get dup [ key? ] [ 2drop t ] if ;
+    changed-vocabs get [ key? ] [ drop t ] if* ;
 
 : filter-changed ( vocabs -- vocabs' )
     [ changed-vocab? ] filter ;
@@ -47,7 +47,7 @@ SYMBOL: modified-docs
                 source-modified? [ get push ] [ 2drop ] if
             ] [ 3drop ] if
         ] [ drop get push ] if
-    ] [ 2drop 2drop ] if ;
+    ] [ 4drop ] if ;
 
 : to-refresh ( prefix -- modified-sources modified-docs unchanged )
     [

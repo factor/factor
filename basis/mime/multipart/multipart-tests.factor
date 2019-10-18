@@ -32,7 +32,7 @@ IN: mime.multipart.tests
 
 [ t ] [
     mime-test-stream [ upload-separator parse-multipart ] with-input-stream
-    "file1" swap at filename>> "up.txt" =
+    "file1" of filename>> "up.txt" =
 ] unit-test
 
 SYMBOL: mime-test-server

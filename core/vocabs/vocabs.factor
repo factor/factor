@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs definitions kernel namespaces sequences
-sets sorting splitting strings ;
+sorting splitting strings ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -91,9 +91,8 @@ GENERIC: vocab-changed ( vocab obj -- )
     vocab-observers get [ vocab-changed ] with each ;
 
 : create-vocab ( name -- vocab )
-    check-vocab-name
-    dictionary get [ <vocab> ] cache
-    dup notify-vocab-observers ;
+    check-vocab-name dictionary get
+    [ <vocab> dup notify-vocab-observers ] cache ;
 
 ERROR: no-vocab name ;
 
@@ -136,7 +135,7 @@ SYMBOL: require-hook
 PREDICATE: runnable-vocab < vocab
     vocab-main >boolean ;
 
-INSTANCE: vocab-spec definition
+INSTANCE: vocab-spec definition-mixin
 
 : call-require-hook ( name -- )
     require-hook get call( name -- ) ;

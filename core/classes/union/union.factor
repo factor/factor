@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra
-classes.algebra.private classes.builtin
-classes.private combinators definitions kernel kernel.private
-math math.private quotations sequences words vocabs ;
+classes.algebra.private classes.builtin classes.private
+combinators definitions kernel kernel.private math math.private
+quotations sequences words ;
+FROM: sets => set= ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -53,10 +54,27 @@ M: union-class update-class define-union-predicate ;
 : (define-union-class) ( class members -- )
     f swap f union-class make-class-props (define-class) ;
 
+ERROR: cannot-reference-self class members ;
+
+GENERIC: classes-contained-by ( obj -- members )
+
+M: union-class classes-contained-by ( union -- members )
+    "members" word-prop [ f ] when-empty ;
+
+M: object classes-contained-by
+    "members" word-prop [ f ] when-empty ;
+
+: check-self-reference ( class members -- class members )
+    2dup [
+        dup dup [ classes-contained-by ] map concat sift append
+        2dup set= [ 2drop f ] [ nip ] if
+    ] follow concat
+    member-eq? [ cannot-reference-self ] when ;
+
 PRIVATE>
 
 : define-union-class ( class members -- )
-    [ (define-union-class) ]
+    [ check-self-reference (define-union-class) ]
     [ drop changed-conditionally ]
     [ drop update-classes ]
     2tri ;

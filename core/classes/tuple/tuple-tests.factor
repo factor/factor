@@ -59,6 +59,12 @@ TUPLE: point x y ;
 [ 200 ] [ "p" get y>> ] unit-test
 [ 300 ] [ "p" get "z>>" "accessors" lookup-word execute ] unit-test
 
+TUPLE: slotty a b c ;
+
+[ T{ slotty } ] [ H{ } slotty from-slots ] unit-test
+[ T{ slotty f 1 2 f } ] [ H{ { "a" 1 } { "b" 2 } } slotty from-slots ] unit-test
+[ H{ { "d" 0 } } slotty new set-slots ] must-fail
+
 TUPLE: predicate-test ;
 
 C: <predicate-test> predicate-test
@@ -89,7 +95,7 @@ C: <empty> empty
 [ t length ] [ object>> t eq? ] must-fail-with
 
 [ "<constructor-test>" ]
-[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval( -- ) word name>> ] unit-test
+[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval( -- ) last-word name>> ] unit-test
 
 TUPLE: size-test a b c d ;
 

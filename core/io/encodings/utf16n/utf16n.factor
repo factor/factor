@@ -7,9 +7,9 @@ IN: io.encodings.utf16n
 
 SINGLETON: utf16n
 
-: utf16n ( -- descriptor )
+: choose-utf16-endian ( -- descriptor )
     B{ 1 0 0 0 } 0 alien-unsigned-4 1 = utf16le utf16be ? ; foldable
 
-M: utf16n <decoder> drop utf16n <decoder> ;
+M: utf16n <decoder> drop choose-utf16-endian <decoder> ;
 
-M: utf16n <encoder> drop utf16n <encoder> ;
+M: utf16n <encoder> drop choose-utf16-endian <encoder> ;

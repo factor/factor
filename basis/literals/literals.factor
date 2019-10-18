@@ -17,7 +17,7 @@ IN: literals
     ] with-datastack ;
 
 : expand-literals ( seq -- seq' )
-    [ [ { } ] dip expand-literal ] map concat ;
+    { } [ expand-literal ] reduce ;
 
 PRIVATE>
 

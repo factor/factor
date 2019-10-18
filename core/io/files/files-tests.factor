@@ -246,7 +246,7 @@ CONSTANT: pt-array-1
 ] must-fail
 
 [ ] [
-    "resource:misc/icons/Factor_48x48.png" binary [
+    "resource:license.txt" binary [
         44 read drop
         tell-input 44 assert=
         -44 seek-relative seek-input

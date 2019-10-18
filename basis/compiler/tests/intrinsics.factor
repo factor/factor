@@ -301,7 +301,7 @@ cell 8 = [
     [ -18446744073709551616 ] [ -1 64 [ fixnum-shift ] compile-call ] unit-test
     [ -18446744073709551616 ] [ -1 [ 64 fixnum-shift ] compile-call ] unit-test
     [ -18446744073709551616 ] [ -1 [ 32 fixnum-shift 32 fixnum-shift ] compile-call ] unit-test
-    
+
     [ 576460752303423488 ] [ -576460752303423488 >fixnum -1 [ fixnum/i ] compile-call ] unit-test
 
     [ 576460752303423488 0 ] [ -576460752303423488 >fixnum -1 [ fixnum/mod ] compile-call ] unit-test
@@ -315,11 +315,11 @@ cell 8 = [
 ERROR: bug-in-fixnum* x y a b ;
 
 [ ] [
-    10000 [ 
+    10000 [
         32 random-bits >fixnum
         32 random-bits >fixnum
         2dup [ fixnum* ] [ compiled-fixnum* ] 2bi 2dup =
-        [ 2drop 2drop ] [ bug-in-fixnum* ] if
+        [ 4drop ] [ bug-in-fixnum* ] if
     ] times
 ] unit-test
 

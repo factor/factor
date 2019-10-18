@@ -4,10 +4,10 @@ USING: alien.c-types help.markup help.syntax kernel quotations
 sequences strings ;
 IN: tools.coverage
 
-HELP: <coverage>
+HELP: <coverage-state>
 { $values
     { "executed?" boolean }
-    { "coverage" coverage }
+    { "coverage-state" coverage-state }
 }
 { $description "Makes a coverage tuple. Users should not call this directly." } ; 
 

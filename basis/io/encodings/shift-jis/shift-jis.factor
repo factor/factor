@@ -33,7 +33,7 @@ TUPLE: jis assoc ;
 : jis>ch ( jis tuple -- string ) assoc>> at replacement-char or ;
 
 : make-jis ( filename -- jis )
-    flat-file>biassoc [ nip ] assoc-filter jis boa ;
+    flat-file>biassoc sift-values jis boa ;
 
 "vocab:io/encodings/shift-jis/CP932.txt"
 make-jis windows-31j-table set-global
@@ -62,3 +62,5 @@ M: jis decode-char
             [ 2drop replacement-char ] if*
         ] if
     ] [ 2drop f ] if* ;
+
+PRIVATE>

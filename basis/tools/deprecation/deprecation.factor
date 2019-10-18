@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors arrays assocs combinators.short-circuit
-compiler.units debugger init io
+compiler.units debugger init io sets
 io.streams.null kernel namespaces prettyprint sequences
 source-files.errors summary tools.crossref
 tools.crossref.private tools.errors words ;
@@ -11,16 +11,16 @@ SYMBOL: deprecation-notes
 
 deprecation-notes [ H{ } clone ] initialize
 
-TUPLE: deprecation-note < source-file-error ;
+TUPLE: deprecation-note-error < source-file-error ;
 
-M: deprecation-note error-type drop +deprecation-note+ ;
+M: deprecation-note-error error-type drop +deprecation-note+ ;
 
 TUPLE: deprecated-usages asset usages ;
 
 : :deprecations ( -- )
     deprecation-notes get-global values errors. ;
 
-T{ error-type
+T{ error-type-holder
     { type +deprecation-note+ }
     { word ":deprecations" }
     { plural "deprecated word usages" }
@@ -29,12 +29,12 @@ T{ error-type
     { forget-quot [ deprecation-notes get delete-at ] }
 } define-error-type
 
-: <deprecation-note> ( error word -- deprecation-note )
-    \ deprecation-note <definition-error> ;
+: <deprecation-note-error> ( error word -- deprecation-note )
+    \ deprecation-note-error <definition-error> ;
 
 : deprecation-note ( word usages -- )
     [ deprecated-usages boa ]
-    [ drop <deprecation-note> ]
+    [ drop <deprecation-note-error> ]
     [ drop deprecation-notes get-global set-at ] 2tri ;
 
 : clear-deprecation-note ( word -- )
@@ -67,7 +67,7 @@ SINGLETON: deprecation-observer
     ] with-null-writer ;
 
 M: deprecation-observer definitions-changed
-    drop keys [ word? ] filter
+    drop members [ word? ] filter
     dup [ deprecated? ] any? not
     [ [ check-deprecations ] each ]
     [ drop initialize-deprecation-notes ] if ;

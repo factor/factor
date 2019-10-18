@@ -29,7 +29,7 @@ M: linkage-error error-type drop +linkage-error+ ;
 : save-compiler-error ( error -- )
     dup asset>> compiler-errors get-global set-at ;
 
-T{ error-type
+T{ error-type-holder
    { type +compiler-error+ }
    { word ":errors" }
    { plural "compiler errors" }
@@ -44,10 +44,10 @@ T{ error-type
 : <linkage-error> ( error word -- linkage-error )
     \ linkage-error <definition-error> ;
 
-: linkage-error ( name message word class -- )
+: set-linkage-error ( name message word class -- )
     '[ _ boa ] dip <linkage-error> dup asset>> linkage-errors get set-at ; inline
 
-T{ error-type
+T{ error-type-holder
    { type +linkage-error+ }
    { word ":linkage" }
    { plural "linkage errors" }
@@ -61,17 +61,17 @@ TUPLE: no-such-library name message ;
 
 M: no-such-library summary drop "Library not found" ;
 
-: no-such-library-error ( name message word -- ) \ no-such-library linkage-error ;
+: no-such-library-error ( name message word -- ) \ no-such-library set-linkage-error ;
 
 TUPLE: no-such-symbol name message ;
 
 M: no-such-symbol summary drop "Symbol not found" ;
 
-: no-such-symbol-error ( name message word -- ) \ no-such-symbol linkage-error ;
+: no-such-symbol-error ( name message word -- ) \ no-such-symbol set-linkage-error ;
 
 ERROR: not-compiled word error ;
 
-T{ error-type
+T{ error-type-holder
     { type +user-init-error+ }
     { word ":user-init-errors" }
     { plural "rc file errors" }

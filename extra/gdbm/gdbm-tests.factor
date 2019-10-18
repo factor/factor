@@ -4,7 +4,7 @@ USING: accessors arrays continuations gdbm io.directories
 io.files.temp kernel sequences sets system tools.test ;
 IN: gdbm.tests
 
-: db-path ( -- filename ) "test.db" temp-file ;
+: db-path ( -- filename ) cpu name>> "-test.db" append temp-file ;
 
 : CLEANUP ( -- ) [ db-path delete-file ] ignore-errors ;
 

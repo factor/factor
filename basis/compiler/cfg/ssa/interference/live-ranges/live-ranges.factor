@@ -30,6 +30,12 @@ GENERIC: record-insn ( n insn -- )
 M: ##phi record-insn
     record-defs ;
 
+M: ##parallel-copy record-insn
+    [ 2 * ] dip
+    [ record-defs ]
+    [ uses-vregs [ local-kill-indices get set-at ] with each ]
+    2bi ;
+
 M: vreg-insn record-insn
     [ 2 * ] dip [ record-defs ] [ record-uses ] 2bi ;
 

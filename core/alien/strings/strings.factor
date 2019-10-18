@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays sequences kernel kernel.private accessors math
-alien.accessors byte-arrays io io.encodings io.encodings.utf8
-io.encodings.utf16n io.streams.byte-array io.streams.memory system
-system.private alien strings combinators namespaces init ;
+USING: accessors alien arrays byte-arrays init io io.encodings
+io.encodings.utf16n io.encodings.utf8 io.streams.byte-array
+io.streams.memory kernel kernel.private namespaces sequences
+strings system system.private ;
 IN: alien.strings
 
 GENERIC# alien>string 1 ( c-ptr encoding -- string/f )

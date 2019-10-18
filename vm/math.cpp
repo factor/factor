@@ -18,7 +18,7 @@ void factor_vm::primitive_float_to_fixnum()
 by -1. */
 void factor_vm::primitive_fixnum_divint()
 {
-	fixnum y = untag_fixnum(ctx->pop()); \
+	fixnum y = untag_fixnum(ctx->pop());
 	fixnum x = untag_fixnum(ctx->peek());
 	fixnum result = x / y;
 	if(result == -fixnum_min)
@@ -31,18 +31,20 @@ void factor_vm::primitive_fixnum_divint()
 /* does not allocate, even though from_signed_cell can allocate */
 void factor_vm::primitive_fixnum_divmod()
 {
-	cell y = ((cell *)ctx->datastack)[0];
-	cell x = ((cell *)ctx->datastack)[-1];
-	if(y == tag_fixnum(-1) && x == tag_fixnum(fixnum_min))
+	cell *s0 = (cell *)(ctx->datastack);
+	cell *s1 = (cell *)(ctx->datastack - sizeof(cell));
+	fixnum y = untag_fixnum(*s0);
+	fixnum x = untag_fixnum(*s1);
+	if(y == -1 && x == fixnum_min)
 	{
 		/* Does not allocate */
-		((cell *)ctx->datastack)[-1] = from_signed_cell(-fixnum_min);
-		((cell *)ctx->datastack)[0] = tag_fixnum(0);
+		*s1 = from_signed_cell(-fixnum_min);
+		*s0 = tag_fixnum(0);
 	}
 	else
 	{
-		((cell *)ctx->datastack)[-1] = tag_fixnum(untag_fixnum(x) / untag_fixnum(y));
-		((cell *)ctx->datastack)[0] = (fixnum)x % (fixnum)y;
+		*s1 = tag_fixnum(x / y);
+		*s0 = tag_fixnum(x % y);
 	}
 }
 
@@ -104,106 +106,109 @@ void factor_vm::primitive_float_to_bignum()
 
 #define POP_BIGNUMS(x,y) \
 	bignum * y = untag<bignum>(ctx->pop()); \
-	bignum * x = untag<bignum>(ctx->pop());
+	bignum * x = untag<bignum>(ctx->peek());
 
 void factor_vm::primitive_bignum_eq()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_equal_p(x,y)));
+	ctx->replace(tag_boolean(bignum_equal_p(x,y)));
 }
 
 void factor_vm::primitive_bignum_add()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_add(x,y)));
+	ctx->replace(tag<bignum>(bignum_add(x,y)));
 }
 
 void factor_vm::primitive_bignum_subtract()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_subtract(x,y)));
+	ctx->replace(tag<bignum>(bignum_subtract(x,y)));
 }
 
 void factor_vm::primitive_bignum_multiply()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_multiply(x,y)));
+	ctx->replace(tag<bignum>(bignum_multiply(x,y)));
 }
 
 void factor_vm::primitive_bignum_divint()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_quotient(x,y)));
+	ctx->replace(tag<bignum>(bignum_quotient(x,y)));
 }
 
 void factor_vm::primitive_bignum_divmod()
 {
+	cell *s0 = (cell *)(ctx->datastack);
+	cell *s1 = (cell *)(ctx->datastack - sizeof(cell));
+	bignum *y = untag<bignum>(*s0);
+	bignum *x = untag<bignum>(*s1);
 	bignum *q, *r;
-	POP_BIGNUMS(x,y);
-	bignum_divide(x,y,&q,&r);
-	ctx->push(tag<bignum>(q));
-	ctx->push(tag<bignum>(r));
+	bignum_divide(x, y, &q, &r);
+	*s1 = tag<bignum>(q);
+	*s0 = tag<bignum>(r);
 }
 
 void factor_vm::primitive_bignum_mod()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_remainder(x,y)));
+	ctx->replace(tag<bignum>(bignum_remainder(x,y)));
 }
 
 void factor_vm::primitive_bignum_gcd()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_gcd(x,y)));
+	ctx->replace(tag<bignum>(bignum_gcd(x,y)));
 }
 
 void factor_vm::primitive_bignum_and()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_bitwise_and(x,y)));
+	ctx->replace(tag<bignum>(bignum_bitwise_and(x,y)));
 }
 
 void factor_vm::primitive_bignum_or()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_bitwise_ior(x,y)));
+	ctx->replace(tag<bignum>(bignum_bitwise_ior(x,y)));
 }
 
 void factor_vm::primitive_bignum_xor()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag<bignum>(bignum_bitwise_xor(x,y)));
+	ctx->replace(tag<bignum>(bignum_bitwise_xor(x,y)));
 }
 
 void factor_vm::primitive_bignum_shift()
 {
 	fixnum y = untag_fixnum(ctx->pop());
-	bignum* x = untag<bignum>(ctx->pop());
-	ctx->push(tag<bignum>(bignum_arithmetic_shift(x,y)));
+	bignum* x = untag<bignum>(ctx->peek());
+	ctx->replace(tag<bignum>(bignum_arithmetic_shift(x,y)));
 }
 
 void factor_vm::primitive_bignum_less()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_compare(x,y) == bignum_comparison_less));
+	ctx->replace(tag_boolean(bignum_compare(x,y) == bignum_comparison_less));
 }
 
 void factor_vm::primitive_bignum_lesseq()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_compare(x,y) != bignum_comparison_greater));
+	ctx->replace(tag_boolean(bignum_compare(x,y) != bignum_comparison_greater));
 }
 
 void factor_vm::primitive_bignum_greater()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_compare(x,y) == bignum_comparison_greater));
+	ctx->replace(tag_boolean(bignum_compare(x,y) == bignum_comparison_greater));
 }
 
 void factor_vm::primitive_bignum_greatereq()
 {
 	POP_BIGNUMS(x,y);
-	ctx->push(tag_boolean(bignum_compare(x,y) != bignum_comparison_less));
+	ctx->replace(tag_boolean(bignum_compare(x,y) != bignum_comparison_less));
 }
 
 void factor_vm::primitive_bignum_not()
@@ -214,8 +219,8 @@ void factor_vm::primitive_bignum_not()
 void factor_vm::primitive_bignum_bitp()
 {
 	int bit = (int)to_fixnum(ctx->pop());
-	bignum *x = untag<bignum>(ctx->pop());
-	ctx->push(tag_boolean(bignum_logbitp(bit,x)));
+	bignum *x = untag<bignum>(ctx->peek());
+	ctx->replace(tag_boolean(bignum_logbitp(bit,x)));
 }
 
 void factor_vm::primitive_bignum_log2()
@@ -223,7 +228,7 @@ void factor_vm::primitive_bignum_log2()
 	ctx->replace(tag<bignum>(bignum_integer_length(untag<bignum>(ctx->peek()))));
 }
 
-/* allocates memory */
+/* Allocates memory */
 cell factor_vm::unbox_array_size_slow()
 {
 	if(tagged<object>(ctx->peek()).type() == BIGNUM_TYPE)
@@ -244,76 +249,82 @@ cell factor_vm::unbox_array_size_slow()
 	return 0; /* can't happen */
 }
 
+/* Allocates memory */
 void factor_vm::primitive_fixnum_to_float()
 {
 	ctx->replace(allot_float(fixnum_to_float(ctx->peek())));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_format_float()
 {
 	byte_array *array = allot_byte_array(100);
 	char *format = alien_offset(ctx->pop());
-	double value = untag_float_check(ctx->pop());
+	double value = untag_float_check(ctx->peek());
 	SNPRINTF(array->data<char>(),99,format,value);
-	ctx->push(tag<byte_array>(array));
+	ctx->replace(tag<byte_array>(array));
 }
 
 #define POP_FLOATS(x,y) \
 	double y = untag_float(ctx->pop()); \
-	double x = untag_float(ctx->pop());
+	double x = untag_float(ctx->peek());
 
 void factor_vm::primitive_float_eq()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x == y));
+	ctx->replace(tag_boolean(x == y));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_add()
 {
 	POP_FLOATS(x,y);
-	ctx->push(allot_float(x + y));
+	ctx->replace(allot_float(x + y));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_subtract()
 {
 	POP_FLOATS(x,y);
-	ctx->push(allot_float(x - y));
+	ctx->replace(allot_float(x - y));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_multiply()
 {
 	POP_FLOATS(x,y);
-	ctx->push(allot_float(x * y));
+	ctx->replace(allot_float(x * y));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_float_divfloat()
 {
 	POP_FLOATS(x,y);
-	ctx->push(allot_float(x / y));
+	ctx->replace(allot_float(x / y));
 }
 
 void factor_vm::primitive_float_less()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x < y));
+	ctx->replace(tag_boolean(x < y));
 }
 
 void factor_vm::primitive_float_lesseq()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x <= y));
+	ctx->replace(tag_boolean(x <= y));
 }
 
 void factor_vm::primitive_float_greater()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x > y));
+	ctx->replace(tag_boolean(x > y));
 }
 
 void factor_vm::primitive_float_greatereq()
 {
 	POP_FLOATS(x,y);
-	ctx->push(tag_boolean(x >= y));
+	ctx->replace(tag_boolean(x >= y));
 }
 
 /* Allocates memory */
@@ -333,6 +344,7 @@ void factor_vm::primitive_double_bits()
 	ctx->push(from_unsigned_8(double_bits(untag_float_check(ctx->pop()))));
 }
 
+/* Allocates memory */
 void factor_vm::primitive_bits_double()
 {
 	ctx->push(allot_float(bits_double(to_unsigned_8(ctx->pop()))));
@@ -414,6 +426,7 @@ VM_C_API s64 to_signed_8(cell obj, factor_vm *parent)
 	return parent->to_signed_8(obj);
 }
 
+/* Allocates memory */
 cell factor_vm::from_unsigned_8(u64 n)
 {
 	if(n > (u64)fixnum_max)
@@ -461,6 +474,7 @@ double factor_vm::to_double(cell value)
 
 /* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
 overflow, they call these functions. */
+/* Allocates memory */
 inline void factor_vm::overflow_fixnum_add(fixnum x, fixnum y)
 {
 	ctx->replace(tag<bignum>(fixnum_to_bignum(
@@ -472,6 +486,7 @@ VM_C_API void overflow_fixnum_add(fixnum x, fixnum y, factor_vm *parent)
 	parent->overflow_fixnum_add(x,y);
 }
 
+/* Allocates memory */
 inline void factor_vm::overflow_fixnum_subtract(fixnum x, fixnum y)
 {
 	ctx->replace(tag<bignum>(fixnum_to_bignum(
@@ -483,6 +498,7 @@ VM_C_API void overflow_fixnum_subtract(fixnum x, fixnum y, factor_vm *parent)
 	parent->overflow_fixnum_subtract(x,y);
 }
 
+/* Allocates memory */
 inline void factor_vm::overflow_fixnum_multiply(fixnum x, fixnum y)
 {
 	bignum *bx = fixnum_to_bignum(x);

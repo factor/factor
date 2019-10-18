@@ -1,5 +1,5 @@
 ifndef DEBUG
-	CFLAGS += -fomit-frame-pointer
+	SITE_CFLAGS += -fomit-frame-pointer
 endif
 
 EXE_SUFFIX =
@@ -18,7 +18,6 @@ else
 	X11_UI_LIBS = `pkg-config --libs gtk+-2.0 gtkglext-1.0`
 endif
 
-# CFLAGS += -fPIC
 FFI_TEST_CFLAGS = -fPIC
 
 # LINKER = gcc -shared -o

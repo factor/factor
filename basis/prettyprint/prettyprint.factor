@@ -10,12 +10,12 @@ FROM: namespaces => set ;
 IN: prettyprint
 
 : with-use ( obj quot -- )
-    make-pprint (pprint-manifest
+    t make-pprint (pprint-manifest
     [ pprint-manifest) ] [ [ drop nl ] unless-empty ] bi
     do-pprint ; inline
 
 : with-in ( obj quot -- )
-    make-pprint current-vocab>> [ pprint-in bl ] when* do-pprint ; inline
+    t make-pprint current-vocab>> [ pprint-in bl ] when* do-pprint ; inline
 
 : pprint ( obj -- ) [ pprint* ] with-pprint ;
 
@@ -35,6 +35,9 @@ IN: prettyprint
 
 : short. ( obj -- ) pprint-short nl ;
 
+: error-in-pprint ( obj -- str )
+    class-of name>> "~pprint error: " "~" surround ;
+
 : .b ( n -- ) >bin print ;
 : .o ( n -- ) >oct print ;
 : .h ( n -- ) >hex print ;
@@ -42,9 +45,7 @@ IN: prettyprint
 : stack. ( seq -- )
     [
         [ short. ] [
-            drop
-            [ class-of name>> "~pprint error: " "~" surround ]
-            keep write-object nl
+            drop [ error-in-pprint ] keep write-object nl
         ] recover
     ] each ;
 

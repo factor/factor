@@ -250,7 +250,7 @@ M: struct-bit-slot-spec compute-slot-offset
 
 PRIVATE>
 
-M: struct byte-length class-of "struct-size" word-prop ; foldable
+M: struct byte-length class-of "struct-size" word-prop ; inline foldable
 M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inline
 
 ! class definition
@@ -339,16 +339,10 @@ SYMBOL: bits:
 
 <PRIVATE
 
-ERROR: bad-type-for-bits type ;
-
 :: set-bits ( slot-spec n -- slot-spec )
     struct-bit-slot-spec new
         n >>bits
-        slot-spec type>> {
-            { int [ t ] }
-            { uint [ f ] }
-            [ bad-type-for-bits ]
-        } case >>signed?
+        slot-spec type>> c-type-signed >>signed?
         slot-spec name>> >>name
         slot-spec class>> >>class
         slot-spec type>> >>type

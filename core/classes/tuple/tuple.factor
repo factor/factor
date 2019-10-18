@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions hashtables kernel kernel.private math
-namespaces make sequences sequences.private strings vectors
-words quotations memory combinators generic classes
-classes.algebra classes.algebra.private classes.builtin
-classes.private slots.private slots math.private accessors
-assocs effects ;
+USING: accessors arrays assocs classes classes.algebra
+classes.algebra.private classes.builtin classes.private
+combinators definitions effects generic kernel kernel.private
+make math math.private memory namespaces quotations sequences
+sequences.private slots slots.private strings words ;
 IN: classes.tuple
 
 PREDICATE: tuple-class < class
@@ -27,6 +26,12 @@ ERROR: no-slot name tuple ;
 
 : set-slot-named ( value name tuple -- )
     [ nip ] [ offset-of-slot ] 2bi set-slot ;
+
+: set-slots ( assoc tuple -- )
+    [ swapd set-slot-named ] curry assoc-each ; inline
+
+: from-slots ( assoc class -- tuple )
+    new [ set-slots ] keep ; inline
 
 PREDICATE: immutable-tuple-class < tuple-class
     all-slots [ read-only>> ] all? ;
@@ -233,10 +238,12 @@ M: tuple-class update-class
     } cleave ;
 
 : define-new-tuple-class ( class superclass slots -- )
-    [ drop f f tuple-class define-class ]
-    [ nip "slots" set-word-prop ]
-    [ 2drop update-classes ]
-    3tri ;
+    {
+        [ drop f f tuple-class define-class ]
+        [ nip "slots" set-word-prop ]
+        [ 2drop update-classes ]
+        [ 2drop f "defining-class" set-word-prop ]
+    } 3cleave ;
 
 : subclasses ( class -- classes )
     class-usages [ tuple-class? ] filter ;
@@ -293,7 +300,7 @@ PRIVATE>
 GENERIC: make-final ( class -- )
 
 M: tuple-class make-final
-    [ dup class-usage keys ?metaclass-changed ]
+    [ dup class-usage ?metaclass-changed ]
     [ t "final" set-word-prop ]
     bi ;
 
@@ -327,8 +334,14 @@ M: error-class reset-class
 : boa-effect ( class -- effect )
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
+ERROR: not-a-tuple-class obj ;
+
+: check-tuple-class ( class -- class )
+    dup tuple-class? [ not-a-tuple-class ] unless ; inline
+
 : define-boa-word ( word class -- )
-    [ [ boa ] curry ] [ boa-effect ] bi define-inline ;
+    check-tuple-class [ [ boa ] curry ] [ boa-effect ] bi
+    define-inline ;
 
 : forget-slot-accessors ( class slots -- )
     [

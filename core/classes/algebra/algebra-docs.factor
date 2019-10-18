@@ -47,7 +47,7 @@ HELP: flatten-class
 HELP: class<=
 { $values { "first" "a class" } { "second" "a class" } { "?" "a boolean" } }
 { $description "Tests if all instances of " { $snippet "class1" } " are also instances of " { $snippet "class2" } "." }
-{ $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 = class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
+{ $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 <= class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
 
 HELP: sort-classes
 { $values { "seq" "a sequence of class" } { "newseq" "a new sequence of classes" } }

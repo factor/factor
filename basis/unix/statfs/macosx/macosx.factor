@@ -115,5 +115,5 @@ STRUCT: statfs64
     { f_mntfromname { char MAXPATHLEN } }
     { f_reserved uint32_t[8] } ;
 
-FUNCTION: int statfs64 ( c-string path, statfs64* buf ) ;
+FUNCTION-ALIAS: statfs64-func int statfs64 ( c-string path, statfs64* buf ) ;
 FUNCTION: int getmntinfo64 ( statfs64** mntbufp, int flags ) ;

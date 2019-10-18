@@ -21,13 +21,13 @@ GENERIC: draw* ( tick-slice delegate -- )
 
 DEFER: stop-loop
 
-TUPLE: game-loop-error game-loop error ;
+TUPLE: game-loop-error-state game-loop error ;
 
 : ?ui-error ( error -- )
     ui-running? [ ui-error ] [ rethrow ] if ;
 
 : game-loop-error ( game-loop error -- )
-    [ drop stop-loop ] [ \ game-loop-error boa ?ui-error ] 2bi ;
+    [ drop stop-loop ] [ \ game-loop-error-state boa ?ui-error ] 2bi ;
 
 : fps ( fps -- nanos )
     [ 1,000,000,000 ] dip /i ; inline

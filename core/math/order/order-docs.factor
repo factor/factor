@@ -31,8 +31,7 @@ HELP: +gt+
 { $description "Output by " { $link <=> } " when the first object is strictly greater than the second object." } ;
 
 HELP: invert-comparison
-{ $values { "<=>" symbol }
-          { "<=>'" symbol } }
+{ $values { "<=>" "an ordering specifier" } { ">=<" "an ordering specifier" } }
 { $description "Invert the comparison symbol returned by " { $link <=> } "." }
 { $examples
     { $example "USING: math.order prettyprint ;" "+lt+ invert-comparison ." "+gt+" } } ;

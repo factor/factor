@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math.order sorting sequences definitions
-namespaces arrays splitting io math.parser math init continuations ;
+USING: accessors assocs continuations definitions init io
+kernel math math.parser namespaces sequences sorting ;
 IN: source-files.errors
 
 GENERIC: error-file ( error -- file )
@@ -25,7 +25,7 @@ M: source-file-error compute-restarts error>> compute-restarts ;
 : group-by-source-file ( errors -- assoc )
     H{ } clone [ [ push-at ] curry [ dup file>> ] prepose each ] keep ;
 
-TUPLE: error-type type word plural icon quot forget-quot { fatal? initial: t } ;
+TUPLE: error-type-holder type word plural icon quot forget-quot { fatal? initial: t } ;
 
 GENERIC: error-type ( error -- type )
 

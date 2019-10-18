@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: multiline locals io.encodings.ascii io.encodings.string sequences
 math specialized-arrays alien.c-types math.order alien opencl tools.test
-accessors arrays destructors kernel namespaces ;
+accessors arrays destructors kernel namespaces alien.data ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: opencl.tests
@@ -31,13 +31,14 @@ __kernel void square(
             "" kernel-source 1array <cl-program> &dispose "square" <cl-kernel> &dispose :> kernel
             cl-read-access num-bytes in <cl-buffer> &dispose :> in-buffer
             cl-write-access num-bytes f <cl-buffer> &dispose :> out-buffer
-            
+           
             kernel in-buffer out-buffer num-floats uint <ref> 3array
             { num-floats } [ ] cl-queue-kernel &dispose drop
             
             cl-finish
+
             out-buffer 0 num-bytes <cl-buffer-range>
-            cl-read-buffer num-floats flloat <c-direct-array>
+            cl-read-buffer num-floats \ float <c-direct-array>
         ] with-cl-state
     ] with-destructors ;
 

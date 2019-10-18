@@ -1,15 +1,15 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic assocs kernel math namespaces
-sequences strings vectors words quotations io io.files
-io.pathnames combinators sorting splitting math.parser effects
-continuations checksums checksums.crc32 vocabs hashtables
-compiler.units io.encodings.utf8 accessors source-files.errors ;
+USING: accessors arrays assocs checksums checksums.crc32
+compiler.units continuations definitions io.encodings.utf8
+io.files io.pathnames kernel namespaces sequences sets
+source-files.errors strings words ;
+FROM: namespaces => set ;
 IN: source-files
 
 SYMBOL: source-files
 
-TUPLE: source-file
+TUPLE: source-file-tuple
 path
 top-level-form
 checksum
@@ -18,7 +18,7 @@ main ;
 
 : record-top-level-form ( quot file -- )
     top-level-form<<
-    [ ] [ H{ } notify-definition-observers ] if-bootstrapping ;
+    [ ] [ f notify-definition-observers ] if-bootstrapping ;
 
 : record-checksum ( lines source-file -- )
     [ crc32 checksum-lines ] dip checksum<< ;
@@ -27,7 +27,7 @@ main ;
     new-definitions get >>definitions drop ;
 
 : <source-file> ( path -- source-file )
-    \ source-file new
+    \ source-file-tuple new
         swap >>path
         <definitions> >>definitions ;
 
@@ -48,14 +48,14 @@ M: pathname where string>> 1 2array ;
 
 : forget-source ( path -- )
     source-files get delete-at*
-    [ definitions>> [ keys forget-all ] each ] [ drop ] if ;
+    [ definitions>> [ members forget-all ] each ] [ drop ] if ;
 
 M: pathname forget*
     string>> forget-source ;
 
 : rollback-source-file ( file -- )
     [
-        new-definitions get [ assoc-union ] 2map
+        new-definitions get [ union ] 2map
     ] change-definitions drop ;
 
 SYMBOL: file

@@ -5,6 +5,7 @@ classes.tuple classes.tuple.private continuations definitions
 generic init kernel kernel.private math namespaces sequences
 sets source-files.errors vocabs words ;
 FROM: namespaces => set ;
+FROM: sets => members ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -12,15 +13,15 @@ SYMBOL: new-definitions
 
 TUPLE: redefine-error def ;
 
-: redefine-error ( definition -- )
+: throw-redefine-error ( definition -- )
     \ redefine-error boa throw-continue ;
 
 <PRIVATE
 
-: add-once ( key assoc -- )
-    2dup key? [ over redefine-error ] when conjoin ;
+: add-once ( key set -- )
+    dupd ?adjoin [ drop ] [ throw-redefine-error ] if ;
 
-: (remember-definition) ( definition loc assoc -- )
+: (remember-definition) ( definition loc set -- )
     [ over set-where ] dip add-once ;
 
 PRIVATE>
@@ -29,16 +30,16 @@ PRIVATE>
     new-definitions get first (remember-definition) ;
 
 : fake-definition ( definition -- )
-    old-definitions get [ delete-at ] with each ;
+    old-definitions get [ delete ] with each ;
 
 : remember-class ( class loc -- )
-    [ dup new-definitions get first key? [ dup redefine-error ] when ] dip
+    [ dup new-definitions get first in? [ dup throw-redefine-error ] when ] dip
     new-definitions get second (remember-definition) ;
 
 : forward-reference? ( word -- ? )
-    dup old-definitions get assoc-stack
-    [ new-definitions get assoc-stack not ]
-    [ drop f ] if ;
+    dup old-definitions get [ in? ] with any? [
+        new-definitions get [ in? ] with any? not
+    ] [ drop f ] if ;
 
 SYMBOL: compiler-impl
 
@@ -70,7 +71,7 @@ M: f update-call-sites
     2drop { } ;
 
 M: f to-recompile
-    changed-definitions get [ drop word? ] assoc-filter keys ;
+    changed-definitions get members [ word? ] filter ;
 
 M: f recompile
     [ dup def>> ] { } map>assoc ;
@@ -80,11 +81,11 @@ M: f process-forgotten-words drop ;
 : without-optimizer ( quot -- )
     [ f compiler-impl ] dip with-variable ; inline
 
-: <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
+: <definitions> ( -- pair ) { HS{ } HS{ } } [ clone ] map ;
 
 SYMBOL: definition-observers
 
-GENERIC: definitions-changed ( assoc obj -- )
+GENERIC: definitions-changed ( set obj -- )
 
 [ V{ } clone definition-observers set-global ]
 "compiler.units" add-startup-hook
@@ -99,7 +100,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 : remove-definition-observer ( obj -- )
     definition-observers get remove-eq! drop ;
 
-: notify-definition-observers ( assoc -- )
+: notify-definition-observers ( set -- )
     definition-observers get
     [ definitions-changed ] with each ;
 
@@ -114,30 +115,30 @@ M: object always-bump-effect-counter? drop f ;
 
 <PRIVATE
 
-: changed-vocabs ( assoc -- vocabs )
-    [ drop word? ] assoc-filter
-    [ drop vocabulary>> dup [ lookup-vocab ] when dup ] assoc-map ;
+: changed-vocabs ( set -- vocabs )
+    members [ word? ] filter
+    [ vocabulary>> dup [ lookup-vocab ] when ] map ;
 
-: updated-definitions ( -- assoc )
-    H{ } clone
-    forgotten-definitions get assoc-union!
-    new-definitions get first assoc-union!
-    new-definitions get second assoc-union!
-    changed-definitions get assoc-union!
-    maybe-changed get assoc-union!
-    dup changed-vocabs assoc-union! ;
+: updated-definitions ( -- set )
+    HS{ } clone
+    forgotten-definitions get union!
+    new-definitions get first union!
+    new-definitions get second union!
+    changed-definitions get union!
+    maybe-changed get union!
+    dup changed-vocabs over adjoin-all ;
 
 : process-forgotten-definitions ( -- )
-    forgotten-definitions get keys
+    forgotten-definitions get members
     [ [ word? ] filter process-forgotten-words ]
     [ [ delete-definition-errors ] each ]
     bi ;
 
 : bump-effect-counter? ( -- ? )
-    changed-effects get
-    maybe-changed get
-    changed-definitions get [ drop always-bump-effect-counter? ] assoc-filter
-    3array assoc-combine new-words get assoc-diff assoc-empty? not ;
+    changed-effects get members
+    maybe-changed get members
+    changed-definitions get members [ always-bump-effect-counter? ] filter
+    3array combine new-words get [ in? not ] curry any? ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [
@@ -146,14 +147,14 @@ M: object always-bump-effect-counter? drop f ;
     ] when ;
 
 : notify-observers ( -- )
-    updated-definitions dup assoc-empty?
+    updated-definitions dup null?
     [ drop ] [ notify-definition-observers notify-error-observers ] if ;
 
 : update-existing? ( defs -- ? )
-    new-words get keys diff empty? not ;
+    new-words get [ in? not ] curry any? ;
 
 : reset-pics? ( -- ? )
-    outdated-generics get assoc-empty? not ;
+    outdated-generics get null? not ;
 
 : finish-compilation-unit ( -- )
     [ ] [
@@ -169,7 +170,8 @@ M: object always-bump-effect-counter? drop f ;
 
 TUPLE: nesting-observer new-words ;
 
-M: nesting-observer definitions-changed new-words>> swap assoc-diff! drop ;
+M: nesting-observer definitions-changed
+    [ members ] dip new-words>> [ delete ] curry each ;
 
 : add-nesting-observer ( -- )
     new-words get nesting-observer boa
@@ -182,12 +184,12 @@ PRIVATE>
 
 : with-nested-compilation-unit ( quot -- )
     [
-        H{ } clone changed-definitions set
-        H{ } clone maybe-changed set
-        H{ } clone changed-effects set
-        H{ } clone outdated-generics set
+        HS{ } clone changed-definitions set
+        HS{ } clone maybe-changed set
+        HS{ } clone changed-effects set
+        HS{ } clone outdated-generics set
         H{ } clone outdated-tuples set
-        H{ } clone new-words set
+        HS{ } clone new-words set
         add-nesting-observer
         [
             remove-nesting-observer
@@ -199,6 +201,6 @@ PRIVATE>
     [
         <definitions> new-definitions set
         <definitions> old-definitions set
-        H{ } clone forgotten-definitions set
+        HS{ } clone forgotten-definitions set
         with-nested-compilation-unit
     ] with-scope ; inline

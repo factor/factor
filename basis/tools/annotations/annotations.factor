@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math sorting words parser io summary
-quotations sequences sequences.generalizations prettyprint
-continuations effects definitions compiler.units namespaces
-assocs tools.time generic inspector fry locals generalizations
-macros sequences.deep ;
+USING: accessors arrays assocs compiler.units effects fry
+generalizations generic inspector io kernel locals macros math
+namespaces prettyprint quotations sequences sequences.deep
+sequences.generalizations sorting summary tools.time words ;
+FROM: sequences => change-nth ;
+FROM: assocs => change-at ;
 IN: tools.annotations
 
 <PRIVATE
@@ -122,7 +123,14 @@ word-timing [ H{ } clone ] initialize
 <PRIVATE
 
 : (add-timing) ( def word -- def' )
-    '[ _ benchmark _ word-timing get at+ ] ;
+    '[
+        _ benchmark _ word-timing get [
+            [
+                [ 0 swap [ + ] change-nth ] keep
+                [ 1 swap [ 1 + ] change-nth ] keep
+            ] [ 1 2array ] if*
+        ] change-at
+    ] ;
 
 PRIVATE>
 
@@ -130,6 +138,7 @@ PRIVATE>
     dup '[ _ (add-timing) ] annotate ;
 
 : word-timing. ( -- )
-    word-timing get
-    >alist [ 1,000,000,000 /f ] assoc-map sort-values
+    word-timing get >alist
+    [ second first ] sort-with
+    [ first2 first2 [ 1,000,000,000 /f ] dip 3array ] map
     simple-table. ;

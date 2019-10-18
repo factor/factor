@@ -73,6 +73,8 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
     key?
     at
     ?at
+    of
+    ?of
     assoc-empty?
     keys
     values
@@ -151,6 +153,11 @@ $nl
     assoc-any?
     assoc-all?
 }
+"Removing empty keys or values:"
+{ $subsections
+    sift-keys
+    sift-values
+}
 "Mapping between assocs and sequences:"
 { $subsections
     map>assoc
@@ -199,7 +206,7 @@ HELP: set-at
 
 HELP: new-assoc
 { $values { "capacity" "a non-negative integer" } { "exemplar" assoc } { "newassoc" assoc } }
-{ $contract "Creates a new assoc of the same size as " { $snippet "exemplar" } " which can hold " { $snippet "capacity" } " entries before growing." } ;
+{ $contract "Creates a new assoc from an " { $snippet "exemplar" } " which can hold " { $snippet "capacity" } " entries before growing." } ;
 
 HELP: assoc-find
 { $values { "assoc" assoc } { "quot" { $quotation "( ... key value -- ... ? )" } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" boolean } }
@@ -231,7 +238,7 @@ HELP: key?
 { $values { "key" object } { "assoc" assoc } { "?" boolean } }
 { $description "Tests if an assoc contains a key." } ;
 
-{ at at* key? ?at } related-words
+{ at at* key? ?at of ?of } related-words
 
 HELP: at
 { $values { "key" object } { "assoc" assoc } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } }
@@ -239,6 +246,14 @@ HELP: at
 
 HELP: ?at
 { $values { "key" object } { "assoc" assoc } { "value/key" "the value associated to the key, or the key if the key is not present in the assoc" } { "?" "a " { $link boolean } " indicating if the key was present" } }
+{ $description "Looks up the value associated with a key. If the key was not present, an error can be thrown without extra stack shuffling. This word handles assocs that store " { $link f } "." } ;
+
+HELP: of
+{ $values { "assoc" assoc } { "key" object } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } }
+{ $description "Looks up the value associated with a key. This word makes no distinction between a missing value and a value set to " { $link f } "; if the difference is important, use " { $link ?of } "." } ;
+
+HELP: ?of
+{ $values { "assoc" assoc } { "key" object } { "value/key" "the value associated to the key, or the key if the key is not present in the assoc" } { "?" "a " { $link boolean } " indicating if the key was present" } }
 { $description "Looks up the value associated with a key. If the key was not present, an error can be thrown without extra stack shuffling. This word handles assocs that store " { $link f } "." } ;
 
 HELP: assoc-each
@@ -305,6 +320,14 @@ HELP: assoc-refine
 HELP: assoc-subset?
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }
 { $description "Tests if " { $snippet "assoc2" } " contains all key/value pairs of " { $snippet "assoc1" } "." } ;
+
+HELP: sift-keys
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing keys that are " { $link f } "." } ;
+
+HELP: sift-values
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing values that are " { $link f } "." } ;
 
 HELP: assoc=
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }

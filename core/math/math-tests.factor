@@ -79,3 +79,10 @@ IN: math.tests
 [ t ] [ -0.0 neg? ] unit-test
 [ t ] [ -1.0 neg? ] unit-test
 [ t ] [ -1/0. neg? ] unit-test
+
+{ -0x3fffffff } [ 0x3ffffffe >bignum bitnot ] unit-test
+{ -0x40000000 } [ 0x3fffffff >bignum bitnot ] unit-test
+{ -0x40000001 } [ 0x40000000 >bignum bitnot ] unit-test
+{ -0x3fffffffffffffff } [ 0x3ffffffffffffffe >bignum bitnot ] unit-test
+{ -0x4000000000000000 } [ 0x3fffffffffffffff >bignum bitnot ] unit-test
+{ -0x4000000000000001 } [ 0x4000000000000000 >bignum bitnot ] unit-test

@@ -25,10 +25,8 @@ release "RELEASES" {
         version builder binary-release-name >>last-release ;
 
 : update-binary-releases ( version builders -- )
-    [
-        release new delete-tuples
-        [ <release> insert-tuple ] with each
-    ] with-transaction ;
+    release new delete-tuples
+    [ <release> insert-tuple ] with each ;
 
 TUPLE: version
 id version git-id timestamp source-path announcement-url ;

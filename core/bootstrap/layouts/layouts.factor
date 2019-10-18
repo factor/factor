@@ -1,9 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces math words kernel alien byte-arrays
-hashtables vectors strings sbufs arrays
-quotations assocs layouts classes.tuple.private
-kernel.private ;
+USING: alien arrays byte-arrays kernel layouts math namespaces
+quotations strings words ;
 
 16 data-alignment set
 

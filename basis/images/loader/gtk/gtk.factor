@@ -39,7 +39,7 @@ os linux? [
         [ pixels h rowstride * memory>byte-array ]
         [
             pixels rowstride h * uchar <c-direct-array>
-            rowstride <sliced-groups>
+            rowstride <groups>
             [ bytes-per-row head-slice ] map concat
         ] if
     ] ;
@@ -64,9 +64,8 @@ os linux? [
 
 PRIVATE>
 
-M: gtk-image stream>image
-    drop [
-        stream-contents data>GInputStream &g_object_unref
-        GInputStream>GdkPixbuf &g_object_unref
-        GdkPixbuf>image
-    ] with-destructors ;
+M: gtk-image stream>image*
+    drop
+    stream-contents data>GInputStream &g_object_unref
+    GInputStream>GdkPixbuf &g_object_unref
+    GdkPixbuf>image ;

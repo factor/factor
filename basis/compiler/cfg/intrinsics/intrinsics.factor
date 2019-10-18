@@ -31,8 +31,13 @@ QUALIFIED: math.floats.private
 QUALIFIED: math.libm
 IN: compiler.cfg.intrinsics
 
+ERROR: inline-intrinsics-not-supported word quot ;
+
 : enable-intrinsics ( alist -- )
-    [ "intrinsic" set-word-prop ] assoc-each ;
+    [
+        over inline? [ inline-intrinsics-not-supported ] when
+        "intrinsic" set-word-prop
+    ] assoc-each ;
 
 {
     { kernel.private:tag [ drop emit-tag ] }

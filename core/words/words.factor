@@ -1,15 +1,26 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions kernel kernel.private
-slots.private math namespaces sequences strings vectors sbufs
-quotations assocs hashtables sorting vocabs math.order sets
-words.private ;
+USING: accessors arrays assocs definitions hashtables kernel
+kernel.private math math.order namespaces quotations sequences
+slots.private strings vocabs ;
 FROM: assocs => change-at ;
 IN: words
 
-: word ( -- word ) \ word get-global ;
+BUILTIN: word
+{ hashcode fixnum initial: 0 } name vocabulary
+{ def quotation initial: [ ] } props pic-def pic-tail-def
+{ sub-primitive read-only } ;
 
-: set-word ( word -- ) \ word set-global ;
+! Need a dummy word here because BUILTIN: word is not a real word
+! and parse-datum looks for things that are actually words instead of
+! also looking for classes
+: word ( -- * ) "dummy word" throw ;
+
+SYMBOL: last-word-symbol
+
+: last-word ( -- word ) \ last-word-symbol get-global ;
+
+: set-last-word ( word -- ) \ last-word-symbol set-global ;
 
 M: word execute (execute) ;
 
@@ -42,8 +53,8 @@ M: word definition def>> ;
 
 PRIVATE>
 
-TUPLE: undefined word ;
-: undefined ( -- * ) callstack caller \ undefined boa throw ;
+TUPLE: undefined-word word ;
+: undefined ( -- * ) callstack caller \ undefined-word boa throw ;
 
 : undefined-def ( -- quot )
     #! 'f' inhibits tail call optimization in non-optimizing
@@ -89,7 +100,7 @@ M: word parent-word drop f ;
     over changed-definition [ ] like >>def drop ;
 
 : changed-effect ( word -- )
-    [ dup changed-effects get set-in-unit ]
+    [ changed-effects get add-to-unit ]
     [ dup primitive? [ drop ] [ changed-definition ] if ] bi ;
 
 : set-stack-effect ( effect word -- )
@@ -106,7 +117,17 @@ M: word parent-word drop f ;
 : make-deprecated ( word -- )
     t "deprecated" set-word-prop ;
 
-: inline? ( word -- ? ) "inline" word-prop ; inline
+: inline? ( obj -- ? )
+    dup word? [ "inline" word-prop ] [ drop f ] if ; inline
+
+: recursive? ( obj -- ? )
+    dup word? [ "recursive" word-prop ] [ drop f ] if ; inline
+
+: inline-recursive? ( obj -- ? )
+    dup word? [
+        dup "inline" word-prop
+        [ "recursive" word-prop ] [ drop f ] if
+    ] [ drop f ] if ; inline
 
 ERROR: cannot-be-inline word ;
 
@@ -235,4 +256,4 @@ M: word hashcode*
 
 M: word literalize <wrapper> ;
 
-INSTANCE: word definition
+INSTANCE: word definition-mixin

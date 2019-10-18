@@ -177,7 +177,7 @@ HINTS: (process-md5-block-I) { uint-array md5-state } ;
 
 : byte-array>le ( byte-array -- byte-array )
     little-endian? [
-        dup 4 <sliced-groups> [
+        dup 4 <groups> [
             [ [ 1 2 ] dip exchange-unsafe ]
             [ [ 0 3 ] dip exchange-unsafe ] bi
         ] each

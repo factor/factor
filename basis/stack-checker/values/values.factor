@@ -38,25 +38,25 @@ GENERIC: (input-value?) ( value -- ? )
 GENERIC: (literal) ( known -- literal )
 
 ! Literal value
-TUPLE: literal < identity-tuple value recursion ;
+TUPLE: literal-tuple < identity-tuple value recursion ;
 
 : literal ( value -- literal ) known (literal) ;
 
-M: literal hashcode* nip value>> identity-hashcode ;
+M: literal-tuple hashcode* nip value>> identity-hashcode ;
 
 : <literal> ( obj -- value )
-    recursive-state get \ literal boa ;
+    recursive-state get \ literal-tuple boa ;
 
-M: literal (input-value?) drop f ;
+M: literal-tuple (input-value?) drop f ;
 
-M: literal (literal-value?) drop t ;
+M: literal-tuple (literal-value?) drop t ;
 
-M: literal (literal) ;
+M: literal-tuple (literal) ;
 
 : curried/composed-literal ( input1 input2 quot -- literal )
     [ [ literal ] bi@ ] dip
     [ [ [ value>> ] bi@ ] dip call ] [ drop nip recursion>> ] 3bi
-    \ literal boa ; inline
+    \ literal-tuple boa ; inline
 
 ! Result of curry
 TUPLE: curried obj quot ;
@@ -126,7 +126,7 @@ GENERIC: known>callable ( known -- quot )
     dup callable? [ drop [ @ ] ] unless ;
 
 M: object known>callable drop \ _ ;
-M: literal known>callable value>> ;
+M: literal-tuple known>callable value>> ;
 M: composed known>callable
     [ quot1>> known known>callable ?@ ] [ quot2>> known known>callable ?@ ] bi
     append ;

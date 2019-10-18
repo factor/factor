@@ -1,16 +1,20 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators definitions graphs kernel
+USING: accessors assocs combinators definitions kernel
 make namespaces quotations sequences sets words words.symbol ;
 FROM: namespaces => set ;
+QUALIFIED: sets
 IN: classes
 
 ERROR: bad-inheritance class superclass ;
 
 PREDICATE: class < word "class" word-prop ;
 
+PREDICATE: defining-class < word "defining-class" word-prop ;
+
 MIXIN: classoid
 INSTANCE: class classoid
+INSTANCE: defining-class classoid
 
 <PRIVATE
 
@@ -51,6 +55,7 @@ GENERIC: reset-class ( class -- )
 
 M: class reset-class
     {
+        "defining-class"
         "class"
         "metaclass"
         "superclass"
@@ -129,24 +134,40 @@ GENERIC: implementors ( class/classes -- seq )
         tri
     ] { } make ;
 
-: class-usage ( class -- seq ) update-map get at ;
+: class-usage ( class -- seq )
+    update-map get at sets:members ;
 
-: class-usages ( class -- seq ) [ class-usage ] closure keys ;
+<PRIVATE
 
-M: class implementors implementors-map get at keys ;
+: (closure) ( obj set quot: ( elt -- seq ) -- )
+    2over ?adjoin [
+        [ dip ] keep [ (closure) ] 2curry each
+    ] [ 3drop ] if ; inline recursive
+
+: closure ( obj quot -- set )
+    HS{ } clone [ swap (closure) ] keep ; inline
+
+PRIVATE>
+
+: class-usages ( class -- seq )
+    [ class-usage ] closure sets:members ;
+
+M: class implementors implementors-map get at sets:members ;
 
 M: sequence implementors [ implementors ] gather ;
 
 <PRIVATE
 
 : update-map+ ( class -- )
-    dup class-uses update-map get add-vertex ;
+    dup class-uses update-map get
+    [ adjoin-at ] curry with each ;
 
 : update-map- ( class -- )
-    dup class-uses update-map get remove-vertex ;
+    dup class-uses update-map get
+    [ at delete ] curry with each ;
 
 : implementors-map+ ( class -- )
-    [ H{ } clone ] dip implementors-map get set-at ;
+    [ HS{ } clone ] dip implementors-map get set-at ;
 
 : implementors-map- ( class -- )
     implementors-map get delete-at ;
@@ -169,7 +190,7 @@ GENERIC: metaclass-changed ( use class -- )
 : check-metaclass ( class metaclass -- usages/f )
     over class? [
         over "metaclass" word-prop eq?
-        [ drop f ] [ class-usage keys ] if
+        [ drop f ] [ class-usage ] if
     ] [ 2drop f ] if ;
 
 : ?define-symbol ( word -- )
@@ -177,7 +198,7 @@ GENERIC: metaclass-changed ( use class -- )
 
 : (define-class) ( word props -- )
     reset-caches
-    2dup "metaclass" swap at check-metaclass
+    2dup "metaclass" of check-metaclass
     {
         [ 2drop update-map- ]
         [ 2drop dup class? [ reset-class ] [ implementors-map+ ] if ]

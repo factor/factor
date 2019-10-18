@@ -1,31 +1,36 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators.short-circuit grouping kernel math
-math.combinatorics math.constants math.functions math.order
-math.primes math.ranges math.statistics math.vectors memoize
-sequences ;
+USING: accessors arrays assocs assocs.extras byte-arrays
+combinators combinators.short-circuit compression.zlib fry
+grouping kernel locals math math.combinatorics math.constants
+math.functions math.order math.primes math.ranges
+math.ranges.private math.statistics math.vectors memoize random
+sequences sequences.extras sets sorting ;
 
 IN: math.extras
 
 <PRIVATE
 
-DEFER: sterling
+DEFER: stirling
 
-: (sterling) ( n k -- x )
-    [ [ 1 - ] bi@ sterling ]
-    [ [ 1 - ] dip sterling ]
+: (stirling) ( n k -- x )
+    [ [ 1 - ] bi@ stirling ]
+    [ [ 1 - ] dip stirling ]
     [ nip * + ] 2tri ;
 
 PRIVATE>
 
-MEMO: sterling ( n k -- x )
+MEMO: stirling ( n k -- x )
     2dup { [ = ] [ nip 1 = ] } 2||
-    [ 2drop 1 ] [ (sterling) ] if ;
+    [ 2drop 1 ] [ (stirling) ] if ;
 
-<PRIVATE
+:: ramanujan ( x -- y )
+    pi sqrt x e / x ^ * x 8 * 4 + x * 1 + x * 1/30 + 1/6 ^ * ;
 
 DEFER: bernoulli
+
+<PRIVATE
 
 : (bernoulli) ( p -- n )
     [ iota ] [ 1 + ] bi [
@@ -94,7 +99,7 @@ PRIVATE>
     [ 1 ] 2dip [ [ dupd swap - ] dip * + dup ] curry map nip ;
 
 : moving-median ( u n -- v )
-    <clumps> [ median ] map ;
+    clump [ median ] map ;
 
 : moving-supremum ( u n -- v )
     <clumps> [ supremum ] map ;
@@ -105,30 +110,33 @@ PRIVATE>
 : moving-sum ( u n -- v )
     <clumps> [ sum ] map ;
 
+: moving-count ( ... u n quot: ( ... elt -- ... ? ) -- ... v )
+    [ <clumps> ] [ [ count ] curry map ] bi* ; inline
+
 : nonzero ( seq -- seq' )
     [ zero? not ] filter ;
 
 : bartlett ( n -- seq )
-    dup 1 <= [ 1 = { 1 } { } ? ] [
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
         [ iota ] [ 1 - 2 / ] bi [
             [ recip * ] [ >= ] 2bi [ 2 swap - ] when
         ] curry map
     ] if ;
 
 : hanning ( n -- seq )
-    dup 1 <= [ 1 = { 1 } { } ? ] [
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
         [ iota ] [ 1 - 2pi swap / ] bi v*n
         [ cos -0.5 * 0.5 + ] map!
     ] if ;
 
 : hamming ( n -- seq )
-    dup 1 <= [ 1 = { 1 } { } ? ] [
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
         [ iota ] [ 1 - 2pi swap / ] bi v*n
         [ cos -0.46 * 0.54 + ] map!
     ] if ;
 
 : blackman ( n -- seq )
-    dup 1 <= [ 1 = { 1 } { } ? ] [
+    dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
         [ iota ] [ 1 - 2pi swap / ] bi v*n
         [ [ cos -0.5 * ] map ] [ [ 2 * cos 0.08 * ] map ] bi
         v+ 0.42 v+n
@@ -145,3 +153,108 @@ PRIVATE>
 
 : sinc ( x -- y )
     [ 1 ] [ pi * [ sin ] [ / ] bi ] if-zero ;
+
+: until-zero ( n quot -- )
+    [ dup zero? ] swap until drop ; inline
+
+: cum-reduce ( seq identity quot: ( prev elt -- next ) -- result cum-result )
+    [ dup rot ] dip dup '[ _ curry dip dupd @ ] each ; inline
+
+<PRIVATE
+
+:: (gini) ( seq -- x )
+    seq natural-sort :> sorted
+    seq length :> len
+    sorted 0 [ + ] cum-reduce :> ( a b )
+    b len a * / :> B
+    1 len recip + 2 B * - ;
+
+PRIVATE>
+
+: gini ( seq -- x )
+    dup length 1 <= [ drop 0 ] [ (gini) ] if ;
+
+: concentration-coefficient ( seq -- x )
+    dup length 1 <= [
+        drop 0
+    ] [
+        [ (gini) ] [ length [ ] [ 1 - ] bi / ] bi *
+    ] if ;
+
+: herfindahl ( seq -- x )
+    [ sum-of-squares ] [ sum sq ] bi / ;
+
+: normalized-herfindahl ( seq -- x )
+    [ herfindahl ] [ length recip ] bi
+    [ - ] [ 1 swap - / ] bi ;
+
+: exponential-index ( seq -- x )
+    dup sum '[ _ / dup ^ ] map-product ;
+
+: search-sorted ( obj seq -- i )
+    swap '[ [ _ >= ] find drop dup ] [ length ] bi ? ;
+
+: weighted-random ( histogram -- obj )
+    unzip cum-sum [ last random ] [ search-sorted ] bi swap nth ;
+
+: unique-indices ( seq -- unique indices )
+    [ members ] keep over dup length iota H{ } zip-as '[ _ at ] map ;
+
+<PRIVATE
+
+: steps ( a b length -- a b step )
+    [ 2dup swap - ] dip / ; inline
+
+PRIVATE>
+
+: linspace[a,b) ( a b length -- seq )
+    steps ,b) <range> ;
+
+: linspace[a,b] ( a b length -- seq )
+    {
+        { [ dup 1 < ] [ 3drop { } ] }
+        { [ dup 1 = ] [ 2drop 1array ] }
+        [ 1 - steps <range> ]
+    } cond ;
+
+: logspace[a,b) ( a b length base -- seq )
+    [ linspace[a,b) ] dip swap n^v ;
+
+: logspace[a,b] ( a b length base -- seq )
+    [ linspace[a,b] ] dip swap n^v ;
+
+: majority ( seq -- elt/f )
+    [ f 0 ] dip [
+        over zero? [ 2nip 1 ] [
+            pick = [ 1 + ] [ 1 - ] if
+        ] if
+    ] each zero? [ drop f ] when ;
+
+: compression-lengths ( a b -- len(a+b) len(a) len(b) )
+    [ append ] 2keep [ >byte-array compress data>> length ] tri@ ;
+
+: compression-distance ( a b -- n )
+    compression-lengths sort-pair [ - ] [ / ] bi* ;
+
+: compression-dissimilarity ( a b -- n )
+    compression-lengths + / ;
+
+GENERIC: round-to-even ( x -- y )
+
+M: integer round-to-even ; inline
+
+M: ratio round-to-even
+    >fraction [ /mod abs 2 * ] keep > [ dup 0 < -1 1 ? + ] when ;
+
+M: float round-to-even
+    dup 0 > [
+        dup 0x1p52 <= [ 0x1p52 + 0x1p52 - ] when
+    ] [
+        dup -0x1p52 >= [ 0x1p52 - 0x1p52 + ] when
+    ] if ;
+
+: round-to-decimal ( x n -- y )
+    10^ [ * 0.5 over 0 > [ + ] [ - ] if truncate ] [ / ] bi ;
+
+: round-to-step ( x step -- y )
+    [ [ / round ] [ * ] bi ] unless-zero ;

@@ -1,6 +1,6 @@
 ! Copyright (c) 2009 Samuel Tardieu.
 ! See See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax quotations sequences ;
 IN: backtrack
 
 HELP: fail
@@ -30,15 +30,15 @@ HELP: amb-execute
 
 HELP: if-amb
 { $values
-  { "true" "a quotation with stack effect ( -- ? )" }
-  { "false" "a quotation" }
+  { "true" { $quotation "( -- ? )" } }
+  { "false" quotation }
   { "?" "a boolean" }
 }
 { $description "Execute the first quotation and returns " { $link t } " if it returns " { $link t } " itself. If it fails with " { $link fail } " or returns " { $link f } ", then the second quotation is executed and " { $link f } " is returned." } ;
 
 HELP: amb-all
 { $values
-  { "quot" "a quotation with stack effect ( -- )" }
+  { "quot" { $quotation "( -- )" } }
 }
 { $description "Execute all the alternatives in the quotation by calling " { $link fail } " repeatedly at the end." }
 { $see-also bag-of fail }
@@ -46,8 +46,8 @@ HELP: amb-all
 
 HELP: bag-of
 { $values
-  { "quot" "a quotation with stack effect ( -- result )" }
-  { "seq" "a sequence" }
+  { "quot" { $quotation "( -- result )" } }
+  { "seq" sequence }
 }
 { $description "Execute all the alternatives in the quotation and collect the results." }
 { $see-also amb-all } ;

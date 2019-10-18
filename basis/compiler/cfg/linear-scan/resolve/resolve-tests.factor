@@ -107,7 +107,7 @@ IN: compiler.cfg.linear-scan.resolve.tests
 ] unit-test
 
 cfg new 8 >>spill-area-size cfg set
-H{ } clone spill-temps set
+init-resolve
 
 [ t ] [
     {

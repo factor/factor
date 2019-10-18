@@ -14,7 +14,7 @@ IN: couchdb.tests
     [ couch get delete-db ] must-fail
     [ ] [ couch get ensure-db ] unit-test
     [ ] [ couch get ensure-db ] unit-test
-    [ 0 ] [ couch get db-info "doc_count" swap at ] unit-test
+    [ 0 ] [ couch get db-info "doc_count" of ] unit-test
     [ ] [ couch get compact-db ] unit-test
     [ t ] [ couch get server>> next-uuid string? ] unit-test
     [ ] [ H{
@@ -25,13 +25,13 @@ IN: couchdb.tests
             { "Author" "Rusty" }
             { "PostedDate" "2006-08-15T17:30:12Z-04:00" }
            } save-doc ] unit-test
-    [ t ] [ couch get all-docs "rows" swap at first "id" swap at dup "id" set string? ] unit-test
+    [ t ] [ couch get all-docs "rows" of first "id" of dup "id" set string? ] unit-test
     [ t ] [ "id" get dup load-doc id> = ] unit-test
     [ ] [ "id" get load-doc save-doc ] unit-test
-    [ "Rusty" ] [ "id" get load-doc "Author" swap at ] unit-test
+    [ "Rusty" ] [ "id" get load-doc "Author" of ] unit-test
     [ ] [ "id" get load-doc "Alex" "Author" pick set-at save-doc ] unit-test
-    [ "Alex" ] [ "id" get load-doc "Author" swap at ] unit-test
-    [ 1 ] [ "function(doc) { emit(null, doc) }" temp-view-map "total_rows" swap at ] unit-test
+    [ "Alex" ] [ "id" get load-doc "Author" of ] unit-test
+    [ 1 ] [ "function(doc) { emit(null, doc) }" temp-view-map "total_rows" of ] unit-test
     [ ] [ H{
          { "_id" "_design/posts" }
          { "language" "javascript" }

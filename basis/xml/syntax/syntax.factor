@@ -10,13 +10,13 @@ IN: xml.syntax
 
 <PRIVATE
 
-TUPLE: no-tag name word ;
+ERROR: no-tag name word ;
+
 M: no-tag summary
     drop "The tag-dispatching word has no method for the given tag name" ;
 
 : compile-tags ( word xtable -- quot )
-    >alist swap '[ _ no-tag boa throw ] suffix
-    '[ dup main>> _ case ] ;
+    >alist swap '[ _ no-tag ] suffix '[ dup main>> _ case ] ;
 
 : define-tags ( word effect -- )
     [ dup dup "xtable" word-prop compile-tags ] dip define-declared ;
@@ -72,7 +72,7 @@ SYNTAX: XML-NS:
 DEFER: interpolate-sequence
 
 : get-interpolated ( interpolated -- quot )
-    var>> '[ [ _ swap at ] keep ] ;
+    var>> '[ [ _ of ] keep ] ;
 
 : ?present ( object -- string )
     dup [ present ] when ;
@@ -82,14 +82,11 @@ DEFER: interpolate-sequence
     [ get-interpolated '[ _ swap @ [ ?present 2array ] dip ] ]
     [ 2array '[ _ swap ] ] if ;
 
-: filter-nulls ( assoc -- newassoc )
-    [ nip ] assoc-filter ;
-
 : interpolate-attrs ( attrs -- quot )
     [
         [ [ interpolate-attr ] { } assoc>map [ ] join ]
         [ assoc-size ] bi
-        '[ @ _ swap [ narray filter-nulls <attrs> ] dip ]
+        '[ @ _ swap [ narray sift-values <attrs> ] dip ]
     ] when-interpolated ;
 
 : interpolate-tag ( tag -- quot )
@@ -106,6 +103,10 @@ M: xml-data push-item , ;
 M: object push-item present , ;
 M: sequence push-item
     dup xml-data? [ , ] [ [ push-item ] each ] if ;
+M: xml push-item
+    [ before>> push-item ]
+    [ body>> push-item ]
+    [ after>> push-item ] tri ;
 M: number push-item present , ;
 M: xml-chunk push-item % ;
 

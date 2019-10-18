@@ -32,7 +32,7 @@ $nl
 "If " { $snippet "path" } " is relative, it is first resolved relative to the current directory. If " { $snippet "path" } " is absolute, it becomes the new current directory." } ;
 
 HELP: (directory-entries)
-{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ name dir? }" } " pairs" } }
+{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
 { $notes "This is a low-level word, and user code should call one of the related words instead." } ;
 

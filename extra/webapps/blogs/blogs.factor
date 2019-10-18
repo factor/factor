@@ -47,19 +47,19 @@ entity f {
 
 M: entity feed-entry-date date>> ;
 
-TUPLE: post < entity title comments ;
+TUPLE: post-state < entity title comments ;
 
-M: post feed-entry-title
+M: post-state feed-entry-title
     [ author>> ] [ title>> ] bi ": " glue ;
 
-M: post entity-url
+M: post-state entity-url
     id>> view-post-url ;
 
-\ post "BLOG_POSTS" {
+\ post-state "BLOG_POSTS" {
     { "title" "TITLE" { VARCHAR 256 } +not-null+ }
 } define-persistent
 
-: <post> ( id -- post ) \ post new swap >>id ;
+: <post-state> ( id -- post ) \ post-state new swap >>id ;
 
 TUPLE: comment < entity parent ;
 
@@ -79,7 +79,7 @@ M: comment entity-url
         swap >>parent ;
 
 : post ( id -- post )
-    [ <post> select-tuple ] [ f <comment> select-tuples ] bi
+    [ <post-state> select-tuple ] [ f <comment> select-tuples ] bi
     >>comments ;
 
 : reverse-chronological-order ( seq -- sorted )
@@ -89,7 +89,7 @@ M: comment entity-url
     { { "author" [ v-username ] } } validate-params ;
 
 : list-posts ( -- posts )
-    f <post> "author" value >>author
+    f <post-state> "author" value >>author
     select-tuples [ dup id>> f <comment> count-tuples >>comments ] map
     reverse-chronological-order ;
 
@@ -164,7 +164,7 @@ M: comment entity-url
         ] >>validate
 
         [
-            f <post>
+            f <post-state>
                 dup { "title" "content" } to-object
                 username >>author
                 now >>date
@@ -183,7 +183,7 @@ M: comment entity-url
 
 : do-post-action ( -- )
     validate-integer-id
-    "id" value <post> select-tuple from-object ;
+    "id" value <post-state> select-tuple from-object ;
 
 : <edit-post-action> ( -- action )
     <page-action>
@@ -197,7 +197,7 @@ M: comment entity-url
         [ "author" value authorize-author ] >>authorize
 
         [
-            "id" value <post>
+            "id" value <post-state>
             dup { "title" "author" "date" "content" } to-object
             [ update-tuple ] [ entity-url <redirect> ] bi
         ] >>submit
@@ -208,7 +208,7 @@ M: comment entity-url
         "edit a blog post" >>description ;
 
 : delete-post ( id -- )
-    [ <post> delete-tuples ] [ f <comment> delete-tuples ] bi ;
+    [ <post-state> delete-tuples ] [ f <comment> delete-tuples ] bi ;
 
 : <delete-post-action> ( -- action )
     <action>
@@ -234,7 +234,7 @@ M: comment entity-url
 
         [
             [
-                f <post> "author" value >>author select-tuples [ id>> delete-post ] each
+                f <post-state> "author" value >>author select-tuples [ id>> delete-post ] each
                 f f <comment> "author" value >>author delete-tuples
             ] with-transaction
             "author" value posts-by-url <redirect>
@@ -277,7 +277,7 @@ M: comment entity-url
         ] >>validate
 
         [
-            "parent" value <post> select-tuple
+            "parent" value <post-state> select-tuple
             author>> authorize-author
         ] >>authorize
 

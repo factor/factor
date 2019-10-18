@@ -8,11 +8,8 @@ IN: benchmark.sum-file
 ] with-file-writer
 >>
 
-: sum-file-loop ( n -- n' )
-    readln [ string>number + sum-file-loop ] when* ;
-
 : sum-file ( file -- n )
-    ascii [ 0 sum-file-loop ] with-file-reader ;
+    ascii [ 0 [ string>number + ] each-line ] with-file-reader ;
 
 : sum-file-benchmark ( -- )
     15 [

@@ -4,6 +4,7 @@ USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.private
 combinators definitions kernel make namespaces sequences sets
 words ;
+FROM: sets => members ;
 IN: generic
 
 ! Method combination protocol
@@ -96,10 +97,11 @@ ERROR: check-method-error class generic ;
     ] unless ; inline
 
 : remake-generic ( generic -- )
-    dup outdated-generics get set-in-unit ;
+    outdated-generics get add-to-unit ;
 
 : remake-generics ( -- )
-    outdated-generics get keys [ generic? ] filter [ make-generic ] each ;
+    outdated-generics get members [ generic? ] filter
+    [ make-generic ] each ;
 
 GENERIC: update-generic ( class generic -- )
 
@@ -140,7 +142,7 @@ M: anonymous-intersection implementor-classes participants>> ;
     [ swap implementor-classes [ implementors-map get at ] map ] dip call ; inline
 
 : reveal-method ( method classes generic -- )
-    [ [ [ conjoin ] with each ] with-implementors ]
+    [ [ [ adjoin ] with each ] with-implementors ]
     [ [ set-at ] with-methods ]
     2bi ;
 
@@ -176,8 +178,8 @@ M: method forget*
                 ] keep eq?
                 [
                     [ [ delete-at ] with-methods ]
-                    [ [ [ delete-at ] with each ] with-implementors ] 2bi
-                    reset-caches
+                    [ [ [ delete ] with each ] with-implementors ]
+                    2bi reset-caches
                 ] [ 2drop ] if
             ] if
         ]

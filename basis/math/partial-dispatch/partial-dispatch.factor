@@ -129,7 +129,7 @@ M: word integer-op-input-classes
 : define-math-ops ( op -- )
     { fixnum bignum float }
     [ [ dup 3array ] [ swap ?lookup-method ] 2bi ] with { } map>assoc
-    [ nip ] assoc-filter
+    sift-values
     [ def>> ] assoc-map
     [ nip length 1 = ] assoc-filter
     [ first ] assoc-map % ;
@@ -147,7 +147,7 @@ SYMBOL: fast-math-ops
 
 : math-both-known? ( word left right -- ? )
     3dup math-op
-    [ 2drop 2drop t ]
+    [ 4drop t ]
     [ drop math-class-max swap method-for-class >boolean ] if ;
 
 : (derived-ops) ( word assoc -- words )

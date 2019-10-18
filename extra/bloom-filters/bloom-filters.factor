@@ -1,159 +1,142 @@
 ! Copyright (C) 2009 Alec Berryman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays bit-arrays fry infix kernel layouts locals math
-math.functions multiline sequences ;
-IN: bloom-filters
-
+USING: accessors arrays bit-arrays fry kernel kernel.private
+layouts locals math math.functions math.order math.private
+multiline sequences sequences.private typed ;
 FROM: math.ranges => [1,b] ;
-FROM: math.intervals => (a,b) interval-contains? ;
-FROM: sequences => change-nth ;
+
+IN: bloom-filters
 
 /*
 
 TODO:
 
-- The false positive rate is 10x what it should be, based on informal testing.
-  Better object hashes or a better method of generating extra hash codes would
-  help.  Another way is to increase the number of bits used.
+- The false positive rate is 10x what it should be, based on
+  informal testing.  Better object hashes or a better method of
+  generating extra hash codes would help.  Another way is to
+  increase the number of bits used.
 
-  - Try something smarter than the bitwise complement for a second hash code.
+  - Try something smarter than the bitwise complement for a
+    second hash code.
 
   - http://spyced.blogspot.com/2009/01/all-you-ever-wanted-to-know-about.html
-    makes a case for http://murmurhash.googlepages.com/ instead of enhanced
-    double-hashing.
+    makes a case for http://murmurhash.googlepages.com/ instead
+    of enhanced double-hashing.
 
-  - Be sure to adjust the test that asserts the number of false positives isn't
-    unreasonable.
+  - Be sure to adjust the test that asserts the number of false
+    positives isn't unreasonable.
 
-- Could round bits up to next power of two and use wrap instead of mod.  This
-  would cost a lot of bits on 32-bit platforms, though, and limit the bit-array
-  to 8MB.
+- Could round bits up to next power of two and use wrap instead
+  of mod.  This would cost a lot of bits on 32-bit platforms,
+  though, and limit the bit-array to 8MB.
 
-- Should allow user to specify the hash codes, either as inputs to enhanced
-  double hashing or for direct use.
+- Should allow user to specify the hash codes, either as inputs
+  to enhanced double hashing or for direct use.
 
 - Support for serialization.
 
 - Wrappers for combining filters.
 
-- Should we signal an error when inserting past the number of objects the filter
-  is sized for?  The filter will continue to work, just not very well.
+- Should we signal an error when inserting past the number of
+  objects the filter is sized for?  The filter will continue to
+  work, just not very well.
 
 */
 
 TUPLE: bloom-filter
-{ n-hashes fixnum read-only }
+{ #hashes fixnum read-only }
 { bits bit-array read-only }
-{ maximum-n-objects fixnum read-only }
-{ current-n-objects fixnum } ;
+{ capacity fixnum read-only }
+{ count fixnum } ;
 
-ERROR: capacity-error ;
-ERROR: invalid-error-rate ;
-ERROR: invalid-n-objects ;
+ERROR: invalid-size ;
+ERROR: invalid-error-rate error-rate ;
+ERROR: invalid-capacity capacity ;
 
 <PRIVATE
 
-! infix doesn't like ^
-: pow ( x y -- z )
-    ^ ; inline
-
 :: bits-to-satisfy-error-rate ( hashes error objects -- size )
-    [infix -(objects * hashes) / log(1 - pow(error, (1/hashes))) infix]
+    objects hashes * neg error hashes recip ^ 1 swap - log /
     ceiling >integer ;
 
 ! 100 hashes ought to be enough for anybody.
-: n-hashes-range ( -- range )
+: #hashes-range ( -- range )
     100 [1,b] ;
 
-! { n-hashes n-bits }
+! { #hashes #bits }
 : identity-configuration ( -- 2seq )
     0 max-array-capacity 2array ;
 
 : smaller-second ( 2seq 2seq -- 2seq )
     [ [ second ] bi@ <= ] most ;
 
-! If the number of hashes isn't positive, we haven't found anything smaller than the
-! identity configuration.
-: validate-sizes ( 2seq -- )
-    first 0 <= [ capacity-error ] when ;
+! If the number of hashes isn't positive, we haven't found
+! anything smaller than the identity configuration.
+: check-hashes ( 2seq -- 2seq )
+    dup first 0 <= [ invalid-size ] when ;
 
-! The consensus on the tradeoff between increasing the number of bits and
-! increasing the number of hash functions seems to be "go for the smallest
-! number of bits", probably because most implementations just generate one hash
-! value and cheaply mangle it into the number of hashes they need.  I have not
-! seen any usage studies from the implementations that made this tradeoff to
-! support it, and I haven't done my own, but we'll go with it anyway.
-!
+! The consensus on the tradeoff between increasing the number of
+! bits and increasing the number of hash functions seems to be
+! "go for the smallest number of bits", probably because most
+! implementations just generate one hash value and cheaply
+! mangle it into the number of hashes they need.  I have not
+! seen any usage studies from the implementations that made this
+! tradeoff to support it, and I haven't done my own, but we'll
+! go with it anyway.
 : size-bloom-filter ( error-rate number-objects -- number-hashes number-bits )
-    [ n-hashes-range identity-configuration ] 2dip
-    '[ dup [ _ _ bits-to-satisfy-error-rate ]
-       call 2array smaller-second ]
-    reduce
-    dup validate-sizes
-    first2 ;
+    [ #hashes-range identity-configuration ] 2dip '[
+        dup _ _ bits-to-satisfy-error-rate
+        2array smaller-second
+    ] reduce check-hashes first2 ;
 
-: validate-n-objects ( n-objects -- )
-    0 <= [ invalid-n-objects ] when ;
+: check-capacity ( capacity -- capacity )
+    dup 0 <= [ invalid-capacity ] when ;
 
-: valid-error-rate-interval ( -- interval )
-    0 1 (a,b) ;
-
-: validate-error-rate ( error-rate -- )
-    valid-error-rate-interval interval-contains?
+: check-error-rate ( error-rate -- error-rate )
+    dup [ 0 after? ] [ 1 before? ] bi and
     [ invalid-error-rate ] unless ;
-
-: validate-constraints ( error-rate n-objects -- )
-    validate-n-objects validate-error-rate ;
 
 PRIVATE>
 
-: <bloom-filter> ( error-rate number-objects -- bloom-filter )
-    [ validate-constraints ] 2keep
+: <bloom-filter> ( error-rate capacity -- bloom-filter )
+    [ check-error-rate ] [ check-capacity ] bi*
     [ size-bloom-filter <bit-array> ] keep
     0 ! initially empty
     bloom-filter boa ;
 
 <PRIVATE
 
-! See "Bloom Filters in Probabilistic Verification" by Peter C. Dillinger and
-! Panagiotis Manolios, section 5.2, "Enhanced Double Hashing":
+! See "Bloom Filters in Probabilistic Verification" by Peter C.
+! Dillinger and Panagiotis Manolios, section 5.2, "Enhanced
+! Double Hashing":
 ! http://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
-:: enhanced-double-hash ( index hash0 hash1 -- hash )
-    [infix hash0 + (index * hash1) + ((pow(index, 3) - index) / 6) infix] ;
+: combine-hashcodes ( index hash0 hash1 -- hash )
+    { fixnum fixnum fixnum } declare
+    [ [ [ 3 ^ ] [ - ] bi 6 /i ] keep ]
+    [ fixnum*fast ] [ fixnum+fast ] tri* + abs ;
 
-: enhanced-double-hashes ( hash0 hash1 n -- seq )
-    iota
-    [ '[ _ _ enhanced-double-hash ] ] dip
-    swap map ;
+: double-hashcodes ( object -- hash0 hash1 )
+    hashcode >fixnum dup most-positive-fixnum bitxor >fixnum ;
 
-! Make sure it's a fixnum here to speed up double-hashing.
-: hashcodes-from-hashcode ( n -- n n )
-    dup most-positive-fixnum bitxor ;
+: increment-count ( bloom-filter -- )
+    [ 1 + ] change-count drop ; inline
 
-: hashcodes-from-object ( obj -- n n )
-    hashcode abs hashcodes-from-hashcode ;
+: #hashes-and-length ( bloom-filter -- #hashes length )
+    [ #hashes>> ] [ bits>> length ] bi ; inline
 
-: set-indices ( indices bit-array -- )
-    [ [ drop t ] change-nth ] curry each ;
-
-: increment-n-objects ( bloom-filter -- )
-    [ 1 + ] change-current-n-objects drop ;
-
-: n-hashes-and-length ( bloom-filter -- n-hashes length )
-    [ n-hashes>> ] [ bits>> length ] bi ;
-
-: relevant-indices ( value bloom-filter -- indices )
-    [ hashcodes-from-object ] [ n-hashes-and-length ] bi*
-    [ enhanced-double-hashes ] dip '[ _ mod ] map ;
+: relevant-indices ( object bloom-filter -- n quot: ( elt -- n ) )
+    [ double-hashcodes ] [ #hashes-and-length ] bi*
+    [ -rot ] dip '[ _ _ combine-hashcodes _ mod ] ; inline
 
 PRIVATE>
 
-: bloom-filter-insert ( object bloom-filter -- )
-    [ increment-n-objects ]
+TYPED: bloom-filter-insert ( object bloom-filter: bloom-filter -- )
+    [ increment-count ]
     [ relevant-indices ]
-    [ bits>> set-indices ]
-    tri ;
+    [ bits>> [ [ t ] 2dip set-nth-unsafe ] curry ]
+    tri compose each-integer ;
 
-: bloom-filter-member? ( object bloom-filter -- ? )
-    [ relevant-indices ] keep
-    bits>> nths [ ] all? ;
+TYPED: bloom-filter-member? ( object bloom-filter: bloom-filter -- ? )
+    [ relevant-indices ]
+    [ bits>> [ nth-unsafe ] curry ]
+    bi compose all-integers? ;

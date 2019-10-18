@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs binary-search classes.tuple fry
-kernel locals math math.order math.ranges namespaces sequences
-sequences.private sorting ;
+kernel locals math math.order math.ranges memoize namespaces
+sequences sequences.private sorting ;
 FROM: sequences => change-nth ;
 IN: math.combinatorics
 
@@ -17,14 +17,14 @@ IN: math.combinatorics
 
 PRIVATE>
 
-: factorial ( n -- n! )
+MEMO: factorial ( n -- n! )
     dup 1 > [ [1,b] product ] [ drop 1 ] if ;
 
 : nPk ( n k -- nPk )
     2dup possible? [ dupd - [a,b) product ] [ 2drop 0 ] if ;
 
 : nCk ( n k -- nCk )
-    twiddle [ nPk ] keep factorial / ;
+    twiddle [ nPk ] keep factorial /i ;
 
 
 ! Factoradic-based permutation methodology
@@ -34,11 +34,14 @@ PRIVATE>
 : factoradic ( n -- factoradic )
     0 [ over 0 > ] [ 1 + [ /mod ] keep swap ] produce reverse! 2nip ;
 
-: (>permutation) ( seq n -- seq )
-    [ '[ _ dupd >= [ 1 + ] when ] map! ] keep prefix ;
+: bump-indices ( seq n -- )
+    '[ dup _ >= [ 1 + ] when ] map! drop ; inline
+
+: (>permutation) ( seq n index -- seq )
+    swap [ dupd head-slice ] dip bump-indices ;
 
 : >permutation ( factoradic -- permutation )
-    reverse! 1 cut [ (>permutation) ] each ;
+    reverse! dup [ (>permutation) ] each-index reverse! ;
 
 : permutation-indices ( n seq -- permutation )
     length [ factoradic ] dip 0 pad-head >permutation ;
@@ -49,7 +52,7 @@ PRIVATE>
 PRIVATE>
 
 : permutation ( n seq -- seq' )
-    [ permutation-indices ] keep nths ;
+    [ permutation-indices ] keep nths-unsafe ;
 
 TUPLE: permutations length seq ;
 
@@ -62,26 +65,33 @@ M: permutations hashcode* tuple-hashcode ;
 
 INSTANCE: permutations immutable-sequence
 
-: each-permutation ( seq quot -- )
-    [ [ permutation-iota ] keep ] dip
-    '[ _ permutation @ ] each ; inline
+DEFER: next-permutation
 
-: map-permutations ( seq quot -- seq' )
-    [ [ permutation-iota ] keep ] dip
-    '[ _ permutation @ ] map ; inline
+<PRIVATE
 
-: filter-permutations ( seq quot -- seq' )
+: permutations-quot ( seq quot -- seq quot' )
+    [ [ permutation-iota ] [ length iota >array ] [ ] tri ] dip
+    '[ drop _ [ _ nths-unsafe @ ] keep next-permutation drop ] ; inline
+
+PRIVATE>
+
+: each-permutation ( ... seq quot: ( ... elt -- ... ) -- ... )
+    permutations-quot each ; inline
+
+: map-permutations ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
+    permutations-quot map ; inline
+
+: filter-permutations ( ... seq quot: ( ... elt -- ... ? ) -- ... newseq )
     selector [ each-permutation ] dip ; inline
 
 : all-permutations ( seq -- seq' )
     [ ] map-permutations ;
 
-: find-permutation ( seq quot -- elt )
-    [ dup [ permutation-iota ] keep ] dip
-    '[ _ permutation @ ] find drop
-    [ swap permutation ] [ drop f ] if* ; inline
+: find-permutation ( ... seq quot: ( ... elt -- ... ? ) -- ... elt/f )
+    [ permutations-quot find drop ]
+    [ drop over [ permutation ] [ 2drop f ] if ] 2bi ; inline
 
-: reduce-permutations ( seq identity quot -- result )
+: reduce-permutations ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each-permutation ; inline
 
 : inverse-permutation ( seq -- permutation )
@@ -109,6 +119,7 @@ PRIVATE>
 : next-permutation ( seq -- seq )
     dup [ ] [ drop (next-permutation) ] if-empty ;
 
+
 ! Combinadic-based combination methodology
 
 <PRIVATE
@@ -132,16 +143,10 @@ PRIVATE>
     p 1 < [ drop ] [ x + k - p 1 - c set-nth ] if
     c [ 1 - ] map! ;
 
-:: combinations-quot ( seq k quot -- seq quot )
-    seq length :> n
-    n k nCk iota [
-        k n combination-indices seq nths quot call
-    ] ; inline
-
 PRIVATE>
 
 : combination ( m seq k -- seq' )
-    swap [ length combination-indices ] [ nths ] bi ;
+    swap [ length combination-indices ] [ nths-unsafe ] bi ;
 
 TUPLE: combinations seq k length ;
 
@@ -154,26 +159,52 @@ M: combinations hashcode* tuple-hashcode ;
 
 INSTANCE: combinations immutable-sequence
 
-: each-combination ( seq k quot -- )
+<PRIVATE
+
+: find-max-index ( seq n -- i )
+    over length - '[ _ + >= ] find-index drop ;
+
+: increment-rest ( i seq -- )
+    [ nth ] [ swap tail-slice ] 2bi
+    [ drop 1 + dup ] map! 2drop ;
+
+: increment-last ( seq -- )
+    [ [ length 1 - ] keep [ 1 + ] change-nth ] unless-empty ;
+
+:: next-combination ( seq n -- seq )
+    seq n find-max-index [
+        1 [-] seq increment-rest
+    ] [
+        seq increment-last
+    ] if* seq ;
+
+:: combinations-quot ( seq k quot -- seq quot' )
+    seq length :> n
+    n k nCk iota k iota >array seq quot n
+    '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination drop ] ; inline
+
+PRIVATE>
+
+: each-combination ( ... seq k quot: ( ... elt -- ... ) -- ... )
     combinations-quot each ; inline
 
-: map-combinations ( seq k quot -- seq' )
+: map-combinations ( ... seq k quot: ( ... elt -- ... newelt ) -- ... newseq )
     combinations-quot map ; inline
 
-: filter-combinations ( seq k quot -- seq' )
+: filter-combinations ( ... seq k quot: ( ... elt -- ... ? ) -- ... newseq )
     selector [ each-combination ] dip ; inline
 
-: map>assoc-combinations ( seq k quot exemplar -- )
+: map>assoc-combinations ( ... seq k quot: ( ... elt -- ... key value ) exemplar -- ... assoc )
     [ combinations-quot ] dip map>assoc ; inline
 
 : all-combinations ( seq k -- seq' )
     [ ] map-combinations ;
 
-: find-combination ( seq k quot -- i elt )
+: find-combination ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
     [ combinations-quot find drop ]
     [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
 
-: reduce-combinations ( seq k identity quot -- result )
+: reduce-combinations ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     [ -rot ] dip each-combination ; inline
 
 : all-subsets ( seq -- subsets )
@@ -182,8 +213,8 @@ INSTANCE: combinations immutable-sequence
 <PRIVATE
 
 : (selections) ( seq n -- selections )
-    [ [ 1array ] map dup ] [ 1 - ] bi* [
-        cartesian-product concat [ { } concat-as ] map
+    [ dup [ 1sequence ] curry { } map-as dup ] [ 1 - ] bi* [
+        cartesian-product concat [ concat ] map
     ] with times ;
 
 PRIVATE>

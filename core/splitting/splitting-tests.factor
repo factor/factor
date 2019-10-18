@@ -58,20 +58,49 @@ unit-test
 [ { "hello" "hi" } ] [ "hello\rhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\r\nhi" string-lines ] unit-test
 
+[ { "" } ] [ SBUF" " string-lines ] unit-test
+[ { "" "" } ] [ SBUF" \n" string-lines ] unit-test
+[ { "" "" } ] [ SBUF" \r" string-lines ] unit-test
+[ { "" "" } ] [ SBUF" \r\n" string-lines ] unit-test
+[ { "hello" } ] [ SBUF" hello" string-lines ] unit-test
+[ { "hello" "" } ] [ SBUF" hello\n" string-lines ] unit-test
+[ { "hello" "" } ] [ SBUF" hello\r" string-lines ] unit-test
+[ { "hello" "" } ] [ SBUF" hello\r\n" string-lines ] unit-test
+[ { "hello" "hi" } ] [ SBUF" hello\nhi" string-lines ] unit-test
+[ { "hello" "hi" } ] [ SBUF" hello\rhi" string-lines ] unit-test
+[ { "hello" "hi" } ] [ SBUF" hello\r\nhi" string-lines ] unit-test
+
 [ { "hey" "world" "what's" "happening" } ]
 [ "heyAworldBwhat'sChappening" [ LETTER? ] split-when ] unit-test
+{ { { 2 } { 3 } { 5 1 } { 7 } } } [
+    1 { 2 1 3 2 5 1 3 7 }
+    [ dupd = dup [ [ 1 + ] dip ] when ] split-when nip
+] unit-test
+
+[ { "hey" "world" "what's" "happening" } ]
+[
+    "heyAworldBwhat'sChappening" [ LETTER? ] split-when-slice
+    [ >string ] map
+] unit-test
 
 [ "" f ] [ "" [ blank? ] split1-when ] unit-test
 [ "" "ABC" ] [ " ABC" [ blank? ] split1-when ] unit-test
 [ "a" " bc" ] [ "a  bc" [ blank? ] split1-when ] unit-test
 
-{ { } } [ { } { 0 } split* ] unit-test
-{ { { 1 2 3 } } } [ { 1 2 3 } { 0 } split* ] unit-test
-{ { { 0 } } } [ { 0 } { 0 } split* ] unit-test
-{ { { 0 } { 0 } } } [ { 0 0 } { 0 } split* ] unit-test
-{ { { 1 2 0 } { 3 0 } { 0 } } } [ { 1 2 0 3 0 0 } { 0 } split* ] unit-test
+[ "" f ] [ "" [ blank? ] split1-when-slice ] unit-test
+[ "" "ABC" ] [ " ABC" [ blank? ] split1-when-slice [ >string ] bi@ ] unit-test
+[ "a" " bc" ] [ "a  bc" [ blank? ] split1-when-slice [ >string ] bi@ ] unit-test
 
-{ { } } [ { } [ 0 > ] split*-when ] unit-test
-{ { { 0 } } } [ { 0 } [ 0 > ] split*-when ] unit-test
-{ { { 0 0 } } } [ { 0 0 } [ 0 > ] split*-when ] unit-test
-{ { { 1 } { 2 } { 0 3 } { 0 0 } } } [ { 1 2 0 3 0 0 } [ 0 > ] split*-when ] unit-test
+{ "abarbbarc" }
+[ "afoobfooc" "foo" "bar" replace ] unit-test
+
+{ "abc" }
+[ "afoobfooc" "foo" "" replace ] unit-test
+
+{ "afoobfooc" }
+[ "afoobfooc" "" "bar" replace ] unit-test
+
+{ "afoobfooc" }
+[ "afoobfooc" "" "" replace ] unit-test
+
+{ "" } [ "" "" "" replace ] unit-test

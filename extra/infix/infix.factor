@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
-effects fry infix.parser infix.ast kernel locals locals.parser
-locals.types math math.order multiline namespaces parser
-quotations sequences summary words vocabs.parser ;
-
+USING: accessors assocs combinators effects effects.parser fry
+infix.ast infix.parser kernel locals locals.parser math
+math.functions math.order math.ranges multiline namespaces
+parser quotations sequences summary words ;
 IN: infix
 
 <PRIVATE
@@ -18,13 +17,17 @@ M: local-not-defined summary
 : >local-word ( string -- word )
     locals get ?at [ local-not-defined ] unless ;
 
+ERROR: invalid-op string ;
+
 : select-op ( string -- word )
     {
         { "+" [ [ + ] ] }
         { "-" [ [ - ] ] }
         { "*" [ [ * ] ] }
         { "/" [ [ / ] ] }
-        [ drop [ mod ] ]
+        { "%" [ [ mod ] ] }
+        { "**" [ [ ^ ] ] }
+        [ invalid-op ]
     } case ;
 
 GENERIC: infix-codegen ( ast -- quot/number )
@@ -41,16 +44,33 @@ M: ast-array infix-codegen
     [ index>> infix-codegen prepare-operand ]
     [ name>> >local-word ] bi '[ @ _ infix-nth ] ;
 
-:: infix-subseq ( from to seq -- subseq )
-    seq length :> len
-    from 0 or dup 0 < [ len + ] when
-    to [ dup 0 < [ len + ] when ] [ len ] if*
-    [ 0 len clamp ] bi@ dupd max seq subseq ;
+: infix-subseq-step ( subseq step -- subseq' )
+    dup 0 < [ [ reverse! ] dip ] when
+    abs dup 1 = [ drop ] [
+        [ dup length 1 [-] 0 swap ] dip
+        <range> swap nths
+    ] if ;
+
+:: infix-subseq-range ( from to step len -- from to )
+    step [ 0 < ] [ f ] if* [
+        to [ dup 0 < [ len + ] when 1 + ] [ 0 ] if*
+        from [ dup 0 < [ len + ] when 1 + ] [ len ] if*
+    ] [
+        from 0 or dup 0 < [ len + ] when
+        to [ dup 0 < [ len + ] when ] [ len ] if*
+    ] if [ 0 len clamp ] bi@ dupd max ;
+
+:: infix-subseq ( from to step seq -- subseq )
+    from to step seq length infix-subseq-range
+    seq subseq step [ infix-subseq-step ] when* ;
 
 M: ast-slice infix-codegen
-    [ from>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
-    [ to>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
-    [ name>> >local-word ] tri '[ @ @ _ infix-subseq ] ;
+    {
+        [ from>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
+        [ to>>   [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
+        [ step>> [ infix-codegen prepare-operand ] [ [ f ] ] if* ]
+        [ name>> >local-word ]
+    } cleave '[ @ @ @ _ infix-subseq ] ;
 
 M: ast-op infix-codegen
     [ left>> infix-codegen ] [ right>> infix-codegen ]
@@ -90,10 +110,23 @@ M: ast-function infix-codegen
     [ arguments>> [ arguments-codegen ] [ length ] bi ]
     [ name>> ] bi find-and-check ;
 
-: [infix-parse ( end -- result/quot )
+: parse-infix-quotation ( end -- result/quot )
     parse-multiline-string build-infix-ast
     infix-codegen prepare-operand ;
+
 PRIVATE>
 
 SYNTAX: [infix
-    "infix]" [infix-parse suffix! \ call suffix! ;
+    "infix]" parse-infix-quotation suffix! \ call suffix! ;
+
+<PRIVATE
+
+: (INFIX::) ( -- word def effect )
+    [
+        scan-new-word
+        [ ";" parse-infix-quotation ] parse-locals-definition
+    ] with-definition ;
+
+PRIVATE>
+
+SYNTAX: INFIX:: (INFIX::) define-declared ;

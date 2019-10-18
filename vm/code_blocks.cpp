@@ -403,6 +403,7 @@ void factor_vm::fixup_labels(array *labels, code_block *compiled)
 }
 
 /* Might GC */
+/* Allocates memory */
 code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 {
 	code_block *block = code->allocator->allot(size + sizeof(code_block));
@@ -431,6 +432,7 @@ code_block *factor_vm::allot_code_block(cell size, code_block_type type)
 }
 
 /* Might GC */
+/* Allocates memory */
 code_block *factor_vm::add_code_block(code_block_type type, cell code_, cell labels_,
 	cell owner_, cell relocation_, cell parameters_, cell literals_,
 	cell frame_size_untagged)

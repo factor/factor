@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences io.files io.files.temp io.launcher
-io.pathnames io.encodings.ascii io.streams.string http.client
-generalizations combinators math.parser math.vectors
-math.intervals interval-maps memoize csv accessors assocs
-strings math splitting grouping arrays combinators.smart ;
+USING: accessors arrays assocs combinators combinators.smart
+csv grouping http.client interval-maps io.encodings.ascii
+io.files io.files.temp io.launcher io.pathnames kernel math
+math.parser math.vectors memoize sequences splitting strings ;
 IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" cache-file ;
@@ -34,7 +33,7 @@ TUPLE: ip-entry from to registry assigned city cntry country ;
 
 MEMO: ip-db ( -- seq )
     download-db ascii file-lines
-    [ "#" head? not ] filter "\n" join <string-reader> csv
+    [ "#" head? not ] filter "\n" join string>csv
     [ parse-ip-entry ] map ;
 
 : filter-overlaps ( alist -- alist' )

@@ -199,9 +199,9 @@ MEMO: specified-font ( assoc -- font )
     #! We memoize here to avoid creating lots of duplicate font objects.
     [ monospace-font <font> ] dip
     {
-        [ font-name swap at >>name ]
+        [ font-name of >>name ]
         [
-            font-style swap at {
+            font-style of {
                 { f [ ] }
                 { plain [ ] }
                 { bold [ t >>bold? ] }
@@ -209,9 +209,9 @@ MEMO: specified-font ( assoc -- font )
                 { bold-italic [ t >>bold? t >>italic? ] }
             } case
         ]
-        [ font-size swap at >>size ]
-        [ foreground swap at >>foreground ]
-        [ background swap at >>background ]
+        [ font-size of >>size ]
+        [ foreground of >>foreground ]
+        [ background of >>background ]
     } cleave
     derive-font ;
 
@@ -389,7 +389,7 @@ M: f sloppy-pick-up*
 
 : begin-selection ( pane -- )
     f >>selecting?
-    dup hand-loc get move-caret
+    dup hand-loc get-global move-caret
     f >>mark
     drop ;
 
@@ -397,12 +397,12 @@ M: f sloppy-pick-up*
     hand-moved? [
         [
             dup selecting?>> [
-                hand-loc get move-caret
+                hand-loc get-global move-caret
             ] [
-                dup hand-clicked get child? [
+                dup hand-clicked get-global child? [
                     t >>selecting?
                     [ hand-clicked set-global ]
-                    [ hand-click-loc get move-caret ]
+                    [ hand-click-loc get-global move-caret ]
                     [ caret>mark ]
                     tri
                 ] [ drop ] if
@@ -419,7 +419,7 @@ M: f sloppy-pick-up*
 
 : select-to-caret ( pane -- )
     t >>selecting?
-    [ dup mark>> [ dup caret>mark ] unless hand-loc get move-caret ]
+    [ dup mark>> [ dup caret>mark ] unless hand-loc get-global move-caret ]
     [ com-copy-selection ]
     [ request-focus ]
     tri ;

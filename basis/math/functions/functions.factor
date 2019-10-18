@@ -4,8 +4,11 @@ USING: math kernel math.constants math.private math.bits
 math.libm combinators fry math.order sequences ;
 IN: math.functions
 
-: >fraction ( a/b -- a b )
-    [ numerator ] [ denominator ] bi ; inline
+GENERIC: >fraction ( a/b -- a b )
+
+M: integer >fraction 1 ; inline
+
+M: ratio >fraction [ numerator ] [ denominator ] bi ; inline
 
 : rect> ( x y -- z )
     ! Note: an imaginary 0.0 should still create a complex
@@ -25,12 +28,25 @@ M: real sqrt
 
 <PRIVATE
 
-GENERIC# ^n 1 ( z w -- z^w ) foldable
+: (^fixnum) ( z w -- z^w )
+    [ 1 ] 2dip
+    [ dup zero? ] [
+        dup odd? [
+            [ [ * ] keep ] [ 1 - ] bi*
+        ] when [ sq ] [ 2/ ] bi*
+    ] until 2drop ; inline
 
-: (^n) ( z w -- z^w )
+: (^bignum) ( z w -- z^w )
     make-bits 1 [ [ over * ] when [ sq ] dip ] reduce nip ; inline
 
-M: integer ^n
+: (^n) ( z w -- z^w )
+    dup fixnum? [ (^fixnum) ] [ (^bignum) ] if ; inline
+
+GENERIC# ^n 1 ( z w -- z^w ) foldable
+
+M: fixnum ^n (^n) ;
+
+M: bignum ^n
     [ factor-2s ] dip [ (^n) ] keep rot * shift ;
 
 M: ratio ^n
@@ -45,8 +61,11 @@ M: complex ^n (^n) ;
 
 PRIVATE>
 
-: >rect ( z -- x y )
-    [ real-part ] [ imaginary-part ] bi ; inline
+GENERIC: >rect ( z -- x y )
+
+M: real >rect 0 ; inline
+
+M: complex >rect [ real-part ] [ imaginary-part ] bi ; inline
 
 : >float-rect ( z -- x y )
     >rect [ >float ] bi@ ; inline
@@ -346,7 +365,14 @@ M: real atan >float atan ; inline
 
 : truncate ( x -- y ) dup 1 mod - ; inline
 
-: round ( x -- y ) dup sgn 2 / + truncate ; inline
+GENERIC: round ( x -- y )
+
+M: integer round ; inline
+
+M: ratio round
+    >fraction [ /mod abs 2 * ] keep >= [ dup 0 < -1 1 ? + ] when ;
+
+M: float round dup sgn 2 /f + truncate ;
 
 : floor ( x -- y )
     dup 1 mod

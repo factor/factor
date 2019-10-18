@@ -111,7 +111,7 @@ M: inspector-gadget focusable-child*
     [ table>> (selected-row) ] tri [
         [ key>> ] [ key-string>> ] bi
         slot-editor-window
-    ] [ 2drop 2drop ] if ;
+    ] [ 4drop ] if ;
 
 : inspector-help ( -- ) "ui-inspector" com-browse ;
 

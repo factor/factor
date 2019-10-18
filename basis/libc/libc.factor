@@ -72,7 +72,7 @@ M: realloc-error summary
     [ <malloc-ptr> unregister-disposable ] when* ;
 
 : malloc-exists? ( alien -- ? )
-    <malloc-ptr> disposables get key? ;
+    <malloc-ptr> disposables get in? ;
 
 PRIVATE>
 

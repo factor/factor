@@ -179,3 +179,7 @@ TYPED: typed-intersection ( x: intersection{ integer bignum } -- ? ) >boolean ;
 
 [ t ] [ 5555555555555555555555555555555555555555555555555555 typed-intersection ] unit-test
 [ 0 typed-intersection ] [ input-mismatch-error? ] must-fail-with
+
+[
+    """IN: test123 USE: typed TYPED: foo ( x -- y ) ;""" eval( -- )
+] [ error>> no-types-specified? ] must-fail-with

@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel hashtables sequences sequences.private arrays
-words namespaces make parser effects.parser math assocs effects
-definitions quotations summary accessors fry hashtables.identity ;
+USING: accessors arrays assocs definitions effects
+effects.parser fry hashtables.identity kernel kernel.private
+math sequences sequences.private words ;
 IN: memoize
 
 <PRIVATE
@@ -28,9 +28,10 @@ IN: memoize
     [ { } [nsequence] ] if ;
 
 : unpacker ( seq -- quot )
-    length dup 4 <=
+    length dup dup 4 <=
     [ { [ drop ] [ ] [ first2-unsafe ] [ first3-unsafe ] [ first4-unsafe ] } nth ]
-    [ [firstn] ] if ;
+    [ [firstn] ] if swap 1 >
+    [ [ { array } declare ] prepose ] when ;
 
 : pack/unpack ( quot effect -- newquot )
     [ in>> packer ] [ out>> unpacker ] bi surround ;

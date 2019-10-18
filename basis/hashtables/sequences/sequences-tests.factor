@@ -4,7 +4,7 @@
 USING: assocs hashtables.sequences kernel literals sequences
 tools.test ;
 
-IN: hashtables.identity.tests
+IN: hashtables.sequences.tests
 
 [ 1000 ] [ 0 4 "asdf" <slice> SH{ { "asdf" 1000 } } at ] unit-test
 
@@ -15,7 +15,7 @@ IN: hashtables.identity.tests
 
 [ 1001 ] [
     SH{ } clone 1001 0 4 "asdf" <slice> pick set-at
-    "asdf" swap at
+    "asdf" of
 ] unit-test
 
 [ { { "asdf" 1000 } } ] [ SH{ { "asdf" 1000 } } >alist ] unit-test

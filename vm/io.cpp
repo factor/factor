@@ -182,18 +182,23 @@ FILE *factor_vm::pop_file_handle()
 	return (FILE *)alien_offset(ctx->pop());
 }
 
+FILE *factor_vm::peek_file_handle()
+{
+	return (FILE *)alien_offset(ctx->peek());
+}
+
 void factor_vm::primitive_fgetc()
 {
-	FILE *file = pop_file_handle();
+	FILE *file = peek_file_handle();
 
 	int c = safe_fgetc(file);
 	if(c == EOF && feof(file))
 	{
 		clearerr(file);
-		ctx->push(false_object);
+		ctx->replace(false_object);
 	}
 	else
-		ctx->push(tag_fixnum(c));
+		ctx->replace(tag_fixnum(c));
 }
 
 /* Allocates memory */
@@ -238,8 +243,8 @@ void factor_vm::primitive_fwrite()
 
 void factor_vm::primitive_ftell()
 {
-	FILE *file = pop_file_handle();
-	ctx->push(from_signed_8(safe_ftell(file)));
+	FILE *file = peek_file_handle();
+	ctx->replace(from_signed_8(safe_ftell(file)));
 }
 
 void factor_vm::primitive_fseek()

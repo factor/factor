@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic assocs kernel math namespaces
-sequences strings vectors words words.symbol quotations io
-combinators sorting splitting math.parser effects continuations
-io.files vocabs io.encodings.utf8 source-files classes
-hashtables compiler.units accessors sets lexer vocabs.parser
-slots parser.notes classes.algebra ;
+USING: accessors arrays assocs classes combinators
+compiler.units continuations definitions effects io
+io.encodings.utf8 io.files kernel lexer math.parser namespaces
+parser.notes quotations sequences sets slots source-files
+vectors vocabs vocabs.parser words words.symbol ;
+FROM: sets => members ;
 IN: parser
 
 : location ( -- loc )
@@ -18,7 +18,7 @@ IN: parser
 M: parsing-word stack-effect drop ( parsed -- parsed ) ;
 
 : create-in ( str -- word )
-    current-vocab create dup set-word dup save-location ;
+    current-vocab create dup set-last-word dup save-location ;
 
 SYMBOL: auto-use?
 
@@ -63,7 +63,7 @@ ERROR: number-expected ;
     (scan-token) dup [ parse-datum ] when ;
 
 : scan-datum ( -- word/number )
-    (scan-datum) [ \ word unexpected-eof ] unless* ;
+    (scan-datum) [ \ word throw-unexpected-eof ] unless* ;
 
 : scan-word ( -- word )
     (scan-token) parse-word ;
@@ -91,7 +91,7 @@ ERROR: staging-violation word ;
     pop-parsing-word ; inline
 
 : execute-parsing ( accum word -- accum )
-    dup changed-definitions get key? [ staging-violation ] when
+    dup changed-definitions get in? [ staging-violation ] when
     (execute-parsing) ;
 
 : scan-object ( -- object )
@@ -106,7 +106,7 @@ ERROR: staging-violation word ;
 : parse-until-step ( accum end -- accum ? )
     (scan-datum) {
         { [ 2dup eq? ] [ 2drop f ] }
-        { [ dup not ] [ drop unexpected-eof t ] }
+        { [ dup not ] [ drop throw-unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
         { [ dup parsing-word? ] [ nip execute-parsing t ] }
         [ pick push drop t ]
@@ -163,8 +163,8 @@ print-use-hook [ [ ] ] initialize
 : parsing-file ( file -- )
     parser-quiet? get [ drop ] [ "Loading " write print flush ] if ;
 
-: filter-moved ( assoc1 assoc2 -- seq )
-    swap assoc-diff keys [
+: filter-moved ( set1 set2 -- seq )
+    swap diff members [
         {
             { [ dup where dup [ first ] when file get path>> = not ] [ f ] }
             { [ dup reader-method? ] [ f ] }
@@ -173,11 +173,11 @@ print-use-hook [ [ ] ] initialize
         } cond nip
     ] filter ;
 
-: removed-definitions ( -- assoc1 assoc2 )
+: removed-definitions ( -- set1 set2 )
     new-definitions old-definitions
-    [ get first2 assoc-union ] bi@ ;
+    [ get first2 union ] bi@ ;
 
-: removed-classes ( -- assoc1 assoc2 )
+: removed-classes ( -- set1 set2 )
     new-definitions old-definitions
     [ get second ] bi@ ;
 

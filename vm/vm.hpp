@@ -375,6 +375,7 @@ struct factor_vm
 	object *allot_object(cell type, cell size);
 	object *allot_large_object(cell type, cell size);
 
+	/* Allocates memory */
 	template<typename Type> Type *allot(cell size)
 	{
 		return (Type *)allot_object(Type::type_number,size);
@@ -556,6 +557,7 @@ struct factor_vm
 	void safe_fclose(FILE *stream);
 	void primitive_fopen();
 	FILE *pop_file_handle();
+	FILE *peek_file_handle();
 	void primitive_fgetc();
 	void primitive_fread();
 	void primitive_fputc();

@@ -424,7 +424,7 @@ PRIVATE>
             [ cl-current-device  ,, ] when*
             [ cl-current-context ,, ] when*
         ] 3curry H{ } make
-    ] dip with-variable ; inline
+    ] dip with-variables ; inline
 
 : cl-platforms ( -- platforms )
     0 f 0 uint <ref> [ clGetPlatformIDs cl-success ] keep uint deref
@@ -520,10 +520,10 @@ PRIVATE>
 : cl-normalized-coords? ( sampler -- ? )
     handle>> CL_SAMPLER_NORMALIZED_COORDS sampler-info-bool ; inline
 
-: cl-addressing-mode ( sampler -- addressing-mode )
+: sampler>cl-addressing-mode ( sampler -- addressing-mode )
     handle>> CL_SAMPLER_ADDRESSING_MODE sampler-info-uint cl_addressing_mode>addressing-mode ; inline
 
-: cl-filter-mode ( sampler -- filter-mode )
+: sampler>cl-filter-mode ( sampler -- filter-mode )
     handle>> CL_SAMPLER_FILTER_MODE sampler-info-uint cl_filter_mode>filter-mode ; inline
 
 : <cl-program> ( options strings -- program )

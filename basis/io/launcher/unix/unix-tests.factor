@@ -1,65 +1,68 @@
+USING: accessors arrays bootstrap.image calendar
+concurrency.promises continuations debugger.unix destructors io
+io.backend.unix io.directories io.encodings.ascii
+io.encodings.binary io.encodings.utf8 io.files io.files.temp
+io.launcher io.launcher.unix io.pathnames io.streams.duplex
+io.timeouts kernel locals math namespaces sequences threads
+tools.test unix unix.process ;
 IN: io.launcher.unix.tests
-USING: io.backend.unix io.files io.files.temp io.directories
-io.pathnames tools.test io.launcher arrays io namespaces
-continuations math io.encodings.binary io.encodings.ascii
-accessors kernel sequences io.encodings.utf8 destructors
-io.streams.duplex locals concurrency.promises threads
-unix.process calendar unix debugger.unix io.timeouts
-io.launcher.unix ;
+
+: arch-temp-file ( str -- str' )
+    "-" my-arch 3append temp-file ;
 
 [ ] [
-    [ "launcher-test-1" temp-file delete-file ] ignore-errors
+    [ "launcher-test-1" arch-temp-file delete-file ] ignore-errors
 ] unit-test
 
 [ ] [
     "touch"
-    "launcher-test-1" temp-file
+    "launcher-test-1" arch-temp-file
     2array
     try-process
 ] unit-test
 
-[ t ] [ "launcher-test-1" temp-file exists? ] unit-test
+[ t ] [ "launcher-test-1" arch-temp-file exists? ] unit-test
 
 [ ] [
-    [ "launcher-test-1" temp-file delete-file ] ignore-errors
+    [ "launcher-test-1" arch-temp-file delete-file ] ignore-errors
 ] unit-test
 
 [ ] [
     <process>
         "echo Hello" >>command
-        "launcher-test-1" temp-file >>stdout
+        "launcher-test-1" arch-temp-file >>stdout
     try-process
 ] unit-test
 
 [ "Hello\n" ] [
     "cat"
-    "launcher-test-1" temp-file
+    "launcher-test-1" arch-temp-file
     2array
     ascii <process-reader> stream-contents
 ] unit-test
 
 [ ] [
-    [ "launcher-test-1" temp-file delete-file ] ignore-errors
+    [ "launcher-test-1" arch-temp-file delete-file ] ignore-errors
 ] unit-test
 
 [ ] [
     <process>
         "cat" >>command
         +closed+ >>stdin
-        "launcher-test-1" temp-file >>stdout
+        "launcher-test-1" arch-temp-file >>stdout
     try-process
 ] unit-test
 
 [ "" ] [
     "cat"
-    "launcher-test-1" temp-file
+    "launcher-test-1" arch-temp-file
     2array
     ascii <process-reader> stream-contents
 ] unit-test
 
 [ ] [
     2 [
-        "launcher-test-1" temp-file binary <file-appender> [
+        "launcher-test-1" arch-temp-file binary <file-appender> [
             <process>
                 swap >>stdout
                 "echo Hello" >>command
@@ -70,7 +73,7 @@ io.launcher.unix ;
 
 [ "Hello\nHello\n" ] [
     "cat"
-    "launcher-test-1" temp-file
+    "launcher-test-1" arch-temp-file
     2array
     ascii <process-reader> stream-contents
 ] unit-test
@@ -103,16 +106,16 @@ io.launcher.unix ;
     utf8 file-contents
 ] unit-test
 
-[ "append-test" temp-file delete-file ] ignore-errors
+[ "append-test" arch-temp-file delete-file ] ignore-errors
 
 [ "hi\nhi\n" ] [
     2 [
         <process>
             "echo hi" >>command
-            "append-test" temp-file <appender> >>stdout
+            "append-test" arch-temp-file <appender> >>stdout
         try-process
     ] times
-    "append-test" temp-file utf8 file-contents
+    "append-test" arch-temp-file utf8 file-contents
 ] unit-test
 
 [ t ] [ "ls" utf8 <process-stream> stream-contents >boolean ] unit-test

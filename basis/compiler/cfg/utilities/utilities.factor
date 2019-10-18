@@ -18,18 +18,15 @@ IN: compiler.cfg.utilities
         [ first ##branch? ]
     } 1&& ;
 
-SYMBOL: visited
-
-: (skip-empty-blocks) ( bb -- bb' )
-    dup visited get key? [
-        dup empty-block? [
-            dup visited get conjoin
+: (skip-empty-blocks) ( visited bb -- visited bb' )
+    dup empty-block? [
+        dup pick ?adjoin [
             successors>> first (skip-empty-blocks)
         ] when
-    ] unless ;
+    ] when ; inline recursive
 
 : skip-empty-blocks ( bb -- bb' )
-    H{ } clone visited [ (skip-empty-blocks) ] with-variable ;
+    [ HS{ } clone ] dip (skip-empty-blocks) nip ;
 
 :: update-predecessors ( from to bb -- )
     ! Whenever 'from' appears in the list of predecessors of 'to'

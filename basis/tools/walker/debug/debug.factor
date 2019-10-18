@@ -26,5 +26,5 @@ IN: tools.walker.debug
     send-synchronous drop
 
     p ?promise
-    variables>> walker-continuation swap at
+    variables>> walker-continuation of 
     value>> data>> ;

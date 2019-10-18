@@ -9,6 +9,8 @@ IN: xml.traversal.tests
 
 [ "" ] [ "<foo/>" string>xml children>string ] unit-test
 
+[ "bar qux" ] [ "<foo>bar <baz>qux</baz></foo>" string>xml deep-children>string ] unit-test
+
 [ "blah" ] [ "<foo attr='blah'/>" string>xml-chunk "foo" deep-tag-named "attr" attr ] unit-test
 
 [ { "blah" } ] [ "<foo attr='blah'/>" string>xml-chunk "foo" deep-tags-named [ "attr" attr ] map ] unit-test

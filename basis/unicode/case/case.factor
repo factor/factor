@@ -11,16 +11,10 @@ SYMBOL: locale ! Just casing locale, or overall?
 
 <PRIVATE
 
-: split-subseq ( string sep -- strings )
-    [ dup ] swap '[ _ split1-slice swap ] produce nip ;
+: i-dot? ( locale -- ? )
+    { "tr" "az" } member? ; inline
 
-: replace ( old new str -- newstr )
-    [ split-subseq ] dip join ; inline
-
-: i-dot? ( -- ? )
-    locale get { "tr" "az" } member? ;
-
-: lithuanian? ( -- ? ) locale get "lt" = ;
+: lithuanian? ( locale -- ? ) "lt" = ; inline
 
 : lithuanian>upper ( string -- lower )
     "i\u000307" "i" replace
@@ -80,19 +74,26 @@ SYMBOL: locale ! Just casing locale, or overall?
         [ char-quot call out push ] ?if
     ] each out "" like ; inline
 
+: locale>lower ( string -- string' )
+    locale get
+    [ i-dot? [ turk>lower ] when ]
+    [ lithuanian? [ lithuanian>lower ] when ] bi ;
+
+: locale>upper ( string -- string' )
+    locale get
+    [ i-dot? [ turk>upper ] when ]
+    [ lithuanian? [ lithuanian>upper ] when ] bi ;
+
 PRIVATE>
 
 : >lower ( string -- lower )
-    i-dot? [ turk>lower ] when
-    lithuanian? [ lithuanian>lower ] when
-    final-sigma
+    locale>lower final-sigma
     [ lower>> ] [ ch>lower ] map-case ;
 
 HINTS: >lower string ;
 
 : >upper ( string -- upper )
-    i-dot? [ turk>upper ] when
-    lithuanian? [ lithuanian>upper ] when
+    locale>upper
     [ upper>> ] [ ch>upper ] map-case ;
 
 HINTS: >upper string ;
@@ -100,17 +101,17 @@ HINTS: >upper string ;
 <PRIVATE
 
 : (>title) ( string -- title )
-    i-dot? [ turk>upper ] when
-    lithuanian? [ lithuanian>upper ] when
+    locale>upper
     [ title>> ] [ ch>title ] map-case ; inline
 
 PRIVATE>
 
 : capitalize ( string -- title )
-    unclip 1string [ >lower ] [ (>title) ] bi* prepend ; inline
+    unclip-slice 1string [ >lower ] [ (>title) ] bi*
+    "" prepend-as ; inline
 
 : >title ( string -- title )
-    final-sigma >words [ capitalize ] map concat ;
+    final-sigma >words [ capitalize ] map! concat ;
 
 HINTS: >title string ;
 

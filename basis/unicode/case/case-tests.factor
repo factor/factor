@@ -9,17 +9,17 @@ IN: unicode.case.tests
 [ "\u0003C3a\u0003C2 \u0003C3\u0003C2 \u0003C3a\u0003C2" ] [ "\u0003A3A\u0003A3 \u0003A3\u0003A3 \u0003A3A\u0003A3" >lower ] unit-test
 [ t ] [ "hello how are you?" lower? ] unit-test
 [
-    [ f ] [ i-dot? ] unit-test
-    [ f ] [ lithuanian? ] unit-test
+    [ f ] [ locale get i-dot? ] unit-test
+    [ f ] [ locale get lithuanian? ] unit-test
     "tr" locale set
-    [ t ] [ i-dot? ] unit-test
-    [ f ] [ lithuanian? ] unit-test
+    [ t ] [ locale get i-dot? ] unit-test
+    [ f ] [ locale get lithuanian? ] unit-test
     [ "i\u000131i \u000131jj" ] [ "i\u000131I\u000307 IJj" >lower ] unit-test
     [ "I\u000307\u000131i Ijj" ] [ "i\u000131I\u000307 IJj" >title ] unit-test
     [ "I\u000307II\u000307 IJJ" ] [ "i\u000131I\u000307 IJj" >upper ] unit-test
     "lt" locale set
-    [ f ] [ i-dot? ] unit-test
-    [ t ] [ lithuanian? ] unit-test
+    [ f ] [ locale get i-dot? ] unit-test
+    [ t ] [ locale get lithuanian? ] unit-test
     [ "i\u000307\u000300" ] [ 0xCC 1string nfd >lower ] unit-test
     [ "\u00012f\u000307" ] [ 0x12E 1string nfd >lower nfc ] unit-test
     [ "I\u000300" ] [ "i\u000307\u000300" >upper ] unit-test

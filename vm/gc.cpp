@@ -290,11 +290,11 @@ void factor_vm::primitive_compact_gc()
 		true /* trace contexts? */);
 }
 
-/* Allocates memory */
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
+/* Allocates memory */
 object *factor_vm::allot_large_object(cell type, cell size)
 {
 	/* If tenured space does not have enough room, collect and compact */
@@ -328,6 +328,7 @@ void factor_vm::primitive_enable_gc_events()
 	gc_events = new std::vector<gc_event>();
 }
 
+/* Allocates memory */
 void factor_vm::primitive_disable_gc_events()
 {
 	if(gc_events)

@@ -123,3 +123,25 @@ M: null-set members drop f ;
 [ t ] [ { } set? ] unit-test
 [ t ] [ 5 <bit-set> set? ] unit-test
 [ f ] [ H{ } set? ] unit-test
+
+[ HS{ } ] [ HS{ } [ clear-set ] keep ] unit-test
+[ HS{ } ] [ HS{ 1 2 3 } [ clear-set ] keep ] unit-test
+
+[ HS{ } ] [ HS{ } HS{ } union! ] unit-test
+[ HS{ 1 } ] [ HS{ 1 } HS{ } union! ] unit-test
+[ HS{ 1 } ] [ HS{ } HS{ 1 } union! ] unit-test
+[ HS{ 1 2 3 } ] [ HS{ 1 } HS{ 1 2 3 } union! ] unit-test
+
+[ f ] [ { } intersection ] unit-test
+[ HS{ } ] [ { HS{ } } intersection ] unit-test
+[ HS{ 1 } ] [ { HS{ 1 2 3 } HS{ 1 } } intersection ] unit-test
+
+[ HS{ } ] [ HS{ } HS{ } diff! ] unit-test
+[ HS{ 1 } ] [ HS{ 1 2 3 } HS{ 2 3 } diff! ] unit-test
+[ HS{ 1 } ] [ HS{ 1 } HS{ 2 3 4 } diff! ] unit-test
+[ HS{ 1 2 3 } ] [ HS{ 1 2 3 } HS{ 4 } diff! ] unit-test
+
+[ HS{ } ] [ HS{ } HS{ } intersect! ] unit-test
+[ HS{ 2 3 } ] [ HS{ 1 2 3 } HS{ 2 3 } intersect! ] unit-test
+[ HS{ } ] [ HS{ 1 } HS{ 2 3 4 } intersect! ] unit-test
+[ HS{ } ] [ HS{ 1 2 3 } HS{ 4 } intersect! ] unit-test

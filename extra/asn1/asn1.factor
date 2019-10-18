@@ -70,13 +70,13 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 : get-id ( -- id )
     elements get id>> ;
 
+ERROR: unsupported-tag-encoding id ;
+
 : (set-tag) ( -- )
     elements get id>> 31 bitand
     dup elements get tag<<
     31 < [
-        [ "unsupported tag encoding: #{" % 
-          get-id # "}" %
-        ] "" make throw
+        get-id unsupported-tag-encoding
     ] unless ;
 
 : set-tagclass ( -- )
@@ -100,10 +100,10 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
 : set-objtype ( syntax -- )
     builtin-syntax 2array [
-        elements get tagclass>> swap at
-        elements get encoding>> swap at
+        elements get tagclass>> of
+        elements get encoding>> of
         elements get tag>>
-        swap at [ 
+        of [ 
             elements get objtype<<
         ] when*
     ] each ;
@@ -215,7 +215,7 @@ M: string >ber ( str -- byte-array )
 
 : >ber-seq-internal ( array code -- byte-array )
     1array "C" pack-native swap dup length >ber-length-encoding
-    swapd append swap [ number>string ] map "" join >array append ;
+    swapd append swap [ number>string ] map { } concat-as append ;
 
 M: array >ber ( array -- byte-array )
     0x30 >ber-seq-internal ;

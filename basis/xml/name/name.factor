@@ -53,10 +53,15 @@ SYMBOL: ns-stack
         } 2&&
     ] if-empty ;
 
+<PRIVATE
+
+: valid-name-start? ( str -- ? )
+    [ f ] [ version-1.0? swap first name-start? ] if-empty ;
+
 : maybe-name ( space main -- name/f )
     2dup {
-        [ drop valid-name? ]
-        [ nip valid-name? ]
+        [ drop valid-name-start? ]
+        [ nip valid-name-start? ]
     } 2&& [ f <name> ] [ 2drop f ] if ;
 
 : prefixed-name ( str -- name/f )
@@ -68,10 +73,9 @@ SYMBOL: ns-stack
     ] [ drop f ] if* ;
 
 : interpret-name ( str -- name )
-    dup prefixed-name [ ] [
-        dup valid-name?
-        [ <simple-name> ] [ bad-name ] if
-    ] ?if ;
+    dup prefixed-name [ ] [ <simple-name> ] ?if ;
+
+PRIVATE>
 
 : take-name ( -- string )
     version-1.0? '[ _ swap name-char? not ] take-until ;

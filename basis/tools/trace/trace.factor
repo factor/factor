@@ -20,10 +20,10 @@ exclude-vocabs { "math" "accessors" } swap set-global
 SYMBOL: end
 
 : include? ( vocab -- ? )
-    include-vocabs get dup [ member? ] [ 2drop t ] if ;
+    include-vocabs get [ member? ] [ drop t ] if* ;
 
 : exclude? ( vocab -- ? )
-    exclude-vocabs get dup [ member? ] [ 2drop f ] if ;
+    exclude-vocabs get [ member? ] [ drop f ] if* ;
 
 : into? ( obj -- ? )
     {
@@ -43,9 +43,9 @@ SYMBOL: end
         ]
     } 1&& ;
 
-TUPLE: trace-step word inputs ;
+TUPLE: trace-step-state word inputs ;
 
-M: trace-step summary
+M: trace-step-state summary
     [
         [ "Word: " % word>> name>> % ]
         [ " -- inputs: " % inputs>> unparse-short % ] bi
@@ -53,7 +53,7 @@ M: trace-step summary
 
 : <trace-step> ( continuation word -- trace-step )
     [ nip ] [ [ data>> ] [ stack-effect in>> length ] bi* short tail* ] 2bi
-    \ trace-step boa ;
+    \ trace-step-state boa ;
 
 : print-step ( continuation -- )
     dup continuation-current dup word? [

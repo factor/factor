@@ -49,7 +49,7 @@ M: #alien-node compute-live-values* nip look-at-inputs ;
     zip filter-mapping values ;
 
 : filter-live ( values -- values' )
-    dup empty? [ [ live-value? ] filter ] unless ;
+    dup empty? [ live-values get '[ _ at ] filter ] unless ;
 
 :: drop-values ( inputs outputs mapping-keys mapping-values -- #shuffle )
     inputs

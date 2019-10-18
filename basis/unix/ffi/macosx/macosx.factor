@@ -264,3 +264,11 @@ CONSTANT: SIGWINCH  28
 CONSTANT: SIGINFO   29
 CONSTANT: SIGUSR1   30
 CONSTANT: SIGUSR2   31
+
+STRUCT: sf_hdtr
+    { headers void* }
+    { hdr_cnt int }
+    { trailers void* }
+    { trl_cnt int } ;
+
+FUNCTION: int sendfile ( int fd, int s, off_t offset, off_t* len, sf_hdtr* hdtr, int flags ) ;

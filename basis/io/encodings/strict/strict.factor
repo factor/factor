@@ -3,16 +3,9 @@
 USING: io.encodings kernel accessors summary ;
 IN: io.encodings.strict
 
-TUPLE: strict code ;
-C: strict strict
+TUPLE: strict-state code ;
 
-TUPLE: decode-error ;
-: decode-error ( -- * ) \ decode-error new throw ;
-M: decode-error summary
-    drop "Error in decoding input stream" ;
+C: strict strict-state
 
-M: strict <decoder>
-    code>> <decoder> [ strict ] change-code ;
-
-M: strict decode-char
+M: strict-state decode-char
     code>> decode-char dup replacement-char = [ decode-error ] when ;

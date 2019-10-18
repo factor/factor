@@ -10,7 +10,7 @@ classes compiler.units generic.standard generic.single vocabs
 init kernel.private io.encodings accessors math.order
 destructors source-files parser classes.tuple.parser
 effects.parser lexer generic.parser strings.parser vocabs.loader
-vocabs.parser source-files.errors ;
+vocabs.parser source-files.errors grouping ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -43,7 +43,8 @@ M: string error. print ;
     error-continuation get name>> assoc-stack ;
 
 : :res ( n -- * )
-    1 - restarts get-global nth f restarts set-global restart ;
+    1 - restarts get-global nth f restarts set-global
+    continue-restart ;
 
 : :1 ( -- * ) 1 :res ;
 : :2 ( -- * ) 2 :res ;
@@ -110,7 +111,9 @@ HOOK: signal-error. os ( obj -- )
 : undefined-symbol-error. ( obj -- )
     "Cannot resolve C library function" print
     "Symbol: " write dup third symbol>string print
-    "Library: " write fourth . ;
+    "Library: " write fourth .
+    "You are probably missing a library or the library path is wrong." print
+    "See http://concatenative.org/wiki/view/Factor/Requirements" print ;
 
 : stack-underflow. ( obj name -- )
     write " stack underflow" print drop ;
@@ -220,6 +223,8 @@ M: slice-error summary
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
 
+M: groups-error summary drop "Non positive group size" ;
+
 M: condition error. error>> error. ;
 
 M: condition summary error>> summary ;
@@ -242,8 +247,8 @@ M: redefine-error error.
     "Re-definition of " write
     def>> . ;
 
-M: undefined summary
-    word>> undefined?
+M: undefined-word summary
+    word>> undefined-word?
     "Cannot execute a deferred word before it has been defined"
     "Cannot execute a word before it has been compiled"
     ? ;

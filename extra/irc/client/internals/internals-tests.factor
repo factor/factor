@@ -223,7 +223,7 @@ M: mb-writer dispose drop ;
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       "ircuser" over join-participant
       ":ircserver.net MODE #factortest +o ircuser" %push-line
-      participants>> "ircuser" swap at
+      participants>> "ircuser" of
   ] unit-test
 ] spawning-irc
 

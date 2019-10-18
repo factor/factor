@@ -15,11 +15,11 @@ TUPLE: audio-source
     { distance float initial: 1.0 }
     { rolloff float initial: 1.0 } ;
 
-TUPLE: audio-orientation
+TUPLE: audio-orientation-state
     { forward initial: { 0.0 0.0 -1.0 } }
     { up initial: { 0.0 1.0 0.0 } } ;
 
-C: <audio-orientation> audio-orientation
+C: <audio-orientation-state> audio-orientation-state
 
 : orientation>float-array ( orientation -- float-array )
     [ forward>> first3 ]
@@ -29,7 +29,7 @@ TUPLE: audio-listener
     { position initial: { 0.0 0.0 0.0 } }
     { gain float initial: 1.0 }
     { velocity initial: { 0.0 0.0 0.0 } }
-    { orientation initial: T{ audio-orientation } } ;
+    { orientation initial: T{ audio-orientation-state } } ;
 
 GENERIC: audio-position ( source/listener -- position )
 GENERIC: audio-gain ( source/listener -- gain )
@@ -45,7 +45,7 @@ M: object audio-velocity drop { 0.0 0.0 0.0 } ; inline
 M: object audio-relative? drop f ; inline
 M: object audio-distance drop 1.0 ; inline
 M: object audio-rolloff drop 1.0 ; inline
-M: object audio-orientation drop T{ audio-orientation } ; inline
+M: object audio-orientation drop T{ audio-orientation-state } ; inline
 
 M: audio-source audio-position position>> ; inline
 M: audio-source audio-gain gain>> ; inline

@@ -71,7 +71,7 @@ PRIVATE>
         [ drop 26 ] [
             0xE0100 0xE01EF between?  5 29 ?
         ] if
-    ] ?if ;
+    ] ?if ; inline
 
 : category ( char -- category )
     category# categories nth ;
@@ -92,7 +92,7 @@ PRIVATE>
 
 : (chain-decomposed) ( hash value -- newvalue )
     [
-        2dup swap at
+        2dup of
         [ (chain-decomposed) ] [ 1array nip ] ?if
     ] with map concat ;
 
@@ -137,9 +137,6 @@ PRIVATE>
     >hashtable ;
 
 ! the maximum unicode char in the first 3 planes
-
-: ?set-nth ( val index seq -- )
-    2dup bounds-check? [ set-nth ] [ 3drop ] if ;
 
 :: fill-ranges ( table -- table )
     name-map sort-values keys
@@ -219,3 +216,5 @@ load-properties properties swap assoc-union! drop
 
 [ name>char [ "Invalid character" throw ] unless* ]
 name>char-hook set-global
+
+PRIVATE>

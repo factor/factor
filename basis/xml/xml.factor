@@ -155,7 +155,7 @@ PRIVATE>
         init-xml init-xml-stack
         call
         [ process ] xml-loop
-        done? [ unclosed ] unless
+        done? [ throw-unclosed ] unless
         xml-stack get first second
     ] with-state ; inline
 

@@ -306,6 +306,9 @@ TUPLE: single-texture < disposable image dim loc texture-coords texture display-
         ] do-attribs
     ] do-enabled ; inline
 
+: texture-dim ( texture -- dim )
+    [ dim>> ] [ image>> ] bi 2x?>> [ [ 2.0 / ] map ] when ;
+
 : (draw-textured-rect) ( dim texture -- )
     [ loc>> ]
     [ [ GL_TEXTURE_2D ] dip texture>> glBindTexture ]
@@ -339,10 +342,14 @@ TUPLE: single-texture < disposable image dim loc texture-coords texture display-
     [ v* ] with map float-array{ } join ;
 
 : make-texture-display-list ( texture -- dlist )
-    GL_COMPILE [ [ dim>> ] keep draw-textured-rect ] make-dlist ;
+    GL_COMPILE [
+        [ texture-dim ] keep draw-textured-rect
+    ] make-dlist ;
 
 : <single-texture> ( image loc -- texture )
-    single-texture new-disposable swap >>loc swap [ >>image ] [ dim>> >>dim ] bi
+    single-texture new-disposable
+        swap >>loc
+        swap [ >>image ] [ dim>> >>dim ] bi
     dup image>> dim>> product 0 = [
         dup texture-coords >>texture-coords
         dup image>> make-texture >>texture
@@ -361,7 +368,8 @@ M: single-texture draw-scaled-texture
 TUPLE: multi-texture < disposable grid display-list loc ;
 
 : image-locs ( image-grid -- loc-grid )
-    [ first [ dim>> first ] map ] [ [ first dim>> second ] map ] bi
+    [ first [ image-dim first ] map ]
+    [ [ first image-dim second ] map ] bi
     [ 0 [ + ] accumulate nip ] bi@
     cartesian-product flip ;
 
@@ -376,7 +384,7 @@ TUPLE: multi-texture < disposable grid display-list loc ;
     GL_COMPILE [
         [
             [ grid-has-alpha? [ GL_BLEND glDisable ] unless ]
-            [ [ [ [ dim>> ] keep (draw-textured-rect) ] each ] each ]
+            [ [ [ [ texture-dim ] keep (draw-textured-rect) ] each ] each ]
             [ grid-has-alpha? [ GL_BLEND glEnable ] unless ] tri
             GL_TEXTURE_2D 0 glBindTexture
         ] with-texturing

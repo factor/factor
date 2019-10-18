@@ -7,7 +7,7 @@ IN: bit-sets
 TUPLE: bit-set { table bit-array read-only } ;
 
 : <bit-set> ( capacity -- bit-set )
-    <bit-array> bit-set boa ;
+    <bit-array> bit-set boa ; inline
 
 INSTANCE: bit-set set
 
@@ -23,9 +23,7 @@ M: bit-set delete
     ! This isn't allowed to throw an error if the elt wasn't
     ! in the set
     over integer? [
-        table>> 2dup bounds-check? [
-            [ f ] 2dip set-nth
-        ] [ 2drop ] if
+        [ f ] 2dip table>> ?set-nth
     ] [ 2drop ] if ;
 
 ! If you do binary set operations with a bit-set, it's expected
@@ -78,7 +76,7 @@ M: bit-set members
     over bit-set? [ 2dup [ table>> length ] same? ] [ f ] if
     [ drop ] [
         [ members ] dip table>> length <bit-set>
-        [ [ adjoin ] curry each ] keep
+        [ adjoin-all ] keep
     ] if ;
 
 PRIVATE>

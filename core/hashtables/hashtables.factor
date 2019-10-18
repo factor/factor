@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel kernel.private slots.private math
-assocs math.private sequences sequences.private vectors ;
+USING: accessors arrays assocs kernel kernel.private math
+math.private sequences sequences.private slots.private vectors ;
 IN: hashtables
 
 TUPLE: hashtable
@@ -24,7 +24,7 @@ TUPLE: hashtable
 
 : (key@) ( key array i probe# -- array n ? )
     [ 3dup swap array-nth ] dip over ((empty)) eq?
-    [ drop 3drop no-key ] [
+    [ 4drop no-key ] [
         [ = ] dip swap
         [ drop rot drop t ]
         [ probe (key@) ]
@@ -87,17 +87,31 @@ TUPLE: hashtable
     2 fixnum+fast [ set-slot ] 2keep
     1 fixnum+fast set-slot ; inline
 
-: (rehash) ( hash alist -- )
-    swap [ swapd set-at ] curry assoc-each ; inline
+: (set-at) ( value key hash -- )
+    dupd new-key@ set-nth-pair ; inline
+
+: (rehash) ( alist hash -- )
+    [ swapd (set-at) ] curry assoc-each ; inline
 
 : hash-large? ( hash -- ? )
     [ count>> 3 fixnum*fast 1 fixnum+fast ]
     [ array>> length>> ] bi fixnum> ; inline
 
+: each-pair ( array quot: ( key value -- ) -- )
+    [
+        [ length 2/ ] keep [
+            [ 1 fixnum-shift-fast ] dip [ array-nth ] 2keep
+            pick tombstone? [ 3drop ]
+        ] curry
+    ] dip [ [ 1 fixnum+fast ] dip array-nth ] prepose
+    [ if ] curry compose each-integer ; inline
+
 : grow-hash ( hash -- )
-    [ [ >alist ] [ assoc-size 1 + ] bi ] keep
-    [ reset-hash ] keep
-    swap (rehash) ;
+    { hashtable } declare [
+        [ array>> ]
+        [ assoc-size 1 + ]
+        [ reset-hash ] tri
+    ] keep [ swapd (set-at) ] curry each-pair ;
 
 : ?grow-hash ( hash -- )
     dup hash-large? [ grow-hash ] [ drop ] if ; inline
@@ -107,13 +121,13 @@ PRIVATE>
 : <hashtable> ( n -- hash )
     hashtable new [ reset-hash ] keep ; inline
 
-M: hashtable at* ( key hash -- value ? )
+M: hashtable at*
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
 
-M: hashtable clear-assoc ( hash -- )
+M: hashtable clear-assoc
     [ init-hash ] [ array>> [ drop ((empty)) ] map! drop ] bi ;
 
-M: hashtable delete-at ( key hash -- )
+M: hashtable delete-at
     [ nip ] [ key@ ] 2bi [
         [ ((tombstone)) dup ] 2dip set-nth-pair
         hash-deleted+
@@ -121,14 +135,14 @@ M: hashtable delete-at ( key hash -- )
         3drop
     ] if ;
 
-M: hashtable assoc-size ( hash -- n )
+M: hashtable assoc-size
     [ count>> ] [ deleted>> ] bi - ; inline
 
 : rehash ( hash -- )
-    dup >alist [ dup clear-assoc ] dip (rehash) ;
+    [ >alist ] [ clear-assoc ] [ (rehash) ] tri ;
 
-M: hashtable set-at ( value key hash -- )
-    dup ?grow-hash dupd new-key@ set-nth-pair ;
+M: hashtable set-at
+    dup ?grow-hash (set-at) ;
 
 : associate ( value key -- hash )
     1 <hashtable> [ set-at ] keep ; inline
@@ -141,18 +155,18 @@ M: hashtable set-at ( value key hash -- )
     [ [ 1 fixnum+fast { array-capacity } declare ] dip length<< ]
     2bi ; inline
 
+: collect-pairs ( hash quot: ( key value -- elt ) -- seq )
+    [ [ array>> ] [ assoc-size <vector> ] bi ] dip swap [
+        [ push-unsafe ] curry compose each-pair
+    ] keep { } like ; inline
+
 PRIVATE>
 
-M: hashtable >alist
-    [ array>> [ length 2/ ] keep ] [ assoc-size <vector> ] bi [
-        [
-            [
-                [ 1 fixnum-shift-fast ] dip
-                [ array-nth ] [ [ 1 fixnum+fast ] dip array-nth ] 2bi
-            ] dip
-            pick tombstone? [ 3drop ] [ [ 2array ] dip push-unsafe ] if
-        ] 2curry each-integer
-    ] keep { } like ;
+M: hashtable >alist [ 2array ] collect-pairs ;
+
+M: hashtable keys [ drop ] collect-pairs ;
+
+M: hashtable values [ nip ] collect-pairs ;
 
 M: hashtable clone
     (clone) [ clone ] change-array ; inline
@@ -166,7 +180,7 @@ M: assoc new-assoc drop <hashtable> ; inline
 M: f new-assoc drop <hashtable> ; inline
 
 : >hashtable ( assoc -- hashtable )
-    H{ } assoc-clone-like ;
+    [ >alist ] [ assoc-size <hashtable> ] bi [ (rehash) ] keep ;
 
 M: hashtable assoc-like
     drop dup hashtable? [ >hashtable ] unless ; inline
@@ -180,5 +194,13 @@ M: hashtable assoc-like
 : hash-combine ( obj oldhash -- newhash )
     [ hashcode 0x13c6ef37 + ] dip
     [ 6 shift ] [ -2 shift ] bi + + ;
+
+ERROR: malformed-hashtable-pair seq pair ;
+
+: check-hashtable ( seq -- seq )
+    dup [ dup length 2 = [ drop ] [ malformed-hashtable-pair ] if ] each ;
+
+: parse-hashtable ( seq -- hashtable )
+    check-hashtable H{ } assoc-clone-like ;
 
 INSTANCE: hashtable assoc

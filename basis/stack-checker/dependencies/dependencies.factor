@@ -58,8 +58,8 @@ SYMBOL: generic-dependencies
     [ class-or ] when* ;
 
 : add-depends-on-generic ( class generic -- )
-    generic-dependencies get dup
-    [ [ ?class-or ] change-at ] [ 3drop ] if ;
+    generic-dependencies get
+    [ [ ?class-or ] change-at ] [ 2drop ] if* ;
 
 ! Conditional dependencies are re-evaluated when classes change;
 ! if any fail, the word is recompiled
@@ -69,7 +69,7 @@ GENERIC: satisfied? ( dependency -- ? )
 
 : add-conditional-dependency ( ... class -- )
     boa conditional-dependencies get
-    dup [ conjoin ] [ 2drop ] if ; inline
+    [ adjoin ] [ drop ] if* ; inline
 
 TUPLE: depends-on-class-predicate class1 class2 result ;
 
@@ -78,7 +78,8 @@ TUPLE: depends-on-class-predicate class1 class2 result ;
 
 M: depends-on-class-predicate satisfied?
     {
-        [ [ class1>> valid-classoid? ] [ class2>> valid-classoid? ] bi and ]
+        [ class1>> valid-classoid? ]
+        [ class2>> valid-classoid? ]
         [ [ [ class1>> ] [ class2>> ] bi evaluate-class-predicate ] [ result>> ] bi eq? ]
     } 1&& ;
 
@@ -147,7 +148,7 @@ M: depends-on-final satisfied?
 : init-dependencies ( -- )
     H{ } clone dependencies set
     H{ } clone generic-dependencies set
-    H{ } clone conditional-dependencies set ;
+    HS{ } clone conditional-dependencies set ;
 
 : without-dependencies ( quot -- )
     [

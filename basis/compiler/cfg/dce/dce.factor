@@ -59,11 +59,9 @@ GENERIC: compute-live-vregs ( insn -- )
 
 : (record-live) ( vregs -- )
     [
-        dup live-vreg? [ drop ] [
-            [ live-vregs get adjoin ]
-            [ liveness-graph get at (record-live) ]
-            bi
-        ] if
+        dup live-vregs get ?adjoin [
+            liveness-graph get at (record-live)
+        ] [ drop ] if
     ] each ;
 
 : record-live ( insn -- )

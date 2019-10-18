@@ -253,7 +253,7 @@ ERROR: bad-tga-unsupported ;
     image-data                         >>bitmap
     ubyte-components                   >>component-type ;
     
-M: tga-image stream>image
+M: tga-image stream>image*
     drop [ [ read-tga ] throw-on-eof ] with-input-stream ;
 
 M: tga-image image>stream

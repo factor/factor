@@ -248,5 +248,5 @@ ERROR: loading-gif-error gif-image ;
 : ensure-loaded ( gif-image -- gif-image )
     dup loading?>> [ loading-gif-error ] when ;
 
-M: gif-image stream>image ( path gif-image -- image )
+M: gif-image stream>image* ( path gif-image -- image )
     drop load-gif ensure-loaded gif>image ;

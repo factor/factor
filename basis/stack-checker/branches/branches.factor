@@ -21,7 +21,7 @@ SYMBOLS: +bottom+ +top+ ;
     ! Terminated branches are padded with bottom values which
     ! unify with literals.
     dup empty? [
-        dup [ length ] [ max ] map-reduce
+        dup longest length
         '[ _ +bottom+ pad-head ] map
     ] unless ;
 
@@ -78,7 +78,7 @@ SYMBOLS: combinator quotations ;
     terminated? branch-variable ;
 
 : terminate-branches ( seq -- )
-    [ terminated? swap at ] all? [ terminate ] when ;
+    [ terminated? of ] all? [ terminate ] when ;
 
 : compute-phi-function ( seq -- )
     [ quotation active-variable sift quotations set ]
@@ -94,7 +94,7 @@ SYMBOLS: combinator quotations ;
 
 GENERIC: infer-branch ( literal -- namespace )
 
-M: literal infer-branch
+M: literal-tuple infer-branch
     [
         copy-inference
         nest-visitor

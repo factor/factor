@@ -142,7 +142,7 @@ ERROR: vocab-name-contains-dot path ;
     } at* ;
 
 : add-using ( object -- )
-    vocabulary>> using get [ conjoin ] [ drop ] if* ;
+    vocabulary>> using get [ adjoin ] [ drop ] if* ;
 
 : ($values.) ( array -- )
     [ bl ] [
@@ -224,7 +224,7 @@ ERROR: vocab-name-contains-dot path ;
 
 : write-using ( vocab -- )
     "USING:" write
-    using get keys
+    using get members
     { "help.markup" "help.syntax" } append natural-sort remove
     [ bl write ] each
     " ;" print ;
@@ -237,7 +237,7 @@ ERROR: vocab-name-contains-dot path ;
     ] with-output-stream ;
 
 : with-scaffold ( quot -- )
-    [ H{ } clone using ] dip with-variable ; inline
+    [ HS{ } clone using ] dip with-variable ; inline
 
 : link-vocab ( vocab -- )
     check-vocab

@@ -4,6 +4,9 @@ USING: accessors byte-arrays byte-vectors continuations.private
 init kernel kernel.private math namespaces sequences ;
 IN: alien
 
+BUILTIN: alien { underlying c-ptr read-only initial: f } expired ;
+BUILTIN: dll { path byte-array read-only initial: B{ } } ;
+
 PREDICATE: pinned-alien < alien underlying>> not ;
 
 UNION: pinned-c-ptr pinned-alien POSTPONE: f ;

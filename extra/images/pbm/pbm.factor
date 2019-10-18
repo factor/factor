@@ -72,7 +72,7 @@ SINGLETON: pbm-image
     ubyte-components >>component-type ;
 PRIVATE>
 
-M: pbm-image stream>image
+M: pbm-image stream>image*
     drop [ [ read-pbm ] throw-on-eof ] with-input-stream ;
 
 M: pbm-image image>stream

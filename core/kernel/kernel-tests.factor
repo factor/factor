@@ -117,7 +117,7 @@ os windows? [
 ! Regression
 : (loop) ( a b c d -- )
     [ pick ] dip swap [ pick ] dip swap
-    < [ [ 1 + ] 3dip (loop) ] [ 2drop 2drop ] if ; inline recursive
+    < [ [ 1 + ] 3dip (loop) ] [ 4drop ] if ; inline recursive
 
 : loop ( obj -- )
     H{ } values swap [ dup length swap ] dip [ 0 ] 3dip (loop) ;
@@ -187,3 +187,6 @@ os windows? [
 ! Make sure memory protection faults work
 [ f 0 alien-unsigned-1 ] [ vm-error? ] must-fail-with
 [ 1 <alien> 0 alien-unsigned-1 ] [ vm-error? ] must-fail-with
+
+{ 1 2 3 1 2 3 } [ 1 2 3 3dup ] unit-test
+{ 1 2 3 4 1 2 3 4 } [ 1 2 3 4 4dup ] unit-test

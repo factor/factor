@@ -16,6 +16,8 @@ GENERIC: assoc-size ( assoc -- n )
 GENERIC: assoc-like ( assoc exemplar -- newassoc )
 GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
 GENERIC: >alist ( assoc -- newassoc )
+GENERIC: keys ( assoc -- keys )
+GENERIC: values ( assoc -- values )
 
 M: assoc assoc-like drop ; inline
 
@@ -50,7 +52,7 @@ M: assoc assoc-like drop ; inline
 PRIVATE>
 
 : assoc-find ( ... assoc quot: ( ... key value -- ... ? ) -- ... key value ? )
-    (assoc-each) find swap [ first2 t ] [ drop f f f ] if ; inline
+    (assoc-each) find swap [ first2-unsafe t ] [ drop f f f ] if ; inline
 
 : key? ( key assoc -- ? ) at* nip ; inline
 
@@ -58,7 +60,7 @@ PRIVATE>
     (assoc-each) each ; inline
 
 : assoc>map ( ... assoc quot: ( ... key value -- ... elt ) exemplar -- ... seq )
-    [ >alist ] 2dip [ [ first2 ] prepose ] dip map-as ; inline
+    [ (assoc-each) ] dip map-as ; inline
 
 : assoc-map-as ( ... assoc quot: ( ... key value -- ... newkey newvalue ) exemplar -- ... newassoc )
     [ [ 2array ] compose { } assoc>map ] dip assoc-like ; inline
@@ -78,6 +80,12 @@ PRIVATE>
         assoc-each
     ] [ drop ] 2bi ; inline
 
+: sift-keys ( assoc -- assoc' )
+    [ drop ] assoc-filter ; inline
+
+: sift-values ( assoc -- assoc' )
+    [ nip ] assoc-filter ; inline
+
 : assoc-partition ( ... assoc quot: ( ... key value -- ... ? ) -- ... true-assoc false-assoc )
     [ (assoc-each) partition ] [ drop ] 2bi
     [ assoc-like ] curry bi@ ; inline
@@ -91,15 +99,19 @@ PRIVATE>
 : at ( key assoc -- value/f )
     at* drop ; inline
 
+: ?of ( assoc key -- value/key ? )
+    swap ?at ; inline
+
+: of ( assoc key -- value/f )
+    swap at ; inline
+
 M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ dup assoc-size ] dip new-assoc
     [ [ set-at ] with-assoc assoc-each ] keep ; inline
 
-: keys ( assoc -- keys )
-    [ drop ] { } assoc>map ;
+M: assoc keys [ drop ] { } assoc>map ;
 
-: values ( assoc -- values )
-    [ nip ] { } assoc>map ;
+M: assoc values [ nip ] { } assoc>map ;
 
 : delete-at* ( key assoc -- old ? )
     [ at* ] 2keep delete-at ;
@@ -157,7 +169,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     unless ; inline
 
 : 2cache ( ... key1 key2 assoc quot: ( ... key1 key2 -- ... value ) -- ... value )
-    [ 2array ] 2dip [ first2 ] prepose cache ; inline
+    [ 2array ] 2dip [ first2-unsafe ] prepose cache ; inline
 
 : change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ [ at ] dip call ] [ drop ] 3bi set-at ; inline
@@ -244,8 +256,18 @@ M: enum delete-at seq>> remove-nth! drop ; inline
 M: enum >alist ( enum -- alist )
     seq>> [ length iota ] keep zip ; inline
 
+M: enum keys seq>> length iota >array ; inline
+
+M: enum values seq>> >array ; inline
+
 M: enum assoc-size seq>> length ; inline
 
 M: enum clear-assoc seq>> delete-all ; inline
 
 INSTANCE: enum assoc
+
+M: enum length seq>> length ; inline
+
+M: enum nth-unsafe dupd seq>> nth-unsafe 2array ; inline
+
+INSTANCE: enum immutable-sequence

@@ -14,7 +14,7 @@ IN: linked-assocs.test
     <linked-hash> 1 "b" pick set-at
                   2 "c" pick set-at
                   3 "a" pick set-at
-    "c" swap at*
+    "c" ?of
 ] unit-test
 
 { { 2 3 4 } { "c" "a" "d" } 3 } [

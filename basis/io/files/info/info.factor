@@ -5,7 +5,7 @@ vocabs vocabs.loader io.files.types math ;
 IN: io.files.info
 
 ! File info
-TUPLE: file-info type size size-on-disk permissions created modified
+TUPLE: file-info-tuple type size size-on-disk permissions created modified
 accessed ;
 
 HOOK: file-info os ( path -- info )
@@ -13,6 +13,8 @@ HOOK: file-info os ( path -- info )
 HOOK: link-info os ( path -- info )
 
 : directory? ( file-info -- ? ) type>> +directory+ = ;
+: regular-file? ( file-info -- ? ) type>> +regular-file+ = ;
+: symbolic-link? ( file-info -- ? ) type>> +symbolic-link+ = ;
 
 : sparse-file? ( file-info -- ? )
     [ size-on-disk>> ] [ size>> ] bi < ;
@@ -20,10 +22,14 @@ HOOK: link-info os ( path -- info )
 ! File systems
 HOOK: file-systems os ( -- array )
 
-TUPLE: file-system-info device-name mount-point type
+TUPLE: file-system-info-tuple device-name mount-point type
 available-space free-space used-space total-space ;
 
 HOOK: file-system-info os ( path -- file-system-info )
+
+HOOK: file-readable? os ( path -- ? )
+HOOK: file-writable? os ( path -- ? )
+HOOK: file-executable? os ( path -- ? )
 
 {
     { [ os unix? ] [ "io.files.info.unix" ] }

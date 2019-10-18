@@ -33,10 +33,10 @@ M: object v/n [ / ] curry map ; inline
 GENERIC: n/v ( n v -- w )
 M: object n/v [ / ] with map ; inline
 
-GENERIC: v+  ( u v -- w )
+GENERIC: v+ ( u v -- w )
 M: object v+ [ + ] 2map ; inline
 
-GENERIC: v-  ( u v -- w )
+GENERIC: v- ( u v -- w )
 M: object v- [ - ] 2map ; inline
 
 GENERIC: [v-] ( u v -- w )
@@ -159,8 +159,8 @@ M: object vand [ and ] 2map ; inline
 GENERIC: vandn ( u v -- w )
 M: object vandn [ [ not ] dip and ] 2map ; inline
 
-GENERIC: vor  ( u v -- w )
-M: object vor  [ or  ] 2map ; inline
+GENERIC: vor ( u v -- w )
+M: object vor [ or ] 2map ; inline
 
 GENERIC: vxor ( u v -- w )
 M: object vxor [ xor ] 2map ; inline
@@ -180,37 +180,37 @@ M: object vany? [ ] any? ; inline
 GENERIC: vnone? ( v -- ? )
 M: object vnone? [ not ] all? ; inline
 
-GENERIC: v<  ( u v -- w )
-M: object v<  [ <   ] 2map ; inline
+GENERIC: v< ( u v -- w )
+M: object v< [ < ] 2map ; inline
 
 GENERIC: v<= ( u v -- w )
-M: object v<= [ <=  ] 2map ; inline
+M: object v<= [ <= ] 2map ; inline
 
 GENERIC: v>= ( u v -- w )
-M: object v>= [ >=  ] 2map ; inline
+M: object v>= [ >= ] 2map ; inline
 
-GENERIC: v>  ( u v -- w )
-M: object v>  [ >   ] 2map ; inline
+GENERIC: v> ( u v -- w )
+M: object v> [ > ] 2map ; inline
 
 GENERIC: vunordered? ( u v -- w )
 M: object vunordered? [ unordered? ] 2map ; inline
 
-GENERIC: v=  ( u v -- w )
-M: object v=  [ =   ] 2map ; inline
+GENERIC: v= ( u v -- w )
+M: object v= [ = ] 2map ; inline
 
 GENERIC: v? ( mask true false -- result )
 M: object v? 
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
 
-:: vif ( mask true-quot: ( -- vector ) false-quot: ( -- vector ) -- result )
+: vif ( mask true-quot: ( -- vector ) false-quot: ( -- vector ) -- result )
     {
-        { [ mask vall?  ] [ true-quot  call ] }
-        { [ mask vnone? ] [ false-quot call ] }
-        [ mask true-quot call false-quot call v? ]
+        { [ pick vall? ] [ drop nip call ] }
+        { [ pick vnone? ] [ 2nip call ] }
+        [ [ call ] dip call v? ]
     } cond ; inline
 
-: vfloor    ( u -- v ) [ floor ] map ;
-: vceiling  ( u -- v ) [ ceiling ] map ;
+: vfloor ( u -- v ) [ floor ] map ;
+: vceiling ( u -- v ) [ ceiling ] map ;
 : vtruncate ( u -- v ) [ truncate ] map ;
 
 : vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
@@ -225,10 +225,20 @@ M: object h. [ conjugate * ] [ + ] 2map-reduce ; inline
 GENERIC: norm-sq ( v -- x )
 M: object norm-sq [ absq ] [ + ] map-reduce ; inline
 
+: l1-norm ( v -- x ) [ abs ] map-sum ; inline
+
 : norm ( v -- x ) norm-sq sqrt ; inline
 
-: p-norm ( v p -- x )
+: p-norm-default ( v p -- x )
     [ [ [ abs ] dip ^ ] curry map-sum ] keep recip ^ ; inline
+
+: p-norm ( v p -- x )
+    {
+        { [ dup 1 = ] [ drop l1-norm ] }
+        { [ dup 2 = ] [ drop norm ] }
+        { [ dup fp-infinity? ] [ drop supremum ] }
+        [ p-norm-default ]
+    } cond ;
 
 : normalize ( u -- v ) dup norm v/n ; inline
 

@@ -20,7 +20,7 @@ SYMBOL: :restarts
     compute-restarts :restarts prefix ; inline
 
 : fuel-pprint-sequence ( seq open close -- )
-    [ write ] dip swap [ " " write ] [ fuel-pprint ] interleave write ; inline
+    [ write ] dip swap [ bl ] [ fuel-pprint ] interleave write ; inline
 
 PRIVATE>
 
@@ -60,4 +60,4 @@ M: source-file-error fuel-pprint
     [ file>> ] [ error>> ] bi 2array source-file-error prefix
     fuel-pprint ;
 
-M: source-file fuel-pprint path>> fuel-pprint ;
+M: source-file-tuple fuel-pprint path>> fuel-pprint ;

@@ -42,7 +42,7 @@ CONSTANT: tweet-metadata-style
                         tweet-username-style [
                             dup user>> screen-name>> write
                         ] with-style
-                        " " write dup text>> print
+                        bl dup text>> print
 
                         tweet-metadata-style [
                             dup created-at>> write

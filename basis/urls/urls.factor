@@ -1,10 +1,11 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel ascii combinators combinators.short-circuit
-sequences splitting fry namespaces make assocs arrays strings
-io.sockets io.encodings.string io.encodings.utf8 math
-math.parser accessors parser strings.parser lexer
-hashtables present peg.ebnf urls.encoding ;
+
+USING: accessors arrays assocs combinators fry hashtables
+io.pathnames io.sockets kernel lexer make math.parser
+namespaces peg.ebnf present sequences splitting strings
+strings.parser urls.encoding vocabs.loader ;
+
 IN: urls
 
 TUPLE: url protocol username password host port path query anchor ;
@@ -83,6 +84,8 @@ M: string >url
         [ fourth >>anchor ]
     } cleave
     dup host>> [ [ "/" or ] change-path ] when ;
+
+M: pathname >url string>> >url ;
 
 : protocol-port ( protocol -- port )
     {
@@ -191,8 +194,6 @@ PRIVATE>
 
 ! Literal syntax
 SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
-
-USE: vocabs.loader
 
 { "urls" "prettyprint" } "urls.prettyprint" require-when
 { "urls" "io.sockets.secure" } "urls.secure" require-when

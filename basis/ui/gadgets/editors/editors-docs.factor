@@ -32,7 +32,7 @@ HELP: editor-mark
 { $description "Outputs the current mark location as a line/column number pair." } ;
 
 HELP: change-caret
-{ $values { "editor" editor } { "quot" { $quotation "( loc -- newloc )" } } }
+{ $values { "editor" editor } { "quot" { $quotation "( loc document -- newloc )" } } }
 { $description "Applies a quotation to the current caret location and moves the caret to the location output by the quotation." } ;
 
 { change-caret change-caret&mark mark>caret } related-words
@@ -42,7 +42,7 @@ HELP: mark>caret
 { $description "Moves the mark to the caret location, effectively deselecting any selected text." } ;
 
 HELP: change-caret&mark
-{ $values { "editor" editor } { "quot" { $quotation "( loc -- newloc )" } } }
+{ $values { "editor" editor } { "quot" { $quotation "( loc document -- newloc )" } } }
 { $description "Applies a quotation to the current caret location and moves the caret and the mark to the location output by the quotation." } ;
 
 HELP: point>loc

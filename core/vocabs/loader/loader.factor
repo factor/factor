@@ -112,7 +112,7 @@ PRIVATE>
     over [ lookup-vocab ] all? [
         require drop
     ] [
-        [ drop [ require-when-vocabs get adjoin ] each ]
+        [ drop require-when-vocabs get adjoin-all ]
         [ 2array require-when-table get push ] 2bi
     ] if ;
 

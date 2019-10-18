@@ -268,14 +268,14 @@ HELP: gensym
 HELP: bootstrapping?
 { $var-description "Set by the library while bootstrap is in progress. Some parsing words need to behave differently during bootstrap." } ;
 
-HELP: word
+HELP: last-word
 { $values { "word" word } }
 { $description "Outputs the most recently defined word." }
 { $class-description "The class of words. One notable subclass is " { $link class } ", the class of class words." } ;
 
-{ word set-word save-location } related-words
+{ last-word set-last-word save-location } related-words
 
-HELP: set-word
+HELP: set-last-word
 { $values { "word" word } }
 { $description "Sets the recently defined word." } ;
 

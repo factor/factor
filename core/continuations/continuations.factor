@@ -28,10 +28,14 @@ SYMBOL: restarts
 
 : catchstack ( -- catchstack ) catchstack* clone ; inline
 
-: set-catchstack ( catchstack -- )
-    >vector CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
+: (set-catchstack) ( catchstack -- )
+    CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
 
-: init-catchstack ( -- ) f set-catchstack ;
+: set-catchstack ( catchstack -- )
+    >vector (set-catchstack) ; inline
+
+: init-catchstack ( -- )
+    V{ } clone (set-catchstack) ;
 
 PRIVATE>
 
@@ -45,8 +49,11 @@ C: <continuation> continuation
 
 <PRIVATE
 
+ERROR: not-a-continuation obj ;
+
 : >continuation< ( continuation -- data call retain name catch )
-    { [ data>> ] [ call>> ] [ retain>> ] [ name>> ] [ catch>> ] } cleave ;
+    dup continuation? [ not-a-continuation ] unless
+    { [ data>> ] [ call>> ] [ retain>> ] [ name>> ] [ catch>> ] } cleave ; inline
 
 PRIVATE>
 
@@ -160,7 +167,7 @@ ERROR: attempt-all-error ;
 
 TUPLE: condition error restarts continuation ;
 
-C: <condition> condition ( error restarts cc -- condition )
+C: <condition> condition
 
 : throw-restarts ( error restarts -- restart )
     [ <condition> throw ] callcc1 2nip ;
@@ -175,7 +182,7 @@ TUPLE: restart name obj continuation ;
 
 C: <restart> restart
 
-: restart ( restart -- * )
+: continue-restart ( restart -- * )
     [ obj>> ] [ continuation>> ] bi continue-with ;
 
 M: object compute-restarts drop { } ;

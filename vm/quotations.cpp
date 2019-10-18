@@ -156,6 +156,7 @@ void quotation_jit::emit_epilog(bool safepoint, bool stack_frame)
 	if(stack_frame) emit(parent->special_objects[JIT_EPILOG]);
 }
 
+/* Allocates memory conditionally */
 void quotation_jit::emit_quot(cell quot_)
 {
 	data_root<quotation> quot(quot_,parent);
@@ -341,6 +342,7 @@ code_block *factor_vm::jit_compile_quot(cell owner_, cell quot_, bool relocating
 	return compiled;
 }
 
+/* Allocates memory */
 void factor_vm::jit_compile_quot(cell quot_, bool relocating)
 {
 	data_root<quotation> quot(quot_,this);
@@ -351,6 +353,7 @@ void factor_vm::jit_compile_quot(cell quot_, bool relocating)
 	}
 }
 
+/* Allocates memory */
 void factor_vm::primitive_jit_compile()
 {
 	jit_compile_quot(ctx->pop(),true);
@@ -361,8 +364,8 @@ void *factor_vm::lazy_jit_compile_entry_point()
 	return untag<word>(special_objects[LAZY_JIT_COMPILE_WORD])->entry_point;
 }
 
-/* Allocates memory */
 /* push a new quotation on the stack */
+/* Allocates memory */
 void factor_vm::primitive_array_to_quotation()
 {
 	quotation *quot = allot<quotation>(sizeof(quotation));
@@ -398,6 +401,7 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset)
 	return compiler.get_position();
 }
 
+/* Allocates memory */
 cell factor_vm::lazy_jit_compile(cell quot_)
 {
 	data_root<quotation> quot(quot_,this);
@@ -410,6 +414,7 @@ cell factor_vm::lazy_jit_compile(cell quot_)
 	return quot.value();
 }
 
+/* Allocates memory */
 VM_C_API cell lazy_jit_compile(cell quot, factor_vm *parent)
 {
 	return parent->lazy_jit_compile(quot);
@@ -427,11 +432,13 @@ void factor_vm::primitive_quot_compiled_p()
 	ctx->push(tag_boolean(quot_compiled_p(quot.untagged())));
 }
 
+/* Allocates memory */
 cell factor_vm::find_all_quotations()
 {
 	return instances(QUOTATION_TYPE);
 }
 
+/* Allocates memory */
 void factor_vm::initialize_all_quotations()
 {
 	data_root<array> quotations(find_all_quotations(),this);

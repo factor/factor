@@ -1,7 +1,8 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff, 2013 John Benediktsson
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators kernel kernel.private
-make math namespaces sequences sequences.private splitting
-strings ;
+layouts make math math.private namespaces sbufs sequences
+sequences.private splitting strings ;
 IN: math.parser
 
 : digit> ( ch -- n )
@@ -46,7 +47,7 @@ TUPLE: number-parse
     [ / ] [ drop f ] if* ; inline
 
 TUPLE: float-parse
-    { radix read-only }
+    { radix fixnum read-only }
     { point read-only }
     { exponent read-only } ;
 
@@ -99,7 +100,7 @@ TUPLE: float-parse
     dup ratio? [ + ] [ 2drop f ] if ; inline
 
 : @abort ( i number-parse n x -- f )
-    2drop 2drop f ; inline
+    4drop f ; inline
 
 : @split ( i number-parse n -- n i number-parse n' )
     -rot 0 ; inline
@@ -295,7 +296,7 @@ PRIVATE>
 <PRIVATE
 
 : (digits>integer) ( valid? accum digit radix -- valid? accum )
-    2dup < [ swapd * + ] [ 2drop 2drop f 0 ] if ; inline
+    2dup < [ swapd * + ] [ 4drop f 0 ] if ; inline
 
 : each-digit ( seq radix quot -- n/f )
     [ t 0 ] 3dip curry each swap [ drop f ] unless ; inline
@@ -310,33 +311,96 @@ PRIVATE>
 
 <PRIVATE
 
-: positive>base ( num radix -- str )
+CONSTANT: TENS B{
+    48 48 48 48 48 48 48 48 48 48 49 49 49 49 49 49 49 49 49 49
+    50 50 50 50 50 50 50 50 50 50 51 51 51 51 51 51 51 51 51 51
+    52 52 52 52 52 52 52 52 52 52 53 53 53 53 53 53 53 53 53 53
+    54 54 54 54 54 54 54 54 54 54 55 55 55 55 55 55 55 55 55 55
+    56 56 56 56 56 56 56 56 56 56 57 57 57 57 57 57 57 57 57 57
+}
+
+CONSTANT: ONES B{
+    48 49 50 51 52 53 54 55 56 57 48 49 50 51 52 53 54 55 56 57
+    48 49 50 51 52 53 54 55 56 57 48 49 50 51 52 53 54 55 56 57
+    48 49 50 51 52 53 54 55 56 57 48 49 50 51 52 53 54 55 56 57
+    48 49 50 51 52 53 54 55 56 57 48 49 50 51 52 53 54 55 56 57
+    48 49 50 51 52 53 54 55 56 57 48 49 50 51 52 53 54 55 56 57
+}
+
+: (two-digit) ( num accum -- num' accum )
+    [
+        100 /mod [ TENS nth-unsafe ] [ ONES nth-unsafe ] bi
+    ] dip [ push ] keep [ push ] keep ; inline
+
+: (one-digit) ( num accum -- num' accum )
+    [ 10 /mod CHAR: 0 + ] dip [ push ] keep ; inline
+
+: (bignum>dec) ( num accum -- num' accum )
+    [ over most-positive-fixnum > ]
+    [ { bignum sbuf } declare (two-digit) ] while
+    [ >fixnum ] dip ; inline
+
+: (fixnum>dec) ( num accum -- num' accum )
+    { fixnum sbuf } declare
+    [ over 10 >= ] [ (two-digit) ] while
+    [ over zero? ] [ (one-digit) ] until ; inline
+
+GENERIC: (positive>dec) ( num -- str )
+
+M: bignum (positive>dec)
+    12 <sbuf> (bignum>dec) (fixnum>dec) "" like reverse! nip ; inline
+
+: (count-digits) ( digits n -- digits' )
+    {
+        { [ dup 10 < ] [ drop ] }
+        { [ dup 100 < ] [ drop 1 fixnum+fast ] }
+        { [ dup 1,000 < ] [ drop 2 fixnum+fast ] }
+        [
+            dup 1,000,000,000,000 < [
+                dup 100,000,000 < [
+                    dup 1,000,000 < [
+                        dup 10,000 < [
+                            drop 3
+                        ] [
+                            100,000 >= 5 4 ?
+                        ] if
+                    ] [
+                        10,000,000 >= 7 6 ?
+                    ] if
+                ] [
+                    dup 10,000,000,000 < [
+                        1,000,000,000 >= 9 8 ?
+                    ] [
+                        100,000,000,000 >= 11 10 ?
+                    ] if
+                ] if fixnum+fast
+            ] [
+                [ 12 fixnum+fast ] [ 1,000,000,000,000 /i ] bi*
+                (count-digits)
+            ] if
+        ]
+    } cond ; inline recursive
+
+M: fixnum (positive>dec)
+    1 over (count-digits) <sbuf> (fixnum>dec) "" like reverse! nip ; inline
+
+: (positive>base) ( num radix -- str )
     dup 1 <= [ invalid-radix ] when
     [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
     reverse! ; inline
+
+: positive>base ( num radix -- str )
+    dup 10 = [ drop (positive>dec) ] [ (positive>base) ] if ; inline
 
 PRIVATE>
 
 GENERIC# >base 1 ( n radix -- str )
 
 : number>string ( n -- str ) 10 >base ; inline
+
 : >bin ( n -- str ) 2 >base ; inline
 : >oct ( n -- str ) 8 >base ; inline
 : >hex ( n -- str ) 16 >base ; inline
-
-<PRIVATE
-
-SYMBOL: radix
-SYMBOL: negative?
-
-: sign ( -- str ) negative? get "-" "+" ? ;
-
-: with-radix ( radix quot -- )
-    radix swap with-variable ; inline
-
-: (>base) ( n -- str ) radix get positive>base ;
-
-PRIVATE>
 
 M: integer >base
     over 0 = [
@@ -350,17 +414,13 @@ M: integer >base
     ] if ;
 
 M: ratio >base
+    [ [ 0 < ] [ abs 1 /mod ] bi ]
+    [ [ positive>base ] curry ] bi*
     [
-        dup 0 < negative? set
-        abs 1 /mod
-        [ [ "" ] [ (>base) sign append ] if-zero ]
-        [
-            [ numerator (>base) ]
-            [ denominator (>base) ] bi
-            "/" glue
-        ] bi* append
-        negative? get [ CHAR: - prefix ] when
-    ] with-radix ;
+        [ [ numerator ] [ denominator ] bi ] dip bi@ "/" glue
+    ] keep rot [ drop ] [
+        swap call pick "-" "+" ? rot 3append
+    ] if-zero swap [ CHAR: - prefix ] when ;
 
 : fix-float ( str -- newstr )
     {

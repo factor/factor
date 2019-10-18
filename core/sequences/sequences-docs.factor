@@ -59,11 +59,11 @@ HELP: immutable
 
 HELP: new-sequence
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a mutable sequence" } }
-{ $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } ". The initial contents of the sequence are undefined." } ;
+{ $contract "Outputs a mutable sequence of length " { $snippet "len" } " which can hold the elements of " { $snippet "seq" } ". The initial contents of the sequence are undefined." } ;
 
 HELP: new-resizable
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a resizable mutable sequence" } }
-{ $contract "Outputs a resizable mutable sequence with an initial capacity of " { $snippet "n" } " elements and zero length, which can hold the elements of " { $snippet "seq" } "." }
+{ $contract "Outputs a resizable mutable sequence with an initial capacity of " { $snippet "len" } " elements and zero length, which can hold the elements of " { $snippet "seq" } "." }
 { $examples
     { $example "USING: prettyprint sequences ;" "300 V{ } new-resizable ." "V{ }" }
     { $example "USING: prettyprint sequences ;" "300 SBUF\" \" new-resizable ." "SBUF\" \"" }
@@ -178,6 +178,10 @@ HELP: bounds-check
 HELP: ?nth
 { $values { "n" "an integer" } { "seq" sequence } { "elt/f" "an object or " { $link f } } }
 { $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
+
+HELP: ?set-nth
+{ $values { "elt" object } { "n" "an integer" } { "seq" sequence } }
+{ $description "A forgiving version of " { $link set-nth } ".  If the index is out of bounds, does nothing." } ;
 
 HELP: ?first
 { $values { "seq" sequence } { "elt/f" "an object or " { $link f } } }
@@ -624,7 +628,13 @@ HELP: join
 { $notes "If the " { $snippet "glue" } " sequence is empty, this word calls " { $link concat-as } "." }
 { $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "glue" } "." } ;
 
-{ join concat concat-as } related-words
+HELP: join-as
+{ $values { "seq" sequence } { "glue" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Concatenates a sequence of sequences together into one sequence, placing a copy of " { $snippet "glue" } " between each pair of sequences. The resulting sequence is of the same class as " { $snippet "glue" } "." }
+{ $notes "If the " { $snippet "glue" } " sequence is empty, this word calls " { $link concat-as } "." }
+{ $errors "Throws an error if one of the sequences in " { $snippet "seq" } " contains elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." } ;
+
+{ join join-as concat concat-as } related-words
 
 HELP: last
 { $values { "seq" sequence } { "elt" object } }
@@ -740,16 +750,16 @@ HELP: <repetition>
     { $example "USING: prettyprint sequences ;" "10 \"X\" <repetition> concat ." "\"XXXXXXXXXX\"" }
 } ;
 HELP: copy
-{ $values { "src" sequence } { "i" "an index in " { $snippet "dest" } } { "dst" "a mutable sequence" } }
-{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "i" } ". Grows " { $snippet "to" } " first if necessary." }
-{ $side-effects "dest" }
-{ $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
+{ $values { "src" sequence } { "i" "an index in " { $snippet "dst" } } { "dst" "a mutable sequence" } }
+{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dst" } ", with destination indices starting from " { $snippet "i" } ". Grows " { $snippet "dst" } " first if necessary." }
+{ $side-effects "dst" }
+{ $errors "An error is thrown if " { $snippet "dst" } " is not resizable, and not large enough to hold the copied elements." } ;
 
 HELP: push-all
-{ $values { "src" sequence } { "dest" "a resizable mutable sequence" } }
-{ $description "Appends " { $snippet "src" } " to the end of " { $snippet "dest" } "." }
-{ $side-effects "dest" }
-{ $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dest" } "." } ;
+{ $values { "src" sequence } { "dst" "a resizable mutable sequence" } }
+{ $description "Appends " { $snippet "src" } " to the end of " { $snippet "dst" } "." }
+{ $side-effects "dst" }
+{ $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dst" } "." } ;
 
 HELP: append
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
@@ -1344,7 +1354,7 @@ HELP: insert-nth
 
 HELP: map-reduce
 { $values
-     { "seq" sequence } { "map-quot" quotation } { "reduce-quot" quotation }
+     { "seq" sequence } { "map-quot" { $quotation "( ..a elt -- ..b intermediate )" } } { "reduce-quot" { $quotation "( ..b prev intermediate -- ..a next )" } }
      { "result" object } }
 { $description "Calls " { $snippet "map-quot" } " on each element and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }

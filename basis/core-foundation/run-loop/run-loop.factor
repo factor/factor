@@ -58,13 +58,13 @@ FUNCTION: void CFRunLoopRemoveTimer (
 
 CFSTRING: CFRunLoopDefaultMode "kCFRunLoopDefaultMode"
 
-TUPLE: run-loop fds sources timers ;
+TUPLE: run-loop-state fds sources timers ;
 
 : <run-loop> ( -- run-loop )
-    V{ } clone V{ } clone V{ } clone \ run-loop boa ;
+    V{ } clone V{ } clone V{ } clone \ run-loop-state boa ;
 
 : run-loop ( -- run-loop )
-    \ run-loop [ <run-loop> ] initialize-alien ;
+    \ run-loop-state [ <run-loop> ] initialize-alien ;
 
 : add-source-to-run-loop ( source -- )
     [ run-loop sources>> push ]
@@ -127,5 +127,5 @@ PRIVATE>
 
 : run-one-iteration ( nanos -- handled? )
     CFRunLoopDefaultMode
-    swap [ 1,000,000,000 / ] [ 300 ] if*
+    swap [ 1,000,000,000 /f ] [ 300 ] if*
     t CFRunLoopRunInMode kCFRunLoopRunHandledSource = ;

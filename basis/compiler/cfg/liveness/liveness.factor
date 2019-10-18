@@ -3,8 +3,9 @@
 USING: arrays kernel accessors assocs fry locals combinators
 deques dlists namespaces sequences sets compiler.cfg
 compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.utilities
-compiler.cfg.predecessors compiler.cfg.rpo cpu.architecture ;
+compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
+compiler.cfg.utilities compiler.cfg.predecessors
+compiler.cfg.rpo cpu.architecture ;
 FROM: namespaces => set ;
 IN: compiler.cfg.liveness
 
@@ -44,8 +45,20 @@ SYMBOL: base-pointers
 
 GENERIC: visit-insn ( live-set insn -- live-set )
 
+! If liveness analysis is run after SSA destruction, we need to
+! kill vregs that have been coalesced with others (they won't
+! have been renamed from their original values in the CFG).
+! Otherwise, we get a bunch of stray uses that wind up
+! live-in/out when they shouldn't be.  However, we must take
+! care to still report the original vregs in the live-sets,
+! because they have information associated with them (like
+! representations) that would get lost if we just used the
+! leaders for everything.
+
 : kill-defs ( live-set insn -- live-set )
-    defs-vregs [ over delete-at ] each ; inline
+    defs-vregs [
+        ?leader '[ drop ?leader _ eq? not ] assoc-filter!
+    ] each ; inline
 
 : gen-uses ( live-set insn -- live-set )
     uses-vregs [ over conjoin ] each ; inline
@@ -55,36 +68,45 @@ M: vreg-insn visit-insn
 
 DEFER: lookup-base-pointer
 
-GENERIC: lookup-base-pointer* ( insn -- vreg/f )
+GENERIC: lookup-base-pointer* ( vreg insn -- vreg/f )
 
-M: ##tagged>integer lookup-base-pointer* src>> ;
+M: ##tagged>integer lookup-base-pointer* nip src>> ;
 
 M: ##unbox-any-c-ptr lookup-base-pointer*
     ! If the input to unbox-any-c-ptr was an alien and not a
     ! byte array, then the derived pointer will be outside of
     ! the data heap. The GC has to handle this case and ignore
     ! it.
-    src>> ;
+    nip src>> ;
 
-M: ##copy lookup-base-pointer* src>> lookup-base-pointer ;
+M: ##copy lookup-base-pointer* nip src>> lookup-base-pointer ;
 
-M: ##add-imm lookup-base-pointer* src1>> lookup-base-pointer ;
+M: ##add-imm lookup-base-pointer* nip src1>> lookup-base-pointer ;
 
-M: ##sub-imm lookup-base-pointer* src1>> lookup-base-pointer ;
+M: ##sub-imm lookup-base-pointer* nip src1>> lookup-base-pointer ;
+
+M: ##parallel-copy lookup-base-pointer* values>> value-at ;
 
 M: ##add lookup-base-pointer*
     ! If both operands have a base pointer, then the user better
     ! not be doing memory reads and writes on the object, since
     ! we don't give it a base pointer in that case at all.
-    [ src1>> ] [ src2>> ] bi [ lookup-base-pointer ] bi@ xor ;
+    nip [ src1>> ] [ src2>> ] bi [ lookup-base-pointer ] bi@ xor ;
 
 M: ##sub lookup-base-pointer*
-    src1>> lookup-base-pointer ;
+    nip src1>> lookup-base-pointer ;
 
-M: vreg-insn lookup-base-pointer* drop f ;
+M: vreg-insn lookup-base-pointer* 2drop f ;
 
-: lookup-base-pointer ( vreg -- vreg/f )
-    base-pointers get [ insn-of lookup-base-pointer* ] cache ;
+! Can't use cache here because of infinite recursion inside
+! the quotation passed to cache
+: lookup-base-pointer ( vreg -- vregs/f )
+    base-pointers get ?at [
+        f over base-pointers get set-at
+        [ dup ?leader insn-of lookup-base-pointer* ] keep
+        dupd base-pointers get set-at
+    ] unless ;
+
 
 :: visit-derived-root ( vreg derived-roots gc-roots -- )
     vreg lookup-base-pointer :> base
@@ -97,7 +119,7 @@ M: vreg-insn lookup-base-pointer* drop f ;
     pick rep-of {
         { tagged-rep [ nip adjoin ] }
         { int-rep [ visit-derived-root ] }
-        [ 2drop 2drop ]
+        [ 4drop ]
     } case ;
 
 : gc-roots ( live-set -- derived-roots gc-roots )

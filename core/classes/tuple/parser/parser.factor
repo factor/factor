@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sets namespaces make sequences parser
-lexer combinators words classes.parser classes.tuple arrays
-slots math assocs parser.notes classes classes.algebra ;
+USING: accessors arrays assocs classes.parser classes.tuple
+combinators kernel lexer make parser parser.notes sequences
+sets slots ;
 IN: classes.tuple.parser
 
 : slot-names ( slots -- seq )
@@ -54,8 +54,7 @@ ERROR: invalid-slot-name name ;
 : parse-tuple-slots ( -- )
     ";" parse-tuple-slots-delim ;
 
-: parse-tuple-definition ( -- class superclass slots )
-    scan-new-class
+: (parse-tuple-definition) ( word -- class superclass slots )
     scan-token {
         { ";" [ tuple f ] }
         { "<" [ scan-word [ parse-tuple-slots ] { } make ] }
@@ -63,6 +62,10 @@ ERROR: invalid-slot-name name ;
     } case
     dup check-duplicate-slots
     3dup check-slot-shadowing ;
+
+: parse-tuple-definition ( -- class superclass slots )
+    scan-new-class (parse-tuple-definition) ;
+
 
 ERROR: bad-literal-tuple ;
 

@@ -67,71 +67,75 @@ M: object specializer-declaration class-of ;
 : specialized-length ( specializer -- n )
     dup [ array? ] all? [ first ] when length ;
 
+ERROR: cannot-specialize word specializer ;
+
+: set-specializer ( word specializer -- )
+    over inline-recursive? [ cannot-specialize ] when
+    "specializer" set-word-prop ;
+
 SYNTAX: HINTS:
     scan-object dup wrapper? [ wrapped>> ] when
     [ changed-definition ]
     [ subwords [ changed-definition ] each ]
-    [ parse-definition { } like "specializer" set-word-prop ] tri ;
+    [ parse-definition { } like set-specializer ] tri ;
 
 ! Default specializers
-{ last pop* pop } [
-    { vector } "specializer" set-word-prop
+{ pop* pop push last } [
+    { vector } set-specializer
 ] each
 
-\ push { { vector } { sbuf } } "specializer" set-word-prop
-
-\ last { { vector } } "specializer" set-word-prop
-
-\ set-last { { object vector } } "specializer" set-word-prop
+\ set-last { { object vector } } set-specializer
 
 \ push-all
 { { string sbuf } { array vector } { byte-array byte-vector } }
-"specializer" set-word-prop
+set-specializer
 
-\ append
-{ { string string } { array array } }
-"specializer" set-word-prop
-
-\ prepend
-{ { string string } { array array } }
-"specializer" set-word-prop
+{ append prepend } [
+    { { string string } { array array } }
+    set-specializer
+] each
 
 \ subseq
 { { fixnum fixnum string } { fixnum fixnum array } }
-"specializer" set-word-prop
+set-specializer
 
 \ reverse!
 { { string } { array } }
-"specializer" set-word-prop
+set-specializer
 
 \ mismatch
 { string string }
-"specializer" set-word-prop
+set-specializer
 
-\ >string { sbuf } "specializer" set-word-prop
+\ >string { sbuf } set-specializer
 
-\ >array { { vector } } "specializer" set-word-prop
+\ >array { { vector } } set-specializer
 
-\ >vector { { array } { vector } } "specializer" set-word-prop
+\ >vector { { array } { vector } } set-specializer
 
-\ >sbuf { string } "specializer" set-word-prop
+\ >sbuf { string } set-specializer
 
-\ split, { string string } "specializer" set-word-prop
+\ split { string string } set-specializer
 
-\ member-eq? { array } "specializer" set-word-prop
+\ member? { { array } { string } } set-specializer
 
-\ member? { array } "specializer" set-word-prop
+\ member-eq? { array } set-specializer
 
-\ assoc-stack { vector } "specializer" set-word-prop
+\ assoc-stack { vector } set-specializer
 
-\ >le { { fixnum fixnum } { bignum fixnum } } "specializer" set-word-prop
+{ >le >be } [
+    { { fixnum fixnum } { bignum fixnum } }
+    set-specializer
+] each
 
-\ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop
+\ base> { string fixnum } set-specializer
 
-\ base> { string fixnum } "specializer" set-word-prop
+M\ hashtable at*
+{ { fixnum object } { word object } }
+set-specializer
 
-M\ hashtable at* { { fixnum object } { word object } } "specializer" set-word-prop
+M\ hashtable set-at
+{ { object fixnum object } { object word object } }
+set-specializer
 
-M\ hashtable set-at { { object fixnum object } { object word object } } "specializer" set-word-prop
-
-\ encode-string { string object object } "specializer" set-word-prop
+\ encode-string { string object object } set-specializer

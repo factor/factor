@@ -63,7 +63,7 @@ ARTICLE: "lists-manipulation" "Manipulating lists"
 } ;
 
 HELP: cons
-{ $values { "car" "the head of the list cell" } { "cdr" "the tail of the list cell" } { "cons" list } }
+{ $values { "car" "the head of the list cell" } { "cdr" "the tail of the list cell" } { "cons-state" list } }
 { $description "Constructs a cons cell." } ;
 
 HELP: swons

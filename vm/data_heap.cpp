@@ -148,6 +148,7 @@ data_heap_room factor_vm::data_room()
 	return room;
 }
 
+/* Allocates memory */
 void factor_vm::primitive_data_room()
 {
 	data_heap_room room = data_room();
@@ -167,6 +168,7 @@ struct object_accumulator {
 	}
 };
 
+/* Allocates memory */
 cell factor_vm::instances(cell type)
 {
 	object_accumulator accum(type);
@@ -174,6 +176,7 @@ cell factor_vm::instances(cell type)
 	return std_vector_to_array(accum.objects);
 }
 
+/* Allocates memory */
 void factor_vm::primitive_all_instances()
 {
 	primitive_full_gc();

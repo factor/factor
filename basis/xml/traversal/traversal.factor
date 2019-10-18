@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces sequences words io assocs
-quotations strings parser lexer arrays xml.data
+quotations strings parser lexer arrays xml.data make
 splitting vectors sequences.deep combinators fry memoize ;
 IN: xml.traversal
 
@@ -14,6 +14,11 @@ IN: xml.traversal
         }
         [ concat ]
     } cond ;
+
+: deep-children>string ( tag -- string )
+    children>> [
+        [ dup tag? [ deep-children>string ] when % ] each
+    ] "" make ;
 
 : children-tags ( tag -- sequence )
     children>> [ tag? ] filter ;

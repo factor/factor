@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml io kernel math sequences strings xml.traversal
 tools.test math.parser xml.syntax xml.data xml.syntax.private
-accessors multiline locals inverse xml.writer splitting classes ;
+accessors multiline locals inverse xml.writer splitting classes
+xml.private ;
 IN: xml.syntax.tests
 
 ! TAGS test
@@ -130,3 +131,21 @@ XML-NS: foo http://blah.com
 [ "apple" ] [ <XML <a>pple</a> XML> dispatch-doc ] unit-test
 [ "apple" ] [ [XML <a>pple</a> XML] dispatch-doc ] unit-test
 [ "apple" ] [ <XML <a>pple</a> XML> body>> dispatch-doc ] unit-test
+
+! Make sure nested XML documents interpolate correctly
+{
+    """<?xml version="1.0" encoding="UTF-8"?><color><blue>it's blue!</blue></color>"""
+} [
+    "it's blue!" <XML <blue><-></blue> XML>
+    <XML <color><-></color> XML> xml>string
+] unit-test
+
+{
+    """<?xml version="1.0" encoding="UTF-8"?><a>asdf<asdf/>asdf2</a>"""
+} [
+    default-prolog
+    "asdf"
+    "asdf" f f <tag>
+    "asdf2" <xml>
+    <XML <a><-></a> XML> xml>string
+] unit-test

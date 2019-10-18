@@ -4,7 +4,7 @@ sequences strings io.files io.pathnames definitions
 continuations sorting classes.tuple compiler.units debugger
 vocabs vocabs.loader accessors eval combinators lexer
 vocabs.parser words.symbol multiline source-files.errors
-tools.crossref grouping ;
+tools.crossref grouping sets ;
 IN: parser.tests
 
 [ 1 [ 2 [ 3 ] 4 ] 5 ]
@@ -110,7 +110,7 @@ DEFER: foo
     "IN: parser.tests : smudge-me ( -- ) ;" <string-reader> "foo"
     parse-stream drop
 
-    "foo" source-file definitions>> first assoc-size
+    "foo" source-file definitions>> first cardinality
 ] unit-test
 
 [ t ] [ "smudge-me" "parser.tests" lookup-word >boolean ] unit-test
@@ -127,21 +127,21 @@ DEFER: foo
     "IN: parser.tests USING: math strings ; GENERIC: smudge-me ( a -- b ) M: integer smudge-me ; M: string smudge-me ;" <string-reader> "foo"
     parse-stream drop
 
-    "foo" source-file definitions>> first assoc-size
+    "foo" source-file definitions>> first cardinality
 ] unit-test
 
 [ 1 ] [
     "IN: parser.tests USING: arrays ; M: array smudge-me ;" <string-reader> "bar"
     parse-stream drop
 
-    "bar" source-file definitions>> first assoc-size
+    "bar" source-file definitions>> first cardinality
 ] unit-test
 
 [ 2 ] [
     "IN: parser.tests USING: math strings ; GENERIC: smudge-me ( a -- b ) M: integer smudge-me ;" <string-reader> "foo"
     parse-stream drop
 
-    "foo" source-file definitions>> first assoc-size
+    "foo" source-file definitions>> first cardinality
 ] unit-test
 
 [ t ] [
@@ -342,7 +342,7 @@ DEFER: foo
 ] unit-test
 
 [ t ] [
-    "foo" "parser.tests" lookup-word word eq?
+    "foo" "parser.tests" lookup-word last-word eq?
 ] unit-test
 
 [ ] [
@@ -621,9 +621,9 @@ EXCLUDE: qualified.tests.bar => x ;
 
 [
     [ "vocabs.loader.test.l" use-vocab ] must-fail
-    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> key? ] unit-test
+    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test
     [ ] [ "vocabs.loader.test.l" unuse-vocab ] unit-test
-    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> key? ] unit-test    
+    [ f ] [ "vocabs.loader.test.l" manifest get search-vocab-names>> in? ] unit-test    
 ] with-file-vocabs
 
 ! Test cases for #183

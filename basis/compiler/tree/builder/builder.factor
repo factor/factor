@@ -20,9 +20,6 @@ M: callable (build-tree) infer-quot-here ;
 : check-no-compile ( word -- )
     dup "no-compile" word-prop [ do-not-compile ] [ drop ] if ;
 
-: inline-recursive? ( word -- ? )
-    [ "inline" word-prop ] [ "recursive" word-prop ] bi and ;
-
 : word-body ( word -- quot )
     dup inline-recursive? [ 1quotation ] [ specialized-def ] if ;
 

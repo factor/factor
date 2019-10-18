@@ -11,8 +11,13 @@ SYMBOL: in-lambda?
 : ?rewrite-closures ( form -- form' )
     in-lambda? get [ 1array ] [ rewrite-closures ] if ;
 
+ERROR: invalid-local-name name ;
+
+: check-local-name ( name -- name )
+    dup { "]" "]!" } member? [ invalid-local-name ] when ;
+
 : make-local ( name -- word )
-    "!" ?tail [
+    check-local-name "!" ?tail [
         <local-reader>
         dup <local-writer> dup name>> ,,
     ] [ <local> ] if
@@ -86,13 +91,17 @@ M: lambda-parser parse-quotation ( -- quotation )
     (parse-locals-definition) ; inline
 
 : (::) ( -- word def effect )
-    scan-new-word
-    [ parse-definition ]
-    parse-locals-definition ;
+    [
+        scan-new-word
+        [ parse-definition ]
+        parse-locals-definition
+    ] with-definition ;
 
 : (M::) ( -- word def )
-    scan-new-method
     [
-        [ parse-definition ]
-        parse-locals-method-definition drop
-    ] with-method-definition ;
+        scan-new-method
+        [
+            [ parse-definition ]
+            parse-locals-method-definition drop
+        ] with-method-definition
+    ] with-definition ;

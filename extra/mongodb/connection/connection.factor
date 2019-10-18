@@ -32,10 +32,10 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
     mdb-db new swap >>nodes swap >>name H{ } clone >>collections ;
 
 : master-node ( mdb -- node )
-    nodes>> t swap at ;
+    nodes>> t of ;
 
 : slave-node ( mdb -- node )
-    nodes>> f swap at ;
+    nodes>> f of ;
 
 : with-connection ( connection quot -- * )
     [ mdb-connection ] dip with-variable ; inline
@@ -74,7 +74,7 @@ CONSTRUCTOR: mdb-connection ( instance -- mdb-connection ) ;
 
 : get-nonce ( -- nonce )
     getnonce-cmd make-cmd send-cmd
-    [ "nonce" swap at ] [ f ] if* ;
+    [ "nonce" of ] [ f ] if* ;
 
 : auth? ( mdb -- ? )
     [ username>> ] [ pwd-digest>> ] bi and ; 

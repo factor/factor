@@ -119,7 +119,7 @@ SYMBOL: unhandled-intervals
 : reg-class-assoc ( quot -- assoc )
     [ reg-classes ] dip { } map>assoc ; inline
 
-: next-spill-slot ( size -- n )
+: next-spill-slot ( size -- spill-slot )
     cfg get
     [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop
     <spill-slot> ;

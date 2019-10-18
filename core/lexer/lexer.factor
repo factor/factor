@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors namespaces math words strings
-io vectors arrays math.parser combinators continuations
-source-files.errors ;
+USING: accessors arrays combinators continuations io kernel
+math math.parser namespaces sequences source-files.errors
+strings vectors ;
 IN: lexer
 
 TUPLE: lexer
@@ -108,9 +108,10 @@ M: lexer skip-word ( lexer -- )
 
 PREDICATE: unexpected-eof < unexpected got>> not ;
 
-: unexpected-eof ( word -- * ) f unexpected ;
+: throw-unexpected-eof ( word -- * ) f unexpected ;
 
-: scan-token ( -- str ) (scan-token) [ "token" unexpected-eof ] unless* ;
+: scan-token ( -- str )
+    (scan-token) [ "token" throw-unexpected-eof ] unless* ;
 
 : expect ( token -- )
     scan-token 2dup = [ 2drop ] [ unexpected ] if ;

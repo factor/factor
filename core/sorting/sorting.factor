@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math vectors math.order
-sequences sequences.private ;
+USING: accessors arrays assocs growable.private kernel math
+math.order sequences sequences.private vectors ;
 IN: sorting
 
 ! Optimized merge-sort:
@@ -13,7 +13,7 @@ IN: sorting
 
 <PRIVATE
 
-TUPLE: merge
+TUPLE: merge-state
 { seq    array }
 { accum  vector }
 { accum1 vector }
@@ -22,25 +22,6 @@ TUPLE: merge
 { to1    array-capacity }
 { from2  array-capacity }
 { to2    array-capacity } ;
-
-: dump ( from to seq accum -- )
-    #! Optimize common case where to - from = 1, 2, or 3.
-    [ 2dup swap - ] 2dip pick 1 = 
-    [ [ [ 2drop ] dip nth-unsafe ] dip push ] [
-        pick 2 = [
-            [
-                [ 2drop dup 1 + ] dip
-                [ nth-unsafe ] curry bi@
-            ] dip [ push ] curry bi@
-        ] [
-            pick 3 = [
-                [
-                    [ 2drop dup 1 + dup 1 + ] dip
-                    [ nth-unsafe ] curry tri@
-                ] dip [ push ] curry tri@
-            ] [ [ nip subseq ] dip push-all ] if
-        ] if
-    ] if ; inline
 
 : l-elt ( merge -- elt ) [ from1>> ] [ seq>> ] bi nth-unsafe ; inline
 
@@ -51,18 +32,22 @@ TUPLE: merge
 : r-done? ( merge -- ? ) [ from2>> ] [ to2>> ] bi eq? ; inline
 
 : dump-l ( merge -- )
-    [ [ from1>> ] [ to1>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
+    [ [ from1>> ] [ to1>> ] [ seq>> ] tri ] [ accum>> ] bi
+    push-all-unsafe ; inline
 
 : dump-r ( merge -- )
-    [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
+    [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi
+    push-all-unsafe ; inline
 
 : l-next ( merge -- )
-    [ [ l-elt ] [ [ 1 + ] change-from1 drop ] bi ] [ accum>> ] bi push ; inline
+    [ [ l-elt ] [ [ 1 + ] change-from1 drop ] bi ] [ accum>> ] bi
+    push-unsafe ; inline
 
 : r-next ( merge -- )
-    [ [ r-elt ] [ [ 1 + ] change-from2 drop ] bi ] [ accum>> ] bi push ; inline
+    [ [ r-elt ] [ [ 1 + ] change-from2 drop ] bi ] [ accum>> ] bi
+    push-unsafe ; inline
 
-: decide ( merge -- ? )
+: decide ( merge quot: ( elt1 elt2 -- <=> ) -- ? )
     [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
 
 : (merge) ( merge quot: ( elt1 elt2 -- <=> ) -- )
@@ -85,12 +70,11 @@ TUPLE: merge
     dup accum>> 0 >>length 2drop ; inline
 
 : <merge> ( seq -- merge )
-    \ merge new
+    \ merge-state new
         over >vector >>accum1
         swap length <vector> >>accum2
         dup accum1>> underlying>> >>seq
-        dup accum2>> >>accum
-        dup accum>> 0 >>length drop ; inline
+        dup accum2>> >>accum ; inline
 
 : compute-midpoint ( merge -- merge )
     dup [ from1>> ] [ to2>> ] bi + 2/ >>to1 ; inline
@@ -124,7 +108,7 @@ TUPLE: merge
     [ merge ] 2curry each-chunk ; inline
 
 : sort-loop ( merge quot -- )
-    [ 2 [ over seq>> length over > ] ] dip
+    [ 2 over seq>> length [ over > ] curry ] dip
     [ [ 1 shift 2dup ] dip sort-pass ] curry
     while 2drop ; inline
 
@@ -134,12 +118,12 @@ TUPLE: merge
 
 : (sort-pairs) ( i1 i2 seq quot accum -- )
     [ 2dup length = ] 2dip rot [
-        [ drop nip nth ] dip push
+        [ drop nip nth-unsafe ] dip push-unsafe
     ] [
         [
             [ [ nth-unsafe ] curry bi@ 2dup ] dip call +gt+ eq?
             [ swap ] when
-        ] dip [ push ] curry bi@
+        ] dip [ push-unsafe ] curry bi@
     ] if ; inline
 
 : sort-pairs ( merge quot -- )
@@ -161,16 +145,26 @@ PRIVATE>
 : inv-sort-with ( seq quot: ( elt -- key ) -- sortedseq )
     [ compare invert-comparison ] curry sort ; inline
 
+<PRIVATE
+
+: check-bounds ( alist n -- alist )
+    [ swap 2dup bounds-check? [ 2drop ] [ bounds-error ] if ]
+    curry dupd each ;
+
+PRIVATE>
+
 GENERIC: sort-keys ( obj -- sortedseq )
 
 M: object sort-keys >alist sort-keys ;
 
-M: sequence sort-keys [ first ] sort-with ;
+M: sequence sort-keys
+    0 check-bounds [ first-unsafe ] sort-with ;
 
 GENERIC: sort-values ( obj -- sortedseq )
 
 M: object sort-values >alist sort-values ;
 
-M: sequence sort-values [ second ] sort-with ;
+M: sequence sort-values
+    1 check-bounds [ second-unsafe ] sort-with ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;

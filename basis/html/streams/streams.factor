@@ -29,10 +29,10 @@ TUPLE: html-sub-stream < html-writer style parent ;
     [ data>> ] [ style>> ] [ parent>> ] tri ;
 
 : object-link-tag ( xml style -- xml )
-    presented swap at [ url-of [ simple-link ] when* ] when* ;
+    presented of [ url-of [ simple-link ] when* ] when* ;
 
 : href-link-tag ( xml style -- xml )
-    href swap at [ simple-link ] when* ;
+    href of [ simple-link ] when* ;
 
 : hex-color, ( color -- )
     [ red>> ] [ green>> ] [ blue>> ] tri
@@ -58,7 +58,7 @@ TUPLE: html-sub-stream < html-writer style parent ;
     "font-family: " % % "; " % ;
 
 MACRO: make-css ( pairs -- str )
-    [ '[ _ swap at [ _ execute ] when* ] ] { } assoc>map
+    [ '[ _ of [ _ execute ] when* ] ] { } assoc>map
     '[ [ _ cleave ] "" make ] ;
 
 : span-css-style ( style -- str )
@@ -81,7 +81,7 @@ MACRO: make-css ( pairs -- str )
     "vocab:definitions/icons/" ?head [ "/icons/" prepend ] when ;
 
 : img-tag ( xml style -- xml )
-    image swap at [ nip image-path simple-image ] when* ;
+    image of [ nip image-path simple-image ] when* ;
 
 : format-html-span ( string style stream -- )
     [
@@ -101,8 +101,15 @@ M: html-span-stream dispose
 : border-css, ( border -- )
     "border: 1px solid #" % hex-color, "; " % ;
 
+: (padding-css,) ( horizontal vertical -- )
+    2dup = [
+        drop "padding: " % # "px; " %
+    ] [
+        "padding: " % # "px " % # "px; " %
+    ] if ;
+
 : padding-css, ( padding -- )
-    first2 "padding: " % # "px " % # "px; " % ;
+    first2 (padding-css,) ;
 
 CONSTANT: pre-css "white-space: pre; font-family: monospace;"
 
@@ -113,7 +120,7 @@ CONSTANT: pre-css "white-space: pre; font-family: monospace;"
             { border-color border-css, }
             { inset padding-css, }
         } make-css
-    ] [ wrap-margin swap at [ pre-css append ] unless ] bi
+    ] [ wrap-margin of [ pre-css append ] unless ] bi
     " display: inline-block;" append ;
 
 : div-tag ( xml style -- xml' )
@@ -129,14 +136,13 @@ M: html-block-stream dispose
     end-sub-stream format-html-div ;
 
 : border-spacing-css, ( pair -- )
-    "padding: " % first2 max 2 /i # "px; " % ;
+    first2 [ 2 /i ] bi@ (padding-css,) ;
 
 : table-style ( style -- str )
     {
         { table-border border-css, }
         { table-gap border-spacing-css, }
-    } make-css
-    " border-collapse: collapse;" append ;
+    } make-css ;
 
 PRIVATE>
 
@@ -170,7 +176,7 @@ M: html-writer stream-write-table
             [ data>> [XML <td valign="top" style=<->><-></td> XML] ] with map
             [XML <tr><-></tr> XML]
         ] with map
-        [XML <table style="display: inline-table;"><-></table> XML]
+        [XML <table style="display: inline-table; border-collapse: collapse;"><-></table> XML]
     ] emit-html ;
 
 M: html-writer dispose drop ;

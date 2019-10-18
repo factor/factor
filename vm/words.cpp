@@ -3,7 +3,8 @@
 namespace factor
 {
 
-/* Compile a word definition with the non-optimizing compiler. Allocates memory */
+/* Compile a word definition with the non-optimizing compiler. */
+/* Allocates memory */
 void factor_vm::jit_compile_word(cell word_, cell def_, bool relocating)
 {
 	data_root<word> word(word_,this);
@@ -21,11 +22,13 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocating)
 	if(to_boolean(word->pic_tail_def)) jit_compile_quot(word->pic_tail_def,relocating);
 }
 
+/* Allocates memory */
 cell factor_vm::find_all_words()
 {
 	return instances(WORD_TYPE);
 }
 
+/* Allocates memory */
 void factor_vm::compile_all_words()
 {
 	data_root<array> words(find_all_words(),this);
@@ -63,8 +66,8 @@ word *factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_)
 	return new_word.untagged();
 }
 
-/* Allocates memory */
 /* (word) ( name vocabulary hashcode -- word ) */
+/* Allocates memory */
 void factor_vm::primitive_word()
 {
 	cell hashcode = ctx->pop();
@@ -73,8 +76,8 @@ void factor_vm::primitive_word()
 	ctx->push(tag<word>(allot_word(name,vocab,hashcode)));
 }
 
-/* Allocates memory (from_unsigned_cell allocates) */
 /* word-code ( word -- start end ) */
+/* Allocates memory (from_unsigned_cell allocates) */
 void factor_vm::primitive_word_code()
 {
 	data_root<word> w(ctx->pop(),this);

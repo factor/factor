@@ -33,50 +33,50 @@ M: object handles-gesture? ( gesture gadget -- ? )
 
 GENERIC: send-queued-gesture ( request -- )
 
-TUPLE: send-gesture gesture gadget ;
+TUPLE: send-gesture-tuple gesture gadget ;
 
-M: send-gesture send-queued-gesture
+M: send-gesture-tuple send-queued-gesture
     [ gesture>> ] [ gadget>> ] bi handle-gesture drop ;
 
 : queue-gesture ( ... class -- )
     boa gesture-queue push-front notify-ui-thread ; inline
 
 : send-gesture ( gesture gadget -- )
-    \ send-gesture queue-gesture ;
+    \ send-gesture-tuple queue-gesture ;
 
 : each-gesture ( gesture seq -- ) [ send-gesture ] with each ;
 
-TUPLE: propagate-gesture gesture gadget ;
+TUPLE: propagate-gesture-tuple gesture gadget ;
 
 : resend-gesture ( gesture gadget -- ? )
     [ handle-gesture ] with each-parent ;
 
-M: propagate-gesture send-queued-gesture
+M: propagate-gesture-tuple send-queued-gesture
     [ gesture>> ] [ gadget>> ] bi resend-gesture drop ;
 
 : propagate-gesture ( gesture gadget -- )
-    \ propagate-gesture queue-gesture ;
+    \ propagate-gesture-tuple queue-gesture ;
 
-TUPLE: propagate-key-gesture gesture world ;
+TUPLE: propagate-key-gesture-tuple gesture world ;
 
 : world-focus ( world -- gadget )
     dup focus>> [ world-focus ] [ ] ?if ;
 
-M: propagate-key-gesture send-queued-gesture
+M: propagate-key-gesture-tuple send-queued-gesture
     [ gesture>> ] [ world>> world-focus ] bi
     [ handle-gesture ] with each-parent drop ;
 
 : propagate-key-gesture ( gesture world -- )
-    \ propagate-key-gesture queue-gesture ;
+    \ propagate-key-gesture-tuple queue-gesture ;
 
-TUPLE: user-input string world ;
+TUPLE: user-input-tuple string world ;
 
-M: user-input send-queued-gesture
+M: user-input-tuple send-queued-gesture
     [ string>> ] [ world>> world-focus ] bi
     [ user-input* ] with each-parent drop ;
 
 : user-input ( string world -- )
-    '[ _ \ user-input queue-gesture ] unless-empty ;
+    '[ _ \ user-input-tuple queue-gesture ] unless-empty ;
 
 ! Gesture objects
 TUPLE: drag # ;             C: <drag> drag
@@ -170,7 +170,7 @@ SYMBOL: double-click-timeout
 300 milliseconds double-click-timeout set-global
 
 : hand-moved? ( -- ? )
-    hand-loc get hand-click-loc get = not ;
+    hand-loc get-global hand-click-loc get-global = not ;
 
 : button-gesture ( gesture -- )
     hand-clicked get-global propagate-gesture ;
@@ -257,7 +257,7 @@ SYMBOL: drag-timer
     dup hand-last-button get = ;
 
 : multi-click-position? ( -- ? )
-    hand-loc get hand-click-loc get distance 10 <= ;
+    hand-loc get-global hand-click-loc get-global distance 10 <= ;
 
 : multi-click? ( button -- ? )
     {
@@ -326,10 +326,10 @@ M: macosx modifiers>string
             { S+ [ "\u0021e7" ] }
             { C+ [ "\u002303" ] }
         } case
-    ] map "" join ;
+    ] map "" concat-as ;
 
 M: object modifiers>string
-    [ name>> ] map "" join ;
+    [ name>> ] map "" concat-as ;
 
 HOOK: keysym>string os ( keysym -- string )
 

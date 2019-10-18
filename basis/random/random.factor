@@ -1,11 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays assocs
-byte-arrays byte-vectors combinators combinators.short-circuit
-fry io.backend io.binary kernel locals math math.bitwise
-math.constants math.functions math.order math.ranges namespaces
-sequences sequences.private sets summary system vocabs hints
-typed ;
+USING: accessors alien.data arrays assocs byte-arrays
+byte-vectors combinators combinators.short-circuit fry
+hashtables hashtables.private hash-sets hints io.backend
+io.binary kernel locals math math.bitwise math.constants
+math.functions math.order math.ranges namespaces sequences
+sequences.private sets summary system typed vocabs ;
+QUALIFIED-WITH: alien.c-types c
+QUALIFIED-WITH: sets sets
 IN: random
 
 SYMBOL: system-random-generator
@@ -18,15 +20,16 @@ GENERIC: random-bytes* ( n tuple -- byte-array )
 
 M: object random-bytes* ( n tuple -- byte-array )
     [ [ <byte-vector> ] keep 4 /mod ] dip
-    [ pick '[ _ random-32* int <ref> _ push-all ] times ]
+    [ pick '[ _ random-32* c:int <ref> _ push-all ] times ]
     [
         over zero?
-        [ 2drop ] [ random-32* int <ref> swap head append! ] if
+        [ 2drop ] [ random-32* c:int <ref> swap head append! ] if
     ] bi-curry bi* B{ } like ;
 
 HINTS: M\ object random-bytes* { fixnum object } ;
 
-M: object random-32* ( tuple -- r ) 4 swap random-bytes* be> ;
+M: object random-32* ( tuple -- r )
+    4 swap random-bytes* c:uint deref ;
 
 ERROR: no-random-number-generator ;
 
@@ -44,21 +47,28 @@ TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
 
 <PRIVATE
 
-:: ((random-integer)) ( bits obj -- n required-bits )
+: #bits ( n -- bits )
+    dup 2 <= [ drop 1 ] [ 1 - log2 1 + ] if ; inline
+
+:: (random-bits) ( n bits obj -- n' )
     obj random-32* 32 bits 32 - [ dup 0 > ] [
         [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
-    ] while drop ;
+    ] while drop [ n * ] [ neg shift ] bi* ; inline
 
-: (random-integer) ( n obj -- n' )
-    [ dup next-power-of-2 log2 ] dip ((random-integer))
-    [ * ] [ 2^ /i ] bi* ;
+: ((random-integer)) ( n obj -- n' )
+    [ dup #bits ] dip (random-bits) ; inline
+
+GENERIC# (random-integer) 1 ( n obj -- n )
+M: fixnum (random-integer) ( n obj -- n' ) ((random-integer)) ;
+M: bignum (random-integer) ( n obj -- n' ) ((random-integer)) ;
 
 : random-integer ( n -- n' )
     random-generator get (random-integer) ;
 
 PRIVATE>
 
-: random-bits ( numbits -- r ) 2^ random-integer ;
+: random-bits ( numbits -- r )
+    [ 2^ ] keep random-generator get (random-bits) ;
 
 : random-bits* ( numbits -- n )
     1 - [ random-bits ] keep set-bit ;
@@ -72,10 +82,31 @@ M: sequence random
         [ length random-integer ] keep nth
     ] if-empty ;
 
+M: assoc random >alist random ;
+
+M: hashtable random
+    dup assoc-size [ drop f ] [
+        [ 0 ] [ array>> ] [ random ] tri* 1 + [
+            [ 2dup array-nth tombstone? [ 2 + ] 2dip ] loop
+        ] times [ 2 - ] dip
+        [ array-nth ] [ [ 1 + ] dip array-nth ] 2bi 2array
+    ] if-zero ;
+
+M: sets:set random members random ;
+
+M: hash-set random
+    dup cardinality [ drop f ] [
+        [ 0 ] [ array>> ] [ random ] tri* 1 + [
+            [ 2dup array-nth tombstone? [ 1 + ] 2dip ] loop
+        ] times [ 1 - ] dip array-nth
+    ] if-zero ;
+
 : randomize-n-last ( seq n -- seq )
     [ dup length dup ] dip - 1 max '[ dup _ > ]
-    [ [ random ] [ 1 - ] bi [ pick exchange-unsafe ] keep ]
-    while drop ;
+    random-generator get '[
+        [ _ (random-integer) ] [ 1 - ] bi
+        [ pick exchange-unsafe ] keep
+    ] while drop ;
 
 : randomize ( seq -- randomized )
     dup length randomize-n-last ;
@@ -85,10 +116,11 @@ ERROR: too-many-samples seq n ;
 : sample ( seq n -- seq' )
     2dup [ length ] dip < [ too-many-samples ] when
     [ [ length iota >array ] dip [ randomize-n-last ] keep tail-slice* ]
-    [ drop ] 2bi nths ;
+    [ drop ] 2bi nths-unsafe ;
 
 : delete-random ( seq -- elt )
-    [ length random-integer ] keep [ nth ] 2keep remove-nth! drop ;
+    [ length random-integer ] keep
+    [ nth ] 2keep remove-nth! drop ;
 
 : with-random ( tuple quot -- )
     random-generator swap with-variable ; inline
@@ -102,7 +134,7 @@ ERROR: too-many-samples seq n ;
 <PRIVATE
 
 : (uniform-random-float) ( min max obj -- n )
-    [ 4 4 ] dip [ random-bytes* uint deref >float ] curry bi@
+    [ random-32* ] keep random-32* [ >float ] bi@
     2.0 32 ^ * +
     [ over - 2.0 -64 ^ * ] dip
     * + ; inline
@@ -112,11 +144,20 @@ PRIVATE>
 : uniform-random-float ( min max -- n )
     random-generator get (uniform-random-float) ; inline
 
+M: float random [ f ] [ 0.0 swap uniform-random-float ] if-zero ;
+
+<PRIVATE
+
+: (random-unit) ( obj -- n )
+    [ 0.0 1.0 ] dip (uniform-random-float) ; inline
+
+PRIVATE>
+
 : random-unit ( -- n )
-    0.0 1.0 uniform-random-float ; inline
+    random-generator get (random-unit) ; inline
 
 : random-units ( length -- sequence )
-    random-generator get '[ 0.0 1.0 _ (uniform-random-float) ] replicate ;
+    random-generator get '[ _ (random-unit) ] replicate ;
 
 : random-integers ( length n -- sequence )
     random-generator get '[ _ _ (random-integer) ] replicate ;
@@ -149,9 +190,10 @@ PRIVATE>
     ! Uses R.C.H. Cheng, "The generation of Gamma
     ! variables with non-integral shape parameters",
     ! Applied Statistics, (1977), 26, No. 1, p71-74
-    2. alpha * 1 - sqrt :> ainv
-    alpha 4. log -      :> bbb
-    alpha ainv +        :> ccc
+    random-generator get :> rnd
+    2. alpha * 1 - sqrt  :> ainv
+    alpha 4. log -       :> bbb
+    alpha ainv +         :> ccc
 
     0 :> r! 0 :> z! 0 :> result! ! initialize locals
     [
@@ -160,11 +202,11 @@ PRIVATE>
             [ z log >= ]
         } 1|| not
     ] [
-        random-unit :> u1
-        random-unit :> u2
+        rnd (random-unit) :> u1
+        rnd (random-unit) :> u2
 
         u1 1. u1 - / log ainv / :> v
-        alpha v e^ *           :> x
+        alpha v e^ *            :> x
         u1 sq u2 *              z!
         bbb ccc v * + x -       r!
 
@@ -176,17 +218,18 @@ PRIVATE>
 
 :: (gamma-random-float<1) ( alpha beta -- n )
     ! Uses ALGORITHM GS of Statistical Computing - Kennedy & Gentle
+    random-generator get :> rnd
     alpha e + e / :> b
 
     0 :> x! 0 :> p! ! initialize locals
     [
         p 1.0 > [
-            random-unit x alpha 1 - ^ >
+            rnd (random-unit) x alpha 1 - ^ >
         ] [
-            random-unit x neg e^ >
+            rnd (random-unit) x neg e^ >
         ] if
     ] [
-        random-unit b * p!
+        rnd (random-unit) b * p!
         p 1.0 <= [
             p 1. alpha / ^
         ] [
@@ -209,8 +252,9 @@ PRIVATE>
     ! Based upon an algorithm published in: Fisher, N.I.,
     ! "Statistical Analysis of Circular Data", Cambridge
     ! University Press, 1993.
+    random-generator get :> rnd
     kappa 1e-6 <= [
-        2pi random-unit *
+        2pi rnd (random-unit) *
     ] [
         4. kappa sq * 1. + sqrt 1. + :> a
         a 2. a * sqrt - 2. kappa * / :> b
@@ -218,16 +262,17 @@ PRIVATE>
 
         0 :> c! 0 :> _f! ! initialize locals
         [
-            random-unit {
+            rnd (random-unit) {
                 [ 2. c - c * < ] [ 1. c - e^ c * <= ]
             } 1|| not
         ] [
-            random-unit pi * cos :> z
+            rnd (random-unit) pi * cos :> z
             r z * 1. + r z + /   _f!
             r _f - kappa *       c!
         ] do while
 
-        mu 2pi mod _f cos random-unit 0.5 > [ + ] [ - ] if
+        mu 2pi mod _f cos
+        rnd (random-unit) 0.5 > [ + ] [ - ] if
     ] if ;
 
 :: (triangular-random-float) ( low high mode -- n )
@@ -268,6 +313,12 @@ PRIVATE>
 
 : power-random-float ( alpha -- n )
     [ random-unit log e^ 1 swap - ] dip recip ^ ;
+
+! Box-Muller
+: poisson-random-float ( mean -- n )
+    [ -1 0 ] dip [ 2dup < ] random-generator get '[
+        [ 1 + ] 2dip [ _ (random-unit) log neg + ] dip
+    ] while 2drop ;
 
 {
     { [ os windows? ] [ "random.windows" require ] }
