@@ -1,25 +1,14 @@
 USING: kernel sequences words math math.functions arrays 
 shuffle quotations parser math.parser strings namespaces 
-splitting effects ;
+splitting effects sequences.lib ;
 IN: shufflers
 
 : shuffle>string ( names shuffle -- string )
     swap [ [ nth ] curry map ] curry map
     first2 "-" swap 3append >string ;
 
-: translate ( n alphabet out-len -- seq )
-    [ drop /mod ] curry* map nip  ;
-
-: (combinations) ( alphabet out-len -- seq[seq] )
-    [ ^ ] 2keep [ translate ] 2curry map ;
-
-: combinations ( n max-out -- seq[seq] )
-    ! This returns a seq of length O(n^m)
-    ! where and m is max-out
-    1+ [ (combinations) ] curry* map concat ;
-
 : make-shuffles ( max-out max-in -- shuffles )
-    [ 1+ dup rot combinations [ 2array ] curry* map ]
+    [ 1+ dup rot strings [ 2array ] curry* map ]
     curry* map concat ;
 
 : shuffle>quot ( shuffle -- quot )

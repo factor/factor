@@ -3,7 +3,7 @@ IN: benchmark.ring
 
 SYMBOL: done
 
-: tunnel ( process -- )
+: tunnel ( process -- process )
     receive 2dup swap send done eq? [ tunnel ] unless ;
 
 : create-ring ( processes -- target )
@@ -15,7 +15,7 @@ SYMBOL: done
 : destroy-ring ( target -- )
     done swap send [ done eq? ] receive-if drop ;
 
-: ring-bench ( messages processes -- gctime runtime )
+: ring-bench ( messages processes -- )
     create-ring [ send-messages ] keep destroy-ring ; 
 
 : main-ring-bench ( -- )

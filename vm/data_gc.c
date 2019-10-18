@@ -138,7 +138,7 @@ void init_data_heap(CELL gens,
 /* Size of the object pointed to by a tagged pointer */
 CELL object_size(CELL tagged)
 {
-	if(tagged == F || TAG(tagged) == FIXNUM_TYPE)
+	if(immediate_p(tagged))
 		return 0;
 	else
 		return untagged_object_size(UNTAG(tagged));
@@ -158,7 +158,6 @@ CELL unaligned_object_size(CELL pointer)
 	case ARRAY_TYPE:
 	case TUPLE_TYPE:
 	case BIGNUM_TYPE:
-	case QUOTATION_TYPE:
 		return array_size(array_capacity((F_ARRAY*)pointer));
 	case BYTE_ARRAY_TYPE:
 		return byte_array_size(
@@ -171,6 +170,8 @@ CELL unaligned_object_size(CELL pointer)
 			float_array_capacity((F_FLOAT_ARRAY*)pointer));
 	case STRING_TYPE:
 		return string_size(string_capacity((F_STRING*)pointer));
+	case QUOTATION_TYPE:
+		return sizeof(F_QUOTATION);
 	case WORD_TYPE:
 		return sizeof(F_WORD);
 	case HASHTABLE_TYPE:
@@ -193,19 +194,22 @@ CELL unaligned_object_size(CELL pointer)
 		return sizeof(F_WRAPPER);
 	case CURRY_TYPE:
 		return sizeof(F_CURRY);
+	case CALLSTACK_TYPE:
+		return callstack_size(
+			untag_fixnum_fast(((F_CALLSTACK *)pointer)->length));
 	default:
-		critical_error("Cannot determine untagged_object_size",pointer);
+		critical_error("Invalid header",pointer);
 		return -1; /* can't happen */
 	}
 }
 
-void primitive_size(void)
+DEFINE_PRIMITIVE(size)
 {
 	box_unsigned_cell(object_size(dpop()));
 }
 
 /* Push memory usage statistics in data heap */
-void primitive_data_room(void)
+DEFINE_PRIMITIVE(data_room)
 {
 	F_ARRAY *a = allot_array(ARRAY_TYPE,data_heap->gen_count * 2,F);
 	int gen;
@@ -229,16 +233,16 @@ void begin_scan(void)
 	gc_off = true;
 }
 
-void primitive_begin_scan(void)
+DEFINE_PRIMITIVE(begin_scan)
 {
-	primitive_data_gc();
+	data_gc();
 	begin_scan();
 }
 
 CELL next_object(void)
 {
 	if(!gc_off)
-		simple_error(ERROR_HEAP_SCAN,F,F);
+		general_error(ERROR_HEAP_SCAN,F,F,NULL);
 
 	CELL value = get(heap_scan_ptr);
 	CELL obj = heap_scan_ptr;
@@ -254,13 +258,13 @@ CELL next_object(void)
 }
 
 /* Push object at heap scan cursor and advance; pushes f when done */
-void primitive_next_object(void)
+DEFINE_PRIMITIVE(next_object)
 {
 	dpush(next_object());
 }
 
 /* Re-enables GC */
-void primitive_end_scan(void)
+DEFINE_PRIMITIVE(end_scan)
 {
 	gc_off = false;
 }
@@ -362,15 +366,6 @@ void collect_cards(void)
 		collect_gen_cards(i);
 }
 
-void collect_callframe(F_INTERP_FRAME *callframe)
-{
-	callframe->scan -= callframe->quot;
-	callframe->end -= callframe->quot;
-	copy_handle(&callframe->quot);
-	callframe->scan += callframe->quot;
-	callframe->end += callframe->quot;
-}
-
 /* Copy all tagged pointers in a range of memory */
 void collect_stack(F_SEGMENT *region, CELL top)
 {
@@ -381,51 +376,56 @@ void collect_stack(F_SEGMENT *region, CELL top)
 		copy_handle((CELL*)ptr);
 }
 
-/* The callstack has a special format */
-void collect_callstack(F_SEGMENT *seg, F_INTERP_FRAME *top)
+void collect_stack_frame(F_STACK_FRAME *frame)
 {
-	F_INTERP_FRAME *bottom = (F_INTERP_FRAME *)seg->start;
-	while(bottom < top)
+	if(frame_type(frame) == QUOTATION_TYPE)
 	{
-		collect_callframe(bottom);
-		bottom++;
+		CELL scan = frame->scan - frame->array;
+		copy_handle(&frame->array);
+		frame->scan = scan + frame->array;
 	}
+
+	if(collecting_code)
+		recursive_mark(compiled_to_block(frame_code(frame)));
+}
+
+/* The base parameter allows us to adjust for a heap-allocated
+callstack snapshot */
+void collect_callstack(F_CONTEXT *stacks)
+{
+	CELL top = (CELL)stacks->callstack_top;
+	CELL bottom = (CELL)stacks->callstack_bottom;
+	iterate_callstack(top,bottom,collect_stack_frame);
 }
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
 the user environment and extra roots registered with REGISTER_ROOT */
 void collect_roots(void)
 {
-	int i;
-	F_CONTEXT *stacks;
-
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
 
-	collect_callframe(&callframe);
-
 	collect_stack(extra_roots_region,extra_roots);
 
 	save_stacks();
-	stacks = stack_chain;
+	F_CONTEXT *stacks = stack_chain;
 
 	while(stacks)
 	{
-		collect_stack(stacks->data_region,stacks->data);
-		collect_stack(stacks->retain_region,stacks->retain);
-		collect_callstack(stacks->call_region,stacks->call);
-
-		if(stacks->next != NULL)
-			collect_callframe(&stacks->callframe);
+		collect_stack(stacks->datastack_region,stacks->datastack);
+		collect_stack(stacks->retainstack_region,stacks->retainstack);
 
 		copy_handle(&stacks->catchstack_save);
 		copy_handle(&stacks->current_callback_save);
 
+		collect_callstack(stacks);
+
 		stacks = stacks->next;
 	}
 
+	int i;
 	for(i = 0; i < USER_ENV; i++)
 		copy_handle(&userenv[i]);
 }
@@ -435,7 +435,7 @@ INLINE void *copy_untagged_object(void *pointer, CELL size)
 {
 	void *newpointer;
 	if(newspace->here + size >= newspace->end)
-		LONGJMP(gc_jmp,1);
+		longjmp(gc_jmp,1);
 	allot_barrier(newspace->here);
 	newpointer = allot_zone(newspace,size);
 	memcpy(newpointer,pointer,size);
@@ -444,7 +444,8 @@ INLINE void *copy_untagged_object(void *pointer, CELL size)
 
 INLINE void forward_object(CELL pointer, CELL newpointer)
 {
-	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
+	if(pointer != newpointer)
+		put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
 }
 
 INLINE CELL copy_object_impl(CELL pointer)
@@ -492,10 +493,8 @@ void copy_handle(CELL *handle)
 {
 	CELL pointer = *handle;
 
-	if(immediate_p(pointer) || !should_copy(pointer))
-		return;
-
-	*handle = copy_object(pointer);
+	if(!immediate_p(pointer) && should_copy(pointer))
+		*handle = copy_object(pointer);
 }
 
 /* The number of cells from the start of the object which should be scanned by
@@ -512,31 +511,53 @@ CELL binary_payload_start(CELL pointer)
 	case BIT_ARRAY_TYPE:
 	case FLOAT_ARRAY_TYPE:
 	case BIGNUM_TYPE:
+	case CALLSTACK_TYPE:
 		return 0;
 	/* these objects have some binary data at the end */
 	case WORD_TYPE:
-		return sizeof(F_WORD) - CELLS;
+		return sizeof(F_WORD) - CELLS * 2;
 	case ALIEN_TYPE:
+		return CELLS * 3;
 	case DLL_TYPE:
 		return CELLS * 2;
+	case QUOTATION_TYPE:
+		return sizeof(F_QUOTATION) - CELLS * 2;
 	/* everything else consists entirely of pointers */
 	default:
 		return unaligned_object_size(pointer);
 	}
 }
 
+void collect_callstack_object(F_CALLSTACK *callstack)
+{
+	iterate_callstack_object(callstack,collect_stack_frame);
+}
+
 CELL collect_next(CELL scan)
 {
 	do_slots(scan,copy_handle);
 
-	/* It is odd to put this hook here, but this is the only special case
-	made for any type of object by the GC. If code GC is being performed,
-	compiled code blocks referenced by this word must be marked. */
-	if(collecting_code && object_type(scan) == WORD_TYPE)
+	/* Special behaviors */
+	F_WORD *word;
+	F_QUOTATION *quot;
+	F_CALLSTACK *stack;
+
+	switch(object_type(scan))
 	{
-		F_WORD *word = (F_WORD *)scan;
-		if(word->compiledp != F)
-			recursive_mark(word->xt);
+	case WORD_TYPE:
+		word = (F_WORD *)scan;
+		if(collecting_code && word->compiledp != F)
+			recursive_mark(compiled_to_block(word->code));
+		break;
+	case QUOTATION_TYPE:
+		quot = (F_QUOTATION *)scan;
+		if(collecting_code && quot->compiledp != F)
+			recursive_mark(compiled_to_block(quot->code));
+		break;
+	case CALLSTACK_TYPE:
+		stack = (F_CALLSTACK *)scan;
+		collect_callstack_object(stack);
+		break;
 	}
 
 	return scan + untagged_object_size(scan);
@@ -667,7 +688,7 @@ void garbage_collection(CELL gen,
 	collecting_gen = gen;
 
 	/* we come back here if a generation is full */
-	if(SETJMP(gc_jmp))
+	if(setjmp(gc_jmp))
 	{
 		/* We have no older generations we can try collecting, so we
 		resort to growing the data heap */
@@ -732,13 +753,18 @@ void garbage_collection(CELL gen,
 	performing_gc = false;
 }
 
-void primitive_data_gc(void)
+void data_gc(void)
 {
 	garbage_collection(TENURED,false,false,0);
 }
 
+DEFINE_PRIMITIVE(data_gc)
+{
+	data_gc();
+}
+
 /* Push total time spent on GC */
-void primitive_gc_time(void)
+DEFINE_PRIMITIVE(gc_time)
 {
 	box_unsigned_8(gc_time);
 }
@@ -748,23 +774,24 @@ void simple_gc(void)
 	maybe_gc(0);
 }
 
-void primitive_become(void)
+DEFINE_PRIMITIVE(become)
 {
-	F_VECTOR *new_object_vector = untag_vector(dpop());
-	F_ARRAY *new_objects = untag_object(new_object_vector->array);
-	F_VECTOR *old_object_vector = untag_vector(dpop());
-	F_ARRAY *old_objects = untag_object(old_object_vector->array);
+	F_ARRAY *new_objects = untag_array(dpop());
+	F_ARRAY *old_objects = untag_array(dpop());
 
-	CELL capacity = untag_fixnum_fast(new_object_vector->top);
+	CELL capacity = array_capacity(new_objects);
+	if(capacity != array_capacity(old_objects))
+		critical_error("bad parameters to become",0);
+
 	CELL i;
 	
 	for(i = 0; i < capacity; i++)
 	{
-		CELL old_obj = get(AREF(old_objects,i));
-		CELL new_obj = get(AREF(new_objects,i));
+		CELL old_obj = array_nth(old_objects,i);
+		CELL new_obj = array_nth(new_objects,i);
 
 		forward_object(old_obj,new_obj);
 	}
-	
-	primitive_data_gc();
+
+	data_gc();
 }

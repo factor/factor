@@ -4,7 +4,7 @@ USING: arrays io kernel namespaces parser prettyprint sequences
 words assocs definitions generic quotations effects
 slots continuations tuples debugger combinators
 vocabs help.stylesheet help.topics help.crossref help.markup
-sorting ;
+sorting classes ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -15,11 +15,21 @@ GENERIC: word-help* ( word -- content )
         [ swap 2array 1array ] [ 2drop f ] if
     ] ?if ;
 
+: $predicate ( element -- )
+    { { "object" object } { "?" "a boolean" } } $values
+    [
+        "Tests if the object is an instance of the " ,
+        first "predicating" word-prop \ $link swap 2array ,
+        " class." ,
+    ] { } make $description ;
+
 M: word word-help* drop f ;
 
 M: slot-reader word-help* drop \ $slot-reader ;
 
 M: slot-writer word-help* drop \ $slot-writer ;
+
+M: predicate word-help* drop \ $predicate ;
 
 : all-articles ( -- seq )
     articles get keys
@@ -94,7 +104,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
         "To define one, refer to \\ ABOUT: help" print
     ] ?if ;
 
-: ($index) ( seq quot -- )
+: ($index) ( articles -- )
     subsection-style get [
         sort-articles [ nl ] [ ($subsection) ] interleave
     ] with-style ;

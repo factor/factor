@@ -19,6 +19,7 @@ iterate? [
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : run ( -- )
+[ ] >background
 { -1 2 -1 2 } viewport set
 0.01 threshold set
 [ flower6 ] start-shape set

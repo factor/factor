@@ -1,0 +1,4 @@
+CC=/k/target/bin/x86_64-pc-mingw32-gcc
+include vm/Config.windows.nt
+include vm/Config.x86.64
+WINDRES = /k/target/bin/windres

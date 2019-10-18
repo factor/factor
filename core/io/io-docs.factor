@@ -18,10 +18,10 @@ $nl
 { $subsection stream-write }
 { $subsection stream-format }
 { $subsection stream-nl }
-{ $subsection with-nested-stream }
-{ $subsection with-stream-style }
+{ $subsection make-span-stream }
+{ $subsection make-block-stream }
+{ $subsection make-cell-stream }
 { $subsection stream-write-table }
-{ $subsection make-table-cell }
 "Optional word for network streams:"
 { $subsection set-timeout } ;
 
@@ -133,34 +133,36 @@ $nl
 "The " { $snippet "style" } " hashtable holds character style information. See " { $link "character-styles" } "." }
 $io-error ;
 
-HELP: with-nested-stream
-{ $values { "quot" "a quotation" } { "style" "a hashtable" } { "stream" "an output stream" } }
-{ $contract "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied."
+HELP: make-block-stream
+{ $values { "style" "a hashtable" } { "stream" "an output stream" } { "stream'" "an output stream" } }
+{ $contract "Creates an output stream which wraps " { $snippet "stream" } " and adds " { $snippet "style" } " on calls to " { $link stream-write } " and " { $link stream-format } "."
 $nl
-"Unlike " { $link with-stream-style } ", this creates a new paragraph block in the output."
+"Unlike " { $link make-span-stream } ", this creates a new paragraph block in the output."
 $nl
 "The " { $snippet "style" } " hashtable holds paragraph style information. See " { $link "paragraph-styles" } "." }
+{ $notes "Instead of calling this word directly, use " { $link with-nesting } "." }
 $io-error ;
 
 HELP: stream-write-table
 { $values { "table-cells" "a sequence of sequences of table cells" } { "style" "a hashtable" } { "stream" "an output stream" } }
-{ $contract "Prints a table of cells produced by " { $link make-table-cell } "."
+{ $contract "Prints a table of cells produced by " { $link with-cell } "."
 $nl
 "The " { $snippet "style" } " hashtable holds table style information. See " { $link "table-styles" } "." }
 { $notes "Instead of calling this word directly, use " { $link tabular-output } "." }
 $io-error ;
 
-HELP: make-table-cell
-{ $values { "quot" quotation } { "style" hashtable } { "stream" "an output stream" } { "table-cell" object } }
-{ $contract "Creates a table cell by calling the quotation in a new scope with a rebound " { $link stdio } " stream. Callers should not make any assumptions about the type of this word's output value; it should be treated like an opaque handle passed to " { $link stream-write-table } "." }
+HELP: make-cell-stream
+{ $values { "style" hashtable } { "stream" "an output stream" } { "stream'" object } }
+{ $contract "Creates an output stream which writes to a table cell object." }
 { $notes "Instead of calling this word directly, use " { $link tabular-output } "." }
 $io-error ;
 
-HELP: with-stream-style
-{ $values { "style" "a hashtable" } { "quot" "a quotation" } { "stream" "an output stream" } }
-{ $contract "Calls the quotation in a new dynamic scope where calls to " { $link write } ", " { $link format } " and other stream output words automatically inherit style settings from " { $snippet "style" } "."
+HELP: make-span-stream
+{ $values { "style" "a hashtable" } { "stream" "an output stream" } { "stream'" "an output stream" } }
+{ $contract "Creates an output stream which wraps " { $snippet "stream" } " and adds " { $snippet "style" } " on calls to " { $link stream-write } " and " { $link stream-format } "."
 $nl
-"Unlike " { $link with-nested-stream } ", the quotation's output is inline, and not nested in a paragraph block." }
+"Unlike " { $link make-block-stream } ", the stream output is inline, and not nested in a paragraph block." }
+{ $notes "Instead of calling this word directly, use " { $link with-style } "." }
 $io-error ;
 
 HELP: stream-print
@@ -227,7 +229,7 @@ $io-error ;
 HELP: with-nesting
 { $values { "style" "a hashtable" } { "quot" "a quotation" } }
 { $contract "Calls the quotation in a new dynamic scope with the " { $link stdio } " stream rebound to a nested paragraph stream, with formatting information applied." }
-{ $notes "Details are in the documentation for " { $link stream-format } "." }
+{ $notes "Details are in the documentation for " { $link make-block-stream } "." }
 $io-error ;
 
 HELP: tabular-output
@@ -263,7 +265,7 @@ $io-error ;
 HELP: with-style
 { $values { "style" "a hashtable" } { "quot" "a quotation" } }
 { $description "Calls the quotation in a new dynamic scope where calls to " { $link write } ", " { $link format } " and other stream output words automatically inherit style settings from " { $snippet "style" } "." }
-{ $notes "Details are in the documentation for " { $link with-stream-style } "." }
+{ $notes "Details are in the documentation for " { $link make-span-stream } "." }
 $io-error ;
 
 HELP: print

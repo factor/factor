@@ -1,18 +1,15 @@
 USING: tools.profiler.private tools.time help.markup help.syntax
-quotations io strings words definitions generator ;
+quotations io strings words definitions ;
 IN: tools.profiler
 
 ARTICLE: "profiling" "Profiling code" 
-"A simple call counting profiler is included. Both compiled and interpreted code can be profiled. There are a number of limitations when profiling compiled code:"
+"The " { $vocab-link "tools.profiler" } " vocabulary implements a simple call counting profiler. The profiler has three main limitations:"
 { $list
-    { "Calls to " { $link POSTPONE: inline } " words are not counted" }
-    "Calls to primitives are not counted"
+    "Calls to primitives are not counted."
+    { "Calls to " { $link POSTPONE: inline } " words from words compiled with the optimizing compiler are not counted." }
+    "Certain types of tail-recursive words compiled with the optimizing compiler will only count the initial invocation of the word, not every tail call."
 }
-"The profiler must be enabled before use:"
-{ $subsection enable-profiler }
-"Since enabling the profiler reduces performance, it should be disabled after use:"
-{ $subsection disable-profiler }
-"While enabled, a combinator which counts all calls made by a quotation can be used:"
+"Quotations can be passed to a combinator which calls them with word call counting enabled:"
 { $subsection profile }
 "After a quotation has been profiled, call counts can be presented in various ways:"
 { $subsection profile. }
@@ -22,10 +19,6 @@ ARTICLE: "profiling" "Profiling code"
 
 ABOUT: "profiling"
 
-HELP: reset-counters
-{ $description "Reset the call count of all words in the dictionary." }
-{ $notes "This word is automatically called by the profiler when profiling begins." } ;
-
 HELP: counters
 { $values { "words" "a sequence of words" } { "assoc" "an association list mapping words to integers" } }
 { $description "Outputs an association list of word call counts." } ;
@@ -34,20 +27,9 @@ HELP: counters.
 { $values { "assoc" "an association list mapping words to integers" } }
 { $description "Prints an association list of call counts to the " { $link stdio } " stream." } ;
 
-HELP: enable-profiler
-{ $description "Recompiles all words in the dictionary to include a stub which increments the call count during profiling. Once this is done, the " { $link profile } " combinator may be used." }
-{ $notes "Performance is affected when profiling is enabled, so profiling should only be enabled when necessary." } ;
-
-HELP: disable-profiler
-{ $description "Recompiles all words in the dictionary to exclude a stub which increments the call count during profiling. This should be done when you no longer wish to use the " { $link profile } " combinator." } ;
-
-HELP: check-profiler
-{ $description "Throws an error if the profiler has not yet been enabled by a call to " { $link enable-profiler } "." } ;
-
 HELP: profile
 { $values { "quot" quotation } }
-{ $description "Calls the quotation while collecting word call counts, which can then be displayed using " { $link profile. } " or related words." }
-{ $errors "Throws an error if the profiler has not been enabled by a prior call to " { $link enable-profiler } "." } ;
+{ $description "Calls the quotation while collecting word call counts, which can then be displayed using " { $link profile. } " or related words." } ;
 
 HELP: profile.
 { $description "Prints a table of call counts from the most recent invocation of " { $link profile } "." } ;
@@ -68,9 +50,6 @@ HELP: vocabs-profile.
 
 HELP: profiling ( ? -- )
 { $values { "?" "a boolean" } }
-{ $description "Internal primitive to switch on call counting. This word should not be used; instead see " { $link enable-profiler } ", " { $link profile } " and " { $link disable-profiler } "." } ;
+{ $description "Internal primitive to switch on call counting. This word should not be used; instead use " { $link profile } "." } ;
 
 { time profile } related-words
-
-HELP: profiler-prologues
-{ $var-description "If set, each word will be compiled with an extra prologue which checks if profiling is enabled, and if so, increments the word's call count. This variable is off by default. It should never be set directly; " { $link enable-profiler } " and " { $link disable-profiler } " should be used instead." } ;

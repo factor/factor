@@ -1,0 +1,819 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- LilyPond (www.lilypond.org) mode by Bertalan Fodor <lilypondtool@organum.hu> & others at http://lily4jedit.sf.net
+	Requires jEdit 4.3pre6 or compatible
+Recommended jEdit/modes/catalog entry:
+	<MODE NAME="lilypond" FILE="lilypond.xml"
+	FILE_NAME_GLOB="*.ly" />
+
+-->
+
+<MODE>
+<PROPS>
+	<PROPERTY NAME="commentStart" VALUE="%{" />
+	<PROPERTY NAME="commentEnd" VALUE="%}" />
+	<PROPERTY NAME="lineComment" VALUE="%" />
+	<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+	<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+	<PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+	<PROPERTY NAME="wordBreakChars" VALUE="=" />
+</PROPS>
+
+<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE">
+
+	<SPAN TYPE="COMMENT2" NO_LINE_BREAK="FALSE">
+		<BEGIN>%{</BEGIN><END>%}</END>
+	</SPAN>
+	<EOL_SPAN TYPE="COMMENT1">%</EOL_SPAN>
+
+	<SEQ TYPE="DIGIT">\breve</SEQ>
+	<SEQ TYPE="DIGIT">\longa</SEQ>
+	<SEQ TYPE="DIGIT">\maxima</SEQ>
+	<MARK_PREVIOUS TYPE="FUNCTION" AT_WHITESPACE_END="TRUE">=</MARK_PREVIOUS>
+	<MARK_PREVIOUS TYPE="FUNCTION" AT_WHITESPACE_END="TRUE"> =</MARK_PREVIOUS>
+	<SEQ TYPE="MARKUP">{</SEQ>
+	<SEQ TYPE="MARKUP">}</SEQ>
+	<SEQ TYPE="MARKUP">[</SEQ>
+	<SEQ TYPE="MARKUP">]</SEQ>
+	<SEQ TYPE="MARKUP">&lt;&lt;</SEQ>
+	<SEQ TYPE="MARKUP">&gt;&gt;</SEQ>
+	<SEQ TYPE="NULL">-&lt;</SEQ>
+	<SEQ TYPE="NULL">-&gt;</SEQ>
+	<SEQ TYPE="OPERATOR">&gt;</SEQ>
+	<SEQ TYPE="OPERATOR">&lt;</SEQ>
+	<SEQ TYPE="OPERATOR">|</SEQ>
+	<SEQ_REGEXP HASH_CHAR="&quot;"  TYPE = "LITERAL1">"(\\"|[^\\"]|\\)+"</SEQ_REGEXP>
+	<SPAN TYPE="LITERAL1"><BEGIN>"</BEGIN><END>"</END></SPAN>
+
+<!-- Less can be more: Notes are simple black.
+	Now digits are highlighted.
+	Octave jumps now are as highlighted as markup. -->
+
+	<!--octave-->
+	<SEQ TYPE="MARKUP">'</SEQ>
+	<SEQ TYPE="MARKUP">,</SEQ>
+
+	<!-- rests and skip -->
+
+	<SEQ_REGEXP TYPE="LITERAL4" AT_WORD_START="TRUE" HASH_CHARS="rRs">[rRs]\d*\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="LITERAL4" AT_WORD_START="TRUE" HASH_CHAR="R">R\d*\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="LITERAL4" AT_WORD_START="TRUE" HASH_CHAR="s">s\d*\b</SEQ_REGEXP>
+
+	<SEQ_REGEXP TYPE="DIGIT" AT_WORD_START="FALSE" HASH_CHARS="1234567890">\d+\b</SEQ_REGEXP>
+
+	<MARK_FOLLOWING TYPE="LITERAL3" MATCH_TYPE="OPERATOR">.</MARK_FOLLOWING>
+
+<!-- Generated part follows -->
+<!-- internal commands -->
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\override">\\override\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\version">\\version\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\include">\\include\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\invalid">\\invalid\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\addquote">\\addquote\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\alternative">\\alternative\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\book">\\book\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\~">\\~\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\mark">\\mark\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\default">\\default\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\key">\\key\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\skip">\\skip\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\octave">\\octave\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\partial">\\partial\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\time">\\time\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\change">\\change\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\consists">\\consists\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\remove">\\remove\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\accepts">\\accepts\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\defaultchild">\\defaultchild\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\denies">\\denies\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\alias">\\alias\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\type">\\type\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\description">\\description\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\name">\\name\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\context">\\context\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\grobdescriptions">\\grobdescriptions\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\markup">\\markup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\header">\\header\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\notemode">\\notemode\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\drummode">\\drummode\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\figuremode">\\figuremode\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\chordmode">\\chordmode\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\lyricmode">\\lyricmode\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\drums">\\drums\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\figures">\\figures\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\chords">\\chords\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\lyrics">\\lyrics\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\once">\\once\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\revert">\\revert\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\set">\\set\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\unset">\\unset\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\addlyrics">\\addlyrics\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\objectid">\\objectid\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\with">\\with\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\rest">\\rest\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\paper">\\paper\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\midi">\\midi\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\layout">\\layout\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\new">\\new\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\times">\\times\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\transpose">\\transpose\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\tag">\\tag\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\relative">\\relative\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\renameinput">\\renameinput\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\repeat">\\repeat\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\lyricsto">\\lyricsto\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\score">\\score\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\sequential">\\sequential\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\simultaneous">\\simultaneous\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\longa">\\longa\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\breve">\\breve\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\maxima">\\maxima\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR="\tempo">\\tempo\b</SEQ_REGEXP>
+<!-- identifiers -->
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\AncientRemoveEmptyStaffContext">\\AncientRemoveEmptyStaffContext\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\RemoveEmptyRhythmicStaffContext">\\RemoveEmptyRhythmicStaffContext\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\RemoveEmptyStaffContext">\\RemoveEmptyStaffContext\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\accent">\\accent\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\aeolian">\\aeolian\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\afterGraceFraction">\\afterGraceFraction\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\aikenHeads">\\aikenHeads\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\allowPageTurn">\\allowPageTurn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\arpeggio">\\arpeggio\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\arpeggioBracket">\\arpeggioBracket\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\arpeggioDown">\\arpeggioDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\arpeggioNeutral">\\arpeggioNeutral\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\arpeggioUp">\\arpeggioUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\autoBeamOff">\\autoBeamOff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\autoBeamOn">\\autoBeamOn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\between-system-padding">\\between-system-padding\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\between-system-space">\\between-system-space\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\bigger">\\bigger\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\blackTriangleMarkup">\\blackTriangleMarkup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\bookTitleMarkup">\\bookTitleMarkup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\bracketCloseSymbol">\\bracketCloseSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\bracketOpenSymbol">\\bracketOpenSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\break">\\break\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\breve">\\breve\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\cadenzaOff">\\cadenzaOff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\cadenzaOn">\\cadenzaOn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\center">\\center\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\chordmodifiers">\\chordmodifiers\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\cm">\\cm\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\coda">\\coda\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\cr">\\cr\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\cresc">\\cresc\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\decr">\\decr\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\dim">\\dim\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\dorian">\\dorian\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\dotsDown">\\dotsDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\dotsNeutral">\\dotsNeutral\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\dotsUp">\\dotsUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\down">\\down\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\downbow">\\downbow\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\downmordent">\\downmordent\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\downprall">\\downprall\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\drumPitchNames">\\drumPitchNames\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\dutchPitchnames">\\dutchPitchnames\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\dynamicDown">\\dynamicDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\dynamicNeutral">\\dynamicNeutral\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\dynamicUp">\\dynamicUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\emptyText">\\emptyText\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\endcr">\\endcr\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\endcresc">\\endcresc\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\enddecr">\\enddecr\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\enddim">\\enddim\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\endincipit">\\endincipit\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\escapedBiggerSymbol">\\escapedBiggerSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\escapedExclamationSymbol">\\escapedExclamationSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\escapedParenthesisCloseSymbol">\\escapedParenthesisCloseSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\escapedParenthesisOpenSymbol">\\escapedParenthesisOpenSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\escapedSmallerSymbol">\\escapedSmallerSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\espressivo">\\espressivo\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\evenHeaderMarkup">\\evenHeaderMarkup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\f">\\f\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\fatText">\\fatText\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\fermata">\\fermata\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\fermataMarkup">\\fermataMarkup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ff">\\ff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\fff">\\fff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ffff">\\ffff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\first-page-number">\\first-page-number\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\flageolet">\\flageolet\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\fp">\\fp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\frenchChords">\\frenchChords\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\fullJazzExceptions">\\fullJazzExceptions\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\fz">\\fz\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\germanChords">\\germanChords\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\glissando">\\glissando\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\harmonic">\\harmonic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\hideNotes">\\hideNotes\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\hideStaffSwitch">\\hideStaffSwitch\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ignatzekExceptionMusic">\\ignatzekExceptionMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ignatzekExceptions">\\ignatzekExceptions\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\improvisationOff">\\improvisationOff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\improvisationOn">\\improvisationOn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\in">\\in\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\input-encoding">\\input-encoding\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\instrument-definitions">\\instrument-definitions\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ionian">\\ionian\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\italianChords">\\italianChords\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\laissezVibrer">\\laissezVibrer\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\left">\\left\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\lheel">\\lheel\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\lineprall">\\lineprall\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\locrian">\\locrian\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\longa">\\longa\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\longfermata">\\longfermata\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ltoe">\\ltoe\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\lydian">\\lydian\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\major">\\major\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\marcato">\\marcato\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\maxima">\\maxima\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\melisma">\\melisma\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\melismaEnd">\\melismaEnd\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\mf">\\mf\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\midiDrumPitches">\\midiDrumPitches\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\minor">\\minor\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\mixolydian">\\mixolydian\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\mm">\\mm\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\mordent">\\mordent\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\mp">\\mp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\newSpacingSection">\\newSpacingSection\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\noBeam">\\noBeam\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\noBreak">\\noBreak\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\noPageBreak">\\noPageBreak\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\noPageTurn">\\noPageTurn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\normalsize">\\normalsize\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\oddFooterMarkup">\\oddFooterMarkup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\oddHeaderMarkup">\\oddHeaderMarkup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\oneVoice">\\oneVoice\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\open">\\open\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\output-scale">\\output-scale\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\p">\\p\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\page-top-space">\\page-top-space\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\pageBreak">\\pageBreak\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\pageTurn">\\pageTurn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\parenthesisCloseSymbol">\\parenthesisCloseSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\parenthesisOpenSymbol">\\parenthesisOpenSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\partialJazzExceptions">\\partialJazzExceptions\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\partialJazzMusic">\\partialJazzMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\phrasingSlurDown">\\phrasingSlurDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\phrasingSlurNeutral">\\phrasingSlurNeutral\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\phrasingSlurUp">\\phrasingSlurUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\phrygian">\\phrygian\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\pipeSymbol">\\pipeSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\pitchnames">\\pitchnames\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\portato">\\portato\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\pp">\\pp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ppp">\\ppp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\pppp">\\pppp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ppppp">\\ppppp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\prall">\\prall\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\pralldown">\\pralldown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\prallmordent">\\prallmordent\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\prallprall">\\prallprall\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\prallup">\\prallup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\print-first-page-number">\\print-first-page-number\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\print-page-number">\\print-page-number\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\pt">\\pt\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ragged-bottom">\\ragged-bottom\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\ragged-last-bottom">\\ragged-last-bottom\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\repeatTie">\\repeatTie\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\reverseturn">\\reverseturn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\rfz">\\rfz\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\rheel">\\rheel\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\right">\\right\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\rtoe">\\rtoe\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sacredHarpHeads">\\sacredHarpHeads\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\scoreTitleMarkup">\\scoreTitleMarkup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\segno">\\segno\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\semiGermanChords">\\semiGermanChords\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\setDefaultDurationToQuarter">\\setDefaultDurationToQuarter\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\setEasyHeads">\\setEasyHeads\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\setHairpinCresc">\\setHairpinCresc\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\setHairpinDecresc">\\setHairpinDecresc\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\setHairpinDim">\\setHairpinDim\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\setTextCresc">\\setTextCresc\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\setTextDecresc">\\setTextDecresc\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\setTextDim">\\setTextDim\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sf">\\sf\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sff">\\sff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sfp">\\sfp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sfz">\\sfz\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\shiftOff">\\shiftOff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\shiftOn">\\shiftOn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\shiftOnn">\\shiftOnn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\shiftOnnn">\\shiftOnnn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\shortfermata">\\shortfermata\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\showStaffSwitch">\\showStaffSwitch\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\signumcongruentiae">\\signumcongruentiae\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\slashSeparator">\\slashSeparator\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\slurDashed">\\slurDashed\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\slurDotted">\\slurDotted\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\slurDown">\\slurDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\slurNeutral">\\slurNeutral\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\slurSolid">\\slurSolid\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\slurUp">\\slurUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\small">\\small\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\smaller">\\smaller\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sostenutoDown">\\sostenutoDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sostenutoUp">\\sostenutoUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sp">\\sp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\spp">\\spp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\staccatissimo">\\staccatissimo\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\staccato">\\staccato\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\start">\\start\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\startAcciaccaturaMusic">\\startAcciaccaturaMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\startAppoggiaturaMusic">\\startAppoggiaturaMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\startGraceMusic">\\startGraceMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\startGroup">\\startGroup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\startStaff">\\startStaff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\startTextSpan">\\startTextSpan\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\startTrillSpan">\\startTrillSpan\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stemDown">\\stemDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stemNeutral">\\stemNeutral\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stemUp">\\stemUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stop">\\stop\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stopAcciaccaturaMusic">\\stopAcciaccaturaMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stopAppoggiaturaMusic">\\stopAppoggiaturaMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stopGraceMusic">\\stopGraceMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stopGroup">\\stopGroup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stopStaff">\\stopStaff\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stopTextSpan">\\stopTextSpan\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stopTrillSpan">\\stopTrillSpan\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\stopped">\\stopped\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sustainDown">\\sustainDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\sustainUp">\\sustainUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tagline">\\tagline\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tenuto">\\tenuto\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\textSpannerDown">\\textSpannerDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\textSpannerNeutral">\\textSpannerNeutral\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\textSpannerUp">\\textSpannerUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\thumb">\\thumb\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tieDashed">\\tieDashed\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tieDotted">\\tieDotted\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tieDown">\\tieDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tieNeutral">\\tieNeutral\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tieSolid">\\tieSolid\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tieUp">\\tieUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tildeSymbol">\\tildeSymbol\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tiny">\\tiny\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\treCorde">\\treCorde\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\trill">\\trill\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tupletDown">\\tupletDown\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tupletNeutral">\\tupletNeutral\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tupletUp">\\tupletUp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\turn">\\turn\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\unHideNotes">\\unHideNotes\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\unaCorda">\\unaCorda\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\unit">\\unit\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\up">\\up\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\upbow">\\upbow\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\upmordent">\\upmordent\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\upprall">\\upprall\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\varcoda">\\varcoda\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\verylongfermata">\\verylongfermata\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\voiceFour">\\voiceFour\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\voiceOne">\\voiceOne\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\voiceThree">\\voiceThree\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\voiceTwo">\\voiceTwo\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\whiteTriangleMarkup">\\whiteTriangleMarkup\b</SEQ_REGEXP>
+<!-- music functions -->
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\acciaccatura">\\acciaccatura\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\addInstrumentDefinition">\\addInstrumentDefinition\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\addquote">\\addquote\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\afterGrace">\\afterGrace\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\applyContext">\\applyContext\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\applyMusic">\\applyMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\applyOutput">\\applyOutput\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\appoggiatura">\\appoggiatura\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\assertBeamQuant">\\assertBeamQuant\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\assertBeamSlope">\\assertBeamSlope\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\autochange">\\autochange\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\balloonGrobText">\\balloonGrobText\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\balloonText">\\balloonText\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\bar">\\bar\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\barNumberCheck">\\barNumberCheck\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\bendAfter">\\bendAfter\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\breathe">\\breathe\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\clef">\\clef\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\compressMusic">\\compressMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\cueDuring">\\cueDuring\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\displayLilyMusic">\\displayLilyMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\displayMusic">\\displayMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\featherDurations">\\featherDurations\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\grace">\\grace\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\includePageLayoutFile">\\includePageLayoutFile\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\instrumentSwitch">\\instrumentSwitch\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\keepWithTag">\\keepWithTag\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\killCues">\\killCues\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\makeClusters">\\makeClusters\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\musicMap">\\musicMap\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\octave">\\octave\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\oldaddlyrics">\\oldaddlyrics\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\overrideProperty">\\overrideProperty\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\parallelMusic">\\parallelMusic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\parenthesize">\\parenthesize\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\partcombine">\\partcombine\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\pitchedTrill">\\pitchedTrill\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\quoteDuring">\\quoteDuring\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\removeWithTag">\\removeWithTag\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\resetRelativeOctave">\\resetRelativeOctave\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\rightHandFinger">\\rightHandFinger\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\scoreTweak">\\scoreTweak\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\shiftDurations">\\shiftDurations\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\spacingTweaks">\\spacingTweaks\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tag">\\tag\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\transposedCueDuring">\\transposedCueDuring\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\transposition">\\transposition\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\tweak">\\tweak\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\unfoldRepeats">\\unfoldRepeats\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="\withMusicProperty">\\withMusicProperty\b</SEQ_REGEXP>
+<!-- markup commands -->
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\arrow-head">\\arrow-head\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\beam">\\beam\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\bigger">\\bigger\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\bold">\\bold\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\box">\\box\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\bracket">\\bracket\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\bracketed-y-column">\\bracketed-y-column\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\caps">\\caps\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\center-align">\\center-align\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\char">\\char\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\circle">\\circle\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\column">\\column\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\combine">\\combine\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\dir-column">\\dir-column\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\doubleflat">\\doubleflat\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\doublesharp">\\doublesharp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\draw-circle">\\draw-circle\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\dynamic">\\dynamic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\epsfile">\\epsfile\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\fill-line">\\fill-line\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\filled-box">\\filled-box\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\finger">\\finger\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\flat">\\flat\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\fontCaps">\\fontCaps\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\fontsize">\\fontsize\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\fraction">\\fraction\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\fret-diagram">\\fret-diagram\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\fret-diagram-terse">\\fret-diagram-terse\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\fret-diagram-verbose">\\fret-diagram-verbose\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\fromproperty">\\fromproperty\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\general-align">\\general-align\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\halign">\\halign\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\hbracket">\\hbracket\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\hcenter">\\hcenter\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\hcenter-in">\\hcenter-in\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\hspace">\\hspace\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\huge">\\huge\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\italic">\\italic\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\justify">\\justify\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\justify-field">\\justify-field\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\justify-string">\\justify-string\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\large">\\large\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\left-align">\\left-align\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\line">\\line\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\lookup">\\lookup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\lower">\\lower\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\magnify">\\magnify\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\markalphabet">\\markalphabet\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\markletter">\\markletter\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\medium">\\medium\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\musicglyph">\\musicglyph\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\natural">\\natural\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\normal-size-sub">\\normal-size-sub\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\normal-size-super">\\normal-size-super\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\normal-text">\\normal-text\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\normalsize">\\normalsize\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\note">\\note\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\note-by-number">\\note-by-number\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\null">\\null\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\number">\\number\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\on-the-fly">\\on-the-fly\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\override">\\override\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\pad-around">\\pad-around\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\pad-markup">\\pad-markup\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\pad-to-box">\\pad-to-box\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\pad-x">\\pad-x\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\postscript">\\postscript\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\put-adjacent">\\put-adjacent\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\raise">\\raise\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\right-align">\\right-align\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\roman">\\roman\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\rotate">\\rotate\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\sans">\\sans\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\score">\\score\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\semiflat">\\semiflat\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\semisharp">\\semisharp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\sesquiflat">\\sesquiflat\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\sesquisharp">\\sesquisharp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\sharp">\\sharp\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\simple">\\simple\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\slashed-digit">\\slashed-digit\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\small">\\small\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\smallCaps">\\smallCaps\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\smaller">\\smaller\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\stencil">\\stencil\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\strut">\\strut\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\sub">\\sub\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\super">\\super\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\teeny">\\teeny\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\text">\\text\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\tied-lyric">\\tied-lyric\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\tiny">\\tiny\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\translate">\\translate\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\translate-scaled">\\translate-scaled\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\transparent">\\transparent\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\triangle">\\triangle\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\typewriter">\\typewriter\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\upright">\\upright\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\vcenter">\\vcenter\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\verbatim-file">\\verbatim-file\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\whiteout">\\whiteout\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\with-color">\\with-color\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\with-dimensions">\\with-dimensions\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\with-url">\\with-url\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\wordwrap">\\wordwrap\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\wordwrap-field">\\wordwrap-field\b</SEQ_REGEXP>
+	<SEQ_REGEXP TYPE="KEYWORD4" HASH_CHAR="\wordwrap-string">\\wordwrap-string\b</SEQ_REGEXP>
+<MARK_FOLLOWING TYPE="FUNCTION">\</MARK_FOLLOWING>
+<KEYWORDS>
+	<KEYWORD2>staff-spacing-interface</KEYWORD2>
+	<KEYWORD2>text-script-interface</KEYWORD2>
+	<KEYWORD2>Ottava_spanner_engraver</KEYWORD2>
+	<KEYWORD2>Figured_bass_engraver</KEYWORD2>
+	<KEYWORD2>Lyrics</KEYWORD2>
+	<KEYWORD2>Separating_line_group_engraver</KEYWORD2>
+	<KEYWORD2>cluster-interface</KEYWORD2>
+	<KEYWORD2>Glissando_engraver</KEYWORD2>
+	<KEYWORD2>key-signature-interface</KEYWORD2>
+	<KEYWORD2>clef-interface</KEYWORD2>
+	<KEYWORD2>VaticanaVoice</KEYWORD2>
+	<KEYWORD2>Rest_collision_engraver</KEYWORD2>
+	<KEYWORD2>Grace_engraver</KEYWORD2>
+	<KEYWORD2>grid-point-interface</KEYWORD2>
+	<KEYWORD2>Measure_grouping_engraver</KEYWORD2>
+	<KEYWORD2>Laissez_vibrer_engraver</KEYWORD2>
+	<KEYWORD2>Script_row_engraver</KEYWORD2>
+	<KEYWORD2>bass-figure-alignment-interface</KEYWORD2>
+	<KEYWORD2>Note_head_line_engraver</KEYWORD2>
+	<KEYWORD2>ottava-bracket-interface</KEYWORD2>
+	<KEYWORD2>rhythmic-head-interface</KEYWORD2>
+	<KEYWORD2>Accidental_engraver</KEYWORD2>
+	<KEYWORD2>Mark_engraver</KEYWORD2>
+	<KEYWORD2>hara-kiri-group-interface</KEYWORD2>
+	<KEYWORD2>Instrument_name_engraver</KEYWORD2>
+	<KEYWORD2>Vaticana_ligature_engraver</KEYWORD2>
+	<KEYWORD2>Page_turn_engraver</KEYWORD2>
+	<KEYWORD2>staff-symbol-interface</KEYWORD2>
+	<KEYWORD2>Beam_performer</KEYWORD2>
+	<KEYWORD2>accidental-suggestion-interface</KEYWORD2>
+	<KEYWORD2>Key_engraver</KEYWORD2>
+	<KEYWORD2>GrandStaff</KEYWORD2>
+	<KEYWORD2>multi-measure-interface</KEYWORD2>
+	<KEYWORD2>rest-collision-interface</KEYWORD2>
+	<KEYWORD2>Dot_column_engraver</KEYWORD2>
+	<KEYWORD2>MensuralVoice</KEYWORD2>
+	<KEYWORD2>TabStaff</KEYWORD2>
+	<KEYWORD2>Pitched_trill_engraver</KEYWORD2>
+	<KEYWORD2>line-spanner-interface</KEYWORD2>
+	<KEYWORD2>Time_signature_performer</KEYWORD2>
+	<KEYWORD2>lyric-interface</KEYWORD2>
+	<KEYWORD2>StaffGroup</KEYWORD2>
+	<KEYWORD2>text-interface</KEYWORD2>
+	<KEYWORD2>slur-interface</KEYWORD2>
+	<KEYWORD2>Drum_note_performer</KEYWORD2>
+	<KEYWORD2>TabVoice</KEYWORD2>
+	<KEYWORD2>measure-grouping-interface</KEYWORD2>
+	<KEYWORD2>stanza-number-interface</KEYWORD2>
+	<KEYWORD2>self-alignment-interface</KEYWORD2>
+	<KEYWORD2>Span_arpeggio_engraver</KEYWORD2>
+	<KEYWORD2>system-interface</KEYWORD2>
+	<KEYWORD2>Engraver</KEYWORD2>
+	<KEYWORD2>RhythmicStaff</KEYWORD2>
+	<KEYWORD2>font-interface</KEYWORD2>
+	<KEYWORD2>fret-diagram-interface</KEYWORD2>
+	<KEYWORD2>Grace_spacing_engraver</KEYWORD2>
+	<KEYWORD2>Bar_engraver</KEYWORD2>
+	<KEYWORD2>Dynamic_engraver</KEYWORD2>
+	<KEYWORD2>Grob_pq_engraver</KEYWORD2>
+	<KEYWORD2>Default_bar_line_engraver</KEYWORD2>
+	<KEYWORD2>Swallow_performer</KEYWORD2>
+	<KEYWORD2>script-column-interface</KEYWORD2>
+	<KEYWORD2>Piano_pedal_performer</KEYWORD2>
+	<KEYWORD2>metronome-mark-interface</KEYWORD2>
+	<KEYWORD2>melody-spanner-interface</KEYWORD2>
+	<KEYWORD2>FretBoards</KEYWORD2>
+	<KEYWORD2>spacing-spanner-interface</KEYWORD2>
+	<KEYWORD2>Control_track_performer</KEYWORD2>
+	<KEYWORD2>Break_align_engraver</KEYWORD2>
+	<KEYWORD2>paper-column-interface</KEYWORD2>
+	<KEYWORD2>PianoStaff</KEYWORD2>
+	<KEYWORD2>Breathing_sign_engraver</KEYWORD2>
+	<KEYWORD2>accidental-placement-interface</KEYWORD2>
+	<KEYWORD2>Tuplet_engraver</KEYWORD2>
+	<KEYWORD2>stroke-finger-interface</KEYWORD2>
+	<KEYWORD2>side-position-interface</KEYWORD2>
+	<KEYWORD2>note-name-interface</KEYWORD2>
+	<KEYWORD2>bar-line-interface</KEYWORD2>
+	<KEYWORD2>lyric-extender-interface</KEYWORD2>
+	<KEYWORD2>Staff</KEYWORD2>
+	<KEYWORD2>GregorianTranscriptionStaff</KEYWORD2>
+	<KEYWORD2>Rest_swallow_translator</KEYWORD2>
+	<KEYWORD2>dynamic-text-spanner-interface</KEYWORD2>
+	<KEYWORD2>arpeggio-interface</KEYWORD2>
+	<KEYWORD2>Cluster_spanner_engraver</KEYWORD2>
+	<KEYWORD2>Collision_engraver</KEYWORD2>
+	<KEYWORD2>accidental-interface</KEYWORD2>
+	<KEYWORD2>rest-interface</KEYWORD2>
+	<KEYWORD2>Tab_note_heads_engraver</KEYWORD2>
+	<KEYWORD2>dots-interface</KEYWORD2>
+	<KEYWORD2>staff-symbol-referencer-interface</KEYWORD2>
+	<KEYWORD2>ambitus-interface</KEYWORD2>
+	<KEYWORD2>bass-figure-interface</KEYWORD2>
+	<KEYWORD2>vaticana-ligature-interface</KEYWORD2>
+	<KEYWORD2>ledgered-interface</KEYWORD2>
+	<KEYWORD2>item-interface</KEYWORD2>
+	<KEYWORD2>Tie_performer</KEYWORD2>
+	<KEYWORD2>volta-bracket-interface</KEYWORD2>
+	<KEYWORD2>vertically-spaceable-interface</KEYWORD2>
+	<KEYWORD2>ledger-line-interface</KEYWORD2>
+	<KEYWORD2>Chord_tremolo_engraver</KEYWORD2>
+	<KEYWORD2>note-column-interface</KEYWORD2>
+	<KEYWORD2>DrumVoice</KEYWORD2>
+	<KEYWORD2>axis-group-interface</KEYWORD2>
+	<KEYWORD2>Ledger_line_engraver</KEYWORD2>
+	<KEYWORD2>Slash_repeat_engraver</KEYWORD2>
+	<KEYWORD2>ligature-bracket-interface</KEYWORD2>
+	<KEYWORD2>Pitch_squash_engraver</KEYWORD2>
+	<KEYWORD2>Instrument_switch_engraver</KEYWORD2>
+	<KEYWORD2>Voice</KEYWORD2>
+	<KEYWORD2>Script_column_engraver</KEYWORD2>
+	<KEYWORD2>Volta_engraver</KEYWORD2>
+	<KEYWORD2>Stanza_number_align_engraver</KEYWORD2>
+	<KEYWORD2>Vertical_align_engraver</KEYWORD2>
+	<KEYWORD2>span-bar-interface</KEYWORD2>
+	<KEYWORD2>Staff_collecting_engraver</KEYWORD2>
+	<KEYWORD2>Ligature_bracket_engraver</KEYWORD2>
+	<KEYWORD2>Time_signature_engraver</KEYWORD2>
+	<KEYWORD2>Beam_engraver</KEYWORD2>
+	<KEYWORD2>Note_name_engraver</KEYWORD2>
+	<KEYWORD2>Note_heads_engraver</KEYWORD2>
+	<KEYWORD2>Forbid_line_break_engraver</KEYWORD2>
+	<KEYWORD2>spacing-options-interface</KEYWORD2>
+	<KEYWORD2>spacing-interface</KEYWORD2>
+	<KEYWORD2>Span_dynamic_performer</KEYWORD2>
+	<KEYWORD2>piano-pedal-script-interface</KEYWORD2>
+	<KEYWORD2>MensuralStaff</KEYWORD2>
+	<KEYWORD2>Global</KEYWORD2>
+	<KEYWORD2>trill-pitch-accidental-interface</KEYWORD2>
+	<KEYWORD2>grob-interface</KEYWORD2>
+	<KEYWORD2>Horizontal_bracket_engraver</KEYWORD2>
+	<KEYWORD2>Grid_line_span_engraver</KEYWORD2>
+	<KEYWORD2>NoteNames</KEYWORD2>
+	<KEYWORD2>piano-pedal-interface</KEYWORD2>
+	<KEYWORD2>Axis_group_engraver</KEYWORD2>
+	<KEYWORD2>Staff_symbol_engraver</KEYWORD2>
+	<KEYWORD2>stem-interface</KEYWORD2>
+	<KEYWORD2>Slur_engraver</KEYWORD2>
+	<KEYWORD2>pitched-trill-interface</KEYWORD2>
+	<KEYWORD2>tie-column-interface</KEYWORD2>
+	<KEYWORD2>stem-tremolo-interface</KEYWORD2>
+	<KEYWORD2>Grid_point_engraver</KEYWORD2>
+	<KEYWORD2>System_start_delimiter_engraver</KEYWORD2>
+	<KEYWORD2>Completion_heads_engraver</KEYWORD2>
+	<KEYWORD2>Drum_notes_engraver</KEYWORD2>
+	<KEYWORD2>Swallow_engraver</KEYWORD2>
+	<KEYWORD2>Slur_performer</KEYWORD2>
+	<KEYWORD2>lyric-hyphen-interface</KEYWORD2>
+	<KEYWORD2>Clef_engraver</KEYWORD2>
+	<KEYWORD2>dynamic-interface</KEYWORD2>
+	<KEYWORD2>Score</KEYWORD2>
+	<KEYWORD2>Output_property_engraver</KEYWORD2>
+	<KEYWORD2>Repeat_tie_engraver</KEYWORD2>
+	<KEYWORD2>Rest_engraver</KEYWORD2>
+	<KEYWORD2>break-aligned-interface</KEYWORD2>
+	<KEYWORD2>String_number_engraver</KEYWORD2>
+	<KEYWORD2>only-prebreak-interface</KEYWORD2>
+	<KEYWORD2>Lyric_engraver</KEYWORD2>
+	<KEYWORD2>Tempo_performer</KEYWORD2>
+	<KEYWORD2>Parenthesis_engraver</KEYWORD2>
+	<KEYWORD2>Repeat_acknowledge_engraver</KEYWORD2>
+	<KEYWORD2>mensural-ligature-interface</KEYWORD2>
+	<KEYWORD2>align-interface</KEYWORD2>
+	<KEYWORD2>Stanza_number_engraver</KEYWORD2>
+	<KEYWORD2>system-start-delimiter-interface</KEYWORD2>
+	<KEYWORD2>lyric-syllable-interface</KEYWORD2>
+	<KEYWORD2>bend-after-interface</KEYWORD2>
+	<KEYWORD2>dynamic-line-spanner-interface</KEYWORD2>
+	<KEYWORD2>Staff_performer</KEYWORD2>
+	<KEYWORD2>Bar_number_engraver</KEYWORD2>
+	<KEYWORD2>Fretboard_engraver</KEYWORD2>
+	<KEYWORD2>tablature-interface</KEYWORD2>
+	<KEYWORD2>Fingering_engraver</KEYWORD2>
+	<KEYWORD2>chord-name-interface</KEYWORD2>
+	<KEYWORD2>Note_swallow_translator</KEYWORD2>
+	<KEYWORD2>Chord_name_engraver</KEYWORD2>
+	<KEYWORD2>note-head-interface</KEYWORD2>
+	<KEYWORD2>breathing-sign-interface</KEYWORD2>
+	<KEYWORD2>Extender_engraver</KEYWORD2>
+	<KEYWORD2>Ambitus_engraver</KEYWORD2>
+	<KEYWORD2>DrumStaff</KEYWORD2>
+	<KEYWORD2>dot-column-interface</KEYWORD2>
+	<KEYWORD2>Lyric_performer</KEYWORD2>
+	<KEYWORD2>enclosing-bracket-interface</KEYWORD2>
+	<KEYWORD2>Trill_spanner_engraver</KEYWORD2>
+	<KEYWORD2>Key_performer</KEYWORD2>
+	<KEYWORD2>Vertically_spaced_contexts_engraver</KEYWORD2>
+	<KEYWORD2>hairpin-interface</KEYWORD2>
+	<KEYWORD2>Hyphen_engraver</KEYWORD2>
+	<KEYWORD2>Dots_engraver</KEYWORD2>
+	<KEYWORD2>multi-measure-rest-interface</KEYWORD2>
+	<KEYWORD2>break-alignment-align-interface</KEYWORD2>
+	<KEYWORD2>Multi_measure_rest_engraver</KEYWORD2>
+	<KEYWORD2>InnerStaffGroup</KEYWORD2>
+	<KEYWORD2>text-spanner-interface</KEYWORD2>
+	<KEYWORD2>Grace_beam_engraver</KEYWORD2>
+	<KEYWORD2>separation-item-interface</KEYWORD2>
+	<KEYWORD2>Balloon_engraver</KEYWORD2>
+	<KEYWORD2>Translator</KEYWORD2>
+	<KEYWORD2>separation-spanner-interface</KEYWORD2>
+	<KEYWORD2>Tweak_engraver</KEYWORD2>
+	<KEYWORD2>Devnull</KEYWORD2>
+	<KEYWORD2>Bend_after_engraver</KEYWORD2>
+	<KEYWORD2>Spacing_engraver</KEYWORD2>
+	<KEYWORD2>Piano_pedal_align_engraver</KEYWORD2>
+	<KEYWORD2>system-start-text-interface</KEYWORD2>
+	<KEYWORD2>parentheses-interface</KEYWORD2>
+	<KEYWORD2>Melisma_translator</KEYWORD2>
+	<KEYWORD2>ChoirStaff</KEYWORD2>
+	<KEYWORD2>Span_bar_engraver</KEYWORD2>
+	<KEYWORD2>Text_engraver</KEYWORD2>
+	<KEYWORD2>GregorianTranscriptionVoice</KEYWORD2>
+	<KEYWORD2>Timing_translator</KEYWORD2>
+	<KEYWORD2>script-interface</KEYWORD2>
+	<KEYWORD2>semi-tie-interface</KEYWORD2>
+	<KEYWORD2>Percent_repeat_engraver</KEYWORD2>
+	<KEYWORD2>Tab_staff_symbol_engraver</KEYWORD2>
+	<KEYWORD2>line-interface</KEYWORD2>
+	<KEYWORD2>rhythmic-grob-interface</KEYWORD2>
+	<KEYWORD2>Dynamic_performer</KEYWORD2>
+	<KEYWORD2>note-spacing-interface</KEYWORD2>
+	<KEYWORD2>spanner-interface</KEYWORD2>
+	<KEYWORD2>break-alignment-interface</KEYWORD2>
+	<KEYWORD2>tuplet-number-interface</KEYWORD2>
+	<KEYWORD2>Rhythmic_column_engraver</KEYWORD2>
+	<KEYWORD2>cluster-beacon-interface</KEYWORD2>
+	<KEYWORD2>horizontal-bracket-interface</KEYWORD2>
+	<KEYWORD2>Mensural_ligature_engraver</KEYWORD2>
+	<KEYWORD2>ChordNames</KEYWORD2>
+	<KEYWORD2>gregorian-ligature-interface</KEYWORD2>
+	<KEYWORD2>Melody_engraver</KEYWORD2>
+	<KEYWORD2>ligature-interface</KEYWORD2>
+	<KEYWORD2>Paper_column_engraver</KEYWORD2>
+	<KEYWORD2>FiguredBass</KEYWORD2>
+	<KEYWORD2>grace-spacing-interface</KEYWORD2>
+	<KEYWORD2>tie-interface</KEYWORD2>
+	<KEYWORD2>New_fingering_engraver</KEYWORD2>
+	<KEYWORD2>Script_engraver</KEYWORD2>
+	<KEYWORD2>Metronome_mark_engraver</KEYWORD2>
+	<KEYWORD2>string-number-interface</KEYWORD2>
+	<KEYWORD2>Hara_kiri_engraver</KEYWORD2>
+	<KEYWORD2>grid-line-interface</KEYWORD2>
+	<KEYWORD2>Skip_event_swallow_translator</KEYWORD2>
+	<KEYWORD2>Auto_beam_engraver</KEYWORD2>
+	<KEYWORD2>spaceable-grob-interface</KEYWORD2>
+	<KEYWORD2>Font_size_engraver</KEYWORD2>
+	<KEYWORD2>figured-bass-continuation-interface</KEYWORD2>
+	<KEYWORD2>semi-tie-column-interface</KEYWORD2>
+	<KEYWORD2>CueVoice</KEYWORD2>
+	<KEYWORD2>Phrasing_slur_engraver</KEYWORD2>
+	<KEYWORD2>InnerChoirStaff</KEYWORD2>
+	<KEYWORD2>Arpeggio_engraver</KEYWORD2>
+	<KEYWORD2>mark-interface</KEYWORD2>
+	<KEYWORD2>VaticanaStaff</KEYWORD2>
+	<KEYWORD2>piano-pedal-bracket-interface</KEYWORD2>
+	<KEYWORD2>beam-interface</KEYWORD2>
+	<KEYWORD2>Note_performer</KEYWORD2>
+	<KEYWORD2>custos-interface</KEYWORD2>
+	<KEYWORD2>percent-repeat-interface</KEYWORD2>
+	<KEYWORD2>time-signature-interface</KEYWORD2>
+	<KEYWORD2>Custos_engraver</KEYWORD2>
+	<KEYWORD2>Part_combine_engraver</KEYWORD2>
+	<KEYWORD2>Piano_pedal_engraver</KEYWORD2>
+	<KEYWORD2>tuplet-bracket-interface</KEYWORD2>
+	<KEYWORD2>Stem_engraver</KEYWORD2>
+	<KEYWORD2>finger-interface</KEYWORD2>
+	<KEYWORD2>note-collision-interface</KEYWORD2>
+	<KEYWORD2>Text_spanner_engraver</KEYWORD2>
+	<KEYWORD2>text-balloon-interface</KEYWORD2>
+	<KEYWORD2>Tie_engraver</KEYWORD2>
+	<KEYWORD2>Figured_bass_position_engraver</KEYWORD2>
+</KEYWORDS>
+<!-- Generated part ended -->
+
+</RULES>
+
+</MODE>

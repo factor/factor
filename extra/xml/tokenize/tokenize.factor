@@ -137,7 +137,7 @@ SYMBOL: ns-stack
     CHAR: > expect ;
 
 : take-cdata ( -- string )
-    "[CDATA[" expect-string "]]>" take-string next ;
+    "[CDATA[" expect-string "]]>" take-string ;
 
 : take-directive ( -- directive )
     CHAR: > take-char <directive> next ;
@@ -171,7 +171,7 @@ SYMBOL: ns-stack
     [ T{ name f "" "version" f } swap at
       [ good-version ] [ <versionless-prolog> throw ] if* ] keep
     [ T{ name f "" "encoding" f } swap at
-      [ "iso-8859-1" ] unless* ] keep
+      "iso-8859-1" or ] keep
     T{ name f "" "standalone" f } swap at
     [ yes/no>bool ] [ f ] if*
     <prolog> ;

@@ -8,7 +8,7 @@ DLL_EXTENSION = .dylib
 ifdef X11
 	LIBS = -lm -framework Foundation $(X11_UI_LIBS)
 else
-    LIBS = -lm -framework Cocoa -framework OpenGL -framework AppKit
+    LIBS = -lm -framework Cocoa -framework AppKit
 endif
 
 LINKER = gcc $(CFLAGS) -dynamiclib -single_module -std=gnu99 \

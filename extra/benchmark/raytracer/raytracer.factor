@@ -2,7 +2,7 @@
 ! http://www.ffconsultancy.com/free/ray_tracer/languages.html
 
 USING: float-arrays compiler generic io io.files kernel math
-math.vectors math.parser namespaces sequences
+math.functions math.vectors math.parser namespaces sequences
 sequences.private words ;
 IN: benchmark.raytracer
 

@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- SQR Mode by Richard F. Ashwell III  -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="!" />
+	</PROPS>
+
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- Normal comments. -->
+		<EOL_SPAN TYPE="COMMENT1">!</EOL_SPAN>
+
+		<!-- Literal String -->	
+		<SPAN TYPE="LABEL" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>	
+
+		<!-- SQR Replacement String -->			
+		<SPAN TYPE="LABEL" NO_LINE_BREAK="TRUE">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>	
+		
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">@</SEQ>
+		<SEQ TYPE="OPERATOR">:=</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		
+		<MARK_FOLLOWING TYPE="LITERAL1">$</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="LITERAL2">#</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="MARKUP">&amp;</MARK_FOLLOWING>
+
+		<KEYWORDS>
+			<!-- Section KeyWords -->
+			<FUNCTION>begin-procedure</FUNCTION> 			 
+			<FUNCTION>end-procedure</FUNCTION>			
+			<FUNCTION>begin-report</FUNCTION>
+			<FUNCTION>end-report</FUNCTION>
+			<FUNCTION>begin-heading</FUNCTION>
+			<FUNCTION>end-heading</FUNCTION>
+			<FUNCTION>begin-setup</FUNCTION>
+			<FUNCTION>end-setup</FUNCTION>
+			<FUNCTION>begin-footing</FUNCTION>
+			<FUNCTION>end-footing</FUNCTION>
+			<FUNCTION>begin-program</FUNCTION>
+			<FUNCTION>end-program</FUNCTION>
+
+			<!-- Block Keywords -->
+			<KEYWORD1>begin-select</KEYWORD1>
+			<KEYWORD1>end-select</KEYWORD1>
+			<KEYWORD1>begin-sql</KEYWORD1>
+			<KEYWORD1>end-sql</KEYWORD1>
+			
+			<!-- SQR Functional Keywords -->
+			<KEYWORD2>add</KEYWORD2> 
+			<KEYWORD2>array-add</KEYWORD2> 
+			<KEYWORD2>array-divide</KEYWORD2> 
+			<KEYWORD2>array-multiply</KEYWORD2> 
+			<KEYWORD2>array-subtract</KEYWORD2> 
+			<KEYWORD2>ask</KEYWORD2>
+			<KEYWORD2>break</KEYWORD2>
+			<KEYWORD2>call</KEYWORD2> 
+			<KEYWORD2>clear-array</KEYWORD2> 
+			<KEYWORD2>close</KEYWORD2> 
+			<KEYWORD2>columns</KEYWORD2> 
+			<KEYWORD2>commit</KEYWORD2> 
+			<KEYWORD2>concat</KEYWORD2> 
+			<KEYWORD2>connect</KEYWORD2> 
+			<KEYWORD2>create-array</KEYWORD2>
+			<KEYWORD2>date-time</KEYWORD2> 
+			<KEYWORD2>display</KEYWORD2> 
+			<KEYWORD2>divide</KEYWORD2> 
+			<KEYWORD2>do</KEYWORD2> 
+			<KEYWORD2>dollar-symbol</KEYWORD2>
+			<KEYWORD2>else</KEYWORD2> 
+			<KEYWORD2>encode</KEYWORD2> 
+			<KEYWORD2>end-evaluate</KEYWORD2> 
+			<KEYWORD2>end-if</KEYWORD2> 
+			<KEYWORD2>end-while</KEYWORD2> 
+			<KEYWORD2>evaluate</KEYWORD2> 
+			<KEYWORD2>execute</KEYWORD2> 
+			<KEYWORD2>extract</KEYWORD2>
+			<KEYWORD2>find</KEYWORD2> 
+			<KEYWORD2>font</KEYWORD2>
+			<KEYWORD2>get</KEYWORD2> 
+			<KEYWORD2>goto</KEYWORD2> 
+			<KEYWORD2>graphic</KEYWORD2>
+			<KEYWORD2>if</KEYWORD2>
+			<KEYWORD2>last-page</KEYWORD2> 
+			<KEYWORD2>let</KEYWORD2> 
+			<KEYWORD2>lookup</KEYWORD2> 
+			<KEYWORD2>lowercase</KEYWORD2>
+			<KEYWORD2>money-symbol</KEYWORD2> 
+			<KEYWORD2>move</KEYWORD2> 
+			<KEYWORD2>multiply</KEYWORD2>
+			<KEYWORD2>new-page</KEYWORD2> 
+			<KEYWORD2>new-report</KEYWORD2> 
+			<KEYWORD2>next-column</KEYWORD2> 
+			<KEYWORD2>next-listing</KEYWORD2> 
+			<KEYWORD2>no-formfeed</KEYWORD2>
+			<KEYWORD2>open</KEYWORD2>
+			<KEYWORD2>page-number</KEYWORD2> 
+			<KEYWORD2>page-size</KEYWORD2> 
+			<KEYWORD2>position</KEYWORD2> 
+			<KEYWORD2>print</KEYWORD2> 
+			<KEYWORD2>print-bar-code</KEYWORD2> 
+			<KEYWORD2>print-chart</KEYWORD2> 
+			<KEYWORD2>print-direct</KEYWORD2> 
+			<KEYWORD2>print-image</KEYWORD2> 
+			<KEYWORD2>printer-deinit</KEYWORD2> 
+			<KEYWORD2>printer-init</KEYWORD2> 
+			<KEYWORD2>put</KEYWORD2>
+			<KEYWORD2>read</KEYWORD2> 
+			<KEYWORD2>rollback</KEYWORD2>
+			<KEYWORD2>show</KEYWORD2> 
+			<KEYWORD2>stop</KEYWORD2> 
+			<KEYWORD2>string</KEYWORD2> 
+			<KEYWORD2>subtract</KEYWORD2>
+			<KEYWORD2>unstring</KEYWORD2> 
+			<KEYWORD2>uppercase</KEYWORD2> 
+			<KEYWORD2>use</KEYWORD2> 
+			<KEYWORD2>use-column</KEYWORD2> 
+			<KEYWORD2>use-printer-type</KEYWORD2> 
+			<KEYWORD2>use-procedure</KEYWORD2> 
+			<KEYWORD2>use-report</KEYWORD2> 
+			<KEYWORD2>use-report</KEYWORD2>
+			<KEYWORD2>while</KEYWORD2> 
+			<KEYWORD2>write</KEYWORD2>
+			<KEYWORD2>to</KEYWORD2>
+
+			<!-- SQL Keywords -->
+ 			<KEYWORD3>from</KEYWORD3>
+			<KEYWORD3>where</KEYWORD3>
+			<KEYWORD3>and</KEYWORD3>
+			<KEYWORD3>between</KEYWORD3>
+			<KEYWORD3>or</KEYWORD3>
+			<KEYWORD3>in</KEYWORD3>
+			
+		</KEYWORDS>
+	</RULES>
+</MODE>

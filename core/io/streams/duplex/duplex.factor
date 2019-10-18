@@ -35,6 +35,9 @@ M: duplex-stream stream-read1
 M: duplex-stream stream-read-until
     duplex-stream-in+ stream-read-until ;
 
+M: duplex-stream stream-read-partial
+    duplex-stream-in+ stream-read-partial ;
+
 M: duplex-stream stream-read
     duplex-stream-in+ stream-read ;
 
@@ -50,17 +53,17 @@ M: duplex-stream stream-nl
 M: duplex-stream stream-format
     duplex-stream-out+ stream-format ;
 
-M: duplex-stream with-stream-style
-    duplex-stream-out+ with-stream-style ;
+M: duplex-stream make-span-stream
+    duplex-stream-out+ make-span-stream ;
 
-M: duplex-stream with-nested-stream
-    duplex-stream-out+ with-nested-stream ;
+M: duplex-stream make-block-stream
+    duplex-stream-out+ make-block-stream ;
+
+M: duplex-stream make-cell-stream
+    duplex-stream-out+ make-cell-stream ;
 
 M: duplex-stream stream-write-table
     duplex-stream-out+ stream-write-table ;
-
-M: duplex-stream make-table-cell
-    duplex-stream-out+ make-table-cell ;
 
 M: duplex-stream stream-close
     #! The output stream is closed first, in case both streams
@@ -69,7 +72,7 @@ M: duplex-stream stream-close
     dup duplex-stream-closed? [
         t over set-duplex-stream-closed?
         [ dup duplex-stream-out stream-close ]
-        [ dup duplex-stream-in stream-close ] cleanup
+        [ dup duplex-stream-in stream-close ] [ ] cleanup
     ] unless drop ;
 
 M: duplex-stream set-timeout

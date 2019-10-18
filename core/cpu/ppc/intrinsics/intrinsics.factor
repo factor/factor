@@ -5,35 +5,91 @@ cpu.ppc.architecture cpu.ppc.allot cpu.architecture kernel
 kernel.private math math.private namespaces sequences words
 generic quotations byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
-sbufs vectors system layouts math.functions math.floats.private
+sbufs vectors system layouts math.floats.private
 classes tuples tuples.private sbufs.private vectors.private
 strings.private slots.private combinators bit-arrays
 float-arrays ;
 IN: cpu.ppc.intrinsics
 
+: %slot-literal-known-tag
+    "val" operand
+    "obj" operand
+    "n" get cells
+    "obj" get operand-tag - ;
+
+: %slot-literal-any-tag
+    "obj" operand "scratch" operand %untag
+    "val" operand "scratch" operand "n" get cells ;
+
+: %slot-any
+    "obj" operand "scratch" operand %untag
+    "n" operand dup 1 SRAWI
+    "scratch" operand "val" operand "n" operand ;
+
 \ slot {
+    ! Slot number is literal and the tag is known
+    {
+        [ %slot-literal-known-tag LWZ ] H{
+            { +input+ { { f "obj" known-tag } { [ small-slot? ] "n" } } }
+            { +scratch+ { { f "val" } } }
+            { +output+ { "val" } }
+        }
+    }
     ! Slot number is literal
     {
-        [
-            "obj" operand "out" operand %untag
-            "out" operand dup "n" get cells LWZ
-        ] H{
+        [ %slot-literal-any-tag LWZ ] H{
             { +input+ { { f "obj" } { [ small-slot? ] "n" } } }
-            { +scratch+ { { f "out" } } }
-            { +output+ { "out" } }
+            { +scratch+ { { f "scratch" } { f "val" } } }
+            { +output+ { "val" } }
         }
     }
     ! Slot number in a register
     {
-        [
-            "obj" operand "untagged" operand %untag
-            "n" operand dup 1 SRAWI
-            "untagged" operand "out" operand "n" operand LWZX
-        ] H{
+        [ %slot-any LWZX ] H{
             { +input+ { { f "obj" } { f "n" } } }
-            { +scratch+ { { f "out" } { f "untagged" } } }
-            { +output+ { "out" } }
+            { +scratch+ { { f "val" } { f "scratch" } } }
+            { +output+ { "val" } }
             { +clobber+ { "n" } }
+        }
+    }
+} define-intrinsics
+
+: load-cards-offset ( dest -- )
+    "cards_offset" f pick %load-dlsym  dup 0 LWZ ;
+
+: %write-barrier ( -- )
+    "val" get operand-immediate? "obj" get fresh-object? or [
+        "obj" operand "scratch" operand card-bits SRWI
+        "val" operand load-cards-offset
+        "scratch" operand dup "val" operand ADD
+        "val" operand "scratch" operand 0 LBZ
+        "val" operand dup card-mark ORI
+        "val" operand "scratch" operand 0 STB
+    ] unless ;
+
+\ set-slot {
+    ! Slot number is literal and tag is known
+    {
+        [ %slot-literal-known-tag STW %write-barrier ] H{
+            { +input+ { { f "val" } { f "obj" known-tag } { [ small-slot? ] "n" } } }
+            { +scratch+ { { f "scratch" } } }
+            { +clobber+ { "val" } }
+        }
+    }
+    ! Slot number is literal
+    {
+        [ %slot-literal-any-tag STW %write-barrier ] H{
+            { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
+            { +scratch+ { { f "scratch" } } }
+            { +clobber+ { "val" } }
+        }
+    }
+    ! Slot number is in a register
+    {
+        [ %slot-any STWX %write-barrier ] H{
+            { +input+ { { f "val" } { f "obj" } { f "n" } } }
+            { +scratch+ { { f "scratch" } } }
+            { +clobber+ { "val" "n" } }
         }
     }
 } define-intrinsics
@@ -50,47 +106,6 @@ IN: cpu.ppc.intrinsics
     { +output+ { "out" } }
     { +clobber+ { "n" } }
 } define-intrinsic
-
-: load-cards-offset ( dest -- )
-    "cards_offset" f pick compile-dlsym  dup 0 LWZ ;
-
-: generate-write-barrier ( -- )
-    "val" operand-immediate? "obj" get fresh-object? or [
-        "scratch" operand dup card-bits SRWI
-        "val" operand load-cards-offset
-        "scratch" operand dup "val" operand ADD
-        "val" operand "scratch" operand 0 LBZ
-        "val" operand dup card-mark ORI
-        "val" operand "scratch" operand 0 STB
-    ] unless ;
-
-\ set-slot {
-    ! Slot number is literal
-    {
-        [
-            "obj" operand "scratch" operand %untag
-            "val" operand "scratch" operand "n" get cells STW
-            generate-write-barrier
-        ] H{
-            { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
-            { +scratch+ { { f "scratch" } } }
-            { +clobber+ { "val" } }
-        }
-    }
-    ! Slot number is in a register
-    {
-        [
-            "obj" operand "scratch" operand %untag
-            "slot" operand dup 1 SRAWI
-            "scratch" operand "val" operand "slot" operand STWX
-            generate-write-barrier
-        ] H{
-            { +input+ { { f "val" } { f "obj" } { f "slot" } } }
-            { +scratch+ { { f "scratch" } } }
-            { +clobber+ { "val" "slot" } }
-        }
-    }
-} define-intrinsics
 
 \ set-char-slot [
     "val" operand dup %untag-fixnum
@@ -359,14 +374,6 @@ IN: cpu.ppc.intrinsics
     { +output+ { "out" } }
 } define-intrinsic
 
-! \ fsqrt [
-!     "y" operand "x" operand FSQRT
-! ] H{
-!     { +input+ { { float "x" } } }
-!     { +scratch+ { { float "y" } } }
-!     { +output+ { "y" } }
-! } define-intrinsic
-
 \ tag [
     "out" operand "in" operand tag-mask get ANDI
     "out" operand dup %tag-fixnum
@@ -377,7 +384,6 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 \ type [
-    "f" define-label
     "end" define-label
     ! Get the tag
     "y" operand "obj" operand tag-mask get ANDI
@@ -388,16 +394,37 @@ IN: cpu.ppc.intrinsics
     ! Jump if the object doesn't store type info in its header
     "end" get BNE
     ! It does store type info in its header
-    ! Is the pointer itself equal to 3? Then its F_TYPE (9).
-    0 "obj" operand object tag-number CMPI
-    "f" get BEQ
-    ! The pointer is not equal to 3. Load the object header.
-    "x" operand "obj" operand object tag-number neg LWZ
-    "x" operand dup %untag
+    "x" operand "obj" operand header-offset LWZ
+    "end" resolve-label
+] H{
+    { +input+ { { f "obj" } } }
+    { +scratch+ { { f "x" } { f "y" } } }
+    { +output+ { "x" } }
+} define-intrinsic
+
+\ class-hash [
+    "end" define-label
+    "tuple" define-label
+    "object" define-label
+    ! Get the tag
+    "y" operand "obj" operand tag-mask get ANDI
+    ! Compare with tuple tag number (2).
+    0 "y" operand tuple tag-number CMPI
+    "tuple" get BEQ
+    ! Compare with object tag number (3).
+    0 "y" operand object tag-number CMPI
+    "object" get BEQ
+    ! Tag the tag
+    "y" operand "x" operand %tag-fixnum
     "end" get B
-    "f" resolve-label
-    ! The pointer is equal to 3. Load F_TYPE (9).
-    f type v>operand "x" operand LI
+    "object" get resolve-label
+    ! Load header type
+    "x" operand "obj" operand header-offset LWZ
+    "end" get B
+    "tuple" get resolve-label
+    ! Load class hash
+    "x" operand "obj" operand tuple-class-offset LWZ
+    "x" operand dup class-hash-offset LWZ
     "end" resolve-label
 ] H{
     { +input+ { { f "obj" } } }
@@ -407,7 +434,7 @@ IN: cpu.ppc.intrinsics
 
 : userenv ( reg -- )
     #! Load the userenv pointer in a register.
-    "userenv" f rot compile-dlsym ;
+    "userenv" f rot %load-dlsym ;
 
 \ getenv [
     "n" operand dup 1 SRAWI
@@ -443,7 +470,7 @@ IN: cpu.ppc.intrinsics
     f v>operand 12 LI
     "n" get 1- [ 12 11 rot 3 + cells STW ] each
     ! Store tagged ptr in reg
-    "tuple" get object %store-tagged
+    "tuple" get tuple %store-tagged
 ] H{
     { +input+ { { f "class" } { [ inline-array? ] "n" } } }
     { +scratch+ { { f "tuple" } } }
@@ -509,7 +536,7 @@ IN: cpu.ppc.intrinsics
     wrapper 2 cells %allot
     "obj" operand 11 1 cells STW
     ! Store tagged ptr in reg
-    "wrapper" get wrapper %store-tagged
+    "wrapper" get object %store-tagged
 ] H{
     { +input+ { { f "obj" } } }
     { +scratch+ { { f "wrapper" } } }
@@ -554,40 +581,41 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 ! Alien intrinsics
+: %alien-accessor ( quot -- )
+    "offset" operand dup %untag-fixnum
+    "offset" operand dup "alien" operand ADD
+    "value" operand "offset" operand 0 roll call ; inline
+
 : alien-integer-get-template
     H{
         { +input+ {
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "output" } } }
-        { +output+ { "output" } }
+        { +scratch+ { { f "value" } } }
+        { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
 
-: %alien-get ( quot -- )
-    "output" get "address" set
-    "offset" operand dup %untag-fixnum
-    "output" operand "alien" operand-class %alien-accessor ;
-
 : %alien-integer-get ( quot -- )
-    %alien-get
-    "output" operand dup %tag-fixnum ; inline
-
-: %alien-integer-set ( quot -- )
-    { "offset" "value" } %untag-fixnums
-    "value" operand "alien" operand-class %alien-accessor ; inline
+    %alien-accessor
+    "value" operand dup %tag-fixnum ; inline
 
 : alien-integer-set-template
     H{
         { +input+ {
             { f "value" fixnum }
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "address" } } }
         { +clobber+ { "value" "offset" } }
     } ;
+
+: %alien-integer-set ( quot -- )
+    "offset" get "value" get = [
+        "value" operand dup %untag-fixnum
+    ] unless
+    %alien-accessor ; inline
 
 : define-alien-integer-intrinsics ( word get-quot word set-quot -- )
     [ %alien-integer-set ] curry
@@ -613,41 +641,55 @@ define-alien-integer-intrinsics
 \ set-alien-signed-2 [ STH ]
 define-alien-integer-intrinsics
 
-: %alien-float-get ( quot -- )
-    "offset" operand dup %untag-fixnum
-    "output" operand "alien" operand-class %alien-accessor ; inline
+\ alien-cell [
+    [ LWZ ] %alien-accessor
+] H{
+    { +input+ {
+        { unboxed-c-ptr "alien" c-ptr }
+        { f "offset" fixnum }
+    } }
+    { +scratch+ { { unboxed-alien "value" } } }
+    { +output+ { "value" } }
+    { +clobber+ { "offset" } }
+} define-intrinsic
+
+\ set-alien-cell [
+    [ STW ] %alien-accessor
+] H{
+    { +input+ {
+        { unboxed-c-ptr "value" pinned-c-ptr }
+        { unboxed-c-ptr "alien" c-ptr }
+        { f "offset" fixnum }
+    } }
+    { +clobber+ { "offset" } }
+} define-intrinsic
 
 : alien-float-get-template
     H{
         { +input+ {
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { float "output" } { f "address" } } }
-        { +output+ { "output" } }
+        { +scratch+ { { float "value" } } }
+        { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
-
-: %alien-float-set ( quot -- )
-    "offset" operand dup %untag-fixnum
-    "value" operand "alien" operand-class %alien-accessor ; inline
 
 : alien-float-set-template
     H{
         { +input+ {
             { float "value" float }
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "address" } } }
         { +clobber+ { "offset" } }
     } ;
 
 : define-alien-float-intrinsics ( word get-quot word set-quot -- )
-    [ %alien-float-set ] curry
+    [ %alien-accessor ] curry
     alien-float-set-template
     define-intrinsic
-    [ %alien-float-get ] curry
+    [ %alien-accessor ] curry
     alien-float-get-template
     define-intrinsic ;
 
@@ -658,8 +700,3 @@ define-alien-float-intrinsics
 \ alien-float [ LFS ]
 \ set-alien-float [ STFS ]
 define-alien-float-intrinsics
-
-\ alien-cell [
-    [ LWZ ] %alien-get
-    "output" get %allot-alien
-] alien-integer-get-template define-intrinsic

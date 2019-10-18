@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes inference inference.dataflow io kernel
 kernel.private math.parser namespaces optimizer prettyprint
-prettyprint.backend sequences words arrays ;
+prettyprint.backend sequences words arrays match macros
+assocs combinators.private ;
 IN: optimizer.debugger
 
 ! A simple tool for turning dataflow IR into quotations, for
@@ -38,8 +39,32 @@ M: comment pprint*
         " r: " swap node-out-r values%
     ] "" make 1 tail ;
 
+MACRO: match-choose ( alist -- )
+    [ [ ] curry ] assoc-map [ match-cond ] curry ;
+
+MATCH-VARS: ?a ?b ?c ;
+
+: pretty-shuffle ( in out -- word/f )
+    2array {
+        { { { ?a } { } } drop }
+        { { { ?a ?b } { } } 2drop }
+        { { { ?a ?b ?c } { } } 3drop }
+        { { { ?a } { ?a ?a } } dup }
+        { { { ?a ?b } { ?a ?b ?a ?b } } 2dup }
+        { { { ?a ?b ?c } { ?a ?b ?c ?a ?b ?c } } 3dup }
+        { { { ?a ?b } { ?a ?b ?a } } over }
+        { { { ?b ?a } { ?a ?b } } swap }
+        { { { ?a ?b ?c } { ?a ?b ?c ?a } } pick }
+        { { { ?a ?b ?c } { ?c ?a ?b } } -rot }
+        { { { ?a ?b ?c } { ?b ?c ?a } } rot }
+        { { { ?a ?b } { ?b } } nip }
+        { _ f }
+    } match-choose ;
+
 M: #shuffle node>quot
-    >r drop t r> dup effect-str "#shuffle: " swap append comment, ;
+    dup node-in-d over node-out-d pretty-shuffle
+    [ , ] [ >r drop t r> ] if*
+    dup effect-str "#shuffle: " swap append comment, ;
 
 : pushed-literals node-out-d [ value-literal ] map ;
 

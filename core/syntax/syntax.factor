@@ -24,6 +24,14 @@ IN: bootstrap.syntax
 
 { "]" "}" ";" } [ define-delimiter ] each
 
+"PRIMITIVE:" [
+    "Primitive definition is not supported" throw
+] define-syntax
+
+"CS{" [
+    "Call stack literals are not supported" throw
+] define-syntax
+
 "!" [ lexer get next-line ] define-syntax
 
 "#!" [ POSTPONE: ! ] define-syntax
@@ -69,7 +77,6 @@ IN: bootstrap.syntax
 "?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
 "F{" [ \ } [ >float-array ] parse-literal ] define-syntax
 "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
-"C{" [ \ } [ first2 rect> ] parse-literal ] define-syntax
 "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
 "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
 
@@ -123,18 +130,24 @@ IN: bootstrap.syntax
     2array r> (save-location)
 ] define-syntax
 
-"UNION:" [ CREATE parse-definition define-union-class ] define-syntax
+"UNION:" [
+    CREATE-CLASS parse-definition define-union-class
+] define-syntax
 
-"MIXIN:" [ CREATE define-mixin-class ] define-syntax
+"MIXIN:" [
+    CREATE-CLASS define-mixin-class
+] define-syntax
 
 "INSTANCE:" [ scan-word scan-word add-mixin-instance ] define-syntax
 
 "PREDICATE:" [
-    scan-word CREATE parse-definition define-predicate-class
+    scan-word
+    CREATE-CLASS
+    parse-definition define-predicate-class
 ] define-syntax
 
 "TUPLE:" [
-    CREATE ";" parse-tokens define-tuple-class
+    CREATE-CLASS ";" parse-tokens define-tuple-class
 ] define-syntax
 
 "C:" [
@@ -151,5 +164,3 @@ IN: bootstrap.syntax
 ] define-syntax
 
 "MAIN:" [ scan-word in get vocab set-vocab-main ] define-syntax
-
-"bootstrap.syntax" forget-vocab

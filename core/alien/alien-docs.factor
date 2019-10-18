@@ -73,16 +73,29 @@ HELP: add-library
 { $examples { $code "\"gif\" \"libgif.so\" \"cdecl\" add-library" } } ;
 
 HELP: alien-invoke-error
-{ $error-description "Thrown when " { $link alien-invoke } " is called in the interpreter.  Words using " { $link alien-invoke } " must be compiled first, and all four inputs to " { $link alien-invoke } " must be literals." } ;
+{ $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
+    { $list
+        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word and then call " { $link recompile } ". See " { $link "compiler" } "." }
+        { "The return type or parameter list references an unknown C type." }
+        { "The symbol or library could not be found." }
+        { "One of the four inputs to " { $link alien-invoke } " is not a literal value. To call functions which are not known at compile-time, use " { $link alien-indirect } "." }
+    }
+} ;
 
 HELP: alien-invoke
 { $values { "..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
 { $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $snippet "\"void\"" } " indicates that no value is to be expected." }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
-{ $errors "Throws an " { $link alien-invoke-error } " if the word calling " { $link alien-invoke } " is not compiled." } ;
+{ $errors "Throws an " { $link alien-invoke-error } " if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler." } ;
 
 HELP: alien-indirect-error
-{ $error-description "Thrown when " { $link alien-indirect } " is called in the interpreter.  Words using " { $link alien-indirect } " must be compiled first, and all three inputs to " { $link alien-indirect } " must be literals." } ;
+{ $error-description "Thrown if the word calling " { $link alien-indirect } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
+    { $list
+        { "This can happen when experimenting with " { $link alien-indirect } " in this listener. To fix the problem, place the " { $link alien-indirect } " call in a word and then call " { $link recompile } ". See " { $link "compiler" } "." }
+        { "The return type or parameter list references an unknown C type." }
+        { "One of the three inputs to " { $link alien-indirect } " is not a literal value." }
+    }
+} ;
 
 HELP: alien-indirect
 { $values { "..." "zero or more objects passed to the C function" } { "funcptr" "a C function pointer" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
@@ -93,7 +106,13 @@ HELP: alien-indirect
 { $errors "Throws an " { $link alien-indirect-error } " if the word calling " { $link alien-indirect } " is not compiled." } ;
 
 HELP: alien-callback-error
-{ $error-description "Thrown when " { $link alien-callback } " is called in the interpreter.  Words using " { $link alien-callback } " must be compiled first, and all three inputs to " { $link alien-callback } " must be literals." } ;
+{ $error-description "Thrown if the word calling " { $link alien-callback } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
+    { $list
+        { "This can happen when experimenting with " { $link alien-callback } " in this listener. To fix the problem, place the " { $link alien-callback } " call in a word and then call " { $link recompile } ". See " { $link "compiler" } "." }
+        { "The return type or parameter list references an unknown C type." }
+        { "One of the four inputs to " { $link alien-callback } " is not a literal value." }
+    }
+} ;
 
 HELP: alien-callback
 { $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" "a quotation" } { "alien" c-ptr } }

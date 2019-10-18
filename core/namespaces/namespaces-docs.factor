@@ -53,7 +53,8 @@ $nl
 "A useful facility for constructing sequences by holding an accumulator sequence in a variable:"
 { $subsection "namespaces-make" }
 "Implementation details your code probably does not care about:"
-{ $subsection "namespaces.private" } ;
+{ $subsection "namespaces.private" }
+"An alternative to dynamic scope is lexical scope. Lexically-scoped values and closures are implemented in the " { $vocab-link "locals" } " vocabulary." ;
 
 ABOUT: "namespaces"
 

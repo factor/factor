@@ -1361,4 +1361,4 @@ SYMBOL: root
 : close-x ( -- ) dpy get XCloseDisplay drop ;
 
 : with-x ( display-string quot -- )
-    >r initialize-x r> [ close-x ] cleanup ;
+    >r initialize-x r> [ close-x ] [ ] cleanup ;

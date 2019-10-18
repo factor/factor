@@ -3,7 +3,7 @@
 USING: assocs kernel io io.files namespaces serialize ;
 IN: store.blob
 
-: (save-blob) [ serialize ] with-serialized ;
+: (save-blob) serialize ;
 
 : save-blob ( obj path -- )
     <file-appender> [ (save-blob) ] with-stream ;
@@ -11,7 +11,7 @@ IN: store.blob
 : (load-blob) ( path -- seq/f )
     dup exists? [
         <file-reader> [
-            [ deserialize-sequence ] with-serialized
+            deserialize-sequence
         ] with-stream
     ] [
         drop f

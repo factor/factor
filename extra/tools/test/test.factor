@@ -18,16 +18,14 @@ SYMBOL: this-test
 : (unit-test) ( what quot -- )
     swap dup . flush this-test set
     [ time ] curry failures get [
-        [
-            this-test get <failure> failures get push
-        ] recover
+        [ this-test get failure ] recover
     ] [
         call
     ] if ;
 
 : unit-test ( output input -- )
     [ 2array ] 2keep [
-        V{ } swap with-datastack swap >vector assert=
+        { } swap with-datastack swap >array assert=
     ] 2curry (unit-test) ;
 
 TUPLE: expected-error ;
@@ -76,4 +74,5 @@ TUPLE: expected-error ;
 
 : test-all ( -- ) "" test ;
 
-: test-changes ( -- ) "" (refresh) run-vocab-tests ;
+: test-changes ( -- )
+    "" to-refresh dupd do-refresh run-vocab-tests ;

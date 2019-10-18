@@ -1,6 +1,6 @@
 
-USING: kernel combinators sequences math math.vectors mortar slot-accessors
-       x x.widgets.wm.root x.widgets.wm.frame ;
+USING: kernel combinators sequences math math.functions math.vectors mortar slot-accessors
+       x x.widgets.wm.root x.widgets.wm.frame combinators.lib ;
 
 IN: factory.commands
 

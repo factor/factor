@@ -1,0 +1,33 @@
+<% USING: io math math.parser namespaces furnace ; %>
+
+<h1>Annotate</h1>
+
+<form method="POST" action="/responder/pastebin/annotate-paste">
+
+<table>
+
+<input type="hidden" name="n" value="<% "n" get number>string write %>" />
+
+<tr>
+<th align="right">Summary:</th>
+<td><input type="TEXT" name="summary" value="" /></td>
+</tr>
+
+<tr>
+<th align="right">Your name:</th>
+<td><input type="TEXT" name="author" value="" /></td>
+</tr>
+
+<tr>
+<th align="right">File type:</th>
+<td><% "modes" render-template %></td>
+</tr>
+
+<tr>
+<th align="right" valign="top">Content:</th>
+<td><textarea rows="24" cols="60" name="contents"></textarea></td>
+</tr>
+</table>
+
+<input type="SUBMIT" value="Annotate" />
+</form>

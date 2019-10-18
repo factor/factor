@@ -1,4 +1,5 @@
-USING: locals math sequences tools.test ;
+USING: locals math sequences tools.test hashtables words kernel
+namespaces ;
 IN: temporary
 
 :: foo | a b | a a ;
@@ -26,18 +27,19 @@ IN: temporary
 
 [ 7 ] [ 4 let-test ] unit-test
 
-: let-test-2
+:: let-test-2 | |
     [let | a [ ] | [let | b [ a ] | a ] ] ;
 
 [ 3 ] [ 3 let-test-2 ] unit-test
 
-: let-test-3
+:: let-test-3 | |
     [let | a [ ] | [let | b [ [ a ] ] | [let | a [ 3 ] | b ] ] ] ;
 
 [ -1 ] [ -1 let-test-3 call ] unit-test
 
 [ 5 ] [
     [let | a [ 3 ] | [wlet | func [ a + ] | 2 func ] ]
+    with-locals
 ] unit-test
 
 :: wlet-test-2 | a b |
@@ -72,7 +74,7 @@ IN: temporary
 
 [ 5 ] [ 2 "q" get call ] unit-test
 
-: write-test-2
+:: write-test-2 | |
     [let | n! [ 0 ] |
         [| i | n i + dup n! ] ] ;
 
@@ -85,3 +87,24 @@ write-test-2 "q" set
 [ 3 ] [ 1 "q" get call ] unit-test
 
 [ 5 ] [ 2 "q" get call ] unit-test
+
+[ 10 20 ]
+[
+    20 10 [| a! | [| b! | a b ] ] with-locals call call
+] unit-test
+
+:: write-test-3 | a! | [| b | b a! ] ;
+
+[ ] [ 1 2 write-test-3 call ] unit-test
+
+:: write-test-4 | x! | [ [let | y! [ 0 ] | f x! ] ] ;
+
+[ ] [ 5 write-test-4 drop ] unit-test
+
+SYMBOL: a
+
+:: use-test | a b c |
+    USE: kernel
+    ;
+
+[ t ] [ a symbol? ] unit-test

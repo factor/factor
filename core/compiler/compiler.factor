@@ -16,9 +16,10 @@ M: object inference-error-major? drop t ;
 
 : begin-batch ( seq -- )
     batch-mode on
-    [
-        "Compiling " % length # " words..." %
-    ] "" make print flush
+    "quiet" get [ drop ] [
+        [ "Compiling " % length # " words..." % ] "" make
+        print flush
+    ] if
     V{ } clone compile-errors set-global ;
 
 : compile-error. ( pair -- )

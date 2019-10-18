@@ -39,7 +39,7 @@ vectors words assocs combinators sorting ;
 
 : score ( full fuzzy -- n )
     dup [
-        [ [ length ] 2apply - 15 swap [-] 3 / ] 2keep
+        [ [ length ] 2apply - 15 swap [-] 3 /f ] 2keep
         runs [
             [ 0 [ pick score-1 max ] reduce nip ] keep
             length * +
@@ -50,7 +50,7 @@ vectors words assocs combinators sorting ;
 
 : rank-completions ( results -- newresults )
     sort-keys <reversed>
-    [ 0 [ first max ] reduce 3 / ] keep
+    [ 0 [ first max ] reduce 3 /f ] keep
     [ first < ] curry* subset
     [ second ] map ;
 

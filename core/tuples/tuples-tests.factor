@@ -125,7 +125,6 @@ TUPLE: yo-momma ;
 [ f ] [ \ yo-momma typemap get values memq? ] unit-test
 
 [ f ] [ \ yo-momma interned? ] unit-test
-[ f ] [ \ yo-momma? interned? ] unit-test
 
 TUPLE: loc-recording ;
 
@@ -212,3 +211,47 @@ SYMBOL: not-a-tuple-class
 ! Missing check
 [ not-a-tuple-class construct-boa ] unit-test-fails
 [ not-a-tuple-class construct-empty ] unit-test-fails
+
+! Reshaping bug. It's only an issue when optimizer compiler is
+! enabled.
+parse-hook get [
+    TUPLE: erg's-reshape-problem a b c ;
+
+    C: <erg's-reshape-problem> erg's-reshape-problem
+
+    [ ] [
+        "IN: temporary TUPLE: erg's-reshape-problem a b c d ;" eval
+    ] unit-test
+
+
+    [ 1 2 ] [
+        ! <erg's-reshape-problem> hasn't been recompiled yet, so
+        ! we just created a tuple using an obsolete layout
+        1 2 3 <erg's-reshape-problem>
+
+        ! that's ok, but... this shouldn't fail:
+        "IN: temporary TUPLE: erg's-reshape-problem a b d c ;" eval
+
+        { erg's-reshape-problem-a erg's-reshape-problem-b }
+        get-slots
+    ] unit-test
+] when
+
+! We want to make sure constructors are recompiled when
+! tuples are reshaped
+: cons-test-1 \ erg's-reshape-problem construct-empty ;
+: cons-test-2 \ erg's-reshape-problem construct-boa ;
+: cons-test-3
+    { erg's-reshape-problem-a }
+    \ erg's-reshape-problem construct ;
+
+"IN: temporary TUPLE: erg's-reshape-problem a b c d e f ;" eval
+
+[ t ] [
+    {
+        <erg's-reshape-problem>
+        cons-test-1
+        cons-test-2
+        cons-test-3
+    } [ changed-words get key? ] all?
+] unit-test

@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien io kernel namespaces core-foundation cocoa.messages
-cocoa cocoa.classes cocoa.runtime sequences threads debugger ;
+cocoa cocoa.classes cocoa.runtime sequences threads debugger
+init inspector kernel.private ;
 IN: cocoa.application
 
 : NSApplicationDelegateReplySuccess 0 ;
@@ -23,9 +24,7 @@ IN: cocoa.application
     -> nextEventMatchingMask:untilDate:inMode:dequeue: ;
 
 : do-event ( app -- ? )
-    [
-        dup next-event [ -> sendEvent: t ] [ drop f ] if*
-    ] with-autorelease-pool ;
+    dup next-event [ -> sendEvent: t ] [ drop f ] if* ;
 
 : do-events ( app -- )
     dup do-event [ do-events ] [ drop ] if ;
@@ -44,11 +43,15 @@ IN: cocoa.application
 : install-delegate ( receiver delegate -- )
     -> alloc -> init -> setDelegate: ;
 
-PREDICATE: kernel-error objc-error second 18 = ;
+TUPLE: objc-error alien reason ;
 
-M: objc-error error. ( error -- )
-    "Objective C exception:" print
-    third -> reason CF>string print ;
+: objc-error ( alien -- * )
+    dup -> reason CF>string \ objc-error construct-boa throw ;
+
+M: objc-error summary ( error -- )
+    drop "Objective C exception" ;
+
+[ [ objc-error ] 19 setenv ] "cocoa.application" add-init-hook
 
 : running.app? ( -- ? )
     #! Test if we're running a .app.

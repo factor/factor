@@ -1,11 +1,10 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic assocs hashtables inference
-inference.backend inference.dataflow kernel kernel.private math
-namespaces sequences words quotations layouts system combinators
-effects classes generator.fixup cpu.architecture
-generator.registers inference.stack optimizer io prettyprint
-threads ;
+USING: arrays assocs classes combinators cpu.architecture
+effects generator.fixup generator.registers generic hashtables
+inference inference.backend inference.dataflow io kernel
+kernel.private layouts math namespaces optimizer prettyprint
+quotations sequences system threads words ;
 IN: generator
 
 SYMBOL: compiled-xts
@@ -20,57 +19,64 @@ SYMBOL: compiled-xts
         { [ t ] [ compiled? ] }
     } cond ;
 
-SYMBOL: compiling
+SYMBOL: compiling-word
 
-SYMBOL: compiled-stack-traces
+SYMBOL: compiling-label
 
-t compiled-stack-traces set-global
+! Label of current word, after prologue, makes recursion faster
+SYMBOL: current-label-start
 
-: init-generator ( word -- )
+SYMBOL: compiled-stack-traces?
+
+t compiled-stack-traces? set-global
+
+: init-generator ( -- )
     V{ } clone literal-table set
     V{ } clone word-table set
-    compiled-stack-traces get
-    [ dup ] [ f ] if
-    literal-table get push
-    compiling set ;
+    compiled-stack-traces? get compiling-word get f ?
+    literal-table get push ;
 
 : generate-1 ( word label node quot -- )
     pick f save-xt [
-        roll init-generator
-        %prologue-later
+        roll compiling-word set
+        pick compiling-label set
+        init-generator
         call
-        literal-table get
-        word-table get
-    ] V{ } make fixup code-format add-compiled-block save-xt ;
+        literal-table get >array
+        word-table get >array
+    ] { } make fixup add-compiled-block save-xt ;
+
+: generate-profiler-prologue ( -- )
+    compiled-stack-traces? get [
+        compiling-word get %profiler-prologue
+    ] when ;
 
 GENERIC: generate-node ( node -- next )
 
 : generate-nodes ( node -- )
     [ node@ generate-node ] iterate-nodes end-basic-block ;
 
-SYMBOL: profiler-prologues
-
-: profiler-prologue ( -- )
-    profiler-prologues get-global [
-        compiling get %profiler-prologue
-    ] when ;
-
 : generate ( word label node -- )
     [
         init-templates
-        profiler-prologue
+        generate-profiler-prologue
+        %save-word-xt
+        %prologue-later
+        current-label-start define-label
+        current-label-start resolve-label
         [ generate-nodes ] with-node-iterator
     ] generate-1 ;
 
 : word-dataflow ( word -- dataflow )
     [
         dup "no-effect" word-prop [ no-effect ] when
-        dup dup add-recursive-state
-        [ specialized-def (dataflow) ] keep
-        finish-word drop
-    ] with-infer ;
+        dup specialized-def over dup 2array 1array infer-quot
+        finish-word
+    ] with-infer nip ;
 
 SYMBOL: compiler-hook
+
+[ ] compiler-hook set-global
 
 SYMBOL: compile-errors
 
@@ -120,7 +126,22 @@ UNION: #terminal
 ! node
 M: node generate-node drop iterate-next ;
 
-! #label
+: %call ( word -- )
+    dup primitive? [ %call-primitive ] [ %call-label ] if ;
+
+: %jump ( word -- )
+    {
+        { [ dup compiling-label get eq? ] [
+            drop current-label-start get %jump-label
+        ] }
+        { [ dup primitive? ] [
+            %epilogue-later %jump-primitive
+        ] }
+        { [ t ] [
+            %epilogue-later %jump-label
+        ] }
+    } cond ;
+
 : generate-call ( label -- next )
     dup (compile)
     end-basic-block
@@ -132,6 +153,7 @@ M: node generate-node drop iterate-next ;
         iterate-next
     ] if ;
 
+! #label
 M: #label generate-node
     dup node-param generate-call >r
     dup #label-word over node-param rot node-child generate
@@ -158,18 +180,24 @@ M: #if generate-node
     with-template
     generate-if ;
 
+: rel-current-word ( class -- )
+    compiling-label get add-word
+    swap rt-xt-profiling rel-fixup ;
+
 ! #dispatch
 : dispatch-branch ( node word -- label )
     gensym [
         rot [
             copy-templates
+            %save-dispatch-xt
+            %prologue-later
             [ generate-nodes ] with-node-iterator
         ] generate-1
     ] keep ;
 
 : dispatch-branches ( node -- syms )
     node-children
-    [ compiling get dispatch-branch ] map
+    [ compiling-word get dispatch-branch ] map
     word-table get push-all ;
 
 : %dispatch ( word-table# -- )
@@ -203,15 +231,13 @@ M: #dispatch generate-node
     "true" resolve-label
     t "if-scratch" get load-literal
     "end" resolve-label
-    "if-scratch" get phantom-d get phantom-push ; inline
+    "if-scratch" get phantom-push ; inline
 
 : define-if>boolean-intrinsics ( word intrinsics -- )
     [
-        first2
         >r [ if>boolean-intrinsic ] curry r>
         { { f "if-scratch" } } +scratch+ associate union
-        2array
-    ] map "intrinsics" set-word-prop ;
+    ] assoc-map "intrinsics" set-word-prop ;
 
 : define-if-intrinsics ( word intrinsics -- )
     [ +input+ associate ] assoc-map
@@ -221,10 +247,8 @@ M: #dispatch generate-node
 : define-if-intrinsic ( word quot inputs -- )
     2array 1array define-if-intrinsics ;
 
-: do-intrinsic ( pair -- ) first2 with-template ;
-
 : do-if-intrinsic ( #call pair -- next )
-    <label> [ swap do-intrinsic ] keep
+    <label> [ swap do-template ] keep
     >r node-successor r> generate-if
     node-successor ;
 
@@ -239,11 +263,12 @@ M: #dispatch generate-node
     ] if ;
 
 M: #call generate-node
+    dup node-input-classes set-operand-classes
     dup find-if-intrinsic [
         do-if-intrinsic
     ] [
         dup find-intrinsic [
-            do-intrinsic iterate-next
+            do-template iterate-next
         ] [
             node-param generate-call
         ] ?if
@@ -253,29 +278,22 @@ M: #call generate-node
 M: #call-label generate-node node-param generate-call ;
 
 ! #push
-UNION: immediate fixnum POSTPONE: f ;
-
 M: #push generate-node
-    node-out-d phantom-d get phantom-append iterate-next ;
+    node-out-d [ value-literal <constant> phantom-push ] each
+    iterate-next ;
 
 ! #shuffle
-: phantom-shuffle ( shuffle -- )
-    [ effect-in length phantom-d get phantom-input ] keep
-    shuffle* phantom-d get phantom-append ;
-
 M: #shuffle generate-node
     node-shuffle phantom-shuffle iterate-next ;
 
 M: #>r generate-node
     node-in-d length
-    phantom-d get phantom-input
-    phantom-r get phantom-append
+    phantom->r
     iterate-next ;
 
 M: #r> generate-node
     node-out-d length
-    phantom-r get phantom-input
-    phantom-d get phantom-append
+    phantom-r>
     iterate-next ;
 
 ! #return
@@ -289,8 +307,11 @@ M: #return generate-node drop end-basic-block %return f ;
 : header-offset object tag-number neg ;
 : float-offset 8 float tag-number - ;
 : string-offset 3 cells object tag-number - ;
-: profile-count-offset 8 cells \ word tag-number - ;
-: alien-offset 2 cells object tag-number - ;
-
-: operand-immediate? ( operand -- ? )
-    operand-class immediate class< ;
+: profile-count-offset 7 cells object tag-number - ;
+: byte-array-offset 2 cells object tag-number - ;
+: alien-offset 3 cells object tag-number - ;
+: underlying-alien-offset cell object tag-number - ;
+: tuple-class-offset 2 cells tuple tag-number - ;
+: class-hash-offset cell object tag-number - ;
+: word-xt-offset 8 cells object tag-number - ;
+: compiled-header-size 8 cells ;

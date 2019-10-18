@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+catalog entry:
+
+<MODE NAME="embperl"		FILE="embperl.xml"
+				FILE_NAME_GLOB="*.epl"/>
+
+sidekick parser entry:
+mode.embperl.sidekick.parser=html
+
+xml completion entry:
+mode.embperl.xml.completion-info=jeditresource:/XML.jar!/xml/completion/html-complete.xml
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="FALSE">
+		<SPAN TYPE="COMMENT2">
+			<BEGIN>[#</BEGIN>
+			<END>#]</END>
+		</SPAN>
+		<!-- output result -->
+		<SPAN DELEGATE="perl::MAIN" TYPE="LITERAL3">
+			<BEGIN>[+</BEGIN>
+			<END>+]</END>
+		</SPAN>
+		<!-- execute code -->
+		<SPAN DELEGATE="perl::MAIN" TYPE="LITERAL3">
+			<BEGIN>[-</BEGIN>
+			<END>-]</END>
+		</SPAN>
+		<!-- control flow -->
+		<SPAN DELEGATE="perl::MAIN" TYPE="LITERAL3">
+			<BEGIN>[$</BEGIN>
+			<END>$]</END>
+		</SPAN>
+		<!-- execute once -->
+		<SPAN DELEGATE="perl::MAIN" TYPE="LITERAL3">
+			<BEGIN>[!</BEGIN>
+			<END>!]</END>
+		</SPAN>
+		<IMPORT DELEGATE="html::MAIN"/>
+	</RULES>
+</MODE>
+

@@ -4,18 +4,19 @@ USING: continuations continuations.private kernel
 kernel.private sequences assocs namespaces namespaces.private ;
 IN: init
 
-SYMBOL: startup-hooks
+SYMBOL: init-hooks
 
-startup-hooks global [ drop V{ } clone ] cache drop
+init-hooks global [ drop V{ } clone ] cache drop
 
-: do-startup-hooks ( -- )
-    startup-hooks get [ nip call ] assoc-each ;
+: do-init-hooks ( -- )
+    init-hooks get [ nip call ] assoc-each ;
 
-: add-startup-hook ( quot name -- )
-    over call startup-hooks get set-at ;
+: add-init-hook ( quot name -- )
+    dup init-hooks get at [ over call ] unless
+    init-hooks get set-at ;
 
 : boot ( -- ) init-namespaces init-error-handler ;
 
-: boot-quot ( -- quot ) 8 getenv ;
+: boot-quot ( -- quot ) 20 getenv ;
 
-: set-boot-quot ( quot -- ) 8 setenv ;
+: set-boot-quot ( quot -- ) 20 setenv ;

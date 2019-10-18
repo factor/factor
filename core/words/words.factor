@@ -10,6 +10,10 @@ vocabs ;
 
 : set-word ( word -- ) \ word set-global ;
 
+GENERIC: execute ( word -- )
+
+M: word execute (execute) ;
+
 ! Used by the compiler
 SYMBOL: changed-words
 
@@ -27,19 +31,19 @@ M: word <=>
 
 M: word definition drop f ;
 
-PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
+PREDICATE: word undefined ( obj -- ? ) word-def not ;
 M: undefined definer drop \ DEFER: f ;
 
-PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
+PREDICATE: word compound  ( obj -- ? ) word-def quotation? ;
 
 M: compound definer drop \ : \ ; ;
 
 M: compound definition word-def ;
 
-PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;
+PREDICATE: word primitive ( obj -- ? ) word-def fixnum? ;
 M: primitive definer drop \ PRIMITIVE: f ;
 
-PREDICATE: word symbol    ( obj -- ? ) word-primitive 2 = ;
+PREDICATE: word symbol    ( obj -- ? ) word-def t eq? ;
 M: symbol definer drop \ SYMBOL: f ;
 
 : word-prop ( word name -- value ) swap word-props at ;
@@ -51,6 +55,8 @@ M: symbol definer drop \ SYMBOL: f ;
     over
     [ pick word-props ?set-at swap set-word-props ]
     [ nip remove-word-prop ] if ;
+
+: reset-props ( word seq -- ) [ remove-word-prop ] curry* each ;
 
 : lookup ( name vocab -- word ) vocab-words at ;
 
@@ -77,7 +83,7 @@ M: interned (quot-uses) dupd set-at ;
 
 M: array (quot-uses) seq-uses ;
 
-M: quotation (quot-uses) seq-uses ;
+M: callable (quot-uses) seq-uses ;
 
 M: wrapper (quot-uses) >r wrapped r> (quot-uses) ;
 
@@ -87,34 +93,36 @@ M: wrapper (quot-uses) >r wrapped r> (quot-uses) ;
 M: word uses ( word -- seq )
     word-def quot-uses keys ;
 
-: reset-props ( word seq -- ) [ remove-word-prop ] curry* each ;
-
-M: compound unxref* ( word -- )
+M: compound redefined* ( word -- )
     dup changed-word
     { "inferred-effect" "base-case" "no-effect" } reset-props ;
 
-: definition-changed? ( word def primitive -- ? )
-    pick word-primitive = >r swap word-def = r> and not ;
+<PRIVATE
 
-: define ( word def primitive -- )
-    3dup definition-changed? [
-        pick unxref
-        pick set-word-primitive
+: definition-changed? ( word def -- ? )
+    swap word-def = not ;
+
+: define ( word def -- )
+    2dup definition-changed? [
+        over redefined
+        over unxref
         over set-word-def
         dup update-xt
         dup word-vocabulary [
             dup changed-word dup xref
         ] when drop
     ] [
-        3drop
+        2drop
     ] if ;
 
-: define-symbol ( word -- ) dup 2 define ;
+PRIVATE>
+
+: define-symbol ( word -- ) t define ;
 
 : intern-symbol ( word -- )
     dup undefined? [ define-symbol ] [ drop ] if ;
 
-: define-compound ( word def -- ) 1 define ;
+: define-compound ( word def -- ) [ ] like define ;
 
 : define-declared ( word def effect -- )
     pick swap "declared-effect" set-word-prop
@@ -193,7 +201,6 @@ M: word (forget-word)
     reveal ;
 
 : forget-word ( word -- )
-    dup f "methods" set-word-prop
     dup delete-xref
     dup unchanged-word
     (forget-word) ;

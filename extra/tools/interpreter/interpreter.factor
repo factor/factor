@@ -1,177 +1,116 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic io kernel kernel.private math
-namespaces prettyprint sequences strings threads vectors words
-hashtables quotations assocs combinators splitting
-namespaces.private classes continuations continuations.private ;
+USING: arrays assocs classes combinators combinators.private
+continuations continuations.private generic hashtables io kernel
+kernel.private math namespaces namespaces.private prettyprint
+quotations sequences splitting strings threads vectors words ;
 IN: tools.interpreter
 
-SYMBOL: meta-interp
+TUPLE: interpreter continuation ;
 
-SYMBOL: callframe
-SYMBOL: callframe-scan
+: <interpreter> interpreter construct-empty ;
 
-! Meta-stacks;
-: meta-d ( -- seq ) meta-interp get continuation-data ;
-: push-d ( obj -- ) meta-d push ;
-: pop-d  ( -- obj ) meta-d pop ;
-: peek-d ( -- obj ) meta-d peek ;
-
-: meta-r ( -- seq ) meta-interp get continuation-retain ;
-: push-r ( obj -- ) meta-r push ;
-: pop-r  ( -- obj ) meta-r pop ;
-: peek-r ( -- obj ) meta-r peek ;
-
-: meta-c ( -- seq ) meta-interp get continuation-call ;
-: push-c ( obj -- ) meta-c push ;
-: pop-c  ( -- obj ) meta-c pop ;
-: peek-c ( -- obj ) meta-c peek ;
-
-! Hook
-SYMBOL: break-hook
-
-: (meta-call) ( quot -- )
-    callframe set 0 callframe-scan set ;
-
-! Callframe.
-
-: break ( -- )
-    continuation walker-hook
-    [ continue-with ] [ break-hook get call ] if* ;
-
-: remove-breaks \ break swap remove ;
-
-: up ( -- )
-    pop-c drop
-    pop-c pop-c cut [ remove-breaks ] 2apply
-    >r dup length callframe-scan set r> append
-    callframe set ;
-
-: done-cf? ( -- ? ) callframe-scan get callframe get length >= ;
-
-: done? ( -- ? ) done-cf? meta-c empty? and ;
-
-: reset-interpreter ( -- )
-    meta-interp off f (meta-call) ;
-
-: (save-callframe) ( -- )
-    callframe get push-c
-    callframe-scan get push-c
-    callframe get length push-c ;
-
-: save-callframe ( -- )
-    done-cf? [ (save-callframe) ] unless ;
-
-GENERIC: meta-call ( quot -- )
-
-M: f meta-call drop ;
-
-M: quotation meta-call save-callframe (meta-call) ;
-
-M: curry meta-call
-    dup curry-obj push-d curry-quot meta-call ;
-
-: meta-swap ( -- )
-    meta-d [ length 1- dup 1- ] keep exchange ;
-
-GENERIC: restore ( obj -- )
-
-M: continuation restore
-    clone meta-interp set
-    meta-c empty? [ f (meta-call) ] [ up ] if ;
-
-M: pair restore
-    first2 restore push-d meta-swap ;
+GENERIC# restore 1 ( obj interpreter -- )
 
 M: f restore
-    drop reset-interpreter ;
+    set-interpreter-continuation ;
 
-: <callframe> ( quot scan -- seq )
-    >r >quotation r> over length 3array >vector ;
+M: continuation restore
+    >r clone r> set-interpreter-continuation ;
 
-: <breakpoint> ( break quot scan -- callframe )
-    >r cut [ break ] swap 3append r> <callframe> ;
+: with-interpreter-datastack ( quot interpreter -- )
+    interpreter-continuation [
+        continuation-data
+        swap with-datastack
+    ] keep set-continuation-data ; inline
 
-: step-to ( n -- )
-    callframe get callframe-scan get <breakpoint>
-    meta-c push-all
-    [ set-walker-hook meta-interp get (continue) ] callcc1
-    restore ;
+M: pair restore
+    >r first2 r> [ restore ] keep
+    >r [ nip f ] curry r> with-interpreter-datastack ;
 
-! The interpreter loses object identity of the name and catch
-! stacks -- they are copied after each step -- so we execute
-! these atomically and don't allow stepping into these words
-{ >n >c c> rethrow continue continue-with continuation
-(continue) (continue-with) }
-[ t "no-meta-word" set-word-prop ] each
+<PRIVATE
 
-\ call [ pop-d meta-call ] "meta-word" set-word-prop
-\ execute [ pop-d 1quotation meta-call ] "meta-word" set-word-prop
-\ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] "meta-word" set-word-prop
-\ dispatch [ pop-d pop-d swap nth meta-call ] "meta-word" set-word-prop
+: (step-into-call) \ break add* call ;
 
-! Time travel
-SYMBOL: meta-history
+: (step-into-if) ? (step-into-call) ;
 
-: save-interp ( -- )
-    meta-history get [
-        [
-            callframe [ ] change
-            callframe-scan [ ] change
-            meta-interp [ clone ] change
-        ] H{ } make-assoc swap push
-    ] when* ;
+: (step-into-dispatch)
+    nth (step-into-call) ;
 
-: restore-interp ( ns -- )
-    { callframe callframe-scan }
-    [ dup pick at swap set ] each
-    meta-interp swap at clone meta-interp set ;
-
-: advance ( -- ) callframe-scan inc ;
-
-: (next) callframe-scan get callframe get nth ;
-
-: next ( quot -- )
-    save-interp {
-        { [ done? ] [ drop [ ] (meta-call) ] }
-        { [ done-cf? ] [ drop up ] }
-        { [ >r (next) r> call ] [ ] }
-        { [ t ] [ callframe-scan get 1+ step-to ] }
-    } cond ; inline
-
-GENERIC: (step) ( obj -- ? )
-
-M: wrapper (step) advance wrapped push-d t ;
-
-M: object (step) advance push-d t ;
-
-M: word (step) drop f ;
-
-: step ( -- ) [ (step) ] next ;
-
-: (step-in) ( word -- ? )
-    dup "meta-word" word-prop [
-        advance call t
+: (step-into-execute) ( word -- )
+    dup "step-into" word-prop [
+        call
     ] [
-        dup "no-meta-word" word-prop not over compound? and [
-            advance word-def meta-call t
+        dup compound? [
+            word-def (step-into-call)
         ] [
-            drop f
+            execute break
         ] if
     ] ?if ;
 
-: step-in ( -- )
-    [ dup word? [ (step-in) ] [ (step) ] if ] next ;
+: (step-into-continuation)
+    continuation callstack over set-continuation-call break ;
 
-: step-out ( -- )
-    save-interp callframe get length step-to ;
+M: word (step-into) (step-into-execute) ;
 
-: step-back ( -- )
-    meta-history get dup empty?
-    [ drop ] [ pop restore-interp ] if ;
+{
+    { call [ (step-into-call) ] }
+    { (throw) [ (step-into-call) ] }
+    { execute [ (step-into-execute) ] }
+    { if [ (step-into-if) ] }
+    { dispatch [ (step-into-dispatch) ] }
+    { continuation [ (step-into-continuation) ] }
+} [ "step-into" set-word-prop ] assoc-each
 
-: step-all ( -- )
-    save-callframe meta-interp get schedule-thread ;
+{
+    >n ndrop >c c>
+    continue continue-with
+    (continue-with) stop
+} [
+    dup [ execute break ] curry
+    "step-into" set-word-prop
+] each
 
-: abandon ( -- )
-    [ "Single-stepping abandoned" throw ] meta-call step-all ;
+\ break [ break ] "step-into" set-word-prop
+
+! Stepping
+: change-innermost-frame ( quot interpreter -- )
+    interpreter-continuation [
+        continuation-call clone
+        [
+            dup innermost-frame-scan 1+
+            swap innermost-frame-quot
+            rot call
+        ] keep
+        [ set-innermost-frame-quot ] keep
+    ] keep set-continuation-call ; inline
+
+: (step) ( interpreter quot -- )
+    swap
+    [ change-innermost-frame ] keep
+    [ interpreter-continuation with-walker-hook ] keep
+    restore ;
+
+PRIVATE>
+
+: step ( interpreter -- )
+    [
+        2dup nth \ break = [
+            nip
+        ] [
+            swap 1+ cut [ break ] swap 3append
+        ] if
+    ] (step) ;
+
+: step-out ( interpreter -- )
+    [ nip \ break add ] (step) ;
+
+: step-into ( interpreter -- )
+    [
+        swap cut [
+            swap % unclip literalize , \ (step-into) , %
+        ] [ ] make
+    ] (step) ;
+
+: step-all ( interpreter -- )
+    interpreter-continuation [ (continue) ] curry in-thread ;

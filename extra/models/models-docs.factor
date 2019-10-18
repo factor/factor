@@ -45,7 +45,7 @@ HELP: deactivate-model
 { $warning "Calls to " { $link activate-model } " and " { $link deactivate-model } " should be balanced to keep the reference counting consistent, otherwise " { $link model-changed } " might be called at the wrong time or not at all." } ;
 
 HELP: model-changed
-{ $values { "observer" object } }
+{ $values { "model" model } { "observer" object } }
 { $contract "Called to notify observers of a model that the model value has changed as a result of a call to " { $link set-model } ". Observers can be registered with " { $link add-connection } "." } ;
 
 { add-connection remove-connection model-changed } related-words
@@ -83,7 +83,7 @@ HELP: filter
 { $examples
     "The following code displays a label showing the result of applying " { $link sq } " to the value 5:"
     { $code
-        "USING: models gadgets-labels gadgets-panes ;"
+        "USING: models ui.gadgets.labels ui.gadgets.panes ;"
         "5 <model> [ sq ] <filter> [ number>string ] <filter>"
         "<label-control> gadget."
     }
@@ -106,7 +106,7 @@ $nl
         ": <funny-slider> <x-slider> 100 over set-slider-max ;"
         "<funny-slider> <funny-slider> 2array"
         "dup make-pile gadget."
-        "dup [ control-model ] map <compose> [ unparse ] <filter>"
+        "dup [ gadget-model ] map <compose> [ unparse ] <filter>"
         "<label-control> gadget."
     }
 } ;
@@ -142,11 +142,11 @@ HELP: delay
 { $examples
     "The following code displays a sliders and a label which is updated half a second after the slider stops changing:"
     { $code
-        "USING: models gadgets-labels gadgets-sliders gadgets-panes ;"
+        "USING: models ui.gadgets.labels ui.gadgets.sliders ui.gadgets.panes ;"
         ": <funny-slider>"
         "    0 0 0 100 <range> <x-slider> 500 over set-slider-max ;"
         "<funny-slider> dup gadget."
-        "control-model 500 <delay> [ number>string ] <filter>"
+        "gadget-model 500 <delay> [ number>string ] <filter>"
         "<label-control> gadget."
     }
 } ;

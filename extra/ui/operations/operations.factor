@@ -12,8 +12,12 @@ SYMBOL: +secondary+
 TUPLE: operation predicate command translator hook listener? ;
 
 : <operation> ( predicate command -- operation )
-    { set-operation-predicate set-operation-command }
-    operation construct ;
+    [ ] [ ] {
+        set-operation-predicate
+        set-operation-command
+        set-operation-translator
+        set-operation-hook
+    } operation construct ;
 
 PREDICATE: operation listener-operation
     dup operation-command listener-command?

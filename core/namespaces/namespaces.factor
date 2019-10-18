@@ -7,7 +7,7 @@ IN: namespaces
 <PRIVATE
 
 : namestack* ( -- namestack )
-    3 getenv { vector } declare ; inline
+    0 getenv { vector } declare ; inline
 
 : >n ( namespace -- ) namestack* push ;
 : ndrop ( -- ) namestack* pop* ;
@@ -16,8 +16,8 @@ PRIVATE>
 
 : namespace ( -- namespace ) namestack* peek ;
 : namestack ( -- namestack ) namestack* clone ; inline
-: set-namestack ( namestack -- ) >vector 3 setenv ; inline
-: global ( -- g ) 4 getenv { hashtable } declare ; inline
+: set-namestack ( namestack -- ) >vector 0 setenv ; inline
+: global ( -- g ) 21 getenv { hashtable } declare ; inline
 : init-namespaces ( -- ) global 1array set-namestack ;
 : get ( variable -- value ) namestack* assoc-stack ; flushable
 : set ( value variable -- ) namespace set-at ;
@@ -29,7 +29,7 @@ PRIVATE>
 : change ( variable quot -- )
     >r dup get r> rot slip set ; inline
 
-: +@ ( n variable -- ) [ [ 0 ] unless* + ] change ;
+: +@ ( n variable -- ) [ 0 or + ] change ;
 
 : inc ( variable -- ) 1 swap +@ ; inline
 

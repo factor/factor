@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays hashtables io io.streams.string kernel math
-math.vectors math.parser
-namespaces sequences strings tuples system ;
+math.vectors math.functions math.parser namespaces sequences
+strings tuples system debugger ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -102,6 +102,7 @@ SYMBOL: m
 : hours ( n -- dt ) zero-dt [ set-dt-hour ] keep ;
 : minutes ( n -- dt ) zero-dt [ set-dt-minute ] keep ;
 : seconds ( n -- dt ) zero-dt [ set-dt-second ] keep ;
+: milliseconds ( n -- dt ) 1000 /f zero-dt [ set-dt-second ] keep ;
 
 : julian-day-number>timestamp ( n -- timestamp )
     julian-day-number>date 0 0 0 0 <timestamp> ;
@@ -192,6 +193,7 @@ M: number +second ( timestamp n -- timestamp )
 : dt>hours ( dt -- x ) dt>years 8765.82 * ;
 : dt>minutes ( dt -- x ) dt>years 525949.2 * ;
 : dt>seconds ( dt -- x ) dt>years 31556952 * ;
+: dt>milliseconds ( dt -- x ) dt>years 31556952000 * ;
 
 : convert-timezone ( timestamp n -- timestamp )
     [ over timestamp-gmt-offset - hours +dt ] keep
@@ -203,7 +205,7 @@ M: number +second ( timestamp n -- timestamp )
 : >gmt ( timestamp -- timestamp )
     0 convert-timezone ;
 
-: compare-timestamps ( tuple tuple -- n )
+M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
 : timestamp- ( timestamp timestamp -- seconds )
@@ -314,7 +316,28 @@ M: number +second ( timestamp n -- timestamp )
 : timestamp>rfc3339 ( timestamp -- str )
     >gmt [
         (timestamp>rfc3339)
-     ] string-out ;
+    ] string-out ;
+
+: expect read1 assert= ;
+
+: (rfc3339>timestamp) ( -- timestamp )
+    4 read string>number ! year
+    CHAR: - expect
+    2 read string>number ! month
+    CHAR: - expect
+    2 read string>number ! day
+    CHAR: T expect
+    2 read string>number ! hour
+    CHAR: : expect
+    2 read string>number ! minute
+    CHAR: : expect
+    2 read string>number ! second
+    0 <timestamp> ;
+
+: rfc3339>timestamp ( str -- timestamp )
+    [
+        (rfc3339>timestamp)
+    ] string-in ;
 
 : file-time-string ( timestamp -- string )
     [

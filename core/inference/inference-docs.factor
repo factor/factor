@@ -70,7 +70,8 @@ $nl
 "This property can hold a quotation to be called when the stack effect of a call to this word is being inferred. This quotation can access all internal state of the stack effect inferencer, such as the known literals on the data stack."
 { $subsection pop-literal }
 { $subsection infer-quot }
-{ $subsection infer-quot-value } ;
+{ $subsection infer-quot-value }
+"The " { $vocab-link "macros" } " vocabulary defines some nice syntax sugar which makes compiler transforms easier to work with." ;
 
 ARTICLE: "inference" "Stack effect inference"
 "The stack effect inference tool is used to check correctness of code before it is run. It is also used by the compiler to build a dataflow graph on which optimizations can be performed. Only words for which a stack effect can be inferred will compile."

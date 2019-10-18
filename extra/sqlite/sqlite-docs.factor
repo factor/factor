@@ -1,6 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help sqlite help.syntax help.markup ;
+IN: sqlite
 
 HELP: sqlite-open 
 { $values { "filename" "path to sqlite database" } 

@@ -4,7 +4,7 @@ USING: alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
 cpu.x86.allot cpu.architecture kernel kernel.private math
 namespaces sequences generator.registers generator.fixup system
-alien ;
+alien alien.compiler alien.structs slots splitting ;
 IN: cpu.x86.64
 
 PREDICATE: x86-backend amd64-backend
@@ -13,11 +13,13 @@ PREDICATE: x86-backend amd64-backend
 M: amd64-backend ds-reg R14 ;
 M: amd64-backend rs-reg R15 ;
 M: amd64-backend stack-reg RSP ;
+M: amd64-backend xt-reg RCX ;
+M: amd64-backend stack-save-reg RSI ;
 
-M: temp-reg v>operand drop R11 ;
+M: temp-reg v>operand drop RBX ;
 
 M: int-regs return-reg drop RAX ;
-M: int-regs vregs drop { RAX RCX RDX RSI RDI RBP R8 R9 R10 } ;
+M: int-regs vregs drop { RAX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 R13 } ;
 M: int-regs param-regs drop { RDI RSI RDX RCX R8 R9 } ;
 
 M: float-regs return-reg drop XMM0 ;
@@ -37,9 +39,6 @@ M: amd64-backend address-operand ( address -- operand )
     #! This word can only be called right before a subroutine
     #! call, where all vregs have been flushed anyway.
     temp-reg v>operand [ swap MOV ] keep ;
-
-: compile-c-call ( symbol dll -- )
-    0 address-operand >r rc-absolute-cell rel-dlsym r> CALL ;
 
 M: amd64-backend fixnum>slot@ drop ;
 
@@ -63,7 +62,7 @@ M: amd64-backend %prepare-unbox ( -- )
 
 M: amd64-backend %unbox ( n reg-class func -- )
     ! Call the unboxer
-    f compile-c-call
+    f %alien-invoke
     ! Store the return value on the C stack
     over [ [ return-reg ] keep %save-param-reg ] [ 2drop ] if ;
 
@@ -72,13 +71,13 @@ M: amd64-backend %unbox-long-long ( n func -- )
 
 M: amd64-backend %unbox-struct-1 ( -- )
     #! Alien must be in RDI.
-    "alien_offset" f compile-c-call
+    "alien_offset" f %alien-invoke
     ! Load first cell
     RAX RAX [] MOV ;
 
 M: amd64-backend %unbox-struct-2 ( -- )
     #! Alien must be in RDI.
-    "alien_offset" f compile-c-call
+    "alien_offset" f %alien-invoke
     ! Load second cell
     RDX RAX cell [+] MOV
     ! Load first cell
@@ -91,7 +90,7 @@ M: amd64-backend %unbox-large-struct ( n size -- )
     ! Load structure size
     RDX swap MOV
     ! Copy the struct to the C stack
-    "to_value_struct" f compile-c-call ;
+    "to_value_struct" f %alien-invoke ;
 
 : load-return-value ( reg-class -- )
     0 over param-reg swap return-reg
@@ -103,7 +102,7 @@ M: amd64-backend %box ( n reg-class func -- )
     ] [
         swap load-return-value
     ] if*
-    f compile-c-call ;
+    f %alien-invoke ;
 
 M: amd64-backend %box-long-long ( n func -- )
     T{ int-regs } swap %box ;
@@ -115,7 +114,7 @@ M: amd64-backend %box-small-struct ( size -- )
     RDI RAX MOV
     RSI RDX MOV
     RDX swap MOV
-    "box_small_struct" f compile-c-call ;
+    "box_small_struct" f %alien-invoke ;
 
 M: amd64-backend %box-large-struct ( n size -- )
     ! Struct size is parameter 2
@@ -123,39 +122,37 @@ M: amd64-backend %box-large-struct ( n size -- )
     ! Compute destination address
     swap struct-return@ RDI RSP rot [+] LEA
     ! Copy the struct from the C stack
-    "box_value_struct" f compile-c-call ;
+    "box_value_struct" f %alien-invoke ;
 
 M: amd64-backend %prepare-box-struct ( size -- )
     ! Compute target address for value struct return
     RAX RSP rot f struct-return@ [+] LEA
     RSP 0 [+] RAX MOV ;
 
-: reset-sse RAX RAX XOR ;
+M: amd64-backend %prepare-var-args RAX RAX XOR ;
 
 M: amd64-backend %alien-invoke ( symbol dll -- )
-    reset-sse compile-c-call ;
-
-: temp@ stack-reg stack-frame* cell - [+] ;
+    0 address-operand >r rc-absolute-cell rel-dlsym r> CALL ;
 
 M: amd64-backend %prepare-alien-indirect ( -- )
-    "unbox_alien" f compile-c-call
-    temp@ RAX MOV ;
+    "unbox_alien" f %alien-invoke
+    cell temp@ RAX MOV ;
 
 M: amd64-backend %alien-indirect ( -- )
-    reset-sse temp@ CALL ;
+    cell temp@ CALL ;
 
 M: amd64-backend %alien-callback ( quot -- )
-    RDI load-indirect "run_callback" f compile-c-call ;
+    RDI load-indirect "c_to_factor" f %alien-invoke ;
 
 M: amd64-backend %callback-value ( ctype -- )
     ! Save top of data stack
     %prepare-unbox
     ! Put former top of data stack in RDI
-    temp@ RDI MOV
+    cell temp@ RDI MOV
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Put former top of data stack in RDI
-    RDI temp@ MOV
+    RDI cell temp@ MOV
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
@@ -174,3 +171,34 @@ USE: cpu.x86.intrinsics
 \ set-alien-signed-4 small-reg-32 define-setter
 
 T{ x86-backend f 8 } compiler-backend set-global
+
+! The ABI for passing structs by value is pretty messed up
+"void*" c-type clone "__stack_value" define-primitive-type
+T{ stack-params } "__stack_value" c-type set-c-type-reg-class
+
+: struct-types&offset ( struct-type -- pairs )
+    struct-type-fields [
+        dup slot-spec-type swap slot-spec-offset 2array
+    ] map ;
+
+: split-struct ( pairs -- seq )
+    [
+        [ first2 8 mod zero? [ t , ] when , ] each
+    ] { } make { t } split [ empty? not ] subset ;
+
+: flatten-large-struct ( type -- )
+    heap-size cell align
+    cell /i "__stack_value" c-type <repetition> % ;
+
+M: struct-type flatten-value-type ( type -- seq )
+    dup heap-size 16 > [
+        flatten-large-struct
+    ] [
+        struct-types&offset split-struct [
+            [ c-type c-type-reg-class ] map
+            T{ int-regs } swap member?
+            "void*" "double" ? c-type ,
+        ] each
+    ] if ;
+
+12 set-profiler-prologues

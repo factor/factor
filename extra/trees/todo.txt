@@ -1,0 +1,2 @@
+- Make trees.splay use the same tree protocol as trees.binary and trees.avl
+- Make all trees follow the assoc protocol

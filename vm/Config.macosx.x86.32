@@ -1,0 +1,2 @@
+include vm/Config.macosx
+include vm/Config.x86.32

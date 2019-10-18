@@ -8,7 +8,9 @@ TUPLE: slate action dim graft ungraft ;
 : <slate> ( action -- slate )
   slate construct-gadget
   tuck set-slate-action
-  { 100 100 } over set-slate-dim ;
+  { 100 100 } over set-slate-dim
+  [ ] over set-slate-graft
+  [ ] over set-slate-ungraft ;
 
 M: slate pref-dim* ( slate -- dim ) slate-dim ;
 

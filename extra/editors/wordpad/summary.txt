@@ -1,0 +1,1 @@
+Wordpad editor integration

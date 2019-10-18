@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: ui.gadgets.viewports
-USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.controls
+USING: arrays ui.gadgets ui.gadgets.borders
 kernel math namespaces sequences models math.vectors ;
 
 : viewport-gap { 3 3 } ; inline
@@ -16,8 +16,7 @@ TUPLE: viewport ;
 : <viewport> ( content model -- viewport )
     <gadget> viewport construct-control
     t over set-gadget-clipped?
-    [ add-gadget ] keep
-    [ model-changed ] keep ;
+    [ add-gadget ] keep ;
 
 M: viewport layout*
     dup rect-dim viewport-gap 2 v*n v-
@@ -30,9 +29,10 @@ M: viewport focusable-child*
 M: viewport pref-dim* viewport-dim ;
 
 : scroller-value ( scroller -- loc )
-    control-model range-value [ >fixnum ] map ;
+    gadget-model range-value [ >fixnum ] map ;
 
 M: viewport model-changed
+    nip
     dup relayout-1
     dup scroller-value
     vneg viewport-gap v+

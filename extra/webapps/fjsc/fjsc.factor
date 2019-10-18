@@ -2,24 +2,24 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel furnace fjsc  parser-combinators namespaces
-       lazy-lists io io.files furnace.validator sequences 
-       http.client http.server http.server.responders 
-       http.server.responders.file ;
+       lazy-lists io io.files furnace.validator sequences
+       http.client http.server http.server.responders
+       webapps.file html ;
 IN: webapps.fjsc
 
 : compile ( code -- )
   #! Compile the factor code as a string, outputting the http
   #! response containing the javascript.
   serving-text
-  'expression' parse car parse-result-parsed fjsc-compile 
+  'expression' parse-1 fjsc-compile
   write flush ;
 
 ! The 'compile' action results in an URL that looks like
-! 'responder/fjsc/compile'. It takes one query or post 
+! 'responder/fjsc/compile'. It takes one query or post
 ! parameter called 'code'. It calls the 'compile' word
 ! passing the parameter to it on the stack.
-\ compile { 
-  { "code" v-required } 
+\ compile {
+  { "code" v-required }
 } define-action
 
 : compile-url ( url -- )
@@ -28,18 +28,23 @@ IN: webapps.fjsc
   "http://" host rot 3append http-get 2nip compile "();" write flush ;
 
 \ compile-url {
-  { "url" v-required } 
+  { "url" v-required }
 } define-action
+
+: render-page* ( model body-template head-template -- )
+  [
+      [ render-component ] [ f rot render-component ] html-document 
+  ] serve-html ;
 
 : repl ( -- )
   #! The main 'repl' page.
   f "repl" "head" render-page* ;
 
-! An action called 'repl' 
+! An action called 'repl'
 \ repl { } define-action
 
 : fjsc-web-app ( -- )
-  ! Create the web app, providing access 
+  ! Create the web app, providing access
   ! under '/responder/fjsc' which calls the
   ! 'repl' action.
   "fjsc" "repl" "extra/webapps/fjsc" web-app

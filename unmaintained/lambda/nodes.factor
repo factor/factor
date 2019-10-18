@@ -4,8 +4,6 @@ sequences namespaces words parser kernel ;
 
 IN: lambda
 
-: dip swap slip ; inline
-
 SYMBOL: lambda-names
 TUPLE: lambda-node self expr name ;
 TUPLE: apply-node func arg ;

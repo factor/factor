@@ -1,5 +1,6 @@
 
 USING: kernel namespaces threads math math.vectors quotations sequences
+       opengl
        opengl.gl
        colors
        ui
@@ -11,10 +12,14 @@ USING: kernel namespaces threads math math.vectors quotations sequences
        ui.gadgets.lib
        ui.gadgets.slate
        ui.gadgets.theme
-       vars rewrite-closures opengl.lib 
+       vars rewrite-closures
        self pos ori turtle opengl.camera
-       lsys.tortoise lsys.tortoise.graphics lsys.strings
-;
+       lsys.tortoise lsys.tortoise.graphics
+       lsys.strings.rewrite lsys.strings.interpret ;
+
+       ! lsys.strings
+       ! lsys.strings.rewrite
+       ! lsys.strings.interpret
 
 IN: lsys.ui
 
@@ -34,7 +39,7 @@ VAR: model
 
 : display ( -- )
 
-black gl-clear-color
+black gl-clear
 
 GL_FLAT glShadeModel
 
@@ -48,13 +53,11 @@ glLoadIdentity
 
 camera> do-look-at
 
-GL_COLOR_BUFFER_BIT glClear
-
 GL_FRONT_AND_BACK GL_LINE glPolygonMode
 
-white gl-color-4f
+white gl-color
 
-GL_LINES glBegin { 0 0 0 } gl-vertex-3f { 0 0 1 } gl-vertex-3f glEnd
+GL_LINES glBegin { 0 0 0 } gl-vertex { 0 0 1 } gl-vertex glEnd
 
 color> set-color
 
@@ -148,7 +151,7 @@ make-pile 1 over set-pack-fill "L-system control" open-window ;
 
 : lsys-viewer ( -- )
 
-f <slate> >slate
+[ ] <slate> >slate
 { 400 400 } clone slate> set-slate-dim
 
 {

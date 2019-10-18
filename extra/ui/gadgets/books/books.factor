@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences models ui.gadgets ui.gadgets.controls ;
+USING: kernel sequences models ui.gadgets ;
 IN: ui.gadgets.books
 
 TUPLE: book ;
@@ -10,15 +10,14 @@ TUPLE: book ;
 : current-page ( book -- gadget )
     [ control-value ] keep nth-gadget ;
 
-M: book model-changed ( book -- )
+M: book model-changed
+    nip
     dup hide-all
     dup current-page show-gadget
     relayout ;
 
 : <book> ( pages model -- book )
-    <gadget> book construct-control
-    [ add-gadgets ] keep
-    [ model-changed ] keep ;
+    <gadget> book construct-control [ add-gadgets ] keep ;
 
 M: book pref-dim* gadget-children pref-dims max-dim ;
 

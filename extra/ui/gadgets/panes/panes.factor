@@ -1,14 +1,14 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.controls ui.gadgets.scrollers
+ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.theme ui.clipboards ui.gestures ui.traverse ui.render
 hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors
 io.streams.duplex sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
-ui.gadgets.grid-lines tuples ;
+ui.gadgets.grid-lines tuples models ;
 IN: ui.gadgets.panes
 
 TUPLE: pane output current prototype scrolls?
@@ -137,8 +137,14 @@ M: duplex-stream write-gadget
 : <scrolling-pane> ( -- pane )
     <pane> t over set-pane-scrolls? ;
 
+TUPLE: pane-control quot ;
+
+M: pane-control model-changed
+    swap model-value swap dup pane-control-quot with-pane ;
+
 : <pane-control> ( model quot -- pane )
-    [ with-pane ] curry <pane> swap <control> ;
+    >r <pane> pane-control construct-control r>
+    over set-pane-control-quot ;
 
 : do-pane-stream ( pane-stream quot -- )
     >r pane-stream-pane r> keep scroll-pane ; inline
@@ -159,7 +165,8 @@ M: pane-stream stream-close drop ;
 
 M: pane-stream stream-flush drop ;
 
-M: pane-stream with-stream-style (with-stream-style) ;
+M: pane-stream make-span-stream
+    <style-stream> <ignore-close-stream> ;
 
 ! Character styles
 
@@ -173,9 +180,9 @@ M: pane-stream with-stream-style (with-stream-style) ;
     background [ dupd solid-interior ] apply-style ;
 
 : specified-font ( style -- font )
-    [ font swap at [ "monospace" ] unless* ] keep
-    [ font-style swap at [ plain ] unless* ] keep
-    font-size swap at [ 12 ] unless* 3array ;
+    [ font swap at "monospace" or ] keep
+    [ font-style swap at plain or ] keep
+    font-size swap at 12 or 3array ;
 
 : apply-font-style ( style gadget -- style gadget )
     over specified-font over set-label-font ;
@@ -183,33 +190,12 @@ M: pane-stream with-stream-style (with-stream-style) ;
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <presentation> ] apply-style ;
 
-TUPLE: scroll-to-me done? ;
-
-: <scroll-to-me>
-    scroll-to-me construct-empty
-    [ set-gadget-delegate ] keep ;
-
-: scroll-on-graft? ( gadget -- ? )
-    parents
-    [ [ pane? ] is? ] subset
-    [ pane-scrolls? ] contains? not ;
-
-M: scroll-to-me graft*
-    dup scroll-to-me-done? [
-        t over set-scroll-to-me-done?
-        dup scroll-on-graft? [ dup scroll>gadget ] when
-    ] unless delegate graft* ;
-
-: apply-highlight-style ( style gadget -- style gadget )
-    highlight [ drop <scroll-to-me> ] apply-style ;
-
 : <styled-label> ( style text -- gadget )
     <label>
     apply-foreground-style
     apply-background-style
     apply-font-style
     apply-presentation-style
-    apply-highlight-style
     nip ;
 
 ! Paragraph styles
@@ -246,12 +232,30 @@ M: scroll-to-me graft*
     apply-printer-style
     nip ;
 
-: make-styled-pane ( quot style -- gadget )
-    #! Create a pane, call the quotation to fill it out.
-    <pane> [
-        apply-wrap-style nip swap with-pane
-    ] 2keep smash-pane style-pane ; inline
+TUPLE: nested-pane-stream style parent ;
 
+: <nested-pane-stream> ( style parent -- stream )
+    >r <pane> apply-wrap-style <pane-stream> r> {
+        set-nested-pane-stream-style
+        set-delegate
+        set-nested-pane-stream-parent
+    } nested-pane-stream construct ;
+
+: unnest-pane-stream ( stream -- child parent )
+    dup ?nl
+    dup nested-pane-stream-style
+    over pane-stream-pane smash-pane style-pane
+    swap nested-pane-stream-parent ;
+
+TUPLE: pane-block-stream ;
+
+M: pane-block-stream stream-close
+    unnest-pane-stream write-gadget ;
+
+M: pane-stream make-block-stream
+    <nested-pane-stream> pane-block-stream construct-delegate ;
+
+! Tables
 : apply-table-gap-style ( style grid -- style grid )
     table-gap [ over set-grid-gap ] apply-style ;
 
@@ -266,14 +270,18 @@ M: scroll-to-me graft*
     apply-table-border-style
     nip ;
 
+TUPLE: pane-cell-stream ;
+
+M: pane-cell-stream stream-close ?nl ;
+
+M: pane-stream make-cell-stream
+    <nested-pane-stream> pane-cell-stream construct-delegate ;
+
 M: pane-stream stream-write-table
-    >r swap styled-grid r> print-gadget ;
-
-M: pane-stream make-table-cell
-    drop make-styled-pane ;
-
-M: pane-stream with-nested-stream
-    >r make-styled-pane r> write-gadget ;
+    >r
+    swap [ [ pane-stream-pane smash-pane ] map ] map
+    styled-grid
+    r> print-gadget ;
 
 ! Stream utilities
 M: pack stream-close drop ;
@@ -351,7 +359,6 @@ M: f sloppy-pick-up*
 : move-caret ( pane -- )
     dup hand-rel
     over sloppy-pick-up
-    2dup gadget-at-path scroll>gadget
     over set-pane-caret
     relayout-1 ;
 
@@ -370,6 +377,7 @@ M: f sloppy-pick-up*
                 dup caret>mark
             ] when
         ] if
+        dup dup pane-caret gadget-at-path scroll>gadget
     ] when drop ;
 
 : end-selection ( pane -- )

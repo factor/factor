@@ -21,3 +21,11 @@ HELP: random
 { $values { "seq" "a sequence" } { "elt" "a random element" } }
 { $description "Outputs a random element of the sequence. If the sequence is empty, always outputs " { $link f } "." }
 { $notes "Since integers are sequences, passing an integer " { $snippet "n" } " yields a random integer in the interval " { $snippet "[0,n)" } "." } ;
+
+HELP: big-random
+{ $values { "n" "an integer" } { "r" "a random integer" } }
+{ $description "Outputs an integer with n bytes worth of bits." } ;
+
+HELP: random-256
+{ $values { "r" "a random integer" } }
+{ $description "Outputs an random integer 256 bits in length." } ;

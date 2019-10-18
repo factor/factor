@@ -1,11 +1,13 @@
-USING: tools.deploy ;
-V{
-    { strip-word-props? t }
-    { strip-word-names? t }
-    { strip-dictionary? t }
-    { strip-debugger? t }
+USING: tools.deploy.config ;
+H{
     { deploy-math? f }
-    { deploy-compiled? f }
-    { deploy-io? f }
+    { deploy-word-defs? f }
+    { deploy-word-props? f }
+    { deploy-name "Hello world (console)" }
+    { "stop-after-last-window?" t }
+    { deploy-c-types? f }
+    { deploy-compiler? f }
+    { deploy-io 2 }
     { deploy-ui? f }
+    { deploy-reflection 1 }
 }

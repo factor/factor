@@ -8,7 +8,7 @@ INLINE void *ucontext_stack_pointer(void *uap)
 	return (void *)ucontext->uc_mcontext.arm_sp;
 }
 
-INLINE void flush_icache(CELL start, CELL len)
-{
-	syscall(__ARM_NR_cacheflush,start,start + len,0);
-}
+#define UAP_PROGRAM_COUNTER(ucontext) \
+	(((ucontext_t *)(ucontext))->uc_mcontext.arm_pc)
+
+void flush_icache(CELL start, CELL len);

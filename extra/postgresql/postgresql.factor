@@ -18,7 +18,7 @@ SYMBOL: query-res
 
 : with-postgres ( host port pgopts pgtty db user pass quot -- )
     [ >r connect-postgres db set r>
-    [ db get PQfinish ] cleanup ] with-scope ; inline
+    [ db get PQfinish ] [ ] cleanup ] with-scope ; inline
 
 : postgres-error ( ret -- ret )
     dup zero? [ PQresultErrorMessage throw ] when ;

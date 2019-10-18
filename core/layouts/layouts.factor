@@ -15,16 +15,20 @@ SYMBOL: tag-numbers
 
 SYMBOL: type-numbers
 
-: tag-number ( class -- n ) tag-numbers get at ;
+: tag-number ( class -- n )
+    tag-numbers get at [ object tag-number ] unless* ;
 
-: type-number ( class -- n ) type-numbers get at ;
+: type-number ( class -- n )
+    type-numbers get at ;
 
 : tag-header ( n -- tagged )
-    tag-bits get shift object tag-number bitor ;
+    tag-bits get shift ;
 
 : first-bignum ( -- n )
     bootstrap-cell-bits tag-bits get - 1 - 2^ ;
 
-: most-positive-fixnum ( -- n ) first-bignum 1- ;
+: most-positive-fixnum ( -- n )
+    first-bignum 1- ;
 
-: most-negative-fixnum ( -- n ) first-bignum neg ;
+: most-negative-fixnum ( -- n )
+    first-bignum neg ;

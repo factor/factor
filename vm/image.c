@@ -3,11 +3,8 @@
 /* Certain special objects in the image are known to the runtime */
 void init_objects(F_HEADER *h)
 {
-	int i;
-	for(i = 0; i < USER_ENV; i++)
-		userenv[i] = F;
-	userenv[GLOBAL_ENV] = h->global;
-	userenv[BOOT_ENV] = h->boot;
+	memcpy(userenv,h->userenv,sizeof(userenv));
+
 	T = h->t;
 	bignum_zero = h->bignum_zero;
 	bignum_pos_one = h->bignum_pos_one;
@@ -84,21 +81,8 @@ void load_image(F_PARAMETERS *p)
 	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image));
 }
 
-/* Compute total sum of sizes of free blocks */
-void save_code_heap(FILE *file)
-{
-	F_BLOCK *scan = first_block(&code_heap);
-
-	while(scan)
-	{
-		if(scan->status == B_ALLOCATED)
-			fwrite(scan,scan->size,1,file);
-		scan = next_block(&code_heap,scan);
-	}
-}
-
 /* Save the current image to disk */
-bool save_image(const F_CHAR *filename)
+void save_image(const F_CHAR *filename)
 {
 	FILE* file;
 	F_HEADER h;
@@ -107,51 +91,126 @@ bool save_image(const F_CHAR *filename)
 
 	file = OPEN_WRITE(filename);
 	if(file == NULL)
-		fatal_error("Cannot open image for writing",errno);
+	{
+		fprintf(stderr,"Cannot open image file: %s\n",strerror(errno));
+		return;
+	}
 
 	F_ZONE *tenured = &data_heap->generations[TENURED];
 
 	h.magic = IMAGE_MAGIC;
 	h.version = IMAGE_VERSION;
 	h.data_relocation_base = tenured->start;
-	h.boot = userenv[BOOT_ENV];
 	h.data_size = tenured->here - tenured->start;
-	h.global = userenv[GLOBAL_ENV];
+	h.code_relocation_base = code_heap.segment->start;
+	h.code_size = heap_size(&code_heap);
+
 	h.t = T;
 	h.bignum_zero = bignum_zero;
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
-	
-	h.code_size = heap_size(&code_heap);
-	h.code_relocation_base = code_heap.segment->start;
+
+	CELL i;
+	for(i = 0; i < USER_ENV; i++)
+	{
+		if(i < FIRST_SAVE_ENV)
+			h.userenv[i] = F;
+		else
+			h.userenv[i] = userenv[i];
+	}
+
 	fwrite(&h,sizeof(F_HEADER),1,file);
 
-	fwrite((void*)tenured->start,h.data_size,1,file);
-	/* save_code_heap(file); */
-	fwrite(first_block(&code_heap),h.code_size,1,file);
+	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1)
+	{
+		fprintf(stderr,"Save data heap failed: %s\n",strerror(errno));
+		return;
+	}
 
-	fclose(file);
+	if(fwrite(first_block(&code_heap),h.code_size,1,file) != 1)
+	{
+		fprintf(stderr,"Save code heap failed: %s\n",strerror(errno));
+		return;
+	}
 
-	return true;
+	if(fclose(file))
+	{
+		fprintf(stderr,"Failed to close image file: %s\n",strerror(errno));
+		return;
+	}
 }
 
-void primitive_save_image(void)
+DEFINE_PRIMITIVE(save_image)
 {
 	/* do a full GC to push everything into tenured space */
-	primitive_code_gc();
+	code_gc();
 
 	save_image(unbox_native_string());
 }
 
-void primitive_save_image_and_exit(void)
+DEFINE_PRIMITIVE(save_image_and_exit)
 {
+	/* strip out userenv data which is set on startup anyway */
+	CELL i;
+	for(i = 0; i < FIRST_SAVE_ENV; i++)
+		userenv[i] = F;
+
 	/* do a full GC + code heap compaction */
 	compact_code_heap();
 
+	/* Save the image */
 	save_image(unbox_native_string());
 
 	/* now exit; we cannot continue executing like this */
 	exit(0);
+}
+
+void fixup_word(F_WORD *word)
+{
+	/* If this is a compiled word, relocate the code pointer. Otherwise,
+	reset it based on the primitive number of the word. */
+	if(word->compiledp == F)
+		word->xt = default_word_xt(word);
+	else
+	{
+		code_fixup((CELL)&word->xt);
+		code_fixup((CELL)&word->code);
+	}
+}
+
+void fixup_quotation(F_QUOTATION *quot)
+{
+	if(quot->compiledp == F)
+		quot->xt = lazy_jit_compile;
+	else
+	{
+		code_fixup((CELL)&quot->xt);
+		code_fixup((CELL)&quot->code);
+	}
+}
+
+void fixup_alien(F_ALIEN *d)
+{
+	d->expired = T;
+}
+
+void fixup_stack_frame(F_STACK_FRAME *frame)
+{
+	code_fixup((CELL)&frame->xt);
+
+	if(frame_type(frame) == QUOTATION_TYPE)
+	{
+		CELL scan = frame->scan - frame->array;
+		data_fixup(&frame->array);
+		frame->scan = scan + frame->array;
+	}
+
+	code_fixup((CELL)&FRAME_RETURN_ADDRESS(frame));
+}
+
+void fixup_callstack_object(F_CALLSTACK *stack)
+{
+	iterate_callstack_object(stack,fixup_stack_frame);
 }
 
 /* Initialize an object in a newly-loaded image */
@@ -162,13 +221,19 @@ void relocate_object(CELL relocating)
 	switch(untag_header(get(relocating)))
 	{
 	case WORD_TYPE:
-		fixup_word((F_WORD*)relocating);
+		fixup_word((F_WORD *)relocating);
+		break;
+	case QUOTATION_TYPE:
+		fixup_quotation((F_QUOTATION *)relocating);
 		break;
 	case DLL_TYPE:
-		ffi_dlopen((F_DLL*)relocating,false);
+		ffi_dlopen((F_DLL *)relocating,false);
 		break;
 	case ALIEN_TYPE:
-		fixup_alien((F_ALIEN*)relocating);
+		fixup_alien((F_ALIEN *)relocating);
+		break;
+	case CALLSTACK_TYPE:
+		fixup_callstack_object((F_CALLSTACK *)relocating);
 		break;
 	}
 }
@@ -179,8 +244,10 @@ void relocate_data()
 {
 	CELL relocating;
 
-	data_fixup(&userenv[BOOT_ENV]);
-	data_fixup(&userenv[GLOBAL_ENV]);
+	CELL i;
+	for(i = 0; i < USER_ENV; i++)
+		data_fixup(&userenv[i]);
+
 	data_fixup(&T);
 	data_fixup(&bignum_zero);
 	data_fixup(&bignum_pos_one);
@@ -198,25 +265,28 @@ void relocate_data()
 }
 
 void fixup_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
 	/* relocate literal table data */
 	CELL scan;
-	CELL literal_end = literal_start + relocating->literal_length;
+	CELL literal_end = literals_start + relocating->literals_length;
 
-	for(scan = literal_start; scan < literal_end; scan += CELLS)
+	for(scan = literals_start; scan < literal_end; scan += CELLS)
 		data_fixup((CELL*)scan);
 
 	for(scan = words_start; scan < words_end; scan += CELLS)
 	{
 		if(relocating->finalized)
-			code_fixup((XT*)scan);
+			code_fixup(scan);
 		else
 			data_fixup((CELL*)scan);
 	}
 
-	relocate_code_block(relocating,code_start,reloc_start,
-		literal_start,words_start,words_end);
+	if(reloc_start != literals_start)
+	{
+		relocate_code_block(relocating,code_start,reloc_start,
+			literals_start,words_start,words_end);
+	}
 }
 
 void relocate_code()

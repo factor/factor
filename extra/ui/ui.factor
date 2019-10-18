@@ -1,9 +1,10 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces
-prettyprint queues sequences threads sequences words timers
+prettyprint dlists sequences threads sequences words timers
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
-ui.gestures ui.backend ui.render continuations init ;
+ui.gestures ui.backend ui.render continuations init
+combinators hashtables ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -31,6 +32,11 @@ SYMBOL: windows
     windows get-global [ second eq? ] curry* find drop
     windows get-global [ length 1- ] keep exchange ;
 
+: focus-gestures ( new old -- )
+    drop-prefix <reversed>
+    T{ lose-focus } swap each-gesture
+    T{ gain-focus } swap each-gesture ;
+
 : focus-world ( world -- )
     t over set-world-focused?
     dup raised-window
@@ -40,62 +46,109 @@ SYMBOL: windows
     f over set-world-focused?
     focus-path f swap focus-gestures ;
 
+M: world graft*
+    dup (open-window)
+    dup world-title over set-title
+    request-focus ;
+
 : reset-world ( world -- )
+    #! This is used when a window is being closed, but also
+    #! when restoring saved worlds on image startup.
     dup world-fonts clear-assoc
     dup unfocus-world
     f swap set-world-handle ;
 
-: stop-world ( world -- )
-    dup ungraft
+M: world ungraft*
+    dup free-fonts
     dup hand-clicked close-global
     dup hand-gadget close-global
-    dup free-fonts
+    dup world-handle (close-window)
     reset-world ;
 
-: open-world-window ( world -- )
-    dup pref-dim over set-gadget-dim
-    dup (open-world-window)
-    dup draw-world ;
-
-: open-window ( gadget title -- )
-    >r [ 1 track, ] { 0 1 } make-track r>
-    f <world> open-world-window ;
-
 : find-window ( quot -- world )
-    windows get 1 <column>
+    windows get values
     [ gadget-child swap call ] curry* find-last nip ; inline
 
+SYMBOL: ui-hook
+
+: init-ui ( -- )
+    <dlist> \ graft-queue set-global
+    <dlist> \ layout-queue set-global
+    V{ } clone windows set-global ;
+
+: restore-gadget-later ( gadget -- )
+    dup gadget-graft-state {
+        { { f f } [ ] }
+        { { f t } [ ] }
+        { { t t } [
+            { f f } over set-gadget-graft-state
+        ] }
+        { { t f } [
+            dup unqueue-graft
+            { f f } over set-gadget-graft-state
+        ] }
+    } case graft-later ;
+
+: restore-gadget ( gadget -- )
+    dup restore-gadget-later
+    gadget-children [ restore-gadget ] each ;
+
+: restore-world ( world -- )
+    dup reset-world restore-gadget ;
+
 : restore-windows ( -- )
-    windows get [ 1 <column> >array ] keep delete-all
-    [ dup reset-world (open-world-window) ] each
+    windows get [ values ] keep delete-all
+    [ restore-world ] each
     forget-rollover ;
 
 : restore-windows? ( -- ? )
-    windows get [ empty? not ] [ f ] if* ;
+    windows get empty? not ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
     [ hand-loc get-global swap move-hand ] [ drop ] if ;
 
-: post-layout ( hash gadget -- )
-    dup find-world dup [
-        rot [
-            >r screen-rect r> [ rect-union ] when*
-        ] change-at
-    ] [
-        3drop
-    ] if ;
+: layout-queued ( -- seq )
+    [
+        in-layout? on
+        layout-queue [
+            dup layout find-world [ , ] when*
+        ] dlist-slurp
+    ] { } make prune ;
 
-: layout-queued ( -- hash )
-    H{ } clone invalid [
-        dup layout dupd post-layout
-    ] queue-each ;
+: redraw-worlds ( seq -- )
+    [ dup update-hand draw-world ] each ;
 
-SYMBOL: ui-hook
+: notify ( gadget -- )
+    dup gadget-graft-state {
+        { { f t } [ dup activate-control dup graft* ] }
+        { { t f } [ dup activate-control dup ungraft* ] }
+    } case
+    dup gadget-graft-state first { f f } { t t } ?
+    swap set-gadget-graft-state ;
 
-: init-ui ( -- )
-    <queue> \ invalid set-global
-    V{ } clone windows set-global ;
+: notify-queued ( -- )
+    graft-queue [ notify ] dlist-slurp ;
+
+: ui-step ( -- )
+    [
+        do-timers
+        notify-queued
+        layout-queued
+        redraw-worlds
+    ] assert-depth ;
+
+: open-world-window ( world -- )
+    dup pref-dim over set-gadget-dim dup relayout graft ui-step ;
+
+: open-window ( gadget title -- )
+    >r [ 1 track, ] { 0 1 } make-track r>
+    f <world> open-world-window ;
+
+HOOK: close-window ui-backend ( gadget -- )
+
+M: object close-window
+    find-world [ ungraft ] when* ;
 
 : start-ui ( -- )
     init-timers
@@ -103,27 +156,16 @@ SYMBOL: ui-hook
         restore-windows
     ] [
         init-ui ui-hook get call
-    ] if ;
-
-: redraw-worlds ( hash -- )
-    [
-        swap dup update-hand
-        dup world-handle [ draw-world ] [ 2drop ] if
-    ] assoc-each ;
-
-: ui-step ( -- )
-    [
-        do-timers layout-queued redraw-worlds 10 sleep
-    ] assert-depth ;
+    ] if ui-step ;
 
 : ui-running ( quot -- )
     t \ ui-running set-global
-    [ f \ ui-running set-global ] cleanup ; inline
+    [ f \ ui-running set-global ] [ ] cleanup ; inline
 
 : ui-running? ( -- ? )
     \ ui-running get-global ;
 
-[ f \ ui-running set-global ] "ui" add-startup-hook
+[ f \ ui-running set-global ] "ui" add-init-hook
 
 HOOK: ui ui-backend ( -- )
 

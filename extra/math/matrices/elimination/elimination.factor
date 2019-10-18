@@ -77,7 +77,7 @@ SYMBOL: matrix
     [
         rows <reversed> [
             dup nth-row leading drop
-            dup 0 >= [ swap dup clear-col ] [ 2drop ] if
+            dup [ swap dup clear-col ] [ 2drop ] if
         ] each
     ] with-matrix ;
 
@@ -93,7 +93,7 @@ SYMBOL: matrix
         dup first length identity-matrix [
             [
                 dup leading drop
-                dup 0 >= [ basis-vector ] [ 2drop ] if
+                dup [ basis-vector ] [ 2drop ] if
             ] each
         ] with-matrix flip nonzero-rows
     ] unless ;

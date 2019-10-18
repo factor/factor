@@ -1158,24 +1158,14 @@ FUNCTION: void glPopName ( ) ;
 : GL_ALIASED_LINE_WIDTH_RANGE       HEX: 846E ; inline
 
 
-FUNCTION: void glDrawRangeElements ( GLenum mode, GLuint start, GLuint end,
-                                     GLsizei count, GLenum type, GLvoid* indices ) ;
+! Not present on Windows
+! FUNCTION: void glDrawRangeElements ( GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, GLvoid* indices ) ;
 
-FUNCTION: void glTexImage3D ( GLenum target, GLint level, GLint internalFormat,
-                              GLsizei width, GLsizei height, GLsizei depth, GLint border,
-			      GLenum format, GLenum type, GLvoid* pixels ) ;
+! FUNCTION: void glTexImage3D ( GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, GLvoid* pixels ) ;
 
-FUNCTION: void glTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
-                                 GLint zoffset, GLsizei width, GLsizei height, GLsizei depth,
-				 GLenum format, GLenum type, GLvoid* pixels ) ;
+! FUNCTION: void glTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels ) ;
 
-FUNCTION: void glCopyTexSubImage3D ( GLenum target, GLint level,
-                                     GLint xoffset, GLint yoffset, GLint zoffset,
-				     GLint x, GLint y, GLsizei width, GLsizei height ) ;
-! windows? [
-!     { glDrawRangeElements glTexImage3D glTexSubImage3D glCopyTexSubImage3D } [ forget ] each
-! ] unless
-
+! FUNCTION: void glCopyTexSubImage3D ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height ) ;
 
 ! TODO: the rest. looks fiddly
 

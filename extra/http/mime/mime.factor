@@ -8,8 +8,7 @@ IN: http.mime
     "." split dup length 1 <= [ drop f ] [ peek ] if ;
 
 : mime-type ( filename -- mime-type )
-    file-extension "mime-types" get
-    at [ "text/plain" ] unless* ;
+    file-extension "mime-types" get at "application/octet-stream" or ;
 
 H{
     { "html"   "text/html"                        }

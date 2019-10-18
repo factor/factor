@@ -17,9 +17,6 @@ typedef char F_SYMBOL;
 
 #define STR_FORMAT(string) string
 
-#define SETJMP(jmpbuf) sigsetjmp(jmpbuf,1)
-#define LONGJMP siglongjmp
-#define JMP_BUF sigjmp_buf
 #define SSCANF sscanf
 #define STRCMP strcmp
 #define STRNCMP strncmp
@@ -38,13 +35,8 @@ void unix_init_signals(void);
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);
 void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 
-void primitive_open_file(void);
-void primitive_stat(void);
-void primitive_read_dir(void);
-void primitive_cwd(void);
-void primitive_cd(void);
-
 s64 current_millis(void);
 void sleep_millis(CELL msec);
 
 void reset_stdio(void);
+void open_console(void);

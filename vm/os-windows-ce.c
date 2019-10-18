@@ -10,37 +10,41 @@ s64 current_millis(void)
 		| (s64)ft.dwHighDateTime<<32) - EPOCH_OFFSET) / 10000;
 }
 
-void primitive_cwd(void)
+DEFINE_PRIMITIVE(cwd)
 {
-	primitive_error();
+	not_implemented_error();
 }
 
-void primitive_cd(void)
+DEFINE_PRIMITIVE(cd)
 {
-	primitive_error();
+	not_implemented_error();
 }
 
 char *strerror(int err)
 {
 	/* strerror() is not defined on WinCE */
-	return "strerror() is not defined on WinCE. Use native io";
+	return "strerror() is not defined on WinCE. Use native I/O.";
 }
 
-void flush_icache()
+void flush_icache(CELL start, CELL end)
 {
 	FlushInstructionCache(GetCurrentProcess(), 0, 0);
 }
 
 char *getenv(char *name)
 {
-	primitive_error();
+	not_implemented_error();
 	return 0; /* unreachable */
 }
 
-long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
+DEFINE_PRIMITIVE(os_envs)
 {
-	memory_protection_error(
-		rec->ExceptionInformation[1] & 0x1ffffff,
-		native_stack_pointer());
-	return -1; /* unreachable */
+	not_implemented_error();
 }
+
+void c_to_factor_toplevel(CELL quot)
+{
+	c_to_factor(quot);
+}
+
+void open_console(void) { }

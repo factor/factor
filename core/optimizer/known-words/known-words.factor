@@ -6,9 +6,9 @@ inference.class kernel assocs math math.private kernel.private
 sequences words parser vectors strings sbufs io namespaces
 assocs quotations sequences.private io.binary io.crc32
 io.streams.string layouts splitting math.intervals
-math.floats.private math.vectors tuples tuples.private classes
+math.floats.private tuples tuples.private classes
 optimizer.def-use optimizer.backend optimizer.pattern-match
-float-arrays ;
+float-arrays combinators.private combinators ;
 
 ! the output of <tuple> and <tuple-boa> has the class which is
 ! its second-to-last input
@@ -48,6 +48,20 @@ float-arrays ;
 
 \ eq? {
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
+} define-optimizers
+
+: literal-member? ( #call -- ? )
+    node-in-d peek dup value?
+    [ value-literal sequence? ] [ drop f ] if ;
+
+: member-quot ( seq -- newquot )
+    [ [ t ] ] { } map>assoc [ drop f ] add [ nip case ] curry ;
+
+: expand-member ( #call -- )
+    dup node-in-d peek value-literal member-quot splice-quot ;
+
+\ member? {
+    { [ dup literal-member? ] [ expand-member ] }
 } define-optimizers
 
 ! if the result of eq? is t and the second input is a literal,
@@ -92,7 +106,7 @@ float-arrays ;
 ] each
 
 ! Specializers
-{ 1+ 1- sq neg recip sgn truncate } [
+{ 1+ 1- sq neg recip sgn } [
     { number } "specializer" set-word-prop
 ] each
 
@@ -100,20 +114,6 @@ float-arrays ;
 
 { min max } [
     { number number } "specializer" set-word-prop
-] each
-
-{ vneg norm-sq norm normalize } [
-    { { float-array array } } "specializer" set-word-prop
-] each
-
-\ n*v { * { float-array array } } "specializer" set-word-prop
-\ v*n { { float-array array } * } "specializer" set-word-prop
-\ n/v { * { float-array array } } "specializer" set-word-prop
-\ v/n { { float-array array } * } "specializer" set-word-prop
-
-{ v+ v- v* v/ vmax vmin v. } [
-    { { float-array array } { float-array array } }
-    "specializer" set-word-prop
 ] each
 
 { first first2 first3 first4 }

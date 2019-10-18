@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel sequences quotations
-math.private ;
+math.private math.functions ;
 IN: math
 
 ARTICLE: "division-by-zero" "Division by zero"
@@ -26,13 +26,17 @@ $nl
 { $subsection < }
 { $subsection <= }
 { $subsection > }
-{ $subsection >= } ;
+{ $subsection >= }
+"Inexact comparison:"
+{ $subsection ~ } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
 { $subsection mod }
 { $subsection rem }
 { $subsection /mod }
 { $subsection /i }
+{ $subsection mod-inv }
+{ $subsection ^mod }
 { $see-also "integer-functions" } ;
 
 ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
@@ -44,6 +48,7 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 { $subsection shift }
 { $subsection 2/ }
 { $subsection 2^ }
+{ $subsection bit? }
 { $see-also "conditionals" } ;
 
 ARTICLE: "arithmetic" "Arithmetic"
@@ -214,6 +219,16 @@ HELP: bitnot
 $nl
 "Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1-" } } ;
 
+HELP: bit?
+{ $values { "x" integer } { "n" integer } { "?" "a boolean" } }
+{ $description "Tests if the " { $snippet "n" } "th bit of " { $snippet "x" } " is set." }
+{ $examples { $example "BIN: 101 2 bit? ." "t" } } ;
+
+HELP: log2
+{ $values { "x" "a positive integer" } { "n" integer } }
+{ $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "2^n" } " is less than " { $snippet "x" } "." }
+{ $errors "Throws an error if " { $snippet "x" } " is zero or negative." } ;
+
 HELP: 1+
 { $values { "x" number } { "y" number } }
 { $description
@@ -227,26 +242,6 @@ HELP: 1-
     "Decrements a number by 1. The following two lines are equivalent, but the first is more efficient:"
     { $code "1-" "1 -" }
 } ;
-
-HELP: truncate
-{ $values { "x" real } { "y" "a whole real number" } }
-{ $description "Outputs the number that results from subtracting the fractional component of " { $snippet "x" } "." }
-{ $notes "The result is not necessarily an integer." } ;
-
-HELP: floor
-{ $values { "x" real } { "y" "a whole real number" } }
-{ $description "Outputs the greatest whole number smaller than or equal to " { $snippet "x" } "." }
-{ $notes "The result is not necessarily an integer." } ;
-
-HELP: ceiling
-{ $values { "x" real } { "y" "a whole real number" } }
-{ $description "Outputs the least whole number greater than or equal to " { $snippet "x" } "." }
-{ $notes "The result is not necessarily an integer." } ;
-
-HELP: round
-{ $values { "x" real } { "y" "a whole real number" } }
-{ $description "Outputs the whole number closest to " { $snippet "x" } "." }
-{ $notes "The result is not necessarily an integer." } ;
 
 HELP: sq
 { $values { "x" number } { "y" number } }
@@ -336,22 +331,29 @@ HELP: imaginary ( z -- y )
 { $values { "z" number } { "y" real } }
 { $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." } ;
 
-HELP: (rect>)
-{ $values { "x" real } { "y" real } { "z" number } }
-{ $description "Creates a complex number from real and imaginary components." }
-{ $warning "This word does not check that the arguments are real numbers, which can have undefined consequences. Use the " { $link rect> } " word instead." } ;
-
 HELP: number
 { $class-description "The class of numbers." } ;
-
-HELP: rect>
-{ $values { "x" real } { "y" real } { "z" number } }
-{ $description "Creates a complex number from real and imaginary components." } ;
-
-HELP: >rect
-{ $values { "z" number } { "x" real } { "y" real } }
-{ $description "Extracts the real and imaginary components of a complex number." } ;
 
 HELP: next-power-of-2
 { $values { "m" "a non-negative integer" } { "n" "an integer" } }
 { $description "Outputs the smallest power of 2 greater than " { $snippet "m" } ". The output value is always at least 1." } ;
+
+HELP: each-integer
+{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- )" } } }
+{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } "." }
+{ $notes "This word is used to implement " { $link each } "." } ;
+
+HELP: all-integers?
+{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- ? )" } } { "?" "a boolean" } }
+{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
+{ $notes "This word is used to implement " { $link all? } "." } ;
+
+HELP: find-integer
+{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- ? )" } } { "i" "an integer or " { $link f } } }
+{ $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
+{ $notes "This word is used to implement " { $link find } "." } ;
+
+HELP: find-last-integer
+{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- ? )" } } { "i" "an integer or " { $link f } } }
+{ $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
+{ $notes "This word is used to implement " { $link find-last } "." } ;

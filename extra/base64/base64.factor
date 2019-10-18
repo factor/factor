@@ -33,7 +33,7 @@ PRIVATE>
 : >base64 ( seq -- base64 )
     #! cut string into two pieces, convert 3 bytes at a time
     #! pad string with = when not enough bits
-    [ length dup 3 mod - ] keep cut swap
+    dup length dup 3 mod - cut swap
     [
         3 group [ encode3 % ] each
         dup empty? [ drop ] [ >base64-rem % ] if

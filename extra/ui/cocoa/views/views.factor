@@ -3,7 +3,8 @@
 USING: alien arrays assocs cocoa kernel math cocoa.messages
 cocoa.subclassing cocoa.classes cocoa.views cocoa.application
 cocoa.pasteboard cocoa.types cocoa.windows sequences ui
-ui.gadgets ui.gadgets.worlds ui.gestures core-foundation ;
+ui.gadgets ui.gadgets.worlds ui.gestures core-foundation
+threads ;
 IN: ui.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -313,8 +314,6 @@ CLASS: {
 { "dealloc" "void" { "id" "SEL" }
     [
         drop
-        dup window stop-world
-        dup unregister-window
         dup remove-observer
         SUPER-> dealloc
     ]
@@ -346,6 +345,12 @@ CLASS: {
     [
         forget-rollover
         2nip -> object -> contentView window unfocus-world
+    ]
+}
+
+{ "windowShouldClose:" "bool" { "id" "SEL" "id" }
+    [
+        2nip -> contentView window ungraft t
     ]
 } ;
 

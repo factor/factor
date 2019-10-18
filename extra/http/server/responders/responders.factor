@@ -11,22 +11,21 @@ SYMBOL: vhosts
 SYMBOL: responders
 
 : print-header ( alist -- )
-    [ swap write ": " write print ] assoc-each ;
+    [ swap write ": " write print ] assoc-each nl ;
 
-: response ( header msg -- )
-    "HTTP/1.0 " write print print-header ;
+: response ( msg -- ) "HTTP/1.0 " write print ;
 
-: error-body ( error -- body )
+: error-body ( error -- )
     <html> <body> <h1> write </h1> </body> </html> ;
 
 : error-head ( error -- )
-    dup log-error
-    H{ { "Content-Type" "text/html" } } over response ;
+    dup log-error response
+    H{ { "Content-Type" "text/html" } } print-header nl ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request
-    error-head
-    "head" "method" get = [ drop ] [ nl error-body ] if ;
+    dup error-head
+    "head" "method" get = [ drop ] [ error-body ] if ;
 
 : bad-request ( -- )
     [
@@ -36,8 +35,8 @@ SYMBOL: responders
     ] with-scope ;
 
 : serving-content ( mime -- )
-    "Content-Type" associate
-    "200 Document follows" response nl ;
+    "200 Document follows" response
+    "Content-Type" associate print-header ;
 
 : serving-html "text/html" serving-content ;
 
@@ -46,14 +45,14 @@ SYMBOL: responders
 
 : serving-text "text/plain" serving-content ;
 
-: (redirect) ( to response -- )
-    >r "Location" associate r> response nl ;
+: redirect ( to response -- )
+    response "Location" associate print-header ;
 
 : permanent-redirect ( to -- )
-    "301 Moved Permanently" (redirect) ;
+    "301 Moved Permanently" redirect ;
 
 : temporary-redirect ( to -- )
-    "307 Temporary Redirect" (redirect) ;
+    "307 Temporary Redirect" redirect ;
 
 : directory-no/ ( -- )
     [
@@ -84,8 +83,15 @@ SYMBOL: max-post-request
 
 : log-headers ( hash -- )
     [
-        drop { "User-Agent" "X-Forwarded-For" "Host" } member?
-    ] assoc-subset [ ": " swap 3append log-message ] assoc-each ;
+        drop {
+            "User-Agent"
+            "Referer"
+            "X-Forwarded-For"
+            "Host"
+        } member?
+    ] assoc-subset [
+        ": " swap 3append log-message
+    ] assoc-each ;
 
 : prepare-url ( url -- url )
     #! This is executed in the with-request namespace.
@@ -94,7 +100,8 @@ SYMBOL: max-post-request
     dup "request" set ;
 
 : prepare-header ( -- )
-    read-header dup "header" set
+    read-header
+    dup "header" set
     dup log-headers
     read-post-request "response" set "raw-response" set ;
 
@@ -115,17 +122,13 @@ SYMBOL: max-post-request
 
 : query-param ( key -- value ) "query" get at ;
 
+: header-param ( key -- value ) "header" get at ;
+
 : add-responder ( responder -- )
     #! Add a responder object to the list.
     "responder" over at  responders get set-at ;
 
-: add-simple-responder ( name quot -- )
-    [
-        [ drop ] swap append dup "get" set "post" set
-        "responder" set
-    ] H{ } make-assoc add-responder ;
-
-: make-responder ( quot -- responder )
+: make-responder ( quot -- )
     #! quot has stack effect ( url -- )
     [
         [
@@ -144,6 +147,12 @@ SYMBOL: max-post-request
         call
     ] H{ } make-assoc add-responder ;
 
+: add-simple-responder ( name quot -- )
+    [
+        [ drop ] swap append dup "get" set "post" set
+        "responder" set
+    ] make-responder ;
+
 : vhost ( name -- vhost )
     vhosts get at [ "default" vhost ] unless* ;
 
@@ -154,7 +163,7 @@ SYMBOL: max-post-request
     responder "default" responders get set-at ;
 
 : call-responder ( method argument responder -- )
-    over "argument" set [ swap get call ] bind ;
+    over "argument" set [ swap get with-scope ] bind ;
 
 : serve-default-responder ( method url -- )
     "/" "responder-url" set
@@ -168,7 +177,7 @@ SYMBOL: max-post-request
     "/" ?head drop ;
 
 : serve-explicit-responder ( method url -- )
-    "/" split1 
+    "/" split1
     "/responder/" pick "/" 3append "responder-url" set
     dup [
         swap responder call-responder
@@ -193,7 +202,7 @@ SYMBOL: max-post-request
     "404 No such responder" httpd-error ;
 
 ! create a responders hash if it doesn't already exist
-global [ 
+global [
     responders [ H{ } assoc-like ] change
     
     ! 404 error message pages are served by this guy

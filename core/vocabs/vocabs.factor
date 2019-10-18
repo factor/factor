@@ -76,7 +76,7 @@ SYMBOL: load-vocab-hook
     [ ] subset ;
 
 : forget-vocab ( vocab -- )
-    dup vocab-words [ nip forget ] assoc-each
+    dup vocab-words values forget-all
     vocab-name dictionary get delete-at ;
 
 : child-vocab? ( prefix name -- ? )

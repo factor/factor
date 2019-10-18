@@ -105,6 +105,8 @@ M: vocab-link summary vocab-summary ;
         { [ ".unix" ?tail ] [ t ] }
         { [ "unix." ?head ] [ t ] }
         { [ ".linux" ?tail ] [ t ] }
+        { [ ".bsd" ?tail ] [ t ] }
+        { [ ".macosx" ?tail ] [ t ] }
         { [ "windows." ?head ] [ t ] }
         { [ "cocoa" ?head ] [ t ] }
         { [ ".test" ?tail ] [ t ] }
@@ -300,10 +302,6 @@ C: <vocab-author> vocab-author
     dup all-tags tags.
     "Authors" $heading
     all-authors authors. ;
-
-ARTICLE: "vocab-index" "Vocabulary index"
-{ $tags,authors }
-{ $describe-vocab "" } ;
 
 M: vocab-spec article-title vocab-name " vocabulary" append ;
 

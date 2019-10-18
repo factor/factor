@@ -196,16 +196,6 @@ FUNCTION: void gluBeginPolygon ( GLUtesselator* tess ) ;
 FUNCTION: void gluBeginSurface ( GLUnurbs* nurb ) ;
 FUNCTION: void gluBeginTrim ( GLUnurbs* nurb ) ;
 
-FUNCTION: GLint gluBuild1DMipmapLevels ( GLenum target, GLint internalFormat, GLsizei width, GLenum format, GLenum type, GLint level, GLint base, GLint max, void* data ) ;
-FUNCTION: GLint gluBuild1DMipmaps ( GLenum target, GLint internalFormat, GLsizei width, GLenum format, GLenum type, void* data ) ;
-FUNCTION: GLint gluBuild2DMipmapLevels ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLint level, GLint base, GLint max, void* data ) ;
-FUNCTION: GLint gluBuild2DMipmaps ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, void* data ) ;
-FUNCTION: GLint gluBuild3DMipmapLevels ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLint level, GLint base, GLint max, void* data ) ;
-FUNCTION: GLint gluBuild3DMipmaps ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, void* data ) ;
-FUNCTION: GLboolean gluCheckExtension ( GLubyte* extName, GLubyte* extString ) ;
-! windows? [
-!     { gluBuild1DMipmapLevels gluBuild1DMipmaps gluBuild2DMipmapLevels gluBuild2DMipmaps gluBuild3DMipmapLevels gluBuild3DMipmaps gluCheckExtension } [ forget ] each
-! ] unless
 FUNCTION: void gluCylinder ( GLUquadric* quad, GLdouble base, GLdouble top, GLdouble height, GLint slices, GLint stacks ) ;
 FUNCTION: void gluDeleteNurbsRenderer ( GLUnurbs* nurb ) ;
 FUNCTION: void gluDeleteQuadric ( GLUquadric* quad ) ;
@@ -226,11 +216,8 @@ FUNCTION: GLUquadric* gluNewQuadric ( ) ;
 FUNCTION: GLUtesselator* gluNewTess ( ) ;
 FUNCTION: void gluNextContour ( GLUtesselator* tess, GLenum type ) ;
 FUNCTION: void gluNurbsCallback ( GLUnurbs* nurb, GLenum which, GLUfuncptr CallBackFunc ) ;
-FUNCTION: void gluNurbsCallbackData ( GLUnurbs* nurb, GLvoid* userData ) ;
-FUNCTION: void gluNurbsCallbackDataEXT ( GLUnurbs* nurb, GLvoid* userData ) ;
-! windows? [
-!     { gluNurbsCallbackData gluNurbsCallbackDataEXT } [ forget ] each
-! ] unless
+! FUNCTION: void gluNurbsCallbackData ( GLUnurbs* nurb, GLvoid* userData ) ;
+! FUNCTION: void gluNurbsCallbackDataEXT ( GLUnurbs* nurb, GLvoid* userData ) ;
 FUNCTION: void gluNurbsCurve ( GLUnurbs* nurb, GLint knotCount, GLfloat *knots, GLint stride, GLfloat *control, GLint order, GLenum type ) ;
 FUNCTION: void gluNurbsProperty ( GLUnurbs* nurb, GLenum property, GLfloat value ) ;
 FUNCTION: void gluNurbsSurface ( GLUnurbs* nurb, GLint sKnotCount, GLfloat* sKnots, GLint tKnotCount, GLfloat* tKnots, GLint sStride, GLint tStride, GLfloat* control, GLint sOrder, GLint tOrder, GLenum type ) ;
@@ -256,4 +243,13 @@ FUNCTION: void gluTessNormal ( GLUtesselator* tess, GLdouble valueX, GLdouble va
 FUNCTION: void gluTessProperty ( GLUtesselator* tess, GLenum which, GLdouble data ) ;
 FUNCTION: void gluTessVertex ( GLUtesselator* tess, GLdouble* location, GLvoid* data ) ;
 FUNCTION: GLint gluUnProject ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble* model, GLdouble* proj, GLint* view, GLdouble* objX, GLdouble* objY, GLdouble* objZ ) ;
-FUNCTION: GLint gluUnProject4 ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble clipW, GLdouble* model, GLdouble* proj, GLint* view, GLdouble nearVal, GLdouble farVal, GLdouble* objX, GLdouble* objY, GLdouble* objZ, GLdouble* objW ) ;
+
+! Not present on Windows
+! FUNCTION: GLint gluBuild1DMipmapLevels ( GLenum target, GLint internalFormat, GLsizei width, GLenum format, GLenum type, GLint level, GLint base, GLint max, void* data ) ;
+! FUNCTION: GLint gluBuild1DMipmaps ( GLenum target, GLint internalFormat, GLsizei width, GLenum format, GLenum type, void* data ) ;
+! FUNCTION: GLint gluBuild2DMipmapLevels ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLint level, GLint base, GLint max, void* data ) ;
+! FUNCTION: GLint gluBuild2DMipmaps ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, void* data ) ;
+! FUNCTION: GLint gluBuild3DMipmapLevels ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLint level, GLint base, GLint max, void* data ) ;
+! FUNCTION: GLint gluBuild3DMipmaps ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, void* data ) ;
+! FUNCTION: GLboolean gluCheckExtension ( GLubyte* extName, GLubyte* extString ) ;
+! FUNCTION: GLint gluUnProject4 ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble clipW, GLdouble* model, GLdouble* proj, GLint* view, GLdouble nearVal, GLdouble farVal, GLdouble* objX, GLdouble* objY, GLdouble* objZ, GLdouble* objW ) ;

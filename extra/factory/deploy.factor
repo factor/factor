@@ -1,4 +1,4 @@
-USING: tools.deploy ;
+USING: tools.deploy.config ;
 V{
     { strip-globals? f }
     { strip-word-props? f }

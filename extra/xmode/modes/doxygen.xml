@@ -1,0 +1,313 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="lineComment" VALUE="#" />
+    </PROPS>
+    <RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+        <!-- Comment -->
+        <EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+        <MARK_PREVIOUS TYPE="KEYWORD1"
+            AT_LINE_START="TRUE" MATCH_TYPE="OPERATOR">=</MARK_PREVIOUS>
+        <MARK_PREVIOUS TYPE="KEYWORD1"
+            AT_LINE_START="TRUE" MATCH_TYPE="OPERATOR">+=</MARK_PREVIOUS>
+
+        <!-- Literals -->
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>`</BEGIN>
+            <END>`</END>
+        </SPAN>
+        <KEYWORDS>
+            <KEYWORD2>YES</KEYWORD2>
+            <KEYWORD3>NO</KEYWORD3>
+        </KEYWORDS>
+    </RULES>
+
+    <RULES SET="DOXYGEN" DEFAULT="COMMENT3" IGNORE_CASE="TRUE">
+        <!-- so that *@param is highlighted -->
+        <SEQ TYPE="COMMENT3">*</SEQ>
+
+        <!-- HTML comments -->
+        <SPAN TYPE="COMMENT1">
+            <BEGIN>&lt;!--</BEGIN>
+            <END>--&gt;</END>
+        </SPAN>
+
+        <!-- Doxygen allows this -->
+        <SEQ TYPE="COMMENT3">&lt;&lt;</SEQ>
+        <SEQ TYPE="COMMENT3">&lt;=</SEQ>
+        <SEQ TYPE="COMMENT3">&lt; </SEQ>
+
+        <!-- HTML tags -->
+        <SPAN TYPE="MARKUP" DELEGATE="xml::TAGS"
+            NO_LINE_BREAK="TRUE">
+            <BEGIN>&lt;</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+        <KEYWORDS>
+            <LABEL>\a</LABEL>
+            <LABEL>\addindex</LABEL>
+            <LABEL>\addtogroup</LABEL>
+            <LABEL>\anchor</LABEL>
+            <LABEL>\arg</LABEL>
+            <LABEL>\attention</LABEL>
+            <LABEL>\author</LABEL>
+            <LABEL>\b</LABEL>
+            <LABEL>\brief</LABEL>
+            <LABEL>\bug</LABEL>
+            <LABEL>\c</LABEL>
+            <LABEL>\callgraph</LABEL>
+            <LABEL>\category</LABEL>
+            <LABEL>\class</LABEL>
+            <LABEL>\code</LABEL>
+            <LABEL>\copydoc</LABEL>
+            <LABEL>\date</LABEL>
+            <LABEL>\def</LABEL>
+            <LABEL>\defgroup</LABEL>
+            <LABEL>\deprecated</LABEL>
+            <LABEL>\dontinclude</LABEL>
+            <LABEL>\dot</LABEL>
+            <LABEL>\dotfile</LABEL>
+            <LABEL>\e</LABEL>
+            <LABEL>\else</LABEL>
+            <LABEL>\elseif</LABEL>
+            <LABEL>\em</LABEL>
+            <LABEL>\endcode</LABEL>
+            <LABEL>\enddot</LABEL>
+            <LABEL>\endhtmlonly</LABEL>
+            <LABEL>\endif</LABEL>
+            <LABEL>\endlatexonly</LABEL>
+            <LABEL>\endlink</LABEL>
+            <LABEL>\endmanonly</LABEL>
+            <LABEL>\endverbatim</LABEL>
+            <LABEL>\endxmlonly</LABEL>
+            <LABEL>\enum</LABEL>
+            <LABEL>\example</LABEL>
+            <LABEL>\exception</LABEL>
+            <LABEL>\f$</LABEL>
+            <LABEL>\f[</LABEL>
+            <LABEL>\f]</LABEL>
+            <LABEL>\file</LABEL>
+            <LABEL>\fn</LABEL>
+            <LABEL>\hideinitializer</LABEL>
+            <LABEL>\htmlinclude</LABEL>
+            <LABEL>\htmlonly</LABEL>
+            <LABEL>\if</LABEL>
+            <LABEL>\ifnot</LABEL>
+            <LABEL>\image</LABEL>
+            <LABEL>\include</LABEL>
+            <LABEL>\includelineno</LABEL>
+            <LABEL>\ingroup</LABEL>
+            <LABEL>\internal</LABEL>
+            <LABEL>\invariant</LABEL>
+            <LABEL>\interface</LABEL>
+            <LABEL>\latexonly</LABEL>
+            <LABEL>\li</LABEL>
+            <LABEL>\line</LABEL>
+            <LABEL>\link</LABEL>
+            <LABEL>\mainpage</LABEL>
+            <LABEL>\manonly</LABEL>
+            <LABEL>\n</LABEL>
+            <LABEL>\name</LABEL>
+            <LABEL>\namespace</LABEL>
+            <LABEL>\nosubgrouping</LABEL>
+            <LABEL>\note</LABEL>
+            <LABEL>\overload</LABEL>
+            <LABEL>\p</LABEL>
+            <LABEL>\package</LABEL>
+            <LABEL>\page</LABEL>
+            <LABEL>\par</LABEL>
+            <LABEL>\paragraph</LABEL>
+            <LABEL>\param</LABEL>
+            <LABEL>\param[in]</LABEL>
+            <LABEL>\param[out]</LABEL>
+            <LABEL>\param[in,out]</LABEL>
+            <LABEL>\post</LABEL>
+            <LABEL>\pre</LABEL>
+            <LABEL>\private</LABEL>
+            <LABEL>\privatesection</LABEL>
+            <LABEL>\property</LABEL>
+            <LABEL>\protected</LABEL>
+            <LABEL>\protectedsection</LABEL>
+            <LABEL>\protocol</LABEL>
+            <LABEL>\public</LABEL>
+            <LABEL>\publicsection</LABEL>
+            <LABEL>\ref</LABEL>
+            <LABEL>\relates</LABEL>
+            <LABEL>\relatesalso</LABEL>
+            <LABEL>\remarks</LABEL>
+            <LABEL>\return</LABEL>
+            <LABEL>\retval</LABEL>
+            <LABEL>\sa</LABEL>
+            <LABEL>\section</LABEL>
+            <LABEL>\showinitializer</LABEL>
+            <LABEL>\since</LABEL>
+            <LABEL>\skip</LABEL>
+            <LABEL>\skipline</LABEL>
+            <LABEL>\struct</LABEL>
+            <LABEL>\subsection</LABEL>
+            <LABEL>\subsubsection</LABEL>
+            <LABEL>\test</LABEL>
+            <LABEL>\throw</LABEL>
+            <LABEL>\todo</LABEL>
+            <LABEL>\typedef</LABEL>
+            <LABEL>\union</LABEL>
+            <LABEL>\until</LABEL>
+            <LABEL>\var</LABEL>
+            <LABEL>\verbatim</LABEL>
+            <LABEL>\verbinclude</LABEL>
+            <LABEL>\version</LABEL>
+            <LABEL>\warning</LABEL>
+            <LABEL>\weakgroup</LABEL>
+            <LABEL>\xmlonly</LABEL>
+            <LABEL>\xrefitem</LABEL>
+            <LABEL>\$</LABEL>
+            <LABEL>\@</LABEL>
+            <LABEL>\\</LABEL>
+            <LABEL>\&amp;</LABEL>
+            <LABEL>\~</LABEL>
+            <LABEL>\&lt;</LABEL>
+            <LABEL>\&gt;</LABEL>
+            <LABEL>\#</LABEL>
+            <LABEL>\%</LABEL>
+            <LABEL>@a</LABEL>
+            <LABEL>@addindex</LABEL>
+            <LABEL>@addtogroup</LABEL>
+            <LABEL>@anchor</LABEL>
+            <LABEL>@arg</LABEL>
+            <LABEL>@attention</LABEL>
+            <LABEL>@author</LABEL>
+            <LABEL>@b</LABEL>
+            <LABEL>@brief</LABEL>
+            <LABEL>@bug</LABEL>
+            <LABEL>@c</LABEL>
+            <LABEL>@callgraph</LABEL>
+            <LABEL>@category</LABEL>
+            <LABEL>@class</LABEL>
+            <LABEL>@code</LABEL>
+            <LABEL>@copydoc</LABEL>
+            <LABEL>@date</LABEL>
+            <LABEL>@def</LABEL>
+            <LABEL>@defgroup</LABEL>
+            <LABEL>@deprecated</LABEL>
+            <LABEL>@dontinclude</LABEL>
+            <LABEL>@dot</LABEL>
+            <LABEL>@dotfile</LABEL>
+            <LABEL>@e</LABEL>
+            <LABEL>@else</LABEL>
+            <LABEL>@elseif</LABEL>
+            <LABEL>@em</LABEL>
+            <LABEL>@endcode</LABEL>
+            <LABEL>@enddot</LABEL>
+            <LABEL>@endhtmlonly</LABEL>
+            <LABEL>@endif</LABEL>
+            <LABEL>@endlatexonly</LABEL>
+            <LABEL>@endlink</LABEL>
+            <LABEL>@endmanonly</LABEL>
+            <LABEL>@endverbatim</LABEL>
+            <LABEL>@endxmlonly</LABEL>
+            <LABEL>@enum</LABEL>
+            <LABEL>@example</LABEL>
+            <LABEL>@exception</LABEL>
+            <LABEL>@f$</LABEL>
+            <LABEL>@f[</LABEL>
+            <LABEL>@f]</LABEL>
+            <LABEL>@file</LABEL>
+            <LABEL>@fn</LABEL>
+            <LABEL>@hideinitializer</LABEL>
+            <LABEL>@htmlinclude</LABEL>
+            <LABEL>@htmlonly</LABEL>
+            <LABEL>@if</LABEL>
+            <LABEL>@ifnot</LABEL>
+            <LABEL>@image</LABEL>
+            <LABEL>@include</LABEL>
+            <LABEL>@includelineno</LABEL>
+            <LABEL>@ingroup</LABEL>
+            <LABEL>@internal</LABEL>
+            <LABEL>@invariant</LABEL>
+            <LABEL>@interface</LABEL>
+            <LABEL>@latexonly</LABEL>
+            <LABEL>@li</LABEL>
+            <LABEL>@line</LABEL>
+            <LABEL>@link</LABEL>
+            <LABEL>@mainpage</LABEL>
+            <LABEL>@manonly</LABEL>
+            <LABEL>@n</LABEL>
+            <LABEL>@name</LABEL>
+            <LABEL>@namespace</LABEL>
+            <LABEL>@nosubgrouping</LABEL>
+            <LABEL>@note</LABEL>
+            <LABEL>@overload</LABEL>
+            <LABEL>@p</LABEL>
+            <LABEL>@package</LABEL>
+            <LABEL>@page</LABEL>
+            <LABEL>@par</LABEL>
+            <LABEL>@paragraph</LABEL>
+            <LABEL>@param</LABEL>
+            <LABEL>@param[in]</LABEL>
+            <LABEL>@param[out]</LABEL>
+            <LABEL>@param[in,out]</LABEL>
+            <LABEL>@post</LABEL>
+            <LABEL>@pre</LABEL>
+            <LABEL>@private</LABEL>
+            <LABEL>@privatesection</LABEL>
+            <LABEL>@property</LABEL>
+            <LABEL>@protected</LABEL>
+            <LABEL>@protectedsection</LABEL>
+            <LABEL>@protocol</LABEL>
+            <LABEL>@public</LABEL>
+            <LABEL>@publicsection</LABEL>
+            <LABEL>@ref</LABEL>
+            <LABEL>@relates</LABEL>
+            <LABEL>@relatesalso</LABEL>
+            <LABEL>@remarks</LABEL>
+            <LABEL>@return</LABEL>
+            <LABEL>@retval</LABEL>
+            <LABEL>@sa</LABEL>
+            <LABEL>@section</LABEL>
+            <LABEL>@showinitializer</LABEL>
+            <LABEL>@since</LABEL>
+            <LABEL>@skip</LABEL>
+            <LABEL>@skipline</LABEL>
+            <LABEL>@struct</LABEL>
+            <LABEL>@subsection</LABEL>
+            <LABEL>@subsubsection</LABEL>
+            <LABEL>@test</LABEL>
+            <LABEL>@throw</LABEL>
+            <LABEL>@todo</LABEL>
+            <LABEL>@typedef</LABEL>
+            <LABEL>@union</LABEL>
+            <LABEL>@until</LABEL>
+            <LABEL>@var</LABEL>
+            <LABEL>@verbatim</LABEL>
+            <LABEL>@verbinclude</LABEL>
+            <LABEL>@version</LABEL>
+            <LABEL>@warning</LABEL>
+            <LABEL>@weakgroup</LABEL>
+            <LABEL>@xmlonly</LABEL>
+            <LABEL>@xrefitem</LABEL>
+            <LABEL>@$</LABEL>
+            <LABEL>@@</LABEL>
+            <LABEL>@\</LABEL>
+            <LABEL>@&amp;</LABEL>
+            <LABEL>@~</LABEL>
+            <LABEL>@&lt;</LABEL>
+            <LABEL>@&gt;</LABEL>
+            <LABEL>@#</LABEL>
+            <LABEL>@%</LABEL>
+        </KEYWORDS>
+    </RULES>
+
+</MODE>

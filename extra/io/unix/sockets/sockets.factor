@@ -45,9 +45,9 @@ M: connect-task task-container drop write-tasks get-global ;
     [ swap <connect-task> add-io-task stop ] callcc0 drop ;
 
 M: unix-io (client) ( addrspec -- stream )
-    dup make-sockaddr >r >r
+    dup make-sockaddr/size >r >r
     protocol-family SOCK_STREAM socket-fd
-    dup r> r> heap-size connect
+    dup r> r> connect
     zero? err_no EINPROGRESS = or [
         dup init-client-socket
         dup handle>duplex-stream
@@ -92,7 +92,7 @@ USE: io.sockets
 : server-fd ( addrspec type -- fd )
     >r dup protocol-family r>  socket-fd
     dup init-server-socket
-    dup rot make-sockaddr heap-size bind
+    dup rot make-sockaddr/size bind
     zero? [ dup close (io-error) ] unless ;
 
 M: unix-io <server> ( addrspec -- stream )
@@ -190,20 +190,19 @@ M: send-task task-container drop write-tasks get ;
 
 M: unix-io send ( packet addrspec datagram -- )
     3dup check-datagram-send
-    [ >r make-sockaddr heap-size r> wait-send ] keep
+    [ >r make-sockaddr/size r> wait-send ] keep
     pending-error ;
 
 M: local protocol-family drop PF_UNIX ;
 
-M: local sockaddr-type drop "sockaddr-un" ;
+M: local sockaddr-type drop "sockaddr-un" c-type ;
 
 M: local make-sockaddr
     local-path
     dup length 1 + max-un-path > [ "Path too long" throw ] when
     "sockaddr-un" <c-object>
     AF_UNIX over set-sockaddr-un-family
-    dup sockaddr-un-path rot string>char-alien dup length memcpy
-   "sockaddr-un" ;
+    dup sockaddr-un-path rot string>char-alien dup length memcpy ;
 
 M: local parse-sockaddr
     drop

@@ -4,11 +4,16 @@
 USING: kernel furnace sqlite.tuple-db webapps.article-manager.database 
        sequences namespaces math arrays assocs quotations io.files
        http.server http.basic-authentication http.server.responders 
-       http.server.responders.file ;
+       webapps.file html html.elements io ;
 IN: webapps.article-manager
 
 : current-site ( -- site )
   host get-site* ;
+
+: render-titled-page* ( model body-template head-template title -- )
+  [ 
+      [ render-component ] swap [ <title> write </title> f rot render-component ] curry html-document
+  ] serve-html ;
 
 TUPLE: template-args arg1 ;
   
@@ -122,7 +127,7 @@ C: <template-args> template-args
 SYMBOL: redirections
 
 : redirector ( url quot -- )
-  over redirections get [ H{ } ] unless* at dup [ 
+  over redirections get H{ } or at dup [ 
     2nip permanent-redirect
   ] [
     drop call

@@ -47,49 +47,28 @@ INLINE F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
 /* compiled code */
 F_HEAP code_heap;
 
-/* The compiled code heap is structured into blocks. */
-typedef struct
-{
-	CELL code_length; /* # bytes */
-	CELL reloc_length; /* # bytes */
-	CELL literal_length; /* # bytes */
-	CELL words_length; /* # bytes */
-	CELL finalized; /* has finalize_code_block() been called on this yet? */
-	CELL padding[3];
-} F_COMPILED;
-
 typedef void (*CODE_HEAP_ITERATOR)(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end);
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end);
 
 INLINE void iterate_code_heap_step(F_COMPILED *compiled, CODE_HEAP_ITERATOR iter)
 {
 	CELL code_start = (CELL)(compiled + 1);
 	CELL reloc_start = code_start + compiled->code_length;
-	CELL literal_start = reloc_start + compiled->reloc_length;
-	CELL words_start = literal_start + compiled->literal_length;
+	CELL literals_start = reloc_start + compiled->reloc_length;
+	CELL words_start = literals_start + compiled->literals_length;
 	CELL words_end = words_start + compiled->words_length;
 
-	iter(compiled,code_start,reloc_start,literal_start,words_start,words_end);
+	iter(compiled,code_start,reloc_start,literals_start,words_start,words_end);
 }
 
-INLINE F_BLOCK *xt_to_block(XT xt)
+INLINE F_BLOCK *compiled_to_block(F_COMPILED *compiled)
 {
-	return (F_BLOCK *)((CELL)xt - sizeof(F_BLOCK) - sizeof(F_COMPILED));
-}
-
-INLINE F_COMPILED *xt_to_compiled(XT xt)
-{
-	return (F_COMPILED *)((CELL)xt - sizeof(F_COMPILED));
+	return (F_BLOCK *)compiled - 1;
 }
 
 INLINE F_COMPILED *block_to_compiled(F_BLOCK *block)
 {
 	return (F_COMPILED *)(block + 1);
-}
-
-INLINE XT block_to_xt(F_BLOCK *block)
-{
-	return (XT)((CELL)block + sizeof(F_BLOCK) + sizeof(F_COMPILED));
 }
 
 INLINE F_BLOCK *first_block(F_HEAP *heap)
@@ -106,8 +85,10 @@ void init_code_heap(CELL size);
 bool in_code_heap_p(CELL ptr);
 void iterate_code_heap(CODE_HEAP_ITERATOR iter);
 void collect_literals(void);
-void recursive_mark(XT xt);
-void primitive_code_room(void);
-void primitive_code_gc(void);
+void recursive_mark(F_BLOCK *block);
 void dump_heap(F_HEAP *heap);
+void code_gc(void);
 void compact_code_heap(void);
+
+DECLARE_PRIMITIVE(code_room);
+DECLARE_PRIMITIVE(code_gc);

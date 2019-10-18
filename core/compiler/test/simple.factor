@@ -1,4 +1,5 @@
-USING: compiler tools.test kernel kernel.private ;
+USING: compiler tools.test kernel kernel.private
+combinators.private ;
 IN: temporary
 
 ! Test empty word
@@ -55,3 +56,8 @@ IN: temporary
 \ recursive compile
 
 [ ] [ t recursive ] unit-test
+
+! Make sure error reporting works
+
+[ [ dup ] compile-1 ] unit-test-fails
+[ [ drop ] compile-1 ] unit-test-fails

@@ -5,31 +5,27 @@ ui.tools.operations ui.tools.browser ui.tools.inspector
 ui.tools.listener ui.tools.profiler ui.tools.walker
 ui.tools.operations inspector io kernel math models namespaces
 prettyprint quotations sequences ui ui.commands ui.gadgets
-ui.gadgets.books ui.gadgets.buttons ui.gadgets.controls
+ui.gadgets.books ui.gadgets.buttons
 ui.gadgets.labelled ui.gadgets.scrollers ui.gadgets.tracks
 ui.gadgets.worlds ui.gadgets.presentations ui.gestures words
 vocabs.loader tools.test ui.gadgets.buttons
-ui.gadgets.status-bar ;
+ui.gadgets.status-bar mirrors ;
 IN: ui.tools
 
-: workspace-tabs ( -- seq )
-    {
-        <stack-display>
-        <browser-gadget>
-        <inspector-gadget>
-        <walker-gadget>
-        <profiler-gadget>
-    } ;
-
 : <workspace-tabs> ( -- tabs )
-    g control-model
+    g gadget-model
     "tool-switching" workspace command-map
-    [ command-string ] { } assoc>map
-    [ length ] keep 2array flip
-    <radio-box> ;
+    [ command-string ] { } assoc>map <enum> >alist
+    <toggle-buttons> ;
 
 : <workspace-book> ( -- gadget )
-    workspace-tabs [ execute ] map g control-model <book> ;
+    [
+        <stack-display> ,
+        <browser-gadget> ,
+        <inspector-gadget> ,
+        <walker> ,
+        <profiler-gadget> ,
+    ] { } make g gadget-model <book> ;
 
 : <workspace> ( -- workspace )
     0 <model> { 0 1 } <track> workspace construct-control [
@@ -53,6 +49,7 @@ IN: ui.tools
     ] if relayout ;
 
 M: workspace model-changed
+    nip
     dup workspace-listener listener-gadget-output scroll>bottom
     dup resize-workspace
     request-focus ;
@@ -65,16 +62,16 @@ M: workspace model-changed
 
 : com-inspector inspector-gadget select-tool ;
 
-: com-walker walker-gadget select-tool ;
+: com-walker walker select-tool ;
 
 : com-profiler profiler-gadget select-tool ;
 
 workspace "tool-switching" f {
-    { T{ key-down f f "F2" } com-listener }
-    { T{ key-down f f "F3" } com-browser }
-    { T{ key-down f f "F4" } com-inspector }
-    { T{ key-down f f "F5" } com-walker }
-    { T{ key-down f f "F6" } com-profiler }
+    { T{ key-down f { A+ } "1" } com-listener }
+    { T{ key-down f { A+ } "2" } com-browser }
+    { T{ key-down f { A+ } "3" } com-inspector }
+    { T{ key-down f { A+ } "4" } com-walker }
+    { T{ key-down f { A+ } "5" } com-profiler }
 } define-command-map
 
 \ workspace-window
@@ -89,8 +86,8 @@ H{ { +nullary+ t } { +listener+ t } } define-command
 workspace "workflow" f {
     { T{ key-down f { C+ } "n" } workspace-window }
     { T{ key-down f f "ESC" } hide-popup }
-    { T{ key-down f f "F8" } refresh-all }
-    { T{ key-down f { A+ } "F8" } test-changes }
+    { T{ key-down f f "F2" } refresh-all }
+    { T{ key-down f { A+ } "F2" } test-changes }
 } define-command-map
 
 [

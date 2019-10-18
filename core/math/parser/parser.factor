@@ -28,9 +28,12 @@ DEFER: base>
         { [ t ] [ swap [ < ] curry all? ] }
     } cond ;
 
+: string>digits ( str -- digits )
+    [ digit> ] { } map-as ;
+
 : string>integer ( str radix -- n/f )
     swap "-" ?head >r
-    [ digit> ] { } map-as 2dup valid-digits?
+    string>digits 2dup valid-digits?
     [ digits>integer r> [ neg ] when ] [ r> 3drop f ] if ;
 
 : base> ( str radix -- n/f )

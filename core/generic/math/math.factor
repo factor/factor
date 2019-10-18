@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
-classes definitions ;
+combinators.private classes definitions ;
 IN: generic.math
 
 PREDICATE: class math-class ( object -- ? )
@@ -25,16 +25,12 @@ PREDICATE: class math-class ( object -- ? )
     [ [ math-precedence ] compare 0 > ] most ;
 
 : (math-upgrade) ( max class -- quot )
-    dupd = [
-        drop [ ]
-    ] [
-        "coercer" word-prop [ [ ] ] unless*
-    ] if ;
+    dupd = [ drop [ ] ] [ "coercer" word-prop [ ] or ] if ;
 
 : math-upgrade ( class1 class2 -- quot )
     [ math-class-max ] 2keep
-    >r over r> (math-upgrade)
-    >r (math-upgrade) dup empty? [ 1 make-dip ] unless
+    >r over r> (math-upgrade) >r (math-upgrade)
+    dup empty? [ [ dip ] curry [ ] like ] unless
     r> append ;
 
 TUPLE: no-math-method left right generic ;

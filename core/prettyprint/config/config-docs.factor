@@ -27,9 +27,3 @@ HELP: line-limit
 
 HELP: string-limit
 { $var-description "Toggles whether printed strings are truncated to the margin." } ;
-
-HELP: hilite-quotation
-{ $var-description "If set, printing this quotation will highlight the element with index " { $link hilite-index } " in an output stream-specific manner." } ;
-
-HELP: hilite-index
-{ $var-description "If set, printing the quotation stored in " { $link hilite-quotation } " will highlight the element with this index in an output stream-specific manner." } ;

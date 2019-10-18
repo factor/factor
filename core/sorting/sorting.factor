@@ -66,18 +66,18 @@ PRIVATE>
     >r dup midpoint@ r> 1 < [ head-slice ] [ tail-slice ] if ;
     inline
 
-: (binsearch) ( elt quot seq -- elt quot i )
+: (binsearch) ( elt quot seq -- i )
     dup length 1 <= [
-        slice-from
+        slice-from 2nip
     ] [
         [ midpoint swap call ] 3keep roll dup zero?
-        [ drop dup slice-from swap midpoint@ + ]
+        [ drop dup slice-from swap midpoint@ + 2nip ]
         [ partition (binsearch) ] if
     ] if ; inline
 
 : binsearch ( elt seq quot -- i )
     swap dup empty?
-    [ 3drop f ] [ <flat-slice> (binsearch) 2nip ] if ; inline
+    [ 3drop f ] [ <flat-slice> (binsearch) ] if ; inline
 
 : binsearch* ( elt seq quot -- result )
     over >r binsearch [ r> ?nth ] [ r> drop f ] if* ; inline

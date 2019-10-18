@@ -1,5 +1,5 @@
 USING: ui.gadgets help.markup help.syntax strings models
-ui.gadgets.panes ui.gadgets.controls ;
+ui.gadgets.panes ;
 IN: ui.gadgets.labelled
 
 HELP: labelled-gadget
@@ -19,7 +19,7 @@ HELP: <closable-gadget>
 
 HELP: <labelled-pane>
 { $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( value -- )" } } { "title" string } { "gadget" "a new " { $link gadget } } }
-{ $description "Creates a new " { $link control } " delegating to a " { $link pane } ", and wraps it in a " { $link labelled-gadget } ". When the value of the model changes, the value is pushed on the stack and the quotation is called using " { $link with-pane } "." } ;
+{ $description "Creates a new control delegating to a " { $link pane } ", and wraps it in a " { $link labelled-gadget } ". When the value of the model changes, the value is pushed on the stack and the quotation is called using " { $link with-pane } "." } ;
 
 { <labelled-pane> <pane-control> } related-words
 

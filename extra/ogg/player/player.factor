@@ -11,10 +11,11 @@
 ! - Have start/stop/seek methods on the player object.
 !
 USING: kernel alien ogg ogg.vorbis ogg.theora io byte-arrays
-sequences libc shuffle alien.c-types system openal math
-namespaces threads shuffle opengl arrays ui.gadgets.worlds
-combinators math.parser ui.gadgets ui.render opengl.gl ui
-continuations io.files hints ;
+       sequences libc shuffle alien.c-types system openal math
+       namespaces threads shuffle opengl arrays ui.gadgets.worlds
+       combinators math.parser ui.gadgets ui.render opengl.gl ui
+       continuations io.files hints combinators.lib ;
+
 IN: ogg.player
 
 : audio-buffer-size ( -- number ) 128 1024 *  ; inline
@@ -157,7 +158,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     
 : append-new-audio-buffer ( player -- player )
     dup player-buffers 1 gen-buffers append over set-player-buffers 
-    [ dup >r player-buffers second r> al-channel-format ] keep
+    [ [ player-buffers second ] keep al-channel-format ] keep
     [ player-audio-buffer dup length  ] keep
     [ player-vi vorbis_info-rate alBufferData check-error ]  keep 
     [ player-source 1 ] keep
@@ -181,7 +182,7 @@ HINTS: yuv>rgb byte-array byte-array ;
     } cond ;    
 
 : start-audio ( player -- player bool )
-    [ dup >r player-buffers first r> al-channel-format ] keep
+    [ [ player-buffers first ] keep al-channel-format ] keep
     [ player-audio-buffer dup length ] keep
     [ player-vi vorbis_info-rate alBufferData check-error ]  keep 
     [ player-source 1 ] keep

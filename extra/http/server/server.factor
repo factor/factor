@@ -2,9 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io strings splitting
 threads http http.server.responders sequences prettyprint
-io.server http.server.responders.file
-http.server.responders.callback
-http.server.responders.continuation ;
+io.server ;
 
 IN: http.server
 
@@ -28,11 +26,11 @@ IN: http.server
         { "GET" "get" }
         { "POST" "post" }
         { "HEAD" "head" }
-    } at [ "bad" ] unless* ;
+    } at "bad" or ;
 
 : host ( -- string )
     #! The host the current responder was called from.
-    "Host" "header" get at ":" split1 drop ;
+    "Host" header-param ":" split1 drop ;
 
 : (handle-request) ( arg cmd -- method path host )
     request-method dup "method" set swap
@@ -55,7 +53,7 @@ IN: http.server
 
 : httpd ( port -- )
     "Starting HTTP server on port " write dup . flush
-    internet-server [
+    internet-server "http.server" [
         60000 stdio get set-timeout
         readln [ parse-request ] when*
     ] with-server ;
@@ -63,3 +61,9 @@ IN: http.server
 : httpd-main ( -- ) 8888 httpd ;
 
 MAIN: httpd-main
+
+! Load default webapps
+USE: webapps.file
+USE: webapps.callback
+USE: webapps.continuation
+USE: webapps.cgi

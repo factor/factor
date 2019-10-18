@@ -32,7 +32,7 @@ SYMBOL: page
     pdf get HPDF_Free drop ;
 
 : with-pdf ( quot -- )
-    [ f f new-pdf [ free-pdf ] cleanup ] with-scope ; inline
+    [ f f new-pdf [ free-pdf ] [ ] cleanup ] with-scope ; inline
 
 : set-compression-mode ( mode -- )
     pdf get swap HPDF_SetCompressionMode check-status ;
@@ -88,7 +88,7 @@ SYMBOL: page
     page get HPDF_Page_EndText check-status ;
 
 : with-text ( -- )
-    [ page-begin-text [ page-end-text ] cleanup ] with-scope ; inline
+    [ page-begin-text [ page-end-text ] [ ] cleanup ] with-scope ; inline
 
 : page-move-text-pos ( x y -- )
     page get -rot HPDF_Page_MoveTextPos check-status ;

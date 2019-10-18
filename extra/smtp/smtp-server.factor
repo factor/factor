@@ -61,7 +61,7 @@ SYMBOL: data-mode
 
 : start-server ( port -- )
     "Starting SMTP server on port " write dup . flush
-    internet-server [
+    internet-server "smtp-server" [
         60000 stdio get set-timeout
         "220 hello\r\n" write flush
         process

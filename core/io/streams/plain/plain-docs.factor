@@ -5,8 +5,9 @@ ARTICLE: "io.streams.plain" "Plain writer streams"
 "Plain writer streams wrap an underlying stream and provide a default implementation of "
 { $link stream-nl } ", "
 { $link stream-format } ", "
-{ $link with-nested-stream } " and "
-{ $link with-stream-style } "."
+{ $link make-span-stream } ", "
+{ $link make-block-stream } " and "
+{ $link make-cell-stream } "."
 { $subsection plain-writer }
 { $subsection <plain-writer> } ;
 

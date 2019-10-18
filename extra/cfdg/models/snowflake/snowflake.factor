@@ -11,8 +11,8 @@ iterate? [
     { 0.03 [ square
       	     [ 60 r spike ] do
 	     [ -60 r spike ] do
-	     [ 0.95 y 0.97 s spike ] do ] }
-  } random-weighted* call
+	     [ 0.95 y 0.97 s spike ] do ] } }
+  call-random-weighted
 ] when ;
 
 : snowflake ( -- )
@@ -26,6 +26,7 @@ spike
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : run ( -- )
+[ ] >background
 { -40 80 -40 80 } viewport set
 0.1 threshold set
 [ snowflake ] start-shape set

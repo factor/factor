@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math tetris.board tetris.piece
-tetris.tetromino lazy-lists combinators system ;
+USING: kernel sequences math math.functions tetris.board
+tetris.piece tetris.tetromino lazy-lists combinators system ;
 IN: tetris.game
 
 TUPLE: tetris pieces last-update update-interval rows score game-state paused? running? ;

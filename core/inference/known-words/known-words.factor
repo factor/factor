@@ -1,15 +1,60 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference.known-words
-USING: arrays bit-arrays byte-arrays alien generic hashtables
-hashtables.private io io.streams.c io.files.private io.backend
-kernel kernel.private math math.private memory parser sequences
-strings sbufs vectors words prettyprint namespaces quotations
-sequences.private system namespaces.private strings.private
-effects classes tuples tuples.private continuations.private
-inference.backend inference.dataflow
-sbufs.private vectors.private io.files slots.private
-float-arrays ;
+USING: alien arrays bit-arrays byte-arrays classes
+combinators.private continuations.private effects float-arrays
+generic hashtables hashtables.private inference.backend
+inference.dataflow io io.backend io.files io.files.private
+io.streams.c kernel kernel.private math math.private memory
+namespaces namespaces.private parser prettyprint quotations
+quotations.private sbufs sbufs.private sequences
+sequences.private slots.private strings strings.private system
+threads.private tuples tuples.private vectors vectors.private
+words assocs ;
+
+! Shuffle words
+: infer-shuffle-inputs ( shuffle node -- )
+    >r effect-in length 0 r> node-inputs ;
+
+: shuffle-stacks ( shuffle -- )
+    meta-d [ swap shuffle ] change ;
+
+: infer-shuffle-outputs ( shuffle node -- )
+    >r effect-out length 0 r> node-outputs ;
+
+: infer-shuffle ( shuffle -- )
+    dup effect-in ensure-values
+    #shuffle
+    2dup infer-shuffle-inputs
+    over shuffle-stacks
+    2dup infer-shuffle-outputs
+    node, drop ;
+
+: define-shuffle ( word shuffle -- )
+    [ infer-shuffle ] curry "infer" set-word-prop ;
+
+{
+    { drop  T{ effect f 1 {             } } }
+    { 2drop T{ effect f 2 {             } } }
+    { 3drop T{ effect f 3 {             } } }
+    { dup   T{ effect f 1 { 0 0         } } }
+    { 2dup  T{ effect f 2 { 0 1 0 1     } } }
+    { 3dup  T{ effect f 3 { 0 1 2 0 1 2 } } }
+    { rot   T{ effect f 3 { 1 2 0       } } }
+    { -rot  T{ effect f 3 { 2 0 1       } } }
+    { dupd  T{ effect f 2 { 0 0 1       } } }
+    { swapd T{ effect f 3 { 1 0 2       } } }
+    { nip   T{ effect f 2 { 1           } } }
+    { 2nip  T{ effect f 3 { 2           } } }
+    { tuck  T{ effect f 2 { 1 0 1       } } }
+    { over  T{ effect f 2 { 0 1 0       } } }
+    { pick  T{ effect f 3 { 0 1 2 0     } } }
+    { swap  T{ effect f 2 { 1 0         } } }
+} [ define-shuffle ] assoc-each
+
+\ >r [ infer->r ] "infer" set-word-prop
+
+\ r> [ infer-r> ] "infer" set-word-prop
 
 \ declare [
     1 ensure-values
@@ -21,32 +66,19 @@ float-arrays ;
     node,
 ] "infer" set-word-prop
 
-\ fixnum< { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
-\ fixnum< make-foldable
-
-\ fixnum<= { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
-\ fixnum<= make-foldable
-
-\ fixnum> { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
-\ fixnum> make-foldable
-
-\ fixnum>= { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
-\ fixnum>= make-foldable
-
-\ eq? { object object } { object } <effect> "inferred-effect" set-word-prop
-\ eq? make-foldable
-
 ! Primitive combinators
 GENERIC: infer-call ( value -- )
 
 M: value infer-call
-    drop pop-literal infer-quot-value ;
+    drop
+    1 #drop node,
+    pop-d infer-quot-value ;
 
 M: curried infer-call
-    uncurry peek-d infer-call ;
+    infer-uncurry peek-d infer-call ;
 
 M: composed infer-call
-    uncurry
+    infer-uncurry
     infer->r peek-d infer-call infer-r>
     peek-d infer-call ;
 
@@ -65,15 +97,15 @@ M: object infer-call
         apply-object
     ] [
         drop
-        [ "execute must be given a word" throw ]
-        infer-quot
+        "execute must be given a word" time-bomb
     ] if
 ] "infer" set-word-prop
 
 \ if [
     3 ensure-values
     2 d-tail [ special? ] contains? [
-        [ rot [ drop call ] [ nip call ] if ] infer-quot
+        [ rot [ drop call ] [ nip call ] if ]
+        recursive-state get infer-quot
     ] [
         [ #values ]
         2 #drop node, pop-d pop-d swap 2array
@@ -113,11 +145,26 @@ M: object infer-call
 \ <tuple-boa> 2 { tuple } <effect> "inferred-effect" set-word-prop
 
 ! Non-standard control flow
-\ throw { object } { } <effect>
+\ (throw) { callable } { } <effect>
 t over set-effect-terminated?
 "inferred-effect" set-word-prop
 
 ! Stack effects for all primitives
+\ fixnum< { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ fixnum< make-foldable
+
+\ fixnum<= { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ fixnum<= make-foldable
+
+\ fixnum> { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ fixnum> make-foldable
+
+\ fixnum>= { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
+\ fixnum>= make-foldable
+
+\ eq? { object object } { object } <effect> "inferred-effect" set-word-prop
+\ eq? make-foldable
+
 \ rehash-string { string } { } <effect> "inferred-effect" set-word-prop
 
 \ string>sbuf { string integer } { sbuf } <effect> "inferred-effect" set-word-prop
@@ -255,6 +302,18 @@ t over set-effect-terminated?
 \ bignum>= { bignum bignum } { object } <effect> "inferred-effect" set-word-prop
 \ bignum>= make-foldable
 
+\ bignum-bit? { bignum integer } { object } <effect> "inferred-effect" set-word-prop
+\ bignum-bit? make-foldable
+
+\ bignum-log2 { bignum } { bignum } <effect> "inferred-effect" set-word-prop
+\ bignum-log2 make-foldable
+
+\ byte-array>bignum { byte-array } { bignum } <effect> "inferred-effect" set-word-prop
+\ byte-array>bignum make-foldable
+
+\ float= { float float } { object } <effect> "inferred-effect" set-word-prop
+\ float= make-foldable
+
 \ float+ { float float } { float } <effect> "inferred-effect" set-word-prop
 \ float+ make-foldable
 
@@ -301,9 +360,7 @@ t over set-effect-terminated?
 
 \ data-gc { } { } <effect> "inferred-effect" set-word-prop
 
-! code-gc does not declare a stack effect since it might be
-! called from a compiled word which becomes unreachable during
-! the course of its execution, resulting in a crash
+\ code-gc { } { } <effect> "inferred-effect" set-word-prop
 
 \ gc-time { } { integer } <effect> "inferred-effect" set-word-prop
 
@@ -311,7 +368,9 @@ t over set-effect-terminated?
 
 \ save-image-and-exit { string } { } <effect> "inferred-effect" set-word-prop
 
-\ exit { integer } { } <effect> "inferred-effect" set-word-prop
+\ exit { integer } { } <effect>
+t over set-effect-terminated?
+"inferred-effect" set-word-prop
 
 \ data-room { } { integer array } <effect> "inferred-effect" set-word-prop
 \ data-room make-flushable
@@ -482,8 +541,11 @@ t over set-effect-terminated?
 \ <string> { integer integer } { string } <effect> "inferred-effect" set-word-prop
 \ <string> make-flushable
 
-\ <quotation> { integer } { quotation } <effect> "inferred-effect" set-word-prop
-\ <quotation> make-flushable
+\ array>quotation { array } { quotation } <effect> "inferred-effect" set-word-prop
+\ array>quotation make-flushable
+
+\ quotation-xt { quotation } { integer } <effect> "inferred-effect" set-word-prop
+\ quotation-xt make-flushable
 
 \ <tuple> { word integer } { quotation } <effect> "inferred-effect" set-word-prop
 \ <tuple> make-flushable
@@ -494,5 +556,26 @@ t over set-effect-terminated?
 \ tuple>array { tuple } { array } <effect> "inferred-effect" set-word-prop
 \ tuple>array make-flushable
 
-\ xt-map { } { array } <effect> "inferred-effect" set-word-prop
-\ xt-map make-flushable
+\ datastack { } { array } <effect> "inferred-effect" set-word-prop
+\ datastack make-flushable
+
+\ retainstack { } { array } <effect> "inferred-effect" set-word-prop
+\ retainstack make-flushable
+
+\ callstack { } { callstack } <effect> "inferred-effect" set-word-prop
+\ callstack make-flushable
+
+\ callstack>array { callstack } { array } <effect> "inferred-effect" set-word-prop
+\ callstack>array make-flushable
+
+\ (sleep) { integer } { } <effect> "inferred-effect" set-word-prop
+
+\ become { array array } { } <effect> "inferred-effect" set-word-prop
+
+\ innermost-frame-quot { callstack } { quotation } <effect> "inferred-effect" set-word-prop
+
+\ innermost-frame-scan { callstack } { fixnum } <effect> "inferred-effect" set-word-prop
+
+\ set-innermost-frame-quot { quotation callstack } { } <effect> "inferred-effect" set-word-prop
+
+\ (os-envs) { } { array } <effect> "inferred-effect" set-word-prop

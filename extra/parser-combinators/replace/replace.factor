@@ -13,21 +13,21 @@ IN: parser-combinators
   } cond ;
 
 : search ( string parser -- seq )
-  'any-char' [ drop f ] <@ <|> <*> parse dup nil? [
+  any-char-parser [ drop f ] <@ <|> <*> parse dup nil? [
     drop { }
   ] [
     car parse-result-parsed [ ] subset 
   ] if ;
 
 : search* ( string parsers -- seq )
-  unclip [ <|> ] reduce 'any-char' [ drop f ] <@ <|> <*> parse dup nil? [
+  unclip [ <|> ] reduce any-char-parser [ drop f ] <@ <|> <*> parse dup nil? [
     drop { }
   ] [
     car parse-result-parsed [ ] subset 
   ] if ;
 
 : (replace) ( string parser -- seq )
-  'any-char' <|> <*> parse car parse-result-parsed ;
+  any-char-parser <|> <*> parse-1 ;
 
 : replace ( string parser -- result )
  [  (replace) [ tree-write ] each ] string-out ;

@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gestures ui.gadgets ui.gadgets.buttons
-ui.gadgets.controls ui.gadgets.frames ui.gadgets.grids
+ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.theme ui.render kernel math namespaces sequences
-vectors models math.vectors quotations colors ;
+vectors models math.vectors math.functions quotations colors ;
 IN: ui.gadgets.sliders
 
 TUPLE: elevator direction ;
@@ -22,13 +22,13 @@ TUPLE: slider elevator thumb saved line ;
 
 : min-thumb-dim 15 ;
 
-: slider-value control-model range-value >fixnum ;
+: slider-value gadget-model range-value >fixnum ;
 
-: slider-page control-model range-page-value ;
+: slider-page gadget-model range-page-value ;
 
-: slider-max control-model range-max-value ;
+: slider-max gadget-model range-max-value ;
 
-: slider-max* control-model range-max-value* ;
+: slider-max* gadget-model range-max-value* ;
 
 : thumb-dim ( slider -- h )
     dup slider-page over slider-max 1 max / 1 min
@@ -47,7 +47,7 @@ TUPLE: slider elevator thumb saved line ;
 
 : screen>slider slider-scale / ;
 
-M: slider model-changed slider-elevator relayout-1 ;
+M: slider model-changed nip slider-elevator relayout-1 ;
 
 TUPLE: thumb ;
 
@@ -57,7 +57,7 @@ TUPLE: thumb ;
 : do-drag ( thumb -- )
     find-slider drag-loc over gadget-orientation v.
     over screen>slider swap [ slider-saved + ] keep
-    control-model set-range-value ;
+    gadget-model set-range-value ;
 
 thumb H{
     { T{ button-down } [ begin-drag ] }
@@ -75,10 +75,10 @@ thumb H{
     [ set-gadget-orientation ] keep ;
 
 : slide-by ( amount slider -- )
-    control-model move-by ;
+    gadget-model move-by ;
 
 : slide-by-page ( amount slider -- )
-    control-model move-by-page ;
+    gadget-model move-by-page ;
 
 : compute-direction ( elevator -- -1/1 )
     dup find-slider swap hand-click-rel
@@ -131,7 +131,7 @@ M: elevator layout*
 : slide-by-line ( amount slider -- )
     [ slider-line * ] keep slide-by ;
 
-: <slide-button> ( vector polygon amount -- )
+: <slide-button> ( vector polygon amount -- button )
     >r gray swap <polygon-gadget> r>
     [ swap find-slider slide-by-line ] curry <repeat-button>
     [ set-gadget-orientation ] keep ;
@@ -144,7 +144,7 @@ M: elevator layout*
 : <left-button> { 0 1 } arrow-left -1 <slide-button> ;
 : <right-button> { 0 1 } arrow-right 1 <slide-button> ;
 
-: build-x-slider ( slider -- slider )
+: build-x-slider ( slider -- )
     [
         <left-button> @left frame,
         { 0 1 } elevator,
@@ -154,7 +154,7 @@ M: elevator layout*
 : <up-button> { 1 0 } arrow-up -1 <slide-button> ;
 : <down-button> { 1 0 } arrow-down 1 <slide-button> ;
 
-: build-y-slider ( slider -- slider )
+: build-y-slider ( slider -- )
     [
         <up-button> @top frame,
         { 1 0 } elevator,

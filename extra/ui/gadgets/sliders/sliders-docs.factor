@@ -1,5 +1,4 @@
-USING: ui.gadgets.controls help.markup help.syntax ui.gadgets
-models ;
+USING: help.markup help.syntax ui.gadgets models ;
 IN: ui.gadgets.sliders
 
 HELP: elevator
@@ -10,7 +9,7 @@ HELP: find-elevator
 { $description "Finds the first parent of " { $snippet "gadget" } " which is an " { $link elevator } ". Outputs " { $link f } " if the gadget is not contained in an " { $link elevator } "." } ;
 
 HELP: slider
-{ $class-description "A slider is a " { $link control } " for graphically manipulating a " { $link "models-range" } "."
+{ $class-description "A slider is a control for graphically manipulating a " { $link "models-range" } "."
 $nl
 "Sliders are created by calling " { $link <x-slider> } " or " { $link <y-slider> } "." } ;
 
@@ -57,6 +56,6 @@ ARTICLE: "ui.gadgets.sliders" "Slider gadgets"
 { $subsection slide-by }
 { $subsection slide-by-line }
 { $subsection slide-by-page }
-"Since sliders are controls the value can be get and set by calling " { $link control-model } "." ;
+"Since sliders are controls the value can be get and set by calling " { $link gadget-model } "." ;
 
 ABOUT: "ui.gadgets.sliders"

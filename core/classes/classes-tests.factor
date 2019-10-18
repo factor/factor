@@ -152,20 +152,6 @@ UNION: empty-union-2 ;
 
 M: empty-union-2 empty-union-test ;
 
-! More class redefinition bugs
-UNION: union-2 integer vector ;
-
-GENERIC: union-2-generic
-
-M: union-2 union-2-generic "x" ;
-
-[ t ] [ \ vector? \ union-2-generic word-def memq? ] unit-test
-
-"USE: vectors IN: temporary UNION: union-2 integer array ;" eval
-
-[ f ] [ \ vector? \ union-2-generic word-def memq? ] unit-test
-[ t ] [ \ array? \ union-2-generic word-def memq? ] unit-test
-
 ! Redefining a class didn't update containing unions
 UNION: redefine-bug-1 fixnum ;
 

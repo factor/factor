@@ -140,6 +140,7 @@ M: polygon draw-interior
     >r <polygon> <gadget> r> over set-rect-dim
     [ set-gadget-interior ] keep ;
 
+! Font rendering
 SYMBOL: font-renderer
 
 HOOK: open-font font-renderer ( font -- open-font )

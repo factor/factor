@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- IDL mode, by Slava Pestov
+     based on Java mode by Mike Dillon and IDLTokenMarker by Juha Lindfors -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="boxComment" VALUE="*" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE">
+		<!-- C style comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+		<!-- some of these should be marked OPERATOR -->
+		<!-- <SEQ TYPE="NULL">)</SEQ>
+		<SEQ TYPE="NULL">=</SEQ>
+		<SEQ TYPE="NULL">!</SEQ>
+		<SEQ TYPE="NULL">&gt;=</SEQ>
+		<SEQ TYPE="NULL">&lt;=</SEQ>
+		<SEQ TYPE="NULL">+</SEQ>
+		<SEQ TYPE="NULL">-</SEQ>
+		<SEQ TYPE="NULL">/</SEQ>
+		<SEQ TYPE="NULL">*</SEQ>
+		<SEQ TYPE="NULL">&gt;</SEQ>
+		<SEQ TYPE="NULL">&lt;</SEQ>
+		<SEQ TYPE="NULL">%</SEQ>
+		<SEQ TYPE="NULL">&amp;</SEQ>
+		<SEQ TYPE="NULL">|</SEQ>
+		<SEQ TYPE="NULL">^</SEQ>
+		<SEQ TYPE="NULL">~</SEQ>
+		<SEQ TYPE="NULL">.</SEQ>
+		<SEQ TYPE="NULL">,</SEQ>
+		<SEQ TYPE="NULL">;</SEQ>
+		<SEQ TYPE="NULL">]</SEQ>
+		<SEQ TYPE="NULL">[</SEQ>
+		<SEQ TYPE="NULL">?</SEQ> -->
+
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+
+		<!-- Function calls -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD3>any</KEYWORD3>
+			<KEYWORD1>attribute</KEYWORD1>
+			<KEYWORD3>boolean</KEYWORD3>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD3>char</KEYWORD3>
+			<KEYWORD1>const</KEYWORD1>
+			<KEYWORD1>context</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>enum</KEYWORD3>
+			<KEYWORD1>exception</KEYWORD1>
+			<LITERAL2>FALSE</LITERAL2>
+			<KEYWORD1>fixed</KEYWORD1>
+			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>inout</KEYWORD1>
+			<KEYWORD1>interface</KEYWORD1>
+			<KEYWORD3>long</KEYWORD3>
+			<KEYWORD1>module</KEYWORD1>
+			<KEYWORD3>Object</KEYWORD3>
+			<KEYWORD3>octet</KEYWORD3>
+			<KEYWORD1>oneway</KEYWORD1>
+			<KEYWORD1>out</KEYWORD1>
+			<KEYWORD1>raises</KEYWORD1>
+			<KEYWORD1>readonly</KEYWORD1>
+			<KEYWORD3>sequence</KEYWORD3>
+			<KEYWORD3>short</KEYWORD3>
+			<KEYWORD3>string</KEYWORD3>
+			<KEYWORD3>struct</KEYWORD3>
+			<KEYWORD1>switch</KEYWORD1>
+			<LITERAL2>TRUE</LITERAL2>
+			<KEYWORD3>typedef</KEYWORD3>
+			<KEYWORD3>unsigned</KEYWORD3>
+			<KEYWORD3>union</KEYWORD3>
+			<KEYWORD3>void</KEYWORD3>
+			<KEYWORD3>wchar</KEYWORD3>
+			<KEYWORD3>wstring</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+</MODE>

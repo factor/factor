@@ -150,10 +150,6 @@ HELP: retainstack-overflow.
 { $error-description "Thrown by the Factor VM if " { $link >r } " is called when the retain stack is full." }
 { $notes "This error usually indicates a run-away recursion, however if you legitimately need a retain stack larger than the default, see " { $link "runtime-cli-args" } "." } ;
 
-HELP: callstack-overflow.
-{ $error-description "Thrown by the Factor VM if the call stack is full." }
-{ $notes "This error usually indicates a run-away recursion, however if you legitimately need a call stack larger than the default, see " { $link "runtime-cli-args" } "." } ;
-
 HELP: memory-error.
 { $error-description "Thrown by the Factor VM if an invalid memory access occurs." }
 { $notes "This can be a result of incorrect usage of C library interface words, a bug in the compiler, or a bug in the VM." } ;

@@ -1,4 +1,4 @@
-USING: alien alien.c-types arrays kernel
+USING: alien alien.c-types arrays kernel structs
 math unix calendar namespaces ;
 IN: calendar.unix
 

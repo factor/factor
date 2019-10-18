@@ -59,4 +59,4 @@ SYMBOL: main-vocab-hook
     ignore-cli-args? [ drop ] [ [ run-file ] each ] if
     "e" get [ eval ] when* ;
 
-[ default-cli-args ] "command-line" add-startup-hook
+[ default-cli-args ] "command-line" add-init-hook

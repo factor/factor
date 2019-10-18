@@ -6,7 +6,7 @@ s64 current_millis(void)
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
-	return (s64)t.tv_sec * 1000 + t.tv_usec/1000;
+	return (s64)t.tv_sec * 1000 + t.tv_usec / 1000;
 }
 
 void sleep_millis(CELL msec)
@@ -16,7 +16,7 @@ void sleep_millis(CELL msec)
 
 void init_ffi(void)
 {
-    // NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix
+	/* NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix */
 	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
@@ -28,8 +28,9 @@ void ffi_dlopen(F_DLL *dll, bool error)
 	{
 		if(error)
 		{
-			simple_error(ERROR_FFI,F,
-				tag_object(from_char_string(dlerror())));
+			general_error(ERROR_FFI,F,
+				tag_object(from_char_string(dlerror())),
+				NULL);
 		}
 		else
 			dll->dll = NULL;
@@ -50,13 +51,13 @@ void ffi_dlclose(F_DLL *dll)
 {
 	if(dlclose(dll->dll))
 	{
-		simple_error(ERROR_FFI,tag_object(
-			from_char_string(dlerror())),F);
+		general_error(ERROR_FFI,tag_object(
+			from_char_string(dlerror())),F,NULL);
 	}
 	dll->dll = NULL;
 }
 
-void primitive_stat(void)
+DEFINE_PRIMITIVE(stat)
 {
 	struct stat sb;
 
@@ -89,7 +90,7 @@ CELL parse_dir_entry(struct dirent *file)
 	}
 }
 
-void primitive_read_dir(void)
+DEFINE_PRIMITIVE(read_dir)
 {
 	DIR* dir = opendir(unbox_char_string());
 	GROWABLE_ARRAY(result);
@@ -100,9 +101,9 @@ void primitive_read_dir(void)
 
 		while((file = readdir(dir)) != NULL)
 		{
-			REGISTER_ARRAY(result);
+			REGISTER_UNTAGGED(result);
 			CELL pair = parse_dir_entry(file);
-			UNREGISTER_ARRAY(result);
+			UNREGISTER_UNTAGGED(result);
 			GROWABLE_ADD(result,pair);
 		}
 
@@ -114,7 +115,7 @@ void primitive_read_dir(void)
 	dpush(tag_object(result));
 }
 
-void primitive_cwd(void)
+DEFINE_PRIMITIVE(cwd)
 {
 	char wd[MAXPATHLEN];
 	if(getcwd(wd,MAXPATHLEN) == NULL)
@@ -122,9 +123,27 @@ void primitive_cwd(void)
 	box_char_string(wd);
 }
 
-void primitive_cd(void)
+DEFINE_PRIMITIVE(cd)
 {
 	chdir(unbox_char_string());
+}
+
+DEFINE_PRIMITIVE(os_envs)
+{
+	GROWABLE_ARRAY(result);
+	char **env = environ;
+
+	while(*env)
+	{
+		REGISTER_UNTAGGED(result);
+		CELL string = tag_object(from_char_string(*env));
+		UNREGISTER_UNTAGGED(result);
+		GROWABLE_ADD(result,string);
+		env++;
+	}
+
+	GROWABLE_TRIM(result);
+	dpush(tag_object(result));
 }
 
 F_SEGMENT *alloc_segment(CELL size)
@@ -166,24 +185,30 @@ void dealloc_segment(F_SEGMENT *block)
 	free(block);
 }
   
-INLINE F_COMPILED_FRAME *uap_stack_pointer(void *uap)
+INLINE F_STACK_FRAME *uap_stack_pointer(void *uap)
 {
-	F_COMPILED_FRAME *ptr = ucontext_stack_pointer(uap);
-	if(ptr)
-		return ptr;
+	/* There is a race condition here, but in practice a signal
+	delivered during stack frame setup/teardown or while transitioning
+	from Factor to C is a sign of things seriously gone wrong, not just
+	a divide by zero or stack underflow in the listener */
+	if(in_code_heap_p(UAP_PROGRAM_COUNTER(uap)))
+		return ucontext_stack_pointer(uap);
 	else
-		return native_stack_pointer();
+		return NULL;
 }
 
 void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	memory_protection_error((CELL)siginfo->si_addr,
-		uap_stack_pointer(uap));
+	signal_fault_addr = (CELL)siginfo->si_addr;
+	signal_callstack_top = uap_stack_pointer(uap);
+	UAP_PROGRAM_COUNTER(uap) = (CELL)memory_signal_handler_impl;
 }
 
 void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
 {
-	signal_error(signal,uap_stack_pointer(uap));
+	signal_number = signal;
+	signal_callstack_top = uap_stack_pointer(uap);
+	UAP_PROGRAM_COUNTER(uap) = (CELL)misc_signal_handler_impl;
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)
@@ -194,6 +219,9 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 		ret = sigaction(signum, act, oldact);
 	}
 	while(ret == -1 && errno == EINTR);
+
+	if(ret == -1)
+		fatal_error("sigaction failed", 0);
 }
 
 void unix_init_signals(void)
@@ -231,3 +259,5 @@ void reset_stdio(void)
 	fcntl(0,F_SETFL,0);
 	fcntl(1,F_SETFL,0);
 }
+
+void open_console(void) { }

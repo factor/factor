@@ -14,8 +14,8 @@ math.constants ;
 [ t ] [ qj qj q* q1 v+ q0 = ] unit-test
 [ t ] [ qk qk q* q1 v+ q0 = ] unit-test
 [ t ] [ qi qj qk q* q* q1 v+ q0 = ] unit-test
-[ t ] [ i qj n*v qk = ] unit-test
-[ t ] [ qj i q*n qk v+ q0 = ] unit-test
+[ t ] [ C{ 0 1 } qj n*v qk = ] unit-test
+[ t ] [ qj C{ 0 1 } q*n qk v+ q0 = ] unit-test
 [ t ] [ qk qj q/ qi = ] unit-test
 [ t ] [ qi qk q/ qj = ] unit-test
 [ t ] [ qj qi q/ qk = ] unit-test
@@ -23,4 +23,4 @@ math.constants ;
 [ t ] [ qj q>v v>q qj = ] unit-test
 [ t ] [ qk q>v v>q qk = ] unit-test
 [ t ] [ 1 c>q q1 = ] unit-test
-[ t ] [ i c>q qi = ] unit-test
+[ t ] [ C{ 0 1 } c>q qi = ] unit-test

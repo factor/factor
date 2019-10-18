@@ -3,7 +3,6 @@ USING: io.files tools.test sequences namespaces kernel ;
 {
     "templates-early"
     "simple"
-    "bail-out"
     "intrinsics"
     "float"
     "generic"

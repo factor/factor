@@ -1,35 +1,37 @@
-typedef struct _F_COMPILED_FRAME {
-	struct _F_COMPILED_FRAME *previous;
-	CELL padding1;
-	CELL return_address;
-	CELL padding2;
-} F_COMPILED_FRAME;
+/* Fault handler information.  MacOSX version.
+Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
+Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
 
-#define SIGSEGV_EXC_STATE_TYPE ppc_exception_state_t
-#define SIGSEGV_EXC_STATE_FLAVOR PPC_EXCEPTION_STATE
-#define SIGSEGV_EXC_STATE_COUNT PPC_EXCEPTION_STATE_COUNT
-#define SIGSEGV_THREAD_STATE_TYPE ppc_thread_state_t
-#define SIGSEGV_THREAD_STATE_FLAVOR PPC_THREAD_STATE
-#define SIGSEGV_THREAD_STATE_COUNT PPC_THREAD_STATE_COUNT
+Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
+2005-03-10:
+
+http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
+
+Modified for Factor by Slava Pestov */
+#define FRAME_RETURN_ADDRESS(frame) *((XT *)(frame_successor(frame) + 1) + 2)
+
+#define MACH_EXC_STATE_TYPE ppc_exception_state_t
+#define MACH_EXC_STATE_FLAVOR PPC_EXCEPTION_STATE
+#define MACH_EXC_STATE_COUNT PPC_EXCEPTION_STATE_COUNT
+#define MACH_THREAD_STATE_TYPE ppc_thread_state_t
+#define MACH_THREAD_STATE_FLAVOR PPC_THREAD_STATE
+#define MACH_THREAD_STATE_COUNT PPC_THREAD_STATE_COUNT
 
 #if __DARWIN_UNIX03
-    #define SIGSEGV_EXC_STATE_FAULT(exc_state) (exc_state).__dar
-    #define SIGSEGV_STACK_POINTER(thr_state) (thr_state).__r1
-    #define SIGSEGV_THREAD_STATE_ARG(thr_state) (thr_state).__r3
-    #define SIGSEGV_PROGRAM_COUNTER(thr_state) (thr_state).__srr0
+	#define MACH_EXC_STATE_FAULT(exc_state) (exc_state)->__dar
+	#define MACH_STACK_POINTER(thr_state) (thr_state)->__r1
+	#define MACH_PROGRAM_COUNTER(thr_state) (thr_state)->__srr0
+	#define UAP_PROGRAM_COUNTER(ucontext) \
+		MACH_PROGRAM_COUNTER(&(((ucontext_t *)(ucontext))->uc_mcontext->__ss))
 #else
-    #define SIGSEGV_EXC_STATE_FAULT(exc_state) (exc_state).dar
-    #define SIGSEGV_STACK_POINTER(thr_state) (thr_state).r1
-    #define SIGSEGV_THREAD_STATE_ARG(thr_state) (thr_state).r3
-    #define SIGSEGV_PROGRAM_COUNTER(thr_state) (thr_state).srr0
+	#define MACH_EXC_STATE_FAULT(exc_state) (exc_state)->dar
+	#define MACH_STACK_POINTER(thr_state) (thr_state)->r1
+	#define MACH_PROGRAM_COUNTER(thr_state) (thr_state)->srr0
+	#define UAP_PROGRAM_COUNTER(ucontext) \
+		MACH_PROGRAM_COUNTER(&(((ucontext_t *)(ucontext))->uc_mcontext->ss))
 #endif
 
-INLINE unsigned long fix_stack_ptr(unsigned long sp)
+INLINE CELL fix_stack_pointer(CELL sp)
 {
-	  return sp;
-}
-
-INLINE void pass_arg0(SIGSEGV_THREAD_STATE_TYPE *thr_state, CELL arg)
-{
-	SIGSEGV_THREAD_STATE_ARG(*thr_state) = arg;
+	return sp;
 }

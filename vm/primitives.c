@@ -1,13 +1,9 @@
 #include "master.h"
 
-static void *_primitives[] = {
-	undefined,
-	docol,
-	dosym,
+void *primitives[] = {
 	primitive_execute,
 	primitive_call,
-	primitive_ifte,
-	primitive_dispatch,
+	primitive_uncurry,
 	primitive_string_to_sbuf,
 	primitive_bignum_to_fixnum,
 	primitive_float_to_fixnum,
@@ -57,6 +53,10 @@ static void *_primitives[] = {
 	primitive_bignum_lesseq,
 	primitive_bignum_greater,
 	primitive_bignum_greatereq,
+	primitive_bignum_bitp,
+	primitive_bignum_log2,
+	primitive_byte_array_to_bignum,
+	primitive_float_eq,
 	primitive_float_add,
 	primitive_float_subtract,
 	primitive_float_multiply,
@@ -173,14 +173,13 @@ static void *_primitives[] = {
 	primitive_fwrite,
 	primitive_fflush,
 	primitive_fclose,
-	primitive_expired,
 	primitive_wrapper,
 	primitive_clone,
 	primitive_array_to_vector,
 	primitive_string,
-	primitive_xt_map,
 	primitive_to_tuple,
-	primitive_quotation,
+	primitive_array_to_quotation,
+	primitive_quotation_xt,
 	primitive_tuple,
 	primitive_tuple_to_array,
 	primitive_profiling,
@@ -190,14 +189,11 @@ static void *_primitives[] = {
 	primitive_curry,
 	primitive_tuple_boa,
 	primitive_class_hash,
+	primitive_callstack_to_array,
+	primitive_innermost_stack_frame_quot,
+	primitive_innermost_stack_frame_scan,
+	primitive_set_innermost_stack_frame_quot,
+	primitive_call_clear,
+	primitive_strip_compiled_quotations,
+	primitive_os_envs,
 };
-
-void init_primitives(void)
-{
-	primitives = _primitives;
-}
-
-XT primitive_to_xt(CELL primitive)
-{
-	return primitives[primitive];
-}

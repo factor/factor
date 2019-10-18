@@ -4,7 +4,7 @@ USING: arrays assocs combinators continuations documents
 ui.tools.workspace hashtables io io.styles kernel math
 math.vectors models namespaces parser prettyprint quotations
 sequences strings threads listener tuples ui.commands
-ui.gadgets ui.gadgets.controls ui.gadgets.editors
+ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures ;
 IN: ui.tools.interactor
 
@@ -19,25 +19,14 @@ help ;
 
 : word-at-loc ( loc interactor -- word )
     over [
-        [ control-model T{ one-word-elt } elt-string ] keep
+        [ gadget-model T{ one-word-elt } elt-string ] keep
         interactor-use assoc-stack
     ] [
         2drop f
     ] if ;
 
-TUPLE: caret-help model gadget ;
-
-: <caret-help> ( interactor -- caret-help )
-    [ editor-caret 100 <delay> ] keep caret-help construct-boa
-    dup dup caret-help-model add-connection ;
-
-M: caret-help model-changed
-    dup caret-help-gadget
-    swap caret-help-model model-value over word-at-loc
-    swap show-summary ;
-
 : init-caret-help ( interactor -- )
-    dup <caret-help> swap set-interactor-help ;
+    dup editor-caret 100 <delay> swap set-interactor-help ;
 
 : init-interactor-history ( interactor -- )
     V{ } clone swap set-interactor-history ;
@@ -46,18 +35,25 @@ M: caret-help model-changed
     <source-editor>
     { set-interactor-output set-gadget-delegate }
     interactor construct
-    dup dup set-control-self
+    dup dup set-editor-self
     dup init-interactor-history
     dup init-caret-help ;
 
 M: interactor graft*
     dup delegate graft*
-    dup interactor-help caret-help-model activate-model
+    dup dup interactor-help add-connection
     f swap set-interactor-busy? ;
 
 M: interactor ungraft*
-    dup interactor-help caret-help-model deactivate-model
+    dup dup interactor-help remove-connection
     delegate ungraft* ;
+
+M: interactor model-changed
+    2dup interactor-help eq? [
+        swap model-value over word-at-loc swap show-summary
+    ] [
+        delegate model-changed
+    ] if ;
 
 : write-input ( string input -- )
     <input> presented associate
@@ -79,7 +75,7 @@ M: interactor ungraft*
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
-    dup control-model clear-doc
+    dup gadget-model clear-doc
     interactor-continue ;
 
 : interactor-eval ( interactor -- )
@@ -93,10 +89,10 @@ M: interactor ungraft*
 : evaluate-input ( interactor -- )
     dup interactor-busy? [ drop ] [ interactor-eval ] if ;
 
-: interactor-yield ( interactor quot -- )
+: interactor-yield ( interactor quot -- obj )
     over set-interactor-quot
     f over set-interactor-busy?
-    [ swap set-interactor-continuation stop ] callcc1 nip ;
+    [ set-interactor-continuation stop ] curry callcc1 ;
 
 M: interactor stream-readln
     [ interactor-finish ] interactor-yield ;
@@ -105,8 +101,14 @@ M: interactor stream-readln
     2dup interactor-input. interactor-continue ;
 
 M: interactor stream-read
-    swap dup zero?
-    [ 2drop "" ] [ >r stream-readln r> head ] if ;
+    swap dup zero? [
+        2drop ""
+    ] [
+        >r stream-readln dup length r> min head
+    ] if ;
+
+M: interactor stream-read-partial
+    stream-read ;
 
 : save-vars ( interactor -- )
     { use in stdio lexer-factory } [ dup get ] H{ } map>assoc
@@ -117,7 +119,7 @@ M: interactor stream-read
 
 : go-to-error ( interactor error -- )
     dup parse-error-line 1- swap parse-error-col 2array
-    over [ control-model validate-loc ] keep
+    over [ gadget-model validate-loc ] keep
     editor-caret set-model
     mark>caret ;
 
@@ -131,7 +133,7 @@ M: interactor stream-read
             [ restore-vars parse ] keep save-vars
         ] [
             >r f swap set-interactor-busy? drop r>
-            dup [ unexpected-eof? ] is? [ drop f ] when
+            dup delegate unexpected-eof? [ drop f ] when
         ] recover
     ] with-scope ;
 
@@ -150,7 +152,7 @@ M: interactor parse-interactive
 M: interactor pref-dim*
     0 over line-height 4 * 2array swap delegate pref-dim* vmax ;
 
-: clear-input control-model clear-doc ;
+: clear-input gadget-model clear-doc ;
 
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }

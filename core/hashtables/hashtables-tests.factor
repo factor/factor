@@ -34,11 +34,11 @@ unit-test
 
 16 <hashtable> "testhash" set
 
-t C{ 2 3 } "testhash" get set-at
+t { 2 3 } "testhash" get set-at
 f 100000000000000000000000000 "testhash" get set-at
 { } { [ { } ] } "testhash" get set-at
 
-[ t ] [ C{ 2 3 } "testhash" get at ] unit-test
+[ t ] [ { 2 3 } "testhash" get at ] unit-test
 [ f ] [ 100000000000000000000000000 "testhash" get at* drop ] unit-test
 [ { } ] [ { [ { } ] } clone "testhash" get at* drop ] unit-test
 
@@ -122,7 +122,7 @@ H{ } "x" set
 100 [ drop "x" get clear-assoc ] each
 
 ! Crash discovered by erg
-[ t ] [ 3/4 <hashtable> dup clone = ] unit-test
+[ t ] [ 0.75 <hashtable> dup clone = ] unit-test
 
 ! Another crash discovered by erg
 [ ] [

@@ -1,0 +1,45 @@
+body {
+	font:75%/1.6em "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
+	color:#888;
+}
+
+h1.planet-title {
+	font-size:300%;
+}
+
+a {
+	color:#222;
+	border-bottom:1px dotted #ccc;
+	text-decoration:none;
+}
+
+a:hover {
+	border-bottom:1px solid #ccc;
+}
+
+.posting-title {
+	background-color:#f5f5f5;
+}
+
+pre, code {
+	color:#000000;
+	font-size:120%;
+}
+
+.infobox {
+	border-left: 1px solid #C1DAD7;
+}
+
+.posting-date {
+	text-align: right;
+	font-size:90%;
+}
+
+a.more {
+	display:block;
+	padding:0 0 5px 0;
+	color:#333;
+	text-decoration:none;
+	text-align:right;
+	border:none;
+}

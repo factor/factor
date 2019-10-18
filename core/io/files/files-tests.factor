@@ -1,9 +1,7 @@
 IN: temporary
-USING: tools.test io.files ;
+USING: tools.test io.files io threads kernel ;
 
-[ "/etc" ] [ "/etc/passwd" parent-dir ] unit-test
 [ "passwd" ] [ "/etc/passwd" file-name ] unit-test
-[ "/usr/libexec" ] [ "/usr/libexec/awk/" parent-dir ] unit-test
 [ "awk/" ] [ "/usr/libexec/awk/" file-name ] unit-test
 
 [ ] [
@@ -55,3 +53,15 @@ USING: tools.test io.files ;
 [ ] [ "test-blah" resource-path delete-directory ] unit-test
 
 [ f ] [ "test-blah" resource-path exists? ] unit-test
+
+[ ] [ "test-quux.txt" resource-path <file-writer> [ [ yield "Hi" write ] in-thread ] with-stream ] unit-test
+
+[ ] [ "test-quux.txt" resource-path delete-file ] unit-test
+
+[ ] [ "test-quux.txt" resource-path <file-writer> [ [ yield "Hi" write ] in-thread ] with-stream ] unit-test
+
+[ ] [ "test-quux.txt" "quux-test.txt" [ resource-path ] 2apply rename-file ] unit-test
+[ t ] [ "quux-test.txt" resource-path exists? ] unit-test
+
+[ ] [ "quux-test.txt" resource-path delete-file ] unit-test
+

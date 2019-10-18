@@ -1,5 +1,5 @@
 USING: ui.gadgets help.markup help.syntax opengl kernel strings
-tuples classes quotations ;
+tuples classes quotations models ;
 
 HELP: rect
 { $class-description "A rectangle with the following slots:"
@@ -259,3 +259,52 @@ HELP: g
 HELP: g->
 { $values { "x" object } { "gadget" gadget } }
 { $description "Duplicates the top of the stack and outputs the gadget being built. Can only be used inside a quotation passed to " { $link build-gadget } "." } ;
+
+HELP: construct-control
+{ $values { "model" model } { "gadget" gadget } { "class" class } { "control" gadget } }
+{ $description "Creates a new control linked to the given model. The gadget parameter becomes the control's delegate. The quotation is called when the model value changes." }
+{ $examples
+    "The following example creates a gadget whose fill color is determined by the value of a model:"
+    { $code
+        "USING: ui.gadgets ui.gadgets.panes models ;"
+        ": set-fill-color >r <solid> r> set-gadget-interior ;"
+        ""
+        "TUPLE: color-gadget ;"
+        ""
+        "M: color-gadget model-changed"
+        "    >r model-value r> set-fill-color ;"
+        ""
+        ": <color-gadget> ( model -- gadget )"
+        "    <gadget>"
+        "    { 100 100 } over set-rect-dim"
+        "    color-gadget"
+        "    construct-control ;"
+        ""
+        "{ 1.0 0.0 0.5 1.0 } <model> <color-gadget>"
+        "gadget."
+    }
+    "The " { $vocab-link "color-picker" } " module extends this example into a more elaborate color chooser."
+} ;
+
+{ construct-control control-value set-control-value gadget-model } related-words
+
+HELP: control-value
+{ $values { "control" gadget } { "value" object } }
+{ $description "Outputs the value of the control's model." } ;
+
+HELP: set-control-value
+{ $values { "value" object } { "control" gadget } }
+{ $description "Sets the value of the control's model." } ;
+
+ARTICLE: "ui-control-impl" "Implementing controls"
+"A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $link gadget-model } " slot set to a model instance."
+$nl
+"To implement a new control, simply use this word in your constructor:"
+{ $subsection construct-control }
+"Some utility words useful in control implementations:"
+{ $subsection gadget-model }
+{ $subsection control-value }
+{ $subsection set-control-value }
+{ $see-also "models" } ;
+
+ABOUT: "ui-control-impl"

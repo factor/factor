@@ -1,15 +1,6 @@
-USING: kernel math math.analysis math.functions math.vectors
-sequences sorting ;
+USING: combinators.lib kernel math math.analysis
+math.functions math.vectors sequences sequences.lib sorting ;
 IN: math.statistics
-
-
-: minmax ( seq -- min max )
-    #! find the min and max of a seq in one pass
-    1./0. -1./0. rot [ dup pick max -rot nip pick min -rot nip ] each ;
-    
-: absminmax ( seq -- min max )
-    #! find the absolute values of the min and max of a seq in one pass
-    minmax 2dup [ abs ] 2apply > [ swap ] when ;
 
 : mean ( seq -- n )
     #! arithmetic mean, sum divided by length
@@ -38,16 +29,21 @@ IN: math.statistics
 
 : var ( seq -- x )
     #! variance, normalize by N-1
-    dup length 1- dup zero? [
-        0 2nip
+    dup length 1 <= [
+        drop 0
     ] [
-        swap [ mean ] keep 0 [ pick - sq + ] reduce nip swap /
+        [ [ mean ] keep [ - sq ] curry* sigma ] keep
+        length 1- /
     ] if ;
 
 : std ( seq -- x )
     #! standard deviation, sqrt of variance
     var sqrt ;
 
+: ste ( seq -- x )
+    #! standard error, standard deviation / sqrt ( length of sequence )
+    dup std swap length sqrt / ;
+     
 : ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
     ! finds sigma((xi-mean(x))(yi-mean(y)) 
     0 [ [ >r pick r> swap - ] 2apply * + ] 2reduce 2nip ;

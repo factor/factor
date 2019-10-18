@@ -217,7 +217,7 @@ ARTICLE: "cookbook-io" "I/O cookbook"
 } ;
 
 ARTICLE: "cookbook-philosophy" "Factor philosophy"
-"Factor is a high-level language with automatic memory management, runtime type checking, and strong typing. Factor code should be as simple as possible, but not simpler. If you are coming to Factor from another programming language, one of your first observations might me related to the amount of code you " { $emphasis "don't" } " have to write."
+"Factor is a high-level language with automatic memory management, runtime type checking, and strong typing. Factor code should be as simple as possible, but not simpler. If you are coming to Factor from another programming language, one of your first observations might be related to the amount of code you " { $emphasis "don't" } " have to write."
 $nl
 "If you try to write Factor word definitions which are longer than a couple of lines, you will find it hard to keep track of the stack contents. Well-written Factor code is " { $emphasis "factored" } " into short definitions, where each definition is easy to test interactively, and has a clear purpose. Well-chosen word names are critical, and having a thesaurus on hand really helps."
 $nl
@@ -233,26 +233,26 @@ $nl
 ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
 "Factor is a very clean and consistent language. However, it has some limitations and leaky abstractions you should keep in mind, as well as behaviors which differ from other languages you may be used to."
 { $list
+    "Factor only makes use of one native thread, and Factor threads are scheduled co-operatively. C library calls block the entire VM."
     "Factor does not hide anything from the programmer, all internals are exposed. It is your responsibility to avoid writing fragile code which depends too much on implementation detail."
     { "When a source file uses two vocabularies which define words with the same name, the order of the vocabularies in the " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " forms is important. The parser prints warnings when vocabularies shadow words from other vocabularies; see " { $link "vocabulary-search-shadow" } ". The " { $vocab-link "qualified" } " vocabulary implements qualified naming, which can be used to resolve ambiguities." }
     { "If a literal object appears in a word definition, the object itself is pushed on the stack when the word executes, not a copy. If you intend to mutate this object, you must " { $link clone } " it first. See " { $link "syntax-literals" } "." }
     { "For a discussion of potential issues surrounding the " { $link f } " object, see " { $link "booleans" } "." }
-    { "Words which call quotations will not compile, and thus will run in the interpreter; however, if they are declared " { $link POSTPONE: inline } ", words calling them with literal quotations will compile to efficient machine code." }
-    { "A word cannot be compiled unless all words it calls also compile (after inlining). A generic word cannot be compiled unless all methods compile. The root cause of a word not compiling is the compiler being unable to infer the stack effect. Words which do not compile run in the interpreter, which is slower than natively-compiled code. See " { $link "inference" } "."
+    { "Factor's object system is quite flexible. Careless usage of union, mixin and predicate classes can lead to similar problems to those caused by ``multiple inheritance'' in other languages. In particular, it is possible to have two classes such that they have a non-empty intersection and yet neither is a subclass of the other. If a generic word defines methods on two such classes, method precedence is undefined for objects that are instances of both classes. See " { $link "method-order" } " for details." }
+    { "Performance-sensitive code should have a static stack effect so that it can be compiled by the optimizing word compiler, which generates more efficient code than the non-optimizing quotation compiler. See " { $link "inference" } " and " { $link "compiler" } "."
     $nl
-    "This means that any methods defined on performance sensitive, frequently-called core generic words such as " { $link nth } " should be written in a way which will compile, otherwise very poor performance will result."
+    "This means that methods defined on performance sensitive, frequently-called core generic words such as " { $link nth } " should have static stack effects which are consistent with each other, since a generic word will only have a static stack effect if all methods do."
     $nl
-    "Unit testing can be used to ensure that any methods defined by a vocabulary do not result in degraded performance due to unintended interpreter usage:"
-    { $code "M: foo nth ... ;" "..." "[ t ] [ \\ nth compiled? ] unit-test" }
-    "In general, you should strive to write code with inferrable stack effects, even for sections of a program which are not performance sensitive; the " { $link infer. } " tool together with compiler error reporting can catch many bugs before run time." }
+    "Unit tests for the " { $vocab-link "inference" } " vocabulary can be used to ensure that any methods your vocabulary defines on core generic words have static stack effects:"
+    { $code "\"inference\" test" }
+    "In general, you should strive to write code with inferrable stack effects, even for sections of a program which are not performance sensitive; the " { $link infer. } " tool together with the optimizing compiler's error reporting can catch many bugs ahead of time." }
     { "Be careful when calling words which access variables from a " { $link make-assoc } " which constructs an assoc with arbitrary keys, since those keys might shadow variables." }
     { "If " { $link run-file } " throws a stack depth assertion, it means that the top-level form in the file left behind values on the stack. The stack depth is compared before and after loading a source file, since this type of situation is almost always an error. If you have a legitimate need to load a source file which returns data in some manner, define a word in the source file which produces this data on the stack and call the word after loading the file." }
-    "Factor only makes use of one native thread, and Factor threads are scheduled co-operatively. C library calls block the entire run time."
 } ;
 
 ARTICLE: "cookbook" "Factor cookbook"
 { $list
-    { "Factor is a stack-based language." }
+    { "Factor is a dynamically-typed, stack-based language." }
     { { $link .s } " prints the contents of the stack." }
     { { $link . } " prints the object at the top of the stack." }
     { { "You can load vocabularies from " { $snippet "core/" } ", " { $snippet "extra/" } " or " { $snippet "work/" } " with " { $link require } ":" }
@@ -265,7 +265,7 @@ ARTICLE: "cookbook" "Factor cookbook"
     { "You can load source files with " { $link run-file } ":"
     { $code "\"my-program.factor\" run-file" }
     "However, the vocabulary system should be used instead of loading source files directly; it provides automatic code organization and dependency management." }
-    ! { "If you are reading this from the Factor UI, take a look at " { $link "ui-tools" } "." }
+    { "If you are reading this from the Factor UI, take a look at " { $link "ui-tools" } "." }
 }
 { $subsection "cookbook-syntax" }
 { $subsection "cookbook-colon-defs" }

@@ -1,10 +1,11 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help sqlite sqlite.tuple-db help.syntax help.markup ;
+IN: sqlite.tuple-db
 
 ARTICLE: { "sqlite" "tuple-db-loading" } "Loading"
-"The quickest way to get up and running with this library is to load it as a module:"
-{ $code "\"libs/sqlite\" require\nUSE: sqlite\nUSE: tuple-db\n" } 
+"The quickest way to get up and running with this library is to use the vocabulary:"
+{ $code "USING: sqlite sqlite.tuple-db ;\n" } 
 "Some simple tests can be run to check that everything is working ok:"
 { $code "\"libs/sqlite\" test-module" } ;
 
@@ -126,3 +127,5 @@ HELP: delete-tuple
 }
 { $description "Delete this tuple instance from the database. The tuple must have previously been obtained from the database, or inserted into it. It must have a delegate of 'persistent' with the key field set (which is done by the find and insert operations)." } 
 { $see-also { "sqlite" "tuple-db" } insert-tuple update-tuple find-tuples delete-tuple save-tuple } ;
+
+ABOUT: { "sqlite" "tuple-db" } 

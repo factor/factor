@@ -1,0 +1,479 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+<!--
+DirectX FX Files Syntax Highlighting (Edit Mode) for jEdit
+Including: Preprocessor, HLSL and Shader Assembler up to shader version 3.0
+
+Author: Adam Sawicki
+- Homepage: http://regedit.gamedev.pl/
+- E-mail: sawickiap@poczta.onet.pl
+- IRC: #warsztat @ PolNet
+- Gadu-Gadu: 2272474
+
+-->
+
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="wordBreakChars" VALUE=".,+-*/=&lt;&gt;?^&amp;[]{}" />
+		
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="indentNextLine" VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+		<PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+		<PROPERTY NAME="lineUpClosingBracket" VALUE="true" />
+	</PROPS>
+	
+	<RULES
+		ESCAPE="\"
+		IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="((0[xX][0-9a-fA-F]+|\d+)[uUIL]?|\d+([eE]\d*)?[hHfF]?)">
+		
+		<!-- C style comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		
+		<!-- preprocessor statements -->
+		<SEQ TYPE="KEYWORD2">##</SEQ>
+		<SEQ TYPE="KEYWORD2">#@</SEQ>
+		<EOL_SPAN TYPE="KEYWORD2" DELEGATE="Preprocessor">#</EOL_SPAN>
+		
+		<!-- asm -->
+		<SPAN AT_WORD_START="TRUE" EXCLUDE_MATCH="FALSE" TYPE="KEYWORD1" DELEGATE="Asm">
+			<BEGIN>asm</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN AT_WORD_START="TRUE" EXCLUDE_MATCH="FALSE" TYPE="KEYWORD1" DELEGATE="Asm">
+			<BEGIN>ASM</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN AT_WORD_START="TRUE" EXCLUDE_MATCH="FALSE" TYPE="KEYWORD1" DELEGATE="Asm">
+			<BEGIN>Asm</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN AT_WORD_START="TRUE" EXCLUDE_MATCH="FALSE" TYPE="KEYWORD1" DELEGATE="Asm">
+			<BEGIN>asm_fragment</BEGIN>
+			<END>}</END>
+		</SPAN>
+		
+		<!-- C style comment -->
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		
+		<!-- Operators - multi character -->
+		<SEQ TYPE="OPERATOR">++</SEQ>
+		<SEQ TYPE="OPERATOR">--</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">||</SEQ>
+		<SEQ TYPE="OPERATOR">==</SEQ>
+		<SEQ TYPE="OPERATOR">::</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">...</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">!=</SEQ>
+		<SEQ TYPE="OPERATOR">*=</SEQ>
+		<SEQ TYPE="OPERATOR">/=</SEQ>
+		<SEQ TYPE="OPERATOR">+=</SEQ>
+		<SEQ TYPE="OPERATOR">-=</SEQ>
+		<SEQ TYPE="OPERATOR">%=</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;=</SEQ>
+		<SEQ TYPE="OPERATOR">|=</SEQ>
+		<SEQ TYPE="OPERATOR">^=</SEQ>
+		<SEQ TYPE="OPERATOR">-&gt;</SEQ>
+
+		<!-- Operators - single characters -->
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		
+		<!-- Function calls -->
+		<MARK_PREVIOUS TYPE="FUNCTION" EXCLUDE_MATCH="TRUE">(</MARK_PREVIOUS>
+		
+		<!-- Swizzle operator for vectors/scalars (a.xyzw OR b.rgba), matrices (c._m00_m01 OR d._11_12) indexing -->
+		<SEQ_REGEXP TYPE="OPERATOR" HASH_CHAR=".">.(([xyzw]{1,4})|([rgba]{1,4})|((_m[0123][0123])+)|((_[1234][1234])+))(?!\p{Alnum})</SEQ_REGEXP>
+		
+		<!-- Atomic, but complex types -->
+		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="bool">bool[1234](x[1234])?\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="int">int[1234](x[1234])?\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="half">half[1234](x[1234])?\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="float">float[1234](x[1234])?\b</SEQ_REGEXP>
+		<SEQ_REGEXP TYPE="KEYWORD2" AT_WORD_START="TRUE" HASH_CHAR="double">double[1234](x[1234])?\b</SEQ_REGEXP>
+		
+		<!-- Semantics -->
+		<SEQ_REGEXP TYPE="KEYWORD1" HASH_CHAR=":">:\s*(register\s*\(\w+(\s*\,\s*\w+\s*)?\)|\w+)</SEQ_REGEXP>
+		
+		<KEYWORDS>
+			<!-- Control flow keywords -->
+			<KEYWORD1>discard</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>typedef</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			
+			<!-- Other keywords -->
+			<KEYWORD1>compile</KEYWORD1>
+			<KEYWORD1>compile_fragment</KEYWORD1>
+			<KEYWORD1>register</KEYWORD1>
+			<KEYWORD1>sampler_state</KEYWORD1>
+			<KEYWORD1>stateblock_state</KEYWORD1>
+			<KEYWORD1>technique</KEYWORD1>
+			<KEYWORD1>Technique</KEYWORD1>
+			<KEYWORD1>TECHNIQUE</KEYWORD1>
+			<KEYWORD1>pass</KEYWORD1>
+			<KEYWORD1>Pass</KEYWORD1>
+			<KEYWORD1>PASS</KEYWORD1>
+			<KEYWORD1>decl</KEYWORD1>
+			<KEYWORD1>Decl</KEYWORD1>
+			<KEYWORD1>DECL</KEYWORD1>
+			
+			<!-- Atomic type keywords -->
+			<KEYWORD2>void</KEYWORD2>
+			<KEYWORD2>bool</KEYWORD2>
+			<KEYWORD2>int</KEYWORD2>
+			<KEYWORD2>half</KEYWORD2>
+			<KEYWORD2>float</KEYWORD2>
+			<KEYWORD2>double</KEYWORD2>
+			<KEYWORD2>vector</KEYWORD2>
+			<KEYWORD2>matrix</KEYWORD2>
+			
+			<!-- Object type keywords -->
+			<KEYWORD3>string</KEYWORD3>
+			<KEYWORD3>texture</KEYWORD3>
+			<KEYWORD3>texture1D</KEYWORD3>
+			<KEYWORD3>texture2D</KEYWORD3>
+			<KEYWORD3>texture3D</KEYWORD3>
+			<KEYWORD3>textureCUBE</KEYWORD3>
+			<KEYWORD3>sampler</KEYWORD3>
+			<KEYWORD3>sampler1D</KEYWORD3>
+			<KEYWORD3>sampler2D</KEYWORD3>
+			<KEYWORD3>sampler3D</KEYWORD3>
+			<KEYWORD3>samplerCUBE</KEYWORD3>
+			<KEYWORD3>pixelfragment</KEYWORD3>
+			<KEYWORD3>vertexfragment</KEYWORD3>
+			<KEYWORD3>pixelshader</KEYWORD3>
+			<KEYWORD3>vertexshader</KEYWORD3>
+			<KEYWORD3>stateblock</KEYWORD3>
+			<KEYWORD3>struct</KEYWORD3>
+
+			<!-- Usage keywords -->
+			<KEYWORD4>static</KEYWORD4>
+			<KEYWORD4>uniform</KEYWORD4>
+			<KEYWORD4>extern</KEYWORD4>
+			<KEYWORD4>volatile</KEYWORD4>
+			<KEYWORD4>inline</KEYWORD4>
+			<KEYWORD4>shared</KEYWORD4>
+			<KEYWORD4>const</KEYWORD4>
+			<KEYWORD4>row_major</KEYWORD4>
+			<KEYWORD4>column_major</KEYWORD4>
+			<KEYWORD4>in</KEYWORD4>
+			<KEYWORD4>inout</KEYWORD4>
+			<KEYWORD4>out</KEYWORD4>			
+			
+			<!-- Literals -->
+			<LITERAL1>false</LITERAL1>
+			<LITERAL1>true</LITERAL1>
+			<LITERAL1>NULL</LITERAL1>
+			
+			<!-- Intrinsic functions -->
+			<LITERAL2>abs</LITERAL2>
+			<LITERAL2>acos</LITERAL2>
+			<LITERAL2>all</LITERAL2>
+			<LITERAL2>any</LITERAL2>
+			<LITERAL2>asin</LITERAL2>
+			<LITERAL2>atan</LITERAL2>
+			<LITERAL2>atan2</LITERAL2>
+			<LITERAL2>ceil</LITERAL2>
+			<LITERAL2>clamp</LITERAL2>
+			<LITERAL2>clip</LITERAL2>
+			<LITERAL2>cos</LITERAL2>
+			<LITERAL2>cosh</LITERAL2>
+			<LITERAL2>cross</LITERAL2>
+			<LITERAL2>D3DCOLORtoUBYTE4</LITERAL2>
+			<LITERAL2>ddx</LITERAL2>
+			<LITERAL2>ddy</LITERAL2>
+			<LITERAL2>degrees</LITERAL2>
+			<LITERAL2>determinant</LITERAL2>
+			<LITERAL2>distance</LITERAL2>
+			<LITERAL2>dot</LITERAL2>
+			<LITERAL2>exp</LITERAL2>
+			<LITERAL2>exp2</LITERAL2>
+			<LITERAL2>faceforward</LITERAL2>
+			<LITERAL2>floor</LITERAL2>
+			<LITERAL2>fmod</LITERAL2>
+			<LITERAL2>frac</LITERAL2>
+			<LITERAL2>frexp</LITERAL2>
+			<LITERAL2>fwidth</LITERAL2>
+			<LITERAL2>isfinite</LITERAL2>
+			<LITERAL2>isinf</LITERAL2>
+			<LITERAL2>isnan</LITERAL2>
+			<LITERAL2>ldexp</LITERAL2>
+			<LITERAL2>length</LITERAL2>
+			<LITERAL2>lerp</LITERAL2>
+			<LITERAL2>lit</LITERAL2>
+			<LITERAL2>log</LITERAL2>
+			<LITERAL2>log10</LITERAL2>
+			<LITERAL2>log2</LITERAL2>
+			<LITERAL2>max</LITERAL2>
+			<LITERAL2>min</LITERAL2>
+			<LITERAL2>modf</LITERAL2>
+			<LITERAL2>mul</LITERAL2>
+			<LITERAL2>noise</LITERAL2>
+			<LITERAL2>normalize</LITERAL2>
+			<LITERAL2>pow</LITERAL2>
+			<LITERAL2>radians</LITERAL2>
+			<LITERAL2>reflect</LITERAL2>
+			<LITERAL2>refract</LITERAL2>
+			<LITERAL2>round</LITERAL2>
+			<LITERAL2>rsqrt</LITERAL2>
+			<LITERAL2>saturate</LITERAL2>
+			<LITERAL2>sign</LITERAL2>
+			<LITERAL2>sin</LITERAL2>
+			<LITERAL2>sincos</LITERAL2>
+			<LITERAL2>sinh</LITERAL2>
+			<LITERAL2>smoothstep</LITERAL2>
+			<LITERAL2>sqrt</LITERAL2>
+			<LITERAL2>step</LITERAL2>
+			<LITERAL2>tan</LITERAL2>
+			<LITERAL2>tanh</LITERAL2>
+			<LITERAL2>transpose</LITERAL2>
+			
+			<!-- Intrinsic functions - sampling -->
+			<LITERAL3>tex1D</LITERAL3>
+			<LITERAL3>tex1Dgrad</LITERAL3>
+			<LITERAL3>tex1Dbias</LITERAL3>
+			<LITERAL3>tex1Dgrad</LITERAL3>
+			<LITERAL3>tex1Dlod</LITERAL3>
+			<LITERAL3>tex1Dproj</LITERAL3>
+			<LITERAL3>tex2D</LITERAL3>
+			<LITERAL3>tex2D</LITERAL3>
+			<LITERAL3>tex2Dbias</LITERAL3>
+			<LITERAL3>tex2Dgrad</LITERAL3>
+			<LITERAL3>tex2Dlod</LITERAL3>
+			<LITERAL3>tex2Dproj</LITERAL3>
+			<LITERAL3>tex3D</LITERAL3>
+			<LITERAL3>tex3D</LITERAL3>
+			<LITERAL3>tex3Dbias</LITERAL3>
+			<LITERAL3>tex3Dgrad</LITERAL3>
+			<LITERAL3>tex3Dlod</LITERAL3>
+			<LITERAL3>tex3Dproj</LITERAL3>
+			<LITERAL3>texCUBE</LITERAL3>
+			<LITERAL3>texCUBE</LITERAL3>
+			<LITERAL3>texCUBEbias</LITERAL3>
+			<LITERAL3>texCUBEgrad</LITERAL3>
+			<LITERAL3>texCUBElod</LITERAL3>
+			<LITERAL3>texCUBEproj</LITERAL3>
+
+			<!-- Reserved but unused words -->
+			<INVALID>auto</INVALID>
+			<INVALID>break</INVALID>
+			<INVALID>case</INVALID>
+			<INVALID>catch</INVALID>
+			<INVALID>char</INVALID>
+			<INVALID>class</INVALID>
+			<INVALID>const_cast</INVALID>
+			<INVALID>continue</INVALID>
+			<INVALID>default</INVALID>
+			<INVALID>delete</INVALID>
+			<INVALID>dynamic_cast</INVALID>
+			<INVALID>enum</INVALID>
+			<INVALID>explicit</INVALID>
+			<INVALID>friend</INVALID>
+			<INVALID>goto</INVALID>
+			<INVALID>long</INVALID>
+			<INVALID>mutable</INVALID>
+			<INVALID>namespace</INVALID>
+			<INVALID>new</INVALID>
+			<INVALID>operator</INVALID>
+			<INVALID>private</INVALID>
+			<INVALID>protected</INVALID>
+			<INVALID>public</INVALID>
+			<INVALID>reinterpret_cast</INVALID>
+			<INVALID>short</INVALID>
+			<INVALID>signed</INVALID>
+			<INVALID>sizeof</INVALID>
+			<INVALID>static_cast</INVALID>
+			<INVALID>switch</INVALID>
+			<INVALID>template</INVALID>
+			<INVALID>this</INVALID>
+			<INVALID>throw</INVALID>
+			<INVALID>try</INVALID>
+			<INVALID>typename</INVALID>
+			<INVALID>union</INVALID>
+			<INVALID>unsigned</INVALID>
+			<INVALID>using</INVALID>
+			<INVALID>virtual</INVALID>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="Include" DEFAULT="KEYWORD2" />
+
+	<RULES
+		SET="Preprocessor"
+		DEFAULT="KEYWORD2"
+		IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="((0x[[:xdigit:]]+|[[:digit:]]+)[uUIL]?|[[:digit:]]+([eE][[:digit:]]*)?[hHfF]?)">
+
+		<!-- C style comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		
+		<!-- this is a hack so that #include <net/if.h> does not get the if highlighted -->
+		<EOL_SPAN TYPE="MARKUP" DELEGATE="Include">include</EOL_SPAN>
+		
+		<KEYWORDS>
+			<!-- Directives -->
+			<MARKUP>define</MARKUP>
+			<MARKUP>elif</MARKUP>
+			<MARKUP>else</MARKUP>
+			<MARKUP>endif</MARKUP>
+			<MARKUP>error</MARKUP>
+			<MARKUP>if</MARKUP>
+			<MARKUP>ifdef</MARKUP>
+			<MARKUP>ifndef</MARKUP>
+			<MARKUP>line</MARKUP>
+			<MARKUP>pragma</MARKUP>
+			<MARKUP>undef</MARKUP>
+			
+			<!-- Other -->
+			<LITERAL1>pack_matrix</LITERAL1>
+			<LITERAL1>warning</LITERAL1>
+			<LITERAL1>def</LITERAL1>
+			<LITERAL1>defined</LITERAL1>
+			<LITERAL1>D3DX</LITERAL1>
+			<LITERAL1>D3DX_VERSION</LITERAL1>
+			<LITERAL1>DIRECT3D</LITERAL1>
+			<LITERAL1>DIRECT3D_VERSION</LITERAL1>
+			<LITERAL1>__FILE__</LITERAL1>
+			<LITERAL1>__LINE__</LITERAL1>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="Asm"
+		DEFAULT="NULL"
+		IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="((0x[[:xdigit:]]+|[[:digit:]]+)[uUIL]?|[[:digit:]]+([eE][[:digit:]]*)?[hHfF]?)">
+		
+		<!-- Starting... -->
+		<SEQ TYPE="OPERATOR">{</SEQ>
+
+		<!-- Comments -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT2">;</EOL_SPAN>
+
+		<!-- Operators -->
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+
+		<!-- Swizzle operator -->
+		<SEQ_REGEXP TYPE="OPERATOR" HASH_CHAR=".">.(([xyzw]{1,4}))</SEQ_REGEXP>
+		
+		<!-- Instruction -->
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="abs">abs(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="add">add(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="bem">bem(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="break_comp">break_comp(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="breakp">breakp(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="callnz">callnz(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="cmp">cmp(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="cnd">cnd(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="crs">crs(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="dp2add">dp2add(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="dp3">dp3(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="dp4">dp4(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="dst">dst(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="dsx">dsx(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="dsy">dsy(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="else">else(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="endif">endif(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="endloop">endloop(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="endrep">endrep(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="exp">exp(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="frc">frc(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="if">if(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="label">label(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="lit">lit(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="logp">logp(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="loop">loop(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="lrp">lrp(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="m3x2">m3x2(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="m3x3">m3x3(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="m3x4">m3x4(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="m4x3">m4x3(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="m4x4">m4x4(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="mad">mad(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="mov">mov(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="max">max(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="min">min(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="mova">mova(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="mul">mul(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="nop">nop(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="nrm">nrm(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="phase">phase(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="pow">pow(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="rcp">rcp(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="rep">rep(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="ret">ret(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="rsq">rsq(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="setp_comp">setp_comp(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="sge">sge(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="sgn">sgn(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="sincos">sincos(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="slt">slt(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="sub">sub(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		<!-- (seen in preshader -->
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="FUNCTION" HASH_CHAR="neg">neg(_pp|_sat|_x2|_x4|_x8|_bx2|_d2|_d4|_d8)*\b</SEQ_REGEXP>
+		
+		<!-- Texturing instruction -->
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="KEYWORD2" HASH_CHAR="tex">tex\w*</SEQ_REGEXP>
+		
+		<!-- Main instruction -->
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="KEYWORD1" HASH_CHAR="ps">ps\w*</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="KEYWORD1" HASH_CHAR="vs">vs\w*</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="KEYWORD1" HASH_CHAR="def">def\w*</SEQ_REGEXP>
+		<SEQ_REGEXP AT_WORD_START="TRUE" TYPE="KEYWORD1" HASH_CHAR="dcl">dcl\w*</SEQ_REGEXP>
+
+		<KEYWORDS>
+		</KEYWORDS>
+	</RULES>
+</MODE>
+

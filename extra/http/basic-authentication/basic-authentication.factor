@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel base64 http.server crypto.sha2 namespaces assocs
        quotations hashtables combinators splitting sequences
-       http.server.responders io  ;
+       http.server.responders io html.elements ;
 IN: http.basic-authentication
 
 ! 'realms' is a hashtable mapping a realm (a string) to 
@@ -49,18 +49,17 @@ SYMBOL: realms
   ] [
     2drop f
   ] if ;
-  
+
+: authentication-error ( realm -- )
+  "401 Unauthorized" response
+  "Basic realm=\"" swap "\"" 3append "WWW-Authenticate" associate print-header
+  <html> <body>
+    "Username or Password is invalid" write
+  </body> </html> ;
+
 : with-basic-authentication ( realm quot -- )
   #! Check if the user is authenticated in the given realm
   #! to run the specified quotation. If not, use Basic
   #! Authentication to ask for authorization details.
-  over "Authorization" "header" get at authorization-ok? [
-    nip call
-  ] [
-    drop "Basic realm=\"" swap "\"" 3append "WWW-Authenticate" associate 
-    "401 Unauthorized" response nl 
-    "<html><body>Username or Password is invalid</body></html>" write 
-  ] if ;
-
-
-
+  over "Authorization" header-param authorization-ok?
+  [ nip call ] [ drop authentication-error ] if ;

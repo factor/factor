@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private math
 namespaces sequences vectors words strings layouts combinators
-classes optimizer.backend optimizer.def-use
+combinators.private classes optimizer.backend optimizer.def-use
 optimizer.known-words optimizer.math inference.class
 generic.standard ;
 IN: optimizer

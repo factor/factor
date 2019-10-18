@@ -1,11 +1,10 @@
 IN: temporary
 USING: arrays compiler kernel kernel.private math
-math.private sequences strings tools.test words continuations
-sequences.private hashtables.private byte-arrays
-strings.private system random math.vectors layouts
-vectors.private sbufs.private strings.private slots.private
-alien alien.c-types alien.syntax namespaces libc math.constants
-math.functions ;
+math.constants math.private sequences strings tools.test words
+continuations sequences.private hashtables.private byte-arrays
+strings.private system random layouts vectors.private
+sbufs.private strings.private slots.private alien alien.c-types
+alien.syntax namespaces libc combinators.private ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-1 ] unit-test
@@ -327,9 +326,13 @@ cell 8 = [
     [ 500 <byte-array> length ] compile-1
 ] unit-test
 
-[ C{ 1 2 } ] [ 1 2 [ <complex> ] compile-1 ] unit-test
+[ 1 2 ] [
+    1 2 [ <complex> ] compile-1 dup real swap imaginary
+] unit-test
 
-[ 1/2 ] [ 1 2 [ <ratio> ] compile-1 ] unit-test
+[ 1 2 ] [
+    1 2 [ <ratio> ] compile-1 dup numerator swap denominator
+] unit-test
 
 [ \ + ] [ \ + [ <wrapper> ] compile-1 ] unit-test
 
@@ -349,30 +352,39 @@ cell 8 = [
     "hello world" 5 [ string>sbuf ] compile-1
 ] unit-test
 
+[ [ 3 + ] ] [
+    3 [ + ] [ curry ] compile-1
+] unit-test
+
 ! Alien intrinsics
 [ 3 ] [ B{ 1 2 3 4 5 } 2 [ alien-unsigned-1 ] compile-1 ] unit-test
 [ 3 ] [ [ B{ 1 2 3 4 5 } 2 alien-unsigned-1 ] compile-1 ] unit-test
 [ 3 ] [ B{ 1 2 3 4 5 } 2 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
-[ 3 ] [ B{ 1 2 3 4 5 } 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+[ 3 ] [ B{ 1 2 3 4 5 } 2 [ { c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
 
 [ ] [ B{ 1 2 3 4 5 } malloc-byte-array "b" set ] unit-test
+[ t ] [ "b" get >boolean ] unit-test
 
-[ 3 ] [ "b" get 2 [ alien-unsigned-1 ] compile-1 ] unit-test
-[ 3 ] [ "b" get [ { simple-alien } declare 2 alien-unsigned-1 ] compile-1 ] unit-test
-[ 3 ] [ "b" get 2 [ { simple-alien fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
-[ 3 ] [ "b" get 2 [ { simple-c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+"b" get [
+    [ 3 ] [ "b" get 2 [ alien-unsigned-1 ] compile-1 ] unit-test
+    [ 3 ] [ "b" get [ { alien } declare 2 alien-unsigned-1 ] compile-1 ] unit-test
+    [ 3 ] [ "b" get 2 [ { simple-alien fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
+    [ 3 ] [ "b" get 2 [ { c-ptr fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
 
-[ ] [ "b" get free ] unit-test
+    [ ] [ "b" get free ] unit-test
+] when
 
 [ ] [ "hello world" malloc-char-string "s" set ] unit-test
 
-[ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-1 alien>char-string ] unit-test
-[ "hello world" ] [ "s" get <void*> [ { simple-c-ptr } declare *void* ] compile-1 alien>char-string ] unit-test
+"s" get [
+    [ "hello world" ] [ "s" get <void*> [ { byte-array } declare *void* ] compile-1 alien>char-string ] unit-test
+    [ "hello world" ] [ "s" get <void*> [ { c-ptr } declare *void* ] compile-1 alien>char-string ] unit-test
 
-[ ] [ "s" get free ] unit-test
+    [ ] [ "s" get free ] unit-test
+] when
 
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { simple-alien } declare <void*> ] compile-1 *void* ] unit-test
-[ ALIEN: 1234 ] [ ALIEN: 1234 [ { simple-c-ptr } declare <void*> ] compile-1 *void* ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { alien } declare <void*> ] compile-1 *void* ] unit-test
+[ ALIEN: 1234 ] [ ALIEN: 1234 [ { c-ptr } declare <void*> ] compile-1 *void* ] unit-test
 [ f ] [ f [ { POSTPONE: f } declare <void*> ] compile-1 *void* ] unit-test
 
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-1 ] unit-test
@@ -403,7 +415,31 @@ cell 8 = [
 [ t ] [ pi <double> [ { byte-array } declare *double ] compile-1 pi = ] unit-test
 
 ! Silly
-[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-1 ] keep *float pi - abs 0.001 < ] unit-test
-[ t ] [ pi <float> [ { byte-array } declare *float ] compile-1 pi - abs 0.001 < ] unit-test
+[ t ] [ pi 4 <byte-array> [ [ { float byte-array } declare 0 set-alien-float ] compile-1 ] keep *float pi - -0.001 0.001 between? ] unit-test
+[ t ] [ pi <float> [ { byte-array } declare *float ] compile-1 pi - -0.001 0.001 between? ] unit-test
 
 [ t ] [ pi 8 <byte-array> [ [ { float byte-array } declare 0 set-alien-double ] compile-1 ] keep *double pi = ] unit-test
+
+[ 4 ] [
+    2 B{ 1 2 3 4 5 6 } <displaced-alien> [
+        { alien } declare 1 alien-unsigned-1
+    ] compile-1
+] unit-test
+
+[
+    B{ 0 0 0 0 } [ { byte-array } declare <void*> ] compile-1
+] unit-test-fails
+
+[
+    B{ 0 0 0 0 } [ { c-ptr } declare <void*> ] compile-1
+] unit-test-fails
+
+[
+    4 5
+] [
+    3 [
+        [
+            { [ 4444 ] [ 444 ] [ 44 ] [ 4 ] } dispatch
+        ] keep 2 fixnum+fast
+    ] compile-1
+] unit-test

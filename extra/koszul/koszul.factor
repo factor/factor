@@ -40,7 +40,7 @@ SYMBOL: terms
         { [ t ] [ number>string " + " swap append ] }
     } cond ;
 
-: ((alt.)) ( basis n -- str )
+: (alt.) ( basis n -- str )
     over empty? [
         nip number>string
     ] [
@@ -49,14 +49,12 @@ SYMBOL: terms
         append
     ] if ;
 
-: (alt.) ( assoc -- )
-    dup empty? [
+: alt. ( assoc -- )
+    dup assoc-empty? [
         drop 0 .
     ] [
-        [ first2 ((alt.)) ] map concat " + " ?head drop print
+        [ (alt.) ] { } assoc>map concat " + " ?head drop print
     ] if ;
-
-: alt. ( vec -- ) { } >alist (alt.) ;
 
 ! Addition
 : (alt+) ( x -- )
@@ -151,12 +149,9 @@ DEFER: (d)
     dup 0 [ length max ] reduce 1+ [ drop V{ } clone ] map
     [ dup length pick nth push ] reduce ;
 
-: nth-bit? ( m bit# -- ? )
-    1 swap shift bitand 0 > ;
-
 : nth-basis-elt ( generators n -- elt )
     over length [
-        3dup nth-bit? [ nth ] [ 2drop f ] if
+        3dup bit? [ nth ] [ 2drop f ] if
     ] map [ ] subset 2nip ;
 
 : basis ( generators -- seq )
@@ -172,7 +167,7 @@ DEFER: (d)
 
 ! Computing cohomology
 : (op-matrix) ( range quot basis-elt -- row )
-    swap call [ at [ 0 ] unless* ] curry map ; inline
+    swap call [ at 0 or ] curry map ; inline
 
 : op-matrix ( domain range quot -- matrix )
     rot [ >r 2dup r> (op-matrix) ] map 2nip ; inline
@@ -241,8 +236,13 @@ DEFER: (d)
 
 : laplacian-kernel ( basis1 basis2 basis3 -- basis )
     >r tuck r>
-    laplacian-matrix nullspace
-    [ [ [ wedge (alt+) ] 2each ] with-terms ] curry* map ;
+    laplacian-matrix dup empty-matrix? [
+        2drop f
+    ] [
+        nullspace [
+            [ [ wedge (alt+) ] 2each ] with-terms
+        ] curry* map
+    ] if ;
 
 : graded-triple ( seq n -- triple )
     3 [ 1- + ] curry* map swap [ ?nth ] curry map ;
@@ -282,9 +282,8 @@ DEFER: (d)
     ] curry* map ;
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
-    -rot
-    [ basis graded ] 2apply tensor bigraded-triples
-    [ [ first3 ] swap compose map ] curry* map ; inline
+    >r [ basis graded ] 2apply tensor bigraded-triples r>
+    [ [ first3 ] swap compose map ] curry map ; inline
 
 : bigraded-laplacian-betti ( u-generators z-generators -- seq )
     [ laplacian-betti ] bigraded-laplacian ;

@@ -4,9 +4,6 @@ USING: kernel kernel.private sequences
 sequences.private math math.private combinators ;
 IN: math.integers.private
 
-M: integer hashcode* nip >fixnum ;
-M: integer <=> - ;
-
 M: integer numerator ;
 M: integer denominator drop 1 ;
 
@@ -35,6 +32,14 @@ M: fixnum shift >fixnum fixnum-shift ;
 
 M: fixnum bitnot fixnum-bitnot ;
 
+M: fixnum bit? 2^ bitand 0 > ;
+
+: (fixnum-log2) ( accum n -- accum )
+    dup 1 number= [ drop ] [ >r 1+ r> 2/ (fixnum-log2) ] if ;
+    inline
+
+M: fixnum (log2) 0 swap (fixnum-log2) ;
+
 M: bignum >fixnum bignum>fixnum ;
 M: bignum >bignum ;
 
@@ -55,8 +60,10 @@ M: bignum /mod bignum/mod ;
 M: bignum bitand bignum-bitand ;
 M: bignum bitor bignum-bitor ;
 M: bignum bitxor bignum-bitxor ;
-M: bignum shift >fixnum bignum-shift ;
+M: bignum shift bignum-shift ;
 
 M: bignum bitnot bignum-bitnot ;
+M: bignum bit? bignum-bit? ;
+M: bignum (log2) bignum-log2 ;
 
 M: integer zero? 0 number= ;

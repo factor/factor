@@ -20,4 +20,4 @@ HOOK: normalize-pathname io-backend ( str -- newstr )
 M: object normalize-pathname ;
 
 [ init-io embedded? [ init-stdio ] unless ]
-"io.backend" add-startup-hook
+"io.backend" add-init-hook

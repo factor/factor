@@ -1,2 +1,3 @@
 include vm/Config.linux
 include vm/Config.arm
+PLAF_DLL_OBJS += vm/os-linux-arm.o

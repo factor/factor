@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="{% comment %}" />
+		<PROPERTY NAME="commentEnd" VALUE="{% endcomment %}" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE">
+		<IMPORT DELEGATE="html::MAIN"/>
+
+		<SPAN TYPE="COMMENT3">
+			<BEGIN>{% comment %}</BEGIN>
+			<END>{% endcomment %}</END>
+		</SPAN>
+		<SPAN TYPE="KEYWORD3" DELEGATE="DJANGO_BLOCK">
+			<BEGIN>{%</BEGIN>
+			<END>%}</END>
+		</SPAN>
+		<!-- variable -->
+		<SPAN TYPE="KEYWORD3" DELEGATE="DJANGO_VARIABLE">
+			<BEGIN>{{</BEGIN>
+			<END>}}</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="DJANGO_VARIABLE" DEFAULT="LITERAL4">
+		<IMPORT DELEGATE="DJANGO_CORE"/>
+	</RULES>
+
+	<RULES SET="DJANGO_BLOCK" DEFAULT="LITERAL4">
+		<IMPORT DELEGATE="DJANGO_CORE"/>
+		<KEYWORDS>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>block</KEYWORD1>
+			<KEYWORD1>blocktrans</KEYWORD1>
+			<KEYWORD1>by</KEYWORD1>
+			<KEYWORD1>endblock</KEYWORD1>
+			<KEYWORD1>endblocktrans</KEYWORD1>
+			<KEYWORD1>comment</KEYWORD1>
+			<KEYWORD1>endcomment</KEYWORD1>
+			<KEYWORD1>cycle</KEYWORD1>
+			<KEYWORD1>date</KEYWORD1>
+			<KEYWORD1>debug</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>filter</KEYWORD1>
+			<KEYWORD1>endfilter</KEYWORD1>
+			<KEYWORD1>firstof</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>endfor</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>endif</KEYWORD1>
+			<KEYWORD1>ifchanged</KEYWORD1>
+			<KEYWORD1>endifchanged</KEYWORD1>
+			<KEYWORD1>ifnotequal</KEYWORD1>
+			<KEYWORD1>endifnotequal</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>load</KEYWORD1>
+			<KEYWORD1>not</KEYWORD1>
+			<KEYWORD1>now</KEYWORD1>
+			<KEYWORD1>or</KEYWORD1>
+			<KEYWORD1>parsed</KEYWORD1>
+			<KEYWORD1>regroup</KEYWORD1>
+			<KEYWORD1>ssi</KEYWORD1>
+			<KEYWORD1>trans</KEYWORD1>
+			<KEYWORD1>with</KEYWORD1>
+			<KEYWORD1>widthratio</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="DJANGO_CORE">
+		<SPAN TYPE="LITERAL2">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<KEYWORDS>
+			<LITERAL3>openblock</LITERAL3>
+			<LITERAL3>closeblock</LITERAL3>
+			<LITERAL3>openvariable</LITERAL3>
+			<LITERAL3>closevariable</LITERAL3>
+
+			<FUNCTION>add</FUNCTION>
+			<FUNCTION>addslashes</FUNCTION>
+			<FUNCTION>capfirst</FUNCTION>
+			<FUNCTION>center</FUNCTION>
+			<FUNCTION>cut</FUNCTION>
+			<FUNCTION>date</FUNCTION>
+			<FUNCTION>default</FUNCTION>
+			<FUNCTION>dictsort</FUNCTION>
+			<FUNCTION>dictsortreversed</FUNCTION>
+			<FUNCTION>divisibleby</FUNCTION>
+			<FUNCTION>escape</FUNCTION>
+			<FUNCTION>filesizeformat</FUNCTION>
+			<FUNCTION>first</FUNCTION>
+			<FUNCTION>fix_ampersands</FUNCTION>
+			<FUNCTION>floatformat</FUNCTION>
+			<FUNCTION>get_digit</FUNCTION>
+			<FUNCTION>join</FUNCTION>
+			<FUNCTION>length</FUNCTION>
+			<FUNCTION>length_is</FUNCTION>
+			<FUNCTION>linebreaks</FUNCTION>
+			<FUNCTION>linebreaksbr</FUNCTION>
+			<FUNCTION>linenumbers</FUNCTION>
+			<FUNCTION>ljust</FUNCTION>
+			<FUNCTION>lower</FUNCTION>
+			<FUNCTION>make_list</FUNCTION>
+			<FUNCTION>phone2numeric</FUNCTION>
+			<FUNCTION>pluralize</FUNCTION>
+			<FUNCTION>pprint</FUNCTION>
+			<FUNCTION>random</FUNCTION>
+			<FUNCTION>removetags</FUNCTION>
+			<FUNCTION>rjust</FUNCTION>
+			<FUNCTION>slice</FUNCTION>
+			<FUNCTION>slugify</FUNCTION>
+			<FUNCTION>stringformat</FUNCTION>
+			<FUNCTION>striptags</FUNCTION>
+			<FUNCTION>time</FUNCTION>
+			<FUNCTION>timesince</FUNCTION>
+			<FUNCTION>title</FUNCTION>
+			<FUNCTION>truncatewords</FUNCTION>
+			<FUNCTION>unordered_list</FUNCTION>
+			<FUNCTION>upper</FUNCTION>
+			<FUNCTION>urlencode</FUNCTION>
+			<FUNCTION>urlize</FUNCTION>
+			<FUNCTION>urlizetrunc</FUNCTION>
+			<FUNCTION>wordcount</FUNCTION>
+			<FUNCTION>wordwrap</FUNCTION>
+			<FUNCTION>yesno</FUNCTION>
+
+		</KEYWORDS>
+	</RULES>
+
+</MODE>

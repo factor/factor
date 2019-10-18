@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic kernel kernel.private math memory
 namespaces sequences layouts system hashtables classes alien
-byte-arrays bit-arrays float-arrays combinators ;
+byte-arrays bit-arrays float-arrays combinators words ;
 IN: cpu.architecture
 
-SYMBOL: compiler-backend
+: set-profiler-prologues ( n -- )
+    39 setenv ;
 
-! Does the assembler emit bytes or cells?
-HOOK: code-format compiler-backend ( -- byte# )
+SYMBOL: compiler-backend
 
 ! A pseudo-register class for parameters spilled on the stack
 TUPLE: stack-params ;
@@ -49,14 +49,25 @@ HOOK: %epilogue compiler-backend ( n -- )
 ! Bump profiling counter
 HOOK: %profiler-prologue compiler-backend ( word -- )
 
-! Call another word
-HOOK: %call compiler-backend ( label -- )
+! Store word XT in stack frame
+HOOK: %save-word-xt compiler-backend ( -- )
+
+! Store dispatch branch XT in stack frame
+HOOK: %save-dispatch-xt compiler-backend ( -- )
+
+M: object %save-dispatch-xt %save-word-xt ;
+
+! Call another label
+HOOK: %call-label compiler-backend ( label -- )
+
+! Call C primitive
+HOOK: %call-primitive compiler-backend ( label -- )
 
 ! Local jump for branches
 HOOK: %jump-label compiler-backend ( label -- )
 
-! Tail call another word
-: %jump ( label -- ) %epilogue-later %jump-label ;
+! Far jump to C primitive
+HOOK: %jump-primitive compiler-backend ( label -- )
 
 ! Test if vreg is 'f' or not
 HOOK: %jump-t compiler-backend ( label -- )
@@ -76,17 +87,14 @@ HOOK: %inc-d compiler-backend ( n -- )
 HOOK: %inc-r compiler-backend ( n -- )
 
 ! Load stack into vreg
-GENERIC: (%peek) ( vreg loc reg-class -- )
-: %peek ( vreg loc -- ) over (%peek) ;
+HOOK: %peek compiler-backend ( vreg loc -- )
 
 ! Store vreg to stack
-GENERIC: (%replace) ( vreg loc reg-class -- )
-: %replace ( vreg loc -- ) over (%replace) ;
+HOOK: %replace compiler-backend ( vreg loc -- )
 
-! Move one vreg to another
-HOOK: %move-int>int compiler-backend ( dst src -- )
-HOOK: %move-int>float compiler-backend ( dst src -- )
-HOOK: %move-float>int compiler-backend ( dst src -- )
+! Box and unbox floats
+HOOK: %unbox-float compiler-backend ( dst src -- )
+HOOK: %box-float compiler-backend ( dst src -- )
 
 ! FFI stuff
 
@@ -127,6 +135,12 @@ GENERIC: %save-param-reg ( stack reg reg-class -- )
 
 GENERIC: %load-param-reg ( stack reg reg-class -- )
 
+HOOK: %prepare-alien-invoke compiler-backend ( -- )
+
+HOOK: %prepare-var-args compiler-backend ( -- )
+
+M: object %prepare-var-args ;
+
 HOOK: %alien-invoke compiler-backend ( library function -- )
 
 HOOK: %cleanup compiler-backend ( alien-node -- )
@@ -148,7 +162,7 @@ GENERIC: v>operand ( obj -- operand )
 
 M: integer v>operand tag-bits get shift ;
 
-M: f v>operand drop object tag-number ;
+M: f v>operand drop \ f tag-number ;
 
 M: object load-literal v>operand load-indirect ;
 
@@ -178,24 +192,15 @@ PREDICATE: integer inline-array 32 < ;
     ] if-small-struct ;
 
 ! Alien accessors
-HOOK: %unbox-byte-array compiler-backend ( quot src -- ) inline
+HOOK: %unbox-byte-array compiler-backend ( dst src -- )
 
-HOOK: %unbox-alien compiler-backend ( quot src -- ) inline
+HOOK: %unbox-alien compiler-backend ( dst src -- )
 
-HOOK: %unbox-f compiler-backend ( quot src -- ) inline
+HOOK: %unbox-f compiler-backend ( dst src -- )
 
-HOOK: %complex-alien-accessor compiler-backend ( quot src -- )
-inline
+HOOK: %unbox-any-c-ptr compiler-backend ( dst src -- )
 
-: %alien-accessor ( quot src class -- )
-    {
-        { [ dup \ f class< ] [ drop %unbox-f ] }
-        { [ dup simple-alien class< ] [ drop %unbox-alien ] }
-        { [ dup byte-array class< ] [ drop %unbox-byte-array ] }
-        { [ dup bit-array class< ] [ drop %unbox-byte-array ] }
-        { [ dup float-array class< ] [ drop %unbox-byte-array ] }
-        { [ t ] [ drop %complex-alien-accessor ] }
-    } cond ; inline
+HOOK: %box-alien compiler-backend ( dst src -- )
 
 : operand ( var -- op ) get v>operand ; inline
 

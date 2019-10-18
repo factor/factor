@@ -5,14 +5,14 @@ ui.clipboards ui.gadgets.worlds assocs kernel math namespaces
 opengl sequences strings x11.xlib x11.events x11.xim x11.glx
 x11.clipboard x11.constants x11.windows io.utf8 combinators
 debugger system command-line ui.render math.vectors tuples
-opengl.gl ;
+opengl.gl threads ;
 IN: ui.x11
 
 TUPLE: x11-ui-backend ;
 
 : XA_NET_WM_NAME "_NET_WM_NAME" x-atom ;
 
-TUPLE: x11-handle window glx xic copy-sub-buffer? ;
+TUPLE: x11-handle window glx xic ;
 
 C: <x11-handle> x11-handle
 
@@ -93,8 +93,12 @@ M: world button-up-event
     send-button-up ;
 
 : mouse-event>scroll-direction ( event -- pair )
-    #! Reminder for myself: 4 is up, 5 is down
-    XButtonEvent-button 5 = 1 -1 ? 0 swap 2array ;
+    XButtonEvent-button {
+        { 4 { 0 -1 } }
+        { 5 { 0 1 } }
+        { 6 { -1 0 } }
+        { 7 { 1 0 } }
+    } at ;
 
 M: world wheel-event
     >r dup mouse-event>scroll-direction swap mouse-event-loc r>
@@ -154,23 +158,18 @@ M: world selection-request-event
         { [ t ] [ drop send-notify-failure ] }
     } cond ;
 
-: close-window ( handle -- )
+M: x11-ui-backend (close-window) ( handle -- )
     dup x11-handle-xic XDestroyIC
     dup x11-handle-glx destroy-glx
     x11-handle-window dup unregister-window
     destroy-window ;
 
 M: world client-event
-    swap close-box? [
-        dup world-handle >r stop-world r> close-window
-    ] [
-        drop
-    ] if ;
+    swap close-box? [ ungraft ] [ drop ] if ;
 
 : gadget-window ( world -- )
     dup world-loc over rect-dim glx-window
-    over "Factor" create-xic
-    copy-sub-buffer-supported? <x11-handle>
+    over "Factor" create-xic <x11-handle>
     2dup x11-handle-window register-window
     swap set-world-handle ;
 
@@ -179,7 +178,7 @@ M: world client-event
         next-event dup
         None XFilterEvent zero? [ drop wait-event ] unless
     ] [
-        ui-step wait-event
+        ui-step 10 sleep wait-event
     ] if ;
 
 : do-events ( -- )
@@ -219,9 +218,8 @@ M: x11-ui-backend set-title ( string world -- )
     world-handle x11-handle-window swap dpy get -rot
     3dup set-title-old set-title-new ;
 
-M: x11-ui-backend (open-world-window) ( world -- )
+M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
-    dup start-world
     world-handle x11-handle-window dup set-closable map-window ;
 
 M: x11-ui-backend raise-window ( world -- )
@@ -234,49 +232,8 @@ M: x11-ui-backend select-gl-context ( handle -- )
     dup x11-handle-window swap x11-handle-glx glXMakeCurrent
     [ "Failed to set current GLX context" throw ] unless ;
 
-: swap-buffers-mesa ( handle -- )
-    dpy get swap x11-handle-window
-    clip get flip-rect fix-coordinates
-    glXCopySubBufferMESA ;
-
-: swap-buffers-full ( handle -- )
-    dpy get swap x11-handle-window glXSwapBuffers ;
-
-: gl-raster-pos ( loc -- )
-    first2 [ >fixnum ] 2apply glRasterPos2i ;
-
-: gl-copy-pixels ( loc dim buffer -- )
-    >r fix-coordinates r> glCopyPixels ;
-
-: swap-buffers-slow ( -- )
-    GL_BACK glReadBuffer
-    GL_FRONT glDrawBuffer
-    GL_SCISSOR_TEST glDisable
-    GL_ONE GL_ZERO glBlendFunc
-    clip get rect-bounds { 0 1 } v* v+ gl-raster-pos
-    clip get flip-rect GL_COLOR gl-copy-pixels
-    GL_BACK glDrawBuffer
-    glFlush ;
-
-: swap-buffer-strategy
-    "swap-buffer-strategy" get [ "slow" ] unless* ;
-
-: can-swap-full? ( -- ? )
-    clip get world get delegates [ rect? ] find nip = ;
-
-: swap-buffers ( handle strategy -- )
-    {
-        { "mesa" [ swap-buffers-mesa ] }
-        { "full" [ swap-buffers-full ] }
-        { "slow" [
-            can-swap-full?
-            [ swap-buffers-full ]
-            [ drop swap-buffers-slow ] if
-        ] }
-    } case ;
-
 M: x11-ui-backend flush-gl-context ( handle -- )
-    swap-buffer-strategy swap-buffers ;
+    dpy get swap x11-handle-window glXSwapBuffers ;
 
 M: x11-ui-backend ui ( -- )
     [

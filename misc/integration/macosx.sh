@@ -4,6 +4,7 @@ if [ "$CPU" = "x86.32" ]; then
 	TARGET="macosx-x86"
 elif [ "$CPU" = "ppc" ]; then
 	TARGET="macosx-ppc"
+	CPU = "macosx-ppc"
 else
 	echo "Specify a CPU"
 	exit 1

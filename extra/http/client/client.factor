@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
-io io.sockets io.streams.string io.files strings splitting ;
+io io.sockets io.streams.string io.files strings splitting
+continuations ;
 IN: http.client
 
 : parse-host ( url -- host port )
@@ -16,7 +17,9 @@ IN: http.client
 
 : parse-response ( line -- code )
     "HTTP/" ?head [ " " split1 nip ] when
-    " " split1 drop string>number ;
+    " " split1 drop string>number [
+        "Premature end of stream" throw
+    ] unless* ;
 
 : read-response ( -- code header )
     #! After sending a GET or POST we read a response line and
@@ -34,18 +37,18 @@ IN: http.client
 
 DEFER: http-get-stream
 
-: do-redirect ( code headers string -- code headers stream )
+: do-redirect ( code headers stream -- code headers stream )
     #! Should this support Location: headers that are
     #! relative URLs?
     pick 100 /i 3 = [
-        drop "Location" swap at nip http-get-stream
+        stream-close "Location" swap at nip http-get-stream
     ] when ;
 
 : http-get-stream ( url -- code headers stream )
     #! Opens a stream for reading from an HTTP URL.
     parse-url over parse-host <inet> <client> [
-        get-request read-response stdio get 
-    ] with-stream* do-redirect ;
+        [ [ get-request read-response ] with-stream* ] keep
+    ] [ >r stream-close r> rethrow ] recover do-redirect ;
 
 : http-get ( url -- code headers string )
     #! Opens a stream for reading from an HTTP URL.

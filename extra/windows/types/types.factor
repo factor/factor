@@ -7,7 +7,7 @@ TYPEDEF: char                CHAR
 TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
 
-TYPEDEF: short               wchar_t
+TYPEDEF: ushort               wchar_t
 TYPEDEF: wchar_t             WCHAR
 
 TYPEDEF: short               SHORT
@@ -66,7 +66,8 @@ TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 
 TYPEDEF: WCHAR       TCHAR
 TYPEDEF: TCHAR       TBYTE
-TYPEDEF: uchar*  LPCSTR
+! TYPEDEF: uchar*  LPCSTR
+TYPEDEF: ushort*  LPCSTR
 TYPEDEF: ushort*  LPWSTR
 
 
@@ -127,7 +128,7 @@ TYPEDEF: WCHAR*               LPSTR
 TYPEDEF: ushort* LPCTSTR
 TYPEDEF: ushort* LPWTSTR
 
-TYPEDEF: LPSTR       LPTSTR
+TYPEDEF: ushort*       LPTSTR
 TYPEDEF: LPCSTR      PCTSTR
 TYPEDEF: LPSTR       PTSTR
 
@@ -195,11 +196,17 @@ TYPEDEF: void* LPWNDCLASS
 TYPEDEF: void* LPWNDCLASSEX
 TYPEDEF: void* MSGBOXPARAMSA
 TYPEDEF: void* MSGBOXPARAMSW
+TYPEDEF: void* LPOVERLAPPED_COMPLETION_ROUTINE
 
 TYPEDEF: int size_t
 TYPEDEF: size_t socklen_t
 
 TYPEDEF: void* WNDPROC
+
+: FALSE 0 ; inline
+: TRUE 1 ; inline
+
+: >BOOLEAN ( ? -- 1/0 ) 1 0 ? ; inline
 
 ! typedef LRESULT (CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 
@@ -326,4 +333,8 @@ C-STRUCT: LVFINDINFO
     { "POINT" "pt" }
     { "uint" "vkDirection" } ;
 
-
+C-STRUCT: ACCEL
+    { "BYTE" "fVirt" }
+    { "WORD" "key" }
+    { "WORD" "cmd" } ;
+TYPEDEF: ACCEL* LPACCEL

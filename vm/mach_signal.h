@@ -1,3 +1,13 @@
+/* Fault handler information.  MacOSX version.
+Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
+Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
+
+Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
+2005-03-10:
+
+http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
+
+Modified for Factor by Slava Pestov */
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -10,10 +20,8 @@
 #include <mach/task.h>
 #include <pthread.h>
 
-/* For MacOSX.  */
-#ifndef SS_DISABLE
-#define SS_DISABLE SA_DISABLE
-#endif
+/* The exception port on which our thread listens. */
+mach_port_t our_exception_port;
 
 /* This is not defined in any header, although documented.  */
 
@@ -69,4 +77,4 @@ catch_exception_raise_state_identity (mach_port_t exception_port,
                                       thread_state_t out_state,
                                       mach_msg_type_number_t *out_state_count);
 
-int mach_initialize ();
+void mach_initialize (void);

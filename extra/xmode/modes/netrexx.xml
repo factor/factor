@@ -1,0 +1,414 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="indentNextLines"
+      VALUE="\s*(if|loop|do|else|select|otherwise|catch|finally|class|method|properties)(.*)"/>
+    <!-- VALUE="\s*(((if|while)\s*\(|else\s*(\{|$)|else\s+if\s*\(|case\s+.+:|default:)[^;]*|for\s*\(.*)" -->
+    <PROPERTY NAME="commentStart" VALUE="/*" />
+    <PROPERTY NAME="commentEnd" VALUE="*/" />
+    <PROPERTY NAME="lineComment" VALUE="--" />
+    <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+  </PROPS>
+  <RULES ESCAPE="\" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+    <!-- Documentation comment -->
+    <SPAN TYPE="COMMENT2" DELEGATE="java::JAVADOC">
+      <BEGIN>/**</BEGIN>
+      <END>*/</END>
+    </SPAN>
+
+    <!-- C style comment -->
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>/*</BEGIN>
+      <END>*/</END>
+    </SPAN>
+
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+
+    <EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
+
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">!</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">/</SEQ>
+
+    <!-- workaround to stop "*" from being colorized
+         in import statements. -->
+    <SEQ TYPE="NULL">.*</SEQ>
+
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">%</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;</SEQ>
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <SEQ TYPE="OPERATOR">^</SEQ>
+    <SEQ TYPE="OPERATOR">~</SEQ>
+    <SEQ TYPE="OPERATOR">}</SEQ>
+    <SEQ TYPE="OPERATOR">{</SEQ>
+
+    <KEYWORDS>
+
+      <FUNCTION>abbrev</FUNCTION>
+      <FUNCTION>abs</FUNCTION>
+      <FUNCTION>b2x</FUNCTION>
+      <FUNCTION>center</FUNCTION>
+      <FUNCTION>centre</FUNCTION>
+      <FUNCTION>changestr</FUNCTION>
+      <FUNCTION>charAt</FUNCTION>
+      <FUNCTION>compare</FUNCTION>
+      <FUNCTION>copies</FUNCTION>
+      <FUNCTION>copyIndexed</FUNCTION>
+      <FUNCTION>countstr</FUNCTION>
+      <FUNCTION>c2d</FUNCTION>
+      <FUNCTION>c2x</FUNCTION>
+      <FUNCTION>datatype</FUNCTION>
+      <FUNCTION>delstr</FUNCTION>
+      <FUNCTION>delword</FUNCTION>
+      <FUNCTION>d2c</FUNCTION>
+      <FUNCTION>d2X</FUNCTION>
+      <FUNCTION>equals</FUNCTION>
+      <FUNCTION>exists</FUNCTION>
+      <FUNCTION>format</FUNCTION>
+      <FUNCTION>hashCode</FUNCTION>
+      <FUNCTION>insert</FUNCTION>
+      <FUNCTION>lastpos</FUNCTION>
+      <FUNCTION>left</FUNCTION>
+      <FUNCTION>length</FUNCTION>
+      <FUNCTION>lower</FUNCTION>
+      <FUNCTION>max</FUNCTION>
+      <FUNCTION>min</FUNCTION>
+      <FUNCTION>nop</FUNCTION>
+      <FUNCTION>overlay</FUNCTION>
+      <FUNCTION>parse</FUNCTION>
+      <FUNCTION>pos</FUNCTION>
+      <FUNCTION>reverse</FUNCTION>
+      <FUNCTION>right</FUNCTION>
+      <FUNCTION>say</FUNCTION>
+      <FUNCTION>sequence</FUNCTION>
+      <FUNCTION>sign</FUNCTION>
+      <FUNCTION>space</FUNCTION>
+      <FUNCTION>strip</FUNCTION>
+      <FUNCTION>substr</FUNCTION>
+      <FUNCTION>subword</FUNCTION>
+      <FUNCTION>toCharArray</FUNCTION>
+      <FUNCTION>toString</FUNCTION>
+      <FUNCTION>toboolean</FUNCTION>
+      <FUNCTION>tobyte</FUNCTION>
+      <FUNCTION>tochar</FUNCTION>
+      <FUNCTION>todouble</FUNCTION>
+      <FUNCTION>tofloat</FUNCTION>
+      <FUNCTION>toint</FUNCTION>
+      <FUNCTION>tolong</FUNCTION>
+      <FUNCTION>toshort</FUNCTION>
+      <FUNCTION>trunc</FUNCTION>
+      <FUNCTION>translate</FUNCTION>
+      <FUNCTION>upper</FUNCTION>
+      <FUNCTION>verify</FUNCTION>
+      <FUNCTION>word</FUNCTION>
+      <FUNCTION>wordindex</FUNCTION>
+      <FUNCTION>wordlength</FUNCTION>
+      <FUNCTION>wordpos</FUNCTION>
+      <FUNCTION>words</FUNCTION>
+      <FUNCTION>x2b</FUNCTION>
+      <FUNCTION>x2c</FUNCTION>
+      <FUNCTION>x2d</FUNCTION>
+
+      <KEYWORD1>class</KEYWORD1>
+      <KEYWORD1>private</KEYWORD1>
+      <KEYWORD1>public</KEYWORD1>
+      <KEYWORD1>abstract</KEYWORD1>
+      <KEYWORD1>final</KEYWORD1>
+      <KEYWORD1>interface</KEYWORD1>
+      <KEYWORD1>dependent</KEYWORD1>
+      <KEYWORD1>adapter</KEYWORD1>
+      <KEYWORD1>deprecated</KEYWORD1>
+      <KEYWORD1>extends</KEYWORD1>
+      <KEYWORD1>uses</KEYWORD1>
+      <KEYWORD1>implements</KEYWORD1>
+
+      <KEYWORD1>method</KEYWORD1>
+      <KEYWORD1>native</KEYWORD1>
+      <KEYWORD1>returns</KEYWORD1>
+      <KEYWORD1>signals</KEYWORD1>
+
+      <KEYWORD1>properties</KEYWORD1>
+      <KEYWORD1>private</KEYWORD1>
+      <KEYWORD1>public</KEYWORD1>
+      <KEYWORD1>inheritable</KEYWORD1>
+      <KEYWORD1>constant</KEYWORD1>
+      <KEYWORD1>static</KEYWORD1>
+      <KEYWORD1>volatile</KEYWORD1>
+      <KEYWORD1>unused</KEYWORD1>
+      <KEYWORD1>transient</KEYWORD1>
+      <KEYWORD1>indirect</KEYWORD1>
+
+      <KEYWORD2>do</KEYWORD2>
+      <KEYWORD2>label</KEYWORD2>
+      <KEYWORD2>protect</KEYWORD2>
+      <KEYWORD2>catch</KEYWORD2>
+      <KEYWORD2>finally</KEYWORD2>
+      <KEYWORD2>end</KEYWORD2>
+      <KEYWORD2>signal</KEYWORD2>
+
+      <KEYWORD2>if</KEYWORD2>
+      <KEYWORD2>then</KEYWORD2>
+      <KEYWORD2>else</KEYWORD2>
+      <KEYWORD2>select</KEYWORD2>
+      <KEYWORD2>case</KEYWORD2>
+      <KEYWORD2>when</KEYWORD2>
+      <KEYWORD2>otherwise</KEYWORD2>
+
+      <KEYWORD2>loop</KEYWORD2>
+      <KEYWORD2>forever</KEYWORD2>
+      <KEYWORD2>for</KEYWORD2>
+      <KEYWORD2>to</KEYWORD2>
+      <KEYWORD2>by</KEYWORD2>
+      <KEYWORD2>over</KEYWORD2>
+      <KEYWORD2>until</KEYWORD2>
+      <KEYWORD2>while</KEYWORD2>
+      <KEYWORD2>leave</KEYWORD2>
+      <KEYWORD2>iterate</KEYWORD2>
+
+      <KEYWORD2>return</KEYWORD2>
+      <KEYWORD2>exit</KEYWORD2>
+
+      <KEYWORD3>ask</KEYWORD3>
+      <KEYWORD3>digits</KEYWORD3>
+      <KEYWORD3>form</KEYWORD3>
+      <KEYWORD3>null</KEYWORD3>
+      <KEYWORD3>source</KEYWORD3>
+      <KEYWORD3>this</KEYWORD3>
+      <KEYWORD3>super</KEYWORD3>
+      <KEYWORD3>parent</KEYWORD3>
+      <KEYWORD3>sourceline</KEYWORD3>
+      <KEYWORD3>version</KEYWORD3>
+
+      <KEYWORD3>trace</KEYWORD3>
+      <KEYWORD3>var</KEYWORD3>
+      <KEYWORD3>all</KEYWORD3>
+      <KEYWORD3>results</KEYWORD3>
+      <KEYWORD3>off</KEYWORD3>
+      <KEYWORD3>methods</KEYWORD3>
+
+      <KEYWORD3>package</KEYWORD3>
+      <KEYWORD3>import</KEYWORD3>
+      <KEYWORD3>numeric</KEYWORD3>
+      <KEYWORD3>scientific</KEYWORD3>
+      <KEYWORD3>engineering</KEYWORD3>
+
+      <LITERAL2>options</LITERAL2>
+      <LITERAL2>comments</LITERAL2>
+      <LITERAL2>nocomments</LITERAL2>
+      <LITERAL2>keep</LITERAL2>
+      <LITERAL2>nokeep</LITERAL2>
+      <LITERAL2>compact</LITERAL2>
+      <LITERAL2>nocompact</LITERAL2>
+      <LITERAL2>console</LITERAL2>
+      <LITERAL2>noconsole</LITERAL2>
+      <LITERAL2>decimal</LITERAL2>
+      <LITERAL2>nodecimal</LITERAL2>
+      <LITERAL2>explicit</LITERAL2>
+      <LITERAL2>noexplicit</LITERAL2>
+      <LITERAL2>java</LITERAL2>
+      <LITERAL2>nojava</LITERAL2>
+      <LITERAL2>savelog</LITERAL2>
+      <LITERAL2>nosavelog</LITERAL2>
+
+      <LITERAL2>sourcedir</LITERAL2>
+      <LITERAL2>nosourcedir</LITERAL2>
+      <LITERAL2>symbols</LITERAL2>
+      <LITERAL2>nosymbols</LITERAL2>
+      <LITERAL2>utf8</LITERAL2>
+      <LITERAL2>noutf8</LITERAL2>
+
+      <LITERAL2>notrace</LITERAL2>
+      <LITERAL2>binary</LITERAL2>
+      <LITERAL2>nobinary</LITERAL2>
+      <LITERAL2>crossref</LITERAL2>
+      <LITERAL2>nocrossref</LITERAL2>
+      <LITERAL2>diag</LITERAL2>
+      <LITERAL2>nodiag</LITERAL2>
+      <LITERAL2>format</LITERAL2>
+      <LITERAL2>noformat</LITERAL2>
+      <LITERAL2>logo</LITERAL2>
+      <LITERAL2>nologo</LITERAL2>
+      <LITERAL2>replace</LITERAL2>
+      <LITERAL2>noreplace</LITERAL2>
+
+      <LITERAL2>strictassign</LITERAL2>
+      <LITERAL2>nostrictassign</LITERAL2>
+      <LITERAL2>strictcase</LITERAL2>
+      <LITERAL2>nostrictcase</LITERAL2>
+      <LITERAL2>strictargs</LITERAL2>
+      <LITERAL2>nostrictargs</LITERAL2>
+      <LITERAL2>strictimport</LITERAL2>
+      <LITERAL2>nostrictimport</LITERAL2>
+      <LITERAL2>strictsignal</LITERAL2>
+      <LITERAL2>nostrictsignal</LITERAL2>
+      <LITERAL2>strictprops</LITERAL2>
+      <LITERAL2>nostrictprops</LITERAL2>
+
+      <LITERAL2>verbose</LITERAL2>
+      <LITERAL2>noverbose</LITERAL2>
+      <LITERAL2>verbose0</LITERAL2>
+      <LITERAL2>verbose1</LITERAL2>
+      <LITERAL2>verbose2</LITERAL2>
+      <LITERAL2>verbose3</LITERAL2>
+      <LITERAL2>verbose4</LITERAL2>
+      <LITERAL2>verbose5</LITERAL2>
+
+      <LABEL>boolean</LABEL>
+      <LABEL>char</LABEL>
+      <LABEL>byte</LABEL>
+      <LABEL>short</LABEL>
+      <LABEL>int</LABEL>
+      <LABEL>long</LABEL>
+      <LABEL>float</LABEL>
+      <LABEL>double</LABEL>
+      <LABEL>Boolean</LABEL>
+      <LABEL>Character</LABEL>
+      <LABEL>Byte</LABEL>
+      <LABEL>Short</LABEL>
+      <LABEL>Integer</LABEL>
+      <LABEL>Long</LABEL>
+      <LABEL>Float</LABEL>
+      <LABEL>Double</LABEL>
+      <LABEL>BigDecimal</LABEL>
+      <LABEL>BigInteger</LABEL>
+      <LABEL>String</LABEL>
+      <LABEL>Rexx</LABEL>
+
+      <LABEL>StringBuffer</LABEL>
+      <LABEL>Object</LABEL>
+      <LABEL>Number</LABEL>
+      <LABEL>ArrayList</LABEL>
+      <LABEL>Calendar</LABEL>
+      <LABEL>Date</LABEL>
+      <LABEL>HashMap</LABEL>
+      <LABEL>HashSet</LABEL>
+      <LABEL>Hashtable</LABEL>
+      <LABEL>LinkedHashMap</LABEL>
+      <LABEL>LinkedHashSet</LABEL>
+      <LABEL>TreeMap</LABEL>
+      <LABEL>TreeSet</LABEL>
+      <LABEL>Vector</LABEL>
+      <LABEL>ConcurrentModificationException</LABEL>
+
+      <LABEL>BufferedInputStream</LABEL>
+      <LABEL>BufferedOutputStream</LABEL>
+      <LABEL>BufferedReader</LABEL>
+      <LABEL>BufferedWriter</LABEL>
+      <LABEL>ByteArrayInputStream</LABEL>
+      <LABEL>ByteArrayOutputStream</LABEL>
+      <LABEL>CharArrayReader</LABEL>
+      <LABEL>CharArrayWriter</LABEL>
+      <LABEL>DataInputStream</LABEL>
+      <LABEL>DataOutputStream</LABEL>
+      <LABEL>File</LABEL>
+      <LABEL>FileDescriptor</LABEL>
+      <LABEL>FileInputStream</LABEL>
+      <LABEL>FileOutputStream</LABEL>
+      <LABEL>FilePermission</LABEL>
+      <LABEL>FileReader</LABEL>
+      <LABEL>FileWriter</LABEL>
+      <LABEL>FilterInputStream</LABEL>
+      <LABEL>FilterOutputStream</LABEL>
+      <LABEL>FilterReader</LABEL>
+      <LABEL>FilterWriter</LABEL>
+      <LABEL>InputStream</LABEL>
+      <LABEL>InputStreamReader</LABEL>
+      <LABEL>LineNumberInputStream</LABEL>
+      <LABEL>LineNumberReader</LABEL>
+      <LABEL>ObjectInputStream</LABEL>
+      <LABEL>ObjectOutputStream</LABEL>
+      <LABEL>OutputStream</LABEL>
+      <LABEL>OutputStreamWriter</LABEL>
+      <LABEL>PipedInputStream</LABEL>
+      <LABEL>PipedOutputStream</LABEL>
+      <LABEL>PipedReader</LABEL>
+      <LABEL>PipedWriter</LABEL>
+      <LABEL>PrintStream</LABEL>
+      <LABEL>PrintWriter</LABEL>
+      <LABEL>PushbackInputStream</LABEL>
+      <LABEL>PushbackReader</LABEL>
+      <LABEL>RandomAccessFile</LABEL>
+      <LABEL>Reader</LABEL>
+      <LABEL>SequenceInputStream</LABEL>
+      <LABEL>StreamTokenizer</LABEL>
+      <LABEL>StringBufferInputStream</LABEL>
+      <LABEL>StringReader</LABEL>
+      <LABEL>StringWriter</LABEL>
+      <LABEL>Writer</LABEL>
+
+      <!-- Commonly used (=java.lang.* and java.io.*) Exceptions -->
+      <MARKUP>ArithmeticException</MARKUP>
+      <MARKUP>ArrayIndexOutOfBoundsException</MARKUP>
+      <MARKUP>ArrayStoreException</MARKUP>
+      <MARKUP>ClassCastException</MARKUP>
+      <MARKUP>ClassNotFoundException</MARKUP>
+      <MARKUP>CloneNotSupportedException</MARKUP>
+      <MARKUP>Exception</MARKUP>
+      <MARKUP>IllegalAccessException</MARKUP>
+      <MARKUP>IllegalArgumentException</MARKUP>
+      <MARKUP>IllegalMonitorStateException</MARKUP>
+      <MARKUP>IllegalStateException</MARKUP>
+      <MARKUP>IllegalThreadStateException</MARKUP>
+      <MARKUP>IndexOutOfBoundsException</MARKUP>
+      <MARKUP>InstantiationException</MARKUP>
+      <MARKUP>InterruptedException</MARKUP>
+      <MARKUP>NegativeArraySizeException</MARKUP>
+      <MARKUP>NoSuchFieldException</MARKUP>
+      <MARKUP>NoSuchMethodException</MARKUP>
+      <MARKUP>NullPointerException</MARKUP>
+      <MARKUP>NumberFormatException</MARKUP>
+      <MARKUP>RuntimeException</MARKUP>
+      <MARKUP>SecurityException</MARKUP>
+      <MARKUP>StringIndexOutOfBoundsException</MARKUP>
+      <MARKUP>UnsupportedOperationException</MARKUP>
+
+      <MARKUP>CharConversionException</MARKUP>
+      <MARKUP>EOFException</MARKUP>
+      <MARKUP>FileNotFoundException</MARKUP>
+      <MARKUP>InterruptedIOException</MARKUP>
+      <MARKUP>InvalidClassException</MARKUP>
+      <MARKUP>InvalidObjectException</MARKUP>
+      <MARKUP>IOException</MARKUP>
+      <MARKUP>NotActiveException</MARKUP>
+      <MARKUP>NotSerializableException</MARKUP>
+      <MARKUP>ObjectStreamException</MARKUP>
+      <MARKUP>OptionalDataException</MARKUP>
+      <MARKUP>StreamCorruptedException</MARKUP>
+      <MARKUP>SyncFailedException</MARKUP>
+      <MARKUP>UnsupportedEncodingException</MARKUP>
+      <MARKUP>UTFDataFormatException</MARKUP>
+      <MARKUP>WriteAbortedException</MARKUP>
+
+      <!-- all rmi functions need to signal this -->
+      <MARKUP>RemoteException</MARKUP>
+
+      <!-- Rexx specific Exception -->
+      <MARKUP>BadArgumentException</MARKUP>
+      <MARKUP>BadColumnException</MARKUP>
+      <MARKUP>BadNumericException</MARKUP>
+      <MARKUP>DivideException</MARKUP>
+      <MARKUP>ExponentOverflowException</MARKUP>
+      <MARKUP>NoOtherwiseException</MARKUP>
+      <MARKUP>NotCharacterException</MARKUP>
+      <MARKUP>NotLogicException</MARKUP>
+
+    </KEYWORDS>
+  </RULES>
+</MODE>

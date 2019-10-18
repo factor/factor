@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+	Tpl mode by Brant Gurganus <brantgurganus2001@cherokeescouting.org>
+    Adapted from ColdFusion
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+    <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT3">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+		
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+        
+        <!-- TPL markup start tags -->
+		<SPAN TYPE="KEYWORD3" DELEGATE="TPL">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+	</RULES>
+    
+    <RULES SET="TPL" DEFAULT="KEYWORD1" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+	
+		<SPAN TYPE="LABEL">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LABEL">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		
+		<SEQ TYPE="OPERATOR">*</SEQ>
+
+		
+		<KEYWORDS>
+			<KEYWORD1>include</KEYWORD1>
+            <OPERATOR>=</OPERATOR>
+            <KEYWORD2>START</KEYWORD2>
+            <KEYWORD2>END</KEYWORD2>
+		</KEYWORDS>
+	</RULES>
+    
+    <RULES SET="TAGS" DEFAULT="MARKUP" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+	</RULES>
+</MODE>

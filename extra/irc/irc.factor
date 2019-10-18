@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays calendar io io.sockets kernel match namespaces
-sequences sequences.trim splitting continuations threads ;
+sequences splitting strings continuations threads ;
 IN: irc
 
 ! "setup" objects
@@ -72,12 +72,12 @@ TUPLE: part-command channel text ;
 
 SYMBOL: irc-client
 : irc-stream> ( -- stream ) irc-client get irc-client-stream ;
-: trim-: ( seq -- seq ) [ CHAR: : = ] ltrim* ;
+: trim-: ( seq -- seq ) [ CHAR: : = ] left-trim ;
 : parse-name ( string -- string )
     trim-: "!" split first ;
 : irc-split ( string -- seq )
     1 swap [ [ CHAR: : = ] find* ] keep
-    swap [ cut trim-: ] [ nip f ] if >r trim trim-:
+    swap [ swap cut trim-: ] [ nip f ] if >r [ blank? ] trim trim-:
     " " split r> [ 1array append ] when* ;
 : me? ( name -- ? )
     irc-client get irc-client-nick nick-name = ;
@@ -185,7 +185,7 @@ SYMBOL: line
     dup irc-client-profile profile-server
     over irc-client-profile profile-port connect*
     dup irc-client-profile profile-nickname login
-    [ irc-loop ] [ irc-stream> stream-close ] cleanup ;
+    [ irc-loop ] [ irc-stream> stream-close ] [ ] cleanup ;
 
 : with-infinite-loop ( quot timeout -- quot timeout )
     "looping" print flush

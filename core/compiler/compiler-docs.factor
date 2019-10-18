@@ -1,13 +1,13 @@
 USING: generator help.markup help.syntax words io parser
-assocs ;
+assocs words.private sequences ;
 IN: compiler
 
-ARTICLE: "compiler-usage" "Compiler usage"
-"The main entry point to the compiler is a single word taking a word as input:"
+ARTICLE: "compiler-usage" "Calling the optimizing compiler"
+"The main entry point to the optimizing compiler is a single word taking a word as input:"
 { $subsection compile }
 "The above word throws an error if the word did not compile. Another variant simply prints the error and returns:"
 { $subsection try-compile }
-"The compiler can also compile a single quotation:"
+"The optimizing compiler can also compile a single quotation:"
 { $subsection compile-quot }
 { $subsection compile-1 }
 "Three utility words for bulk compilation:"
@@ -19,23 +19,25 @@ ARTICLE: "compiler-usage" "Compiler usage"
 "The warnings and errors can be viewed later:"
 { $subsection :warnings }
 { $subsection :errors }
-{ $subsection forget-errors }
-"Two utility words for ad-hoc compilation:"
-{ $subsection compile-quot }
-{ $subsection compile-1 } ;
+{ $subsection forget-errors } ;
 
 ARTICLE: "recompile" "Automatic recompilation"
-"Factor's compiler performs " { $emphasis "early binding" } "; if a compiled word " { $snippet "A" } " calls another compiled word " { $snippet "B" } " and " { $snippet "B" } " is subsequently redefined, the compiled definition of " { $snippet "A" } " will still refer to the earlier compiled definition of " { $snippet "B" } "."
-$nl
 "When a word is redefined, you can recompile all affected words automatically:"
 { $subsection recompile }
 "Normally loading a source file or a module also calls " { $link recompile } ". This can be disabled by wrapping file loading in a combinator:"
 { $subsection no-parse-hook } ;
 
-ARTICLE: "compiler" "The compiler"
-"The Factor compiler transforms word definitions to native machine code and performs a variety of optimizations."
-$nl
-"Only words for which a stack effect can be inferred will compile. All other words run in the interpreter. See " { $link "inference" } "."
+ARTICLE: "compiler" "Optimizing compiler"
+"Factor is a fully compiled language implementation with two distinct compilers:"
+{ $list
+    { "The " { $emphasis "non-optimizing quotation compiler" } " compiles quotations to naive machine code very quickly. The non-optimizing quotation compiler is part of the VM." }
+    { "The " { $emphasis "optimizing word compiler" } " compiles whole words at a time while performing extensive data and control flow analysis. This provides greater performance for generated code, but incurs a much longer compile time. The optimizing compiler is written in Factor." }
+}
+"While the quotation compiler is transparent to the developer, the optimizing compiler is invoked explicitly. It differs in two important ways from the non-optimizing compiler:"
+{ $list
+    { "The optimizing compiler only compiles words which have a static stack effect. This means that methods defined on fundamental generic words such as " { $link nth } " should have a static stack effect; for otherwise, most of the system would be compiled with the non-optimizing compiler. See " { $link "inference" } " and " { $link "cookbook-pitfalls" } "." }
+    { "The optimizing compiler performs " { $emphasis "early binding" } "; if a compiled word " { $snippet "A" } " calls another compiled word " { $snippet "B" } " and " { $snippet "B" } " is subsequently redefined, the compiled definition of " { $snippet "A" } " will still refer to the earlier compiled definition of " { $snippet "B" } ", until " { $snippet "A" } " explicitly recompiled." }
+}
 { $subsection "compiler-usage" }
 { $subsection "recompile" } ;
 
@@ -79,7 +81,7 @@ HELP: compile
 
 HELP: compile-failed
 { $values { "word" word } { "error" "an error" } }
-{ $description "Called when a word fails to compile. The word is removed from the set of words pending compilation, and will subsequently run in the interpreter. The error is reported by calling " { $link compile-error } "." } ;
+{ $description "Called when the optimizing compiler fails to compile a word. The word is removed from the set of words pending compilation, and it's un-optimized compiled definition will be used. The error is reported by calling " { $link compile-error } "." } ;
 
 HELP: try-compile
 { $values { "word" word } }

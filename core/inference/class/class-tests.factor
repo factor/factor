@@ -225,5 +225,9 @@ M: fixnum annotate-entry-test-1 drop ;
 
 [ t ] [
     [ { float } declare 10 [ 2.3 * ] times >float ]
-    \ >float  inlined?
+    \ >float inlined?
+] unit-test
+
+[ t ] [
+    [ 3 + = ] \ equal? inlined?
 ] unit-test

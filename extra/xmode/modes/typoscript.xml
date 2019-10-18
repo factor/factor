@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- TypoScript syntax highlighting, by Neil Bertram <neil@tasmanstudios.co.nz>
+	Based on Kasper's highlighter in ExtDevEval and his "TypoScript Syntax and In-depth Study"
+	available at http://typo3.org/documentation/document-library/doc_core_ts/
+
+  -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#"/>
+		<PROPERTY NAME="lineComment" VALUE="/"/>
+		<PROPERTY NAME="commentStart" VALUE="/*"/>
+		<PROPERTY NAME="commentEnd" VALUE="*/"/>
+		<PROPERTY NAME="indentOpenBrackets" VALUE="({"/>
+		<PROPERTY NAME="indentCloseBrackets" VALUE=")}"/>
+		<PROPERTY NAME="lineUpClosingBracket" VALUE="true"/>
+	</PROPS>
+	<RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE" NO_WORD_SEP=":" DEFAULT="MARKUP">
+		<!-- Include statement (<INCLUDE_TYPOSCRIPT: source="FILE: fileadmin/html/mainmenu_typoscript.txt">) -->
+		<SPAN TYPE="KEYWORD4" NO_LINE_BREAK="TRUE" AT_LINE_START="TRUE">
+			<BEGIN>&lt;INCLUDE</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- Assignments (using the = operator) are delegated to the assignment rule for more flexibility -->
+		<EOL_SPAN TYPE="OPERATOR" DELEGATE="typoscript::assignment" AT_LINE_START="FALSE" AT_WHITESPACE_END="FALSE">=</EOL_SPAN>
+
+		<!-- Multi-line assignments (using the (blah blah) syntax) -->
+		<SPAN TYPE="OPERATOR" AT_LINE_START="FALSE" NO_LINE_BREAK="FALSE" DELEGATE="typoscript::assignment">
+			<BEGIN>(</BEGIN>
+			<END>)</END>
+		</SPAN>
+
+		<!-- Object copies (using the < operator)
+			Note that object references (=<) are not highlighted due to the fact
+			that they're only supported by the core template engine, and not
+			actually a feature of typoscript itself
+		  -->
+		<EOL_SPAN TYPE="OPERATOR" AT_LINE_START="FALSE" DELEGATE="typoscript::copy">&lt;</EOL_SPAN>
+
+		<!-- Comments
+			- note that block comments must start/end at the beginning of the trimmed line
+			  but this is difficult to accomplish here, so we just force it to be line-start
+		  -->
+		<EOL_SPAN AT_WORD_START="TRUE" TYPE="COMMENT4">#</EOL_SPAN>
+		<SPAN TYPE="COMMENT1" NO_LINE_BREAK="FALSE" AT_LINE_START="TRUE">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		<EOL_SPAN AT_WORD_START="TRUE" TYPE="COMMENT2">/</EOL_SPAN>
+
+		<!-- Conditionals (anything inside square brackets at a word start -->
+		<SPAN TYPE="KEYWORD1" NO_LINE_BREAK="TRUE" AT_WORD_START="TRUE">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+		<!-- Special characters that haven't been caught yet -->
+		<SEQ TYPE="NULL">{</SEQ>
+		<SEQ TYPE="NULL">}</SEQ>
+		<SEQ TYPE="NULL">(</SEQ>
+		<SEQ TYPE="NULL">)</SEQ>
+	</RULES>
+
+	<!-- Rule for both single and multi-line assignments -->
+	<RULES SET="assignment" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE" DEFAULT="LITERAL1">
+		<!-- TypoScript constants inserted with {$blah} are highlighted -->
+		<SPAN TYPE="LABEL" AT_WORD_START="FALSE" AT_LINE_START="FALSE">
+			<BEGIN>{$</BEGIN>
+			<END>}</END>
+		</SPAN>
+	</RULES>
+
+	<!-- Rule for object copies -->
+	<RULES SET="copy" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="FALSE" DEFAULT="KEYWORD2">
+		<!-- nothing right now -->
+	</RULES>
+</MODE>

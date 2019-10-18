@@ -1,5 +1,5 @@
 
-USING: kernel math quotations namespaces sequences namespaces.lib 
+USING: kernel parser math quotations namespaces sequences namespaces.lib 
        inference.transforms ;
 
 IN: rewrite-closures
@@ -25,3 +25,7 @@ IN: rewrite-closures
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : lambda ( parameters quot -- ) parametric-quot scoped-quot closed-quot ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: C[ \ ] [ >quotation ] parse-literal \ closed-quot parsed ; parsing

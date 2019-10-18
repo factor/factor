@@ -26,8 +26,7 @@ M: string error. print ;
     error-continuation get continuation-retain stack. ;
 
 : :c ( -- )
-    error-continuation get
-    dup continuation-call swap continuation-c callstack. ;
+    error-continuation get continuation-call callstack. ;
 
 : :get ( variable -- value )
     error-continuation get continuation-name assoc-stack ;
@@ -69,11 +68,9 @@ M: string error. print ;
     flush ;
 
 : print-error ( error -- )
-    [
-        dup error.
-    ] [
-        "Error in print-error!" print drop
-    ] recover drop ;
+    [ error. flush ] curry
+    [ global [ "Error in print-error!" print drop ] bind ]
+    recover ;
 
 SYMBOL: error-hook
 
@@ -138,15 +135,10 @@ TUPLE: assert got expect ;
 : stack-overflow. ( obj name -- )
     write " stack overflow" print drop ;
 
-: objc-error. ( alien -- )
-    "Objective C exception" print drop ;
-
 : datastack-underflow. "Data" stack-underflow. ;
 : datastack-overflow. "Data" stack-overflow. ;
 : retainstack-underflow. "Retain" stack-underflow. ;
 : retainstack-overflow. "Retain" stack-overflow. ;
-: callstack-underflow. "Call" stack-underflow. ;
-: callstack-overflow. "Call" stack-overflow. ;
 
 : memory-error.
     "Memory protection fault at address " write third .h ;
@@ -158,37 +150,33 @@ PREDICATE: array kernel-error ( obj -- ? )
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup first "kernel-error" = not ] [ drop f ] }
-        { [ t ] [ second 0 19 between? ] }
+        { [ t ] [ second 0 16 between? ] }
     } cond ;
 
-: kernel-error ( error -- word )
-    #! Kernel are indexed by integers.
+: kernel-errors
     second {
-        expired-error.
-        io-error.
-        undefined-word-error.
-        type-check-error.
-        divide-by-zero-error.
-        signal-error.
-        array-size-error.
-        c-string-error.
-        ffi-error.
-        heap-scan-error.
-        undefined-symbol-error.
-        datastack-underflow.
-        datastack-overflow.
-        retainstack-underflow.
-        retainstack-overflow.
-        callstack-underflow.
-        callstack-overflow.
-        memory-error.
-        objc-error.
-        primitive-error.
-    } nth ;
+        { 0  [ expired-error.          ] }
+        { 1  [ io-error.               ] }
+        { 2  [ undefined-word-error.   ] }
+        { 3  [ type-check-error.       ] }
+        { 4  [ divide-by-zero-error.   ] }
+        { 5  [ signal-error.           ] }
+        { 6  [ array-size-error.       ] }
+        { 7  [ c-string-error.         ] }
+        { 8  [ ffi-error.              ] }
+        { 9  [ heap-scan-error.        ] }
+        { 10 [ undefined-symbol-error. ] }
+        { 11 [ datastack-underflow.    ] }
+        { 12 [ datastack-overflow.     ] }
+        { 13 [ retainstack-underflow.  ] }
+        { 14 [ retainstack-overflow.   ] }
+        { 15 [ memory-error.           ] }
+        { 16 [ primitive-error.        ] }
+    } ; inline
 
-M: kernel-error error. dup kernel-error execute ;
+M: kernel-error error. dup kernel-errors case ;
 
-M: kernel-error error-help kernel-error ;
+M: kernel-error error-help kernel-errors at first ;
 
 M: no-method summary
     drop "No suitable method" ;

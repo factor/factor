@@ -4,14 +4,11 @@ USING: kernel strings math sequences lazy-lists words
 math.parser promises ;
 IN: parser-combinators 
 
-LAZY: 'any-char' ( -- parser )
-  [ drop t ] satisfy ;
-
 : 'digit' ( -- parser )
   [ digit? ] satisfy [ digit> ] <@ ;
 
 : 'integer' ( -- parser )
-  'digit' <!+> [ 0 [ swap 10 * + ] reduce ] <@ ;
+  'digit' <!+> [ 10 swap digits>integer ] <@ ;
 
 : 'string' ( -- parser )
   [ CHAR: " = ] satisfy 

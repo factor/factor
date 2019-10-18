@@ -3,7 +3,7 @@
 !
 IN: openal
 USING: kernel alien system combinators alien.syntax namespaces
-alien.c-types sequences vocabs.loader shuffle ;
+       alien.c-types sequences vocabs.loader shuffle combinators.lib ;
 
 : load-alut-library ( -- )
     "alut" {

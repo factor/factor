@@ -47,7 +47,6 @@ VARS: openal-buffer ;
   malloc [ fill-data ] keep ;
 
 : output-openal ( pcm -- ? )
-  break
   openal-buffer> swap     ! buffer pcm
   [ get-format ] keep     ! buffer format pcm
   [ get-data ] keep       ! buffer format size alien pcm

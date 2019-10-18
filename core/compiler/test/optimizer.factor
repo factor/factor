@@ -165,7 +165,8 @@ GENERIC: void-generic ( obj -- * )
 
 ! ensure identities are working in some form
 [ t ] [
-    [ 0 + ] dataflow optimize [ #push? ] node-exists? not
+    [ { number } declare 0 + ] dataflow optimize
+    [ #push? ] node-exists? not
 ] unit-test
 
 ! compiling <tuple> with a non-literal class failed
@@ -207,10 +208,6 @@ M: slice foozul ;
 [ -5 ] [ 5 [ -1 * ] compile-1 ] unit-test
 [ -5 ] [ 5 [ -1 swap * ] compile-1 ] unit-test
 
-[ 5 ] [ 5 [ 1 / ] compile-1 ] unit-test
-[ 1/5 ] [ 5 [ 1 swap / ] compile-1 ] unit-test
-[ -5 ] [ 5 [ -1 / ] compile-1 ] unit-test
-
 [ 0 ] [ 5 [ 1 mod ] compile-1 ] unit-test
 [ 0 ] [ 5 [ 1 rem ] compile-1 ] unit-test
 
@@ -245,4 +242,38 @@ M: slice foozul ;
 [ t ] [ 5 [ dup number= ] compile-1 ] unit-test
 [ t ] [ \ vector [ \ vector = ] compile-1 ] unit-test
 
-[ 3 ] [ 10/3 [ { ratio } declare 1 /i ] compile-1 ] unit-test
+GENERIC: detect-number ( obj -- obj )
+M: number detect-number ;
+
+[ 10 f [ <array> 0 + detect-number ] compile-1 ] unit-test-fails
+
+! Regression
+[ 4 [ + ] ] [ 2 2 [ [ + ] [ call ] keep ] compile-1 ] unit-test
+
+! Regression
+USE: sorting
+USE: sorting.private
+
+: old-binsearch ( elt quot seq -- elt quot i )
+    dup length 1 <= [
+        slice-from
+    ] [
+        [ midpoint swap call ] 3keep roll dup zero?
+        [ drop dup slice-from swap midpoint@ + ]
+        [ partition old-binsearch ] if
+    ] if ; inline
+
+[ 10 ] [
+    10 20 >vector <flat-slice>
+    [ [ - ] swap old-binsearch ] compile-1 2nip
+] unit-test
+
+! Regression
+TUPLE: silly-tuple a b ;
+
+[ 1 2 { silly-tuple-a silly-tuple-b } ] [
+    T{ silly-tuple f 1 2 }
+    [
+        { silly-tuple-a silly-tuple-b } [ get-slots ] keep
+    ] compile-1
+] unit-test

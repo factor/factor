@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
-io.encodings combinators splitting math.functions ;
+io.encodings combinators splitting ;
 IN: io.utf16
 
 SYMBOL: double

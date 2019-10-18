@@ -13,8 +13,7 @@ IN: strings
 : reset-string-hashcode f swap set-string-hashcode ; inline
 
 : rehash-string ( str -- )
-    dup 0 [ swap 31 fixnum*fast fixnum+fast ] reduce
-    swap set-string-hashcode ; inline
+    1 over sequence-hashcode swap set-string-hashcode ; inline
 
 PRIVATE>
 
@@ -67,7 +66,7 @@ M: string resize resize-string ;
 
 : >upper ( str -- upper ) [ ch>upper ] map ;
 
-: 1string ( ch -- str ) "" 1sequence ;
+: 1string ( ch -- str ) 1 swap <string> ;
 
 : >string ( seq -- str ) "" clone-like ;
 

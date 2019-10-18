@@ -5,6 +5,8 @@ IN: temporary
 
 MATCH-VARS: ?a ?b ;
 
+[ f ] [ { ?a ?a } { 1 2 } match ] unit-test
+
 [ H{ { ?a 1 } { ?b 2 } } ] [
  { ?a ?b } { 1 2 } match
 ] unit-test

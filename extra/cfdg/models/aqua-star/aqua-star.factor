@@ -6,12 +6,13 @@ IN: cfdg.models.aqua-star
 
 : tentacle ( -- )
 iterate? [
-  { [ circle
-      [ .23 y .99 s .002 b tentacle ] do ]
-    [ circle
-      [ .17 y 2 r .99 s .002 b tentacle ] do ]
-    [ circle
-      [ .12 y -2 r .99 s .001 b tentacle ] do ] } random call
+  { { 1 [ circle
+          [ .23 y .99 s .002 b tentacle ] do ] }
+    { 1 [ circle
+      	  [ .17 y 2 r .99 s .002 b tentacle ] do ] }
+    { 1 [ circle
+      	  [ .12 y -2 r .99 s .001 b tentacle ] do ] } }
+  call-random-weighted
 ] when ;
 
 : anemone ( -- )

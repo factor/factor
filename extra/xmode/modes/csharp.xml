@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+
+		<!-- Auto indent -->
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="indentNextLine"
+			VALUE="\s*(((if|while)\s*\(|else\s*|else\s+if\s*\(|for\s*\(.*\))[^{;]*)" />
+		<PROPERTY NAME="unindentThisLine"
+			VALUE="^.*(default:\s*|case.*:.*)$" />
+		<PROPERTY NAME="electricKeys" VALUE=":" />
+	</PROPS>
+	<RULES ESCAPE="\"
+		IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0x[\p{XDigit}]+[lL]?|[\p{Digit}]+(e[\p{Digit}]*)?[lLdDfF]?)">
+
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+
+		<!-- DocComments may have XML in them -->
+		<EOL_SPAN TYPE="COMMENT3" DELEGATE="DOC_COMMENT">///</EOL_SPAN>
+
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+		<!-- verbatim strings -->
+		<SPAN TYPE="LITERAL3" NO_LINE_BREAK="FALSE" NO_ESCAPE="TRUE">
+			<BEGIN>@"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<EOL_SPAN TYPE="KEYWORD2">#if</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#else</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#elif</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#endif</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#define</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#undef</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#warning</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#error</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#line</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#region</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#endregion</EOL_SPAN>
+
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">\</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>abstract</KEYWORD1>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>base</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>checked</KEYWORD1>
+			<KEYWORD1>const</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>decimal</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>delegate</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>explicit</KEYWORD1>
+			<KEYWORD1>extern</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD1>fixed</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>foreach</KEYWORD1>
+			<KEYWORD1>goto</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>implicit</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>internal</KEYWORD1>
+			<KEYWORD1>is</KEYWORD1>
+			<KEYWORD1>lock</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>operator</KEYWORD1>
+			<KEYWORD1>out</KEYWORD1>
+			<KEYWORD1>override</KEYWORD1>
+			<KEYWORD1>params</KEYWORD1>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>readonly</KEYWORD1>
+			<KEYWORD1>ref</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>sealed</KEYWORD1>
+			<KEYWORD1>sizeof</KEYWORD1>
+			<KEYWORD1>stackalloc</KEYWORD1>
+			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>typeof</KEYWORD1>
+			<KEYWORD1>unchecked</KEYWORD1>
+			<KEYWORD1>unsafe</KEYWORD1>
+			<KEYWORD1>virtual</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+
+			<KEYWORD2>using</KEYWORD2>
+			<KEYWORD2>namespace</KEYWORD2>
+
+			<KEYWORD3>bool</KEYWORD3>
+			<KEYWORD3>byte</KEYWORD3>
+			<KEYWORD3>char</KEYWORD3>
+			<KEYWORD3>class</KEYWORD3>
+			<KEYWORD3>double</KEYWORD3>
+			<KEYWORD3>enum</KEYWORD3>
+			<KEYWORD3>event</KEYWORD3>
+			<KEYWORD3>float</KEYWORD3>
+			<KEYWORD3>int</KEYWORD3>
+			<KEYWORD3>interface</KEYWORD3>
+			<KEYWORD3>long</KEYWORD3>
+			<KEYWORD3>object</KEYWORD3>
+			<KEYWORD3>sbyte</KEYWORD3>
+			<KEYWORD3>short</KEYWORD3>
+			<KEYWORD3>string</KEYWORD3>
+			<KEYWORD3>struct</KEYWORD3>
+			<KEYWORD3>uint</KEYWORD3>
+			<KEYWORD3>ulong</KEYWORD3>
+			<KEYWORD3>ushort</KEYWORD3>
+			<KEYWORD3>void</KEYWORD3>
+
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>null</LITERAL2>
+			<LITERAL2>this</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="DOC_COMMENT" DEFAULT="COMMENT3" IGNORE_CASE="TRUE">
+		<!-- XML comments -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+		<!-- XML tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="xml::TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+	</RULES>
+</MODE>
+

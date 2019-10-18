@@ -1,6 +1,6 @@
 IN: temporary
 USING: kernel math.matrices math.matrices.elimination
-tools.test ;
+tools.test sequences ;
 
 [
     {
@@ -131,6 +131,15 @@ tools.test ;
         { 1 0 0 0 }
         { 1 1 0 1 }
     } echelon
+] unit-test
+
+[
+    2
+] [
+    {
+        { 0 0 }
+        { 0 0 }
+    } nullspace length
 ] unit-test
 
 [

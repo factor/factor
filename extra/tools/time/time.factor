@@ -6,7 +6,9 @@ IN: tools.time
 
 : benchmark ( quot -- gctime runtime )
     millis >r gc-time >r call gc-time r> - millis r> - ;
+    inline
 
 : time ( quot -- )
     benchmark
     [ # " ms run / " % # " ms GC time" % ] "" make print flush ;
+    inline

@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#" />
+	</PROPS>
+	<RULES>
+		<!-- comments -->
+		<EOL_SPAN TYPE="COMMENT1" AT_LINE_START="TRUE">#</EOL_SPAN>
+
+		<!-- Dependency operators -->
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<!-- %attr -->
+		<SPAN TYPE="MARKUP" DELEGATE="ATTR" NO_LINE_BREAK="TRUE">
+			<BEGIN>%attr(</BEGIN>
+			<END>)</END>
+		</SPAN>
+
+		<!-- %verify -->
+		<SPAN TYPE="MARKUP" DELEGATE="VERIFY" NO_LINE_BREAK="TRUE">
+			<BEGIN>%verify(</BEGIN>
+			<END>)</END>
+		</SPAN>
+
+		<!-- Source -->
+		<MARK_FOLLOWING TYPE="KEYWORD1"
+			AT_LINE_START="TRUE">Source</MARK_FOLLOWING>
+
+		<!-- Patch -->
+		<MARK_FOLLOWING TYPE="KEYWORD1"
+			AT_LINE_START="TRUE">Patch</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="FUNCTION"
+			AT_LINE_START="TRUE">%patch</MARK_FOLLOWING>
+
+		<!-- Variables -->
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<SPAN TYPE="KEYWORD3" NO_LINE_BREAK="TRUE">
+			<BEGIN>%{</BEGIN>
+			<END>}</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">$#</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD2">$?</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD2">$*</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD2">$&lt;</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+
+		<KEYWORDS>
+			<KEYWORD1>Summary:</KEYWORD1>
+			<KEYWORD1>Name:</KEYWORD1>
+			<KEYWORD1>Version:</KEYWORD1>
+			<KEYWORD1>Release:</KEYWORD1>
+			<KEYWORD1>Copyright:</KEYWORD1>
+			<KEYWORD1>Group:</KEYWORD1>
+			<KEYWORD1>URL:</KEYWORD1>
+			<KEYWORD1>Packager:</KEYWORD1>
+			<KEYWORD1>Prefix:</KEYWORD1>
+			<KEYWORD1>Distribution:</KEYWORD1>
+			<KEYWORD1>Vendor:</KEYWORD1>
+			<KEYWORD1>Icon:</KEYWORD1>
+			<KEYWORD1>Provides:</KEYWORD1>
+			<KEYWORD1>Requires:</KEYWORD1>
+			<KEYWORD1>Serial:</KEYWORD1>
+			<KEYWORD1>Conflicts:</KEYWORD1>
+			<KEYWORD1>AutoReqProv:</KEYWORD1>
+			<KEYWORD1>BuildArch:</KEYWORD1>
+			<KEYWORD1>ExcludeArch:</KEYWORD1>
+			<KEYWORD1>ExclusiveArch:</KEYWORD1>
+			<KEYWORD1>ExclusiveOS:</KEYWORD1>
+			<KEYWORD1>BuildRoot:</KEYWORD1>
+			<KEYWORD1>NoSource:</KEYWORD1>
+			<KEYWORD1>NoPatch:</KEYWORD1>
+
+			<LABEL>%prep</LABEL>
+			<LABEL>%install</LABEL>
+			<LABEL>%description</LABEL>
+			<LABEL>%build</LABEL>
+			<LABEL>%files</LABEL>
+			<LABEL>%clean</LABEL>
+			<LABEL>%pre</LABEL>
+			<LABEL>%post</LABEL>
+			<LABEL>%preun</LABEL>
+			<LABEL>%postun</LABEL>
+			<LABEL>%verifyscript</LABEL>
+
+			<FUNCTION>%setup</FUNCTION>
+			<FUNCTION>%ifarch</FUNCTION>
+			<FUNCTION>%ifnarch</FUNCTION>
+			<FUNCTION>%ifos</FUNCTION>
+			<FUNCTION>%ifnos</FUNCTION>
+			<FUNCTION>%else</FUNCTION>
+			<FUNCTION>%endif</FUNCTION>
+
+			<MARKUP>%doc</MARKUP>
+			<MARKUP>%config</MARKUP>
+			<MARKUP>%docdir</MARKUP>
+			<MARKUP>%dir</MARKUP>
+			<MARKUP>%package</MARKUP>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="ATTR" HIGHLIGHT_DIGITS="TRUE">
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+	</RULES>
+
+	<RULES SET="VERIFY">
+		<KEYWORDS>
+			<KEYWORD2>owner</KEYWORD2>
+			<KEYWORD2>group</KEYWORD2>
+			<KEYWORD2>mode</KEYWORD2>
+			<KEYWORD2>md5</KEYWORD2>
+			<KEYWORD2>size</KEYWORD2>
+			<KEYWORD2>maj</KEYWORD2>
+			<KEYWORD2>min</KEYWORD2>
+			<KEYWORD2>symlink</KEYWORD2>
+			<KEYWORD2>mtime</KEYWORD2>
+			<OPERATOR>not</OPERATOR>
+		</KEYWORDS>
+	</RULES>
+</MODE>

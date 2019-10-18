@@ -3,11 +3,11 @@
 USING: kernel cpu.ppc.architecture cpu.ppc.assembler
 kernel.private namespaces math sequences generic arrays
 generator generator.registers generator.fixup system layouts
-math.functions cpu.architecture alien ;
+cpu.architecture alien ;
 IN: cpu.ppc.allot
 
 : load-zone-ptr ( reg -- )
-    "nursery" f pick compile-dlsym dup 0 LWZ ;
+    "nursery" f pick %load-dlsym dup 0 LWZ ;
 
 : %allot ( header size -- )
     #! Store a pointer to 'size' bytes allocated from the
@@ -32,12 +32,7 @@ IN: cpu.ppc.allot
     12 11 float tag-number ORI
     f fresh-object ;
 
-M: float-regs (%replace)
-    drop
-    swap v>operand %allot-float
-    12 swap loc>operand STW ;
-
-M: ppc-backend %move-float>int ( dst src -- )
+M: ppc-backend %box-float ( dst src -- )
     [ v>operand ] 2apply %allot-float 12 MR ;
 
 : %allot-bignum ( #digits -- )
@@ -83,21 +78,21 @@ M: ppc-backend %move-float>int ( dst src -- )
         "end" resolve-label
     ] with-scope ;
 
-: %allot-alien ( ptr -- )
-    "temp" set
-    "f" define-label
-    "end" define-label
-    0 "temp" operand 0 CMPI
+M: ppc-backend %box-alien ( dst src -- )
+    { "end" "f" } [ define-label ] each
+    0 over v>operand 0 CMPI
     "f" get BEQ
     alien 4 cells %allot
-    "temp" operand 11 2 cells STW
-    f v>operand "temp" operand LI
-    "temp" operand 11 1 cells STW
-    0 "temp" operand LI
-    "temp" operand 11 3 cells STW
+    ! Store offset
+    v>operand 11 3 cells STW
+    f v>operand 12 LI
+    ! Store expired slot
+    12 11 1 cells STW
+    ! Store underlying-alien slot
+    12 11 2 cells STW
     ! Store tagged ptr in reg
-    "temp" get object %store-tagged
+    dup object %store-tagged
     "end" get B
     "f" resolve-label
-    f v>operand "temp" operand LI
+    f v>operand swap v>operand LI
     "end" resolve-label ;

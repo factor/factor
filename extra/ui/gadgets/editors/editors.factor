@@ -2,26 +2,22 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays documents ui.clipboards ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.theme ui.gadgets.controls
-ui.render ui.gestures io kernel math models namespaces opengl
-opengl.gl sequences strings io.styles math.vectors sorting
-colors ;
+ui.gadgets.scrollers ui.gadgets.theme ui.render ui.gestures io
+kernel math models namespaces opengl opengl.gl sequences strings
+io.styles math.vectors sorting colors combinators assocs ;
 IN: ui.gadgets.editors
 
 TUPLE: editor
+self
 font color caret-color selection-color
 caret mark
 focused? ;
 
-TUPLE: loc-monitor editor ;
-
-: <loc> ( editor -- loc )
-    loc-monitor construct-boa
-    { 0 0 } <model> [ add-connection ] keep ;
+: <loc> ( -- loc ) { 0 0 } <model> ;
 
 : init-editor-locs ( editor -- )
-    dup <loc> over set-editor-caret
-    dup <loc> swap set-editor-mark ;
+    <loc> over set-editor-caret
+    <loc> swap set-editor-mark ;
 
 : editor-theme ( editor -- )
     black over set-editor-color
@@ -31,46 +27,48 @@ TUPLE: loc-monitor editor ;
 
 : <editor> ( -- editor )
     <document> <gadget> editor construct-control
+    dup dup set-editor-self
     dup init-editor-locs
     dup editor-theme ;
 
+: field-theme ( gadget -- )
+    gray <solid> swap set-gadget-boundary ;
+
 : construct-editor ( class -- tuple )
-    >r <editor> { set-gadget-delegate } r>
-    (construct-control) ; inline
+    >r <editor> { set-gadget-delegate } r> construct
+    dup dup set-editor-self ; inline
 
 TUPLE: source-editor ;
 
 : <source-editor> source-editor construct-editor ;
 
 : activate-editor-model ( editor model -- )
-    dup activate-model swap control-model add-loc ;
+    2dup add-connection
+    dup activate-model
+    swap gadget-model add-loc ;
 
 : deactivate-editor-model ( editor model -- )
-    dup deactivate-model swap control-model remove-loc ;
+    2dup remove-connection
+    dup deactivate-model
+    swap gadget-model remove-loc ;
 
 M: editor graft*
-    dup dup editor-caret activate-editor-model
-    dup dup editor-mark activate-editor-model
-    dup control-self swap control-model add-connection ;
+    dup
+    dup editor-caret activate-editor-model
+    dup editor-mark activate-editor-model ;
 
 M: editor ungraft*
-    dup dup editor-caret deactivate-editor-model
-    dup dup editor-mark deactivate-editor-model
-    dup control-self swap control-model remove-connection ;
-
-M: editor model-changed
-    control-self dup control-model
-    over editor-caret [ over validate-loc ] (change-model)
-    over editor-mark [ over validate-loc ] (change-model)
-    drop relayout ;
+    dup
+    dup editor-caret deactivate-editor-model
+    dup editor-mark deactivate-editor-model ;
 
 : editor-caret* ( editor -- loc ) editor-caret model-value ;
 
 : editor-mark* ( editor -- loc ) editor-mark model-value ;
 
 : change-caret ( editor quot -- )
-    over >r >r dup editor-caret* swap control-model r> call r>
-    [ control-model validate-loc ] keep
+    over >r >r dup editor-caret* swap gadget-model r> call r>
+    [ gadget-model validate-loc ] keep
     editor-caret set-model ; inline
 
 : mark>caret ( editor -- )
@@ -87,7 +85,7 @@ M: editor model-changed
     editor-font* "" string-height ;
 
 : y>line ( y editor -- line# )
-    [ line-height / >fixnum ] keep control-model validate-line ;
+    [ line-height / >fixnum ] keep gadget-model validate-line ;
 
 : point>loc ( point editor -- loc )
     [
@@ -96,8 +94,11 @@ M: editor model-changed
         rot editor-line x>offset ,
     ] { } make ;
 
+: clicked-loc ( editor -- loc )
+    [ hand-rel ] keep point>loc ;
+
 : click-loc ( editor model -- )
-    >r [ hand-rel ] keep point>loc r> set-model ;
+    >r clicked-loc r> set-model ;
 
 : focus-editor ( editor -- )
     t over set-editor-focused? relayout-1 ;
@@ -124,14 +125,10 @@ M: editor model-changed
     line-height 0 swap 2array ;
 
 : scroll>caret ( editor -- )
-    dup gadget-grafted? [
+    dup gadget-graft-state second [
         dup caret-loc over caret-dim { 1 0 } v+ <rect>
         over scroll>rect
     ] when drop ;
-
-M: loc-monitor model-changed
-    loc-monitor-editor control-self
-    dup relayout-1 scroll>caret ;
 
 : draw-caret ( -- )
     editor get editor-focused? [
@@ -164,7 +161,7 @@ M: loc-monitor model-changed
         swap
         dup first-visible-line \ first-visible-line set
         dup last-visible-line \ last-visible-line set
-        dup control-model document set
+        dup gadget-model document set
         editor set
         call
     ] with-scope ; inline
@@ -214,31 +211,73 @@ M: editor draw-gadget*
 M: editor pref-dim*
     dup editor-font* swap control-value text-dim ;
 
+: contents-changed
+    editor-self swap
+    over editor-caret [ over validate-loc ] (change-model)
+    over editor-mark [ over validate-loc ] (change-model)
+    drop relayout ;
+
+: caret/mark-changed
+    nip editor-self dup relayout-1 scroll>caret ;
+
+M: editor model-changed
+    {
+        { [ 2dup gadget-model eq? ] [ contents-changed ] }
+        { [ 2dup editor-caret eq? ] [ caret/mark-changed ] }
+        { [ 2dup editor-mark eq? ] [ caret/mark-changed ] }
+    } cond ;
+
 M: editor gadget-selection?
     selection-start/end = not ;
 
 M: editor gadget-selection
-    [ selection-start/end ] keep control-model doc-range ;
+    [ selection-start/end ] keep gadget-model doc-range ;
 
 : remove-selection ( editor -- )
-    [ selection-start/end ] keep control-model remove-doc-range ;
+    [ selection-start/end ] keep gadget-model remove-doc-range ;
 
 M: editor user-input*
-    [ selection-start/end ] keep control-model set-doc-range t ;
+    [ selection-start/end ] keep gadget-model set-doc-range t ;
 
 : editor-string ( editor -- string )
-    control-model doc-string ;
+    gadget-model doc-string ;
 
 : set-editor-string ( string editor -- )
-    control-model set-doc-string ;
+    gadget-model set-doc-string ;
 
 M: editor gadget-text* editor-string % ;
 
-: start-selection ( editor -- )
-    dup editor-caret click-loc ;
-
 : extend-selection ( editor -- )
-    dup request-focus start-selection ;
+    dup request-focus dup editor-caret click-loc ;
+
+: mouse-elt ( -- elelement )
+    hand-click# get {
+        { 2 T{ one-word-elt } }
+        { 3 T{ one-line-elt } }
+    } at T{ one-char-elt } or ;
+
+: drag-direction? ( loc editor -- ? )
+    editor-mark* <=> 0 < ;
+
+: drag-selection-caret ( loc editor element -- loc )
+    >r [ drag-direction? ] 2keep
+    gadget-model
+    r> prev/next-elt ? ;
+
+: drag-selection-mark ( loc editor element -- loc )
+    >r [ drag-direction? not ] 2keep
+    nip dup editor-mark* swap gadget-model
+    r> prev/next-elt ? ;
+
+: drag-caret&mark ( editor -- caret mark )
+    dup clicked-loc swap mouse-elt
+    [ drag-selection-caret ] 3keep
+    drag-selection-mark ;
+
+: drag-selection ( editor -- )
+    dup drag-caret&mark
+    pick editor-mark set-model
+    swap editor-caret set-model ;
 
 : editor-cut ( editor clipboard -- )
     dupd gadget-copy remove-selection ;
@@ -247,8 +286,8 @@ M: editor gadget-text* editor-string % ;
     over gadget-selection? [
         drop nip remove-selection
     ] [
-        over >r >r dup editor-caret* swap control-model
-        r> call r> control-model remove-doc-range
+        over >r >r dup editor-caret* swap gadget-model
+        r> call r> gadget-model remove-doc-range
     ] if ; inline
 
 : editor-delete ( editor elt -- )
@@ -274,7 +313,7 @@ M: editor gadget-text* editor-string % ;
 
 : select-elt ( editor elt -- )
     over >r
-    >r dup editor-caret* swap control-model r> prev/next-elt
+    >r dup editor-caret* swap gadget-model r> prev/next-elt
     r> editor-select ;
 
 : start-of-document ( editor -- ) T{ doc-elt } editor-prev ;
@@ -286,17 +325,10 @@ M: editor gadget-text* editor-string % ;
         dup T{ one-word-elt } select-elt
     ] unless gadget-selection ;
 
-: (position-caret) ( editor -- )
-    dup extend-selection
-    dup editor-mark click-loc ;
-
 : position-caret ( editor -- )
-    hand-click# get {
-        [ ]
-        [ dup (position-caret) ]
-        [ dup T{ one-word-elt } select-elt ]
-        [ dup T{ one-line-elt } select-elt ]
-    } ?nth call drop ;
+    mouse-elt dup T{ one-char-elt } =
+    [ drop dup extend-selection dup editor-mark click-loc ]
+    [ select-elt ] if ;
 
 : insert-newline "\n" swap user-input ;
 
@@ -398,7 +430,7 @@ editor "caret-motion" f {
 
 editor "selection" f {
     { T{ button-down f { S+ } } extend-selection }
-    { T{ drag } start-selection }
+    { T{ drag } drag-selection }
     { T{ gain-focus } focus-editor }
     { T{ lose-focus } unfocus-editor }
     { T{ delete-action } remove-selection }
@@ -416,12 +448,28 @@ editor "selection" f {
     { T{ key-down f { S+ C+ } "END" } select-end-of-document }
 } define-command-map
 
-! Editors support the stream output protocol
-M: editor stream-write1 >r 1string r> stream-write ;
+! Fields are like editors except they edit an external model
+TUPLE: field model editor ;
 
-M: editor stream-write
-    control-self dup end-of-document user-input ;
+: <field-border> ( gadget -- border )
+    2 <border>
+    { 1 0 } over set-border-fill
+    dup field-theme ;
 
-M: editor stream-close drop ;
+: <field> ( model -- gadget )
+    <editor> dup <field-border>
+    { set-field-model set-field-editor set-gadget-delegate }
+    field construct ;
 
-M: editor stream-flush drop ;
+M: field graft*
+    dup field-model model-value
+    over field-editor set-editor-string
+    dup field-editor gadget-model add-connection ;
+
+M: field ungraft*
+    dup field-editor gadget-model remove-connection ;
+
+M: field model-changed
+    nip
+    dup field-editor editor-string
+    swap field-model set-model ;

@@ -31,7 +31,7 @@ M: float-array equal?
 
 INSTANCE: float-array sequence
 
-: 1float-array ( x -- array ) F{ } 1sequence ; flushable
+: 1float-array ( x -- array ) 1 swap <float-array> ; flushable
 
 : 2float-array ( x y -- array ) F{ } 2sequence ; flushable
 

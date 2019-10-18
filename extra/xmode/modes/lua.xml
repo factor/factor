@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!-- Lua 5.0 Mode, written by Philipp Janda -->
+
+<!-- TODO:
+  * Autoindent screws up, if { or ( gets typed after the indentNextLines trigger
+  -> This is very annoying, so I disabled the automatic indenting in this case!
+  -> It should be fixed if you set doubleBracketIndent to "true", but I keep it
+     disabled anyway since it is not that useful if you don't have an unindent!
+  * Should I use FUNCTION and OPERATOR tags inside of <KEYWORDS>??!!
+-->
+
+<MODE>
+  <PROPS>
+    <!-- Comments -->
+    <PROPERTY NAME="lineComment" VALUE="--"/>
+    <PROPERTY NAME="commentStart" VALUE="--[["/>
+    <PROPERTY NAME="commentEnd" VALUE="]]"/>
+    <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*"/>
+    <!-- Auto indent -->
+    <PROPERTY NAME="indentOpenBrackets" VALUE="{"/>
+    <PROPERTY NAME="indentCloseBrackets" VALUE="}"/>
+    <!--
+    <PROPERTY NAME="indentNextLines" VALUE=".*((then|else|do|function)).*"/>
+    -->
+    <PROPERTY NAME="doubleBracketIndent" VALUE="true"/>
+  </PROPS>
+  <RULES IGNORE_CASE="FALSE" NO_WORD_SEP="_:." HIGHLIGHT_DIGITS="TRUE"
+         DIGIT_RE="[\p{Digit}]*(\.[\p{Digit}]*)?([eE][+-]?[\p{Digit}]*)?">
+    <!-- Multiline comments -->
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>--[[</BEGIN>
+      <END>]]</END>
+    </SPAN>
+    <!-- Single line comments -->
+    <EOL_SPAN TYPE="COMMENT1">--</EOL_SPAN>
+    <EOL_SPAN AT_LINE_START="TRUE" TYPE="COMMENT2">#!</EOL_SPAN>
+    <!-- Simple string literals -->
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+    <!-- Multiline string literals -->
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>[[</BEGIN>
+      <END>]]</END>
+    </SPAN>
+    <!-- Operators -->
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <SEQ TYPE="OPERATOR">-</SEQ>
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <SEQ TYPE="OPERATOR">^</SEQ>
+    <SEQ TYPE="OPERATOR">..</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+    <SEQ TYPE="OPERATOR">&lt;</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">==</SEQ>
+    <SEQ TYPE="OPERATOR">~=</SEQ>
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <!-- Function calls and definitions -->
+    <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+	<SEQ TYPE="OPERATOR">)</SEQ>
+    <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">{</MARK_PREVIOUS>
+	<SEQ TYPE="OPERATOR">}</SEQ>
+    <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">"</MARK_PREVIOUS>
+	<SEQ TYPE="OPERATOR">"</SEQ>
+    <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">'</MARK_PREVIOUS>
+	<SEQ TYPE="OPERATOR">'</SEQ>
+
+    <KEYWORDS>
+      <!-- Keywords -->
+      <KEYWORD1>do</KEYWORD1>
+      <KEYWORD1>end</KEYWORD1>
+      <KEYWORD1>while</KEYWORD1>
+      <KEYWORD1>repeat</KEYWORD1>
+      <KEYWORD1>until</KEYWORD1>
+      <KEYWORD1>if</KEYWORD1>
+      <KEYWORD1>then</KEYWORD1>
+      <KEYWORD1>elseif</KEYWORD1>
+      <KEYWORD1>else</KEYWORD1>
+      <KEYWORD1>return</KEYWORD1>
+      <KEYWORD1>break</KEYWORD1>
+      <KEYWORD1>for</KEYWORD1>
+      <KEYWORD1>in</KEYWORD1>
+      <KEYWORD1>function</KEYWORD1>
+      <KEYWORD1>local</KEYWORD1>
+      <KEYWORD3>nil</KEYWORD3>
+      <KEYWORD3>true</KEYWORD3>
+      <KEYWORD3>false</KEYWORD3>
+      <KEYWORD1>and</KEYWORD1>
+      <KEYWORD1>or</KEYWORD1>
+      <KEYWORD1>not</KEYWORD1>
+      <!-- Builtin functions or special names -->
+      <KEYWORD2>assert</KEYWORD2>
+      <KEYWORD2>collectgarbage</KEYWORD2>
+      <KEYWORD2>dofile</KEYWORD2>
+      <KEYWORD2>error</KEYWORD2>
+      <KEYWORD2>_G</KEYWORD2>
+      <KEYWORD2>getfenv</KEYWORD2>
+      <KEYWORD2>getmetatable</KEYWORD2>
+      <KEYWORD2>gcinfo</KEYWORD2>
+      <KEYWORD2>ipairs</KEYWORD2>
+      <KEYWORD2>loadfile</KEYWORD2>
+      <KEYWORD2>loadlib</KEYWORD2>
+      <KEYWORD2>loadstring</KEYWORD2>
+      <KEYWORD2>next</KEYWORD2>
+      <KEYWORD2>pairs</KEYWORD2>
+      <KEYWORD2>pcall</KEYWORD2>
+      <KEYWORD2>print</KEYWORD2>
+      <KEYWORD2>rawequal</KEYWORD2>
+      <KEYWORD2>rawget</KEYWORD2>
+      <KEYWORD2>rawset</KEYWORD2>
+      <KEYWORD2>require</KEYWORD2>
+      <KEYWORD2>setfenv</KEYWORD2>
+      <KEYWORD2>setmetatable</KEYWORD2>
+      <KEYWORD2>tonumber</KEYWORD2>
+      <KEYWORD2>tostring</KEYWORD2>
+      <KEYWORD2>type</KEYWORD2>
+      <KEYWORD2>unpack</KEYWORD2>
+      <KEYWORD2>xpcall</KEYWORD2>
+      <KEYWORD2>_VERSION</KEYWORD2>
+      <KEYWORD2>LUA_PATH</KEYWORD2>
+      <KEYWORD2>_LOADED</KEYWORD2>
+      <KEYWORD2>_REQUIREDNAME</KEYWORD2>
+      <KEYWORD2>_ALERT</KEYWORD2>
+      <KEYWORD2>_ERRORMESSAGE</KEYWORD2>
+      <KEYWORD2>_PROMPT</KEYWORD2>
+      <KEYWORD2>__add</KEYWORD2>
+      <KEYWORD2>__sub</KEYWORD2>
+      <KEYWORD2>__mul</KEYWORD2>
+      <KEYWORD2>__div</KEYWORD2>
+      <KEYWORD2>__pow</KEYWORD2>
+      <KEYWORD2>__unm</KEYWORD2>
+      <KEYWORD2>__concat</KEYWORD2>
+      <KEYWORD2>__eq</KEYWORD2>
+      <KEYWORD2>__lt</KEYWORD2>
+      <KEYWORD2>__le</KEYWORD2>
+      <KEYWORD2>__index</KEYWORD2>
+      <KEYWORD2>__newindex</KEYWORD2>
+      <KEYWORD2>__call</KEYWORD2>
+      <KEYWORD2>__metatable</KEYWORD2>
+      <KEYWORD2>__mode</KEYWORD2>
+      <KEYWORD2>__tostring</KEYWORD2>
+      <KEYWORD2>__fenv</KEYWORD2>
+      <KEYWORD2>...</KEYWORD2>
+      <KEYWORD2>arg</KEYWORD2>
+      <KEYWORD2>coroutine.create</KEYWORD2>
+      <KEYWORD2>coroutine.resume</KEYWORD2>
+      <KEYWORD2>coroutine.status</KEYWORD2>
+      <KEYWORD2>coroutine.wrap</KEYWORD2>
+      <KEYWORD2>coroutine.yield</KEYWORD2>
+      <KEYWORD2>string.byte</KEYWORD2>
+      <KEYWORD2>string.char</KEYWORD2>
+      <KEYWORD2>string.dump</KEYWORD2>
+      <KEYWORD2>string.find</KEYWORD2>
+      <KEYWORD2>string.len</KEYWORD2>
+      <KEYWORD2>string.lower</KEYWORD2>
+      <KEYWORD2>string.rep</KEYWORD2>
+      <KEYWORD2>string.sub</KEYWORD2>
+      <KEYWORD2>string.upper</KEYWORD2>
+      <KEYWORD2>string.format</KEYWORD2>
+      <KEYWORD2>string.gfind</KEYWORD2>
+      <KEYWORD2>string.gsub</KEYWORD2>
+      <KEYWORD2>table.concat</KEYWORD2>
+      <KEYWORD2>table.foreach</KEYWORD2>
+      <KEYWORD2>table.foreachi</KEYWORD2>
+      <KEYWORD2>table.getn</KEYWORD2>
+      <KEYWORD2>table.sort</KEYWORD2>
+      <KEYWORD2>table.insert</KEYWORD2>
+      <KEYWORD2>table.remove</KEYWORD2>
+      <KEYWORD2>table.setn</KEYWORD2>
+      <KEYWORD2>math.abs</KEYWORD2>
+      <KEYWORD2>math.acos</KEYWORD2>
+      <KEYWORD2>math.asin</KEYWORD2>
+      <KEYWORD2>math.atan</KEYWORD2>
+      <KEYWORD2>math.atan2</KEYWORD2>
+      <KEYWORD2>math.ceil</KEYWORD2>
+      <KEYWORD2>math.cos</KEYWORD2>
+      <KEYWORD2>math.deg</KEYWORD2>
+      <KEYWORD2>math.exp</KEYWORD2>
+      <KEYWORD2>math.floor</KEYWORD2>
+      <KEYWORD2>math.log</KEYWORD2>
+      <KEYWORD2>math.log10</KEYWORD2>
+      <KEYWORD2>math.max</KEYWORD2>
+      <KEYWORD2>math.min</KEYWORD2>
+      <KEYWORD2>math.mod</KEYWORD2>
+      <KEYWORD2>math.pow</KEYWORD2>
+      <KEYWORD2>math.rad</KEYWORD2>
+      <KEYWORD2>math.sin</KEYWORD2>
+      <KEYWORD2>math.sqrt</KEYWORD2>
+      <KEYWORD2>math.tan</KEYWORD2>
+      <KEYWORD2>math.frexp</KEYWORD2>
+      <KEYWORD2>math.ldexp</KEYWORD2>
+      <KEYWORD2>math.random</KEYWORD2>
+      <KEYWORD2>math.randomseed</KEYWORD2>
+      <KEYWORD2>math.pi</KEYWORD2>
+      <KEYWORD2>io.close</KEYWORD2>
+      <KEYWORD2>io.flush</KEYWORD2>
+      <KEYWORD2>io.input</KEYWORD2>
+      <KEYWORD2>io.lines</KEYWORD2>
+      <KEYWORD2>io.open</KEYWORD2>
+      <KEYWORD2>io.read</KEYWORD2>
+      <KEYWORD2>io.tmpfile</KEYWORD2>
+      <KEYWORD2>io.type</KEYWORD2>
+      <KEYWORD2>io.write</KEYWORD2>
+      <KEYWORD2>io.stdin</KEYWORD2>
+      <KEYWORD2>io.stdout</KEYWORD2>
+      <KEYWORD2>io.stderr</KEYWORD2>
+      <KEYWORD2>os.clock</KEYWORD2>
+      <KEYWORD2>os.date</KEYWORD2>
+      <KEYWORD2>os.difftime</KEYWORD2>
+      <KEYWORD2>os.execute</KEYWORD2>
+      <KEYWORD2>os.exit</KEYWORD2>
+      <KEYWORD2>os.getenv</KEYWORD2>
+      <KEYWORD2>os.remove</KEYWORD2>
+      <KEYWORD2>os.rename</KEYWORD2>
+      <KEYWORD2>os.setlocale</KEYWORD2>
+      <KEYWORD2>os.time</KEYWORD2>
+      <KEYWORD2>os.tmpname</KEYWORD2>
+      <KEYWORD2>debug.debug</KEYWORD2>
+      <KEYWORD2>debug.gethook</KEYWORD2>
+      <KEYWORD2>debug.getinfo</KEYWORD2>
+      <KEYWORD2>debug.getlocal</KEYWORD2>
+      <KEYWORD2>debug.getupvalue</KEYWORD2>
+      <KEYWORD2>debug.setlocal</KEYWORD2>
+      <KEYWORD2>debug.setupvalue</KEYWORD2>
+      <KEYWORD2>debug.sethook</KEYWORD2>
+      <KEYWORD2>debug.traceback</KEYWORD2>
+    </KEYWORDS>
+  </RULES>
+</MODE>
+

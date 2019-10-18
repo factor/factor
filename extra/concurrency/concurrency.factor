@@ -5,13 +5,19 @@
 ! concurrency.
 USING: vectors dlists threads sequences continuations
        namespaces random math quotations words kernel match
-       arrays io assocs serialize io.sockets io.server ;
+       arrays io assocs init shuffle system ;
 IN: concurrency
 
-#! Debug
-USE:  prettyprint
-
 TUPLE: mailbox threads data ;
+
+TUPLE: thread timeout continuation continued? ;
+
+: <thread> ( timeout continuation -- obj )
+    >r dup [ millis + ] when r>
+    {
+        set-thread-timeout
+        set-thread-continuation
+    } thread construct ;
 
 : make-mailbox ( -- mailbox )
     V{ } clone <dlist> mailbox construct-boa ;
@@ -20,36 +26,43 @@ TUPLE: mailbox threads data ;
     mailbox-data dlist-empty? ;
 
 : mailbox-put ( obj mailbox -- )
-    [ mailbox-data dlist-push-end ] keep
-    [ mailbox-threads ] keep 0 <vector> swap set-mailbox-threads
-    [ schedule-thread ] each yield ;
+    [ mailbox-data push-back ] keep
+    [ mailbox-threads ] keep
+    V{ } clone swap set-mailbox-threads
+    [ thread-continuation schedule-thread ] each yield ;
 
-: (mailbox-block-unless-pred) ( pred mailbox -- pred2 mailbox2 )
-    dup mailbox-data pick swap dlist-contains? [
-        [ swap mailbox-threads push stop ] callcc0
+<PRIVATE
+: (mailbox-block-unless-pred) ( pred mailbox timeout -- )
+    2over mailbox-data dlist-contains? [
+        3drop
+    ] [
+        [ <thread> swap mailbox-threads push stop ] callcc0
         (mailbox-block-unless-pred)
-    ] unless ;
+    ] if ; inline
 
-: (mailbox-block-if-empty) ( mailbox -- mailbox2 )
-    dup mailbox-empty? [
-        [ swap mailbox-threads push stop ] callcc0
+: (mailbox-block-if-empty) ( mailbox timeout -- mailbox2 )
+    over mailbox-empty? [
+        [ <thread> swap mailbox-threads push stop ] callcc0
         (mailbox-block-if-empty)
-    ] when ;
+    ] [
+        drop
+    ] if ;
+PRIVATE>
+: mailbox-get* ( mailbox timeout -- obj )
+    (mailbox-block-if-empty)
+    mailbox-data pop-front ;
 
 : mailbox-get ( mailbox -- obj )
-    (mailbox-block-if-empty)
-    mailbox-data dlist-pop-front ;
+    f mailbox-get* ;
 
-: (mailbox-get-all) ( mailbox -- )
-    dup mailbox-empty? [
-        drop
-    ] [
-        dup mailbox-data dlist-pop-front , (mailbox-get-all)
-    ] if ;
+: mailbox-get-all* ( mailbox timeout -- array )
+    (mailbox-block-if-empty)
+    [ dup mailbox-empty? ]
+    [ dup mailbox-data pop-front ]
+    [ ] unfold nip ;
 
 : mailbox-get-all ( mailbox -- array )
-    (mailbox-block-if-empty)
-    [ (mailbox-get-all) ] { } make ;
+    f mailbox-get-all* ;
 
 : while-mailbox-empty ( mailbox quot -- )
     over mailbox-empty? [
@@ -58,74 +71,64 @@ TUPLE: mailbox threads data ;
         2drop
     ] if ; inline
 
+: mailbox-get?* ( pred mailbox timeout -- obj )
+    2over >r >r (mailbox-block-unless-pred) r> r>
+    mailbox-data delete-node ; inline
+
 : mailbox-get? ( pred mailbox -- obj )
-    (mailbox-block-unless-pred) mailbox-data dlist-remove ;
-
-TUPLE: node hostname port ;
-
-C: <node> node
-
-: localnode ( -- node )
-    \ localnode get ;
+    f mailbox-get?* ;
 
 TUPLE: process links pid mailbox ;
 
 C: <process> process
 
-TUPLE: remote-process node pid ;
-
-C: <remote-process> remote-process
-
 GENERIC: send ( message process -- )
 
-: random-64 ( -- id )
-    #! Generate a random id to use for pids
-    "ID" 64 [ drop 10 random CHAR: 0 + ] map append ;
-
+<PRIVATE
 : make-process ( -- process )
     #! Return a process set to run on the local node. A process is
     #! similar to a thread but can send and receive messages to and
     #! from other processes. It may also be linked to other processes so
     #! that it receives a message if that process terminates.
-    [ ] random-64 make-mailbox <process> ;
+    [ ] random-256 make-mailbox <process> ;
 
 : make-linked-process ( process -- process )
     #! Return a process set to run on the local node. That process is
     #! linked to the process on the stack. It will receive a message if
     #! that process terminates.
-    1quotation random-64 make-mailbox <process> ;
+    1quotation random-256 make-mailbox <process> ;
+PRIVATE>
 
 : self ( -- process )
     \ self get  ;
 
+<PRIVATE
 : init-main-process ( -- )
     #! Setup the main process.
     make-process \ self set-global ;
 
-init-main-process
-
 : with-process ( quot process -- )
     #! Calls the quotation with 'self' set
     #! to the given process.
-    [
-        \ self set
-    ] H{ } make-assoc swap bind ;
+    \ self rot with-variable ; inline
+
+PRIVATE>
 
 DEFER: register-process
 DEFER: unregister-process
 
+<PRIVATE
 : ((spawn)) ( quot -- )
     self dup process-pid swap register-process
-    call
-    self process-pid unregister-process ; inline
+    [ self process-pid unregister-process ] [ ] cleanup ; inline
 
 : (spawn) ( quot -- process )
-    [ in-thread ] make-process [ with-process ] keep ;
+    [ in-thread ] make-process [ with-process ] keep ; inline
+
+PRIVATE>
 
 : spawn ( quot -- process )
-    [
-        ((spawn))
-    ] curry (spawn) ;
+    [ ((spawn)) ] curry (spawn) ; inline
 
 TUPLE: linked-exception error ;
 
@@ -148,7 +151,7 @@ M: process send ( message process -- )
 : receive-if ( pred -- message )
     self process-mailbox mailbox-get? dup linked-exception? [
         linked-exception-error throw
-    ] when ;
+    ] when ; inline
 
 : rethrow-linked ( error -- )
     #! Rethrow the error to the linked process
@@ -156,16 +159,17 @@ M: process send ( message process -- )
         over <linked-exception> swap send
     ] each drop ;
 
+<PRIVATE
 : (spawn-link) ( quot -- process )
     [ in-thread ] self make-linked-process
-    [ with-process ] keep ;
+    [ with-process ] keep ; inline
+PRIVATE>
 
 : spawn-link ( quot -- process )
     [ catch [ rethrow-linked ] when* ] curry
-    [
-        ((spawn))
-    ] curry (spawn-link) ;
+    [ ((spawn)) ] curry (spawn-link) ; inline
 
+<PRIVATE
 : (recv) ( msg form -- )
     #! Process a form with the following format:
     #!   [ pred match-quot ]
@@ -176,6 +180,7 @@ M: process send ( message process -- )
     #! will be called with the message on the top of the stack if
     #! the 'pred' word returned true.
     [ first execute ] 2keep rot [ second call ] [ 2drop ] if ;
+PRIVATE>
 
 : recv ( forms -- )
     #! Get a message from the processes mailbox. Compare it against the
@@ -195,9 +200,11 @@ M: process send ( message process -- )
 
 MATCH-VARS: ?from ?tag ;
 
+<PRIVATE
 : tag-message ( message -- tagged-message )
     #! Given a message, wrap it with the sending process and a unique tag.
-    >r self random-64 r> 3array ;
+    >r self random-256 r> 3array ;
+PRIVATE>
 
 : send-synchronous ( message process -- reply )
     #! Sends a message to the process synchronously. The
@@ -207,6 +214,7 @@ MATCH-VARS: ?from ?tag ;
     >r tag-message dup r> send second _ 2array [ match ] curry
     receive-if second ;
 
+<PRIVATE
 : forever ( quot -- )
     #! Loops forever executing the quotation.
     dup slip forever ;
@@ -220,6 +228,7 @@ SYMBOL: quit-cc
     "Waiting for message in server: " write
     self process-pid print
     receive over call [ (spawn-server) ] when ;
+PRIVATE>
 
 : spawn-server ( quot -- process )
     #! Spawn a server that receives messages, calling the
@@ -240,7 +249,7 @@ SYMBOL: quit-cc
         "Exiting process: " write self process-pid print
     ] curry spawn-link ;
 
-: server-cc ( -- cc | process )
+: server-cc ( -- cc|process )
     #! Captures the current continuation and returns the value.
     #! If that CC is called with a process on the stack it will
     #! set 'self' for the current process to it. Otherwise it will
@@ -274,7 +283,7 @@ SYMBOL: quit-cc
     #! joining the results into a sequence at the end.
     [ curry future ] curry map [ ?future ] map ;
 
-: parallel-each ( seq quot -- newseq )
+: parallel-each ( seq quot -- )
     #! Spawn a process to apply quot to each element of seq,
     #! and waits for all processes to complete.
     [ f ] compose parallel-map drop ;
@@ -287,33 +296,45 @@ TUPLE: promise fulfilled? value processes ;
 : fulfill ( value promise  -- )
     #! Set the future of the promise to the given value. Threads
     #! blocking on the promise will then be released.
-    dup promise-fulfilled? [
+    dup promise-fulfilled? [ 
+        2drop
+    ] [
         [ set-promise-value ] keep
         [ t swap set-promise-fulfilled? ] keep
         [ promise-processes ] keep
-        0 <vector> swap set-promise-processes
-        [ schedule-thread ] each yield
-    ] unless ;
+        V{ } clone swap set-promise-processes
+        [ thread-continuation schedule-thread ] each yield
+    ] if ;
 
- : (maybe-block-promise) ( promise -- promise )
+<PRIVATE
+ : (maybe-block-promise) ( promise timeout -- promise )
     #! Block the process if the promise is unfulfilled. This is different from
     #! (mailbox-block-if-empty) in that when a promise is fulfilled, all threads
     #! need to be resumed, rather than just one.
-    dup promise-fulfilled? [
-        [ swap promise-processes push stop ] callcc0
-    ] unless ;
+    over promise-fulfilled? [
+        drop
+    ] [
+        [ <thread> swap promise-processes push stop ] callcc0
+        drop
+    ] if ;
+PRIVATE>
+
+: ?promise* ( promise timeout -- result )
+    (maybe-block-promise) promise-value ;
 
 : ?promise ( promise -- result )
-    (maybe-block-promise) promise-value ;
+    f ?promise* ;
 
 ! ******************************
 ! Experimental code below
 ! ******************************
+<PRIVATE
 : (lazy) ( v -- )
     receive {
         { { ?from ?tag _ }
             [ ?tag over 2array ?from send (lazy) ] }
     } match-cond ;
+PRIVATE>
 
 : lazy ( quot -- lazy )
     #! Spawn a process that immediately blocks and return it.
@@ -330,76 +351,22 @@ TUPLE: promise fulfilled? value processes ;
     #! Given a process spawned using 'lazy', evaluate it and return the result.
     f swap send-synchronous ;
 
-! ******************************
-! Standard Processes
-! ******************************
-MATCH-VARS: ?process ?name ;
-SYMBOL: register
-SYMBOL: unregister
-
-: process-registry ( table -- )
-    receive {
-        { { register ?name ?process }
-            [ ?process ?name pick set-at ] }
-        { { unregister ?name }
-            [ ?name over delete-at ] }
-        { { ?from ?tag { process ?name } }
-            [ ?tag ?name pick at 2array ?from send ] }
-    } match-cond process-registry ;
+<PRIVATE
+: remote-processes ( -- hash )
+   \ remote-processes get-global ;
+PRIVATE>
 
 : register-process ( name process -- )
-    [ register , swap , , ] { } make
-    \ process-registry get send ;
+    swap remote-processes set-at ;
 
 : unregister-process ( name -- )
-    [ unregister , , ] { } make
-    \ process-registry get send ;
+    remote-processes delete-at ;
 
-: get-process ( name -- )
-    [ process , , ] { } make
-    \ process-registry get send-synchronous ;
+: get-process ( name -- process )
+    remote-processes at ;
 
 [
-    H{ } clone process-registry
-] (spawn) \ process-registry set-global
-
-: handle-node-client ( -- )
-    [ deserialize ] with-serialized first2 get-process send ;
-
-: node-server ( port -- )
-    local-server [ handle-node-client ] with-server ;
-
-: send-to-node ( msg pid  host port -- )
-    <inet> <client> [ 2array [ serialize ] with-serialized ] with-stream ;
-
-: start-node ( hostname port -- )
-    [ node-server ] in-thread
-    <node> \ localnode set-global ;
-
-M: remote-process send ( message process -- )
-    #! Send the message via the inter-node protocol
-    [ remote-process-pid ] keep
-    remote-process-node
-    [ node-hostname ] keep
-    node-port send-to-node ;
-
-M: process serialize ( obj -- )
-    localnode swap process-pid <remote-process> serialize ;
-
-SYMBOL: line
-: (test-node1)
-    receive dup line set {
-        ! { { ?from ?tag _ }
-        !   [ ?tag "ack" 2array ?from send (test-node1) ] }
-        { _ [ line get . ] }
-    } match-cond ;
-
-: test-node1 ( -- )
-    [ (test-node1) ] spawn
-    "test1" swap register-process ;
-
-: test-node2 ( hostname port -- )
-    [
-        <node> "test1" <remote-process>
-        "message" swap send-synchronous .
-    ] spawn 2drop ;
+    H{ } clone \ remote-processes set-global
+    init-main-process
+    self [ process-pid ] keep register-process
+] "process-registry" add-init-hook

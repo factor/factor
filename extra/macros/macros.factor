@@ -1,8 +1,9 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser kernel sequences words effects
-inference.transforms combinators assocs definitions quotations
-namespaces ;
+
+USING: parser kernel sequences words effects inference.transforms
+       combinators assocs definitions quotations namespaces ;
+
 IN: macros
 
 : (:)
@@ -18,25 +19,14 @@ IN: macros
 : MACRO:
     (:) (MACRO:) ; parsing
 
-PREDICATE: word macro
+PREDICATE: compound macro
     "macro" word-prop >boolean ;
 
 M: macro definer drop \ MACRO: \ ; ;
 
 M: macro definition "macro" word-prop ;
 
-: macro-expand ( ... word -- quot )
-    "macro" word-prop call ;
-
-: short-circuit ( quots quot default -- quot )
-    >r { } map>assoc <reversed> r>
-    1quotation swap alist>quot ;
-
-MACRO: && ( quots -- ? )
-    [ [ not ] append [ f ] ] t short-circuit ;
-
-MACRO: || ( quots -- ? )
-    [ [ t ] ] f short-circuit ;
+: macro-expand ( ... word -- quot ) "macro" word-prop call ;
 
 : n*quot ( n seq -- seq' ) <repetition> concat >quotation ;
 

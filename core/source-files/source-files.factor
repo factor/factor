@@ -16,7 +16,7 @@ modified checksum
 uses definitions ;
 
 : (source-modified?) ( path modified checksum -- ? )
-    pick file-modified rot [ [ 0 ] unless* ] 2apply >
+    pick file-modified rot [ 0 or ] 2apply >
     [ swap file-crc32 number= not ] [ 2drop f ] if ;
 
 : source-modified? ( path -- ? )
@@ -71,7 +71,7 @@ M: pathname where pathname-string 1 2array ;
 : forget-source ( path -- )
     dup source-file
     dup unxref-source
-    source-file-definitions [ drop forget ] assoc-each
+    source-file-definitions keys forget-all
     source-files get delete-at ;
 
 M: pathname forget pathname-string forget-source ;

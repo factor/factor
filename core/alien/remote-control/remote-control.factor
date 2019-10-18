@@ -18,8 +18,8 @@ IN: alien.remote-control
     dup compiled? [ execute ] [ drop f ] if ; inline
 
 : init-remote-control ( -- )
-    \ eval-callback ?callback 15 setenv
-    \ yield-callback ?callback 18 setenv
-    \ sleep-callback ?callback 20 setenv ;
+    \ eval-callback ?callback 16 setenv
+    \ yield-callback ?callback 17 setenv
+    \ sleep-callback ?callback 18 setenv ;
 
 MAIN: init-remote-control

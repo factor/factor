@@ -1,0 +1,396 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Python mode, by Slava Pestov. Based on PythonTokenMarker by -->
+<!-- Jonathan Revusky -->
+
+<!-- Modified 19-Jul-00 by Ivan Frohne to: -->
+<!--  (a) implement 'indentOnEnter'; -->
+<!--  (b) indent next line automatically after control structures followed -->
+<!--	  by ':'; -->
+<!--  (c) make """ or ''' multiline quotes TYPE LITERAL2; -->
+<!--  (d) add TYPE FUNCTION identified by a following '(' -->
+<!--  (e) eliminate the '?' SEQ TYPE ('?' has no meaning in Python); -->
+<!--  (f) change the TYPE of 'and', 'or', and 'not' to KEYWORD1; and -->
+<!--  (g) add all builtin functions, builtin exceptions, -->
+<!--	  builtin type methods, File object methods, and special type -->
+<!--	  attributes as TYPE KEYWORD3. -->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="indentNextLines" VALUE="\s*[^#]{3,}:\s*(#.*)?" />
+		<PROPERTY NAME="unalignedOpenBrackets" VALUE="(" />
+		<PROPERTY NAME="unalignedCloseBrackets" VALUE=")" />
+		<PROPERTY NAME="unindentNextLines" VALUE="^\s*(pass|else\s*:|elif\s.*:|except(\s.*)?:|finally\s*:)$" />
+		<PROPERTY NAME="unindentThisLine" VALUE="^\s*(else|elif\s.*|except(\s.*)?|finally)\s*:" />
+		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="electricKeys" VALUE=":" />
+		<PROPERTY NAME="ignoreWhitespace" VALUE="false" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- Comment -->
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+		<!-- decorator -->
+		<EOL_SPAN_REGEXP HASH_CHAR="@" AT_WORD_START="TRUE" TYPE="KEYWORD4">@\w</EOL_SPAN_REGEXP>
+
+		<!-- Triple-quotes -->
+		<SPAN TYPE="LITERAL2" DELEGATE="LITERAL_TWO">
+			<BEGIN>"""</BEGIN>
+			<END>"""</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL2" DELEGATE="LITERAL_TWO">
+			<BEGIN>'''</BEGIN>
+			<END>'''</END>
+		</SPAN>
+
+		<!-- Standard literals -->
+		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL_ONE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" DELEGATE="LITERAL_ONE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="KEYWORD1">:</SEQ>
+
+		<MARK_PREVIOUS TYPE="FUNCTION"
+			MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<KEYWORDS>
+			<!--  Reserved Words  -->
+			<KEYWORD1>and</KEYWORD1>
+			<KEYWORD1>as</KEYWORD1>
+			<KEYWORD1>assert</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>class</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>def</KEYWORD1>
+			<KEYWORD1>del</KEYWORD1>
+			<KEYWORD1>elif</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>except</KEYWORD1>
+			<KEYWORD1>exec</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>from</KEYWORD1>
+			<KEYWORD1>global</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<KEYWORD1>is</KEYWORD1>
+			<KEYWORD1>lambda</KEYWORD1>
+			<KEYWORD1>not</KEYWORD1>
+			<KEYWORD1>or</KEYWORD1>
+			<KEYWORD1>pass</KEYWORD1>
+			<KEYWORD1>print</KEYWORD1>
+			<KEYWORD1>raise</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>reversed</KEYWORD1>
+			<KEYWORD1>sorted</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>with</KEYWORD1>
+			<KEYWORD1>yield</KEYWORD1>
+			<KEYWORD1>self</KEYWORD1>
+
+			<!-- builtins -->
+			<KEYWORD2>abs</KEYWORD2>
+			<KEYWORD2>all</KEYWORD2>
+			<KEYWORD2>any</KEYWORD2>
+			<KEYWORD2>apply</KEYWORD2>
+			<KEYWORD2>bool</KEYWORD2>
+			<KEYWORD2>buffer</KEYWORD2>
+			<KEYWORD2>callable</KEYWORD2>
+			<KEYWORD2>chr</KEYWORD2>
+			<KEYWORD2>classmethod</KEYWORD2>
+			<KEYWORD2>cmp</KEYWORD2>
+			<KEYWORD2>coerce</KEYWORD2>
+			<KEYWORD2>compile</KEYWORD2>
+			<KEYWORD2>complex</KEYWORD2>
+			<KEYWORD2>delattr</KEYWORD2>
+			<KEYWORD2>dict</KEYWORD2>
+			<KEYWORD2>dir</KEYWORD2>
+			<KEYWORD2>divmod</KEYWORD2>
+			<KEYWORD2>enumerate</KEYWORD2>
+			<KEYWORD2>eval</KEYWORD2>
+			<KEYWORD2>execfile</KEYWORD2>
+			<KEYWORD2>file</KEYWORD2>
+			<KEYWORD2>filter</KEYWORD2>
+			<KEYWORD2>float</KEYWORD2>
+			<KEYWORD2>frozenset</KEYWORD2>
+			<KEYWORD2>getattr</KEYWORD2>
+			<KEYWORD2>globals</KEYWORD2>
+			<KEYWORD2>hasattr</KEYWORD2>
+			<KEYWORD2>hash</KEYWORD2>
+			<KEYWORD2>hex</KEYWORD2>
+			<KEYWORD2>id</KEYWORD2>
+			<KEYWORD2>input</KEYWORD2>
+			<KEYWORD2>int</KEYWORD2>
+			<KEYWORD2>intern</KEYWORD2>
+			<KEYWORD2>isinstance</KEYWORD2>
+			<KEYWORD2>issubclass</KEYWORD2>
+			<KEYWORD2>iter</KEYWORD2>
+			<KEYWORD2>len</KEYWORD2>
+			<KEYWORD2>list</KEYWORD2>
+			<KEYWORD2>locals</KEYWORD2>
+			<KEYWORD2>long</KEYWORD2>
+			<KEYWORD2>map</KEYWORD2>
+			<KEYWORD2>max</KEYWORD2>
+			<KEYWORD2>min</KEYWORD2>
+			<KEYWORD2>object</KEYWORD2>
+			<KEYWORD2>oct</KEYWORD2>
+			<KEYWORD2>open</KEYWORD2>
+			<KEYWORD2>ord</KEYWORD2>
+			<KEYWORD2>pow</KEYWORD2>
+			<KEYWORD2>property</KEYWORD2>
+			<KEYWORD2>range</KEYWORD2>
+			<KEYWORD2>raw_input</KEYWORD2>
+			<KEYWORD2>reduce</KEYWORD2>
+			<KEYWORD2>reload</KEYWORD2>
+			<KEYWORD2>repr</KEYWORD2>
+			<KEYWORD2>round</KEYWORD2>
+			<KEYWORD2>set</KEYWORD2>
+			<KEYWORD2>setattr</KEYWORD2>
+			<KEYWORD2>slice</KEYWORD2>
+			<KEYWORD2>staticmethod</KEYWORD2>
+			<KEYWORD2>str</KEYWORD2>
+			<KEYWORD2>sum</KEYWORD2>
+			<KEYWORD2>super</KEYWORD2>
+			<KEYWORD2>tuple</KEYWORD2>
+			<KEYWORD2>type</KEYWORD2>
+			<KEYWORD2>unichr</KEYWORD2>
+			<KEYWORD2>unicode</KEYWORD2>
+			<KEYWORD2>vars</KEYWORD2>
+			<KEYWORD2>xrange</KEYWORD2>
+			<KEYWORD2>zip</KEYWORD2>
+
+			<!-- exceptions -->
+			<KEYWORD3>ArithmeticError</KEYWORD3>
+			<KEYWORD3>AssertionError</KEYWORD3>
+			<KEYWORD3>AttributeError</KEYWORD3>
+			<KEYWORD3>DeprecationWarning</KEYWORD3>
+			<KEYWORD3>EOFError</KEYWORD3>
+			<KEYWORD3>EnvironmentError</KEYWORD3>
+			<KEYWORD3>Exception</KEYWORD3>
+			<KEYWORD3>FloatingPointError</KEYWORD3>
+			<KEYWORD3>IOError</KEYWORD3>
+			<KEYWORD3>ImportError</KEYWORD3>
+			<KEYWORD3>IndentationError</KEYWORD3>
+			<KEYWORD3>IndexError</KEYWORD3>
+			<KEYWORD3>KeyError</KEYWORD3>
+			<KEYWORD3>KeyboardInterrupt</KEYWORD3>
+			<KEYWORD3>LookupError</KEYWORD3>
+			<KEYWORD3>MemoryError</KEYWORD3>
+			<KEYWORD3>NameError</KEYWORD3>
+			<KEYWORD3>NotImplemented</KEYWORD3>
+			<KEYWORD3>NotImplementedError</KEYWORD3>
+			<KEYWORD3>OSError</KEYWORD3>
+			<KEYWORD3>OverflowError</KEYWORD3>
+			<KEYWORD3>OverflowWarning</KEYWORD3>
+			<KEYWORD3>ReferenceError</KEYWORD3>
+			<KEYWORD3>RuntimeError</KEYWORD3>
+			<KEYWORD3>RuntimeWarning</KEYWORD3>
+			<KEYWORD3>StandardError</KEYWORD3>
+			<KEYWORD3>StopIteration</KEYWORD3>
+			<KEYWORD3>SyntaxError</KEYWORD3>
+			<KEYWORD3>SyntaxWarning</KEYWORD3>
+			<KEYWORD3>SystemError</KEYWORD3>
+			<KEYWORD3>SystemExit</KEYWORD3>
+			<KEYWORD3>TabError</KEYWORD3>
+			<KEYWORD3>TypeError</KEYWORD3>
+			<KEYWORD3>UnboundLocalError</KEYWORD3>
+			<KEYWORD3>UnicodeError</KEYWORD3>
+			<KEYWORD3>UserWarning</KEYWORD3>
+			<KEYWORD3>ValueError</KEYWORD3>
+			<KEYWORD3>Warning</KEYWORD3>
+			<KEYWORD3>WindowsError</KEYWORD3>
+			<KEYWORD3>ZeroDivisionError</KEYWORD3>
+
+			<!-- types (from types module) -->
+			<KEYWORD3>BufferType</KEYWORD3>
+			<KEYWORD3>BuiltinFunctionType</KEYWORD3>
+			<KEYWORD3>BuiltinMethodType</KEYWORD3>
+			<KEYWORD3>ClassType</KEYWORD3>
+			<KEYWORD3>CodeType</KEYWORD3>
+			<KEYWORD3>ComplexType</KEYWORD3>
+			<KEYWORD3>DictProxyType</KEYWORD3>
+			<KEYWORD3>DictType</KEYWORD3>
+			<KEYWORD3>DictionaryType</KEYWORD3>
+			<KEYWORD3>EllipsisType</KEYWORD3>
+			<KEYWORD3>FileType</KEYWORD3>
+			<KEYWORD3>FloatType</KEYWORD3>
+			<KEYWORD3>FrameType</KEYWORD3>
+			<KEYWORD3>FunctionType</KEYWORD3>
+			<KEYWORD3>GeneratorType</KEYWORD3>
+			<KEYWORD3>InstanceType</KEYWORD3>
+			<KEYWORD3>IntType</KEYWORD3>
+			<KEYWORD3>LambdaType</KEYWORD3>
+			<KEYWORD3>ListType</KEYWORD3>
+			<KEYWORD3>LongType</KEYWORD3>
+			<KEYWORD3>MethodType</KEYWORD3>
+			<KEYWORD3>ModuleType</KEYWORD3>
+			<KEYWORD3>NoneType</KEYWORD3>
+			<KEYWORD3>ObjectType</KEYWORD3>
+			<KEYWORD3>SliceType</KEYWORD3>
+			<KEYWORD3>StringType</KEYWORD3>
+			<KEYWORD3>StringTypes</KEYWORD3>
+			<KEYWORD3>TracebackType</KEYWORD3>
+			<KEYWORD3>TupleType</KEYWORD3>
+			<KEYWORD3>TypeType</KEYWORD3>
+			<KEYWORD3>UnboundMethodType</KEYWORD3>
+			<KEYWORD3>UnicodeType</KEYWORD3>
+			<KEYWORD3>XRangeType</KEYWORD3>
+
+			<KEYWORD3>False</KEYWORD3>
+			<KEYWORD3>None</KEYWORD3>
+			<KEYWORD3>True</KEYWORD3>
+
+			<KEYWORD3>__abs__</KEYWORD3>
+			<KEYWORD3>__add__</KEYWORD3>
+			<KEYWORD3>__all__</KEYWORD3>
+			<KEYWORD3>__author__</KEYWORD3>
+			<KEYWORD3>__bases__</KEYWORD3>
+			<KEYWORD3>__builtins__</KEYWORD3>
+			<KEYWORD3>__call__</KEYWORD3>
+			<KEYWORD3>__class__</KEYWORD3>
+			<KEYWORD3>__cmp__</KEYWORD3>
+			<KEYWORD3>__coerce__</KEYWORD3>
+			<KEYWORD3>__contains__</KEYWORD3>
+			<KEYWORD3>__debug__</KEYWORD3>
+			<KEYWORD3>__del__</KEYWORD3>
+			<KEYWORD3>__delattr__</KEYWORD3>
+			<KEYWORD3>__delitem__</KEYWORD3>
+			<KEYWORD3>__delslice__</KEYWORD3>
+			<KEYWORD3>__dict__</KEYWORD3>
+			<KEYWORD3>__div__</KEYWORD3>
+			<KEYWORD3>__divmod__</KEYWORD3>
+			<KEYWORD3>__doc__</KEYWORD3>
+			<KEYWORD3>__docformat__</KEYWORD3>
+			<KEYWORD3>__eq__</KEYWORD3>
+			<KEYWORD3>__file__</KEYWORD3>
+			<KEYWORD3>__float__</KEYWORD3>
+			<KEYWORD3>__floordiv__</KEYWORD3>
+			<KEYWORD3>__future__</KEYWORD3>
+			<KEYWORD3>__ge__</KEYWORD3>
+			<KEYWORD3>__getattr__</KEYWORD3>
+			<KEYWORD3>__getattribute__</KEYWORD3>
+			<KEYWORD3>__getitem__</KEYWORD3>
+			<KEYWORD3>__getslice__</KEYWORD3>
+			<KEYWORD3>__gt__</KEYWORD3>
+			<KEYWORD3>__hash__</KEYWORD3>
+			<KEYWORD3>__hex__</KEYWORD3>
+			<KEYWORD3>__iadd__</KEYWORD3>
+			<KEYWORD3>__import__</KEYWORD3>
+			<KEYWORD3>__imul__</KEYWORD3>
+			<KEYWORD3>__init__</KEYWORD3>
+			<KEYWORD3>__int__</KEYWORD3>
+			<KEYWORD3>__invert__</KEYWORD3>
+			<KEYWORD3>__iter__</KEYWORD3>
+			<KEYWORD3>__le__</KEYWORD3>
+			<KEYWORD3>__len__</KEYWORD3>
+			<KEYWORD3>__long__</KEYWORD3>
+			<KEYWORD3>__lshift__</KEYWORD3>
+			<KEYWORD3>__lt__</KEYWORD3>
+			<KEYWORD3>__members__</KEYWORD3>
+			<KEYWORD3>__metaclass__</KEYWORD3>
+			<KEYWORD3>__mod__</KEYWORD3>
+			<KEYWORD3>__mro__</KEYWORD3>
+			<KEYWORD3>__mul__</KEYWORD3>
+			<KEYWORD3>__name__</KEYWORD3>
+			<KEYWORD3>__ne__</KEYWORD3>
+			<KEYWORD3>__neg__</KEYWORD3>
+			<KEYWORD3>__new__</KEYWORD3>
+			<KEYWORD3>__nonzero__</KEYWORD3>
+			<KEYWORD3>__oct__</KEYWORD3>
+			<KEYWORD3>__or__</KEYWORD3>
+			<KEYWORD3>__path__</KEYWORD3>
+			<KEYWORD3>__pos__</KEYWORD3>
+			<KEYWORD3>__pow__</KEYWORD3>
+			<KEYWORD3>__radd__</KEYWORD3>
+			<KEYWORD3>__rdiv__</KEYWORD3>
+			<KEYWORD3>__rdivmod__</KEYWORD3>
+			<KEYWORD3>__reduce__</KEYWORD3>
+			<KEYWORD3>__repr__</KEYWORD3>
+			<KEYWORD3>__rfloordiv__</KEYWORD3>
+			<KEYWORD3>__rlshift__</KEYWORD3>
+			<KEYWORD3>__rmod__</KEYWORD3>
+			<KEYWORD3>__rmul__</KEYWORD3>
+			<KEYWORD3>__ror__</KEYWORD3>
+			<KEYWORD3>__rpow__</KEYWORD3>
+			<KEYWORD3>__rrshift__</KEYWORD3>
+			<KEYWORD3>__rsub__</KEYWORD3>
+			<KEYWORD3>__rtruediv__</KEYWORD3>
+			<KEYWORD3>__rxor__</KEYWORD3>
+			<KEYWORD3>__setattr__</KEYWORD3>
+			<KEYWORD3>__setitem__</KEYWORD3>
+			<KEYWORD3>__setslice__</KEYWORD3>
+			<KEYWORD3>__self__</KEYWORD3>
+			<KEYWORD3>__slots__</KEYWORD3>
+			<KEYWORD3>__str__</KEYWORD3>
+			<KEYWORD3>__sub__</KEYWORD3>
+			<KEYWORD3>__truediv__</KEYWORD3>
+			<KEYWORD3>__version__</KEYWORD3>
+			<KEYWORD3>__xor__</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+
+	<!-- rulesets to syntax highlight string interpolation sequences -->
+	<RULES SET="LITERAL_ONE" DEFAULT="LITERAL1" ESCAPE="\">
+		<SEQ_REGEXP HASH_CHAR="%" TYPE="LITERAL4">%[.]?\d*[diouxXeEfFgGcrs]</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="%(" TYPE="LITERAL4">%\([^)]+\)[+ -]?\d*[diouxXeEfFgGcrs]</SEQ_REGEXP>
+	</RULES>
+	<!-- triple-quoted strings has its own, since it's LITERAL2 by default -->
+	<RULES SET="LITERAL_TWO" DEFAULT="LITERAL2" ESCAPE="\">
+		<SEQ_REGEXP HASH_CHAR="%" TYPE="LITERAL4">%\d*[diouxXeEfFgGcrs]</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR="%(" TYPE="LITERAL4">%\([^)]+\)[+ -]?\d*[diouxXeEfFgGcrs]</SEQ_REGEXP>
+		<SPAN TYPE="LITERAL3">
+			<BEGIN>B{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL3">
+			<BEGIN>C{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL3">
+			<BEGIN>E{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL3">
+			<BEGIN>I{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL3">
+			<BEGIN>L{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<!--
+		<EOL_SPAN AT_WHITESPACE_END="TRUE" DELEGATE="python::MAIN" TYPE="LITERAL3">&gt;&gt;&gt;</EOL_SPAN>
+		<EOL_SPAN AT_WHITESPACE_END="TRUE" DELEGATE="python::MAIN" TYPE="LITERAL3">...</EOL_SPAN>
+		-->
+		<EOL_SPAN AT_WHITESPACE_END="TRUE" TYPE="LITERAL3">&gt;&gt;&gt;</EOL_SPAN>
+		<EOL_SPAN AT_WHITESPACE_END="TRUE" TYPE="LITERAL3">...</EOL_SPAN>
+		<MARK_FOLLOWING	TYPE="LITERAL3" AT_WHITESPACE_END="TRUE">@</MARK_FOLLOWING>
+	</RULES>
+</MODE>
+

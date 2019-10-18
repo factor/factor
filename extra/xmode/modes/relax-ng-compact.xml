@@ -1,0 +1,74 @@
+<?xml version='1.0'?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- RELAX NG Compact Syntax mode, by Randy Hudson. -->
+<!-- mode catalog entry:
+     
+  <MODE NAME="relax-ng-compact" FILE="relax-ng-compact.xml"
+      FILE_NAME_GLOB="*.rnc" /> 
+  -->
+
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+        <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+        <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+        <PROPERTY NAME="lineComment" VALUE="#" />
+        <PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+    </PROPS>  
+    
+    <RULES IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+    
+        <EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+        <SPAN TYPE='LITERAL2'>
+            <BEGIN>"""</BEGIN>
+            <END>"""</END>
+        </SPAN>
+        <SPAN TYPE='LITERAL2'>
+            <BEGIN>'''</BEGIN>
+            <END>'''</END>
+        </SPAN>
+ 
+        <SEQ TYPE="OPERATOR">+</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ>
+        <SEQ TYPE="OPERATOR">?</SEQ>
+        <SEQ TYPE="OPERATOR">&amp;=</SEQ>
+        <SEQ TYPE="OPERATOR">&amp;</SEQ>
+        <SEQ TYPE="OPERATOR">|=</SEQ>
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">=</SEQ>
+        <SEQ TYPE="OPERATOR">-</SEQ>
+        
+        <MARK_FOLLOWING TYPE="NULL">\</MARK_FOLLOWING>
+        
+        <KEYWORDS>
+            <KEYWORD1>attribute</KEYWORD1>
+            <KEYWORD1>default</KEYWORD1>
+            <KEYWORD1>datatypes</KEYWORD1>
+            <KEYWORD1>div</KEYWORD1>
+            <KEYWORD1>element</KEYWORD1>
+            <KEYWORD1>empty</KEYWORD1>
+            <KEYWORD1>external</KEYWORD1>
+            <KEYWORD1>grammar</KEYWORD1>
+            <KEYWORD1>include</KEYWORD1>
+            <KEYWORD1>inherit</KEYWORD1>
+            <KEYWORD1>list</KEYWORD1>
+            <KEYWORD1>mixed</KEYWORD1>
+            <KEYWORD1>namespace</KEYWORD1>
+            <KEYWORD1>notAllowed</KEYWORD1>
+            <KEYWORD1>parent</KEYWORD1>
+            <KEYWORD1>start</KEYWORD1>
+            <KEYWORD2>string</KEYWORD2>
+            <KEYWORD1>text</KEYWORD1>
+            <KEYWORD2>token</KEYWORD2>
+        </KEYWORDS>
+    </RULES>
+</MODE>

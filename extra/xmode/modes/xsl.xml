@@ -1,0 +1,436 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd"><!--
+  ======================================================================
+  Edit mode for XSLT 1.0 and XSLT 2.0
+  ======================================================================
+  Token types:
+
+  COMMENT1    XML comments
+  COMMENT2    XPath 2.0 comments - top or nested within COMMENT3
+  COMMENT3    XPath 2.0 comments - nested within COMMENT2
+  COMMENT4    Default task names used in Task List
+  DIGIT       Digits
+  FUNCTION    Functions
+  INVALID     -
+  KEYWORD1    XSLT element names
+  KEYWORD2    XSLT attribute names
+  KEYWORD3    Attribute values
+  KEYWORD4    Axes specifiers
+  LABEL       Namespace prefixes
+  LITERAL1    String literals
+  LITERAL2    Parameter and variable references
+  LITERAL3    Entity references and processing instructions
+  LITERAL4    DTD constructs and CDATA sections
+  MARKUP      Result elements and extension elements
+  OPERATOR    XPath 2.0 keywords + some other stuff
+  ======================================================================
+-->
+
+<MODE>
+
+  <PROPS>
+    <PROPERTY NAME="commentStart" VALUE="&lt;!--"/>
+    <PROPERTY NAME="commentEnd" VALUE="--&gt;"/>
+  </PROPS>
+
+  <RULES HIGHLIGHT_DIGITS="FALSE" IGNORE_CASE="FALSE">
+
+    <!-- XML comments -->
+    <SPAN DELEGATE="TASKS" TYPE="COMMENT1">
+      <BEGIN>&lt;!--</BEGIN>
+      <END>--&gt;</END>
+    </SPAN>
+
+    <!-- Assume 'xsl' prefix for XSLT elements -->
+    <SPAN_REGEXP HASH_CHAR="&lt;" DELEGATE="XSLTAGS" TYPE="KEYWORD2">
+      <BEGIN>&lt;(?=xsl:)</BEGIN>
+      <END>&gt;</END>
+    </SPAN_REGEXP>
+
+    <SPAN_REGEXP HASH_CHAR="&lt;" DELEGATE="XSLTAGS" TYPE="KEYWORD2">
+      <BEGIN>&lt;(?=/xsl:)</BEGIN>
+      <END>&gt;</END>
+    </SPAN_REGEXP>
+
+    <!-- CDATA marked sections. Reuse common xml mode -->
+    <SPAN TYPE="KEYWORD2" DELEGATE="xml::CDATA">
+      <BEGIN>&lt;![CDATA[</BEGIN>
+      <END>]]&gt;</END>
+    </SPAN>
+
+    <!-- DTD constructs. Reuse common xml mode  -->
+    <SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+      <BEGIN>&lt;!</BEGIN>
+      <END>&gt;</END>
+    </SPAN>
+
+    <!-- Entity references -->
+    <SPAN TYPE="LITERAL3" NO_WORD_BREAK="TRUE">
+      <BEGIN>&amp;</BEGIN>
+      <END>;</END>
+    </SPAN>
+
+    <!-- Processing instructions -->
+    <SPAN TYPE="LITERAL3">
+      <BEGIN>&lt;?</BEGIN>
+      <END>?&gt;</END>
+    </SPAN>
+
+    <!-- Result elements and extension elements -->
+    <SPAN DELEGATE="TAGS" TYPE="MARKUP">
+      <BEGIN>&lt;</BEGIN>
+      <END>&gt;</END>
+    </SPAN>
+  </RULES>
+
+  <!-- XML comments -->
+  <RULES DEFAULT="COMMENT1" IGNORE_CASE="FALSE" SET="TASKS">
+    <!-- Default task names used in Task List -->
+    <KEYWORDS>
+      <COMMENT4>DEBUG:</COMMENT4>
+      <COMMENT4>DONE:</COMMENT4>
+      <COMMENT4>FIXME:</COMMENT4>
+      <COMMENT4>IDEA:</COMMENT4>
+      <COMMENT4>NOTE:</COMMENT4>
+      <COMMENT4>QUESTION:</COMMENT4>
+      <COMMENT4>TODO:</COMMENT4>
+      <COMMENT4>XXX</COMMENT4>
+      <COMMENT4>???</COMMENT4>
+    </KEYWORDS>
+  </RULES>
+
+  <!-- Result elements and extension elements -->
+  <RULES DEFAULT="MARKUP" HIGHLIGHT_DIGITS="FALSE" NO_WORD_SEP=".-_:" SET="TAGS">
+
+    <!-- Highlight all AVTs in result attribute values. -->
+    <SPAN TYPE="MARKUP" DELEGATE="AVT">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="MARKUP" DELEGATE="AVT">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+
+    <!-- Namespace declarations -->
+    <SEQ TYPE="OPERATOR">xmlns:</SEQ>
+    <!-- Default namespace declaration. Not really used in XSLT -->
+    <SEQ TYPE="OPERATOR">xmlns</SEQ>
+
+    <!-- Namespace prefixes -->
+    <MARK_PREVIOUS TYPE="LABEL">:</MARK_PREVIOUS>
+
+  </RULES>
+
+  <!-- AVTs -->
+  <RULES DEFAULT="KEYWORD3" HIGHLIGHT_DIGITS="FALSE" NO_WORD_SEP=".-_:" SET="AVT">
+
+    <!-- Literal curly braces ({}) must be written as {{ or }} -->
+    <SEQ>{{</SEQ>
+    <SEQ>}}</SEQ><!-- Does nothing. Is overridden by the SPAN below. -->
+
+    <!-- The AVT itself -->
+    <SPAN DELEGATE="XPATH" TYPE="OPERATOR">
+      <BEGIN>{</BEGIN>
+      <END>}</END>
+    </SPAN>
+
+    <!-- Entity references -->
+    <SPAN TYPE="LITERAL3" NO_WORD_BREAK="TRUE">
+      <BEGIN>&amp;</BEGIN>
+      <END>;</END>
+    </SPAN>
+
+  </RULES>
+
+  <!-- XSLT tags -->
+  <RULES DEFAULT="KEYWORD2" HIGHLIGHT_DIGITS="FALSE" NO_WORD_SEP=".-_:" SET="XSLTAGS">
+
+    <!-- If we spot something that looks like an AVT, assume it is. Lazy, I know... -->
+    <SPAN TYPE="KEYWORD2" DELEGATE="AVT">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="KEYWORD2" DELEGATE="AVT">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+
+    <!-- XSLT attributes that contains XPath expressions or match patterns -->
+    <!-- count -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="count" DELEGATE="XPATH">
+      <BEGIN>count[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="count" DELEGATE="XPATH">
+      <BEGIN>count[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+    <!-- from -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="from" DELEGATE="XPATH">
+      <BEGIN>from[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="from" DELEGATE="XPATH">
+      <BEGIN>from[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+    <!-- group-adjacent -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="group-adjacent" DELEGATE="XPATH">
+      <BEGIN>group-adjacent[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="group-adjacent" DELEGATE="XPATH">
+      <BEGIN>group-adjacent[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+    <!-- group-by -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="group-by" DELEGATE="XPATH">
+      <BEGIN>group-by[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="group-by" DELEGATE="XPATH">
+      <BEGIN>group-by[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+    <!-- group-ending-with -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="group-ending-with" DELEGATE="XPATH">
+      <BEGIN>group-ending-with[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="group-ending-with" DELEGATE="XPATH">
+      <BEGIN>group-ending-with[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+    <!-- group-starting-with -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="group-starting-with" DELEGATE="XPATH">
+      <BEGIN>group-starting-with[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="group-starting-with" DELEGATE="XPATH">
+      <BEGIN>group-starting-with[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+    <!-- match -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="match" DELEGATE="XPATH">
+      <BEGIN>match[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="match" DELEGATE="XPATH">
+      <BEGIN>match[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+    <!-- select -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="select" DELEGATE="XPATH">
+      <BEGIN>select[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="select" DELEGATE="XPATH">
+      <BEGIN>select[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+    <!-- test -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="test" DELEGATE="XPATH">
+      <BEGIN>test[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="test" DELEGATE="XPATH">
+      <BEGIN>test[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+    <!-- use -->
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="use" DELEGATE="XPATH">
+      <BEGIN>use[\p{Space}]*=[\p{Space}]*"</BEGIN>
+      <END>"</END>
+    </SPAN_REGEXP>
+    <SPAN_REGEXP TYPE="KEYWORD2" HASH_CHAR="use" DELEGATE="XPATH">
+      <BEGIN>use[\p{Space}]*=[\p{Space}]*'</BEGIN>
+      <END>'</END>
+    </SPAN_REGEXP>
+
+    <!-- Namespace declarations -->
+    <SEQ TYPE="OPERATOR">xmlns:</SEQ>
+    <!-- Default namespace declaration. Not really used in XSLT -->
+    <SEQ TYPE="OPERATOR">xmlns</SEQ>
+
+    <!-- Namespace prefixes -->
+    <MARK_PREVIOUS TYPE="LABEL">:</MARK_PREVIOUS>
+
+    <!-- XSLT 2.0 element names -->
+    <KEYWORDS>
+      <KEYWORD1>analyze-string</KEYWORD1>
+      <KEYWORD1>apply-imports</KEYWORD1>
+      <KEYWORD1>apply-templates</KEYWORD1>
+      <KEYWORD1>attribute</KEYWORD1>
+      <KEYWORD1>attribute-set</KEYWORD1>
+      <KEYWORD1>call-template</KEYWORD1>
+      <KEYWORD1>character-map</KEYWORD1>
+      <KEYWORD1>choose</KEYWORD1>
+      <KEYWORD1>comment</KEYWORD1>
+      <KEYWORD1>copy</KEYWORD1>
+      <KEYWORD1>copy-of</KEYWORD1>
+      <KEYWORD1>date-format</KEYWORD1>
+      <KEYWORD1>decimal-format</KEYWORD1>
+      <KEYWORD1>element</KEYWORD1>
+      <KEYWORD1>fallback</KEYWORD1>
+      <KEYWORD1>for-each</KEYWORD1>
+      <KEYWORD1>for-each-group</KEYWORD1>
+      <KEYWORD1>function</KEYWORD1>
+      <KEYWORD1>if</KEYWORD1>
+      <KEYWORD1>import</KEYWORD1>
+      <KEYWORD1>import-schema</KEYWORD1>
+      <KEYWORD1>include</KEYWORD1>
+      <KEYWORD1>key</KEYWORD1>
+      <KEYWORD1>matching-substring</KEYWORD1>
+      <KEYWORD1>message</KEYWORD1>
+      <KEYWORD1>namespace</KEYWORD1>
+      <KEYWORD1>namespace-alias</KEYWORD1>
+      <KEYWORD1>next-match</KEYWORD1>
+      <KEYWORD1>non-matching-substring</KEYWORD1>
+      <KEYWORD1>number</KEYWORD1>
+      <KEYWORD1>otherwise</KEYWORD1>
+      <KEYWORD1>output</KEYWORD1>
+      <KEYWORD1>output-character</KEYWORD1>
+      <KEYWORD1>param</KEYWORD1>
+      <KEYWORD1>preserve-space</KEYWORD1>
+      <KEYWORD1>processing-instruction</KEYWORD1>
+      <KEYWORD1>result-document</KEYWORD1>
+      <KEYWORD1>sequence</KEYWORD1>
+      <KEYWORD1>sort</KEYWORD1>
+      <KEYWORD1>sort-key</KEYWORD1>
+      <KEYWORD1>strip-space</KEYWORD1>
+      <KEYWORD1>stylesheet</KEYWORD1>
+      <KEYWORD1>template</KEYWORD1>
+      <KEYWORD1>text</KEYWORD1>
+      <KEYWORD1>transform</KEYWORD1>
+      <KEYWORD1>value-of</KEYWORD1>
+      <KEYWORD1>variable</KEYWORD1>
+      <KEYWORD1>when</KEYWORD1>
+      <KEYWORD1>with-param</KEYWORD1>
+    </KEYWORDS>
+
+  </RULES>
+
+  <RULES DEFAULT="KEYWORD3" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="[\p{Digit}]+([\p{Punct}][\p{Digit}]+)?" NO_WORD_SEP=".-_" SET="XPATH">
+    <!-- String literals -->
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+
+    <!-- XPath comments -->
+    <SPAN TYPE="COMMENT2" DELEGATE="XPATHCOMMENT2">
+      <BEGIN>(:</BEGIN>
+      <END>:)</END>
+    </SPAN>
+
+    <!-- Axes specifiers -->
+    <MARK_PREVIOUS TYPE="KEYWORD4">::</MARK_PREVIOUS>
+    <!-- Abbreviated 'attribute::' -->
+    <SEQ TYPE="KEYWORD4">@</SEQ>
+
+    <!-- XPath 2.0 operators + some other stuff -->
+    <!-- Comparison expressions -->
+    <SEQ TYPE="OPERATOR">=</SEQ>
+    <SEQ TYPE="OPERATOR">!=</SEQ>
+    <SEQ TYPE="OPERATOR">&gt;</SEQ>
+    <SEQ TYPE="OPERATOR">&amp;gt;</SEQ><!-- Treat as operator -->
+    <SEQ TYPE="OPERATOR">&amp;lt;</SEQ><!-- Treat as operator -->
+    <!-- Optional occurrence indicator -->
+    <SEQ TYPE="OPERATOR">?</SEQ>
+    <!-- Addition operator, one-or-more occurrence indicator-->
+    <SEQ TYPE="OPERATOR">+</SEQ>
+    <!-- Multiplication operator, zero-or-more occurrence indicator, node test -->
+    <SEQ TYPE="OPERATOR">*</SEQ>
+    <!-- Path expression step separator -->
+    <SEQ TYPE="OPERATOR">/</SEQ>
+    <!-- Union operator -->
+    <SEQ TYPE="OPERATOR">|</SEQ>
+    <!-- Sequence expression item separator -->
+    <SEQ TYPE="OPERATOR">,</SEQ>
+
+    <!-- Predicates -->
+    <SPAN TYPE="OPERATOR" DELEGATE="XPATH">
+      <BEGIN>[</BEGIN>
+      <END>]</END>
+    </SPAN>
+
+    <!-- Entity references -->
+    <SPAN TYPE="LITERAL3" NO_WORD_BREAK="TRUE">
+      <BEGIN>&amp;</BEGIN>
+      <END>;</END>
+    </SPAN>
+
+    <!-- Namespace prefixes -->
+    <MARK_PREVIOUS TYPE="LABEL">:</MARK_PREVIOUS>
+
+    <!-- Functions -->
+    <MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+	<SEQ TYPE="OPERATOR">)</SEQ>
+
+    <!-- Variables -->
+    <MARK_FOLLOWING TYPE="LITERAL2">$</MARK_FOLLOWING>
+    <!-- XPath 2.0 keywords + some other stuff -->
+    <KEYWORDS>
+      <!-- Keywords -->
+      <OPERATOR>and</OPERATOR>
+      <OPERATOR>as</OPERATOR>
+      <OPERATOR>castable</OPERATOR>
+      <OPERATOR>div</OPERATOR>
+      <OPERATOR>else</OPERATOR>
+      <OPERATOR>eq</OPERATOR>
+      <OPERATOR>every</OPERATOR>
+      <OPERATOR>except</OPERATOR>
+      <OPERATOR>for</OPERATOR>
+      <OPERATOR>ge</OPERATOR>
+      <OPERATOR>gt</OPERATOR>
+      <OPERATOR>idiv</OPERATOR>
+      <OPERATOR>if</OPERATOR>
+      <OPERATOR>in</OPERATOR>
+      <OPERATOR>instance</OPERATOR>
+      <OPERATOR>intersect</OPERATOR>
+      <OPERATOR>is</OPERATOR>
+      <OPERATOR>isnot</OPERATOR>
+      <OPERATOR>le</OPERATOR>
+      <OPERATOR>lt</OPERATOR>
+      <OPERATOR>mod</OPERATOR>
+      <OPERATOR>nillable</OPERATOR>
+      <OPERATOR>ne</OPERATOR>
+      <OPERATOR>of</OPERATOR>
+      <OPERATOR>or</OPERATOR>
+      <OPERATOR>return</OPERATOR>
+      <OPERATOR>satisfies</OPERATOR>
+      <OPERATOR>some</OPERATOR>
+      <OPERATOR>then</OPERATOR>
+      <OPERATOR>to</OPERATOR>
+      <OPERATOR>treat</OPERATOR>
+      <OPERATOR>union</OPERATOR>
+
+      <!-- Subtraction operator -->
+      <OPERATOR>-</OPERATOR>
+
+    </KEYWORDS>
+
+  </RULES>
+
+  <!-- XPath comments - top or nested within COMMENT3 -->
+  <RULES DEFAULT="COMMENT2" SET="XPATHCOMMENT2">
+    <SPAN TYPE="COMMENT3" DELEGATE="XPATHCOMMENT3">
+      <BEGIN>(:</BEGIN>
+      <END>:)</END>
+    </SPAN>
+  </RULES>
+
+  <!-- XPath comments - nested within COMMENT2 -->
+  <RULES DEFAULT="COMMENT3" SET="XPATHCOMMENT3">
+    <SPAN TYPE="COMMENT2" DELEGATE="XPATHCOMMENT2">
+      <BEGIN>(:</BEGIN>
+      <END>:)</END>
+    </SPAN>
+  </RULES>
+
+</MODE>

@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="##" />
+		<PROPERTY NAME="wrap" VALUE="soft" />
+	</PROPS>
+	<RULES ESCAPE="\" HIGHLIGHT_DIGITS="FALSE" IGNORE_CASE="FALSE">
+
+		<!-- comment -->
+		<EOL_SPAN TYPE="COMMENT1">##</EOL_SPAN>
+
+		<!-- directive -->
+		<EOL_SPAN TYPE="KEYWORD2">#pragma</EOL_SPAN>
+
+		<!-- macro -->
+		<SPAN TYPE="KEYWORD4">
+			<BEGIN>[[</BEGIN>
+			<END>]]</END>
+		</SPAN>
+
+		<!-- term definition -->
+		<SEQ_REGEXP
+			HASH_CHAR=' '
+			AT_LINE_START='TRUE'
+			TYPE="LABEL"
+		>\s+(?:\(|\)|\w)[\p{Alnum}\p{Blank}.()]+::</SEQ_REGEXP>
+
+		<!-- smileys -->
+		<!-- not on by default because it slows things down a bit
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\:\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\sB\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\:\)\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\;\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\:D\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\%lt;\:\(\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\sX\-\(\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\:o\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\:\(\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\/\!\\\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\%lt;\!\b\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\(\!\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\:\-\?\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\:\b\:\b\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\%\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\@\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\|\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\;\)\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\(\.\/\)\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\{OK\}\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\{X\}\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\{i\}\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\{1\}\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\{2\}\s</SEQ_REGEXP>
+		<SEQ_REGEXP HASH_CHAR=' ' AT_LINE_START='FALSE' TYPE="LITERAL3">\s\{3\}\s</SEQ_REGEXP>
+		-->
+
+		<!-- code or literal -->
+		<SPAN TYPE="LITERAL2">
+			<BEGIN>{{{</BEGIN>
+			<END>}}}</END>
+		</SPAN>
+
+		<!-- code or literal -->
+		<SPAN TYPE="LITERAL2">
+			<BEGIN>`</BEGIN>
+			<END>`</END>
+		</SPAN>
+
+		<!-- bold or italic -->
+		<SEQ_REGEXP
+			HASH_CHAR="''"
+			TYPE="LITERAL1"
+		>('{2,5})[^']+\1[^']</SEQ_REGEXP>
+
+		<!-- horizontal rule -->
+		<SEQ_REGEXP
+			HASH_CHAR="----"
+			TYPE="LITERAL4"
+		>-{4,}</SEQ_REGEXP>
+
+		<!-- section header -->
+		<SPAN_REGEXP
+			HASH_CHAR="="
+			TYPE="KEYWORD1"
+			AT_LINE_START="TRUE"
+		>
+			<BEGIN>(={1,5}) </BEGIN>
+			<END> $1</END>
+		</SPAN_REGEXP>
+
+		<!-- implicit WikiWords - a bit of a hack, but I can't think of a better way... -->
+		<SEQ_REGEXP HASH_CHARS="ABCDEFGHIJKLMNOPQRSTUVWXYZ" AT_WORD_START="TRUE" TYPE="KEYWORD2">[A-Z][a-z]+[A-Z][a-zA-Z]+</SEQ_REGEXP>
+
+		<!-- explicit WikiWord -->
+		<SPAN TYPE="KEYWORD2">
+			<BEGIN>[&quot;</BEGIN>
+			<END>&quot;]</END>
+		</SPAN>
+
+		<!-- url -->
+		<SPAN TYPE="KEYWORD3">
+			<BEGIN>[</BEGIN>
+			<END>]</END>
+		</SPAN>
+
+	</RULES>
+</MODE>
+

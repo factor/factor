@@ -15,7 +15,7 @@ SYMBOL: xim
     xim get-global XCloseIM drop f xim set-global ;
 
 : with-xim ( quot -- )
-    >r "Factor" init-xim r> [ close-xim ] cleanup ;
+    >r "Factor" init-xim r> [ close-xim ] [ ] cleanup ;
 
 : create-xic ( window classname -- xic )
     >r >r xim get-global

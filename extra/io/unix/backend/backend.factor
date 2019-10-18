@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien bit-arrays generic assocs io
-kernel kernel.private math io.nonblocking sequences strings
+USING: alien bit-arrays generic assocs io kernel
+kernel.private math io.nonblocking sequences strings structs
 sbufs threads unix vectors io.buffers io.backend
-io.streams.duplex math.parser continuations system ;
+io.streams.duplex math.parser continuations system libc ;
 IN: io.unix.backend
 
 TUPLE: unix-io ;
@@ -33,6 +33,9 @@ M: integer init-handle ( fd -- )
     #! when running the Factor.app (presumably because fd 0 and
     #! 1 are closed).
     F_SETFL O_NONBLOCK fcntl drop ;
+
+M: integer close-handle ( fd -- )
+    close ;
 
 : report-error ( error port -- )
     [ "Error on fd " % dup port-handle # ": " % swap % ] "" make
@@ -156,7 +159,7 @@ TUPLE: write-task ;
 : <write-task> ( port -- task ) write-task <io-task> ;
 
 M: write-task do-io-task
-    io-task-port dup buffer-length zero? over port-error or
+    io-task-port dup buffer-empty? over port-error or
     [ 0 swap buffer-reset t ] [ write-step ] if ;
 
 M: write-task task-container drop write-tasks get-global ;
@@ -168,20 +171,8 @@ M: write-task task-container drop write-tasks get-global ;
 : (wait-to-write) ( port -- )
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
-: port-flush ( port -- )
+M: port port-flush ( port -- )
     dup buffer-empty? [ drop ] [ (wait-to-write) ] if ;
-
-M: output-port stream-flush
-    dup port-flush pending-error ;
-
-M: port stream-close
-    dup port-type closed eq? [
-        dup port-type >r closed over set-port-type r>
-        output eq? [ dup port-flush ] when
-        dup port-handle close
-        dup delegate [ buffer-free ] when*
-        f over set-delegate
-    ] unless drop ;
 
 USE: io
 

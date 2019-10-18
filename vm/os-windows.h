@@ -1,4 +1,3 @@
-#include <windows.h>
 #include <ctype.h>
 
 #ifndef wcslen
@@ -16,9 +15,6 @@ typedef wchar_t F_CHAR;
 
 #define MAX_UNICODE_PATH 32768
 #define DLLEXPORT __declspec(dllexport)
-#define SETJMP setjmp
-#define LONGJMP longjmp
-#define JMP_BUF jmp_buf
 #define SSCANF swscanf
 #define STRCMP wcscmp
 #define STRNCMP wcsncmp
@@ -40,11 +36,6 @@ void ffi_dlopen(F_DLL *dll, bool error);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 
-void primitive_open_file(void);
-void primitive_stat(void);
-void primitive_read_dir(void);
-void primitive_cwd(void);
-void primitive_cd(void);
 void sleep_millis(DWORD msec);
 
 INLINE void init_signals(void) {}
@@ -57,14 +48,3 @@ s64 current_millis(void);
 
 INLINE void reset_stdio(void) {}
 
-/* SEH support. Proceed with caution. */
-typedef long exception_handler_t(
-	PEXCEPTION_RECORD rec, void *frame, void *context, void *dispatch);
-
-typedef struct exception_record
-{
-	struct exception_record *next_handler;
-	void *handler_func;
-} exception_record_t;
-
-long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch);

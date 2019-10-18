@@ -32,4 +32,6 @@ M: circular set-nth bounds-check virtual@ set-nth ;
 : <circular-string> ( n -- circular )
     0 <string> <circular> ;
 
+M: circular virtual-seq circular-seq ;
+
 INSTANCE: circular virtual-sequence

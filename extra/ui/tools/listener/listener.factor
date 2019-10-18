@@ -129,9 +129,8 @@ M: stack-display tool-scroller
     dup listener-stream [
         dup [ ui-listener-hook ] curry listener-hook set
         dup [ ui-error-hook ] curry error-hook set
-        dup [ ui-inspector-hook ] curry inspector-hook set
+        [ ui-inspector-hook ] curry inspector-hook set
         [ yield ] compiler-hook set
-        drop
         welcome.
         listener
     ] with-stream* ;

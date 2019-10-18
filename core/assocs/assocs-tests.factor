@@ -87,3 +87,9 @@ unit-test
 [ H{ { 1 2 } { 3 4 } } ]
 [ "hi" 5 H{ { 1 2 } { 3 4 } } clone [ rename-at ] keep ]
 unit-test
+
+[
+    H{ { 1.0 1.0 } { 2.0 2.0 } }
+] [
+    F{ 1.0 2.0 } [ dup ] H{ } map>assoc
+] unit-test

@@ -1,7 +1,6 @@
 USE: io.unix.backend
 USE: io.unix.files
 USE: io.unix.sockets
-USE: io.unix.launcher
 USE: io.backend
 USE: namespaces
 

@@ -3,8 +3,8 @@
 USING: kernel math sequences ;
 IN: io.binary
 
-: be> ( seq -- x ) 0 [ swap 8 shift bitor ] reduce ;
-: le> ( seq -- x ) <reversed> be> ;
+: le> ( seq -- x ) B{ } like byte-array>bignum ;
+: be> ( seq -- x ) <reversed> le> ;
 
 : mask-byte ( x -- y ) HEX: ff bitand ; inline
 

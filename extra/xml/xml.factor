@@ -93,7 +93,7 @@ M: closer process
 
 : make-xml-doc ( prolog seq -- xml-doc )
     dup [ tag? ] find
-    >r assure-tags swap cut 1 tail
+    >r assure-tags cut 1 tail
     no-pre/post no-post-tags
     r> swap <xml> ;
 

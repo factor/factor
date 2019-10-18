@@ -27,7 +27,7 @@ SYMBOL: serialized
 USE: prettyprint 
 
 ! Serialize object
-GENERIC: serialize ( obj -- )
+GENERIC: (serialize) ( obj -- )
 
 : serialize-cell 8 >be write ;
 
@@ -37,13 +37,13 @@ GENERIC: serialize ( obj -- )
     >r dup object-id
     [ "o" write serialize-cell drop ] r> if* ; inline
 
-M: f serialize ( obj -- )
+M: f (serialize) ( obj -- )
     drop "n" write ;
 
 : bytes-needed ( number -- int )
     log2 8 + 8 /i ; inline
 
-M: integer serialize ( obj -- )
+M: integer (serialize) ( obj -- )
     dup 0 = [
         drop "z" write
     ] [
@@ -52,21 +52,21 @@ M: integer serialize ( obj -- )
         >be write 
     ] if ;
 
-M: float serialize ( obj -- )
+M: float (serialize) ( obj -- )
     "F" write
     double>bits serialize-cell ;
 
-M: complex serialize ( obj -- )
+M: complex (serialize) ( obj -- )
     "c" write
-    dup real serialize
-    imaginary serialize ;
+    dup real (serialize)
+    imaginary (serialize) ;
 
-M: ratio serialize ( obj -- )
+M: ratio (serialize) ( obj -- )
     "r" write
-    dup numerator serialize
-    denominator serialize ;
+    dup numerator (serialize)
+    denominator (serialize) ;
 
-M: string serialize ( obj -- )
+M: string (serialize) ( obj -- )
     [
         "s" write
         dup add-object serialize-cell
@@ -74,7 +74,7 @@ M: string serialize ( obj -- )
         write 
     ] serialize-shared ;
 
-M: sbuf serialize ( obj -- )
+M: sbuf (serialize) ( obj -- )
     [
         "S" write
         dup add-object serialize-cell
@@ -82,13 +82,13 @@ M: sbuf serialize ( obj -- )
         >string write 
     ] serialize-shared ;
 
-M: tuple serialize ( obj -- )
+M: tuple (serialize) ( obj -- )
     [
         "T" write
         dup add-object serialize-cell
         tuple>array
         dup length serialize-cell
-        [ serialize ] each
+        [ (serialize) ] each
     ] serialize-shared ;
 
 : serialize-seq ( seq code -- )
@@ -96,32 +96,32 @@ M: tuple serialize ( obj -- )
         write
         dup add-object serialize-cell
         dup length serialize-cell
-        [ serialize ] each
+        [ (serialize) ] each
     ] curry serialize-shared ;
 
-M: array serialize ( obj -- )
+M: array (serialize) ( obj -- )
     "a" serialize-seq ;
 
-M: vector serialize ( obj -- )
+M: vector (serialize) ( obj -- )
     "v" serialize-seq ;
 
-M: byte-array serialize ( obj -- )
+M: byte-array (serialize) ( obj -- )
     "A" serialize-seq ;
 
-M: bit-array serialize ( obj -- )
+M: bit-array (serialize) ( obj -- )
     "b" serialize-seq ;
 
-M: quotation serialize ( obj -- )
+M: quotation (serialize) ( obj -- )
     "q" serialize-seq ;
 
-M: curry serialize ( obj -- )
+M: curry (serialize) ( obj -- )
     [
         "C" write
         dup add-object serialize-cell
-        dup curry-obj serialize curry-quot serialize
+        dup curry-obj (serialize) curry-quot (serialize)
     ] serialize-shared ;
 
-M: float-array serialize ( obj -- )
+M: float-array (serialize) ( obj -- )
     [
         "f" write
         dup add-object serialize-cell
@@ -129,23 +129,23 @@ M: float-array serialize ( obj -- )
         [ double>bits 8 >be write ] each
     ] serialize-shared ;
 
-M: hashtable serialize ( obj -- )
+M: hashtable (serialize) ( obj -- )
     [
         "h" write
         dup add-object serialize-cell
-        >alist serialize
+        >alist (serialize)
     ] serialize-shared ;
 
-M: word serialize ( obj -- )
+M: word (serialize) ( obj -- )
     "w" write
-    dup word-name serialize
-    word-vocabulary serialize ;
+    dup word-name (serialize)
+    word-vocabulary (serialize) ;
 
-M: wrapper serialize ( obj -- )
+M: wrapper (serialize) ( obj -- )
     "W" write
-    wrapped serialize ;
+    wrapped (serialize) ;
 
-DEFER: deserialize ( -- obj )
+DEFER: (deserialize) ( -- obj )
 
 : intern-object ( id obj -- obj )
     dup rot serialized get set-nth ;
@@ -166,10 +166,10 @@ DEFER: deserialize ( -- obj )
     deserialize-cell bits>double ;
 
 : deserialize-ratio ( -- ratio )
-    deserialize deserialize / ;
+    (deserialize) (deserialize) / ;
 
 : deserialize-complex ( -- complex )
-    deserialize deserialize rect> ;
+    (deserialize) (deserialize) rect> ;
 
 : deserialize-string ( -- string )
     deserialize-cell deserialize-cell read intern-object ;
@@ -178,15 +178,15 @@ DEFER: deserialize ( -- obj )
     deserialize-cell deserialize-cell read >sbuf intern-object ;
 
 : deserialize-word ( -- word )
-    deserialize dup deserialize lookup
+    (deserialize) dup (deserialize) lookup
     [ ] [ "Unknown word" throw ] ?if ;
 
 : deserialize-wrapper ( -- wrapper )
-    deserialize <wrapper> ;
+    (deserialize) <wrapper> ;
 
 : deserialize-seq ( seq -- array )
     deserialize-cell deserialize-cell
-    [ drop deserialize ] roll map-as
+    [ drop (deserialize) ] roll map-as
     intern-object ;
 
 : deserialize-array ( -- array )
@@ -210,16 +210,16 @@ DEFER: deserialize ( -- obj )
     intern-object ;
 
 : deserialize-hashtable ( -- hashtable )
-    deserialize-cell deserialize >hashtable intern-object ;
+    deserialize-cell (deserialize) >hashtable intern-object ;
 
 : deserialize-tuple ( -- array )
     deserialize-cell
-    deserialize-cell [ drop deserialize ] map >tuple
+    deserialize-cell [ drop (deserialize) ] map >tuple
     intern-object ;
 
 : deserialize-curry ( -- curry )
     deserialize-cell
-    deserialize deserialize curry
+    (deserialize) (deserialize) curry
     intern-object ;
 
 : deserialize-unknown ( -- object )
@@ -254,14 +254,17 @@ DEFER: deserialize ( -- obj )
         f f
     ] if* ;
 
-: deserialize ( -- obj )
+: (deserialize) ( -- obj )
     deserialize* [ "End of stream" throw ] unless ;
 
 : with-serialized ( quot -- )
     V{ } clone serialized rot with-variable ; inline
 
-: (deserialize-sequence)
-    deserialize* [ , (deserialize-sequence) ] [ drop ] if ;
-
 : deserialize-sequence ( -- seq )
-    [ (deserialize-sequence) ] { } make ;
+    [ [ deserialize* ] [ ] [ drop ] unfold ] with-serialized ;
+
+: deserialize ( -- obj )
+    [ (deserialize) ] with-serialized ;
+
+: serialize ( obj -- )
+    [ (serialize) ] with-serialized ;

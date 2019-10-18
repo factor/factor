@@ -1,12 +1,6 @@
 /* Set by the -S command line argument */
 bool secure_gc;
 
-typedef struct {
-	CELL start;
-	CELL size;
-	CELL end;
-} F_SEGMENT;
-
 /* set up guard pages to check for under/overflow.
 size must be a multiple of the page size */
 F_SEGMENT *alloc_segment(CELL size);
@@ -16,13 +10,14 @@ CELL untagged_object_size(CELL pointer);
 CELL unaligned_object_size(CELL pointer);
 CELL object_size(CELL pointer);
 CELL binary_payload_start(CELL pointer);
-void primitive_data_room(void);
-void primitive_size(void);
 void begin_scan(void);
-void primitive_begin_scan(void);
 CELL next_object(void);
-void primitive_next_object(void);
-void primitive_end_scan(void);
+
+DECLARE_PRIMITIVE(data_room);
+DECLARE_PRIMITIVE(size);
+DECLARE_PRIMITIVE(begin_scan);
+DECLARE_PRIMITIVE(next_object);
+DECLARE_PRIMITIVE(end_scan);
 
 /* generational copying GC divides memory into zones */
 typedef struct {
@@ -216,7 +211,7 @@ void copy_handle(CELL *handle);
 
 /* in case a generation fills up in the middle of a gc, we jump back
 up to try collecting the next generation. */
-JMP_BUF gc_jmp;
+jmp_buf gc_jmp;
 
 /* A heap walk allows useful things to be done, like finding all
 references to an object for debugging purposes. */
@@ -241,11 +236,11 @@ DEFPUSHPOP(root_,extra_roots)
 #define REGISTER_ROOT(obj) root_push(obj)
 #define UNREGISTER_ROOT(obj) obj = root_pop()
 
-#define REGISTER_ARRAY(obj) root_push(tag_object(obj))
-#define UNREGISTER_ARRAY(obj) obj = untag_object(root_pop())
+#define REGISTER_UNTAGGED(obj) root_push(obj ? tag_object(obj) : 0)
+#define UNREGISTER_UNTAGGED(obj) obj = untag_object(root_pop())
 
-#define REGISTER_STRING(obj) root_push(tag_object(obj))
-#define UNREGISTER_STRING(obj) obj = untag_object(root_pop())
+#define REGISTER_STRING(obj) REGISTER_UNTAGGED(obj)
+#define UNREGISTER_STRING(obj) UNREGISTER_UNTAGGED(obj)
 
 /* We ignore strings which point outside the data heap, but we might be given
 a char* which points inside the data heap, in which case it is a root, for
@@ -313,8 +308,11 @@ INLINE void* allot_object(CELL type, CELL length)
 }
 
 CELL collect_next(CELL scan);
-void primitive_data_gc(void);
-void primitive_gc_time(void);
 
 DLLEXPORT void simple_gc(void);
-void primitive_become(void);
+
+void data_gc(void);
+
+DECLARE_PRIMITIVE(data_gc);
+DECLARE_PRIMITIVE(gc_time);
+DECLARE_PRIMITIVE(become);

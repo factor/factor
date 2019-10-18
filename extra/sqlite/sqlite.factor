@@ -122,6 +122,6 @@ DEFER: (sqlite-map)
 : with-sqlite ( path quot -- )
     [
         >r sqlite-open db set r>
-        [ db get sqlite-close ] cleanup
+        [ db get sqlite-close ] [ ] cleanup
     ] with-scope ;
 

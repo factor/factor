@@ -1,12 +1,13 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference.errors
-USING: inference.backend
-inference.known-words kernel generic sequences prettyprint io
-words arrays inspector effects debugger ;
+USING: inference.backend inference.dataflow kernel generic
+sequences prettyprint io words arrays inspector effects debugger
+assocs ;
 
 M: inference-error error.
-    dup inference-error-rstate 0 <column> >array
+    dup inference-error-rstate
+    keys [ dup value? [ value-literal ] when ] map
     dup empty? [ "Word: " write dup peek . ] unless
     swap delegate error. "Nesting: " write . ;
 

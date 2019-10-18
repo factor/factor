@@ -124,15 +124,16 @@ M: object short-section? section-fits? ;
     ] if ;
 
 ! Break section
-TUPLE: break type ;
+TUPLE: line-break type ;
 
-: <break> ( type -- section )
+: <line-break> ( type -- section )
     H{ } 0 <section>
-    { set-break-type set-delegate } \ break construct ;
+    { set-line-break-type set-delegate }
+    \ line-break construct ;
 
-M: break short-section drop ;
+M: line-break short-section drop ;
 
-M: break long-section drop ;
+M: line-break long-section drop ;
 
 ! Block sections
 TUPLE: block sections ;
@@ -149,18 +150,8 @@ TUPLE: block sections ;
     pprinter-block block-sections push ;
 
 : last-section ( -- section )
-    pprinter-block block-sections [ break? not ] find-last nip ;
-
-: hilite-style ( -- hash )
-    H{
-        { background { 0.9 0.9 0.9 1 } }
-        { highlight t }
-    } ;
-
-: hilite ( -- )
-    last-section
-    dup section-style hilite-style union
-    swap set-section-style ;
+    pprinter-block block-sections
+    [ line-break? not ] find-last nip ;
 
 : start-group ( -- )
     t last-section set-section-start-group? ;
@@ -173,13 +164,13 @@ TUPLE: block sections ;
     swap short-section? and
     [ bl ] when ;
 
-: break ( type -- ) [ <break> add-section ] when* ;
+: line-break ( type -- ) [ <line-break> add-section ] when* ;
 
 M: block section-fits? ( section -- ? )
     line-limit? [ drop t ] [ delegate section-fits? ] if ;
 
 : pprint-sections ( block advancer -- )
-    swap block-sections [ break? not ] subset
+    swap block-sections [ line-break? not ] subset
     unclip pprint-section [
         dup rot call pprint-section
     ] curry* each ; inline
@@ -188,7 +179,7 @@ M: block short-section ( block -- )
     [ advance ] pprint-sections ;
 
 : do-break ( break -- )
-    dup break-type hard eq?
+    dup line-break-type hard eq?
     over section-end last-newline get - margin get 2/ > or
     [ <fresh-line ] [ drop ] if ;
 
@@ -295,7 +286,7 @@ M: colon unindent-first-line? drop t ;
 
 ! Long section layout algorithm
 : chop-break ( seq -- seq )
-    dup peek break? [ 1 head-slice* chop-break ] when ;
+    dup peek line-break? [ 1 head-slice* chop-break ] when ;
 
 SYMBOL: prev
 SYMBOL: next
@@ -333,7 +324,7 @@ M: block long-section ( block -- )
     [
         block-sections chop-break group-flow [
             dup ?break-group [
-                dup break? [
+                dup line-break? [
                     do-break
                 ] [
                     dup advance pprint-section

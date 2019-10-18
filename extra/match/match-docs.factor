@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax match namespaces assocs
-sequences kernel ;
+USING: help.markup help.syntax namespaces assocs sequences
+kernel combinators ;
+IN: match
 
 HELP: match 
 { $values { "value1" object } { "value2" object } { "bindings" assoc }
@@ -47,3 +48,17 @@ HELP: match-replace
   }
 }
 { $see-also match-cond POSTPONE: MATCH-VARS: } ;
+
+ARTICLE: "match" "Pattern matching"
+"The " { $vocab-link "match" } " vocabulary implements ML-style pattern matching."
+$nl
+"Variables used for pattern matching must be explicitly defined first:"
+{ $subsection POSTPONE: MATCH-VARS: }
+"A basic pattern match:"
+{ $subsection match }
+"A conditional form analogous to " { $link cond } ":"
+{ $subsection match-cond }
+"Pattern replacement:"
+{ $subsection match-replace } ;
+
+ABOUT: "match"

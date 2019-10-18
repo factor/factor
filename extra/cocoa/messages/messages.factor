@@ -3,7 +3,8 @@
 USING: alien alien.c-types alien.compiler
 arrays assocs combinators compiler inference.transforms kernel
 math namespaces parser prettyprint prettyprint.sections
-quotations sequences strings words cocoa.runtime io macros ;
+quotations sequences strings words cocoa.runtime io macros
+memoize debugger ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -20,10 +21,8 @@ IN: cocoa.messages
 SYMBOL: message-senders
 SYMBOL: super-message-senders
 
-global [
-    message-senders [ H{ } assoc-like ] change
-    super-message-senders [ H{ } assoc-like ] change
-] bind
+message-senders global [ H{ } assoc-like ] change-at
+super-message-senders global [ H{ } assoc-like ] change-at
 
 : cache-stub ( method function hash -- )
     [
@@ -44,7 +43,7 @@ global [
 
 TUPLE: selector name object ;
 
-: <selector> ( name -- sel ) f \ selector construct-boa ;
+MEMO: <selector> ( name -- sel ) f \ selector construct-boa ;
 
 : selector ( selector -- alien )
     dup selector-object expired? [
@@ -54,34 +53,31 @@ TUPLE: selector name object ;
         selector-object
     ] if ;
 
-SYMBOL: selectors
-
-H{ } clone selectors set-global
-
-: cache-selector ( string -- selector )
-    selectors get-global [ <selector> ] cache ;
-
 SYMBOL: objc-methods
 
-H{ } clone objc-methods set-global
+objc-methods global [ H{ } assoc-like ] change-at
 
 : lookup-method ( selector -- method )
     dup objc-methods get at
     [ ] [ "No such method: " swap append throw ] ?if ;
 
-: make-prepare-send ( selector method super? -- quot )
+: make-dip ( quot n -- quot' )
+    dup
+    \ >r <repetition> >quotation -rot
+    \ r> <repetition> >quotation 3append ;
+
+MEMO: make-prepare-send ( selector method super? -- quot )
     [
         [ \ <super> , ] when
-        swap cache-selector , \ selector ,
+        swap <selector> , \ selector ,
     ] [ ] make
     swap second length 2 - make-dip ;
 
 MACRO: (send) ( selector super? -- quot )
-    [
-        >r dup lookup-method r>
-        [ make-prepare-send % ] 2keep
-        super-message-senders message-senders ? get at ,
-    ] [ ] make ;
+    >r dup lookup-method r>
+    [ make-prepare-send ] 2keep
+    super-message-senders message-senders ? get at
+    [ slip execute ] 2curry ;
 
 : send ( args... receiver selector -- return... ) f (send) ; inline
 
@@ -205,8 +201,11 @@ H{
 : import-objc-class ( name quot -- )
     2dup unless-defined
     dupd define-objc-class-word
-    dup objc-class register-objc-methods
-    objc-meta-class register-objc-methods ;
+    [
+        dup
+        objc-class register-objc-methods
+        objc-meta-class register-objc-methods
+    ] curry try ;
 
 : root-class ( class -- root )
     dup objc-class-super-class [ root-class ] [ ] ?if ;

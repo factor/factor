@@ -100,12 +100,3 @@ FUNCTION: void* glXGetProcAddress ( char* procname ) ;
 
 : destroy-glx ( GLXContext -- )
     dpy get swap glXDestroyContext ;
-
-: copy-sub-buffer-supported? ( -- ? )
-    "GLX_MESA_copy_sub_buffer"
-    dpy get scr get glXQueryExtensionsString subseq? ;
-
-: glXCopySubBufferMESA ( dpy drawable x y width height -- )
-    "glXCopySubBufferMESA" glXGetProcAddress
-    "void" { "Display*" "GLXDrawable" "int" "int" "int" "int" }
-    "cdecl" alien-indirect ;

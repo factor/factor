@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays cocoa cocoa.application command-line help.topics
+USING: arrays cocoa cocoa.application command-line
 kernel memory namespaces cocoa.messages cocoa.runtime
 cocoa.subclassing cocoa.pasteboard cocoa.types cocoa.windows
 cocoa.classes cocoa.application sequences system ui ui.backend
 ui.clipboards ui.gadgets ui.gadgets.worlds ui.cocoa.views
-core-foundation ;
+core-foundation threads ;
 IN: ui.cocoa
 
 TUPLE: cocoa-ui-backend ;
@@ -19,7 +19,7 @@ SYMBOL: stop-after-last-window?
 : event-loop ( -- )
     event-loop? [
         [
-            [ NSApp do-events ui-step ] ui-try
+            [ NSApp do-events ui-step 10 sleep ] ui-try
         ] with-autorelease-pool event-loop
     ] when ;
 
@@ -60,11 +60,18 @@ M: cocoa-ui-backend set-title ( string world -- )
         drop
     ] if ;
 
-M: cocoa-ui-backend (open-world-window) ( world -- )
+M: cocoa-ui-backend (open-window) ( world -- )
     dup gadget-window
-    dup start-world
     dup auto-position
     world-handle second f -> makeKeyAndOrderFront: ;
+
+M: cocoa-ui-backend (close-window) ( handle -- )
+    first unregister-window ;
+
+M: cocoa-ui-backend close-window ( gadget -- )
+    find-world [
+        world-handle second f -> performClose:
+    ] when* ;
 
 M: cocoa-ui-backend raise-window ( world -- )
     world-handle [
@@ -84,7 +91,7 @@ M: cocoa-ui-backend ui
     "UI" assert.app [
         [
             init-clipboard
-            cocoa-init-hook get call
+            cocoa-init-hook get [ call ] when*
             start-ui
             finish-launching
             event-loop

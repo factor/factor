@@ -72,7 +72,7 @@ $nl
 "Once the output sections have been generated, the tree of sections is traversed and intelligent decisions are made about indentation and line breaks. Finally, text is output."
 { $subsection section }
 "Adding leaf sections:"
-{ $subsection break }
+{ $subsection line-break }
 { $subsection text }
 { $subsection styled-text }
 "Nesting and denesting sections:"
@@ -203,8 +203,8 @@ HELP: stack.
 { $notes "This word is used in the implementation of " { $link .s } " and " { $link .r } "." } ;
 
 HELP: callstack.
-{ $values { "interp" "a sequence of interpreter stack frames" } { "compiled" "a sequence of compiled stack frames" } }
-{ $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame." } ;
+{ $values { "callstack" callstack } }
+{ $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame with " { $link -> } "." } ;
 
 HELP: .c
 { $description "Displays the contents of the call stack, with the top of the stack printed first." } ;

@@ -13,10 +13,6 @@ SYMBOL: length-limit
 SYMBOL: line-limit
 SYMBOL: string-limit
 
-! Special trick to highlight a word in a quotation
-SYMBOL: hilite-quotation
-SYMBOL: hilite-index
-
 global [
     4 tab-size set
     64 margin set

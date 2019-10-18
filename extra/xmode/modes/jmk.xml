@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="#" />
+		<PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+		<PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- Comment -->
+		<EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+		<!-- Literals -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<!-- Brackets -->
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>cat</KEYWORD1>
+			<KEYWORD1>copy</KEYWORD1>
+			<KEYWORD1>create</KEYWORD1>
+			<KEYWORD1>delall</KEYWORD1>
+			<KEYWORD1>delete</KEYWORD1>
+			<KEYWORD1>dirs</KEYWORD1>
+			<KEYWORD1>equal</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>exec</KEYWORD1>
+			<KEYWORD1>first</KEYWORD1>
+			<KEYWORD1>forname</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>getprop</KEYWORD1>
+			<KEYWORD1>glob</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>join</KEYWORD1>
+			<KEYWORD1>load</KEYWORD1>
+			<KEYWORD1>mkdir</KEYWORD1>
+			<KEYWORD1>mkdirs</KEYWORD1>
+			<KEYWORD1>note</KEYWORD1>
+			<KEYWORD1>patsubst</KEYWORD1>
+			<KEYWORD1>rename</KEYWORD1>
+			<KEYWORD1>rest</KEYWORD1>
+			<KEYWORD1>subst</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+			<KEYWORD2>@</KEYWORD2>
+			<KEYWORD2>?</KEYWORD2>
+			<KEYWORD2>&lt;</KEYWORD2>
+			<KEYWORD2>%</KEYWORD2>
+			<KEYWORD3>include</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+</MODE>

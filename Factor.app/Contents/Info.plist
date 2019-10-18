@@ -22,7 +22,7 @@
 	<key>CFBundleExecutable</key>
 	<string>factor</string>
 	<key>CFBundleIconFile</key>
-	<string>FRaptorMix.icns</string>
+	<string>Factor.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.factorcode.Factor</string>
 	<key>CFBundleInfoDictionaryVersion</key>

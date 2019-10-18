@@ -13,10 +13,8 @@
 #if defined(WINDOWS)
 	#if defined(WINCE)
 		#include "os-windows-ce.h"
-	#elif defined (__i386)
-		#include "os-windows-nt.h"
 	#else
-		#error "Unsupported Windows flavor"
+		#include "os-windows-nt.h"
 	#endif
 
 	#include "os-windows.h"
@@ -29,9 +27,11 @@
 		#include "mach_signal.h"
 		
 		#ifdef FACTOR_X86
-			#include "os-macosx-x86.h"
+			#include "os-macosx-x86.32.h"
 		#elif defined(FACTOR_PPC)
 			#include "os-macosx-ppc.h"
+		#elif defined(FACTOR_AMD64)
+			#include "os-macosx-x86.64.h"
 		#else
 			#error "Unsupported Mac OS X flavor"
 		#endif
@@ -42,14 +42,20 @@
 			#define FACTOR_OS_STRING "freebsd"
 			#include "os-freebsd.h"
 			#include "os-unix-ucontext.h"
+			
+			#if defined(FACTOR_X86)
+				#include "os-freebsd-x86.32.h"
+			#else
+				#error "Unsupported FreeBSD flavor"
+			#endif
 		#elif defined(__OpenBSD__)
 			#define FACTOR_OS_STRING "openbsd"
 			#include "os-openbsd.h"
 
 			#if defined(FACTOR_X86)
-				#include "os-openbsd-x86.h"
+				#include "os-openbsd-x86.32.h"
 			#elif defined(FACTOR_AMD64)
-				#include "os-openbsd-amd64.h"
+				#include "os-openbsd-x86.64.h"
 			#else
 				#error "Unsupported OpenBSD flavor"
 			#endif
@@ -59,13 +65,14 @@
 
 			#if defined(FACTOR_X86)
 				#include "os-unix-ucontext.h"
+				#include "os-linux-x86-32.h"
 			#elif defined(FACTOR_PPC)
 				#include "os-unix-ucontext.h"
 				#include "os-linux-ppc.h"
 			#elif defined(FACTOR_ARM)
 				#include "os-linux-arm.h"
 			#elif defined(FACTOR_AMD64)
-				#include "os-unix-ucontext.h"
+				#include "os-linux-x86-64.h"
 			#else
 				#error "Unsupported Linux flavor"
 			#endif
@@ -80,11 +87,13 @@
 #endif
 
 #if defined(FACTOR_X86)
+	#include "cpu-x86.32.h"
+	#include "cpu-x86.h"
+#elif defined(FACTOR_AMD64)
+	#include "cpu-x86.64.h"
 	#include "cpu-x86.h"
 #elif defined(FACTOR_PPC)
 	#include "cpu-ppc.h"
-#elif defined(FACTOR_AMD64)
-	#include "cpu-amd64.h"
 #elif defined(FACTOR_ARM)
 	#include "cpu-arm.h"
 #else

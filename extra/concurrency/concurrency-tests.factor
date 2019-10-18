@@ -3,7 +3,7 @@
 !
 USING: kernel concurrency threads vectors arrays sequences
 namespaces tools.test continuations dlists strings math words
-match quotations ;
+match quotations concurrency.private ;
 IN: temporary
 
 [ V{ 1 2 3 } ] [
@@ -109,3 +109,23 @@ SYMBOL: value
   [ value , self , ] { } make swap send 
   receive
 ] unit-test
+
+! The following unit test blocks forever if the
+! exception does not propogate. Uncomment when
+! this is fixed (via a timeout).
+! [
+!  [ "this should propogate" throw ] future ?future 
+! ] unit-test-fails
+
+[ ] [
+  [ "this should not propogate" throw ] future drop 
+] unit-test
+
+[ f ] [
+  [ 1 drop ] spawn 100 sleep process-pid get-process
+] unit-test
+
+[ f ] [
+  [ "testing unregistering on error" throw ] spawn 
+  100 sleep process-pid get-process
+] unit-test 

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+<!--
+	** jEdit edit mode for gettext catalogs (.po/.pot extension)
+	** Use the ConfigurableFoldHandler plugin for optimal
+	** results. =)
+-->
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="# " />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		<!-- Comments -->
+		<EOL_SPAN TYPE="COMMENT2">#:</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT1"># </EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT2">#.</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT2">#~</EOL_SPAN>
+
+		<MARK_FOLLOWING TYPE="COMMENT2">#,</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD3">%</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD3">$</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD3">@</MARK_FOLLOWING>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="QUOTED" >
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- keywords -->
+		<KEYWORDS>
+			<KEYWORD1>msgid</KEYWORD1>
+			<KEYWORD1>msgid_plural</KEYWORD1>
+			<KEYWORD1>msgstr</KEYWORD1>
+			<KEYWORD2>fuzzy</KEYWORD2>
+<!--		** Ideally, we'd highlight the next msgstr differently
+			** whenever fuzzy is encountered, but this doesn't seem
+			** to be possible just yet.
+-->
+			<KEYWORD2>c-format</KEYWORD2>
+			<KEYWORD2>no-c-format</KEYWORD2>
+		</KEYWORDS>
+
+	</RULES>
+
+	<RULES SET="QUOTED" DEFAULT="LITERAL1">
+		<SPAN TYPE="LITERAL2" NO_LINE_BREAK="TRUE">
+			<BEGIN>\"</BEGIN>
+			<END>\"</END>
+		</SPAN>
+
+		<MARK_FOLLOWING TYPE="KEYWORD3">%</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD3">$</MARK_FOLLOWING>
+		<MARK_FOLLOWING TYPE="KEYWORD3">@</MARK_FOLLOWING>
+	</RULES>
+
+</MODE>

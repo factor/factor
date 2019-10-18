@@ -1,0 +1,166 @@
+<!-- Syntax tokens -->
+<!ENTITY % token_values "NULL | COMMENT1 | COMMENT2 | COMMENT3 | COMMENT4 |
+	DIGIT | FUNCTION | INVALID | KEYWORD1 | KEYWORD2 | KEYWORD3 | KEYWORD4 |
+	LABEL | LITERAL1 | LITERAL2 | LITERAL3 | LITERAL4 | MARKUP | OPERATOR" >
+<!ENTITY % tokens "( %token_values; )" >
+
+<!-- Entities for attributes shared by multiple rules -->
+<!ENTITY % att-bool '( TRUE | FALSE ) #IMPLIED' >
+<!ENTITY % att-type 'TYPE %tokens; #IMPLIED' >
+<!ENTITY % att-position-mix 'AT_LINE_START %att-bool;
+	AT_WHITESPACE_END %att-bool;
+	AT_WORD_START %att-bool; ' >
+<!ENTITY % att-match-type 'MATCH_TYPE ( %token_values; | CONTEXT | RULE ) #IMPLIED' >
+<!ENTITY % att-delegate 'DELEGATE CDATA #IMPLIED' >
+<!ENTITY % att-span-mix 'NO_LINE_BREAK %att-bool;
+	NO_WORD_BREAK %att-bool;
+	NO_ESCAPE %att-bool; '>
+<!ENTITY % att-hash-char 'HASH_CHAR CDATA #IMPLIED
+	HASH_CHARS CDATA #IMPLIED' >
+
+<!-- MODE element -->
+<!ELEMENT MODE ( PROPS?, RULES* ) >
+
+<!-- MODE children -->
+<!-- PROPS element -->
+<!ELEMENT PROPS ( PROPERTY+ ) >
+
+<!-- PROPS children -->
+<!ELEMENT PROPERTY EMPTY >
+<!ATTLIST PROPERTY
+	NAME CDATA #REQUIRED
+	VALUE CDATA #REQUIRED >
+
+<!-- RULES element -->
+<!ELEMENT RULES ( PROPS?, ( IMPORT | TERMINATE | SEQ | SEQ_REGEXP | SPAN
+	| SPAN_REGEXP | EOL_SPAN | EOL_SPAN_REGEXP | MARK_PREVIOUS
+	| MARK_FOLLOWING )*, KEYWORDS? ) >
+
+<!-- RULES attributes -->
+<!ATTLIST RULES
+	SET CDATA #IMPLIED
+	IGNORE_CASE %att-bool;
+	HIGHLIGHT_DIGITS %att-bool;
+	DIGIT_RE CDATA #IMPLIED
+	ESCAPE CDATA #IMPLIED
+	DEFAULT %tokens; #IMPLIED
+	NO_WORD_SEP CDATA #IMPLIED >
+
+<!-- IMPORT element -->
+<!ELEMENT IMPORT EMPTY >
+<!ATTLIST IMPORT DELEGATE CDATA #REQUIRED >
+
+<!-- TERMINATE element -->
+<!ELEMENT TERMINATE EMPTY >
+<!ATTLIST TERMINATE AT_CHAR CDATA #REQUIRED >
+
+<!-- SEQ element -->
+<!ELEMENT SEQ ( #PCDATA ) >
+
+<!-- SEQ attributes -->
+<!ATTLIST SEQ
+	%att-type;
+	%att-position-mix;
+	%att-delegate; >
+
+<!-- SEQ_REGEXP element -->
+<!ELEMENT SEQ_REGEXP ( #PCDATA ) >
+
+<!-- SEQ_REGEXP attributes -->
+<!ATTLIST SEQ_REGEXP
+	%att-hash-char;
+	%att-type;
+	%att-position-mix;
+	%att-delegate; >
+
+<!-- SPAN element -->
+<!ELEMENT SPAN ( BEGIN, END ) >
+
+<!-- SPAN attributes -->
+<!ATTLIST SPAN
+	%att-type;
+	%att-position-mix;
+	%att-span-mix;
+	%att-match-type;
+	%att-delegate; >
+
+<!-- SPAN_REGEXP element -->
+<!ELEMENT SPAN_REGEXP ( BEGIN, END ) >
+
+<!-- SPAN_REGEXP attributes -->
+<!ATTLIST SPAN_REGEXP
+	%att-hash-char;
+	%att-type;
+	%att-position-mix;
+	%att-span-mix;
+	%att-match-type;
+	%att-delegate; >
+
+<!-- SPAN and SPAN_REGEXP children -->
+<!ELEMENT BEGIN ( #PCDATA ) >
+<!ATTLIST BEGIN %att-position-mix; >
+<!ELEMENT END ( #PCDATA ) >
+<!ATTLIST END %att-position-mix; >
+
+<!-- EOL_SPAN element -->
+<!ELEMENT EOL_SPAN ( #PCDATA ) >
+
+<!-- EOL_SPAN attributes -->
+<!ATTLIST EOL_SPAN
+	%att-type;
+	%att-position-mix;
+	%att-match-type;
+	%att-delegate; >
+
+<!-- EOL_SPAN_REGEXP element -->
+<!ELEMENT EOL_SPAN_REGEXP ( #PCDATA ) >
+
+<!-- EOL_SPAN_REGEXP attributes -->
+<!ATTLIST EOL_SPAN_REGEXP
+	%att-hash-char;
+	%att-type;
+	%att-position-mix;
+	%att-match-type;
+	%att-delegate; >
+
+<!-- MARK_FOLLOWING element -->
+<!ELEMENT MARK_FOLLOWING ( #PCDATA ) >
+
+<!-- MARK_FOLLOWING attributes -->
+<!ATTLIST MARK_FOLLOWING
+	%att-type;
+	%att-position-mix;
+	%att-match-type; >
+
+<!-- MARK_PREVIOUS element -->
+<!ELEMENT MARK_PREVIOUS ( #PCDATA ) >
+
+<!-- MARK_PREVIOUS attributes -->
+<!ATTLIST MARK_PREVIOUS
+	%att-type;
+	%att-position-mix;
+	%att-match-type; >
+
+<!-- KEYWORDS element -->
+<!ELEMENT KEYWORDS (%tokens;)+ >
+
+<!-- KEYWORDS children -->
+<!ELEMENT COMMENT1 ( #PCDATA ) >
+<!ELEMENT COMMENT2 ( #PCDATA ) >
+<!ELEMENT COMMENT3 ( #PCDATA ) >
+<!ELEMENT COMMENT4 ( #PCDATA ) >
+<!ELEMENT DIGIT ( #PCDATA ) >
+<!ELEMENT FUNCTION ( #PCDATA ) >
+<!ELEMENT KEYWORD1 ( #PCDATA ) >
+<!ELEMENT KEYWORD2 ( #PCDATA ) >
+<!ELEMENT KEYWORD3 ( #PCDATA ) >
+<!ELEMENT KEYWORD4 ( #PCDATA ) >
+<!ELEMENT LABEL ( #PCDATA ) >
+<!ELEMENT LITERAL1 ( #PCDATA ) >
+<!ELEMENT LITERAL2 ( #PCDATA ) >
+<!ELEMENT LITERAL3 ( #PCDATA ) >
+<!ELEMENT LITERAL4 ( #PCDATA ) >
+<!ELEMENT MARKUP ( #PCDATA ) >
+<!ELEMENT NULL ( #PCDATA ) >
+<!ELEMENT OPERATOR ( #PCDATA ) >
+<!ELEMENT INVALID ( #PCDATA ) >

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel kernel.private slots.private math
 namespaces sequences vectors words quotations definitions
-hashtables layouts combinators generic classes classes.private ;
+hashtables layouts combinators combinators.private generic
+classes classes.private ;
 IN: generic.standard
 
 TUPLE: standard-combination # ;
@@ -11,9 +12,15 @@ C: <standard-combination> standard-combination
 
 SYMBOL: (dispatch#)
 
-: pickers { [ dup ] [ over ] [ pick ] } ; inline
+: (picker) ( n -- quot )
+    {
+        { 0 [ [ dup ] ] }
+        { 1 [ [ over ] ] }
+        { 2 [ [ pick ] ] }
+        [ 1- (picker) [ >r ] swap [ r> swap ] 3append ]
+    } case ;
 
-: picker ( -- quot ) \ (dispatch#) get pickers nth ;
+: picker ( -- quot ) \ (dispatch#) get (picker) ;
 
 : unpickers { [ nip ] [ >r nip r> swap ] [ >r >r nip r> r> -rot ] } ; inline
 
@@ -115,15 +122,15 @@ TUPLE: no-method object generic ;
 : flatten-methods ( methods -- newmethods )
     [ [ flatten-method ] assoc-each ] V{ } make-assoc ;
 
-: generic-tags ( methods -- seq )
-    keys object bootstrap-word swap remove
-    [ types ] map concat prune ;
+: dispatched-types ( methods -- seq )
+    keys object bootstrap-word swap remove prune ;
 
 : single-combination ( methods -- quot )
     dup length 4 <= [
         small-generic
     ] [
-        dup generic-tags [ tag-mask get < ] all?
+        flatten-methods
+        dup dispatched-types [ number class< ] all?
         [ tag-generic ] [ big-generic ] if
     ] if ;
 
@@ -132,9 +139,7 @@ TUPLE: no-method object generic ;
 
 M: standard-combination perform-combination
     standard-combination-# (dispatch#) [
-        dup standard-methods
-        swap "inline" word-prop [ flatten-methods ] unless
-        single-combination
+        standard-methods single-combination
     ] with-variable ;
 
 : default-hook-method ( word -- pair )
@@ -152,7 +157,7 @@ M: hook-combination perform-combination
     0 (dispatch#) [
         [
             hook-combination-var [ get ] curry %
-            hook-methods flatten-methods single-combination %
+            hook-methods single-combination %
         ] [ ] make
     ] with-variable ;
 

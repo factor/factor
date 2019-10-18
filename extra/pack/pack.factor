@@ -1,7 +1,8 @@
 USING: alien alien.c-types arrays assocs byte-arrays inference
 inference.transforms io io.binary io.streams.string kernel
 math math.parser namespaces parser prettyprint
-quotations sequences strings threads vectors words macros ;
+quotations sequences strings threads vectors
+words macros ;
 IN: pack
 
 SYMBOL: big-endian
@@ -9,11 +10,8 @@ SYMBOL: big-endian
 : big-endian? ( -- ? )
     1 <int> *char zero? ;
 
-: bit-set? ( m n -- ? )
-    1 swap shift bitand zero? not ;
-
 : clear-bit ( m n -- o )
-    1 swap shift bitnot bitand ;
+    2^ bitnot bitand ;
 
 : >endian ( obj n -- str )
     big-endian get [ >be ] [ >le ] if ; inline
@@ -26,7 +24,7 @@ M: integer b, ( m n -- ) >endian % ;
 
 ! for doing native, platform-dependent sized values
 M: string b, ( n string -- ) heap-size b, ;
-: read-native ( string -- ) heap-size read endian> ;
+: read-native ( string -- n ) heap-size read endian> ;
 
 ! Portable
 : s8, ( n -- ) 1 b, ;
@@ -89,12 +87,13 @@ M: string b, ( n string -- ) heap-size b, ;
 : read-c-string ( -- str/f )
     "\0" read-until [ drop f ] unless ;
 
+: read-c-string* ( n -- str/f )
+    read [ 0 = ] right-trim dup empty? [ drop f ] when ;
+
 : (read-128-ber) ( n -- n )
     1 read first
     [ >r 7 shift r> 7 clear-bit bitor ] keep
-    7 bit-set? [
-        (read-128-ber)
-    ] when ;
+    7 bit? [ (read-128-ber) ] when ;
     
 : read-128-ber ( -- n )
     0 (read-128-ber) ;

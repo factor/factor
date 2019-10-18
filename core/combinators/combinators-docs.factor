@@ -1,11 +1,10 @@
 USING: arrays help.markup help.syntax strings sbufs vectors
 kernel quotations generic generic.standard classes
-math assocs ;
+math assocs sequences combinators.private ;
 IN: combinators
 
 ARTICLE: "combinators-quot" "Quotation construction utilities"
 "Some words for creating quotations which can be useful for implementing method combinations and compiler transforms:"
-{ $subsection make-dip }
 { $subsection cond>quot }
 { $subsection case>quot }
 { $subsection alist>quot }
@@ -26,13 +25,6 @@ ARTICLE: "combinators" "Additional combinators"
 { $see-also "quotations" "basic-combinators" } ;
 
 ABOUT: "combinators"
-
-HELP: make-dip
-{ $values { "quot" "a quotation" } { "n" "a non-negative integer" } { "newquot" "a new quotation" } }
-{ $description "Constructs a quotation which retains the top " { $snippet "n" } " stack items, and applies " { $snippet "quot" } " to what is underneath." }
-{ $examples
-    { $example "USE: quotations" "[ 3 + ] 2 make-dip ." "[ >r >r 3 + r> r> ]" }
-} ;
 
 HELP: alist>quot
 { $values { "default" "a quotation" } { "assoc" "a sequence of quotation pairs" } { "quot" "a new quotation" } }
@@ -91,10 +83,10 @@ HELP: no-case
 { $error-description "Thrown by " { $link case } " if the object at the top of the stack does not match any case, and no default case is given." } ;
 
 HELP: with-datastack
-{ $values { "stack" "a sequence" } { "quot" quotation } { "newstack" "a sequence" } }
+{ $values { "stack" sequence } { "quot" quotation } { "newstack" sequence } }
 { $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
 { $examples
-    { $example "{ 3 7 } [ + ] with-datastack ." "V{ 10 }" }
+    { $example "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
 } ;
 
 HELP: recursive-hashcode
@@ -125,3 +117,8 @@ HELP: hash-case>quot
 $nl
 "The quotation uses an efficient hash-based search to avoid testing the object against all possible keys." }
 { $notes "This word is used behind the scenes to compile " { $link case } " forms efficiently; it can also be called directly,  which is useful for meta-programming." } ;
+
+HELP: dispatch ( n array -- )
+{ $values { "n" "a fixnum" } { "array" "an array of quotations" } }
+{ $description "Calls the " { $snippet "n" } "th quotation in the array." }
+{ $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;

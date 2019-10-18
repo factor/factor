@@ -11,5 +11,5 @@ IN: temporary
 
 [ f ] [ make-100-randoms make-100-randoms = ] unit-test
 
-[ 708 ] [ 0 init-random 1000 [ random drop ] each 1000 random ] unit-test
-[ 359 ] [ 0 init-random 10000 [ random drop ] each 1000 random ] unit-test
+[ 1333075495 ] [ 0 init-random 1000 [ drop (random) drop ] each (random) ] unit-test
+[ 1575309035 ] [ 0 init-random 10000 [ drop (random) drop ] each (random) ] unit-test

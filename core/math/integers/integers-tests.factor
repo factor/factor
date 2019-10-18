@@ -1,4 +1,4 @@
-USING: kernel math namespaces prettyprint math.functions
+USING: kernel math namespaces prettyprint
 math.private continuations tools.test sequences ;
 IN: temporary
 
@@ -31,30 +31,6 @@ IN: temporary
 
 [ 5 ] [ 2 >bignum 3 >bignum + ] unit-test
 
-[ 100 ] [ 100 100 gcd ] unit-test
-[ 100 ] [ 1000 100 gcd ] unit-test
-[ 100 ] [ 100 1000 gcd ] unit-test
-[ 4 ] [ 132 64 gcd ] unit-test
-[ 4 ] [ -132 64 gcd ] unit-test
-[ 4 ] [ -132 -64 gcd ] unit-test
-[ 4 ] [ 132 -64 gcd ] unit-test
-[ 4 ] [ -132 -64 gcd ] unit-test
-
-[ 100 ] [ 100 >bignum 100 >bignum gcd ] unit-test
-[ 100 ] [ 1000 >bignum 100 >bignum gcd ] unit-test
-[ 100 ] [ 100 >bignum 1000 >bignum gcd ] unit-test
-[ 4 ] [ 132 >bignum 64 >bignum gcd ] unit-test
-[ 4 ] [ -132 >bignum 64 >bignum gcd ] unit-test
-[ 4 ] [ -132 >bignum -64 >bignum gcd ] unit-test
-[ 4 ] [ 132 >bignum -64 >bignum gcd ] unit-test
-[ 4 ] [ -132 >bignum -64 >bignum gcd ] unit-test
-
-[ 6 ] [
-    1326264299060955293181542400000006
-    1591517158873146351817850880000000
-    gcd
-] unit-test
-
 [ -10000000001981284352 ] [
     -10000000000000000000
     HEX: -100000000 bitand
@@ -81,21 +57,39 @@ IN: temporary
 [ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
 unit-test
 
-[ t ] [ 0 0 ^ fp-nan? ] unit-test
-[ 1 ] [ 10 0 ^ ] unit-test
-[ 1/8 ] [ 1/2 3 ^ ] unit-test
-[ 1/8 ] [ 2 -3 ^ ] unit-test
-[ t ] [ 1 100 shift 2 100 ^ = ] unit-test
-
-[ t ] [ 256 power-of-2? ] unit-test
-[ f ] [ 123 power-of-2? ] unit-test
+[ 7 ] [ 255 log2 ] unit-test
 [ 8 ] [ 256 log2 ] unit-test
-[ 0 ] [ 1 log2 ] unit-test
+[ 8 ] [ 257 log2 ] unit-test
+[ 0 ] [ 1   log2 ] unit-test
 
-[ 1 ] [ 7/8 ceiling ] unit-test
-[ 2 ] [ 3/2 ceiling ] unit-test
-[ 0 ] [ -7/8 ceiling ] unit-test
-[ -1 ] [ -3/2 ceiling ] unit-test
+[ 7 ] [ 255 >bignum log2 ] unit-test
+[ 8 ] [ 256 >bignum log2 ] unit-test
+[ 8 ] [ 257 >bignum log2 ] unit-test
+[ 0 ] [ 1   >bignum log2 ] unit-test
+
+[ t ] [ BIN: 1101 0 bit? ] unit-test
+[ f ] [ BIN: 1101 1 bit? ] unit-test
+[ t ] [ BIN: 1101 2 bit? ] unit-test
+[ t ] [ BIN: 1101 3 bit? ] unit-test
+[ f ] [ BIN: 1101 4 bit? ] unit-test
+
+[ t ] [ BIN: 1101 >bignum 0 bit? ] unit-test
+[ f ] [ BIN: 1101 >bignum 1 bit? ] unit-test
+[ t ] [ BIN: 1101 >bignum 2 bit? ] unit-test
+[ t ] [ BIN: 1101 >bignum 3 bit? ] unit-test
+[ f ] [ BIN: 1101 >bignum 4 bit? ] unit-test
+
+[ t ] [ BIN: -1101 0 bit? ] unit-test
+[ t ] [ BIN: -1101 1 bit? ] unit-test
+[ f ] [ BIN: -1101 2 bit? ] unit-test
+[ f ] [ BIN: -1101 3 bit? ] unit-test
+[ t ] [ BIN: -1101 4 bit? ] unit-test
+
+[ t ] [ BIN: -1101 >bignum 0 bit? ] unit-test
+[ t ] [ BIN: -1101 >bignum 1 bit? ] unit-test
+[ f ] [ BIN: -1101 >bignum 2 bit? ] unit-test
+[ f ] [ BIN: -1101 >bignum 3 bit? ] unit-test
+[ t ] [ BIN: -1101 >bignum 4 bit? ] unit-test
 
 [ 2 ] [ 0 next-power-of-2 ] unit-test
 [ 2 ] [ 1 next-power-of-2 ] unit-test
@@ -104,10 +98,8 @@ unit-test
 [ 16 ] [ 13 next-power-of-2 ] unit-test
 [ 16 ] [ 16 next-power-of-2 ] unit-test
 
-[ 268435456 ] [ -268435456 >fixnum -1 / ] unit-test
 [ 268435456 ] [ -268435456 >fixnum -1 /i ] unit-test
 [ 268435456 0 ] [ -268435456 >fixnum -1 /mod ] unit-test
-[ 1/268435456 ] [ -1 -268435456 >fixnum / ] unit-test
 [ 0 ] [ -1 -268435456 >fixnum /i ] unit-test
 [ 0 -1 ] [ -1 -268435456 >fixnum /mod ] unit-test
 [ 14355 ] [ 1591517158873146351817850880000000 32769 mod ] unit-test
@@ -180,3 +172,15 @@ unit-test
 [ 10 ] [ 10 2 align ] unit-test
 [ 14 ] [ 13 2 align ] unit-test
 [ 11 ] [ 11 1 align ] unit-test
+
+[ HEX: 332211 ] [
+    B{ HEX: 11 HEX: 22 HEX: 33 } byte-array>bignum
+] unit-test
+
+[ HEX: 7a2c793b2ff08554 ] [
+    B{ HEX: 54 HEX: 85 HEX: f0 HEX: 2f HEX: 3b HEX: 79 HEX: 2c HEX: 7a } byte-array>bignum
+] unit-test
+
+[ HEX: 988a259c3433f237 ] [
+    B{ HEX: 37 HEX: f2 HEX: 33 HEX: 34 HEX: 9c HEX: 25 HEX: 8a HEX: 98 } byte-array>bignum
+] unit-test

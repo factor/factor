@@ -3,7 +3,7 @@ USING: alien alien.c-types arrays sequences math
 math.vectors math.matrices math.parser io io.files kernel opengl
 opengl.gl opengl.glu shuffle http.client vectors timers
 namespaces ui.gadgets ui.gadgets.canvas ui.render ui splitting
-combinators tools.time system ;
+combinators tools.time system combinators.lib ;
 IN: bunny
 
 : numbers ( str -- seq )
@@ -57,10 +57,7 @@ IN: bunny
     ] unless ;
 
 : draw-triangle ( ns vs triple -- )
-    [
-        dup roll nth first3 glNormal3d
-        swap nth first3 glVertex3d
-    ] each-with2 ;
+    [ dup roll nth gl-normal swap nth gl-vertex ] each-with2 ;
 
 : draw-bunny ( ns vs is -- )
     GL_TRIANGLES [ [ draw-triangle ] each-with2 ] do-state ;

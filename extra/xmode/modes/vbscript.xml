@@ -1,0 +1,739 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- VBScript mode by Andre Kaplan -->
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="'" />
+	</PROPS>
+
+	<RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- conditional compilation -->
+		<EOL_SPAN TYPE="KEYWORD2">#if</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#else</EOL_SPAN>
+		<EOL_SPAN TYPE="KEYWORD2">#end</EOL_SPAN>
+
+		<EOL_SPAN TYPE="COMMENT1">'</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT1">rem </EOL_SPAN>
+
+		<!-- Comparison operators -->
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">.</SEQ>
+		<!-- See in keywords: is -->
+
+		<!-- Arithmetic operators -->
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">\</SEQ>
+		<!-- See in keywords: mod -->
+		<SEQ TYPE="OPERATOR">^</SEQ>
+
+		<!-- Concatenation operators -->
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<!-- <SEQ TYPE="OPERATOR">+</SEQ> -->
+
+		<!-- Logical operators -->
+		<!-- See in keywords: and, or, not, xor, eqv -->
+
+		<!-- EOL Continuation -->
+<!--		<SEQ TYPE="NULL">_</SEQ>-->
+		<!-- Instruction separator -->
+		<MARK_PREVIOUS TYPE="LABEL" MATCH_TYPE="OPERATOR"
+			AT_LINE_START="TRUE">:</MARK_PREVIOUS>
+
+		<KEYWORDS>
+			<!-- Conditional Statements -->
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>then</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>elseif</KEYWORD1>
+			<KEYWORD1>select</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+
+			<!-- Loop Statements -->
+			<!-- For..Next -->
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>to</KEYWORD1>
+			<KEYWORD1>step</KEYWORD1>
+			<KEYWORD1>next</KEYWORD1>
+			<!-- For Each..Next -->
+			<KEYWORD1>each</KEYWORD1>
+			<KEYWORD1>in</KEYWORD1>
+			<!-- Do..Loop -->
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>until</KEYWORD1>
+			<KEYWORD1>loop</KEYWORD1>
+			<!-- While..Wend -->
+			<KEYWORD1>wend</KEYWORD1>
+
+			<!-- Closing, Exit Statements -->
+			<KEYWORD1>exit</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+
+			<!-- Methods, Functions, Class, Properties, Variables -->
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>sub</KEYWORD1>
+			<KEYWORD1>class</KEYWORD1>
+			<KEYWORD1>property</KEYWORD1>
+			<KEYWORD1>get</KEYWORD1>
+			<KEYWORD1>let</KEYWORD1>
+			<KEYWORD1>set</KEYWORD1>
+
+			<!-- Parameters passing -->
+			<KEYWORD1>byval</KEYWORD1>
+			<KEYWORD1>byref</KEYWORD1>
+
+			<!-- Declaration -->
+			<KEYWORD1>const</KEYWORD1>
+			<KEYWORD1>dim</KEYWORD1>
+			<KEYWORD1>redim</KEYWORD1>
+			<KEYWORD1>preserve</KEYWORD1>
+			<KEYWORD1>as</KEYWORD1>
+
+			<!-- Object Assignement/Instantiation -->
+			<KEYWORD1>set</KEYWORD1>
+			<KEYWORD1>with</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+
+			<!-- Visibility -->
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>private</KEYWORD1>
+
+			<!-- Comments -->
+			<KEYWORD1>rem</KEYWORD1>
+
+			<!-- Function Call - Dynamic Evaluation -->
+			<KEYWORD1>call</KEYWORD1>
+			<KEYWORD1>execute</KEYWORD1>
+			<KEYWORD1>eval</KEYWORD1>
+
+			<!-- Miscellaneous -->
+			<KEYWORD1>on</KEYWORD1>
+			<KEYWORD1>error</KEYWORD1>
+			<KEYWORD1>goto</KEYWORD1>
+			<KEYWORD1>resume</KEYWORD1>
+			<KEYWORD1>option</KEYWORD1>
+			<KEYWORD1>explicit</KEYWORD1>
+			<KEYWORD1>erase</KEYWORD1>
+			<KEYWORD1>randomize</KEYWORD1>
+
+			<!-- Operators -->
+			<!-- Comparison operators -->
+			<OPERATOR>is</OPERATOR>
+			<!-- Arithmetic operators -->
+			<OPERATOR>mod</OPERATOR>
+			<!-- Logical operators -->
+			<OPERATOR>and</OPERATOR>
+			<OPERATOR>or</OPERATOR>
+			<OPERATOR>not</OPERATOR>
+			<OPERATOR>xor</OPERATOR>
+			<OPERATOR>imp</OPERATOR>
+
+			<!-- Datatypes Constants/Literals -->
+			<KEYWORD3>false</KEYWORD3>
+			<KEYWORD3>true</KEYWORD3>
+			<KEYWORD3>empty</KEYWORD3>
+			<KEYWORD3>nothing</KEYWORD3>
+			<KEYWORD3>null</KEYWORD3>
+
+			<!-- VBScript Constants -->
+			<!-- Color constants -->
+			<LITERAL2>vbblack</LITERAL2>
+			<LITERAL2>vbred</LITERAL2>
+			<LITERAL2>vbgreen</LITERAL2>
+			<LITERAL2>vbyellow</LITERAL2>
+			<LITERAL2>vbblue</LITERAL2>
+			<LITERAL2>vbmagenta</LITERAL2>
+			<LITERAL2>vbcyan</LITERAL2>
+			<LITERAL2>vbwhite</LITERAL2>
+
+			<!-- Date & Time Constants -->
+<!--			<LITERAL2>vbSunday</LITERAL2>
+			<LITERAL2>vbMonday</LITERAL2>
+			<LITERAL2>vbTuesday</LITERAL2>
+			<LITERAL2>vbWednesday</LITERAL2>
+			<LITERAL2>vbThursday</LITERAL2>
+			<LITERAL2>vbFriday</LITERAL2>
+			<LITERAL2>vbSaturday</LITERAL2>
+			<LITERAL2>vbUseSystem</LITERAL2>
+			<LITERAL2>vbUseSystemDayOfWeek</LITERAL2>
+			<LITERAL2>vbFirstJan1</LITERAL2>
+			<LITERAL2>vbFirstFourDays</LITERAL2>
+			<LITERAL2>vbFirstFullWeek</LITERAL2>
+-->
+			<!-- Date Format Constants -->
+			<LITERAL2>vbGeneralDate</LITERAL2>
+			<LITERAL2>vbLongDate</LITERAL2>
+			<LITERAL2>vbShortDate</LITERAL2>
+			<LITERAL2>vbLongTime</LITERAL2>
+			<LITERAL2>vbShortTime</LITERAL2>
+
+			<!-- Miscellaneous  -->
+			<LITERAL2>vbObjectError</LITERAL2>
+			<KEYWORD2>Err</KEYWORD2>
+
+			<!-- MsgBox Constants -->
+			<LITERAL2>vbOKOnly</LITERAL2>
+			<LITERAL2>vbOKCancel</LITERAL2>
+			<LITERAL2>vbAbortRetryIgnore</LITERAL2>
+			<LITERAL2>vbYesNoCancel</LITERAL2>
+			<LITERAL2>vbYesNo</LITERAL2>
+			<LITERAL2>vbRetryCancel</LITERAL2>
+			<LITERAL2>vbCritical</LITERAL2>
+			<LITERAL2>vbQuestion</LITERAL2>
+			<LITERAL2>vbExclamation</LITERAL2>
+			<LITERAL2>vbInformation</LITERAL2>
+			<LITERAL2>vbDefaultButton1</LITERAL2>
+			<LITERAL2>vbDefaultButton2</LITERAL2>
+			<LITERAL2>vbDefaultButton3</LITERAL2>
+			<LITERAL2>vbDefaultButton4</LITERAL2>
+			<LITERAL2>vbApplicationModal</LITERAL2>
+			<LITERAL2>vbSystemModal</LITERAL2>
+			<LITERAL2>vbOK</LITERAL2>
+			<LITERAL2>vbCancel</LITERAL2>
+			<LITERAL2>vbAbort</LITERAL2>
+			<LITERAL2>vbRetry</LITERAL2>
+			<LITERAL2>vbIgnore</LITERAL2>
+			<LITERAL2>vbYes</LITERAL2>
+			<LITERAL2>vbNo</LITERAL2>
+
+			<!-- Tristate Constants -->
+			<LITERAL2>vbUseDefault</LITERAL2>
+			<LITERAL2>vbTrue</LITERAL2>
+			<LITERAL2>vbFalse</LITERAL2>
+
+			<!-- String Constants -->
+			<LITERAL2>vbcr</LITERAL2>
+			<LITERAL2>vbcrlf</LITERAL2>
+			<LITERAL2>vbformfeed</LITERAL2>
+			<LITERAL2>vblf</LITERAL2>
+			<LITERAL2>vbnewline</LITERAL2>
+			<LITERAL2>vbnullchar</LITERAL2>
+			<LITERAL2>vbnullstring</LITERAL2>
+			<LITERAL2>vbtab</LITERAL2>
+			<LITERAL2>vbverticaltab</LITERAL2>
+			<!-- VarType Constants -->
+			<LITERAL2>vbempty</LITERAL2>
+			<LITERAL2>vbnull</LITERAL2>
+			<LITERAL2>vbinteger</LITERAL2>
+			<LITERAL2>vblong</LITERAL2>
+			<LITERAL2>vbsingle</LITERAL2>
+			<LITERAL2>vbdouble</LITERAL2>
+			<LITERAL2>vbcurrency</LITERAL2>
+			<LITERAL2>vbdate</LITERAL2>
+			<LITERAL2>vbstring</LITERAL2>
+			<LITERAL2>vbobject</LITERAL2>
+			<LITERAL2>vberror</LITERAL2>
+			<LITERAL2>vbboolean</LITERAL2>
+			<LITERAL2>vbvariant</LITERAL2>
+			<LITERAL2>vbdataobject</LITERAL2>
+			<LITERAL2>vbdecimal</LITERAL2>
+			<LITERAL2>vbbyte</LITERAL2>
+			<LITERAL2>vbarray</LITERAL2>
+
+			<!-- Built-in Functions -->
+			<!-- Array Handling -->
+			<KEYWORD2>array</KEYWORD2>
+			<KEYWORD2>lbound</KEYWORD2>
+			<KEYWORD2>ubound</KEYWORD2>
+			<!-- Conversion Functions (Variant) -->
+			<KEYWORD2>cbool</KEYWORD2>
+			<KEYWORD2>cbyte</KEYWORD2>
+			<KEYWORD2>ccur</KEYWORD2>
+			<KEYWORD2>cdate</KEYWORD2>
+			<KEYWORD2>cdbl</KEYWORD2>
+			<KEYWORD2>cint</KEYWORD2>
+			<KEYWORD2>clng</KEYWORD2>
+			<KEYWORD2>csng</KEYWORD2>
+			<KEYWORD2>cstr</KEYWORD2>
+			<!-- Conversion Functions (Radix) -->
+			<KEYWORD2>hex</KEYWORD2>
+			<KEYWORD2>oct</KEYWORD2>
+			<!-- Date/Time Functions -->
+			<KEYWORD2>date</KEYWORD2>
+			<KEYWORD2>time</KEYWORD2>
+			<KEYWORD2>dateadd</KEYWORD2>
+			<KEYWORD2>datediff</KEYWORD2>
+			<KEYWORD2>datepart</KEYWORD2>
+			<KEYWORD2>dateserial</KEYWORD2>
+			<KEYWORD2>datevalue</KEYWORD2>
+			<KEYWORD2>day</KEYWORD2>
+			<KEYWORD2>month</KEYWORD2>
+			<KEYWORD2>monthname</KEYWORD2>
+			<KEYWORD2>weekday</KEYWORD2>
+			<KEYWORD2>weekdayname</KEYWORD2>
+			<KEYWORD2>year</KEYWORD2>
+			<KEYWORD2>hour</KEYWORD2>
+			<KEYWORD2>minute</KEYWORD2>
+			<KEYWORD2>second</KEYWORD2>
+			<KEYWORD2>now</KEYWORD2>
+			<KEYWORD2>timeserial</KEYWORD2>
+			<KEYWORD2>timevalue</KEYWORD2>
+			<!-- Formatting Strings -->
+			<KEYWORD2>formatcurrency</KEYWORD2>
+			<KEYWORD2>formatdatetime</KEYWORD2>
+			<KEYWORD2>formatnumber</KEYWORD2>
+			<KEYWORD2>formatpercent</KEYWORD2>
+			<!-- Input/Output -->
+			<KEYWORD2>inputbox</KEYWORD2>
+			<KEYWORD2>loadpicture</KEYWORD2>
+			<KEYWORD2>msgbox</KEYWORD2>
+			<!-- Math Functions -->
+			<KEYWORD2>atn</KEYWORD2>
+			<KEYWORD2>cos</KEYWORD2>
+			<KEYWORD2>sin</KEYWORD2>
+			<KEYWORD2>tan</KEYWORD2>
+			<KEYWORD2>exp</KEYWORD2>
+			<KEYWORD2>log</KEYWORD2>
+			<KEYWORD2>sqr</KEYWORD2>
+			<KEYWORD2>rnd</KEYWORD2>
+			<!-- Miscellaneous -->
+			<KEYWORD2>rgb</KEYWORD2>
+			<!-- Objects -->
+			<KEYWORD2>createobject</KEYWORD2>
+			<KEYWORD2>getobject</KEYWORD2>
+			<KEYWORD2>getref</KEYWORD2>
+			<!-- Rounding -->
+			<KEYWORD2>abs</KEYWORD2>
+			<KEYWORD2>int</KEYWORD2>
+			<KEYWORD2>fix</KEYWORD2>
+			<KEYWORD2>round</KEYWORD2>
+			<KEYWORD2>sgn</KEYWORD2>
+			<!-- Script Engine ID -->
+			<KEYWORD2>scriptengine</KEYWORD2>
+			<KEYWORD2>scriptenginebuildversion</KEYWORD2>
+			<KEYWORD2>scriptenginemajorversion</KEYWORD2>
+			<KEYWORD2>scriptengineminorversion</KEYWORD2>
+			<!-- Strings -->
+			<KEYWORD2>asc</KEYWORD2>
+			<KEYWORD2>ascb</KEYWORD2>
+			<KEYWORD2>ascw</KEYWORD2>
+			<KEYWORD2>chr</KEYWORD2>
+			<KEYWORD2>chrb</KEYWORD2>
+			<KEYWORD2>chrw</KEYWORD2>
+			<KEYWORD2>filter</KEYWORD2>
+			<KEYWORD2>instr</KEYWORD2>
+			<KEYWORD2>instrb</KEYWORD2>
+			<KEYWORD2>instrrev</KEYWORD2>
+			<KEYWORD2>join</KEYWORD2>
+			<KEYWORD2>len</KEYWORD2>
+			<KEYWORD2>lenb</KEYWORD2>
+			<KEYWORD2>lcase</KEYWORD2>
+			<KEYWORD2>ucase</KEYWORD2>
+			<KEYWORD2>left</KEYWORD2>
+			<KEYWORD2>leftb</KEYWORD2>
+			<KEYWORD2>mid</KEYWORD2>
+			<KEYWORD2>midb</KEYWORD2>
+			<KEYWORD2>right</KEYWORD2>
+			<KEYWORD2>rightb</KEYWORD2>
+			<KEYWORD2>replace</KEYWORD2>
+			<KEYWORD2>space</KEYWORD2>
+			<KEYWORD2>split</KEYWORD2>
+			<KEYWORD2>strcomp</KEYWORD2>
+			<KEYWORD2>string</KEYWORD2>
+			<KEYWORD2>strreverse</KEYWORD2>
+			<KEYWORD2>ltrim</KEYWORD2>
+			<KEYWORD2>rtrim</KEYWORD2>
+			<KEYWORD2>trim</KEYWORD2>
+			<!-- Variants -->
+			<KEYWORD2>isarray</KEYWORD2>
+			<KEYWORD2>isdate</KEYWORD2>
+			<KEYWORD2>isempty</KEYWORD2>
+			<KEYWORD2>isnull</KEYWORD2>
+			<KEYWORD2>isnumeric</KEYWORD2>
+			<KEYWORD2>isobject</KEYWORD2>
+			<KEYWORD2>typename</KEYWORD2>
+			<KEYWORD2>vartype</KEYWORD2>
+
+			<!-- Comment/Uncomment your favorite ADO Constants-->
+
+			<!-- ADO Constants-->
+
+			<!-- CursorTypeEnum Values -->
+			<LITERAL2>adOpenForwardOnly</LITERAL2>
+			<LITERAL2>adOpenKeyset</LITERAL2>
+			<LITERAL2>adOpenDynamic</LITERAL2>
+			<LITERAL2>adOpenStatic</LITERAL2>
+
+			<!-- CursorOptionEnum Values -->
+<!--		<LITERAL2>adHoldRecords</LITERAL2>
+			<LITERAL2>adMovePrevious</LITERAL2>
+			<LITERAL2>adAddNew</LITERAL2>
+			<LITERAL2>adDelete</LITERAL2>
+			<LITERAL2>adUpdate</LITERAL2>
+			<LITERAL2>adBookmark</LITERAL2>
+			<LITERAL2>adApproxPosition</LITERAL2>
+			<LITERAL2>adUpdateBatch</LITERAL2>
+			<LITERAL2>adResync</LITERAL2>
+			<LITERAL2>adNotify</LITERAL2>
+			<LITERAL2>adFind</LITERAL2>
+			<LITERAL2>adSeek</LITERAL2>
+			<LITERAL2>adIndex</LITERAL2>
+-->
+			<!-- LockTypeEnum Values -->
+			<LITERAL2>adLockReadOnly</LITERAL2>
+			<LITERAL2>adLockPessimistic</LITERAL2>
+			<LITERAL2>adLockOptimistic</LITERAL2>
+			<LITERAL2>adLockBatchOptimistic</LITERAL2>
+
+			<!-- ExecuteOptionEnum Values -->
+			<LITERAL2>adRunAsync</LITERAL2>
+			<LITERAL2>adAsyncExecute</LITERAL2>
+			<LITERAL2>adAsyncFetch</LITERAL2>
+			<LITERAL2>adAsyncFetchNonBlocking</LITERAL2>
+			<LITERAL2>adExecuteNoRecords</LITERAL2>
+
+			<!-- ConnectOptionEnum Values -->
+<!--			<LITERAL2>adAsyncConnect</LITERAL2>
+-->
+			<!-- ObjectStateEnum Values -->
+			<LITERAL2>adStateClosed</LITERAL2>
+			<LITERAL2>adStateOpen</LITERAL2>
+			<LITERAL2>adStateConnecting</LITERAL2>
+			<LITERAL2>adStateExecuting</LITERAL2>
+			<LITERAL2>adStateFetching</LITERAL2>
+
+			<!-- CursorLocationEnum Values -->
+			<LITERAL2>adUseServer</LITERAL2>
+			<LITERAL2>adUseClient</LITERAL2>
+
+			<!-- DataTypeEnum Values -->
+			<LITERAL2>adEmpty</LITERAL2>
+			<LITERAL2>adTinyInt</LITERAL2>
+			<LITERAL2>adSmallInt</LITERAL2>
+			<LITERAL2>adInteger</LITERAL2>
+			<LITERAL2>adBigInt</LITERAL2>
+			<LITERAL2>adUnsignedTinyInt</LITERAL2>
+			<LITERAL2>adUnsignedSmallInt</LITERAL2>
+			<LITERAL2>adUnsignedInt</LITERAL2>
+			<LITERAL2>adUnsignedBigInt</LITERAL2>
+			<LITERAL2>adSingle</LITERAL2>
+			<LITERAL2>adDouble</LITERAL2>
+			<LITERAL2>adCurrency</LITERAL2>
+			<LITERAL2>adDecimal</LITERAL2>
+			<LITERAL2>adNumeric</LITERAL2>
+			<LITERAL2>adBoolean</LITERAL2>
+			<LITERAL2>adError</LITERAL2>
+			<LITERAL2>adUserDefined</LITERAL2>
+			<LITERAL2>adVariant</LITERAL2>
+			<LITERAL2>adIDispatch</LITERAL2>
+			<LITERAL2>adIUnknown</LITERAL2>
+			<LITERAL2>adGUID</LITERAL2>
+			<LITERAL2>adDate</LITERAL2>
+			<LITERAL2>adDBDate</LITERAL2>
+			<LITERAL2>adDBTime</LITERAL2>
+			<LITERAL2>adDBTimeStamp</LITERAL2>
+			<LITERAL2>adBSTR</LITERAL2>
+			<LITERAL2>adChar</LITERAL2>
+			<LITERAL2>adVarChar</LITERAL2>
+			<LITERAL2>adLongVarChar</LITERAL2>
+			<LITERAL2>adWChar</LITERAL2>
+			<LITERAL2>adVarWChar</LITERAL2>
+			<LITERAL2>adLongVarWChar</LITERAL2>
+			<LITERAL2>adBinary</LITERAL2>
+			<LITERAL2>adVarBinary</LITERAL2>
+			<LITERAL2>adLongVarBinary</LITERAL2>
+			<LITERAL2>adChapter</LITERAL2>
+			<LITERAL2>adFileTime</LITERAL2>
+			<LITERAL2>adDBFileTime</LITERAL2>
+			<LITERAL2>adPropVariant</LITERAL2>
+			<LITERAL2>adVarNumeric</LITERAL2>
+
+			<!-- FieldAttributeEnum Values -->
+<!--			<LITERAL2>adFldMayDefer</LITERAL2>
+			<LITERAL2>adFldUpdatable</LITERAL2>
+			<LITERAL2>adFldUnknownUpdatable</LITERAL2>
+			<LITERAL2>adFldFixed</LITERAL2>
+			<LITERAL2>adFldIsNullable</LITERAL2>
+			<LITERAL2>adFldMayBeNull</LITERAL2>
+			<LITERAL2>adFldLong</LITERAL2>
+			<LITERAL2>adFldRowID</LITERAL2>
+			<LITERAL2>adFldRowVersion</LITERAL2>
+			<LITERAL2>adFldCacheDeferred</LITERAL2>
+			<LITERAL2>adFldKeyColumn</LITERAL2>
+-->
+
+			<!-- EditModeEnum Values -->
+<!--			<LITERAL2>adEditNone</LITERAL2>
+			<LITERAL2>adEditInProgress</LITERAL2>
+			<LITERAL2>adEditAdd</LITERAL2>
+			<LITERAL2>adEditDelete</LITERAL2>
+-->
+			<!-- RecordStatusEnum Values -->
+<!--			<LITERAL2>adRecOK</LITERAL2>
+			<LITERAL2>adRecNew</LITERAL2>
+			<LITERAL2>adRecModified</LITERAL2>
+			<LITERAL2>adRecDeleted</LITERAL2>
+			<LITERAL2>adRecUnmodified</LITERAL2>
+			<LITERAL2>adRecInvalid</LITERAL2>
+			<LITERAL2>adRecMultipleChanges</LITERAL2>
+			<LITERAL2>adRecPendingChanges</LITERAL2>
+			<LITERAL2>adRecCanceled</LITERAL2>
+			<LITERAL2>adRecCantRelease</LITERAL2>
+			<LITERAL2>adRecConcurrencyViolation</LITERAL2>
+			<LITERAL2>adRecIntegrityViolation</LITERAL2>
+			<LITERAL2>adRecMaxChangesExceeded</LITERAL2>
+			<LITERAL2>adRecObjectOpen</LITERAL2>
+			<LITERAL2>adRecOutOfMemory</LITERAL2>
+			<LITERAL2>adRecPermissionDenied</LITERAL2>
+			<LITERAL2>adRecSchemaViolation</LITERAL2>
+			<LITERAL2>adRecDBDeleted</LITERAL2>
+-->
+			<!-- GetRowsOptionEnum Values -->
+<!--			<LITERAL2>adGetRowsRest</LITERAL2>
+-->
+
+			<!-- PositionEnum Values -->
+<!--			<LITERAL2>adPosUnknown</LITERAL2>
+			<LITERAL2>adPosBOF</LITERAL2>
+			<LITERAL2>adPosEOF</LITERAL2>
+-->
+
+			<!-- enum Values -->
+<!--			<LITERAL2>adBookmarkCurrent</LITERAL2>
+			<LITERAL2>adBookmarkFirst</LITERAL2>
+			<LITERAL2>adBookmarkLast</LITERAL2>
+-->
+			<!-- MarshalOptionsEnum Values -->
+<!--			<LITERAL2>adMarshalAll</LITERAL2>
+			<LITERAL2>adMarshalModifiedOnly</LITERAL2>
+-->
+			<!-- AffectEnum Values -->
+<!--			<LITERAL2>adAffectCurrent</LITERAL2>
+			<LITERAL2>adAffectGroup</LITERAL2>
+			<LITERAL2>adAffectAll</LITERAL2>
+			<LITERAL2>adAffectAllChapters</LITERAL2>
+-->
+
+			<!-- ResyncEnum Values -->
+<!--			<LITERAL2>adResyncUnderlyingValues</LITERAL2>
+			<LITERAL2>adResyncAllValues</LITERAL2>
+-->
+			<!-- CompareEnum Values -->
+<!--			<LITERAL2>adCompareLessThan</LITERAL2>
+			<LITERAL2>adCompareEqual</LITERAL2>
+			<LITERAL2>adCompareGreaterThan</LITERAL2>
+			<LITERAL2>adCompareNotEqual</LITERAL2>
+			<LITERAL2>adCompareNotComparable</LITERAL2>
+-->
+			<!-- FilterGroupEnum Values -->
+<!--			<LITERAL2>adFilterNone</LITERAL2>
+			<LITERAL2>adFilterPendingRecords</LITERAL2>
+			<LITERAL2>adFilterAffectedRecords</LITERAL2>
+			<LITERAL2>adFilterFetchedRecords</LITERAL2>
+			<LITERAL2>adFilterPredicate</LITERAL2>
+			<LITERAL2>adFilterConflictingRecords</LITERAL2>
+-->
+			<!-- SearchDirectionEnum Values -->
+<!--			<LITERAL2>adSearchForward</LITERAL2>
+			<LITERAL2>adSearchBackward</LITERAL2>
+-->
+
+			<!-- PersistFormatEnum Values -->
+			<LITERAL2>adPersistADTG</LITERAL2>
+			<LITERAL2>adPersistXML</LITERAL2>
+
+			<!-- StringFormatEnum Values -->
+<!--			<LITERAL2>adStringXML</LITERAL2>
+			<LITERAL2>adStringHTML</LITERAL2>
+			<LITERAL2>adClipString</LITERAL2>
+-->
+			<!-- ConnectPromptEnum Values -->
+<!--			<LITERAL2>adPromptAlways</LITERAL2>
+			<LITERAL2>adPromptComplete</LITERAL2>
+			<LITERAL2>adPromptCompleteRequired</LITERAL2>
+			<LITERAL2>adPromptNever</LITERAL2>
+-->
+			<!-- ConnectModeEnum Values -->
+<!--			<LITERAL2>adModeUnknown</LITERAL2>
+			<LITERAL2>adModeRead</LITERAL2>
+			<LITERAL2>adModeWrite</LITERAL2>
+			<LITERAL2>adModeReadWrite</LITERAL2>
+			<LITERAL2>adModeShareDenyRead</LITERAL2>
+			<LITERAL2>adModeShareDenyWrite</LITERAL2>
+			<LITERAL2>adModeShareExclusive</LITERAL2>
+			<LITERAL2>adModeShareDenyNone</LITERAL2>
+-->
+			<!-- IsolationLevelEnum Values -->
+<!--			<LITERAL2>adXactUnspecified</LITERAL2>
+			<LITERAL2>adXactChaos</LITERAL2>
+			<LITERAL2>adXactReadUncommitted</LITERAL2>
+			<LITERAL2>adXactBrowse</LITERAL2>
+			<LITERAL2>adXactCursorStability</LITERAL2>
+			<LITERAL2>adXactReadCommitted</LITERAL2>
+			<LITERAL2>adXactRepeatableRead</LITERAL2>
+			<LITERAL2>adXactSerializable</LITERAL2>
+			<LITERAL2>adXactIsolated</LITERAL2>
+-->
+			<!-- XactAttributeEnum Values -->
+<!--			<LITERAL2>adXactCommitRetaining</LITERAL2>
+			<LITERAL2>adXactAbortRetaining</LITERAL2>
+-->
+			<!-- PropertyAttributesEnum Values -->
+<!--			<LITERAL2>adPropNotSupported</LITERAL2>
+			<LITERAL2>adPropRequired</LITERAL2>
+			<LITERAL2>adPropOptional</LITERAL2>
+			<LITERAL2>adPropRead</LITERAL2>
+			<LITERAL2>adPropWrite</LITERAL2>
+-->
+			<!-- ErrorValueEnum Values -->
+<!--			<LITERAL2>adErrInvalidArgument</LITERAL2>
+			<LITERAL2>adErrNoCurrentRecord</LITERAL2>
+			<LITERAL2>adErrIllegalOperation</LITERAL2>
+			<LITERAL2>adErrInTransaction</LITERAL2>
+			<LITERAL2>adErrFeatureNotAvailable</LITERAL2>
+			<LITERAL2>adErrItemNotFound</LITERAL2>
+			<LITERAL2>adErrObjectInCollection</LITERAL2>
+			<LITERAL2>adErrObjectNotSet</LITERAL2>
+			<LITERAL2>adErrDataConversion</LITERAL2>
+			<LITERAL2>adErrObjectClosed</LITERAL2>
+			<LITERAL2>adErrObjectOpen</LITERAL2>
+			<LITERAL2>adErrProviderNotFound</LITERAL2>
+			<LITERAL2>adErrBoundToCommand</LITERAL2>
+			<LITERAL2>adErrInvalidParamInfo</LITERAL2>
+			<LITERAL2>adErrInvalidConnection</LITERAL2>
+			<LITERAL2>adErrNotReentrant</LITERAL2>
+			<LITERAL2>adErrStillExecuting</LITERAL2>
+			<LITERAL2>adErrOperationCancelled</LITERAL2>
+			<LITERAL2>adErrStillConnecting</LITERAL2>
+			<LITERAL2>adErrNotExecuting</LITERAL2>
+			<LITERAL2>adErrUnsafeOperation</LITERAL2>
+-->
+			<!-- ParameterAttributesEnum Values -->
+			<LITERAL2>adParamSigned</LITERAL2>
+			<LITERAL2>adParamNullable</LITERAL2>
+			<LITERAL2>adParamLong</LITERAL2>
+
+			<!-- ParameterDirectionEnum Values -->
+			<LITERAL2>adParamUnknown</LITERAL2>
+			<LITERAL2>adParamInput</LITERAL2>
+			<LITERAL2>adParamOutput</LITERAL2>
+			<LITERAL2>adParamInputOutput</LITERAL2>
+			<LITERAL2>adParamReturnValue</LITERAL2>
+
+			<!-- CommandTypeEnum Values -->
+			<LITERAL2>adCmdUnknown</LITERAL2>
+			<LITERAL2>adCmdText</LITERAL2>
+			<LITERAL2>adCmdTable</LITERAL2>
+			<LITERAL2>adCmdStoredProc</LITERAL2>
+			<LITERAL2>adCmdFile</LITERAL2>
+			<LITERAL2>adCmdTableDirect</LITERAL2>
+
+			<!-- EventStatusEnum Values -->
+<!--			<LITERAL2>adStatusOK</LITERAL2>
+			<LITERAL2>adStatusErrorsOccurred</LITERAL2>
+			<LITERAL2>adStatusCantDeny</LITERAL2>
+			<LITERAL2>adStatusCancel</LITERAL2>
+			<LITERAL2>adStatusUnwantedEvent</LITERAL2>
+-->
+			<!-- EventReasonEnum Values -->
+<!--			<LITERAL2>adRsnAddNew</LITERAL2>
+			<LITERAL2>adRsnDelete</LITERAL2>
+			<LITERAL2>adRsnUpdate</LITERAL2>
+			<LITERAL2>adRsnUndoUpdate</LITERAL2>
+			<LITERAL2>adRsnUndoAddNew</LITERAL2>
+			<LITERAL2>adRsnUndoDelete</LITERAL2>
+			<LITERAL2>adRsnRequery</LITERAL2>
+			<LITERAL2>adRsnResynch</LITERAL2>
+			<LITERAL2>adRsnClose</LITERAL2>
+			<LITERAL2>adRsnMove</LITERAL2>
+			<LITERAL2>adRsnFirstChange</LITERAL2>
+			<LITERAL2>adRsnMoveFirst</LITERAL2>
+			<LITERAL2>adRsnMoveNext</LITERAL2>
+			<LITERAL2>adRsnMovePrevious</LITERAL2>
+			<LITERAL2>adRsnMoveLast</LITERAL2>
+-->
+			<!-- SchemaEnum Values -->
+<!--			<LITERAL2>adSchemaProviderSpecific</LITERAL2>
+			<LITERAL2>adSchemaAsserts</LITERAL2>
+			<LITERAL2>adSchemaCatalogs</LITERAL2>
+			<LITERAL2>adSchemaCharacterSets</LITERAL2>
+			<LITERAL2>adSchemaCollations</LITERAL2>
+			<LITERAL2>adSchemaColumns</LITERAL2>
+			<LITERAL2>adSchemaCheckConstraints</LITERAL2>
+			<LITERAL2>adSchemaConstraintColumnUsage</LITERAL2>
+			<LITERAL2>adSchemaConstraintTableUsage</LITERAL2>
+			<LITERAL2>adSchemaKeyColumnUsage</LITERAL2>
+			<LITERAL2>adSchemaReferentialConstraints</LITERAL2>
+			<LITERAL2>adSchemaTableConstraints</LITERAL2>
+			<LITERAL2>adSchemaColumnsDomainUsage</LITERAL2>
+			<LITERAL2>adSchemaIndexes</LITERAL2>
+			<LITERAL2>adSchemaColumnPrivileges</LITERAL2>
+			<LITERAL2>adSchemaTablePrivileges</LITERAL2>
+			<LITERAL2>adSchemaUsagePrivileges</LITERAL2>
+			<LITERAL2>adSchemaProcedures</LITERAL2>
+			<LITERAL2>adSchemaSchemata</LITERAL2>
+			<LITERAL2>adSchemaSQLLanguages</LITERAL2>
+			<LITERAL2>adSchemaStatistics</LITERAL2>
+			<LITERAL2>adSchemaTables</LITERAL2>
+			<LITERAL2>adSchemaTranslations</LITERAL2>
+			<LITERAL2>adSchemaProviderTypes</LITERAL2>
+			<LITERAL2>adSchemaViews</LITERAL2>
+			<LITERAL2>adSchemaViewColumnUsage</LITERAL2>
+			<LITERAL2>adSchemaViewTableUsage</LITERAL2>
+			<LITERAL2>adSchemaProcedureParameters</LITERAL2>
+			<LITERAL2>adSchemaForeignKeys</LITERAL2>
+			<LITERAL2>adSchemaPrimaryKeys</LITERAL2>
+			<LITERAL2>adSchemaProcedureColumns</LITERAL2>
+			<LITERAL2>adSchemaDBInfoKeywords</LITERAL2>
+			<LITERAL2>adSchemaDBInfoLiterals</LITERAL2>
+			<LITERAL2>adSchemaCubes</LITERAL2>
+			<LITERAL2>adSchemaDimensions</LITERAL2>
+			<LITERAL2>adSchemaHierarchies</LITERAL2>
+			<LITERAL2>adSchemaLevels</LITERAL2>
+			<LITERAL2>adSchemaMeasures</LITERAL2>
+			<LITERAL2>adSchemaProperties</LITERAL2>
+			<LITERAL2>adSchemaMembers</LITERAL2>
+-->
+			<!-- SeekEnum Values -->
+<!--			<LITERAL2>adSeekFirstEQ</LITERAL2>
+			<LITERAL2>adSeekLastEQ</LITERAL2>
+			<LITERAL2>adSeekAfterEQ</LITERAL2>
+			<LITERAL2>adSeekAfter</LITERAL2>
+			<LITERAL2>adSeekBeforeEQ</LITERAL2>
+			<LITERAL2>adSeekBefore</LITERAL2>
+-->
+			<!-- ADCPROP_UPDATECRITERIA_ENUM Values -->
+<!--			<LITERAL2>adCriteriaKey</LITERAL2>
+			<LITERAL2>adCriteriaAllCols</LITERAL2>
+			<LITERAL2>adCriteriaUpdCols</LITERAL2>
+			<LITERAL2>adCriteriaTimeStamp</LITERAL2>
+-->
+			<!-- ADCPROP_ASYNCTHREADPRIORITY_ENUM Values -->
+<!--			<LITERAL2>adPriorityLowest</LITERAL2>
+			<LITERAL2>adPriorityBelowNormal</LITERAL2>
+			<LITERAL2>adPriorityNormal</LITERAL2>
+			<LITERAL2>adPriorityAboveNormal</LITERAL2>
+			<LITERAL2>adPriorityHighest</LITERAL2>
+-->
+			<!-- CEResyncEnum Values -->
+<!--			<LITERAL2>adResyncNone</LITERAL2>
+			<LITERAL2>adResyncAutoIncrement</LITERAL2>
+			<LITERAL2>adResyncConflicts</LITERAL2>
+			<LITERAL2>adResyncUpdates</LITERAL2>
+			<LITERAL2>adResyncInserts</LITERAL2>
+			<LITERAL2>adResyncAll</LITERAL2>
+-->
+			<!-- ADCPROP_AUTORECALC_ENUM Values -->
+<!--			<LITERAL2>adRecalcUpFront</LITERAL2>
+			<LITERAL2>adRecalcAlways</LITERAL2>
+-->
+		</KEYWORDS>
+	</RULES>
+</MODE>
+

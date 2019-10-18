@@ -22,14 +22,16 @@ GENERIC: pprint* ( obj -- )
 
 ! Atoms
 : word-style ( word -- style )
-    [
-        dup presented set
-        dup parsing? over delimiter? rot t eq? or or
-        [ bold font-style set ] when
-    ] H{ } make-assoc ;
+    dup "word-style" word-prop >hashtable [
+        [
+            dup presented set
+            dup parsing? over delimiter? rot t eq? or or
+            [ bold font-style set ] when
+        ] bind
+    ] keep ;
 
 : word-name* ( word -- str )
-    word-name [ "( no name )" ] unless* ;
+    word-name "( no name )" or ;
 
 : pprint-word ( word -- )
     dup record-vocab
@@ -42,10 +44,10 @@ M: word pprint*
     dup parsing? [
         \ POSTPONE: [ pprint-word ] pprint-prefix
     ] [
-        dup "break-before" word-prop break
+        dup "break-before" word-prop line-break
         dup pprint-word
         dup ?start-group dup ?end-group
-        "break-after" word-prop break
+        "break-after" word-prop line-break
     ] if ;
 
 M: real pprint* number>string text ;
@@ -87,19 +89,20 @@ M: f pprint* drop \ f pprint-word ;
         { 0.3 0.3 0.3 1.0 } foreground set
     ] H{ } make-assoc ;
 
-: unparse-string ( str prefix -- str )
-    [
-        % do-string-limit [ unparse-ch ] each CHAR: " ,
-    ] "" make ;
+: unparse-string ( str prefix suffix -- str )
+    [ >r % do-string-limit [ unparse-ch ] each r> % ] "" make ;
 
-: pprint-string ( obj str prefix -- )
+: pprint-string ( obj str prefix suffix -- )
     unparse-string swap string-style styled-text ;
 
-M: string pprint* dup "\"" pprint-string ;
+M: string pprint*
+    dup "\"" "\"" pprint-string ;
 
-M: sbuf pprint* dup "SBUF\" " pprint-string ;
+M: sbuf pprint*
+    dup "SBUF\" " "\"" pprint-string ;
 
-M: pathname pprint* dup pathname-string "P\" " pprint-string ;
+M: pathname pprint*
+    dup pathname-string "P\" " "\"" pprint-string ;
 
 ! Sequences
 : nesting-limit? ( -- ? )
@@ -129,20 +132,13 @@ M: pathname pprint* dup pathname-string "P\" " pprint-string ;
         dup zero? [ 2drop f ] [ >r head r> ] if
     ] when ;
 
-: pprint-hilite ( n object -- )
-    pprint* hilite-index get = [ hilite ] when ;
-
 : pprint-elements ( seq -- )
-    do-length-limit >r dup hilite-quotation get eq? [
-        [ length ] keep [ pprint-hilite ] 2each
-    ] [
-        [ pprint* ] each
-    ] if
+    do-length-limit >r
+    [ pprint* ] each
     r> [ "~" swap number>string " more~" 3append text ] when* ;
 
 GENERIC: pprint-delims ( obj -- start end )
 
-M: complex pprint-delims drop \ C{ \ } ;
 M: quotation pprint-delims drop \ [ \ ] ;
 M: curry pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
@@ -153,15 +149,16 @@ M: vector pprint-delims drop \ V{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
 M: tuple pprint-delims drop \ T{ \ } ;
 M: wrapper pprint-delims drop \ W{ \ } ;
+M: callstack pprint-delims drop \ CS{ \ } ;
 
 GENERIC: >pprint-sequence ( obj -- seq )
 
 M: object >pprint-sequence ;
 
-M: complex >pprint-sequence >rect 2array ;
 M: hashtable >pprint-sequence >alist ;
 M: tuple >pprint-sequence tuple>array ;
 M: wrapper >pprint-sequence wrapped 1array ;
+M: callstack >pprint-sequence callstack>array ;
 
 GENERIC: pprint-narrow? ( obj -- ? )
 

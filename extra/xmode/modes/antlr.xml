@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+        This mode file describes the ANTLR syntax definition language.
+        It is derived from and tested with the ANTLR syntax rules specified in
+        antlr.g included with the ANTLR distribution.
+        
+        Portions of this file from java.xml.
+        
+        Author: Brant Gurganus <brantgurga@users.sourceforge.net>
+-->
+<MODE>
+        <PROPS>
+                <PROPERTY NAME="commentStart" VALUE="/*" />
+                <PROPERTY NAME="commentEnd" VALUE="*/" />
+                <PROPERTY NAME="lineComment" VALUE="//" />
+                <PROPERTY NAME="wordBreakChars" VALUE="" />
+        </PROPS>
+        <RULES>
+		<SPAN TYPE="COMMENT2" DELEGATE="java::JAVADOC">
+			<BEGIN>/**</BEGIN>
+			<END>*/</END>
+		</SPAN>
+                <SPAN TYPE="COMMENT1">
+                        <BEGIN>/*</BEGIN>
+                        <END>*/</END>
+                </SPAN>
+                <EOL_SPAN TYPE="COMMENT1">//</EOL_SPAN>
+                <SPAN TYPE="LITERAL1">
+                        <BEGIN>"</BEGIN>
+                        <END>"</END>
+                </SPAN>
+                <SEQ TYPE="OPERATOR">|</SEQ>
+                <SEQ TYPE="OPERATOR">:</SEQ>
+                <KEYWORDS>
+                        <KEYWORD3>header</KEYWORD3>
+                        <KEYWORD3>options</KEYWORD3>
+                        <KEYWORD3>tokens</KEYWORD3>
+                        <KEYWORD1>abstract</KEYWORD1>
+			<KEYWORD1>break</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>catch</KEYWORD1>
+			<KEYWORD1>continue</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>do</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>extends</KEYWORD1>
+			<KEYWORD1>final</KEYWORD1>
+			<KEYWORD1>finally</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>implements</KEYWORD1>
+			<KEYWORD1>instanceof</KEYWORD1>
+			<KEYWORD1>native</KEYWORD1>
+			<KEYWORD1>new</KEYWORD1>
+			<KEYWORD1>private</KEYWORD1>
+			<KEYWORD1>protected</KEYWORD1>
+			<KEYWORD1>public</KEYWORD1>
+			<KEYWORD1>return</KEYWORD1>
+			<KEYWORD1>static</KEYWORD1>
+			<KEYWORD1>switch</KEYWORD1>
+			<KEYWORD1>synchronized</KEYWORD1>
+			<KEYWORD1>throw</KEYWORD1>
+			<KEYWORD1>throws</KEYWORD1>
+			<KEYWORD1>transient</KEYWORD1>
+			<KEYWORD1>try</KEYWORD1>
+			<KEYWORD1>volatile</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+			<KEYWORD1>package</KEYWORD1>
+			<KEYWORD1>import</KEYWORD1>
+
+			<KEYWORD2>boolean</KEYWORD2>
+			<KEYWORD2>byte</KEYWORD2>
+			<KEYWORD2>char</KEYWORD2>
+			<KEYWORD2>class</KEYWORD2>
+			<KEYWORD2>double</KEYWORD2>
+			<KEYWORD2>float</KEYWORD2>
+			<KEYWORD2>int</KEYWORD2>
+			<KEYWORD2>interface</KEYWORD2>
+			<KEYWORD2>long</KEYWORD2>
+			<KEYWORD2>short</KEYWORD2>
+			<KEYWORD2>void</KEYWORD2>
+
+			<FUNCTION>assert</FUNCTION>
+			<KEYWORD1>strictfp</KEYWORD1>
+
+			<LITERAL2>false</LITERAL2>
+			<LITERAL2>null</LITERAL2>
+			<LITERAL2>super</LITERAL2>
+			<LITERAL2>this</LITERAL2>
+			<LITERAL2>true</LITERAL2>
+
+			<INVALID>goto</INVALID>
+			<INVALID>const</INVALID>
+                </KEYWORDS>
+	</RULES>
+</MODE>

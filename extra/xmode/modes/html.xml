@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+
+	<RULES IGNORE_CASE="TRUE">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+
+	<!-- ESCAPE is not exactly right but it is needed to correctly
+	     handle JavaScript in on* parameters -->
+	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<KEYWORDS>
+			<!-- HTML/XHTML elements, taken from http://de.selfhtml.org/html/referenz/elemente.htm -->
+			<KEYWORD1>fieldset</KEYWORD1>
+			<KEYWORD1>a</KEYWORD1>
+			<KEYWORD1>abbr</KEYWORD1>
+			<KEYWORD1>acronym</KEYWORD1>
+			<KEYWORD1>address</KEYWORD1>
+			<KEYWORD1>applet</KEYWORD1>
+			<KEYWORD1>area</KEYWORD1>
+			<KEYWORD1>b</KEYWORD1>
+			<KEYWORD1>base</KEYWORD1>
+			<KEYWORD1>basefont</KEYWORD1>
+			<KEYWORD1>bdo</KEYWORD1>
+			<KEYWORD1>big</KEYWORD1>
+			<KEYWORD1>blockquote</KEYWORD1>
+			<KEYWORD1>body</KEYWORD1>
+			<KEYWORD1>br</KEYWORD1>
+			<KEYWORD1>button</KEYWORD1>
+			<KEYWORD1>caption</KEYWORD1>
+			<KEYWORD1>center</KEYWORD1>
+			<KEYWORD1>cite</KEYWORD1>
+			<KEYWORD1>code</KEYWORD1>
+			<KEYWORD1>col</KEYWORD1>
+			<KEYWORD1>colgroup</KEYWORD1>
+			<KEYWORD1>dd</KEYWORD1>
+			<KEYWORD1>del</KEYWORD1>
+			<KEYWORD1>dfn</KEYWORD1>
+			<KEYWORD1>dir</KEYWORD1>
+			<KEYWORD1>div</KEYWORD1>
+			<KEYWORD1>dl</KEYWORD1>
+			<KEYWORD1>dt</KEYWORD1>
+			<KEYWORD1>em</KEYWORD1>
+			<KEYWORD1>fieldset</KEYWORD1>
+			<KEYWORD1>font</KEYWORD1>
+			<KEYWORD1>form</KEYWORD1>
+			<KEYWORD1>frame</KEYWORD1>
+			<KEYWORD1>frameset</KEYWORD1>
+			<KEYWORD1>h1</KEYWORD1>
+			<KEYWORD1>h2</KEYWORD1>
+			<KEYWORD1>h3</KEYWORD1>
+			<KEYWORD1>h4</KEYWORD1>
+			<KEYWORD1>h5</KEYWORD1>
+			<KEYWORD1>h6</KEYWORD1>
+			<KEYWORD1>head</KEYWORD1>
+			<KEYWORD1>hr</KEYWORD1>
+			<KEYWORD1>html</KEYWORD1>
+			<KEYWORD1>i</KEYWORD1>
+			<KEYWORD1>iframe</KEYWORD1>
+			<KEYWORD1>img</KEYWORD1>
+			<KEYWORD1>input</KEYWORD1>
+			<KEYWORD1>ins</KEYWORD1>
+			<KEYWORD1>isindex</KEYWORD1>
+			<KEYWORD1>kbd</KEYWORD1>
+			<KEYWORD1>label</KEYWORD1>
+			<KEYWORD1>legend</KEYWORD1>
+			<KEYWORD1>li</KEYWORD1>
+			<KEYWORD1>link</KEYWORD1>
+			<KEYWORD1>map</KEYWORD1>
+			<KEYWORD1>menu</KEYWORD1>
+			<KEYWORD1>meta</KEYWORD1>
+			<KEYWORD1>noframes</KEYWORD1>
+			<KEYWORD1>noscript</KEYWORD1>
+			<KEYWORD1>object</KEYWORD1>
+			<KEYWORD1>ol</KEYWORD1>
+			<KEYWORD1>optgroup</KEYWORD1>
+			<KEYWORD1>option</KEYWORD1>
+			<KEYWORD1>p</KEYWORD1>
+			<KEYWORD1>param</KEYWORD1>
+			<KEYWORD1>pre</KEYWORD1>
+			<KEYWORD1>q</KEYWORD1>
+			<KEYWORD1>s</KEYWORD1>
+			<KEYWORD1>samp</KEYWORD1>
+			<KEYWORD1>script</KEYWORD1>
+			<KEYWORD1>select</KEYWORD1>
+			<KEYWORD1>small</KEYWORD1>
+			<KEYWORD1>span</KEYWORD1>
+			<KEYWORD1>strike</KEYWORD1>
+			<KEYWORD1>strong</KEYWORD1>
+			<KEYWORD1>style</KEYWORD1>
+			<KEYWORD1>sub</KEYWORD1>
+			<KEYWORD1>sup</KEYWORD1>
+			<KEYWORD1>table</KEYWORD1>
+			<KEYWORD1>tbody</KEYWORD1>
+			<KEYWORD1>td</KEYWORD1>
+			<KEYWORD1>textarea</KEYWORD1>
+			<KEYWORD1>tfoot</KEYWORD1>
+			<KEYWORD1>th</KEYWORD1>
+			<KEYWORD1>thead</KEYWORD1>
+			<KEYWORD1>title</KEYWORD1>
+			<KEYWORD1>tr</KEYWORD1>
+			<KEYWORD1>tt</KEYWORD1>
+			<KEYWORD1>u</KEYWORD1>
+			<KEYWORD1>ul</KEYWORD1>
+			<KEYWORD1>var</KEYWORD1>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="JAVASCRIPT" DEFAULT="MARKUP" IGNORE_CASE="TRUE">
+		<SEQ TYPE="MARKUP" DELEGATE="javascript::MAIN">&gt;</SEQ>
+		<!-- handle <SCRIPT SRC="..."> properly -->
+		<SEQ TYPE="MARKUP" DELEGATE="BACK_TO_HTML">SRC=</SEQ>
+	</RULES>
+
+	<RULES SET="BACK_TO_HTML" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="html::MAIN">&gt;</SEQ>
+	</RULES>
+
+	<RULES SET="CSS" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="css::MAIN">&gt;</SEQ>
+	</RULES>
+</MODE>

@@ -19,20 +19,28 @@ IN: bootstrap.stage2
 
     parse-command-line
 
-    "Cross-referencing..." print flush
-    H{ } clone changed-words set-global
-    H{ } clone crossref set-global
-    xref-words
-    xref-sources
+    all-words [ dup ] H{ } map>assoc changed-words set-global
+
+    "-no-crossref" cli-args member? [
+        "Cross-referencing..." print flush
+        H{ } clone crossref set-global
+        xref-words
+        xref-sources
+    ] unless
 
     ! Set dll paths
     wince? [ "windows.ce" require ] when
     winnt? [ "windows.nt" require ] when
 
-    [
-        ! Compile everything if compiler is loaded
-        all-words [ changed-word ] each
+    "deploy-vocab" get [
+        "stage2: deployment mode" print
+    ] [
+        "listener" require
+        "none" require
+        "listener" use+
+    ] if
 
+    [
         "exclude" "include"
         [ get-global " " split [ empty? not ] subset ] 2apply
         seq-diff
@@ -54,14 +62,11 @@ IN: bootstrap.stage2
     f error-continuation set-global
 
     "deploy-vocab" get [
-        "tools.deploy" run
+        "tools.deploy.shaker" run
     ] [
-        "listener" require
-        "none" require
-
         [
             boot
-            do-startup-hooks
+            do-init-hooks
             [ parse-command-line ] try
             [ run-user-init ] try
             [ "run" get run ] try
@@ -80,4 +85,6 @@ IN: bootstrap.stage2
 
         "output-image" get resource-path save-image-and-exit
     ] if
-] [ error-hook get call "listener" run ] recover
+] [
+    error-hook get call "listener" vocab-main execute
+] recover

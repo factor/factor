@@ -11,88 +11,100 @@ SYMBOL: restarts
 <PRIVATE
 
 : catchstack* ( -- catchstack )
-    6 getenv { vector } declare ; inline
+    1 getenv { vector } declare ; inline
 
 : >c ( continuation -- ) catchstack* push ;
 
 : c> ( -- continuation ) catchstack* pop ;
 
+: (catch) ( quot -- newquot )
+    [ swap >c call c> drop ] curry ; inline
+
+: dummy ( -- obj )
+    #! Optimizing compiler assumes stack won't be messed with
+    #! in-transit. To ensure that a value is actually reified
+    #! on the stack, we put it in a non-inline word together
+    #! with a declaration.
+    f { object } declare ;
+
 PRIVATE>
 
 : catchstack ( -- catchstack ) catchstack* clone ; inline
 
-: set-catchstack ( catchstack -- ) >vector 6 setenv ; inline
+: set-catchstack ( catchstack -- ) >vector 1 setenv ; inline
 
-TUPLE: continuation data retain call name catch c ;
+TUPLE: continuation data call retain name catch ;
 
 C: <continuation> continuation
 
 : continuation ( -- continuation )
-    datastack retainstack callstack namestack catchstack f
-    <continuation> ; inline
+    datastack callstack retainstack namestack catchstack
+    <continuation> ;
 
-: >continuation< ( continuation -- data retain call name catch c )
-    [ continuation-data ] keep
-    [ continuation-retain ] keep
-    [ continuation-call ] keep
-    [ continuation-name ] keep
-    [ continuation-catch ] keep
-    continuation-c ; inline
+: >continuation< ( continuation -- data call retain name catch )
+    {
+        continuation-data
+        continuation-call
+        continuation-retain
+        continuation-name
+        continuation-catch
+    } get-slots ;
 
-: ifcc ( terminator balance -- )
-    >r >r f [ continuation nip t ] call r> r> if ; inline
+: ifcc ( capture restore -- )
+    #! After continuation is being captured, the stacks looks
+    #! like:
+    #! ( f continuation r:capture r:restore )
+    #! so the 'capture' branch is taken.
+    #!
+    #! Note that the continuation itself is not captured as part
+    #! of the datastack.
+    #!
+    #! BUT...
+    #!
+    #! After the continuation is resumed, (continue-with) pushes
+    #! the given value together with f,
+    #! so now, the stacks looks like:
+    #! ( value f r:capture r:restore )
+    #! Execution begins right after the call to 'continuation'.
+    #! The 'restore' branch is taken.
+    >r >r dummy continuation r> r> ?if ; inline
 
-: callcc0 ( quot -- ) [ ] ifcc ; inline
+: callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
-: callcc1 ( quot -- obj ) callcc0 ; inline
-
-: set-walker-hook ( quot -- ) 2 setenv ; inline
-
-: walker-hook ( -- quot ) 2 getenv f set-walker-hook ; inline
+: callcc1 ( quot -- obj ) [ ] ifcc ; inline
 
 <PRIVATE
 
 : (continue) ( continuation -- )
     >continuation<
-    drop
     set-catchstack
     set-namestack
-    set-callstack
     set-retainstack
-    set-datastack ; inline
+    >r set-datastack r>
+    set-callstack ;
 
 : (continue-with) ( obj continuation -- )
-    #! There's no good way to avoid this code duplication!
-    swap 9 setenv
+    swap 4 setenv
     >continuation<
-    drop
     set-catchstack
     set-namestack
-    set-callstack
     set-retainstack
-    set-datastack
-    9 getenv swap ; inline
+    >r set-datastack drop 4 getenv f 4 setenv f r>
+    set-callstack ;
 
 PRIVATE>
 
-: continue ( continuation -- )
-    walker-hook [ (continue-with) ] [ (continue) ] if* ;
-    inline
+: set-walker-hook ( quot -- ) 3 setenv ; inline
+
+: walker-hook ( -- quot ) 3 getenv f set-walker-hook ; inline
 
 : continue-with ( obj continuation -- )
-    walker-hook [ >r 2array r> ] when* (continue-with) ;
-    inline
+    [
+        walker-hook [ >r 2array r> ] when* (continue-with)
+    ] 2curry (throw) ;
 
-M: continuation clone
-    [ continuation-data clone ] keep
-    [ continuation-retain clone ] keep
-    [ continuation-call clone ] keep
-    [ continuation-name clone ] keep
-    [ continuation-catch clone ] keep
-    continuation-c clone <continuation> ;
-
-: catch ( try -- error/f )
-    [ >c call f c> drop f ] callcc1 nip ; inline
+: continue ( continuation -- )
+    f swap continue-with ;
 
 GENERIC: compute-restarts ( error -- seq )
 
@@ -104,23 +116,24 @@ GENERIC: compute-restarts ( error -- seq )
 
 PRIVATE>
 
-: rethrow ( error -- )
-    catchstack* empty?
-    [ die ] [ dup save-error c> continue-with ] if ;
+: rethrow ( error -- * )
+    catchstack* empty? [ die ] when
+    dup save-error c> continue-with ;
 
-: cleanup ( try cleanup -- )
-    [ >c >r call c> drop r> call ]
-    [ >r nip call r> rethrow ] ifcc ;
-    inline
+: catch ( try -- error/f )
+    (catch) [ f ] compose callcc1 ; inline
 
 : recover ( try recovery -- )
-    [ >c drop call c> drop ]
-    [ rot drop swap call ] ifcc ; inline
+    >r (catch) r> ifcc ; inline
+
+: cleanup ( try cleanup-always cleanup-error -- )
+    >r [ compose (catch) ] keep r> compose
+    [ dip rethrow ] curry ifcc ; inline
 
 : attempt-all ( seq quot -- obj )
     [
-        [ [ , f ] append [ , drop t ] recover ] curry all?
-    ] { } make peek swap [ rethrow ] when ;
+        [ [ , f ] compose [ , drop t ] recover ] curry all?
+    ] { } make peek swap [ rethrow ] when ; inline
 
 TUPLE: condition restarts continuation ;
 
@@ -157,22 +170,31 @@ M: condition compute-restarts
 
 <PRIVATE
 
-: error-handler ( error trace -- )
-    continuation [ set-continuation-c ] keep
-    dup continuation-data 2 head* over set-continuation-data
-    error-continuation set-global
-    dup save-error rethrow ;
-
 : init-error-handler ( -- )
     V{ } clone set-catchstack
-    ! kernel calls on error
-    [ error-handler ] 5 setenv
-    "kernel-error" 12 setenv ;
-
-: find-xt ( xt xtmap -- word )
-    [ second - ] binsearch* first ;
+    ! VM calls on error
+    [
+        continuation error-continuation set-global rethrow
+    ] 5 setenv
+    ! VM adds this to kernel errors, so that user-space
+    ! can identify them
+    "kernel-error" 6 setenv ;
 
 PRIVATE>
 
-: find-xts ( seq -- newseq )
-    xt-map 2 <groups> [ find-xt ] curry map ;
+! Debugging support
+: with-walker-hook ( continuation -- )
+    [ swap set-walker-hook (continue) ] curry callcc1 ;
+
+SYMBOL: break-hook
+
+: break ( -- )
+    continuation callstack
+    over set-continuation-call
+    walker-hook [ (continue-with) ] [ break-hook get call ] if* ;
+
+GENERIC: (step-into) ( obj -- )
+
+M: wrapper (step-into) wrapped break ;
+M: object (step-into) break ;
+M: callable (step-into) \ break add* break ;

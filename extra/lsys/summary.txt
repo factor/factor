@@ -1,1 +1,1 @@
-L-system explorer
+Lindenmayer system explorer

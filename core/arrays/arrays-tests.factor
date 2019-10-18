@@ -1,6 +1,5 @@
 USING: arrays kernel sequences sequences.private growable
-tools.test vectors layouts system math math.functions
-vectors.private ;
+tools.test vectors layouts system math vectors.private ;
 IN: temporary
 
 [ -2 { "a" "b" "c" } nth ] unit-test-fails

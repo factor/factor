@@ -64,7 +64,7 @@ SYMBOL: ldp
     ldap_unbind_s check-result ;
 
 : with-bind ( ld who passwd quot -- )
-    -roll [ simple-bind-s [ ldp get unbind-s ] cleanup ] with-scope ; inline
+    -roll [ simple-bind-s [ ldp get unbind-s ] [ ] cleanup ] with-scope ; inline
 
 ! =========================================================
 ! Search operations

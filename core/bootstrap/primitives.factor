@@ -5,7 +5,7 @@ USING: alien arrays byte-arrays generic hashtables
 hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes tuples
 kernel.private vocabs vocabs.loader source-files definitions
-slots classes.union ;
+slots classes.union words.private ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
@@ -47,6 +47,7 @@ call
     "math.private"
     "memory"
     "quotations"
+    "quotations.private"
     "sbufs"
     "sbufs.private"
     "scratchpad"
@@ -74,13 +75,12 @@ H{ } clone source-files set
 H{ } clone class<map set
 H{ } clone update-map set
 
-: make-primitive ( word vocab n -- ) >r create f r> define ;
+: make-primitive ( word vocab n -- ) >r create r> define ;
 
 {
-    { "execute" "words" }
-    { "call" "kernel" }
-    { "if" "kernel" }
-    { "dispatch" "kernel.private" }
+    { "(execute)" "words.private" }
+    { "(call)" "kernel.private" }
+    { "uncurry" "kernel.private" }
     { "string>sbuf" "sbufs.private" }
     { "bignum>fixnum" "math.private" }
     { "float>fixnum" "math.private" }
@@ -130,6 +130,10 @@ H{ } clone update-map set
     { "bignum<=" "math.private" }
     { "bignum>" "math.private" }
     { "bignum>=" "math.private" }
+    { "bignum-bit?" "math.private" }
+    { "bignum-log2" "math.private" }
+    { "byte-array>bignum" "math" }
+    { "float=" "math.private" }
     { "float+" "math.private" }
     { "float-" "math.private" }
     { "float*" "math.private" }
@@ -173,9 +177,9 @@ H{ } clone update-map set
     { "datastack" "kernel" }
     { "retainstack" "kernel" }
     { "callstack" "kernel" }
-    { "set-datastack" "kernel.private" }
-    { "set-retainstack" "kernel.private" }
-    { "set-callstack" "kernel.private" }
+    { "set-datastack" "kernel" }
+    { "set-retainstack" "kernel" }
+    { "set-callstack" "kernel" }
     { "exit" "system" }
     { "data-room" "memory" }
     { "code-room" "memory" }
@@ -222,7 +226,7 @@ H{ } clone update-map set
     { "string>char-alien" "alien" }
     { "alien>u16-string" "alien" }
     { "string>u16-alien" "alien" }
-    { "throw" "kernel" }
+    { "(throw)" "kernel.private" }
     { "string>memory" "alien" }
     { "memory>string" "alien" }
     { "alien-address" "alien" }
@@ -246,26 +250,31 @@ H{ } clone update-map set
     { "fwrite" "io.streams.c" }
     { "fflush" "io.streams.c" }
     { "fclose" "io.streams.c" }
-    { "expired?" "alien" }
     { "<wrapper>" "kernel" }
-    { "(clone)" "kernel.private" }
+    { "(clone)" "kernel" }
     { "array>vector" "vectors.private" }
     { "<string>" "strings" }
-    { "xt-map" "continuations.private" }
     { "(>tuple)" "tuples.private" }
-    { "<quotation>" "quotations" }
+    { "array>quotation" "quotations.private" }
+    { "quotation-xt" "quotations" }
     { "<tuple>" "tuples.private" }
     { "tuple>array" "tuples" }
     { "profiling" "tools.profiler.private" }
-    { "become" "tuples.private" }
+    { "become" "kernel.private" }
     { "(sleep)" "threads.private" }
     { "<float-array>" "float-arrays" }
     { "curry" "kernel" }
     { "<tuple-boa>" "tuples.private" }
 	{ "class-hash" "kernel.private" }
+    { "callstack>array" "kernel" }
+    { "innermost-frame-quot" "kernel.private" }
+    { "innermost-frame-scan" "kernel.private" }
+    { "set-innermost-frame-quot" "kernel.private" }
+    { "call-clear" "kernel" }
+    { "strip-compiled-quotations" "quotations" }
+    { "(os-envs)" "system" }
 }
-dup length [ 3 + ] map
-[ >r first2 r> make-primitive ] 2each
+dup length [ >r first2 r> make-primitive ] 2each
 
 ! Okay, now we have primitives fleshed out. Bring up the generic
 ! word system.
@@ -284,9 +293,12 @@ dup length [ 3 + ] map
         { slot-spec f } swap append >tuple
     ] map ;
 
-: define-builtin ( symbol type# predicate slotspec -- )
-    >r dup make-inline >r >r
-    dup r> "type" set-word-prop
+: lookup-type-number ( word -- n )
+    global [ target-word ] bind type-number ;
+
+: define-builtin ( symbol predicate slotspec -- )
+    >r dup make-inline >r
+    dup dup lookup-type-number "type" set-word-prop
     dup f f builtin-class define-class
     dup r> builtin-predicate
     dup r> intern-slots 2dup "slots" set-word-prop
@@ -302,66 +314,16 @@ num-types get f <array> builtins set
     { "null" "kernel" }
 } [ create drop ] assoc-each
 
-"fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
+"fixnum" "math" create "fixnum?" "math" create { } define-builtin
 "fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
 
-"bignum" "math" create 1 "bignum?" "math" create { } define-builtin
+"bignum" "math" create "bignum?" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
-"word" "words" create 2 "word?" "words" create
-{
-    {
-        { "object" "kernel" }
-        "name"
-        2
-        { "word-name" "words" }
-        { "set-word-name" "words" }
-    }
-    {
-        { "object" "kernel" }
-        "vocabulary"
-        3
-        { "word-vocabulary" "words" }
-        { "set-word-vocabulary" "words" }
-    }
-    {
-        { "fixnum" "math" }
-        "primitive"
-        4
-        { "word-primitive" "words.private" }
-        { "set-word-primitive" "words.private" }
-    }
-    {
-        { "object" "kernel" }
-        "def"
-        5
-        { "word-def" "words" }
-        { "set-word-def" "words" }
-    }
-    {
-        { "object" "kernel" }
-        "props"
-        6
-        { "word-props" "words" }
-        { "set-word-props" "words" }
-    }
-    {
-        { "object" "kernel" }
-        "?"
-        7
-        { "compiled?" "words" }
-        f
-    }
-    {
-        { "fixnum" "math" }
-        "counter"
-        8
-        { "profile-counter" "tools.profiler.private" }
-        { "set-profile-counter" "tools.profiler.private" }
-    }
-} define-builtin
+"tuple" "kernel" create "tuple?" "kernel" create
+{ } define-builtin
 
-"ratio" "math" create 4 "ratio?" "math" create
+"ratio" "math" create "ratio?" "math" create
 {
     {
         { "integer" "math" }
@@ -379,10 +341,10 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"float" "math" create 5 "float?" "math" create { } define-builtin
+"float" "math" create "float?" "math" create { } define-builtin
 "float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
 
-"complex" "math" create 6 "complex?" "math" create
+"complex" "math" create "complex?" "math" create
 {
     {
         { "real" "math" }
@@ -400,7 +362,13 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"wrapper" "kernel" create 7 "wrapper?" "kernel" create
+"f" "syntax" lookup "not" "kernel" create
+{ } define-builtin
+
+"array" "arrays" create "array?" "arrays" create
+{ } define-builtin
+
+"wrapper" "kernel" create "wrapper?" "kernel" create
 {
     {
         { "object" "kernel" }
@@ -411,13 +379,7 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"array" "arrays" create 8 "array?" "arrays" create
-{ } define-builtin
-
-"f" "syntax" lookup 9 "not" "kernel" create
-{ } define-builtin
-
-"hashtable" "hashtables" create 10 "hashtable?" "hashtables" create
+"hashtable" "hashtables" create "hashtable?" "hashtables" create
 {
     {
         { "array-capacity" "sequences.private" }
@@ -440,7 +402,7 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"vector" "vectors" create 11 "vector?" "vectors" create
+"vector" "vectors" create "vector?" "vectors" create
 {
     {
         { "array-capacity" "sequences.private" }
@@ -457,7 +419,7 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"string" "strings" create 12 "string?" "strings" create
+"string" "strings" create "string?" "strings" create
 {
     {
         { "array-capacity" "sequences.private" }
@@ -468,7 +430,7 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"sbuf" "sbufs" create 13 "sbuf?" "sbufs" create
+"sbuf" "sbufs" create "sbuf?" "sbufs" create
 {
     {
         { "array-capacity" "sequences.private" }
@@ -486,33 +448,113 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"quotation" "quotations" create 14 "quotation?" "quotations" create
-{ } define-builtin
+"quotation" "quotations" create "quotation?" "quotations" create
+{
+    {
+        { "object" "kernel" }
+        "array"
+        1
+        { "quotation-array" "quotations.private" }
+        f
+    }
+    {
+        { "object" "kernel" }
+        "compiled?"
+        2
+        { "quotation-compiled?" "quotations" }
+        f
+    }
+} define-builtin
 
-"dll" "alien" create 15 "dll?" "alien" create
-{ { byte-array "path" 1 { "(dll-path)" "alien" } f } }
+"dll" "alien" create "dll?" "alien" create
+{
+    {
+        { "byte-array" "byte-arrays" }
+        "path"
+        1
+        { "(dll-path)" "alien" }
+        f
+    }
+}
 define-builtin
 
-"alien" "alien" create 16 "alien?" "alien" create
-{ { c-ptr "alien" 1 { "underlying-alien" "alien" } f } }
+"alien" "alien" create "alien?" "alien" create
+{
+    {
+        { "c-ptr" "alien" }
+        "alien"
+        1
+        { "underlying-alien" "alien" }
+        f
+    } {
+        { "object" "kernel" }
+        "expired?"
+        2
+        { "expired?" "alien" }
+        f
+    }
+}
 define-builtin
 
-"tuple" "kernel" create 17 "tuple?" "kernel" create
-{ } define-builtin
+"word" "words" create "word?" "words" create
+{
+    {
+        { "object" "kernel" }
+        "name"
+        2
+        { "word-name" "words" }
+        { "set-word-name" "words" }
+    }
+    {
+        { "object" "kernel" }
+        "vocabulary"
+        3
+        { "word-vocabulary" "words" }
+        { "set-word-vocabulary" "words" }
+    }
+    {
+        { "object" "kernel" }
+        "def"
+        4
+        { "word-def" "words" }
+        { "set-word-def" "words.private" }
+    }
+    {
+        { "object" "kernel" }
+        "props"
+        5
+        { "word-props" "words" }
+        { "set-word-props" "words" }
+    }
+    {
+        { "object" "kernel" }
+        "?"
+        6
+        { "compiled?" "words" }
+        f
+    }
+    {
+        { "fixnum" "math" }
+        "counter"
+        7
+        { "profile-counter" "tools.profiler.private" }
+        { "set-profile-counter" "tools.profiler.private" }
+    }
+} define-builtin
 
-"byte-array" "byte-arrays" create 18
+"byte-array" "byte-arrays" create
 "byte-array?" "byte-arrays" create
 { } define-builtin
 
-"bit-array" "bit-arrays" create 19
+"bit-array" "bit-arrays" create
 "bit-array?" "bit-arrays" create
 { } define-builtin
 
-"float-array" "float-arrays" create 20
+"float-array" "float-arrays" create
 "float-array?" "float-arrays" create
 { } define-builtin
 
-"curry" "kernel" create 21
+"curry" "kernel" create
 "curry?" "kernel" create
 {
     {
@@ -531,6 +573,9 @@ define-builtin
     }
 } define-builtin
 
+"callstack" "kernel" create "callstack?" "kernel" create
+{ } define-builtin
+
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create
 "f" "syntax" lookup builtins get remove [ ] subset f union-class
@@ -542,7 +587,6 @@ define-class
 builtins get [ ] subset f union-class define-class
 
 ! Class of objects with object tag
-"hi-tag" "classes.private" create [ drop t ] "predicate" set-word-prop
 "hi-tag" "classes.private" create
 builtins get num-tags get tail f union-class define-class
 
@@ -554,25 +598,12 @@ builtins get num-tags get tail f union-class define-class
 "tombstone" "hashtables.private" create { } define-tuple-class
 
 "((empty))" "hashtables.private" create
-T{ tombstone f } 1quotation define-compound
-
-"((empty))" "hashtables.private" lookup
-make-inline
+"tombstone" "hashtables.private" lookup f
+2array >tuple 1quotation define-inline
 
 "((tombstone))" "hashtables.private" create
-T{ tombstone t } 1quotation define-compound
-
-"((tombstone))" "hashtables.private" lookup
-make-inline
-
-"c-ptr" "alien" create
-{
-    { "bit-array" "bit-arrays" }
-    { "byte-array" "byte-arrays" }
-    { "float-array" "float-arrays" }
-    { "alien" "alien" }
-    { "f" "syntax" }
-} [ lookup ] { } assoc>map define-union-class
+"tombstone" "hashtables.private" lookup t
+2array >tuple 1quotation define-inline
 
 ! Bump build number
 "build" "kernel" create build 1+ 1quotation define-compound

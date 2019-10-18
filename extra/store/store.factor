@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs io io.files kernel namespaces serialize ;
+USING: assocs io io.files kernel namespaces serialize init ;
 IN: store
 
 TUPLE: store path data ;
@@ -8,26 +8,26 @@ TUPLE: store path data ;
 C: <store> store
 
 : save-store ( store -- )
-    [ store-data ] keep store-path <file-writer> [
-        [
-            dup
-            [ drop [ get ] keep rot set-at ] curry* assoc-each
-        ] keep [ serialize ] with-serialized
-    ] with-stream ;
+    get-global dup store-data swap store-path
+    <file-writer> [ serialize ] with-stream ;
 
 : load-store ( path -- store )
-    resource-path dup exists? [
-        dup <file-reader> [
-            [ deserialize ] with-serialized
-        ] with-stream
+    dup exists? [
+        dup <file-reader> [ deserialize ] with-stream
     ] [
         H{ } clone
     ] if <store> ;
 
-: store-variable ( default variable store -- )
-    store-data 2dup at* [
-        rot set-global 2drop
-    ] [
-        drop >r 2dup set-global r> set-at
-    ] if ;
+: define-store ( path id -- )
+    over >r
+    [ >r resource-path load-store r> set-global ] 2curry
+    r> add-init-hook ;
 
+: get-persistent ( key store -- value )
+    get-global store-data at ;
+
+: set-persistent ( value key store -- )
+    [ get-global store-data set-at ] keep save-store ;
+
+: init-persistent ( value key store -- )
+    2dup get-persistent [ 3drop ] [ set-persistent ] if ;

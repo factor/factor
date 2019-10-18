@@ -3,58 +3,6 @@ math namespaces nonblocking-io parser quotations sequences
 shuffle windows-api words ;
 IN: libs-io
 
-: open-append ( path -- handle )
-    normalize-pathname
-    GENERIC_WRITE share-mode f OPEN_ALWAYS (open-file) ;
-
-: open-existing ( path -- handle )
-    normalize-pathname
-    GENERIC_WRITE share-mode f OPEN_EXISTING (open-file) ;
-
-: set-file-ptr ( n stream -- )
-    delegate port-handle set-win32-file-ptr ;
-
-: open-or-create ( path -- handle length )
-    [ file-length ] keep over [
-        open-append swap
-    ] [
-        nip f t open-file 0
-    ] if ;
-
-: maybe-create-file ( path -- ? )
-    #! returns true if it created a file
-    dup file-length [
-        drop f
-    ] [
-        open-append close-handle t
-    ] if ;
-
-: <file-appender> ( path -- stream )
-    open-or-create <win32-file> <writer> ;
-
-: delete-file ( path -- )
-    normalize-pathname
-    DeleteFile win32-error=0/f ;
-
-: move-file ( path newpath -- )
-    [ normalize-pathname ] 2apply
-    MoveFile win32-error=0/f ;
-
-
-: create-directory ( path -- )
-    normalize-pathname
-    f CreateDirectory win32-error=0/f ;
-
-: delete-directory ( path -- )
-    normalize-pathname
-    RemoveDirectory win32-error=0/f ;
-
-: move-directory ( path newpath -- )
-    #! not just an alias; might be different on other platforms
-    [ normalize-pathname ] 2apply
-    move-file ;
-
-
 : stat* ( path -- WIN32_FIND_DATA )
     "WIN32_FIND_DATA" <c-object>
     [
@@ -145,45 +93,4 @@ IN: libs-io
 ! FILE_ATTRIBUTE_OFFLINE
 ! FILE_ATTRIBUTE_NOT_CONTENT_INDEXED
 ! FILE_ATTRIBUTE_ENCRYPTED
-
-! Security tokens
-!  http://msdn.microsoft.com/msdnmag/issues/05/03/TokenPrivileges/
-! LookupPrivilegeValue  OpenThreadToken [ OpenProcessToken DuplicateTokenEx SetThreadToken ] unless AdjustTokenPrivileges 
-
-: thread-token ( -- token )
-    GetCurrentThread ;
-
-: (open-process-token) ( handle -- handle )
-    TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY bitor "PHANDLE" <c-object>
-    [ OpenProcessToken win32-error=0/f ] keep *void* ;
-
-: open-process-token ( -- handle )
-    #! remember to handle-close this
-    GetCurrentProcess (open-process-token) ;
-
-: with-process-token ( quot -- )
-    #! quot: ( token-handle -- token-handle )
-    >r open-process-token r>
-    1quotation [ keep ] append
-    [ close-handle ] cleanup ; inline
-
-: lookup-privilege ( string -- luid )
-    >r f r> "LUID" <c-object>
-    [ LookupPrivilegeValue win32-error=0/f ] keep ;
-
-! : with-privileges ( array -- )
-    ! ;
-
-! clear 10 [ "LUID" <c-object> [ set-LUID-LowPart ] keep ] map "LUID" !
-
-: make-setter ( type -- word )
-    >r "set-" r> "-nth" 3append parse first ;
-
-: >c-array ( array type -- c-array )
-    [ >r dup length dup r> <c-array> -rot ] keep
-    [ \ pick , make-setter , ] [ ] make 2each ;
-
-! DuplicateHandle
-! RegCreateKey RegSetValueEx RegCloseKey  GetProcAddress RegDeleteKey
-! LookupAccountSid
 

@@ -1,7 +1,6 @@
 IN: temporary
-USING: tools.profiler tools.test kernel memory math threads ;
-
-enable-profiler
+USING: tools.profiler tools.test kernel memory math threads
+alien tools.profiler.private ;
 
 [ ] [ [ 10 [ data-gc ] times ] profile ] unit-test
 
@@ -15,4 +14,15 @@ enable-profiler
 
 [ ] [ \ + usage-profile. ] unit-test
 
-disable-profiler
+: callback-test "void" { } "cdecl" [ ] alien-callback ;
+
+: indirect-test "void" { } "cdecl" alien-indirect ;
+
+: foobar ;
+
+[
+    [ ] [ callback-test indirect-test ] unit-test
+    foobar
+] profile
+
+[ 1 ] [ \ foobar profile-counter ] unit-test

@@ -2,7 +2,8 @@ IN: temporary
 USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences inference words
 arrays parser quotations continuations inference.backend effects
-namespaces.private io io.streams.string memory system threads ;
+namespaces.private io io.streams.string memory system threads
+tools.test.inference ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -12,6 +13,7 @@ FUNCTION: int ffi_test_1 ;
 
 FUNCTION: int ffi_test_2 int x int y ;
 [ 5 ] [ 2 3 ffi_test_2 ] unit-test
+[ "hi" 3 ffi_test_2 ] unit-test-fails
 
 FUNCTION: int ffi_test_3 int x int y int z int t ;
 [ 25 ] [ 2 3 4 5 ffi_test_3 ] unit-test
@@ -24,6 +26,8 @@ FUNCTION: double ffi_test_5 ;
 
 FUNCTION: int ffi_test_9 int a int b int c int d int e int f int g ;
 [ 28 ] [ 1 2 3 4 5 6 7 ffi_test_9 ] unit-test
+[ "a" 2 3 4 5 6 7 ffi_test_9 ] unit-test-fails
+[ 1 2 3 4 5 6 "a" ffi_test_9 ] unit-test-fails
 
 C-STRUCT: foo
     { "int" "x" }
@@ -49,6 +53,7 @@ FUNCTION: char* ffi_test_15 char* x char* y ;
 
 [ "foo" ] [ "xy" "zt" ffi_test_15 ] unit-test
 [ "bar" ] [ "xy" "xy" ffi_test_15 ] unit-test
+[ 1 2 ffi_test_15 ] unit-test-fails
 
 C-STRUCT: bar
     { "long" "x" }
@@ -75,24 +80,24 @@ FUNCTION: tiny ffi_test_17 int x ;
 : indirect-test-1
     "int" { } "cdecl" alien-indirect ;
 
-: short-effect
-    dup effect-in length swap effect-out length 2array ;
-
-[ { 1 1 } ] [ [ indirect-test-1 ] infer short-effect ] unit-test
+{ 1 1 } [ indirect-test-1 ] unit-test-effect
 
 [ 3 ] [ "ffi_test_1" f dlsym indirect-test-1 ] unit-test
 
-: indirect-test-2
-    "int" { "int" "int" } "cdecl" alien-indirect ;
+[ -1 indirect-test-1 ] unit-test-fails
 
-[ { 3 1 } ] [ [ indirect-test-2 ] infer short-effect ] unit-test
+: indirect-test-2
+    "int" { "int" "int" } "cdecl" alien-indirect data-gc ;
+
+{ 3 1 } [ indirect-test-2 ] unit-test-effect
 
 [ 5 ]
 [ 2 3 "ffi_test_2" f dlsym indirect-test-2 ]
 unit-test
 
 : indirect-test-3
-    "int" { "int" "int" "int" "int" } "stdcall" alien-indirect ;
+    "int" { "int" "int" "int" "int" } "stdcall" alien-indirect
+    data-gc ;
 
 ! This is a hack -- words are compiled before top-level forms
 ! run.
@@ -107,22 +112,21 @@ DEFER: >> delimiter
 
 : ffi_test_18 ( w x y z -- int )
     "int" "f-stdcall" "ffi_test_18" { "int" "int" "int" "int" }
-    alien-invoke ;
+    alien-invoke data-gc ;
 
 [ 25 ] [ 2 3 4 5 ffi_test_18 ] unit-test
 
 : ffi_test_19 ( x y z -- bar )
     "bar" "f-stdcall" "ffi_test_19" { "long" "long" "long" }
-    alien-invoke ;
+    alien-invoke data-gc ;
 
 [ 11 6 -7 ] [
     11 6 -7 ffi_test_19 dup bar-x over bar-y rot bar-z
 ] unit-test
 
-! Tests with float args go last, we can't pass float args on
-! ARM yet
 FUNCTION: double ffi_test_6 float x float y ;
 [ 6.0 ] [ 3.0 2.0 ffi_test_6 ] unit-test
+[ "a" "b" ffi_test_6 ] unit-test-fails
 
 FUNCTION: double ffi_test_7 double x double y ;
 [ 6.0 ] [ 3.0 2.0 ffi_test_7 ] unit-test
@@ -139,6 +143,16 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 [ ] [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
+! Make sure XT doesn't get clobbered in stack frame
+
+: ffi_test_31
+    "void"
+    f "ffi_test_31"
+    { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
+    alien-invoke code-gc 3 ;
+
+[ 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
+
 FUNCTION: longlong ffi_test_21 long x long y ;
 
 [ 121932631112635269 ]
@@ -149,7 +163,8 @@ FUNCTION: long ffi_test_22 long x longlong y longlong z ;
 [ 987655432 ]
 [ 1111 121932631112635269 123456789 ffi_test_22 ] unit-test
 
-! Put this last; it doesn't work on AMD64 yet
+[ 1111 f 123456789 ffi_test_22 ] unit-test-fails
+
 C-STRUCT: rect
     { "float" "x" }
     { "float" "y" }
@@ -167,6 +182,8 @@ C-STRUCT: rect
 FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ;
 
 [ 45 ] [ 1 2 3.0 4.0 5.0 6.0 <rect> 7 8 9 ffi_test_12 ] unit-test
+
+[ 1 2 { 1 2 3 } 7 8 9 ffi_test_12 ] unit-test-fails
 
 FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
 
@@ -215,6 +232,50 @@ FUNCTION: test-struct-7 ffi_test_30 ;
 
 [ B{ 1 2 3 4 5 6 7 } ] [ ffi_test_30 ] unit-test
 
+C-STRUCT: test-struct-8 { "double" "x" } { "double" "y" } ;
+
+FUNCTION: double ffi_test_32 test-struct-8 x int y ;
+
+[ 9.0 ] [
+    "test-struct-8" <c-object>
+    1.0 over set-test-struct-8-x
+    2.0 over set-test-struct-8-y
+    3 ffi_test_32
+] unit-test
+
+C-STRUCT: test-struct-9 { "float" "x" } { "float" "y" } ;
+
+FUNCTION: double ffi_test_33 test-struct-9 x int y ;
+
+[ 9.0 ] [
+    "test-struct-9" <c-object>
+    1.0 over set-test-struct-9-x
+    2.0 over set-test-struct-9-y
+    3 ffi_test_33
+] unit-test
+
+C-STRUCT: test-struct-10 { "float" "x" } { "int" "y" } ;
+
+FUNCTION: double ffi_test_34 test-struct-10 x int y ;
+
+[ 9.0 ] [
+    "test-struct-10" <c-object>
+    1.0 over set-test-struct-10-x
+    2 over set-test-struct-10-y
+    3 ffi_test_34
+] unit-test
+
+C-STRUCT: test-struct-11 { "int" "x" } { "int" "y" } ;
+
+FUNCTION: double ffi_test_35 test-struct-11 x int y ;
+
+[ 9.0 ] [
+    "test-struct-11" <c-object>
+    1 over set-test-struct-11-x
+    2 over set-test-struct-11-y
+    3 ffi_test_35
+] unit-test
+
 ! Test callbacks
 
 : callback-1 "void" { } "cdecl" [ ] alien-callback ;
@@ -245,7 +306,9 @@ FUNCTION: test-struct-7 ffi_test_30 ;
     ] with-scope
 ] unit-test
 
-: callback-4 "void" { } "cdecl" [ "Hello world" write ] alien-callback ;
+: callback-4
+    "void" { } "cdecl" [ "Hello world" write ] alien-callback
+    data-gc ;
 
 [ "Hello world" ] [ 
     [ callback-4 callback_test_1 ] string-out
@@ -280,3 +343,10 @@ cpu "arm" = [
 [ 1 2 3 ] [ callback-7 callback_test_1 1 2 3 ] unit-test
 
 [ f ] [ namespace global eq? ] unit-test
+
+: callback-8
+    "void" { } "cdecl" [
+        [ continue ] callcc0
+    ] alien-callback ;
+
+[ ] [ callback-8 callback_test_1 ] unit-test

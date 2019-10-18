@@ -28,7 +28,8 @@ IN: tools.memory
     data-room 2 <groups> 0 [
         "Generation " pick number>string append
         >r first2 r> write-total/used/free 1+
-    ] reduce drop ;
+    ] reduce drop
+    "Cards" write-total ;
 
 : (code-room.) ( -- )
     code-room "Code space" write-total/used/free ;
@@ -37,7 +38,6 @@ IN: tools.memory
     standard-table-style [
         { "" "Total" "Used" "Free" } write-headings
         (data-room.)
-        "Cards" write-total
         (code-room.)
     ] tabular-output ;
 

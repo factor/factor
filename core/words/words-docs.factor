@@ -42,7 +42,7 @@ ARTICLE: "symbols" "Symbols"
 { $subsection define-symbol } ;
 
 ARTICLE: "primitives" "Primitives"
-"Executing a primitive invokes native code in the Factor runtime. Primitives cannot be defined through Factor code. Compiled definitions behave similarly to primitives in that the interpreter jumps to native code upon encountering them."
+"Primitives are words defined in the Factor VM. They provide the essential low-level services to the rest of the system."
 { $subsection primitive }
 { $subsection primitive? } ;
 
@@ -139,17 +139,7 @@ $nl
 } ;
 
 ARTICLE: "word.private" "Word implementation details"
-"The behavior of a word when executed depends on the values of two slots:"
-{ $list
-    "the primitive number"
-    "the primitive parameter"
-}
-"The primitive number is an index into an array of native functions in the Factor runtime."
-$nl
-"Primitive number accessors:"
-{ $subsection word-primitive }
-{ $subsection set-word-primitive }
-"Primitive parameter accessors:"
+"Primitive definition accessors:"
 { $subsection word-def }
 { $subsection set-word-def }
 "An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
@@ -171,6 +161,7 @@ $nl
 { $subsection word? }
 { $subsection "interned-words" }
 { $subsection "word-definition" }
+{ $subsection "word-props" }
 { $subsection "word.private" }
 { $see-also "vocabularies" "vocabs.loader" "definitions" } ;
 
@@ -197,23 +188,13 @@ HELP: set-word-props ( props word -- )
 { $notes "The given assoc must not be a literal, since it will be mutated by future calls to " { $link set-word-prop } "." }
 { $side-effects "word" } ;
 
-HELP: word-primitive ( word -- n )
-{ $values { "word" word } { "n" "a non-negative integer" } }
-{ $description "Outputs a word's primitive number." } ;
-
-HELP: set-word-primitive ( n word -- )
-{ $values { "n" "a non-negative integer" } { "word" word } }
-{ $description "Sets a word's primitive number." }
-{ $notes "Changing the primitive number does not update the execution token, and the word will still call its old definition until a subsequent call to " { $link update-xt } "." }
-{ $side-effects "word" } ;
-
 HELP: word-def ( word -- obj )
 { $values { "word" word } { "obj" object } }
-{ $description "Outputs a word's primitive parameter. This parameter is only used if the primitive number is 1 (compound definitions) or 2 (symbols)." } ;
+{ $description "Outputs a word's primitive definition." } ;
 
 HELP: set-word-def ( obj word -- )
 { $values { "obj" object } { "word" word } }
-{ $description "Sets a word's primitive parameter." }
+{ $description "Sets a word's primitive definition." }
 $low-level-note
 { $side-effects "word" } ;
 
@@ -250,7 +231,7 @@ HELP: word-xt
 { $description "Outputs the machine code address of the word's definition." } ;
 
 HELP: define
-{ $values { "word" word } { "def" object } { "primitive" "a non-negative integer" } }
+{ $values { "word" word } { "def" object } }
 { $description "Defines a word and updates cross-referencing." }
 $low-level-note
 { $side-effects "word" }
@@ -358,7 +339,7 @@ HELP: bootstrap-word
 
 HELP: update-xt ( word -- )
 { $values { "word" word } }
-{ $description "Updates a word's execution token based on the value of the " { $link word-primitive } " slot. If the word was compiled, this will lose the compiled definition and make it run in the interpreter." }
+{ $description "Updates a word's execution token based on the value of the " { $link word-def } " slot. If the word was compiled by the optimizing compiler, this forces the word to revert to its unoptimized definition." }
 { $side-effects "word" } ;
 
 HELP: parsing?

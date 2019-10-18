@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel math tools.test ;
+USING: kernel math math.polynomials tools.test ;
 
 ! Tests
 [ { 0 1 } ] [ { 0 1 0 0 } ptrim ] unit-test

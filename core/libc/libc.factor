@@ -2,7 +2,7 @@
 ! Copyright (C) 2007 Slava Pestov
 ! Copyright (C) 2007 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs init kernel namespaces inspector ;
+USING: alien assocs init inspector kernel namespaces ;
 IN: libc
 
 <PRIVATE
@@ -46,13 +46,7 @@ M: realloc-error summary drop "Memory reallocation failed" ;
 
 <PRIVATE
 
-[
-    mallocs get-global [
-        [ drop expired? not ] assoc-subset
-    ] [
-        H{ } clone
-    ] if* mallocs set-global
-] "mallocs" add-startup-hook
+[ H{ } clone mallocs set-global ] "mallocs" add-init-hook
 
 : add-malloc ( alien -- )
     dup mallocs get-global set-at ;
@@ -81,7 +75,7 @@ PRIVATE>
     dupd (realloc) check-ptr
     swap delete-malloc
     dup add-malloc ;
-    
+
 : free ( alien -- )
     dup delete-malloc
     (free) ;
@@ -90,4 +84,4 @@ PRIVATE>
     "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;
 
 : with-malloc ( size quot -- )
-    swap 1 calloc check-ptr swap keep free ; inline
+    swap 1 calloc swap keep free ; inline

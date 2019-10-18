@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic assocs hashtables inference
+USING: arrays generic assocs hashtables
 kernel kernel.private math namespaces sequences words
 quotations strings alien system combinators math.bitfields
 words.private cpu.architecture ;
@@ -19,6 +19,8 @@ TUPLE: frame-required n ;
 
 GENERIC: fixup* ( frame-size obj -- frame-size )
 
+: code-format 22 getenv ;
+
 : compiled-offset ( -- n ) building get length code-format * ;
 
 TUPLE: label offset ;
@@ -30,10 +32,11 @@ M: label fixup*
 
 : define-label ( name -- ) <label> swap set ;
 
-: resolve-label ( label/name -- ) dup string? [ get ] when , ;
+: resolve-label ( label/name -- ) dup label? [ get ] unless , ;
 
 : if-stack-frame ( frame-size quot -- )
-    over no-stack-frame = [ 2drop ] [ call ] if ; inline
+    swap dup no-stack-frame =
+    [ 2drop ] [ stack-frame swap call ] if ; inline
 
 M: word fixup*
     {
@@ -61,12 +64,13 @@ SYMBOL: label-table
     rot rc-absolute-ppc-2/2 = or or ;
 
 ! Relocation types
-: rt-primitive 0 ;
-: rt-dlsym     1 ;
-: rt-literal   2 ;
-: rt-dispatch  3 ;
-: rt-xt        4 ;
-: rt-label     5 ;
+: rt-primitive    0 ;
+: rt-dlsym        1 ;
+: rt-literal      2 ;
+: rt-dispatch     3 ;
+: rt-xt           4 ;
+: rt-xt-profiling 5 ;
+: rt-label        6 ;
 
 TUPLE: label-fixup label class ;
 
@@ -126,7 +130,7 @@ SYMBOL: word-table
 GENERIC# rel-word 1 ( word class -- )
 
 M: primitive rel-word ( word class -- )
-    >r word-primitive r> rt-primitive rel-fixup ;
+    >r word-def r> rt-primitive rel-fixup ;
 
 M: word rel-word ( word class -- )
     >r add-word r> rt-xt rel-fixup ;
@@ -139,12 +143,16 @@ M: word rel-word ( word class -- )
     V{ } clone label-table set ;
 
 : generate-labels ( -- labels )
-    label-table get [ first3 label-offset 3array ] map concat ;
+    label-table get [
+        first3 label-offset
+        [ "Unresolved label" throw ] unless*
+        3array
+    ] map concat ;
 
 : fixup ( code -- relocation-table label-table code )
     [
         init-fixup
         dup stack-frame-size swap [ fixup* ] each drop
-        relocation-table get
+        relocation-table get >array
         generate-labels
-    ] V{ } make ;
+    ] { } make ;

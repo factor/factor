@@ -1,6 +1,6 @@
 USING: help.syntax help.markup words effects inference.dataflow
 inference.backend kernel sequences kernel.private
-combinators ;
+combinators combinators.private ;
 
 HELP: recursive-state
 { $var-description "During inference, holds an association list mapping words to labels." } ;

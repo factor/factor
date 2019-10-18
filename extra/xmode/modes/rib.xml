@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+<!--
+jEdit edit mode for Renderman Interface Bytestream (*.rib) files
+version 1.0 - 9 nov 2003
+by Alessandro Falappa (alessandro@falappa.net)
+Initial keyword list taken from a syntax highlighting definition
+for TextPad text editor by Kharitonov Konstantin (aqua@sm.bmstu.ru)
+-->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="lineComment" VALUE="#" />
+        <PROPERTY NAME="indentNextLines" VALUE="Begin|WorldBegin|FrameBegin|TransformBegin|AttributeBegin|SolidBegin|ObjectBegin|MotionBegin" />
+        <PROPERTY NAME="doubleBracketIndent" VALUE="false" />
+    </PROPS>
+    <RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE" DIGIT_RE="([\p{Digit}]+(e[\p{Digit}]*)?)">
+		<EOL_SPAN AT_WHITESPACE_END="TRUE" TYPE="COMMENT1">#</EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT2">#</EOL_SPAN>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">[</SEQ>
+		<SEQ TYPE="OPERATOR">]</SEQ>
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="TRUE" DELEGATE="LITERALS">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<KEYWORDS>
+			<KEYWORD1>float</KEYWORD1>
+			<KEYWORD1>string</KEYWORD1>
+			<KEYWORD1>color</KEYWORD1>
+			<KEYWORD1>point</KEYWORD1>
+			<KEYWORD1>vector</KEYWORD1>
+			<KEYWORD1>normal</KEYWORD1>
+			<KEYWORD1>matrix</KEYWORD1>
+			<KEYWORD1>void</KEYWORD1>
+			<KEYWORD1>varying</KEYWORD1>
+			<KEYWORD1>uniform</KEYWORD1>
+			<KEYWORD1>output</KEYWORD1>
+			<KEYWORD1>extern</KEYWORD1>
+
+			<KEYWORD2>Begin</KEYWORD2>
+			<KEYWORD2>End</KEYWORD2>
+			<KEYWORD2>Declare</KEYWORD2>
+			<KEYWORD2>RtContextHandle </KEYWORD2>
+			<KEYWORD2>ContextHandle </KEYWORD2>
+			<KEYWORD2>Context</KEYWORD2>
+			<KEYWORD2>FrameBegin</KEYWORD2>
+			<KEYWORD2>FrameEnd</KEYWORD2>
+			<KEYWORD2>WorldBegin</KEYWORD2>
+			<KEYWORD2>WorldEnd</KEYWORD2>
+			<KEYWORD2>SolidBegin</KEYWORD2>
+			<KEYWORD2>SolidEnd</KEYWORD2>
+			<KEYWORD2>MotionBegin</KEYWORD2>
+			<KEYWORD2>MotionEnd</KEYWORD2>
+			<KEYWORD2>ObjectBegin</KEYWORD2>
+			<KEYWORD2>ObjectEnd</KEYWORD2>
+			<KEYWORD2>Format</KEYWORD2>
+			<KEYWORD2>FrameAspectRatio</KEYWORD2>
+			<KEYWORD2>ScreenWindow</KEYWORD2>
+			<KEYWORD2>CropWindow</KEYWORD2>
+			<KEYWORD2>Projection</KEYWORD2>
+			<KEYWORD2>Clipping</KEYWORD2>
+			<KEYWORD2>ClippingPlane</KEYWORD2>
+			<KEYWORD2>DepthOfField</KEYWORD2>
+			<KEYWORD2>Shutter</KEYWORD2>
+			<KEYWORD2>PixelVariance</KEYWORD2>
+			<KEYWORD2>PixelSamples</KEYWORD2>
+			<KEYWORD2>PixelFilter</KEYWORD2>
+			<KEYWORD2>Exposure</KEYWORD2>
+			<KEYWORD2>Imager</KEYWORD2>
+			<KEYWORD2>Quantize</KEYWORD2>
+			<KEYWORD2>Display</KEYWORD2>
+			<KEYWORD2>Hider</KEYWORD2>
+			<KEYWORD2>ColorSamples</KEYWORD2>
+			<KEYWORD2>RelativeDetail</KEYWORD2>
+			<KEYWORD2>Option</KEYWORD2>
+			<KEYWORD2>AttributeBegin</KEYWORD2>
+			<KEYWORD2>AttributeEnd</KEYWORD2>
+			<KEYWORD2>Color</KEYWORD2>
+			<KEYWORD2>Opacity</KEYWORD2>
+			<KEYWORD2>TextureCoordinates</KEYWORD2>
+			<KEYWORD2>RtLightHandle</KEYWORD2>
+			<KEYWORD2>LightSource</KEYWORD2>
+			<KEYWORD2>AreaLightSource</KEYWORD2>
+			<KEYWORD2>Illuminate</KEYWORD2>
+			<KEYWORD2>Surface</KEYWORD2>
+			<KEYWORD2>Displacement</KEYWORD2>
+			<KEYWORD2>Atmosphere</KEYWORD2>
+			<KEYWORD2>Interior</KEYWORD2>
+			<KEYWORD2>Exterior</KEYWORD2>
+			<KEYWORD2>ShadingRate</KEYWORD2>
+			<KEYWORD2>ShadingInterpolation</KEYWORD2>
+			<KEYWORD2>Matte</KEYWORD2>
+			<KEYWORD2>Bound</KEYWORD2>
+			<KEYWORD2>Detail</KEYWORD2>
+			<KEYWORD2>DetailRange</KEYWORD2>
+			<KEYWORD2>GeometricApproximation</KEYWORD2>
+			<KEYWORD2>Orientation</KEYWORD2>
+			<KEYWORD2>ReverseOrientation</KEYWORD2>
+			<KEYWORD2>Sides</KEYWORD2>
+			<KEYWORD2>Identity</KEYWORD2>
+			<KEYWORD2>Transform</KEYWORD2>
+			<KEYWORD2>ConcatTransform</KEYWORD2>
+			<KEYWORD2>Perspective</KEYWORD2>
+			<KEYWORD2>Translate</KEYWORD2>
+			<KEYWORD2>Rotate</KEYWORD2>
+			<KEYWORD2>Scale</KEYWORD2>
+			<KEYWORD2>Skew</KEYWORD2>
+			<KEYWORD2>CoordinateSystem</KEYWORD2>
+			<KEYWORD2>CoordSysTransform</KEYWORD2>
+			<KEYWORD2>TransformPoints</KEYWORD2>
+			<KEYWORD2>TransformBegin</KEYWORD2>
+			<KEYWORD2>TransformEnd</KEYWORD2>
+			<KEYWORD2>Attribute</KEYWORD2>
+
+			<KEYWORD3>Polygon</KEYWORD3>
+			<KEYWORD3>GeneralPolygon</KEYWORD3>
+			<KEYWORD3>PointsPolygons</KEYWORD3>
+			<KEYWORD3>PointsGeneralPolygons</KEYWORD3>
+			<KEYWORD3>Basis</KEYWORD3>
+			<KEYWORD3>Patch</KEYWORD3>
+			<KEYWORD3>PatchMesh</KEYWORD3>
+			<KEYWORD3>NuPatch</KEYWORD3>
+			<KEYWORD3>TrimCurve</KEYWORD3>
+			<KEYWORD3>SubdivisionMesh</KEYWORD3>
+			<KEYWORD3>Sphere</KEYWORD3>
+			<KEYWORD3>Cone</KEYWORD3>
+			<KEYWORD3>Cylinder</KEYWORD3>
+			<KEYWORD3>Hyperboloid</KEYWORD3>
+			<KEYWORD3>Paraboloid</KEYWORD3>
+			<KEYWORD3>Disk</KEYWORD3>
+			<KEYWORD3>Torus</KEYWORD3>
+			<KEYWORD3>Points</KEYWORD3>
+			<KEYWORD3>Curves</KEYWORD3>
+			<KEYWORD3>Blobby</KEYWORD3>
+			<KEYWORD3>Procedural</KEYWORD3>
+			<KEYWORD3>DelayedReadArchive</KEYWORD3>
+			<KEYWORD3>RunProgram</KEYWORD3>
+			<KEYWORD3>DynamicLoad</KEYWORD3>
+			<KEYWORD3>Geometry</KEYWORD3>
+			<KEYWORD3>SolidBegin</KEYWORD3>
+			<KEYWORD3>SolidEnd</KEYWORD3>
+			<KEYWORD3>RtObjectHandle</KEYWORD3>
+			<KEYWORD3>ObjectBegin</KEYWORD3>
+			<KEYWORD3>ObjectEnd</KEYWORD3>
+			<KEYWORD3>ObjectInstance</KEYWORD3>
+
+			<KEYWORD4>MakeTexture</KEYWORD4>
+			<KEYWORD4>MakeLatLongEnvironment</KEYWORD4>
+			<KEYWORD4>MakeCubeFaceEnvironment</KEYWORD4>
+			<KEYWORD4>MakeShadow</KEYWORD4>
+			<KEYWORD4>ErrorHandler</KEYWORD4>
+			<KEYWORD4>ArchiveRecord</KEYWORD4>
+			<KEYWORD4>ReadArchive</KEYWORD4>
+			<KEYWORD4>Deformation</KEYWORD4>
+			<KEYWORD4>MakeBump</KEYWORD4>
+		</KEYWORDS>
+    </RULES>
+    <RULES SET="LITERALS" ESCAPE="\" IGNORE_CASE="FALSE" DEFAULT="LITERAL1">
+		<KEYWORDS>
+			<KEYWORD1>float</KEYWORD1>
+			<KEYWORD1>string</KEYWORD1>
+			<KEYWORD1>color</KEYWORD1>
+			<KEYWORD1>point</KEYWORD1>
+			<KEYWORD1>vector</KEYWORD1>
+			<KEYWORD1>normal</KEYWORD1>
+			<KEYWORD1>matrix</KEYWORD1>
+			<KEYWORD1>void</KEYWORD1>
+			<KEYWORD1>varying</KEYWORD1>
+			<KEYWORD1>uniform</KEYWORD1>
+			<KEYWORD1>output</KEYWORD1>
+			<KEYWORD1>extern</KEYWORD1>
+
+			<LITERAL2>P</LITERAL2>
+			<LITERAL2>Pw</LITERAL2>
+			<LITERAL2>Pz</LITERAL2>
+			<LITERAL2>N</LITERAL2>
+			<LITERAL2>Cs</LITERAL2>
+			<LITERAL2>Os</LITERAL2>
+			<LITERAL2>RI_NULL</LITERAL2>
+			<LITERAL2>RI_INFINITY</LITERAL2>
+			<LITERAL2>orthographic</LITERAL2>
+			<LITERAL2>perspective</LITERAL2>
+			<LITERAL2>bezier</LITERAL2>
+			<LITERAL2>catmull-rom</LITERAL2>
+			<LITERAL2>b-spline</LITERAL2>
+			<LITERAL2>hermite</LITERAL2>
+			<LITERAL2>power</LITERAL2>
+			<LITERAL2>catmull-clark</LITERAL2>
+			<LITERAL2>hole</LITERAL2>
+			<LITERAL2>crease</LITERAL2>
+			<LITERAL2>corner</LITERAL2>
+			<LITERAL2>interpolateboundary</LITERAL2>
+			<LITERAL2>object</LITERAL2>
+			<LITERAL2>world</LITERAL2>
+			<LITERAL2>camera</LITERAL2>
+			<LITERAL2>screen</LITERAL2>
+			<LITERAL2>raster</LITERAL2>
+			<LITERAL2>NDC</LITERAL2>
+			<LITERAL2>box</LITERAL2>
+			<LITERAL2>triangle</LITERAL2>
+			<LITERAL2>sinc</LITERAL2>
+			<LITERAL2>gaussian</LITERAL2>
+			<LITERAL2>constant</LITERAL2>
+			<LITERAL2>smooth</LITERAL2>
+			<LITERAL2>outside</LITERAL2>
+			<LITERAL2>inside</LITERAL2>
+			<LITERAL2>lh</LITERAL2>
+			<LITERAL2>rh</LITERAL2>
+			<LITERAL2>bicubic</LITERAL2>
+			<LITERAL2>bilinear</LITERAL2>
+			<LITERAL2>periodic</LITERAL2>
+			<LITERAL2>nonperiodic</LITERAL2>
+			<LITERAL2>hidden</LITERAL2>
+			<LITERAL2>null</LITERAL2>
+		</KEYWORDS>
+    </RULES>
+</MODE>
+

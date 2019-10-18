@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+<MODE NAME="zpt"			FILE="zpt.xml"
+				FILE_NAME_GLOB="*.{pt,zpt}"/>
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE">
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+
+	<!-- ESCAPE is not exactly right but it is needed to correctly
+	     handle JavaScript in on* parameters -->
+	<RULES SET="TAGS" DEFAULT="MARKUP" ESCAPE="\">
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRIBUTE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1" DELEGATE="ATTRIBUTE">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<KEYWORDS>
+			<!-- TAL -->
+			<KEYWORD1>tal</KEYWORD1>
+			<KEYWORD3>attributes</KEYWORD3>
+			<KEYWORD3>define</KEYWORD3>
+			<KEYWORD3>condition</KEYWORD3>
+			<KEYWORD3>content</KEYWORD3>
+			<KEYWORD3>omit-tag</KEYWORD3>
+			<KEYWORD3>on-error</KEYWORD3>
+			<KEYWORD3>repeat</KEYWORD3>
+			<KEYWORD3>replace</KEYWORD3>
+
+			<!-- METAL -->
+			<KEYWORD1>metal</KEYWORD1>
+			<KEYWORD3>define-macro</KEYWORD3>
+			<KEYWORD3>define-slot</KEYWORD3>
+			<KEYWORD3>fill-slot</KEYWORD3>
+			<KEYWORD3>use-macro</KEYWORD3>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="ATTRIBUTE" DEFAULT="LITERAL1">
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">;</SEQ>
+		<SEQ TYPE="OPERATOR">?</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="LITERAL2">$$</SEQ>
+
+		<SPAN TYPE="LITERAL4">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL4">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+			<BEGIN>${</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+		<!-- highligh python expressions -->
+		<!--
+		<SEQ TYPE="LITERAL2" DELEGATE="python::MAIN"
+			AT_LINE_START="FALSE">python:</SEQ>
+		-->
+		<KEYWORDS>
+			<!-- TALES expression types -->
+			<KEYWORD4>exists</KEYWORD4>
+			<KEYWORD4>nocall</KEYWORD4>
+			<KEYWORD4>not</KEYWORD4>
+			<KEYWORD4>path</KEYWORD4>
+			<KEYWORD4>python</KEYWORD4>
+			<KEYWORD4>string</KEYWORD4>
+			<KEYWORD4>structure</KEYWORD4>
+
+			<!-- built-in TALES variables -->
+			<!-- NOTE: root, here, container, template, 
+			     request, user, and modules are optional -->
+			<LITERAL3>CONTEXTS</LITERAL3>
+			<LITERAL3>attrs</LITERAL3>
+			<LITERAL3>container</LITERAL3>
+			<LITERAL3>default</LITERAL3>
+			<LITERAL3>here</LITERAL3>
+			<LITERAL3>modules</LITERAL3>
+			<LITERAL3>nothing</LITERAL3>
+			<LITERAL3>options</LITERAL3>
+			<LITERAL3>repeat</LITERAL3>
+			<LITERAL3>request</LITERAL3>
+			<LITERAL3>root</LITERAL3>
+			<LITERAL3>template</LITERAL3>
+			<LITERAL3>user</LITERAL3>
+
+			<!-- repeat variable attributes -->
+			<LITERAL3>index</LITERAL3>
+			<LITERAL3>number</LITERAL3>
+			<LITERAL3>even</LITERAL3>
+			<LITERAL3>odd</LITERAL3>
+			<LITERAL3>start</LITERAL3>
+			<LITERAL3>end</LITERAL3>
+			<LITERAL3>first</LITERAL3>
+			<LITERAL3>last</LITERAL3>
+			<LITERAL3>length</LITERAL3>
+			<LITERAL3>letter</LITERAL3>
+			<LITERAL3>Letter</LITERAL3>
+			<LITERAL3>roman</LITERAL3>
+			<LITERAL3>Roman</LITERAL3>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="JAVASCRIPT" DEFAULT="MARKUP" IGNORE_CASE="TRUE">
+		<SEQ TYPE="MARKUP" DELEGATE="javascript::MAIN">&gt;</SEQ>
+		<SEQ TYPE="MARKUP" DELEGATE="BACK_TO_HTML">SRC=</SEQ>
+	</RULES>
+
+	<RULES SET="BACK_TO_HTML" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="zpt::MAIN">&gt;</SEQ>
+	</RULES>
+
+	<RULES SET="CSS" DEFAULT="MARKUP">
+		<SEQ TYPE="MARKUP" DELEGATE="css::MAIN">&gt;</SEQ>
+	</RULES>
+</MODE>
+

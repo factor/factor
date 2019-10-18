@@ -14,7 +14,7 @@ M: vector like
         dup array? [ dup length array>vector ] [ >vector ] if
     ] unless ;
 
-M: vector new drop [ f <array> ] keep array>vector ;
+M: vector new drop [ f <array> ] keep >fixnum array>vector ;
 
 M: vector equal?
     over vector? [ sequence= ] [ 2drop f ] if ;
@@ -23,7 +23,7 @@ M: sequence new-resizable drop <vector> ;
 
 INSTANCE: vector growable
 
-: 1vector ( x -- vector ) V{ } 1sequence ;
+: 1vector ( x -- vector ) 1array >vector ;
 
 : ?push ( elt seq/f -- seq )
     [ 1 <vector> ] unless* [ push ] keep ;

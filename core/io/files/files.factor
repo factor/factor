@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.files
-USING: io.backend io.files.private hashtables kernel math memory
-namespaces sequences strings arrays definitions system
-combinators splitting ;
+USING: io.backend io.files.private io hashtables kernel math
+memory namespaces sequences strings assocs arrays definitions
+system combinators splitting ;
 
 HOOK: <file-reader> io-backend ( path -- stream )
 
@@ -13,16 +13,24 @@ HOOK: <file-appender> io-backend ( path -- stream )
 
 HOOK: delete-file io-backend ( path -- )
 
+HOOK: rename-file io-backend ( from to -- )
+
 HOOK: make-directory io-backend ( path -- )
 
 HOOK: delete-directory io-backend ( path -- )
 
-! Words for accessing filesystem meta-data.
+: path-separator? ( ch -- ? ) windows? "/\\" "/" ? member? ;
+
+HOOK: root-directory? io-backend ( path -- ? )
+
+M: object root-directory? ( path -- ? ) path-separator? ;
+
+: trim-path-separators ( str -- newstr )
+    [ path-separator? ] right-trim ;
 
 : path+ ( str1 str2 -- str )
-    >r dup "/" tail? [ 1 head* ] when r>
-    dup "/" head? [ 1 tail ] when
-    >r "/" r> 3append ;
+    >r trim-path-separators "/" r>
+    [ path-separator? ] left-trim 3append ;
 
 : stat ( path -- directory? permissions length modified )
     normalize-pathname (stat) ;
@@ -31,12 +39,15 @@ HOOK: delete-directory io-backend ( path -- )
 
 : directory? ( path -- ? ) stat 3drop ;
 
+: special-directory? ( name -- ? )
+    { "." ".." } member? ;
+
 : fixup-directory ( path seq -- newseq )
     [
         dup string?
         [ tuck path+ directory? 2array ] [ nip ] if
     ] curry* map
-    [ first { "." ".." } member? not ] subset ;
+    [ first special-directory? not ] subset ;
 
 : directory ( path -- seq )
     normalize-directory dup (directory) fixup-directory ;
@@ -46,28 +57,62 @@ HOOK: delete-directory io-backend ( path -- )
 : file-modified ( path -- n ) stat >r 3drop r> ;
 
 : last-path-separator ( path -- n ? )
-    [ length 2 [-] ] keep [ "/\\" member? ] find-last* ;
+    [ length 2 [-] ] keep [ path-separator? ] find-last* ;
 
-: parent-dir ( path -- parent )
-    dup last-path-separator
-    [ head ] [ 2drop "." ] if ;
+TUPLE: no-parent-directory path ;
+
+: no-parent-directory ( path -- * )
+    \ no-parent-directory construct-boa throw ;
+
+: parent-directory ( path -- parent )
+    trim-path-separators {
+        { [ dup empty? ] [ drop "/" ] }
+        { [ dup root-directory? ] [ ] }
+        { [ dup [ path-separator? ] contains? not ] [ drop "." ] }
+        { [ t ] [
+            dup last-path-separator drop 1+ cut
+            special-directory? [ no-parent-directory ] when
+        ] }
+    } cond ;
 
 : file-name ( path -- string )
-    dup last-path-separator
-    [ 1+ tail ] [ drop ] if ;
+    dup last-path-separator [ 1+ tail ] [ drop ] if ;
 
 : resource-path ( path -- newpath )
-    \ resource-path get [ image parent-dir ] unless*
+    \ resource-path get [ image parent-directory ] unless*
     swap path+ ;
 
 : ?resource-path ( path -- newpath )
     "resource:" ?head [ resource-path ] when ;
 
-TUPLE: pathname string ;
+: make-directories ( path -- )
+    normalize-pathname trim-path-separators {
+        { [ dup "." = ] [ ] }
+        { [ dup root-directory? ] [ ] }
+        { [ dup empty? ] [ ] }
+        { [ dup exists? ] [ ] }
+        { [ t ] [
+            dup parent-directory make-directories
+            dup make-directory
+        ] }
+    } cond drop ;
 
-C: <pathname> pathname
+HOOK: copy-file io-backend ( from to -- )
 
-M: pathname <=> [ pathname-string ] compare ;
+M: object copy-file
+    dup parent-directory make-directories
+    <file-writer> [
+        stdio get swap
+        <file-reader> [
+            stdio get swap stream-copy
+        ] with-stream
+    ] with-stream ;
+
+: copy-directory ( from to -- )
+    dup make-directories
+    >r dup directory swap r> [
+        >r >r first r> over path+ r> rot path+ copy-file
+    ] 2curry each ;
 
 : home ( -- dir )
     {
@@ -75,3 +120,40 @@ M: pathname <=> [ pathname-string ] compare ;
         { [ wince? ] [ "" resource-path ] }
         { [ unix? ] [ "HOME" os-env ] }
     } cond ;
+
+TUPLE: pathname string ;
+
+C: <pathname> pathname
+
+M: pathname <=> [ pathname-string ] compare ;
+
+HOOK: library-roots io-backend ( -- seq )
+HOOK: binary-roots io-backend ( -- seq )
+
+: find-file ( seq str -- path/f )
+    [
+        [ path+ exists? ] curry find nip
+    ] keep over [ path+ ] [ drop ] if ;
+
+: find-library ( str -- path/f )
+    library-roots swap find-file ;
+
+: find-binary ( str -- path/f )
+    binary-roots swap find-file ;
+
+<PRIVATE
+: append-path ( path files -- paths )
+    [ path+ ] curry* map ;
+
+: get-paths ( dir -- paths )
+    dup directory keys append-path ;
+
+: (walk-dir) ( path -- )
+    dup directory? [
+        get-paths dup % [ (walk-dir) ] each
+    ] [
+        drop
+    ] if ;
+PRIVATE>
+
+: walk-dir ( path -- seq ) [ (walk-dir) ] { } make ;

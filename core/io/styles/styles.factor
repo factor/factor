@@ -19,9 +19,6 @@ SYMBOL: presented
 SYMBOL: presented-path
 SYMBOL: presented-printer
 
-! Only for plain-stream
-SYMBOL: highlight
-
 ! Paragraph styles
 SYMBOL: page-color
 SYMBOL: border-color

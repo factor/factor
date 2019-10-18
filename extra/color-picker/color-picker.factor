@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser models sequences ui ui.gadgets
-ui.gadgets.controls ui.gadgets.frames ui.gadgets.labels
-ui.gadgets.packs ui.gadgets.sliders ui.render ;
+USING: kernel math math.functions math.parser models sequences
+ui ui.gadgets ui.gadgets.frames
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders ui.render
+;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.
@@ -10,9 +11,14 @@ IN: color-picker
 : <color-slider> ( model -- gadget )
     <x-slider> 1 over set-slider-line ;
 
+TUPLE: color-preview ;
+
 : <color-preview> ( model -- gadget )
-    <gadget> { 100 100 } over set-rect-dim
-    [ set-gadget-interior ] <control> ;
+    <gadget> color-preview construct-control
+    { 100 100 } over set-rect-dim ;
+
+M: color-preview model-changed
+    swap model-value over set-gadget-interior relayout-1 ;
 
 : <color-model> ( model -- model )
     [ [ 256 /f ] map 1 add <solid> ] <filter> ;

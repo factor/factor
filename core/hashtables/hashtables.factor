@@ -59,8 +59,7 @@ IN: hashtables
     swap 2 fixnum+fast 2dup slot -rot 1 fixnum+fast slot ;
     inline
 
-: set-nth-pair ( value key n seq -- )
-    swap
+: set-nth-pair ( value key seq n -- )
     2 fixnum+fast [ set-slot ] 2keep
     1 fixnum+fast set-slot ; inline
 
@@ -70,10 +69,10 @@ IN: hashtables
 : hash-deleted+ ( hash -- )
     dup hash-deleted 1+ swap set-hash-deleted ; inline
 
-: (set-hash) ( value key hash -- )
+: (set-hash) ( value key hash -- new? )
     2dup new-key@
-    [ rot hash-count+ ] [ rot drop ] if
-    swap set-nth-pair ; inline
+    [ rot hash-count+ set-nth-pair t ]
+    [ rot drop set-nth-pair f ] if ; inline
 
 : find-pair-next >r 2 fixnum+fast r> ; inline
 
@@ -95,10 +94,10 @@ IN: hashtables
 : find-pair ( array quot -- key value ? ) 0 rot (find-pair) ; inline
 
 : (rehash) ( hash array -- )
-    [ swap pick (set-hash) f ] find-pair 2drop 2drop ;
+    [ swap pick (set-hash) drop f ] find-pair 2drop 2drop ;
 
 : hash-large? ( hash -- ? )
-    dup hash-count 1 fixnum+fast 3 fixnum*fast
+    dup hash-count 3 fixnum*fast
     swap hash-array array-capacity > ;
 
 : hash-stale? ( hash -- ? )
@@ -133,7 +132,7 @@ M: hashtable clear-assoc ( hash -- )
 
 M: hashtable delete-at ( key hash -- )
     tuck key@ [
-        >r >r ((tombstone)) dup r> r> swap set-nth-pair
+        >r >r ((tombstone)) dup r> r> set-nth-pair
         hash-deleted+
     ] [
         3drop
@@ -150,7 +149,7 @@ M: hashtable assoc-size ( hash -- n )
     (rehash) ;
 
 M: hashtable set-at ( value key hash -- )
-    dup ?grow-hash (set-hash) ;
+    dup >r (set-hash) [ r> ?grow-hash ] [ r> drop ] if ;
 
 : associate ( value key -- hash )
     2 <hashtable> [ set-at ] keep ;
@@ -169,8 +168,10 @@ M: hashtable equal?
     } cond ;
 
 M: hashtable hashcode*
-    dup assoc-size 1 number=
-    [ assoc-hashcode ] [ nip assoc-size ] if ;
+    [
+        dup assoc-size 1 number=
+        [ assoc-hashcode ] [ nip assoc-size ] if
+    ] recursive-hashcode ;
 
 ! Default method
 M: assoc new-assoc drop <hashtable> ;

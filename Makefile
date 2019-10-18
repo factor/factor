@@ -1,7 +1,9 @@
 CC = gcc
+AR = ar
+LD = ld
 
 EXECUTABLE = factor
-VERSION = 0.90
+VERSION = 0.91
 
 IMAGE = factor.image
 BUNDLE = Factor.app
@@ -23,7 +25,7 @@ ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
 DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/alien.o \
 	vm/bignum.o \
-	vm/compiler.o \
+	vm/code_heap.o \
 	vm/debug.o \
 	vm/factor.o \
 	vm/ffi_test.o \
@@ -34,30 +36,33 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/code_gc.o \
 	vm/primitives.o \
 	vm/run.o \
-	vm/stack.o \
+	vm/callstack.o \
 	vm/types.o \
-	vm/utilities.o
+	vm/quotations.o \
+	vm/utilities.o \
+	vm/errors.o \
+	vm/profiler.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
-	@echo "freebsd-x86"
-	@echo "freebsd-amd64"
-	@echo "linux-x86"
-	@echo "linux-amd64"
+	@echo "freebsd-x86-32"
+	@echo "freebsd-x86-64"
+	@echo "linux-x86-32"
+	@echo "linux-x86-64"
 	@echo "linux-ppc"
 	@echo "linux-arm"
-	@echo "openbsd-x86"
-	@echo "openbsd-amd64"
-	@echo "macosx-x86"
+	@echo "openbsd-x86-32"
+	@echo "openbsd-x86-64"
+	@echo "macosx-x86-32"
+	@echo "macosx-x86-64"
 	@echo "macosx-ppc"
-	@echo "solaris-x86"
-	@echo "solaris-amd64"
+	@echo "solaris-x86-32"
+	@echo "solaris-x86-64"
 	@echo "windows-ce-arm"
-	@echo "windows-ce-x86"
-	@echo "windows-nt-x86"
+	@echo "windows-nt-x86-32"
 	@echo ""
 	@echo "Additional modifiers:"
 	@echo ""
@@ -66,17 +71,17 @@ default:
 	@echo "NO_UI=1  don't link with X11 libraries (ignored on Mac OS X)"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
-openbsd-x86:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.openbsd.x86
+openbsd-x86-32:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.openbsd.x86.32
 
-openbsd-amd64:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.openbsd.amd64
+openbsd-x86-64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.openbsd.x86.64
 
-freebsd-x86:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.freebsd.x86
+freebsd-x86-32:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.freebsd.x86.32
 
-freebsd-amd64:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.freebsd.amd64
+freebsd-x86-64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.freebsd.x86.64
 
 macosx-freetype:
 	ln -sf libfreetype.6.dylib \
@@ -85,14 +90,17 @@ macosx-freetype:
 macosx-ppc: macosx-freetype
 	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.ppc
 
-macosx-x86: macosx-freetype
-	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86
+macosx-x86-32: macosx-freetype
+	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86.32
 
-linux-x86:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.x86
+macosx-x86-64: macosx-freetype
+	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86.64
 
-linux-amd64:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.amd64
+linux-x86-32:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.x86.32
+
+linux-x86-64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.x86.64
 
 linux-ppc:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.ppc
@@ -100,22 +108,20 @@ linux-ppc:
 linux-arm:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.linux.arm
 
-solaris-x86:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86
+solaris-x86-32:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86.32
 
-solaris-amd64:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.amd64
+solaris-x86-64:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86.64
 
-windows-nt-x86:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86
+windows-nt-x86-32:
+	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
 
 windows-ce-arm:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.arm
 
-windows-ce-x86:
-	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.x86
-
 macosx.app: factor
+	mkdir -p $(BUNDLE)/Contents/MacOS
 	cp $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
 	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
 
@@ -131,9 +137,6 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
-
-pull:
-	darcs pull http://factorcode.org/repos/
 
 clean:
 	rm -f vm/*.o

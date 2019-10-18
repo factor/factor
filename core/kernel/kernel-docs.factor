@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax math memory
 namespaces sequences kernel.private layouts sorting classes
 kernel.private vectors combinators quotations strings words
-assocs ;
+assocs arrays ;
 IN: kernel
 
 ARTICLE: "shuffle-words" "Shuffle words"
@@ -32,7 +32,7 @@ $nl
 { $subsection >r }
 { $subsection r> }
 "The top of the data stack is ``hidden'' between " { $link >r } " and " { $link r> } ":"
-{ $example "1 2 3 >r .s r>" "2\n1" }
+{ $example "1 2 3 >r .s r>" "1\n2" }
 "Words must not leave objects on the retain stack, nor expect values to be there on entry. The retain stack is for local storage within a word only, and occurrences of " { $link >r } " and " { $link r> } " must be balanced inside a single quotation. One exception is the following trick involving " { $link if } "; values may be pushed on the retain stack before the condition value is computed, as long as both branches of the " { $link if } " pop the values off the retain stack before returning:"
 { $code
     ": foo ( m ? n -- m+n/n )"
@@ -40,10 +40,10 @@ $nl
 } ;
 
 ARTICLE: "basic-combinators" "Basic combinators"
-"The following pair of words invoke the interpreter reflectively:"
+"The following pair of words invoke words and quotations reflectively:"
 { $subsection call }
 { $subsection execute }
-"These words are used to implement " { $emphasis "combinators" } ", which are words that take code from the stack. Combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile; for example:"
+"These words are used to implement " { $emphasis "combinators" } ", which are words that take code from the stack. Note that combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile in the optimizing compiler; for example:"
 { $code
     ": keep ( x quot -- x | quot: x -- )"
     "    over >r call r> ; inline"
@@ -60,6 +60,8 @@ $nl
 "A pair of utility words built from " { $link 2apply } ":"
 { $subsection both? }
 { $subsection either? }
+"A looping combinator:"
+{ $subsection while }
 "Quotations can be composed using efficient quotation-specific operations:"
 { $subsection curry }
 { $subsection 2curry }
@@ -167,28 +169,28 @@ HELP: r> ( -- x )
 { $values { "x" object } } { $description "Moves the top of the retain stack to the data stack." } ;
 
 HELP: datastack ( -- ds )
-{ $values { "ds" vector } }
-{ $description "Outputs the a vector containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the vector." } ;
+{ $values { "ds" array } }
+{ $description "Outputs an array containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
 HELP: set-datastack ( ds -- )
-{ $values { "ds" vector } }
-{ $description "Replaces the data stack contents with a copy of a vector. The end of the vector becomes the top of the stack." } ;
+{ $values { "ds" array } }
+{ $description "Replaces the data stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
 HELP: retainstack ( -- rs )
-{ $values { "rs" vector } }
-{ $description "Outputs the a vector containing a copy of the retain stack contents right before the call to this word, with the top of the stack at the end of the vector." } ;
+{ $values { "rs" array } }
+{ $description "Outputs an array containing a copy of the retain stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
 HELP: set-retainstack ( rs -- )
-{ $values { "rs" vector } }
-{ $description "Replaces the retain stack contents with a copy of a vector. The end of the vector becomes the top of the stack." } ;
+{ $values { "rs" array } }
+{ $description "Replaces the retain stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
 HELP: callstack ( -- cs )
-{ $values { "cs" vector } }
-{ $description "Outputs the a vector containing a copy of the call stack contents right before the call to this word, with the top of the stack at the end of the vector. The call frame of the caller word is " { $emphasis "not" } " included." } ;
+{ $values { "cs" callstack } }
+{ $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
 
 HELP: set-callstack ( cs -- )
-{ $values { "cs" vector } }
-{ $description "Replaces the call stack contents with a copy of a vector. The end of the vector becomes the top of the stack. The current quotation continues executing. The new call stack takes effect when the current quotation returns, resulting in a call frame being popped." } ;
+{ $values { "cs" callstack } }
+{ $description "Replaces the call stack contents. The end of the vector becomes the top of the stack. Control flow is transferred immediately to the new call stack." } ;
 
 HELP: clear
 { $description "Clears the data stack." } ;
@@ -273,8 +275,8 @@ HELP: type ( object -- n )
 
 { type tag type>class } related-words
 
-HELP: ?
-{ $values { "cond" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
+HELP: ? ( ? true false -- true/false )
+{ $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
 { $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;
 
 HELP: >boolean
@@ -337,6 +339,11 @@ $nl
     "The following two lines are equivalent:"
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
 } ;
+
+HELP: call-clear ( quot -- )
+{ $values { "quot" callable } }
+{ $description "Calls a quotation with an empty call stack. If the quotation returns, Factor will exit.." }
+{ $notes "Used to implement " { $link "threads" } "." } ;
 
 HELP: slip
 { $values { "quot" quotation } { "x" object } }
@@ -436,11 +443,6 @@ HELP: tag ( object -- n )
 { $values { "object" object } { "n" "a tag number" } }
 { $description "Outputs an object's tag number, between zero and one less than " { $link num-tags } ". This is implementation detail and user code should call " { $link class } " instead." } ;
 
-HELP: dispatch ( n array -- )
-{ $values { "n" "a fixnum" } { "array" "an array of quotations" } }
-{ $description "Calls the " { $snippet "n" } "th quotation in the array." }
-{ $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;
-
 HELP: getenv ( n -- obj )
 { $values { "n" "a non-negative integer" } { "obj" object } }
 { $description "Reads an object from the Factor VM's environment table. User code never has to read the environment table directly; instead, use one of the callers of this word." } ;
@@ -538,3 +540,15 @@ HELP: 3compose
     }
     "However, " { $link 3compose } " runs in constant time, and the compiler is able to compile code which calls composed quotations."
 } ;
+
+HELP: while
+{ $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
+{ $description "Repeatedly calls " { $snippet "pred" } ". If it yields " { $link f } ", iteration stops, otherwise " { $snippet "quot" } " is called. After iteration stops, " { $snippet "tail" } " is called." }
+{ $notes "In most cases, tail recursion should be used, because it is simpler both in terms of implementation and conceptually. However in some cases this combinator expresses intent better and should be used."
+$nl
+"Strictly speaking, the " { $snippet "tail" } " is not necessary, since the following are equivalent:"
+{ $code
+    "[ P ] [ Q ] [ T ] while"
+    "[ P ] [ Q ] [ ] while T"
+}
+"However, depending on the stack effects of " { $snippet "pred" } " and " { $snippet "quot" } ", the " { $snippet "tail" } " quotation might need to be non-empty in order to balance out the stack effect of branches for stack effect inference." } ;

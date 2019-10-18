@@ -1,7 +1,9 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: memory
-USING: kernel sequences vectors system ;
+USING: arrays kernel sequences vectors system hashtables
+kernel.private sbufs growable assocs namespaces quotations
+math strings combinators ;
 
 : (each-object) ( quot -- )
     next-object dup
@@ -10,12 +12,7 @@ USING: kernel sequences vectors system ;
 : each-object ( quot -- )
     begin-scan (each-object) end-scan ; inline
 
-: (instances) ( obj quot seq -- )
-    >r over >r call [ r> r> push ] [ r> r> 2drop ] if ; inline
-
 : instances ( quot -- seq )
-    10000 <vector> [
-        -rot [ (instances) ] 2keep
-    ] each-object nip ; inline
+    pusher >r each-object r> >array ; inline
 
 : save ( -- ) image save-image ;

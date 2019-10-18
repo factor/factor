@@ -1,5 +1,4 @@
-USING: kernel sequences test gap-buffer strings math ;
-IN: gb-tests
+USING: kernel sequences tools.test gap-buffer strings math ;
 
 ! test copy-elements
 [ { 0 3 4 3 4 5 } ] [ { 0 1 2 3 4 5 } dup >r -2 3 5 r> copy-elements ] unit-test

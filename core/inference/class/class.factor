@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs hashtables inference kernel
 math namespaces sequences words parser math.intervals
-math.vectors effects classes inference.dataflow
-inference.backend ;
+effects classes inference.dataflow inference.backend ;
 IN: inference.class
 
 ! Class inference
@@ -128,7 +127,7 @@ M: literal-constraint constraint-satisfied?
     [ swap literal-constraint-literal eql? ] [ 2drop f ] if ;
 
 : value-class* ( value -- class )
-    value-classes get at [ object ] unless* ;
+    value-classes get at object or ;
 
 M: class-constraint constraint-satisfied?
     dup class-constraint-value value-class*

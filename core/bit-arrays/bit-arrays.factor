@@ -27,7 +27,7 @@ PRIVATE>
 
 M: bit-array length array-capacity ;
 
-M: bit-array nth-unsafe cell/bit 2^ bitand 0 > ;
+M: bit-array nth-unsafe cell/bit bit? ;
 
 M: bit-array set-nth-unsafe
     [ cell/bit set-bit ] 2keep

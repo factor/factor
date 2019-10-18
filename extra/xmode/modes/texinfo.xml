@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE="@c" />
+	</PROPS>
+	<RULES>
+		<!-- comments -->
+		<EOL_SPAN TYPE="COMMENT1">@c </EOL_SPAN>
+		<EOL_SPAN TYPE="COMMENT1">@comment </EOL_SPAN>
+
+		<!-- @... commands -->
+		<MARK_FOLLOWING TYPE="KEYWORD1">@</MARK_FOLLOWING>
+
+		<SEQ TYPE="OPERATOR">{</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+	</RULES>
+</MODE>

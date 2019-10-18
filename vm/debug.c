@@ -1,22 +1,36 @@
 #include "master.h"
 
+void print_chars(F_STRING* str)
+{
+	CELL i;
+	for(i = 0; i < string_capacity(str); i++)
+		putchar(cget(SREF(str,i)));
+}
+
 void print_word(F_WORD* word, CELL nesting)
 {
+
+	if(type_of(word->vocabulary) == STRING_TYPE)
+	{
+		print_chars(untag_string(word->vocabulary));
+		printf(":");
+	}
+	
 	if(type_of(word->name) == STRING_TYPE)
-		printf("%s",to_char_string(untag_string(word->name),true));
+		print_chars(untag_string(word->name));
 	else
 	{
 		printf("#<not a string: ");
 		print_nested_obj(word->name,nesting - 1);
 		printf(">");
 	}
-
-	printf(" (#%ld)",untag_fixnum_fast(word->primitive));
 }
 
 void print_string(F_STRING* str)
 {
-	printf("\"%s\"",to_char_string(str,true));
+	putchar('"');
+	print_chars(str);
+	putchar('"');
 }
 
 void print_array(F_ARRAY* array, CELL nesting)
@@ -27,7 +41,7 @@ void print_array(F_ARRAY* array, CELL nesting)
 	for(i = 0; i < length; i++)
 	{
 		printf(" ");
-		print_nested_obj(get(AREF(array,i)),nesting - 1);
+		print_nested_obj(array_nth(array,i),nesting - 1);
 	}
 }
 
@@ -38,6 +52,8 @@ void print_nested_obj(CELL obj, CELL nesting)
 		printf(" ... ");
 		return;
 	}
+
+	F_QUOTATION *quot;
 
 	switch(type_of(obj))
 	{
@@ -55,17 +71,18 @@ void print_nested_obj(CELL obj, CELL nesting)
 		break;
 	case TUPLE_TYPE:
 		printf("T{");
-		print_array((F_ARRAY*)UNTAG(obj),nesting - 1);
+		print_array(untag_object(obj),nesting - 1);
 		printf(" }");
 		break;
 	case ARRAY_TYPE:
 		printf("{");
-		print_array((F_ARRAY*)UNTAG(obj),nesting - 1);
+		print_array(untag_object(obj),nesting - 1);
 		printf(" }");
 		break;
 	case QUOTATION_TYPE:
 		printf("[");
-		print_array((F_ARRAY*)UNTAG(obj),nesting - 1);
+		quot = untag_object(obj);
+		print_array(untag_object(quot->array),nesting - 1);
 		printf(" ]");
 		break;
 	default:
@@ -88,14 +105,21 @@ void print_objects(CELL start, CELL end)
 	}
 }
 
+void print_stack_frame(F_STACK_FRAME *frame)
+{
+	print_obj(frame_executing(frame));
+	printf("\n");
+	print_obj(frame_scan(frame));
+	printf("\n");
+	printf("%lx\n",(CELL)frame_executing(frame));
+	printf("%lx\n",(CELL)frame->xt);
+}
+
 void print_callstack(void)
 {
-	F_INTERP_FRAME *frame;
-	for(frame = cs_bot; frame < cs; frame++)
-	{
-		print_obj(frame->quot);
-		printf("\n");
-	}
+	CELL bottom = (CELL)stack_chain->callstack_bottom;
+	CELL top = (CELL)stack_chain->callstack_top;
+	iterate_callstack(top,bottom,print_stack_frame);
 }
 
 void dump_cell(CELL cell)
@@ -114,14 +138,14 @@ void dump_cell(CELL cell)
 		if(cell == F)
 			printf(" -- F");
 		else if(cell < TYPE_COUNT<<TAG_BITS)
-			printf(" -- header: %ld",cell>>TAG_BITS);
+			printf(" -- possible header: %ld",cell>>TAG_BITS);
 		else if(cell >= data_heap->segment->start
 			&& cell < data_heap->segment->end)
 		{
 			CELL header = get(UNTAG(cell));
 			CELL type = header>>TAG_BITS;
 			printf(" -- object; ");
-			if(TAG(header) == OBJECT_TYPE && type < TYPE_COUNT)
+			if(TAG(header) == 0 && type < TYPE_COUNT)
 				printf(" type %ld",type);
 			else
 				printf(" header corrupt");
@@ -166,9 +190,30 @@ void dump_generations(void)
 		(CELL)(data_heap->cards_end - data_heap->cards));
 }
 
+void dump_objects(F_FIXNUM type)
+{
+	data_gc();
+	begin_scan();
+
+	CELL obj;
+	while((obj = next_object()) != F)
+	{
+		if(type == -1 || type_of(obj) == type)
+		{
+			printf("%lx ",obj);
+			print_nested_obj(obj,3);
+			printf("\n");
+		}
+	}
+
+	/* end scan */
+	gc_off = false;
+}
+
 void factorbug(void)
 {
 	reset_stdio();
+	open_console();
 
 	printf("Starting low level debugger...\n");
 	printf("  Basic commands:\n");
@@ -181,13 +226,14 @@ void factorbug(void)
 	printf(". <addr>         -- print object at tagged <addr>\n");
 	printf("s r              -- dump data, retain stacks\n");
 	printf(".s .r .c         -- print data, retain, call stacks\n");
-	printf("i                -- dump interpreter state\n");
 	printf("e                -- dump environment\n");
 	printf("g                -- dump generations\n");
 	printf("card <addr>      -- print card containing address\n");
 	printf("addr <card>      -- print address containing card\n");
+	printf("data             -- data heap dump\n");
+	printf("words            -- words dump\n");
 	printf("code             -- code heap dump\n");
-	
+
 	for(;;)
 	{
 		char cmd[1024];
@@ -228,12 +274,6 @@ void factorbug(void)
 			print_objects(rs_bot,rs);
 		else if(strcmp(cmd,".c") == 0)
 			print_callstack();
-		else if(strcmp(cmd,"i") == 0)
-		{
-			printf("Call frame:\n");
-			print_obj(callframe.quot);
-			printf("\n");
-		}
 		else if(strcmp(cmd,"e") == 0)
 		{
 			int i;
@@ -260,9 +300,20 @@ void factorbug(void)
 			exit(1);
 		else if(strcmp(cmd,"im") == 0)
 			save_image(STR_FORMAT("fep.image"));
+		else if(strcmp(cmd,"data") == 0)
+			dump_objects(-1);
+		else if(strcmp(cmd,"words") == 0)
+			dump_objects(WORD_TYPE);
 		else if(strcmp(cmd,"code") == 0)
 			dump_heap(&code_heap);
 		else
 			printf("unknown command\n");
 	}
+}
+
+DEFINE_PRIMITIVE(die)
+{
+	fprintf(stderr,"The die word was called by the library. Unless you called it yourself,\n");
+	fprintf(stderr,"you have triggered a bug in Factor. Please report.\n");
+	factorbug();
 }

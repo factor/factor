@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables kernel kernel.private math
 namespaces parser sequences strings words libc slots
-alien.c-types math.functions math.vectors cpu.architecture ;
+alien.c-types cpu.architecture ;
 IN: alien.structs
 
 : align-offset ( offset type -- offset )

@@ -42,7 +42,7 @@ GENERIC: client-event ( event window -- )
 
 : events-queued ( mode -- n ) >r dpy get r> XEventsQueued ;
 
-: wheel? ( event -- ? ) XButtonEvent-button { 4 5 } member? ;
+: wheel? ( event -- ? ) XButtonEvent-button 4 7 between? ;
 
 : button-down-event$ ( event window -- )
     over wheel? [ wheel-event ] [ button-down-event ] if ;

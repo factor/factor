@@ -8,40 +8,98 @@ s64 current_millis(void)
 		- EPOCH_OFFSET) / 10000;
 }
 
-void primitive_cwd(void)
+DEFINE_PRIMITIVE(cwd)
 {
-	F_CHAR buf[MAX_PATH + 4];
+	F_CHAR buf[MAX_UNICODE_PATH];
 
-	if(!GetCurrentDirectory(MAX_PATH + 4, buf))
+	if(!GetCurrentDirectory(MAX_UNICODE_PATH, buf))
 		io_error();
 
 	box_u16_string(buf);
 }
 
-void primitive_cd(void)
+DEFINE_PRIMITIVE(cd)
 {
 	SetCurrentDirectory(unbox_u16_string());
 }
 
-void seh_call(void (*func)(), exception_handler_t *handler)
+DEFINE_PRIMITIVE(os_envs)
 {
-	exception_record_t record;
-	asm volatile("mov %%fs:0, %0" : "=r" (record.next_handler));
-	asm volatile("mov %0, %%fs:0" : : "r" (&record));
-	record.handler_func = handler;
-	func();
-	asm volatile("mov %0, %%fs:0" : "=r" (record.next_handler));
+	GROWABLE_ARRAY(result);
+
+	TCHAR *env = GetEnvironmentStrings();
+	TCHAR *finger = env;
+
+	for(;;)
+	{
+		TCHAR *scan = finger;
+		while(*scan != '\0')
+			scan++;
+		if(scan == finger)
+			break;
+
+		REGISTER_UNTAGGED(result);
+		CELL string = tag_object(from_u16_string(finger));
+		UNREGISTER_UNTAGGED(result);
+		GROWABLE_ADD(result,string);
+
+		finger = scan + 1;
+	}
+
+	FreeEnvironmentStrings(env);
+
+	GROWABLE_TRIM(result);
+	dpush(tag_object(result));
 }
 
-long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
+long exception_handler(PEXCEPTION_POINTERS pe)
 {
-	memory_protection_error(
-		rec->ExceptionInformation[1],
-		native_stack_pointer());
-	return -1; /* unreachable */
+	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
+	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
+
+	if(in_code_heap_p(c->Eip))
+		signal_callstack_top = (void *)c->Esp;
+	else
+		signal_callstack_top = NULL;
+
+	if(e->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
+	{
+		signal_fault_addr = e->ExceptionInformation[1];
+		c->Eip = (CELL)memory_signal_handler_impl;
+	}
+	else if(e->ExceptionCode == EXCEPTION_FLT_DIVIDE_BY_ZERO
+			|| e->ExceptionCode == EXCEPTION_INT_DIVIDE_BY_ZERO)
+	{
+		signal_number = ERROR_DIVIDE_BY_ZERO;
+		c->Eip = (CELL)divide_by_zero_signal_handler_impl;
+	}
+	else
+	{
+		signal_number = 11;
+		c->Eip = (CELL)misc_signal_handler_impl;
+	}
+
+	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-void run_toplevel(void)
+void c_to_factor_toplevel(CELL quot)
 {
-	seh_call(run, exception_handler);
+	if(!AddVectoredExceptionHandler(0, (void*)exception_handler))
+		fatal_error("AddVectoredExceptionHandler failed", 0);
+	c_to_factor(quot);
+	RemoveVectoredExceptionHandler((void*)exception_handler);
+}
+
+void open_console(void)
+{
+	/*
+	// Do this: http://www.cygwin.com/ml/cygwin/2007-11/msg00432.html
+	if(console_open)
+		return;
+
+	if(AttachConsole(ATTACH_PARENT_PROCESS) || AllocConsole())
+	{
+		console_open = true;
+	}
+	*/
 }

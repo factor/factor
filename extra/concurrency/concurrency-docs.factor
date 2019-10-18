@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup concurrency match ;
+USING: help.syntax help.markup concurrency concurrency.private match ;
 IN: concurrency
 
 HELP: make-mailbox
@@ -25,9 +25,8 @@ HELP: mailbox-put
 
 HELP: (mailbox-block-unless-pred)
 { $values { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } } 
-          { "mailbox" "a mailbox object" } 
-	  { "pred2" "same object as 'pred'" }
-	  { "mailbox2" "same object as 'mailbox'" }
+          { "mailbox" "a mailbox object" }
+          { "timeout" "a timeout in milliseconds" }
 }
 { $description "Block the thread if there are no items in the mailbox that return true when the predicate is called with the item on the stack. The predicate must have stack effect " { $snippet "( X -- bool )" } "." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty mailbox-get? } ;
@@ -35,6 +34,7 @@ HELP: (mailbox-block-unless-pred)
 HELP: (mailbox-block-if-empty)
 { $values { "mailbox" "a mailbox object" } 
 	  { "mailbox2" "same object as 'mailbox'" }
+      { "timeout" "a timeout in milliseconds" }
 }
 { $description "Block the thread if the mailbox is empty." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty mailbox-get? } ;
@@ -68,48 +68,26 @@ HELP: mailbox-get?
 { $description "Get the first item in the mailbox which satisfies the predicate. 'pred' will be called repeatedly for each item in the mailbox. When 'pred' returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does. 'pred' must have stack effect " { $snippet "( X -- bool }" } "." } 
 { $see-also make-mailbox mailbox-empty? mailbox-put mailbox-get mailbox-get-all while-mailbox-empty } ;
 
-HELP: <node> 
-{ $values { "hostname" "the hostname of the node as a string" } 
-          { "port" "the integer port number of the node" } 
-          { "node" "the constructed node object" } 
-}
-{ $description "Processes run on nodes. Each node has a hostname and a port." } 
-{ $see-also localnode } ;
-
-HELP: localnode
-{ $values { "node" "a node object" } 
-}
-{ $description "Return the node the process is currently running on." } 
-{ $see-also <node> } ;
-
 HELP: <process>
 { $values { "links" "an array of processes" } 
           { "pid" "the process id" } 
           { "mailbox" "a mailbox object" } 
 }
 { $description "Constructs a process object. A process is a lightweight thread with a mailbox that can be used to communicate with other processes. Each process has a unique process id." } 
-{ $see-also <remote-process> spawn send receive } ;
-
-HELP: <remote-process>
-{ $values { "node" "a node object" } 
-          { "pid" "a process id" } 
-          { "remote-process" "the constructed remote-process object" } 
-}
-{ $description "Constructs a proxy to a process running on another node. It can be used to send messages to the process it is acting as a proxy for." } 
-{ $see-also <node> <process> spawn send } ;
+{ $see-also spawn send receive } ;
 
 HELP: self
 { $values { "process" "a process object" } 
 }
 { $description "Returns the currently running process object." } 
-{ $see-also <process> <remote-process> send receive receive-if } ;
+{ $see-also <process> send receive receive-if } ;
 
 HELP: send
 { $values { "message" "an object" } 
           { "process" "a process object" } 
 }
 { $description "Send the message to the process by placing it in the processes mailbox. This is an asynchronous operation and will return immediately. The receving process will act on the message the next time it retrieves that item from its mailbox (usually using the " { $link receive } " word. The message can be any Factor object. For destinations that are instances of remote-process the message must be a serializable Factor type." } 
-{ $see-also <process> <remote-process> receive receive-if } ;
+{ $see-also <process> receive receive-if } ;
 
 HELP: receive
 { $values { "message" "an object" } 

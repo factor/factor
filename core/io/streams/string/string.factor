@@ -33,7 +33,7 @@ M: sbuf stream-flush drop ;
 M: plain-writer stream-write-table
     [ drop format-table [ print ] each ] with-stream* ;
 
-M: plain-writer make-table-cell 2drop string-out ;
+M: plain-writer make-cell-stream 2drop <string-writer> ;
 
 M: sbuf stream-read1 dup empty? [ drop f ] [ pop ] if ;
 
@@ -59,6 +59,9 @@ M: sbuf stream-read
         [ swap sbuf-read-until ] 2keep
         set-length
     ] if ;
+
+M: sbuf stream-read-partial
+    stream-read ;
 
 : <string-reader> ( str -- stream )
     >sbuf dup reverse-here <line-reader> ;

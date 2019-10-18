@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+
+	redcode syntax highlighting file for jedit
+
+	Will Varfar, 2002
+
+-->
+
+<MODE>
+
+	<PROPS>
+		<PROPERTY NAME="lineComment" VALUE=";" />
+	</PROPS>
+
+	<RULES HIGHLIGHT_DIGITS="TRUE" DEFAULT="MARKUP" IGNORE_CASE="TRUE">
+
+	    <EOL_SPAN TYPE="COMMENT2">;redcode</EOL_SPAN>
+	    <EOL_SPAN TYPE="COMMENT2">;author</EOL_SPAN>
+	    <EOL_SPAN TYPE="COMMENT2">;name</EOL_SPAN>
+	    <EOL_SPAN TYPE="COMMENT2">;strategy</EOL_SPAN>
+	    <EOL_SPAN TYPE="COMMENT2">;password</EOL_SPAN>
+	    <EOL_SPAN TYPE="COMMENT1">;</EOL_SPAN>
+
+		<SEQ TYPE="KEYWORD3">.AB</SEQ> <!-- Instructions read the A-field of the A-instruction  and the B-field of the B-instruction and write to B-fields. -->
+		<SEQ TYPE="KEYWORD3">.BA</SEQ> <!-- Instructions read the B-field of the A-instruction  and the A-field of the B-instruction and write to A-fields. -->
+		<SEQ TYPE="KEYWORD3">.A</SEQ> <!--Instructions read and write A-fields. -->
+		<SEQ TYPE="KEYWORD3">.B</SEQ> <!-- Instructions read and write B-fields. -->
+		<SEQ TYPE="KEYWORD3">.F</SEQ> <!-- Instructions read both A- and B-fields of  the  the  A- and  B-instruction and write to both A- and B-fields (A to A and B to B). -->
+		<SEQ TYPE="KEYWORD3">.X</SEQ> <!-- Instructions read both A- and B-fields of  the  the  A- and  B-instruction  and  write  to both A- and B-fields exchanging fields (A to B and B to A). -->
+		<SEQ TYPE="KEYWORD3">.I</SEQ> <!-- Instructions read and write entire instructions. -->
+
+		<SEQ TYPE="OPERATOR">,</SEQ>
+		<SEQ TYPE="OPERATOR">:</SEQ>
+		<SEQ TYPE="OPERATOR">(</SEQ>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<!-- Arithmetic: -->
+		<SEQ TYPE="OPERATOR">+</SEQ>   <!-- addition or unary plus -->
+		<SEQ TYPE="OPERATOR">-</SEQ>   <!-- subtraction or unary minus -->
+		<SEQ TYPE="OPERATOR">/</SEQ>   <!-- division -->
+		<SEQ TYPE="OPERATOR">%</SEQ>   <!-- modulo (remainder of division) -->
+
+		<!-- Comparison (*): -->
+		<SEQ TYPE="OPERATOR">==</SEQ>  <!-- equality -->
+		<SEQ TYPE="OPERATOR">!=</SEQ>  <!-- inequality -->
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>  <!-- less than or equal -->
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>  <!-- greater than or equal -->
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>   <!-- less than -->
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>   <!-- greater than -->
+
+		<!-- Logical (*): -->
+		<SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>  <!-- and -->
+		<SEQ TYPE="OPERATOR">||</SEQ>  <!-- or -->
+		<SEQ TYPE="OPERATOR">!</SEQ>   <!-- unary negation -->
+
+		<!-- Assignment (*): -->
+		<SEQ TYPE="OPERATOR">=</SEQ>   <!-- (to register variables a..z) -->
+
+
+		<SEQ TYPE="LITERAL1">$</SEQ>
+		<SEQ TYPE="LITERAL1">@</SEQ>
+		<SEQ TYPE="LITERAL1">#</SEQ>
+		<SEQ TYPE="LITERAL1">*</SEQ>
+		<SEQ TYPE="LITERAL1">{</SEQ>
+		<SEQ TYPE="LITERAL1">}</SEQ>
+
+		<KEYWORDS>
+
+			<LITERAL2>CORESIZE</LITERAL2> <!-- value of -s parameter (default: 8000) -->
+			<LITERAL2>MAXPROCESSES</LITERAL2> <!-- value of -p parameter (default: 8000) -->
+			<LITERAL2>MAXCYCLES</LITERAL2> <!-- value of -c parameter (default: 80000) -->
+			<LITERAL2>MAXLENGTH</LITERAL2> <!-- value of -l parameter (default: 100) -->
+			<LITERAL2>MINDISTANCE</LITERAL2> <!-- value of -d parameter (default: 100) -->
+			<LITERAL2>ROUNDS</LITERAL2> <!-- (+) value of -r parameter (default: 1) -->
+			<LITERAL2>PSPACESIZE</LITERAL2> <!-- (+) value of -S parameter (default: 1/16th CORESIZE) -->
+			<LITERAL2>CURLINE</LITERAL2> <!-- current line in generated assembly (starts with 0) -->
+			<LITERAL2>VERSION</LITERAL2> <!-- pMARS version ("60" is v0.6.0) -->
+			<LITERAL2>WARRIORS</LITERAL2> <!-- number of warriors specified on command line -->
+
+			<KEYWORD1>DAT</KEYWORD1> <!-- terminate process -->
+			<KEYWORD1>MOV</KEYWORD1> <!-- move from A to B -->
+			<KEYWORD1>ADD</KEYWORD1> <!-- add A to B, store result in B -->
+			<KEYWORD1>SUB</KEYWORD1> <!-- subtract A from B, store result in B -->
+			<KEYWORD1>MUL</KEYWORD1> <!-- multiply A by B, store result in B -->
+			<KEYWORD1>DIV</KEYWORD1> <!-- divide B by A, store result in B if A <> 0, else terminate -->
+			<KEYWORD1>MOD</KEYWORD1> <!-- divide B by A, store remainder in B if A <> 0, else terminate -->
+			<KEYWORD1>JMP</KEYWORD1> <!-- transfer execution to A -->
+			<KEYWORD1>JMZ</KEYWORD1> <!-- transfer execution to A if B is zero -->
+			<KEYWORD1>JMN</KEYWORD1> <!-- transfer execution to A if B is non-zero -->
+			<KEYWORD1>DJN</KEYWORD1> <!-- decrement B, if B is non-zero, transfer execution to A -->
+			<KEYWORD1>SPL</KEYWORD1> <!-- split off process to A -->
+			<KEYWORD1>SLT</KEYWORD1> <!-- skip next instruction if A is less than B -->
+			<KEYWORD1>CMP</KEYWORD1> <!-- same as SEQ -->
+			<KEYWORD1>SEQ</KEYWORD1> <!-- (*) Skip next instruction if A is equal to B -->
+			<KEYWORD1>SNE</KEYWORD1> <!-- (*) Skip next instruction if A is not equal to B -->
+			<KEYWORD1>NOP</KEYWORD1> <!-- (*) No operation -->
+			<KEYWORD1>LDP</KEYWORD1> <!-- (+) Load P-space cell A into core address B -->
+			<KEYWORD1>STP</KEYWORD1> <!-- (+) Store A-number into P-space cell B -->
+
+			<KEYWORD2>EQU</KEYWORD2>
+			<KEYWORD2>ORG</KEYWORD2>
+			<KEYWORD2>FOR</KEYWORD2>
+			<KEYWORD2>ROF</KEYWORD2>
+			<KEYWORD2>END</KEYWORD2>
+			<KEYWORD2>PIN</KEYWORD2>
+			<KEYWORD2>CORESIZE</KEYWORD2> <!-- value of -s parameter (default: 8000) -->
+			<KEYWORD2>MAXPROCESSES</KEYWORD2> <!-- value of -p parameter (default: 8000) -->
+			<KEYWORD2>MAXCYCLES</KEYWORD2> <!-- value of -c parameter (default: 80000) -->
+			<KEYWORD2>MAXLENGTH</KEYWORD2> <!-- value of -l parameter (default: 100) -->
+			<KEYWORD2>MINDISTANCE</KEYWORD2> <!-- value of -d parameter (default: 100) -->
+			<KEYWORD2>ROUNDS</KEYWORD2> <!-- (+) value of -r parameter (default: 1) -->
+			<KEYWORD2>PSPACESIZE</KEYWORD2> <!-- (+) value of -S parameter (default: 1/16th CORESIZE) -->
+			<KEYWORD2>CURLINE</KEYWORD2> <!-- current line in generated assembly (starts with 0) -->
+			<KEYWORD2>VERSION</KEYWORD2> <!-- pMARS version ("60" is v0.6.0) -->
+			<KEYWORD2>WARRIORS</KEYWORD2> <!-- number of warriors specified on command line -->
+
+		</KEYWORDS>
+
+	</RULES>
+
+</MODE>
+
+

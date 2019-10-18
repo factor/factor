@@ -1,7 +1,7 @@
 USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
-sorting ;
+sorting tuples ;
 IN: temporary
 
 [
@@ -300,6 +300,28 @@ IN: temporary
     [ ] [
         "IN: temporary TUPLE: bogus-error ; C: <bogus-error> bogus-error : bogus <bogus-error> ;"
         <string-reader> "bogus-error" parse-stream drop
+    ] unit-test
+
+    ! Problems with class predicates -vs- ordinary words
+    [ ] [
+        "IN: temporary TUPLE: killer ;"
+        <string-reader> "removing-the-predicate" parse-stream drop
+    ] unit-test
+
+    [ ] [
+        "IN: temporary GENERIC: killer?"
+        <string-reader> "removing-the-predicate" parse-stream drop
+    ] unit-test
+    
+    [ t ] [
+        "killer?" "temporary" lookup >boolean
+    ] unit-test
+
+    [ t ] [
+        [
+            "IN: temporary TUPLE: another-pred-test ; GENERIC: another-pred-test?"
+            <string-reader> "removing-the-predicate" parse-stream
+        ] catch [ redefine-error? ] is?
     ] unit-test
 ] with-scope
 

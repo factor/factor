@@ -3,7 +3,7 @@ kernel concurrency ;
 
 "." resource-path cd
 
-"mkdir deploy-log" run-process
+"deploy-log" make-directory
 
 {
     "automata.ui"

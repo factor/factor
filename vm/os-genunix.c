@@ -1,13 +1,8 @@
 #include "master.h"
 
-void run(void)
+void c_to_factor_toplevel(CELL quot)
 {
-	interpreter();
-}
-
-void run_toplevel(void)
-{
-	run();
+	c_to_factor(quot);
 }
 
 void init_signals(void)

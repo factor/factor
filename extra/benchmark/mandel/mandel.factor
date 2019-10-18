@@ -1,6 +1,6 @@
 IN: benchmark.mandel
 USING: arrays io kernel math namespaces sequences strings sbufs
-math.functions math.parser io.files ;
+math.functions math.parser io.files colors.hsv ;
 
 : max-color 360 ; inline
 : zoom-fact 0.8 ; inline
@@ -8,27 +8,6 @@ math.functions math.parser io.files ;
 : height 480 ; inline
 : nb-iter 40 ; inline
 : center -0.65 ; inline
-
-: f_ >r swap rot >r 2dup r> 6 * r> - ;
-: p ( v s x -- v p x ) >r dupd neg 1 + * r> ;
-: q ( v s f -- q ) * neg 1 + * ;
-: t_ ( v s f -- t_ ) neg 1 + * neg 1 + * ;
-
-: mod-cond ( p vector -- )
-    #! Call p mod q'th entry of the vector of quotations, where
-    #! q is the length of the vector. The value q remains on the
-    #! stack.
-    [ dupd length mod ] keep nth call ;
-
-: hsv>rgb ( h s v -- r g b )
-    pick 6 * >fixnum {
-        [ f_ t_ p swap     ] ! v p t
-        [ f_ q  p -rot     ] ! q v p
-        [ f_ t_ p swapd    ] ! p v t
-        [ f_ q  p rot      ] ! p q v
-        [ f_ t_ p swap rot ] ! t p v
-        [ f_ q  p          ] ! v p q
-    } mod-cond ;
 
 : scale 255 * >fixnum ; inline
 
@@ -40,8 +19,8 @@ math.functions math.parser io.files ;
 
 : <color-map> ( nb-cols -- map )
     dup [
-        360 * swap 1+ / 360 / sat val
-        hsv>rgb scale-rgb
+        360 * swap 1+ / sat val
+        3array hsv>rgb first3 scale-rgb
     ] curry* map ;
 
 : iter ( c z nb-iter -- x )
@@ -85,7 +64,7 @@ SYMBOL: cols
         building get >string
     ] with-scope ;
 
-: mandel-main ( file -- )
+: mandel-main ( -- )
     "mandel.ppm" resource-path <file-writer>
     [ mandel write ] with-stream ;
 

@@ -1,13 +1,13 @@
-USING: http.server.responders.file http.server.responders http
+USING: webapps.file http.server.responders http
 http.server namespaces io tools.test strings io.server ;
 IN: temporary
 
-[ ] [ [ "404 not found" httpd-error ] with-logging ] unit-test
+[ ] [ f [ "404 not found" httpd-error ] with-logging ] unit-test
 
 [ "inspect/global" ] [ "/inspect/global" trim-/ ] unit-test
 
 [ ] [
-    [ "unit/test" log-responder ] with-logging
+    f [ "unit/test" log-responder ] with-logging
 ] unit-test
 
 [ "index.html" ]
@@ -28,8 +28,8 @@ IN: temporary
 [ f ]
 [ "foobar/../baz" secure-path ] unit-test
 
-[ ] [ [ "GET ../index.html" parse-request ] with-logging ] unit-test
-[ ] [ [ "POO" parse-request ] with-logging ] unit-test
+[ ] [ f [ "GET ../index.html" parse-request ] with-logging ] unit-test
+[ ] [ f [ "POO" parse-request ] with-logging ] unit-test
 
 [ H{ { "Foo" "Bar" } } ] [ "Foo=Bar" query>hash ] unit-test
 

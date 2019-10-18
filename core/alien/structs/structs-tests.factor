@@ -1,6 +1,6 @@
 IN: temporary
 USING: alien alien.syntax alien.c-types kernel tools.test
-sequences system libc words ;
+sequences system libc words vocabs namespaces ;
 
 C-STRUCT: bar
     { "int" "x" }

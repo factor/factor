@@ -1,38 +1,54 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
-continuations prettyprint io.streams.string ;
+continuations prettyprint io.streams.string debugger ;
 IN: temporary
 
 [ 0 ] [ f size ] unit-test
 [ t ] [ [ \ = \ = ] all-equal? ] unit-test
 
 ! Don't leak extra roots if error is thrown
+[ ] [ 10000 [ [ 3 throw ] catch drop ] times ] unit-test
+
 [ ] [ 10000 [ [ -1 f <array> ] catch drop ] times ] unit-test
 
 ! Make sure we report the correct error on stack underflow
 [ { "kernel-error" 11 f f } ]
 [ [ clear drop ] catch ] unit-test
 
+[ ] [ :c ] unit-test
+
 [ { "kernel-error" 13 f f } ]
-[ [ V{ } set-retainstack r> ] catch ] unit-test
+[ [ { } set-retainstack r> ] catch ] unit-test
+
+[ ] [ :c ] unit-test
 
 : overflow-d 3 overflow-d ;
 
 [ { "kernel-error" 12 f f } ]
 [ [ overflow-d ] catch ] unit-test
 
+[ ] [ :c ] unit-test
+
+: (overflow-d-alt) 3 ;
+
+: overflow-d-alt (overflow-d-alt) overflow-d-alt ;
+
+[ { "kernel-error" 12 f f } ]
+[ [ overflow-d-alt ] catch ] unit-test
+
+[ ] [ [ :c ] string-out drop ] unit-test
+
 : overflow-r 3 >r overflow-r ;
 
 [ { "kernel-error" 14 f f } ]
 [ [ overflow-r ] catch ] unit-test
 
-! [ { "kernel-error" 15 f f } ]
-! [ [ V{ } set-callstack ] catch ] unit-test
+[ ] [ :c ] unit-test
 
-: overflow-c overflow-c 3 ;
-
-[ { "kernel-error" 16 f f } ]
-[ [ overflow-c ] catch ] unit-test
+! : overflow-c overflow-c 3 ;
+! 
+! [ { "kernel-error" 16 f f } ]
+! [ [ overflow-c ] catch ] unit-test
 
 [ -7 <byte-array> ] unit-test-fails
 
@@ -46,9 +62,17 @@ IN: temporary
 [ 6 ] [ f 6 or ] unit-test
 
 [ slip ] unit-test-fails
+[ ] [ :c ] unit-test
+
 [ 1 slip ] unit-test-fails
+[ ] [ :c ] unit-test
+
 [ 1 2 slip ] unit-test-fails
+[ ] [ :c ] unit-test
+
 [ 1 2 3 slip ] unit-test-fails
+[ ] [ :c ] unit-test
+
 
 [ 5 ] [ [ 2 2 + ] 1 slip + ] unit-test
 
@@ -69,14 +93,12 @@ IN: temporary
 [ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?if ] string-out ] unit-test
 [ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?if ] string-out ] unit-test
 
-! some primitives are missing GC checks
-! these tests take a long time to run and they have dubious value
-! we always GC check in allot() now
+[ f ] [ f (clone) ] unit-test
+[ -123 ] [ -123 (clone) ] unit-test
 
-! [ ] [ 1000000 [ drop H{ } clone >n ndrop ] each ] unit-test
-! [ ] [ 1.0 1000000 [ 1.0 * ] times drop ] unit-test
-! [ ] [ 268435455 >fixnum 1000000 [ dup dup + drop ] times drop ] unit-test
-! [ ] [ 268435455 >fixnum 1000000 [ dup dup fixnum+ drop ] times drop ] unit-test
-! [ ] [ 1000000 [ drop 1/3 >fixnum drop ] each ] unit-test
-! [ ] [ 1000000 [ drop 1/3 >bignum drop ] each ] unit-test
-! [ ] [ 1000000 [ drop 1/3 >float drop ] each ] unit-test
+[ 6 2 ] [ 1 2 [ 5 + ] dip ] unit-test
+
+[ ] [ callstack set-callstack ] unit-test
+
+[ 3drop datastack ] unit-test-fails
+[ ] [ :c ] unit-test

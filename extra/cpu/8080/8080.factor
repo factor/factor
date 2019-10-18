@@ -3,7 +3,8 @@
 !
 USING: kernel math sequences words arrays io 
        io.files namespaces math.parser kernel.private
-       assocs quotations parser parser-combinators tools.time ;
+       assocs quotations parser parser-combinators tools.time
+       combinators.private ;
 IN: cpu.8080
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix
-USING: alien alien.c-types alien.syntax kernel math namespaces
-system ;
+USING: alien alien.c-types alien.syntax kernel libc structs
+math namespaces system ;
 
 ! ! ! Unix types
 TYPEDEF: int blksize_t
@@ -22,6 +22,7 @@ TYPEDEF: ulong u_long
 TYPEDEF: ulonglong off_t
 TYPEDEF: ushort mode_t
 TYPEDEF: ushort nlink_t
+TYPEDEF: void* caddr_t
 
 USE-IF: linux? unix.linux
 USE-IF: bsd? unix.bsd
@@ -43,16 +44,6 @@ C-STRUCT: tm
 C-STRUCT: timespec
     { "time_t" "sec" }
     { "long" "nsec" } ;
-
-C-STRUCT: timeval
-    { "long" "sec" }
-    { "long" "usec" } ;
-
-: make-timeval ( ms -- timeval )
-    1000 /mod 1000 *
-    "timeval" <c-object>
-    [ set-timeval-usec ] keep
-    [ set-timeval-sec ] keep ;
 
 ! ! ! Unix constants
 
@@ -89,6 +80,17 @@ C-STRUCT: timeval
 : S_ISGID OCT: 0002000 ; inline    ! set group id on execution
 : S_ISVTX OCT: 0001000 ; inline    ! sticky bit
 
+: PROT_NONE   0 ; inline
+: PROT_READ   1 ; inline
+: PROT_WRITE  2 ; inline
+: PROT_EXEC   4 ; inline
+
+: MAP_FILE    0 ; inline
+: MAP_SHARED  1 ; inline
+: MAP_PRIVATE 2 ; inline
+
+: MAP_FAILED -1 <alien> ; inline
+
 ! ! ! Unix functions
 LIBRARY: factor
 FUNCTION: int err_no ( ) ;
@@ -105,6 +107,8 @@ FUNCTION: void close ( int fd ) ;
 FUNCTION: int connect ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int dup2 ( int oldd, int newd ) ;
 ! FUNCTION: int dup ( int oldd ) ;
+FUNCTION: int execv ( char* path, char** argv ) ;
+FUNCTION: int execvp ( char* path, char** argv ) ;
 FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
 FUNCTION: int fchdir ( int fd ) ;
 FUNCTION: int fchmod ( int fd, mode_t mode ) ;
@@ -126,11 +130,14 @@ FUNCTION: uid_t getuid ;
 FUNCTION: uint htonl ( uint n ) ;
 FUNCTION: ushort htons ( ushort n ) ;
 ! FUNCTION: int issetugid ;
+FUNCTION: int ioctl ( int fd, ulong request, char* argp ) ;
 FUNCTION: int lchown ( char* path, uid_t owner, gid_t group ) ;
 FUNCTION: int listen ( int s, int backlog ) ;
 FUNCTION: tm* localtime ( time_t* clock ) ;
 FUNCTION: off_t lseek ( int fildes, off_t offset, int whence ) ;
 FUNCTION: int mkdir ( char* path, mode_t mode ) ;
+FUNCTION: void* mmap ( void* addr, size_t len, int prot, int flags, int fd, off_t offset ) ;
+FUNCTION: int munmap ( void* addr, size_t len ) ;
 FUNCTION: uint ntohl ( uint n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
 FUNCTION: int open ( char* path, int flags, int prot ) ;
@@ -140,6 +147,7 @@ FUNCTION: void* popen ( char* command, char* type ) ;
 FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
 FUNCTION: ssize_t recv ( int s, void* buf, size_t nbytes, int flags ) ;
 FUNCTION: ssize_t recvfrom ( int s, void* buf, size_t nbytes, int flags, sockaddr-in* from, socklen_t* fromlen ) ;
+FUNCTION: int rename ( char* from, char* to ) ;
 FUNCTION: int rmdir ( char* path ) ;
 FUNCTION: int select ( int nfds, void* readfds, void* writefds, void* exceptfds, timeval* timeout ) ;
 FUNCTION: ssize_t sendto ( int s, void* buf, size_t len, int flags, sockaddr-in* to, socklen_t tolen ) ;
@@ -157,6 +165,42 @@ FUNCTION: int system ( char* command ) ;
 FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: int unlink ( char* path ) ;
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! wait and waitpid
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Flags for waitpid
+
+: WNOHANG   1 ;
+: WUNTRACED 2 ;
+
+: WSTOPPED   2 ;
+: WEXITED    4 ;
+: WCONTINUED 8 ;
+: WNOWAIT    HEX: 1000000 ;
+
+! Examining status
+
+: WTERMSIG ( status -- value ) HEX: 7f bitand ;
+
+: WIFEXITED ( status -- ? ) WTERMSIG zero? ;
+
+: WEXITSTATUS ( status -- value ) HEX: ff00 bitand -8 shift ;
+
+: WIFSIGNALED ( status -- ? ) HEX: 7f bitand 1+ -1 shift 0 > ;
+
+: WCOREFLAG ( -- value ) HEX: 80 ;
+
+: WCOREDUMP ( status -- ? ) WCOREFLAG bitand zero? not ;
+
+: WIFSTOPPED ( status -- ? ) HEX: ff bitand HEX: 7f = ;
+
+: WSTOPSIG ( status -- value ) WEXITSTATUS ;
+
 FUNCTION: pid_t wait ( int* status ) ;
 FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;

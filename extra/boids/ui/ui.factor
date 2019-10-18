@@ -1,6 +1,7 @@
 
 USING: kernel namespaces
        math
+       math.functions
        math.vectors
        math.parser
        hashtables sequences threads
@@ -18,6 +19,7 @@ USING: kernel namespaces
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gestures
+       combinators.cleave
        hashtables.lib vars rewrite-closures boids ;
 
 IN: boids.ui
@@ -26,16 +28,13 @@ IN: boids.ui
 ! draw-boid
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: boid-point-a ( boid -- a ) boid-pos ;
+: point-a ( boid -- a ) boid-pos ;
 
-: boid-point-b ( boid -- b ) dup boid-pos swap boid-vel normalize* 20 v*n v+ ;
+: point-b ( boid -- b ) [ boid-pos ] [ boid-vel normalize* 20 v*n ] bi v+ ;
 
-: boid-points ( boid -- point-a point-b ) dup boid-point-a swap boid-point-b ;
+: boid-points ( boid -- point-a point-b ) [ point-a ] [ point-b ] bi ;
 
-: draw-line ( a b -- )
-GL_LINES glBegin first2 glVertex2d first2 glVertex2d glEnd ;
-
-: draw-boid ( boid -- ) boid-points draw-line ;
+: draw-boid ( boid -- ) boid-points gl-line ;
 
 : draw-boids ( -- ) boids> [ draw-boid ] each ;
 
@@ -49,8 +48,10 @@ VAR: loop
 
 : run ( -- )
   slate> rect-dim >world-size
-  iterate-boids slate> relayout-1 1 sleep
-  loop> [ run ] [ ] if ;
+  iterate-boids
+  slate> relayout-1
+  yield
+  loop> [ run ] when ;
 
 : button* ( string quot -- button ) closed-quot <bevel-button> ;
 
@@ -97,13 +98,12 @@ VARS: population-label cohesion-label alignment-label separation-label ;
 
 : boids-window* ( -- )
   init-variables init-world-size init-boids loop on
-  [ display ] closed-quot <slate> >slate
 
-  { 600 400 } slate> set-slate-dim
-
-  [ [ run ] in-thread ] closed-quot slate> set-slate-graft
-
-  [ loop off ] closed-quot slate> set-slate-ungraft
+  C[ display ] <slate> >slate
+    t                      slate> set-gadget-clipped?
+    { 600 400 }            slate> set-slate-dim
+    C[ [ run ] in-thread ] slate> set-slate-graft
+    C[ loop off ]          slate> set-slate-ungraft
 
   "" <label> dup reverse-video-theme >population-label update-population-label
 
@@ -120,8 +120,8 @@ VARS: population-label cohesion-label alignment-label separation-label ;
 
     [ <pile> 1 over set-pack-fill
       population-label> over add-gadget
-      "2 - Sub 10" [ drop sub-10-boids ] button* over add-gadget
-      "3 - Add 10" [ drop add-10-boids ] button* over add-gadget ]
+      "3 - Add 10" [ drop add-10-boids ] button* over add-gadget
+      "2 - Sub 10" [ drop sub-10-boids ] button* over add-gadget ]
 
     [ <pile> 1 over set-pack-fill
       cohesion-label> over add-gadget
@@ -145,25 +145,21 @@ VARS: population-label cohesion-label alignment-label separation-label ;
   slate> over @center grid-add
 
   H{ } clone
-    T{ key-down f f "1" } [ drop randomize    ] closed-quot put-hash
-    T{ key-down f f "2" } [ drop sub-10-boids ] closed-quot put-hash
-    T{ key-down f f "3" } [ drop add-10-boids ] closed-quot put-hash
+    T{ key-down f f "1" } C[ drop randomize    ] put-hash
+    T{ key-down f f "2" } C[ drop sub-10-boids ] put-hash
+    T{ key-down f f "3" } C[ drop add-10-boids ] put-hash
 
-    T{ key-down f f "q" } [ drop inc-cohesion-weight ] closed-quot put-hash
-    T{ key-down f f "a" } [ drop dec-cohesion-weight ] closed-quot put-hash
+    T{ key-down f f "q" } C[ drop inc-cohesion-weight ] put-hash
+    T{ key-down f f "a" } C[ drop dec-cohesion-weight ] put-hash
 
-    T{ key-down f f "w" } [ drop inc-alignment-weight ] closed-quot put-hash
-    T{ key-down f f "s" } [ drop dec-alignment-weight ] closed-quot put-hash
+    T{ key-down f f "w" } C[ drop inc-alignment-weight ] put-hash
+    T{ key-down f f "s" } C[ drop dec-alignment-weight ] put-hash
 
-    T{ key-down f f "e" } [ drop inc-separation-weight ] closed-quot put-hash
-    T{ key-down f f "d" } [ drop dec-separation-weight ] closed-quot put-hash
+    T{ key-down f f "e" } C[ drop inc-separation-weight ] put-hash
+    T{ key-down f f "d" } C[ drop dec-separation-weight ] put-hash
 
-    T{ key-down f f "ESC" } [ drop toggle-loop ] closed-quot put-hash
-
-  <handler> tuck set-gadget-delegate "Boids" open-window
-
-!   slate> over set-gadget-delegate "Boids" open-window ;
-  ;
+    T{ key-down f f "ESC" } C[ drop toggle-loop ] put-hash
+  <handler> tuck set-gadget-delegate "Boids" open-window ;
 
 : boids-window ( -- ) [ [ boids-window* ] with-scope ] with-ui ;
 

@@ -42,9 +42,6 @@ M: world-error error.
     "This world has been deactivated to prevent cascading errors." print
     delegate error. ;
 
-: ui-try ( quot -- )
-    [ debugger-window ] recover ;
-
 debugger "gestures" f {
     { T{ button-down } request-focus }
 } define-command-map
@@ -55,7 +52,7 @@ debugger "gestures" f {
 
 \ :help H{ { +nullary+ t } { +listener+ t } } define-command
 
-\ :edit H{ { +nullary+ t } } define-command
+\ :edit H{ { +nullary+ t } { +listener+ t } } define-command
 
 debugger "toolbar" f {
     { T{ key-down f f "s" } com-traceback }

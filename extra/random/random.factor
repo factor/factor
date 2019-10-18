@@ -4,7 +4,8 @@
 ! mersenne twister based on 
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 
-USING: arrays kernel math namespaces sequences system init ;
+USING: arrays kernel math namespaces sequences
+system init alien.c-types ;
 IN: random
 
 <PRIVATE
@@ -89,11 +90,18 @@ PRIVATE>
         mt-temper
     ] bind ;
 
+: big-random ( n -- r )
+    [ drop (random) ] map >c-uint-array byte-array>bignum ;
+
+: random-256 ( -- r ) 8 big-random ; inline
+
 : random ( seq -- elt )
     dup empty? [
         drop f
     ] [
-        [ length (random) * -32 shift ] keep nth
+        [
+            length dup log2 31 + 32 /i big-random swap mod
+        ] keep nth
     ] if ;
 
-[ millis init-random ] "random" add-startup-hook
+[ millis init-random ] "random" add-init-hook

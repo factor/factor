@@ -5,5 +5,5 @@
     </ul>
     <% current-site site-ad1 write-html %>
     <h1>Tags</h1>
-    <% host all-tags <template-args> "tags" render-template %>
+    <% host all-tags <template-args> "tags" render-component %>
     </div>

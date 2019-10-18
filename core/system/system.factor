@@ -1,21 +1,22 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: system
-USING: kernel kernel.private sequences math namespaces ;
+USING: kernel kernel.private sequences math namespaces
+splitting assocs ;
 
-: cell ( -- n ) 1 getenv ; foldable
+: cell ( -- n ) 7 getenv ; foldable
 
 : cells ( m -- n ) cell * ; inline
 
 : cell-bits ( -- n ) 8 cells ; inline
 
-: cpu ( -- cpu ) 7 getenv ; foldable
+: cpu ( -- cpu ) 8 getenv ; foldable
 
-: os ( -- os ) 11 getenv ; foldable
+: os ( -- os ) 9 getenv ; foldable
 
-: image ( -- path ) 16 getenv ;
+: image ( -- path ) 13 getenv ;
 
-: vm ( -- path ) 17 getenv ;
+: vm ( -- path ) 14 getenv ;
 
 : wince? ( -- ? )
     os "wince" = ; foldable
@@ -34,7 +35,7 @@ USING: kernel kernel.private sequences math namespaces ;
 
 : macosx? ( -- ? ) os "macosx" = ; foldable
 
-: embedded? ( -- ? ) 19 getenv ;
+: embedded? ( -- ? ) 15 getenv ;
 
 : unix? ( -- ? )
     os {
@@ -50,8 +51,11 @@ USING: kernel kernel.private sequences math namespaces ;
 : solaris? ( -- ? )
     os "solaris" = ;
 
-: bootstrap-cell \ cell get [ cell ] unless* ; inline
+: bootstrap-cell \ cell get cell or ; inline
 
 : bootstrap-cells bootstrap-cell * ; inline
 
 : bootstrap-cell-bits 8 bootstrap-cells ; inline
+
+: os-envs ( -- assoc )
+    (os-envs) [ "=" split1 ] H{ } map>assoc ;

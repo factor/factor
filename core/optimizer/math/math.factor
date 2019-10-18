@@ -5,22 +5,22 @@ USING: alien arrays generic hashtables kernel assocs math
 math.private kernel.private sequences words parser
 inference.class inference.dataflow vectors strings sbufs io
 namespaces assocs quotations math.intervals sequences.private
-math.libm combinators splitting layouts math.parser classes
+combinators splitting layouts math.parser classes
 generic.math optimizer.pattern-match optimizer.backend
 optimizer.def-use generic.standard ;
 
 { + bignum+ float+ fixnum+fast } {
-    { { @ 0 } [ drop ] }
-    { { 0 @ } [ nip ]  }
+    { { number 0 } [ drop ] }
+    { { 0 number } [ nip ] }
 } define-identities
 
 { fixnum+ } {
-    { { @ 0 } [ drop ] }
-    { { 0 @ } [ nip ]  }
+    { { number 0 } [ drop ] }
+    { { 0 number } [ nip ] }
 } define-identities
 
 { - fixnum- bignum- float- fixnum-fast } {
-    { { @ 0 } [ drop ]    }
+    { { number 0 } [ drop ] }
     { { @ @ } [ 2drop 0 ] }
 } define-identities
 
@@ -31,7 +31,7 @@ optimizer.def-use generic.standard ;
 { <= fixnum<= bignum<= float<= } {
     { { @ @ } [ 2drop t ] }
 } define-identities
-    
+
 { > fixnum> bignum> float>= } {
     { { @ @ } [ 2drop f ] }
 } define-identities
@@ -41,61 +41,63 @@ optimizer.def-use generic.standard ;
 } define-identities
 
 { * fixnum* bignum* float* } {
-    { { @ 1 }  [ drop ]          }
-    { { 1 @ }  [ nip ]           }
-    { { @ 0 }  [ nip ]           }
-    { { 0 @ }  [ drop ]          }
-    { { @ -1 } [ drop 0 swap - ] }
-    { { -1 @ } [ nip 0 swap - ]  }
+    { { number 1 } [ drop ] }
+    { { 1 number } [ nip ] }
+    { { number 0 } [ nip ] }
+    { { 0 number } [ drop ] }
+    { { number -1 } [ drop 0 swap - ] }
+    { { -1 number } [ nip 0 swap - ] }
 } define-identities
 
 { / fixnum/i bignum/i float/f } {
-    { { @ 1 }  [ drop ]          }
-    { { @ -1 } [ drop 0 swap - ] }
+    { { number 1 } [ drop ] }
+    { { number -1 } [ drop 0 swap - ] }
 } define-identities
 
 { fixnum-mod bignum-mod } {
-    { { @ 1 }  [ 2drop 0 ] }
+    { { number 1 } [ 2drop 0 ] }
 } define-identities
 
 { bitand fixnum-bitand bignum-bitand } {
-    { { @ -1 } [ drop ] }
-    { { -1 @ } [ nip  ] }
-    { { @ @ }  [ drop ] }
-    { { @ 0 }  [ nip  ] }
-    { { 0 @ }  [ drop ] }
+    { { number -1 } [ drop ] }
+    { { -1 number } [ nip ] }
+    { { @ @ } [ drop ] }
+    { { number 0 } [ nip ] }
+    { { 0 number } [ drop ] }
 } define-identities
 
 { bitor fixnum-bitor bignum-bitor } {
-    { { @ 0 }  [ drop ] }
-    { { 0 @ }  [ nip  ] }
-    { { @ @ }  [ drop ] }
-    { { @ -1 } [ nip  ] }
-    { { -1 @ } [ drop ] }
+    { { number 0 } [ drop ] }
+    { { 0 number } [ nip ] }
+    { { @ @ } [ drop ] }
+    { { number -1 } [ nip ] }
+    { { -1 number } [ drop ] }
 } define-identities
 
 { bitxor fixnum-bitxor bignum-bitxor } {
-    { { @ 0 }  [ drop ]        }
-    { { 0 @ }  [ nip  ]        }
-    { { @ -1 } [ drop bitnot ] }
-    { { -1 @ } [ nip  bitnot ] }
-    { { @ @ }  [ 2drop 0 ]     }
+    { { number 0 } [ drop ] }
+    { { 0 number } [ nip ] }
+    { { number -1 } [ drop bitnot ] }
+    { { -1 number } [ nip bitnot ] }
+    { { @ @ } [ 2drop 0 ] }
 } define-identities
 
 { shift fixnum-shift bignum-shift } {
-    { { 0 @ } [ drop ] }
-    { { @ 0 } [ drop ] }
+    { { 0 number } [ drop ] }
+    { { number 0 } [ drop ] }
 } define-identities
 
 : math-closure ( class -- newclass )
-    { fixnum integer rational real number object }
-    [ class< ] curry* find nip ;
+    { fixnum integer rational real }
+    [ class< ] curry* find nip number or ;
 
 : fits? ( interval class -- ? )
     "interval" word-prop dup
     [ interval-subset? ] [ 2drop t ] if ;
 
 : math-output-class ( node min -- newclass )
+    #! if min is f, it means we just want to use the declared
+    #! output class from the "infer-effect".
     dup [
         swap node-in-d
         [ value-class* math-closure math-class-max ] each
@@ -109,7 +111,7 @@ optimizer.def-use generic.standard ;
 
 : post-process ( class interval node -- classes intervals )
     dupd won't-overflow?
-    [ >r dup { f integer } memq? [ drop fixnum ] when r> ] when
+    [ >r dup { f integer } member? [ drop fixnum ] when r> ] when
     [ dup [ 1array ] when ] 2apply ;
 
 : math-output-interval-1 ( node word -- interval )
@@ -437,17 +439,3 @@ most-negative-fixnum most-positive-fixnum [a,b]
         [ splice-quot ] curry ,
     ] { } make 1array define-optimizers
 ] assoc-each
-
-! This will go away when we have cross-word type inference
-{
-    facos fasin fatan
-    fcos fexp fcosh flog fpow
-    fsin fsinh fsqrt
-} [
-    [ drop { float } f ]
-    "output-classes" set-word-prop
-] each
-
-\ fatan2
-[ drop { float float } f ]
-"output-classes" set-word-prop

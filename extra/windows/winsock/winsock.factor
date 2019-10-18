@@ -1,9 +1,9 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
+USING: alien alien.c-types alien.syntax arrays byte-arrays kernel
+math sequences windows.types windows.kernel32 windows.errors structs
+windows ;
 IN: windows.winsock
-USING: alien alien.c-types
-alien.syntax arrays byte-arrays kernel math windows.types
-windows.kernel32 windows.errors ;
 
 USE: libc
 : alien>byte-array ( alien str -- byte-array )
@@ -104,9 +104,6 @@ TYPEDEF: void* SOCKET
 
 : SOL_SOCKET HEX: ffff ; inline
 
-: FALSE 0 ; inline
-: TRUE 1 ; inline
-
 ! TYPEDEF: uint in_addr_t
 ! C-STRUCT: in_addr
     ! { "in_addr_t" "s_addr" } ;
@@ -150,11 +147,9 @@ FUNCTION: int setsockopt ( SOCKET s, int level, int optname, char* optval, int o
 
 FUNCTION: ushort htons ( ushort n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
-<PRIVATE
 FUNCTION: int bind ( void* socket, sockaddr_in* sockaddr, int len ) ;
 FUNCTION: int listen ( void* socket, int backlog ) ;
 FUNCTION: char* inet_ntoa ( int in-addr ) ;
-PRIVATE>
 FUNCTION: int getaddrinfo ( char* nodename,
                             char* servername,
                             addrinfo* hints,
@@ -171,7 +166,6 @@ FUNCTION: int closesocket ( SOCKET s ) ;
 FUNCTION: int shutdown ( SOCKET s, int how ) ;
 FUNCTION: int send ( SOCKET s, char* buf, int len, int flags ) ;
 FUNCTION: int recv ( SOCKET s, char* buf, int len, int flags ) ;
-
 
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED
@@ -280,11 +274,7 @@ FUNCTION: SOCKET WSAAccept ( SOCKET s,
                              LPCONDITIONPROC lpfnCondition,
                              DWORD dwCallbackData ) ;
 
-FUNCTION: INT WSAAddressToString ( LPSOCKADDR lpsaAddress,
-                         DWORD dwAddressLength,
-                         LPWSAPROTOCOL_INFO lpProtocolInfo,
-                         LPTSTR lpszAddressString,
-                         LPDWORD lpdwAddressStringLength ) ;
+! FUNCTION: INT WSAAddressToString ( LPSOCKADDR lpsaAddress, DWORD dwAddressLength, LPWSAPROTOCOL_INFO lpProtocolInfo, LPTSTR lpszAddressString, LPDWORD lpdwAddressStringLength ) ;
 
 FUNCTION: int WSACleanup ( ) ;
 FUNCTION: BOOL WSACloseEvent ( WSAEVENT hEvent ) ;
@@ -297,14 +287,11 @@ FUNCTION: int WSAConnect ( SOCKET s,
                            LPQOS lpSQOS,
                            LPQOS lpGQOS ) ;
 FUNCTION: WSAEVENT WSACreateEvent ( ) ;
-FUNCTION: INT WSAEnumNameSpaceProviders ( LPDWORD lpdwBufferLength,
-                                          LPWSANAMESPACE_INFO lpnspBuffer ) ;
+! FUNCTION: INT WSAEnumNameSpaceProviders ( LPDWORD lpdwBufferLength, LPWSANAMESPACE_INFO lpnspBuffer ) ;
 FUNCTION: int WSAEnumNetworkEvents ( SOCKET s,
                                      WSAEVENT hEventObject,
                                      LPWSANETWORKEVENTS lpNetworkEvents ) ;
-FUNCTION: int WSAEnumProtocols ( LPINT lpiProtocols,
-                                 LPWSAPROTOCOL_INFO lpProtocolBuffer,
-                                 LPDWORD lpwdBufferLength ) ;
+! FUNCTION: int WSAEnumProtocols ( LPINT lpiProtocols, LPWSAPROTOCOL_INFO lpProtocolBuffer, LPDWORD lpwdBufferLength ) ;
 
 FUNCTION: int WSAEventSelect ( SOCKET s,
                                WSAEVENT hEventObject,
@@ -315,7 +302,7 @@ FUNCTION: BOOL WSAGetOverlappedResult ( SOCKET s,
                                         LPDWORD lpcbTransfer,
                                         BOOL fWait,
                                         LPDWORD lpdwFlags ) ;
-                                        
+
 FUNCTION: int WSAIoctl ( SOCKET s,
                          DWORD dwIoControlCode,
                          LPVOID lpvInBuffer,
@@ -403,4 +390,51 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
         HEX: 8e HEX: e9 HEX: 76 HEX: e5
         HEX: 8c HEX: 74 HEX: 06 HEX: 3e
     } over set-GUID-Data4 ;
+
+: winsock-expected-error? ( n -- ? )
+    ERROR_IO_PENDING ERROR_SUCCESS WSA_IO_PENDING 3array member? ;
+
+: (winsock-error-string) ( n -- str )
+    ! #! WSAStartup returns the error code 'n' directly
+    dup winsock-expected-error?
+    [ drop f ] [ error_message alien>u16-string ] if ;
+
+: winsock-error-string ( -- string/f )
+    WSAGetLastError (winsock-error-string) ;
+
+: winsock-error ( -- )
+    winsock-error-string [ throw ] when* ;
+
+: winsock-error=0/f ( n/f -- )
+    { 0 f } member? [
+        winsock-error-string throw
+    ] when ;
+
+: winsock-error!=0/f ( n/f -- )
+    { 0 f } member? [
+        winsock-error-string throw
+    ] unless ;
+
+: winsock-return-check ( n/f -- )
+    dup { 0 f } member? [
+        drop
+    ] [
+        (winsock-error-string) throw
+    ] if ;
+
+: socket-error* ( n -- )
+    SOCKET_ERROR = [
+        WSAGetLastError
+        dup WSA_IO_PENDING = [
+            drop
+        ] [
+            (winsock-error-string) throw
+        ] if
+    ] when ;
+
+: socket-error ( n -- )
+    SOCKET_ERROR = [ winsock-error ] when ;
+
+: init-winsock ( -- )
+    HEX: 0202 <wsadata> WSAStartup winsock-return-check ;
 

@@ -19,14 +19,16 @@ void init_c_io(void)
 
 void io_error(void)
 {
+#ifndef WINCE
 	if(errno == EINTR)
 		return;
+#endif
 
 	CELL error = tag_object(from_char_string(strerror(errno)));
-	simple_error(ERROR_IO,error,F);
+	general_error(ERROR_IO,error,F,NULL);
 }
 
-void primitive_fopen(void)
+DEFINE_PRIMITIVE(fopen)
 {
 	char *mode = unbox_char_string();
 	REGISTER_C_STRING(mode);
@@ -46,7 +48,7 @@ void primitive_fopen(void)
 	}
 }
 
-void primitive_fgetc(void)
+DEFINE_PRIMITIVE(fgetc)
 {
 	FILE* file = unbox_alien();
 
@@ -71,7 +73,7 @@ void primitive_fgetc(void)
 	}
 }
 
-void primitive_fread(void)
+DEFINE_PRIMITIVE(fread)
 {
 	FILE* file = unbox_alien();
 	CELL size = unbox_array_size();
@@ -106,7 +108,7 @@ void primitive_fread(void)
 	}
 }
 
-void primitive_fwrite(void)
+DEFINE_PRIMITIVE(fwrite)
 {
 	FILE* file = unbox_alien();
 	F_STRING* text = untag_string(dpop());
@@ -135,7 +137,7 @@ void primitive_fwrite(void)
 	}
 }
 
-void primitive_fflush(void)
+DEFINE_PRIMITIVE(fflush)
 {
 	FILE *file = unbox_alien();
 	for(;;)
@@ -147,7 +149,7 @@ void primitive_fflush(void)
 	}
 }
 
-void primitive_fclose(void)
+DEFINE_PRIMITIVE(fclose)
 {
 	FILE *file = unbox_alien();
 	for(;;)
@@ -165,22 +167,4 @@ reads thread-local storage. */
 int err_no(void)
 {
 	return errno;
-}
-
-/* Used by library/io/buffer/buffer.factor. Similar to C standard library
-function strcspn(const char *s, const char *charset) */
-long memcspn(const char *s, const char *end, const char *charset)
-{
-	const char *scan1, *scan2;
-
-	for(scan1 = s; scan1 < end; scan1++)
-	{
-		for(scan2 = charset; *scan2; scan2++)
-		{
-			if(*scan1 == *scan2)
-				return scan1 - s;
-		}
-	}
-
-	return -1;
 }

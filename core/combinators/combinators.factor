@@ -1,8 +1,14 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: combinators
-USING: arrays sequences sequences.private
+USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors ;
+
+<PRIVATE
+
+: dispatch ( n array -- ) array-nth (call) ;
+
+PRIVATE>
 
 TUPLE: no-cond ;
 
@@ -24,16 +30,15 @@ TUPLE: no-case ;
     } cond ;
 
 : with-datastack ( stack quot -- newstack )
-    datastack >r >r >vector set-datastack r> call
-    datastack r> [ push ] keep set-datastack 2nip ; inline
+    datastack >r
+    >r >array set-datastack r> call
+    datastack r> swap add set-datastack 2nip ; inline
 
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline
 
 M: sequence hashcode*
-    [
-        0 -rot [ hashcode* bitxor ] curry* each
-    ] recursive-hashcode ;
+    [ sequence-hashcode ] recursive-hashcode ;
 
 : alist>quot ( default assoc -- quot )
     [ rot \ if 3array append [ ] like ] assoc-each ;
@@ -67,13 +72,17 @@ M: sequence hashcode*
     [ case>quot ] curry* map ;
 
 : hash-dispatch-quot ( table -- quot )
-    [ length 1- [ bitand ] curry ] keep
+    [ length 1- [ fixnum-bitand ] curry ] keep
     [ dispatch ] curry append ;
 
 : hash-case>quot ( default assoc -- quot )
     dup empty? [
         drop
     ] [
-        hash-case-table hash-dispatch-quot
-        [ dup hashcode ] swap append
+        dup length 4 <= [
+            case>quot
+        ] [
+            hash-case-table hash-dispatch-quot
+            [ dup hashcode >fixnum ] swap append
+        ] if
     ] if ;

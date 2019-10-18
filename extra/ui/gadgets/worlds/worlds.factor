@@ -63,9 +63,9 @@ M: world focusable-child* gadget-child ;
 
 M: world children-on nip gadget-children ;
 
-: (draw-world) ( rect world -- )
+: (draw-world) ( world -- )
     dup world-handle [
-        [ init-gl ] keep draw-gadget
+        [ dup init-gl ] keep draw-gadget
     ] with-gl-context ;
 
 : draw-world? ( world -- ? )
@@ -87,7 +87,7 @@ SYMBOL: ui-error-hook
 
 [ rethrow ] ui-error-hook set-global
 
-: draw-world ( rect world -- )
+: draw-world ( world -- )
     dup draw-world? [
         dup world [
             [
@@ -95,11 +95,10 @@ SYMBOL: ui-error-hook
             ] [
                 over <world-error> ui-error
                 f swap set-world-active?
-                drop
             ] recover
         ] with-variable
     ] [
-        2drop
+        drop
     ] if ;
 
 world H{
@@ -113,17 +112,6 @@ world H{
     { T{ button-up f { A+ } 1 } [ T{ button-up f f 2 } swap resend-button-up ] }
 } set-gestures
 
-: start-world ( world -- )
-    dup graft
-    dup relayout
-    dup world-title over set-title
-    request-focus ;
-
 : close-global ( world global -- )
     dup get-global find-world rot eq?
     [ f swap set-global ] [ drop ] if ;
-
-: focus-gestures ( new old -- )
-    drop-prefix <reversed>
-    T{ lose-focus } swap each-gesture
-    T{ gain-focus } swap each-gesture ;

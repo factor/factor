@@ -1,5 +1,5 @@
 
-USING: kernel math math.vectors sequences self ;
+USING: kernel math math.functions math.vectors sequences self ;
 
 IN: pos
 

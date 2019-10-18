@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.commands ui.gestures ui.render ui.gadgets
-ui.gadgets.controls ui.gadgets.labels ui.gadgets.scrollers
+ui.gadgets.labels ui.gadgets.scrollers
 kernel sequences models opengl math namespaces
 ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
 math.vectors tuples ;
@@ -42,6 +42,7 @@ TUPLE: list index presenter color hook ;
     ] map 2nip ;
 
 M: list model-changed
+    nip
     dup clear-gadget
     dup <list-items> over add-gadgets
     bound-index ;

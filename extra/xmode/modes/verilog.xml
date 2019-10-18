@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!-- Written By: Wojciech Stryjewski - thvortex@sourceforge.net -->
+
+<MODE>
+	<PROPS>
+		<!-- Rules for indenting:
+		   - Case expressions (a line ending with colon) are indented
+		   - Keywords begin, module, task, etc. always indented
+		   - Keywords if, while, etc. indent only if ; not on the same line
+		-->
+		<PROPERTY NAME="indentNextLines" VALUE="(.*:\s*)|(\s*(begin|fork|task|table|specify|primitive|module|generate|function|case[xz]?)\b.*)|(\s*(always|if|else|for|forever|initial|repeat|while)\b[^;]*)" />
+
+		<PROPERTY NAME="commentStart" VALUE="/*" />
+		<PROPERTY NAME="commentEnd" VALUE="*/" />
+		<PROPERTY NAME="lineComment" VALUE="//" />
+		<PROPERTY NAME="noWordSep" VALUE="_'" />
+		<PROPERTY NAME="wordBreakChars" VALUE=",+-=&lt;&gt;/?^&amp;*" />
+	</PROPS>
+	<RULES ESCAPE="\" IGNORE_CASE="FALSE" HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="([\p{Digit}]|_)+" NO_WORD_SEP="'">
+		<!-- Comments -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>/*</BEGIN>
+			<END>*/</END>
+		</SPAN>
+		<EOL_SPAN TYPE="COMMENT2">//</EOL_SPAN>
+
+		<!--String Literals -->
+		<SPAN TYPE="LITERAL1" NO_LINE_BREAK="FALSE">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SEQ TYPE="DIGIT">'d</SEQ>
+		<SEQ TYPE="DIGIT">'h</SEQ>
+		<SEQ TYPE="DIGIT">'b</SEQ>
+		<SEQ TYPE="DIGIT">'o</SEQ>
+
+		<!-- Function calls, module instantiation, system tasks with args -->
+		<MARK_PREVIOUS TYPE="FUNCTION" MATCH_TYPE="OPERATOR">(</MARK_PREVIOUS>
+		<SEQ TYPE="OPERATOR">)</SEQ>
+
+		<!-- Operators -->
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!</SEQ>
+		<SEQ TYPE="OPERATOR">+</SEQ>
+		<SEQ TYPE="OPERATOR">-</SEQ>
+		<SEQ TYPE="OPERATOR">/</SEQ>
+		<SEQ TYPE="OPERATOR">*</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">%</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">|</SEQ>
+		<SEQ TYPE="OPERATOR">^</SEQ>
+		<SEQ TYPE="OPERATOR">~</SEQ>
+		<SEQ TYPE="OPERATOR">}</SEQ>
+		<SEQ TYPE="OPERATOR">{</SEQ>
+
+		<KEYWORDS>
+			<!-- Regular Keywords -->
+			<KEYWORD1>always</KEYWORD1>
+			<KEYWORD1>assign</KEYWORD1>
+			<KEYWORD1>begin</KEYWORD1>
+			<KEYWORD1>case</KEYWORD1>
+			<KEYWORD1>casex</KEYWORD1>
+			<KEYWORD1>casez</KEYWORD1>
+			<KEYWORD1>default</KEYWORD1>
+			<KEYWORD1>deassign</KEYWORD1>
+			<KEYWORD1>disable</KEYWORD1>
+			<KEYWORD1>else</KEYWORD1>
+			<KEYWORD1>end</KEYWORD1>
+			<KEYWORD1>endcase</KEYWORD1>
+			<KEYWORD1>endfunction</KEYWORD1>
+			<KEYWORD1>endgenerate</KEYWORD1>
+			<KEYWORD1>endmodule</KEYWORD1>
+			<KEYWORD1>endprimitive</KEYWORD1>
+			<KEYWORD1>endspecify</KEYWORD1>
+			<KEYWORD1>endtable</KEYWORD1>
+			<KEYWORD1>endtask</KEYWORD1>
+			<KEYWORD1>for</KEYWORD1>
+			<KEYWORD1>force</KEYWORD1>
+			<KEYWORD1>forever</KEYWORD1>
+			<KEYWORD1>fork</KEYWORD1>
+			<KEYWORD1>function</KEYWORD1>
+			<KEYWORD1>generate</KEYWORD1>
+			<KEYWORD1>if</KEYWORD1>
+			<KEYWORD1>initial</KEYWORD1>
+			<KEYWORD1>join</KEYWORD1>
+			<KEYWORD1>macromodule</KEYWORD1>
+			<KEYWORD1>module</KEYWORD1>
+			<KEYWORD1>negedge</KEYWORD1>
+			<KEYWORD1>posedge</KEYWORD1>
+			<KEYWORD1>primitive</KEYWORD1>
+			<KEYWORD1>repeat</KEYWORD1>
+			<KEYWORD1>release</KEYWORD1>
+			<KEYWORD1>specify</KEYWORD1>
+			<KEYWORD1>table</KEYWORD1>
+			<KEYWORD1>task</KEYWORD1>
+			<KEYWORD1>wait</KEYWORD1>
+			<KEYWORD1>while</KEYWORD1>
+
+			<!-- Compiler Directives -->
+			<KEYWORD2>`include</KEYWORD2>
+			<KEYWORD2>`define</KEYWORD2>
+			<KEYWORD2>`undef</KEYWORD2>
+			<KEYWORD2>`ifdef</KEYWORD2>
+			<KEYWORD2>`ifndef</KEYWORD2>
+			<KEYWORD2>`else</KEYWORD2>
+			<KEYWORD2>`endif</KEYWORD2>
+			<KEYWORD2>`timescale</KEYWORD2>
+			<KEYWORD2>`resetall</KEYWORD2>
+			<KEYWORD2>`signed</KEYWORD2>
+			<KEYWORD2>`unsigned</KEYWORD2>
+			<KEYWORD2>`celldefine</KEYWORD2>
+			<KEYWORD2>`endcelldefine</KEYWORD2>
+			<KEYWORD2>`default_nettype</KEYWORD2>
+			<KEYWORD2>`unconnected_drive</KEYWORD2>
+			<KEYWORD2>`nounconnected_drive</KEYWORD2>
+			<KEYWORD2>`protect</KEYWORD2>
+			<KEYWORD2>`endprotect</KEYWORD2>
+			<KEYWORD2>`protected</KEYWORD2>
+			<KEYWORD2>`endprotected</KEYWORD2>
+			<KEYWORD2>`remove_gatename</KEYWORD2>
+			<KEYWORD2>`noremove_gatename</KEYWORD2>
+			<KEYWORD2>`remove_netname</KEYWORD2>
+			<KEYWORD2>`noremove_netname</KEYWORD2>
+			<KEYWORD2>`expand_vectornets</KEYWORD2>
+			<KEYWORD2>`noexpand_vectornets</KEYWORD2>
+			<KEYWORD2>`autoexpand_vectornets</KEYWORD2>
+
+			<!-- Type Declaration Keywords -->
+			<KEYWORD3>integer</KEYWORD3>
+			<KEYWORD3>reg</KEYWORD3>
+			<KEYWORD3>time</KEYWORD3>
+			<KEYWORD3>realtime</KEYWORD3>
+			<KEYWORD3>defparam</KEYWORD3>
+			<KEYWORD3>parameter</KEYWORD3>
+			<KEYWORD3>event</KEYWORD3>
+			<KEYWORD3>wire</KEYWORD3>
+			<KEYWORD3>wand</KEYWORD3>
+			<KEYWORD3>wor</KEYWORD3>
+			<KEYWORD3>tri</KEYWORD3>
+			<KEYWORD3>triand</KEYWORD3>
+			<KEYWORD3>trior</KEYWORD3>
+			<KEYWORD3>tri0</KEYWORD3>
+			<KEYWORD3>tri1</KEYWORD3>
+			<KEYWORD3>trireg</KEYWORD3>
+			<KEYWORD3>vectored</KEYWORD3>
+			<KEYWORD3>scalared</KEYWORD3>
+			<KEYWORD3>input</KEYWORD3>
+			<KEYWORD3>output</KEYWORD3>
+			<KEYWORD3>inout</KEYWORD3>
+
+			<!-- Signal Strengths -->
+			<KEYWORD3>supply0</KEYWORD3>
+			<KEYWORD3>supply1</KEYWORD3>
+			<KEYWORD3>strong0</KEYWORD3>
+			<KEYWORD3>strong1</KEYWORD3>
+			<KEYWORD3>pull0</KEYWORD3>
+			<KEYWORD3>pull1</KEYWORD3>
+			<KEYWORD3>weak0</KEYWORD3>
+			<KEYWORD3>weak1</KEYWORD3>
+			<KEYWORD3>highz0</KEYWORD3>
+			<KEYWORD3>highz1</KEYWORD3>
+			<KEYWORD3>small</KEYWORD3>
+			<KEYWORD3>medium</KEYWORD3>
+			<KEYWORD3>large</KEYWORD3>
+
+			<!-- System Tasks With No/Optional Arguments -->
+			<FUNCTION>$stop</FUNCTION>
+			<FUNCTION>$finish</FUNCTION>
+			<FUNCTION>$time</FUNCTION>
+			<FUNCTION>$stime</FUNCTION>
+			<FUNCTION>$realtime</FUNCTION>
+			<FUNCTION>$settrace</FUNCTION>
+			<FUNCTION>$cleartrace</FUNCTION>
+			<FUNCTION>$showscopes</FUNCTION>
+			<FUNCTION>$showvars</FUNCTION>
+			<FUNCTION>$monitoron</FUNCTION>
+			<FUNCTION>$monitoroff</FUNCTION>
+			<FUNCTION>$random</FUNCTION>
+			<FUNCTION>$printtimescale</FUNCTION>
+			<FUNCTION>$timeformat</FUNCTION>
+
+			<!-- Built-in primitives -->
+			<FUNCTION>and</FUNCTION>
+			<FUNCTION>nand</FUNCTION>
+			<FUNCTION>or</FUNCTION>
+			<FUNCTION>nor</FUNCTION>
+			<FUNCTION>xor</FUNCTION>
+			<FUNCTION>xnor</FUNCTION>
+			<FUNCTION>buf</FUNCTION>
+			<FUNCTION>bufif0</FUNCTION>
+			<FUNCTION>bufif1</FUNCTION>
+			<FUNCTION>not</FUNCTION>
+			<FUNCTION>notif0</FUNCTION>
+			<FUNCTION>notif1</FUNCTION>
+			<FUNCTION>nmos</FUNCTION>
+			<FUNCTION>pmos</FUNCTION>
+			<FUNCTION>cmos</FUNCTION>
+			<FUNCTION>rnmos</FUNCTION>
+			<FUNCTION>rpmos</FUNCTION>
+			<FUNCTION>rcmos</FUNCTION>
+			<FUNCTION>tran</FUNCTION>
+			<FUNCTION>tranif0</FUNCTION>
+			<FUNCTION>tranif1</FUNCTION>
+			<FUNCTION>rtran</FUNCTION>
+			<FUNCTION>rtranif0</FUNCTION>
+			<FUNCTION>rtranif1</FUNCTION>
+			<FUNCTION>pullup</FUNCTION>
+			<FUNCTION>pulldown</FUNCTION>
+		</KEYWORDS>
+	</RULES>
+</MODE>
+

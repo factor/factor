@@ -4,43 +4,44 @@ IN: io.streams.nested
 USING: arrays generic assocs kernel namespaces strings
 quotations io ;
 
+TUPLE: ignore-close-stream ;
+
+: <ignore-close-stream> ignore-close-stream construct-delegate ;
+
+M: ignore-close-stream stream-close drop ;
+
 TUPLE: style-stream style ;
 
 : do-nested-style ( style stream -- style delegate )
     [ style-stream-style swap union ] keep
-    delegate ;
-
-: collapse-nested-style ( style stream -- style steam )
-    dup style-stream? [ do-nested-style ] when ;
+    delegate ; inline
 
 : <style-stream> ( style delegate -- stream )
     { set-style-stream-style set-delegate }
     style-stream construct ;
 
-: (with-stream-style) ( quot style stream -- )
-    collapse-nested-style <style-stream> swap with-stream* ;
-    inline
-
 M: style-stream stream-format
     do-nested-style stream-format ;
 
 M: style-stream stream-write
-    H{ } swap stream-format ;
+    dup style-stream-style swap delegate stream-format ;
 
 M: style-stream stream-write1
-    >r 1string H{ } r> stream-format ;
+    >r 1string r> stream-write ;
 
-M: style-stream with-stream-style
-    do-nested-style with-stream-style ;
+M: style-stream make-span-stream
+    do-nested-style make-span-stream ;
 
-: do-nested-quot ( quot style stream -- quot style stream )
-    tuck >r >r
-    style-stream-style swap \ with-style
-    3array >quotation
-    r> r> do-nested-style ;
+M: style-stream make-block-stream
+    [ do-nested-style make-block-stream ] keep
+    style-stream-style swap <style-stream> ;
 
-M: style-stream with-nested-stream
-    do-nested-quot with-nested-stream ;
+M: style-stream make-cell-stream
+    [ do-nested-style make-cell-stream ] keep
+    style-stream-style swap <style-stream> ;
 
-M: style-stream make-table-cell
-    do-nested-quot make-table-cell ;
+TUPLE: block-stream ;
+
+: <block-stream> block-stream construct-delegate ;
+
+M: block-stream stream-close drop ;

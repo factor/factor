@@ -11,27 +11,30 @@ vocabs.loader system ;
 
 "Bootstrap stage 1..." print flush
 
-"resource:core/bootstrap/layouts/layouts.factor" run-file
 "resource:core/bootstrap/primitives.factor" run-file
 
 ! Create a boot quotation
 [
     ! Rehash hashtables, since core/tools/image creates them
     ! using the host image's hashing algorithms
+
     [ [ hashtable? ] instances [ rehash ] each ] %
+
     \ boot ,
 
     "math.integers" require
+    "math.floats" require
     "memory" require
+
+    ! this must add its init hook before io.backend does
+    "libc" require
+
     "io.streams.c" require
-    "init" require
     "vocabs.loader" require
     "syntax" require
     "bootstrap.layouts" require
 
     [
-        do-startup-hooks
-
         "resource:core/bootstrap/stage2.factor"
         dup ?resource-path exists? [
             run-file

@@ -4,7 +4,7 @@ USING: assocs ui.tools.interactor ui.tools.listener
 ui.tools.workspace help help.topics io.files io.styles kernel
 models namespaces prettyprint quotations sequences sorting
 source-files strings tools.completion tools.crossref tuples
-ui.commands ui.gadgets ui.gadgets.controls ui.gadgets.editors
+ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.lists ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.operations vocabs words vocabs.loader
 tools.browser ;
@@ -44,7 +44,7 @@ search-field H{
 } set-gestures
 
 : <search-model> ( producer -- model )
-    >r g live-search-field control-model 200 <delay>
+    >r g live-search-field gadget-model 200 <delay>
     [ "\n" join ] r> append <filter> ;
 
 : <search-list> ( seq limited? presenter -- gadget )

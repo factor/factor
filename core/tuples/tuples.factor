@@ -30,12 +30,12 @@ M: tuple class class-of-tuple ;
     swap [ index ] curry map ;
 
 : reshape-tuple ( oldtuple permutation -- newtuple )
-    >r tuple>array 2 swap cut r>
-    [ [ swap nth ] [ drop f ] if* ] curry* map
+    >r tuple>array 2 cut r>
+    [ [ swap ?nth ] [ drop f ] if* ] curry* map
     append (>tuple) ;
 
 : reshape-tuples ( class newslots -- )
-    >r dup "predicate" word-prop instances dup
+    >r dup [ swap class eq? ] curry instances dup
     rot "slot-names" word-prop r> permutation
     [ reshape-tuple ] curry map become ;
 
@@ -52,8 +52,11 @@ M: tuple class class-of-tuple ;
 
 : check-shape ( class newslots -- )
     over tuple-class? [
-        over "slot-names" word-prop over =
-        [ 2dup forget-slots 2dup reshape-tuples ] unless
+        over "slot-names" word-prop over = [
+            2dup forget-slots
+            2dup reshape-tuples
+            over redefined
+        ] unless
     ] when 2drop ;
 
 GENERIC: tuple-size ( class -- size ) foldable
@@ -103,7 +106,8 @@ M: tuple equal?
 : (delegates) ( obj -- )
     [ dup , delegate (delegates) ] when* ;
 
-: delegates ( obj -- seq ) [ (delegates) ] { } make ;
+: delegates ( obj -- seq )
+    [ dup ] [ [ delegate ] keep ] [ ] unfold nip ;
 
 : is? ( obj quot -- ? ) >r delegates r> contains? ; inline
 

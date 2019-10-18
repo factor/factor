@@ -10,7 +10,7 @@ HELP: tree-write
     "Write the object to the standard output stream, unless "
     "it is an array, in which case recurse through the array "
     "writing each object to the stream." }
-{ $example "[ { 65 \"bc\" { 68 \"ef\" } } tree-write ] string-out ." "\"AbcDef\"" } ;
+{ $example "USE: parser-combinators" "{ 65 \"bc\" { 68 \"ef\" } } tree-write" "AbcDef" } ;
 
 HELP: search
 { $values 
@@ -24,8 +24,8 @@ HELP: search
     "parser."
 }
     
-{ $example "\"one 123 two 456\" 'integer' search ." "{ 123 456 }" }
-{ $example "\"one 123 \\\"hello\\\" two 456\" 'integer' 'string' <|> search ." "{ 123 \"hello\" 456 }" }
+{ $example "USE: parser-combinators" "\"one 123 two 456\" 'integer' search ." "{ 123 456 }" }
+{ $example "USE: parser-combinators" "\"one 123 \\\"hello\\\" two 456\" 'integer' 'string' <|> search ." "{ 123 \"hello\" 456 }" }
 { $see-also search* replace replace* } ;
 
 HELP: search*
@@ -40,7 +40,7 @@ HELP: search*
     "parsers in the 'parsers' sequence."
 }
     
-{ $example "\"one 123 \\\"hello\\\" two 456\" 'integer' 'string' 2array search* ." "{ 123 \"hello\" 456 }" }
+{ $example "USE: parser-combinators" "\"one 123 \\\"hello\\\" two 456\" 'integer' 'string' 2array search* ." "{ 123 \"hello\" 456 }" }
 { $see-also search replace replace* } ;
 
 HELP: replace
@@ -54,9 +54,9 @@ HELP: replace
     "successfully parse with the given parser replaced with "
     "the result of that parser."
 }   
-{ $example "\"one 123 two 456\" 'integer' [ 2 * number>string ] <@ replace ." "\"one 246 two 912\"" }
-{ $example "\"hello *world* from *factor*\" 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@ replace ." "\"hello <strong>world</strong> from <strong>factor</strong>\"" }
-{ $example "\"hello *world* from _factor_\"\n 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@\n 'italic' [ \"<emphasis>\" swap \"</emphasis>\" 3append ] <@ <|>\n replace ." "\"hello <strong>world</strong> from <emphasis>factor</emphasis>\"" }
+{ $example "USING: parser-combinators math.parser ;" "\"one 123 two 456\" 'integer' [ 2 * number>string ] <@ replace ." "\"one 246 two 912\"" }
+{ $example "USE: parser-combinators" "\"hello *world* from *factor*\" 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@ replace ." "\"hello <strong>world</strong> from <strong>factor</strong>\"" }
+{ $example "USE: parser-combinators" "\"hello *world* from _factor_\"\n 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@\n 'italic' [ \"<emphasis>\" swap \"</emphasis>\" 3append ] <@ <|>\n replace ." "\"hello <strong>world</strong> from <emphasis>factor</emphasis>\"" }
 { $see-also search search* replace* } ;
 
 HELP: replace*
@@ -71,6 +71,6 @@ HELP: replace*
     "the result of that parser. Each parser is done in sequence so that "
     "the parse results of the first parser can be replaced by later parsers."
 }   
-{ $example "\"*hello _world_*\"\n 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@\n 'italic' [ \"<emphasis>\" swap \"</emphasis>\" 3append ] <@ 2array\n replace* ." "\"<strong>hello <emphasis>world</emphasis></strong>\"" }
+{ $example "USE: parser-combinators" "\"*hello _world_*\"\n 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@\n 'italic' [ \"<emphasis>\" swap \"</emphasis>\" 3append ] <@ 2array\n replace* ." "\"<strong>hello <emphasis>world</emphasis></strong>\"" }
 { $see-also search search* replace* } ;
 

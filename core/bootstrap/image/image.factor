@@ -4,9 +4,10 @@ USING: alien arrays bit-arrays byte-arrays generic assocs
 hashtables assocs hashtables.private io kernel kernel.private
 math namespaces parser prettyprint sequences sequences.private
 strings sbufs vectors words quotations assocs system layouts
-splitting growable math.functions classes tuples words.private
+splitting growable classes tuples words.private
 io.binary io.files vocabs vocabs.loader source-files
-definitions debugger float-arrays ;
+definitions debugger float-arrays quotations.private
+combinators.private combinators ;
 IN: bootstrap.image
 
 <PRIVATE
@@ -14,22 +15,28 @@ IN: bootstrap.image
 ! Constants
 
 : image-magic HEX: 0f0e0d0c ; inline
-: image-version 3 ; inline
+: image-version 4 ; inline
 
 : char bootstrap-cell 2/ ; inline
 
 : data-base 1024 ; inline
 
-: boot-quot-offset      3 ; inline
-: global-offset         4 ; inline
-: t-offset              5 ; inline
-: 0-offset              6 ; inline
-: 1-offset              7 ; inline
-: -1-offset             8 ; inline
-: data-heap-size-offset 9 ; inline
-: code-heap-size-offset 10 ; inline
+: userenv-size 40 ; inline
 
-: header-size 12 ; inline
+: header-size 10 ; inline
+
+: data-heap-size-offset 3 ; inline
+: t-offset              6 ; inline
+: 0-offset              7 ; inline
+: 1-offset              8 ; inline
+: -1-offset             9 ; inline
+
+: array-start 2 bootstrap-cells object tag-number - ;
+: scan@ array-start bootstrap-cell - ;
+: wrapper@ bootstrap-cell object tag-number - ;
+: word-xt@ 8 bootstrap-cells object tag-number - ;
+: quot-array@ bootstrap-cell object tag-number - ;
+: quot-xt@ 3 bootstrap-cells object tag-number - ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -43,8 +50,51 @@ SYMBOL: big-endian
 ! Bootstrap architecture name
 SYMBOL: architecture
 
+! Bootstrap global namesapce
+SYMBOL: bootstrap-global
+
 ! Boot quotation, set in stage1.factor
 SYMBOL: bootstrap-boot-quot
+
+! JIT parameters
+SYMBOL: jit-code-format
+SYMBOL: jit-setup
+SYMBOL: jit-prolog
+SYMBOL: jit-word-primitive-jump
+SYMBOL: jit-word-primitive-call
+SYMBOL: jit-word-jump
+SYMBOL: jit-word-call
+SYMBOL: jit-push-wrapper
+SYMBOL: jit-push-literal
+SYMBOL: jit-if-word
+SYMBOL: jit-if-jump
+SYMBOL: jit-if-call
+SYMBOL: jit-dispatch-word
+SYMBOL: jit-dispatch
+SYMBOL: jit-epilog
+SYMBOL: jit-return
+
+: userenv-offset ( symbol -- n )
+    {
+        { bootstrap-boot-quot 20 }
+        { bootstrap-global 21 }
+        { jit-code-format 22 }
+        { jit-setup 23 }
+        { jit-prolog 24 }
+        { jit-word-primitive-jump 25 }
+        { jit-word-primitive-call 26 }
+        { jit-word-jump 27 }
+        { jit-word-call 28 }
+        { jit-push-wrapper 29 }
+        { jit-push-literal 30 }
+        { jit-if-word 31 }
+        { jit-if-jump 32 }
+        { jit-if-call 33 }
+        { jit-dispatch-word 34 }
+        { jit-dispatch 35 }
+        { jit-epilog 36 }
+        { jit-return 37 }
+    } at header-size + ;
 
 : emit ( cell -- ) image get push ;
 
@@ -60,7 +110,8 @@ SYMBOL: bootstrap-boot-quot
 : fixup ( value offset -- ) image get set-nth ;
 
 : heap-size ( -- size )
-    image get length header-size - bootstrap-cells ;
+    image get length header-size - userenv-size -
+    bootstrap-cells ;
 
 : here ( -- size ) heap-size data-base + ;
 
@@ -75,24 +126,26 @@ SYMBOL: bootstrap-boot-quot
     swap here-as >r swap tag-header emit call align-here r> ;
     inline
 
+! Write an object to the image.
+GENERIC: ' ( obj -- ptr )
+
 ! Image header
 
-: header ( -- )
+: emit-header ( -- )
     image-magic emit
     image-version emit
     data-base emit ! relocation base at end of header
-    0 emit ! bootstrap quotation set later
-    0 emit ! global namespace set later
+    0 emit ! size of data heap set later
+    0 emit ! reloc base of code heap is 0
+    0 emit ! size of code heap is 0
     0 emit ! pointer to t object
     0 emit ! pointer to bignum 0
     0 emit ! pointer to bignum 1
     0 emit ! pointer to bignum -1
-    0 emit ! size of data heap set later
-    0 emit ! size of code heap is 0
-    0 emit ; ! reloc base of code heap is 0
+    userenv-size [ f ' emit ] times ;
 
-GENERIC: ' ( obj -- ptr )
-#! Write an object to the image.
+: emit-userenv ( symbol -- )
+    dup get ' swap userenv-offset fixup ;
 
 ! Bignums
 
@@ -100,20 +153,14 @@ GENERIC: ' ( obj -- ptr )
 
 : bignum-radix bignum-bits 2^ 1- ;
 
-: (bignum>seq) ( n -- )
-    dup zero? [
-        drop
-    ] [
-        dup bignum-radix bitand ,
-        bignum-bits neg shift (bignum>seq)
-    ] if ;
-
 : bignum>seq ( n -- seq )
     #! n is positive or zero.
-    [ (bignum>seq) ] { } make ;
+    [ dup 0 > ]
+    [ dup bignum-bits neg shift swap bignum-radix bitand ]
+    [ ] unfold nip ;
 
 : emit-bignum ( n -- )
-    [ 0 < 1 0 ? ] keep abs bignum>seq
+    dup 0 < [ 1 swap neg ] [ 0 swap ] if bignum>seq
     dup length 1+ emit-fixnum
     swap emit emit-seq ;
 
@@ -142,18 +189,16 @@ M: float '
 : t, t t-offset fixup ;
 
 M: f '
-    #! f is #define F RETAG(0,OBJECT_TYPE)
-    drop object tag-number ;
+    #! f is #define F RETAG(0,F_TYPE)
+    drop \ f tag-number ;
 
 :  0,  0 >bignum '  0-offset fixup ;
 :  1,  1 >bignum '  1-offset fixup ;
 : -1, -1 >bignum ' -1-offset fixup ;
 
 ! Beginning of the image
-! The image begins with the header, then T,
-! and the bignums 0, 1, and -1.
 
-: begin-image ( -- ) header t, 0, 1, -1, ;
+: begin-image ( -- ) emit-header t, 0, 1, -1, ;
 
 ! Words
 
@@ -162,14 +207,15 @@ M: f '
         dup hashcode ' ,
         dup word-name ' ,
         dup word-vocabulary ' ,
-        dup word-primitive ' ,
         dup word-def ' ,
         dup word-props ' ,
         f ' ,
-        0 ,
-        0 ,
+        0 , ! count
+        0 , ! xt
+        0 , ! code
     ] { } make
-    \ word tag-number dup [ emit-seq ] emit-object
+    \ word type-number object tag-number
+    [ emit-seq ] emit-object
     swap objects get set-at ;
 
 : word-error ( word msg -- * )
@@ -190,7 +236,8 @@ M: word ' ;
 ! Wrappers
 
 M: wrapper '
-    wrapped ' wrapper tag-number dup [ emit ] emit-object ;
+    wrapped ' wrapper type-number object tag-number
+    [ emit ] emit-object ;
 
 ! Strings
 : 16be> 0 [ swap 16 shift bitor ] reduce ;
@@ -230,25 +277,43 @@ M: bit-array ' bit-array emit-dummy-array ;
 
 M: float-array ' float-array emit-dummy-array ;
 
-! Arrays and vectors
-: emit-array ( list type -- pointer )
-    >r [ ' ] map r> object tag-number [
+! Arrays
+: emit-array ( list type tag -- pointer )
+    >r >r [ ' ] map r> r> [
         dup length emit-fixnum
         emit-seq
     ] emit-object ;
 
-: emit-tuple ( obj quot -- pointer )
-    [ { } make tuple type-number emit-array ] curry
-    objects get swap cache ; inline
+: emit-tuple ( obj -- pointer )
+    objects get [
+        [ tuple>array unclip transfer-word , % ] { } make
+        tuple type-number dup emit-array
+    ] cache ; inline
 
-M: tuple '
-    [ tuple>array unclip transfer-word , % ] emit-tuple ;
+M: tuple ' emit-tuple ;
+
+M: tombstone '
+    delegate
+    "((tombstone))" "((empty))" ? "hashtables.private" lookup
+    word-def first emit-tuple ;
 
 M: array '
-    array type-number emit-array ;
+    array type-number object tag-number emit-array ;
+
+! Quotations
 
 M: quotation '
-    quotation type-number emit-array ;
+    objects get [
+        quotation-array '
+        quotation type-number object tag-number [
+            emit ! array
+            f ' emit ! compiled?
+            0 emit ! xt
+            0 emit ! code
+        ] emit-object
+    ] cache ;
+
+! Vectors and sbufs
 
 M: vector '
     dup underlying ' swap length
@@ -283,33 +348,62 @@ M: curry '
 
 ! End of the image
 
-: words, ( -- )
+: emit-words ( -- )
     all-words [ emit-word ] each ;
 
-: global, ( -- )
+: emit-global ( -- )
     [
         {
             dictionary source-files
             typemap builtins class<map update-map
         } [ dup get swap bootstrap-word set ] each
-    ] H{ } make-assoc '
-    global-offset fixup ;
+    ] H{ } make-assoc
+    bootstrap-global set
+    bootstrap-global emit-userenv ;
 
-: boot, ( -- )
-    bootstrap-boot-quot get ' boot-quot-offset fixup ;
+: emit-boot-quot ( -- )
+    bootstrap-boot-quot emit-userenv ;
+
+: emit-jit-data ( -- )
+    \ if jit-if-word set
+    \ dispatch jit-dispatch-word set
+    {
+        jit-code-format
+        jit-setup
+        jit-prolog
+        jit-word-primitive-jump
+        jit-word-primitive-call
+        jit-word-jump
+        jit-word-call
+        jit-push-wrapper
+        jit-push-literal
+        jit-if-word
+        jit-if-jump
+        jit-if-call
+        jit-dispatch-word
+        jit-dispatch
+        jit-epilog
+        jit-return
+    } [ emit-userenv ] each ;
+
+: fixup-header ( -- )
+    heap-size data-heap-size-offset fixup ;
 
 : end-image ( -- )
     "Building generic words..." print flush
     all-words [ generic? ] subset [ make-generic ] each
     "Serializing words..." print flush
-    words,
+    emit-words
+    "Serializing JIT data..." print flush
+    emit-jit-data
     "Serializing global namespace..." print flush
-    global,
+    emit-global
     "Serializing boot quotation..." print flush
-    boot,
-    "Performing some word fixups..." print flush
+    emit-boot-quot
+    "Performing word fixups..." print flush
     fixup-words
-    heap-size data-heap-size-offset fixup
+    "Performing header fixups..." print flush
+    fixup-header
     "Image length: " write image get length .
     "Object cache size: " write objects get assoc-size .
     \ word global delete-at ;
@@ -326,23 +420,29 @@ M: curry '
 : image-name
     "boot." architecture get ".image" 3append resource-path ;
 
-: write-image ( image -- )
+: write-image ( image filename -- )
     "Writing image to " write dup write "..." print flush
     <file-writer> [ (write-image) ] with-stream ;
 
 : prepare-profile ( arch -- )
-    "resource:/core/bootstrap/" swap ".factor" 3append
-    run-file ;
+    "resource:core/bootstrap/layouts/layouts.factor" run-file
+    "resource:core/cpu/" swap {
+        { "x86.32" "x86/32" }
+        { "x86.64" "x86/64" }
+        { "linux-ppc" "ppc/linux" }
+        { "macosx-ppc" "ppc/macosx" }
+        { "arm" "arm" }
+    } at "/bootstrap.factor" 3append ?resource-path run-file ;
 
 : prepare-image ( arch -- )
+    dup architecture set prepare-profile
     bootstrapping? on
     load-help? off
-    dup architecture set prepare-profile
     800000 <vector> image set 20000 <hashtable> objects set ;
 
 PRIVATE>
 
-: make-image ( architecture -- )
+: make-image ( arch -- )
     [
         parse-hook off
         prepare-image
@@ -352,5 +452,10 @@ PRIVATE>
         image get image-name write-image
     ] with-scope ;
 
+: my-arch ( -- arch )
+    cpu dup "ppc" = [ os "-" rot 3append ] when ;
+
 : make-images ( -- )
-    { "x86.32" "x86.64" "ppc" "arm" } [ make-image ] each ;
+    {
+        "x86.32" "x86.64" "linux-ppc" "macosx-ppc" "arm"
+    } [ make-image ] each ;

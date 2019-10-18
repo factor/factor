@@ -1,5 +1,6 @@
 USING: kernel math namespaces io tools.test sequences vectors
-continuations debugger parser memory ;
+continuations debugger parser memory arrays words
+kernel.private ;
 IN: temporary
 
 : (callcc1-test)
@@ -24,8 +25,6 @@ IN: temporary
 [ t ] [ 10 callcc1-test 10 reverse >vector = ] unit-test
 [ t ] [ callcc-namespace-test ] unit-test
 
-[ clear drop ] unit-test-fails
-
 [ f ] [ [ ] catch ] unit-test
 
 [ 5 ] [ [ 5 throw ] catch ] unit-test
@@ -46,10 +45,6 @@ IN: temporary
 
 [ f throw ] unit-test-fails
 
-! See how well callstack overflow is handled
-: callstack-overflow callstack-overflow f ;
-[ callstack-overflow ] unit-test-fails
-
 ! Weird PowerPC bug.
 [ ] [
     [ "4" throw ] catch drop
@@ -60,14 +55,19 @@ IN: temporary
 [ f ] [ { } kernel-error? ] unit-test
 [ f ] [ { "A" "B" } kernel-error? ] unit-test
 
-[ [ 3 throw ] ] [
-    [ 3 throw ] catch drop
-    error-continuation get continuation-call 3 tail* first
-] unit-test
+! ! See how well callstack overflow is handled
+! [ clear drop ] unit-test-fails
+! 
+! : callstack-overflow callstack-overflow f ;
+! [ callstack-overflow ] unit-test-fails
 
-[ f [ 5 call 2 ] ] [
-    [ 5 call 2 ] catch drop
-    error-continuation get continuation-call 6 tail*
-    dup first over fourth eq?
-    swap fourth
-] unit-test
+: don't-compile-me { } [ ] each ;
+
+: foo callstack "c" set 3 don't-compile-me ;
+: bar 1 foo 2 ;
+
+[ 1 3 2 ] [ bar ] unit-test
+
+[ t ] [ \ bar word-def "c" get innermost-frame-quot = ] unit-test
+
+[ 1 ] [ "c" get innermost-frame-scan ] unit-test

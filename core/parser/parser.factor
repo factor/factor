@@ -168,7 +168,7 @@ TUPLE: parse-error file line col text ;
     dup parse-error-file file.
     dup parse-error-line number>string print
     dup parse-error-text dup string? [ print ] [ drop ] if
-    parse-error-col [ 0 ] unless* CHAR: \s <string> write
+    parse-error-col 0 or CHAR: \s <string> write
     "^" print ;
 
 M: parse-error error.
@@ -237,6 +237,9 @@ PREDICATE: unexpected unexpected-eof
 
 : CREATE ( -- word ) scan create-in ;
 
+: CREATE-CLASS ( -- word )
+    scan create-in dup predicate-word save-location ;
+
 : word-restarts ( possibilities -- restarts )
     natural-sort [
         [ "Use the word " swap summary append ] keep
@@ -247,21 +250,10 @@ TUPLE: no-word name ;
 M: no-word summary
     drop "Word not found in current vocabulary search path" ;
 
-: auto-use-note ( word -- )
-    [
-        dup word-name %
-        " not in search path; automatically using " %
-        word-vocabulary %
-    ] "" make note. ;
-
 : no-word ( name -- newword )
-    dup words-named dup length 1 = [
-        nip first dup auto-use-note
-    ] [
-        >r \ no-word construct-boa r>
-        word-restarts throw-restarts
-    ] if
-    dup word-vocabulary use+ ;
+    dup \ no-word construct-boa
+    swap words-named word-restarts throw-restarts
+    dup word-vocabulary (use+) ;
 
 : forward-reference? ( word -- ? )
     dup old-definitions get key?
@@ -371,7 +363,7 @@ SYMBOL: bootstrap-syntax
 
 SYMBOL: parse-hook
 
-: do-parse-hook ( -- ) parse-hook get call ;
+: do-parse-hook ( -- ) parse-hook get [ call ] when* ;
 
 : parsing-file ( file -- )
     "quiet" get [
@@ -424,7 +416,7 @@ SYMBOL: parse-hook
     ] keep ;
 
 : forget-smudged ( -- )
-    smudged-usage [ forget ] each
+    smudged-usage forget-all
     over empty? [ 2dup smudged-usage-warning ] unless 2drop ;
 
 : record-definitions ( file -- )
@@ -441,7 +433,7 @@ SYMBOL: parse-hook
         2drop
     ] if ;
 
-: recover-parsing ( -- )
+: undo-parsing ( -- )
     file get [
         dup source-file-definitions new-definitions get union
         swap set-source-file-definitions
@@ -453,9 +445,7 @@ SYMBOL: parse-hook
             start-parsing
             \ contents get string-lines parse-fresh
             dup finish-parsing
-        ] [
-            recover-parsing rethrow
-        ] recover
+        ] [ ] [ undo-parsing ] cleanup
     ] no-parse-hook ;
 
 : parse-file-restarts ( file -- restarts )
@@ -511,11 +501,9 @@ global [
         "debugger"
         "definitions"
         "generic"
-        "inference"
         "inspector"
         "io"
         "kernel"
-        "listener"
         "math"
         "memory"
         "namespaces"

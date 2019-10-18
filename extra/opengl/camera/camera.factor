@@ -1,5 +1,5 @@
 
-USING: kernel namespaces math.vectors opengl.lib pos ori turtle self ;
+USING: kernel namespaces math.vectors opengl pos ori turtle self ;
 
 IN: opengl.camera
 
@@ -13,4 +13,4 @@ IN: opengl.camera
 [ 90 pitch-up pos> 1 step-turtle pos> swap v- ] save-self ;
 
 : do-look-at ( camera -- )
-[ >self camera-eye camera-focus camera-up glu-look-at ] with-scope ;
+[ >self camera-eye camera-focus camera-up gl-look-at ] with-scope ;

@@ -12,7 +12,7 @@ PREDICATE: class union-class
     0 (dispatch#) [
         [ [ drop t ] ] { } map>assoc
         object bootstrap-word [ drop f ] 2array add*
-        flatten-methods single-combination
+        single-combination
     ] with-variable ;
 
 : define-union-predicate ( class -- )

@@ -23,7 +23,7 @@ M: growable set-nth-unsafe underlying set-nth-unsafe ;
 : contract ( len seq -- )
     [ length ] keep
     [ 0 -rot set-nth-unsafe ] curry
-    (each-integer) ;
+    (each-integer) ; inline
 
 : growable-check ( n seq -- n seq )
     over 0 < [ bounds-error ] when ; inline

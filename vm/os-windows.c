@@ -1,6 +1,6 @@
 #include "master.h"
 
-F_STRING *get_error_message()
+F_STRING *get_error_message(void)
 {
 	DWORD id = GetLastError();
 	F_CHAR *msg = error_message(id);
@@ -36,7 +36,7 @@ F_CHAR *error_message(DWORD id)
 
 HMODULE hFactorDll;
 
-void init_ffi()
+void init_ffi(void)
 {
 	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
@@ -51,8 +51,7 @@ void ffi_dlopen (F_DLL *dll, bool error)
 	{
 		dll->dll = NULL;
 		if(error)
-			simple_error(ERROR_FFI,F,
-				tag_object(get_error_message()));
+			general_error(ERROR_FFI,F,tag_object(get_error_message()),NULL);
 		else
 			return;
 	}
@@ -71,17 +70,6 @@ void ffi_dlclose(F_DLL *dll)
 	dll->dll = NULL;
 }
 
-static void get_full_exe_path(F_CHAR *path, DWORD size)
-{
-	DWORD ret;
-	HMODULE hModule = GetModuleHandle(NULL);
-	if(!hModule)
-		fatal_error("GetModuleHandle(NULL) failed", 0);
-	ret = GetModuleFileName(hModule, path, size);
-	if(!ret)
-		fatal_error("GetModuleFileName(...) failed", 0);
-}
-
 /* You must free() this yourself. */
 const F_CHAR *default_image_path(void)
 {
@@ -89,7 +77,8 @@ const F_CHAR *default_image_path(void)
 	F_CHAR *ptr;
 	F_CHAR path_temp[MAX_UNICODE_PATH];
 
-	get_full_exe_path(full_path, MAX_UNICODE_PATH);
+	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+		fatal_error("GetModuleFileName() failed", 0);
 
 	if((ptr = wcsrchr(full_path, '.')))
 		*ptr = 0;
@@ -104,38 +93,80 @@ const F_CHAR *default_image_path(void)
 const F_CHAR *vm_executable_path(void)
 {
 	F_CHAR full_path[MAX_UNICODE_PATH];
-	get_full_exe_path(full_path, MAX_UNICODE_PATH);
+	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+		fatal_error("GetModuleFileName() failed", 0);
 	return safe_strdup(full_path);
 }
 
-void primitive_stat(void)
+void stat_not_found(void)
 {
+	dpush(F);
+	dpush(F);
+	dpush(F);
+	dpush(F);
+}
+
+void find_file_stat(F_CHAR *path)
+{
+	// FindFirstFile is the only call that can stat c:\pagefile.sys
 	WIN32_FIND_DATA st;
 	HANDLE h;
 
-	F_CHAR *path = unbox_u16_string();
-	if(INVALID_HANDLE_VALUE == (h = FindFirstFile(
-		path,
-		&st)))
-	{
-		dpush(F);
-		dpush(F);
-		dpush(F);
-		dpush(F);
-	}
+	if(INVALID_HANDLE_VALUE == (h = FindFirstFile(path, &st)))
+		stat_not_found();
 	else
 	{
 		box_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 		dpush(tag_fixnum(0));
 		box_unsigned_8(
 			(u64)st.nFileSizeLow | (u64)st.nFileSizeHigh << 32);
-		box_unsigned_8(
-			((*(u64*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));
+
+		u64 lo = st.ftLastWriteTime.dwLowDateTime;
+		u64 hi = st.ftLastWriteTime.dwHighDateTime;
+		u64 modTime = (hi << 32) + lo;
+
+		box_unsigned_8((modTime - EPOCH_OFFSET) / 10000000);
 		FindClose(h);
 	}
 }
 
-void primitive_read_dir(void)
+DEFINE_PRIMITIVE(stat)
+{
+	HANDLE h;
+	BY_HANDLE_FILE_INFORMATION bhfi;
+
+	F_CHAR *path = unbox_u16_string();
+	//wprintf(L"path = %s\n", path);
+	h = CreateFileW(path,
+					GENERIC_READ,
+					FILE_SHARE_READ,
+					NULL,
+					OPEN_EXISTING,
+					FILE_FLAG_BACKUP_SEMANTICS,
+					NULL);
+	if(h == INVALID_HANDLE_VALUE)
+	{
+		find_file_stat(path);
+		return;
+	}
+
+	if(!GetFileInformationByHandle(h, &bhfi))
+		stat_not_found();
+	else {
+		box_boolean(bhfi.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+		dpush(tag_fixnum(0));
+		box_unsigned_8(
+			(u64)bhfi.nFileSizeLow | (u64)bhfi.nFileSizeHigh << 32);
+		u64 lo = bhfi.ftLastWriteTime.dwLowDateTime;
+		u64 hi = bhfi.ftLastWriteTime.dwHighDateTime;
+		u64 modTime = (hi << 32) + lo;
+
+		box_unsigned_8((modTime - EPOCH_OFFSET) / 10000000);
+	}
+	CloseHandle(h);
+}
+
+DEFINE_PRIMITIVE(read_dir)
 {
 	HANDLE dir;
 	WIN32_FIND_DATA find_data;
@@ -147,11 +178,11 @@ void primitive_read_dir(void)
 	{
 		do
 		{
-			REGISTER_ARRAY(result);
+			REGISTER_UNTAGGED(result);
 			CELL name = tag_object(from_u16_string(find_data.cFileName));
 			CELL dirp = tag_boolean(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 			CELL pair = allot_array_2(name,dirp);
-			UNREGISTER_ARRAY(result);
+			UNREGISTER_UNTAGGED(result);
 			GROWABLE_ADD(result,pair);
 		}
 		while (FindNextFile(dir, &find_data));
@@ -211,11 +242,5 @@ long getpagesize(void)
 
 void sleep_millis(DWORD msec)
 {
-    Sleep(msec);
+	Sleep(msec);
 }
-
-void run(void)
-{
-	interpreter();
-}
-

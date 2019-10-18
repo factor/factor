@@ -6,11 +6,11 @@ generic tools.completion quotations parser inspector
 sorting hashtables vocabs ;
 IN: tools.crossref
 
-: sort-definitions ( seq -- newseq )
-    [ dup synopsis swap ] { } map>assoc sort-keys ;
+: synopsis-alist ( definitions -- alist )
+    [ dup synopsis swap ] { } map>assoc ;
 
-: definitions. ( seq -- )
-    sort-definitions [ write-object nl ] assoc-each ;
+: definitions. ( alist -- )
+    [ write-object nl ] assoc-each ;
 
 : (method-usage) ( word generic -- methods )
     tuck methods
@@ -25,12 +25,14 @@ IN: tools.crossref
     [ generic? not ] subset ;
 
 : smart-usage ( word -- definitions )
-    [ \ f ] unless*
+    \ f or
     dup usage dup compound-usage -rot method-usage append ;
 
-: usage. ( word -- ) smart-usage definitions. ;
+: usage. ( word -- )
+    smart-usage synopsis-alist sort-keys definitions. ;
 
 : words-matching ( str -- seq )
     all-words [ dup word-name ] { } map>assoc completions ;
 
-: apropos ( str -- ) words-matching definitions. ;
+: apropos ( str -- )
+    words-matching synopsis-alist reverse definitions. ;

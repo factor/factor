@@ -1,17 +1,11 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays cpu.x86.assembler cpu.x86.architecture
-generic kernel kernel.private math math.private memory
-namespaces sequences words generator generator.registers
-cpu.architecture math.floats.private layouts quotations ;
+cpu.x86.intrinsics generic kernel kernel.private math
+math.private memory namespaces sequences words generator
+generator.registers cpu.architecture math.floats.private layouts
+quotations ;
 IN: cpu.x86.sse2
-
-M: float-regs (%peek)
-    drop
-    temp-reg swap %move-int>int
-    temp-reg %move-int>float ;
-
-M: float-regs (%replace) drop swap %move-float>int ;
 
 : define-float-op ( word op -- )
     [ "x" operand "y" operand ] swap add H{
@@ -61,42 +55,32 @@ M: float-regs (%replace) drop swap %move-float>int ;
     { +clobber+ { "in" } }
 } define-intrinsic
 
-: %alien-float-get ( quot -- )
-    "offset" operand %untag-fixnum
-    "output" operand "alien" operand-class %alien-accessor ;
-    inline
-
 : alien-float-get-template
     H{
         { +input+ {
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { float "output" } } }
-        { +output+ { "output" } }
-        { +clobber+ { "alien" "offset" } }
+        { +scratch+ { { float "value" } } }
+        { +output+ { "value" } }
+        { +clobber+ { "offset" } }
     } ;
-
-: %alien-float-set ( quot -- )
-    "offset" operand %untag-fixnum
-    "value" operand "alien" operand-class %alien-accessor ;
-    inline
 
 : alien-float-set-template
     H{
         { +input+ {
             { float "value" float }
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +clobber+ { "value" "alien" "offset" } }
+        { +clobber+ { "offset" } }
     } ;
 
 : define-alien-float-intrinsics ( word get-quot word set-quot -- )
-    [ %alien-float-set ] curry
+    [ "value" operand swap %alien-accessor ] curry
     alien-float-set-template
     define-intrinsic
-    [ %alien-float-get ] curry
+    [ "value" operand swap %alien-accessor ] curry
     alien-float-get-template
     define-intrinsic ;
 

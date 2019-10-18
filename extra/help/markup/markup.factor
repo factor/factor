@@ -113,7 +113,7 @@ M: f print-element drop ;
     "Examples" $heading print-element ;
 
 : $example ( element -- )
-    1 swap cut* swap "\n" join dup <input> [
+    1 cut* swap "\n" join dup <input> [
         input-style get format nl print-element
     ] ($code) ;
 

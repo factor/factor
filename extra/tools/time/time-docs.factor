@@ -22,9 +22,11 @@ HELP: time
 { $values { "quot" "a quotation" } }
 { $description "Runs a quotation and then prints the total run time and time spent in the garbage collector." }
 { $examples
-    "This word can be used to compare interpreter performance with compiler performance:"
+    "This word can be used to compare performance of the non-optimizing and optimizing compilers."
+    $nl
+    "First, we time a quotation directly; quotations are compiled by the non-optimizing quotation compiler:"
     { $unchecked-example "[ 1000000 0 [ + ] reduce drop ] time" "1116 ms run / 6 ms GC time" }
-    "The compiled example is much faster:"
+    "Now we define a word and compile it with the optimizing word compiler. This results is faster execution:"
     { $unchecked-example ": foo 1000000 0 [ + ] reduce ;" "\\ foo compile" "[ foo drop ] time" "202 ms run / 13 ms GC time" }
 } ;
 

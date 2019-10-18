@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+	Literate Haskell mode by Cameron Morrison (c.morrison@iinet.net.au)
+	Modified version of the Haskell mode by Kristian Ovaska (kristian.ovaska@helsinki.fi)
+	Based on Haskell 98
+-->
+
+<MODE>
+
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="{-" />
+		<PROPERTY NAME="commentEnd" VALUE="-}" />
+		<PROPERTY NAME="lineComment" VALUE="--" />
+		<!-- apparently, this is required... -->
+		<PROPERTY NAME="tabSize" VALUE="8" />
+		<PROPERTY NAME="indentSize" VALUE="8" />
+	</PROPS>
+
+	<RULES IGNORE_CASE="FALSE" DEFAULT="COMMENT4">
+		<EOL_SPAN AT_WHITESPACE_END="TRUE" TYPE="FUNCTION" DELEGATE="haskell::MAIN">&gt;</EOL_SPAN>
+		<!-- for LaTeX-style -->
+		<EOL_SPAN AT_LINE_START="TRUE" TYPE="COMMENT3">%</EOL_SPAN>
+		<SPAN TYPE="LITERAL3" DELEGATE="haskell::MAIN">
+			<BEGIN>\begin{code}</BEGIN>
+			<END>\end{code}</END>
+		</SPAN>
+		<!--
+		<EOL_SPAN_REGEXP HASH_CHAR="\" AT_LINE_START="TRUE"
+			DELEGATE="latex::MAIN" TYPE="KEYWORD1"
+		>\\\w+</EOL_SPAN_REGEXP>
+		-->
+    </RULES>
+
+</MODE>

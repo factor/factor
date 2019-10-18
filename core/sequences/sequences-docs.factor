@@ -127,8 +127,9 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection 2reduce }
 "Mapping:"
 { $subsection map }
-{ $subsection accumulate }
 { $subsection 2map }
+{ $subsection accumulate }
+{ $subsection unfold }
 "Filtering:"
 { $subsection push-if }
 { $subsection subset } ;
@@ -230,6 +231,7 @@ $nl
 { $subsection "sequences-tests" }
 { $subsection "sequences-search" }
 { $subsection "sequences-comparing" }
+{ $subsection "sequences-split" }
 { $subsection "sequences-destructive" }
 { $subsection "sequences-stacks" }
 "For inner loops:"
@@ -379,10 +381,6 @@ HELP: first3-unsafe
 HELP: first4-unsafe
 { $values { "seq" sequence } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } { "fourth" "the fourth element" } }
 { $contract "Unsafe variant of " { $link first4 } " that does not perform bounds checks." } ;
-
-HELP: 1sequence
-{ $values { "obj" object } { "exemplar" sequence } { "seq" sequence } }
-{ $description "Creates a one-element sequence of the same type as " { $snippet "exemplar" } " containing " { $snippet "obj" } "." } ;
 
 HELP: 2sequence
 { $values { "obj1" object } { "obj2" object } { "exemplar" sequence } { "seq" sequence } }
@@ -822,8 +820,8 @@ HELP: <repetition> ( len elt -- repetition )
     { $example "10 \"X\" <repetition> >array concat ." "\"XXXXXXXXXX\"" }
 } ;
 HELP: copy
-{ $values { "src" sequence } { "n" "an index in " { $snippet "dest" } } { "dst" "a mutable sequence" } }
-{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "n" } ". Grows " { $snippet "to" } " first if necessary." }
+{ $values { "src" sequence } { "i" "an index in " { $snippet "dest" } } { "dst" "a mutable sequence" } }
+{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "i" } ". Grows " { $snippet "to" } " first if necessary." }
 { $side-effects "dest" }
 { $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
 
@@ -860,7 +858,7 @@ HELP: head-slice
 
 HELP: tail-slice
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "slice" "a slice" } }
-{ $description "Outputs a virtual sequence sharing storage with all elements up to the " { $snippet "n" } "th index of the input sequence." }
+{ $description "Outputs a virtual sequence sharing storage with all elements from the " { $snippet "n" } "th index until the end of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
 HELP: head-slice*
@@ -908,17 +906,17 @@ HELP: tail?
 { delete-nth remove delete } related-words
 
 HELP: cut-slice
-{ $values { "n" "a non-negative integer" } { "seq" sequence } { "before" sequence } { "after" "a slice" } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" "a slice" } }
 { $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } " and has the same type, while " { $snippet "after" } " is a slice of the remaining elements." }
 { $notes "Unlike " { $link cut } ", the run time of this word is proportional to the length of " { $snippet "before" } ", not " { $snippet "after" } ", so it is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
 
 HELP: cut
-{ $values { "n" "a non-negative integer" } { "seq" sequence } { "before" sequence } { "after" sequence } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }
 { $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "after" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." }
 { $notes "Since this word copies the entire tail of the sequence, it should not be used in a loop. If this is important, consider using " { $link cut-slice } " instead, since it returns a slice for the tail instead of copying." } ;
 
 HELP: cut*
-{ $values { "n" "a non-negative integer" } { "seq" sequence } { "before" sequence } { "after" sequence } }
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }
 { $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." } ;
 
 HELP: start*
@@ -947,3 +945,31 @@ HELP: unclip
 HELP: unclip-slice
 { $values { "seq" sequence } { "rest" slice } { "first" object } }
 { $description "Outputs a tail sequence and the first element of " { $snippet "seq" } "; the tail sequence consists of all elements of " { $snippet "seq" } " but the first. Unlike " { $link unclip } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
+
+HELP: sum
+{ $values { "seq" "a sequence of numbers" } { "n" "a number" } }
+{ $description "Outputs the sum of all elements of " { $snippet "seq" } ". Outputs zero given an empty sequence." } ;
+
+HELP: product
+{ $values { "seq" "a sequence of numbers" } { "n" "a number" } }
+{ $description "Outputs the product of all elements of " { $snippet "seq" } ". Outputs one given an empty sequence." } ;
+
+HELP: infimum
+{ $values { "seq" "a sequence of real numbers" } { "n" "a number" } }
+{ $description "Outputs the least element of " { $snippet "seq" } "." }
+{ $errors "Throws an error if the sequence is empty." } ;
+
+HELP: supremum
+{ $values { "seq" "a sequence of real numbers" } { "n" "a number" } }
+{ $description "Outputs the greatest element of " { $snippet "seq" } "." }
+{ $errors "Throws an error if the sequence is empty." } ;
+
+HELP: unfold
+{ $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "quot" "a quotation with stack effect " { $snippet "( -- obj )" } } { "tail" "a quotation" } { "seq" "a sequence" } }
+{ $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence at the end." }
+{ $examples
+    "The following example divides a number by two until we reach zero, and accumulates intermediate results:"
+    { $example "1337 [ dup 0 > ] [ 2/ dup ] [ ] unfold nip ." "{ 668 334 167 83 41 20 10 5 2 1 0 }" }
+    "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link unfold } " call:"
+    { $unchecked-example "[ 10 random dup 1 > ] [ ] [ drop ] unfold ." "{ 8 2 2 9 }" }
+} ;

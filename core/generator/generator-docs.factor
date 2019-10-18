@@ -5,9 +5,8 @@ IN: generator
 ARTICLE: "generator" "Compiled code generator"
 "Most of the words in the " { $vocab-link "generator" } " vocabulary are internal to the compiler and user code has no reason to call them."
 $nl
-"Debugging information can be enabled or disabled; these hooks are used by " { $link "profiling" } " and " { $link "tools.deploy" } ":"
-{ $subsection profiler-prologues }
-{ $subsection compiled-stack-traces }
+"Debugging information can be enabled or disabled; this hook is used by " { $link "tools.deploy" } ":"
+{ $subsection compiled-stack-traces? }
 "Assembler intrinsics can be defined for low-level optimization:"
 { $subsection define-intrinsic }
 { $subsection define-intrinsics }
@@ -32,26 +31,28 @@ HELP: finalize-compile ( xts -- )
 { $values { "xts" "an association list mapping words to uninterned words" } }
 { $description "Performs relocation, atomically changes the XT of each key to the XT of each value, and flushes the CPU instruction cache on architectures where this has to be done manually." } ;
 
-HELP: add-compiled-block ( literals words rel labels code format -- xt )
-{ $values { "literals" vector } { "words" "a vector of words" } { "rel" "a vector of integers" } { "labels" "an array of integers" } { "code" "a vector of integers" } { "format" "1 or 4" } { "xt" "an uninterned word" } }
+HELP: add-compiled-block ( literals words rel labels code -- xt )
+{ $values { "literals" vector } { "words" "a vector of words" } { "rel" "a vector of integers" } { "labels" "an array of integers" } { "code" "a vector of integers" } { "xt" "an uninterned word" } }
 { $description "Adds a new compiled block and outputs an uninterned word whose XT points at this block. This uninterned word can then be passed to " { $link finalize-compile } "." } ;
 
-HELP: compiling
+HELP: compiling-word
 { $var-description "The word currently being compiled, set by " { $link generate-1 } "." } ;
 
-HELP: compiled-stack-traces
+HELP: compiling-label
+{ $var-description "The label currently being compiled, set by " { $link generate-1 } "." } ;
+
+HELP: compiled-stack-traces?
 { $var-description "If set to true, compiled code blocks will retain what word they were compiled from. This information is used by " { $link :c } " to display call stack traces after an error is thrown from compiled code. This variable is on by default; the deployment tool switches it off to save some space in the deployed image." } ;
 
 HELP: literal-table
-{ $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces } " is on, " { $link init-generator } " ensures that the first entry is the word being compiled." } ;
+{ $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces? } " is on, " { $link init-generator } " ensures that the first entry is the word being compiled." } ;
 
 HELP: init-generator
-{ $values { "word" word } }
 { $description "Prepares to generate machine code for a word." } ;
 
 HELP: generate-1
 { $values { "word" word } { "label" word } { "node" "a dataflow node" } { "quot" "a quotation with stack effect " { $snippet "( node -- )" } } }
-{ $description "Generates machine code for " { $snippet "label" } " by applying the quotation to the dataflow node. The value of " { $snippet "word" } " is retained for debugging purposes; it is the word which will appear in a call stack trace if this compiled code block throws an error when run." } ;
+{ $description "Generates machine code for " { $snippet "label" } " by applying the quotation to the dataflow node." } ;
 
 HELP: generate-node
 { $values { "node" "a dataflow node" } { "next" "a dataflow node" } }
@@ -62,9 +63,6 @@ HELP: generate-nodes
 { $values { "node" "a dataflow node" } } 
 { $description "Recursively generate machine code for a dataflow graph." }
 { $notes "This word can only be called from inside the quotation passed to " { $link generate-1 } "." } ;
-
-HELP: profiler-prologue
-{ $description "Compiles a prologue which increment's the currently compiling word's call count, if such prologues were enabled by setting " { $link profiler-prologues } " to a true value." } ;
 
 HELP: generate
 { $values { "word" word } { "label" word } { "node" "a dataflow node" } }

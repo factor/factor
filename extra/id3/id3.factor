@@ -2,7 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 
-USING: arrays combinators io io.binary io.files io.utf16 kernel math math.parser namespaces sequences splitting strings assocs ;
+USING: arrays combinators io io.binary io.files io.paths
+io.utf16 kernel math math.parser namespaces sequences
+splitting strings assocs ;
 
 IN: id3
 
@@ -24,8 +26,6 @@ C: <extended-header> extended-header
 
 : >hexstring ( str -- hex )
   >array [ >hex 2 CHAR: 0 pad-left ] map concat ;
-
-: bit-set? ( int n -- ? ) neg shift odd? ;
 
 : good-frame-id? ( id -- ? )
   [ [ LETTER? ] keep digit? or ] all? ;
@@ -83,23 +83,23 @@ C: <extended-header> extended-header
   6 - read ;
 
 : read-crc ( flags -- crc )
-  5 bit-set? [ read1 read >syncsafe ] [ f ] if ; 
+  5 bit? [ read1 read >syncsafe ] [ f ] if ; 
 
 : tag-is-update? ( flags -- ? )
-  6 bit-set? dup [ read1 drop ] [ ] if ;
+  6 bit? dup [ read1 drop ] [ ] if ;
 
 : (read-tag-restrictions) ( -- restrictions )
   read1 dup read le> ; 
 
 : read-tag-restrictions ( flags -- restrictions/f )
-  4 bit-set? [ (read-tag-restrictions) ] [ f ] if ;
+  4 bit? [ (read-tag-restrictions) ] [ f ] if ;
 
 : (read-extended-header) ( -- extended-header )
   read-size read-eh-flags dup tag-is-update? over dup
   read-crc swap read-tag-restrictions <extended-header> ;
 
 : read-extended-header ( flags -- extended-header/f )
-  6 bit-set? [ (read-extended-header) ] [ f ] if ;
+  6 bit? [ (read-extended-header) ] [ f ] if ;
 
 : read-header ( version -- header )
   read1 read1 read-size over read-extended-header <header> ;
@@ -122,18 +122,6 @@ C: <extended-header> extended-header
 
 : id3v2 ( filename -- tag/f )
   <file-reader> [ read-tag ] with-stream ;
-
-: append-path ( path files -- paths )
-  [ path+ ] curry* map ;
-
-: get-paths ( dir -- paths )
-  dup directory keys append-path ;
-
-: (walk-dir) ( path -- )
-  dup directory? [ get-paths dup % [ (walk-dir) ] each ] [ drop ] if ;
-
-: walk-dir ( path -- seq )
-  [ (walk-dir) ] { } make ;
 
 : file? ( path -- ? )
   stat 3drop not ;

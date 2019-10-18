@@ -1,37 +1,61 @@
-/* Is profiling on? */
-DLLEXPORT bool profiling;
-
-/* Callstack top pointer */
-F_INTERP_FRAME *cs;
-
-/* Currently executing quotation */
-F_INTERP_FRAME callframe;
-
-#define USER_ENV 32
+#define USER_ENV 40
 
 typedef enum {
-	CURRENT_CALLBACK_ENV,   /* used by library only, per-callback */
-	CELL_SIZE_ENV,          /* sizeof(CELL) */
-	NLX_VECTOR_ENV,         /* non-local exit hook, used by library only */
-	NAMESTACK_ENV,          /* used by library only */
-	GLOBAL_ENV,             
-	BREAK_ENV,              
-	CATCHSTACK_ENV,         /* used by library only, per-callback */
-	CPU_ENV,                
-	BOOT_ENV,               
-	CALLCC_1_ENV,           /* used by library only */
-	ARGS_ENV,               
-	OS_ENV,                 
-	ERROR_ENV,              /* a marker consed onto kernel errors */
-	IN_ENV,                 
-	OUT_ENV,                
-	EVAL_CALLBACK_ENV,      /* used when Factor is embedded in a C app */
-	IMAGE_ENV,              /* image path name */
-	EXECUTABLE_ENV,		/* runtime executable path name */
-	YIELD_CALLBACK_ENV,     /* used when Factor is embedded in a C app */
-	EMBEDDED_ENV,		/* are we embedded in another app? */
-	SLEEP_CALLBACK_ENV,     /* used when Factor is embedded in a C app */
+	NAMESTACK_ENV,            /* used by library only */
+	CATCHSTACK_ENV,           /* used by library only, per-callback */
+
+	CURRENT_CALLBACK_ENV = 2, /* used by library only, per-callback */
+	WALKER_HOOK_ENV,          /* non-local exit hook, used by library only */
+	CALLCC_1_ENV,             /* used to pass the value in callcc1 */
+                                  
+	BREAK_ENV            = 5, /* quotation called by throw primitive */
+	ERROR_ENV,                /* a marker consed onto kernel errors */
+                                  
+	CELL_SIZE_ENV        = 7, /* sizeof(CELL) */
+	CPU_ENV,                  /* CPU architecture */
+	OS_ENV,                   /* operating system name */
+                                  
+	ARGS_ENV            = 10, /* command line arguments */
+	IN_ENV,                   /* stdin FILE* handle */
+	OUT_ENV,                  /* stdout FILE* handle */
+                                  
+	IMAGE_ENV           = 13, /* image path name */
+	EXECUTABLE_ENV,		  /* runtime executable path name */
+                                  
+	EMBEDDED_ENV 	    = 15, /* are we embedded in another app? */
+	EVAL_CALLBACK_ENV,        /* used when Factor is embedded in a C app */
+	YIELD_CALLBACK_ENV,       /* used when Factor is embedded in a C app */
+	SLEEP_CALLBACK_ENV,       /* used when Factor is embedded in a C app */
+
+	COCOA_EXCEPTION_ENV = 19, /* Cocoa exception handler quotation */
+
+	BOOT_ENV            = 20, /* boot quotation */
+	GLOBAL_ENV,               /* global namespace */
+
+	/* Used by the JIT compiler */
+	JIT_CODE_FORMAT     = 22,
+	JIT_SETUP,
+	JIT_PROLOG,
+	JIT_WORD_PRIMITIVE_JUMP,
+	JIT_WORD_PRIMITIVE_CALL,
+	JIT_WORD_JUMP,
+	JIT_WORD_CALL,
+	JIT_PUSH_WRAPPER,
+	JIT_PUSH_LITERAL,
+	JIT_IF_WORD,
+	JIT_IF_JUMP,
+	JIT_IF_CALL,
+	JIT_DISPATCH_WORD,
+	JIT_DISPATCH,
+	JIT_EPILOG,
+	JIT_RETURN,
+
+	/* Profiler support */    
+	PROFILING_ENV       = 38, /* is the profiler on? */
+	PROFILER_PROLOGUE_ENV     /* length of optimizing compiler's profiler prologue */
 } F_ENVTYPE;
+
+#define FIRST_SAVE_ENV BOOT_ENV
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
@@ -71,7 +95,7 @@ CELL T;
 
 INLINE CELL tag_header(CELL cell)
 {
-	return RETAG(cell << TAG_BITS,OBJECT_TYPE);
+	return cell << TAG_BITS;
 }
 
 INLINE CELL untag_header(CELL cell)
@@ -91,12 +115,11 @@ INLINE CELL object_type(CELL tagged)
 
 INLINE CELL type_of(CELL tagged)
 {
-	if(tagged == F)
-		return F_TYPE;
-	else if(TAG(tagged) == FIXNUM_TYPE)
-		return FIXNUM_TYPE;
-	else
+	CELL tag = TAG(tagged);
+	if(tag == OBJECT_TYPE)
 		return object_type(tagged);
+	else
+		return tag;
 }
 
 #define DEFPUSHPOP(prefix,ptr) \
@@ -123,92 +146,101 @@ INLINE CELL type_of(CELL tagged)
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
 
-void init_interpreter(void);
+typedef struct {
+	CELL start;
+	CELL size;
+	CELL end;
+} F_SEGMENT;
 
-void call(CELL quot);
-void handle_error();
-void interpreter_loop(void);
-void interpreter(void);
-void run(void);
-DLLEXPORT void run_toplevel(void);
-void undefined(F_WORD *word);
-void docol(F_WORD *word);
-void dosym(F_WORD *word);
-void primitive_execute(void);
-void primitive_call(void);
-void primitive_ifte(void);
-void primitive_dispatch(void);
-void primitive_getenv(void);
-void primitive_setenv(void);
-void primitive_exit(void);
-void primitive_os_env(void);
-void primitive_eq(void);
-void primitive_millis(void);
-void primitive_sleep(void);
-void primitive_type(void);
-void primitive_tag(void);
-void primitive_class_hash(void);
-void primitive_slot(void);
-void primitive_set_slot(void);
+/* Assembly code makes assumptions about the layout of this struct:
+   - callstack_top field is 0
+   - callstack_bottom field is 1
+   - datastack field is 2
+   - retainstack field is 3 */
+typedef struct _F_CONTEXT {
+	/* C stack pointer on entry */
+	F_STACK_FRAME *callstack_top;
+	F_STACK_FRAME *callstack_bottom;
 
-DLLEXPORT void run_callback(CELL quot);
+	/* current datastack top pointer */
+	CELL datastack;
 
-/* Runtime errors */
-typedef enum
-{
-	ERROR_EXPIRED = 0,
-	ERROR_IO,
-	ERROR_UNDEFINED_WORD,
-	ERROR_TYPE,
-	ERROR_DIVIDE_BY_ZERO,
-	ERROR_SIGNAL,
-	ERROR_ARRAY_SIZE,
-	ERROR_C_STRING,
-	ERROR_FFI,
-	ERROR_HEAP_SCAN,
-	ERROR_UNDEFINED_SYMBOL,
-	ERROR_DS_UNDERFLOW,
-	ERROR_DS_OVERFLOW,
-	ERROR_RS_UNDERFLOW,
-	ERROR_RS_OVERFLOW,
-	ERROR_CS_UNDERFLOW,
-	ERROR_CS_OVERFLOW,
-	ERROR_MEMORY,
-	ERROR_OBJECTIVE_C,
-	ERROR_PRIMITIVE
-} F_ERRORTYPE;
+	/* current retain stack top pointer */
+	CELL retainstack;
 
-/* Are we throwing an error? */
-/* XXX Why is this volatile? The resulting executable crashes when compiled
-under gcc on windows otherwise. Proper fix pending */
-volatile bool throwing;
-/* When throw_error throws an error, it sets this global and
-longjmps back to the top-level. */
-CELL thrown_error;
-CELL thrown_native_stack_trace;
-CELL thrown_keep_stacks;
-/* Since longjmp restores registers, we must save all these values. */
-CELL thrown_ds;
-CELL thrown_rs;
+	/* saved contents of ds register on entry to callback */
+	CELL datastack_save;
 
-void fatal_error(char* msg, CELL tagged);
-void critical_error(char* msg, CELL tagged);
-void throw_error(CELL error, bool keep_stacks, F_COMPILED_FRAME *native_stack);
-void early_error(CELL error);
-void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2,
-	bool keep_stacks, F_COMPILED_FRAME *native_stack);
-void simple_error(F_ERRORTYPE error, CELL arg1, CELL arg2);
-void memory_protection_error(CELL addr, F_COMPILED_FRAME *native_stacks);
-void signal_error(int signal, F_COMPILED_FRAME *native_stack);
-void type_error(CELL type, CELL tagged);
-void divide_by_zero_error(void);
-void primitive_error(void);
-void primitive_throw(void);
-void primitive_die(void);
+	/* saved contents of rs register on entry to callback */
+	CELL retainstack_save;
 
-INLINE void type_check(CELL type, CELL tagged)
-{
-	if(type_of(tagged) != type) type_error(type,tagged);
-}
+	/* memory region holding current datastack */
+	F_SEGMENT *datastack_region;
 
-void primitive_profiling(void);
+	/* memory region holding current retain stack */
+	F_SEGMENT *retainstack_region;
+
+	/* saved userenv slots on entry to callback */
+	CELL catchstack_save;
+	CELL current_callback_save;
+
+	/* saved extra_roots pointer on entry to callback */
+	CELL extra_roots;
+
+	struct _F_CONTEXT *next;
+} F_CONTEXT;
+
+DLLEXPORT F_CONTEXT *stack_chain;
+
+CELL ds_size, rs_size;
+
+#define ds_bot (stack_chain->datastack_region->start)
+#define ds_top (stack_chain->datastack_region->end)
+#define rs_bot (stack_chain->retainstack_region->start)
+#define rs_top (stack_chain->retainstack_region->end)
+
+void reset_datastack(void);
+void reset_retainstack(void);
+void fix_stacks(void);
+DLLEXPORT void save_stacks(void);
+DLLEXPORT void nest_stacks(void);
+DLLEXPORT void unnest_stacks(void);
+void init_stacks(CELL ds_size, CELL rs_size);
+DECLARE_PRIMITIVE(drop);
+DECLARE_PRIMITIVE(2drop);
+DECLARE_PRIMITIVE(3drop);
+DECLARE_PRIMITIVE(dup);
+DECLARE_PRIMITIVE(2dup);
+DECLARE_PRIMITIVE(3dup);
+DECLARE_PRIMITIVE(rot);
+DECLARE_PRIMITIVE(_rot);
+DECLARE_PRIMITIVE(dupd);
+DECLARE_PRIMITIVE(swapd);
+DECLARE_PRIMITIVE(nip);
+DECLARE_PRIMITIVE(2nip);
+DECLARE_PRIMITIVE(tuck);
+DECLARE_PRIMITIVE(over);
+DECLARE_PRIMITIVE(pick);
+DECLARE_PRIMITIVE(swap);
+DECLARE_PRIMITIVE(to_r);
+DECLARE_PRIMITIVE(from_r);
+DECLARE_PRIMITIVE(datastack);
+DECLARE_PRIMITIVE(retainstack);
+
+XT default_word_xt(F_WORD *word);
+
+DECLARE_PRIMITIVE(execute);
+DECLARE_PRIMITIVE(call);
+DECLARE_PRIMITIVE(getenv);
+DECLARE_PRIMITIVE(setenv);
+DECLARE_PRIMITIVE(exit);
+DECLARE_PRIMITIVE(os_env);
+DECLARE_PRIMITIVE(os_envs);
+DECLARE_PRIMITIVE(eq);
+DECLARE_PRIMITIVE(millis);
+DECLARE_PRIMITIVE(sleep);
+DECLARE_PRIMITIVE(type);
+DECLARE_PRIMITIVE(tag);
+DECLARE_PRIMITIVE(class_hash);
+DECLARE_PRIMITIVE(slot);
+DECLARE_PRIMITIVE(set_slot);

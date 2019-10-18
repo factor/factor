@@ -1,19 +1,5 @@
 #include "master.h"
 
-/* test if alien is no longer valid (it survived an image save/load) */
-void primitive_expired(void)
-{
-	CELL object = dpeek();
-
-	if(type_of(object) == ALIEN_TYPE)
-	{
-		F_ALIEN *alien = untag_object(object);
-		drepl(tag_boolean(alien->expired));
-	}
-	else
-		drepl(object == F ? T : F);
-}
-
 /* gets the address of an object representing a C pointer */
 void *alien_offset(CELL object)
 {
@@ -29,9 +15,30 @@ void *alien_offset(CELL object)
 		return byte_array + 1;
 	case ALIEN_TYPE:
 		alien = untag_object(object);
-		if(alien->expired)
-			simple_error(ERROR_EXPIRED,object,F);
+		if(alien->expired != F)
+			general_error(ERROR_EXPIRED,object,F,NULL);
 		return alien_offset(alien->alien) + alien->displacement;
+	case F_TYPE:
+		return NULL;
+	default:
+		type_error(ALIEN_TYPE,object);
+		return NULL; /* can't happen */
+	}
+}
+
+/* gets the address of an object representing a C pointer, with the
+intention of storing the pointer across code which may potentially GC. */
+void *pinned_alien_offset(CELL object)
+{
+	F_ALIEN *alien;
+
+	switch(type_of(object))
+	{
+	case ALIEN_TYPE:
+		alien = untag_object(object);
+		if(alien->expired != F)
+			general_error(ERROR_EXPIRED,object,F,NULL);
+		return pinned_alien_offset(alien->alien) + alien->displacement;
 	case F_TYPE:
 		return NULL;
 	default:
@@ -54,7 +61,7 @@ CELL allot_alien(CELL delegate, CELL displacement)
 	UNREGISTER_ROOT(delegate);
 	alien->alien = delegate;
 	alien->displacement = displacement;
-	alien->expired = false;
+	alien->expired = F;
 	return tag_object(alien);
 }
 
@@ -68,37 +75,36 @@ void box_alien(void *ptr)
 }
 
 /* make an alien pointing at an offset of another alien */
-void primitive_displaced_alien(void)
+DEFINE_PRIMITIVE(displaced_alien)
 {
 	CELL alien = dpop();
 	CELL displacement = to_cell(dpop());
+
 	if(alien == F && displacement == 0)
 		dpush(F);
 	else
-		dpush(allot_alien(alien,displacement));
+	{
+		switch(type_of(alien))
+		{
+		case BYTE_ARRAY_TYPE:
+		case BIT_ARRAY_TYPE:
+		case FLOAT_ARRAY_TYPE:
+		case ALIEN_TYPE:
+		case F_TYPE:
+			dpush(allot_alien(alien,displacement));
+			break;
+		default:
+			type_error(ALIEN_TYPE,alien);
+			break;
+		}
+	}
 }
 
 /* address of an object representing a C pointer. Explicitly throw an error
 if the object is a byte array, as a sanity check. */
-void primitive_alien_address(void)
+DEFINE_PRIMITIVE(alien_address)
 {
-	CELL object = dpop();
-	switch(type_of(object))
-	{
-	case ALIEN_TYPE:
-	case F_TYPE:
-		box_unsigned_cell((CELL)alien_offset(object));
-		break;
-	default:
-		type_error(ALIEN_TYPE,object);
-		break;
-	}
-}
-
-/* image loading */
-void fixup_alien(F_ALIEN *d)
-{
-	d->expired = true;
+	box_unsigned_cell((CELL)pinned_alien_offset(dpop()));
 }
 
 /* pop ( alien n ) from datastack, return alien's address plus n */
@@ -109,31 +115,31 @@ INLINE void *alien_pointer(void)
 }
 
 /* define words to read/write values at an alien address */
-#define DEF_ALIEN_SLOT(name,type,boxer,to) \
-void primitive_alien_##name (void) \
-{ \
-	boxer (*(type*)alien_pointer()); \
-} \
-void primitive_set_alien_##name (void) \
-{ \
-	type* ptr = alien_pointer(); \
-	type value = to(dpop()); \
-	*ptr = value; \
-}
+#define DEFINE_ALIEN_ACCESSOR(name,type,boxer,to) \
+	DEFINE_PRIMITIVE(alien_##name) \
+	{ \
+		boxer(*(type*)alien_pointer()); \
+	} \
+	DEFINE_PRIMITIVE(set_alien_##name) \
+	{ \
+		type* ptr = alien_pointer(); \
+		type value = to(dpop()); \
+		*ptr = value; \
+	}
 
-DEF_ALIEN_SLOT(signed_cell,F_FIXNUM,box_signed_cell,to_fixnum)
-DEF_ALIEN_SLOT(unsigned_cell,CELL,box_unsigned_cell,to_cell)
-DEF_ALIEN_SLOT(signed_8,s64,box_signed_8,to_signed_8)
-DEF_ALIEN_SLOT(unsigned_8,u64,box_unsigned_8,to_unsigned_8)
-DEF_ALIEN_SLOT(signed_4,s32,box_signed_4,to_fixnum)
-DEF_ALIEN_SLOT(unsigned_4,u32,box_unsigned_4,to_cell)
-DEF_ALIEN_SLOT(signed_2,s16,box_signed_2,to_fixnum)
-DEF_ALIEN_SLOT(unsigned_2,u16,box_unsigned_2,to_cell)
-DEF_ALIEN_SLOT(signed_1,s8,box_signed_1,to_fixnum)
-DEF_ALIEN_SLOT(unsigned_1,u8,box_unsigned_1,to_cell)
-DEF_ALIEN_SLOT(float,float,box_float,to_float)
-DEF_ALIEN_SLOT(double,double,box_double,to_double)
-DEF_ALIEN_SLOT(cell,void *,box_alien,alien_offset)
+DEFINE_ALIEN_ACCESSOR(signed_cell,F_FIXNUM,box_signed_cell,to_fixnum)
+DEFINE_ALIEN_ACCESSOR(unsigned_cell,CELL,box_unsigned_cell,to_cell)
+DEFINE_ALIEN_ACCESSOR(signed_8,s64,box_signed_8,to_signed_8)
+DEFINE_ALIEN_ACCESSOR(unsigned_8,u64,box_unsigned_8,to_unsigned_8)
+DEFINE_ALIEN_ACCESSOR(signed_4,s32,box_signed_4,to_fixnum)
+DEFINE_ALIEN_ACCESSOR(unsigned_4,u32,box_unsigned_4,to_cell)
+DEFINE_ALIEN_ACCESSOR(signed_2,s16,box_signed_2,to_fixnum)
+DEFINE_ALIEN_ACCESSOR(unsigned_2,u16,box_unsigned_2,to_cell)
+DEFINE_ALIEN_ACCESSOR(signed_1,s8,box_signed_1,to_fixnum)
+DEFINE_ALIEN_ACCESSOR(unsigned_1,u8,box_unsigned_1,to_cell)
+DEFINE_ALIEN_ACCESSOR(float,float,box_float,to_float)
+DEFINE_ALIEN_ACCESSOR(double,double,box_double,to_double)
+DEFINE_ALIEN_ACCESSOR(cell,void *,box_alien,pinned_alien_offset)
 
 /* for FFI calls passing structs by value */
 void to_value_struct(CELL src, void *dest, CELL size)
@@ -159,7 +165,7 @@ void box_small_struct(CELL x, CELL y, CELL size)
 }
 
 /* open a native library and push a handle */
-void primitive_dlopen(void)
+DEFINE_PRIMITIVE(dlopen)
 {
 	CELL path = tag_object(string_to_native_alien(
 		untag_string(dpop())));
@@ -172,7 +178,7 @@ void primitive_dlopen(void)
 }
 
 /* look up a symbol in a native library */
-void primitive_dlsym(void)
+DEFINE_PRIMITIVE(dlsym)
 {
 	CELL dll = dpop();
 	REGISTER_ROOT(dll);
@@ -187,14 +193,14 @@ void primitive_dlsym(void)
 	{
 		d = untag_dll(dll);
 		if(d->dll == NULL)
-			simple_error(ERROR_EXPIRED,dll,F);
+			general_error(ERROR_EXPIRED,dll,F,NULL);
 	}
 
 	box_alien(ffi_dlsym(d,sym));
 }
 
 /* close a native library handle */
-void primitive_dlclose(void)
+DEFINE_PRIMITIVE(dlclose)
 {
 	ffi_dlclose(untag_dll(dpop()));
 }

@@ -284,7 +284,7 @@ SYMBOL: node-stack
     swap node-intervals at ;
 
 : node-class ( node value -- class )
-    swap node-classes at [ object ] unless* ;
+    swap node-classes at object or ;
 
 : node-input-classes ( node -- seq )
     dup node-in-d [ node-class ] curry* map ;

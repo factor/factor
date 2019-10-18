@@ -83,7 +83,6 @@ over @center grid-add
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: automata-window ( -- )
-[ [ automata-window* ] with-scope ] with-ui ;
+: automata-window ( -- ) [ [ automata-window* ] with-scope ] with-ui ;
 
 MAIN: automata-window

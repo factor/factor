@@ -245,13 +245,13 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 
 /* Copy all literals referenced from a code block to newspace */
 void collect_literals_step(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
 	CELL scan;
 
-	CELL literal_end = literal_start + compiled->literal_length;
+	CELL literal_end = literals_start + compiled->literals_length;
 
-	for(scan = literal_start; scan < literal_end; scan += CELLS)
+	for(scan = literals_start; scan < literal_end; scan += CELLS)
 		copy_handle((CELL*)scan);
 
 	/* If the block is not finalized, the words area contains pointers to
@@ -277,19 +277,19 @@ void collect_literals(void)
 
 /* Mark all XTs referenced from a code block */
 void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
-	CELL scan;
+	F_COMPILED **start = (F_COMPILED **)words_start;
+	F_COMPILED **end = (F_COMPILED **)words_end;
+	F_COMPILED **iter = start;
 
-	for(scan = words_start; scan < words_end; scan += CELLS)
-		recursive_mark((XT)get(scan));
+	while(iter < end)
+		recursive_mark(compiled_to_block(*iter++));
 }
 
 /* Mark all XTs and literals referenced from a word XT */
-void recursive_mark(XT xt)
+void recursive_mark(F_BLOCK *block)
 {
-	F_BLOCK *block = xt_to_block(xt);
-
 	/* If already marked, do nothing */
 	switch(block->status)
 	{
@@ -303,7 +303,7 @@ void recursive_mark(XT xt)
 		break;
 	}
 
-	F_COMPILED *compiled = xt_to_compiled(xt);
+	F_COMPILED *compiled = block_to_compiled(block);
 	iterate_code_heap_step(compiled,collect_literals_step);
 
 	switch(compiled->finalized)
@@ -320,16 +320,20 @@ void recursive_mark(XT xt)
 }
 
 /* Push the free space and total size of the code heap */
-void primitive_code_room(void)
+DEFINE_PRIMITIVE(code_room)
 {
 	dpush(tag_fixnum(heap_usage(&code_heap,B_FREE) / 1024));
 	dpush(tag_fixnum((code_heap.segment->size) / 1024));
 }
 
-/* Perform a code GC */
-void primitive_code_gc(void)
+void code_gc(void)
 {
 	garbage_collection(TENURED,true,false,0);
+}
+
+DEFINE_PRIMITIVE(code_gc)
+{
+	code_gc();
 }
 
 /* Dump all code blocks for debugging */
@@ -375,6 +379,8 @@ CELL compute_heap_forwarding(F_HEAP *heap)
 			scan->forwarding = (F_BLOCK *)address;
 			address += scan->size;
 		}
+		else if(scan->status == B_MARKED)
+			critical_error("Why is the block marked?",0);
 
 		scan = next_block(heap,scan);
 	}
@@ -382,13 +388,20 @@ CELL compute_heap_forwarding(F_HEAP *heap)
 	return address - heap->segment->start;
 }
 
-void forward_xt(XT *xt)
+F_COMPILED *forward_xt(F_COMPILED *compiled)
 {
-	F_BLOCK *block = xt_to_block(*xt);
-	*xt = block_to_xt(block->forwarding);
+	return block_to_compiled(compiled_to_block(compiled)->forwarding);
 }
 
-void forward_word_xts(void)
+void forward_frame_xt(F_STACK_FRAME *frame)
+{
+	CELL offset = (CELL)FRAME_RETURN_ADDRESS(frame) - (CELL)frame_code(frame);
+	F_COMPILED *forwarded = forward_xt(frame_code(frame));
+	frame->xt = (XT)(forwarded + 1);
+	FRAME_RETURN_ADDRESS(frame) = (XT)((CELL)forwarded + offset);
+}
+
+void forward_object_xts(void)
 {
 	begin_scan();
 
@@ -400,22 +413,38 @@ void forward_word_xts(void)
 		{
 			F_WORD *word = untag_object(obj);
 
-			if(in_code_heap_p((CELL)word->xt))
-				forward_xt(&word->xt);
+			if(word->compiledp != F)
+				set_word_xt(word,forward_xt(word->code));
+		}
+		else if(type_of(obj) == QUOTATION_TYPE)
+		{
+			F_QUOTATION *quot = untag_object(obj);
+
+			if(quot->compiledp != F)
+				set_quot_xt(quot,forward_xt(quot->code));
+		}
+		else if(type_of(obj) == CALLSTACK_TYPE)
+		{
+			F_CALLSTACK *stack = untag_object(obj);
+			iterate_callstack_object(stack,forward_frame_xt);
 		}
 	}
 
-	primitive_end_scan();
+	/* End the heap scan */
+	gc_off = false;
 }
 
 void compaction_code_block_fixup(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
+	CELL reloc_start, CELL literals_start, CELL words_start, CELL words_end)
 {
-	XT *iter = (XT *)words_start;
-	XT *end = (XT *)words_end;
+	F_COMPILED **iter = (F_COMPILED **)words_start;
+	F_COMPILED **end = (F_COMPILED **)words_end;
 
 	while(iter < end)
-		forward_xt(iter++);
+	{
+		*iter = forward_xt(*iter);
+		iter++;
+	}
 }
 
 void forward_block_xts(void)
@@ -456,15 +485,15 @@ critical here */
 void compact_code_heap(void)
 {
 	/* Free all unreachable code blocks */
-	primitive_code_gc();
+	code_gc();
 
 	fprintf(stderr,"*** Code heap compaction...\n");
 
 	/* Figure out where the code heap blocks are going to end up */
 	CELL size = compute_heap_forwarding(&code_heap);
 
-	/* Update word XTs to point to the new locations */
-	forward_word_xts();
+	/* Update word and quotation XTs to point to the new locations */
+	forward_object_xts();
 
 	/* Update code block XTs to point to the new locations */
 	forward_block_xts();

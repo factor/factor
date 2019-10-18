@@ -1,5 +1,9 @@
-USING: rss io.files tools.test ;
-IN: temporary
+USING: rss io kernel io.files tools.test ;
+
+: load-news-file ( filename -- feed )
+    #! Load an news syndication file and process it, returning
+    #! it as an feed tuple.
+    <file-reader> read-feed ;
 
 [ T{
     feed
@@ -34,4 +38,3 @@ IN: temporary
         }
     }
 } ] [ "extra/rss/atom.xml" resource-path load-news-file ] unit-test
-[ " &amp; &amp; hi" ] [ " & &amp; hi" &>&amp; ] unit-test

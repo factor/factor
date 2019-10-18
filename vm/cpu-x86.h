@@ -1,16 +1,13 @@
-#define FACTOR_CPU_STRING "x86.32"
-
-register CELL ds asm("esi");
-register CELL rs asm("edi");
-void **primitives;
+#define FRAME_RETURN_ADDRESS(frame) *(XT *)(frame_successor(frame) + 1)
 
 INLINE void flush_icache(CELL start, CELL len) {}
 
-void *native_stack_pointer(void);
+F_FASTCALL void c_to_factor(CELL quot);
+F_FASTCALL void throw_impl(CELL quot, F_STACK_FRAME *rewind_to);
+F_FASTCALL void undefined(CELL word);
+F_FASTCALL void dosym(CELL word);
+F_FASTCALL void docol_profiling(CELL word);
+F_FASTCALL void docol(CELL word);
+F_FASTCALL void lazy_jit_compile(CELL quot);
 
-typedef CELL F_COMPILED_FRAME;
-
-#define PREVIOUS_FRAME(frame) (frame + 1)
-#define RETURN_ADDRESS(frame) (*(frame))
-
-void execute(F_WORD *word);
+void set_callstack(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, void *memcpy);

@@ -1,12 +1,12 @@
 USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
-effects splitting generic.standard ;
+effects splitting generic.standard prettyprint.private
+continuations ;
 IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test
 [ "1.0" ] [ 1.0 unparse ] unit-test
-[ "C{ 1/2 2/3 }" ] [ C{ 1/2 2/3 } unparse ] unit-test
 [ "1267650600228229401496703205376" ] [ 1 100 shift unparse ] unit-test
 
 [ "+" ] [ \ + unparse ] unit-test
@@ -52,12 +52,6 @@ unit-test
 ] unit-test
 
 [ "W{ \\ + }" ] [ [ W{ \ + } ] first unparse ] unit-test
-
-[ "[ 1 2 DUP ]" ]
-[
-    [ 1 2 dup ] dup hilite-quotation set 2 hilite-index set
-    [ pprint ] string-out
-] unit-test
 
 [ t ] [
     "[ >r \"alloc\" add 0 0 r> ]" dup parse first unparse =
@@ -283,3 +277,28 @@ unit-test
 ] unit-test
 
 [ ] [ \ effect-in synopsis drop ] unit-test
+
+[ [ + ] ] [
+    [ \ + (step-into) ] (remove-breakpoints)
+] unit-test
+
+[ [ (step-into) ] ] [
+    [ (step-into) ] (remove-breakpoints)
+] unit-test
+
+[ [ 3 ] ] [
+    [ 3 (step-into) ] (remove-breakpoints)
+] unit-test
+
+[ [ 2 2 + . ] ] [
+    [ 2 2 \ + (step-into) . ] (remove-breakpoints)
+] unit-test
+
+[ [ 2 2 + . ] ] [
+    [ 2 break 2 \ + (step-into) . ] (remove-breakpoints)
+] unit-test
+
+[ [ 2 . ] ] [
+    [ 2 \ break (step-into) . ] (remove-breakpoints)
+] unit-test
+

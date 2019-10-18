@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! 
 USING: tools.test kernel serialize io io.streams.string math
-alien arrays byte-arrays sequences math prettyprint ;
+alien arrays byte-arrays sequences math prettyprint parser
+classes math.constants ;
 IN: temporary
 
 TUPLE: serialize-test a b ;
@@ -39,8 +40,8 @@ C: <serialize-test> serialize-test
 
 : check-serialize-1 ( obj -- ? )
     dup class .
-    dup [ [ serialize ] with-serialized ] string-out
-    [ [ deserialize ] with-serialized ] string-in = ;
+    dup [ serialize ] string-out
+    [ deserialize ] string-in = ;
 
 : check-serialize-2 ( obj -- ? )
     dup number? over wrapper? or [
@@ -48,8 +49,8 @@ C: <serialize-test> serialize-test
     ] [
         dup class .
         dup 2array
-        [ [ serialize ] with-serialized ] string-out
-        [ [ deserialize ] with-serialized ] string-in
+        [ serialize ] string-out
+        [ deserialize ] string-in
         first2 eq?
     ] if ;
 
@@ -58,3 +59,13 @@ C: <serialize-test> serialize-test
 [ t ] [ objects [ check-serialize-2 ] all? ] unit-test
 
 [ t ] [ pi check-serialize-1 ] unit-test
+
+[ t ] [
+    { 1 2 3 } [
+        [
+            dup (serialize) (serialize)
+        ] with-serialized
+    ] string-out [
+        deserialize-sequence all-eq?
+    ] string-in
+] unit-test

@@ -38,8 +38,11 @@ IN: units.si
 : cd/m^2 { cd } { m m } <dimensioned> ;
 : kg/kg { kg } { kg } <dimensioned> ;
 
-: radians ( n -- radian ) { m } { m } <dimensioned> ;
-: sr ( n -- steradian ) { m m } { m m } <dimensioned> ;
+! Radians are really m/m, and steradians are m^2/m^2
+! but they need to be in reduced form here.
+: radians ( n -- radian ) scalar ;
+: sr ( n -- steradian ) scalar ;
+
 : Hz ( n -- hertz ) { } { s } <dimensioned> ;
 : N ( n -- newton ) { kg m } { s s } <dimensioned> ;
 : Pa ( n -- pascal ) { kg } { m s s } <dimensioned> ;
@@ -71,7 +74,9 @@ IN: units.si
 : B ( n -- bel ) 1.151292546497023 * Np ;
 : eV ( n -- electronvolt ) 1.60218e-19 * J ;
 : u ( n -- unified-atomic-mass-unit ) 1.66054e-27 * kg ;
-: au ( n -- astronomical-unit ) 149598000000 * m ;
+
+! au has error of 30m, according to wikipedia
+: au ( n -- astronomical-unit ) 149597870691 * m ;
 
 : a ( n -- are ) 100 * m^2 ;
 : ha ( n -- hectare ) 10000 * m^2 ;
@@ -81,8 +86,8 @@ IN: units.si
 : R 258/10000 { s A } { kg } <dimensioned> ;
 : rad 100 / Gy ;
 
-! roentgen equivalend man, equal to one roentgen of X-rays
-: rem 100 / Sv ;
+! roentgen equivalent man, equal to one roentgen of X-rays
+: roentgen-equivalent-man 100 / Sv ;
 
 ! inaccurate, use calendar where possible
 : minutes 60 * s ;

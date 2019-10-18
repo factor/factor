@@ -189,9 +189,11 @@ HELP: parsing
 HELP: inline
 { $syntax ": foo ... ; inline" }
 { $description
-    "Declares the most recently defined word as an inline word."
+    "Declares the most recently defined word as an inline word. The optimizing compiler copies definitions of inline words when compiling calls to them."
     $nl
-    "Combinators must be inlined in order to compile - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization. Inlining does not affect the execution of the word in the interpreter."
+    "Combinators must be inlined in order to compile with the optimizing compiler - see " { $link "inference-combinators" } ". For any other word, inlining is merely an optimization."
+    $nl
+    "The non-optimizing quotation compiler ignores inlining declarations."
 } ;
 
 HELP: foldable
@@ -512,7 +514,7 @@ HELP: PREDICATE:
 HELP: TUPLE:
 { $syntax "TUPLE: class slots... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class with membership predicate " { $snippet "name?" } " and constructor " { $snippet "<name>" } "."
+{ $description "Defines a new tuple class with membership predicate " { $snippet "name?" } "."
 $nl
 "Tuples are user-defined classes with instances composed of named slots. All tuple classes are subtypes of the built-in " { $link tuple } " type." } ;
 

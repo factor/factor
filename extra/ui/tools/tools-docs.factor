@@ -58,14 +58,14 @@ ARTICLE: "ui-walker" "UI walker"
 "The walker single-steps through quotations. To use the walker, enter a piece of code in the listener's input area and press " { $operation walk } "."
 $nl
 "The walker can travel backwards through time, and restore stacks. This does not undo side effects and therefore can only be used reliably on referentially transparent code."
-{ $command-map walker-gadget "toolbar" }
-{ $command-map walker-gadget "other" }
-"Walkers are instances of " { $link walker-gadget } "." ;
+{ $command-map walker "toolbar" }
+{ $command-map walker "other" }
+"Walkers are instances of " { $link walker } "." ;
 
 ARTICLE: "ui-profiler" "UI profiler" 
 "The graphical profiler is based on the terminal profiler (see " { $link "profiling" } ") and adds more convenient browsing of profiler results."
 $nl
-"The profiler must be enabled before use. Once the profiler has been enabled, enter a piece of code in the listener input area and press " { $operation com-profile } "."
+"To use the profiler, enter a piece of code in the listener input area and press " { $operation com-profile } "."
 $nl
 "Vocabulary and word presentations in the profiler pane can be clicked on to show profiler results pertaining to the object in question. Clicking a vocabulary in the profiler yields the same output as the " { $link vocab-profile. } " word, and clicking a word yields the same output as the " { $link usage-profile. } " word. Consult " { $link "profiling" } " for details."
 { $command-map profiler-gadget "toolbar" } ;
@@ -130,12 +130,14 @@ $nl
 { $subsection "ui-presentations" }
 { $subsection "ui-completion" }
 { $heading "Tools" }
-"All development tools are integrated into a single-window " { $emphasis "workspace" } "."
+"A single-window " { $emphasis "workspace" } " contains the most frequently-used tools:"
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-inspector" }
 { $subsection "ui-walker" }
 { $subsection "ui-profiler" }
+"Additional tools:"
+{ $subsection "ui.tools.deploy" }
 "Platform-specific features:"
 { $subsection "ui-cocoa" } ;
 

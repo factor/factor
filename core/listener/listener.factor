@@ -10,6 +10,8 @@ SYMBOL: quit-flag
 
 SYMBOL: listener-hook
 
+[ ] listener-hook set-global
+
 GENERIC: parse-interactive ( stream -- quot/f )
 
 : parse-interactive-step ( lines -- quot/f )

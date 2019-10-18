@@ -23,7 +23,7 @@ M: array equal?
 
 INSTANCE: array sequence
 
-: 1array ( x -- array ) { } 1sequence ; flushable
+: 1array ( x -- array ) 1 swap <array> ; flushable
 
 : 2array ( x y -- array ) { } 2sequence ; flushable
 

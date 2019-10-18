@@ -2,22 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.compiler arrays
 cpu.x86.assembler cpu.architecture kernel kernel.private math
-math.functions memory namespaces sequences words generator
-generator.registers generator.fixup system layouts combinators ;
+memory namespaces sequences words generator generator.registers
+generator.fixup system layouts combinators ;
 IN: cpu.x86.architecture
 
 TUPLE: x86-backend cell ;
 
-! We implement the FFI for Linux, OS X and Windows all at once.
-! OS X requires that the stack be 16-byte aligned, and we do
-! this on all platforms, sacrificing some stack space for
-! code simplicity.
-
-M: x86-backend code-format 1 ;
-
 HOOK: ds-reg compiler-backend
 HOOK: rs-reg compiler-backend
 HOOK: stack-reg compiler-backend
+HOOK: xt-reg compiler-backend
+HOOK: stack-save-reg compiler-backend
 
 : stack@ stack-reg swap [+] ;
 
@@ -46,33 +41,55 @@ HOOK: prepare-division compiler-backend
 
 M: immediate load-literal v>operand swap v>operand MOV ;
 
-M: x86-backend stack-frame ( n -- i ) 16 align 16 + cell - ;
+M: x86-backend stack-frame ( n -- i )
+    3 cells + 16 align cell - ;
+
+M: x86-backend %save-word-xt ( -- )
+    xt-reg 0 MOV rc-absolute-cell rel-current-word ;
+
+: factor-area-size 4 cells ;
 
 M: x86-backend %prologue ( n -- )
-    stack-reg swap stack-frame SUB ;
+    dup cell + PUSH
+    xt-reg PUSH
+    stack-reg swap 2 cells - SUB ;
 
 M: x86-backend %epilogue ( n -- )
-    stack-reg swap stack-frame ADD ;
+    stack-reg swap ADD ;
 
-: %alien-global ( symbol dll -- )
-    temp-reg v>operand 0 MOV rc-absolute-cell rel-dlsym
-    temp-reg v>operand dup [] MOV ;
+: %alien-global ( symbol dll register -- )
+    [ 0 MOV rc-absolute-cell rel-dlsym ] keep dup [] MOV ;
+
+M: x86-backend %prepare-alien-invoke
+    #! Save Factor stack pointers in case the C code calls a
+    #! callback which does a GC, which must reliably trace
+    #! all roots.
+    "stack_chain" f temp-reg v>operand %alien-global
+    temp-reg v>operand [] stack-reg MOV
+    temp-reg v>operand [] cell SUB
+    temp-reg v>operand 2 cells [+] ds-reg MOV
+    temp-reg v>operand 3 cells [+] rs-reg MOV ;
 
 M: x86-backend %profiler-prologue ( word -- )
-    "end" define-label
-    "profiling" f %alien-global
-    temp-reg v>operand 0 CMP
-    "end" get JE
-    temp-reg v>operand load-indirect
-    temp-reg v>operand profile-count-offset [+] 1 v>operand ADD
-    "end" resolve-label ;
+    temp-reg load-literal
+    temp-reg v>operand profile-count-offset [+] 1 v>operand ADD ;
 
-: (%call) ( label -- label )
-    dup primitive? [ address-operand ] when ;
+M: x86-backend %call-label ( label -- ) CALL ;
 
-M: x86-backend %call ( label -- ) (%call) CALL ;
+M: x86-backend %jump-label ( label -- ) JMP ;
 
-M: x86-backend %jump-label ( label -- ) (%call) JMP ;
+: %prepare-primitive ( word -- operand )
+    ! Save stack pointer to stack_chain->callstack_top, load XT
+    ! in register
+    stack-save-reg stack-reg MOV address-operand ;
+
+M: x86-backend %call-primitive ( word -- )
+    stack-save-reg stack-reg cell neg [+] LEA
+    address-operand CALL ;
+
+M: x86-backend %jump-primitive ( word -- )
+    stack-save-reg stack-reg MOV
+    address-operand JMP ;
 
 M: x86-backend %jump-t ( label -- )
     "flag" operand f v>operand CMP JNE ;
@@ -84,14 +101,16 @@ M: x86-backend %jump-t ( label -- )
     ! since on AMD64 we have to load a 64-bit immediate. On
     ! x86, this is redundant.
     "scratch" operand HEX: ffffffff MOV rc-absolute-cell rel-dispatch
-    "n" operand "scratch" operand ADD ;
+    "n" operand "n" operand "scratch" operand [+] MOV
+    "n" operand compiled-header-size ADD ;
 
 : dispatch-template ( word-table# quot -- )
     [
-        >r (%dispatch) "n" operand [] r> call
+        >r (%dispatch) "n" operand r> call
     ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "scratch" } } }
+        { +clobber+ { "n" } }
     } with-template ; inline
 
 M: x86-backend %call-dispatch ( word-table# -- )
@@ -100,15 +119,12 @@ M: x86-backend %call-dispatch ( word-table# -- )
 M: x86-backend %jump-dispatch ( word-table# -- )
     [ %epilogue-later JMP ] dispatch-template ;
 
-M: x86-backend %move-int>int ( dst src -- )
-    [ v>operand ] 2apply MOV ;
-
-M: x86-backend %move-int>float ( dst src -- )
+M: x86-backend %unbox-float ( dst src -- )
     [ v>operand ] 2apply float-offset [+] MOVSD ;
 
-M: int-regs (%peek) drop %move-int>int ;
+M: x86-backend %peek [ v>operand ] 2apply MOV ;
 
-M: int-regs (%replace) drop swap %move-int>int ;
+M: x86-backend %replace swap %peek ;
 
 : (%inc) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 
@@ -129,11 +145,13 @@ M: x86-backend small-enough? ( n -- ? )
 
 : %tag-fixnum ( reg -- ) tag-bits get SHL ;
 
+: temp@ stack-reg \ stack-frame get rot - [+] ;
+
 : struct-return@ ( size n -- n )
     [
         stack-frame* cell + +
     ] [
-        stack-frame* swap -
+        \ stack-frame get swap -
     ] ?if ;
 
 HOOK: %unbox-struct-1 compiler-backend ( -- )
@@ -142,7 +160,7 @@ HOOK: %unbox-struct-2 compiler-backend ( -- )
 
 M: x86-backend %unbox-small-struct ( size -- )
     #! Alien must be in EAX.
-    cell align cell / {
+    cell align cell /i {
         { 1 [ %unbox-struct-1 ] }
         { 2 [ %unbox-struct-2 ] }
     } case ;
@@ -154,30 +172,45 @@ M: x86-backend struct-small-enough? ( size -- ? )
 M: x86-backend %return ( -- ) 0 %unwind ;
 
 ! Alien intrinsics
-M: x86-backend %unbox-byte-array ( quot src -- )
-    "alien" operand "offset" operand ADD
-    "alien" operand alien-offset [+]
-    rot call ;
+M: x86-backend %unbox-byte-array ( dst src -- )
+    [ v>operand ] 2apply byte-array-offset [+] LEA ;
 
-M: x86-backend %unbox-alien ( quot src -- )
-    "alien" operand dup alien-offset [+] MOV
-    "alien" operand "offset" operand [+]
-    rot call ;
+M: x86-backend %unbox-alien ( dst src -- )
+    [ v>operand ] 2apply alien-offset [+] MOV ;
 
-M: x86-backend %unbox-f ( quot src -- )
-    "offset" operand rot call ;
+M: x86-backend %unbox-f ( dst src -- )
+    drop v>operand 0 MOV ;
 
-M: x86-backend %complex-alien-accessor ( quot src -- )
-    { "is-f" "is-alien" "end" } [ define-label ] each
-    "alien" operand f v>operand CMP
-    "is-f" get JE
-    "alien" operand header-offset [+] alien type-number tag-header CMP
-    "is-alien" get JE
-    [ %unbox-byte-array ] 2keep
-    "end" get JMP
-    "is-alien" resolve-label
-    [ %unbox-alien ] 2keep
-    "end" get JMP
-    "is-f" resolve-label
-    %unbox-f
-    "end" resolve-label ;
+M: x86-backend %unbox-any-c-ptr ( dst src -- )
+    { "is-byte-array" "end" "start" } [ define-label ] each
+    ! Address is computed in ds-reg
+    ds-reg PUSH
+    ds-reg 0 MOV
+    ! Object is stored in ds-reg
+    rs-reg PUSH
+    rs-reg swap v>operand MOV
+    ! We come back here with displaced aliens
+    "start" resolve-label
+    ! Is the object f?
+    rs-reg f v>operand CMP
+    "end" get JE
+    ! Is the object an alien?
+    rs-reg header-offset [+] alien type-number tag-header CMP
+    "is-byte-array" get JNE
+    ! If so, load the offset and add it to the address
+    ds-reg rs-reg alien-offset [+] ADD
+    ! Now recurse on the underlying alien
+    rs-reg rs-reg underlying-alien-offset [+] MOV
+    "start" get JMP
+    "is-byte-array" resolve-label
+    ! Add byte array address to address being computed
+    ds-reg rs-reg ADD
+    ! Add an offset to start of byte array's data
+    ds-reg byte-array-offset ADD
+    "end" resolve-label
+    ! Done, store address in destination register
+    v>operand ds-reg MOV
+    ! Restore rs-reg
+    rs-reg POP
+    ! Restore ds-reg
+    ds-reg POP ;

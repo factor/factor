@@ -2,11 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes continuations help help.topics kernel models
 sequences ui ui.backend ui.tools.debugger ui.gadgets
-ui.gadgets.books ui.gadgets.buttons ui.gadgets.controls
-ui.gadgets.labelled ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.tracks ui.gadgets.worlds ui.gadgets.presentations
-ui.gadgets.status-bar ui.commands ui.gestures assocs arrays
-namespaces ;
+ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks
+ui.gadgets.worlds ui.gadgets.presentations ui.gadgets.status-bar
+ui.commands ui.gestures assocs arrays namespaces ;
 IN: ui.tools.workspace
 
 TUPLE: workspace book listener popup ;
@@ -28,7 +27,7 @@ M: gadget tool-scroller drop f ;
     workspace-book gadget-children [ class eq? ] curry* find ;
 
 : show-tool ( class workspace -- tool )
-    [ find-tool swap ] keep workspace-book control-model
+    [ find-tool swap ] keep workspace-book gadget-model
     set-model ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;
@@ -70,7 +69,7 @@ M: gadget tool-scroller drop f ;
     [ find-workspace hide-popup ] <debugger>
     "Error" show-titled-popup ;
 
-M: workspace pref-dim* drop { 600 750 } ;
+M: workspace pref-dim* drop { 600 700 } ;
 
 M: workspace focusable-child*
     dup workspace-popup [ ] [ workspace-listener ] ?if ;

@@ -96,27 +96,28 @@ TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 
 : INVALID_HANDLE_VALUE -1 <alien> ; inline
 : INVALID_FILE_SIZE HEX: FFFFFFFF ; inline
+: INVALID_SET_FILE_POINTER HEX: ffffffff ; inline
 
 : FILE_BEGIN 0 ; inline
 : FILE_CURRENT 1 ; inline
 : FILE_END 2 ; inline
 
 : OF_READ 0 ;
-: OF_READWRITE	2 ;
-: OF_WRITE	1 ;
-: OF_SHARE_COMPAT	0 ;
-: OF_SHARE_DENY_NONE	64 ;
-: OF_SHARE_DENY_READ	48 ;
-: OF_SHARE_DENY_WRITE	32 ;
-: OF_SHARE_EXCLUSIVE	16 ;
-: OF_CANCEL	2048 ;
-: OF_CREATE	4096 ;
-: OF_DELETE	512 ;
-: OF_EXIST	16384 ;
-: OF_PARSE	256 ;
-: OF_PROMPT	8192 ;
-: OF_REOPEN	32768 ;
-: OF_VERIFY	1024 ;
+: OF_READWRITE    2 ;
+: OF_WRITE    1 ;
+: OF_SHARE_COMPAT    0 ;
+: OF_SHARE_DENY_NONE    64 ;
+: OF_SHARE_DENY_READ    48 ;
+: OF_SHARE_DENY_WRITE    32 ;
+: OF_SHARE_EXCLUSIVE    16 ;
+: OF_CANCEL    2048 ;
+: OF_CREATE    4096 ;
+: OF_DELETE    512 ;
+: OF_EXIST    16384 ;
+: OF_PARSE    256 ;
+: OF_PROMPT    8192 ;
+: OF_REOPEN    32768 ;
+: OF_VERIFY    1024 ;
 
 
 : INFINITE HEX: FFFFFFFF ; inline
@@ -134,28 +135,54 @@ TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 : TIME_ZONE_ID_INVALID HEX: FFFFFFFF ; inline
 
 
-: CREATE_DEFAULT_ERROR_MODE HEX: 4000000 ; inline
-: DETACHED_PROCESS 8 ; inline
 : PF_XMMI64_INSTRUCTIONS_AVAILABLE 10 ; inline
 : PF_SSE3_INSTRUCTIONS_AVAILABLE 13 ; inline
 
 : MAX_COMPUTERNAME_LENGTH 15 ; inline
 : UNLEN 256 ; inline
 
-: PROCESS_TERMINATE ( -- number ) HEX: 1 ; inline
-: PROCESS_CREATE_THREAD ( -- number ) HEX: 2 ; inline
-: PROCESS_VM_OPERATION ( -- number ) HEX: 8 ; inline
-: PROCESS_VM_READ ( -- number ) HEX: 10 ; inline
-: PROCESS_VM_WRITE ( -- number ) HEX: 20 ; inline
-: PROCESS_DUP_HANDLE ( -- number ) HEX: 40 ; inline
-: PROCESS_CREATE_PROCESS ( -- number ) HEX: 80 ; inline
-: PROCESS_SET_QUOTA ( -- number ) HEX: 100 ; inline
-: PROCESS_SET_INFORMATION ( -- number ) HEX: 200 ; inline
-: PROCESS_QUERY_INFORMATION ( -- number ) HEX: 400 ; inline
+: PROCESS_TERMINATE ( -- n ) HEX: 1 ; inline
+: PROCESS_CREATE_THREAD ( -- n ) HEX: 2 ; inline
+: PROCESS_VM_OPERATION ( -- n ) HEX: 8 ; inline
+: PROCESS_VM_READ ( -- n ) HEX: 10 ; inline
+: PROCESS_VM_WRITE ( -- n ) HEX: 20 ; inline
+: PROCESS_DUP_HANDLE ( -- n ) HEX: 40 ; inline
+: PROCESS_CREATE_PROCESS ( -- n ) HEX: 80 ; inline
+: PROCESS_SET_QUOTA ( -- n ) HEX: 100 ; inline
+: PROCESS_SET_INFORMATION ( -- n ) HEX: 200 ; inline
+: PROCESS_QUERY_INFORMATION ( -- n ) HEX: 400 ; inline
 
-: PAGE_READWRITE ( -- number ) HEX: 4 ; inline
-: MEM_COMMIT ( -- number ) HEX: 1000 ; inline
-: MEM_RELEASE ( -- number ) HEX: 8000 ; inline
+: MEM_COMMIT ( -- n ) HEX: 1000 ; inline
+: MEM_RELEASE ( -- n ) HEX: 8000 ; inline
+
+: PAGE_NOACCESS    1 ; inline
+: PAGE_READONLY    2 ; inline
+: PAGE_READWRITE 4 ; inline
+: PAGE_WRITECOPY 8 ; inline
+: PAGE_EXECUTE HEX: 10 ; inline
+: PAGE_EXECUTE_READ HEX: 20 ; inline
+: PAGE_EXECUTE_READWRITE HEX: 40 ; inline
+: PAGE_EXECUTE_WRITECOPY HEX: 80 ; inline
+: PAGE_GUARD HEX: 100 ; inline
+: PAGE_NOCACHE HEX: 200 ; inline
+
+: SEC_BASED HEX: 00200000 ; inline
+: SEC_NO_CHANGE HEX: 00400000 ; inline
+: SEC_FILE HEX: 00800000 ; inline
+: SEC_IMAGE HEX: 01000000 ; inline
+: SEC_VLM HEX: 02000000 ; inline
+: SEC_RESERVE HEX: 04000000 ; inline
+: SEC_COMMIT HEX: 08000000 ; inline
+: SEC_NOCACHE HEX: 10000000 ; inline
+: MEM_IMAGE SEC_IMAGE ; inline
+
+: ERROR_ALREADY_EXISTS 183 ; inline
+
+: FILE_MAP_ALL_ACCESS HEX: f001f ;
+: FILE_MAP_READ   4 ;
+: FILE_MAP_WRITE  2 ;
+: FILE_MAP_COPY   1 ;
+
 C-STRUCT: OVERLAPPED
     { "int" "internal" }
     { "int" "internal-high" }
@@ -430,6 +457,40 @@ TYPEDEF: PFILETIME LPFILETIME
 
 TYPEDEF: int GET_FILEEX_INFO_LEVELS
 
+C-STRUCT: SECURITY_ATTRIBUTES
+    { "DWORD" "nLength" }
+    { "LPVOID" "lpSecurityDescriptor" }
+    { "BOOL" "bInheritHandle" } ;
+
+: HANDLE_FLAG_INHERIT 1 ; inline
+: HANDLE_FLAG_PROTECT_FROM_CLOSE 2 ; inline
+
+: STARTF_USESHOWWINDOW    HEX: 00000001 ; inline
+: STARTF_USESIZE          HEX: 00000002 ; inline
+: STARTF_USEPOSITION      HEX: 00000004 ; inline
+: STARTF_USECOUNTCHARS    HEX: 00000008 ; inline
+: STARTF_USEFILLATTRIBUTE HEX: 00000010 ; inline
+: STARTF_RUNFULLSCREEN    HEX: 00000020 ; inline
+: STARTF_FORCEONFEEDBACK  HEX: 00000040 ; inline
+: STARTF_FORCEOFFFEEDBACK HEX: 00000080 ; inline
+: STARTF_USESTDHANDLES    HEX: 00000100 ; inline
+: STARTF_USEHOTKEY        HEX: 00000200 ; inline
+
+: PIPE_ACCESS_INBOUND  1 ; inline
+: PIPE_ACCESS_OUTBOUND 2 ; inline
+: PIPE_ACCESS_DUPLEX   3 ; inline
+
+: PIPE_TYPE_BYTE    0 ; inline
+: PIPE_TYPE_MESSAGE 4 ; inline
+
+: PIPE_READMODE_BYTE    0 ; inline
+: PIPE_READMODE_MESSAGE 2 ; inline
+
+: PIPE_WAIT   0 ; inline
+: PIPE_NOWAIT 1 ; inline
+
+: PIPE_UNLIMITED_INSTANCES 255 ; inline
+
 LIBRARY: kernel32
 ! FUNCTION: _hread
 ! FUNCTION: _hwrite
@@ -496,7 +557,7 @@ FUNCTION: BOOL CloseHandle ( HANDLE h ) ;
 ! FUNCTION: CompareFileTime
 ! FUNCTION: CompareStringA
 ! FUNCTION: CompareStringW
-! FUNCTION: ConnectNamedPipe
+FUNCTION: BOOL ConnectNamedPipe ( HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped ) ;
 ! FUNCTION: ConsoleMenuControl
 ! FUNCTION: ContinueDebugEvent
 ! FUNCTION: ConvertDefaultLocale
@@ -505,7 +566,8 @@ FUNCTION: BOOL CloseHandle ( HANDLE h ) ;
 ! FUNCTION: CopyFileA
 ! FUNCTION: CopyFileExA
 ! FUNCTION: CopyFileExW
-! FUNCTION: CopyFileW
+FUNCTION: BOOL CopyFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName, BOOL bFailIfExists ) ;
+: CopyFile CopyFileW ; inline
 ! FUNCTION: CopyLZFile
 ! FUNCTION: CreateActCtxA
 ! FUNCTION: CreateActCtxW
@@ -514,7 +576,7 @@ FUNCTION: BOOL CloseHandle ( HANDLE h ) ;
 ! FUNCTION: CreateDirectoryExA
 ! FUNCTION: CreateDirectoryExW
 FUNCTION: BOOL CreateDirectoryW ( LPCTSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttribytes ) ;
-: CreateDirectory CreateDirectoryW ;
+: CreateDirectory CreateDirectoryW ; inline
 
 ! FUNCTION: CreateEventA
 ! FUNCTION: CreateEventW
@@ -546,9 +608,36 @@ FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCo
 ! FUNCTION: CreateMutexA
 ! FUNCTION: CreateMutexW
 ! FUNCTION: CreateNamedPipeA
-! FUNCTION: CreateNamedPipeW
+FUNCTION: HANDLE CreateNamedPipeW ( LPCTSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD nMaxInstances, DWORD nOutBufferSize, DWORD nInBufferSize, DWORD nDefaultTimeOut, LPSECURITY_ATTRIBUTES lpSecurityAttributes ) ;
+: CreateNamedPipe CreateNamedPipeW ;
+
 ! FUNCTION: CreateNlsSecurityDescriptor
 FUNCTION: BOOL CreatePipe ( PHANDLE hReadPipe, PHANDLE hWritePipe, LPSECURITY_ATTRIBUTES lpPipeAttributes, DWORD nSize ) ;
+
+: DEBUG_PROCESS                   HEX: 00000001 ;
+: DEBUG_ONLY_THIS_PROCESS         HEX: 00000002 ;
+: CREATE_SUSPENDED                HEX: 00000004 ;
+: DETACHED_PROCESS                HEX: 00000008 ;
+: CREATE_NEW_CONSOLE              HEX: 00000010 ;
+: NORMAL_PRIORITY_CLASS           HEX: 00000020 ;
+: IDLE_PRIORITY_CLASS             HEX: 00000040 ;
+: HIGH_PRIORITY_CLASS             HEX: 00000080 ;
+: REALTIME_PRIORITY_CLASS         HEX: 00000100 ;
+: CREATE_NEW_PROCESS_GROUP        HEX: 00000200 ;
+: CREATE_UNICODE_ENVIRONMENT      HEX: 00000400 ;
+: CREATE_SEPARATE_WOW_VDM         HEX: 00000800 ;
+: CREATE_SHARED_WOW_VDM           HEX: 00001000 ;
+: CREATE_FORCEDOS                 HEX: 00002000 ;
+: BELOW_NORMAL_PRIORITY_CLASS     HEX: 00004000 ;
+: ABOVE_NORMAL_PRIORITY_CLASS     HEX: 00008000 ;
+: CREATE_BREAKAWAY_FROM_JOB       HEX: 01000000 ;
+: CREATE_WITH_USERPROFILE         HEX: 02000000 ;
+: CREATE_DEFAULT_ERROR_MODE       HEX: 04000000 ;
+: CREATE_NO_WINDOW                HEX: 08000000 ;
+: PROFILE_USER                    HEX: 10000000 ;
+: PROFILE_KERNEL                  HEX: 20000000 ;
+: PROFILE_SERVER                  HEX: 40000000 ;
+
 FUNCTION: BOOL CreateProcessW ( LPCTSTR lpApplicationname,
                                 LPTSTR lpCommandLine,
                                 LPSECURITY_ATTRIBUTES lpProcessAttributes,
@@ -840,7 +929,7 @@ FUNCTION: DWORD GetFullPathNameW ( LPCTSTR lpFileName, DWORD nBufferLength, LPTS
 ! FUNCTION: GetGeoInfoA
 ! FUNCTION: GetGeoInfoW
 ! FUNCTION: GetHandleContext
-! FUNCTION: GetHandleInformation
+FUNCTION: BOOL GetHandleInformation ( HANDLE hObject, LPDWORD lpdwFlags ) ;
 ! FUNCTION: GetLargestConsoleWindowSize
 FUNCTION: DWORD GetLastError ( ) ;
 ! FUNCTION: GetLinguistLangSize
@@ -921,7 +1010,8 @@ FUNCTION: HANDLE GetStdHandle ( DWORD nStdHandle ) ;
 ! FUNCTION: GetSystemDefaultLCID
 ! FUNCTION: GetSystemDefaultUILanguage
 ! FUNCTION: GetSystemDirectoryA
-! FUNCTION: GetSystemDirectoryW
+FUNCTION: UINT GetSystemDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
+: GetSystemDirectory GetSystemDirectoryW ; inline
 FUNCTION: void GetSystemInfo ( LPSYSTEM_INFO lpSystemInfo ) ;
 ! FUNCTION: GetSystemPowerStatus
 ! FUNCTION: GetSystemRegistryQuota
@@ -930,7 +1020,8 @@ FUNCTION: void GetSystemTime ( LPSYSTEMTIME lpSystemTime ) ;
 FUNCTION: void GetSystemTimeAsFileTime ( LPFILETIME lpSystemTimeAsFileTime ) ;
 ! FUNCTION: GetSystemTimes
 ! FUNCTION: GetSystemWindowsDirectoryA
-! FUNCTION: GetSystemWindowsDirectoryW
+FUNCTION: UINT GetSystemWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
+: GetSystemWindowsDirectory GetSystemWindowsDirectoryW ; inline
 ! FUNCTION: GetSystemWow64DirectoryA
 ! FUNCTION: GetSystemWow64DirectoryW
 ! FUNCTION: GetTapeParameters
@@ -968,7 +1059,8 @@ FUNCTION: BOOL GetVersionExW ( LPOSVERSIONINFO lpVersionInfo ) ;
 ! FUNCTION: GetVolumePathNamesForVolumeNameW
 ! FUNCTION: GetVolumePathNameW
 ! FUNCTION: GetWindowsDirectoryA
-! FUNCTION: GetWindowsDirectoryW
+FUNCTION: UINT GetWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;
+: GetWindowsDirectory GetWindowsDirectoryW ; inline
 ! FUNCTION: GetWriteWatch
 ! FUNCTION: GlobalAddAtomA
 ! FUNCTION: GlobalAddAtomW
@@ -1190,9 +1282,9 @@ FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD
 ! FUNCTION: ReadConsoleOutputW
 ! FUNCTION: ReadConsoleW
 FUNCTION: BOOL ReadDirectoryChangesW ( HANDLE hDirectory, LPVOID lpBuffer, DWORD nBufferLength, BOOL bWatchSubtree, DWORD dwNotifyFilter, LPDWORD lpBytesReturned, LPOVERLAPPED lpOverlapped, void* lpCompletionRoutine ) ;
-FUNCTION: BOOL ReadFile ( HANDLE hFile, int lpBuffer, DWORD nNumberOfBytesToRead, void* lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped ) ;
+FUNCTION: BOOL ReadFile ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, void* lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped ) ;
 ! FUNCTION: BOOL ReadFile ( HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped ) ;
-! FUNCTION: ReadFileEx
+FUNCTION: BOOL ReadFileEx ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 ! FUNCTION: ReadFileScatter
 FUNCTION: BOOL ReadProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, long nSize, long* lpNumberOfBytesRead )  ;
 ! FUNCTION: RegisterConsoleIME
@@ -1301,7 +1393,7 @@ FUNCTION: BOOL SetFileTime ( HANDLE hFile, FILETIME* lpCreationTime, FILETIME* l
 ! FUNCTION: SetFirmwareEnvironmentVariableW
 ! FUNCTION: SetHandleContext
 ! FUNCTION: SetHandleCount
-! FUNCTION: SetHandleInformation
+FUNCTION: BOOL SetHandleInformation ( HANDLE hObject, DWORD dwMask, DWORD dwFlags ) ;
 ! FUNCTION: SetInformationJobObject
 ! FUNCTION: SetLastConsoleEventActive
 ! FUNCTION: SetLastError
@@ -1406,7 +1498,7 @@ FUNCTION: BOOL VirtualQueryEx ( HANDLE hProcess, void* lpAddress, MEMORY_BASIC_I
 ! FUNCTION: WaitForDebugEvent
 ! FUNCTION: WaitForMultipleObjects
 ! FUNCTION: WaitForMultipleObjectsEx
-! FUNCTION: WaitForSingleObject
+FUNCTION: BOOL WaitForSingleObject ( HANDLE hHandle, DWORD dwMilliseconds ) ;
 ! FUNCTION: WaitForSingleObjectEx
 ! FUNCTION: WaitNamedPipeA
 ! FUNCTION: WaitNamedPipeW
@@ -1423,8 +1515,8 @@ FUNCTION: BOOL VirtualQueryEx ( HANDLE hProcess, void* lpAddress, MEMORY_BASIC_I
 ! FUNCTION: WriteConsoleOutputCharacterW
 ! FUNCTION: WriteConsoleOutputW
 ! FUNCTION: WriteConsoleW
-FUNCTION: BOOL WriteFile ( HANDLE hFile, int lpBuffer, DWORD nNumberOfBytesToWrite, void* lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped ) ;
-! FUNCTION: WriteFileEx
+FUNCTION: BOOL WriteFile ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToWrite, void* lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped ) ;
+FUNCTION: BOOL WriteFileEx ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 ! FUNCTION: WriteFileGather
 ! FUNCTION: WritePrivateProfileSectionA
 ! FUNCTION: WritePrivateProfileSectionW

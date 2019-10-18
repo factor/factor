@@ -4,8 +4,8 @@ USING: alien alien.c-types arrays assocs ui ui.gadgets
 ui.backend ui.clipboards ui.gadgets.worlds ui.gestures io kernel
 math math.vectors namespaces prettyprint sequences strings
 vectors words windows.kernel32 windows.gdi32 windows.user32
-windows.opengl32 windows.messages windows.types windows.nt
-windows threads timers libc combinators continuations
+windows.opengl32 windows.messages windows.types
+windows.nt windows threads timers libc combinators continuations
 command-line shuffle opengl ui.render ;
 IN: ui.windows
 
@@ -14,21 +14,18 @@ TUPLE: windows-ui-backend ;
 : crlf>lf CHAR: \r swap remove ;
 : lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
-: (enum-clipboard) ( n -- n )
-    EnumClipboardFormats win32-error dup 0 > [ dup , (enum-clipboard) ] when ;
-
 : enum-clipboard ( -- seq )
-    [ 0 (enum-clipboard) ] { } make nip ;
+    0 [ EnumClipboardFormats win32-error dup dup 0 > ] [ ]
+    { } unfold nip ;
 
 : with-clipboard ( quot -- )
     f OpenClipboard win32-error=0/f
     call
     CloseClipboard win32-error=0/f ; inline
-    
 
 : paste ( -- str )
     [
-        CF_UNICODETEXT IsClipboardFormatAvailable 0 = [
+        CF_UNICODETEXT IsClipboardFormatAvailable zero? [
             ! nothing to paste
             ""
         ] [
@@ -65,7 +62,7 @@ M: pasteboard set-clipboard-contents drop copy ;
     <clipboard> selection set-global ;
 
 ! world-handle is a <win>
-TUPLE: win hWnd hDC hRC swap-hint? world title ;
+TUPLE: win hWnd hDC hRC world title ;
 C: <win> win
 
 SYMBOL: msg-obj
@@ -94,11 +91,10 @@ SYMBOL: mouse-captured
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window dup draw-world ;
+    3drop window draw-world ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
-    [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array
-    2nip
+    [ lo-word ] keep hi-word make-RECT get-RECT-dimensions 2array 2nip
     dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ui-step ] if ;
 
 : wm-keydown-codes ( -- key )
@@ -132,7 +128,7 @@ SYMBOL: mouse-captured
     } ;
 
 : key-state-down?
-    GetKeyState 1 16 shift bitand 0 > ;
+    GetKeyState 16 bit? ;
 
 : left-shift? ( -- ? ) VK_LSHIFT key-state-down? ;
 : left-ctrl? ( -- ? ) VK_LCONTROL key-state-down? ;
@@ -214,18 +210,21 @@ SYMBOL: hWnd
     hWnd get window-focus send-gesture
     drop ;
 
+: handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
+    dup alpha? [ 4drop 0 ] [ DefWindowProc ] if ;
+
 : cleanup-window ( handle -- )
     dup win-title [ free ] when*
     dup win-hRC wglDeleteContext win32-error=0/f
     dup win-hWnd swap win-hDC ReleaseDC win32-error=0/f ;
 
-: handle-wm-close ( hWnd uMsg wParam lParam -- )
-    3drop
-    window [ world-handle ] keep
-    stop-world
+M: windows-ui-backend (close-window)
     dup win-hWnd unregister-window
     dup cleanup-window
     win-hWnd DestroyWindow win32-error=0/f ;
+
+: handle-wm-close ( hWnd uMsg wParam lParam -- )
+    3drop window ungraft ;
 
 : handle-wm-set-focus ( hWnd uMsg wParam lParam -- )
     3drop window [ focus-world ] when* ;
@@ -261,14 +260,12 @@ SYMBOL: hWnd
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
     nip >r mouse-event>gesture r> >lo-hi rot window ;
 
-: mouse-captured? ( -- ? )
-    mouse-captured get ;
-
 : set-capture ( hwnd -- )
     mouse-captured get [
         drop
     ] [
-        [ SetCapture drop ] keep mouse-captured set
+        [ SetCapture drop ] keep
+        mouse-captured set
     ] if ;
 
 : release-capture ( -- )
@@ -280,13 +277,16 @@ SYMBOL: hWnd
     prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
-    mouse-captured? [ release-capture ] when
+    mouse-captured get [ release-capture ] when
     prepare-mouse send-button-up ;
+
+: make-TRACKMOUSEEVENT ( hWnd -- alien )
+    "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
+    "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
     2nip
-    over "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
-    "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize
+    over make-TRACKMOUSEEVENT
     TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
     0 over set-TRACKMOUSEEVENT-dwHoverTime
     TrackMouseEvent drop
@@ -298,19 +298,17 @@ SYMBOL: hWnd
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
-    3drop drop release-capture ;
+    4drop release-capture ;
 
 : handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
     #! message sent if mouse leaves main application 
-    3drop drop forget-rollover ;
+    4drop forget-rollover ;
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
-        pick
-        ! "Message: " write dup get-windows-message-name write
-            ! " " write dup unparse print flush
+        pick ! global [ dup windows-message-name . ] bind
             {
                 { [ dup WM_CLOSE = ]    [ drop handle-wm-close 0 ] }
                 { [ dup WM_PAINT = ]
@@ -319,12 +317,13 @@ SYMBOL: hWnd
 
                 ! Keyboard events
                 { [ dup WM_KEYDOWN = over WM_SYSKEYDOWN = or ]
-                    [ drop 4dup handle-wm-keydown DefWindowProc ] }
+                [ drop 4dup handle-wm-keydown DefWindowProc ] }
                 { [ dup WM_CHAR = over WM_SYSCHAR = or ]
                     [ drop 4dup handle-wm-char DefWindowProc ] }
                 { [ dup WM_KEYUP = over WM_SYSKEYUP = or ]
                     [ drop 4dup handle-wm-keyup DefWindowProc ] }
 
+                { [ dup WM_SYSCOMMAND = ] [ drop handle-wm-syscommand ] }
                 { [ dup WM_SETFOCUS = ] [ drop handle-wm-set-focus 0 ] }
                 { [ dup WM_KILLFOCUS = ] [ drop handle-wm-kill-focus 0 ] }
 
@@ -343,21 +342,24 @@ SYMBOL: hWnd
                 { [ t ] [ drop DefWindowProc ] }
             } cond
         ] ui-try
-        ! "finished handling message" print .s flush
      ] alien-callback ;
 
-: do-events ( -- )
-    msg-obj get f 0 0 PM_REMOVE PeekMessage 
-    zero? not [
-        msg-obj get MSG-message WM_QUIT = [
-            msg-obj get [ TranslateMessage drop ] keep DispatchMessage drop
-        ] unless
-    ] when ;
+: peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
-: event-loop ( -- )
-    windows get empty? [
-        [ do-events ui-step ] ui-try event-loop
-    ] unless ;
+: event-loop ( msg -- )
+    {
+        { [ windows get empty? ] [ drop ] }
+        { [ dup peek-message? ] [
+            >r [ ui-step 10 sleep ] ui-try
+            r> event-loop
+        ] }
+        { [ dup MSG-message WM_QUIT = ] [ drop ] }
+        { [ t ] [
+            dup TranslateMessage drop
+            dup DispatchMessage drop
+            event-loop
+        ] }
+    } cond ;
 
 : register-wndclassex ( -- class )
     "WNDCLASSEX" <c-object>
@@ -383,7 +385,7 @@ SYMBOL: hWnd
     >r class-name-ptr get-global f r>
     >r >r >r ex-style r> r>
         WS_CLIPSIBLINGS WS_CLIPCHILDREN bitor style bitor
-        0 0 r>
+        CW_USEDEFAULT dup r>
     get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 
@@ -392,15 +394,17 @@ SYMBOL: hWnd
     dup SetForegroundWindow drop
     SetFocus drop ;
 
-: init-win32-ui
+: init-win32-ui ( -- )
     "MSG" <c-object> msg-obj set
     "Factor-window" malloc-u16-string class-name-ptr set-global
-    register-wndclassex
+    register-wndclassex drop
     GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
-    class-name-ptr get-global f UnregisterClass drop
-    class-name-ptr get-global [ free ] when*
+    class-name-ptr get-global [
+        dup f UnregisterClass drop
+        free
+    ] when*
     f class-name-ptr set-global ;
 
 : setup-pixel-format ( hdc -- )
@@ -413,33 +417,26 @@ SYMBOL: hWnd
     dup wglCreateContext dup win32-error=0/f
     [ wglMakeCurrent win32-error=0/f ] keep ;
 
-: setup-gl ( hwnd -- hDC hRC swap-hint? )
-    get-dc
-    dup setup-pixel-format
-    dup get-rc
-    swap-hint-supported? ;
+: setup-gl ( hwnd -- hDC hRC )
+    get-dc dup setup-pixel-format dup get-rc ;
 
-M: windows-ui-backend (open-world-window) ( world -- )
+M: windows-ui-backend (open-window) ( world -- )
     [ rect-dim first2 create-window dup setup-gl ] keep
     [ f <win> ] keep
     [ swap win-hWnd register-window ] 2keep
-    [ set-world-handle ] 2keep 
-    start-world win-hWnd show-window ;
+    dupd set-world-handle
+    win-hWnd show-window ;
 
 M: windows-ui-backend select-gl-context ( handle -- )
     [ win-hDC ] keep win-hRC wglMakeCurrent win32-error=0/f ;
 
 M: windows-ui-backend flush-gl-context ( handle -- )
-    dup win-swap-hint? [
-        clip get flip-rect fix-coordinates
-        glAddSwapHintRectWIN
-    ] when
     win-hDC SwapBuffers win32-error=0/f ;
 
 ! Move window to front
 M: windows-ui-backend raise-window ( world -- )
     world-handle [
-        win-hWnd SetFocus drop release-capture
+        win-hWnd SetFocus drop
     ] when* ;
 
 M: windows-ui-backend set-title ( string world -- )
@@ -455,8 +452,8 @@ M: windows-ui-backend ui
             init-clipboard
             init-win32-ui
             start-ui
-            event-loop
-        ] [ cleanup-win32-ui ] cleanup
+            msg-obj get event-loop
+        ] [ cleanup-win32-ui ] [ ] cleanup
     ] ui-running ;
 
 T{ windows-ui-backend } ui-backend set-global

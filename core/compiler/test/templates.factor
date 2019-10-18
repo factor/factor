@@ -1,9 +1,9 @@
-! Black box testing of templater optimization
+! Black box testing of templating optimization
 
 USING: arrays compiler kernel kernel.private math
-hashtables.private math.private math.ratios.private namespaces
-sequences sequences.private tools.test namespaces.private
-slots.private ;
+hashtables.private math.private namespaces sequences
+sequences.private tools.test namespaces.private slots.private
+combinators.private byte-arrays alien layouts ;
 IN: temporary
 
 ! Oops!
@@ -37,40 +37,13 @@ unit-test
 
 : foo ;
 
-[ 4 4 ]
-[ 1/2 [ tag [ foo ] keep ] compile-1 ]
+[ 5 5 ]
+[ 1.2 [ tag [ foo ] keep ] compile-1 ]
 unit-test
 
 [ 1 2 2 ]
-[ 1/2 [ dup 1 slot swap 2 slot [ foo ] keep ] compile-1 ]
+[ { 1 2 } [ dup 2 slot swap 3 slot [ foo ] keep ] compile-1 ]
 unit-test
-
-[ 41 5 4 ] [
-    5/4 4/5 [
-        dup ratio? [
-            over ratio? [
-                2dup 2>fraction >r * swap r> * swap
-                + -rot denominator swap denominator
-            ] [
-                2drop f f f
-            ] if
-        ] [
-            2drop f f f
-        ] if
-    ] compile-1
-] unit-test
-
-: jxyz
-    over bignum? [
-        dup ratio? [
-            [ >fraction ] 2apply swapd
-            >r 2array swap r> 2array swap
-        ] when
-    ] when ;
-
-\ jxyz compile
-
-[ { 1 2 } { 1 1 } ] [ 1 >bignum 1/2 jxyz ] unit-test
 
 [ 3 ]
 [
@@ -185,3 +158,36 @@ TUPLE: my-tuple ;
 [ 4 ] [ T{ my-tuple } foox ] unit-test
 
 [ 5 ] [ "hi" foox ] unit-test
+
+! Making sure we don't needlessly unbox/rebox
+[ t 3.0 ] [ 1.0 dup [ dup 2.0 float+ >r eq? r> ] compile-1 ] unit-test
+
+[ t 3.0 ] [ 1.0 dup [ dup 2.0 float+ ] compile-1 >r eq? r> ] unit-test
+
+[ t ] [ 1.0 dup [ [ 2.0 float+ ] keep ] compile-1 nip eq? ] unit-test
+
+[ 1 B{ 1 2 3 4 } ] [
+    B{ 1 2 3 4 } [
+        { byte-array } declare
+        [ 0 alien-unsigned-1 ] keep
+    ] compile-1
+] unit-test
+
+[ 1 t ] [
+    B{ 1 2 3 4 } [
+        { c-ptr } declare
+        [ 0 alien-unsigned-1 ] keep type
+    ] compile-1 byte-array type-number =
+] unit-test
+
+[ t ] [
+    B{ 1 2 3 4 } [
+        { c-ptr } declare
+        0 alien-cell type
+    ] compile-1 alien type-number =
+] unit-test
+
+[ 2 1 ] [
+    2 1
+    [ 2dup fixnum< [ >r die r> ] when ] compile-1
+] unit-test

@@ -7,7 +7,7 @@ IN: http
 : header-line ( line -- )
     ": " split1 dup [ swap set ] [ 2drop ] if ;
 
-: (read-header) ( hash -- hash )
+: (read-header) ( -- )
     readln dup
     empty? [ drop ] [ header-line (read-header) ] if ;
 
@@ -20,7 +20,7 @@ IN: http
     dup letter?
     over LETTER? or
     over digit? or
-    swap "/_?." member? or ; foldable
+    swap "/_-?." member? or ; foldable
 
 : url-encode ( str -- str )
     [

@@ -1,10 +1,9 @@
 USING: documents help.markup help.syntax ui.gadgets
-ui.gadgets.scrollers ui.gadgets.controls
-models strings ui.commands ;
+ui.gadgets.scrollers models strings ui.commands ;
 IN: ui.gadgets.editors
 
 HELP: editor
-{ $class-description "An editor is a " { $link control } " for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
+{ $class-description "An editor is a control for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
 $nl
 "Editors have the following slots:"
 { $list
@@ -16,9 +15,6 @@ $nl
     { { $link editor-mark } " - a model storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
     { { $link editor-focused? } " - a boolean." }
 } } ;
-
-HELP: loc-monitor
-{ $class-description "Instances of this class are used internally by " { $link editor } " controls to redraw the editor when the caret or mark is moved by calling " { $link set-model } " on " { $link editor-caret } " or " { $link editor-mark } "." } ;
 
 HELP: <editor>
 { $values { "editor" "a new " { $link editor } } }

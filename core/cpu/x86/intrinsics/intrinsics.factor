@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays cpu.x86.assembler cpu.x86.allot
 cpu.x86.architecture cpu.architecture kernel kernel.private math
-math.functions math.private namespaces quotations sequences
+math.private namespaces quotations sequences
 words generic byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
 sbufs sbufs.private vectors vectors.private layouts system
@@ -19,65 +19,91 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 \ type [
-    #! Intrinstic version of type primitive.
-    "header" define-label
-    "f" define-label
     "end" define-label
     ! Make a copy
     "x" operand "obj" operand MOV
     ! Get the tag
-    "obj" operand tag-mask get AND
+    "x" operand tag-mask get AND
+    ! Tag the tag
+    "x" operand %tag-fixnum
     ! Compare with object tag number (3).
-    "obj" operand object tag-number CMP
-    ! Jump if the object doesn't store type info in its header
-    "header" get JE
-    ! It doesn't store type info in its header
-    "obj" operand %tag-fixnum
-    "end" get JMP
-    "header" resolve-label
-    ! It does store type info in its header
-    ! Is the pointer itself equal to 3? Then its F_TYPE (9).
-    "x" operand object tag-number CMP
-    "f" get JE
-    ! The pointer is not equal to 3. Load the object header.
-    "obj" operand "x" operand object tag-number neg [+] MOV
-    ! Mask off header tag, making a fixnum.
-    "obj" operand object tag-number XOR
-    "end" get JMP
-    "f" resolve-label
-    ! The pointer is equal to 3. Load F_TYPE (9).
-    "obj" operand f type v>operand MOV
+    "x" operand object tag-number tag-bits get shift CMP
+    "end" get JNE
+    ! If we have equality, load type from header
+    "x" operand "obj" operand -3 [+] MOV
     "end" resolve-label
 ] H{
     { +input+ { { f "obj" } } }
-    { +scratch+ { { f "x" } { f "y" } } }
-    { +output+ { "obj" } }
+    { +scratch+ { { f "x" } } }
+    { +output+ { "x" } }
+} define-intrinsic
+
+\ class-hash [
+    "end" define-label
+    "tuple" define-label
+    "object" define-label
+    ! Make a copy
+    "x" operand "obj" operand MOV
+    ! Get the tag
+    "x" operand tag-mask get AND
+    ! Tag the tag
+    "x" operand %tag-fixnum
+    ! Compare with tuple tag number (2).
+    "x" operand tuple tag-number tag-bits get shift CMP
+    "tuple" get JE
+    ! Compare with object tag number (3).
+    "x" operand object tag-number tag-bits get shift CMP
+    "object" get JE
+    "end" get JMP
+    "object" get resolve-label
+    ! Load header type
+    "x" operand "obj" operand header-offset [+] MOV
+    "end" get JMP
+    "tuple" get resolve-label
+    ! Load class hash
+    "x" operand "obj" operand tuple-class-offset [+] MOV
+    "x" operand dup class-hash-offset [+] MOV
+    "end" resolve-label
+] H{
+    { +input+ { { f "obj" } } }
+    { +scratch+ { { f "x" } } }
+    { +output+ { "x" } }
 } define-intrinsic
 
 ! Slots
+: %slot-literal-known-tag
+    "obj" operand
+    "n" get cells
+    "obj" get operand-tag - [+] ;
+
+: %slot-literal-any-tag
+    "obj" operand %untag
+    "obj" operand "n" get cells [+] ;
+
+: %slot-any
+    "obj" operand %untag
+    "n" operand fixnum>slot@
+    "obj" operand "n" operand [+] ;
 
 \ slot {
+    ! Slot number is literal and the tag is known
+    {
+        [ "val" operand %slot-literal-known-tag MOV ] H{
+            { +input+ { { f "obj" known-tag } { [ small-slot? ] "n" } } }
+            { +scratch+ { { f "val" } } }
+            { +output+ { "val" } }
+        }
+    }
     ! Slot number is literal
     {
-        [
-            "obj" operand %untag
-            ! load slot value
-            "obj" operand dup "n" get cells [+] MOV
-        ] H{
+        [ "obj" operand %slot-literal-any-tag MOV ] H{
             { +input+ { { f "obj" } { [ small-slot? ] "n" } } }
             { +output+ { "obj" } }
         }
     }
     ! Slot number in a register
     {
-        [
-            "obj" operand %untag
-            ! turn tagged fixnum slot # into an offset,
-            ! multiple of 4
-            "n" operand fixnum>slot@
-            ! load slot value
-            "obj" operand dup "n" operand [+] MOV
-        ] H{
+        [ "obj" operand %slot-any MOV ] H{
             { +input+ { { f "obj" } { f "n" } } }
             { +output+ { "obj" } }
             { +clobber+ { "n" } }
@@ -87,40 +113,30 @@ IN: cpu.x86.intrinsics
 
 : generate-write-barrier ( -- )
     #! Mark the card pointed to by vreg.
-    "val" operand-immediate? "obj" get fresh-object? or [
+    "val" get operand-immediate? "obj" get fresh-object? or [
         "obj" operand card-bits SHR
-        "scratch" operand HEX: ffffffff MOV
-        "cards_offset" f rc-absolute-cell rel-dlsym
-        "scratch" operand dup [] MOV
-        "scratch" operand "obj" operand [+] card-mark OR
+        "cards_offset" f temp-reg v>operand %alien-global
+        temp-reg v>operand "obj" operand [+] card-mark OR
     ] unless ;
 
 \ set-slot {
+    ! Slot number is literal and the tag is known
+    {
+        [ %slot-literal-known-tag "val" operand MOV generate-write-barrier ] H{
+            { +input+ { { f "val" } { f "obj" known-tag } { [ small-slot? ] "n" } } }
+            { +clobber+ { "obj" } }
+        }
+    }
     ! Slot number is literal
     {
-        [
-            "obj" operand %untag
-            ! store new slot value
-            "obj" operand "n" get cells [+] "val" operand MOV
-            generate-write-barrier
-        ] H{
+        [ %slot-literal-any-tag "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
-            { +scratch+ { { f "scratch" } } }
             { +clobber+ { "obj" } }
         }
     }
     ! Slot number in a register
     {
-        [
-            ! turn tagged fixnum slot # into an offset
-            "n" operand fixnum>slot@
-            "obj" operand %untag
-            ! store new slot value
-            "obj" operand "n" operand [+] "val" operand MOV
-            ! reuse register
-            "n" get "scratch" set
-            generate-write-barrier
-        ] H{
+        [ %slot-any "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { f "n" } } }
             { +clobber+ { "obj" "n" } }
         }
@@ -131,7 +147,7 @@ IN: cpu.x86.intrinsics
 ! less than the word size. Instead of teaching the register
 ! allocator about the different sized registers, with all
 ! the complexity this entails, we just push/pop a register
-! which is guaranteed to be unused (the datastack pointer)
+! which is guaranteed to be unused (the tempreg)
 : small-reg cell 8 = RBX EBX ? ; inline
 : small-reg-8 BL ; inline
 : small-reg-16 BX ; inline
@@ -354,7 +370,7 @@ IN: cpu.x86.intrinsics
         ! Zero out the rest of the tuple
         "n" operand 1- [ 3 + object@ f v>operand MOV ] each
         ! Store tagged ptr in reg
-        "tuple" get object %store-tagged
+        "tuple" get tuple %store-tagged
     ] %allot
 ] H{
     { +input+ { { f "class" } { [ inline-array? ] "n" } } }
@@ -422,7 +438,7 @@ IN: cpu.x86.intrinsics
     wrapper 2 cells [
         1 object@ "obj" operand MOV
         ! Store tagged ptr in reg
-        "wrapper" get wrapper %store-tagged
+        "wrapper" get object %store-tagged
     ] %allot
 ] H{
     { +input+ { { f "obj" } } }
@@ -470,22 +486,27 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 ! Alien intrinsics
+: %alien-accessor ( quot -- )
+    "offset" operand %untag-fixnum
+    "offset" operand "alien" operand ADD
+    "offset" operand [] swap call ; inline
+
 : %alien-integer-get ( quot reg -- )
     small-reg PUSH
-    "offset" operand %untag-fixnum
-    "alien" operand-class %alien-accessor
-    "offset" operand small-reg MOV
-    "offset" operand %tag-fixnum
+    swap %alien-accessor
+    "value" operand small-reg MOV
+    "value" operand %tag-fixnum
     small-reg POP ; inline
 
 : alien-integer-get-template
     H{
         { +input+ {
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +output+ { "offset" } }
-        { +clobber+ { "alien" "offset" } }
+        { +scratch+ { { f "value" } } }
+        { +output+ { "value" } }
+        { +clobber+ { "offset" } }
     } ;
 
 : define-getter
@@ -501,19 +522,21 @@ IN: cpu.x86.intrinsics
 
 : %alien-integer-set ( quot reg -- )
     small-reg PUSH
-    { "offset" "value" } %untag-fixnums
+    "offset" get "value" get = [
+        "value" operand %untag-fixnum
+    ] unless
     small-reg "value" operand MOV
-    "alien" operand-class %alien-accessor
+    swap %alien-accessor
     small-reg POP ; inline
 
 : alien-integer-set-template
     H{
         { +input+ {
             { f "value" fixnum }
-            { f "alien" simple-c-ptr }
+            { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +clobber+ { "value" "alien" "offset" } }
+        { +clobber+ { "value" "offset" } }
     } ;
 
 : define-setter
@@ -535,12 +558,24 @@ IN: cpu.x86.intrinsics
 \ set-alien-signed-2 small-reg-16 define-setter
 
 \ alien-cell [
-    "offset" operand %untag-fixnum
+    "value" operand [ MOV ] %alien-accessor
+] H{
+    { +input+ {
+        { unboxed-c-ptr "alien" c-ptr }
+        { f "offset" fixnum }
+    } }
+    { +scratch+ { { unboxed-alien "value" } } }
+    { +output+ { "value" } }
+    { +clobber+ { "offset" } }
+} define-intrinsic
 
-    [ MOV ]
-    "offset" operand
-    "alien" operand-class
-    %alien-accessor
-
-    "offset" get %allot-alien
-] alien-integer-get-template define-intrinsic
+\ set-alien-cell [
+    "value" operand [ swap MOV ] %alien-accessor
+] H{
+    { +input+ {
+        { unboxed-c-ptr "value" pinned-c-ptr }
+        { unboxed-c-ptr "alien" c-ptr }
+        { f "offset" fixnum }
+    } }
+    { +clobber+ { "offset" } }
+} define-intrinsic

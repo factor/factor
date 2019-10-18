@@ -13,6 +13,8 @@ GENERIC: forget ( defspec -- )
 
 M: object forget drop ;
 
+: forget-all ( definitions -- ) [ forget ] each ;
+
 GENERIC: synopsis* ( defspec -- )
 
 GENERIC: definer ( defspec -- start end )
@@ -29,12 +31,14 @@ M: object uses drop f ;
 
 : usage ( defspec -- seq ) crossref get at keys ;
 
-GENERIC: unxref* ( defspec -- )
+GENERIC: redefined* ( defspec -- )
 
-M: object unxref* drop ;
+M: object redefined* drop ;
+
+: redefined ( defspec -- )
+    [ crossref get at ] closure [ drop redefined* ] assoc-each ;
 
 : unxref ( defspec -- )
-    dup [ crossref get at ] closure [ drop unxref* ] assoc-each
     dup uses crossref get remove-vertex ;
 
 : delete-xref ( defspec -- )

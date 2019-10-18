@@ -4,7 +4,8 @@
 USING: cpu.8080 openal math alien.c-types sequences kernel
        shuffle arrays io.files combinators kernel.private
        ui.gestures ui.gadgets ui.render opengl.gl system 
-       threads concurrency match ui byte-arrays ;
+       threads concurrency match ui byte-arrays combinators.lib
+       combinators.private ;
 IN: space-invaders
 
 TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap sounds looping? ;
@@ -115,14 +116,8 @@ M: space-invaders read-port ( port cpu -- byte )
   #! Setting this value affects the value read from port 3
   set-space-invaders-port2o ;
 
-: bit-set? ( value bit -- bool )
-  1 swap shift bitand 0 = not ;
-
-: bit-clear? ( value bit -- bool )
-  1 swap shift bitand 0 = ;
-
 : bit-newly-set? ( old-value new-value bit -- bool )
-  [ bit-set? ] keep swapd bit-clear? and ;
+  tuck bit? >r bit? not r> and ;
 
 : port3-newly-set? ( new-value cpu bit -- bool )
   >r space-invaders-port3o swap r> bit-newly-set? ;
@@ -137,11 +132,11 @@ M: space-invaders read-port ( port cpu -- byte )
   #! Bit 2 = Your ship hit
   #! Bit 3 = Invader hit
   #! Bit 4 = Extended play sound
-  over 0 bit-set? over space-invaders-looping? not and [ 
+  over 0 bit? over space-invaders-looping? not and [ 
     dup SOUND-UFO play-invaders-sound 
     t over set-space-invaders-looping?
   ] when 
-  over 0 bit-clear? over space-invaders-looping? and [ 
+  over 0 bit? not over space-invaders-looping? and [ 
     dup SOUND-UFO stop-invaders-sound 
     f over set-space-invaders-looping?
   ] when 

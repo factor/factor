@@ -2,47 +2,31 @@
 
 #include "master.h"
 
-static CELL error;
-
-/* This code is convoluted because Cocoa places restrictions on longjmp and
-exception handling. In particular, a longjmp can never cross an NS_DURING,
-NS_HANDLER or NS_ENDHANDLER. */
-void run()
+void c_to_factor_toplevel(CELL quot)
 {
-	error = F;
-
 	for(;;)
 	{
 NS_DURING
-		stack_chain->native_stack_pointer = native_stack_pointer();
-		SETJMP(stack_chain->toplevel);
-		handle_error();
-
-		if(error != F)
-		{
-			CELL e = error;
-			error = F;
-			simple_error(ERROR_OBJECTIVE_C,e,F);
-		}
-
-		interpreter_loop();
+		c_to_factor(quot);
 		NS_VOIDRETURN;
 NS_HANDLER
-		error = allot_alien(F,(CELL)localException);
+		dpush(allot_alien(F,(CELL)localException));
+		quot = userenv[COCOA_EXCEPTION_ENV];
+		if(type_of(quot) != QUOTATION_TYPE)
+		{
+			/* No Cocoa exception handler was registered, so
+			extra/cocoa/ is not loaded. So we pass the exception
+			along. */
+			[localException raise];
+		}
 NS_ENDHANDLER
 	}
-}
-
-void run_toplevel(void)
-{
-	run();
 }
 
 void early_init(void)
 {
 	[[NSAutoreleasePool alloc] init];
 }
-
 
 const char *vm_executable_path(void)
 {

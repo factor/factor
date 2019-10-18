@@ -24,23 +24,11 @@ TUPLE: profiler-gadget pane ;
 : com-vocabs-profile ( gadget -- )
     [ vocabs-profile. ] with-profiler-pane ;
 
-\ enable-profiler H{
-    { +nullary+ t }
-    { +listener+ t }
-} define-command
-
-\ disable-profiler H{
-    { +nullary+ t }
-    { +listener+ t }
-} define-command
-
 : profiler-help "ui-profiler" help-window ;
 
 \ profiler-help H{ { +nullary+ t } } define-command
 
 profiler-gadget "toolbar" f {
-    { f enable-profiler }
-    { f disable-profiler }
     { f com-full-profile }
     { f com-vocabs-profile }
     { T{ key-down f f "F1" } profiler-help }

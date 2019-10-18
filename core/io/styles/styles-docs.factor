@@ -3,7 +3,7 @@ hashtables ;
 IN: io.styles
 
 ARTICLE: "character-styles" "Character styles"
-"Character styles for " { $link stream-format } ":"
+"Character styles for " { $link stream-format } " and " { $link with-style } ":"
 { $subsection foreground }
 { $subsection background }
 { $subsection font }
@@ -12,7 +12,7 @@ ARTICLE: "character-styles" "Character styles"
 { $subsection presented } ;
 
 ARTICLE: "paragraph-styles" "Paragraph styles"
-"Paragraph styles for " { $link with-nested-stream } ":"
+"Paragraph styles for " { $link with-nesting } ":"
 { $subsection page-color }
 { $subsection border-color }
 { $subsection border-width }
@@ -28,7 +28,7 @@ ARTICLE: "presentations" "Presentations"
 "The " { $link presented } " style can be used to emit clickable objects. The " { $link write-object } " word should be used instead of setting this directly." ;
 
 ARTICLE: "styles" "Formatted output"
-"The " { $link stream-format } ", " { $link with-nested-stream } " and " { $link tabular-output } " words take a hashtable of style attributes. Output stream implementations are free to ignore style information."
+"The " { $link stream-format } ", " { $link with-style } ", " { $link with-nesting } " and " { $link tabular-output } " words take a hashtable of style attributes. Output stream implementations are free to ignore style information."
 $nl
 "Style hashtables are keyed by symbols from the " { $vocab-link "styles" } " vocabulary."
 { $subsection "character-styles" }
@@ -105,10 +105,6 @@ HELP: presented-path
 
 HELP: presented-printer
 { $description "Character and paragraph style. A quotation with stack effect " { $snippet "( obj -- )" } " which is applied to the value at the " { $link presented-path } " if the presentation needs to be re-displayed after the object has been edited." } ;
-
-HELP: highlight
-{ $description "Character style. Used to mark up text on streams that otherwise do not support different colors or font styles." }
-{ $examples "Instances of " { $link plain-writer } " uppercases highlighted text." } ;
 
 HELP: page-color
 { $description "Paragraph style. Background color of the paragraph block, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." } 

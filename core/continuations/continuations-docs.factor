@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
 continuations.private parser vectors arrays namespaces
-threads assocs words ;
+threads assocs words quotations ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable error handling"
@@ -49,7 +49,6 @@ ARTICLE: "continuations.private" "Continuation implementation details"
 "The continuations implementation has hooks for single-steppers:"
 { $subsection walker-hook }
 { $subsection set-walker-hook }
-{ $subsection (continue) }
 { $subsection (continue-with) } ;
 
 ARTICLE: "continuations" "Continuations"
@@ -86,12 +85,12 @@ HELP: continuation
 { $description "Reifies the current continuation from the point immediately after which the caller returns." } ;
 
 HELP: >continuation<
-{ $values { "continuation" continuation } { "data" vector } { "retain" vector } { "call" vector } { "name" vector } { "catch" vector } { "c" array } }
+{ $values { "continuation" continuation } { "data" vector } { "retain" vector } { "call" vector } { "name" vector } { "catch" vector } }
 { $description "Takes a continuation apart into its constituents." } ;
 
 HELP: ifcc
-{ $values { "terminator" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "balance" "a quotation" } }
-{ $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "terminator" } ". When the continuation is restored, execution resumes and "{ $snippet "balance" } " is called." } ;
+{ $values { "capture" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "restore" quotation } }
+{ $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and "{ $snippet "restore" } " is called." } ;
 
 { callcc0 continue callcc1 continue-with ifcc } related-words
 
@@ -102,28 +101,6 @@ HELP: callcc0
 HELP: callcc1
 { $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "obj" "an object provided when resuming the continuation" } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue-with } " word resumes the continuation, passing a value back to the original execution context." } ;
-
-HELP: set-walker-hook
-{ $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } ", or " { $link f } } }
-{ $description "Sets a quotation to be called when a continuation is resumed." }
-{ $notes "The single-stepper uses this hook to support single-stepping through code which makes use of continuations." } ;
-
-HELP: walker-hook
-{ $values { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } ", or " { $link f } } }
-{ $description "Outputs a quotation to be called when a continuation is resumed, or " { $link f } " if no hook is set. If a hook was set prior to this word being called, it will be reset to " { $link f } "."
-$nl
-"The following words do not perform their usual action and instead just call the walker hook if one is set:"
-    { $list
-        { { $link callcc0 } " will call the hook, passing it the continuation to resume." }
-        { { $link callcc1 } " will call the hook, passing it a " { $snippet "{ obj continuation }" } " pair." }
-        { { $link stop } " will call the hook, passing it " { $link f } "." }
-    }
-"The walker hook must take appropriate action so that the callers of these words see the behavior that they expect." }
-{ $notes "The single-stepper uses this hook to support single-stepping through code which makes use of continuations." } ;
-
-HELP: (continue)
-{ $values { "continuation" continuation } }
-{ $description "Resumes a continuation reified by " { $link callcc0 } " without invoking " { $link walker-hook } "." } ;
 
 HELP: (continue-with)
 { $values { "obj" "an object to pass to the continuation's execution context" } { "continuation" continuation } }
@@ -157,27 +134,27 @@ HELP: c>
 { $values { "continuation" continuation } }
 { $description "Pops an exception handler continuation from the catch stack." } ;
 
-HELP: throw ( error -- * )
-{ $values { "error" "an object" } }
+HELP: throw
+{ $values { "error" object } }
 { $description "Saves the current continuation in the " { $link error-continuation } " global variable and throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." } ;
 
 HELP: catch
-{ $values { "try" "a quotation" } { "error/f" "an object" } }
+{ $values { "try" quotation } { "error/f" object } }
 { $description "Calls the " { $snippet "try" } " quotation. If an error is thrown in the dynamic extent of the quotation, restores the data stack and pushes the error. If the quotation returns successfully, outputs " { $link f } " without restoring the data stack." }
 { $notes "This word cannot differentiate between the case of " { $link f } " being thrown, and no error being thrown. You should never throw " { $link f } ", and you should also use other error handling combinators where possible." } ;
 
 { catch cleanup recover } related-words
 
 HELP: cleanup
-{ $values { "try" "a quotation" } { "cleanup" "a quotation" } }
-{ $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack, calls the " { $snippet "cleanup" } " quotation, and rethrows the error. If the " { $snippet "try" } " quotation returns successfully, calls the " { $snippet "cleanup" } " quotation without restoring the data stack." } ;
+{ $values { "try" quotation } { "cleanup-always" quotation } { "cleanup-error" quotation } }
+{ $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
 
 HELP: recover
-{ $values { "try" "a quotation" } { "recovery" "a quotation with stack effect " { $snippet "( error -- )" } } }
+{ $values { "try" quotation } { "recovery" "a quotation with stack effect " { $snippet "( error -- )" } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
 HELP: rethrow
-{ $values { "error" "an object" } }
+{ $values { "error" object } }
 { $description "Throws an error without saving the current continuation in the " { $link error-continuation } " global variable. This is done so that inspecting the error stacks sheds light on the original cause of the exception, rather than the point where it was rethrown." }
 { $notes
     "This word is intended to be used in conjunction with " { $link recover } " or " { $link catch } " to implement error handlers which perform an action and pass the error to the next outermost error handler."
@@ -188,7 +165,7 @@ HELP: rethrow
 } ;
 
 HELP: throw-restarts
-{ $values { "error" "an object" } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" "an object" } }
+{ $values { "error" object } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" object } }
 { $description "Throws a restartable error using " { $link throw } ". The " { $snippet "restarts" } " parameter is a sequence of pairs where the first element in each pair is a human-readable description and the second is an arbitrary object. If the error reaches the top-level error handler, the user will be presented with the list of possible restarts, and upon invoking one, execution will continue after the call to " { $link condition } " with the object associated to the chosen restart on the stack." }
 { $examples
     "Try invoking one of the two restarts which are offered after the below code throws an error:"
@@ -201,13 +178,13 @@ HELP: throw-restarts
 } ;
 
 HELP: rethrow-restarts
-{ $values { "error" "an object" } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" "an object" } }
+{ $values { "error" object } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" object } }
 { $description "Throws a restartable error using " { $link rethrow } ". Otherwise, this word is identical to " { $link throw-restarts } "." } ;
 
 { throw rethrow throw-restarts rethrow-restarts } related-words
 
 HELP: compute-restarts
-{ $values { "error" "an object" } { "seq" "a sequence" } }
+{ $values { "error" object } { "seq" "a sequence" } }
 { $description "Outputs a sequence of triples, where each triple consists of a human-readable string, an object, and a continuation. Resuming a continuation with the corresponding object restarts execution immediately after the corresponding call to " { $link condition } "."
 $nl
 "This word recursively travels up the delegation chain to collate restarts from nested and wrapped conditions." } ;
@@ -217,23 +194,8 @@ HELP: save-error
 { $description "Called by the error handler to set the " { $link error } " and " { $link restarts } " global variables after an error was thrown." }
 $low-level-note ;
 
-HELP: error-handler
-{ $values { "error" "an error" } { "trace" "a sequence of XTs" } }
-{ $description "Called by the Factor VM when an error is thrown, either from an explicit call to " { $link throw } " or an error occurring inside the VM. This word saves the error in a global variable and passes it on to the innermost " { $link catch } " handler." }
-$low-level-note ;
-
 HELP: init-error-handler
 { $description "Called on startup to initialize the catch stack and set a pair of hooks which allow the Factor VM to signal errors to library code." } ;
 
-HELP: xt-map ( -- xt-map )
-{ $values { "xt-map" "an association list mapping words to XTs" } }
-{ $description "Outputs an association list of all compiled words in the code heap, mapping words to XTs, sorted by XT (for binary search). Since one word can generate multiple compiled code blocks, this association list may have duplicate keys." }
-;
-
-HELP: find-xt
-{ $values { "xt" "an XT" } { "xtmap" "an association list mapping words to XTs" } { "word" word } }
-{ $description "Look up the word containing the specified code heap address." } ;
-
-HELP: find-xts
-{ $values { "seq" "a sequence of XTs" } { "newseq" "a sequence of words" } }
-{ $description "Translates a sequence of return addresses captured from the call stack to a sequence of words." } ;
+HELP: break
+{ $description "Suspends execution of the current thread and starts the single stepper by calling " { $link break-hook } "." } ;

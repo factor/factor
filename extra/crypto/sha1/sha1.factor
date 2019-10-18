@@ -1,6 +1,6 @@
 USING: arrays combinators crypto.common kernel io io.binary
 io.files io.streams.string math.vectors strings sequences
-namespaces math parser sequences sequences.trim vectors
+namespaces math parser sequences vectors
 hashtables ;
 IN: crypto.sha1
 
@@ -127,7 +127,7 @@ SYMBOL: K
 : file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
 
 : string>sha1-interleave ( string -- )
-    [ zero? ] ltrim*
+    [ zero? ] left-trim
     dup length odd? [ 1 tail ] when
     seq>2seq [ string>sha1 ] 2apply
     swap 2seq>seq ;

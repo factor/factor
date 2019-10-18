@@ -20,7 +20,6 @@ f swap set-vocab-source-loaded?
     "B{"
     "C:"
     "CHAR:"
-    "C{"
     "DEFER:"
     "F{"
     "FORGET:"
@@ -63,6 +62,7 @@ f swap set-vocab-source-loaded?
     "t"
     "{"
     "}"
+    "CS{"
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

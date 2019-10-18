@@ -134,11 +134,11 @@ M: indirect extended? indirect-base extended? ;
 
 : reg-code "register" word-prop 7 bitand ;
 
-: indirect-base* indirect-base [ EBP ] unless* reg-code ;
+: indirect-base* indirect-base EBP or reg-code ;
 
-: indirect-index* indirect-index [ ESP ] unless* reg-code ;
+: indirect-index* indirect-index ESP or reg-code ;
 
-: indirect-scale* indirect-scale [ 0 ] unless* ;
+: indirect-scale* indirect-scale 0 or ;
 
 GENERIC: sib-present? ( op -- ? )
 
@@ -162,35 +162,43 @@ GENERIC: modifier ( op -- n )
 
 M: indirect modifier
     dup indirect-base [
-        indirect-displacement BIN: 10 BIN: 00 ?
+        indirect-displacement {
+            { [ dup not ]      [ BIN: 00 ] }
+            { [ dup byte? ]    [ BIN: 01 ] }
+            { [ dup integer? ] [ BIN: 10 ] }
+        } cond nip
     ] [
         drop BIN: 00
     ] if ;
 
 M: register modifier drop BIN: 11 ;
 
-: mod-r/m ( reg# indirect -- byte )
-    dup modifier 6 shift rot 3 shift rot r/m bitor bitor ;
+: mod-r/m, ( reg# indirect -- )
+    dup modifier 6 shift rot 3 shift rot r/m bitor bitor , ;
 
-: sib ( indirect -- byte )
+: sib, ( indirect -- )
     dup sib-present? [
         dup indirect-base*
         over indirect-index* 3 shift bitor
-        swap indirect-scale* 6 shift bitor
+        swap indirect-scale* 6 shift bitor ,
     ] [
-        drop f
+        drop
     ] if ;
 
-GENERIC: displacement ( op -- n )
+GENERIC: displacement, ( op -- )
 
-M: indirect displacement indirect-displacement ;
+M: indirect displacement,
+    dup indirect-displacement dup [
+        swap indirect-base
+        [ dup byte? [ , ] [ 4, ] if ] [ 4, ] if
+    ] [
+        2drop
+    ] if ;
 
-M: register displacement drop f ;
+M: register displacement, drop ;
 
 : addressing ( reg# indirect -- )
-    [ mod-r/m , ] keep
-    [ sib [ , ] when* ] keep
-    displacement [ 4, ] when* ;
+    [ mod-r/m, ] keep [ sib, ] keep displacement, ;
 
 ! Utilities
 UNION: operand register indirect ;
@@ -247,9 +255,8 @@ UNION: operand register indirect ;
 : extended-opcode, ( opcode -- ) extended-opcode opcode, ;
 
 : opcode-or ( opcode mask -- opcode' )
-    over array?
-    [ 1 rot cut* first rot bitor add ]
-    [ bitor ] if ;
+    swap dup array?
+    [ 1 cut* first rot bitor add ] [ bitor ] if ;
 
 : 1-operand ( op reg rex.w opcode -- )
     #! The 'reg' is not really a register, but a value for the
@@ -424,6 +431,26 @@ M: operand IMUL2 OCT: 257 extended-opcode (2-operand) ;
     over register-16? [ BIN: 1 opcode-or ] when
     swapd
     (2-operand) ;
+
+! Conditional move
+: MOVcc ( dst src cc -- ) extended-opcode swapd (2-operand) ;
+
+: CMOVO  HEX: 40 MOVcc ;
+: CMOVNO HEX: 41 MOVcc ;
+: CMOVB  HEX: 42 MOVcc ;
+: CMOVAE HEX: 43 MOVcc ;
+: CMOVE  HEX: 44 MOVcc ; ! aka CMOVZ
+: CMOVNE HEX: 45 MOVcc ;
+: CMOVBE HEX: 46 MOVcc ;
+: CMOVA  HEX: 47 MOVcc ;
+: CMOVS  HEX: 48 MOVcc ;
+: CMOVNS HEX: 49 MOVcc ;
+: CMOVP  HEX: 4a MOVcc ;
+: CMOVNP HEX: 4b MOVcc ;
+: CMOVL  HEX: 4c MOVcc ;
+: CMOVGE HEX: 4d MOVcc ;
+: CMOVLE HEX: 4e MOVcc ;
+: CMOVG  HEX: 4f MOVcc ;
 
 ! CPU Identification
 

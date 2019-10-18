@@ -13,25 +13,28 @@ $nl
     "USING: sequences io ;"
     ""
     ": append"
-    "    #! Prints a message, then calls sequences::append."
-    "    \"foe::append calls sequences::append\" print append ;"
+    "    \"foe::append calls sequences::append\" print  append ;"
     ""
     "IN: fee"
     ""
     ": append"
-    "    #! Infinite recursion! Calls fee::append."
-    "    \"fee::append calls fee::append\" print append ;"
+    "    \"fee::append calls fee::append\" print  append ;"
     ""
+    "IN: fox"
     "USE: foe"
     ""
     ": append"
-    "    #! Redefining fee::append to call foe::append."
-    "    \"fee::append calls foe::append\" print append ;"
+    "    \"fox::append calls foe::append\" print  append ;"
     ""
+    "\"1234\" \"5678\" append print"
+    ""
+    "USE: fox"
     "\"1234\" \"5678\" append print"
 }
 "When placed in a source file and run, the above code produces the following output:"
 { $code
+    "foe::append calls sequences::append"
+    "12345678"
     "fee::append calls foe::append"
     "foe::append calls sequences::append"
     "12345678"
@@ -561,7 +564,7 @@ HELP: finish-parsing
 { $description "Records information to the current " { $link file } " and prints warnings about any removed definitions which are still in use." }
 { $notes "This is one of the factors of " { $link parse-stream } "." } ;
 
-HELP: recover-parsing
+HELP: undo-parsing
 { $description "Records information to the current " { $link file } " after an incomplete parse which ended with an error." } ;
 
 HELP: parse-stream

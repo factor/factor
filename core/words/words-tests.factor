@@ -131,3 +131,15 @@ DEFER: x
     [ ] define-temp drop
     changed-words get assoc-size =
 ] unit-test
+
+! regression
+SYMBOL: quot-uses-a
+SYMBOL: quot-uses-b
+
+quot-uses-a [ 2 3 + ] define-compound
+
+[ { + } ] [ \ quot-uses-a uses ] unit-test
+
+quot-uses-b 2 [ 3 + ] curry define-compound
+
+[ { + } ] [ \ quot-uses-b uses ] unit-test

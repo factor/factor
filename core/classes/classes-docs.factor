@@ -203,17 +203,3 @@ HELP: define-class
 { $values { "word" word } { "members" "a sequence of class words" } { "superclass" class } { "metaclass" class } }
 { $description "Sets a property indicating this word is a class word, thus making it an instance of " { $link class } ", and registers it with " { $link typemap } " and " { $link class<map } "." }
 $low-level-note ;
-
-: $predicate ( element -- )
-    { { "object" object } { "?" "a boolean" } } $values
-    [
-        "Tests if the object is an instance of the " ,
-        first "predicating" word-prop \ $link swap 2array ,
-        " class." ,
-    ] { } make $description ;
-
-M: predicate word-help* drop \ $predicate ;
-
-HELP: $predicate
-{ $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
-{ $description "Prints the boilerplate description of a class membership predicate word such as " { $link array? } " or " { $link integer? } "." } ;
